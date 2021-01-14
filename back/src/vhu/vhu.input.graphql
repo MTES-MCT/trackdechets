@@ -1,67 +1,110 @@
 input VhuFormInput {
+  "Permet d'identifier un bordereau comme brouillon. N'est plus modifiable dès qu'une signature a été apposée."
   isDraft: Boolean
 
+  "Détails sur l'émetteur"
   emitter: VhuEmitterInput
-  wasteDetails: VhuWasteDetailsInput
+
+  "Code déchet. Presque toujours 16 01 06"
+  wasteCode: String
+  "Conditionnement du déchet"
+  packaging: VhuPackaging
+  "Identification des VHUs"
+  identification: VhuIdentificationInput
+  "Quantité de VHUs"
+  quantity: VhuQuantityInput
+
+  "Détails sur la destination"
   recipient: VhuRecipientInput
+  "Détails sur le transporteur"
   transporter: VhuTransporterInput
 }
 
 input VhuEmitterInput {
-  agreement: String
-  validityLimit: DateTime
+  "Numéro d'agrément émetteur"
+  agrementNumber: String
 
+  "Coordonnées de l'entreprise émétrice"
   company: CompanyInput
 }
 
-input VhuWasteDetailsInput {
-  packagingType: VhuPackagingType
-  identificationNumbers: [String]
-  identificationType: VhuIdentificationType
-  quantity: Float
-  quantityUnit: VhuQuantityUnit
+input VhuIdentificationInput {
+  "Numéros d'identification"
+  numbers: [String]
+  "Type de numéros d'indentification"
+  type: VhuIdentificationType
+}
+
+input VhuQuantityInput {
+  "Quantité en nombre (nombre de lots ou nombre de numéros d'ordre)"
+  number: Int
+  "Quantité en tonnes"
+  tons: Float
 }
 
 input VhuRecipientInput {
-  plannedOperation: String
-  agreement: String
-  validityLimit: DateTime
+  "Type de receveur: broyeur ou second centre VHU"
+  type: VhuRecipientType
+  "Numéro d'agrément de receveur"
+  agrementNumber: String
+  "Coordonnées de l'entreprise qui recoit les déchets"
   company: CompanyInput
 
+  "Informations d'acceptation"
   acceptance: VhuAcceptanceInput
+  "Informations sur l'opétation de traitement"
   operation: VhuOperationInput
+
+  "Destination utérieure prévue, dans le cas d'un second centre VHU"
+  plannedBroyeurCompany: CompanyInput
 }
 
 input VhuAcceptanceInput {
+  "Quantité réelle reçue"
   quantity: Float
+  "Status d'acceptation du déchet"
   status: WasteAcceptationStatusInput
+  "Raison du refus du déchet, dans le cas d'un refus"
   refusalReason: String
+  "Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)"
+  identification: VhuIdentificationInput
 }
 
 input VhuOperationInput {
+  "Opération de traitement prévue"
   planned: String
+  "Opération de traitement réalisée"
   done: String
 }
 
 input VhuTransporterInput {
-  agreement: String
-  receipt: String
+  "Coordonnées de l'entreprise de transport"
+  company: CompanyInput
+  "Numéro de TVA intracommunautaire, dans le cas d'un transporteur étranger"
+  tvaIntracommunautaire: String
+  "Récépissé transporteur"
+  recepisse: VhuRecepisseInput
+}
+
+input VhuRecepisseInput {
+  number: String
   department: String
   validityLimit: DateTime
-  transportType: String
-
-  company: CompanyInput
 }
 
 input VhuSignatureInput {
+  "Type de signature apposé"
   type: SignatureTypeInput!
-  signedAt: DateTime
-  signedBy: String!
+  "Date de la signature"
+  date: DateTime
+  "Nom et prénom du signataire"
+  author: String!
+  "Code de sécurité de l'entreprise pour laquelle on signe. Permet de signer en tant que. Optionnel"
+  securityCode: Int
 }
 
 enum SignatureTypeInput {
-  SENT
-  TRANSPORT
-  ACCEPTANCE
-  OPERATION
+  EMITTER
+  TRANSPORTER
+  RECIPIENT
 }

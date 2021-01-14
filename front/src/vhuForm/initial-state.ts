@@ -1,26 +1,35 @@
 import { initialCompany } from "form/initial-state";
 
 export default {
-  emitter: { company: initialCompany, agreement: "", validityLimit: null },
-  recipient: {
+  isDraft: true,
+  emitter: {
     company: initialCompany,
-    agreement: "",
-    validityLimit: null,
-    operation: { planned: "" },
+    agrementNumber: "",
   },
-  wasteDetails: {
-    packagingType: "UNIT",
-    identificationNumbers: [],
-    identificationType: "VHU_NUMBER",
-    quantity: null,
-    quantityUnit: "NUMBER",
+  recipient: {
+    type: "BROYEUR",
+    company: initialCompany,
+    agrementNumber: "",
+    operation: { planned: "R 4" },
+    plannedBroyeurCompany: initialCompany,
+  },
+  packaging: "UNITE",
+  wasteCode: "16 01 06",
+  identification: {
+    numbers: [],
+    type: "NUMERO_ORDRE_REGISTRE_POLICE",
+  },
+  quantity: {
+    number: null,
+    tons: null,
   },
   transporter: {
-    agreement: "",
     company: initialCompany,
-    receipt: "",
-    department: "",
-    validityLimit: null,
-    transportType: "",
+    tvaIntracommunautaire: "",
+    recepisse: {
+      number: "",
+      department: "",
+      validityLimit: null,
+    },
   },
 };

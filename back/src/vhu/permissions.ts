@@ -1,6 +1,6 @@
 import { User, VhuForm } from "@prisma/client";
-import { NotFormContributor } from "src/forms/errors";
-import { getFullUser } from "src/users/database";
+import { NotFormContributor } from "../forms/errors";
+import { getFullUser } from "../users/database";
 
 export async function checkIsFormContributor(
   user: User,

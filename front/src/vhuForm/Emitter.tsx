@@ -1,33 +1,48 @@
 import { RedErrorMessage } from "common/components";
 import CompanySelector from "form/company/CompanySelector";
-import DateInput from "form/custom-inputs/DateInput";
-import { Field } from "formik";
+import { Field, useFormikContext } from "formik";
 import React from "react";
 
-export default function Emitter() {
+export default function Emitter({ disabled }) {
+  const { setFieldValue } = useFormikContext();
+
   return (
     <>
+      {disabled && (
+        <div className="notification notification--error">
+          Les champs ci-dessous ont été scéllés via signature et ne sont plus
+          modifiables.
+        </div>
+      )}
+      <CompanySelector
+        disabled={disabled}
+        name="emitter.company"
+        heading="Entreprise émettrice"
+        onCompanySelected={emitter => {
+          if (emitter.vhuAgrementDemolisseur) {
+            setFieldValue(
+              "emitter.agrementNumber",
+              emitter.vhuAgrementDemolisseur.agrementNumber
+            );
+          } else {
+            setFieldValue("emitter.agrementNumber", "");
+          }
+        }}
+      />
+
       <div className="form__row">
         <label>
-          Agréément
-          <Field type="text" name="emitter.agreement" className="td-input" />
-        </label>
-
-        <RedErrorMessage name="emitter.receipt" />
-
-        <label>
-          Limite de validité (optionnel)
+          Numéro d'agrément
           <Field
-            component={DateInput}
-            name="emitter.validityLimit"
-            className={`td-input`}
+            disabled={disabled}
+            type="text"
+            name="emitter.agrementNumber"
+            className="td-input"
           />
         </label>
 
-        <RedErrorMessage name="emitter.validityLimit" />
+        <RedErrorMessage name="emitter.agrementNumber" />
       </div>
-
-      <CompanySelector name="emitter.company" heading="Entreprise émettrice" />
     </>
   );
 }

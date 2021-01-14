@@ -1,5 +1,5 @@
-import { FormNotFound } from "src/forms/errors";
-import prisma from "src/prisma";
+import { FormNotFound } from "../forms/errors";
+import prisma from "../prisma";
 
 export async function getFormOrFormNotFound(id: string) {
   const form = await prisma.vhuForm.findUnique({

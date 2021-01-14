@@ -36,7 +36,9 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     address,
     companyTypes,
     transporterReceiptId,
-    traderReceiptId
+    traderReceiptId,
+    vhuAgrementDemolisseurId,
+    vhuAgrementBroyeurId
   } = companyInput;
   const ecoOrganismeAgreements =
     companyInput.ecoOrganismeAgreements?.map(a => a.href) || [];
@@ -109,6 +111,18 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   if (!!traderReceiptId) {
     companyCreateInput.traderReceipt = {
       connect: { id: traderReceiptId }
+    };
+  }
+
+  if (!!vhuAgrementDemolisseurId) {
+    companyCreateInput.vhuAgrementDemolisseur = {
+      connect: { id: vhuAgrementDemolisseurId }
+    };
+  }
+
+  if (!!vhuAgrementBroyeurId) {
+    companyCreateInput.vhuAgrementBroyeur = {
+      connect: { id: vhuAgrementBroyeurId }
     };
   }
 

@@ -1,5 +1,6 @@
 NODE_ENV=test
 DATABASE_URL=postgresql://test:no_pass@postgres:5432/prisma?schema=default$default
+REDIS_URL=redis://redis:6379
 JWT_SECRET=any_secret
 SESSION_SECRET=any_secret
 API_TOKEN_SECRET=any_secret

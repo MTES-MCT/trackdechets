@@ -1,22 +1,45 @@
 import {
   MutationResolvers,
-  QueryResolvers
+  QueryResolvers,
+  BordereauVhuMutationResolvers,
+  BordereauVhuQueryResolvers
 } from "../../generated/graphql/types";
 
-import vhuForm from "./queries/form";
-import createVhuForm from "./mutations/create";
-import editVhuForm from "./mutations/edit";
-import signVhuForm from "./mutations/sign";
+import findUnique from "./queries/findUnique";
+import findMany from "./queries/findMany";
+import pdf from "./queries/pdf";
+import create from "./mutations/create";
+import update from "./mutations/update";
+import sign from "./mutations/sign";
+import duplicate from "./mutations/duplicate";
 
 const Query: QueryResolvers = {
-  vhuForm
-  //vhuForms
+  bordereauVhu: () => ({
+    findUnique: null,
+    findMany: null,
+    pdf: null
+  })
 };
-
 const Mutation: MutationResolvers = {
-  createVhuForm,
-  editVhuForm,
-  signVhuForm
+  bordereauVhu: () => ({
+    create: null,
+    update: null,
+    sign: null,
+    duplicate: null
+  })
 };
 
-export default { Query, Mutation };
+const BordereauVhuQuery: BordereauVhuQueryResolvers = {
+  findUnique,
+  findMany,
+  pdf
+};
+
+const BordereauVhuMutation: BordereauVhuMutationResolvers = {
+  create,
+  update,
+  sign,
+  duplicate
+};
+
+export default { Query, Mutation, BordereauVhuMutation, BordereauVhuQuery };

@@ -1,19 +1,20 @@
-import { checkIsAuthenticated } from "src/common/permissions";
-import { MutationCreateVhuFormArgs } from "src/generated/graphql/types";
-import prisma from "src/prisma";
-import { GraphQLContext } from "src/types";
-import { expandVhuFormFromDb, flattenVhuInput } from "src/vhu/converter";
-import { checkIsFormContributor } from "src/vhu/permissions";
-import { validateVhuForm } from "src/vhu/validation";
+import { checkIsAuthenticated } from "../../../common/permissions";
+import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
+import { BordereauVhuMutationCreateArgs } from "../../../generated/graphql/types";
+import prisma from "../../../prisma";
+import { GraphQLContext } from "../../../types";
+import { expandVhuFormFromDb, flattenVhuInput } from "../../converter";
+import { checkIsFormContributor } from "../../permissions";
+import { validateVhuForm } from "../../validation";
 
-export default async function createVhuForm(
+export default async function create(
   _,
-  { vhuFormInput }: MutationCreateVhuFormArgs,
+  { input }: BordereauVhuMutationCreateArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
 
-  const form = flattenVhuInput(vhuFormInput);
+  const form = flattenVhuInput(input);
   await checkIsFormContributor(
     user,
     form,
@@ -23,7 +24,7 @@ export default async function createVhuForm(
   await validateVhuForm(form, {});
 
   const newForm = await prisma.vhuForm.create({
-    data: { ...form, owner: { connect: { id: user.id } } }
+    data: { ...form, readableId: getReadableId(ReadableIdPrefix.VHU) }
   });
 
   // TODO Status log ?

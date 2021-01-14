@@ -23,3 +23,9 @@ export class TransporterReceiptNotFound extends UserInputError {
     super(`Ce récépissé transporteur n'existe pas`);
   }
 }
+
+export class VhuAgrementNotFound extends UserInputError {
+  constructor() {
+    super(`Cet agrément VHU n'existe pas`);
+  }
+}

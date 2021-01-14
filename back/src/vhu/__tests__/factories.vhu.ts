@@ -1,30 +1,23 @@
-import {
-  IdentificationType,
-  PackagingType,
-  Prisma,
-  VhuQuantityUnit
-} from "@prisma/client";
-import prisma from "src/prisma";
+import { VhuIdentificationType, VhuPackaging, Prisma } from "@prisma/client";
+import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
+import prisma from "../../prisma";
 
 export const vhuFormFactory = async ({
-  ownerId,
   opt = {}
 }: {
-  ownerId: string;
   opt?: Partial<Prisma.VhuFormCreateInput>;
 }) => {
   const formParams = { ...vhuFormdata, ...opt };
   return prisma.vhuForm.create({
     data: {
-      ...formParams,
-      owner: { connect: { id: ownerId } }
+      ...formParams
     }
   });
 };
 
 const vhuFormdata = {
-  emitterAgreement: "agreement",
-  emitterValidityLimit: "2019-11-27T00:00:00.000Z",
+  readableId: getReadableId(ReadableIdPrefix.VHU),
+  emitterAgrementNumber: "agrement",
   emitterCompanyName: "emitter company",
   emitterCompanySiret: "15397456982146",
   emitterCompanyAddress: "20 Avenue de l'Emitter, Emitter City",
@@ -33,8 +26,7 @@ const vhuFormdata = {
   emitterCompanyMail: "recipient@td.io",
 
   recipientOperationPlanned: "R 4",
-  recipientAgreement: "agreement recipient",
-  recipientValidityLimit: "2019-11-27T00:00:00.000Z",
+  recipientAgrementNumber: "agrement recipient",
   recipientCompanyName: "I reveive waste INC",
   recipientCompanySiret: "13254678974589",
   recipientCompanyAddress: "14 boulevard Recipient, Recipient City",
@@ -42,23 +34,21 @@ const vhuFormdata = {
   recipientCompanyPhone: "05 05 05 05 05",
   recipientCompanyMail: "recipient@td.io",
 
-  wasteDetailsPackagingType: "UNIT" as PackagingType,
-  wasteDetailsIdentificationNumbers: ["1", "2", "3"],
-  wasteDetailsIdentificationType: "VHU_NUMBER" as IdentificationType,
-  wasteDetailsQuantity: 2,
-  wasteDetailsQuantityUnit: "TON" as VhuQuantityUnit,
+  packaging: "UNITE" as VhuPackaging,
+  identificationNumbers: ["1", "2", "3"],
+  identificationType: "NUMERO_ORDRE_REGISTRE_POLICE" as VhuIdentificationType,
+  quantityNumber: 2,
+  quantityTons: 1.4,
 
-  transporterAgreement: "agreement transport",
   transporterCompanyName: "Transport facile",
   transporterCompanySiret: "12345678974589",
   transporterCompanyAddress: "12 route du Transporter, Transporter City",
   transporterCompanyContact: "Henri Transport",
   transporterCompanyPhone: "06 06 06 06 06",
   transporterCompanyMail: "transporter@td.io",
-  transporterReceipt: "a receipt",
-  transporterDepartment: "83",
-  transporterValidityLimit: "2019-11-27T00:00:00.000Z",
-  transporterTransportType: "Camion pardi",
+  transporterRecepisseNumber: "a receipt",
+  transporterRecepisseDepartment: "83",
+  transporterRecepisseValidityLimit: "2019-11-27T00:00:00.000Z",
 
   recipientAcceptanceQuantity: null,
   recipientAcceptanceStatus: null,

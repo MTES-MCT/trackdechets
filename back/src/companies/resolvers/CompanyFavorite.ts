@@ -13,6 +13,16 @@ const companyFavoriteResolvers: CompanyFavoriteResolvers = {
       .findUnique({ where: { siret: parent.siret } })
       .traderReceipt();
     return traderReceipt;
+  },
+  vhuAgrementBroyeur: parent => {
+    return prisma.company
+      .findUnique({ where: { siret: parent.siret } })
+      .vhuAgrementBroyeur();
+  },
+  vhuAgrementDemolisseur: parent => {
+    return prisma.company
+      .findUnique({ where: { siret: parent.siret } })
+      .vhuAgrementDemolisseur();
   }
 };
 

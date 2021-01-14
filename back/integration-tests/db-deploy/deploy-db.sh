@@ -5,7 +5,7 @@ psql_container_id=$(docker ps -qf "name=integration_postgres")
 api_container_id=$(docker ps -qf "name=integration_td-api")
 
 # Wait for psql to be ready
-until PGPASSWORD="no_pass" docker exec -t $psql_container_id bash -c "psql -U \"test\" -c '\q'" 2>/dev/null; do
+until PGPASSWORD="no_pass" docker exec -t $psql_container_id bash -c "psql -U \"test\" -c '\q' 2>/dev/null"; do
   >&2 echo "⏳ Postgres is unavailable - sleeping"
   sleep 1
 done

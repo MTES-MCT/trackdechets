@@ -13,13 +13,36 @@ export default function FormContainer() {
     <main className="main">
       <div className="container">
         <StepList formId={id}>
-          <StepContainer component={Emitter} title="Émetteur du déchet" />
-          <StepContainer component={WasteInfo} title="Détail du déchet" />
-          <StepContainer component={Recipient} title="Destination du déchet" />
-          <StepContainer
-            component={Transporter}
-            title="Transporteur du déchet"
-          />
+          {vhuForm => {
+            const emitterSigned = vhuForm?.emitter?.signature?.author != null;
+            const transporterSigned =
+              vhuForm?.transporter?.signature?.author != null;
+
+            return (
+              <>
+                <StepContainer
+                  component={Emitter}
+                  title="Émetteur du déchet"
+                  disabled={emitterSigned}
+                />
+                <StepContainer
+                  component={WasteInfo}
+                  title="Détail du déchet"
+                  disabled={emitterSigned}
+                />
+                <StepContainer
+                  component={Recipient}
+                  title="Destination du déchet"
+                  disabled={emitterSigned}
+                />
+                <StepContainer
+                  component={Transporter}
+                  title="Transporteur du déchet"
+                  disabled={transporterSigned}
+                />
+              </>
+            );
+          }}
         </StepList>
       </div>
     </main>

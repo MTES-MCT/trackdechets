@@ -1,21 +1,28 @@
-import { isObject } from "src/forms/workflow/diff";
+import { VhuForm as PrismaVhuForm } from "@prisma/client";
+import { isObject, objectDiff } from "../forms/workflow/diff";
 import {
+  FormCompany,
   Signature,
   VhuForm as GqlVhuForm,
-  VhuFormInput
-} from "src/generated/graphql/types";
-import { VhuForm as PrismaVhuForm } from "@prisma/client";
+  VhuFormInput,
+  VhuIdentification,
+  VhuQuantity,
+  VhuRecepisse
+} from "../generated/graphql/types";
+import { expandVhuFormFromDb } from "./converter";
 
 // Cannot extend object otherwise we have problems with arrays
 // This way works with nested (on several levels) objects
 type InternalRules<T, V> = {
-  [K in keyof T]: T[K] extends { [subKey: string]: unknown }
+  [K in keyof Required<Omit<T, "__typename">>]: T[K] extends {
+    [subKey: string]: unknown;
+  }
     ? InternalRules<T[K], V>
     : ((item: V) => boolean) | boolean;
 };
 
 function getNestedKey(obj: any, keys: string[]) {
-  return keys.reduce((prev, cur) => prev[cur], obj);
+  return keys.reduce((prev, cur) => prev?.[cur], obj);
 }
 
 /**
@@ -28,44 +35,78 @@ function getNestedKey(obj: any, keys: string[]) {
  */
 export function getNotEditableKeys(
   updates: VhuFormInput,
-  currentForm: PrismaVhuForm,
+  currentForm: PrismaVhuForm
+) {
+  // Calculate diff between the update & the current form
+  // We allow reposting fields if they are not modified
+  const diffInput = getDiffInput(updates, currentForm);
+
+  return recursiveGetNotEditableKeys(diffInput, currentForm);
+}
+
+export function recursiveGetNotEditableKeys(
+  updates: VhuFormInput,
+  currentPrismaForm: PrismaVhuForm,
   prevKeys: string[] = []
 ): string[] {
   return Object.keys(updates)
     .map(key => {
       const keysList = [...prevKeys, key];
       if (isObject(updates[key])) {
-        return getNotEditableKeys(updates[key], currentForm, keysList);
+        return recursiveGetNotEditableKeys(
+          updates[key],
+          currentPrismaForm,
+          keysList
+        );
       }
 
       const rule = getNestedKey(vhuFormRules, keysList);
-      return rule(currentForm) ? null : keysList.join(".");
+      return rule(currentPrismaForm) ? null : keysList.join(".");
     })
     .flat()
     .filter(Boolean);
 }
 
+function getDiffInput(updates: VhuFormInput, currentForm: PrismaVhuForm) {
+  const prismaForm = expandVhuFormFromDb(currentForm);
+  return objectDiff(prismaForm, updates);
+}
+
 const signatureRule: InternalRules<Signature, PrismaVhuForm> = {
-  signedAt: false,
-  signedBy: false
+  author: false,
+  date: false
 };
 
-const getCompanyRule = (field: keyof PrismaVhuForm) => {
-  const rule = item => item[field] != null;
+const companyKeys: Array<keyof FormCompany> = [
+  "address",
+  "contact",
+  "country",
+  "mail",
+  "name",
+  "phone",
+  "siret"
+];
 
-  return {
-    address: rule,
-    contact: rule,
-    country: rule,
-    mail: rule,
-    name: rule,
-    phone: rule,
-    siret: rule
-  };
-};
+const identificationKeys: Array<keyof VhuIdentification> = ["numbers", "type"];
+const quantityKeys: Array<keyof VhuQuantity> = ["number", "tons"];
+const recepisseKeys: Array<keyof VhuRecepisse> = [
+  "number",
+  "validityLimit",
+  "department"
+];
 
-const nullFieldRule = (field: keyof PrismaVhuForm) => (item: PrismaVhuForm) =>
-  item[field] == null;
+function nullFieldRule(field: keyof PrismaVhuForm) {
+  return (item: PrismaVhuForm) => item[field] == null;
+}
+
+function globalNullFieldRule<Type>(keys: string[], field: keyof PrismaVhuForm) {
+  const rule = item => item[field] == null;
+
+  return keys.reduce((prev, cur) => {
+    prev[cur] = rule;
+    return prev;
+  }, {} as Type);
+}
 
 /**
  * Each field returns true if it can be edited, false otherwise.
@@ -75,45 +116,53 @@ const vhuFormRules: InternalRules<GqlVhuForm, PrismaVhuForm> = {
   createdAt: false,
   updatedAt: false,
   isDeleted: false,
+  status: false,
+  readableId: false,
   isDraft: item =>
     [
-      item.emitterSignatureId,
-      item.recipientOperationSignatureId,
-      item.recipientAcceptanceSignatureId,
-      item.transporterSignatureId
+      item.emitterSignatureDate,
+      item.recipientSignatureDate,
+      item.transporterSignatureDate
     ].every(s => s == null),
   emitter: {
-    agreement: nullFieldRule("emitterSignatureId"),
+    agrementNumber: nullFieldRule("emitterSignatureDate"),
     signature: signatureRule,
-    validityLimit: nullFieldRule("emitterSignatureId"),
-    company: getCompanyRule("emitterSignatureId")
+    company: globalNullFieldRule(companyKeys, "emitterSignatureDate")
   },
   recipient: {
+    type: nullFieldRule("emitterSignatureDate"),
     acceptance: {
-      status: nullFieldRule("recipientAcceptanceSignatureId")
+      refusalReason: nullFieldRule("recipientSignatureDate"),
+      status: nullFieldRule("recipientSignatureDate"),
+      quantity: nullFieldRule("recipientSignatureDate"),
+      identification: globalNullFieldRule(
+        identificationKeys,
+        "recipientSignatureDate"
+      )
     },
     operation: {
-      done: nullFieldRule("recipientOperationSignatureId"),
-      planned: nullFieldRule("emitterSignatureId")
+      done: nullFieldRule("recipientSignatureDate"),
+      planned: nullFieldRule("emitterSignatureDate")
     },
-    agreement: nullFieldRule("recipientAcceptanceSignatureId"),
-    company: getCompanyRule("recipientAcceptanceSignatureId"),
-    validityLimit: nullFieldRule("recipientAcceptanceSignatureId")
+    agrementNumber: nullFieldRule("recipientSignatureDate"),
+    company: globalNullFieldRule(companyKeys, "recipientSignatureDate"),
+    plannedBroyeurCompany: globalNullFieldRule(
+      companyKeys,
+      "recipientSignatureDate"
+    ),
+    signature: signatureRule
   },
-  wasteDetails: {
-    identificationNumbers: nullFieldRule("emitterSignatureId"),
-    identificationType: nullFieldRule("emitterSignatureId"),
-    packagingType: nullFieldRule("emitterSignatureId"),
-    quantity: nullFieldRule("emitterSignatureId"),
-    quantityUnit: nullFieldRule("emitterSignatureId")
-  },
+  packaging: nullFieldRule("emitterSignatureDate"),
+  identification: globalNullFieldRule(
+    identificationKeys,
+    "emitterSignatureDate"
+  ),
+  wasteCode: nullFieldRule("emitterSignatureDate"),
+  quantity: globalNullFieldRule(quantityKeys, "emitterSignatureDate"),
   transporter: {
-    agreement: nullFieldRule("transporterSignatureId"),
-    company: getCompanyRule("transporterSignatureId"),
-    department: nullFieldRule("transporterSignatureId"),
-    receipt: nullFieldRule("transporterSignatureId"),
-    signature: signatureRule,
-    transportType: nullFieldRule("transporterSignatureId"),
-    validityLimit: nullFieldRule("transporterSignatureId")
+    company: globalNullFieldRule(companyKeys, "transporterSignatureDate"),
+    tvaIntracommunautaire: nullFieldRule("transporterSignatureDate"),
+    recepisse: globalNullFieldRule(recepisseKeys, "transporterSignatureDate"),
+    signature: signatureRule
   }
 };

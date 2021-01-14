@@ -19,6 +19,12 @@ export const FAVORITES = gql`
         validityLimit
         department
       }
+      vhuAgrementDemolisseur {
+        agrementNumber
+      }
+      vhuAgrementBroyeur {
+        agrementNumber
+      }
     }
   }
 `;
@@ -74,6 +80,14 @@ export const SEARCH_COMPANIES = gql`
       traderReceipt {
         receiptNumber
         validityLimit
+        department
+      }
+      vhuAgrementDemolisseur {
+        agrementNumber
+        department
+      }
+      vhuAgrementBroyeur {
+        agrementNumber
         department
       }
     }

@@ -1,4 +1,4 @@
-import { FieldArray, useField } from "formik";
+import { FieldArray, FieldArrayRenderProps, useField } from "formik";
 import React, { useRef } from "react";
 import "./TagsInput.scss";
 
@@ -8,7 +8,7 @@ export default function TagsInput(props) {
 
   function onInputKeyDown(
     e: React.KeyboardEvent<HTMLInputElement>,
-    arrayHelpers
+    arrayHelpers: FieldArrayRenderProps
   ) {
     e.stopPropagation();
 
@@ -40,7 +40,7 @@ export default function TagsInput(props) {
                 {tag}
                 <button
                   type="button"
-                  onClick={() => arrayHelpers.remove(index)}
+                  onClick={() => !props.disabled && arrayHelpers.remove(index)}
                 >
                   +
                 </button>
@@ -51,6 +51,7 @@ export default function TagsInput(props) {
                 type="text"
                 onKeyDown={e => onInputKeyDown(e, arrayHelpers)}
                 ref={inputContainer}
+                disabled={props.disabled}
               />
             </li>
           </ul>

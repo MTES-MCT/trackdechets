@@ -32,6 +32,7 @@ const Signup = lazy(() => import("login/Signup"));
 const Dialog = lazy(() => import("oauth2/Dialog"));
 const Company = lazy(() => import("company/Company"));
 const WasteTree = lazy(() => import("search/WasteTree"));
+const Pdf = lazy(() => import("vhuForm/pdf/pdf"));
 
 const GET_ME = gql`
   query GetMe {
@@ -82,6 +83,14 @@ export default withRouter(function LayoutContainer({ history }) {
           isAuthenticated={isAuthenticated}
         >
           <Dialog />
+        </PrivateRoute>
+
+        <PrivateRoute
+          exact
+          path={routes.dashboard.slips.vhu.pdf}
+          isAuthenticated={isAuthenticated}
+        >
+          <Pdf />
         </PrivateRoute>
 
         <Route>

@@ -1,14 +1,18 @@
-import { chain, nullIfNoValues, safeInput } from "src/forms/form-converter";
+import { chain, nullIfNoValues, safeInput } from "../forms/form-converter";
 import {
   FormCompany,
+  Signature,
   VhuEmitter,
   VhuForm as GraphqlVhuForm,
+  VhuFormInput,
+  VhuIdentification,
+  VhuQuantity,
+  VhuRecepisse,
   VhuRecipient,
   VhuRecipientAcceptance,
   VhuRecipientOperation,
-  VhuTransporter,
-  VhuWasteDetails
-} from "src/generated/graphql/types";
+  VhuTransporter
+} from "../generated/graphql/types";
 import {
   Prisma,
   VhuForm as PrismaVhuForm,
@@ -18,14 +22,14 @@ import {
 export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
   return {
     id: form.id,
-    createdAt: form.createdAt.toISOString(),
-    updatedAt: form.updatedAt.toISOString(),
+    createdAt: form.createdAt,
+    updatedAt: form.updatedAt,
     isDeleted: form.isDeleted,
     isDraft: form.isDraft,
-
+    status: form.status,
+    readableId: form.readableId,
     emitter: nullIfNoValues<VhuEmitter>({
-      agreement: form.emitterAgreement,
-      validityLimit: form.emitterValidityLimit?.toISOString(),
+      agrementNumber: form.emitterAgrementNumber,
       company: nullIfNoValues<FormCompany>({
         name: form.emitterCompanyName,
         siret: form.emitterCompanySiret,
@@ -34,18 +38,24 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         phone: form.emitterCompanyPhone,
         mail: form.emitterCompanyMail
       }),
-      signature: null
+      signature: nullIfNoValues<Signature>({
+        author: form.emitterSignatureAuthor,
+        date: form.emitterSignatureDate
+      })
     }),
-    wasteDetails: nullIfNoValues<VhuWasteDetails>({
-      packagingType: form.wasteDetailsPackagingType,
-      identificationNumbers: form.wasteDetailsIdentificationNumbers,
-      identificationType: form.wasteDetailsIdentificationType,
-      quantity: form.wasteDetailsQuantity,
-      quantityUnit: form.wasteDetailsQuantityUnit
+    packaging: form.packaging,
+    wasteCode: form.wasteCode,
+    identification: nullIfNoValues<VhuIdentification>({
+      numbers: form.identificationNumbers,
+      type: form.identificationType
+    }),
+    quantity: nullIfNoValues<VhuQuantity>({
+      number: form.quantityNumber,
+      tons: form.quantityTons
     }),
     recipient: nullIfNoValues<VhuRecipient>({
-      agreement: form.recipientAgreement,
-      validityLimit: form.recipientValidityLimit?.toISOString(),
+      type: form.recipientType,
+      agrementNumber: form.recipientAgrementNumber,
       company: nullIfNoValues<FormCompany>({
         name: form.recipientCompanyName,
         siret: form.recipientCompanySiret,
@@ -58,20 +68,30 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         quantity: form.recipientAcceptanceQuantity,
         status: form.recipientAcceptanceStatus,
         refusalReason: form.recipientAcceptanceRefusalReason,
-        signature: null
+        identification: nullIfNoValues<VhuIdentification>({
+          numbers: form.recipientAcceptanceIdentificationNumbers,
+          type: form.recipientAcceptanceIdentificationType
+        })
       }),
       operation: nullIfNoValues<VhuRecipientOperation>({
         planned: form.recipientOperationPlanned,
-        done: form.recipientOperationDone,
-        signature: null
+        done: form.recipientOperationDone
+      }),
+      plannedBroyeurCompany: nullIfNoValues<FormCompany>({
+        name: form.recipientPlannedBroyeurCompanyName,
+        siret: form.recipientPlannedBroyeurCompanySiret,
+        address: form.recipientPlannedBroyeurCompanyAddress,
+        contact: form.recipientPlannedBroyeurCompanyContact,
+        phone: form.recipientPlannedBroyeurCompanyPhone,
+        mail: form.recipientPlannedBroyeurCompanyMail
+      }),
+      signature: nullIfNoValues<Signature>({
+        author: form.recipientSignatureAuthor,
+        date: form.recipientSignatureDate
       })
     }),
     transporter: nullIfNoValues<VhuTransporter>({
-      agreement: form.transporterAgreement,
-      receipt: form.transporterReceipt,
-      department: form.transporterDepartment,
-      validityLimit: form.transporterValidityLimit?.toISOString(),
-      transportType: form.transporterTransportType,
+      tvaIntracommunautaire: form.transporterTvaIntracommunautaire,
       company: nullIfNoValues<FormCompany>({
         name: form.transporterCompanyName,
         siret: form.transporterCompanySiret,
@@ -80,25 +100,37 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         phone: form.transporterCompanyPhone,
         mail: form.transporterCompanyMail
       }),
-      signature: null
+      recepisse: nullIfNoValues<VhuRecepisse>({
+        number: form.transporterRecepisseNumber,
+        department: form.transporterRecepisseDepartment,
+        validityLimit: form.transporterRecepisseValidityLimit
+      }),
+      signature: nullIfNoValues<Signature>({
+        author: form.transporterSignatureAuthor,
+        date: form.transporterSignatureDate
+      })
     })
   };
 }
 
-export function flattenVhuInput(formInput): Partial<Prisma.VhuFormCreateInput> {
+export function flattenVhuInput(
+  formInput: VhuFormInput
+): Partial<Prisma.VhuFormCreateInput> {
   return safeInput({
     isDraft: formInput.isDraft,
     ...flattenVhuEmitterInput(formInput),
     ...flattenVhuRecipientInput(formInput),
     ...flattenVhuTransporterInput(formInput),
-    ...flattenVhuWasteDetailsInput(formInput)
+    packaging: chain(formInput, f => f.packaging),
+    wasteCode: chain(formInput, f => f.wasteCode),
+    ...flattenVhuIdentificationInput(formInput),
+    ...flattenVhuQuantityInput(formInput)
   });
 }
 
 function flattenVhuEmitterInput({ emitter }: Pick<GraphqlVhuForm, "emitter">) {
   return {
-    emitterAgreement: chain(emitter, e => e.agreement),
-    emitterValidityLimit: chain(emitter, e => e.validityLimit),
+    emitterAgrementNumber: chain(emitter, e => e.agrementNumber),
     emitterCompanyName: chain(emitter, e => chain(e.company, c => c.name)),
     emitterCompanySiret: chain(emitter, e => chain(e.company, c => c.siret)),
     emitterCompanyAddress: chain(emitter, e =>
@@ -116,8 +148,8 @@ function flattenVhuRecipientInput({
   recipient
 }: Pick<GraphqlVhuForm, "recipient">) {
   return {
-    recipientAgreement: chain(recipient, r => r.agreement),
-    recipientValidityLimit: chain(recipient, r => r.validityLimit),
+    recipientType: chain(recipient, r => r.type),
+    recipientAgrementNumber: chain(recipient, r => r.agrementNumber),
     recipientCompanyName: chain(recipient, r => chain(r.company, c => c.name)),
     recipientCompanySiret: chain(recipient, r =>
       chain(r.company, c => c.siret)
@@ -146,6 +178,24 @@ function flattenVhuRecipientInput({
     ),
     recipientOperationDone: chain(recipient, r =>
       chain(r.operation, o => o.done)
+    ),
+    recipientPlannedBroyeurCompanyName: chain(recipient, r =>
+      chain(r.plannedBroyeurCompany, c => c.name)
+    ),
+    recipientPlannedBroyeurCompanySiret: chain(recipient, r =>
+      chain(r.plannedBroyeurCompany, c => c.siret)
+    ),
+    recipientPlannedBroyeurCompanyAddress: chain(recipient, r =>
+      chain(r.plannedBroyeurCompany, c => c.address)
+    ),
+    recipientPlannedBroyeurCompanyContact: chain(recipient, r =>
+      chain(r.plannedBroyeurCompany, c => c.contact)
+    ),
+    recipientPlannedBroyeurCompanyPhone: chain(recipient, r =>
+      chain(r.plannedBroyeurCompany, c => c.phone)
+    ),
+    recipientPlannedBroyeurCompanyMail: chain(recipient, r =>
+      chain(r.plannedBroyeurCompany, c => c.mail)
     )
   };
 }
@@ -154,7 +204,6 @@ function flattenVhuTransporterInput({
   transporter
 }: Pick<GraphqlVhuForm, "transporter">) {
   return {
-    transporterAgreement: chain(transporter, t => t.agreement),
     transporterCompanyName: chain(transporter, t =>
       chain(t.company, c => c.name)
     ),
@@ -173,27 +222,36 @@ function flattenVhuTransporterInput({
     transporterCompanyMail: chain(transporter, t =>
       chain(t.company, c => c.mail)
     ),
-    transporterReceipt: chain(transporter, t => t.receipt),
-    transporterDepartment: chain(transporter, t => t.department),
-    transporterValidityLimit: chain(transporter, t => t.validityLimit),
-    transporterTransportType: chain(transporter, t => t.transportType)
+    transporterRecepisseNumber: chain(transporter, t =>
+      chain(t.recepisse, r => r.number)
+    ),
+    transporterRecepisseDepartment: chain(transporter, t =>
+      chain(t.recepisse, r => r.department)
+    ),
+    transporterRecepisseValidityLimit: chain(transporter, t =>
+      chain(t.recepisse, r => r.validityLimit)
+    ),
+    transporterTvaIntracommunautaire: chain(
+      transporter,
+      t => t.tvaIntracommunautaire
+    )
   };
 }
 
-function flattenVhuWasteDetailsInput({
-  wasteDetails
-}: Pick<GraphqlVhuForm, "wasteDetails">) {
+function flattenVhuIdentificationInput({
+  identification
+}: Pick<GraphqlVhuForm, "identification">) {
   return {
-    wasteDetailsPackagingType: chain(wasteDetails, w => w.packagingType),
-    wasteDetailsIdentificationNumbers: chain(
-      wasteDetails,
-      w => w.identificationNumbers
-    ),
-    wasteDetailsIdentificationType: chain(
-      wasteDetails,
-      w => w.identificationType
-    ),
-    wasteDetailsQuantity: chain(wasteDetails, w => w.quantity),
-    wasteDetailsQuantityUnit: chain(wasteDetails, w => w.quantityUnit)
+    identificationNumbers: chain(identification, i => i.numbers),
+    identificationType: chain(identification, i => i.type)
+  };
+}
+
+function flattenVhuQuantityInput({
+  quantity
+}: Pick<GraphqlVhuForm, "quantity">) {
+  return {
+    quantityNumber: chain(quantity, q => q.number),
+    quantityTons: chain(quantity, q => q.tons)
   };
 }

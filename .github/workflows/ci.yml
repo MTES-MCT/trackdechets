@@ -1,0 +1,118 @@
+name: Build, test and deploy app
+
+on:
+  pull_request:
+    branches:
+      - master
+      - dev
+  push:
+    branches:
+      - master
+      - dev
+      - staging-*
+
+jobs:
+  front:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: "12.x"
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+      - name: Run linter
+        run: npm run lint
+      - name: Run typecheck
+        run: npm run types
+      - name: Run tests
+        run: npm test
+
+  back:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: "12.x"
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+      - name: Run linter
+        run: npm run lint
+      - name: Run typecheck
+        run: |
+          npm run generate
+          npm run types
+      - name: Run tests
+        run: npm test -- --forceExit
+        env:
+          JWT_SECRET: "xxx"
+          EMAIL_BACKEND: "console"
+          MAIN_TEMPLATE_ID: "9"
+          ONBOARDING_TEMPLATE_ID: "8"
+          SECOND_ONBOARDING_TEMPLATE_ID: "7"
+          SECURITY_CODE_RENEWAL_TEMPLATE_ID: "6"
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back/integration-tests
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run integration tests
+        run: |
+          chmod +x ./run.sh
+          ./run.sh
+
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: scripts
+    needs: [front, back, integration-tests]
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Add SSH key
+        uses: shimataro/ssh-key-action@v2.1.0
+        with:
+          key: ${{ secrets.CC_SSH_KEY }}
+          known_hosts: ${{ secrets.CC_KNOWN_HOST }}
+      - name: Deploy
+        run: |
+          chmod +x ./deploy.sh
+          ./deploy.sh
+        env:
+          GIT_STAGING_1_BACK: ${{ secrets.GIT_STAGING_1_BACK }}
+          GIT_STAGING_1_FRONT: ${{ secrets.GIT_STAGING_1_FRONT }}
+          GIT_PROD_BACK: "TODO"
+          GIT_PROD_FRONT: "TODO"
+          GIT_SANDBOX_BACK: "TODO"
+          GIT_SANDBOX_FRONT: "TODO"
+          GIT_DEV_BACK: "TODO"
+          GIT_DEV_FRONT: "TODO"

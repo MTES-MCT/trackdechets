@@ -1,96 +1,227 @@
 type Query {
+  bordereauVhu: BordereauVhuQuery
   vhuForm(id: ID!): VhuForm
-  vhuForms(siret: String): VhuForm
+  vhuForms(siret: String): [VhuForm!]
+}
+
+type BordereauVhuQuery {
+  findUnique(id: ID!): VhuForm!
+  findMany(
+    "SIRET d'un établissement dont je suis membre"
+    siret: String
+
+    "(Optionnel) Permet de récupérer uniquement les bordereaux en brouillon"
+    isDraft: Boolean
+
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `first` de paginer "en avant"
+    (des bordereaux les plus récents aux bordereaux les plus anciens)
+    Curseur après lequel les bordereaux doivent être retournés
+    Attend un identifiant (propriété `id`) de BSD
+    Défaut à vide, pour retourner les bordereaux les plus récents
+    Le BSD précisé dans le curseur ne fait pas partie du résultat
+    """
+    cursorAfter: ID
+
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `cursorAfter` de paginer "en avant"
+    (des bordereaux les plus récents aux bordereaux les plus anciens)
+    Nombre de bordereaux retournés après le `cursorAfter`
+    Défaut à 50, maximum à 500
+    """
+    first: Int
+
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `last` de paginer "en arrière"
+    (des bordereaux les plus anciens aux bordereaux les plus récents)
+    Curseur avant lequel les bordereaux doivent être retournés
+    Attend un identifiant (propriété `id`) de BSD
+    Défaut à vide, pour retourner les bordereaux les plus anciens
+    Le BSD précisé dans le curseur ne fait pas partie du résultat
+    """
+    cursorBefore: ID
+
+    """
+    (Optionnel) PAGINATION
+    Nombre de bordereaux retournés avant le `cursorBefore`
+    Défaut à 50, maximum à 500
+    """
+    last: Int
+
+    """
+    (Optionnel) Filtre sur le statut des bordereaux
+    Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
+    Défaut à vide.
+    """
+    status: VhuStatus
+
+    """
+    (Optionnel) Retourne les BSD modifiés après la date
+    Filtre sur la date de dernière modification
+    Au format (YYYY-MM-DD)
+    Par défaut vide, aucun filtre n'est appliqué
+    """
+    updatedAfter: String
+
+    """
+    (Optionnel) Siret d'une autre entreprise présente sur le bordereau
+    Vous n'avez pas besoin d'être membre de cette entreprise.
+    Seuls les bordereaux ou cette entreprise apparait (dans n'importe quel cadre) seront retournés.
+    Défaut à vide.
+    """
+    siretPresentOnForm: String
+  ): [VhuForm!]!
+
+  """
+  Renvoie un token pour télécharger un pdf de bordereau
+  Ce token doit être transmis à la route /download pour obtenir le fichier.
+  Il est valable 10 secondes
+  """
+  pdf("ID d'un bordereau" id: ID): FileDownload!
 }
 
 type Mutation {
-  createVhuForm(vhuFormInput: VhuFormInput!): VhuForm
-  editVhuForm(id: ID!, vhuFormInput: VhuFormInput!): VhuForm
-  signVhuForm(id: ID!, vhuSignatureInput: VhuSignatureInput!): VhuForm
+  bordereauVhu: BordereauVhuMutation
+}
+
+type BordereauVhuMutation {
+  create(input: VhuFormInput!): VhuForm
+  update(id: ID!, input: VhuFormInput!): VhuForm
+  sign(id: ID!, input: VhuSignatureInput!): VhuForm
+
+  "Duplique un BSD VHU"
+  duplicate("ID d'un BSD" id: ID!): VhuForm
 }
 
 type VhuForm {
+  "Identifiant internet"
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
+  "Indique si le bordereau a été supprimé"
   isDeleted: Boolean!
+  "Indique si le bordereau est à l'état de brouillon"
   isDraft: Boolean!
+  "Status du bordereau"
+  status: VhuStatus!
+  "Numéro unique attribué par Trackdéchets"
+  readableId: String!
 
+  "Informations sur l'émetteur"
   emitter: VhuEmitter
-  wasteDetails: VhuWasteDetails
+
+  "Code déchet. Presque toujours 16 01 06"
+  wasteCode: String
+  "Conditionnement du déchet"
+  packaging: VhuPackaging
+  "Identification des VHUs"
+  identification: VhuIdentification
+  "Quantité de VHUs"
+  quantity: VhuQuantity
+
+  "Détails sur la destination"
   recipient: VhuRecipient
+  "Détails sur le transporteur"
   transporter: VhuTransporter
 }
 
 type VhuEmitter {
-  agreement: String
-  validityLimit: DateTime
-
+  "Numéro d'agrément émetteur"
+  agrementNumber: String
+  "Coordonnées de l'entreprise émétrice"
   company: FormCompany
-
   signature: Signature
 }
 
-enum VhuPackagingType {
-  UNIT
-  BUNDLE
+enum VhuStatus {
+  IN_PROGRESS
+  DONE
+}
+
+enum VhuPackaging {
+  UNITE
+  LOT
 }
 
 enum VhuIdentificationType {
-  VHU_NUMBER
-  BUNDLE_NUMBER
+  NUMERO_ORDRE_REGISTRE_POLICE
+  NUMERO_ORDRE_LOTS_SORTANTS
 }
 
-enum VhuQuantityUnit {
-  TON
-  NUMBER
-}
-
-type VhuWasteDetails {
-  packagingType: VhuPackagingType
-  identificationNumbers: [String]
-  identificationType: VhuIdentificationType
-  quantity: Float
-  quantityUnit: VhuQuantityUnit
+enum VhuRecipientType {
+  BROYEUR
+  DEMOLISSEUR
 }
 
 type VhuTransporter {
-  agreement: String
-  receipt: String
-  department: String
-  validityLimit: DateTime
-  transportType: String
-
+  "Coordonnées de l'entreprise de transport"
   company: FormCompany
+  "Numéro de TVA intracommunautaire, dans le cas d'un transporteur étranger"
+  tvaIntracommunautaire: String
+
+  "Récépissé transporteur"
+  recepisse: VhuRecepisse
 
   signature: Signature
+}
+
+type VhuRecepisse {
+  number: String
+  department: String
+  validityLimit: DateTime
 }
 
 type VhuRecipient {
-  agreement: String
-  validityLimit: DateTime
+  "Type de receveur: broyeur ou second centre VHU"
+  type: VhuRecipientType
+  "Numéro d'agrément de receveur"
+  agrementNumber: String
+  "Coordonnées de l'entreprise qui recoit les déchets"
   company: FormCompany
 
+  "Informations d'acceptation"
   acceptance: VhuRecipientAcceptance
+  "Informations sur l'opétation de traitement"
   operation: VhuRecipientOperation
+
+  "Coordonnées de l'entreprise de broyage prévue. Utilisé uniquement lorsque le receveur est lui même un centre VHU."
+  plannedBroyeurCompany: FormCompany
+
+  signature: Signature
 }
 
 type VhuRecipientAcceptance {
+  "Quantité réelle reçue"
   quantity: Float
+  "Etat d'acceptation du déchet"
   status: String
+  "Raison du refus du déchet, dans le cas d'un refus"
   refusalReason: String
-
-  signature: Signature
+  "Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)"
+  identification: VhuIdentification
 }
 
 type VhuRecipientOperation {
+  "Opération de traitement prévue"
   planned: String
+  "Opération de traitement réalisée"
   done: String
-
-  signature: Signature
 }
 
 type Signature {
-  signedAt: DateTime
-  signedBy: String
+  date: DateTime
+  author: String
+}
+
+type VhuIdentification {
+  numbers: [String]
+  type: VhuIdentificationType
+}
+
+type VhuQuantity {
+  number: Int
+  tons: Float
 }

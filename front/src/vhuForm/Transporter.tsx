@@ -2,83 +2,101 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "form/company/CompanySelector";
 import DateInput from "form/custom-inputs/DateInput";
 import { Field, useFormikContext } from "formik";
+import { VhuForm } from "generated/graphql/types";
 import React from "react";
 import styles from "./Transporter.module.scss";
 
-export default function Transporter() {
-  const { setFieldValue } = useFormikContext();
+export default function Transporter({ disabled }) {
+  const { setFieldValue, values } = useFormikContext<VhuForm>();
   return (
     <>
-      <h4 className="form__section-heading">Transporteur</h4>
-      <div className="form__row">
-        <label>
-          Agréément
-          <Field
-            type="text"
-            name="transporter.agreement"
-            className="td-input"
-          />
-        </label>
-
-        <RedErrorMessage name="transporter.receipt" />
-      </div>
-
+      {disabled && (
+        <div className="notification notification--error">
+          Les champs ci-dessous ont été scéllés via signature et ne sont plus
+          modifiables.
+        </div>
+      )}
       <CompanySelector
+        disabled={disabled}
         name="transporter.company"
+        heading="Entreprise de transport"
+        allowForeignCompanies={true}
         onCompanySelected={transporter => {
           if (transporter.transporterReceipt) {
             setFieldValue(
-              "transporter.receipt",
+              "transporter.recepisse.number",
               transporter.transporterReceipt.receiptNumber
             );
             setFieldValue(
-              "transporter.validityLimit",
+              "transporter.recepisse.validityLimit",
               transporter.transporterReceipt.validityLimit
             );
             setFieldValue(
-              "transporter.department",
+              "transporter.recepisse.department",
               transporter.transporterReceipt.department
             );
           } else {
-            setFieldValue("transporter.receipt", "");
-            setFieldValue("transporter.validityLimit", null);
-            setFieldValue("transporter.department", "");
+            setFieldValue("transporter.recepisse.number", "");
+            setFieldValue("transporter.recepisse.validityLimit", null);
+            setFieldValue("transporter.recepisse.department", "");
           }
         }}
       />
 
-      <h4 className="form__section-heading">Autorisations</h4>
-      <div className="form__row">
+      {values.transporter?.company?.siret === null ? (
         <label>
-          Numéro de récépissé
-          <Field type="text" name="transporter.receipt" className="td-input" />
-        </label>
-
-        <RedErrorMessage name="transporter.receipt" />
-
-        <label>
-          Département
+          Numéro de TVA intracommunautaire
           <Field
             type="text"
-            name="transporter.department"
-            placeholder="Ex: 83"
-            className={`td-input ${styles.transporterDepartment}`}
+            name="transporter.tvaIntracommunautaire"
+            placeholder="Ex: DE 123456789"
+            className="td-input"
+            disabled={disabled}
           />
         </label>
+      ) : (
+        <>
+          <h4 className="form__section-heading">Autorisations</h4>
+          <div className="form__row">
+            <label>
+              Numéro de récépissé
+              <Field
+                type="text"
+                name="transporter.recepisse.number"
+                className="td-input"
+                disabled={disabled}
+              />
+            </label>
 
-        <RedErrorMessage name="transporter.department" />
+            <RedErrorMessage name="transporter.recepisse.number" />
 
-        <label>
-          Limite de validité (optionnel)
-          <Field
-            component={DateInput}
-            name="transporter.validityLimit"
-            className={`td-input ${styles.transporterValidityLimit}`}
-          />
-        </label>
+            <label>
+              Département
+              <Field
+                type="text"
+                name="transporter.recepisse.department"
+                placeholder="Ex: 83"
+                className={`td-input ${styles.transporterDepartment}`}
+                disabled={disabled}
+              />
+            </label>
 
-        <RedErrorMessage name="transporter.validityLimit" />
-      </div>
+            <RedErrorMessage name="transporter.recepisse.department" />
+
+            <label>
+              Limite de validité
+              <Field
+                component={DateInput}
+                name="transporter.recepisse.validityLimit"
+                className={`td-input ${styles.transporterValidityLimit}`}
+                disabled={disabled}
+              />
+            </label>
+
+            <RedErrorMessage name="transporter.recepisse.validityLimit" />
+          </div>
+        </>
+      )}
     </>
   );
 }

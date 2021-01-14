@@ -1,11 +1,15 @@
-import { resetDatabase } from "integration-tests/helper";
-import { ErrorCode } from "src/common/errors";
-import { userFactory, userWithCompanyFactory } from "src/__tests__/factories";
-import makeClient from "src/__tests__/testClient";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import { ErrorCode } from "../../../../common/errors";
+import {
+  userFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
 
 const CREATE_VHU_FORM = `
 mutation CreateVhuForm($vhuFormInput: VhuFormInput!) {
-    createVhuForm(vhuFormInput: $vhuFormInput) {
+  bordereauVhu {
+    create(input: $vhuFormInput) {
       id
       recipient {
         company {
@@ -27,14 +31,15 @@ mutation CreateVhuForm($vhuFormInput: VhuFormInput!) {
           phone
         }
       }
-      wasteDetails {
-        quantity
+      quantity {
+        number
       }
     }
   }
+}
 `;
 
-describe("Mutation.createVhuForm", () => {
+describe("Mutation.Vhu.create", () => {
   afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
@@ -102,7 +107,7 @@ describe("Mutation.createVhuForm", () => {
       }
     });
 
-    expect(data.createVhuForm.recipient.company).toMatchObject(
+    expect(data.bordereauVhu.create.recipient.company).toMatchObject(
       vhuFormInput.recipient.company
     );
   });

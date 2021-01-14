@@ -207,6 +207,16 @@ export async function getTransporterReceiptOrNotFound({
   return receipt;
 }
 
+export async function getVhuAgrementOrNotFound({
+  id
+}: Prisma.TraderReceiptWhereUniqueInput) {
+  const receipt = await prisma.vhuAgrement.findUnique({ where: { id } });
+  if (receipt == null) {
+    throw new TraderReceiptNotFound();
+  }
+  return receipt;
+}
+
 export function convertUrls<T extends Partial<Company>>(
   company: T
 ): T & { ecoOrganismeAgreements: URL[] } {

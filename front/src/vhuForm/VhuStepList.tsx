@@ -6,20 +6,21 @@ import GenericStepList, {
 } from "form/stepper/GenericStepList";
 import { IStepContainerProps } from "form/stepper/Step";
 import {
-  Mutation,
-  MutationCreateVhuFormArgs,
-  MutationEditVhuFormArgs,
+  BordereauVhuMutation,
+  BordereauVhuMutationCreateArgs,
+  BordereauVhuMutationUpdateArgs,
+  BordereauVhuQueryFindUniqueArgs,
   Query,
-  QueryVhuFormArgs,
+  VhuForm,
   VhuFormInput,
 } from "generated/graphql/types";
 import React, { ReactElement, useMemo } from "react";
 import { generatePath, useHistory, useParams } from "react-router-dom";
 import initialState from "./initial-state";
-import { CREATE_VHU_FORM, EDIT_VHU_FORM, GET_VHU_FORM } from "./queries";
+import { CREATE_VHU_FORM, UPDATE_VHU_FORM, GET_VHU_FORM } from "./queries";
 
 interface Props {
-  children: ReactElement<IStepContainerProps>[];
+  children: (vhuForm: VhuForm | undefined) => ReactElement;
   formId?: string;
 }
 
@@ -27,38 +28,39 @@ export default function VhuStepsList(props: Props) {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
 
-  const formQuery = useQuery<Pick<Query, "vhuForm">, QueryVhuFormArgs>(
-    GET_VHU_FORM,
-    {
-      variables: {
-        id: props.formId!,
-      },
-      skip: !props.formId,
-      fetchPolicy: "network-only",
-    }
-  );
+  const formQuery = useQuery<
+    Pick<Query, "bordereauVhu">,
+    BordereauVhuQueryFindUniqueArgs
+  >(GET_VHU_FORM, {
+    variables: {
+      id: props.formId!,
+    },
+    skip: !props.formId,
+    fetchPolicy: "network-only",
+  });
 
   const formState = useMemo(
-    () => getComputedState(initialState, formQuery.data?.vhuForm),
+    () =>
+      getComputedState(initialState, formQuery.data?.bordereauVhu?.findUnique),
     [formQuery.data]
   );
 
   const [createVhuForm] = useMutation<
-    Pick<Mutation, "createVhuForm">,
-    MutationCreateVhuFormArgs
+    Pick<BordereauVhuMutation, "create">,
+    BordereauVhuMutationCreateArgs
   >(CREATE_VHU_FORM);
 
-  const [editVhuForm] = useMutation<
-    Pick<Mutation, "editVhuForm">,
-    MutationEditVhuFormArgs
-  >(EDIT_VHU_FORM);
+  const [updateVhuForm] = useMutation<
+    Pick<BordereauVhuMutation, "update">,
+    BordereauVhuMutationUpdateArgs
+  >(UPDATE_VHU_FORM);
 
-  function saveForm(vhuFormInput: VhuFormInput): Promise<any> {
+  function saveForm(input: VhuFormInput): Promise<any> {
     return formState.id
-      ? editVhuForm({
-          variables: { id: formState.id, vhuFormInput },
+      ? updateVhuForm({
+          variables: { id: formState.id, input },
         })
-      : createVhuForm({ variables: { vhuFormInput } });
+      : createVhuForm({ variables: { input } });
   }
 
   function onSubmit(e, values) {
@@ -66,7 +68,8 @@ export default function VhuStepsList(props: Props) {
     // As we want to be able to save draft, we skip validation on submit
     // and don't use the classic Formik mechanism
 
-    saveForm(values)
+    const { id, ...input } = values;
+    saveForm(input)
       .then(_ => {
         // TODO VHU redirect to the correct dashboard
         const redirectTo = generatePath(routes.dashboard.slips.drafts, {
@@ -81,9 +84,18 @@ export default function VhuStepsList(props: Props) {
       });
   }
 
+  // As it's a render function, the steps are nested into a `<></>` block
+  // So we render then unwrap to get the steps
+  const parentOfSteps = props.children(
+    formQuery.data?.bordereauVhu?.findUnique
+  );
+  const steps = parentOfSteps.props.children as ReactElement<
+    IStepContainerProps
+  >[];
+
   return (
     <GenericStepList
-      children={props.children}
+      children={steps}
       formId={props.formId}
       formQuery={formQuery}
       onSubmit={onSubmit}

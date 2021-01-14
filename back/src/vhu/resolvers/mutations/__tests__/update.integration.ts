@@ -1,27 +1,30 @@
-import { resetDatabase } from "integration-tests/helper";
-import { ErrorCode } from "src/common/errors";
-import { vhuFormFactory } from "src/vhu/__tests__/factories.vhu";
-import { userFactory, userWithCompanyFactory } from "src/__tests__/factories";
-import makeClient from "src/__tests__/testClient";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import { ErrorCode } from "../../../../common/errors";
+import { vhuFormFactory } from "../../../__tests__/factories.vhu";
+import {
+  userFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
 
-const EDIT_VHU_FORM = `
+const UPDATE_VHU_FORM = `
 mutation EditVhuForm($id: ID!, $vhuFormInput: VhuFormInput!) {
-    editVhuForm(id: $id, vhuFormInput: $vhuFormInput) {
+  bordereauVhu {
+    update(id: $id, input: $vhuFormInput) {
       id
       isDraft
       recipient {
         company {
-            siret
+          siret
         }
       }
       emitter {
-        agreement
+        agrementNumber
         company {
-            siret
+          siret
         }
       }
       transporter {
-        agreement
         company {
           siret
           name
@@ -30,20 +33,25 @@ mutation EditVhuForm($id: ID!, $vhuFormInput: VhuFormInput!) {
           mail
           phone
         }
+        tvaIntracommunautaire
+        recepisse {
+          number
+        }
       }
-      wasteDetails {
-        quantity
+      quantity {
+        number
       }
     }
   }
+}
 `;
 
-describe("Mutation.editVhuForm", () => {
+describe("Mutation.Vhu.update", () => {
   afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
-    const { errors } = await mutate(EDIT_VHU_FORM, {
+    const { errors } = await mutate(UPDATE_VHU_FORM, {
       variables: { id: 1, vhuFormInput: {} }
     });
 
@@ -58,11 +66,8 @@ describe("Mutation.editVhuForm", () => {
   });
 
   it("should disallow a user to update a form they are not part of", async () => {
-    const { user: anotherUser, company } = await userWithCompanyFactory(
-      "MEMBER"
-    );
+    const { company } = await userWithCompanyFactory("MEMBER");
     const form = await vhuFormFactory({
-      ownerId: anotherUser.id,
       opt: {
         emitterCompanySiret: company.siret
       }
@@ -70,12 +75,12 @@ describe("Mutation.editVhuForm", () => {
 
     const conenctedUser = await userFactory();
     const { mutate } = makeClient(conenctedUser);
-    const { errors } = await mutate(EDIT_VHU_FORM, {
+    const { errors } = await mutate(UPDATE_VHU_FORM, {
       variables: {
         id: form.id,
         vhuFormInput: {
-          wasteDetails: {
-            quantity: 4
+          quantity: {
+            number: 4
           }
         }
       }
@@ -95,7 +100,6 @@ describe("Mutation.editVhuForm", () => {
   it("should be possible to update a non signed form", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await vhuFormFactory({
-      ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret
       }
@@ -103,21 +107,20 @@ describe("Mutation.editVhuForm", () => {
 
     const { mutate } = makeClient(user);
     const vhuFormInput = {
-      wasteDetails: {
-        quantity: 4
+      quantity: {
+        number: 4
       }
     };
-    const { data } = await mutate(EDIT_VHU_FORM, {
+    const { data } = await mutate(UPDATE_VHU_FORM, {
       variables: { id: form.id, vhuFormInput }
     });
 
-    expect(data.editVhuForm.wasteDetails.quantity).toBe(4);
+    expect(data.bordereauVhu.update.quantity.number).toBe(4);
   });
 
   it("should allow isDraft update before any signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await vhuFormFactory({
-      ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret
       }
@@ -127,25 +130,20 @@ describe("Mutation.editVhuForm", () => {
     const vhuFormInput = {
       isDraft: true
     };
-    const { data } = await mutate(EDIT_VHU_FORM, {
+    const { data } = await mutate(UPDATE_VHU_FORM, {
       variables: { id: form.id, vhuFormInput }
     });
 
-    expect(data.editVhuForm.isDraft).toBe(true);
+    expect(data.bordereauVhu.update.isDraft).toBe(true);
   });
 
   it("should disallow isDraft update after any signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await vhuFormFactory({
-      ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        emitterSignature: {
-          create: {
-            signatory: { connect: { id: user.id } },
-            signedBy: "The Signatory"
-          }
-        }
+        emitterSignatureAuthor: "The Signatory",
+        emitterSignatureDate: new Date()
       }
     });
 
@@ -153,7 +151,7 @@ describe("Mutation.editVhuForm", () => {
     const vhuFormInput = {
       isDraft: true
     };
-    const { errors } = await mutate(EDIT_VHU_FORM, {
+    const { errors } = await mutate(UPDATE_VHU_FORM, {
       variables: { id: form.id, vhuFormInput }
     });
 
@@ -171,7 +169,6 @@ describe("Mutation.editVhuForm", () => {
   it("should allow emitter fields update before emitter signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await vhuFormFactory({
-      ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret
       }
@@ -180,45 +177,42 @@ describe("Mutation.editVhuForm", () => {
     const { mutate } = makeClient(user);
     const vhuFormInput = {
       emitter: {
-        agreement: "new agreement"
+        agrementNumber: "new agrement"
       }
     };
-    const { data } = await mutate(EDIT_VHU_FORM, {
+    const { data } = await mutate(UPDATE_VHU_FORM, {
       variables: { id: form.id, vhuFormInput }
     });
 
-    expect(data.editVhuForm.emitter.agreement).toBe("new agreement");
+    expect(data.bordereauVhu.update.emitter.agrementNumber).toBe(
+      "new agrement"
+    );
   });
 
   it("should disallow emitter fields update after emitter signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await vhuFormFactory({
-      ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        emitterSignature: {
-          create: {
-            signatory: { connect: { id: user.id } },
-            signedBy: "The Signatory"
-          }
-        }
+        emitterSignatureAuthor: "The Signatory",
+        emitterSignatureDate: new Date()
       }
     });
 
     const { mutate } = makeClient(user);
     const vhuFormInput = {
       emitter: {
-        agreement: "new agreement"
+        agrementNumber: "new agrement"
       }
     };
-    const { errors } = await mutate(EDIT_VHU_FORM, {
+    const { errors } = await mutate(UPDATE_VHU_FORM, {
       variables: { id: form.id, vhuFormInput }
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: emitter.agreement",
+          "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: emitter.agrementNumber",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
@@ -229,30 +223,25 @@ describe("Mutation.editVhuForm", () => {
   it("should allow transporter fields update after emitter signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await vhuFormFactory({
-      ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        emitterSignature: {
-          create: {
-            signatory: { connect: { id: user.id } },
-            signedBy: "The Signatory"
-          }
-        }
+        emitterSignatureAuthor: "The Signatory",
+        emitterSignatureDate: new Date()
       }
     });
 
     const { mutate } = makeClient(user);
     const vhuFormInput = {
       transporter: {
-        agreement: "new transporter agreement"
+        tvaIntracommunautaire: "DE 123456789"
       }
     };
-    const { data } = await mutate(EDIT_VHU_FORM, {
+    const { data } = await mutate(UPDATE_VHU_FORM, {
       variables: { id: form.id, vhuFormInput }
     });
 
-    expect(data.editVhuForm.transporter.agreement).toBe(
-      "new transporter agreement"
+    expect(data.bordereauVhu.update.transporter.tvaIntracommunautaire).toBe(
+      "DE 123456789"
     );
   });
 });

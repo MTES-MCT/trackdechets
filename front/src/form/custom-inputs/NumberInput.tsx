@@ -10,7 +10,7 @@ type NumberInputProps = FieldProps & { label: string } & InputHTMLAttributes<
   };
 
 export default function NumberInput({
-  field: { value, ...field },
+  field,
   label,
   noSpin,
   ...props
@@ -29,7 +29,6 @@ export default function NumberInput({
         className={classNames(props.className, {
           [styles.NumberInputNoSpin]: noSpin,
         })}
-        value={value == null ? "" : value}
       />
     </label>
   );

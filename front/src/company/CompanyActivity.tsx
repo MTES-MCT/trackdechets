@@ -19,7 +19,7 @@ export default function CompanyActivity({ installation }: Props) {
     WASTE_CENTER:
       "Installation de collecte de déchets apportés par le producteur initial",
     WASTE_VEHICLES:
-      "Installation d'entreposage, dépollution, démontage, découpage de VHU",
+      "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)",
     WASTEPROCESSOR: "Installation de traitement",
   };
 

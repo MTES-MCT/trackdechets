@@ -175,6 +175,10 @@ model Company {
   brokerReceipt          BrokerReceipt?       @relation(fields: [brokerReceiptId], references: [id])
   transporterReceiptId   String?
   transporterReceipt     TransporterReceipt?  @relation(fields: [transporterReceiptId], references: [id])
+  vhuAgrementDemolisseurId String?
+  vhuAgrementDemolisseur   VhuAgrement?         @relation(name: "VhuAgrementDemolisseur_Company", fields: [vhuAgrementDemolisseurId], references: [id])
+  vhuAgrementBroyeurId     String?
+  vhuAgrementBroyeur       VhuAgrement?         @relation(name: "VhuAgrementBroyeur_Company", fields: [vhuAgrementBroyeurId], references: [id])
   CompanyAssociation     CompanyAssociation[]
   MembershipRequest      MembershipRequest[]
 }
@@ -477,6 +481,14 @@ model TransporterReceipt {
   Company       Company[]
 }
 
+model VhuAgrement {
+  id                   String    @id @default(cuid())
+  agrementNumber       String
+  department           String
+  demolisseurCompanies Company[] @relation("VhuAgrementDemolisseur_Company")
+  broyeurCompanies     Company[] @relation("VhuAgrementBroyeur_Company")
+}
+
 model TransportSegment {
   id                              String         @id @default(cuid())
   segmentNumber                   Int?
@@ -552,36 +564,24 @@ enum VhuStatus {
   DONE
 }
 
-enum PackagingType {
-  UNIT
-  BUNDLE
+enum VhuPackaging {
+  UNITE
+  LOT
 }
 
-enum IdentificationType {
-  VHU_NUMBER
-  BUNDLE_NUMBER
+enum VhuIdentificationType {
+  NUMERO_ORDRE_REGISTRE_POLICE
+  NUMERO_ORDRE_LOTS_SORTANTS
 }
 
 enum VhuQuantityUnit {
-  TON
-  NUMBER
+  TONNES
+  NOMBRE
 }
 
-model Signature {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  signatory   User     @relation(fields: [signatoryId], references: [id])
-  signatoryId String
-
-  signedAt DateTime @default(now())
-  signedBy String
-
-  // To disambiguate relations
-  // see https://www.prisma.io/docs/concepts/components/prisma-schema/relations#disambiguating-relations
-  emitterSignature             VhuForm? @relation("emitterSignature")
-  transporterSignature         VhuForm? @relation("transporterSignature")
-  recipientAcceptanceSignature VhuForm? @relation("recipientAcceptanceSignature")
-  recipientOperationSignature  VhuForm? @relation("recipientOperationSignature")
+enum VhuRecipientType {
+  BROYEUR
+  DEMOLISSEUR
 }
 
 model VhuForm {
@@ -591,14 +591,10 @@ model VhuForm {
   isDraft   Boolean  @default(false)
   isDeleted Boolean  @default(false)
 
-  ownerId String
-  owner   User   @relation(fields: [ownerId], references: [id])
+  status     VhuStatus @default(IN_PROGRESS)
+  readableId String    @unique
 
-  status VhuStatus @default(IN_PROGRESS)
-
-  // Frame 1
-  emitterAgreement      String?
-  emitterValidityLimit  DateTime?
+  emitterAgrementNumber String?
   emitterCompanyName    String?
   emitterCompanySiret   String?
   emitterCompanyAddress String?
@@ -606,10 +602,9 @@ model VhuForm {
   emitterCompanyPhone   String?
   emitterCompanyMail    String?
 
-  // Frame 2
-  recipientOperationPlanned String?
-  recipientAgreement        String?
-  recipientValidityLimit    DateTime?
+  recipientType             VhuRecipientType?
+  recipientOperationPlanned String?           @default("R 4")
+  recipientAgrementNumber   String?
   recipientCompanyName      String?
   recipientCompanySiret     String?
   recipientCompanyAddress   String?
@@ -617,43 +612,41 @@ model VhuForm {
   recipientCompanyPhone     String?
   recipientCompanyMail      String?
 
-  // Frames 3, 4, 5
-  wasteDetailsPackagingType         PackagingType?
-  wasteDetailsIdentificationNumbers String[]
-  wasteDetailsIdentificationType    IdentificationType?
-  wasteDetailsQuantity              Int?
-  wasteDetailsQuantityUnit          VhuQuantityUnit?
+  wasteCode             String?                @default("16 01 06")
+  packaging             VhuPackaging?
+  identificationNumbers String[]
+  identificationType    VhuIdentificationType?
+  quantityNumber        Int?
+  quantityTons          Float?
 
-  // Frame 6
-  emitterSignature   Signature? @relation(name: "emitterSignature", fields: [emitterSignatureId], references: [id])
-  emitterSignatureId Int?
+  emitterSignatureAuthor String?
+  emitterSignatureDate   DateTime?
 
-  // Frame 7
-  transporterAgreement      String?
-  transporterCompanyName    String?
-  transporterCompanySiret   String?
-  transporterCompanyAddress String?
-  transporterCompanyContact String?
-  transporterCompanyPhone   String?
-  transporterCompanyMail    String?
-  transporterReceipt        String?
-  transporterDepartment     String?
-  transporterValidityLimit  DateTime?
-  transporterTransportType  String? // Mode de transport. String ou enum ?
-  transporterSignature      Signature? @relation(name: "transporterSignature", fields: [transporterSignatureId], references: [id])
-  transporterSignatureId    Int?
+  transporterCompanyName            String?
+  transporterCompanySiret           String?
+  transporterCompanyAddress         String?
+  transporterCompanyContact         String?
+  transporterCompanyPhone           String?
+  transporterCompanyMail            String?
+  transporterTvaIntracommunautaire  String?
+  transporterRecepisseNumber        String?
+  transporterRecepisseDepartment    String?
+  transporterRecepisseValidityLimit DateTime?
+  transporterSignatureAuthor        String?
+  transporterSignatureDate          DateTime?
 
-  // Frame 8, 9, 10
-  // TODO
-
-  // Frame 11
-  // ...(data from frame 2)
-  recipientAcceptanceQuantity      Float?
-  recipientAcceptanceStatus        WasteAcceptationStatus?
-  recipientAcceptanceRefusalReason String?
-  recipientAcceptanceSignature     Signature?              @relation(name: "recipientAcceptanceSignature", fields: [recipientAcceptanceSignatureId], references: [id])
-  recipientAcceptanceSignatureId   Int?
-  recipientOperationDone           String? // Code normalisé. String ou enum ?
-  recipientOperationSignature      Signature?              @relation(name: "recipientOperationSignature", fields: [recipientOperationSignatureId], references: [id])
-  recipientOperationSignatureId    Int?
+  recipientAcceptanceQuantity              Float?
+  recipientAcceptanceStatus                WasteAcceptationStatus?
+  recipientAcceptanceRefusalReason         String?
+  recipientAcceptanceIdentificationNumbers String[]
+  recipientAcceptanceIdentificationType    VhuIdentificationType?
+  recipientOperationDone                   String?
+  recipientPlannedBroyeurCompanyName      String?
+  recipientPlannedBroyeurCompanySiret     String?
+  recipientPlannedBroyeurCompanyAddress   String?
+  recipientPlannedBroyeurCompanyContact   String?
+  recipientPlannedBroyeurCompanyPhone     String?
+  recipientPlannedBroyeurCompanyMail      String?
+  recipientSignatureAuthor                 String?
+  recipientSignatureDate                   DateTime?
 }

@@ -16,6 +16,16 @@ const companyPublicResolvers: CompanyPublicResolvers = {
     return await prisma.company
       .findUnique({ where: { siret: parent.siret } })
       .brokerReceipt();
+  },
+  vhuAgrementBroyeur: parent => {
+    return prisma.company
+      .findUnique({ where: { siret: parent.siret } })
+      .vhuAgrementBroyeur();
+  },
+  vhuAgrementDemolisseur: parent => {
+    return prisma.company
+      .findUnique({ where: { siret: parent.siret } })
+      .vhuAgrementDemolisseur();
   }
 };
 

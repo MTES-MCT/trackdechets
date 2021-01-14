@@ -7,6 +7,10 @@ declare module "yup" {
   }
 }
 
+export type FactorySchemaOf<Context, Type> = (
+  context: Context
+) => yup.SchemaOf<Type>;
+
 export default function configureYup() {
   yup.setLocale({
     mixed: {
@@ -21,10 +25,10 @@ export default function configureYup() {
     message?: string
   ) {
     if (condition) {
-      return this.nullable().notRequired();
+      // nullable to treat null as a missing value, not a type error
+      return this.nullable().required(message);
     }
 
-    // nullable to treat null as a missing value, not a type error
-    return this.nullable().required(message);
+    return this.nullable().notRequired();
   });
 }

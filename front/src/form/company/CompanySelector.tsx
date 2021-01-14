@@ -29,10 +29,12 @@ interface CompanySelectorProps {
     | "recipient.company"
     | "trader.company"
     | "broker.company"
-    | "temporaryStorageDetail.destination.company";
+    | "temporaryStorageDetail.destination.company"
+    | "recipient.plannedBroyeurCompany";
   onCompanySelected?: (company: CompanyFavorite) => void;
   allowForeignCompanies?: boolean;
   heading?: string;
+  disabled?: boolean;
 }
 
 export default function CompanySelector({
@@ -40,6 +42,7 @@ export default function CompanySelector({
   onCompanySelected,
   allowForeignCompanies,
   heading,
+  disabled,
 }: CompanySelectorProps) {
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
@@ -66,6 +69,7 @@ export default function CompanySelector({
   });
   const selectCompany = useCallback(
     (company: CompanyFavorite) => {
+      if (disabled) return;
       setFieldValue(`${field.name}.siret`, company.siret);
 
       const fields = {
@@ -85,7 +89,7 @@ export default function CompanySelector({
         onCompanySelected(company);
       }
     },
-    [field.name, setFieldValue, onCompanySelected]
+    [field.name, setFieldValue, onCompanySelected, disabled]
   );
 
   const searchResults: CompanyFavorite[] = useMemo(
@@ -98,6 +102,8 @@ export default function CompanySelector({
           transporterReceipt,
           traderReceipt,
           brokerReceipt,
+          vhuAgrementDemolisseur,
+          vhuAgrementBroyeur,
         }) => ({
           // convert CompanySearchResult to CompanyFavorite
           siret,
@@ -106,6 +112,8 @@ export default function CompanySelector({
           transporterReceipt,
           traderReceipt,
           brokerReceipt,
+          vhuAgrementDemolisseur,
+          vhuAgrementBroyeur,
 
           __typename: "CompanyFavorite",
           contact: "",
@@ -168,6 +176,7 @@ export default function CompanySelector({
                   className={`td-input ${styles.companySelectorSearchSiret}`}
                   onChange={event => setClue(event.target.value)}
                   onBlur={() => setFieldTouched(`${field.name}.siret`, true)}
+                  disabled={disabled}
                 />
                 <i className={styles.searchIcon} aria-label="Recherche">
                   <IconSearch size="12px" />
@@ -185,6 +194,7 @@ export default function CompanySelector({
                 type="text"
                 className={`td-input ${styles.companySelectorSearchGeo}`}
                 onChange={event => setDepartement(event.target.value)}
+                disabled={disabled}
               />
             </div>
           </div>
@@ -202,6 +212,8 @@ export default function CompanySelector({
               transporterReceipt: null,
               traderReceipt: null,
               brokerReceipt: null,
+              vhuAgrementBroyeur: null,
+              vhuAgrementDemolisseur: null,
             }}
           />
         </>
@@ -221,6 +233,7 @@ export default function CompanySelector({
               );
             }}
             checked={field.value.siret == null}
+            disabled={disabled}
           />
           L'entreprise est à l'étranger
         </label>
@@ -236,6 +249,7 @@ export default function CompanySelector({
                 className="td-input"
                 name={`${field.name}.name`}
                 placeholder="Nom"
+                disabled={disabled}
               />
             </label>
 
@@ -248,6 +262,7 @@ export default function CompanySelector({
                 className="td-input"
                 name={`${field.name}.address`}
                 placeholder="Adresse"
+                disabled={disabled}
               />
             </label>
 
@@ -255,7 +270,7 @@ export default function CompanySelector({
 
             <label>
               Pays de l'entreprise
-              <Field name={`${field.name}.country`}>
+              <Field name={`${field.name}.country`} disabled={disabled}>
                 {({ field, form }) => (
                   <CountrySelector
                     {...field}
@@ -277,6 +292,7 @@ export default function CompanySelector({
             name={`${field.name}.contact`}
             placeholder="NOM Prénom"
             className="td-input"
+            disabled={disabled}
           />
         </label>
 
@@ -290,6 +306,7 @@ export default function CompanySelector({
             name={`${field.name}.phone`}
             placeholder="Numéro"
             className={`td-input ${styles.companySelectorSearchPhone}`}
+            disabled={disabled}
           />
         </label>
 
@@ -302,6 +319,7 @@ export default function CompanySelector({
             type="email"
             name={`${field.name}.mail`}
             className={`td-input ${styles.companySelectorSearchEmail}`}
+            disabled={disabled}
           />
         </label>
 

@@ -44,6 +44,11 @@ Siret d'un des établissements dont je suis membre
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>bordereauVhu</strong></td>
+<td valign="top"><a href="#bordereauvhuquery">BordereauVhuQuery</a></td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>companyInfos</strong></td>
 <td valign="top"><a href="#companypublic">CompanyPublic</a>!</td>
 <td>
@@ -540,7 +545,7 @@ Renvoie des statistiques sur le volume de déchets entrant et sortant
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>vhuForms</strong></td>
-<td valign="top"><a href="#vhuform">VhuForm</a></td>
+<td valign="top">[<a href="#vhuform">VhuForm</a>!]</td>
 <td></td>
 </tr>
 <tr>
@@ -563,6 +568,11 @@ Renvoie des statistiques sur le volume de déchets entrant et sortant
 </thead>
 <tbody>
 <tr>
+<td colspan="2" valign="top"><strong>bordereauVhu</strong></td>
+<td valign="top"><a href="#bordereauvhumutation">BordereauVhuMutation</a></td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>createForm</strong></td>
 <td valign="top"><a href="#form">Form</a>!</td>
 <td>
@@ -579,16 +589,6 @@ Crée un nouveau bordereau
 Payload de création d'un bordereau
 
 </td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>createVhuForm</strong></td>
-<td valign="top"><a href="#vhuform">VhuForm</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">vhuFormInput</td>
-<td valign="top"><a href="#vhuforminput">VhuFormInput</a>!</td>
-<td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>deleteForm</strong></td>
@@ -648,21 +648,6 @@ ID d'un BSD
 <tr>
 <td colspan="2" align="right" valign="top">nextSegmentInfo</td>
 <td valign="top"><a href="#nextsegmentinfoinput">NextSegmentInfoInput</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>editVhuForm</strong></td>
-<td valign="top"><a href="#vhuform">VhuForm</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">vhuFormInput</td>
-<td valign="top"><a href="#vhuforminput">VhuFormInput</a>!</td>
 <td></td>
 </tr>
 <tr>
@@ -1051,21 +1036,6 @@ l'établissement qui ont le choix de l'accepter ou de la refuser.
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>signVhuForm</strong></td>
-<td valign="top"><a href="#vhuform">VhuForm</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">id</td>
-<td valign="top"><a href="#id">ID</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">vhuSignatureInput</td>
-<td valign="top"><a href="#vhusignatureinput">VhuSignatureInput</a>!</td>
-<td></td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>signedByTransporter</strong></td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
@@ -1209,6 +1179,236 @@ header d'autorisation `Authorization: Bearer ******`
 <td>
 
 Utilisateur lié au token
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BordereauVhuMutation
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>create</strong></td>
+<td valign="top"><a href="#vhuform">VhuForm</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#vhuforminput">VhuFormInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>update</strong></td>
+<td valign="top"><a href="#vhuform">VhuForm</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#vhuforminput">VhuFormInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>sign</strong></td>
+<td valign="top"><a href="#vhuform">VhuForm</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#vhusignatureinput">VhuSignatureInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>duplicate</strong></td>
+<td valign="top"><a href="#vhuform">VhuForm</a></td>
+<td>
+
+Duplique un BSD VHU
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ID d'un BSD
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BordereauVhuQuery
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>findUnique</strong></td>
+<td valign="top"><a href="#vhuform">VhuForm</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>findMany</strong></td>
+<td valign="top">[<a href="#vhuform">VhuForm</a>!]!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siret</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+SIRET d'un établissement dont je suis membre
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">isDraft</td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+(Optionnel) Permet de récupérer uniquement les bordereaux en brouillon
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">cursorAfter</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Permet en conjonction avec `first` de paginer "en avant"
+(des bordereaux les plus récents aux bordereaux les plus anciens)
+Curseur après lequel les bordereaux doivent être retournés
+Attend un identifiant (propriété `id`) de BSD
+Défaut à vide, pour retourner les bordereaux les plus récents
+Le BSD précisé dans le curseur ne fait pas partie du résultat
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">first</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Permet en conjonction avec `cursorAfter` de paginer "en avant"
+(des bordereaux les plus récents aux bordereaux les plus anciens)
+Nombre de bordereaux retournés après le `cursorAfter`
+Défaut à 50, maximum à 500
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">cursorBefore</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Permet en conjonction avec `last` de paginer "en arrière"
+(des bordereaux les plus anciens aux bordereaux les plus récents)
+Curseur avant lequel les bordereaux doivent être retournés
+Attend un identifiant (propriété `id`) de BSD
+Défaut à vide, pour retourner les bordereaux les plus anciens
+Le BSD précisé dans le curseur ne fait pas partie du résultat
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">last</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Nombre de bordereaux retournés avant le `cursorBefore`
+Défaut à 50, maximum à 500
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">status</td>
+<td valign="top"><a href="#vhustatus">VhuStatus</a></td>
+<td>
+
+(Optionnel) Filtre sur le statut des bordereaux
+Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
+Défaut à vide.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">updatedAfter</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Retourne les BSD modifiés après la date
+Filtre sur la date de dernière modification
+Au format (YYYY-MM-DD)
+Par défaut vide, aucun filtre n'est appliqué
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">siretPresentOnForm</td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+(Optionnel) Siret d'une autre entreprise présente sur le bordereau
+Vous n'avez pas besoin d'être membre de cette entreprise.
+Seuls les bordereaux ou cette entreprise apparait (dans n'importe quel cadre) seront retournés.
+Défaut à vide.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>pdf</strong></td>
+<td valign="top"><a href="#filedownload">FileDownload</a>!</td>
+<td>
+
+Renvoie un token pour télécharger un pdf de bordereau
+Ce token doit être transmis à la route /download pour obtenir le fichier.
+Il est valable 10 secondes
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+ID d'un bordereau
 
 </td>
 </tr>
@@ -1594,6 +1794,24 @@ Récépissé courtier (le cas échéant, pour les profils courtier)
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>vhuAgrementDemolisseur</strong></td>
+<td valign="top"><a href="#vhuagrement">VhuAgrement</a></td>
+<td>
+
+Récépissé négociant (le cas échéant, pour les profils transporteur)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>vhuAgrementBroyeur</strong></td>
+<td valign="top"><a href="#vhuagrement">VhuAgrement</a></td>
+<td>
+
+Récépissé négociant (le cas échéant, pour les profils transporteur)
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>ecoOrganismeAgreements</strong></td>
 <td valign="top">[<a href="#url">URL</a>!]!</td>
 <td>
@@ -1758,6 +1976,24 @@ Récépissé courtier associé à cet établissement (le cas échant)
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>vhuAgrementDemolisseur</strong></td>
+<td valign="top"><a href="#vhuagrement">VhuAgrement</a></td>
+<td>
+
+Agrément VHU démolisseur (le cas échéant, pour les profils VHU)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>vhuAgrementBroyeur</strong></td>
+<td valign="top"><a href="#vhuagrement">VhuAgrement</a></td>
+<td>
+
+Agrément VHU broyeur (le cas échéant, pour les profils VHU)
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>ecoOrganismeAgreements</strong></td>
 <td valign="top">[<a href="#url">URL</a>!]!</td>
 <td>
@@ -1880,6 +2116,24 @@ Récépissé négociant associé à cet établissement (le cas échant)
 <td>
 
 Récépissé courtier associé à cet établissement (le cas échant)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>vhuAgrementDemolisseur</strong></td>
+<td valign="top"><a href="#vhuagrement">VhuAgrement</a></td>
+<td>
+
+Agrément VHU démolisseur (le cas échéant, pour les profils VHU)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>vhuAgrementBroyeur</strong></td>
+<td valign="top"><a href="#vhuagrement">VhuAgrement</a></td>
+<td>
+
+Agrément VHU broyeur (le cas échéant, pour les profils VHU)
 
 </td>
 </tr>
@@ -3043,12 +3297,12 @@ Type de déchets autorisé
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>signedAt</strong></td>
+<td colspan="2" valign="top"><strong>date</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a></td>
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>signedBy</strong></td>
+<td colspan="2" valign="top"><strong>author</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td></td>
 </tr>
@@ -3885,6 +4139,46 @@ Liste des établissements dont l'utilisateur est membre
 </tbody>
 </table>
 
+### VhuAgrement
+
+Agrément VHU
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>agrementNumber</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Numéro d'agrément VHU
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Département ayant enregistré la déclaration
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### VhuEmitter
 
 <table>
@@ -3898,19 +4192,22 @@ Liste des établissements dont l'utilisateur est membre
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>agreement</strong></td>
+<td colspan="2" valign="top"><strong>agrementNumber</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>validityLimit</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
-<td></td>
+<td>
+
+Numéro d'agrément émetteur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>company</strong></td>
 <td valign="top"><a href="#formcompany">FormCompany</a></td>
-<td></td>
+<td>
+
+Coordonnées de l'entreprise émétrice
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>signature</strong></td>
@@ -3935,7 +4232,11 @@ Liste des établissements dont l'utilisateur est membre
 <tr>
 <td colspan="2" valign="top"><strong>id</strong></td>
 <td valign="top"><a href="#id">ID</a>!</td>
-<td></td>
+<td>
+
+Identifiant internet
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>createdAt</strong></td>
@@ -3950,31 +4251,180 @@ Liste des établissements dont l'utilisateur est membre
 <tr>
 <td colspan="2" valign="top"><strong>isDeleted</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a>!</td>
-<td></td>
+<td>
+
+Indique si le bordereau a été supprimé
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>isDraft</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a>!</td>
-<td></td>
+<td>
+
+Indique si le bordereau est à l'état de brouillon
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>status</strong></td>
+<td valign="top"><a href="#vhustatus">VhuStatus</a>!</td>
+<td>
+
+Status du bordereau
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>readableId</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Numéro unique attribué par Trackdéchets
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>emitter</strong></td>
 <td valign="top"><a href="#vhuemitter">VhuEmitter</a></td>
-<td></td>
+<td>
+
+Informations sur l'émetteur
+
+</td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
-<td valign="top"><a href="#vhuwastedetails">VhuWasteDetails</a></td>
-<td></td>
+<td colspan="2" valign="top"><strong>wasteCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code déchet. Presque toujours 16 01 06
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>packaging</strong></td>
+<td valign="top"><a href="#vhupackaging">VhuPackaging</a></td>
+<td>
+
+Conditionnement du déchet
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>identification</strong></td>
+<td valign="top"><a href="#vhuidentification">VhuIdentification</a></td>
+<td>
+
+Identification des VHUs
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#vhuquantity">VhuQuantity</a></td>
+<td>
+
+Quantité de VHUs
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>recipient</strong></td>
 <td valign="top"><a href="#vhurecipient">VhuRecipient</a></td>
-<td></td>
+<td>
+
+Détails sur la destination
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>transporter</strong></td>
 <td valign="top"><a href="#vhutransporter">VhuTransporter</a></td>
+<td>
+
+Détails sur le transporteur
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### VhuIdentification
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>numbers</strong></td>
+<td valign="top">[<a href="#string">String</a>]</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#vhuidentificationtype">VhuIdentificationType</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### VhuQuantity
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>number</strong></td>
+<td valign="top"><a href="#int">Int</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>tons</strong></td>
+<td valign="top"><a href="#float">Float</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### VhuRecepisse
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>number</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
 <td></td>
 </tr>
 </tbody>
@@ -3993,28 +4443,62 @@ Liste des établissements dont l'utilisateur est membre
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>agreement</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#vhurecipienttype">VhuRecipientType</a></td>
+<td>
+
+Type de receveur: broyeur ou second centre VHU
+
+</td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>validityLimit</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
-<td></td>
+<td colspan="2" valign="top"><strong>agrementNumber</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro d'agrément de receveur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>company</strong></td>
 <td valign="top"><a href="#formcompany">FormCompany</a></td>
-<td></td>
+<td>
+
+Coordonnées de l'entreprise qui recoit les déchets
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>acceptance</strong></td>
 <td valign="top"><a href="#vhurecipientacceptance">VhuRecipientAcceptance</a></td>
-<td></td>
+<td>
+
+Informations d'acceptation
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>operation</strong></td>
 <td valign="top"><a href="#vhurecipientoperation">VhuRecipientOperation</a></td>
+<td>
+
+Informations sur l'opétation de traitement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>plannedBroyeurCompany</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+
+Coordonnées de l'entreprise de broyage prévue. Utilisé uniquement lorsque le receveur est lui même un centre VHU.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a></td>
 <td></td>
 </tr>
 </tbody>
@@ -4035,22 +4519,38 @@ Liste des établissements dont l'utilisateur est membre
 <tr>
 <td colspan="2" valign="top"><strong>quantity</strong></td>
 <td valign="top"><a href="#float">Float</a></td>
-<td></td>
+<td>
+
+Quantité réelle reçue
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>status</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Etat d'acceptation du déchet
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>refusalReason</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Raison du refus du déchet, dans le cas d'un refus
+
+</td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#signature">Signature</a></td>
-<td></td>
+<td colspan="2" valign="top"><strong>identification</strong></td>
+<td valign="top"><a href="#vhuidentification">VhuIdentification</a></td>
+<td>
+
+Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -4070,17 +4570,20 @@ Liste des établissements dont l'utilisateur est membre
 <tr>
 <td colspan="2" valign="top"><strong>planned</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Opération de traitement prévue
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>done</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#signature">Signature</a></td>
-<td></td>
+<td>
+
+Opération de traitement réalisée
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -4098,78 +4601,35 @@ Liste des établissements dont l'utilisateur est membre
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>agreement</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>receipt</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>department</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>validityLimit</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>transportType</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>company</strong></td>
 <td valign="top"><a href="#formcompany">FormCompany</a></td>
-<td></td>
+<td>
+
+Coordonnées de l'entreprise de transport
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>tvaIntracommunautaire</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro de TVA intracommunautaire, dans le cas d'un transporteur étranger
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>recepisse</strong></td>
+<td valign="top"><a href="#vhurecepisse">VhuRecepisse</a></td>
+<td>
+
+Récépissé transporteur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>signature</strong></td>
 <td valign="top"><a href="#signature">Signature</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-
-### VhuWasteDetails
-
-<table>
-<thead>
-<tr>
-<th align="left">Field</th>
-<th align="right">Argument</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>packagingType</strong></td>
-<td valign="top"><a href="#vhupackagingtype">VhuPackagingType</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>identificationNumbers</strong></td>
-<td valign="top">[<a href="#string">String</a>]</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>identificationType</strong></td>
-<td valign="top"><a href="#vhuidentificationtype">VhuIdentificationType</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>quantity</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>quantityUnit</strong></td>
-<td valign="top"><a href="#vhuquantityunit">VhuQuantityUnit</a></td>
 <td></td>
 </tr>
 </tbody>
@@ -6204,17 +6664,38 @@ Annexe 2
 <tr>
 <td colspan="2" valign="top"><strong>quantity</strong></td>
 <td valign="top"><a href="#float">Float</a></td>
-<td></td>
+<td>
+
+Quantité réelle reçue
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>status</strong></td>
 <td valign="top"><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a></td>
-<td></td>
+<td>
+
+Status d'acceptation du déchet
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>refusalReason</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Raison du refus du déchet, dans le cas d'un refus
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>identification</strong></td>
+<td valign="top"><a href="#vhuidentificationinput">VhuIdentificationInput</a></td>
+<td>
+
+Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -6231,19 +6712,22 @@ Annexe 2
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>agreement</strong></td>
+<td colspan="2" valign="top"><strong>agrementNumber</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>validityLimit</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
-<td></td>
+<td>
+
+Numéro d'agrément émetteur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>company</strong></td>
 <td valign="top"><a href="#companyinput">CompanyInput</a></td>
-<td></td>
+<td>
+
+Coordonnées de l'entreprise émétrice
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -6262,27 +6746,106 @@ Annexe 2
 <tr>
 <td colspan="2" valign="top"><strong>isDraft</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a></td>
-<td></td>
+<td>
+
+Permet d'identifier un bordereau comme brouillon. N'est plus modifiable dès qu'une signature a été apposée.
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>emitter</strong></td>
 <td valign="top"><a href="#vhuemitterinput">VhuEmitterInput</a></td>
-<td></td>
+<td>
+
+Détails sur l'émetteur
+
+</td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
-<td valign="top"><a href="#vhuwastedetailsinput">VhuWasteDetailsInput</a></td>
-<td></td>
+<td colspan="2" valign="top"><strong>wasteCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code déchet. Presque toujours 16 01 06
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>packaging</strong></td>
+<td valign="top"><a href="#vhupackaging">VhuPackaging</a></td>
+<td>
+
+Conditionnement du déchet
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>identification</strong></td>
+<td valign="top"><a href="#vhuidentificationinput">VhuIdentificationInput</a></td>
+<td>
+
+Identification des VHUs
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#vhuquantityinput">VhuQuantityInput</a></td>
+<td>
+
+Quantité de VHUs
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>recipient</strong></td>
 <td valign="top"><a href="#vhurecipientinput">VhuRecipientInput</a></td>
-<td></td>
+<td>
+
+Détails sur la destination
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>transporter</strong></td>
 <td valign="top"><a href="#vhutransporterinput">VhuTransporterInput</a></td>
-<td></td>
+<td>
+
+Détails sur le transporteur
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### VhuIdentificationInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>numbers</strong></td>
+<td valign="top">[<a href="#string">String</a>]</td>
+<td>
+
+Numéros d'identification
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#vhuidentificationtype">VhuIdentificationType</a></td>
+<td>
+
+Type de numéros d'indentification
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -6301,11 +6864,80 @@ Annexe 2
 <tr>
 <td colspan="2" valign="top"><strong>planned</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td>
+
+Opération de traitement prévue
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>done</strong></td>
 <td valign="top"><a href="#string">String</a></td>
+<td>
+
+Opération de traitement réalisée
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### VhuQuantityInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>number</strong></td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+Quantité en nombre (nombre de lots ou nombre de numéros d'ordre)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>tons</strong></td>
+<td valign="top"><a href="#float">Float</a></td>
+<td>
+
+Quantité en tonnes
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### VhuRecepisseInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>number</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
 <td></td>
 </tr>
 </tbody>
@@ -6323,34 +6955,58 @@ Annexe 2
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>plannedOperation</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#vhurecipienttype">VhuRecipientType</a></td>
+<td>
+
+Type de receveur: broyeur ou second centre VHU
+
+</td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>agreement</strong></td>
+<td colspan="2" valign="top"><strong>agrementNumber</strong></td>
 <td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>validityLimit</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
-<td></td>
+<td>
+
+Numéro d'agrément de receveur
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>company</strong></td>
 <td valign="top"><a href="#companyinput">CompanyInput</a></td>
-<td></td>
+<td>
+
+Coordonnées de l'entreprise qui recoit les déchets
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>acceptance</strong></td>
 <td valign="top"><a href="#vhuacceptanceinput">VhuAcceptanceInput</a></td>
-<td></td>
+<td>
+
+Informations d'acceptation
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>operation</strong></td>
 <td valign="top"><a href="#vhuoperationinput">VhuOperationInput</a></td>
-<td></td>
+<td>
+
+Informations sur l'opétation de traitement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>plannedBroyeurCompany</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td>
+
+Destination utérieure prévue, dans le cas d'un second centre VHU
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -6369,17 +7025,38 @@ Annexe 2
 <tr>
 <td colspan="2" valign="top"><strong>type</strong></td>
 <td valign="top"><a href="#signaturetypeinput">SignatureTypeInput</a>!</td>
-<td></td>
+<td>
+
+Type de signature apposé
+
+</td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>signedAt</strong></td>
+<td colspan="2" valign="top"><strong>date</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a></td>
-<td></td>
+<td>
+
+Date de la signature
+
+</td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>signedBy</strong></td>
+<td colspan="2" valign="top"><strong>author</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
-<td></td>
+<td>
+
+Nom et prénom du signataire
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>securityCode</strong></td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+Code de sécurité de l'entreprise pour laquelle on signe. Permet de signer en tant que. Optionnel
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -6396,73 +7073,31 @@ Annexe 2
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>agreement</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>receipt</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>department</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>validityLimit</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>transportType</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>company</strong></td>
 <td valign="top"><a href="#companyinput">CompanyInput</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
+<td>
 
-### VhuWasteDetailsInput
+Coordonnées de l'entreprise de transport
 
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>packagingType</strong></td>
-<td valign="top"><a href="#vhupackagingtype">VhuPackagingType</a></td>
-<td></td>
+</td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>identificationNumbers</strong></td>
-<td valign="top">[<a href="#string">String</a>]</td>
-<td></td>
+<td colspan="2" valign="top"><strong>tvaIntracommunautaire</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro de TVA intracommunautaire, dans le cas d'un transporteur étranger
+
+</td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>identificationType</strong></td>
-<td valign="top"><a href="#vhuidentificationtype">VhuIdentificationType</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>quantity</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>quantityUnit</strong></td>
-<td valign="top"><a href="#vhuquantityunit">VhuQuantityUnit</a></td>
-<td></td>
+<td colspan="2" valign="top"><strong>recepisse</strong></td>
+<td valign="top"><a href="#vhurecepisseinput">VhuRecepisseInput</a></td>
+<td>
+
+Récépissé transporteur
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -6686,7 +7321,7 @@ Transporteur
 <td valign="top"><strong>WASTE_VEHICLES</strong></td>
 <td>
 
-Installation d'entreposage, dépollution, démontage, découpage de VHU
+Installation de traitement de VHU (casse automobile et/ou broyeur agréé)
 
 </td>
 </tr>
@@ -7306,19 +7941,15 @@ L'auteur de la signature est l'éco-organisme figurant sur le BSD
 </thead>
 <tbody>
 <tr>
-<td valign="top"><strong>SENT</strong></td>
+<td valign="top"><strong>EMITTER</strong></td>
 <td></td>
 </tr>
 <tr>
-<td valign="top"><strong>TRANSPORT</strong></td>
+<td valign="top"><strong>TRANSPORTER</strong></td>
 <td></td>
 </tr>
 <tr>
-<td valign="top"><strong>ACCEPTANCE</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>OPERATION</strong></td>
+<td valign="top"><strong>RECIPIENT</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -7400,17 +8031,17 @@ pour le détail de chacun des rôles
 </thead>
 <tbody>
 <tr>
-<td valign="top"><strong>VHU_NUMBER</strong></td>
+<td valign="top"><strong>NUMERO_ORDRE_REGISTRE_POLICE</strong></td>
 <td></td>
 </tr>
 <tr>
-<td valign="top"><strong>BUNDLE_NUMBER</strong></td>
+<td valign="top"><strong>NUMERO_ORDRE_LOTS_SORTANTS</strong></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 
-### VhuPackagingType
+### VhuPackaging
 
 <table>
 <thead>
@@ -7419,17 +8050,17 @@ pour le détail de chacun des rôles
 </thead>
 <tbody>
 <tr>
-<td valign="top"><strong>UNIT</strong></td>
+<td valign="top"><strong>UNITE</strong></td>
 <td></td>
 </tr>
 <tr>
-<td valign="top"><strong>BUNDLE</strong></td>
+<td valign="top"><strong>LOT</strong></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 
-### VhuQuantityUnit
+### VhuRecipientType
 
 <table>
 <thead>
@@ -7438,11 +8069,30 @@ pour le détail de chacun des rôles
 </thead>
 <tbody>
 <tr>
-<td valign="top"><strong>TON</strong></td>
+<td valign="top"><strong>BROYEUR</strong></td>
 <td></td>
 </tr>
 <tr>
-<td valign="top"><strong>NUMBER</strong></td>
+<td valign="top"><strong>DEMOLISSEUR</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### VhuStatus
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>IN_PROGRESS</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>DONE</strong></td>
 <td></td>
 </tr>
 </tbody>
