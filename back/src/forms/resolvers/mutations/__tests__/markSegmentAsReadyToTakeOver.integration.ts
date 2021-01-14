@@ -6,7 +6,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
+import prisma from "src/prisma";
 
 jest.mock("axios", () => ({
   default: {
@@ -50,8 +50,8 @@ describe("{ mutation { markSegmentAsReadyToTakeOver} }", () => {
         }`
     );
 
-    const readyToTakeOverSegment = await prisma.transportSegment({
-      id: segment.id
+    const readyToTakeOverSegment = await prisma.transportSegment.findUnique({
+      where: { id: segment.id }
     });
     expect(readyToTakeOverSegment.readyToTakeOver).toBe(true);
   });

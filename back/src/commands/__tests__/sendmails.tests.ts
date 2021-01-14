@@ -7,9 +7,9 @@ import {
 } from "../onboarding.helpers";
 
 // Let's mock prima DB
-jest.mock("../../generated/prisma-client", () => ({
-  prisma: {
-    users: jest.fn(() => [
+jest.mock("src/prisma", () => ({
+  user: {
+    findMany: jest.fn(() => [
       {
         email: "user@example.com",
         id: "xy123",
@@ -23,10 +23,10 @@ jest.mock("../../generated/prisma-client", () => ({
 }));
 
 describe("xDaysAgo", () => {
-  it("should return a formatted relative past date", () => {
+  it("should return a relative past date", () => {
     const someDate = new Date(2019, 9, 3, 10, 0, 0);
     const threeDaysBefore = xDaysAgo(someDate, 3);
-    expect(threeDaysBefore).toEqual("2019-09-30");
+    expect(threeDaysBefore.toISOString()).toEqual("2019-09-30T00:00:00.000Z");
   });
 });
 

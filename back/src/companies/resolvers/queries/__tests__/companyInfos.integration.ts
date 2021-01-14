@@ -1,6 +1,6 @@
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
 import makeClient from "../../../../__tests__/testClient";
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
 import * as sirene from "../../../sirene";
 
 const searchCompanySpy = jest.spyOn(sirene, "searchCompany");
@@ -70,18 +70,22 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       libelleNaf: "Programmation informatique"
     });
 
-    await prisma.createCompany({
-      siret: "85001946400013",
-      name: "Code en Stock",
-      securityCode: 1234,
-      contactEmail: "john.snow@trackdechets.fr",
-      contactPhone: "0600000000",
-      website: "https://trackdechets.beta.gouv.fr"
+    await prisma.company.create({
+      data: {
+        siret: "85001946400013",
+        name: "Code en Stock",
+        securityCode: 1234,
+        contactEmail: "john.snow@trackdechets.fr",
+        contactPhone: "0600000000",
+        website: "https://trackdechets.beta.gouv.fr"
+      }
     });
 
-    await prisma.createInstallation({
-      s3icNumeroSiret: "85001946400013",
-      codeS3ic: "0064.00001"
+    await prisma.installation.create({
+      data: {
+        s3icNumeroSiret: "85001946400013",
+        codeS3ic: "0064.00001"
+      }
     });
     const gqlquery = `
       query {
@@ -137,14 +141,16 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       department: "07"
     };
 
-    await prisma.createCompany({
-      siret: "85001946400013",
-      name: "Code en Stock",
-      securityCode: 1234,
-      contactEmail: "john.snow@trackdechets.fr",
-      contactPhone: "0600000000",
-      website: "https://trackdechets.beta.gouv.fr",
-      transporterReceipt: { create: receipt }
+    await prisma.company.create({
+      data: {
+        siret: "85001946400013",
+        name: "Code en Stock",
+        securityCode: 1234,
+        contactEmail: "john.snow@trackdechets.fr",
+        contactPhone: "0600000000",
+        website: "https://trackdechets.beta.gouv.fr",
+        transporterReceipt: { create: receipt }
+      }
     });
 
     const gqlquery = `
@@ -178,14 +184,16 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       department: "07"
     };
 
-    await prisma.createCompany({
-      siret: "85001946400013",
-      name: "Code en Stock",
-      securityCode: 1234,
-      contactEmail: "john.snow@trackdechets.fr",
-      contactPhone: "0600000000",
-      website: "https://trackdechets.beta.gouv.fr",
-      traderReceipt: { create: receipt }
+    await prisma.company.create({
+      data: {
+        siret: "85001946400013",
+        name: "Code en Stock",
+        securityCode: 1234,
+        contactEmail: "john.snow@trackdechets.fr",
+        contactPhone: "0600000000",
+        website: "https://trackdechets.beta.gouv.fr",
+        traderReceipt: { create: receipt }
+      }
     });
 
     const gqlquery = `

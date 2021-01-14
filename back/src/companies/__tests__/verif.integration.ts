@@ -1,8 +1,8 @@
 import axios from "axios";
+import prisma from "src/prisma";
+import { resetDatabase } from "integration-tests/helper";
 import * as sirene from "../sirene";
-import { verifyPrestataire, anomalies } from "../verif";
-import { prisma } from "../../generated/prisma-client";
-import { resetDatabase } from "../../../integration-tests/helper";
+import { anomalies, verifyPrestataire } from "../verif";
 
 // mock calls to declarations endpoint. Assume no declaration is returned
 const mockAxiosGet = jest.spyOn(axios, "get");
@@ -40,9 +40,11 @@ describe("verifyPrestataire", () => {
 
   it("should return NO_ANOMALY if company is an ICPE", async () => {
     mockSearchCompany.mockResolvedValueOnce(company);
-    await prisma.createInstallation({
-      s3icNumeroSiret: "85001946400013",
-      codeS3ic: "0064.00001"
+    await prisma.installation.create({
+      data: {
+        s3icNumeroSiret: "85001946400013",
+        codeS3ic: "0064.00001"
+      }
     });
 
     const [_, anomaly] = await verifyPrestataire("85001946400013");
@@ -54,16 +56,20 @@ describe("verifyPrestataire", () => {
       but is not allowed for dangereous waste`, async () => {
     mockSearchCompany.mockResolvedValueOnce(company);
     // create an ICPE
-    await prisma.createInstallation({
-      s3icNumeroSiret: "85001946400013",
-      codeS3ic: "0064.00001"
+    await prisma.installation.create({
+      data: {
+        s3icNumeroSiret: "85001946400013",
+        codeS3ic: "0064.00001"
+      }
     });
 
     // with only one rubrique for not dangereous waste
-    await prisma.createRubrique({
-      codeS3ic: "0064.00001",
-      rubrique: "2780",
-      wasteType: "NOT_DANGEROUS"
+    await prisma.rubrique.create({
+      data: {
+        codeS3ic: "0064.00001",
+        rubrique: "2780",
+        wasteType: "NOT_DANGEROUS"
+      }
     });
 
     // verify this company for a dangereous waste
@@ -75,16 +81,20 @@ describe("verifyPrestataire", () => {
   it("should return NO_ANOMALY if a company is an ICPE allowed for dangerous waste", async () => {
     mockSearchCompany.mockResolvedValueOnce(company);
     // create an ICPE
-    await prisma.createInstallation({
-      s3icNumeroSiret: "85001946400013",
-      codeS3ic: "0064.00001"
+    await prisma.installation.create({
+      data: {
+        s3icNumeroSiret: "85001946400013",
+        codeS3ic: "0064.00001"
+      }
     });
 
     // with one rubrique for dangereous waste
-    await prisma.createRubrique({
-      codeS3ic: "0064.00001",
-      rubrique: "2780",
-      wasteType: "DANGEROUS"
+    await prisma.rubrique.create({
+      data: {
+        codeS3ic: "0064.00001",
+        rubrique: "2780",
+        wasteType: "DANGEROUS"
+      }
     });
 
     // verify this company for a dangereous waste

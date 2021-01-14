@@ -1,5 +1,5 @@
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
 import makeClient from "../../../../__tests__/testClient";
 
 const INVITATION = `
@@ -18,11 +18,13 @@ describe("query / invitation", () => {
 
   it("should return an invitation by hash", async () => {
     const { query } = makeClient();
-    const userAccountHash = await prisma.createUserAccountHash({
-      email: "john.snow@trackdechets.fr",
-      companySiret: "11111111111111",
-      hash: "azerty",
-      role: "MEMBER"
+    const userAccountHash = await prisma.userAccountHash.create({
+      data: {
+        email: "john.snow@trackdechets.fr",
+        companySiret: "11111111111111",
+        hash: "azerty",
+        role: "MEMBER"
+      }
     });
     const { data } = await query(INVITATION, {
       variables: { hash: userAccountHash.hash }

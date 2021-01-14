@@ -1,13 +1,13 @@
-import { resetDatabase } from "../../../../../integration-tests/helper";
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
+import { ErrorCode } from "../../../../common/errors";
 import {
-  userWithCompanyFactory,
-  userFactory,
+  companyFactory,
   formFactory,
-  companyFactory
+  userFactory,
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { prisma } from "../../../../generated/prisma-client";
-import { ErrorCode } from "../../../../common/errors";
 
 const UPDATE_FORM = `
   mutation UpdateForm($updateFormInput: UpdateFormInput!) {
@@ -267,10 +267,12 @@ describe("Mutation.updateForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.createEcoOrganisme({
-      address: "",
-      name: eo.name,
-      siret: eo.siret
+    await prisma.ecoOrganisme.create({
+      data: {
+        address: "",
+        name: eo.name,
+        siret: eo.siret
+      }
     });
     const form = await formFactory({
       ownerId: user.id,
@@ -363,10 +365,12 @@ describe("Mutation.updateForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.createEcoOrganisme({
-      address: "",
-      name: originalEO.name,
-      siret: originalEO.siret
+    await prisma.ecoOrganisme.create({
+      data: {
+        address: "",
+        name: originalEO.name,
+        siret: originalEO.siret
+      }
     });
     const form = await formFactory({
       ownerId: user.id,
@@ -382,10 +386,12 @@ describe("Mutation.updateForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.createEcoOrganisme({
-      address: "",
-      name: newEO.name,
-      siret: newEO.siret
+    await prisma.ecoOrganisme.create({
+      data: {
+        address: "",
+        name: newEO.name,
+        siret: newEO.siret
+      }
     });
 
     const { mutate } = makeClient(user);
@@ -411,10 +417,12 @@ describe("Mutation.updateForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.createEcoOrganisme({
-      address: "",
-      name: eo.name,
-      siret: eo.siret
+    await prisma.ecoOrganisme.create({
+      data: {
+        address: "",
+        name: eo.name,
+        siret: eo.siret
+      }
     });
     const form = await formFactory({
       ownerId: user.id,

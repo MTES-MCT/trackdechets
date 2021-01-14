@@ -1,3 +1,4 @@
+import { WasteAcceptationStatus } from "@prisma/client";
 import { Machine } from "xstate";
 import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "../../common/constants";
 import { Event, EventType, FormState } from "./types";
@@ -167,21 +168,25 @@ const machine = Machine<any, Event>(
         !!event?.formUpdateInput?.noTraceability,
       awaitsGroup: (_, event) =>
         PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-          event.formUpdateInput?.processingOperationDone
+          event.formUpdateInput?.processingOperationDone as string
         ),
       isFormRefused: (_, event) =>
         event.formUpdateInput?.wasteAcceptationStatus === "REFUSED",
       isFormAccepted: (_, event) =>
-        ["ACCEPTED", "PARTIALLY_REFUSED"].includes(
-          event.formUpdateInput?.wasteAcceptationStatus
-        ),
+        [
+          WasteAcceptationStatus.ACCEPTED,
+          WasteAcceptationStatus.PARTIALLY_REFUSED
+        ].includes(event.formUpdateInput?.wasteAcceptationStatus as any),
       isFormRefusedByTempStorage: (_, event) =>
         event.formUpdateInput?.temporaryStorageDetail?.update
           ?.tempStorerWasteAcceptationStatus === "REFUSED",
       isFormAcceptedByTempStorage: (_, event) =>
-        ["ACCEPTED", "PARTIALLY_REFUSED"].includes(
+        [
+          WasteAcceptationStatus.ACCEPTED,
+          WasteAcceptationStatus.PARTIALLY_REFUSED
+        ].includes(
           event.formUpdateInput?.temporaryStorageDetail?.update
-            ?.tempStorerWasteAcceptationStatus
+            ?.tempStorerWasteAcceptationStatus as any
         )
     }
   }

@@ -1,4 +1,5 @@
-import { User, Company, prisma } from "../generated/prisma-client";
+import { User, Company } from "@prisma/client";
+import prisma from "src/prisma";
 import { getCompanyAdminUsers } from "../companies/database";
 import { NotCompanyAdmin, NotCompanyMember } from "../common/errors";
 
@@ -14,14 +15,18 @@ export async function checkIsCompanyMember(
   { id }: { id: string },
   { siret }: { siret: string }
 ) {
-  const isCompanyMember = await prisma.$exists.companyAssociation({
-    user: {
-      id
-    },
-    company: {
-      siret
+  const companyAssociation = await prisma.companyAssociation.findFirst({
+    where: {
+      user: {
+        id
+      },
+      company: {
+        siret
+      }
     }
   });
+
+  const isCompanyMember = companyAssociation != null;
 
   if (isCompanyMember) {
     return true;

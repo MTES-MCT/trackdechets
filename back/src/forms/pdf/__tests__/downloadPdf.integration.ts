@@ -5,7 +5,7 @@ import {
   userWithCompanyFactory
 } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
-import { prisma } from "../../../generated/prisma-client";
+import prisma from "src/prisma";
 
 const request = supertest(app);
 
@@ -21,9 +21,11 @@ describe("downloadPdf", () => {
   afterAll(resetDatabase);
   it("should download a pdf", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const { token } = await prisma.createAccessToken({
-      user: { connect: { id: user.id } },
-      token: "token"
+    const { token } = await prisma.accessToken.create({
+      data: {
+        user: { connect: { id: user.id } },
+        token: "token"
+      }
     });
     const form = await formFactory({
       ownerId: user.id,

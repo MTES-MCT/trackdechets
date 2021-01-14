@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import bodyParser from "body-parser";
+import { text } from "body-parser";
 
 /**
  * GraphQL server middleware to support application/graphql requests
@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
  */
 export default (req: Request, res: Response, next: NextFunction) => {
   if (req.is("application/graphql")) {
-    bodyParser.text({ type: "application/graphql" })(req, res, () => {
+    text({ type: "application/graphql" })(req, res, () => {
       req.headers["content-type"] = "application/json";
       req.body = {
         query: req.body

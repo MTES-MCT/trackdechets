@@ -1,11 +1,11 @@
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
 import {
   formFactory,
   formWithTempStorageFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { prisma } from "../../../../generated/prisma-client";
-import { resetDatabase } from "../../../../../integration-tests/helper";
 
 const DUPLICATE_FORM = `
   mutation DuplicateForm($id: ID!) {
@@ -112,7 +112,9 @@ describe("Mutation.duplicateForm", () => {
         id
       }
     });
-    const duplicatedForm = await prisma.form({ id: data.duplicateForm.id });
+    const duplicatedForm = await prisma.form.findUnique({
+      where: { id: data.duplicateForm.id }
+    });
 
     expect(duplicatedForm).toMatchObject({
       customId: null,
@@ -122,7 +124,7 @@ describe("Mutation.duplicateForm", () => {
       status: "DRAFT",
       sentAt: null,
       sentBy: null,
-      isAccepted: null,
+      isAccepted: false,
       wasteAcceptationStatus: null,
       wasteRefusalReason: null,
       receivedBy: null,
@@ -233,7 +235,9 @@ describe("Mutation.duplicateForm", () => {
       transporterReceipt,
       transporterDepartment,
       transporterValidityLimit
-    } = await prisma.form({ id: form.id }).temporaryStorageDetail();
+    } = await prisma.form
+      .findUnique({ where: { id: form.id } })
+      .temporaryStorageDetail();
 
     const { mutate } = makeClient(user);
     const { data } = await mutate(DUPLICATE_FORM, {
@@ -241,10 +245,14 @@ describe("Mutation.duplicateForm", () => {
         id: form.id
       }
     });
-    const duplicatedForm = await prisma.form({ id: data.duplicateForm.id });
-    const duplicatedTemporaryStorageDetail = await prisma
-      .form({
-        id: duplicatedForm.id
+    const duplicatedForm = await prisma.form.findUnique({
+      where: { id: data.duplicateForm.id }
+    });
+    const duplicatedTemporaryStorageDetail = await prisma.form
+      .findUnique({
+        where: {
+          id: duplicatedForm.id
+        }
       })
       .temporaryStorageDetail();
 
@@ -302,7 +310,8 @@ describe("Mutation.duplicateForm", () => {
       }
     });
 
-    const statusLogs = await prisma.statusLogs({
+    // check relevant statusLog is created
+    const statusLogs = await prisma.statusLog.findMany({
       where: {
         form: { id: data.duplicateForm.id },
         user: { id: user.id },

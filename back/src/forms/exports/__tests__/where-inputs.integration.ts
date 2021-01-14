@@ -1,9 +1,10 @@
+import { CompanyType } from "@prisma/client";
+import prisma from "src/prisma";
+import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   formFactory,
   userWithCompanyFactory
 } from "../../../__tests__/factories";
-import { CompanyType, prisma } from "../../../generated/prisma-client";
-import { resetDatabase } from "../../../../integration-tests/helper";
 import { formsWhereInput } from "../where-inputs";
 
 describe("whereInputs", () => {
@@ -22,7 +23,7 @@ describe("whereInputs", () => {
       ownerId: user.id,
       opt: {
         status: "PROCESSED",
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         emitterCompanySiret: company.siret,
         wasteDetailsCode: "06 01 01*"
       }
@@ -34,7 +35,7 @@ describe("whereInputs", () => {
       ownerId: user.id,
       opt: {
         status: "PROCESSED",
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         emitterCompanySiret: "xxxxxxxxxxxxxx",
         recipientCompanySiret: "zzzzzzzzzzzzzz",
         wasteDetailsCode: "06 01 01*"
@@ -48,7 +49,7 @@ describe("whereInputs", () => {
       opt: {
         status: "DRAFT",
         emitterCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -57,7 +58,7 @@ describe("whereInputs", () => {
       opt: {
         status: "SEALED",
         emitterCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -69,7 +70,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         recipientCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -81,7 +82,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         emitterCompanySiret: company.siret,
-        sentAt: "2019-03-01T00:00:00",
+        sentAt: new Date("2019-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -93,7 +94,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         emitterCompanySiret: company.siret,
-        sentAt: "2021-03-01T00:00:00",
+        sentAt: new Date("2021-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -105,7 +106,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         emitterCompanySiret: company.siret,
-        sentAt: "2021-03-01T00:00:00",
+        sentAt: new Date("2021-03-01T00:00:00"),
         wasteDetailsCode: "06 01 02*"
       }
     });
@@ -113,11 +114,11 @@ describe("whereInputs", () => {
     const whereInput = formsWhereInput(
       "OUTGOING",
       [company.siret],
-      "2020-01-01T00:00:00",
-      "2020-12-31T00:00:00",
+      new Date("2020-01-01"),
+      new Date("2020-12-31"),
       "06 01 01*"
     );
-    const forms = await prisma.forms({ where: whereInput });
+    const forms = await prisma.form.findMany({ where: whereInput });
 
     expect(forms).toHaveLength(1);
     expect(forms[0]).toEqual(form);
@@ -140,7 +141,7 @@ describe("whereInputs", () => {
       ownerId: user.id,
       opt: {
         status: "PROCESSED",
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         recipientCompanySiret: company.siret,
         wasteDetailsCode: "06 01 01*"
       }
@@ -153,7 +154,7 @@ describe("whereInputs", () => {
       ownerId: user.id,
       opt: {
         status: "PROCESSED",
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         recipientIsTempStorage: true,
         recipientCompanySiret: company.siret,
         wasteDetailsCode: "06 01 01*"
@@ -167,7 +168,7 @@ describe("whereInputs", () => {
       ownerId: user.id,
       opt: {
         status: "PROCESSED",
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         recipientIsTempStorage: true,
         temporaryStorageDetail: {
           create: { destinationCompanySiret: company.siret }
@@ -183,7 +184,7 @@ describe("whereInputs", () => {
       ownerId: user.id,
       opt: {
         status: "PROCESSED",
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         emitterCompanySiret: "xxxxxxxxxxxxxx",
         recipientCompanySiret: "zzzzzzzzzzzzzz",
         wasteDetailsCode: "06 01 01*"
@@ -197,7 +198,7 @@ describe("whereInputs", () => {
       opt: {
         status: "DRAFT",
         recipientCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -206,7 +207,7 @@ describe("whereInputs", () => {
       opt: {
         status: "SEALED",
         recipientCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -215,7 +216,7 @@ describe("whereInputs", () => {
       opt: {
         status: "SENT",
         recipientCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -227,7 +228,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         emitterCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -239,7 +240,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         recipientCompanySiret: company.siret,
-        sentAt: "2019-03-01T00:00:00",
+        sentAt: new Date("2019-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -251,7 +252,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         recipientCompanySiret: company.siret,
-        sentAt: "2021-03-01T00:00:00",
+        sentAt: new Date("2021-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -263,7 +264,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         emitterCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 02*"
       }
     });
@@ -271,11 +272,11 @@ describe("whereInputs", () => {
     const whereInput = formsWhereInput(
       "INCOMING",
       [company.siret],
-      "2020-01-01T00:00:00",
-      "2020-12-31T00:00:00",
+      new Date("2020-01-01"),
+      new Date("2020-12-31"),
       "06 01 01*"
     );
-    const forms = await prisma.forms({ where: whereInput });
+    const forms = await prisma.form.findMany({ where: whereInput });
 
     expect(forms).toHaveLength(3);
     expect(forms).toEqual(expected);
@@ -297,7 +298,7 @@ describe("whereInputs", () => {
       ownerId: user.id,
       opt: {
         status: "PROCESSED",
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         transporterCompanySiret: company.siret,
         wasteDetailsCode: "06 01 01*"
       }
@@ -310,7 +311,7 @@ describe("whereInputs", () => {
       ownerId: user.id,
       opt: {
         status: "PROCESSED",
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         recipientIsTempStorage: true,
         temporaryStorageDetail: {
           create: { transporterCompanySiret: company.siret }
@@ -326,7 +327,7 @@ describe("whereInputs", () => {
       ownerId: user.id,
       opt: {
         status: "PROCESSED",
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         transportSegments: {
           create: {
             transporterCompanySiret: company.siret
@@ -343,7 +344,7 @@ describe("whereInputs", () => {
       ownerId: user.id,
       opt: {
         status: "PROCESSED",
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         transporterCompanySiret: "xxxxxxxxxxxxxx",
         wasteDetailsCode: "06 01 01*"
       }
@@ -356,7 +357,7 @@ describe("whereInputs", () => {
       opt: {
         status: "DRAFT",
         transporterCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -365,7 +366,7 @@ describe("whereInputs", () => {
       opt: {
         status: "SEALED",
         recipientCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -377,7 +378,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         emitterCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -389,7 +390,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         transporterCompanySiret: company.siret,
-        sentAt: "2019-03-01T00:00:00",
+        sentAt: new Date("2019-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -401,7 +402,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         transporterCompanySiret: company.siret,
-        sentAt: "2021-03-01T00:00:00",
+        sentAt: new Date("2021-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -413,7 +414,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         transporterCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 02*"
       }
     });
@@ -421,11 +422,11 @@ describe("whereInputs", () => {
     const whereInput = formsWhereInput(
       "TRANSPORTED",
       [company.siret],
-      "2020-01-01T00:00:00",
-      "2020-12-31T00:00:00",
+      new Date("2020-01-01"),
+      new Date("2020-12-31"),
       "06 01 01*"
     );
-    const forms = await prisma.forms({ where: whereInput });
+    const forms = await prisma.form.findMany({ where: whereInput });
 
     expect(forms).toHaveLength(3);
     expect(forms).toEqual(expected);
@@ -447,7 +448,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         traderCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -459,7 +460,7 @@ describe("whereInputs", () => {
       opt: {
         status: "DRAFT",
         traderCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -468,7 +469,7 @@ describe("whereInputs", () => {
       opt: {
         status: "SEALED",
         traderCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -480,7 +481,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         traderCompanySiret: company.siret,
-        sentAt: "2019-03-01T00:00:00",
+        sentAt: new Date("2019-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -492,7 +493,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         traderCompanySiret: company.siret,
-        sentAt: "2021-03-01T00:00:00",
+        sentAt: new Date("2021-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -504,7 +505,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         traderCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 02*"
       }
     });
@@ -512,11 +513,11 @@ describe("whereInputs", () => {
     const whereInput = formsWhereInput(
       "TRADED",
       [company.siret],
-      "2020-01-01T00:00:00",
-      "2020-12-31T00:00:00",
+      new Date("2020-01-01"),
+      new Date("2020-12-31"),
       "06 01 01*"
     );
-    const forms = await prisma.forms({ where: whereInput });
+    const forms = await prisma.form.findMany({ where: whereInput });
 
     expect(forms).toHaveLength(1);
     expect(forms[0]).toEqual(form);
@@ -534,7 +535,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         emitterCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -547,7 +548,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         recipientCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -559,7 +560,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         transporterCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -572,7 +573,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         traderCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -589,7 +590,7 @@ describe("whereInputs", () => {
       opt: {
         status: "DRAFT",
         traderCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -598,7 +599,7 @@ describe("whereInputs", () => {
       opt: {
         status: "SEALED",
         traderCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -610,7 +611,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         traderCompanySiret: company.siret,
-        sentAt: "2019-03-01T00:00:00",
+        sentAt: new Date("2019-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -622,7 +623,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         traderCompanySiret: company.siret,
-        sentAt: "2021-03-01T00:00:00",
+        sentAt: new Date("2021-03-01T00:00:00"),
         wasteDetailsCode: "06 01 01*"
       }
     });
@@ -634,7 +635,7 @@ describe("whereInputs", () => {
       opt: {
         status: "PROCESSED",
         traderCompanySiret: company.siret,
-        sentAt: "2020-03-01T00:00:00",
+        sentAt: new Date("2020-03-01T00:00:00"),
         wasteDetailsCode: "06 01 02*"
       }
     });
@@ -642,11 +643,11 @@ describe("whereInputs", () => {
     const whereInput = formsWhereInput(
       "ALL",
       [company.siret],
-      "2020-01-01T00:00:00",
-      "2020-12-31T00:00:00",
+      new Date("2020-01-01"),
+      new Date("2020-12-31"),
       "06 01 01*"
     );
-    const forms = await prisma.forms({ where: whereInput });
+    const forms = await prisma.form.findMany({ where: whereInput });
 
     expect(forms).toHaveLength(4);
     expect(forms).toEqual(expected);

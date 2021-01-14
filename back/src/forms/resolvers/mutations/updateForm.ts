@@ -3,7 +3,8 @@ import {
   flattenTemporaryStorageDetailInput,
   expandFormFromDb
 } from "../../form-converter";
-import { FormUpdateInput, prisma } from "../../../generated/prisma-client";
+import { Prisma } from "@prisma/client";
+import prisma from "src/prisma";
 import {
   ResolversParentTypes,
   MutationUpdateFormArgs
@@ -48,7 +49,7 @@ const updateFormResolver = async (
   const form = flattenFormInput(formContent);
 
   // Construct form update payload
-  const formUpdateInput: FormUpdateInput = {
+  const formUpdateInput: Prisma.FormUpdateInput = {
     ...form,
     appendix2Forms: { set: appendix2Forms }
   };
@@ -65,8 +66,8 @@ const updateFormResolver = async (
       formContent.recipient?.isTempStorage !== false) ||
     formContent.recipient?.isTempStorage === true;
 
-  const existingTemporaryStorageDetail = await prisma
-    .form({ id })
+  const existingTemporaryStorageDetail = await prisma.form
+    .findUnique({ where: { id } })
     .temporaryStorageDetail();
 
   // make sure user will still be form contributor after update
@@ -86,7 +87,9 @@ const updateFormResolver = async (
     nextFormSirets.temporaryStorageDetail = {
       destinationCompanySiret:
         temporaryStorageDetail?.destination?.company?.siret ??
-        existingTemporaryStorageDetail?.destinationCompanySiret
+        existingTemporaryStorageDetail?.destinationCompanySiret,
+      transporterCompanySiret:
+        existingTemporaryStorageDetail?.transporterCompanySiret
     };
   }
 
@@ -122,7 +125,7 @@ const updateFormResolver = async (
     }
   }
 
-  const updatedForm = await prisma.updateForm({
+  const updatedForm = await prisma.form.update({
     where: { id },
     data: formUpdateInput
   });

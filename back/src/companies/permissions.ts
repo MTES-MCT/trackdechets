@@ -1,4 +1,5 @@
-import { User, TraderReceipt, prisma } from "../generated/prisma-client";
+import { User, TraderReceipt } from "@prisma/client";
+import prisma from "src/prisma";
 import { getFullUser } from "../users/database";
 import { ForbiddenError } from "apollo-server-express";
 import { getUserRole } from "./database";
@@ -10,7 +11,7 @@ export async function checkCanReadUpdateDeleteTraderReceipt(
   const fullUser = await getFullUser(user);
 
   // check associated company
-  const companies = await prisma.companies({
+  const companies = await prisma.company.findMany({
     where: { traderReceipt: { id: receipt.id } }
   });
 
@@ -43,7 +44,7 @@ export async function checkCanReadUpdateDeleteTransporterReceipt(
   const fullUser = await getFullUser(user);
 
   // check associated company
-  const companies = await prisma.companies({
+  const companies = await prisma.company.findMany({
     where: { transporterReceipt: { id: receipt.id } }
   });
 

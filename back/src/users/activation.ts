@@ -1,4 +1,4 @@
-import { prisma } from "../generated/prisma-client";
+import prisma from "src/prisma";
 import { getUIBaseURL } from "../utils";
 
 export const userActivationHandler = async (req, res) => {
@@ -8,13 +8,15 @@ export const userActivationHandler = async (req, res) => {
     return;
   }
 
-  const user = await prisma.userActivationHash({ hash }).user();
+  const user = await prisma.userActivationHash
+    .findUnique({ where: { hash } })
+    .user();
   if (user == null) {
     res.status(500).send("Hash invalide.");
     return;
   }
 
-  await prisma.updateUser({
+  await prisma.user.update({
     where: { id: user.id },
     data: { isActive: true }
   });

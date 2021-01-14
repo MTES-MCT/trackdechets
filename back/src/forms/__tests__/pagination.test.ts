@@ -3,25 +3,25 @@ import { getConnectionsArgs } from "../pagination";
 describe("getConnectionArgs", () => {
   it("should default to forward pagination if no arguments is provided", () => {
     const args = getConnectionsArgs({ defaultPaginateBy: 100 });
-    expect(args).toEqual({ first: 100 });
+    expect(args).toEqual({ take: 100 });
   });
   it("should default to forward pagination if only `skip` is provided", () => {
     const args = getConnectionsArgs({ defaultPaginateBy: 100, skip: 2 });
-    expect(args).toEqual({ first: 100, skip: 2 });
+    expect(args).toEqual({ take: 100, skip: 2 });
   });
   it("should set default value to `first` if cursorAfter is provided", () => {
     const args = getConnectionsArgs({
       cursorAfter: "after",
       defaultPaginateBy: 100
     });
-    expect(args).toEqual({ first: 100, after: "after" });
+    expect(args).toEqual({ take: 100, skip: 1, cursor: { id: "after" } });
   });
   it("should set default value to `last` if cursorBefore is provided", () => {
     const args = getConnectionsArgs({
       cursorBefore: "before",
       defaultPaginateBy: 100
     });
-    expect(args).toEqual({ last: 100, before: "before" });
+    expect(args).toEqual({ take: -100, skip: 1, cursor: { id: "before" } });
   });
   it.each(["first", "last"])(
     "should throw a validation error if %p is not an integer",

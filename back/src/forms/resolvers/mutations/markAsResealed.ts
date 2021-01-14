@@ -1,15 +1,15 @@
-import { MutationResolvers } from "../../../generated/graphql/types";
+import { UserInputError } from "apollo-server-express";
+import prisma from "src/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
 import {
   expandFormFromDb,
   flattenResealedFormInput
 } from "../../form-converter";
 import { checkCanMarkAsResealed } from "../../permissions";
-import transitionForm from "../../workflow/transitionForm";
-import { prisma } from "../../../generated/prisma-client";
-import { UserInputError } from "apollo-server-express";
 import { resealedFormSchema } from "../../validation";
+import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 
 const markAsResealed: MutationResolvers["markAsResealed"] = async (
@@ -23,8 +23,8 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
 
   const form = await getFormOrFormNotFound({ id });
 
-  const temporaryStorageDetail = await prisma
-    .form({ id: form.id })
+  const temporaryStorageDetail = await prisma.form
+    .findUnique({ where: { id: form.id } })
     .temporaryStorageDetail();
 
   if (temporaryStorageDetail === null) {

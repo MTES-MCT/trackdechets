@@ -1,4 +1,13 @@
+import {
+  Consistence,
+  EmitterType,
+  Form,
+  QuantityType,
+  TemporaryStorageDetail,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
+import prisma from "src/prisma";
 import countries from "world-countries";
 import * as yup from "yup";
 import {
@@ -10,15 +19,6 @@ import {
 import configureYup from "../common/yup/configureYup";
 import validDatetime from "../common/yup/validDatetime";
 import { PackagingInfo, Packagings } from "../generated/graphql/types";
-import {
-  Consistence,
-  EmitterType,
-  Form,
-  prisma,
-  QuantityType,
-  TemporaryStorageDetail,
-  WasteAcceptationStatus
-} from "../generated/prisma-client";
 
 // set yup default error messages
 configureYup();
@@ -202,7 +202,9 @@ const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseignée ne p
 // *************************************************************
 
 // 1 - Émetteur du bordereau
-export const emitterSchema: yup.ObjectSchema<Emitter> = yup.object().shape({
+export const emitterSchema: yup.ObjectSchema<Partial<
+  Emitter
+>> = yup.object().shape({
   emitterType: yup.mixed<EmitterType>().when("ecoOrganismeSiret", {
     is: ecoOrganismeSiret => !ecoOrganismeSiret,
     then: yup.mixed().required(`Émetteur: Le type d'émetteur est obligatoire`),
@@ -252,14 +254,20 @@ export const ecoOrganismeSchema = yup.object().shape({
       "L'éco-organisme avec le siret \"${value}\" n'est pas reconnu.",
       ecoOrganismeSiret =>
         ecoOrganismeSiret
-          ? prisma.$exists.ecoOrganisme({ siret: ecoOrganismeSiret })
+          ? prisma.ecoOrganisme
+              .findFirst({
+                where: { siret: ecoOrganismeSiret }
+              })
+              .then(el => el != null)
           : true
     ),
   ecoOrganismeName: yup.string().notRequired().nullable()
 });
 
 // 2 - Installation de destination ou d’entreposage ou de reconditionnement prévue
-export const recipientSchema: yup.ObjectSchema<Recipient> = yup.object().shape({
+export const recipientSchema: yup.ObjectSchema<Partial<
+  Recipient
+>> = yup.object().shape({
   recipientProcessingOperation: yup
     .string()
     .label("Opération d’élimination / valorisation")
@@ -332,140 +340,141 @@ const packagingInfo: yup.ObjectSchema<PackagingInfo> = yup.object().shape({
 // 4 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
 // 5 - Conditionnement
 // 6 - Quantité
-export const wasteDetailsSchema: yup.ObjectSchema<WasteDetails> = yup
-  .object()
-  .shape({
-    wasteDetailsCode: yup
-      .string()
-      .ensure()
-      .required("Le code déchet est obligatoire")
-      .oneOf(WASTES_CODES, INVALID_WASTE_CODE),
-    wasteDetailsOnuCode: yup.string().when("wasteDetailsCode", {
-      is: (wasteCode: string) => isDangerous(wasteCode || ""),
-      then: () =>
-        yup
-          .string()
-          .ensure()
-          .required(
-            `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
-          ),
-      otherwise: () => yup.string().nullable()
-    }),
-    wasteDetailsPackagingInfos: yup
-      .array()
-      .required("Le détail du conditionnement est obligatoire")
-      .of(packagingInfo)
-      .test(
-        "is-valid-packaging-infos",
-        "${path} ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
-        (infos: PackagingInfo[]) => {
-          const hasCiterne = infos?.find(i => i.type === "CITERNE");
-          const hasBenne = infos?.find(i => i.type === "BENNE");
+export const wasteDetailsSchema: yup.ObjectSchema<Partial<
+  WasteDetails
+>> = yup.object().shape({
+  wasteDetailsCode: yup
+    .string()
+    .ensure()
+    .required("Le code déchet est obligatoire")
+    .oneOf(WASTES_CODES, INVALID_WASTE_CODE),
+  wasteDetailsOnuCode: yup.string().when("wasteDetailsCode", {
+    is: (wasteCode: string) => isDangerous(wasteCode || ""),
+    then: () =>
+      yup
+        .string()
+        .ensure()
+        .required(
+          `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
+        ),
+    otherwise: () => yup.string().nullable()
+  }),
+  wasteDetailsPackagingInfos: yup
+    .array()
+    .required("Le détail du conditionnement est obligatoire")
+    .of(packagingInfo)
+    .test(
+      "is-valid-packaging-infos",
+      "${path} ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
+      (infos: PackagingInfo[]) => {
+        const hasCiterne = infos?.find(i => i.type === "CITERNE");
+        const hasBenne = infos?.find(i => i.type === "BENNE");
 
-          if (hasCiterne && hasBenne) {
-            return false;
-          }
-
-          const hasOtherPackaging = infos?.find(
-            i => !["CITERNE", "BENNE"].includes(i.type)
-          );
-          if ((hasCiterne || hasBenne) && hasOtherPackaging) {
-            return false;
-          }
-
-          return true;
+        if (hasCiterne && hasBenne) {
+          return false;
         }
-      ),
-    wasteDetailsQuantity: yup
-      .number()
-      .required("La quantité du déchet en tonnes est obligatoire")
-      .min(0, "La quantité doit être supérieure à 0"),
-    wasteDetailsQuantityType: yup
-      .mixed<QuantityType>()
-      .required("Le type de quantité (réelle ou estimée) doit être précisé"),
-    wasteDetailsConsistence: yup
-      .mixed<Consistence>()
-      .required("La consistance du déchet doit être précisée"),
-    wasteDetailsPop: yup
-      .boolean()
-      .required("La présence (ou non) de POP doit être précisée")
-  });
+
+        const hasOtherPackaging = infos?.find(
+          i => !["CITERNE", "BENNE"].includes(i.type)
+        );
+        if ((hasCiterne || hasBenne) && hasOtherPackaging) {
+          return false;
+        }
+
+        return true;
+      }
+    ),
+  wasteDetailsQuantity: yup
+    .number()
+    .required("La quantité du déchet en tonnes est obligatoire")
+    .min(0, "La quantité doit être supérieure à 0"),
+  wasteDetailsQuantityType: yup
+    .mixed<QuantityType>()
+    .required("Le type de quantité (réelle ou estimée) doit être précisé"),
+  wasteDetailsConsistence: yup
+    .mixed<Consistence>()
+    .required("La consistance du déchet doit être précisée"),
+  wasteDetailsPop: yup
+    .boolean()
+    .required("La présence (ou non) de POP doit être précisée")
+});
 
 // 8 - Collecteur-transporteur
-export const transporterSchema: yup.ObjectSchema<Transporter> = yup
-  .object()
-  .shape({
-    transporterCompanyName: yup
-      .string()
-      .ensure()
-      .required(`Transporteur: ${MISSING_COMPANY_NAME}`),
-    transporterCompanySiret: yup
-      .string()
-      .ensure()
-      .required(`Transporteur: ${MISSING_COMPANY_SIRET}`)
-      .length(14, `Transporteur: ${INVALID_SIRET_LENGTH}`),
-    transporterCompanyAddress: yup
-      .string()
-      .ensure()
-      .required(`Transporteur: ${MISSING_COMPANY_ADDRESS}`),
-    transporterCompanyContact: yup
-      .string()
-      .ensure()
-      .required(`Transporteur: ${MISSING_COMPANY_CONTACT}`),
-    transporterCompanyPhone: yup
-      .string()
-      .ensure()
-      .required(`Transporteur: ${MISSING_COMPANY_PHONE}`),
-    transporterCompanyMail: yup
-      .string()
-      .email()
-      .ensure()
-      .required(`Transporteur: ${MISSING_COMPANY_EMAIL}`),
-    transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
-    transporterReceipt: yup
-      .string()
-      .when("transporterIsExemptedOfReceipt", (isExemptedOfReceipt, schema) =>
-        isExemptedOfReceipt
-          ? schema.notRequired().nullable()
-          : schema
-              .ensure()
-              .required(
-                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
-              )
-      ),
-    transporterDepartment: yup
-      .string()
-      .when("transporterIsExemptedOfReceipt", (isExemptedOfReceipt, schema) =>
-        isExemptedOfReceipt
-          ? schema.notRequired().nullable()
-          : schema
-              .ensure()
-              .required("Le département du transporteur est obligatoire")
-      ),
-    transporterValidityLimit: validDatetime({
-      verboseFieldName: "date de validité"
-    })
-  });
+export const transporterSchema: yup.ObjectSchema<Partial<
+  Transporter
+>> = yup.object().shape({
+  transporterCompanyName: yup
+    .string()
+    .ensure()
+    .required(`Transporteur: ${MISSING_COMPANY_NAME}`),
+  transporterCompanySiret: yup
+    .string()
+    .ensure()
+    .required(`Transporteur: ${MISSING_COMPANY_SIRET}`)
+    .length(14, `Transporteur: ${INVALID_SIRET_LENGTH}`),
+  transporterCompanyAddress: yup
+    .string()
+    .ensure()
+    .required(`Transporteur: ${MISSING_COMPANY_ADDRESS}`),
+  transporterCompanyContact: yup
+    .string()
+    .ensure()
+    .required(`Transporteur: ${MISSING_COMPANY_CONTACT}`),
+  transporterCompanyPhone: yup
+    .string()
+    .ensure()
+    .required(`Transporteur: ${MISSING_COMPANY_PHONE}`),
+  transporterCompanyMail: yup
+    .string()
+    .email()
+    .ensure()
+    .required(`Transporteur: ${MISSING_COMPANY_EMAIL}`),
+  transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
+  transporterReceipt: yup
+    .string()
+    .when("transporterIsExemptedOfReceipt", (isExemptedOfReceipt, schema) =>
+      isExemptedOfReceipt
+        ? schema.notRequired().nullable()
+        : schema
+            .ensure()
+            .required(
+              "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+            )
+    ),
+  transporterDepartment: yup
+    .string()
+    .when("transporterIsExemptedOfReceipt", (isExemptedOfReceipt, schema) =>
+      isExemptedOfReceipt
+        ? schema.notRequired().nullable()
+        : schema
+            .ensure()
+            .required("Le département du transporteur est obligatoire")
+    ),
+  transporterValidityLimit: validDatetime({
+    verboseFieldName: "date de validité"
+  })
+});
 
 // 8 - Collecteur-transporteur
 // 9 - Déclaration générale de l’émetteur du bordereau :
-export const signingInfoSchema: yup.ObjectSchema<SigningInfo> = yup
-  .object()
-  .shape({
-    sentAt: validDatetime({
-      verboseFieldName: "date d'envoi",
-      required: true
-    }),
-    sentBy: yup
-      .string()
-      .ensure()
-      .required("Le nom de l'émetteur du bordereau est obligatoire")
-  });
+export const signingInfoSchema: yup.ObjectSchema<Partial<
+  SigningInfo
+>> = yup.object().shape({
+  sentAt: validDatetime({
+    verboseFieldName: "date d'envoi",
+    required: true
+  }),
+  sentBy: yup
+    .string()
+    .ensure()
+    .required("Le nom de l'émetteur du bordereau est obligatoire")
+});
 
 // 10 - Expédition reçue à l’installation de destination
 export const receivedInfoSchema: yup.ObjectSchema<ReceivedInfo> = yup
   .object()
   .shape({
+    isAccepted: yup.boolean(),
     receivedBy: yup
       .string()
       .ensure()
@@ -520,6 +529,7 @@ export const receivedInfoSchema: yup.ObjectSchema<ReceivedInfo> = yup
 export const acceptedInfoSchema: yup.ObjectSchema<AcceptedInfo> = yup
   .object()
   .shape({
+    isAccepted: yup.boolean(),
     signedAt: validDatetime({
       verboseFieldName: "date d'acceptation"
     }),
@@ -741,6 +751,10 @@ export const tempStoredInfoSchema: yup.ObjectSchema<TempStorageInfo> = yup
 export const tempStorerAcceptedInfoSchema: yup.ObjectSchema<TempStorageInfo> = yup
   .object()
   .shape({
+    tempStorerReceivedAt: validDatetime({
+      verboseFieldName: "date de réception"
+    }),
+    tempStorerReceivedBy: yup.string(),
     tempStorerQuantityType: yup.mixed<QuantityType>().required(),
     tempStorerWasteAcceptationStatus: yup
       .mixed<WasteAcceptationStatus>()
@@ -798,60 +812,62 @@ export const tempStorerAcceptedInfoSchema: yup.ObjectSchema<TempStorageInfo> = y
   });
 
 // 14 - Installation de destination prévue
-export const destinationAfterTempStorageSchema: yup.ObjectSchema<DestinationAfterTempStorage> = yup
-  .object()
-  .shape({
-    destinationCompanyName: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_NAME}`),
-    destinationCompanySiret: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_SIRET}`)
-      .length(14, `Destination ultérieure: ${INVALID_SIRET_LENGTH}`),
-    destinationCompanyAddress: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_ADDRESS}`),
-    destinationCompanyContact: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_CONTACT}`),
-    destinationCompanyPhone: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_PHONE}`),
-    destinationCompanyMail: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_EMAIL}`),
-    destinationProcessingOperation: yup
-      .string()
-      .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
-  });
+export const destinationAfterTempStorageSchema: yup.ObjectSchema<Partial<
+  DestinationAfterTempStorage
+>> = yup.object().shape({
+  destinationCompanyName: yup
+    .string()
+    .ensure()
+    .required(`Destination prévue: ${MISSING_COMPANY_NAME}`),
+  destinationCompanySiret: yup
+    .string()
+    .ensure()
+    .required(`Destination prévue: ${MISSING_COMPANY_SIRET}`)
+    .length(14, `Destination ultérieure: ${INVALID_SIRET_LENGTH}`),
+  destinationCompanyAddress: yup
+    .string()
+    .ensure()
+    .required(`Destination prévue: ${MISSING_COMPANY_ADDRESS}`),
+  destinationCompanyContact: yup
+    .string()
+    .ensure()
+    .required(`Destination prévue: ${MISSING_COMPANY_CONTACT}`),
+  destinationCompanyPhone: yup
+    .string()
+    .ensure()
+    .required(`Destination prévue: ${MISSING_COMPANY_PHONE}`),
+  destinationCompanyMail: yup
+    .string()
+    .ensure()
+    .required(`Destination prévue: ${MISSING_COMPANY_EMAIL}`),
+  destinationProcessingOperation: yup
+    .string()
+    .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
+});
 
 // 15 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
 // 16 - Conditionnement
 // 17 - Quantité
-export const wasteRepackagingSchema: yup.ObjectSchema<WasteRepackaging> = yup
-  .object()
-  .shape({
-    wasteDetailsNumberOfPackages: yup
-      .number()
-      .nullable()
-      .notRequired()
-      .integer()
-      .min(1, "Le nombre de colis doit être supérieur à 0"),
-    wasteDetailsQuantity: yup
-      .number()
-      .nullable()
-      .notRequired()
-      .min(0, "La quantité doit être supérieure à 0")
-  });
+export const wasteRepackagingSchema: yup.ObjectSchema<Partial<
+  WasteRepackaging
+>> = yup.object().shape({
+  wasteDetailsNumberOfPackages: yup
+    .number()
+    .nullable()
+    .notRequired()
+    .integer()
+    .min(1, "Le nombre de colis doit être supérieur à 0"),
+  wasteDetailsQuantity: yup
+    .number()
+    .nullable()
+    .notRequired()
+    .min(0, "La quantité doit être supérieure à 0")
+});
 
 // 18 - Collecteur-transporteur reconditionnement
-export const transporterAfterTempStorageSchema: yup.ObjectSchema<TransporterAfterTempStorage> = transporterSchema;
+export const transporterAfterTempStorageSchema: yup.ObjectSchema<Partial<
+  TransporterAfterTempStorage
+>> = transporterSchema;
 
 // *******************************************************************
 // COMPOSE VALIDATION SCHEMAS TO VALIDATE A FORM FOR A SPECIFIC STATUS

@@ -1,4 +1,4 @@
-import { initSubscriptions } from "./subscriptions";
+import { initSubscriptions } from "./events";
 import { app } from "./server";
 
 const port = process.env.BACK_PORT || 80;

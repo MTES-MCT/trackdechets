@@ -1,10 +1,10 @@
 import { Response } from "express";
-import Excel from "exceljs";
+import * as Excel from "exceljs";
 import { format } from "@fast-csv/format";
 import { QueryFormsRegisterArgs } from "../../generated/graphql/types";
 import { formsReader, formsTransformer } from "./streams";
 import { formsWhereInput } from "./where-inputs";
-import { formFragment } from "./fragments";
+import { formFieldsSelection } from "./fragments";
 import { getExportsFileName } from "./filename";
 import { getXlsxHeaders } from "./columns";
 
@@ -21,14 +21,14 @@ export async function downloadFormsRegister(
   const whereInput = formsWhereInput(
     args.exportType,
     args.sirets,
-    args.startDate,
-    args.endDate,
+    args.startDate ? new Date(args.startDate) : null,
+    args.endDate ? new Date(args.endDate) : null,
     args.wasteCode
   );
 
-  const fragment = formFragment(args.exportType);
+  const fieldsSelection = formFieldsSelection(args.exportType);
 
-  const reader = formsReader({ whereInput, fragment });
+  const reader = formsReader({ whereInput, fieldsSelection });
 
   const filename = getExportsFileName(
     args.exportType,

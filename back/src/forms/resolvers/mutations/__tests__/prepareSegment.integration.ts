@@ -5,7 +5,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
+import prisma from "src/prisma";
 
 jest.mock("axios", () => ({
   default: {
@@ -57,8 +57,8 @@ describe("{ mutation { prepareSegment } }", () => {
       }`
     );
 
-    const segment = await prisma.transportSegment({
-      id: data.prepareSegment.id
+    const segment = await prisma.transportSegment.findUnique({
+      where: { id: data.prepareSegment.id }
     });
 
     expect(segment.transporterCompanySiret).toBe("976345");
@@ -106,8 +106,8 @@ describe("{ mutation { prepareSegment } }", () => {
       }`
     );
 
-    const segment = await prisma.transportSegment({
-      id: data.prepareSegment.id
+    const segment = await prisma.transportSegment.findUnique({
+      where: { id: data.prepareSegment.id }
     });
 
     expect(segment.transporterCompanySiret).toBe("976345");

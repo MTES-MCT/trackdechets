@@ -1,3 +1,3 @@
-import { User, Company } from "../generated/prisma-client";
+import { User, Company } from "@prisma/client";
 
 export type FullUser = User & { companies: Company[] };

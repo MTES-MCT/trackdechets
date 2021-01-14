@@ -1,54 +1,11 @@
-import { QueryResolvers } from "../../../generated/graphql/types";
-import {
-  prisma,
-  StatusLogConnection,
-  Company
-} from "../../../generated/prisma-client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
+import prisma from "src/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { QueryResolvers } from "../../../generated/graphql/types";
 import { getFormsRightFilter } from "../../database";
 import { getConnectionsArgs } from "../../pagination";
 
 const PAGINATE_BY = 100;
-
-const companyFragment = `
-    fragment CompanyLifeCycleInfo on CompanyAssociation {
-      company {
-        id
-        siret
-      }
-    }
-    `;
-// formsLifeCycle fragment
-const statusLogFragment = `
-      fragment StatusLogPaginated on StatusLogConnection {
-        aggregate {
-          count
-        }
-        pageInfo {
-          hasNextPage
-          hasPreviousPage
-          startCursor
-          endCursor
-        }
-        edges {
-          node {
-            id
-            loggedAt
-            status
-            updatedFields
-            form {
-              id
-              readableId
-            }
-            user {
-              id
-              email
-            }
-          }
-        }
-      }
-    `;
 
 const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
   parent,
@@ -57,9 +14,13 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const userCompanies = await prisma
-    .companyAssociations({ where: { user: { id: user.id } } })
-    .$fragment<{ company: Company }[]>(companyFragment)
+  const userCompanies = await prisma.companyAssociation
+    .findMany({
+      where: { user: { id: user.id } },
+      include: {
+        company: { select: { id: true, siret: true } }
+      }
+    })
     .then(associations => associations.map(a => a.company));
 
   // User must be associated with a company
@@ -95,27 +56,48 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
     defaultPaginateBy: PAGINATE_BY
   });
 
-  const statusLogsCx = await prisma
-    .statusLogsConnection({
-      orderBy: "loggedAt_DESC",
-      ...connectionArgs,
-      where: {
-        loggedAt_not: null,
-        loggedAt_gte: loggedAfter,
-        loggedAt_lte: loggedBefore,
-        form: { ...formsFilter, isDeleted: false, id: formId }
-      }
-    })
-    .$fragment<
-      StatusLogConnection & {
-        aggregate: { count: number };
-      }
-    >(statusLogFragment);
+  const where = {
+    loggedAt: {
+      not: null,
+      ...(loggedAfter && { gte: new Date(loggedAfter) }),
+      ...(loggedBefore && { lte: new Date(loggedBefore) })
+    },
+    form: { ...formsFilter, isDeleted: false, id: formId }
+  };
+
+  const count = await prisma.statusLog.count({ where });
+  const statusLogs = await prisma.statusLog.findMany({
+    orderBy: { loggedAt: "desc" },
+    ...connectionArgs,
+    take: parseInt(`${cursorBefore ? "-" : "+"}${PAGINATE_BY}`, 10),
+    ...(cursorAfter && { cursor: { id: cursorAfter } }),
+    ...(cursorBefore && { cursor: { id: cursorBefore } }),
+    where,
+    include: {
+      form: { select: { id: true, readableId: true } },
+      user: { select: { id: true, email: true } }
+    }
+  });
+
+  const startCursor = statusLogs.length > 0 ? statusLogs[0].id : undefined;
+  const endCursor =
+    statusLogs.length > 0 ? statusLogs[statusLogs.length - 1].id : undefined;
+
+  const hasNextPage = true; // TODO-PRISMA
+  const hasPreviousPage = true; // TODO-PRISMA
 
   return {
-    statusLogs: statusLogsCx.edges.map(el => el.node),
-    ...statusLogsCx.pageInfo,
-    count: statusLogsCx.aggregate.count
+    statusLogs: statusLogs.map(sl => ({
+      ...sl,
+      loggedAt: sl.loggedAt?.toISOString()
+    })),
+    pageInfo: {
+      startCursor,
+      endCursor,
+      hasNextPage,
+      hasPreviousPage
+    },
+    count
   };
 };
 

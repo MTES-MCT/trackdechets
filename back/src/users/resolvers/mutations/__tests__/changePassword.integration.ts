@@ -1,7 +1,7 @@
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
+import prisma from "src/prisma";
 import { compare } from "bcrypt";
 import { AuthType } from "../../../../auth";
 
@@ -24,7 +24,9 @@ describe("mutation changePassword", () => {
       variables: { oldPassword: "pass", newPassword }
     });
     expect(data.changePassword.id).toEqual(user.id);
-    const updatedUser = await prisma.user({ id: user.id });
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
     expect(await compare(newPassword, updatedUser.password)).toEqual(true);
   });
 });

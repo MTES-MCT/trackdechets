@@ -1,0 +1,506 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CompanyType {
+  PRODUCER
+  COLLECTOR
+  WASTEPROCESSOR
+  TRANSPORTER
+  WASTE_VEHICLES
+  WASTE_CENTER
+  TRADER
+  ECO_ORGANISME
+}
+
+enum Seveso {
+  NS
+  SB
+  SH
+}
+
+enum WasteType {
+  INERTE
+  NOT_DANGEROUS
+  DANGEROUS
+}
+
+enum GerepType {
+  Producteur
+  Traiteur
+}
+
+enum WasteAcceptationStatus {
+  ACCEPTED
+  REFUSED
+  PARTIALLY_REFUSED
+}
+
+enum EmitterType {
+  PRODUCER
+  OTHER
+  APPENDIX1
+  APPENDIX2
+}
+
+enum QuantityType {
+  REAL
+  ESTIMATED
+}
+
+enum Consistence {
+  SOLID
+  LIQUID
+  GASEOUS
+  DOUGHY
+}
+
+enum Status {
+  DRAFT
+  SEALED
+  SENT
+  RECEIVED
+  ACCEPTED
+  PROCESSED
+  AWAITING_GROUP
+  GROUPED
+  NO_TRACEABILITY
+  REFUSED
+
+  // Temporary storage status
+  TEMP_STORED
+  TEMP_STORER_ACCEPTED
+  RESEALED
+  RESENT
+}
+
+enum TransportMode {
+  ROAD
+  RAIL
+  AIR
+  RIVER
+  SEA
+}
+
+enum UserRole {
+  MEMBER
+  ADMIN
+}
+
+enum MembershipRequestStatus {
+  PENDING
+  ACCEPTED
+  REFUSED
+}
+
+// Different types of authentication possible to Trackdechet's API
+enum AuthType {
+  // Session authentification from Trackdechets'UI
+  SESSION
+  // Bearer access token (stored in database)
+  BEARER
+  // JWT token
+  JWT
+}
+
+model AccessToken {
+  id            String       @id @default(cuid())
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  token         String       @unique
+  isRevoked     Boolean      @default(false)
+  lastUsed      DateTime?
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id])
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+}
+
+model Application {
+  id           String        @id @default(cuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  clientSecret String
+  name         String
+  logoUrl      String?
+  redirectUris String[]
+  admins       User[]
+  AccessToken  AccessToken[]
+  Grant        Grant[]
+}
+
+model Company {
+  id                     String               @id @default(cuid())
+  siret                  String               @unique
+  updatedAt              DateTime             @updatedAt
+  createdAt              DateTime             @default(now())
+  securityCode           Int
+  name                   String?
+  gerepId                String?
+  codeNaf                String?
+  givenName              String?
+  contactEmail           String?
+  contactPhone           String?
+  website                String?
+  documentKeys           String[]
+  ecoOrganismeAgreements String[]
+  companyTypes           CompanyType[]
+  traderReceiptId        String?
+  traderReceipt          TraderReceipt?       @relation(fields: [traderReceiptId], references: [id])
+  transporterReceiptId   String?
+  transporterReceipt     TransporterReceipt?  @relation(fields: [transporterReceiptId], references: [id])
+  CompanyAssociation     CompanyAssociation[]
+  MembershipRequest      MembershipRequest[]
+}
+
+// Companies with restricted diffusion of SIRENE information (police, army, etc)
+
+// "Certaines entreprises demandent à ne pas figurer sur les listes de diffusion publique
+// en vertu de l'article A123-96 du code du commerce. On parle d‘entreprise non diffusable.
+// Dans ce cas les API SIRENE ne diffusent pas les informations de cette entreprise dans
+// les résultats de recherche. Pour des raisons de sécurité, certaines associations et les
+// organismes relevant du Ministère de la Défense ne sont pas diffusibles non plus."
+model AnonymousCompany {
+  id          String @id @default(cuid())
+  siret       String @unique
+  name        String
+  address     String
+  codeNaf     String
+  libelleNaf  String
+  codeCommune String
+}
+
+model CompanyAssociation {
+  id        String   @id @default(cuid())
+  role      UserRole
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Declaration {
+  id         String     @id @default(cuid())
+  codeS3ic   String?
+  nomEts     String?
+  annee      String?
+  codeDechet String?
+  libDechet  String?
+  gerepType  GerepType?
+
+  @@index([codeS3ic], name: "declaration_codes3ic")
+}
+
+model EcoOrganisme {
+  id      String @id @default(cuid())
+  siret   String @unique
+  name    String
+  address String
+}
+
+model Form {
+  id                                 String                  @id @default(cuid())
+  createdAt                          DateTime                @default(now())
+  updatedAt                          DateTime                @updatedAt
+  emitterType                        EmitterType?
+  emitterPickupSite                  String?
+  emitterCompanyName                 String?
+  emitterCompanySiret                String?
+  emitterCompanyAddress              String?
+  emitterCompanyContact              String?
+  emitterCompanyPhone                String?
+  emitterCompanyMail                 String?
+  recipientCap                       String?
+  recipientProcessingOperation       String?
+  recipientCompanyName               String?
+  recipientCompanySiret              String?
+  recipientCompanyAddress            String?
+  recipientCompanyContact            String?
+  recipientCompanyPhone              String?
+  recipientCompanyMail               String?
+  transporterCompanyName             String?
+  transporterCompanySiret            String?
+  transporterCompanyAddress          String?
+  transporterCompanyContact          String?
+  transporterCompanyPhone            String?
+  transporterCompanyMail             String?
+  transporterReceipt                 String?
+  transporterDepartment              String?
+  transporterValidityLimit           DateTime?
+  transporterNumberPlate             String?
+  wasteDetailsCode                   String?
+  wasteDetailsOnuCode                String?
+  wasteDetailsPackagingInfos         Json?
+  wasteDetailsPackagings             Json?
+  wasteDetailsOtherPackaging         String?
+  wasteDetailsNumberOfPackages       Int?
+  wasteDetailsQuantity               Float?
+  wasteDetailsQuantityType           QuantityType?
+  wasteDetailsPop                    Boolean                 @default(false)
+  readableId                         String                  @unique
+  status                             Status                  @default(DRAFT)
+  sentAt                             DateTime?
+  sentBy                             String?
+  isAccepted                         Boolean?                @default(false)
+  receivedAt                         DateTime?
+  quantityReceived                   Float?
+  processingOperationDone            String?
+  wasteDetailsName                   String?
+  isDeleted                          Boolean?                @default(false)
+  receivedBy                         String?
+  wasteDetailsConsistence            Consistence?
+  processedBy                        String?
+  processedAt                        String?
+  nextDestinationProcessingOperation String?
+  traderCompanyName                  String?
+  traderCompanySiret                 String?
+  traderCompanyAddress               String?
+  traderCompanyContact               String?
+  traderCompanyPhone                 String?
+  traderCompanyMail                  String?
+  traderReceipt                      String?
+  traderDepartment                   String?
+  traderValidityLimit                DateTime?
+  processingOperationDescription     String?
+  noTraceability                     Boolean?
+  signedByTransporter                Boolean?
+  transporterIsExemptedOfReceipt     Boolean?
+  customId                           String?
+  wasteAcceptationStatus             WasteAcceptationStatus?
+  wasteRefusalReason                 String?
+  nextDestinationCompanyName         String?
+  nextDestinationCompanySiret        String?
+  nextDestinationCompanyAddress      String?
+  nextDestinationCompanyContact      String?
+  nextDestinationCompanyPhone        String?
+  nextDestinationCompanyMail         String?
+  emitterWorkSiteName                String?
+  emitterWorkSiteAddress             String?
+  emitterWorkSiteCity                String?
+  emitterWorkSitePostalCode          String?
+  emitterWorkSiteInfos               String?
+  transporterCustomInfo              String?
+  recipientIsTempStorage             Boolean?                @default(false)
+  signedAt                           DateTime?
+  currentTransporterSiret            String?
+  nextTransporterSiret               String?
+  nextDestinationCompanyCountry      String?
+  isImportedFromPaper                Boolean                 @default(false)
+  ecoOrganismeName                   String?
+  ecoOrganismeSiret                  String?
+  signedBy                           String?
+  temporaryStorageDetailId           String?                 @unique
+  temporaryStorageDetail             TemporaryStorageDetail? @relation(fields: [temporaryStorageDetailId], references: [id])
+  transportSegments                  TransportSegment[]
+  appendix2Forms                     Form[]                  @relation("FormToForm")
+  appendix2RootFormId                String?
+  appendix2RootForm                  Form?                   @relation("FormToForm", fields: [appendix2RootFormId], references: [id])
+  ownerId                            String
+  owner                              User                    @relation(fields: [ownerId], references: [id])
+  StatusLog                          StatusLog[]
+}
+
+model Grant {
+  id            String      @id @default(cuid())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  code          String      @unique
+  expires       Int
+  redirectUri   String
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id])
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+}
+
+model Installation {
+  id                String  @id @default(cuid())
+  codeS3ic          String?
+  nomEts            String?
+  regime            String?
+  libRegime         String?
+  seveso            Seveso?
+  libSeveso         String?
+  familleIc         String?
+  urlFiche          String?
+  s3icNumeroSiret   String?
+  irepNumeroSiret   String?
+  gerepNumeroSiret  String?
+  sireneNumeroSiret String?
+
+  @@index([gerepNumeroSiret], name: "installation_gerepnumerosiret")
+  @@index([irepNumeroSiret], name: "installation_irepnumerosiret")
+  @@index([s3icNumeroSiret], name: "installation_s3icnumerosiret")
+  @@index([sireneNumeroSiret], name: "installation_sirenenumerosiret")
+}
+
+model MembershipRequest {
+  id              String                  @id @default(cuid())
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+  status          MembershipRequestStatus @default(PENDING)
+  statusUpdatedBy String?
+  sentTo          String[]
+  companyId       String
+  company         Company                 @relation(fields: [companyId], references: [id])
+  userId          String
+  user            User                    @relation(fields: [userId], references: [id])
+}
+
+model Rubrique {
+  id               String     @id @default(cuid())
+  codeS3ic         String?
+  rubrique         String?
+  alinea           String?
+  dateAutorisation String?
+  etatActivite     String?
+  regimeAutorise   String?
+  activite         String?
+  volume           String?
+  unite            String?
+  category         String?
+  wasteType        WasteType?
+
+  @@index([codeS3ic], name: "rubrique_codes3ic")
+}
+
+model StatusLog {
+  id            String    @id @default(cuid())
+  status        Status
+  loggedAt      DateTime?
+  updatedFields Json
+  formId        String
+  form          Form      @relation(fields: [formId], references: [id])
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  authType      AuthType
+}
+
+model TemporaryStorageDetail {
+  id                               String                  @id @default(cuid())
+  tempStorerQuantityType           QuantityType?
+  tempStorerQuantityReceived       Float?
+  tempStorerWasteAcceptationStatus WasteAcceptationStatus?
+  tempStorerWasteRefusalReason     String?
+  tempStorerReceivedAt             DateTime?
+  tempStorerReceivedBy             String?
+  tempStorerSignedAt               DateTime?
+  tempStorerSignedBy               String?
+  destinationIsFilledByEmitter     Boolean?                @default(true)
+  destinationCompanyName           String?
+  destinationCompanySiret          String?
+  destinationCompanyAddress        String?
+  destinationCompanyContact        String?
+  destinationCompanyPhone          String?
+  destinationCompanyMail           String?
+  destinationCap                   String?
+  destinationProcessingOperation   String?
+  wasteDetailsOnuCode              String?
+  wasteDetailsPackagingInfos       Json?
+  wasteDetailsPackagings           Json?
+  wasteDetailsOtherPackaging       String?
+  wasteDetailsNumberOfPackages     Int?
+  wasteDetailsQuantity             Float?
+  wasteDetailsQuantityType         QuantityType?
+  transporterCompanyName           String?
+  transporterCompanySiret          String?
+  transporterCompanyAddress        String?
+  transporterCompanyContact        String?
+  transporterCompanyPhone          String?
+  transporterCompanyMail           String?
+  transporterIsExemptedOfReceipt   Boolean?
+  transporterReceipt               String?
+  transporterDepartment            String?
+  transporterValidityLimit         DateTime?
+  transporterNumberPlate           String?
+  signedByTransporter              Boolean?
+  signedBy                         String?
+  signedAt                         DateTime?
+  Form                             Form[]
+}
+
+model TraderReceipt {
+  id            String    @id @default(cuid())
+  receiptNumber String
+  validityLimit DateTime
+  department    String
+  Company       Company[]
+}
+
+model TransporterReceipt {
+  id            String    @id @default(cuid())
+  receiptNumber String
+  validityLimit DateTime
+  department    String
+  Company       Company[]
+}
+
+model TransportSegment {
+  id                              String         @id @default(cuid())
+  segmentNumber                   Int?
+  transporterCompanySiret         String?
+  transporterCompanyName          String?
+  transporterCompanyAddress       String?
+  transporterCompanyContact       String?
+  transporterCompanyPhone         String?
+  transporterCompanyMail          String?
+  transporterIsExemptedOfReceipt  Boolean?
+  transporterReceipt              String?
+  transporterDepartment           String?
+  transporterValidityLimit        DateTime?
+  transporterNumberPlate          String?
+  mode                            TransportMode?
+  readyToTakeOver                 Boolean?       @default(false)
+  previousTransporterCompanySiret String?
+  takenOverAt                     DateTime?
+  takenOverBy                     String?
+  createdAt                       DateTime       @default(now())
+  updatedAt                       DateTime       @updatedAt
+  formId                          String
+  form                            Form           @relation(fields: [formId], references: [id])
+}
+
+model User {
+  id                  String               @id @default(cuid())
+  email               String               @unique
+  password            String
+  name                String?
+  phone               String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  isActive            Boolean?             @default(false)
+  applicationId       String?
+  application         Application?         @relation(fields: [applicationId], references: [id])
+  companyAssociations CompanyAssociation[]
+  AccessToken         AccessToken[]
+  Form                Form[]
+  Grant               Grant[]
+  MembershipRequest   MembershipRequest[]
+  StatusLog           StatusLog[]
+  UserActivationHash  UserActivationHash[]
+}
+
+model UserAccountHash {
+  id           String    @id @default(cuid())
+  email        String
+  companySiret String
+  hash         String    @unique
+  updatedAt    DateTime  @updatedAt
+  createdAt    DateTime  @default(now())
+  role         UserRole
+  acceptedAt   DateTime?
+}
+
+model UserActivationHash {
+  id        String   @id @default(cuid())
+  hash      String   @unique
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}

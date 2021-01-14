@@ -1,12 +1,12 @@
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
+import { ErrorCode } from "../../../../common/errors";
 import {
-  userWithCompanyFactory,
+  companyFactory,
   formFactory,
-  companyFactory
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
-import { ErrorCode } from "../../../../common/errors";
 
 const MARK_AS_TEMP_STORED = `
   mutation MarkAsTempStored($id: ID!, $tempStoredInfos: TempStoredFormInput!){
@@ -92,12 +92,14 @@ describe("{ mutation { markAsTempStored } }", () => {
       }
     });
 
-    const formAfterMutation = await prisma.form({ id: form.id });
+    const formAfterMutation = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
 
     expect(formAfterMutation.status).toEqual("TEMP_STORED");
 
     // check relevant statusLog is created
-    const statusLogs = await prisma.statusLogs({
+    const statusLogs = await prisma.statusLog.findMany({
       where: {
         form: { id: form.id },
         user: { id: user.id },
@@ -142,12 +144,14 @@ describe("{ mutation { markAsTempStored } }", () => {
       }
     });
 
-    const formAfterMutation = await prisma.form({ id: form.id });
+    const formAfterMutation = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
 
     expect(formAfterMutation.status).toEqual("TEMP_STORER_ACCEPTED");
 
     // check relevant statusLog is created
-    const statusLogs = await prisma.statusLogs({
+    const statusLogs = await prisma.statusLog.findMany({
       where: {
         form: { id: form.id },
         user: { id: user.id },
@@ -187,8 +191,8 @@ describe("{ mutation { markAsTempStored } }", () => {
       }
     });
 
-    const updatedTemporaryStorageDetail = await prisma
-      .form({ id: form.id })
+    const updatedTemporaryStorageDetail = await prisma.form
+      .findUnique({ where: { id: form.id } })
       .temporaryStorageDetail();
     expect(updatedTemporaryStorageDetail.tempStorerSignedAt).toBeNull();
   });
@@ -228,12 +232,14 @@ describe("{ mutation { markAsTempStored } }", () => {
       }
     });
 
-    const formAfterMutation = await prisma.form({ id: form.id });
+    const formAfterMutation = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
 
     expect(formAfterMutation.status).toEqual("REFUSED");
 
     // check relevant statusLog is created
-    const statusLogs = await prisma.statusLogs({
+    const statusLogs = await prisma.statusLog.findMany({
       where: {
         form: { id: form.id },
         user: { id: user.id },

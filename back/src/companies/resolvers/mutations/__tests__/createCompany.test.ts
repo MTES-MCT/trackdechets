@@ -1,14 +1,12 @@
-import { User, Company } from "../../../../generated/prisma-client";
+import { User, Company } from "@prisma/client";
 import { warnIfUserCreatesTooManyCompanies } from "../createCompany";
 
 const countMock = jest.fn();
 const mailMock = jest.fn();
 
-jest.mock("../../../../generated/prisma-client", () => ({
-  prisma: {
-    companyAssociationsConnection: () => ({
-      aggregate: () => ({ count: countMock })
-    })
+jest.mock("src/prisma", () => ({
+  companyAssociation: {
+    count: jest.fn((...args) => countMock(...args))
   }
 }));
 
@@ -18,12 +16,13 @@ jest.mock("../../../../mailer/mailing", () => ({
 
 describe("warnIfUserCreatesTooManyCompanies subscription", () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    countMock.mockReset();
+    mailMock.mockReset();
   });
 
   test("should send mail if user has too much companies", async () => {
     // 10 > MAX
-    countMock.mockResolvedValue(10);
+    countMock.mockResolvedValue(100);
     await warnIfUserCreatesTooManyCompanies(
       { id: "id", name: "name" } as User,
       { name: "companyName", siret: "siret" } as Company

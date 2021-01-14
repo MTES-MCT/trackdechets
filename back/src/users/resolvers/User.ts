@@ -1,4 +1,4 @@
-import { getInstallation } from "../../companies/database";
+import { convertUrls, getInstallation } from "../../companies/database";
 import { UserResolvers, CompanyPrivate } from "../../generated/graphql/types";
 import { getUserCompanies } from "../database";
 import { searchCompany } from "../../companies/sirene";
@@ -11,7 +11,7 @@ const userResolvers: UserResolvers = {
     const companies = await getUserCompanies(parent.id);
     return Promise.all(
       companies.map(async company => {
-        let companyPrivate: CompanyPrivate = company;
+        let companyPrivate: CompanyPrivate = convertUrls(company);
         try {
           // try to set naf, libelleNaf and address from SIRENE database
           const { naf, libelleNaf, address } = await searchCompany(

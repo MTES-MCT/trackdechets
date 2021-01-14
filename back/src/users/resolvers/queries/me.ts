@@ -1,10 +1,10 @@
-import { QueryResolvers } from "../../../generated/graphql/types";
+import prisma from "src/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { prisma } from "../../../generated/prisma-client";
+import { QueryResolvers } from "../../../generated/graphql/types";
 
 const meResolver: QueryResolvers["me"] = async (parent, args, context) => {
   const me = checkIsAuthenticated(context);
-  const user = await prisma.user({ id: me.id });
+  const user = await prisma.user.findUnique({ where: { id: me.id } });
 
   return {
     ...user,

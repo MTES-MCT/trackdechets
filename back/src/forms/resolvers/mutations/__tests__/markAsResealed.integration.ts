@@ -1,12 +1,12 @@
-import { resetDatabase } from "../../../../../integration-tests/helper";
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
+import { ErrorCode } from "../../../../common/errors";
 import {
-  userWithCompanyFactory,
   formWithTempStorageFactory,
-  userFactory
+  userFactory,
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { prisma } from "../../../../generated/prisma-client";
-import { ErrorCode } from "../../../../common/errors";
 
 const MARK_AS_RESEALED = `
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!){
@@ -41,7 +41,9 @@ describe("Mutation markAsResealed", () => {
       }
     });
 
-    const resealedForm = await prisma.form({ id: form.id });
+    const resealedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resealedForm.status).toEqual("RESEALED");
   });
 
@@ -60,7 +62,7 @@ describe("Mutation markAsResealed", () => {
     });
 
     // assume destination siret missing
-    await prisma.updateForm({
+    await prisma.form.update({
       where: { id: form.id },
       data: {
         temporaryStorageDetail: { update: { destinationCompanySiret: "" } }
@@ -79,7 +81,9 @@ describe("Mutation markAsResealed", () => {
       "Destination prévue: Le siret de l'entreprise est obligatoire"
     );
     expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
-    const resealedForm = await prisma.form({ id: form.id });
+    const resealedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resealedForm.status).toEqual("TEMP_STORER_ACCEPTED");
   });
 
@@ -98,7 +102,7 @@ describe("Mutation markAsResealed", () => {
     });
 
     // assume destination siret is missing
-    await prisma.updateForm({
+    await prisma.form.update({
       where: { id: form.id },
       data: {
         temporaryStorageDetail: { update: { destinationCompanySiret: "" } }
@@ -119,7 +123,9 @@ describe("Mutation markAsResealed", () => {
       }
     });
 
-    const resealedForm = await prisma.form({ id: form.id });
+    const resealedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resealedForm.status).toEqual("RESEALED");
   });
 });

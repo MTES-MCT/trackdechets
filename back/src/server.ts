@@ -1,34 +1,34 @@
-import * as Sentry from "@sentry/node";
 import { CaptureConsole } from "@sentry/integrations";
+import * as Sentry from "@sentry/node";
 import {
+  ApolloError,
   ApolloServer,
   makeExecutableSchema,
-  ApolloError,
   UserInputError
 } from "apollo-server-express";
-import express from "express";
-import passport from "passport";
-import session from "express-session";
-import rateLimit from "express-rate-limit";
-import RateLimitRedisStore from "rate-limit-redis";
+import { json, urlencoded } from "body-parser";
 import redisStore from "connect-redis";
-import depthLimit from "graphql-depth-limit";
-import bodyParser from "body-parser";
 import cors from "cors";
-import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
+import express from "express";
+import rateLimit from "express-rate-limit";
+import session from "express-session";
+import depthLimit from "graphql-depth-limit";
 import { applyMiddleware } from "graphql-middleware";
-import { authRouter } from "./routers/auth-router";
-import { downloadFileHandler } from "./common/file-download";
-import { oauth2Router } from "./routers/oauth2-router";
-import { prisma } from "./generated/prisma-client";
-import { userActivationHandler } from "./users/activation";
-import { typeDefs, resolvers } from "./schema";
-import { getUIBaseURL } from "./utils";
+import passport from "passport";
+import RateLimitRedisStore from "rate-limit-redis";
+import prisma from "src/prisma";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 import { ErrorCode } from "./common/errors";
-import { redisClient } from "./common/redis";
-import loggingMiddleware from "./common/middlewares/loggingMiddleware";
+import { downloadFileHandler } from "./common/file-download";
 import errorHandler from "./common/middlewares/errorHandler";
+import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
+import loggingMiddleware from "./common/middlewares/loggingMiddleware";
+import { redisClient } from "./common/redis";
+import { authRouter } from "./routers/auth-router";
+import { oauth2Router } from "./routers/oauth2-router";
+import { resolvers, typeDefs } from "./schema";
+import { userActivationHandler } from "./users/activation";
+import { getUIBaseURL } from "./utils";
 
 const {
   SENTRY_DSN,
@@ -190,9 +190,9 @@ app.use(
  * parse application/x-www-form-urlencoded
  * used when submitting login form
  */
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(urlencoded({ extended: false }));
 
-app.use(bodyParser.json());
+app.use(json());
 
 // allow application/graphql header
 app.use(graphqlBodyParser);

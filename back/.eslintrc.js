@@ -1,4 +1,9 @@
 module.exports = {
+  settings: {
+    "import/resolver": {
+      typescript: {}
+    }
+  },
   parser: "@typescript-eslint/parser",
   extends: [
     "plugin:@typescript-eslint/recommended",

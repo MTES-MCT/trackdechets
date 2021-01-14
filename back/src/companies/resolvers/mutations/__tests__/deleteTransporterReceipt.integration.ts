@@ -1,8 +1,8 @@
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
+import { AuthType } from "../../../../auth";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { prisma } from "../../../../generated/prisma-client";
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import { AuthType } from "../../../../auth";
 
 describe("{ mutation { deleteTransporterReceipt } }", () => {
   afterEach(() => resetDatabase());
@@ -15,10 +15,12 @@ describe("{ mutation { deleteTransporterReceipt } }", () => {
       validityLimit: "2021-03-31T00:00:00.000Z",
       department: "07"
     };
-    const receiptId = await prisma.createTransporterReceipt(receipt).id();
+    const createdReceipt = await prisma.transporterReceipt.create({
+      data: receipt
+    });
 
-    await prisma.updateCompany({
-      data: { transporterReceipt: { connect: { id: receiptId } } },
+    await prisma.company.update({
+      data: { transporterReceipt: { connect: { id: createdReceipt.id } } },
       where: { id: company.id }
     });
 
@@ -28,7 +30,7 @@ describe("{ mutation { deleteTransporterReceipt } }", () => {
       mutation {
         deleteTransporterReceipt(
           input: {
-            id: "${receiptId}"
+            id: "${createdReceipt.id}"
           }
         ){
           id
@@ -37,10 +39,8 @@ describe("{ mutation { deleteTransporterReceipt } }", () => {
     `;
 
     const { data } = await mutate(mutation);
-    expect(data.deleteTransporterReceipt.id).toEqual(receiptId);
+    expect(data.deleteTransporterReceipt.id).toEqual(createdReceipt.id);
 
-    expect(
-      await prisma.transporterReceiptsConnection().aggregate().count()
-    ).toEqual(0);
+    expect(await prisma.transporterReceipt.count()).toEqual(0);
   });
 });

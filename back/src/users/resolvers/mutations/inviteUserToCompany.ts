@@ -1,17 +1,21 @@
-import { prisma, User } from "../../../generated/prisma-client";
+import { User } from "@prisma/client";
+import prisma from "src/prisma";
+import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sendMail } from "../../../mailer/mailing";
-import { userMails } from "../../mails";
+import { checkIsAuthenticated } from "../../../common/permissions";
 import {
-  MutationInviteUserToCompanyArgs,
+  convertUrls,
+  getCompanyOrCompanyNotFound
+} from "../../../companies/database";
+import {
   CompanyPrivate,
+  MutationInviteUserToCompanyArgs,
   MutationResolvers
 } from "../../../generated/graphql/types";
-import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkIsCompanyAdmin } from "../../permissions";
-import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import { associateUserToCompany, createUserAccountHash } from "../../database";
-import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sanitizeEmail } from "../../../utils";
+import { associateUserToCompany, createUserAccountHash } from "../../database";
+import { userMails } from "../../mails";
+import { checkIsCompanyAdmin } from "../../permissions";
 
 export async function inviteUserToCompanyFn(
   adminUser: User,
@@ -19,9 +23,9 @@ export async function inviteUserToCompanyFn(
 ): Promise<CompanyPrivate> {
   const email = sanitizeEmail(unsafeEmail);
 
-  const existingUser = await prisma.user({ email });
+  const existingUser = await prisma.user.findUnique({ where: { email } });
 
-  const company = await prisma.company({ siret });
+  const company = await prisma.company.findUnique({ where: { siret } });
 
   if (existingUser) {
     // there is already an user with this email
@@ -54,7 +58,7 @@ export async function inviteUserToCompanyFn(
     );
   }
 
-  return company;
+  return convertUrls(company);
 }
 
 const inviteUserToCompanyResolver: MutationResolvers["inviteUserToCompany"] = async (

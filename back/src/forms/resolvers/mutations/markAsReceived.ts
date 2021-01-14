@@ -10,7 +10,7 @@ import {
   HasSegmentToTakeOverError,
   TemporaryStorageCannotReceive
 } from "../../errors";
-import { prisma } from "../../../generated/prisma-client";
+import prisma from "src/prisma";
 
 const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   parent,
@@ -25,8 +25,8 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   if (form.recipientIsTempStorage === true) {
     // this form can be mark as received only if it has been
     // taken over by the transporter after temp storage
-    const temporaryStorageDetail = await prisma
-      .form({ id: form.id })
+    const temporaryStorageDetail = await prisma.form
+      .findUnique({ where: { id: form.id } })
       .temporaryStorageDetail();
 
     if (!temporaryStorageDetail?.signedAt) {
@@ -35,8 +35,8 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   }
 
   // check all multi-modal transport segments (if any) have been taken over
-  const transportSegments = await prisma
-    .form({ id: form.id })
+  const transportSegments = await prisma.form
+    .findUnique({ where: { id: form.id } })
     .transportSegments();
   if (transportSegments.length > 0) {
     const hasSegmentToTakeOver = transportSegments.some(f => !f.takenOverAt);
@@ -48,6 +48,10 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   await receivedInfoSchema.validate(receivedInfo);
   const formUpdateInput = {
     ...receivedInfo,
+    receivedAt: new Date(receivedInfo.receivedAt),
+    signedAt: receivedInfo.signedAt
+      ? new Date(receivedInfo.signedAt)
+      : new Date(),
     currentTransporterSiret: ""
   };
   const receivedForm = await transitionForm(user, form, {

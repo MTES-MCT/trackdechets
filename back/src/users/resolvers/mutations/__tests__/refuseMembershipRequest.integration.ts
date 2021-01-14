@@ -1,5 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
+import prisma from "src/prisma";
 import {
   userFactory,
   userWithCompanyFactory
@@ -54,9 +54,11 @@ describe("mutation refuseMembershipRequest", () => {
   it("should return an error if user is not admin of the company", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const requester = await userFactory();
-    const membershipRequest = await prisma.createMembershipRequest({
-      user: { connect: { id: requester.id } },
-      company: { connect: { id: company.id } }
+    const membershipRequest = await prisma.membershipRequest.create({
+      data: {
+        user: { connect: { id: requester.id } },
+        company: { connect: { id: company.id } }
+      }
     });
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const { errors } = await mutate(REFUSE_MEMBERSHIP_REQUEST, {
@@ -71,11 +73,13 @@ describe("mutation refuseMembershipRequest", () => {
   it("should return an error if the request is already accepted", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const requester = await userFactory();
-    const membershipRequest = await prisma.createMembershipRequest({
-      user: { connect: { id: requester.id } },
-      company: { connect: { id: company.id } },
-      status: "ACCEPTED",
-      statusUpdatedBy: "john.snow@trackdechets.fr"
+    const membershipRequest = await prisma.membershipRequest.create({
+      data: {
+        user: { connect: { id: requester.id } },
+        company: { connect: { id: company.id } },
+        status: "ACCEPTED",
+        statusUpdatedBy: "john.snow@trackdechets.fr"
+      }
     });
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const { errors } = await mutate(REFUSE_MEMBERSHIP_REQUEST, {
@@ -90,11 +94,13 @@ describe("mutation refuseMembershipRequest", () => {
   it("should return an error if the request is already refused", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const requester = await userFactory();
-    const membershipRequest = await prisma.createMembershipRequest({
-      user: { connect: { id: requester.id } },
-      company: { connect: { id: company.id } },
-      status: "REFUSED",
-      statusUpdatedBy: "john.snow@trackdechets.fr"
+    const membershipRequest = await prisma.membershipRequest.create({
+      data: {
+        user: { connect: { id: requester.id } },
+        company: { connect: { id: company.id } },
+        status: "REFUSED",
+        statusUpdatedBy: "john.snow@trackdechets.fr"
+      }
     });
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const { errors } = await mutate(REFUSE_MEMBERSHIP_REQUEST, {
@@ -109,24 +115,31 @@ describe("mutation refuseMembershipRequest", () => {
   it("should refuse a membership request", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const requester = await userFactory();
-    const membershipRequest = await prisma.createMembershipRequest({
-      user: { connect: { id: requester.id } },
-      company: { connect: { id: company.id } }
+    const membershipRequest = await prisma.membershipRequest.create({
+      data: {
+        user: { connect: { id: requester.id } },
+        company: { connect: { id: company.id } }
+      }
     });
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await mutate(REFUSE_MEMBERSHIP_REQUEST, {
       variables: { id: membershipRequest.id }
     });
     expect(data.refuseMembershipRequest.users).toHaveLength(1);
-    const refusedMembershipRequest = await prisma.membershipRequest({
-      id: membershipRequest.id
+    const refusedMembershipRequest = await prisma.membershipRequest.findUnique({
+      where: {
+        id: membershipRequest.id
+      }
     });
     expect(refusedMembershipRequest.status).toEqual("REFUSED");
     expect(refusedMembershipRequest.statusUpdatedBy).toEqual(user.email);
-    const associationExists = await prisma.$exists.companyAssociation({
-      user: { id: requester.id },
-      company: { id: company.id }
-    });
+    const associationExists =
+      (await prisma.companyAssociation.findFirst({
+        where: {
+          user: { id: requester.id },
+          company: { id: company.id }
+        }
+      })) != null;
     expect(associationExists).toEqual(false);
     expect(sendMailSpy).toHaveBeenCalledWith(
       userMails.membershipRequestRefused(requester, company)

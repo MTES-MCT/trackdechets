@@ -1,9 +1,9 @@
+import { json } from "body-parser";
 import express from "express";
 import supertest from "supertest";
 import Transport from "winston-transport";
-import bodyParser from "body-parser";
-import loggingMiddleware from "../loggingMiddleware";
 import logger from "../../../logging/logger";
+import loggingMiddleware from "../loggingMiddleware";
 
 const logMock = jest.fn();
 
@@ -29,7 +29,7 @@ describe("loggingMiddleware", () => {
 
   const app = express();
   const graphQLPath = "/";
-  app.use(bodyParser.json());
+  app.use(json());
   app.use(loggingMiddleware("/"));
   app.get("/hello", (req, res) => {
     res.status(200).send("world");

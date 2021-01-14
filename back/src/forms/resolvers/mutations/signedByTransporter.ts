@@ -1,19 +1,19 @@
-import { MutationResolvers } from "../../../generated/graphql/types";
-import { checkIsAuthenticated } from "../../../common/permissions";
-import { getFormOrFormNotFound } from "../../database";
 import { UserInputError } from "apollo-server-express";
-import { prisma } from "../../../generated/prisma-client";
-import transitionForm from "../../workflow/transitionForm";
+import prisma from "src/prisma";
+import { checkIsAuthenticated } from "../../../common/permissions";
+import { MutationResolvers } from "../../../generated/graphql/types";
+import { getFormOrFormNotFound } from "../../database";
+import {
+  expandFormFromDb,
+  flattenSignedByTransporterInput
+} from "../../form-converter";
 import {
   checkCanSignedByTransporter,
   checkSecurityCode
 } from "../../permissions";
 import { signingInfoSchema, wasteDetailsSchema } from "../../validation";
+import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
-import {
-  expandFormFromDb,
-  flattenSignedByTransporterInput
-} from "../../form-converter";
 
 const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = async (
   parent,
@@ -72,8 +72,8 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
     // check security code is temp storer's
     await checkSecurityCode(form.recipientCompanySiret, securityCode);
 
-    const temporaryStorageDetail = await prisma
-      .form({ id })
+    const temporaryStorageDetail = await prisma.form
+      .findUnique({ where: { id } })
       .temporaryStorageDetail();
 
     const hasWasteDetailsOverride = !!temporaryStorageDetail.wasteDetailsQuantity;
@@ -83,7 +83,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
       temporaryStorageDetail: {
         update: {
           signedBy: infos.sentBy,
-          signedAt: infos.sentAt,
+          signedAt: new Date(infos.sentAt),
           signedByTransporter: true,
           ...(hasWasteDetailsOverride && wasteDetails(infos))
         }
@@ -111,7 +111,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
 
   const formUpdateInput = {
     signedByTransporter: true,
-    sentAt: infos.sentAt,
+    sentAt: new Date(infos.sentAt),
     sentBy: infos.sentBy,
     ...wasteDetails(infos),
     currentTransporterSiret: form.transporterCompanySiret

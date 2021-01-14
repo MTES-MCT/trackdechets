@@ -1,8 +1,11 @@
-import { prisma } from "../../../generated/prisma-client";
+import prisma from "src/prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getTransporterReceiptOrNotFound } from "../../database";
+import {
+  getTransporterReceiptOrNotFound,
+  stringifyDates
+} from "../../database";
 import { checkCanReadUpdateDeleteTransporterReceipt } from "../../permissions";
 
 /**
@@ -19,7 +22,10 @@ const deleteTransporterReceiptResolver: MutationResolvers["deleteTransporterRece
   const { id } = input;
   const receipt = await getTransporterReceiptOrNotFound({ id });
   await checkCanReadUpdateDeleteTransporterReceipt(user, receipt);
-  return prisma.deleteTransporterReceipt({ id });
+  const transporterReceipt = await prisma.transporterReceipt.delete({
+    where: { id }
+  });
+  return stringifyDates(transporterReceipt);
 };
 
 export default deleteTransporterReceiptResolver;

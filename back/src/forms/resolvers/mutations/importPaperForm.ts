@@ -1,16 +1,11 @@
+import { Form, Prisma, User } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
+import prisma from "src/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   ImportPaperFormInput,
   MutationResolvers
 } from "../../../generated/graphql/types";
-import {
-  Form,
-  FormCreateInput,
-  FormUpdateInput,
-  prisma,
-  User
-} from "../../../generated/prisma-client";
 import { getUserCompanies } from "../../../users/database";
 import { getFormOrFormNotFound } from "../../database";
 import {
@@ -61,7 +56,7 @@ async function updateForm(user: User, form: Form, input: ImportPaperFormInput) {
     );
   }
 
-  const formUpdateInput: FormUpdateInput = {
+  const formUpdateInput: Prisma.FormUpdateInput = {
     ...flattenedFormInput,
     isImportedFromPaper: true,
     signedByTransporter: true
@@ -94,7 +89,7 @@ async function createForm(user: User, input: ImportPaperFormInput) {
     );
   }
 
-  const formCreateInput: FormCreateInput = {
+  const formCreateInput: Prisma.FormCreateInput = {
     ...flattenedFormInput,
     readableId: await getReadableId(),
     owner: { connect: { id: user.id } },
@@ -103,7 +98,7 @@ async function createForm(user: User, input: ImportPaperFormInput) {
     signedByTransporter: true
   };
 
-  const form = await prisma.createForm(formCreateInput);
+  const form = await prisma.form.create({ data: formCreateInput });
   return expandFormFromDb(form);
 }
 

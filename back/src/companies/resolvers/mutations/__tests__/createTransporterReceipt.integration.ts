@@ -1,8 +1,8 @@
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
+import { AuthType } from "../../../../auth";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
-import { AuthType } from "../../../../auth";
 
 describe("{ mutation { createTransporterReceipt } }", () => {
   afterEach(() => resetDatabase());
@@ -30,9 +30,7 @@ describe("{ mutation { createTransporterReceipt } }", () => {
 
     const { data } = await mutate(mutation);
 
-    expect(
-      await prisma.transporterReceiptsConnection().aggregate().count()
-    ).toEqual(1);
+    expect(await prisma.transporterReceipt.count()).toEqual(1);
 
     expect(data.createTransporterReceipt).toEqual(receipt);
   });

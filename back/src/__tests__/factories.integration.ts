@@ -1,13 +1,13 @@
-import { prisma } from "../generated/prisma-client";
+import prisma from "src/prisma";
+import { resetDatabase } from "integration-tests/helper";
 import {
-  userFactory,
   companyFactory,
-  userWithCompanyFactory,
   formFactory,
   statusLogFactory,
-  transportSegmentFactory
+  transportSegmentFactory,
+  userFactory,
+  userWithCompanyFactory
 } from "./factories";
-import { resetDatabase } from "../../integration-tests/helper";
 
 describe("Test Factories", () => {
   afterAll(async () => {
@@ -30,23 +30,23 @@ describe("Test Factories", () => {
   test("should create a user with a company", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
-    const usr = await prisma.user({ id: user.id }).$fragment<{
-      companyAssociations: {
-        id: string;
-        company: { siret: string; id: string; companyTypes: [string] };
-      }[];
-    }>(`
-        fragment UserSirets on User {
-          companyAssociations {
-            id,
-            company {
-              id
-              siret
-              companyTypes
+    const usr = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: {
+        companyAssociations: {
+          select: {
+            id: true,
+            company: {
+              select: {
+                id: true,
+                siret: true,
+                companyTypes: true
+              }
             }
           }
         }
-      `);
+      }
+    });
 
     const companyAssociations = usr.companyAssociations;
     expect(companyAssociations.length).toBe(1);
@@ -61,23 +61,23 @@ describe("Test Factories", () => {
       companyTypes: { set: ["TRANSPORTER"] }
     });
 
-    const usr = await prisma.user({ id: user.id }).$fragment<{
-      companyAssociations: {
-        id: string;
-        company: { siret: string; id: string; companyTypes: [string] };
-      }[];
-    }>(`
-        fragment UserSirets on User {
-          companyAssociations {
-            id,
-            company {
-              id
-              siret
-              companyTypes
+    const usr = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: {
+        companyAssociations: {
+          select: {
+            id: true,
+            company: {
+              select: {
+                id: true,
+                siret: true,
+                companyTypes: true
+              }
             }
           }
         }
-      `);
+      }
+    });
 
     const companyAssociations = usr.companyAssociations;
     expect(companyAssociations.length).toBe(1);
@@ -127,12 +127,14 @@ describe("Test Factories", () => {
       userId: usr.id,
       status: "SEALED",
       formId: frm.id,
-      opt: { loggedAt: "2017-03-25" }
+      opt: { loggedAt: new Date("2017-03-25") }
     });
 
     expect(newStatusLog.id).toBeTruthy();
 
-    expect(newStatusLog.loggedAt).toEqual("2017-03-25T00:00:00.000Z");
+    expect(newStatusLog.loggedAt.toISOString()).toEqual(
+      "2017-03-25T00:00:00.000Z"
+    );
   });
 });
 
@@ -151,6 +153,8 @@ test("should create a transport segment", async () => {
   expect(newTransportSegment.id).toBeTruthy();
   expect(newTransportSegment.transporterCompanySiret).toEqual("1234");
   //check reverse access
-  const segments = await prisma.form({ id: frm.id }).transportSegments();
+  const segments = await prisma.form
+    .findUnique({ where: { id: frm.id } })
+    .transportSegments();
   expect(segments.length).toEqual(1);
 });

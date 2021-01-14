@@ -1,19 +1,19 @@
-import { userMails } from "../users/mails";
+import prisma from "src/prisma";
 import { sendMail } from "../mailer/mailing";
-import { prisma } from "../generated/prisma-client";
+import { userMails } from "../users/mails";
 
 /**
  * Compute a past date relative to now
  *
  * @param baseDate Date
  * @param daysAgo Integer
- * @return a date formatted as "YYYY-MM-DD"
+ * @return a date at 00:00:00
  */
-export const xDaysAgo = (baseDate: Date, daysAgo: number): string => {
+export const xDaysAgo = (baseDate: Date, daysAgo: number): Date => {
   const clonedDate = new Date(baseDate.getTime()); // avoid mutating baseDate
-  return new Date(clonedDate.setDate(clonedDate.getDate() - daysAgo))
-    .toISOString()
-    .split("T")[0];
+  clonedDate.setDate(clonedDate.getDate() - daysAgo);
+
+  return new Date(clonedDate.toDateString());
 };
 
 /**
@@ -28,11 +28,11 @@ export const sendOnboardingEmails = async (daysAgo: number, emailFunction) => {
   const inscriptionDateGt = xDaysAgo(now, daysAgo);
   const inscriptionDateLt = xDaysAgo(now, daysAgo - 1);
   // retrieve users whose account was created yesterday
-  const recipients = await prisma.users({
+  const recipients = await prisma.user.findMany({
     where: {
       AND: [
-        { createdAt_gt: inscriptionDateGt },
-        { createdAt_lt: inscriptionDateLt }
+        { createdAt: { gt: inscriptionDateGt } },
+        { createdAt: { lt: inscriptionDateLt } }
       ],
       isActive: true
     }

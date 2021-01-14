@@ -1,4 +1,4 @@
-import { prisma } from "../../../generated/prisma-client";
+import prisma from "src/prisma";
 import {
   MutationEditProfileArgs,
   MutationResolvers
@@ -24,7 +24,7 @@ export async function editProfileFn(
     ...(phone !== undefined ? { phone } : {}),
     ...(email !== undefined ? { email } : {})
   };
-  const updatedUser = await prisma.updateUser({
+  const updatedUser = await prisma.user.update({
     where: { id: userId },
     data
   });

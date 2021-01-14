@@ -1,9 +1,8 @@
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
 import * as mailsHelper from "../../../mailer/mailing";
-
-import { bulkCreate } from "../index";
-import { prisma } from "../../../generated/prisma-client";
-import { resetDatabase } from "../../../../integration-tests/helper";
 import { companyFactory, userFactory } from "../../../__tests__/factories";
+import { bulkCreate } from "../index";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -72,9 +71,9 @@ describe("bulk create users and companies from csv files", () => {
     userCount: number,
     associationCount: number
   ) {
-    const companies = await prisma.companies();
-    const users = await prisma.users();
-    const associations = await prisma.companyAssociations();
+    const companies = await prisma.company.findMany();
+    const users = await prisma.user.findMany();
+    const associations = await prisma.companyAssociation.findMany();
     expect(companies).toHaveLength(companyCount);
     expect(users).toHaveLength(userCount);
     expect(associations).toHaveLength(associationCount);
@@ -88,12 +87,16 @@ describe("bulk create users and companies from csv files", () => {
     await expectNumberOfRecords(2, 3, 4);
 
     // check fields are OK for first user
-    const john = await prisma.user({ email: "john.snow@trackdechets.fr" });
+    const john = await prisma.user.findUnique({
+      where: { email: "john.snow@trackdechets.fr" }
+    });
     expect(john.name).toEqual("john.snow@trackdechets.fr");
     expect(john.isActive).toEqual(true);
 
     // check fields are OK for first company
-    const codeEnStock = await prisma.company({ siret: "85001946400013" });
+    const codeEnStock = await prisma.company.findUnique({
+      where: { siret: "85001946400013" }
+    });
     expect(codeEnStock.name).toEqual("NAME FROM SIRENE");
     expect(codeEnStock.givenName).toEqual("Code en Stock");
     expect(codeEnStock.companyTypes).toEqual(["PRODUCER"]);
@@ -112,9 +115,9 @@ describe("bulk create users and companies from csv files", () => {
     await expectNumberOfRecords(2, 3, 4);
 
     // Code en stock should be untouched
-    expect(await prisma.company({ siret: "85001946400013" })).toEqual(
-      codeEnStock
-    );
+    expect(
+      await prisma.company.findUnique({ where: { siret: "85001946400013" } })
+    ).toEqual(codeEnStock);
   }, 10000);
 
   test("already existing user", async () => {
@@ -126,12 +129,14 @@ describe("bulk create users and companies from csv files", () => {
     await expectNumberOfRecords(2, 3, 4);
 
     // john snow user should be untouched
-    expect(await prisma.user({ email: "john.snow@trackdechets.fr" })).toEqual(
-      john
-    );
+    expect(
+      await prisma.user.findUnique({
+        where: { email: "john.snow@trackdechets.fr" }
+      })
+    ).toEqual(john);
 
     // associations should exist between John Snow and Code en Stock
-    const associations = await prisma.companyAssociations({
+    const associations = await prisma.companyAssociation.findMany({
       where: { user: { id: john.id }, company: { siret: "85001946400013" } }
     });
     expect(associations).toHaveLength(1);
@@ -143,24 +148,28 @@ describe("bulk create users and companies from csv files", () => {
     const john = await userFactory({ email: "john.snow@trackdechets.fr" });
     const codeEnStock = await companyFactory({ siret: "85001946400013" });
     // and John Snow is member of Code en Stock
-    const role = await prisma.createCompanyAssociation({
-      user: { connect: { id: john.id } },
-      company: { connect: { id: codeEnStock.id } },
-      role: "MEMBER"
+    const role = await prisma.companyAssociation.create({
+      data: {
+        user: { connect: { id: john.id } },
+        company: { connect: { id: codeEnStock.id } },
+        role: "MEMBER"
+      }
     });
 
     await bulkCreateIdempotent();
 
     await expectNumberOfRecords(2, 3, 4);
     // John Snow should be untouched
-    expect(await prisma.user({ email: john.email })).toEqual(john);
+    expect(
+      await prisma.user.findUnique({ where: { email: john.email } })
+    ).toEqual(john);
 
     // Code en Stock should be untouched
-    expect(await prisma.company({ siret: codeEnStock.siret })).toEqual(
-      codeEnStock
-    );
+    expect(
+      await prisma.company.findUnique({ where: { siret: codeEnStock.siret } })
+    ).toEqual(codeEnStock);
     // Association should be there
-    const associations = await prisma.companyAssociations({
+    const associations = await prisma.companyAssociation.findMany({
       where: { user: { id: john.id }, company: { siret: codeEnStock.siret } }
     });
     expect(associations).toHaveLength(1);
@@ -171,11 +180,13 @@ describe("bulk create users and companies from csv files", () => {
     const company = await companyFactory({ siret: "51212357100022" });
 
     // John Snow has been invited to company 51212357100022
-    const invitation = await prisma.createUserAccountHash({
-      email: "john.snow@trackdechets.fr",
-      companySiret: company.siret,
-      role: "MEMBER",
-      hash: "hash"
+    const invitation = await prisma.userAccountHash.create({
+      data: {
+        email: "john.snow@trackdechets.fr",
+        companySiret: company.siret,
+        role: "MEMBER",
+        hash: "hash"
+      }
     });
 
     await bulkCreateIdempotent();
@@ -183,10 +194,12 @@ describe("bulk create users and companies from csv files", () => {
     await expectNumberOfRecords(3, 3, 5);
 
     // John Snow user should be created
-    const john = await prisma.user({ email: "john.snow@trackdechets.fr" });
+    const john = await prisma.user.findUnique({
+      where: { email: "john.snow@trackdechets.fr" }
+    });
 
     // and pending invitation converted into an association
-    const associations = await prisma.companyAssociations({
+    const associations = await prisma.companyAssociation.findMany({
       where: { user: { id: john.id }, company: { siret: company.siret } }
     });
 
@@ -194,38 +207,46 @@ describe("bulk create users and companies from csv files", () => {
     expect(associations[0].role).toEqual("MEMBER");
 
     // invitation should be marked as joined
-    const updatedInvitation = await prisma.userAccountHash({
-      id: invitation.id
+    const updatedInvitation = await prisma.userAccountHash.findUnique({
+      where: {
+        id: invitation.id
+      }
     });
-    expect(updatedInvitation.acceptedAt.length).toBeGreaterThan(0);
+    expect(updatedInvitation.acceptedAt).not.toBeNull();
   }, 10000);
 
   test("role in csv already in pending invitation", async () => {
     // assume John Snow was already invited to Trackdéchets
     const company = await companyFactory({ siret: "85001946400013" });
-    const invitation = await prisma.createUserAccountHash({
-      email: "john.snow@trackdechets.fr",
-      companySiret: company.siret,
-      role: "MEMBER",
-      hash: "hash"
+    const invitation = await prisma.userAccountHash.create({
+      data: {
+        email: "john.snow@trackdechets.fr",
+        companySiret: company.siret,
+        role: "MEMBER",
+        hash: "hash"
+      }
     });
 
     await bulkCreateIdempotent();
     await expectNumberOfRecords(2, 3, 4);
 
-    const john = await prisma.user({ email: "john.snow@trackdechets.fr" });
+    const john = await prisma.user.findUnique({
+      where: { email: "john.snow@trackdechets.fr" }
+    });
 
     // pending invitation should have priority
-    const associations = await prisma.companyAssociations({
+    const associations = await prisma.companyAssociation.findMany({
       where: { user: { id: john.id }, company: { siret: company.siret } }
     });
     expect(associations).toHaveLength(1);
     expect(associations[0].role).toEqual("MEMBER");
 
     // invitation should be marked as joined
-    const updatedInvitation = await prisma.userAccountHash({
-      id: invitation.id
+    const updatedInvitation = await prisma.userAccountHash.findUnique({
+      where: {
+        id: invitation.id
+      }
     });
-    expect(updatedInvitation.acceptedAt.length).toBeGreaterThan(0);
+    expect(updatedInvitation.acceptedAt).not.toBeNull();
   }, 10000);
 });

@@ -1,10 +1,10 @@
+import prisma from "src/prisma";
 import { FormResolvers } from "../../../generated/graphql/types";
 import { expandTemporaryStorageFromDb } from "../../form-converter";
-import { prisma } from "../../../generated/prisma-client";
 
 const temporaryStorageDetailsResolver: FormResolvers["temporaryStorageDetail"] = async form => {
-  const temporaryStorageDetail = await prisma
-    .form({ id: form.id })
+  const temporaryStorageDetail = await prisma.form
+    .findUnique({ where: { id: form.id } })
     .temporaryStorageDetail();
 
   return temporaryStorageDetail

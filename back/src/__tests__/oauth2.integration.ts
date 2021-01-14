@@ -1,11 +1,11 @@
-import { app } from "../server";
+import prisma from "src/prisma";
 import supertest from "supertest";
-import { logIn } from "./auth.helper";
-import { userFactory, applicationFactory } from "./factories";
 import { resetDatabase } from "../../integration-tests/helper";
-import { prisma } from "../generated/prisma-client";
-import { getUid } from "../utils";
 import { tokenErrorMessages } from "../oauth2";
+import { app } from "../server";
+import { getUid } from "../utils";
+import { logIn } from "./auth.helper";
+import { applicationFactory, userFactory } from "./factories";
 
 const request = supertest(app);
 
@@ -113,20 +113,17 @@ describe("/oauth2/authorize/decision", () => {
 
     // should have created a grant
     expect(
-      await prisma
-        .grantsConnection({
-          where: {
-            user: { id: user.id },
-            application: { id: application.id }
-          }
-        })
-        .aggregate()
-        .count()
+      await prisma.grant.count({
+        where: {
+          user: { id: user.id },
+          application: { id: application.id }
+        }
+      })
     ).toEqual(1);
 
     // should pass the grant code as query in the redirect uri
     const redirect = decision.header.location;
-    const grants = await prisma.grants({
+    const grants = await prisma.grant.findMany({
       where: { user: { id: user.id }, application: { id: application.id } }
     });
     expect(redirect).toEqual(
@@ -232,12 +229,14 @@ describe("/oauth2/token", () => {
 
     const code = getUid(16);
 
-    const grant = await prisma.createGrant({
-      user: { connect: { id: user.id } },
-      code,
-      application: { connect: { id: application.id } },
-      expires: 10 * 60,
-      redirectUri: application.redirectUris[0]
+    const grant = await prisma.grant.create({
+      data: {
+        user: { connect: { id: user.id } },
+        code,
+        application: { connect: { id: application.id } },
+        expires: 10 * 60,
+        redirectUri: application.redirectUris[0]
+      }
     });
 
     const res = await request
@@ -252,16 +251,13 @@ describe("/oauth2/token", () => {
 
     // an accessToken should have been created
     expect(
-      await prisma
-        .accessTokensConnection({
-          where: { application: { id: application.id }, user: { id: user.id } }
-        })
-        .aggregate()
-        .count()
+      await prisma.accessToken.count({
+        where: { application: { id: application.id }, user: { id: user.id } }
+      })
     ).toEqual(1);
 
     const accessToken = (
-      await prisma.accessTokens({
+      await prisma.accessToken.findMany({
         where: { application: { id: application.id }, user: { id: user.id } }
       })
     )[0];
@@ -299,12 +295,14 @@ describe("/oauth2/token", () => {
 
     const code = getUid(16);
 
-    await prisma.createGrant({
-      user: { connect: { id: user.id } },
-      code,
-      application: { connect: { id: application.id } },
-      expires: 10 * 60,
-      redirectUri: application.redirectUris[0]
+    await prisma.grant.create({
+      data: {
+        user: { connect: { id: user.id } },
+        code,
+        application: { connect: { id: application.id } },
+        expires: 10 * 60,
+        redirectUri: application.redirectUris[0]
+      }
     });
 
     const res = await request
@@ -330,12 +328,14 @@ describe("/oauth2/token", () => {
 
     const code = getUid(16);
 
-    await prisma.createGrant({
-      user: { connect: { id: user.id } },
-      code,
-      application: { connect: { id: application1.id } },
-      expires: 10 * 60,
-      redirectUri: application1.redirectUris[0]
+    await prisma.grant.create({
+      data: {
+        user: { connect: { id: user.id } },
+        code,
+        application: { connect: { id: application1.id } },
+        expires: 10 * 60,
+        redirectUri: application1.redirectUris[0]
+      }
     });
 
     const res = await request
@@ -360,12 +360,14 @@ describe("/oauth2/token", () => {
 
     const code = getUid(16);
 
-    const grant = await prisma.createGrant({
-      user: { connect: { id: user.id } },
-      code,
-      application: { connect: { id: application.id } },
-      expires: 0,
-      redirectUri: application.redirectUris[0]
+    const grant = await prisma.grant.create({
+      data: {
+        user: { connect: { id: user.id } },
+        code,
+        application: { connect: { id: application.id } },
+        expires: 0,
+        redirectUri: application.redirectUris[0]
+      }
     });
 
     const res = await request

@@ -1,17 +1,13 @@
 import { ValidationError } from "yup";
 import { validateCompany, validateRoleGenerator } from "../validations";
-import { CompanyType } from "../../../generated/prisma-client";
+import { CompanyType } from "@prisma/client";
 
 const mockCompanyExists = jest.fn();
 const mockUserExists = jest.fn();
 
-jest.mock("../../../generated/prisma-client", () => ({
-  prisma: {
-    $exists: {
-      company: jest.fn(() => mockCompanyExists()),
-      user: jest.fn(() => mockUserExists())
-    }
-  }
+jest.mock("src/prisma", () => ({
+  company: { findFirst: jest.fn(() => mockCompanyExists()) },
+  user: { findFirst: jest.fn(() => mockUserExists()) }
 }));
 
 const mockSirene = jest.fn();

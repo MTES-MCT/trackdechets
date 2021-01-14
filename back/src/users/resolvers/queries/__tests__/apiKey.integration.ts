@@ -1,8 +1,8 @@
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
+import { AuthType } from "../../../../auth";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
-import { AuthType } from "../../../../auth";
 
 describe("{ query { apiKey } }", () => {
   afterAll(() => resetDatabase());
@@ -13,8 +13,10 @@ describe("{ query { apiKey } }", () => {
     const { data } = await query("query { apiKey }");
     expect(data.apiKey).toHaveLength(40);
     // should have created an accessToken in db
-    const accessToken = await prisma.accessToken({
-      token: data.apiKey
+    const accessToken = await prisma.accessToken.findUnique({
+      where: {
+        token: data.apiKey
+      }
     });
     expect(accessToken).not.toBeNull();
   });

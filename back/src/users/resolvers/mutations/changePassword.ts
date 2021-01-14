@@ -1,12 +1,12 @@
-import { prisma } from "../../../generated/prisma-client";
-import { compare } from "bcrypt";
 import { UserInputError } from "apollo-server-express";
+import { compare } from "bcrypt";
+import prisma from "src/prisma";
+import { applyAuthStrategies, AuthType } from "../../../auth";
+import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   MutationChangePasswordArgs,
   MutationResolvers
 } from "../../../generated/graphql/types";
-import { checkIsAuthenticated } from "../../../common/permissions";
-import { applyAuthStrategies, AuthType } from "../../../auth";
 import { hashPassword } from "../../utils";
 
 /**
@@ -16,7 +16,7 @@ export async function changePasswordFn(
   userId: string,
   { oldPassword, newPassword }: MutationChangePasswordArgs
 ) {
-  const user = await prisma.user({ id: userId });
+  const user = await prisma.user.findUnique({ where: { id: userId } });
   const passwordValid = await compare(oldPassword, user.password);
   if (!passwordValid) {
     throw new UserInputError("L'ancien mot de passe est incorrect.", {
@@ -25,7 +25,7 @@ export async function changePasswordFn(
   }
 
   const hashedPassword = await hashPassword(newPassword);
-  const updatedUser = await prisma.updateUser({
+  const updatedUser = await prisma.user.update({
     where: { id: userId },
     data: { password: hashedPassword }
   });

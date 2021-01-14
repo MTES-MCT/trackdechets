@@ -1,8 +1,8 @@
-import { resetDatabase } from "../../../../../integration-tests/helper";
+import { resetDatabase } from "integration-tests/helper";
+import prisma from "src/prisma";
+import { AuthType } from "../../../../auth";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { AuthType } from "../../../../auth";
-import { prisma } from "../../../../generated/prisma-client";
 
 const UPDATE_COMPANY = `
   mutation UpdateCompany(
@@ -55,7 +55,9 @@ describe("mutation updateCompany", () => {
     });
     expect(data.updateCompany.id).toEqual(company.id);
 
-    const updatedCompany = await prisma.company({ id: company.id });
+    const updatedCompany = await prisma.company.findUnique({
+      where: { id: company.id }
+    });
     expect(updatedCompany).toMatchObject(variables);
   });
 

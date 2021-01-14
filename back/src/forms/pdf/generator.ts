@@ -18,7 +18,8 @@ import {
   appendixYOffsets,
   transportSegmentSettings
 } from "./settings";
-import { Form, prisma } from "../../generated/prisma-client";
+import { Form } from "@prisma/client";
+import prisma from "src/prisma";
 
 const customIdTitleParams = { x: 220, y: 104, fontSize: 12 };
 const multimodalYOffset = 85;
@@ -29,10 +30,14 @@ const multimodalYOffset = 85;
  * @return Buffer
  */
 export const buildPdf = async (form: Form) => {
-  const appendix2Forms = await prisma.form({ id: form.id }).appendix2Forms();
-  const segments = await prisma.form({ id: form.id }).transportSegments();
-  const temporaryStorageDetail = await prisma
-    .form({ id: form.id })
+  const appendix2Forms = await prisma.form
+    .findUnique({ where: { id: form.id } })
+    .appendix2Forms();
+  const segments = await prisma.form
+    .findUnique({ where: { id: form.id } })
+    .transportSegments();
+  const temporaryStorageDetail = await prisma.form
+    .findUnique({ where: { id: form.id } })
     .temporaryStorageDetail();
 
   const params = { ...form, appendix2Forms, temporaryStorageDetail };

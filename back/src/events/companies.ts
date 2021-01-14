@@ -1,16 +1,14 @@
+import { Company, CompanyType } from "@prisma/client";
 import {
   alertTypes,
   createNotICPEAlertCard,
   createSiretUnknownAlertCard
 } from "../common/trello";
 import { anomalies, verifyPrestataire } from "../companies/verif";
-import {
-  CompanySubscriptionPayload,
-  CompanyType
-} from "../generated/prisma-client";
+import { TDEventPayload } from "./emitter";
 
 export async function companiesSubscriptionCallback(
-  payload: CompanySubscriptionPayload
+  payload: TDEventPayload<Company>
 ) {
   await Promise.all([
     verifyPresta(payload).catch(err => {
@@ -19,7 +17,7 @@ export async function companiesSubscriptionCallback(
   ]);
 }
 
-async function verifyPresta(payload: CompanySubscriptionPayload) {
+async function verifyPresta(payload: TDEventPayload<Company>) {
   if (payload.mutation === "CREATED") {
     const company = payload.node;
 

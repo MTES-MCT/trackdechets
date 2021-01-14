@@ -1,25 +1,24 @@
-import { hash } from "bcrypt";
 import {
   CompanyType,
   Consistence,
   EmitterType,
   QuantityType,
-  TemporaryStorageDetailCreateInput,
-  prisma,
-  UserRole,
   Status,
-  CompanyCreateInput,
-  FormCreateInput,
-  UserCreateInput
-} from "../generated/prisma-client";
+  UserRole,
+  Prisma
+} from "@prisma/client";
+import { hash } from "bcrypt";
+import prisma from "src/prisma";
 
 /**
  * Create a user with name and email
  * @param opt: extra parameters
  */
-export const userFactory = async (opt: Partial<UserCreateInput> = {}) => {
+export const userFactory = async (
+  opt: Partial<Prisma.UserCreateInput> = {}
+) => {
   const defaultPassword = await hash("pass", 10);
-  const userIndex = (await prisma.usersConnection().aggregate().count()) + 1;
+  const userIndex = (await prisma.user.count()) + 1;
   const data = {
     name: `User_${userIndex}`,
     email: `user_${userIndex}@td.io`,
@@ -28,7 +27,7 @@ export const userFactory = async (opt: Partial<UserCreateInput> = {}) => {
     ...opt
   };
 
-  return prisma.createUser(data);
+  return prisma.user.create({ data });
 };
 
 /**
@@ -54,19 +53,20 @@ function siretify(index) {
  * @param opt: extram parameters
  */
 export const companyFactory = async (
-  companyOpts: Partial<CompanyCreateInput> = {}
+  companyOpts: Partial<Prisma.CompanyCreateInput> = {}
 ) => {
   const opts = companyOpts || {};
-  const companyIndex =
-    (await prisma.companiesConnection().aggregate().count()) + 1;
-  return prisma.createCompany({
-    siret: siretify(companyIndex),
-    companyTypes: {
-      set: ["PRODUCER" as CompanyType]
-    },
-    name: `company_${companyIndex}`,
-    securityCode: 1234,
-    ...opts
+  const companyIndex = (await prisma.company.count()) + 1;
+  return prisma.company.create({
+    data: {
+      siret: siretify(companyIndex),
+      companyTypes: {
+        set: ["PRODUCER" as CompanyType]
+      },
+      name: `company_${companyIndex}`,
+      securityCode: 1234,
+      ...opts
+    }
   });
 };
 
@@ -76,7 +76,7 @@ export const companyFactory = async (
  */
 export const userWithCompanyFactory = async (
   role,
-  companyOpts: Partial<CompanyCreateInput> = {}
+  companyOpts: Partial<Prisma.CompanyCreateInput> = {}
 ) => {
   const company = await companyFactory(companyOpts);
 
@@ -98,12 +98,13 @@ export const userWithCompanyFactory = async (
 export const userWithAccessTokenFactory = async (opt = {}) => {
   const user = await userFactory(opt);
 
-  const accessTokenIndex =
-    (await prisma.accessTokensConnection().aggregate().count()) + 1;
+  const accessTokenIndex = (await prisma.accessToken.count()) + 1;
 
-  const accessToken = await prisma.createAccessToken({
-    token: `token_${accessTokenIndex}`,
-    user: { connect: { id: user.id } }
+  const accessToken = await prisma.accessToken.create({
+    data: {
+      token: `token_${accessTokenIndex}`,
+      user: { connect: { id: user.id } }
+    }
   });
   return { user, accessToken };
 };
@@ -183,7 +184,7 @@ const formdata = {
   recipientCompanyName: "WASTE COMPANY"
 };
 
-export const tempStorageData: TemporaryStorageDetailCreateInput = {
+export const tempStorageData: Prisma.TemporaryStorageDetailCreateInput = {
   tempStorerQuantityType: "ESTIMATED",
   tempStorerQuantityReceived: 1,
   tempStorerWasteAcceptationStatus: "ACCEPTED",
@@ -221,9 +222,11 @@ export const tempStorageData: TemporaryStorageDetailCreateInput = {
 };
 
 export const transportSegmentFactory = async ({ formId, segmentPayload }) => {
-  return prisma.createTransportSegment({
-    form: { connect: { id: formId } },
-    ...segmentPayload
+  return prisma.transportSegment.create({
+    data: {
+      form: { connect: { id: formId } },
+      ...segmentPayload
+    }
   });
 };
 
@@ -245,13 +248,15 @@ export const formFactory = async ({
   opt = {}
 }: {
   ownerId: string;
-  opt?: Partial<FormCreateInput>;
+  opt?: Partial<Prisma.FormCreateInput>;
 }) => {
   const formParams = { ...formdata, ...opt };
-  return prisma.createForm({
-    readableId: getReadableId(),
-    ...formParams,
-    owner: { connect: { id: ownerId } }
+  return prisma.form.create({
+    data: {
+      readableId: getReadableId(),
+      ...formParams,
+      owner: { connect: { id: ownerId } }
+    }
   });
 };
 
@@ -260,7 +265,7 @@ export const formWithTempStorageFactory = async ({
   opt = {}
 }: {
   ownerId: string;
-  opt?: Partial<FormCreateInput>;
+  opt?: Partial<Prisma.FormCreateInput>;
 }) => {
   return formFactory({
     ownerId,
@@ -279,27 +284,31 @@ export const statusLogFactory = async ({
   updatedFields = {},
   opt = {}
 }) => {
-  return prisma.createStatusLog({
-    form: { connect: { id: formId } },
-    user: { connect: { id: userId } },
-    loggedAt: new Date(),
-    status,
-    updatedFields,
-    ...opt
+  return prisma.statusLog.create({
+    data: {
+      form: { connect: { id: formId } },
+      user: { connect: { id: userId } },
+      loggedAt: new Date(),
+      authType: "SESSION",
+      status,
+      updatedFields,
+      ...opt
+    }
   });
 };
 
 export const applicationFactory = async () => {
   const admin = await userFactory();
 
-  const applicationIndex =
-    (await prisma.applicationsConnection().aggregate().count()) + 1;
+  const applicationIndex = (await prisma.application.count()) + 1;
 
-  const application = await prisma.createApplication({
-    admins: { connect: { id: admin.id } },
-    clientSecret: `Secret_${applicationIndex}`,
-    name: `Application_${applicationIndex}`,
-    redirectUris: { set: ["https://acme.inc/authorize"] }
+  const application = await prisma.application.create({
+    data: {
+      admins: { connect: { id: admin.id } },
+      clientSecret: `Secret_${applicationIndex}`,
+      name: `Application_${applicationIndex}`,
+      redirectUris: ["https://acme.inc/authorize"]
+    }
   });
 
   return application;
