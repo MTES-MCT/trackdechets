@@ -8,7 +8,7 @@
     "dev": "concurrently npm:watch-node npm:watch-graphql",
     "watch-node": "npx nodemon -L --watch src --exec \"ts-node\" -r tsconfig-paths/register src/index.ts",
     "watch-graphql": "npm run graphql-codegen -- --watch",
-    "start": "node src/index.js",
+    "start": "node -r tsconfig-paths/register src/index.js",
     "update": "node prisma/scripts/index.js",
     "update:dev": "ts-node -r tsconfig-paths/register prisma/scripts/index.ts",
     "migrate": "node prisma/migrate.js",
