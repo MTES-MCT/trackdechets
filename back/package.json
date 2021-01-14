@@ -71,6 +71,7 @@
     "postgres-migrations": "^5.1.0",
     "rate-limit-redis": "^2.0.0",
     "request": "^2.88.2",
+    "tsconfig-paths": "^3.9.0",
     "winston": "^3.2.1",
     "winston-transport": "^4.3.0",
     "world-countries": "^4.0.0",
@@ -128,7 +129,6 @@
     "supertest": "^4.0.2",
     "ts-jest": "26.0.0",
     "ts-node": "^8.10.2",
-    "tsconfig-paths": "^3.9.0",
     "typescript": "3.8.3"
   }
 }
