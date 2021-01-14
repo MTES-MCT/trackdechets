@@ -103,7 +103,7 @@ jobs:
                   docker-compose up -d postgres td-doc-redirect
                 fi
                 docker-compose up -d prisma redis td-api td-ui td-doc
-                docker exec \$(docker ps -qf 'name=td-api') npm run update"
+                docker exec \$(docker ps -qf 'name=td-api') npm run migrate"
 
   integration-tests:
     machine:
