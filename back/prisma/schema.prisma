@@ -141,6 +141,9 @@ model Company {
   createdAt              DateTime             @default(now())
   securityCode           Int
   name                   String?
+  address                String?
+  longitude              Float?
+  latitude               Float?
   gerepId                String?
   codeNaf                String?
   givenName              String?

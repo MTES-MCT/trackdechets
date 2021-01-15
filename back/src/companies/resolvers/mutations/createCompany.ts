@@ -7,6 +7,7 @@ import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { randomNumber } from "../../../utils";
+import geocode from "../../geocode";
 
 /**
  * Create a new company and associate it to a user
@@ -27,6 +28,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     codeNaf,
     gerepId,
     companyName: name,
+    address,
     companyTypes,
     transporterReceiptId,
     traderReceiptId,
@@ -75,11 +77,16 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     );
   }
 
+  const { latitude, longitude } = await geocode(address);
+
   const companyCreateInput: Prisma.CompanyCreateInput = {
     siret,
     codeNaf,
     gerepId,
     name,
+    address,
+    latitude,
+    longitude,
     companyTypes: { set: companyTypes },
     securityCode: randomNumber(4),
     ecoOrganismeAgreements: {
