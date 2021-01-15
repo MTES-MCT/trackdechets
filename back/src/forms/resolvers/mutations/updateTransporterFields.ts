@@ -3,7 +3,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
 import { ForbiddenError } from "apollo-server-express";
 import { checkCanUpdateTransporterFields } from "../../permissions";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import { expandFormFromDb } from "../../form-converter";
 
 const updateTransporterFieldsResolver: MutationResolvers["updateTransporterFields"] = async (

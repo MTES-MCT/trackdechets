@@ -1,6 +1,6 @@
 import { TransportSegment as PrismaTransportSegment } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import * as Yup from "yup";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import validDatetime from "../../../common/yup/validDatetime";

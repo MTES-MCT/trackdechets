@@ -10,7 +10,7 @@ import {
   HasSegmentToTakeOverError,
   TemporaryStorageCannotReceive
 } from "../../errors";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 
 const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   parent,

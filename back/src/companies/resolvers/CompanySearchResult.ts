@@ -1,4 +1,4 @@
-import prisma from "src/prisma";
+import prisma from "../../prisma";
 import { CompanySearchResultResolvers } from "../../generated/graphql/types";
 import { stringifyDates } from "../database";
 

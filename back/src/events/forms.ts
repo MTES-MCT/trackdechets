@@ -1,6 +1,6 @@
 import { Form } from "@prisma/client";
 import axios from "axios";
-import prisma from "src/prisma";
+import prisma from "../prisma";
 import { sendMail } from "../mailer/mailing";
 import { trim } from "../common/strings";
 import {

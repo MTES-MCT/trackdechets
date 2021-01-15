@@ -1,5 +1,5 @@
 import { Response } from "express";
-import prisma from "src/prisma";
+import prisma from "../../prisma";
 import { buildPdf } from "./generator";
 
 /**

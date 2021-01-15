@@ -1,5 +1,5 @@
 import { UserInputError } from "apollo-server-express";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import * as yup from "yup";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import {

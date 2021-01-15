@@ -1,9 +1,9 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { receiptSchema } from "../../validation";
-import { stringifyDates } from "src/companies/database";
+import { stringifyDates } from "../../database";
 
 /**
  * Create a transporter receipt

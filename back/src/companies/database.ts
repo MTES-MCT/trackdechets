@@ -2,7 +2,7 @@
  * PRISMA HELPER FUNCTIONS
  */
 
-import prisma from "src/prisma";
+import prisma from "../prisma";
 import {
   User,
   Prisma,

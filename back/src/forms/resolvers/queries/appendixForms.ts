@@ -1,5 +1,5 @@
 import { checkIsCompanyMember } from "../../../users/permissions";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { expandFormFromDb } from "../../form-converter";

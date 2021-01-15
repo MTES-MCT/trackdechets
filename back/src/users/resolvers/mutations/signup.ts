@@ -1,7 +1,7 @@
 import { User } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import * as yup from "yup";
 import { sendMail } from "../../../mailer/mailing";
 import {

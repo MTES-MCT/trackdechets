@@ -1,4 +1,4 @@
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";

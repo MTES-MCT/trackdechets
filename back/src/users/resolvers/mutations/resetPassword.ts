@@ -1,4 +1,4 @@
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import { sendMail } from "../../../mailer/mailing";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { userMails } from "../../mails";

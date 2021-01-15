@@ -1,6 +1,6 @@
 import axios from "axios";
-import prisma from "src/prisma";
-import { resetDatabase } from "integration-tests/helper";
+import prisma from "../../prisma";
+import { resetDatabase } from "../../../integration-tests/helper";
 import * as sirene from "../sirene";
 import { anomalies, verifyPrestataire } from "../verif";
 

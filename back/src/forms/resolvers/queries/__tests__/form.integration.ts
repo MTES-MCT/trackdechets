@@ -1,5 +1,5 @@
 import { Form as PrismaForm, Prisma } from "@prisma/client";
-import { resetDatabase } from "integration-tests/helper";
+import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   formFactory,
   transportSegmentFactory,

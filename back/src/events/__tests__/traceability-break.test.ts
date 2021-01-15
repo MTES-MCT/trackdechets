@@ -15,7 +15,7 @@ const mockedForm = {
   recipientCompanyName: "recipient_name"
 };
 
-jest.mock("src/prisma", () => ({
+jest.mock("../../prisma", () => ({
   form: { findUnique: jest.fn(() => mockedForm) }
 }));
 

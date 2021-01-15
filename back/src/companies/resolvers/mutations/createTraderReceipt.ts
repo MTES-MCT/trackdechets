@@ -1,5 +1,5 @@
-import { stringifyDates } from "src/companies/database";
-import prisma from "src/prisma";
+import { stringifyDates } from "../../database";
+import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";

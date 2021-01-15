@@ -1,6 +1,6 @@
 import { cachedGet, generateKey } from "../redis";
 
-jest.mock("src/prisma", () => ({
+jest.mock("../../prisma", () => ({
   foo: null
 }));
 

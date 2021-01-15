@@ -5,7 +5,7 @@ import {
   userWithCompanyFactory
 } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 
 const request = supertest(app);
 

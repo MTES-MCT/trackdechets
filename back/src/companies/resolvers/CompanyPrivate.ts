@@ -1,4 +1,4 @@
-import prisma from "src/prisma";
+import prisma from "../../prisma";
 import { CompanyPrivateResolvers } from "../../generated/graphql/types";
 import { getCompanyUsers, getUserRole, stringifyDates } from "../database";
 

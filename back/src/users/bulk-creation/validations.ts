@@ -1,4 +1,4 @@
-import prisma from "src/prisma";
+import prisma from "../../prisma";
 import * as yup from "yup";
 import { getCompanyThrottled } from "./sirene";
 import { CompanyRow } from "./types";

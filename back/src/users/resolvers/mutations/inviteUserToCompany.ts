@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";

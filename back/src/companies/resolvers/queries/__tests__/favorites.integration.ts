@@ -5,7 +5,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import prisma from "src/prisma";
+import prisma from "../../../../prisma";
 
 const FAVORITES = `query Favorites($siret: String!, $type: FavoriteType!) {
   favorites(siret: $siret, type: $type) {

@@ -4,7 +4,7 @@
 
 import { Form, Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
-import prisma from "src/prisma";
+import prisma from "../prisma";
 import { FormRole } from "../generated/graphql/types";
 import { FormNotFound } from "./errors";
 import { FullForm } from "./types";

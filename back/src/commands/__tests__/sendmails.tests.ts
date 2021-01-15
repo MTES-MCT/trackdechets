@@ -7,7 +7,7 @@ import {
 } from "../onboarding.helpers";
 
 // Let's mock prima DB
-jest.mock("src/prisma", () => ({
+jest.mock("../../prisma", () => ({
   user: {
     findMany: jest.fn(() => [
       {

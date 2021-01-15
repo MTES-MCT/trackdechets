@@ -4,7 +4,7 @@ import {
   expandFormFromDb
 } from "../../form-converter";
 import { Prisma } from "@prisma/client";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import {
   ResolversParentTypes,
   MutationUpdateFormArgs

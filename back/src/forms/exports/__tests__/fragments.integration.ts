@@ -1,7 +1,7 @@
 import { formFieldsSelection } from "../fragments";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { userFactory, formFactory } from "../../../__tests__/factories";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 
 /**
  * Check that selection are in sync with prisma schema

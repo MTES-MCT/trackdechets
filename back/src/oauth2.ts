@@ -1,6 +1,6 @@
 import { Grant } from "@prisma/client";
 import { createServer, grant, exchange, TokenError } from "oauth2orize";
-import prisma from "src/prisma";
+import prisma from "./prisma";
 import { getUid } from "./utils";
 
 // Create OAuth 2.0 server

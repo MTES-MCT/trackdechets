@@ -1,5 +1,5 @@
-import { resetDatabase } from "integration-tests/helper";
-import prisma from "src/prisma";
+import { resetDatabase } from "../../../../integration-tests/helper";
+import prisma from "../../../prisma";
 import {
   formFactory,
   statusLogFactory,
@@ -17,7 +17,9 @@ describe("deleteUser", () => {
 
     await deleteUser(user);
 
-    const deletedUser = await prisma.user.findUnique({ where: { id: user.id } });
+    const deletedUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
     expect(deletedUser).toBe(null);
   });
 

@@ -2,7 +2,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import {
   associateUserToCompany,
   getMembershipRequestOrNotFoundError
@@ -13,7 +13,7 @@ import {
 } from "../../errors";
 import { userMails } from "../../mails";
 import { checkIsCompanyAdmin } from "../../permissions";
-import { convertUrls } from "src/companies/database";
+import { convertUrls } from "../../../companies/database";
 
 const acceptMembershipRequestResolver: MutationResolvers["acceptMembershipRequest"] = async (
   parent,

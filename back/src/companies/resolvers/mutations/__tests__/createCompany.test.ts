@@ -4,7 +4,7 @@ import { warnIfUserCreatesTooManyCompanies } from "../createCompany";
 const countMock = jest.fn();
 const mailMock = jest.fn();
 
-jest.mock("src/prisma", () => ({
+jest.mock("../../../../prisma", () => ({
   companyAssociation: {
     count: jest.fn((...args) => countMock(...args))
   }

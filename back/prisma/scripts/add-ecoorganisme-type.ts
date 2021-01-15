@@ -1,4 +1,4 @@
-import prisma from "src/prisma";
+import prisma from "../../src/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
 
 @registerUpdater(
@@ -10,10 +10,10 @@ export class AddEcoOrganismeType implements Updater {
   async run() {
     const ecoOrganismes = await prisma.ecoOrganisme.findMany();
     for (const ecoOrganisme of ecoOrganismes) {
-      const company = await prisma.company.findOne({where: {
-
-        siret: ecoOrganisme.siret
-      }
+      const company = await prisma.company.findOne({
+        where: {
+          siret: ecoOrganisme.siret
+        }
       });
 
       if (company && !company.companyTypes.includes("ECO_ORGANISME")) {

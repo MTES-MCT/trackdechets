@@ -1,5 +1,5 @@
 import { CompanyType } from "@prisma/client";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   formFactory,

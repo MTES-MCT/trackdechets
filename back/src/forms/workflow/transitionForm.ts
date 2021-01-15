@@ -1,5 +1,5 @@
 import { Form, Prisma, Status } from "@prisma/client";
-import prisma from "src/prisma";
+import prisma from "../../prisma";
 import { Event } from "./types";
 import machine from "./machine";
 import { InvalidTransition } from "../errors";

@@ -3,7 +3,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyAdminUsers } from "../../../companies/database";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { MembershipRequest } from "@prisma/client";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import { getMembershipRequestOrNotFoundError } from "../../database";
 
 const invitationRequestResolver: QueryResolvers["membershipRequest"] = async (

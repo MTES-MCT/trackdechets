@@ -1,6 +1,6 @@
 import { Form, Prisma, User } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   ImportPaperFormInput,

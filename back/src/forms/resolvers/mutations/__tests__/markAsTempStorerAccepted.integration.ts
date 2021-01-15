@@ -5,7 +5,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import prisma from "src/prisma";
+import prisma from "../../../../prisma";
 
 const MARK_AS_TEMP_STORER_ACCEPTED = `
     mutation MarkAsTempStorerAccepted($id: ID!, $tempStorerAcceptedInfo: TempStorerAcceptedFormInput!){

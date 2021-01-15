@@ -1,6 +1,6 @@
 import { UserInputError } from "apollo-server-express";
 import { compare } from "bcrypt";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {

@@ -1,8 +1,8 @@
 import { Server as HttpServer } from "http";
 import { Server as HttpsServer } from "https";
-import { redisClient } from "src/common/redis";
-import prisma from "src/prisma";
-import { app } from "src/server";
+import { redisClient } from "../src/common/redis";
+import prisma from "../src/prisma";
+import { app } from "../src/server";
 
 let httpServerInstance: HttpServer | HttpsServer = null;
 

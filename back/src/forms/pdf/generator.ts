@@ -19,7 +19,7 @@ import {
   transportSegmentSettings
 } from "./settings";
 import { Form } from "@prisma/client";
-import prisma from "src/prisma";
+import prisma from "../../prisma";
 
 const customIdTitleParams = { x: 220, y: 104, fontSize: 12 };
 const multimodalYOffset = 85;

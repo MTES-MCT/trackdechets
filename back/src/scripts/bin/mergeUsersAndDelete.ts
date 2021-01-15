@@ -1,5 +1,5 @@
 #!/usr/bin/env ts-node
-import prisma from "src/prisma";
+import prisma from "../../prisma";
 import mergeUsers from "../prisma/mergeUsers";
 import deleteUser from "../prisma/deleteUser";
 

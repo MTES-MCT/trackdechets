@@ -5,7 +5,7 @@ import { inviteUserToCompanyFn as inviteUserToCompany } from "../inviteUserToCom
 const userMock = jest.fn();
 const companyMock = jest.fn();
 
-jest.mock("src/prisma", () => ({
+jest.mock("../../../../prisma", () => ({
   user: { findUnique: jest.fn((...args) => userMock(...args)) },
   company: { findUnique: jest.fn((...args) => companyMock(...args)) }
 }));

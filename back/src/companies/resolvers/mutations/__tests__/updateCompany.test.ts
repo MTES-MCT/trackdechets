@@ -2,7 +2,7 @@ import { updateCompanyFn as updateCompany } from "../updateCompany";
 import { MutationUpdateCompanyArgs } from "../../../../generated/graphql/types";
 
 const updateCompanyMock = jest.fn();
-jest.mock("src/prisma", () => ({
+jest.mock("../../../../prisma", () => ({
   company: { update: jest.fn((...args) => updateCompanyMock(...args)) }
 }));
 

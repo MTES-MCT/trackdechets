@@ -8,7 +8,7 @@ import {
   Prisma
 } from "@prisma/client";
 import { hash } from "bcrypt";
-import prisma from "src/prisma";
+import prisma from "../prisma";
 
 /**
  * Create a user with name and email

@@ -5,7 +5,7 @@ import {
   userFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import prisma from "src/prisma";
+import prisma from "../../../../prisma";
 import { AuthType } from "../../../../auth";
 
 const INVITE_USER_TO_COMPANY = `

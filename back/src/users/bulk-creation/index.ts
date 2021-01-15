@@ -1,5 +1,5 @@
 import parseArgs from "minimist";
-import prisma from "src/prisma";
+import prisma from "../../prisma";
 import { loadCompanies, loadRoles } from "./loaders";
 import { validateCompany, validateRoleGenerator } from "./validations";
 import { sirenify } from "./sirene";

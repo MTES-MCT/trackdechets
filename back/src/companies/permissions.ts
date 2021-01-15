@@ -1,5 +1,5 @@
 import { User, TraderReceipt } from "@prisma/client";
-import prisma from "src/prisma";
+import prisma from "../prisma";
 import { getFullUser } from "../users/database";
 import { ForbiddenError } from "apollo-server-express";
 import { getUserRole } from "./database";

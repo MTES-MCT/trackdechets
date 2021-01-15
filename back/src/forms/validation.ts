@@ -7,7 +7,7 @@ import {
   WasteAcceptationStatus
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
-import prisma from "src/prisma";
+import prisma from "../prisma";
 import countries from "world-countries";
 import * as yup from "yup";
 import {

@@ -3,7 +3,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
 import { expandFormFromDb, flattenResentFormInput } from "../../form-converter";
 import transitionForm from "../../workflow/transitionForm";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import { checkCanMarkAsResent } from "../../permissions";
 import { UserInputError } from "apollo-server-express";
 import { resealedFormSchema } from "../../validation";

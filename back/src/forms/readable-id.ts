@@ -1,4 +1,4 @@
-import prisma from "src/prisma";
+import prisma from "../prisma";
 
 export async function getReadableId() {
   const beginningOfYear = new Date(new Date().getFullYear(), 0, 1);

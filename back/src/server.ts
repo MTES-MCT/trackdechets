@@ -16,7 +16,7 @@ import depthLimit from "graphql-depth-limit";
 import { applyMiddleware } from "graphql-middleware";
 import passport from "passport";
 import RateLimitRedisStore from "rate-limit-redis";
-import prisma from "src/prisma";
+import prisma from "./prisma";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 import { ErrorCode } from "./common/errors";
 import { downloadFileHandler } from "./common/file-download";

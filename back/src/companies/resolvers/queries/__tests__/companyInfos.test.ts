@@ -8,7 +8,7 @@ jest.mock("../../../sirene", () => ({
 }));
 
 const companyMock = jest.fn();
-jest.mock("src/prisma", () => ({
+jest.mock("../../../../prisma", () => ({
   company: { findUnique: jest.fn((...args) => companyMock(...args)) }
 }));
 

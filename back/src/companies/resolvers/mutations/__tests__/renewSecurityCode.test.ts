@@ -4,7 +4,7 @@ import { companyMails } from "../../../mails";
 
 const companyMock = jest.fn();
 const updateCompanyMock = jest.fn();
-jest.mock("src/prisma", () => ({
+jest.mock("../../../../prisma", () => ({
   company: {
     findUnique: jest.fn((...args) => companyMock(...args)),
     update: jest.fn((...args) => updateCompanyMock(...args))

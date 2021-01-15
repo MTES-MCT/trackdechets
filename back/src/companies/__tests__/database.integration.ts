@@ -1,5 +1,5 @@
-import prisma from "src/prisma";
-import { resetDatabase } from "integration-tests/helper";
+import prisma from "../../prisma";
+import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory } from "../../__tests__/factories";
 import { getCompanyInvitedUsers } from "../database";
 

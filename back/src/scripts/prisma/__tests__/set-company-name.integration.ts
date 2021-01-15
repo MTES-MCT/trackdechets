@@ -1,6 +1,6 @@
 import axios from "axios";
-import { resetDatabase } from "integration-tests/helper";
-import prisma from "src/prisma";
+import { resetDatabase } from "../../../../integration-tests/helper";
+import prisma from "../../../prisma";
 import { setCompanyName } from "../set-company-name";
 
 jest.mock("axios");

@@ -1,4 +1,4 @@
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import { FormResolvers } from "../../../generated/graphql/types";
 import { expandTransportSegmentFromDb } from "../../form-converter";
 

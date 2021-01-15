@@ -1,7 +1,7 @@
 import { AuthType } from "../../../auth";
 import { Prisma } from "@prisma/client";
-import { resetDatabase } from "integration-tests/helper";
-import prisma from "src/prisma";
+import { resetDatabase } from "../../../../integration-tests/helper";
+import prisma from "../../../prisma";
 import { formFactory, userFactory } from "../../../__tests__/factories";
 import transitionForm from "../transitionForm";
 import { EventType } from "../types";

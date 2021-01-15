@@ -17,7 +17,7 @@ const ASSOCIATIONS = [
   }
 ];
 
-jest.mock("src/prisma", () => ({
+jest.mock("../../prisma", () => ({
   companyAssociation: {
     findMany: jest.fn(() => Promise.resolve(ASSOCIATIONS))
   }

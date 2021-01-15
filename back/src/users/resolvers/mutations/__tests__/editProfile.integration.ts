@@ -2,7 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
-import prisma from "src/prisma";
+import prisma from "../../../../prisma";
 
 const EDIT_PROFILE = `
   mutation EditProfile($name: String, $email: String, $phone: String){

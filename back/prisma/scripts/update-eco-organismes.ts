@@ -1,4 +1,4 @@
-import prisma from "src/prisma";
+import prisma from "../../src/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
 
 const ecoOrganismes = [

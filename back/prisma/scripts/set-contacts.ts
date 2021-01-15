@@ -1,6 +1,6 @@
 import axios from "axios";
-import { addContact } from "src/mailer/mailing";
-import prisma from "src/prisma";
+import { addContact } from "../../src/mailer/mailing";
+import prisma from "../../src/prisma";
 import { Updater, registerUpdater } from "./helper/helper";
 
 type Contact = { Email: string; Name?: string };

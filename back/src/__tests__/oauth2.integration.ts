@@ -1,4 +1,4 @@
-import prisma from "src/prisma";
+import prisma from "../prisma";
 import supertest from "supertest";
 import { resetDatabase } from "../../integration-tests/helper";
 import { tokenErrorMessages } from "../oauth2";

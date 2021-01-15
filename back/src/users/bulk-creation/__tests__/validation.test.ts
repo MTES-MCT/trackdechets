@@ -5,7 +5,7 @@ import { CompanyType } from "@prisma/client";
 const mockCompanyExists = jest.fn();
 const mockUserExists = jest.fn();
 
-jest.mock("src/prisma", () => ({
+jest.mock("../../../prisma", () => ({
   company: { findFirst: jest.fn(() => mockCompanyExists()) },
   user: { findFirst: jest.fn(() => mockUserExists()) }
 }));

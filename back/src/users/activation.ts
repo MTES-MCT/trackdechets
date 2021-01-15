@@ -1,4 +1,4 @@
-import prisma from "src/prisma";
+import prisma from "../prisma";
 import { getUIBaseURL } from "../utils";
 
 export const userActivationHandler = async (req, res) => {

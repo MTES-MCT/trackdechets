@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 import fs from "fs";
-import { resetDatabase } from "integration-tests/helper";
+import { resetDatabase } from "../../../../integration-tests/helper";
 import os from "os";
 import path from "path";
 import supertest from "supertest";

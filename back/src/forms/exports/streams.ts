@@ -1,6 +1,6 @@
 import { Readable, Transform, ReadableOptions } from "stream";
 import { Form, Prisma } from "@prisma/client";
-import prisma from "src/prisma";
+import prisma from "../../prisma";
 import { flattenForm } from "./transformers";
 import { formatRow } from "./columns";
 

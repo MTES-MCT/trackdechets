@@ -1,4 +1,4 @@
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import { compare } from "bcrypt";
 import { UserInputError, ForbiddenError } from "apollo-server-express";
 import { MutationResolvers } from "../../../generated/graphql/types";

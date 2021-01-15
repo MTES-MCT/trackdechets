@@ -1,5 +1,5 @@
 import { signupFn as signup } from "../signup";
-import prisma from "src/prisma";
+import prisma from "../../../../prisma";
 const userInfos = {
   id: "new_user",
   name: "an user",
@@ -8,7 +8,7 @@ const userInfos = {
   phone: "0000"
 };
 
-jest.mock("src/prisma", () => ({
+jest.mock("../../../../prisma", () => ({
   user: {
     create: jest.fn(() => Promise.resolve(userInfos)),
     findFirst: jest.fn(() => Promise.resolve(null)),

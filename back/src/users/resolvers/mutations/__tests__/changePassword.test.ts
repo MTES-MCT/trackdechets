@@ -5,7 +5,7 @@ import { hashPassword } from "../../../utils";
 const userMock = jest.fn();
 const updateUserMock = jest.fn();
 
-jest.mock("src/prisma", () => ({
+jest.mock("../../../../prisma", () => ({
   user: {
     findUnique: jest.fn((...args) => userMock(...args)),
     update: jest.fn((...args) => updateUserMock(...args))

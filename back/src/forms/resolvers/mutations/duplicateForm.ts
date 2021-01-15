@@ -1,5 +1,5 @@
 import { Status, Form, TemporaryStorageDetail, User } from "@prisma/client";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 
 import { expandFormFromDb } from "../../form-converter";
 import { getReadableId } from "../../readable-id";

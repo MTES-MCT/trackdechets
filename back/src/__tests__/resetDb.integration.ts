@@ -1,4 +1,4 @@
-import prisma from "src/prisma";
+import prisma from "../prisma";
 
 import { userFactory } from "./factories";
 import { resetDatabase } from "../../integration-tests/helper";

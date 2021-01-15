@@ -1,6 +1,6 @@
 import { UserRole } from "@prisma/client";
-import { resetDatabase } from "integration-tests/helper";
-import prisma from "src/prisma";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import prisma from "../../../../prisma";
 import * as mailsHelper from "../../../../mailer/mailing";
 import {
   companyFactory,

@@ -7,7 +7,7 @@ import { AccessToken, User } from "@prisma/client";
 import { GraphQLContext } from "../types";
 
 const updateAccessTokenMock = jest.fn();
-jest.mock("src/prisma", () => ({
+jest.mock("../prisma", () => ({
   accessToken: {
     update: jest.fn((...args) => updateAccessTokenMock(...args))
   }

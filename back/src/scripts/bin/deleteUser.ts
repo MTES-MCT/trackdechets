@@ -1,5 +1,5 @@
 #!/usr/bin/env ts-node
-import prisma from "src/prisma";
+import prisma from "../../prisma";
 import deleteUser from "../prisma/deleteUser";
 
 (async () => {

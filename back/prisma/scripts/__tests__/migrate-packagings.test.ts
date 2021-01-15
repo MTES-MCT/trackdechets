@@ -3,7 +3,7 @@ import { MigratePackagingsUpdater } from "../migrate-packagings";
 const formsMock = jest.fn();
 const updateFormMock = jest.fn();
 
-jest.mock("src/prisma", () => ({
+jest.mock("../../../src/prisma", () => ({
   form: {
     findMany: jest.fn((...args) => formsMock(...args)),
     update: jest.fn((...args) => updateFormMock(...args))

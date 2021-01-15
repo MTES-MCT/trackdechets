@@ -1,5 +1,5 @@
 import { User, Company } from "@prisma/client";
-import prisma from "src/prisma";
+import prisma from "../prisma";
 import { getCompanyAdminUsers } from "../companies/database";
 import { NotCompanyAdmin, NotCompanyMember } from "../common/errors";
 

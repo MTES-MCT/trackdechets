@@ -1,7 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { createTestClient } from "apollo-server-integration-testing";
 import { server } from "../../../../server";
-import prisma from "src/prisma";
+import prisma from "../../../../prisma";
 import { companyFactory } from "../../../../__tests__/factories";
 import { getUserCompanies } from "../../../database";
 import makeClient from "../../../../__tests__/testClient";

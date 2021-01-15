@@ -1,5 +1,5 @@
 import { CompanySearchResult } from "../../generated/graphql/types";
-import prisma from "src/prisma";
+import prisma from "../../prisma";
 
 /**
  * "Certaines entreprises demandent à ne pas figurer sur les listes de diffusion publique

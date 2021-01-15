@@ -17,7 +17,7 @@ services:
     build:
       context: ../
       dockerfile: Dockerfile.dev
-    command: npx nodemon -L --watch src --exec "ts-node" --project ../tsconfig.json -r tsconfig-paths/register src/index.ts
+    command: npx nodemon -L --watch src --exec "ts-node" src/index.ts
     volumes:
       - ../src:/usr/src/app/src
     env_file:
@@ -28,4 +28,3 @@ services:
       LETSENCRYPT_HOST: $API_HOST
       EMAIL_BACKEND: "sendinblue"
       MAIN_TEMPLATE_ID: "9"
-

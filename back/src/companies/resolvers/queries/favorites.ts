@@ -5,7 +5,7 @@ import {
   QueryResolvers
 } from "../../../generated/graphql/types";
 import { Company, CompanyType, Prisma } from "@prisma/client";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import { searchCompany } from "../../sirene";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";

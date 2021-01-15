@@ -1,5 +1,5 @@
 import { TemporaryStorageDetail } from "@prisma/client";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import {
   Form,
   FormResolvers,

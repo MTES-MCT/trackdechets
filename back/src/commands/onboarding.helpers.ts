@@ -1,4 +1,4 @@
-import prisma from "src/prisma";
+import prisma from "../prisma";
 import { sendMail } from "../mailer/mailing";
 import { userMails } from "../users/mails";
 

@@ -1,5 +1,5 @@
-import { convertUrls } from "src/companies/database";
-import prisma from "src/prisma";
+import { convertUrls } from "../../../companies/database";
+import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";

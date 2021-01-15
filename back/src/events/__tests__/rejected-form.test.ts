@@ -164,7 +164,7 @@ jest.mock("../../companies/database", () => ({
 }));
 
 // Mock prima DB
-jest.mock("src/prisma", () => ({
+jest.mock("../../prisma", () => ({
   form: { findUnique: jest.fn(() => mockedForm) }
 }));
 

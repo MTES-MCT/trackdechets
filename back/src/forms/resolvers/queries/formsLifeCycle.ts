@@ -1,5 +1,5 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { getFormsRightFilter } from "../../database";

@@ -1,6 +1,6 @@
 import { FormResolvers } from "../../../generated/graphql/types";
-import prisma from "src/prisma";
-import { stringifyDates } from "src/forms/database";
+import prisma from "../../../prisma";
+import { stringifyDates } from "../../database";
 
 const appendix2FormsResolver: FormResolvers["appendix2Forms"] = async form => {
   const appendix2Forms = await prisma.form

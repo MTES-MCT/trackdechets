@@ -2,7 +2,7 @@ import { getReadableId } from "../readable-id";
 
 const formsMock = jest.fn();
 
-jest.mock("src/prisma", () => ({
+jest.mock("../../prisma", () => ({
   form: {
     findMany: jest.fn((...args) => formsMock(...args))
   }

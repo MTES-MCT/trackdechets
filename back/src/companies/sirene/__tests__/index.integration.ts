@@ -1,5 +1,5 @@
 import { UserInputError } from "apollo-server-express";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import * as searchCompanyDecorated from "../searchCompany";
 import { searchCompany } from "../index";
 import { resetDatabase } from "../../../../integration-tests/helper";

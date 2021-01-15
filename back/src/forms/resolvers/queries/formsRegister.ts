@@ -1,5 +1,5 @@
 import { UserInputError } from "apollo-server-express";
-import prisma from "src/prisma";
+import prisma from "../../../prisma";
 import * as yup from "yup";
 import { getFileDownloadToken } from "../../../common/file-download";
 import { checkIsAuthenticated } from "../../../common/permissions";
