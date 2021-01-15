@@ -19,6 +19,7 @@ import cogoToast from "cogo-toast";
 const MARK_AS_SEALED = gql`
   mutation MarkAsSealed($id: ID!) {
     markAsSealed(id: $id) {
+      readableId
       ...StatusChange
     }
   }
