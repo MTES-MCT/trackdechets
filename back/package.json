@@ -15,7 +15,7 @@
     "migrate:dev": "ts-node prisma/migrate.ts",
     "test": "jest",
     "prebuild": "npx prisma generate",
-    "build": "tsc && copyfiles -e **/*.ts src/**/*.{graphql,pdf,png,ttf} prisma/**/*.prisma dist/",
+    "build": "tsc && copyfiles -e **/*.ts src/**/*.{graphql,pdf,png,ttf} prisma/**/*.{prisma,sql} dist/",
     "lint": "eslint -c .eslintrc.js --ext .ts ./src",
     "lint:fix": "eslint -c .eslintrc.js --fix --ext .ts ./src",
     "bulk-create-account:dev": "ts-node src/users/bulk-creation/index.ts",
