@@ -5,25 +5,6 @@ x-logging: &gelf-logging
     gelf-address: udp://$OVH_LOGS_HOST:$OVH_LOGS_PORT
     env: X-OVH-TOKEN,facility
 services:
-  prisma:
-    image: prismagraphql/prisma:1.34.10
-    restart: always
-    ports:
-      - "127.0.0.1:4466:4466"
-    environment:
-      PRISMA_CONFIG: |
-        port: 4466
-        databases:
-          default:
-            connector: postgres
-            host: $POSTGRES_HOST
-            port: $POSTGRES_PORT
-            user: $POSTGRES_USER
-            password: $POSTGRES_PASSWORD
-            migrations: true
-      X-OVH-TOKEN: $OVH_LOGS_TOKEN
-      facility: docker-prisma
-    logging: *gelf-logging
   redis:
     image: redis:5.0-alpine
     restart: always
