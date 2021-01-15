@@ -271,6 +271,8 @@ export default function AccountCompanyAdd() {
     return [];
   }
 
+  console.log(companyInfos);
+
   return (
     <div className="panel">
       <h5 className={styles.subtitle}>Identification</h5>
@@ -371,13 +373,14 @@ export default function AccountCompanyAdd() {
             <Form className={styles.companyAddForm}>
               <div className={styles.field}>
                 <label className={`text-right ${styles.bold}`}>
-                  Nom de l'entreprise
+                  Raison sociale
                 </label>
                 <div className={styles.field__value}>
                   <Field
                     type="text"
                     name="companyName"
                     className={`td-input ${styles.textField}`}
+                    disabled={!!companyInfos?.name}
                   />
                 </div>
               </div>
@@ -389,6 +392,7 @@ export default function AccountCompanyAdd() {
                     type="text"
                     name="codeNaf"
                     className={`td-input ${styles.textField}`}
+                    disabled={!!companyInfos?.naf}
                   />
                 </div>
               </div>
@@ -400,6 +404,7 @@ export default function AccountCompanyAdd() {
                     type="text"
                     name="address"
                     className={`td-input ${styles.textField}`}
+                    disabled={!!companyInfos?.address}
                   />
                 </div>
               </div>
