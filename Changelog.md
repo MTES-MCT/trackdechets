@@ -21,6 +21,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+* Migration de Prisma 1 vers Prisma 2 (ORM utilisé côté backend) [PR 733](https://github.com/MTES-MCT/trackdechets/pull/733)
+
 # [2021.01.2] 11/01/2021
 #### :rocket: Nouvelles fonctionnalités
 
