@@ -147,7 +147,6 @@ export default function AccountCompanyAdd() {
    */
   async function onSubmit(values: Values) {
     const {
-      address,
       isAllowed,
       document,
       transporterReceiptNumber,
@@ -270,9 +269,6 @@ export default function AccountCompanyAdd() {
     }
     return [];
   }
-
-  console.log(companyInfos);
-
   return (
     <div className="panel">
       <h5 className={styles.subtitle}>Identification</h5>
@@ -375,37 +371,44 @@ export default function AccountCompanyAdd() {
                 <label className={`text-right ${styles.bold}`}>
                   Raison sociale
                 </label>
+
                 <div className={styles.field__value}>
-                  <Field
-                    type="text"
-                    name="companyName"
-                    className={`td-input ${styles.textField}`}
-                    disabled={!!companyInfos?.name}
-                  />
+                  {companyInfos?.name || (
+                    <Field
+                      type="text"
+                      name="companyName"
+                      className={`td-input ${styles.textField}`}
+                    />
+                  )}
                 </div>
               </div>
 
               <div className={styles.field}>
                 <label className={`text-right ${styles.bold}`}>Code NAF</label>
                 <div className={styles.field__value}>
-                  <Field
-                    type="text"
-                    name="codeNaf"
-                    className={`td-input ${styles.textField}`}
-                    disabled={!!companyInfos?.naf}
-                  />
+                  {companyInfos?.naf ? (
+                    `${companyInfos?.naf} - ${companyInfos?.libelleNaf}`
+                  ) : (
+                    <Field
+                      type="text"
+                      name="codeNaf"
+                      className={`td-input ${styles.textField}`}
+                    />
+                  )}
                 </div>
               </div>
 
               <div className={styles.field}>
                 <label className={`text-right ${styles.bold}`}>Adresse</label>
                 <div className={styles.field__value}>
-                  <Field
-                    type="text"
-                    name="address"
-                    className={`td-input ${styles.textField}`}
-                    disabled={!!companyInfos?.address}
-                  />
+                  {companyInfos?.address || (
+                    <Field
+                      type="text"
+                      name="address"
+                      className={`td-input ${styles.textField}`}
+                      disabled={!!companyInfos?.address}
+                    />
+                  )}
                 </div>
               </div>
 
