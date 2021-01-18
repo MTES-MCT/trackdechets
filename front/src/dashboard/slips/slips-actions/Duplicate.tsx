@@ -1,4 +1,4 @@
-import { useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import React from "react";
 import { DuplicateFile } from "common/components/Icons";
@@ -9,10 +9,10 @@ import {
   Mutation,
   MutationDuplicateFormArgs,
 } from "generated/graphql/types";
-import { GET_SLIPS } from "../query";
-import mutations from "./slip-actions.mutations";
+import { DRAFT_TAB_FORMS } from "../tabs/queries";
 import { COLORS } from "common/config";
 import routes from "common/routes";
+import { fullFormFragment } from "common/fragments";
 
 type Props = {
   formId: string;
@@ -20,6 +20,15 @@ type Props = {
   onClose?: () => void;
   redirectToDashboard?: boolean;
 };
+
+const DUPLICATE_FORM = gql`
+  mutation DuplicateForm($id: ID!) {
+    duplicateForm(id: $id) {
+      ...FullForm
+    }
+  }
+  ${fullFormFragment}
+`;
 
 export default function Duplicate({
   formId,
@@ -32,7 +41,7 @@ export default function Duplicate({
   const [duplicate] = useMutation<
     Pick<Mutation, "duplicateForm">,
     MutationDuplicateFormArgs
-  >(mutations.DUPLICATE_FORM, {
+  >(DUPLICATE_FORM, {
     variables: { id: formId },
     update: (store, { data }) => {
       if (!data?.duplicateForm) {
@@ -40,10 +49,10 @@ export default function Duplicate({
       }
       const duplicateForm = data.duplicateForm;
       updateApolloCache<{ forms: Form[] }>(store, {
-        query: GET_SLIPS,
-        variables: { siret, status: ["DRAFT"] },
+        query: DRAFT_TAB_FORMS,
+        variables: { siret },
         getNewData: data => ({
-          forms: [...data.forms, duplicateForm],
+          forms: [duplicateForm, ...data.forms],
         }),
       });
     },

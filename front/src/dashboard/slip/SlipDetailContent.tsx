@@ -27,12 +27,12 @@ import {
   getVerboseQuantityType,
 } from "./utils";
 import QRCodeIcon from "react-qr-code";
-import { DynamicActions } from "../slips/slips-actions/SlipActions";
 
 import styles from "./Slip.module.scss";
 
 import { DateRow, DetailRow, YesNoRow, PackagingRow } from "./Components";
 import { useParams } from "react-router-dom";
+import WorkflowAction from "dashboard/slips/slips-actions/workflow/WorkflowAction";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -482,7 +482,7 @@ export default function SlipDetailContent({
           </>
         )}
         {statusesWithDynamicActions.includes(form.status) && (
-          <DynamicActions siret={siret} form={form} refetch={refetch} />
+          <WorkflowAction siret={siret} form={form} />
         )}
         {children}
       </div>

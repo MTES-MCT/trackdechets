@@ -2,9 +2,9 @@ import { useQuery, NetworkStatus } from "@apollo/client";
 import React from "react";
 import { InlineError } from "common/components/Error";
 import Loader from "common/components/Loaders";
-import { FormStatus, Query, QueryFormsArgs } from "generated/graphql/types";
-import { GET_SLIPS } from "../query";
-import Slips from "../Slips";
+import { Query, QueryFormsArgs } from "generated/graphql/types";
+import { FOLLOW_TAB_FORMS } from "./queries";
+import Slips, { SlipsColumn } from "../Slips";
 import TabContent from "./TabContent";
 import EmptyTab from "./EmptyTab";
 import { useParams } from "react-router-dom";
@@ -14,27 +14,11 @@ export default function FollowTab() {
   const { error, data, fetchMore, refetch, networkStatus } = useQuery<
     Pick<Query, "forms">,
     Partial<QueryFormsArgs>
-  >(GET_SLIPS, {
+  >(FOLLOW_TAB_FORMS, {
     variables: {
       siret,
-      status: [
-        FormStatus.Sealed,
-        FormStatus.Sent,
-        FormStatus.Received,
-        FormStatus.Accepted,
-        FormStatus.TempStored,
-        FormStatus.TempStorerAccepted,
-        FormStatus.Resealed,
-        FormStatus.Resent,
-        FormStatus.AwaitingGroup,
-        FormStatus.Grouped,
-      ],
-      hasNextStep: false,
     },
     notifyOnNetworkStatusChange: true,
-    // workaround waiting for a way to append a sealed form to the cache
-    // after markAsSealed has been called
-    fetchPolicy: "cache-and-network",
   });
 
   if (networkStatus === NetworkStatus.loading) return <Loader />;
@@ -61,7 +45,20 @@ export default function FollowTab() {
       forms={data.forms}
       fetchMore={fetchMore}
     >
-      <Slips siret={siret} forms={data.forms} refetch={refetch} />
+      <Slips
+        siret={siret}
+        forms={data.forms}
+        columns={[
+          SlipsColumn.READABLE_ID,
+          SlipsColumn.SENT_AT,
+          SlipsColumn.EMITTER_COMPANY_NAME,
+          SlipsColumn.RECIPIENT_COMPANY_NAME,
+          SlipsColumn.WASTE_DETAILS_CODE,
+          SlipsColumn.QUANTITY,
+          SlipsColumn.STATUS,
+          SlipsColumn.SLIPS_ACTIONS,
+        ]}
+      />
     </TabContent>
   );
 }

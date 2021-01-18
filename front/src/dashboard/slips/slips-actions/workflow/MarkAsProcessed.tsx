@@ -7,10 +7,34 @@ import {
 } from "generated/constants";
 import DateInput from "form/custom-inputs/DateInput";
 import CompanySelector from "form/company/CompanySelector";
-import { SlipActionProps } from "./SlipActions";
-import { MutationMarkAsProcessedArgs } from "generated/graphql/types";
+import {
+  Form as TdForm,
+  FormStatus,
+  Mutation,
+  MutationMarkAsProcessedArgs,
+  Query,
+} from "generated/graphql/types";
+import { gql, useMutation } from "@apollo/client";
+import { statusChangeFragment } from "common/fragments";
+import { WorkflowActionProps } from "./WorkflowAction";
+import { updateApolloCache } from "common/helper";
+import { ACT_TAB_FORMS, HISTORY_TAB_FORMS } from "dashboard/slips/tabs/queries";
+import { TdModalTrigger } from "common/components/Modal";
+import { ActionButton } from "common/components";
+import { CogApprovedIcon } from "common/components/Icons";
+import { NotificationError } from "common/components/Error";
+import cogoToast from "cogo-toast";
 
-function Processed(props: SlipActionProps) {
+const MARK_AS_PROCESSED = gql`
+  mutation MarkAsProcessed($id: ID!, $processedInfo: ProcessedFormInput!) {
+    markAsProcessed(id: $id, processedInfo: $processedInfo) {
+      ...StatusChange
+    }
+  }
+  ${statusChangeFragment}
+`;
+
+function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   const {
     values: { processingOperationDone, nextDestination },
     setFieldValue,
@@ -78,7 +102,7 @@ function Processed(props: SlipActionProps) {
         </Field>
         <div>
           Code de traitement initialement prévu par le producteur:{" "}
-          {props.form.recipient?.processingOperation}
+          {form.recipient?.processingOperation}
         </div>
       </div>
       <div className="form__row">
@@ -135,7 +159,7 @@ function Processed(props: SlipActionProps) {
         <button
           type="button"
           className="btn btn--outline-primary"
-          onClick={props.onCancel}
+          onClick={close}
         >
           Annuler
         </button>
@@ -147,22 +171,81 @@ function Processed(props: SlipActionProps) {
   );
 }
 
-export default function ProcessedWrapper(props: SlipActionProps) {
+export default function MarkAsProcessed({ form, siret }: WorkflowActionProps) {
+  const [markAsProcessed, { error }] = useMutation<
+    Pick<Mutation, "markAsProcessed">,
+    MutationMarkAsProcessedArgs
+  >(MARK_AS_PROCESSED, {
+    update: (cache, { data }) => {
+      if (!data?.markAsProcessed) {
+        return;
+      }
+      const processedForm = data.markAsProcessed;
+      // remove form from the action tab
+      updateApolloCache<Pick<Query, "forms">>(cache, {
+        query: ACT_TAB_FORMS,
+        variables: { siret },
+        getNewData: data => ({
+          forms: [...data.forms].filter(form => form.id !== processedForm.id),
+        }),
+      });
+      // add the form to the history tab
+      updateApolloCache<Pick<Query, "forms">>(cache, {
+        query: HISTORY_TAB_FORMS,
+        variables: { siret },
+        getNewData: data => ({
+          forms: [processedForm, ...data.forms],
+        }),
+      });
+    },
+    onCompleted: data => {
+      if (
+        data.markAsProcessed &&
+        data.markAsProcessed.status === FormStatus.Processed
+      ) {
+        cogoToast.success(
+          `Le traitement du déchet a bien été validé. Vous pouvez retrouver ce bordereau dans l'onglet "Archives".`
+        );
+      }
+    },
+  });
+
+  const actionLabel = "Valider le traitement";
+
   return (
-    <div>
-      <Formik
-        initialValues={{
-          processingOperationDone: "",
-          processingOperationDescription: "",
-          processedBy: "",
-          processedAt: formatISO(new Date(), { representation: "date" }),
-          nextDestination: null,
-          noTraceability: false,
-        }}
-        onSubmit={values => props.onSubmit({ info: values })}
-      >
-        <Processed {...props} />
-      </Formik>
-    </div>
+    <TdModalTrigger
+      ariaLabel={actionLabel}
+      trigger={open => (
+        <ActionButton
+          title={actionLabel}
+          icon={CogApprovedIcon}
+          onClick={open}
+        />
+      )}
+      modalContent={close => (
+        <div>
+          <Formik
+            initialValues={{
+              processingOperationDone: "",
+              processingOperationDescription: "",
+              processedBy: "",
+              processedAt: formatISO(new Date(), { representation: "date" }),
+              nextDestination: null,
+              noTraceability: false,
+            }}
+            onSubmit={values => {
+              markAsProcessed({
+                variables: { id: form.id, processedInfo: values },
+              });
+            }}
+          >
+            <ProcessedInfo form={form} close={close} />
+          </Formik>
+          {error && (
+            <NotificationError className="action-error" apolloError={error} />
+          )}
+        </div>
+      )}
+    />
   );
 }

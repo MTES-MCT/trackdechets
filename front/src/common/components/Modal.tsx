@@ -2,7 +2,7 @@ import { DialogOverlay, DialogContent } from "@reach/dialog";
 import { Close } from "./Icons";
 import "@reach/dialog/styles.css";
 import styles from "./Modal.module.scss";
-import React from "react";
+import React, { useState } from "react";
 import classNames from "classnames";
 
 type TdModalProps = {
@@ -45,5 +45,36 @@ export default function TdModal({
         {children}
       </DialogContent>
     </DialogOverlay>
+  );
+}
+
+type ModalTriggerProps = {
+  trigger: (open: () => void) => React.ReactNode;
+  modalContent: (close: () => void) => React.ReactNode;
+};
+
+/**
+ * Represents a component, usually a button used to trigger
+ * a modal and its content
+ */
+export function TdModalTrigger({
+  trigger,
+  modalContent,
+  ...modalProps
+}: Pick<TdModalProps, "padding" | "ariaLabel" | "wide"> & ModalTriggerProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const open = () => setIsOpen(true);
+  const close = () => setIsOpen(false);
+  return (
+    <div>
+      {trigger(open)}
+      <TdModal {...modalProps} isOpen={isOpen} onClose={() => setIsOpen(false)}>
+        <>
+          <h2 className="td-modal-title">{modalProps.ariaLabel}</h2>
+          {modalContent(close)}
+        </>
+      </TdModal>
+    </div>
   );
 }

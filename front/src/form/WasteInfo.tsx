@@ -10,7 +10,6 @@ import FormsSelector from "./appendix/FormsSelector";
 import AppendixInfo from "./appendix/AppendixInfo";
 import Tooltip from "../common/components/Tooltip";
 import { FieldSwitch } from "common/components";
-import { Question } from "common/components/Icons";
 import "./WasteInfo.scss";
 import { isDangerous } from "../generated/constants";
 

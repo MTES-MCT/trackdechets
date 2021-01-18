@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-
 import { COLORS } from "common/config";
 import { TrashIcon } from "common/components/Icons";
-import mutations from "./slip-actions.mutations";
-import { GET_SLIPS } from "../query";
-import { useMutation } from "@apollo/client";
+import { DRAFT_TAB_FORMS, FOLLOW_TAB_FORMS } from "../tabs/queries";
+import { gql, useMutation } from "@apollo/client";
 import { updateApolloCache } from "common/helper";
 import {
   FormStatus,
@@ -23,6 +21,15 @@ type Props = {
   onClose?: () => void;
 };
 
+const DELETE_FORM = gql`
+  mutation DeleteForm($id: ID!) {
+    deleteForm(id: $id) {
+      id
+      status
+    }
+  }
+`;
+
 export default function Delete({
   formId,
   small = true,
@@ -34,7 +41,7 @@ export default function Delete({
   const [deleteForm] = useMutation<
     Pick<Mutation, "deleteForm">,
     MutationDeleteFormArgs
-  >(mutations.DELETE_FORM, {
+  >(DELETE_FORM, {
     variables: { id: formId },
     update: (cache, { data }) => {
       if (!data?.deleteForm) {
@@ -45,8 +52,8 @@ export default function Delete({
       if (deleteForm.status === FormStatus.Draft) {
         // update draft tab
         updateApolloCache<Pick<Query, "forms">>(cache, {
-          query: GET_SLIPS,
-          variables: { siret, status: [FormStatus.Draft] },
+          query: DRAFT_TAB_FORMS,
+          variables: { siret },
           getNewData: data => ({
             forms: [...data.forms.filter(f => f.id !== deleteForm.id)],
           }),
@@ -54,20 +61,9 @@ export default function Delete({
       } else if (deleteForm.status === FormStatus.Sealed) {
         // update follow tab
         updateApolloCache<Pick<Query, "forms">>(cache, {
-          query: GET_SLIPS,
+          query: FOLLOW_TAB_FORMS,
           variables: {
             siret,
-            status: [
-              FormStatus.Sealed,
-              FormStatus.Sent,
-              FormStatus.Received,
-              FormStatus.TempStored,
-              FormStatus.Resealed,
-              FormStatus.Resent,
-              FormStatus.AwaitingGroup,
-              FormStatus.Grouped,
-            ],
-            hasNextStep: false,
           },
           getNewData: data => ({
             forms: [...data.forms.filter(f => f.id !== deleteForm.id)],

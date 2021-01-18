@@ -106,8 +106,7 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
             OR: [
               { status: Status.SENT },
               { status: Status.TEMP_STORED },
-              { status: Status.TEMP_STORER_ACCEPTED },
-              { status: Status.RESEALED }
+              { status: Status.TEMP_STORER_ACCEPTED }
             ]
           }
         ]
