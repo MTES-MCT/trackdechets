@@ -1,4 +1,3 @@
-import * as fs from "fs";
 import { Updater, registerUpdater } from "./helper/helper";
 import prisma from "../../src/prisma";
 import { searchCompany } from "../../src/companies/sirene/insee/client";
@@ -25,11 +24,13 @@ export class AddAddressLatLongUpdater implements Updater {
             data: { latitude, longitude, address: companyInfo.address },
             where: { id: company.id }
           });
-        } catch (e) {
-          console.log(e);
+        } catch (_) {
+          console.log(
+            `Failed retrieving address and geo info for SIRET ${company.siret}`
+          );
         } finally {
           // Wait some time to avoid 429 Too many requests
-          await sleep(500);
+          await sleep(200);
         }
       }
     } catch (err) {
