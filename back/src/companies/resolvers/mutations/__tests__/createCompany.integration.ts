@@ -5,10 +5,16 @@ import { ErrorCode } from "../../../../common/errors";
 import * as mailsHelper from "../../../../mailer/mailing";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import * as geocode from "../../../geocode";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
+
+// Mock calls to API adresse
+const geocodeSpy = jest.spyOn(geocode, "default");
+const geoInfo = { latitude: 43.302546, longitude: 5.384324 };
+geocodeSpy.mockResolvedValue(geoInfo);
 
 const CREATE_COMPANY = `
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
@@ -57,7 +63,9 @@ describe("Mutation.createCompany", () => {
       siret: companyInput.siret,
       gerepId: companyInput.gerepId,
       name: companyInput.companyName,
-      companyTypes: companyInput.companyTypes
+      companyTypes: companyInput.companyTypes,
+      latitude: geoInfo.latitude,
+      longitude: geoInfo.longitude
     });
 
     const newCompanyExists =
