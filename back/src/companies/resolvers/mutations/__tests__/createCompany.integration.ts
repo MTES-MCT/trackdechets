@@ -146,28 +146,6 @@ describe("Mutation.createCompany", () => {
     );
   });
 
-  it("should create document keys", async () => {
-    const user = await userFactory();
-
-    const companyInput = {
-      siret: "12345678912345",
-      companyName: "Acme",
-      companyTypes: ["PRODUCER"],
-      documentKeys: ["key1", "key2"]
-    };
-    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    await mutate(CREATE_COMPANY, {
-      variables: {
-        companyInput
-      }
-    });
-
-    const company = await prisma.company.findUnique({
-      where: { siret: companyInput.siret }
-    });
-    expect(company.documentKeys).toEqual(["key1", "key2"]);
-  });
-
   it("should throw error if the company already exist", async () => {
     const user = await userFactory();
     const company = await companyFactory();

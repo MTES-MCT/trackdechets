@@ -291,12 +291,6 @@ input PrivateCompanyInput {
   address: String
 
   """
-  Liste de documents permettant de démontrer l'appartenance
-  de l'utilisateur à l'établissement
-  """
-  documentKeys: [String]
-
-  """
   Récipissé transporteur (le cas échéant, pour les profils transporteur)
   """
   transporterReceiptId: String

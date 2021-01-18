@@ -31,8 +31,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     address,
     companyTypes,
     transporterReceiptId,
-    traderReceiptId,
-    documentKeys
+    traderReceiptId
   } = companyInput;
   const ecoOrganismeAgreements =
     companyInput.ecoOrganismeAgreements?.map(a => a.href) || [];
@@ -103,12 +102,6 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   if (!!traderReceiptId) {
     companyCreateInput.traderReceipt = {
       connect: { id: traderReceiptId }
-    };
-  }
-
-  if (!!documentKeys && documentKeys.length >= 1) {
-    companyCreateInput.documentKeys = {
-      set: documentKeys
     };
   }
 

@@ -150,7 +150,6 @@ model Company {
   contactEmail           String?
   contactPhone           String?
   website                String?
-  documentKeys           String[]
   ecoOrganismeAgreements String[]
   companyTypes           CompanyType[]
   traderReceiptId        String?

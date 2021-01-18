@@ -33,15 +33,6 @@ const CREATE_COMPANY = gql`
   }
 `;
 
-const CREATE_UPLOAD_LINK = gql`
-  mutation CreateUploadLink($fileName: String!, $fileType: String!) {
-    createUploadLink(fileName: $fileName, fileType: $fileType) {
-      signedUrl
-      key
-    }
-  }
-`;
-
 const CREATE_TRANSPORTER_RECEIPT = gql`
   mutation CreateTransporterReceipt($input: CreateTransporterReceiptInput!) {
     createTransporterReceipt(input: $input) {
@@ -65,7 +56,6 @@ interface Values extends FormikValues {
   companyTypes: _CompanyType[];
   gerepId: string;
   codeNaf: string;
-  document: File | null;
   isAllowed: boolean;
   transporterReceiptNumber: string;
   transporterReceiptValidity: string;
@@ -125,10 +115,6 @@ export default function AccountCompanyAdd() {
     { error: createTraderReceiptError },
   ] = useMutation(CREATE_TRADER_RECEIPT);
 
-  const [createUploadLink, { error: uploadError }] = useMutation<{
-    createUploadLink: { signedUrl: string; key: string };
-  }>(CREATE_UPLOAD_LINK);
-
   function isTransporter(companyTypes: _CompanyType[]) {
     return companyTypes.includes(_CompanyType.Transporter);
   }
@@ -148,7 +134,6 @@ export default function AccountCompanyAdd() {
   async function onSubmit(values: Values) {
     const {
       isAllowed,
-      document,
       transporterReceiptNumber,
       transporterReceiptValidity,
       transporterReceiptDepartment,
@@ -158,34 +143,6 @@ export default function AccountCompanyAdd() {
       ecoOrganismeAgreements,
       ...companyInput
     } = values;
-
-    let documentKeys = [] as string[];
-
-    if (document) {
-      // upload files if any
-
-      const { name: fileName, type: fileType } = document;
-
-      // Retrieves a signed URL
-
-      const { data } = await createUploadLink({
-        variables: { fileName, fileType },
-      });
-
-      if (data) {
-        // upload file to signed URL
-        const uploadLink = data.createUploadLink;
-        await fetch(uploadLink.signedUrl, {
-          method: "PUT",
-          body: document,
-          headers: {
-            "Content-Type": fileType,
-            "x-amz-acl": "private",
-          },
-        });
-        documentKeys = [uploadLink.key];
-      }
-    }
 
     let transporterReceiptId: string | null = null;
 
@@ -241,7 +198,6 @@ export default function AccountCompanyAdd() {
       variables: {
         companyInput: {
           ...companyInput,
-          documentKeys,
           transporterReceiptId,
           traderReceiptId,
           // Filter out empty agreements
@@ -289,7 +245,6 @@ export default function AccountCompanyAdd() {
             companyTypes: getCompanyTypes(companyInfos),
             gerepId: companyInfos?.installation?.codeS3ic ?? "",
             codeNaf: companyInfos?.naf ?? "",
-            document: null,
             isAllowed: false,
             transporterReceiptNumber: "",
             transporterReceiptValidity: "",
@@ -412,32 +367,6 @@ export default function AccountCompanyAdd() {
                 </div>
               </div>
 
-              <div className={styles.field}>
-                <label className={`text-right ${styles.bold}`}>
-                  Justificatif (optionnel)
-                </label>
-
-                <div className={styles.field__value}>
-                  <input
-                    type="file"
-                    className={`button ${styles.textField}`}
-                    accept="image/png, image/jpeg, image/gif, application/pdf "
-                    onChange={async event => {
-                      const file = event.currentTarget.files?.item(0);
-                      if (!!file) {
-                        setFieldValue("document", file);
-                      }
-                    }}
-                  />
-                  <div className={styles.smaller}>
-                    KBIS, justificatif du siège social de l'entreprise... Ce
-                    document est suceptible d'être vérifié par l'équipe
-                    Trackdéchets afin de lutter contre la fraude. Formats
-                    acceptés: jpeg, png, pdf.
-                  </div>
-                </div>
-              </div>
-
               <h5 className={styles.subtitle}>Activité</h5>
 
               <div className={styles.field}>
@@ -520,7 +449,6 @@ export default function AccountCompanyAdd() {
                 </button>
               </div>
               {/* // ERRORS */}
-              {uploadError && <NotificationError apolloError={uploadError} />}
               {createTransporterReceiptError && (
                 <NotificationError
                   apolloError={createTransporterReceiptError}
