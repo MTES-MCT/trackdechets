@@ -23,7 +23,6 @@ const CREATE_COMPANY = `
       gerepId
       name
       companyTypes
-      ecoOrganismeAgreements
       transporterReceipt {
         id
         receiptNumber
@@ -63,9 +62,7 @@ describe("Mutation.createCompany", () => {
       siret: companyInput.siret,
       gerepId: companyInput.gerepId,
       name: companyInput.companyName,
-      companyTypes: companyInput.companyTypes,
-      latitude: geoInfo.latitude,
-      longitude: geoInfo.longitude
+      companyTypes: companyInput.companyTypes
     });
 
     const newCompanyExists =
