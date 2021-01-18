@@ -20,6 +20,7 @@ import {
   CompanyType as _CompanyType,
   CompanyPublic,
 } from "generated/graphql/types";
+import Tooltip from "common/components/Tooltip";
 
 const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
@@ -52,6 +53,7 @@ const CREATE_TRADER_RECEIPT = gql`
 interface Values extends FormikValues {
   siret: string;
   companyName: string;
+  givenName: string;
   address: string;
   companyTypes: _CompanyType[];
   gerepId: string;
@@ -241,6 +243,7 @@ export default function AccountCompanyAdd() {
           initialValues={{
             siret: companyInfos?.siret ?? "",
             companyName: companyInfos?.name ?? "",
+            givenName: "",
             address: companyInfos?.address ?? "",
             companyTypes: getCompanyTypes(companyInfos),
             gerepId: companyInfos?.installation?.codeS3ic ?? "",
@@ -335,6 +338,21 @@ export default function AccountCompanyAdd() {
                       className={`td-input ${styles.textField}`}
                     />
                   )}
+                </div>
+              </div>
+
+              <div className={styles.field}>
+                <label className={`text-right ${styles.bold}`}>
+                  Nom usuel{" "}
+                  <Tooltip msg="Nom usuel de l'établissement qui permet de différencier plusieurs établissements ayant la même raison sociale" />
+                  (optionnel)
+                </label>
+                <div className={styles.field__value}>
+                  <Field
+                    type="text"
+                    name="givenName"
+                    className={`td-input ${styles.textField}`}
+                  />
                 </div>
               </div>
 

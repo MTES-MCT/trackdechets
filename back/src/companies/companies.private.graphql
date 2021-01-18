@@ -287,6 +287,9 @@ input PrivateCompanyInput {
   "Nom de l'établissement"
   companyName: String
 
+  "Nom d'usage de l'établissement"
+  givenName: String
+
   "Adresse de l'établissement"
   address: String
 
