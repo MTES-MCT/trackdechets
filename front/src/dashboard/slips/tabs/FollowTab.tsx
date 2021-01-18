@@ -34,7 +34,7 @@ export default function FollowTab() {
     notifyOnNetworkStatusChange: true,
     // workaround waiting for a way to append a sealed form to the cache
     // after markAsSealed has been called
-    fetchPolicy: "no-cache",
+    fetchPolicy: "cache-and-network",
   });
 
   if (networkStatus === NetworkStatus.loading) return <Loader />;
