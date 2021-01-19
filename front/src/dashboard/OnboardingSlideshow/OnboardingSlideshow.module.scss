@@ -1,4 +1,5 @@
 @import "src/scss/Constants.scss";
+@import "src/scss/Breakpoints.scss";
 
 .ModalTitle {
   font-size: 1.5rem;
@@ -13,10 +14,17 @@
 
 .SlideContent {
   display: flex;
+  flex-direction: column;
   align-items: center;
+
+  @include tablet {
+    flex-direction: row;
+  }
 }
 .SlideContentImage {
-  width: 40%;
+  @include tablet {
+    width: 40%;
+  }
 }
 .SlideContentList {
   flex: 1;
