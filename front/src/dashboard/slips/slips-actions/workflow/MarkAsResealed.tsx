@@ -17,7 +17,7 @@ import ProcessingOperationSelect from "common/components/ProcessingOperationSele
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton } from "common/components";
-import { PaperWriteIcon } from "common/components/Icons";
+import { IconPaperWrite } from "common/components/Icons";
 import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
 import { ACT_TAB_FORMS, FOLLOW_TAB_FORMS } from "dashboard/slips/tabs/queries";
@@ -126,7 +126,7 @@ export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
       trigger={open => (
         <ActionButton
           title={actionLabel}
-          icon={PaperWriteIcon}
+          icon={IconPaperWrite}
           onClick={open}
         />
       )}

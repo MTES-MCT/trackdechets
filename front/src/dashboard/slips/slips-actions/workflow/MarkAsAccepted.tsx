@@ -5,7 +5,7 @@ import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
 import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton } from "common/components";
-import { WaterDamIcon } from "common/components/Icons";
+import { IconWaterDam } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 import AcceptedInfo from "./AcceptedInfo";
 
@@ -30,7 +30,7 @@ export default function MarkAsAccepted({ form }: WorkflowActionProps) {
     <TdModalTrigger
       ariaLabel={actionLabel}
       trigger={open => (
-        <ActionButton title={actionLabel} icon={WaterDamIcon} onClick={open} />
+        <ActionButton title={actionLabel} icon={IconWaterDam} onClick={open} />
       )}
       modalContent={close => (
         <div>
