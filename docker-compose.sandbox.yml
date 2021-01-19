@@ -6,6 +6,3 @@ services:
   td-ui:
     image: betagouv/trackdechets-ui:sandbox
 
-  td-doc:
-    image: betagouv/trackdechets-doc:sandbox
-

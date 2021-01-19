@@ -20,7 +20,5 @@ services:
   td-ui:
     image: betagouv/trackdechets-ui:dev
 
-  td-doc:
-    image: betagouv/trackdechets-doc:dev
 
 

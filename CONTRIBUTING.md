@@ -85,12 +85,12 @@ Pour plus de détails, se référer au post ["Set a local web development enviro
 3. Démarrer les containers
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up postgres redis prisma td-api td-ui
+   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui
    ```
 
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
 
-   Vous pouvez également démarrer les services `td-doc`, `td-etl` au cas par cas mais ceux-ci ne sont pas essentiels au fonctionnement de l'API ou de l'interface utilisateur.
+   Vous pouvez également démarrer le service `td-doc` il n'est pas essentiel au fonctionnement de l'API ou de l'interface utilisateur.
 
 4. Synchroniser la base de données avec le schéma prisma.
 
