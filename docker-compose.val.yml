@@ -23,14 +23,4 @@ services:
   td-doc:
     image: betagouv/trackdechets-doc:dev
 
-  # Simple Nginx container to redirect doc.trackdechets.fr
-  # to developers.trackdechets.fr/docs
-  td-doc-redirect:
-    image: betagouv/trackdechets-doc-redirect:dev
-    environment:
-      VIRTUAL_HOST: $DOC_HOST
-      LETSENCRYPT_HOST: $DOC_HOST
-      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
-      DEVELOPERS_HOST: $DEVELOPERS_HOST
-      DEVELOPERS_URL_SCHEME: $DEVELOPERS_URL_SCHEME
 

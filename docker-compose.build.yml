@@ -13,7 +13,4 @@ services:
     build:
       context: ./doc
 
-  td-doc-redirect:
-    build:
-      context: ./doc-redirect
 
