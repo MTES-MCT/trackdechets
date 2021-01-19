@@ -1,0 +1,185 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>OAuth2 · Trackdéchets Développeurs</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content=":::note"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="OAuth2 · Trackdéchets Développeurs"/><meta property="og:type" content="website"/><meta property="og:url" content="undefined/"/><meta property="og:description" content=":::note"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/prism.css"/><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="Trackdéchets Développeurs"/><h2 class="headerTitleWithLogo">Trackdéchets Développeurs</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/introduction" target="_self">Documentation</a></li><li class="siteNavGroupActive"><a href="/docs/api-reference" target="_self">Référence de l&#x27;API</a></li><li class=""><a href="https://api.trackdechets.beta.gouv.fr" target="_blank">Playground</a></li><li class=""><a href="https://forum.trackdechets.beta.gouv.fr" target="_blank">Support</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Guides</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Introduction<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/introduction">API Trackdéchets</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Guides<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/graphql">Faire des appels à l&#x27;API GraphQL</a></li><li class="navListItem"><a class="navItem" href="/docs/workflow">Cycle de vie du bordereau</a></li><li class="navListItem"><a class="navItem" href="/docs/errors">Gestion des erreurs</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/docs/oauth2">OAuth2</a></li><li class="navListItem"><a class="navItem" href="/docs/environments">Environnements de tests</a></li><li class="navListItem"><a class="navItem" href="/docs/access-token">Obtenir un jeton d&#x27;accès personnel</a></li><li class="navListItem"><a class="navItem" href="/docs/playground">Utilisation du playground</a></li><li class="navListItem"><a class="navItem" href="/docs/multimodal">Transport multimodal</a></li><li class="navListItem"><a class="navItem" href="/docs/sirene">API Sirene enrichie</a></li><li class="navListItem"><a class="navItem" href="/docs/registre">Registre</a></li><li class="navListItem"><a class="navItem" href="/docs/roles">Rôles</a></li><li class="navListItem"><a class="navItem" href="/docs/notifications">Notifications</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Référence de l&#x27;API<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/api-reference">Référence de l&#x27;API</a></li><li class="navListItem"><a class="navItem" href="/docs/changelog">Changelog</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">OAuth2</h1></header><article><div><span>
+    <div class="admonition admonition-note">
+      <div class="admonition-heading">
+        <h5><div class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"/></svg></div> note</h5>
+      </div>
+      <div class="admonition-content">
+    <p>Avant de pouvoir implémenter le procotole OAuth2, vous aurez besoin d'une application sur la plateforme Trackdéchets. Pour ce faire, merci de nous envoyer un email à l'adresse <a href="mailto:tech@trackdechets.beta.gouv.fr">tech@trackdechets.beta.gouv.fr</a> en spécifiant l'environnement concerné, (production ou <a href="/docs/environments">&quot;bac à sable&quot;</a>) ainsi que les informations suivantes:</p>
+<ul>
+<li>Email associé à un compte Trackdéchets existant</li>
+<li>Nom de l'application</li>
+<li>Logo de l’application au format png, jpeg ou svg</li>
+<li>Une liste d’urls de redirection valides</li>
+</ul>
+</div></div><p>Le <a href="https://tools.ietf.org/html/rfc6749">protocole OAuth2</a> permet à des logiciels tiers type SaaS déchets (&quot;client&quot;) d'accéder à l'API Trackdéchets (&quot;ressource server&quot;) pour le compte d'utilisateurs (&quot;ressource owner&quot;) sans exposer le mot de passe de celui-ci.</p>
+<pre><code class="hljs">     +--------+                               +---------------+
+     |        |--(A)- Authorization Request -&gt;|  <span class="hljs-built_in"> Resource </span>   |
+     |        |                               |     Owner     |
+     |        |&lt;-(B)-- Authorization Grant ---|               |
+     |        |                               +---------------+
+     |        |
+     |        |                               +---------------+
+     |        |--(C)-- Authorization Grant --&gt;| Authorization |
+     |<span class="hljs-built_in"> Client </span>|                               |    <span class="hljs-built_in"> Server </span>   |
+     |        |&lt;-(D)----- Access Token -------|               |
+     |        |                               +---------------+
+     |        |
+     |        |                               +---------------+
+     |        |--(E)----- Access Token ------&gt;|   <span class="hljs-built_in"> Resource </span>  |
+     |        |                               |    <span class="hljs-built_in"> Server </span>   |
+     |        |&lt;-(F)--- Protected<span class="hljs-built_in"> Resource </span>---|               |
+     +--------+                               +---------------+
+
+                    Abstract Protocol Flow
+</code></pre>
+<p>Seul le &quot;grant&quot; par échange de de code d'autorisation est implémentée dans Trackdéchets <a href="https://tools.ietf.org/html/rfc6749#section-4.1">https://tools.ietf.org/html/rfc6749#section-4.1</a>. Le schéma de flux est le suivant</p>
+<pre><code class="hljs">     +----------+
+     |<span class="hljs-string"> Resource </span>|
+     |<span class="hljs-string">   Owner  </span>|
+     |<span class="hljs-string">          </span>|
+     +----------+
+          ^
+          |<span class="hljs-string">
+         (B)
+     +----</span>|<span class="hljs-string">-----+          Client Identifier      +---------------+
+     </span>|<span class="hljs-string">         -+----(A)-- &amp; Redirection URI ----&gt;</span>|<span class="hljs-string">               </span>|
+     |<span class="hljs-string">  User-   </span>|<span class="hljs-string">                                 </span>|<span class="hljs-string"> Authorization </span>|
+     |<span class="hljs-string">  Agent  -+----(B)-- User authenticates ---&gt;</span>|<span class="hljs-string">     Server    </span>|
+     |<span class="hljs-string">          </span>|<span class="hljs-string">                                 </span>|<span class="hljs-string">               </span>|
+     |<span class="hljs-string">         -+----(C)-- Authorization Code ---&lt;</span>|<span class="hljs-string">               </span>|
+     +-|<span class="hljs-string">----</span>|<span class="hljs-string">---+                                 +---------------+
+       </span>|<span class="hljs-string">    </span>|<span class="hljs-string">                                         ^      v
+      (A)  (C)                                        </span>|<span class="hljs-string">      </span>|
+       |<span class="hljs-string">    </span>|<span class="hljs-string">                                         </span>|<span class="hljs-string">      </span>|
+       ^    v                                         |<span class="hljs-string">      </span>|
+     +---------+                                      |<span class="hljs-string">      </span>|
+     |<span class="hljs-string">         </span>|<span class="hljs-string">&gt;---(D)-- Authorization Code ---------'      </span>|
+     |<span class="hljs-string">  Client </span>|<span class="hljs-string">          &amp; Redirection URI                  </span>|
+     |<span class="hljs-string">         </span>|<span class="hljs-string">                                             </span>|
+     |<span class="hljs-string">         </span>|<span class="hljs-string">&lt;---(E)----- Access Token -------------------'
+     +---------+
+
+   Note: The lines illustrating steps (A), (B), and (C) are broken into
+   two parts as they pass through the user-agent.
+
+                     Authorization Code Flow
+</span></code></pre>
+<ul>
+<li>(A) L'application cliente initie le protocole en redirigeant l'utilisateur (&quot;resource owner&quot;) sur l'URL d'autorisation Trackdéchets <code>https://app.trackdechets.beta.gouv.fr/oauth2/authorize/dialog</code></li>
+</ul>
+<p>Les arguments suivants doivent être passés en &quot;query string&quot; de la requête (Cf <a href="https://tools.ietf.org/html/rfc6749#section-4.1.1">https://tools.ietf.org/html/rfc6749#section-4.1.1</a>):</p>
+<ul>
+<li><code>client_id={client_id}</code>: L'identifiant de l'application cliente</li>
+<li><code>response_type=code</code></li>
+<li><code>redirect_url={redirect_uri}</code>: URL de redirection</li>
+</ul>
+<p>Exemple: <code>https://app.trackdechets.beta.gouv.fr/oauth2/authorize/dialog?response_type=code&amp;redirect_uri=https://client.example.com/cb&amp;client_id=ck7d66y9s00x20784u4u7fp8l</code></p>
+<p>Si la requête échoue à cause d'un paramètre invalide, une erreur est retournée <a href="https://tools.ietf.org/html/rfc6749#section-4.1.2.1">https://tools.ietf.org/html/rfc6749#section-4.1.2.1</a></p>
+<ul>
+<li>(B) Le serveur d'autorisation authentifie l'utilisateur via le navigateur (&quot;resource owner&quot;) et établit si oui ou non l'utilisateur autorise ou non l'application autorise l'accès</li>
+</ul>
+<p><img src="/docs/assets/oauth2-dialog.png" alt="oauth2-dialog.png"></p>
+<ul>
+<li>(C) Si l'utilisateur donne accès, le serveur d'autorisation redirige l'utilisateur vers l'application cliente en utilisant l'URL de redirection fournit à l'étape (A) <a href="https://tools.ietf.org/html/rfc6749#section-4.1.2">https://tools.ietf.org/html/rfc6749#section-4.1.2</a>. L'URL de redirection inclut un code d'autorisation avec une durée de validité de 10 minutes. Par exemple: <code>https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA</code>.</li>
+</ul>
+<ul>
+<li><p>(D) L'application cliente demande un jeton d'accès au serveur d'autorisation en incluant le code d'autorisation reçu à l'étape précédente en faisant un <code>POST</code> sur l'URL <code>https://api.trackdechets.beta.gouv.fr/oauth2/token</code>. Cf <a href="https://tools.ietf.org/html/rfc6749#section-4.1.3">https://tools.ietf.org/html/rfc6749#section-4.1.3</a>. Les paramètres suivants doivent être passés en utilisant le format &quot;application/x-www-form-urlencoded&quot;.</p>
+<ul>
+<li><code>grant_type=code</code></li>
+<li><code>code={code}</code> code reçu à l'étape précédente</li>
+<li><code>redirect_uri={redirect_uri}</code> URL de redirection spécifié à l'étape (A)</li>
+</ul></li>
+</ul>
+<p>La requête doit être authentifiée avec avec le <code>client_id</code> et <code>client_secret</code> (<a href="https://fr.wikipedia.org/wiki/Authentification_HTTP#M%C3%A9thode_%C2%AB_Basic_%C2%BB">méthode basique</a>).</p>
+<pre><code class="hljs"><span class="hljs-keyword">POST</span> <span class="hljs-string">/oauth2/token</span> HTTP/1.1
+<span class="hljs-attribute">Host</span>: api.trackdechets.beta.gouv.fr
+<span class="hljs-attribute">Authorization</span>: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+<span class="hljs-attribute">Content-Type</span>: application/x-www-form-urlencoded
+
+<span class="routeros"><span class="hljs-attribute">grant_type</span>=authorization_code&amp;code=SplxlOBeZQQYbYS6WxSbIA
+&amp;<span class="hljs-attribute">redirect_uri</span>=https://client.example.com/cb
+</span></code></pre>
+<ul>
+<li>(E) Si la requête est valide et autorisée, le serveur d'autorisation émet un jeton d'accès. Par exemple</li>
+</ul>
+<pre><code class="hljs">HTTP/1.1 <span class="hljs-number">200</span> OK
+<span class="hljs-attribute">Content-Type</span>: application/json;charset=UTF-8
+<span class="hljs-attribute">Cache-Control</span>: no-store
+<span class="hljs-attribute">Pragma</span>: no-cache
+
+<span class="dts">{
+  <span class="hljs-string">"access_token"</span>:<span class="hljs-string">"*****************"</span>,
+  <span class="hljs-string">"token_type"</span>:<span class="hljs-string">"bearer"</span>,
+<span class="hljs-symbol">    user:</span> {
+<span class="hljs-symbol">      email:</span> <span class="hljs-string">"foo@bar.com"</span>,
+<span class="hljs-symbol">      name:</span> <span class="hljs-string">"Foo Bar"</span>
+    }
+}
+</span></code></pre>
+<p><strong>Le token émit a une durée de vie infinie, il n'y a pas besoin de le rafraichir</strong>. Il pourra toutefois être révoqué par l'utilisateur dans son espace client Trackdéchets.</p>
+<p>Vous pouvez ensuite stocker ce token et l'utiliser pour accéder aux ressources de l'utilisateur sur la plateforme Trackdéchets. Cf <a href="/docs/graphql">Faire des appels à l'API GraphQL</a>.</p>
+<p>Si la requête échoue, le serveur répond par un message d'erreur tel que décrit <a href="https://tools.ietf.org/html/rfc6749#section-5.2">ici</a></p>
+
+    <div class="admonition admonition-tip">
+      <div class="admonition-heading">
+        <h5><div class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"/></svg></div> tip</h5>
+      </div>
+      <div class="admonition-content">
+    <p>Une application OAuth2 de démonstration a été créee à l'adresse <a href="https://td-oauth2-demo.osc-fr1.scalingo.io/">https://td-oauth2-demo.osc-fr1.scalingo.io/</a></p>
+</div></div></span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/errors"><span class="arrow-prev">← </span><span>Gestion des erreurs</span></a><a class="docs-next button" href="/docs/environments"><span>Environnements de tests</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="Trackdéchets Développeurs" width="66" height="58"/></a><div><h5>Trackdéchets</h5><a href="https://trackdechets.beta.gouv.fr">Site web</a><a href="https://trello.com/b/2pkc7bFg/trackd%C3%A9chets-roadmap-produit">Roadmap produit</a><a href="https://github.com/MTES-MCT/trackdechets">Code source</a><a class="github-button" href="https://github.com/MTES-MCT/trackdechets" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Communauté</h5><a href="https://forum.trackdechets.beta.gouv.fr">Forum technique</a></div><div><h5>API</h5><a href="/docs/api-reference">Référence de l&#x27;API</a><a href="https://status.trackdechets.beta.gouv.fr">Statut de l&#x27;API</a><a href="https://api.trackdechets.beta.gouv.fr">Playground</a></div></section><a href="https://beta.gouv.fr/incubateurs/mtes.html" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/logo-mtes-mef.svg" alt="La Fabrique Numérique" width="170" height="45"/></a><section class="copyright">Copyright 2021 Ministère de la Transition Écologique et Solidaire</section></footer></div></body></html>
