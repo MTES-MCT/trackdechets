@@ -201,20 +201,27 @@ describe("Query.forms", () => {
   it("should convert packagingInfos to an empty array if null", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
-    await createForms(user.id, [
-      {
+    await formFactory({
+      ownerId: user.id,
+      opt: {
         recipientCompanySiret: company.siret,
         wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }]
-      },
-      {
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
         recipientCompanySiret: company.siret,
         wasteDetailsPackagingInfos: []
-      },
-      {
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
         recipientCompanySiret: company.siret,
         wasteDetailsPackagingInfos: null
       }
-    ]);
+    });
 
     const { query } = makeClient(user);
     const { data, errors } = await query(FORMS);

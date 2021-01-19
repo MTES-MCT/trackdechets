@@ -396,7 +396,10 @@ type Mutation {
   markAsTempStored(id: ID!, tempStoredInfos: TempStoredFormInput!): Form
 
   "Valide l'acceptation ou le refus d'un BSD d'un entreposage provisoire ou reconditionnement"
-  markAsTempStorerAccepted(id: ID!, tempStorerAcceptedInfo: TempStorerAcceptedFormInput!): Form
+  markAsTempStorerAccepted(
+    id: ID!
+    tempStorerAcceptedInfo: TempStorerAcceptedFormInput!
+  ): Form
 
   "Valide la complétion des cadres 14 à 19 lors d'un entreposage provisoire ou reconditionnement"
   markAsResealed(id: ID!, resealedInfos: ResealedFormInput!): Form
@@ -543,6 +546,8 @@ type Form {
   Identifiant lisible utilisé comme numéro sur le CERFA (case "Bordereau n°****").
   Il est possible de l'utiliser pour récupérer l'identifiant unique du bordereau via la query form,
   utilisé pour le reste des opérations.
+  Cet identifiant possède le format BSD-{yyyyMMdd}-{XXXXXXXX} où yyyyMMdd est la date du jour
+  et XXXXXXXXX une chaine de 9 caractères alphanumériques. Ex: BSD-20210101-HY87F54D1
   """
   readableId: String!
 

@@ -10,7 +10,7 @@ import { Form as GraphQLForm } from "../../../../generated/graphql/types";
 export function getNewValidPrismaForm(): Partial<PrismaForm> {
   return {
     id: "cjplbvecc000d0766j32r19am",
-    readableId: "TD-xxx",
+    readableId: "BSD-20210101-AAAAAAAA",
     isImportedFromPaper: false,
     createdAt: new Date("2018-12-11T00:00:00.000Z"),
     updatedAt: new Date("2018-12-11T00:00:00.000Z"),
@@ -62,7 +62,7 @@ export function getNewValidPrismaForm(): Partial<PrismaForm> {
 export function getNewValidForm(): GraphQLForm {
   return {
     id: "cjplbvecc000d0766j32r19am",
-    readableId: "TD-xxx",
+    readableId: "BSD-20210101-AAAAAAAA",
     isImportedFromPaper: false,
     status: "DRAFT",
     emitter: {

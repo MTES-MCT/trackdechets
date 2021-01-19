@@ -1,3 +1,5 @@
+import { hash } from "bcrypt";
+import getReadableId from "../forms/readableId";
 import {
   CompanyType,
   Consistence,
@@ -7,7 +9,6 @@ import {
   UserRole,
   Prisma
 } from "@prisma/client";
-import { hash } from "bcrypt";
 import prisma from "../prisma";
 
 /**
@@ -229,19 +230,6 @@ export const transportSegmentFactory = async ({ formId, segmentPayload }) => {
     }
   });
 };
-
-/**
- * Thread-safe version of getReadableId for tests
- */
-export function getReadableId() {
-  const year = new Date().getFullYear().toString().slice(-2);
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  const uid = Array.from({ length: 8 })
-    .map(() => chars.charAt(Math.floor(Math.random() * chars.length)))
-    .join("");
-
-  return `TD-${year}-${uid}`;
-}
 
 export const formFactory = async ({
   ownerId,
