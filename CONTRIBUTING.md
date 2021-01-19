@@ -84,11 +84,11 @@ Pour plus de détails, se référer au post ["Set a local web development enviro
 3. Démarrer les containers
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up postgres redis prisma td-api td-ui
+   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui
    ```
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
 
-   Vous pouvez également démarrer les services `td-doc`, `td-etl` au cas par cas mais ceux-ci ne sont pas essentiels au fonctionnement de l'API ou de l'interface utilisateur.
+   Vous pouvez également démarrer le service `td-doc` il n'est pas essentiel au fonctionnement de l'API ou de l'interface utilisateur.
 
 4. Synchroniser la base de données avec le schéma prisma.
 
@@ -191,7 +191,7 @@ A noter que une fois que ces migrations ont été jouées, le contenu des fichie
 Pour les migrations scriptées, c'est dans `back/prisma/scripts`. Les migrations doivent prendre la forme d'une classe, implémentant `Updater` et décorée par `registerUpdater`.
 Attention, contrairement aux scripts SQL ces migrations ne sont pas jouées une seules fois. Il faut donc s'assurer qu'elles sont idempotentes, ou les désactiver après chaque mise en production.
 
-Toutes ces migrations sont jouées avec la commande `npm run update:dev`. (sans le suffixe `:dev` en production)  
+Toutes ces migrations sont jouées avec la commande `npm run update:dev`. (sans le suffixe `:dev` en production)
 
 ## Guides
 

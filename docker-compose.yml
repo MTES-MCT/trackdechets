@@ -74,13 +74,7 @@ services:
       VIRTUAL_HOST: $UI_HOST
       LETSENCRYPT_HOST: $UI_HOST
       LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
-  td-doc:
-    image: betagouv/trackdechets-doc:master
-    restart: always
-    environment:
-      VIRTUAL_HOST: $DEVELOPERS_HOST
-      LETSENCRYPT_HOST: $DEVELOPERS_HOST
-      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
+
 volumes:
   postgres:
 
