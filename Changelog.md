@@ -21,6 +21,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+* Déploiement de la documentation avec Github Pages [PR 772](https://github.com/MTES-MCT/trackdechets/pull/772)
+
 # [2021.01.2] 11/01/2021
 #### :rocket: Nouvelles fonctionnalités
 
