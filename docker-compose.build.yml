@@ -9,8 +9,4 @@ services:
     build:
       context: ./front
 
-  td-doc:
-    build:
-      context: ./doc
-
 
