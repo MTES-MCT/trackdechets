@@ -42,5 +42,5 @@ describe("downloadPdf", () => {
     expect(res.header["content-disposition"]).toBe(
       `attachment;filename=${form.readableId}.pdf`
     );
-  });
+  }, 10000);
 });
