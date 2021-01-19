@@ -1,7 +1,7 @@
 import { useMutation, gql } from "@apollo/client";
 import { formatISO } from "date-fns";
 import { NotificationError } from "common/components/Error";
-import { BusTransfer } from "common/components/Icons";
+import { IconBusTransfer } from "common/components/Icons";
 
 import React, { useState } from "react";
 
@@ -143,7 +143,7 @@ export default function PrepareSegment({
           onClick={() => setIsOpen(true)}
           title="Signer ce bordereau"
         >
-          <BusTransfer size={32} />
+          <IconBusTransfer size="32px" />
           <span className="tw-text-sm tw-ml-2">
             Préparer <br />
             le&nbsp;transfert
@@ -152,9 +152,9 @@ export default function PrepareSegment({
       ) : (
         <ActionButton
           title="Préparer le transfert"
-          icon={BusTransfer}
+          icon={IconBusTransfer}
           onClick={() => setIsOpen(true)}
-          iconSize={32}
+          iconSize="32px"
         />
       )}
 

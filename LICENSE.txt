@@ -5,6 +5,9 @@
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 
+ Streamline icons are the property of Webalys LLC and can be used
+ only in the context of this open source project.
+
                             Preamble
 
   The GNU Affero General Public License is a free, copyleft license for

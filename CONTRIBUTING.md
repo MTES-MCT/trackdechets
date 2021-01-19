@@ -15,6 +15,7 @@
   - [Utiliser un backup de base de donnée](#utiliser-un-backup-de-base-de-donnée)
   - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
   - [Nourrir la base de donnée avec des données par défaut](#nourrir-la-base-de-donnée-avec-des-données-par-défaut)
+  - [Ajouter une nouvelle icône](#ajouter-une-nouvelle-icône)
 
 ## Mise en route
 
@@ -86,6 +87,7 @@ Pour plus de détails, se référer au post ["Set a local web development enviro
    ```bash
    docker-compose -f docker-compose.dev.yml up postgres redis prisma td-api td-ui
    ```
+
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
 
    Vous pouvez également démarrer les services `td-doc`, `td-etl` au cas par cas mais ceux-ci ne sont pas essentiels au fonctionnement de l'API ou de l'interface utilisateur.
@@ -248,3 +250,16 @@ Pour palier à ce problème, il est possible de nourrir la base de donnée Prism
 3. Accéder au container `td-api`.
 4. Exécuter la commande `npx prisma seed`.
    Éventuellement lancer la commande avec le flag `--reset` pour remettre à zéro : `npx prisma seed --reset`.
+
+### Ajouter une nouvelle icône
+
+Les icônes utilisées dans l'application front viennent de https://streamlineicons.com/.
+Nous détenons une license qui nous permet d'utiliser jusqu'à 100 icônes (cf [Streamline Icons Premium License](https://help.streamlineicons.com/license-premium)).
+
+Voilà la procédure pour ajouter une icône au fichier `Icons.tsx` :
+
+1. Se connecter sur streamlineicons.
+2. Copier le SVG de l'icône concerné.
+3. [Convertir le SVG en JSX](https://react-svgr.com/playground/?expandProps=start&icon=true&replaceAttrValues=%23000%3D%22currentColor%22&typescript=true) et l'ajouter au fichier (adapter le code selon les exemples existants : props, remplacer `width`/`height` et `"currentColor"`).
+
+Pour s'y retrouver plus facilement, suivre la convention de nommage en place et utiliser le nom donné par streamlineicons.

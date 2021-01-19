@@ -4,7 +4,7 @@ import React, { useState } from "react";
 
 import { Field, Form as FormikForm, Formik } from "formik";
 import { segmentFragment } from "common/fragments";
-import { PaperWriteIcon } from "common/components/Icons";
+import { IconPaperWrite } from "common/components/Icons";
 
 import { transportModeLabels } from "../../constants";
 import CompanySelector from "form/company/CompanySelector";
@@ -168,7 +168,7 @@ export default function EditSegment({
           onClick={() => setIsOpen(true)}
           title="Modifier le segment"
         >
-          <PaperWriteIcon />
+          <IconPaperWrite />
           <span>
             Modifier <br />
             le&nbsp;segment&nbsp;N°{segment.segmentNumber}
@@ -177,9 +177,9 @@ export default function EditSegment({
       ) : (
         <ActionButton
           title="Modifier le segment"
-          icon={PaperWriteIcon}
+          icon={IconPaperWrite}
           onClick={() => setIsOpen(true)}
-          iconSize={32}
+          iconSize="32px"
         />
       )}
 

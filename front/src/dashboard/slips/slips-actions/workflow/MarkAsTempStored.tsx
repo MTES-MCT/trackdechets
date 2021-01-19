@@ -10,7 +10,7 @@ import { statusChangeFragment } from "common/fragments";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton } from "common/components";
-import { WarehouseStorageIcon } from "common/components/Icons";
+import { IconWarehouseStorage } from "common/components/Icons";
 import ReceivedInfo from "./ReceivedInfo";
 import { NotificationError } from "common/components/Error";
 
@@ -38,7 +38,7 @@ export default function MarkAsTempStored({ form }: WorkflowActionProps) {
         trigger={open => (
           <ActionButton
             title={actionLabel}
-            icon={WarehouseStorageIcon}
+            icon={IconWarehouseStorage}
             onClick={open}
           />
         )}

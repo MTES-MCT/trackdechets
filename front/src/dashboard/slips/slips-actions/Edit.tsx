@@ -1,9 +1,8 @@
 import React from "react";
 
-import { PaperWriteIcon } from "common/components/Icons";
+import { IconPaperWrite } from "common/components/Icons";
 
 import { generatePath, Link, useParams } from "react-router-dom";
-import { COLORS } from "common/config";
 import routes from "common/routes";
 
 type Props = { formId: string; small?: boolean };
@@ -20,7 +19,7 @@ export default function Edit({ formId, small = true }: Props) {
       title="Modifier"
       className={className}
     >
-      <PaperWriteIcon size={24} color={COLORS.blueLight} />
+      <IconPaperWrite size="24px" color="blueLight" />
       <span>Modifier</span>
     </Link>
   );

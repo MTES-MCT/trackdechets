@@ -1,15 +1,11 @@
+@import "src/scss/Constants.scss";
+
 .td-modal {
   position: relative;
   border-radius: $common-radius;
-  border-radius: var(--theme-border-radius);
-
-  box-shadow: 0 1px 2px rgba(201, 211, 223, 0.2);
-
-  box-shadow: var(--theme-box-shadow);
-  background: #fff;
-  background: var(--white);
+  box-shadow: $shadow-short;
+  background: $white;
   padding: 1.5em;
-  padding: var(--space-m);
   max-width: 32em;
   z-index: 1000;
   &--no-padding {
@@ -25,5 +21,3 @@
   margin-bottom: 2rem;
   font-weight: bold;
 }
-
-

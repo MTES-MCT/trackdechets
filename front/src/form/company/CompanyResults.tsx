@@ -1,5 +1,5 @@
 import React from "react";
-import { FaCheck, FaRegCircle } from "react-icons/fa";
+import { IconCheckCircle1, IconSignBadgeCircle } from "common/components/Icons";
 import styles from "./CompanyResult.module.scss";
 import { CompanySearchResult } from "../../generated/graphql/types";
 import { generatePath } from "react-router-dom";
@@ -50,9 +50,9 @@ export default function CompanyResults<
             </div>
             <div className={styles.icon}>
               {selectedItem?.siret === item.siret ? (
-                <FaCheck />
+                <IconCheckCircle1 />
               ) : (
-                <FaRegCircle />
+                <IconSignBadgeCircle />
               )}
             </div>
           </li>

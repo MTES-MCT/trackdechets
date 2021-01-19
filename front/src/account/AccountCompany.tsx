@@ -1,13 +1,13 @@
 import React, { useState, ReactNode } from "react";
 import { gql } from "@apollo/client";
 import { filter } from "graphql-anywhere";
+import { IconPasswordKey } from "common/components/Icons";
 import AccountCompanyMenu from "./AccountCompanyMenu";
 import AccountCompanyInfo from "./AccountCompanyInfo";
 import AccountCompanySecurity from "./AccountCompanySecurity";
 import AccountCompanyMemberList from "./AccountCompanyMemberList";
 import AccountCompanyPage from "./AccountCompanyPage";
 import styles from "./AccountCompany.module.scss";
-import { FaUserShield } from "react-icons/fa";
 import { CompanyPrivate, UserRole } from "generated/graphql/types";
 
 type Props = {
@@ -99,7 +99,7 @@ export default function AccountCompany({ company }: Props) {
         {isAdmin && (
           <h6 className={styles.admin}>
             Vous êtes administrateur
-            <FaUserShield />
+            <IconPasswordKey />
           </h6>
         )}
       </div>

@@ -1,11 +1,25 @@
 import React from "react";
+import { IconProps } from "common/components/Icons";
 import styles from "./ActionButton.module.scss";
+
+interface ActionButtonProps {
+  onClick: () => void;
+  title: string;
+  icon: React.ElementType<IconProps>;
+  iconSize?: string;
+}
+
 /**
  * Custom button intended to be used in dashboards action column.
  * Tries eagerly to adapt its layout to available space
  *
  */
-export default function ActionButton({ onClick, title, icon, iconSize = 24 }) {
+export default function ActionButton({
+  onClick,
+  title,
+  icon: Icon,
+  iconSize = "24px",
+}: ActionButtonProps) {
   return (
     <div className={styles.dynamicAction}>
       <button
@@ -14,7 +28,7 @@ export default function ActionButton({ onClick, title, icon, iconSize = 24 }) {
         title={title}
       >
         <span className={styles.dynamicActionContent}>
-          {icon({ size: iconSize })}
+          <Icon size={iconSize} />
           <span className={styles.dynamicActionText}>{title}</span>
         </span>
       </button>

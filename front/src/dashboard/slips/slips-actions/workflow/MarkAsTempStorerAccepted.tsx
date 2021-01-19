@@ -9,7 +9,7 @@ import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
 import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton } from "common/components";
-import { WarehouseStorageIcon } from "common/components/Icons";
+import { IconWarehouseStorage } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 import AcceptedInfo from "./AcceptedInfo";
 
@@ -45,7 +45,7 @@ export default function MarkAsTempStorerAccepted({
       trigger={open => (
         <ActionButton
           title={actionLabel}
-          icon={WarehouseStorageIcon}
+          icon={IconWarehouseStorage}
           onClick={open}
         />
       )}

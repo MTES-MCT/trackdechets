@@ -21,7 +21,7 @@ import { updateApolloCache } from "common/helper";
 import { ACT_TAB_FORMS, HISTORY_TAB_FORMS } from "dashboard/slips/tabs/queries";
 import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton } from "common/components";
-import { CogApprovedIcon } from "common/components/Icons";
+import { IconCogApproved } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 import cogoToast from "cogo-toast";
 
@@ -218,7 +218,7 @@ export default function MarkAsProcessed({ form, siret }: WorkflowActionProps) {
       trigger={open => (
         <ActionButton
           title={actionLabel}
-          icon={CogApprovedIcon}
+          icon={IconCogApproved}
           onClick={open}
         />
       )}
