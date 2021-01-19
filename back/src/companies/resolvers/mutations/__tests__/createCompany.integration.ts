@@ -23,6 +23,7 @@ const CREATE_COMPANY = `
       gerepId
       name
       companyTypes
+      ecoOrganismeAgreements
       transporterReceipt {
         id
         receiptNumber
@@ -264,7 +265,7 @@ describe("Mutation.createCompany", () => {
     ]);
   });
 
-  it("should allow creating a known eco-organisme with its agreement", async () => {
+  it.only("should allow creating a known eco-organisme with its agreement", async () => {
     const user = await userFactory();
 
     const companyInput = {
@@ -281,7 +282,7 @@ describe("Mutation.createCompany", () => {
     });
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await mutate(CREATE_COMPANY, {
+    const { data, errors } = await mutate(CREATE_COMPANY, {
       variables: {
         companyInput
       }
