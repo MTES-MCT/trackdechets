@@ -94,12 +94,12 @@ Pour plus de détails, se référer au post ["Set a local web development enviro
 
 4. Synchroniser la base de données avec le schéma prisma.
 
-   Les modèles de données sont définis dans les fichiers `back/prisma/database/*.prisma`.
+   Les modèles de données sont définis dans les fichiers `back/prisma/schema.prisma`.
    Afin de synchroniser les tables PostgreSQL, il faut lancer une déploiement prisma
 
    ```bash
    docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
-   npx prisma deploy
+   npx prisma db push
    ```
 
 5. Accéder aux différents services.
