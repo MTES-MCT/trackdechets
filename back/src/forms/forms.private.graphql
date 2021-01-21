@@ -5,32 +5,4 @@ type Query {
 type FormSearchResult {
   id: ID!
   readableId: String!
-  emitter: FormSearchResultEmitter
-  transporter: FormSearchResultTransporter
-  recipient: FormSearchResultRecipient
-  waste: FormSearchResultWaste
-  status: FormSearchResultStatus
-}
-
-type FormSearchResultEmitter {
-  name: String!
-  siret: String!
-}
-
-type FormSearchResultTransporter {
-  name: String!
-  siret: String!
-}
-
-type FormSearchResultRecipient {
-  name: String!
-  siret: String!
-}
-
-type FormSearchResultWaste {
-  code: String!
-}
-
-enum FormSearchResultStatus {
-  SENT
 }

@@ -622,38 +622,6 @@ export type FormSearchResult = {
   __typename?: "FormSearchResult";
   id: Scalars["ID"];
   readableId: Scalars["String"];
-  emitter: Maybe<FormSearchResultEmitter>;
-  transporter: Maybe<FormSearchResultTransporter>;
-  recipient: Maybe<FormSearchResultRecipient>;
-  waste: Maybe<FormSearchResultWaste>;
-  status: Maybe<FormSearchResultStatus>;
-};
-
-export type FormSearchResultEmitter = {
-  __typename?: "FormSearchResultEmitter";
-  name: Scalars["String"];
-  siret: Scalars["String"];
-};
-
-export type FormSearchResultRecipient = {
-  __typename?: "FormSearchResultRecipient";
-  name: Scalars["String"];
-  siret: Scalars["String"];
-};
-
-export enum FormSearchResultStatus {
-  Sent = "SENT"
-}
-
-export type FormSearchResultTransporter = {
-  __typename?: "FormSearchResultTransporter";
-  name: Scalars["String"];
-  siret: Scalars["String"];
-};
-
-export type FormSearchResultWaste = {
-  __typename?: "FormSearchResultWaste";
-  code: Scalars["String"];
 };
 
 /** Informations du cycle de vie des bordereaux */
@@ -2703,54 +2671,6 @@ export function createFormSearchResultMock(
     __typename: "FormSearchResult",
     id: "",
     readableId: "",
-    emitter: null,
-    transporter: null,
-    recipient: null,
-    waste: null,
-    status: null,
-    ...props
-  };
-}
-
-export function createFormSearchResultEmitterMock(
-  props: Partial<FormSearchResultEmitter>
-): FormSearchResultEmitter {
-  return {
-    __typename: "FormSearchResultEmitter",
-    name: "",
-    siret: "",
-    ...props
-  };
-}
-
-export function createFormSearchResultRecipientMock(
-  props: Partial<FormSearchResultRecipient>
-): FormSearchResultRecipient {
-  return {
-    __typename: "FormSearchResultRecipient",
-    name: "",
-    siret: "",
-    ...props
-  };
-}
-
-export function createFormSearchResultTransporterMock(
-  props: Partial<FormSearchResultTransporter>
-): FormSearchResultTransporter {
-  return {
-    __typename: "FormSearchResultTransporter",
-    name: "",
-    siret: "",
-    ...props
-  };
-}
-
-export function createFormSearchResultWasteMock(
-  props: Partial<FormSearchResultWaste>
-): FormSearchResultWaste {
-  return {
-    __typename: "FormSearchResultWaste",
-    code: "",
     ...props
   };
 }
