@@ -14,7 +14,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Utilisation du format `BSD-{yyyyMMdd}-{XXXXXXXXX}` pour le champ `readableId` de l'objet `Form` en remplacement de l'ancien format `TD-{yy}-{XXXXXXXX}` [PR 759](https://github.com/MTES-MCT/trackdechets/pull/759)
 
 #### :bug: Corrections de bugs
-
 - Correction du formulaire de réception [PR 769](https://github.com/MTES-MCT/trackdechets/pull/769)
 #### :nail_care: Améliorations
 
