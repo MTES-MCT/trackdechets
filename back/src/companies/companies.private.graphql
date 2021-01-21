@@ -287,11 +287,11 @@ input PrivateCompanyInput {
   "Nom de l'établissement"
   companyName: String
 
-  """
-  Liste de documents permettant de démontrer l'appartenance
-  de l'utilisateur à l'établissement
-  """
-  documentKeys: [String]
+  "Nom d'usage de l'établissement"
+  givenName: String
+
+  "Adresse de l'établissement"
+  address: String
 
   """
   Récipissé transporteur (le cas échéant, pour les profils transporteur)
