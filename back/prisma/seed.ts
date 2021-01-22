@@ -1,10 +1,8 @@
 import fs from "fs";
 import path from "path";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../src/prisma";
 
 const seedPath = path.join(__dirname, "seed.dev.ts");
-
-const prisma = new PrismaClient();
 
 // A `main` function so that we can use async/await
 async function main() {
