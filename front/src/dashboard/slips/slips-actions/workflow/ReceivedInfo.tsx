@@ -114,10 +114,8 @@ export default function ReceivedInfo({
             <label>
               Date de présentation
               <Field
-                min={formatISO(parseDate(form.sentAt!), {
-                  representation: "date",
-                })}
                 component={DateInput}
+                minDate={parseDate(form.sentAt!)}
                 name="receivedAt"
                 className="td-input"
               />
