@@ -226,8 +226,7 @@ export async function prepareSegment(
 
   const segment = await prisma.transportSegment.create({
     data: {
-      form: { connect: { id } },
-
+      formId: id,
       ...nextSegmentPayload,
       previousTransporterCompanySiret: siret,
       segmentNumber: transportSegments.length + 1 // additional segments begin at index 1
