@@ -14,7 +14,7 @@ setYupLocale();
 export default function App() {
   return (
     <BrowserDetect>
-      <ErrorBoundary>
+      <ErrorBoundary showDialog dialogOptions={{ lang: "fr" }}>
         <ApolloProvider client={client}>
           <Router>
             <div className="App">
