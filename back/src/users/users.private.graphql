@@ -1,9 +1,9 @@
 type Query {
   """
-  USAGE INTERNE > Mon Compte > Générer un token
-  Renvoie un token permettant de s'authentifier à l'API Trackdéchets
+  USAGE INTERNE
+  Retourne la liste des access tokens non liés à une application de l'utilisateur courant.
   """
-  apiKey: String!
+  personalAccessTokens: [AccessToken!]!
 
   """
   USAGE INTERNE
@@ -84,6 +84,28 @@ type Mutation {
   Refuse une demande de rattachement à un un établissement
   """
   refuseMembershipRequest(id: ID!): CompanyPrivate!
+
+  """
+  USAGE INTERNE
+  Crée un nouvel access token personnel.
+  """
+  createPersonalAccessToken: AccessToken!
+
+  """
+  USAGE INTERNE
+  Révoque un access token personnel.
+  """
+  revokePersonalAccessToken(id: ID!): AccessToken!
+}
+
+"""
+Access token pouvant être utilisé pour s'authentifier auprès de l'API.
+Quand il n'est pas lié à une application en particulier, on parle d'un "access token personnel".
+"""
+type AccessToken {
+  id: ID!
+  token: String!
+  lastUsed: DateTime
 }
 
 """

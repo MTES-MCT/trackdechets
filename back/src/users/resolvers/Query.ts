@@ -1,12 +1,12 @@
 import { QueryResolvers } from "../../generated/graphql/types";
 import me from "./queries/me";
-import apiKey from "./queries/apiKey";
+import personalAccessTokens from "./queries/personalAccessTokens";
 import invitation from "./queries/invitation";
 import membershipRequest from "./queries/membershipRequest";
 
 const Query: QueryResolvers = {
   me,
-  apiKey,
+  personalAccessTokens,
   invitation,
   membershipRequest
 };

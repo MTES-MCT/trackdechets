@@ -40,6 +40,13 @@ export type AcceptedFormInput = {
   quantityReceived: Scalars["Float"];
 };
 
+export type AccessToken = {
+  __typename?: "AccessToken";
+  id: Scalars["ID"];
+  token: Scalars["String"];
+  lastUsed: Maybe<Scalars["DateTime"]>;
+};
+
 /** Payload de création d'une annexe 2 */
 export type AppendixFormInput = {
   /** Identifiant unique du bordereau */
@@ -884,6 +891,7 @@ export type Mutation = {
   createCompany: CompanyPrivate;
   /** Crée un nouveau bordereau */
   createForm: Form;
+  createPersonalAccessToken: AccessToken;
   /**
    * USAGE INTERNE
    * Crée un récépissé transporteur
@@ -1057,6 +1065,7 @@ export type Mutation = {
    * Envoie un email pour la réinitialisation du mot de passe
    */
   resetPassword: Scalars["Boolean"];
+  revokePersonalAccessToken: AccessToken;
   /**
    * DEPRECATED - Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)
    * @deprecated Utiliser createForm / updateForm selon le besoin
@@ -1274,6 +1283,10 @@ export type MutationResetPasswordArgs = {
   email: Scalars["String"];
 };
 
+export type MutationRevokePersonalAccessTokenArgs = {
+  id: Scalars["ID"];
+};
+
 export type MutationSaveFormArgs = {
   formInput: FormInput;
 };
@@ -1437,11 +1450,6 @@ export enum QuantityType {
 
 export type Query = {
   __typename?: "Query";
-  /**
-   * USAGE INTERNE > Mon Compte > Générer un token
-   * Renvoie un token permettant de s'authentifier à l'API Trackdéchets
-   */
-  apiKey: Scalars["String"];
   /** Renvoie des BSD candidats à un regroupement dans une annexe 2 */
   appendixForms: Array<Form>;
   /**
@@ -1519,6 +1527,7 @@ export type Query = {
    * (en attente, accepté, refusé)
    */
   membershipRequest: Maybe<MembershipRequest>;
+  personalAccessTokens: Array<AccessToken>;
   /**
    * Effectue une recherche floue sur la base SIRENE et enrichit
    * les résultats avec des informations provenant de Trackdéchets
@@ -2267,6 +2276,18 @@ export function createAcceptedFormInputMock(
     signedAt: new Date().toISOString(),
     signedBy: "",
     quantityReceived: 0,
+    ...props
+  };
+}
+
+export function createAccessTokenMock(
+  props: Partial<AccessToken>
+): AccessToken {
+  return {
+    __typename: "AccessToken",
+    id: "",
+    token: "",
+    lastUsed: null,
     ...props
   };
 }

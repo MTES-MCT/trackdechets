@@ -8,12 +8,14 @@ import {
   UserRole,
   Prisma,
   Company,
-  UserAccountHash
+  UserAccountHash,
+  AccessToken as PrismaAccessToken
 } from "@prisma/client";
 import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail } from "../utils";
+import { AccessToken } from "../generated/graphql/types";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma.user
@@ -148,6 +150,14 @@ export async function createAccessToken(user: User) {
     }
   });
   return accessToken;
+}
+
+export function toAccessToken(accessToken: PrismaAccessToken): AccessToken {
+  return {
+    id: accessToken.id,
+    token: accessToken.token,
+    lastUsed: accessToken.lastUsed?.toISOString()
+  };
 }
 
 export async function userExists(unsafeEmail: string) {
