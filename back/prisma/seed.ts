@@ -1,29 +1,30 @@
 import fs from "fs";
 import path from "path";
+import { PrismaClient } from "@prisma/client";
 
-/**
- * To seed the DB, run `ts-node prisma/seed.ts`
- * It looks for a `seed.dev.ts` file and execute it.
- * Content should look something like:
- *
- * ```
- * import { PrismaClient } from "@prisma/client";
- * const prisma = new PrismaClient();
- * const main = async () => { ... }
- *
- * main()
- *   .catch(e => console.error(e))
- *   .finally(() => prisma.disconnect())
- * ```
- */
 const seedPath = path.join(__dirname, "seed.dev.ts");
 
-(() => {
+const prisma = new PrismaClient();
+
+// A `main` function so that we can use async/await
+async function main() {
   try {
     fs.accessSync(seedPath);
   } catch (err) {
-    return;
+    throw new Error("Aucun fichier `prisma/seed.dev.ts`");
   }
+  const seed = (await import(seedPath)).default;
+  await seed();
+}
 
-  import(seedPath);
-})();
+let exitCode = 0;
+
+main()
+  .catch(async e => {
+    console.log(e);
+    exitCode = 1;
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+    process.exit(exitCode);
+  });
