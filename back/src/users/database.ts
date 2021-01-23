@@ -156,7 +156,7 @@ export function toAccessToken(accessToken: PrismaAccessToken): AccessToken {
   return {
     id: accessToken.id,
     token: accessToken.token,
-    lastUsed: accessToken.lastUsed?.toISOString()
+    lastUsed: accessToken.lastUsed?.toISOString() ?? null
   };
 }
 
