@@ -1,7 +1,7 @@
 import React from "react";
 import { gql, useQuery, useMutation, Reference } from "@apollo/client";
 import copyToClipboard from "copy-to-clipboard";
-import { formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import fr from "date-fns/locale/fr";
 import { Mutation, Query } from "generated/graphql/types";
 import { IconDelete1, IconCopyPaste } from "common/components/Icons";
@@ -113,9 +113,13 @@ export default function AccountFieldApiKey() {
                 <small className={styles.listItemLastUsed}>
                   Dernière utilisation :{" "}
                   {accessToken.lastUsed
-                    ? formatDistanceToNow(parseDate(accessToken.lastUsed), {
-                        locale: fr,
-                      })
+                    ? `le ${format(
+                        parseDate(accessToken.lastUsed),
+                        "d MMMM yyyy",
+                        {
+                          locale: fr,
+                        }
+                      )}`
                     : "jamais"}
                 </small>
               </div>
