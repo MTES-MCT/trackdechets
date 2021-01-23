@@ -40,6 +40,10 @@ export type AcceptedFormInput = {
   quantityReceived: Scalars["Float"];
 };
 
+/**
+ * Access token pouvant être utilisé pour s'authentifier auprès de l'API.
+ * Quand il n'est pas lié à une application en particulier, on parle d'un "access token personnel".
+ */
 export type AccessToken = {
   __typename?: "AccessToken";
   id: Scalars["ID"];
@@ -891,6 +895,10 @@ export type Mutation = {
   createCompany: CompanyPrivate;
   /** Crée un nouveau bordereau */
   createForm: Form;
+  /**
+   * USAGE INTERNE
+   * Crée un nouvel access token personnel.
+   */
   createPersonalAccessToken: AccessToken;
   /**
    * USAGE INTERNE
@@ -1065,6 +1073,10 @@ export type Mutation = {
    * Envoie un email pour la réinitialisation du mot de passe
    */
   resetPassword: Scalars["Boolean"];
+  /**
+   * USAGE INTERNE
+   * Révoque un access token personnel.
+   */
   revokePersonalAccessToken: AccessToken;
   /**
    * DEPRECATED - Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)
@@ -1527,6 +1539,10 @@ export type Query = {
    * (en attente, accepté, refusé)
    */
   membershipRequest: Maybe<MembershipRequest>;
+  /**
+   * USAGE INTERNE
+   * Retourne la liste des access tokens non liés à une application de l'utilisateur courant.
+   */
   personalAccessTokens: Array<AccessToken>;
   /**
    * Effectue une recherche floue sur la base SIRENE et enrichit

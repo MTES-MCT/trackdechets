@@ -1,0 +1,32 @@
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+}
+.listItem {
+  display: flex;
+  align-items: baseline;
+
+  &:not(:last-child) {
+    margin-bottom: 0.5rem;
+  }
+}
+.listItemContent {
+  flex: 1;
+  min-width: 0;
+}
+.listItemToken {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.listItemLastUsed {
+  font-size: 0.8rem;
+}
+.listItemActions {
+  display: flex;
+
+  > * {
+    margin-left: 0.5rem;
+  }
+}

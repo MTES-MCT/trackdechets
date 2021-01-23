@@ -1,11 +1,14 @@
 import React from "react";
 import { gql, useQuery, useMutation, Reference } from "@apollo/client";
+import copyToClipboard from "copy-to-clipboard";
 import { formatDistanceToNow } from "date-fns";
 import fr from "date-fns/locale/fr";
 import { Mutation, Query } from "generated/graphql/types";
+import { IconDelete1, IconCopyPaste } from "common/components/Icons";
 import ToolTip from "common/components/Tooltip";
 import { parseDate } from "common/datetime";
-import styles from "./AccountField.module.scss";
+import baseStyles from "./AccountField.module.scss";
+import styles from "./AccountFieldApiKey.module.scss";
 
 const AccessTokenFragment = gql`
   fragment AccessTokenFragment on AccessToken {
@@ -96,46 +99,67 @@ export default function AccountFieldApiKey() {
   });
 
   return (
-    <div className={styles.field}>
+    <div className={baseStyles.field}>
       <label>
         Clés d'API{" "}
         <ToolTip msg="Ces clés peuvent être utilisées pour s'authentifier à l'API Trackdéchets" />
       </label>
-      <ul>
-        {data?.personalAccessTokens.map(accessToken => (
-          <li key={accessToken.token}>
-            <p>{accessToken.token}</p>
-            <p>
-              Dernière utilisation :{" "}
-              {accessToken.lastUsed
-                ? formatDistanceToNow(parseDate(accessToken.lastUsed), {
-                    locale: fr,
-                  })
-                : "jamais"}
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                revokePersonalAccessToken({
-                  variables: { id: accessToken.id },
-                });
-              }}
-            >
-              Supprimer
-            </button>
-          </li>
-        ))}
-        <li>
-          <button
-            type="button"
-            onClick={() => {
-              createPersonalAccessToken();
-            }}
-          >
-            Générer une clé
-          </button>
-        </li>
-      </ul>
+      <div>
+        <ul className={styles.list}>
+          {data?.personalAccessTokens.map(accessToken => (
+            <li key={accessToken.token} className={styles.listItem}>
+              <div className={styles.listItemContent}>
+                <div className={styles.listItemToken}>{accessToken.token}</div>
+                <small className={styles.listItemLastUsed}>
+                  Dernière utilisation :{" "}
+                  {accessToken.lastUsed
+                    ? formatDistanceToNow(parseDate(accessToken.lastUsed), {
+                        locale: fr,
+                      })
+                    : "jamais"}
+                </small>
+              </div>
+              <div className={styles.listItemActions}>
+                <button
+                  type="button"
+                  className="btn btn--outline-primary"
+                  onClick={() => {
+                    copyToClipboard(accessToken.token);
+                  }}
+                >
+                  Copier <IconCopyPaste style={{ marginLeft: "0.5rem" }} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        "Êtes-vous sûr de vouloir révoquer cette clé ?\n\nIl ne sera plus possible de l'utiliser pour s'authentifier à votre compte Trackdéchets."
+                      )
+                    ) {
+                      revokePersonalAccessToken({
+                        variables: { id: accessToken.id },
+                      });
+                    }
+                  }}
+                  className="btn btn--outline-danger"
+                >
+                  <IconDelete1 />
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <button
+          type="button"
+          onClick={() => {
+            createPersonalAccessToken();
+          }}
+          className="btn btn--primary"
+        >
+          Générer une clé
+        </button>
+      </div>
     </div>
   );
 }
