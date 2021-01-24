@@ -5,7 +5,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import prisma from "../../../prisma";
 import { toAccessToken } from "../../database";
 
-const revokePersonalAccessTokenResolver: MutationResolvers["revokePersonalAccessToken"] = async (
+const revokeAccessTokenResolver: MutationResolvers["revokeAccessToken"] = async (
   parent,
   args,
   context
@@ -36,4 +36,4 @@ const revokePersonalAccessTokenResolver: MutationResolvers["revokePersonalAccess
   return toAccessToken(accessToken);
 };
 
-export default revokePersonalAccessTokenResolver;
+export default revokeAccessTokenResolver;

@@ -1,5 +1,5 @@
 import React from "react";
-import AccountFieldApiKey from "./fields/AccountFieldApiKey";
+import AccountFieldPersonalAccessTokens from "./fields/AccountFieldPersonalAccessTokens";
 
 export default function AccountIntegrationApi() {
   return (
@@ -17,7 +17,7 @@ export default function AccountIntegrationApi() {
           la documentation
         </a>
       </div>
-      <AccountFieldApiKey />
+      <AccountFieldPersonalAccessTokens />
     </>
   );
 }

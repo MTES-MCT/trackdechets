@@ -8,7 +8,7 @@ import { IconDelete1, IconCopyPaste } from "common/components/Icons";
 import ToolTip from "common/components/Tooltip";
 import { parseDate } from "common/datetime";
 import baseStyles from "./AccountField.module.scss";
-import styles from "./AccountFieldApiKey.module.scss";
+import styles from "./AccountFieldPersonalAccessTokens.module.scss";
 
 const AccessTokenFragment = gql`
   fragment AccessTokenFragment on AccessToken {
@@ -37,15 +37,15 @@ const CREATE_PERSONAL_ACCESS_TOKEN = gql`
 `;
 
 const REVOKE_PERSONAL_ACCESS_TOKEN = gql`
-  mutation RevokePersonalAccessToken($id: ID!) {
-    revokePersonalAccessToken(id: $id) {
+  mutation RevokeAccessToken($id: ID!) {
+    revokeAccessToken(id: $id) {
       ...AccessTokenFragment
     }
   }
   ${AccessTokenFragment}
 `;
 
-export default function AccountFieldApiKey() {
+export default function AccountFieldPersonalAccessTokens() {
   const { data } = useQuery<Pick<Query, "personalAccessTokens">>(
     GET_PERSONAL_ACCESS_TOKENS
   );
@@ -72,31 +72,32 @@ export default function AccountFieldApiKey() {
       });
     },
   });
-  const [revokePersonalAccessToken] = useMutation<
-    Pick<Mutation, "revokePersonalAccessToken">
-  >(REVOKE_PERSONAL_ACCESS_TOKEN, {
-    update: (cache, { data }) => {
-      const accessToken = data?.revokePersonalAccessToken;
+  const [revokeAccessToken] = useMutation<Pick<Mutation, "revokeAccessToken">>(
+    REVOKE_PERSONAL_ACCESS_TOKEN,
+    {
+      update: (cache, { data }) => {
+        const accessToken = data?.revokeAccessToken;
 
-      if (accessToken == null) {
-        return;
-      }
+        if (accessToken == null) {
+          return;
+        }
 
-      cache.modify({
-        fields: {
-          personalAccessTokens(
-            existingPersonalAccessTokens: Reference[] = [],
-            { readField }
-          ) {
-            return existingPersonalAccessTokens.filter(
-              existingAccessToken =>
-                readField("id", existingAccessToken) !== accessToken.id
-            );
+        cache.modify({
+          fields: {
+            personalAccessTokens(
+              existingPersonalAccessTokens: Reference[] = [],
+              { readField }
+            ) {
+              return existingPersonalAccessTokens.filter(
+                existingAccessToken =>
+                  readField("id", existingAccessToken) !== accessToken.id
+              );
+            },
           },
-        },
-      });
-    },
-  });
+        });
+      },
+    }
+  );
 
   return (
     <div className={baseStyles.field}>
@@ -141,7 +142,7 @@ export default function AccountFieldApiKey() {
                         "Êtes-vous sûr de vouloir révoquer cette clé ?\n\nIl ne sera plus possible de l'utiliser pour s'authentifier à votre compte Trackdéchets."
                       )
                     ) {
-                      revokePersonalAccessToken({
+                      revokeAccessToken({
                         variables: { id: accessToken.id },
                       });
                     }

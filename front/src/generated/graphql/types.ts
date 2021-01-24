@@ -1075,9 +1075,9 @@ export type Mutation = {
   resetPassword: Scalars["Boolean"];
   /**
    * USAGE INTERNE
-   * Révoque un access token personnel.
+   * Révoque un access token, qu'il soit personnel ou qu'il provienne d'une application.
    */
-  revokePersonalAccessToken: AccessToken;
+  revokeAccessToken: AccessToken;
   /**
    * DEPRECATED - Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)
    * @deprecated Utiliser createForm / updateForm selon le besoin
@@ -1295,7 +1295,7 @@ export type MutationResetPasswordArgs = {
   email: Scalars["String"];
 };
 
-export type MutationRevokePersonalAccessTokenArgs = {
+export type MutationRevokeAccessTokenArgs = {
   id: Scalars["ID"];
 };
 

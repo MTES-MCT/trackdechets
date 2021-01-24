@@ -8,8 +8,8 @@ import prisma from "../../../../prisma";
 import { createAccessToken } from "../../../database";
 
 const REVOKE_PERSONAL_ACCESS_TOKEN = `
-  mutation RevokePersonalAccessToken($id: ID!) {
-    revokePersonalAccessToken(id: $id) {
+  mutation RevokeAccessToken($id: ID!) {
+    revokeAccessToken(id: $id) {
       id
       token
       lastUsed
@@ -17,7 +17,7 @@ const REVOKE_PERSONAL_ACCESS_TOKEN = `
   }
 `;
 
-describe("Mutation.revokePersonalAccessToken", () => {
+describe("Mutation.revokeAccessToken", () => {
   afterEach(resetDatabase);
 
   it("should revoke a personal access token", async () => {
@@ -26,7 +26,7 @@ describe("Mutation.revokePersonalAccessToken", () => {
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await mutate<
-      ExecutionResult<Pick<Mutation, "revokePersonalAccessToken">>
+      ExecutionResult<Pick<Mutation, "revokeAccessToken">>
     >(REVOKE_PERSONAL_ACCESS_TOKEN, {
       variables: {
         id: accessToken.id
@@ -35,7 +35,7 @@ describe("Mutation.revokePersonalAccessToken", () => {
 
     const deletedAccessToken = await prisma.accessToken.findUnique({
       where: {
-        id: data.revokePersonalAccessToken.id
+        id: data.revokeAccessToken.id
       }
     });
 
@@ -49,7 +49,7 @@ describe("Mutation.revokePersonalAccessToken", () => {
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const { errors } = await mutate<
-      ExecutionResult<Pick<Mutation, "revokePersonalAccessToken">>
+      ExecutionResult<Pick<Mutation, "revokeAccessToken">>
     >(REVOKE_PERSONAL_ACCESS_TOKEN, {
       variables: {
         id: accessToken.id

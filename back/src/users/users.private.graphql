@@ -93,9 +93,9 @@ type Mutation {
 
   """
   USAGE INTERNE
-  Révoque un access token personnel.
+  Révoque un access token, qu'il soit personnel ou qu'il provienne d'une application.
   """
-  revokePersonalAccessToken(id: ID!): AccessToken!
+  revokeAccessToken(id: ID!): AccessToken!
 }
 
 """
