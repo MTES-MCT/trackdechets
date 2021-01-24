@@ -1,0 +1,40 @@
+@import "scss/Constants.scss";
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.listItem {
+  &:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+}
+
+.application {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.applicationLogo {
+  img {
+    border-radius: $common-radius;
+  }
+}
+.applicationLogoAvatar {
+  width: 40px;
+  height: 40px;
+  background-color: $grey-dark;
+  color: $white;
+  text-transform: uppercase;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $common-radius;
+}
+.applicationName {
+  flex: 1;
+  padding-left: 0.5rem;
+  font-weight: bold;
+}

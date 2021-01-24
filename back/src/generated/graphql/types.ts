@@ -74,6 +74,16 @@ export type AppendixFormInput = {
   readableId?: Maybe<Scalars["ID"]>;
 };
 
+/** Application Trackdéchets pouvant se servir de l'OAuth2 pour générer des access tokens. */
+export type Application = {
+  __typename?: "Application";
+  id: Scalars["ID"];
+  name: Scalars["String"];
+  logoUrl?: Maybe<Scalars["String"]>;
+  /** Access tokens que cette application a généré pour l'utilisateur courant. */
+  accessTokens: Array<AccessToken>;
+};
+
 /** Cet objet est renvoyé par la mutation login qui est dépréciée */
 export type AuthPayload = {
   __typename?: "AuthPayload";
@@ -1521,6 +1531,11 @@ export type Query = {
    * par son hash
    */
   invitation?: Maybe<Invitation>;
+  /**
+   * USAGE INTERNE
+   * Retourne la liste des applications ayant accès au compte de l'utilisateur courant.
+   */
+  linkedApplications: Array<Application>;
   /** Renvoie les informations sur l'utilisateur authentifié */
   me: User;
   /**
@@ -2432,13 +2447,14 @@ export type ResolversTypes = {
   FormsRegisterExportFormat: FormsRegisterExportFormat;
   Invitation: ResolverTypeWrapper<Invitation>;
   UserRole: UserRole;
+  Application: ResolverTypeWrapper<Application>;
+  AccessToken: ResolverTypeWrapper<AccessToken>;
   User: ResolverTypeWrapper<User>;
   CompanyPrivate: ResolverTypeWrapper<CompanyPrivate>;
   CompanyType: CompanyType;
   CompanyMember: ResolverTypeWrapper<CompanyMember>;
   MembershipRequest: ResolverTypeWrapper<MembershipRequest>;
   MembershipRequestStatus: MembershipRequestStatus;
-  AccessToken: ResolverTypeWrapper<AccessToken>;
   CompanySearchResult: ResolverTypeWrapper<CompanySearchResult>;
   CompanyStat: ResolverTypeWrapper<CompanyStat>;
   Stat: ResolverTypeWrapper<Stat>;
@@ -2530,11 +2546,12 @@ export type ResolversParentTypes = {
   StatusLogForm: StatusLogForm;
   StatusLogUser: StatusLogUser;
   Invitation: Invitation;
+  Application: Application;
+  AccessToken: AccessToken;
   User: User;
   CompanyPrivate: CompanyPrivate;
   CompanyMember: CompanyMember;
   MembershipRequest: MembershipRequest;
-  AccessToken: AccessToken;
   CompanySearchResult: CompanySearchResult;
   CompanyStat: CompanyStat;
   Stat: Stat;
@@ -2591,6 +2608,21 @@ export type AccessTokenResolvers<
   token?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   lastUsed?: Resolver<
     Maybe<ResolversTypes["DateTime"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ApplicationResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["Application"] = ResolversParentTypes["Application"]
+> = {
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  logoUrl?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  accessTokens?: Resolver<
+    Array<ResolversTypes["AccessToken"]>,
     ParentType,
     ContextType
   >;
@@ -3594,6 +3626,11 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryInvitationArgs, "hash">
   >;
+  linkedApplications?: Resolver<
+    Array<ResolversTypes["Application"]>,
+    ParentType,
+    ContextType
+  >;
   me?: Resolver<ResolversTypes["User"], ParentType, ContextType>;
   membershipRequest?: Resolver<
     Maybe<ResolversTypes["MembershipRequest"]>,
@@ -4087,6 +4124,7 @@ export type WorkSiteResolvers<
 
 export type Resolvers<ContextType = GraphQLContext> = {
   AccessToken?: AccessTokenResolvers<ContextType>;
+  Application?: ApplicationResolvers<ContextType>;
   AuthPayload?: AuthPayloadResolvers<ContextType>;
   CompanyFavorite?: CompanyFavoriteResolvers<ContextType>;
   CompanyMember?: CompanyMemberResolvers<ContextType>;
@@ -4172,6 +4210,19 @@ export function createAppendixFormInputMock(
   return {
     id: null,
     readableId: null,
+    ...props
+  };
+}
+
+export function createApplicationMock(
+  props: Partial<Application>
+): Application {
+  return {
+    __typename: "Application",
+    id: "",
+    name: "",
+    logoUrl: null,
+    accessTokens: [],
     ...props
   };
 }

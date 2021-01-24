@@ -1,14 +1,16 @@
 import { QueryResolvers } from "../../generated/graphql/types";
 import me from "./queries/me";
-import personalAccessTokens from "./queries/personalAccessTokens";
 import invitation from "./queries/invitation";
 import membershipRequest from "./queries/membershipRequest";
+import personalAccessTokens from "./queries/personalAccessTokens";
+import linkedApplications from "./queries/linkedApplications";
 
 const Query: QueryResolvers = {
   me,
-  personalAccessTokens,
   invitation,
-  membershipRequest
+  membershipRequest,
+  personalAccessTokens,
+  linkedApplications
 };
 
 export default Query;

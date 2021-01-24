@@ -40,7 +40,8 @@
   margin-left: 1em;
   margin-right: 1em;
   width: 100%;
-  // display: block;
+
+  // FIXME: this is not desirable in all situations
   ul {
     margin: 0;
     padding: 0 1em;

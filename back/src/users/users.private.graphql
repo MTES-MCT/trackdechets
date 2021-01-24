@@ -7,6 +7,12 @@ type Query {
 
   """
   USAGE INTERNE
+  Retourne la liste des applications ayant accès au compte de l'utilisateur courant.
+  """
+  linkedApplications: [Application!]!
+
+  """
+  USAGE INTERNE
   Recherche une invitation à rejoindre une entreprise
   par son hash
   """
@@ -106,6 +112,18 @@ type AccessToken {
   id: ID!
   token: String!
   lastUsed: DateTime
+}
+
+"""
+Application Trackdéchets pouvant se servir de l'OAuth2 pour générer des access tokens.
+"""
+type Application {
+  id: ID!
+  name: String!
+  logoUrl: String
+
+  "Access tokens que cette application a généré pour l'utilisateur courant."
+  accessTokens: [AccessToken!]!
 }
 
 """

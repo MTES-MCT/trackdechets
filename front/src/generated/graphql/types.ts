@@ -64,6 +64,16 @@ export type AppendixFormInput = {
   readableId: Maybe<Scalars["ID"]>;
 };
 
+/** Application Trackdéchets pouvant se servir de l'OAuth2 pour générer des access tokens. */
+export type Application = {
+  __typename?: "Application";
+  id: Scalars["ID"];
+  name: Scalars["String"];
+  logoUrl: Maybe<Scalars["String"]>;
+  /** Access tokens que cette application a généré pour l'utilisateur courant. */
+  accessTokens: Array<AccessToken>;
+};
+
 /** Cet objet est renvoyé par la mutation login qui est dépréciée */
 export type AuthPayload = {
   __typename?: "AuthPayload";
@@ -1528,6 +1538,11 @@ export type Query = {
    * par son hash
    */
   invitation: Maybe<Invitation>;
+  /**
+   * USAGE INTERNE
+   * Retourne la liste des applications ayant accès au compte de l'utilisateur courant.
+   */
+  linkedApplications: Array<Application>;
   /** Renvoie les informations sur l'utilisateur authentifié */
   me: User;
   /**
@@ -2314,6 +2329,19 @@ export function createAppendixFormInputMock(
   return {
     id: null,
     readableId: null,
+    ...props
+  };
+}
+
+export function createApplicationMock(
+  props: Partial<Application>
+): Application {
+  return {
+    __typename: "Application",
+    id: "",
+    name: "",
+    logoUrl: null,
+    accessTokens: [],
     ...props
   };
 }

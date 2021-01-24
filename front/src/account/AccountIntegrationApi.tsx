@@ -1,5 +1,6 @@
 import React from "react";
 import AccountFieldPersonalAccessTokens from "./fields/AccountFieldPersonalAccessTokens";
+import AccountFieldLinkedApplications from "./fields/AccountFieldLinkedApplications";
 
 export default function AccountIntegrationApi() {
   return (
@@ -18,6 +19,7 @@ export default function AccountIntegrationApi() {
         </a>
       </div>
       <AccountFieldPersonalAccessTokens />
+      <AccountFieldLinkedApplications />
     </>
   );
 }

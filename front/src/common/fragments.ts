@@ -278,3 +278,11 @@ export const detailFormFragment = gql`
   }
   ${transporterFormFragment}
 `;
+
+export const accessTokenFragment = gql`
+  fragment AccessTokenFragment on AccessToken {
+    id
+    token
+    lastUsed
+  }
+`;
