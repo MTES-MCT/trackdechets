@@ -193,7 +193,7 @@ A noter que une fois que ces migrations ont été jouées, le contenu des fichie
 Pour les migrations scriptées, c'est dans `back/prisma/scripts`. Les migrations doivent prendre la forme d'une classe, implémentant `Updater` et décorée par `registerUpdater`.
 Attention, contrairement aux scripts SQL ces migrations ne sont pas jouées une seules fois. Il faut donc s'assurer qu'elles sont idempotentes, ou les désactiver après chaque mise en production.
 
-Toutes ces migrations sont jouées avec la commande `npm run update:dev`. (sans le suffixe `:dev` en production)  
+Toutes ces migrations sont jouées avec la commande `npm run update:dev`. (sans le suffixe `:dev` en production)
 
 ## Guides
 
@@ -245,11 +245,13 @@ C'est un fichier PNG valide que l'on peut éditer directement dans Visual Code a
 Il peut être assez fastidieux de devoir recréer des comptes de tests régulièrement en local.
 Pour palier à ce problème, il est possible de nourrir la base de donnée Prisma avec des données par défaut.
 
-1. Créer le fichier `back/prisma/seed.dev.ts` en suivant la [documentation](https://v1.prisma.io/docs/1.34/prisma-cli-and-configuration/cli-command-reference/prisma-seed-xcv8/).
-2. Démarrer les containers.
-3. Accéder au container `td-api`.
-4. Exécuter la commande `npx prisma seed`.
-   Éventuellement lancer la commande avec le flag `--reset` pour remettre à zéro : `npx prisma seed --reset`.
+1. Créer le fichier `back/prisma/seed.dev.ts` en se basant sur le modèle `back/prisma/seed.model.ts`.
+2. Démarrer les containers `postgres` et `td-api`
+3. (Optionnel) Reset de la base de données
+   3.1 Dans le container `postgres `: `psql -U trackdechets -d prisma -c "DROP SCHEMA \"default\$default\" CASCADE;"` pour supprimer les données existantes
+   3.2 Dans le container `td-api`:  `npx prisma db push --preview-feature` pour recréer les tables
+4. Dans le container `td-api`: `npx prisma db seed --preview-feature` pour nourrir la base de données.
+
 
 ### Ajouter une nouvelle icône
 

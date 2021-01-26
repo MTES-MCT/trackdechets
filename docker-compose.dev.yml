@@ -25,6 +25,7 @@ services:
     command: npm run dev
     volumes:
       - ./back/src:/usr/src/app/src
+      - ./back/prisma:/usr/src/app/prisma
       - ./doc/docs:/usr/src/app/documentation
       - ./front/src/generated:/usr/src/app/front/generated
     env_file:
