@@ -1,8 +1,7 @@
 import React from "react";
-import { PdfIcon } from "common/components/Icons";
+import { IconPdf } from "common/components/Icons";
 import DownloadFileLink from "common/components/DownloadFileLink";
 import { gql } from "@apollo/client";
-import { COLORS } from "common/config";
 
 type Props = { formId: string; small?: boolean; onSuccess?: () => void };
 
@@ -32,7 +31,7 @@ export default function DownloadPdf({
       className={className}
       onSuccess={onSuccess}
     >
-      <PdfIcon size={24} color={COLORS.blueLight} />
+      <IconPdf size="24px" color="blueLight" />
       <span>Pdf</span>
     </DownloadFileLink>
   );

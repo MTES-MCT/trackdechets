@@ -17,6 +17,7 @@ import DashboardMenu from "./DashboardMenu";
 import Exports from "./exports/Exports";
 import SlipsContainer from "./slips/SlipsContainer";
 import Transport from "./transport/Transport";
+import { OnboardingSlideshow } from "./OnboardingSlideshow";
 
 import { Query } from "generated/graphql/types";
 import Stats from "./stats/Stats";
@@ -64,42 +65,45 @@ export default function Dashboard() {
     }
 
     return (
-      <div id="dashboard" className="dashboard">
-        <DashboardMenu
-          me={data.me}
-          handleCompanyChange={siret =>
-            history.push(
-              generatePath(routes.dashboard.slips.drafts, {
-                siret,
-              })
-            )
-          }
-        />
+      <>
+        <OnboardingSlideshow />
+        <div id="dashboard" className="dashboard">
+          <DashboardMenu
+            me={data.me}
+            handleCompanyChange={siret =>
+              history.push(
+                generatePath(routes.dashboard.slips.drafts, {
+                  siret,
+                })
+              )
+            }
+          />
 
-        <div className="dashboard-content">
-          <Switch>
-            <Route path={routes.dashboard.slips.index}>
-              <SlipsContainer />
-            </Route>
-            <Route path={routes.dashboard.transport.index}>
-              <Transport />
-            </Route>
-            <Route path={routes.dashboard.exports}>
-              <Exports
-                companies={filter(Exports.fragments.company, companies)}
+          <div className="dashboard-content">
+            <Switch>
+              <Route path={routes.dashboard.slips.index}>
+                <SlipsContainer />
+              </Route>
+              <Route path={routes.dashboard.transport.index}>
+                <Transport />
+              </Route>
+              <Route path={routes.dashboard.exports}>
+                <Exports
+                  companies={filter(Exports.fragments.company, companies)}
+                />
+              </Route>
+              <Route path={routes.dashboard.stats}>
+                <Stats />
+              </Route>
+              <Redirect
+                to={generatePath(routes.dashboard.slips.drafts, {
+                  siret,
+                })}
               />
-            </Route>
-            <Route path={routes.dashboard.stats}>
-              <Stats />
-            </Route>
-            <Redirect
-              to={generatePath(routes.dashboard.slips.drafts, {
-                siret,
-              })}
-            />
-          </Switch>
+            </Switch>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 

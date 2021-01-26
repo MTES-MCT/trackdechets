@@ -15,7 +15,7 @@ import { GET_TRANSPORT_SLIPS, GET_FORM } from "../queries";
 import { updateApolloCache } from "common/helper";
 import DateInput from "form/custom-inputs/DateInput";
 import cogoToast from "cogo-toast";
-import { BusTransfer } from "common/components/Icons";
+import { IconBusTransfer } from "common/components/Icons";
 import ActionButton from "common/components/ActionButton";
 import TdModal from "common/components/Modal";
 
@@ -111,7 +111,7 @@ export default function TakeOverSegment({
           onClick={() => setIsOpen(true)}
           title="Prendre en charge le déchet"
         >
-          <BusTransfer />
+          <IconBusTransfer />
           <span>
             Prendre&nbsp;en&nbsp;charge
             <br />
@@ -121,9 +121,9 @@ export default function TakeOverSegment({
       ) : (
         <ActionButton
           title="Prendre en charge le déchet"
-          icon={BusTransfer}
+          icon={IconBusTransfer}
           onClick={() => setIsOpen(true)}
-          iconSize={32}
+          iconSize="32px"
         />
       )}
 

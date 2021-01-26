@@ -1,5 +1,5 @@
 import React from "react";
-import { Search } from "./Icons";
+import { IconSearch } from "./Icons";
 import styles from "./SearchInput.module.scss";
 
 export default function SearchInput({
@@ -26,7 +26,7 @@ export default function SearchInput({
         {...(!!value ? { value: value } : {})}
       />
       <i className={styles.SearchIcon} aria-label="Recherche">
-        <Search color="#8393a7" size={12} />
+        <IconSearch size="12px" />
       </i>
     </div>
   );

@@ -1,0 +1,40 @@
+@import "src/scss/Constants.scss";
+
+.Slideshow {
+  position: relative;
+}
+.SlideshowArrowLeft,
+.SlideshowArrowRight {
+  position: absolute;
+  top: 50%;
+  color: $blue;
+  font-size: 1.25rem;
+}
+.SlideshowArrowDisabled {
+  pointer-events: none;
+  opacity: 0.8;
+}
+.SlideshowArrowLeft {
+  transform: translate(-100%, -50%);
+  left: 0;
+}
+.SlideshowArrowRight {
+  transform: translate(100%, -50%);
+  right: 0;
+}
+
+.SlideshowDots {
+  justify-content: center;
+}
+.SlideshowDotsItem {
+  width: 12px;
+  height: 12px;
+  background-color: $blue;
+  opacity: 0.4;
+  border-radius: 50%;
+}
+.SlideshowDotsItemActive,
+.SlideshowDotsItem:focus,
+.SlideshowDotsItem:hover {
+  opacity: 1;
+}

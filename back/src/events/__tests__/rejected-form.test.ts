@@ -79,7 +79,7 @@ const mockedForm = {
   noTraceability: null,
   emitterCompanySiret: "12343606600011",
   processingOperationDone: null,
-  readableId: "TD-19-AAA03488",
+  readableId: "BSD-20210101-AAAAAAAA",
   recipientCompanyName: "Dechet processor SA",
   wasteAcceptationStatus: "REFUSED"
 };
@@ -108,7 +108,7 @@ const mockedCompanyAdmins = {
 const formPayload = (wasteAcceptationStatus): TDEventPayload<Form> => ({
   node: {
     id: "xyz12345",
-    readableId: "TD-xxx",
+    readableId: "BSD-20210101-AAAAAAAA",
     isImportedFromPaper: false,
     status: "REFUSED",
     createdAt: new Date("2019-10-16T07:45:13.959Z"),
@@ -126,7 +126,7 @@ const formPayload = (wasteAcceptationStatus): TDEventPayload<Form> => ({
   mutation: "UPDATED",
   previousNode: {
     id: "xyz12345",
-    readableId: "TD-xxx",
+    readableId: "BSD-20210101-AAAAAAAA",
     isImportedFromPaper: false,
     status: "SENT",
     createdAt: new Date("2019-10-16T07:45:13.959Z"),
@@ -248,7 +248,7 @@ describe("mailWhenFormIsDeclined", () => {
     );
 
     // check form readable id is in mail body
-    expect(payload1.body).toContain("TD-19-AAA03488");
+    expect(payload1.body).toContain("BSD-20210101-AAAAAAAA");
 
     expect(payload1.templateId).toBeUndefined();
   });
@@ -305,7 +305,7 @@ describe("mailWhenFormIsDeclined", () => {
     );
 
     // check form readable id is in mail body
-    expect(payload1.body).toContain("TD-19-AAA03488");
+    expect(payload1.body).toContain("BSD-20210101-AAAAAAAA");
 
     expect(payload1.templateId).toBeUndefined();
   });

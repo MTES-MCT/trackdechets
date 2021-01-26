@@ -1,7 +1,7 @@
 import { useQuery, NetworkStatus } from "@apollo/client";
 import Loader, { RefreshLoader } from "common/components/Loaders";
 import React from "react";
-import { MEDIA_QUERIES, COLORS } from "common/config";
+import { MEDIA_QUERIES } from "common/config";
 import {
   Form,
   FormRole,
@@ -10,9 +10,9 @@ import {
   QueryFormsArgs,
 } from "generated/graphql/types";
 import {
-  RefreshIcon,
-  Layout2Icon,
-  LayoutModule1Icon,
+  IconRefresh,
+  IconLayout2,
+  IconLayoutModule1,
 } from "common/components/Icons";
 import routes from "common/routes";
 
@@ -173,9 +173,9 @@ export function TransportContent({ formType }) {
           }`}
           onClick={() => setDisplayAsCards(false)}
         >
-          <Layout2Icon
-            color={displayAsCards ? COLORS.blueLight : COLORS.white}
-            size={16}
+          <IconLayout2
+            color={displayAsCards ? "blueLight" : "white"}
+            size="16px"
           />{" "}
           <span>Tableau</span>
         </button>
@@ -185,9 +185,9 @@ export function TransportContent({ formType }) {
           }`}
           onClick={() => setDisplayAsCards(true)}
         >
-          <LayoutModule1Icon
-            color={!displayAsCards ? COLORS.blueLight : COLORS.white}
-            size={16}
+          <IconLayoutModule1
+            color={!displayAsCards ? "blueLight" : "white"}
+            size="16px"
           />{" "}
           <span>Cartes</span>
         </button>
@@ -214,7 +214,7 @@ export function TransportContent({ formType }) {
           className="btn btn--primary tw-ml-auto tw-mr-1"
           onClick={() => refetch()}
         >
-          <span>Rafraîchir</span> <RefreshIcon />
+          <span>Rafraîchir</span> <IconRefresh />
         </button>
       </div>
       <RefreshLoader networkStatus={networkStatus} />

@@ -6,23 +6,30 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
 # Next release
+
 #### :rocket: Nouvelles fonctionnalités
 
 #### :boom: Breaking changes
 
+- Utilisation du format `BSD-{yyyyMMdd}-{XXXXXXXXX}` pour le champ `readableId` de l'objet `Form` en remplacement de l'ancien format `TD-{yy}-{XXXXXXXX}` [PR 759](https://github.com/MTES-MCT/trackdechets/pull/759)
+
 #### :bug: Corrections de bugs
-
-
+- Correction du formulaire de réception [PR 769](https://github.com/MTES-MCT/trackdechets/pull/769)
 #### :nail_care: Améliorations
 
-* Amélioration du rafraichissement automatique de la liste des bordereaux entre les différents onglets du tableau de bord [PR 746](https://github.com/MTES-MCT/trackdechets/pull/746)
-* Auto-complétion du récépissé transporteur lors de la complétion du BSD suite [PR 770](https://github.com/MTES-MCT/trackdechets/pull/770)
+- Amélioration du rafraichissement automatique de la liste des bordereaux entre les différents onglets du tableau de bord [PR 746](https://github.com/MTES-MCT/trackdechets/pull/746)
+- Refonte des slides d'embarquement des nouveaux utilisateurs, [PR 742](https://github.com/MTES-MCT/trackdechets/pull/742)
+- Le nom, l'adresse et le code naf ne sont plus modifiables lors du rattachement d'un établissement et suppression de l'ajout de justificatifs [PR 766](https://github.com/MTES-MCT/trackdechets/pull/766)
+- Auto-complétion du récépissé transporteur lors de la complétion du BSD suite [PR 770](https://github.com/MTES-MCT/trackdechets/pull/770)
 
 #### :memo: Documentation
 
 #### :house: Interne
 
+- Migration de Prisma 1 vers Prisma 2 (ORM utilisé côté backend) [PR 733](https://github.com/MTES-MCT/trackdechets/pull/733)
+- Enregistrement et géocodage des adresses des établissements lors du rattachement [PR 766](https://github.com/MTES-MCT/trackdechets/pull/766)
 # [2021.01.2] 11/01/2021
+
 #### :rocket: Nouvelles fonctionnalités
 
 #### :boom: Breaking changes

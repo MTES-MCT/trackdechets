@@ -7,6 +7,7 @@ import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { randomNumber } from "../../../utils";
+import geocode from "../../geocode";
 
 /**
  * Create a new company and associate it to a user
@@ -27,10 +28,11 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     codeNaf,
     gerepId,
     companyName: name,
+    givenName,
+    address,
     companyTypes,
     transporterReceiptId,
-    traderReceiptId,
-    documentKeys
+    traderReceiptId
   } = companyInput;
   const ecoOrganismeAgreements =
     companyInput.ecoOrganismeAgreements?.map(a => a.href) || [];
@@ -75,11 +77,17 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     );
   }
 
+  const { latitude, longitude } = await geocode(address);
+
   const companyCreateInput: Prisma.CompanyCreateInput = {
     siret,
     codeNaf,
     gerepId,
     name,
+    givenName,
+    address,
+    latitude,
+    longitude,
     companyTypes: { set: companyTypes },
     securityCode: randomNumber(4),
     ecoOrganismeAgreements: {
@@ -96,12 +104,6 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   if (!!traderReceiptId) {
     companyCreateInput.traderReceipt = {
       connect: { id: traderReceiptId }
-    };
-  }
-
-  if (!!documentKeys && documentKeys.length >= 1) {
-    companyCreateInput.documentKeys = {
-      set: documentKeys
     };
   }
 

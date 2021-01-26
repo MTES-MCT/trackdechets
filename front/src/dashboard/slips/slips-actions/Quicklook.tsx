@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { ViewIcon } from "common/components/Icons";
+import { IconView } from "common/components/Icons";
 
 import { useQuery } from "@apollo/client";
 import SlipDetailContent from "dashboard/slip/SlipDetailContent";
@@ -12,7 +12,6 @@ import { Query, QueryFormArgs } from "generated/graphql/types";
 import { InlineError } from "common/components/Error";
 import { GET_DETAIL_FORM } from "common/queries";
 
-import { COLORS } from "common/config";
 const QuicklookModal = ({ formId, onClose }) => {
   const { loading, error, data } = useQuery<Pick<Query, "form">, QueryFormArgs>(
     GET_DETAIL_FORM,
@@ -73,7 +72,7 @@ export default function Quicklook({
           !!onOpen && onOpen();
         }}
       >
-        <ViewIcon color={COLORS.blueLight} size={24} />
+        <IconView color="blueLight" size="24px" />
         <span>Aperçu</span>
       </button>
       {isOpen && (

@@ -476,6 +476,8 @@ export type Form = {
    * Identifiant lisible utilisé comme numéro sur le CERFA (case "Bordereau n°****").
    * Il est possible de l'utiliser pour récupérer l'identifiant unique du bordereau via la query form,
    * utilisé pour le reste des opérations.
+   * Cet identifiant possède le format BSD-{yyyyMMdd}-{XXXXXXXX} où yyyyMMdd est la date du jour
+   * et XXXXXXXXX une chaine de 9 caractères alphanumériques. Ex: BSD-20210101-HY87F54D1
    */
   readableId: Scalars["String"];
   /**
@@ -1388,11 +1390,10 @@ export type PrivateCompanyInput = {
   codeNaf?: Maybe<Scalars["String"]>;
   /** Nom de l'établissement */
   companyName?: Maybe<Scalars["String"]>;
-  /**
-   * Liste de documents permettant de démontrer l'appartenance
-   * de l'utilisateur à l'établissement
-   */
-  documentKeys?: Maybe<Array<Maybe<Scalars["String"]>>>;
+  /** Nom d'usage de l'établissement */
+  givenName?: Maybe<Scalars["String"]>;
+  /** Adresse de l'établissement */
+  address?: Maybe<Scalars["String"]>;
   /** Récipissé transporteur (le cas échéant, pour les profils transporteur) */
   transporterReceiptId?: Maybe<Scalars["String"]>;
   /** Récipissé négociant (le cas échéant, pour les profils négociant) */
@@ -4648,7 +4649,8 @@ export function createPrivateCompanyInputMock(
     companyTypes: [],
     codeNaf: null,
     companyName: null,
-    documentKeys: null,
+    givenName: null,
+    address: null,
     transporterReceiptId: null,
     traderReceiptId: null,
     ecoOrganismeAgreements: null,

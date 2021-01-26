@@ -21,7 +21,7 @@ describe("formatRow", () => {
     emitterCompanyContact: "Marc Martin",
     recipientCompanyMail: "recipient@td.io",
     emitterCompanySiret: "1234",
-    readableId: "TD-8865a853b7da51b9789db6ada3ef8bee",
+    readableId: "BSD-20210101-AAAAAAAA",
     recipientCompanyName: "WASTE COMPANY",
     ecoOrganismeName: ""
   };

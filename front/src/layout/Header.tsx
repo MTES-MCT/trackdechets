@@ -11,7 +11,7 @@ import {
 import { trackEvent } from "tracker";
 
 import { localAuthService } from "login/auth.service";
-import { ProfileIcon, LeftArrowIcon, Close } from "common/components/Icons";
+import { IconProfile, IconLeftArrow, IconClose } from "common/components/Icons";
 import { AccountMenuContent } from "account/AccountMenu";
 import { useQuery, gql } from "@apollo/client";
 import Loader from "common/components/Loaders";
@@ -111,7 +111,7 @@ const getMenuEntries = (isAuthenticated, devEndpoint, currentSiret) => {
 const MenuLink = ({ entry, mobileCallback }) => {
   const content = (
     <>
-      <LeftArrowIcon color="#0053b3" size={16} />
+      <IconLeftArrow color="blue" size="16px" />
       <span> {entry.caption}</span>
     </>
   );
@@ -238,7 +238,7 @@ export default withRouter(function Header({
               onClick={() => closeMobileMenu()}
             >
               <span className="tw-mr-2">Fermer</span>
-              <Close color="#000" size={16} />
+              <IconClose size="16px" />
             </button>
           </div>
 
@@ -271,7 +271,7 @@ export default withRouter(function Header({
                     }}
                   >
                     <span>Se déconnecter</span>
-                    <ProfileIcon color="#ffffff" />
+                    <IconProfile />
                   </button>
                 </form>
               </li>
@@ -303,7 +303,7 @@ export default withRouter(function Header({
                     }}
                   >
                     <span>Se connecter</span>
-                    <ProfileIcon color="#ffffff" />
+                    <IconProfile />
                   </NavLink>
                 </li>
               </>

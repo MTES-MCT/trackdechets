@@ -1,8 +1,13 @@
 import { User, Company } from "@prisma/client";
 import { warnIfUserCreatesTooManyCompanies } from "../createCompany";
+import * as geocode from "../../../geocode";
 
 const countMock = jest.fn();
 const mailMock = jest.fn();
+
+// Mock calls to API adresse
+const geocodeSpy = jest.spyOn(geocode, "default");
+geocodeSpy.mockResolvedValue({ latitude: 43.302546, longitude: 5.384324 });
 
 jest.mock("../../../../prisma", () => ({
   companyAssociation: {

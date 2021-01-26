@@ -73,7 +73,7 @@ test("chain should optionnally chain data access", () => {
 test("expandFormFromDb", () => {
   const form: Partial<Form> = {
     id: "ckcejngdp00p00895cxaze1e8",
-    readableId: "TD-61feb7d24fd67a5688e761eb1cbcb497",
+    readableId: "BSD-20210101-AAAAAAAA",
     isImportedFromPaper: false,
     customId: null,
     isDeleted: false,

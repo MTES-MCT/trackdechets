@@ -1,6 +1,6 @@
 import { useQuery, NetworkStatus } from "@apollo/client";
 import React from "react";
-import { DuplicateFile } from "common/components/Icons";
+import { IconDuplicateFile } from "common/components/Icons";
 import { generatePath, Link, useParams } from "react-router-dom";
 import { InlineError } from "common/components/Error";
 import Loader from "common/components/Loaders";
@@ -8,7 +8,6 @@ import { Query, QueryFormsArgs } from "generated/graphql/types";
 import { DRAFT_TAB_FORMS } from "./queries";
 import Slips, { SlipsColumn } from "../Slips";
 import TabContent from "./TabContent";
-import { COLORS } from "common/config";
 import EmptyTab from "./EmptyTab";
 import routes from "common/routes";
 
@@ -40,7 +39,7 @@ export default function DraftsTab() {
           ou dupliquer un bordereau déjà existant dans un autre onglet grâce à
           l'icône{" "}
           <span style={{ display: "inline" }}>
-            <DuplicateFile color={COLORS.blueLight} />
+            <IconDuplicateFile color="blueLight" />
           </span>
         </p>
       </EmptyTab>
