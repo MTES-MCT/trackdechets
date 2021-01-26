@@ -1,15 +1,20 @@
 import React from "react";
 import CompanySelector from "./company/CompanySelector";
-import { Field, connect } from "formik";
+import { Field, connect, useFormikContext } from "formik";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import DateInput from "./custom-inputs/DateInput";
 import TdSwitch from "common/components/Switch";
 
 import styles from "./Transporter.module.scss";
+import { Transporter as TransporterType } from "generated/graphql/types";
+
 type Values = {
-  transporter: { isExemptedOfReceipt: boolean };
+  transporter: TransporterType;
 };
-export default connect<{}, Values>(function Transporter(props) {
+
+export default function Transporter() {
+  const { setFieldValue, values } = useFormikContext<Values>();
+
   return (
     <>
       <h4 className="form__section-heading">Transporteur</h4>
@@ -17,22 +22,22 @@ export default connect<{}, Values>(function Transporter(props) {
         name="transporter.company"
         onCompanySelected={transporter => {
           if (transporter.transporterReceipt) {
-            props.formik.setFieldValue(
+            setFieldValue(
               "transporter.receipt",
               transporter.transporterReceipt.receiptNumber
             );
-            props.formik.setFieldValue(
+            setFieldValue(
               "transporter.validityLimit",
               transporter.transporterReceipt.validityLimit
             );
-            props.formik.setFieldValue(
+            setFieldValue(
               "transporter.department",
               transporter.transporterReceipt.department
             );
           } else {
-            props.formik.setFieldValue("transporter.receipt", "");
-            props.formik.setFieldValue("transporter.validityLimit", null);
-            props.formik.setFieldValue("transporter.department", "");
+            setFieldValue("transporter.receipt", "");
+            setFieldValue("transporter.validityLimit", null);
+            setFieldValue("transporter.department", "");
           }
         }}
       />
@@ -40,18 +45,18 @@ export default connect<{}, Values>(function Transporter(props) {
       <h4 className="form__section-heading">Autorisations</h4>
       <div className="form__row">
         <TdSwitch
-          checked={!!props.formik.values.transporter.isExemptedOfReceipt}
+          checked={!!values.transporter.isExemptedOfReceipt}
           onChange={() =>
-            props.formik.setFieldValue(
+            setFieldValue(
               "transporter.isExemptedOfReceipt",
-              !props.formik.values.transporter.isExemptedOfReceipt
+              !values.transporter.isExemptedOfReceipt
             )
           }
           label="Le transporteur déclare être exempté de récépissé conformément aux
           dispositions de l'article R.541-50 du code de l'environnement."
         />
       </div>
-      {!props.formik.values.transporter.isExemptedOfReceipt && (
+      {!values.transporter.isExemptedOfReceipt && (
         <div className="form__row">
           <label>
             Numéro de récépissé
@@ -102,4 +107,4 @@ export default connect<{}, Values>(function Transporter(props) {
       )}
     </>
   );
-});
+}

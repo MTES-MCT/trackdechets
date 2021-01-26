@@ -23,6 +23,7 @@ import { statusChangeFragment } from "common/fragments";
 import { ACT_TAB_FORMS, FOLLOW_TAB_FORMS } from "dashboard/slips/tabs/queries";
 import { NotificationError } from "common/components/Error";
 import cogoToast from "cogo-toast";
+import Transporter from "form/Transporter";
 
 const MARK_RESEALED = gql`
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {
@@ -240,71 +241,7 @@ export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
                   Collecteur-transporteur après entreposage ou reconditionnement
                 </h5>
 
-                <CompanySelector name="transporter.company" />
-
-                <div className="form__row form__row--inline">
-                  <Field
-                    type="checkbox"
-                    name="transporter.isExemptedOfReceipt"
-                    id="id_isExemptedOfReceipt"
-                    checked={values.transporter.isExemptedOfReceipt}
-                    className="td-checkbox"
-                  />
-                  <label htmlFor="id_isExemptedOfReceipt">
-                    Le transporteur déclare être exempté de récépissé
-                    conformément aux dispositions de l'article R.541-50 du code
-                    de l'environnement.
-                  </label>
-                </div>
-                {!values.transporter.isExemptedOfReceipt && (
-                  <div className="form__row">
-                    <label>
-                      Numéro de récépissé
-                      <Field
-                        type="text"
-                        name="transporter.receipt"
-                        className="td-input"
-                      />
-                    </label>
-
-                    <RedErrorMessage name="transporter.receipt" />
-
-                    <label>
-                      Département
-                      <Field
-                        type="text"
-                        name="transporter.department"
-                        placeholder="Ex: 83"
-                        className="td-input"
-                      />
-                    </label>
-
-                    <RedErrorMessage name="transporter.department" />
-
-                    <label>
-                      Limite de validité
-                      <Field
-                        component={DateInput}
-                        name="transporter.validityLimit"
-                        className="td-input"
-                      />
-                    </label>
-
-                    <RedErrorMessage name="transporter.validityLimit" />
-
-                    <label>
-                      Immatriculation
-                      <Field
-                        type="text"
-                        name="transporter.numberPlate"
-                        className="td-input"
-                        placeholder="Plaque d'immatriculation du véhicule"
-                      />
-                    </label>
-
-                    <RedErrorMessage name="transporter.numberPlate" />
-                  </div>
-                )}
+                <Transporter />
 
                 <div className="form__actions">
                   <button
