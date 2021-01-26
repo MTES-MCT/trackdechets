@@ -15,9 +15,8 @@ setDefaultLocale("fr");
 export default function DateInput({
   field,
   form: { setFieldValue },
-
   ...props
-}: FieldProps<Date | string | null> & {
+}: FieldProps<string | null> & {
   label: string;
 } & ReactDatePickerProps) {
   const { value, ...rest } = field;
@@ -30,7 +29,7 @@ export default function DateInput({
         dateFormat="dd/MM/yyyy"
         selected={value ? parseDate(value) : null}
         onChange={(value: Date | null) => {
-          setFieldValue(field.name, value);
+          setFieldValue(field.name, value?.toISOString() ?? null);
         }}
       />
     </div>
