@@ -70,6 +70,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Amélioration de la collecte des erreurs par Sentry, [PR 605](https://github.com/MTES-MCT/trackdechets/pull/605)
 - Désactivation de Matomo en dehors de l'environnement de production, [PR 736](https://github.com/MTES-MCT/trackdechets/pull/736)
 - Ajout d'un hook prettier dans graphql-codegen [PR 744](https://github.com/MTES-MCT/trackdechets/pull/744)
+- Ajustements de config pour permettre un développement en local sans docker [PR 777](https://github.com/MTES-MCT/trackdechets/pull/777)
 
 # [2020.11.2] 30/11/2020
 
