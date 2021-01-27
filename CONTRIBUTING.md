@@ -45,7 +45,7 @@
 
    > Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
 
-   > La valeur des URL's doit correspondre aux variables d'environnement `API_HOST`, `UI_HOST` et `DEVELOPERS_HOST`
+   > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `UI_HOST` et `DEVELOPERS_HOST`
 
 4. Démarrer les containers
 
