@@ -77,9 +77,16 @@ Vous pouvez également faire tourner l'ensemble des services sans docker. Veille
 
 1. Démarrer `postgres`, `redis`, et `nginx` sur votre machine hôte. Pour la configuration `nginx` vous pouvez vous inspirer du fichier `nginx/templates/default.conf.template`.
 
-> Il est également possible de démarrer ces trois services avec docker `docker-compose -f docker-compose.dev.yml up postgres redis nginx`
+2. Créer un lien symbolique entre le fichier `.env` et le fichier `back/.env`
 
-2. Démarrer l'API
+```
+ln -s /path/to/trackdechets/.env /path/to/trackdechets/back/.env
+```
+
+> Il est également possible de démarrer ces trois services avec docker `docker-compose -f docker-compose.dev.yml up postgres redis nginx`. Dans ce cas, l'API doit être démarrée sur le port 4000 pour coller avec la configuration Nginx  `API_PORT=4000`.
+
+
+3. Démarrer l'API
 
 ```bash
 cd back
@@ -87,7 +94,7 @@ npm install
 npm run dev
 ```
 
-3. Démarrer l'UI
+4. Démarrer l'UI
 
 ```bash
 cd front
@@ -95,7 +102,7 @@ npm install
 npm start
 ```
 
-4. (Optionnel) Démarrer la documentation
+5. (Optionnel) Démarrer la documentation
 
 ```
 cd doc/website
