@@ -19,11 +19,17 @@ jobs:
           name: "back: Run linter"
           command: npm run lint --prefix back
       - run:
+          name: "back: Run typecheck"
+          command: npm run types --prefix back
+      - run:
           name: "front: Install dependencies"
           command: npm ci --prefix front
       - run:
           name: "front: Run linter"
           command: npm run lint --prefix front
+      - run:
+          name: "front: Run typecheck"
+          command: npm run types --prefix front
 
   test:
     description: "Run tests"
