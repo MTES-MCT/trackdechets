@@ -16,6 +16,9 @@ jobs:
           name: "back: Install dependencies"
           command: npm ci --prefix back
       - run:
+          name: "back: Generate Prisma client"
+          command: npm run generate --prefix back
+      - run:
           name: "back: Run linter"
           command: npm run lint --prefix back
       - run:
