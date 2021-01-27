@@ -1,6 +1,6 @@
 import React from "react";
-import { Field, Form, Formik } from "formik";
-import { formatISO, startOfDay } from "date-fns";
+import { Field, Form, Formik, FormikConfig } from "formik";
+import { startOfDay } from "date-fns";
 import { parseDate } from "common/datetime";
 import * as yup from "yup";
 import { RedErrorMessage } from "common/components";
@@ -87,15 +87,15 @@ export default function ReceivedInfo({
   onSubmit,
 }: {
   form: TdForm;
-  onSubmit: (values: ReceivedInfoValues) => Promise<any>;
+  onSubmit: FormikConfig<ReceivedInfoValues>["onSubmit"];
   close: () => void;
 }) {
   return (
     <Formik<ReceivedInfoValues>
       initialValues={{
         receivedBy: "",
-        receivedAt: formatISO(new Date(), { representation: "date" }),
-        signedAt: formatISO(new Date(), { representation: "date" }),
+        receivedAt: new Date().toISOString(),
+        signedAt: new Date().toISOString(),
         quantityReceived: null,
         wasteAcceptationStatus: null,
         wasteRefusalReason: "",
@@ -228,10 +228,8 @@ export default function ReceivedInfo({
             <label>
               Date d'acceptation
               <Field
-                min={formatISO(parseDate(form.sentAt!), {
-                  representation: "date",
-                })}
                 component={DateInput}
+                minDate={parseDate(values.receivedAt)}
                 name="signedAt"
                 className="td-input"
               />

@@ -1,6 +1,5 @@
 import React from "react";
 import { Field, Form, Formik } from "formik";
-import { formatISO } from "date-fns";
 import NumberInput from "form/custom-inputs/NumberInput";
 import DateInput from "form/custom-inputs/DateInput";
 import { InlineRadioButton, RadioButton } from "form/custom-inputs/RadioButton";
@@ -38,14 +37,14 @@ export default function AcceptedInfo({
     <Formik<AcceptedInfoValues>
       initialValues={{
         signedBy: "",
-        signedAt: formatISO(new Date(), { representation: "date" }),
+        signedAt: new Date().toISOString(),
         quantityReceived: null,
         wasteAcceptationStatus: "" as WasteAcceptationStatus,
         wasteRefusalReason: "",
       }}
       onSubmit={onSubmit}
     >
-      {({ errors, isSubmitting, setFieldValue, values, handleReset }) => (
+      {({ isSubmitting, setFieldValue, values, handleReset }) => (
         <Form>
           <div className="form__row">
             <div className="form__row">

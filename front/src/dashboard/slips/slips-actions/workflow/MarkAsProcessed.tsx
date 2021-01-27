@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { Formik, Field, Form, useFormikContext } from "formik";
-import { formatISO } from "date-fns";
 import {
   PROCESSING_OPERATIONS,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
@@ -229,7 +228,7 @@ export default function MarkAsProcessed({ form, siret }: WorkflowActionProps) {
               processingOperationDone: "",
               processingOperationDescription: "",
               processedBy: "",
-              processedAt: formatISO(new Date(), { representation: "date" }),
+              processedAt: new Date().toISOString(),
               nextDestination: null,
               noTraceability: false,
             }}
