@@ -23,53 +23,6 @@
 1. Installer Node.js
 2. Installer Docker et Docker Compose
 
-#### NGINX Proxy
-
-Afin de pouvoir accéder aux différents services via des URLs du type `http://trackdechets.local` plutôt que `http://localhost:1234`, il est nécessaire de créer un container docker se basant sur [jwilder/nginx-proxy](https://github.com/nginx-proxy/nginx-proxy).
-
-1. Créer un répertoire `nginx-proxy` sur votre espace de travail et y ajouter le fichier `docker-compose.yml` suivant :
-
-   ```docker
-   version: "3.1"
-   services:
-     nginx-proxy:
-       image: jwilder/nginx-proxy:alpine
-       ports:
-         - "80:80"
-       volumes:
-         - /var/run/docker.sock:/tmp/docker.sock:ro
-       restart: unless-stopped
-   networks:
-     default:
-       external:
-         name: nginx-proxy
-   ```
-
-2. Créer le `network` docker `nginx-proxy`.
-
-   ```
-   docker network create nginx-proxy
-   ```
-
-3. Mapper les différentes URLs sur localhost dans votre fichier `host`.
-
-   ```
-   127.0.0.1 api.trackdechets.local
-   127.0.0.1 trackdechets.local
-   127.0.0.1 etl.trackdechets.local
-   127.0.0.1 doc.trackdechets.local
-   127.0.0.1 developers.trackdechets.local
-   ```
-
-   > Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
-
-4. Démarrer le proxy nginx
-   ```
-   docker-compose up
-   ```
-
-Pour plus de détails, se référer au post ["Set a local web development environement with custom urls and https"](https://medium.com/@francoisromain/set-a-local-web-development-environment-with-custom-urls-and-https-3fbe91d2eaf0) par @francoisromain
-
 ### Installation
 
 1. Cloner le dépôt sur votre machine.
@@ -81,30 +34,74 @@ Pour plus de détails, se référer au post ["Set a local web development enviro
 2. Configurer les variables d'environnements :
    1. Renommer le ficher `.env.model` en `.env` et le compléter en demandant les infos à un développeur de l'équipe
    2. Créer un fichier `.env` dans `front/` en s'inspirant du fichier `.env.recette`
-3. Démarrer les containers
+
+3. Mapper les différentes URLs sur localhost dans votre fichier `host`
+
+   ```
+   127.0.0.1 api.trackdechets.local
+   127.0.0.1 trackdechets.local
+   127.0.0.1 developers.trackdechets.local
+   ```
+
+   > Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
+
+   > La valeur des URL's doit correspondre aux variables d'environnement `API_HOST`, `UI_HOST` et `DEVELOPERS_HOST`
+
+4. Démarrer les containers
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui
+   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx
    ```
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
 
    Vous pouvez également démarrer le service `td-doc` il n'est pas essentiel au fonctionnement de l'API ou de l'interface utilisateur.
 
-4. Synchroniser la base de données avec le schéma prisma.
+5. Synchroniser la base de données avec le schéma prisma.
 
-   Les modèles de données sont définis dans les fichiers `back/prisma/database/*.prisma`.
+   Les modèles de données sont définis dans les fichiers `back/prisma/schema.prisma`.
    Afin de synchroniser les tables PostgreSQL, il faut lancer une déploiement prisma
 
    ```bash
    docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
-   npx prisma deploy
+   npx prisma db push --preview-feature
    ```
 
-5. Accéder aux différents services.
+6. Accéder aux différents services.
 
    C'est prêt ! Rendez-vous sur l'URL `UI_HOST` configurée dans votre fichier `.env` (par ex: `http://trackdechets.local`) pour commencer à utiliser l'application ou sur `API_HOST` (par ex `http://api.trackdechets.local`) pour accéder au playground GraphQL.
 
-   Il existe également un playground prisma exposant directement les fonctionnalités de l'ORM accessible sur `http://localhost:4466`.
+
+### Installation alternative sans docker
+
+Vous pouvez également faire tourner l'ensemble des services sans docker. Veillez à utiliser la même version de Node.js que celle spécifiée dans les images Docker. Vous pouvez utiliser [NVM](https://github.com/nvm-sh/nvm) pour changer facilement de version de Node.
+
+1. Démarrer `postgres`, `redis`, et `nginx` sur votre machine hôte. Pour la configuration `nginx` vous pouvez vous inspirer du fichier `nginx/templates/default.conf.template`.
+
+> Il est également possible de démarrer ces trois services avec docker `docker-compose -f docker-compose.dev.yml up postgres redis nginx`
+
+2. Démarrer l'API
+
+```bash
+cd back
+npm install
+npm run dev
+```
+
+3. Démarrer l'UI
+
+```bash
+cd front
+npm install
+npm start
+```
+
+4. (Optionnel) Démarrer la documentation
+
+```
+cd doc/website
+npm install
+npm start
+```
 
 ### Conventions
 
