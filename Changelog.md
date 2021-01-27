@@ -67,6 +67,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Correction d'un bug de langue dans l'application front, pouvant provoquer une traduction erronée par le navigateur. [PR 737](https://github.com/MTES-MCT/trackdechets/pull/737)
+- Correction de l'ordre des bordereaux dans l'onglet "Brouillon" suite à une création de bordereau [PR 781](https://github.com/MTES-MCT/trackdechets/pull/781)
 
 #### :nail_care: Améliorations
 
