@@ -22,7 +22,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 * Déploiement de la documentation avec Github Pages [PR 772](https://github.com/MTES-MCT/trackdechets/pull/772)
-
+- Ajustements de config pour permettre un développement en local sans docker [PR 777](https://github.com/MTES-MCT/trackdechets/pull/777)
 # [2021.01.2] 11/01/2021
 #### :rocket: Nouvelles fonctionnalités
 
@@ -40,7 +40,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Mise à jour du template de PR Github [PR 756](https://github.com/MTES-MCT/trackdechets/pull/756)
-
 # [2021.01.1] 07/01/2021
 
 #### :rocket: Nouvelles fonctionnalités
@@ -70,7 +69,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Amélioration de la collecte des erreurs par Sentry, [PR 605](https://github.com/MTES-MCT/trackdechets/pull/605)
 - Désactivation de Matomo en dehors de l'environnement de production, [PR 736](https://github.com/MTES-MCT/trackdechets/pull/736)
 - Ajout d'un hook prettier dans graphql-codegen [PR 744](https://github.com/MTES-MCT/trackdechets/pull/744)
-- Ajustements de config pour permettre un développement en local sans docker [PR 777](https://github.com/MTES-MCT/trackdechets/pull/777)
 
 # [2020.11.2] 30/11/2020
 
