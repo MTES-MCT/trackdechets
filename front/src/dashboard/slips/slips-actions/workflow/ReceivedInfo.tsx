@@ -96,7 +96,7 @@ export default function ReceivedInfo({
         receivedBy: "",
         receivedAt: formatISO(new Date(), { representation: "date" }),
         signedAt: formatISO(new Date(), { representation: "date" }),
-        quantityReceived: form.stateSummary?.quantity ?? 0,
+        quantityReceived: null,
         wasteAcceptationStatus: null,
         wasteRefusalReason: "",
         ...(form.recipient?.isTempStorage &&
@@ -104,9 +104,7 @@ export default function ReceivedInfo({
             quantityType: QuantityType.Real,
           }),
       }}
-      onSubmit={(values, { setSubmitting }) =>
-        onSubmit(values).finally(() => setSubmitting(false))
-      }
+      onSubmit={onSubmit}
       validationSchema={() => validationSchema(form)}
     >
       {({ values, isSubmitting, handleReset, setFieldValue }) => (

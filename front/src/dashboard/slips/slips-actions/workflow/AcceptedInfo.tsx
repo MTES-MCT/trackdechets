@@ -87,7 +87,7 @@ export default function AcceptedInfo({
               </fieldset>
             </div>
           </div>
-          <p className="form__row">
+          <div className="form__row">
             <label>
               Poids à l'arrivée
               <Field
@@ -105,7 +105,7 @@ export default function AcceptedInfo({
               </span>
             </label>
             <RedErrorMessage name="quantityReceived" />
-          </p>
+          </div>
           {form.recipient?.isTempStorage && form.status === FormStatus.Sent && (
             <fieldset className="form__row">
               <legend>Cette quantité est</legend>
@@ -128,15 +128,15 @@ export default function AcceptedInfo({
             WasteAcceptationStatus.Refused.toString(),
             WasteAcceptationStatus.PartiallyRefused.toString(),
           ].includes(values.wasteAcceptationStatus) && (
-            <p className="form__row">
+            <div className="form__row">
               <label>
                 {textConfig[values.wasteAcceptationStatus].refusalReasonText}
                 <Field name="wasteRefusalReason" className="td-input" />
               </label>
               <RedErrorMessage name="wasteRefusalReason" />
-            </p>
+            </div>
           )}
-          <p className="form__row">
+          <div className="form__row">
             <label>
               Nom du responsable
               <Field
@@ -147,8 +147,8 @@ export default function AcceptedInfo({
               />
             </label>
             <RedErrorMessage name="signedBy" />
-          </p>
-          <p className="form__row">
+          </div>
+          <div className="form__row">
             <label>
               Date d'acceptation
               <Field
@@ -158,7 +158,7 @@ export default function AcceptedInfo({
               />
             </label>
             <RedErrorMessage name="signedAt" />
-          </p>
+          </div>
           <p>
             {values.wasteAcceptationStatus &&
               textConfig[values.wasteAcceptationStatus].validationText}
