@@ -1,5 +1,6 @@
 import React from "react";
 import { Field, Form, Formik } from "formik";
+import * as yup from "yup";
 import NumberInput from "form/custom-inputs/NumberInput";
 import DateInput from "form/custom-inputs/DateInput";
 import { InlineRadioButton, RadioButton } from "form/custom-inputs/RadioButton";
@@ -20,6 +21,19 @@ export type AcceptedInfoValues = {
   wasteRefusalReason: string;
   quantityType?: QuantityType;
 };
+
+const validationSchema: yup.ObjectSchema<AcceptedInfoValues> = yup.object({
+  signedBy: yup.string().required("Le nom du responsable est un champ requis"),
+  signedAt: yup.string().required("La date de signature est un champ requis"),
+  quantityReceived: yup
+    .number()
+    .nullable()
+    .required("Le poids accepté est un champ requis"),
+  wasteAcceptationStatus: yup
+    .string<WasteAcceptationStatus>()
+    .required("Le statut d'acceptation du lot est un champ requis"),
+  wasteRefusalReason: yup.string(),
+});
 
 /**
  * Accepted info form shared between markAsAccepted and markAsTempStorerAccepted
@@ -43,6 +57,7 @@ export default function AcceptedInfo({
         wasteRefusalReason: "",
       }}
       onSubmit={onSubmit}
+      validationSchema={validationSchema}
     >
       {({ isSubmitting, setFieldValue, values, handleReset }) => (
         <Form>

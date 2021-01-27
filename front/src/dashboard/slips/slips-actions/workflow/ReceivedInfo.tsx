@@ -55,7 +55,6 @@ const validationSchema = (form: TdForm) =>
     quantityReceived: yup
       .number()
       .nullable()
-      .positive("La quantité reçu doit être supérieure à 0")
       .required("Le poids à l'arrivée est un champ requis"),
     receivedAt: yup
       .date()
