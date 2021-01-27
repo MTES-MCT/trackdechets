@@ -1,6 +1,6 @@
 import React from "react";
 import CompanySelector from "./company/CompanySelector";
-import { Field, connect, useFormikContext } from "formik";
+import { Field, useFormikContext } from "formik";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import DateInput from "./custom-inputs/DateInput";
 import TdSwitch from "common/components/Switch";
