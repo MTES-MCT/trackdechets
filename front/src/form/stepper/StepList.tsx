@@ -72,8 +72,8 @@ export default function StepList(props: IProps) {
         variables: { siret },
         getNewData: data => ({
           forms: [
-            ...data.forms.filter(f => f.id !== createdForm.id),
             createdForm,
+            ...data.forms.filter(f => f.id !== createdForm.id),
           ],
         }),
       });
