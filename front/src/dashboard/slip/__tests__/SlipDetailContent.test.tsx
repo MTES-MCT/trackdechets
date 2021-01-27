@@ -104,6 +104,7 @@ const simpleForm: Form = {
     quantity: 24,
     quantityType: QuantityType.Estimated,
     consistence: Consistence.Liquid,
+    pop: false,
   },
   appendix2Forms: [],
   ecoOrganisme: null,
@@ -253,6 +254,7 @@ const tempStorageForm: Form = {
     quantity: 24,
     quantityType: QuantityType.Estimated,
     consistence: Consistence.Liquid,
+    pop: false,
   },
   appendix2Forms: [],
   ecoOrganisme: null,
@@ -293,6 +295,7 @@ const tempStorageForm: Form = {
       packagingInfos: [],
       quantity: null,
       quantityType: QuantityType.Estimated,
+      pop: false,
     },
     transporter: {
       isExemptedOfReceipt: false,
