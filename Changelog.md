@@ -29,9 +29,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+<<<<<<< HEAD
 - Migration de Prisma 1 vers Prisma 2 (ORM utilisé côté backend) [PR 733](https://github.com/MTES-MCT/trackdechets/pull/733)
 - Enregistrement et géocodage des adresses des établissements lors du rattachement [PR 766](https://github.com/MTES-MCT/trackdechets/pull/766)
 - Affichage de la dialogue de feedback Sentry en cas d'erreur dans l'application front [PR 774](https://github.com/MTES-MCT/trackdechets/pull/774)
+- Déploiement de la documentation avec Github Pages [PR 772](https://github.com/MTES-MCT/trackdechets/pull/772)
 
 # [2021.01.2] 11/01/2021
 
