@@ -25,6 +25,27 @@ jobs:
           name: "front: Run linter"
           command: npm run lint --prefix front
 
+  types:
+    description: "Run typecheck"
+    executor: node
+    steps:
+      - checkout
+      - run:
+          name: "back: Install dependencies"
+          command: npm ci --prefix back
+      - run:
+          name: "back: Generate Prisma client"
+          command: npm run generate --prefix back
+      - run:
+          name: "back: Run typecheck"
+          command: npm run types --prefix back
+      - run:
+          name: "front: Install dependencies"
+          command: npm ci --prefix front
+      - run:
+          name: "front: Run typecheck"
+          command: npm run types --prefix front
+
   test:
     description: "Run tests"
     executor: node
@@ -122,12 +143,14 @@ workflows:
   build-and-deploy:
     jobs:
       - lint
+      - types
       - test
       - integration-tests
       - build-and-push:
           name: build-and-push-prod
           requires:
             - lint
+            - types
             - test
             - integration-tests
           filters:
@@ -139,6 +162,7 @@ workflows:
           build-args: "--build-arg build_env=sandbox"
           requires:
             - lint
+            - types
             - test
             - integration-tests
           filters:
@@ -150,6 +174,7 @@ workflows:
           build-args: "--build-arg build_env=recette"
           requires:
             - lint
+            - types
             - test
             - integration-tests
           filters:

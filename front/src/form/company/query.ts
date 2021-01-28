@@ -29,6 +29,7 @@ export const COMPANY_INFOS = gql`
       siret
       name
       naf
+      libelleNaf
       address
       etatAdministratif
       isRegistered

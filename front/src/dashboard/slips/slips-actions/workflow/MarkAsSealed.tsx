@@ -2,7 +2,7 @@ import { gql, useMutation } from "@apollo/client";
 import React from "react";
 import { statusChangeFragment } from "common/fragments";
 import { ActionButton } from "common/components";
-import { PaperWriteIcon } from "common/components/Icons";
+import { IconPaperWrite } from "common/components/Icons";
 import {
   FormStatus,
   Mutation,
@@ -74,7 +74,7 @@ export default function MarkAsSealed({ form, siret }: WorkflowActionProps) {
         <div>
           <ActionButton
             title={actionLabel}
-            icon={PaperWriteIcon}
+            icon={IconPaperWrite}
             onClick={open}
           />
         </div>

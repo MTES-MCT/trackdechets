@@ -1,10 +1,12 @@
+@import "src/scss/Constants.scss";
+
 .companyAddForm {
   max-width: initial;
 
   .subtitle {
     padding-bottom: 0.5em;
     margin-bottom: 0.5em;
-    border-bottom: 1px solid var(--lighter-grey);
+    border-bottom: 1px solid $grey-lighter;
   }
 
   .field {

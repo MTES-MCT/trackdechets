@@ -13,7 +13,6 @@ import { WASTES } from "generated/constants";
 import { useLazyQuery, gql } from "@apollo/client";
 import { NotificationError } from "common/components/Error";
 import RedErrorMessage from "common/components/RedErrorMessage";
-import { FaHourglassHalf } from "react-icons/fa";
 
 interface IProps {
   companies: CompanyPrivate[];
@@ -347,13 +346,7 @@ export default function ExportsForm({ companies }: IProps) {
                 className="btn btn--primary"
                 disabled={loading}
               >
-                {loading ? (
-                  <span>
-                    Préparation de l'export... <FaHourglassHalf />
-                  </span>
-                ) : (
-                  "Exporter"
-                )}
+                {loading ? <span>Préparation de l'export...</span> : "Exporter"}
               </button>
             </div>
           </Form>

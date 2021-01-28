@@ -1,0 +1,43 @@
+@import "src/scss/Constants.scss";
+@import "src/scss/Breakpoints.scss";
+
+.ModalTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: $blue;
+  margin-bottom: 1rem;
+}
+
+.CheckmarkIcon {
+  color: $green;
+}
+
+.SlideContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @include tablet {
+    flex-direction: row;
+  }
+}
+.SlideContentImage {
+  @include tablet {
+    width: 40%;
+  }
+}
+.SlideContentList {
+  flex: 1;
+}
+
+.Features {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  grid-gap: 1rem;
+}
+.FeaturesItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

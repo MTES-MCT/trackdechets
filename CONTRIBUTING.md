@@ -15,6 +15,7 @@
   - [Utiliser un backup de base de donnée](#utiliser-un-backup-de-base-de-donnée)
   - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
   - [Nourrir la base de donnée avec des données par défaut](#nourrir-la-base-de-donnée-avec-des-données-par-défaut)
+  - [Ajouter une nouvelle icône](#ajouter-une-nouvelle-icône)
 
 ## Mise en route
 
@@ -52,6 +53,7 @@
    ```bash
    docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx
    ```
+
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
 
    Vous pouvez également démarrer le service `td-doc` il n'est pas essentiel au fonctionnement de l'API ou de l'interface utilisateur.
@@ -247,8 +249,23 @@ C'est un fichier PNG valide que l'on peut éditer directement dans Visual Code a
 Il peut être assez fastidieux de devoir recréer des comptes de tests régulièrement en local.
 Pour palier à ce problème, il est possible de nourrir la base de donnée Prisma avec des données par défaut.
 
-1. Créer le fichier `back/prisma/seed.dev.ts` en suivant la [documentation](https://v1.prisma.io/docs/1.34/prisma-cli-and-configuration/cli-command-reference/prisma-seed-xcv8/).
-2. Démarrer les containers.
-3. Accéder au container `td-api`.
-4. Exécuter la commande `npx prisma seed`.
-   Éventuellement lancer la commande avec le flag `--reset` pour remettre à zéro : `npx prisma seed --reset`.
+1. Créer le fichier `back/prisma/seed.dev.ts` en se basant sur le modèle `back/prisma/seed.model.ts`.
+2. Démarrer les containers `postgres` et `td-api`
+3. (Optionnel) Reset de la base de données
+   3.1 Dans le container `postgres `: `psql -U trackdechets -d prisma -c "DROP SCHEMA \"default\$default\" CASCADE;"` pour supprimer les données existantes
+   3.2 Dans le container `td-api`:  `npx prisma db push --preview-feature` pour recréer les tables
+4. Dans le container `td-api`: `npx prisma db seed --preview-feature` pour nourrir la base de données.
+
+
+### Ajouter une nouvelle icône
+
+Les icônes utilisées dans l'application front viennent de https://streamlineicons.com/.
+Nous détenons une license qui nous permet d'utiliser jusqu'à 100 icônes (cf [Streamline Icons Premium License](https://help.streamlineicons.com/license-premium)).
+
+Voilà la procédure pour ajouter une icône au fichier `Icons.tsx` :
+
+1. Se connecter sur streamlineicons.
+2. Copier le SVG de l'icône concerné.
+3. [Convertir le SVG en JSX](https://react-svgr.com/playground/?expandProps=start&icon=true&replaceAttrValues=%23000%3D%22currentColor%22&typescript=true) et l'ajouter au fichier (adapter le code selon les exemples existants : props, remplacer `width`/`height` et `"currentColor"`).
+
+Pour s'y retrouver plus facilement, suivre la convention de nommage en place et utiliser le nom donné par streamlineicons.

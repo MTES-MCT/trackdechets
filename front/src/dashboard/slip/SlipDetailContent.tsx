@@ -14,11 +14,11 @@ import {
 } from "generated/graphql/types";
 import { statusesWithDynamicActions, statusLabels } from "../constants";
 import {
-  WarehouseDeliveryIcon,
-  WarehouseStorageIcon,
-  WaterDamIcon,
-  RenewableEnergyEarthIcon,
-  WarehousePackageIcon,
+  IconWarehouseDelivery,
+  IconWarehouseStorage,
+  IconWaterDam,
+  IconRenewableEnergyEarth,
+  IconWarehousePackage,
 } from "common/components/Icons";
 
 import {
@@ -334,24 +334,24 @@ export default function SlipDetailContent({
         {/* Tabs menu */}
         <TabList className={styles.detailTabs}>
           <Tab className={styles.detailTab}>
-            <WaterDamIcon color="#000" size={25} />
+            <IconWaterDam size="25px" />
             <span className={styles.detailTabCaption}>Producteur</span>
           </Tab>
           {!!form?.trader?.company?.name && (
             <Tab className={styles.detailTab}>
-              <WarehousePackageIcon color="#000" size={25} />
+              <IconWarehousePackage size="25px" />
               <span className={styles.detailTabCaption}>Négociant</span>
             </Tab>
           )}
           <Tab className={styles.detailTab}>
-            <WarehouseDeliveryIcon color="#000" size={25} />
+            <IconWarehouseDelivery size="25px" />
             <span className={styles.detailTabCaption}>
               <span> {isMultiModal ? "Transp. n°1" : "Transporteur"}</span>
             </span>
           </Tab>
           {form.transportSegments?.map((segment, idx) => (
             <Tab className={styles.detailTab} key={idx}>
-              <WarehouseDeliveryIcon color="#000" size={25} />
+              <IconWarehouseDelivery size="25px" />
               <span className={styles.detailTabCaption}>
                 Transp.
                 {!!segment.segmentNumber && `N° ${segment.segmentNumber + 1}`}
@@ -360,13 +360,13 @@ export default function SlipDetailContent({
           ))}
           {hasTempStorage && (
             <Tab className={styles.detailTab}>
-              <WarehouseStorageIcon color="#000" size={25} />
+              <IconWarehouseStorage size="25px" />
               <span className={styles.detailTabCaption}>Entr. Prov.</span>
             </Tab>
           )}
 
           <Tab className={styles.detailTab}>
-            <RenewableEnergyEarthIcon color="#000" size={25} />
+            <IconRenewableEnergyEarth size="25px" />
             <span className={styles.detailTabCaption}>Destinataire</span>
           </Tab>
         </TabList>

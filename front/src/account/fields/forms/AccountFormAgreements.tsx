@@ -1,7 +1,7 @@
 import React from "react";
 import { Formik, Form, FieldArray, Field } from "formik";
-import { FaTrash } from "react-icons/fa";
 import { useMutation, gql } from "@apollo/client";
+import { IconTrash } from "common/components/Icons";
 import { InlineError } from "common/components/Error";
 import styles from "./AccountForm.module.scss";
 
@@ -81,7 +81,7 @@ export default function AccountFormAgreements({
                         onClick={() => remove(index)}
                         aria-label="Supprimer"
                       >
-                        <FaTrash />
+                        <IconTrash />
                       </button>
                     </div>
                   ))}

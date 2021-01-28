@@ -1,8 +1,14 @@
 import { useMutation } from "@apollo/client";
 import { Field } from "formik";
 import React, { useState } from "react";
-import { FaEnvelope, FaEye, FaIdCard, FaLock, FaPhone } from "react-icons/fa";
 import { useHistory } from "react-router-dom";
+import {
+  IconEmailActionUnread,
+  IconView,
+  IconSingleNeutralIdCard4,
+  IconLock1,
+  IconPhone,
+} from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 import PasswordMeter from "common/components/PasswordMeter";
 import RedErrorMessage from "common/components/RedErrorMessage";
@@ -109,7 +115,7 @@ export default function Signup() {
                 <div className="field-with-icon-wrapper">
                   <Field type="text" name="name" className="td-input" />
                   <i>
-                    <FaIdCard />
+                    <IconSingleNeutralIdCard4 />
                   </i>
                 </div>
 
@@ -121,7 +127,7 @@ export default function Signup() {
                 <div className="field-with-icon-wrapper">
                   <Field type="email" name="email" className="td-input" />
                   <i>
-                    <FaEnvelope />
+                    <IconEmailActionUnread />
                   </i>
                 </div>
 
@@ -133,7 +139,7 @@ export default function Signup() {
                 <div className="field-with-icon-wrapper">
                   <Field type="text" name="phone" className="td-input" />
                   <i>
-                    <FaPhone />
+                    <IconPhone />
                   </i>
                 </div>
               </div>
@@ -152,7 +158,7 @@ export default function Signup() {
                             className="td-input"
                           />
                           <i>
-                            <FaLock />
+                            <IconLock1 />
                           </i>
                         </div>
                         <span
@@ -163,7 +169,7 @@ export default function Signup() {
                             )
                           }
                         >
-                          <FaEye /> <span>Afficher le mot de passe</span>
+                          <IconView /> <span>Afficher le mot de passe</span>
                         </span>
                         <PasswordMeter password={field.value} />
                       </>

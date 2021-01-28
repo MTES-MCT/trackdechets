@@ -2,7 +2,7 @@ import * as React from "react";
 import { useParams } from "react-router-dom";
 import { Form } from "generated/graphql/types";
 import { ActionButton } from "common/components";
-import { ShipmentSignSmartphoneIcon } from "common/components/Icons";
+import { IconShipmentSignSmartphone } from "common/components/Icons";
 import { TransportSignatureModal } from "./TransportSignatureModal";
 
 interface TransportSignatureModalToggleProps {
@@ -33,7 +33,7 @@ export function TransportSignatureModalToggle({
     <>
       {variant === "button" ? (
         <button className="btn btn--primary" onClick={() => setIsOpen(true)}>
-          <ShipmentSignSmartphoneIcon size={32} />
+          <IconShipmentSignSmartphone size="32px" />
           <span className="tw-text-sm tw-ml-2">
             Signer <br /> l'enlèvement
           </span>
@@ -41,9 +41,9 @@ export function TransportSignatureModalToggle({
       ) : (
         <ActionButton
           title="Signer l'enlèvement"
-          icon={ShipmentSignSmartphoneIcon}
+          icon={IconShipmentSignSmartphone}
           onClick={() => setIsOpen(true)}
-          iconSize={32}
+          iconSize="32px"
         />
       )}
       <TransportSignatureModal

@@ -1,7 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import React from "react";
-import { DuplicateFile } from "common/components/Icons";
+import { IconDuplicateFile } from "common/components/Icons";
 import { updateApolloCache } from "common/helper";
 import { generatePath, useHistory, useParams } from "react-router-dom";
 import {
@@ -10,7 +10,6 @@ import {
   MutationDuplicateFormArgs,
 } from "generated/graphql/types";
 import { DRAFT_TAB_FORMS } from "../tabs/queries";
-import { COLORS } from "common/config";
 import routes from "common/routes";
 import { fullFormFragment } from "common/fragments";
 
@@ -84,7 +83,7 @@ export default function Duplicate({
       title="Dupliquer en brouillon"
       onClick={() => duplicate()}
     >
-      <DuplicateFile size={24} color={COLORS.blueLight} />
+      <IconDuplicateFile size="24px" color="blueLight" />
       <span>Dupliquer</span>
     </button>
   );

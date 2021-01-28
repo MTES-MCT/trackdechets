@@ -81,9 +81,9 @@ function getLastActionOn(
     case "TEMP_STORED":
     case "TEMP_STORER_ACCEPTED":
     case "RESEALED":
-      return temporaryStorageDetail.tempStorerReceivedAt.toString();
+      return temporaryStorageDetail.tempStorerReceivedAt.toISOString();
     case "RESENT":
-      return temporaryStorageDetail.signedAt.toString();
+      return temporaryStorageDetail.signedAt.toISOString();
     default:
       return form.createdAt;
   }

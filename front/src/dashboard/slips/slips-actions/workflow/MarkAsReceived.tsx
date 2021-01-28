@@ -5,7 +5,7 @@ import { statusChangeFragment } from "common/fragments";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton } from "common/components";
-import { WaterDamIcon } from "common/components/Icons";
+import { IconWaterDam } from "common/components/Icons";
 import ReceivedInfo from "./ReceivedInfo";
 import { NotificationError } from "common/components/Error";
 
@@ -33,7 +33,7 @@ export default function MarkAsReceived({ form }: WorkflowActionProps) {
         trigger={open => (
           <ActionButton
             title={actionLabel}
-            icon={WaterDamIcon}
+            icon={IconWaterDam}
             onClick={open}
           />
         )}
@@ -42,7 +42,7 @@ export default function MarkAsReceived({ form }: WorkflowActionProps) {
             <ReceivedInfo
               form={form}
               onSubmit={values => {
-                markAsReceived({
+                return markAsReceived({
                   variables: {
                     id: form.id,
                     receivedInfo: values,

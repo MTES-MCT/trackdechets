@@ -215,7 +215,7 @@ app.use(
 // configure session for passport local strategy
 const RedisStore = redisStore(session);
 
-export const sess = {
+export const sess: session.SessionOptions = {
   store: new RedisStore({ client: redisClient }),
   name: SESSION_NAME || "trackdechets.connect.sid",
   secret: SESSION_SECRET,

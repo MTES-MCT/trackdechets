@@ -1,7 +1,7 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
 import { Field, useField, useFormikContext } from "formik";
 import React, { useEffect, useCallback, useMemo, useState } from "react";
-import { Search } from "common/components/Icons";
+import { IconSearch } from "common/components/Icons";
 import { constantCase } from "constant-case";
 import { InlineError } from "common/components/Error";
 import RedErrorMessage from "common/components/RedErrorMessage";
@@ -160,7 +160,7 @@ export default function CompanySelector({
                   onChange={event => setClue(event.target.value)}
                 />
                 <i className={styles.searchIcon} aria-label="Recherche">
-                  <Search color="#8393a7" size={12} />
+                  <IconSearch size="12px" />
                 </i>
               </div>
             </div>

@@ -2,6 +2,7 @@ import React from "react";
 import { Field, Form, Formik } from "formik";
 import { isBefore, formatISO, startOfDay } from "date-fns";
 import { parseDate } from "common/datetime";
+import * as yup from "yup";
 import { RedErrorMessage } from "common/components";
 import NumberInput from "form/custom-inputs/NumberInput";
 import DateInput from "form/custom-inputs/DateInput";
@@ -45,6 +46,37 @@ export type ReceivedInfoValues = {
   quantityType?: QuantityType;
 };
 
+const validationSchema = (form: TdForm) =>
+  yup.object({
+    wasteAcceptationStatus: yup
+      .string()
+      .nullable()
+      .required("Le statut d'acceptation du lot est un champ requis"),
+    quantityReceived: yup
+      .number()
+      .nullable()
+      .required("Le poids à l'arrivée est un champ requis"),
+    receivedAt: yup
+      .date()
+      .nullable()
+      .required("La date de présentation est un champ requis")
+      // we only care about the day, not the exact time
+      .transform(value => startOfDay(parseDate(value)))
+      .min(
+        startOfDay(parseDate(form.sentAt!)),
+        "La date de réception du déchet ne peut pas être antérieure à sa date d'émission."
+      ),
+    receivedBy: yup
+      .string()
+      .nullable()
+      .required("Le nom du responsable est un champ requis"),
+    signedAt: yup
+      .date()
+      .nullable()
+      .required("La date de signature est un champ requis")
+      .transform(value => startOfDay(parseDate(value))),
+  });
+
 /**
  * Reception info form shared between markAsReceived and markAsTempStored
  */
@@ -54,7 +86,7 @@ export default function ReceivedInfo({
   onSubmit,
 }: {
   form: TdForm;
-  onSubmit: (values: ReceivedInfoValues) => void;
+  onSubmit: (values: ReceivedInfoValues) => Promise<any>;
   close: () => void;
 }) {
   return (
@@ -71,33 +103,21 @@ export default function ReceivedInfo({
             quantityType: QuantityType.Real,
           }),
       }}
-      onSubmit={onSubmit}
+      onSubmit={(values, { setSubmitting }) =>
+        onSubmit(values).finally(() => setSubmitting(false))
+      }
+      validationSchema={() => validationSchema(form)}
     >
       {({ values, isSubmitting, handleReset, setFieldValue }) => (
         <Form>
           <p className="form__row">
             <label>
-              Date d'arrivée
+              Date de présentation
               <Field
-                min={formatISO(parseDate(form.sentAt!), {
-                  representation: "date",
-                })}
                 component={DateInput}
+                minDate={parseDate(form.sentAt!)}
                 name="receivedAt"
                 className="td-input"
-                validate={value => {
-                  // we only care about the day, not the exact time
-                  // that's why we are setting both dates to the start of day
-                  const receivedAt = startOfDay(parseDate(value));
-                  const sentAt = startOfDay(parseDate(form.sentAt!));
-
-                  if (isBefore(receivedAt, sentAt)) {
-                    return {
-                      receivedAt:
-                        "La date de réception du déchet ne peut pas être antérieure à sa date d'émission.",
-                    };
-                  }
-                }}
               />
             </label>
             <RedErrorMessage name="receivedAt" />
@@ -140,6 +160,7 @@ export default function ReceivedInfo({
                   component={InlineRadioButton}
                 />
               </fieldset>
+              <RedErrorMessage name="wasteAcceptationStatus" />
             </div>
           </div>
           <p className="form__row">
@@ -208,6 +229,9 @@ export default function ReceivedInfo({
             <label>
               Date d'acceptation
               <Field
+                min={formatISO(parseDate(form.sentAt!), {
+                  representation: "date",
+                })}
                 component={DateInput}
                 name="signedAt"
                 className="td-input"

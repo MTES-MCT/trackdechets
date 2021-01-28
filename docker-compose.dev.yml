@@ -29,6 +29,7 @@ services:
       - ./back/src:/usr/src/app/src
       - ./doc/docs:/usr/src/doc/docs
       - ./front/src/generated:/usr/src/front/src/generated
+      - ./back/prisma:/usr/src/app/prisma
     env_file:
       - .env
     environment:

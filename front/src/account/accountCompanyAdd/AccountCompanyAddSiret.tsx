@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { Field, Form, Formik } from "formik";
-import { FaHourglassHalf } from "react-icons/fa";
 import cogoToast from "cogo-toast";
 import { COMPANY_INFOS } from "form/company/query";
 import RedErrorMessage from "common/components/RedErrorMessage";
@@ -88,7 +87,7 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
                     className="btn btn--primary tw-mt-2"
                     type="submit"
                   >
-                    {loading ? <FaHourglassHalf /> : "Valider"}
+                    {loading ? "Chargement..." : "Valider"}
                   </button>
                 </div>
               </div>

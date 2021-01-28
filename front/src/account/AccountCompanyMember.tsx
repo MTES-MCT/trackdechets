@@ -1,6 +1,6 @@
 import React from "react";
 import { gql, useMutation } from "@apollo/client";
-import { FaTimes, FaEnvelope } from "react-icons/fa";
+import { IconTrash, IconEmailActionUnread } from "common/components/Icons";
 import styles from "./AccountCompanyMember.module.scss";
 import cogoToast from "cogo-toast";
 import {
@@ -121,7 +121,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
                 });
               }}
             >
-              <FaTimes /> Retirer les droits
+              <IconTrash /> Retirer les droits
             </button>
           </td>
         )}
@@ -136,7 +136,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
                   });
                 }}
               >
-                <FaTimes /> Supprimer l'invitation
+                <IconTrash /> Supprimer l'invitation
               </button>
             </td>
             <td className={styles["right-column"]}>
@@ -148,7 +148,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
                   });
                 }}
               >
-                <FaEnvelope /> Renvoyer l'invitation
+                <IconEmailActionUnread /> Renvoyer l'invitation
               </button>
             </td>
           </>

@@ -1396,11 +1396,10 @@ export type PrivateCompanyInput = {
   codeNaf: Maybe<Scalars["String"]>;
   /** Nom de l'établissement */
   companyName: Maybe<Scalars["String"]>;
-  /**
-   * Liste de documents permettant de démontrer l'appartenance
-   * de l'utilisateur à l'établissement
-   */
-  documentKeys: Maybe<Array<Maybe<Scalars["String"]>>>;
+  /** Nom d'usage de l'établissement */
+  givenName: Maybe<Scalars["String"]>;
+  /** Adresse de l'établissement */
+  address: Maybe<Scalars["String"]>;
   /** Récipissé transporteur (le cas échéant, pour les profils transporteur) */
   transporterReceiptId: Maybe<Scalars["String"]>;
   /** Récipissé négociant (le cas échéant, pour les profils négociant) */
@@ -2824,7 +2823,8 @@ export function createPrivateCompanyInputMock(
     companyTypes: [],
     codeNaf: null,
     companyName: null,
-    documentKeys: null,
+    givenName: null,
+    address: null,
     transporterReceiptId: null,
     traderReceiptId: null,
     ecoOrganismeAgreements: null,

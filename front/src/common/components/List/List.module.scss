@@ -1,0 +1,28 @@
+.ListUnstyled,
+.ListInline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ListInline {
+  display: flex;
+
+  & > * {
+    &:not(:last-child) {
+      margin-right: 1rem;
+    }
+  }
+}
+
+.ListItemWithIcon {
+  display: flex;
+  margin-bottom: 1rem;
+}
+.ListItemStartIcon {
+  font-size: 1.25rem;
+  padding-right: 0.5rem;
+}
+.ListItemContent {
+  flex: 1;
+}
