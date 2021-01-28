@@ -48,10 +48,7 @@ export type ReceivedInfoValues = {
 
 const validationSchema = (form: TdForm) =>
   yup.object({
-    wasteAcceptationStatus: yup
-      .string()
-      .nullable()
-      .required("Le statut d'acceptation du lot est un champ requis"),
+    wasteAcceptationStatus: yup.string().nullable(),
     quantityReceived: yup
       .number()
       .nullable()
@@ -73,7 +70,6 @@ const validationSchema = (form: TdForm) =>
     signedAt: yup
       .date()
       .nullable()
-      .required("La date de signature est un champ requis")
       .transform(value => startOfDay(parseDate(value))),
   });
 
