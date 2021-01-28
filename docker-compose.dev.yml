@@ -16,6 +16,8 @@ services:
     restart: always
     sysctls:
       - net.core.somaxconn=511
+    ports:
+      - "6379:6379"
 
   td-api:
     image: td-api
@@ -25,17 +27,15 @@ services:
     command: npm run dev
     volumes:
       - ./back/src:/usr/src/app/src
+      - ./doc/docs:/usr/src/doc/docs
+      - ./front/src/generated:/usr/src/front/src/generated
       - ./back/prisma:/usr/src/app/prisma
-      - ./doc/docs:/usr/src/app/documentation
-      - ./front/src/generated:/usr/src/app/front/generated
     env_file:
       - .env
     environment:
       NODE_ENV: dev
-      DATABASE_URL: $DATABASE_URL
-      VIRTUAL_HOST: $API_HOST
-      LETSENCRYPT_HOST: $API_HOST
-      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
+    ports:
+      - "4000:80"
 
   td-ui:
     stdin_open: true
@@ -45,13 +45,10 @@ services:
     command: sh -c "npm install && npm start"
     expose:
       - "3000"
-    environment:
-      VIRTUAL_HOST: $UI_HOST
-      VIRTUAL_PORT: 3000
-      LETSENCRYPT_HOST: $UI_HOST
-      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
     volumes:
       - ./front/:/usr/src/front
+    ports:
+      - "3000:3000"
 
   td-doc:
     image: td-doc
@@ -66,16 +63,20 @@ services:
       - ./doc/website/sidebars.json:/app/website/sidebars.json
       - ./doc/website/siteConfig.js:/app/website/siteConfig.js
     working_dir: /app/website
+    ports:
+      - "5000:3000"
+
+  nginx:
+    image: nginx:1.19.6
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates
     environment:
-      VIRTUAL_HOST: $DEVELOPERS_HOST
-      VIRTUAL_PORT: 3000
-      LETSENCRYPT_HOST: $DEVELOPERS_HOST
-      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
+      API_HOST: $API_HOST
+      API_PORT: $API_PORT
+      UI_HOST: $UI_HOST
+      DEVELOPERS_HOST: $DEVELOPERS_HOST
+    ports:
+      - "80:80"
 
 volumes:
   postgres:
-
-networks:
-  default:
-    external:
-      name: nginx-proxy
