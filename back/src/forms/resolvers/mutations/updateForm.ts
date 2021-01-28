@@ -15,7 +15,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanUpdate, checkIsFormContributor } from "../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
-import { sealedFormSchema } from "../../validation";
+import { draftFormSchema, sealedFormSchema } from "../../validation";
 import { FormSirets } from "../../types";
 
 function validateArgs(args: MutationUpdateFormArgs) {
@@ -55,10 +55,11 @@ const updateFormResolver = async (
   };
 
   // Validate form input
-  await sealedFormSchema.validate(
-    { ...existingForm, ...formUpdateInput },
-    { context: { isDraft: existingForm.status === "DRAFT" } }
-  );
+  if (existingForm.status === "DRAFT") {
+    await draftFormSchema.validate({ ...existingForm, ...formUpdateInput });
+  } else {
+    await sealedFormSchema.validate({ ...existingForm, ...formUpdateInput });
+  }
 
   const isOrWillBeTempStorage =
     (existingForm.recipientIsTempStorage &&

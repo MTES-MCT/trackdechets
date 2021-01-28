@@ -1,4 +1,11 @@
 import * as yup from "yup";
+import { AnyObject } from "yup/lib/types";
+
+declare module "yup" {
+  interface BaseSchema<TCast = any, TContext = AnyObject, TOutput = any> {
+    requiredIf<T>(contextKey: string, message?: string): this;
+  }
+}
 
 export default function configureYup() {
   yup.setLocale({
@@ -9,15 +16,15 @@ export default function configureYup() {
     }
   });
 
-  yup.addMethod<yup.BaseSchema>(
-    yup.mixed,
-    "sealedRequired",
-    function sealedRequired(message?: string) {
-      return this.when("$isDraft", {
-        is: true,
-        then: s => s.nullable().notRequired(),
-        otherwise: s => s.nullable().required(message) // nullable to treat null as a missing value, not a type error
-      }).transform(val => (val === "" ? null : val));
+  yup.addMethod<yup.BaseSchema>(yup.mixed, "requiredIf", function requiredIf(
+    condition: boolean,
+    message?: string
+  ) {
+    if (condition) {
+      return this.nullable().notRequired();
     }
-  );
+
+    // nullable to treat null as a missing value, not a type error
+    return this.nullable().required(message);
+  });
 }

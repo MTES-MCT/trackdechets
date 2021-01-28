@@ -14,7 +14,7 @@ import {
   flattenFormInput,
   flattenTemporaryStorageDetailInput
 } from "../../form-converter";
-import { sealedFormSchema } from "../../validation";
+import { draftFormSchema } from "../../validation";
 import { checkIsFormContributor } from "../../permissions";
 import { FormSirets } from "../../types";
 
@@ -59,9 +59,7 @@ const createFormResolver = async (
     appendix2Forms: { connect: appendix2Forms }
   };
 
-  await sealedFormSchema.validate(formCreateInput, {
-    context: { isDraft: true }
-  });
+  await draftFormSchema.validate(formCreateInput);
 
   if (temporaryStorageDetail) {
     if (formContent.recipient?.isTempStorage !== true) {

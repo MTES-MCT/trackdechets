@@ -28,11 +28,11 @@ export async function sirenify(
   company: CompanyRow
 ): Promise<CompanyRow & CompanyInfo> {
   try {
-    const companyInfo = await getCompanyThrottled(company.siret);
+    const { naf: codeNaf, name } = await getCompanyThrottled(company.siret);
     return {
       ...company,
-      codeNaf: companyInfo.naf,
-      name: companyInfo.name
+      codeNaf,
+      name
     };
   } catch (err) {
     throw new Error(`SIRET ${company.siret} does not exist`);

@@ -1,5 +1,6 @@
 import { Form } from "@prisma/client";
 import {
+  draftFormSchema,
   sealedFormSchema,
   ecoOrganismeSchema,
   receivedInfoSchema
@@ -305,9 +306,7 @@ describe("draftFormSchema", () => {
   };
 
   it("should be valid when passing empty strings", () => {
-    const isValid = sealedFormSchema.isValidSync(form, {
-      context: { isDraft: true }
-    });
+    const isValid = draftFormSchema.isValidSync(form);
     expect(isValid).toBe(true);
   });
 
@@ -322,31 +321,23 @@ describe("draftFormSchema", () => {
       transporterCompanyMail: null,
       transporterValidityLimit: null
     };
-    const isValid = sealedFormSchema.isValidSync(form, {
-      context: { isDraft: true }
-    });
+    const isValid = draftFormSchema.isValidSync(form);
 
     expect(isValid).toBe(true);
   });
 
   it("should be valid when passing undefined values", () => {
-    const isValid = sealedFormSchema.isValidSync(
-      {},
-      { context: { isDraft: true } }
-    );
+    const isValid = draftFormSchema.isValidSync({});
 
     expect(isValid).toBe(true);
   });
 
   it("should not be valid when passing an invalid siret", async () => {
     const validateFn = () =>
-      sealedFormSchema.validate(
-        {
-          ...form,
-          emitterCompanySiret: "this is not a siret"
-        },
-        { context: { isDraft: true } }
-      );
+      draftFormSchema.validate({
+        ...form,
+        emitterCompanySiret: "this is not a siret"
+      });
 
     await expect(validateFn()).rejects.toThrow(
       "Émetteur: Le SIRET doit faire 14 caractères numériques"
@@ -355,13 +346,10 @@ describe("draftFormSchema", () => {
 
   it("should be invalid when passing an invalid waste code", async () => {
     const validateFn = () =>
-      sealedFormSchema.validate(
-        {
-          ...form,
-          wasteDetailsCode: "this is not a waste cde"
-        },
-        { context: { isDraft: true } }
-      );
+      draftFormSchema.validate({
+        ...form,
+        wasteDetailsCode: "this is not a waste cde"
+      });
 
     await expect(validateFn()).rejects.toThrow(
       "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement."
@@ -370,13 +358,10 @@ describe("draftFormSchema", () => {
 
   it("should be invalid when passing an invalid email", async () => {
     const validateFn = () =>
-      sealedFormSchema.validate(
-        {
-          ...form,
-          emitterCompanyMail: "this is not an email"
-        },
-        { context: { isDraft: true } }
-      );
+      draftFormSchema.validate({
+        ...form,
+        emitterCompanyMail: "this is not an email"
+      });
 
     await expect(validateFn()).rejects.toThrow(
       "emitterCompanyMail must be a valid email"
