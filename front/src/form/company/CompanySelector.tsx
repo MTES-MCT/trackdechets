@@ -90,14 +90,23 @@ export default function CompanySelector({
   const searchResults: CompanyFavorite[] = useMemo(
     () =>
       searchData?.searchCompanies.map(
-        ({ siret, name, address, transporterReceipt, traderReceipt }) => ({
+        ({
+          siret,
+          name,
+          address,
+          isRegistered,
+          companyTypes,
+          transporterReceipt,
+          traderReceipt,
+        }) => ({
           // convert CompanySearchResult to CompanyFavorite
           siret,
           name,
           address,
           transporterReceipt,
           traderReceipt,
-
+          isRegistered,
+          companyTypes,
           __typename: "CompanyFavorite",
           contact: "",
           phone: "",
