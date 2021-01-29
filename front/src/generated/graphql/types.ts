@@ -203,6 +203,11 @@ export type CompanyPublic = {
   installation: Maybe<Installation>;
   /** Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets */
   isRegistered: Maybe<Scalars["Boolean"]>;
+  /**
+   * Profil de l'établissement sur Trackdéchets
+   * Valeur à nulle si l'établissement n'est pas inscrit sur la plateforme `isRegistered=false`
+   */
+  companyTypes: Maybe<Array<CompanyType>>;
   /** Récépissé transporteur associé à cet établissement (le cas échéant) */
   transporterReceipt: Maybe<TransporterReceipt>;
   /** Récépissé négociant associé à cet établissement (le cas échant) */
@@ -224,8 +229,13 @@ export type CompanySearchResult = {
   codeCommune: Maybe<Scalars["String"]>;
   /** Nom de l'établissement */
   name: Maybe<Scalars["String"]>;
-  /** Profil de l'établissement */
-  companyTypes: Maybe<Array<Maybe<CompanyType>>>;
+  /** Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets */
+  isRegistered: Maybe<Scalars["Boolean"]>;
+  /**
+   * Profil de l'établissement sur Trackdéchets
+   * Valeur à nulle si l'établissement n'est pas inscrit sur la plateforme `isRegistered=false`
+   */
+  companyTypes: Maybe<Array<CompanyType>>;
   /** Code NAF */
   naf: Maybe<Scalars["String"]>;
   /** Libellé NAF */
@@ -2383,6 +2393,7 @@ export function createCompanyPublicMock(
     libelleNaf: null,
     installation: null,
     isRegistered: null,
+    companyTypes: null,
     transporterReceipt: null,
     traderReceipt: null,
     ecoOrganismeAgreements: [],
@@ -2400,6 +2411,7 @@ export function createCompanySearchResultMock(
     address: null,
     codeCommune: null,
     name: null,
+    isRegistered: null,
     companyTypes: null,
     naf: null,
     libelleNaf: null,

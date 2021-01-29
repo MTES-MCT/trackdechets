@@ -213,6 +213,11 @@ export type CompanyPublic = {
   installation?: Maybe<Installation>;
   /** Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets */
   isRegistered?: Maybe<Scalars["Boolean"]>;
+  /**
+   * Profil de l'établissement sur Trackdéchets
+   * Valeur à nulle si l'établissement n'est pas inscrit sur la plateforme `isRegistered=false`
+   */
+  companyTypes?: Maybe<Array<CompanyType>>;
   /** Récépissé transporteur associé à cet établissement (le cas échéant) */
   transporterReceipt?: Maybe<TransporterReceipt>;
   /** Récépissé négociant associé à cet établissement (le cas échant) */
@@ -234,8 +239,13 @@ export type CompanySearchResult = {
   codeCommune?: Maybe<Scalars["String"]>;
   /** Nom de l'établissement */
   name?: Maybe<Scalars["String"]>;
-  /** Profil de l'établissement */
-  companyTypes?: Maybe<Array<Maybe<CompanyType>>>;
+  /** Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets */
+  isRegistered?: Maybe<Scalars["Boolean"]>;
+  /**
+   * Profil de l'établissement sur Trackdéchets
+   * Valeur à nulle si l'établissement n'est pas inscrit sur la plateforme `isRegistered=false`
+   */
+  companyTypes?: Maybe<Array<CompanyType>>;
   /** Code NAF */
   naf?: Maybe<Scalars["String"]>;
   /** Libellé NAF */
@@ -2390,6 +2400,7 @@ export type ResolversTypes = {
   WasteType: WasteType;
   Declaration: ResolverTypeWrapper<Declaration>;
   GerepType: GerepType;
+  CompanyType: CompanyType;
   TransporterReceipt: ResolverTypeWrapper<TransporterReceipt>;
   TraderReceipt: ResolverTypeWrapper<TraderReceipt>;
   URL: ResolverTypeWrapper<Scalars["URL"]>;
@@ -2409,7 +2420,6 @@ export type ResolversTypes = {
   UserRole: UserRole;
   User: ResolverTypeWrapper<User>;
   CompanyPrivate: ResolverTypeWrapper<CompanyPrivate>;
-  CompanyType: CompanyType;
   CompanyMember: ResolverTypeWrapper<CompanyMember>;
   MembershipRequest: ResolverTypeWrapper<MembershipRequest>;
   MembershipRequestStatus: MembershipRequestStatus;
@@ -2719,6 +2729,11 @@ export type CompanyPublicResolvers<
     ParentType,
     ContextType
   >;
+  companyTypes?: Resolver<
+    Maybe<Array<ResolversTypes["CompanyType"]>>,
+    ParentType,
+    ContextType
+  >;
   transporterReceipt?: Resolver<
     Maybe<ResolversTypes["TransporterReceipt"]>,
     ParentType,
@@ -2754,8 +2769,13 @@ export type CompanySearchResultResolvers<
     ContextType
   >;
   name?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  isRegistered?: Resolver<
+    Maybe<ResolversTypes["Boolean"]>,
+    ParentType,
+    ContextType
+  >;
   companyTypes?: Resolver<
-    Maybe<Array<Maybe<ResolversTypes["CompanyType"]>>>,
+    Maybe<Array<ResolversTypes["CompanyType"]>>,
     ParentType,
     ContextType
   >;
@@ -4209,6 +4229,7 @@ export function createCompanyPublicMock(
     libelleNaf: null,
     installation: null,
     isRegistered: null,
+    companyTypes: null,
     transporterReceipt: null,
     traderReceipt: null,
     ecoOrganismeAgreements: [],
@@ -4226,6 +4247,7 @@ export function createCompanySearchResultMock(
     address: null,
     codeCommune: null,
     name: null,
+    isRegistered: null,
     companyTypes: null,
     naf: null,
     libelleNaf: null,

@@ -1540,6 +1540,16 @@ Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>companyTypes</strong></td>
+<td valign="top">[<a href="#companytype">CompanyType</a>!]</td>
+<td>
+
+Profil de l'établissement sur Trackdéchets
+Valeur à nulle si l'établissement n'est pas inscrit sur la plateforme `isRegistered=false`
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>transporterReceipt</strong></td>
 <td valign="top"><a href="#transporterreceipt">TransporterReceipt</a></td>
 <td>
@@ -1629,11 +1639,21 @@ Nom de l'établissement
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>companyTypes</strong></td>
-<td valign="top">[<a href="#companytype">CompanyType</a>]</td>
+<td colspan="2" valign="top"><strong>isRegistered</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
 <td>
 
-Profil de l'établissement
+Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>companyTypes</strong></td>
+<td valign="top">[<a href="#companytype">CompanyType</a>!]</td>
+<td>
+
+Profil de l'établissement sur Trackdéchets
+Valeur à nulle si l'établissement n'est pas inscrit sur la plateforme `isRegistered=false`
 
 </td>
 </tr>

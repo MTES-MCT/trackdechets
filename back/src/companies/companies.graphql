@@ -171,6 +171,12 @@ type CompanyPublic {
   isRegistered: Boolean
 
   """
+  Profil de l'établissement sur Trackdéchets
+  Valeur à nulle si l'établissement n'est pas inscrit sur la plateforme `isRegistered=false`
+  """
+  companyTypes: [CompanyType!]
+
+  """
   Récépissé transporteur associé à cet établissement (le cas échéant)
   """
   transporterReceipt: TransporterReceipt
@@ -203,8 +209,16 @@ type CompanySearchResult {
   "Nom de l'établissement"
   name: String
 
-  "Profil de l'établissement"
-  companyTypes: [CompanyType]
+  """
+  Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
+  """
+  isRegistered: Boolean
+
+  """
+  Profil de l'établissement sur Trackdéchets
+  Valeur à nulle si l'établissement n'est pas inscrit sur la plateforme `isRegistered=false`
+  """
+  companyTypes: [CompanyType!]
 
   "Code NAF"
   naf: String
