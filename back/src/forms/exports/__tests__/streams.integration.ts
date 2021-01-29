@@ -9,11 +9,9 @@ describe("formsReader", () => {
     const user = await userFactory();
 
     // create 10 forms
-    const formsPromise = Array(10)
-      .fill(1)
-      .map(() => formFactory({ ownerId: user.id }));
-
-    await Promise.all(formsPromise);
+    for (let i = 0; i < 10; i++) {
+      await formFactory({ ownerId: user.id });
+    }
 
     // read forms by chunk of 2
     const reader = formsReader({ chunk: 2 });
@@ -25,7 +23,7 @@ describe("formsReader", () => {
     });
 
     // wait until all chunks are consumed
-    await new Promise(resolve => {
+    await new Promise<void>(resolve => {
       reader.on("end", () => resolve());
     });
 

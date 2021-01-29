@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { CompanyType, User } from "@prisma/client";
 import fs from "fs";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import os from "os";
@@ -9,7 +9,11 @@ import {
   associateUserToCompany,
   createAccessToken
 } from "../../../users/database";
-import { companyFactory, userFactory } from "../../../__tests__/factories";
+import {
+  companyFactory,
+  destinationFactory,
+  userFactory
+} from "../../../__tests__/factories";
 
 // Ce fichier de tests illustre l'utilisation de l'API GraphQL Trackdéchets
 // dans les exemples de situation décrits dans la notice explicative
@@ -102,7 +106,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     await associateUserToCompany(producteurUser.id, producteur.siret, "MEMBER");
 
     // Installation d'incinération
-    const traiteur = await companyFactory({
+    const traiteur = await destinationFactory({
       siret: "22222222222222",
       name: "Incinérateur du Grand Est"
     });
@@ -415,7 +419,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       );
 
       // Installation d'incinération
-      const traiteur = await companyFactory({
+      const traiteur = await destinationFactory({
         siret: "22222222222222",
         name: "Incinérateur du Grand Est"
       });
@@ -642,7 +646,8 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     // Installation d'entreposage provisoire
     const entreposage = await companyFactory({
       siret: "22222222222222",
-      name: "Entreposage & Reconditionnement"
+      name: "Entreposage & Reconditionnement",
+      companyTypes: { set: [CompanyType.COLLECTOR] }
     });
     // Avec un utilisateur membre
     const entreprosageUser = await userFactory();
@@ -653,7 +658,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     );
 
     // Installation d'incinération
-    const traiteur = await companyFactory({
+    const traiteur = await destinationFactory({
       siret: "33333333333333",
       name: "Incinérateur du Grand Est"
     });
@@ -1183,7 +1188,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     await associateUserToCompany(producteurUser.id, producteur.siret, "MEMBER");
 
     // Installation d'incinération
-    const traiteur = await companyFactory({
+    const traiteur = await destinationFactory({
       siret: "22222222222222",
       name: "Incinérateur du Grand Est"
     });
