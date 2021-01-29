@@ -999,7 +999,7 @@ async function checkDestination(siret: string) {
  * Check company in frame 2 is registered with profile
  * COLLECTOR or WASTE_PROCESSOR or throw error
  */
-export async function checkDestinationAfterTempStorage(siret: string) {
+async function checkDestinationAfterTempStorage(siret: string) {
   // check company in frame 14 is registered in Trackdechets
   const company = await prisma.company.findUnique({
     where: { siret }
@@ -1031,9 +1031,9 @@ export async function checkDestinationAfterTempStorage(siret: string) {
  * (producer, trader, destination, etc)
  *
  * For the time beeing we are only checking companies in frame 2 and 14
- * (if any). They should be registered as COLLECTOR (TTR) or WASTE_PROCESSOR
+ * (if any). They should be registered as COLLECTOR (TTR) or WASTEPROCESSOR
  */
-export async function checkCompaniesProfile(form: Form) {
+export async function checkCompaniesType(form: Form) {
   await checkDestination(form.recipientCompanySiret);
 
   const temporaryStorageDetail = await prisma.form

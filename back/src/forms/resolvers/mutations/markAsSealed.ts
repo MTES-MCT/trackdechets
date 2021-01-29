@@ -4,7 +4,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
 import { expandFormFromDb } from "../../form-converter";
 import { checkCanMarkAsSealed } from "../../permissions";
-import { checkCanBeSealed, checkCompaniesProfile } from "../../validation";
+import { checkCanBeSealed, checkCompaniesType } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 
@@ -20,8 +20,8 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   // validate form data
   await checkCanBeSealed(form);
 
-  // check companies profile in TD
-  await checkCompaniesProfile(form);
+  // check companies type in TD
+  await checkCompaniesType(form);
 
   const sealedForm = await transitionForm(user, form, {
     type: EventType.MarkAsSealed

@@ -459,14 +459,15 @@ describe("Mutation.markAsSealed", () => {
     const { user, company: emitterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
-    const producer = await companyFactory({
+    const destination = await companyFactory({
+      // assume profile is not COLLECTOR or WASTEPROCESSOR
       companyTypes: { set: [CompanyType.PRODUCER] }
     });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: producer.siret
+        recipientCompanySiret: destination.siret
       }
     });
     const { mutate } = makeClient(user);
@@ -476,7 +477,7 @@ describe("Mutation.markAsSealed", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination ou d’entreposage ou de reconditionnement prévue ${producer.siret}
+        message: `L'installation de destination ou d’entreposage ou de reconditionnement prévue ${destination.siret}
       n'est pas inscrite sur Trackdéchets en tant que qu'installation de traitement ou de tri transit regroupement.
       Cette installation ne peut donc pas être visée en case 2 du bordereau. Veuillez vous rapprocher de l'administrateur
       de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
@@ -491,7 +492,8 @@ describe("Mutation.markAsSealed", () => {
     const collector = await companyFactory({
       companyTypes: { set: [CompanyType.COLLECTOR] }
     });
-    const producer = await companyFactory({
+    const destination = await companyFactory({
+      // assume profile is not COLLECTOR or WASTEPROCESSOR
       companyTypes: { set: [CompanyType.PRODUCER] }
     });
     const form = await formWithTempStorageFactory({
@@ -505,7 +507,7 @@ describe("Mutation.markAsSealed", () => {
       where: { id: form.id },
       data: {
         temporaryStorageDetail: {
-          update: { destinationCompanySiret: producer.siret }
+          update: { destinationCompanySiret: destination.siret }
         }
       }
     });
@@ -515,7 +517,7 @@ describe("Mutation.markAsSealed", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination prévue après entreposage provisoire ou reconditionnement ${producer.siret}
+        message: `L'installation de destination prévue après entreposage provisoire ou reconditionnement ${destination.siret}
       n'est pas inscrite sur Trackdéchets en tant que qu'installation de traitement ou de tri transit regroupement.
       Cette installation ne peut donc pas être visée en case 14 du bordereau. Veuillez vous rapprocher de l'administrateur
       de cette installation pour qu'il modifie le profil de l'installation depuis l'interface Trackdéchets Mon Compte > Établissements`

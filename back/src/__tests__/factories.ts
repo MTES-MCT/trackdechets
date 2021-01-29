@@ -265,16 +265,20 @@ export const formFactory = async ({
 
 export const formWithTempStorageFactory = async ({
   ownerId,
-  opt = {}
+  opt = {},
+  tempStorageOpts = {}
 }: {
   ownerId: string;
   opt?: Partial<Prisma.FormCreateInput>;
+  tempStorageOpts?: Partial<Prisma.TemporaryStorageDetailCreateInput>;
 }) => {
   return formFactory({
     ownerId,
     opt: {
       recipientIsTempStorage: true,
-      temporaryStorageDetail: { create: tempStorageData },
+      temporaryStorageDetail: {
+        create: { ...tempStorageData, ...tempStorageOpts }
+      },
       ...opt
     }
   });
