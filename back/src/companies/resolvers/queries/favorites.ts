@@ -209,7 +209,20 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
   // Return up to 10 results
   favorites.splice(10);
 
-  return favorites;
+  return favorites.map(async f => {
+    // check if company is registered in Trackdechets and add companyTypes
+    const tdCompany = await prisma.company.findUnique({
+      where: { siret: f.siret },
+      select: {
+        companyTypes: true
+      }
+    });
+    return {
+      ...f,
+      isRegistered: !!tdCompany,
+      companyTypes: tdCompany?.companyTypes
+    };
+  });
 };
 
 export default favoritesResolver;

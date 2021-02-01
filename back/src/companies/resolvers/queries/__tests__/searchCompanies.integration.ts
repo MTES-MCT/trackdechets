@@ -15,15 +15,14 @@ describe("query { searchCompanies(clue, department) }", () => {
 
   const { query } = makeClient(null);
   it("should return list of companies based on clue", async () => {
-    searchCompanySpy.mockResolvedValueOnce([
-      {
-        siret: "85001946400013",
-        address: "4 Boulevard Longchamp 13001 Marseille",
-        name: "CODE EN STOCK",
-        naf: "6201Z",
-        libelleNaf: "Programmation informatique"
-      }
-    ]);
+    const company = {
+      siret: "85001946400013",
+      address: "4 Boulevard Longchamp 13001 Marseille",
+      name: "CODE EN STOCK",
+      naf: "6201Z",
+      libelleNaf: "Programmation informatique"
+    };
+    searchCompanySpy.mockResolvedValueOnce([company]);
 
     const gqlQuery = `
       query {
@@ -44,6 +43,17 @@ describe("query { searchCompanies(clue, department) }", () => {
     const response = await query<any>(gqlQuery);
     const companies = response.data.searchCompanies;
     expect(companies).toHaveLength(1);
+    expect(companies).toEqual([
+      expect.objectContaining({
+        siret: company.siret,
+        address: company.address,
+        name: company.name,
+        isRegistered: false,
+        companyTypes: null,
+        naf: company.naf,
+        installation: null
+      })
+    ]);
   });
 
   it("should merge info from SIRENE, TD and ICPE", async () => {
