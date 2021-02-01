@@ -19,7 +19,10 @@ import {
   Packagings,
   Consistence,
   WasteAcceptationStatusInput as WasteAcceptationStatus,
+  CompanyType,
 } from "generated/graphql/types";
+import graphlClient from "../graphql-client";
+import { COMPANY_INFOS } from "./company/query";
 
 setLocale({
   mixed: {
@@ -105,7 +108,38 @@ export const formSchema = object().shape({
         (v: string) => v !== ""
       ),
     cap: string().nullable(true),
-    company: companySchema,
+    company: companySchema.concat(
+      object().shape({
+        siret: string().test(
+          "is-registered",
+          `Cet établissement n'est pas inscrit sur Trackdéchets ou son profil
+          ne lui permet pas d'être destinataire du bordereau. Seul les établissements
+          inscrits sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement
+          peuvent apparaitre en tant que destinataire sur le bordereau`,
+          async value => {
+            if (value) {
+              const { data } = await graphlClient.query({
+                query: COMPANY_INFOS,
+                variables: { siret: value },
+              });
+              // it should be registered to TD
+              if (data.companyInfos?.isRegistered === false) {
+                return false;
+              }
+              if (data.companyInfos?.companyTypes) {
+                // it should be COLLECTOR or WASTEPROCESSOR
+                return data.companyInfos?.companyTypes.some(companyType =>
+                  [CompanyType.Collector, CompanyType.Wasteprocessor].includes(
+                    companyType
+                  )
+                );
+              }
+            }
+            return true;
+          }
+        ),
+      })
+    ),
   }),
   transporter: object().shape({
     isExemptedOfReceipt: boolean().nullable(true),
