@@ -10,6 +10,7 @@ import AccountFieldCompanyGivenName, {
 import { CompanyPrivate, UserRole, CompanyType } from "generated/graphql/types";
 import AccountFieldCompanyTransporterReceipt from "./fields/AccountFieldCompanyTransporterReceipt";
 import AccountFieldCompanyTraderReceipt from "./fields/AccountFieldCompanyTraderReceipt";
+import AccountFieldCompanyBrokerReceipt from "./fields/AccountFieldCompanyBrokerReceipt";
 
 type Props = { company: CompanyPrivate };
 
@@ -28,6 +29,7 @@ AccountCompanyInfo.fragments = {
       ...AccountFieldCompanyGivenNameFragment
       ...AccountFieldCompanyTransporterReceiptFragment
       ...AccountFieldCompanyTraderReceiptFragment
+      ...AccountFieldCompanyBrokerReceiptFragment
       installation {
         urlFiche
       }
@@ -37,6 +39,7 @@ AccountCompanyInfo.fragments = {
     ${AccountFieldCompanyGivenName.fragments.company}
     ${AccountFieldCompanyTransporterReceipt.fragments.company}
     ${AccountFieldCompanyTraderReceipt.fragments.company}
+    ${AccountFieldCompanyBrokerReceipt.fragments.company}
   `,
 };
 
@@ -93,6 +96,14 @@ export default function AccountCompanyInfo({ company }: Props) {
         <AccountFieldCompanyTraderReceipt
           company={filter(
             AccountFieldCompanyTraderReceipt.fragments.company,
+            company
+          )}
+        />
+      )}
+      {company.companyTypes.includes(CompanyType.Broker) && (
+        <AccountFieldCompanyBrokerReceipt
+          company={filter(
+            AccountFieldCompanyBrokerReceipt.fragments.company,
             company
           )}
         />

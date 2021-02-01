@@ -98,6 +98,18 @@ const traderFragment = gql`
   ${companyFragment}
 `;
 
+const brokerFragment = gql`
+  fragment BrokerFragment on Broker {
+    receipt
+    department
+    validityLimit
+    company {
+      ...CompanyFragment
+    }
+  }
+  ${companyFragment}
+`;
+
 export const temporaryStorageDetailFragment = gql`
   fragment TemporaryStorageDetailFragment on TemporaryStorageDetail {
     temporaryStorer {
@@ -180,6 +192,9 @@ const mutableFieldsFragment = gql`
     trader {
       ...TraderFragment
     }
+    broker {
+      ...BrokerFragment
+    }
     wasteDetails {
       ...WasteDetailsFragment
     }
@@ -196,6 +211,7 @@ const mutableFieldsFragment = gql`
   }
 
   ${traderFragment}
+  ${brokerFragment}
   ${transporterFragment}
   ${temporaryStorageDetailFragment}
   ${wasteDetailsFragment}

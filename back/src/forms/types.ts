@@ -14,6 +14,7 @@ export type FormSirets = Pick<
   | "recipientCompanySiret"
   | "transporterCompanySiret"
   | "traderCompanySiret"
+  | "brokerCompanySiret"
   | "ecoOrganismeSiret"
 > & {
   temporaryStorageDetail?: Pick<

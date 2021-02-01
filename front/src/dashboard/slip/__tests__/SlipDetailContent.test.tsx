@@ -87,6 +87,20 @@ const simpleForm: Form = {
       mail: "",
     },
   },
+  broker: {
+    receipt: "",
+    department: "",
+    validityLimit: null,
+    company: {
+      name: "",
+      siret: "",
+      address: "",
+      contact: "",
+      country: "FR",
+      phone: "",
+      mail: "",
+    },
+  },
   wasteDetails: {
     code: "09 01 01*",
     name: "some waste",
@@ -224,6 +238,20 @@ const tempStorageForm: Form = {
     },
   },
   trader: {
+    receipt: "",
+    department: "",
+    validityLimit: null,
+    company: {
+      name: "",
+      siret: "",
+      address: "",
+      contact: "",
+      country: "FR",
+      phone: "",
+      mail: "",
+    },
+  },
+  broker: {
     receipt: "",
     department: "",
     validityLimit: null,

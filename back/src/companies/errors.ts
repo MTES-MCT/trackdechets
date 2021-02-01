@@ -12,6 +12,12 @@ export class TraderReceiptNotFound extends UserInputError {
   }
 }
 
+export class BrokerReceiptNotFound extends UserInputError {
+  constructor() {
+    super(`Ce récépissé courtier n'existe pas`);
+  }
+}
+
 export class TransporterReceiptNotFound extends UserInputError {
   constructor() {
     super(`Ce récépissé transporteur n'existe pas`);

@@ -7,6 +7,7 @@ import { User, Prisma, Company } from "@prisma/client";
 import {
   CompanyNotFound,
   TraderReceiptNotFound,
+  BrokerReceiptNotFound,
   TransporterReceiptNotFound
 } from "./errors";
 import { CompanyMember } from "../generated/graphql/types";
@@ -182,6 +183,16 @@ export async function getTraderReceiptOrNotFound({
   const receipt = await prisma.traderReceipt.findUnique({ where: { id } });
   if (receipt == null) {
     throw new TraderReceiptNotFound();
+  }
+  return receipt;
+}
+
+export async function getBrokerReceiptOrNotFound({
+  id
+}: Prisma.BrokerReceiptWhereUniqueInput) {
+  const receipt = await prisma.brokerReceipt.findUnique({ where: { id } });
+  if (receipt == null) {
+    throw new BrokerReceiptNotFound();
   }
   return receipt;
 }

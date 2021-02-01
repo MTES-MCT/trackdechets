@@ -15,6 +15,7 @@ enum CompanyType {
   WASTE_VEHICLES
   WASTE_CENTER
   TRADER
+  BROKER
   ECO_ORGANISME
 }
 
@@ -154,6 +155,8 @@ model Company {
   companyTypes           CompanyType[]
   traderReceiptId        String?
   traderReceipt          TraderReceipt?       @relation(fields: [traderReceiptId], references: [id])
+  brokerReceiptId        String?
+  brokerReceipt          BrokerReceipt?       @relation(fields: [brokerReceiptId], references: [id])
   transporterReceiptId   String?
   transporterReceipt     TransporterReceipt?  @relation(fields: [transporterReceiptId], references: [id])
   CompanyAssociation     CompanyAssociation[]
@@ -268,6 +271,15 @@ model Form {
   traderReceipt                      String?
   traderDepartment                   String?
   traderValidityLimit                DateTime?
+  brokerCompanyName                  String?
+  brokerCompanySiret                 String?
+  brokerCompanyAddress               String?
+  brokerCompanyContact               String?
+  brokerCompanyPhone                 String?
+  brokerCompanyMail                  String?
+  brokerReceipt                      String?
+  brokerDepartment                   String?
+  brokerValidityLimit                DateTime?
   processingOperationDescription     String?
   noTraceability                     Boolean?
   signedByTransporter                Boolean?
@@ -432,6 +444,13 @@ model TraderReceipt {
   validityLimit DateTime
   department    String
   Company       Company[]
+}
+
+model BrokerReceipt {
+  id            String    @id @default(cuid())
+  receiptNumber String
+  validityLimit DateTime
+  department    String
 }
 
 model TransporterReceipt {

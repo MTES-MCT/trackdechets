@@ -165,6 +165,9 @@ input CreateFormInput {
   "Négociant (case 7)"
   trader: TraderInput
 
+  "Courtier"
+  broker: BrokerInput
+
   "Annexe 2"
   appendix2Forms: [AppendixFormInput!]
   ecoOrganisme: EcoOrganismeInput
@@ -202,6 +205,9 @@ input UpdateFormInput {
   "Négociant (case 7)"
   trader: TraderInput
 
+  "Courtier"
+  broker: BrokerInput
+
   "Annexe 2"
   appendix2Forms: [AppendixFormInput!]
   ecoOrganisme: EcoOrganismeInput
@@ -238,6 +244,9 @@ input FormInput {
 
   "Négociant (case 7)"
   trader: TraderInput
+
+  "Courtier"
+  broker: BrokerInput
 
   "Annexe 2"
   appendix2Forms: [AppendixFormInput!]
@@ -416,6 +425,21 @@ input TraderInput {
   validityLimit: DateTime
 
   "Établissement négociant"
+  company: CompanyInput
+}
+
+"Payload lié au courtier"
+input BrokerInput {
+  "N° de récipissé"
+  receipt: String
+
+  "Département"
+  department: String
+
+  "Limite de validité"
+  validityLimit: DateTime
+
+  "Établissement courtier"
   company: CompanyInput
 }
 
@@ -601,6 +625,9 @@ input ImportPaperFormInput {
 
   "Négociant (case 7)"
   trader: TraderInput
+
+  "Courtier"
+  broker: BrokerInput
 
   "Éco-organisme (apparait en case 1)"
   ecoOrganisme: EcoOrganismeInput

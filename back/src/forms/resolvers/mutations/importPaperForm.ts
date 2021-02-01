@@ -42,14 +42,16 @@ async function updateForm(user: User, form: Form, input: ImportPaperFormInput) {
     emitterCompanySiret,
     recipientCompanySiret,
     transporterCompanySiret,
-    traderCompanySiret
+    traderCompanySiret,
+    brokerCompanySiret
   } = validationData;
 
   if (
     emitterCompanySiret != form.emitterCompanySiret ||
     recipientCompanySiret != form.recipientCompanySiret ||
     transporterCompanySiret != form.transporterCompanySiret ||
-    traderCompanySiret != form.traderCompanySiret
+    traderCompanySiret != form.traderCompanySiret ||
+    brokerCompanySiret != form.brokerCompanySiret
   ) {
     throw new UserInputError(
       "Vous ne pouvez pas mettre à jour les numéros SIRET des établissements présents sur le BSD"

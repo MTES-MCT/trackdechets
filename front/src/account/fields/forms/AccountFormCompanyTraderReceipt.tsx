@@ -111,7 +111,7 @@ export default function AccountFormCompanyTransporterReceipt({
       }
     : {
         receiptNumber: "",
-        validityLimit: "",
+        validityLimit: new Date().toISOString(),
         department: "",
       };
 

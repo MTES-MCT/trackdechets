@@ -4,7 +4,8 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "./company/CompanySelector";
 import DateInput from "./custom-inputs/DateInput";
 import {
-  getInitalTrader,
+  getInitialTrader,
+  getInitialBroker,
   getInitialTemporaryStorageDetail,
 } from "./initial-state";
 import { Form } from "generated/graphql/types";
@@ -14,12 +15,19 @@ import TdSwitch from "../common/components/Switch";
 
 import styles from "./Recipient.module.scss";
 import classNames from "classnames";
+import { RadioButton } from "./custom-inputs/RadioButton";
 
 export default function Recipient() {
   const { values, setFieldValue } = useFormikContext<Form>();
 
   const hasTrader = !!values.trader;
+  const hasBroker = !!values.broker;
   const isTempStorage = !!values.recipient?.isTempStorage;
+
+  function handleNoneToggle() {
+    setFieldValue("broker", null, false);
+    setFieldValue("trader", null, false);
+  }
 
   function handleTraderToggle() {
     if (hasTrader) {
@@ -27,7 +35,17 @@ export default function Recipient() {
       setFieldValue("trader", null, false);
     } else {
       // the switch is toggled on, set trader to initial value
-      setFieldValue("trader", getInitalTrader(), false);
+      setFieldValue("broker", null, false);
+      setFieldValue("trader", getInitialTrader(), false);
+    }
+  }
+
+  function handleBrokerToggle() {
+    if (hasBroker) {
+      setFieldValue("broker", null, false);
+    } else {
+      setFieldValue("trader", null, false);
+      setFieldValue("broker", getInitialBroker(), false);
     }
   }
 
@@ -98,11 +116,33 @@ export default function Recipient() {
         </label>
       </div>
       <div className="form__row">
-        <TdSwitch
-          checked={hasTrader}
-          onChange={handleTraderToggle}
-          label="Je suis passé par un négociant"
-        />
+        <div className="tw-flex">
+          <legend className="tw-font-semibold"> Intermédiaire :</legend>
+          <Field
+            name="intermediate"
+            id="NONE"
+            label="Aucun"
+            component={RadioButton}
+            onChange={handleNoneToggle}
+            checked={!hasTrader && !hasBroker}
+          />
+          <Field
+            name="intermediate"
+            id="TRADER"
+            component={RadioButton}
+            checked={hasTrader}
+            onChange={handleTraderToggle}
+            label="Je suis passé par un négociant"
+          />
+          <Field
+            name="intermediate"
+            id="BROKER"
+            label="Je suis passé par un courtier"
+            component={RadioButton}
+            checked={hasBroker}
+            onChange={handleBrokerToggle}
+          />
+        </div>
       </div>
       {hasTrader && (
         <div className="form__row">
@@ -166,6 +206,71 @@ export default function Recipient() {
             </label>
 
             <RedErrorMessage name="trader.validityLimit" />
+          </div>
+        </div>
+      )}
+      {hasBroker && (
+        <div className="form__row">
+          <h4 className="form__section-heading">Courtier</h4>
+          <CompanySelector
+            name="broker.company"
+            onCompanySelected={broker => {
+              if (broker.brokerReceipt) {
+                setFieldValue(
+                  "broker.receipt",
+                  broker.brokerReceipt.receiptNumber
+                );
+                setFieldValue(
+                  "broker.validityLimit",
+                  broker.brokerReceipt.validityLimit
+                );
+                setFieldValue(
+                  "broker.department",
+                  broker.brokerReceipt.department
+                );
+              } else {
+                setFieldValue("broker.receipt", "");
+                setFieldValue("broker.validityLimit", null);
+                setFieldValue("broker.department", "");
+              }
+            }}
+          />
+
+          <div className="form__row">
+            <label>
+              Numéro de récépissé
+              <Field type="text" name="broker.receipt" className="td-input" />
+            </label>
+
+            <RedErrorMessage name="broker.receipt" />
+          </div>
+          <div className="form__row">
+            <label>
+              Département
+              <Field
+                type="text"
+                name="broker.department"
+                placeholder="Ex: 83"
+                className={classNames("td-input", styles.recipientDepartment)}
+              />
+            </label>
+
+            <RedErrorMessage name="broker.department" />
+          </div>
+          <div className="form__row">
+            <label>
+              Limite de validité
+              <Field
+                component={DateInput}
+                name="broker.validityLimit"
+                className={classNames(
+                  "td-input",
+                  styles.recipientValidityLimit
+                )}
+              />
+            </label>
+
+            <RedErrorMessage name="broker.validityLimit" />
           </div>
         </div>
       )}

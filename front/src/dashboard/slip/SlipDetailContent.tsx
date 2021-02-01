@@ -198,6 +198,35 @@ const Trader = ({ trader }) => (
     </div>
   </>
 );
+const Broker = ({ broker }) => (
+  <>
+    <div className={styles.detailColumns}>
+      <div className={styles.detailGrid}>
+        <dt>Courtier</dt>
+        <dd>{broker.company?.name}</dd>
+
+        <dt>Siret</dt>
+        <dd>{broker.company?.siret}</dd>
+
+        <dt>Adresse</dt>
+        <dd>{broker.company?.address}</dd>
+
+        <dt>Tél</dt>
+        <dd>{broker.company?.phone}</dd>
+
+        <dt>Mél</dt>
+        <dd>{broker.company?.mail}</dd>
+
+        <dt>Contact</dt>
+      </div>
+      <div className={styles.detailGrid}>
+        <DetailRow value={broker.receipt} label="Récépissé" />
+        <DetailRow value={broker.department} label="Départment" />
+        <DateRow value={broker.validityLimit} label="Date de validité" />
+      </div>
+    </div>
+  </>
+);
 const EcoOrganisme = ({ ecoOrganisme }) => (
   <div className={styles.detailGrid}>
     <dt>EcoOrganisme</dt>
@@ -343,6 +372,12 @@ export default function SlipDetailContent({
               <span className={styles.detailTabCaption}>Négociant</span>
             </Tab>
           )}
+          {!!form?.broker?.company?.name && (
+            <Tab className={styles.detailTab}>
+              <IconWarehousePackage size="25px" />
+              <span className={styles.detailTabCaption}>Courtier</span>
+            </Tab>
+          )}
           <Tab className={styles.detailTab}>
             <IconWarehouseDelivery size="25px" />
             <span className={styles.detailTabCaption}>
@@ -411,6 +446,12 @@ export default function SlipDetailContent({
           {!!form?.trader?.company?.name && (
             <TabPanel className={styles.detailTabPanel}>
               <Trader trader={form.trader} />
+            </TabPanel>
+          )}
+          {/* Broker tab panel */}
+          {!!form?.broker?.company?.name && (
+            <TabPanel className={styles.detailTabPanel}>
+              <Broker broker={form.broker} />
             </TabPanel>
           )}
           {/* Transporter tab panel */}

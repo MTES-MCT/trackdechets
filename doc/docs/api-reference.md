@@ -1155,6 +1155,108 @@ Utilisateur lié au token
 </tbody>
 </table>
 
+### Broker
+
+Courtier
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+
+Établissement courtier
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receipt</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+N° de récipissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Département
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Limite de validité
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BrokerReceipt
+
+Récépissé courtier
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receiptNumber</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Numéro de récépissé courtier
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Limite de validatié du récépissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Département ayant enregistré la déclaration
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### CompanyMember
 
 Information sur utilisateur au sein d'un établissement
@@ -1409,7 +1511,16 @@ Récépissé transporteur (le cas échéant, pour les profils transporteur)
 <td valign="top"><a href="#traderreceipt">TraderReceipt</a></td>
 <td>
 
-Récépissé négociant (le cas échéant, pour les profils transporteur)
+Récépissé négociant (le cas échéant, pour les profils négociant)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>brokerReceipt</strong></td>
+<td valign="top"><a href="#brokerreceipt">BrokerReceipt</a></td>
+<td>
+
+Récépissé courtier (le cas échéant, pour les profils courtier)
 
 </td>
 </tr>
@@ -1569,6 +1680,15 @@ Récépissé négociant associé à cet établissement (le cas échant)
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>brokerReceipt</strong></td>
+<td valign="top"><a href="#brokerreceipt">BrokerReceipt</a></td>
+<td>
+
+Récépissé courtier associé à cet établissement (le cas échant)
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>ecoOrganismeAgreements</strong></td>
 <td valign="top">[<a href="#url">URL</a>!]!</td>
 <td>
@@ -1682,6 +1802,15 @@ Récépissé transporteur associé à cet établissement (le cas échéant)
 <td>
 
 Récépissé négociant associé à cet établissement (le cas échant)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>brokerReceipt</strong></td>
+<td valign="top"><a href="#brokerreceipt">BrokerReceipt</a></td>
+<td>
+
+Récépissé courtier associé à cet établissement (le cas échant)
 
 </td>
 </tr>
@@ -2074,6 +2203,15 @@ Détails du déchet (case 3)
 <td>
 
 Négociant (case 7)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>broker</strong></td>
+<td valign="top"><a href="#broker">Broker</a></td>
+<td>
+
+Courtier
 
 </td>
 </tr>
@@ -3998,6 +4136,58 @@ Le readableId permet de le récupérer via la query form.
 </tbody>
 </table>
 
+### BrokerInput
+
+Payload lié au courtier
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>receipt</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+N° de récipissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Département
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Limite de validité
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td>
+
+Établissement courtier
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### CompanyInput
 
 Payload d'un établissement
@@ -4135,6 +4325,15 @@ Détails du déchet (case 3)
 <td>
 
 Négociant (case 7)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>broker</strong></td>
+<td valign="top"><a href="#brokerinput">BrokerInput</a></td>
+<td>
+
+Courtier
 
 </td>
 </tr>
@@ -4361,6 +4560,15 @@ Négociant (case 7)
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>broker</strong></td>
+<td valign="top"><a href="#brokerinput">BrokerInput</a></td>
+<td>
+
+Courtier
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>appendix2Forms</strong></td>
 <td valign="top">[<a href="#appendixforminput">AppendixFormInput</a>!]</td>
 <td>
@@ -4460,6 +4668,15 @@ Détails du déchet (case 3)
 <td>
 
 Négociant (case 7)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>broker</strong></td>
+<td valign="top"><a href="#brokerinput">BrokerInput</a></td>
+<td>
+
+Courtier
 
 </td>
 </tr>
@@ -5559,6 +5776,15 @@ Négociant (case 7)
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>broker</strong></td>
+<td valign="top"><a href="#brokerinput">BrokerInput</a></td>
+<td>
+
+Courtier
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>appendix2Forms</strong></td>
 <td valign="top">[<a href="#appendixforminput">AppendixFormInput</a>!]</td>
 <td>
@@ -5820,6 +6046,14 @@ Négociant
 </td>
 </tr>
 <tr>
+<td valign="top"><strong>BROKER</strong></td>
+<td>
+
+Courtier
+
+</td>
+</tr>
+<tr>
 <td valign="top"><strong>ECO_ORGANISME</strong></td>
 <td>
 
@@ -5957,6 +6191,14 @@ Les BSD's dont je suis l'émetteur
 <td>
 
 Les BSD's dont je suis le négociant
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>BROKER</strong></td>
+<td>
+
+Les BSD's dont je suis le courtier
 
 </td>
 </tr>
@@ -6184,6 +6426,14 @@ des déchets transportés ou collectés.
 
 Registre négociants
 Art 4: Les négociants tiennent à jour un registre chronologique des déchets détenus.
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>BROKERED</strong></td>
+<td>
+
+Registre courtier
 
 </td>
 </tr>

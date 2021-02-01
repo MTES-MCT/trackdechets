@@ -107,6 +107,10 @@ function getPossibleExportTypes(companies: CompanyPrivate[]) {
     exportTypes.push(FormsRegisterExportType.Traded);
   }
 
+  if (companyTypes.includes(CompanyType.Broker)) {
+    exportTypes.push(FormsRegisterExportType.Brokered);
+  }
+
   exportTypes.push(FormsRegisterExportType.All);
 
   return exportTypes;
@@ -240,6 +244,14 @@ export default function ExportsForm({ companies }: IProps) {
                   }
                 >
                   Négociant
+                </option>
+                <option
+                  value={FormsRegisterExportType.Brokered}
+                  disabled={
+                    !exportTypes.includes(FormsRegisterExportType.Brokered)
+                  }
+                >
+                  Courtier
                 </option>
                 <option value={FormsRegisterExportType.All}>Exhaustif</option>
               </Field>
