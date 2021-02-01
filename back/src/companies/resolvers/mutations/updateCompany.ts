@@ -20,6 +20,7 @@ export async function updateCompanyFn({
   givenName,
   transporterReceiptId,
   traderReceiptId,
+  brokerReceiptId,
   ecoOrganismeAgreements
 }: MutationUpdateCompanyArgs): Promise<CompanyPrivate> {
   const data = {
@@ -34,6 +35,9 @@ export async function updateCompanyFn({
       : {}),
     ...(traderReceiptId
       ? { traderReceipt: { connect: { id: traderReceiptId } } }
+      : {}),
+    ...(brokerReceiptId
+      ? { brokerReceipt: { connect: { id: brokerReceiptId } } }
       : {}),
     ...(ecoOrganismeAgreements != null
       ? {

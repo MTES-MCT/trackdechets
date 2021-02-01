@@ -38,6 +38,14 @@ function isFormTrader(user: { companies: Company[] }, form: FormSirets) {
   return sirets.includes(form.traderCompanySiret);
 }
 
+function isFormBroker(user: { companies: Company[] }, form: FormSirets) {
+  if (!form.brokerCompanySiret) {
+    return false;
+  }
+  const sirets = user.companies.map(c => c.siret);
+  return sirets.includes(form.brokerCompanySiret);
+}
+
 function isFormEcoOrganisme(user: { companies: Company[] }, form: FormSirets) {
   if (!form.ecoOrganismeSiret) {
     return false;
@@ -88,6 +96,7 @@ export async function isFormContributor(user: User, form: FormSirets) {
     isFormEmitter,
     isFormRecipient,
     isFormTrader,
+    isFormBroker,
     isFormTransporter,
     isFormEcoOrganisme,
     isFormTransporterAfterTempStorage,

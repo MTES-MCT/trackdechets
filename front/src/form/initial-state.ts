@@ -8,6 +8,7 @@ import {
   QuantityType,
   TemporaryStorageDetail,
   Trader,
+  Broker,
   WorkSite,
 } from "generated/graphql/types";
 
@@ -15,12 +16,25 @@ import {
  * Computes initial values for trader fields in Formik's form
  * by merging defaults with current state of the draft BSD (if any)
  */
-export function getInitalTrader(trader?: Trader | null) {
+export function getInitialTrader(trader?: Trader | null) {
   return {
     receipt: trader?.receipt ?? "",
     department: trader?.department ?? "",
     validityLimit: trader?.validityLimit ?? null,
     company: getInitialCompany(trader?.company),
+  };
+}
+
+/**
+ * Computes initial values for broker fields in Formik's form
+ * by merging defaults with current state of the draft BSD (if any)
+ */
+export function getInitialBroker(broker?: Broker | null) {
+  return {
+    receipt: broker?.receipt ?? "",
+    department: broker?.department ?? "",
+    validityLimit: broker?.validityLimit ?? null,
+    company: getInitialCompany(broker?.company),
   };
 }
 
@@ -119,6 +133,14 @@ export function getInitialState(f?: Form | null): FormInput {
           department: f?.trader?.department ?? "",
           validityLimit: f?.trader?.validityLimit ?? null,
           company: getInitialCompany(f?.trader?.company),
+        }
+      : null,
+    broker: f?.broker
+      ? {
+          receipt: f?.broker?.receipt ?? "",
+          department: f?.broker?.department ?? "",
+          validityLimit: f?.broker?.validityLimit ?? null,
+          company: getInitialCompany(f?.broker?.company),
         }
       : null,
     wasteDetails: {

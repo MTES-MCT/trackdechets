@@ -36,6 +36,7 @@ const createFormResolver = async (
     recipientCompanySiret: formContent.recipient?.company?.siret,
     transporterCompanySiret: formContent.transporter?.company?.siret,
     traderCompanySiret: formContent.trader?.company?.siret,
+    brokerCompanySiret: formContent.broker?.company?.siret,
     ecoOrganismeSiret: formContent.ecoOrganisme?.siret,
     ...(temporaryStorageDetail?.destination?.company?.siret
       ? {

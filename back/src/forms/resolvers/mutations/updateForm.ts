@@ -80,6 +80,8 @@ const updateFormResolver = async (
       form.transporterCompanySiret ?? existingForm.transporterCompanySiret,
     traderCompanySiret:
       form.traderCompanySiret ?? existingForm.traderCompanySiret,
+    brokerCompanySiret:
+      form.brokerCompanySiret ?? existingForm.brokerCompanySiret,
     ecoOrganismeSiret: form.ecoOrganismeSiret ?? existingForm.ecoOrganismeSiret
   };
 

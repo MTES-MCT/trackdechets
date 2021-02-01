@@ -1,6 +1,6 @@
 import { useQuery, gql } from "@apollo/client";
 import { useField, useFormikContext } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import CompanyResults from "../company/CompanyResults";
 import styles from "./EcoOrganismes.module.scss";
 import SearchInput from "common/components/SearchInput";

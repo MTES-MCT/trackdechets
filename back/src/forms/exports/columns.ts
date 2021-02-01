@@ -131,6 +131,26 @@ const columns: Column[] = [
     label: "Négociant adresse",
     format: identity
   },
+  // Courtier
+  { field: "brokerCompanySiret", label: "Courtier siret", format: identity },
+  { field: "brokerCompanyName", label: "Courtier nom", format: identity },
+
+  { field: "brokerReceipt", label: "Courtier récépissé N°", format: identity },
+  {
+    field: "brokerValidityLimit",
+    label: "Courtier récépissé validité",
+    format: formatDate
+  },
+  {
+    field: "brokerCompanyContact",
+    label: "Courtier contact",
+    format: identity
+  },
+  {
+    field: "brokerCompanyAddress",
+    label: "Courtier adresse",
+    format: identity
+  },
   // cadre 8
   {
     field: "transporterCompanySiret",

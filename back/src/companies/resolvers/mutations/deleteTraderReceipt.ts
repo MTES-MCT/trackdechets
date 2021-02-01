@@ -9,7 +9,7 @@ import { checkCanReadUpdateDeleteTraderReceipt } from "../../permissions";
  * Delete a trader receipt
  * @param id
  */
-const deleteTransporterReceiptResolver: MutationResolvers["deleteTraderReceipt"] = async (
+const deleteTraderReceiptResolver: MutationResolvers["deleteTraderReceipt"] = async (
   parent,
   { input },
   context
@@ -22,4 +22,4 @@ const deleteTransporterReceiptResolver: MutationResolvers["deleteTraderReceipt"]
   return prisma.traderReceipt.delete({ where: { id } });
 };
 
-export default deleteTransporterReceiptResolver;
+export default deleteTraderReceiptResolver;

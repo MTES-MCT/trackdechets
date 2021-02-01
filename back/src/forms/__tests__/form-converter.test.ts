@@ -158,6 +158,15 @@ test("expandFormFromDb", () => {
     traderCompanySiret: null,
     traderReceipt: null,
     traderCompanyPhone: null,
+    brokerCompanyAddress: null,
+    brokerValidityLimit: null,
+    brokerCompanyContact: null,
+    brokerCompanyName: null,
+    brokerCompanyMail: null,
+    brokerDepartment: null,
+    brokerCompanySiret: null,
+    brokerReceipt: null,
+    brokerCompanyPhone: null,
     ecoOrganismeName: null,
     ecoOrganismeSiret: null
   };
@@ -231,6 +240,7 @@ test("expandFormFromDb", () => {
       pop: form.wasteDetailsPop
     },
     trader: null,
+    broker: null,
     ecoOrganisme: null,
     createdAt: form.createdAt,
     updatedAt: form.updatedAt,

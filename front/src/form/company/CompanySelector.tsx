@@ -28,6 +28,7 @@ interface CompanySelectorProps {
     | "emitter.company"
     | "recipient.company"
     | "trader.company"
+    | "broker.company"
     | "temporaryStorageDetail.destination.company";
   onCompanySelected?: (company: CompanyFavorite) => void;
   allowForeignCompanies?: boolean;
@@ -90,13 +91,21 @@ export default function CompanySelector({
   const searchResults: CompanyFavorite[] = useMemo(
     () =>
       searchData?.searchCompanies.map(
-        ({ siret, name, address, transporterReceipt, traderReceipt }) => ({
+        ({
+          siret,
+          name,
+          address,
+          transporterReceipt,
+          traderReceipt,
+          brokerReceipt,
+        }) => ({
           // convert CompanySearchResult to CompanyFavorite
           siret,
           name,
           address,
           transporterReceipt,
           traderReceipt,
+          brokerReceipt,
 
           __typename: "CompanyFavorite",
           contact: "",
@@ -192,6 +201,7 @@ export default function CompanySelector({
               __typename: "CompanyFavorite",
               transporterReceipt: null,
               traderReceipt: null,
+              brokerReceipt: null,
             }}
           />
         </>

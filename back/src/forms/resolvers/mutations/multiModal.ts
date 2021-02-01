@@ -74,6 +74,7 @@ type FormSiretsAndSegments = {
   emitterCompanySiret: string;
   transporterCompanySiret: string;
   traderCompanySiret: string;
+  brokerCompanySiret: string;
   ecoOrganisme: { siret: string };
   temporaryStorageDetail: {
     destinationCompanySiret: string;

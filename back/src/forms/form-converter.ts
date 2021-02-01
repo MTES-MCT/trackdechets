@@ -12,6 +12,7 @@ import {
   Recipient,
   Transporter,
   Trader,
+  Broker,
   WasteDetails,
   FormStatus,
   WorkSite,
@@ -29,6 +30,7 @@ import {
   ResentFormInput,
   RecipientInput,
   TraderInput,
+  BrokerInput,
   NextDestinationInput,
   ImportPaperFormInput,
   EcoOrganismeInput,
@@ -281,6 +283,30 @@ function flattenTraderInput(input: { trader?: TraderInput }) {
   };
 }
 
+function flattenBrokerInput(input: { broker?: BrokerInput }) {
+  return {
+    brokerCompanyName: chain(input.broker, t => chain(t.company, c => c.name)),
+    brokerCompanySiret: chain(input.broker, t =>
+      chain(t.company, c => c.siret)
+    ),
+    brokerCompanyAddress: chain(input.broker, t =>
+      chain(t.company, c => c.address)
+    ),
+    brokerCompanyContact: chain(input.broker, t =>
+      chain(t.company, c => c.contact)
+    ),
+    brokerCompanyPhone: chain(input.broker, t =>
+      chain(t.company, c => c.phone)
+    ),
+    brokerCompanyMail: chain(input.broker, t => chain(t.company, c => c.mail)),
+    brokerReceipt: chain(input.broker, t => t.receipt),
+    brokerDepartment: chain(input.broker, t => t.department),
+    brokerValidityLimit: chain(input.broker, t =>
+      t.validityLimit ? new Date(t.validityLimit) : null
+    )
+  };
+}
+
 function flattenEcoOrganismeInput(input: { ecoOrganisme?: EcoOrganismeInput }) {
   return {
     ecoOrganismeName: chain(input.ecoOrganisme, e => e.name),
@@ -329,6 +355,7 @@ export function flattenFormInput(
     | "transporter"
     | "wasteDetails"
     | "trader"
+    | "broker"
     | "ecoOrganisme"
   >
 ): Partial<Prisma.FormCreateInput> {
@@ -339,6 +366,7 @@ export function flattenFormInput(
     ...flattenTransporterInput(formInput),
     ...flattenWasteDetailsInput(formInput),
     ...flattenTraderInput(formInput),
+    ...flattenBrokerInput(formInput),
     ...flattenEcoOrganismeInput(formInput)
   });
 }
@@ -374,6 +402,7 @@ export function flattenImportPaperFormInput(
     ...flattenTransporterInput(rest),
     ...flattenWasteDetailsInput(rest),
     ...flattenTraderInput(rest),
+    ...flattenBrokerInput(rest),
     ...flattenSigningInfo(signingInfo),
     ...flattenReceivedInfo(receivedInfo),
     ...flattenProcessedFormInput(processedInfo)
@@ -545,6 +574,19 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       receipt: form.traderReceipt,
       department: form.traderDepartment,
       validityLimit: form.traderValidityLimit
+    }),
+    broker: nullIfNoValues<Broker>({
+      company: nullIfNoValues<FormCompany>({
+        name: form.brokerCompanyName,
+        siret: form.brokerCompanySiret,
+        address: form.brokerCompanyAddress,
+        contact: form.brokerCompanyContact,
+        phone: form.brokerCompanyPhone,
+        mail: form.brokerCompanyMail
+      }),
+      receipt: form.brokerReceipt,
+      department: form.brokerDepartment,
+      validityLimit: form.brokerValidityLimit
     }),
     ecoOrganisme: nullIfNoValues<FormEcoOrganisme>({
       name: form.ecoOrganismeName,

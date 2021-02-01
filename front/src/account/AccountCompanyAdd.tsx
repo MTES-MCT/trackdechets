@@ -9,6 +9,7 @@ import RedErrorMessage from "../common/components/RedErrorMessage";
 import CompanyType from "../login/CompanyType";
 import AccountCompanyAddTransporterReceipt from "./accountCompanyAdd/AccountCompanyAddTransporterReceipt";
 import AccountCompanyAddTraderReceipt from "./accountCompanyAdd/AccountCompanyAddTraderReceipt";
+import AccountCompanyAddBrokerReceipt from "./accountCompanyAdd/AccountCompanyAddBrokerReceipt";
 import AccountCompanyAddSiret from "./accountCompanyAdd/AccountCompanyAddSiret";
 import AccountCompanyAddEcoOrganisme from "./accountCompanyAdd/AccountCompanyAddEcoOrganisme";
 import AccountCompanyAddMembershipRequest from "./accountCompanyAdd/AccountCompanyAddMembershipRequest";
@@ -50,6 +51,14 @@ const CREATE_TRADER_RECEIPT = gql`
   }
 `;
 
+const CREATE_BROKER_RECEIPT = gql`
+  mutation CreateBrokerReceipt($input: CreateBrokerReceiptInput!) {
+    createBrokerReceipt(input: $input) {
+      id
+    }
+  }
+`;
+
 interface Values extends FormikValues {
   siret: string;
   companyName: string;
@@ -66,6 +75,9 @@ interface Values extends FormikValues {
   traderReceiptNumber: string;
   traderReceiptValidity: string;
   traderReceiptDepartment: string;
+  brokerReceiptNumber: string;
+  brokerReceiptValidity: string;
+  brokerReceiptDepartment: string;
 }
 
 /**
@@ -117,12 +129,21 @@ export default function AccountCompanyAdd() {
     { error: createTraderReceiptError },
   ] = useMutation(CREATE_TRADER_RECEIPT);
 
+  const [
+    createBrokerReceipt,
+    { error: createBrokerReceiptError },
+  ] = useMutation(CREATE_BROKER_RECEIPT);
+
   function isTransporter(companyTypes: _CompanyType[]) {
     return companyTypes.includes(_CompanyType.Transporter);
   }
 
   function isTrader(companyTypes: _CompanyType[]) {
     return companyTypes.includes(_CompanyType.Trader);
+  }
+
+  function isBroker(companyTypes: _CompanyType[]) {
+    return companyTypes.includes(_CompanyType.Broker);
   }
 
   function isEcoOrganisme(companyTypes: _CompanyType[]) {
@@ -142,6 +163,9 @@ export default function AccountCompanyAdd() {
       traderReceiptNumber,
       traderReceiptValidity,
       traderReceiptDepartment,
+      brokerReceiptNumber,
+      brokerReceiptValidity,
+      brokerReceiptDepartment,
       ecoOrganismeAgreements,
       ...companyInput
     } = values;
@@ -196,12 +220,38 @@ export default function AccountCompanyAdd() {
       }
     }
 
+    let brokerReceiptId: string | null = null;
+
+    // create broker receipt if any
+    if (
+      !!brokerReceiptNumber &&
+      !!brokerReceiptValidity &&
+      !!brokerReceiptDepartment &&
+      isBroker(values.companyTypes)
+    ) {
+      // all fields should be set
+      const input = {
+        receiptNumber: brokerReceiptNumber,
+        validityLimit: brokerReceiptValidity,
+        department: brokerReceiptDepartment,
+      };
+
+      const { data } = await createBrokerReceipt({
+        variables: { input },
+      });
+
+      if (data) {
+        brokerReceiptId = data.createBrokerReceipt.id;
+      }
+    }
+
     await createCompany({
       variables: {
         companyInput: {
           ...companyInput,
           transporterReceiptId,
           traderReceiptId,
+          brokerReceiptId,
           // Filter out empty agreements
           ecoOrganismeAgreements: ecoOrganismeAgreements.filter(Boolean),
         },
@@ -255,6 +305,9 @@ export default function AccountCompanyAdd() {
             traderReceiptNumber: "",
             traderReceiptValidity: "",
             traderReceiptDepartment: "",
+            brokerReceiptNumber: "",
+            brokerReceiptValidity: "",
+            brokerReceiptDepartment: "",
             ecoOrganismeAgreements: [],
           }}
           validate={values => {
@@ -266,13 +319,21 @@ export default function AccountCompanyAdd() {
 
             const isTransporter_ = isTransporter(values.companyTypes);
 
-            // whether or not one of the transporter receipt field is set
+            // whether or not one of the trader receipt field is set
             const anyTraderReceipField =
               !!values.traderReceiptNumber ||
               !!values.traderReceiptValidity ||
               !!values.traderReceiptDepartment;
 
             const isTrader_ = isTrader(values.companyTypes);
+
+            // whether or not one of the broker receipt field is set
+            const anyBrokerReceipField =
+              !!values.brokerReceiptNumber ||
+              !!values.brokerReceiptValidity ||
+              !!values.brokerReceiptDepartment;
+
+            const isBroker_ = isBroker(values.companyTypes);
 
             return {
               ...(values.companyTypes.length === 0 && {
@@ -314,6 +375,26 @@ export default function AccountCompanyAdd() {
                 isTrader_ &&
                 !values.traderReceiptDepartment && {
                   traderReceiptDepartment: "Champ obligatoire",
+                }),
+              ...(anyBrokerReceipField &&
+                isBroker_ &&
+                !values.brokerReceiptDepartment && {
+                  brokerReceiptDepartment: "Champ obligatoire",
+                }),
+              ...(anyBrokerReceipField &&
+                isBroker_ &&
+                !values.brokerReceiptNumber && {
+                  brokerReceiptNumber: "Champ obligatoire",
+                }),
+              ...(anyBrokerReceipField &&
+                isBroker_ &&
+                !values.brokerReceiptValidity && {
+                  brokerReceiptValidity: "Champ obligatoire",
+                }),
+              ...(anyBrokerReceipField &&
+                isBroker_ &&
+                !values.brokerReceiptDepartment && {
+                  brokerReceiptDepartment: "Champ obligatoire",
                 }),
               ...(isEcoOrganisme(values.companyTypes) &&
                 values.ecoOrganismeAgreements.length < 1 && {
@@ -404,6 +485,10 @@ export default function AccountCompanyAdd() {
                 <AccountCompanyAddTraderReceipt />
               )}
 
+              {isBroker(values.companyTypes) && (
+                <AccountCompanyAddBrokerReceipt />
+              )}
+
               {isEcoOrganisme(values.companyTypes) && (
                 <AccountCompanyAddEcoOrganisme />
               )}
@@ -474,6 +559,9 @@ export default function AccountCompanyAdd() {
               )}
               {createTraderReceiptError && (
                 <NotificationError apolloError={createTraderReceiptError} />
+              )}
+              {createBrokerReceiptError && (
+                <NotificationError apolloError={createBrokerReceiptError} />
               )}
               {savingError && <NotificationError apolloError={savingError} />}
             </Form>
