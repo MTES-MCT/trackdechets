@@ -19,7 +19,11 @@ export default function AccountCompanyAddTransporterReceipt() {
             <tr>
               <td>Numéro de récépissé</td>
               <td>
-                <Field type="text" name="transporterReceiptNumber" />
+                <Field
+                  type="text"
+                  name="transporterReceiptNumber"
+                  className="td-input"
+                />
                 <RedErrorMessage name="transporterReceiptNumber" />
               </td>
             </tr>
@@ -29,6 +33,7 @@ export default function AccountCompanyAddTransporterReceipt() {
                 <Field
                   name="transporterReceiptValidity"
                   component={DateInput}
+                  className="td-input"
                 />
                 <RedErrorMessage name="transporterReceiptValidity" />
               </td>
@@ -40,6 +45,7 @@ export default function AccountCompanyAddTransporterReceipt() {
                   type="text"
                   name="transporterReceiptDepartment"
                   placeholder="75"
+                  className="td-input"
                 />
                 <RedErrorMessage name="transporterReceiptDepartment" />
               </td>

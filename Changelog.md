@@ -17,6 +17,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Correction du formulaire de réception [PR 769](https://github.com/MTES-MCT/trackdechets/pull/769)
 - Correction d'un bug de saisie de date sur Safari [PR 774](https://github.com/MTES-MCT/trackdechets/pull/774)
+- Correction d'un bug d'affichage des champs de saisie des récépissés transporteur et négociant [PR 783](https://github.com/MTES-MCT/trackdechets/pull/783)
 
 #### :nail_care: Améliorations
 
