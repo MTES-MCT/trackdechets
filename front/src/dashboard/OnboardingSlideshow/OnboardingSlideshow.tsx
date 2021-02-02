@@ -11,7 +11,7 @@ import prepareImage from "./assets/prepare.svg";
 import signImage from "./assets/sign.svg";
 import followImage from "./assets/follow.svg";
 import downloadImage from "./assets/download.svg";
-import slide6Image from "./assets/slide6.png";
+import slide6Image from "./assets/slide6.svg";
 
 const LOCAL_STORAGE_KEY = "td-slideshow";
 
@@ -36,7 +36,7 @@ export function OnboardingSlideshow() {
       ariaLabel="Présentation de Trackdéchets"
     >
       <Slideshow>
-        <>
+        <div className={styles.Slide}>
           <div className={styles.ModalTitle}>
             Préparer facilement un Bordereau de Suivi de Déchets
           </div>
@@ -66,8 +66,8 @@ export function OnboardingSlideshow() {
               </List>
             </div>
           </div>
-        </>
-        <>
+        </div>
+        <div className={styles.Slide}>
           <div className={styles.ModalTitle}>
             Signer numériquement l’enlèvement de vos déchets
           </div>
@@ -83,7 +83,7 @@ export function OnboardingSlideshow() {
                   }
                 >
                   Signez de manière dématérialisée sur l’outil du chauffeur avec
-                  votre code de sécurité entreprise
+                  votre code de signature entreprise
                 </ListItem>
                 <ListItem
                   startIcon={
@@ -96,8 +96,8 @@ export function OnboardingSlideshow() {
               </List>
             </div>
           </div>
-        </>
-        <>
+        </div>
+        <div className={styles.Slide}>
           <div className={styles.ModalTitle}>
             Suivre l’état de ses BSD en temps réel
           </div>
@@ -133,8 +133,8 @@ export function OnboardingSlideshow() {
               </List>
             </div>
           </div>
-        </>
-        <>
+        </div>
+        <div className={styles.Slide}>
           <div className={styles.ModalTitle}>
             Télécharger son registre réglementaire
           </div>
@@ -169,35 +169,35 @@ export function OnboardingSlideshow() {
               </List>
             </div>
           </div>
-        </>
-        <>
+        </div>
+        <div className={styles.Slide}>
           <div className={styles.ModalTitle}>Trackdéchets permet de :</div>
           <div className={styles.Features}>
             <div className={styles.FeaturesItem}>
               <img src={prepareImage} alt="" />
-              <div>Préparer</div>
+              <div className={styles.FeaturesItemLabel}>Préparer</div>
             </div>
             <div className={styles.FeaturesItem}>
               <img src={signImage} alt="" />
-              <div>Signer</div>
+              <div className={styles.FeaturesItemLabel}>Signer</div>
             </div>
             <div className={styles.FeaturesItem}>
               <img src={followImage} alt="" />
-              <div>Suivre</div>
+              <div className={styles.FeaturesItemLabel}>Suivre</div>
             </div>
             <div className={styles.FeaturesItem}>
               <img src={downloadImage} alt="" />
-              <div>Télécharger</div>
+              <div className={styles.FeaturesItemLabel}>Télécharger</div>
             </div>
           </div>
-        </>
-        <>
+        </div>
+        <div className={styles.Slide}>
           <div className={styles.ModalTitle}>
             Des questions ? Besoin d’aide ?
           </div>
           <div className={styles.SlideContent}>
             <div className={styles.SlideContentImage}>
-              <img src={slide6Image} alt="" />
+              <img src={slide6Image} alt="" style={{ padding: "1rem" }} />
             </div>
             <div className={styles.SlideContentList}>
               <List variant="unstyled">
@@ -226,7 +226,7 @@ export function OnboardingSlideshow() {
               </List>
             </div>
           </div>
-        </>
+        </div>
       </Slideshow>
     </Modal>
   );
