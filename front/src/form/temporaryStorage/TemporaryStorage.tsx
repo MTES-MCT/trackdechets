@@ -2,7 +2,6 @@ import { useFormikContext, Field } from "formik";
 import React, { useEffect } from "react";
 import CompanySelector from "form/company/CompanySelector";
 import { Form } from "generated/graphql/types";
-import initialState from "../initial-state";
 import { initalTemporaryStorageDetail } from "../initial-state";
 import styles from "./TemporaryStorage.module.scss";
 import classNames from "classnames";
