@@ -1,0 +1,155 @@
+input DasriPackagingInfoInput {
+  "Type de conditionnement"
+  type: DasriPackagings!
+
+  "Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"
+  other: String
+
+  "Nombre de colis associés à ce conditionnement"
+  volume: Int!
+
+  "Nombre de colis associés à ce conditionnement"
+  quantity: Int!
+}
+
+input WorkSiteInput {
+  name: String
+  address: String
+  city: String
+  postalCode: String
+  infos: String
+}
+
+input DasriEmitterInput {
+  "Établissement émetteur"
+  company: CompanyInput
+  workSite: WorkSiteInput
+  "Champ libre émetteur"
+  customInfo: String
+}
+
+input DasriWasteDetailInput {
+  quantity: Int
+  quantityType: QuantityType
+  packagingInfos: [DasriPackagingInfoInput!]
+  onuCode: String
+}
+input DasriRecipientWasteDetailInput {
+  quantity: Int
+  volume: Int
+}
+input DasriWasteAcceptationInput {
+  status: WasteAcceptationStatusInput
+  refusalReason: String
+  refusedQuantity: Int
+}
+input DasriEmissionInput {
+  wasteCode: String
+  wasteDetailsOnuCode: String
+  wasteDetails: DasriWasteDetailInput
+  handedOverAt: DateTime
+}
+input DasriTransportInput {
+  wasteDetails: DasriWasteDetailInput
+  takenOverAt: DateTime
+  handedOverAt: DateTime
+  wasteAcceptation: DasriWasteAcceptationInput
+}
+
+input DasriTransporterInput {
+  "Établissement collecteur - transporteur"
+  company: CompanyInput
+
+  "N° de récipissé"
+  receipt: String
+
+  "Département"
+  receiptDepartment: String
+
+  "Limite de validité du récipissé"
+  receiptValidityLimit: DateTime
+
+  "Champ libre transporteur"
+  customInfo: String
+}
+
+input DasriRecipientInput {
+  "Établissement émetteur"
+  company: CompanyInput
+
+  "Champ libre transporteur"
+  customInfo: String
+}
+
+input DasriReceptionInput {
+  wasteDetails: DasriWasteDetailInput
+  receivedAt: DateTime
+}
+
+input DasriOperationInput {
+  processingOperation: String
+  processedAt: DateTime
+}
+
+input DasriInput {
+  customId: String
+  emitter: DasriEmitterInput
+  emission: DasriEmissionInput
+  transporter: DasriTransporterInput
+  transport: DasriTransportInput
+  recipient: DasriRecipientInput
+  reception: DasriReceptionInput
+  operation: DasriOperationInput
+}
+
+input DasriCreateInput {
+  "Identifiant custom"
+  customId: String
+
+  emitter: DasriEmitterInput
+  emission: DasriEmissionInput
+  transporter: DasriTransporterInput
+  transport: DasriTransportInput
+  recipient: DasriRecipientInput
+  reception: DasriReceptionInput
+  operation: DasriOperationInput
+}
+
+input DasriUpdateInput {
+  "Identifiant opaque"
+  id: ID!
+
+  "Identifiant custom"
+  customId: String
+
+  emitter: DasriEmitterInput
+  emission: DasriEmissionInput
+  transporter: DasriTransporterInput
+  transport: DasriTransportInput
+  recipient: DasriRecipientInput
+  reception: DasriReceptionInput
+  operation: DasriOperationInput
+}
+
+enum DasriSignatureType {
+  "Signature du cadre émetteur (PRED)"
+  EMISSION
+
+  "Signature du cadre émetteur (PRED) par le transporteur, grâce au code de sécurité de l'émetteur"
+  EMISSION_WITH_SECRET_CODE
+
+  "Signature du cadre collecteur transporteur"
+  TRANSPORT
+
+  "Signature de la réception du déchet"
+  RECEPTION
+
+  "Siganture du traitement du déchet"
+  OPERATION
+}
+
+input DasriSignatureInput {
+  type: DasriSignatureType!
+  signedBy: String!
+  securityCode: Int
+}
