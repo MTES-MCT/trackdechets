@@ -1,25 +1,63 @@
 import { client, index } from "../../common/elastic";
 import { indexAllForms } from "../../forms/elastic";
+import prisma from "../../prisma";
 
 (async () => {
-  await createIndexIfNotFound();
-  await createAliasIfNotFound();
+  if (process.argv.includes("--reset")) {
+    console.log(
+      `The --reset flag was passed, now deleting alias "${index.alias}" and index "${index.index}"...`
+    );
+    await client.indices.deleteAlias(
+      {
+        index: index.index,
+        name: index.alias
+      },
+      { ignore: [404] }
+    );
+    await client.indices.delete(
+      {
+        index: index.index
+      },
+      { ignore: [404] }
+    );
+  }
 
-  const { body } = await client.indices.getAlias({ name: index.alias });
-  const aliasIndexes = Object.keys(body);
+  const { statusCode, body } = await client.indices.getAlias(
+    { name: index.alias },
+    { ignore: [404] }
+  );
+  const aliasIndexes = statusCode === 404 ? [] : Object.keys(body);
 
-  if (aliasIndexes.includes(index.index)) {
-    // the alias is already pointing to the appropriate index
-    // which means the data doesn't have to be reindexed,
-    // otherwise the index would have changed and thus not found
+  if (statusCode === 404) {
+    console.log(
+      `The index "${index.index}" doesn't exist yet, now creating...`
+    );
+    await client.indices.create({
+      index: index.index,
+      body: { mappings: index.mappings }
+    });
+
+    console.log(
+      `The alias "${index.alias}" doesn't exist yet, now creating...`
+    );
+    await client.indices.putAlias({
+      name: index.alias,
+      index: index.index
+    });
+  } else if (aliasIndexes.includes(index.index)) {
+    console.log(
+      `The alias "${index.alias}" already exists and points to the current index "${index.index}".`,
+      `Indexing data with this configuration may index documents that are already indexed.`,
+      `You can run this script with the flag --reset to start fresh by deleting all existing data.`,
+      `Otherwise, change the name of the index to trigger a seamless reindexation.`
+    );
     return;
   }
 
-  // index data in the new index before updating the alias
+  console.log(`Indexing all forms...`);
   await indexAllForms();
 
-  // now that the data has been indexed,
-  // we can update the alias so it points to the new index
+  console.log(`Changing the alias' pointer to the newly created index...`);
   await client.indices.updateAliases({
     body: {
       actions: [
@@ -40,34 +78,13 @@ import { indexAllForms } from "../../forms/elastic";
   });
 
   for (const oldIndex of aliasIndexes) {
+    console.log(`Deleting the old index "${oldIndex}"...`);
     await client.indices.delete({
       index: oldIndex
     });
   }
+
+  await prisma.$disconnect();
+
+  console.log("Done!");
 })();
-
-async function createIndexIfNotFound() {
-  const { statusCode } = await client.indices.get(
-    { index: index.index },
-    { ignore: [404] }
-  );
-  if (statusCode === 404) {
-    await client.indices.create({
-      index: index.index,
-      body: { mappings: index.mappings }
-    });
-  }
-}
-
-async function createAliasIfNotFound() {
-  const { statusCode } = await client.indices.getAlias(
-    { name: index.alias },
-    { ignore: [404] }
-  );
-  if (statusCode === 404) {
-    await client.indices.putAlias({
-      name: index.alias,
-      index: index.index
-    });
-  }
-}
