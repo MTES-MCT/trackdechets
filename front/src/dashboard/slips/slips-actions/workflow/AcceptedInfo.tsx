@@ -1,6 +1,6 @@
 import React from "react";
 import { Field, Form, Formik } from "formik";
-import { formatISO } from "date-fns";
+import * as yup from "yup";
 import NumberInput from "form/custom-inputs/NumberInput";
 import DateInput from "form/custom-inputs/DateInput";
 import { InlineRadioButton, RadioButton } from "form/custom-inputs/RadioButton";
@@ -22,6 +22,19 @@ export type AcceptedInfoValues = {
   quantityType?: QuantityType;
 };
 
+const validationSchema: yup.ObjectSchema<AcceptedInfoValues> = yup.object({
+  signedBy: yup.string().required("Le nom du responsable est un champ requis"),
+  signedAt: yup.string().required("La date de signature est un champ requis"),
+  quantityReceived: yup
+    .number()
+    .nullable()
+    .required("Le poids accepté est un champ requis"),
+  wasteAcceptationStatus: yup
+    .string<WasteAcceptationStatus>()
+    .required("Le statut d'acceptation du lot est un champ requis"),
+  wasteRefusalReason: yup.string(),
+});
+
 /**
  * Accepted info form shared between markAsAccepted and markAsTempStorerAccepted
  */
@@ -38,14 +51,15 @@ export default function AcceptedInfo({
     <Formik<AcceptedInfoValues>
       initialValues={{
         signedBy: "",
-        signedAt: formatISO(new Date(), { representation: "date" }),
+        signedAt: new Date().toISOString(),
         quantityReceived: null,
         wasteAcceptationStatus: "" as WasteAcceptationStatus,
         wasteRefusalReason: "",
       }}
       onSubmit={onSubmit}
+      validationSchema={validationSchema}
     >
-      {({ errors, isSubmitting, setFieldValue, values, handleReset }) => (
+      {({ isSubmitting, setFieldValue, values, handleReset }) => (
         <Form>
           <div className="form__row">
             <div className="form__row">
@@ -87,7 +101,7 @@ export default function AcceptedInfo({
               </fieldset>
             </div>
           </div>
-          <p className="form__row">
+          <div className="form__row">
             <label>
               Poids à l'arrivée
               <Field
@@ -105,7 +119,7 @@ export default function AcceptedInfo({
               </span>
             </label>
             <RedErrorMessage name="quantityReceived" />
-          </p>
+          </div>
           {form.recipient?.isTempStorage && form.status === FormStatus.Sent && (
             <fieldset className="form__row">
               <legend>Cette quantité est</legend>
@@ -128,15 +142,15 @@ export default function AcceptedInfo({
             WasteAcceptationStatus.Refused.toString(),
             WasteAcceptationStatus.PartiallyRefused.toString(),
           ].includes(values.wasteAcceptationStatus) && (
-            <p className="form__row">
+            <div className="form__row">
               <label>
                 {textConfig[values.wasteAcceptationStatus].refusalReasonText}
                 <Field name="wasteRefusalReason" className="td-input" />
               </label>
               <RedErrorMessage name="wasteRefusalReason" />
-            </p>
+            </div>
           )}
-          <p className="form__row">
+          <div className="form__row">
             <label>
               Nom du responsable
               <Field
@@ -147,8 +161,8 @@ export default function AcceptedInfo({
               />
             </label>
             <RedErrorMessage name="signedBy" />
-          </p>
-          <p className="form__row">
+          </div>
+          <div className="form__row">
             <label>
               Date d'acceptation
               <Field
@@ -158,7 +172,7 @@ export default function AcceptedInfo({
               />
             </label>
             <RedErrorMessage name="signedAt" />
-          </p>
+          </div>
           <p>
             {values.wasteAcceptationStatus &&
               textConfig[values.wasteAcceptationStatus].validationText}

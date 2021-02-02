@@ -54,7 +54,7 @@ export default function MarkAsTempStorerAccepted({
           <AcceptedInfo
             form={form}
             close={close}
-            onSubmit={values => {
+            onSubmit={values =>
               markAsTempStorerAccepted({
                 variables: {
                   id: form.id,
@@ -64,8 +64,8 @@ export default function MarkAsTempStorerAccepted({
                     quantityType: values.quantityType ?? QuantityType.Real,
                   },
                 },
-              });
-            }}
+              })
+            }
           />
 
           {error && (

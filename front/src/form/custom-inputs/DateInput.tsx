@@ -8,6 +8,7 @@ import DatePicker, {
   ReactDatePickerProps,
 } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import "./DateInput.module.scss";
 
 registerLocale("fr", fr);
 setDefaultLocale("fr");
@@ -22,16 +23,14 @@ export default function DateInput({
   const { value, ...rest } = field;
 
   return (
-    <div>
-      <DatePicker
-        {...rest}
-        {...props}
-        dateFormat="dd/MM/yyyy"
-        selected={value ? parseDate(value) : null}
-        onChange={(value: Date | null) => {
-          setFieldValue(field.name, value?.toISOString() ?? null);
-        }}
-      />
-    </div>
+    <DatePicker
+      {...rest}
+      {...props}
+      dateFormat="dd/MM/yyyy"
+      selected={value ? parseDate(value) : null}
+      onChange={(value: Date | null) => {
+        setFieldValue(field.name, value?.toISOString() ?? null);
+      }}
+    />
   );
 }

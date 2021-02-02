@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { mergeDefaults, updateApolloCache } from "common/helper";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "form/company/CompanySelector";
-import DateInput from "form/custom-inputs/DateInput";
 import NumberInput from "form/custom-inputs/NumberInput";
 import { RadioButton } from "form/custom-inputs/RadioButton";
 import Packagings from "form/packagings/Packagings";

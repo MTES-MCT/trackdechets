@@ -46,11 +46,9 @@ export function TransportSignatureModalToggle({
           iconSize="32px"
         />
       )}
-      <TransportSignatureModal
-        form={form}
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-      />
+      {isOpen && (
+        <TransportSignatureModal form={form} onClose={() => setIsOpen(false)} />
+      )}
     </>
   );
 }

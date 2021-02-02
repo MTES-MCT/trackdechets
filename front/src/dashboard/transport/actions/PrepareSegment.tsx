@@ -1,5 +1,4 @@
 import { useMutation, gql } from "@apollo/client";
-import { formatISO } from "date-fns";
 import { NotificationError } from "common/components/Error";
 import { IconBusTransfer } from "common/components/Icons";
 
@@ -109,7 +108,7 @@ export default function PrepareSegment({
       isExemptedOfReceipt: false,
       receipt: "",
       department: "",
-      validityLimit: formatISO(new Date(), { representation: "date" }),
+      validityLimit: new Date().toISOString(),
       numberPlate: "",
     },
 

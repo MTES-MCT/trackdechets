@@ -31,13 +31,11 @@ const SIGNED_BY_TRANSPORTER = gql`
 
 interface TransportSignatureModalProps {
   form: Form;
-  isOpen: boolean;
   onClose: () => void;
 }
 
 export function TransportSignatureModal({
   form,
-  isOpen,
   onClose,
 }: TransportSignatureModalProps) {
   const [stepIndex, setStepIndex] = React.useState(0);
@@ -56,7 +54,7 @@ export function TransportSignatureModal({
   const { Component } = steps[stepIndex];
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} ariaLabel="Signer l'enlèvement">
+    <Modal isOpen onClose={onClose} ariaLabel="Signer l'enlèvement">
       <h2 className="td-modal-title">Signature</h2>
 
       <Breadcrumb>

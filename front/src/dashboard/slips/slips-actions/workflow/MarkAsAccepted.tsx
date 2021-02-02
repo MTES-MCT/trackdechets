@@ -37,7 +37,7 @@ export default function MarkAsAccepted({ form }: WorkflowActionProps) {
           <AcceptedInfo
             form={form}
             close={close}
-            onSubmit={values => {
+            onSubmit={values =>
               markAsAccepted({
                 variables: {
                   id: form.id,
@@ -46,8 +46,8 @@ export default function MarkAsAccepted({ form }: WorkflowActionProps) {
                     quantityReceived: values.quantityReceived ?? 0,
                   },
                 },
-              });
-            }}
+              })
+            }
           />
 
           {error && (

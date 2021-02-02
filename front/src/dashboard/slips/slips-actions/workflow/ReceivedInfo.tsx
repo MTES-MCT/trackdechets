@@ -1,6 +1,6 @@
 import React from "react";
-import { Field, Form, Formik } from "formik";
-import { isBefore, formatISO, startOfDay } from "date-fns";
+import { Field, Form, Formik, FormikConfig } from "formik";
+import { startOfDay } from "date-fns";
 import { parseDate } from "common/datetime";
 import * as yup from "yup";
 import { RedErrorMessage } from "common/components";
@@ -48,10 +48,7 @@ export type ReceivedInfoValues = {
 
 const validationSchema = (form: TdForm) =>
   yup.object({
-    wasteAcceptationStatus: yup
-      .string()
-      .nullable()
-      .required("Le statut d'acceptation du lot est un champ requis"),
+    wasteAcceptationStatus: yup.string().nullable(),
     quantityReceived: yup
       .number()
       .nullable()
@@ -73,7 +70,6 @@ const validationSchema = (form: TdForm) =>
     signedAt: yup
       .date()
       .nullable()
-      .required("La date de signature est un champ requis")
       .transform(value => startOfDay(parseDate(value))),
   });
 
@@ -86,15 +82,15 @@ export default function ReceivedInfo({
   onSubmit,
 }: {
   form: TdForm;
-  onSubmit: (values: ReceivedInfoValues) => Promise<any>;
+  onSubmit: FormikConfig<ReceivedInfoValues>["onSubmit"];
   close: () => void;
 }) {
   return (
     <Formik<ReceivedInfoValues>
       initialValues={{
         receivedBy: "",
-        receivedAt: formatISO(new Date(), { representation: "date" }),
-        signedAt: formatISO(new Date(), { representation: "date" }),
+        receivedAt: new Date().toISOString(),
+        signedAt: new Date().toISOString(),
         quantityReceived: null,
         wasteAcceptationStatus: null,
         wasteRefusalReason: "",
@@ -103,14 +99,12 @@ export default function ReceivedInfo({
             quantityType: QuantityType.Real,
           }),
       }}
-      onSubmit={(values, { setSubmitting }) =>
-        onSubmit(values).finally(() => setSubmitting(false))
-      }
+      onSubmit={onSubmit}
       validationSchema={() => validationSchema(form)}
     >
       {({ values, isSubmitting, handleReset, setFieldValue }) => (
         <Form>
-          <p className="form__row">
+          <div className="form__row">
             <label>
               Date de présentation
               <Field
@@ -121,7 +115,7 @@ export default function ReceivedInfo({
               />
             </label>
             <RedErrorMessage name="receivedAt" />
-          </p>
+          </div>
           <div className="form__row">
             <div className="form__row">
               <fieldset className="form__radio-group">
@@ -163,7 +157,7 @@ export default function ReceivedInfo({
               <RedErrorMessage name="wasteAcceptationStatus" />
             </div>
           </div>
-          <p className="form__row">
+          <div className="form__row">
             <label>
               Poids à l'arrivée
               <Field
@@ -181,7 +175,7 @@ export default function ReceivedInfo({
               </span>
             </label>
             <RedErrorMessage name="quantityReceived" />
-          </p>
+          </div>
           {form.recipient?.isTempStorage && form.status === FormStatus.Sent && (
             <fieldset className="form__row">
               <legend>Cette quantité est</legend>
@@ -205,15 +199,15 @@ export default function ReceivedInfo({
               WasteAcceptationStatus.Refused.toString(),
               WasteAcceptationStatus.PartiallyRefused.toString(),
             ].includes(values.wasteAcceptationStatus) && (
-              <p className="form__row">
+              <div className="form__row">
                 <label>
                   {textConfig[values.wasteAcceptationStatus].refusalReasonText}
                   <Field name="wasteRefusalReason" className="td-input" />
                 </label>
                 <RedErrorMessage name="wasteRefusalReason" />
-              </p>
+              </div>
             )}
-          <p className="form__row">
+          <div className="form__row">
             <label>
               Nom du responsable
               <Field
@@ -224,21 +218,19 @@ export default function ReceivedInfo({
               />
             </label>
             <RedErrorMessage name="receivedBy" />
-          </p>
-          <p className="form__row">
+          </div>
+          <div className="form__row">
             <label>
               Date d'acceptation
               <Field
-                min={formatISO(parseDate(form.sentAt!), {
-                  representation: "date",
-                })}
                 component={DateInput}
+                minDate={parseDate(values.receivedAt)}
                 name="signedAt"
                 className="td-input"
               />
             </label>
             <RedErrorMessage name="signedAt" />
-          </p>
+          </div>
           <p>
             {values.wasteAcceptationStatus &&
               textConfig[values.wasteAcceptationStatus].validationText}
