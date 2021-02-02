@@ -54,6 +54,40 @@ const companySchema = object().shape({
     .required("L'email est obligatoire"),
 });
 
+// Destination should be a company registered in TD with profile COLLECTOR or WASTEPROCESSOR
+const destinationSchema = companySchema.concat(
+  object().shape({
+    siret: string().test(
+      "is-registered",
+      `Cet établissement n'est pas inscrit sur Trackdéchets ou son profil
+    ne lui permet pas d'être destinataire du bordereau. Seul les établissements
+    inscrits sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement
+    peuvent apparaitre en tant que destinataire sur le bordereau`,
+      async value => {
+        if (value) {
+          const { data } = await graphlClient.query({
+            query: COMPANY_INFOS,
+            variables: { siret: value },
+          });
+          // it should be registered to TD
+          if (data.companyInfos?.isRegistered === false) {
+            return false;
+          }
+          if (data.companyInfos?.companyTypes) {
+            // it should be COLLECTOR or WASTEPROCESSOR
+            return data.companyInfos?.companyTypes.some(companyType =>
+              [CompanyType.Collector, CompanyType.Wasteprocessor].includes(
+                companyType
+              )
+            );
+          }
+        }
+        return true;
+      }
+    ),
+  })
+);
+
 const packagingInfo: ObjectSchema<PackagingInfo> = object().shape({
   type: mixed<Packagings>().required(
     "Le type de conditionnement doit être précisé."
@@ -108,38 +142,7 @@ export const formSchema = object().shape({
         (v: string) => v !== ""
       ),
     cap: string().nullable(true),
-    company: companySchema.concat(
-      object().shape({
-        siret: string().test(
-          "is-registered",
-          `Cet établissement n'est pas inscrit sur Trackdéchets ou son profil
-          ne lui permet pas d'être destinataire du bordereau. Seul les établissements
-          inscrits sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement
-          peuvent apparaitre en tant que destinataire sur le bordereau`,
-          async value => {
-            if (value) {
-              const { data } = await graphlClient.query({
-                query: COMPANY_INFOS,
-                variables: { siret: value },
-              });
-              // it should be registered to TD
-              if (data.companyInfos?.isRegistered === false) {
-                return false;
-              }
-              if (data.companyInfos?.companyTypes) {
-                // it should be COLLECTOR or WASTEPROCESSOR
-                return data.companyInfos?.companyTypes.some(companyType =>
-                  [CompanyType.Collector, CompanyType.Wasteprocessor].includes(
-                    companyType
-                  )
-                );
-              }
-            }
-            return true;
-          }
-        ),
-      })
-    ),
+    company: destinationSchema,
   }),
   transporter: object().shape({
     isExemptedOfReceipt: boolean().nullable(true),
@@ -210,6 +213,14 @@ export const formSchema = object().shape({
       "La consistance du déchet doit être précisée"
     ),
   }),
+  temporaryStorageDetail: object()
+    .notRequired()
+    .nullable()
+    .shape({
+      destination: object().notRequired().nullable().shape({
+        company: destinationSchema,
+      }),
+    }),
 });
 
 export const receivedFormSchema = object().shape({

@@ -16,6 +16,14 @@ const initialTransporter = {
   company: initialCompany,
 };
 
+export const initalTemporaryStorageDetail = {
+  destination: {
+    company: initialCompany,
+    cap: "",
+    processingOperation: "",
+  },
+};
+
 export default {
   customId: "",
   emitter: {
@@ -57,11 +65,5 @@ export default {
     siret: null,
     name: null,
   },
-  temporaryStorageDetail: {
-    destination: {
-      company: initialCompany,
-      cap: "",
-      processingOperation: "",
-    },
-  },
+  temporaryStorageDetail: null,
 };

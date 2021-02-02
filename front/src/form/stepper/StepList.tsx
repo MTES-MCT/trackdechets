@@ -16,7 +16,7 @@ import { Breadcrumb, BreadcrumbItem } from "common/components";
 import { InlineError } from "common/components/Error";
 import { updateApolloCache } from "common/helper";
 import { DRAFT_TAB_FORMS } from "dashboard/slips/tabs/queries";
-import initialState from "../initial-state";
+import initialState, { initalTemporaryStorageDetail } from "../initial-state";
 import {
   Form,
   Query,
@@ -54,9 +54,22 @@ export default function StepList(props: IProps) {
     }
   );
 
-  const formState = useMemo(() => getComputedState(initialState, data?.form), [
-    data,
-  ]);
+  const formState = useMemo(() => {
+    if (!data?.form) {
+      return initialState;
+    } else {
+      const { temporaryStorageDetail, ...form } = data.form;
+      return {
+        ...getComputedState(initialState, form),
+        temporaryStorageDetail: temporaryStorageDetail
+          ? getComputedState(
+              initalTemporaryStorageDetail,
+              temporaryStorageDetail
+            )
+          : null,
+      };
+    }
+  }, [data]);
 
   const [createForm] = useMutation<
     Pick<Mutation, "createForm">,

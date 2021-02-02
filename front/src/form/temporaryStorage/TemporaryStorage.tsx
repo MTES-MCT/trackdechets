@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import CompanySelector from "form/company/CompanySelector";
 import { Form } from "generated/graphql/types";
 import initialState from "../initial-state";
+import { initalTemporaryStorageDetail } from "../initial-state";
 import styles from "./TemporaryStorage.module.scss";
 import classNames from "classnames";
 import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";
@@ -11,11 +12,18 @@ export default function TemporaryStorage(props) {
   const { values, setFieldValue } = useFormikContext<Form>();
 
   useEffect(() => {
+    // set initial value for temp storage when the switch is toggled
     if (values.recipient?.isTempStorage && !values.temporaryStorageDetail) {
       setFieldValue(
         "temporaryStorageDetail",
-        initialState.temporaryStorageDetail
+        initalTemporaryStorageDetail,
+        false
       );
+    }
+
+    // set temp storage to null when the switch is toggled off
+    if (!values.recipient?.isTempStorage && values.temporaryStorageDetail) {
+      setFieldValue("temporaryStorageDetail", null, false);
     }
 
     if (
@@ -25,7 +33,8 @@ export default function TemporaryStorage(props) {
     ) {
       setFieldValue(
         "temporaryStorageDetail.destination.processingOperation",
-        values.recipient.processingOperation
+        values.recipient.processingOperation,
+        false
       );
     }
   }, [values, setFieldValue]);
