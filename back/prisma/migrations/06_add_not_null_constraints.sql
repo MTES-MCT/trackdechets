@@ -31,6 +31,10 @@ WHERE "authType" IS NULL;
 
 ALTER TABLE "default$default"."StatusLog" ALTER COLUMN "authType" SET NOT NULL;
 
+-- Delete statusLogs where formId is null
+DELETE FROM "default$default"."StatusLog"
+WHERE "formId" IS NULL;
+
 ALTER TABLE "default$default"."StatusLog"
 ALTER COLUMN "formId" SET NOT NULL,
 ALTER COLUMN "userId" SET NOT NULL;
@@ -41,12 +45,6 @@ SET "updatedFields" = '{}'
 WHERE "updatedFields" IS NULL;
 
 ALTER TABLE "default$default"."StatusLog" ALTER COLUMN "updatedFields" SET NOT NULL;
-
--- Delete statusLogs where formId is null
-DELETE FROM "default$default"."StatusLog"
-WHERE "formId" IS NULL;
-
-ALTER TABLE "default$default"."StatusLog" ALTER COLUMN "formId" SET NOT NULL;
 
 -- TRANSPORT_SEGMENT
 
