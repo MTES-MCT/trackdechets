@@ -1,15 +1,15 @@
-import supertest from "supertest";
-import os from "os";
+import { User } from "@prisma/client";
 import fs from "fs";
-import path from "path";
-import { app } from "../../../server";
-import { companyFactory, userFactory } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
+import os from "os";
+import path from "path";
+import supertest from "supertest";
+import { app } from "../../../server";
 import {
   associateUserToCompany,
   createAccessToken
 } from "../../../users/database";
-import { User } from "../../../generated/prisma-client";
+import { companyFactory, userFactory } from "../../../__tests__/factories";
 
 // Ce fichier de tests illustre l'utilisation de l'API GraphQL Trackdéchets
 // dans les exemples de situation décrits dans la notice explicative
@@ -28,7 +28,7 @@ import { User } from "../../../generated/prisma-client";
 const request = supertest(app);
 
 describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () => {
-  afterEach(() => resetDatabase());
+  beforeEach(() => resetDatabase());
 
   // Chemin d'accès au répertoire de stockage des PDF de tests ./pdf
   // Vous pouvez inspecter ces PDF pour visualiser à quoi ressemble le PDF
@@ -232,12 +232,10 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       .post("/")
       .set("Authorization", `Bearer ${producteurToken}`)
       .send({ query: markAsSealedQuery });
-
     form = markAsSealedResponse.body.data.markAsSealed;
 
     // Le BSD passe à l'état "Finalisé"
     expect(form.status).toEqual("SEALED");
-
     // Télécharge le pdf
     await downloadPdf(form.id, producteurToken, "1-bsd-sealed.pdf");
 
@@ -273,7 +271,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     form = signedByTransporterResponse.body.data.signedByTransporter;
 
     expect(form.status).toEqual("SENT");
-
     // Télécharge le pdf
     await downloadPdf(form.id, producteurToken, "1-bsd-sent.pdf");
 
@@ -304,7 +301,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
 
     form = markAsReceivedResponse.body.data.markAsReceived;
     expect(form.status).toEqual("ACCEPTED");
-
     // Télécharge le pdf
     await downloadPdf(form.id, producteurToken, "1-bsd-received.pdf");
 
@@ -341,7 +337,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     // Le producteur reçoit les notifications de réception et de traitement
     // en temps réel en interrogeant la query formsLifeCycle périodiquement
     // (tous les jours par exemple)
-
     const formsLifeCycleQuery = `
       query {
         formsLifeCycle(siret: "${producteur.siret}"){
@@ -360,7 +355,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
 
     const statusLogs =
       formsLifeCycleResponse.body.data.formsLifeCycle.statusLogs;
-
     expect(statusLogs).toEqual([
       {
         status: "PROCESSED",
@@ -1127,12 +1121,12 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
                 phone: "0400000000",
                 mail: "marc.pneu@transportquimousse.fr"
               },
-              isExemptedOfReceipt: null,
               receipt: "76498",
+              customInfo: null,
+              isExemptedOfReceipt: null,
               department: "07",
               validityLimit: "2020-07-30T00:00:00.000Z",
-              numberPlate: "OG-678-PS",
-              customInfo: null
+              numberPlate: "OG-678-PS"
             }
           }
         }
@@ -1439,6 +1433,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
       .post("/")
       .set("Authorization", `Bearer ${transporteur1Token}`)
       .send({ query: prepareSegmentQuery });
+
     const transportSegment1 = prepareSegmentResponse.body.data.prepareSegment;
 
     const {

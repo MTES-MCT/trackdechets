@@ -2,17 +2,18 @@ import { GraphQLContext } from "../../../../types";
 import {
   EmitterType,
   QuantityType,
-  Form as PrismaForm
-} from "../../../../generated/prisma-client";
+  Form as PrismaForm,
+  User
+} from "@prisma/client";
 import { Form as GraphQLForm } from "../../../../generated/graphql/types";
 
-export function getNewValidPrismaForm(): PrismaForm {
+export function getNewValidPrismaForm(): Partial<PrismaForm> {
   return {
     id: "cjplbvecc000d0766j32r19am",
-    readableId: "TD-xxx",
+    readableId: "BSD-20210101-AAAAAAAA",
     isImportedFromPaper: false,
-    createdAt: "2018-12-11T00:00:00.000Z",
-    updatedAt: "2018-12-11T00:00:00.000Z",
+    createdAt: new Date("2018-12-11T00:00:00.000Z"),
+    updatedAt: new Date("2018-12-11T00:00:00.000Z"),
     status: "DRAFT",
     emitterType: "PRODUCER",
     emitterWorkSiteName: "",
@@ -37,7 +38,7 @@ export function getNewValidPrismaForm(): PrismaForm {
     recipientIsTempStorage: false,
     transporterReceipt: "sdfg",
     transporterDepartment: "82",
-    transporterValidityLimit: "2018-12-11T00:00:00.000Z",
+    transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
     transporterNumberPlate: "12345",
     transporterCompanyName: "A company 4",
     transporterCompanySiret: "25698741547863",
@@ -61,7 +62,7 @@ export function getNewValidPrismaForm(): PrismaForm {
 export function getNewValidForm(): GraphQLForm {
   return {
     id: "cjplbvecc000d0766j32r19am",
-    readableId: "TD-xxx",
+    readableId: "BSD-20210101-AAAAAAAA",
     isImportedFromPaper: false,
     status: "DRAFT",
     emitter: {
@@ -225,9 +226,9 @@ export function getContext(): GraphQLContext {
       name: "username",
       email: "user@trackdechets.fr",
       password: "pass",
-      createdAt: "",
-      updatedAt: ""
-    },
+      createdAt: new Date(),
+      updatedAt: new Date()
+    } as User,
     req: null as any,
     res: null as any
   };

@@ -1,9 +1,9 @@
-import Excel from "exceljs";
+import * as Excel from "exceljs";
 import countries from "world-countries";
 import { Column, FormFlattened } from "./types";
 
 const identity = (v: any) => v ?? "";
-const formatDate = (d: string | null) => (d ? d.slice(0, 10) : "");
+const formatDate = (d: Date | null) => d?.toISOString().slice(0, 10) ?? "";
 const formatBoolean = (b: boolean | null) => {
   if (b === null) {
     return "";

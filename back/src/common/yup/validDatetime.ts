@@ -1,4 +1,4 @@
-import { parse } from "date-fns";
+import { parse, isDate, isValid } from "date-fns";
 import * as yup from "yup";
 
 const allowedFormats = [
@@ -10,22 +10,23 @@ const allowedFormats = [
 ];
 
 /**
- * Check an incoming string is a date formatted according to allowed_formats
+ * Check input is a date or a date string formatted according to allowed_formats
  * "2020-11-23", "2020-11-23T13:34:55","2020-11-23T13:34:55Z", "2020-11-23T13:34:55.987", "2020-11-23T13:34:55.987Z"
  */
-export const isValidDatetime = str => {
-  if (!str) {
-    return true;
+function parseDateString(_, originalValue) {
+  if (isDate(originalValue)) {
+    return originalValue;
   }
+
   for (const fmt of allowedFormats) {
-    // to know if a given string is correctly formatted date, we use date-fns parse
-    // if format is correct, getDate() will return a nice Date object,
-    // else parse will return an Invalid Date, i.e Date, whose time value is NaN
-    if (!!parse(str, fmt, new Date()).getDate()) {
-      return true;
+    const date = parse(originalValue, fmt, new Date());
+    if (isValid(date)) {
+      return date;
     }
   }
-};
+
+  return null;
+}
 
 /**
  * Check a provided string is parsable as a valid date
@@ -39,18 +40,14 @@ export const isValidDatetime = str => {
  * @param required - is this field required ?
  */
 export default function validDatetime({ verboseFieldName, required = false }) {
-  let validator = yup.string();
+  const validator = yup
+    .date()
+    .typeError(`La ${verboseFieldName} n'est pas formatée correctement`)
+    .transform(parseDateString);
+
   if (!!required) {
-    validator = validator.required(`Vous devez saisir une ${verboseFieldName}`);
-  } else {
-    validator = validator.nullable();
+    return validator.required(`Vous devez saisir une ${verboseFieldName}`);
   }
 
-  return validator.test(
-    "valid-required-date",
-    `La ${verboseFieldName} n'est pas formatée correctement`,
-    v => {
-      return isValidDatetime(v);
-    }
-  );
+  return validator.nullable();
 }

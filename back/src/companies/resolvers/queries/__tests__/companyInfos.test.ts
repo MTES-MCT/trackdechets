@@ -8,17 +8,14 @@ jest.mock("../../../sirene", () => ({
 }));
 
 const companyMock = jest.fn();
-jest.mock("../../../../generated/prisma-client", () => ({
-  prisma: {
-    company: jest.fn(() => ({
-      $fragment: companyMock
-    }))
-  }
+jest.mock("../../../../prisma", () => ({
+  company: { findUnique: jest.fn((...args) => companyMock(...args)) }
 }));
 
 const installationMock = jest.fn();
 jest.mock("../../../database", () => ({
-  getInstallation: jest.fn((...args) => installationMock(...args))
+  getInstallation: jest.fn((...args) => installationMock(...args)),
+  convertUrls: v => v
 }));
 
 describe("companyInfos", () => {

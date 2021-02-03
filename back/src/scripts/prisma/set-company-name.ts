@@ -1,4 +1,4 @@
-import { prisma } from "../../generated/prisma-client";
+import prisma from "../../prisma";
 import { searchCompany } from "../../companies/sirene";
 
 function sleep(ms) {
@@ -7,7 +7,7 @@ function sleep(ms) {
 
 export async function setCompanyName() {
   // filter companies where name field is not set
-  const companies = await prisma.companies({ where: { name: null } });
+  const companies = await prisma.company.findMany({ where: { name: null } });
 
   for (const company of companies) {
     console.log(`Setting name for company ${company.siret}`);
@@ -15,7 +15,7 @@ export async function setCompanyName() {
     try {
       const companyInfo = await searchCompany(company.siret);
 
-      await prisma.updateCompany({
+      await prisma.company.update({
         data: {
           name: companyInfo.name
         },

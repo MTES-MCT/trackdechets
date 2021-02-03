@@ -1,4 +1,4 @@
-import { FormWhereInput } from "../../generated/prisma-client";
+import { Prisma } from "@prisma/client";
 import { FormsRegisterExportType } from "../../generated/graphql/types";
 
 /**
@@ -8,19 +8,19 @@ import { FormsRegisterExportType } from "../../generated/graphql/types";
 export function formsWhereInput(
   exportType: FormsRegisterExportType,
   sirets: string[],
-  startDate?: string,
-  endDate?: string,
+  startDate?: Date,
+  endDate?: Date,
   wasteCode?: string
-): FormWhereInput {
+): Prisma.FormWhereInput {
   // build prisma where input
-  const whereInputs: FormWhereInput[] = [];
+  const whereInputs: Prisma.FormWhereInput[] = [];
 
   if (startDate) {
-    whereInputs.push({ sentAt_gte: startDate });
+    whereInputs.push({ sentAt: { gte: startDate } });
   }
 
   if (endDate) {
-    whereInputs.push({ sentAt_lte: endDate });
+    whereInputs.push({ sentAt: { lte: endDate } });
   }
 
   if (wasteCode) {
@@ -43,10 +43,13 @@ export function formsWhereInput(
 /**
  * Forms corresponding to outgoing wastes of a list of production companies
  */
-function outgoingWasteWhereInput(sirets: string[]): FormWhereInput {
+function outgoingWasteWhereInput(sirets: string[]): Prisma.FormWhereInput {
   return {
-    OR: [{ emitterCompanySiret_in: sirets }, { ecoOrganismeSiret_in: sirets }],
-    AND: [{ status_not_in: ["DRAFT", "SEALED"] }]
+    OR: [
+      { emitterCompanySiret: { in: sirets } },
+      { ecoOrganismeSiret: { in: sirets } }
+    ],
+    AND: [{ status: { notIn: ["DRAFT", "SEALED"] } }]
   };
 }
 
@@ -54,14 +57,14 @@ function outgoingWasteWhereInput(sirets: string[]): FormWhereInput {
  * Forms corresponding to incoming wastes of a list of treatment or TTR companies
  * We need to handle cases whith a temp storage
  */
-function incomingWasteWhereInput(sirets: string[]): FormWhereInput {
+function incomingWasteWhereInput(sirets: string[]): Prisma.FormWhereInput {
   return {
     OR: [
       {
         AND: [
           { recipientIsTempStorage: false },
-          { recipientCompanySiret_in: sirets },
-          { status_not_in: ["DRAFT", "SEALED", "SENT"] }
+          { recipientCompanySiret: { in: sirets } },
+          { status: { notIn: ["DRAFT", "SEALED", "SENT"] } }
         ]
       },
       {
@@ -71,26 +74,28 @@ function incomingWasteWhereInput(sirets: string[]): FormWhereInput {
             OR: [
               {
                 AND: [
-                  { recipientCompanySiret_in: sirets },
-                  { status_not_in: ["DRAFT", "SEALED", "SENT"] }
+                  { recipientCompanySiret: { in: sirets } },
+                  { status: { notIn: ["DRAFT", "SEALED", "SENT"] } }
                 ]
               },
               {
                 AND: [
                   {
                     temporaryStorageDetail: {
-                      destinationCompanySiret_in: sirets
+                      destinationCompanySiret: { in: sirets }
                     }
                   },
                   {
-                    status_not_in: [
-                      "DRAFT",
-                      "SEALED",
-                      "SENT",
-                      "TEMP_STORED",
-                      "TEMP_STORER_ACCEPTED",
-                      "RESENT"
-                    ]
+                    status: {
+                      notIn: [
+                        "DRAFT",
+                        "SEALED",
+                        "SENT",
+                        "TEMP_STORED",
+                        "TEMP_STORER_ACCEPTED",
+                        "RESENT"
+                      ]
+                    }
                   }
                 ]
               }
@@ -106,14 +111,14 @@ function incomingWasteWhereInput(sirets: string[]): FormWhereInput {
  * Forms corresponding to transported wastes of a list of transporter companies
  * We need to handle cases of multiple transporters with temporary storage
  */
-function transportedWasteWhereInput(sirets: string[]): FormWhereInput {
+function transportedWasteWhereInput(sirets: string[]): Prisma.FormWhereInput {
   return {
     OR: [
       {
         AND: [
           { recipientIsTempStorage: false },
-          { transporterCompanySiret_in: sirets },
-          { status_not_in: ["DRAFT", "SEALED"] }
+          { transporterCompanySiret: { in: sirets } },
+          { status: { notIn: ["DRAFT", "SEALED"] } }
         ]
       },
       // temporary storage
@@ -122,17 +127,19 @@ function transportedWasteWhereInput(sirets: string[]): FormWhereInput {
           { recipientIsTempStorage: true },
           {
             temporaryStorageDetail: {
-              transporterCompanySiret_in: sirets
+              transporterCompanySiret: { in: sirets }
             }
           },
           {
-            status_not_in: [
-              "DRAFT",
-              "SEALED",
-              "SENT",
-              "TEMP_STORED",
-              "TEMP_STORER_ACCEPTED"
-            ]
+            status: {
+              notIn: [
+                "DRAFT",
+                "SEALED",
+                "SENT",
+                "TEMP_STORED",
+                "TEMP_STORER_ACCEPTED"
+              ]
+            }
           }
         ]
       },
@@ -140,11 +147,13 @@ function transportedWasteWhereInput(sirets: string[]): FormWhereInput {
       {
         AND: [
           {
-            transportSegments_some: {
-              transporterCompanySiret_in: sirets
+            transportSegments: {
+              some: {
+                transporterCompanySiret: { in: sirets }
+              }
             }
           },
-          { status_not_in: ["DRAFT", "SEALED"] }
+          { status: { notIn: ["DRAFT", "SEALED"] } }
         ]
       }
     ]
@@ -154,13 +163,13 @@ function transportedWasteWhereInput(sirets: string[]): FormWhereInput {
 /**
  * Forms corresponding to traded waste of a list of trader companies
  */
-function tradedWasteWhereInput(sirets: string[]): FormWhereInput {
+function tradedWasteWhereInput(sirets: string[]): Prisma.FormWhereInput {
   return {
     AND: [
       {
-        status_not_in: ["DRAFT", "SEALED"]
+        status: { notIn: ["DRAFT", "SEALED"] }
       },
-      { traderCompanySiret_in: sirets }
+      { traderCompanySiret: { in: sirets } }
     ]
   };
 }
@@ -169,30 +178,32 @@ function tradedWasteWhereInput(sirets: string[]): FormWhereInput {
  * Forms where a list of companies are present for any status
  * excepted DRAFT and SEALED
  */
-function allWasteWhereInput(sirets: string[]): FormWhereInput {
+function allWasteWhereInput(sirets: string[]): Prisma.FormWhereInput {
   return {
     AND: [
       {
-        status_not_in: ["DRAFT", "SEALED"]
+        status: { notIn: ["DRAFT", "SEALED"] }
       },
       {
         OR: [
-          { emitterCompanySiret_in: sirets },
-          { ecoOrganismeSiret_in: sirets },
-          { recipientCompanySiret_in: sirets },
-          { traderCompanySiret_in: sirets },
+          { emitterCompanySiret: { in: sirets } },
+          { ecoOrganismeSiret: { in: sirets } },
+          { recipientCompanySiret: { in: sirets } },
+          { traderCompanySiret: { in: sirets } },
           {
-            temporaryStorageDetail: { destinationCompanySiret_in: sirets }
+            temporaryStorageDetail: { destinationCompanySiret: { in: sirets } }
           },
-          { traderCompanySiret_in: sirets },
-          { traderCompanySiret_in: sirets },
-          { transporterCompanySiret_in: sirets },
+          { traderCompanySiret: { in: sirets } },
+          { traderCompanySiret: { in: sirets } },
+          { transporterCompanySiret: { in: sirets } },
           {
-            temporaryStorageDetail: { transporterCompanySiret_in: sirets }
+            temporaryStorageDetail: { transporterCompanySiret: { in: sirets } }
           },
           {
-            transportSegments_some: {
-              transporterCompanySiret_in: sirets
+            transportSegments: {
+              some: {
+                transporterCompanySiret: { in: sirets }
+              }
             }
           }
         ]

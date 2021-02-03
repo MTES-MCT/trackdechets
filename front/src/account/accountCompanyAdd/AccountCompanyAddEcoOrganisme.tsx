@@ -1,7 +1,7 @@
 import React from "react";
-import { FaTrash } from "react-icons/fa";
 import { Field, FieldArray, useField } from "formik";
 import className from "classnames";
+import { IconTrash } from "common/components/Icons";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "../AccountCompanyAdd.module.scss";
 
@@ -39,7 +39,7 @@ export default function AccountCompanyAddEcoOrganisme() {
                             onClick={() => remove(index)}
                             aria-label="Supprimer"
                           >
-                            <FaTrash />
+                            <IconTrash />
                           </button>
                         </div>
                       ))}

@@ -1,17 +1,17 @@
+import { parseString } from "@fast-csv/parse";
+import * as Excel from "exceljs";
 import fs, { createWriteStream } from "fs";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import prisma from "../../../../prisma";
+import supertest from "supertest";
+import { ErrorCode } from "../../../../common/errors";
+import { app } from "../../../../server";
 import {
-  userWithCompanyFactory,
   formFactory,
-  formWithTempStorageFactory
+  formWithTempStorageFactory,
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import supertest from "supertest";
-import { app } from "../../../../server";
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import { parseString } from "@fast-csv/parse";
-import Excel from "exceljs";
-import { ErrorCode } from "../../../../common/errors";
-import { prisma } from "../../../../generated/prisma-client";
 
 function emitterFormFactory(ownerId: string, siret: string) {
   return formFactory({
@@ -203,8 +203,8 @@ describe("query { formsRegister }", () => {
       }
     });
 
-    const tempStorageDetail = await prisma
-      .form({ id: form.id })
+    const tempStorageDetail = await prisma.form
+      .findUnique({ where: { id: form.id } })
       .temporaryStorageDetail();
 
     const { query } = makeClient(user);

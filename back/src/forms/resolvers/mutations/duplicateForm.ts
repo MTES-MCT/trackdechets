@@ -1,16 +1,13 @@
-import {
-  Form,
-  prisma,
-  Status,
-  TemporaryStorageDetail,
-  User
-} from "../../../generated/prisma-client";
+import { Status, Form, TemporaryStorageDetail, User } from "@prisma/client";
+import prisma from "../../../prisma";
+
 import { expandFormFromDb } from "../../form-converter";
-import { getReadableId } from "../../readable-id";
+import getReadableId from "../../readableId";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
 import { checkCanDuplicate } from "../../permissions";
+import { eventEmitter, TDEvent } from "../../../events/emitter";
 
 /**
  * Duplicate a form by stripping the properties that should not be copied.
@@ -47,15 +44,20 @@ async function duplicateForm(
     transporterNumberPlate,
     transporterCustomInfo,
     currentTransporterSiret,
+    temporaryStorageDetailId,
+    appendix2RootFormId,
+    ownerId,
 
     ...rest
   }: Form
 ) {
-  return prisma.createForm({
-    ...rest,
-    readableId: await getReadableId(),
-    status: "DRAFT",
-    owner: { connect: { id: user.id } }
+  return prisma.form.create({
+    data: {
+      ...rest,
+      readableId: getReadableId(),
+      status: "DRAFT",
+      owner: { connect: { id: user.id } }
+    }
   });
 }
 
@@ -85,7 +87,7 @@ function duplicateTemporaryStorageDetail(
     ...rest
   }: TemporaryStorageDetail
 ) {
-  return prisma.updateForm({
+  return prisma.form.update({
     where: {
       id: form.id
     },
@@ -119,21 +121,31 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
 
   const newForm = await duplicateForm(user, existingForm);
 
-  const temporaryStorageDetail = await prisma
-    .form({ id: existingForm.id })
+  const temporaryStorageDetail = await prisma.form
+    .findUnique({ where: { id: existingForm.id } })
     .temporaryStorageDetail();
 
   if (temporaryStorageDetail) {
     await duplicateTemporaryStorageDetail(newForm, temporaryStorageDetail);
   }
 
-  // create statuslog when form is created
-  await prisma.createStatusLog({
-    form: { connect: { id: newForm.id } },
-    user: { connect: { id: user.id } },
-    status: newForm.status as Status,
+  eventEmitter.emit(TDEvent.CreateForm, {
+    previousNode: null,
+    node: newForm,
     updatedFields: {},
-    loggedAt: new Date()
+    mutation: "CREATED"
+  });
+
+  // create statuslog when form is created
+  await prisma.statusLog.create({
+    data: {
+      form: { connect: { id: newForm.id } },
+      user: { connect: { id: user.id } },
+      status: newForm.status as Status,
+      authType: user.auth,
+      updatedFields: {},
+      loggedAt: new Date()
+    }
   });
 
   return expandFormFromDb(newForm);

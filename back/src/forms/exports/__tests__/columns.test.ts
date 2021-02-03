@@ -14,14 +14,14 @@ describe("formatRow", () => {
     emitterCompanyAddress: "20 Avenue de la 1ère Dfl 13000 Marseille",
     recipientCompanySiret: "5678",
     receivedAt: null,
-    sentAt: "2020-03-01T00:00:00.000Z",
+    sentAt: new Date("2020-03-01T00:00:00.000Z"),
     transporterNumberPlate: "aa22",
     transporterIsExemptedOfReceipt: true,
     recipientProcessingOperation: "D 6",
     emitterCompanyContact: "Marc Martin",
     recipientCompanyMail: "recipient@td.io",
     emitterCompanySiret: "1234",
-    readableId: "TD-8865a853b7da51b9789db6ada3ef8bee",
+    readableId: "BSD-20210101-AAAAAAAA",
     recipientCompanyName: "WASTE COMPANY",
     ecoOrganismeName: ""
   };

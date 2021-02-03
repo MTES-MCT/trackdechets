@@ -1,8 +1,8 @@
-import { createUserAccountHash, associateUserToCompany } from "../database";
-import { prisma } from "../../generated/prisma-client";
+import { resetDatabase } from "../../../integration-tests/helper";
+import prisma from "../../prisma";
 import { ErrorCode } from "../../common/errors";
 import { userWithCompanyFactory } from "../../__tests__/factories";
-import { resetDatabase } from "../../../integration-tests/helper";
+import { associateUserToCompany, createUserAccountHash } from "../database";
 
 describe("createUserAccountHash", () => {
   afterAll(resetDatabase);
@@ -12,7 +12,7 @@ describe("createUserAccountHash", () => {
     const role = "MEMBER";
     const siret = "00000000000000";
     await createUserAccountHash(email, role, siret);
-    const userAccountHashes = await prisma.userAccountHashes();
+    const userAccountHashes = await prisma.userAccountHash.findMany();
     expect(userAccountHashes).toHaveLength(1);
     expect(userAccountHashes[0].email).toEqual(email);
     expect(userAccountHashes[0].role).toEqual(role);
@@ -24,11 +24,13 @@ describe("createUserAccountHash", () => {
     const email = "john.snow@trackdechets.fr";
     const role = "MEMBER";
     const siret = "00000000000000";
-    await prisma.createUserAccountHash({
-      email,
-      role,
-      companySiret: siret,
-      hash: "hash"
+    await prisma.userAccountHash.create({
+      data: {
+        email,
+        role,
+        companySiret: siret,
+        hash: "hash"
+      }
     });
     try {
       await createUserAccountHash(email, role, siret);

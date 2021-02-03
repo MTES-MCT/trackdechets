@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { Form as FormModel } from "generated/graphql/types";
 import { NotificationError } from "common/components/Error";
 import { capitalize } from "common/helper";
-import { PaperWriteIcon } from "common/components/Icons";
+import { IconPaperWrite } from "common/components/Icons";
 import TdModal from "common/components/Modal";
 
 export const UPDATE_PLATE = gql`
@@ -76,7 +76,7 @@ export default function TransporterInfoEdit({
         onClick={() => setIsOpen(true)}
         title={`Modifier ${verboseFieldName}`}
       >
-        <PaperWriteIcon color="#0053b3" />
+        <IconPaperWrite color="blue" />
       </button>
       <TdModal
         isOpen={isOpen}

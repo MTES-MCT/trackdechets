@@ -1,5 +1,5 @@
 import Tooltip from "../../common/components/Tooltip";
-import { Close } from "common/components/Icons";
+import { IconClose } from "common/components/Icons";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import NumberInput from "form/custom-inputs/NumberInput";
 import { Field, FieldArray, FieldProps } from "formik";
@@ -126,7 +126,7 @@ export default function Packagings({
                     onClick={() => arrayHelpers.remove(idx)}
                   >
                     <button type="button">
-                      <Close color="#000" />
+                      <IconClose />
                     </button>
                   </div>
                 </div>

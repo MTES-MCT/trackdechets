@@ -1,7 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { createTestClient } from "apollo-server-integration-testing";
 import { server } from "../../../../server";
-import { prisma } from "../../../../generated/prisma-client";
+import prisma from "../../../../prisma";
 import { companyFactory } from "../../../../__tests__/factories";
 import { getUserCompanies } from "../../../database";
 import makeClient from "../../../../__tests__/testClient";
@@ -36,12 +36,14 @@ describe("joinWithInvite mutation", () => {
     const company = await companyFactory();
     const invitee = "john.snow@trackdechets.fr";
 
-    const invitation = await prisma.createUserAccountHash({
-      email: invitee,
-      companySiret: company.siret,
-      role: "MEMBER",
-      hash: "hash",
-      acceptedAt: new Date().toISOString()
+    const invitation = await prisma.userAccountHash.create({
+      data: {
+        email: invitee,
+        companySiret: company.siret,
+        role: "MEMBER",
+        hash: "hash",
+        acceptedAt: new Date().toISOString()
+      }
     });
     const { errors } = await mutate(JOIN_WITH_INVITE, {
       variables: {
@@ -58,11 +60,13 @@ describe("joinWithInvite mutation", () => {
     const company = await companyFactory();
     const invitee = "john.snow@trackdechets.fr";
 
-    const invitation = await prisma.createUserAccountHash({
-      email: invitee,
-      companySiret: company.siret,
-      role: "MEMBER",
-      hash: "hash"
+    const invitation = await prisma.userAccountHash.create({
+      data: {
+        email: invitee,
+        companySiret: company.siret,
+        role: "MEMBER",
+        hash: "hash"
+      }
     });
 
     const { data } = await mutate(JOIN_WITH_INVITE, {
@@ -76,16 +80,21 @@ describe("joinWithInvite mutation", () => {
     expect(data.joinWithInvite.email).toEqual(invitee);
 
     // should mark invitation as joined
-    const updatedInvitation = await prisma.userAccountHash({
-      id: invitation.id
+    const updatedInvitation = await prisma.userAccountHash.findUnique({
+      where: {
+        id: invitation.id
+      }
     });
-    expect(updatedInvitation.acceptedAt.length).toBeGreaterThan(0);
+    expect(updatedInvitation.acceptedAt).not.toBeNull();
 
     // check invitee is company member
-    const isCompanyMember = await prisma.$exists.companyAssociation({
-      user: { email: invitee },
-      company: { siret: company.siret }
-    });
+    const isCompanyMember =
+      (await prisma.companyAssociation.findFirst({
+        where: {
+          user: { email: invitee },
+          company: { siret: company.siret }
+        }
+      })) != null;
     expect(isCompanyMember).toEqual(true);
   });
 
@@ -94,18 +103,22 @@ describe("joinWithInvite mutation", () => {
     const company2 = await companyFactory();
     const invitee = "john.snow@trackdechets.fr";
 
-    const invitation1 = await prisma.createUserAccountHash({
-      email: invitee,
-      companySiret: company1.siret,
-      role: "MEMBER",
-      hash: "hash1"
+    const invitation1 = await prisma.userAccountHash.create({
+      data: {
+        email: invitee,
+        companySiret: company1.siret,
+        role: "MEMBER",
+        hash: "hash1"
+      }
     });
 
-    const invitation2 = await prisma.createUserAccountHash({
-      email: invitee,
-      companySiret: company2.siret,
-      role: "MEMBER",
-      hash: "hash2"
+    const invitation2 = await prisma.userAccountHash.create({
+      data: {
+        email: invitee,
+        companySiret: company2.siret,
+        role: "MEMBER",
+        hash: "hash2"
+      }
     });
 
     await mutate(JOIN_WITH_INVITE, {
@@ -116,12 +129,14 @@ describe("joinWithInvite mutation", () => {
       }
     });
 
-    const updatedInvitation2 = await prisma.userAccountHash({
-      id: invitation2.id
+    const updatedInvitation2 = await prisma.userAccountHash.findUnique({
+      where: {
+        id: invitation2.id
+      }
     });
-    expect(updatedInvitation2.acceptedAt.length).toBeGreaterThan(0);
+    expect(updatedInvitation2.acceptedAt).not.toBeNull();
 
-    const user = await prisma.user({ email: invitee });
+    const user = await prisma.user.findUnique({ where: { email: invitee } });
     const companies = await getUserCompanies(user.id);
 
     expect(companies.length).toEqual(2);
@@ -137,11 +152,13 @@ describe("joinWithInvite mutation", () => {
     const company = await companyFactory();
     const invitee = "john.snow@trackdechets.fr";
 
-    const invitation = await prisma.createUserAccountHash({
-      email: invitee,
-      companySiret: company.siret,
-      role: "MEMBER",
-      hash: "hash"
+    const invitation = await prisma.userAccountHash.create({
+      data: {
+        email: invitee,
+        companySiret: company.siret,
+        role: "MEMBER",
+        hash: "hash"
+      }
     });
     const { errors: errs1 } = await mutate(JOIN_WITH_INVITE, {
       variables: {

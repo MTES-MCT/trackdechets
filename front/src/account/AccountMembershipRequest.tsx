@@ -9,7 +9,6 @@ import {
   UserRole,
 } from "generated/graphql/types";
 import { useHistory, useParams } from "react-router-dom";
-import { FaHourglassHalf } from "react-icons/fa";
 import cogoToast from "cogo-toast";
 
 const MEMBERSHIP_REQUEST = gql`
@@ -138,7 +137,7 @@ export default function AccountMembershipRequest() {
               type="button"
               onClick={() => refuseMembershipRequest({ variables: { id } })}
             >
-              {refuseLoading ? <FaHourglassHalf /> : "Refuser"}
+              {refuseLoading ? "Chargement..." : "Refuser"}
             </button>
             <button
               className="btn btn--primary"
@@ -147,7 +146,7 @@ export default function AccountMembershipRequest() {
                 acceptMembershipRequest({ variables: { id, role: userRole } })
               }
             >
-              {acceptLoading ? <FaHourglassHalf /> : "Accepter"}
+              {acceptLoading ? "Chargement..." : "Accepter"}
             </button>
           </div>
           {acceptError && <NotificationError apolloError={acceptError} />}

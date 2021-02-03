@@ -3,13 +3,13 @@ import {
   AuthType,
   applyAuthStrategies
 } from "../auth";
-import { AccessToken, User } from "../generated/prisma-client";
+import { AccessToken, User } from "@prisma/client";
 import { GraphQLContext } from "../types";
 
 const updateAccessTokenMock = jest.fn();
-jest.mock("../generated/prisma-client", () => ({
-  prisma: {
-    updateAccessToken: jest.fn((...args) => updateAccessTokenMock(...args))
+jest.mock("../prisma", () => ({
+  accessToken: {
+    update: jest.fn((...args) => updateAccessTokenMock(...args))
   }
 }));
 
@@ -30,11 +30,13 @@ describe("updateAccessTokenLastUsed", () => {
     mockDate();
     const accessToken: AccessToken = {
       id: "",
-      createdAt: "",
-      updatedAt: "",
+      createdAt: new Date(),
+      updatedAt: new Date(),
       token: "token",
       lastUsed: null,
-      isRevoked: false
+      isRevoked: false,
+      applicationId: null,
+      userId: ""
     };
 
     // it should set lastUsed if it was never set
@@ -48,11 +50,13 @@ describe("updateAccessTokenLastUsed", () => {
   it("should not set lastUsed if it was already set the same day", () => {
     const accessToken: AccessToken = {
       id: "",
-      createdAt: "",
-      updatedAt: "",
+      createdAt: new Date(),
+      updatedAt: new Date(),
       token: "token",
-      lastUsed: "2019-10-04T00:00:00.000Z",
-      isRevoked: false
+      lastUsed: new Date("2019-10-04T00:00:00.000Z"),
+      isRevoked: false,
+      applicationId: null,
+      userId: ""
     };
     updateAccessTokenLastUsed(accessToken);
     expect(updateAccessTokenMock).not.toBeCalled();
@@ -61,11 +65,13 @@ describe("updateAccessTokenLastUsed", () => {
   it("should set lastUsed if it was set more than one day ago", () => {
     const accessToken: AccessToken = {
       id: "",
-      createdAt: "",
-      updatedAt: "",
+      createdAt: new Date(),
+      updatedAt: new Date(),
       token: "token",
-      lastUsed: "2019-10-02T00:00:00.000Z",
-      isRevoked: false
+      lastUsed: new Date("2019-10-02T00:00:00.000Z"),
+      isRevoked: false,
+      applicationId: null,
+      userId: ""
     };
     updateAccessTokenLastUsed(accessToken);
     expect(updateAccessTokenMock).toHaveBeenCalledWith({
@@ -77,15 +83,15 @@ describe("updateAccessTokenLastUsed", () => {
 
 describe("applyAuthStrategies", () => {
   it("should keep user in context if auth strategy is allowed", () => {
-    const user: User = {
+    const user: Partial<User> = {
       id: "1",
       email: "john.snow@trackdechets.fr",
       password: "pass",
-      createdAt: "",
-      updatedAt: ""
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     const context: GraphQLContext = {
-      user: { ...user, auth: AuthType.Session },
+      user: { ...(user as User), auth: AuthType.Session },
       req: null,
       res: null
     };
@@ -94,15 +100,15 @@ describe("applyAuthStrategies", () => {
   });
 
   it("should remove user from context if auth strategy is not allowed", () => {
-    const user: User = {
+    const user: Partial<User> = {
       id: "1",
       email: "john.snow@trackdechets.fr",
       password: "pass",
-      createdAt: "",
-      updatedAt: ""
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     const context: GraphQLContext = {
-      user: { ...user, auth: AuthType.Bearer },
+      user: { ...(user as User), auth: AuthType.Bearer },
       req: null,
       res: null
     };

@@ -1,14 +1,5 @@
-import { useMutation } from "@apollo/client";
-import React, { useState, useEffect, useCallback } from "react";
-
-import {
-  WaterDamIcon,
-  CogApprovedIcon,
-  PaperWriteIcon,
-  WarehouseStorageIcon,
-  ChevronDown,
-  ChevronUp,
-} from "common/components/Icons";
+import React, { useState, useCallback } from "react";
+import { IconChevronDown, IconChevronUp } from "common/components/Icons";
 import { Form, FormStatus } from "generated/graphql/types";
 import "./SlipActions.scss";
 import Delete from "./Delete";
@@ -16,30 +7,13 @@ import DownloadPdf from "./DownloadPdf";
 import Edit from "./Edit";
 import Duplicate from "./Duplicate";
 import Quicklook from "./Quicklook";
-import { getNextStep } from "./next-step";
-import Processed from "./Processed";
-import Received from "./Received";
-import Accepted from "./Accepted";
-import Sealed from "./Sealed";
-import Resealed from "./Resealed";
-import mutations from "./slip-actions.mutations";
-import { NotificationError } from "common/components/Error";
 import OutsideClickHandler from "react-outside-click-handler";
-import { COLORS } from "common/config";
-import TdModal from "common/components/Modal";
-import ActionButton from "common/components/ActionButton";
 
-export type SlipActionProps = {
-  onSubmit: (vars: any) => any;
-  onCancel: () => void;
-  form: Form;
-};
 interface SlipActionsProps {
   form: Form;
-  siret: string;
 }
 
-export const SlipActions = ({ form, siret }: SlipActionsProps) => {
+export const SlipActions = ({ form }: SlipActionsProps) => {
   const [dropdownOpened, toggleDropdown] = useState(false);
   // To avoid tracking each dropdown opening state we rely on OutsideClickHandler to close opened dropdown
   //when we open another one.
@@ -72,9 +46,9 @@ export const SlipActions = ({ form, siret }: SlipActionsProps) => {
         >
           <span>Actions</span>
           {dropdownOpened ? (
-            <ChevronUp size={18} color={COLORS.blueLight} />
+            <IconChevronUp size="18px" color="blueLight" />
           ) : (
-            <ChevronDown size={18} color={COLORS.blueLight} />
+            <IconChevronDown size="18px" color="blueLight" />
           )}
         </button>
         {dropdownOpened && (
@@ -116,102 +90,4 @@ export const SlipActions = ({ form, siret }: SlipActionsProps) => {
       </div>
     </OutsideClickHandler>
   );
-};
-
-interface DynamicActionsProps extends SlipActionsProps {
-  siret: string;
-  refetch?: () => void;
-}
-export function DynamicActions({ form, siret, refetch }: DynamicActionsProps) {
-  const nextStep = getNextStep(form, siret);
-  // This dynamic mutation must have a value, otherwise the `useMutation` hook throws.
-  // And hooks should not be conditionally called (cf rules of hooks)
-  // Therefore, when there is no `nextStep`, we assign it **any** mutation: it does not matter as it will never get called
-  // Indeed nothing is rendered when there is no `nextStep`
-  const dynamicMutation = nextStep
-    ? mutations[nextStep]
-    : mutations.DELETE_FORM;
-
-  const [isOpen, setIsOpen] = useState(false);
-  const [mark, { error }] = useMutation(dynamicMutation, {
-    onCompleted: () => {
-      !!refetch && refetch();
-    },
-  });
-
-  useEffect(() => {
-    setIsOpen(false);
-  }, [nextStep]);
-
-  const ButtonComponent = nextStep ? buttons[nextStep].component : null;
-
-  if (!nextStep) {
-    return null;
-  }
-
-  return (
-    <div className="SlipActions">
-      <ActionButton
-        title={buttons[nextStep].title}
-        icon={buttons[nextStep].icon}
-        onClick={() => setIsOpen(true)}
-      />
-
-      <TdModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        ariaLabel={buttons[nextStep].title}
-      >
-        <h2 className="td-modal-title">{buttons[nextStep].title}</h2>
-        {ButtonComponent && (
-          <ButtonComponent
-            onCancel={() => setIsOpen(false)}
-            onSubmit={vars => mark({ variables: { id: form.id, ...vars } })}
-            form={form}
-          />
-        )}
-        {error && (
-          <NotificationError className="action-error" apolloError={error} />
-        )}
-      </TdModal>
-    </div>
-  );
-}
-
-const buttons = {
-  SEALED: {
-    title: "Finaliser le bordereau",
-    icon: PaperWriteIcon,
-    component: Sealed,
-  },
-  RECEIVED: {
-    title: "Valider la réception",
-    icon: WaterDamIcon,
-    component: Received,
-  },
-  ACCEPTED: {
-    title: "Valider l'acceptation",
-    icon: WaterDamIcon,
-    component: Accepted,
-  },
-  PROCESSED: {
-    title: "Valider le traitement",
-    icon: CogApprovedIcon,
-    component: Processed,
-  },
-  TEMP_STORED: {
-    title: "Valider l'entreposage provisoire",
-    icon: WarehouseStorageIcon,
-    component: Received,
-  },
-  TEMP_STORER_ACCEPTED: {
-    title: "Valider l'acceptation de l'entreposage provisoire",
-    icon: WarehouseStorageIcon,
-    component: Accepted,
-  },
-  RESEALED: {
-    title: "Compléter le BSD suite",
-    icon: PaperWriteIcon,
-    component: Resealed,
-  },
 };

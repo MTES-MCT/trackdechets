@@ -1,5 +1,5 @@
 import parseArgs from "minimist";
-import { prisma } from "../../generated/prisma-client";
+import prisma from "../../prisma";
 import { loadCompanies, loadRoles } from "./loaders";
 import { validateCompany, validateRoleGenerator } from "./validations";
 import { sirenify } from "./sirene";
@@ -120,20 +120,24 @@ export async function bulkCreate(opts: Opts): Promise<void> {
   // create companies in Trackdéchets
 
   for (const company of sirenifiedCompanies) {
-    const existingCompany = await prisma.company({ siret: company.siret });
+    const existingCompany = await prisma.company.findUnique({
+      where: { siret: company.siret }
+    });
     if (!existingCompany) {
       console.info(`Create company ${company.siret}`);
-      await prisma.createCompany({
-        siret: company.siret,
-        codeNaf: company.codeNaf,
-        gerepId: company.gerepId,
-        name: company.name,
-        companyTypes: { set: company.companyTypes },
-        securityCode: randomNumber(4),
-        givenName: company.givenName,
-        contactEmail: company.contactEmail,
-        contactPhone: company.contactPhone,
-        website: company.website
+      await prisma.company.create({
+        data: {
+          siret: company.siret,
+          codeNaf: company.codeNaf,
+          gerepId: company.gerepId,
+          name: company.name,
+          companyTypes: { set: company.companyTypes },
+          securityCode: randomNumber(4),
+          givenName: company.givenName,
+          contactEmail: company.contactEmail,
+          contactPhone: company.contactPhone,
+          website: company.website
+        }
       });
     }
   }
@@ -143,7 +147,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
 
   for (const email of Object.keys(usersWithRoles)) {
     // check for existing user
-    let user = await prisma.user({ email });
+    let user = await prisma.user.findUnique({ where: { email } });
 
     let newUser = null;
 
@@ -154,11 +158,13 @@ export async function bulkCreate(opts: Opts): Promise<void> {
       const hashedPassword = await hashPassword(password);
 
       console.info(`Create user ${email} / ${password}`);
-      user = await prisma.createUser({
-        name: email,
-        email,
-        password: hashedPassword,
-        isActive: true
+      user = await prisma.user.create({
+        data: {
+          name: email,
+          email,
+          password: hashedPassword,
+          isActive: true
+        }
       });
 
       await acceptNewUserCompanyInvitations(user);
@@ -173,9 +179,11 @@ export async function bulkCreate(opts: Opts): Promise<void> {
         } catch (err) {
           if (err instanceof UserInputError) {
             // association already exist, return it
-            const existingAssociations = await prisma.companyAssociations({
-              where: { company: { siret }, user: { id: user.id } }
-            });
+            const existingAssociations = await prisma.companyAssociation.findMany(
+              {
+                where: { company: { siret }, user: { id: user.id } }
+              }
+            );
             return existingAssociations[0];
           }
 

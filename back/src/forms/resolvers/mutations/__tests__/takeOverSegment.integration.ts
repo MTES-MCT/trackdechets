@@ -1,12 +1,12 @@
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import prisma from "../../../../prisma";
 import {
-  userWithCompanyFactory,
   formFactory,
+  transportSegmentFactory,
   userFactory,
-  transportSegmentFactory
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
 
 jest.mock("axios", () => ({
   default: {
@@ -70,12 +70,19 @@ describe("{ mutation { takeOverSegment } }", () => {
     );
 
     // segment take over fields are filled
-    const takenOverSegment = await prisma.transportSegment({ id: segment.id });
-    expect(takenOverSegment.takenOverAt).toBe("2020-04-28T00:00:00.000Z");
+    const takenOverSegment = await prisma.transportSegment.findUnique({
+      where: { id: segment.id }
+    });
+
+    expect(takenOverSegment.takenOverAt.toISOString()).toBe(
+      "2020-04-28T00:00:00.000Z"
+    );
     expect(takenOverSegment.takenOverBy).toBe("transporter suivant");
 
     // form next and currentTransporterSiret have been updated
-    const udpatedForm = await prisma.form({ id: form.id });
+    const udpatedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(udpatedForm.currentTransporterSiret).toBe(
       secondTransporterCompany.siret
     );

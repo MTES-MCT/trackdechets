@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-
-import { ChevronDown, ChevronUp } from "./Icons";
-import { COLORS } from "common/config";
+import { IconChevronDown, IconChevronUp } from "./Icons";
 
 export const MenuDropDown = props => {
   const [dropdownOpened, toggleDropdown] = useState(false);
@@ -14,9 +12,9 @@ export const MenuDropDown = props => {
       >
         <span>Actions</span>{" "}
         {dropdownOpened ? (
-          <ChevronUp size={18} color={COLORS.blueLight} />
+          <IconChevronUp size="18px" color="blueLight" />
         ) : (
-          <ChevronDown size={18} color={COLORS.blueLight} />
+          <IconChevronDown size="18px" color="blueLight" />
         )}
       </button>
       {dropdownOpened && (

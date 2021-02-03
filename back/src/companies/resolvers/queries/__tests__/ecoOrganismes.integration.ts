@@ -1,5 +1,5 @@
-import { prisma } from "../../../../generated/prisma-client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import prisma from "../../../../prisma";
 import makeClient from "../../../../__tests__/testClient";
 
 const ECO_ORGANISMES = `query { ecoOrganismes { siret } }`;
@@ -10,7 +10,9 @@ describe("query ecoOrgansime", () => {
   it("should return list of registered ecoOrganismes", async () => {
     const { query } = makeClient();
     const siret = "11111111111111";
-    await prisma.createEcoOrganisme({ siret, name: "", address: "" });
+    await prisma.ecoOrganisme.create({
+      data: { siret, name: "", address: "" }
+    });
     const { data } = await query(ECO_ORGANISMES);
     expect(data.ecoOrganismes.map(c => c.siret)).toEqual([siret]);
   });

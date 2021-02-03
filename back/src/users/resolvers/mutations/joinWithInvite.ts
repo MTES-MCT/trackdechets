@@ -1,13 +1,13 @@
-import { prisma } from "../../../generated/prisma-client";
+import { UserInputError } from "apollo-server-express";
+import prisma from "../../../prisma";
 import * as yup from "yup";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { hashPassword } from "../../utils";
 import {
   acceptNewUserCompanyInvitations,
   getUserAccountHashOrNotFound,
   userExists
 } from "../../database";
-import { UserInputError } from "apollo-server-express";
+import { hashPassword } from "../../utils";
 
 const validationSchema = yup.object({
   name: yup.string().required("Le nom est un champ requis"),
@@ -39,12 +39,14 @@ const joinWithInviteResolver: MutationResolvers["joinWithInvite"] = async (
   }
 
   const hashedPassword = await hashPassword(password);
-  const user = await prisma.createUser({
-    name,
-    email: existingHash.email,
-    password: hashedPassword,
-    phone: "",
-    isActive: true
+  const user = await prisma.user.create({
+    data: {
+      name,
+      email: existingHash.email,
+      password: hashedPassword,
+      phone: "",
+      isActive: true
+    }
   });
 
   // accept all pending invitations at once

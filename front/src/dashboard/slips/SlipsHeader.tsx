@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-
+import { useRouteMatch } from "react-router-dom";
+import { IconClose } from "common/components/Icons";
 import routes from "common/routes";
 import styles from "./SlipsHeader.module.scss";
-import { FaTimesCircle } from "react-icons/fa";
-import { useRouteMatch } from "react-router-dom";
 
 const Crumb = () => {
   const draft = useRouteMatch(routes.dashboard.slips.drafts);
@@ -57,7 +56,7 @@ export default function SlipsHeader() {
               setIsOpen(false);
             }}
           >
-            <FaTimesCircle className="tw-text-2xl tw-ml-1" />
+            <IconClose className="tw-text-2xl tw-ml-1" />
           </button>
         </div>
       )}

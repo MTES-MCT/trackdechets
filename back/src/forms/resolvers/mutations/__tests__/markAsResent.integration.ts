@@ -1,12 +1,12 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import prisma from "../../../../prisma";
+import { ErrorCode } from "../../../../common/errors";
 import {
-  userWithCompanyFactory,
   formWithTempStorageFactory,
-  userFactory
+  userFactory,
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { prisma } from "../../../../generated/prisma-client";
-import { ErrorCode } from "../../../../common/errors";
 
 const MARK_AS_RESENT = `
   mutation MarkAsResent($id: ID!, $resentInfos: ResentFormInput!){
@@ -74,7 +74,9 @@ describe("Mutation markAsResent", () => {
       }
     });
 
-    const resealedForm = await prisma.form({ id: form.id });
+    const resealedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resealedForm.status).toEqual("RESENT");
   });
 
@@ -93,7 +95,7 @@ describe("Mutation markAsResent", () => {
     });
 
     // assume destination siret missing
-    await prisma.updateForm({
+    await prisma.form.update({
       where: { id: form.id },
       data: {
         temporaryStorageDetail: { update: { destinationCompanySiret: "" } }
@@ -115,7 +117,9 @@ describe("Mutation markAsResent", () => {
       "Destination prévue: Le siret de l'entreprise est obligatoire"
     );
     expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
-    const resealedForm = await prisma.form({ id: form.id });
+    const resealedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resealedForm.status).toEqual("TEMP_STORER_ACCEPTED");
   });
 
@@ -134,7 +138,7 @@ describe("Mutation markAsResent", () => {
     });
 
     // assume destination siret is missing
-    await prisma.updateForm({
+    await prisma.form.update({
       where: { id: form.id },
       data: {
         temporaryStorageDetail: { update: { destinationCompanySiret: "" } }
@@ -157,7 +161,9 @@ describe("Mutation markAsResent", () => {
       }
     });
 
-    const resealedForm = await prisma.form({ id: form.id });
+    const resealedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
     expect(resealedForm.status).toEqual("RESENT");
   });
 });

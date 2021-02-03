@@ -1,4 +1,4 @@
-import { prisma } from "../../../generated/prisma-client";
+import prisma from "../../../prisma";
 import { compare } from "bcrypt";
 import { UserInputError, ForbiddenError } from "apollo-server-express";
 import { MutationResolvers } from "../../../generated/graphql/types";
@@ -15,7 +15,7 @@ const loginResolver: MutationResolvers["login"] = async (
   parent,
   { email, password }
 ) => {
-  const user = await prisma.user({ email: email.trim() });
+  const user = await prisma.user.findUnique({ where: { email: email.trim() } });
   if (!user) {
     throw new UserInputError(`Aucun utilisateur trouvé avec l'email ${email}`, {
       invalidArgs: ["email"]

@@ -1,13 +1,13 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  userWithCompanyFactory,
-  userFactory
-} from "../../../../__tests__/factories";
-import { createUserAccountHash } from "../../../database";
-import makeClient from "../../../../__tests__/testClient";
+import prisma from "../../../../prisma";
 import { AuthType } from "../../../../auth";
-import { prisma } from "../../../../generated/prisma-client";
 import { ErrorCode } from "../../../../common/errors";
+import {
+  userFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
+import { createUserAccountHash } from "../../../database";
 
 describe("mutation deleteInvitation", () => {
   afterEach(resetDatabase);
@@ -36,9 +36,12 @@ describe("mutation deleteInvitation", () => {
     await mutate(mutation);
 
     // Check invitation has been successfully deleted
-    const userAccountHashExists = await prisma.$exists.userAccountHash({
-      id: accountHash.id
-    });
+    const userAccountHashExists =
+      (await prisma.userAccountHash.findFirst({
+        where: {
+          id: accountHash.id
+        }
+      })) != null;
     expect(userAccountHashExists).toBeFalsy();
   });
 

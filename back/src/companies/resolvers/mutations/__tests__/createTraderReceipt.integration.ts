@@ -1,8 +1,8 @@
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import prisma from "../../../../prisma";
+import { AuthType } from "../../../../auth";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
-import { AuthType } from "../../../../auth";
 
 describe("{ mutation { createTraderReceipt } }", () => {
   afterEach(() => resetDatabase());
@@ -30,9 +30,7 @@ describe("{ mutation { createTraderReceipt } }", () => {
 
     const { data } = await mutate(mutation);
 
-    expect(await prisma.traderReceiptsConnection().aggregate().count()).toEqual(
-      1
-    );
+    expect(await prisma.traderReceipt.count()).toEqual(1);
 
     expect(data.createTraderReceipt).toEqual(receipt);
   });

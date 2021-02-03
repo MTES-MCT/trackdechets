@@ -10,13 +10,11 @@ export MSYS_NO_PATHCONV=1 # needed for windows
 EXIT_CODE=0
 
 startcontainers(){
-    echo ">> Starting containers..."
+    echo "🚀 >> Starting containers..."
     docker-compose up --build -d
-    echo ">> Deploy to prisma..."
-    api_container_id=$(docker ps -qf "name=integration_td-api")
-    docker exec -t $api_container_id bash integration-tests/wait-for-prisma.sh
-    docker exec -t $api_container_id npx prisma deploy
-    docker exec -t $api_container_id npx prisma reset --force
+    echo "📑 >> Deploy DB..."
+    chmod +x ./db-deploy/deploy-db.sh
+    ./db-deploy/deploy-db.sh
 }
 
 stopcontainers(){
@@ -40,7 +38,7 @@ help="$(basename "$0") [-h] [-u] [-d] [-r] [-p] -- trackdechets test runner
 
 where:
     -h show this help text
-    -u spin up containers and run prisma deploy
+    -u spin up containers and deploy DB
     -d down containers
     -r run integration test(s) matching given path, containers must be up
         ./$(basename "$0") -r /docker-path/to/my/test
@@ -67,7 +65,6 @@ while getopts "hudp:r:" OPTION; do
         runtest $OPTARG
           exit 1
         ;;
-
     p)
         all $OPTARG
         exit 1

@@ -1,4 +1,4 @@
-import { prisma } from "../generated/prisma-client";
+import prisma from "../prisma";
 
 import { userFactory } from "./factories";
 import { resetDatabase } from "../../integration-tests/helper";
@@ -15,12 +15,12 @@ describe("Test database reset", () => {
     await userFactory();
 
     // so we have one more
-    expect((await prisma.users()).length).toBe(1);
+    expect((await prisma.user.findMany()).length).toBe(1);
 
     // then we reset the db
     await resetDatabase();
 
     // we have the initial number of users
-    expect((await prisma.users()).length).toBe(0);
+    expect((await prisma.user.findMany()).length).toBe(0);
   });
 });

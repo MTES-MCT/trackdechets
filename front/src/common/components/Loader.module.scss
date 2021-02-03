@@ -1,3 +1,5 @@
+@import "src/scss/Constants.scss";
+
 /* Absolute Center Spinner */
 .loader {
   position: fixed;
@@ -8,8 +10,8 @@
   left: 0;
   bottom: 0;
   right: 0;
-  border: 8px solid var(--lighter-grey); /* Light grey */
-  border-top: 8px solid var(--dark-grey); /* Blue */
+  border: 8px solid $grey-lighter; /* Light grey */
+  border-top: 8px solid $grey-dark; /* Blue */
   border-radius: 50%;
   width: 60px;
   height: 60px;

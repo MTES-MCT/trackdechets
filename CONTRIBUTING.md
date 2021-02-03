@@ -8,12 +8,14 @@
 - [Tests d'intégration](#tests-dintégration)
 - [Créer une PR](#créer-une-pr)
 - [Déploiement](#déploiement)
+- [Migrations](#migrations)
 - [Guides](#guides)
   - [Mettre à jour le changelog](#mettre-à-jour-le-changelog)
   - [Mettre à jour la documentation](#mettre-à-jour-la-documentation)
   - [Utiliser un backup de base de donnée](#utiliser-un-backup-de-base-de-donnée)
   - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
   - [Nourrir la base de donnée avec des données par défaut](#nourrir-la-base-de-donnée-avec-des-données-par-défaut)
+  - [Ajouter une nouvelle icône](#ajouter-une-nouvelle-icône)
 
 ## Mise en route
 
@@ -21,53 +23,6 @@
 
 1. Installer Node.js
 2. Installer Docker et Docker Compose
-
-#### NGINX Proxy
-
-Afin de pouvoir accéder aux différents services via des URLs du type `http://trackdechets.local` plutôt que `http://localhost:1234`, il est nécessaire de créer un container docker se basant sur [jwilder/nginx-proxy](https://github.com/nginx-proxy/nginx-proxy).
-
-1. Créer un répertoire `nginx-proxy` sur votre espace de travail et y ajouter le fichier `docker-compose.yml` suivant :
-
-   ```docker
-   version: "3.1"
-   services:
-     nginx-proxy:
-       image: jwilder/nginx-proxy:alpine
-       ports:
-         - "80:80"
-       volumes:
-         - /var/run/docker.sock:/tmp/docker.sock:ro
-       restart: unless-stopped
-   networks:
-     default:
-       external:
-         name: nginx-proxy
-   ```
-
-2. Créer le `network` docker `nginx-proxy`.
-
-   ```
-   docker network create nginx-proxy
-   ```
-
-3. Mapper les différentes URLs sur localhost dans votre fichier `host`.
-
-   ```
-   127.0.0.1 api.trackdechets.local
-   127.0.0.1 trackdechets.local
-   127.0.0.1 etl.trackdechets.local
-   127.0.0.1 doc.trackdechets.local
-   127.0.0.1 developers.trackdechets.local
-   ```
-
-   > Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
-
-4. Démarrer le proxy nginx
-   ```
-   docker-compose up
-   ```
-
-Pour plus de détails, se référer au post ["Set a local web development environement with custom urls and https"](https://medium.com/@francoisromain/set-a-local-web-development-environment-with-custom-urls-and-https-3fbe91d2eaf0) par @francoisromain
 
 ### Installation
 
@@ -80,30 +35,82 @@ Pour plus de détails, se référer au post ["Set a local web development enviro
 2. Configurer les variables d'environnements :
    1. Renommer le ficher `.env.model` en `.env` et le compléter en demandant les infos à un développeur de l'équipe
    2. Créer un fichier `.env` dans `front/` en s'inspirant du fichier `.env.recette`
-3. Démarrer les containers
+
+3. Mapper les différentes URLs sur localhost dans votre fichier `host`
+
+   ```
+   127.0.0.1 api.trackdechets.local
+   127.0.0.1 trackdechets.local
+   127.0.0.1 developers.trackdechets.local
+   ```
+
+   > Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
+
+   > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `UI_HOST` et `DEVELOPERS_HOST`
+
+4. Démarrer les containers
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up postgres redis prisma td-api td-ui
+   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx
    ```
+
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
 
-   Vous pouvez également démarrer les services `td-doc`, `td-etl` au cas par cas mais ceux-ci ne sont pas essentiels au fonctionnement de l'API ou de l'interface utilisateur.
+   Vous pouvez également démarrer le service `td-doc` il n'est pas essentiel au fonctionnement de l'API ou de l'interface utilisateur.
 
-4. Synchroniser la base de données avec le schéma prisma.
+5. Synchroniser la base de données avec le schéma prisma.
 
-   Les modèles de données sont définis dans les fichiers `back/prisma/database/*.prisma`.
+   Les modèles de données sont définis dans les fichiers `back/prisma/schema.prisma`.
    Afin de synchroniser les tables PostgreSQL, il faut lancer une déploiement prisma
 
    ```bash
    docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
-   npx prisma deploy
+   npx prisma db push --preview-feature
    ```
 
-5. Accéder aux différents services.
+6. Accéder aux différents services.
 
    C'est prêt ! Rendez-vous sur l'URL `UI_HOST` configurée dans votre fichier `.env` (par ex: `http://trackdechets.local`) pour commencer à utiliser l'application ou sur `API_HOST` (par ex `http://api.trackdechets.local`) pour accéder au playground GraphQL.
 
-   Il existe également un playground prisma exposant directement les fonctionnalités de l'ORM accessible sur `http://localhost:4466`.
+
+### Installation alternative sans docker
+
+Vous pouvez également faire tourner l'ensemble des services sans docker. Veillez à utiliser la même version de Node.js que celle spécifiée dans les images Docker. Vous pouvez utiliser [NVM](https://github.com/nvm-sh/nvm) pour changer facilement de version de Node.
+
+1. Démarrer `postgres`, `redis`, et `nginx` sur votre machine hôte. Pour la configuration `nginx` vous pouvez vous inspirer du fichier `nginx/templates/default.conf.template`.
+
+2. Créer un lien symbolique entre le fichier `.env` et le fichier `back/.env`
+
+```
+ln -s /path/to/trackdechets/.env /path/to/trackdechets/back/.env
+```
+
+> Il est également possible de démarrer ces trois services avec docker `docker-compose -f docker-compose.dev.yml up postgres redis nginx`. Dans ce cas, l'API doit être démarrée sur le port 4000 pour coller avec la configuration Nginx  `API_PORT=4000`.
+
+
+3. Démarrer l'API
+
+```bash
+cd back
+npm install
+npm run dev
+```
+
+4. Démarrer l'UI
+
+```bash
+cd front
+npm install
+npm start
+```
+
+5. (Optionnel) Démarrer la documentation
+
+```
+cd doc/website
+npm install
+npm start
+```
 
 ### Conventions
 
@@ -181,6 +188,17 @@ Chaque update de la branche `dev` déclenche un déploiement sur l'environnement
 9. Merger la PR et suivre l'avancement du déploiement sur le CI
 10. Se connecter à l'instance de prod et faire tourner le script `npm run update` dans le container `td-api`. Faire de même sur l'instance sandbox.
 
+## Migrations
+
+Les migrations de base peuvent se faire soit en SQL, soit via des script TypeScript.
+Pour le SQL elles sont situées dans `back/prisma/migrations`. Les fichiers sont numérotés dans l'ordre croissant. Ils doivent être nommé `XX_any-namme.sql`.
+A noter que une fois que ces migrations ont été jouées, le contenu des fichiers est hashé dans la table migration et il ne faut donc surtout pas les modifier.
+
+Pour les migrations scriptées, c'est dans `back/prisma/scripts`. Les migrations doivent prendre la forme d'une classe, implémentant `Updater` et décorée par `registerUpdater`.
+Attention, contrairement aux scripts SQL ces migrations ne sont pas jouées une seules fois. Il faut donc s'assurer qu'elles sont idempotentes, ou les désactiver après chaque mise en production.
+
+Toutes ces migrations sont jouées avec la commande `npm run update:dev`. (sans le suffixe `:dev` en production)
+
 ## Guides
 
 ### Mettre à jour le changelog
@@ -231,8 +249,23 @@ C'est un fichier PNG valide que l'on peut éditer directement dans Visual Code a
 Il peut être assez fastidieux de devoir recréer des comptes de tests régulièrement en local.
 Pour palier à ce problème, il est possible de nourrir la base de donnée Prisma avec des données par défaut.
 
-1. Créer le fichier `back/prisma/seed.dev.ts` en suivant la [documentation](https://v1.prisma.io/docs/1.34/prisma-cli-and-configuration/cli-command-reference/prisma-seed-xcv8/).
-2. Démarrer les containers.
-3. Accéder au container `td-api`.
-4. Exécuter la commande `npx prisma seed`.
-   Éventuellement lancer la commande avec le flag `--reset` pour remettre à zéro : `npx prisma seed --reset`.
+1. Créer le fichier `back/prisma/seed.dev.ts` en se basant sur le modèle `back/prisma/seed.model.ts`.
+2. Démarrer les containers `postgres` et `td-api`
+3. (Optionnel) Reset de la base de données
+   3.1 Dans le container `postgres `: `psql -U trackdechets -d prisma -c "DROP SCHEMA \"default\$default\" CASCADE;"` pour supprimer les données existantes
+   3.2 Dans le container `td-api`:  `npx prisma db push --preview-feature` pour recréer les tables
+4. Dans le container `td-api`: `npx prisma db seed --preview-feature` pour nourrir la base de données.
+
+
+### Ajouter une nouvelle icône
+
+Les icônes utilisées dans l'application front viennent de https://streamlineicons.com/.
+Nous détenons une license qui nous permet d'utiliser jusqu'à 100 icônes (cf [Streamline Icons Premium License](https://help.streamlineicons.com/license-premium)).
+
+Voilà la procédure pour ajouter une icône au fichier `Icons.tsx` :
+
+1. Se connecter sur streamlineicons.
+2. Copier le SVG de l'icône concerné.
+3. [Convertir le SVG en JSX](https://react-svgr.com/playground/?expandProps=start&icon=true&replaceAttrValues=%23000%3D%22currentColor%22&typescript=true) et l'ajouter au fichier (adapter le code selon les exemples existants : props, remplacer `width`/`height` et `"currentColor"`).
+
+Pour s'y retrouver plus facilement, suivre la convention de nommage en place et utiliser le nom donné par streamlineicons.

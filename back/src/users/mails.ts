@@ -1,5 +1,5 @@
 import { escape } from "querystring";
-import { Company, Form, User } from "../generated/prisma-client";
+import { Company, Form, User } from "@prisma/client";
 import {
   cleanupSpecialChars,
   toFrFormat,

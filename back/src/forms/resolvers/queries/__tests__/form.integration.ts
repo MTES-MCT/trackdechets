@@ -1,15 +1,12 @@
+import { Form as PrismaForm, Prisma } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
-  userFactory,
   formFactory,
-  userWithCompanyFactory,
-  transportSegmentFactory
+  transportSegmentFactory,
+  userFactory,
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
-  FormCreateInput,
-  Form as PrismaForm
-} from "../../../../generated/prisma-client";
 
 const GET_FORM_QUERY = `
   query GetForm($id: ID, $readableId: String) {
@@ -19,7 +16,9 @@ const GET_FORM_QUERY = `
   }
 `;
 
-async function createForm(opts: Partial<FormCreateInput>): Promise<PrismaForm> {
+async function createForm(
+  opts: Partial<Prisma.FormCreateInput>
+): Promise<PrismaForm> {
   const owner = await userFactory();
   const form = await formFactory({
     ownerId: owner.id,

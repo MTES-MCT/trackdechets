@@ -1,4 +1,5 @@
-import { prisma, User, UserRole } from "../../generated/prisma-client";
+import { User } from "@prisma/client";
+import prisma from "../../prisma";
 
 export default async function deleteUser(user: User) {
   const errors = [
@@ -18,13 +19,13 @@ export default async function deleteUser(user: User) {
   await deleteUserAccessTokens(user);
   await deleteUserGrants(user);
 
-  await prisma.deleteUser({
-    id: user.id
+  await prisma.user.delete({
+    where: { id: user.id }
   });
 }
 
 async function checkForms(user: User): Promise<string[]> {
-  const forms = await prisma.forms({
+  const forms = await prisma.form.findMany({
     where: {
       owner: {
         id: user.id
@@ -42,7 +43,7 @@ async function checkForms(user: User): Promise<string[]> {
 }
 
 async function checkStatusLogs(user: User): Promise<string[]> {
-  const statusLogs = await prisma.statusLogs({
+  const statusLogs = await prisma.statusLog.findMany({
     where: {
       user: {
         id: user.id
@@ -61,39 +62,27 @@ async function checkStatusLogs(user: User): Promise<string[]> {
 
 async function checkCompanyAssociations(user: User): Promise<string[]> {
   const errors = [];
-  const companyAssociations = await prisma
-    .companyAssociations({
-      where: {
-        user: {
-          id: user.id
-        }
+  const companyAssociations = await prisma.companyAssociation.findMany({
+    where: {
+      user: {
+        id: user.id
       }
-    })
-    .$fragment<
-      Array<{
-        id: string;
-        role: UserRole;
-        company: { id: string };
-      }>
-    >(
-      `fragment DeletedUserCompanyAssociation on CompanyAssociation {
-        id
-        role
-        company {
-          id
-        }
-      }`
-    );
+    },
+    include: {
+      company: { select: { id: true } }
+    }
+  });
+
   for (const association of companyAssociations) {
     if (association.role !== "ADMIN") {
       continue;
     }
 
-    const otherAdmins = await prisma.companyAssociations({
+    const otherAdmins = await prisma.companyAssociation.findMany({
       where: {
         role: "ADMIN",
         user: {
-          id_not: user.id
+          id: { not: user.id }
         },
         company: {
           id: association.company.id
@@ -111,33 +100,32 @@ async function checkCompanyAssociations(user: User): Promise<string[]> {
 }
 
 async function deleteUserCompanyAssociations(user: User) {
-  await prisma.deleteManyCompanyAssociations({
-    user: {
-      id: user.id
+  await prisma.companyAssociation.deleteMany({
+    where: {
+      user: {
+        id: user.id
+      }
     }
   });
 }
 
 async function checkApplications(user: User): Promise<string[]> {
   const errors = [];
-  const applications = await prisma.applications({
+  const applications = await prisma.application.findMany({
     where: {
-      admins_some: {
-        id: user.id
+      admins: {
+        some: {
+          id: user.id
+        }
       }
     }
   });
   for (const application of applications) {
-    const { admins } = await prisma
-      .application({ id: application.id })
-      .$fragment<{ id: string; admins: Array<{ id: string }> }>(
-        `fragment DeletedUserApplication on Application {
-          id
-          admins {
-            id
-          }
-        }`
-      );
+    const { admins } = await prisma.application.findUnique({
+      where: { id: application.id },
+      include: { admins: { select: { id: true } } }
+    });
+
     const otherAdmins = admins.filter(admin => admin.id !== user.id);
     if (otherAdmins.length <= 0) {
       errors.push(
@@ -150,15 +138,15 @@ async function checkApplications(user: User): Promise<string[]> {
 }
 
 async function removeUserFromApplications(user: User) {
-  const applications = await prisma.applications({
+  const applications = await prisma.application.findMany({
     where: {
-      admins_some: {
-        id: user.id
+      admins: {
+        some: { id: user.id }
       }
     }
   });
   for (const application of applications) {
-    await prisma.updateApplication({
+    await prisma.application.update({
       data: {
         admins: {
           disconnect: [
@@ -176,25 +164,31 @@ async function removeUserFromApplications(user: User) {
 }
 
 async function deleteUserActivationHashes(user: User) {
-  await prisma.deleteManyUserActivationHashes({
-    user: {
-      id: user.id
+  await prisma.userActivationHash.deleteMany({
+    where: {
+      user: {
+        id: user.id
+      }
     }
   });
 }
 
 async function deleteUserAccessTokens(user: User) {
-  await prisma.deleteManyAccessTokens({
-    user: {
-      id: user.id
+  await prisma.accessToken.deleteMany({
+    where: {
+      user: {
+        id: user.id
+      }
     }
   });
 }
 
 async function deleteUserGrants(user: User) {
-  await prisma.deleteManyGrants({
-    user: {
-      id: user.id
+  await prisma.grant.deleteMany({
+    where: {
+      user: {
+        id: user.id
+      }
     }
   });
 }

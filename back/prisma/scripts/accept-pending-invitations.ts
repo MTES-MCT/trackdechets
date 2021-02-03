@@ -1,5 +1,5 @@
-import { Updater, registerUpdater } from "./helper/helper";
 import acceptPendingInvitations from "../../src/scripts/prisma/acceptPendingInvitations";
+import { registerUpdater, Updater } from "./helper/helper";
 
 @registerUpdater(
   "Accept pending invitations",

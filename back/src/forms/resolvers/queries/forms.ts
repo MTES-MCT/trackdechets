@@ -1,8 +1,9 @@
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import { Company, prisma } from "../../../generated/prisma-client";
 import { MissingSiret } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
+import { Company, Status } from "@prisma/client";
+import prisma from "../../../prisma";
 import { getUserCompanies } from "../../../users/database";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { getFormsRightFilter } from "../../database";
@@ -45,14 +46,16 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
     maxPaginateBy: 500
   });
 
-  const queriedForms = await prisma.forms({
+  const queriedForms = await prisma.form.findMany({
     ...connectionsArgs,
-    orderBy: "createdAt_DESC",
+    orderBy: { createdAt: "desc" },
     where: {
-      updatedAt_gte: rest.updatedAfter,
-      sentAt_gte: rest.sentAfter,
+      ...(rest.updatedAfter && {
+        updatedAt: { gte: new Date(rest.updatedAfter) }
+      }),
+      ...(rest.sentAfter && { sentAt: { gte: new Date(rest.sentAfter) } }),
       wasteDetailsCode: rest.wasteCode,
-      ...(status?.length && { status_in: status }),
+      ...(status?.length && { status: { in: status } }),
       AND: [
         getFormsRightFilter(company.siret, roles),
         getHasNextStepFilter(company.siret, hasNextStep),
@@ -75,7 +78,7 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
   const filter = {
     OR: [
       // DRAFT
-      { status: "DRAFT" },
+      { status: Status.DRAFT },
       // isTemporaryStorer && (RESENT || RECEIVED)
       {
         AND: [
@@ -86,9 +89,9 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
           },
           {
             OR: [
-              { status: "RESENT" },
-              { status: "RECEIVED" },
-              { status: "ACCEPTED" }
+              { status: Status.RESENT },
+              { status: Status.RECEIVED },
+              { status: Status.ACCEPTED }
             ]
           }
         ]
@@ -101,10 +104,9 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
           { recipientIsTempStorage: true },
           {
             OR: [
-              { status: "SENT" },
-              { status: "TEMP_STORED" },
-              { status: "TEMP_STORER_ACCEPTED" },
-              { status: "RESEALED" }
+              { status: Status.SENT },
+              { status: Status.TEMP_STORED },
+              { status: Status.TEMP_STORER_ACCEPTED }
             ]
           }
         ]
@@ -116,10 +118,13 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
           {
             OR: [
               {
-                AND: [{ status: "SENT" }, { recipientIsTempStorage: false }]
+                AND: [
+                  { status: Status.SENT },
+                  { recipientIsTempStorage: false }
+                ]
               },
-              { status: "RECEIVED" },
-              { status: "ACCEPTED" }
+              { status: Status.RECEIVED },
+              { status: Status.ACCEPTED }
             ]
           }
         ]

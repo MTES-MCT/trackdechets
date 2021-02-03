@@ -1,7 +1,7 @@
-import makeClient from "../../../../__tests__/testClient";
-import { prisma } from "../../../../generated/prisma-client";
-import * as sirene from "../../../sirene";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import prisma from "../../../../prisma";
+import makeClient from "../../../../__tests__/testClient";
+import * as sirene from "../../../sirene";
 
 const searchCompanySpy = jest.spyOn(sirene, "searchCompanies");
 
@@ -75,7 +75,7 @@ describe("query { searchCompanies(clue, department) }", () => {
       codeS3ic: "0064.00001"
     };
 
-    await prisma.createInstallation(icpe);
+    await prisma.installation.create({ data: icpe });
     const response = await query<any>(gqlQuery);
     const companies = response.data.searchCompanies;
     expect(companies).toHaveLength(1);
@@ -105,15 +105,17 @@ describe("query { searchCompanies(clue, department) }", () => {
       department: "07"
     };
 
-    await prisma.createCompany({
-      siret: "85001946400013",
-      name: "Code en Stock",
-      securityCode: 1234,
-      contactEmail: "john.snow@trackdechets.fr",
-      contactPhone: "0600000000",
-      website: "https://trackdechets.beta.gouv.fr",
-      transporterReceipt: { create: transporterReceipt },
-      traderReceipt: { create: traderReceipt }
+    await prisma.company.create({
+      data: {
+        siret: "85001946400013",
+        name: "Code en Stock",
+        securityCode: 1234,
+        contactEmail: "john.snow@trackdechets.fr",
+        contactPhone: "0600000000",
+        website: "https://trackdechets.beta.gouv.fr",
+        transporterReceipt: { create: transporterReceipt },
+        traderReceipt: { create: traderReceipt }
+      }
     });
 
     const gqlQuery = `

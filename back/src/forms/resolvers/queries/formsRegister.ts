@@ -1,13 +1,13 @@
+import { UserInputError } from "apollo-server-express";
+import prisma from "../../../prisma";
 import * as yup from "yup";
 import { getFileDownloadToken } from "../../../common/file-download";
-import { downloadFormsRegister } from "../../exports/handler";
-import { QueryResolvers } from "../../../generated/graphql/types";
-import { prisma } from "../../../generated/prisma-client";
-import { formsWhereInput } from "../../exports/where-inputs";
-import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import validDatetime from "../../../common/yup/validDatetime";
 import { checkIsCompanyMember } from "../../../users/permissions";
+import { QueryResolvers } from "../../../generated/graphql/types";
+import { downloadFormsRegister } from "../../exports/handler";
+import { formsWhereInput } from "../../exports/where-inputs";
 
 const TYPE = "forms_register";
 
@@ -39,13 +39,13 @@ const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
   const whereInput = formsWhereInput(
     args.exportType,
     args.sirets,
-    args.startDate,
-    args.endDate,
+    args.startDate ? new Date(args.startDate) : null,
+    args.endDate ? new Date(args.endDate) : null,
     args.wasteCode
   );
 
   // check if register is empty
-  const isEmpty = !(await prisma.$exists.form(whereInput));
+  const isEmpty = !(await prisma.form.findFirst({ where: whereInput }));
 
   if (isEmpty) {
     throw new UserInputError(

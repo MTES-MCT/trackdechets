@@ -1,5 +1,6 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
+import prisma from "../../../../prisma";
+import * as mailsHelper from "../../../../mailer/mailing";
 import {
   companyFactory,
   userFactory,
@@ -7,7 +8,6 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { associateUserToCompany } from "../../../database";
-import * as mailsHelper from "../../../../mailer/mailing";
 import { userMails } from "../../../mails";
 
 // No mails
@@ -56,14 +56,20 @@ describe("mutation sendMembershipRequest", () => {
     expect(sentTo).toEqual(["jo****@trackdechets.fr"]);
     expect(email).toEqual(requester.email);
     expect(siret).toEqual(company.siret);
-    const membershipRequest = await prisma.membershipRequest({ id });
+    const membershipRequest = await prisma.membershipRequest.findUnique({
+      where: { id }
+    });
 
     // check relation to user was created
-    const linkedUser = await prisma.membershipRequest({ id }).user();
+    const linkedUser = await prisma.membershipRequest
+      .findUnique({ where: { id } })
+      .user();
     expect(linkedUser.id).toEqual(requester.id);
 
     // check relation to company was created
-    const linkedCompany = await prisma.membershipRequest({ id }).company();
+    const linkedCompany = await prisma.membershipRequest
+      .findUnique({ where: { id } })
+      .company();
     expect(linkedCompany.id).toEqual(company.id);
 
     expect(membershipRequest.sentTo).toEqual(["john.snow@trackdechets.fr"]);
@@ -114,9 +120,11 @@ describe("mutation sendMembershipRequest", () => {
     const requester = await userFactory();
     const company = await companyFactory();
 
-    await prisma.createMembershipRequest({
-      user: { connect: { id: requester.id } },
-      company: { connect: { id: company.id } }
+    await prisma.membershipRequest.create({
+      data: {
+        user: { connect: { id: requester.id } },
+        company: { connect: { id: company.id } }
+      }
     });
 
     const { mutate } = makeClient(requester);

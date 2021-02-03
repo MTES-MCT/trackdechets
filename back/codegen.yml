@@ -1,7 +1,7 @@
 overwrite: true
 schema: ./src/**/*.graphql
 generates:
-  src/generated/graphql/types.ts:
+  ./src/generated/graphql/types.ts:
     plugins:
       - typescript
       - typescript-resolvers
@@ -11,14 +11,14 @@ generates:
       enumsAsTypes: true
       scalars:
         DateTime: string
-        URL: string
+        URL: URL
       scalarDefaults:
         DateTime: new Date().toISOString()
         URL: "https://example.com"
     hooks:
       afterOneFileWrite:
-        - prettier --write
-  front/generated/graphql/types.ts:
+        - prettier --config .prettierrc --write
+  ../front/src/generated/graphql/types.ts:
     plugins:
       - typescript
       - typescript-operations
@@ -33,8 +33,8 @@ generates:
         URL: "https://example.com"
     hooks:
       afterOneFileWrite:
-        - prettier --write
-  documentation/api-reference.md:
+        - prettier --config .prettierrc --write
+  ../doc/docs/api-reference.md:
     schema: "!./src/**/*.private.graphql"
     plugins:
       - graphql-markdown-plugin.js

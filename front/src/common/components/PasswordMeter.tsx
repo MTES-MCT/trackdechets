@@ -1,7 +1,8 @@
 import React from "react";
 import zxcvbn from "zxcvbn";
-import { FaAward } from "react-icons/fa";
+import { IconLockShield } from "common/components/Icons";
 import styles from "./PasswordMeter.module.scss";
+
 type Props = {
   password: string;
 };
@@ -13,7 +14,7 @@ export default function PasswordMeter({ password }: Props) {
 
   return (
     <span className={styles.passwordMeter}>
-      <FaAward />{" "}
+      <IconLockShield />{" "}
       <span>Difficulté du mot de passe: {createPasswordLabel(score)}</span>
     </span>
   );

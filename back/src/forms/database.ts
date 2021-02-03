@@ -2,16 +2,12 @@
  * PRISMA HELPER FUNCTIONS
  */
 
-import {
-  Form,
-  prisma,
-  FormWhereUniqueInput,
-  FormWhereInput
-} from "../generated/prisma-client";
-import { FullForm } from "./types";
-import { FormNotFound } from "./errors";
+import { Form, Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
+import prisma from "../prisma";
 import { FormRole } from "../generated/graphql/types";
+import { FormNotFound } from "./errors";
+import { FullForm } from "./types";
 
 /**
  * Returns a prisma Form with all linked objects
@@ -19,11 +15,11 @@ import { FormRole } from "../generated/graphql/types";
  * @param form
  */
 export async function getFullForm(form: Form): Promise<FullForm> {
-  const temporaryStorageDetail = await prisma
-    .form({ id: form.id })
+  const temporaryStorageDetail = await prisma.form
+    .findUnique({ where: { id: form.id } })
     .temporaryStorageDetail();
-  const transportSegments = await prisma
-    .form({ id: form.id })
+  const transportSegments = await prisma.form
+    .findUnique({ where: { id: form.id } })
     .transportSegments();
   return {
     ...form,
@@ -38,11 +34,13 @@ export async function getFullForm(form: Form): Promise<FullForm> {
 export async function getFormOrFormNotFound({
   id,
   readableId
-}: FormWhereUniqueInput) {
+}: Prisma.FormWhereUniqueInput) {
   if (!id && !readableId) {
     throw new UserInputError("You should specify an id or a readableId");
   }
-  const form = await prisma.form(id ? { id } : { readableId });
+  const form = await prisma.form.findUnique({
+    where: id ? { id } : { readableId }
+  });
   if (form == null || form.isDeleted == true) {
     throw new FormNotFound(id ? id.toString() : readableId);
   }
@@ -58,7 +56,9 @@ export async function getFormOrFormNotFound({
  * @param roles optional [FormRole] to refine filter
  */
 export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
-  const filtersByRole: { [key in FormRole]: Partial<FormWhereInput>[] } = {
+  const filtersByRole: {
+    [key in FormRole]: Partial<Prisma.FormWhereInput>[];
+  } = {
     ["RECIPIENT"]: [
       { recipientCompanySiret: siret },
       {
@@ -71,8 +71,10 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
     ["TRANSPORTER"]: [
       { transporterCompanySiret: siret },
       {
-        transportSegments_some: {
-          transporterCompanySiret: siret
+        transportSegments: {
+          some: {
+            transporterCompanySiret: siret
+          }
         }
       },
       {
@@ -92,5 +94,20 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
       )
       .map(role => filtersByRole[role])
       .flat()
+  };
+}
+
+export function stringifyDates(obj: Form) {
+  if (!obj) {
+    return null;
+  }
+
+  return {
+    ...obj,
+    ...(obj?.createdAt && { createdAt: obj.createdAt.toISOString() }),
+    ...(obj?.updatedAt && { updatedAt: obj.updatedAt.toISOString() }),
+    ...(obj?.sentAt && { sentAt: obj.sentAt.toISOString() }),
+    ...(obj?.receivedAt && { receivedAt: obj.receivedAt.toISOString() }),
+    ...(obj?.signedAt && { signedAt: obj.signedAt.toISOString() })
   };
 }

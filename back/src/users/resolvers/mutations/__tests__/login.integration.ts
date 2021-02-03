@@ -1,6 +1,6 @@
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { prisma } from "../../../../generated/prisma-client";
+import prisma from "../../../../prisma";
 
 describe("{ mutation { login } }", () => {
   it("should return a token", async () => {
@@ -17,8 +17,10 @@ describe("{ mutation { login } }", () => {
     const { data } = await mutate(mutation);
     expect(data.login.token).toHaveLength(40);
     // should have created an accessToken in db
-    const accessToken = await prisma.accessToken({
-      token: data.login.token
+    const accessToken = await prisma.accessToken.findUnique({
+      where: {
+        token: data.login.token
+      }
     });
     expect(accessToken).not.toBeNull();
     expect(accessToken.token).toEqual(data.login.token);

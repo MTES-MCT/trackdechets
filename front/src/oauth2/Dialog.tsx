@@ -1,5 +1,5 @@
 import React from "react";
-import { FaCheckCircle } from "react-icons/fa";
+import { IconCheckCircle1 } from "common/components/Icons";
 import Loader from "../common/components/Loaders";
 import styles from "./Dialog.module.scss";
 import { useOAuth2, AuthorizePayload } from "./use-oauth2";
@@ -34,7 +34,7 @@ export default function Dialog() {
           alt="application logo"
           width="100px"
         />
-        <FaCheckCircle color="var(--green)" size="40px" />
+        <IconCheckCircle1 size="40px" />
         <img src="/trackdechets.png" alt="trackdechets" width="100px" />
       </div>
       <h4 className="text-center">Autoriser {client.name}</h4>

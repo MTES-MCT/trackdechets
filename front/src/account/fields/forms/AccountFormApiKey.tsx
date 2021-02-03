@@ -1,6 +1,6 @@
 import React from "react";
+import { IconCopyPaste } from "common/components/Icons";
 import styles from "./AccountForm.module.scss";
-import { FaCopy } from "react-icons/fa";
 
 type Props = {
   apiKey: string;
@@ -23,7 +23,10 @@ export default function AccountFormApiKey({ apiKey }: Props) {
           value={apiKey}
           readOnly
         />
-        <FaCopy className={styles.icon} onClick={copyApiKeyToClipboard} />
+        <IconCopyPaste
+          className={styles.icon}
+          onClick={copyApiKeyToClipboard}
+        />
       </div>
     </div>
   );

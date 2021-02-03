@@ -2,7 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
-import { prisma } from "../../../../generated/prisma-client";
+import prisma from "../../../../prisma";
 
 const EDIT_PROFILE = `
   mutation EditProfile($name: String, $email: String, $phone: String){
@@ -23,7 +23,9 @@ describe("mutation editProfile", () => {
     const email = "newemail@trackdechets.fr";
     const phone = "01234567891";
     await mutate(EDIT_PROFILE, { variables: { name, email, phone } });
-    const updatedUser = await prisma.user({ id: user.id });
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
     expect(updatedUser.name).toEqual(name);
     expect(updatedUser.email).toEqual(email);
     expect(updatedUser.phone).toEqual(phone);

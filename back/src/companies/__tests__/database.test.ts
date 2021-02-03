@@ -17,11 +17,9 @@ const ASSOCIATIONS = [
   }
 ];
 
-jest.mock("../../generated/prisma-client", () => ({
-  prisma: {
-    companyAssociations: jest.fn(() => ({
-      $fragment: jest.fn(() => Promise.resolve(ASSOCIATIONS))
-    }))
+jest.mock("../../prisma", () => ({
+  companyAssociation: {
+    findMany: jest.fn(() => Promise.resolve(ASSOCIATIONS))
   }
 }));
 

@@ -25,6 +25,27 @@ jobs:
           name: "front: Run linter"
           command: npm run lint --prefix front
 
+  types:
+    description: "Run typecheck"
+    executor: node
+    steps:
+      - checkout
+      - run:
+          name: "back: Install dependencies"
+          command: npm ci --prefix back
+      - run:
+          name: "back: Generate Prisma client"
+          command: npm run generate --prefix back
+      - run:
+          name: "back: Run typecheck"
+          command: npm run types --prefix back
+      - run:
+          name: "front: Install dependencies"
+          command: npm ci --prefix front
+      - run:
+          name: "front: Run typecheck"
+          command: npm run types --prefix front
+
   test:
     description: "Run tests"
     executor: node
@@ -100,10 +121,10 @@ jobs:
             ssh ${<< parameters.user >>}@${<< parameters.host >>} "cd /srv/trackdechets/
                 docker-compose pull
                 if [ "${CIRCLE_BRANCH}" == "dev" ]; then
-                  docker-compose up -d postgres td-doc-redirect
+                  docker-compose up -d postgres
                 fi
-                docker-compose up -d prisma redis td-api td-ui td-doc
-                docker exec \$(docker ps -qf 'name=td-api') npx prisma deploy"
+                docker-compose up -d redis td-api td-ui
+                docker exec \$(docker ps -qf 'name=td-api') npm run migrate"
 
   integration-tests:
     machine:
@@ -122,12 +143,14 @@ workflows:
   build-and-deploy:
     jobs:
       - lint
+      - types
       - test
       - integration-tests
       - build-and-push:
           name: build-and-push-prod
           requires:
             - lint
+            - types
             - test
             - integration-tests
           filters:
@@ -139,6 +162,7 @@ workflows:
           build-args: "--build-arg build_env=sandbox"
           requires:
             - lint
+            - types
             - test
             - integration-tests
           filters:
@@ -150,6 +174,7 @@ workflows:
           build-args: "--build-arg build_env=recette"
           requires:
             - lint
+            - types
             - test
             - integration-tests
           filters:

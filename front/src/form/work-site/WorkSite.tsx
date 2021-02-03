@@ -62,7 +62,7 @@ export default function WorkSite() {
 
           <div className="form__row">
             <label>
-              Autre informations
+              Informations complémentaires
               <Field
                 component="textarea"
                 className="textarea-pickup-site td-textarea"

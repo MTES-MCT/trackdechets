@@ -1,11 +1,11 @@
-import * as mailsHelper from "../../../../mailer/mailing";
-import { server } from "../../../../server";
 import { createTestClient } from "apollo-server-integration-testing";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
-import { userMails } from "../../../mails";
-import { userFactory, companyFactory } from "../../../../__tests__/factories";
+import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
+import * as mailsHelper from "../../../../mailer/mailing";
+import { server } from "../../../../server";
+import { companyFactory, userFactory } from "../../../../__tests__/factories";
+import { userMails } from "../../../mails";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -50,10 +50,12 @@ describe("Mutation.signup", () => {
     });
     expect(data.signup).toEqual(user);
 
-    const newUser = await prisma.user({ email: user.email });
+    const newUser = await prisma.user.findUnique({
+      where: { email: user.email }
+    });
     expect(newUser.email).toEqual(user.email);
 
-    const activationHashes = await prisma.userActivationHashes({
+    const activationHashes = await prisma.userActivationHash.findMany({
       where: { user: { email: user.email } }
     });
     expect(activationHashes.length).toEqual(1);
@@ -146,11 +148,13 @@ describe("Mutation.signup", () => {
 
     const company = await companyFactory();
 
-    const invitation = await prisma.createUserAccountHash({
-      email: user.email,
-      companySiret: company.siret,
-      hash: "hash",
-      role: "MEMBER"
+    const invitation = await prisma.userAccountHash.create({
+      data: {
+        email: user.email,
+        companySiret: company.siret,
+        hash: "hash",
+        role: "MEMBER"
+      }
     });
 
     await mutate(SIGNUP, {
@@ -164,14 +168,18 @@ describe("Mutation.signup", () => {
       }
     });
 
-    const newUser = await prisma.user({ email: user.email });
-
-    const updatedInvitation = await prisma.userAccountHash({
-      id: invitation.id
+    const newUser = await prisma.user.findUnique({
+      where: { email: user.email }
     });
-    expect(updatedInvitation.acceptedAt.length).toBeGreaterThan(0);
 
-    const companyAssociation = await prisma.companyAssociations({
+    const updatedInvitation = await prisma.userAccountHash.findUnique({
+      where: {
+        id: invitation.id
+      }
+    });
+    expect(updatedInvitation.acceptedAt).not.toBeNull();
+
+    const companyAssociation = await prisma.companyAssociation.findMany({
       where: { user: { id: newUser.id }, company: { id: company.id } }
     });
 

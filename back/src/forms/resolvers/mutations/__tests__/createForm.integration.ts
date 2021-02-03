@@ -1,12 +1,12 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import prisma from "../../../../prisma";
+import { ErrorCode } from "../../../../common/errors";
 import {
-  userWithCompanyFactory,
   companyFactory,
-  userFactory
+  userFactory,
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { prisma } from "../../../../generated/prisma-client";
-import { ErrorCode } from "../../../../common/errors";
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
@@ -125,7 +125,6 @@ describe("Mutation.createForm", () => {
           }
         }
       });
-
       expect(data.createForm.id).toBeTruthy();
     }
   );
@@ -136,10 +135,12 @@ describe("Mutation.createForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.createEcoOrganisme({
-      address: "",
-      siret: eo.siret,
-      name: eo.name
+    await prisma.ecoOrganisme.create({
+      data: {
+        address: "",
+        siret: eo.siret,
+        name: eo.name
+      }
     });
 
     const { mutate } = makeClient(user);

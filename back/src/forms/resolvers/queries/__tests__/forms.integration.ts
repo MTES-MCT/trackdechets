@@ -1,20 +1,20 @@
 import { addDays, format, subDays } from "date-fns";
+import { Form, Prisma } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  Form,
-  FormCreateInput,
-  prisma
-} from "../../../../generated/prisma-client";
+import prisma from "../../../../prisma";
 import {
   companyFactory,
   formFactory,
-  userWithCompanyFactory,
   transportSegmentFactory,
-  userFactory
+  userFactory,
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
-function createForms(userId: string, params: Partial<FormCreateInput>[]) {
+function createForms(
+  userId: string,
+  params: Partial<Prisma.FormCreateInput>[]
+) {
   return Promise.all(
     params.map(p => {
       return formFactory({
@@ -27,7 +27,7 @@ function createForms(userId: string, params: Partial<FormCreateInput>[]) {
 
 function createNForms(
   userId: string,
-  param: Partial<FormCreateInput>,
+  param: Partial<Prisma.FormCreateInput>,
   n: number
 ) {
   return createForms(userId, Array(n).fill(param));
@@ -37,7 +37,7 @@ function createNForms(
 // strict ordering on the field `createdAt`
 async function createNSortedForms(
   userId: string,
-  opt: Partial<FormCreateInput>,
+  opt: Partial<Prisma.FormCreateInput>,
   n: number
 ) {
   const forms: Form[] = [];
@@ -167,10 +167,12 @@ describe("Query.forms", () => {
   it("should filter by siret", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const otherCompany = await companyFactory();
-    await prisma.createCompanyAssociation({
-      company: { connect: { id: otherCompany.id } },
-      user: { connect: { id: user.id } },
-      role: "ADMIN"
+    await prisma.companyAssociation.create({
+      data: {
+        company: { connect: { id: otherCompany.id } },
+        user: { connect: { id: user.id } },
+        role: "ADMIN"
+      }
     });
 
     // 1 form on each company
@@ -199,20 +201,27 @@ describe("Query.forms", () => {
   it("should convert packagingInfos to an empty array if null", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
-    await createForms(user.id, [
-      {
+    await formFactory({
+      ownerId: user.id,
+      opt: {
         recipientCompanySiret: company.siret,
         wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }]
-      },
-      {
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
         recipientCompanySiret: company.siret,
         wasteDetailsPackagingInfos: []
-      },
-      {
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
         recipientCompanySiret: company.siret,
         wasteDetailsPackagingInfos: null
       }
-    ]);
+    });
 
     const { query } = makeClient(user);
     const { data, errors } = await query(FORMS);
@@ -551,10 +560,12 @@ describe("Query.forms", () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const otherCompany = await companyFactory();
 
-    await prisma.createCompanyAssociation({
-      company: { connect: { id: otherCompany.id } },
-      user: { connect: { id: user.id } },
-      role: "ADMIN"
+    await prisma.companyAssociation.create({
+      data: {
+        company: { connect: { id: otherCompany.id } },
+        user: { connect: { id: user.id } },
+        role: "ADMIN"
+      }
     });
 
     // 1 form on each company

@@ -1,12 +1,12 @@
-import { getFormOrFormNotFound } from "../../database";
-import transitionForm from "../../workflow/transitionForm";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkCanMarkAsSealed } from "../../permissions";
-import { prisma } from "../../../generated/prisma-client";
-import { checkCanBeSealed } from "../../validation";
-import { EventType } from "../../workflow/types";
+import { MutationResolvers } from "../../../generated/graphql/types";
+import { getFormOrFormNotFound } from "../../database";
 import { expandFormFromDb } from "../../form-converter";
+import { checkCanMarkAsSealed } from "../../permissions";
+import { checkCanBeSealed } from "../../validation";
+import transitionForm from "../../workflow/transitionForm";
+import { EventType } from "../../workflow/types";
 
 const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   parent,
@@ -24,7 +24,9 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   });
 
   // mark appendix2Forms as GROUPED
-  const appendix2Forms = await prisma.form({ id: form.id }).appendix2Forms();
+  const appendix2Forms = await prisma.form
+    .findUnique({ where: { id: form.id } })
+    .appendix2Forms();
   if (appendix2Forms.length > 0) {
     const promises = appendix2Forms.map(appendix => {
       return transitionForm(user, appendix, {

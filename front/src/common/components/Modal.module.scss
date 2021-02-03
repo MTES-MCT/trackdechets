@@ -6,16 +6,16 @@
   position: fixed;
 }
 .tdModal {
- 
+  position: relative;
   border-radius: $common-radius;
   box-shadow: 0 1px 2px rgba(201, 211, 223, 0.2);
   background: #fff;
-  background: var(--white);
+  background: $white;
   width: 95vw;
   min-width: 50vw;
   z-index: 1000;
   padding: 0;
- 
+
   @include desktop {
     width: 50vw;
   }
@@ -29,14 +29,11 @@
     max-width: 95vw;
   }
 }
-.tdModalTitle {
-  font-size: 1.75rem;
-  margin-bottom: 2rem;
-  font-weight: bold;
-}
 
-.tdModalCloseMenu {
-  display: flex;
-  justify-content: flex-end;
-  padding: 1rem 1rem 0 0;
+.ModalCloseButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.25rem;
+  color: $blue;
 }

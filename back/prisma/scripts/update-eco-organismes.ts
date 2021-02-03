@@ -1,5 +1,5 @@
-import { Updater, registerUpdater } from "./helper/helper";
-import { prisma } from "../../src/generated/prisma-client";
+import prisma from "../../src/prisma";
+import { registerUpdater, Updater } from "./helper/helper";
 
 const ecoOrganismes = [
   {
@@ -112,7 +112,7 @@ const ecoOrganismes = [
 export class UpdateEcoOrganismesUpdater implements Updater {
   async run() {
     for (const ecoOrganisme of ecoOrganismes) {
-      await prisma.upsertEcoOrganisme({
+      await prisma.ecoOrganisme.upsert({
         create: ecoOrganisme,
         update: ecoOrganisme,
         where: {

@@ -1,14 +1,21 @@
-import fs from "fs";
 import path from "path";
+import prisma from "../src/prisma";
 
-const seedPath = path.join(__dirname, "seed.dev.ts");
+let exitCode = 0;
 
-(() => {
+(async () => {
   try {
-    fs.accessSync(seedPath);
+    // the seed.dev file may not exist and TypeScript would prevent us
+    // from importing it with a regular import
+    // that's why we're using a dynamic import with path.join(),
+    // so TypeScript loses track of what's being imported
+    const { default: seed } = await import(path.join(__dirname, "seed.dev"));
+    await seed();
   } catch (err) {
-    return;
+    console.error(err);
+    exitCode = 1;
   }
 
-  import(seedPath);
+  await prisma.$disconnect();
+  process.exit(exitCode);
 })();

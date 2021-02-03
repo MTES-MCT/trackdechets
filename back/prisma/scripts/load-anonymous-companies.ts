@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { Updater, registerUpdater } from "./helper/helper";
-import { prisma } from "../../src/generated/prisma-client";
+import prisma from "../../src/prisma";
 
 @registerUpdater(
   "Load anonymous companies",
@@ -20,7 +20,7 @@ export class LoadAnonymousCompaniesUpdater implements Updater {
       const data = JSON.parse(fs.readFileSync(fixturePath, "utf8"));
 
       for (const companyInput of data) {
-        await prisma.createAnonymousCompany(companyInput);
+        await prisma.anonymousCompany.create({ data: companyInput });
       }
     } catch (err) {
       console.error("☠ Something went wrong during the update", err);

@@ -1,7 +1,7 @@
-import { QueryResolvers } from "../../../generated/graphql/types";
+import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { QueryResolvers } from "../../../generated/graphql/types";
 import { getUserCompanies } from "../../../users/database";
-import { prisma } from "../../../generated/prisma-client";
 
 const statsResolver: QueryResolvers["stats"] = async (
   parent,
@@ -13,7 +13,7 @@ const statsResolver: QueryResolvers["stats"] = async (
   const userCompanies = await getUserCompanies(user.id);
 
   return userCompanies.map(async userCompany => {
-    const queriedForms = await prisma.forms({
+    const queriedForms = await prisma.form.findMany({
       where: {
         OR: [
           { owner: { id: user.id } },

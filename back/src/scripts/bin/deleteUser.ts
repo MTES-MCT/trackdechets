@@ -1,5 +1,5 @@
 #!/usr/bin/env ts-node
-import { prisma } from "../../generated/prisma-client";
+import prisma from "../../prisma";
 import deleteUser from "../prisma/deleteUser";
 
 (async () => {
@@ -21,7 +21,7 @@ import deleteUser from "../prisma/deleteUser";
     return;
   }
 
-  const user = await prisma.user({ id: userID });
+  const user = await prisma.user.findUnique({ where: { id: userID } });
 
   if (!user) {
     console.log(

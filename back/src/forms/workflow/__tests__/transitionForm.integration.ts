@@ -1,6 +1,7 @@
-import { resetDatabase } from "../../../../integration-tests/helper";
 import { AuthType } from "../../../auth";
-import { FormUpdateInput, prisma } from "../../../generated/prisma-client";
+import { Prisma } from "@prisma/client";
+import { resetDatabase } from "../../../../integration-tests/helper";
+import prisma from "../../../prisma";
 import { formFactory, userFactory } from "../../../__tests__/factories";
 import transitionForm from "../transitionForm";
 import { EventType } from "../types";
@@ -15,7 +16,7 @@ describe("transition form", () => {
       ownerId: owner.id,
       opt: { status: "SENT" }
     });
-    const formUpdateInput: FormUpdateInput = {
+    const formUpdateInput: Prisma.FormUpdateInput = {
       receivedBy: "Bill",
       receivedAt: "2019-01-17T09:22:00.000Z",
       signedAt: "2019-01-17T09:22:00.000Z",
@@ -26,21 +27,27 @@ describe("transition form", () => {
     const event = { type: EventType.MarkAsReceived, formUpdateInput };
     await transitionForm({ ...user, auth: AuthType.Bearer }, form, event);
 
-    const updatedForm = await prisma.form({ id: form.id });
+    const updatedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
 
     const nextStatus = "ACCEPTED";
 
     expect(updatedForm.status).toEqual(nextStatus);
 
-    const statusLogs = await prisma.statusLogs();
+    const statusLogs = await prisma.statusLog.findMany();
     expect(statusLogs).toHaveLength(1);
     const statusLog = statusLogs[0];
-    const statusLogUser = await prisma.statusLog({ id: statusLog.id }).user();
-    const statusLogForm = await prisma.statusLog({ id: statusLog.id }).form();
+    const statusLogUser = await prisma.statusLog
+      .findUnique({ where: { id: statusLog.id } })
+      .user();
+    const statusLogForm = await prisma.statusLog
+      .findUnique({ where: { id: statusLog.id } })
+      .form();
 
     expect(statusLog.status).toEqual(nextStatus);
     expect(statusLog.authType).toEqual("BEARER");
-    expect(statusLog.loggedAt.length).toBeGreaterThan(0);
+    expect(statusLog.loggedAt).not.toBeNull();
     expect(statusLog.updatedFields).toEqual(formUpdateInput);
     expect(statusLogUser.id).toEqual(user.id);
     expect(statusLogForm.id).toEqual(form.id);
@@ -53,7 +60,7 @@ describe("transition form", () => {
       ownerId: owner.id,
       opt: { status: "DRAFT" }
     });
-    const formUpdateInput: FormUpdateInput = {
+    const formUpdateInput: Prisma.FormUpdateInput = {
       receivedBy: "Bill",
       receivedAt: "2019-01-17T09:22:00.000Z",
       signedAt: "2019-01-17T09:22:00.000Z",

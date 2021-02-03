@@ -1,6 +1,6 @@
 import React from "react";
 import { generatePath, Link, useParams } from "react-router-dom";
-import { RefreshIcon } from "common/components/Icons";
+import { IconRefresh } from "common/components/Icons";
 import styles from "./SlipsHeaderActions.module.scss";
 import routes from "common/routes";
 
@@ -23,7 +23,7 @@ export default function SlipsHeaderActions({
         onClick={() => refetch()}
       >
         <span>Rafraîchir</span>
-        <RefreshIcon />
+        <IconRefresh />
       </button>
     </div>
   );

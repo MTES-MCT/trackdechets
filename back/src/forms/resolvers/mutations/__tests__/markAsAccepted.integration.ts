@@ -1,5 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma } from "../../../../generated/prisma-client";
+import prisma from "../../../../prisma";
 import makeClient from "../../../../__tests__/testClient";
 import { prepareDB, prepareRedis } from "../../../__tests__/helpers";
 
@@ -24,12 +24,12 @@ describe("Test Form reception", () => {
       recipientCompany,
       form: initialForm
     } = await prepareDB();
-    const form = await prisma.updateForm({
+    const form = await prisma.form.update({
       where: { id: initialForm.id },
       data: {
         status: "RECEIVED",
         receivedBy: "Bill",
-        receivedAt: "2019-01-17T10:22:00+0100"
+        receivedAt: new Date("2019-01-17T10:22:00+0100")
       }
     });
     await prepareRedis({
@@ -43,7 +43,7 @@ describe("Test Form reception", () => {
       variables: {
         id: form.id,
         acceptedInfo: {
-          signedAt: "2019-01-17T10:22:00+0100",
+          signedAt: new Date("2019-01-17T10:22:00+0100"),
           signedBy: "Bill",
           wasteAcceptationStatus: "ACCEPTED",
           quantityReceived: 11
@@ -51,7 +51,9 @@ describe("Test Form reception", () => {
       }
     });
 
-    const acceptedForm = await prisma.form({ id: form.id });
+    const acceptedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
 
     expect(acceptedForm.status).toBe("ACCEPTED");
     expect(acceptedForm.wasteAcceptationStatus).toBe("ACCEPTED");
@@ -59,7 +61,7 @@ describe("Test Form reception", () => {
     expect(acceptedForm.quantityReceived).toBe(11);
 
     // A StatusLog object is created
-    const logs = await prisma.statusLogs({
+    const logs = await prisma.statusLog.findMany({
       where: { form: { id: acceptedForm.id }, user: { id: recipient.id } }
     });
     expect(logs.length).toBe(1);
@@ -73,12 +75,12 @@ describe("Test Form reception", () => {
       recipientCompany,
       form
     } = await prepareDB();
-    await prisma.updateForm({
+    await prisma.form.update({
       where: { id: form.id },
       data: {
         status: "RECEIVED",
         receivedBy: "Bill",
-        receivedAt: "2019-01-17T10:22:00+0100"
+        receivedAt: new Date("2019-01-17T10:22:00+0100")
       }
     });
 
@@ -94,14 +96,14 @@ describe("Test Form reception", () => {
         id: form.id,
         acceptedInfo: {
           signedBy: "Bill",
-          signedAt: "2019-01-17T10:22:00+0100",
+          signedAt: new Date("2019-01-17T10:22:00+0100"),
           wasteAcceptationStatus: "ACCEPTED",
           quantityReceived: -2
         }
       }
     });
 
-    const frm = await prisma.form({ id: form.id });
+    const frm = await prisma.form.findUnique({ where: { id: form.id } });
     // form was not accepted, still sent
     expect(frm.status).toBe("RECEIVED");
     expect(frm.wasteAcceptationStatus).toBe(null);
@@ -116,12 +118,12 @@ describe("Test Form reception", () => {
       recipientCompany,
       form
     } = await prepareDB();
-    await prisma.updateForm({
+    await prisma.form.update({
       where: { id: form.id },
       data: {
         status: "RECEIVED",
         receivedBy: "Bill",
-        receivedAt: "2019-01-17T10:22:00+0100"
+        receivedAt: new Date("2019-01-17T10:22:00+0100")
       }
     });
 
@@ -137,14 +139,14 @@ describe("Test Form reception", () => {
         id: form.id,
         acceptedInfo: {
           signedBy: "Bill",
-          signedAt: "2019-01-17T10:22:00+0100",
+          signedAt: new Date("2019-01-17T10:22:00+0100"),
           wasteAcceptationStatus: "ACCEPTED",
           quantityReceived: 0
         }
       }
     });
 
-    const frm = await prisma.form({ id: form.id });
+    const frm = await prisma.form.findUnique({ where: { id: form.id } });
     // form was not accepted, still sent
     expect(frm.status).toBe("RECEIVED");
     expect(frm.wasteAcceptationStatus).toBe(null);
@@ -159,12 +161,12 @@ describe("Test Form reception", () => {
       recipientCompany,
       form
     } = await prepareDB();
-    await prisma.updateForm({
+    await prisma.form.update({
       where: { id: form.id },
       data: {
         status: "RECEIVED",
         receivedBy: "Bill",
-        receivedAt: "2019-01-17T10:22:00+0100"
+        receivedAt: new Date("2019-01-17T10:22:00+0100")
       }
     });
     await prepareRedis({
@@ -178,7 +180,7 @@ describe("Test Form reception", () => {
         id: form.id,
         acceptedInfo: {
           signedBy: "Holden",
-          signedAt: "2019-01-17T10:22:00+0100",
+          signedAt: new Date("2019-01-17T10:22:00+0100"),
           wasteAcceptationStatus: "REFUSED",
           wasteRefusalReason: "Lorem ipsum",
           quantityReceived: 0
@@ -186,7 +188,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form({ id: form.id });
+    const frm = await prisma.form.findUnique({ where: { id: form.id } });
 
     // form was refused
     expect(frm.status).toBe("REFUSED");
@@ -196,7 +198,7 @@ describe("Test Form reception", () => {
     expect(frm.quantityReceived).toBe(0); // quantityReceived is set to 0
 
     // A StatusLog object is created
-    const logs = await prisma.statusLogs({
+    const logs = await prisma.statusLog.findMany({
       where: { form: { id: frm.id }, user: { id: recipient.id } }
     });
     expect(logs.length).toBe(1);
@@ -210,12 +212,12 @@ describe("Test Form reception", () => {
       recipientCompany,
       form
     } = await prepareDB();
-    await prisma.updateForm({
+    await prisma.form.update({
       where: { id: form.id },
       data: {
         status: "RECEIVED",
         receivedBy: "Bill",
-        receivedAt: "2019-01-17T10:22:00+0100"
+        receivedAt: new Date("2019-01-17T10:22:00+0100")
       }
     });
     await prepareRedis({
@@ -229,7 +231,7 @@ describe("Test Form reception", () => {
         id: form.id,
         acceptedInfo: {
           signedBy: "Holden",
-          signedAt: "2019-01-17T10:22:00+0100",
+          signedAt: new Date("2019-01-17T10:22:00+0100"),
           wasteAcceptationStatus: "REFUSED",
           wasteRefusalReason: "Lorem ipsum",
           quantityReceived: 21
@@ -237,7 +239,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form({ id: form.id });
+    const frm = await prisma.form.findUnique({ where: { id: form.id } });
 
     // form is still sent
     expect(frm.status).toBe("RECEIVED");
@@ -247,7 +249,7 @@ describe("Test Form reception", () => {
     expect(frm.quantityReceived).toBe(null);
 
     // No StatusLog object was created
-    const logs = await prisma.statusLogs({
+    const logs = await prisma.statusLog.findMany({
       where: { form: { id: frm.id }, user: { id: recipient.id } }
     });
     expect(logs.length).toBe(0);
@@ -260,12 +262,12 @@ describe("Test Form reception", () => {
       recipientCompany,
       form
     } = await prepareDB();
-    await prisma.updateForm({
+    await prisma.form.update({
       where: { id: form.id },
       data: {
         status: "RECEIVED",
         receivedBy: "Bill",
-        receivedAt: "2019-01-17T10:22:00+0100"
+        receivedAt: new Date("2019-01-17T10:22:00+0100")
       }
     });
     await prepareRedis({
@@ -279,7 +281,7 @@ describe("Test Form reception", () => {
         id: form.id,
         acceptedInfo: {
           signedBy: "Carol",
-          signedAt: "2019-01-17T10:22:00+0100",
+          signedAt: new Date("2019-01-17T10:22:00+0100"),
           wasteAcceptationStatus: "PARTIALLY_REFUSED",
           wasteRefusalReason: "Dolor sit amet",
           quantityReceived: 12.5
@@ -287,7 +289,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form({ id: form.id });
+    const frm = await prisma.form.findUnique({ where: { id: form.id } });
     // form was not accepted
     expect(frm.status).toBe("ACCEPTED");
     expect(frm.wasteAcceptationStatus).toBe("PARTIALLY_REFUSED");
@@ -296,7 +298,7 @@ describe("Test Form reception", () => {
     expect(frm.quantityReceived).toBe(12.5);
 
     // A StatusLog object is created
-    const logs = await prisma.statusLogs({
+    const logs = await prisma.statusLog.findMany({
       where: { form: { id: frm.id }, user: { id: recipient.id } }
     });
     expect(logs.length).toBe(1);

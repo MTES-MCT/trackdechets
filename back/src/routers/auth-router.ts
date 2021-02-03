@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import passport from "passport";
 import querystring from "querystring";
 import { getUIBaseURL } from "../utils";
@@ -7,7 +7,7 @@ import nocache from "../common/middlewares/nocache";
 
 const UI_BASE_URL = getUIBaseURL();
 
-const authRouter = express.Router();
+const authRouter = Router();
 authRouter.post("/login", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {

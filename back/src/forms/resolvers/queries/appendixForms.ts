@@ -1,8 +1,8 @@
-import { QueryResolvers } from "../../../generated/graphql/types";
-import { prisma } from "../../../generated/prisma-client";
-import { checkIsAuthenticated } from "../../../common/permissions";
-import { expandFormFromDb } from "../../form-converter";
 import { checkIsCompanyMember } from "../../../users/permissions";
+import prisma from "../../../prisma";
+import { checkIsAuthenticated } from "../../../common/permissions";
+import { QueryResolvers } from "../../../generated/graphql/types";
+import { expandFormFromDb } from "../../form-converter";
 
 const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
   _,
@@ -12,7 +12,7 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
   const user = checkIsAuthenticated(context);
   await checkIsCompanyMember(user, { siret });
 
-  const queriedForms = await prisma.forms({
+  const queriedForms = await prisma.form.findMany({
     where: {
       ...(wasteCode && { wasteDetailsCode: wasteCode }),
       status: "AWAITING_GROUP",

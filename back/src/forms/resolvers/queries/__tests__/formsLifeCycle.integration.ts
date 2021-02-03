@@ -1,19 +1,20 @@
+import { UserRole } from "@prisma/client";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import prisma from "../../../../prisma";
 import * as mailsHelper from "../../../../mailer/mailing";
+import {
+  companyFactory,
+  formFactory,
+  statusLogFactory,
+  userFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import {
-  prepareRedis,
   prepareDB,
+  prepareRedis,
   storeRedisCompanyInfo
 } from "../../../__tests__/helpers";
-import {
-  statusLogFactory,
-  formFactory,
-  companyFactory,
-  userWithCompanyFactory,
-  userFactory
-} from "../../../../__tests__/factories";
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import { prisma, UserRole } from "../../../../generated/prisma-client";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -126,7 +127,6 @@ describe("Test formsLifeCycle query", () => {
     const today = new Date();
     const yesterday = (d => new Date(d.setDate(d.getDate() - 1)))(new Date());
     const todayStr = today.toISOString().substring(0, 10);
-    const yesterdayStr = yesterday.toISOString().substring(0, 10);
 
     // form was sent yesterday
     await statusLogFactory({
@@ -134,7 +134,7 @@ describe("Test formsLifeCycle query", () => {
       formId: form.id,
       userId: emitter.id,
       updatedFields: { dolor: "sit amet" },
-      opt: { loggedAt: yesterdayStr }
+      opt: { loggedAt: yesterday }
     });
     // form was received today
     await statusLogFactory({
@@ -171,7 +171,6 @@ describe("Test formsLifeCycle query", () => {
     const today = new Date();
     const yesterday = (d => new Date(d.setDate(d.getDate() - 1)))(new Date());
     const todayStr = today.toISOString().substring(0, 10);
-    const yesterdayStr = yesterday.toISOString().substring(0, 10);
 
     // form was sent yesterday
     await statusLogFactory({
@@ -179,7 +178,7 @@ describe("Test formsLifeCycle query", () => {
       formId: form.id,
       userId: emitter.id,
       updatedFields: { dolor: "sit amet" },
-      opt: { loggedAt: yesterdayStr }
+      opt: { loggedAt: yesterday }
     });
     // form was received today
     await statusLogFactory({
@@ -263,10 +262,12 @@ describe("Test formsLifeCycle query", () => {
 
     // let's create another company, associate it to recipient user, then create a form and its status log
     const otherCompany = await companyFactory();
-    await prisma.createCompanyAssociation({
-      user: { connect: { id: recipient.id } },
-      role: "MEMBER" as UserRole,
-      company: { connect: { siret: otherCompany.siret } }
+    await prisma.companyAssociation.create({
+      data: {
+        user: { connect: { id: recipient.id } },
+        role: "MEMBER" as UserRole,
+        company: { connect: { siret: otherCompany.siret } }
+      }
     });
     const otherForm = await formFactory({
       ownerId: emitter.id,
@@ -329,7 +330,7 @@ describe("Test formsLifeCycle query", () => {
     });
 
     // mark the form as deleted, related statuslogs should be hidden
-    await prisma.updateForm({
+    await prisma.form.update({
       where: { id: form.id },
       data: {
         isDeleted: true

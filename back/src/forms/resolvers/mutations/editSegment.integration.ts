@@ -1,12 +1,12 @@
+import { resetDatabase } from "../../../../integration-tests/helper";
+import prisma from "../../../prisma";
 import {
-  userWithCompanyFactory,
   formFactory,
+  transportSegmentFactory,
   userFactory,
-  transportSegmentFactory
+  userWithCompanyFactory
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
-import { resetDatabase } from "../../../../integration-tests/helper";
-import { prisma } from "../../../generated/prisma-client";
 
 jest.mock("axios", () => ({
   default: {
@@ -61,7 +61,9 @@ describe("{ mutation { editSegment } }", () => {
           }`
     );
 
-    const editedSegment = await prisma.transportSegment({ id: segment.id });
+    const editedSegment = await prisma.transportSegment.findUnique({
+      where: { id: segment.id }
+    });
     expect(editedSegment.transporterCompanySiret).toBe("5678956789");
   });
 
@@ -108,7 +110,9 @@ describe("{ mutation { editSegment } }", () => {
           }`
     );
 
-    const editedSegment = await prisma.transportSegment({ id: segment.id });
+    const editedSegment = await prisma.transportSegment.findUnique({
+      where: { id: segment.id }
+    });
     expect(editedSegment.transporterCompanySiret).toBe("5678956789");
   });
 
@@ -162,7 +166,9 @@ describe("{ mutation { editSegment } }", () => {
           }`
     );
 
-    const editedSegment = await prisma.transportSegment({ id: segment.id });
+    const editedSegment = await prisma.transportSegment.findUnique({
+      where: { id: segment.id }
+    });
 
     expect(editedSegment.transporterCompanyContact).toBe("José Lannister");
   });

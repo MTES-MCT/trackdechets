@@ -1,6 +1,5 @@
 import { signupFn as signup } from "../signup";
-import { prisma } from "../../../../generated/prisma-client";
-
+import prisma from "../../../../prisma";
 const userInfos = {
   id: "new_user",
   name: "an user",
@@ -9,18 +8,22 @@ const userInfos = {
   phone: "0000"
 };
 
-jest.mock("../../../../generated/prisma-client", () => ({
-  prisma: {
-    createUser: jest.fn(() => Promise.resolve(userInfos)),
-    $exists: {
-      user: jest.fn(() => Promise.resolve(false))
-    },
-    createUserActivationHash: jest.fn(() =>
-      Promise.resolve({ hash: "an hash" })
-    ),
-    userAccountHashes: jest.fn(() => Promise.resolve([])),
-    createCompanyAssociation: jest.fn(() => Promise.resolve()),
-    updateManyUserAccountHashes: jest.fn(() => Promise.resolve())
+jest.mock("../../../../prisma", () => ({
+  user: {
+    create: jest.fn(() => Promise.resolve(userInfos)),
+    findFirst: jest.fn(() => Promise.resolve(null)),
+    findMany: jest.fn(() => Promise.resolve([])),
+    count: jest.fn(() => Promise.resolve(0))
+  },
+  userActivationHash: {
+    create: jest.fn(() => Promise.resolve({ hash: "an hash" }))
+  },
+  userAccountHash: {
+    findMany: jest.fn(() => Promise.resolve([])),
+    updateMany: jest.fn(() => Promise.resolve())
+  },
+  companyAssociation: {
+    create: jest.fn(() => Promise.resolve())
   }
 }));
 
@@ -42,7 +45,7 @@ describe("signup", () => {
   test("should create activation hash", async () => {
     await signup({ userInfos });
 
-    expect(prisma.createUserActivationHash).toHaveBeenCalledTimes(1);
+    expect(prisma.userActivationHash.create).toHaveBeenCalledTimes(1);
   });
 
   test("should accept all pending invitations", async () => {
@@ -51,13 +54,13 @@ describe("signup", () => {
       { companySiret: "", role: "ADMIN" },
       { companySiret: "", role: "ADMIN" }
     ];
-    (prisma.userAccountHashes as jest.Mock).mockResolvedValue(hashes);
+    (prisma.userAccountHash.findMany as jest.Mock).mockResolvedValue(hashes);
 
     await signup({ userInfos });
 
-    expect(prisma.createCompanyAssociation).toHaveBeenCalledTimes(
+    expect(prisma.companyAssociation.create).toHaveBeenCalledTimes(
       hashes.length
     );
-    expect(prisma.updateManyUserAccountHashes).toHaveBeenCalledTimes(1);
+    expect(prisma.userAccountHash.updateMany).toHaveBeenCalledTimes(1);
   });
 });
