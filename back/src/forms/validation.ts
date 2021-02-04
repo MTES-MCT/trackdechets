@@ -3,6 +3,7 @@ import {
   EmitterType,
   Form,
   QuantityType,
+  TemporaryStorageDetail,
   WasteAcceptationStatus
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
@@ -18,9 +19,167 @@ import {
 import configureYup from "../common/yup/configureYup";
 import validDatetime from "../common/yup/validDatetime";
 import { PackagingInfo, Packagings } from "../generated/graphql/types";
+import { SchemaOf } from "yup";
 
 // set yup default error messages
 configureYup();
+
+// ************************************************
+// BREAK DOWN FORM TYPE INTO INDIVIDUAL FRAME TYPES
+// ************************************************
+
+type Emitter = Pick<
+  Form,
+  | "emitterType"
+  | "emitterPickupSite"
+  | "emitterWorkSiteName"
+  | "emitterWorkSiteAddress"
+  | "emitterWorkSiteCity"
+  | "emitterWorkSitePostalCode"
+  | "emitterWorkSiteInfos"
+  | "emitterCompanyName"
+  | "emitterCompanySiret"
+  | "emitterCompanyAddress"
+  | "emitterCompanyContact"
+  | "emitterCompanyPhone"
+  | "emitterCompanyMail"
+>;
+
+type Recipient = Pick<
+  Form,
+  | "recipientCap"
+  | "recipientProcessingOperation"
+  | "recipientIsTempStorage"
+  | "recipientCompanyName"
+  | "recipientCompanySiret"
+  | "recipientCompanyAddress"
+  | "recipientCompanyContact"
+  | "recipientCompanyPhone"
+  | "recipientCompanyMail"
+>;
+
+type WasteDetails = Pick<
+  Form,
+  | "wasteDetailsCode"
+  | "wasteDetailsName"
+  | "wasteDetailsOnuCode"
+  | "wasteDetailsPackagingInfos"
+  | "wasteDetailsPackagings"
+  | "wasteDetailsOtherPackaging"
+  | "wasteDetailsNumberOfPackages"
+  | "wasteDetailsQuantity"
+  | "wasteDetailsQuantityType"
+  | "wasteDetailsConsistence"
+  | "wasteDetailsPop"
+>;
+
+type Transporter = Pick<
+  Form,
+  | "transporterCompanyName"
+  | "transporterCompanySiret"
+  | "transporterCompanyAddress"
+  | "transporterCompanyContact"
+  | "transporterCompanyPhone"
+  | "transporterCompanyMail"
+  | "transporterIsExemptedOfReceipt"
+  | "transporterReceipt"
+  | "transporterDepartment"
+  | "transporterValidityLimit"
+  | "transporterNumberPlate"
+  | "transporterCustomInfo"
+  | "sentAt"
+  | "signedByTransporter"
+>;
+
+type ReceivedInfo = Pick<
+  Form,
+  | "isAccepted"
+  | "wasteAcceptationStatus"
+  | "wasteRefusalReason"
+  | "receivedBy"
+  | "receivedAt"
+  | "signedAt"
+  | "quantityReceived"
+>;
+
+type AcceptedInfo = Pick<
+  Form,
+  | "isAccepted"
+  | "wasteAcceptationStatus"
+  | "wasteRefusalReason"
+  | "signedAt"
+  | "signedBy"
+  | "quantityReceived"
+>;
+
+type SigningInfo = Pick<Form, "sentAt" | "sentBy" | "signedByTransporter">;
+
+type ProcessedInfo = Pick<
+  Form,
+  | "processedBy"
+  | "processedAt"
+  | "processingOperationDone"
+  | "processingOperationDescription"
+  | "noTraceability"
+  | "nextDestinationProcessingOperation"
+  | "nextDestinationCompanyName"
+  | "nextDestinationCompanySiret"
+  | "nextDestinationCompanyAddress"
+  | "nextDestinationCompanyCountry"
+  | "nextDestinationCompanyContact"
+  | "nextDestinationCompanyPhone"
+  | "nextDestinationCompanyMail"
+>;
+
+type TempStorageInfo = Pick<
+  TemporaryStorageDetail,
+  | "tempStorerQuantityType"
+  | "tempStorerQuantityReceived"
+  | "tempStorerWasteAcceptationStatus"
+  | "tempStorerWasteRefusalReason"
+  | "tempStorerReceivedAt"
+  | "tempStorerReceivedBy"
+  | "tempStorerSignedAt"
+>;
+
+type DestinationAfterTempStorage = Pick<
+  TemporaryStorageDetail,
+  | "destinationCompanyName"
+  | "destinationCompanySiret"
+  | "destinationCompanyAddress"
+  | "destinationCompanyContact"
+  | "destinationCompanyPhone"
+  | "destinationCompanyMail"
+  | "destinationCap"
+  | "destinationProcessingOperation"
+>;
+
+type TransporterAfterTempStorage = Pick<
+  TemporaryStorageDetail,
+  | "transporterCompanyName"
+  | "transporterCompanySiret"
+  | "transporterCompanyAddress"
+  | "transporterCompanyContact"
+  | "transporterCompanyPhone"
+  | "transporterCompanyMail"
+  | "transporterIsExemptedOfReceipt"
+  | "transporterReceipt"
+  | "transporterDepartment"
+  | "transporterValidityLimit"
+  | "transporterNumberPlate"
+>;
+
+type WasteRepackaging = Pick<
+  Form,
+  | "wasteDetailsOnuCode"
+  | "wasteDetailsPackagings"
+  | "wasteDetailsOtherPackaging"
+  | "wasteDetailsNumberOfPackages"
+  | "wasteDetailsQuantity"
+  | "wasteDetailsQuantityType"
+>;
+
+type FactorySchemaOf<T> = (isDraft: boolean) => SchemaOf<T>;
 
 // *********************
 // COMMON ERROR MESSAGES
@@ -48,8 +207,14 @@ const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseignée ne p
 // *************************************************************
 
 // 1 - Émetteur du bordereau
-const emitterSchemaFn = isDraft =>
-  yup.object().shape({
+const emitterSchemaFn: FactorySchemaOf<Emitter> = isDraft =>
+  yup.object({
+    emitterPickupSite: yup.string().nullable(),
+    emitterWorkSiteAddress: yup.string().nullable(),
+    emitterWorkSiteCity: yup.string().nullable(),
+    emitterWorkSiteInfos: yup.string().nullable(),
+    emitterWorkSiteName: yup.string().nullable(),
+    emitterWorkSitePostalCode: yup.string().nullable(),
     emitterType: yup.mixed<EmitterType>().when("ecoOrganismeSiret", {
       is: ecoOrganismeSiret => !ecoOrganismeSiret,
       then: yup
@@ -114,8 +279,10 @@ export const ecoOrganismeSchema = yup.object().shape({
 });
 
 // 2 - Installation de destination ou d’entreposage ou de reconditionnement prévue
-const recipientSchemaFn = isDraft =>
-  yup.object().shape({
+const recipientSchemaFn: FactorySchemaOf<Recipient> = isDraft =>
+  yup.object({
+    recipientCap: yup.string().nullable(),
+    recipientIsTempStorage: yup.boolean().nullable(),
     recipientProcessingOperation: yup
       .string()
       .label("Opération d’élimination / valorisation")
@@ -151,7 +318,7 @@ const recipientSchemaFn = isDraft =>
       .requiredIf(isDraft, `Destinataire: ${MISSING_COMPANY_EMAIL}`)
   });
 
-const packagingInfoFn = isDraft =>
+const packagingInfoFn = (isDraft: boolean) =>
   yup.object().shape({
     type: yup
       .mixed<Packagings>()
@@ -193,8 +360,12 @@ const packagingInfoFn = isDraft =>
 // 4 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
 // 5 - Conditionnement
 // 6 - Quantité
-const wasteDetailsSchemaFn = isDraft =>
-  yup.object().shape({
+const wasteDetailsSchemaFn: FactorySchemaOf<WasteDetails> = isDraft =>
+  yup.object({
+    wasteDetailsNumberOfPackages: yup.number().nullable(),
+    wasteDetailsOtherPackaging: yup.string().nullable(),
+    wasteDetailsPackagings: yup.object().nullable(),
+    wasteDetailsName: yup.string().nullable(),
     wasteDetailsCode: yup
       .string()
       .requiredIf(isDraft, "Le code déchet est obligatoire")
@@ -257,8 +428,14 @@ const wasteDetailsSchemaFn = isDraft =>
 export const wasteDetailsSchema = wasteDetailsSchemaFn(false);
 
 // 8 - Collecteur-transporteur
-const transporterSchemaFn = isDraft =>
-  yup.object().shape({
+const transporterSchemaFn: FactorySchemaOf<Transporter> = isDraft =>
+  yup.object({
+    sentAt: validDatetime({
+      verboseFieldName: "date d'envoi"
+    }) as any,
+    signedByTransporter: yup.boolean().nullable(),
+    transporterCustomInfo: yup.string().nullable(),
+    transporterNumberPlate: yup.string().nullable(),
     transporterCompanyName: yup
       .string()
       .ensure()
@@ -314,16 +491,17 @@ const transporterSchemaFn = isDraft =>
       ),
     transporterValidityLimit: validDatetime({
       verboseFieldName: "date de validité"
-    })
+    }) as any
   });
 
 // 8 - Collecteur-transporteur
 // 9 - Déclaration générale de l’émetteur du bordereau :
-export const signingInfoSchema = yup.object().shape({
+export const signingInfoSchema: SchemaOf<SigningInfo> = yup.object({
+  signedByTransporter: yup.boolean().nullable(),
   sentAt: validDatetime({
     verboseFieldName: "date d'envoi",
     required: true
-  }),
+  }) as any,
   sentBy: yup
     .string()
     .ensure()
@@ -331,7 +509,7 @@ export const signingInfoSchema = yup.object().shape({
 });
 
 // 10 - Expédition reçue à l’installation de destination
-export const receivedInfoSchema = yup.object().shape({
+export const receivedInfoSchema: SchemaOf<ReceivedInfo> = yup.object({
   isAccepted: yup.boolean(),
   receivedBy: yup
     .string()
@@ -340,10 +518,10 @@ export const receivedInfoSchema = yup.object().shape({
   receivedAt: validDatetime({
     verboseFieldName: "date de réception",
     required: true
-  }),
+  }) as any,
   signedAt: validDatetime({
     verboseFieldName: "date d'acceptation"
-  }),
+  }) as any,
   quantityReceived: yup
     .number()
     // if waste is refused, quantityReceived must be 0
@@ -384,11 +562,11 @@ export const receivedInfoSchema = yup.object().shape({
 });
 
 // 10 - Expédition acceptée (ou refusée) à l’installation de destination
-export const acceptedInfoSchema = yup.object().shape({
+export const acceptedInfoSchema: SchemaOf<AcceptedInfo> = yup.object({
   isAccepted: yup.boolean(),
   signedAt: validDatetime({
     verboseFieldName: "date d'acceptation"
-  }),
+  }) as any,
   signedBy: yup
     .string()
     .ensure()
@@ -515,8 +693,10 @@ const withoutNextDestination = yup.object().shape({
 });
 
 // 11 - Réalisation de l’opération :
-const processedInfoSchemaFn = (value: any) => {
-  const base = yup.object().shape({
+const processedInfoSchemaFn: (
+  value: any
+) => SchemaOf<ProcessedInfo> = value => {
+  const base = yup.object({
     processedBy: yup
       .string()
       .ensure()
@@ -524,10 +704,12 @@ const processedInfoSchemaFn = (value: any) => {
     processedAt: validDatetime({
       verboseFieldName: "date de traitement",
       required: true
-    }),
+    }) as any,
     processingOperationDone: yup
       .string()
-      .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
+      .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION),
+    processingOperationDescription: yup.string().nullable(),
+    noTraceability: yup.boolean().nullable()
   });
 
   return PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
@@ -544,7 +726,7 @@ export const processedInfoSchema = yup.lazy(processedInfoSchemaFn);
 // *********************************************************************
 
 // 13 - Réception dans l’installation d’entreposage ou de reconditionnement
-export const tempStoredInfoSchema = yup.object().shape({
+export const tempStoredInfoSchema: SchemaOf<TempStorageInfo> = yup.object({
   tempStorerReceivedBy: yup
     .string()
     .ensure()
@@ -552,10 +734,10 @@ export const tempStoredInfoSchema = yup.object().shape({
   tempStorerReceivedAt: validDatetime({
     verboseFieldName: "date de réception",
     required: true
-  }),
+  }) as any,
   tempStorerSignedAt: validDatetime({
     verboseFieldName: "date d'acceptation"
-  }),
+  }) as any,
   tempStorerQuantityType: yup.mixed<QuantityType>(),
   tempStorerWasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
   tempStorerQuantityReceived: yup
@@ -663,41 +845,48 @@ export const tempStorerAcceptedInfoSchema = yup.object().shape({
 });
 
 // 14 - Installation de destination prévue
-export const destinationAfterTempStorageSchema = yup.object().shape({
-  destinationCompanyName: yup
-    .string()
-    .ensure()
-    .required(`Destination prévue: ${MISSING_COMPANY_NAME}`),
-  destinationCompanySiret: yup
-    .string()
-    .ensure()
-    .required(`Destination prévue: ${MISSING_COMPANY_SIRET}`)
-    .length(14, `Destination ultérieure: ${INVALID_SIRET_LENGTH}`),
-  destinationCompanyAddress: yup
-    .string()
-    .ensure()
-    .required(`Destination prévue: ${MISSING_COMPANY_ADDRESS}`),
-  destinationCompanyContact: yup
-    .string()
-    .ensure()
-    .required(`Destination prévue: ${MISSING_COMPANY_CONTACT}`),
-  destinationCompanyPhone: yup
-    .string()
-    .ensure()
-    .required(`Destination prévue: ${MISSING_COMPANY_PHONE}`),
-  destinationCompanyMail: yup
-    .string()
-    .ensure()
-    .required(`Destination prévue: ${MISSING_COMPANY_EMAIL}`),
-  destinationProcessingOperation: yup
-    .string()
-    .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
-});
+export const destinationAfterTempStorageSchema: SchemaOf<DestinationAfterTempStorage> = yup.object(
+  {
+    destinationCap: yup.string().nullable(),
+    destinationCompanyName: yup
+      .string()
+      .ensure()
+      .required(`Destination prévue: ${MISSING_COMPANY_NAME}`),
+    destinationCompanySiret: yup
+      .string()
+      .ensure()
+      .required(`Destination prévue: ${MISSING_COMPANY_SIRET}`)
+      .length(14, `Destination ultérieure: ${INVALID_SIRET_LENGTH}`),
+    destinationCompanyAddress: yup
+      .string()
+      .ensure()
+      .required(`Destination prévue: ${MISSING_COMPANY_ADDRESS}`),
+    destinationCompanyContact: yup
+      .string()
+      .ensure()
+      .required(`Destination prévue: ${MISSING_COMPANY_CONTACT}`),
+    destinationCompanyPhone: yup
+      .string()
+      .ensure()
+      .required(`Destination prévue: ${MISSING_COMPANY_PHONE}`),
+    destinationCompanyMail: yup
+      .string()
+      .ensure()
+      .required(`Destination prévue: ${MISSING_COMPANY_EMAIL}`),
+    destinationProcessingOperation: yup
+      .string()
+      .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
+  }
+);
 
 // 15 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
 // 16 - Conditionnement
 // 17 - Quantité
-export const wasteRepackagingSchema = yup.object().shape({
+export const wasteRepackagingSchema: SchemaOf<WasteRepackaging> = yup.object({
+  wasteDetailsOnuCode: yup.string().nullable(),
+  wasteDetailsOtherPackaging: yup.string().nullable(),
+  wasteDetailsPackagings: yup.object().nullable(),
+  wasteDetailsQuantityType: yup.mixed<QuantityType>().nullable(),
   wasteDetailsNumberOfPackages: yup
     .number()
     .nullable()
@@ -712,14 +901,16 @@ export const wasteRepackagingSchema = yup.object().shape({
 });
 
 // 18 - Collecteur-transporteur reconditionnement
-export const transporterAfterTempStorageSchema = transporterSchemaFn(false);
+export const transporterAfterTempStorageSchema: SchemaOf<TransporterAfterTempStorage> = transporterSchemaFn(
+  false
+);
 
 // *******************************************************************
 // COMPOSE VALIDATION SCHEMAS TO VALIDATE A FORM FOR A SPECIFIC STATUS
 // *******************************************************************
 
 // validation schema for BSD before it can be sealed
-const baseFormSchemaFn = isDraft =>
+const baseFormSchemaFn = (isDraft: boolean) =>
   emitterSchemaFn(isDraft)
     .concat(ecoOrganismeSchema)
     .concat(recipientSchemaFn(isDraft))
