@@ -8,6 +8,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
 import { checkCanDuplicate } from "../../permissions";
 import { eventEmitter, TDEvent } from "../../../events/emitter";
+import { indexForm } from "../../elastic";
 
 /**
  * Duplicate a form by stripping the properties that should not be copied.
@@ -147,6 +148,7 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
       loggedAt: new Date()
     }
   });
+  await indexForm(newForm);
 
   return expandFormFromDb(newForm);
 };

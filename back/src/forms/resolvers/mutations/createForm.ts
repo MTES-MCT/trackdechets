@@ -17,6 +17,7 @@ import {
 import { draftFormSchema } from "../../validation";
 import { checkIsFormContributor } from "../../permissions";
 import { FormSirets } from "../../types";
+import { indexForm } from "../../elastic";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -100,6 +101,7 @@ const createFormResolver = async (
       loggedAt: new Date()
     }
   });
+  await indexForm(newForm);
 
   return expandFormFromDb(newForm);
 };

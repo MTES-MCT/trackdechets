@@ -20,6 +20,8 @@ const deleteFormResolver: MutationResolvers["deleteForm"] = async (
     where: { id },
     data: { isDeleted: true }
   });
+  // FIXME: create the appropriate status log
+  // FIXME: delete document from elastic search
 
   return expandFormFromDb(deletedForm);
 };

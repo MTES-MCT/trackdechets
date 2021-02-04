@@ -5,6 +5,7 @@ import machine from "./machine";
 import { InvalidTransition } from "../errors";
 import { formDiff } from "./diff";
 import { eventEmitter, TDEvent } from "../../events/emitter";
+import { indexForm } from "../elastic";
 
 /**
  * Transition a form from initial state (ex: DRAFT) to next state (ex: SEALED)
@@ -75,6 +76,8 @@ export default async function transitionForm(
       updatedFields
     }
   });
+  // FIXME: it should update the existing document, not create a new one
+  await indexForm(form);
 
   return updatedForm;
 }
