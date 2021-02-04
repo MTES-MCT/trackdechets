@@ -5,13 +5,11 @@ interface FormColumnActionsProps {
   searchResult: FormSearchResult;
 }
 
-export default function FormColumnActions({
-  searchResult,
-}: FormColumnActionsProps) {
+export function FormColumnActions({ searchResult }: FormColumnActionsProps) {
   return (
     <>
       {searchResult.status === FormStatus.Draft && (
-        <button type="button">Modifier</button>
+        <button type="button">Finaliser</button>
       )}
     </>
   );

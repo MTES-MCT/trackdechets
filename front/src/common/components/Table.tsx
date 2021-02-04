@@ -8,7 +8,7 @@ interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
 
 export function Table({ children, className, ...props }: TableProps) {
   return (
-    <table {...props} className={classNames(styles.table, className)}>
+    <table {...props} className={classNames(styles.Table, className)}>
       {children}
     </table>
   );
@@ -20,7 +20,7 @@ interface TableHeadProps extends React.HTMLAttributes<HTMLTableSectionElement> {
 
 export function TableHead({ children, className, ...props }: TableHeadProps) {
   return (
-    <thead {...props} className={classNames(styles.thead, className)}>
+    <thead {...props} className={classNames(styles.TableHead, className)}>
       {children}
     </thead>
   );
@@ -32,7 +32,7 @@ interface TableBodyProps extends React.HTMLAttributes<HTMLTableSectionElement> {
 
 export function TableBody({ children, className, ...props }: TableBodyProps) {
   return (
-    <tbody {...props} className={classNames(styles.tbody, className)}>
+    <tbody {...props} className={classNames(styles.TableBody, className)}>
       {children}
     </tbody>
   );
@@ -44,7 +44,7 @@ interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
 
 export function TableRow({ children, className, ...props }: TableRowProps) {
   return (
-    <tr {...props} className={classNames(styles.tr, className)}>
+    <tr {...props} className={classNames(styles.TableRow, className)}>
       {children}
     </tr>
   );
@@ -61,7 +61,7 @@ export function TableHeaderCell({
   ...props
 }: TableHeaderCellProps) {
   return (
-    <th {...props} className={classNames(styles.th, className)}>
+    <th {...props} className={classNames(styles.TableHeaderCell, className)}>
       {children}
     </th>
   );
@@ -73,7 +73,7 @@ interface TableCellProps extends React.HTMLAttributes<HTMLTableCellElement> {
 
 export function TableCell({ children, className, ...props }: TableCellProps) {
   return (
-    <td {...props} className={classNames(styles.td, className)}>
+    <td {...props} className={classNames(styles.TableCell, className)}>
       {children}
     </td>
   );
