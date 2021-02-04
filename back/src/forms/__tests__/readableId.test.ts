@@ -1,8 +1,4 @@
-import getReadableId, {
-  ReadableIdPrefix,
-  base32Encode,
-  getRandomInt
-} from "../readableId";
+import getReadableId, { ReadableIdPrefix, getRandomInt } from "../readableId";
 
 jest.mock("date-fns", () => ({
   format: jest.fn().mockReturnValue("20191004")
@@ -18,18 +14,6 @@ describe("getReadableId", () => {
     const readableId = getReadableId(prefix);
     const regexp = new RegExp(`^${prefix}-20191004-[A-Z0-9]{9}$`);
     expect(readableId).toMatch(regexp);
-  });
-});
-
-describe("base32Encode", () => {
-  it("should base32Encode a number", () => {
-    expect(base32Encode(0)).toEqual("0");
-    expect(base32Encode(1)).toEqual("1");
-    expect(base32Encode(9)).toEqual("9");
-    expect(base32Encode(10)).toEqual("A");
-    expect(base32Encode(31)).toEqual("Z");
-    expect(base32Encode(32)).toEqual("10");
-    expect(base32Encode(Math.pow(32, 9) - 1)).toEqual("ZZZZZZZZZ");
   });
 });
 

@@ -60,3 +60,33 @@ export function daysBetween(date1: Date, date2: Date): number {
 export function sanitizeEmail(email: string): string {
   return email.toLowerCase().trim();
 }
+
+/**
+ * base32-crockford
+ * ================
+ * Implement the alternate base32 encoding as described
+ * by Douglas Crockford at: http://www.crockford.com/wrmg/base32.html.
+ * He designed the encoding to:
+ *   * Be human and machine readable
+ *   * Be compact
+ *   * Be error resistant
+ *   * Be pronounceable
+ * It uses a symbol set of 10 digits and 22 letters, excluding I, L O and U.
+ */
+export function base32Encode(n: number): string {
+  const alphabet = "0123456789ABCDEFGHJKMNPQRSTVWXYZ".split("");
+  function encode(n: number, encoded = "") {
+    if (n > 0) {
+      const r = n % 32;
+      const q = (n - r) / 32;
+      const symbol = alphabet[r];
+      return encode(q, symbol + encoded);
+    }
+    return encoded;
+  }
+  if (n === 0) {
+    return "0";
+  } else {
+    return encode(n);
+  }
+}
