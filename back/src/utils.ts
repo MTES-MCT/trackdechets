@@ -1,3 +1,5 @@
+import crypto from "crypto";
+
 export function randomNumber(length = 4) {
   const basis = Math.pow(10, length - 1);
   return Math.floor(basis + Math.random() * 9 * basis);
@@ -16,16 +18,9 @@ export function getUid(len: number): string {
   const charsLength = chars.length;
 
   for (let i = 0; i < len; ++i) {
-    uid += chars[getRandomInt(0, charsLength - 1)];
+    uid += chars[crypto.randomInt(0, charsLength - 1)];
   }
   return uid;
-}
-
-/**
- * Return a random int, used by `utils.getUid()`.
- */
-function getRandomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 export function getUIBaseURL() {
