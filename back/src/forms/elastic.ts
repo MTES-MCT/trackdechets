@@ -8,13 +8,12 @@ function toFormSearchResult(form: Form): FormSearchResult {
     id: form.id,
     readableId: form.readableId,
     status: form.status,
-    recipientCompany: form.recipientCompanySiret
-      ? {
-          siret: form.recipientCompanySiret,
-          name: form.recipientCompanyName
-        }
-      : null,
-    sirets: [form.recipientCompanySiret]
+    emitter: form.emitterCompanyName,
+    recipient: form.recipientCompanyName,
+    waste: form.wasteDetailsCode,
+    sirets: [form.emitterCompanySiret, form.recipientCompanySiret].filter(
+      Boolean
+    )
   };
 }
 
@@ -22,7 +21,10 @@ export async function indexAllForms({ skip = 0 }: { skip?: number } = {}) {
   const take = 1000;
   const forms = await prisma.form.findMany({
     skip,
-    take
+    take,
+    where: {
+      isDeleted: false
+    }
   });
 
   if (forms.length === 0) {

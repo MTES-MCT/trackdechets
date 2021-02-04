@@ -629,16 +629,14 @@ export type FormSearchResult = {
   readableId: Scalars["String"];
   /** Status du déchet, qui varie d'un BSD à l'autre. */
   status: Scalars["String"];
+  /** Émetteur du déchet. */
+  emitter?: Maybe<Scalars["String"]>;
   /** Destinataire final du déchet. */
-  recipientCompany?: Maybe<FormSearchResultCompany>;
+  recipient?: Maybe<Scalars["String"]>;
+  /** Dénomination du déchet. */
+  waste?: Maybe<Scalars["String"]>;
   /** Liste de SIRETs des entreprises qui figurent sur le bordereau. */
   sirets: Array<Scalars["String"]>;
-};
-
-export type FormSearchResultCompany = {
-  __typename?: "FormSearchResultCompany";
-  siret: Scalars["String"];
-  name: Scalars["String"];
 };
 
 /** Informations du cycle de vie des bordereaux */
@@ -2439,7 +2437,6 @@ export type ResolversTypes = {
   MembershipRequestStatus: MembershipRequestStatus;
   CompanySearchResult: ResolverTypeWrapper<CompanySearchResult>;
   FormSearchResult: ResolverTypeWrapper<FormSearchResult>;
-  FormSearchResultCompany: ResolverTypeWrapper<FormSearchResultCompany>;
   CompanyStat: ResolverTypeWrapper<CompanyStat>;
   Stat: ResolverTypeWrapper<Stat>;
   Mutation: ResolverTypeWrapper<{}>;
@@ -2536,7 +2533,6 @@ export type ResolversParentTypes = {
   MembershipRequest: MembershipRequest;
   CompanySearchResult: CompanySearchResult;
   FormSearchResult: FormSearchResult;
-  FormSearchResultCompany: FormSearchResultCompany;
   CompanyStat: CompanyStat;
   Stat: Stat;
   Mutation: {};
@@ -3106,21 +3102,14 @@ export type FormSearchResultResolvers<
   id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
   readableId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   status?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-  recipientCompany?: Resolver<
-    Maybe<ResolversTypes["FormSearchResultCompany"]>,
+  emitter?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  recipient?: Resolver<
+    Maybe<ResolversTypes["String"]>,
     ParentType,
     ContextType
   >;
+  waste?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
   sirets?: Resolver<Array<ResolversTypes["String"]>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type FormSearchResultCompanyResolvers<
-  ContextType = GraphQLContext,
-  ParentType extends ResolversParentTypes["FormSearchResultCompany"] = ResolversParentTypes["FormSearchResultCompany"]
-> = {
-  siret?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-  name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -4106,7 +4095,6 @@ export type Resolvers<ContextType = GraphQLContext> = {
   FormCompany?: FormCompanyResolvers<ContextType>;
   FormEcoOrganisme?: FormEcoOrganismeResolvers<ContextType>;
   FormSearchResult?: FormSearchResultResolvers<ContextType>;
-  FormSearchResultCompany?: FormSearchResultCompanyResolvers<ContextType>;
   formsLifeCycleData?: FormsLifeCycleDataResolvers<ContextType>;
   FormSubscription?: FormSubscriptionResolvers<ContextType>;
   Installation?: InstallationResolvers<ContextType>;
@@ -4552,19 +4540,10 @@ export function createFormSearchResultMock(
     id: "",
     readableId: "",
     status: "",
-    recipientCompany: null,
+    emitter: null,
+    recipient: null,
+    waste: null,
     sirets: [],
-    ...props
-  };
-}
-
-export function createFormSearchResultCompanyMock(
-  props: Partial<FormSearchResultCompany>
-): FormSearchResultCompany {
-  return {
-    __typename: "FormSearchResultCompany",
-    siret: "",
-    name: "",
     ...props
   };
 }

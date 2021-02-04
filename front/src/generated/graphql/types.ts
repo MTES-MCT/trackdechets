@@ -624,16 +624,14 @@ export type FormSearchResult = {
   readableId: Scalars["String"];
   /** Status du déchet, qui varie d'un BSD à l'autre. */
   status: Scalars["String"];
+  /** Émetteur du déchet. */
+  emitter: Maybe<Scalars["String"]>;
   /** Destinataire final du déchet. */
-  recipientCompany: Maybe<FormSearchResultCompany>;
+  recipient: Maybe<Scalars["String"]>;
+  /** Dénomination du déchet. */
+  waste: Maybe<Scalars["String"]>;
   /** Liste de SIRETs des entreprises qui figurent sur le bordereau. */
   sirets: Array<Scalars["String"]>;
-};
-
-export type FormSearchResultCompany = {
-  __typename?: "FormSearchResultCompany";
-  siret: Scalars["String"];
-  name: Scalars["String"];
 };
 
 /** Informations du cycle de vie des bordereaux */
@@ -2689,19 +2687,10 @@ export function createFormSearchResultMock(
     id: "",
     readableId: "",
     status: "",
-    recipientCompany: null,
+    emitter: null,
+    recipient: null,
+    waste: null,
     sirets: [],
-    ...props
-  };
-}
-
-export function createFormSearchResultCompanyMock(
-  props: Partial<FormSearchResultCompany>
-): FormSearchResultCompany {
-  return {
-    __typename: "FormSearchResultCompany",
-    siret: "",
-    name: "",
     ...props
   };
 }

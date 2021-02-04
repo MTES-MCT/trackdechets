@@ -22,17 +22,22 @@ type FormSearchResult {
   status: String!
 
   """
+  Émetteur du déchet.
+  """
+  emitter: String
+
+  """
   Destinataire final du déchet.
   """
-  recipientCompany: FormSearchResultCompany
+  recipient: String
+
+  """
+  Dénomination du déchet.
+  """
+  waste: String
 
   """
   Liste de SIRETs des entreprises qui figurent sur le bordereau.
   """
   sirets: [String!]!
-}
-
-type FormSearchResultCompany {
-  siret: String!
-  name: String!
 }
