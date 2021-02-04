@@ -620,9 +620,13 @@ export enum FormRole {
 
 export type FormSearchResult = {
   __typename?: "FormSearchResult";
+  /** Identifiant unique du bordereau. */
   id: Scalars["ID"];
+  /** Identifiant lisible du bordereau. */
   readableId: Scalars["String"];
-  /** Status du déchet, qui varie d'un BSD à l'autre. */
+  /** Type de bordereau dont il s'agit. */
+  type: FormType;
+  /** Status du déchet, qui varie d'un bordereau à l'autre. */
   status: Scalars["String"];
   /** Émetteur du déchet. */
   emitter: Maybe<Scalars["String"]>;
@@ -747,6 +751,10 @@ export type FormSubscription = {
   /** Ancienne valeurs */
   previousValues: Maybe<Form>;
 };
+
+export enum FormType {
+  Form = "FORM"
+}
 
 /** Type d'une déclaration GEREP */
 export enum GerepType {
@@ -2686,6 +2694,7 @@ export function createFormSearchResultMock(
     __typename: "FormSearchResult",
     id: "",
     readableId: "",
+    type: FormType.Form,
     status: "",
     emitter: null,
     recipient: null,

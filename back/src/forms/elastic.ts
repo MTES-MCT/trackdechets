@@ -7,6 +7,7 @@ function toFormSearchResult(form: Form): FormSearchResult {
   return {
     id: form.id,
     readableId: form.readableId,
+    type: "FORM",
     status: form.status,
     emitter: form.emitterCompanyName,
     recipient: form.recipientCompanyName,

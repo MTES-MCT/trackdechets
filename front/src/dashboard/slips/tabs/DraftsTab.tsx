@@ -2,7 +2,12 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";
 import { useTable, Column } from "react-table";
-import { FormSearchResult, FormStatus, Query } from "generated/graphql/types";
+import {
+  FormSearchResult,
+  FormStatus,
+  Query,
+  FormType,
+} from "generated/graphql/types";
 import {
   Table,
   TableHead,
@@ -11,12 +16,14 @@ import {
   TableHeaderCell,
   TableCell,
 } from "common/components";
+import FormColumnActions from "../FormColumnActions";
 
 const SEARCH_DRAFTS = gql`
   query SearchDrafts($siret: String!, $status: [String!]!) {
     searchForms(siret: $siret, status: $status) {
       id
       readableId
+      type
       status
       emitter
       recipient
@@ -26,6 +33,9 @@ const SEARCH_DRAFTS = gql`
   }
 `;
 
+const ACTIONS_COMPONENTS = {
+  [FormType.Form]: FormColumnActions,
+};
 const COLUMNS: Array<Column<FormSearchResult>> = [
   {
     id: "readableId",
@@ -56,6 +66,14 @@ const COLUMNS: Array<Column<FormSearchResult>> = [
     id: "status",
     Header: "Statut",
     accessor: searchResult => searchResult.status,
+  },
+  {
+    id: "actions",
+    Header: () => null,
+    Cell: ({ row: { original: searchResult } }) => {
+      const Component = ACTIONS_COMPONENTS[searchResult.type];
+      return <Component searchResult={searchResult} />;
+    },
   },
 ];
 

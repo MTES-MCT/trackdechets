@@ -13,11 +13,23 @@ type Query {
 }
 
 type FormSearchResult {
+  """
+  Identifiant unique du bordereau.
+  """
   id: ID!
+
+  """
+  Identifiant lisible du bordereau.
+  """
   readableId: String!
 
   """
-  Status du déchet, qui varie d'un BSD à l'autre.
+  Type de bordereau dont il s'agit.
+  """
+  type: FormType!
+
+  """
+  Status du déchet, qui varie d'un bordereau à l'autre.
   """
   status: String!
 
@@ -40,4 +52,12 @@ type FormSearchResult {
   Liste de SIRETs des entreprises qui figurent sur le bordereau.
   """
   sirets: [String!]!
+}
+
+"""
+TODO: I think Benoît already created a similar enum.
+If that's the case, they should probably be merged together.
+"""
+enum FormType {
+  FORM
 }

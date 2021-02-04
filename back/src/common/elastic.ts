@@ -11,6 +11,9 @@ export const index = {
       readableId: {
         type: "keyword"
       },
+      type: {
+        type: "keyword"
+      },
       status: {
         type: "keyword"
       },

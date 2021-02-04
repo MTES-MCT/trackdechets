@@ -625,9 +625,13 @@ export type FormRole =
 
 export type FormSearchResult = {
   __typename?: "FormSearchResult";
+  /** Identifiant unique du bordereau. */
   id: Scalars["ID"];
+  /** Identifiant lisible du bordereau. */
   readableId: Scalars["String"];
-  /** Status du déchet, qui varie d'un BSD à l'autre. */
+  /** Type de bordereau dont il s'agit. */
+  type: FormType;
+  /** Status du déchet, qui varie d'un bordereau à l'autre. */
   status: Scalars["String"];
   /** Émetteur du déchet. */
   emitter?: Maybe<Scalars["String"]>;
@@ -749,6 +753,8 @@ export type FormSubscription = {
   /** Ancienne valeurs */
   previousValues?: Maybe<Form>;
 };
+
+export type FormType = "FORM";
 
 /** Type d'une déclaration GEREP */
 export type GerepType = "Producteur" | "Traiteur";
@@ -2437,6 +2443,7 @@ export type ResolversTypes = {
   MembershipRequestStatus: MembershipRequestStatus;
   CompanySearchResult: ResolverTypeWrapper<CompanySearchResult>;
   FormSearchResult: ResolverTypeWrapper<FormSearchResult>;
+  FormType: FormType;
   CompanyStat: ResolverTypeWrapper<CompanyStat>;
   Stat: ResolverTypeWrapper<Stat>;
   Mutation: ResolverTypeWrapper<{}>;
@@ -3101,6 +3108,7 @@ export type FormSearchResultResolvers<
 > = {
   id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
   readableId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  type?: Resolver<ResolversTypes["FormType"], ParentType, ContextType>;
   status?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   emitter?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
   recipient?: Resolver<
@@ -4539,6 +4547,7 @@ export function createFormSearchResultMock(
     __typename: "FormSearchResult",
     id: "",
     readableId: "",
+    type: "FORM",
     status: "",
     emitter: null,
     recipient: null,
