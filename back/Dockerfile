@@ -1,11 +1,11 @@
-FROM node:14.3 AS builder
+FROM node:14.15.4 AS builder
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci --quiet
 COPY . .
 RUN npm run build
 
-FROM node:14.3
+FROM node:14.15.4
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci --quiet --only=production
