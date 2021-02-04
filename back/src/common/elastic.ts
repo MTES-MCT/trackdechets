@@ -1,15 +1,34 @@
 import { Client } from "@elastic/elasticsearch";
 
 export const index = {
-  alias: "documents",
-  index: "documents_v1",
+  alias: "forms",
+  index: "forms_v1",
+
   mappings: {
     properties: {
       id: {
-        type: "text"
+        type: "keyword"
       },
       readableId: {
-        type: "text"
+        // TODO: perhaps it should also be indexed as text?
+        type: "keyword"
+      },
+      status: {
+        type: "keyword"
+      },
+      recipientCompany: {
+        properties: {
+          siret: {
+            // TODO: perhaps it should also be indexed as text?
+            type: "keyword"
+          },
+          name: {
+            type: "text"
+          }
+        }
+      },
+      sirets: {
+        type: "keyword"
       }
     }
   }

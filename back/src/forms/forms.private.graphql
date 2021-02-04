@@ -1,8 +1,38 @@
 type Query {
-  searchForms: [FormSearchResult!]!
+  searchForms(
+    """
+    SIRET de l'entreprise pour laquelle retourner les BSDs.
+    """
+    siret: String!
+
+    """
+    Liste des status à filtrer.
+    """
+    status: [String!]!
+  ): [FormSearchResult!]!
 }
 
 type FormSearchResult {
   id: ID!
   readableId: String!
+
+  """
+  Status du déchet, qui varie d'un BSD à l'autre.
+  """
+  status: String!
+
+  """
+  Destinataire final du déchet.
+  """
+  recipientCompany: FormSearchResultCompany
+
+  """
+  Liste de SIRETs des entreprises qui figurent sur le bordereau.
+  """
+  sirets: [String!]!
+}
+
+type FormSearchResultCompany {
+  siret: String!
+  name: String!
 }

@@ -6,7 +6,15 @@ import { FormSearchResult } from "../generated/graphql/types";
 function toFormSearchResult(form: Form): FormSearchResult {
   return {
     id: form.id,
-    readableId: form.readableId
+    readableId: form.readableId,
+    status: form.status,
+    recipientCompany: form.recipientCompanySiret
+      ? {
+          siret: form.recipientCompanySiret,
+          name: form.recipientCompanyName
+        }
+      : null,
+    sirets: [form.recipientCompanySiret]
   };
 }
 
@@ -40,4 +48,11 @@ export async function indexAllForms({ skip = 0 }: { skip?: number } = {}) {
   }
 
   return indexAllForms({ skip: skip + take });
+}
+
+export async function indexForm(form: Form) {
+  await client.index({
+    index: index.index,
+    body: toFormSearchResult(form)
+  });
 }

@@ -14,7 +14,7 @@ interface SearchResponse<T> {
   };
 }
 
-const searchFormsResolver: QueryResolvers["searchForms"] = async () => {
+const searchFormsResolver: QueryResolvers["searchForms"] = async (_, args) => {
   const {
     body: {
       hits: { hits }
@@ -25,10 +25,24 @@ const searchFormsResolver: QueryResolvers["searchForms"] = async () => {
       size: 10,
       from: 0,
       query: {
-        match_all: {}
+        bool: {
+          filter: [
+            {
+              term: {
+                sirets: args.siret
+              }
+            },
+            {
+              terms: {
+                status: args.status
+              }
+            }
+          ]
+        }
       }
     }
   });
+
   return hits.map(hit => hit._source);
 };
 

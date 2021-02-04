@@ -622,6 +622,18 @@ export type FormSearchResult = {
   __typename?: "FormSearchResult";
   id: Scalars["ID"];
   readableId: Scalars["String"];
+  /** Status du déchet, qui varie d'un BSD à l'autre. */
+  status: Scalars["String"];
+  /** Destinataire final du déchet. */
+  recipientCompany: Maybe<FormSearchResultCompany>;
+  /** Liste de SIRETs des entreprises qui figurent sur le bordereau. */
+  sirets: Array<Scalars["String"]>;
+};
+
+export type FormSearchResultCompany = {
+  __typename?: "FormSearchResultCompany";
+  siret: Scalars["String"];
+  name: Scalars["String"];
 };
 
 /** Informations du cycle de vie des bordereaux */
@@ -1604,6 +1616,11 @@ export type QueryMembershipRequestArgs = {
 export type QuerySearchCompaniesArgs = {
   clue: Scalars["String"];
   department: Maybe<Scalars["String"]>;
+};
+
+export type QuerySearchFormsArgs = {
+  siret: Scalars["String"];
+  status: Array<Scalars["String"]>;
 };
 
 /** Payload de réception d'un BSD */
@@ -2671,6 +2688,20 @@ export function createFormSearchResultMock(
     __typename: "FormSearchResult",
     id: "",
     readableId: "",
+    status: "",
+    recipientCompany: null,
+    sirets: [],
+    ...props
+  };
+}
+
+export function createFormSearchResultCompanyMock(
+  props: Partial<FormSearchResultCompany>
+): FormSearchResultCompany {
+  return {
+    __typename: "FormSearchResultCompany",
+    siret: "",
+    name: "",
     ...props
   };
 }
