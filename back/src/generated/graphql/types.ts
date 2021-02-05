@@ -308,7 +308,7 @@ export type CreateFormInput = {
   /** Négociant (case 7) */
   trader?: Maybe<TraderInput>;
   /** Annexe 2 */
-  appendix2Forms?: Maybe<Array<Maybe<AppendixFormInput>>>;
+  appendix2Forms?: Maybe<Array<AppendixFormInput>>;
   ecoOrganisme?: Maybe<EcoOrganismeInput>;
   temporaryStorageDetail?: Maybe<TemporaryStorageDetailInput>;
 };
@@ -606,7 +606,7 @@ export type FormInput = {
   /** Négociant (case 7) */
   trader?: Maybe<TraderInput>;
   /** Annexe 2 */
-  appendix2Forms?: Maybe<Array<Maybe<AppendixFormInput>>>;
+  appendix2Forms?: Maybe<Array<AppendixFormInput>>;
   ecoOrganisme?: Maybe<EcoOrganismeInput>;
   temporaryStorageDetail?: Maybe<TemporaryStorageDetailInput>;
 };
@@ -2050,7 +2050,7 @@ export type UpdateFormInput = {
   /** Négociant (case 7) */
   trader?: Maybe<TraderInput>;
   /** Annexe 2 */
-  appendix2Forms?: Maybe<Array<Maybe<AppendixFormInput>>>;
+  appendix2Forms?: Maybe<Array<AppendixFormInput>>;
   ecoOrganisme?: Maybe<EcoOrganismeInput>;
   temporaryStorageDetail?: Maybe<TemporaryStorageDetailInput>;
 };
