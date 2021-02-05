@@ -9,11 +9,15 @@ import {
   TableHeaderCell,
   TableCell,
 } from "common/components";
-import { FormColumnActions } from "./FormColumnActions";
+import { FormColumnStatus, FormColumnActions } from "./Form";
 
-const ACTIONS_COMPONENTS = {
-  [FormType.Form]: FormColumnActions,
+const FORM_TYPES = {
+  [FormType.Form]: {
+    Status: FormColumnStatus,
+    Actions: FormColumnActions,
+  },
 };
+
 const COLUMNS: Array<Column<FormSearchResult>> = [
   {
     id: "readableId",
@@ -43,14 +47,17 @@ const COLUMNS: Array<Column<FormSearchResult>> = [
   {
     id: "status",
     Header: "Statut",
-    accessor: searchResult => searchResult.status,
+    Cell: ({ row: { original: searchResult } }) => {
+      const { Status } = FORM_TYPES[searchResult.type];
+      return <Status searchResult={searchResult} />;
+    },
   },
   {
     id: "actions",
     Header: () => null,
     Cell: ({ row: { original: searchResult } }) => {
-      const Component = ACTIONS_COMPONENTS[searchResult.type];
-      return <Component searchResult={searchResult} />;
+      const { Actions } = FORM_TYPES[searchResult.type];
+      return <Actions searchResult={searchResult} />;
     },
   },
 ];
