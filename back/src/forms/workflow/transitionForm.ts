@@ -44,18 +44,15 @@ export default async function transitionForm(
   // update form
   const updatedForm = await prisma.form.update({
     where: { id: form.id },
-    data: formUpdateInput
+    data: formUpdateInput,
+    include: { temporaryStorageDetail: true, transportSegments: true }
   });
-
-  // retrieves updated temp storage
-  const updatedTemporaryStorageDetail = await prisma.form
-    .findUnique({ where: { id: updatedForm.id } })
-    .temporaryStorageDetail();
 
   // calculates diff between initial form and updated form
   const updatedFields = formDiff(
     { ...form, temporaryStorageDetail },
-    { ...updatedForm, temporaryStorageDetail: updatedTemporaryStorageDetail }
+    // FIXME: formDiff is not prepared to diff a form with .transportSegments
+    updatedForm
   );
 
   eventEmitter.emit<Form>(TDEvent.TransitionForm, {
@@ -77,7 +74,7 @@ export default async function transitionForm(
     }
   });
   // FIXME: it should update the existing document, not create a new one
-  await indexForm(form);
+  await indexForm(updatedForm);
 
   return updatedForm;
 }

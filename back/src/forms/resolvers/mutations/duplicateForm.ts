@@ -1,4 +1,4 @@
-import { Status, Form, TemporaryStorageDetail, User } from "@prisma/client";
+import { Status, TemporaryStorageDetail } from "@prisma/client";
 import prisma from "../../../prisma";
 
 import { expandFormFromDb } from "../../form-converter";
@@ -9,97 +9,63 @@ import { getFormOrFormNotFound } from "../../database";
 import { checkCanDuplicate } from "../../permissions";
 import { eventEmitter, TDEvent } from "../../../events/emitter";
 import { indexForm } from "../../elastic";
+import { FullForm } from "../../types";
 
-/**
- * Duplicate a form by stripping the properties that should not be copied.
- *
- * @param {User} user user that should own the duplicated form
- * @param {Form} form the form to duplicate
- */
-async function duplicateForm(
-  user: User,
-  {
-    id,
-    readableId,
-    customId,
-    isDeleted,
-    isImportedFromPaper,
-    createdAt,
-    updatedAt,
-    signedByTransporter,
-    status,
-    sentAt,
-    sentBy,
-    isAccepted,
-    wasteAcceptationStatus,
-    wasteRefusalReason,
-    receivedBy,
-    receivedAt,
-    signedAt,
-    quantityReceived,
-    processedBy,
-    processedAt,
-    processingOperationDone,
-    processingOperationDescription,
-    noTraceability,
-    transporterNumberPlate,
-    transporterCustomInfo,
-    currentTransporterSiret,
-    temporaryStorageDetailId,
-    appendix2RootFormId,
-    ownerId,
+function getDuplicatableFormFields({
+  id,
+  readableId,
+  customId,
+  isDeleted,
+  isImportedFromPaper,
+  createdAt,
+  updatedAt,
+  signedByTransporter,
+  status,
+  sentAt,
+  sentBy,
+  isAccepted,
+  wasteAcceptationStatus,
+  wasteRefusalReason,
+  receivedBy,
+  receivedAt,
+  signedAt,
+  quantityReceived,
+  processedBy,
+  processedAt,
+  processingOperationDone,
+  processingOperationDescription,
+  noTraceability,
+  transporterNumberPlate,
+  transporterCustomInfo,
+  currentTransporterSiret,
+  temporaryStorageDetailId,
+  appendix2RootFormId,
+  ownerId,
+  temporaryStorageDetail,
+  transportSegments,
 
-    ...rest
-  }: Form
-) {
-  return prisma.form.create({
-    data: {
-      ...rest,
-      readableId: getReadableId(),
-      status: "DRAFT",
-      owner: { connect: { id: user.id } }
-    }
-  });
+  ...rest
+}: FullForm) {
+  return rest;
 }
 
-/**
- * Duplicate a temporary storage detail by stripping
- * the properties that should not be copied.
- *
- * @param {Form} form the form to which the duplicated temporary storage detail should be linked to
- * @param {TemporaryStorageDetail} temporaryStorageDetail the temporary storage detail to duplicate
- */
-function duplicateTemporaryStorageDetail(
-  form: Form,
-  {
-    id,
-    tempStorerQuantityType,
-    tempStorerQuantityReceived,
-    tempStorerWasteAcceptationStatus,
-    tempStorerWasteRefusalReason,
-    tempStorerReceivedAt,
-    tempStorerReceivedBy,
-    tempStorerSignedAt,
-    transporterNumberPlate,
-    signedByTransporter,
-    signedBy,
-    signedAt,
+function getDuplicatableTemporaryStorageFields({
+  id,
+  tempStorerQuantityType,
+  tempStorerQuantityReceived,
+  tempStorerWasteAcceptationStatus,
+  tempStorerWasteRefusalReason,
+  tempStorerReceivedAt,
+  tempStorerReceivedBy,
+  tempStorerSignedAt,
+  transporterNumberPlate,
+  signedByTransporter,
+  signedBy,
+  signedAt,
 
-    ...rest
-  }: TemporaryStorageDetail
-) {
-  return prisma.form.update({
-    where: {
-      id: form.id
-    },
-    data: {
-      temporaryStorageDetail: {
-        create: {
-          ...rest
-        }
-      }
-    }
-  });
+  ...rest
+}: TemporaryStorageDetail) {
+  return rest;
 }
 
 /**
@@ -116,19 +82,44 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
+  // TODO: ideally we would use prisma's "include" option
+  // perhaps we should refactor getFormOrFormNotFound a bit
   const existingForm = await getFormOrFormNotFound({ id });
+  const existingTemporaryStorageDetail = existingForm.temporaryStorageDetailId
+    ? await prisma.temporaryStorageDetail.findUnique({
+        where: {
+          id: existingForm.temporaryStorageDetailId
+        }
+      })
+    : null;
+  const fullExistingForm = {
+    ...existingForm,
+    temporaryStorageDetail: existingTemporaryStorageDetail,
+    transportSegments: []
+  };
 
-  await checkCanDuplicate(user, existingForm);
+  // TODO: transportSegments are not queried, which means a multimodal transporter cannot duplicate that form
+  await checkCanDuplicate(user, fullExistingForm);
 
-  const newForm = await duplicateForm(user, existingForm);
-
-  const temporaryStorageDetail = await prisma.form
-    .findUnique({ where: { id: existingForm.id } })
-    .temporaryStorageDetail();
-
-  if (temporaryStorageDetail) {
-    await duplicateTemporaryStorageDetail(newForm, temporaryStorageDetail);
-  }
+  const newForm = await prisma.form.create({
+    data: {
+      ...getDuplicatableFormFields(fullExistingForm),
+      temporaryStorageDetail: fullExistingForm.temporaryStorageDetail
+        ? {
+            create: getDuplicatableTemporaryStorageFields(
+              fullExistingForm.temporaryStorageDetail
+            )
+          }
+        : undefined,
+      readableId: getReadableId(),
+      status: "DRAFT",
+      owner: { connect: { id: user.id } }
+    },
+    include: {
+      temporaryStorageDetail: true,
+      transportSegments: true
+    }
+  });
 
   eventEmitter.emit(TDEvent.CreateForm, {
     previousNode: null,
@@ -137,7 +128,6 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
     mutation: "CREATED"
   });
 
-  // create statuslog when form is created
   await prisma.statusLog.create({
     data: {
       form: { connect: { id: newForm.id } },

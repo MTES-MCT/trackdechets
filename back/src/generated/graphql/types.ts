@@ -754,6 +754,10 @@ export type FormSubscription = {
   previousValues?: Maybe<Form>;
 };
 
+/**
+ * TODO: I think Benoît already created a similar enum.
+ * If that's the case, they should probably be merged together.
+ */
 export type FormType = "FORM";
 
 /** Type d'une déclaration GEREP */

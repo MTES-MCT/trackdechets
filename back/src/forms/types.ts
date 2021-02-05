@@ -4,7 +4,7 @@ import { Form, TemporaryStorageDetail, TransportSegment } from "@prisma/client";
  * A Prisma Form with linked objects
  */
 export interface FullForm extends Form {
-  temporaryStorageDetail: TemporaryStorageDetail;
+  temporaryStorageDetail: TemporaryStorageDetail | null;
   transportSegments: TransportSegment[];
 }
 

@@ -1,9 +1,9 @@
-import { Form } from "@prisma/client";
 import prisma from "../prisma";
 import { client, index } from "../common/elastic";
 import { FormSearchResult } from "../generated/graphql/types";
+import { FullForm } from "./types";
 
-function toFormSearchResult(form: Form): FormSearchResult {
+function toFormSearchResult(form: FullForm): FormSearchResult {
   return {
     id: form.id,
     readableId: form.readableId,
@@ -12,9 +12,16 @@ function toFormSearchResult(form: Form): FormSearchResult {
     emitter: form.emitterCompanyName,
     recipient: form.recipientCompanyName,
     waste: form.wasteDetailsCode,
-    sirets: [form.emitterCompanySiret, form.recipientCompanySiret].filter(
-      Boolean
-    )
+    sirets: [
+      form.emitterCompanySiret,
+      form.transporterCompanySiret,
+      ...form.transportSegments.map(segment => segment.transporterCompanySiret),
+      form.temporaryStorageDetail?.destinationCompanySiret,
+      form.temporaryStorageDetail?.transporterCompanySiret,
+      form.recipientCompanySiret,
+      form.traderCompanySiret,
+      form.ecoOrganismeSiret
+    ].filter(Boolean)
   };
 }
 
@@ -25,6 +32,10 @@ export async function indexAllForms({ skip = 0 }: { skip?: number } = {}) {
     take,
     where: {
       isDeleted: false
+    },
+    include: {
+      temporaryStorageDetail: true,
+      transportSegments: true
     }
   });
 
@@ -53,7 +64,7 @@ export async function indexAllForms({ skip = 0 }: { skip?: number } = {}) {
   return indexAllForms({ skip: skip + take });
 }
 
-export async function indexForm(form: Form) {
+export async function indexForm(form: FullForm) {
   await client.index({
     index: index.index,
     body: toFormSearchResult(form)

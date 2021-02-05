@@ -752,6 +752,10 @@ export type FormSubscription = {
   previousValues: Maybe<Form>;
 };
 
+/**
+ * TODO: I think Benoît already created a similar enum.
+ * If that's the case, they should probably be merged together.
+ */
 export enum FormType {
   Form = "FORM"
 }

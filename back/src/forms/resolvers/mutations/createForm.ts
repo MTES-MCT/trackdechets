@@ -81,7 +81,10 @@ const createFormResolver = async (
     }
   }
 
-  const newForm = await prisma.form.create({ data: formCreateInput });
+  const newForm = await prisma.form.create({
+    data: formCreateInput,
+    include: { temporaryStorageDetail: true, transportSegments: true }
+  });
 
   eventEmitter.emit(TDEvent.CreateForm, {
     previousNode: null,
