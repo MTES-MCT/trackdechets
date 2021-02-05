@@ -56,7 +56,7 @@ const createFormResolver = async (
     ...form,
     readableId: getReadableId(),
     owner: { connect: { id: user.id } },
-    appendix2Forms: { connect: appendix2Forms }
+    appendix2Forms: appendix2Forms ? { connect: appendix2Forms } : undefined
   };
 
   await draftFormSchema.validate(formCreateInput);
