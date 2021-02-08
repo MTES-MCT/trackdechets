@@ -5,7 +5,7 @@ import { resetDatabase } from "../../integration-tests/helper";
 import { getLoginError } from "../auth";
 import prisma from "../prisma";
 import { app, sess } from "../server";
-import { getUid } from "../utils";
+import { getUid, hashToken } from "../utils";
 import { userFactory } from "./factories";
 
 const { UI_HOST, JWT_SECRET } = process.env;
@@ -217,10 +217,11 @@ describe("Authentification with token", () => {
     // should create a new access token to make it revokable
     // next time this token is used, it will use passport bearer strategy
     const accessToken = await prisma.accessToken.findUnique({
-      where: { token }
+      where: { token: hashToken(token) }
     });
     expect(accessToken).toBeDefined();
-    expect(accessToken.token).toEqual(token);
+    expect(accessToken.token).toEqual(hashToken(token));
+    expect(accessToken.isHashed).toBeTruthy();
     expect(accessToken.lastUsed).not.toBeNull();
     const accessTokenUser = await prisma.accessToken
       .findUnique({ where: { token } })
@@ -234,7 +235,8 @@ describe("Authentification with token", () => {
     const token = getUid(10);
     await prisma.accessToken.create({
       data: {
-        token,
+        token: hashToken(token),
+        isHashed: true,
         user: { connect: { id: user.id } }
       }
     });
@@ -250,7 +252,7 @@ describe("Authentification with token", () => {
 
     // should update lastUsed field
     const accessToken = await prisma.accessToken.findUnique({
-      where: { token }
+      where: { token: hashToken(token) }
     });
     expect(accessToken.lastUsed).not.toBeNull();
   });
