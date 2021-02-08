@@ -1,8 +1,6 @@
-import { useFormikContext, Field } from "formik";
-import React, { useEffect } from "react";
+import { Field } from "formik";
+import React from "react";
 import CompanySelector from "form/company/CompanySelector";
-import { Form } from "generated/graphql/types";
-import { initalTemporaryStorageDetail } from "../initial-state";
 import styles from "./TemporaryStorage.module.scss";
 import classNames from "classnames";
 import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";

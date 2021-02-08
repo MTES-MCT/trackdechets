@@ -43,7 +43,7 @@ export default function EcoOrganismes(props: EcoOrganismesProps) {
     if (!isChecked && field.value) {
       setFieldValue(field.name, null, false);
     }
-  }, [isChecked, setFieldValue]);
+  }, [isChecked, field.value, field.name, setFieldValue]);
 
   return (
     <>

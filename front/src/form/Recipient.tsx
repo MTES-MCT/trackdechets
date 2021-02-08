@@ -3,10 +3,7 @@ import React, { useEffect, useState } from "react";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "./company/CompanySelector";
 import DateInput from "./custom-inputs/DateInput";
-import initialState, {
-  initalTemporaryStorageDetail,
-  initialTrader,
-} from "./initial-state";
+import { initalTemporaryStorageDetail, initialTrader } from "./initial-state";
 import { Form } from "generated/graphql/types";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import TemporaryStorage from "./temporaryStorage/TemporaryStorage";

@@ -21,7 +21,7 @@ export default function WorkSite() {
     if (!showWorkSite && values.emitter?.workSite) {
       setFieldValue("emitter.workSite", null, false);
     }
-  }, [showWorkSite, setFieldValue]);
+  }, [showWorkSite, values.emitter, setFieldValue]);
 
   function setAddress(details) {
     setFieldValue(`emitter.workSite.address`, details.name);
