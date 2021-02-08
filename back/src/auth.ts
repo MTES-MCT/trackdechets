@@ -17,7 +17,12 @@ import {
 } from "passport-oauth2-client-password";
 import prisma from "./prisma";
 import { GraphQLContext } from "./types";
-import { daysBetween, sameDayMidnight, sanitizeEmail } from "./utils";
+import {
+  daysBetween,
+  sameDayMidnight,
+  sanitizeEmail,
+  hashToken
+} from "./utils";
 
 const { JWT_SECRET } = process.env;
 
@@ -115,8 +120,14 @@ passport.use(
           const token = jwtOpts.jwtFromRequest(req);
           // verify that the token has not been
           // converted to OAuth and revoked
-          const accessToken = await prisma.accessToken.findUnique({
-            where: { token }
+          // despite accessToken.token uniqueness, typing prevent us to use findUnique
+          const accessToken = await prisma.accessToken.findFirst({
+            where: {
+              OR: [
+                { token, isHashed: false },
+                { token: hashToken(token), isHashed: true }
+              ]
+            }
           });
           if (accessToken && accessToken.isRevoked) {
             return done(null, false);
@@ -157,8 +168,13 @@ export function updateAccessTokenLastUsed(accessToken: AccessToken) {
 passport.use(
   new BearerStrategy(async (token, done) => {
     try {
-      const accessToken = await prisma.accessToken.findUnique({
-        where: { token },
+      const accessToken = await prisma.accessToken.findFirst({
+        where: {
+          OR: [
+            { token, isHashed: false },
+            { token: hashToken(token), isHashed: true }
+          ]
+        },
         include: { user: true }
       });
       if (accessToken && !accessToken.isRevoked) {
