@@ -3,7 +3,10 @@ import React, { useEffect, useState } from "react";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "./company/CompanySelector";
 import DateInput from "./custom-inputs/DateInput";
-import initialState from "./initial-state";
+import initialState, {
+  initalTemporaryStorageDetail,
+  initialTrader,
+} from "./initial-state";
 import { Form } from "generated/graphql/types";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import TemporaryStorage from "./temporaryStorage/TemporaryStorage";
@@ -18,10 +21,44 @@ export default function Recipient() {
   const [hasTrader, setHasTrader] = useState(!!values.trader?.company?.siret);
 
   useEffect(() => {
-    if (!hasTrader) {
-      setFieldValue("trader.company", initialState.trader.company);
+    // set initial value for trader when the switch is toggled
+    if (hasTrader && !values.trader) {
+      setFieldValue("trader", initialTrader, false);
+    }
+
+    // set trader to null when the switch is toggled off
+    if (!hasTrader && values.trader) {
+      setFieldValue("trader", null, false);
     }
   }, [hasTrader, setFieldValue]);
+
+  useEffect(() => {
+    // set initial value for temp storage when the switch is toggled
+    if (values.recipient?.isTempStorage && !values.temporaryStorageDetail) {
+      setFieldValue(
+        "temporaryStorageDetail",
+        initalTemporaryStorageDetail,
+        false
+      );
+    }
+
+    // set temp storage to null when the switch is toggled off
+    if (!values.recipient?.isTempStorage && values.temporaryStorageDetail) {
+      setFieldValue("temporaryStorageDetail", null, false);
+    }
+
+    if (
+      values.recipient?.processingOperation &&
+      values.temporaryStorageDetail &&
+      !values.temporaryStorageDetail.destination?.processingOperation
+    ) {
+      setFieldValue(
+        "temporaryStorageDetail.destination.processingOperation",
+        values.recipient.processingOperation,
+        false
+      );
+    }
+  }, [values, setFieldValue]);
 
   return (
     <>
@@ -38,14 +75,12 @@ export default function Recipient() {
           reconditionnement"
         />
       </div>
-
       <h4 className="form__section-heading">
         Installation{" "}
         {values.recipient?.isTempStorage
           ? "d'entreposage ou de reconditionnement"
           : "de destination"}
       </h4>
-
       <div className={styles.recipientTextQuote}>
         <p>
           Pour vous assurer que l'entreprise de destination est autorisée à
@@ -60,11 +95,8 @@ export default function Recipient() {
           </a>
         </p>
       </div>
-
       <CompanySelector name="recipient.company" />
-
       <h4 className="form__section-heading">Informations complémentaires</h4>
-
       <div className="form__row">
         <Field
           component={ProcessingOperation}
@@ -73,7 +105,6 @@ export default function Recipient() {
 
         <RedErrorMessage name="recipient.processingOperation" />
       </div>
-
       <div className="form__row">
         <label>
           Numéro de CAP (optionnel)
@@ -84,7 +115,6 @@ export default function Recipient() {
           />
         </label>
       </div>
-
       <div className="form__row">
         <TdSwitch
           checked={hasTrader}
@@ -92,7 +122,7 @@ export default function Recipient() {
           label="Je suis passé par un négociant"
         />
       </div>
-      {hasTrader && (
+      {hasTrader && values.trader && (
         <div className="form__row">
           <h4 className="form__section-heading">Négociant</h4>
           <CompanySelector
@@ -157,8 +187,9 @@ export default function Recipient() {
           </div>
         </div>
       )}
-
-      <TemporaryStorage name="temporaryStorageDetail" />
+      {values.recipient?.isTempStorage && values.temporaryStorageDetail && (
+        <TemporaryStorage name="temporaryStorageDetail" />
+      )}
     </>
   );
 }
