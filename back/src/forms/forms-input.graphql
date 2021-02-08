@@ -149,7 +149,11 @@ input CreateFormInput {
   "Établissement émetteur/producteur du déchet (case 1)"
   emitter: EmitterInput
 
-  "Établissement qui reçoit le déchet (case 2)"
+  """
+  Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+  L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+  de traitement ou de tri, transit, regroupement.
+  """
   recipient: RecipientInput
 
   "Transporteur du déchet (case 8)"
@@ -182,7 +186,11 @@ input UpdateFormInput {
   "Établissement émetteur/producteur du déchet (case 1)"
   emitter: EmitterInput
 
-  "Établissement qui reçoit le déchet (case 2)"
+  """
+  Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+  L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+  de traitement ou de tri, transit, regroupement.
+  """
   recipient: RecipientInput
 
   "Transporteur du déchet (case 8)"
@@ -215,7 +223,11 @@ input FormInput {
   "Établissement émetteur/producteur du déchet (case 1)"
   emitter: EmitterInput
 
-  "Établissement qui reçoit le déchet (case 2)"
+  """
+  Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+  L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+  de traitement ou de tri, transit, regroupement.
+  """
   recipient: RecipientInput
 
   "Transporteur du déchet (case 8)"
@@ -259,7 +271,11 @@ input TemporaryStorageDetailInput {
 }
 
 input DestinationInput {
-  "Installation de destination prévue"
+  """
+  Installation de destination prévue (case 14)
+  L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+  de traitement ou de tri, transit, regroupement.
+  """
   company: CompanyInput
 
   "N° de CAP prévu (le cas échéant)"
@@ -570,7 +586,11 @@ input ImportPaperFormInput {
   "Établissement émetteur/producteur du déchet (case 1)"
   emitter: EmitterInput
 
-  "Établissement qui reçoit le déchet (case 2)"
+  """
+  Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+  L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+  de traitement ou de tri, transit, regroupement.
+  """
   recipient: RecipientInput
 
   "Transporteur du déchet (case 8)"

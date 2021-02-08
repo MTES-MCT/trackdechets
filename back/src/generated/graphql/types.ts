@@ -302,7 +302,11 @@ export type CreateFormInput = {
   customId?: Maybe<Scalars["String"]>;
   /** Établissement émetteur/producteur du déchet (case 1) */
   emitter?: Maybe<EmitterInput>;
-  /** Établissement qui reçoit le déchet (case 2) */
+  /**
+   * Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+   * L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+   * de traitement ou de tri, transit, regroupement.
+   */
   recipient?: Maybe<RecipientInput>;
   /** Transporteur du déchet (case 8) */
   transporter?: Maybe<TransporterInput>;
@@ -374,7 +378,11 @@ export type Destination = {
 };
 
 export type DestinationInput = {
-  /** Installation de destination prévue */
+  /**
+   * Installation de destination prévue (case 14)
+   * L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+   * de traitement ou de tri, transit, regroupement.
+   */
   company?: Maybe<CompanyInput>;
   /** N° de CAP prévu (le cas échéant) */
   cap?: Maybe<Scalars["String"]>;
@@ -495,7 +503,7 @@ export type Form = {
   isImportedFromPaper: Scalars["Boolean"];
   /** Établissement émetteur/producteur du déchet (case 1) */
   emitter?: Maybe<Emitter>;
-  /** Établissement qui reçoit le déchet (case 2) */
+  /** Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2) */
   recipient?: Maybe<Recipient>;
   /** Transporteur du déchet (case 8) */
   transporter?: Maybe<Transporter>;
@@ -600,7 +608,11 @@ export type FormInput = {
   customId?: Maybe<Scalars["String"]>;
   /** Établissement émetteur/producteur du déchet (case 1) */
   emitter?: Maybe<EmitterInput>;
-  /** Établissement qui reçoit le déchet (case 2) */
+  /**
+   * Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+   * L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+   * de traitement ou de tri, transit, regroupement.
+   */
   recipient?: Maybe<RecipientInput>;
   /** Transporteur du déchet (case 8) */
   transporter?: Maybe<TransporterInput>;
@@ -755,7 +767,11 @@ export type ImportPaperFormInput = {
   customId?: Maybe<Scalars["String"]>;
   /** Établissement émetteur/producteur du déchet (case 1) */
   emitter?: Maybe<EmitterInput>;
-  /** Établissement qui reçoit le déchet (case 2) */
+  /**
+   * Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+   * L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+   * de traitement ou de tri, transit, regroupement.
+   */
   recipient?: Maybe<RecipientInput>;
   /** Transporteur du déchet (case 8) */
   transporter?: Maybe<TransporterInput>;
@@ -2044,7 +2060,11 @@ export type UpdateFormInput = {
   customId?: Maybe<Scalars["String"]>;
   /** Établissement émetteur/producteur du déchet (case 1) */
   emitter?: Maybe<EmitterInput>;
-  /** Établissement qui reçoit le déchet (case 2) */
+  /**
+   * Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+   * L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+   * de traitement ou de tri, transit, regroupement.
+   */
   recipient?: Maybe<RecipientInput>;
   /** Transporteur du déchet (case 8) */
   transporter?: Maybe<TransporterInput>;
