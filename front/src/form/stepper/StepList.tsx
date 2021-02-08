@@ -11,17 +11,11 @@ import React, {
   useMemo,
 } from "react";
 import { useHistory, useParams, generatePath } from "react-router-dom";
-
 import { Breadcrumb, BreadcrumbItem } from "common/components";
 import { InlineError } from "common/components/Error";
 import { updateApolloCache } from "common/helper";
 import { DRAFT_TAB_FORMS } from "dashboard/slips/tabs/queries";
-import initialState, {
-  initalTemporaryStorageDetail,
-  initialTrader,
-  initialEcoOrganisme,
-  initialWorkSite,
-} from "../initial-state";
+import { getInitialState } from "../initial-state";
 import {
   Form,
   Query,
@@ -60,37 +54,7 @@ export default function StepList(props: IProps) {
   );
 
   const formState = useMemo(() => {
-    if (!data?.form) {
-      return initialState;
-    } else {
-      const {
-        temporaryStorageDetail,
-        ecoOrganisme,
-        trader,
-        ...form
-      } = data.form;
-      const state = {
-        ...getComputedState(initialState, form),
-        temporaryStorageDetail: temporaryStorageDetail
-          ? getComputedState(
-              initalTemporaryStorageDetail,
-              temporaryStorageDetail
-            )
-          : null,
-        trader: trader ? getComputedState(initialTrader, trader) : null,
-        ecoOrganisme: ecoOrganisme
-          ? getComputedState(initialEcoOrganisme, ecoOrganisme)
-          : null,
-      };
-      if (form.emitter?.workSite) {
-        state.emitter.workSite = getComputedState(
-          initialWorkSite,
-          form.emitter.workSite
-        );
-      }
-
-      return state;
-    }
+    return getInitialState(data?.form);
   }, [data]);
 
   const [createForm] = useMutation<
@@ -121,11 +85,12 @@ export default function StepList(props: IProps) {
   >(UPDATE_FORM);
 
   function saveForm(formInput: FormInput): Promise<any> {
-    return formState.id
+    const { id, ...input } = formInput;
+    return id
       ? updateForm({
-          variables: { updateFormInput: { ...formInput, id: formState.id } },
+          variables: { updateFormInput: { ...input, id } },
         })
-      : createForm({ variables: { createFormInput: formInput } });
+      : createForm({ variables: { createFormInput: input } });
   }
 
   useEffect(() => window.scrollTo(0, 0), [currentStep]);
@@ -250,36 +215,4 @@ export default function StepList(props: IProps) {
       </div>
     </div>
   );
-}
-
-/**
- * Construct the form state by merging initialState and the actual form.
- * The actual form may include properties that do not belong to the form.
- * If we keep them in the form state they will break the mutation validation.
- * To avoid that, we make sure that every properties we keep is a property contained in initial state.
- *
- * @param initialState what an empty Form is
- * @param actualForm the actual form
- */
-export function getComputedState(initialState, actualForm) {
-  if (!actualForm) {
-    return initialState;
-  }
-
-  const startingObject = actualForm.id ? { id: actualForm.id } : {};
-
-  return Object.keys(initialState).reduce((prev, curKey) => {
-    const initialValue = initialState[curKey];
-    if (
-      typeof initialValue === "object" &&
-      initialValue !== null &&
-      !(initialValue instanceof Array)
-    ) {
-      prev[curKey] = getComputedState(initialValue, actualForm[curKey]);
-    } else {
-      prev[curKey] = actualForm[curKey] ?? initialValue;
-    }
-
-    return prev;
-  }, startingObject);
 }

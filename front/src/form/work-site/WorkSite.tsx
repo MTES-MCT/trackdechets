@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Form } from "generated/graphql/types";
 import WorkSiteAddress from "./WorkSiteAddress";
 import TdSwitch from "common/components/Switch";
-import { initialWorkSite } from "form/initial-state";
+import { getInitialEmitterWorkSite } from "form/initial-state";
 const FIELDS = ["name", "address", "city", "postalCode", "infos"];
 
 export default function WorkSite() {
@@ -16,7 +16,7 @@ export default function WorkSite() {
 
   useEffect(() => {
     if (showWorkSite && !values.emitter?.workSite) {
-      setFieldValue("emitter.workSite", initialWorkSite, false);
+      setFieldValue("emitter.workSite", getInitialEmitterWorkSite(), false);
     }
     if (!showWorkSite && values.emitter?.workSite) {
       setFieldValue("emitter.workSite", null, false);

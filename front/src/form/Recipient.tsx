@@ -3,7 +3,10 @@ import React, { useEffect, useState } from "react";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "./company/CompanySelector";
 import DateInput from "./custom-inputs/DateInput";
-import { initalTemporaryStorageDetail, initialTrader } from "./initial-state";
+import {
+  getInitalTrader,
+  getInitialTemporaryStorageDetail,
+} from "./initial-state";
 import { Form } from "generated/graphql/types";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import TemporaryStorage from "./temporaryStorage/TemporaryStorage";
@@ -20,7 +23,7 @@ export default function Recipient() {
   useEffect(() => {
     // set initial value for trader when the switch is toggled
     if (hasTrader && !values.trader) {
-      setFieldValue("trader", initialTrader, false);
+      setFieldValue("trader", getInitalTrader(), false);
     }
 
     // set trader to null when the switch is toggled off
@@ -34,7 +37,7 @@ export default function Recipient() {
     if (values.recipient?.isTempStorage && !values.temporaryStorageDetail) {
       setFieldValue(
         "temporaryStorageDetail",
-        initalTemporaryStorageDetail,
+        getInitialTemporaryStorageDetail(),
         false
       );
     }

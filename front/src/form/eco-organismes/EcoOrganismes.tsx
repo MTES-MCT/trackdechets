@@ -7,7 +7,7 @@ import SearchInput from "common/components/SearchInput";
 import { Query, EcoOrganisme, Form } from "../../generated/graphql/types";
 import TdSwitch from "common/components/Switch";
 import { tdContactEmail } from "common/config";
-import { initialEcoOrganisme } from "form/initial-state";
+import { getInitialEcoOrganisme } from "form/initial-state";
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -36,7 +36,7 @@ export default function EcoOrganismes(props: EcoOrganismesProps) {
   useEffect(() => {
     // set initial value for ecoOrganisme when the switch is toggled
     if (isChecked && !field.value) {
-      setFieldValue(field.name, initialEcoOrganisme, false);
+      setFieldValue(field.name, getInitialEcoOrganisme(), false);
     }
 
     // set ecoOrganisme to null when the switch is toggled off
