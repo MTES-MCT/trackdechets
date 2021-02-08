@@ -62,8 +62,6 @@ export const SEARCH_COMPANIES = gql`
       siret
       name
       address
-      isRegistered
-      companyTypes
       installation {
         codeS3ic
         urlFiche
