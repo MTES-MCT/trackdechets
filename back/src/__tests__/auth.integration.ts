@@ -229,6 +229,35 @@ describe("Authentification with token", () => {
     expect(accessTokenUser.id).toEqual(user.id);
   });
 
+  it("should authenticate against previously unHashed token", async () => {
+    const user = await userFactory();
+
+    const token = getUid(10);
+    // mimicking token genrated before hasing routine implementation
+    await prisma.accessToken.create({
+      data: {
+        token: token,
+        isHashed: false, // unecessary, but let's be explicit
+        user: { connect: { id: user.id } }
+      }
+    });
+
+    const res = await request
+      .post("/")
+      .send({ query: "{ me { email } }" })
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.body.data).toEqual({
+      me: { email: user.email }
+    });
+
+    // should update lastUsed field
+    const accessToken = await prisma.accessToken.findUnique({
+      where: { token: token }
+    });
+    expect(accessToken.lastUsed).not.toBeNull();
+  });
+
   it("should authenticate using OAuth2 bearer token", async () => {
     const user = await userFactory();
 
