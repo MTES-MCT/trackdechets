@@ -217,11 +217,12 @@ describe("Authentification with token", () => {
     // should create a new access token to make it revokable
     // next time this token is used, it will use passport bearer strategy
     const accessToken = await prisma.accessToken.findUnique({
-      where: { token: hashToken(token) }
+      where: { token: token }
     });
+
     expect(accessToken).toBeDefined();
-    expect(accessToken.token).toEqual(hashToken(token));
-    expect(accessToken.isHashed).toBeTruthy();
+    expect(accessToken.token).toEqual(token);
+    expect(accessToken.isHashed).toBeFalsy();
     expect(accessToken.lastUsed).not.toBeNull();
     const accessTokenUser = await prisma.accessToken
       .findUnique({ where: { token } })
