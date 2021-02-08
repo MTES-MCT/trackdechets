@@ -1,7 +1,5 @@
-import { CompanyType } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
-import { companyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import * as sirene from "../../../sirene";
 
@@ -15,14 +13,15 @@ describe("query { searchCompanies(clue, department) }", () => {
 
   const { query } = makeClient(null);
   it("should return list of companies based on clue", async () => {
-    const company = {
-      siret: "85001946400013",
-      address: "4 Boulevard Longchamp 13001 Marseille",
-      name: "CODE EN STOCK",
-      naf: "6201Z",
-      libelleNaf: "Programmation informatique"
-    };
-    searchCompanySpy.mockResolvedValueOnce([company]);
+    searchCompanySpy.mockResolvedValueOnce([
+      {
+        siret: "85001946400013",
+        address: "4 Boulevard Longchamp 13001 Marseille",
+        name: "CODE EN STOCK",
+        naf: "6201Z",
+        libelleNaf: "Programmation informatique"
+      }
+    ]);
 
     const gqlQuery = `
       query {
@@ -30,7 +29,6 @@ describe("query { searchCompanies(clue, department) }", () => {
           siret
           address
           name
-          isRegistered
           companyTypes
           naf
           libelleNaf
@@ -43,20 +41,9 @@ describe("query { searchCompanies(clue, department) }", () => {
     const response = await query<any>(gqlQuery);
     const companies = response.data.searchCompanies;
     expect(companies).toHaveLength(1);
-    expect(companies).toEqual([
-      expect.objectContaining({
-        siret: company.siret,
-        address: company.address,
-        name: company.name,
-        isRegistered: false,
-        companyTypes: null,
-        naf: company.naf,
-        installation: null
-      })
-    ]);
   });
 
-  it("should merge info from SIRENE, TD and ICPE", async () => {
+  it("should merge info from SIRENE and ICPE", async () => {
     searchCompanySpy.mockResolvedValueOnce([
       {
         siret: "85001946400013",
@@ -67,19 +54,12 @@ describe("query { searchCompanies(clue, department) }", () => {
       }
     ]);
 
-    await companyFactory({
-      siret: "85001946400013",
-      name: "CODE EN STOCK",
-      companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
-    });
-
     const gqlQuery = `
       query {
         searchCompanies(clue: "Code en Stock"){
           siret
           address
           name
-          isRegistered
           companyTypes
           naf
           libelleNaf
@@ -100,8 +80,6 @@ describe("query { searchCompanies(clue, department) }", () => {
     const companies = response.data.searchCompanies;
     expect(companies).toHaveLength(1);
     expect(companies[0].installation.codeS3ic).toEqual(icpe.codeS3ic);
-    expect(companies[0].isRegistered).toEqual(true);
-    expect(companies[0].companyTypes).toEqual([CompanyType.WASTEPROCESSOR]);
   });
 
   it("should fetch transporter and trader receipt info", async () => {

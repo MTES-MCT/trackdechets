@@ -1,5 +1,4 @@
 import {
-  companyFactory,
   formFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -7,13 +6,10 @@ import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
-import { CompanyType } from "@prisma/client";
 
 const FAVORITES = `query Favorites($siret: String!, $type: FavoriteType!) {
   favorites(siret: $siret, type: $type) {
     siret
-    isRegistered
-    companyTypes
   }
 }`;
 
@@ -307,75 +303,6 @@ describe("query favorites", () => {
     expect(data.favorites).toEqual([
       expect.objectContaining({
         siret: form.nextDestinationCompanySiret
-      })
-    ]);
-  });
-
-  it("should set isRegistered to false if company does not exist in TD", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER", {
-      companyTypes: {
-        set: [CompanyType.COLLECTOR]
-      }
-    });
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        // this siret is not registered
-        emitterCompanySiret: "11111111111111"
-      }
-    });
-
-    const { query } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await query(FAVORITES, {
-      variables: {
-        siret: company.siret,
-        type: "EMITTER"
-      }
-    });
-
-    expect(data.favorites).toEqual([
-      expect.objectContaining({
-        siret: form.emitterCompanySiret,
-        isRegistered: false,
-        companyTypes: null
-      })
-    ]);
-  });
-
-  it("should provide companyTypes if company is registered in TD", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER", {
-      companyTypes: {
-        set: [CompanyType.COLLECTOR]
-      }
-    });
-
-    const emitter = await companyFactory({
-      companyTypes: {
-        set: [CompanyType.PRODUCER]
-      }
-    });
-
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        // this siret is not registered
-        emitterCompanySiret: emitter.siret
-      }
-    });
-
-    const { query } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await query(FAVORITES, {
-      variables: {
-        siret: company.siret,
-        type: "EMITTER"
-      }
-    });
-
-    expect(data.favorites).toEqual([
-      expect.objectContaining({
-        siret: form.emitterCompanySiret,
-        isRegistered: true,
-        companyTypes: emitter.companyTypes
       })
     ]);
   });

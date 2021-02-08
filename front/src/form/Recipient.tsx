@@ -27,7 +27,7 @@ export default function Recipient() {
     if (!hasTrader && values.trader) {
       setFieldValue("trader", null, false);
     }
-  }, [hasTrader, setFieldValue]);
+  }, [hasTrader, values, setFieldValue]);
 
   useEffect(() => {
     // set initial value for temp storage when the switch is toggled

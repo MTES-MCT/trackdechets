@@ -141,17 +141,6 @@ type CompanyFavorite {
   mail: String
 
   """
-  Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
-  """
-  isRegistered: Boolean
-
-  """
-  Profil de l'établissement sur Trackdéchets
-  Valeur à nulle si l'établissement n'est pas inscrit sur la plateforme `isRegistered=false`
-  """
-  companyTypes: [CompanyType!]
-
-  """
   Récépissé transporteur associé à cet établissement (le cas échéant)
   """
   transporterReceipt: TransporterReceipt

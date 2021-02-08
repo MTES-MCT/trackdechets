@@ -46,7 +46,6 @@ export default function CompanySelector({
   const { setFieldValue, setFieldTouched } = useFormikContext();
   const [clue, setClue] = useState("");
   const [department, setDepartement] = useState<null | string>(null);
-
   const [
     searchCompaniesQuery,
     { loading: isLoadingSearch, data: searchData },
@@ -91,23 +90,14 @@ export default function CompanySelector({
   const searchResults: CompanyFavorite[] = useMemo(
     () =>
       searchData?.searchCompanies.map(
-        ({
-          siret,
-          name,
-          address,
-          isRegistered,
-          companyTypes,
-          transporterReceipt,
-          traderReceipt,
-        }) => ({
+        ({ siret, name, address, transporterReceipt, traderReceipt }) => ({
           // convert CompanySearchResult to CompanyFavorite
           siret,
           name,
           address,
           transporterReceipt,
           traderReceipt,
-          isRegistered,
-          companyTypes,
+
           __typename: "CompanyFavorite",
           contact: "",
           phone: "",
@@ -202,8 +192,6 @@ export default function CompanySelector({
               __typename: "CompanyFavorite",
               transporterReceipt: null,
               traderReceipt: null,
-              isRegistered: null,
-              companyTypes: null,
             }}
           />
         </>

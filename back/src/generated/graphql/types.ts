@@ -95,13 +95,6 @@ export type CompanyFavorite = {
   phone?: Maybe<Scalars["String"]>;
   /** Email de contact */
   mail?: Maybe<Scalars["String"]>;
-  /** Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets */
-  isRegistered?: Maybe<Scalars["Boolean"]>;
-  /**
-   * Profil de l'établissement sur Trackdéchets
-   * Valeur à nulle si l'établissement n'est pas inscrit sur la plateforme `isRegistered=false`
-   */
-  companyTypes?: Maybe<Array<CompanyType>>;
   /** Récépissé transporteur associé à cet établissement (le cas échéant) */
   transporterReceipt?: Maybe<TransporterReceipt>;
   /** Récépissé négociant associé à cet établissement (le cas échant) */
@@ -246,13 +239,6 @@ export type CompanySearchResult = {
   codeCommune?: Maybe<Scalars["String"]>;
   /** Nom de l'établissement */
   name?: Maybe<Scalars["String"]>;
-  /** Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets */
-  isRegistered?: Maybe<Scalars["Boolean"]>;
-  /**
-   * Profil de l'établissement sur Trackdéchets
-   * Valeur à nulle si l'établissement n'est pas inscrit sur la plateforme `isRegistered=false`
-   */
-  companyTypes?: Maybe<Array<CompanyType>>;
   /** Code NAF */
   naf?: Maybe<Scalars["String"]>;
   /** Libellé NAF */
@@ -2592,16 +2578,6 @@ export type CompanyFavoriteResolvers<
   contact?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
   phone?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
   mail?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
-  isRegistered?: Resolver<
-    Maybe<ResolversTypes["Boolean"]>,
-    ParentType,
-    ContextType
-  >;
-  companyTypes?: Resolver<
-    Maybe<Array<ResolversTypes["CompanyType"]>>,
-    ParentType,
-    ContextType
-  >;
   transporterReceipt?: Resolver<
     Maybe<ResolversTypes["TransporterReceipt"]>,
     ParentType,
@@ -2786,16 +2762,6 @@ export type CompanySearchResultResolvers<
     ContextType
   >;
   name?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
-  isRegistered?: Resolver<
-    Maybe<ResolversTypes["Boolean"]>,
-    ParentType,
-    ContextType
-  >;
-  companyTypes?: Resolver<
-    Maybe<Array<ResolversTypes["CompanyType"]>>,
-    ParentType,
-    ContextType
-  >;
   naf?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
   libelleNaf?: Resolver<
     Maybe<ResolversTypes["String"]>,
@@ -4166,8 +4132,6 @@ export function createCompanyFavoriteMock(
     contact: null,
     phone: null,
     mail: null,
-    isRegistered: null,
-    companyTypes: null,
     transporterReceipt: null,
     traderReceipt: null,
     ...props
@@ -4266,8 +4230,6 @@ export function createCompanySearchResultMock(
     address: null,
     codeCommune: null,
     name: null,
-    isRegistered: null,
-    companyTypes: null,
     naf: null,
     libelleNaf: null,
     installation: null,
