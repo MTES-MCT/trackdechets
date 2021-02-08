@@ -88,36 +88,6 @@ const destinationSchema = companySchema.concat(
   })
 );
 
-const traderSchema = companySchema.concat(
-  object().shape({
-    siret: string().test(
-      "is-registered",
-      `Cet établissement n'est pas inscrit sur Trackdéchets ou son profil
-  ne lui permet pas d'apparaitre en tant que négociant sur le bordereau. Seuls les établissements
-  inscrits sur Trackdéchets en tant que négociant peuvent apparaitre en tant que tel sur le bordereau`,
-      async value => {
-        if (value) {
-          const { data } = await graphlClient.query({
-            query: COMPANY_INFOS,
-            variables: { siret: value },
-          });
-          // it should be registered to TD
-          if (data.companyInfos?.isRegistered === false) {
-            return false;
-          }
-          if (data.companyInfos?.companyTypes) {
-            // it should be TRADER
-            return data.companyInfos?.companyTypes.some(
-              companyType => companyType === CompanyType.Trader
-            );
-          }
-        }
-        return true;
-      }
-    ),
-  })
-);
-
 const packagingInfo: ObjectSchema<PackagingInfo> = object().shape({
   type: mixed<Packagings>().required(
     "Le type de conditionnement doit être précisé."
@@ -208,7 +178,7 @@ export const formSchema = object().shape({
     .notRequired()
     .nullable()
     .shape({
-      company: traderSchema,
+      company: companySchema,
       validityLimit: date().nullable(true),
       department: string().nullable(),
       receipt: string().nullable(),
