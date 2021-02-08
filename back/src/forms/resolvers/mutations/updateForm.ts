@@ -56,8 +56,8 @@ const updateFormResolver = async (
 
   // Validate form input
   if (existingForm.status === "DRAFT") {
-    await draftFormSchema.validate(formUpdateInput);
-  } else if (existingForm.status === "SEALED") {
+    await draftFormSchema.validate({ ...existingForm, ...formUpdateInput });
+  } else {
     await sealedFormSchema.validate({ ...existingForm, ...formUpdateInput });
   }
 

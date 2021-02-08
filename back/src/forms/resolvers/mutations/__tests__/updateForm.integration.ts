@@ -278,6 +278,7 @@ describe("Mutation.updateForm", () => {
       ownerId: user.id,
       opt: {
         status: "DRAFT",
+        emitterType: "OTHER",
         ecoOrganismeName: eo.name,
         ecoOrganismeSiret: eo.siret
       }
@@ -336,6 +337,9 @@ describe("Mutation.updateForm", () => {
 
     const updateFormInput = {
       id: form.id,
+      emitter: {
+        type: "OTHER"
+      },
       ecoOrganisme: {
         name: "",
         siret: "does_not_exist"
@@ -399,6 +403,9 @@ describe("Mutation.updateForm", () => {
       variables: {
         updateFormInput: {
           id: form.id,
+          emitter: {
+            type: "OTHER"
+          },
           ecoOrganisme: {
             name: newEO.name,
             siret: newEO.siret

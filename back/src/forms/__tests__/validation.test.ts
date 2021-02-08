@@ -1,9 +1,9 @@
 import { Form } from "@prisma/client";
 import {
+  draftFormSchema,
   sealedFormSchema,
   ecoOrganismeSchema,
-  receivedInfoSchema,
-  draftFormSchema
+  receivedInfoSchema
 } from "../validation";
 import { ReceivedFormInput } from "../../generated/graphql/types";
 
@@ -18,7 +18,7 @@ const form: Partial<Form> = {
   emitterWorkSitePostalCode: "",
   emitterWorkSiteInfos: "",
   emitterCompanyName: "A company 2",
-  emitterCompanySiret: "XXXXXXXXXX0002",
+  emitterCompanySiret: "00000000000002",
   emitterCompanyContact: "Emetteur",
   emitterCompanyPhone: "01",
   emitterCompanyAddress: "8 rue du Général de Gaulle",
@@ -26,7 +26,7 @@ const form: Partial<Form> = {
   recipientCap: "1234",
   recipientProcessingOperation: "D 6",
   recipientCompanyName: "A company 3",
-  recipientCompanySiret: "XXXXXXXXXX0003",
+  recipientCompanySiret: "00000000000003",
   recipientCompanyAddress: "8 rue du Général de Gaulle",
   recipientCompanyContact: "Destination",
   recipientCompanyPhone: "02",
@@ -35,7 +35,7 @@ const form: Partial<Form> = {
   transporterDepartment: "82",
   transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
   transporterCompanyName: "A company 4",
-  transporterCompanySiret: "XXXXXXXXXX0004",
+  transporterCompanySiret: "00000000000004",
   transporterCompanyAddress: "8 rue du Général de Gaulle",
   transporterCompanyContact: "Transporteur",
   transporterCompanyPhone: "03",
@@ -322,11 +322,13 @@ describe("draftFormSchema", () => {
       transporterValidityLimit: null
     };
     const isValid = draftFormSchema.isValidSync(form);
+
     expect(isValid).toBe(true);
   });
 
   it("should be valid when passing undefined values", () => {
     const isValid = draftFormSchema.isValidSync({});
+
     expect(isValid).toBe(true);
   });
 

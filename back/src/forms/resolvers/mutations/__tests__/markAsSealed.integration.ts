@@ -222,7 +222,6 @@ describe("Mutation.markAsSealed", () => {
     const errMessage =
       "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.\n" +
       "Erreur(s): Émetteur: Le siret de l'entreprise est obligatoire\n" +
-      "Émetteur: Le SIRET doit faire 14 caractères numériques\n" +
       "Émetteur: Le contact dans l'entreprise est obligatoire";
     expect(errors[0].message).toBe(errMessage);
 
@@ -236,7 +235,7 @@ describe("Mutation.markAsSealed", () => {
     expect(statusLogs.length).toEqual(0);
   });
 
-  it.each(["toto", "", "lorem ipsum", "01 02 03", "101309*"])(
+  it.each(["toto", "lorem ipsum", "01 02 03", "101309*"])(
     "wrong waste code (%p) must invalidate mutation",
     async wrongWasteCode => {
       const { user, company: recipientCompany } = await userWithCompanyFactory(

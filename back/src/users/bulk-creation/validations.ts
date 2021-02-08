@@ -18,7 +18,7 @@ const ROLES = ["MEMBER", "ADMIN"];
 /**
  * Validation schema for company
  */
-export const companyValidationSchema = yup.object().shape({
+export const companyValidationSchema = yup.object({
   siret: yup
     .string()
     .required()
@@ -53,15 +53,11 @@ export const companyValidationSchema = yup.object().shape({
   gerepId: yup.string().notRequired(),
   companyTypes: yup
     .array()
+    .of(yup.string().oneOf(COMPANY_TYPES))
     .ensure()
     .compact()
     .required()
-    .test("is-companyType", "${value} is not a valid company type", value => {
-      const isCompanyType = value.reduce((acc: boolean, curr: string) => {
-        return acc && COMPANY_TYPES.includes(curr);
-      }, true);
-      return isCompanyType;
-    }),
+    .min(1),
   givenName: yup.string().notRequired(),
   contactEmail: yup.string().notRequired().email(),
   contactPhone: yup
