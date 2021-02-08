@@ -16,7 +16,12 @@ import { Breadcrumb, BreadcrumbItem } from "common/components";
 import { InlineError } from "common/components/Error";
 import { updateApolloCache } from "common/helper";
 import { DRAFT_TAB_FORMS } from "dashboard/slips/tabs/queries";
-import initialState, { initalTemporaryStorageDetail } from "../initial-state";
+import initialState, {
+  initalTemporaryStorageDetail,
+  initialTrader,
+  initialEcoOrganisme,
+  initialWorkSite,
+} from "../initial-state";
 import {
   Form,
   Query,
@@ -58,8 +63,13 @@ export default function StepList(props: IProps) {
     if (!data?.form) {
       return initialState;
     } else {
-      const { temporaryStorageDetail, ...form } = data.form;
-      return {
+      const {
+        temporaryStorageDetail,
+        ecoOrganisme,
+        trader,
+        ...form
+      } = data.form;
+      const state = {
         ...getComputedState(initialState, form),
         temporaryStorageDetail: temporaryStorageDetail
           ? getComputedState(
@@ -67,7 +77,19 @@ export default function StepList(props: IProps) {
               temporaryStorageDetail
             )
           : null,
+        trader: trader ? getComputedState(initialTrader, trader) : null,
+        ecoOrganisme: ecoOrganisme
+          ? getComputedState(initialEcoOrganisme, ecoOrganisme)
+          : null,
       };
+      if (form.emitter?.workSite) {
+        state.emitter.workSite = getComputedState(
+          initialWorkSite,
+          form.emitter.workSite
+        );
+      }
+
+      return state;
     }
   }, [data]);
 

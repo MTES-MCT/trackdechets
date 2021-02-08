@@ -8,40 +8,6 @@ import classNames from "classnames";
 import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";
 
 export default function TemporaryStorage(props) {
-  const { values, setFieldValue } = useFormikContext<Form>();
-
-  useEffect(() => {
-    // set initial value for temp storage when the switch is toggled
-    if (values.recipient?.isTempStorage && !values.temporaryStorageDetail) {
-      setFieldValue(
-        "temporaryStorageDetail",
-        initalTemporaryStorageDetail,
-        false
-      );
-    }
-
-    // set temp storage to null when the switch is toggled off
-    if (!values.recipient?.isTempStorage && values.temporaryStorageDetail) {
-      setFieldValue("temporaryStorageDetail", null, false);
-    }
-
-    if (
-      values.recipient?.processingOperation &&
-      values.temporaryStorageDetail &&
-      !values.temporaryStorageDetail.destination?.processingOperation
-    ) {
-      setFieldValue(
-        "temporaryStorageDetail.destination.processingOperation",
-        values.recipient.processingOperation,
-        false
-      );
-    }
-  }, [values, setFieldValue]);
-
-  if (!values.recipient?.isTempStorage || !values.temporaryStorageDetail) {
-    return null;
-  }
-
   return (
     <>
       <h4 className="form__section-heading">

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Form } from "generated/graphql/types";
 import WorkSiteAddress from "./WorkSiteAddress";
 import TdSwitch from "common/components/Switch";
+import { initialWorkSite } from "form/initial-state";
 const FIELDS = ["name", "address", "city", "postalCode", "infos"];
 
 export default function WorkSite() {
@@ -14,10 +15,11 @@ export default function WorkSite() {
   );
 
   useEffect(() => {
-    if (!showWorkSite) {
-      for (const field of FIELDS) {
-        setFieldValue(`emitter.workSite.${field}`, "");
-      }
+    if (showWorkSite && !values.emitter?.workSite) {
+      setFieldValue("emitter.workSite", initialWorkSite, false);
+    }
+    if (!showWorkSite && values.emitter?.workSite) {
+      setFieldValue("emitter.workSite", null, false);
     }
   }, [showWorkSite, setFieldValue]);
 
@@ -35,7 +37,7 @@ export default function WorkSite() {
         label="Je souhaite ajouter une adresse de chantier ou de collecte"
       />
 
-      {showWorkSite && (
+      {showWorkSite && values.emitter?.workSite && (
         <>
           <h4 className="form__section-heading">Adresse chantier</h4>
 

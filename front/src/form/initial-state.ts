@@ -24,17 +24,31 @@ export const initalTemporaryStorageDetail = {
   },
 };
 
+export const initialTrader = {
+  receipt: "",
+  department: "",
+  validityLimit: null,
+  company: initialCompany,
+};
+
+export const initialEcoOrganisme = {
+  siret: null,
+  name: null,
+};
+
+export const initialWorkSite = {
+  name: "",
+  address: "",
+  city: "",
+  postalCode: "",
+  infos: "",
+};
+
 export default {
   customId: "",
   emitter: {
     type: "PRODUCER",
-    workSite: {
-      name: "",
-      address: "",
-      city: "",
-      postalCode: "",
-      infos: "",
-    },
+    workSite: null,
     company: initialCompany,
   },
   recipient: {
@@ -44,12 +58,7 @@ export default {
     company: initialCompany,
   },
   transporter: initialTransporter,
-  trader: {
-    receipt: "",
-    department: "",
-    validityLimit: null,
-    company: initialCompany,
-  },
+  trader: null,
   wasteDetails: {
     code: "",
     name: "",
@@ -61,9 +70,6 @@ export default {
     pop: false,
   },
   appendix2Forms: [],
-  ecoOrganisme: {
-    siret: null,
-    name: null,
-  },
+  ecoOrganisme: null,
   temporaryStorageDetail: null,
 };

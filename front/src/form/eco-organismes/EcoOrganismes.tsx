@@ -1,12 +1,13 @@
 import { useQuery, gql } from "@apollo/client";
 import { useField, useFormikContext } from "formik";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CompanyResults from "../company/CompanyResults";
 import styles from "./EcoOrganismes.module.scss";
 import SearchInput from "common/components/SearchInput";
 import { Query, EcoOrganisme, Form } from "../../generated/graphql/types";
 import TdSwitch from "common/components/Switch";
 import { tdContactEmail } from "common/config";
+import { initialEcoOrganisme } from "form/initial-state";
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -25,12 +26,24 @@ interface EcoOrganismesProps {
 
 export default function EcoOrganismes(props: EcoOrganismesProps) {
   const [field] = useField<Form["ecoOrganisme"]>(props);
-  const { setFieldValue } = useFormikContext();
+  const { setFieldValue } = useFormikContext<Form>();
   const [isChecked, setIsChecked] = useState(Boolean(field.value?.siret));
   const [clue, setClue] = useState("");
   const { loading, error, data } = useQuery<Pick<Query, "ecoOrganismes">>(
     GET_ECO_ORGANISMES
   );
+
+  useEffect(() => {
+    // set initial value for ecoOrganisme when the switch is toggled
+    if (isChecked && !field.value) {
+      setFieldValue(field.name, initialEcoOrganisme, false);
+    }
+
+    // set ecoOrganisme to null when the switch is toggled off
+    if (!isChecked && field.value) {
+      setFieldValue(field.name, null, false);
+    }
+  }, [isChecked, setFieldValue]);
 
   return (
     <>
