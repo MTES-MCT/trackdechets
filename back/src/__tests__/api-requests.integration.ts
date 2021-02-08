@@ -12,11 +12,12 @@ describe("Perform api requests", () => {
 
   test("query request with application/json header", async () => {
     const { user, accessToken } = await userWithAccessTokenFactory();
+    console.log(accessToken)
     const res = await request
       .post("/")
       .set("Authorization", `Bearer ${accessToken}`)
       .send({ query: "{ me { email }}" });
-
+    console.log(res)
     expect(res.body.data.me.email).toEqual(user.email);
   });
 

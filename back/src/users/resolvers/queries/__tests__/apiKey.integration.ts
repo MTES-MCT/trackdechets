@@ -3,6 +3,7 @@ import prisma from "../../../../prisma";
 import { AuthType } from "../../../../auth";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { hashToken } from "../../../../utils";
 
 describe("{ query { apiKey } }", () => {
   afterAll(() => resetDatabase());
@@ -15,7 +16,7 @@ describe("{ query { apiKey } }", () => {
     // should have created an accessToken in db
     const accessToken = await prisma.accessToken.findUnique({
       where: {
-        token: data.apiKey
+        token: hashToken(data.apiKey)
       }
     });
     expect(accessToken).not.toBeNull();
