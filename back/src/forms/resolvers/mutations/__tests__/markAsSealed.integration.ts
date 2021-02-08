@@ -431,18 +431,12 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: collector.siret
+        recipientCompanySiret: collector.siret,
+        // this SIRET is not regsitered in TD
+        traderCompanySiret: "11111111111111"
       }
     });
 
-    await prisma.form.update({
-      where: { id: form.id },
-      data: {
-        temporaryStorageDetail: {
-          update: { destinationCompanySiret: "11111111111111" }
-        }
-      }
-    });
     const { mutate } = makeClient(user);
     const { errors } = await mutate(MARK_AS_SEALED, {
       variables: { id: form.id }
@@ -450,7 +444,31 @@ describe("Mutation.markAsSealed", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "L'installation de destination prévue après entreposage provisoire ou reconditionnement (cadre 14) n'est pas inscrite sur Trackdéchets"
+          "Le négociant qui apparait sur le BSD n'est pas inscrit sur Trackdéchets"
+      })
+    ]);
+  });
+
+  it("should throw an error if trader is not registered in TD", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: "11111111111111"
+      }
+    });
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "L'installation de destination ou d’entreposage ou de reconditionnement prévue (cadre 2) n'est pas inscrite sur Trackdéchets"
       })
     ]);
   });
@@ -521,6 +539,39 @@ describe("Mutation.markAsSealed", () => {
       n'est pas inscrite sur Trackdéchets en tant que qu'installation de traitement ou de tri transit regroupement.
       Cette installation ne peut donc pas être visée en case 14 du bordereau. Veuillez vous rapprocher de l'administrateur
       de cette installation pour qu'il modifie le profil de l'installation depuis l'interface Trackdéchets Mon Compte > Établissements`
+      })
+    ]);
+  });
+
+  it("should throw an error if trader is not registered as TRADER", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const destination = await companyFactory({
+      companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+    });
+    const trader = await companyFactory({
+      // assume profile is not TRADER
+      companyTypes: { set: [CompanyType.PRODUCER] }
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: destination.siret,
+        traderCompanySiret: trader.siret
+      }
+    });
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `L'établissement apparaissant en tant que négociant ${trader.siret} n'est pas inscrit sur Trackdéchets en tant que Négociant.
+      Cet établissement ne peut donc pas être visée en case 7 du bordereau. Veuillez vous rapprocher de l'administrateur
+      de cet établissement pour qu'il modifie le profil de l'installation depuis l'interface Trackdéchets Mon Compte > Établissements`
       })
     ]);
   });

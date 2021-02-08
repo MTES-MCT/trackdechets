@@ -966,6 +966,10 @@ function isWasteProcessor(company: Company) {
   return company.companyTypes.includes(CompanyType.WASTEPROCESSOR);
 }
 
+function isTrader(company: Company) {
+  return company.companyTypes.includes(CompanyType.TRADER);
+}
+
 /**
  * Check company in frame 2 is registered with profile
  * COLLECTOR or WASTE_PROCESSOR or throw error
@@ -1025,6 +1029,34 @@ async function checkDestinationAfterTempStorage(siret: string) {
 }
 
 /**
+ * Check company in frame 7 is registered with profile TRADER
+ * or throw error
+ */
+async function checkTrader(siret: string) {
+  // check company in frame 7 is registered in Trackdechets
+  const company = await prisma.company.findUnique({
+    where: { siret }
+  });
+
+  if (!company) {
+    throw new UserInputError(
+      "Le négociant qui apparait sur le BSD n'est pas inscrit sur Trackdéchets"
+    );
+  }
+
+  // check company has profile TRADER
+  if (!isTrader(company)) {
+    throw new UserInputError(
+      `L'établissement apparaissant en tant que négociant ${company.siret} n'est pas inscrit sur Trackdéchets en tant que Négociant.
+      Cet établissement ne peut donc pas être visée en case 7 du bordereau. Veuillez vous rapprocher de l'administrateur
+      de cet établissement pour qu'il modifie le profil de l'installation depuis l'interface Trackdéchets Mon Compte > Établissements`
+    );
+  }
+
+  return true;
+}
+
+/**
  * Check that the n°SIRET appearing on the form match existing
  * companies registered in Trackdechets and that their profile
  * is consistent with the role they play on the form
@@ -1048,4 +1080,10 @@ export async function checkCompaniesType(form: Form) {
       temporaryStorageDetail.destinationCompanySiret
     );
   }
+
+  if (form.traderCompanySiret) {
+    await checkTrader(form.traderCompanySiret);
+  }
+
+  return true;
 }
