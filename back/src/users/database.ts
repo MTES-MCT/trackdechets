@@ -3,11 +3,19 @@
  */
 
 import prisma from "../prisma";
-import { User, UserRole, Prisma, Company } from "@prisma/client";
+
+import {
+  User,
+  UserRole,
+  Prisma,
+  Company,
+  UserAccountHash
+} from "@prisma/client";
+
 import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
-import { getUid, sanitizeEmail } from "../utils";
+import { getUid, sanitizeEmail, hashToken } from "../utils";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma.user
@@ -133,15 +141,17 @@ export async function getCompanyAssociationOrNotFound(
 
 export async function createAccessToken(user: User) {
   const token = getUid(40);
+
   const accessToken = await prisma.accessToken.create({
     data: {
       user: {
         connect: { id: user.id }
       },
-      token
+      token: hashToken(token),
+      isHashed: true
     }
   });
-  return accessToken;
+  return { accessToken, clearToken: token };
 }
 
 export async function userExists(unsafeEmail: string) {

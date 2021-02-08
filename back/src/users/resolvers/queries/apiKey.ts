@@ -15,8 +15,8 @@ const apiKeyResolver: QueryResolvers["apiKey"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-  const accessToken = await createAccessToken(user);
-  return accessToken.token;
+  const { clearToken } = await createAccessToken(user);
+  return clearToken;
 };
 
 export default apiKeyResolver;
