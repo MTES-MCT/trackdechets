@@ -124,17 +124,13 @@ export const formSchema = object().shape({
   id: string().required(),
   emitter: object().shape({
     type: string().matches(/(PRODUCER|OTHER|APPENDIX2)/),
-    workSite: object()
-      .notRequired()
-      .nullable()
-      .shape({
-        name: string().nullable(),
-        address: string().nullable(),
-        city: string().nullable(),
-        postalCode: string().nullable(),
-        infos: string().nullable(),
-      })
-      .nullable(),
+    workSite: object().notRequired().nullable().shape({
+      name: string().nullable(),
+      address: string().nullable(),
+      city: string().nullable(),
+      postalCode: string().nullable(),
+      infos: string().nullable(),
+    }),
     company: companySchema,
   }),
   ecoOrganisme: object().notRequired().nullable().shape({

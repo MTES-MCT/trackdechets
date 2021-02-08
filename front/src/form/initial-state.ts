@@ -20,14 +20,7 @@ export function getInitalTrader(trader?: Trader | null) {
     receipt: trader?.receipt ?? "",
     department: trader?.department ?? "",
     validityLimit: trader?.validityLimit ?? null,
-    company: {
-      siret: trader?.company?.siret ?? "",
-      name: trader?.company?.name ?? "",
-      address: trader?.company?.address ?? "",
-      contact: trader?.company?.contact ?? "",
-      mail: trader?.company?.mail ?? "",
-      phone: trader?.company?.phone ?? "",
-    },
+    company: getInitialCompany(trader?.company),
   };
 }
 
@@ -98,8 +91,7 @@ export function getInitialState(f?: Form | null): FormInput {
     id: f?.id ?? null,
     customId: f?.customId ?? "",
     emitter: {
-      // deprecated
-      pickupSite: null,
+      pickupSite: null, // deprecated
       type: f?.emitter?.type ?? EmitterType.Producer,
       workSite: f?.emitter?.workSite
         ? getInitialEmitterWorkSite(f?.emitter?.workSite)
@@ -138,12 +130,9 @@ export function getInitialState(f?: Form | null): FormInput {
       quantityType: f?.wasteDetails?.quantityType ?? QuantityType.Estimated,
       consistence: f?.wasteDetails?.consistence ?? Consistence.Solid,
       pop: f?.wasteDetails?.pop ?? false,
-      // deprecated
-      packagings: null,
-      // deprecated
-      otherPackaging: null,
-      // deprecated
-      numberOfPackages: null,
+      packagings: null, // deprecated
+      otherPackaging: null, // deprecated
+      numberOfPackages: null, // deprecated
     },
     appendix2Forms: f?.appendix2Forms ?? [],
     ecoOrganisme: f?.ecoOrganisme

@@ -53,9 +53,7 @@ export default function StepList(props: IProps) {
     }
   );
 
-  const formState = useMemo(() => {
-    return getInitialState(data?.form);
-  }, [data]);
+  const formState = useMemo(() => getInitialState(data?.form), [data]);
 
   const [createForm] = useMutation<
     Pick<Mutation, "createForm">,
