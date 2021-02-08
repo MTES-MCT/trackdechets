@@ -107,7 +107,11 @@ describe("Mutation.markAsSealed", () => {
   it("the eco-organisme of the BSD can seal it", async () => {
     const emitterCompany = await companyFactory();
     const recipientCompany = await destinationFactory();
-    const traderCompany = await companyFactory();
+    const traderCompany = await companyFactory({
+      companyTypes: {
+        set: [CompanyType.TRADER]
+      }
+    });
 
     const { user, company: ecoOrganismeCompany } = await userWithCompanyFactory(
       "MEMBER"
@@ -424,35 +428,6 @@ describe("Mutation.markAsSealed", () => {
     const { user, company: emitterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
-    const collector = await companyFactory({
-      companyTypes: { set: [CompanyType.COLLECTOR] }
-    });
-    const form = await formWithTempStorageFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: collector.siret,
-        // this SIRET is not regsitered in TD
-        traderCompanySiret: "11111111111111"
-      }
-    });
-
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate(MARK_AS_SEALED, {
-      variables: { id: form.id }
-    });
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message:
-          "Le négociant qui apparait sur le BSD n'est pas inscrit sur Trackdéchets"
-      })
-    ]);
-  });
-
-  it("should throw an error if trader is not registered in TD", async () => {
-    const { user, company: emitterCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -469,6 +444,35 @@ describe("Mutation.markAsSealed", () => {
       expect.objectContaining({
         message:
           "L'installation de destination ou d’entreposage ou de reconditionnement prévue (cadre 2) n'est pas inscrite sur Trackdéchets"
+      })
+    ]);
+  });
+
+  it("should throw an error if trader is not registered in TD", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const destination = await companyFactory({
+      companyTypes: { set: [CompanyType.COLLECTOR] }
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: destination.siret,
+        // this SIRET is not regsitered in TD
+        traderCompanySiret: "11111111111111"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le négociant qui apparait sur le BSD n'est pas inscrit sur Trackdéchets"
       })
     ]);
   });
