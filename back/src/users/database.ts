@@ -140,18 +140,18 @@ export async function getCompanyAssociationOrNotFound(
 }
 
 export async function createAccessToken(user: User) {
-  const token = getUid(40);
+  const clearToken = getUid(40);
 
-  const accessToken = await prisma.accessToken.create({
+  await prisma.accessToken.create({
     data: {
       user: {
         connect: { id: user.id }
       },
-      token: hashToken(token),
+      token: hashToken(clearToken),
       isHashed: true
     }
   });
-  return { accessToken, clearToken: token };
+  return { clearToken };
 }
 
 export async function userExists(unsafeEmail: string) {
