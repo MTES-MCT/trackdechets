@@ -1,14 +1,19 @@
 import { hash } from "bcrypt";
+import crypto from "crypto";
 import * as yup from "yup";
-
+import { base32Encode } from "../utils";
 const saltRound = 10;
 
 export function hashPassword(password: string) {
   return hash(password, saltRound);
 }
 
-export function generatePassword() {
-  return Math.random().toString(36).slice(-10);
+/**
+ * Generates a cryptographically-sure random 10 characters password
+ */
+export function generatePassword(): string {
+  const randomHex = crypto.randomBytes(7).toString("hex");
+  return base32Encode(parseInt(randomHex, 16)).slice(-10).toLocaleLowerCase();
 }
 
 /**
