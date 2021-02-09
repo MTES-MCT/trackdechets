@@ -147,8 +147,7 @@ export async function createAccessToken(user: User) {
       user: {
         connect: { id: user.id }
       },
-      token: hashToken(clearToken),
-      isHashed: true
+      token: hashToken(clearToken)
     }
   });
   return { clearToken };

@@ -120,13 +120,9 @@ passport.use(
           const token = jwtOpts.jwtFromRequest(req);
           // verify that the token has not been
           // converted to OAuth and revoked
-          // despite accessToken.token uniqueness, typing prevent us to use findUnique
-          const accessToken = await prisma.accessToken.findFirst({
+          const accessToken = await prisma.accessToken.findUnique({
             where: {
-              OR: [
-                { token, isHashed: false },
-                { token: hashToken(token), isHashed: true }
-              ]
+              token: hashToken(token)
             }
           });
           if (accessToken && accessToken.isRevoked) {
@@ -170,10 +166,7 @@ passport.use(
     try {
       const accessToken = await prisma.accessToken.findFirst({
         where: {
-          OR: [
-            { token, isHashed: false },
-            { token: hashToken(token), isHashed: true }
-          ]
+          token: hashToken(token)
         },
         include: { user: true }
       });

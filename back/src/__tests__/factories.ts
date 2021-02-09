@@ -119,7 +119,6 @@ export const userWithAccessTokenFactory = async (opt = {}) => {
   await prisma.accessToken.create({
     data: {
       token: hashToken(clearToken),
-      isHashed: true,
       user: { connect: { id: user.id } }
     }
   });

@@ -114,7 +114,6 @@ model AccessToken {
   updatedAt     DateTime     @updatedAt
   token         String       @unique
   isRevoked     Boolean      @default(false)
-  isHashed      Boolean      @default(false) // tells apart cleartext stored tokens from hashed ones 
   lastUsed      DateTime? 
   applicationId String?
   application   Application? @relation(fields: [applicationId], references: [id])
