@@ -9,10 +9,10 @@ const {
   SENDER_EMAIL_ADDRESS,
   SENDER_NAME,
   SENTRY_DSN,
-  NODE_ENV
+  MOCK_SIB_URL
 } = process.env;
 
-const baseUrl = NODE_ENV === "production" ? SIB_BASE_URL : "http://mailservice"; // use a fake url for tests
+const baseUrl = MOCK_SIB_URL === "true" ? "http://mailservice" : SIB_BASE_URL; // use a fake url for tests
 const SIB_SMTP_URL = `${baseUrl}/smtp/email`;
 const SIB_CONTACT_URL = `${baseUrl}/contacts`;
 

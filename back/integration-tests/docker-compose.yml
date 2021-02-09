@@ -27,4 +27,5 @@ services:
       VIRTUAL_HOST: $API_HOST
       LETSENCRYPT_HOST: $API_HOST
       EMAIL_BACKEND: "sendinblue"
+      MOCK_SIB_URL: "true"
       MAIN_TEMPLATE_ID: "9"

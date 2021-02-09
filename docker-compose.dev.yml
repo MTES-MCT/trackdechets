@@ -34,6 +34,7 @@ services:
       - .env
     environment:
       NODE_ENV: dev
+      MOCK_SIB_URL: "true"
     ports:
       - "4000:80"
 
