@@ -2,8 +2,8 @@ import {
   Consistence,
   EmitterType,
   Form,
+  Prisma,
   QuantityType,
-  TemporaryStorageDetail,
   WasteAcceptationStatus
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
@@ -29,7 +29,7 @@ configureYup();
 // ************************************************
 
 type Emitter = Pick<
-  Form,
+  Prisma.FormCreateInput,
   | "emitterType"
   | "emitterPickupSite"
   | "emitterWorkSiteName"
@@ -46,7 +46,7 @@ type Emitter = Pick<
 >;
 
 type Recipient = Pick<
-  Form,
+  Prisma.FormCreateInput,
   | "recipientCap"
   | "recipientProcessingOperation"
   | "recipientIsTempStorage"
@@ -59,7 +59,7 @@ type Recipient = Pick<
 >;
 
 type WasteDetails = Pick<
-  Form,
+  Prisma.FormCreateInput,
   | "wasteDetailsCode"
   | "wasteDetailsName"
   | "wasteDetailsOnuCode"
@@ -74,7 +74,7 @@ type WasteDetails = Pick<
 >;
 
 type Transporter = Pick<
-  Form,
+  Prisma.FormCreateInput,
   | "transporterCompanyName"
   | "transporterCompanySiret"
   | "transporterCompanyAddress"
@@ -92,7 +92,7 @@ type Transporter = Pick<
 >;
 
 type ReceivedInfo = Pick<
-  Form,
+  Prisma.FormCreateInput,
   | "isAccepted"
   | "wasteAcceptationStatus"
   | "wasteRefusalReason"
@@ -103,7 +103,7 @@ type ReceivedInfo = Pick<
 >;
 
 type AcceptedInfo = Pick<
-  Form,
+  Prisma.FormCreateInput,
   | "isAccepted"
   | "wasteAcceptationStatus"
   | "wasteRefusalReason"
@@ -112,10 +112,13 @@ type AcceptedInfo = Pick<
   | "quantityReceived"
 >;
 
-type SigningInfo = Pick<Form, "sentAt" | "sentBy" | "signedByTransporter">;
+type SigningInfo = Pick<
+  Prisma.FormCreateInput,
+  "sentAt" | "sentBy" | "signedByTransporter"
+>;
 
 type ProcessedInfo = Pick<
-  Form,
+  Prisma.FormCreateInput,
   | "processedBy"
   | "processedAt"
   | "processingOperationDone"
@@ -132,7 +135,7 @@ type ProcessedInfo = Pick<
 >;
 
 type TempStorageInfo = Pick<
-  TemporaryStorageDetail,
+  Prisma.TemporaryStorageDetailCreateInput,
   | "tempStorerQuantityType"
   | "tempStorerQuantityReceived"
   | "tempStorerWasteAcceptationStatus"
@@ -143,7 +146,7 @@ type TempStorageInfo = Pick<
 >;
 
 type DestinationAfterTempStorage = Pick<
-  TemporaryStorageDetail,
+  Prisma.TemporaryStorageDetailCreateInput,
   | "destinationCompanyName"
   | "destinationCompanySiret"
   | "destinationCompanyAddress"
@@ -155,7 +158,7 @@ type DestinationAfterTempStorage = Pick<
 >;
 
 type TransporterAfterTempStorage = Pick<
-  TemporaryStorageDetail,
+  Prisma.TemporaryStorageDetailCreateInput,
   | "transporterCompanyName"
   | "transporterCompanySiret"
   | "transporterCompanyAddress"
@@ -170,7 +173,7 @@ type TransporterAfterTempStorage = Pick<
 >;
 
 type WasteRepackaging = Pick<
-  Form,
+  Prisma.TemporaryStorageDetailCreateInput,
   | "wasteDetailsOnuCode"
   | "wasteDetailsPackagings"
   | "wasteDetailsOtherPackaging"
@@ -430,9 +433,10 @@ export const wasteDetailsSchema = wasteDetailsSchemaFn(false);
 // 8 - Collecteur-transporteur
 const transporterSchemaFn: FactorySchemaOf<Transporter> = isDraft =>
   yup.object({
-    sentAt: validDatetime({
-      verboseFieldName: "date d'envoi"
-    }) as any,
+    sentAt: yup
+      .date()
+      .allowedFormat("La date d'envoi n'est pas formatée correctement")
+      .nullable(),
     signedByTransporter: yup.boolean().nullable(),
     transporterCustomInfo: yup.string().nullable(),
     transporterNumberPlate: yup.string().nullable(),
