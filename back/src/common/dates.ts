@@ -1,5 +1,8 @@
-import { parse, isValid, isDate } from "date-fns";
-
+/**
+ * String formats allowed as date values in GraphQL API
+ * Note that we may accept all ISO 8601 formats but only
+ * those ones are tested
+ */
 export const allowedFormats = [
   "yyyy-MM-dd",
   "yyyy-MM-dd'T'HH:mm:ss",
@@ -7,16 +10,3 @@ export const allowedFormats = [
   "yyyy-MM-dd'T'HH:mm:ss.SSS",
   "yyyy-MM-dd'T'HH:mm:ss.SSSX"
 ];
-
-export function isAllowedFormat(dateString: string) {
-  if (isDate(dateString)) {
-    return true;
-  }
-  for (const fmt of allowedFormats) {
-    const date = parse(dateString, fmt, new Date());
-    if (isValid(date)) {
-      return true;
-    }
-  }
-  return false;
-}

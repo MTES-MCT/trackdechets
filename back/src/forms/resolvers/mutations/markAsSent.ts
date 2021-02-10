@@ -27,12 +27,11 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
   }
 
   // validate input
-  await signingInfoSchema.validate(sentInfo);
+  const sentInfoValidated = await signingInfoSchema.validate(sentInfo);
 
   // when form is sent, we store transporterCompanySiret as currentTransporterSiret to ease multimodal management
   const formUpdateInput = {
-    ...sentInfo,
-    sentAt: new Date(sentInfo.sentAt),
+    ...sentInfoValidated,
     currentTransporterSiret: form.transporterCompanySiret,
     signedByTransporter: false
   };

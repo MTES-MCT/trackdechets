@@ -35,7 +35,12 @@ async function updateForm(user: User, form: Form, input: ImportPaperFormInput) {
   const flattenedFormInput = flattenImportPaperFormInput(input);
   const validationData = { ...form, ...flattenedFormInput };
 
-  await processedFormSchema.validate(validationData, { abortEarly: false });
+  const flattenedFormInputValidated = await processedFormSchema.validate(
+    validationData,
+    {
+      abortEarly: false
+    }
+  );
 
   // prevent overwriting company sirets
   const {
@@ -57,7 +62,7 @@ async function updateForm(user: User, form: Form, input: ImportPaperFormInput) {
   }
 
   const formUpdateInput: Prisma.FormUpdateInput = {
-    ...flattenedFormInput,
+    ...flattenedFormInputValidated,
     isImportedFromPaper: true,
     signedByTransporter: true
   };

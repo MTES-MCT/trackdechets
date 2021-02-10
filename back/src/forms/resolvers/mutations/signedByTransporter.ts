@@ -48,7 +48,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
     );
   }
 
-  await signingInfoSchema.validate({
+  const signingInfoValidated = await signingInfoSchema.validate({
     sentAt: infos.sentAt,
     sentBy: infos.sentBy
   });
@@ -61,10 +61,13 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
   });
 
   // check waste details override is valid
-  await wasteDetailsSchema.validate({
-    ...form,
-    ...wasteDetails(infos)
-  });
+  const wasteDetailsValidated = await wasteDetailsSchema.validate(
+    {
+      ...form,
+      ...wasteDetails(infos)
+    },
+    { stripUnknown: true }
+  );
 
   if (form.sentAt) {
     // BSD has already been sent, it must be a signature for frame 18
@@ -82,8 +85,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
       ...(!hasWasteDetailsOverride && wasteDetails(infos)),
       temporaryStorageDetail: {
         update: {
-          signedBy: infos.sentBy,
-          signedAt: new Date(infos.sentAt),
+          ...signingInfoValidated,
           signedByTransporter: true,
           ...(hasWasteDetailsOverride && wasteDetails(infos))
         }
@@ -111,8 +113,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
 
   const formUpdateInput = {
     signedByTransporter: true,
-    sentAt: new Date(infos.sentAt),
-    sentBy: infos.sentBy,
+    ...signingInfoValidated,
     ...wasteDetails(infos),
     currentTransporterSiret: form.transporterCompanySiret
   };

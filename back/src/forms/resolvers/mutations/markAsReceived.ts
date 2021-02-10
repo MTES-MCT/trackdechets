@@ -45,13 +45,9 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
     }
   }
 
-  await receivedInfoSchema.validate(receivedInfo);
+  const receivedInfoValidated = await receivedInfoSchema.validate(receivedInfo);
   const formUpdateInput = {
-    ...receivedInfo,
-    receivedAt: new Date(receivedInfo.receivedAt),
-    signedAt: receivedInfo.signedAt
-      ? new Date(receivedInfo.signedAt)
-      : new Date(),
+    ...receivedInfoValidated,
     currentTransporterSiret: ""
   };
   const receivedForm = await transitionForm(user, form, {

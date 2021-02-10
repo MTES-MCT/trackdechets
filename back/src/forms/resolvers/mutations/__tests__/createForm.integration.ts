@@ -125,13 +125,13 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
-  it.each(["emitter", "trader", "recipient", "transporter"])(
+  it.only.each(["emitter", "trader", "recipient", "transporter"])(
     "should allow %p to create a form",
     async role => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
       const { mutate } = makeClient(user);
-      const { data } = await mutate(CREATE_FORM, {
+      const { errors, data } = await mutate(CREATE_FORM, {
         variables: {
           createFormInput: {
             [role]: {
@@ -140,6 +140,7 @@ describe("Mutation.createForm", () => {
           }
         }
       });
+      console.log(errors);
       expect(data.createForm.id).toBeTruthy();
     }
   );

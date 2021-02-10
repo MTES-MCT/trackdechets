@@ -26,10 +26,7 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 
   await checkCanMarkAsProcessed(user, form);
 
-  const formUpdateInput: Prisma.FormUpdateInput = flattenProcessedFormInput(
-    processedInfo
-  );
-  await processedInfoSchema.validate(formUpdateInput);
+  const formUpdateInput = flattenProcessedFormInput(processedInfo);
 
   // set default value for processingOperationDescription
   const operation = PROCESSING_OPERATIONS.find(
@@ -48,9 +45,13 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
     formUpdateInput.nextDestinationCompanyCountry = "FR";
   }
 
+  const formUpdateInputValidated = await processedInfoSchema.validate(
+    formUpdateInput
+  );
+
   const processedForm = await transitionForm(user, form, {
     type: EventType.MarkAsProcessed,
-    formUpdateInput
+    formUpdateInput: formUpdateInputValidated
   });
 
   // mark appendix2Forms as PROCESSED

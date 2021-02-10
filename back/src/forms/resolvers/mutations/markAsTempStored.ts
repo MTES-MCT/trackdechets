@@ -37,11 +37,13 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
       : null
   };
 
-  await tempStoredInfoSchema.validate(tempStorageUpdateInput);
+  const tempStorageUpdateInputValidated = await tempStoredInfoSchema.validate(
+    tempStorageUpdateInput
+  );
 
   const formUpdateInput = {
     temporaryStorageDetail: {
-      update: tempStorageUpdateInput
+      update: tempStorageUpdateInputValidated
     }
   };
 

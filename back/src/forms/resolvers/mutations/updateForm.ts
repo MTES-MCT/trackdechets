@@ -48,18 +48,16 @@ const updateFormResolver = async (
 
   const form = flattenFormInput(formContent);
 
+  const validationSchema =
+    existingForm.status === "DRAFT" ? draftFormSchema : sealedFormSchema;
+
+  const validatedForm = await validationSchema.validate(form);
+
   // Construct form update payload
   const formUpdateInput: Prisma.FormUpdateInput = {
-    ...form,
+    ...validatedForm,
     appendix2Forms: { set: appendix2Forms }
   };
-
-  // Validate form input
-  if (existingForm.status === "DRAFT") {
-    await draftFormSchema.validate({ ...existingForm, ...formUpdateInput });
-  } else {
-    await sealedFormSchema.validate({ ...existingForm, ...formUpdateInput });
-  }
 
   const isOrWillBeTempStorage =
     (existingForm.recipientIsTempStorage &&

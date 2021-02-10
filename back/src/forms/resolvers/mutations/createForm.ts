@@ -52,14 +52,14 @@ const createFormResolver = async (
   );
 
   const form = flattenFormInput(formContent);
+  const validatedForm = await draftFormSchema.validate(form);
+
   const formCreateInput: Prisma.FormCreateInput = {
-    ...form,
+    ...validatedForm,
     readableId: getReadableId(),
     owner: { connect: { id: user.id } },
     appendix2Forms: { connect: appendix2Forms }
   };
-
-  await draftFormSchema.validate(formCreateInput);
 
   if (temporaryStorageDetail) {
     if (formContent.recipient?.isTempStorage !== true) {

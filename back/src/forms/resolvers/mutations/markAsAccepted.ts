@@ -17,14 +17,11 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
   const form = await getFormOrFormNotFound({ id });
   await checkCanMarkAsAccepted(user, form);
 
-  await acceptedInfoSchema.validate(acceptedInfo);
+  const acceptedInfoValidated = await acceptedInfoSchema.validate(acceptedInfo);
 
   const acceptedForm = await transitionForm(user, form, {
     type: EventType.MarkAsAccepted,
-    formUpdateInput: {
-      ...acceptedInfo,
-      signedAt: new Date(acceptedInfo.signedAt)
-    }
+    formUpdateInput: acceptedInfoValidated
   });
 
   return expandFormFromDb(acceptedForm);

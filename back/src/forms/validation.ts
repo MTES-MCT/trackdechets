@@ -17,7 +17,6 @@ import {
   WASTES_CODES
 } from "../common/constants";
 import configureYup from "../common/yup/configureYup";
-import validDatetime from "../common/yup/validDatetime";
 import { PackagingInfo, Packagings } from "../generated/graphql/types";
 import { SchemaOf } from "yup";
 
@@ -87,8 +86,6 @@ type Transporter = Pick<
   | "transporterValidityLimit"
   | "transporterNumberPlate"
   | "transporterCustomInfo"
-  | "sentAt"
-  | "signedByTransporter"
 >;
 
 type ReceivedInfo = Pick<
@@ -204,6 +201,9 @@ const INVALID_WASTE_CODE =
   "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement.";
 
 const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseignée ne permet pas de destination ultérieure`;
+
+const invalidDateFormat = verboseFieldName =>
+  `La ${verboseFieldName} n'est pas formatée correctement`;
 
 // *************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 1
@@ -433,11 +433,6 @@ export const wasteDetailsSchema = wasteDetailsSchemaFn(false);
 // 8 - Collecteur-transporteur
 const transporterSchemaFn: FactorySchemaOf<Transporter> = isDraft =>
   yup.object({
-    sentAt: yup
-      .date()
-      .allowedFormat("La date d'envoi n'est pas formatée correctement")
-      .nullable(),
-    signedByTransporter: yup.boolean().nullable(),
     transporterCustomInfo: yup.string().nullable(),
     transporterNumberPlate: yup.string().nullable(),
     transporterCompanyName: yup
@@ -493,19 +488,20 @@ const transporterSchemaFn: FactorySchemaOf<Transporter> = isDraft =>
                 "Le département du transporteur est obligatoire"
               )
       ),
-    transporterValidityLimit: validDatetime({
-      verboseFieldName: "date de validité"
-    }) as any
+    transporterValidityLimit: yup
+      .date()
+      .typeError(
+        invalidDateFormat("date de validité du récipissé transporteur")
+      )
+      .nullable()
+      .notRequired()
   });
 
 // 8 - Collecteur-transporteur
 // 9 - Déclaration générale de l’émetteur du bordereau :
 export const signingInfoSchema: SchemaOf<SigningInfo> = yup.object({
   signedByTransporter: yup.boolean().nullable(),
-  sentAt: validDatetime({
-    verboseFieldName: "date d'envoi",
-    required: true
-  }) as any,
+  sentAt: yup.date().typeError(invalidDateFormat("date d'envoi")).required(),
   sentBy: yup
     .string()
     .ensure()
@@ -519,13 +515,15 @@ export const receivedInfoSchema: SchemaOf<ReceivedInfo> = yup.object({
     .string()
     .ensure()
     .required("Vous devez saisir un responsable de la réception."),
-  receivedAt: validDatetime({
-    verboseFieldName: "date de réception",
-    required: true
-  }) as any,
-  signedAt: validDatetime({
-    verboseFieldName: "date d'acceptation"
-  }) as any,
+  receivedAt: yup
+    .date()
+    .typeError(invalidDateFormat("date de réception"))
+    .required(),
+  signedAt: yup
+    .date()
+    .typeError(invalidDateFormat("date d'acceptation"))
+    .nullable()
+    .notRequired(),
   quantityReceived: yup
     .number()
     // if waste is refused, quantityReceived must be 0
@@ -568,9 +566,10 @@ export const receivedInfoSchema: SchemaOf<ReceivedInfo> = yup.object({
 // 10 - Expédition acceptée (ou refusée) à l’installation de destination
 export const acceptedInfoSchema: SchemaOf<AcceptedInfo> = yup.object({
   isAccepted: yup.boolean(),
-  signedAt: validDatetime({
-    verboseFieldName: "date d'acceptation"
-  }) as any,
+  signedAt: yup
+    .date()
+    .typeError(invalidDateFormat("date d'acceptation"))
+    .required(),
   signedBy: yup
     .string()
     .ensure()
@@ -705,10 +704,7 @@ const processedInfoSchemaFn: (
       .string()
       .ensure()
       .required("Vous devez saisir un responsable de traitement."),
-    processedAt: validDatetime({
-      verboseFieldName: "date de traitement",
-      required: true
-    }) as any,
+    processedAt: yup.string().required(),
     processingOperationDone: yup
       .string()
       .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION),
@@ -735,13 +731,16 @@ export const tempStoredInfoSchema: SchemaOf<TempStorageInfo> = yup.object({
     .string()
     .ensure()
     .required("Vous devez saisir un responsable de la réception."),
-  tempStorerReceivedAt: validDatetime({
-    verboseFieldName: "date de réception",
-    required: true
-  }) as any,
-  tempStorerSignedAt: validDatetime({
-    verboseFieldName: "date d'acceptation"
-  }) as any,
+  tempStorerReceivedAt: yup
+    .date()
+    .typeError(invalidDateFormat("date de réception"))
+    .nullable()
+    .notRequired(),
+  tempStorerSignedAt: yup
+    .date()
+    .typeError(invalidDateFormat("date d'acceptation"))
+    .nullable()
+    .notRequired(),
   tempStorerQuantityType: yup.mixed<QuantityType>(),
   tempStorerWasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
   tempStorerQuantityReceived: yup
@@ -789,9 +788,10 @@ export const tempStoredInfoSchema: SchemaOf<TempStorageInfo> = yup.object({
 });
 
 export const tempStorerAcceptedInfoSchema = yup.object().shape({
-  tempStorerReceivedAt: validDatetime({
-    verboseFieldName: "date de réception"
-  }),
+  tempStorerReceivedAt: yup
+    .date()
+    .typeError(invalidDateFormat("date de réception"))
+    .nullable(),
   tempStorerQuantityType: yup.mixed<QuantityType>().required(),
   tempStorerWasteAcceptationStatus: yup
     .mixed<WasteAcceptationStatus>()
@@ -800,9 +800,10 @@ export const tempStorerAcceptedInfoSchema = yup.object().shape({
     .string()
     .ensure()
     .required("Vous devez saisir un responsable de l'acceptation."),
-  tempStorerSignedAt: validDatetime({
-    verboseFieldName: "date d'acceptation"
-  }),
+  tempStorerSignedAt: yup
+    .date()
+    .typeError(invalidDateFormat("date d'acceptation"))
+    .nullable(),
   tempStorerQuantityReceived: yup
     .number()
     .required()

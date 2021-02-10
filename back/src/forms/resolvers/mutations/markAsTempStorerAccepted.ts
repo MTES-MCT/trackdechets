@@ -28,14 +28,13 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
     tempStorerSignedBy: tempStorerAcceptedInfo.signedBy
   };
 
-  await tempStorerAcceptedInfoSchema.validate(tempStorageUpdateInput);
+  const tempStorageUpdateInputValidated = await tempStorerAcceptedInfoSchema.validate(
+    tempStorageUpdateInput
+  );
 
   const formUpdateInput = {
     temporaryStorageDetail: {
-      update: {
-        ...tempStorageUpdateInput,
-        tempStorerSignedAt: new Date(tempStorageUpdateInput.tempStorerSignedAt)
-      }
+      update: tempStorageUpdateInputValidated
     }
   };
 
