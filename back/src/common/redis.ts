@@ -2,9 +2,9 @@ import Redis from "ioredis";
 
 const { REDIS_URL } = process.env;
 
-const connexionArgs = REDIS_URL ? { path: REDIS_URL } : { host: "redis" };
-
-export const redisClient = new Redis(connexionArgs);
+export const redisClient = REDIS_URL
+  ? new Redis(REDIS_URL)
+  : new Redis({ host: "redis" });
 
 /**
  * Generate a cache key
