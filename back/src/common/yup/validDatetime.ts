@@ -1,13 +1,6 @@
 import { parse, isDate, isValid } from "date-fns";
 import * as yup from "yup";
-
-const allowedFormats = [
-  "yyyy-MM-dd",
-  "yyyy-MM-dd'T'HH:mm:ss",
-  "yyyy-MM-dd'T'HH:mm:ssX",
-  "yyyy-MM-dd'T'HH:mm:ss.SSS",
-  "yyyy-MM-dd'T'HH:mm:ss.SSSX"
-];
+import { allowedFormats } from "../dates";
 
 /**
  * Check input is a date or a date string formatted according to allowed_formats

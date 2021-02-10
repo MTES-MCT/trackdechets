@@ -1,4 +1,7 @@
+import { Status, UserRole } from "@prisma/client";
+import { format } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { allowedFormats } from "../../../../common/dates";
 import prisma from "../../../../prisma";
 import {
   companyFactory,
@@ -286,6 +289,39 @@ describe("{ mutation { markAsSent } }", () => {
       expect(statusLogs.length).toEqual(0);
     }
   );
+
+  test.each(allowedFormats)("%p is a valid format for sentAt", async f => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      UserRole.MEMBER
+    );
+
+    const recipientCompany = await companyFactory();
+
+    let form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SEALED,
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const sentAt = new Date("2018-12-11");
+
+    await mutate(MARK_AS_SENT, {
+      variables: {
+        id: form.id,
+        sentInfo: { sentAt: format(sentAt, f), sentBy: "John Doe" }
+      }
+    });
+
+    form = await prisma.form.findUnique({ where: { id: form.id } });
+
+    expect(form.status).toEqual(Status.SENT);
+    expect(form.sentAt).toEqual(sentAt);
+  });
 
   test.each(["20201211", "junk", "2020-12-33"])(
     "sentAt must be a valid date, %p is not valid",

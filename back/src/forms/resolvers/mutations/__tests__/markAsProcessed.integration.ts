@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { PROCESSING_OPERATIONS } from "../../../../common/constants";
@@ -7,6 +8,8 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { allowedFormats } from "../../../../common/dates";
+import { Status } from "@prisma/client";
 
 jest.mock("axios", () => ({
   default: {
@@ -456,5 +459,39 @@ describe("mutation.markAsProcessed", () => {
       where: { id: appendix2.id }
     });
     expect(appendix2grouped.status).toEqual("PROCESSED");
+  });
+
+  test.each(allowedFormats)("%p is a valid format for processedAt", async f => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.ACCEPTED,
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const processedAt = new Date("2019-10-04");
+    const processedAtStr = format(processedAt, f);
+
+    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 1",
+          processedBy: "A simple bot",
+          processedAt: processedAtStr
+        }
+      }
+    });
+
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
+    expect(resultingForm.status).toBe(Status.PROCESSED);
+    expect(resultingForm.processedAt).toEqual(processedAtStr);
   });
 });
