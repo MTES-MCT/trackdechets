@@ -467,7 +467,9 @@ describe("Mutation.createForm", () => {
           createFormInput
         }
       });
-      const form = await prisma.form.findUnique(data.createForm.id);
+      const form = await prisma.form.findUnique({
+        where: { id: data.createForm.id }
+      });
       expect(form.transporterValidityLimit).toEqual(validityLimit);
       expect(form.traderValidityLimit).toEqual(validityLimit);
     }
