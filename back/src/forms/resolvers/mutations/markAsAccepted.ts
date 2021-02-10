@@ -21,7 +21,10 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
 
   const acceptedForm = await transitionForm(user, form, {
     type: EventType.MarkAsAccepted,
-    formUpdateInput: acceptedInfo
+    formUpdateInput: {
+      ...acceptedInfo,
+      signedAt: new Date(acceptedInfo.signedAt)
+    }
   });
 
   return expandFormFromDb(acceptedForm);

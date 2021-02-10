@@ -1,4 +1,5 @@
-import { UserRole } from "@prisma/client";
+import { format } from "date-fns";
+import { CompanyType, Status, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import * as mailsHelper from "../../../../mailer/mailing";
@@ -6,10 +7,12 @@ import {
   companyFactory,
   formFactory,
   transportSegmentFactory,
-  userFactory
+  userFactory,
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { prepareDB, prepareRedis } from "../../../__tests__/helpers";
+import { allowedFormats } from "../../../../common/dates";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -564,4 +567,41 @@ describe("Test Form reception", () => {
         "pour marquer ce bordereau comme entreposé provisoirement"
     );
   });
+
+  test.each(allowedFormats)(
+    "%p should be a valid format for receivedAt",
+    async f => {
+      const { user, company: destination } = await userWithCompanyFactory(
+        UserRole.MEMBER,
+        {
+          companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+        }
+      );
+
+      const owner = await userFactory();
+      const form = await formFactory({
+        ownerId: owner.id,
+        opt: { status: Status.SENT, recipientCompanySiret: destination.siret }
+      });
+
+      const { mutate } = makeClient(user);
+
+      const receivedAt = new Date("2019-10-04");
+
+      await mutate(MARK_AS_RECEIVED, {
+        variables: {
+          id: form.id,
+          receivedInfo: {
+            receivedBy: "Bill",
+            receivedAt: format(receivedAt, f)
+          }
+        }
+      });
+
+      const frm = await prisma.form.findUnique({ where: { id: form.id } });
+
+      expect(frm.status).toBe(Status.RECEIVED);
+      expect(frm.receivedAt).toEqual(receivedAt);
+    }
+  );
 });

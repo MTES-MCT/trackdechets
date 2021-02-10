@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import {
   userWithCompanyFactory,
   formFactory,
@@ -6,6 +7,8 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
+import { allowedFormats } from "../../../../common/dates";
+import { Status, WasteAcceptationStatus } from "@prisma/client";
 
 const MARK_AS_TEMP_STORER_ACCEPTED = `
     mutation MarkAsTempStorerAccepted($id: ID!, $tempStorerAcceptedInfo: TempStorerAcceptedFormInput!){
@@ -162,5 +165,57 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
       }
     });
     expect(statusLogs.length).toEqual(1);
+  });
+
+  test.each(allowedFormats)("%p is a valid format for signedAt", async f => {
+    const { user, company: tempStorerCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const emitterCompany = await companyFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.TEMP_STORED,
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: tempStorerCompany.siret,
+        recipientIsTempStorage: true,
+        temporaryStorageDetail: { create: {} },
+        receivedBy: "John Doe",
+        receivedAt: "2018-12-11T00:00:00.000Z"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const signedAt = new Date("2018-12-11");
+
+    await mutate(MARK_AS_TEMP_STORER_ACCEPTED, {
+      variables: {
+        id: form.id,
+        tempStorerAcceptedInfo: {
+          wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
+          wasteRefusalReason: "",
+          signedAt: format(signedAt, f),
+          signedBy: "John Doe",
+          quantityReceived: 2.4,
+          quantityType: "REAL"
+        }
+      }
+    });
+
+    const formAfterMutation = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
+
+    const tempStorage = await prisma.form
+      .findUnique({
+        where: { id: form.id }
+      })
+      .temporaryStorageDetail();
+
+    expect(formAfterMutation.status).toEqual(Status.TEMP_STORER_ACCEPTED);
+    expect(tempStorage.tempStorerSignedAt).toEqual(signedAt);
   });
 });

@@ -1,5 +1,18 @@
+import {
+  CompanyType,
+  Status,
+  UserRole,
+  WasteAcceptationStatus
+} from "@prisma/client";
+import { format } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { allowedFormats } from "../../../../common/dates";
 import prisma from "../../../../prisma";
+import {
+  formFactory,
+  userFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { prepareDB, prepareRedis } from "../../../__tests__/helpers";
 
@@ -304,4 +317,50 @@ describe("Test Form reception", () => {
     expect(logs.length).toBe(1);
     expect(logs[0].status).toBe("ACCEPTED");
   });
+
+  test.each(allowedFormats)(
+    "%p should be a valid format for signedAt",
+    async f => {
+      const owner = await userFactory();
+      const { user, company: destination } = await userWithCompanyFactory(
+        UserRole.MEMBER,
+        {
+          companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+        }
+      );
+
+      const form = await formFactory({
+        ownerId: owner.id,
+        opt: {
+          status: Status.RECEIVED,
+          receivedBy: "Bill",
+          recipientCompanySiret: destination.siret,
+          receivedAt: new Date("2019-01-17")
+        }
+      });
+
+      const { mutate } = makeClient(user);
+
+      const signedAt = new Date("2019-01-18");
+
+      await mutate(MARK_AS_ACCEPTED, {
+        variables: {
+          id: form.id,
+          acceptedInfo: {
+            signedAt: format(signedAt, f),
+            signedBy: "Bill",
+            wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
+            quantityReceived: 11
+          }
+        }
+      });
+
+      const acceptedForm = await prisma.form.findUnique({
+        where: { id: form.id }
+      });
+
+      expect(acceptedForm.status).toBe(Status.ACCEPTED);
+      expect(acceptedForm.signedAt).toEqual(signedAt);
+    }
+  );
 });
