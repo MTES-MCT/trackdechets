@@ -1,4 +1,4 @@
-import { partiallyHideEmail } from "../utils";
+import { partiallyHideEmail, generatePassword } from "../utils";
 
 describe("partiallyHideEmail", () => {
   it("should partially hide a well formatted email address", () => {
@@ -18,5 +18,13 @@ describe("partiallyHideEmail", () => {
   it("should throw an error if string is not an email", () => {
     const t = () => partiallyHideEmail("this is not an email");
     expect(t).toThrowError("this must be a valid email");
+  });
+});
+
+describe("generatePassword", () => {
+  it("should generate a 10 characters password", () => {
+    const pw = generatePassword();
+    expect(pw.length).toEqual(10);
+    expect(pw.toLowerCase()).toEqual(pw); // is lowercased ?
   });
 });

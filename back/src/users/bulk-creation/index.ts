@@ -3,7 +3,7 @@ import prisma from "../../prisma";
 import { loadCompanies, loadRoles } from "./loaders";
 import { validateCompany, validateRoleGenerator } from "./validations";
 import { sirenify } from "./sirene";
-import { hashPassword } from "../utils";
+import { hashPassword, generatePassword } from "../utils";
 import { randomNumber, getUIBaseURL } from "../../utils";
 import { groupBy } from "./utils";
 import { sendMail } from "../../mailer/mailing";
@@ -153,7 +153,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
 
     if (!user) {
       // No user matches this email. Creates a new one
-      const password = Math.random().toString(36).slice(-10);
+      const password = generatePassword();
 
       const hashedPassword = await hashPassword(password);
 
