@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
@@ -7,6 +8,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { allowedFormats } from "../../../../common/dates";
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
@@ -52,6 +54,19 @@ const CREATE_FORM = `
         validityLimit
         numberPlate
         customInfo
+      }
+      trader {
+        company {
+          siret
+          name
+          address
+          contact
+          mail
+          phone
+        }
+        receipt
+        department
+        validityLimit
       }
       wasteDetails {
         packagingInfos {
@@ -403,6 +418,62 @@ describe("Mutation.createForm", () => {
       createFormInput.transporter
     );
   });
+
+  test.each(allowedFormats)(
+    "%p should be a valid format for transporter and trader receipt validity limit",
+    async f => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const validityLimit = new Date("2040-01-01");
+      const createFormInput = {
+        emitter: {
+          company: {
+            siret: company.siret
+          }
+        },
+        transporter: {
+          company: {
+            siret: "12345678901234",
+            name: "Transporter",
+            address: "123 whatever street, Somewhere",
+            contact: "Jane Doe",
+            mail: "janedoe@transporter.com",
+            phone: "06"
+          },
+          isExemptedOfReceipt: false,
+          receipt: "8043",
+          department: "69",
+          validityLimit: format(validityLimit, f),
+          numberPlate: "AX-123-69",
+          customInfo: "T-456"
+        },
+        trader: {
+          company: {
+            siret: "12345678901234",
+            name: "Trader",
+            address: "123 Wall Street, NY",
+            contact: "Jane Doe",
+            mail: "janedoe@trader.com",
+            phone: "06"
+          },
+          validityLimit: format(validityLimit, f),
+          receipt: "8043",
+          department: "07"
+        }
+      };
+      const { mutate } = makeClient(user);
+      const { data } = await mutate(CREATE_FORM, {
+        variables: {
+          createFormInput
+        }
+      });
+      const form = await prisma.form.findUnique({
+        where: { id: data.createForm.id }
+      });
+      expect(form.transporterValidityLimit).toEqual(validityLimit);
+      expect(form.traderValidityLimit).toEqual(validityLimit);
+    }
+  );
 
   it("should create a form from deprecated packagings fields", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");

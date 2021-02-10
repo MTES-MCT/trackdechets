@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
@@ -7,6 +8,8 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { allowedFormats } from "../../../../common/dates";
+import { Status } from "@prisma/client";
 
 jest.mock("axios", () => ({
   default: {
@@ -412,4 +415,50 @@ describe("Mutation.signedByTransporter", () => {
     });
     expect(resultingForm.status).toBe("RESENT");
   });
+
+  test.each(allowedFormats)(
+    "%p should be a valid format for sentAt",
+    async f => {
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const emitterCompany = await companyFactory();
+      // convert sentAt to formatted string
+      const sentAt = new Date("2018-12-11");
+      const sentAtStr = format(sentAt, f);
+
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          sentAt: null,
+          status: "SEALED",
+          emitterCompanyName: emitterCompany.name,
+          emitterCompanySiret: emitterCompany.siret,
+          transporterCompanyName: company.name,
+          transporterCompanySiret: company.siret
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      await mutate(SIGNED_BY_TRANSPORTER, {
+        variables: {
+          id: form.id,
+          signingInfo: {
+            sentAt: sentAtStr,
+            signedByTransporter: true,
+            securityCode: emitterCompany.securityCode,
+            sentBy: "Roger Lapince",
+            signedByProducer: true,
+            packagingInfos: form.wasteDetailsPackagingInfos,
+            quantity: form.wasteDetailsQuantity,
+            onuCode: "Code ONU"
+          }
+        }
+      });
+
+      const resultingForm = await prisma.form.findUnique({
+        where: { id: form.id }
+      });
+      expect(resultingForm.status).toEqual(Status.SENT);
+      expect(resultingForm.sentAt).toEqual(sentAt);
+    }
+  );
 });

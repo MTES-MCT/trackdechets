@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
@@ -7,6 +8,8 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { allowedFormats } from "../../../../common/dates";
+import { Status } from "@prisma/client";
 
 const MARK_AS_TEMP_STORED = `
   mutation MarkAsTempStored($id: ID!, $tempStoredInfos: TempStoredFormInput!){
@@ -291,4 +294,55 @@ describe("{ mutation { markAsTempStored } }", () => {
     );
     expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
+
+  test.each(allowedFormats)(
+    "%p should be a valid format for receivedAt",
+    async f => {
+      const { user, company: tempStorerCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+
+      const emitterCompany = await companyFactory();
+
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.SENT,
+          emitterCompanySiret: emitterCompany.siret,
+          recipientCompanySiret: tempStorerCompany.siret,
+          recipientIsTempStorage: true,
+          temporaryStorageDetail: { create: {} }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+
+      const receivedAt = new Date("2019-10-04");
+
+      await mutate(MARK_AS_TEMP_STORED, {
+        variables: {
+          id: form.id,
+          tempStoredInfos: {
+            receivedBy: "John Doe",
+            receivedAt: format(receivedAt, f),
+            quantityReceived: 2.4,
+            quantityType: "REAL"
+          }
+        }
+      });
+
+      const formAfterMutation = await prisma.form.findUnique({
+        where: { id: form.id }
+      });
+
+      const tempStorage = await prisma.form
+        .findUnique({
+          where: { id: form.id }
+        })
+        .temporaryStorageDetail();
+
+      expect(formAfterMutation.status).toEqual(Status.TEMP_STORED);
+      expect(tempStorage.tempStorerReceivedAt).toEqual(receivedAt);
+    }
+  );
 });
