@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import prisma from "../../../prisma";
 import { PROCESSING_OPERATIONS } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";

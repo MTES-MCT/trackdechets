@@ -125,7 +125,7 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
-  it.only.each(["emitter", "trader", "recipient", "transporter"])(
+  it.each(["emitter", "trader", "recipient", "transporter"])(
     "should allow %p to create a form",
     async role => {
       const { user, company } = await userWithCompanyFactory("MEMBER");

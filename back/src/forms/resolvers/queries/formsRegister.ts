@@ -3,7 +3,6 @@ import prisma from "../../../prisma";
 import * as yup from "yup";
 import { getFileDownloadToken } from "../../../common/file-download";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import validDatetime from "../../../common/yup/validDatetime";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { downloadFormsRegister } from "../../exports/handler";
@@ -12,14 +11,16 @@ import { formsWhereInput } from "../../exports/where-inputs";
 const TYPE = "forms_register";
 
 const validationSchema = yup.object().shape({
-  startDate: validDatetime({
-    verboseFieldName: "Date de début",
-    required: false
-  }),
-  endDate: validDatetime({
-    verboseFieldName: "Date de début",
-    required: false
-  })
+  startDate: yup
+    .date()
+    .typeError("La date de début n'est pas formatée correctement")
+    .nullable()
+    .required(),
+  endDate: yup
+    .date()
+    .typeError("La date de fin n'est pas formatée correctement")
+    .nullable()
+    .required()
 });
 
 const formsRegisterResolver: QueryResolvers["formsRegister"] = async (

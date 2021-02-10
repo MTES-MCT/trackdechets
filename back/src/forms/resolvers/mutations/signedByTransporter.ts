@@ -61,13 +61,10 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
   });
 
   // check waste details override is valid
-  const wasteDetailsValidated = await wasteDetailsSchema.validate(
-    {
-      ...form,
-      ...wasteDetails(infos)
-    },
-    { stripUnknown: true }
-  );
+  await wasteDetailsSchema.validate({
+    ...form,
+    ...wasteDetails(infos)
+  });
 
   if (form.sentAt) {
     // BSD has already been sent, it must be a signature for frame 18
