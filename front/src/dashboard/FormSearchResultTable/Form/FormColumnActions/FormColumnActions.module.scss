@@ -1,0 +1,7 @@
+.FormColumnActions {
+  display: flex;
+
+  > *:not(:last-child) {
+    margin-right: 1rem;
+  }
+}
