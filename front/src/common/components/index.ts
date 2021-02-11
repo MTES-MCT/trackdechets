@@ -1,5 +1,5 @@
 import ActionButton from "./ActionButton";
-import Modal from "./Modal";
+import Modal, { ModalTitle, useModal } from "./Modal";
 import RedErrorMessage from "./RedErrorMessage";
 import DownloadFileLink from "./DownloadFileLink";
 import Switch, { FieldSwitch } from "./Switch";
@@ -7,6 +7,8 @@ import Switch, { FieldSwitch } from "./Switch";
 export {
   ActionButton,
   Modal,
+  ModalTitle,
+  useModal,
   RedErrorMessage,
   DownloadFileLink,
   Switch,

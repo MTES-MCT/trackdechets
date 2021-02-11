@@ -30,6 +30,13 @@
   }
 }
 
+.ModalTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: $blue;
+  margin-bottom: 1rem;
+}
+
 .ModalCloseButton {
   position: absolute;
   top: 1rem;

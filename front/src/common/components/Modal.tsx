@@ -49,6 +49,14 @@ export default function TdModal({
   );
 }
 
+interface ModalTitleProps {
+  children: React.ReactNode;
+}
+
+export function ModalTitle({ children }: ModalTitleProps) {
+  return <h2 className={styles.ModalTitle}>{children}</h2>;
+}
+
 type ModalTriggerProps = {
   trigger: (open: () => void) => React.ReactNode;
   modalContent: (close: () => void) => React.ReactNode;
@@ -72,10 +80,20 @@ export function TdModalTrigger({
       {trigger(open)}
       <TdModal {...modalProps} isOpen={isOpen} onClose={() => setIsOpen(false)}>
         <>
-          <h2 className="td-modal-title">{modalProps.ariaLabel}</h2>
+          <ModalTitle>{modalProps.ariaLabel}</ModalTitle>
           {modalContent(close)}
         </>
       </TdModal>
     </div>
   );
+}
+
+export function useModal() {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  return {
+    isOpen,
+    onOpen: () => setIsOpen(true),
+    onClose: () => setIsOpen(false),
+  };
 }

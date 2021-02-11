@@ -1,5 +1,11 @@
 import * as React from "react";
-import { Modal, Slideshow, List, ListItem } from "common/components";
+import {
+  Modal,
+  ModalTitle,
+  Slideshow,
+  List,
+  ListItem,
+} from "common/components";
 import { IconCheckCircle1 } from "common/components/Icons";
 
 import styles from "./OnboardingSlideshow.module.scss";
@@ -37,9 +43,9 @@ export function OnboardingSlideshow() {
     >
       <Slideshow>
         <div className={styles.Slide}>
-          <div className={styles.ModalTitle}>
+          <ModalTitle>
             Préparer facilement un Bordereau de Suivi de Déchets
-          </div>
+          </ModalTitle>
           <div className={styles.SlideContent}>
             <div className={styles.SlideContentImage}>
               <img src={slide1Image} alt="" />
@@ -68,9 +74,9 @@ export function OnboardingSlideshow() {
           </div>
         </div>
         <div className={styles.Slide}>
-          <div className={styles.ModalTitle}>
+          <ModalTitle>
             Signer numériquement l’enlèvement de vos déchets
-          </div>
+          </ModalTitle>
           <div className={styles.SlideContent}>
             <div className={styles.SlideContentImage}>
               <img src={slide2Image} alt="" />
@@ -98,9 +104,7 @@ export function OnboardingSlideshow() {
           </div>
         </div>
         <div className={styles.Slide}>
-          <div className={styles.ModalTitle}>
-            Suivre l’état de ses BSD en temps réel
-          </div>
+          <ModalTitle>Suivre l’état de ses BSD en temps réel</ModalTitle>
           <div className={styles.SlideContent}>
             <div className={styles.SlideContentImage}>
               <img src={slide3Image} alt="" />
@@ -135,9 +139,7 @@ export function OnboardingSlideshow() {
           </div>
         </div>
         <div className={styles.Slide}>
-          <div className={styles.ModalTitle}>
-            Télécharger son registre réglementaire
-          </div>
+          <ModalTitle>Télécharger son registre réglementaire</ModalTitle>
           <div className={styles.SlideContent}>
             <div className={styles.SlideContentImage}>
               <img src={slide4Image} alt="" />
@@ -171,7 +173,7 @@ export function OnboardingSlideshow() {
           </div>
         </div>
         <div className={styles.Slide}>
-          <div className={styles.ModalTitle}>Trackdéchets permet de :</div>
+          <ModalTitle>Trackdéchets permet de :</ModalTitle>
           <div className={styles.Features}>
             <div className={styles.FeaturesItem}>
               <img src={prepareImage} alt="" />
@@ -192,9 +194,7 @@ export function OnboardingSlideshow() {
           </div>
         </div>
         <div className={styles.Slide}>
-          <div className={styles.ModalTitle}>
-            Des questions ? Besoin d’aide ?
-          </div>
+          <ModalTitle>Des questions ? Besoin d’aide ?</ModalTitle>
           <div className={styles.SlideContent}>
             <div className={styles.SlideContentImage}>
               <img src={slide6Image} alt="" style={{ padding: "1rem" }} />
