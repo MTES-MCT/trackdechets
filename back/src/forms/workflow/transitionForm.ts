@@ -73,7 +73,6 @@ export default async function transitionForm(
       updatedFields
     }
   });
-  // FIXME: it should update the existing document, not create a new one
   await indexForm(updatedForm);
 
   return updatedForm;

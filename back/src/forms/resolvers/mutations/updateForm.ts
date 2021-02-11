@@ -17,6 +17,7 @@ import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
 import { draftFormSchema, sealedFormSchema } from "../../validation";
 import { FormSirets } from "../../types";
+import { indexForm } from "../../elastic";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -127,8 +128,13 @@ const updateFormResolver = async (
 
   const updatedForm = await prisma.form.update({
     where: { id },
-    data: formUpdateInput
+    data: formUpdateInput,
+    include: { temporaryStorageDetail: true, transportSegments: true }
   });
+
+  // FIXME: arent' we supposed to create a status log here?
+  await indexForm(updatedForm);
+
   return expandFormFromDb(updatedForm);
 };
 

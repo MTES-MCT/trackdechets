@@ -49,7 +49,8 @@ export async function indexAllForms({ skip = 0 }: { skip?: number } = {}) {
     body: forms.flatMap(form => [
       {
         index: {
-          _index: index.index
+          _index: index.index,
+          _id: form.id
         }
       },
       toFormSearchResult(form)
@@ -67,6 +68,7 @@ export async function indexAllForms({ skip = 0 }: { skip?: number } = {}) {
 export async function indexForm(form: FullForm) {
   await client.index({
     index: index.index,
+    id: form.id,
     body: toFormSearchResult(form)
   });
 }
