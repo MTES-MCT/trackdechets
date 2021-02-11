@@ -1,5 +1,7 @@
 import * as React from "react";
 import { Link, generatePath, useParams } from "react-router-dom";
+import cogoToast from "cogo-toast";
+import { gql, useMutation } from "@apollo/client";
 import {
   Menu,
   MenuButton,
@@ -8,11 +10,25 @@ import {
   MenuLink,
 } from "@reach/menu-button";
 import "@reach/menu-button/styles.css";
-import { FormSearchResult } from "generated/graphql/types";
+import {
+  FormSearchResult,
+  Mutation,
+  MutationDuplicateFormArgs,
+} from "generated/graphql/types";
+import { fullFormFragment } from "common/fragments";
 import routes from "common/routes";
 import { IconChevronUp, IconChevronDown } from "common/components/Icons";
 import { QuicklookModal } from "../../../slips/slips-actions/Quicklook";
 import { DeleteModal } from "../../../slips/slips-actions/Delete";
+
+const DUPLICATE_FORM = gql`
+  mutation DuplicateForm($id: ID!) {
+    duplicateForm(id: $id) {
+      ...FullForm
+    }
+  }
+  ${fullFormFragment}
+`;
 
 interface ActionsDropdownProps {
   searchResult: FormSearchResult;
@@ -23,6 +39,24 @@ export function ActionsDropdown({ searchResult }: ActionsDropdownProps) {
   const [currentModal, setCurrentModal] = React.useState<
     "PREVIEW" | "DELETE" | null
   >(null);
+
+  const [duplicateForm] = useMutation<
+    Pick<Mutation, "duplicateForm">,
+    MutationDuplicateFormArgs
+  >(DUPLICATE_FORM, {
+    variables: { id: searchResult.id },
+    update: () => {
+      // TODO: add a FormSearchResult to SEARCH_DRAFTS
+      // except we don't have a FormSearchResult here but Form :/
+    },
+    onCompleted: () => {
+      setCurrentModal(null);
+
+      cogoToast.success(
+        `Le bordereau a été dupliqué, il est disponible dans l'onglet "Brouillons"`
+      );
+    },
+  });
 
   return (
     <>
@@ -48,7 +82,7 @@ export function ActionsDropdown({ searchResult }: ActionsDropdownProps) {
               >
                 Modifier
               </MenuLink>
-              <MenuItem onSelect={() => {}}>Dupliquer</MenuItem>
+              <MenuItem onSelect={() => duplicateForm()}>Dupliquer</MenuItem>
             </MenuList>
           </>
         )}
