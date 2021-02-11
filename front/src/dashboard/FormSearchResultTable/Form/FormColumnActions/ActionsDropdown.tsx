@@ -12,6 +12,7 @@ import { FormSearchResult } from "generated/graphql/types";
 import routes from "common/routes";
 import { IconChevronUp, IconChevronDown } from "common/components/Icons";
 import { QuicklookModal } from "../../../slips/slips-actions/Quicklook";
+import { DeleteModal } from "../../../slips/slips-actions/Delete";
 
 interface ActionsDropdownProps {
   searchResult: FormSearchResult;
@@ -19,9 +20,9 @@ interface ActionsDropdownProps {
 
 export function ActionsDropdown({ searchResult }: ActionsDropdownProps) {
   const { siret } = useParams<{ siret: string }>();
-  const [currentModal, setCurrentModal] = React.useState<"PREVIEW" | null>(
-    null
-  );
+  const [currentModal, setCurrentModal] = React.useState<
+    "PREVIEW" | "DELETE" | null
+  >(null);
 
   return (
     <>
@@ -35,7 +36,9 @@ export function ActionsDropdown({ searchResult }: ActionsDropdownProps) {
               <MenuItem onSelect={() => setCurrentModal("PREVIEW")}>
                 Aperçu
               </MenuItem>
-              <MenuItem onSelect={() => {}}>Supprimer</MenuItem>
+              <MenuItem onSelect={() => setCurrentModal("DELETE")}>
+                Supprimer
+              </MenuItem>
               <MenuLink
                 as={Link}
                 to={generatePath(routes.dashboard.slips.edit, {
@@ -52,6 +55,12 @@ export function ActionsDropdown({ searchResult }: ActionsDropdownProps) {
       </Menu>
       {currentModal === "PREVIEW" && (
         <QuicklookModal
+          formId={searchResult.id}
+          onClose={() => setCurrentModal(null)}
+        />
+      )}
+      {currentModal === "DELETE" && (
+        <DeleteModal
           formId={searchResult.id}
           onClose={() => setCurrentModal(null)}
         />

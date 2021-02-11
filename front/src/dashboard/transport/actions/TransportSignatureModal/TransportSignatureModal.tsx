@@ -9,7 +9,12 @@ import {
   SignatureAuthor,
   TransporterSignatureFormInput,
 } from "generated/graphql/types";
-import { Breadcrumb, BreadcrumbItem, Modal } from "common/components";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  Modal,
+  ModalTitle,
+} from "common/components";
 import steps from "./steps";
 
 const SIGNED_BY_TRANSPORTER = gql`
@@ -55,7 +60,7 @@ export function TransportSignatureModal({
 
   return (
     <Modal isOpen onClose={onClose} ariaLabel="Signer l'enlèvement">
-      <h2 className="td-modal-title">Signature</h2>
+      <ModalTitle>Signature</ModalTitle>
 
       <Breadcrumb>
         {steps.map((step, index) => (

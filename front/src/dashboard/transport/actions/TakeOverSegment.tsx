@@ -14,9 +14,9 @@ import { GET_TRANSPORT_SLIPS, GET_FORM } from "../queries";
 import { updateApolloCache } from "common/helper";
 import DateInput from "form/custom-inputs/DateInput";
 import cogoToast from "cogo-toast";
+import { Modal, ModalTitle } from "common/components";
 import { IconBusTransfer } from "common/components/Icons";
 import ActionButton from "common/components/ActionButton";
-import TdModal from "common/components/Modal";
 
 export const TAKE_OVER_SEGMENT = gql`
   mutation takeOverSegment($id: ID!, $takeOverInfo: TakeOverInput!) {
@@ -127,12 +127,12 @@ export default function TakeOverSegment({
       )}
 
       {isOpen ? (
-        <TdModal
+        <Modal
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
           ariaLabel="Prendre en charge"
         >
-          <h2 className="td-modal-title">Prendre en charge le déchet</h2>
+          <ModalTitle>Prendre en charge le déchet</ModalTitle>
           <Formik
             initialValues={initialValues}
             onSubmit={values => {
@@ -184,7 +184,7 @@ export default function TakeOverSegment({
               </FormikForm>
             )}
           </Formik>
-        </TdModal>
+        </Modal>
       ) : null}
     </>
   );

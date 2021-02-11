@@ -11,7 +11,7 @@ import {
 } from "generated/graphql/types";
 import { useParams } from "react-router-dom";
 import cogoToast from "cogo-toast";
-import TdModal from "common/components/Modal";
+import { Modal, ModalTitle } from "common/components";
 
 type Props = {
   formId: string;
@@ -29,14 +29,13 @@ const DELETE_FORM = gql`
   }
 `;
 
-export default function Delete({
-  formId,
-  small = true,
-  onOpen,
-  onClose,
-}: Props) {
+interface DeleteModalProps {
+  formId: string;
+  onClose: () => void;
+}
+
+export function DeleteModal({ formId, onClose }: DeleteModalProps) {
   const { siret } = useParams<{ siret: string }>();
-  const [isOpen, setIsOpen] = useState(false);
   const [deleteForm] = useMutation<
     Pick<Mutation, "deleteForm">,
     MutationDeleteFormArgs
@@ -72,13 +71,38 @@ export default function Delete({
     },
     onCompleted: () => {
       cogoToast.success("Bordereau supprimé", { hideAfter: 5 });
-      !!onClose && onClose();
+      onClose();
     },
     onError: () =>
       cogoToast.error("Le bordereau n'a pas pu être supprimé", {
         hideAfter: 5,
       }),
   });
+
+  return (
+    <Modal ariaLabel="Supprimer un bordereau" onClose={onClose} isOpen>
+      <ModalTitle>Confirmer la suppression ?</ModalTitle>
+      <p>Cette action est irréversible.</p>
+      <div className="td-modal-actions">
+        <button className="btn btn--outline-primary" onClick={onClose}>
+          Annuler
+        </button>
+        <button className="btn btn--primary" onClick={() => deleteForm()}>
+          <IconTrash />
+          <span> Supprimer</span>
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
+export default function Delete({
+  formId,
+  small = true,
+  onOpen,
+  onClose,
+}: Props) {
+  const [isOpen, setIsOpen] = useState(false);
   const className = small
     ? "btn--no-style slips-actions__button"
     : "btn btn--outline-primary";
@@ -96,29 +120,15 @@ export default function Delete({
         <IconTrash color="blueLight" size="24px" />
         <span>Supprimer</span>
       </button>
-      <TdModal
-        isOpen={isOpen}
-        onClose={() => {
-          setIsOpen(false);
-          !!onClose && onClose();
-        }}
-        ariaLabel="Supprimer un bordereau"
-      >
-        <h2 className="td-modal-title">Confirmer la suppression ?</h2>
-        <p>Cette action est irréversible.</p>
-        <div className="td-modal-actions">
-          <button
-            className="btn btn--outline-primary"
-            onClick={() => setIsOpen(false)}
-          >
-            Annuler
-          </button>
-          <button className="btn btn--primary" onClick={() => deleteForm()}>
-            <IconTrash />
-            <span> Supprimer</span>
-          </button>
-        </div>
-      </TdModal>
+      {isOpen && (
+        <DeleteModal
+          formId={formId}
+          onClose={() => {
+            setIsOpen(false);
+            onClose && onClose();
+          }}
+        />
+      )}
     </>
   );
 }

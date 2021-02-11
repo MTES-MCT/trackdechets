@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { transportModeLabels } from "../constants";
 import styles from "./Transport.module.scss";
-import TdModal from "common/components/Modal";
+import { Modal, ModalTitle } from "common/components";
 import { OutlineButton } from "common/components/ActionButton";
 
 const verboseTakenOver = ({ segment, userSiret }) => {
@@ -37,12 +37,12 @@ export const Segments = ({ form, userSiret, inCard = false }) => {
           onClick={() => setIsOpen(true)}
         />
       )}
-      <TdModal
+      <Modal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         ariaLabel="Signature transporteur"
       >
-        <h2 className="td-modal-title">Segments</h2>
+        <ModalTitle>Segments</ModalTitle>
 
         {/*  sticking to table because of incomplete IE grid layout support */}
         <table className="td-table">
@@ -72,7 +72,7 @@ export const Segments = ({ form, userSiret, inCard = false }) => {
             )}
           </tbody>
         </table>
-      </TdModal>
+      </Modal>
     </div>
   );
 };
