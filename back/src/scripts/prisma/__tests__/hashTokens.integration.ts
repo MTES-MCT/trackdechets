@@ -16,7 +16,7 @@ describe("hashTokens", () => {
     // generate a hashed token
     const { accessToken: hashedToken } = await userWithAccessTokenFactory();
 
-    // generate a unhashed token, as they were created before the hashing implementation
+    // generate an unhashed token, as they were created before the hashing implementation
     const user = await userFactory();
     const unHashedToken = await prisma.accessToken.create({
       data: {
@@ -28,10 +28,14 @@ describe("hashTokens", () => {
     // run the migration function
     await hashTokens();
     // let's retrieve the previously unhashed token by its hashed value
-    await prisma.accessToken.findUnique({
+    const newlyHashedToken = await prisma.accessToken.findUnique({
       where: { token: hashToken(unHashedToken.token) }
     });
+    expect(newlyHashedToken.id).not.toBeNull();
     // let's retrieve the hashed token who shouldn't have been updated
-    await prisma.accessToken.findUnique({ where: { token: hashedToken } });
+    const alreadyHashedToken = await prisma.accessToken.findUnique({
+      where: { token: hashToken(hashedToken) }
+    });
+    expect(alreadyHashedToken).not.toBeNull();
   });
 });
