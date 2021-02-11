@@ -1,64 +1,44 @@
-import { useQuery, NetworkStatus } from "@apollo/client";
 import React from "react";
-import { InlineError } from "common/components/Error";
-import Loader from "common/components/Loaders";
-import { Query, QueryFormsArgs } from "generated/graphql/types";
-import { FOLLOW_TAB_FORMS } from "./queries";
-import Slips, { SlipsColumn } from "../Slips";
-import TabContent from "./TabContent";
-import EmptyTab from "./EmptyTab";
 import { useParams } from "react-router-dom";
+import { useQuery, gql } from "@apollo/client";
+import { Query } from "generated/graphql/types";
+import { formSearchResultFragment } from "common/fragments";
+import { FormSearchResultTable } from "../../FormSearchResultTable";
+
+// FIXME: missing hasNextStep
+export const SEARCH_FOLLOWS = gql`
+  query SearchFollows($siret: String!) {
+    searchForms(
+      siret: $siret
+      status: [
+        "SEALED"
+        "SENT"
+        "RECEIVED"
+        "ACCEPTED"
+        "TEMP_STORED"
+        "TEMP_STORER_ACCEPTED"
+        "RESEALED"
+        "RESENT"
+        "AWAITING_GROUP"
+        "GROUPED"
+      ]
+    ) {
+      ...FormSearchResultFragment
+    }
+  }
+  ${formSearchResultFragment}
+`;
 
 export default function FollowTab() {
   const { siret } = useParams<{ siret: string }>();
-  const { error, data, fetchMore, refetch, networkStatus } = useQuery<
-    Pick<Query, "forms">,
-    Partial<QueryFormsArgs>
-  >(FOLLOW_TAB_FORMS, {
+  const { data } = useQuery<Pick<Query, "searchForms">>(SEARCH_FOLLOWS, {
     variables: {
       siret,
     },
-    notifyOnNetworkStatusChange: true,
   });
 
-  if (networkStatus === NetworkStatus.loading) return <Loader />;
-  if (error) return <InlineError apolloError={error} />;
-  if (!data?.forms?.length)
-    return (
-      <EmptyTab>
-        <img src="/illu/illu_transfer.svg" alt="" />
-        <h4>Il n'y a aucun bordereau à suivre</h4>
-        <p>
-          Des bordereaux apparaissent dans cet onglet lorsqu'ils sont en attente
-          d'une action extérieure. Par exemple lorsqu'en tant que producteur
-          vous attendez la réception d'un déchet ou son traitement. La colonne{" "}
-          <strong>STATUT</strong> vous renseignera sur l'état précis du
-          bordereau.
-        </p>
-      </EmptyTab>
-    );
+  // TODO: blankslate
+  // TODO: loading state
 
-  return (
-    <TabContent
-      networkStatus={networkStatus}
-      refetch={refetch}
-      forms={data.forms}
-      fetchMore={fetchMore}
-    >
-      <Slips
-        siret={siret}
-        forms={data.forms}
-        columns={[
-          SlipsColumn.READABLE_ID,
-          SlipsColumn.SENT_AT,
-          SlipsColumn.EMITTER_COMPANY_NAME,
-          SlipsColumn.RECIPIENT_COMPANY_NAME,
-          SlipsColumn.WASTE_DETAILS_CODE,
-          SlipsColumn.QUANTITY,
-          SlipsColumn.STATUS,
-          SlipsColumn.SLIPS_ACTIONS,
-        ]}
-      />
-    </TabContent>
-  );
+  return <FormSearchResultTable searchResults={data?.searchForms ?? []} />;
 }

@@ -12,6 +12,7 @@ import {
 import "@reach/menu-button/styles.css";
 import {
   FormSearchResult,
+  FormStatus,
   Mutation,
   MutationDuplicateFormArgs,
 } from "generated/graphql/types";
@@ -70,19 +71,25 @@ export function ActionsDropdown({ searchResult }: ActionsDropdownProps) {
               <MenuItem onSelect={() => setCurrentModal("PREVIEW")}>
                 Aperçu
               </MenuItem>
-              <MenuItem onSelect={() => setCurrentModal("DELETE")}>
-                Supprimer
-              </MenuItem>
-              <MenuLink
-                as={Link}
-                to={generatePath(routes.dashboard.slips.edit, {
-                  siret,
-                  id: searchResult.id,
-                })}
-              >
-                Modifier
-              </MenuLink>
               <MenuItem onSelect={() => duplicateForm()}>Dupliquer</MenuItem>
+              {[FormStatus.Draft, FormStatus.Sealed].includes(
+                searchResult.status as FormStatus
+              ) && (
+                <>
+                  <MenuLink
+                    as={Link}
+                    to={generatePath(routes.dashboard.slips.edit, {
+                      siret,
+                      id: searchResult.id,
+                    })}
+                  >
+                    Modifier
+                  </MenuLink>
+                  <MenuItem onSelect={() => setCurrentModal("DELETE")}>
+                    Supprimer
+                  </MenuItem>
+                </>
+              )}
             </MenuList>
           </>
         )}

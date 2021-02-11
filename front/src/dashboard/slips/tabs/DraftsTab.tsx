@@ -2,21 +2,16 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";
 import { Query } from "generated/graphql/types";
+import { formSearchResultFragment } from "common/fragments";
 import { FormSearchResultTable } from "../../FormSearchResultTable";
 
 export const SEARCH_DRAFTS = gql`
   query SearchDrafts($siret: String!) {
     searchForms(siret: $siret, status: ["DRAFT"]) {
-      id
-      readableId
-      type
-      status
-      emitter
-      recipient
-      waste
-      sirets
+      ...FormSearchResultFragment
     }
   }
+  ${formSearchResultFragment}
 `;
 
 export default function DraftsTab() {
@@ -26,6 +21,9 @@ export default function DraftsTab() {
       siret,
     },
   });
+
+  // TODO: blankslate
+  // TODO: loading state
 
   return <FormSearchResultTable searchResults={data?.searchForms ?? []} />;
 }

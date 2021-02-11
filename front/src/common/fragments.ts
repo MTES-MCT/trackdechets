@@ -212,6 +212,19 @@ export const fullFormFragment = gql`
   ${staticFieldsFragment}
 `;
 
+export const formSearchResultFragment = gql`
+  fragment FormSearchResultFragment on FormSearchResult {
+    id
+    readableId
+    type
+    status
+    emitter
+    recipient
+    waste
+    sirets
+  }
+`;
+
 export const transporterFormFragment = gql`
   fragment TransporterFormFragment on Form {
     ...MutableFieldsFragment
