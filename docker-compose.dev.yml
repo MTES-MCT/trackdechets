@@ -1,6 +1,5 @@
 version: "3.7"
 services:
-  # FIXME: configure it properly so it works for integration tests and local development
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
     environment:
@@ -19,7 +18,6 @@ services:
         constraints:
           - "node.labels.elasticsearch == true"
 
-  # FIXME: configure it properly so it works for local development, omitted for integration tests
   kibana:
     image: docker.elastic.co/kibana/kibana:7.10.0
     ports:
@@ -106,6 +104,8 @@ services:
       UI_HOST: $UI_HOST
       DEVELOPERS_HOST: $DEVELOPERS_HOST
       NGINX_PROXY_HOST: $NGINX_PROXY_HOST
+      ELASTIC_SEARCH_HOST: $ELASTIC_SEARCH_HOST
+      KIBANA_HOST: $KIBANA_HOST
     ports:
       - "80:80"
 

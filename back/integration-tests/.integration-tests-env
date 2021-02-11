@@ -4,3 +4,4 @@ JWT_SECRET=any_secret
 SESSION_SECRET=any_secret
 API_HOST=api.trackdechets.local
 UI_HOST=trackdechets.local
+ELASTIC_SEARCH_URL=http://elasticsearch:9200

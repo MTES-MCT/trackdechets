@@ -33,6 +33,7 @@
    git checkout --track origin/dev
    ```
 2. Configurer les variables d'environnements :
+
    1. Renommer le ficher `.env.model` en `.env` et le compléter en demandant les infos à un développeur de l'équipe
    2. Créer un fichier `.env` dans `front/` en s'inspirant du fichier `.env.recette`
 
@@ -42,11 +43,13 @@
    127.0.0.1 api.trackdechets.local
    127.0.0.1 trackdechets.local
    127.0.0.1 developers.trackdechets.local
+   127.0.0.1 es.trackdechets.local
+   127.0.0.1 kibana.trackdechets.local
    ```
 
    > Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
 
-   > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `UI_HOST` et `DEVELOPERS_HOST`
+   > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `UI_HOST`, `DEVELOPERS_HOST`, `ELASTIC_SEARCH_HOST` et `KIBANA_HOST`
 
 4. Démarrer les containers
 
@@ -72,7 +75,6 @@
 
    C'est prêt ! Rendez-vous sur l'URL `UI_HOST` configurée dans votre fichier `.env` (par ex: `http://trackdechets.local`) pour commencer à utiliser l'application ou sur `API_HOST` (par ex `http://api.trackdechets.local`) pour accéder au playground GraphQL.
 
-
 ### Installation alternative sans docker
 
 Vous pouvez également faire tourner l'ensemble des services sans docker. Veillez à utiliser la même version de Node.js que celle spécifiée dans les images Docker. Vous pouvez utiliser [NVM](https://github.com/nvm-sh/nvm) pour changer facilement de version de Node.
@@ -85,8 +87,7 @@ Vous pouvez également faire tourner l'ensemble des services sans docker. Veille
 ln -s /path/to/trackdechets/.env /path/to/trackdechets/back/.env
 ```
 
-> Il est également possible de démarrer ces trois services avec docker `docker-compose -f docker-compose.dev.yml up postgres redis nginx`. Dans ce cas, l'API doit être démarrée sur le port 4000 pour coller avec la configuration Nginx  `API_PORT=4000`.
-
+> Il est également possible de démarrer ces trois services avec docker `docker-compose -f docker-compose.dev.yml up postgres redis nginx`. Dans ce cas, l'API doit être démarrée sur le port 4000 pour coller avec la configuration Nginx `API_PORT=4000`.
 
 3. Démarrer l'API
 
@@ -253,9 +254,8 @@ Pour palier à ce problème, il est possible de nourrir la base de donnée Prism
 2. Démarrer les containers `postgres` et `td-api`
 3. (Optionnel) Reset de la base de données
    3.1 Dans le container `postgres `: `psql -U trackdechets -d prisma -c "DROP SCHEMA \"default\$default\" CASCADE;"` pour supprimer les données existantes
-   3.2 Dans le container `td-api`:  `npx prisma db push --preview-feature` pour recréer les tables
+   3.2 Dans le container `td-api`: `npx prisma db push --preview-feature` pour recréer les tables
 4. Dans le container `td-api`: `npx prisma db seed --preview-feature` pour nourrir la base de données.
-
 
 ### Ajouter une nouvelle icône
 

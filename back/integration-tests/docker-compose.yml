@@ -12,6 +12,22 @@ services:
     sysctls:
       - net.core.somaxconn=511
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.elasticsearch == true"
+
   td-api:
     image: td-api
     build:
@@ -29,3 +45,4 @@ services:
       EMAIL_BACKEND: "sendinblue"
       SIB_BASE_URL: "http://mailservice"
       MAIN_TEMPLATE_ID: "9"
+      ELASTIC_SEARCH_URL: $ELASTIC_SEARCH_URL
