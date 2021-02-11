@@ -12,7 +12,7 @@ import { Query, QueryFormArgs } from "generated/graphql/types";
 import { InlineError } from "common/components/Error";
 import { GET_DETAIL_FORM } from "common/queries";
 
-const QuicklookModal = ({ formId, onClose }) => {
+export const QuicklookModal = ({ formId, onClose }) => {
   const { loading, error, data } = useQuery<Pick<Query, "form">, QueryFormArgs>(
     GET_DETAIL_FORM,
     {
