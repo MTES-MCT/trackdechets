@@ -80,6 +80,10 @@ export function FormSearchResultTable({
     data: searchResults,
   });
 
+  // TODO: pagination
+  // TODO: filters
+  // TODO: sort by
+
   return (
     <Table {...getTableProps()}>
       <TableHead>
