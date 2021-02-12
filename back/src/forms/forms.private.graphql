@@ -8,7 +8,12 @@ type Query {
     """
     Liste des status à filtrer.
     """
-    status: [String!]!
+    status: [String!]
+
+    """
+    Filtrer les résultats où j'apparais (ou pas) dans la liste waitingForSirets.
+    """
+    waitingForMe: Boolean
   ): [FormSearchResult!]!
 }
 
@@ -52,6 +57,12 @@ type FormSearchResult {
   Liste de SIRETs des entreprises qui figurent sur le bordereau.
   """
   sirets: [String!]!
+
+  """
+  Liste de SIRETs des entreprises qui doivent effectuer une action
+  pour que le déchet puisse continuer son parcours.
+  """
+  waitingForSirets: [String!]!
 }
 
 """

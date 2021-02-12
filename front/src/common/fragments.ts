@@ -222,6 +222,7 @@ export const formSearchResultFragment = gql`
     recipient
     waste
     sirets
+    waitingForSirets
   }
 `;
 

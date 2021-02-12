@@ -28,6 +28,9 @@ export const index = {
       },
       sirets: {
         type: "keyword"
+      },
+      waitingForSirets: {
+        type: "keyword"
       }
     }
   }

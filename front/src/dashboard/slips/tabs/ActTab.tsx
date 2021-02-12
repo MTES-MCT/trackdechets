@@ -5,7 +5,6 @@ import { Query } from "generated/graphql/types";
 import { formSearchResultFragment } from "common/fragments";
 import { FormSearchResultTable } from "../../FormSearchResultTable";
 
-// FIXME: missing hasNextStep
 export const SEARCH_ACTS = gql`
   query SearchFollows($siret: String!) {
     searchForms(
@@ -18,6 +17,7 @@ export const SEARCH_ACTS = gql`
         "TEMP_STORER_ACCEPTED"
         "RESENT"
       ]
+      waitingForMe: true
     ) {
       ...FormSearchResultFragment
     }

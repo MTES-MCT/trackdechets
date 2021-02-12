@@ -641,6 +641,11 @@ export type FormSearchResult = {
   waste?: Maybe<Scalars["String"]>;
   /** Liste de SIRETs des entreprises qui figurent sur le bordereau. */
   sirets: Array<Scalars["String"]>;
+  /**
+   * Liste de SIRETs des entreprises qui doivent effectuer une action
+   * pour que le déchet puisse continuer son parcours.
+   */
+  waitingForSirets: Array<Scalars["String"]>;
 };
 
 /** Informations du cycle de vie des bordereaux */
@@ -1621,7 +1626,8 @@ export type QuerySearchCompaniesArgs = {
 
 export type QuerySearchFormsArgs = {
   siret: Scalars["String"];
-  status: Array<Scalars["String"]>;
+  status?: Maybe<Array<Scalars["String"]>>;
+  waitingForMe?: Maybe<Scalars["Boolean"]>;
 };
 
 /** Payload de réception d'un BSD */
@@ -3122,6 +3128,11 @@ export type FormSearchResultResolvers<
   >;
   waste?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
   sirets?: Resolver<Array<ResolversTypes["String"]>, ParentType, ContextType>;
+  waitingForSirets?: Resolver<
+    Array<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -3614,7 +3625,7 @@ export type QueryResolvers<
     Array<ResolversTypes["FormSearchResult"]>,
     ParentType,
     ContextType,
-    RequireFields<QuerySearchFormsArgs, "siret" | "status">
+    RequireFields<QuerySearchFormsArgs, "siret">
   >;
   stats?: Resolver<
     Array<ResolversTypes["CompanyStat"]>,
@@ -4557,6 +4568,7 @@ export function createFormSearchResultMock(
     recipient: null,
     waste: null,
     sirets: [],
+    waitingForSirets: [],
     ...props
   };
 }

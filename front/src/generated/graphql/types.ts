@@ -636,6 +636,11 @@ export type FormSearchResult = {
   waste: Maybe<Scalars["String"]>;
   /** Liste de SIRETs des entreprises qui figurent sur le bordereau. */
   sirets: Array<Scalars["String"]>;
+  /**
+   * Liste de SIRETs des entreprises qui doivent effectuer une action
+   * pour que le déchet puisse continuer son parcours.
+   */
+  waitingForSirets: Array<Scalars["String"]>;
 };
 
 /** Informations du cycle de vie des bordereaux */
@@ -1630,7 +1635,8 @@ export type QuerySearchCompaniesArgs = {
 
 export type QuerySearchFormsArgs = {
   siret: Scalars["String"];
-  status: Array<Scalars["String"]>;
+  status: Maybe<Array<Scalars["String"]>>;
+  waitingForMe: Maybe<Scalars["Boolean"]>;
 };
 
 /** Payload de réception d'un BSD */
@@ -2704,6 +2710,7 @@ export function createFormSearchResultMock(
     recipient: null,
     waste: null,
     sirets: [],
+    waitingForSirets: [],
     ...props
   };
 }

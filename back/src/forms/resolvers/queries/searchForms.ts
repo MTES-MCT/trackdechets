@@ -15,6 +15,44 @@ interface SearchResponse<T> {
 }
 
 const searchFormsResolver: QueryResolvers["searchForms"] = async (_, args) => {
+  // elastic search doesn't have precise types
+  const query: Record<string, any> = {
+    bool: {
+      filter: [
+        {
+          term: {
+            sirets: args.siret
+          }
+        }
+      ],
+      must_not: []
+    }
+  };
+
+  if (args.status && args.status.length > 0) {
+    query.bool.filter.push({
+      terms: {
+        status: args.status
+      }
+    });
+  }
+
+  if (typeof args.waitingForMe === "boolean") {
+    if (args.waitingForMe) {
+      query.bool.filter.push({
+        term: {
+          waitingForSirets: args.siret
+        }
+      });
+    } else {
+      query.bool.must_not.push({
+        term: {
+          waitingForSirets: args.siret
+        }
+      });
+    }
+  }
+
   const {
     body: {
       hits: { hits }
@@ -24,22 +62,7 @@ const searchFormsResolver: QueryResolvers["searchForms"] = async (_, args) => {
     body: {
       size: 10,
       from: 0,
-      query: {
-        bool: {
-          filter: [
-            {
-              term: {
-                sirets: args.siret
-              }
-            },
-            {
-              terms: {
-                status: args.status
-              }
-            }
-          ]
-        }
-      }
+      query
     }
   });
 
