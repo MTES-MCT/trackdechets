@@ -352,7 +352,7 @@ export function flattenProcessedFormInput(
   const { nextDestination, ...rest } = processedFormInput;
   return safeInput({
     ...rest,
-    processedAt: rest.processedAt.toISOString(),
+    processedAt: rest.processedAt?.toISOString(),
     ...flattenNextDestinationInput(processedFormInput)
   });
 }
@@ -385,20 +385,11 @@ export function flattenImportPaperFormInput(
 }
 
 function flattenSigningInfo(signingInfo: SignatureFormInput) {
-  return safeInput({
-    ...signingInfo,
-    ...(signingInfo.sentAt && { sentAt: new Date(signingInfo.sentAt) })
-  });
+  return safeInput(signingInfo);
 }
 
 function flattenReceivedInfo(receivedInfo: ReceivedFormInput) {
-  return safeInput({
-    ...receivedInfo,
-    ...(receivedInfo.receivedAt && {
-      receivedAt: new Date(receivedInfo.receivedAt)
-    }),
-    ...(receivedInfo.signedAt && { signedAt: new Date(receivedInfo.signedAt) })
-  });
+  return safeInput(receivedInfo);
 }
 
 export function flattenTemporaryStorageDetailInput(
@@ -543,7 +534,7 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
     processingOperationDone: form.processingOperationDone,
     processingOperationDescription: form.processingOperationDescription,
     processedBy: form.processedBy,
-    processedAt: new Date(form.processedAt),
+    processedAt: form.processedAt ? new Date(form.processedAt) : null,
     noTraceability: form.noTraceability,
     nextDestination: nullIfNoValues<NextDestination>({
       processingOperation: form.nextDestinationProcessingOperation,
