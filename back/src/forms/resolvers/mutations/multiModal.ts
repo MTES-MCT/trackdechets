@@ -3,7 +3,6 @@ import { ForbiddenError, UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
 import * as Yup from "yup";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import validDatetime from "../../../common/yup/validDatetime";
 import {
   MutationEditSegmentArgs,
   MutationMarkSegmentAsReadyToTakeOverArgs,
@@ -58,17 +57,12 @@ const segmentSchema = Yup.object<any>().shape({
         : schema.required("Le département du transporteur est obligatoire")
   ),
 
-  transporterValidityLimit: validDatetime({
-    verboseFieldName: "date de validité"
-  }),
+  transporterValidityLimit: Yup.date().nullable(),
   transporterNumberPlate: Yup.string().nullable(true)
 });
 
 const takeOverInfoSchema = Yup.object<any>().shape({
-  takenOverAt: validDatetime({
-    verboseFieldName: "date de prise en charge",
-    required: true
-  }),
+  takenOverAt: Yup.date().required(),
   takenOverBy: Yup.string().required("Le nom du responsable est obligatoire")
 });
 
