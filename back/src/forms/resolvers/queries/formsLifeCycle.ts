@@ -87,10 +87,7 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
   const hasPreviousPage = true; // TODO-PRISMA
 
   return {
-    statusLogs: statusLogs.map(sl => ({
-      ...sl,
-      loggedAt: sl.loggedAt?.toISOString()
-    })),
+    statusLogs,
     pageInfo: {
       startCursor,
       endCursor,

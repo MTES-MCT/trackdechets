@@ -31,7 +31,7 @@ export type Scalars = {
    * - "yyyy-MM-dd'T'HH:mm:ss.SSS" (eg. 2020-11-23T13:34:55.987)
    * - "yyyy-MM-dd'T'HH:mm:ss.SSSX" (eg. 2020-11-23T13:34:55.987Z)
    */
-  DateTime: string;
+  DateTime: Date;
   /** Chaîne de caractère au format URL, débutant par un protocole http(s). */
   URL: URL;
   JSON: any;
@@ -4114,7 +4114,7 @@ export function createAcceptedFormInputMock(
   return {
     wasteAcceptationStatus: "ACCEPTED",
     wasteRefusalReason: null,
-    signedAt: new Date().toISOString(),
+    signedAt: new Date(),
     signedBy: "",
     quantityReceived: 0,
     ...props
@@ -4293,7 +4293,7 @@ export function createCreateTraderReceiptInputMock(
 ): CreateTraderReceiptInput {
   return {
     receiptNumber: "",
-    validityLimit: new Date().toISOString(),
+    validityLimit: new Date(),
     department: "",
     ...props
   };
@@ -4304,7 +4304,7 @@ export function createCreateTransporterReceiptInputMock(
 ): CreateTransporterReceiptInput {
   return {
     receiptNumber: "",
-    validityLimit: new Date().toISOString(),
+    validityLimit: new Date(),
     department: "",
     ...props
   };
@@ -4689,7 +4689,7 @@ export function createProcessedFormInputMock(
     processingOperationDone: "",
     processingOperationDescription: null,
     processedBy: "",
-    processedAt: new Date().toISOString(),
+    processedAt: new Date(),
     nextDestination: null,
     noTraceability: null,
     ...props
@@ -4701,7 +4701,7 @@ export function createReceivedFormInputMock(
 ): ReceivedFormInput {
   return {
     receivedBy: "",
-    receivedAt: new Date().toISOString(),
+    receivedAt: new Date(),
     wasteAcceptationStatus: null,
     wasteRefusalReason: null,
     signedAt: null,
@@ -4752,7 +4752,7 @@ export function createResentFormInputMock(
     wasteDetails: null,
     transporter: null,
     signedBy: "",
-    signedAt: new Date().toISOString(),
+    signedAt: new Date(),
     ...props
   };
 }
@@ -4777,7 +4777,7 @@ export function createSentFormInputMock(
   props: Partial<SentFormInput>
 ): SentFormInput {
   return {
-    sentAt: new Date().toISOString(),
+    sentAt: new Date(),
     sentBy: "",
     ...props
   };
@@ -4787,7 +4787,7 @@ export function createSignatureFormInputMock(
   props: Partial<SignatureFormInput>
 ): SignatureFormInput {
   return {
-    sentAt: new Date().toISOString(),
+    sentAt: new Date(),
     sentBy: "",
     ...props
   };
@@ -4883,7 +4883,7 @@ export function createTakeOverInputMock(
   props: Partial<TakeOverInput>
 ): TakeOverInput {
   return {
-    takenOverAt: new Date().toISOString(),
+    takenOverAt: new Date(),
     takenOverBy: "",
     ...props
   };
@@ -4935,7 +4935,7 @@ export function createTempStoredFormInputMock(
     wasteAcceptationStatus: null,
     wasteRefusalReason: null,
     receivedBy: "",
-    receivedAt: new Date().toISOString(),
+    receivedAt: new Date(),
     signedAt: null,
     quantityReceived: 0,
     quantityType: "REAL",
@@ -4947,7 +4947,7 @@ export function createTempStorerAcceptedFormInputMock(
   props: Partial<TempStorerAcceptedFormInput>
 ): TempStorerAcceptedFormInput {
   return {
-    signedAt: new Date().toISOString(),
+    signedAt: new Date(),
     signedBy: "",
     wasteAcceptationStatus: "ACCEPTED",
     wasteRefusalReason: null,
@@ -4987,7 +4987,7 @@ export function createTraderReceiptMock(
     __typename: "TraderReceipt",
     id: "",
     receiptNumber: "",
-    validityLimit: new Date().toISOString(),
+    validityLimit: new Date(),
     department: "",
     ...props
   };
@@ -5031,7 +5031,7 @@ export function createTransporterReceiptMock(
     __typename: "TransporterReceipt",
     id: "",
     receiptNumber: "",
-    validityLimit: new Date().toISOString(),
+    validityLimit: new Date(),
     department: "",
     ...props
   };
@@ -5041,7 +5041,7 @@ export function createTransporterSignatureFormInputMock(
   props: Partial<TransporterSignatureFormInput>
 ): TransporterSignatureFormInput {
   return {
-    sentAt: new Date().toISOString(),
+    sentAt: new Date(),
     signedByTransporter: false,
     securityCode: 0,
     signatureAuthor: null,

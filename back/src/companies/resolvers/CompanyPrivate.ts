@@ -1,6 +1,6 @@
 import prisma from "../../prisma";
 import { CompanyPrivateResolvers } from "../../generated/graphql/types";
-import { getCompanyUsers, getUserRole, stringifyDates } from "../database";
+import { getCompanyUsers, getUserRole } from "../database";
 
 const companyPrivateResolvers: CompanyPrivateResolvers = {
   users: parent => {
@@ -14,13 +14,13 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
     const transporterReceipt = await prisma.company
       .findUnique({ where: { siret: parent.siret } })
       .transporterReceipt();
-    return stringifyDates(transporterReceipt);
+    return transporterReceipt;
   },
   traderReceipt: async parent => {
     const traderReceipt = await prisma.company
       .findUnique({ where: { siret: parent.siret } })
       .traderReceipt();
-    return stringifyDates(traderReceipt);
+    return traderReceipt;
   }
 };
 

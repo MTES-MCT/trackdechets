@@ -3,7 +3,6 @@ import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { receiptSchema } from "../../validation";
-import { stringifyDates } from "../../database";
 
 /**
  * Create a transporter receipt
@@ -18,10 +17,9 @@ const createTransporterReceiptResolver: MutationResolvers["createTransporterRece
   checkIsAuthenticated(context);
   const { input } = args;
   await receiptSchema.validate(input);
-  const transporterReceipt = await prisma.transporterReceipt.create({
+  return prisma.transporterReceipt.create({
     data: input
   });
-  return stringifyDates(transporterReceipt);
 };
 
 export default createTransporterReceiptResolver;
