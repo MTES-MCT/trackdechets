@@ -25,7 +25,7 @@ describe("mutation / importPaperForm", () => {
     afterEach(resetDatabase);
 
     function getImportPaperFormInput() {
-      const input: ImportPaperFormInput = {
+      const input = {
         customId: "customId",
         emitter: {
           type: "PRODUCER",
@@ -74,6 +74,7 @@ describe("mutation / importPaperForm", () => {
         },
         receivedInfo: {
           receivedAt: "2019-12-21T00:00:00.000Z",
+          signedAt: "2019-12-20T00:00:00.000Z",
           receivedBy: "Mr Destination",
           wasteAcceptationStatus: "ACCEPTED",
           quantityReceived: 1.0
@@ -83,7 +84,8 @@ describe("mutation / importPaperForm", () => {
           processedBy: "Mr Recipient",
           processingOperationDone: "R 1",
           processingOperationDescription: "Traitement final"
-        }
+        },
+        ecoOrganisme: null
       };
       return input;
     }

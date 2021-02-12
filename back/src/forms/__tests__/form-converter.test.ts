@@ -292,7 +292,7 @@ describe("flattenFormInput", () => {
       transporter: {
         receipt: "12379",
         department: "07",
-        validityLimit: "2020-06-30",
+        validityLimit: new Date("2020-06-30"),
         numberPlate: "AD-007-TS",
         company: null
       },
