@@ -9,9 +9,7 @@ type Props = { formId: string; small?: boolean };
 
 export default function Edit({ formId, small = true }: Props) {
   const { siret } = useParams<{ siret: string }>();
-  const className = small
-    ? "slips-actions__button"
-    : "btn btn--outline-primary";
+  const className = small ? "" : "btn btn--outline-primary";
 
   return (
     <Link

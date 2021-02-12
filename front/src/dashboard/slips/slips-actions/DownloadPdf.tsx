@@ -19,9 +19,7 @@ export default function DownloadPdf({
   onSuccess,
   small = true,
 }: Props) {
-  const className = small
-    ? "btn--no-style slips-actions__button"
-    : "btn btn--outline-primary";
+  const className = small ? "btn--no-style" : "btn btn--outline-primary";
 
   return (
     <DownloadFileLink

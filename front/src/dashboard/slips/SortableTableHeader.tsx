@@ -24,8 +24,8 @@ export default function SortControl({
   };
   const Icon = getIcon(sortParams);
   return (
-    <th className="sortable" onClick={() => sortFunc(fieldName)}>
-      <div className="sortControl">
+    <th onClick={() => sortFunc(fieldName)}>
+      <div>
         <span>{caption}</span>
         <Icon size="16px" />
       </div>

@@ -156,7 +156,7 @@ export const TransportTable = ({ forms, userSiret, refetchQuery }) => {
             <td>
               <Quicklook
                 formId={form.id}
-                buttonClass={`btn--no-style slips-actions__button ${styles.quicklook}`}
+                buttonClass={`btn--no-style ${styles.quicklook}`}
               />
             </td>
           </tr>

@@ -103,9 +103,7 @@ export default function Delete({
   onClose,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const className = small
-    ? "btn--no-style slips-actions__button"
-    : "btn btn--outline-primary";
+  const className = small ? "btn--no-style" : "btn btn--outline-primary";
 
   return (
     <>
