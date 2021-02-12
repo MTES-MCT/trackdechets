@@ -1,7 +1,6 @@
 import { Form, Prisma, Status } from "@prisma/client";
 import { format } from "date-fns";
 import prisma from "../../../../prisma";
-import { ImportPaperFormInput } from "../../../../generated/graphql/types";
 import {
   userFactory,
   userWithCompanyFactory
