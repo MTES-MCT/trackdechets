@@ -136,17 +136,6 @@ function flattenSegmentForDb(
   return dbObject;
 }
 
-function datifySegmentForDb(transportSegment: Partial<PrismaTransportSegment>) {
-  return {
-    ...transportSegment,
-    ...(transportSegment.transporterValidityLimit && {
-      transporterValidityLimit: new Date(
-        transportSegment.transporterValidityLimit
-      )
-    })
-  };
-}
-
 /**
  *
  * Prepare a new transport segment
@@ -163,9 +152,7 @@ export async function prepareSegment(
   if (!currentUserSirets.includes(siret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
-  const nextSegmentPayload = datifySegmentForDb(
-    flattenSegmentForDb(nextSegmentInfo)
-  );
+  const nextSegmentPayload = flattenSegmentForDb(nextSegmentInfo);
 
   if (!nextSegmentPayload.transporterCompanySiret) {
     throw new ForbiddenError("Le siret est obligatoire");
@@ -352,12 +339,7 @@ export async function takeOverSegment(
   }
   const updatedSegment = await prisma.transportSegment.update({
     where: { id },
-    data: {
-      ...takeOverInfo,
-      ...(takeOverInfo.takenOverAt && {
-        takenOverAt: new Date(takeOverInfo.takenOverAt)
-      })
-    }
+    data: takeOverInfo
   });
 
   await prisma.form.update({
