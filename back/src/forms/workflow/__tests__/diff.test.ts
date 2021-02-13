@@ -142,3 +142,53 @@ describe("objectDiff", () => {
     expect(diff).toEqual({ a: null });
   });
 });
+
+describe("dateDiff", () => {
+  test("diff with same date", () => {
+    // same date but different object
+    const date1 = new Date("2021-01-01");
+    const date2 = new Date("2021-01-01");
+
+    const o1 = {
+      a: date1
+    };
+
+    const o2 = {
+      a: date2
+    };
+
+    const diff = objectDiff(o1, o2);
+    expect(diff).toEqual({});
+  });
+
+  test("diff with new date", () => {
+    // same date but different object
+    const date = new Date("2021-01-01");
+
+    const o1 = {};
+
+    const o2 = {
+      a: date
+    };
+
+    const diff = objectDiff(o1, o2);
+    expect(diff).toEqual({ a: date });
+  });
+
+  test("diff with modified date", () => {
+    // same date but different object
+    const date1 = new Date("2021-01-01");
+    const date2 = new Date("2021-01-02");
+
+    const o1 = {
+      a: date1
+    };
+
+    const o2 = {
+      a: date2
+    };
+
+    const diff = objectDiff(o1, o2);
+    expect(diff).toEqual({ a: date2 });
+  });
+});

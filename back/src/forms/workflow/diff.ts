@@ -1,3 +1,4 @@
+import { isDate, isEqual } from "date-fns";
 import { Form, TemporaryStorageDetail } from "@prisma/client";
 import {
   expandFormFromDb,
@@ -41,6 +42,15 @@ export function objectDiff(o1, o2) {
     }
     if (isArray(o2[key])) {
       if (arraysEqual(o1[key], o2[key])) {
+        return diff;
+      }
+      return {
+        ...diff,
+        [key]: o2[key]
+      };
+    }
+    if (isDate(o2[key])) {
+      if (o1[key] && isEqual(o2[key], o1[key])) {
         return diff;
       }
       return {
