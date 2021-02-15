@@ -182,7 +182,7 @@ export async function acceptNewUserCompanyInvitations(user: User) {
     where: {
       id: { in: existingHashes.map(h => h.id) }
     },
-    data: { acceptedAt: new Date().toISOString() }
+    data: { acceptedAt: new Date() }
   });
 }
 
