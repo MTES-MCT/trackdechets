@@ -1,5 +1,4 @@
 import { Status, UserRole } from "@prisma/client";
-import { UserInputError } from "apollo-server-express";
 import { format } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { allowedFormats } from "../../../../common/dates";

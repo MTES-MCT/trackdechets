@@ -24,7 +24,8 @@ export type Scalars = {
   Int: number;
   Float: number;
   /**
-   * The `DateTime` scalar expects a date-formatted string matching one of the following formats:
+   * Le scalaire `DateTime` accepte des chaines de caractères
+   * formattées selon le standard ISO 8601. Exemples:
    * - "yyyy-MM-dd" (eg. 2020-11-23)
    * - "yyyy-MM-ddTHH:mm:ss" (eg. 2020-11-23T13:34:55)
    * - "yyyy-MM-ddTHH:mm:ssX" (eg. 2020-11-23T13:34:55Z)
