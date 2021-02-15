@@ -35,7 +35,8 @@ import {
   PackagingInfo,
   TransporterSignatureFormInput,
   SignatureFormInput,
-  ReceivedFormInput
+  ReceivedFormInput,
+  NextSegmentInfoInput
 } from "../generated/graphql/types";
 
 export function flattenObjectForDb(
@@ -185,9 +186,7 @@ function flattenTransporterInput(input: { transporter?: TransporterInput }) {
     ),
     transporterReceipt: chain(input.transporter, t => t.receipt),
     transporterDepartment: chain(input.transporter, t => t.department),
-    transporterValidityLimit: chain(input.transporter, t =>
-      t.validityLimit ? new Date(t.validityLimit) : null
-    ),
+    transporterValidityLimit: chain(input.transporter, t => t.validityLimit),
     transporterNumberPlate: chain(input.transporter, t => t.numberPlate),
     transporterCustomInfo: chain(input.transporter, t => t.customInfo)
   };
@@ -278,9 +277,7 @@ function flattenTraderInput(input: { trader?: TraderInput }) {
     traderCompanyMail: chain(input.trader, t => chain(t.company, c => c.mail)),
     traderReceipt: chain(input.trader, t => t.receipt),
     traderDepartment: chain(input.trader, t => t.department),
-    traderValidityLimit: chain(input.trader, t =>
-      t.validityLimit ? new Date(t.validityLimit) : null
-    )
+    traderValidityLimit: chain(input.trader, t => t.validityLimit)
   };
 }
 
@@ -417,8 +414,6 @@ export function flattenResentFormInput(
     ...flattenTransporterInput(resentFormInput),
     signedBy: resentFormInput.signedBy,
     signedAt: resentFormInput.signedAt
-      ? new Date(resentFormInput.signedAt)
-      : null
   });
 }
 
@@ -428,6 +423,43 @@ export function flattenSignedByTransporterInput(
   return safeInput({
     ...transporterSignatureFormInput,
     packagingInfos: getProcessedPackagingInfos(transporterSignatureFormInput)
+  });
+}
+
+export function flattenTransportSegmentInput(
+  segmentInput: NextSegmentInfoInput
+) {
+  return safeInput({
+    transporterCompanySiret: chain(segmentInput.transporter, t =>
+      chain(t.company, c => c.siret)
+    ),
+    transporterCompanyName: chain(segmentInput.transporter, t =>
+      chain(t.company, c => c.name)
+    ),
+    transporterCompanyAddress: chain(segmentInput.transporter, t =>
+      chain(t.company, c => c.address)
+    ),
+    transporterCompanyContact: chain(segmentInput.transporter, t =>
+      chain(t.company, c => c.contact)
+    ),
+    transporterCompanyMail: chain(segmentInput.transporter, t =>
+      chain(t.company, c => c.mail)
+    ),
+    transporterCompanyPhone: chain(segmentInput.transporter, t =>
+      chain(t.company, c => c.phone)
+    ),
+    transporterIsExemptedOfReceipt: chain(
+      segmentInput.transporter,
+      t => t.isExemptedOfReceipt
+    ),
+    transporterReceipt: chain(segmentInput.transporter, t => t.receipt),
+    transporterDepartment: chain(segmentInput.transporter, t => t.department),
+    transporterNumberPlate: chain(segmentInput.transporter, t => t.numberPlate),
+    transporterValidityLimit: chain(
+      segmentInput.transporter,
+      t => t.validityLimit
+    ),
+    mode: segmentInput.mode
   });
 }
 

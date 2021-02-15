@@ -1,5 +1,6 @@
 import { GraphQLScalarType, Kind } from "graphql";
 import { isValid, parseISO } from "date-fns";
+import { UserInputError } from "apollo-server-express";
 
 const INVALID_DATE_FORMAT = v =>
   `Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu ${v}.`;
@@ -14,7 +15,7 @@ function parseDate(value: string) {
     parsed = parseISO(value);
 
     if (!isValid(parsed)) {
-      throw new TypeError(INVALID_DATE_FORMAT(value));
+      throw new UserInputError(INVALID_DATE_FORMAT(value));
     }
   }
   return parsed;
@@ -28,15 +29,14 @@ export default new GraphQLScalarType({
   },
   parseValue(value) {
     if (typeof value !== "string") {
-      throw new TypeError(INVALID_DATE_FORMAT(value));
+      throw new UserInputError(INVALID_DATE_FORMAT(value));
     }
     return parseDate(value);
   },
   parseLiteral(ast) {
-    console.log("ast");
     // value from client in ast
     if (ast.kind !== Kind.STRING) {
-      return new TypeError(INVALID_DATE_FORMAT(ast.kind));
+      throw new UserInputError(INVALID_DATE_FORMAT(ast.kind));
     }
     return parseDate(ast.value);
   }

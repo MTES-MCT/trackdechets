@@ -492,6 +492,8 @@ describe("mutation.markAsProcessed", () => {
       where: { id: form.id }
     });
     expect(resultingForm.status).toBe(Status.PROCESSED);
-    expect(resultingForm.processedAt).toEqual(processedAtStr);
+    expect(resultingForm.processedAt).toEqual(
+      new Date(processedAtStr).toISOString()
+    );
   });
 });

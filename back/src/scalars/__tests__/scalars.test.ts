@@ -1,7 +1,6 @@
-import { ApolloServer, gql } from "apollo-server-express";
+import { ApolloServer, gql, UserInputError } from "apollo-server-express";
 import { createTestClient } from "apollo-server-testing";
 import { format } from "date-fns";
-import { GraphQLError } from "graphql";
 import scalars from "..";
 
 describe("DateTime", () => {
@@ -96,7 +95,7 @@ describe("DateTime", () => {
       variables: { bar: "2020-33-02" }
     });
     expect(errors).toEqual([
-      new GraphQLError(
+      new UserInputError(
         `Variable "$bar" got invalid value "2020-33-02"; Expected type DateTime. Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 2020-33-02.`
       )
     ]);
@@ -108,7 +107,7 @@ describe("DateTime", () => {
       variables: { bar: 1 }
     });
     expect(errors).toEqual([
-      new GraphQLError(
+      new UserInputError(
         `Variable "$bar" got invalid value 1; Expected type DateTime. Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 1.`
       )
     ]);

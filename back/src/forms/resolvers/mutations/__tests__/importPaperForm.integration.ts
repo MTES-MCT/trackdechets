@@ -244,7 +244,7 @@ describe("mutation / importPaperForm", () => {
         expect(form.sentAt).toEqual(sentAt);
         expect(form.receivedAt).toEqual(receivedAt);
         expect(form.signedAt).toEqual(signedAt);
-        expect(form.processedAt).toEqual(format(processedAt, f));
+        expect(form.processedAt).toEqual(processedAt.toISOString());
       }
     );
   });

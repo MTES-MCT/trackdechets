@@ -1,4 +1,5 @@
 import { Status, UserRole } from "@prisma/client";
+import { UserInputError } from "apollo-server-express";
 import { format } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { allowedFormats } from "../../../../common/dates";
@@ -346,12 +347,16 @@ describe("{ mutation { markAsSent } }", () => {
       const { errors } = await mutate(MARK_AS_SENT, {
         variables: {
           id: form.id,
-          sentInfo: { sentAt: new Date(dateStr), sentBy: "John Doe" }
+          sentInfo: { sentAt: dateStr, sentBy: "John Doe" }
         }
       });
-      expect(errors[0].message).toEqual(
-        "La date d'envoi n'est pas formatée correctement"
-      );
+      expect(errors).toEqual([
+        new UserInputError(
+          `Variable "$sentInfo" got invalid value ${dateStr} at "sentInfo.sentAt"; Expected type DateTime.
+          Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu ${dateStr}.`
+        )
+      ]);
+      console.log(errors);
       form = await prisma.form.findUnique({ where: { id: form.id } });
 
       expect(form.status).toEqual("SEALED");
