@@ -59,6 +59,7 @@ export const sendOnboardingFirstStepMails = async () => {
       return sendMail(payload);
     })
   );
+  await prisma.$disconnect();
 };
 
 type recipientType = User & {
@@ -105,4 +106,5 @@ export const sendOnboardingSecondStepMails = async () => {
       return sendMail(payload);
     })
   );
+  await prisma.$disconnect();
 };
