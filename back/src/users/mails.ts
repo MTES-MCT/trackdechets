@@ -220,8 +220,10 @@ export const userMails = {
   }),
   onboardingProfessionalSecondStep: (toEmail, toName) => ({
     to: [{ email: toEmail, name: toName }],
-    subject: "Trackdéchets vous accompagne pour mettre en oeuvre la traçabilité dématérialisée",
-    title: "Trackdéchets vous accompagne pour mettre en oeuvre la traçabilité dématérialisée",
+    subject:
+      "Trackdéchets vous accompagne pour mettre en oeuvre la traçabilité dématérialisée",
+    title:
+      "Trackdéchets vous accompagne pour mettre en oeuvre la traçabilité dématérialisée",
     body: "_",
     templateId: templateIds.PROFESSIONAL_SECOND_ONBOARDING,
     baseUrl
