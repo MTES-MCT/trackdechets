@@ -208,12 +208,22 @@ export const userMails = {
     templateId: templateIds.FIRST_ONBOARDING,
     baseUrl
   }),
-  onboardingSecondStep: (toEmail, toName) => ({
+  onboardingProducerSecondStep: (toEmail, toName) => ({
     to: [{ email: toEmail, name: toName }],
-    subject: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
-    title: "Registre, FAQ, explorez tout ce que peut faire Trackdéchets !",
+    subject:
+      "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
+    title:
+      "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
     body: "_",
-    templateId: templateIds.SECOND_ONBOARDING,
+    templateId: templateIds.PRODUCER_SECOND_ONBOARDING,
+    baseUrl
+  }),
+  onboardingProfessionalSecondStep: (toEmail, toName) => ({
+    to: [{ email: toEmail, name: toName }],
+    subject: "Trackdéchets vous accompagne pour mettre en oeuvre la traçabilité dématérialisée",
+    title: "Trackdéchets vous accompagne pour mettre en oeuvre la traçabilité dématérialisée",
+    body: "_",
+    templateId: templateIds.PROFESSIONAL_SECOND_ONBOARDING,
     baseUrl
   }),
   formTraceabilityBreak: (toEmail: string, toName: string, form: Form) => ({
