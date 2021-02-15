@@ -687,7 +687,7 @@ const processedInfoSchemaFn: (
       .string()
       .ensure()
       .required("Vous devez saisir un responsable de traitement."),
-    processedAt: yup.string().required(),
+    processedAt: yup.date().required(),
     processingOperationDone: yup
       .string()
       .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION),

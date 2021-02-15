@@ -349,7 +349,6 @@ export function flattenProcessedFormInput(
   const { nextDestination, ...rest } = processedFormInput;
   return safeInput({
     ...rest,
-    processedAt: rest.processedAt?.toISOString(),
     ...flattenNextDestinationInput(processedFormInput)
   });
 }
@@ -566,7 +565,7 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
     processingOperationDone: form.processingOperationDone,
     processingOperationDescription: form.processingOperationDescription,
     processedBy: form.processedBy,
-    processedAt: form.processedAt ? new Date(form.processedAt) : null,
+    processedAt: form.processedAt,
     noTraceability: form.noTraceability,
     nextDestination: nullIfNoValues<NextDestination>({
       processingOperation: form.nextDestinationProcessingOperation,

@@ -247,7 +247,7 @@ test("expandFormFromDb", () => {
     processingOperationDone: form.processingOperationDone,
     processingOperationDescription: form.processingOperationDescription,
     processedBy: form.processedBy,
-    processedAt: form.processedBy,
+    processedAt: form.processedAt,
     noTraceability: form.noTraceability,
     nextDestination: null,
     currentTransporterSiret: form.currentTransporterSiret,
