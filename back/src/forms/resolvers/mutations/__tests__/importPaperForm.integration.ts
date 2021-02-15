@@ -244,7 +244,7 @@ describe("mutation / importPaperForm", () => {
         expect(form.sentAt).toEqual(sentAt);
         expect(form.receivedAt).toEqual(receivedAt);
         expect(form.signedAt).toEqual(signedAt);
-        expect(form.processedAt).toEqual(processedAt.toISOString());
+        expect(form.processedAt).toEqual(processedAt);
       }
     );
   });
@@ -337,13 +337,13 @@ describe("mutation / importPaperForm", () => {
 
       expect(updatedForm.status).toEqual("PROCESSED");
       expect(updatedForm.isImportedFromPaper).toEqual(true);
-      expect(updatedForm.sentAt.toISOString()).toEqual(
-        importedData.signingInfo.sentAt
+      expect(updatedForm.sentAt).toEqual(
+        new Date(importedData.signingInfo.sentAt)
       );
       expect(updatedForm.sentBy).toEqual(importedData.signingInfo.sentBy);
 
-      expect(updatedForm.receivedAt.toISOString()).toEqual(
-        importedData.receivedInfo.receivedAt
+      expect(updatedForm.receivedAt).toEqual(
+        new Date(importedData.receivedInfo.receivedAt)
       );
       expect(updatedForm.receivedBy).toEqual(
         importedData.receivedInfo.receivedBy
@@ -355,7 +355,7 @@ describe("mutation / importPaperForm", () => {
         importedData.receivedInfo.quantityReceived
       );
       expect(updatedForm.processedAt).toEqual(
-        importedData.processedInfo.processedAt
+        new Date(importedData.processedInfo.processedAt)
       );
       expect(updatedForm.processedBy).toEqual(
         importedData.processedInfo.processedBy
