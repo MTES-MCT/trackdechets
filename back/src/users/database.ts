@@ -4,13 +4,7 @@
 
 import prisma from "../prisma";
 
-import {
-  User,
-  UserRole,
-  Prisma,
-  Company,
-  UserAccountHash
-} from "@prisma/client";
+import { User, UserRole, Prisma, Company } from "@prisma/client";
 
 import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";

@@ -5,7 +5,7 @@ import {
   userFactory
 } from "../../../__tests__/factories";
 import { getUid, hashToken } from "../../../utils";
-import { hashTokens } from "../hash-tokens";
+import { hashTokens } from "../hashTokens";
 
 describe("hashTokens", () => {
   afterAll(async () => {

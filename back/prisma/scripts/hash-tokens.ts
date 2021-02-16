@@ -1,4 +1,4 @@
-import { hashTokens } from "../../src/scripts/prisma/hash-tokens";
+import { hashTokens } from "../../src/scripts/prisma/hashTokens";
 import { registerUpdater, Updater } from "./helper/helper";
 
 @registerUpdater(
@@ -10,7 +10,6 @@ export class HashTokens implements Updater {
   run() {
     console.info("Starting script to hash tokens. This will take some time...");
     try {
-      console.log("o");
       return hashTokens();
     } catch (err) {
       console.error("☠ Something went wrong during the update", err);

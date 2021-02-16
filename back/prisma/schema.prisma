@@ -114,7 +114,7 @@ model AccessToken {
   updatedAt     DateTime     @updatedAt
   token         String       @unique
   isRevoked     Boolean      @default(false)
-  lastUsed      DateTime? 
+  lastUsed      DateTime?
   applicationId String?
   application   Application? @relation(fields: [applicationId], references: [id])
   userId        String
