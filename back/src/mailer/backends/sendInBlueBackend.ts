@@ -2,19 +2,17 @@ import { Mail, Contact } from "../types";
 import axios from "axios";
 import * as Sentry from "@sentry/node";
 import { templateIds } from "../helpers";
-const SIB_BASE_URL = "https://api.sendinblue.com/v3";
 
 const {
   SIB_APIKEY,
   SENDER_EMAIL_ADDRESS,
   SENDER_NAME,
   SENTRY_DSN,
-  MOCK_SIB_URL
+  SIB_BASE_URL
 } = process.env;
 
-const baseUrl = MOCK_SIB_URL === "true" ? "http://mailservice" : SIB_BASE_URL; // use a fake url for tests
-const SIB_SMTP_URL = `${baseUrl}/smtp/email`;
-const SIB_CONTACT_URL = `${baseUrl}/contacts`;
+const SIB_SMTP_URL = `${SIB_BASE_URL}/smtp/email`;
+const SIB_CONTACT_URL = `${SIB_BASE_URL}/contacts`;
 
 const headers = {
   "api-key": SIB_APIKEY,

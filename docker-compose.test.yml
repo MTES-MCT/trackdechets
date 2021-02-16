@@ -8,7 +8,7 @@ services:
     environment:
       JWT_SECRET: "xxx"
       EMAIL_BACKEND: "sendinblue"
-      MOCK_SIB_URL: "true"
+      SIB_BASE_URL: "http://mailservice"
       MAIN_TEMPLATE_ID: "9"
       ONBOARDING_TEMPLATE_ID: "8"
       SECOND_ONBOARDING_TEMPLATE_ID: "7"

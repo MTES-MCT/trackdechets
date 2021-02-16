@@ -34,7 +34,7 @@ services:
       - .env
     environment:
       NODE_ENV: dev
-      MOCK_SIB_URL: "true"
+      SIB_BASE_URL: "http://mailservice"
     ports:
       - "4000:80"
 
