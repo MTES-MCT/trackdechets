@@ -37,7 +37,28 @@ TODO
 
 ### Filtres
 
-TODO
+Pour filtrer une liste, on utilise l'argument `filter`. Cette argument est un objet qui peut contenir
+différents champs filtrables en fonction du type de BSD.
+
+```graphql
+bsdList(filter: BsdFilter): [Bsd]
+
+input BsdFilter {
+  wasteCode: string
+  status: FormStatus
+  emitterCompanySiret: string
+  recipientCompanySiret: string
+}
+```
+
+Certains champs filtrables sont communs à l'ensemble des BSD:
+
+- wasteCode
+- status
+- emitterCompanySiret
+- recipientCompanySiret
+- ... // TODO
+
 
 ### Conventions spécifiques aux mutations
 
