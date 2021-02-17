@@ -35,7 +35,7 @@ services:
     environment:
       NODE_ENV: dev
     ports:
-      - "4000:80"
+      - "4000:$API_PORT"
 
   td-ui:
     stdin_open: true
@@ -68,6 +68,7 @@ services:
 
   nginx:
     image: nginx:1.19.6
+    network_mode: $NGINX_NETWORK_MODE
     volumes:
       - ./nginx/templates:/etc/nginx/templates
     environment:
@@ -75,6 +76,7 @@ services:
       API_PORT: $API_PORT
       UI_HOST: $UI_HOST
       DEVELOPERS_HOST: $DEVELOPERS_HOST
+      NGINX_PROXY_HOST: $NGINX_PROXY_HOST
     ports:
       - "80:80"
 
