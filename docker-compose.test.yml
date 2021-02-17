@@ -8,10 +8,12 @@ services:
     environment:
       JWT_SECRET: "xxx"
       EMAIL_BACKEND: "sendinblue"
+      SIB_BASE_URL: "http://mailservice"
       MAIN_TEMPLATE_ID: "9"
       ONBOARDING_TEMPLATE_ID: "8"
       SECOND_ONBOARDING_TEMPLATE_ID: "7"
       SECURITY_CODE_RENEWAL_TEMPLATE_ID: "6"
+
 
   td-ui:
     restart: "no"
