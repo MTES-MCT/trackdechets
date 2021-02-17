@@ -27,35 +27,32 @@ interface EcoOrganismesProps {
 export default function EcoOrganismes(props: EcoOrganismesProps) {
   const [field] = useField<Form["ecoOrganisme"]>(props);
   const { setFieldValue } = useFormikContext<Form>();
-  const [isChecked, setIsChecked] = useState(Boolean(field.value?.siret));
   const [clue, setClue] = useState("");
   const { loading, error, data } = useQuery<Pick<Query, "ecoOrganismes">>(
     GET_ECO_ORGANISMES
   );
 
-  useEffect(() => {
-    // set initial value for ecoOrganisme when the switch is toggled
-    if (isChecked && !field.value) {
+  const hasEcoOrganisme = !!field.value;
+
+  function handleEcoOrganismeToggle() {
+    if (hasEcoOrganisme) {
+      setFieldValue(field.name, null, false);
+    } else {
       setFieldValue(field.name, getInitialEcoOrganisme(), false);
     }
-
-    // set ecoOrganisme to null when the switch is toggled off
-    if (!isChecked && field.value) {
-      setFieldValue(field.name, null, false);
-    }
-  }, [isChecked, field, setFieldValue]);
+  }
 
   return (
     <>
       <div className="form__row">
         <TdSwitch
-          checked={isChecked}
-          onChange={checked => setIsChecked(checked)}
+          checked={hasEcoOrganisme}
+          onChange={handleEcoOrganismeToggle}
           label="Un éco-organisme est le responsable / producteur des déchets de ce bordereau"
         />
       </div>
 
-      {isChecked && (
+      {hasEcoOrganisme && (
         <>
           {loading && <p>Chargement...</p>}
           {error && <p>Erreur lors du chargement des éco-organismes...</p>}
