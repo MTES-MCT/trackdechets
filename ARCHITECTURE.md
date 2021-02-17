@@ -67,7 +67,7 @@ Bien qu'il s'agisse d'un filtre, celui-ci agit sur différentes colonnes avec un
 ```graphql
 bsds(terms: String): [Bsd!]!
 
-// Exemple avec des filtres
+# Exemple avec des filtres
 bsds(terms: String, filter: BsdFilter): [Bsd!]!
 ```
 
@@ -80,6 +80,3 @@ TODO
 ### Erreurs
 
 TODO
-
-
-
