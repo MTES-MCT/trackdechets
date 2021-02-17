@@ -986,7 +986,7 @@ async function checkDestination(siret: string) {
   if (!(isCollector(company) || isWasteProcessor(company))) {
     throw new UserInputError(
       `L'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
-      n'est pas inscrite sur Trackdéchets en tant que qu'installation de traitement ou de tri transit regroupement.
+      n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement.
       Cette installation ne peut donc pas être visée en case 2 du bordereau. Veuillez vous rapprocher de l'administrateur
       de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
     );
@@ -1015,7 +1015,7 @@ async function checkDestinationAfterTempStorage(siret: string) {
   if (!(isCollector(company) || isWasteProcessor(company))) {
     throw new UserInputError(
       `L'installation de destination prévue après entreposage provisoire ou reconditionnement ${company.siret}
-      n'est pas inscrite sur Trackdéchets en tant que qu'installation de traitement ou de tri transit regroupement.
+      n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement.
       Cette installation ne peut donc pas être visée en case 14 du bordereau. Veuillez vous rapprocher de l'administrateur
       de cette installation pour qu'il modifie le profil de l'installation depuis l'interface Trackdéchets Mon Compte > Établissements`
     );
