@@ -59,6 +59,70 @@ Certains champs filtrables sont communs à l'ensemble des BSD:
 - recipientCompanySiret
 - ... // TODO
 
+
+#### Enums
+##### Match strict
+
+```graphql
+query {
+  bsdList(filter: { status: DRAFT })
+} 
+
+```
+##### Contains
+
+```graphql
+query {
+  bsdList(filter: { status_in: [DRAFT, SENT]})
+} 
+
+```
+#### Texte
+##### Match strict
+
+```graphql
+query {
+  bsdList(filter: { emitterCompanySiret: "1234567890"})
+} 
+```
+##### Contains
+
+```graphql
+query {
+  bsdList(filter: { emitterCompanySiret_contains: "12345"}) 
+} 
+```
+
+#### Datetimes
+
+##### Match strict
+
+```graphql
+query {
+  bsdList(filter: { updatedAt: "<date>"})
+} 
+```
+##### LT, LTE, GT, GTE
+
+```graphql
+query {
+  bsdList(filter: { updatedAt_gt: "<date>"})
+} 
+```
+
+```graphql
+query {
+  bsdList(filter: { updatedAt_lt: "<date>"})
+} 
+```
+
+```graphql
+query {
+  bsdList(filter: { updatedAt_lte: "<date>"})
+} 
+
+```
+
 ### Recherche textuel
 
 Certaines queries acceptent un paramètre permettrant de filtrer les résultats selon des termes.
@@ -80,3 +144,6 @@ TODO
 ### Erreurs
 
 TODO
+
+### Validation pré-action
+
