@@ -104,7 +104,7 @@ export default function Recipient() {
           label="Je suis passé par un négociant"
         />
       </div>
-      {hasTrader && values.trader && (
+      {hasTrader && (
         <div className="form__row">
           <h4 className="form__section-heading">Négociant</h4>
           <CompanySelector
@@ -169,9 +169,7 @@ export default function Recipient() {
           </div>
         </div>
       )}
-      {values.recipient?.isTempStorage && values.temporaryStorageDetail && (
-        <TemporaryStorage name="temporaryStorageDetail" />
-      )}
+      {isTempStorage && <TemporaryStorage name="temporaryStorageDetail" />}
     </>
   );
 }
