@@ -43,7 +43,6 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     ...updateInput
   });
 
-  // check companies type in TD
   await checkCompaniesType(form);
 
   const formUpdateInput = {

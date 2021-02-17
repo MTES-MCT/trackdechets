@@ -20,7 +20,6 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   // validate form data
   await checkCanBeSealed(form);
 
-  // check companies type in TD
   await checkCompaniesType(form);
 
   const sealedForm = await transitionForm(user, form, {
