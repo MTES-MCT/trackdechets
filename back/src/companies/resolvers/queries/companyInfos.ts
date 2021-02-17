@@ -52,7 +52,10 @@ export async function getCompanyInfos(siret: string): Promise<CompanyPublic> {
 
     ...companyIcpeInfo,
     ...sireneCompanyInfo,
-    ...convertUrls(trackdechetsCompanyInfo)
+    ...convertUrls({
+      ...trackdechetsCompanyInfo,
+      companyTypes: isRegistered ? trackdechetsCompanyInfo.companyTypes : []
+    })
   };
 
   return company;

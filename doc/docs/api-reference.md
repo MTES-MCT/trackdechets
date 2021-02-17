@@ -1541,11 +1541,12 @@ Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>companyTypes</strong></td>
-<td valign="top">[<a href="#companytype">CompanyType</a>!]</td>
+<td valign="top">[<a href="#companytype">CompanyType</a>!]!</td>
 <td>
 
 Profil de l'établissement sur Trackdéchets
-Valeur à nulle si l'établissement n'est pas inscrit sur la plateforme `isRegistered=false`
+ayant pour valeur un tableau vide quand l'établissement
+n'est pas inscrit sur la plateforme `isRegistered=false`
 
 </td>
 </tr>

@@ -55,7 +55,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       naf: "62.01Z",
       libelleNaf: "Programmation informatique",
       isRegistered: false,
-      companyTypes: null,
+      companyTypes: [],
       contactEmail: null,
       contactPhone: null,
       website: null,

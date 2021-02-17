@@ -205,9 +205,10 @@ export type CompanyPublic = {
   isRegistered: Maybe<Scalars["Boolean"]>;
   /**
    * Profil de l'établissement sur Trackdéchets
-   * Valeur à nulle si l'établissement n'est pas inscrit sur la plateforme `isRegistered=false`
+   * ayant pour valeur un tableau vide quand l'établissement
+   * n'est pas inscrit sur la plateforme `isRegistered=false`
    */
-  companyTypes: Maybe<Array<CompanyType>>;
+  companyTypes: Array<CompanyType>;
   /** Récépissé transporteur associé à cet établissement (le cas échéant) */
   transporterReceipt: Maybe<TransporterReceipt>;
   /** Récépissé négociant associé à cet établissement (le cas échant) */
@@ -2406,7 +2407,7 @@ export function createCompanyPublicMock(
     libelleNaf: null,
     installation: null,
     isRegistered: null,
-    companyTypes: null,
+    companyTypes: [],
     transporterReceipt: null,
     traderReceipt: null,
     ecoOrganismeAgreements: [],
