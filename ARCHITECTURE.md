@@ -59,6 +59,17 @@ Certains champs filtrables sont communs à l'ensemble des BSD:
 - recipientCompanySiret
 - ... // TODO
 
+### Recherche textuel
+
+Certaines queries acceptent un paramètre permettrant de filtrer les résultats selon des termes.
+Bien qu'il s'agisse d'un filtre, celui-ci agit sur différentes colonnes avec un résultat moins déterministe que les filtres classiques.
+
+```graphql
+bsds(terms: String): [Bsd!]!
+
+// Exemple avec des filtres
+bsds(terms: String, filter: BsdFilter): [Bsd!]!
+```
 
 ### Conventions spécifiques aux mutations
 
