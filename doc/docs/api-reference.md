@@ -1540,6 +1540,17 @@ Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>companyTypes</strong></td>
+<td valign="top">[<a href="#companytype">CompanyType</a>!]!</td>
+<td>
+
+Profil de l'établissement sur Trackdéchets
+ayant pour valeur un tableau vide quand l'établissement
+n'est pas inscrit sur la plateforme `isRegistered=false`
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>transporterReceipt</strong></td>
 <td valign="top"><a href="#transporterreceipt">TransporterReceipt</a></td>
 <td>
@@ -1625,15 +1636,6 @@ Code commune de l'établissement
 <td>
 
 Nom de l'établissement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>companyTypes</strong></td>
-<td valign="top">[<a href="#companytype">CompanyType</a>]</td>
-<td>
-
-Profil de l'établissement
 
 </td>
 </tr>
@@ -2044,7 +2046,7 @@ bordereau signé papier via la mutation `importPaperForm`
 <td valign="top"><a href="#recipient">Recipient</a></td>
 <td>
 
-Établissement qui reçoit le déchet (case 2)
+Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
 
 </td>
 </tr>
@@ -4103,7 +4105,9 @@ objet un système d'information tierce
 <td valign="top"><a href="#recipientinput">RecipientInput</a></td>
 <td>
 
-Établissement qui reçoit le déchet (case 2)
+Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+de traitement ou de tri, transit, regroupement.
 
 </td>
 </tr>
@@ -4172,7 +4176,9 @@ Annexe 2
 <td valign="top"><a href="#companyinput">CompanyInput</a></td>
 <td>
 
-Installation de destination prévue
+Installation de destination prévue (case 14)
+L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+de traitement ou de tri, transit, regroupement.
 
 </td>
 </tr>
@@ -4321,7 +4327,9 @@ objet un système d'information tierce
 <td valign="top"><a href="#recipientinput">RecipientInput</a></td>
 <td>
 
-Établissement qui reçoit le déchet (case 2)
+Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+de traitement ou de tri, transit, regroupement.
 
 </td>
 </tr>
@@ -4422,7 +4430,9 @@ pas été émis initialement dans Trackdéchets.
 <td valign="top"><a href="#recipientinput">RecipientInput</a></td>
 <td>
 
-Établissement qui reçoit le déchet (case 2)
+Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+de traitement ou de tri, transit, regroupement.
 
 </td>
 </tr>
@@ -5515,7 +5525,9 @@ objet un système d'information tierce
 <td valign="top"><a href="#recipientinput">RecipientInput</a></td>
 <td>
 
-Établissement qui reçoit le déchet (case 2)
+Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+de traitement ou de tri, transit, regroupement.
 
 </td>
 </tr>

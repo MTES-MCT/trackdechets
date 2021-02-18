@@ -203,6 +203,12 @@ export type CompanyPublic = {
   installation: Maybe<Installation>;
   /** Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets */
   isRegistered: Maybe<Scalars["Boolean"]>;
+  /**
+   * Profil de l'établissement sur Trackdéchets
+   * ayant pour valeur un tableau vide quand l'établissement
+   * n'est pas inscrit sur la plateforme `isRegistered=false`
+   */
+  companyTypes: Array<CompanyType>;
   /** Récépissé transporteur associé à cet établissement (le cas échéant) */
   transporterReceipt: Maybe<TransporterReceipt>;
   /** Récépissé négociant associé à cet établissement (le cas échant) */
@@ -224,8 +230,6 @@ export type CompanySearchResult = {
   codeCommune: Maybe<Scalars["String"]>;
   /** Nom de l'établissement */
   name: Maybe<Scalars["String"]>;
-  /** Profil de l'établissement */
-  companyTypes: Maybe<Array<Maybe<CompanyType>>>;
   /** Code NAF */
   naf: Maybe<Scalars["String"]>;
   /** Libellé NAF */
@@ -291,7 +295,11 @@ export type CreateFormInput = {
   customId: Maybe<Scalars["String"]>;
   /** Établissement émetteur/producteur du déchet (case 1) */
   emitter: Maybe<EmitterInput>;
-  /** Établissement qui reçoit le déchet (case 2) */
+  /**
+   * Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+   * L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+   * de traitement ou de tri, transit, regroupement.
+   */
   recipient: Maybe<RecipientInput>;
   /** Transporteur du déchet (case 8) */
   transporter: Maybe<TransporterInput>;
@@ -363,7 +371,11 @@ export type Destination = {
 };
 
 export type DestinationInput = {
-  /** Installation de destination prévue */
+  /**
+   * Installation de destination prévue (case 14)
+   * L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+   * de traitement ou de tri, transit, regroupement.
+   */
   company: Maybe<CompanyInput>;
   /** N° de CAP prévu (le cas échéant) */
   cap: Maybe<Scalars["String"]>;
@@ -486,7 +498,7 @@ export type Form = {
   isImportedFromPaper: Scalars["Boolean"];
   /** Établissement émetteur/producteur du déchet (case 1) */
   emitter: Maybe<Emitter>;
-  /** Établissement qui reçoit le déchet (case 2) */
+  /** Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2) */
   recipient: Maybe<Recipient>;
   /** Transporteur du déchet (case 8) */
   transporter: Maybe<Transporter>;
@@ -591,7 +603,11 @@ export type FormInput = {
   customId: Maybe<Scalars["String"]>;
   /** Établissement émetteur/producteur du déchet (case 1) */
   emitter: Maybe<EmitterInput>;
-  /** Établissement qui reçoit le déchet (case 2) */
+  /**
+   * Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+   * L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+   * de traitement ou de tri, transit, regroupement.
+   */
   recipient: Maybe<RecipientInput>;
   /** Transporteur du déchet (case 8) */
   transporter: Maybe<TransporterInput>;
@@ -753,7 +769,11 @@ export type ImportPaperFormInput = {
   customId: Maybe<Scalars["String"]>;
   /** Établissement émetteur/producteur du déchet (case 1) */
   emitter: Maybe<EmitterInput>;
-  /** Établissement qui reçoit le déchet (case 2) */
+  /**
+   * Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+   * L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+   * de traitement ou de tri, transit, regroupement.
+   */
   recipient: Maybe<RecipientInput>;
   /** Transporteur du déchet (case 8) */
   transporter: Maybe<TransporterInput>;
@@ -2055,7 +2075,11 @@ export type UpdateFormInput = {
   customId: Maybe<Scalars["String"]>;
   /** Établissement émetteur/producteur du déchet (case 1) */
   emitter: Maybe<EmitterInput>;
-  /** Établissement qui reçoit le déchet (case 2) */
+  /**
+   * Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+   * L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+   * de traitement ou de tri, transit, regroupement.
+   */
   recipient: Maybe<RecipientInput>;
   /** Transporteur du déchet (case 8) */
   transporter: Maybe<TransporterInput>;
@@ -2383,6 +2407,7 @@ export function createCompanyPublicMock(
     libelleNaf: null,
     installation: null,
     isRegistered: null,
+    companyTypes: [],
     transporterReceipt: null,
     traderReceipt: null,
     ecoOrganismeAgreements: [],
@@ -2400,7 +2425,6 @@ export function createCompanySearchResultMock(
     address: null,
     codeCommune: null,
     name: null,
-    companyTypes: null,
     naf: null,
     libelleNaf: null,
     installation: null,

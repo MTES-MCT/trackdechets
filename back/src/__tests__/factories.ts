@@ -76,7 +76,7 @@ export const companyFactory = async (
  * @param role: user role in the company
  */
 export const userWithCompanyFactory = async (
-  role,
+  role: UserRole,
   companyOpts: Partial<Prisma.CompanyCreateInput> = {}
 ) => {
   const company = await companyFactory(companyOpts);
@@ -90,6 +90,21 @@ export const userWithCompanyFactory = async (
     }
   });
   return { user, company };
+};
+
+export const destinationFactory = async (
+  companyOpts: Partial<Prisma.CompanyCreateInput> = {}
+) => {
+  const { company: destination } = await userWithCompanyFactory(
+    UserRole.MEMBER,
+    {
+      ...companyOpts,
+      companyTypes: {
+        set: [CompanyType.WASTEPROCESSOR]
+      }
+    }
+  );
+  return destination;
 };
 
 /**
@@ -250,16 +265,20 @@ export const formFactory = async ({
 
 export const formWithTempStorageFactory = async ({
   ownerId,
-  opt = {}
+  opt = {},
+  tempStorageOpts = {}
 }: {
   ownerId: string;
   opt?: Partial<Prisma.FormCreateInput>;
+  tempStorageOpts?: Partial<Prisma.TemporaryStorageDetailCreateInput>;
 }) => {
   return formFactory({
     ownerId,
     opt: {
       recipientIsTempStorage: true,
-      temporaryStorageDetail: { create: tempStorageData },
+      temporaryStorageDetail: {
+        create: { ...tempStorageData, ...tempStorageOpts }
+      },
       ...opt
     }
   });

@@ -33,6 +33,7 @@ export const COMPANY_INFOS = gql`
       address
       etatAdministratif
       isRegistered
+      companyTypes
       installation {
         codeS3ic
         urlFiche

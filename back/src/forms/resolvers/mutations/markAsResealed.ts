@@ -8,7 +8,7 @@ import {
   flattenResealedFormInput
 } from "../../form-converter";
 import { checkCanMarkAsResealed } from "../../permissions";
-import { resealedFormSchema } from "../../validation";
+import { checkCompaniesType, resealedFormSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 
@@ -42,6 +42,8 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     ...temporaryStorageDetail,
     ...updateInput
   });
+
+  await checkCompaniesType(form);
 
   const formUpdateInput = {
     temporaryStorageDetail: {

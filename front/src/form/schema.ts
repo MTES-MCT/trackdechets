@@ -19,7 +19,10 @@ import {
   Packagings,
   Consistence,
   WasteAcceptationStatusInput as WasteAcceptationStatus,
+  CompanyType,
 } from "generated/graphql/types";
+import graphlClient from "../graphql-client";
+import { COMPANY_INFOS } from "./company/query";
 
 setLocale({
   mixed: {
@@ -50,6 +53,40 @@ const companySchema = object().shape({
     .email("Le format d'adresse email est incorrect")
     .required("L'email est obligatoire"),
 });
+
+// Destination should be a company registered in TD with profile COLLECTOR or WASTEPROCESSOR
+const destinationSchema = companySchema.concat(
+  object().shape({
+    siret: string().test(
+      "is-registered",
+      `Cet établissement n'est pas inscrit sur Trackdéchets ou son profil
+    ne lui permet pas d'être destinataire du bordereau. Seuls les établissements
+    inscrits sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement
+    peuvent apparaitre en tant que destinataire sur le bordereau`,
+      async value => {
+        if (value) {
+          const { data } = await graphlClient.query({
+            query: COMPANY_INFOS,
+            variables: { siret: value },
+          });
+          // it should be registered to TD
+          if (data.companyInfos?.isRegistered === false) {
+            return false;
+          }
+          if (data.companyInfos?.companyTypes) {
+            // it should be COLLECTOR or WASTEPROCESSOR
+            return data.companyInfos?.companyTypes.some(companyType =>
+              [CompanyType.Collector, CompanyType.Wasteprocessor].includes(
+                companyType
+              )
+            );
+          }
+        }
+        return true;
+      }
+    ),
+  })
+);
 
 const packagingInfo: ObjectSchema<PackagingInfo> = object().shape({
   type: mixed<Packagings>().required(
@@ -87,14 +124,18 @@ export const formSchema = object().shape({
   id: string().required(),
   emitter: object().shape({
     type: string().matches(/(PRODUCER|OTHER|APPENDIX2)/),
-    workSite: object({
+    workSite: object().notRequired().nullable().shape({
       name: string().nullable(),
       address: string().nullable(),
       city: string().nullable(),
       postalCode: string().nullable(),
       infos: string().nullable(),
-    }).nullable(),
+    }),
     company: companySchema,
+  }),
+  ecoOrganisme: object().notRequired().nullable().shape({
+    name: string().required(),
+    siret: string().required(),
   }),
   recipient: object().shape({
     processingOperation: string()
@@ -105,7 +146,7 @@ export const formSchema = object().shape({
         (v: string) => v !== ""
       ),
     cap: string().nullable(true),
-    company: companySchema,
+    company: destinationSchema,
   }),
   transporter: object().shape({
     isExemptedOfReceipt: boolean().nullable(true),
@@ -129,6 +170,15 @@ export const formSchema = object().shape({
     numberPlate: string().nullable(true),
     company: companySchema,
   }),
+  trader: object()
+    .notRequired()
+    .nullable()
+    .shape({
+      company: companySchema,
+      validityLimit: date().nullable(true),
+      department: string().nullable(),
+      receipt: string().nullable(),
+    }),
   wasteDetails: object().shape({
     code: string().required("Code déchet manquant"),
     name: string().nullable(true),
@@ -176,6 +226,14 @@ export const formSchema = object().shape({
       "La consistance du déchet doit être précisée"
     ),
   }),
+  temporaryStorageDetail: object()
+    .notRequired()
+    .nullable()
+    .shape({
+      destination: object().notRequired().nullable().shape({
+        company: destinationSchema,
+      }),
+    }),
 });
 
 export const receivedFormSchema = object().shape({

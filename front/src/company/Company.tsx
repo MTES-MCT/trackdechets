@@ -20,6 +20,7 @@ const COMPANY_INFOS = gql`
       naf
       libelleNaf
       isRegistered
+      companyTypes
       contactEmail
       contactPhone
       website
@@ -103,7 +104,10 @@ export default function CompanyInfo() {
             libelleNaf={company.libelleNaf}
           />
 
-          <CompanyRegistration isRegistered={company.isRegistered} />
+          <CompanyRegistration
+            isRegistered={company.isRegistered}
+            companyTypes={company.companyTypes}
+          />
 
           <CompanyDisclaimer />
 

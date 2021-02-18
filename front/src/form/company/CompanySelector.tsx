@@ -43,7 +43,7 @@ export default function CompanySelector({
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
   const [field] = useField<FormCompany>({ name });
-  const { setFieldValue } = useFormikContext();
+  const { setFieldValue, setFieldTouched } = useFormikContext();
   const [clue, setClue] = useState("");
   const [department, setDepartement] = useState<null | string>(null);
   const [
@@ -158,6 +158,7 @@ export default function CompanySelector({
                   type="text"
                   className={`td-input ${styles.companySelectorSearchSiret}`}
                   onChange={event => setClue(event.target.value)}
+                  onBlur={() => setFieldTouched(`${field.name}.siret`, true)}
                 />
                 <i className={styles.searchIcon} aria-label="Recherche">
                   <IconSearch size="12px" />

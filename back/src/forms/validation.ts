@@ -1,4 +1,6 @@
 import {
+  Company,
+  CompanyType,
   Consistence,
   EmitterType,
   Form,
@@ -954,4 +956,98 @@ export async function checkCanBeSealed(form: Form) {
       throw err;
     }
   }
+}
+
+function isCollector(company: Company) {
+  return company.companyTypes.includes(CompanyType.COLLECTOR);
+}
+
+function isWasteProcessor(company: Company) {
+  return company.companyTypes.includes(CompanyType.WASTEPROCESSOR);
+}
+
+/**
+ * Check company in frame 2 is registered with profile
+ * COLLECTOR or WASTE_PROCESSOR or throw error
+ */
+async function checkDestination(siret: string) {
+  // check company is registered in Trackdechets
+  const company = await prisma.company.findUnique({
+    where: { siret }
+  });
+
+  if (!company) {
+    throw new UserInputError(
+      "L'installation de destination ou d’entreposage ou de reconditionnement prévue (cadre 2) n'est pas inscrite sur Trackdéchets"
+    );
+  }
+
+  // check company has profile COLLECTOR or WASTE_PROCESSOR
+  if (!(isCollector(company) || isWasteProcessor(company))) {
+    throw new UserInputError(
+      `L'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
+      n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement.
+      Cette installation ne peut donc pas être visée en case 2 du bordereau. Veuillez vous rapprocher de l'administrateur
+      de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+    );
+  }
+
+  return true;
+}
+
+/**
+ * Check company in frame 2 is registered with profile
+ * COLLECTOR or WASTE_PROCESSOR or throw error
+ */
+async function checkDestinationAfterTempStorage(siret: string) {
+  // check company in frame 14 is registered in Trackdechets
+  const company = await prisma.company.findUnique({
+    where: { siret }
+  });
+
+  if (!company) {
+    throw new UserInputError(
+      "L'installation de destination prévue après entreposage provisoire ou reconditionnement (cadre 14) n'est pas inscrite sur Trackdéchets"
+    );
+  }
+
+  // check company has profile COLLECTOR or WASTE_PROCESSOR
+  if (!(isCollector(company) || isWasteProcessor(company))) {
+    throw new UserInputError(
+      `L'installation de destination prévue après entreposage provisoire ou reconditionnement ${company.siret}
+      n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement.
+      Cette installation ne peut donc pas être visée en case 14 du bordereau. Veuillez vous rapprocher de l'administrateur
+      de cette installation pour qu'il modifie le profil de l'installation depuis l'interface Trackdéchets Mon Compte > Établissements`
+    );
+  }
+
+  return true;
+}
+
+/**
+ * Check that the n°SIRET appearing on the form match existing
+ * companies registered in Trackdechets and that their profile
+ * is consistent with the role they play on the form
+ * (producer, trader, destination, etc)
+ *
+ * For the time beeing we are only checking companies in frame 2 and 14
+ * (if any). They should be registered as COLLECTOR (TTR) or WASTEPROCESSOR
+ */
+export async function checkCompaniesType(form: Form) {
+  await checkDestination(form.recipientCompanySiret);
+
+  const temporaryStorageDetail = await prisma.form
+    .findUnique({ where: { id: form.id } })
+    .temporaryStorageDetail();
+
+  if (
+    temporaryStorageDetail &&
+    temporaryStorageDetail.destinationCompanySiret
+  ) {
+    await checkDestinationAfterTempStorage(
+      temporaryStorageDetail.destinationCompanySiret
+    );
+  }
+
+  return true;
 }

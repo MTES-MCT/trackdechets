@@ -566,7 +566,7 @@ type Form {
   "Établissement émetteur/producteur du déchet (case 1)"
   emitter: Emitter
 
-  "Établissement qui reçoit le déchet (case 2)"
+  "Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)"
   recipient: Recipient
 
   "Transporteur du déchet (case 8)"

@@ -1,9 +1,12 @@
 import { Field, useFormikContext } from "formik";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "./company/CompanySelector";
 import DateInput from "./custom-inputs/DateInput";
-import initialState from "./initial-state";
+import {
+  getInitalTrader,
+  getInitialTemporaryStorageDetail,
+} from "./initial-state";
 import { Form } from "generated/graphql/types";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import TemporaryStorage from "./temporaryStorage/TemporaryStorage";
@@ -15,37 +18,51 @@ import classNames from "classnames";
 export default function Recipient() {
   const { values, setFieldValue } = useFormikContext<Form>();
 
-  const [hasTrader, setHasTrader] = useState(!!values.trader?.company?.siret);
+  const hasTrader = !!values.trader;
+  const isTempStorage = !!values.recipient?.isTempStorage;
 
-  useEffect(() => {
-    if (!hasTrader) {
-      setFieldValue("trader.company", initialState.trader.company);
+  function handleTraderToggle() {
+    if (hasTrader) {
+      // the switch is toggled off, set trader to null
+      setFieldValue("trader", null, false);
+    } else {
+      // the switch is toggled on, set trader to initial value
+      setFieldValue("trader", getInitalTrader(), false);
     }
-  }, [hasTrader, setFieldValue]);
+  }
+
+  function handleTempStorageToggle() {
+    if (isTempStorage) {
+      // the switch is toggled off, set isTempStorage to false
+      setFieldValue("recipient.isTempStorage", false, false);
+      setFieldValue("temporaryStorageDetail", null, false);
+    } else {
+      // the switch is toggled on, set isTempStorage to true
+      setFieldValue("recipient.isTempStorage", true, false);
+      setFieldValue(
+        "temporaryStorageDetail",
+        getInitialTemporaryStorageDetail(),
+        false
+      );
+    }
+  }
 
   return (
     <>
       <div className="form__row">
         <TdSwitch
           checked={!!values.recipient?.isTempStorage}
-          onChange={() =>
-            setFieldValue(
-              "recipient.isTempStorage",
-              !values.recipient?.isTempStorage
-            )
-          }
+          onChange={handleTempStorageToggle}
           label="Le BSD va passer par une étape d'entreposage provisoire ou
           reconditionnement"
         />
       </div>
-
       <h4 className="form__section-heading">
         Installation{" "}
-        {values.recipient?.isTempStorage
+        {isTempStorage
           ? "d'entreposage ou de reconditionnement"
           : "de destination"}
       </h4>
-
       <div className={styles.recipientTextQuote}>
         <p>
           Pour vous assurer que l'entreprise de destination est autorisée à
@@ -60,11 +77,8 @@ export default function Recipient() {
           </a>
         </p>
       </div>
-
       <CompanySelector name="recipient.company" />
-
       <h4 className="form__section-heading">Informations complémentaires</h4>
-
       <div className="form__row">
         <Field
           component={ProcessingOperation}
@@ -73,7 +87,6 @@ export default function Recipient() {
 
         <RedErrorMessage name="recipient.processingOperation" />
       </div>
-
       <div className="form__row">
         <label>
           Numéro de CAP (optionnel)
@@ -84,11 +97,10 @@ export default function Recipient() {
           />
         </label>
       </div>
-
       <div className="form__row">
         <TdSwitch
           checked={hasTrader}
-          onChange={() => setHasTrader(!hasTrader)}
+          onChange={handleTraderToggle}
           label="Je suis passé par un négociant"
         />
       </div>
@@ -157,8 +169,7 @@ export default function Recipient() {
           </div>
         </div>
       )}
-
-      <TemporaryStorage name="temporaryStorageDetail" />
+      {isTempStorage && <TemporaryStorage name="temporaryStorageDetail" />}
     </>
   );
 }
