@@ -154,9 +154,21 @@ bsds(terms: String, filter: BsdFilter): [Bsd!]!
 
 ### Conventions spécifiques aux mutations
 
-### Variables
+### Arguments
 
-TODO
+On regroupe l'ensemble des arguments d'une mutation dans un seul input, exception faite de l'identifiant d'un BSD lors d'un update.
+
+```graphql
+mutation {
+  create(input: CreateBsdInput!)
+}
+mutation {
+  sign(input: SignatureInput!)
+}
+mutation {
+  update(id: ID!, input: SignatureInput!)
+}
+```
 
 ### Erreurs
 
