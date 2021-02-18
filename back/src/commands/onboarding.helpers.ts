@@ -16,14 +16,14 @@ export const xDaysAgo = (baseDate: Date, daysAgo: number): Date => {
   return new Date(clonedDate.toDateString());
 };
 
-type getRecipientsParams = {
+type getRecentlyJoinedUsersParams = {
   daysAgo: number;
   retrieveCompanies?: boolean;
 };
-export const getRecipients = async ({
+export const getRecentlyJoinedUsers = async ({
   daysAgo,
   retrieveCompanies = false
-}: getRecipientsParams) => {
+}: getRecentlyJoinedUsersParams) => {
   const now = new Date();
 
   const inscriptionDateGt = xDaysAgo(now, daysAgo);
@@ -33,10 +33,7 @@ export const getRecipients = async ({
 
   return prisma.user.findMany({
     where: {
-      AND: [
-        { createdAt: { gt: inscriptionDateGt } },
-        { createdAt: { lt: inscriptionDateLt } }
-      ],
+      createdAt: { gt: inscriptionDateGt, lt: inscriptionDateLt },
       isActive: true
     },
     ...(retrieveCompanies && {
@@ -49,7 +46,7 @@ export const getRecipients = async ({
  * Send first step onboarding email to active users who suscribed yesterday
  */
 export const sendOnboardingFirstStepMails = async () => {
-  const recipients = await getRecipients({ daysAgo: 1 });
+  const recipients = await getRecentlyJoinedUsers({ daysAgo: 1 });
   await Promise.all(
     recipients.map(recipient => {
       const payload = userMails.onboardingFirstStep(
@@ -83,6 +80,7 @@ export const selectSecondOnboardingEmail = (recipient: recipientType) => {
   if (companyTypes.size == 1 && companyTypes.has("PRODUCER")) {
     return userMails.onboardingProducerSecondStep;
   }
+  //
   return userMails.onboardingProfessionalSecondStep;
 };
 
@@ -92,7 +90,9 @@ export const selectSecondOnboardingEmail = (recipient: recipientType) => {
  */
 
 export const sendOnboardingSecondStepMails = async () => {
-  const recipients = await getRecipients({
+  // we explictly retrieve user companies to tell apart producers from waste
+  // professionals to selectthe right email template
+  const recipients = await getRecentlyJoinedUsers({
     daysAgo: 3,
     retrieveCompanies: true
   });

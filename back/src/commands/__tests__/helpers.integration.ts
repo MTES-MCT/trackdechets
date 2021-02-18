@@ -3,7 +3,7 @@ import { CompanyType } from "@prisma/client";
 import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
 import prisma from "../../prisma";
 import {
-  getRecipients,
+  getRecentlyJoinedUsers,
   selectSecondOnboardingEmail
 } from "../onboarding.helpers";
 
@@ -14,7 +14,7 @@ describe("Retrieve relevant users for onboarding emails", () => {
     yesterday.setDate(yesterday.getDate() - 1);
     const user = await userFactory({ createdAt: yesterday });
     await userFactory(); // another user created just now
-    const recipients = await getRecipients({ daysAgo: 1 });
+    const recipients = await getRecentlyJoinedUsers({ daysAgo: 1 });
     expect(recipients.length).toEqual(1);
     expect(recipients[0].id).toEqual(user.id);
     expect(recipients[0].companyAssociations).toBeUndefined();
@@ -29,7 +29,7 @@ describe("Retrieve relevant users for onboarding emails", () => {
       data: { createdAt: yesterday }
     });
     await userFactory(); // another user created just now
-    const recipients = await getRecipients({
+    const recipients = await getRecentlyJoinedUsers({
       daysAgo: 1,
       retrieveCompanies: true
     });
