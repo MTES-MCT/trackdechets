@@ -33,7 +33,47 @@ TODO
 
 ### Pagination
 
-TODO
+Nous suivons la spécification relay permettant de paginer par curseur: https://relay.dev/graphql/connections.htm. Voir aussi https://graphql.org/learn/pagination/
+Toutes les requêtes permettant de lister des ressources renvoie un objet de type Connection
+
+```graphql
+interface Connection {
+  pageInfo: PageInfo
+  edges: [Edge]
+  totalCount: Int # nombre de résultat en tout
+}
+
+type PageInfo {
+  hasPreviousPage: Boolean!
+  hasNextPage: Boolean!
+  startCursor: ID!
+  endCursor: ID!
+}
+
+interface Edge {
+  cursor: ID
+}
+
+type PaginationArgs {
+  first: Int
+  after: ID
+  last: Int
+  before: ID
+}
+
+type Query {
+  dasris(pagination: PaginationArgs, filter: DasriFilter): DasriConnection
+}
+
+type DasriConnection implements Connection {
+  pageInfo: PageInfo
+  edges: {
+    cursor: ID
+    node: Dasri
+  }
+}
+
+```
 
 ### Filtres
 
