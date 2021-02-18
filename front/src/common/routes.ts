@@ -20,9 +20,18 @@ export default {
       act: "/dashboard/:siret/slips/act",
       follow: "/dashboard/:siret/slips/follow",
       history: "/dashboard/:siret/slips/history",
+
+      // FIXME: we need a different route depending on the form's type
+      // e.g /dashboard/:siret/dasri/:id
+      //     /dashboard/:siret/vhu/:id
+      // but we could also go with something like:
+      // /dashboard/:siret/slips/dasri/:id
+      // /dashboard/:siret/slips/vhu/:id
+      // it would have the advantage of not creating:
+      // /dashboard/:siret/dasris for which we have nothing to show
       view: "/dashboard/:siret/slips/view/:id",
-      create: "/dashboard/:siret/slips/create",
       edit: "/dashboard/:siret/slips/edit/:id",
+      create: "/dashboard/:siret/slips/create",
     },
     transport: {
       index: "/dashboard/:siret/transport",
