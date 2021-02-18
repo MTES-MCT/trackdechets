@@ -7,9 +7,12 @@ import {
   Route,
   Switch,
   useHistory,
+  useLocation,
   useParams,
 } from "react-router-dom";
+import { Location } from "history";
 import routes from "common/routes";
+import { Modal } from "common/components";
 import { InlineError } from "../common/components/Error";
 import Loader from "../common/components/Loaders";
 import "./Dashboard.scss";
@@ -17,9 +20,16 @@ import DashboardMenu from "./DashboardMenu";
 import Exports from "./exports/Exports";
 import RouteTransport from "./transport/RouteTransport";
 import { OnboardingSlideshow } from "./OnboardingSlideshow";
-import RouteSlips from "./slips/RouteSlips";
+import {
+  RouteSlipsView,
+  RouteSlipsAct,
+  RouteSlipsDrafts,
+  RouteSlipsFollow,
+  RouteSlipsHistory,
+} from "./slips";
 
 import { Query } from "generated/graphql/types";
+import DisclaimerBanner from "./DisclaimerBanner";
 import Stats from "./stats/Stats";
 
 export const GET_ME = gql`
@@ -40,11 +50,18 @@ export const GET_ME = gql`
 export default function Dashboard() {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
+  const location = useLocation<{ background?: Location }>();
+  const backgroundLocation = location.state?.background;
 
   const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME);
 
-  if (loading) return <Loader />;
-  if (error) return <InlineError apolloError={error} />;
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <InlineError apolloError={error} />;
+  }
 
   if (data) {
     const companies = data.me.companies;
@@ -67,6 +84,7 @@ export default function Dashboard() {
     return (
       <>
         <OnboardingSlideshow />
+
         <div id="dashboard" className="dashboard">
           <DashboardMenu
             me={data.me}
@@ -80,9 +98,22 @@ export default function Dashboard() {
           />
 
           <div className="dashboard-content">
-            <Switch>
-              <Route path={routes.dashboard.slips.index}>
-                <RouteSlips />
+            <DisclaimerBanner />
+            <Switch location={backgroundLocation ?? location}>
+              <Route path={routes.dashboard.slips.view}>
+                <RouteSlipsView />
+              </Route>
+              <Route path={routes.dashboard.slips.drafts}>
+                <RouteSlipsDrafts />
+              </Route>
+              <Route path={routes.dashboard.slips.act}>
+                <RouteSlipsAct />
+              </Route>
+              <Route path={routes.dashboard.slips.follow}>
+                <RouteSlipsFollow />
+              </Route>
+              <Route path={routes.dashboard.slips.history}>
+                <RouteSlipsHistory />
               </Route>
               <Route path={routes.dashboard.transport.index}>
                 <RouteTransport />
@@ -103,6 +134,20 @@ export default function Dashboard() {
             </Switch>
           </div>
         </div>
+
+        {backgroundLocation && (
+          <Route path={routes.dashboard.slips.view}>
+            <Modal
+              ariaLabel="Aperçu"
+              onClose={() => {
+                history.goBack();
+              }}
+              isOpen
+            >
+              <RouteSlipsView />
+            </Modal>
+          </Route>
+        )}
       </>
     );
   }

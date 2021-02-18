@@ -3,7 +3,8 @@ import { useParams } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";
 import { Query } from "generated/graphql/types";
 import { formSearchResultFragment } from "common/fragments";
-import { FormSearchResultTable } from "../../FormSearchResultTable";
+import { Breadcrumb, BreadcrumbItem } from "common/components";
+import { FormSearchResultTable } from "../FormSearchResultTable";
 
 export const SEARCH_ARCHIVES = gql`
   query SearchFollows($siret: String!) {
@@ -17,7 +18,7 @@ export const SEARCH_ARCHIVES = gql`
   ${formSearchResultFragment}
 `;
 
-export default function HistoryTab() {
+export function RouteSlipsHistory() {
   const { siret } = useParams<{ siret: string }>();
   const { data } = useQuery<Pick<Query, "searchForms">>(SEARCH_ARCHIVES, {
     variables: {
@@ -28,5 +29,13 @@ export default function HistoryTab() {
   // TODO: blankslate
   // TODO: loading state
 
-  return <FormSearchResultTable searchResults={data?.searchForms ?? []} />;
+  return (
+    <>
+      <Breadcrumb>
+        <BreadcrumbItem>Mes bordereaux</BreadcrumbItem>
+        <BreadcrumbItem>Archives</BreadcrumbItem>
+      </Breadcrumb>
+      <FormSearchResultTable searchResults={data?.searchForms ?? []} />
+    </>
+  );
 }

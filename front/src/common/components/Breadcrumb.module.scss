@@ -1,0 +1,14 @@
+.Breadcrumb {
+  list-style: none;
+  padding: 1rem;
+  margin: 0;
+  display: flex;
+  font-size: 1.5rem;
+}
+
+.BreadcrumbItem {
+  &:not(:last-child)::after {
+    content: ">";
+    margin: 0 0.5rem;
+  }
+}

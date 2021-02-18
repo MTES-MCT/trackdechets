@@ -1,5 +1,11 @@
 import * as React from "react";
-import { Link, generatePath, useParams } from "react-router-dom";
+import {
+  Link,
+  generatePath,
+  useParams,
+  useHistory,
+  useLocation,
+} from "react-router-dom";
 import cogoToast from "cogo-toast";
 import { gql, useMutation } from "@apollo/client";
 import {
@@ -19,7 +25,6 @@ import {
 import { fullFormFragment } from "common/fragments";
 import routes from "common/routes";
 import { IconChevronUp, IconChevronDown } from "common/components/Icons";
-import { QuicklookModal } from "../../../slips/slips-actions/Quicklook";
 import { DeleteModal } from "../../../slips/slips-actions/Delete";
 
 const DUPLICATE_FORM = gql`
@@ -37,9 +42,9 @@ interface ActionsDropdownProps {
 
 export function ActionsDropdown({ searchResult }: ActionsDropdownProps) {
   const { siret } = useParams<{ siret: string }>();
-  const [currentModal, setCurrentModal] = React.useState<
-    "PREVIEW" | "DELETE" | null
-  >(null);
+  const history = useHistory();
+  const location = useLocation();
+  const [currentModal, setCurrentModal] = React.useState<"DELETE" | null>(null);
 
   const [duplicateForm] = useMutation<
     Pick<Mutation, "duplicateForm">,
@@ -68,7 +73,17 @@ export function ActionsDropdown({ searchResult }: ActionsDropdownProps) {
               {isExpanded ? <IconChevronUp /> : <IconChevronDown />} Actions
             </MenuButton>
             <MenuList>
-              <MenuItem onSelect={() => setCurrentModal("PREVIEW")}>
+              <MenuItem
+                onSelect={() => {
+                  history.push(
+                    generatePath(routes.dashboard.slips.view, {
+                      siret,
+                      id: searchResult.id,
+                    }),
+                    { background: location }
+                  );
+                }}
+              >
                 Aperçu
               </MenuItem>
               <MenuItem onSelect={() => duplicateForm()}>Dupliquer</MenuItem>
@@ -94,12 +109,6 @@ export function ActionsDropdown({ searchResult }: ActionsDropdownProps) {
           </>
         )}
       </Menu>
-      {currentModal === "PREVIEW" && (
-        <QuicklookModal
-          formId={searchResult.id}
-          onClose={() => setCurrentModal(null)}
-        />
-      )}
       {currentModal === "DELETE" && (
         <DeleteModal
           formId={searchResult.id}

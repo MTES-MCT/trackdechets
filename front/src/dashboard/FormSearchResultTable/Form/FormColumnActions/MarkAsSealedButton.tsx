@@ -14,7 +14,7 @@ import { updateApolloCache } from "common/helper";
 import { Modal, ModalTitle, useModal } from "common/components";
 import { IconPaperWrite } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
-import { SEARCH_DRAFTS } from "../../../slips/tabs/DraftsTab";
+import { SEARCH_DRAFTS } from "../../../slips";
 
 const MARK_AS_SEALED = gql`
   mutation MarkAsSealed($id: ID!) {

@@ -8,6 +8,7 @@ import {
   useRouteMatch,
 } from "react-router-dom";
 import classNames from "classnames";
+import { Breadcrumb, BreadcrumbItem } from "common/components";
 import { IconLayout2, IconLayoutModule1 } from "common/components/Icons";
 import routes from "common/routes";
 import ToCollectTab from "./tabs/ToCollectTab";
@@ -20,13 +21,18 @@ export default function RouteTransport() {
   const toCollect = useRouteMatch(routes.dashboard.transport.toCollect);
   const collected = useRouteMatch(routes.dashboard.transport.collected);
 
-  // FIXME: not cross-environment proof (e.g SSR)
-  // FIXME: the app would crash if localStorage doesn't work
-  const preferredDisplayMode = window.localStorage.getItem(DISPLAY_MODE_KEY);
   const [displayMode, setDisplayMode] = React.useState<"TABLE" | "CARDS">(
-    preferredDisplayMode && ["TABLE", "CARDS"].includes(preferredDisplayMode)
-      ? (preferredDisplayMode as "TABLE" | "CARDS")
-      : "TABLE"
+    () => {
+      // FIXME: not cross-environment proof (e.g SSR)
+      // FIXME: the app would crash if localStorage doesn't work
+      const preferredDisplayMode = window.localStorage.getItem(
+        DISPLAY_MODE_KEY
+      );
+      return preferredDisplayMode &&
+        ["TABLE", "CARDS"].includes(preferredDisplayMode)
+        ? (preferredDisplayMode as "TABLE" | "CARDS")
+        : "TABLE";
+    }
   );
 
   React.useEffect(() => {
@@ -36,16 +42,16 @@ export default function RouteTransport() {
 
   return (
     <>
-      <div style={{ margin: "1em 0 0 1em" }}>
-        <h2 className="h2 tw-mb-4">
-          Transport{" "}
-          <span>
-            {"> "}
-            {toCollect && "À collecter"}
-            {collected && "Chargés, en attente de réception ou de transfert"}
-          </span>
-        </h2>
-      </div>
+      <Breadcrumb>
+        <BreadcrumbItem>Transport</BreadcrumbItem>
+        {toCollect && <BreadcrumbItem>À collecter</BreadcrumbItem>}
+        {collected && (
+          <BreadcrumbItem>
+            Chargés, en attente de réception ou de transfert
+          </BreadcrumbItem>
+        )}
+      </Breadcrumb>
+
       <div style={{ margin: "1rem" }}>
         <button
           type="button"
