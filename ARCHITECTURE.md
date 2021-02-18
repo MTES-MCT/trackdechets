@@ -54,7 +54,7 @@ input BsdFilter {
 }
 ```
 
-### Opérateurs logique
+#### Opérateurs logique
 
 Il est possible d'utiliser des opérateurs logiques pour combiner des filtres.
 Par exemple la requête suivante permet de rechercher tous les bordereaux
