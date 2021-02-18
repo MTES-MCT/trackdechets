@@ -1,17 +1,12 @@
 import { Field, Form, Formik } from "formik";
 import React, { useState } from "react";
-import { mergeDefaults, updateApolloCache } from "common/helper";
+import { mergeDefaults } from "common/helper";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "form/company/CompanySelector";
 import NumberInput from "form/custom-inputs/NumberInput";
 import { RadioButton } from "form/custom-inputs/RadioButton";
 import Packagings from "form/packagings/Packagings";
-import {
-  FormStatus,
-  Mutation,
-  Query,
-  WasteDetails,
-} from "generated/graphql/types";
+import { FormStatus, Mutation, WasteDetails } from "generated/graphql/types";
 import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "common/components/Modal";
@@ -19,7 +14,6 @@ import { ActionButton } from "common/components";
 import { IconPaperWrite } from "common/components/Icons";
 import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
-import { ACT_TAB_FORMS, FOLLOW_TAB_FORMS } from "dashboard/slips/tabs/queries";
 import { NotificationError } from "common/components/Error";
 import cogoToast from "cogo-toast";
 import Transporter from "form/Transporter";
@@ -89,22 +83,8 @@ export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
         return;
       }
       const resealedForm = data.markAsResealed;
-      // remove form from the action tab
-      updateApolloCache<Pick<Query, "forms">>(cache, {
-        query: ACT_TAB_FORMS,
-        variables: { siret },
-        getNewData: data => ({
-          forms: [...data.forms].filter(form => form.id !== resealedForm.id),
-        }),
-      });
-      // add the form to the follow tab
-      updateApolloCache<Pick<Query, "forms">>(cache, {
-        query: FOLLOW_TAB_FORMS,
-        variables: { siret },
-        getNewData: data => ({
-          forms: [resealedForm, ...data.forms],
-        }),
-      });
+      // FIXME: remove form from the action tab
+      // FIXME: add the form to the follow tab
     },
     onCompleted: data => {
       if (

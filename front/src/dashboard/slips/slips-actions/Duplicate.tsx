@@ -2,14 +2,8 @@ import { gql, useMutation } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import React from "react";
 import { IconDuplicateFile } from "common/components/Icons";
-import { updateApolloCache } from "common/helper";
 import { generatePath, useHistory, useParams } from "react-router-dom";
-import {
-  Form,
-  Mutation,
-  MutationDuplicateFormArgs,
-} from "generated/graphql/types";
-import { DRAFT_TAB_FORMS } from "../tabs/queries";
+import { Mutation, MutationDuplicateFormArgs } from "generated/graphql/types";
 import routes from "common/routes";
 import { fullFormFragment } from "common/fragments";
 
@@ -47,13 +41,7 @@ export default function Duplicate({
         return;
       }
       const duplicateForm = data.duplicateForm;
-      updateApolloCache<{ forms: Form[] }>(store, {
-        query: DRAFT_TAB_FORMS,
-        variables: { siret },
-        getNewData: data => ({
-          forms: [duplicateForm, ...data.forms],
-        }),
-      });
+      // FIXME: add to drafts tab
     },
     onCompleted: () => {
       if (onClose) {

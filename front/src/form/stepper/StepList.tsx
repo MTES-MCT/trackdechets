@@ -14,11 +14,8 @@ import { useHistory, useParams, generatePath } from "react-router-dom";
 
 import { Breadcrumb, BreadcrumbItem } from "common/components";
 import { InlineError } from "common/components/Error";
-import { updateApolloCache } from "common/helper";
-import { DRAFT_TAB_FORMS } from "dashboard/slips/tabs/queries";
 import initialState from "../initial-state";
 import {
-  Form,
   Query,
   QueryFormArgs,
   Mutation,
@@ -67,16 +64,7 @@ export default function StepList(props: IProps) {
         return;
       }
       const createdForm = data.createForm;
-      updateApolloCache<{ forms: Form[] }>(store, {
-        query: DRAFT_TAB_FORMS,
-        variables: { siret },
-        getNewData: data => ({
-          forms: [
-            createdForm,
-            ...data.forms.filter(f => f.id !== createdForm.id),
-          ],
-        }),
-      });
+      // FIXME: add to drafts tab
     },
   });
 

@@ -15,9 +15,9 @@ import Loader from "../common/components/Loaders";
 import "./Dashboard.scss";
 import DashboardMenu from "./DashboardMenu";
 import Exports from "./exports/Exports";
-import SlipsContainer from "./slips/SlipsContainer";
 import Transport from "./transport/Transport";
 import { OnboardingSlideshow } from "./OnboardingSlideshow";
+import RouteSlips from "./slips/RouteSlips";
 
 import { Query } from "generated/graphql/types";
 import Stats from "./stats/Stats";
@@ -82,7 +82,7 @@ export default function Dashboard() {
           <div className="dashboard-content">
             <Switch>
               <Route path={routes.dashboard.slips.index}>
-                <SlipsContainer />
+                <RouteSlips />
               </Route>
               <Route path={routes.dashboard.transport.index}>
                 <Transport />

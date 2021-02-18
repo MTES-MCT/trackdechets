@@ -1,13 +1,10 @@
 import React, { useState } from "react";
 import { IconTrash } from "common/components/Icons";
-import { DRAFT_TAB_FORMS, FOLLOW_TAB_FORMS } from "../tabs/queries";
 import { gql, useMutation } from "@apollo/client";
-import { updateApolloCache } from "common/helper";
 import {
   FormStatus,
   Mutation,
   MutationDeleteFormArgs,
-  Query,
 } from "generated/graphql/types";
 import { useParams } from "react-router-dom";
 import cogoToast from "cogo-toast";
@@ -48,25 +45,9 @@ export function DeleteModal({ formId, onClose }: DeleteModalProps) {
       const deleteForm = data.deleteForm;
 
       if (deleteForm.status === FormStatus.Draft) {
-        // update draft tab
-        updateApolloCache<Pick<Query, "forms">>(cache, {
-          query: DRAFT_TAB_FORMS,
-          variables: { siret },
-          getNewData: data => ({
-            forms: [...data.forms.filter(f => f.id !== deleteForm.id)],
-          }),
-        });
+        // FIXME: update draft tab
       } else if (deleteForm.status === FormStatus.Sealed) {
-        // update follow tab
-        updateApolloCache<Pick<Query, "forms">>(cache, {
-          query: FOLLOW_TAB_FORMS,
-          variables: {
-            siret,
-          },
-          getNewData: data => ({
-            forms: [...data.forms.filter(f => f.id !== deleteForm.id)],
-          }),
-        });
+        // FIXME: update follow tab
       }
     },
     onCompleted: () => {

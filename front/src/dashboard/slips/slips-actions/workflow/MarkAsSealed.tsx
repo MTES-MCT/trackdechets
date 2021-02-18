@@ -7,10 +7,7 @@ import {
   FormStatus,
   Mutation,
   MutationMarkAsSealedArgs,
-  Query,
 } from "generated/graphql/types";
-import { updateApolloCache } from "common/helper";
-import { DRAFT_TAB_FORMS, FOLLOW_TAB_FORMS } from "../../tabs/queries";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { NotificationError } from "common/components/Error";
 import { TdModalTrigger } from "common/components/Modal";
@@ -37,22 +34,8 @@ export default function MarkAsSealed({ form, siret }: WorkflowActionProps) {
         return;
       }
       const sealedForm = data.markAsSealed;
-      // remove form from the draft tab
-      updateApolloCache<Pick<Query, "forms">>(cache, {
-        query: DRAFT_TAB_FORMS,
-        variables: { siret },
-        getNewData: data => ({
-          forms: [...data.forms].filter(form => form.id !== sealedForm.id),
-        }),
-      });
-      // add the form to the follow tab
-      updateApolloCache<Pick<Query, "forms">>(cache, {
-        query: FOLLOW_TAB_FORMS,
-        variables: { siret },
-        getNewData: data => ({
-          forms: [sealedForm, ...data.forms],
-        }),
-      });
+      // FIXME: remove form from the draft tab
+      // FIXME: add the form to the follow tab
     },
     onCompleted: data => {
       if (data.markAsSealed) {
