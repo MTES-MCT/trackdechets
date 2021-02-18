@@ -34,7 +34,7 @@ TODO
 ### Pagination
 
 Nous suivons la spécification relay permettant de paginer par curseur: https://relay.dev/graphql/connections.htm. Voir aussi https://graphql.org/learn/pagination/
-Toutes les requêtes permettant de lister des ressources renvoie un objet de type Connection
+Toutes les requêtes permettant de lister des ressources renvoie un objet de type `Connection`.
 
 ```graphql
 interface Connection {
