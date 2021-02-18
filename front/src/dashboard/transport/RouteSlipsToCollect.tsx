@@ -35,9 +35,7 @@ export function RouteSlipsToCollect() {
     <>
       <Breadcrumb>
         <BreadcrumbItem>Transport</BreadcrumbItem>
-        <BreadcrumbItem>
-          Chargés, en attente de réception ou de transfert
-        </BreadcrumbItem>
+        <BreadcrumbItem>À collecter</BreadcrumbItem>
       </Breadcrumb>
       <FormSearchResultTable searchResults={data?.searchForms ?? []} />
     </>
