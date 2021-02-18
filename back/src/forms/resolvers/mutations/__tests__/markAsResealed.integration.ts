@@ -215,7 +215,7 @@ describe("Mutation markAsResealed", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message: `L'installation de destination prévue après entreposage provisoire ou reconditionnement ${destination.siret}
-      n'est pas inscrite sur Trackdéchets en tant que qu'installation de traitement ou de tri transit regroupement.
+      n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement.
       Cette installation ne peut donc pas être visée en case 14 du bordereau. Veuillez vous rapprocher de l'administrateur
       de cette installation pour qu'il modifie le profil de l'installation depuis l'interface Trackdéchets Mon Compte > Établissements`
       })
