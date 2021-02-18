@@ -18,8 +18,8 @@ import Loader from "../common/components/Loaders";
 import "./Dashboard.scss";
 import DashboardMenu from "./DashboardMenu";
 import Exports from "./exports/Exports";
-import RouteTransport from "./transport/RouteTransport";
 import { OnboardingSlideshow } from "./OnboardingSlideshow";
+import { RouteSlipsCollected, RouteSlipsToCollect } from "./transport";
 import {
   RouteSlipsView,
   RouteSlipsAct,
@@ -115,8 +115,11 @@ export default function Dashboard() {
               <Route path={routes.dashboard.slips.history}>
                 <RouteSlipsHistory />
               </Route>
-              <Route path={routes.dashboard.transport.index}>
-                <RouteTransport />
+              <Route path={routes.dashboard.transport.toCollect}>
+                <RouteSlipsToCollect />
+              </Route>
+              <Route path={routes.dashboard.transport.collected}>
+                <RouteSlipsCollected />
               </Route>
               <Route path={routes.dashboard.exports}>
                 <Exports
