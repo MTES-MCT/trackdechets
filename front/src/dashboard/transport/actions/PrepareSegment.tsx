@@ -12,17 +12,14 @@ import { transportModeLabels } from "../../constants";
 import cogoToast from "cogo-toast";
 
 import DateInput from "form/custom-inputs/DateInput";
-import { GET_TRANSPORT_SLIPS, GET_FORM } from "../queries";
+import { GET_FORM } from "../queries";
 import {
   Form,
   Mutation,
   MutationPrepareSegmentArgs,
   TransportMode,
   TransportSegment,
-  FormRole,
-  FormStatus,
 } from "generated/graphql/types";
-import { updateApolloCache } from "common/helper";
 import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
 
@@ -73,26 +70,6 @@ export default function PrepareSegment({
       });
     },
     refetchQueries: [refetchQuery],
-    update: store => {
-      updateApolloCache<{ forms: Form[] }>(store, {
-        query: GET_TRANSPORT_SLIPS,
-        variables: {
-          userSiret,
-          roles: [FormRole.Transporter],
-          status: [
-            FormStatus.Sealed,
-            FormStatus.Sent,
-            FormStatus.Resealed,
-            FormStatus.Resent,
-          ],
-        },
-        getNewData: data => {
-          return {
-            forms: data.forms.filter(f => f.id === form.id),
-          };
-        },
-      });
-    },
   });
 
   const initialValues = {

@@ -15,7 +15,7 @@ import Loader from "../common/components/Loaders";
 import "./Dashboard.scss";
 import DashboardMenu from "./DashboardMenu";
 import Exports from "./exports/Exports";
-import Transport from "./transport/Transport";
+import RouteTransport from "./transport/RouteTransport";
 import { OnboardingSlideshow } from "./OnboardingSlideshow";
 import RouteSlips from "./slips/RouteSlips";
 
@@ -85,7 +85,7 @@ export default function Dashboard() {
                 <RouteSlips />
               </Route>
               <Route path={routes.dashboard.transport.index}>
-                <Transport />
+                <RouteTransport />
               </Route>
               <Route path={routes.dashboard.exports}>
                 <Exports

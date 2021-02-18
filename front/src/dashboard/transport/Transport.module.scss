@@ -1,39 +1,6 @@
 @import "src/scss/Constants.scss";
 @import "src/scss/Breakpoints.scss";
 
-.headerContent {
-  margin: 1em 0 0 1em;
-}
-.headerTitle {
-  line-height: 1.75rem;
-}
-
-@media all and (max-width: 768px) {
-  td.hide-on-mobile,
-  th.hide-on-mobile {
-    display: none;
-    width: 0;
-    height: 0;
-    opacity: 0;
-    visibility: collapse;
-  }
-}
-.transportMenu {
-  margin: 1em;
-  display: flex;
-  align-items: center;
-}
-.transportPermanentFilter {
-  display: flex;
-  align-items: center;
-  input {
-    @include desktop {
-      max-width: 300px;
-      margin-right: 0.25em;
-    }
-  }
-}
-
 .segmentPill {
   background-color: $blue;
   color: white;
@@ -45,8 +12,4 @@
   margin: 4px 2px;
 
   border-radius: 10px;
-}
-
-.chooseLayout {
-  margin: 1rem;
 }

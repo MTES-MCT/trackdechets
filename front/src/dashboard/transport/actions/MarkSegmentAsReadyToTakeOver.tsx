@@ -1,18 +1,15 @@
 import { useMutation, gql } from "@apollo/client";
 
 import React, { useState } from "react";
-import { GET_TRANSPORT_SLIPS, GET_FORM } from "../queries";
+import { GET_FORM } from "../queries";
 import {
   Form,
-  FormRole,
-  FormStatus,
   Mutation,
   MutationMarkSegmentAsReadyToTakeOverArgs,
   TransportSegment,
 } from "generated/graphql/types";
 import { Form as FormikForm, Formik } from "formik";
 import { segmentFragment } from "common/fragments";
-import { updateApolloCache } from "common/helper";
 import cogoToast from "cogo-toast";
 import { NotificationError } from "common/components/Error";
 
@@ -77,24 +74,6 @@ export default function MarkSegmentAsReadyToTakeOver({
       );
     },
     refetchQueries: [refetchQuery],
-    update: store => {
-      updateApolloCache<{ forms: Form[] }>(store, {
-        query: GET_TRANSPORT_SLIPS,
-        variables: {
-          userSiret,
-          roles: [FormRole.Transporter],
-          status: [
-            FormStatus.Sealed,
-            FormStatus.Sent,
-            FormStatus.Resealed,
-            FormStatus.Resent,
-          ],
-        },
-        getNewData: data => ({
-          forms: data.forms,
-        }),
-      });
-    },
   });
 
   const segment = getSegmentToMarkSegmentAsReadyToTakeOver({ form, userSiret });

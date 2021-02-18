@@ -10,17 +10,14 @@ import { transportModeLabels } from "../../constants";
 import CompanySelector from "form/company/CompanySelector";
 import DateInput from "form/custom-inputs/DateInput";
 import cogoToast from "cogo-toast";
-import { GET_TRANSPORT_SLIPS, GET_FORM } from "../queries";
+import { GET_FORM } from "../queries";
 import {
   Form,
   Mutation,
   MutationEditSegmentArgs,
   TransportSegment,
-  FormRole,
-  FormStatus,
 } from "generated/graphql/types";
 import { NotificationError } from "common/components/Error";
-import { updateApolloCache } from "common/helper";
 import TdModal from "common/components/Modal";
 import styles from "./Segments.module.scss";
 import ActionButton from "common/components/ActionButton";
@@ -130,24 +127,6 @@ export default function EditSegment({
       });
     },
     refetchQueries: [refetchQuery],
-    update: store => {
-      updateApolloCache<{ forms: Form[] }>(store, {
-        query: GET_TRANSPORT_SLIPS,
-        variables: {
-          userSiret,
-          roles: [FormRole.Transporter],
-          status: [
-            FormStatus.Sealed,
-            FormStatus.Sent,
-            FormStatus.Resealed,
-            FormStatus.Resent,
-          ],
-        },
-        getNewData: data => ({
-          forms: data.forms,
-        }),
-      });
-    },
   });
 
   const segment = getSegmentToEdit({ form, userSiret });

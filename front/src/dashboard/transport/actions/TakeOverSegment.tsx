@@ -5,13 +5,10 @@ import {
   Mutation,
   MutationTakeOverSegmentArgs,
   TransportSegment,
-  FormRole,
-  FormStatus,
 } from "generated/graphql/types";
 import { useMutation, gql } from "@apollo/client";
 import { NotificationError } from "common/components/Error";
-import { GET_TRANSPORT_SLIPS, GET_FORM } from "../queries";
-import { updateApolloCache } from "common/helper";
+import { GET_FORM } from "../queries";
 import DateInput from "form/custom-inputs/DateInput";
 import cogoToast from "cogo-toast";
 import { Modal, ModalTitle } from "common/components";
@@ -72,24 +69,6 @@ export default function TakeOverSegment({
       });
     },
     refetchQueries: [refetchQuery],
-    update: store => {
-      updateApolloCache<{ forms: Form[] }>(store, {
-        query: GET_TRANSPORT_SLIPS,
-        variables: {
-          userSiret,
-          roles: [FormRole.Transporter],
-          status: [
-            FormStatus.Sealed,
-            FormStatus.Sent,
-            FormStatus.Resealed,
-            FormStatus.Resent,
-          ],
-        },
-        getNewData: data => ({
-          forms: data.forms,
-        }),
-      });
-    },
   });
   const segment = getSegmentToTakeOver({ form, userSiret });
 
