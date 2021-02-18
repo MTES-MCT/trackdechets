@@ -44,6 +44,9 @@ différents champs filtrables en fonction du type de BSD.
 bsdList(filter: BsdFilter): [Bsd]
 
 input BsdFilter {
+  _or: BsdFilter
+  _and: BsdFilter
+  _not: BsdFilter
   wasteCode: string
   status: FormStatus
   emitterCompanySiret: string
@@ -51,13 +54,27 @@ input BsdFilter {
 }
 ```
 
-Certains champs filtrables sont communs à l'ensemble des BSD:
+### Opérateurs logique
 
-- wasteCode
-- status
-- emitterCompanySiret
-- recipientCompanySiret
-- ... // TODO
+Il est possible d'utiliser des opérateurs logiques pour combiner des filtres.
+Par exemple la requête suivante permet de rechercher tous les bordereaux
+non brouillon sur lesquelles l'établissement 85001946400021 apparait soit en tant
+qu'émetteur, soit en tant que destinataire.
+
+
+```graphql
+query {
+  bsdList(filter: {
+    _or : {
+      emitterCompanySiret: "85001946400021"
+      recipientCompanySiret: "85001946400021"
+    }
+    _not: {
+      status: DRAFT
+    }
+  })
+}
+```
 
 
 #### Enums
@@ -66,7 +83,7 @@ Certains champs filtrables sont communs à l'ensemble des BSD:
 ```graphql
 query {
   bsdList(filter: { status: DRAFT })
-} 
+}
 
 ```
 ##### Contains
@@ -74,7 +91,7 @@ query {
 ```graphql
 query {
   bsdList(filter: { status_in: [DRAFT, SENT]})
-} 
+}
 
 ```
 #### Texte
@@ -83,14 +100,14 @@ query {
 ```graphql
 query {
   bsdList(filter: { emitterCompanySiret: "1234567890"})
-} 
+}
 ```
 ##### Contains
 
 ```graphql
 query {
-  bsdList(filter: { emitterCompanySiret_contains: "12345"}) 
-} 
+  bsdList(filter: { emitterCompanySiret_contains: "12345"})
+}
 ```
 
 #### Datetimes
@@ -100,26 +117,26 @@ query {
 ```graphql
 query {
   bsdList(filter: { updatedAt: "<date>"})
-} 
+}
 ```
 ##### LT, LTE, GT, GTE
 
 ```graphql
 query {
   bsdList(filter: { updatedAt_gt: "<date>"})
-} 
+}
 ```
 
 ```graphql
 query {
   bsdList(filter: { updatedAt_lt: "<date>"})
-} 
+}
 ```
 
 ```graphql
 query {
   bsdList(filter: { updatedAt_lte: "<date>"})
-} 
+}
 
 ```
 
