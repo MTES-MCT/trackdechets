@@ -51,7 +51,7 @@ const updateFormResolver = async (
   // Construct form update payload
   const formUpdateInput: Prisma.FormUpdateInput = {
     ...form,
-    appendix2Forms: { set: appendix2Forms }
+    appendix2Forms: appendix2Forms ? { set: appendix2Forms } : undefined
   };
 
   // Validate form input

@@ -5,6 +5,22 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# Next release
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :boom: Breaking changes
+
+#### :bug: Corrections de bugs
+
+- Correction du support optionnel du champ "appendix2Forms" [PR 792](https://github.com/MTES-MCT/trackdechets/pull/792)
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2021.02.2] 10/02/2021
 
 - Correction d'un bug empêchant l'utilisation de certains formats de date dans les mutations `markAsAccepted`, `markAsTempStorerAccepted` et `markAsSent` [PR 798](https://github.com/MTES-MCT/trackdechets/pull/798)
@@ -59,6 +75,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Mise à jour du template de PR Github [PR 756](https://github.com/MTES-MCT/trackdechets/pull/756)
+
 # [2021.01.1] 07/01/2021
 
 #### :rocket: Nouvelles fonctionnalités

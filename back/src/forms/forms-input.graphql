@@ -162,7 +162,7 @@ input CreateFormInput {
   trader: TraderInput
 
   "Annexe 2"
-  appendix2Forms: [AppendixFormInput]
+  appendix2Forms: [AppendixFormInput!]
   ecoOrganisme: EcoOrganismeInput
 
   temporaryStorageDetail: TemporaryStorageDetailInput
@@ -195,7 +195,7 @@ input UpdateFormInput {
   trader: TraderInput
 
   "Annexe 2"
-  appendix2Forms: [AppendixFormInput]
+  appendix2Forms: [AppendixFormInput!]
   ecoOrganisme: EcoOrganismeInput
 
   temporaryStorageDetail: TemporaryStorageDetailInput
@@ -228,7 +228,7 @@ input FormInput {
   trader: TraderInput
 
   "Annexe 2"
-  appendix2Forms: [AppendixFormInput]
+  appendix2Forms: [AppendixFormInput!]
   ecoOrganisme: EcoOrganismeInput
 
   temporaryStorageDetail: TemporaryStorageDetailInput
