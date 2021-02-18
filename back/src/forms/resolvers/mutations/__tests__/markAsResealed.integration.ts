@@ -9,7 +9,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { CompanyType } from "@prisma/client";
+import { CompanyType, CompanyVerificationStatus, Status } from "@prisma/client";
 
 const MARK_AS_RESEALED = `
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!){
@@ -22,6 +22,17 @@ const MARK_AS_RESEALED = `
 
 describe("Mutation markAsResealed", () => {
   afterEach(resetDatabase);
+
+  const OLD_ENV = process.env;
+
+  beforeEach(() => {
+    jest.resetModules();
+    delete process.env.COMPANY_VERIFICATION;
+  });
+
+  afterEach(() => {
+    process.env = OLD_ENV;
+  });
 
   test("the temp storer of the BSD can reseal it", async () => {
     const owner = await userFactory();
@@ -196,11 +207,10 @@ describe("Mutation markAsResealed", () => {
     const form = await formWithTempStorageFactory({
       ownerId: owner.id,
       opt: {
-        status: "TEMP_STORER_ACCEPTED",
+        status: Status.TEMP_STORER_ACCEPTED,
         recipientCompanySiret: collector.siret
       },
       tempStorageOpts: {
-        // this company p
         destinationCompanySiret: destination.siret
       }
     });
@@ -218,6 +228,64 @@ describe("Mutation markAsResealed", () => {
       n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement.
       Cette installation ne peut donc pas être visée en case 14 du bordereau. Veuillez vous rapprocher de l'administrateur
       de cette installation pour qu'il modifie le profil de l'installation depuis l'interface Trackdéchets Mon Compte > Établissements`
+      })
+    ]);
+  });
+
+  it("should throw an error if COMPANY_VERIFICATION=strict and destination after temp storage is not verified", async () => {
+    // patch process.env and reload server
+    process.env.COMPANY_VERIFICATION = "strict";
+    const makeClient = require("../../../../__tests__/testClient").default;
+
+    const {
+      user: owner,
+      company: emitterCompany
+    } = await userWithCompanyFactory("MEMBER");
+
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] },
+        verificationStatus: CompanyVerificationStatus.VERIFIED
+      }
+    );
+
+    const destination = await companyFactory({
+      companyTypes: { set: [CompanyType.WASTEPROCESSOR] },
+      verificationStatus: CompanyVerificationStatus.TO_BE_VERIFIED
+    });
+
+    const form = await formWithTempStorageFactory({
+      ownerId: owner.id,
+      opt: {
+        status: Status.TEMP_STORER_ACCEPTED,
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: collector.siret
+      },
+      tempStorageOpts: {
+        destinationCompanySiret: destination.siret
+      }
+    });
+
+    await prisma.form.update({
+      where: { id: form.id },
+      data: {
+        temporaryStorageDetail: {
+          update: { destinationCompanySiret: destination.siret }
+        }
+      }
+    });
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_RESEALED, {
+      variables: {
+        id: form.id,
+        resealedInfos: {}
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${destination.siret}
+      n'a pas encore été vérifié. Cette installation ne peut pas être visé en case 14 du bordereau.`
       })
     ]);
   });

@@ -3,7 +3,11 @@ import { gql } from "@apollo/client";
 import { filter } from "graphql-anywhere";
 import AccountFormCompanyInviteNewUser from "./fields/forms/AccountFormCompanyInviteNewUser";
 import AccountCompanyMember from "./AccountCompanyMember";
-import { CompanyPrivate } from "generated/graphql/types";
+import {
+  CompanyPrivate,
+  CompanyType,
+  CompanyVerificationStatus,
+} from "generated/graphql/types";
 
 type Props = { company: CompanyPrivate };
 
@@ -12,6 +16,8 @@ AccountCompanyMemberList.fragments = {
     fragment AccountCompanyMemberListFragment on CompanyPrivate {
       ...AccountCompanyMemberCompanyFragment
       ...AccountFormCompanyInviteNewUserFragment
+      companyTypes
+      verificationStatus
       users {
         ...AccountCompanyMemberUserFragment
       }
@@ -23,14 +29,36 @@ AccountCompanyMemberList.fragments = {
 };
 
 export default function AccountCompanyMemberList({ company }: Props) {
+  const isProfessional = company.companyTypes.some(ct =>
+    [
+      CompanyType.Wasteprocessor,
+      CompanyType.Collector,
+      CompanyType.Transporter,
+      CompanyType.Trader,
+      CompanyType.EcoOrganisme,
+      CompanyType.WasteVehicles,
+    ].includes(ct)
+  );
+
+  const isVerified =
+    company.verificationStatus === CompanyVerificationStatus.Verified;
+
   return (
     <>
-      <AccountFormCompanyInviteNewUser
-        company={filter(
-          AccountFormCompanyInviteNewUser.fragments.company,
-          company
-        )}
-      />
+      {!isProfessional || (isProfessional && isVerified) ? (
+        <AccountFormCompanyInviteNewUser
+          company={filter(
+            AccountFormCompanyInviteNewUser.fragments.company,
+            company
+          )}
+        />
+      ) : (
+        <div className="notification">
+          Vous ne pouvez pas inviter de nouveaux membres car l'établissement n'a
+          pas encore été vérifié
+        </div>
+      )}
+
       {company && company.users && company.users.length > 0 && (
         <table className="td-table">
           <tbody>

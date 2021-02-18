@@ -1,4 +1,4 @@
-import { CompanyType } from "@prisma/client";
+import { CompanyType, CompanyVerificationStatus, Status } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import {
@@ -28,6 +28,17 @@ const MARK_AS_SEALED = `
 
 describe("Mutation.markAsSealed", () => {
   afterAll(() => resetDatabase());
+
+  const OLD_ENV = process.env;
+
+  beforeEach(() => {
+    jest.resetModules();
+    delete process.env.COMPANY_VERIFICATION;
+  });
+
+  afterEach(() => {
+    process.env = OLD_ENV;
+  });
 
   it("should fail if SEALED is not a possible next state", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -514,6 +525,83 @@ describe("Mutation.markAsSealed", () => {
       n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement.
       Cette installation ne peut donc pas être visée en case 14 du bordereau. Veuillez vous rapprocher de l'administrateur
       de cette installation pour qu'il modifie le profil de l'installation depuis l'interface Trackdéchets Mon Compte > Établissements`
+      })
+    ]);
+  });
+
+  it("should throw an error if COMPANY_VERIFICATION=strict and destination is not verified", async () => {
+    // patch process.env and reload server
+    process.env.COMPANY_VERIFICATION = "strict";
+    const makeClient = require("../../../../__tests__/testClient").default;
+
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const destination = await companyFactory({
+      companyTypes: { set: [CompanyType.WASTEPROCESSOR] },
+      verificationStatus: CompanyVerificationStatus.TO_BE_VERIFIED
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.DRAFT,
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: destination.siret
+      }
+    });
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${destination.siret}
+      n'a pas encore été vérifié. Cette installation ne peut pas être visé en case 2 du bordereau.`
+      })
+    ]);
+  });
+
+  it("should throw an error if COMPANY_VERIFICATION=strict and destination after temp storage is not verified", async () => {
+    // patch process.env and reload server
+    process.env.COMPANY_VERIFICATION = "strict";
+    const makeClient = require("../../../../__tests__/testClient").default;
+
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const collector = await companyFactory({
+      companyTypes: { set: [CompanyType.COLLECTOR] },
+      verificationStatus: CompanyVerificationStatus.VERIFIED
+    });
+    const destination = await companyFactory({
+      companyTypes: { set: [CompanyType.WASTEPROCESSOR] },
+      verificationStatus: CompanyVerificationStatus.TO_BE_VERIFIED
+    });
+    const form = await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.DRAFT,
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: collector.siret
+      }
+    });
+    await prisma.form.update({
+      where: { id: form.id },
+      data: {
+        temporaryStorageDetail: {
+          update: { destinationCompanySiret: destination.siret }
+        }
+      }
+    });
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${destination.siret}
+      n'a pas encore été vérifié. Cette installation ne peut pas être visé en case 14 du bordereau.`
       })
     ]);
   });

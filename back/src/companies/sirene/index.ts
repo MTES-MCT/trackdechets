@@ -1,8 +1,8 @@
 import decoratedSearchCompany from "./searchCompany";
 import decoratedSearchCompanies from "./searchCompanies";
-import { CompanySearchResult } from "../../generated/graphql/types";
 import { UserInputError } from "apollo-server-express";
 import { searchAnonymousCompany } from "./anonymous";
+import { CompanySearchResult } from "./types";
 
 export async function searchCompany(
   siret: string
@@ -15,7 +15,7 @@ export async function searchCompany(
 
   if (process.env.NODE_ENV === "test") {
     // do not call the APIs when running integration tests
-    return Promise.resolve({});
+    return Promise.resolve({} as any);
   }
 
   try {

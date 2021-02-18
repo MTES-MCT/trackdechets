@@ -55,7 +55,10 @@ export default function AccountField({
         {!editing ? value : form}
       </div>
       {modifier && (
-        <div className="btn btn--primary" onClick={toggleEdition}>
+        <div
+          className={`${styles.modifier} btn btn--primary`}
+          onClick={toggleEdition}
+        >
           {!editing ? (!!value ? modifier : "Ajouter") : "Annuler"}
         </div>
       )}

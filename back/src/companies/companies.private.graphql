@@ -49,6 +49,14 @@ type Mutation {
 
   """
   USAGE INTERNE
+  Permet de vérifier un établissement à partir du code de vérification
+  envoyé par courrier à l'adresse de l'établissement renseigné au
+  registre du commerce et des sociétés
+  """
+  verifyCompany(input: VerifyCompanyInput!): CompanyPrivate!
+
+  """
+  USAGE INTERNE
   Crée un récépissé transporteur
   """
   createTransporterReceipt(
@@ -351,6 +359,13 @@ input DeleteBrokerReceiptInput {
   The id of the broker receipt to delete
   """
   id: ID!
+}
+
+input VerifyCompanyInput {
+  "Le SIRET de l'établissement à vérifier"
+  siret: String!
+  "Le code de vérification de l'établissement envoyé par courrier"
+  code: String!
 }
 
 "Payload permettant le rattachement d'un établissement à un utilisateur"

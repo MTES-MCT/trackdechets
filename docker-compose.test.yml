@@ -14,7 +14,7 @@ services:
       PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID: "7"
       PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID: "9"
       SECURITY_CODE_RENEWAL_TEMPLATE_ID: "6"
-
+      POST_BACKEND: "console"
 
   td-ui:
     restart: "no"

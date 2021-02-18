@@ -6,6 +6,8 @@ import * as mailsHelper from "../../../../mailer/mailing";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import * as geocode from "../../../geocode";
+import { CompanyType } from "@prisma/client";
+import { companyMails } from "../../../mails";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -322,5 +324,53 @@ describe("Mutation.createCompany", () => {
           "Impossible de lier des agréments d'éco-organisme : l'entreprise n'est pas un éco-organisme."
       })
     ]);
+  });
+
+  it("should send an email about the verification process when COMPANY_VERIFICATION=strict", async () => {
+    const OLD_ENV = process.env;
+
+    process.env.COMPANY_VERIFICATION = "strict";
+
+    // get local versions of imports to reload env variables
+    jest.resetModules();
+    const makeClient = require("../../../../__tests__/testClient").default;
+    const mailsHelper = require("../../../../mailer/mailing");
+    const geocode = require("../../../geocode");
+
+    // No mails
+    const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
+    sendMailSpy.mockImplementation(() => Promise.resolve());
+
+    // Mock calls to API adresse
+    const geocodeSpy = jest.spyOn(geocode, "default");
+    const geoInfo = { latitude: 43.302546, longitude: 5.384324 };
+    geocodeSpy.mockResolvedValue(geoInfo);
+
+    const user = await userFactory();
+    const companyInput = {
+      siret: "12345678912345",
+      gerepId: "1234",
+      companyName: "Acme",
+      companyTypes: [CompanyType.WASTEPROCESSOR]
+    };
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    const company = await prisma.company.findUnique({
+      where: { siret: companyInput.siret }
+    });
+
+    expect(sendMailSpy).toHaveBeenCalledWith(
+      companyMails.verificationProcessInfo(
+        [{ name: user.name, email: user.email }],
+        company
+      )
+    );
+
+    process.env = OLD_ENV;
   });
 });

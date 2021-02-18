@@ -66,6 +66,7 @@ export const companyFactory = async (
       },
       name: `company_${companyIndex}`,
       securityCode: 1234,
+      verificationCode: "34567",
       ...opts
     }
   });

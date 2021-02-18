@@ -1,4 +1,10 @@
+import { CompanyVerificationStatus } from "@prisma/client";
 import axios from "axios";
+import { addDays } from "date-fns";
+import * as COMPANY_TYPES from "../common/constants/COMPANY_TYPES";
+import { sendVerificationCodeLetter } from "../common/post";
+import prisma from "../prisma";
+import { sameDayMidnight } from "../utils";
 import { getInstallation, getRubriques } from "./database";
 import { searchCompany } from "./sirene";
 
@@ -88,4 +94,30 @@ export async function checkIsCompatible(installation, wasteCode) {
 
   // this is not a dangerous waste, assume any ICPE can take it
   return true;
+}
+
+// Sends verification letters to all waste professionnal that were not
+// verified manually within the allowed timeframe. This functions is typically
+// called by a CRON job running every day.
+export async function sendVerificationCodeLetters() {
+  const today = sameDayMidnight(new Date(Date.now()));
+  const verifiableCompanies = await prisma.company.findMany({
+    where: {
+      // Companies that change their profile from producer only to professional after the
+      // allowed timeframe will not be targeted by the query below. Manual action
+      // will be needed from the admin interface
+      createdAt: { gte: addDays(today, -4), lt: addDays(today, -3) },
+      verificationStatus: CompanyVerificationStatus.TO_BE_VERIFIED,
+      companyTypes: {
+        hasSome: COMPANY_TYPES.PROFESSIONALS
+      }
+    }
+  });
+  for (const company of verifiableCompanies) {
+    await sendVerificationCodeLetter(company);
+    await prisma.company.update({
+      where: { id: company.id },
+      data: { verificationStatus: CompanyVerificationStatus.LETTER_SENT }
+    });
+  }
 }

@@ -23,7 +23,10 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       address: "4 Boulevard Longchamp 13001 Marseille",
       codeCommune: "13201",
       naf: "62.01Z",
-      libelleNaf: "Programmation informatique"
+      libelleNaf: "Programmation informatique",
+      addressVoie: "4 boulevard Longchamp",
+      addressCity: "Marseille",
+      addressPostalCode: "13001"
     });
 
     const gqlquery = `
@@ -71,7 +74,10 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       address: "4 Boulevard Longchamp 13001 Marseille",
       codeCommune: "13201",
       naf: "62.01Z",
-      libelleNaf: "Programmation informatique"
+      libelleNaf: "Programmation informatique",
+      addressVoie: "4 boulevard Longchamp",
+      addressCity: "Marseille",
+      addressPostalCode: "13001"
     });
 
     await companyFactory({
@@ -138,7 +144,10 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       address: "4 Boulevard Longchamp 13001 Marseille",
       codeCommune: "13201",
       naf: "62.01Z",
-      libelleNaf: "Programmation informatique"
+      libelleNaf: "Programmation informatique",
+      addressVoie: "4 boulevard Longchamp",
+      addressCity: "Marseille",
+      addressPostalCode: "13001"
     });
 
     const receipt = {
@@ -147,16 +156,14 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       department: "07"
     };
 
-    await prisma.company.create({
-      data: {
-        siret: "85001946400013",
-        name: "Code en Stock",
-        securityCode: 1234,
-        contactEmail: "john.snow@trackdechets.fr",
-        contactPhone: "0600000000",
-        website: "https://trackdechets.beta.gouv.fr",
-        transporterReceipt: { create: receipt }
-      }
+    await companyFactory({
+      siret: "85001946400013",
+      name: "Code en Stock",
+      securityCode: 1234,
+      contactEmail: "john.snow@trackdechets.fr",
+      contactPhone: "0600000000",
+      website: "https://trackdechets.beta.gouv.fr",
+      transporterReceipt: { create: receipt }
     });
 
     const gqlquery = `
@@ -181,7 +188,10 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       address: "4 Boulevard Longchamp 13001 Marseille",
       codeCommune: "13201",
       naf: "62.01Z",
-      libelleNaf: "Programmation informatique"
+      libelleNaf: "Programmation informatique",
+      addressVoie: "4 boulevard Longchamp",
+      addressCity: "Marseille",
+      addressPostalCode: "13001"
     });
 
     const receipt = {
@@ -190,16 +200,14 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       department: "07"
     };
 
-    await prisma.company.create({
-      data: {
-        siret: "85001946400013",
-        name: "Code en Stock",
-        securityCode: 1234,
-        contactEmail: "john.snow@trackdechets.fr",
-        contactPhone: "0600000000",
-        website: "https://trackdechets.beta.gouv.fr",
-        traderReceipt: { create: receipt }
-      }
+    await companyFactory({
+      siret: "85001946400013",
+      name: "Code en Stock",
+      securityCode: 1234,
+      contactEmail: "john.snow@trackdechets.fr",
+      contactPhone: "0600000000",
+      website: "https://trackdechets.beta.gouv.fr",
+      traderReceipt: { create: receipt }
     });
 
     const gqlquery = `

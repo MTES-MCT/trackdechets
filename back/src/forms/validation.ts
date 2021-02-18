@@ -6,7 +6,8 @@ import {
   Form,
   QuantityType,
   WasteAcceptationStatus,
-  Prisma
+  Prisma,
+  CompanyVerificationStatus
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
@@ -24,6 +25,8 @@ import { SchemaOf } from "yup";
 
 // set yup default error messages
 configureYup();
+
+const { COMPANY_VERIFICATION } = process.env;
 
 // ************************************************
 // BREAK DOWN FORM TYPE INTO INDIVIDUAL FRAME TYPES
@@ -939,7 +942,7 @@ function isWasteProcessor(company: Company) {
 }
 
 /**
- * Check company in frame 2 is registered with profile
+ * Check company in frame 2 is verified and registered with profile
  * COLLECTOR or WASTE_PROCESSOR or throw error
  */
 async function checkDestination(siret: string) {
@@ -964,11 +967,21 @@ async function checkDestination(siret: string) {
     );
   }
 
+  if (
+    COMPANY_VERIFICATION === "strict" &&
+    company.verificationStatus !== CompanyVerificationStatus.VERIFIED
+  ) {
+    throw new UserInputError(
+      `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
+      n'a pas encore été vérifié. Cette installation ne peut pas être visé en case 2 du bordereau.`
+    );
+  }
+
   return true;
 }
 
 /**
- * Check company in frame 2 is registered with profile
+ * Check company in frame 2 is verified and registered with profile
  * COLLECTOR or WASTE_PROCESSOR or throw error
  */
 async function checkDestinationAfterTempStorage(siret: string) {
@@ -990,6 +1003,16 @@ async function checkDestinationAfterTempStorage(siret: string) {
       n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement.
       Cette installation ne peut donc pas être visée en case 14 du bordereau. Veuillez vous rapprocher de l'administrateur
       de cette installation pour qu'il modifie le profil de l'installation depuis l'interface Trackdéchets Mon Compte > Établissements`
+    );
+  }
+
+  if (
+    COMPANY_VERIFICATION === "strict" &&
+    company.verificationStatus !== CompanyVerificationStatus.VERIFIED
+  ) {
+    throw new UserInputError(
+      `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
+      n'a pas encore été vérifié. Cette installation ne peut pas être visé en case 14 du bordereau.`
     );
   }
 

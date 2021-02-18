@@ -1,6 +1,7 @@
 import axios from "axios";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import prisma from "../../../prisma";
+import { companyFactory } from "../../../__tests__/factories";
 import { setCompanyName } from "../set-company-name";
 
 jest.mock("axios");
@@ -16,40 +17,32 @@ describe.skip("setCompanyName", () => {
 
   it("should set company name where it was not previously set", async () => {
     // Frontier, name is set
-    const frontier = await prisma.company.create({
-      data: {
-        siret: "81343950200028",
-        name: "Frontier SAS",
-        securityCode: 1234
-      }
+    const frontier = await companyFactory({
+      siret: "81343950200028",
+      name: "Frontier SAS",
+      securityCode: 1234
     });
 
     // LP, name is not set
-    const lp = await prisma.company.create({
-      data: {
-        siret: "51212357100022",
-        securityCode: 2345
-      }
+    const lp = await companyFactory({
+      siret: "51212357100022",
+      name: null
     });
     const resp1 = { status: 200, data: { name: "LP" } };
     (axios.get as jest.Mock).mockResolvedValueOnce(resp1);
 
     // Code en stock, name is not set
-    const codeEnStock = await prisma.company.create({
-      data: {
-        siret: "85001946400013",
-        securityCode: 2345
-      }
+    const codeEnStock = await companyFactory({
+      siret: "85001946400013",
+      name: null
     });
     const resp2 = { status: 200, data: { name: "CODE EN STOCK" } };
     (axios.get as jest.Mock).mockResolvedValueOnce(resp2);
 
     // Unknown SIRET, name is not set
-    const unknown = await prisma.company.create({
-      data: {
-        siret: "xxxxxxxxxxxxxx",
-        securityCode: 3456
-      }
+    const unknown = await companyFactory({
+      siret: "xxxxxxxxxxxxxx",
+      name: null
     });
 
     // expect insee service to retunr 404

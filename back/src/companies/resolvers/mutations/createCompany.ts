@@ -8,6 +8,8 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { randomNumber } from "../../../utils";
 import geocode from "../../geocode";
+import * as COMPANY_TYPES from "../../../common/constants/COMPANY_TYPES";
+import { companyMails as mails } from "../../mails";
 
 /**
  * Create a new company and associate it to a user
@@ -15,6 +17,8 @@ import geocode from "../../geocode";
  * @param companyInput
  * @param userId
  */
+
+const { COMPANY_VERIFICATION } = process.env;
 
 const createCompanyResolver: MutationResolvers["createCompany"] = async (
   parent,
@@ -90,6 +94,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     longitude,
     companyTypes: { set: companyTypes },
     securityCode: randomNumber(4),
+    verificationCode: randomNumber(5).toString(),
     ecoOrganismeAgreements: {
       set: ecoOrganismeAgreements
     }
@@ -124,6 +129,21 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     where: { id: user.id, firstAssociationDate: null },
     data: { firstAssociationDate: new Date() }
   });
+
+  if (COMPANY_VERIFICATION === "strict") {
+    const isProfessional = company.companyTypes.some(ct => {
+      return COMPANY_TYPES.PROFESSIONALS.includes(ct);
+    });
+    if (isProfessional) {
+      await sendMail(
+        mails.verificationProcessInfo(
+          [{ email: user.email, name: user.name }],
+          company
+        )
+      );
+    }
+  }
+
   await warnIfUserCreatesTooManyCompanies(user, company);
 
   return convertUrls(company);

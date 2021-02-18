@@ -1,5 +1,5 @@
-import { CompanySearchResult } from "../../generated/graphql/types";
 import prisma from "../../prisma";
+import { CompanySearchResult } from "./types";
 
 /**
  * "Certaines entreprises demandent à ne pas figurer sur les listes de diffusion publique
@@ -21,7 +21,10 @@ export async function searchAnonymousCompany(
     return {
       ...company,
       etatAdministratif: "A",
-      naf: company.codeNaf
+      naf: company.codeNaf,
+      addressVoie: "",
+      addressCity: "",
+      addressPostalCode: ""
     };
   }
   return null;

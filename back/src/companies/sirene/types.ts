@@ -76,4 +76,7 @@ export interface CompanySearchResult {
   name: string;
   naf: string;
   libelleNaf: string;
+  addressVoie: string;
+  addressCity: string;
+  addressPostalCode: string;
 }
