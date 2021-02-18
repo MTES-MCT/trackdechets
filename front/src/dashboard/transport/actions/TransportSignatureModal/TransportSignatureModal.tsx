@@ -9,12 +9,7 @@ import {
   SignatureAuthor,
   TransporterSignatureFormInput,
 } from "generated/graphql/types";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  Modal,
-  ModalTitle,
-} from "common/components";
+import { Stepper, StepperItem, Modal, ModalTitle } from "common/components";
 import steps from "./steps";
 
 const SIGNED_BY_TRANSPORTER = gql`
@@ -62,9 +57,9 @@ export function TransportSignatureModal({
     <Modal isOpen onClose={onClose} ariaLabel="Signer l'enlèvement">
       <ModalTitle>Signature</ModalTitle>
 
-      <Breadcrumb>
+      <Stepper>
         {steps.map((step, index) => (
-          <BreadcrumbItem
+          <StepperItem
             key={index}
             variant={
               index === stepIndex
@@ -76,9 +71,9 @@ export function TransportSignatureModal({
             onClick={() => setStepIndex(index)}
           >
             {step.title}
-          </BreadcrumbItem>
+          </StepperItem>
         ))}
-      </Breadcrumb>
+      </Stepper>
 
       <div className="step-content">
         <Formik

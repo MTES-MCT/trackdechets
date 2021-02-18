@@ -14,7 +14,7 @@ export {
   Switch,
   FieldSwitch,
 };
-export * from "./Breadcrumb";
+export * from "./Stepper";
 export * from "./Label";
 export * from "./Slideshow";
 export * from "./List";

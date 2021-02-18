@@ -1,6 +1,6 @@
 @import "src/scss/Breakpoints.scss";
 
-.Breadcrumb {
+.Stepper {
   display: flex;
   justify-content: space-between;
   padding: 0;
@@ -17,7 +17,7 @@
   }
 }
 
-.BreadcrumbItem {
+.StepperItem {
   outline: none;
   cursor: pointer;
   flex: 2;
@@ -69,15 +69,15 @@
   }
 }
 
-.BreadcrumbItemContent {
+.StepperItemContent {
   transition: opacity 0.3s ease-in-out;
 }
-.BreadcrumbItem:not(.BreadcrumbItemActive) .BreadcrumbItemContent {
+.StepperItem:not(.StepperItemActive) .StepperItemContent {
   opacity: 0.5;
 }
 
-.BreadcrumbItemComplete:not(:first-child)::after,
-.BreadcrumbItemActive:not(:first-child)::after {
+.StepperItemComplete:not(:first-child)::after,
+.StepperItemActive:not(:first-child)::after {
   content: "";
   display: block;
   width: 100%;
@@ -88,27 +88,27 @@
   border-bottom: 2px solid #006be6;
 }
 
-.BreadcrumbItemComplete:last-child::after,
-.BreadcrumbItemActive:last-child::after {
+.StepperItemComplete:last-child::after,
+.StepperItemActive:last-child::after {
   width: 200%;
   left: -100%;
 }
 
-.BreadcrumbItemComplete::before {
+.StepperItemComplete::before {
   background-color: #006be6;
 }
 
-.BreadcrumbItemActive::before,
-.BreadcrumbItem:focus::before,
-.BreadcrumbItem:hover::before {
+.StepperItemActive::before,
+.StepperItem:focus::before,
+.StepperItem:hover::before {
   background-color: #ebeff3;
   border-color: #006be6;
 }
-.BreadcrumbItem:focus::before,
-.BreadcrumbItem:hover::before {
+.StepperItem:focus::before,
+.StepperItem:hover::before {
   transform: scale(1.33);
 }
-.BreadcrumbItem:focus .BreadcrumbItemContent,
-.BreadcrumbItem:hover .BreadcrumbItemContent {
+.StepperItem:focus .StepperItemContent,
+.StepperItem:hover .StepperItemContent {
   opacity: 1;
 }

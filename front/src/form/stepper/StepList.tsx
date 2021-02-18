@@ -12,7 +12,7 @@ import React, {
 } from "react";
 import { useHistory, useParams, generatePath } from "react-router-dom";
 
-import { Breadcrumb, BreadcrumbItem } from "common/components";
+import { Stepper, StepperItem } from "common/components";
 import { InlineError } from "common/components/Error";
 import initialState from "../initial-state";
 import {
@@ -126,9 +126,9 @@ export default function StepList(props: IProps) {
 
   return (
     <div>
-      <Breadcrumb>
+      <Stepper>
         {Children.map(props.children, (child, index) => (
-          <BreadcrumbItem
+          <StepperItem
             variant={
               index === currentStep
                 ? "active"
@@ -139,9 +139,9 @@ export default function StepList(props: IProps) {
             onClick={() => setCurrentStep(index)}
           >
             <span>{child.props.title}</span>
-          </BreadcrumbItem>
+          </StepperItem>
         ))}
-      </Breadcrumb>
+      </Stepper>
       <div className="step-content">
         <Formik<FormInput>
           innerRef={formikForm}
