@@ -160,13 +160,13 @@ On regroupe l'ensemble des arguments d'une mutation dans un seul input, exceptio
 
 ```graphql
 mutation {
-  create(input: CreateBsdInput!)
+  create(input: CreateInput!)
 }
 mutation {
   sign(input: SignatureInput!)
 }
 mutation {
-  update(id: ID!, input: SignatureInput!)
+  update(id: ID!, input: UpdateInput!)
 }
 ```
 
