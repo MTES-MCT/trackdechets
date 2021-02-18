@@ -6,6 +6,7 @@ import PasswordMeter from "common/components/PasswordMeter";
 import styles from "./AccountForm.module.scss";
 import { object, string } from "yup";
 import { MutationChangePasswordArgs, Mutation } from "generated/graphql/types";
+import classNames from "classnames";
 
 type Props = {
   toggleEdition: () => void;
@@ -76,7 +77,7 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
             <label htmlFor="oldPassword">Ancien mot de passe:</label>
             <Field
               id="oldPassword"
-              className={styles.input}
+              className={classNames("td-input", styles.input)}
               type="password"
               name="oldPassword"
             />
@@ -86,7 +87,7 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
             <label htmlFor="newPassword">Nouveau mot de passe:</label>
             <Field
               id="newPassword"
-              className={styles.input}
+              className={classNames("td-input", styles.input)}
               type="password"
               name="newPassword"
             />
