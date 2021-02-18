@@ -53,107 +53,103 @@ export default function Dashboard() {
   const location = useLocation<{ background?: Location }>();
   const backgroundLocation = location.state?.background;
 
-  const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME);
-
-  if (loading) {
-    return <Loader />;
-  }
+  const { error, data } = useQuery<Pick<Query, "me">>(GET_ME);
 
   if (error) {
     return <InlineError apolloError={error} />;
   }
 
-  if (data) {
-    const companies = data.me.companies;
-    // if the user is not part of the company whose siret is in the url
-    // redirect them to their first company or account if they're not part of any company
-    if (!companies.find(company => company.siret === siret)) {
-      return (
-        <Redirect
-          to={
-            companies.length > 0
-              ? generatePath(routes.dashboard.slips.drafts, {
-                  siret: companies[0].siret,
-                })
-              : routes.account.companies
-          }
-        />
-      );
-    }
+  if (data?.me == null) {
+    return <Loader />;
+  }
 
+  const companies = data.me.companies;
+  // if the user is not part of the company whose siret is in the url
+  // redirect them to their first company or account if they're not part of any company
+  if (!companies.find(company => company.siret === siret)) {
     return (
-      <>
-        <OnboardingSlideshow />
-
-        <div id="dashboard" className="dashboard">
-          <DashboardMenu
-            me={data.me}
-            handleCompanyChange={siret =>
-              history.push(
-                generatePath(routes.dashboard.slips.drafts, {
-                  siret,
-                })
-              )
-            }
-          />
-
-          <div className="dashboard-content">
-            <DisclaimerBanner />
-            <Switch location={backgroundLocation ?? location}>
-              <Route path={routes.dashboard.slips.view}>
-                <RouteSlipsView />
-              </Route>
-              <Route path={routes.dashboard.slips.drafts}>
-                <RouteSlipsDrafts />
-              </Route>
-              <Route path={routes.dashboard.slips.act}>
-                <RouteSlipsAct />
-              </Route>
-              <Route path={routes.dashboard.slips.follow}>
-                <RouteSlipsFollow />
-              </Route>
-              <Route path={routes.dashboard.slips.history}>
-                <RouteSlipsHistory />
-              </Route>
-              <Route path={routes.dashboard.transport.toCollect}>
-                <RouteSlipsToCollect />
-              </Route>
-              <Route path={routes.dashboard.transport.collected}>
-                <RouteSlipsCollected />
-              </Route>
-              <Route path={routes.dashboard.exports}>
-                <Exports
-                  companies={filter(Exports.fragments.company, companies)}
-                />
-              </Route>
-              <Route path={routes.dashboard.stats}>
-                <Stats />
-              </Route>
-              <Redirect
-                to={generatePath(routes.dashboard.slips.drafts, {
-                  siret,
-                })}
-              />
-            </Switch>
-          </div>
-        </div>
-
-        {backgroundLocation && (
-          <Route path={routes.dashboard.slips.view}>
-            <Modal
-              ariaLabel="Aperçu"
-              onClose={() => {
-                history.goBack();
-              }}
-              isOpen
-            >
-              <RouteSlipsView />
-            </Modal>
-          </Route>
-        )}
-      </>
+      <Redirect
+        to={
+          companies.length > 0
+            ? generatePath(routes.dashboard.slips.drafts, {
+                siret: companies[0].siret,
+              })
+            : routes.account.companies
+        }
+      />
     );
   }
 
-  return <p>Aucune donnée à afficher</p>;
+  return (
+    <>
+      <OnboardingSlideshow />
+
+      <div id="dashboard" className="dashboard">
+        <DashboardMenu
+          me={data.me}
+          handleCompanyChange={siret =>
+            history.push(
+              generatePath(routes.dashboard.slips.drafts, {
+                siret,
+              })
+            )
+          }
+        />
+
+        <div className="dashboard-content">
+          <DisclaimerBanner />
+          <Switch location={backgroundLocation ?? location}>
+            <Route path={routes.dashboard.slips.view}>
+              <RouteSlipsView />
+            </Route>
+            <Route path={routes.dashboard.slips.drafts}>
+              <RouteSlipsDrafts />
+            </Route>
+            <Route path={routes.dashboard.slips.act}>
+              <RouteSlipsAct />
+            </Route>
+            <Route path={routes.dashboard.slips.follow}>
+              <RouteSlipsFollow />
+            </Route>
+            <Route path={routes.dashboard.slips.history}>
+              <RouteSlipsHistory />
+            </Route>
+            <Route path={routes.dashboard.transport.toCollect}>
+              <RouteSlipsToCollect />
+            </Route>
+            <Route path={routes.dashboard.transport.collected}>
+              <RouteSlipsCollected />
+            </Route>
+            <Route path={routes.dashboard.exports}>
+              <Exports
+                companies={filter(Exports.fragments.company, companies)}
+              />
+            </Route>
+            <Route path={routes.dashboard.stats}>
+              <Stats />
+            </Route>
+            <Redirect
+              to={generatePath(routes.dashboard.slips.drafts, {
+                siret,
+              })}
+            />
+          </Switch>
+        </div>
+      </div>
+
+      {backgroundLocation && (
+        <Route path={routes.dashboard.slips.view}>
+          <Modal
+            ariaLabel="Aperçu"
+            onClose={() => {
+              history.goBack();
+            }}
+            isOpen
+          >
+            <RouteSlipsView />
+          </Modal>
+        </Route>
+      )}
+    </>
+  );
 }
