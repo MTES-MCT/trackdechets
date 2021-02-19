@@ -4,21 +4,25 @@ import { useQuery, gql } from "@apollo/client";
 import { Query } from "generated/graphql/types";
 import { formSearchResultFragment } from "common/fragments";
 import { Breadcrumb, BreadcrumbItem } from "common/components";
-import { FormSearchResultTable } from "../FormSearchResultTable";
+import { FormSearchResultTable } from "../../FormSearchResultTable";
 
-export const SEARCH_ACTS = gql`
+export const SEARCH_FOLLOWS = gql`
   query SearchFollows($siret: String!) {
     searchForms(
       siret: $siret
       status: [
+        "SEALED"
         "SENT"
         "RECEIVED"
         "ACCEPTED"
         "TEMP_STORED"
         "TEMP_STORER_ACCEPTED"
+        "RESEALED"
         "RESENT"
+        "AWAITING_GROUP"
+        "GROUPED"
       ]
-      waitingForMe: true
+      waitingForMe: false
     ) {
       ...FormSearchResultFragment
     }
@@ -26,9 +30,9 @@ export const SEARCH_ACTS = gql`
   ${formSearchResultFragment}
 `;
 
-export function RouteSlipsAct() {
+export function RouteSlipsFollow() {
   const { siret } = useParams<{ siret: string }>();
-  const { data } = useQuery<Pick<Query, "searchForms">>(SEARCH_ACTS, {
+  const { data } = useQuery<Pick<Query, "searchForms">>(SEARCH_FOLLOWS, {
     variables: {
       siret,
     },
@@ -41,7 +45,7 @@ export function RouteSlipsAct() {
     <>
       <Breadcrumb>
         <BreadcrumbItem>Mes bordereaux</BreadcrumbItem>
-        <BreadcrumbItem>Pour action</BreadcrumbItem>
+        <BreadcrumbItem>Suivi</BreadcrumbItem>
       </Breadcrumb>
       <FormSearchResultTable searchResults={data?.searchForms ?? []} />
     </>

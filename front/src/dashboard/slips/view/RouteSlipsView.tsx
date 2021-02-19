@@ -27,7 +27,7 @@ import {
   FormStatus,
   PackagingInfo,
 } from "generated/graphql/types";
-import { statusesWithDynamicActions, statusLabels } from "../constants";
+import { statusesWithDynamicActions, statusLabels } from "../../constants";
 import {
   IconWarehouseDelivery,
   IconWarehouseStorage,
