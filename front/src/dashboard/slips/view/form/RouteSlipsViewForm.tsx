@@ -27,7 +27,7 @@ import {
   FormStatus,
   PackagingInfo,
 } from "generated/graphql/types";
-import { statusesWithDynamicActions, statusLabels } from "../../constants";
+import { statusesWithDynamicActions, statusLabels } from "../../../constants";
 import {
   IconWarehouseDelivery,
   IconWarehouseStorage,
@@ -38,7 +38,7 @@ import {
 
 import QRCodeIcon from "react-qr-code";
 
-import styles from "./RouteSlipsView.module.scss";
+import styles from "./RouteSlipsViewForm.module.scss";
 
 import WorkflowAction from "dashboard/slips/slips-actions/workflow/WorkflowAction";
 
@@ -388,7 +388,7 @@ const Recipient = ({
   );
 };
 
-export function RouteSlipsView() {
+export function RouteSlipsViewForm() {
   const { id: formId, siret } = useParams<{ id: string; siret: string }>();
   const { error, data } = useQuery<Pick<Query, "form">, QueryFormArgs>(
     GET_DETAIL_FORM,

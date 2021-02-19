@@ -21,7 +21,7 @@ import Exports from "./exports/Exports";
 import { OnboardingSlideshow } from "./OnboardingSlideshow";
 import { RouteSlipsCollected, RouteSlipsToCollect } from "./transport";
 import {
-  RouteSlipsView,
+  RouteSlipsViewForm,
   RouteSlipsAct,
   RouteSlipsDrafts,
   RouteSlipsFollow,
@@ -100,7 +100,7 @@ export default function Dashboard() {
           <DisclaimerBanner />
           <Switch location={backgroundLocation ?? location}>
             <Route path={routes.dashboard.slips.view}>
-              <RouteSlipsView />
+              <RouteSlipsViewForm />
             </Route>
             <Route path={routes.dashboard.slips.drafts}>
               <RouteSlipsDrafts />
@@ -146,7 +146,7 @@ export default function Dashboard() {
             }}
             isOpen
           >
-            <RouteSlipsView />
+            <RouteSlipsViewForm />
           </Modal>
         </Route>
       )}
