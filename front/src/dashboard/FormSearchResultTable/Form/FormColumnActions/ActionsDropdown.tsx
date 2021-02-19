@@ -25,7 +25,7 @@ import {
 import { fullFormFragment } from "common/fragments";
 import routes from "common/routes";
 import { IconChevronUp, IconChevronDown } from "common/components/Icons";
-import { DeleteModal } from "../../../slips/slips-actions/Delete";
+import { DeleteModal } from "./DeleteModal";
 
 const DUPLICATE_FORM = gql`
   mutation DuplicateForm($id: ID!) {

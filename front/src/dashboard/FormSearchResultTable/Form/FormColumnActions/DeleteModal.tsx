@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { IconTrash } from "common/components/Icons";
 import { gql, useMutation } from "@apollo/client";
 import {
@@ -9,13 +9,6 @@ import {
 import { useParams } from "react-router-dom";
 import cogoToast from "cogo-toast";
 import { Modal, ModalTitle } from "common/components";
-
-type Props = {
-  formId: string;
-  small?: boolean;
-  onOpen?: () => void;
-  onClose?: () => void;
-};
 
 const DELETE_FORM = gql`
   mutation DeleteForm($id: ID!) {
@@ -74,40 +67,5 @@ export function DeleteModal({ formId, onClose }: DeleteModalProps) {
         </button>
       </div>
     </Modal>
-  );
-}
-
-export default function Delete({
-  formId,
-  small = true,
-  onOpen,
-  onClose,
-}: Props) {
-  const [isOpen, setIsOpen] = useState(false);
-  const className = small ? "btn--no-style" : "btn btn--outline-primary";
-
-  return (
-    <>
-      <button
-        className={className}
-        title="Supprimer définitivement"
-        onClick={() => {
-          setIsOpen(true);
-          onOpen && onOpen();
-        }}
-      >
-        <IconTrash color="blueLight" size="24px" />
-        <span>Supprimer</span>
-      </button>
-      {isOpen && (
-        <DeleteModal
-          formId={formId}
-          onClose={() => {
-            setIsOpen(false);
-            onClose && onClose();
-          }}
-        />
-      )}
-    </>
   );
 }

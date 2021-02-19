@@ -9,7 +9,7 @@ import {
   WasteAcceptationStatusInput as WasteAcceptationStatus,
   QuantityType,
 } from "generated/graphql/types";
-import { useParams } from "react-router-dom";
+import { useParams, Link, generatePath } from "react-router-dom";
 import { GET_DETAIL_FORM } from "common/queries";
 import { InlineError } from "common/components/Error";
 
@@ -17,8 +17,7 @@ import { formatDate } from "common/datetime";
 import DownloadPdf from "dashboard/slips/slips-actions/DownloadPdf";
 import Duplicate from "dashboard/slips/slips-actions/Duplicate";
 
-import Delete from "dashboard/slips/slips-actions/Delete";
-import Edit from "dashboard/slips/slips-actions/Edit";
+import { DeleteModal } from "../../../FormSearchResultTable/Form/FormColumnActions/DeleteModal";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import {
   TransportSegment,
@@ -34,6 +33,8 @@ import {
   IconWaterDam,
   IconRenewableEnergyEarth,
   IconWarehousePackage,
+  IconTrash,
+  IconPaperWrite,
 } from "common/components/Icons";
 
 import QRCodeIcon from "react-qr-code";
@@ -41,6 +42,7 @@ import QRCodeIcon from "react-qr-code";
 import styles from "./RouteSlipsViewForm.module.scss";
 
 import WorkflowAction from "dashboard/slips/slips-actions/workflow/WorkflowAction";
+import routes from "common/routes";
 
 const getVerboseConsistence = (
   consistence: Consistence | null | undefined | ""
@@ -400,6 +402,7 @@ export function RouteSlipsViewForm() {
       fetchPolicy: "network-only",
     }
   );
+  const [isDeleting, setIsDeleting] = React.useState(false);
   const form = data?.form;
 
   if (error) {
@@ -414,210 +417,248 @@ export function RouteSlipsViewForm() {
   const hasTempStorage: boolean = !!form?.temporaryStorageDetail;
 
   return (
-    <div className={styles.detail}>
-      <div className={styles.detailSummary}>
-        <h4 className={styles.detailTitle}>
-          <span className={styles.detailStatus}>
-            [{statusLabels[form.status]}]
-          </span>
-          {form.status !== "DRAFT" && <span>{form.readableId}</span>}
-
-          {!!form.customId && (
-            <span className="tw-ml-auto">Numéro libre: {form.customId}</span>
-          )}
-        </h4>
-
-        <div className={styles.detailContent}>
-          <div className={`${styles.detailQRCodeIcon}`}>
-            {form.status !== "DRAFT" && (
-              <div className={styles.detailQRCode}>
-                <QRCodeIcon value={form.readableId} size={96} />
-                <span>Ce QR code contient le numéro du bordereau </span>
-              </div>
-            )}
-          </div>
-          <div className={styles.detailGrid}>
-            <DateRow
-              value={form.stateSummary?.lastActionOn}
-              label="Dernière action sur le BSD"
-            />
-            <dt>Code déchet</dt>
-            <dd>{form.wasteDetails?.code}</dd>
-            <DetailRow value={form.wasteDetails?.name} label="Nom usuel" />
-            <dt>Quantité</dt>
-            <dd>{form.stateSummary?.quantity ?? "?"} tonnes</dd>
-            <PackagingRow packagingInfos={form.wasteDetails?.packagingInfos} />
-            <dt>Consistance</dt>{" "}
-            <dd>{getVerboseConsistence(form.wasteDetails?.consistence)}</dd>
-          </div>
-
-          <div className={styles.detailGrid}>
-            <dt>Code onu</dt>
-            <dd>{form?.wasteDetails?.onuCode}</dd>
-            <dt>POP</dt> <dd>{form.wasteDetails?.pop ? "Oui" : "Non"}</dd>
-          </div>
-
-          {form.ecoOrganisme && (
-            <EcoOrganisme ecoOrganisme={form.ecoOrganisme} />
-          )}
-        </div>
-      </div>
-
-      <Tabs selectedTabClassName={styles.detailTabSelected}>
-        {/* Tabs menu */}
-        <TabList className={styles.detailTabs}>
-          <Tab className={styles.detailTab}>
-            <IconWaterDam size="25px" />
-            <span className={styles.detailTabCaption}>Producteur</span>
-          </Tab>
-          {!!form?.trader?.company?.name && (
-            <Tab className={styles.detailTab}>
-              <IconWarehousePackage size="25px" />
-              <span className={styles.detailTabCaption}>Négociant</span>
-            </Tab>
-          )}
-          <Tab className={styles.detailTab}>
-            <IconWarehouseDelivery size="25px" />
-            <span className={styles.detailTabCaption}>
-              <span> {isMultiModal ? "Transp. n°1" : "Transporteur"}</span>
+    <>
+      <div className={styles.detail}>
+        <div className={styles.detailSummary}>
+          <h4 className={styles.detailTitle}>
+            <span className={styles.detailStatus}>
+              [{statusLabels[form.status]}]
             </span>
-          </Tab>
-          {form.transportSegments?.map((segment, idx) => (
-            <Tab className={styles.detailTab} key={idx}>
-              <IconWarehouseDelivery size="25px" />
-              <span className={styles.detailTabCaption}>
-                Transp.
-                {!!segment.segmentNumber && `N° ${segment.segmentNumber + 1}`}
-              </span>
-            </Tab>
-          ))}
-          {hasTempStorage && (
-            <Tab className={styles.detailTab}>
-              <IconWarehouseStorage size="25px" />
-              <span className={styles.detailTabCaption}>Entr. Prov.</span>
-            </Tab>
-          )}
+            {form.status !== "DRAFT" && <span>{form.readableId}</span>}
 
-          <Tab className={styles.detailTab}>
-            <IconRenewableEnergyEarth size="25px" />
-            <span className={styles.detailTabCaption}>Destinataire</span>
-          </Tab>
-        </TabList>
-        {/* Tabs content */}
-        <div className={styles.detailTabPanels}>
-          {/* Emitter tab panel */}
-          <TabPanel className={styles.detailTabPanel}>
-            <div className={styles.detailColumns}>
-              <div className={styles.detailGrid}>
-                <Company label="Émetteur" company={form.emitter?.company} />
+            {!!form.customId && (
+              <span className="tw-ml-auto">Numéro libre: {form.customId}</span>
+            )}
+          </h4>
 
-                <DetailRow
-                  value={form.emitter?.workSite?.name}
-                  label="Chantier"
-                />
-                {!!form.emitter?.workSite?.address && (
-                  <>
-                    <dt>Adresse Chantier</dt>
-                    <dd>
-                      {form.emitter?.workSite?.address}{" "}
-                      {form.emitter?.workSite?.postalCode}{" "}
-                      {form.emitter?.workSite?.city}
-                    </dd>
-                  </>
-                )}
-              </div>
-              <div className={styles.detailGrid}>
-                <dt>Quantité</dt> <dd>{form.wasteDetails?.quantity} tonnes</dd>
-                <DetailRow
-                  value={getVerboseQuantityType(
-                    form.wasteDetails?.quantityType
-                  )}
-                  label="Quantité"
-                />
-                <DateRow value={form.sentAt} label="Envoyé le" />
-                <DetailRow value={form.sentBy} label="Envoyé par" />
-                <YesNoRow value={!!form.sentAt} label="Signature producteur" />
-              </div>
-            </div>
-          </TabPanel>
-          {/* Trader tab panel */}
-          {!!form?.trader?.company?.name && (
-            <TabPanel className={styles.detailTabPanel}>
-              <Trader trader={form.trader} />
-            </TabPanel>
-          )}
-          {/* Transporter tab panel */}
-          <TabPanel className={styles.detailTabPanel}>
-            <div className={`${styles.detailGrid} `}>
-              <Company
-                label={`Transporteur ${isMultiModal ? "N°1" : ""}`}
-                company={form.transporter?.company}
-              />
+          <div className={styles.detailContent}>
+            <div className={`${styles.detailQRCodeIcon}`}>
+              {form.status !== "DRAFT" && (
+                <div className={styles.detailQRCode}>
+                  <QRCodeIcon value={form.readableId} size={96} />
+                  <span>Ce QR code contient le numéro du bordereau </span>
+                </div>
+              )}
             </div>
             <div className={styles.detailGrid}>
-              <YesNoRow
-                value={form?.transporter?.isExemptedOfReceipt}
-                label="Exemption de récépissé"
-              />
-              <DetailRow
-                value={form?.transporter?.receipt}
-                label="Numéro de récépissé"
-              />
-              <DetailRow
-                value={form?.transporter?.department}
-                label="Département"
-              />
               <DateRow
-                value={form?.transporter?.validityLimit}
-                label="Date de validité"
+                value={form.stateSummary?.lastActionOn}
+                label="Dernière action sur le BSD"
               />
-              <DetailRow
-                value={form?.transporter?.numberPlate}
-                label="Immatriculation"
+              <dt>Code déchet</dt>
+              <dd>{form.wasteDetails?.code}</dd>
+              <DetailRow value={form.wasteDetails?.name} label="Nom usuel" />
+              <dt>Quantité</dt>
+              <dd>{form.stateSummary?.quantity ?? "?"} tonnes</dd>
+              <PackagingRow
+                packagingInfos={form.wasteDetails?.packagingInfos}
               />
-              <YesNoRow
-                value={form.signedByTransporter}
-                label="Signé par le transporteur"
-              />
-              <DateRow value={form.sentAt} label="Date de prise en charge" />
+              <dt>Consistance</dt>{" "}
+              <dd>{getVerboseConsistence(form.wasteDetails?.consistence)}</dd>
             </div>
-          </TabPanel>
-          {/* Multimodal transporters tab panels */}
-          {form.transportSegments?.map((segment, idx) => (
-            <TabPanel className={styles.detailTabPanel} key={idx}>
-              <TransportSegmentDetail segment={segment} key={segment.id} />
-            </TabPanel>
-          ))}
-          {/* Temp storage tab panel */}
-          {hasTempStorage && (
-            <TabPanel className={styles.detailTabPanel}>
-              <TempStorage form={form} />
-            </TabPanel>
-          )}
 
-          {/* Recipient  tab panel */}
-          <TabPanel className={styles.detailTabPanel}>
-            <div className={styles.detailColumns}>
-              <Recipient form={form} hasTempStorage={hasTempStorage} />
+            <div className={styles.detailGrid}>
+              <dt>Code onu</dt>
+              <dd>{form?.wasteDetails?.onuCode}</dd>
+              <dt>POP</dt> <dd>{form.wasteDetails?.pop ? "Oui" : "Non"}</dd>
             </div>
-          </TabPanel>
+
+            {form.ecoOrganisme && (
+              <EcoOrganisme ecoOrganisme={form.ecoOrganisme} />
+            )}
+          </div>
         </div>
-      </Tabs>
-      <div className={styles.detailActions}>
-        {form.status !== FormStatus.Draft && (
-          <DownloadPdf formId={form.id} small={false} />
-        )}
-        <Duplicate formId={form.id} small={false} redirectToDashboard={true} />
-        {[FormStatus.Draft, FormStatus.Sealed].includes(form.status) && (
-          <>
-            <Delete formId={form.id} small={false} />
-            <Edit formId={form.id} small={false} />
-          </>
-        )}
-        {statusesWithDynamicActions.includes(form.status) && (
-          <WorkflowAction siret={siret} form={form} />
-        )}
+
+        <Tabs selectedTabClassName={styles.detailTabSelected}>
+          {/* Tabs menu */}
+          <TabList className={styles.detailTabs}>
+            <Tab className={styles.detailTab}>
+              <IconWaterDam size="25px" />
+              <span className={styles.detailTabCaption}>Producteur</span>
+            </Tab>
+            {!!form?.trader?.company?.name && (
+              <Tab className={styles.detailTab}>
+                <IconWarehousePackage size="25px" />
+                <span className={styles.detailTabCaption}>Négociant</span>
+              </Tab>
+            )}
+            <Tab className={styles.detailTab}>
+              <IconWarehouseDelivery size="25px" />
+              <span className={styles.detailTabCaption}>
+                <span> {isMultiModal ? "Transp. n°1" : "Transporteur"}</span>
+              </span>
+            </Tab>
+            {form.transportSegments?.map((segment, idx) => (
+              <Tab className={styles.detailTab} key={idx}>
+                <IconWarehouseDelivery size="25px" />
+                <span className={styles.detailTabCaption}>
+                  Transp.
+                  {!!segment.segmentNumber && `N° ${segment.segmentNumber + 1}`}
+                </span>
+              </Tab>
+            ))}
+            {hasTempStorage && (
+              <Tab className={styles.detailTab}>
+                <IconWarehouseStorage size="25px" />
+                <span className={styles.detailTabCaption}>Entr. Prov.</span>
+              </Tab>
+            )}
+
+            <Tab className={styles.detailTab}>
+              <IconRenewableEnergyEarth size="25px" />
+              <span className={styles.detailTabCaption}>Destinataire</span>
+            </Tab>
+          </TabList>
+          {/* Tabs content */}
+          <div className={styles.detailTabPanels}>
+            {/* Emitter tab panel */}
+            <TabPanel className={styles.detailTabPanel}>
+              <div className={styles.detailColumns}>
+                <div className={styles.detailGrid}>
+                  <Company label="Émetteur" company={form.emitter?.company} />
+
+                  <DetailRow
+                    value={form.emitter?.workSite?.name}
+                    label="Chantier"
+                  />
+                  {!!form.emitter?.workSite?.address && (
+                    <>
+                      <dt>Adresse Chantier</dt>
+                      <dd>
+                        {form.emitter?.workSite?.address}{" "}
+                        {form.emitter?.workSite?.postalCode}{" "}
+                        {form.emitter?.workSite?.city}
+                      </dd>
+                    </>
+                  )}
+                </div>
+                <div className={styles.detailGrid}>
+                  <dt>Quantité</dt>{" "}
+                  <dd>{form.wasteDetails?.quantity} tonnes</dd>
+                  <DetailRow
+                    value={getVerboseQuantityType(
+                      form.wasteDetails?.quantityType
+                    )}
+                    label="Quantité"
+                  />
+                  <DateRow value={form.sentAt} label="Envoyé le" />
+                  <DetailRow value={form.sentBy} label="Envoyé par" />
+                  <YesNoRow
+                    value={!!form.sentAt}
+                    label="Signature producteur"
+                  />
+                </div>
+              </div>
+            </TabPanel>
+            {/* Trader tab panel */}
+            {!!form?.trader?.company?.name && (
+              <TabPanel className={styles.detailTabPanel}>
+                <Trader trader={form.trader} />
+              </TabPanel>
+            )}
+            {/* Transporter tab panel */}
+            <TabPanel className={styles.detailTabPanel}>
+              <div className={`${styles.detailGrid} `}>
+                <Company
+                  label={`Transporteur ${isMultiModal ? "N°1" : ""}`}
+                  company={form.transporter?.company}
+                />
+              </div>
+              <div className={styles.detailGrid}>
+                <YesNoRow
+                  value={form?.transporter?.isExemptedOfReceipt}
+                  label="Exemption de récépissé"
+                />
+                <DetailRow
+                  value={form?.transporter?.receipt}
+                  label="Numéro de récépissé"
+                />
+                <DetailRow
+                  value={form?.transporter?.department}
+                  label="Département"
+                />
+                <DateRow
+                  value={form?.transporter?.validityLimit}
+                  label="Date de validité"
+                />
+                <DetailRow
+                  value={form?.transporter?.numberPlate}
+                  label="Immatriculation"
+                />
+                <YesNoRow
+                  value={form.signedByTransporter}
+                  label="Signé par le transporteur"
+                />
+                <DateRow value={form.sentAt} label="Date de prise en charge" />
+              </div>
+            </TabPanel>
+            {/* Multimodal transporters tab panels */}
+            {form.transportSegments?.map((segment, idx) => (
+              <TabPanel className={styles.detailTabPanel} key={idx}>
+                <TransportSegmentDetail segment={segment} key={segment.id} />
+              </TabPanel>
+            ))}
+            {/* Temp storage tab panel */}
+            {hasTempStorage && (
+              <TabPanel className={styles.detailTabPanel}>
+                <TempStorage form={form} />
+              </TabPanel>
+            )}
+
+            {/* Recipient  tab panel */}
+            <TabPanel className={styles.detailTabPanel}>
+              <div className={styles.detailColumns}>
+                <Recipient form={form} hasTempStorage={hasTempStorage} />
+              </div>
+            </TabPanel>
+          </div>
+        </Tabs>
+        <div className={styles.detailActions}>
+          {form.status !== FormStatus.Draft && (
+            <DownloadPdf formId={form.id} small={false} />
+          )}
+          <Duplicate
+            formId={form.id}
+            small={false}
+            redirectToDashboard={true}
+          />
+          {[FormStatus.Draft, FormStatus.Sealed].includes(form.status) && (
+            <>
+              <button
+                className="btn btn--outline-primary"
+                onClick={() => {
+                  setIsDeleting(true);
+                }}
+              >
+                <IconTrash color="blueLight" size="24px" />
+                <span>Supprimer</span>
+              </button>
+              <Link
+                to={generatePath(routes.dashboard.slips.edit, {
+                  siret,
+                  id: formId,
+                })}
+                title="Modifier"
+                className="btn btn--outline-primary"
+              >
+                <IconPaperWrite size="24px" color="blueLight" />
+                <span>Modifier</span>
+              </Link>
+            </>
+          )}
+          {statusesWithDynamicActions.includes(form.status) && (
+            <WorkflowAction siret={siret} form={form} />
+          )}
+        </div>
       </div>
-    </div>
+      {isDeleting && (
+        <DeleteModal
+          formId={formId}
+          onClose={() => {
+            setIsDeleting(false);
+          }}
+        />
+      )}
+    </>
   );
 }
