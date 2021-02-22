@@ -7,7 +7,7 @@ import makeClient from "../../../../__tests__/testClient";
 describe("{ mutation { createBrokerReceipt } }", () => {
   afterEach(() => resetDatabase());
 
-  it("should create a broker receipt", async () => {
+  it("should create a broker receipt !", async () => {
     const receipt = {
       receiptNumber: "receiptNumber",
       validityLimit: "2021-03-31T00:00:00.000Z",
@@ -22,13 +22,13 @@ describe("{ mutation { createBrokerReceipt } }", () => {
           receiptNumber
           validityLimit
           department
-              }
+          }
       }`;
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
     const { data } = await mutate(createBrokerReceipt, {
-      variables: { input: { receipt } }
+      variables: { input: receipt }
     });
 
     expect(await prisma.brokerReceipt.count()).toEqual(1);
