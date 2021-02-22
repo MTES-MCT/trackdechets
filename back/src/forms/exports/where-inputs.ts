@@ -211,6 +211,9 @@ function allWasteWhereInput(sirets: string[]): Prisma.FormWhereInput {
           },
           { transporterCompanySiret: { in: sirets } },
           {
+            temporaryStorageDetail: { transporterCompanySiret: { in: sirets } }
+          },
+          {
             transportSegments: {
               some: {
                 transporterCompanySiret: { in: sirets }
