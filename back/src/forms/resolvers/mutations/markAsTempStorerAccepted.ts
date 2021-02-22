@@ -32,10 +32,7 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
 
   const formUpdateInput = {
     temporaryStorageDetail: {
-      update: {
-        ...tempStorageUpdateInput,
-        tempStorerSignedAt: new Date(tempStorageUpdateInput.tempStorerSignedAt)
-      }
+      update: tempStorageUpdateInput
     }
   };
 

@@ -473,7 +473,6 @@ describe("mutation.markAsProcessed", () => {
     });
 
     const processedAt = new Date("2019-10-04");
-    const processedAtStr = format(processedAt, f);
 
     const { mutate } = makeClient(user);
     await mutate(MARK_AS_PROCESSED, {
@@ -483,7 +482,7 @@ describe("mutation.markAsProcessed", () => {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 1",
           processedBy: "A simple bot",
-          processedAt: processedAtStr
+          processedAt: format(processedAt, f)
         }
       }
     });
@@ -492,6 +491,6 @@ describe("mutation.markAsProcessed", () => {
       where: { id: form.id }
     });
     expect(resultingForm.status).toBe(Status.PROCESSED);
-    expect(resultingForm.processedAt).toEqual(processedAtStr);
+    expect(resultingForm.processedAt).toEqual(processedAt);
   });
 });

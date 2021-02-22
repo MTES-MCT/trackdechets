@@ -257,7 +257,7 @@ model Form {
   receivedBy                         String?
   wasteDetailsConsistence            Consistence?
   processedBy                        String?
-  processedAt                        String?
+  processedAt                        DateTime?
   nextDestinationProcessingOperation String?
   traderCompanyName                  String?
   traderCompanySiret                 String?

@@ -5,8 +5,8 @@ import {
   EmitterType,
   Form,
   QuantityType,
-  TemporaryStorageDetail,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  Prisma
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
@@ -19,7 +19,6 @@ import {
   WASTES_CODES
 } from "../common/constants";
 import configureYup from "../common/yup/configureYup";
-import validDatetime from "../common/yup/validDatetime";
 import { PackagingInfo, Packagings } from "../generated/graphql/types";
 import { SchemaOf } from "yup";
 
@@ -31,7 +30,7 @@ configureYup();
 // ************************************************
 
 type Emitter = Pick<
-  Form,
+  Prisma.FormCreateInput,
   | "emitterType"
   | "emitterPickupSite"
   | "emitterWorkSiteName"
@@ -48,7 +47,7 @@ type Emitter = Pick<
 >;
 
 type Recipient = Pick<
-  Form,
+  Prisma.FormCreateInput,
   | "recipientCap"
   | "recipientProcessingOperation"
   | "recipientIsTempStorage"
@@ -61,7 +60,7 @@ type Recipient = Pick<
 >;
 
 type WasteDetails = Pick<
-  Form,
+  Prisma.FormCreateInput,
   | "wasteDetailsCode"
   | "wasteDetailsName"
   | "wasteDetailsOnuCode"
@@ -76,7 +75,7 @@ type WasteDetails = Pick<
 >;
 
 type Transporter = Pick<
-  Form,
+  Prisma.FormCreateInput,
   | "transporterCompanyName"
   | "transporterCompanySiret"
   | "transporterCompanyAddress"
@@ -89,12 +88,10 @@ type Transporter = Pick<
   | "transporterValidityLimit"
   | "transporterNumberPlate"
   | "transporterCustomInfo"
-  | "sentAt"
-  | "signedByTransporter"
 >;
 
 type ReceivedInfo = Pick<
-  Form,
+  Prisma.FormCreateInput,
   | "isAccepted"
   | "wasteAcceptationStatus"
   | "wasteRefusalReason"
@@ -105,7 +102,7 @@ type ReceivedInfo = Pick<
 >;
 
 type AcceptedInfo = Pick<
-  Form,
+  Prisma.FormCreateInput,
   | "isAccepted"
   | "wasteAcceptationStatus"
   | "wasteRefusalReason"
@@ -114,10 +111,13 @@ type AcceptedInfo = Pick<
   | "quantityReceived"
 >;
 
-type SigningInfo = Pick<Form, "sentAt" | "sentBy" | "signedByTransporter">;
+type SigningInfo = Pick<
+  Prisma.FormCreateInput,
+  "sentAt" | "sentBy" | "signedByTransporter"
+>;
 
 type ProcessedInfo = Pick<
-  Form,
+  Prisma.FormCreateInput,
   | "processedBy"
   | "processedAt"
   | "processingOperationDone"
@@ -134,7 +134,7 @@ type ProcessedInfo = Pick<
 >;
 
 type TempStorageInfo = Pick<
-  TemporaryStorageDetail,
+  Prisma.TemporaryStorageDetailCreateInput,
   | "tempStorerQuantityType"
   | "tempStorerQuantityReceived"
   | "tempStorerWasteAcceptationStatus"
@@ -145,7 +145,7 @@ type TempStorageInfo = Pick<
 >;
 
 type DestinationAfterTempStorage = Pick<
-  TemporaryStorageDetail,
+  Prisma.TemporaryStorageDetailCreateInput,
   | "destinationCompanyName"
   | "destinationCompanySiret"
   | "destinationCompanyAddress"
@@ -157,7 +157,7 @@ type DestinationAfterTempStorage = Pick<
 >;
 
 type TransporterAfterTempStorage = Pick<
-  TemporaryStorageDetail,
+  Prisma.TemporaryStorageDetailCreateInput,
   | "transporterCompanyName"
   | "transporterCompanySiret"
   | "transporterCompanyAddress"
@@ -172,7 +172,7 @@ type TransporterAfterTempStorage = Pick<
 >;
 
 type WasteRepackaging = Pick<
-  Form,
+  Prisma.TemporaryStorageDetailCreateInput,
   | "wasteDetailsOnuCode"
   | "wasteDetailsPackagings"
   | "wasteDetailsOtherPackaging"
@@ -432,10 +432,6 @@ export const wasteDetailsSchema = wasteDetailsSchemaFn(false);
 // 8 - Collecteur-transporteur
 const transporterSchemaFn: FactorySchemaOf<Transporter> = isDraft =>
   yup.object({
-    sentAt: validDatetime({
-      verboseFieldName: "date d'envoi"
-    }) as any,
-    signedByTransporter: yup.boolean().nullable(),
     transporterCustomInfo: yup.string().nullable(),
     transporterNumberPlate: yup.string().nullable(),
     transporterCompanyName: yup
@@ -491,19 +487,14 @@ const transporterSchemaFn: FactorySchemaOf<Transporter> = isDraft =>
                 "Le département du transporteur est obligatoire"
               )
       ),
-    transporterValidityLimit: validDatetime({
-      verboseFieldName: "date de validité"
-    }) as any
+    transporterValidityLimit: yup.date().nullable()
   });
 
 // 8 - Collecteur-transporteur
 // 9 - Déclaration générale de l’émetteur du bordereau :
 export const signingInfoSchema: SchemaOf<SigningInfo> = yup.object({
   signedByTransporter: yup.boolean().nullable(),
-  sentAt: validDatetime({
-    verboseFieldName: "date d'envoi",
-    required: true
-  }) as any,
+  sentAt: yup.date().required(),
   sentBy: yup
     .string()
     .ensure()
@@ -517,13 +508,8 @@ export const receivedInfoSchema: SchemaOf<ReceivedInfo> = yup.object({
     .string()
     .ensure()
     .required("Vous devez saisir un responsable de la réception."),
-  receivedAt: validDatetime({
-    verboseFieldName: "date de réception",
-    required: true
-  }) as any,
-  signedAt: validDatetime({
-    verboseFieldName: "date d'acceptation"
-  }) as any,
+  receivedAt: yup.date().required(),
+  signedAt: yup.date().nullable(),
   quantityReceived: yup
     .number()
     // if waste is refused, quantityReceived must be 0
@@ -566,9 +552,7 @@ export const receivedInfoSchema: SchemaOf<ReceivedInfo> = yup.object({
 // 10 - Expédition acceptée (ou refusée) à l’installation de destination
 export const acceptedInfoSchema: SchemaOf<AcceptedInfo> = yup.object({
   isAccepted: yup.boolean(),
-  signedAt: validDatetime({
-    verboseFieldName: "date d'acceptation"
-  }) as any,
+  signedAt: yup.date().nullable(),
   signedBy: yup
     .string()
     .ensure()
@@ -703,10 +687,7 @@ const processedInfoSchemaFn: (
       .string()
       .ensure()
       .required("Vous devez saisir un responsable de traitement."),
-    processedAt: validDatetime({
-      verboseFieldName: "date de traitement",
-      required: true
-    }) as any,
+    processedAt: yup.date().required(),
     processingOperationDone: yup
       .string()
       .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION),
@@ -733,13 +714,8 @@ export const tempStoredInfoSchema: SchemaOf<TempStorageInfo> = yup.object({
     .string()
     .ensure()
     .required("Vous devez saisir un responsable de la réception."),
-  tempStorerReceivedAt: validDatetime({
-    verboseFieldName: "date de réception",
-    required: true
-  }) as any,
-  tempStorerSignedAt: validDatetime({
-    verboseFieldName: "date d'acceptation"
-  }) as any,
+  tempStorerReceivedAt: yup.date().required(),
+  tempStorerSignedAt: yup.date().nullable(),
   tempStorerQuantityType: yup.mixed<QuantityType>(),
   tempStorerWasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
   tempStorerQuantityReceived: yup
@@ -787,9 +763,7 @@ export const tempStoredInfoSchema: SchemaOf<TempStorageInfo> = yup.object({
 });
 
 export const tempStorerAcceptedInfoSchema = yup.object().shape({
-  tempStorerReceivedAt: validDatetime({
-    verboseFieldName: "date de réception"
-  }),
+  tempStorerReceivedAt: yup.date().nullable(),
   tempStorerQuantityType: yup.mixed<QuantityType>().required(),
   tempStorerWasteAcceptationStatus: yup
     .mixed<WasteAcceptationStatus>()
@@ -798,9 +772,7 @@ export const tempStorerAcceptedInfoSchema = yup.object().shape({
     .string()
     .ensure()
     .required("Vous devez saisir un responsable de l'acceptation."),
-  tempStorerSignedAt: validDatetime({
-    verboseFieldName: "date d'acceptation"
-  }),
+  tempStorerSignedAt: yup.date().nullable(),
   tempStorerQuantityReceived: yup
     .number()
     .required()

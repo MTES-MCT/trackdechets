@@ -20,7 +20,7 @@ const MARK_AS_SENT = `
 `;
 
 describe("{ mutation { markAsSent } }", () => {
-  afterAll(() => resetDatabase());
+  afterEach(resetDatabase);
 
   it("should fail when SENT is not a possible next step", async () => {
     const { user, company: emitterCompany } = await userWithCompanyFactory(
@@ -323,7 +323,7 @@ describe("{ mutation { markAsSent } }", () => {
     expect(form.sentAt).toEqual(sentAt);
   });
 
-  test.each(["20201211", "junk", "2020-12-33"])(
+  test.each(["junk", "2020-12-33"])(
     "sentAt must be a valid date, %p is not valid",
     async dateStr => {
       const { user, company: emitterCompany } = await userWithCompanyFactory(
@@ -332,7 +332,7 @@ describe("{ mutation { markAsSent } }", () => {
 
       const recipientCompany = await companyFactory();
 
-      let form = await formFactory({
+      const form = await formFactory({
         ownerId: user.id,
         opt: {
           status: "SEALED",
@@ -343,28 +343,18 @@ describe("{ mutation { markAsSent } }", () => {
 
       const { mutate } = makeClient(user);
 
-      const { errors } = await mutate(MARK_AS_SENT, {
-        variables: {
-          id: form.id,
-          sentInfo: { sentAt: new Date(dateStr), sentBy: "John Doe" }
-        }
-      });
-      expect(errors[0].message).toEqual(
-        "La date d'envoi n'est pas formatée correctement"
+      const markAsSent = () =>
+        mutate(MARK_AS_SENT, {
+          variables: {
+            id: form.id,
+            sentInfo: { sentAt: dateStr, sentBy: "John Doe" }
+          }
+        });
+      expect(markAsSent).rejects.toThrow(
+        `{"errors":[{"message":"Variable \\"$sentInfo\\" got invalid value \\"${dateStr}\\" at \\"sentInfo.sentAt\\"; ` +
+          `Expected type DateTime. Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. ` +
+          `Reçu ${dateStr}.","locations":[{"line":2,"column":33}],"extensions":{"code":"BAD_USER_INPUT"}}]}`
       );
-      form = await prisma.form.findUnique({ where: { id: form.id } });
-
-      expect(form.status).toEqual("SEALED");
-
-      // check no SEALED statusLog is created
-      const statusLogs = await prisma.statusLog.findMany({
-        where: {
-          form: { id: form.id },
-          user: { id: user.id },
-          status: "SEALED"
-        }
-      });
-      expect(statusLogs.length).toEqual(0);
     }
   );
 

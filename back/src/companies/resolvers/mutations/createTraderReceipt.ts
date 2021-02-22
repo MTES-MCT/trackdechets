@@ -1,4 +1,3 @@
-import { stringifyDates } from "../../database";
 import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -18,8 +17,7 @@ const createTraderReceiptResolver: MutationResolvers["createTraderReceipt"] = as
   checkIsAuthenticated(context);
   const { input } = args;
   await receiptSchema.validate(input);
-  const traderReceipt = await prisma.traderReceipt.create({ data: input });
-  return stringifyDates(traderReceipt);
+  return prisma.traderReceipt.create({ data: input });
 };
 
 export default createTraderReceiptResolver;

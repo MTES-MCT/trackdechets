@@ -3,13 +3,7 @@
  */
 
 import prisma from "../prisma";
-import {
-  User,
-  Prisma,
-  Company,
-  TraderReceipt,
-  TransporterReceipt
-} from "@prisma/client";
+import { User, Prisma, Company } from "@prisma/client";
 import {
   CompanyNotFound,
   TraderReceiptNotFound,
@@ -200,19 +194,6 @@ export async function getTransporterReceiptOrNotFound({
     throw new TransporterReceiptNotFound();
   }
   return receipt;
-}
-
-export function stringifyDates(obj: TraderReceipt | TransporterReceipt) {
-  if (!obj) {
-    return null;
-  }
-
-  return {
-    ...obj,
-    ...(obj?.validityLimit && {
-      validityLimit: obj.validityLimit.toISOString()
-    })
-  };
 }
 
 export function convertUrls<T extends Partial<Company>>(

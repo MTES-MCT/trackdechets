@@ -31,7 +31,7 @@ export default async function acceptPendingInvitations() {
         );
         await prisma.userAccountHash.update({
           where: { hash: invitation.hash },
-          data: { acceptedAt: new Date().toISOString() }
+          data: { acceptedAt: new Date() }
         });
       }
     }

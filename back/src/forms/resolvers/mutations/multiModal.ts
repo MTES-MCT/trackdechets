@@ -1,9 +1,7 @@
-import { TransportSegment as PrismaTransportSegment } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
 import * as Yup from "yup";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import validDatetime from "../../../common/yup/validDatetime";
 import {
   MutationEditSegmentArgs,
   MutationMarkSegmentAsReadyToTakeOverArgs,
@@ -13,7 +11,10 @@ import {
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
-import { expandTransportSegmentFromDb } from "../../form-converter";
+import {
+  expandTransportSegmentFromDb,
+  flattenTransportSegmentInput
+} from "../../form-converter";
 
 const SEGMENT_NOT_FOUND = "Le segment de transport n'a pas été trouvé";
 const FORM_NOT_FOUND_OR_NOT_ALLOWED =
@@ -58,17 +59,12 @@ const segmentSchema = Yup.object<any>().shape({
         : schema.required("Le département du transporteur est obligatoire")
   ),
 
-  transporterValidityLimit: validDatetime({
-    verboseFieldName: "date de validité"
-  }),
+  transporterValidityLimit: Yup.date().nullable(),
   transporterNumberPlate: Yup.string().nullable(true)
 });
 
 const takeOverInfoSchema = Yup.object<any>().shape({
-  takenOverAt: validDatetime({
-    verboseFieldName: "date de prise en charge",
-    required: true
-  }),
+  takenOverAt: Yup.date().required(),
   takenOverBy: Yup.string().required("Le nom du responsable est obligatoire")
 });
 
@@ -108,45 +104,6 @@ const getForm = async formId => {
   return form;
 };
 
-function flattenSegmentForDb(
-  input,
-  previousKeys = [],
-  dbObject = {}
-): Partial<PrismaTransportSegment> {
-  Object.keys(input).forEach(key => {
-    if (
-      input[key] &&
-      !Array.isArray(input[key]) &&
-      typeof input[key] === "object"
-    ) {
-      return flattenSegmentForDb(input[key], [...previousKeys, key], dbObject);
-    }
-
-    const objectKey = [...previousKeys, key]
-      .map((k, i) => {
-        if (i !== 0) {
-          return k.charAt(0).toUpperCase() + k.slice(1);
-        }
-
-        return k;
-      })
-      .join("");
-    dbObject[objectKey] = input[key];
-  });
-  return dbObject;
-}
-
-function datifySegmentForDb(transportSegment: Partial<PrismaTransportSegment>) {
-  return {
-    ...transportSegment,
-    ...(transportSegment.transporterValidityLimit && {
-      transporterValidityLimit: new Date(
-        transportSegment.transporterValidityLimit
-      )
-    })
-  };
-}
-
 /**
  *
  * Prepare a new transport segment
@@ -163,9 +120,7 @@ export async function prepareSegment(
   if (!currentUserSirets.includes(siret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
-  const nextSegmentPayload = datifySegmentForDb(
-    flattenSegmentForDb(nextSegmentInfo)
-  );
+  const nextSegmentPayload = flattenTransportSegmentInput(nextSegmentInfo);
 
   if (!nextSegmentPayload.transporterCompanySiret) {
     throw new ForbiddenError("Le siret est obligatoire");
@@ -226,8 +181,8 @@ export async function prepareSegment(
 
   const segment = await prisma.transportSegment.create({
     data: {
-      formId: id,
       ...nextSegmentPayload,
+      formId: id,
       previousTransporterCompanySiret: siret,
       segmentNumber: transportSegments.length + 1 // additional segments begin at index 1
     }
@@ -352,12 +307,7 @@ export async function takeOverSegment(
   }
   const updatedSegment = await prisma.transportSegment.update({
     where: { id },
-    data: {
-      ...takeOverInfo,
-      ...(takeOverInfo.takenOverAt && {
-        takenOverAt: new Date(takeOverInfo.takenOverAt)
-      })
-    }
+    data: takeOverInfo
   });
 
   await prisma.form.update({
@@ -400,7 +350,7 @@ export async function editSegment(
     throw new ForbiddenError(SEGMENT_NOT_FOUND);
   }
 
-  const nextSegmentPayload = flattenSegmentForDb(nextSegmentInfo);
+  const nextSegmentPayload = flattenTransportSegmentInput(nextSegmentInfo);
 
   // check user owns siret
   const userCompanies = await getUserCompanies(user.id);

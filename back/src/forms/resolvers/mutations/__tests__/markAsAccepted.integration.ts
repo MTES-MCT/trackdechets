@@ -56,7 +56,7 @@ describe("Test Form reception", () => {
       variables: {
         id: form.id,
         acceptedInfo: {
-          signedAt: new Date("2019-01-17T10:22:00+0100"),
+          signedAt: "2019-01-17T10:22:00+0100",
           signedBy: "Bill",
           wasteAcceptationStatus: "ACCEPTED",
           quantityReceived: 11
@@ -109,7 +109,7 @@ describe("Test Form reception", () => {
         id: form.id,
         acceptedInfo: {
           signedBy: "Bill",
-          signedAt: new Date("2019-01-17T10:22:00+0100"),
+          signedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "ACCEPTED",
           quantityReceived: -2
         }
@@ -152,7 +152,7 @@ describe("Test Form reception", () => {
         id: form.id,
         acceptedInfo: {
           signedBy: "Bill",
-          signedAt: new Date("2019-01-17T10:22:00+0100"),
+          signedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "ACCEPTED",
           quantityReceived: 0
         }
@@ -193,7 +193,7 @@ describe("Test Form reception", () => {
         id: form.id,
         acceptedInfo: {
           signedBy: "Holden",
-          signedAt: new Date("2019-01-17T10:22:00+0100"),
+          signedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "REFUSED",
           wasteRefusalReason: "Lorem ipsum",
           quantityReceived: 0
@@ -244,7 +244,7 @@ describe("Test Form reception", () => {
         id: form.id,
         acceptedInfo: {
           signedBy: "Holden",
-          signedAt: new Date("2019-01-17T10:22:00+0100"),
+          signedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "REFUSED",
           wasteRefusalReason: "Lorem ipsum",
           quantityReceived: 21
@@ -294,7 +294,7 @@ describe("Test Form reception", () => {
         id: form.id,
         acceptedInfo: {
           signedBy: "Carol",
-          signedAt: new Date("2019-01-17T10:22:00+0100"),
+          signedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "PARTIALLY_REFUSED",
           wasteRefusalReason: "Dolor sit amet",
           quantityReceived: 12.5

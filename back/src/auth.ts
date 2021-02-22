@@ -146,7 +146,7 @@ export function updateAccessTokenLastUsed(accessToken: AccessToken) {
     daysBetween(now, new Date(accessToken.lastUsed)) > 0
   ) {
     return prisma.accessToken.update({
-      data: { lastUsed: sameDayMidnight(now).toISOString() },
+      data: { lastUsed: sameDayMidnight(now) },
       where: { token: accessToken.token }
     });
   } else {
@@ -286,7 +286,7 @@ export const passportJwtMiddleware = (
             data: {
               token,
               user: { connect: { id: user.id } },
-              lastUsed: new Date().toISOString()
+              lastUsed: new Date()
             }
           });
         }

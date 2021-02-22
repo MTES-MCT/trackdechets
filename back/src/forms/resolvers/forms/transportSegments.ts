@@ -8,7 +8,7 @@ const transportSegmentResolver: FormResolvers["transportSegments"] = async form 
     .transportSegments({ orderBy: { segmentNumber: "asc" } });
   return segments.map(el => ({
     ...el,
-    ...(el.takenOverAt && { takenOverAt: el.takenOverAt.toISOString() }),
+    ...(el.takenOverAt && { takenOverAt: el.takenOverAt }),
     ...expandTransportSegmentFromDb(el)
   }));
 };

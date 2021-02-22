@@ -3,13 +3,7 @@
  */
 
 import prisma from "../prisma";
-import {
-  User,
-  UserRole,
-  Prisma,
-  Company,
-  UserAccountHash
-} from "@prisma/client";
+import { User, UserRole, Prisma, Company } from "@prisma/client";
 import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
@@ -122,7 +116,7 @@ export async function getUserAccountHashOrNotFound(
   if (userAccountHashes.length === 0) {
     throw new UserInputError("Cette invitation n'existe pas");
   }
-  return stringifyDates(userAccountHashes[0]);
+  return userAccountHashes[0];
 }
 
 export async function getCompanyAssociationOrNotFound(
@@ -188,7 +182,7 @@ export async function acceptNewUserCompanyInvitations(user: User) {
     where: {
       id: { in: existingHashes.map(h => h.id) }
     },
-    data: { acceptedAt: new Date().toISOString() }
+    data: { acceptedAt: new Date() }
   });
 }
 
@@ -202,11 +196,4 @@ export async function getMembershipRequestOrNotFoundError(
     throw new UserInputError("Cette demande de rattachement n'existe pas");
   }
   return membershipRequest;
-}
-
-export function stringifyDates(obj: UserAccountHash) {
-  return {
-    ...obj,
-    ...(obj?.acceptedAt && { acceptedAt: obj.acceptedAt.toISOString() })
-  };
 }

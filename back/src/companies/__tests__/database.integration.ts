@@ -14,7 +14,7 @@ describe("getInvitedUsers", () => {
         companySiret: company.siret,
         hash: "hash1",
         role: "MEMBER",
-        acceptedAt: new Date().toISOString()
+        acceptedAt: new Date()
       }
     });
     const invitedUsers = await getCompanyInvitedUsers(company.siret);

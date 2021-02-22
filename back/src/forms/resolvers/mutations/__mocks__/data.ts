@@ -99,7 +99,7 @@ export function getNewValidForm(): GraphQLForm {
     transporter: {
       receipt: "sdfg",
       department: "82",
-      validityLimit: "2018-12-11T00:00:00.000Z",
+      validityLimit: new Date("2018-12-11T00:00:00.000Z"),
       numberPlate: "12345",
       company: {
         name: "A company 4",

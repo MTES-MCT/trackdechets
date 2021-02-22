@@ -132,9 +132,7 @@ describe("Test Factories", () => {
 
     expect(newStatusLog.id).toBeTruthy();
 
-    expect(newStatusLog.loggedAt.toISOString()).toEqual(
-      "2017-03-25T00:00:00.000Z"
-    );
+    expect(newStatusLog.loggedAt).toEqual(new Date("2017-03-25T00:00:00.000Z"));
   });
 });
 

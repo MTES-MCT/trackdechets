@@ -201,8 +201,8 @@ describe("receivedInfosSchema", () => {
       quantityReceived: 12.5,
       wasteRefusalReason: "",
       receivedBy: "Jim",
-      receivedAt: "2020-01-17T10:12:00+0100",
-      signedAt: "2020-01-17T10:12:00+0100"
+      receivedAt: new Date("2020-01-17T10:12:00+0100"),
+      signedAt: new Date("2020-01-17T10:12:00+0100")
     };
 
     it("should be valid when waste is accepted", () => {
@@ -228,8 +228,8 @@ describe("receivedInfosSchema", () => {
       quantityReceived: 0,
       wasteRefusalReason: "non conformity",
       receivedBy: "Joe",
-      receivedAt: "2020-01-17T10:12:00+0100",
-      signedAt: "2020-01-17T10:12:00+0100"
+      receivedAt: new Date("2020-01-17T10:12:00+0100"),
+      signedAt: new Date("2020-01-17T10:12:00+0100")
     };
 
     it("should be valid when waste is refused", () => {
@@ -263,8 +263,8 @@ describe("receivedInfosSchema", () => {
       quantityReceived: 11,
       wasteRefusalReason: "mixed waste",
       receivedBy: "Bill",
-      receivedAt: "2020-01-17T10:12:00+0100",
-      signedAt: "2020-01-17T10:12:00+0100"
+      receivedAt: new Date("2020-01-17T10:12:00+0100"),
+      signedAt: new Date("2020-01-17T10:12:00+0100")
     };
 
     it("should be valid when waste is partially refused", () => {

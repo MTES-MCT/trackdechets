@@ -2,7 +2,7 @@ import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { getTraderReceiptOrNotFound, stringifyDates } from "../../database";
+import { getTraderReceiptOrNotFound } from "../../database";
 import { checkCanReadUpdateDeleteTraderReceipt } from "../../permissions";
 import { receiptSchema } from "../../validation";
 
@@ -27,7 +27,7 @@ const updateTraderReceiptResolver: MutationResolvers["updateTraderReceipt"] = as
     data,
     where: { id: receipt.id }
   });
-  return stringifyDates(traderReceipt);
+  return traderReceipt;
 };
 
 export default updateTraderReceiptResolver;

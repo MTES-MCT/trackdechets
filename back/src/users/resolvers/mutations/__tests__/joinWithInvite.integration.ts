@@ -42,7 +42,7 @@ describe("joinWithInvite mutation", () => {
         companySiret: company.siret,
         role: "MEMBER",
         hash: "hash",
-        acceptedAt: new Date().toISOString()
+        acceptedAt: new Date()
       }
     });
     const { errors } = await mutate(JOIN_WITH_INVITE, {
