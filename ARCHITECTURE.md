@@ -4,7 +4,7 @@
 
 ### Terminologie
 
-La terminologie permet de décliner les différentes `queries` et `mutations` de façon cohérente sur les différents types de bordereau. Le nom de chaque bordereau est construit en préfixant le type de déchet tracé par `bs`. Le terme générique utilisé pour désigner n'importe quel type de bordereaux est `bsd`.  
+La terminologie permet de décliner les différentes `queries` et `mutations` de façon cohérente sur les différents types de bordereau. Le nom de chaque bordereau est construit en préfixant le type de déchet tracé par `bs`. Le terme générique utilisé pour désigner n'importe quel type de bordereau est `bsd`.  
 
 * `bsd` - permet de désigner n'importe quel bordereau de façon générique
 * `bsdd` - bordereau de suivi des déchets dangereux (CERFA n° 12571\*01) 
@@ -37,7 +37,16 @@ query {
 
 ```graphql
 query {
-  bsdasris(first: 2) {
+  bsdasris(
+    pagination: { first: 2 }
+    filter: {
+      emitter {
+        company: {
+          siret: "11111111111111"
+        }
+      }
+    }
+  ) {
     id
     status
   }
@@ -50,9 +59,9 @@ Il existe en plus une requête "multi-bordereaux" renvoyant les bordereaux tout 
 ```graphql
 query {
   bsds(search: "World Wide Waste Company"){
-    ...on BSDD {}
-    ...on BSDASRI {}
-    ...on BSVHU {}
+    ...on Bsdd {}
+    ...on Bsdasri {}
+    ...on Bsvhu {}
   } 
 }
 ```
@@ -123,7 +132,7 @@ Pour filtrer une liste, on utilise l'argument `filter`. Cette argument est un ob
 différents champs filtrables en fonction du type de BSD.
 
 ```graphql
-bsdList(filter: BsdFilter): [Bsd]
+bsdds(filter: BsdFilter): [Bsdd]
 
 input BsdFilter {
   _or: BsdFilter
@@ -146,7 +155,7 @@ qu'émetteur, soit en tant que destinataire.
 
 ```graphql
 query {
-  bsdList(filter: {
+  bsdds(filter: {
     _or : {
       emitterCompanySiret: "85001946400021"
       recipientCompanySiret: "85001946400021"
@@ -164,7 +173,7 @@ query {
 
 ```graphql
 query {
-  bsdList(filter: { status: DRAFT })
+  bsdds(filter: { status: DRAFT })
 }
 
 ```
@@ -172,7 +181,7 @@ query {
 
 ```graphql
 query {
-  bsdList(filter: { status_in: [DRAFT, SENT]})
+  bsdds(filter: { status_in: [DRAFT, SENT]})
 }
 
 ```
@@ -181,14 +190,14 @@ query {
 
 ```graphql
 query {
-  bsdList(filter: { emitterCompanySiret: "1234567890"})
+  bsdds(filter: { emitterCompanySiret: "1234567890"})
 }
 ```
 ##### Contains
 
 ```graphql
 query {
-  bsdList(filter: { emitterCompanySiret_contains: "12345"})
+  bsdds(filter: { emitterCompanySiret_contains: "12345"})
 }
 ```
 
@@ -198,26 +207,26 @@ query {
 
 ```graphql
 query {
-  bsdList(filter: { updatedAt: "<date>"})
+  bsdds(filter: { updatedAt: "<date>"})
 }
 ```
 ##### LT, LTE, GT, GTE
 
 ```graphql
 query {
-  bsdList(filter: { updatedAt_gt: "<date>"})
+  bsdds(filter: { updatedAt_gt: "<date>"})
 }
 ```
 
 ```graphql
 query {
-  bsdList(filter: { updatedAt_lt: "<date>"})
+  bsdds(filter: { updatedAt_lt: "<date>"})
 }
 ```
 
 ```graphql
 query {
-  bsdList(filter: { updatedAt_lte: "<date>"})
+  bsdds(filter: { updatedAt_lte: "<date>"})
 }
 
 ```
