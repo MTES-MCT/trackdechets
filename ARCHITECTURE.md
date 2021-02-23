@@ -113,14 +113,14 @@ type PaginationArgs {
 }
 
 type Query {
-  dasris(pagination: PaginationArgs, where: DasriWhereInput): DasriConnection
+  bsdasris(pagination: PaginationArgs, where: BsdasriWhereInput): BsdasriConnection
 }
 
-type DasriConnection implements Connection {
+type BsdasriConnection implements Connection {
   pageInfo: PageInfo
   edges: {
     cursor: ID
-    node: Dasri
+    node: Bsdasri
   }
 }
 
