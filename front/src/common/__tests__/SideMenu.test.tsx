@@ -1,6 +1,5 @@
 import React from "react";
 import SideMenu from "common/components/SideMenu";
-import "@testing-library/jest-dom/extend-expect";
 import { render } from "@testing-library/react";
 import { mockMatchMediaWidth } from "common/__mocks__/matchmedia.mock";
 

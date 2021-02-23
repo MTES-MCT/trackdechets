@@ -1,0 +1,26 @@
+.Blankslate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.BlankslateImg,
+.BlankslateTitle {
+  margin-bottom: 1rem;
+}
+
+.BlankslateImg {
+  max-height: 300px;
+  width: auto;
+}
+
+.BlankslateTitle {
+  font-size: 1.2rem;
+}
+
+.BlankslateDescription {
+  font-size: 0.9rem;
+  max-width: 800px;
+}

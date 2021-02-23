@@ -11,10 +11,10 @@ import React, {
   useMemo,
 } from "react";
 import { useHistory, useParams, generatePath } from "react-router-dom";
-import { Breadcrumb, BreadcrumbItem } from "common/components";
+import { Stepper, StepperItem } from "common/components";
 import { InlineError } from "common/components/Error";
 import { updateApolloCache } from "common/helper";
-import { DRAFT_TAB_FORMS } from "dashboard/slips/tabs/queries";
+import { DRAFT_TAB_FORMS } from "dashboard/bsds/queries";
 import { getInitialState } from "../initial-state";
 import {
   Form,
@@ -131,14 +131,14 @@ export default function StepList(props: IProps) {
 
   const redirectTo =
     data?.form?.status === "SEALED"
-      ? generatePath(routes.dashboard.slips.follow, { siret })
-      : generatePath(routes.dashboard.slips.drafts, { siret });
+      ? generatePath(routes.dashboard.bsds.follow, { siret })
+      : generatePath(routes.dashboard.bsds.drafts, { siret });
 
   return (
     <div>
-      <Breadcrumb>
+      <Stepper>
         {Children.map(props.children, (child, index) => (
-          <BreadcrumbItem
+          <StepperItem
             variant={
               index === currentStep
                 ? "active"
@@ -149,9 +149,9 @@ export default function StepList(props: IProps) {
             onClick={() => setCurrentStep(index)}
           >
             <span>{child.props.title}</span>
-          </BreadcrumbItem>
+          </StepperItem>
         ))}
-      </Breadcrumb>
+      </Stepper>
       <div className="step-content">
         <Formik<FormInput>
           innerRef={formikForm}

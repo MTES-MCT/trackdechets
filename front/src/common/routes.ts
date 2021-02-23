@@ -14,15 +14,17 @@ export default {
     index: "/dashboard/:siret",
     exports: "/dashboard/:siret/exports",
     stats: "/dashboard/:siret/stats",
-    slips: {
-      index: "/dashboard/:siret/slips",
-      drafts: "/dashboard/:siret/slips/drafts",
-      act: "/dashboard/:siret/slips/act",
-      follow: "/dashboard/:siret/slips/follow",
-      history: "/dashboard/:siret/slips/history",
-      view: "/dashboard/:siret/slips/view/:id",
-      create: "/dashboard/:siret/slips/create",
-      edit: "/dashboard/:siret/slips/edit/:id",
+    bsds: {
+      index: "/dashboard/:siret/bsds",
+      drafts: "/dashboard/:siret/bsds/drafts",
+      act: "/dashboard/:siret/bsds/act",
+      follow: "/dashboard/:siret/bsds/follow",
+      history: "/dashboard/:siret/bsds/history",
+    },
+    bsdds: {
+      create: "/dashboard/:siret/bsdds/create",
+      edit: "/dashboard/:siret/bsdds/edit/:id",
+      view: "/dashboard/:siret/bsdds/view/:id",
     },
     transport: {
       index: "/dashboard/:siret/transport",
