@@ -39,7 +39,7 @@ query {
 query {
   bsdasris(
     pagination: { first: 2 }
-    filter: {
+    where: {
       emitter {
         company: {
           siret: "11111111111111"
@@ -113,7 +113,7 @@ type PaginationArgs {
 }
 
 type Query {
-  dasris(pagination: PaginationArgs, filter: DasriFilter): DasriConnection
+  dasris(pagination: PaginationArgs, where: DasriWhereInput): DasriConnection
 }
 
 type DasriConnection implements Connection {
@@ -128,16 +128,16 @@ type DasriConnection implements Connection {
 
 ### Filtres
 
-Pour filtrer une liste, on utilise l'argument `filter`. Cette argument est un objet qui peut contenir
+Pour filtrer une liste, on utilise l'argument `where`. Cette argument est un objet qui peut contenir
 différents champs filtrables en fonction du type de BSD.
 
 ```graphql
-bsdds(filter: BsdFilter): [Bsdd]
+bsdds(where: BsddWhereInput): [Bsdd]
 
-input BsdFilter {
-  _or: BsdFilter
-  _and: BsdFilter
-  _not: BsdFilter
+input BsddWhereInput {
+  _or: BsddWhereInput
+  _and: BsddWhereInput
+  _not: BsddWhereInput
   wasteCode: string
   status: FormStatus
   emitterCompanySiret: string
@@ -155,7 +155,7 @@ qu'émetteur, soit en tant que destinataire.
 
 ```graphql
 query {
-  bsdds(filter: {
+  bsdds(where: {
     _or : {
       emitterCompanySiret: "85001946400021"
       recipientCompanySiret: "85001946400021"
@@ -173,7 +173,7 @@ query {
 
 ```graphql
 query {
-  bsdds(filter: { status: DRAFT })
+  bsdds(where: { status: DRAFT })
 }
 
 ```
@@ -181,7 +181,7 @@ query {
 
 ```graphql
 query {
-  bsdds(filter: { status_in: [DRAFT, SENT]})
+  bsdds(where: { status_in: [DRAFT, SENT]})
 }
 
 ```
@@ -190,14 +190,14 @@ query {
 
 ```graphql
 query {
-  bsdds(filter: { emitterCompanySiret: "1234567890"})
+  bsdds(where: { emitterCompanySiret: "1234567890"})
 }
 ```
 ##### Contains
 
 ```graphql
 query {
-  bsdds(filter: { emitterCompanySiret_contains: "12345"})
+  bsdds(where: { emitterCompanySiret_contains: "12345"})
 }
 ```
 
@@ -207,26 +207,26 @@ query {
 
 ```graphql
 query {
-  bsdds(filter: { updatedAt: "<date>"})
+  bsdds(where: { updatedAt: "<date>"})
 }
 ```
 ##### LT, LTE, GT, GTE
 
 ```graphql
 query {
-  bsdds(filter: { updatedAt_gt: "<date>"})
+  bsdds(where: { updatedAt_gt: "<date>"})
 }
 ```
 
 ```graphql
 query {
-  bsdds(filter: { updatedAt_lt: "<date>"})
+  bsdds(where: { updatedAt_lt: "<date>"})
 }
 ```
 
 ```graphql
 query {
-  bsdds(filter: { updatedAt_lte: "<date>"})
+  bsdds(where: { updatedAt_lte: "<date>"})
 }
 
 ```
@@ -240,21 +240,21 @@ Bien qu'il s'agisse d'un filtre, celui-ci agit sur différentes colonnes avec un
 bsds(terms: String): [Bsd!]!
 
 # Exemple avec des filtres
-bsds(terms: String, filter: BsdFilter): [Bsd!]!
+bsds(terms: String, where: BsdWhereInput): [Bsd!]!
 ```
 
 ### Conventions spécifiques aux mutations
 
 ### Arguments
 
-On regroupe l'ensemble des arguments d'une mutation dans un seul input, exception faite de l'identifiant d'un BSD lors d'un update.
+On regroupe l'ensemble des arguments d'une mutation dans un seul input à l'exception de l'identifiant du bordereau (le cas échéant)
 
 ```graphql
 mutation {
   create(input: CreateInput!)
 }
 mutation {
-  sign(input: SignatureInput!)
+  sign(id: ID!, input: SignatureInput!)
 }
 mutation {
   update(id: ID!, input: UpdateInput!)
