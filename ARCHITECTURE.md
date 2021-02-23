@@ -2,30 +2,72 @@
 
 ## Conventions de code
 
-### Nommage
+### Terminologie
 
-* Les queries et mutations sont préfixées avec le nom du type de BSD:
-  * `bsd*` pour le bordereau de suivi des déchets dangereux "générique" (CERFA n° 12571*01)
-  * `bsdDasri*` pour le bordereau de suivi des déchets d'activités de soins à risque infectieux
-  * `bsdVhu*` pour le bordereau de suivi des véhicules hors d'usage
-  * `bsdHfc*` pour le bordereau de suivi de déchets fluides frigorigènes (CERFA n° 12497*02)
-  * `bsdAmiante*` pour le bordereau de suivi des déchets dangereux contenant de l'amiante (CERFA n°11861*03)
-  * `bsdPah*` pour le bordereau de suivi de l'élimination des pièces anatomiques humaines (CERFA N° 11350*03)
+La terminologie permet de décliner les différentes `queries` et `mutations` de façon cohérente sur les différents types de bordereau. Le nom de chaque bordereau est construit en préfixant le type de déchet tracé par `bs`. Le terme générique utilisé pour désigner n'importe quel type de bordereaux est `bsd`.  
+
+* `bsd` - permet de désigner n'importe quel bordereau de façon générique
+* `bsdd` - bordereau de suivi des déchets dangereux (CERFA n° 12571\*01) 
+* `bsdasri`- bordereau de suivi des déchets d’activités de soins à risques infectieux (Cerfa N°11351\*04)
+* `bsvhu`- bordereau de suivi des véhicules hors d'usage 
+* `bshfc` - bordereau de suivi des déchets dangereux pour les opérations nécessitant une manipulation de fluides frigorigènes effectuées sur un équipement, prévus aux articles R.543-82 et R.541-45 du code de l'environnement (CERFA n°15497\*02)
+* `bsda` - bordereau de suivi des déchets dangereux contenant de l'amiante (CERFA n°11861\*03) 
+* `bspa` - bordereau de suivi pour l'élimination des pièces anatomiques (N° 11350\*03)
+
+Une appellation spécifique `bsdnd` pourra être envisagée pour les bordereaux de suivi de déchets non dangereux si cela s'avère nécessaire. 
 
 #### Queries
 
 Deux types de queries existent pour chaque type de BSD:
 
-- `{prefix}` pour obtenir un BSD par son identifiant (ex: `bsd`, `bsdDasri`, `bsdVhu`, etc)
-- `{prefix}List` pour lister les BSD avec possibilité de filtrer et de paginer (ex; `bsdList`, `bsdDasriList`, `bsdVhuList`, etc)
+- `{nom}` pour obtenir un BSD par son identifiant (ex: `bsdd`, `bsdasri`, `bsdvhu`, etc)
+
+```graphql
+query {
+  bsdasri(id: "id") {
+    id
+    status
+    ...
+  }
+}
+```
+
+
+- `{nom}s` pour lister les BSD avec possibilité de filtrer et de paginer (ex; `bsdds`, `bsdasris`, `bsvhus`, etc)
+
+```graphql
+query {
+  bsdasris(first: 2) {
+    id
+    status
+  }
+}
+```
+
+Il existe en plus une requête "multi-bordereaux" renvoyant les bordereaux tout type confondu respectant certains critères de recherches:
+
+
+```graphql
+query {
+  bsds(search: "World Wide Waste Company"){
+    ...on BSDD {}
+    ...on BSDASRI {}
+    ...on BSVHU {}
+  } 
+}
+```
+
+
 
 #### Mutations
 
-Trois types de mutations existent pour chaque type de BSD:
+Les mutations sont construite en préfixant le nom du bordereau par un verbe d'action en camelCase `create{Nom}`, `update{Nom}`, `sign{Nom}`, `delete{Nom}`, etc. Exemple pour la création de bordereaux:
 
-- `{prefix}Create` pour la création d'un BSD
-- `{prefix}Update` pour la mise à jour des informations d'un BSD sélectionné par son identifiant
-- `{prefix}Sign` pour signer un BSD sélectionné par son identifiant
+- `createBsdd` 
+- `createBsdasri` 
+- `createBsvhu`
+- `createBsda`
+- ...
 
 ### Conventions spécifiques aux queries
 
