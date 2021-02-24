@@ -38,7 +38,7 @@ query {
 ```graphql
 query {
   bsdasris(
-    pagination: { first: 2 }
+    first: 2
     where: {
       emitter {
         company: {
@@ -105,15 +105,8 @@ interface Edge {
   cursor: ID
 }
 
-type PaginationArgs {
-  first: Int
-  after: ID
-  last: Int
-  before: ID
-}
-
 type Query {
-  bsdasris(pagination: PaginationArgs, where: BsdasriWhereInput): BsdasriConnection
+  bsdasris(first: Int, after: ID, last: Int, before: ID, where: BsdasriWhereInput): BsdasriConnection
 }
 
 type BsdasriConnection implements Connection {
