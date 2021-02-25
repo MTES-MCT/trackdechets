@@ -1,5 +1,6 @@
 import { Form as PrismaForm, Prisma } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { Query } from "../../../../generated/graphql/types";
 import {
   formFactory,
   transportSegmentFactory,
@@ -40,7 +41,7 @@ describe("Query.form", () => {
       });
 
       const { query } = makeClient(user);
-      const { data } = await query(GET_FORM_QUERY, {
+      const { data } = await query<Pick<Query, "form">>(GET_FORM_QUERY, {
         variables: {
           id: form.id
         }
@@ -60,7 +61,7 @@ describe("Query.form", () => {
     });
 
     const { query } = makeClient(user);
-    const { data } = await query(GET_FORM_QUERY, {
+    const { data } = await query<Pick<Query, "form">>(GET_FORM_QUERY, {
       variables: {
         id: form.id
       }
@@ -74,7 +75,7 @@ describe("Query.form", () => {
     const form = await createForm({});
 
     const { query } = makeClient(user);
-    const { errors } = await query(GET_FORM_QUERY, {
+    const { errors } = await query<Pick<Query, "form">>(GET_FORM_QUERY, {
       variables: {
         id: form.id
       }
@@ -92,7 +93,7 @@ describe("Query.form", () => {
     });
 
     const { query } = makeClient(user);
-    const { data } = await query(GET_FORM_QUERY, {
+    const { data } = await query<Pick<Query, "form">>(GET_FORM_QUERY, {
       variables: {
         readableId: form.readableId
       }

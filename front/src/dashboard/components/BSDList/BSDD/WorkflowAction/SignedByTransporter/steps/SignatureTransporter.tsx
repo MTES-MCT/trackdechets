@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Field } from "formik";
 import { Form } from "generated/graphql/types";
-import { FORMS_PDF } from "dashboard/components/BSDDActions/useDownloadPdf";
+import { FORMS_PDF } from "dashboard/components/BSDList/BSDD/BSDDActions/useDownloadPdf";
 import Packagings from "form/bsdd/components/packagings/Packagings";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { RedErrorMessage, DownloadFileLink, Label } from "common/components";

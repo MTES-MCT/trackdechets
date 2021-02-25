@@ -1,0 +1,40 @@
+@import "src/scss/Constants.scss";
+
+.Table {
+  width: 100%;
+}
+
+.TableHead {
+  background-color: $grey-light;
+}
+
+.TableBody {
+}
+
+.TableRow {
+}
+
+.TableHeaderCell,
+.TableCell {
+  font-size: 14px;
+  padding: 8px 20px;
+  border-bottom: 1px solid $grey-light;
+}
+
+.TableHeaderCell {
+  font-weight: bold;
+  text-align: left;
+  vertical-align: top;
+}
+
+.TableCell {
+}
+
+.TableSortIcon {
+  display: inline;
+  margin: 0 0.5rem;
+  visibility: hidden;
+}
+.TableSortIconVisible {
+  visibility: visible;
+}

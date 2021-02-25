@@ -1,5 +1,5 @@
-import { detailFormFragment } from "./fragments";
 import { gql } from "@apollo/client";
+import { detailFormFragment, fullFormFragment } from "./fragments";
 
 // full fledged form to display in detailled views
 export const GET_DETAIL_FORM = gql`
@@ -9,4 +9,36 @@ export const GET_DETAIL_FORM = gql`
     }
   }
   ${detailFormFragment}
+`;
+
+export const GET_BSDS = gql`
+  query GetBsds(
+    $after: String
+    $first: Int
+    $clue: String
+    $where: BsdWhere
+    $orderBy: OrderBy
+  ) {
+    bsds(
+      after: $after
+      first: $first
+      clue: $clue
+      where: $where
+      orderBy: $orderBy
+    ) {
+      edges {
+        node {
+          ... on Form {
+            ...FullForm
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+  ${fullFormFragment}
 `;

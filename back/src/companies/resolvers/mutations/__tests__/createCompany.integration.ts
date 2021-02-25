@@ -9,6 +9,7 @@ import * as geocode from "../../../geocode";
 import { CompanyType } from "@prisma/client";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../../mailer/templates";
+import { Mutation } from "../../../../generated/graphql/types";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -56,11 +57,14 @@ describe("Mutation.createCompany", () => {
       companyTypes: ["PRODUCER"]
     };
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await mutate(CREATE_COMPANY, {
-      variables: {
-        companyInput
+    const { data } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
       }
-    });
+    );
 
     expect(data.createCompany).toMatchObject({
       siret: companyInput.siret,
@@ -109,11 +113,14 @@ describe("Mutation.createCompany", () => {
     };
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await mutate(CREATE_COMPANY, {
-      variables: {
-        companyInput
+    const { data } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
       }
-    });
+    );
 
     expect(data.createCompany.transporterReceipt.receiptNumber).toEqual(
       transporterReceipt.receiptNumber
@@ -144,11 +151,14 @@ describe("Mutation.createCompany", () => {
     };
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await mutate(CREATE_COMPANY, {
-      variables: {
-        companyInput
+    const { data } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
       }
-    });
+    );
 
     // check the traderReceipt was created in db
     expect(data.createCompany.traderReceipt.receiptNumber).toEqual(
@@ -292,11 +302,14 @@ describe("Mutation.createCompany", () => {
     });
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await mutate(CREATE_COMPANY, {
-      variables: {
-        companyInput
+    const { data } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
       }
-    });
+    );
 
     expect(data.createCompany.ecoOrganismeAgreements).toEqual(
       companyInput.ecoOrganismeAgreements

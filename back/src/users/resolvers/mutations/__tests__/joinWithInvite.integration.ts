@@ -5,6 +5,7 @@ import prisma from "../../../../prisma";
 import { companyFactory } from "../../../../__tests__/factories";
 import { getUserCompanies } from "../../../database";
 import makeClient from "../../../../__tests__/testClient";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const JOIN_WITH_INVITE = `
   mutation JoinWithInvite($inviteHash: String!, $name: String!, $password: String!){
@@ -69,13 +70,16 @@ describe("joinWithInvite mutation", () => {
       }
     });
 
-    const { data } = await mutate(JOIN_WITH_INVITE, {
-      variables: {
-        inviteHash: invitation.hash,
-        name: "John Snow",
-        password: "password"
+    const { data } = await mutate<Pick<Mutation, "joinWithInvite">>(
+      JOIN_WITH_INVITE,
+      {
+        variables: {
+          inviteHash: invitation.hash,
+          name: "John Snow",
+          password: "password"
+        }
       }
-    });
+    );
 
     expect(data.joinWithInvite.email).toEqual(invitee);
 

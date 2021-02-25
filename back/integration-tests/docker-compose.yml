@@ -12,6 +12,22 @@ services:
     sysctls:
       - net.core.somaxconn=511
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.0
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.elasticsearch == true"
+
   td-api:
     image: td-api
     build:
@@ -35,4 +51,4 @@ services:
       SENDER_EMAIL_ADDRESS: "us@td.test"
       SENDER_NAME: "Wastetracker corp."
       POST_BACKEND: console
-
+      ELASTIC_SEARCH_URL: $ELASTIC_SEARCH_URL

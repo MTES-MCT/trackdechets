@@ -1,0 +1,53 @@
+type Query {
+  bsds(
+    clue: String
+    where: BsdWhere
+    after: String
+    first: Int
+    orderBy: OrderBy
+  ): BsdConnection!
+}
+
+type BsdConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [BsdEdge!]!
+}
+
+type BsdEdge {
+  cursor: String!
+  node: Bsd!
+}
+
+union Bsd = Form
+
+input BsdWhere {
+  readableId: String
+  emitter: String
+  recipient: String
+  waste: String
+  types: [BsdType!]
+  isDraftFor: [String!]
+  isForActionFor: [String!]
+  isFollowFor: [String!]
+  isArchivedFor: [String!]
+  isToCollectFor: [String!]
+  isCollectedFor: [String!]
+}
+
+input OrderBy {
+  type: OrderType
+  readableId: OrderType
+  emitter: OrderType
+  recipient: OrderType
+  waste: OrderType
+}
+
+enum OrderType {
+  ASC
+  DESC
+}
+
+enum BsdType {
+  BSDD
+}

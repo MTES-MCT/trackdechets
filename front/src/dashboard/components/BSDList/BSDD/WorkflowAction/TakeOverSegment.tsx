@@ -2,20 +2,12 @@ import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Field, Form as FormikForm, Formik } from "formik";
 import cogoToast from "cogo-toast";
-import {
-  Form,
-  Mutation,
-  MutationTakeOverSegmentArgs,
-  FormRole,
-  FormStatus,
-} from "generated/graphql/types";
-import { updateApolloCache } from "common/helper";
+import { Mutation, MutationTakeOverSegmentArgs } from "generated/graphql/types";
 import { IconBusTransfer } from "common/components/Icons";
 import ActionButton from "common/components/ActionButton";
 import TdModal from "common/components/Modal";
 import { NotificationError } from "common/components/Error";
 import DateInput from "form/common/components/custom-inputs/DateInput";
-import { GET_TRANSPORT_BSDS, GET_FORM } from "../../../transport/queries";
 import { WorkflowActionProps } from "./WorkflowAction";
 
 const TAKE_OVER_SEGMENT = gql`
@@ -26,12 +18,8 @@ const TAKE_OVER_SEGMENT = gql`
   }
 `;
 
-export default function TakeOverSegment({ form, siret }: WorkflowActionProps) {
+export default function TakeOverSegment({ form }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const refetchQuery = {
-    query: GET_FORM,
-    variables: { id: form.id },
-  };
   const [takeOverSegment, { error }] = useMutation<
     Pick<Mutation, "takeOverSegment">,
     MutationTakeOverSegmentArgs
@@ -40,25 +28,6 @@ export default function TakeOverSegment({ form, siret }: WorkflowActionProps) {
       setIsOpen(false);
       cogoToast.success("La prise en charge du bordereau est validée", {
         hideAfter: 5,
-      });
-    },
-    refetchQueries: [refetchQuery],
-    update: store => {
-      updateApolloCache<{ forms: Form[] }>(store, {
-        query: GET_TRANSPORT_BSDS,
-        variables: {
-          siret,
-          roles: [FormRole.Transporter],
-          status: [
-            FormStatus.Sealed,
-            FormStatus.Sent,
-            FormStatus.Resealed,
-            FormStatus.Resent,
-          ],
-        },
-        getNewData: data => ({
-          forms: data.forms,
-        }),
       });
     },
   });

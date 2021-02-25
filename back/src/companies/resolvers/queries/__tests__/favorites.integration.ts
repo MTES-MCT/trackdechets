@@ -6,6 +6,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
+import { Query } from "../../../../generated/graphql/types";
 
 const FAVORITES = `query Favorites($siret: String!, $type: FavoriteType!) {
   favorites(siret: $siret, type: $type) {
@@ -27,7 +28,7 @@ describe("query favorites", () => {
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await query(FAVORITES, {
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
         siret: company.siret,
         type: "EMITTER"
@@ -55,7 +56,7 @@ describe("query favorites", () => {
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await query(FAVORITES, {
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
         siret: company.siret,
         type: "EMITTER"
@@ -73,7 +74,7 @@ describe("query favorites", () => {
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
-    const { data, errors } = await query(FAVORITES, {
+    const { data, errors } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
         siret: company.siret,
         type: "EMITTER"
@@ -108,7 +109,7 @@ describe("query favorites", () => {
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await query(FAVORITES, {
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
         siret: company.siret,
         type: "EMITTER"
@@ -154,7 +155,7 @@ describe("query favorites", () => {
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await query(FAVORITES, {
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
         siret: company.siret,
         type: "EMITTER"
@@ -196,7 +197,7 @@ describe("query favorites", () => {
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await query(FAVORITES, {
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
         siret: company.siret,
         type: "EMITTER"
@@ -228,7 +229,7 @@ describe("query favorites", () => {
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await query(FAVORITES, {
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
         siret: company.siret,
         type: "TEMPORARY_STORAGE_DETAIL"
@@ -265,7 +266,7 @@ describe("query favorites", () => {
       .temporaryStorageDetail();
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await query(FAVORITES, {
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
         siret: company.siret,
         type: "DESTINATION"
@@ -293,7 +294,7 @@ describe("query favorites", () => {
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await query(FAVORITES, {
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
         siret: company.siret,
         type: "NEXT_DESTINATION"

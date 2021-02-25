@@ -6,6 +6,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const UPDATE_VHU_FORM = `
 mutation EditVhuForm($id: ID!, $input: BsvhuInput!) {
@@ -49,9 +50,12 @@ describe("Mutation.Vhu.update", () => {
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
-    const { errors } = await mutate(UPDATE_VHU_FORM, {
-      variables: { id: 1, input: {} }
-    });
+    const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: 1, input: {} }
+      }
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -73,16 +77,19 @@ describe("Mutation.Vhu.update", () => {
 
     const conenctedUser = await userFactory();
     const { mutate } = makeClient(conenctedUser);
-    const { errors } = await mutate(UPDATE_VHU_FORM, {
-      variables: {
-        id: form.id,
-        input: {
-          quantity: {
-            number: 4
+    const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: {
+          id: form.id,
+          input: {
+            quantity: {
+              number: 4
+            }
           }
         }
       }
-    });
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -109,9 +116,12 @@ describe("Mutation.Vhu.update", () => {
         number: 4
       }
     };
-    const { data } = await mutate(UPDATE_VHU_FORM, {
-      variables: { id: form.id, input }
-    });
+    const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: form.id, input }
+      }
+    );
 
     expect(data.updateBsvhu.quantity.number).toBe(4);
   });
@@ -130,9 +140,12 @@ describe("Mutation.Vhu.update", () => {
         agrementNumber: "new agrement"
       }
     };
-    const { data } = await mutate(UPDATE_VHU_FORM, {
-      variables: { id: form.id, input }
-    });
+    const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: form.id, input }
+      }
+    );
 
     expect(data.updateBsvhu.emitter.agrementNumber).toBe("new agrement");
   });
@@ -153,9 +166,12 @@ describe("Mutation.Vhu.update", () => {
         agrementNumber: "new agrement"
       }
     };
-    const { errors } = await mutate(UPDATE_VHU_FORM, {
-      variables: { id: form.id, input }
-    });
+    const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: form.id, input }
+      }
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -184,9 +200,12 @@ describe("Mutation.Vhu.update", () => {
         company: { vatNumber: "DE 123456789" }
       }
     };
-    const { data } = await mutate(UPDATE_VHU_FORM, {
-      variables: { id: form.id, input }
-    });
+    const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: form.id, input }
+      }
+    );
 
     expect(data.updateBsvhu.transporter.company.vatNumber).toBe("DE 123456789");
   });

@@ -3,6 +3,7 @@ import prisma from "../../../../prisma";
 import { AuthType } from "../../../../auth";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { Mutation } from "../../../../generated/graphql/types";
 
 describe("{ mutation { createBrokerReceipt } }", () => {
   afterEach(() => resetDatabase());
@@ -27,9 +28,12 @@ describe("{ mutation { createBrokerReceipt } }", () => {
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
-    const { data } = await mutate(createBrokerReceipt, {
-      variables: { input: receipt }
-    });
+    const { data } = await mutate<Pick<Mutation, "createBrokerReceipt">>(
+      createBrokerReceipt,
+      {
+        variables: { input: receipt }
+      }
+    );
 
     expect(await prisma.brokerReceipt.count()).toEqual(1);
 

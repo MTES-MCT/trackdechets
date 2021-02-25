@@ -6,6 +6,10 @@ import {
 import { gql } from "apollo-server-express";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
+  Query,
+  QueryCompaniesForVerificationArgs
+} from "../../../../generated/graphql/types";
+import {
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -55,7 +59,10 @@ describe("query companies", () => {
       }
     );
     const { query } = makeClient(admin);
-    const { data } = await query(COMPANIES_FOR_VERIFICATION);
+    const { data } = await query<
+      Pick<Query, "companiesForVerification">,
+      QueryCompaniesForVerificationArgs
+    >(COMPANIES_FOR_VERIFICATION);
 
     expect(data.companiesForVerification.totalCount).toEqual(2);
     expect(data.companiesForVerification.companies).toEqual([
@@ -93,7 +100,10 @@ describe("query companies", () => {
       }
     );
     const { query } = makeClient(admin);
-    const { data } = await query(COMPANIES_FOR_VERIFICATION, {
+    const { data } = await query<
+      Pick<Query, "companiesForVerification">,
+      QueryCompaniesForVerificationArgs
+    >(COMPANIES_FOR_VERIFICATION, {
       variables: {
         where: { verificationStatus: "VERIFIED" }
       }

@@ -13,6 +13,7 @@ import {
   membershipRequestConfirmation,
   membershipRequest as membershipRequestMail
 } from "../../../../mailer/templates";
+import { Mutation } from "../../../../generated/graphql/types";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -51,9 +52,12 @@ describe("mutation sendMembershipRequest", () => {
     const company = await companyFactory();
     await associateUserToCompany(admin.id, company.siret, "ADMIN");
     const { mutate } = makeClient(requester);
-    const { data } = await mutate(SEND_MEMBERSHIP_REQUEST, {
-      variables: { siret: company.siret }
-    });
+    const { data } = await mutate<Pick<Mutation, "sendMembershipRequest">>(
+      SEND_MEMBERSHIP_REQUEST,
+      {
+        variables: { siret: company.siret }
+      }
+    );
     const { id, status, sentTo, email, siret } = data.sendMembershipRequest;
     expect(status).toEqual("PENDING");
     // emails should be hidden

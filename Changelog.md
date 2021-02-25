@@ -9,6 +9,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Ajout de différents filtres dans les tableaux [PR 810](https://github.com/MTES-MCT/trackdechets/pull/810)
+- Ajout d'un sélecteur de type de bordereaux dans les tableaux, en vue des prochains bordereaux [PR 810](https://github.com/MTES-MCT/trackdechets/pull/810)
+
 #### :boom: Breaking changes
 
 #### :bug: Corrections de bugs
@@ -21,9 +24,12 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :memo: Documentation
 
+- Mise à jour du schéma d'architecture afin d'inclure Elastic Search [PR 810](https://github.com/MTES-MCT/trackdechets/pull/810)
+
 #### :house: Interne
 
 - Refactoring du système de template d'email [PR 839](https://github.com/MTES-MCT/trackdechets/pull/839)
+- Ajout d'une base de donnée Elastic Search pour faciliter la recherche multi bordereaux. [PR 810](https://github.com/MTES-MCT/trackdechets/pull/810)
 
 # [2021.04.1] 12/04/2021
 

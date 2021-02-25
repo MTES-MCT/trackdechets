@@ -1,9 +1,11 @@
 import * as React from "react";
 import { generatePath, Link } from "react-router-dom";
+import { useQuery } from "@apollo/client";
 import classNames from "classnames";
-import { useMedia } from "use-media";
-import { Form } from "generated/graphql/types";
+import useMedia from "use-media";
+import { Query, QueryBsdsArgs, BsdWhere } from "generated/graphql/types";
 import { MEDIA_QUERIES } from "common/config";
+import { GET_BSDS } from "common/queries";
 import routes from "common/routes";
 import Loader from "common/components/Loaders";
 import {
@@ -11,113 +13,18 @@ import {
   IconLayoutModule1,
   IconRefresh,
 } from "common/components/Icons";
-import { formatDate } from "common/datetime";
 import { usePersistedState } from "common/hooks/usePersistedState";
-import { ITEMS_PER_PAGE, statusLabels } from "../../constants";
-import { Column } from "./types";
 import { BSDTable } from "./BSDTable";
 import { BSDCards } from "./BSDCards";
+import { COLUMNS, Column } from "./columns";
 import styles from "./BSDList.module.scss";
-import TransporterInfoEdit from "./TransporterInfoEdit";
 
-export const COLUMNS: Record<string, Column> = {
-  readableId: {
-    id: "readableId",
-    Header: "Numéro",
-    accessor: form => form.readableId,
-    sortable: false,
-    filterable: true,
-  },
-  sentAt: {
-    id: "sentAt",
-    Header: "Date d'enlèvement",
-    accessor: form => (form.sentAt ? formatDate(form.sentAt) : ""),
-    sortable: true,
-    filterable: false,
-  },
-  emitter: {
-    id: "emitter.company.name",
-    Header: "Émetteur",
-    accessor: form => form.emitter?.company?.name ?? "",
-    sortable: true,
-    filterable: true,
-  },
-  recipient: {
-    id: "stateSummary.recipient.name",
-    Header: "Destinataire",
-    accessor: form => form.stateSummary?.recipient?.name ?? "",
-    sortable: true,
-    filterable: true,
-  },
-  waste: {
-    id: "wasteDetails.code",
-    Header: "Déchet",
-    accessor: form =>
-      [form.wasteDetails?.code, form.wasteDetails?.name]
-        .filter(Boolean)
-        .join(" "),
-    sortable: true,
-    filterable: true,
-  },
-  quantity: {
-    id: "form.stateSummary.quantity",
-    Header: "Quantité",
-    accessor: form =>
-      form.stateSummary?.quantity
-        ? `${form.stateSummary?.quantity} tonnes`
-        : "",
-    sortable: false,
-    filterable: false,
-  },
-  transporterCustomInfo: {
-    id: "form.stateSummary.transporterCustomInfo",
-    Header: "Champ libre",
-    accessor: form => form.stateSummary?.transporterCustomInfo ?? "",
-    sortable: false,
-    filterable: false,
-    Cell: ({ value, row }) => (
-      <>
-        <span style={{ marginRight: "0.5rem" }}>{value}</span>
-        <TransporterInfoEdit
-          fieldName="customInfo"
-          verboseFieldName="champ libre"
-          form={row}
-        />
-      </>
-    ),
-  },
-  transporterNumberPlate: {
-    id: "form.stateSummary.transporterNumberPlate",
-    Header: "Immat.",
-    accessor: form => form.stateSummary?.transporterNumberPlate ?? "",
-    sortable: false,
-    filterable: false,
-    Cell: ({ value, row }) => (
-      <>
-        <span style={{ marginRight: "0.5rem" }}>{value}</span>
-        <TransporterInfoEdit
-          fieldName="numberPlate"
-          verboseFieldName="plaque d'immatriculation"
-          form={row}
-        />
-      </>
-    ),
-  },
-  status: {
-    id: "status",
-    Header: "Status",
-    accessor: form => statusLabels[form.status],
-    sortable: true,
-    filterable: false,
-  },
-};
 const DEFAULT_COLUMNS = [
+  COLUMNS.type,
   COLUMNS.readableId,
-  COLUMNS.sentAt,
   COLUMNS.emitter,
   COLUMNS.recipient,
   COLUMNS.waste,
-  COLUMNS.quantity,
   COLUMNS.status,
 ];
 
@@ -149,24 +56,49 @@ const LAYOUTS = [
 type LayoutType = "table" | "cards";
 
 interface BSDListProps {
-  forms: Form[];
   siret: string;
   columns?: Column[];
-  fetchMore: any;
-  loading: boolean;
   blankslate: React.ReactNode;
-  refetch: () => void;
+  defaultWhere: BsdWhere;
 }
 
 export function BSDList({
-  forms,
   siret,
   columns = DEFAULT_COLUMNS,
-  fetchMore,
-  loading,
   blankslate,
-  refetch,
+  defaultWhere,
 }: BSDListProps) {
+  const { data, loading, fetchMore, refetch } = useQuery<
+    Pick<Query, "bsds">,
+    QueryBsdsArgs
+  >(GET_BSDS, {
+    variables: {
+      where: defaultWhere,
+    },
+    notifyOnNetworkStatusChange: true,
+  });
+
+  // show the blankslate if the query returns no results without any filters
+  // because if it returns no results with filters applied, it doesn't mean there are no results at all
+  // it means that the criteria don't match any documents
+  const { data: cachedData } = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(
+    GET_BSDS,
+    {
+      variables: {
+        where: defaultWhere,
+      },
+      // read from the cache only to avoid duplicate requests
+      fetchPolicy: "cache-only",
+    }
+  );
+  const showBlankslate = cachedData?.bsds.totalCount === 0;
+
+  const refetchWithDefaultWhere = React.useCallback(
+    ({ where, ...args }) =>
+      refetch({ ...args, where: { ...where, ...defaultWhere } }),
+    [refetch, defaultWhere]
+  );
+
   const [layoutType, setLayoutType] = usePersistedState<LayoutType>(
     LAYOUT_LOCAL_STORAGE_KEY,
     value => LAYOUTS.find(layout => layout.type === value)?.type ?? "table"
@@ -189,12 +121,18 @@ export function BSDList({
         >
           Créer un bordereau
         </Link>
-        <button className="btn btn--primary" onClick={() => refetch()}>
+        <button
+          className="btn btn--primary"
+          onClick={() => refetch()}
+          disabled={loading}
+        >
           Rafraîchir <IconRefresh style={{ marginLeft: "0.5rem" }} />
         </button>
       </div>
       {loading && <Loader />}
-      {forms.length > 0 || loading ? (
+      {showBlankslate ? (
+        blankslate
+      ) : (
         <>
           <div className={styles.ButtonGroup} style={{ margin: "1rem" }}>
             {LAYOUTS.map(layout => (
@@ -214,24 +152,33 @@ export function BSDList({
             ))}
           </div>
           <currentLayout.Component
-            siret={siret}
-            forms={forms}
+            bsds={data?.bsds.edges.map(edge => edge.node) ?? []}
             columns={columns}
+            refetch={refetchWithDefaultWhere}
           />
-          {forms.length >= ITEMS_PER_PAGE && (
+          {data?.bsds.pageInfo.hasNextPage && (
             <div style={{ textAlign: "center" }}>
               <button
                 className="center btn btn--primary small"
                 onClick={() =>
                   fetchMore({
                     variables: {
-                      cursorAfter: forms[forms.length - 1].id,
+                      after: data?.bsds.pageInfo.endCursor,
                     },
                     updateQuery: (prev, { fetchMoreResult }) => {
-                      if (!fetchMoreResult) return prev;
+                      if (fetchMoreResult == null) {
+                        return prev;
+                      }
+
                       return {
                         ...prev,
-                        forms: [...prev.forms, ...fetchMoreResult.forms],
+                        bsds: {
+                          ...prev.bsds,
+                          ...fetchMoreResult.bsds,
+                          edges: prev.bsds.edges.concat(
+                            fetchMoreResult.bsds.edges
+                          ),
+                        },
                       };
                     },
                   })
@@ -242,8 +189,6 @@ export function BSDList({
             </div>
           )}
         </>
-      ) : (
-        blankslate
       )}
     </>
   );

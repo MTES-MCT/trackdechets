@@ -22,15 +22,10 @@ generates:
     plugins:
       - typescript
       - typescript-operations
-      - graphql-codegen-factories
     config:
-      avoidOptionals: true
       scalars:
         DateTime: string
         URL: string
-      scalarDefaults:
-        DateTime: new Date().toISOString()
-        URL: "https://example.com"
     hooks:
       afterOneFileWrite:
         - prettier --config .prettierrc --write

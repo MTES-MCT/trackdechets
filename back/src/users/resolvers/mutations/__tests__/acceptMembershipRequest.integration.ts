@@ -9,6 +9,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { membershipRequestAccepted } from "../../../../mailer/templates";
+import { Mutation } from "../../../../generated/graphql/types";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -124,9 +125,12 @@ describe("mutation acceptMembershipRequest", () => {
         }
       });
       const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-      const { data } = await mutate(ACCEPT_MEMBERSHIP_REQUEST, {
-        variables: { id: membershipRequest.id, role }
-      });
+      const { data } = await mutate<Pick<Mutation, "acceptMembershipRequest">>(
+        ACCEPT_MEMBERSHIP_REQUEST,
+        {
+          variables: { id: membershipRequest.id, role }
+        }
+      );
       expect(data.acceptMembershipRequest.users).toHaveLength(2);
       const members = data.acceptMembershipRequest.users.map(u => u.email);
       expect(members).toContain(user.email);

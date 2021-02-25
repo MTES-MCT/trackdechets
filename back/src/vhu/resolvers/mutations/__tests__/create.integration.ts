@@ -1,5 +1,6 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
+import { Mutation } from "../../../../generated/graphql/types";
 import {
   userFactory,
   userWithCompanyFactory
@@ -42,9 +43,12 @@ describe("Mutation.Vhu.create", () => {
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
-    const { errors } = await mutate(CREATE_VHU_FORM, {
-      variables: { input: {} }
-    });
+    const { errors } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: { input: {} }
+      }
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -60,17 +64,20 @@ describe("Mutation.Vhu.create", () => {
     const user = await userFactory();
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_VHU_FORM, {
-      variables: {
-        input: {
-          emitter: {
-            company: {
-              siret: "siret"
+    const { errors } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input: {
+            emitter: {
+              company: {
+                siret: "siret"
+              }
             }
           }
         }
       }
-    });
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -122,11 +129,14 @@ describe("Mutation.Vhu.create", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_VHU_FORM, {
-      variables: {
-        input
+    const { data } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
       }
-    });
+    );
 
     expect(data.createBsvhu.id).toMatch(
       new RegExp(`^VHU-[0-9]{8}-[A-Z0-9]{9}$`)
@@ -174,11 +184,14 @@ describe("Mutation.Vhu.create", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_VHU_FORM, {
-      variables: {
-        input
+    const { errors } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
       }
-    });
+    );
 
     expect(errors[0].message).toBe(
       "Émetteur: le numéro d'agréément est obligatoire"

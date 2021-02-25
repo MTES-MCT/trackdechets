@@ -12,6 +12,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
   { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
   { [SubKey in K]: Maybe<T[SubKey]> };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = {
   [X in Exclude<keyof T, K>]?: T[X];
 } &
@@ -119,6 +120,37 @@ export type BrokerReceipt = {
   validityLimit: Scalars["DateTime"];
   /** Département ayant enregistré la déclaration */
   department: Scalars["String"];
+};
+
+export type Bsd = Form;
+
+export type BsdConnection = {
+  __typename?: "BsdConnection";
+  totalCount: Scalars["Int"];
+  pageInfo: PageInfo;
+  edges: Array<BsdEdge>;
+};
+
+export type BsdEdge = {
+  __typename?: "BsdEdge";
+  cursor: Scalars["String"];
+  node: Bsd;
+};
+
+export type BsdType = "BSDD";
+
+export type BsdWhere = {
+  readableId?: Maybe<Scalars["String"]>;
+  emitter?: Maybe<Scalars["String"]>;
+  recipient?: Maybe<Scalars["String"]>;
+  waste?: Maybe<Scalars["String"]>;
+  types?: Maybe<Array<BsdType>>;
+  isDraftFor?: Maybe<Array<Scalars["String"]>>;
+  isForActionFor?: Maybe<Array<Scalars["String"]>>;
+  isFollowFor?: Maybe<Array<Scalars["String"]>>;
+  isArchivedFor?: Maybe<Array<Scalars["String"]>>;
+  isToCollectFor?: Maybe<Array<Scalars["String"]>>;
+  isCollectedFor?: Maybe<Array<Scalars["String"]>>;
 };
 
 export type Bsvhu = {
@@ -1995,6 +2027,16 @@ export type NextSegmentInfoInput = {
   mode: TransportMode;
 };
 
+export type OrderBy = {
+  type?: Maybe<OrderType>;
+  readableId?: Maybe<OrderType>;
+  emitter?: Maybe<OrderType>;
+  recipient?: Maybe<OrderType>;
+  waste?: Maybe<OrderType>;
+};
+
+export type OrderType = "ASC" | "DESC";
+
 /** Informations sur le conditionnement */
 export type PackagingInfo = {
   __typename?: "PackagingInfo";
@@ -2103,6 +2145,7 @@ export type Query = {
   apiKey: Scalars["String"];
   /** Renvoie des BSD candidats à un regroupement dans une annexe 2 */
   appendixForms: Array<Form>;
+  bsds: BsdConnection;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsvhu: Bsvhu;
   /**
@@ -2207,6 +2250,15 @@ export type Query = {
 export type QueryAppendixFormsArgs = {
   siret: Scalars["String"];
   wasteCode?: Maybe<Scalars["String"]>;
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsdsArgs = {
+  clue?: Maybe<Scalars["String"]>;
+  where?: Maybe<BsdWhere>;
+  after?: Maybe<Scalars["String"]>;
+  first?: Maybe<Scalars["Int"]>;
+  orderBy?: Maybe<OrderBy>;
 };
 
 /** Views of the Company ressource for the admin panel */
@@ -3165,6 +3217,16 @@ export type ResolversTypes = {
   StateSummary: ResolverTypeWrapper<StateSummary>;
   TransportSegment: ResolverTypeWrapper<TransportSegment>;
   TransportMode: TransportMode;
+  BsdWhere: BsdWhere;
+  BsdType: BsdType;
+  OrderBy: OrderBy;
+  OrderType: OrderType;
+  BsdConnection: ResolverTypeWrapper<BsdConnection>;
+  PageInfo: ResolverTypeWrapper<PageInfo>;
+  BsdEdge: ResolverTypeWrapper<
+    Omit<BsdEdge, "node"> & { node: ResolversTypes["Bsd"] }
+  >;
+  Bsd: ResolversTypes["Form"];
   Bsvhu: ResolverTypeWrapper<Bsvhu>;
   BsvhuStatus: BsvhuStatus;
   BsvhuEmitter: ResolverTypeWrapper<BsvhuEmitter>;
@@ -3198,7 +3260,6 @@ export type ResolversTypes = {
   BsvhuDestinationWhere: BsvhuDestinationWhere;
   BsvhuOperationWhere: BsvhuOperationWhere;
   BsvhuConnection: ResolverTypeWrapper<BsvhuConnection>;
-  PageInfo: ResolverTypeWrapper<PageInfo>;
   BsvhuEdge: ResolverTypeWrapper<BsvhuEdge>;
   CompanyForVerificationWhere: CompanyForVerificationWhere;
   CompanyVerificationStatus: CompanyVerificationStatus;
@@ -3335,6 +3396,12 @@ export type ResolversParentTypes = {
   Destination: Destination;
   StateSummary: StateSummary;
   TransportSegment: TransportSegment;
+  BsdWhere: BsdWhere;
+  OrderBy: OrderBy;
+  BsdConnection: BsdConnection;
+  PageInfo: PageInfo;
+  BsdEdge: Omit<BsdEdge, "node"> & { node: ResolversParentTypes["Bsd"] };
+  Bsd: ResolversParentTypes["Form"];
   Bsvhu: Bsvhu;
   BsvhuEmitter: BsvhuEmitter;
   BsvhuEmission: BsvhuEmission;
@@ -3362,7 +3429,6 @@ export type ResolversParentTypes = {
   BsvhuDestinationWhere: BsvhuDestinationWhere;
   BsvhuOperationWhere: BsvhuOperationWhere;
   BsvhuConnection: BsvhuConnection;
-  PageInfo: PageInfo;
   BsvhuEdge: BsvhuEdge;
   CompanyForVerificationWhere: CompanyForVerificationWhere;
   CompanyForVerificationConnection: CompanyForVerificationConnection;
@@ -3508,6 +3574,32 @@ export type BrokerReceiptResolvers<
   receiptNumber?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   validityLimit?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
   department?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["Bsd"] = ResolversParentTypes["Bsd"]
+> = {
+  __resolveType: TypeResolveFn<"Form", ParentType, ContextType>;
+};
+
+export type BsdConnectionResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdConnection"] = ResolversParentTypes["BsdConnection"]
+> = {
+  totalCount?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes["PageInfo"], ParentType, ContextType>;
+  edges?: Resolver<Array<ResolversTypes["BsdEdge"]>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdEdgeResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdEdge"] = ResolversParentTypes["BsdEdge"]
+> = {
+  cursor?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  node?: Resolver<ResolversTypes["Bsd"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -4974,6 +5066,12 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryAppendixFormsArgs, "siret">
   >;
+  bsds?: Resolver<
+    ResolversTypes["BsdConnection"],
+    ParentType,
+    ContextType,
+    RequireFields<QueryBsdsArgs, never>
+  >;
   bsvhu?: Resolver<
     ResolversTypes["Bsvhu"],
     ParentType,
@@ -5562,6 +5660,9 @@ export type Resolvers<ContextType = GraphQLContext> = {
   AuthPayload?: AuthPayloadResolvers<ContextType>;
   Broker?: BrokerResolvers<ContextType>;
   BrokerReceipt?: BrokerReceiptResolvers<ContextType>;
+  Bsd?: BsdResolvers<ContextType>;
+  BsdConnection?: BsdConnectionResolvers<ContextType>;
+  BsdEdge?: BsdEdgeResolvers<ContextType>;
   Bsvhu?: BsvhuResolvers<ContextType>;
   BsvhuConnection?: BsvhuConnectionResolvers<ContextType>;
   BsvhuDestination?: BsvhuDestinationResolvers<ContextType>;
@@ -5716,6 +5817,44 @@ export function createBrokerReceiptMock(
     receiptNumber: "",
     validityLimit: new Date(),
     department: "",
+    ...props
+  };
+}
+
+export function createBsdConnectionMock(
+  props: Partial<BsdConnection>
+): BsdConnection {
+  return {
+    __typename: "BsdConnection",
+    totalCount: 0,
+    pageInfo: createPageInfoMock({}),
+    edges: [],
+    ...props
+  };
+}
+
+export function createBsdEdgeMock(props: Partial<BsdEdge>): BsdEdge {
+  return {
+    __typename: "BsdEdge",
+    cursor: "",
+    node: createFormMock({}),
+    ...props
+  };
+}
+
+export function createBsdWhereMock(props: Partial<BsdWhere>): BsdWhere {
+  return {
+    readableId: null,
+    emitter: null,
+    recipient: null,
+    waste: null,
+    types: null,
+    isDraftFor: null,
+    isForActionFor: null,
+    isFollowFor: null,
+    isArchivedFor: null,
+    isToCollectFor: null,
+    isCollectedFor: null,
     ...props
   };
 }
@@ -6739,6 +6878,17 @@ export function createNextSegmentInfoInputMock(
   return {
     transporter: null,
     mode: "ROAD",
+    ...props
+  };
+}
+
+export function createOrderByMock(props: Partial<OrderBy>): OrderBy {
+  return {
+    type: null,
+    readableId: null,
+    emitter: null,
+    recipient: null,
+    waste: null,
     ...props
   };
 }

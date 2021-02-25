@@ -6,6 +6,7 @@ export PRISMA_ENDPOINT=http://prisma:4467/default/staging
 export PRISMA_SECRET=any_secret
 export COMPOSE_PROJECT_NAME=integration
 export MSYS_NO_PATHCONV=1 # needed for windows
+export ELASTIC_SEARCH_URL=http://elasticsearch:9200
 
 EXIT_CODE=0
 

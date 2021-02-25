@@ -1,4 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { Query } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import makeClient from "../../../../__tests__/testClient";
 
@@ -13,7 +14,7 @@ describe("query ecoOrgansime", () => {
     await prisma.ecoOrganisme.create({
       data: { siret, name: "", address: "" }
     });
-    const { data } = await query(ECO_ORGANISMES);
+    const { data } = await query<Pick<Query, "ecoOrganismes">>(ECO_ORGANISMES);
     expect(data.ecoOrganismes.map(c => c.siret)).toEqual([siret]);
   });
 });
