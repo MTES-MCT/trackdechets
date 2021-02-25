@@ -129,6 +129,9 @@ export function TransportContent({ formType }) {
       (statuses.includes(form.status) &&
         form.transporter?.company?.siret === siret) ||
       (formType === "TO_TAKE_OVER" &&
+        form.status === "RESEALED" &&
+        form.temporaryStorageDetail?.transporter?.company?.siret === siret) ||
+      (formType === "TO_TAKE_OVER" &&
         form.status === "SENT" &&
         !!segmentsToTakeOver.length) ||
       (formType === "TAKEN_OVER" &&
