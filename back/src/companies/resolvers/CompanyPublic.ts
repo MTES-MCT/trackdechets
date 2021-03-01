@@ -3,7 +3,7 @@ import { CompanyPublicResolvers } from "../../generated/graphql/types";
 
 const companyPublicResolvers: CompanyPublicResolvers = {
   transporterReceipt: async parent => {
-    return await prisma.company
+    return prisma.company
       .findUnique({ where: { siret: parent.siret } })
       .transporterReceipt();
   },
