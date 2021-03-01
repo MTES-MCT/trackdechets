@@ -140,7 +140,7 @@ export default function PrepareSegment({
         <button
           className="btn btn--primary"
           onClick={() => setIsOpen(true)}
-          title="Signer l'enlèvement"
+          title="Préparer le transfert"
         >
           <IconBusTransfer size="32px" />
           <span className="tw-text-sm tw-ml-2">
