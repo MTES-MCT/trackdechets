@@ -218,7 +218,7 @@ export default withRouter(function Header({
       <div className={styles.headerContent}>
         <div className={styles.headerBranding}>
           <img
-            src="/marianne.svg"
+            src="/marianne_mte.svg"
             alt=""
             style={{ height: "80px", width: "80px" }}
           />
