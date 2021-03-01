@@ -1241,7 +1241,7 @@ Numéro de récépissé courtier
 <td valign="top"><a href="#datetime">DateTime</a>!</td>
 <td>
 
-Limite de validatié du récépissé
+Limite de validité du récépissé
 
 </td>
 </tr>
@@ -3501,7 +3501,7 @@ Numéro de récépissé négociant
 <td valign="top"><a href="#datetime">DateTime</a>!</td>
 <td>
 
-Limite de validatié du récépissé
+Limite de validité du récépissé
 
 </td>
 </tr>
@@ -3713,7 +3713,7 @@ Numéro de récépissé transporteur
 <td valign="top"><a href="#datetime">DateTime</a>!</td>
 <td>
 
-Limite de validatié du récépissé
+Limite de validité du récépissé
 
 </td>
 </tr>
