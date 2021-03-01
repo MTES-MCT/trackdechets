@@ -283,7 +283,7 @@ type TransporterReceipt {
   receiptNumber: String!
 
   """
-  Limite de validatié du récépissé
+  Limite de validité du récépissé
   """
   validityLimit: DateTime!
 
@@ -305,7 +305,7 @@ type TraderReceipt {
   receiptNumber: String!
 
   """
-  Limite de validatié du récépissé
+  Limite de validité du récépissé
   """
   validityLimit: DateTime!
 
@@ -327,7 +327,7 @@ type BrokerReceipt {
   receiptNumber: String!
 
   """
-  Limite de validatié du récépissé
+  Limite de validité du récépissé
   """
   validityLimit: DateTime!
 

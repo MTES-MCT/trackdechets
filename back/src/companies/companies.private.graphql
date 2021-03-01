@@ -198,7 +198,7 @@ input CreateTransporterReceiptInput {
   receiptNumber: String!
 
   """
-  Limite de validatié du récépissé
+  Limite de validité du récépissé
   """
   validityLimit: DateTime!
 
@@ -223,7 +223,7 @@ input UpdateTransporterReceiptInput {
   receiptNumber: String
 
   """
-  Limite de validatié du récépissé
+  Limite de validité du récépissé
   """
   validityLimit: DateTime
 
@@ -253,7 +253,7 @@ input CreateTraderReceiptInput {
   receiptNumber: String!
 
   """
-  Limite de validatié du récépissé
+  Limite de validité du récépissé
   """
   validityLimit: DateTime!
 
@@ -278,7 +278,7 @@ input UpdateTraderReceiptInput {
   receiptNumber: String
 
   """
-  Limite de validatié du récépissé
+  Limite de validité du récépissé
   """
   validityLimit: DateTime
 
@@ -308,7 +308,7 @@ input CreateBrokerReceiptInput {
   receiptNumber: String!
 
   """
-  Limite de validatié du récépissé
+  Limite de validité du récépissé
   """
   validityLimit: DateTime!
 
@@ -333,7 +333,7 @@ input UpdateBrokerReceiptInput {
   receiptNumber: String
 
   """
-  Limite de validatié du récépissé
+  Limite de validité du récépissé
   """
   validityLimit: DateTime
 
