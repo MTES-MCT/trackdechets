@@ -24,7 +24,7 @@ ALTER TABLE "default$default"."Form" ADD "brokerCompanyPhone" text;
 ALTER TABLE "default$default"."Form" ADD "brokerCompanyMail" text;
 ALTER TABLE "default$default"."Form" ADD "brokerReceipt" text;
 ALTER TABLE "default$default"."Form" ADD "brokerDepartment" text;
-ALTER TABLE "default$default"."Form" ADD "brokerValidityLimit" text;
+ALTER TABLE "default$default"."Form" ADD "brokerValidityLimit" timestamp(3);
 
 ALTER TABLE "default$default"."Company" ALTER COLUMN "companyTypes" TYPE VARCHAR(255);
 DROP TYPE IF EXISTS "default$default"."CompanyType";
