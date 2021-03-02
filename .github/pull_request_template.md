@@ -7,7 +7,7 @@
 - [ ] Mettre à jour la documentation
 - [ ] Mettre à jour le change log
 - [ ] Documenter les manipulations à faire lors de la mise en production (sur le ticket Trello de release)
-
+- [ ] S'assurer que la numérotation des nouvelles migrations est bien cohérente
 ---
 
 - [Ticket Trello]()
