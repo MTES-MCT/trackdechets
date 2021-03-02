@@ -27,7 +27,7 @@ describe("Mutation markAsResealed", () => {
 
   beforeEach(() => {
     jest.resetModules();
-    delete process.env.COMPANY_VERIFICATION;
+    delete process.env.VERIFY_COMPANY;
   });
 
   afterEach(() => {
@@ -232,9 +232,9 @@ describe("Mutation markAsResealed", () => {
     ]);
   });
 
-  it("should throw an error if COMPANY_VERIFICATION=strict and destination after temp storage is not verified", async () => {
+  it("should throw an error if VERIFY_COMPANY=true and destination after temp storage is not verified", async () => {
     // patch process.env and reload server
-    process.env.COMPANY_VERIFICATION = "strict";
+    process.env.VERIFY_COMPANY = "true";
     const makeClient = require("../../../../__tests__/testClient").default;
 
     const {

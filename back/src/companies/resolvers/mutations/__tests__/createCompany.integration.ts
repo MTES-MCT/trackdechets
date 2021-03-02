@@ -326,10 +326,10 @@ describe("Mutation.createCompany", () => {
     ]);
   });
 
-  it("should send an email about the verification process when COMPANY_VERIFICATION=strict", async () => {
+  it("should send an email about the verification process when VERIFY_COMPANY=true", async () => {
     const OLD_ENV = process.env;
 
-    process.env.COMPANY_VERIFICATION = "strict";
+    process.env.VERIFY_COMPANY = "true";
 
     // get local versions of imports to reload env variables
     jest.resetModules();

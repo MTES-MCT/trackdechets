@@ -26,7 +26,7 @@ import { SchemaOf } from "yup";
 // set yup default error messages
 configureYup();
 
-const { COMPANY_VERIFICATION } = process.env;
+const { VERIFY_COMPANY } = process.env;
 
 // ************************************************
 // BREAK DOWN FORM TYPE INTO INDIVIDUAL FRAME TYPES
@@ -968,7 +968,7 @@ async function checkDestination(siret: string) {
   }
 
   if (
-    COMPANY_VERIFICATION === "strict" &&
+    VERIFY_COMPANY === "true" &&
     company.verificationStatus !== CompanyVerificationStatus.VERIFIED
   ) {
     throw new UserInputError(
@@ -1007,7 +1007,7 @@ async function checkDestinationAfterTempStorage(siret: string) {
   }
 
   if (
-    COMPANY_VERIFICATION === "strict" &&
+    VERIFY_COMPANY === "true" &&
     company.verificationStatus !== CompanyVerificationStatus.VERIFIED
   ) {
     throw new UserInputError(

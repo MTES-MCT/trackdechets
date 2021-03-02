@@ -18,7 +18,7 @@ import { companyMails as mails } from "../../mails";
  * @param userId
  */
 
-const { COMPANY_VERIFICATION } = process.env;
+const { VERIFY_COMPANY } = process.env;
 
 const createCompanyResolver: MutationResolvers["createCompany"] = async (
   parent,
@@ -130,7 +130,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     data: { firstAssociationDate: new Date() }
   });
 
-  if (COMPANY_VERIFICATION === "strict") {
+  if (VERIFY_COMPANY === "true") {
     const isProfessional = company.companyTypes.some(ct => {
       return COMPANY_TYPES.PROFESSIONALS.includes(ct);
     });
