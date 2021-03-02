@@ -99,7 +99,7 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
             </label>
             <Field
               id="newPasswordConfirmation"
-              className={styles.input}
+              className={classNames("td-input", styles.input)}
               type="password"
               name="newPasswordConfirmation"
             />
@@ -108,7 +108,7 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
           {loading && <div>Envoi en cours...</div>}
 
           <button
-            className="btn btn--primary"
+            className="btn btn--primary tw-mt-4"
             type="submit"
             disabled={props.isSubmitting}
           >
