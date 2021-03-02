@@ -5,6 +5,23 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# Next release
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout d'un mécanisme de vérification par envoi de courrier pour les établissements considérés comme professionnels du déchet (traiteur, TTR, transporteur, négociant, courtier, éco-organisme, VHU) permettant de s'assurer que l'administrateur a bien les droits de créer l'établissement dans Trackdéchets. Dans l'attente de cette vérification, le premier administrateur ne peut pas inviter de nouveaux membres et l'établissement ne peut pas être visé en tant qu'installation de destination d'un BSD. [PR 807](https://github.com/MTES-MCT/trackdechets/pull/807)
+
+#### :boom: Breaking changes
+
+#### :bug: Corrections de bugs
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+
 # [2021.03.1] 16/03/2021
 
 #### :rocket: Nouvelles fonctionnalités
