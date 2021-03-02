@@ -12,6 +12,7 @@ import AccountFieldCompanyTransporterReceipt from "./fields/AccountFieldCompanyT
 import AccountFieldCompanyTraderReceipt from "./fields/AccountFieldCompanyTraderReceipt";
 import AccountFieldCompanyBrokerReceipt from "./fields/AccountFieldCompanyBrokerReceipt";
 import AccountFieldCompanyVerificationStatus from "./fields/AccountFieldCompanyVerificationStatus";
+import * as COMPANY_TYPES from "generated/constants/COMPANY_TYPES";
 
 const { REACT_APP_VERIFY_COMPANY } = process.env;
 
@@ -50,14 +51,7 @@ AccountCompanyInfo.fragments = {
 
 export default function AccountCompanyInfo({ company }: Props) {
   const isWasteProfessional = company.companyTypes.some(ct =>
-    [
-      CompanyType.Wasteprocessor,
-      CompanyType.Collector,
-      CompanyType.Trader,
-      CompanyType.EcoOrganisme,
-      CompanyType.Transporter,
-      CompanyType.WasteVehicles,
-    ].includes(ct)
+    COMPANY_TYPES.PROFESSIONALS.includes(ct)
   );
 
   return (

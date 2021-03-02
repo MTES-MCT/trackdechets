@@ -1,4 +1,4 @@
-import { CompanyVerificationStatus } from "@prisma/client";
+import { CompanyType, CompanyVerificationStatus } from "@prisma/client";
 import axios from "axios";
 import { addDays } from "date-fns";
 import * as COMPANY_TYPES from "../common/constants/COMPANY_TYPES";
@@ -109,7 +109,7 @@ export async function sendVerificationCodeLetters() {
       createdAt: { gte: addDays(today, -4), lt: addDays(today, -3) },
       verificationStatus: CompanyVerificationStatus.TO_BE_VERIFIED,
       companyTypes: {
-        hasSome: COMPANY_TYPES.PROFESSIONALS
+        hasSome: COMPANY_TYPES.PROFESSIONALS as CompanyType[]
       }
     }
   });
