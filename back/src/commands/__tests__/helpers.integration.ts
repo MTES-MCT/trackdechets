@@ -3,33 +3,35 @@ import { CompanyType } from "@prisma/client";
 import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
 import prisma from "../../prisma";
 import {
-  getRecentlyJoinedUsers,
+  getRecentlyAssociatedUsers,
   selectSecondOnboardingEmail
 } from "../onboarding.helpers";
 
 describe("Retrieve relevant users for onboarding emails", () => {
   afterEach(resetDatabase);
-  it("should retrieve users created yesterday", async () => {
+  it("should retrieve users associated yesterday", async () => {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const user = await userFactory({ createdAt: yesterday });
-    await userFactory(); // another user created just now
-    const recipients = await getRecentlyJoinedUsers({ daysAgo: 1 });
+    const user = await userFactory({ associatedAt: yesterday });
+    await userFactory({ associatedAt: new Date() }); // user associated just now
+    await userFactory(); // user non associated
+    const recipients = await getRecentlyAssociatedUsers({ daysAgo: 1 });
     expect(recipients.length).toEqual(1);
     expect(recipients[0].id).toEqual(user.id);
     expect(recipients[0].companyAssociations).toBeUndefined();
   });
 
-  it("should retrieve users created yesterday with related companies info", async () => {
+  it("should retrieve users associated yesterday with related companies info", async () => {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const { user, company } = await userWithCompanyFactory("ADMIN");
     await prisma.user.update({
       where: { id: user.id },
-      data: { createdAt: yesterday }
+      data: { associatedAt: yesterday }
     });
-    await userFactory(); // another user created just now
-    const recipients = await getRecentlyJoinedUsers({
+    await userFactory({ associatedAt: new Date() }); // user associated just now
+    await userFactory(); // user non associated
+    const recipients = await getRecentlyAssociatedUsers({
       daysAgo: 1,
       retrieveCompanies: true
     });

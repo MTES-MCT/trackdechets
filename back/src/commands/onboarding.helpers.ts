@@ -20,20 +20,20 @@ type getRecentlyJoinedUsersParams = {
   daysAgo: number;
   retrieveCompanies?: boolean;
 };
-export const getRecentlyJoinedUsers = async ({
+export const getRecentlyAssociatedUsers = async ({
   daysAgo,
   retrieveCompanies = false
 }: getRecentlyJoinedUsersParams) => {
   const now = new Date();
 
-  const inscriptionDateGt = xDaysAgo(now, daysAgo);
-  const inscriptionDateLt = xDaysAgo(now, daysAgo - 1);
+  const associatedDateGt = xDaysAgo(now, daysAgo);
+  const associatedDateLt = xDaysAgo(now, daysAgo - 1);
   // retrieve users whose account was created xDaysAgo
   // and associated company(ies) to tell apart producers and waste professionals according to their type
 
   return prisma.user.findMany({
     where: {
-      createdAt: { gt: inscriptionDateGt, lt: inscriptionDateLt },
+      associatedAt: { gt: associatedDateGt, lt: associatedDateLt },
       isActive: true
     },
     ...(retrieveCompanies && {
@@ -46,7 +46,7 @@ export const getRecentlyJoinedUsers = async ({
  * Send first step onboarding email to active users who suscribed yesterday
  */
 export const sendOnboardingFirstStepMails = async () => {
-  const recipients = await getRecentlyJoinedUsers({ daysAgo: 1 });
+  const recipients = await getRecentlyAssociatedUsers({ daysAgo: 1 });
   await Promise.all(
     recipients.map(recipient => {
       const payload = userMails.onboardingFirstStep(
@@ -92,7 +92,7 @@ export const selectSecondOnboardingEmail = (recipient: recipientType) => {
 export const sendOnboardingSecondStepMails = async () => {
   // we explictly retrieve user companies to tell apart producers from waste
   // professionals to selectthe right email template
-  const recipients = await getRecentlyJoinedUsers({
+  const recipients = await getRecentlyAssociatedUsers({
     daysAgo: 3,
     retrieveCompanies: true
   });
