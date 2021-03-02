@@ -67,10 +67,11 @@ describe("associateUserToCompany", () => {
     const company = await companyFactory();
 
     await associateUserToCompany(user.id, company.siret, "MEMBER");
-    const refreshedUser = await prisma.user.findUnique({ where: { id: user.id } });
+    const refreshedUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
     const fullUser = await getFullUser(refreshedUser);
     expect(fullUser.associatedAt).toBeTruthy();
     expect(fullUser.companies).toEqual([company]);
-    
   });
 });

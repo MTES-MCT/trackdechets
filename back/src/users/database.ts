@@ -105,7 +105,7 @@ export async function associateUserToCompany(userId, siret, role) {
       company: { connect: { siret } }
     }
   });
-  
+
   // fill associatedAt field if null (no need to update it if user was previously already associated)
   await prisma.user.updateMany({
     where: { id: userId, associatedAt: null },

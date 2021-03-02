@@ -124,20 +124,18 @@ describe("bulk create users and companies from csv files", () => {
 
   test("already existing user", async () => {
     // assume a user with this email already exists
-    const { associatedAt:_1, updatedAt:_2, ...john } = await userFactory({
+    const { associatedAt: _1, updatedAt: _2, ...john } = await userFactory({
       email: "john.snow@trackdechets.fr"
     });
 
     await bulkCreateIdempotent();
 
     await expectNumberOfRecords(2, 3, 4);
-    const {
-      associatedAt   ,
-      updatedAt ,
-      ...dbJohn
-    } = await prisma.user.findUnique({
-      where: { email: "john.snow@trackdechets.fr" }
-    });
+    const { associatedAt, updatedAt, ...dbJohn } = await prisma.user.findUnique(
+      {
+        where: { email: "john.snow@trackdechets.fr" }
+      }
+    );
 
     // john snow user should be untouched
     expect(dbJohn).toEqual(john);

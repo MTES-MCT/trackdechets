@@ -9,20 +9,22 @@ import supertest from "supertest";
 
 import { app } from "../../server";
 const request = supertest(app);
-describe("createUserAccountHash", () => {
+
+describe("user activation", () => {
   afterEach(resetDatabase);
-  it("should return user account hash", async () => {
+
+  it("should activate an user", async () => {
     const user = await userFactory({
       email: "bruce.banner@trackdechets.fr",
       isActive: false
     });
 
     const userActivationHash = await createActivationHash(user);
-    const activate = await request.get(
-      `/userActivation?hash=${userActivationHash.hash}`
-    );
+    await request.get(`/userActivation?hash=${userActivationHash.hash}`);
 
-    const refreshedUser = await prisma.user.findUnique({ where :  { id: user.id }});
+    const refreshedUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
 
     expect(refreshedUser.isActive).toEqual(true);
     expect(refreshedUser.activatedAt).toBeTruthy();
