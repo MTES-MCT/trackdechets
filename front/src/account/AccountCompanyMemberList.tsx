@@ -5,9 +5,9 @@ import AccountFormCompanyInviteNewUser from "./fields/forms/AccountFormCompanyIn
 import AccountCompanyMember from "./AccountCompanyMember";
 import {
   CompanyPrivate,
-  CompanyType,
   CompanyVerificationStatus,
 } from "generated/graphql/types";
+import * as COMPANY_TYPES from "generated/constants/COMPANY_TYPES";
 
 type Props = { company: CompanyPrivate };
 
@@ -30,14 +30,7 @@ AccountCompanyMemberList.fragments = {
 
 export default function AccountCompanyMemberList({ company }: Props) {
   const isProfessional = company.companyTypes.some(ct =>
-    [
-      CompanyType.Wasteprocessor,
-      CompanyType.Collector,
-      CompanyType.Transporter,
-      CompanyType.Trader,
-      CompanyType.EcoOrganisme,
-      CompanyType.WasteVehicles,
-    ].includes(ct)
+    COMPANY_TYPES.PROFESSIONALS.includes(ct)
   );
 
   const isVerified =

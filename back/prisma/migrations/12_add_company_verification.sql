@@ -1,14 +1,14 @@
--- Creates new column
 
+-- Create enum types
 CREATE TYPE "default$default"."CompanyVerificationStatus" AS ENUM ('TO_BE_VERIFIED', 'LETTER_SENT', 'VERIFIED');
 CREATE TYPE "default$default"."CompanyVerificationMode" AS ENUM ('KNOWLEDGE', 'MANUAL', 'LETTER');
 
-
+-- Create new columns
 ALTER TABLE "default$default"."Company"
 ADD "verificationCode" TEXT,
 ADD "verificationStatus" "default$default"."CompanyVerificationStatus" NOT NULL DEFAULT 'TO_BE_VERIFIED'::"default$default"."CompanyVerificationStatus" ,
-ADD "verificationMode" "default$default"."CompanyVerificationMode";
-
+ADD "verificationMode" "default$default"."CompanyVerificationMode",
+ADD "verifiedAt" TIMESTAMP;
 
 -- Generates codes for existing records
 UPDATE "default$default"."Company"
