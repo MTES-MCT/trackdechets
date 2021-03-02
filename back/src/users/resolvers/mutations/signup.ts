@@ -75,7 +75,7 @@ const signupResolver: MutationResolvers["signup"] = async (parent, args) => {
  *
  * @param user
  */
-async function createActivationHash(user: User) {
+export async function createActivationHash(user: User) {
   const activationHash = await hash(
     new Date().valueOf().toString() + Math.random().toString(),
     10
