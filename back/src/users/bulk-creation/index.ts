@@ -163,7 +163,8 @@ export async function bulkCreate(opts: Opts): Promise<void> {
           name: email,
           email,
           password: hashedPassword,
-          isActive: true
+          isActive: true,
+          activatedAt: new Date()
         }
       });
 
@@ -175,7 +176,14 @@ export async function bulkCreate(opts: Opts): Promise<void> {
     await Promise.all(
       usersWithRoles[email].map(async ({ role, siret }) => {
         try {
-          return await associateUserToCompany(user.id, siret, role);
+          const association =  await associateUserToCompany(user.id, siret, role);
+          if (!user.associatedAt) {
+            await prisma.user.update({
+              where: { id: user.id },
+              data: { associatedAt: new Date() }
+            });
+          }
+          return association
         } catch (err) {
           if (err instanceof UserInputError) {
             // association already exist, return it
