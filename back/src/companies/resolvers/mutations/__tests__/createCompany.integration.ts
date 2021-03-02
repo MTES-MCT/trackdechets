@@ -79,6 +79,13 @@ describe("Mutation.createCompany", () => {
         where: { company: { siret: companyInput.siret }, user: { id: user.id } }
       })) != null;
     expect(newCompanyAssociationExists).toBe(true);
+
+    const refreshedUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
+
+    // association date is filled
+    expect(refreshedUser.associatedAt).toBeTruthy();
   });
 
   it("should link to a transporterReceipt", async () => {
