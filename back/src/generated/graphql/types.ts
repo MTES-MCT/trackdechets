@@ -108,7 +108,7 @@ export type BrokerReceipt = {
   id: Scalars["ID"];
   /** Numéro de récépissé courtier */
   receiptNumber: Scalars["String"];
-  /** Limite de validatié du récépissé */
+  /** Limite de validité du récépissé */
   validityLimit: Scalars["DateTime"];
   /** Département ayant enregistré la déclaration */
   department: Scalars["String"];
@@ -346,7 +346,7 @@ export type Consistence =
 export type CreateBrokerReceiptInput = {
   /** Numéro de récépissé courtier */
   receiptNumber: Scalars["String"];
-  /** Limite de validatié du récépissé */
+  /** Limite de validité du récépissé */
   validityLimit: Scalars["DateTime"];
   /** Département ayant enregistré la déclaration */
   department: Scalars["String"];
@@ -385,7 +385,7 @@ export type CreateFormInput = {
 export type CreateTraderReceiptInput = {
   /** Numéro de récépissé négociant */
   receiptNumber: Scalars["String"];
-  /** Limite de validatié du récépissé */
+  /** Limite de validité du récépissé */
   validityLimit: Scalars["DateTime"];
   /** Département ayant enregistré la déclaration */
   department: Scalars["String"];
@@ -395,7 +395,7 @@ export type CreateTraderReceiptInput = {
 export type CreateTransporterReceiptInput = {
   /** Numéro de récépissé transporteur */
   receiptNumber: Scalars["String"];
-  /** Limite de validatié du récépissé */
+  /** Limite de validité du récépissé */
   validityLimit: Scalars["DateTime"];
   /** Département ayant enregistré la déclaration */
   department: Scalars["String"];
@@ -2057,7 +2057,7 @@ export type TraderReceipt = {
   id: Scalars["ID"];
   /** Numéro de récépissé négociant */
   receiptNumber: Scalars["String"];
-  /** Limite de validatié du récépissé */
+  /** Limite de validité du récépissé */
   validityLimit: Scalars["DateTime"];
   /** Département ayant enregistré la déclaration */
   department: Scalars["String"];
@@ -2106,7 +2106,7 @@ export type TransporterReceipt = {
   id: Scalars["ID"];
   /** Numéro de récépissé transporteur */
   receiptNumber: Scalars["String"];
-  /** Limite de validatié du récépissé */
+  /** Limite de validité du récépissé */
   validityLimit: Scalars["DateTime"];
   /** Département ayant enregistré la déclaration */
   department: Scalars["String"];
@@ -2163,7 +2163,7 @@ export type UpdateBrokerReceiptInput = {
   id: Scalars["ID"];
   /** Numéro de récépissé courtier */
   receiptNumber?: Maybe<Scalars["String"]>;
-  /** Limite de validatié du récépissé */
+  /** Limite de validité du récépissé */
   validityLimit?: Maybe<Scalars["DateTime"]>;
   /** Département ayant enregistré la déclaration */
   department?: Maybe<Scalars["String"]>;
@@ -2206,7 +2206,7 @@ export type UpdateTraderReceiptInput = {
   id: Scalars["ID"];
   /** Numéro de récépissé négociant */
   receiptNumber?: Maybe<Scalars["String"]>;
-  /** Limite de validatié du récépissé */
+  /** Limite de validité du récépissé */
   validityLimit?: Maybe<Scalars["DateTime"]>;
   /** Département ayant enregistré la déclaration */
   department?: Maybe<Scalars["String"]>;
@@ -2218,7 +2218,7 @@ export type UpdateTransporterReceiptInput = {
   id: Scalars["ID"];
   /** Numéro de récépissé transporteur */
   receiptNumber?: Maybe<Scalars["String"]>;
-  /** Limite de validatié du récépissé */
+  /** Limite de validité du récépissé */
   validityLimit?: Maybe<Scalars["DateTime"]>;
   /** Département ayant enregistré la déclaration */
   department?: Maybe<Scalars["String"]>;
