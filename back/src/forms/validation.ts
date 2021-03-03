@@ -950,14 +950,14 @@ async function checkDestination(siret: string) {
 
   if (!company) {
     throw new UserInputError(
-      "L'installation de destination ou d’entreposage ou de reconditionnement prévue (cadre 2) n'est pas inscrite sur Trackdéchets"
+      `L'installation de destination ou d’entreposage ou de reconditionnement qui a été renseignée en case 2 (SIRET: ${siret}) n'est pas inscrite sur Trackdéchets`
     );
   }
 
   // check company has profile COLLECTOR or WASTE_PROCESSOR
   if (!(isCollector(company) || isWasteProcessor(company))) {
     throw new UserInputError(
-      `L'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
+      `L'installation de destination ou d’entreposage ou de reconditionnement qui a été renseignée en case 2 (SIRET: ${company.siret})
       n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement.
       Cette installation ne peut donc pas être visée en case 2 du bordereau. Veuillez vous rapprocher de l'administrateur
       de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
@@ -979,14 +979,14 @@ async function checkDestinationAfterTempStorage(siret: string) {
 
   if (!company) {
     throw new UserInputError(
-      "L'installation de destination prévue après entreposage provisoire ou reconditionnement (cadre 14) n'est pas inscrite sur Trackdéchets"
+      `L'installation de destination après entreposage provisoire ou reconditionnement qui a été renseignée en case 14 (SIRET ${siret}) n'est pas inscrite sur Trackdéchets`
     );
   }
 
   // check company has profile COLLECTOR or WASTE_PROCESSOR
   if (!(isCollector(company) || isWasteProcessor(company))) {
     throw new UserInputError(
-      `L'installation de destination prévue après entreposage provisoire ou reconditionnement ${company.siret}
+      `L'installation de destination après entreposage provisoire ou reconditionnement qui a été renseignée en case 14 (SIRET ${company.siret})
       n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement.
       Cette installation ne peut donc pas être visée en case 14 du bordereau. Veuillez vous rapprocher de l'administrateur
       de cette installation pour qu'il modifie le profil de l'installation depuis l'interface Trackdéchets Mon Compte > Établissements`
