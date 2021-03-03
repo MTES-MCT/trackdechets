@@ -5,7 +5,7 @@ import { resetDatabase } from "../../integration-tests/helper";
 import { getLoginError } from "../auth";
 import prisma from "../prisma";
 import { app, sess } from "../server";
-import { getUid } from "../utils";
+import { getUid, hashToken } from "../utils";
 import { userFactory } from "./factories";
 
 const { UI_HOST, JWT_SECRET } = process.env;
@@ -219,13 +219,36 @@ describe("Authentification with token", () => {
     const accessToken = await prisma.accessToken.findUnique({
       where: { token }
     });
+
     expect(accessToken).toBeDefined();
     expect(accessToken.token).toEqual(token);
+
     expect(accessToken.lastUsed).not.toBeNull();
     const accessTokenUser = await prisma.accessToken
       .findUnique({ where: { token } })
       .user();
     expect(accessTokenUser.id).toEqual(user.id);
+  });
+
+  it("should not authenticate against previously unHashed token", async () => {
+    const user = await userFactory();
+
+    const token = getUid(10);
+    // mimicking token generated before hashing routine implementation
+    await prisma.accessToken.create({
+      data: {
+        token: token,
+        user: { connect: { id: user.id } }
+      }
+    });
+
+    const res = await request
+      .post("/")
+      .send({ query: "{ me { email } }" })
+      .set("Authorization", `Bearer ${token}`);
+    expect(res.body.errors).toHaveLength(1);
+    expect(res.body.errors[0].message).toEqual("Vous n'êtes pas connecté.");
+    expect(res.body.data).toBeNull();
   });
 
   it("should authenticate using OAuth2 bearer token", async () => {
@@ -234,7 +257,7 @@ describe("Authentification with token", () => {
     const token = getUid(10);
     await prisma.accessToken.create({
       data: {
-        token,
+        token: hashToken(token),
         user: { connect: { id: user.id } }
       }
     });
@@ -250,7 +273,7 @@ describe("Authentification with token", () => {
 
     // should update lastUsed field
     const accessToken = await prisma.accessToken.findUnique({
-      where: { token }
+      where: { token: hashToken(token) }
     });
     expect(accessToken.lastUsed).not.toBeNull();
   });

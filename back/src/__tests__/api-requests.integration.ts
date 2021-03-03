@@ -14,9 +14,8 @@ describe("Perform api requests", () => {
     const { user, accessToken } = await userWithAccessTokenFactory();
     const res = await request
       .post("/")
-      .set("Authorization", `Bearer ${accessToken.token}`)
+      .set("Authorization", `Bearer ${accessToken}`)
       .send({ query: "{ me { email }}" });
-
     expect(res.body.data.me.email).toEqual(user.email);
   });
 
@@ -26,7 +25,7 @@ describe("Perform api requests", () => {
     const res = await request
       .post("/")
       .type("application/graphql")
-      .set("Authorization", `Bearer ${accessToken.token}`)
+      .set("Authorization", `Bearer ${accessToken}`)
       .send("{ me { email }}");
 
     expect(res.body.data.me.email).toEqual(user.email);

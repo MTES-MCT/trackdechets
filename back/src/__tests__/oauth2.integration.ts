@@ -3,7 +3,7 @@ import supertest from "supertest";
 import { resetDatabase } from "../../integration-tests/helper";
 import { tokenErrorMessages } from "../oauth2";
 import { app } from "../server";
-import { getUid } from "../utils";
+import { getUid, hashToken } from "../utils";
 import { logIn } from "./auth.helper";
 import { applicationFactory, userFactory } from "./factories";
 
@@ -261,14 +261,12 @@ describe("/oauth2/token", () => {
         where: { application: { id: application.id }, user: { id: user.id } }
       })
     )[0];
-
-    expect(res.body).toEqual({
-      access_token: accessToken.token,
-      token_type: "Bearer",
-      user: {
-        email: user.email,
-        name: user.name
-      }
+    const { access_token, token_type, user: responseUser } = res.body;
+    expect(hashToken(access_token)).toEqual(accessToken.token);
+    expect(token_type).toEqual("Bearer");
+    expect(responseUser).toEqual({
+      email: user.email,
+      name: user.name
     });
   });
 

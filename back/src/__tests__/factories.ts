@@ -10,7 +10,7 @@ import {
   Prisma
 } from "@prisma/client";
 import prisma from "../prisma";
-
+import { hashToken } from "../utils";
 /**
  * Create a user with name and email
  * @param opt: extra parameters
@@ -115,14 +115,14 @@ export const userWithAccessTokenFactory = async (opt = {}) => {
   const user = await userFactory(opt);
 
   const accessTokenIndex = (await prisma.accessToken.count()) + 1;
-
-  const accessToken = await prisma.accessToken.create({
+  const clearToken = `token_${accessTokenIndex}`;
+  await prisma.accessToken.create({
     data: {
-      token: `token_${accessTokenIndex}`,
+      token: hashToken(clearToken),
       user: { connect: { id: user.id } }
     }
   });
-  return { user, accessToken };
+  return { user, accessToken: clearToken };
 };
 
 const formdata = {

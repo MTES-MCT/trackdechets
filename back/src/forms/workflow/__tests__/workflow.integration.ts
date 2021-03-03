@@ -88,8 +88,8 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
    * Helper function to return a user token
    */
   async function apiKey(user: User) {
-    const accessToken = await createAccessToken(user);
-    return accessToken.token;
+    const { clearToken } = await createAccessToken(user);
+    return clearToken;
   }
 
   test("Acheminement direct du producteur à l'installation de traitement", async () => {

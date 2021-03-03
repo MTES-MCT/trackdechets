@@ -33,10 +33,10 @@ const loginResolver: MutationResolvers["login"] = async (
     });
   }
 
-  const accesToken = await createAccessToken(user);
+  const { clearToken } = await createAccessToken(user);
 
   return {
-    token: accesToken.token,
+    token: clearToken,
     user: {
       ...user,
       // companies are resolved through a separate resolver (User.companies)
