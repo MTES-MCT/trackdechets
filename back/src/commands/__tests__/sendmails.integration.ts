@@ -26,12 +26,12 @@ describe("sendOnboardingFirstStepMails", () => {
     );
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const user = await userFactory({ createdAt: yesterday });
-    // Users created today and 2 days ago, should not receive any email
+    const user = await userFactory({ associatedAt: yesterday });
+    // Users associatedAt today and 2 days ago, should not receive any email
     await userFactory();
     const twoDaysAgo = new Date();
     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-    await userFactory({ createdAt: twoDaysAgo });
+    await userFactory({ associatedAt: twoDaysAgo });
 
     await sendOnboardingFirstStepMails();
 
@@ -86,7 +86,7 @@ describe("sendOnboardingSecondStepMails", () => {
 
       await prisma.user.update({
         where: { id: producer.id },
-        data: { createdAt: someDaysAgo }
+        data: { associatedAt: someDaysAgo }
       });
       const { user: professional } = await userWithCompanyFactory("ADMIN", {
         companyTypes: {
@@ -96,7 +96,7 @@ describe("sendOnboardingSecondStepMails", () => {
 
       await prisma.user.update({
         where: { id: professional.id },
-        data: { createdAt: someDaysAgo }
+        data: { associatedAt: someDaysAgo }
       });
 
       (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
@@ -122,7 +122,7 @@ describe("sendOnboardingSecondStepMails", () => {
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { createdAt: threeDaysAgo }
+      data: { associatedAt: threeDaysAgo }
     });
 
     (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
@@ -178,7 +178,7 @@ describe("sendOnboardingSecondStepMails", () => {
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { createdAt: threeDaysAgo }
+      data: { associatedAt: threeDaysAgo }
     });
 
     (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
