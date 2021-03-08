@@ -51,7 +51,7 @@ const mailjetBackend = {
     const request = mj
       .post("send", { version: "v3.1" })
       .request({ Messages: [payload] });
-    request
+    return request
       .then(() => {
         const allRecipients = [...mail.to, ...(!!mail.cc ? mail.cc : [])];
         for (const recipient of allRecipients) {

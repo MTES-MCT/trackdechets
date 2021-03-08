@@ -51,7 +51,7 @@ const sendInBlueBackend = {
       headers: headers,
       timeout: 5000
     });
-    req
+    return req
       .then(() => {
         const allRecipients = [...mail.to, ...(!!mail.cc ? mail.cc : [])];
         for (const recipient of allRecipients) {
