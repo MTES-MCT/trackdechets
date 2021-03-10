@@ -1,10 +1,15 @@
 @import "src/scss/Constants.scss";
+@import "src/scss/Breakpoints";
 
 .BSDCards {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(1, 1fr);
   grid-gap: 1rem;
   padding: 0 1rem;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .BSDCard {
@@ -19,17 +24,22 @@
   padding: 0;
 }
 .BSDCardListItem {
-  display: flex;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+
+  @include phone {
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: 30% 1fr;
+  }
 }
 .BSDCardListItemLabel {
   font-weight: bold;
-  text-align: right;
-  flex: 0 0 30%;
-  padding-right: 1rem;
+
+  @include phone {
+    text-align: right;
+  }
 }
 .BSDCardListItemValue {
-  flex: 1;
 }
 .BSDCardActions {
   display: flex;
