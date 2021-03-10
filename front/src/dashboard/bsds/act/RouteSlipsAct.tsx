@@ -11,7 +11,6 @@ import {
 } from "common/components";
 import { Query, QueryFormsArgs } from "generated/graphql/types";
 import { BSDList } from "../../components/BSDList";
-import SlipsHeaderActions from "../SlipsHeaderActions";
 import { ACT_TAB_FORMS } from "../queries";
 import illustration from "./assets/blankslateAct.svg";
 
@@ -35,13 +34,12 @@ export function RouteSlipsAct() {
         <BreadcrumbItem>Pour Action</BreadcrumbItem>
       </Breadcrumb>
 
-      <SlipsHeaderActions refetch={refetch} />
-
       <BSDList
         loading={loading}
         siret={siret}
         forms={forms}
         fetchMore={fetchMore}
+        refetch={refetch}
         blankslate={
           <Blankslate>
             <BlankslateImg src={illustration} alt="" />

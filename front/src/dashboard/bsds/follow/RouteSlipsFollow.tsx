@@ -12,7 +12,6 @@ import {
 import { Query, QueryFormsArgs } from "generated/graphql/types";
 import { BSDList } from "../../components/BSDList";
 import { FOLLOW_TAB_FORMS } from "../queries";
-import SlipsHeaderActions from "../SlipsHeaderActions";
 import illustration from "./assets/blankslateFollow.svg";
 
 export function RouteSlipsFollow() {
@@ -35,13 +34,12 @@ export function RouteSlipsFollow() {
         <BreadcrumbItem>Suivi</BreadcrumbItem>
       </Breadcrumb>
 
-      <SlipsHeaderActions refetch={refetch} />
-
       <BSDList
         siret={siret}
         forms={forms}
         loading={loading}
         fetchMore={fetchMore}
+        refetch={refetch}
         blankslate={
           <Blankslate>
             <BlankslateImg src={illustration} alt="" />

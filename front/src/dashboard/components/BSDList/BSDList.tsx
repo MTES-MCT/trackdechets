@@ -2,7 +2,11 @@ import * as React from "react";
 import classNames from "classnames";
 import { Form } from "generated/graphql/types";
 import Loader from "common/components/Loaders";
-import { IconLayout2, IconLayoutModule1 } from "common/components/Icons";
+import {
+  IconLayout2,
+  IconLayoutModule1,
+  IconRefresh,
+} from "common/components/Icons";
 import { formatDate } from "common/datetime";
 import { usePersistedState } from "common/hooks/usePersistedState";
 import { ITEMS_PER_PAGE, statusLabels } from "../../constants";
@@ -11,6 +15,8 @@ import { BSDTable } from "./BSDTable";
 import { BSDCards } from "./BSDCards";
 import styles from "./BSDList.module.scss";
 import TransporterInfoEdit from "./TransporterInfoEdit";
+import { generatePath, Link } from "react-router-dom";
+import routes from "common/routes";
 
 export const COLUMNS: Record<string, Column> = {
   readableId: {
@@ -147,6 +153,7 @@ interface BSDListProps {
   fetchMore: any;
   loading: boolean;
   blankslate: React.ReactNode;
+  refetch: () => void;
 }
 
 export function BSDList({
@@ -156,6 +163,7 @@ export function BSDList({
   fetchMore,
   loading,
   blankslate,
+  refetch,
 }: BSDListProps) {
   const [layoutType, setLayoutType] = usePersistedState<LayoutType>(
     LAYOUT_LOCAL_STORAGE_KEY,
@@ -165,6 +173,17 @@ export function BSDList({
 
   return (
     <>
+      <div className={styles.BSDListActions}>
+        <Link
+          to={generatePath(routes.dashboard.bsdds.create, { siret })}
+          className="btn btn--primary"
+        >
+          Créer un bordereau
+        </Link>
+        <button className="btn btn--primary" onClick={() => refetch()}>
+          Rafraîchir <IconRefresh style={{ marginLeft: "0.5rem" }} />
+        </button>
+      </div>
       {loading && <Loader />}
       {forms.length > 0 || loading ? (
         <>

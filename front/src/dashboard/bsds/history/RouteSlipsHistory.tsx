@@ -13,7 +13,6 @@ import { Query, QueryFormsArgs } from "generated/graphql/types";
 import { BSDList } from "../../components/BSDList";
 
 import { HISTORY_TAB_FORMS } from "../queries";
-import SlipsHeaderActions from "../SlipsHeaderActions";
 import illustration from "./assets/blankslateHistory.svg";
 
 export function RouteSlipsHistory() {
@@ -36,13 +35,12 @@ export function RouteSlipsHistory() {
         <BreadcrumbItem>Archives</BreadcrumbItem>
       </Breadcrumb>
 
-      <SlipsHeaderActions refetch={refetch} />
-
       <BSDList
         loading={loading}
         siret={siret}
         forms={forms}
         fetchMore={fetchMore}
+        refetch={refetch}
         blankslate={
           <Blankslate>
             <BlankslateImg src={illustration} alt="" />

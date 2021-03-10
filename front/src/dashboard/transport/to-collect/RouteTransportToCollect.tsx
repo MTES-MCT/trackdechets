@@ -31,7 +31,7 @@ const TO_COLLECT_COLUMNS = [
 
 export function RouteTransportToCollect() {
   const { siret } = useParams<{ siret: string }>();
-  const { data, loading, fetchMore } = useQuery<
+  const { data, loading, fetchMore, refetch } = useQuery<
     Pick<Query, "forms">,
     Partial<QueryFormsArgs>
   >(GET_TRANSPORT_SLIPS, {
@@ -82,6 +82,7 @@ export function RouteTransportToCollect() {
         forms={filteredForms}
         loading={loading}
         fetchMore={fetchMore}
+        refetch={refetch}
         columns={TO_COLLECT_COLUMNS}
         blankslate={
           <Blankslate>

@@ -15,7 +15,6 @@ import { BSDList, COLUMNS } from "../../components/BSDList";
 
 import routes from "common/routes";
 import { DRAFT_TAB_FORMS } from "../queries";
-import SlipsHeaderActions from "../SlipsHeaderActions";
 import illustration from "./assets/blankslateDrafts.svg";
 
 const DRAFTS_COLUMNS = [
@@ -43,14 +42,13 @@ export function RouteSlipsDrafts() {
         <BreadcrumbItem>Brouillons</BreadcrumbItem>
       </Breadcrumb>
 
-      <SlipsHeaderActions refetch={refetch} />
-
       <BSDList
         loading={loading}
         siret={siret}
         forms={forms}
         columns={DRAFTS_COLUMNS}
         fetchMore={fetchMore}
+        refetch={refetch}
         blankslate={
           <Blankslate>
             <BlankslateImg src={illustration} alt="" />

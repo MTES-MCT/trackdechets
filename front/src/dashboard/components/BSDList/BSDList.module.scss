@@ -1,5 +1,11 @@
 @import "src/scss/Constants.scss";
 
+.BSDListActions {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 1rem;
+}
+
 .ButtonGroup {
   > * {
     border-radius: 0;
