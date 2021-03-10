@@ -1,6 +1,10 @@
 import * as React from "react";
+import { generatePath, Link } from "react-router-dom";
 import classNames from "classnames";
+import useMedia from "use-media";
 import { Form } from "generated/graphql/types";
+import { MEDIA_QUERIES } from "common/config";
+import routes from "common/routes";
 import Loader from "common/components/Loaders";
 import {
   IconLayout2,
@@ -15,8 +19,6 @@ import { BSDTable } from "./BSDTable";
 import { BSDCards } from "./BSDCards";
 import styles from "./BSDList.module.scss";
 import TransporterInfoEdit from "./TransporterInfoEdit";
-import { generatePath, Link } from "react-router-dom";
-import routes from "common/routes";
 
 export const COLUMNS: Record<string, Column> = {
   readableId: {
@@ -169,7 +171,14 @@ export function BSDList({
     LAYOUT_LOCAL_STORAGE_KEY,
     value => LAYOUTS.find(layout => layout.type === value)?.type ?? "table"
   );
+  const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
   const currentLayout = LAYOUTS.find(layout => layout.type === layoutType)!;
+
+  React.useEffect(() => {
+    if (isMobile) {
+      setLayoutType("cards");
+    }
+  }, [isMobile]);
 
   return (
     <>
