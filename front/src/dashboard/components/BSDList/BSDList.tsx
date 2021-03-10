@@ -88,7 +88,7 @@ export const COLUMNS: Record<string, Column> = {
   },
   transporterNumberPlate: {
     id: "form.stateSummary.transporterNumberPlate",
-    Header: "Plaque d'immatriculation",
+    Header: "Immat.",
     accessor: form => form.stateSummary?.transporterNumberPlate ?? "",
     sortable: false,
     filterable: false,
