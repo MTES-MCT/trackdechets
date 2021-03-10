@@ -178,7 +178,7 @@ export function BSDList({
     if (isMobile) {
       setLayoutType("cards");
     }
-  }, [isMobile]);
+  }, [isMobile, setLayoutType]);
 
   return (
     <>
