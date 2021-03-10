@@ -7,10 +7,17 @@ import {
   Query,
   QueryFormsArgs,
 } from "generated/graphql/types";
-import { Breadcrumb, BreadcrumbItem } from "common/components";
-import Loader from "common/components/Loaders";
+import {
+  Blankslate,
+  BlankslateDescription,
+  BlankslateImg,
+  BlankslateTitle,
+  Breadcrumb,
+  BreadcrumbItem,
+} from "common/components";
 import { BSDList, COLUMNS } from "../../components/BSDList";
 import { GET_TRANSPORT_SLIPS } from "../queries";
+import illustration from "./assets/blankslateToCollect.svg";
 
 const TO_COLLECT_COLUMNS = [
   COLUMNS.readableId,
@@ -70,17 +77,25 @@ export function RouteTransportToCollect() {
         <BreadcrumbItem>À collecter</BreadcrumbItem>
       </Breadcrumb>
 
-      {loading ? (
-        <Loader />
-      ) : (
-        <BSDList
-          siret={siret}
-          forms={filteredForms}
-          loading={loading}
-          fetchMore={fetchMore}
-          columns={TO_COLLECT_COLUMNS}
-        />
-      )}
+      <BSDList
+        siret={siret}
+        forms={filteredForms}
+        loading={loading}
+        fetchMore={fetchMore}
+        columns={TO_COLLECT_COLUMNS}
+        blankslate={
+          <Blankslate>
+            <BlankslateImg src={illustration} alt="" />
+            <BlankslateTitle>
+              Il n'y a aucun bordereau à collecter
+            </BlankslateTitle>
+            <BlankslateDescription>
+              Des bordereaux apparaissent dans cet onglet lorsqu'ils sont en
+              attente de collecte par votre entreprise.
+            </BlankslateDescription>
+          </Blankslate>
+        }
+      />
     </>
   );
 }

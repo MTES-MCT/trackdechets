@@ -146,6 +146,7 @@ interface BSDListProps {
   columns?: Column[];
   fetchMore: any;
   loading: boolean;
+  blankslate: React.ReactNode;
 }
 
 export function BSDList({
@@ -154,6 +155,7 @@ export function BSDList({
   columns = DEFAULT_COLUMNS,
   fetchMore,
   loading,
+  blankslate,
 }: BSDListProps) {
   const [layoutType, setLayoutType] = usePersistedState<LayoutType>(
     LAYOUT_LOCAL_STORAGE_KEY,
@@ -164,46 +166,56 @@ export function BSDList({
   return (
     <>
       {loading && <Loader />}
-      <div className={styles.ButtonGroup} style={{ margin: "1rem" }}>
-        {LAYOUTS.map(layout => (
-          <button
-            key={layout.type}
-            type="button"
-            className={classNames(
-              "btn btn--small",
-              layout.type === currentLayout.type
-                ? "btn--primary"
-                : "btn--outline-primary"
-            )}
-            onClick={() => setLayoutType(layout.type)}
-          >
-            {layout.label}
-          </button>
-        ))}
-      </div>
-      <currentLayout.Component siret={siret} forms={forms} columns={columns} />
-      {forms.length >= ITEMS_PER_PAGE && (
-        <div style={{ textAlign: "center" }}>
-          <button
-            className="center btn btn--primary small"
-            onClick={() =>
-              fetchMore({
-                variables: {
-                  cursorAfter: forms[forms.length - 1].id,
-                },
-                updateQuery: (prev, { fetchMoreResult }) => {
-                  if (!fetchMoreResult) return prev;
-                  return {
-                    ...prev,
-                    forms: [...prev.forms, ...fetchMoreResult.forms],
-                  };
-                },
-              })
-            }
-          >
-            Charger plus de bordereaux
-          </button>
-        </div>
+      {forms.length > 0 || loading ? (
+        <>
+          <div className={styles.ButtonGroup} style={{ margin: "1rem" }}>
+            {LAYOUTS.map(layout => (
+              <button
+                key={layout.type}
+                type="button"
+                className={classNames(
+                  "btn btn--small",
+                  layout.type === currentLayout.type
+                    ? "btn--primary"
+                    : "btn--outline-primary"
+                )}
+                onClick={() => setLayoutType(layout.type)}
+              >
+                {layout.label}
+              </button>
+            ))}
+          </div>
+          <currentLayout.Component
+            siret={siret}
+            forms={forms}
+            columns={columns}
+          />
+          {forms.length >= ITEMS_PER_PAGE && (
+            <div style={{ textAlign: "center" }}>
+              <button
+                className="center btn btn--primary small"
+                onClick={() =>
+                  fetchMore({
+                    variables: {
+                      cursorAfter: forms[forms.length - 1].id,
+                    },
+                    updateQuery: (prev, { fetchMoreResult }) => {
+                      if (!fetchMoreResult) return prev;
+                      return {
+                        ...prev,
+                        forms: [...prev.forms, ...fetchMoreResult.forms],
+                      };
+                    },
+                  })
+                }
+              >
+                Charger plus de bordereaux
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+        blankslate
       )}
     </>
   );

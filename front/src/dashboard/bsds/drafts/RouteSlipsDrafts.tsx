@@ -45,35 +45,34 @@ export function RouteSlipsDrafts() {
 
       <SlipsHeaderActions refetch={refetch} />
 
-      {forms.length > 0 || loading ? (
-        <BSDList
-          loading={loading}
-          siret={siret}
-          forms={forms}
-          columns={DRAFTS_COLUMNS}
-          fetchMore={fetchMore}
-        />
-      ) : (
-        <Blankslate>
-          <BlankslateImg src={illustration} alt="" />
-          <BlankslateTitle>
-            Il n'y a aucun bordereau en brouillon
-          </BlankslateTitle>
-          <BlankslateDescription>
-            Si vous le souhaitez, vous pouvez{" "}
-            <Link to={generatePath(routes.dashboard.bsdds.create, { siret })}>
-              <button className="btn btn--outline-primary btn--medium-text">
-                Créer un bordereau
-              </button>{" "}
-            </Link>
-            ou dupliquer un bordereau déjà existant dans un autre onglet grâce à
-            l'icône{" "}
-            <span style={{ display: "inline" }}>
-              <IconDuplicateFile color="blueLight" />
-            </span>
-          </BlankslateDescription>
-        </Blankslate>
-      )}
+      <BSDList
+        loading={loading}
+        siret={siret}
+        forms={forms}
+        columns={DRAFTS_COLUMNS}
+        fetchMore={fetchMore}
+        blankslate={
+          <Blankslate>
+            <BlankslateImg src={illustration} alt="" />
+            <BlankslateTitle>
+              Il n'y a aucun bordereau en brouillon
+            </BlankslateTitle>
+            <BlankslateDescription>
+              Si vous le souhaitez, vous pouvez{" "}
+              <Link to={generatePath(routes.dashboard.bsdds.create, { siret })}>
+                <button className="btn btn--outline-primary btn--medium-text">
+                  Créer un bordereau
+                </button>{" "}
+              </Link>
+              ou dupliquer un bordereau déjà existant dans un autre onglet grâce
+              à l'icône{" "}
+              <span style={{ display: "inline" }}>
+                <IconDuplicateFile color="blueLight" />
+              </span>
+            </BlankslateDescription>
+          </Blankslate>
+        }
+      />
     </>
   );
 }

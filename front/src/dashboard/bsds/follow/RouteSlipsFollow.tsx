@@ -37,26 +37,25 @@ export function RouteSlipsFollow() {
 
       <SlipsHeaderActions refetch={refetch} />
 
-      {forms.length > 0 || loading ? (
-        <BSDList
-          siret={siret}
-          forms={forms}
-          loading={loading}
-          fetchMore={fetchMore}
-        />
-      ) : (
-        <Blankslate>
-          <BlankslateImg src={illustration} alt="" />
-          <BlankslateTitle>Il n'y a aucun bordereau à suivre</BlankslateTitle>
-          <BlankslateDescription>
-            Des bordereaux apparaissent dans cet onglet lorsqu'ils sont en
-            attente d'une action extérieure. Par exemple lorsqu'en tant que
-            producteur vous attendez la réception d'un déchet ou son traitement.
-            La colonne <strong>STATUT</strong> vous renseignera sur l'état
-            précis du bordereau.
-          </BlankslateDescription>
-        </Blankslate>
-      )}
+      <BSDList
+        siret={siret}
+        forms={forms}
+        loading={loading}
+        fetchMore={fetchMore}
+        blankslate={
+          <Blankslate>
+            <BlankslateImg src={illustration} alt="" />
+            <BlankslateTitle>Il n'y a aucun bordereau à suivre</BlankslateTitle>
+            <BlankslateDescription>
+              Des bordereaux apparaissent dans cet onglet lorsqu'ils sont en
+              attente d'une action extérieure. Par exemple lorsqu'en tant que
+              producteur vous attendez la réception d'un déchet ou son
+              traitement. La colonne <strong>STATUT</strong> vous renseignera
+              sur l'état précis du bordereau.
+            </BlankslateDescription>
+          </Blankslate>
+        }
+      />
     </>
   );
 }

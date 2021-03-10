@@ -37,25 +37,24 @@ export function RouteSlipsAct() {
 
       <SlipsHeaderActions refetch={refetch} />
 
-      {forms.length > 0 || loading ? (
-        <BSDList
-          loading={loading}
-          siret={siret}
-          forms={forms}
-          fetchMore={fetchMore}
-        />
-      ) : (
-        <Blankslate>
-          <BlankslateImg src={illustration} alt="" />
-          <BlankslateTitle>Il n'y a aucun bordereau à signer</BlankslateTitle>
-          <BlankslateDescription>
-            Bonne nouvelle, vous n'avez aucun bordereau à signer ! Des
-            bordereaux apparaissent dans cet onglet uniquement lorsque vous avez
-            une action à effectuer dans le cadre de leur cycle de vie (envoi,
-            réception ou traitement...)
-          </BlankslateDescription>
-        </Blankslate>
-      )}
+      <BSDList
+        loading={loading}
+        siret={siret}
+        forms={forms}
+        fetchMore={fetchMore}
+        blankslate={
+          <Blankslate>
+            <BlankslateImg src={illustration} alt="" />
+            <BlankslateTitle>Il n'y a aucun bordereau à signer</BlankslateTitle>
+            <BlankslateDescription>
+              Bonne nouvelle, vous n'avez aucun bordereau à signer ! Des
+              bordereaux apparaissent dans cet onglet uniquement lorsque vous
+              avez une action à effectuer dans le cadre de leur cycle de vie
+              (envoi, réception ou traitement...)
+            </BlankslateDescription>
+          </Blankslate>
+        }
+      />
     </>
   );
 }

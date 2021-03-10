@@ -7,10 +7,17 @@ import {
   Query,
   QueryFormsArgs,
 } from "generated/graphql/types";
-import { Breadcrumb, BreadcrumbItem } from "common/components";
-import Loader from "common/components/Loaders";
+import {
+  Blankslate,
+  BlankslateDescription,
+  BlankslateImg,
+  BlankslateTitle,
+  Breadcrumb,
+  BreadcrumbItem,
+} from "common/components";
 import { COLUMNS, BSDList } from "../../components/BSDList";
 import { GET_TRANSPORT_SLIPS } from "../queries";
+import illustration from "./assets/blankslateCollected.svg";
 
 const COLLECTED_COLUMNS = [
   COLUMNS.readableId,
@@ -66,17 +73,23 @@ export function RouteTransportCollected() {
         </BreadcrumbItem>
       </Breadcrumb>
 
-      {loading ? (
-        <Loader />
-      ) : (
-        <BSDList
-          columns={COLLECTED_COLUMNS}
-          forms={filteredForms}
-          siret={siret}
-          fetchMore={fetchMore}
-          loading={loading}
-        />
-      )}
+      <BSDList
+        columns={COLLECTED_COLUMNS}
+        forms={filteredForms}
+        siret={siret}
+        fetchMore={fetchMore}
+        loading={loading}
+        blankslate={
+          <Blankslate>
+            <BlankslateImg src={illustration} alt="" />
+            <BlankslateTitle>Il n'y a aucun bordereau collecté</BlankslateTitle>
+            <BlankslateDescription>
+              Des bordereaux apparaissent dans cet onglet lorsqu'ils sont en
+              cours de transport par votre entreprise.
+            </BlankslateDescription>
+          </Blankslate>
+        }
+      />
     </>
   );
 }
