@@ -101,7 +101,7 @@ describe("joinWithInvite mutation", () => {
       where: { email: invitee }
     });
     expect(createdUser.activatedAt).toBeTruthy();
-    expect(createdUser.associatedAt).toBeTruthy();
+    expect(createdUser.firstAssociationDate).toBeTruthy();
   });
 
   it("should accept other pending invitations", async () => {

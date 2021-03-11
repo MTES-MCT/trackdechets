@@ -93,7 +93,7 @@ describe("bulk create users and companies from csv files", () => {
     expect(john.name).toEqual("john.snow@trackdechets.fr");
     expect(john.isActive).toEqual(true);
     expect(john.activatedAt).toBeTruthy();
-    expect(john.associatedAt).toBeTruthy();
+    expect(john.firstAssociationDate).toBeTruthy();
 
     // check fields are OK for first company
     const codeEnStock = await prisma.company.findUnique({
@@ -124,22 +124,28 @@ describe("bulk create users and companies from csv files", () => {
 
   test("already existing user", async () => {
     // assume a user with this email already exists
-    const { associatedAt: _1, updatedAt: _2, ...john } = await userFactory({
+    const {
+      firstAssociationDate: _1,
+      updatedAt: _2,
+      ...john
+    } = await userFactory({
       email: "john.snow@trackdechets.fr"
     });
 
     await bulkCreateIdempotent();
 
     await expectNumberOfRecords(2, 3, 4);
-    const { associatedAt, updatedAt, ...dbJohn } = await prisma.user.findUnique(
-      {
-        where: { email: "john.snow@trackdechets.fr" }
-      }
-    );
+    const {
+      firstAssociationDate,
+      updatedAt,
+      ...dbJohn
+    } = await prisma.user.findUnique({
+      where: { email: "john.snow@trackdechets.fr" }
+    });
 
     // john snow user should be untouched
     expect(dbJohn).toEqual(john);
-    expect(associatedAt).toBeTruthy();
+    expect(firstAssociationDate).toBeTruthy();
 
     // associations should exist between John Snow and Code en Stock
     const associations = await prisma.companyAssociation.findMany({

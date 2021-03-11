@@ -181,10 +181,10 @@ export async function bulkCreate(opts: Opts): Promise<void> {
             siret,
             role
           );
-          if (!user.associatedAt) {
+          if (!user.firstAssociationDate) {
             await prisma.user.update({
               where: { id: user.id },
-              data: { associatedAt: new Date() }
+              data: { firstAssociationDate: new Date() }
             });
           }
           return association;

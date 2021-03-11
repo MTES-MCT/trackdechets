@@ -119,10 +119,10 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   const company = await companyAssociationPromise.company();
 
-  // fill associatedAt field if null (no need to update it if user was previously already associated)
+  // fill firstAssociationDate field if null (no need to update it if user was previously already associated)
   await prisma.user.updateMany({
-    where: { id: user.id, associatedAt: null },
-    data: { associatedAt: new Date() }
+    where: { id: user.id, firstAssociationDate: null },
+    data: { firstAssociationDate: new Date() }
   });
   await warnIfUserCreatesTooManyCompanies(user, company);
 

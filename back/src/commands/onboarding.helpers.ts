@@ -33,7 +33,7 @@ export const getRecentlyAssociatedUsers = async ({
 
   return prisma.user.findMany({
     where: {
-      associatedAt: { gt: associatedDateGt, lt: associatedDateLt },
+      firstAssociationDate: { gt: associatedDateGt, lt: associatedDateLt },
       isActive: true
     },
     ...(retrieveCompanies && {

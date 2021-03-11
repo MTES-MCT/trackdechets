@@ -106,10 +106,10 @@ export async function associateUserToCompany(userId, siret, role) {
     }
   });
 
-  // fill associatedAt field if null (no need to update it if user was previously already associated)
+  // fill firstAssociationDate field if null (no need to update it if user was previously already associated)
   await prisma.user.updateMany({
-    where: { id: userId, associatedAt: null },
-    data: { associatedAt: new Date() }
+    where: { id: userId, firstAssociationDate: null },
+    data: { firstAssociationDate: new Date() }
   });
   return association;
 }
@@ -184,10 +184,10 @@ export async function acceptNewUserCompanyInvitations(user: User) {
       })
     )
   );
-  if (!user.associatedAt) {
+  if (!user.firstAssociationDate) {
     await prisma.user.update({
       where: { id: user.id },
-      data: { associatedAt: new Date() }
+      data: { firstAssociationDate: new Date() }
     });
   }
 

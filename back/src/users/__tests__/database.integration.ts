@@ -71,7 +71,7 @@ describe("associateUserToCompany", () => {
       where: { id: user.id }
     });
     const fullUser = await getFullUser(refreshedUser);
-    expect(fullUser.associatedAt).toBeTruthy();
+    expect(fullUser.firstAssociationDate).toBeTruthy();
     expect(fullUser.companies).toEqual([company]);
   });
 });

@@ -85,7 +85,7 @@ describe("Mutation.createCompany", () => {
     });
 
     // association date is filled
-    expect(refreshedUser.associatedAt).toBeTruthy();
+    expect(refreshedUser.firstAssociationDate).toBeTruthy();
   });
 
   it("should link to a transporterReceipt", async () => {

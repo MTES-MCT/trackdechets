@@ -12,8 +12,8 @@ describe("Retrieve relevant users for onboarding emails", () => {
   it("should retrieve users associated yesterday", async () => {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const user = await userFactory({ associatedAt: yesterday });
-    await userFactory({ associatedAt: new Date() }); // user associated just now
+    const user = await userFactory({ firstAssociationDate: yesterday });
+    await userFactory({ firstAssociationDate: new Date() }); // user associated just now
     await userFactory(); // user non associated
     const recipients = await getRecentlyAssociatedUsers({ daysAgo: 1 });
     expect(recipients.length).toEqual(1);
@@ -27,9 +27,9 @@ describe("Retrieve relevant users for onboarding emails", () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     await prisma.user.update({
       where: { id: user.id },
-      data: { associatedAt: yesterday }
+      data: { firstAssociationDate: yesterday }
     });
-    await userFactory({ associatedAt: new Date() }); // user associated just now
+    await userFactory({ firstAssociationDate: new Date() }); // user associated just now
     await userFactory(); // user non associated
     const recipients = await getRecentlyAssociatedUsers({
       daysAgo: 1,
