@@ -10,10 +10,11 @@ export function SignedByTransporter({ form }: WorkflowActionProps) {
   return (
     <>
       <ActionButton
-        title="Signer l'enlèvement"
-        icon={IconShipmentSignSmartphone}
+        icon={<IconShipmentSignSmartphone size="24px" />}
         onClick={() => setIsOpen(true)}
-      />
+      >
+        Signer l'enlèvement
+      </ActionButton>
       {isOpen && (
         <SignedByTransporterModal
           form={form}

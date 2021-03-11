@@ -30,7 +30,9 @@ export default function MarkAsAccepted({ form }: WorkflowActionProps) {
     <TdModalTrigger
       ariaLabel={actionLabel}
       trigger={open => (
-        <ActionButton title={actionLabel} icon={IconWaterDam} onClick={open} />
+        <ActionButton icon={<IconWaterDam size="24px" />} onClick={open}>
+          {actionLabel}
+        </ActionButton>
       )}
       modalContent={close => (
         <div>

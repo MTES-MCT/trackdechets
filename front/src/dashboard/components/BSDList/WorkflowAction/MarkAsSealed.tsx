@@ -72,11 +72,9 @@ export default function MarkAsSealed({ form, siret }: WorkflowActionProps) {
       ariaLabel={actionLabel}
       trigger={open => (
         <div>
-          <ActionButton
-            title={actionLabel}
-            icon={IconPaperWrite}
-            onClick={open}
-          />
+          <ActionButton icon={<IconPaperWrite size="24px" />} onClick={open}>
+            {actionLabel}
+          </ActionButton>
         </div>
       )}
       modalContent={close => (

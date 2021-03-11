@@ -124,11 +124,9 @@ export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
     <TdModalTrigger
       ariaLabel={actionLabel}
       trigger={open => (
-        <ActionButton
-          title={actionLabel}
-          icon={IconPaperWrite}
-          onClick={open}
-        />
+        <ActionButton icon={<IconPaperWrite size="24px" />} onClick={open}>
+          {actionLabel}
+        </ActionButton>
       )}
       modalContent={close => (
         <div>

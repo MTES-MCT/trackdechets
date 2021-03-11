@@ -71,11 +71,11 @@ export default function MarkSegmentAsReadyToTakeOver({
   return (
     <>
       <ActionButton
-        title="Finaliser pour transférer"
-        icon={IconPaperWrite}
+        icon={<IconPaperWrite size="24px" />}
         onClick={() => setIsOpen(true)}
-        iconSize="32px"
-      />
+      >
+        Finaliser pour transférer
+      </ActionButton>
       {isOpen && (
         <TdModal
           isOpen={isOpen}

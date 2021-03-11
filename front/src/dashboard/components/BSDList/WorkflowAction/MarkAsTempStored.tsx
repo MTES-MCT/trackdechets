@@ -37,10 +37,11 @@ export default function MarkAsTempStored({ form }: WorkflowActionProps) {
         ariaLabel={actionLabel}
         trigger={open => (
           <ActionButton
-            title={actionLabel}
-            icon={IconWarehouseStorage}
+            icon={<IconWarehouseStorage size="24px" />}
             onClick={open}
-          />
+          >
+            {actionLabel}
+          </ActionButton>
         )}
         modalContent={close => (
           <div>

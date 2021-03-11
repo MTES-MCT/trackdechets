@@ -73,11 +73,11 @@ export default function TakeOverSegment({ form, siret }: WorkflowActionProps) {
   return (
     <>
       <ActionButton
-        title="Prendre en charge le déchet"
-        icon={IconBusTransfer}
+        icon={<IconBusTransfer size="24px" />}
         onClick={() => setIsOpen(true)}
-        iconSize="32px"
-      />
+      >
+        Prendre en charge le déchet
+      </ActionButton>
       {isOpen && (
         <TdModal
           isOpen={isOpen}

@@ -56,11 +56,11 @@ export default function EditSegment({ siret, segment }: Props) {
   return (
     <>
       <ActionButton
-        title="Modifier le segment"
-        icon={IconPaperWrite}
+        icon={<IconPaperWrite size="24px" />}
         onClick={() => setIsOpen(true)}
-        iconSize="32px"
-      />
+      >
+        Modifier le segment
+      </ActionButton>
       {isOpen && (
         <TdModal
           isOpen={isOpen}

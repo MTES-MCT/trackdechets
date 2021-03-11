@@ -92,11 +92,11 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
   return (
     <>
       <ActionButton
-        title="Préparer le transfert"
-        icon={IconBusTransfer}
+        icon={<IconBusTransfer size="24px" />}
         onClick={() => setIsOpen(true)}
-        iconSize="32px"
-      />
+      >
+        Préparer le transfert
+      </ActionButton>
       {isOpen && (
         <TdModal
           isOpen={isOpen}
