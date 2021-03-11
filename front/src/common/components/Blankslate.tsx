@@ -5,6 +5,24 @@ interface BlankslateProps {
   children: React.ReactNode;
 }
 
+// This component is used to display information
+// when a page is empty because there's nothing to be shown.
+//
+// It's composed of two things:
+// 1. An illustration
+// 2. A message indicating why the page is empty and how to change that
+//
+// Example:
+// <Blankslate>
+//   <BlankslateImg src="/path/to/img" />
+//   <BlankslateTitle>
+//     This page is empty
+//   </BlankslateTitle>
+//   <BlankslateDescription>
+//     This page is empty because you have not created something yet.
+//     You can create something by clicking the "create something" button.
+//   </BlankslateDescription>
+// </Blankslate>
 export function Blankslate({ children }: BlankslateProps) {
   return <div className={styles.Blankslate}>{children}</div>;
 }
