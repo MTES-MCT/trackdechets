@@ -2,7 +2,7 @@ import * as React from "react";
 import { Form } from "generated/graphql/types";
 import { ActionButtonContext } from "common/components/ActionButton";
 import { WorkflowAction } from "../WorkflowAction";
-import { SlipActions } from "../../SlipsActions/SlipActions";
+import { BSDDActions } from "../../BSDDActions/BSDDActions";
 import { useFormsTable } from "./useFormsTable";
 import { SortableTableHeader } from "./SortableTableHeader";
 import { Column } from "../types";
@@ -80,7 +80,7 @@ export function BSDTable({ forms, siret, columns }: BSDTableProps) {
                 </ActionButtonContext.Provider>
               </td>
               <td>
-                <SlipActions form={form} />
+                <BSDDActions form={form} />
               </td>
             </tr>
           ))}

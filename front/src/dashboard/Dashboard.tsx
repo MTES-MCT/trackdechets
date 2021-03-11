@@ -24,10 +24,10 @@ import { Query } from "generated/graphql/types";
 import Stats from "./stats/Stats";
 import { DisclaimerBanner } from "./DisclaimerBanner";
 import {
-  RouteSlipsAct,
-  RouteSlipsDrafts,
-  RouteSlipsFollow,
-  RouteSlipsHistory,
+  RouteBsdsAct,
+  RouteBsdsDrafts,
+  RouteBsdsFollow,
+  RouteBsdsHistory,
 } from "./bsds";
 import { RouteBSDDsView } from "./bsdds";
 import { RouteTransportToCollect, RouteTransportCollected } from "./transport";
@@ -117,16 +117,16 @@ export default function Dashboard() {
               <RouteBSDDsView />
             </Route>
             <Route path={routes.dashboard.bsds.drafts}>
-              <RouteSlipsDrafts />
+              <RouteBsdsDrafts />
             </Route>
             <Route path={routes.dashboard.bsds.act}>
-              <RouteSlipsAct />
+              <RouteBsdsAct />
             </Route>
             <Route path={routes.dashboard.bsds.follow}>
-              <RouteSlipsFollow />
+              <RouteBsdsFollow />
             </Route>
             <Route path={routes.dashboard.bsds.history}>
-              <RouteSlipsHistory />
+              <RouteBsdsHistory />
             </Route>
             <Route path={routes.dashboard.transport.toCollect}>
               <RouteTransportToCollect />

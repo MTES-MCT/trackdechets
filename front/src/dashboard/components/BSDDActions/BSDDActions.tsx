@@ -23,13 +23,13 @@ import { Form, FormStatus } from "generated/graphql/types";
 import { DeleteModal } from "./DeleteModal";
 import { useDuplicate } from "./useDuplicate";
 import { useDownloadPdf } from "./useDownloadPdf";
-import styles from "./SlipActions.module.scss";
+import styles from "./BSDDActions.module.scss";
 
-interface SlipActionsProps {
+interface BSDDActionsProps {
   form: Form;
 }
 
-export const SlipActions = ({ form }: SlipActionsProps) => {
+export const BSDDActions = ({ form }: BSDDActionsProps) => {
   const { siret } = useParams<{ siret: string }>();
   const location = useLocation();
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
@@ -44,7 +44,7 @@ export const SlipActions = ({ form }: SlipActionsProps) => {
             <MenuButton
               className={classNames(
                 "btn btn--outline-primary",
-                styles.SlipActionsToggle
+                styles.BSDDActionsToggle
               )}
             >
               Actions

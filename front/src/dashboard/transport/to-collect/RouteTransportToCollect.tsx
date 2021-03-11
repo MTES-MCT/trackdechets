@@ -16,7 +16,7 @@ import {
   BreadcrumbItem,
 } from "common/components";
 import { BSDList, COLUMNS } from "../../components/BSDList";
-import { GET_TRANSPORT_SLIPS } from "../queries";
+import { GET_TRANSPORT_BSDS } from "../queries";
 import illustration from "./assets/blankslateToCollect.svg";
 
 const TO_COLLECT_COLUMNS = [
@@ -34,7 +34,7 @@ export function RouteTransportToCollect() {
   const { data, loading, fetchMore, refetch } = useQuery<
     Pick<Query, "forms">,
     Partial<QueryFormsArgs>
-  >(GET_TRANSPORT_SLIPS, {
+  >(GET_TRANSPORT_BSDS, {
     variables: {
       siret,
       roles: [FormRole.Transporter],

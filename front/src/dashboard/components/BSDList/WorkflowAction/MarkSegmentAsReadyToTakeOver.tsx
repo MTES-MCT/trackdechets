@@ -15,7 +15,7 @@ import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
 import { IconPaperWrite } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
-import { GET_TRANSPORT_SLIPS } from "../../../transport/queries";
+import { GET_TRANSPORT_BSDS } from "../../../transport/queries";
 import { WorkflowActionProps } from "./WorkflowAction";
 
 const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
@@ -45,7 +45,7 @@ export default function MarkSegmentAsReadyToTakeOver({
     },
     update: store => {
       updateApolloCache<{ forms: Form[] }>(store, {
-        query: GET_TRANSPORT_SLIPS,
+        query: GET_TRANSPORT_BSDS,
         variables: {
           siret,
           roles: [FormRole.Transporter],

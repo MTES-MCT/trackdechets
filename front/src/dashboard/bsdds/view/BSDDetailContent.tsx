@@ -1,10 +1,10 @@
 import React from "react";
 import { generatePath, Link, useHistory, useParams } from "react-router-dom";
 
-import { useDownloadPdf } from "dashboard/components/SlipsActions/useDownloadPdf";
-import { useDuplicate } from "dashboard/components/SlipsActions/useDuplicate";
+import { useDownloadPdf } from "dashboard/components/BSDDActions/useDownloadPdf";
+import { useDuplicate } from "dashboard/components/BSDDActions/useDuplicate";
 
-import { DeleteModal } from "dashboard/components/SlipsActions/DeleteModal";
+import { DeleteModal } from "dashboard/components/BSDDActions/DeleteModal";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import {
   TransportSegment,
@@ -33,7 +33,7 @@ import {
 } from "./utils";
 import QRCodeIcon from "react-qr-code";
 
-import styles from "./Slip.module.scss";
+import styles from "./BSDDetailContent.module.scss";
 
 import { DateRow, DetailRow, YesNoRow, PackagingRow } from "./Components";
 import { WorkflowAction } from "dashboard/components/BSDList";
@@ -250,7 +250,7 @@ const EcoOrganisme = ({ ecoOrganisme }) => (
   </div>
 );
 
-type SlipDetailContentProps = {
+type BSDDetailContentProps = {
   form: Form;
   children?: React.ReactNode;
   refetch?: () => void;
@@ -310,11 +310,11 @@ const Recipient = ({
   );
 };
 
-export default function SlipDetailContent({
+export default function BSDDetailContent({
   form,
   children = null,
   refetch,
-}: SlipDetailContentProps) {
+}: BSDDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
   const [isDeleting, setIsDeleting] = React.useState(false);

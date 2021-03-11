@@ -1,5 +1,5 @@
 import React from "react";
-import SlipDetailContent from "./SlipDetailContent";
+import BSDDetailContent from "./BSDDetailContent";
 import Loader from "common/components/Loaders";
 import { useQuery } from "@apollo/client";
 import { Query, QueryFormArgs } from "generated/graphql/types";
@@ -29,5 +29,5 @@ export function RouteBSDDsView() {
     return <Loader />;
   }
 
-  return <SlipDetailContent form={data.form} />;
+  return <BSDDetailContent form={data.form} />;
 }

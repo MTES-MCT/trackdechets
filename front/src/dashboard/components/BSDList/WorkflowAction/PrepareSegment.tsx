@@ -19,7 +19,7 @@ import { IconBusTransfer } from "common/components/Icons";
 import CompanySelector from "form/company/CompanySelector";
 import DateInput from "form/custom-inputs/DateInput";
 import { transportModeLabels } from "../../../constants";
-import { GET_TRANSPORT_SLIPS } from "../../../transport/queries";
+import { GET_TRANSPORT_BSDS } from "../../../transport/queries";
 import { WorkflowActionProps } from "./WorkflowAction";
 
 const PREPARE_SEGMENT = gql`
@@ -49,7 +49,7 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
     },
     update: store => {
       updateApolloCache<{ forms: Form[] }>(store, {
-        query: GET_TRANSPORT_SLIPS,
+        query: GET_TRANSPORT_BSDS,
         variables: {
           siret,
           roles: [FormRole.Transporter],

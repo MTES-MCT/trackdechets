@@ -15,7 +15,7 @@ import { BSDList } from "../../components/BSDList";
 import { HISTORY_TAB_FORMS } from "../queries";
 import illustration from "./assets/blankslateHistory.svg";
 
-export function RouteSlipsHistory() {
+export function RouteBsdsHistory() {
   const { siret } = useParams<{ siret: string }>();
   const { data, loading, fetchMore, refetch } = useQuery<
     Pick<Query, "forms">,

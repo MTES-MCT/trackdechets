@@ -15,7 +15,7 @@ import ActionButton from "common/components/ActionButton";
 import TdModal from "common/components/Modal";
 import { NotificationError } from "common/components/Error";
 import DateInput from "form/custom-inputs/DateInput";
-import { GET_TRANSPORT_SLIPS, GET_FORM } from "../../../transport/queries";
+import { GET_TRANSPORT_BSDS, GET_FORM } from "../../../transport/queries";
 import { WorkflowActionProps } from "./WorkflowAction";
 
 const TAKE_OVER_SEGMENT = gql`
@@ -45,7 +45,7 @@ export default function TakeOverSegment({ form, siret }: WorkflowActionProps) {
     refetchQueries: [refetchQuery],
     update: store => {
       updateApolloCache<{ forms: Form[] }>(store, {
-        query: GET_TRANSPORT_SLIPS,
+        query: GET_TRANSPORT_BSDS,
         variables: {
           siret,
           roles: [FormRole.Transporter],

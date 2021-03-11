@@ -24,7 +24,7 @@ const DRAFTS_COLUMNS = [
   COLUMNS.quantity,
 ];
 
-export function RouteSlipsDrafts() {
+export function RouteBsdsDrafts() {
   const { siret } = useParams<{ siret: string }>();
   const { data, loading, fetchMore, refetch } = useQuery<
     Pick<Query, "forms">,
