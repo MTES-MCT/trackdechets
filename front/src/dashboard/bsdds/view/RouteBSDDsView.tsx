@@ -3,14 +3,13 @@ import SlipDetailContent from "./SlipDetailContent";
 import Loader from "common/components/Loaders";
 import { useQuery } from "@apollo/client";
 import { Query, QueryFormArgs } from "generated/graphql/types";
-import { generatePath, Redirect, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { GET_DETAIL_FORM } from "common/queries";
 import { InlineError } from "common/components/Error";
-import routes from "common/routes";
 
 export function RouteBSDDsView() {
-  const { id: formId, siret } = useParams<{ id: string; siret: string }>();
-  const { loading, error, data } = useQuery<Pick<Query, "form">, QueryFormArgs>(
+  const { id: formId } = useParams<{ id: string }>();
+  const { error, data } = useQuery<Pick<Query, "form">, QueryFormArgs>(
     GET_DETAIL_FORM,
     {
       variables: {
@@ -21,26 +20,14 @@ export function RouteBSDDsView() {
       fetchPolicy: "network-only",
     }
   );
-  const form = data?.form;
-
-  if (loading) {
-    return <Loader />;
-  }
 
   if (error) {
     return <InlineError apolloError={error} />;
   }
 
-  if (form == null) {
-    return (
-      <Redirect
-        to={generatePath(routes.dashboard.bsds.drafts, {
-          siret,
-          id: formId,
-        })}
-      />
-    );
+  if (data == null) {
+    return <Loader />;
   }
 
-  return <SlipDetailContent form={form} />;
+  return <SlipDetailContent form={data.form} />;
 }

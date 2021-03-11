@@ -1585,7 +1585,7 @@ export type Query = {
    */
   favorites: Array<CompanyFavorite>;
   /** Renvoie un BSD sélectionné par son ID (opaque ou lisible, l'un des deux doit être fourni) */
-  form: Maybe<Form>;
+  form: Form;
   /**
    * Renvoie un token pour télécharger un pdf de BSD
    * Ce token doit être transmis à la route /download pour obtenir le fichier.
