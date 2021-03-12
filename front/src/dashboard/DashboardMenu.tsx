@@ -37,7 +37,7 @@ export default function DashboardMenu({ me, handleCompanyChange }: IProps) {
             <ul>
               <li>
                 <NavLink
-                  to={generatePath(routes.dashboard.slips.drafts, { siret })}
+                  to={generatePath(routes.dashboard.bsds.drafts, { siret })}
                   className="sidebar__link sidebar__link--indented"
                   activeClassName="sidebar__link--active"
                 >
@@ -47,7 +47,7 @@ export default function DashboardMenu({ me, handleCompanyChange }: IProps) {
 
               <li>
                 <NavLink
-                  to={generatePath(routes.dashboard.slips.act, { siret })}
+                  to={generatePath(routes.dashboard.bsds.act, { siret })}
                   className="sidebar__link sidebar__link--indented"
                   activeClassName="sidebar__link--active"
                 >
@@ -57,7 +57,7 @@ export default function DashboardMenu({ me, handleCompanyChange }: IProps) {
 
               <li>
                 <NavLink
-                  to={generatePath(routes.dashboard.slips.follow, { siret })}
+                  to={generatePath(routes.dashboard.bsds.follow, { siret })}
                   className="sidebar__link sidebar__link--indented"
                   activeClassName="sidebar__link--active"
                 >
@@ -66,7 +66,7 @@ export default function DashboardMenu({ me, handleCompanyChange }: IProps) {
               </li>
               <li>
                 <NavLink
-                  to={generatePath(routes.dashboard.slips.history, { siret })}
+                  to={generatePath(routes.dashboard.bsds.history, { siret })}
                   className="sidebar__link sidebar__link--indented"
                   activeClassName="sidebar__link--active"
                 >

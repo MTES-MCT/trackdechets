@@ -38,7 +38,7 @@ export function DashboardNav({
             companies={companies}
             handleCompanyChange={siret =>
               history.push(
-                generatePath(routes.dashboard.slips.drafts, { siret })
+                generatePath(routes.dashboard.bsds.drafts, { siret })
               )
             }
           />
@@ -53,7 +53,7 @@ export function DashboardNav({
           <ul>
             <li className="sidebar__item">
               <NavLink
-                to={generatePath(routes.dashboard.slips.drafts, {
+                to={generatePath(routes.dashboard.bsds.drafts, {
                   siret: currentSiret,
                 })}
                 className={`${styles.dashboardNavLink} ${styles.dashboardNavIndented}`}
@@ -66,7 +66,7 @@ export function DashboardNav({
 
             <li>
               <NavLink
-                to={generatePath(routes.dashboard.slips.act, {
+                to={generatePath(routes.dashboard.bsds.act, {
                   siret: currentSiret,
                 })}
                 className={`${styles.dashboardNavLink} ${styles.dashboardNavIndented}`}
@@ -79,7 +79,7 @@ export function DashboardNav({
 
             <li>
               <NavLink
-                to={generatePath(routes.dashboard.slips.follow, {
+                to={generatePath(routes.dashboard.bsds.follow, {
                   siret: currentSiret,
                 })}
                 className={`${styles.dashboardNavLink} ${styles.dashboardNavIndented}`}
@@ -91,7 +91,7 @@ export function DashboardNav({
             </li>
             <li>
               <NavLink
-                to={generatePath(routes.dashboard.slips.history, {
+                to={generatePath(routes.dashboard.bsds.history, {
                   siret: currentSiret,
                 })}
                 className={`${styles.dashboardNavLink} ${styles.dashboardNavIndented}`}

@@ -5,6 +5,7 @@ import {
   Switch,
   Redirect,
   generatePath,
+  RouteChildrenProps,
 } from "react-router-dom";
 import PrivateRoute from "login/PrivateRoute";
 import { trackPageView } from "tracker";
@@ -117,43 +118,41 @@ export default withRouter(function LayoutContainer({ history }) {
                 <WasteTree />
               </Route>
 
-              <PrivateRoute
-                path={routes.dashboard.slips.edit}
-                isAuthenticated={isAuthenticated}
-                exact
-              >
-                <FormContainer />
-              </PrivateRoute>
-
-              <PrivateRoute
-                path={routes.dashboard.slips.create}
-                isAuthenticated={isAuthenticated}
-                exact
-              >
-                <FormContainer />
-              </PrivateRoute>
-
-              {/*
-                This is a legacy URL we need to keep for some time
-                in order to redirect users from the old URL to the new one
-              */}
-              <PrivateRoute path="/form/:id?" isAuthenticated={isAuthenticated}>
-                {({ match }) => (
+              <Route path="/dashboard/:siret/bsds/edit/:id" exact>
+                {({
+                  match,
+                }: RouteChildrenProps<{ siret: string; id: string }>) => (
                   <Redirect
-                    to={
-                      data && data.me.companies.length > 0
-                        ? match?.params?.id
-                          ? generatePath(routes.dashboard.slips.edit, {
-                              siret: data.me.companies[0].siret,
-                              id: match.params.id,
-                            })
-                          : generatePath(routes.dashboard.slips.create, {
-                              siret: data.me.companies[0].siret,
-                            })
-                        : routes.account.companies
-                    }
+                    to={generatePath(routes.dashboard.bsdds.edit, {
+                      siret: match!.params.siret,
+                      id: match!.params.id,
+                    })}
                   />
                 )}
+              </Route>
+              <PrivateRoute
+                path={routes.dashboard.bsdds.edit}
+                isAuthenticated={isAuthenticated}
+                exact
+              >
+                <FormContainer />
+              </PrivateRoute>
+
+              <Route path="/dashboard/:siret/bsds/create" exact>
+                {({ match }: RouteChildrenProps<{ siret: string }>) => (
+                  <Redirect
+                    to={generatePath(routes.dashboard.bsdds.create, {
+                      siret: match!.params.siret,
+                    })}
+                  />
+                )}
+              </Route>
+              <PrivateRoute
+                path={routes.dashboard.bsdds.create}
+                isAuthenticated={isAuthenticated}
+                exact
+              >
+                <FormContainer />
               </PrivateRoute>
 
               <PrivateRoute

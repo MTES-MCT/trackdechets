@@ -74,7 +74,7 @@ Renvoie la liste des éco-organismes
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>form</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
+<td valign="top"><a href="#form">Form</a>!</td>
 <td>
 
 Renvoie un BSD sélectionné par son ID (opaque ou lisible, l'un des deux doit être fourni)

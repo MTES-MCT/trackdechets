@@ -2,7 +2,7 @@
 @import "src/scss/Breakpoints.scss";
 .dashboard-content {
   flex: 1;
-  padding-bottom: 80px; //prevent crispr icon to overlap slips list
+  padding-bottom: 80px; //prevent crispr icon to overlap bsds list
 
   overflow-x: scroll;
   width: 100%;
@@ -11,5 +11,4 @@
     width: calc(100vw - 210px);
     max-width: calc(100vw - 210px);
   }
-  
 }

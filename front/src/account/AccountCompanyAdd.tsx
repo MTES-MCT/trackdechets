@@ -259,7 +259,7 @@ export default function AccountCompanyAdd() {
     });
 
     history.push(
-      generatePath(routes.dashboard.slips.drafts, {
+      generatePath(routes.dashboard.bsds.drafts, {
         siret: companyInput.siret,
       })
     );

@@ -30,7 +30,7 @@ export function StepContainer(props: IStepContainerProps) {
 export function Step(props: IStepProps) {
   if (props.isActive === false) return null;
   const submitCaption = props.formId ? "Enregistrer" : "Créer";
-  const cancelLink = props.formId ? "/slips/drafts" : "x";
+  const cancelLink = props.formId ? "/bsds/drafts" : "x";
   return (
     <>
       {props.children}
