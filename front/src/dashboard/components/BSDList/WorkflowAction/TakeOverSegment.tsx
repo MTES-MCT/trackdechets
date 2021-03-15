@@ -14,7 +14,7 @@ import { IconBusTransfer } from "common/components/Icons";
 import ActionButton from "common/components/ActionButton";
 import TdModal from "common/components/Modal";
 import { NotificationError } from "common/components/Error";
-import DateInput from "form/custom-inputs/DateInput";
+import DateInput from "form/common/components/custom-inputs/DateInput";
 import { GET_TRANSPORT_BSDS, GET_FORM } from "../../../transport/queries";
 import { WorkflowActionProps } from "./WorkflowAction";
 

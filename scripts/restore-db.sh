@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to restore a DB backup locally
+# Helper to restore a DB backup locally
 # -------------------------------------
 
 psql_container_id=$(docker ps -qf "name=postgres")

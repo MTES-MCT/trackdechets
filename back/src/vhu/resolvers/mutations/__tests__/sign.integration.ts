@@ -3,11 +3,9 @@ import { ErrorCode } from "../../../../common/errors";
 import makeClient from "../../../../__tests__/testClient";
 
 const SIGN_VHU_FORM = `
-mutation SignVhuForm($id: ID!, $vhuSignatureInput: VhuSignatureInput!) {
-  bordereauVhu {
-    sign(id: $id, input: $vhuSignatureInput) {
-        id
-    }
+mutation SignVhuForm($id: ID!, $input: BsvhuSignatureInput!) {
+  signBsvhu(id: $id, input: $input) {
+      id
   }
 }
 `;
@@ -20,7 +18,7 @@ describe("Mutation.Vhu.sign", () => {
     const { errors } = await mutate(SIGN_VHU_FORM, {
       variables: {
         id: 1,
-        vhuSignatureInput: { type: "EMITTER", author: "The Ghost" }
+        input: { type: "EMITTER", author: "The Ghost" }
       }
     });
 

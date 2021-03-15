@@ -2,7 +2,7 @@ import { VhuForm } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkSecurityCode } from "../../../forms/permissions";
 import {
-  BordereauVhuMutationSignArgs,
+  MutationSignBsvhuArgs,
   SignatureTypeInput
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
@@ -21,7 +21,7 @@ type SignatureTypeInfos = {
 
 export default async function sign(
   _,
-  { id, input }: BordereauVhuMutationSignArgs,
+  { id, input }: MutationSignBsvhuArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);

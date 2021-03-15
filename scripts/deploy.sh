@@ -4,9 +4,6 @@ set -e
 BACK_GIT_URL=""
 FRONT_GIT_URL=""
 
-BACK_ORIGIN="back-deploy"
-FRONT_ORIGIN="front-deploy"
-
 BRANCH_NAME=$(echo "$GITHUB_REF" | cut -d/ -f3)
 
 echo "🪐 \e[1mGetting GIT deploy URLs...\e[m"
@@ -35,15 +32,12 @@ then
       exit 1
 fi
 
-echo "🏠 \e[1mAdding remotes...\e[m"
+echo "🏠 \e[1mConfiguring GIT...\e[m"
 git config --global user.email "tech@trackdechets.beta.gouv.fr"
 git config --global user.name "TD GitHub actions"
 
-git remote add "$BACK_ORIGIN" "$BACK_GIT_URL"
-git remote add "$FRONT_ORIGIN" "$FRONT_GIT_URL"
-
 echo "📦 \e[1mPushing for branch \e[36m<$BRANCH_NAME>\e[39m...\e[m"
-git push "$BACK_ORIGIN" HEAD:master --force 2>&1 | grep -e 'remote:' -e '->'
-git push "$FRONT_ORIGIN" HEAD:master --force 2>&1 | grep -e 'remote:' -e '->'
+git push "$BACK_GIT_URL" HEAD:master --force 2>&1 | grep -e 'remote:' -e '->'
+git push "$FRONT_GIT_URL" HEAD:master --force 2>&1 | grep -e 'remote:' -e '->'
 
 echo "🚀 \e[1mDeploy successfull\e[m"

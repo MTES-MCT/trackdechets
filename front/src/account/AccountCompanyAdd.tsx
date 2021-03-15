@@ -54,7 +54,8 @@ const CREATE_TRADER_RECEIPT = gql`
 
 const CREATE_BROKER_RECEIPT = gql`
   mutation CreateBrokerReceipt($input: CreateBrokerReceiptInput!) {
-    createBrokerReceipt(input: $input) {id
+    createBrokerReceipt(input: $input) {
+      id
     }
   }
 `;
@@ -141,7 +142,7 @@ export default function AccountCompanyAdd() {
     createBrokerReceipt,
     { error: createBrokerReceiptError },
   ] = useMutation(CREATE_BROKER_RECEIPT);
-  
+
   const [createVhuAgrement, { error: createVhuAgrementError }] = useMutation(
     CREATE_VHU_AGREMENT
   );
@@ -262,7 +263,9 @@ export default function AccountCompanyAdd() {
 
       if (data) {
         brokerReceiptId = data.createBrokerReceipt.id;
-        
+      }
+    }
+
     let vhuAgrementDemolisseurId: string | null = null;
     let vhuAgrementBroyeurId: string | null = null;
 
@@ -333,7 +336,7 @@ export default function AccountCompanyAdd() {
     }
     return [];
   }
-  
+
   return (
     <div className="panel">
       <h5 className={styles.subtitle}>Identification</h5>
@@ -625,7 +628,7 @@ export default function AccountCompanyAdd() {
               )}
               {createBrokerReceiptError && (
                 <NotificationError apolloError={createBrokerReceiptError} />
-                )}
+              )}
               {createVhuAgrementError && (
                 <NotificationError apolloError={createVhuAgrementError} />
               )}

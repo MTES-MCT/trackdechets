@@ -2,10 +2,10 @@ import { Field, Form, Formik } from "formik";
 import React, { useState } from "react";
 import { mergeDefaults, updateApolloCache } from "common/helper";
 import RedErrorMessage from "common/components/RedErrorMessage";
-import CompanySelector from "form/company/CompanySelector";
-import NumberInput from "form/custom-inputs/NumberInput";
-import { RadioButton } from "form/custom-inputs/RadioButton";
-import Packagings from "form/packagings/Packagings";
+import CompanySelector from "form/common/components/company/CompanySelector";
+import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
+import Packagings from "form/bsdd/components/packagings/Packagings";
 import {
   FormStatus,
   Mutation,
@@ -22,7 +22,7 @@ import { statusChangeFragment } from "common/fragments";
 import { ACT_TAB_FORMS, FOLLOW_TAB_FORMS } from "dashboard/bsds/queries";
 import { NotificationError } from "common/components/Error";
 import cogoToast from "cogo-toast";
-import Transporter from "form/Transporter";
+import Transporter from "form/bsdd/Transporter";
 
 const MARK_RESEALED = gql`
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {

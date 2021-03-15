@@ -1,21 +1,21 @@
 import { useMutation } from "@apollo/client";
 import { Field, Form, Formik } from "formik";
 import {
-  BordereauVhuMutation,
-  BordereauVhuMutationUpdateArgs,
-  VhuForm,
+  Mutation,
+  MutationUpdateBsvhuArgs,
+  Bsvhu,
 } from "generated/graphql/types";
 import React from "react";
-import { UPDATE_VHU_FORM } from "vhuForm/queries";
+import { UPDATE_VHU_FORM } from "form/bsvhu/utils/queries";
 
 type Props = {
-  form: VhuForm;
+  form: Bsvhu;
 };
 
 export default function TransporterForm({ form }: Props) {
   const [update] = useMutation<
-    Pick<BordereauVhuMutation, "update">,
-    BordereauVhuMutationUpdateArgs
+    Pick<Mutation, "updateBsvhu">,
+    MutationUpdateBsvhuArgs
   >(UPDATE_VHU_FORM);
 
   return (

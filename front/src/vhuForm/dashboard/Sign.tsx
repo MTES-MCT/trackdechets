@@ -3,12 +3,12 @@ import { Modal, RedErrorMessage } from "common/components";
 import { NotificationError } from "common/components/Error";
 import { formatISO } from "date-fns";
 import { Field, Form, Formik } from "formik";
-import { SignatureTypeInput, VhuForm } from "generated/graphql/types";
+import { SignatureTypeInput, Bsvhu } from "generated/graphql/types";
 import React from "react";
-import { SIGN_VHU_FORM } from "vhuForm/queries";
+import { SIGN_VHU_FORM } from "form/bsvhu/utils/queries";
 import RecipientForm from "./signature/RecipientForm";
 
-type Props = { form: VhuForm; isOpen: boolean; onClose: () => void };
+type Props = { form: Bsvhu; isOpen: boolean; onClose: () => void };
 
 export default function Sign({ form, isOpen, onClose }: Props) {
   const signatureType = getSignatureType(form);
@@ -93,7 +93,7 @@ export default function Sign({ form, isOpen, onClose }: Props) {
   );
 }
 
-function getSignatureType(form: VhuForm) {
+function getSignatureType(form: Bsvhu) {
   if (form.emitter?.signature?.date == null) {
     return SignatureTypeInput.Emitter;
   }
@@ -107,7 +107,7 @@ function getSignatureType(form: VhuForm) {
   return null;
 }
 
-function getAdditionalForm(type: SignatureTypeInput | null, form: VhuForm) {
+function getAdditionalForm(type: SignatureTypeInput | null, form: Bsvhu) {
   switch (type) {
     case SignatureTypeInput.Recipient:
       return <RecipientForm form={form} />;

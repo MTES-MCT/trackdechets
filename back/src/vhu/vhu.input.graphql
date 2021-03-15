@@ -1,26 +1,26 @@
-input VhuFormInput {
+input BsvhuInput {
   "Permet d'identifier un bordereau comme brouillon. N'est plus modifiable dès qu'une signature a été apposée."
   isDraft: Boolean
 
   "Détails sur l'émetteur"
-  emitter: VhuEmitterInput
+  emitter: BsvhuEmitterInput
 
   "Code déchet. Presque toujours 16 01 06"
   wasteCode: String
   "Conditionnement du déchet"
-  packaging: VhuPackaging
+  packaging: BsvhuPackaging
   "Identification des VHUs"
-  identification: VhuIdentificationInput
+  identification: BsvhuIdentificationInput
   "Quantité de VHUs"
-  quantity: VhuQuantityInput
+  quantity: BsvhuQuantityInput
 
   "Détails sur la destination"
-  recipient: VhuRecipientInput
+  recipient: BsvhuRecipientInput
   "Détails sur le transporteur"
-  transporter: VhuTransporterInput
+  transporter: BsvhuTransporterInput
 }
 
-input VhuEmitterInput {
+input BsvhuEmitterInput {
   "Numéro d'agrément émetteur"
   agrementNumber: String
 
@@ -28,38 +28,38 @@ input VhuEmitterInput {
   company: CompanyInput
 }
 
-input VhuIdentificationInput {
+input BsvhuIdentificationInput {
   "Numéros d'identification"
   numbers: [String]
   "Type de numéros d'indentification"
-  type: VhuIdentificationType
+  type: BsvhuIdentificationType
 }
 
-input VhuQuantityInput {
+input BsvhuQuantityInput {
   "Quantité en nombre (nombre de lots ou nombre de numéros d'ordre)"
   number: Int
   "Quantité en tonnes"
   tons: Float
 }
 
-input VhuRecipientInput {
+input BsvhuRecipientInput {
   "Type de receveur: broyeur ou second centre VHU"
-  type: VhuRecipientType
+  type: BsvhuRecipientType
   "Numéro d'agrément de receveur"
   agrementNumber: String
   "Coordonnées de l'entreprise qui recoit les déchets"
   company: CompanyInput
 
   "Informations d'acceptation"
-  acceptance: VhuAcceptanceInput
+  acceptance: BsvhuAcceptanceInput
   "Informations sur l'opétation de traitement"
-  operation: VhuOperationInput
+  operation: BsvhuOperationInput
 
   "Destination utérieure prévue, dans le cas d'un second centre VHU"
   plannedBroyeurCompany: CompanyInput
 }
 
-input VhuAcceptanceInput {
+input BsvhuAcceptanceInput {
   "Quantité réelle reçue"
   quantity: Float
   "Status d'acceptation du déchet"
@@ -67,32 +67,32 @@ input VhuAcceptanceInput {
   "Raison du refus du déchet, dans le cas d'un refus"
   refusalReason: String
   "Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)"
-  identification: VhuIdentificationInput
+  identification: BsvhuIdentificationInput
 }
 
-input VhuOperationInput {
+input BsvhuOperationInput {
   "Opération de traitement prévue"
   planned: String
   "Opération de traitement réalisée"
   done: String
 }
 
-input VhuTransporterInput {
+input BsvhuTransporterInput {
   "Coordonnées de l'entreprise de transport"
   company: CompanyInput
   "Numéro de TVA intracommunautaire, dans le cas d'un transporteur étranger"
   tvaIntracommunautaire: String
   "Récépissé transporteur"
-  recepisse: VhuRecepisseInput
+  recepisse: BsvhuRecepisseInput
 }
 
-input VhuRecepisseInput {
+input BsvhuRecepisseInput {
   number: String
   department: String
   validityLimit: DateTime
 }
 
-input VhuSignatureInput {
+input BsvhuSignatureInput {
   "Type de signature apposé"
   type: SignatureTypeInput!
   "Date de la signature"

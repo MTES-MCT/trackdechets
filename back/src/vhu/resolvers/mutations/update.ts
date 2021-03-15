@@ -1,5 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { BordereauVhuMutationUpdateArgs } from "../../../generated/graphql/types";
+import { MutationUpdateBsvhuArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb, flattenVhuInput } from "../../converter";
@@ -11,7 +11,7 @@ import { validateVhuForm } from "../../validation";
 
 export default async function edit(
   _,
-  { id, input }: BordereauVhuMutationUpdateArgs,
+  { id, input }: MutationUpdateBsvhuArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);

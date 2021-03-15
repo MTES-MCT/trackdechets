@@ -1,29 +1,32 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
 import Tooltip from "common/components/Tooltip";
-import { textConfig } from "dashboard/slips/slips-actions/workflow/ReceivedInfo";
-import NumberInput from "form/custom-inputs/NumberInput";
-import { InlineRadioButton, RadioButton } from "form/custom-inputs/RadioButton";
+import { textConfig } from "dashboard/components/BSDList/WorkflowAction/ReceivedInfo";
+import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import {
+  InlineRadioButton,
+  RadioButton,
+} from "form/common/components/custom-inputs/RadioButton";
 import { Field, Form, Formik } from "formik";
 import {
-  BordereauVhuMutation,
-  BordereauVhuMutationUpdateArgs,
-  VhuForm,
-  VhuRecipientType,
+  Mutation,
+  MutationUpdateBsvhuArgs,
+  Bsvhu,
+  BsvhuRecipientType,
   WasteAcceptationStatusInput,
 } from "generated/graphql/types";
 import React from "react";
-import { UPDATE_VHU_FORM } from "vhuForm/queries";
-import TagsInput from "vhuForm/tags-input/TagsInput";
+import { UPDATE_VHU_FORM } from "form/bsvhu/utils/queries";
+import TagsInput from "form/bsvhu/components/tags-input/TagsInput";
 
 type Props = {
-  form: VhuForm;
+  form: Bsvhu;
 };
 
 export default function RecipientForm({ form }: Props) {
   const [update] = useMutation<
-    Pick<BordereauVhuMutation, "update">,
-    BordereauVhuMutationUpdateArgs
+    Pick<Mutation, "updateBsvhu">,
+    MutationUpdateBsvhuArgs
   >(UPDATE_VHU_FORM);
 
   return (
@@ -37,7 +40,7 @@ export default function RecipientForm({ form }: Props) {
             quantity: form.quantity?.tons,
             status: WasteAcceptationStatusInput.Accepted,
             refusalReason: "",
-            ...(form.recipient?.type === VhuRecipientType.Demolisseur && {
+            ...(form.recipient?.type === BsvhuRecipientType.Demolisseur && {
               identification: {
                 numbers: [],
                 type: "NUMERO_ORDRE_REGISTRE_POLICE",
@@ -153,7 +156,7 @@ export default function RecipientForm({ form }: Props) {
               )}
             </div>
 
-            {form.recipient?.type === VhuRecipientType.Demolisseur && (
+            {form.recipient?.type === BsvhuRecipientType.Demolisseur && (
               <>
                 <div className="form__row">
                   <fieldset>

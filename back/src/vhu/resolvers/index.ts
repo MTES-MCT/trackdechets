@@ -1,45 +1,29 @@
 import {
   MutationResolvers,
-  QueryResolvers,
-  BordereauVhuMutationResolvers,
-  BordereauVhuQueryResolvers
+  QueryResolvers
 } from "../../generated/graphql/types";
 
-import findUnique from "./queries/findUnique";
-import findMany from "./queries/findMany";
-import pdf from "./queries/pdf";
-import create from "./mutations/create";
-import update from "./mutations/update";
-import sign from "./mutations/sign";
-import duplicate from "./mutations/duplicate";
+import bsvhu from "./queries/bsvhu";
+import bsvhuPdf from "./queries/bsvhuPdf";
+import bsvhus from "./queries/bsvhus";
+import createBsvhu from "./mutations/create";
+import updateBsvhu from "./mutations/update";
+import signBsvhu from "./mutations/sign";
+import duplicateBsvhu from "./mutations/duplicate";
+
+import BsvhuMetadata from "./BsvhuMetadata";
+import Bsvhu from "./Bsvhu";
 
 const Query: QueryResolvers = {
-  bordereauVhu: () => ({
-    findUnique: null,
-    findMany: null,
-    pdf: null
-  })
+  bsvhu,
+  bsvhus,
+  bsvhuPdf
 };
 const Mutation: MutationResolvers = {
-  bordereauVhu: () => ({
-    create: null,
-    update: null,
-    sign: null,
-    duplicate: null
-  })
+  createBsvhu,
+  updateBsvhu,
+  signBsvhu,
+  duplicateBsvhu
 };
 
-const BordereauVhuQuery: BordereauVhuQueryResolvers = {
-  findUnique,
-  findMany,
-  pdf
-};
-
-const BordereauVhuMutation: BordereauVhuMutationResolvers = {
-  create,
-  update,
-  sign,
-  duplicate
-};
-
-export default { Query, Mutation, BordereauVhuMutation, BordereauVhuQuery };
+export default { Query, Mutation, BsvhuMetadata, Bsvhu };

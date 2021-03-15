@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Formik, Form, Field } from "formik";
-import DateInput from "form/custom-inputs/DateInput";
+import DateInput from "form/common/components/custom-inputs/DateInput";
 import styles from "./ExportsForms.module.scss";
 import {
   CompanyPrivate,
@@ -8,7 +8,7 @@ import {
   CompanyType,
 } from "generated/graphql/types";
 import WasteTreeModal from "search/WasteTreeModal";
-import { wasteCodeValidator } from "form/waste-code/waste-code.validator";
+import { wasteCodeValidator } from "form/bsdd/components/waste-code/waste-code.validator";
 import { WASTES } from "generated/constants";
 import { useLazyQuery, gql } from "@apollo/client";
 import { NotificationError } from "common/components/Error";

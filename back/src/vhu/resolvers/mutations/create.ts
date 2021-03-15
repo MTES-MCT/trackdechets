@@ -1,6 +1,6 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import { BordereauVhuMutationCreateArgs } from "../../../generated/graphql/types";
+import { MutationCreateBsvhuArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb, flattenVhuInput } from "../../converter";
@@ -9,7 +9,7 @@ import { validateVhuForm } from "../../validation";
 
 export default async function create(
   _,
-  { input }: BordereauVhuMutationCreateArgs,
+  { input }: MutationCreateBsvhuArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);

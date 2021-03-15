@@ -18,14 +18,15 @@
     "generate": "npx prisma generate",
     "prebuild": "npm run generate",
     "build": "tsc && copyfiles -e **/*.ts src/**/*.{graphql,pdf,png,ttf,html} prisma/**/*.{prisma,sql} dist/",
+    "scalingo-postbuild": "npm run build && cd dist && npm run migrate",
     "lint": "eslint -c .eslintrc.js --ext .ts ./src",
     "lint:fix": "eslint -c .eslintrc.js --fix --ext .ts ./src",
     "bulk-create-account:dev": "ts-node src/users/bulk-creation/index.ts",
     "bulk-create-account": "node src/users/bulk-creation/index.js",
     "graphql-codegen": "graphql-codegen --config codegen.yml"
   },
-  "engines" : {
-    "node" : "^14"
+  "engines": {
+    "node": "^14"
   },
   "keywords": [],
   "author": "",

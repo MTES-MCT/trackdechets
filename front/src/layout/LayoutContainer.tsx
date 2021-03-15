@@ -20,8 +20,8 @@ const Account = lazy(() => import("account/Account"));
 const AccountMembershipRequest = lazy(() =>
   import("account/AccountMembershipRequest")
 );
-const FormContainer = lazy(() => import("form/FormContainer"));
-const VhuFormContainer = lazy(() => import("vhuForm/FormContainer"));
+const FormContainer = lazy(() => import("form/bsdd/FormContainer"));
+const BsvhuFormContainer = lazy(() => import("form/bsvhu/FormContainer"));
 const SignupInfo = lazy(() => import("login/SignupInfos"));
 const WasteSelector = lazy(() => import("login/WasteSelector"));
 
@@ -32,7 +32,6 @@ const Signup = lazy(() => import("login/Signup"));
 const Dialog = lazy(() => import("oauth2/Dialog"));
 const Company = lazy(() => import("company/Company"));
 const WasteTree = lazy(() => import("search/WasteTree"));
-const Pdf = lazy(() => import("vhuForm/pdf/pdf"));
 
 const GET_ME = gql`
   query GetMe {
@@ -83,14 +82,6 @@ export default withRouter(function LayoutContainer({ history }) {
           isAuthenticated={isAuthenticated}
         >
           <Dialog />
-        </PrivateRoute>
-
-        <PrivateRoute
-          exact
-          path={routes.dashboard.slips.vhu.pdf}
-          isAuthenticated={isAuthenticated}
-        >
-          <Pdf />
         </PrivateRoute>
 
         <Route>
@@ -163,6 +154,22 @@ export default withRouter(function LayoutContainer({ history }) {
                 exact
               >
                 <FormContainer />
+              </PrivateRoute>
+
+              <PrivateRoute
+                path={routes.dashboard.bsvhus.create}
+                isAuthenticated={isAuthenticated}
+                exact
+              >
+                <BsvhuFormContainer />
+              </PrivateRoute>
+
+              <PrivateRoute
+                path={routes.dashboard.bsvhus.edit}
+                isAuthenticated={isAuthenticated}
+                exact
+              >
+                <BsvhuFormContainer />
               </PrivateRoute>
 
               <PrivateRoute

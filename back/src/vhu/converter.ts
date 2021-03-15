@@ -2,16 +2,16 @@ import { chain, nullIfNoValues, safeInput } from "../forms/form-converter";
 import {
   FormCompany,
   Signature,
-  VhuEmitter,
-  VhuForm as GraphqlVhuForm,
-  VhuFormInput,
-  VhuIdentification,
-  VhuQuantity,
-  VhuRecepisse,
-  VhuRecipient,
-  VhuRecipientAcceptance,
-  VhuRecipientOperation,
-  VhuTransporter
+  BsvhuEmitter,
+  Bsvhu as GraphqlVhuForm,
+  BsvhuInput,
+  BsvhuIdentification,
+  BsvhuQuantity,
+  BsvhuRecepisse,
+  BsvhuRecipient,
+  BsvhuRecipientAcceptance,
+  BsvhuRecipientOperation,
+  BsvhuTransporter
 } from "../generated/graphql/types";
 import {
   Prisma,
@@ -28,7 +28,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
     isDraft: form.isDraft,
     status: form.status,
     readableId: form.readableId,
-    emitter: nullIfNoValues<VhuEmitter>({
+    emitter: nullIfNoValues<BsvhuEmitter>({
       agrementNumber: form.emitterAgrementNumber,
       company: nullIfNoValues<FormCompany>({
         name: form.emitterCompanyName,
@@ -45,15 +45,15 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
     }),
     packaging: form.packaging,
     wasteCode: form.wasteCode,
-    identification: nullIfNoValues<VhuIdentification>({
+    identification: nullIfNoValues<BsvhuIdentification>({
       numbers: form.identificationNumbers,
       type: form.identificationType
     }),
-    quantity: nullIfNoValues<VhuQuantity>({
+    quantity: nullIfNoValues<BsvhuQuantity>({
       number: form.quantityNumber,
       tons: form.quantityTons
     }),
-    recipient: nullIfNoValues<VhuRecipient>({
+    recipient: nullIfNoValues<BsvhuRecipient>({
       type: form.recipientType,
       agrementNumber: form.recipientAgrementNumber,
       company: nullIfNoValues<FormCompany>({
@@ -64,16 +64,16 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         phone: form.recipientCompanyPhone,
         mail: form.recipientCompanyMail
       }),
-      acceptance: nullIfNoValues<VhuRecipientAcceptance>({
+      acceptance: nullIfNoValues<BsvhuRecipientAcceptance>({
         quantity: form.recipientAcceptanceQuantity,
         status: form.recipientAcceptanceStatus,
         refusalReason: form.recipientAcceptanceRefusalReason,
-        identification: nullIfNoValues<VhuIdentification>({
+        identification: nullIfNoValues<BsvhuIdentification>({
           numbers: form.recipientAcceptanceIdentificationNumbers,
           type: form.recipientAcceptanceIdentificationType
         })
       }),
-      operation: nullIfNoValues<VhuRecipientOperation>({
+      operation: nullIfNoValues<BsvhuRecipientOperation>({
         planned: form.recipientOperationPlanned,
         done: form.recipientOperationDone
       }),
@@ -90,7 +90,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         date: form.recipientSignatureDate
       })
     }),
-    transporter: nullIfNoValues<VhuTransporter>({
+    transporter: nullIfNoValues<BsvhuTransporter>({
       tvaIntracommunautaire: form.transporterTvaIntracommunautaire,
       company: nullIfNoValues<FormCompany>({
         name: form.transporterCompanyName,
@@ -100,7 +100,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         phone: form.transporterCompanyPhone,
         mail: form.transporterCompanyMail
       }),
-      recepisse: nullIfNoValues<VhuRecepisse>({
+      recepisse: nullIfNoValues<BsvhuRecepisse>({
         number: form.transporterRecepisseNumber,
         department: form.transporterRecepisseDepartment,
         validityLimit: form.transporterRecepisseValidityLimit
@@ -109,12 +109,13 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         author: form.transporterSignatureAuthor,
         date: form.transporterSignatureDate
       })
-    })
+    }),
+    metadata: null
   };
 }
 
 export function flattenVhuInput(
-  formInput: VhuFormInput
+  formInput: BsvhuInput
 ): Partial<Prisma.VhuFormCreateInput> {
   return safeInput({
     isDraft: formInput.isDraft,

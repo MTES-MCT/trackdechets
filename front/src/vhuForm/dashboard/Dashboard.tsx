@@ -1,14 +1,14 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { DownloadFileLink } from "common/components";
 import routes from "common/routes";
-import { BordereauVhuQueryFindManyArgs, Query } from "generated/graphql/types";
+import { QueryBsvhusArgs, Query } from "generated/graphql/types";
 import React, { useState } from "react";
 import { generatePath, Link, useParams } from "react-router-dom";
 import {
   DUPLICATE_VHU_FORM,
   GET_VHU_FORMS,
   PDF_VHU_FORM,
-} from "vhuForm/queries";
+} from "form/bsvhu/utils/queries";
 import { InlineError } from "../../common/components/Error";
 import Loader from "../../common/components/Loaders";
 import Tooltip from "../../common/components/Tooltip";
@@ -18,11 +18,11 @@ export default function Dashboard() {
   const { siret } = useParams<{ siret: string }>();
   const [isSignatureOpen, setIsSignatureOpen] = useState(false);
 
-  const [formRoute, setFormRoute] = useState(routes.dashboard.slips.create);
+  const [formRoute, setFormRoute] = useState(routes.dashboard.bsvhus.create);
 
   const { error, data, loading, refetch } = useQuery<
-    Pick<Query, "bordereauVhu">,
-    BordereauVhuQueryFindManyArgs
+    Pick<Query, "bsvhus">,
+    QueryBsvhusArgs
   >(GET_VHU_FORMS, {
     variables: {
       siret,
@@ -50,8 +50,8 @@ export default function Dashboard() {
             onChange={e => setFormRoute(e.target.value)}
             className="td-select"
           >
-            <option value={routes.dashboard.slips.create}>BSD classique</option>
-            <option value={routes.dashboard.slips.vhu.create}>BSD VHU</option>
+            <option value={routes.dashboard.bsdds.create}>BSD classique</option>
+            <option value={routes.dashboard.bsvhus.create}>BSD VHU</option>
             <option value="TODO" disabled>
               BSD DASRI
             </option>
@@ -77,7 +77,7 @@ export default function Dashboard() {
           </tr>
         </thead>
         <tbody>
-          {data.bordereauVhu?.findMany.map(vhu => (
+          {data.bsvhus?.edges?.map(({ node: vhu }) => (
             <tr key={vhu.id}>
               <td className="tw-border tw-px-4 tw-py-2">
                 {vhu.emitter?.company?.name}
@@ -108,7 +108,7 @@ export default function Dashboard() {
                   <>
                     <Link
                       className="btn btn--primary btn--slim"
-                      to={generatePath(routes.dashboard.slips.vhu.edit, {
+                      to={generatePath(routes.dashboard.bsvhus.edit, {
                         siret,
                         id: vhu.id,
                       })}
@@ -140,17 +140,6 @@ export default function Dashboard() {
                 >
                   Dupliquer
                 </button>
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn--primary btn--slim"
-                  href={generatePath(routes.dashboard.slips.vhu.pdf, {
-                    siret,
-                    id: vhu.id,
-                  })}
-                >
-                  Imprimer
-                </a>
                 <DownloadFileLink
                   query={PDF_VHU_FORM}
                   params={{ id: vhu.id }}

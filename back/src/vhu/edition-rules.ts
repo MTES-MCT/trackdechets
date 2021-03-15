@@ -2,23 +2,21 @@ import { VhuForm as PrismaVhuForm } from "@prisma/client";
 import { isObject, objectDiff } from "../forms/workflow/diff";
 import {
   FormCompany,
-  Signature,
-  VhuForm as GqlVhuForm,
-  VhuFormInput,
-  VhuIdentification,
-  VhuQuantity,
-  VhuRecepisse
+  BsvhuInput,
+  BsvhuIdentification,
+  BsvhuQuantity,
+  BsvhuRecepisse
 } from "../generated/graphql/types";
 import { expandVhuFormFromDb } from "./converter";
 
 // Cannot extend object otherwise we have problems with arrays
 // This way works with nested (on several levels) objects
-type InternalRules<T, V> = {
-  [K in keyof Required<Omit<T, "__typename">>]: T[K] extends {
+type InternalRules<TApiKey, TDbKey> = {
+  [K in keyof Required<Omit<TApiKey, "__typename">>]: TApiKey[K] extends {
     [subKey: string]: unknown;
   }
-    ? InternalRules<T[K], V>
-    : ((item: V) => boolean) | boolean;
+    ? InternalRules<TApiKey[K], TDbKey>
+    : ((item: TDbKey) => boolean) | boolean;
 };
 
 function getNestedKey(obj: any, keys: string[]) {
@@ -34,7 +32,7 @@ function getNestedKey(obj: any, keys: string[]) {
  * @param prevKeys Internal array used when accessing nested keys
  */
 export function getNotEditableKeys(
-  updates: VhuFormInput,
+  updates: BsvhuInput,
   currentForm: PrismaVhuForm
 ) {
   // Calculate diff between the update & the current form
@@ -44,8 +42,8 @@ export function getNotEditableKeys(
   return recursiveGetNotEditableKeys(diffInput, currentForm);
 }
 
-export function recursiveGetNotEditableKeys(
-  updates: VhuFormInput,
+function recursiveGetNotEditableKeys(
+  updates: BsvhuInput,
   currentPrismaForm: PrismaVhuForm,
   prevKeys: string[] = []
 ): string[] {
@@ -67,15 +65,10 @@ export function recursiveGetNotEditableKeys(
     .filter(Boolean);
 }
 
-function getDiffInput(updates: VhuFormInput, currentForm: PrismaVhuForm) {
+function getDiffInput(updates: BsvhuInput, currentForm: PrismaVhuForm) {
   const prismaForm = expandVhuFormFromDb(currentForm);
   return objectDiff(prismaForm, updates);
 }
-
-const signatureRule: InternalRules<Signature, PrismaVhuForm> = {
-  author: false,
-  date: false
-};
 
 const companyKeys: Array<keyof FormCompany> = [
   "address",
@@ -87,9 +80,12 @@ const companyKeys: Array<keyof FormCompany> = [
   "siret"
 ];
 
-const identificationKeys: Array<keyof VhuIdentification> = ["numbers", "type"];
-const quantityKeys: Array<keyof VhuQuantity> = ["number", "tons"];
-const recepisseKeys: Array<keyof VhuRecepisse> = [
+const identificationKeys: Array<keyof BsvhuIdentification> = [
+  "numbers",
+  "type"
+];
+const quantityKeys: Array<keyof BsvhuQuantity> = ["number", "tons"];
+const recepisseKeys: Array<keyof BsvhuRecepisse> = [
   "number",
   "validityLimit",
   "department"
@@ -111,13 +107,7 @@ function globalNullFieldRule<Type>(keys: string[], field: keyof PrismaVhuForm) {
 /**
  * Each field returns true if it can be edited, false otherwise.
  */
-const vhuFormRules: InternalRules<GqlVhuForm, PrismaVhuForm> = {
-  id: false,
-  createdAt: false,
-  updatedAt: false,
-  isDeleted: false,
-  status: false,
-  readableId: false,
+const vhuFormRules: InternalRules<BsvhuInput, PrismaVhuForm> = {
   isDraft: item =>
     [
       item.emitterSignatureDate,
@@ -126,7 +116,6 @@ const vhuFormRules: InternalRules<GqlVhuForm, PrismaVhuForm> = {
     ].every(s => s == null),
   emitter: {
     agrementNumber: nullFieldRule("emitterSignatureDate"),
-    signature: signatureRule,
     company: globalNullFieldRule(companyKeys, "emitterSignatureDate")
   },
   recipient: {
@@ -149,8 +138,7 @@ const vhuFormRules: InternalRules<GqlVhuForm, PrismaVhuForm> = {
     plannedBroyeurCompany: globalNullFieldRule(
       companyKeys,
       "recipientSignatureDate"
-    ),
-    signature: signatureRule
+    )
   },
   packaging: nullFieldRule("emitterSignatureDate"),
   identification: globalNullFieldRule(
@@ -162,7 +150,6 @@ const vhuFormRules: InternalRules<GqlVhuForm, PrismaVhuForm> = {
   transporter: {
     company: globalNullFieldRule(companyKeys, "transporterSignatureDate"),
     tvaIntracommunautaire: nullFieldRule("transporterSignatureDate"),
-    recepisse: globalNullFieldRule(recepisseKeys, "transporterSignatureDate"),
-    signature: signatureRule
+    recepisse: globalNullFieldRule(recepisseKeys, "transporterSignatureDate")
   }
 };

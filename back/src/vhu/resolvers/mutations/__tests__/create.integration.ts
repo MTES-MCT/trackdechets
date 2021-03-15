@@ -7,33 +7,31 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 
 const CREATE_VHU_FORM = `
-mutation CreateVhuForm($vhuFormInput: VhuFormInput!) {
-  bordereauVhu {
-    create(input: $vhuFormInput) {
-      id
-      recipient {
-        company {
-            siret
-        }
-      }
-      emitter {
-        company {
-            siret
-        }
-      }
-      transporter {
-        company {
+mutation CreateVhuForm($input: BsvhuInput!) {
+  createBsvhu(input: $input) {
+    id
+    recipient {
+      company {
           siret
-          name
-          address
-          contact
-          mail
-          phone
-        }
       }
-      quantity {
-        number
+    }
+    emitter {
+      company {
+          siret
       }
+    }
+    transporter {
+      company {
+        siret
+        name
+        address
+        contact
+        mail
+        phone
+      }
+    }
+    quantity {
+      number
     }
   }
 }
@@ -45,7 +43,7 @@ describe("Mutation.Vhu.create", () => {
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
     const { errors } = await mutate(CREATE_VHU_FORM, {
-      variables: { vhuFormInput: {} }
+      variables: { input: {} }
     });
 
     expect(errors).toEqual([
@@ -64,7 +62,7 @@ describe("Mutation.Vhu.create", () => {
     const { mutate } = makeClient(user);
     const { errors } = await mutate(CREATE_VHU_FORM, {
       variables: {
-        vhuFormInput: {
+        input: {
           emitter: {
             company: {
               siret: "siret"
@@ -88,7 +86,7 @@ describe("Mutation.Vhu.create", () => {
   it("create a form with an emitter and a recipient", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
-    const vhuFormInput = {
+    const input = {
       emitter: {
         company: {
           siret: company.siret
@@ -103,12 +101,12 @@ describe("Mutation.Vhu.create", () => {
     const { mutate } = makeClient(user);
     const { data } = await mutate(CREATE_VHU_FORM, {
       variables: {
-        vhuFormInput
+        input
       }
     });
 
-    expect(data.bordereauVhu.create.recipient.company).toMatchObject(
-      vhuFormInput.recipient.company
+    expect(data.createBsvhu.recipient.company).toMatchObject(
+      input.recipient.company
     );
   });
 });

@@ -1,7 +1,7 @@
 import { VhuForm } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import { BordereauVhuMutationDuplicateArgs } from "../../../generated/graphql/types";
+import { MutationDuplicateBsvhuArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { expandVhuFormFromDb } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
@@ -9,7 +9,7 @@ import { checkIsFormContributor } from "../../permissions";
 
 export default async function duplicate(
   _,
-  { id }: BordereauVhuMutationDuplicateArgs,
+  { id }: MutationDuplicateBsvhuArgs,
   context
 ) {
   const user = checkIsAuthenticated(context);

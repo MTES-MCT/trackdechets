@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { generatePath, Link, useHistory, useParams } from "react-router-dom";
 
 import { useDownloadPdf } from "dashboard/components/BSDDActions/useDownloadPdf";
@@ -317,7 +317,7 @@ export default function BSDDetailContent({
 }: BSDDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
-  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
   const [duplicate] = useDuplicate(
     {

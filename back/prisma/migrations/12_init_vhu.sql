@@ -6,24 +6,13 @@
 CREATE TYPE "default$default"."VhuStatus" AS ENUM ('IN_PROGRESS', 'DONE');
 
 -- CreateEnum
-CREATE TYPE "default$default"."PackagingType" AS ENUM ('UNIT', 'BUNDLE');
+CREATE TYPE "default$default"."VhuPackaging" AS ENUM ('UNITE', 'LOT');
 
 -- CreateEnum
-CREATE TYPE "default$default"."IdentificationType" AS ENUM ('VHU_NUMBER', 'BUNDLE_NUMBER');
+CREATE TYPE "default$default"."VhuIdentificationType" AS ENUM ('NUMERO_ORDRE_REGISTRE_POLICE', 'NUMERO_ORDRE_LOTS_SORTANTS');
 
 -- CreateEnum
-CREATE TYPE "default$default"."VhuQuantityUnit" AS ENUM ('TON', 'NUMBER');
-
--- CreateTable
-CREATE TABLE "default$default"."Signature" (
-    "id" SERIAL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "signatoryId" VARCHAR(40) NOT NULL,
-    "signedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "signedBy" VARCHAR(100) NOT NULL,
-
-    PRIMARY KEY ("id")
-);
+CREATE TYPE "default$default"."VhuRecipientType" AS ENUM ('BROYEUR', 'DEMOLISSEUR');
 
 -- CreateTable
 CREATE TABLE "default$default"."VhuForm" (
@@ -32,79 +21,58 @@ CREATE TABLE "default$default"."VhuForm" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "isDraft" BOOLEAN NOT NULL DEFAULT false,
     "isDeleted" BOOLEAN NOT NULL DEFAULT false,
-    "ownerId" VARCHAR(40) NOT NULL,
     "status" "default$default"."VhuStatus" NOT NULL DEFAULT E'IN_PROGRESS',
-    "emitterAgreement" VARCHAR(100),
-    "emitterValidityLimit" TIMESTAMP(3),
+    "readableId" VARCHAR(40) UNIQUE NOT NULL,
+    "emitterAgrementNumber" VARCHAR(100),
     "emitterCompanyName" VARCHAR(100),
     "emitterCompanySiret" VARCHAR(17),
     "emitterCompanyAddress" TEXT,
     "emitterCompanyContact" VARCHAR(50),
     "emitterCompanyPhone" VARCHAR(15),
     "emitterCompanyMail" VARCHAR(50),
-    "recipientOperationPlanned" VARCHAR(50),
-    "recipientAgreement" VARCHAR(100),
-    "recipientValidityLimit" TIMESTAMP(3),
+    "recipientType" "default$default"."VhuRecipientType",
+    "recipientOperationPlanned" VARCHAR(50) DEFAULT E'R 4',
+    "recipientAgrementNumber" VARCHAR(100),
     "recipientCompanyName" VARCHAR(100),
     "recipientCompanySiret" VARCHAR(17),
     "recipientCompanyAddress" TEXT,
     "recipientCompanyContact" VARCHAR(50),
     "recipientCompanyPhone" VARCHAR(15),
     "recipientCompanyMail" VARCHAR(50),
-    "wasteDetailsPackagingType" "default$default"."PackagingType",
-    "wasteDetailsIdentificationNumbers" TEXT[],
-    "wasteDetailsIdentificationType" "default$default"."IdentificationType",
-    "wasteDetailsQuantity" INTEGER,
-    "wasteDetailsQuantityUnit" "default$default"."VhuQuantityUnit",
-    "emitterSignatureId" INTEGER,
-    "transporterAgreement" VARCHAR(100),
+    "wasteCode" VARCHAR(10) DEFAULT E'16 01 06',
+    "packaging" "default$default"."VhuPackaging",
+    "identificationNumbers" TEXT[],
+    "identificationType" "default$default"."VhuIdentificationType",
+    "quantityNumber" INTEGER,
+    "quantityTons" FLOAT,
+    "emitterSignatureAuthor" VARCHAR(50),
+    "emitterSignatureDate" TIMESTAMP(3),
     "transporterCompanyName" VARCHAR(100),
     "transporterCompanySiret" VARCHAR(17),
     "transporterCompanyAddress" TEXT,
     "transporterCompanyContact" VARCHAR(50),
     "transporterCompanyPhone" VARCHAR(15),
     "transporterCompanyMail" VARCHAR(50),
-    "transporterReceipt" VARCHAR(50),
-    "transporterDepartment" VARCHAR(30),
-    "transporterValidityLimit" TIMESTAMP(3),
-    "transporterTransportType" TEXT,
-    "transporterSignatureId" INTEGER,
+    "transporterRecepisseNumber" VARCHAR(50),
+    "transporterRecepisseDepartment" VARCHAR(50),
+    "transporterRecepisseValidityLimit" TIMESTAMP(3),
+    "transporterTvaIntracommunautaire" VARCHAR(50),
+    "transporterSignatureAuthor" VARCHAR(50),
+    "transporterSignatureDate" TIMESTAMP(3),
     "recipientAcceptanceQuantity" DECIMAL(65,30),
     "recipientAcceptanceStatus" "default$default"."WasteAcceptationStatus",
     "recipientAcceptanceRefusalReason" TEXT,
-    "recipientAcceptanceSignatureId" INTEGER,
+    "recipientAcceptanceIdentificationNumbers" TEXT[],
+    "recipientAcceptanceIdentificationType" "default$default"."VhuIdentificationType",
     "recipientOperationDone" VARCHAR(50),
-    "recipientOperationSignatureId" INTEGER,
+    "recipientPlannedBroyeurCompanyName" VARCHAR(100),
+    "recipientPlannedBroyeurCompanySiret" VARCHAR(17),
+    "recipientPlannedBroyeurCompanyAddress" TEXT,
+    "recipientPlannedBroyeurCompanyContact" VARCHAR(50),
+    "recipientPlannedBroyeurCompanyPhone" VARCHAR(15),
+    "recipientPlannedBroyeurCompanyMail" VARCHAR(50),
+    "recipientSignatureAuthor" VARCHAR(50),
+    "recipientSignatureDate" TIMESTAMP(3),
 
     PRIMARY KEY ("id")
 );
-
--- CreateIndex
-CREATE UNIQUE INDEX "VhuForm_emitterSignatureId_unique" ON "default$default"."VhuForm"("emitterSignatureId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "VhuForm_transporterSignatureId_unique" ON "default$default"."VhuForm"("transporterSignatureId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "VhuForm_recipientAcceptanceSignatureId_unique" ON "default$default"."VhuForm"("recipientAcceptanceSignatureId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "VhuForm_recipientOperationSignatureId_unique" ON "default$default"."VhuForm"("recipientOperationSignatureId");
-
--- AddForeignKey
-ALTER TABLE "default$default"."Signature" ADD FOREIGN KEY("signatoryId")REFERENCES "default$default"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "default$default"."VhuForm" ADD FOREIGN KEY("ownerId")REFERENCES "default$default"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "default$default"."VhuForm" ADD FOREIGN KEY("emitterSignatureId")REFERENCES "default$default"."Signature"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "default$default"."VhuForm" ADD FOREIGN KEY("transporterSignatureId")REFERENCES "default$default"."Signature"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "default$default"."VhuForm" ADD FOREIGN KEY("recipientAcceptanceSignatureId")REFERENCES "default$default"."Signature"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "default$default"."VhuForm" ADD FOREIGN KEY("recipientOperationSignatureId")REFERENCES "default$default"."Signature"("id") ON DELETE SET NULL ON UPDATE CASCADE;

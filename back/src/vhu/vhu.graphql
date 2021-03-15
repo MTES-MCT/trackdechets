@@ -1,18 +1,6 @@
 type Query {
-  bordereauVhu: BordereauVhuQuery
-  vhuForm(id: ID!): VhuForm
-  vhuForms(siret: String): [VhuForm!]
-}
-
-type BordereauVhuQuery {
-  findUnique(id: ID!): VhuForm!
-  findMany(
-    "SIRET d'un établissement dont je suis membre"
-    siret: String
-
-    "(Optionnel) Permet de récupérer uniquement les bordereaux en brouillon"
-    isDraft: Boolean
-
+  bsvhu(id: ID!): Bsvhu!
+  bsvhus(
     """
     (Optionnel) PAGINATION
     Permet en conjonction avec `first` de paginer "en avant"
@@ -22,7 +10,7 @@ type BordereauVhuQuery {
     Défaut à vide, pour retourner les bordereaux les plus récents
     Le BSD précisé dans le curseur ne fait pas partie du résultat
     """
-    cursorAfter: ID
+    after: ID
 
     """
     (Optionnel) PAGINATION
@@ -42,7 +30,7 @@ type BordereauVhuQuery {
     Défaut à vide, pour retourner les bordereaux les plus anciens
     Le BSD précisé dans le curseur ne fait pas partie du résultat
     """
-    cursorBefore: ID
+    before: ID
 
     """
     (Optionnel) PAGINATION
@@ -51,53 +39,110 @@ type BordereauVhuQuery {
     """
     last: Int
 
-    """
-    (Optionnel) Filtre sur le statut des bordereaux
-    Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
-    Défaut à vide.
-    """
-    status: VhuStatus
+    "SIRET d'un établissement dont je suis membre"
+    siret: String
 
-    """
-    (Optionnel) Retourne les BSD modifiés après la date
-    Filtre sur la date de dernière modification
-    Au format (YYYY-MM-DD)
-    Par défaut vide, aucun filtre n'est appliqué
-    """
-    updatedAfter: String
-
-    """
-    (Optionnel) Siret d'une autre entreprise présente sur le bordereau
-    Vous n'avez pas besoin d'être membre de cette entreprise.
-    Seuls les bordereaux ou cette entreprise apparait (dans n'importe quel cadre) seront retournés.
-    Défaut à vide.
-    """
-    siretPresentOnForm: String
-  ): [VhuForm!]!
+    where: BsvhuWhere
+  ): BsvhuConnection!
 
   """
   Renvoie un token pour télécharger un pdf de bordereau
   Ce token doit être transmis à la route /download pour obtenir le fichier.
   Il est valable 10 secondes
   """
-  pdf("ID d'un bordereau" id: ID): FileDownload!
+  bsvhuPdf("ID d'un bordereau" id: ID): FileDownload!
 }
 
 type Mutation {
-  bordereauVhu: BordereauVhuMutation
-}
-
-type BordereauVhuMutation {
-  create(input: VhuFormInput!): VhuForm
-  update(id: ID!, input: VhuFormInput!): VhuForm
-  sign(id: ID!, input: VhuSignatureInput!): VhuForm
+  createBsvhu(input: BsvhuInput!): Bsvhu
+  updateBsvhu(id: ID!, input: BsvhuInput!): Bsvhu
+  signBsvhu(id: ID!, input: BsvhuSignatureInput!): Bsvhu
 
   "Duplique un BSD VHU"
-  duplicate("ID d'un BSD" id: ID!): VhuForm
+  duplicateBsvhu("ID d'un BSD" id: ID!): Bsvhu
 }
 
-type VhuForm {
-  "Identifiant internet"
+type PageInfo {
+  startCursor: String!
+  endCursor: String!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}
+
+type BsvhuConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [BsvhuEdge!]!
+}
+
+type BsvhuEdge {
+  cursor: String!
+  node: Bsvhu!
+}
+
+input BsvhuWhere {
+  "(Optionnel) Permet de récupérer uniquement les bordereaux en brouillon"
+  isDraft: Boolean
+
+  """
+  (Optionnel) Filtre sur le statut des bordereaux
+  Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
+  Défaut à vide.
+  """
+  status: BsvhuStatus
+
+  createdAt: DateFilter
+  updatedAt: DateFilter
+  emitter: BsBsvhuEmitterWhere
+  transporter: BsBsvhuTransporterWhere
+  recipient: BsBsvhuRecipientWhere
+  _and: [BsvhuWhere!]
+  _or: [BsvhuWhere!]
+  _not: [BsvhuWhere!]
+}
+
+input DateFilter {
+  _gte: DateTime
+  _gt: DateTime
+  _lte: DateTime
+  _lt: DateTime
+}
+
+input BsBsvhuEmitterWhere {
+  company: BsvhuCompanyWhere
+  signature: BsvhuSignatureWhere
+}
+
+input BsBsvhuTransporterWhere {
+  company: BsvhuCompanyWhere
+  signature: BsvhuSignatureWhere
+}
+
+input BsBsvhuRecipientWhere {
+  company: BsvhuCompanyWhere
+  signature: BsvhuSignatureWhere
+}
+
+input BsvhuCompanyWhere {
+  siret: String!
+}
+
+input BsvhuSignatureWhere {
+  date: DateFilter!
+}
+
+type BsvhuMetadata {
+  errors: [BsvhuError!]!
+}
+
+type BsvhuError {
+  message: String!
+  path: String!
+  requiredFor: SignatureTypeInput!
+}
+
+type Bsvhu {
+  "Identifiant interne"
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -106,29 +151,31 @@ type VhuForm {
   "Indique si le bordereau est à l'état de brouillon"
   isDraft: Boolean!
   "Status du bordereau"
-  status: VhuStatus!
+  status: BsvhuStatus!
   "Numéro unique attribué par Trackdéchets"
   readableId: String!
 
   "Informations sur l'émetteur"
-  emitter: VhuEmitter
+  emitter: BsvhuEmitter
 
   "Code déchet. Presque toujours 16 01 06"
   wasteCode: String
   "Conditionnement du déchet"
-  packaging: VhuPackaging
+  packaging: BsvhuPackaging
   "Identification des VHUs"
-  identification: VhuIdentification
+  identification: BsvhuIdentification
   "Quantité de VHUs"
-  quantity: VhuQuantity
+  quantity: BsvhuQuantity
 
   "Détails sur la destination"
-  recipient: VhuRecipient
+  recipient: BsvhuRecipient
   "Détails sur le transporteur"
-  transporter: VhuTransporter
+  transporter: BsvhuTransporter
+
+  metadata: BsvhuMetadata!
 }
 
-type VhuEmitter {
+type BsvhuEmitter {
   "Numéro d'agrément émetteur"
   agrementNumber: String
   "Coordonnées de l'entreprise émétrice"
@@ -136,56 +183,56 @@ type VhuEmitter {
   signature: Signature
 }
 
-enum VhuStatus {
+enum BsvhuStatus {
   IN_PROGRESS
   DONE
 }
 
-enum VhuPackaging {
+enum BsvhuPackaging {
   UNITE
   LOT
 }
 
-enum VhuIdentificationType {
+enum BsvhuIdentificationType {
   NUMERO_ORDRE_REGISTRE_POLICE
   NUMERO_ORDRE_LOTS_SORTANTS
 }
 
-enum VhuRecipientType {
+enum BsvhuRecipientType {
   BROYEUR
   DEMOLISSEUR
 }
 
-type VhuTransporter {
+type BsvhuTransporter {
   "Coordonnées de l'entreprise de transport"
   company: FormCompany
   "Numéro de TVA intracommunautaire, dans le cas d'un transporteur étranger"
   tvaIntracommunautaire: String
 
   "Récépissé transporteur"
-  recepisse: VhuRecepisse
+  recepisse: BsvhuRecepisse
 
   signature: Signature
 }
 
-type VhuRecepisse {
+type BsvhuRecepisse {
   number: String
   department: String
   validityLimit: DateTime
 }
 
-type VhuRecipient {
+type BsvhuRecipient {
   "Type de receveur: broyeur ou second centre VHU"
-  type: VhuRecipientType
+  type: BsvhuRecipientType
   "Numéro d'agrément de receveur"
   agrementNumber: String
   "Coordonnées de l'entreprise qui recoit les déchets"
   company: FormCompany
 
   "Informations d'acceptation"
-  acceptance: VhuRecipientAcceptance
+  acceptance: BsvhuRecipientAcceptance
   "Informations sur l'opétation de traitement"
-  operation: VhuRecipientOperation
+  operation: BsvhuRecipientOperation
 
   "Coordonnées de l'entreprise de broyage prévue. Utilisé uniquement lorsque le receveur est lui même un centre VHU."
   plannedBroyeurCompany: FormCompany
@@ -193,7 +240,7 @@ type VhuRecipient {
   signature: Signature
 }
 
-type VhuRecipientAcceptance {
+type BsvhuRecipientAcceptance {
   "Quantité réelle reçue"
   quantity: Float
   "Etat d'acceptation du déchet"
@@ -201,10 +248,10 @@ type VhuRecipientAcceptance {
   "Raison du refus du déchet, dans le cas d'un refus"
   refusalReason: String
   "Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)"
-  identification: VhuIdentification
+  identification: BsvhuIdentification
 }
 
-type VhuRecipientOperation {
+type BsvhuRecipientOperation {
   "Opération de traitement prévue"
   planned: String
   "Opération de traitement réalisée"
@@ -216,12 +263,12 @@ type Signature {
   author: String
 }
 
-type VhuIdentification {
+type BsvhuIdentification {
   numbers: [String]
-  type: VhuIdentificationType
+  type: BsvhuIdentificationType
 }
 
-type VhuQuantity {
+type BsvhuQuantity {
   number: Int
   tons: Float
 }

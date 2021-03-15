@@ -8,39 +8,37 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 
 const UPDATE_VHU_FORM = `
-mutation EditVhuForm($id: ID!, $vhuFormInput: VhuFormInput!) {
-  bordereauVhu {
-    update(id: $id, input: $vhuFormInput) {
-      id
-      isDraft
-      recipient {
-        company {
-          siret
-        }
+mutation EditVhuForm($id: ID!, $input: BsvhuInput!) {
+  updateBsvhu(id: $id, input: $input) {
+    id
+    isDraft
+    recipient {
+      company {
+        siret
       }
-      emitter {
-        agrementNumber
-        company {
-          siret
-        }
+    }
+    emitter {
+      agrementNumber
+      company {
+        siret
       }
-      transporter {
-        company {
-          siret
-          name
-          address
-          contact
-          mail
-          phone
-        }
-        tvaIntracommunautaire
-        recepisse {
-          number
-        }
+    }
+    transporter {
+      company {
+        siret
+        name
+        address
+        contact
+        mail
+        phone
       }
-      quantity {
+      tvaIntracommunautaire
+      recepisse {
         number
       }
+    }
+    quantity {
+      number
     }
   }
 }
@@ -52,7 +50,7 @@ describe("Mutation.Vhu.update", () => {
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
     const { errors } = await mutate(UPDATE_VHU_FORM, {
-      variables: { id: 1, vhuFormInput: {} }
+      variables: { id: 1, input: {} }
     });
 
     expect(errors).toEqual([
@@ -78,7 +76,7 @@ describe("Mutation.Vhu.update", () => {
     const { errors } = await mutate(UPDATE_VHU_FORM, {
       variables: {
         id: form.id,
-        vhuFormInput: {
+        input: {
           quantity: {
             number: 4
           }
@@ -106,16 +104,16 @@ describe("Mutation.Vhu.update", () => {
     });
 
     const { mutate } = makeClient(user);
-    const vhuFormInput = {
+    const input = {
       quantity: {
         number: 4
       }
     };
     const { data } = await mutate(UPDATE_VHU_FORM, {
-      variables: { id: form.id, vhuFormInput }
+      variables: { id: form.id, input }
     });
 
-    expect(data.bordereauVhu.update.quantity.number).toBe(4);
+    expect(data.updateBsvhu.quantity.number).toBe(4);
   });
 
   it("should allow isDraft update before any signature", async () => {
@@ -127,14 +125,14 @@ describe("Mutation.Vhu.update", () => {
     });
 
     const { mutate } = makeClient(user);
-    const vhuFormInput = {
+    const input = {
       isDraft: true
     };
     const { data } = await mutate(UPDATE_VHU_FORM, {
-      variables: { id: form.id, vhuFormInput }
+      variables: { id: form.id, input }
     });
 
-    expect(data.bordereauVhu.update.isDraft).toBe(true);
+    expect(data.updateBsvhu.isDraft).toBe(true);
   });
 
   it("should disallow isDraft update after any signature", async () => {
@@ -148,11 +146,11 @@ describe("Mutation.Vhu.update", () => {
     });
 
     const { mutate } = makeClient(user);
-    const vhuFormInput = {
+    const input = {
       isDraft: true
     };
     const { errors } = await mutate(UPDATE_VHU_FORM, {
-      variables: { id: form.id, vhuFormInput }
+      variables: { id: form.id, input }
     });
 
     expect(errors).toEqual([
@@ -175,18 +173,16 @@ describe("Mutation.Vhu.update", () => {
     });
 
     const { mutate } = makeClient(user);
-    const vhuFormInput = {
+    const input = {
       emitter: {
         agrementNumber: "new agrement"
       }
     };
     const { data } = await mutate(UPDATE_VHU_FORM, {
-      variables: { id: form.id, vhuFormInput }
+      variables: { id: form.id, input }
     });
 
-    expect(data.bordereauVhu.update.emitter.agrementNumber).toBe(
-      "new agrement"
-    );
+    expect(data.updateBsvhu.emitter.agrementNumber).toBe("new agrement");
   });
 
   it("should disallow emitter fields update after emitter signature", async () => {
@@ -200,13 +196,13 @@ describe("Mutation.Vhu.update", () => {
     });
 
     const { mutate } = makeClient(user);
-    const vhuFormInput = {
+    const input = {
       emitter: {
         agrementNumber: "new agrement"
       }
     };
     const { errors } = await mutate(UPDATE_VHU_FORM, {
-      variables: { id: form.id, vhuFormInput }
+      variables: { id: form.id, input }
     });
 
     expect(errors).toEqual([
@@ -231,16 +227,16 @@ describe("Mutation.Vhu.update", () => {
     });
 
     const { mutate } = makeClient(user);
-    const vhuFormInput = {
+    const input = {
       transporter: {
         tvaIntracommunautaire: "DE 123456789"
       }
     };
     const { data } = await mutate(UPDATE_VHU_FORM, {
-      variables: { id: form.id, vhuFormInput }
+      variables: { id: form.id, input }
     });
 
-    expect(data.bordereauVhu.update.transporter.tvaIntracommunautaire).toBe(
+    expect(data.updateBsvhu.transporter.tvaIntracommunautaire).toBe(
       "DE 123456789"
     );
   });

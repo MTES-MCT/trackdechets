@@ -82,7 +82,7 @@ export function validateVhuForm(
     .concat(packagingSchema(context))
     .concat(identificationSchema(context))
     .concat(quantitySchema(context))
-    .validate(form);
+    .validate(form, { abortEarly: false });
 }
 
 const emitterSchema: FactorySchemaOf<VhuValidationContext, Emitter> = context =>
