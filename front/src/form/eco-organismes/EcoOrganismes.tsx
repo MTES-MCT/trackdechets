@@ -7,6 +7,7 @@ import SearchInput from "common/components/SearchInput";
 import { Query, EcoOrganisme, Form } from "../../generated/graphql/types";
 import TdSwitch from "common/components/Switch";
 import { tdContactEmail } from "common/config";
+import { getInitialEcoOrganisme } from "form/initial-state";
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -25,24 +26,33 @@ interface EcoOrganismesProps {
 
 export default function EcoOrganismes(props: EcoOrganismesProps) {
   const [field] = useField<Form["ecoOrganisme"]>(props);
-  const { setFieldValue } = useFormikContext();
-  const [isChecked, setIsChecked] = useState(Boolean(field.value?.siret));
+  const { setFieldValue } = useFormikContext<Form>();
   const [clue, setClue] = useState("");
   const { loading, error, data } = useQuery<Pick<Query, "ecoOrganismes">>(
     GET_ECO_ORGANISMES
   );
 
+  const hasEcoOrganisme = !!field.value;
+
+  function handleEcoOrganismeToggle() {
+    if (hasEcoOrganisme) {
+      setFieldValue(field.name, null, false);
+    } else {
+      setFieldValue(field.name, getInitialEcoOrganisme(), false);
+    }
+  }
+
   return (
     <>
       <div className="form__row">
         <TdSwitch
-          checked={isChecked}
-          onChange={checked => setIsChecked(checked)}
+          checked={hasEcoOrganisme}
+          onChange={handleEcoOrganismeToggle}
           label="Un éco-organisme est le responsable / producteur des déchets de ce bordereau"
         />
       </div>
 
-      {isChecked && (
+      {hasEcoOrganisme && (
         <>
           {loading && <p>Chargement...</p>}
           {error && <p>Erreur lors du chargement des éco-organismes...</p>}

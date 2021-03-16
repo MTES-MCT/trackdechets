@@ -39,6 +39,9 @@ class Footer extends React.Component {
             <h5>Trackdéchets</h5>
             <a href={this.props.config.trackdechetsUrl}>Site web</a>
             <a href={this.props.config.roadmapUrl}>Roadmap produit</a>
+            <a href={this.props.config.typeformInfoIdeasBugs}>
+              Formulaire de remontée d'infos / idées / bugs
+            </a>
             <a href={this.props.config.repoUrl}>Code source</a>
             <a
               className="github-button"

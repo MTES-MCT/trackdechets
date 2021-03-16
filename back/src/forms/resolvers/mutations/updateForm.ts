@@ -51,13 +51,13 @@ const updateFormResolver = async (
   // Construct form update payload
   const formUpdateInput: Prisma.FormUpdateInput = {
     ...form,
-    appendix2Forms: { set: appendix2Forms }
+    appendix2Forms: appendix2Forms ? { set: appendix2Forms } : undefined
   };
 
   // Validate form input
   if (existingForm.status === "DRAFT") {
-    await draftFormSchema.validate(formUpdateInput);
-  } else if (existingForm.status === "SEALED") {
+    await draftFormSchema.validate({ ...existingForm, ...formUpdateInput });
+  } else {
     await sealedFormSchema.validate({ ...existingForm, ...formUpdateInput });
   }
 
@@ -80,6 +80,8 @@ const updateFormResolver = async (
       form.transporterCompanySiret ?? existingForm.transporterCompanySiret,
     traderCompanySiret:
       form.traderCompanySiret ?? existingForm.traderCompanySiret,
+    brokerCompanySiret:
+      form.brokerCompanySiret ?? existingForm.brokerCompanySiret,
     ecoOrganismeSiret: form.ecoOrganismeSiret ?? existingForm.ecoOrganismeSiret
   };
 

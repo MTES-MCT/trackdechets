@@ -13,48 +13,48 @@ const users = [
   {
     caption: "Trinov",
     image: "/img/partners-logos/trinov.png",
-    pinned: true
+    pinned: true,
   },
   {
     caption: "Kerlog",
     image: "/img/partners-logos/kerlog.png",
-    pinned: true
+    pinned: true,
   },
   {
     caption: "Chimirec",
     image: "/img/partners-logos/chimirec.png",
-    pinned: true
+    pinned: true,
   },
   {
     caption: "Hensel Recycling",
     image: "/img/partners-logos/hensel.png",
-    pinned: true
+    pinned: true,
   },
   {
     caption: "Sarpi Veolia",
     image: "/img/partners-logos/sarpi-veolia.png",
-    pinned: true
+    pinned: true,
   },
   {
     caption: "Séché Environnement",
     image: "/img/partners-logos/seche.png",
-    pinned: true
+    pinned: true,
   },
   {
     caption: "Caktus",
     image: "/img/partners-logos/caktus.png",
-    pinned: true
+    pinned: true,
   },
   {
     caption: "Sarp Veolia",
     image: "/img/partners-logos/sarp.png",
-    pinned: true
+    pinned: true,
   },
   {
     caption: "Colleco",
     image: "/img/partners-logos/colleco.png",
-    pinned: true
-  }
+    pinned: true,
+  },
 ];
 
 const siteConfig = {
@@ -76,7 +76,7 @@ const siteConfig = {
   // Add custom markdown plugins
   markdownPlugins: [
     // Highlight admonitions (callouts such as tips, warnings, note, important, etc)
-    require("remarkable-admonitions")({ icon: "svg-inline" })
+    require("remarkable-admonitions")({ icon: "svg-inline" }),
   ],
 
   usePrism: ["graphql"],
@@ -88,13 +88,13 @@ const siteConfig = {
     {
       href: "https://api.trackdechets.beta.gouv.fr",
       label: "Playground",
-      external: true
+      external: true,
     },
     {
       href: "https://forum.trackdechets.beta.gouv.fr",
       label: "Support",
-      external: true
-    }
+      external: true,
+    },
   ],
 
   // If you have users set above, you add it here:
@@ -108,7 +108,7 @@ const siteConfig = {
   /* Colors for website */
   colors: {
     primaryColor: "#16a085",
-    secondaryColor: "#1abc9c"
+    secondaryColor: "#1abc9c",
   },
 
   // This copyright info is used in /core/Footer.js and blog RSS/Atom feeds.
@@ -116,7 +116,7 @@ const siteConfig = {
 
   highlight: {
     // Highlight.js theme to use for syntax highlighting in code blocks.
-    theme: "default"
+    theme: "default",
   },
 
   // Add custom scripts here that would be placed in <script> tags.
@@ -153,7 +153,9 @@ const siteConfig = {
 
   statusUrl: "https://status.trackdechets.beta.gouv.fr",
 
-  playgroundUrl: "https://api.trackdechets.beta.gouv.fr"
+  playgroundUrl: "https://api.trackdechets.beta.gouv.fr",
+
+  typeformInfoIdeasBugs: "https://cutt.ly/trackdechets",
 };
 
 module.exports = siteConfig;

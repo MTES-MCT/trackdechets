@@ -523,6 +523,97 @@ describe("whereInputs", () => {
     expect(forms[0]).toEqual(form);
   });
 
+  test("BROKERED exportType", async () => {
+    const companyOpts = {
+      companyTypes: { set: ["BROKER" as CompanyType] }
+    };
+    const { user, company } = await userWithCompanyFactory(
+      "MEMBER",
+      companyOpts
+    );
+
+    // Form in which the company is broker
+    // SHOULD BE RETURNED
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "PROCESSED",
+        brokerCompanySiret: company.siret,
+        sentAt: new Date("2020-03-01T00:00:00"),
+        wasteDetailsCode: "06 01 01*"
+      }
+    });
+
+    // DRAFT and SEALED forms
+    // SHOULD NOT BE RETURNED
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        brokerCompanySiret: company.siret,
+        sentAt: new Date("2020-03-01T00:00:00"),
+        wasteDetailsCode: "06 01 01*"
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        brokerCompanySiret: company.siret,
+        sentAt: new Date("2020-03-01T00:00:00"),
+        wasteDetailsCode: "06 01 01*"
+      }
+    });
+
+    // Form sent before the start date filter
+    // SHOULD NOT BE RETURNED
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "PROCESSED",
+        brokerCompanySiret: company.siret,
+        sentAt: new Date("2019-03-01T00:00:00"),
+        wasteDetailsCode: "06 01 01*"
+      }
+    });
+
+    // Form sent after the end date filter
+    // SHOULD NOT BE RETURNED
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "PROCESSED",
+        brokerCompanySiret: company.siret,
+        sentAt: new Date("2021-03-01T00:00:00"),
+        wasteDetailsCode: "06 01 01*"
+      }
+    });
+
+    // Form with different waste code
+    // SHOULD NOT BE RETURNED
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "PROCESSED",
+        brokerCompanySiret: company.siret,
+        sentAt: new Date("2020-03-01T00:00:00"),
+        wasteDetailsCode: "06 01 02*"
+      }
+    });
+
+    const whereInput = formsWhereInput(
+      "BROKERED",
+      [company.siret],
+      new Date("2020-01-01"),
+      new Date("2020-12-31"),
+      "06 01 01*"
+    );
+    const forms = await prisma.form.findMany({ where: whereInput });
+
+    expect(forms).toHaveLength(1);
+    expect(forms[0]).toEqual(form);
+  });
+
   test("ALL exportType", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 

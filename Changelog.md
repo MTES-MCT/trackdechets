@@ -5,6 +5,44 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2021.03.1] 16/03/2021
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout du rôle _courtier_ afin de suivre le cadre légal à venir. [PR 786](https://github.com/MTES-MCT/trackdechets/pull/786)
+
+- Ajout du champ `companyTypes` au type `CompanyPublic` retourné par la query `companyInfos` permettant de connaitre le profil d'un établissement inscrit sur Trackdéchets. Cette information apparait désormais également sur les fiches entreprise de l'interface Trackdéchets [PR 784](https://github.com/MTES-MCT/trackdechets/pull/784)
+- L'affichage sous forme de cartes est maintenant disponible pour l'ensemble des tableaux [PR 809](https://github.com/MTES-MCT/trackdechets/pull/809)
+
+#### :boom: Breaking changes
+
+- Seuls les établissements inscrits sur Trackdéchets en tant qu'installation de traitement ou de tri, transit, regoupement peuvent être visés en case 2 ou 14 [PR 784](https://github.com/MTES-MCT/trackdechets/pull/784)
+- Suppression du champ `companyTypes` du type `CompanySearchResult` retourné par la query `searchCompanies`. Ce champ avait été ajouté par erreur et renvoyait tout le temps `null` [PR 784](https://github.com/MTES-MCT/trackdechets/pull/784)
+- Validation exhaustive des champs pour les brouillons. Il était jusqu'à présent possible de saisir des valeurs invalides tant qu'un BSD était en brouillon. Les mêmes règles de validation que pour les bordereaux scéllés sont désormais appliquées [PR 764](https://github.com/MTES-MCT/trackdechets/pull/764)
+#### :bug: Corrections de bugs
+
+- Correction du support optionnel du champ "appendix2Forms" [PR 792](https://github.com/MTES-MCT/trackdechets/pull/792)
+- Correction de l'affichage des bordereaux à collecter après un entreposage provisoire [PR 811](https://github.com/MTES-MCT/trackdechets/pull/811)
+- Affichage du bouton de signature de l'enlèvement sur la vue détaillée d'un BSD [PR 809](https://github.com/MTES-MCT/trackdechets/pull/809)
+- Correction d'un bug lié à l'édition d'un segment du multimodal [PR 809](https://github.com/MTES-MCT/trackdechets/pull/809)
+- Correction de l'affichage du formulaire d'export du registre [PR 821](https://github.com/MTES-MCT/trackdechets/pull/821)
+
+#### :nail_care: Améliorations
+
+- Affichage de l'avertissement concernant les limites de Trackdéchets sur toutes les pages du dashboard [PR 809](https://github.com/MTES-MCT/trackdechets/pull/809)
+- Correction de divers problèmes d'accessibilité [PR 809](https://github.com/MTES-MCT/trackdechets/pull/809)
+- L'URL est mis à jour à l'ouverture de la modale d'aperçu d'un BSD [PR 809](https://github.com/MTES-MCT/trackdechets/pull/809)
+- L'affichage détaillée du multimodal, ainsi que l'édition d'un segment, se fait dorénavant depuis la fiche détaillée d'un BSD [PR 809](https://github.com/MTES-MCT/trackdechets/pull/809)
+
+#### :memo: Documentation
+
+#### :house: Interne
+- Prise en compte de la date d'activation pour les emails d'onboarding (au lieu de la date d'inscription) [PR 817](https://github.com/MTES-MCT/trackdechets/pull/817)
+- Segmentation des emails d'embarquement en fonction du profil utilisateur [PR 803](https://github.com/MTES-MCT/trackdechets/pull/803)
+- Utilisation d'un resolver GraphQL pour le scalaire DateTime [PR 802](https://github.com/MTES-MCT/trackdechets/pull/802)
+- Conversion du champ `processedAt` en champ date [PR 802](https://github.com/MTES-MCT/trackdechets/pull/802)
+- Les URLs de l'application ont évolués en vue de l'ajout future d'autres types de bordereaux, des redirections ont été mises en place [PR 809](https://github.com/MTES-MCT/trackdechets/pull/809)
+
 # [2021.02.2] 10/02/2021
 
 - Correction d'un bug empêchant l'utilisation de certains formats de date dans les mutations `markAsAccepted`, `markAsTempStorerAccepted` et `markAsSent` [PR 798](https://github.com/MTES-MCT/trackdechets/pull/798)
@@ -58,6 +96,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Mise à jour du template de PR Github [PR 756](https://github.com/MTES-MCT/trackdechets/pull/756)
+
 # [2021.01.1] 07/01/2021
 
 #### :rocket: Nouvelles fonctionnalités

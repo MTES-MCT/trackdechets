@@ -1,4 +1,10 @@
-import { getUid, sameDayMidnight, daysBetween, base32Encode } from "../utils";
+import {
+  getUid,
+  sameDayMidnight,
+  daysBetween,
+  base32Encode,
+  hashToken
+} from "../utils";
 
 test("getUid returns a unique identifier of fixed length", () => {
   const uid = getUid(10);
@@ -28,5 +34,16 @@ describe("base32Encode", () => {
     expect(base32Encode(31)).toEqual("Z");
     expect(base32Encode(32)).toEqual("10");
     expect(base32Encode(Math.pow(32, 9) - 1)).toEqual("ZZZZZZZZZ");
+  });
+
+  test("hashToken", () => {
+    const OLD_ENV = process.env;
+    process.env.API_TOKEN_SECRET = "loremipsum";
+    const someToken = "xyzef1234";
+
+    expect(hashToken(someToken)).toEqual(
+      "97706c213b37c5347a40da50f4ae1f34ef18503cd4ef33fd5e2780b0ed0bb3a7"
+    );
+    process.env = { ...OLD_ENV };
   });
 });

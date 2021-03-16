@@ -19,6 +19,7 @@ function matchesFavoriteType(
   const EMITTER: CompanyType[] = ["PRODUCER", "ECO_ORGANISME"];
   const TRANSPORTER: CompanyType[] = ["TRANSPORTER"];
   const TRADER: CompanyType[] = ["TRADER"];
+  const BROKER: CompanyType[] = ["BROKER"];
   const RECIPIENT: CompanyType[] = [
     "COLLECTOR",
     "WASTEPROCESSOR",
@@ -33,6 +34,7 @@ function matchesFavoriteType(
     EMITTER,
     TRANSPORTER,
     TRADER,
+    BROKER,
     RECIPIENT,
     DESTINATION,
     NEXT_DESTINATION,
@@ -70,6 +72,7 @@ async function getRecentPartners(
       { ecoOrganismeSiret: siret },
       { recipientCompanySiret: siret },
       { traderCompanySiret: siret },
+      { brokerCompanySiret: siret },
       {
         temporaryStorageDetail: { destinationCompanySiret: siret }
       },
@@ -143,6 +146,7 @@ async function getRecentPartners(
     case "TRANSPORTER":
     case "RECIPIENT":
     case "TRADER":
+    case "BROKER":
     case "NEXT_DESTINATION": {
       const lowerType = camelCase(type);
       const forms = await prisma.form.findMany({

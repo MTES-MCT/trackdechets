@@ -3,16 +3,11 @@
  */
 
 import prisma from "../prisma";
-import {
-  User,
-  Prisma,
-  Company,
-  TraderReceipt,
-  TransporterReceipt
-} from "@prisma/client";
+import { User, Prisma, Company } from "@prisma/client";
 import {
   CompanyNotFound,
   TraderReceiptNotFound,
+  BrokerReceiptNotFound,
   TransporterReceiptNotFound
 } from "./errors";
 import { CompanyMember } from "../generated/graphql/types";
@@ -192,6 +187,16 @@ export async function getTraderReceiptOrNotFound({
   return receipt;
 }
 
+export async function getBrokerReceiptOrNotFound({
+  id
+}: Prisma.BrokerReceiptWhereUniqueInput) {
+  const receipt = await prisma.brokerReceipt.findUnique({ where: { id } });
+  if (receipt == null) {
+    throw new BrokerReceiptNotFound();
+  }
+  return receipt;
+}
+
 export async function getTransporterReceiptOrNotFound({
   id
 }: Prisma.TransporterReceiptWhereUniqueInput) {
@@ -200,19 +205,6 @@ export async function getTransporterReceiptOrNotFound({
     throw new TransporterReceiptNotFound();
   }
   return receipt;
-}
-
-export function stringifyDates(obj: TraderReceipt | TransporterReceipt) {
-  if (!obj) {
-    return null;
-  }
-
-  return {
-    ...obj,
-    ...(obj?.validityLimit && {
-      validityLimit: obj.validityLimit.toISOString()
-    })
-  };
 }
 
 export function convertUrls<T extends Partial<Company>>(

@@ -1,5 +1,6 @@
 """
-The `DateTime` scalar expects a date-formatted string matching one of the following formats:
+Le scalaire `DateTime` accepte des chaines de caractères
+formattées selon le standard ISO 8601. Exemples:
 - "yyyy-MM-dd" (eg. 2020-11-23)
 - "yyyy-MM-ddTHH:mm:ss" (eg. 2020-11-23T13:34:55)
 - "yyyy-MM-ddTHH:mm:ssX" (eg. 2020-11-23T13:34:55Z)
@@ -17,7 +18,7 @@ type Query {
     id: ID
     "Identifiant lisible du BSD"
     readableId: String
-  ): Form
+  ): Form!
 
   """
   Renvoie les BSDs de l'établissement sélectionné.
@@ -530,6 +531,8 @@ enum FormRole {
   EMITTER
   "Les BSD's dont je suis le négociant"
   TRADER
+  "Les BSD's dont je suis le courtier"
+  BROKER
   "Les BSD's dont je suis éco-organisme"
   ECO_ORGANISME
 }
@@ -566,7 +569,7 @@ type Form {
   "Établissement émetteur/producteur du déchet (case 1)"
   emitter: Emitter
 
-  "Établissement qui reçoit le déchet (case 2)"
+  "Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)"
   recipient: Recipient
 
   "Transporteur du déchet (case 8)"
@@ -577,6 +580,9 @@ type Form {
 
   "Négociant (case 7)"
   trader: Trader
+
+  "Courtier"
+  broker: Broker
 
   "Date de création du BSD"
   createdAt: DateTime
@@ -975,6 +981,21 @@ type Trader {
   validityLimit: DateTime
 }
 
+"Courtier"
+type Broker {
+  "Établissement courtier"
+  company: FormCompany
+
+  "N° de récipissé"
+  receipt: String
+
+  "Département"
+  department: String
+
+  "Limite de validité"
+  validityLimit: DateTime
+}
+
 "Statistiques d'un établissement"
 type CompanyStat {
   "Établissement"
@@ -1046,6 +1067,11 @@ enum FormsRegisterExportType {
   Art 4: Les négociants tiennent à jour un registre chronologique des déchets détenus.
   """
   TRADED
+
+  """
+  Registre courtier
+  """
+  BROKERED
 }
 
 """

@@ -1,5 +1,7 @@
+import { CompanyType } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
+import { companyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import * as sirene from "../../../sirene";
 
@@ -34,6 +36,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
           naf
           libelleNaf
           isRegistered
+          companyTypes
           contactEmail
           contactPhone
           website
@@ -52,6 +55,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       naf: "62.01Z",
       libelleNaf: "Programmation informatique",
       isRegistered: false,
+      companyTypes: [],
       contactEmail: null,
       contactPhone: null,
       website: null,
@@ -70,14 +74,14 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       libelleNaf: "Programmation informatique"
     });
 
-    await prisma.company.create({
-      data: {
-        siret: "85001946400013",
-        name: "Code en Stock",
-        securityCode: 1234,
-        contactEmail: "john.snow@trackdechets.fr",
-        contactPhone: "0600000000",
-        website: "https://trackdechets.beta.gouv.fr"
+    await companyFactory({
+      siret: "85001946400013",
+      name: "Code en Stock",
+      contactEmail: "john.snow@trackdechets.fr",
+      contactPhone: "0600000000",
+      website: "https://trackdechets.beta.gouv.fr",
+      companyTypes: {
+        set: [CompanyType.WASTEPROCESSOR]
       }
     });
 
@@ -97,6 +101,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
           naf
           libelleNaf
           isRegistered
+          companyTypes
           contactEmail
           contactPhone
           website
@@ -115,6 +120,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       naf: "62.01Z",
       libelleNaf: "Programmation informatique",
       isRegistered: true,
+      companyTypes: [CompanyType.WASTEPROCESSOR],
       contactEmail: "john.snow@trackdechets.fr",
       contactPhone: "0600000000",
       website: "https://trackdechets.beta.gouv.fr",

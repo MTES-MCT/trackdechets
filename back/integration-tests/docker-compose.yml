@@ -27,4 +27,9 @@ services:
       VIRTUAL_HOST: $API_HOST
       LETSENCRYPT_HOST: $API_HOST
       EMAIL_BACKEND: "sendinblue"
+      SIB_BASE_URL: "http://mailservice"
       MAIN_TEMPLATE_ID: "9"
+      PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID: "10"
+      PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID: "11"
+      SENDER_EMAIL_ADDRESS: "us@td.test"
+      SENDER_NAME: "Wastetracker corp."

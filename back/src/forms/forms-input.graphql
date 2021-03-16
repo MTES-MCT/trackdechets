@@ -149,7 +149,11 @@ input CreateFormInput {
   "Établissement émetteur/producteur du déchet (case 1)"
   emitter: EmitterInput
 
-  "Établissement qui reçoit le déchet (case 2)"
+  """
+  Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+  L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+  de traitement ou de tri, transit, regroupement.
+  """
   recipient: RecipientInput
 
   "Transporteur du déchet (case 8)"
@@ -161,8 +165,11 @@ input CreateFormInput {
   "Négociant (case 7)"
   trader: TraderInput
 
+  "Courtier"
+  broker: BrokerInput
+
   "Annexe 2"
-  appendix2Forms: [AppendixFormInput]
+  appendix2Forms: [AppendixFormInput!]
   ecoOrganisme: EcoOrganismeInput
 
   temporaryStorageDetail: TemporaryStorageDetailInput
@@ -182,7 +189,11 @@ input UpdateFormInput {
   "Établissement émetteur/producteur du déchet (case 1)"
   emitter: EmitterInput
 
-  "Établissement qui reçoit le déchet (case 2)"
+  """
+  Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+  L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+  de traitement ou de tri, transit, regroupement.
+  """
   recipient: RecipientInput
 
   "Transporteur du déchet (case 8)"
@@ -194,8 +205,11 @@ input UpdateFormInput {
   "Négociant (case 7)"
   trader: TraderInput
 
+  "Courtier"
+  broker: BrokerInput
+
   "Annexe 2"
-  appendix2Forms: [AppendixFormInput]
+  appendix2Forms: [AppendixFormInput!]
   ecoOrganisme: EcoOrganismeInput
 
   temporaryStorageDetail: TemporaryStorageDetailInput
@@ -215,7 +229,11 @@ input FormInput {
   "Établissement émetteur/producteur du déchet (case 1)"
   emitter: EmitterInput
 
-  "Établissement qui reçoit le déchet (case 2)"
+  """
+  Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+  L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+  de traitement ou de tri, transit, regroupement.
+  """
   recipient: RecipientInput
 
   "Transporteur du déchet (case 8)"
@@ -227,8 +245,11 @@ input FormInput {
   "Négociant (case 7)"
   trader: TraderInput
 
+  "Courtier"
+  broker: BrokerInput
+
   "Annexe 2"
-  appendix2Forms: [AppendixFormInput]
+  appendix2Forms: [AppendixFormInput!]
   ecoOrganisme: EcoOrganismeInput
 
   temporaryStorageDetail: TemporaryStorageDetailInput
@@ -259,7 +280,11 @@ input TemporaryStorageDetailInput {
 }
 
 input DestinationInput {
-  "Installation de destination prévue"
+  """
+  Installation de destination prévue (case 14)
+  L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+  de traitement ou de tri, transit, regroupement.
+  """
   company: CompanyInput
 
   "N° de CAP prévu (le cas échéant)"
@@ -400,6 +425,21 @@ input TraderInput {
   validityLimit: DateTime
 
   "Établissement négociant"
+  company: CompanyInput
+}
+
+"Payload lié au courtier"
+input BrokerInput {
+  "N° de récipissé"
+  receipt: String
+
+  "Département"
+  department: String
+
+  "Limite de validité"
+  validityLimit: DateTime
+
+  "Établissement courtier"
   company: CompanyInput
 }
 
@@ -570,7 +610,11 @@ input ImportPaperFormInput {
   "Établissement émetteur/producteur du déchet (case 1)"
   emitter: EmitterInput
 
-  "Établissement qui reçoit le déchet (case 2)"
+  """
+  Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+  L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+  de traitement ou de tri, transit, regroupement.
+  """
   recipient: RecipientInput
 
   "Transporteur du déchet (case 8)"
@@ -581,6 +625,9 @@ input ImportPaperFormInput {
 
   "Négociant (case 7)"
   trader: TraderInput
+
+  "Courtier"
+  broker: BrokerInput
 
   "Éco-organisme (apparait en case 1)"
   ecoOrganisme: EcoOrganismeInput

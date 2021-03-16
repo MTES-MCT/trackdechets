@@ -14,7 +14,8 @@ export type Scalars = {
   Int: number;
   Float: number;
   /**
-   * The `DateTime` scalar expects a date-formatted string matching one of the following formats:
+   * Le scalaire `DateTime` accepte des chaines de caractères
+   * formattées selon le standard ISO 8601. Exemples:
    * - "yyyy-MM-dd" (eg. 2020-11-23)
    * - "yyyy-MM-ddTHH:mm:ss" (eg. 2020-11-23T13:34:55)
    * - "yyyy-MM-ddTHH:mm:ssX" (eg. 2020-11-23T13:34:55Z)
@@ -66,6 +67,43 @@ export type AuthPayload = {
   user: User;
 };
 
+/** Courtier */
+export type Broker = {
+  __typename?: "Broker";
+  /** Établissement courtier */
+  company: Maybe<FormCompany>;
+  /** N° de récipissé */
+  receipt: Maybe<Scalars["String"]>;
+  /** Département */
+  department: Maybe<Scalars["String"]>;
+  /** Limite de validité */
+  validityLimit: Maybe<Scalars["DateTime"]>;
+};
+
+/** Payload lié au courtier */
+export type BrokerInput = {
+  /** N° de récipissé */
+  receipt: Maybe<Scalars["String"]>;
+  /** Département */
+  department: Maybe<Scalars["String"]>;
+  /** Limite de validité */
+  validityLimit: Maybe<Scalars["DateTime"]>;
+  /** Établissement courtier */
+  company: Maybe<CompanyInput>;
+};
+
+/** Récépissé courtier */
+export type BrokerReceipt = {
+  __typename?: "BrokerReceipt";
+  id: Scalars["ID"];
+  /** Numéro de récépissé courtier */
+  receiptNumber: Scalars["String"];
+  /** Limite de validité du récépissé */
+  validityLimit: Scalars["DateTime"];
+  /** Département ayant enregistré la déclaration */
+  department: Scalars["String"];
+};
+
 /**
  * Information sur établissement accessible dans la liste des favoris
  * La liste des favoris est constituée à partir de l'historique des
@@ -89,6 +127,8 @@ export type CompanyFavorite = {
   transporterReceipt: Maybe<TransporterReceipt>;
   /** Récépissé négociant associé à cet établissement (le cas échant) */
   traderReceipt: Maybe<TraderReceipt>;
+  /** Récépissé courtier associé à cet établissement (le cas échant) */
+  brokerReceipt: Maybe<BrokerReceipt>;
 };
 
 /** Payload d'un établissement */
@@ -169,8 +209,10 @@ export type CompanyPrivate = {
   installation: Maybe<Installation>;
   /** Récépissé transporteur (le cas échéant, pour les profils transporteur) */
   transporterReceipt: Maybe<TransporterReceipt>;
-  /** Récépissé négociant (le cas échéant, pour les profils transporteur) */
+  /** Récépissé négociant (le cas échéant, pour les profils négociant) */
   traderReceipt: Maybe<TraderReceipt>;
+  /** Récépissé courtier (le cas échéant, pour les profils courtier) */
+  brokerReceipt: Maybe<BrokerReceipt>;
   /** Liste des agréments de l'éco-organisme */
   ecoOrganismeAgreements: Array<Scalars["URL"]>;
 };
@@ -203,10 +245,18 @@ export type CompanyPublic = {
   installation: Maybe<Installation>;
   /** Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets */
   isRegistered: Maybe<Scalars["Boolean"]>;
+  /**
+   * Profil de l'établissement sur Trackdéchets
+   * ayant pour valeur un tableau vide quand l'établissement
+   * n'est pas inscrit sur la plateforme `isRegistered=false`
+   */
+  companyTypes: Array<CompanyType>;
   /** Récépissé transporteur associé à cet établissement (le cas échéant) */
   transporterReceipt: Maybe<TransporterReceipt>;
   /** Récépissé négociant associé à cet établissement (le cas échant) */
   traderReceipt: Maybe<TraderReceipt>;
+  /** Récépissé courtier associé à cet établissement (le cas échant) */
+  brokerReceipt: Maybe<BrokerReceipt>;
   /** Liste des agréments de l'éco-organisme */
   ecoOrganismeAgreements: Array<Scalars["URL"]>;
 };
@@ -224,8 +274,6 @@ export type CompanySearchResult = {
   codeCommune: Maybe<Scalars["String"]>;
   /** Nom de l'établissement */
   name: Maybe<Scalars["String"]>;
-  /** Profil de l'établissement */
-  companyTypes: Maybe<Array<Maybe<CompanyType>>>;
   /** Code NAF */
   naf: Maybe<Scalars["String"]>;
   /** Libellé NAF */
@@ -239,6 +287,8 @@ export type CompanySearchResult = {
   transporterReceipt: Maybe<TransporterReceipt>;
   /** Récépissé négociant associé à cet établissement (le cas échant) */
   traderReceipt: Maybe<TraderReceipt>;
+  /** Récépissé courtier associé à cet établissement (le cas échant) */
+  brokerReceipt: Maybe<BrokerReceipt>;
 };
 
 /** Statistiques d'un établissement */
@@ -266,6 +316,8 @@ export enum CompanyType {
   WasteCenter = "WASTE_CENTER",
   /** Négociant */
   Trader = "TRADER",
+  /** Courtier */
+  Broker = "BROKER",
   /** Éco-organisme */
   EcoOrganisme = "ECO_ORGANISME"
 }
@@ -282,6 +334,16 @@ export enum Consistence {
   Doughy = "DOUGHY"
 }
 
+/** Payload de création d'un récépissé courtier */
+export type CreateBrokerReceiptInput = {
+  /** Numéro de récépissé courtier */
+  receiptNumber: Scalars["String"];
+  /** Limite de validité du récépissé */
+  validityLimit: Scalars["DateTime"];
+  /** Département ayant enregistré la déclaration */
+  department: Scalars["String"];
+};
+
 /** Payload de création d'un bordereau */
 export type CreateFormInput = {
   /**
@@ -291,7 +353,11 @@ export type CreateFormInput = {
   customId: Maybe<Scalars["String"]>;
   /** Établissement émetteur/producteur du déchet (case 1) */
   emitter: Maybe<EmitterInput>;
-  /** Établissement qui reçoit le déchet (case 2) */
+  /**
+   * Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+   * L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+   * de traitement ou de tri, transit, regroupement.
+   */
   recipient: Maybe<RecipientInput>;
   /** Transporteur du déchet (case 8) */
   transporter: Maybe<TransporterInput>;
@@ -299,8 +365,10 @@ export type CreateFormInput = {
   wasteDetails: Maybe<WasteDetailsInput>;
   /** Négociant (case 7) */
   trader: Maybe<TraderInput>;
+  /** Courtier */
+  broker: Maybe<BrokerInput>;
   /** Annexe 2 */
-  appendix2Forms: Maybe<Array<Maybe<AppendixFormInput>>>;
+  appendix2Forms: Maybe<Array<AppendixFormInput>>;
   ecoOrganisme: Maybe<EcoOrganismeInput>;
   temporaryStorageDetail: Maybe<TemporaryStorageDetailInput>;
 };
@@ -309,7 +377,7 @@ export type CreateFormInput = {
 export type CreateTraderReceiptInput = {
   /** Numéro de récépissé négociant */
   receiptNumber: Scalars["String"];
-  /** Limite de validatié du récépissé */
+  /** Limite de validité du récépissé */
   validityLimit: Scalars["DateTime"];
   /** Département ayant enregistré la déclaration */
   department: Scalars["String"];
@@ -319,7 +387,7 @@ export type CreateTraderReceiptInput = {
 export type CreateTransporterReceiptInput = {
   /** Numéro de récépissé transporteur */
   receiptNumber: Scalars["String"];
-  /** Limite de validatié du récépissé */
+  /** Limite de validité du récépissé */
   validityLimit: Scalars["DateTime"];
   /** Département ayant enregistré la déclaration */
   department: Scalars["String"];
@@ -336,6 +404,12 @@ export type Declaration = {
   libDechet: Maybe<Scalars["String"]>;
   /** Type de déclaration GEREP: producteur ou traiteur */
   gerepType: Maybe<GerepType>;
+};
+
+/** Payload de suppression d'un récépissé courtier */
+export type DeleteBrokerReceiptInput = {
+  /** The id of the broker receipt to delete */
+  id: Scalars["ID"];
 };
 
 /** Payload de suppression d'un récépissé négociant */
@@ -363,7 +437,11 @@ export type Destination = {
 };
 
 export type DestinationInput = {
-  /** Installation de destination prévue */
+  /**
+   * Installation de destination prévue (case 14)
+   * L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+   * de traitement ou de tri, transit, regroupement.
+   */
   company: Maybe<CompanyInput>;
   /** N° de CAP prévu (le cas échéant) */
   cap: Maybe<Scalars["String"]>;
@@ -441,6 +519,7 @@ export enum FavoriteType {
   Transporter = "TRANSPORTER",
   Recipient = "RECIPIENT",
   Trader = "TRADER",
+  Broker = "BROKER",
   NextDestination = "NEXT_DESTINATION",
   TemporaryStorageDetail = "TEMPORARY_STORAGE_DETAIL",
   Destination = "DESTINATION"
@@ -486,7 +565,7 @@ export type Form = {
   isImportedFromPaper: Scalars["Boolean"];
   /** Établissement émetteur/producteur du déchet (case 1) */
   emitter: Maybe<Emitter>;
-  /** Établissement qui reçoit le déchet (case 2) */
+  /** Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2) */
   recipient: Maybe<Recipient>;
   /** Transporteur du déchet (case 8) */
   transporter: Maybe<Transporter>;
@@ -494,6 +573,8 @@ export type Form = {
   wasteDetails: Maybe<WasteDetails>;
   /** Négociant (case 7) */
   trader: Maybe<Trader>;
+  /** Courtier */
+  broker: Maybe<Broker>;
   /** Date de création du BSD */
   createdAt: Maybe<Scalars["DateTime"]>;
   /** Date de la dernière modification du BSD */
@@ -591,7 +672,11 @@ export type FormInput = {
   customId: Maybe<Scalars["String"]>;
   /** Établissement émetteur/producteur du déchet (case 1) */
   emitter: Maybe<EmitterInput>;
-  /** Établissement qui reçoit le déchet (case 2) */
+  /**
+   * Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+   * L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+   * de traitement ou de tri, transit, regroupement.
+   */
   recipient: Maybe<RecipientInput>;
   /** Transporteur du déchet (case 8) */
   transporter: Maybe<TransporterInput>;
@@ -599,8 +684,10 @@ export type FormInput = {
   wasteDetails: Maybe<WasteDetailsInput>;
   /** Négociant (case 7) */
   trader: Maybe<TraderInput>;
+  /** Courtier */
+  broker: Maybe<BrokerInput>;
   /** Annexe 2 */
-  appendix2Forms: Maybe<Array<Maybe<AppendixFormInput>>>;
+  appendix2Forms: Maybe<Array<AppendixFormInput>>;
   ecoOrganisme: Maybe<EcoOrganismeInput>;
   temporaryStorageDetail: Maybe<TemporaryStorageDetailInput>;
 };
@@ -614,6 +701,8 @@ export enum FormRole {
   Emitter = "EMITTER",
   /** Les BSD's dont je suis le négociant */
   Trader = "TRADER",
+  /** Les BSD's dont je suis le courtier */
+  Broker = "BROKER",
   /** Les BSD's dont je suis éco-organisme */
   EcoOrganisme = "ECO_ORGANISME"
 }
@@ -674,7 +763,9 @@ export enum FormsRegisterExportType {
    * Registre négociants
    * Art 4: Les négociants tiennent à jour un registre chronologique des déchets détenus.
    */
-  Traded = "TRADED"
+  Traded = "TRADED",
+  /** Registre courtier */
+  Brokered = "BROKERED"
 }
 
 /** Différents statuts d'un BSD au cours de son cycle de vie */
@@ -753,7 +844,11 @@ export type ImportPaperFormInput = {
   customId: Maybe<Scalars["String"]>;
   /** Établissement émetteur/producteur du déchet (case 1) */
   emitter: Maybe<EmitterInput>;
-  /** Établissement qui reçoit le déchet (case 2) */
+  /**
+   * Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+   * L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+   * de traitement ou de tri, transit, regroupement.
+   */
   recipient: Maybe<RecipientInput>;
   /** Transporteur du déchet (case 8) */
   transporter: Maybe<TransporterInput>;
@@ -761,6 +856,8 @@ export type ImportPaperFormInput = {
   wasteDetails: Maybe<WasteDetailsInput>;
   /** Négociant (case 7) */
   trader: Maybe<TraderInput>;
+  /** Courtier */
+  broker: Maybe<BrokerInput>;
   /** Éco-organisme (apparait en case 1) */
   ecoOrganisme: Maybe<EcoOrganismeInput>;
   /** Informations liées aux signatures transporteur et émetteur (case 8 et 9) */
@@ -879,6 +976,11 @@ export type Mutation = {
   changePassword: User;
   /**
    * USAGE INTERNE
+   * Crée un récépissé courtier
+   */
+  createBrokerReceipt: Maybe<BrokerReceipt>;
+  /**
+   * USAGE INTERNE
    * Rattache un établissement à l'utilisateur authentifié
    */
   createCompany: CompanyPrivate;
@@ -886,7 +988,7 @@ export type Mutation = {
   createForm: Form;
   /**
    * USAGE INTERNE
-   * Crée un récépissé transporteur
+   * Crée un récépissé négociant
    */
   createTraderReceipt: Maybe<TraderReceipt>;
   /**
@@ -899,6 +1001,11 @@ export type Mutation = {
    * Récupère une URL signé pour l'upload d'un fichier
    */
   createUploadLink: UploadLink;
+  /**
+   * USAGE INTERNE
+   * Supprime un récépissé courtier
+   */
+  deleteBrokerReceipt: Maybe<BrokerReceipt>;
   /** Supprime un BSD */
   deleteForm: Maybe<Form>;
   /**
@@ -910,7 +1017,7 @@ export type Mutation = {
    * USAGE INTERNE
    * Supprime un récépissé négociant
    */
-  deleteTraderReceipt: Maybe<TransporterReceipt>;
+  deleteTraderReceipt: Maybe<TraderReceipt>;
   /**
    * USAGE INTERNE
    * Supprime un récépissé transporteur
@@ -1094,6 +1201,11 @@ export type Mutation = {
   takeOverSegment: Maybe<TransportSegment>;
   /**
    * USAGE INTERNE
+   * Édite les informations d'un récépissé courtier
+   */
+  updateBrokerReceipt: Maybe<BrokerReceipt>;
+  /**
+   * USAGE INTERNE
    * Édite les informations d'un établissement
    */
   updateCompany: CompanyPrivate;
@@ -1123,6 +1235,10 @@ export type MutationChangePasswordArgs = {
   newPassword: Scalars["String"];
 };
 
+export type MutationCreateBrokerReceiptArgs = {
+  input: CreateBrokerReceiptInput;
+};
+
 export type MutationCreateCompanyArgs = {
   companyInput: PrivateCompanyInput;
 };
@@ -1142,6 +1258,10 @@ export type MutationCreateTransporterReceiptArgs = {
 export type MutationCreateUploadLinkArgs = {
   fileName: Scalars["String"];
   fileType: Scalars["String"];
+};
+
+export type MutationDeleteBrokerReceiptArgs = {
+  input: DeleteBrokerReceiptInput;
 };
 
 export type MutationDeleteFormArgs = {
@@ -1296,6 +1416,10 @@ export type MutationTakeOverSegmentArgs = {
   takeOverInfo: TakeOverInput;
 };
 
+export type MutationUpdateBrokerReceiptArgs = {
+  input: UpdateBrokerReceiptInput;
+};
+
 export type MutationUpdateCompanyArgs = {
   siret: Scalars["String"];
   gerepId: Maybe<Scalars["String"]>;
@@ -1306,6 +1430,7 @@ export type MutationUpdateCompanyArgs = {
   givenName: Maybe<Scalars["String"]>;
   transporterReceiptId: Maybe<Scalars["String"]>;
   traderReceiptId: Maybe<Scalars["String"]>;
+  brokerReceiptId: Maybe<Scalars["String"]>;
   ecoOrganismeAgreements: Maybe<Array<Scalars["URL"]>>;
 };
 
@@ -1404,6 +1529,8 @@ export type PrivateCompanyInput = {
   transporterReceiptId: Maybe<Scalars["String"]>;
   /** Récipissé négociant (le cas échéant, pour les profils négociant) */
   traderReceiptId: Maybe<Scalars["String"]>;
+  /** Récipissé courtier (le cas échéant, pour les profils courtier) */
+  brokerReceiptId: Maybe<Scalars["String"]>;
   /** Liste des agréments de l'éco-organisme */
   ecoOrganismeAgreements: Maybe<Array<Scalars["URL"]>>;
 };
@@ -1458,7 +1585,7 @@ export type Query = {
    */
   favorites: Array<CompanyFavorite>;
   /** Renvoie un BSD sélectionné par son ID (opaque ou lisible, l'un des deux doit être fourni) */
-  form: Maybe<Form>;
+  form: Form;
   /**
    * Renvoie un token pour télécharger un pdf de BSD
    * Ce token doit être transmis à la route /download pour obtenir le fichier.
@@ -1938,7 +2065,7 @@ export type TraderReceipt = {
   id: Scalars["ID"];
   /** Numéro de récépissé négociant */
   receiptNumber: Scalars["String"];
-  /** Limite de validatié du récépissé */
+  /** Limite de validité du récépissé */
   validityLimit: Scalars["DateTime"];
   /** Département ayant enregistré la déclaration */
   department: Scalars["String"];
@@ -1987,7 +2114,7 @@ export type TransporterReceipt = {
   id: Scalars["ID"];
   /** Numéro de récépissé transporteur */
   receiptNumber: Scalars["String"];
-  /** Limite de validatié du récépissé */
+  /** Limite de validité du récépissé */
   validityLimit: Scalars["DateTime"];
   /** Département ayant enregistré la déclaration */
   department: Scalars["String"];
@@ -2044,6 +2171,18 @@ export type TransportSegment = {
   segmentNumber: Maybe<Scalars["Int"]>;
 };
 
+/** Payload d'édition d'un récépissé courtier */
+export type UpdateBrokerReceiptInput = {
+  /** The id of the broker receipt to modify */
+  id: Scalars["ID"];
+  /** Numéro de récépissé courtier */
+  receiptNumber: Maybe<Scalars["String"]>;
+  /** Limite de validité du récépissé */
+  validityLimit: Maybe<Scalars["DateTime"]>;
+  /** Département ayant enregistré la déclaration */
+  department: Maybe<Scalars["String"]>;
+};
+
 /** Payload de mise à jour d'un bordereau */
 export type UpdateFormInput = {
   /** Identifiant opaque */
@@ -2055,7 +2194,11 @@ export type UpdateFormInput = {
   customId: Maybe<Scalars["String"]>;
   /** Établissement émetteur/producteur du déchet (case 1) */
   emitter: Maybe<EmitterInput>;
-  /** Établissement qui reçoit le déchet (case 2) */
+  /**
+   * Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+   * L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+   * de traitement ou de tri, transit, regroupement.
+   */
   recipient: Maybe<RecipientInput>;
   /** Transporteur du déchet (case 8) */
   transporter: Maybe<TransporterInput>;
@@ -2063,19 +2206,21 @@ export type UpdateFormInput = {
   wasteDetails: Maybe<WasteDetailsInput>;
   /** Négociant (case 7) */
   trader: Maybe<TraderInput>;
+  /** Courtier */
+  broker: Maybe<BrokerInput>;
   /** Annexe 2 */
-  appendix2Forms: Maybe<Array<Maybe<AppendixFormInput>>>;
+  appendix2Forms: Maybe<Array<AppendixFormInput>>;
   ecoOrganisme: Maybe<EcoOrganismeInput>;
   temporaryStorageDetail: Maybe<TemporaryStorageDetailInput>;
 };
 
-/** Payload d'édition d'un récépissé transporteur */
+/** Payload d'édition d'un récépissé négociant */
 export type UpdateTraderReceiptInput = {
   /** The id of the trader receipt to modify */
   id: Scalars["ID"];
-  /** Numéro de récépissé transporteur */
+  /** Numéro de récépissé négociant */
   receiptNumber: Maybe<Scalars["String"]>;
-  /** Limite de validatié du récépissé */
+  /** Limite de validité du récépissé */
   validityLimit: Maybe<Scalars["DateTime"]>;
   /** Département ayant enregistré la déclaration */
   department: Maybe<Scalars["String"]>;
@@ -2087,7 +2232,7 @@ export type UpdateTransporterReceiptInput = {
   id: Scalars["ID"];
   /** Numéro de récépissé transporteur */
   receiptNumber: Maybe<Scalars["String"]>;
-  /** Limite de validatié du récépissé */
+  /** Limite de validité du récépissé */
   validityLimit: Maybe<Scalars["DateTime"]>;
   /** Département ayant enregistré la déclaration */
   department: Maybe<Scalars["String"]>;
@@ -2292,6 +2437,42 @@ export function createAuthPayloadMock(
   };
 }
 
+export function createBrokerMock(props: Partial<Broker>): Broker {
+  return {
+    __typename: "Broker",
+    company: null,
+    receipt: null,
+    department: null,
+    validityLimit: null,
+    ...props
+  };
+}
+
+export function createBrokerInputMock(
+  props: Partial<BrokerInput>
+): BrokerInput {
+  return {
+    receipt: null,
+    department: null,
+    validityLimit: null,
+    company: null,
+    ...props
+  };
+}
+
+export function createBrokerReceiptMock(
+  props: Partial<BrokerReceipt>
+): BrokerReceipt {
+  return {
+    __typename: "BrokerReceipt",
+    id: "",
+    receiptNumber: "",
+    validityLimit: new Date().toISOString(),
+    department: "",
+    ...props
+  };
+}
+
 export function createCompanyFavoriteMock(
   props: Partial<CompanyFavorite>
 ): CompanyFavorite {
@@ -2305,6 +2486,7 @@ export function createCompanyFavoriteMock(
     mail: null,
     transporterReceipt: null,
     traderReceipt: null,
+    brokerReceipt: null,
     ...props
   };
 }
@@ -2362,6 +2544,7 @@ export function createCompanyPrivateMock(
     installation: null,
     transporterReceipt: null,
     traderReceipt: null,
+    brokerReceipt: null,
     ecoOrganismeAgreements: [],
     ...props
   };
@@ -2383,8 +2566,10 @@ export function createCompanyPublicMock(
     libelleNaf: null,
     installation: null,
     isRegistered: null,
+    companyTypes: [],
     transporterReceipt: null,
     traderReceipt: null,
+    brokerReceipt: null,
     ecoOrganismeAgreements: [],
     ...props
   };
@@ -2400,12 +2585,12 @@ export function createCompanySearchResultMock(
     address: null,
     codeCommune: null,
     name: null,
-    companyTypes: null,
     naf: null,
     libelleNaf: null,
     installation: null,
     transporterReceipt: null,
     traderReceipt: null,
+    brokerReceipt: null,
     ...props
   };
 }
@@ -2421,6 +2606,17 @@ export function createCompanyStatMock(
   };
 }
 
+export function createCreateBrokerReceiptInputMock(
+  props: Partial<CreateBrokerReceiptInput>
+): CreateBrokerReceiptInput {
+  return {
+    receiptNumber: "",
+    validityLimit: new Date().toISOString(),
+    department: "",
+    ...props
+  };
+}
+
 export function createCreateFormInputMock(
   props: Partial<CreateFormInput>
 ): CreateFormInput {
@@ -2431,6 +2627,7 @@ export function createCreateFormInputMock(
     transporter: null,
     wasteDetails: null,
     trader: null,
+    broker: null,
     appendix2Forms: null,
     ecoOrganisme: null,
     temporaryStorageDetail: null,
@@ -2469,6 +2666,15 @@ export function createDeclarationMock(
     codeDechet: null,
     libDechet: null,
     gerepType: null,
+    ...props
+  };
+}
+
+export function createDeleteBrokerReceiptInputMock(
+  props: Partial<DeleteBrokerReceiptInput>
+): DeleteBrokerReceiptInput {
+  return {
+    id: "",
     ...props
   };
 }
@@ -2584,6 +2790,7 @@ export function createFormMock(props: Partial<Form>): Form {
     transporter: null,
     wasteDetails: null,
     trader: null,
+    broker: null,
     createdAt: null,
     updatedAt: null,
     status: FormStatus.Draft,
@@ -2650,6 +2857,7 @@ export function createFormInputMock(props: Partial<FormInput>): FormInput {
     transporter: null,
     wasteDetails: null,
     trader: null,
+    broker: null,
     appendix2Forms: null,
     ecoOrganisme: null,
     temporaryStorageDetail: null,
@@ -2696,6 +2904,7 @@ export function createImportPaperFormInputMock(
     transporter: null,
     wasteDetails: null,
     trader: null,
+    broker: null,
     ecoOrganisme: null,
     signingInfo: createSignatureFormInputMock({}),
     receivedInfo: createReceivedFormInputMock({}),
@@ -2827,6 +3036,7 @@ export function createPrivateCompanyInputMock(
     address: null,
     transporterReceiptId: null,
     traderReceiptId: null,
+    brokerReceiptId: null,
     ecoOrganismeAgreements: null,
     ...props
   };
@@ -3222,6 +3432,18 @@ export function createTransportSegmentMock(
   };
 }
 
+export function createUpdateBrokerReceiptInputMock(
+  props: Partial<UpdateBrokerReceiptInput>
+): UpdateBrokerReceiptInput {
+  return {
+    id: "",
+    receiptNumber: null,
+    validityLimit: null,
+    department: null,
+    ...props
+  };
+}
+
 export function createUpdateFormInputMock(
   props: Partial<UpdateFormInput>
 ): UpdateFormInput {
@@ -3233,6 +3455,7 @@ export function createUpdateFormInputMock(
     transporter: null,
     wasteDetails: null,
     trader: null,
+    broker: null,
     appendix2Forms: null,
     ecoOrganisme: null,
     temporaryStorageDetail: null,

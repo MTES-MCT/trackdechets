@@ -74,7 +74,7 @@ Renvoie la liste des éco-organismes
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>form</strong></td>
-<td valign="top"><a href="#form">Form</a></td>
+<td valign="top"><a href="#form">Form</a>!</td>
 <td>
 
 Renvoie un BSD sélectionné par son ID (opaque ou lisible, l'un des deux doit être fourni)
@@ -1155,6 +1155,108 @@ Utilisateur lié au token
 </tbody>
 </table>
 
+### Broker
+
+Courtier
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+
+Établissement courtier
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receipt</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+N° de récipissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Département
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Limite de validité
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BrokerReceipt
+
+Récépissé courtier
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receiptNumber</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Numéro de récépissé courtier
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Limite de validité du récépissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Département ayant enregistré la déclaration
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### CompanyMember
 
 Information sur utilisateur au sein d'un établissement
@@ -1409,7 +1511,16 @@ Récépissé transporteur (le cas échéant, pour les profils transporteur)
 <td valign="top"><a href="#traderreceipt">TraderReceipt</a></td>
 <td>
 
-Récépissé négociant (le cas échéant, pour les profils transporteur)
+Récépissé négociant (le cas échéant, pour les profils négociant)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>brokerReceipt</strong></td>
+<td valign="top"><a href="#brokerreceipt">BrokerReceipt</a></td>
+<td>
+
+Récépissé courtier (le cas échéant, pour les profils courtier)
 
 </td>
 </tr>
@@ -1540,6 +1651,17 @@ Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>companyTypes</strong></td>
+<td valign="top">[<a href="#companytype">CompanyType</a>!]!</td>
+<td>
+
+Profil de l'établissement sur Trackdéchets
+ayant pour valeur un tableau vide quand l'établissement
+n'est pas inscrit sur la plateforme `isRegistered=false`
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>transporterReceipt</strong></td>
 <td valign="top"><a href="#transporterreceipt">TransporterReceipt</a></td>
 <td>
@@ -1554,6 +1676,15 @@ Récépissé transporteur associé à cet établissement (le cas échéant)
 <td>
 
 Récépissé négociant associé à cet établissement (le cas échant)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>brokerReceipt</strong></td>
+<td valign="top"><a href="#brokerreceipt">BrokerReceipt</a></td>
+<td>
+
+Récépissé courtier associé à cet établissement (le cas échant)
 
 </td>
 </tr>
@@ -1629,15 +1760,6 @@ Nom de l'établissement
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>companyTypes</strong></td>
-<td valign="top">[<a href="#companytype">CompanyType</a>]</td>
-<td>
-
-Profil de l'établissement
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>naf</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
@@ -1680,6 +1802,15 @@ Récépissé transporteur associé à cet établissement (le cas échéant)
 <td>
 
 Récépissé négociant associé à cet établissement (le cas échant)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>brokerReceipt</strong></td>
+<td valign="top"><a href="#brokerreceipt">BrokerReceipt</a></td>
+<td>
+
+Récépissé courtier associé à cet établissement (le cas échant)
 
 </td>
 </tr>
@@ -2044,7 +2175,7 @@ bordereau signé papier via la mutation `importPaperForm`
 <td valign="top"><a href="#recipient">Recipient</a></td>
 <td>
 
-Établissement qui reçoit le déchet (case 2)
+Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
 
 </td>
 </tr>
@@ -2072,6 +2203,15 @@ Détails du déchet (case 3)
 <td>
 
 Négociant (case 7)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>broker</strong></td>
+<td valign="top"><a href="#broker">Broker</a></td>
+<td>
+
+Courtier
 
 </td>
 </tr>
@@ -3361,7 +3501,7 @@ Numéro de récépissé négociant
 <td valign="top"><a href="#datetime">DateTime</a>!</td>
 <td>
 
-Limite de validatié du récépissé
+Limite de validité du récépissé
 
 </td>
 </tr>
@@ -3573,7 +3713,7 @@ Numéro de récépissé transporteur
 <td valign="top"><a href="#datetime">DateTime</a>!</td>
 <td>
 
-Limite de validatié du récépissé
+Limite de validité du récépissé
 
 </td>
 </tr>
@@ -3996,6 +4136,58 @@ Le readableId permet de le récupérer via la query form.
 </tbody>
 </table>
 
+### BrokerInput
+
+Payload lié au courtier
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>receipt</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+N° de récipissé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Département
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Limite de validité
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td>
+
+Établissement courtier
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### CompanyInput
 
 Payload d'un établissement
@@ -4103,7 +4295,9 @@ objet un système d'information tierce
 <td valign="top"><a href="#recipientinput">RecipientInput</a></td>
 <td>
 
-Établissement qui reçoit le déchet (case 2)
+Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+de traitement ou de tri, transit, regroupement.
 
 </td>
 </tr>
@@ -4135,8 +4329,17 @@ Négociant (case 7)
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>broker</strong></td>
+<td valign="top"><a href="#brokerinput">BrokerInput</a></td>
+<td>
+
+Courtier
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>appendix2Forms</strong></td>
-<td valign="top">[<a href="#appendixforminput">AppendixFormInput</a>]</td>
+<td valign="top">[<a href="#appendixforminput">AppendixFormInput</a>!]</td>
 <td>
 
 Annexe 2
@@ -4172,7 +4375,9 @@ Annexe 2
 <td valign="top"><a href="#companyinput">CompanyInput</a></td>
 <td>
 
-Installation de destination prévue
+Installation de destination prévue (case 14)
+L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+de traitement ou de tri, transit, regroupement.
 
 </td>
 </tr>
@@ -4321,7 +4526,9 @@ objet un système d'information tierce
 <td valign="top"><a href="#recipientinput">RecipientInput</a></td>
 <td>
 
-Établissement qui reçoit le déchet (case 2)
+Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+de traitement ou de tri, transit, regroupement.
 
 </td>
 </tr>
@@ -4353,8 +4560,17 @@ Négociant (case 7)
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>broker</strong></td>
+<td valign="top"><a href="#brokerinput">BrokerInput</a></td>
+<td>
+
+Courtier
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>appendix2Forms</strong></td>
-<td valign="top">[<a href="#appendixforminput">AppendixFormInput</a>]</td>
+<td valign="top">[<a href="#appendixforminput">AppendixFormInput</a>!]</td>
 <td>
 
 Annexe 2
@@ -4422,7 +4638,9 @@ pas été émis initialement dans Trackdéchets.
 <td valign="top"><a href="#recipientinput">RecipientInput</a></td>
 <td>
 
-Établissement qui reçoit le déchet (case 2)
+Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+de traitement ou de tri, transit, regroupement.
 
 </td>
 </tr>
@@ -4450,6 +4668,15 @@ Détails du déchet (case 3)
 <td>
 
 Négociant (case 7)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>broker</strong></td>
+<td valign="top"><a href="#brokerinput">BrokerInput</a></td>
+<td>
+
+Courtier
 
 </td>
 </tr>
@@ -5515,7 +5742,9 @@ objet un système d'information tierce
 <td valign="top"><a href="#recipientinput">RecipientInput</a></td>
 <td>
 
-Établissement qui reçoit le déchet (case 2)
+Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)
+L'établissement renseigné doit être inscrit sur Trackdéchets en tant qu'installation
+de traitement ou de tri, transit, regroupement.
 
 </td>
 </tr>
@@ -5547,8 +5776,17 @@ Négociant (case 7)
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>broker</strong></td>
+<td valign="top"><a href="#brokerinput">BrokerInput</a></td>
+<td>
+
+Courtier
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>appendix2Forms</strong></td>
-<td valign="top">[<a href="#appendixforminput">AppendixFormInput</a>]</td>
+<td valign="top">[<a href="#appendixforminput">AppendixFormInput</a>!]</td>
 <td>
 
 Annexe 2
@@ -5808,6 +6046,14 @@ Négociant
 </td>
 </tr>
 <tr>
+<td valign="top"><strong>BROKER</strong></td>
+<td>
+
+Courtier
+
+</td>
+</tr>
+<tr>
 <td valign="top"><strong>ECO_ORGANISME</strong></td>
 <td>
 
@@ -5945,6 +6191,14 @@ Les BSD's dont je suis l'émetteur
 <td>
 
 Les BSD's dont je suis le négociant
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>BROKER</strong></td>
+<td>
+
+Les BSD's dont je suis le courtier
 
 </td>
 </tr>
@@ -6172,6 +6426,14 @@ des déchets transportés ou collectés.
 
 Registre négociants
 Art 4: Les négociants tiennent à jour un registre chronologique des déchets détenus.
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>BROKERED</strong></td>
+<td>
+
+Registre courtier
 
 </td>
 </tr>
@@ -6485,7 +6747,8 @@ The `Boolean` scalar type represents `true` or `false`.
 
 ### DateTime
 
-The `DateTime` scalar expects a date-formatted string matching one of the following formats:
+Le scalaire `DateTime` accepte des chaines de caractères
+formattées selon le standard ISO 8601. Exemples:
 - "yyyy-MM-dd" (eg. 2020-11-23)
 - "yyyy-MM-ddTHH:mm:ss" (eg. 2020-11-23T13:34:55)
 - "yyyy-MM-ddTHH:mm:ssX" (eg. 2020-11-23T13:34:55Z)

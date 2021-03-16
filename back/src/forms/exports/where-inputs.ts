@@ -32,6 +32,7 @@ export function formsWhereInput(
     INCOMING: incomingWasteWhereInput(sirets),
     TRANSPORTED: transportedWasteWhereInput(sirets),
     TRADED: tradedWasteWhereInput(sirets),
+    BROKERED: brokerWasteWhereInput(sirets),
     ALL: allWasteWhereInput(sirets)
   };
 
@@ -175,6 +176,20 @@ function tradedWasteWhereInput(sirets: string[]): Prisma.FormWhereInput {
 }
 
 /**
+ * Forms corresponding to traded waste of a list of broker companies
+ */
+function brokerWasteWhereInput(sirets: string[]): Prisma.FormWhereInput {
+  return {
+    AND: [
+      {
+        status: { notIn: ["DRAFT", "SEALED"] }
+      },
+      { brokerCompanySiret: { in: sirets } }
+    ]
+  };
+}
+
+/**
  * Forms where a list of companies are present for any status
  * excepted DRAFT and SEALED
  */
@@ -190,11 +205,10 @@ function allWasteWhereInput(sirets: string[]): Prisma.FormWhereInput {
           { ecoOrganismeSiret: { in: sirets } },
           { recipientCompanySiret: { in: sirets } },
           { traderCompanySiret: { in: sirets } },
+          { brokerCompanySiret: { in: sirets } },
           {
             temporaryStorageDetail: { destinationCompanySiret: { in: sirets } }
           },
-          { traderCompanySiret: { in: sirets } },
-          { traderCompanySiret: { in: sirets } },
           { transporterCompanySiret: { in: sirets } },
           {
             temporaryStorageDetail: { transporterCompanySiret: { in: sirets } }

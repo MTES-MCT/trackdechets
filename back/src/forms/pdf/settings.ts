@@ -69,6 +69,16 @@ export const mainFormFieldSettings = {
   traderValidityLimit: { x: 366, y: 408 },
   traderDepartment: { x: 468, y: 398 },
 
+  brokerCompanySiret: { x: 87, y: 410 },
+  brokerCompanyName: { x: 70, y: 420, maxLength: 50 },
+  brokerCompanyAddress: { x: 78, y: 430, lineBreakAt: 55, maxLength: 110 },
+  brokerCompanyPhone: { x: 318, y: 428 },
+  brokerCompanyMail: { x: 319, y: 438.5 },
+  brokerCompanyContact: { x: 377, y: 418 },
+  brokerReceipt: { x: 350, y: 398 },
+  brokerValidityLimit: { x: 366, y: 408 },
+  brokerDepartment: { x: 468, y: 398 },
+
   transporterCompanySiren: { x: 87, y: 474 },
   transporterCompanyName: { x: 70, y: 484, maxLength: 50 },
   transporterCompanyAddress: { x: 78, y: 494, lineBreakAt: 55, maxLength: 110 },

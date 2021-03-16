@@ -85,3 +85,12 @@ export function base32Encode(n: number): string {
     return encode(n);
   }
 }
+
+/**
+ * hash a given token with sha256 alg before storing or retrieving it
+ */
+export const hashToken = (token: string) =>
+  crypto
+    .createHmac("sha256", process.env.API_TOKEN_SECRET)
+    .update(token)
+    .digest("hex");

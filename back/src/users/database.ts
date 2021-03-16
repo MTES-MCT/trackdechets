@@ -3,17 +3,13 @@
  */
 
 import prisma from "../prisma";
-import {
-  User,
-  UserRole,
-  Prisma,
-  Company,
-  UserAccountHash
-} from "@prisma/client";
+
+import { User, UserRole, Prisma, Company } from "@prisma/client";
+
 import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
-import { getUid, sanitizeEmail } from "../utils";
+import { getUid, sanitizeEmail, hashToken } from "../utils";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma.user
@@ -104,13 +100,20 @@ export async function associateUserToCompany(userId, siret, role) {
     );
   }
 
-  return prisma.companyAssociation.create({
+  const association = await prisma.companyAssociation.create({
     data: {
       user: { connect: { id: userId } },
       role,
       company: { connect: { siret } }
     }
   });
+
+  // fill firstAssociationDate field if null (no need to update it if user was previously already associated)
+  await prisma.user.updateMany({
+    where: { id: userId, firstAssociationDate: null },
+    data: { firstAssociationDate: new Date() }
+  });
+  return association;
 }
 
 export async function getUserAccountHashOrNotFound(
@@ -122,7 +125,7 @@ export async function getUserAccountHashOrNotFound(
   if (userAccountHashes.length === 0) {
     throw new UserInputError("Cette invitation n'existe pas");
   }
-  return stringifyDates(userAccountHashes[0]);
+  return userAccountHashes[0];
 }
 
 export async function getCompanyAssociationOrNotFound(
@@ -138,16 +141,17 @@ export async function getCompanyAssociationOrNotFound(
 }
 
 export async function createAccessToken(user: User) {
-  const token = getUid(40);
-  const accessToken = await prisma.accessToken.create({
+  const clearToken = getUid(40);
+
+  await prisma.accessToken.create({
     data: {
       user: {
         connect: { id: user.id }
       },
-      token
+      token: hashToken(clearToken)
     }
   });
-  return accessToken;
+  return { clearToken };
 }
 
 export async function userExists(unsafeEmail: string) {
@@ -183,12 +187,18 @@ export async function acceptNewUserCompanyInvitations(user: User) {
       })
     )
   );
+  if (!user.firstAssociationDate) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { firstAssociationDate: new Date() }
+    });
+  }
 
   return prisma.userAccountHash.updateMany({
     where: {
       id: { in: existingHashes.map(h => h.id) }
     },
-    data: { acceptedAt: new Date().toISOString() }
+    data: { acceptedAt: new Date() }
   });
 }
 
@@ -202,11 +212,4 @@ export async function getMembershipRequestOrNotFoundError(
     throw new UserInputError("Cette demande de rattachement n'existe pas");
   }
   return membershipRequest;
-}
-
-export function stringifyDates(obj: UserAccountHash) {
-  return {
-    ...obj,
-    ...(obj?.acceptedAt && { acceptedAt: obj.acceptedAt.toISOString() })
-  };
 }

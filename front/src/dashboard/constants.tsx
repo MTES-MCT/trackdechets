@@ -1,4 +1,3 @@
-import { FormStatus } from "generated/graphql/types";
 export const statusLabels: { [key: string]: string } = {
   DRAFT: "Brouillon",
   SEALED: "En attente de collecte par le transporteur",
@@ -25,12 +24,3 @@ export const transportModeLabels: { [key: string]: string } = {
   RAIL: "Voie ferrée",
   RIVER: "Voie fluviale",
 };
-
-export const statusesWithDynamicActions = [
-  FormStatus.Sent,
-  FormStatus.Received,
-  FormStatus.Accepted,
-  FormStatus.TempStored,
-  FormStatus.TempStorerAccepted,
-  FormStatus.Resent,
-];

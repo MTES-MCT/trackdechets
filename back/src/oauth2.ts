@@ -1,7 +1,7 @@
 import { Grant } from "@prisma/client";
 import { createServer, grant, exchange, TokenError } from "oauth2orize";
 import prisma from "./prisma";
-import { getUid } from "./utils";
+import { getUid, hashToken } from "./utils";
 
 // Create OAuth 2.0 server
 export const oauth2server = createServer();
@@ -97,9 +97,9 @@ oauth2server.exchange(
       return done(err);
     }
 
-    const token = getUid(40);
+    const clearToken = getUid(40);
 
-    const accessToken = await prisma.accessToken.create({
+    await prisma.accessToken.create({
       data: {
         user: {
           connect: { id: grant.user.id }
@@ -107,14 +107,14 @@ oauth2server.exchange(
         application: {
           connect: { id: grant.application.id }
         },
-        token
+        token: hashToken(clearToken)
       }
     });
 
     // Add custom params
     const params = { user: { name: grant.user.name, email: grant.user.email } };
 
-    return done(null, accessToken.token, null, params);
+    return done(null, clearToken, null, params);
   })
 );
 

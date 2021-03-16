@@ -1,8 +1,11 @@
+import { CompanyType } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import {
   companyFactory,
+  destinationFactory,
   formFactory,
+  formWithTempStorageFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -28,12 +31,14 @@ describe("Mutation.markAsSealed", () => {
 
   it("should fail if SEALED is not a possible next state", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await destinationFactory();
 
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "SENT",
-        emitterCompanySiret: company.siret
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -53,13 +58,26 @@ describe("Mutation.markAsSealed", () => {
   it.each(["emitter", "recipient", "trader", "transporter"])(
     "%p of the BSD can seal it",
     async role => {
-      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const companyType = (role: string) =>
+        ({
+          emitter: CompanyType.PRODUCER,
+          recipient: CompanyType.WASTEPROCESSOR,
+          trader: CompanyType.TRADER,
+          transporter: CompanyType.TRANSPORTER
+        }[role]);
+
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: { set: [companyType(role)] }
+      });
 
       let form = await formFactory({
         ownerId: user.id,
         opt: {
           status: "DRAFT",
-          [`${role}CompanySiret`]: company.siret
+          [`${role}CompanySiret`]: company.siret,
+          ...(role !== "recipient"
+            ? { recipientCompanySiret: (await destinationFactory()).siret }
+            : {})
         }
       });
 
@@ -88,8 +106,12 @@ describe("Mutation.markAsSealed", () => {
 
   it("the eco-organisme of the BSD can seal it", async () => {
     const emitterCompany = await companyFactory();
-    const recipientCompany = await companyFactory();
-    const traderCompany = await companyFactory();
+    const recipientCompany = await destinationFactory();
+    const traderCompany = await companyFactory({
+      companyTypes: {
+        set: [CompanyType.TRADER]
+      }
+    });
 
     const { user, company: ecoOrganismeCompany } = await userWithCompanyFactory(
       "MEMBER"
@@ -130,7 +152,7 @@ describe("Mutation.markAsSealed", () => {
 
   it("should fail if bsd has an eco-organisme and the wrong emitterType", async () => {
     const emitterCompany = await companyFactory();
-    const recipientCompany = await companyFactory();
+    const recipientCompany = await destinationFactory();
     const { user, company: eo } = await userWithCompanyFactory("MEMBER");
     await prisma.ecoOrganisme.create({
       data: {
@@ -199,7 +221,9 @@ describe("Mutation.markAsSealed", () => {
   });
 
   it("the BSD can not be sealed if data do not validate", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+    });
 
     let form = await formFactory({
       ownerId: user.id,
@@ -222,7 +246,6 @@ describe("Mutation.markAsSealed", () => {
     const errMessage =
       "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.\n" +
       "Erreur(s): Émetteur: Le siret de l'entreprise est obligatoire\n" +
-      "Émetteur: Le SIRET doit faire 14 caractères numériques\n" +
       "Émetteur: Le contact dans l'entreprise est obligatoire";
     expect(errors[0].message).toBe(errMessage);
 
@@ -236,11 +259,14 @@ describe("Mutation.markAsSealed", () => {
     expect(statusLogs.length).toEqual(0);
   });
 
-  it.each(["toto", "", "lorem ipsum", "01 02 03", "101309*"])(
+  it.each(["toto", "lorem ipsum", "01 02 03", "101309*"])(
     "wrong waste code (%p) must invalidate mutation",
     async wrongWasteCode => {
       const { user, company: recipientCompany } = await userWithCompanyFactory(
-        "MEMBER"
+        "MEMBER",
+        {
+          companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+        }
       );
 
       const emitterCompany = await companyFactory();
@@ -287,7 +313,7 @@ describe("Mutation.markAsSealed", () => {
     const { user, company: emitterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
-    const recipientCompany = await companyFactory();
+    const recipientCompany = await destinationFactory();
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -320,7 +346,7 @@ describe("Mutation.markAsSealed", () => {
     const { user, company: emitterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
-    const recipientCompany = await companyFactory();
+    const recipientCompany = await destinationFactory();
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -344,13 +370,18 @@ describe("Mutation.markAsSealed", () => {
 
   it("should mark appendix2 forms as grouped", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await destinationFactory();
     const appendix2 = await formFactory({
       ownerId: user.id,
       opt: { status: "AWAITING_GROUP" }
     });
     const form = await formFactory({
       ownerId: user.id,
-      opt: { status: "DRAFT", emitterCompanySiret: company.siret }
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret
+      }
     });
     await prisma.form.update({
       where: { id: form.id },
@@ -367,5 +398,123 @@ describe("Mutation.markAsSealed", () => {
       where: { id: appendix2.id }
     });
     expect(appendix2grouped.status).toEqual("GROUPED");
+  });
+
+  it("should throw an error if destination is not registered in TD", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: "11111111111111"
+      }
+    });
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "L'installation de destination ou d’entreposage ou de reconditionnement prévue (cadre 2) n'est pas inscrite sur Trackdéchets"
+      })
+    ]);
+  });
+
+  it("should throw an error if destination after temporary storage is not registered in TD", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: "11111111111111"
+      }
+    });
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "L'installation de destination ou d’entreposage ou de reconditionnement prévue (cadre 2) n'est pas inscrite sur Trackdéchets"
+      })
+    ]);
+  });
+
+  it("should throw an error if destination is not registered as waste processor or TTR", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const destination = await companyFactory({
+      // assume profile is not COLLECTOR or WASTEPROCESSOR
+      companyTypes: { set: [CompanyType.PRODUCER] }
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: destination.siret
+      }
+    });
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `L'installation de destination ou d’entreposage ou de reconditionnement prévue ${destination.siret}
+      n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement.
+      Cette installation ne peut donc pas être visée en case 2 du bordereau. Veuillez vous rapprocher de l'administrateur
+      de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+      })
+    ]);
+  });
+
+  it("should throw an error if destination after temp storage is not registered as waste processor or TTR", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const collector = await companyFactory({
+      companyTypes: { set: [CompanyType.COLLECTOR] }
+    });
+    const destination = await companyFactory({
+      // assume profile is not COLLECTOR or WASTEPROCESSOR
+      companyTypes: { set: [CompanyType.PRODUCER] }
+    });
+    const form = await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: collector.siret
+      }
+    });
+    await prisma.form.update({
+      where: { id: form.id },
+      data: {
+        temporaryStorageDetail: {
+          update: { destinationCompanySiret: destination.siret }
+        }
+      }
+    });
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `L'installation de destination prévue après entreposage provisoire ou reconditionnement ${destination.siret}
+      n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement.
+      Cette installation ne peut donc pas être visée en case 14 du bordereau. Veuillez vous rapprocher de l'administrateur
+      de cette installation pour qu'il modifie le profil de l'installation depuis l'interface Trackdéchets Mon Compte > Établissements`
+      })
+    ]);
   });
 });

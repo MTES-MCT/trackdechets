@@ -29,7 +29,6 @@ describe("query { searchCompanies(clue, department) }", () => {
           siret
           address
           name
-          companyTypes
           naf
           libelleNaf
           installation {
@@ -60,7 +59,6 @@ describe("query { searchCompanies(clue, department) }", () => {
           siret
           address
           name
-          companyTypes
           naf
           libelleNaf
           installation {

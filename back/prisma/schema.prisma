@@ -15,6 +15,7 @@ enum CompanyType {
   WASTE_VEHICLES
   WASTE_CENTER
   TRADER
+  BROKER
   ECO_ORGANISME
 }
 
@@ -154,6 +155,8 @@ model Company {
   companyTypes           CompanyType[]
   traderReceiptId        String?
   traderReceipt          TraderReceipt?       @relation(fields: [traderReceiptId], references: [id])
+  brokerReceiptId        String?
+  brokerReceipt          BrokerReceipt?       @relation(fields: [brokerReceiptId], references: [id])
   transporterReceiptId   String?
   transporterReceipt     TransporterReceipt?  @relation(fields: [transporterReceiptId], references: [id])
   CompanyAssociation     CompanyAssociation[]
@@ -257,7 +260,7 @@ model Form {
   receivedBy                         String?
   wasteDetailsConsistence            Consistence?
   processedBy                        String?
-  processedAt                        String?
+  processedAt                        DateTime?
   nextDestinationProcessingOperation String?
   traderCompanyName                  String?
   traderCompanySiret                 String?
@@ -268,6 +271,15 @@ model Form {
   traderReceipt                      String?
   traderDepartment                   String?
   traderValidityLimit                DateTime?
+  brokerCompanyName                  String?
+  brokerCompanySiret                 String?
+  brokerCompanyAddress               String?
+  brokerCompanyContact               String?
+  brokerCompanyPhone                 String?
+  brokerCompanyMail                  String?
+  brokerReceipt                      String?
+  brokerDepartment                   String?
+  brokerValidityLimit                DateTime?
   processingOperationDescription     String?
   noTraceability                     Boolean?
   signedByTransporter                Boolean?
@@ -434,6 +446,13 @@ model TraderReceipt {
   Company       Company[]
 }
 
+model BrokerReceipt {
+  id            String    @id @default(cuid())
+  receiptNumber String
+  validityLimit DateTime
+  department    String
+}
+
 model TransporterReceipt {
   id            String    @id @default(cuid())
   receiptNumber String
@@ -468,23 +487,25 @@ model TransportSegment {
 }
 
 model User {
-  id                  String               @id @default(cuid())
-  email               String               @unique
-  password            String
-  name                String?
-  phone               String?
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  isActive            Boolean?             @default(false)
-  applicationId       String?
-  application         Application?         @relation(fields: [applicationId], references: [id])
-  companyAssociations CompanyAssociation[]
-  AccessToken         AccessToken[]
-  Form                Form[]
-  Grant               Grant[]
-  MembershipRequest   MembershipRequest[]
-  StatusLog           StatusLog[]
-  UserActivationHash  UserActivationHash[]
+  id                          String               @id @default(cuid())
+  email                       String               @unique
+  password                    String
+  name                        String?
+  phone                       String?
+  createdAt                   DateTime             @default(now())
+  updatedAt                   DateTime             @updatedAt
+  activatedAt                 DateTime?            // when was this user activated ? - emailing purpose
+  firstAssociationDate        DateTime?            // when was this user first associated to any company ? - emailing purpose
+  isActive                    Boolean?             @default(false)
+  applicationId               String?
+  application                 Application?         @relation(fields: [applicationId], references: [id])
+  companyAssociations         CompanyAssociation[]
+  AccessToken                 AccessToken[]
+  Form                        Form[]
+  Grant                       Grant[]
+  MembershipRequest           MembershipRequest[]
+  StatusLog                   StatusLog[]
+  UserActivationHash          UserActivationHash[]
 }
 
 model UserAccountHash {

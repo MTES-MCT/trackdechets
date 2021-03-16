@@ -9,6 +9,7 @@ export function formFieldsSelection(exportType: FormsRegisterExportType) {
     INCOMING: incomingWasteFragment,
     TRANSPORTED: transportedWasteFragment,
     TRADED: tradedWasteFragment,
+    BROKERED: brokeredWasteFragment,
     ALL: allWasteFragment
   }[exportType];
 }
@@ -56,6 +57,12 @@ const outgoingWasteFragment = {
   traderValidityLimit: true,
   traderCompanyContact: true,
   traderCompanyAddress: true,
+  brokerCompanyName: true,
+  brokerCompanySiret: true,
+  brokerReceipt: true,
+  brokerValidityLimit: true,
+  brokerCompanyContact: true,
+  brokerCompanyAddress: true,
   transporterCompanySiret: true,
   transporterCompanyName: true,
   transporterCompanyAddress: true,
@@ -94,6 +101,12 @@ const incomingWasteFragment = {
   traderValidityLimit: true,
   traderCompanyContact: true,
   traderCompanyAddress: true,
+  brokerCompanyName: true,
+  brokerCompanySiret: true,
+  brokerReceipt: true,
+  brokerValidityLimit: true,
+  brokerCompanyContact: true,
+  brokerCompanyAddress: true,
   transporterCompanySiret: true,
   transporterCompanyName: true,
   transporterCompanyAddress: true,
@@ -156,6 +169,12 @@ const transportedWasteFragment = {
   traderValidityLimit: true,
   traderCompanyContact: true,
   traderCompanyAddress: true,
+  brokerCompanyName: true,
+  brokerCompanySiret: true,
+  brokerReceipt: true,
+  brokerValidityLimit: true,
+  brokerCompanyContact: true,
+  brokerCompanyAddress: true,
   wasteDetailsCode: true,
   wasteDetailsPop: true,
   transporterNumberPlate: true,
@@ -216,6 +235,12 @@ const tradedWasteFragment = {
   traderValidityLimit: true,
   traderCompanyContact: true,
   traderCompanyAddress: true,
+  brokerCompanyName: true,
+  brokerCompanySiret: true,
+  brokerReceipt: true,
+  brokerValidityLimit: true,
+  brokerCompanyContact: true,
+  brokerCompanyAddress: true,
   transporterCompanySiret: true,
   transporterCompanyName: true,
   transporterCompanyAddress: true,
@@ -236,6 +261,8 @@ const tradedWasteFragment = {
   nextDestinationCompanyAddress: true,
   nextDestinationCompanyCountry: true
 };
+
+const brokeredWasteFragment = tradedWasteFragment;
 
 const allWasteFragment = {
   readableId: true,
@@ -283,6 +310,12 @@ const allWasteFragment = {
   traderValidityLimit: true,
   traderCompanyContact: true,
   traderCompanyAddress: true,
+  brokerCompanyName: true,
+  brokerCompanySiret: true,
+  brokerReceipt: true,
+  brokerValidityLimit: true,
+  brokerCompanyContact: true,
+  brokerCompanyAddress: true,
   transporterCompanySiret: true,
   transporterCompanyName: true,
   transporterCompanyAddress: true,

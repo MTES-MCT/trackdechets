@@ -17,7 +17,12 @@ import {
 } from "passport-oauth2-client-password";
 import prisma from "./prisma";
 import { GraphQLContext } from "./types";
-import { daysBetween, sameDayMidnight, sanitizeEmail } from "./utils";
+import {
+  daysBetween,
+  sameDayMidnight,
+  sanitizeEmail,
+  hashToken
+} from "./utils";
 
 const { JWT_SECRET } = process.env;
 
@@ -116,7 +121,9 @@ passport.use(
           // verify that the token has not been
           // converted to OAuth and revoked
           const accessToken = await prisma.accessToken.findUnique({
-            where: { token }
+            where: {
+              token: hashToken(token)
+            }
           });
           if (accessToken && accessToken.isRevoked) {
             return done(null, false);
@@ -146,7 +153,7 @@ export function updateAccessTokenLastUsed(accessToken: AccessToken) {
     daysBetween(now, new Date(accessToken.lastUsed)) > 0
   ) {
     return prisma.accessToken.update({
-      data: { lastUsed: sameDayMidnight(now).toISOString() },
+      data: { lastUsed: sameDayMidnight(now) },
       where: { token: accessToken.token }
     });
   } else {
@@ -157,8 +164,10 @@ export function updateAccessTokenLastUsed(accessToken: AccessToken) {
 passport.use(
   new BearerStrategy(async (token, done) => {
     try {
-      const accessToken = await prisma.accessToken.findUnique({
-        where: { token },
+      const accessToken = await prisma.accessToken.findFirst({
+        where: {
+          token: hashToken(token)
+        },
         include: { user: true }
       });
       if (accessToken && !accessToken.isRevoked) {
@@ -286,7 +295,7 @@ export const passportJwtMiddleware = (
             data: {
               token,
               user: { connect: { id: user.id } },
-              lastUsed: new Date().toISOString()
+              lastUsed: new Date()
             }
           });
         }

@@ -98,6 +98,18 @@ const traderFragment = gql`
   ${companyFragment}
 `;
 
+const brokerFragment = gql`
+  fragment BrokerFragment on Broker {
+    receipt
+    department
+    validityLimit
+    company {
+      ...CompanyFragment
+    }
+  }
+  ${companyFragment}
+`;
+
 export const temporaryStorageDetailFragment = gql`
   fragment TemporaryStorageDetailFragment on TemporaryStorageDetail {
     temporaryStorer {
@@ -180,6 +192,9 @@ const mutableFieldsFragment = gql`
     trader {
       ...TraderFragment
     }
+    broker {
+      ...BrokerFragment
+    }
     wasteDetails {
       ...WasteDetailsFragment
     }
@@ -196,6 +211,7 @@ const mutableFieldsFragment = gql`
   }
 
   ${traderFragment}
+  ${brokerFragment}
   ${transporterFragment}
   ${temporaryStorageDetailFragment}
   ${wasteDetailsFragment}
@@ -212,6 +228,33 @@ export const fullFormFragment = gql`
   ${staticFieldsFragment}
 `;
 
+export const segmentFragment = gql`
+  fragment Segment on TransportSegment {
+    id
+    readyToTakeOver
+    transporter {
+      validityLimit
+      numberPlate
+      isExemptedOfReceipt
+      department
+      receipt
+      company {
+        siret
+        name
+        address
+        contact
+        mail
+        phone
+      }
+    }
+    mode
+    takenOverAt
+    takenOverBy
+    previousTransporterCompanySiret
+    segmentNumber
+  }
+`;
+
 export const transporterFormFragment = gql`
   fragment TransporterFormFragment on Form {
     ...MutableFieldsFragment
@@ -219,39 +262,12 @@ export const transporterFormFragment = gql`
     currentTransporterSiret
     nextTransporterSiret
     transportSegments {
-      id
-      readyToTakeOver
-      transporter {
-        validityLimit
-        numberPlate
-        isExemptedOfReceipt
-        department
-        receipt
-
-        company {
-          siret
-          name
-          address
-          contact
-          mail
-          phone
-        }
-      }
-      mode
-      takenOverAt
-      takenOverBy
-      previousTransporterCompanySiret
-      segmentNumber
+      ...Segment
     }
   }
   ${mutableFieldsFragment}
   ${staticFieldsFragment}
-`;
-
-export const segmentFragment = gql`
-  fragment Segment on TransportSegment {
-    id
-  }
+  ${segmentFragment}
 `;
 
 export const detailFormFragment = gql`

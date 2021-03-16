@@ -32,6 +32,7 @@ export async function getCompanyInfos(siret: string): Promise<CompanyPublic> {
   const trackdechetsCompanyInfo = await prisma.company.findUnique({
     where: { siret },
     select: {
+      companyTypes: true,
       contactEmail: true,
       contactPhone: true,
       website: true,
@@ -51,7 +52,10 @@ export async function getCompanyInfos(siret: string): Promise<CompanyPublic> {
 
     ...companyIcpeInfo,
     ...sireneCompanyInfo,
-    ...convertUrls(trackdechetsCompanyInfo)
+    ...convertUrls({
+      ...trackdechetsCompanyInfo,
+      companyTypes: isRegistered ? trackdechetsCompanyInfo.companyTypes : []
+    })
   };
 
   return company;

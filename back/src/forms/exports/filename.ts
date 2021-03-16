@@ -13,7 +13,8 @@ export function getExportsFileName(
     OUTGOING: "sortant",
     INCOMING: "entrant",
     TRANSPORTED: "transporteur",
-    TRADED: "négociant"
+    TRADED: "négociant",
+    BROKERED: "courtier"
   };
 
   const components = ["TD-registre", readableExportTypes[exportType]];

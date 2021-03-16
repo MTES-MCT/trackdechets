@@ -1,58 +1,34 @@
 import React from "react";
-import { IconProps } from "common/components/Icons";
+import classNames from "classnames";
 import styles from "./ActionButton.module.scss";
 
-interface ActionButtonProps {
-  onClick: () => void;
-  title: string;
-  icon: React.ElementType<IconProps>;
-  iconSize?: string;
+export const ActionButtonContext = React.createContext<{
+  size: "normal" | "small";
+}>({
+  size: "normal",
+});
+
+interface ActionButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
+  icon: React.ReactNode;
+  children: React.ReactNode;
 }
 
-/**
- * Custom button intended to be used in dashboards action column.
- * Tries eagerly to adapt its layout to available space
- *
- */
 export default function ActionButton({
-  onClick,
-  title,
-  icon: Icon,
-  iconSize = "24px",
+  icon,
+  children,
+  ...props
 }: ActionButtonProps) {
+  const { size } = React.useContext(ActionButtonContext);
+
   return (
-    <div className={styles.dynamicAction}>
-      <button
-        className="btn btn--primary btn--slim btn--auto-height"
-        onClick={onClick}
-        title={title}
-      >
-        <span className={styles.dynamicActionContent}>
-          <Icon size={iconSize} />
-          <span className={styles.dynamicActionText}>{title}</span>
-        </span>
-      </button>
-      <span className={styles.dynamicActionCaption}>{title}</span>
-    </div>
+    <button
+      {...props}
+      className={classNames("btn btn--primary", styles.ActionButton, {
+        [styles.ActionButtonSmall]: size === "small",
+      })}
+    >
+      <span className={styles.ActionButtonIcon}>{icon}</span>
+      <span className={styles.ActionButtonContent}>{children}</span>
+    </button>
   );
 }
-/**
- * Custom button w/o icon for transporter segment column.
- *
- */
-export const OutlineButton = ({ onClick, title }) => {
-  return (
-    <div className={styles.dynamicAction}>
-      <button
-        className="btn btn--outline-primary btn--slim btn--auto-height"
-        onClick={onClick}
-        title={title}
-      >
-        <span className={styles.dynamicActionContent}>
-          <span className={styles.dynamicActionText}>{title}</span>
-        </span>
-      </button>
-      <span className={styles.dynamicActionCaption}>{title}</span>
-    </div>
-  );
-};

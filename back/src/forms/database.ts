@@ -84,6 +84,7 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
       }
     ],
     ["TRADER"]: [{ traderCompanySiret: siret }],
+    ["BROKER"]: [{ brokerCompanySiret: siret }],
     ["ECO_ORGANISME"]: [{ ecoOrganismeSiret: siret }]
   };
 
@@ -94,20 +95,5 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
       )
       .map(role => filtersByRole[role])
       .flat()
-  };
-}
-
-export function stringifyDates(obj: Form) {
-  if (!obj) {
-    return null;
-  }
-
-  return {
-    ...obj,
-    ...(obj?.createdAt && { createdAt: obj.createdAt.toISOString() }),
-    ...(obj?.updatedAt && { updatedAt: obj.updatedAt.toISOString() }),
-    ...(obj?.sentAt && { sentAt: obj.sentAt.toISOString() }),
-    ...(obj?.receivedAt && { receivedAt: obj.receivedAt.toISOString() }),
-    ...(obj?.signedAt && { signedAt: obj.signedAt.toISOString() })
   };
 }

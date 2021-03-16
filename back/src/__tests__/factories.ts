@@ -10,7 +10,7 @@ import {
   Prisma
 } from "@prisma/client";
 import prisma from "../prisma";
-
+import { hashToken } from "../utils";
 /**
  * Create a user with name and email
  * @param opt: extra parameters
@@ -76,7 +76,7 @@ export const companyFactory = async (
  * @param role: user role in the company
  */
 export const userWithCompanyFactory = async (
-  role,
+  role: UserRole,
   companyOpts: Partial<Prisma.CompanyCreateInput> = {}
 ) => {
   const company = await companyFactory(companyOpts);
@@ -92,6 +92,21 @@ export const userWithCompanyFactory = async (
   return { user, company };
 };
 
+export const destinationFactory = async (
+  companyOpts: Partial<Prisma.CompanyCreateInput> = {}
+) => {
+  const { company: destination } = await userWithCompanyFactory(
+    UserRole.MEMBER,
+    {
+      ...companyOpts,
+      companyTypes: {
+        set: [CompanyType.WASTEPROCESSOR]
+      }
+    }
+  );
+  return destination;
+};
+
 /**
  * Create a user and an accessToken
  * @param opt : extra parameters for user
@@ -100,14 +115,14 @@ export const userWithAccessTokenFactory = async (opt = {}) => {
   const user = await userFactory(opt);
 
   const accessTokenIndex = (await prisma.accessToken.count()) + 1;
-
-  const accessToken = await prisma.accessToken.create({
+  const clearToken = `token_${accessTokenIndex}`;
+  await prisma.accessToken.create({
     data: {
-      token: `token_${accessTokenIndex}`,
+      token: hashToken(clearToken),
       user: { connect: { id: user.id } }
     }
   });
-  return { user, accessToken };
+  return { user, accessToken: clearToken };
 };
 
 const formdata = {
@@ -116,6 +131,7 @@ const formdata = {
   emitterCompanyName: "WASTE PRODUCER",
   transporterCompanyName: "WASTE TRANSPORTER",
   traderCompanyAddress: "",
+  brokerCompanyAddress: "",
   transporterReceipt: "33AA",
   quantityReceived: null,
   processedAt: null,
@@ -123,6 +139,7 @@ const formdata = {
   emitterType: "PRODUCER" as EmitterType,
   traderValidityLimit: null,
   traderCompanyContact: "",
+  brokerCompanyContact: "",
   wasteDetailsCode: "05 01 04*",
   processedBy: null,
   recipientCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
@@ -149,11 +166,13 @@ const formdata = {
   nextDestinationCompanySiret: null,
   recipientCompanyPhone: "06 18 76 02 99",
   traderCompanyName: "",
+  brokerCompanyName: "",
   wasteAcceptationStatus: null,
   customId: null,
   isDeleted: false,
   transporterCompanyContact: "transporter",
   traderCompanyMail: "",
+  brokerCompanyMail: "",
   emitterCompanyAddress: "20 Avenue de la 1ère Dfl 13000 Marseille",
   sentBy: "signe",
   status: "SENT" as Status,
@@ -167,6 +186,7 @@ const formdata = {
   transporterIsExemptedOfReceipt: false,
   sentAt: "2019-11-20T00:00:00.000Z",
   traderCompanySiret: "",
+  brokerCompanySiret: "",
   transporterNumberPlate: "aa22",
   recipientProcessingOperation: "D 6",
   wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }],
@@ -179,6 +199,7 @@ const formdata = {
   wasteDetailsConsistence: "SOLID" as Consistence,
   wasteDetailsPop: false,
   traderCompanyPhone: "",
+  brokerCompanyPhone: "",
   noTraceability: null,
   emitterCompanySiret: "15397456982146",
   processingOperationDone: null,
@@ -250,16 +271,20 @@ export const formFactory = async ({
 
 export const formWithTempStorageFactory = async ({
   ownerId,
-  opt = {}
+  opt = {},
+  tempStorageOpts = {}
 }: {
   ownerId: string;
   opt?: Partial<Prisma.FormCreateInput>;
+  tempStorageOpts?: Partial<Prisma.TemporaryStorageDetailCreateInput>;
 }) => {
   return formFactory({
     ownerId,
     opt: {
       recipientIsTempStorage: true,
-      temporaryStorageDetail: { create: tempStorageData },
+      temporaryStorageDetail: {
+        create: { ...tempStorageData, ...tempStorageOpts }
+      },
       ...opt
     }
   });

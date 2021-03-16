@@ -1,9 +1,13 @@
 import { Field, useFormikContext } from "formik";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "./company/CompanySelector";
 import DateInput from "./custom-inputs/DateInput";
-import initialState from "./initial-state";
+import {
+  getInitialTrader,
+  getInitialBroker,
+  getInitialTemporaryStorageDetail,
+} from "./initial-state";
 import { Form } from "generated/graphql/types";
 import ProcessingOperation from "./processing-operation/ProcessingOperation";
 import TemporaryStorage from "./temporaryStorage/TemporaryStorage";
@@ -11,41 +15,72 @@ import TdSwitch from "../common/components/Switch";
 
 import styles from "./Recipient.module.scss";
 import classNames from "classnames";
+import { RadioButton } from "./custom-inputs/RadioButton";
 
 export default function Recipient() {
   const { values, setFieldValue } = useFormikContext<Form>();
 
-  const [hasTrader, setHasTrader] = useState(!!values.trader?.company?.siret);
+  const hasTrader = !!values.trader;
+  const hasBroker = !!values.broker;
+  const isTempStorage = !!values.recipient?.isTempStorage;
 
-  useEffect(() => {
-    if (!hasTrader) {
-      setFieldValue("trader.company", initialState.trader.company);
+  function handleNoneToggle() {
+    setFieldValue("broker", null, false);
+    setFieldValue("trader", null, false);
+  }
+
+  function handleTraderToggle() {
+    if (hasTrader) {
+      // the switch is toggled off, set trader to null
+      setFieldValue("trader", null, false);
+    } else {
+      // the switch is toggled on, set trader to initial value
+      setFieldValue("broker", null, false);
+      setFieldValue("trader", getInitialTrader(), false);
     }
-  }, [hasTrader, setFieldValue]);
+  }
+
+  function handleBrokerToggle() {
+    if (hasBroker) {
+      setFieldValue("broker", null, false);
+    } else {
+      setFieldValue("trader", null, false);
+      setFieldValue("broker", getInitialBroker(), false);
+    }
+  }
+
+  function handleTempStorageToggle() {
+    if (isTempStorage) {
+      // the switch is toggled off, set isTempStorage to false
+      setFieldValue("recipient.isTempStorage", false, false);
+      setFieldValue("temporaryStorageDetail", null, false);
+    } else {
+      // the switch is toggled on, set isTempStorage to true
+      setFieldValue("recipient.isTempStorage", true, false);
+      setFieldValue(
+        "temporaryStorageDetail",
+        getInitialTemporaryStorageDetail(),
+        false
+      );
+    }
+  }
 
   return (
     <>
       <div className="form__row">
         <TdSwitch
           checked={!!values.recipient?.isTempStorage}
-          onChange={() =>
-            setFieldValue(
-              "recipient.isTempStorage",
-              !values.recipient?.isTempStorage
-            )
-          }
+          onChange={handleTempStorageToggle}
           label="Le BSD va passer par une étape d'entreposage provisoire ou
           reconditionnement"
         />
       </div>
-
       <h4 className="form__section-heading">
         Installation{" "}
-        {values.recipient?.isTempStorage
+        {isTempStorage
           ? "d'entreposage ou de reconditionnement"
           : "de destination"}
       </h4>
-
       <div className={styles.recipientTextQuote}>
         <p>
           Pour vous assurer que l'entreprise de destination est autorisée à
@@ -60,11 +95,8 @@ export default function Recipient() {
           </a>
         </p>
       </div>
-
       <CompanySelector name="recipient.company" />
-
       <h4 className="form__section-heading">Informations complémentaires</h4>
-
       <div className="form__row">
         <Field
           component={ProcessingOperation}
@@ -73,7 +105,6 @@ export default function Recipient() {
 
         <RedErrorMessage name="recipient.processingOperation" />
       </div>
-
       <div className="form__row">
         <label>
           Numéro de CAP (optionnel)
@@ -84,13 +115,34 @@ export default function Recipient() {
           />
         </label>
       </div>
-
       <div className="form__row">
-        <TdSwitch
-          checked={hasTrader}
-          onChange={() => setHasTrader(!hasTrader)}
-          label="Je suis passé par un négociant"
-        />
+        <div className="tw-flex">
+          <legend className="tw-font-semibold"> Intermédiaire :</legend>
+          <Field
+            name="intermediate"
+            id="NONE"
+            label="Aucun"
+            component={RadioButton}
+            onChange={handleNoneToggle}
+            checked={!hasTrader && !hasBroker}
+          />
+          <Field
+            name="intermediate"
+            id="TRADER"
+            component={RadioButton}
+            checked={hasTrader}
+            onChange={handleTraderToggle}
+            label="Je suis passé par un négociant"
+          />
+          <Field
+            name="intermediate"
+            id="BROKER"
+            label="Je suis passé par un courtier"
+            component={RadioButton}
+            checked={hasBroker}
+            onChange={handleBrokerToggle}
+          />
+        </div>
       </div>
       {hasTrader && (
         <div className="form__row">
@@ -157,8 +209,72 @@ export default function Recipient() {
           </div>
         </div>
       )}
+      {hasBroker && (
+        <div className="form__row">
+          <h4 className="form__section-heading">Courtier</h4>
+          <CompanySelector
+            name="broker.company"
+            onCompanySelected={broker => {
+              if (broker.brokerReceipt) {
+                setFieldValue(
+                  "broker.receipt",
+                  broker.brokerReceipt.receiptNumber
+                );
+                setFieldValue(
+                  "broker.validityLimit",
+                  broker.brokerReceipt.validityLimit
+                );
+                setFieldValue(
+                  "broker.department",
+                  broker.brokerReceipt.department
+                );
+              } else {
+                setFieldValue("broker.receipt", "");
+                setFieldValue("broker.validityLimit", null);
+                setFieldValue("broker.department", "");
+              }
+            }}
+          />
 
-      <TemporaryStorage name="temporaryStorageDetail" />
+          <div className="form__row">
+            <label>
+              Numéro de récépissé
+              <Field type="text" name="broker.receipt" className="td-input" />
+            </label>
+
+            <RedErrorMessage name="broker.receipt" />
+          </div>
+          <div className="form__row">
+            <label>
+              Département
+              <Field
+                type="text"
+                name="broker.department"
+                placeholder="Ex: 83"
+                className={classNames("td-input", styles.recipientDepartment)}
+              />
+            </label>
+
+            <RedErrorMessage name="broker.department" />
+          </div>
+          <div className="form__row">
+            <label>
+              Limite de validité
+              <Field
+                component={DateInput}
+                name="broker.validityLimit"
+                className={classNames(
+                  "td-input",
+                  styles.recipientValidityLimit
+                )}
+              />
+            </label>
+
+            <RedErrorMessage name="broker.validityLimit" />
+          </div>
+        </div>
+      )}
+      {isTempStorage && <TemporaryStorage name="temporaryStorageDetail" />}
     </>
   );
 }

@@ -54,6 +54,9 @@ enum CompanyType {
   "Négociant"
   TRADER
 
+  "Courtier"
+  BROKER
+
   "Éco-organisme"
   ECO_ORGANISME
 }
@@ -120,9 +123,14 @@ type CompanyPrivate {
   transporterReceipt: TransporterReceipt
 
   """
-  Récépissé négociant (le cas échéant, pour les profils transporteur)
+  Récépissé négociant (le cas échéant, pour les profils négociant)
   """
   traderReceipt: TraderReceipt
+
+  """
+  Récépissé courtier (le cas échéant, pour les profils courtier)
+  """
+  brokerReceipt: BrokerReceipt
 
   """
   Liste des agréments de l'éco-organisme
@@ -171,6 +179,13 @@ type CompanyPublic {
   isRegistered: Boolean
 
   """
+  Profil de l'établissement sur Trackdéchets
+  ayant pour valeur un tableau vide quand l'établissement
+  n'est pas inscrit sur la plateforme `isRegistered=false`
+  """
+  companyTypes: [CompanyType!]!
+
+  """
   Récépissé transporteur associé à cet établissement (le cas échéant)
   """
   transporterReceipt: TransporterReceipt
@@ -179,6 +194,11 @@ type CompanyPublic {
   Récépissé négociant associé à cet établissement (le cas échant)
   """
   traderReceipt: TraderReceipt
+
+  """
+  Récépissé courtier associé à cet établissement (le cas échant)
+  """
+  brokerReceipt: BrokerReceipt
 
   """
   Liste des agréments de l'éco-organisme
@@ -203,9 +223,6 @@ type CompanySearchResult {
   "Nom de l'établissement"
   name: String
 
-  "Profil de l'établissement"
-  companyTypes: [CompanyType]
-
   "Code NAF"
   naf: String
 
@@ -227,6 +244,11 @@ type CompanySearchResult {
   Récépissé négociant associé à cet établissement (le cas échant)
   """
   traderReceipt: TraderReceipt
+
+  """
+  Récépissé courtier associé à cet établissement (le cas échant)
+  """
+  brokerReceipt: BrokerReceipt
 }
 
 """
@@ -261,7 +283,7 @@ type TransporterReceipt {
   receiptNumber: String!
 
   """
-  Limite de validatié du récépissé
+  Limite de validité du récépissé
   """
   validityLimit: DateTime!
 
@@ -283,7 +305,29 @@ type TraderReceipt {
   receiptNumber: String!
 
   """
-  Limite de validatié du récépissé
+  Limite de validité du récépissé
+  """
+  validityLimit: DateTime!
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String!
+}
+
+"""
+Récépissé courtier
+"""
+type BrokerReceipt {
+  id: ID!
+
+  """
+  Numéro de récépissé courtier
+  """
+  receiptNumber: String!
+
+  """
+  Limite de validité du récépissé
   """
   validityLimit: DateTime!
 

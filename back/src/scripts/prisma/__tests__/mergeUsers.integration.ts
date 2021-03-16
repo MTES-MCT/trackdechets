@@ -8,6 +8,7 @@ import {
   userWithCompanyFactory
 } from "../../../__tests__/factories";
 import mergeUsers from "../mergeUsers";
+import { hashToken } from "../../../utils";
 
 describe("mergeUsers", () => {
   afterEach(() => resetDatabase());
@@ -96,7 +97,7 @@ describe("mergeUsers", () => {
     await mergeUsers(user, heir);
 
     const updatedAccessToken = await prisma.accessToken.findUnique({
-      where: { id: accessToken.id },
+      where: { token: hashToken(accessToken) },
       include: { user: { select: { id: true } } }
     });
     expect(updatedAccessToken.user.id).toBe(heir.id);

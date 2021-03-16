@@ -503,4 +503,60 @@ describe("Mutation.createForm", () => {
       expectedPackagingInfos
     );
   });
+
+  it("should disallow a form with several CITERNE", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      wasteDetails: {
+        packagingInfos: [{ type: "CITERNE", quantity: 3 }]
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Le nombre de benne ou de citerne ne peut être supérieur à 1.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should disallow a form with several BENNE", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      wasteDetails: {
+        packagingInfos: [{ type: "BENNE", quantity: 3 }]
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Le nombre de benne ou de citerne ne peut être supérieur à 1.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
 });

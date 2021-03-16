@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Formik, Form, FormikHelpers } from "formik";
-import { Breadcrumb, BreadcrumbItem } from "common/components";
+import { Stepper, StepperItem } from "common/components";
 import { NextButton, PreviousButton } from "common/components/Buttons";
 
 type Props = { initialValues: Object; children: any[]; onSubmit: Function };
@@ -59,18 +59,18 @@ export class Wizard extends React.Component<Props, State> {
       : {};
     return (
       <>
-        <Breadcrumb>
+        <Stepper>
           {React.Children.map(children, (child, index) => (
-            <BreadcrumbItem
+            <StepperItem
               variant={
                 index === page ? "active" : page > index ? "complete" : "normal"
               }
               onClick={() => this.setState({ page: index })}
             >
               <span>{child.props.title}</span>
-            </BreadcrumbItem>
+            </StepperItem>
           ))}
-        </Breadcrumb>
+        </Stepper>
         <div className="step-content">
           <Formik
             initialValues={values}

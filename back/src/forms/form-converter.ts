@@ -12,6 +12,7 @@ import {
   Recipient,
   Transporter,
   Trader,
+  Broker,
   WasteDetails,
   FormStatus,
   WorkSite,
@@ -29,13 +30,15 @@ import {
   ResentFormInput,
   RecipientInput,
   TraderInput,
+  BrokerInput,
   NextDestinationInput,
   ImportPaperFormInput,
   EcoOrganismeInput,
   PackagingInfo,
   TransporterSignatureFormInput,
   SignatureFormInput,
-  ReceivedFormInput
+  ReceivedFormInput,
+  NextSegmentInfoInput
 } from "../generated/graphql/types";
 
 export function flattenObjectForDb(
@@ -98,18 +101,6 @@ export function safeInput<K>(obj: K): Partial<K> {
   }, {});
 }
 
-/**
- * If the field is either null or undefined, return that same value
- * Otherwise it's a Date, return its ISO string representation
- * @param field a Date, null or undefined
- */
-function isoStringDateOrNoop(field: Date | null | undefined) {
-  if (field === null) {
-    return null;
-  }
-
-  return field?.toISOString();
-}
 /**
  * Equivalent to a typescript optional chaining operator foo?.bar
  * except that it returns "null" instead of "undefined" if "null" is encountered in the chain
@@ -197,9 +188,7 @@ function flattenTransporterInput(input: { transporter?: TransporterInput }) {
     ),
     transporterReceipt: chain(input.transporter, t => t.receipt),
     transporterDepartment: chain(input.transporter, t => t.department),
-    transporterValidityLimit: chain(input.transporter, t =>
-      t.validityLimit ? new Date(t.validityLimit) : null
-    ),
+    transporterValidityLimit: chain(input.transporter, t => t.validityLimit),
     transporterNumberPlate: chain(input.transporter, t => t.numberPlate),
     transporterCustomInfo: chain(input.transporter, t => t.customInfo)
   };
@@ -290,7 +279,29 @@ function flattenTraderInput(input: { trader?: TraderInput }) {
     traderCompanyMail: chain(input.trader, t => chain(t.company, c => c.mail)),
     traderReceipt: chain(input.trader, t => t.receipt),
     traderDepartment: chain(input.trader, t => t.department),
-    traderValidityLimit: chain(input.trader, t =>
+    traderValidityLimit: chain(input.trader, t => t.validityLimit)
+  };
+}
+
+function flattenBrokerInput(input: { broker?: BrokerInput }) {
+  return {
+    brokerCompanyName: chain(input.broker, t => chain(t.company, c => c.name)),
+    brokerCompanySiret: chain(input.broker, t =>
+      chain(t.company, c => c.siret)
+    ),
+    brokerCompanyAddress: chain(input.broker, t =>
+      chain(t.company, c => c.address)
+    ),
+    brokerCompanyContact: chain(input.broker, t =>
+      chain(t.company, c => c.contact)
+    ),
+    brokerCompanyPhone: chain(input.broker, t =>
+      chain(t.company, c => c.phone)
+    ),
+    brokerCompanyMail: chain(input.broker, t => chain(t.company, c => c.mail)),
+    brokerReceipt: chain(input.broker, t => t.receipt),
+    brokerDepartment: chain(input.broker, t => t.department),
+    brokerValidityLimit: chain(input.broker, t =>
       t.validityLimit ? new Date(t.validityLimit) : null
     )
   };
@@ -344,6 +355,7 @@ export function flattenFormInput(
     | "transporter"
     | "wasteDetails"
     | "trader"
+    | "broker"
     | "ecoOrganisme"
   >
 ): Partial<Prisma.FormCreateInput> {
@@ -354,6 +366,7 @@ export function flattenFormInput(
     ...flattenTransporterInput(formInput),
     ...flattenWasteDetailsInput(formInput),
     ...flattenTraderInput(formInput),
+    ...flattenBrokerInput(formInput),
     ...flattenEcoOrganismeInput(formInput)
   });
 }
@@ -389,6 +402,7 @@ export function flattenImportPaperFormInput(
     ...flattenTransporterInput(rest),
     ...flattenWasteDetailsInput(rest),
     ...flattenTraderInput(rest),
+    ...flattenBrokerInput(rest),
     ...flattenSigningInfo(signingInfo),
     ...flattenReceivedInfo(receivedInfo),
     ...flattenProcessedFormInput(processedInfo)
@@ -396,20 +410,11 @@ export function flattenImportPaperFormInput(
 }
 
 function flattenSigningInfo(signingInfo: SignatureFormInput) {
-  return safeInput({
-    ...signingInfo,
-    ...(signingInfo.sentAt && { sentAt: new Date(signingInfo.sentAt) })
-  });
+  return safeInput(signingInfo);
 }
 
 function flattenReceivedInfo(receivedInfo: ReceivedFormInput) {
-  return safeInput({
-    ...receivedInfo,
-    ...(receivedInfo.receivedAt && {
-      receivedAt: new Date(receivedInfo.receivedAt)
-    }),
-    ...(receivedInfo.signedAt && { signedAt: new Date(receivedInfo.signedAt) })
-  });
+  return safeInput(receivedInfo);
 }
 
 export function flattenTemporaryStorageDetailInput(
@@ -437,8 +442,6 @@ export function flattenResentFormInput(
     ...flattenTransporterInput(resentFormInput),
     signedBy: resentFormInput.signedBy,
     signedAt: resentFormInput.signedAt
-      ? new Date(resentFormInput.signedAt)
-      : null
   });
 }
 
@@ -448,6 +451,43 @@ export function flattenSignedByTransporterInput(
   return safeInput({
     ...transporterSignatureFormInput,
     packagingInfos: getProcessedPackagingInfos(transporterSignatureFormInput)
+  });
+}
+
+export function flattenTransportSegmentInput(
+  segmentInput: NextSegmentInfoInput
+) {
+  return safeInput({
+    transporterCompanySiret: chain(segmentInput.transporter, t =>
+      chain(t.company, c => c.siret)
+    ),
+    transporterCompanyName: chain(segmentInput.transporter, t =>
+      chain(t.company, c => c.name)
+    ),
+    transporterCompanyAddress: chain(segmentInput.transporter, t =>
+      chain(t.company, c => c.address)
+    ),
+    transporterCompanyContact: chain(segmentInput.transporter, t =>
+      chain(t.company, c => c.contact)
+    ),
+    transporterCompanyMail: chain(segmentInput.transporter, t =>
+      chain(t.company, c => c.mail)
+    ),
+    transporterCompanyPhone: chain(segmentInput.transporter, t =>
+      chain(t.company, c => c.phone)
+    ),
+    transporterIsExemptedOfReceipt: chain(
+      segmentInput.transporter,
+      t => t.isExemptedOfReceipt
+    ),
+    transporterReceipt: chain(segmentInput.transporter, t => t.receipt),
+    transporterDepartment: chain(segmentInput.transporter, t => t.department),
+    transporterNumberPlate: chain(segmentInput.transporter, t => t.numberPlate),
+    transporterValidityLimit: chain(
+      segmentInput.transporter,
+      t => t.validityLimit
+    ),
+    mode: segmentInput.mode
   });
 }
 
@@ -504,7 +544,7 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       isExemptedOfReceipt: form.transporterIsExemptedOfReceipt,
       receipt: form.transporterReceipt,
       department: form.transporterDepartment,
-      validityLimit: isoStringDateOrNoop(form.transporterValidityLimit),
+      validityLimit: form.transporterValidityLimit,
       numberPlate: form.transporterNumberPlate,
       customInfo: form.transporterCustomInfo
     }),
@@ -533,23 +573,36 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       }),
       receipt: form.traderReceipt,
       department: form.traderDepartment,
-      validityLimit: isoStringDateOrNoop(form.traderValidityLimit)
+      validityLimit: form.traderValidityLimit
+    }),
+    broker: nullIfNoValues<Broker>({
+      company: nullIfNoValues<FormCompany>({
+        name: form.brokerCompanyName,
+        siret: form.brokerCompanySiret,
+        address: form.brokerCompanyAddress,
+        contact: form.brokerCompanyContact,
+        phone: form.brokerCompanyPhone,
+        mail: form.brokerCompanyMail
+      }),
+      receipt: form.brokerReceipt,
+      department: form.brokerDepartment,
+      validityLimit: form.brokerValidityLimit
     }),
     ecoOrganisme: nullIfNoValues<FormEcoOrganisme>({
       name: form.ecoOrganismeName,
       siret: form.ecoOrganismeSiret
     }),
-    createdAt: isoStringDateOrNoop(form.createdAt),
-    updatedAt: isoStringDateOrNoop(form.updatedAt),
+    createdAt: form.createdAt,
+    updatedAt: form.updatedAt,
     status: form.status as FormStatus,
     signedByTransporter: form.signedByTransporter,
-    sentAt: isoStringDateOrNoop(form.sentAt),
+    sentAt: form.sentAt,
     sentBy: form.sentBy,
     wasteAcceptationStatus: form.wasteAcceptationStatus,
     wasteRefusalReason: form.wasteRefusalReason,
     receivedBy: form.receivedBy,
-    receivedAt: isoStringDateOrNoop(form.receivedAt),
-    signedAt: isoStringDateOrNoop(form.signedAt),
+    receivedAt: form.receivedAt,
+    signedAt: form.signedAt,
     quantityReceived: form.quantityReceived,
     processingOperationDone: form.processingOperationDone,
     processingOperationDescription: form.processingOperationDescription,
@@ -586,9 +639,7 @@ export function expandTemporaryStorageFromDb(
       wasteAcceptationStatus:
         temporaryStorageDetail.tempStorerWasteAcceptationStatus,
       wasteRefusalReason: temporaryStorageDetail.tempStorerWasteRefusalReason,
-      receivedAt: isoStringDateOrNoop(
-        temporaryStorageDetail.tempStorerReceivedAt
-      ),
+      receivedAt: temporaryStorageDetail.tempStorerReceivedAt,
       receivedBy: temporaryStorageDetail.tempStorerReceivedBy
     }),
     destination: nullIfNoValues({
@@ -631,14 +682,12 @@ export function expandTemporaryStorageFromDb(
         temporaryStorageDetail.transporterIsExemptedOfReceipt,
       receipt: temporaryStorageDetail.transporterReceipt,
       department: temporaryStorageDetail.transporterDepartment,
-      validityLimit: isoStringDateOrNoop(
-        temporaryStorageDetail.transporterValidityLimit
-      ),
+      validityLimit: temporaryStorageDetail.transporterValidityLimit,
       numberPlate: temporaryStorageDetail.transporterNumberPlate,
       customInfo: null
     }),
     signedBy: temporaryStorageDetail.signedBy,
-    signedAt: isoStringDateOrNoop(temporaryStorageDetail.signedAt)
+    signedAt: temporaryStorageDetail.signedAt
   };
 }
 
@@ -660,12 +709,12 @@ export function expandTransportSegmentFromDb(
       isExemptedOfReceipt: segment.transporterIsExemptedOfReceipt,
       receipt: segment.transporterReceipt,
       department: segment.transporterDepartment,
-      validityLimit: isoStringDateOrNoop(segment.transporterValidityLimit),
+      validityLimit: segment.transporterValidityLimit,
       numberPlate: segment.transporterNumberPlate,
       customInfo: null
     }),
     mode: segment.mode,
-    takenOverAt: isoStringDateOrNoop(segment.takenOverAt),
+    takenOverAt: segment.takenOverAt,
     takenOverBy: segment.takenOverBy,
     readyToTakeOver: segment.readyToTakeOver,
     segmentNumber: segment.segmentNumber

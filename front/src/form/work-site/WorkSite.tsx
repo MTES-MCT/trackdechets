@@ -1,25 +1,22 @@
 import { Field, useFormikContext } from "formik";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Form } from "generated/graphql/types";
 import WorkSiteAddress from "./WorkSiteAddress";
 import TdSwitch from "common/components/Switch";
-const FIELDS = ["name", "address", "city", "postalCode", "infos"];
+import { getInitialEmitterWorkSite } from "form/initial-state";
 
 export default function WorkSite() {
   const { values, setFieldValue } = useFormikContext<Form>();
-  const [showWorkSite, setShowWorkSite] = useState(
-    FIELDS.some(field =>
-      values.emitter?.workSite ? values.emitter?.workSite[field] : null
-    )
-  );
 
-  useEffect(() => {
-    if (!showWorkSite) {
-      for (const field of FIELDS) {
-        setFieldValue(`emitter.workSite.${field}`, "");
-      }
+  const showWorkSite = !!values.emitter?.workSite;
+
+  function handleWorksiteToggle() {
+    if (showWorkSite) {
+      setFieldValue("emitter.workSite", null, false);
+    } else {
+      setFieldValue("emitter.workSite", getInitialEmitterWorkSite(), false);
     }
-  }, [showWorkSite, setFieldValue]);
+  }
 
   function setAddress(details) {
     setFieldValue(`emitter.workSite.address`, details.name);
@@ -31,11 +28,11 @@ export default function WorkSite() {
     <div className="form__row">
       <TdSwitch
         checked={showWorkSite}
-        onChange={() => setShowWorkSite(!showWorkSite)}
+        onChange={handleWorksiteToggle}
         label="Je souhaite ajouter une adresse de chantier ou de collecte"
       />
 
-      {showWorkSite && (
+      {showWorkSite && values.emitter?.workSite && (
         <>
           <h4 className="form__section-heading">Adresse chantier</h4>
 

@@ -10,7 +10,7 @@ function sleep(ms) {
 @registerUpdater(
   "Add address, longitude and latitude to companies",
   "Add address, longitude and latitude to companies",
-  true
+  false
 )
 export class AddAddressLatLongUpdater implements Updater {
   async run() {

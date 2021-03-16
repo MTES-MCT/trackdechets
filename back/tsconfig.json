@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
-    "lib": ["es2016", "esnext.asynciterable"],
+    "lib": ["ES2020", "esnext.asynciterable"],
     "outDir": "dist",
     "moduleResolution": "node",
     "module": "CommonJS",

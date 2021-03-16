@@ -5,6 +5,7 @@ import {
 } from "../auth";
 import { AccessToken, User } from "@prisma/client";
 import { GraphQLContext } from "../types";
+import { sameDayMidnight } from "../utils";
 
 const updateAccessTokenMock = jest.fn();
 jest.mock("../prisma", () => ({
@@ -42,7 +43,7 @@ describe("updateAccessTokenLastUsed", () => {
     // it should set lastUsed if it was never set
     updateAccessTokenLastUsed(accessToken);
     expect(updateAccessTokenMock).toHaveBeenCalledWith({
-      data: { lastUsed: "2019-10-04T00:00:00.000Z" },
+      data: { lastUsed: sameDayMidnight(now) },
       where: { token: "token" }
     });
   });
@@ -75,7 +76,7 @@ describe("updateAccessTokenLastUsed", () => {
     };
     updateAccessTokenLastUsed(accessToken);
     expect(updateAccessTokenMock).toHaveBeenCalledWith({
-      data: { lastUsed: "2019-10-04T00:00:00.000Z" },
+      data: { lastUsed: sameDayMidnight(now) },
       where: { token: "token" }
     });
   });

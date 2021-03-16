@@ -45,7 +45,8 @@ const joinWithInviteResolver: MutationResolvers["joinWithInvite"] = async (
       email: existingHash.email,
       password: hashedPassword,
       phone: "",
-      isActive: true
+      isActive: true,
+      activatedAt: new Date()
     }
   });
 

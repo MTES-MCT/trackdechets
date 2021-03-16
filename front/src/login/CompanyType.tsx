@@ -47,6 +47,12 @@ export const COMPANY_TYPES = [
       "Négociant, prenant part à la relation producteur / traiteur, disposant d'un récépissé préfectoral",
   },
   {
+    value: CompanyType.Broker,
+    label: "Courtier",
+    helpText:
+      "Courtier, acteur de la gestion des déchets qui organise la valorisation ou l'élimination de déchets pour le compte de tiers, disposant d'un récépissé préfectoral",
+  },
+  {
     value: CompanyType.EcoOrganisme,
     label: "Éco-organisme",
     helpText:

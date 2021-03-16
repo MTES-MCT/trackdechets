@@ -28,6 +28,22 @@ const httpLink = createHttpLink({
 });
 
 export default new ApolloClient({
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Form: {
+        fields: {
+          transporter: {
+            merge: true,
+          },
+          stateSummary: {
+            merge: true,
+          },
+          wasteDetails: {
+            merge: true,
+          },
+        },
+      },
+    },
+  }),
   link: ApolloLink.from([cleanTypeNameLink, httpLink]),
 });

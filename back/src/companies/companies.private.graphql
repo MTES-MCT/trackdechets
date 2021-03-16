@@ -41,6 +41,8 @@ type Mutation {
     transporterReceiptId: String
     "Identifiant d'un récépissé négociant"
     traderReceiptId: String
+    "Identifiant d'un récépissé courtier"
+    brokerReceiptId: String
     "Agréments de l'éco-organisme"
     ecoOrganismeAgreements: [URL!]
   ): CompanyPrivate!
@@ -71,7 +73,7 @@ type Mutation {
 
   """
   USAGE INTERNE
-  Crée un récépissé transporteur
+  Crée un récépissé négociant
   """
   createTraderReceipt(input: CreateTraderReceiptInput!): TraderReceipt
 
@@ -85,7 +87,25 @@ type Mutation {
   USAGE INTERNE
   Supprime un récépissé négociant
   """
-  deleteTraderReceipt(input: DeleteTraderReceiptInput!): TransporterReceipt
+  deleteTraderReceipt(input: DeleteTraderReceiptInput!): TraderReceipt
+
+  """
+  USAGE INTERNE
+  Crée un récépissé courtier
+  """
+  createBrokerReceipt(input: CreateBrokerReceiptInput!): BrokerReceipt
+
+  """
+  USAGE INTERNE
+  Édite les informations d'un récépissé courtier
+  """
+  updateBrokerReceipt(input: UpdateBrokerReceiptInput!): BrokerReceipt
+
+  """
+  USAGE INTERNE
+  Supprime un récépissé courtier
+  """
+  deleteBrokerReceipt(input: DeleteBrokerReceiptInput!): BrokerReceipt
 
   """
   USAGE INTERNE
@@ -111,6 +131,7 @@ enum FavoriteType {
   TRANSPORTER
   RECIPIENT
   TRADER
+  BROKER
   NEXT_DESTINATION
   TEMPORARY_STORAGE_DETAIL
   DESTINATION
@@ -149,9 +170,16 @@ type CompanyFavorite {
   Récépissé négociant associé à cet établissement (le cas échant)
   """
   traderReceipt: TraderReceipt
+
+  """
+  Récépissé courtier associé à cet établissement (le cas échant)
+  """
+  brokerReceipt: BrokerReceipt
 }
 
-"Lien d'upload"
+"""
+Lien d'upload
+"""
 type UploadLink {
   "URL signé permettant d'uploader un fichier"
   signedUrl: String
@@ -170,7 +198,7 @@ input CreateTransporterReceiptInput {
   receiptNumber: String!
 
   """
-  Limite de validatié du récépissé
+  Limite de validité du récépissé
   """
   validityLimit: DateTime!
 
@@ -195,7 +223,7 @@ input UpdateTransporterReceiptInput {
   receiptNumber: String
 
   """
-  Limite de validatié du récépissé
+  Limite de validité du récépissé
   """
   validityLimit: DateTime
 
@@ -225,7 +253,7 @@ input CreateTraderReceiptInput {
   receiptNumber: String!
 
   """
-  Limite de validatié du récépissé
+  Limite de validité du récépissé
   """
   validityLimit: DateTime!
 
@@ -236,7 +264,7 @@ input CreateTraderReceiptInput {
 }
 
 """
-Payload d'édition d'un récépissé transporteur
+Payload d'édition d'un récépissé négociant
 """
 input UpdateTraderReceiptInput {
   """
@@ -245,12 +273,12 @@ input UpdateTraderReceiptInput {
   id: ID!
 
   """
-  Numéro de récépissé transporteur
+  Numéro de récépissé négociant
   """
   receiptNumber: String
 
   """
-  Limite de validatié du récépissé
+  Limite de validité du récépissé
   """
   validityLimit: DateTime
 
@@ -266,6 +294,61 @@ Payload de suppression d'un récépissé négociant
 input DeleteTraderReceiptInput {
   """
   The id of the trader receipt to delete
+  """
+  id: ID!
+}
+
+"""
+Payload de création d'un récépissé courtier
+"""
+input CreateBrokerReceiptInput {
+  """
+  Numéro de récépissé courtier
+  """
+  receiptNumber: String!
+
+  """
+  Limite de validité du récépissé
+  """
+  validityLimit: DateTime!
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String!
+}
+
+"""
+Payload d'édition d'un récépissé courtier
+"""
+input UpdateBrokerReceiptInput {
+  """
+  The id of the broker receipt to modify
+  """
+  id: ID!
+
+  """
+  Numéro de récépissé courtier
+  """
+  receiptNumber: String
+
+  """
+  Limite de validité du récépissé
+  """
+  validityLimit: DateTime
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String
+}
+
+"""
+Payload de suppression d'un récépissé courtier
+"""
+input DeleteBrokerReceiptInput {
+  """
+  The id of the broker receipt to delete
   """
   id: ID!
 }
@@ -302,6 +385,11 @@ input PrivateCompanyInput {
   Récipissé négociant (le cas échéant, pour les profils négociant)
   """
   traderReceiptId: String
+
+  """
+  Récipissé courtier (le cas échéant, pour les profils courtier)
+  """
+  brokerReceiptId: String
 
   """
   Liste des agréments de l'éco-organisme

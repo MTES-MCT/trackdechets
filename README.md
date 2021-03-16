@@ -5,7 +5,7 @@
 **Gérer la traçabilité des déchets en toute sécurité**
 
 <img height="100px" style="margin-right: 20px" src="./front/public/trackdechets.png" alt="logo"></img>
-<img height="100px" src="./front/public/marianne.svg" alt="logo"></img>
+<img height="100px" src="./front/public/marianne_mte.svg" alt="logo"></img>
 
 Dépôt de code de la startup d'état **Trackdéchets** incubée à la Fabrique Numérique du Ministère de la Transition Écologique et Solidaire.
 

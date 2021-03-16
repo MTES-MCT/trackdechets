@@ -1,6 +1,5 @@
 import React from "react";
 import Tooltip from "common/components/Tooltip";
-import "@testing-library/jest-dom/extend-expect";
 import { render, fireEvent, act } from "@testing-library/react";
 import { LEAVE_TIMEOUT, MOUSE_REST_TIMEOUT } from "@reach/tooltip";
 describe("<Tooltip />", () => {

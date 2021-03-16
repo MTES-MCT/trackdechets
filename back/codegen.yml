@@ -10,10 +10,10 @@ generates:
       contextType: ../../types#GraphQLContext
       enumsAsTypes: true
       scalars:
-        DateTime: string
+        DateTime: Date
         URL: URL
       scalarDefaults:
-        DateTime: new Date().toISOString()
+        DateTime: new Date()
         URL: "https://example.com"
     hooks:
       afterOneFileWrite:

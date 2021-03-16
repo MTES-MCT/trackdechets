@@ -36,6 +36,7 @@ const createFormResolver = async (
     recipientCompanySiret: formContent.recipient?.company?.siret,
     transporterCompanySiret: formContent.transporter?.company?.siret,
     traderCompanySiret: formContent.trader?.company?.siret,
+    brokerCompanySiret: formContent.broker?.company?.siret,
     ecoOrganismeSiret: formContent.ecoOrganisme?.siret,
     ...(temporaryStorageDetail?.destination?.company?.siret
       ? {
@@ -56,7 +57,7 @@ const createFormResolver = async (
     ...form,
     readableId: getReadableId(),
     owner: { connect: { id: user.id } },
-    appendix2Forms: { connect: appendix2Forms }
+    appendix2Forms: appendix2Forms ? { connect: appendix2Forms } : undefined
   };
 
   await draftFormSchema.validate(formCreateInput);

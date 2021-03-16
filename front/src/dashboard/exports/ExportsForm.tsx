@@ -107,6 +107,10 @@ function getPossibleExportTypes(companies: CompanyPrivate[]) {
     exportTypes.push(FormsRegisterExportType.Traded);
   }
 
+  if (companyTypes.includes(CompanyType.Broker)) {
+    exportTypes.push(FormsRegisterExportType.Brokered);
+  }
+
   exportTypes.push(FormsRegisterExportType.All);
 
   return exportTypes;
@@ -241,27 +245,36 @@ export default function ExportsForm({ companies }: IProps) {
                 >
                   Négociant
                 </option>
+                <option
+                  value={FormsRegisterExportType.Brokered}
+                  disabled={
+                    !exportTypes.includes(FormsRegisterExportType.Brokered)
+                  }
+                >
+                  Courtier
+                </option>
                 <option value={FormsRegisterExportType.All}>Exhaustif</option>
               </Field>
               <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
                 Date de début
               </label>
-              <Field
-                className={`tw-col-span-2 td-input ${styles["max-w-xxs"]}`}
-                name="startDate"
-                component={DateInput}
-              />
+              <div className="tw-col-span-2 tw-max-w-md">
+                <Field
+                  className={`td-input ${styles["max-w-xxs"]}`}
+                  name="startDate"
+                  component={DateInput}
+                />
+              </div>
               <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
                 Date de fin
               </label>
 
-              <div className="tw-col-span-2   tw-max-w-md">
+              <div className="tw-col-span-2 tw-max-w-md">
                 <Field
-                  className={`tw-col-span-2 td-input  ${styles["max-w-xxs"]}`}
+                  className={`td-input ${styles["max-w-xxs"]}`}
                   name="endDate"
                   component={DateInput}
                 />
-
                 <RedErrorMessage name="endDate"></RedErrorMessage>
               </div>
 
