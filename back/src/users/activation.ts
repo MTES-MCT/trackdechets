@@ -18,7 +18,7 @@ export const userActivationHandler = async (req, res) => {
 
   await prisma.user.update({
     where: { id: user.id },
-    data: { isActive: true }
+    data: { isActive: true, activatedAt: new Date() }
   });
 
   const UI_BASE_URL = getUIBaseURL();

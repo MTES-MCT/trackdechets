@@ -100,13 +100,20 @@ export async function associateUserToCompany(userId, siret, role) {
     );
   }
 
-  return prisma.companyAssociation.create({
+  const association = await prisma.companyAssociation.create({
     data: {
       user: { connect: { id: userId } },
       role,
       company: { connect: { siret } }
     }
   });
+
+  // fill firstAssociationDate field if null (no need to update it if user was previously already associated)
+  await prisma.user.updateMany({
+    where: { id: userId, firstAssociationDate: null },
+    data: { firstAssociationDate: new Date() }
+  });
+  return association;
 }
 
 export async function getUserAccountHashOrNotFound(
@@ -180,6 +187,12 @@ export async function acceptNewUserCompanyInvitations(user: User) {
       })
     )
   );
+  if (!user.firstAssociationDate) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { firstAssociationDate: new Date() }
+    });
+  }
 
   return prisma.userAccountHash.updateMany({
     where: {

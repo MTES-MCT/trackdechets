@@ -1,8 +1,16 @@
 import { resetDatabase } from "../../../integration-tests/helper";
 import prisma from "../../prisma";
 import { ErrorCode } from "../../common/errors";
-import { userWithCompanyFactory } from "../../__tests__/factories";
-import { associateUserToCompany, createUserAccountHash } from "../database";
+import {
+  userWithCompanyFactory,
+  userFactory,
+  companyFactory
+} from "../../__tests__/factories";
+import {
+  associateUserToCompany,
+  createUserAccountHash,
+  getFullUser
+} from "../database";
 
 describe("createUserAccountHash", () => {
   afterAll(resetDatabase);
@@ -52,5 +60,18 @@ describe("associateUserToCompany", () => {
         "L'utilisateur est déjà membre de l'établissement"
       );
     }
+  });
+
+  it("should associate an user to a company", async () => {
+    const user = await userFactory();
+    const company = await companyFactory();
+
+    await associateUserToCompany(user.id, company.siret, "MEMBER");
+    const refreshedUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
+    const fullUser = await getFullUser(refreshedUser);
+    expect(fullUser.firstAssociationDate).toBeTruthy();
+    expect(fullUser.companies).toEqual([company]);
   });
 });

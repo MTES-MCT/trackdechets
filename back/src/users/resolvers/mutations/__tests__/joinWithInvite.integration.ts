@@ -96,6 +96,12 @@ describe("joinWithInvite mutation", () => {
         }
       })) != null;
     expect(isCompanyMember).toEqual(true);
+
+    const createdUser = await prisma.user.findUnique({
+      where: { email: invitee }
+    });
+    expect(createdUser.activatedAt).toBeTruthy();
+    expect(createdUser.firstAssociationDate).toBeTruthy();
   });
 
   it("should accept other pending invitations", async () => {
