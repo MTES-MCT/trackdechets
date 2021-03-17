@@ -285,7 +285,7 @@ describe("Mutation markAsResealed", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message: `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${destination.siret}
-      n'a pas encore été vérifié. Cette installation ne peut pas être visé en case 14 du bordereau.`
+      n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 14 du bordereau.`
       })
     ]);
   });

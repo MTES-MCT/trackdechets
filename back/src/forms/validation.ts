@@ -973,7 +973,7 @@ async function checkDestination(siret: string) {
   ) {
     throw new UserInputError(
       `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
-      n'a pas encore été vérifié. Cette installation ne peut pas être visé en case 2 du bordereau.`
+      n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 2 du bordereau.`
     );
   }
 
@@ -1012,7 +1012,7 @@ async function checkDestinationAfterTempStorage(siret: string) {
   ) {
     throw new UserInputError(
       `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
-      n'a pas encore été vérifié. Cette installation ne peut pas être visé en case 14 du bordereau.`
+      n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 14 du bordereau.`
     );
   }
 
