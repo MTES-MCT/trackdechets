@@ -2,6 +2,7 @@ import prisma from "../prisma";
 import { sendMail } from "../mailer/mailing";
 import { userMails } from "../users/mails";
 import { Company, CompanyAssociation, User } from "@prisma/client";
+import * as COMPANY_TYPES from "../common/constants/COMPANY_TYPES";
 /**
  * Compute a past date relative to now
  *
@@ -77,11 +78,11 @@ export const selectSecondOnboardingEmail = (recipient: recipientType) => {
     recipient.companyAssociations.flatMap(c => c.company.companyTypes)
   );
 
-  if (companyTypes.size == 1 && companyTypes.has("PRODUCER")) {
-    return userMails.onboardingProducerSecondStep;
+  if ([...companyTypes].some(ct => COMPANY_TYPES.PROFESSIONALS.includes(ct))) {
+    return userMails.onboardingProfessionalSecondStep;
   }
-  //
-  return userMails.onboardingProfessionalSecondStep;
+
+  return userMails.onboardingProducerSecondStep;
 };
 
 /**
