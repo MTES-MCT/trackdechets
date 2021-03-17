@@ -30,7 +30,6 @@ describe("send verificationEmail", () => {
   });
 
   it("should send verification code letter using sendinbox backend", async () => {
-    process.env.POST_BACKEND = "mysendingbox";
     process.env.MY_SENDING_BOX_API_KEY = "secret";
     const sendVerificationCodeLetter = require("..").sendVerificationCodeLetter;
     const { user, company } = await userWithCompanyFactory("ADMIN");

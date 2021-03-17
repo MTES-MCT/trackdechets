@@ -7,16 +7,11 @@ import { Company, UserRole } from "@prisma/client";
 import { searchCompany } from "../../companies/sirene/";
 import prisma from "../../prisma";
 
-const backends = {
-  console: consoleBackend,
-  mysendingbox: mysendingboxBackend
-};
-
-const backend = backends[process.env.POST_BACKEND];
-
-if (!backend) {
-  throw new Error("Invalid post backend configuration: POST_BACKEND");
-}
+const backend =
+  process.env.MY_SENDING_BOX_API_KEY &&
+  process.env.MY_SENDING_BOX_API_KEY.length > 0
+    ? mysendingboxBackend
+    : consoleBackend;
 
 export function sendLetter(letter) {
   return backend.sendLetter(letter);
