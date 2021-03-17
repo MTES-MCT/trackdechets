@@ -7,7 +7,7 @@ export const vhuFormFactory = async ({
 }: {
   opt?: Partial<Prisma.VhuFormCreateInput>;
 }) => {
-  const formParams = { ...vhuFormdata, ...opt };
+  const formParams = { ...getVhuFormdata(), ...opt };
   return prisma.vhuForm.create({
     data: {
       ...formParams
@@ -15,7 +15,7 @@ export const vhuFormFactory = async ({
   });
 };
 
-const vhuFormdata = {
+const getVhuFormdata = () => ({
   readableId: getReadableId(ReadableIdPrefix.VHU),
   emitterAgrementNumber: "agrement",
   emitterCompanyName: "emitter company",
@@ -54,4 +54,4 @@ const vhuFormdata = {
   recipientAcceptanceStatus: null,
   recipientAcceptanceRefusalReason: null,
   recipientOperationDone: null
-};
+});

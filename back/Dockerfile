@@ -5,7 +5,7 @@ RUN npm ci --quiet
 COPY . .
 RUN npm run build
 
-FROM node:14.15.4
+FROM builder
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci --quiet --only=production

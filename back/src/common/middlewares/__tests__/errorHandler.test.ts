@@ -1,7 +1,12 @@
 import express from "express";
 import supertest from "supertest";
 
+const originalConsole = global.console;
 global.console = { error: jest.fn() } as any;
+
+afterAll(() => {
+  global.console = originalConsole;
+});
 
 describe("errorHandler", () => {
   const OLD_ENV = process.env;

@@ -21,11 +21,11 @@ export async function buildPdf(form: VhuForm) {
     await page.addStyleTag({ content: htmlModelStyle });
 
     const pdfBuffer = await page.pdf({ format: "a4" });
-    browser.close();
+    await browser.close();
 
     return pdfBuffer;
   } catch (err) {
-    browser.close();
+    await browser.close();
     throw new Error("Erreur lors du téléchargement du PDF");
   }
 }

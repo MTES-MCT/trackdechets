@@ -5,6 +5,10 @@ import { BsvhuWhere } from "../generated/graphql/types";
 const comparatorKeys = ["_gte", "_gt", "_lte", "_lt"];
 
 export function convertWhereToDbFilter(where: BsvhuWhere) {
+  if (!where) {
+    return {};
+  }
+
   const { _or, _and, _not, ...filters } = where;
 
   const hasOrNesting = _or?.some(w => w._or || w._and || w._not);

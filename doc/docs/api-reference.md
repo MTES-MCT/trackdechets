@@ -46,7 +46,11 @@ Siret d'un des établissements dont je suis membre
 <tr>
 <td colspan="2" valign="top"><strong>bsvhu</strong></td>
 <td valign="top"><a href="#bsvhu">Bsvhu</a>!</td>
-<td></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">id</td>
@@ -76,7 +80,11 @@ ID d'un bordereau
 <tr>
 <td colspan="2" valign="top"><strong>bsvhus</strong></td>
 <td valign="top"><a href="#bsvhuconnection">BsvhuConnection</a>!</td>
-<td></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">after</td>
@@ -648,7 +656,12 @@ Renvoie des statistiques sur le volume de déchets entrant et sortant
 <tr>
 <td colspan="2" valign="top"><strong>createBsvhu</strong></td>
 <td valign="top"><a href="#bsvhu">Bsvhu</a></td>
-<td></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Crée un BSVHU
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">input</td>
@@ -696,7 +709,8 @@ ID d'un BSD
 <td valign="top"><a href="#bsvhu">Bsvhu</a></td>
 <td>
 
-Duplique un BSD VHU
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Duplique un BSVHU
 
 </td>
 </tr>
@@ -1139,7 +1153,12 @@ l'établissement qui ont le choix de l'accepter ou de la refuser.
 <tr>
 <td colspan="2" valign="top"><strong>signBsvhu</strong></td>
 <td valign="top"><a href="#bsvhu">Bsvhu</a></td>
-<td></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Signe un BSVHU
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">id</td>
@@ -1208,7 +1227,12 @@ Marque un segment comme pris en charge par le nouveau transporteur
 <tr>
 <td colspan="2" valign="top"><strong>updateBsvhu</strong></td>
 <td valign="top"><a href="#bsvhu">Bsvhu</a></td>
-<td></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Met à jour un BSVHU
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">id</td>

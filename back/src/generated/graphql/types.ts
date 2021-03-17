@@ -1308,6 +1308,10 @@ export type Mutation = {
    * Crée un récépissé courtier
    */
   createBrokerReceipt?: Maybe<BrokerReceipt>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Crée un BSVHU
+   */
   createBsvhu?: Maybe<Bsvhu>;
   /**
    * USAGE INTERNE
@@ -1363,7 +1367,10 @@ export type Mutation = {
    * Supprime un agrément VHU
    */
   deleteVhuAgrement?: Maybe<VhuAgrement>;
-  /** Duplique un BSD VHU */
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Duplique un BSVHU
+   */
   duplicateBsvhu?: Maybe<Bsvhu>;
   /** Duplique un BSD */
   duplicateForm?: Maybe<Form>;
@@ -1518,6 +1525,10 @@ export type Mutation = {
    * l'établissement qui ont le choix de l'accepter ou de la refuser.
    */
   sendMembershipRequest?: Maybe<MembershipRequest>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Signe un BSVHU
+   */
   signBsvhu?: Maybe<Bsvhu>;
   /**
    * Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
@@ -1547,6 +1558,10 @@ export type Mutation = {
    * Édite les informations d'un récépissé courtier
    */
   updateBrokerReceipt?: Maybe<BrokerReceipt>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Met à jour un BSVHU
+   */
   updateBsvhu?: Maybe<Bsvhu>;
   /**
    * USAGE INTERNE
@@ -1973,6 +1988,7 @@ export type Query = {
   apiKey: Scalars["String"];
   /** Renvoie des BSD candidats à un regroupement dans une annexe 2 */
   appendixForms: Array<Form>;
+  /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsvhu: Bsvhu;
   /**
    * Renvoie un token pour télécharger un pdf de bordereau
@@ -1980,6 +1996,7 @@ export type Query = {
    * Il est valable 10 secondes
    */
   bsvhuPdf: FileDownload;
+  /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsvhus: BsvhuConnection;
   /**
    * Renvoie des informations publiques sur un établissement

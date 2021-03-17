@@ -1,13 +1,13 @@
 import { MissingSiret } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import { getConnectionsArgs } from "../../../forms/pagination";
 import { QueryBsvhusArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { expandVhuFormFromDb } from "../../converter";
+import { getConnectionsArgs } from "../../pagination";
 import { convertWhereToDbFilter } from "../../where";
 
 export default async function bsvhus(
@@ -32,7 +32,7 @@ export default async function bsvhus(
   }
 
   const itemsPerPage = 50;
-  const connectionsArgs = getConnectionsArgs({
+  const connectionsArgs = await getConnectionsArgs({
     ...paginationArgs,
     defaultPaginateBy: itemsPerPage,
     maxPaginateBy: 500
@@ -51,13 +51,12 @@ export default async function bsvhus(
   });
 
   const forms = queriedForms.map(f => expandVhuFormFromDb(f));
-
   return {
     totalCount,
     edges: forms.map(f => ({ cursor: f.id, node: f })),
     pageInfo: {
       startCursor: forms[0].id,
-      endCursor: forms[forms.length - 2].id, // We query 1 more element to calculate hasNextPage / hasPreviousPage
+      endCursor: forms[forms.length - (forms.length > itemsPerPage ? 2 : 1)].id,
       hasNextPage: paginationArgs.after ? forms.length > itemsPerPage : false,
       hasPreviousPage: paginationArgs.before
         ? forms.length > itemsPerPage

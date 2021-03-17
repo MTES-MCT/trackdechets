@@ -1,4 +1,4 @@
-import { resetDatabase } from "../../../../integration-tests/helper";
+import {  resetDatabase } from "../../../../integration-tests/helper";
 import prisma from "../../../prisma";
 import {
   formFactory,
@@ -9,6 +9,7 @@ import {
 } from "../../../__tests__/factories";
 import mergeUsers from "../mergeUsers";
 import { hashToken } from "../../../utils";
+
 
 describe("mergeUsers", () => {
   afterEach(() => resetDatabase());

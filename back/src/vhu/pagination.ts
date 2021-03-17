@@ -19,7 +19,7 @@ export async function getConnectionsArgs({
   maxPaginateBy = 500
 }: PaginationArgs) {
   // validate number formats
-  getValidationSchema(maxPaginateBy).validate({ first, last });
+  await getValidationSchema(maxPaginateBy).validate({ first, last });
 
   if (first && last) {
     throw new UserInputError(
