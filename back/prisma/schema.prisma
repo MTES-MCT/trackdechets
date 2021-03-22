@@ -20,7 +20,6 @@ enum CompanyType {
 }
 
 enum CompanyVerificationMode {
-  KNOWLEDGE
   MANUAL
   LETTER
 }
@@ -156,6 +155,7 @@ model Company {
   verificationCode       String
   verificationStatus     CompanyVerificationStatus @default(TO_BE_VERIFIED)
   verificationMode       CompanyVerificationMode?
+  verificationComment    String?
   verifiedAt             DateTime?
   name                   String?
   address                String?
