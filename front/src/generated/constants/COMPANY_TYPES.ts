@@ -4,6 +4,7 @@ export const PROFESSIONALS = [
   "COLLECTOR",
   "TRANSPORTER",
   "TRADER",
+  "BROKER",
   "ECO_ORGANISME",
   "WASTE_VEHICLES"
 ];

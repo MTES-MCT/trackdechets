@@ -17,7 +17,7 @@
     "types": "tsc --noEmit",
     "generate": "npx prisma generate",
     "prebuild": "npm run generate",
-    "build": "tsc && copyfiles -e **/*.ts src/**/*.{graphql,pdf,png,ttf} prisma/**/*.{prisma,sql} dist/",
+    "build": "tsc && copyfiles -e **/*.ts src/**/*.{graphql,pdf,png,ttf,html} prisma/**/*.{prisma,sql} dist/",
     "lint": "eslint -c .eslintrc.js --ext .ts ./src",
     "lint:fix": "eslint -c .eslintrc.js --fix --ext .ts ./src",
     "bulk-create-account:dev": "ts-node src/users/bulk-creation/index.ts",
