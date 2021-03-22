@@ -36,11 +36,17 @@ export default function AccountFieldApiKey() {
       )}
 
       {!apiKey ? (
-        <div className={styles.modifier} onClick={() => getApiKey()}>
+        <div
+          className={`${styles.modifier} btn btn--primary`}
+          onClick={() => getApiKey()}
+        >
           Générer une clé
         </div>
       ) : (
-        <div className={styles.modifier} onClick={() => setApiKey(null)}>
+        <div
+          className={`${styles.modifier} btn btn--primary`}
+          onClick={() => setApiKey(null)}
+        >
           Annuler
         </div>
       )}

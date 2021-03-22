@@ -1195,3 +1195,40 @@ export const IconDelete1 = ({
     </g>
   </svg>
 );
+
+export const IconCheckShield = ({
+  color = "currentColor",
+  size = "1em",
+  ...props
+}: IconProps) => (
+  <svg
+    {...props}
+    className={classNames(props.className, {
+      [styles.blue]: color === "blue",
+      [styles.blueLight]: color === "blueLight",
+      [styles.white]: color === "white",
+    })}
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 140 140"
+    width={size}
+    height={size}
+    {...props}
+  >
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+    >
+      <path
+        d="M39.375 64.476l14.292 20.306a6.125 6.125 0 009.957.297l45.751-57.907"
+        strokeWidth={8.749995}
+      />
+      <path
+        d="M17.5 4.37a8.75 8.75 0 00-8.75 8.75v52.5c0 28.075 42.198 59.318 56.542 68.6a8.616 8.616 0 009.415 0c14.345-9.282 56.543-40.525 56.543-68.6v-52.5a8.75 8.75 0 00-8.75-8.75z"
+        strokeWidth={8.749995}
+      />
+    </g>
+  </svg>
+);

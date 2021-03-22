@@ -19,6 +19,17 @@ enum CompanyType {
   ECO_ORGANISME
 }
 
+enum CompanyVerificationMode {
+  MANUAL
+  LETTER
+}
+
+enum CompanyVerificationStatus {
+  TO_BE_VERIFIED
+  LETTER_SENT
+  VERIFIED
+}
+
 enum Seveso {
   NS
   SB
@@ -141,6 +152,11 @@ model Company {
   updatedAt              DateTime             @updatedAt
   createdAt              DateTime             @default(now())
   securityCode           Int
+  verificationCode       String
+  verificationStatus     CompanyVerificationStatus @default(TO_BE_VERIFIED)
+  verificationMode       CompanyVerificationMode?
+  verificationComment    String?
+  verifiedAt             DateTime?
   name                   String?
   address                String?
   longitude              Float?

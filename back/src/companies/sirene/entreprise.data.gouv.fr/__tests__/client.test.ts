@@ -35,6 +35,9 @@ describe("searchCompany", () => {
       siret: "85001946400013",
       etatAdministratif: "A",
       address: "4 Boulevard Longchamp 13001 Marseille",
+      addressVoie: "4 BD LONGCHAMP",
+      addressPostalCode: "13001",
+      addressCity: "MARSEILLE",
       codeCommune: "13201",
       name: "CODE EN STOCK",
       naf: "62.01Z",
@@ -130,6 +133,9 @@ describe("searchCompanies", () => {
     const expected = {
       siret: "85001946400013",
       address: "4 Boulevard Longchamp 13001 Marseille",
+      addressVoie: "4 BD LONGCHAMP",
+      addressPostalCode: "13001",
+      addressCity: "MARSEILLE",
       name: "CODE EN STOCK",
       naf: "6201Z",
       libelleNaf: "Programmation informatique"
@@ -217,6 +223,9 @@ describe("searchCompanies", () => {
     const expected = {
       siret: "xxxxxxxxxxxxxx",
       address: "1 route des blés 07100 ANNONAY",
+      addressVoie: "1 ROUTE DES BLÉS",
+      addressPostalCode: "07100",
+      addressCity: "ANNONAY",
       name: "BOULANGERIE",
       naf: "4724Z",
       libelleNaf:

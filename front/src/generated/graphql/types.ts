@@ -177,6 +177,8 @@ export type CompanyPrivate = {
   gerepId: Maybe<Scalars["String"]>;
   /** Code de signature permettant de signer les BSD */
   securityCode: Scalars["Int"];
+  /** État du processus de vérification de l'établissement */
+  verificationStatus: CompanyVerificationStatus;
   /** Email de contact (visible sur la fiche entreprise) */
   contactEmail: Maybe<Scalars["String"]>;
   /** Numéro de téléphone de contact (visible sur la fiche entreprise) */
@@ -320,6 +322,19 @@ export enum CompanyType {
   Broker = "BROKER",
   /** Éco-organisme */
   EcoOrganisme = "ECO_ORGANISME"
+}
+
+/** État du processus de vérification de l'établissement */
+export enum CompanyVerificationStatus {
+  /** L'établissement est vérifié */
+  Verified = "VERIFIED",
+  /** L'établissement vient d'être crée, en attente de vérifications manuelles par l'équipe Trackdéchets */
+  ToBeVerified = "TO_BE_VERIFIED",
+  /**
+   * Les vérifications manuelles n'ont pas abouties, une lettre a été envoyée à l'adresse enregistrée
+   * auprès du registre du commerce et des sociétés
+   */
+  LetterSent = "LETTER_SENT"
 }
 
 /** Consistance du déchet */
@@ -1223,6 +1238,13 @@ export type Mutation = {
    * Édite les informations d'un récépissé transporteur
    */
   updateTransporterReceipt: Maybe<TransporterReceipt>;
+  /**
+   * USAGE INTERNE
+   * Permet de vérifier un établissement à partir du code de vérification
+   * envoyé par courrier à l'adresse de l'établissement renseigné au
+   * registre du commerce et des sociétés
+   */
+  verifyCompany: CompanyPrivate;
 };
 
 export type MutationAcceptMembershipRequestArgs = {
@@ -1450,6 +1472,10 @@ export type MutationUpdateTransporterFieldsArgs = {
 
 export type MutationUpdateTransporterReceiptArgs = {
   input: UpdateTransporterReceiptInput;
+};
+
+export type MutationVerifyCompanyArgs = {
+  input: VerifyCompanyInput;
 };
 
 /** Destination ultérieure prévue (case 12) */
@@ -2285,6 +2311,13 @@ export enum UserRole {
   Admin = "ADMIN"
 }
 
+export type VerifyCompanyInput = {
+  /** Le SIRET de l'établissement à vérifier */
+  siret: Scalars["String"];
+  /** Le code de vérification de l'établissement envoyé par courrier */
+  code: Scalars["String"];
+};
+
 /** Statut d'acceptation d'un déchet */
 export enum WasteAcceptationStatusInput {
   /** Accepté en totalité */
@@ -2530,6 +2563,7 @@ export function createCompanyPrivateMock(
     companyTypes: [],
     gerepId: null,
     securityCode: 0,
+    verificationStatus: CompanyVerificationStatus.Verified,
     contactEmail: null,
     contactPhone: null,
     website: null,
@@ -3504,6 +3538,16 @@ export function createUserMock(props: Partial<User>): User {
     name: null,
     phone: null,
     companies: [],
+    ...props
+  };
+}
+
+export function createVerifyCompanyInputMock(
+  props: Partial<VerifyCompanyInput>
+): VerifyCompanyInput {
+  return {
+    siret: "",
+    code: "",
     ...props
   };
 }

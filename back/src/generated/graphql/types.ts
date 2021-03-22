@@ -187,6 +187,8 @@ export type CompanyPrivate = {
   gerepId?: Maybe<Scalars["String"]>;
   /** Code de signature permettant de signer les BSD */
   securityCode: Scalars["Int"];
+  /** État du processus de vérification de l'établissement */
+  verificationStatus: CompanyVerificationStatus;
   /** Email de contact (visible sur la fiche entreprise) */
   contactEmail?: Maybe<Scalars["String"]>;
   /** Numéro de téléphone de contact (visible sur la fiche entreprise) */
@@ -330,6 +332,18 @@ export type CompanyType =
   | "BROKER"
   /** Éco-organisme */
   | "ECO_ORGANISME";
+
+/** État du processus de vérification de l'établissement */
+export type CompanyVerificationStatus =
+  /** L'établissement est vérifié */
+  | "VERIFIED"
+  /** L'établissement vient d'être crée, en attente de vérifications manuelles par l'équipe Trackdéchets */
+  | "TO_BE_VERIFIED"
+  /**
+   * Les vérifications manuelles n'ont pas abouties, une lettre a été envoyée à l'adresse enregistrée
+   * auprès du registre du commerce et des sociétés
+   */
+  | "LETTER_SENT";
 
 /** Consistance du déchet */
 export type Consistence =
@@ -1218,6 +1232,13 @@ export type Mutation = {
    * Édite les informations d'un récépissé transporteur
    */
   updateTransporterReceipt?: Maybe<TransporterReceipt>;
+  /**
+   * USAGE INTERNE
+   * Permet de vérifier un établissement à partir du code de vérification
+   * envoyé par courrier à l'adresse de l'établissement renseigné au
+   * registre du commerce et des sociétés
+   */
+  verifyCompany: CompanyPrivate;
 };
 
 export type MutationAcceptMembershipRequestArgs = {
@@ -1445,6 +1466,10 @@ export type MutationUpdateTransporterFieldsArgs = {
 
 export type MutationUpdateTransporterReceiptArgs = {
   input: UpdateTransporterReceiptInput;
+};
+
+export type MutationVerifyCompanyArgs = {
+  input: VerifyCompanyInput;
 };
 
 /** Destination ultérieure prévue (case 12) */
@@ -2268,6 +2293,13 @@ export type User = {
  */
 export type UserRole = "MEMBER" | "ADMIN";
 
+export type VerifyCompanyInput = {
+  /** Le SIRET de l'établissement à vérifier */
+  siret: Scalars["String"];
+  /** Le code de vérification de l'établissement envoyé par courrier */
+  code: Scalars["String"];
+};
+
 /** Statut d'acceptation d'un déchet */
 export type WasteAcceptationStatusInput =
   /** Accepté en totalité */
@@ -2557,6 +2589,7 @@ export type ResolversTypes = {
   UserRole: UserRole;
   User: ResolverTypeWrapper<User>;
   CompanyPrivate: ResolverTypeWrapper<CompanyPrivate>;
+  CompanyVerificationStatus: CompanyVerificationStatus;
   CompanyMember: ResolverTypeWrapper<CompanyMember>;
   MembershipRequest: ResolverTypeWrapper<MembershipRequest>;
   MembershipRequestStatus: MembershipRequestStatus;
@@ -2610,6 +2643,7 @@ export type ResolversTypes = {
   UpdateFormInput: UpdateFormInput;
   UpdateTraderReceiptInput: UpdateTraderReceiptInput;
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
+  VerifyCompanyInput: VerifyCompanyInput;
   Subscription: ResolverTypeWrapper<{}>;
   FormSubscription: ResolverTypeWrapper<FormSubscription>;
 };
@@ -2709,6 +2743,7 @@ export type ResolversParentTypes = {
   UpdateFormInput: UpdateFormInput;
   UpdateTraderReceiptInput: UpdateTraderReceiptInput;
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
+  VerifyCompanyInput: VerifyCompanyInput;
   Subscription: {};
   FormSubscription: FormSubscription;
 };
@@ -2818,6 +2853,11 @@ export type CompanyPrivateResolvers<
   >;
   gerepId?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
   securityCode?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  verificationStatus?: Resolver<
+    ResolversTypes["CompanyVerificationStatus"],
+    ParentType,
+    ContextType
+  >;
   contactEmail?: Resolver<
     Maybe<ResolversTypes["String"]>,
     ParentType,
@@ -3680,6 +3720,12 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationUpdateTransporterReceiptArgs, "input">
   >;
+  verifyCompany?: Resolver<
+    ResolversTypes["CompanyPrivate"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationVerifyCompanyArgs, "input">
+  >;
 };
 
 export type NextDestinationResolvers<
@@ -4443,6 +4489,7 @@ export function createCompanyPrivateMock(
     companyTypes: [],
     gerepId: null,
     securityCode: 0,
+    verificationStatus: "VERIFIED",
     contactEmail: null,
     contactPhone: null,
     website: null,
@@ -5417,6 +5464,16 @@ export function createUserMock(props: Partial<User>): User {
     name: null,
     phone: null,
     companies: [],
+    ...props
+  };
+}
+
+export function createVerifyCompanyInputMock(
+  props: Partial<VerifyCompanyInput>
+): VerifyCompanyInput {
+  return {
+    siret: "",
+    code: "",
     ...props
   };
 }

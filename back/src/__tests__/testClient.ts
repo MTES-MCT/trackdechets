@@ -13,7 +13,7 @@ function makeClient(user?: Express.User) {
   if (user) {
     setOptions({
       request: {
-        user: { ...user, auth: AuthType.SESSION }
+        user: { auth: AuthType.SESSION, ...user }
       }
     });
   }

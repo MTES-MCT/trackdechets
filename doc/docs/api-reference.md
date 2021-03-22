@@ -1388,6 +1388,15 @@ Code de signature permettant de signer les BSD
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>verificationStatus</strong></td>
+<td valign="top"><a href="#companyverificationstatus">CompanyVerificationStatus</a>!</td>
+<td>
+
+État du processus de vérification de l'établissement
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>contactEmail</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
@@ -6058,6 +6067,44 @@ Courtier
 <td>
 
 Éco-organisme
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### CompanyVerificationStatus
+
+État du processus de vérification de l'établissement
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>VERIFIED</strong></td>
+<td>
+
+L'établissement est vérifié
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>TO_BE_VERIFIED</strong></td>
+<td>
+
+L'établissement vient d'être crée, en attente de vérifications manuelles par l'équipe Trackdéchets
+
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>LETTER_SENT</strong></td>
+<td>
+
+Les vérifications manuelles n'ont pas abouties, une lettre a été envoyée à l'adresse enregistrée
+auprès du registre du commerce et des sociétés
 
 </td>
 </tr>

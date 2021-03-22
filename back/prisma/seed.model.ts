@@ -16,6 +16,7 @@ export default async () => {
             create: {
               siret: "11111111111111",
               securityCode: 1234,
+              verificationCode: "4321",
               name: "PRODUCTEUR",
               companyTypes: {
                 set: ["PRODUCER"]
@@ -40,6 +41,7 @@ export default async () => {
             create: {
               siret: "22222222222222",
               securityCode: 1234,
+              verificationCode: "4321",
               name: "TRANSPORTEUR",
               companyTypes: {
                 set: ["TRANSPORTER"]
@@ -71,6 +73,7 @@ export default async () => {
             create: {
               siret: "33333333333333",
               securityCode: 1234,
+              verificationCode: "4321",
               name: "COLLECTEUR",
               companyTypes: {
                 set: ["COLLECTOR"]
@@ -95,6 +98,7 @@ export default async () => {
             create: {
               siret: "44444444444444",
               securityCode: 1234,
+              verificationCode: "4321",
               name: "ECOORG",
               companyTypes: {
                 set: ["ECO_ORGANISME"]

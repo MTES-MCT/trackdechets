@@ -10,16 +10,8 @@ export function libelleFromCodeNaf(codeNaf: string) {
 /**
  * Build a full address string from its base components
  */
-export function buildAddress(
-  streetNumber: string,
-  streetType: string,
-  streetLabel: string,
-  postalCode: string,
-  city: string
-) {
-  return [streetNumber, streetType, streetLabel, postalCode, city]
-    .filter(x => !!x)
-    .join(" ");
+export function buildAddress(addressComponents: string[]) {
+  return addressComponents.filter(x => !!x).join(" ");
 }
 
 export function safeParseFloat(f: string) {

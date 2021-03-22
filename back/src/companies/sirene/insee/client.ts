@@ -16,18 +16,26 @@ const SIRENE_API_BASE_URL = "https://api.insee.fr/entreprises/sirene/V3";
 function searchResponseToCompany({
   etablissement
 }: SearchResponseInsee): CompanySearchResult {
-  const address = buildAddress(
+  const addressVoie = buildAddress([
     etablissement.adresseEtablissement.numeroVoieEtablissement,
     etablissement.adresseEtablissement.typeVoieEtablissement,
-    etablissement.adresseEtablissement.libelleVoieEtablissement,
+    etablissement.adresseEtablissement.libelleVoieEtablissement
+  ]);
+
+  const fullAddress = buildAddress([
+    addressVoie,
     etablissement.adresseEtablissement.codePostalEtablissement,
     etablissement.adresseEtablissement.libelleCommuneEtablissement
-  );
+  ]);
 
   const company = {
     siret: etablissement.siret,
     etatAdministratif: etablissement.uniteLegale.etatAdministratifUniteLegale,
-    address,
+    address: fullAddress,
+    addressVoie,
+    addressPostalCode:
+      etablissement.adresseEtablissement.codePostalEtablissement,
+    addressCity: etablissement.adresseEtablissement.libelleCommuneEtablissement,
     codeCommune: etablissement.adresseEtablissement.codeCommuneEtablissement,
     name: etablissement.uniteLegale.denominationUniteLegale,
     naf: etablissement.uniteLegale.activitePrincipaleUniteLegale,

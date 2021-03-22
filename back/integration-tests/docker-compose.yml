@@ -33,3 +33,5 @@ services:
       PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID: "11"
       SENDER_EMAIL_ADDRESS: "us@td.test"
       SENDER_NAME: "Wastetracker corp."
+      POST_BACKEND: console
+
