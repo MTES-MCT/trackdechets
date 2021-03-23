@@ -25,6 +25,7 @@ const SIGNED_BY_TRANSPORTER = gql`
         quantity
       }
       status
+      sentAt
     }
   }
 `;
