@@ -18,27 +18,31 @@ export interface WorkflowActionProps {
 }
 
 export function WorkflowAction(props: WorkflowActionProps) {
-  switch (props.form.status) {
+  const { form, siret } = props;
+
+  const isTempStorage = form.recipient?.isTempStorage;
+
+  switch (form.status) {
     case FormStatus.Draft:
       return <MarkAsSealed {...props} />;
     case FormStatus.Sealed: {
-      if (props.siret === props.form.transporter?.company?.siret) {
+      if (siret === form.transporter?.company?.siret) {
         return <SignedByTransporter {...props} />;
       }
       return null;
     }
     case FormStatus.Sent: {
-      if (props.siret === props.form.recipient?.company?.siret) {
-        if (props.form.recipient.isTempStorage) {
+      if (siret === form.recipient?.company?.siret) {
+        if (isTempStorage) {
           return <MarkAsTempStored {...props} />;
         }
         return <MarkAsReceived {...props} />;
       }
 
-      const transportSegments = props.form.transportSegments ?? [];
+      const transportSegments = form.transportSegments ?? [];
       const lastSegment = transportSegments[transportSegments.length - 1];
 
-      if (props.form.currentTransporterSiret === props.siret) {
+      if (form.currentTransporterSiret === siret) {
         if (
           // there are no segments yet, current transporter can create one
           lastSegment == null ||
@@ -53,59 +57,58 @@ export function WorkflowAction(props: WorkflowActionProps) {
           // the last segment is still a draft
           !lastSegment.readyToTakeOver &&
           // that was created by the current user
-          lastSegment.previousTransporterCompanySiret === props.siret
+          lastSegment.previousTransporterCompanySiret === siret
         ) {
           return <MarkSegmentAsReadyToTakeOver {...props} />;
         }
       }
 
-      if (
-        props.form.nextTransporterSiret === props.siret &&
-        lastSegment.readyToTakeOver
-      ) {
+      if (form.nextTransporterSiret === siret && lastSegment.readyToTakeOver) {
         return <TakeOverSegment {...props} />;
       }
 
       return null;
     }
     case FormStatus.TempStored: {
-      if (props.siret === props.form.recipient?.company?.siret) {
+      if (siret === form.recipient?.company?.siret) {
         return <MarkAsTempStorerAccepted {...props} />;
       }
       return null;
     }
     case FormStatus.TempStorerAccepted: {
-      if (props.siret === props.form.recipient?.company?.siret) {
+      if (siret === form.recipient?.company?.siret) {
         return <MarkAsResealed {...props} />;
       }
       return null;
     }
     case FormStatus.Resealed: {
-      if (
-        props.siret ===
-        props.form.temporaryStorageDetail?.transporter?.company?.siret
-      ) {
+      if (siret === form.temporaryStorageDetail?.transporter?.company?.siret) {
         return <SignedByTransporter {...props} />;
       }
       return null;
     }
     case FormStatus.Resent: {
-      if (
-        props.siret ===
-        props.form.temporaryStorageDetail?.destination?.company?.siret
-      ) {
+      if (siret === form.temporaryStorageDetail?.destination?.company?.siret) {
         return <MarkAsReceived {...props} />;
       }
       return null;
     }
     case FormStatus.Received: {
-      if (props.siret === props.form.recipient?.company?.siret) {
+      if (
+        (isTempStorage &&
+          siret === form.temporaryStorageDetail?.destination?.company?.siret) ||
+        (!isTempStorage && siret === form.recipient?.company?.siret)
+      ) {
         return <MarkAsAccepted {...props} />;
       }
       return null;
     }
     case FormStatus.Accepted: {
-      if (props.siret === props.form.recipient?.company?.siret) {
+      if (
+        (isTempStorage &&
+          siret === form.temporaryStorageDetail?.destination?.company?.siret) ||
+        (!isTempStorage && siret === form.recipient?.company?.siret)
+      ) {
         return <MarkAsProcessed {...props} />;
       }
       return null;

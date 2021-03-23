@@ -2,7 +2,7 @@ import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { MissingSiret } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
-import { Company, Status } from "@prisma/client";
+import { Company, Status, Prisma } from "@prisma/client";
 import prisma from "../../../prisma";
 import { getUserCompanies } from "../../../users/database";
 import { checkIsCompanyMember } from "../../../users/permissions";
@@ -75,56 +75,61 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
     return {};
   }
 
-  const filter = {
+  const filter: Prisma.FormWhereInput = {
     OR: [
-      // DRAFT
+      // nextStep = markAsSealed
       { status: Status.DRAFT },
-      // isTemporaryStorer && (RESENT || RECEIVED)
       {
         AND: [
+          // BSD avec acheminement direct du producteur à l'installation de destination
+          { recipientIsTempStorage: false },
+          { recipientCompanySiret: siret }, // installation de destination
           {
-            temporaryStorageDetail: {
-              destinationCompanySiret: siret
+            status: {
+              in: [
+                Status.SENT, // nextStep = markAsReceived
+                Status.RECEIVED, // nextStep = markAsAccepted
+                Status.ACCEPTED // nextStep = markAsProcessed
+              ]
             }
-          },
-          {
-            OR: [
-              { status: Status.RESENT },
-              { status: Status.RECEIVED },
-              { status: Status.ACCEPTED }
-            ]
           }
         ]
       },
-      // isRecipient && isTempStorage == isTempStorer
-      // => isTempStorer && (SENT || TEMP_STORED)
       {
         AND: [
-          { recipientCompanySiret: siret },
-          { recipientIsTempStorage: true },
-          {
-            OR: [
-              { status: Status.SENT },
-              { status: Status.TEMP_STORED },
-              { status: Status.TEMP_STORER_ACCEPTED }
-            ]
-          }
-        ]
-      },
-      // isRecipient && (RECEIVED || ACCEPTED || (SENT && noTemporaryStorage))
-      {
-        AND: [
-          { recipientCompanySiret: siret },
+          { recipientIsTempStorage: true }, // BSD avec entreposage provisoire
           {
             OR: [
               {
                 AND: [
-                  { status: Status.SENT },
-                  { recipientIsTempStorage: false }
+                  { recipientCompanySiret: siret }, // installation d'entreposage provisoire
+                  {
+                    status: {
+                      in: [
+                        Status.SENT, // nextStep = markAsTempStored
+                        Status.TEMP_STORED, // nextStep = markAsTempStorerAccepted
+                        Status.TEMP_STORER_ACCEPTED // nextStep = markAsResealed
+                      ]
+                    }
+                  }
                 ]
               },
-              { status: Status.RECEIVED },
-              { status: Status.ACCEPTED }
+              {
+                AND: [
+                  {
+                    temporaryStorageDetail: { destinationCompanySiret: siret } // installation de destination finale
+                  },
+                  {
+                    status: {
+                      in: [
+                        Status.RESENT, // nextStep = markAsReceived
+                        Status.RECEIVED, // nextStep = markAsAccepted
+                        Status.ACCEPTED // nextStep = markAsProcessed
+                      ]
+                    }
+                  }
+                ]
+              }
             ]
           }
         ]
