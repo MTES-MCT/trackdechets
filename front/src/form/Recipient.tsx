@@ -49,12 +49,8 @@ export default function Recipient() {
     }
   }
 
-  function handleTempStorageToggle() {
-    if (isTempStorage) {
-      // the switch is toggled off, set isTempStorage to false
-      setFieldValue("recipient.isTempStorage", false, false);
-      setFieldValue("temporaryStorageDetail", null, false);
-    } else {
+  function handleTempStorageToggle(checked) {
+    if (checked) {
       // the switch is toggled on, set isTempStorage to true
       setFieldValue("recipient.isTempStorage", true, false);
       setFieldValue(
@@ -62,6 +58,10 @@ export default function Recipient() {
         getInitialTemporaryStorageDetail(),
         false
       );
+    } else {
+      // the switch is toggled off, set isTempStorage to false
+      setFieldValue("recipient.isTempStorage", false, false);
+      setFieldValue("temporaryStorageDetail", null, false);
     }
   }
 
@@ -274,7 +274,9 @@ export default function Recipient() {
           </div>
         </div>
       )}
-      {isTempStorage && <TemporaryStorage name="temporaryStorageDetail" />}
+      {isTempStorage && values.temporaryStorageDetail && (
+        <TemporaryStorage name="temporaryStorageDetail" />
+      )}
     </>
   );
 }

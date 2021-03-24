@@ -20,8 +20,14 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :memo: Documentation
 
 #### :house: Interne
+# [2021.03.2] 23/03/2021
 
+#### :bug: Corrections de bugs
 
+- Correction d'un bug dans l'interface Trackdéchets empêchant la destination finale après entreposage provisoire de valider le traitement du déchet [PR 824](https://github.com/MTES-MCT/trackdechets/pull/824)
+- Correction d'un crash de l'interface Trackdéchets lorsque l'on clique sur le switch de l'entreposage provisoire [PR 822](https://github.com/MTES-MCT/trackdechets/pull/822)
+- Correction d'un bug de l'interface Trackdéchets empêchant de valider la réception d'un déchet dans la foulée de son enlèvement
+- Correction du passage de variable d'environnement sélectionnant un template d'email inadapté.
 # [2021.03.1] 16/03/2021
 
 #### :rocket: Nouvelles fonctionnalités
