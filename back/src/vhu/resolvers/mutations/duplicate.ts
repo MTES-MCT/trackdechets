@@ -1,4 +1,4 @@
-import { VhuForm } from "@prisma/client";
+import { BsvhuForm, BsvhuStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { MutationDuplicateBsvhuArgs } from "../../../generated/graphql/types";
@@ -32,7 +32,6 @@ export default async function duplicate(
 
 function duplicateForm({
   id,
-  readableId,
   createdAt,
   updatedAt,
   emitterSignatureAuthor,
@@ -46,12 +45,12 @@ function duplicateForm({
   recipientSignatureAuthor,
   recipientSignatureDate,
   ...rest
-}: VhuForm) {
-  return prisma.vhuForm.create({
+}: BsvhuForm) {
+  return prisma.bsvhuForm.create({
     data: {
       ...rest,
-      readableId: getReadableId(ReadableIdPrefix.VHU),
-      status: "IN_PROGRESS",
+      id: getReadableId(ReadableIdPrefix.VHU),
+      status: BsvhuStatus.INITIAL,
       isDraft: true
     }
   });

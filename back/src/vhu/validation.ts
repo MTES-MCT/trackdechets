@@ -1,8 +1,8 @@
 import {
   Prisma,
-  VhuForm,
-  VhuIdentificationType,
-  VhuPackaging,
+  BsvhuForm,
+  BsvhuIdentificationType,
+  BsvhuPackaging,
   WasteAcceptationStatus
 } from "@prisma/client";
 import { PROCESSING_OPERATIONS_CODES } from "../common/constants";
@@ -19,7 +19,7 @@ import * as yup from "yup";
 import { FactorySchemaOf } from "../common/yup/configureYup";
 
 type Emitter = Pick<
-  VhuForm,
+  BsvhuForm,
   | "emitterAgrementNumber"
   | "emitterCompanyName"
   | "emitterCompanySiret"
@@ -30,7 +30,7 @@ type Emitter = Pick<
 >;
 
 type Recipient = Pick<
-  VhuForm,
+  BsvhuForm,
   | "recipientOperationPlanned"
   | "recipientAgrementNumber"
   | "recipientCompanyName"
@@ -46,7 +46,7 @@ type Recipient = Pick<
 >;
 
 type Transporter = Pick<
-  VhuForm,
+  BsvhuForm,
   | "transporterCompanyName"
   | "transporterCompanySiret"
   | "transporterCompanyAddress"
@@ -59,12 +59,12 @@ type Transporter = Pick<
 >;
 
 type Identification = Pick<
-  VhuForm,
+  BsvhuForm,
   "identificationNumbers" | "identificationType"
 >;
 
-type Quantity = Pick<VhuForm, "quantityNumber" | "quantityTons">;
-type Packaging = Pick<VhuForm, "packaging">;
+type Quantity = Pick<BsvhuForm, "quantityNumber" | "quantityTons">;
+type Packaging = Pick<BsvhuForm, "packaging">;
 
 interface VhuValidationContext {
   emitterSignature?: boolean;
@@ -72,8 +72,8 @@ interface VhuValidationContext {
   recipientSignature?: boolean;
 }
 
-export function validateVhuForm(
-  form: Partial<Prisma.VhuFormCreateInput>,
+export function validateBsvhuForm(
+  form: Partial<Prisma.BsvhuFormCreateInput>,
   context: VhuValidationContext
 ) {
   return emitterSchema(context)
@@ -295,7 +295,7 @@ const identificationSchema: FactorySchemaOf<
   yup.object({
     identificationNumbers: yup.array().ensure().of(yup.string()) as any,
     identificationType: yup
-      .mixed<VhuIdentificationType>()
+      .mixed<BsvhuIdentificationType>()
       .requiredIf(
         context.emitterSignature,
         `Déchet: le type d'indentification est obligatoire`
@@ -322,7 +322,7 @@ const packagingSchema: FactorySchemaOf<
 > = context =>
   yup.object({
     packaging: yup
-      .mixed<VhuPackaging>()
+      .mixed<BsvhuPackaging>()
       .requiredIf(
         context.emitterSignature,
         `Déchet: le type d'empaquetage' est obligatoire`

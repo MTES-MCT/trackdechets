@@ -1,4 +1,4 @@
-import { VhuForm } from "@prisma/client";
+import { BsvhuForm, BsvhuStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkSecurityCode } from "../../../forms/permissions";
 import {
@@ -11,12 +11,13 @@ import { checkIsCompanyMember } from "../../../users/permissions";
 import { expandVhuFormFromDb } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
 import { AlreadySignedError } from "../../errors";
-import { validateVhuForm } from "../../validation";
+import { machine } from "../../machine";
+import { validateBsvhuForm } from "../../validation";
 
 type SignatureTypeInfos = {
-  dbDateKey: keyof VhuForm;
-  dbAuthorKey: keyof VhuForm;
-  getAuthorizedSiret: (form: VhuForm) => string;
+  dbDateKey: keyof BsvhuForm;
+  dbAuthorKey: keyof BsvhuForm;
+  getAuthorizedSiret: (form: BsvhuForm) => string;
 };
 
 export default async function sign(
@@ -43,7 +44,7 @@ export default async function sign(
   }
 
   // Check that all necessary fields are filled
-  await validateVhuForm(prismaForm, {
+  await validateBsvhuForm(prismaForm, {
     emitterSignature:
       prismaForm.emitterSignatureDate != null || input.type === "EMITTER",
     transporterSignature:
@@ -53,13 +54,18 @@ export default async function sign(
       prismaForm.recipientSignatureDate != null || input.type === "RECIPIENT"
   });
 
-  const signedForm = await prisma.vhuForm.update({
+  const { value: newStatus } = machine.transition(prismaForm.status, {
+    type: input.type,
+    bsvhu: prismaForm
+  });
+  //console.log(prismaForm.status,newStatus)
+  const signedForm = await prisma.bsvhuForm.update({
     where: { id },
     data: {
       [signatureTypeInfos.dbAuthorKey]: input.author,
       [signatureTypeInfos.dbDateKey]: new Date(input.date),
-      isDraft: false, // If it was one, signing always "un-drafts" it
-      ...(input.type === "RECIPIENT" && { status: "DONE" }) // Last signature means the form is done
+      isDraft: false, // If it was one, signing always "un-drafts" it,
+      status: newStatus as BsvhuStatus
     }
   });
 

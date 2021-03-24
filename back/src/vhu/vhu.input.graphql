@@ -1,7 +1,4 @@
 input BsvhuInput {
-  "Permet d'identifier un bordereau comme brouillon. N'est plus modifiable dès qu'une signature a été apposée."
-  isDraft: Boolean
-
   "Détails sur l'émetteur"
   emitter: BsvhuEmitterInput
 

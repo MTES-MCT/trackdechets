@@ -104,25 +104,10 @@ export type BrokerReceipt = {
   department: Scalars["String"];
 };
 
-export type BsBsvhuEmitterWhere = {
-  company: Maybe<BsvhuCompanyWhere>;
-  signature: Maybe<BsvhuSignatureWhere>;
-};
-
-export type BsBsvhuRecipientWhere = {
-  company: Maybe<BsvhuCompanyWhere>;
-  signature: Maybe<BsvhuSignatureWhere>;
-};
-
-export type BsBsvhuTransporterWhere = {
-  company: Maybe<BsvhuCompanyWhere>;
-  signature: Maybe<BsvhuSignatureWhere>;
-};
-
 export type Bsvhu = {
   __typename?: "Bsvhu";
-  /** Identifiant interne */
-  id: Scalars["ID"];
+  /** Numéro unique attribué par Trackdéchets */
+  id: Scalars["String"];
   createdAt: Scalars["DateTime"];
   updatedAt: Scalars["DateTime"];
   /** Indique si le bordereau a été supprimé */
@@ -131,8 +116,6 @@ export type Bsvhu = {
   isDraft: Scalars["Boolean"];
   /** Status du bordereau */
   status: BsvhuStatus;
-  /** Numéro unique attribué par Trackdéchets */
-  readableId: Scalars["String"];
   /** Informations sur l'émetteur */
   emitter: Maybe<BsvhuEmitter>;
   /** Code déchet. Presque toujours 16 01 06 */
@@ -194,6 +177,11 @@ export type BsvhuEmitterInput = {
   company: Maybe<CompanyInput>;
 };
 
+export type BsvhuEmitterWhere = {
+  company: Maybe<BsvhuCompanyWhere>;
+  signature: Maybe<BsvhuSignatureWhere>;
+};
+
 export type BsvhuError = {
   __typename?: "BsvhuError";
   message: Scalars["String"];
@@ -220,8 +208,6 @@ export enum BsvhuIdentificationType {
 }
 
 export type BsvhuInput = {
-  /** Permet d'identifier un bordereau comme brouillon. N'est plus modifiable dès qu'une signature a été apposée. */
-  isDraft: Maybe<Scalars["Boolean"]>;
   /** Détails sur l'émetteur */
   emitter: Maybe<BsvhuEmitterInput>;
   /** Code déchet. Presque toujours 16 01 06 */
@@ -338,6 +324,11 @@ export enum BsvhuRecipientType {
   Demolisseur = "DEMOLISSEUR"
 }
 
+export type BsvhuRecipientWhere = {
+  company: Maybe<BsvhuCompanyWhere>;
+  signature: Maybe<BsvhuSignatureWhere>;
+};
+
 export type BsvhuSignatureInput = {
   /** Type de signature apposé */
   type: SignatureTypeInput;
@@ -354,8 +345,11 @@ export type BsvhuSignatureWhere = {
 };
 
 export enum BsvhuStatus {
-  InProgress = "IN_PROGRESS",
-  Done = "DONE"
+  Initial = "INITIAL",
+  SignedByProducer = "SIGNED_BY_PRODUCER",
+  Sent = "SENT",
+  Processed = "PROCESSED",
+  Refused = "REFUSED"
 }
 
 export type BsvhuTransporter = {
@@ -378,6 +372,11 @@ export type BsvhuTransporterInput = {
   recepisse: Maybe<BsvhuRecepisseInput>;
 };
 
+export type BsvhuTransporterWhere = {
+  company: Maybe<BsvhuCompanyWhere>;
+  signature: Maybe<BsvhuSignatureWhere>;
+};
+
 export type BsvhuWhere = {
   /** (Optionnel) Permet de récupérer uniquement les bordereaux en brouillon */
   isDraft: Maybe<Scalars["Boolean"]>;
@@ -389,9 +388,9 @@ export type BsvhuWhere = {
   status: Maybe<BsvhuStatus>;
   createdAt: Maybe<DateFilter>;
   updatedAt: Maybe<DateFilter>;
-  emitter: Maybe<BsBsvhuEmitterWhere>;
-  transporter: Maybe<BsBsvhuTransporterWhere>;
-  recipient: Maybe<BsBsvhuRecipientWhere>;
+  emitter: Maybe<BsvhuEmitterWhere>;
+  transporter: Maybe<BsvhuTransporterWhere>;
+  recipient: Maybe<BsvhuRecipientWhere>;
   _and: Maybe<Array<BsvhuWhere>>;
   _or: Maybe<Array<BsvhuWhere>>;
   _not: Maybe<Array<BsvhuWhere>>;
@@ -512,9 +511,9 @@ export type CompanyPrivate = {
   traderReceipt: Maybe<TraderReceipt>;
   /** Récépissé courtier (le cas échéant, pour les profils courtier) */
   brokerReceipt: Maybe<BrokerReceipt>;
-  /** Récépissé négociant (le cas échéant, pour les profils transporteur) */
+  /** Agrément démolisseur (le cas échéant, pour les profils VHU) */
   vhuAgrementDemolisseur: Maybe<VhuAgrement>;
-  /** Récépissé négociant (le cas échéant, pour les profils transporteur) */
+  /** Agrément broyeur (le cas échéant, pour les profils VHU) */
   vhuAgrementBroyeur: Maybe<VhuAgrement>;
   /** Liste des agréments de l'éco-organisme */
   ecoOrganismeAgreements: Array<Scalars["URL"]>;
@@ -730,6 +729,7 @@ export type DateFilter = {
   _gt: Maybe<Scalars["DateTime"]>;
   _lte: Maybe<Scalars["DateTime"]>;
   _lt: Maybe<Scalars["DateTime"]>;
+  _eq: Maybe<Scalars["DateTime"]>;
 };
 
 /** Représente une ligne dans une déclaration GEREP */
@@ -1334,6 +1334,11 @@ export type Mutation = {
    * Rattache un établissement à l'utilisateur authentifié
    */
   createCompany: CompanyPrivate;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Crée un BSVHU en brouillon
+   */
+  createDraftBsvhu: Maybe<Bsvhu>;
   /** Crée un nouveau bordereau */
   createForm: Form;
   /**
@@ -1505,6 +1510,11 @@ export type Mutation = {
   /** Prépare un nouveau segment de transport multimodal */
   prepareSegment: Maybe<TransportSegment>;
   /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Permet de publier un brouillon pour le marquer comme prêt à être envoyé
+   */
+  publishBsvhu: Maybe<Bsvhu>;
+  /**
    * USAGE INTERNE
    * Refuse une demande de rattachement à un un établissement
    */
@@ -1632,6 +1642,10 @@ export type MutationCreateBsvhuArgs = {
 
 export type MutationCreateCompanyArgs = {
   companyInput: PrivateCompanyInput;
+};
+
+export type MutationCreateDraftBsvhuArgs = {
+  input: BsvhuInput;
 };
 
 export type MutationCreateFormArgs = {
@@ -1773,6 +1787,10 @@ export type MutationPrepareSegmentArgs = {
   id: Scalars["ID"];
   siret: Scalars["String"];
   nextSegmentInfo: NextSegmentInfoInput;
+};
+
+export type MutationPublishBsvhuArgs = {
+  id: Scalars["ID"];
 };
 
 export type MutationRefuseMembershipRequestArgs = {
@@ -2974,36 +2992,6 @@ export function createBrokerReceiptMock(
   };
 }
 
-export function createBsBsvhuEmitterWhereMock(
-  props: Partial<BsBsvhuEmitterWhere>
-): BsBsvhuEmitterWhere {
-  return {
-    company: null,
-    signature: null,
-    ...props
-  };
-}
-
-export function createBsBsvhuRecipientWhereMock(
-  props: Partial<BsBsvhuRecipientWhere>
-): BsBsvhuRecipientWhere {
-  return {
-    company: null,
-    signature: null,
-    ...props
-  };
-}
-
-export function createBsBsvhuTransporterWhereMock(
-  props: Partial<BsBsvhuTransporterWhere>
-): BsBsvhuTransporterWhere {
-  return {
-    company: null,
-    signature: null,
-    ...props
-  };
-}
-
 export function createBsvhuMock(props: Partial<Bsvhu>): Bsvhu {
   return {
     __typename: "Bsvhu",
@@ -3012,8 +3000,7 @@ export function createBsvhuMock(props: Partial<Bsvhu>): Bsvhu {
     updatedAt: new Date().toISOString(),
     isDeleted: false,
     isDraft: false,
-    status: BsvhuStatus.InProgress,
-    readableId: "",
+    status: BsvhuStatus.Initial,
     emitter: null,
     wasteCode: null,
     packaging: null,
@@ -3090,6 +3077,16 @@ export function createBsvhuEmitterInputMock(
   };
 }
 
+export function createBsvhuEmitterWhereMock(
+  props: Partial<BsvhuEmitterWhere>
+): BsvhuEmitterWhere {
+  return {
+    company: null,
+    signature: null,
+    ...props
+  };
+}
+
 export function createBsvhuErrorMock(props: Partial<BsvhuError>): BsvhuError {
   return {
     __typename: "BsvhuError",
@@ -3123,7 +3120,6 @@ export function createBsvhuIdentificationInputMock(
 
 export function createBsvhuInputMock(props: Partial<BsvhuInput>): BsvhuInput {
   return {
-    isDraft: null,
     emitter: null,
     wasteCode: null,
     packaging: null,
@@ -3253,6 +3249,16 @@ export function createBsvhuRecipientOperationMock(
   };
 }
 
+export function createBsvhuRecipientWhereMock(
+  props: Partial<BsvhuRecipientWhere>
+): BsvhuRecipientWhere {
+  return {
+    company: null,
+    signature: null,
+    ...props
+  };
+}
+
 export function createBsvhuSignatureInputMock(
   props: Partial<BsvhuSignatureInput>
 ): BsvhuSignatureInput {
@@ -3294,6 +3300,16 @@ export function createBsvhuTransporterInputMock(
     company: null,
     tvaIntracommunautaire: null,
     recepisse: null,
+    ...props
+  };
+}
+
+export function createBsvhuTransporterWhereMock(
+  props: Partial<BsvhuTransporterWhere>
+): BsvhuTransporterWhere {
+  return {
+    company: null,
+    signature: null,
     ...props
   };
 }
@@ -3523,6 +3539,7 @@ export function createDateFilterMock(props: Partial<DateFilter>): DateFilter {
     _gt: null,
     _lte: null,
     _lt: null,
+    _eq: null,
     ...props
   };
 }

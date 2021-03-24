@@ -1,14 +1,18 @@
-import { VhuIdentificationType, VhuPackaging, Prisma } from "@prisma/client";
+import {
+  BsvhuIdentificationType,
+  BsvhuPackaging,
+  Prisma
+} from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
 
 export const vhuFormFactory = async ({
   opt = {}
 }: {
-  opt?: Partial<Prisma.VhuFormCreateInput>;
+  opt?: Partial<Prisma.BsvhuFormCreateInput>;
 }) => {
   const formParams = { ...getVhuFormdata(), ...opt };
-  return prisma.vhuForm.create({
+  return prisma.bsvhuForm.create({
     data: {
       ...formParams
     }
@@ -16,7 +20,7 @@ export const vhuFormFactory = async ({
 };
 
 const getVhuFormdata = () => ({
-  readableId: getReadableId(ReadableIdPrefix.VHU),
+  id: getReadableId(ReadableIdPrefix.VHU),
   emitterAgrementNumber: "agrement",
   emitterCompanyName: "emitter company",
   emitterCompanySiret: "15397456982146",
@@ -34,9 +38,9 @@ const getVhuFormdata = () => ({
   recipientCompanyPhone: "05 05 05 05 05",
   recipientCompanyMail: "recipient@td.io",
 
-  packaging: "UNITE" as VhuPackaging,
+  packaging: "UNITE" as BsvhuPackaging,
   identificationNumbers: ["1", "2", "3"],
-  identificationType: "NUMERO_ORDRE_REGISTRE_POLICE" as VhuIdentificationType,
+  identificationType: "NUMERO_ORDRE_REGISTRE_POLICE" as BsvhuIdentificationType,
   quantityNumber: 2,
   quantityTons: 1.4,
 

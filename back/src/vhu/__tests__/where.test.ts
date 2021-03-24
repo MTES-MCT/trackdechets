@@ -1,4 +1,4 @@
-import { VhuStatus } from ".prisma/client";
+import { BsvhuStatus } from ".prisma/client";
 import { BsvhuWhere } from "../../generated/graphql/types";
 import { convertWhereToDbFilter } from "../where";
 
@@ -26,34 +26,39 @@ describe("Bsvhu where builder", () => {
 
     const dbFilter = convertWhereToDbFilter(where);
 
-    expect(dbFilter["emitterCompanySiret"]).toBe("1234");
-    expect(dbFilter["recipientCompanySiret"]).toBe("1234");
-    expect(dbFilter["transporterCompanySiret"]).toBe("1234");
+    expect(dbFilter).toEqual({
+      emitterCompanySiret: "1234",
+      recipientCompanySiret: "1234",
+      transporterCompanySiret: "1234"
+    });
   });
 
   it("should convert complex filters to db filters", () => {
     const where: BsvhuWhere = {
       emitter: { company: { siret: "1234" } },
       _or: [{ isDraft: true }],
-      _and: [{ status: VhuStatus.DONE }]
+      _and: [{ status: BsvhuStatus.INITIAL }]
     };
 
     const dbFilter = convertWhereToDbFilter(where);
 
-    expect(dbFilter["emitterCompanySiret"]).toBe("1234");
-    expect(dbFilter["OR"][0]["isDraft"]).toBe(true);
-    expect(dbFilter["AND"][0]["status"]).toBe("DONE");
+    expect(dbFilter).toEqual({
+      emitterCompanySiret: "1234",
+      OR: [{ isDraft: true }],
+      AND: [{ status: "INITIAL" }]
+    });
   });
 
   it("should support ORing the same field", () => {
     const where: BsvhuWhere = {
-      _or: [{ status: VhuStatus.DONE }, { status: VhuStatus.IN_PROGRESS }]
+      _or: [{ status: BsvhuStatus.PROCESSED }, { status: BsvhuStatus.INITIAL }]
     };
 
     const dbFilter = convertWhereToDbFilter(where);
 
-    expect(dbFilter["OR"][0]["status"]).toBe("DONE");
-    expect(dbFilter["OR"][1]["status"]).toBe("IN_PROGRESS");
+    expect(dbFilter).toEqual({
+      OR: [{ status: "PROCESSED" }, { status: "INITIAL" }]
+    });
   });
 
   it("should support date specific filters", () => {
@@ -64,7 +69,9 @@ describe("Bsvhu where builder", () => {
 
     const dbFilter = convertWhereToDbFilter(where);
 
-    expect(dbFilter["createdAt"]["gt"]).toBe(now);
+    expect(dbFilter).toEqual({
+      createdAt: { gt: now }
+    });
   });
 
   it("should support several date specific filters", () => {
@@ -75,7 +82,8 @@ describe("Bsvhu where builder", () => {
 
     const dbFilter = convertWhereToDbFilter(where);
 
-    expect(dbFilter["createdAt"]["gt"]).toBe(now);
-    expect(dbFilter["createdAt"]["lt"]).toBe(now);
+    expect(dbFilter).toEqual({
+      createdAt: { gt: now, lt: now }
+    });
   });
 });

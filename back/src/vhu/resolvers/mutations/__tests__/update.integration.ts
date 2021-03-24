@@ -116,54 +116,6 @@ describe("Mutation.Vhu.update", () => {
     expect(data.updateBsvhu.quantity.number).toBe(4);
   });
 
-  it("should allow isDraft update before any signature", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-    const form = await vhuFormFactory({
-      opt: {
-        emitterCompanySiret: company.siret
-      }
-    });
-
-    const { mutate } = makeClient(user);
-    const input = {
-      isDraft: true
-    };
-    const { data } = await mutate(UPDATE_VHU_FORM, {
-      variables: { id: form.id, input }
-    });
-
-    expect(data.updateBsvhu.isDraft).toBe(true);
-  });
-
-  it("should disallow isDraft update after any signature", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-    const form = await vhuFormFactory({
-      opt: {
-        emitterCompanySiret: company.siret,
-        emitterSignatureAuthor: "The Signatory",
-        emitterSignatureDate: new Date()
-      }
-    });
-
-    const { mutate } = makeClient(user);
-    const input = {
-      isDraft: true
-    };
-    const { errors } = await mutate(UPDATE_VHU_FORM, {
-      variables: { id: form.id, input }
-    });
-
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message:
-          "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: isDraft",
-        extensions: expect.objectContaining({
-          code: ErrorCode.FORBIDDEN
-        })
-      })
-    ]);
-  });
-
   it("should allow emitter fields update before emitter signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await vhuFormFactory({

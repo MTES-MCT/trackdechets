@@ -3,16 +3,16 @@
 -- A few edits have benn done: added schema, some TEXT to VARCHAR(X)
 
 -- CreateEnum
-CREATE TYPE "default$default"."VhuStatus" AS ENUM ('IN_PROGRESS', 'DONE');
+CREATE TYPE "default$default"."BsvhuStatus" AS ENUM ('INITIAL', 'SIGNED_BY_PRODUCER', 'SENT', 'PROCESSED', 'REFUSED');
 
 -- CreateEnum
-CREATE TYPE "default$default"."VhuPackaging" AS ENUM ('UNITE', 'LOT');
+CREATE TYPE "default$default"."BsvhuPackaging" AS ENUM ('UNITE', 'LOT');
 
 -- CreateEnum
-CREATE TYPE "default$default"."VhuIdentificationType" AS ENUM ('NUMERO_ORDRE_REGISTRE_POLICE', 'NUMERO_ORDRE_LOTS_SORTANTS');
+CREATE TYPE "default$default"."BsvhuIdentificationType" AS ENUM ('NUMERO_ORDRE_REGISTRE_POLICE', 'NUMERO_ORDRE_LOTS_SORTANTS');
 
 -- CreateEnum
-CREATE TYPE "default$default"."VhuRecipientType" AS ENUM ('BROYEUR', 'DEMOLISSEUR');
+CREATE TYPE "default$default"."BsvhuRecipientType" AS ENUM ('BROYEUR', 'DEMOLISSEUR');
 
 -- CreateTable
 CREATE TABLE "default$default"."VhuForm" (
@@ -21,7 +21,7 @@ CREATE TABLE "default$default"."VhuForm" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "isDraft" BOOLEAN NOT NULL DEFAULT false,
     "isDeleted" BOOLEAN NOT NULL DEFAULT false,
-    "status" "default$default"."VhuStatus" NOT NULL DEFAULT E'IN_PROGRESS',
+    "status" "default$default"."BsvhuStatus" NOT NULL DEFAULT E'INITIAL',
     "readableId" VARCHAR(40) UNIQUE NOT NULL,
     "emitterAgrementNumber" VARCHAR(100),
     "emitterCompanyName" VARCHAR(100),
@@ -30,7 +30,7 @@ CREATE TABLE "default$default"."VhuForm" (
     "emitterCompanyContact" VARCHAR(50),
     "emitterCompanyPhone" VARCHAR(15),
     "emitterCompanyMail" VARCHAR(50),
-    "recipientType" "default$default"."VhuRecipientType",
+    "recipientType" "default$default"."BsvhuRecipientType",
     "recipientOperationPlanned" VARCHAR(50) DEFAULT E'R 4',
     "recipientAgrementNumber" VARCHAR(100),
     "recipientCompanyName" VARCHAR(100),
@@ -40,9 +40,9 @@ CREATE TABLE "default$default"."VhuForm" (
     "recipientCompanyPhone" VARCHAR(15),
     "recipientCompanyMail" VARCHAR(50),
     "wasteCode" VARCHAR(10) DEFAULT E'16 01 06',
-    "packaging" "default$default"."VhuPackaging",
+    "packaging" "default$default"."BsvhuPackaging",
     "identificationNumbers" TEXT[],
-    "identificationType" "default$default"."VhuIdentificationType",
+    "identificationType" "default$default"."BsvhuIdentificationType",
     "quantityNumber" INTEGER,
     "quantityTons" FLOAT,
     "emitterSignatureAuthor" VARCHAR(50),
@@ -63,7 +63,7 @@ CREATE TABLE "default$default"."VhuForm" (
     "recipientAcceptanceStatus" "default$default"."WasteAcceptationStatus",
     "recipientAcceptanceRefusalReason" TEXT,
     "recipientAcceptanceIdentificationNumbers" TEXT[],
-    "recipientAcceptanceIdentificationType" "default$default"."VhuIdentificationType",
+    "recipientAcceptanceIdentificationType" "default$default"."BsvhuIdentificationType",
     "recipientOperationDone" VARCHAR(50),
     "recipientPlannedBroyeurCompanyName" VARCHAR(100),
     "recipientPlannedBroyeurCompanySiret" VARCHAR(17),

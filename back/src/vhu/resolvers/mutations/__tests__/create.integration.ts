@@ -83,18 +83,42 @@ describe("Mutation.Vhu.create", () => {
     ]);
   });
 
-  it("create a form with an emitter and a recipient", async () => {
+  it("should allow creating a valid form for the producer signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const input = {
       emitter: {
         company: {
-          siret: company.siret
-        }
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Un centre VHU",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        },
+        agrementNumber: "1234"
+      },
+      wasteCode: "16 01 06",
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+      },
+      quantity: {
+        number: 2,
+        tons: 1.3
       },
       recipient: {
+        operation: {
+          planned: "R 12"
+        },
         company: {
-          siret: "11111111111111"
+          siret: "11111111111111",
+          name: "recipient",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
         }
       }
     };
@@ -105,8 +129,61 @@ describe("Mutation.Vhu.create", () => {
       }
     });
 
-    expect(data.createBsvhu.recipient.company).toMatchObject(
-      input.recipient.company
+    expect(data.createBsvhu.id).toMatch(
+      new RegExp(`^VHU-[0-9]{8}-[A-Z0-9]{9}$`)
+    );
+    expect(data.createBsvhu.recipient.company.siret).toBe(
+      input.recipient.company.siret
+    );
+  });
+
+  it("should fail if a required field like the emitter agrement is missing", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const input = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Un centre VHU",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      wasteCode: "16 01 06",
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+      },
+      quantity: {
+        number: 2,
+        tons: 1.3
+      },
+      recipient: {
+        operation: {
+          planned: "R 12"
+        },
+        company: {
+          siret: "11111111111111",
+          name: "recipient",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(CREATE_VHU_FORM, {
+      variables: {
+        input
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      "Émetteur: le numéro d'agréément est obligatoire"
     );
   });
 });

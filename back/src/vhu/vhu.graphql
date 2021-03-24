@@ -62,13 +62,25 @@ type Mutation {
   Crée un BSVHU
   """
   createBsvhu(input: BsvhuInput!): Bsvhu
-  
+
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Crée un BSVHU en brouillon
+  """
+  createDraftBsvhu(input: BsvhuInput!): Bsvhu
+
   """
   EXPERIMENTAL - Ne pas utiliser dans un contexte de production
   Met à jour un BSVHU
   """
   updateBsvhu(id: ID!, input: BsvhuInput!): Bsvhu
-  
+
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Permet de publier un brouillon pour le marquer comme prêt à être envoyé
+  """
+  publishBsvhu(id: ID!): Bsvhu
+
   """
   EXPERIMENTAL - Ne pas utiliser dans un contexte de production
   Signe un BSVHU
@@ -113,9 +125,9 @@ input BsvhuWhere {
 
   createdAt: DateFilter
   updatedAt: DateFilter
-  emitter: BsBsvhuEmitterWhere
-  transporter: BsBsvhuTransporterWhere
-  recipient: BsBsvhuRecipientWhere
+  emitter: BsvhuEmitterWhere
+  transporter: BsvhuTransporterWhere
+  recipient: BsvhuRecipientWhere
   _and: [BsvhuWhere!]
   _or: [BsvhuWhere!]
   _not: [BsvhuWhere!]
@@ -126,19 +138,20 @@ input DateFilter {
   _gt: DateTime
   _lte: DateTime
   _lt: DateTime
+  _eq: DateTime
 }
 
-input BsBsvhuEmitterWhere {
+input BsvhuEmitterWhere {
   company: BsvhuCompanyWhere
   signature: BsvhuSignatureWhere
 }
 
-input BsBsvhuTransporterWhere {
+input BsvhuTransporterWhere {
   company: BsvhuCompanyWhere
   signature: BsvhuSignatureWhere
 }
 
-input BsBsvhuRecipientWhere {
+input BsvhuRecipientWhere {
   company: BsvhuCompanyWhere
   signature: BsvhuSignatureWhere
 }
@@ -162,8 +175,8 @@ type BsvhuError {
 }
 
 type Bsvhu {
-  "Identifiant interne"
-  id: ID!
+  "Numéro unique attribué par Trackdéchets"
+  id: String!
   createdAt: DateTime!
   updatedAt: DateTime!
   "Indique si le bordereau a été supprimé"
@@ -172,8 +185,6 @@ type Bsvhu {
   isDraft: Boolean!
   "Status du bordereau"
   status: BsvhuStatus!
-  "Numéro unique attribué par Trackdéchets"
-  readableId: String!
 
   "Informations sur l'émetteur"
   emitter: BsvhuEmitter
@@ -204,8 +215,11 @@ type BsvhuEmitter {
 }
 
 enum BsvhuStatus {
-  IN_PROGRESS
-  DONE
+  INITIAL
+  SIGNED_BY_PRODUCER
+  SENT
+  PROCESSED
+  REFUSED
 }
 
 enum BsvhuPackaging {

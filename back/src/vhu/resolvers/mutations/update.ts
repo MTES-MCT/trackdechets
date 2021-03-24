@@ -7,7 +7,7 @@ import { getFormOrFormNotFound } from "../../database";
 import { getNotEditableKeys } from "../../edition-rules";
 import { SealedFieldsError } from "../../errors";
 import { checkIsFormContributor } from "../../permissions";
-import { validateVhuForm } from "../../validation";
+import { validateBsvhuForm } from "../../validation";
 
 export default async function edit(
   _,
@@ -37,13 +37,13 @@ export default async function edit(
     "Vous ne pouvez pas enlever votre établissement du bordereau"
   );
 
-  await validateVhuForm(resultingForm, {
+  await validateBsvhuForm(resultingForm, {
     emitterSignature: prismaForm.emitterSignatureAuthor != null,
     recipientSignature: prismaForm.recipientSignatureAuthor != null,
     transporterSignature: prismaForm.transporterSignatureAuthor != null
   });
 
-  const updatedForm = await prisma.vhuForm.update({
+  const updatedForm = await prisma.bsvhuForm.update({
     where: { id },
     data: formUpdate
   });

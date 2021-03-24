@@ -1,4 +1,4 @@
-import { VhuForm as PrismaVhuForm } from "@prisma/client";
+import { BsvhuForm as PrismaVhuForm } from "@prisma/client";
 import { isObject, objectDiff } from "../forms/workflow/diff";
 import {
   FormCompany,
@@ -108,12 +108,6 @@ function globalNullFieldRule<Type>(keys: string[], field: keyof PrismaVhuForm) {
  * Each field returns true if it can be edited, false otherwise.
  */
 const vhuFormRules: InternalRules<BsvhuInput, PrismaVhuForm> = {
-  isDraft: item =>
-    [
-      item.emitterSignatureDate,
-      item.recipientSignatureDate,
-      item.transporterSignatureDate
-    ].every(s => s == null),
   emitter: {
     agrementNumber: nullFieldRule("emitterSignatureDate"),
     company: globalNullFieldRule(companyKeys, "emitterSignatureDate")

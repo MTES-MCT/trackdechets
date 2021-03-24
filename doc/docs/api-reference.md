@@ -669,6 +669,21 @@ Crée un BSVHU
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>createDraftBsvhu</strong></td>
+<td valign="top"><a href="#bsvhu">Bsvhu</a></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Crée un BSVHU en brouillon
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#bsvhuinput">BsvhuInput</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>createForm</strong></td>
 <td valign="top"><a href="#form">Form</a>!</td>
 <td>
@@ -1110,6 +1125,21 @@ Prépare un nouveau segment de transport multimodal
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>publishBsvhu</strong></td>
+<td valign="top"><a href="#bsvhu">Bsvhu</a></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Permet de publier un brouillon pour le marquer comme prêt à être envoyé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>saveForm</strong> ⚠️</td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>
@@ -1456,10 +1486,10 @@ Département ayant enregistré la déclaration
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>id</strong></td>
-<td valign="top"><a href="#id">ID</a>!</td>
+<td valign="top"><a href="#string">String</a>!</td>
 <td>
 
-Identifiant interne
+Numéro unique attribué par Trackdéchets
 
 </td>
 </tr>
@@ -1497,15 +1527,6 @@ Indique si le bordereau est à l'état de brouillon
 <td>
 
 Status du bordereau
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>readableId</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-Numéro unique attribué par Trackdéchets
 
 </td>
 </tr>
@@ -2289,7 +2310,7 @@ Récépissé courtier (le cas échéant, pour les profils courtier)
 <td valign="top"><a href="#vhuagrement">VhuAgrement</a></td>
 <td>
 
-Récépissé négociant (le cas échéant, pour les profils transporteur)
+Agrément démolisseur (le cas échéant, pour les profils VHU)
 
 </td>
 </tr>
@@ -2298,7 +2319,7 @@ Récépissé négociant (le cas échéant, pour les profils transporteur)
 <td valign="top"><a href="#vhuagrement">VhuAgrement</a></td>
 <td>
 
-Récépissé négociant (le cas échéant, pour les profils transporteur)
+Agrément broyeur (le cas échéant, pour les profils VHU)
 
 </td>
 </tr>
@@ -5102,78 +5123,6 @@ Limite de validité
 </tbody>
 </table>
 
-### BsBsvhuEmitterWhere
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#bsvhucompanywhere">BsvhuCompanyWhere</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-
-### BsBsvhuRecipientWhere
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#bsvhucompanywhere">BsvhuCompanyWhere</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-
-### BsBsvhuTransporterWhere
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#bsvhucompanywhere">BsvhuCompanyWhere</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-
 ### BsvhuAcceptanceInput
 
 <table>
@@ -5275,6 +5224,30 @@ Coordonnées de l'entreprise émétrice
 </tbody>
 </table>
 
+### BsvhuEmitterWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#bsvhucompanywhere">BsvhuCompanyWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### BsvhuIdentificationInput
 
 <table>
@@ -5318,15 +5291,6 @@ Type de numéros d'indentification
 </tr>
 </thead>
 <tbody>
-<tr>
-<td colspan="2" valign="top"><strong>isDraft</strong></td>
-<td valign="top"><a href="#boolean">Boolean</a></td>
-<td>
-
-Permet d'identifier un bordereau comme brouillon. N'est plus modifiable dès qu'une signature a été apposée.
-
-</td>
-</tr>
 <tr>
 <td colspan="2" valign="top"><strong>emitter</strong></td>
 <td valign="top"><a href="#bsvhuemitterinput">BsvhuEmitterInput</a></td>
@@ -5554,6 +5518,30 @@ Destination utérieure prévue, dans le cas d'un second centre VHU
 </tbody>
 </table>
 
+### BsvhuRecipientWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#bsvhucompanywhere">BsvhuCompanyWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### BsvhuSignatureInput
 
 <table>
@@ -5664,6 +5652,30 @@ Récépissé transporteur
 </tbody>
 </table>
 
+### BsvhuTransporterWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#bsvhucompanywhere">BsvhuCompanyWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### BsvhuWhere
 
 <table>
@@ -5707,17 +5719,17 @@ Défaut à vide.
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>emitter</strong></td>
-<td valign="top"><a href="#bsbsvhuemitterwhere">BsBsvhuEmitterWhere</a></td>
+<td valign="top"><a href="#bsvhuemitterwhere">BsvhuEmitterWhere</a></td>
 <td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>transporter</strong></td>
-<td valign="top"><a href="#bsbsvhutransporterwhere">BsBsvhuTransporterWhere</a></td>
+<td valign="top"><a href="#bsvhutransporterwhere">BsvhuTransporterWhere</a></td>
 <td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>recipient</strong></td>
-<td valign="top"><a href="#bsbsvhurecipientwhere">BsBsvhuRecipientWhere</a></td>
+<td valign="top"><a href="#bsvhurecipientwhere">BsvhuRecipientWhere</a></td>
 <td></td>
 </tr>
 <tr>
@@ -5937,6 +5949,11 @@ Annexe 2
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>_lt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>_eq</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a></td>
 <td></td>
 </tr>
@@ -7629,11 +7646,23 @@ Payload d'une adresse chantier
 </thead>
 <tbody>
 <tr>
-<td valign="top"><strong>IN_PROGRESS</strong></td>
+<td valign="top"><strong>INITIAL</strong></td>
 <td></td>
 </tr>
 <tr>
-<td valign="top"><strong>DONE</strong></td>
+<td valign="top"><strong>SIGNED_BY_PRODUCER</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>SENT</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>PROCESSED</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>REFUSED</strong></td>
 <td></td>
 </tr>
 </tbody>

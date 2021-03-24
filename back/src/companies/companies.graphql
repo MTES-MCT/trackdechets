@@ -149,12 +149,12 @@ type CompanyPrivate {
   brokerReceipt: BrokerReceipt
 
   """
-  Récépissé négociant (le cas échéant, pour les profils transporteur)
+  Agrément démolisseur (le cas échéant, pour les profils VHU)
   """
   vhuAgrementDemolisseur: VhuAgrement
 
   """
-  Récépissé négociant (le cas échéant, pour les profils transporteur)
+  Agrément broyeur (le cas échéant, pour les profils VHU)
   """
   vhuAgrementBroyeur: VhuAgrement
 
