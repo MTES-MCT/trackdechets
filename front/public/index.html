@@ -31,6 +31,44 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Trackdéchets | La tracabilité des déchets en toute sécurité</title>
+    <!-- Chat Sendinblue -->
+    <script type="text/javascript">
+      (function() {
+ 
+        window.sib = { equeue: [], client_key: "9kbsnihcuztsxe7gf6h1wdw6" };
+        window.sib.display_chat = %REACT_APP_SIB_CHAT%;
+
+        window.sendinblue = {};
+        for (
+          var j = ["track", "identify", "trackLink", "page"], i = 0;
+          i < j.length;
+          i++
+        ) {
+          (function(k) {
+            window.sendinblue[k] = function() {
+              var arg = Array.prototype.slice.call(arguments);
+              (
+                window.sib[k] ||
+                function() {
+                  var t = {};
+                  t[k] = arg;
+                  window.sib.equeue.push(t);
+                }
+              )(arg[0], arg[1], arg[2]);
+            };
+          })(j[i]);
+        }
+        var n = document.createElement("script"),
+          i = document.getElementsByTagName("script")[0];
+        (n.type = "text/javascript"),
+          (n.id = "sendinblue-js"),
+          (n.async = !0),
+          (n.src =
+            "https://sibautomation.com/sa.js?key=" + window.sib.client_key),
+          i.parentNode.insertBefore(n, i),
+          window.sendinblue.page();
+      })();
+    </script>
   </head>
   <body>
     <noscript>
@@ -41,29 +79,5 @@
       >.
     </noscript>
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-
-    <!-- CRISP -->
-    <script type="text/javascript">
-      // CRISP
-      window.$crisp = ["safe", true];
-      window.CRISP_WEBSITE_ID = "11231caa-e6f1-436b-addc-eec1e0ddf040";
-      (function () {
-        d = document;
-        s = d.createElement("script");
-        s.src = "https://client.crisp.chat/l.js";
-        s.async = 1;
-        d.getElementsByTagName("head")[0].appendChild(s);
-      })();
-    </script>
   </body>
 </html>
