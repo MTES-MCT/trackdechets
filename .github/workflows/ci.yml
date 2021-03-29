@@ -89,7 +89,7 @@ jobs:
           chmod +x ./run.sh
           ./run.sh
 
-  deploy:
+  deploy-backend:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -101,20 +101,53 @@ jobs:
         with:
           fetch-depth: 0
       - name: Add SSH key
-        uses: shimataro/ssh-key-action@v2.1.0
+        uses: shimataro/ssh-key-action@v2.3.0
         with:
           key: ${{ secrets.CI_SSH_KEY }}
           known_hosts: ${{ secrets.CI_KNOWN_HOST }}
-      - name: Deploy
+      - name: Deploy backend
         run: |
-          chmod +x ./deploy.sh
-          ./deploy.sh
+          chmod +x ./deploy-back.sh
+          ./deploy-back.sh
         env:
           GIT_STAGING_1_BACK: ${{ secrets.GIT_STAGING_1_BACK }}
-          GIT_STAGING_1_FRONT: ${{ secrets.GIT_STAGING_1_FRONT }}
           GIT_PROD_BACK: "TODO"
-          GIT_PROD_FRONT: "TODO"
           GIT_SANDBOX_BACK: "TODO"
-          GIT_SANDBOX_FRONT: "TODO"
           GIT_DEV_BACK: "TODO"
-          GIT_DEV_FRONT: "TODO"
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front
+    needs: [front, back, integration-tests]
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: "12.x"
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - uses: jakejarvis/s3-sync-action@v0.5.1
+        with:
+          args: --follow-symlinks --delete
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_S3_ENDPOINT: "https://s3.fr-par.scw.cloud"
+          AWS_REGION: "fr-par"
+          SOURCE_DIR: "front/build"
