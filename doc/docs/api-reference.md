@@ -4666,6 +4666,15 @@ Nom de l'utilisateur
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>isAdmin</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+Qualité d'administrateur. Rôle reservé aux agents de l'administration
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>phone</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>

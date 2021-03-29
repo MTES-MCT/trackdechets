@@ -1,4 +1,8 @@
 export default {
+  admin: {
+    index: "/admin",
+    verification: "/admin/verification",
+  },
   login: "/login",
   invite: "/invite",
   membershipRequest: "/membership-request/:id",

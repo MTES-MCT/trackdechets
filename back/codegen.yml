@@ -35,6 +35,6 @@ generates:
       afterOneFileWrite:
         - prettier --config .prettierrc --write
   ../doc/docs/api-reference.md:
-    schema: "!./src/**/*.private.graphql"
+    schema: "!./src/**/*.{private,admin}.graphql"
     plugins:
       - graphql-markdown-plugin.js

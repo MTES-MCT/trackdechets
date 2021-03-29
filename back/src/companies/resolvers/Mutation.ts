@@ -16,6 +16,7 @@ import verifyCompany from "./mutations/verifyCompany";
 import createVhuAgrement from "./mutations/createVhuAgrement";
 import updateVhuAgrement from "./mutations/updateVhuAgrement";
 import deleteVhuAgrement from "./mutations/deleteVhuAgrement";
+import verifyCompanyByAdmin from "./mutations/verifyCompanyByAdmin";
 
 const Mutation: MutationResolvers = {
   createCompany,
@@ -34,7 +35,8 @@ const Mutation: MutationResolvers = {
   verifyCompany,
   createVhuAgrement,
   updateVhuAgrement,
-  deleteVhuAgrement
+  deleteVhuAgrement,
+  verifyCompanyByAdmin
 };
 
 export default Mutation;

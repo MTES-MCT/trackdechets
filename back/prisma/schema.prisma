@@ -526,6 +526,7 @@ model User {
   activatedAt          DateTime? // when was this user activated ? - emailing purpose
   firstAssociationDate DateTime? // when was this user first associated to any company ? - emailing purpose
   isActive             Boolean?             @default(false)
+  isAdmin              Boolean?             @default(false)
   applicationId        String?
   application          Application?         @relation(fields: [applicationId], references: [id])
   companyAssociations  CompanyAssociation[]

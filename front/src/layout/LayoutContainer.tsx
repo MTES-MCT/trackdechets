@@ -14,7 +14,9 @@ import Loader from "common/components/Loaders";
 import Layout from "./Layout";
 import routes from "common/routes";
 import { useQuery, gql } from "@apollo/client";
+import { Query } from "../generated/graphql/types";
 
+const Admin = lazy(() => import("admin/Admin"));
 const Dashboard = lazy(() => import("dashboard/Dashboard"));
 const Account = lazy(() => import("account/Account"));
 const AccountMembershipRequest = lazy(() =>
@@ -38,6 +40,7 @@ const GET_ME = gql`
     me {
       id
       email
+      isAdmin
       companies {
         siret
       }
@@ -46,10 +49,9 @@ const GET_ME = gql`
 `;
 
 export default withRouter(function LayoutContainer({ history }) {
-  const { data, loading } = useQuery<{
-    me: { id: string; email: string; companies: Array<{ siret: string }> };
-  }>(GET_ME);
+  const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME);
   const isAuthenticated = !loading && data != null;
+  const isAdmin = (isAuthenticated && data?.me?.isAdmin) || false;
   const email = data?.me?.email;
 
   useEffect(() => {
@@ -85,8 +87,19 @@ export default withRouter(function LayoutContainer({ history }) {
         </PrivateRoute>
 
         <Route>
-          <Layout isAuthenticated={isAuthenticated}>
+          <Layout isAuthenticated={isAuthenticated} isAdmin={isAdmin}>
             <Switch>
+              <PrivateRoute
+                path={routes.admin.index}
+                isAuthenticated={isAuthenticated}
+              >
+                {isAdmin ? (
+                  <Admin />
+                ) : (
+                  <div>Vous n'êtes pas autorisé à consulter cette page</div>
+                )}
+              </PrivateRoute>
+
               <Route exact path={routes.login}>
                 <Login />
               </Route>
