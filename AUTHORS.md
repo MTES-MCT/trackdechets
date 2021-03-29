@@ -7,3 +7,4 @@
 * [Benoît Guigal](https://github.com/benoitguigal) - Développeur
 * [Laurent Paoletti](https://github.com/providenz) - Développeur
 * [Gabin Aureche](https://github.com/zhouzi) - Développeur
+* [Thomas Bouchardon](https://github.com/alfabouch ) - Développeur
