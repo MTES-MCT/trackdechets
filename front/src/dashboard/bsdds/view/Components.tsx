@@ -48,10 +48,9 @@ export const PackagingRow = ({
     () => packagingInfos?.reduce((prev, cur) => cur.quantity + prev, 0),
     [packagingInfos]
   );
-  const formatedPackagings = useMemo(
-    () => formatPackagings(packagingInfos?.map(p => p.type)),
-    [packagingInfos]
-  );
+  const formatedPackagings = useMemo(() => formatPackagings(packagingInfos), [
+    packagingInfos,
+  ]);
 
   return (
     <>
@@ -59,7 +58,7 @@ export const PackagingRow = ({
       <dd>
         {formatedPackagings}
         {numberOfPackages && (
-          <span className="tw-ml-2">({numberOfPackages})</span>
+          <span className="tw-ml-2">[Total {numberOfPackages}]</span>
         )}
       </dd>
     </>

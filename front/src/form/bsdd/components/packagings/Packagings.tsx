@@ -2,7 +2,7 @@ import Tooltip from "../../../../common/components/Tooltip";
 import { IconClose } from "common/components/Icons";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { Field, FieldArray, FieldProps } from "formik";
+import { Field, FieldArray, FieldProps, useFormikContext } from "formik";
 import {
   PackagingInfo,
   Packagings as PackagingsEnum,
@@ -19,11 +19,12 @@ const PACKAGINGS = [
 ];
 
 export default function Packagings({
-  field: { name, value },
-  form: { errors },
+  field: { name, value, onChange },
+  form,
   id,
   ...props
 }: FieldProps<PackagingInfo[] | null> & InputHTMLAttributes<HTMLInputElement>) {
+  const { setFieldValue } = useFormikContext();
   const isAddButtonDisabled = useMemo(() => {
     if (value == null || value.length === 0) {
       return false;
@@ -61,6 +62,9 @@ export default function Packagings({
                           name={`${name}.${idx}.type`}
                           as="select"
                           className="td-select"
+                          onClick={() =>
+                            setFieldValue(`${name}.${idx}.other`, "")
+                          }
                         >
                           {PACKAGINGS.map(packaging => (
                             <option

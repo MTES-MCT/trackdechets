@@ -371,7 +371,11 @@ export default function BSDDetailContent({
               <dt>Quantité</dt>
               <dd>{form.stateSummary?.quantity ?? "?"} tonnes</dd>
               <PackagingRow
-                packagingInfos={form.wasteDetails?.packagingInfos}
+                packagingInfos={
+                  hasTempStorage
+                    ? form.temporaryStorageDetail?.wasteDetails?.packagingInfos
+                    : form.wasteDetails?.packagingInfos
+                }
               />
               <dt>Consistance</dt>{" "}
               <dd>{getVerboseConsistence(form.wasteDetails?.consistence)}</dd>
