@@ -15,6 +15,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Correction d'un bug dans l'interface Trackdéchets lorsque sur mobile on souhaitait accéder à son compte. Le bouton n'apparaissait pas car on ne pouvait pas scroller [PR 828](https://github.com/MTES-MCT/trackdechets/pull/828)
+- Correction d'un bug dans l'interface lors de la saisie des conditionnements. Si on avait sélectionné "Autre" en précisant la description et qu'on changeait ensuite le type de conditionnement, un message d'erreur apparaissait  [PR 828](https://github.com/MTES-MCT/trackdechets/pull/828)
+- Correction d'un bug dans l'interface dans la modale de détail d'un bordereau. Le conditionnement ne donnait pas le détail des "Autre", et n'affichait pas le bon conditionnement dans le cas d'un entreposage provisoire [PR 828](https://github.com/MTES-MCT/trackdechets/pull/828)
+
 #### :nail_care: Améliorations
 
 #### :memo: Documentation
