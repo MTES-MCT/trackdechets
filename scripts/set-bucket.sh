@@ -11,11 +11,9 @@ case $BRANCH_NAME in
         ;;
     dev)
         BUCKET_NAME="front-dev"
-        exit 0
         ;;
     master)
         BUCKET_NAME="front-master"
-        exit 0
         ;;
     *)
         echo "❌ Not a deploy target, aborting."
