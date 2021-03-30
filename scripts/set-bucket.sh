@@ -10,11 +10,11 @@ case $BRANCH_NAME in
         BUCKET_NAME="front-staging-1"
         ;;
     dev)
-        echo "⚠ Not handled yet, exiting."
+        BUCKET_NAME="front-dev"
         exit 0
         ;;
     master)
-        echo "⚠ Not handled yet, exiting."
+        BUCKET_NAME="front-master"
         exit 0
         ;;
     *)
