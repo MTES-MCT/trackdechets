@@ -7,7 +7,7 @@ import nocache from "../common/middlewares/nocache";
 
 const UI_BASE_URL = getUIBaseURL();
 
-const authRouter = Router();
+export const authRouter = Router();
 authRouter.post("/login", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
@@ -47,5 +47,3 @@ authRouter.post("/logout", (req, res) => {
     })
     .redirect(`${UI_BASE_URL}`);
 });
-
-export { authRouter };

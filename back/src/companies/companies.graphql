@@ -45,7 +45,7 @@ enum CompanyType {
   "Transporteur"
   TRANSPORTER
 
-  "Installation d'entreposage, dépollution, démontage, découpage de VHU"
+  "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)"
   WASTE_VEHICLES
 
   "Installation de collecte de déchets apportés par le producteur initial"
@@ -149,6 +149,16 @@ type CompanyPrivate {
   brokerReceipt: BrokerReceipt
 
   """
+  Agrément démolisseur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementDemolisseur: VhuAgrement
+
+  """
+  Agrément broyeur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementBroyeur: VhuAgrement
+
+  """
   Liste des agréments de l'éco-organisme
   """
   ecoOrganismeAgreements: [URL!]!
@@ -217,6 +227,16 @@ type CompanyPublic {
   brokerReceipt: BrokerReceipt
 
   """
+  Agrément VHU démolisseur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementDemolisseur: VhuAgrement
+
+  """
+  Agrément VHU broyeur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementBroyeur: VhuAgrement
+
+  """
   Liste des agréments de l'éco-organisme
   """
   ecoOrganismeAgreements: [URL!]!
@@ -265,6 +285,16 @@ type CompanySearchResult {
   Récépissé courtier associé à cet établissement (le cas échant)
   """
   brokerReceipt: BrokerReceipt
+
+  """
+  Agrément VHU démolisseur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementDemolisseur: VhuAgrement
+
+  """
+  Agrément VHU broyeur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementBroyeur: VhuAgrement
 }
 
 """
@@ -346,6 +376,23 @@ type BrokerReceipt {
   Limite de validité du récépissé
   """
   validityLimit: DateTime!
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String!
+}
+
+"""
+Agrément VHU
+"""
+type VhuAgrement {
+  id: ID!
+
+  """
+  Numéro d'agrément VHU
+  """
+  agrementNumber: String!
 
   """
   Département ayant enregistré la déclaration

@@ -6,9 +6,6 @@ CREATE TABLE "default$default"."BrokerReceipt"
     department      text         not null
 );
 
-ALTER TABLE "default$default"."BrokerReceipt"
-    OWNER TO trackdechets;
-
 ALTER TABLE "default$default"."Company"
     ADD COLUMN "brokerReceiptId" varchar(30);
 

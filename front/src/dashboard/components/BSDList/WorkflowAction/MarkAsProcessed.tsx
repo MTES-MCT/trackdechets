@@ -4,8 +4,8 @@ import {
   PROCESSING_OPERATIONS,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
 } from "generated/constants";
-import DateInput from "form/custom-inputs/DateInput";
-import CompanySelector from "form/company/CompanySelector";
+import DateInput from "form/common/components/custom-inputs/DateInput";
+import CompanySelector from "form/common/components/company/CompanySelector";
 import {
   Form as TdForm,
   FormStatus,

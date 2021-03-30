@@ -147,36 +147,40 @@ model Application {
 }
 
 model Company {
-  id                     String               @id @default(cuid())
-  siret                  String               @unique
-  updatedAt              DateTime             @updatedAt
-  createdAt              DateTime             @default(now())
-  securityCode           Int
-  verificationCode       String
-  verificationStatus     CompanyVerificationStatus @default(TO_BE_VERIFIED)
-  verificationMode       CompanyVerificationMode?
-  verificationComment    String?
-  verifiedAt             DateTime?
-  name                   String?
-  address                String?
-  longitude              Float?
-  latitude               Float?
-  gerepId                String?
-  codeNaf                String?
-  givenName              String?
-  contactEmail           String?
-  contactPhone           String?
-  website                String?
-  ecoOrganismeAgreements String[]
-  companyTypes           CompanyType[]
-  traderReceiptId        String?
-  traderReceipt          TraderReceipt?       @relation(fields: [traderReceiptId], references: [id])
-  brokerReceiptId        String?
-  brokerReceipt          BrokerReceipt?       @relation(fields: [brokerReceiptId], references: [id])
-  transporterReceiptId   String?
-  transporterReceipt     TransporterReceipt?  @relation(fields: [transporterReceiptId], references: [id])
-  CompanyAssociation     CompanyAssociation[]
-  MembershipRequest      MembershipRequest[]
+  id                       String                    @id @default(cuid())
+  siret                    String                    @unique
+  updatedAt                DateTime                  @updatedAt
+  createdAt                DateTime                  @default(now())
+  securityCode             Int
+  verificationCode         String
+  verificationStatus       CompanyVerificationStatus @default(TO_BE_VERIFIED)
+  verificationMode         CompanyVerificationMode?
+  verificationComment      String?
+  verifiedAt               DateTime?
+  name                     String?
+  address                  String?
+  longitude                Float?
+  latitude                 Float?
+  gerepId                  String?
+  codeNaf                  String?
+  givenName                String?
+  contactEmail             String?
+  contactPhone             String?
+  website                  String?
+  ecoOrganismeAgreements   String[]
+  companyTypes             CompanyType[]
+  traderReceiptId          String?
+  traderReceipt            TraderReceipt?            @relation(fields: [traderReceiptId], references: [id])
+  brokerReceiptId          String?
+  brokerReceipt            BrokerReceipt?            @relation(fields: [brokerReceiptId], references: [id])
+  transporterReceiptId     String?
+  transporterReceipt       TransporterReceipt?       @relation(fields: [transporterReceiptId], references: [id])
+  vhuAgrementDemolisseurId String?
+  vhuAgrementDemolisseur   VhuAgrement?              @relation(name: "VhuAgrementDemolisseur_Company", fields: [vhuAgrementDemolisseurId], references: [id])
+  vhuAgrementBroyeurId     String?
+  vhuAgrementBroyeur       VhuAgrement?              @relation(name: "VhuAgrementBroyeur_Company", fields: [vhuAgrementBroyeurId], references: [id])
+  CompanyAssociation       CompanyAssociation[]
+  MembershipRequest        MembershipRequest[]
 }
 
 // Companies with restricted diffusion of SIRENE information (police, army, etc)
@@ -467,6 +471,7 @@ model BrokerReceipt {
   receiptNumber String
   validityLimit DateTime
   department    String
+  Company       Company[]
 }
 
 model TransporterReceipt {
@@ -475,6 +480,14 @@ model TransporterReceipt {
   validityLimit DateTime
   department    String
   Company       Company[]
+}
+
+model VhuAgrement {
+  id                   String    @id @default(cuid())
+  agrementNumber       String
+  department           String
+  demolisseurCompanies Company[] @relation("VhuAgrementDemolisseur_Company")
+  broyeurCompanies     Company[] @relation("VhuAgrementBroyeur_Company")
 }
 
 model TransportSegment {
@@ -503,25 +516,25 @@ model TransportSegment {
 }
 
 model User {
-  id                          String               @id @default(cuid())
-  email                       String               @unique
-  password                    String
-  name                        String?
-  phone                       String?
-  createdAt                   DateTime             @default(now())
-  updatedAt                   DateTime             @updatedAt
-  activatedAt                 DateTime?            // when was this user activated ? - emailing purpose
-  firstAssociationDate        DateTime?            // when was this user first associated to any company ? - emailing purpose
-  isActive                    Boolean?             @default(false)
-  applicationId               String?
-  application                 Application?         @relation(fields: [applicationId], references: [id])
-  companyAssociations         CompanyAssociation[]
-  AccessToken                 AccessToken[]
-  Form                        Form[]
-  Grant                       Grant[]
-  MembershipRequest           MembershipRequest[]
-  StatusLog                   StatusLog[]
-  UserActivationHash          UserActivationHash[]
+  id                   String               @id @default(cuid())
+  email                String               @unique
+  password             String
+  name                 String?
+  phone                String?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  activatedAt          DateTime? // when was this user activated ? - emailing purpose
+  firstAssociationDate DateTime? // when was this user first associated to any company ? - emailing purpose
+  isActive             Boolean?             @default(false)
+  applicationId        String?
+  application          Application?         @relation(fields: [applicationId], references: [id])
+  companyAssociations  CompanyAssociation[]
+  AccessToken          AccessToken[]
+  Form                 Form[]
+  Grant                Grant[]
+  MembershipRequest    MembershipRequest[]
+  StatusLog            StatusLog[]
+  UserActivationHash   UserActivationHash[]
 }
 
 model UserAccountHash {
@@ -542,4 +555,96 @@ model UserActivationHash {
   createdAt DateTime @default(now())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
+}
+
+// ----------------
+// BSVHU FORM
+// ----------------
+enum BsvhuStatus {
+  INITIAL
+  SIGNED_BY_PRODUCER
+  SENT
+  PROCESSED
+  REFUSED
+}
+
+enum BsvhuPackaging {
+  UNITE
+  LOT
+}
+
+enum BsvhuIdentificationType {
+  NUMERO_ORDRE_REGISTRE_POLICE
+  NUMERO_ORDRE_LOTS_SORTANTS
+}
+
+enum BsvhuRecipientType {
+  BROYEUR
+  DEMOLISSEUR
+}
+
+model BsvhuForm {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDraft   Boolean  @default(false)
+  isDeleted Boolean  @default(false)
+
+  status BsvhuStatus @default(INITIAL)
+
+  emitterAgrementNumber String?
+  emitterCompanyName    String?
+  emitterCompanySiret   String?
+  emitterCompanyAddress String?
+  emitterCompanyContact String?
+  emitterCompanyPhone   String?
+  emitterCompanyMail    String?
+
+  recipientType             BsvhuRecipientType?
+  recipientOperationPlanned String?             @default("R 4")
+  recipientAgrementNumber   String?
+  recipientCompanyName      String?
+  recipientCompanySiret     String?
+  recipientCompanyAddress   String?
+  recipientCompanyContact   String?
+  recipientCompanyPhone     String?
+  recipientCompanyMail      String?
+
+  wasteCode             String?                  @default("16 01 06")
+  packaging             BsvhuPackaging?
+  identificationNumbers String[]
+  identificationType    BsvhuIdentificationType?
+  quantityNumber        Int?
+  quantityTons          Float?
+
+  emitterSignatureAuthor String?
+  emitterSignatureDate   DateTime?
+
+  transporterCompanyName            String?
+  transporterCompanySiret           String?
+  transporterCompanyAddress         String?
+  transporterCompanyContact         String?
+  transporterCompanyPhone           String?
+  transporterCompanyMail            String?
+  transporterTvaIntracommunautaire  String?
+  transporterRecepisseNumber        String?
+  transporterRecepisseDepartment    String?
+  transporterRecepisseValidityLimit DateTime?
+  transporterSignatureAuthor        String?
+  transporterSignatureDate          DateTime?
+
+  recipientAcceptanceQuantity              Float?
+  recipientAcceptanceStatus                WasteAcceptationStatus?
+  recipientAcceptanceRefusalReason         String?
+  recipientAcceptanceIdentificationNumbers String[]
+  recipientAcceptanceIdentificationType    BsvhuIdentificationType?
+  recipientOperationDone                   String?
+  recipientPlannedBroyeurCompanyName       String?
+  recipientPlannedBroyeurCompanySiret      String?
+  recipientPlannedBroyeurCompanyAddress    String?
+  recipientPlannedBroyeurCompanyContact    String?
+  recipientPlannedBroyeurCompanyPhone      String?
+  recipientPlannedBroyeurCompanyMail       String?
+  recipientSignatureAuthor                 String?
+  recipientSignatureDate                   DateTime?
 }

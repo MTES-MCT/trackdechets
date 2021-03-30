@@ -1,7 +1,7 @@
 import * as React from "react";
 import { generatePath, Link } from "react-router-dom";
 import classNames from "classnames";
-import useMedia from "use-media";
+import { useMedia } from "use-media";
 import { Form } from "generated/graphql/types";
 import { MEDIA_QUERIES } from "common/config";
 import routes from "common/routes";

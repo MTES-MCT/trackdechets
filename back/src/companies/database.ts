@@ -8,7 +8,8 @@ import {
   CompanyNotFound,
   TraderReceiptNotFound,
   BrokerReceiptNotFound,
-  TransporterReceiptNotFound
+  TransporterReceiptNotFound,
+  VhuAgrementNotFound
 } from "./errors";
 import { CompanyMember } from "../generated/graphql/types";
 
@@ -205,6 +206,16 @@ export async function getTransporterReceiptOrNotFound({
     throw new TransporterReceiptNotFound();
   }
   return receipt;
+}
+
+export async function getVhuAgrementOrNotFound({
+  id
+}: Prisma.VhuAgrementWhereUniqueInput) {
+  const agrement = await prisma.vhuAgrement.findUnique({ where: { id } });
+  if (agrement == null) {
+    throw new VhuAgrementNotFound();
+  }
+  return agrement;
 }
 
 export function convertUrls<T extends Partial<Company>>(

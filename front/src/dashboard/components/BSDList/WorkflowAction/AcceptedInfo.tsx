@@ -1,9 +1,12 @@
 import React from "react";
 import { Field, Form, Formik } from "formik";
 import * as yup from "yup";
-import NumberInput from "form/custom-inputs/NumberInput";
-import DateInput from "form/custom-inputs/DateInput";
-import { InlineRadioButton, RadioButton } from "form/custom-inputs/RadioButton";
+import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import DateInput from "form/common/components/custom-inputs/DateInput";
+import {
+  InlineRadioButton,
+  RadioButton,
+} from "form/common/components/custom-inputs/RadioButton";
 import {
   WasteAcceptationStatusInput as WasteAcceptationStatus,
   FormStatus,

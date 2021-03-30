@@ -10,7 +10,7 @@ import {
 import { Label, RedErrorMessage } from "common/components";
 import { NotificationError } from "common/components/Error";
 import { PreviousButton } from "common/components/Buttons";
-import NumberInput from "form/custom-inputs/NumberInput";
+import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { CollectAddress } from "./CollectAddress";
 
 interface SignatureEmitterProps {

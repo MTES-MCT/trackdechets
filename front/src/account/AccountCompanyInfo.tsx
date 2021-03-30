@@ -12,6 +12,8 @@ import AccountFieldCompanyTransporterReceipt from "./fields/AccountFieldCompanyT
 import AccountFieldCompanyTraderReceipt from "./fields/AccountFieldCompanyTraderReceipt";
 import AccountFieldCompanyBrokerReceipt from "./fields/AccountFieldCompanyBrokerReceipt";
 import AccountFieldCompanyVerificationStatus from "./fields/AccountFieldCompanyVerificationStatus";
+import AccountFieldCompanyVhuAgrementBroyeur from "./fields/AccountFieldCompanyVhuAgrementBroyeur";
+import AccountFieldCompanyVhuAgrementDemolisseur from "./fields/AccountFieldCompanyVhuAgrementDemolisseur";
 import * as COMPANY_TYPES from "generated/constants/COMPANY_TYPES";
 
 const { REACT_APP_VERIFY_COMPANY } = process.env;
@@ -35,6 +37,8 @@ AccountCompanyInfo.fragments = {
       ...AccountFieldCompanyTraderReceiptFragment
       ...AccountFieldCompanyBrokerReceiptFragment
       ...AccountFieldCompanyVerificationStatusFragment
+      ...AccountFieldCompanyVhuAgrementBroyeurFragment
+      ...AccountFieldCompanyVhuAgrementDemolisseurFragment
       installation {
         urlFiche
       }
@@ -46,6 +50,8 @@ AccountCompanyInfo.fragments = {
     ${AccountFieldCompanyTraderReceipt.fragments.company}
     ${AccountFieldCompanyBrokerReceipt.fragments.company}
     ${AccountFieldCompanyVerificationStatus.fragments.company}
+    ${AccountFieldCompanyVhuAgrementBroyeur.fragments.company}
+    ${AccountFieldCompanyVhuAgrementDemolisseur.fragments.company}
   `,
 };
 
@@ -125,6 +131,22 @@ export default function AccountCompanyInfo({ company }: Props) {
             company
           )}
         />
+      )}
+      {company.companyTypes.includes(CompanyType.WasteVehicles) && (
+        <>
+          <AccountFieldCompanyVhuAgrementBroyeur
+            company={filter(
+              AccountFieldCompanyVhuAgrementBroyeur.fragments.company,
+              company
+            )}
+          />
+          <AccountFieldCompanyVhuAgrementDemolisseur
+            company={filter(
+              AccountFieldCompanyVhuAgrementDemolisseur.fragments.company,
+              company
+            )}
+          />
+        </>
       )}
       {company.userRole === UserRole.Admin ? (
         <AccountFieldCompanyGivenName

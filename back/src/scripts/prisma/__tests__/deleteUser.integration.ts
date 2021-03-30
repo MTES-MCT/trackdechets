@@ -9,6 +9,7 @@ import {
 } from "../../../__tests__/factories";
 import deleteUser from "../deleteUser";
 
+
 describe("deleteUser", () => {
   afterEach(() => resetDatabase());
 

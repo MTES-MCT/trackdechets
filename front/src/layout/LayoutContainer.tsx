@@ -20,7 +20,8 @@ const Account = lazy(() => import("account/Account"));
 const AccountMembershipRequest = lazy(() =>
   import("account/AccountMembershipRequest")
 );
-const FormContainer = lazy(() => import("form/FormContainer"));
+const FormContainer = lazy(() => import("form/bsdd/FormContainer"));
+const BsvhuFormContainer = lazy(() => import("form/bsvhu/FormContainer"));
 const SignupInfo = lazy(() => import("login/SignupInfos"));
 const WasteSelector = lazy(() => import("login/WasteSelector"));
 
@@ -153,6 +154,22 @@ export default withRouter(function LayoutContainer({ history }) {
                 exact
               >
                 <FormContainer />
+              </PrivateRoute>
+
+              <PrivateRoute
+                path={routes.dashboard.bsvhus.create}
+                isAuthenticated={isAuthenticated}
+                exact
+              >
+                <BsvhuFormContainer />
+              </PrivateRoute>
+
+              <PrivateRoute
+                path={routes.dashboard.bsvhus.edit}
+                isAuthenticated={isAuthenticated}
+                exact
+              >
+                <BsvhuFormContainer />
               </PrivateRoute>
 
               <PrivateRoute

@@ -24,7 +24,7 @@ export const COMPANY_TYPES = [
   {
     value: CompanyType.WasteVehicles,
     label:
-      "Installation d'entreposage, dépollution, démontage, découpage de VHU",
+      "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)",
     helpText:
       "Casse automobile, installations d'entreposage, dépollution, démontage de tout type de véhicules hors d'usage - installations relevant de la rubrique 2712 de la nomenclature ICPE",
   },

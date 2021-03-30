@@ -39,3 +39,9 @@ export async function resetDatabase() {
 export function resetCache() {
   return redisClient.flushdb();
 }
+
+afterAll(async () => {
+  jest.restoreAllMocks();
+  await redisClient.quit();
+  await prisma.$disconnect();
+});

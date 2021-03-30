@@ -6,6 +6,7 @@ type Props = {
   query: DocumentNode;
   params: any;
   children?: any;
+  linkGetter?: (data: any) => string;
   onSuccess?: () => void;
 };
 
@@ -13,6 +14,7 @@ export default function DownloadFileLink({
   query,
   params,
   children,
+  linkGetter = data => data.formPdf.downloadLink,
   onSuccess,
   ...props
 }: Props & any) {
@@ -25,13 +27,13 @@ export default function DownloadFileLink({
       return;
     }
 
-    const key = Object.keys(data)[0];
-    if (data[key].downloadLink) {
-      window.open(data[key].downloadLink, "_blank");
+    const link = linkGetter(data);
+    if (link) {
+      window.open(link, "_blank");
     }
 
     !!onSuccess && onSuccess();
-  }, [data, onSuccess]);
+  }, [data, onSuccess, linkGetter]);
 
   return (
     <button

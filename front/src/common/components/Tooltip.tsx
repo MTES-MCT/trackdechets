@@ -1,7 +1,6 @@
 import React from "react";
 import { IconQuestionCircle } from "common/components/Icons";
 import { Tooltip } from "@reach/tooltip";
-import "@reach/tooltip/styles.css";
 import style from "./Tooltip.module.scss";
 
 type Props = {

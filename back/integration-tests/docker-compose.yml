@@ -17,7 +17,7 @@ services:
     build:
       context: ../
       dockerfile: Dockerfile.dev
-    command: npx nodemon -L --watch src --exec "ts-node" src/index.ts
+    command: tail -f /dev/null
     volumes:
       - ../src:/usr/src/app/src
     env_file:

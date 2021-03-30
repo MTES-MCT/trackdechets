@@ -15,6 +15,7 @@ mutation DeleteForm($id: ID!) {
   }
 }
 `;
+
 describe("Mutation.deleteForm", () => {
   afterEach(resetDatabase);
 

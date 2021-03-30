@@ -114,6 +114,290 @@ export type BrokerReceipt = {
   department: Scalars["String"];
 };
 
+export type Bsvhu = {
+  __typename?: "Bsvhu";
+  /** Numéro unique attribué par Trackdéchets */
+  id: Scalars["String"];
+  createdAt: Scalars["DateTime"];
+  updatedAt: Scalars["DateTime"];
+  /** Indique si le bordereau a été supprimé */
+  isDeleted: Scalars["Boolean"];
+  /** Indique si le bordereau est à l'état de brouillon */
+  isDraft: Scalars["Boolean"];
+  /** Status du bordereau */
+  status: BsvhuStatus;
+  /** Informations sur l'émetteur */
+  emitter?: Maybe<BsvhuEmitter>;
+  /** Code déchet. Presque toujours 16 01 06 */
+  wasteCode?: Maybe<Scalars["String"]>;
+  /** Conditionnement du déchet */
+  packaging?: Maybe<BsvhuPackaging>;
+  /** Identification des VHUs */
+  identification?: Maybe<BsvhuIdentification>;
+  /** Quantité de VHUs */
+  quantity?: Maybe<BsvhuQuantity>;
+  /** Détails sur la destination */
+  recipient?: Maybe<BsvhuRecipient>;
+  /** Détails sur le transporteur */
+  transporter?: Maybe<BsvhuTransporter>;
+  metadata: BsvhuMetadata;
+};
+
+export type BsvhuAcceptanceInput = {
+  /** Quantité réelle reçue */
+  quantity?: Maybe<Scalars["Float"]>;
+  /** Status d'acceptation du déchet */
+  status?: Maybe<WasteAcceptationStatusInput>;
+  /** Raison du refus du déchet, dans le cas d'un refus */
+  refusalReason?: Maybe<Scalars["String"]>;
+  /** Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre) */
+  identification?: Maybe<BsvhuIdentificationInput>;
+};
+
+export type BsvhuCompanyWhere = {
+  siret: Scalars["String"];
+};
+
+export type BsvhuConnection = {
+  __typename?: "BsvhuConnection";
+  totalCount: Scalars["Int"];
+  pageInfo: PageInfo;
+  edges: Array<BsvhuEdge>;
+};
+
+export type BsvhuEdge = {
+  __typename?: "BsvhuEdge";
+  cursor: Scalars["String"];
+  node: Bsvhu;
+};
+
+export type BsvhuEmitter = {
+  __typename?: "BsvhuEmitter";
+  /** Numéro d'agrément émetteur */
+  agrementNumber?: Maybe<Scalars["String"]>;
+  /** Coordonnées de l'entreprise émétrice */
+  company?: Maybe<FormCompany>;
+  signature?: Maybe<Signature>;
+};
+
+export type BsvhuEmitterInput = {
+  /** Numéro d'agrément émetteur */
+  agrementNumber?: Maybe<Scalars["String"]>;
+  /** Coordonnées de l'entreprise émétrice */
+  company?: Maybe<CompanyInput>;
+};
+
+export type BsvhuEmitterWhere = {
+  company?: Maybe<BsvhuCompanyWhere>;
+  signature?: Maybe<BsvhuSignatureWhere>;
+};
+
+export type BsvhuError = {
+  __typename?: "BsvhuError";
+  message: Scalars["String"];
+  path: Scalars["String"];
+  requiredFor: SignatureTypeInput;
+};
+
+export type BsvhuIdentification = {
+  __typename?: "BsvhuIdentification";
+  numbers?: Maybe<Array<Maybe<Scalars["String"]>>>;
+  type?: Maybe<BsvhuIdentificationType>;
+};
+
+export type BsvhuIdentificationInput = {
+  /** Numéros d'identification */
+  numbers?: Maybe<Array<Maybe<Scalars["String"]>>>;
+  /** Type de numéros d'indentification */
+  type?: Maybe<BsvhuIdentificationType>;
+};
+
+export type BsvhuIdentificationType =
+  | "NUMERO_ORDRE_REGISTRE_POLICE"
+  | "NUMERO_ORDRE_LOTS_SORTANTS";
+
+export type BsvhuInput = {
+  /** Détails sur l'émetteur */
+  emitter?: Maybe<BsvhuEmitterInput>;
+  /** Code déchet. Presque toujours 16 01 06 */
+  wasteCode?: Maybe<Scalars["String"]>;
+  /** Conditionnement du déchet */
+  packaging?: Maybe<BsvhuPackaging>;
+  /** Identification des VHUs */
+  identification?: Maybe<BsvhuIdentificationInput>;
+  /** Quantité de VHUs */
+  quantity?: Maybe<BsvhuQuantityInput>;
+  /** Détails sur la destination */
+  recipient?: Maybe<BsvhuRecipientInput>;
+  /** Détails sur le transporteur */
+  transporter?: Maybe<BsvhuTransporterInput>;
+};
+
+export type BsvhuMetadata = {
+  __typename?: "BsvhuMetadata";
+  errors: Array<BsvhuError>;
+};
+
+export type BsvhuOperationInput = {
+  /** Opération de traitement prévue */
+  planned?: Maybe<Scalars["String"]>;
+  /** Opération de traitement réalisée */
+  done?: Maybe<Scalars["String"]>;
+};
+
+export type BsvhuPackaging = "UNITE" | "LOT";
+
+export type BsvhuQuantity = {
+  __typename?: "BsvhuQuantity";
+  number?: Maybe<Scalars["Int"]>;
+  tons?: Maybe<Scalars["Float"]>;
+};
+
+export type BsvhuQuantityInput = {
+  /** Quantité en nombre (nombre de lots ou nombre de numéros d'ordre) */
+  number?: Maybe<Scalars["Int"]>;
+  /** Quantité en tonnes */
+  tons?: Maybe<Scalars["Float"]>;
+};
+
+export type BsvhuRecepisse = {
+  __typename?: "BsvhuRecepisse";
+  number?: Maybe<Scalars["String"]>;
+  department?: Maybe<Scalars["String"]>;
+  validityLimit?: Maybe<Scalars["DateTime"]>;
+};
+
+export type BsvhuRecepisseInput = {
+  number?: Maybe<Scalars["String"]>;
+  department?: Maybe<Scalars["String"]>;
+  validityLimit?: Maybe<Scalars["DateTime"]>;
+};
+
+export type BsvhuRecipient = {
+  __typename?: "BsvhuRecipient";
+  /** Type de receveur: broyeur ou second centre VHU */
+  type?: Maybe<BsvhuRecipientType>;
+  /** Numéro d'agrément de receveur */
+  agrementNumber?: Maybe<Scalars["String"]>;
+  /** Coordonnées de l'entreprise qui recoit les déchets */
+  company?: Maybe<FormCompany>;
+  /** Informations d'acceptation */
+  acceptance?: Maybe<BsvhuRecipientAcceptance>;
+  /** Informations sur l'opétation de traitement */
+  operation?: Maybe<BsvhuRecipientOperation>;
+  /** Coordonnées de l'entreprise de broyage prévue. Utilisé uniquement lorsque le receveur est lui même un centre VHU. */
+  plannedBroyeurCompany?: Maybe<FormCompany>;
+  signature?: Maybe<Signature>;
+};
+
+export type BsvhuRecipientAcceptance = {
+  __typename?: "BsvhuRecipientAcceptance";
+  /** Quantité réelle reçue */
+  quantity?: Maybe<Scalars["Float"]>;
+  /** Etat d'acceptation du déchet */
+  status?: Maybe<Scalars["String"]>;
+  /** Raison du refus du déchet, dans le cas d'un refus */
+  refusalReason?: Maybe<Scalars["String"]>;
+  /** Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre) */
+  identification?: Maybe<BsvhuIdentification>;
+};
+
+export type BsvhuRecipientInput = {
+  /** Type de receveur: broyeur ou second centre VHU */
+  type?: Maybe<BsvhuRecipientType>;
+  /** Numéro d'agrément de receveur */
+  agrementNumber?: Maybe<Scalars["String"]>;
+  /** Coordonnées de l'entreprise qui recoit les déchets */
+  company?: Maybe<CompanyInput>;
+  /** Informations d'acceptation */
+  acceptance?: Maybe<BsvhuAcceptanceInput>;
+  /** Informations sur l'opétation de traitement */
+  operation?: Maybe<BsvhuOperationInput>;
+  /** Destination utérieure prévue, dans le cas d'un second centre VHU */
+  plannedBroyeurCompany?: Maybe<CompanyInput>;
+};
+
+export type BsvhuRecipientOperation = {
+  __typename?: "BsvhuRecipientOperation";
+  /** Opération de traitement prévue */
+  planned?: Maybe<Scalars["String"]>;
+  /** Opération de traitement réalisée */
+  done?: Maybe<Scalars["String"]>;
+};
+
+export type BsvhuRecipientType = "BROYEUR" | "DEMOLISSEUR";
+
+export type BsvhuRecipientWhere = {
+  company?: Maybe<BsvhuCompanyWhere>;
+  signature?: Maybe<BsvhuSignatureWhere>;
+};
+
+export type BsvhuSignatureInput = {
+  /** Type de signature apposé */
+  type: SignatureTypeInput;
+  /** Date de la signature */
+  date?: Maybe<Scalars["DateTime"]>;
+  /** Nom et prénom du signataire */
+  author: Scalars["String"];
+  /** Code de sécurité de l'entreprise pour laquelle on signe. Permet de signer en tant que. Optionnel */
+  securityCode?: Maybe<Scalars["Int"]>;
+};
+
+export type BsvhuSignatureWhere = {
+  date: DateFilter;
+};
+
+export type BsvhuStatus =
+  | "INITIAL"
+  | "SIGNED_BY_PRODUCER"
+  | "SENT"
+  | "PROCESSED"
+  | "REFUSED";
+
+export type BsvhuTransporter = {
+  __typename?: "BsvhuTransporter";
+  /** Coordonnées de l'entreprise de transport */
+  company?: Maybe<FormCompany>;
+  /** Numéro de TVA intracommunautaire, dans le cas d'un transporteur étranger */
+  tvaIntracommunautaire?: Maybe<Scalars["String"]>;
+  /** Récépissé transporteur */
+  recepisse?: Maybe<BsvhuRecepisse>;
+  signature?: Maybe<Signature>;
+};
+
+export type BsvhuTransporterInput = {
+  /** Coordonnées de l'entreprise de transport */
+  company?: Maybe<CompanyInput>;
+  /** Numéro de TVA intracommunautaire, dans le cas d'un transporteur étranger */
+  tvaIntracommunautaire?: Maybe<Scalars["String"]>;
+  /** Récépissé transporteur */
+  recepisse?: Maybe<BsvhuRecepisseInput>;
+};
+
+export type BsvhuTransporterWhere = {
+  company?: Maybe<BsvhuCompanyWhere>;
+  signature?: Maybe<BsvhuSignatureWhere>;
+};
+
+export type BsvhuWhere = {
+  /** (Optionnel) Permet de récupérer uniquement les bordereaux en brouillon */
+  isDraft?: Maybe<Scalars["Boolean"]>;
+  /**
+   * (Optionnel) Filtre sur le statut des bordereaux
+   * Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
+   * Défaut à vide.
+   */
+  status?: Maybe<BsvhuStatus>;
+  createdAt?: Maybe<DateFilter>;
+  updatedAt?: Maybe<DateFilter>;
+  emitter?: Maybe<BsvhuEmitterWhere>;
+  transporter?: Maybe<BsvhuTransporterWhere>;
+  recipient?: Maybe<BsvhuRecipientWhere>;
+  _and?: Maybe<Array<BsvhuWhere>>;
+  _or?: Maybe<Array<BsvhuWhere>>;
+  _not?: Maybe<Array<BsvhuWhere>>;
+};
+
 /**
  * Information sur établissement accessible dans la liste des favoris
  * La liste des favoris est constituée à partir de l'historique des
@@ -139,6 +423,10 @@ export type CompanyFavorite = {
   traderReceipt?: Maybe<TraderReceipt>;
   /** Récépissé courtier associé à cet établissement (le cas échant) */
   brokerReceipt?: Maybe<BrokerReceipt>;
+  /** Agrément VHU démolisseur (le cas échéant, pour les profils VHU) */
+  vhuAgrementDemolisseur?: Maybe<VhuAgrement>;
+  /** Agrément VHU broyeur (le cas échéant, pour les profils VHU) */
+  vhuAgrementBroyeur?: Maybe<VhuAgrement>;
 };
 
 /** Payload d'un établissement */
@@ -225,6 +513,10 @@ export type CompanyPrivate = {
   traderReceipt?: Maybe<TraderReceipt>;
   /** Récépissé courtier (le cas échéant, pour les profils courtier) */
   brokerReceipt?: Maybe<BrokerReceipt>;
+  /** Agrément démolisseur (le cas échéant, pour les profils VHU) */
+  vhuAgrementDemolisseur?: Maybe<VhuAgrement>;
+  /** Agrément broyeur (le cas échéant, pour les profils VHU) */
+  vhuAgrementBroyeur?: Maybe<VhuAgrement>;
   /** Liste des agréments de l'éco-organisme */
   ecoOrganismeAgreements: Array<Scalars["URL"]>;
 };
@@ -269,6 +561,10 @@ export type CompanyPublic = {
   traderReceipt?: Maybe<TraderReceipt>;
   /** Récépissé courtier associé à cet établissement (le cas échant) */
   brokerReceipt?: Maybe<BrokerReceipt>;
+  /** Agrément VHU démolisseur (le cas échéant, pour les profils VHU) */
+  vhuAgrementDemolisseur?: Maybe<VhuAgrement>;
+  /** Agrément VHU broyeur (le cas échéant, pour les profils VHU) */
+  vhuAgrementBroyeur?: Maybe<VhuAgrement>;
   /** Liste des agréments de l'éco-organisme */
   ecoOrganismeAgreements: Array<Scalars["URL"]>;
 };
@@ -301,6 +597,10 @@ export type CompanySearchResult = {
   traderReceipt?: Maybe<TraderReceipt>;
   /** Récépissé courtier associé à cet établissement (le cas échant) */
   brokerReceipt?: Maybe<BrokerReceipt>;
+  /** Agrément VHU démolisseur (le cas échéant, pour les profils VHU) */
+  vhuAgrementDemolisseur?: Maybe<VhuAgrement>;
+  /** Agrément VHU broyeur (le cas échéant, pour les profils VHU) */
+  vhuAgrementBroyeur?: Maybe<VhuAgrement>;
 };
 
 /** Statistiques d'un établissement */
@@ -322,7 +622,7 @@ export type CompanyType =
   | "WASTEPROCESSOR"
   /** Transporteur */
   | "TRANSPORTER"
-  /** Installation d'entreposage, dépollution, démontage, découpage de VHU */
+  /** Installation de traitement de VHU (casse automobile et/ou broyeur agréé) */
   | "WASTE_VEHICLES"
   /** Installation de collecte de déchets apportés par le producteur initial */
   | "WASTE_CENTER"
@@ -415,6 +715,22 @@ export type CreateTransporterReceiptInput = {
   department: Scalars["String"];
 };
 
+/** Payload de création d'un agrément VHU */
+export type CreateVhuAgrementInput = {
+  /** Numéro d'agrément VHU */
+  agrementNumber: Scalars["String"];
+  /** Département ayant enregistré la déclaration */
+  department: Scalars["String"];
+};
+
+export type DateFilter = {
+  _gte?: Maybe<Scalars["DateTime"]>;
+  _gt?: Maybe<Scalars["DateTime"]>;
+  _lte?: Maybe<Scalars["DateTime"]>;
+  _lt?: Maybe<Scalars["DateTime"]>;
+  _eq?: Maybe<Scalars["DateTime"]>;
+};
+
 /** Représente une ligne dans une déclaration GEREP */
 export type Declaration = {
   __typename?: "Declaration";
@@ -443,6 +759,12 @@ export type DeleteTraderReceiptInput = {
 /** Payload de suppression d'un récépissé transporteur */
 export type DeleteTransporterReceiptInput = {
   /** The id of the transporter receipt to delete */
+  id: Scalars["ID"];
+};
+
+/** Payload de suppression d'un agrément VHU */
+export type DeleteVhuAgrementInput = {
+  /** ID de l'agrément VHU à supprimer */
   id: Scalars["ID"];
 };
 
@@ -989,10 +1311,20 @@ export type Mutation = {
    */
   createBrokerReceipt?: Maybe<BrokerReceipt>;
   /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Crée un BSVHU
+   */
+  createBsvhu?: Maybe<Bsvhu>;
+  /**
    * USAGE INTERNE
    * Rattache un établissement à l'utilisateur authentifié
    */
   createCompany: CompanyPrivate;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Crée un BSVHU en brouillon
+   */
+  createDraftBsvhu?: Maybe<Bsvhu>;
   /** Crée un nouveau bordereau */
   createForm: Form;
   /**
@@ -1010,6 +1342,11 @@ export type Mutation = {
    * Récupère une URL signé pour l'upload d'un fichier
    */
   createUploadLink: UploadLink;
+  /**
+   * USAGE INTERNE
+   * Crée un agrément VHU
+   */
+  createVhuAgrement?: Maybe<VhuAgrement>;
   /**
    * USAGE INTERNE
    * Supprime un récépissé courtier
@@ -1032,6 +1369,16 @@ export type Mutation = {
    * Supprime un récépissé transporteur
    */
   deleteTransporterReceipt?: Maybe<TransporterReceipt>;
+  /**
+   * USAGE INTERNE
+   * Supprime un agrément VHU
+   */
+  deleteVhuAgrement?: Maybe<VhuAgrement>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Duplique un BSVHU
+   */
+  duplicateBsvhu?: Maybe<Bsvhu>;
   /** Duplique un BSD */
   duplicateForm?: Maybe<Form>;
   /**
@@ -1149,6 +1496,11 @@ export type Mutation = {
   /** Prépare un nouveau segment de transport multimodal */
   prepareSegment?: Maybe<TransportSegment>;
   /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Permet de publier un brouillon pour le marquer comme prêt à être envoyé
+   */
+  publishBsvhu?: Maybe<Bsvhu>;
+  /**
    * USAGE INTERNE
    * Refuse une demande de rattachement à un un établissement
    */
@@ -1186,6 +1538,11 @@ export type Mutation = {
    */
   sendMembershipRequest?: Maybe<MembershipRequest>;
   /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Signe un BSVHU
+   */
+  signBsvhu?: Maybe<Bsvhu>;
+  /**
    * Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
    * ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
    * Cette mutation doit être appelée avec le token du collecteur-transporteur.
@@ -1214,6 +1571,11 @@ export type Mutation = {
    */
   updateBrokerReceipt?: Maybe<BrokerReceipt>;
   /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Met à jour un BSVHU
+   */
+  updateBsvhu?: Maybe<Bsvhu>;
+  /**
    * USAGE INTERNE
    * Édite les informations d'un établissement
    */
@@ -1232,6 +1594,11 @@ export type Mutation = {
    * Édite les informations d'un récépissé transporteur
    */
   updateTransporterReceipt?: Maybe<TransporterReceipt>;
+  /**
+   * USAGE INTERNE
+   * Édite un agrément VHU
+   */
+  updateVhuAgrement?: Maybe<VhuAgrement>;
   /**
    * USAGE INTERNE
    * Permet de vérifier un établissement à partir du code de vérification
@@ -1255,8 +1622,16 @@ export type MutationCreateBrokerReceiptArgs = {
   input: CreateBrokerReceiptInput;
 };
 
+export type MutationCreateBsvhuArgs = {
+  input: BsvhuInput;
+};
+
 export type MutationCreateCompanyArgs = {
   companyInput: PrivateCompanyInput;
+};
+
+export type MutationCreateDraftBsvhuArgs = {
+  input: BsvhuInput;
 };
 
 export type MutationCreateFormArgs = {
@@ -1274,6 +1649,10 @@ export type MutationCreateTransporterReceiptArgs = {
 export type MutationCreateUploadLinkArgs = {
   fileName: Scalars["String"];
   fileType: Scalars["String"];
+};
+
+export type MutationCreateVhuAgrementArgs = {
+  input: CreateVhuAgrementInput;
 };
 
 export type MutationDeleteBrokerReceiptArgs = {
@@ -1295,6 +1674,14 @@ export type MutationDeleteTraderReceiptArgs = {
 
 export type MutationDeleteTransporterReceiptArgs = {
   input: DeleteTransporterReceiptInput;
+};
+
+export type MutationDeleteVhuAgrementArgs = {
+  input: DeleteVhuAgrementInput;
+};
+
+export type MutationDuplicateBsvhuArgs = {
+  id: Scalars["ID"];
 };
 
 export type MutationDuplicateFormArgs = {
@@ -1388,6 +1775,10 @@ export type MutationPrepareSegmentArgs = {
   nextSegmentInfo: NextSegmentInfoInput;
 };
 
+export type MutationPublishBsvhuArgs = {
+  id: Scalars["ID"];
+};
+
 export type MutationRefuseMembershipRequestArgs = {
   id: Scalars["ID"];
 };
@@ -1418,6 +1809,11 @@ export type MutationSendMembershipRequestArgs = {
   siret: Scalars["String"];
 };
 
+export type MutationSignBsvhuArgs = {
+  id: Scalars["ID"];
+  input: BsvhuSignatureInput;
+};
+
 export type MutationSignedByTransporterArgs = {
   id: Scalars["ID"];
   signingInfo: TransporterSignatureFormInput;
@@ -1436,6 +1832,11 @@ export type MutationUpdateBrokerReceiptArgs = {
   input: UpdateBrokerReceiptInput;
 };
 
+export type MutationUpdateBsvhuArgs = {
+  id: Scalars["ID"];
+  input: BsvhuInput;
+};
+
 export type MutationUpdateCompanyArgs = {
   siret: Scalars["String"];
   gerepId?: Maybe<Scalars["String"]>;
@@ -1447,6 +1848,8 @@ export type MutationUpdateCompanyArgs = {
   transporterReceiptId?: Maybe<Scalars["String"]>;
   traderReceiptId?: Maybe<Scalars["String"]>;
   brokerReceiptId?: Maybe<Scalars["String"]>;
+  vhuAgrementDemolisseurId?: Maybe<Scalars["String"]>;
+  vhuAgrementBroyeurId?: Maybe<Scalars["String"]>;
   ecoOrganismeAgreements?: Maybe<Array<Scalars["URL"]>>;
 };
 
@@ -1466,6 +1869,10 @@ export type MutationUpdateTransporterFieldsArgs = {
 
 export type MutationUpdateTransporterReceiptArgs = {
   input: UpdateTransporterReceiptInput;
+};
+
+export type MutationUpdateVhuAgrementArgs = {
+  input: UpdateVhuAgrementInput;
 };
 
 export type MutationVerifyCompanyArgs = {
@@ -1528,6 +1935,14 @@ export type Packagings =
   /** Autre */
   | "AUTRE";
 
+export type PageInfo = {
+  __typename?: "PageInfo";
+  startCursor: Scalars["String"];
+  endCursor: Scalars["String"];
+  hasNextPage: Scalars["Boolean"];
+  hasPreviousPage: Scalars["Boolean"];
+};
+
 /** Payload permettant le rattachement d'un établissement à un utilisateur */
 export type PrivateCompanyInput = {
   /** SIRET de l'établissement */
@@ -1550,6 +1965,10 @@ export type PrivateCompanyInput = {
   traderReceiptId?: Maybe<Scalars["String"]>;
   /** Récipissé courtier (le cas échéant, pour les profils courtier) */
   brokerReceiptId?: Maybe<Scalars["String"]>;
+  /** Agrément VHU démolisseur (le cas échéant, pour les profils VHU) */
+  vhuAgrementDemolisseurId?: Maybe<Scalars["String"]>;
+  /** Agrément VHU broyeur (le cas échéant, pour les profils VHU) */
+  vhuAgrementBroyeurId?: Maybe<Scalars["String"]>;
   /** Liste des agréments de l'éco-organisme */
   ecoOrganismeAgreements?: Maybe<Array<Scalars["URL"]>>;
 };
@@ -1589,6 +2008,16 @@ export type Query = {
   apiKey: Scalars["String"];
   /** Renvoie des BSD candidats à un regroupement dans une annexe 2 */
   appendixForms: Array<Form>;
+  /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
+  bsvhu: Bsvhu;
+  /**
+   * Renvoie un token pour télécharger un pdf de bordereau
+   * Ce token doit être transmis à la route /download pour obtenir le fichier.
+   * Il est valable 10 secondes
+   */
+  bsvhuPdf: FileDownload;
+  /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
+  bsvhus: BsvhuConnection;
   /**
    * Renvoie des informations publiques sur un établissement
    * extrait de la base SIRENE et de la base des installations
@@ -1676,6 +2105,23 @@ export type Query = {
 export type QueryAppendixFormsArgs = {
   siret: Scalars["String"];
   wasteCode?: Maybe<Scalars["String"]>;
+};
+
+export type QueryBsvhuArgs = {
+  id: Scalars["ID"];
+};
+
+export type QueryBsvhuPdfArgs = {
+  id?: Maybe<Scalars["ID"]>;
+};
+
+export type QueryBsvhusArgs = {
+  after?: Maybe<Scalars["ID"]>;
+  first?: Maybe<Scalars["Int"]>;
+  before?: Maybe<Scalars["ID"]>;
+  last?: Maybe<Scalars["Int"]>;
+  siret?: Maybe<Scalars["String"]>;
+  where?: Maybe<BsvhuWhere>;
 };
 
 export type QueryCompanyInfosArgs = {
@@ -1856,6 +2302,12 @@ export type SentFormInput = {
   sentBy: Scalars["String"];
 };
 
+export type Signature = {
+  __typename?: "Signature";
+  date?: Maybe<Scalars["DateTime"]>;
+  author?: Maybe<Scalars["String"]>;
+};
+
 /** Dénomination de l'auteur de la signature */
 export type SignatureAuthor =
   /** L'auteur de la signature est l'émetteur du déchet */
@@ -1870,6 +2322,8 @@ export type SignatureFormInput = {
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
   sentBy: Scalars["String"];
 };
+
+export type SignatureTypeInput = "EMITTER" | "TRANSPORTER" | "RECIPIENT";
 
 export type SignupInput = {
   /** Email de l'utilisateur */
@@ -2249,6 +2703,16 @@ export type UpdateTransporterReceiptInput = {
   department?: Maybe<Scalars["String"]>;
 };
 
+/** Payload d'édition d'un agrément VHU */
+export type UpdateVhuAgrementInput = {
+  /** ID de l'agrément VHU à modifier */
+  id: Scalars["ID"];
+  /** Numéro d'agrément VHU */
+  agrementNumber?: Maybe<Scalars["String"]>;
+  /** Département ayant enregistré la déclaration */
+  department?: Maybe<Scalars["String"]>;
+};
+
 /** Lien d'upload */
 export type UploadLink = {
   __typename?: "UploadLink";
@@ -2298,6 +2762,16 @@ export type VerifyCompanyInput = {
   siret: Scalars["String"];
   /** Le code de vérification de l'établissement envoyé par courrier */
   code: Scalars["String"];
+};
+
+/** Agrément VHU */
+export type VhuAgrement = {
+  __typename?: "VhuAgrement";
+  id: Scalars["ID"];
+  /** Numéro d'agrément VHU */
+  agrementNumber: Scalars["String"];
+  /** Département ayant enregistré la déclaration */
+  department: Scalars["String"];
 };
 
 /** Statut d'acceptation d'un déchet */
@@ -2562,6 +3036,34 @@ export type ResolversTypes = {
   StateSummary: ResolverTypeWrapper<StateSummary>;
   TransportSegment: ResolverTypeWrapper<TransportSegment>;
   TransportMode: TransportMode;
+  Bsvhu: ResolverTypeWrapper<Bsvhu>;
+  BsvhuStatus: BsvhuStatus;
+  BsvhuEmitter: ResolverTypeWrapper<BsvhuEmitter>;
+  Signature: ResolverTypeWrapper<Signature>;
+  BsvhuPackaging: BsvhuPackaging;
+  BsvhuIdentification: ResolverTypeWrapper<BsvhuIdentification>;
+  BsvhuIdentificationType: BsvhuIdentificationType;
+  BsvhuQuantity: ResolverTypeWrapper<BsvhuQuantity>;
+  BsvhuRecipient: ResolverTypeWrapper<BsvhuRecipient>;
+  BsvhuRecipientType: BsvhuRecipientType;
+  BsvhuRecipientAcceptance: ResolverTypeWrapper<BsvhuRecipientAcceptance>;
+  BsvhuRecipientOperation: ResolverTypeWrapper<BsvhuRecipientOperation>;
+  BsvhuTransporter: ResolverTypeWrapper<BsvhuTransporter>;
+  BsvhuRecepisse: ResolverTypeWrapper<BsvhuRecepisse>;
+  BsvhuMetadata: ResolverTypeWrapper<BsvhuMetadata>;
+  BsvhuError: ResolverTypeWrapper<BsvhuError>;
+  SignatureTypeInput: SignatureTypeInput;
+  FileDownload: ResolverTypeWrapper<FileDownload>;
+  BsvhuWhere: BsvhuWhere;
+  DateFilter: DateFilter;
+  BsvhuEmitterWhere: BsvhuEmitterWhere;
+  BsvhuCompanyWhere: BsvhuCompanyWhere;
+  BsvhuSignatureWhere: BsvhuSignatureWhere;
+  BsvhuTransporterWhere: BsvhuTransporterWhere;
+  BsvhuRecipientWhere: BsvhuRecipientWhere;
+  BsvhuConnection: ResolverTypeWrapper<BsvhuConnection>;
+  PageInfo: ResolverTypeWrapper<PageInfo>;
+  BsvhuEdge: ResolverTypeWrapper<BsvhuEdge>;
   CompanyPublic: ResolverTypeWrapper<CompanyPublic>;
   Installation: ResolverTypeWrapper<Installation>;
   Rubrique: ResolverTypeWrapper<Rubrique>;
@@ -2572,11 +3074,11 @@ export type ResolversTypes = {
   TransporterReceipt: ResolverTypeWrapper<TransporterReceipt>;
   TraderReceipt: ResolverTypeWrapper<TraderReceipt>;
   BrokerReceipt: ResolverTypeWrapper<BrokerReceipt>;
+  VhuAgrement: ResolverTypeWrapper<VhuAgrement>;
   URL: ResolverTypeWrapper<Scalars["URL"]>;
   EcoOrganisme: ResolverTypeWrapper<EcoOrganisme>;
   FavoriteType: FavoriteType;
   CompanyFavorite: ResolverTypeWrapper<CompanyFavorite>;
-  FileDownload: ResolverTypeWrapper<FileDownload>;
   FormRole: FormRole;
   formsLifeCycleData: ResolverTypeWrapper<FormsLifeCycleData>;
   StatusLog: ResolverTypeWrapper<StatusLog>;
@@ -2598,11 +3100,21 @@ export type ResolversTypes = {
   Stat: ResolverTypeWrapper<Stat>;
   Mutation: ResolverTypeWrapper<{}>;
   CreateBrokerReceiptInput: CreateBrokerReceiptInput;
+  BsvhuInput: BsvhuInput;
+  BsvhuEmitterInput: BsvhuEmitterInput;
+  CompanyInput: CompanyInput;
+  BsvhuIdentificationInput: BsvhuIdentificationInput;
+  BsvhuQuantityInput: BsvhuQuantityInput;
+  BsvhuRecipientInput: BsvhuRecipientInput;
+  BsvhuAcceptanceInput: BsvhuAcceptanceInput;
+  WasteAcceptationStatusInput: WasteAcceptationStatusInput;
+  BsvhuOperationInput: BsvhuOperationInput;
+  BsvhuTransporterInput: BsvhuTransporterInput;
+  BsvhuRecepisseInput: BsvhuRecepisseInput;
   PrivateCompanyInput: PrivateCompanyInput;
   CreateFormInput: CreateFormInput;
   EmitterInput: EmitterInput;
   WorkSiteInput: WorkSiteInput;
-  CompanyInput: CompanyInput;
   RecipientInput: RecipientInput;
   TransporterInput: TransporterInput;
   WasteDetailsInput: WasteDetailsInput;
@@ -2616,14 +3128,15 @@ export type ResolversTypes = {
   CreateTraderReceiptInput: CreateTraderReceiptInput;
   CreateTransporterReceiptInput: CreateTransporterReceiptInput;
   UploadLink: ResolverTypeWrapper<UploadLink>;
+  CreateVhuAgrementInput: CreateVhuAgrementInput;
   DeleteBrokerReceiptInput: DeleteBrokerReceiptInput;
   DeleteTraderReceiptInput: DeleteTraderReceiptInput;
   DeleteTransporterReceiptInput: DeleteTransporterReceiptInput;
+  DeleteVhuAgrementInput: DeleteVhuAgrementInput;
   NextSegmentInfoInput: NextSegmentInfoInput;
   ImportPaperFormInput: ImportPaperFormInput;
   SignatureFormInput: SignatureFormInput;
   ReceivedFormInput: ReceivedFormInput;
-  WasteAcceptationStatusInput: WasteAcceptationStatusInput;
   ProcessedFormInput: ProcessedFormInput;
   NextDestinationInput: NextDestinationInput;
   InternationalCompanyInput: InternationalCompanyInput;
@@ -2635,6 +3148,7 @@ export type ResolversTypes = {
   TempStoredFormInput: TempStoredFormInput;
   TempStorerAcceptedFormInput: TempStorerAcceptedFormInput;
   FormInput: FormInput;
+  BsvhuSignatureInput: BsvhuSignatureInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignatureAuthor: SignatureAuthor;
   SignupInput: SignupInput;
@@ -2643,6 +3157,7 @@ export type ResolversTypes = {
   UpdateFormInput: UpdateFormInput;
   UpdateTraderReceiptInput: UpdateTraderReceiptInput;
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
+  UpdateVhuAgrementInput: UpdateVhuAgrementInput;
   VerifyCompanyInput: VerifyCompanyInput;
   Subscription: ResolverTypeWrapper<{}>;
   FormSubscription: ResolverTypeWrapper<FormSubscription>;
@@ -2674,6 +3189,29 @@ export type ResolversParentTypes = {
   Destination: Destination;
   StateSummary: StateSummary;
   TransportSegment: TransportSegment;
+  Bsvhu: Bsvhu;
+  BsvhuEmitter: BsvhuEmitter;
+  Signature: Signature;
+  BsvhuIdentification: BsvhuIdentification;
+  BsvhuQuantity: BsvhuQuantity;
+  BsvhuRecipient: BsvhuRecipient;
+  BsvhuRecipientAcceptance: BsvhuRecipientAcceptance;
+  BsvhuRecipientOperation: BsvhuRecipientOperation;
+  BsvhuTransporter: BsvhuTransporter;
+  BsvhuRecepisse: BsvhuRecepisse;
+  BsvhuMetadata: BsvhuMetadata;
+  BsvhuError: BsvhuError;
+  FileDownload: FileDownload;
+  BsvhuWhere: BsvhuWhere;
+  DateFilter: DateFilter;
+  BsvhuEmitterWhere: BsvhuEmitterWhere;
+  BsvhuCompanyWhere: BsvhuCompanyWhere;
+  BsvhuSignatureWhere: BsvhuSignatureWhere;
+  BsvhuTransporterWhere: BsvhuTransporterWhere;
+  BsvhuRecipientWhere: BsvhuRecipientWhere;
+  BsvhuConnection: BsvhuConnection;
+  PageInfo: PageInfo;
+  BsvhuEdge: BsvhuEdge;
   CompanyPublic: CompanyPublic;
   Installation: Installation;
   Rubrique: Rubrique;
@@ -2681,10 +3219,10 @@ export type ResolversParentTypes = {
   TransporterReceipt: TransporterReceipt;
   TraderReceipt: TraderReceipt;
   BrokerReceipt: BrokerReceipt;
+  VhuAgrement: VhuAgrement;
   URL: Scalars["URL"];
   EcoOrganisme: EcoOrganisme;
   CompanyFavorite: CompanyFavorite;
-  FileDownload: FileDownload;
   formsLifeCycleData: FormsLifeCycleData;
   StatusLog: StatusLog;
   JSON: Scalars["JSON"];
@@ -2700,11 +3238,20 @@ export type ResolversParentTypes = {
   Stat: Stat;
   Mutation: {};
   CreateBrokerReceiptInput: CreateBrokerReceiptInput;
+  BsvhuInput: BsvhuInput;
+  BsvhuEmitterInput: BsvhuEmitterInput;
+  CompanyInput: CompanyInput;
+  BsvhuIdentificationInput: BsvhuIdentificationInput;
+  BsvhuQuantityInput: BsvhuQuantityInput;
+  BsvhuRecipientInput: BsvhuRecipientInput;
+  BsvhuAcceptanceInput: BsvhuAcceptanceInput;
+  BsvhuOperationInput: BsvhuOperationInput;
+  BsvhuTransporterInput: BsvhuTransporterInput;
+  BsvhuRecepisseInput: BsvhuRecepisseInput;
   PrivateCompanyInput: PrivateCompanyInput;
   CreateFormInput: CreateFormInput;
   EmitterInput: EmitterInput;
   WorkSiteInput: WorkSiteInput;
-  CompanyInput: CompanyInput;
   RecipientInput: RecipientInput;
   TransporterInput: TransporterInput;
   WasteDetailsInput: WasteDetailsInput;
@@ -2718,9 +3265,11 @@ export type ResolversParentTypes = {
   CreateTraderReceiptInput: CreateTraderReceiptInput;
   CreateTransporterReceiptInput: CreateTransporterReceiptInput;
   UploadLink: UploadLink;
+  CreateVhuAgrementInput: CreateVhuAgrementInput;
   DeleteBrokerReceiptInput: DeleteBrokerReceiptInput;
   DeleteTraderReceiptInput: DeleteTraderReceiptInput;
   DeleteTransporterReceiptInput: DeleteTransporterReceiptInput;
+  DeleteVhuAgrementInput: DeleteVhuAgrementInput;
   NextSegmentInfoInput: NextSegmentInfoInput;
   ImportPaperFormInput: ImportPaperFormInput;
   SignatureFormInput: SignatureFormInput;
@@ -2736,6 +3285,7 @@ export type ResolversParentTypes = {
   TempStoredFormInput: TempStoredFormInput;
   TempStorerAcceptedFormInput: TempStorerAcceptedFormInput;
   FormInput: FormInput;
+  BsvhuSignatureInput: BsvhuSignatureInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignupInput: SignupInput;
   TakeOverInput: TakeOverInput;
@@ -2743,6 +3293,7 @@ export type ResolversParentTypes = {
   UpdateFormInput: UpdateFormInput;
   UpdateTraderReceiptInput: UpdateTraderReceiptInput;
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
+  UpdateVhuAgrementInput: UpdateVhuAgrementInput;
   VerifyCompanyInput: VerifyCompanyInput;
   Subscription: {};
   FormSubscription: FormSubscription;
@@ -2791,6 +3342,263 @@ export type BrokerReceiptResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type BsvhuResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["Bsvhu"] = ResolversParentTypes["Bsvhu"]
+> = {
+  id?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
+  isDeleted?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;
+  isDraft?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes["BsvhuStatus"], ParentType, ContextType>;
+  emitter?: Resolver<
+    Maybe<ResolversTypes["BsvhuEmitter"]>,
+    ParentType,
+    ContextType
+  >;
+  wasteCode?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  packaging?: Resolver<
+    Maybe<ResolversTypes["BsvhuPackaging"]>,
+    ParentType,
+    ContextType
+  >;
+  identification?: Resolver<
+    Maybe<ResolversTypes["BsvhuIdentification"]>,
+    ParentType,
+    ContextType
+  >;
+  quantity?: Resolver<
+    Maybe<ResolversTypes["BsvhuQuantity"]>,
+    ParentType,
+    ContextType
+  >;
+  recipient?: Resolver<
+    Maybe<ResolversTypes["BsvhuRecipient"]>,
+    ParentType,
+    ContextType
+  >;
+  transporter?: Resolver<
+    Maybe<ResolversTypes["BsvhuTransporter"]>,
+    ParentType,
+    ContextType
+  >;
+  metadata?: Resolver<ResolversTypes["BsvhuMetadata"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsvhuConnectionResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsvhuConnection"] = ResolversParentTypes["BsvhuConnection"]
+> = {
+  totalCount?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes["PageInfo"], ParentType, ContextType>;
+  edges?: Resolver<Array<ResolversTypes["BsvhuEdge"]>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsvhuEdgeResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsvhuEdge"] = ResolversParentTypes["BsvhuEdge"]
+> = {
+  cursor?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  node?: Resolver<ResolversTypes["Bsvhu"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsvhuEmitterResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsvhuEmitter"] = ResolversParentTypes["BsvhuEmitter"]
+> = {
+  agrementNumber?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  company?: Resolver<
+    Maybe<ResolversTypes["FormCompany"]>,
+    ParentType,
+    ContextType
+  >;
+  signature?: Resolver<
+    Maybe<ResolversTypes["Signature"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsvhuErrorResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsvhuError"] = ResolversParentTypes["BsvhuError"]
+> = {
+  message?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  path?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  requiredFor?: Resolver<
+    ResolversTypes["SignatureTypeInput"],
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsvhuIdentificationResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsvhuIdentification"] = ResolversParentTypes["BsvhuIdentification"]
+> = {
+  numbers?: Resolver<
+    Maybe<Array<Maybe<ResolversTypes["String"]>>>,
+    ParentType,
+    ContextType
+  >;
+  type?: Resolver<
+    Maybe<ResolversTypes["BsvhuIdentificationType"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsvhuMetadataResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsvhuMetadata"] = ResolversParentTypes["BsvhuMetadata"]
+> = {
+  errors?: Resolver<
+    Array<ResolversTypes["BsvhuError"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsvhuQuantityResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsvhuQuantity"] = ResolversParentTypes["BsvhuQuantity"]
+> = {
+  number?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
+  tons?: Resolver<Maybe<ResolversTypes["Float"]>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsvhuRecepisseResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsvhuRecepisse"] = ResolversParentTypes["BsvhuRecepisse"]
+> = {
+  number?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  department?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  validityLimit?: Resolver<
+    Maybe<ResolversTypes["DateTime"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsvhuRecipientResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsvhuRecipient"] = ResolversParentTypes["BsvhuRecipient"]
+> = {
+  type?: Resolver<
+    Maybe<ResolversTypes["BsvhuRecipientType"]>,
+    ParentType,
+    ContextType
+  >;
+  agrementNumber?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  company?: Resolver<
+    Maybe<ResolversTypes["FormCompany"]>,
+    ParentType,
+    ContextType
+  >;
+  acceptance?: Resolver<
+    Maybe<ResolversTypes["BsvhuRecipientAcceptance"]>,
+    ParentType,
+    ContextType
+  >;
+  operation?: Resolver<
+    Maybe<ResolversTypes["BsvhuRecipientOperation"]>,
+    ParentType,
+    ContextType
+  >;
+  plannedBroyeurCompany?: Resolver<
+    Maybe<ResolversTypes["FormCompany"]>,
+    ParentType,
+    ContextType
+  >;
+  signature?: Resolver<
+    Maybe<ResolversTypes["Signature"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsvhuRecipientAcceptanceResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsvhuRecipientAcceptance"] = ResolversParentTypes["BsvhuRecipientAcceptance"]
+> = {
+  quantity?: Resolver<Maybe<ResolversTypes["Float"]>, ParentType, ContextType>;
+  status?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  refusalReason?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  identification?: Resolver<
+    Maybe<ResolversTypes["BsvhuIdentification"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsvhuRecipientOperationResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsvhuRecipientOperation"] = ResolversParentTypes["BsvhuRecipientOperation"]
+> = {
+  planned?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  done?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsvhuTransporterResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsvhuTransporter"] = ResolversParentTypes["BsvhuTransporter"]
+> = {
+  company?: Resolver<
+    Maybe<ResolversTypes["FormCompany"]>,
+    ParentType,
+    ContextType
+  >;
+  tvaIntracommunautaire?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  recepisse?: Resolver<
+    Maybe<ResolversTypes["BsvhuRecepisse"]>,
+    ParentType,
+    ContextType
+  >;
+  signature?: Resolver<
+    Maybe<ResolversTypes["Signature"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type CompanyFavoriteResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["CompanyFavorite"] = ResolversParentTypes["CompanyFavorite"]
@@ -2813,6 +3621,16 @@ export type CompanyFavoriteResolvers<
   >;
   brokerReceipt?: Resolver<
     Maybe<ResolversTypes["BrokerReceipt"]>,
+    ParentType,
+    ContextType
+  >;
+  vhuAgrementDemolisseur?: Resolver<
+    Maybe<ResolversTypes["VhuAgrement"]>,
+    ParentType,
+    ContextType
+  >;
+  vhuAgrementBroyeur?: Resolver<
+    Maybe<ResolversTypes["VhuAgrement"]>,
     ParentType,
     ContextType
   >;
@@ -2913,6 +3731,16 @@ export type CompanyPrivateResolvers<
     ParentType,
     ContextType
   >;
+  vhuAgrementDemolisseur?: Resolver<
+    Maybe<ResolversTypes["VhuAgrement"]>,
+    ParentType,
+    ContextType
+  >;
+  vhuAgrementBroyeur?: Resolver<
+    Maybe<ResolversTypes["VhuAgrement"]>,
+    ParentType,
+    ContextType
+  >;
   ecoOrganismeAgreements?: Resolver<
     Array<ResolversTypes["URL"]>,
     ParentType,
@@ -2980,6 +3808,16 @@ export type CompanyPublicResolvers<
     ParentType,
     ContextType
   >;
+  vhuAgrementDemolisseur?: Resolver<
+    Maybe<ResolversTypes["VhuAgrement"]>,
+    ParentType,
+    ContextType
+  >;
+  vhuAgrementBroyeur?: Resolver<
+    Maybe<ResolversTypes["VhuAgrement"]>,
+    ParentType,
+    ContextType
+  >;
   ecoOrganismeAgreements?: Resolver<
     Array<ResolversTypes["URL"]>,
     ParentType,
@@ -3028,6 +3866,16 @@ export type CompanySearchResultResolvers<
   >;
   brokerReceipt?: Resolver<
     Maybe<ResolversTypes["BrokerReceipt"]>,
+    ParentType,
+    ContextType
+  >;
+  vhuAgrementDemolisseur?: Resolver<
+    Maybe<ResolversTypes["VhuAgrement"]>,
+    ParentType,
+    ContextType
+  >;
+  vhuAgrementBroyeur?: Resolver<
+    Maybe<ResolversTypes["VhuAgrement"]>,
     ParentType,
     ContextType
   >;
@@ -3447,11 +4295,23 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationCreateBrokerReceiptArgs, "input">
   >;
+  createBsvhu?: Resolver<
+    Maybe<ResolversTypes["Bsvhu"]>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationCreateBsvhuArgs, "input">
+  >;
   createCompany?: Resolver<
     ResolversTypes["CompanyPrivate"],
     ParentType,
     ContextType,
     RequireFields<MutationCreateCompanyArgs, "companyInput">
+  >;
+  createDraftBsvhu?: Resolver<
+    Maybe<ResolversTypes["Bsvhu"]>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationCreateDraftBsvhuArgs, "input">
   >;
   createForm?: Resolver<
     ResolversTypes["Form"],
@@ -3476,6 +4336,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationCreateUploadLinkArgs, "fileName" | "fileType">
+  >;
+  createVhuAgrement?: Resolver<
+    Maybe<ResolversTypes["VhuAgrement"]>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationCreateVhuAgrementArgs, "input">
   >;
   deleteBrokerReceipt?: Resolver<
     Maybe<ResolversTypes["BrokerReceipt"]>,
@@ -3506,6 +4372,18 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationDeleteTransporterReceiptArgs, "input">
+  >;
+  deleteVhuAgrement?: Resolver<
+    Maybe<ResolversTypes["VhuAgrement"]>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeleteVhuAgrementArgs, "input">
+  >;
+  duplicateBsvhu?: Resolver<
+    Maybe<ResolversTypes["Bsvhu"]>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationDuplicateBsvhuArgs, "id">
   >;
   duplicateForm?: Resolver<
     Maybe<ResolversTypes["Form"]>,
@@ -3624,6 +4502,12 @@ export type MutationResolvers<
       "id" | "siret" | "nextSegmentInfo"
     >
   >;
+  publishBsvhu?: Resolver<
+    Maybe<ResolversTypes["Bsvhu"]>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationPublishBsvhuArgs, "id">
+  >;
   refuseMembershipRequest?: Resolver<
     ResolversTypes["CompanyPrivate"],
     ParentType,
@@ -3666,6 +4550,12 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationSendMembershipRequestArgs, "siret">
   >;
+  signBsvhu?: Resolver<
+    Maybe<ResolversTypes["Bsvhu"]>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationSignBsvhuArgs, "id" | "input">
+  >;
   signedByTransporter?: Resolver<
     Maybe<ResolversTypes["Form"]>,
     ParentType,
@@ -3689,6 +4579,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationUpdateBrokerReceiptArgs, "input">
+  >;
+  updateBsvhu?: Resolver<
+    Maybe<ResolversTypes["Bsvhu"]>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationUpdateBsvhuArgs, "id" | "input">
   >;
   updateCompany?: Resolver<
     ResolversTypes["CompanyPrivate"],
@@ -3719,6 +4615,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationUpdateTransporterReceiptArgs, "input">
+  >;
+  updateVhuAgrement?: Resolver<
+    Maybe<ResolversTypes["VhuAgrement"]>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationUpdateVhuAgrementArgs, "input">
   >;
   verifyCompany?: Resolver<
     ResolversTypes["CompanyPrivate"],
@@ -3755,6 +4657,21 @@ export type PackagingInfoResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type PageInfoResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["PageInfo"] = ResolversParentTypes["PageInfo"]
+> = {
+  startCursor?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  endCursor?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  hasNextPage?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;
+  hasPreviousPage?: Resolver<
+    ResolversTypes["Boolean"],
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type QueryResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["Query"] = ResolversParentTypes["Query"]
@@ -3765,6 +4682,24 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QueryAppendixFormsArgs, "siret">
+  >;
+  bsvhu?: Resolver<
+    ResolversTypes["Bsvhu"],
+    ParentType,
+    ContextType,
+    RequireFields<QueryBsvhuArgs, "id">
+  >;
+  bsvhuPdf?: Resolver<
+    ResolversTypes["FileDownload"],
+    ParentType,
+    ContextType,
+    RequireFields<QueryBsvhuPdfArgs, never>
+  >;
+  bsvhus?: Resolver<
+    ResolversTypes["BsvhuConnection"],
+    ParentType,
+    ContextType,
+    RequireFields<QueryBsvhusArgs, never>
   >;
   companyInfos?: Resolver<
     ResolversTypes["CompanyPublic"],
@@ -3887,6 +4822,15 @@ export type RubriqueResolvers<
     ParentType,
     ContextType
   >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type SignatureResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["Signature"] = ResolversParentTypes["Signature"]
+> = {
+  date?: Resolver<Maybe<ResolversTypes["DateTime"]>, ParentType, ContextType>;
+  author?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -4247,6 +5191,16 @@ export type UserResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type VhuAgrementResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["VhuAgrement"] = ResolversParentTypes["VhuAgrement"]
+> = {
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
+  agrementNumber?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  department?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type WasteDetailsResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["WasteDetails"] = ResolversParentTypes["WasteDetails"]
@@ -4309,6 +5263,19 @@ export type Resolvers<ContextType = GraphQLContext> = {
   AuthPayload?: AuthPayloadResolvers<ContextType>;
   Broker?: BrokerResolvers<ContextType>;
   BrokerReceipt?: BrokerReceiptResolvers<ContextType>;
+  Bsvhu?: BsvhuResolvers<ContextType>;
+  BsvhuConnection?: BsvhuConnectionResolvers<ContextType>;
+  BsvhuEdge?: BsvhuEdgeResolvers<ContextType>;
+  BsvhuEmitter?: BsvhuEmitterResolvers<ContextType>;
+  BsvhuError?: BsvhuErrorResolvers<ContextType>;
+  BsvhuIdentification?: BsvhuIdentificationResolvers<ContextType>;
+  BsvhuMetadata?: BsvhuMetadataResolvers<ContextType>;
+  BsvhuQuantity?: BsvhuQuantityResolvers<ContextType>;
+  BsvhuRecepisse?: BsvhuRecepisseResolvers<ContextType>;
+  BsvhuRecipient?: BsvhuRecipientResolvers<ContextType>;
+  BsvhuRecipientAcceptance?: BsvhuRecipientAcceptanceResolvers<ContextType>;
+  BsvhuRecipientOperation?: BsvhuRecipientOperationResolvers<ContextType>;
+  BsvhuTransporter?: BsvhuTransporterResolvers<ContextType>;
   CompanyFavorite?: CompanyFavoriteResolvers<ContextType>;
   CompanyMember?: CompanyMemberResolvers<ContextType>;
   CompanyPrivate?: CompanyPrivateResolvers<ContextType>;
@@ -4333,9 +5300,11 @@ export type Resolvers<ContextType = GraphQLContext> = {
   Mutation?: MutationResolvers<ContextType>;
   NextDestination?: NextDestinationResolvers<ContextType>;
   PackagingInfo?: PackagingInfoResolvers<ContextType>;
+  PageInfo?: PageInfoResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Recipient?: RecipientResolvers<ContextType>;
   Rubrique?: RubriqueResolvers<ContextType>;
+  Signature?: SignatureResolvers<ContextType>;
   Stat?: StatResolvers<ContextType>;
   StateSummary?: StateSummaryResolvers<ContextType>;
   StatusLog?: StatusLogResolvers<ContextType>;
@@ -4352,6 +5321,7 @@ export type Resolvers<ContextType = GraphQLContext> = {
   UploadLink?: UploadLinkResolvers<ContextType>;
   URL?: GraphQLScalarType;
   User?: UserResolvers<ContextType>;
+  VhuAgrement?: VhuAgrementResolvers<ContextType>;
   WasteDetails?: WasteDetailsResolvers<ContextType>;
   WorkSite?: WorkSiteResolvers<ContextType>;
 };
@@ -4432,6 +5402,344 @@ export function createBrokerReceiptMock(
   };
 }
 
+export function createBsvhuMock(props: Partial<Bsvhu>): Bsvhu {
+  return {
+    __typename: "Bsvhu",
+    id: "",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    isDeleted: false,
+    isDraft: false,
+    status: "INITIAL",
+    emitter: null,
+    wasteCode: null,
+    packaging: null,
+    identification: null,
+    quantity: null,
+    recipient: null,
+    transporter: null,
+    metadata: createBsvhuMetadataMock({}),
+    ...props
+  };
+}
+
+export function createBsvhuAcceptanceInputMock(
+  props: Partial<BsvhuAcceptanceInput>
+): BsvhuAcceptanceInput {
+  return {
+    quantity: null,
+    status: null,
+    refusalReason: null,
+    identification: null,
+    ...props
+  };
+}
+
+export function createBsvhuCompanyWhereMock(
+  props: Partial<BsvhuCompanyWhere>
+): BsvhuCompanyWhere {
+  return {
+    siret: "",
+    ...props
+  };
+}
+
+export function createBsvhuConnectionMock(
+  props: Partial<BsvhuConnection>
+): BsvhuConnection {
+  return {
+    __typename: "BsvhuConnection",
+    totalCount: 0,
+    pageInfo: createPageInfoMock({}),
+    edges: [],
+    ...props
+  };
+}
+
+export function createBsvhuEdgeMock(props: Partial<BsvhuEdge>): BsvhuEdge {
+  return {
+    __typename: "BsvhuEdge",
+    cursor: "",
+    node: createBsvhuMock({}),
+    ...props
+  };
+}
+
+export function createBsvhuEmitterMock(
+  props: Partial<BsvhuEmitter>
+): BsvhuEmitter {
+  return {
+    __typename: "BsvhuEmitter",
+    agrementNumber: null,
+    company: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createBsvhuEmitterInputMock(
+  props: Partial<BsvhuEmitterInput>
+): BsvhuEmitterInput {
+  return {
+    agrementNumber: null,
+    company: null,
+    ...props
+  };
+}
+
+export function createBsvhuEmitterWhereMock(
+  props: Partial<BsvhuEmitterWhere>
+): BsvhuEmitterWhere {
+  return {
+    company: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createBsvhuErrorMock(props: Partial<BsvhuError>): BsvhuError {
+  return {
+    __typename: "BsvhuError",
+    message: "",
+    path: "",
+    requiredFor: "EMITTER",
+    ...props
+  };
+}
+
+export function createBsvhuIdentificationMock(
+  props: Partial<BsvhuIdentification>
+): BsvhuIdentification {
+  return {
+    __typename: "BsvhuIdentification",
+    numbers: null,
+    type: null,
+    ...props
+  };
+}
+
+export function createBsvhuIdentificationInputMock(
+  props: Partial<BsvhuIdentificationInput>
+): BsvhuIdentificationInput {
+  return {
+    numbers: null,
+    type: null,
+    ...props
+  };
+}
+
+export function createBsvhuInputMock(props: Partial<BsvhuInput>): BsvhuInput {
+  return {
+    emitter: null,
+    wasteCode: null,
+    packaging: null,
+    identification: null,
+    quantity: null,
+    recipient: null,
+    transporter: null,
+    ...props
+  };
+}
+
+export function createBsvhuMetadataMock(
+  props: Partial<BsvhuMetadata>
+): BsvhuMetadata {
+  return {
+    __typename: "BsvhuMetadata",
+    errors: [],
+    ...props
+  };
+}
+
+export function createBsvhuOperationInputMock(
+  props: Partial<BsvhuOperationInput>
+): BsvhuOperationInput {
+  return {
+    planned: null,
+    done: null,
+    ...props
+  };
+}
+
+export function createBsvhuQuantityMock(
+  props: Partial<BsvhuQuantity>
+): BsvhuQuantity {
+  return {
+    __typename: "BsvhuQuantity",
+    number: null,
+    tons: null,
+    ...props
+  };
+}
+
+export function createBsvhuQuantityInputMock(
+  props: Partial<BsvhuQuantityInput>
+): BsvhuQuantityInput {
+  return {
+    number: null,
+    tons: null,
+    ...props
+  };
+}
+
+export function createBsvhuRecepisseMock(
+  props: Partial<BsvhuRecepisse>
+): BsvhuRecepisse {
+  return {
+    __typename: "BsvhuRecepisse",
+    number: null,
+    department: null,
+    validityLimit: null,
+    ...props
+  };
+}
+
+export function createBsvhuRecepisseInputMock(
+  props: Partial<BsvhuRecepisseInput>
+): BsvhuRecepisseInput {
+  return {
+    number: null,
+    department: null,
+    validityLimit: null,
+    ...props
+  };
+}
+
+export function createBsvhuRecipientMock(
+  props: Partial<BsvhuRecipient>
+): BsvhuRecipient {
+  return {
+    __typename: "BsvhuRecipient",
+    type: null,
+    agrementNumber: null,
+    company: null,
+    acceptance: null,
+    operation: null,
+    plannedBroyeurCompany: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createBsvhuRecipientAcceptanceMock(
+  props: Partial<BsvhuRecipientAcceptance>
+): BsvhuRecipientAcceptance {
+  return {
+    __typename: "BsvhuRecipientAcceptance",
+    quantity: null,
+    status: null,
+    refusalReason: null,
+    identification: null,
+    ...props
+  };
+}
+
+export function createBsvhuRecipientInputMock(
+  props: Partial<BsvhuRecipientInput>
+): BsvhuRecipientInput {
+  return {
+    type: null,
+    agrementNumber: null,
+    company: null,
+    acceptance: null,
+    operation: null,
+    plannedBroyeurCompany: null,
+    ...props
+  };
+}
+
+export function createBsvhuRecipientOperationMock(
+  props: Partial<BsvhuRecipientOperation>
+): BsvhuRecipientOperation {
+  return {
+    __typename: "BsvhuRecipientOperation",
+    planned: null,
+    done: null,
+    ...props
+  };
+}
+
+export function createBsvhuRecipientWhereMock(
+  props: Partial<BsvhuRecipientWhere>
+): BsvhuRecipientWhere {
+  return {
+    company: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createBsvhuSignatureInputMock(
+  props: Partial<BsvhuSignatureInput>
+): BsvhuSignatureInput {
+  return {
+    type: "EMITTER",
+    date: null,
+    author: "",
+    securityCode: null,
+    ...props
+  };
+}
+
+export function createBsvhuSignatureWhereMock(
+  props: Partial<BsvhuSignatureWhere>
+): BsvhuSignatureWhere {
+  return {
+    date: createDateFilterMock({}),
+    ...props
+  };
+}
+
+export function createBsvhuTransporterMock(
+  props: Partial<BsvhuTransporter>
+): BsvhuTransporter {
+  return {
+    __typename: "BsvhuTransporter",
+    company: null,
+    tvaIntracommunautaire: null,
+    recepisse: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createBsvhuTransporterInputMock(
+  props: Partial<BsvhuTransporterInput>
+): BsvhuTransporterInput {
+  return {
+    company: null,
+    tvaIntracommunautaire: null,
+    recepisse: null,
+    ...props
+  };
+}
+
+export function createBsvhuTransporterWhereMock(
+  props: Partial<BsvhuTransporterWhere>
+): BsvhuTransporterWhere {
+  return {
+    company: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createBsvhuWhereMock(props: Partial<BsvhuWhere>): BsvhuWhere {
+  return {
+    isDraft: null,
+    status: null,
+    createdAt: null,
+    updatedAt: null,
+    emitter: null,
+    transporter: null,
+    recipient: null,
+    _and: null,
+    _or: null,
+    _not: null,
+    ...props
+  };
+}
+
 export function createCompanyFavoriteMock(
   props: Partial<CompanyFavorite>
 ): CompanyFavorite {
@@ -4446,6 +5754,8 @@ export function createCompanyFavoriteMock(
     transporterReceipt: null,
     traderReceipt: null,
     brokerReceipt: null,
+    vhuAgrementDemolisseur: null,
+    vhuAgrementBroyeur: null,
     ...props
   };
 }
@@ -4505,6 +5815,8 @@ export function createCompanyPrivateMock(
     transporterReceipt: null,
     traderReceipt: null,
     brokerReceipt: null,
+    vhuAgrementDemolisseur: null,
+    vhuAgrementBroyeur: null,
     ecoOrganismeAgreements: [],
     ...props
   };
@@ -4530,6 +5842,8 @@ export function createCompanyPublicMock(
     transporterReceipt: null,
     traderReceipt: null,
     brokerReceipt: null,
+    vhuAgrementDemolisseur: null,
+    vhuAgrementBroyeur: null,
     ecoOrganismeAgreements: [],
     ...props
   };
@@ -4551,6 +5865,8 @@ export function createCompanySearchResultMock(
     transporterReceipt: null,
     traderReceipt: null,
     brokerReceipt: null,
+    vhuAgrementDemolisseur: null,
+    vhuAgrementBroyeur: null,
     ...props
   };
 }
@@ -4617,6 +5933,27 @@ export function createCreateTransporterReceiptInputMock(
   };
 }
 
+export function createCreateVhuAgrementInputMock(
+  props: Partial<CreateVhuAgrementInput>
+): CreateVhuAgrementInput {
+  return {
+    agrementNumber: "",
+    department: "",
+    ...props
+  };
+}
+
+export function createDateFilterMock(props: Partial<DateFilter>): DateFilter {
+  return {
+    _gte: null,
+    _gt: null,
+    _lte: null,
+    _lt: null,
+    _eq: null,
+    ...props
+  };
+}
+
 export function createDeclarationMock(
   props: Partial<Declaration>
 ): Declaration {
@@ -4651,6 +5988,15 @@ export function createDeleteTraderReceiptInputMock(
 export function createDeleteTransporterReceiptInputMock(
   props: Partial<DeleteTransporterReceiptInput>
 ): DeleteTransporterReceiptInput {
+  return {
+    id: "",
+    ...props
+  };
+}
+
+export function createDeleteVhuAgrementInputMock(
+  props: Partial<DeleteVhuAgrementInput>
+): DeleteVhuAgrementInput {
   return {
     id: "",
     ...props
@@ -4983,6 +6329,17 @@ export function createPackagingInfoInputMock(
   };
 }
 
+export function createPageInfoMock(props: Partial<PageInfo>): PageInfo {
+  return {
+    __typename: "PageInfo",
+    startCursor: "",
+    endCursor: "",
+    hasNextPage: false,
+    hasPreviousPage: false,
+    ...props
+  };
+}
+
 export function createPrivateCompanyInputMock(
   props: Partial<PrivateCompanyInput>
 ): PrivateCompanyInput {
@@ -4997,6 +6354,8 @@ export function createPrivateCompanyInputMock(
     transporterReceiptId: null,
     traderReceiptId: null,
     brokerReceiptId: null,
+    vhuAgrementDemolisseurId: null,
+    vhuAgrementBroyeurId: null,
     ecoOrganismeAgreements: null,
     ...props
   };
@@ -5099,6 +6458,15 @@ export function createSentFormInputMock(
   return {
     sentAt: new Date(),
     sentBy: "",
+    ...props
+  };
+}
+
+export function createSignatureMock(props: Partial<Signature>): Signature {
+  return {
+    __typename: "Signature",
+    date: null,
+    author: null,
     ...props
   };
 }
@@ -5447,6 +6815,17 @@ export function createUpdateTransporterReceiptInputMock(
   };
 }
 
+export function createUpdateVhuAgrementInputMock(
+  props: Partial<UpdateVhuAgrementInput>
+): UpdateVhuAgrementInput {
+  return {
+    id: "",
+    agrementNumber: null,
+    department: null,
+    ...props
+  };
+}
+
 export function createUploadLinkMock(props: Partial<UploadLink>): UploadLink {
   return {
     __typename: "UploadLink",
@@ -5474,6 +6853,18 @@ export function createVerifyCompanyInputMock(
   return {
     siret: "",
     code: "",
+    ...props
+  };
+}
+
+export function createVhuAgrementMock(
+  props: Partial<VhuAgrement>
+): VhuAgrement {
+  return {
+    __typename: "VhuAgrement",
+    id: "",
+    agrementNumber: "",
+    department: "",
     ...props
   };
 }

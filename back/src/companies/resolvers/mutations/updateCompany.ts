@@ -21,6 +21,8 @@ export async function updateCompanyFn({
   transporterReceiptId,
   traderReceiptId,
   brokerReceiptId,
+  vhuAgrementDemolisseurId,
+  vhuAgrementBroyeurId,
   ecoOrganismeAgreements
 }: MutationUpdateCompanyArgs): Promise<CompanyPrivate> {
   const data = {
@@ -38,6 +40,14 @@ export async function updateCompanyFn({
       : {}),
     ...(brokerReceiptId
       ? { brokerReceipt: { connect: { id: brokerReceiptId } } }
+      : {}),
+    ...(vhuAgrementDemolisseurId
+      ? {
+          vhuAgrementDemolisseur: { connect: { id: vhuAgrementDemolisseurId } }
+        }
+      : {}),
+    ...(vhuAgrementBroyeurId
+      ? { vhuAgrementBroyeur: { connect: { id: vhuAgrementBroyeurId } } }
       : {}),
     ...(ecoOrganismeAgreements != null
       ? {
