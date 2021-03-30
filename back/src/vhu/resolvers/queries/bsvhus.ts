@@ -31,10 +31,12 @@ export default async function bsvhus(
     };
   }
 
-  const itemsPerPage = 50;
+  const defaultPaginateBy = 50;
+  const itemsPerPage =
+    paginationArgs.first ?? paginationArgs.last ?? defaultPaginateBy;
   const connectionsArgs = await getConnectionsArgs({
     ...paginationArgs,
-    defaultPaginateBy: itemsPerPage,
+    defaultPaginateBy,
     maxPaginateBy: 500
   });
 
