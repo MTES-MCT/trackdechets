@@ -12,15 +12,15 @@ case $BRANCH_NAME in
         ;;
     dev)
         echo "⚠ Not handled yet, exiting."
-        exit 1
+        exit 0
         ;;
     master)
         echo "⚠ Not handled yet, exiting."
-        exit 1
+        exit 0
         ;;
     *)
         echo "❌ Not a deploy target, aborting."
-        exit 0
+        exit 1
         ;;
 esac
 
