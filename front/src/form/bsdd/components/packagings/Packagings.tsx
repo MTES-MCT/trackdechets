@@ -15,7 +15,7 @@ import React, { InputHTMLAttributes, useMemo } from "react";
 import "./Packagings.scss";
 
 export default function Packagings({
-  field: { name, value, onChange },
+  field: { name, value },
   form,
   id,
   ...props
@@ -44,98 +44,109 @@ export default function Packagings({
         name={name}
         render={arrayHelpers => (
           <div>
-            {value.map((p, idx) => (
-              <div
-                key={`${idx}-${p.type}`}
-                className="tw-border-2 tw-border-gray-400 tw-border-solid tw-rounded-md tw-px-4 tw-py-2 tw-mb-2"
-              >
-                <div className="tw-flex tw-mb-4 tw-items-end">
-                  <div className="tw-w-11/12 tw-flex">
-                    <div className="tw-w-1/3 tw-pr-2">
-                      <label>
-                        Type
-                        <Field
-                          name={`${name}.${idx}.type`}
-                          as="select"
-                          className="td-select"
-                          onClick={() =>
-                            setFieldValue(`${name}.${idx}.other`, "")
-                          }
-                        >
-                          {(Object.entries(PACKAGINGS_NAMES) as Array<
-                            [keyof typeof PACKAGINGS_NAMES, string]
-                          >).map(([optionValue, optionLabel]) => (
-                            <option
-                              key={optionValue}
-                              value={optionValue}
-                              disabled={
-                                value?.length > 1 &&
-                                ([
-                                  PackagingsEnum.Citerne,
-                                  PackagingsEnum.Benne,
-                                ].includes(optionValue) ||
-                                  value.some(p =>
-                                    [
-                                      PackagingsEnum.Citerne,
-                                      PackagingsEnum.Benne,
-                                      ...(optionValue !== PackagingsEnum.Autre
-                                        ? [optionValue]
-                                        : []),
-                                    ].includes(p.type)
-                                  ))
-                              }
-                            >
-                              {optionLabel}
-                            </option>
-                          ))}
-                        </Field>
-                      </label>
-                    </div>
-                    <div className="tw-w-1/3 tw-px-2">
-                      {p.type === "AUTRE" && (
+            {value.map((p, idx) => {
+              const fieldName = `${name}.${idx}`;
+
+              return (
+                <div
+                  key={`${idx}-${p.type}`}
+                  className="tw-border-2 tw-border-gray-400 tw-border-solid tw-rounded-md tw-px-4 tw-py-2 tw-mb-2"
+                >
+                  <div className="tw-flex tw-mb-4 tw-items-end">
+                    <div className="tw-w-11/12 tw-flex">
+                      <div className="tw-w-1/3 tw-pr-2">
                         <label>
-                          Précisez
-                          <Field
-                            className="td-input"
-                            name={`${name}.${idx}.other`}
-                            placeholder="..."
-                          />
+                          Type
+                          <select
+                            name={fieldName}
+                            className="td-select"
+                            value={p.type}
+                            onChange={event => {
+                              if (event.target.value !== PackagingsEnum.Autre) {
+                                setFieldValue(`${fieldName}.other`, "");
+                              }
+
+                              setFieldValue(
+                                `${fieldName}.type`,
+                                event.target.value
+                              );
+                            }}
+                          >
+                            {(Object.entries(PACKAGINGS_NAMES) as Array<
+                              [keyof typeof PACKAGINGS_NAMES, string]
+                            >).map(([optionValue, optionLabel]) => (
+                              <option
+                                key={optionValue}
+                                value={optionValue}
+                                disabled={
+                                  value?.length > 1 &&
+                                  ([
+                                    PackagingsEnum.Citerne,
+                                    PackagingsEnum.Benne,
+                                  ].includes(optionValue) ||
+                                    value.some(p =>
+                                      [
+                                        PackagingsEnum.Citerne,
+                                        PackagingsEnum.Benne,
+                                        ...(optionValue !== PackagingsEnum.Autre
+                                          ? [optionValue]
+                                          : []),
+                                      ].includes(p.type)
+                                    ))
+                                }
+                              >
+                                {optionLabel}
+                              </option>
+                            ))}
+                          </select>
                         </label>
-                      )}
+                      </div>
+                      <div className="tw-w-1/3 tw-px-2">
+                        {p.type === "AUTRE" && (
+                          <label>
+                            Précisez
+                            <Field
+                              className="td-input"
+                              name={`${name}.${idx}.other`}
+                              placeholder="..."
+                            />
+                          </label>
+                        )}
+                      </div>
+                      <div className="tw-w-1/3 tw-px-2">
+                        <Field
+                          label="Colis"
+                          component={NumberInput}
+                          className="td-input"
+                          name={`${name}.${idx}.quantity`}
+                          placeholder="Nombre de colis"
+                          min="1"
+                          max={
+                            [
+                              PackagingsEnum.Citerne,
+                              PackagingsEnum.Benne,
+                            ].includes(p.type)
+                              ? 1
+                              : undefined
+                          }
+                        />
+                      </div>
                     </div>
-                    <div className="tw-w-1/3 tw-px-2">
-                      <Field
-                        label="Colis"
-                        component={NumberInput}
-                        className="td-input"
-                        name={`${name}.${idx}.quantity`}
-                        placeholder="Nombre de colis"
-                        min="1"
-                        max={
-                          [
-                            PackagingsEnum.Citerne,
-                            PackagingsEnum.Benne,
-                          ].includes(p.type)
-                            ? 1
-                            : undefined
-                        }
-                      />
+                    <div
+                      className="tw-px-2"
+                      onClick={() => arrayHelpers.remove(idx)}
+                    >
+                      <button type="button">
+                        <IconClose />
+                      </button>
                     </div>
                   </div>
-                  <div
-                    className="tw-px-2"
-                    onClick={() => arrayHelpers.remove(idx)}
-                  >
-                    <button type="button">
-                      <IconClose />
-                    </button>
-                  </div>
+                  <RedErrorMessage name={`${name}.${idx}.type`} />
+                  <RedErrorMessage name={`${name}.${idx}.other`} />
+                  <RedErrorMessage name={`${name}.${idx}.quantity`} />
                 </div>
-                <RedErrorMessage name={`${name}.${idx}.type`} />
-                <RedErrorMessage name={`${name}.${idx}.other`} />
-                <RedErrorMessage name={`${name}.${idx}.quantity`} />
-              </div>
-            ))}
+              );
+            })}
             <button
               type="button"
               className="btn btn--outline-primary"
