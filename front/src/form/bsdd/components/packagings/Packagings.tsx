@@ -7,16 +7,12 @@ import {
   PackagingInfo,
   Packagings as PackagingsEnum,
 } from "generated/graphql/types";
+import {
+  PACKAGINGS_NAMES,
+  getPackagingInfosSummary,
+} from "form/bsdd/utils/packagings";
 import React, { InputHTMLAttributes, useMemo } from "react";
 import "./Packagings.scss";
-
-const PACKAGINGS = [
-  { value: PackagingsEnum.Benne, label: "Benne" },
-  { value: PackagingsEnum.Citerne, label: "Citerne" },
-  { value: PackagingsEnum.Grv, label: "GRV" },
-  { value: PackagingsEnum.Fut, label: "Fût" },
-  { value: PackagingsEnum.Autre, label: "Autre (à préciser)" },
-];
 
 export default function Packagings({
   field: { name, value, onChange },
@@ -66,29 +62,30 @@ export default function Packagings({
                             setFieldValue(`${name}.${idx}.other`, "")
                           }
                         >
-                          {PACKAGINGS.map(packaging => (
+                          {(Object.entries(PACKAGINGS_NAMES) as Array<
+                            [keyof typeof PACKAGINGS_NAMES, string]
+                          >).map(([optionValue, optionLabel]) => (
                             <option
-                              key={packaging.value}
-                              value={packaging.value}
+                              key={optionValue}
+                              value={optionValue}
                               disabled={
                                 value?.length > 1 &&
                                 ([
                                   PackagingsEnum.Citerne,
                                   PackagingsEnum.Benne,
-                                ].includes(packaging.value) ||
+                                ].includes(optionValue) ||
                                   value.some(p =>
                                     [
                                       PackagingsEnum.Citerne,
                                       PackagingsEnum.Benne,
-                                      ...(packaging.value !==
-                                      PackagingsEnum.Autre
-                                        ? [packaging.value]
+                                      ...(optionValue !== PackagingsEnum.Autre
+                                        ? [optionValue]
                                         : []),
                                     ].includes(p.type)
                                   ))
                               }
                             >
-                              {packaging.label}
+                              {optionLabel}
                             </option>
                           ))}
                         </Field>
@@ -164,15 +161,7 @@ export default function Packagings({
         )}
       />
       {value?.length > 0 && (
-        <div className="tw-mt-4">
-          Total : {value.reduce((prev, cur) => prev + cur.quantity, 0)} colis -{" "}
-          {value
-            .map(v => {
-              const packaging = PACKAGINGS.find(p => p.value === v.type);
-              return `${v.quantity} ${packaging?.label}(s)`;
-            })
-            .join(", ")}
-        </div>
+        <div className="tw-mt-4">{getPackagingInfosSummary(value)}</div>
       )}
     </div>
   );
