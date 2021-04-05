@@ -4,6 +4,7 @@ import prisma from "../../prisma";
 
 const companyForVerificationResolvers: CompanyForVerificationResolvers = {
   admin: async parent => {
+    // returns first admin who joined
     const admin = await prisma.companyAssociation
       .findFirst({
         where: { company: { siret: parent.siret }, role: UserRole.ADMIN }
