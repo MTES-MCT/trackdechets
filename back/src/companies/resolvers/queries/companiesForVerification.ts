@@ -20,14 +20,16 @@ const companiesForVerificationResolver: QueryResolvers["companiesForVerification
   applyAuthStrategies(context, [AuthType.Session]);
   checkIsAdmin(context);
 
-  const totalCount = await prisma.company.count({ where });
+  const whereInput = {
+    ...where,
+    companyTypes: { hasSome: COMPANY_TYPES.PROFESSIONALS as CompanyType[] }
+  };
+
+  const totalCount = await prisma.company.count({ where: whereInput });
 
   const companies = await prisma.company.findMany({
     ...connectionArgs,
-    where: {
-      ...where,
-      companyTypes: { hasSome: COMPANY_TYPES.PROFESSIONALS as CompanyType[] }
-    },
+    where: whereInput,
     orderBy: {
       createdAt: Prisma.SortOrder.desc
     }
