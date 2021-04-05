@@ -20,6 +20,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :memo: Documentation
 
 #### :house: Interne
+
+- Ajout d'une interface d'admin permettant aux agents de l'administration de vérifier manuellement que l'utilisateur ayant rattaché un établissement a bien le droit de le faire [PR 832](https://github.com/MTES-MCT/trackdechets/pull/832)
+
 # [2021.03.2] 23/03/2021
 
 #### :bug: Corrections de bugs
