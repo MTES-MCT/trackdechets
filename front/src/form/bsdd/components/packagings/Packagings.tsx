@@ -62,14 +62,14 @@ export default function Packagings({
                             className="td-select"
                             value={p.type}
                             onChange={event => {
-                              if (event.target.value !== PackagingsEnum.Autre) {
-                                setFieldValue(`${fieldName}.other`, "");
-                              }
-
-                              setFieldValue(
-                                `${fieldName}.type`,
-                                event.target.value
-                              );
+                              setFieldValue(fieldName, {
+                                type: event.target.value,
+                                other:
+                                  event.target.value === PackagingsEnum.Autre
+                                    ? p.other
+                                    : "",
+                                quantity: p.quantity,
+                              });
                             }}
                           >
                             {(Object.entries(PACKAGINGS_NAMES) as Array<
