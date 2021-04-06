@@ -222,7 +222,7 @@ export default function CompaniesVerificationTable({
               <td>Chargement...</td>
             ) : (
               <td>
-                Showing {page.length} of {totalCount} results
+                Affichage de {page.length} sur {totalCount} établissements
               </td>
             )}
           </tr>
