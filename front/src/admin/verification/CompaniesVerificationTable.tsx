@@ -92,8 +92,8 @@ export default function CompaniesVerificationTable({
               const hasComment = comment && comment.length > 0;
               return (
                 <>
-                  <span>Vérifié manuellement</span>{" "}
-                  {hasComment && <span className="tw-italic">{comment}</span>}
+                  <div>Vérifié manuellement</div>
+                  {hasComment && <div className="tw-italic">{comment}</div>}
                 </>
               );
             }
