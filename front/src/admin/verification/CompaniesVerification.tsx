@@ -4,7 +4,7 @@ import {
   QueryCompaniesForVerificationArgs,
   Query,
 } from "generated/graphql/types";
-import React from "react";
+import React, { useCallback } from "react";
 import CompaniesVerificationTable from "./CompaniesVerificationTable";
 import { COMPANIES_FOR_VERIFICATION } from "./queries";
 
@@ -21,7 +21,7 @@ export default function CompaniesVerification() {
     variables: { first: pageSize, skip: 0 },
   });
 
-  const fetchData = React.useCallback(
+  const fetchData = useCallback(
     ({ pageSize, pageIndex, filters }) => {
       const verificationStatus = filters.find(
         f => f.id === "verificationStatus"
