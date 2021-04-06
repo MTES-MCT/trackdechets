@@ -27,21 +27,22 @@ export default function CompaniesVerificationTable({
   const columns = React.useMemo(
     () => [
       {
-        Header: "Date de rattachement",
-        accessor: "createdAt", // accessor is the "key" in the data,
+        Header: "Date de création",
+        accessor: "createdAt",
         disableFilters: true,
-        Cell: props =>
-          props.value && format(new Date(props.value), "yyyy-MM-dd"),
+        Cell: ({ value: createdAt }) =>
+          createdAt && format(new Date(createdAt), "yyyy-MM-dd"),
       },
       {
-        Header: "SIRET",
-        accessor: "siret", // accessor is the "key" in the data,
+        Header: "Établissement",
+        accessor: row => ({ siret: row.siret, name: row.name }),
         disableFilters: true,
-      },
-      {
-        Header: "Raison sociale",
-        accessor: "name",
-        disableFilters: true,
+        Cell: ({ value }) => (
+          <>
+            <div>{value.siret}</div>
+            <div>{value.name}</div>
+          </>
+        ),
       },
       {
         Header: "Profil",
@@ -58,26 +59,33 @@ export default function CompaniesVerificationTable({
         },
       },
       {
-        Header: "Email admin",
-        accessor: "admin.email",
+        Header: "Admin",
+        accessor: "admin",
         disableFilters: true,
-      },
-      {
-        Header: "Nom admin",
-        accessor: "admin.name",
-        disableFilters: true,
-      },
-      {
-        Header: "Téléphone admin",
-        accessor: "admin.phone",
-        disableFilters: true,
+        Cell: ({ value: admin }) => (
+          <div>
+            <span>{admin.email}</span>
+            {admin?.name && (
+              <>
+                <br />
+                <span>{admin?.name}</span>
+              </>
+            )}
+            {admin?.phone && (
+              <>
+                <br />
+                <span>{admin?.phone}</span>
+              </>
+            )}
+          </div>
+        ),
       },
       {
         Header: "Statut de vérification",
         accessor: "verificationStatus",
         Filter: SelectColumnFilter,
         filter: "includes",
-        Cell: ({ row, value, ...props }) => {
+        Cell: ({ row, value }) => {
           const verificationStatus = value;
           if (verificationStatus === CompanyVerificationStatus.ToBeVerified) {
             return "Non vérifié";
