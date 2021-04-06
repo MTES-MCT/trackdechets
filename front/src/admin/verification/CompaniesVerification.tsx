@@ -23,13 +23,10 @@ export default function CompaniesVerification() {
 
   const fetchData = useCallback(
     ({ pageSize, pageIndex, filters }) => {
-      const verificationStatus = filters.find(
-        f => f.id === "verificationStatus"
+      const where = filters.reduce(
+        (acc, filter) => ({ ...acc, [filter.id]: filter.value }),
+        {}
       );
-      const where = {} as any;
-      if (verificationStatus) {
-        where["verificationStatus"] = verificationStatus.value;
-      }
       refetch({ first: pageSize, skip: pageIndex * pageSize, where });
     },
     [refetch]

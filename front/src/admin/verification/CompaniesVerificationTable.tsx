@@ -188,7 +188,6 @@ export default function CompaniesVerificationTable({
             page.map(row => {
               // Prepare the row for display
               prepareRow(row);
-              console.log(row);
               return (
                 // Apply the row props
                 <tr {...row.getRowProps()}>
@@ -230,10 +229,6 @@ export default function CompaniesVerificationTable({
         </tbody>
       </table>
 
-      {/*
-        Pagination can be built however you'd like.
-        This is just a very basic UI implementation:
-      */}
       <div className="pagination">
         <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
           {"<<"}
@@ -250,11 +245,11 @@ export default function CompaniesVerificationTable({
         <span>
           Page{" "}
           <strong>
-            {pageIndex + 1} of {pageOptions.length}
+            {pageIndex + 1} sur {pageOptions.length}
           </strong>{" "}
         </span>
         <span>
-          | Go to page:{" "}
+          | Aller à la page:{" "}
           <input
             type="number"
             defaultValue={pageIndex + 1}
