@@ -63,27 +63,17 @@ export default function CompaniesVerificationTable({
         accessor: "admin",
         disableFilters: true,
         Cell: ({ value: admin }) => (
-          <div>
-            <span>{admin.email}</span>
-            {admin?.name && (
-              <>
-                <br />
-                <span>{admin?.name}</span>
-              </>
-            )}
-            {admin?.phone && (
-              <>
-                <br />
-                <span>{admin?.phone}</span>
-              </>
-            )}
-          </div>
+          <>
+            <div>{admin.email}</div>
+            {admin?.name && <div>{admin?.name}</div>}
+            {admin?.phone && <div>{admin?.phone}</div>}
+          </>
         ),
       },
       {
         Header: "Statut de vérification",
         accessor: "verificationStatus",
-        Filter: SelectColumnFilter,
+        Filter: VerificationStatusFilter,
         filter: "includes",
         Cell: ({ row, value }) => {
           const verificationStatus = value;
@@ -198,6 +188,7 @@ export default function CompaniesVerificationTable({
             page.map(row => {
               // Prepare the row for display
               prepareRow(row);
+              console.log(row);
               return (
                 // Apply the row props
                 <tr {...row.getRowProps()}>
@@ -219,7 +210,7 @@ export default function CompaniesVerificationTable({
                   <td>
                     {row.values.verificationStatus ===
                       CompanyVerificationStatus.ToBeVerified && (
-                      <CompanyVerificationActions company={row.values} />
+                      <CompanyVerificationActions company={row.original} />
                     )}
                   </td>
                 </tr>
@@ -229,7 +220,7 @@ export default function CompaniesVerificationTable({
           <tr>
             {loading ? (
               // Use our custom loading state to show a loading indicator
-              <td>Loading...</td>
+              <td>Chargement...</td>
             ) : (
               <td>
                 Showing {page.length} of {totalCount} results
@@ -279,22 +270,16 @@ export default function CompaniesVerificationTable({
   );
 }
 
-// This is a custom filter UI for selecting
-// a unique option from a list
-function SelectColumnFilter({
-  column: { filterValue, setFilter, preFilteredRows, id },
-}) {
-  // Calculate the options for filtering
-  // using the preFilteredRows
-  const options = React.useMemo(() => {
-    const options = new Set();
-    preFilteredRows.forEach(row => {
-      options.add(row.values[id]);
-    });
-    return [...options.values()];
-  }, [id, preFilteredRows]);
+function VerificationStatusFilter({ column: { filterValue, setFilter } }) {
+  const options = [
+    {
+      value: CompanyVerificationStatus.Verified,
+      label: "Vérifié",
+    },
+    { value: CompanyVerificationStatus.ToBeVerified, label: "À vérifier" },
+    { value: CompanyVerificationStatus.LetterSent, label: "Courrier envoyé" },
+  ];
 
-  // Render a multi-select box
   return (
     <select
       value={filterValue}
@@ -302,10 +287,10 @@ function SelectColumnFilter({
         setFilter(e.target.value || undefined);
       }}
     >
-      <option value="">All</option>
+      <option value="">Tous</option>
       {options.map((option, i) => (
-        <option key={i} value={option as any}>
-          {option as any}
+        <option key={i} value={option.value}>
+          {option.label}
         </option>
       ))}
     </select>
