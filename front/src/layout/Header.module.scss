@@ -64,8 +64,10 @@
   margin-left: auto;
 
   z-index: 20;
+  overflow-y: auto;
 
   top: 0;
+  bottom: 0;
 
   width: 85vw;
   min-height: 100vh;
