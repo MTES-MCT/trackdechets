@@ -26,6 +26,7 @@ const VERIFY_COMPANY_BY_ADMIN = gql`
       id
       verificationStatus
       verificationComment
+      verificationMode
     }
   }
 `;
