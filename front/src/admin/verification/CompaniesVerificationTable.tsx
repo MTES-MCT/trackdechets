@@ -78,7 +78,7 @@ export default function CompaniesVerificationTable({
         Cell: ({ row, value }) => {
           const verificationStatus = value;
           if (verificationStatus === CompanyVerificationStatus.ToBeVerified) {
-            return "Non vérifié";
+            return "À vérifier";
           } else if (
             verificationStatus === CompanyVerificationStatus.LetterSent
           ) {
