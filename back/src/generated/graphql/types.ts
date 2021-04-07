@@ -51,6 +51,13 @@ export type AcceptedFormInput = {
   quantityReceived: Scalars["Float"];
 };
 
+export type AdminForVerification = {
+  __typename?: "AdminForVerification";
+  email: Scalars["String"];
+  name?: Maybe<Scalars["String"]>;
+  phone?: Maybe<Scalars["String"]>;
+};
+
 /** Payload de création d'une annexe 2 */
 export type AppendixFormInput = {
   /** Identifiant unique du bordereau */
@@ -429,6 +436,30 @@ export type CompanyFavorite = {
   vhuAgrementBroyeur?: Maybe<VhuAgrement>;
 };
 
+export type CompanyForVerification = {
+  __typename?: "CompanyForVerification";
+  id: Scalars["ID"];
+  siret: Scalars["String"];
+  name: Scalars["String"];
+  companyTypes: Array<CompanyType>;
+  createdAt: Scalars["DateTime"];
+  verificationStatus: CompanyVerificationStatus;
+  verificationComment?: Maybe<Scalars["String"]>;
+  verificationMode?: Maybe<CompanyVerificationMode>;
+  verifiedAt?: Maybe<Scalars["DateTime"]>;
+  admin?: Maybe<AdminForVerification>;
+};
+
+export type CompanyForVerificationConnection = {
+  __typename?: "CompanyForVerificationConnection";
+  totalCount: Scalars["Int"];
+  companies: Array<CompanyForVerification>;
+};
+
+export type CompanyForVerificationWhere = {
+  verificationStatus?: Maybe<CompanyVerificationStatus>;
+};
+
 /** Payload d'un établissement */
 export type CompanyInput = {
   /** SIRET de l'établissement */
@@ -632,6 +663,8 @@ export type CompanyType =
   | "BROKER"
   /** Éco-organisme */
   | "ECO_ORGANISME";
+
+export type CompanyVerificationMode = "LETTER" | "MANUAL";
 
 /** État du processus de vérification de l'établissement */
 export type CompanyVerificationStatus =
@@ -1606,6 +1639,8 @@ export type Mutation = {
    * registre du commerce et des sociétés
    */
   verifyCompany: CompanyPrivate;
+  /** Verify a company manually */
+  verifyCompanyByAdmin: CompanyForVerification;
 };
 
 export type MutationAcceptMembershipRequestArgs = {
@@ -1879,6 +1914,10 @@ export type MutationVerifyCompanyArgs = {
   input: VerifyCompanyInput;
 };
 
+export type MutationVerifyCompanyByAdminArgs = {
+  input: VerifyCompanyByAdminInput;
+};
+
 /** Destination ultérieure prévue (case 12) */
 export type NextDestination = {
   __typename?: "NextDestination";
@@ -1999,6 +2038,7 @@ export type QuantityType =
   /** Quantité estimée */
   | "ESTIMATED";
 
+/** Views of the Company ressource for the admin panel */
 export type Query = {
   __typename?: "Query";
   /**
@@ -2018,6 +2058,8 @@ export type Query = {
   bsvhuPdf: FileDownload;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsvhus: BsvhuConnection;
+  /** List companies for the company verfication table of the admin panel */
+  companiesForVerification: CompanyForVerificationConnection;
   /**
    * Renvoie des informations publiques sur un établissement
    * extrait de la base SIRENE et de la base des installations
@@ -2102,19 +2144,23 @@ export type Query = {
   stats: Array<CompanyStat>;
 };
 
+/** Views of the Company ressource for the admin panel */
 export type QueryAppendixFormsArgs = {
   siret: Scalars["String"];
   wasteCode?: Maybe<Scalars["String"]>;
 };
 
+/** Views of the Company ressource for the admin panel */
 export type QueryBsvhuArgs = {
   id: Scalars["ID"];
 };
 
+/** Views of the Company ressource for the admin panel */
 export type QueryBsvhuPdfArgs = {
   id?: Maybe<Scalars["ID"]>;
 };
 
+/** Views of the Company ressource for the admin panel */
 export type QueryBsvhusArgs = {
   after?: Maybe<Scalars["ID"]>;
   first?: Maybe<Scalars["Int"]>;
@@ -2124,24 +2170,37 @@ export type QueryBsvhusArgs = {
   where?: Maybe<BsvhuWhere>;
 };
 
+/** Views of the Company ressource for the admin panel */
+export type QueryCompaniesForVerificationArgs = {
+  first?: Maybe<Scalars["Int"]>;
+  last?: Maybe<Scalars["Int"]>;
+  skip?: Maybe<Scalars["Int"]>;
+  where?: Maybe<CompanyForVerificationWhere>;
+};
+
+/** Views of the Company ressource for the admin panel */
 export type QueryCompanyInfosArgs = {
   siret: Scalars["String"];
 };
 
+/** Views of the Company ressource for the admin panel */
 export type QueryFavoritesArgs = {
   siret: Scalars["String"];
   type: FavoriteType;
 };
 
+/** Views of the Company ressource for the admin panel */
 export type QueryFormArgs = {
   id?: Maybe<Scalars["ID"]>;
   readableId?: Maybe<Scalars["String"]>;
 };
 
+/** Views of the Company ressource for the admin panel */
 export type QueryFormPdfArgs = {
   id?: Maybe<Scalars["ID"]>;
 };
 
+/** Views of the Company ressource for the admin panel */
 export type QueryFormsArgs = {
   siret?: Maybe<Scalars["String"]>;
   skip?: Maybe<Scalars["Int"]>;
@@ -2158,6 +2217,7 @@ export type QueryFormsArgs = {
   wasteCode?: Maybe<Scalars["String"]>;
 };
 
+/** Views of the Company ressource for the admin panel */
 export type QueryFormsLifeCycleArgs = {
   siret?: Maybe<Scalars["String"]>;
   loggedBefore?: Maybe<Scalars["String"]>;
@@ -2167,6 +2227,7 @@ export type QueryFormsLifeCycleArgs = {
   formId?: Maybe<Scalars["ID"]>;
 };
 
+/** Views of the Company ressource for the admin panel */
 export type QueryFormsRegisterArgs = {
   sirets: Array<Scalars["String"]>;
   exportType?: Maybe<FormsRegisterExportType>;
@@ -2176,15 +2237,18 @@ export type QueryFormsRegisterArgs = {
   exportFormat?: Maybe<FormsRegisterExportFormat>;
 };
 
+/** Views of the Company ressource for the admin panel */
 export type QueryInvitationArgs = {
   hash: Scalars["String"];
 };
 
+/** Views of the Company ressource for the admin panel */
 export type QueryMembershipRequestArgs = {
   id?: Maybe<Scalars["ID"]>;
   siret?: Maybe<Scalars["String"]>;
 };
 
+/** Views of the Company ressource for the admin panel */
 export type QuerySearchCompaniesArgs = {
   clue: Scalars["String"];
   department?: Maybe<Scalars["String"]>;
@@ -2731,6 +2795,8 @@ export type User = {
   email: Scalars["String"];
   /** Nom de l'utilisateur */
   name?: Maybe<Scalars["String"]>;
+  /** Qualité d'administrateur. Rôle reservé aux agents de l'administration */
+  isAdmin?: Maybe<Scalars["Boolean"]>;
   /** Numéro de téléphone de l'utilisateur */
   phone?: Maybe<Scalars["String"]>;
   /** Liste des établissements dont l'utilisateur est membre */
@@ -2756,6 +2822,11 @@ export type User = {
  * pour le détail de chacun des rôles
  */
 export type UserRole = "MEMBER" | "ADMIN";
+
+export type VerifyCompanyByAdminInput = {
+  siret: Scalars["String"];
+  verificationComment?: Maybe<Scalars["String"]>;
+};
 
 export type VerifyCompanyInput = {
   /** Le SIRET de l'établissement à vérifier */
@@ -3064,13 +3135,21 @@ export type ResolversTypes = {
   BsvhuConnection: ResolverTypeWrapper<BsvhuConnection>;
   PageInfo: ResolverTypeWrapper<PageInfo>;
   BsvhuEdge: ResolverTypeWrapper<BsvhuEdge>;
+  CompanyForVerificationWhere: CompanyForVerificationWhere;
+  CompanyVerificationStatus: CompanyVerificationStatus;
+  CompanyForVerificationConnection: ResolverTypeWrapper<
+    CompanyForVerificationConnection
+  >;
+  CompanyForVerification: ResolverTypeWrapper<CompanyForVerification>;
+  CompanyType: CompanyType;
+  CompanyVerificationMode: CompanyVerificationMode;
+  AdminForVerification: ResolverTypeWrapper<AdminForVerification>;
   CompanyPublic: ResolverTypeWrapper<CompanyPublic>;
   Installation: ResolverTypeWrapper<Installation>;
   Rubrique: ResolverTypeWrapper<Rubrique>;
   WasteType: WasteType;
   Declaration: ResolverTypeWrapper<Declaration>;
   GerepType: GerepType;
-  CompanyType: CompanyType;
   TransporterReceipt: ResolverTypeWrapper<TransporterReceipt>;
   TraderReceipt: ResolverTypeWrapper<TraderReceipt>;
   BrokerReceipt: ResolverTypeWrapper<BrokerReceipt>;
@@ -3091,7 +3170,6 @@ export type ResolversTypes = {
   UserRole: UserRole;
   User: ResolverTypeWrapper<User>;
   CompanyPrivate: ResolverTypeWrapper<CompanyPrivate>;
-  CompanyVerificationStatus: CompanyVerificationStatus;
   CompanyMember: ResolverTypeWrapper<CompanyMember>;
   MembershipRequest: ResolverTypeWrapper<MembershipRequest>;
   MembershipRequestStatus: MembershipRequestStatus;
@@ -3159,6 +3237,7 @@ export type ResolversTypes = {
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
   UpdateVhuAgrementInput: UpdateVhuAgrementInput;
   VerifyCompanyInput: VerifyCompanyInput;
+  VerifyCompanyByAdminInput: VerifyCompanyByAdminInput;
   Subscription: ResolverTypeWrapper<{}>;
   FormSubscription: ResolverTypeWrapper<FormSubscription>;
 };
@@ -3212,6 +3291,10 @@ export type ResolversParentTypes = {
   BsvhuConnection: BsvhuConnection;
   PageInfo: PageInfo;
   BsvhuEdge: BsvhuEdge;
+  CompanyForVerificationWhere: CompanyForVerificationWhere;
+  CompanyForVerificationConnection: CompanyForVerificationConnection;
+  CompanyForVerification: CompanyForVerification;
+  AdminForVerification: AdminForVerification;
   CompanyPublic: CompanyPublic;
   Installation: Installation;
   Rubrique: Rubrique;
@@ -3295,8 +3378,19 @@ export type ResolversParentTypes = {
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
   UpdateVhuAgrementInput: UpdateVhuAgrementInput;
   VerifyCompanyInput: VerifyCompanyInput;
+  VerifyCompanyByAdminInput: VerifyCompanyByAdminInput;
   Subscription: {};
   FormSubscription: FormSubscription;
+};
+
+export type AdminForVerificationResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["AdminForVerification"] = ResolversParentTypes["AdminForVerification"]
+> = {
+  email?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  phone?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type AuthPayloadResolvers<
@@ -3631,6 +3725,60 @@ export type CompanyFavoriteResolvers<
   >;
   vhuAgrementBroyeur?: Resolver<
     Maybe<ResolversTypes["VhuAgrement"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CompanyForVerificationResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["CompanyForVerification"] = ResolversParentTypes["CompanyForVerification"]
+> = {
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
+  siret?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  companyTypes?: Resolver<
+    Array<ResolversTypes["CompanyType"]>,
+    ParentType,
+    ContextType
+  >;
+  createdAt?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
+  verificationStatus?: Resolver<
+    ResolversTypes["CompanyVerificationStatus"],
+    ParentType,
+    ContextType
+  >;
+  verificationComment?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  verificationMode?: Resolver<
+    Maybe<ResolversTypes["CompanyVerificationMode"]>,
+    ParentType,
+    ContextType
+  >;
+  verifiedAt?: Resolver<
+    Maybe<ResolversTypes["DateTime"]>,
+    ParentType,
+    ContextType
+  >;
+  admin?: Resolver<
+    Maybe<ResolversTypes["AdminForVerification"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CompanyForVerificationConnectionResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["CompanyForVerificationConnection"] = ResolversParentTypes["CompanyForVerificationConnection"]
+> = {
+  totalCount?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  companies?: Resolver<
+    Array<ResolversTypes["CompanyForVerification"]>,
     ParentType,
     ContextType
   >;
@@ -4628,6 +4776,12 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationVerifyCompanyArgs, "input">
   >;
+  verifyCompanyByAdmin?: Resolver<
+    ResolversTypes["CompanyForVerification"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationVerifyCompanyByAdminArgs, "input">
+  >;
 };
 
 export type NextDestinationResolvers<
@@ -4700,6 +4854,12 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QueryBsvhusArgs, never>
+  >;
+  companiesForVerification?: Resolver<
+    ResolversTypes["CompanyForVerificationConnection"],
+    ParentType,
+    ContextType,
+    RequireFields<QueryCompaniesForVerificationArgs, never>
   >;
   companyInfos?: Resolver<
     ResolversTypes["CompanyPublic"],
@@ -5182,6 +5342,7 @@ export type UserResolvers<
   id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
   email?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  isAdmin?: Resolver<Maybe<ResolversTypes["Boolean"]>, ParentType, ContextType>;
   phone?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
   companies?: Resolver<
     Array<ResolversTypes["CompanyPrivate"]>,
@@ -5260,6 +5421,7 @@ export type WorkSiteResolvers<
 };
 
 export type Resolvers<ContextType = GraphQLContext> = {
+  AdminForVerification?: AdminForVerificationResolvers<ContextType>;
   AuthPayload?: AuthPayloadResolvers<ContextType>;
   Broker?: BrokerResolvers<ContextType>;
   BrokerReceipt?: BrokerReceiptResolvers<ContextType>;
@@ -5277,6 +5439,10 @@ export type Resolvers<ContextType = GraphQLContext> = {
   BsvhuRecipientOperation?: BsvhuRecipientOperationResolvers<ContextType>;
   BsvhuTransporter?: BsvhuTransporterResolvers<ContextType>;
   CompanyFavorite?: CompanyFavoriteResolvers<ContextType>;
+  CompanyForVerification?: CompanyForVerificationResolvers<ContextType>;
+  CompanyForVerificationConnection?: CompanyForVerificationConnectionResolvers<
+    ContextType
+  >;
   CompanyMember?: CompanyMemberResolvers<ContextType>;
   CompanyPrivate?: CompanyPrivateResolvers<ContextType>;
   CompanyPublic?: CompanyPublicResolvers<ContextType>;
@@ -5341,6 +5507,18 @@ export function createAcceptedFormInputMock(
     signedAt: new Date(),
     signedBy: "",
     quantityReceived: 0,
+    ...props
+  };
+}
+
+export function createAdminForVerificationMock(
+  props: Partial<AdminForVerification>
+): AdminForVerification {
+  return {
+    __typename: "AdminForVerification",
+    email: "",
+    name: null,
+    phone: null,
     ...props
   };
 }
@@ -5756,6 +5934,45 @@ export function createCompanyFavoriteMock(
     brokerReceipt: null,
     vhuAgrementDemolisseur: null,
     vhuAgrementBroyeur: null,
+    ...props
+  };
+}
+
+export function createCompanyForVerificationMock(
+  props: Partial<CompanyForVerification>
+): CompanyForVerification {
+  return {
+    __typename: "CompanyForVerification",
+    id: "",
+    siret: "",
+    name: "",
+    companyTypes: [],
+    createdAt: new Date(),
+    verificationStatus: "VERIFIED",
+    verificationComment: null,
+    verificationMode: null,
+    verifiedAt: null,
+    admin: null,
+    ...props
+  };
+}
+
+export function createCompanyForVerificationConnectionMock(
+  props: Partial<CompanyForVerificationConnection>
+): CompanyForVerificationConnection {
+  return {
+    __typename: "CompanyForVerificationConnection",
+    totalCount: 0,
+    companies: [],
+    ...props
+  };
+}
+
+export function createCompanyForVerificationWhereMock(
+  props: Partial<CompanyForVerificationWhere>
+): CompanyForVerificationWhere {
+  return {
+    verificationStatus: null,
     ...props
   };
 }
@@ -6841,8 +7058,19 @@ export function createUserMock(props: Partial<User>): User {
     id: "",
     email: "",
     name: null,
+    isAdmin: null,
     phone: null,
     companies: [],
+    ...props
+  };
+}
+
+export function createVerifyCompanyByAdminInputMock(
+  props: Partial<VerifyCompanyByAdminInput>
+): VerifyCompanyByAdminInput {
+  return {
+    siret: "",
+    verificationComment: null,
     ...props
   };
 }

@@ -56,6 +56,9 @@ type User {
   "Nom de l'utilisateur"
   name: String
 
+  "Qualité d'administrateur. Rôle reservé aux agents de l'administration"
+  isAdmin: Boolean
+
   "Numéro de téléphone de l'utilisateur"
   phone: String
 

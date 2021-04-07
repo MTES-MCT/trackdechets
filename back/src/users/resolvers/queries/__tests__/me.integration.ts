@@ -6,6 +6,7 @@ const ME = `
   query Me {
     me {
       id
+      isAdmin
     }
   }
 `;
@@ -18,5 +19,6 @@ describe("query me", () => {
     const { query } = makeClient(user);
     const { data } = await query(ME);
     expect(data.me.id).toEqual(user.id);
+    expect(data.me.isAdmin).toEqual(false);
   });
 });

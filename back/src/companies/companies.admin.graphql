@@ -1,0 +1,57 @@
+"""
+Views of the Company ressource for the admin panel
+"""
+type Query {
+  "List companies for the company verfication table of the admin panel"
+  companiesForVerification(
+    first: Int
+    last: Int
+    skip: Int
+    where: CompanyForVerificationWhere
+  ): CompanyForVerificationConnection!
+}
+
+type Mutation {
+  "Verify a company manually"
+  verifyCompanyByAdmin(
+    input: VerifyCompanyByAdminInput!
+  ): CompanyForVerification!
+}
+
+type CompanyForVerification {
+  id: ID!
+  siret: String!
+  name: String!
+  companyTypes: [CompanyType!]!
+  createdAt: DateTime!
+  verificationStatus: CompanyVerificationStatus!
+  verificationComment: String
+  verificationMode: CompanyVerificationMode
+  verifiedAt: DateTime
+  admin: AdminForVerification
+}
+
+enum CompanyVerificationMode {
+  LETTER
+  MANUAL
+}
+
+type AdminForVerification {
+  email: String!
+  name: String
+  phone: String
+}
+
+type CompanyForVerificationConnection {
+  totalCount: Int!
+  companies: [CompanyForVerification!]!
+}
+
+input CompanyForVerificationWhere {
+  verificationStatus: CompanyVerificationStatus
+}
+
+input VerifyCompanyByAdminInput {
+  siret: String!
+  verificationComment: String
+}

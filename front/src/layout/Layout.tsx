@@ -3,6 +3,7 @@ import Header from "./Header";
 
 interface AuthProps {
   isAuthenticated: boolean;
+  isAdmin: boolean;
 }
 const { REACT_APP_WARNING_MESSAGE } = process.env;
 
@@ -12,6 +13,7 @@ const { REACT_APP_WARNING_MESSAGE } = process.env;
 export default function Layout({
   children,
   isAuthenticated,
+  isAdmin,
 }: AuthProps & { children: ReactNode }) {
   return (
     <>
@@ -28,7 +30,7 @@ export default function Layout({
           {REACT_APP_WARNING_MESSAGE}
         </div>
       )}
-      <Header isAuthenticated={isAuthenticated} />
+      <Header isAuthenticated={isAuthenticated} isAdmin={isAdmin} />
       {children}
     </>
   );
