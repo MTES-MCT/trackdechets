@@ -1,7 +1,7 @@
 import {
   CompanyForVerification,
   CompanyVerificationStatus,
-  CompanyVerifificationMode,
+  CompanyVerificationMode,
 } from "generated/graphql/types";
 import React from "react";
 import { useTable, usePagination, useFilters } from "react-table";
@@ -85,7 +85,7 @@ export default function CompaniesVerificationTable({
             return "Courrier envoyé";
           } else {
             const verificationMode = row.original.verificationMode;
-            if (verificationMode === CompanyVerifificationMode.Letter) {
+            if (verificationMode === CompanyVerificationMode.Letter) {
               return "Vérifié par code de sécurité";
             } else {
               const comment = row.original.verificationComment;

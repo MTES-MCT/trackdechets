@@ -26,12 +26,12 @@ type CompanyForVerification {
   createdAt: DateTime!
   verificationStatus: CompanyVerificationStatus!
   verificationComment: String
-  verificationMode: CompanyVerifificationMode
+  verificationMode: CompanyVerificationMode
   verifiedAt: DateTime
   admin: AdminForVerification
 }
 
-enum CompanyVerifificationMode {
+enum CompanyVerificationMode {
   LETTER
   MANUAL
 }

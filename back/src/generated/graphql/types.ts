@@ -445,7 +445,7 @@ export type CompanyForVerification = {
   createdAt: Scalars["DateTime"];
   verificationStatus: CompanyVerificationStatus;
   verificationComment?: Maybe<Scalars["String"]>;
-  verificationMode?: Maybe<CompanyVerifificationMode>;
+  verificationMode?: Maybe<CompanyVerificationMode>;
   verifiedAt?: Maybe<Scalars["DateTime"]>;
   admin?: Maybe<AdminForVerification>;
 };
@@ -664,6 +664,8 @@ export type CompanyType =
   /** Éco-organisme */
   | "ECO_ORGANISME";
 
+export type CompanyVerificationMode = "LETTER" | "MANUAL";
+
 /** État du processus de vérification de l'établissement */
 export type CompanyVerificationStatus =
   /** L'établissement est vérifié */
@@ -675,8 +677,6 @@ export type CompanyVerificationStatus =
    * auprès du registre du commerce et des sociétés
    */
   | "LETTER_SENT";
-
-export type CompanyVerifificationMode = "LETTER" | "MANUAL";
 
 /** Consistance du déchet */
 export type Consistence =
@@ -3142,7 +3142,7 @@ export type ResolversTypes = {
   >;
   CompanyForVerification: ResolverTypeWrapper<CompanyForVerification>;
   CompanyType: CompanyType;
-  CompanyVerifificationMode: CompanyVerifificationMode;
+  CompanyVerificationMode: CompanyVerificationMode;
   AdminForVerification: ResolverTypeWrapper<AdminForVerification>;
   CompanyPublic: ResolverTypeWrapper<CompanyPublic>;
   Installation: ResolverTypeWrapper<Installation>;
@@ -3755,7 +3755,7 @@ export type CompanyForVerificationResolvers<
     ContextType
   >;
   verificationMode?: Resolver<
-    Maybe<ResolversTypes["CompanyVerifificationMode"]>,
+    Maybe<ResolversTypes["CompanyVerificationMode"]>,
     ParentType,
     ContextType
   >;

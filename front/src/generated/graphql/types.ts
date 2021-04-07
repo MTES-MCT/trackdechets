@@ -443,7 +443,7 @@ export type CompanyForVerification = {
   createdAt: Scalars["DateTime"];
   verificationStatus: CompanyVerificationStatus;
   verificationComment: Maybe<Scalars["String"]>;
-  verificationMode: Maybe<CompanyVerifificationMode>;
+  verificationMode: Maybe<CompanyVerificationMode>;
   verifiedAt: Maybe<Scalars["DateTime"]>;
   admin: Maybe<AdminForVerification>;
 };
@@ -663,6 +663,11 @@ export enum CompanyType {
   EcoOrganisme = "ECO_ORGANISME"
 }
 
+export enum CompanyVerificationMode {
+  Letter = "LETTER",
+  Manual = "MANUAL"
+}
+
 /** État du processus de vérification de l'établissement */
 export enum CompanyVerificationStatus {
   /** L'établissement est vérifié */
@@ -674,11 +679,6 @@ export enum CompanyVerificationStatus {
    * auprès du registre du commerce et des sociétés
    */
   LetterSent = "LETTER_SENT"
-}
-
-export enum CompanyVerifificationMode {
-  Letter = "LETTER",
-  Manual = "MANUAL"
 }
 
 /** Consistance du déchet */
