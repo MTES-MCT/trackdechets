@@ -31,10 +31,12 @@ export const companyMails = {
       <br/>
       Dans l'attente de cette vérification, vous ne serez pas en mesure d'inviter
       de nouveaux membres et l'établissement ne pourra pas être visé en tant que
-      destinataire (case 2 ou 14) sur un BSD numérique.
+      destinataire sur un BSD numérique.
       <br/>
       Vous pouvez suivre l'état d'avancement de la vérification depuis votre compte Trackdéchets
       Mon Compte > Établissements > ${company.siret} > Information > Profil vérifié
+      <br /><br />
+      L'équipe Trackdéchets
       `,
     subject: `Établissement ${company.siret} en cours de vérification`,
     title: `Établissement ${company.siret} en cours de vérification`,
@@ -51,9 +53,11 @@ export const companyMails = {
           : "aux vérifications effectuées par nos équipes"
       }. <br/>
       Vous pouvez désormais inviter de nouveaux membres et l'établissement peut désormais
-      être visé en tant que destinataire d'un BSD numérique (case 2 ou 14).
+      être visé en tant que destinataire d'un BSD numérique.
+      <br /><br />
+      L'équipe Trackdéchets
     `,
-      subject: `L'établissement ${company.siret} est désormais vérifié"`,
+      subject: `L'établissement ${company.siret} est désormais vérifié`,
       title: `L'établissement ${company.siret} est désormais vérifié`,
       to: recipients
     };
