@@ -4,17 +4,17 @@
 
 ### Terminologie
 
-La terminologie permet de décliner les différentes `queries` et `mutations` de façon cohérente sur les différents types de bordereau. Le nom de chaque bordereau est construit en préfixant le type de déchet tracé par `bs`. Le terme générique utilisé pour désigner n'importe quel type de bordereau est `bsd`.  
+La terminologie permet de décliner les différentes `queries` et `mutations` de façon cohérente sur les différents types de bordereau. Le nom de chaque bordereau est construit en préfixant le type de déchet tracé par `bs`. Le terme générique utilisé pour désigner n'importe quel type de bordereau est `bsd`.
 
 * `bsd` - permet de désigner n'importe quel bordereau de façon générique
-* `bsdd` - bordereau de suivi des déchets dangereux (CERFA n° 12571\*01) 
+* `bsdd` - bordereau de suivi des déchets dangereux (CERFA n° 12571\*01)
 * `bsdasri`- bordereau de suivi des déchets d’activités de soins à risques infectieux (Cerfa N°11351\*04)
-* `bsvhu`- bordereau de suivi des véhicules hors d'usage 
+* `bsvhu`- bordereau de suivi des véhicules hors d'usage
 * `bshfc` - bordereau de suivi des déchets dangereux pour les opérations nécessitant une manipulation de fluides frigorigènes effectuées sur un équipement, prévus aux articles R.543-82 et R.541-45 du code de l'environnement (CERFA n°15497\*02)
-* `bsda` - bordereau de suivi des déchets dangereux contenant de l'amiante (CERFA n°11861\*03) 
+* `bsda` - bordereau de suivi des déchets dangereux contenant de l'amiante (CERFA n°11861\*03)
 * `bspa` - bordereau de suivi pour l'élimination des pièces anatomiques (N° 11350\*03)
 
-Une appellation spécifique `bsdnd` pourra être envisagée pour les bordereaux de suivi de déchets non dangereux si cela s'avère nécessaire. 
+Une appellation spécifique `bsdnd` pourra être envisagée pour les bordereaux de suivi de déchets non dangereux si cela s'avère nécessaire.
 
 #### Queries
 
@@ -62,7 +62,7 @@ query {
     ...on Bsdd {}
     ...on Bsdasri {}
     ...on Bsvhu {}
-  } 
+  }
 }
 ```
 
@@ -72,15 +72,16 @@ query {
 
 Les mutations sont construite en préfixant le nom du bordereau par un verbe d'action en camelCase `create{Nom}`, `update{Nom}`, `sign{Nom}`, `delete{Nom}`, etc. Exemple pour la création de bordereaux:
 
-- `createBsdd` 
-- `createBsdasri` 
+- `createBsdd`
+- `createBsdasri`
 - `createBsvhu`
 - `createBsda`
 - ...
 
-### Conventions spécifiques aux queries
 
-TODO
+#### Nommage des champs et des types
+
+
 
 ### Pagination
 
