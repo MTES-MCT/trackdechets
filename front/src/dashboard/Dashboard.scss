@@ -2,8 +2,7 @@
 @import "src/scss/Breakpoints.scss";
 .dashboard-content {
   flex: 1;
-  padding-bottom: 80px; //prevent crispr icon to overlap bsds list
-
+  padding-bottom: 80px; //prevent crisp icon to overlap bsds list
   overflow-x: scroll;
   width: 100%;
   max-width: 100%;
