@@ -1,0 +1,201 @@
+type Bsdasri {
+  "Bordereau n°"
+  id: String!
+  "Date de création"
+  createdAt: DateTime!
+  "Date de dernière modification"
+  updatedAt: DateTime!
+  "Indique si le bordereau est à l'état de brouillon"
+  isDraft: Boolean!
+  "Statur du bordereau"
+  status: BsdasriStatus!
+  "Émetteur du bordereau"
+  emitter: BsdasriEmitter
+  "Dénomination du déchet"
+  waste: BsdasriWaste
+  "Mentions au titre des règlements ADR, RID, ADNR, IMDG"
+  onuCode: String
+  "Désignation des conditionnements remis"
+  packagings: [BsdasriPackaging!]!
+  "Quantité de déchets remis (en kg)"
+  quantity: BsdasriQuantity
+  "Quantité de déchets remis (en L)"
+  volume: Float
+  "Transporteur"
+  transporter: BsdasriTransporter
+  "Destinataire"
+  destination: BsdasriDestination
+}
+
+type BsdasriEmitter {
+  company: BsdasriCompany
+  worksite: BsdasriWorkSite
+  emission: BsdasriEmission
+}
+
+type BsdasriEmission {
+  "Date de remise au collecteur-transporteur"
+  handedOverAt: DateTime
+  signature: BsdasriSignature
+}
+
+type BsdasriWorkSite {
+  name: String
+  address: String
+  city: String
+  postalCode: String
+  infos: String
+}
+
+type BsdasriTransporter {
+  company: BsdasriCompany
+  receipt: BsdasriTransporterReceipt
+  transport: BsdasriTransport
+}
+
+type BsdasriTransport {
+  "Refus de prise en charge"
+  acceptationStatus: BsdasriAcceptationStatus
+  "Date du refus de prise en charge"
+  refusalDate: DateTime
+  "Motif du refus de prise en charge"
+  refusalReason: String
+  "Désignation des conditionnements transportées"
+  packagings: [BsdasriPackaging!]!
+  "Quantité de déchets remis (en kg)"
+  quantity: BsdasriQuantity
+  "Quantité de déchets remis (en L)"
+  volume: Float
+  signature: BsdasriSignature
+}
+
+type BsdasriDestination {
+  company: BsdasriCompany
+  reception: BsdasriReception
+  operation: BsdasriOperation
+}
+
+type BsdasriReception {
+  "Refus de prise en charge"
+  acceptationStatus: BsdasriAcceptationStatus
+  "Date du refus de prise en charge"
+  refusalDate: DateTime
+  "Motif du refus de prise en charge"
+  refusalReason: String
+  "Désignation des conditionnements acceptées"
+  packagings: [BsdasriPackaging!]!
+  "Quantité de déchets remis (en kg)"
+  quantity: BsdasriQuantity
+  "Quantité de déchets remis (en L)"
+  volume: Float
+  "Date de prise en charge"
+  date: DateTime
+}
+
+type BsdasriOperation {
+  "Code de traitement D10, R1 ou D9"
+  code: String
+  "date de réalisation de l'opération"
+  date: DateTime
+  signature: BsdasriSignature
+}
+
+type BsdasriTransporterReceipt {
+  number: String
+  validityLimit: DateTime
+  departement: String
+}
+
+type BsdasriWaste {
+  "Code nomenclature des déchets"
+  code: String
+}
+
+type BsdasriPackaging {
+  "Désignation des conditionnements remis"
+  type: BsdasriPackagingType
+
+  "Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"
+  other: String
+
+  "Nombre de colis associés à ce conditionnement"
+  quantity: Int
+
+  "Capacité (litres)"
+  volume: Int
+}
+
+type BsdasriQuantity {
+  "Type de quantité (réelle ou estimé)"
+  type: BsdasriQuantityType
+  "Quantité en kilo"
+  value: Float
+}
+
+type BsdasriSignature {
+  "Horodatage de la signature"
+  date: DateTime
+  "Nom de la personne ayant signé"
+  author: String
+}
+
+type BsdasriCompany {
+  "Nom de l'établissement"
+  name: String!
+
+  "SIRET de l'établissement (si l'établissement est en France)"
+  siret: String
+
+  "Numéro de TVA intracommunautaire (si l'établissement est à l'étranger)"
+  vatNumber: String
+
+  "Adresse de l'établissement"
+  address: String!
+
+  """
+  Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+  https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+  """
+  country: String!
+
+  "Nom du contact dans l'établissement"
+  contact: String
+
+  "Numéro de téléphone de contact dans l'établissement"
+  phone: String
+
+  "Email du contact dans l'établissement"
+  mail: String
+}
+
+enum BsddQuantityType {
+  REAL
+  ESTIMATED
+}
+
+"Type de packaging du déchet"
+enum BsdasriPackagingType {
+  "Caisse en carton avec sac en plastique"
+  BOITE_CARTON
+
+  "Fûts ou jerrican à usage unique"
+  FUT
+
+  "Boîtes et Mini-collecteurs pour déchets perforants"
+  BOITE_PERFORANTS
+
+  "Grand emballage"
+  GRAND_EMBALLAGE
+
+  "Grand récipient pour vrac"
+  VRAC
+
+  "Autre"
+  AUTRE
+}
+
+enum BsdasriAcceptationStatus {
+  ACCEPTED
+  REFUSED
+  PARTIALLY_REFUSED
+}

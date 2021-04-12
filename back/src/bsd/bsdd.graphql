@@ -1,0 +1,266 @@
+type Bsdd {
+  "Bordereau n°"
+  id: String!
+  "Date de création"
+  createdAt: DateTime!
+  "Date de dernière modification"
+  updatedAt: DateTime!
+  "Indique si le bordereau est à l'état de brouillon"
+  isDraft: Boolean!
+  "Statur du bordereau"
+  status: BsddStatus!
+  "Émetteur du bordereau (case 1)"
+  emitter: BsddEmitter
+  """
+  Installation de traitement ou de transformation
+  (case 2 ou 14 dans le cas d'un entreposage provisoire ou reconditionement)
+  """
+  destination: BsddDestination
+  "Dénomination du déchet (case 3)"
+  waste: BsddWaste
+  "Mentions au titre des règlements ADR, RID, ADNR, IMDG (case 4)"
+  onuCode: String
+  "Conditionnement (case 5)"
+  packagings: [BsddPackaging!]!
+  "Quantité (case 6)"
+  quantity: BsddQuantity
+  "Négociant (case 7)"
+  trader: BsddTrader
+  "Collecteur-transporteur (case 8)"
+  transporter: BsddTransporter
+  "Transporteur n°2 (en cas de transport multi-modal)"
+  transporter2: BsddTransporter
+  "Transporteur n°3 (en cas de transport multi-modal)"
+  transporter3: BsddTransporter
+
+  "Destination ultérieure prévue (case 12)"
+  nextDestination: BsddNextDestination
+  "Installation d'entreposage provisoire ou de reconditionnement (case 2 en cas d'entreposage provisoire)"
+  temporaryStorage: BsddTemporaryStorage
+
+  "Reconditionnement (case 16)"
+  repackagings: [BsddPackaging!]!
+  "Mentions au titre des règlements ADR, RID, ADNR, IMDG (en cas de reconditionnement)"
+  onuCodeAfterTempStorage: String
+  "Quantité (en cas de reconditionnement)"
+  quantityAfterTempStorage: BsddQuantity
+
+  "Collecteur-transporteur après entreposage provisoire ou reconditionnement (case 18)"
+  transporterAfterTempStorage: BsddTransporter
+  "Collecteur-transporteur n°2 après entreposage provisoire ou reconditionnement (multi-modal)"
+  transporterAfterTempStorage2: BsddTransporter
+  "Collecteur-transporteur n°3 après entreposage provisoire ou reconditionnement (multi-modal)"
+  transporterAfterTempStorage3: BsddTransporter
+}
+
+"Émetteur du bordereau"
+type BsddEmitter {
+  "Type d'émetteur"
+  type: BsddEmitterType
+  "Établissement émetteur"
+  company: BsddCompany
+  "Adresse chantier"
+  worksite: BsddWorksite
+  "Éco-organisme responsable du déchet"
+  ecoOrganisme: BsddEcorOrganise
+  "Déclaration générale de l'émetteur du bordereau"
+  emission: BsddEmission
+}
+
+type BsddEmission {
+  signature: BsddSignature
+}
+
+type BsddWorksite {
+  name: String
+  address: String
+  city: String
+  postalCode: String
+  infos: String
+}
+
+type BsddDestination {
+  "Établissement de destination"
+  company: BsddCompany
+  "N° de CAP (le cas échéant)"
+  cap: String
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  plannedOperation: String
+
+  "Expédition reçue à l'installation de destination"
+  reception: BsddReception
+
+  "Réalisation de l'opération (case 11)"
+  operation: BsddOperation
+}
+
+type BsddTemporaryStorage {
+  "Établissement de destination"
+  company: BsddCompany
+  "N° de CAP (le cas échéant)"
+  cap: String
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  plannedOperationCode: String
+  "Expédition reçue à l'installation d'entreposage provisoire ou reconditionnement"
+  reception: BsddReception
+}
+
+type BsddReception {
+  "Date de présentation sur site"
+  date: DateTime
+  "Quantité présentée"
+  quantity: BsddQuantity
+  "Lot accepté, accepté partiellement ou refusé"
+  acceptationStatus: BsddAcceptationStatus
+  "Motif de refus"
+  refusalReason: String
+  "Signature case 10"
+  signature: BsddSignature
+}
+
+type BsddOperation {
+  "Code D/R"
+  code: String
+  description: String
+  "Date de réalisation de l'opération"
+  date: DateTime
+  signature: BsddSignature
+}
+
+type BsddWaste {
+  "Rubrique Déchet"
+  code: String
+  "Dénomination usuelle"
+  name: String
+  "Consistence"
+  consistence: BsddConsistence
+}
+
+type BsddPackaging {
+  "Type de conditionnement"
+  type: BsddPackagingType
+
+  "Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"
+  other: String
+
+  "Nombre de colis associés à ce conditionnement"
+  quantity: Int!
+}
+
+type BsddQuantity {
+  "Type de quantité (réelle ou estimé)"
+  type: BsddQuantityType
+  "Quantité en tonne"
+  value: Float
+}
+
+type BsddTrader {
+  "Établissement négociant"
+  company: BsddCompany
+
+  "Récépissé négociant"
+  receipt: BsddTraderReceipt
+}
+
+type BsddTransporter {
+  "Établissement transporter"
+  company: BsddCompany
+
+  "Exemption de récipissé"
+  isExemptedOfReceipt: Boolean
+
+  receipt: BsddTransporterReceipt
+
+  "Numéro de plaque d'immatriculation"
+  numberPlate: String
+
+  "Information libre, destinée aux transporteurs"
+  customInfo: String
+
+  "Informations liés au transport"
+  transport: BsddTransport
+}
+
+type BsddTransport {
+  takenOverAt: DateTime
+  signature: BsddSignature
+}
+
+type BsddNextDestination {
+  company: BsddCompany
+  "Traitement prévue"
+  plannedOperation: String
+}
+
+type BsddSignature {
+  "Horodatage de la signature"
+  date: DateTime
+  "Nom de la personne ayant signé"
+  author: String
+}
+
+type BsddCompany {
+  "Nom de l'établissement"
+  name: String!
+
+  "SIRET de l'établissement (si l'établissement est en France)"
+  siret: String
+
+  "Numéro de TVA intracommunautaire (si l'établissement est à l'étranger)"
+  vatNumber: String
+
+  "Adresse de l'établissement"
+  address: String!
+
+  """
+  Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+  https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+  """
+  country: String!
+
+  "Nom du contact dans l'établissement"
+  contact: String
+
+  "Numéro de téléphone de contact dans l'établissement"
+  phone: String
+
+  "Email du contact dans l'établissement"
+  mail: String
+}
+
+type BsddTraderReceipt {
+  number: String
+  validityLimit: DateTime
+  departement: String
+}
+
+type BsddTransporterReceipt {
+  number: String
+  validityLimit: DateTime
+  departement: String
+}
+
+enum BsddConsistence {
+  SOLIDE
+  LIQUIDE
+  GAZEUX
+}
+
+enum BsddPackagingType {
+  BENNE
+  CITERNE
+  GRV
+  FUT
+  AUTRE
+}
+
+enum BsddQuantityType {
+  REAL
+  ESTIMATED
+}
+
+enum BsddAcceptationStatus {
+  ACCEPTED
+  REFUSED
+  PARTIALLY_REFUSED
+}

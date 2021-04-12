@@ -1,0 +1,173 @@
+type Bsvhu {
+  "Bordereau n°"
+  id: String!
+  "Date de création"
+  createdAt: DateTime!
+  "Date de dernière modification"
+  updatedAt: DateTime!
+  "Indique si le bordereau est à l'état de brouillon"
+  isDraft: Boolean!
+  "Statur du bordereau"
+  status: BsvhuStatus!
+  "Émetteur du bordereau"
+  emitter: BsvhuEmitter
+  "Destinataire du bordereau"
+  destination: BsvhuDestination
+  "Dénomination du déchet"
+  waste: BsdvhuWaste
+  "Conditionnement"
+  packaging: BsvhuPackaging
+  "Identification des VHUs"
+  identification: BsvhuIdentification
+  "Quantité"
+  quantity: BsvhuQuantity
+  "Transporteur"
+  transporter: BsvhuTransporter
+  "Broyeur de destination"
+  nextDestination: BsvhuNextDestination
+}
+
+type BsvhuEmitter {
+  "Numéro d'agrément émetteur"
+  agrementNumber: String
+  "Coordonnées de l'entreprise émétrice"
+  company: BsvhuCompany
+  "Déclaration générale de l'émetteur du bordereau"
+  emission: BsvhuEmission
+}
+
+type BsvhuEmission {
+  signature: BsvhuSignature
+}
+
+type BsvhuDestination {
+  "Type de receveur: broyeur ou second centre VHU"
+  type: BsvhuRecipientType
+  "Numéro d'agrément de receveur"
+  agrementNumber: String
+  "Coordonnées de l'entreprise émétrice"
+  company: BsvhuCompany
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  plannedOperation: String
+  "Informations de réception"
+  reception: BsvhuReception
+  "Informations sur l'opération"
+  operation: BsvhuOperation
+}
+
+type BsvhuReception {
+  "Date de présentation sur site"
+  date: DateTime
+  quantity: BsvhuQuantity
+  "Lot accepté oui/non"
+  acceptationStatus: BsvhuAcceptationStatus
+  "Motif de refus"
+  refusalReason: String
+  signature: BsvhuSignature
+}
+
+type BsvhuOperation {
+  "R4 ou R12"
+  code: String
+  "Date de réalisation"
+  date: DateTime
+  signature: BsddSignature
+}
+
+type BsvhuWaste {
+  code: String
+}
+
+type BsvhuQuantity {
+  number: Int
+  tons: Float
+}
+
+type BsvhuIdentification {
+  numbers: [String]
+  type: BsvhuIdentificationType
+}
+
+type BsvhuTransporter {
+  "Coordonnées de l'entreprise de transport"
+  company: BsvhuCompany
+  "Récépissé transporteur"
+  receipt: BsvhuTransporterReceipt
+  "Informations liés au transport"
+  transport: BsvhuTransport
+}
+
+type BsvhuTransport {
+  "Date de prise en charge"
+  takenOverAt: DateTime
+  signature: BsvhuSignature
+}
+
+type BsvhuTransporterReceipt {
+  number: String
+  department: String
+  validityLimit: DateTime
+}
+
+type BsvhuNextDestination {
+  company: BsvhuCompany
+}
+
+type BsvhuQuantity {
+  "Type de quantité (réelle ou estimé)"
+  type: BsddQuantityType
+  "Quantité en tonne"
+  value: Float
+}
+
+type BsvhuSignature {
+  "Horodatage de la signature"
+  date: DateTime
+  "Nom de la personne ayant signé"
+  author: String
+}
+
+type BsvhuCompany {
+  "Nom de l'établissement"
+  name: String!
+
+  "SIRET de l'établissement (si l'établissement est en France)"
+  siret: String
+
+  "Numéro de TVA intracommunautaire (si l'établissement est à l'étranger)"
+  vatNumber: String
+
+  "Adresse de l'établissement"
+  address: String!
+
+  """
+  Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+  https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+  """
+  country: String!
+
+  "Nom du contact dans l'établissement"
+  contact: String
+
+  "Numéro de téléphone de contact dans l'établissement"
+  phone: String
+
+  "Email du contact dans l'établissement"
+  mail: String
+}
+
+enum BsvhuPacking {
+  UNITE
+  LOT
+}
+
+enum BsvhuIdentificationType {
+  NUMERO_ORDRE_REGISTRE_POLICE
+  NUMERO_ORDRE_LOTS_SORTANTS
+}
+
+enum BsvhuAcceptationStatus {
+  ACCEPTED
+  REFUSED
+  PARTIALLY_REFUSED
+}
