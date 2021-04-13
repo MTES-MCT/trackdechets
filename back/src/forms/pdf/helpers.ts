@@ -244,7 +244,8 @@ const getWasteDetailsPackagings = params => {
     const key = `wasteDetailsPackagings${capitalize(elem.type)}`;
     return {
       ...acc,
-      [key]: true
+      [key]: true,
+      ...(elem.other ? { wasteDetailsPackagingsAutreDetails: elem.other } : {})
     };
   }, {});
 };

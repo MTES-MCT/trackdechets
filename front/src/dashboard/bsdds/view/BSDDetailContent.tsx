@@ -102,7 +102,8 @@ const TempStorage = ({ form }) => {
 
           <PackagingRow
             packagingInfos={
-              temporaryStorageDetail?.wasteDetails?.packagingInfos
+              temporaryStorageDetail?.wasteDetails?.packagingInfos ||
+              form.wasteDetails?.packagingInfos
             }
           />
           <DetailRow
@@ -372,9 +373,8 @@ export default function BSDDetailContent({
               <dd>{form.stateSummary?.quantity ?? "?"} tonnes</dd>
               <PackagingRow
                 packagingInfos={
-                  hasTempStorage
-                    ? form.temporaryStorageDetail?.wasteDetails?.packagingInfos
-                    : form.wasteDetails?.packagingInfos
+                  form.temporaryStorageDetail?.wasteDetails?.packagingInfos ||
+                  form.wasteDetails?.packagingInfos
                 }
               />
               <dt>Consistance</dt>{" "}
