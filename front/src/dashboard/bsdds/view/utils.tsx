@@ -10,7 +10,12 @@ export const getVerboseConsistence = (
   if (!consistence) {
     return "";
   }
-  const verbose = { SOLID: "Solide", LIQUID: "Liquide", GASEOUS: "Gazeux" };
+  const verbose = {
+    SOLID: "Solide",
+    LIQUID: "Liquide",
+    GASEOUS: "Gazeux",
+    DOUGHY: "Pâteux",
+  };
   return verbose[consistence];
 };
 
