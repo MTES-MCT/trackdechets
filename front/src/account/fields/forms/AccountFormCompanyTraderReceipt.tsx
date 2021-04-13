@@ -3,7 +3,7 @@ import { useMutation, gql } from "@apollo/client";
 import { Formik, FormikProps, Form, Field } from "formik";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import { NotificationError } from "common/components/Error";
-import DateInput from "form/custom-inputs/DateInput";
+import DateInput from "form/common/components/custom-inputs/DateInput";
 import { CompanyPrivate } from "generated/graphql/types";
 
 type Props = {

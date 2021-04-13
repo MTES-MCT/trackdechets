@@ -1,6 +1,5 @@
 import {
   Consistence,
-  Packagings,
   WasteAcceptationStatusInput as WasteAcceptationStatus,
   QuantityType,
 } from "generated/graphql/types";
@@ -11,24 +10,13 @@ export const getVerboseConsistence = (
   if (!consistence) {
     return "";
   }
-  const verbose = { SOLID: "Solide", LIQUID: "Liquide", GASEOUS: "Gazeux" };
+  const verbose = {
+    SOLID: "Solide",
+    LIQUID: "Liquide",
+    GASEOUS: "Gazeux",
+    DOUGHY: "Pâteux",
+  };
   return verbose[consistence];
-};
-export const getVerbosePackaging = (
-  packaging: Packagings | null | undefined | ""
-): string => {
-  if (!packaging) {
-    return "";
-  }
-
-  return packaging[0] + packaging.slice(1).toLowerCase();
-};
-
-export const formatPackagings = (
-  packagings: Packagings[] | undefined
-): string => {
-  if (!packagings) return "";
-  return packagings.map(p => getVerbosePackaging(p)).join(" ");
 };
 
 export const getVerboseAcceptationStatus = (

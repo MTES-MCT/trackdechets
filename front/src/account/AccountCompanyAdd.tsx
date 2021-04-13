@@ -22,6 +22,7 @@ import {
   CompanyPublic,
 } from "generated/graphql/types";
 import Tooltip from "common/components/Tooltip";
+import AccountCompanyAddVhuAgrement from "./accountCompanyAdd/AccountCompanyAddVhuAgrement";
 
 const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
@@ -54,6 +55,14 @@ const CREATE_TRADER_RECEIPT = gql`
 const CREATE_BROKER_RECEIPT = gql`
   mutation CreateBrokerReceipt($input: CreateBrokerReceiptInput!) {
     createBrokerReceipt(input: $input) {
+      id
+    }
+  }
+`;
+
+const CREATE_VHU_AGREMENT = gql`
+  mutation CreateVhuAgrement($input: CreateVhuAgrementInput!) {
+    createVhuAgrement(input: $input) {
       id
     }
   }
@@ -134,6 +143,10 @@ export default function AccountCompanyAdd() {
     { error: createBrokerReceiptError },
   ] = useMutation(CREATE_BROKER_RECEIPT);
 
+  const [createVhuAgrement, { error: createVhuAgrementError }] = useMutation(
+    CREATE_VHU_AGREMENT
+  );
+
   function isTransporter(companyTypes: _CompanyType[]) {
     return companyTypes.includes(_CompanyType.Transporter);
   }
@@ -148,6 +161,10 @@ export default function AccountCompanyAdd() {
 
   function isEcoOrganisme(companyTypes: _CompanyType[]) {
     return companyTypes.includes(_CompanyType.EcoOrganisme);
+  }
+
+  function isVhu(companyTypes: _CompanyType[]) {
+    return companyTypes.includes(_CompanyType.WasteVehicles);
   }
 
   /**
@@ -167,6 +184,10 @@ export default function AccountCompanyAdd() {
       brokerReceiptValidity,
       brokerReceiptDepartment,
       ecoOrganismeAgreements,
+      vhuAgrementDemolisseurNumber,
+      vhuAgrementDemolisseurDepartment,
+      vhuAgrementBroyeurNumber,
+      vhuAgrementBroyeurDepartment,
       ...companyInput
     } = values;
 
@@ -245,6 +266,42 @@ export default function AccountCompanyAdd() {
       }
     }
 
+    let vhuAgrementDemolisseurId: string | null = null;
+    let vhuAgrementBroyeurId: string | null = null;
+
+    // create vhu agrement if any
+    if (isVhu(values.companyTypes)) {
+      if (vhuAgrementDemolisseurNumber && vhuAgrementDemolisseurDepartment) {
+        const input = {
+          agrementNumber: vhuAgrementDemolisseurNumber,
+          department: vhuAgrementDemolisseurDepartment,
+        };
+
+        const { data } = await createVhuAgrement({
+          variables: { input },
+        });
+
+        if (data) {
+          vhuAgrementDemolisseurId = data.createVhuAgrement.id;
+        }
+      }
+
+      if (vhuAgrementBroyeurNumber && vhuAgrementBroyeurDepartment) {
+        const input = {
+          agrementNumber: vhuAgrementBroyeurNumber,
+          department: vhuAgrementBroyeurDepartment,
+        };
+
+        const { data } = await createVhuAgrement({
+          variables: { input },
+        });
+
+        if (data) {
+          vhuAgrementBroyeurId = data.createVhuAgrement.id;
+        }
+      }
+    }
+
     await createCompany({
       variables: {
         companyInput: {
@@ -252,6 +309,8 @@ export default function AccountCompanyAdd() {
           transporterReceiptId,
           traderReceiptId,
           brokerReceiptId,
+          vhuAgrementDemolisseurId,
+          vhuAgrementBroyeurId,
           // Filter out empty agreements
           ecoOrganismeAgreements: ecoOrganismeAgreements.filter(Boolean),
         },
@@ -277,6 +336,7 @@ export default function AccountCompanyAdd() {
     }
     return [];
   }
+
   return (
     <div className="panel">
       <h5 className={styles.subtitle}>Identification</h5>
@@ -308,6 +368,10 @@ export default function AccountCompanyAdd() {
             brokerReceiptNumber: "",
             brokerReceiptValidity: "",
             brokerReceiptDepartment: "",
+            vhuAgrementBroyeurNumber: "",
+            vhuAgrementBroyeurDepartment: "",
+            vhuAgrementDemolisseurNumber: "",
+            vhuAgrementDemolisseurDepartment: "",
             ecoOrganismeAgreements: [],
           }}
           validate={values => {
@@ -493,6 +557,8 @@ export default function AccountCompanyAdd() {
                 <AccountCompanyAddEcoOrganisme />
               )}
 
+              {isVhu(values.companyTypes) && <AccountCompanyAddVhuAgrement />}
+
               <div className={styles.field}>
                 <label className={`text-right ${styles.bold}`}>
                   Identifiant GEREP (optionnel)
@@ -562,6 +628,9 @@ export default function AccountCompanyAdd() {
               )}
               {createBrokerReceiptError && (
                 <NotificationError apolloError={createBrokerReceiptError} />
+              )}
+              {createVhuAgrementError && (
+                <NotificationError apolloError={createVhuAgrementError} />
               )}
               {savingError && <NotificationError apolloError={savingError} />}
             </Form>

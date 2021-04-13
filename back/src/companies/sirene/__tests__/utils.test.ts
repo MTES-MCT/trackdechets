@@ -7,23 +7,23 @@ test("removeDiacritics", () => {
 
 describe("buildAdress", () => {
   test("all address components are defined", () => {
-    const address = buildAddress(
+    const address = buildAddress([
       "4",
       "boulevard",
       "Longchamp",
       "13001",
       "Marseille"
-    );
+    ]);
     expect(address).toEqual("4 boulevard Longchamp 13001 Marseille");
   });
   test("some address components are null or empty", () => {
-    const address = buildAddress(
+    const address = buildAddress([
       "",
       "boulevard",
       "Longchamp",
       null,
       "Marseille"
-    );
+    ]);
     expect(address).toEqual("boulevard Longchamp Marseille");
   });
 });

@@ -12,6 +12,11 @@ import deleteBrokerReceipt from "./mutations/deleteBrokerReceipt";
 import createTransporterReceipt from "./mutations/createTransporterReceipt";
 import updateTransporterReceipt from "./mutations/updateTransporterReceipt";
 import deleteTransporterReceipt from "./mutations/deleteTransporterReceipt";
+import verifyCompany from "./mutations/verifyCompany";
+import createVhuAgrement from "./mutations/createVhuAgrement";
+import updateVhuAgrement from "./mutations/updateVhuAgrement";
+import deleteVhuAgrement from "./mutations/deleteVhuAgrement";
+import verifyCompanyByAdmin from "./mutations/verifyCompanyByAdmin";
 
 const Mutation: MutationResolvers = {
   createCompany,
@@ -26,7 +31,12 @@ const Mutation: MutationResolvers = {
   deleteBrokerReceipt,
   createTransporterReceipt,
   updateTransporterReceipt,
-  deleteTransporterReceipt
+  deleteTransporterReceipt,
+  verifyCompany,
+  createVhuAgrement,
+  updateVhuAgrement,
+  deleteVhuAgrement,
+  verifyCompanyByAdmin
 };
 
 export default Mutation;

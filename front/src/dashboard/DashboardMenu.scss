@@ -1,73 +1,29 @@
 @import "src/scss/Constants.scss";
 
-.sidebar {
-  width: $sidebar-width;
-  min-width: $sidebar-width;
-  background-color: $grey-lighter;
-  .company-title {
-    margin: 1rem 1rem;
-    font-weight: bold;
-    overflow-wrap: break-word;
-    
+.company-select {
+  margin: 30px 10px;
+  h3 {
+    font-size: 1.2em;
   }
-  &__chapter {
-    font-weight: bold;
-    padding: 1rem 0 0.5rem 1rem;
-    color: #223540;
-    font-size: rem;
+  p {
+    font-size: 0.9em;
+  }
+  & select {
+    width: 100%;
+    @media (min-width: 749px) {
+      max-width: 200px;
+    }
+  }
+
+  p,
+  h3 {
+    font-weight: 400;
     margin: 0;
   }
-  &__link {
-    display: block;
-    height: 30px;
-    line-height: 30px;
-    border-left: 3px solid transparent;
-    padding-left: 1rem;
-    &--indented {
-      padding-left: 1.75rem;
-    }
-    &--chapter {
-      margin-top: 0.5rem ;
-      font-weight: bold;
-    }
-    &:hover {
-      background-color: $white;
-      border-color: $blue-dark;
-    }
-  }
+}
 
-  &__link--active {
-    font-weight: bold;
-    background-color: $white;
-    border-color: $blue-dark;
-  }
-  li {
-    list-style: none;
-    a {
-      text-decoration: none;
-      color: $black;
-    }
-  }
-
-  .company-select {
-    margin: 30px 10px;
-    h3 {
-      font-size: 1.2em;
-    }
-    p {
-      font-size: 0.9em;
-    }
-    & select {
-      width: 100%;
-      @media (min-width: 749px) {
-        max-width: 200px;
-      }
-    }
-
-    p,
-    h3 {
-      font-weight: 400;
-      margin: 0;
-    }
-  }
+.company-title {
+  margin: 1rem 1rem;
+  font-weight: bold;
+  overflow-wrap: break-word;
 }

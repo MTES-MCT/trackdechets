@@ -43,9 +43,21 @@ type Mutation {
     traderReceiptId: String
     "Identifiant d'un récépissé courtier"
     brokerReceiptId: String
+    "Identifiant d'un agrément VHU démolisseur"
+    vhuAgrementDemolisseurId: String
+    "Identifiant d'un agrément VHU broyeur"
+    vhuAgrementBroyeurId: String
     "Agréments de l'éco-organisme"
     ecoOrganismeAgreements: [URL!]
   ): CompanyPrivate!
+
+  """
+  USAGE INTERNE
+  Permet de vérifier un établissement à partir du code de vérification
+  envoyé par courrier à l'adresse de l'établissement renseigné au
+  registre du commerce et des sociétés
+  """
+  verifyCompany(input: VerifyCompanyInput!): CompanyPrivate!
 
   """
   USAGE INTERNE
@@ -106,6 +118,24 @@ type Mutation {
   Supprime un récépissé courtier
   """
   deleteBrokerReceipt(input: DeleteBrokerReceiptInput!): BrokerReceipt
+
+  """
+  USAGE INTERNE
+  Crée un agrément VHU
+  """
+  createVhuAgrement(input: CreateVhuAgrementInput!): VhuAgrement
+
+  """
+  USAGE INTERNE
+  Édite un agrément VHU
+  """
+  updateVhuAgrement(input: UpdateVhuAgrementInput!): VhuAgrement
+
+  """
+  USAGE INTERNE
+  Supprime un agrément VHU
+  """
+  deleteVhuAgrement(input: DeleteVhuAgrementInput!): VhuAgrement
 
   """
   USAGE INTERNE
@@ -175,6 +205,16 @@ type CompanyFavorite {
   Récépissé courtier associé à cet établissement (le cas échant)
   """
   brokerReceipt: BrokerReceipt
+
+  """
+  Agrément VHU démolisseur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementDemolisseur: VhuAgrement
+
+  """
+  Agrément VHU broyeur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementBroyeur: VhuAgrement
 }
 
 """
@@ -319,6 +359,21 @@ input CreateBrokerReceiptInput {
 }
 
 """
+Payload de création d'un agrément VHU
+"""
+input CreateVhuAgrementInput {
+  """
+  Numéro d'agrément VHU
+  """
+  agrementNumber: String!
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String!
+}
+
+"""
 Payload d'édition d'un récépissé courtier
 """
 input UpdateBrokerReceiptInput {
@@ -344,11 +399,48 @@ input UpdateBrokerReceiptInput {
 }
 
 """
+Payload d'édition d'un agrément VHU
+"""
+input UpdateVhuAgrementInput {
+  """
+  ID de l'agrément VHU à modifier
+  """
+  id: ID!
+
+  """
+  Numéro d'agrément VHU
+  """
+  agrementNumber: String
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String
+}
+
+"""
 Payload de suppression d'un récépissé courtier
 """
 input DeleteBrokerReceiptInput {
   """
   The id of the broker receipt to delete
+  """
+  id: ID!
+}
+
+input VerifyCompanyInput {
+  "Le SIRET de l'établissement à vérifier"
+  siret: String!
+  "Le code de vérification de l'établissement envoyé par courrier"
+  code: String!
+}
+
+"""
+Payload de suppression d'un agrément VHU
+"""
+input DeleteVhuAgrementInput {
+  """
+  ID de l'agrément VHU à supprimer
   """
   id: ID!
 }
@@ -390,6 +482,16 @@ input PrivateCompanyInput {
   Récipissé courtier (le cas échéant, pour les profils courtier)
   """
   brokerReceiptId: String
+
+  """
+  Agrément VHU démolisseur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementDemolisseurId: String
+
+  """
+  Agrément VHU broyeur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementBroyeurId: String
 
   """
   Liste des agréments de l'éco-organisme

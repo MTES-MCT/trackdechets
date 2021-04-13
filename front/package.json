@@ -36,6 +36,7 @@
     "react-scripts": "3.4.3",
     "react-select": "^3.1.0",
     "react-switch": "5.0.1",
+    "react-table": "^7.6.3",
     "react-tabs": "3.1.1",
     "tailwindcss": "^1.4.6",
     "use-media": "^1.4.0",
@@ -45,17 +46,21 @@
     "zxcvbn": "^4.4.2"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "dev": "react-scripts start",
     "build": "react-scripts build",
+    "test": "react-scripts test",
     "build:recette": "env-cmd -f .env.recette npm run build",
     "build:sandbox": "env-cmd -f .env.sandbox npm run build",
     "build:production": "npm run build",
-    "test": "react-scripts test",
+    "start": "npx serve -s build -l $PORT",
     "types": "tsc --noEmit",
     "eject": "react-scripts eject",
     "supportedBrowsers": "echo \"// eslint-disable-next-line\nmodule.exports = $(browserslist-useragent-regexp --allowHigherVersions);\" > src/supportedBrowsers.js",
     "build:tailwind": "tailwindcss build src/tailwind.css -o src/generated/css/tailwind.generated.css",
     "lint": "eslint --ext .ts,.tsx ./src"
+  },
+  "engines": {
+    "node": "^14"
   },
   "eslintConfig": {
     "extends": [

@@ -52,7 +52,8 @@ export const mainFormFieldSettings = {
   wasteDetailsPackagingsCiterne: { x: 179, y: 358, fontSize: 12 },
   wasteDetailsPackagingsGrv: { x: 230, y: 358, fontSize: 12 },
   wasteDetailsPackagingsFut: { x: 272, y: 358, fontSize: 12 },
-  wasteDetailsPackagingsOther: { x: 324, y: 358, fontSize: 12 },
+  wasteDetailsPackagingsAutre: { x: 324, y: 358, fontSize: 12 },
+  wasteDetailsPackagingsAutreDetails: { x: 387, y: 355, maxLength: 15 },
   wasteDetailsNumberOfPackages: { x: 505, y: 355 },
 
   wasteDetailsQuantityReal: { x: 112, y: 380, fontSize: 12 },

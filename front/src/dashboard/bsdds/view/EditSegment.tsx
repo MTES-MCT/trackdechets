@@ -13,8 +13,8 @@ import { IconPaperWrite } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
-import CompanySelector from "form/company/CompanySelector";
-import DateInput from "form/custom-inputs/DateInput";
+import CompanySelector from "form/common/components/company/CompanySelector";
+import DateInput from "form/common/components/custom-inputs/DateInput";
 import { transportModeLabels } from "../../constants";
 
 const EDIT_SEGMENT = gql`

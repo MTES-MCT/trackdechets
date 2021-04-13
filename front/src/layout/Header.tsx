@@ -60,7 +60,12 @@ function MobileSubNav({ currentSiret, onClick }) {
   );
 }
 
-const getMenuEntries = (isAuthenticated, devEndpoint, currentSiret) => {
+const getMenuEntries = (
+  isAuthenticated,
+  isAdmin,
+  devEndpoint,
+  currentSiret
+) => {
   const common = [
     {
       caption: "Foire aux questions",
@@ -85,6 +90,15 @@ const getMenuEntries = (isAuthenticated, devEndpoint, currentSiret) => {
     },
   ];
 
+  const admin = [
+    {
+      caption: "Panneau d'administration",
+      href: routes.admin.verification,
+      onClick: () => trackEvent("navbar", "panneau-administration"),
+      navlink: true,
+    },
+  ];
+
   const connected = [
     {
       caption: "Mon espace",
@@ -105,7 +119,11 @@ const getMenuEntries = (isAuthenticated, devEndpoint, currentSiret) => {
       navlink: true,
     },
   ];
-  return [...common, ...(isAuthenticated ? connected : [])];
+  return [
+    ...common,
+    ...(isAuthenticated ? connected : []),
+    ...(isAdmin ? admin : []),
+  ];
 };
 
 const MenuLink = ({ entry, mobileCallback }) => {
@@ -148,6 +166,7 @@ const MenuLink = ({ entry, mobileCallback }) => {
 
 type HeaderProps = {
   isAuthenticated: boolean;
+  isAdmin: boolean;
 };
 
 /**
@@ -157,6 +176,7 @@ type HeaderProps = {
  */
 export default withRouter(function Header({
   isAuthenticated,
+  isAdmin,
   location,
 }: RouteComponentProps & HeaderProps) {
   const { REACT_APP_API_ENDPOINT, REACT_APP_DEVELOPERS_ENDPOINT } = process.env;
@@ -181,6 +201,7 @@ export default withRouter(function Header({
   const currentSiret = matchDashboard?.params["siret"];
   const menuEntries = getMenuEntries(
     isAuthenticated,
+    isAdmin,
     REACT_APP_DEVELOPERS_ENDPOINT,
     currentSiret
   );

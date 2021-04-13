@@ -17,7 +17,7 @@ services:
     build:
       context: ../
       dockerfile: Dockerfile.dev
-    command: npx nodemon -L --watch src --exec "ts-node" src/index.ts
+    command: tail -f /dev/null
     volumes:
       - ../src:/usr/src/app/src
     env_file:
@@ -33,3 +33,5 @@ services:
       PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID: "11"
       SENDER_EMAIL_ADDRESS: "us@td.test"
       SENDER_NAME: "Wastetracker corp."
+      POST_BACKEND: console
+

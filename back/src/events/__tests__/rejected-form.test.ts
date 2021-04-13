@@ -142,6 +142,9 @@ const insee1: CompanySearchResult = {
   naf: "123",
   libelleNaf: "Fabricant de déchets",
   address: "01 Rue Marie Curie 66480 Laville",
+  addressVoie: "01 Rue Marie Curie",
+  addressPostalCode: "66480",
+  addressCity: "Laville",
   codeCommune: "66001"
 };
 const insee2: CompanySearchResult = {
@@ -150,6 +153,9 @@ const insee2: CompanySearchResult = {
   naf: "345",
   libelleNaf: "Traitement de déchets",
   address: "rue de la Paix, 77760 Une ville",
+  addressVoie: "rue de la Paix",
+  addressPostalCode: "77760",
+  addressCity: "Une ville",
   codeCommune: "77001"
 };
 

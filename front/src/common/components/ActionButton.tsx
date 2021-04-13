@@ -1,16 +1,21 @@
-import React from "react";
 import classNames from "classnames";
+import React, {
+  createContext,
+  HTMLAttributes,
+  ReactNode,
+  useContext,
+} from "react";
 import styles from "./ActionButton.module.scss";
 
-export const ActionButtonContext = React.createContext<{
+export const ActionButtonContext = createContext<{
   size: "normal" | "small";
 }>({
   size: "normal",
 });
 
-interface ActionButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
-  icon: React.ReactNode;
-  children: React.ReactNode;
+interface ActionButtonProps extends HTMLAttributes<HTMLButtonElement> {
+  icon: ReactNode;
+  children: ReactNode;
 }
 
 export default function ActionButton({
@@ -18,7 +23,7 @@ export default function ActionButton({
   children,
   ...props
 }: ActionButtonProps) {
-  const { size } = React.useContext(ActionButtonContext);
+  const { size } = useContext(ActionButtonContext);
 
   return (
     <button

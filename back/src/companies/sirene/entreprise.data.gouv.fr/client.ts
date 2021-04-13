@@ -17,20 +17,27 @@ const SIRENE_API_BASE_URL = "https://entreprise.data.gouv.fr/api/sirene";
 function searchResponseToCompany({
   etablissement
 }: SearchResponseDataGouv): CompanySearchResult {
-  const address = etablissement.geo_adresse
+  const addressVoie = buildAddress([
+    etablissement.numero_voie,
+    etablissement.type_voie,
+    etablissement.libelle_voie
+  ]);
+
+  const fullAddress = etablissement.geo_adresse
     ? etablissement.geo_adresse
-    : buildAddress(
-        etablissement.numero_voie,
-        etablissement.type_voie,
-        etablissement.libelle_voie,
+    : buildAddress([
+        addressVoie,
         etablissement.code_postal,
         etablissement.libelle_commune
-      );
+      ]);
 
   const company = {
     siret: etablissement.siret,
     etatAdministratif: etablissement.etat_administratif,
-    address,
+    address: fullAddress,
+    addressVoie,
+    addressPostalCode: etablissement.code_postal,
+    addressCity: etablissement.libelle_commune,
     codeCommune: etablissement.code_commune,
     name: etablissement.unite_legale.denomination,
     naf: etablissement.unite_legale.activite_principale,
@@ -87,19 +94,26 @@ function fullTextSearchResponseToCompanies(
   r: FullTextSearchResponseDataGouv
 ): CompanySearchResult[] {
   return r.etablissement.map(etablissement => {
-    const address = etablissement.geo_adresse
+    const addressVoie = buildAddress([
+      etablissement.numero_voie,
+      etablissement.type_voie,
+      etablissement.libelle_voie
+    ]);
+
+    const fullAddress = etablissement.geo_adresse
       ? etablissement.geo_adresse
-      : buildAddress(
-          etablissement.numero_voie,
-          etablissement.type_voie,
-          etablissement.libelle_voie,
+      : buildAddress([
+          addressVoie,
           etablissement.code_postal,
           etablissement.libelle_commune
-        );
+        ]);
 
     return {
       siret: etablissement.siret,
-      address,
+      address: fullAddress,
+      addressVoie,
+      addressPostalCode: etablissement.code_postal,
+      addressCity: etablissement.libelle_commune,
       name: etablissement.nom_raison_sociale,
       naf: etablissement.activite_principale,
       libelleNaf: etablissement.libelle_activite_principale

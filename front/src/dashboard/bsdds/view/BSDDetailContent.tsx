@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { generatePath, Link, useHistory, useParams } from "react-router-dom";
 
 import { useDownloadPdf } from "dashboard/components/BSDDActions/useDownloadPdf";
@@ -102,7 +102,8 @@ const TempStorage = ({ form }) => {
 
           <PackagingRow
             packagingInfos={
-              temporaryStorageDetail?.wasteDetails?.packagingInfos
+              temporaryStorageDetail?.wasteDetails?.packagingInfos ||
+              form.wasteDetails?.packagingInfos
             }
           />
           <DetailRow
@@ -317,7 +318,7 @@ export default function BSDDetailContent({
 }: BSDDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
-  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
   const [duplicate] = useDuplicate(
     {
@@ -371,7 +372,10 @@ export default function BSDDetailContent({
               <dt>Quantité</dt>
               <dd>{form.stateSummary?.quantity ?? "?"} tonnes</dd>
               <PackagingRow
-                packagingInfos={form.wasteDetails?.packagingInfos}
+                packagingInfos={
+                  form.temporaryStorageDetail?.wasteDetails?.packagingInfos ||
+                  form.wasteDetails?.packagingInfos
+                }
               />
               <dt>Consistance</dt>{" "}
               <dd>{getVerboseConsistence(form.wasteDetails?.consistence)}</dd>

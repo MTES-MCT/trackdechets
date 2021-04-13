@@ -2,7 +2,7 @@ import React from "react";
 import { Field } from "formik";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "../AccountCompanyAdd.module.scss";
-import DateInput from "../../form/custom-inputs/DateInput";
+import DateInput from "../../form/common/components/custom-inputs/DateInput";
 
 /**
  * Broker receipt Formik fields for company creation

@@ -4,11 +4,12 @@ import scalarResolvers from "./scalars";
 import companiesResolvers from "./companies/resolvers";
 import usersResolvers from "./users/resolvers";
 import formsResolvers from "./forms/resolvers";
+import vhuResolvers from "./vhu/resolvers";
 
 // Merge GraphQL schema by merging types, resolvers and shields
 // definitions from differents modules
 
-const repositories = ["users", "companies", "forms"];
+const repositories = ["users", "companies", "forms", "vhu"];
 
 const typeDefsPath = repositories.map(
   repository => `${__dirname}/${repository}/*.graphql`
@@ -22,7 +23,8 @@ const resolvers = [
   scalarResolvers,
   companiesResolvers,
   formsResolvers,
-  usersResolvers
+  usersResolvers,
+  vhuResolvers
 ];
 
 export { typeDefs, resolvers };

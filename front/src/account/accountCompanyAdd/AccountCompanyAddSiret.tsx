@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { Field, Form, Formik } from "formik";
 import cogoToast from "cogo-toast";
-import { COMPANY_INFOS } from "form/company/query";
+import { COMPANY_INFOS } from "form/common/components/company/query";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import AutoFormattingSiret from "common/components/AutoFormattingSiret";
 import { NotificationError } from "common/components/Error";

@@ -11,6 +11,12 @@ import { CompanyPrivate, UserRole, CompanyType } from "generated/graphql/types";
 import AccountFieldCompanyTransporterReceipt from "./fields/AccountFieldCompanyTransporterReceipt";
 import AccountFieldCompanyTraderReceipt from "./fields/AccountFieldCompanyTraderReceipt";
 import AccountFieldCompanyBrokerReceipt from "./fields/AccountFieldCompanyBrokerReceipt";
+import AccountFieldCompanyVerificationStatus from "./fields/AccountFieldCompanyVerificationStatus";
+import AccountFieldCompanyVhuAgrementBroyeur from "./fields/AccountFieldCompanyVhuAgrementBroyeur";
+import AccountFieldCompanyVhuAgrementDemolisseur from "./fields/AccountFieldCompanyVhuAgrementDemolisseur";
+import * as COMPANY_TYPES from "generated/constants/COMPANY_TYPES";
+
+const { REACT_APP_VERIFY_COMPANY } = process.env;
 
 type Props = { company: CompanyPrivate };
 
@@ -30,6 +36,9 @@ AccountCompanyInfo.fragments = {
       ...AccountFieldCompanyTransporterReceiptFragment
       ...AccountFieldCompanyTraderReceiptFragment
       ...AccountFieldCompanyBrokerReceiptFragment
+      ...AccountFieldCompanyVerificationStatusFragment
+      ...AccountFieldCompanyVhuAgrementBroyeurFragment
+      ...AccountFieldCompanyVhuAgrementDemolisseurFragment
       installation {
         urlFiche
       }
@@ -40,10 +49,17 @@ AccountCompanyInfo.fragments = {
     ${AccountFieldCompanyTransporterReceipt.fragments.company}
     ${AccountFieldCompanyTraderReceipt.fragments.company}
     ${AccountFieldCompanyBrokerReceipt.fragments.company}
+    ${AccountFieldCompanyVerificationStatus.fragments.company}
+    ${AccountFieldCompanyVhuAgrementBroyeur.fragments.company}
+    ${AccountFieldCompanyVhuAgrementDemolisseur.fragments.company}
   `,
 };
 
 export default function AccountCompanyInfo({ company }: Props) {
+  const isWasteProfessional = company.companyTypes.some(ct =>
+    COMPANY_TYPES.PROFESSIONALS.includes(ct)
+  );
+
   return (
     <>
       <AccountFieldNotEditable
@@ -84,6 +100,14 @@ export default function AccountCompanyInfo({ company }: Props) {
       <AccountFieldCompanyTypes
         company={filter(AccountFieldCompanyTypes.fragments.company, company)}
       />
+      {REACT_APP_VERIFY_COMPANY === "true" && isWasteProfessional && (
+        <AccountFieldCompanyVerificationStatus
+          company={filter(
+            AccountFieldCompanyVerificationStatus.fragments.company,
+            company
+          )}
+        />
+      )}
       {company.companyTypes.includes(CompanyType.Transporter) && (
         <AccountFieldCompanyTransporterReceipt
           company={filter(
@@ -107,6 +131,22 @@ export default function AccountCompanyInfo({ company }: Props) {
             company
           )}
         />
+      )}
+      {company.companyTypes.includes(CompanyType.WasteVehicles) && (
+        <>
+          <AccountFieldCompanyVhuAgrementBroyeur
+            company={filter(
+              AccountFieldCompanyVhuAgrementBroyeur.fragments.company,
+              company
+            )}
+          />
+          <AccountFieldCompanyVhuAgrementDemolisseur
+            company={filter(
+              AccountFieldCompanyVhuAgrementDemolisseur.fragments.company,
+              company
+            )}
+          />
+        </>
       )}
       {company.userRole === UserRole.Admin ? (
         <AccountFieldCompanyGivenName

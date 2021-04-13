@@ -1,5 +1,6 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
+import { companyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import * as sirene from "../../../sirene";
 
@@ -19,7 +20,10 @@ describe("query { searchCompanies(clue, department) }", () => {
         address: "4 Boulevard Longchamp 13001 Marseille",
         name: "CODE EN STOCK",
         naf: "6201Z",
-        libelleNaf: "Programmation informatique"
+        libelleNaf: "Programmation informatique",
+        addressVoie: "4 boulevard Longchamp",
+        addressCity: "Marseille",
+        addressPostalCode: "13001"
       }
     ]);
 
@@ -49,7 +53,10 @@ describe("query { searchCompanies(clue, department) }", () => {
         address: "4 Boulevard Longchamp 13001 Marseille",
         name: "CODE EN STOCK",
         naf: "6201Z",
-        libelleNaf: "Programmation informatique"
+        libelleNaf: "Programmation informatique",
+        addressVoie: "4 boulevard Longchamp",
+        addressCity: "Marseille",
+        addressPostalCode: "13001"
       }
     ]);
 
@@ -87,7 +94,10 @@ describe("query { searchCompanies(clue, department) }", () => {
         address: "4 Boulevard Longchamp 13001 Marseille",
         name: "CODE EN STOCK",
         naf: "6201Z",
-        libelleNaf: "Programmation informatique"
+        libelleNaf: "Programmation informatique",
+        addressVoie: "4 boulevard Longchamp",
+        addressCity: "Marseille",
+        addressPostalCode: "13001"
       }
     ]);
 
@@ -103,17 +113,15 @@ describe("query { searchCompanies(clue, department) }", () => {
       department: "07"
     };
 
-    await prisma.company.create({
-      data: {
-        siret: "85001946400013",
-        name: "Code en Stock",
-        securityCode: 1234,
-        contactEmail: "john.snow@trackdechets.fr",
-        contactPhone: "0600000000",
-        website: "https://trackdechets.beta.gouv.fr",
-        transporterReceipt: { create: transporterReceipt },
-        traderReceipt: { create: traderReceipt }
-      }
+    await companyFactory({
+      siret: "85001946400013",
+      name: "Code en Stock",
+      securityCode: 1234,
+      contactEmail: "john.snow@trackdechets.fr",
+      contactPhone: "0600000000",
+      website: "https://trackdechets.beta.gouv.fr",
+      transporterReceipt: { create: transporterReceipt },
+      traderReceipt: { create: traderReceipt }
     });
 
     const gqlQuery = `

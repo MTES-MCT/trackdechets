@@ -4,9 +4,12 @@ import { startOfDay } from "date-fns";
 import { parseDate } from "common/datetime";
 import * as yup from "yup";
 import { RedErrorMessage } from "common/components";
-import NumberInput from "form/custom-inputs/NumberInput";
-import DateInput from "form/custom-inputs/DateInput";
-import { InlineRadioButton, RadioButton } from "form/custom-inputs/RadioButton";
+import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import DateInput from "form/common/components/custom-inputs/DateInput";
+import {
+  InlineRadioButton,
+  RadioButton,
+} from "form/common/components/custom-inputs/RadioButton";
 import {
   WasteAcceptationStatusInput as WasteAcceptationStatus,
   FormStatus,

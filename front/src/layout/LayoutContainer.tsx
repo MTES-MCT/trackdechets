@@ -14,13 +14,16 @@ import Loader from "common/components/Loaders";
 import Layout from "./Layout";
 import routes from "common/routes";
 import { useQuery, gql } from "@apollo/client";
+import { Query } from "../generated/graphql/types";
 
+const Admin = lazy(() => import("admin/Admin"));
 const Dashboard = lazy(() => import("dashboard/Dashboard"));
 const Account = lazy(() => import("account/Account"));
 const AccountMembershipRequest = lazy(() =>
   import("account/AccountMembershipRequest")
 );
-const FormContainer = lazy(() => import("form/FormContainer"));
+const FormContainer = lazy(() => import("form/bsdd/FormContainer"));
+const BsvhuFormContainer = lazy(() => import("form/bsvhu/FormContainer"));
 const SignupInfo = lazy(() => import("login/SignupInfos"));
 const WasteSelector = lazy(() => import("login/WasteSelector"));
 
@@ -37,6 +40,7 @@ const GET_ME = gql`
     me {
       id
       email
+      isAdmin
       companies {
         siret
       }
@@ -45,10 +49,9 @@ const GET_ME = gql`
 `;
 
 export default withRouter(function LayoutContainer({ history }) {
-  const { data, loading } = useQuery<{
-    me: { id: string; email: string; companies: Array<{ siret: string }> };
-  }>(GET_ME);
+  const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME);
   const isAuthenticated = !loading && data != null;
+  const isAdmin = (isAuthenticated && data?.me?.isAdmin) || false;
   const email = data?.me?.email;
 
   useEffect(() => {
@@ -84,8 +87,19 @@ export default withRouter(function LayoutContainer({ history }) {
         </PrivateRoute>
 
         <Route>
-          <Layout isAuthenticated={isAuthenticated}>
+          <Layout isAuthenticated={isAuthenticated} isAdmin={isAdmin}>
             <Switch>
+              <PrivateRoute
+                path={routes.admin.index}
+                isAuthenticated={isAuthenticated}
+              >
+                {isAdmin ? (
+                  <Admin />
+                ) : (
+                  <div>Vous n'êtes pas autorisé à consulter cette page</div>
+                )}
+              </PrivateRoute>
+
               <Route exact path={routes.login}>
                 <Login />
               </Route>
@@ -153,6 +167,22 @@ export default withRouter(function LayoutContainer({ history }) {
                 exact
               >
                 <FormContainer />
+              </PrivateRoute>
+
+              <PrivateRoute
+                path={routes.dashboard.bsvhus.create}
+                isAuthenticated={isAuthenticated}
+                exact
+              >
+                <BsvhuFormContainer />
+              </PrivateRoute>
+
+              <PrivateRoute
+                path={routes.dashboard.bsvhus.edit}
+                isAuthenticated={isAuthenticated}
+                exact
+              >
+                <BsvhuFormContainer />
               </PrivateRoute>
 
               <PrivateRoute

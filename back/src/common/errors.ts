@@ -33,6 +33,12 @@ export class NotLoggedIn extends AuthenticationError {
   }
 }
 
+export class NotAdmin extends ForbiddenError {
+  constructor() {
+    super("Vous n'êtes pas administrateur");
+  }
+}
+
 export class MissingSiret extends UserInputError {
   constructor() {
     super("Le siret de l'entreprise concernée est requis.");

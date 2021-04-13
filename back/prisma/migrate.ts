@@ -1,14 +1,12 @@
 import path from "path";
+import { Pool } from "pg";
 import { migrate } from "postgres-migrations";
 
-const dbConfig = {
-  database: "prisma",
-  user: process.env.POSTGRES_USER,
-  password: process.env.POSTGRES_PASSWORD,
-  host: process.env.POSTGRES_HOST,
-  port: parseInt(process.env.POSTGRES_PORT, 10)
-};
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL
+});
 
-migrate(dbConfig, path.join(__dirname, "migrations"))
+migrate({ client: pool }, path.join(__dirname, "migrations"))
   .then(() => console.log("Migration successful"))
-  .catch(err => console.error(err));
+  .catch(err => console.error(err))
+  .finally(() => pool.end());

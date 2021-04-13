@@ -6,7 +6,8 @@ import {
   Form,
   QuantityType,
   WasteAcceptationStatus,
-  Prisma
+  Prisma,
+  CompanyVerificationStatus
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
@@ -18,12 +19,13 @@ import {
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
   WASTES_CODES
 } from "../common/constants";
-import configureYup from "../common/yup/configureYup";
+import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { PackagingInfo, Packagings } from "../generated/graphql/types";
-import { SchemaOf } from "yup";
 
 // set yup default error messages
 configureYup();
+
+const { VERIFY_COMPANY } = process.env;
 
 // ************************************************
 // BREAK DOWN FORM TYPE INTO INDIVIDUAL FRAME TYPES
@@ -181,35 +183,37 @@ type WasteRepackaging = Pick<
   | "wasteDetailsQuantityType"
 >;
 
-type FactorySchemaOf<T> = (isDraft: boolean) => SchemaOf<T>;
-
 // *********************
 // COMMON ERROR MESSAGES
 // *********************
 
-const MISSING_COMPANY_NAME = "Le nom de l'entreprise est obligatoire";
-const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
-const MISSING_COMPANY_ADDRESS = "L'adresse de l'entreprise est obligatoire";
-const MISSING_COMPANY_CONTACT = "Le contact dans l'entreprise est obligatoire";
-const MISSING_COMPANY_PHONE = "Le téléphone de l'entreprise est obligatoire";
-const MISSING_COMPANY_EMAIL = "L'email de l'entreprise est obligatoire";
+export const MISSING_COMPANY_NAME = "Le nom de l'entreprise est obligatoire";
+export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
+export const MISSING_COMPANY_ADDRESS =
+  "L'adresse de l'entreprise est obligatoire";
+export const MISSING_COMPANY_CONTACT =
+  "Le contact dans l'entreprise est obligatoire";
+export const MISSING_COMPANY_PHONE =
+  "Le téléphone de l'entreprise est obligatoire";
+export const MISSING_COMPANY_EMAIL = "L'email de l'entreprise est obligatoire";
 
-const INVALID_SIRET_LENGTH = "Le SIRET doit faire 14 caractères numériques";
+export const INVALID_SIRET_LENGTH =
+  "Le SIRET doit faire 14 caractères numériques";
 
-const INVALID_PROCESSING_OPERATION =
+export const INVALID_PROCESSING_OPERATION =
   "Cette opération d’élimination / valorisation n'existe pas.";
 
-const INVALID_WASTE_CODE =
+export const INVALID_WASTE_CODE =
   "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement.";
 
-const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseignée ne permet pas de destination ultérieure`;
+export const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseignée ne permet pas de destination ultérieure`;
 
 // *************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 1
 // *************************************************************
 
 // 1 - Émetteur du bordereau
-const emitterSchemaFn: FactorySchemaOf<Emitter> = isDraft =>
+const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
   yup.object({
     emitterPickupSite: yup.string().nullable(),
     emitterWorkSiteAddress: yup.string().nullable(),
@@ -221,7 +225,7 @@ const emitterSchemaFn: FactorySchemaOf<Emitter> = isDraft =>
       is: ecoOrganismeSiret => !ecoOrganismeSiret,
       then: yup
         .mixed()
-        .requiredIf(isDraft, `Émetteur: Le type d'émetteur est obligatoire`),
+        .requiredIf(!isDraft, `Émetteur: Le type d'émetteur est obligatoire`),
       otherwise: yup
         .mixed()
         .oneOf(
@@ -232,31 +236,31 @@ const emitterSchemaFn: FactorySchemaOf<Emitter> = isDraft =>
     emitterCompanyName: yup
       .string()
       .ensure()
-      .requiredIf(isDraft, `Émetteur: ${MISSING_COMPANY_NAME}`),
+      .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_NAME}`),
     emitterCompanySiret: yup
       .string()
       .ensure()
-      .requiredIf(isDraft, `Émetteur: ${MISSING_COMPANY_SIRET}`)
+      .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_SIRET}`)
       .matches(/^$|^\d{14}$/, {
         message: `Émetteur: ${INVALID_SIRET_LENGTH}`
       }),
     emitterCompanyAddress: yup
       .string()
       .ensure()
-      .requiredIf(isDraft, `Émetteur: ${MISSING_COMPANY_ADDRESS}`),
+      .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_ADDRESS}`),
     emitterCompanyContact: yup
       .string()
       .ensure()
-      .requiredIf(isDraft, `Émetteur: ${MISSING_COMPANY_CONTACT}`),
+      .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_CONTACT}`),
     emitterCompanyPhone: yup
       .string()
       .ensure()
-      .requiredIf(isDraft, `Émetteur: ${MISSING_COMPANY_PHONE}`),
+      .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_PHONE}`),
     emitterCompanyMail: yup
       .string()
       .email()
       .ensure()
-      .requiredIf(isDraft, `Émetteur: ${MISSING_COMPANY_EMAIL}`)
+      .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_EMAIL}`)
   });
 
 // Optional validation schema for eco-organisme appearing in frame 1
@@ -281,7 +285,7 @@ export const ecoOrganismeSchema = yup.object().shape({
 });
 
 // 2 - Installation de destination ou d’entreposage ou de reconditionnement prévue
-const recipientSchemaFn: FactorySchemaOf<Recipient> = isDraft =>
+const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
   yup.object({
     recipientCap: yup.string().nullable(),
     recipientIsTempStorage: yup.boolean().nullable(),
@@ -289,35 +293,35 @@ const recipientSchemaFn: FactorySchemaOf<Recipient> = isDraft =>
       .string()
       .label("Opération d’élimination / valorisation")
       .ensure()
-      .requiredIf(isDraft),
+      .requiredIf(!isDraft),
     recipientCompanyName: yup
       .string()
       .ensure()
-      .requiredIf(isDraft, `Destinataire: ${MISSING_COMPANY_NAME}`),
+      .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_NAME}`),
     recipientCompanySiret: yup
       .string()
       .ensure()
-      .requiredIf(isDraft, `Destinataire: ${MISSING_COMPANY_SIRET}`)
+      .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_SIRET}`)
       .matches(/^$|^\d{14}$/, {
         message: `Destinataire: ${INVALID_SIRET_LENGTH}`
       }),
     recipientCompanyAddress: yup
       .string()
       .ensure()
-      .requiredIf(isDraft, `Destinataire: ${MISSING_COMPANY_ADDRESS}`),
+      .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_ADDRESS}`),
     recipientCompanyContact: yup
       .string()
       .ensure()
-      .requiredIf(isDraft, `Destinataire: ${MISSING_COMPANY_CONTACT}`),
+      .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_CONTACT}`),
     recipientCompanyPhone: yup
       .string()
       .ensure()
-      .requiredIf(isDraft, `Destinataire: ${MISSING_COMPANY_PHONE}`),
+      .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_PHONE}`),
     recipientCompanyMail: yup
       .string()
       .email()
       .ensure()
-      .requiredIf(isDraft, `Destinataire: ${MISSING_COMPANY_EMAIL}`)
+      .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_EMAIL}`)
   });
 
 const packagingInfoFn = (isDraft: boolean) =>
@@ -330,7 +334,7 @@ const packagingInfoFn = (isDraft: boolean) =>
       .when("type", (type, schema) =>
         type === "AUTRE"
           ? schema.requiredIf(
-              isDraft,
+              !isDraft,
               "La description doit être précisée pour le conditionnement 'AUTRE'."
             )
           : schema
@@ -343,7 +347,7 @@ const packagingInfoFn = (isDraft: boolean) =>
     quantity: yup
       .number()
       .requiredIf(
-        isDraft,
+        !isDraft,
         "Le nombre de colis associé au conditionnement doit être précisé."
       )
       .integer()
@@ -362,7 +366,7 @@ const packagingInfoFn = (isDraft: boolean) =>
 // 4 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
 // 5 - Conditionnement
 // 6 - Quantité
-const wasteDetailsSchemaFn: FactorySchemaOf<WasteDetails> = isDraft =>
+const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
   yup.object({
     wasteDetailsNumberOfPackages: yup.number().nullable(),
     wasteDetailsOtherPackaging: yup.string().nullable(),
@@ -370,7 +374,7 @@ const wasteDetailsSchemaFn: FactorySchemaOf<WasteDetails> = isDraft =>
     wasteDetailsName: yup.string().nullable(),
     wasteDetailsCode: yup
       .string()
-      .requiredIf(isDraft, "Le code déchet est obligatoire")
+      .requiredIf(!isDraft, "Le code déchet est obligatoire")
       .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE),
     wasteDetailsOnuCode: yup.string().when("wasteDetailsCode", {
       is: (wasteCode: string) => isDangerous(wasteCode || ""),
@@ -379,14 +383,14 @@ const wasteDetailsSchemaFn: FactorySchemaOf<WasteDetails> = isDraft =>
           .string()
           .ensure()
           .requiredIf(
-            isDraft,
+            !isDraft,
             `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
           ),
       otherwise: () => yup.string().nullable()
     }),
     wasteDetailsPackagingInfos: yup
       .array()
-      .requiredIf(isDraft, "Le détail du conditionnement est obligatoire")
+      .requiredIf(!isDraft, "Le détail du conditionnement est obligatoire")
       .of(packagingInfoFn(isDraft))
       .test(
         "is-valid-packaging-infos",
@@ -411,57 +415,57 @@ const wasteDetailsSchemaFn: FactorySchemaOf<WasteDetails> = isDraft =>
       ),
     wasteDetailsQuantity: yup
       .number()
-      .requiredIf(isDraft, "La quantité du déchet en tonnes est obligatoire")
+      .requiredIf(!isDraft, "La quantité du déchet en tonnes est obligatoire")
       .min(0, "La quantité doit être supérieure à 0"),
     wasteDetailsQuantityType: yup
       .mixed<QuantityType>()
       .requiredIf(
-        isDraft,
+        !isDraft,
         "Le type de quantité (réelle ou estimée) doit être précisé"
       ),
     wasteDetailsConsistence: yup
       .mixed<Consistence>()
-      .requiredIf(isDraft, "La consistance du déchet doit être précisée"),
+      .requiredIf(!isDraft, "La consistance du déchet doit être précisée"),
     wasteDetailsPop: yup
       .boolean()
-      .requiredIf(isDraft, "La présence (ou non) de POP doit être précisée")
+      .requiredIf(!isDraft, "La présence (ou non) de POP doit être précisée")
   });
 
 export const wasteDetailsSchema = wasteDetailsSchemaFn(false);
 
 // 8 - Collecteur-transporteur
-const transporterSchemaFn: FactorySchemaOf<Transporter> = isDraft =>
+const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> = isDraft =>
   yup.object({
     transporterCustomInfo: yup.string().nullable(),
     transporterNumberPlate: yup.string().nullable(),
     transporterCompanyName: yup
       .string()
       .ensure()
-      .requiredIf(isDraft, `Transporteur: ${MISSING_COMPANY_NAME}`),
+      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_NAME}`),
     transporterCompanySiret: yup
       .string()
       .ensure()
-      .requiredIf(isDraft, `Transporteur: ${MISSING_COMPANY_SIRET}`)
+      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_SIRET}`)
       .matches(/^$|^\d{14}$/, {
         message: `Transporteur: ${INVALID_SIRET_LENGTH}`
       }),
     transporterCompanyAddress: yup
       .string()
       .ensure()
-      .requiredIf(isDraft, `Transporteur: ${MISSING_COMPANY_ADDRESS}`),
+      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_ADDRESS}`),
     transporterCompanyContact: yup
       .string()
       .ensure()
-      .requiredIf(isDraft, `Transporteur: ${MISSING_COMPANY_CONTACT}`),
+      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_CONTACT}`),
     transporterCompanyPhone: yup
       .string()
       .ensure()
-      .requiredIf(isDraft, `Transporteur: ${MISSING_COMPANY_PHONE}`),
+      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_PHONE}`),
     transporterCompanyMail: yup
       .string()
       .email()
       .ensure()
-      .requiredIf(isDraft, `Transporteur: ${MISSING_COMPANY_EMAIL}`),
+      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_EMAIL}`),
     transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
     transporterReceipt: yup
       .string()
@@ -471,7 +475,7 @@ const transporterSchemaFn: FactorySchemaOf<Transporter> = isDraft =>
           : schema
               .ensure()
               .requiredIf(
-                isDraft,
+                !isDraft,
                 "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
               )
       ),
@@ -483,7 +487,7 @@ const transporterSchemaFn: FactorySchemaOf<Transporter> = isDraft =>
           : schema
               .ensure()
               .requiredIf(
-                isDraft,
+                !isDraft,
                 "Le département du transporteur est obligatoire"
               )
       ),
@@ -492,7 +496,7 @@ const transporterSchemaFn: FactorySchemaOf<Transporter> = isDraft =>
 
 // 8 - Collecteur-transporteur
 // 9 - Déclaration générale de l’émetteur du bordereau :
-export const signingInfoSchema: SchemaOf<SigningInfo> = yup.object({
+export const signingInfoSchema: yup.SchemaOf<SigningInfo> = yup.object({
   signedByTransporter: yup.boolean().nullable(),
   sentAt: yup.date().required(),
   sentBy: yup
@@ -502,7 +506,7 @@ export const signingInfoSchema: SchemaOf<SigningInfo> = yup.object({
 });
 
 // 10 - Expédition reçue à l’installation de destination
-export const receivedInfoSchema: SchemaOf<ReceivedInfo> = yup.object({
+export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
   isAccepted: yup.boolean(),
   receivedBy: yup
     .string()
@@ -550,7 +554,7 @@ export const receivedInfoSchema: SchemaOf<ReceivedInfo> = yup.object({
 });
 
 // 10 - Expédition acceptée (ou refusée) à l’installation de destination
-export const acceptedInfoSchema: SchemaOf<AcceptedInfo> = yup.object({
+export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
   isAccepted: yup.boolean(),
   signedAt: yup.date().nullable(),
   signedBy: yup
@@ -681,7 +685,7 @@ const withoutNextDestination = yup.object().shape({
 // 11 - Réalisation de l’opération :
 const processedInfoSchemaFn: (
   value: any
-) => SchemaOf<ProcessedInfo> = value => {
+) => yup.SchemaOf<ProcessedInfo> = value => {
   const base = yup.object({
     processedBy: yup
       .string()
@@ -709,7 +713,7 @@ export const processedInfoSchema = yup.lazy(processedInfoSchemaFn);
 // *********************************************************************
 
 // 13 - Réception dans l’installation d’entreposage ou de reconditionnement
-export const tempStoredInfoSchema: SchemaOf<TempStorageInfo> = yup.object({
+export const tempStoredInfoSchema: yup.SchemaOf<TempStorageInfo> = yup.object({
   tempStorerReceivedBy: yup
     .string()
     .ensure()
@@ -819,7 +823,7 @@ export const tempStorerAcceptedInfoSchema = yup.object().shape({
 });
 
 // 14 - Installation de destination prévue
-export const destinationAfterTempStorageSchema: SchemaOf<DestinationAfterTempStorage> = yup.object(
+export const destinationAfterTempStorageSchema: yup.SchemaOf<DestinationAfterTempStorage> = yup.object(
   {
     destinationCap: yup.string().nullable(),
     destinationCompanyName: yup
@@ -856,26 +860,28 @@ export const destinationAfterTempStorageSchema: SchemaOf<DestinationAfterTempSto
 // 15 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
 // 16 - Conditionnement
 // 17 - Quantité
-export const wasteRepackagingSchema: SchemaOf<WasteRepackaging> = yup.object({
-  wasteDetailsOnuCode: yup.string().nullable(),
-  wasteDetailsOtherPackaging: yup.string().nullable(),
-  wasteDetailsPackagings: yup.object().nullable(),
-  wasteDetailsQuantityType: yup.mixed<QuantityType>().nullable(),
-  wasteDetailsNumberOfPackages: yup
-    .number()
-    .nullable()
-    .notRequired()
-    .integer()
-    .min(1, "Le nombre de colis doit être supérieur à 0"),
-  wasteDetailsQuantity: yup
-    .number()
-    .nullable()
-    .notRequired()
-    .min(0, "La quantité doit être supérieure à 0")
-});
+export const wasteRepackagingSchema: yup.SchemaOf<WasteRepackaging> = yup.object(
+  {
+    wasteDetailsOnuCode: yup.string().nullable(),
+    wasteDetailsOtherPackaging: yup.string().nullable(),
+    wasteDetailsPackagings: yup.object().nullable(),
+    wasteDetailsQuantityType: yup.mixed<QuantityType>().nullable(),
+    wasteDetailsNumberOfPackages: yup
+      .number()
+      .nullable()
+      .notRequired()
+      .integer()
+      .min(1, "Le nombre de colis doit être supérieur à 0"),
+    wasteDetailsQuantity: yup
+      .number()
+      .nullable()
+      .notRequired()
+      .min(0, "La quantité doit être supérieure à 0")
+  }
+);
 
 // 18 - Collecteur-transporteur reconditionnement
-export const transporterAfterTempStorageSchema: SchemaOf<TransporterAfterTempStorage> = transporterSchemaFn(
+export const transporterAfterTempStorageSchema: yup.SchemaOf<TransporterAfterTempStorage> = transporterSchemaFn(
   false
 );
 
@@ -939,7 +945,7 @@ function isWasteProcessor(company: Company) {
 }
 
 /**
- * Check company in frame 2 is registered with profile
+ * Check company in frame 2 is verified and registered with profile
  * COLLECTOR or WASTE_PROCESSOR or throw error
  */
 async function checkDestination(siret: string) {
@@ -950,17 +956,27 @@ async function checkDestination(siret: string) {
 
   if (!company) {
     throw new UserInputError(
-      "L'installation de destination ou d’entreposage ou de reconditionnement prévue (cadre 2) n'est pas inscrite sur Trackdéchets"
+      `L'installation de destination ou d’entreposage ou de reconditionnement qui a été renseignée en case 2 (SIRET: ${siret}) n'est pas inscrite sur Trackdéchets`
     );
   }
 
   // check company has profile COLLECTOR or WASTE_PROCESSOR
   if (!(isCollector(company) || isWasteProcessor(company))) {
     throw new UserInputError(
-      `L'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
+      `L'installation de destination ou d’entreposage ou de reconditionnement qui a été renseignée en case 2 (SIRET: ${company.siret})
       n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement.
       Cette installation ne peut donc pas être visée en case 2 du bordereau. Veuillez vous rapprocher de l'administrateur
       de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+    );
+  }
+
+  if (
+    VERIFY_COMPANY === "true" &&
+    company.verificationStatus !== CompanyVerificationStatus.VERIFIED
+  ) {
+    throw new UserInputError(
+      `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
+      n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 2 du bordereau.`
     );
   }
 
@@ -968,7 +984,7 @@ async function checkDestination(siret: string) {
 }
 
 /**
- * Check company in frame 2 is registered with profile
+ * Check company in frame 2 is verified and registered with profile
  * COLLECTOR or WASTE_PROCESSOR or throw error
  */
 async function checkDestinationAfterTempStorage(siret: string) {
@@ -979,17 +995,27 @@ async function checkDestinationAfterTempStorage(siret: string) {
 
   if (!company) {
     throw new UserInputError(
-      "L'installation de destination prévue après entreposage provisoire ou reconditionnement (cadre 14) n'est pas inscrite sur Trackdéchets"
+      `L'installation de destination après entreposage provisoire ou reconditionnement qui a été renseignée en case 14 (SIRET ${siret}) n'est pas inscrite sur Trackdéchets`
     );
   }
 
   // check company has profile COLLECTOR or WASTE_PROCESSOR
   if (!(isCollector(company) || isWasteProcessor(company))) {
     throw new UserInputError(
-      `L'installation de destination prévue après entreposage provisoire ou reconditionnement ${company.siret}
+      `L'installation de destination après entreposage provisoire ou reconditionnement qui a été renseignée en case 14 (SIRET ${company.siret})
       n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement.
       Cette installation ne peut donc pas être visée en case 14 du bordereau. Veuillez vous rapprocher de l'administrateur
       de cette installation pour qu'il modifie le profil de l'installation depuis l'interface Trackdéchets Mon Compte > Établissements`
+    );
+  }
+
+  if (
+    VERIFY_COMPANY === "true" &&
+    company.verificationStatus !== CompanyVerificationStatus.VERIFIED
+  ) {
+    throw new UserInputError(
+      `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
+      n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 14 du bordereau.`
     );
   }
 

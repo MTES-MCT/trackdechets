@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { formatDate } from "common/datetime";
-import { formatPackagings } from "./utils";
 import { PackagingInfo } from "generated/graphql/types";
+import { getPackagingInfosSummary } from "form/bsdd/utils/packagings";
 
 export const DetailRow = ({ value, label }) => {
   if (!value) {
@@ -44,24 +44,15 @@ export const PackagingRow = ({
 }: {
   packagingInfos?: PackagingInfo[] | null;
 }) => {
-  const numberOfPackages = useMemo(
-    () => packagingInfos?.reduce((prev, cur) => cur.quantity + prev, 0),
-    [packagingInfos]
-  );
   const formatedPackagings = useMemo(
-    () => formatPackagings(packagingInfos?.map(p => p.type)),
+    () => (packagingInfos ? getPackagingInfosSummary(packagingInfos) : ""),
     [packagingInfos]
   );
 
   return (
     <>
       <dt>Conditionnement</dt>
-      <dd>
-        {formatedPackagings}
-        {numberOfPackages && (
-          <span className="tw-ml-2">({numberOfPackages})</span>
-        )}
-      </dd>
+      <dd>{formatedPackagings}</dd>
     </>
   );
 };

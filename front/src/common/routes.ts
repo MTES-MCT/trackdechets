@@ -1,4 +1,8 @@
 export default {
+  admin: {
+    index: "/admin",
+    verification: "/admin/verification",
+  },
   login: "/login",
   invite: "/invite",
   membershipRequest: "/membership-request/:id",
@@ -25,6 +29,11 @@ export default {
       create: "/dashboard/:siret/bsdds/create",
       edit: "/dashboard/:siret/bsdds/edit/:id",
       view: "/dashboard/:siret/bsdds/view/:id",
+    },
+    bsvhus: {
+      create: "/dashboard/:siret/bsvhus/create",
+      edit: "/dashboard/:siret/bsvhus/edit/:id",
+      view: "/dashboard/:siret/bsvhus/view/:id",
     },
     transport: {
       index: "/dashboard/:siret/transport",

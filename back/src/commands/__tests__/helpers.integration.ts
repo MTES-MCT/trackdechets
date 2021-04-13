@@ -46,31 +46,34 @@ const PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID = 10;
 describe("Select relevant email template function", () => {
   afterEach(resetDatabase);
 
-  it("should select onboarding email for producers", async () => {
-    await userWithCompanyFactory("ADMIN", {
-      companyTypes: {
-        set: ["PRODUCER" as CompanyType]
-      }
-    }); // producer
+  it.each([CompanyType.PRODUCER, CompanyType.WASTE_CENTER])(
+    "should select onboarding email for producers",
+    async companyType => {
+      await userWithCompanyFactory("ADMIN", {
+        companyTypes: {
+          set: [companyType]
+        }
+      }); // producer
 
-    const recipients = await prisma.user.findMany({
-      include: { companyAssociations: { include: { company: true } } }
-    });
+      const recipients = await prisma.user.findMany({
+        include: { companyAssociations: { include: { company: true } } }
+      });
 
-    const emailFn = selectSecondOnboardingEmail(recipients[0]);
-    expect(emailFn("jim@example.test", "Jim").templateId).toEqual(
-      PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID
-    );
-  });
+      const emailFn = selectSecondOnboardingEmail(recipients[0]);
+      expect(emailFn("jim@example.test", "Jim").templateId).toEqual(
+        PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID
+      );
+    }
+  );
 
   it.each([
-    "COLLECTOR",
-    "WASTEPROCESSOR",
-    "TRANSPORTER",
-    "WASTE_VEHICLES",
-    "WASTE_CENTER",
-    "TRADER",
-    "ECO_ORGANISME"
+    CompanyType.COLLECTOR,
+    CompanyType.WASTEPROCESSOR,
+    CompanyType.TRANSPORTER,
+    CompanyType.WASTE_VEHICLES,
+    CompanyType.TRADER,
+    CompanyType.ECO_ORGANISME,
+    CompanyType.BROKER
   ])(
     "should select onboarding email for professionals (%p)",
     async companyType => {
