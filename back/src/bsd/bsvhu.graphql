@@ -63,7 +63,6 @@ type BsvhuReception {
   acceptationStatus: BsvhuAcceptationStatus
   "Motif de refus"
   refusalReason: String
-  signature: BsvhuSignature
 }
 
 type BsvhuOperation {
