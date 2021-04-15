@@ -23,8 +23,6 @@ type Bsvhu {
   quantity: BsvhuQuantity
   "Transporteur"
   transporter: BsvhuTransporter
-  "Broyeur de destination"
-  nextDestination: BsvhuNextDestination
 }
 
 type BsvhuEmitter {
@@ -70,6 +68,8 @@ type BsvhuOperation {
   code: String
   "Date de réalisation"
   date: DateTime
+  "Broyeur de destination en cas de regroupement"
+  nextDestination: BsvhuNextDestination
   signature: BsddSignature
 }
 

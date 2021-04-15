@@ -33,8 +33,6 @@ type Bsdd {
   "Transporteur n°3 (en cas de transport multi-modal)"
   transporter3: BsddTransporter
 
-  "Destination ultérieure prévue (case 12)"
-  nextDestination: BsddNextDestination
   "Installation d'entreposage provisoire ou de reconditionnement (case 2 en cas d'entreposage provisoire)"
   temporaryStorage: BsddTemporaryStorage
 
@@ -124,6 +122,8 @@ type BsddOperation {
   description: String
   "Date de réalisation de l'opération"
   date: DateTime
+  "Destination ultérieure prévue (case 12) en cas de regroupement"
+  nextDestination: BsddNextDestination
   signature: BsddSignature
 }
 
