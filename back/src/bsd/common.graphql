@@ -1,0 +1,35 @@
+type Company {
+  "Nom de l'établissement"
+  name: String
+
+  "SIRET de l'établissement (si l'établissement est en France)"
+  siret: String
+
+  "Numéro de TVA intracommunautaire (si l'établissement est à l'étranger)"
+  vatNumber: String
+
+  "Adresse de l'établissement"
+  address: String
+
+  """
+  Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+  https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+  """
+  country: String
+
+  "Nom du contact dans l'établissement"
+  contact: String
+
+  "Numéro de téléphone de contact dans l'établissement"
+  phone: String
+
+  "Email du contact dans l'établissement"
+  mail: String
+}
+
+type Signature {
+  "Horodatage de la signature"
+  date: DateTime
+  "Nom de la personne ayant signé"
+  author: String
+}

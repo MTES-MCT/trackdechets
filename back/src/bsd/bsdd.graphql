@@ -56,7 +56,7 @@ type BsddEmitter {
   "Type d'émetteur"
   type: BsddEmitterType
   "Établissement émetteur"
-  company: BsddCompany
+  company: Company
   "Adresse chantier"
   worksite: BsddWorksite
   "Éco-organisme responsable du déchet"
@@ -66,7 +66,7 @@ type BsddEmitter {
 }
 
 type BsddEmission {
-  signature: BsddSignature
+  signature: Signature
 }
 
 type BsddWorksite {
@@ -79,7 +79,7 @@ type BsddWorksite {
 
 type BsddDestination {
   "Établissement de destination"
-  company: BsddCompany
+  company: Company
   "N° de CAP (le cas échéant)"
   cap: String
   "Opération d'élimination / valorisation prévue (code D/R)"
@@ -94,7 +94,7 @@ type BsddDestination {
 
 type BsddTemporaryStorage {
   "Établissement de destination"
-  company: BsddCompany
+  company: Company
   "N° de CAP (le cas échéant)"
   cap: String
   "Opération d'élimination / valorisation prévue (code D/R)"
@@ -113,7 +113,7 @@ type BsddReception {
   "Motif de refus"
   refusalReason: String
   "Signature case 10"
-  signature: BsddSignature
+  signature: Signature
 }
 
 type BsddOperation {
@@ -124,7 +124,7 @@ type BsddOperation {
   date: DateTime
   "Destination ultérieure prévue (case 12) en cas de regroupement"
   nextDestination: BsddNextDestination
-  signature: BsddSignature
+  signature: Signature
 }
 
 type BsddWaste {
@@ -156,7 +156,7 @@ type BsddQuantity {
 
 type BsddTrader {
   "Établissement négociant"
-  company: BsddCompany
+  company: Company
 
   "Récépissé négociant"
   receipt: BsddTraderReceipt
@@ -164,7 +164,7 @@ type BsddTrader {
 
 type BsddTransporter {
   "Établissement transporter"
-  company: BsddCompany
+  company: Company
 
   "Exemption de récipissé"
   isExemptedOfReceipt: Boolean
@@ -183,49 +183,13 @@ type BsddTransporter {
 
 type BsddTransport {
   takenOverAt: DateTime
-  signature: BsddSignature
+  signature: Signature
 }
 
 type BsddNextDestination {
-  company: BsddCompany
+  company: Company
   "Traitement prévue"
   plannedOperation: String
-}
-
-type BsddSignature {
-  "Horodatage de la signature"
-  date: DateTime
-  "Nom de la personne ayant signé"
-  author: String
-}
-
-type BsddCompany {
-  "Nom de l'établissement"
-  name: String!
-
-  "SIRET de l'établissement (si l'établissement est en France)"
-  siret: String
-
-  "Numéro de TVA intracommunautaire (si l'établissement est à l'étranger)"
-  vatNumber: String
-
-  "Adresse de l'établissement"
-  address: String!
-
-  """
-  Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
-  https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
-  """
-  country: String!
-
-  "Nom du contact dans l'établissement"
-  contact: String
-
-  "Numéro de téléphone de contact dans l'établissement"
-  phone: String
-
-  "Email du contact dans l'établissement"
-  mail: String
 }
 
 type BsddTraderReceipt {

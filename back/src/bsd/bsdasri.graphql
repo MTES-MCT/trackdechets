@@ -28,7 +28,7 @@ type Bsdasri {
 }
 
 type BsdasriEmitter {
-  company: BsdasriCompany
+  company: Company
   worksite: BsdasriWorkSite
   emission: BsdasriEmission
 }
@@ -36,7 +36,7 @@ type BsdasriEmitter {
 type BsdasriEmission {
   "Date de remise au collecteur-transporteur"
   handedOverAt: DateTime
-  signature: BsdasriSignature
+  signature: Signature
 }
 
 type BsdasriWorkSite {
@@ -48,7 +48,7 @@ type BsdasriWorkSite {
 }
 
 type BsdasriTransporter {
-  company: BsdasriCompany
+  company: Company
   receipt: BsdasriTransporterReceipt
   transport: BsdasriTransport
 }
@@ -66,11 +66,11 @@ type BsdasriTransport {
   quantity: BsdasriQuantity
   "Quantité de déchets remis (en L)"
   volume: Float
-  signature: BsdasriSignature
+  signature: Signature
 }
 
 type BsdasriDestination {
-  company: BsdasriCompany
+  company: Company
   reception: BsdasriReception
   operation: BsdasriOperation
 }
@@ -97,7 +97,7 @@ type BsdasriOperation {
   code: String
   "date de réalisation de l'opération"
   date: DateTime
-  signature: BsdasriSignature
+  signature: Signature
 }
 
 type BsdasriTransporterReceipt {
@@ -130,42 +130,6 @@ type BsdasriQuantity {
   type: BsdasriQuantityType
   "Quantité en kilo"
   value: Float
-}
-
-type BsdasriSignature {
-  "Horodatage de la signature"
-  date: DateTime
-  "Nom de la personne ayant signé"
-  author: String
-}
-
-type BsdasriCompany {
-  "Nom de l'établissement"
-  name: String!
-
-  "SIRET de l'établissement (si l'établissement est en France)"
-  siret: String
-
-  "Numéro de TVA intracommunautaire (si l'établissement est à l'étranger)"
-  vatNumber: String
-
-  "Adresse de l'établissement"
-  address: String!
-
-  """
-  Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
-  https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
-  """
-  country: String!
-
-  "Nom du contact dans l'établissement"
-  contact: String
-
-  "Numéro de téléphone de contact dans l'établissement"
-  phone: String
-
-  "Email du contact dans l'établissement"
-  mail: String
 }
 
 enum BsddQuantityType {

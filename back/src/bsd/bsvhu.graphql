@@ -29,13 +29,13 @@ type BsvhuEmitter {
   "Numéro d'agrément émetteur"
   agrementNumber: String
   "Coordonnées de l'entreprise émétrice"
-  company: BsvhuCompany
+  company: Company
   "Déclaration générale de l'émetteur du bordereau"
   emission: BsvhuEmission
 }
 
 type BsvhuEmission {
-  signature: BsvhuSignature
+  signature: Signature
 }
 
 type BsvhuDestination {
@@ -44,7 +44,7 @@ type BsvhuDestination {
   "Numéro d'agrément de receveur"
   agrementNumber: String
   "Coordonnées de l'entreprise émétrice"
-  company: BsvhuCompany
+  company: Company
   "Opération d'élimination / valorisation prévue (code D/R)"
   plannedOperationCode: String
   "Informations de réception"
@@ -70,7 +70,7 @@ type BsvhuOperation {
   date: DateTime
   "Broyeur de destination en cas de regroupement"
   nextDestination: BsvhuNextDestination
-  signature: BsddSignature
+  signature: Signature
 }
 
 type BsvhuWaste {
@@ -89,7 +89,7 @@ type BsvhuIdentification {
 
 type BsvhuTransporter {
   "Coordonnées de l'entreprise de transport"
-  company: BsvhuCompany
+  company: Company
   "Récépissé transporteur"
   receipt: BsvhuTransporterReceipt
   "Informations liés au transport"
@@ -99,7 +99,7 @@ type BsvhuTransporter {
 type BsvhuTransport {
   "Date de prise en charge"
   takenOverAt: DateTime
-  signature: BsvhuSignature
+  signature: Signature
 }
 
 type BsvhuTransporterReceipt {
@@ -109,7 +109,7 @@ type BsvhuTransporterReceipt {
 }
 
 type BsvhuNextDestination {
-  company: BsvhuCompany
+  company: Company
 }
 
 type BsvhuQuantity {
@@ -117,42 +117,6 @@ type BsvhuQuantity {
   type: BsddQuantityType
   "Quantité en tonne"
   value: Float
-}
-
-type BsvhuSignature {
-  "Horodatage de la signature"
-  date: DateTime
-  "Nom de la personne ayant signé"
-  author: String
-}
-
-type BsvhuCompany {
-  "Nom de l'établissement"
-  name: String!
-
-  "SIRET de l'établissement (si l'établissement est en France)"
-  siret: String
-
-  "Numéro de TVA intracommunautaire (si l'établissement est à l'étranger)"
-  vatNumber: String
-
-  "Adresse de l'établissement"
-  address: String!
-
-  """
-  Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
-  https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
-  """
-  country: String!
-
-  "Nom du contact dans l'établissement"
-  contact: String
-
-  "Numéro de téléphone de contact dans l'établissement"
-  phone: String
-
-  "Email du contact dans l'établissement"
-  mail: String
 }
 
 enum BsvhuPacking {
