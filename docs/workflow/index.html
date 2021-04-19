@@ -139,8 +139,8 @@ D -->|markAsProcessed - avec opération de regroupement | F(AWAITING_GROUP)
 C -->|markAsReceived - avec refus| I(REFUSED)
 C -->|markAsTempStored - avec refus| I
 F.->|createForm - appendix2Forms |A
-F-->|Lors de la création d'un nouveau BSD avec annexe 2|H[GROUPED]
-H-->|Lorsque markAsProcessed est appelé sur le BSD avec annexe 2|E
+F-->|Lorsque markAsSealed est appelé sur le BSD de regroupement avec annexe 2|H[GROUPED]
+H-->|Lorsque markAsProcessed est appelé sur le BSD  de regroupement avec annexe 2|E
 C -->|markAsTempStored - |J(TEMP_STORED)
 C -->|markAsTempStored|N
 J -->|markAsTempStorerAccepted - avec refus|I
