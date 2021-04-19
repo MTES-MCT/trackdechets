@@ -7,10 +7,11 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { sendMail } from "../../../mailer/mailing";
+import { verificationDone } from "../../../mailer/templates";
+import { renderMail } from "../../../mailer/templates/renderers";
 import prisma from "../../../prisma";
 import { checkIsCompanyAdmin } from "../../../users/permissions";
 import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
-import { companyMails } from "../../mails";
 
 /**
  * Verify a company from a verification code sent in a letter
@@ -39,10 +40,10 @@ const verifyCompanyResolver: MutationResolvers["verifyCompany"] = async (
   });
 
   await sendMail(
-    companyMails.verificationDone(
-      [{ name: user.name, email: user.email }],
-      verifiedCompany
-    )
+    renderMail(verificationDone, {
+      to: [{ name: user.name, email: user.email }],
+      variables: { company: verifiedCompany }
+    })
   );
 
   return convertUrls(verifiedCompany);

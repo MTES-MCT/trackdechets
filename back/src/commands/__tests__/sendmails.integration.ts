@@ -52,8 +52,7 @@ describe("sendOnboardingFirstStepMails", () => {
           }
         ],
         params: {
-          title: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
-          body: "_"
+          body: ""
         },
 
         cc: undefined
@@ -151,9 +150,7 @@ describe("sendOnboardingSecondStepMails", () => {
           }
         ],
         params: {
-          title:
-            "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
-          body: "_"
+          body: ""
         },
 
         cc: undefined
@@ -207,9 +204,7 @@ describe("sendOnboardingSecondStepMails", () => {
           }
         ],
         params: {
-          title:
-            "Trackdéchets vous accompagne pour mettre en oeuvre la traçabilité dématérialisée",
-          body: "_"
+          body: ""
         },
 
         cc: undefined

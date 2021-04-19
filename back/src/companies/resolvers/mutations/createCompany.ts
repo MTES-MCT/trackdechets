@@ -9,7 +9,9 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { randomNumber } from "../../../utils";
 import geocode from "../../geocode";
 import * as COMPANY_TYPES from "../../../common/constants/COMPANY_TYPES";
-import { companyMails as mails } from "../../mails";
+import { renderMail } from "../../../mailer/templates/renderers";
+import { verificationProcessInfo } from "../../../mailer/templates";
+import templateIds from "../../../mailer/templates/provider/templateIds";
 
 /**
  * Create a new company and associate it to a user
@@ -150,10 +152,10 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     });
     if (isProfessional) {
       await sendMail(
-        mails.verificationProcessInfo(
-          [{ email: user.email, name: user.name }],
-          company
-        )
+        renderMail(verificationProcessInfo, {
+          to: [{ email: user.email, name: user.name }],
+          variables: { company }
+        })
       );
     }
   }
@@ -178,14 +180,13 @@ export async function warnIfUserCreatesTooManyCompanies(
       body: `L'utilisateur ${user.name} (${user.id}) vient de créer sa ${userCompaniesNumber}ème entreprise: ${company.name} - ${company.siret}. A surveiller !`,
       subject:
         "Alerte: Grand mombre de compagnies créées par un même utilisateur",
-      title:
-        "Alerte: Grand mombre de compagnies créées par un même utilisateur",
       to: [
         {
           email: "tech@trackdechets.beta.gouv.fr ",
           name: "Equipe Trackdéchets"
         }
-      ]
+      ],
+      templateId: templateIds.LAYOUT
     });
   }
 

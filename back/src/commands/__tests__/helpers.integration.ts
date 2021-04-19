@@ -59,8 +59,8 @@ describe("Select relevant email template function", () => {
         include: { companyAssociations: { include: { company: true } } }
       });
 
-      const emailFn = selectSecondOnboardingEmail(recipients[0]);
-      expect(emailFn("jim@example.test", "Jim").templateId).toEqual(
+      const mailTemplate = selectSecondOnboardingEmail(recipients[0]);
+      expect(mailTemplate.templateId).toEqual(
         PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID
       );
     }
@@ -86,8 +86,8 @@ describe("Select relevant email template function", () => {
       const recipients = await prisma.user.findMany({
         include: { companyAssociations: { include: { company: true } } }
       });
-      const emailFn = selectSecondOnboardingEmail(recipients[0]);
-      expect(emailFn("jim@example.test", "Jim").templateId).toEqual(
+      const mailTemplate = selectSecondOnboardingEmail(recipients[0]);
+      expect(mailTemplate.templateId).toEqual(
         PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
       );
     }
@@ -108,8 +108,9 @@ describe("Select relevant email template function", () => {
       const recipients = await prisma.user.findMany({
         include: { companyAssociations: { include: { company: true } } }
       });
-      const emailFn = selectSecondOnboardingEmail(recipients[0]);
-      expect(emailFn("jim@example.test", "Jim").templateId).toEqual(
+
+      const mailTemplate = selectSecondOnboardingEmail(recipients[0]);
+      expect(mailTemplate.templateId).toEqual(
         PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
       );
     }

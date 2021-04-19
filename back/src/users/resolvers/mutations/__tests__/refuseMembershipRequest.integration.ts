@@ -6,8 +6,9 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import * as mailsHelper from "../../../../mailer/mailing";
-import { userMails } from "../../../mails";
 import { AuthType } from "../../../../auth";
+import { renderMail } from "../../../../mailer/templates/renderers";
+import { membershipRequestRefused } from "../../../../mailer/templates";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -142,7 +143,10 @@ describe("mutation refuseMembershipRequest", () => {
       })) != null;
     expect(associationExists).toEqual(false);
     expect(sendMailSpy).toHaveBeenCalledWith(
-      userMails.membershipRequestRefused(requester, company)
+      renderMail(membershipRequestRefused, {
+        to: [{ email: requester.email, name: requester.name }],
+        variables: { companyName: company.name, companySiret: company.siret }
+      })
     );
   });
 });

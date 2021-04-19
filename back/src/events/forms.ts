@@ -13,9 +13,14 @@ import { getCompanyAdminUsers } from "../companies/database";
 import { searchCompany } from "../companies/sirene";
 import { anomalies, verifyPrestataire } from "../companies/verif";
 import { buildPdfBase64 } from "../forms/pdf/generator";
-import { userMails } from "../users/mails";
 import Dreals from "./dreals";
 import { TDEventPayload } from "./emitter";
+import { renderMail } from "../mailer/templates/renderers";
+import {
+  contentAwaitsGuest,
+  formNotAccepted,
+  formPartiallyRefused
+} from "../mailer/templates";
 
 export async function formsEventCallback(payload: TDEventPayload<Form>) {
   await Promise.all([
@@ -62,15 +67,12 @@ async function mailToInexistantRecipient(payload: TDEventPayload<Form>) {
     return;
   }
 
-  return sendMail(
-    userMails.contentAwaitsGuest(
-      recipientMail,
-      recipientName,
-      payload.node.recipientCompanyName,
-      payload.node.recipientCompanySiret,
-      payload.node.emitterCompanyName
-    )
-  );
+  const mail = renderMail(contentAwaitsGuest, {
+    to: [{ email: recipientMail, name: recipientName }],
+    variables: { company: { siret: recipientSiret, name: recipientName } }
+  });
+
+  return sendMail(mail);
 }
 
 async function mailToInexistantEmitter(payload: TDEventPayload<Form>) {
@@ -96,15 +98,12 @@ async function mailToInexistantEmitter(payload: TDEventPayload<Form>) {
     return;
   }
 
-  return sendMail(
-    userMails.contentAwaitsGuest(
-      emitterMail,
-      emitterName,
-      payload.node.emitterCompanyName,
-      payload.node.emitterCompanySiret,
-      payload.node.recipientCompanyName
-    )
-  );
+  const mail = renderMail(contentAwaitsGuest, {
+    to: [{ email: emitterMail, name: emitterName }],
+    variables: { company: { siret: emitterSiret, name: emitterName } }
+  });
+
+  return sendMail(mail);
 }
 
 /**
@@ -176,13 +175,17 @@ export async function mailWhenFormIsDeclined(payload: TDEventPayload<Form>) {
   ].map(admin => ({ email: admin.email, name: admin.name }));
 
   // Get formNotAccepted or formPartiallyRefused mail function according to wasteAcceptationStatus value
-  const mailFunction = {
-    REFUSED: userMails.formNotAccepted,
-    PARTIALLY_REFUSED: userMails.formPartiallyRefused
+  const mailTemplate = {
+    REFUSED: formNotAccepted,
+    PARTIALLY_REFUSED: formPartiallyRefused
   }[payload.node.wasteAcceptationStatus];
 
-  const mail = mailFunction(recipients, ccs, form, attachmentData);
-
+  const mail = renderMail(mailTemplate, {
+    to: recipients,
+    cc: ccs,
+    variables: { form },
+    attachment: attachmentData
+  });
   return sendMail(mail);
 }
 

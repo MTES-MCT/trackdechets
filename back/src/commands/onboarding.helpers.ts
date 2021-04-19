@@ -1,8 +1,13 @@
 import prisma from "../prisma";
 import { sendMail } from "../mailer/mailing";
-import { userMails } from "../users/mails";
 import { Company, CompanyAssociation, User } from "@prisma/client";
 import * as COMPANY_TYPES from "../common/constants/COMPANY_TYPES";
+import {
+  onboardingFirstStep,
+  onboardingProducerSecondStep,
+  onboardingProfessionalSecondStep
+} from "../mailer/templates";
+import { renderMail } from "../mailer/templates/renderers";
 /**
  * Compute a past date relative to now
  *
@@ -50,10 +55,9 @@ export const sendOnboardingFirstStepMails = async () => {
   const recipients = await getRecentlyAssociatedUsers({ daysAgo: 1 });
   await Promise.all(
     recipients.map(recipient => {
-      const payload = userMails.onboardingFirstStep(
-        recipient.email,
-        recipient.name
-      );
+      const payload = renderMail(onboardingFirstStep, {
+        to: [{ name: recipient.name, email: recipient.email }]
+      });
       return sendMail(payload);
     })
   );
@@ -79,10 +83,10 @@ export const selectSecondOnboardingEmail = (recipient: recipientType) => {
   );
 
   if ([...companyTypes].some(ct => COMPANY_TYPES.PROFESSIONALS.includes(ct))) {
-    return userMails.onboardingProfessionalSecondStep;
+    return onboardingProfessionalSecondStep;
   }
 
-  return userMails.onboardingProducerSecondStep;
+  return onboardingProducerSecondStep;
 };
 
 /**
@@ -99,11 +103,10 @@ export const sendOnboardingSecondStepMails = async () => {
   });
   await Promise.all(
     recipients.map(recipient => {
-      const payload = selectSecondOnboardingEmail(recipient)(
-        recipient.email,
-        recipient.name
-      );
-
+      const mailTemplate = selectSecondOnboardingEmail(recipient);
+      const payload = renderMail(mailTemplate, {
+        to: [{ email: recipient.email, name: recipient.name }]
+      });
       return sendMail(payload);
     })
   );

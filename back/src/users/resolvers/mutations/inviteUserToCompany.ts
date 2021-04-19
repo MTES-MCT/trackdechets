@@ -14,8 +14,12 @@ import {
 } from "../../../generated/graphql/types";
 import { sanitizeEmail } from "../../../utils";
 import { associateUserToCompany, createUserAccountHash } from "../../database";
-import { userMails } from "../../mails";
 import { checkIsCompanyAdmin } from "../../permissions";
+import {
+  inviteUserToJoin,
+  notifyUserOfInvite
+} from "../../../mailer/templates";
+import { renderMail } from "../../../mailer/templates/renderers";
 
 export async function inviteUserToCompanyFn(
   adminUser: User,
@@ -33,14 +37,11 @@ export async function inviteUserToCompanyFn(
 
     await associateUserToCompany(existingUser.id, siret, role);
 
-    await sendMail(
-      userMails.notifyUserOfInvite(
-        email,
-        existingUser.name,
-        adminUser.name,
-        company.name
-      )
-    );
+    const mail = renderMail(notifyUserOfInvite, {
+      to: [{ email, name: existingUser.name }],
+      variables: { companyName: company.name }
+    });
+    await sendMail(mail);
   } else {
     // No user matches this email. Create a temporary association
     // and send a link inviting him to create an account. As soon
@@ -48,14 +49,11 @@ export async function inviteUserToCompanyFn(
 
     const userAccountHash = await createUserAccountHash(email, role, siret);
 
-    await sendMail(
-      userMails.inviteUserToJoin(
-        email,
-        adminUser.name,
-        company.name,
-        userAccountHash.hash
-      )
-    );
+    const mail = renderMail(inviteUserToJoin, {
+      to: [{ email, name: email }],
+      variables: { hash: userAccountHash.hash, companyName: company.name }
+    });
+    await sendMail(mail);
   }
 
   return convertUrls(company);

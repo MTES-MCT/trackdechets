@@ -13,6 +13,7 @@ import {
   acceptNewUserCompanyInvitations
 } from "../database";
 import { companyFactory } from "../../__tests__/factories";
+import templateIds from "../../mailer/templates/provider/templateIds";
 
 function printHelp() {
   console.log(`
@@ -220,7 +221,8 @@ export async function bulkCreate(opts: Opts): Promise<void> {
           email: ${email}
           <br/>
           mot de passe provisoire: ${newUser.password}
-        `
+        `,
+        templateId: templateIds.LAYOUT
       };
 
       try {
