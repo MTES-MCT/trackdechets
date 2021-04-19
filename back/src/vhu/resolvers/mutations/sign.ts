@@ -45,13 +45,15 @@ export default async function sign(
 
   // Check that all necessary fields are filled
   await validateBsvhuForm(prismaForm, {
-    emitterSignature:
-      prismaForm.emitterSignatureDate != null || input.type === "EMITTER",
-    transporterSignature:
-      prismaForm.transporterSignatureDate != null ||
+    emissionSignature:
+      prismaForm.emitterEmissionSignatureDate != null ||
+      input.type === "EMITTER",
+    transportSignature:
+      prismaForm.transporterTransportSignatureDate != null ||
       input.type === "TRANSPORTER",
-    recipientSignature:
-      prismaForm.recipientSignatureDate != null || input.type === "RECIPIENT"
+    operationSignature:
+      prismaForm.destinationOperationSignatureDate != null ||
+      input.type === "RECIPIENT"
   });
 
   const { value: newStatus } = machine.transition(prismaForm.status, {
@@ -74,18 +76,18 @@ export default async function sign(
 
 const signatureTypeMapping: Record<SignatureTypeInput, SignatureTypeInfos> = {
   EMITTER: {
-    dbDateKey: "emitterSignatureDate",
-    dbAuthorKey: "emitterSignatureAuthor",
+    dbDateKey: "emitterEmissionSignatureDate",
+    dbAuthorKey: "emitterEmissionSignatureAuthor",
     getAuthorizedSiret: form => form.emitterCompanySiret
   },
   RECIPIENT: {
-    dbDateKey: "recipientSignatureDate",
-    dbAuthorKey: "recipientSignatureAuthor",
-    getAuthorizedSiret: form => form.recipientCompanySiret
+    dbDateKey: "destinationOperationSignatureDate",
+    dbAuthorKey: "destinationOperationSignatureAuthor",
+    getAuthorizedSiret: form => form.destinationCompanySiret
   },
   TRANSPORTER: {
-    dbDateKey: "transporterSignatureDate",
-    dbAuthorKey: "transporterSignatureAuthor",
+    dbDateKey: "transporterTransportSignatureDate",
+    dbAuthorKey: "transporterTransportSignatureAuthor",
     getAuthorizedSiret: form => form.transporterCompanySiret
   }
 };

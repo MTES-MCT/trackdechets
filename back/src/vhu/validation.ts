@@ -17,6 +17,7 @@ import {
 } from "../forms/validation";
 import * as yup from "yup";
 import { FactorySchemaOf } from "../common/yup/configureYup";
+import { BsvhuDestinationType } from "../generated/graphql/types";
 
 type Emitter = Pick<
   BsvhuForm,
@@ -29,20 +30,22 @@ type Emitter = Pick<
   | "emitterCompanyMail"
 >;
 
-type Recipient = Pick<
+type Destination = Pick<
   BsvhuForm,
-  | "recipientOperationPlanned"
-  | "recipientAgrementNumber"
-  | "recipientCompanyName"
-  | "recipientCompanySiret"
-  | "recipientCompanyAddress"
-  | "recipientCompanyContact"
-  | "recipientCompanyPhone"
-  | "recipientCompanyMail"
-  | "recipientAcceptanceQuantity"
-  | "recipientAcceptanceStatus"
-  | "recipientAcceptanceRefusalReason"
-  | "recipientOperationDone"
+  | "destinationType"
+  | "destinationAgrementNumber"
+  | "destinationCompanyName"
+  | "destinationCompanySiret"
+  | "destinationCompanyAddress"
+  | "destinationCompanyContact"
+  | "destinationCompanyPhone"
+  | "destinationCompanyMail"
+  | "destinationPlannedOperationCode"
+  | "destinationReceptionQuantityNumber"
+  | "destinationReceptionQuantityTons"
+  | "destinationReceptionAcceptationStatus"
+  | "destinationReceptionRefusalReason"
+  | "destinationOperationCode"
 >;
 
 type Transporter = Pick<
@@ -67,9 +70,9 @@ type Quantity = Pick<BsvhuForm, "quantityNumber" | "quantityTons">;
 type Packaging = Pick<BsvhuForm, "packaging">;
 
 interface VhuValidationContext {
-  emitterSignature?: boolean;
-  transporterSignature?: boolean;
-  recipientSignature?: boolean;
+  emissionSignature?: boolean;
+  transportSignature?: boolean;
+  operationSignature?: boolean;
 }
 
 export function validateBsvhuForm(
@@ -77,7 +80,7 @@ export function validateBsvhuForm(
   context: VhuValidationContext
 ) {
   return emitterSchema(context)
-    .concat(recipientSchema(context))
+    .concat(destinationSchema(context))
     .concat(transporterSchema(context))
     .concat(packagingSchema(context))
     .concat(identificationSchema(context))
@@ -90,122 +93,129 @@ const emitterSchema: FactorySchemaOf<VhuValidationContext, Emitter> = context =>
     emitterCompanyName: yup
       .string()
       .requiredIf(
-        context.emitterSignature,
+        context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_NAME}`
       ),
     emitterCompanySiret: yup
       .string()
       .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
       .requiredIf(
-        context.emitterSignature,
+        context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_SIRET}`
       ),
     emitterCompanyAddress: yup
       .string()
       .requiredIf(
-        context.emitterSignature,
+        context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_ADDRESS}`
       ),
     emitterCompanyContact: yup
       .string()
       .requiredIf(
-        context.emitterSignature,
+        context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_CONTACT}`
       ),
     emitterCompanyPhone: yup
       .string()
       .requiredIf(
-        context.emitterSignature,
+        context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_PHONE}`
       ),
     emitterCompanyMail: yup
       .string()
       .email()
       .requiredIf(
-        context.emitterSignature,
+        context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_EMAIL}`
       ),
     emitterAgrementNumber: yup
       .string()
       .requiredIf(
-        context.emitterSignature,
+        context.emissionSignature,
         `Émetteur: le numéro d'agréément est obligatoire`
       )
   });
 
-const recipientSchema: FactorySchemaOf<
+const destinationSchema: FactorySchemaOf<
   VhuValidationContext,
-  Recipient
+  Destination
 > = context =>
   yup.object({
-    recipientAcceptanceQuantity: yup
+    destinationType: yup
+      .mixed<BsvhuDestinationType>()
+      .requiredIf(
+        context.emissionSignature,
+        `Destinataire: le type de destination est obligatoire`
+      ),
+    destinationReceptionQuantityNumber: yup
       .number()
       .requiredIf(
-        context.recipientSignature,
+        context.operationSignature,
         `Destinataire: la quantité reçue est obligatoire`
       ),
-    recipientAcceptanceRefusalReason: yup.string().nullable(),
-    recipientAgrementNumber: yup
+    destinationReceptionQuantityTons: yup.number().nullable(),
+    destinationReceptionRefusalReason: yup.string().nullable(),
+    destinationAgrementNumber: yup
       .string()
       .requiredIf(
-        context.recipientSignature,
+        context.operationSignature,
         `Destinataire: le numéro d'agréément est obligatoire`
       ),
-    recipientAcceptanceStatus: yup
+    destinationReceptionAcceptationStatus: yup
       .mixed<WasteAcceptationStatus>()
       .requiredIf(
-        context.recipientSignature,
+        context.operationSignature,
         `Destinataire: le statut d'acceptation est obligatoire`
       ),
-    recipientOperationDone: yup
+    destinationOperationCode: yup
       .string()
       .oneOf([...PROCESSING_OPERATIONS_CODES, null, ""])
       .requiredIf(
-        context.recipientSignature,
+        context.operationSignature,
         `Destinataire: l'opération réalisée est obligatoire`
       ),
-    recipientOperationPlanned: yup
+    destinationPlannedOperationCode: yup
       .string()
       .oneOf([...PROCESSING_OPERATIONS_CODES, null, ""])
       .requiredIf(
-        context.emitterSignature,
+        context.emissionSignature,
         `Destinataire: l'opération prévue est obligatoire`
       ),
-    recipientCompanyName: yup
+    destinationCompanyName: yup
       .string()
       .requiredIf(
-        context.emitterSignature,
+        context.emissionSignature,
         `Destinataire: ${MISSING_COMPANY_NAME}`
       ),
-    recipientCompanySiret: yup
+    destinationCompanySiret: yup
       .string()
       .length(14, `Destination: ${INVALID_SIRET_LENGTH}`)
       .requiredIf(
-        context.emitterSignature,
+        context.emissionSignature,
         `Destinataire: ${MISSING_COMPANY_SIRET}`
       ),
-    recipientCompanyAddress: yup.string().when("$emitterSignature", {
+    destinationCompanyAddress: yup.string().when("$emitterSignature", {
       is: true,
       then: s => s.required(`Destination: ${MISSING_COMPANY_ADDRESS}`),
       otherwise: s => s.nullable()
     }),
-    recipientCompanyContact: yup
+    destinationCompanyContact: yup
       .string()
       .requiredIf(
-        context.emitterSignature,
+        context.emissionSignature,
         `Destinataire: ${MISSING_COMPANY_CONTACT}`
       ),
-    recipientCompanyPhone: yup
+    destinationCompanyPhone: yup
       .string()
       .requiredIf(
-        context.emitterSignature,
+        context.emissionSignature,
         `Destinataire: ${MISSING_COMPANY_PHONE}`
       ),
-    recipientCompanyMail: yup
+    destinationCompanyMail: yup
       .string()
       .email()
       .requiredIf(
-        context.emitterSignature,
+        context.emissionSignature,
         `Destinataire: ${MISSING_COMPANY_EMAIL}`
       )
   });
@@ -220,7 +230,7 @@ const transporterSchema: FactorySchemaOf<
       .when("transporterTvaIntracommunautaire", (tva, schema) => {
         if (tva == null) {
           return schema.requiredIf(
-            context.transporterSignature,
+            context.transportSignature,
             `Transporteur: le département associé au récépissé est obligatoire`
           );
         }
@@ -231,7 +241,7 @@ const transporterSchema: FactorySchemaOf<
       .when("transporterTvaIntracommunautaire", (tva, schema) => {
         if (tva == null) {
           return schema.requiredIf(
-            context.transporterSignature,
+            context.transportSignature,
             `Transporteur: le numéro de récépissé est obligatoire`
           );
         }
@@ -240,13 +250,13 @@ const transporterSchema: FactorySchemaOf<
     transporterRecepisseValidityLimit: yup
       .date()
       .requiredIf(
-        context.transporterSignature,
+        context.transportSignature,
         `Transporteur: ${MISSING_COMPANY_NAME}`
       ) as any,
     transporterCompanyName: yup
       .string()
       .requiredIf(
-        context.transporterSignature,
+        context.transportSignature,
         `Transporteur: ${MISSING_COMPANY_NAME}`
       ),
     transporterCompanySiret: yup
@@ -255,7 +265,7 @@ const transporterSchema: FactorySchemaOf<
       .when("transporterTvaIntracommunautaire", (tva, schema) => {
         if (tva == null) {
           return schema.requiredIf(
-            context.transporterSignature,
+            context.transportSignature,
             `Transporteur: le numéro SIRET est obligatoire pour une entreprise française`
           );
         }
@@ -264,26 +274,26 @@ const transporterSchema: FactorySchemaOf<
     transporterCompanyAddress: yup
       .string()
       .requiredIf(
-        context.transporterSignature,
+        context.transportSignature,
         `Transporteur: ${MISSING_COMPANY_ADDRESS}`
       ),
     transporterCompanyContact: yup
       .string()
       .requiredIf(
-        context.transporterSignature,
+        context.transportSignature,
         `Transporteur: ${MISSING_COMPANY_CONTACT}`
       ),
     transporterCompanyPhone: yup
       .string()
       .requiredIf(
-        context.transporterSignature,
+        context.transportSignature,
         `Transporteur: ${MISSING_COMPANY_PHONE}`
       ),
     transporterCompanyMail: yup
       .string()
       .email()
       .requiredIf(
-        context.transporterSignature,
+        context.transportSignature,
         `Transporteur: ${MISSING_COMPANY_EMAIL}`
       )
   });
@@ -297,7 +307,7 @@ const identificationSchema: FactorySchemaOf<
     identificationType: yup
       .mixed<BsvhuIdentificationType>()
       .requiredIf(
-        context.emitterSignature,
+        context.emissionSignature,
         `Déchet: le type d'indentification est obligatoire`
       )
   });
@@ -310,7 +320,7 @@ const quantitySchema: FactorySchemaOf<
     quantityNumber: yup
       .number()
       .requiredIf(
-        context.emitterSignature,
+        context.emissionSignature,
         `Déchet: la quantité est obligatoire`
       ),
     quantityTons: yup.number().nullable()
@@ -324,7 +334,7 @@ const packagingSchema: FactorySchemaOf<
     packaging: yup
       .mixed<BsvhuPackaging>()
       .requiredIf(
-        context.emitterSignature,
+        context.emissionSignature,
         `Déchet: le type d'empaquetage' est obligatoire`
       )
   });

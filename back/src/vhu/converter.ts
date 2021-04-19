@@ -8,10 +8,13 @@ import {
   BsvhuIdentification,
   BsvhuQuantity,
   BsvhuRecepisse,
-  BsvhuRecipient,
-  BsvhuRecipientAcceptance,
-  BsvhuRecipientOperation,
-  BsvhuTransporter
+  BsvhuTransporter,
+  BsvhuEmission,
+  BsvhuDestination,
+  BsvhuReception,
+  BsvhuOperation,
+  BsvhuNextDestination,
+  BsvhuTransport
 } from "../generated/graphql/types";
 import {
   Prisma,
@@ -24,7 +27,6 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
     id: form.id,
     createdAt: form.createdAt,
     updatedAt: form.updatedAt,
-    isDeleted: form.isDeleted,
     isDraft: form.isDraft,
     status: form.status,
     emitter: nullIfNoValues<BsvhuEmitter>({
@@ -37,9 +39,11 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         phone: form.emitterCompanyPhone,
         mail: form.emitterCompanyMail
       }),
-      signature: nullIfNoValues<Signature>({
-        author: form.emitterSignatureAuthor,
-        date: form.emitterSignatureDate
+      emission: nullIfNoValues<BsvhuEmission>({
+        signature: nullIfNoValues<Signature>({
+          author: form.emitterEmissionSignatureAuthor,
+          date: form.emitterEmissionSignatureDate
+        })
       })
     }),
     packaging: form.packaging,
@@ -52,61 +56,72 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
       number: form.quantityNumber,
       tons: form.quantityTons
     }),
-    recipient: nullIfNoValues<BsvhuRecipient>({
-      type: form.recipientType,
-      agrementNumber: form.recipientAgrementNumber,
+    destination: nullIfNoValues<BsvhuDestination>({
+      type: form.destinationType,
+      agrementNumber: form.destinationAgrementNumber,
       company: nullIfNoValues<FormCompany>({
-        name: form.recipientCompanyName,
-        siret: form.recipientCompanySiret,
-        address: form.recipientCompanyAddress,
-        contact: form.recipientCompanyContact,
-        phone: form.recipientCompanyPhone,
-        mail: form.recipientCompanyMail
+        name: form.destinationCompanyName,
+        siret: form.destinationCompanySiret,
+        address: form.destinationCompanyAddress,
+        contact: form.destinationCompanyContact,
+        phone: form.destinationCompanyPhone,
+        mail: form.destinationCompanyMail
       }),
-      acceptance: nullIfNoValues<BsvhuRecipientAcceptance>({
-        quantity: form.recipientAcceptanceQuantity,
-        status: form.recipientAcceptanceStatus,
-        refusalReason: form.recipientAcceptanceRefusalReason,
+      plannedOperationCode: form.destinationPlannedOperationCode,
+      reception: nullIfNoValues<BsvhuReception>({
+        acceptationStatus: form.destinationReceptionAcceptationStatus,
+        date: form.destinationReceptionDate,
         identification: nullIfNoValues<BsvhuIdentification>({
-          numbers: form.recipientAcceptanceIdentificationNumbers,
-          type: form.recipientAcceptanceIdentificationType
+          numbers: form.destinationReceptionIdentificationNumbers,
+          type: form.destinationReceptionIdentificationType
+        }),
+        quantity: nullIfNoValues<BsvhuQuantity>({
+          number: form.destinationReceptionQuantityNumber,
+          tons: form.destinationReceptionQuantityTons
+        }),
+        refusalReason: form.destinationReceptionRefusalReason
+      }),
+      operation: nullIfNoValues<BsvhuOperation>({
+        code: form.destinationOperationCode,
+        date: form.destinationOperationDate,
+        nextDestination: nullIfNoValues<BsvhuNextDestination>({
+          company: nullIfNoValues<FormCompany>({
+            name: form.destinationOperationNextDestinationCompanyName,
+            siret: form.destinationOperationNextDestinationCompanySiret,
+            address: form.destinationOperationNextDestinationCompanyAddress,
+            contact: form.destinationOperationNextDestinationCompanyContact,
+            phone: form.destinationOperationNextDestinationCompanyPhone,
+            mail: form.destinationOperationNextDestinationCompanyMail
+          })
+        }),
+
+        signature: nullIfNoValues<Signature>({
+          author: form.destinationOperationSignatureAuthor,
+          date: form.destinationOperationSignatureDate
         })
-      }),
-      operation: nullIfNoValues<BsvhuRecipientOperation>({
-        planned: form.recipientOperationPlanned,
-        done: form.recipientOperationDone
-      }),
-      plannedBroyeurCompany: nullIfNoValues<FormCompany>({
-        name: form.recipientPlannedBroyeurCompanyName,
-        siret: form.recipientPlannedBroyeurCompanySiret,
-        address: form.recipientPlannedBroyeurCompanyAddress,
-        contact: form.recipientPlannedBroyeurCompanyContact,
-        phone: form.recipientPlannedBroyeurCompanyPhone,
-        mail: form.recipientPlannedBroyeurCompanyMail
-      }),
-      signature: nullIfNoValues<Signature>({
-        author: form.recipientSignatureAuthor,
-        date: form.recipientSignatureDate
       })
     }),
     transporter: nullIfNoValues<BsvhuTransporter>({
-      tvaIntracommunautaire: form.transporterTvaIntracommunautaire,
       company: nullIfNoValues<FormCompany>({
         name: form.transporterCompanyName,
         siret: form.transporterCompanySiret,
         address: form.transporterCompanyAddress,
         contact: form.transporterCompanyContact,
         phone: form.transporterCompanyPhone,
-        mail: form.transporterCompanyMail
+        mail: form.transporterCompanyMail,
+        vatNumber: form.transporterCompanyVatNumber
       }),
       recepisse: nullIfNoValues<BsvhuRecepisse>({
         number: form.transporterRecepisseNumber,
         department: form.transporterRecepisseDepartment,
         validityLimit: form.transporterRecepisseValidityLimit
       }),
-      signature: nullIfNoValues<Signature>({
-        author: form.transporterSignatureAuthor,
-        date: form.transporterSignatureDate
+      transport: nullIfNoValues<BsvhuTransport>({
+        signature: nullIfNoValues<Signature>({
+          author: form.transporterTransportSignatureAuthor,
+          date: form.transporterTransportSignatureDate
+        }),
+        takenOverAt: form.transporterTransportTakenOverAt
       })
     }),
     metadata: null
@@ -118,7 +133,7 @@ export function flattenVhuInput(
 ): Partial<Prisma.BsvhuFormCreateInput> {
   return safeInput({
     ...flattenVhuEmitterInput(formInput),
-    ...flattenVhuRecipientInput(formInput),
+    ...flattenVhuDestinationInput(formInput),
     ...flattenVhuTransporterInput(formInput),
     packaging: chain(formInput, f => f.packaging),
     wasteCode: chain(formInput, f => f.wasteCode),
@@ -127,7 +142,7 @@ export function flattenVhuInput(
   });
 }
 
-function flattenVhuEmitterInput({ emitter }: Pick<GraphqlVhuForm, "emitter">) {
+function flattenVhuEmitterInput({ emitter }: Pick<BsvhuInput, "emitter">) {
   return {
     emitterAgrementNumber: chain(emitter, e => e.agrementNumber),
     emitterCompanyName: chain(emitter, e => chain(e.company, c => c.name)),
@@ -143,65 +158,82 @@ function flattenVhuEmitterInput({ emitter }: Pick<GraphqlVhuForm, "emitter">) {
   };
 }
 
-function flattenVhuRecipientInput({
-  recipient
-}: Pick<GraphqlVhuForm, "recipient">) {
+function flattenVhuDestinationInput({
+  destination
+}: Pick<BsvhuInput, "destination">) {
   return {
-    recipientType: chain(recipient, r => r.type),
-    recipientAgrementNumber: chain(recipient, r => r.agrementNumber),
-    recipientCompanyName: chain(recipient, r => chain(r.company, c => c.name)),
-    recipientCompanySiret: chain(recipient, r =>
+    destinationType: chain(destination, r => r.type),
+    destinationAgrementNumber: chain(destination, r => r.agrementNumber),
+    destinationCompanyName: chain(destination, r =>
+      chain(r.company, c => c.name)
+    ),
+    destinationCompanySiret: chain(destination, r =>
       chain(r.company, c => c.siret)
     ),
-    recipientCompanyAddress: chain(recipient, r =>
+    destinationCompanyAddress: chain(destination, r =>
       chain(r.company, c => c.address)
     ),
-    recipientCompanyContact: chain(recipient, r =>
+    destinationCompanyContact: chain(destination, r =>
       chain(r.company, c => c.contact)
     ),
-    recipientCompanyPhone: chain(recipient, r =>
+    destinationCompanyPhone: chain(destination, r =>
       chain(r.company, c => c.phone)
     ),
-    recipientCompanyMail: chain(recipient, r => chain(r.company, c => c.mail)),
-    recipientAcceptanceQuantity: chain(recipient, r =>
-      chain(r.acceptance, o => o.quantity)
+    destinationCompanyMail: chain(destination, r =>
+      chain(r.company, c => c.mail)
     ),
-    recipientAcceptanceStatus: chain(recipient, r =>
-      chain(r.acceptance, o => o.status)
+    destinationPlannedOperationCode: chain(
+      destination,
+      r => r.plannedOperationCode
+    ),
+    destinationReceptionQuantity: chain(destination, r =>
+      chain(r.reception, o => o.quantity)
+    ),
+    destinationReceptionAcceptationStatus: chain(destination, r =>
+      chain(r.reception, o => o.acceptationStatus)
     ) as WasteAcceptationStatus,
-    recipientAcceptanceRefusalReason: chain(recipient, r =>
-      chain(r.acceptance, o => o.refusalReason)
+    destinationReceptionRefusalReason: chain(destination, r =>
+      chain(r.reception, o => o.refusalReason)
     ),
-    recipientOperationPlanned: chain(recipient, r =>
-      chain(r.operation, o => o.planned)
+    destinationOperationCode: chain(destination, r =>
+      chain(r.operation, o => o.code)
     ),
-    recipientOperationDone: chain(recipient, r =>
-      chain(r.operation, o => o.done)
+    destinationOperationNextDestinationCompanyName: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.name))
+      )
     ),
-    recipientPlannedBroyeurCompanyName: chain(recipient, r =>
-      chain(r.plannedBroyeurCompany, c => c.name)
+    destinationOperationNextDestinationCompanySiret: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.siret))
+      )
     ),
-    recipientPlannedBroyeurCompanySiret: chain(recipient, r =>
-      chain(r.plannedBroyeurCompany, c => c.siret)
+    destinationOperationNextDestinationCompanyAddress: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.address))
+      )
     ),
-    recipientPlannedBroyeurCompanyAddress: chain(recipient, r =>
-      chain(r.plannedBroyeurCompany, c => c.address)
+    destinationOperationNextDestinationCompanyContact: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.contact))
+      )
     ),
-    recipientPlannedBroyeurCompanyContact: chain(recipient, r =>
-      chain(r.plannedBroyeurCompany, c => c.contact)
+    destinationOperationNextDestinationCompanyPhone: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.phone))
+      )
     ),
-    recipientPlannedBroyeurCompanyPhone: chain(recipient, r =>
-      chain(r.plannedBroyeurCompany, c => c.phone)
-    ),
-    recipientPlannedBroyeurCompanyMail: chain(recipient, r =>
-      chain(r.plannedBroyeurCompany, c => c.mail)
+    destinationOperationNextDestinationCompanyMail: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.mail))
+      )
     )
   };
 }
 
 function flattenVhuTransporterInput({
   transporter
-}: Pick<GraphqlVhuForm, "transporter">) {
+}: Pick<BsvhuInput, "transporter">) {
   return {
     transporterCompanyName: chain(transporter, t =>
       chain(t.company, c => c.name)
@@ -221,6 +253,9 @@ function flattenVhuTransporterInput({
     transporterCompanyMail: chain(transporter, t =>
       chain(t.company, c => c.mail)
     ),
+    transporterCompanyVatNumber: chain(transporter, t =>
+      chain(t.company, c => c.vatNumber)
+    ),
     transporterRecepisseNumber: chain(transporter, t =>
       chain(t.recepisse, r => r.number)
     ),
@@ -229,26 +264,20 @@ function flattenVhuTransporterInput({
     ),
     transporterRecepisseValidityLimit: chain(transporter, t =>
       chain(t.recepisse, r => r.validityLimit)
-    ),
-    transporterTvaIntracommunautaire: chain(
-      transporter,
-      t => t.tvaIntracommunautaire
     )
   };
 }
 
 function flattenVhuIdentificationInput({
   identification
-}: Pick<GraphqlVhuForm, "identification">) {
+}: Pick<BsvhuInput, "identification">) {
   return {
     identificationNumbers: chain(identification, i => i.numbers),
     identificationType: chain(identification, i => i.type)
   };
 }
 
-function flattenVhuQuantityInput({
-  quantity
-}: Pick<GraphqlVhuForm, "quantity">) {
+function flattenVhuQuantityInput({ quantity }: Pick<BsvhuInput, "quantity">) {
   return {
     quantityNumber: chain(quantity, q => q.number),
     quantityTons: chain(quantity, q => q.tons)

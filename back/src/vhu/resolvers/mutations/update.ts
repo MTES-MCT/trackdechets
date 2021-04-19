@@ -38,9 +38,9 @@ export default async function edit(
   );
 
   await validateBsvhuForm(resultingForm, {
-    emitterSignature: prismaForm.emitterSignatureAuthor != null,
-    recipientSignature: prismaForm.recipientSignatureAuthor != null,
-    transporterSignature: prismaForm.transporterSignatureAuthor != null
+    emissionSignature: prismaForm.emitterEmissionSignatureAuthor != null,
+    operationSignature: prismaForm.destinationOperationSignatureAuthor != null,
+    transportSignature: prismaForm.transporterTransportSignatureAuthor != null
   });
 
   const updatedForm = await prisma.bsvhuForm.update({

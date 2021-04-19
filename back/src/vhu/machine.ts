@@ -2,12 +2,6 @@ import { BsvhuForm, BsvhuStatus } from "@prisma/client";
 import { Machine } from "xstate";
 import { SignatureTypeInput } from "../generated/graphql/types";
 
-export enum EventType {
-  ProducerSignature,
-  TransporterSignature,
-  RecipientSignature
-}
-
 type Event = {
   type: SignatureTypeInput;
   bsvhu: BsvhuForm;
@@ -52,7 +46,7 @@ export const machine = Machine<never, Event>(
   {
     guards: {
       isBsvhuRefused: (_, event) =>
-        event.bsvhu?.recipientAcceptanceStatus === "REFUSED"
+        event.bsvhu?.destinationReceptionAcceptationStatus === "REFUSED"
     }
   }
 );

@@ -43,7 +43,7 @@ type Query {
     last: Int
 
     "SIRET d'un établissement dont je suis membre"
-    siret: String
+    siret: String!
 
     where: BsvhuWhere
   ): BsvhuConnection!
@@ -127,7 +127,7 @@ input BsvhuWhere {
   updatedAt: DateFilter
   emitter: BsvhuEmitterWhere
   transporter: BsvhuTransporterWhere
-  recipient: BsvhuRecipientWhere
+  destination: BsvhuDestinationWhere
   _and: [BsvhuWhere!]
   _or: [BsvhuWhere!]
   _not: [BsvhuWhere!]
@@ -151,7 +151,7 @@ input BsvhuTransporterWhere {
   signature: BsvhuSignatureWhere
 }
 
-input BsvhuRecipientWhere {
+input BsvhuDestinationWhere {
   company: BsvhuCompanyWhere
   signature: BsvhuSignatureWhere
 }
@@ -177,16 +177,16 @@ type BsvhuError {
 type Bsvhu {
   "Numéro unique attribué par Trackdéchets"
   id: String!
+  "Date de création"
   createdAt: DateTime!
+  "Date de dernière modification"
   updatedAt: DateTime!
-  "Indique si le bordereau a été supprimé"
-  isDeleted: Boolean!
   "Indique si le bordereau est à l'état de brouillon"
   isDraft: Boolean!
   "Status du bordereau"
   status: BsvhuStatus!
 
-  "Informations sur l'émetteur"
+  "Émetteur du bordereau"
   emitter: BsvhuEmitter
 
   "Code déchet. Presque toujours 16 01 06"
@@ -198,9 +198,9 @@ type Bsvhu {
   "Quantité de VHUs"
   quantity: BsvhuQuantity
 
-  "Détails sur la destination"
-  recipient: BsvhuRecipient
-  "Détails sur le transporteur"
+  "Destinataire du bordereau"
+  destination: BsvhuDestination
+  "Transporteur"
   transporter: BsvhuTransporter
 
   metadata: BsvhuMetadata!
@@ -211,6 +211,11 @@ type BsvhuEmitter {
   agrementNumber: String
   "Coordonnées de l'entreprise émétrice"
   company: FormCompany
+  "Déclaration générale de l'émetteur du bordereau"
+  emission: BsvhuEmission
+}
+
+type BsvhuEmission {
   signature: Signature
 }
 
@@ -232,7 +237,7 @@ enum BsvhuIdentificationType {
   NUMERO_ORDRE_LOTS_SORTANTS
 }
 
-enum BsvhuRecipientType {
+enum BsvhuDestinationType {
   BROYEUR
   DEMOLISSEUR
 }
@@ -240,12 +245,15 @@ enum BsvhuRecipientType {
 type BsvhuTransporter {
   "Coordonnées de l'entreprise de transport"
   company: FormCompany
-  "Numéro de TVA intracommunautaire, dans le cas d'un transporteur étranger"
-  tvaIntracommunautaire: String
-
   "Récépissé transporteur"
   recepisse: BsvhuRecepisse
+  "Informations liés au transport"
+  transport: BsvhuTransport
+}
 
+type BsvhuTransport {
+  "Date de prise en charge"
+  takenOverAt: DateTime
   signature: Signature
 }
 
@@ -255,41 +263,47 @@ type BsvhuRecepisse {
   validityLimit: DateTime
 }
 
-type BsvhuRecipient {
+type BsvhuDestination {
   "Type de receveur: broyeur ou second centre VHU"
-  type: BsvhuRecipientType
+  type: BsvhuDestinationType
   "Numéro d'agrément de receveur"
   agrementNumber: String
   "Coordonnées de l'entreprise qui recoit les déchets"
   company: FormCompany
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  plannedOperationCode: String
 
-  "Informations d'acceptation"
-  acceptance: BsvhuRecipientAcceptance
+  "Informations de réception"
+  reception: BsvhuReception
   "Informations sur l'opétation de traitement"
-  operation: BsvhuRecipientOperation
-
-  "Coordonnées de l'entreprise de broyage prévue. Utilisé uniquement lorsque le receveur est lui même un centre VHU."
-  plannedBroyeurCompany: FormCompany
-
-  signature: Signature
+  operation: BsvhuOperation
 }
 
-type BsvhuRecipientAcceptance {
+type BsvhuReception {
+  "Date de présentation sur site"
+  date: DateTime
   "Quantité réelle reçue"
-  quantity: Float
-  "Etat d'acceptation du déchet"
-  status: String
-  "Raison du refus du déchet, dans le cas d'un refus"
+  quantity: BsvhuQuantity
+  "Lot accepté oui/non"
+  acceptationStatus: BsvhuAcceptationStatus
+  "Motif de refus"
   refusalReason: String
   "Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)"
   identification: BsvhuIdentification
 }
 
-type BsvhuRecipientOperation {
-  "Opération de traitement prévue"
-  planned: String
-  "Opération de traitement réalisée"
-  done: String
+type BsvhuOperation {
+  "Date de réalisation"
+  date: DateTime
+  "Opération de traitement réalisée (R4 ou R12)"
+  code: String
+  "Broyeur de destination, à remplir uniquement lorsque la destination est lui même un centre VHU"
+  nextDestination: BsvhuNextDestination
+  signature: Signature
+}
+
+type BsvhuNextDestination {
+  company: FormCompany
 }
 
 type Signature {
@@ -305,4 +319,10 @@ type BsvhuIdentification {
 type BsvhuQuantity {
   number: Int
   tons: Float
+}
+
+enum BsvhuAcceptationStatus {
+  ACCEPTED
+  REFUSED
+  PARTIALLY_REFUSED
 }

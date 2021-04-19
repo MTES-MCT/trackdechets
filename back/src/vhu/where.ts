@@ -38,7 +38,7 @@ function toPrismaFilter(where: Omit<BsvhuWhere, "_or" | "_and" | "_not">) {
       : undefined,
     transporterCompanySiret: where.transporter?.company?.siret,
     emitterCompanySiret: where.emitter?.company?.siret,
-    recipientCompanySiret: where.recipient?.company?.siret,
+    recipientCompanySiret: where.destination?.company?.siret,
     status: where.status,
     isDraft: where.isDraft
   });

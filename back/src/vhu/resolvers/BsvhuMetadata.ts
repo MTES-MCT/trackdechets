@@ -11,9 +11,9 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
 
     try {
       await validateBsvhuForm(prismaForm, {
-        emitterSignature: true,
-        transporterSignature: true,
-        recipientSignature: true
+        emissionSignature: true,
+        transportSignature: true,
+        operationSignature: true
       });
       return [];
     } catch (errors) {

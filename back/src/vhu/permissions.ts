@@ -8,7 +8,7 @@ export async function checkIsFormContributor(
     Pick<
       BsvhuForm,
       | "emitterCompanySiret"
-      | "recipientCompanySiret"
+      | "destinationCompanySiret"
       | "transporterCompanySiret"
     >
   >,
@@ -29,7 +29,7 @@ export async function isFormContributor(user: User, form: Partial<BsvhuForm>) {
 
   const formSirets = [
     form.emitterCompanySiret,
-    form.recipientCompanySiret,
+    form.destinationCompanySiret,
     form.transporterCompanySiret
   ];
 

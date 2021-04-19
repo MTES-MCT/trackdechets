@@ -34,7 +34,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
     "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  await validateBsvhuForm(form, { emitterSignature: !isDraft });
+  await validateBsvhuForm(form, { emissionSignature: !isDraft });
 
   const newForm = await prisma.bsvhuForm.create({
     data: { ...form, id: getReadableId(ReadableIdPrefix.VHU), isDraft }

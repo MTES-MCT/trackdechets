@@ -78,6 +78,7 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
         contact: "",
         mail: "",
         phone: "",
+        vatNumber: ""
       },
       isExemptedOfReceipt: false,
       receipt: "",

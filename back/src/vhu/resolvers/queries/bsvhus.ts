@@ -4,7 +4,6 @@ import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { QueryBsvhusArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
-import { getUserCompanies } from "../../../users/database";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { expandVhuFormFromDb } from "../../converter";
 import { getConnectionsArgs } from "../../pagination";
@@ -42,6 +41,11 @@ export default async function bsvhus(
 
   const where = {
     ...convertWhereToDbFilter(whereArgs),
+    OR: [
+      { emitterCompanySiret: siret },
+      { transporterCompanySiret: siret },
+      { destinationCompanySiret: siret }
+    ],
     isDeleted: false
   };
 
@@ -52,38 +56,30 @@ export default async function bsvhus(
     where
   });
 
-  const forms = queriedForms.map(f => expandVhuFormFromDb(f));
+  const edges = queriedForms
+    .slice(0, itemsPerPage)
+    .map(f => ({ cursor: f.id, node: expandVhuFormFromDb(f) }));
   return {
     totalCount,
-    edges: forms.map(f => ({ cursor: f.id, node: f })),
+    edges,
     pageInfo: {
-      startCursor: forms[0].id,
-      endCursor: forms[forms.length - (forms.length > itemsPerPage ? 2 : 1)].id,
-      hasNextPage: paginationArgs.after ? forms.length > itemsPerPage : false,
+      startCursor: edges[0]?.cursor,
+      endCursor: edges[edges.length - 1]?.cursor,
+      hasNextPage: paginationArgs.after
+        ? queriedForms.length > itemsPerPage
+        : false,
       hasPreviousPage: paginationArgs.before
-        ? forms.length > itemsPerPage
+        ? queriedForms.length > itemsPerPage
         : false
     }
   };
 }
 
 async function getRequestCompany(user: Express.User, siret: string) {
-  if (siret) {
-    await checkIsCompanyMember({ id: user.id }, { siret });
-    return getCompanyOrCompanyNotFound({ siret });
-  }
-
-  const userCompanies = await getUserCompanies(user.id);
-  if (userCompanies.length === 0) {
-    // the user is not member of any companies
-    return null;
-  }
-
-  if (userCompanies.length > 1) {
-    // the user is member of 2 companies or more, a siret is required
+  if (!siret) {
     throw new MissingSiret();
   }
 
-  // the user is member of only one company, use it as default
-  return userCompanies[0];
+  await checkIsCompanyMember({ id: user.id }, { siret });
+  return getCompanyOrCompanyNotFound({ siret });
 }
