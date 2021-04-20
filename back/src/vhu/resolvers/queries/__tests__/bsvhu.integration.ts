@@ -8,7 +8,7 @@ query GetBsvhu($id: ID!) {
   bsvhu(id: $id) {
     id
     isDraft
-    recipient {
+    destination {
       company {
         siret
       }
@@ -27,8 +27,8 @@ query GetBsvhu($id: ID!) {
         contact
         mail
         phone
+        vatNumber
       }
-      tvaIntracommunautaire
       recepisse {
         number
       }

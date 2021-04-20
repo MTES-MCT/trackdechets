@@ -14,21 +14,21 @@ export const machine = Machine<never, Event>(
     states: {
       [BsvhuStatus.INITIAL]: {
         on: {
-          EMITTER: {
+          EMISSION: {
             target: BsvhuStatus.SIGNED_BY_PRODUCER
           }
         }
       },
       [BsvhuStatus.SIGNED_BY_PRODUCER]: {
         on: {
-          TRANSPORTER: {
+          TRANSPORT: {
             target: BsvhuStatus.SENT
           }
         }
       },
       [BsvhuStatus.SENT]: {
         on: {
-          RECIPIENT: [
+          OPERATION: [
             {
               target: BsvhuStatus.REFUSED,
               cond: "isBsvhuRefused"

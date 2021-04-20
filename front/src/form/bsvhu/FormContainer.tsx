@@ -14,7 +14,8 @@ export default function FormContainer() {
       <div className="container">
         <StepList formId={id}>
           {vhuForm => {
-            const emitterSigned = vhuForm?.emitter?.emission?.signature?.author != null;
+            const emitterSigned =
+              vhuForm?.emitter?.emission?.signature?.author != null;
             const transporterSigned =
               vhuForm?.transporter?.transport?.signature?.author != null;
 

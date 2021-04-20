@@ -10,7 +10,7 @@ const CREATE_VHU_FORM = `
 mutation CreateVhuForm($input: BsvhuInput!) {
   createDraftBsvhu(input: $input) {
     id
-    recipient {
+    destination {
       company {
           siret
       }
@@ -83,7 +83,7 @@ describe("Mutation.Vhu.createDraft", () => {
     ]);
   });
 
-  it("create a form with an emitter and a recipient", async () => {
+  it("create a form with an emitter and a destination", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const input = {
@@ -92,7 +92,7 @@ describe("Mutation.Vhu.createDraft", () => {
           siret: company.siret
         }
       },
-      recipient: {
+      destination: {
         company: {
           siret: "11111111111111"
         }
@@ -105,8 +105,8 @@ describe("Mutation.Vhu.createDraft", () => {
       }
     });
 
-    expect(data.createDraftBsvhu.recipient.company).toMatchObject(
-      input.recipient.company
+    expect(data.createDraftBsvhu.destination.company).toMatchObject(
+      input.destination.company
     );
   });
 });

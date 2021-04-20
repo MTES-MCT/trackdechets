@@ -147,13 +147,13 @@ const destinationSchema: FactorySchemaOf<
         context.emissionSignature,
         `Destinataire: le type de destination est obligatoire`
       ),
-    destinationReceptionQuantityNumber: yup
+    destinationReceptionQuantityNumber: yup.number().nullable(),
+    destinationReceptionQuantityTons: yup
       .number()
       .requiredIf(
         context.operationSignature,
         `Destinataire: la quantité reçue est obligatoire`
       ),
-    destinationReceptionQuantityTons: yup.number().nullable(),
     destinationReceptionRefusalReason: yup.string().nullable(),
     destinationAgrementNumber: yup
       .string()

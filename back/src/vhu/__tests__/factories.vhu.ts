@@ -19,7 +19,7 @@ export const vhuFormFactory = async ({
   });
 };
 
-const getVhuFormdata = () => ({
+const getVhuFormdata = (): Prisma.BsvhuFormCreateInput => ({
   id: getReadableId(ReadableIdPrefix.VHU),
   emitterAgrementNumber: "agrement",
   emitterCompanyName: "emitter company",
@@ -29,14 +29,15 @@ const getVhuFormdata = () => ({
   emitterCompanyPhone: "06 18 76 02 66",
   emitterCompanyMail: "recipient@td.io",
 
-  recipientOperationPlanned: "R 4",
-  recipientAgrementNumber: "agrement recipient",
-  recipientCompanyName: "I reveive waste INC",
-  recipientCompanySiret: "13254678974589",
-  recipientCompanyAddress: "14 boulevard Recipient, Recipient City",
-  recipientCompanyContact: "André Recipient",
-  recipientCompanyPhone: "05 05 05 05 05",
-  recipientCompanyMail: "recipient@td.io",
+  destinationType: "BROYEUR",
+  destinationPlannedOperationCode: "R 4",
+  destinationAgrementNumber: "agrement recipient",
+  destinationCompanyName: "I reveive waste INC",
+  destinationCompanySiret: "13254678974589",
+  destinationCompanyAddress: "14 boulevard Recipient, Recipient City",
+  destinationCompanyContact: "André Recipient",
+  destinationCompanyPhone: "05 05 05 05 05",
+  destinationCompanyMail: "recipient@td.io",
 
   packaging: "UNITE" as BsvhuPackaging,
   identificationNumbers: ["1", "2", "3"],
@@ -54,8 +55,9 @@ const getVhuFormdata = () => ({
   transporterRecepisseDepartment: "83",
   transporterRecepisseValidityLimit: "2019-11-27T00:00:00.000Z",
 
-  recipientAcceptanceQuantity: null,
-  recipientAcceptanceStatus: null,
-  recipientAcceptanceRefusalReason: null,
-  recipientOperationDone: null
+  destinationReceptionQuantityNumber: null,
+  destinationReceptionQuantityTons: null,
+  destinationReceptionAcceptationStatus: null,
+  destinationReceptionRefusalReason: null,
+  destinationOperationCode: null
 });

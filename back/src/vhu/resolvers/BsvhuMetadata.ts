@@ -21,7 +21,7 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
         return {
           message: e.message,
           path: e.path, // TODO return a path formated correctly
-          requiredFor: "TRANSPORTER" // TODO Identify which signature needs this field
+          requiredFor: "TRANSPORT" // TODO Identify which signature needs this field
         };
       });
     }

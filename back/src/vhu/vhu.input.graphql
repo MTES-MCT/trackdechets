@@ -113,7 +113,7 @@ input BsvhuSignatureInput {
 }
 
 enum SignatureTypeInput {
-  EMITTER
-  TRANSPORTER
-  RECIPIENT
+  EMISSION
+  TRANSPORT
+  OPERATION
 }

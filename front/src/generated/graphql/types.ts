@@ -2452,9 +2452,9 @@ export type SignatureFormInput = {
 };
 
 export enum SignatureTypeInput {
-  Emitter = "EMITTER",
-  Transporter = "TRANSPORTER",
-  Recipient = "RECIPIENT"
+  Emission = "EMISSION",
+  Transport = "TRANSPORT",
+  Operation = "OPERATION"
 }
 
 export type SignupInput = {
@@ -3258,7 +3258,7 @@ export function createBsvhuErrorMock(props: Partial<BsvhuError>): BsvhuError {
     __typename: "BsvhuError",
     message: "",
     path: "",
-    requiredFor: SignatureTypeInput.Emitter,
+    requiredFor: SignatureTypeInput.Emission,
     ...props
   };
 }
@@ -3425,7 +3425,7 @@ export function createBsvhuSignatureInputMock(
   props: Partial<BsvhuSignatureInput>
 ): BsvhuSignatureInput {
   return {
-    type: SignatureTypeInput.Emitter,
+    type: SignatureTypeInput.Emission,
     date: null,
     author: "",
     securityCode: null,

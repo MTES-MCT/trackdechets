@@ -4,7 +4,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { vhuFormFactory } from "../../../__tests__/factories.vhu";
 
 const GET_BSVHUS = `
-  query GetBsvhus($siret: String, $where: BsvhuWhere) {
+  query GetBsvhus($siret: String!, $where: BsvhuWhere) {
     bsvhus(siret: $siret, where: $where) {
       totalCount
       pageInfo {
@@ -15,7 +15,7 @@ const GET_BSVHUS = `
       edges {
         node {id
           isDraft
-          recipient {
+          destination {
             company {
               siret
             }
@@ -34,8 +34,8 @@ const GET_BSVHUS = `
               contact
               mail
               phone
+              vatNumber
             }
-            tvaIntracommunautaire
             recepisse {
               number
             }
@@ -65,7 +65,9 @@ describe("Query.Bsvhus", () => {
 
     const { query } = makeClient(user);
 
-    const { data } = await query(GET_BSVHUS);
+    const { data } = await query(GET_BSVHUS, {
+      variables: { siret: company.siret }
+    });
 
     expect(data.bsvhus.edges.length).toBe(4);
   });
@@ -83,7 +85,9 @@ describe("Query.Bsvhus", () => {
 
     const { query } = makeClient(user);
 
-    const { data } = await query(GET_BSVHUS);
+    const { data } = await query(GET_BSVHUS, {
+      variables: { siret: company.siret }
+    });
 
     expect(data.bsvhus.totalCount).toBe(4);
     expect(data.bsvhus.pageInfo.startCursor).toBe(lastForm.id);
@@ -103,11 +107,14 @@ describe("Query.Bsvhus", () => {
     await vhuFormFactory({ opt });
 
     // And 1 on recipient company
-    await vhuFormFactory({ opt: { recipientCompanySiret: company.siret } });
+    await vhuFormFactory({ opt: { destinationCompanySiret: company.siret } });
 
     const { query } = makeClient(user);
     const { data } = await query(GET_BSVHUS, {
-      variables: { where: { recipient: { company: { siret: company.siret } } } }
+      variables: {
+        siret: company.siret,
+        where: { destination: { company: { siret: company.siret } } }
+      }
     });
 
     expect(data.bsvhus.edges.length).toBe(1);

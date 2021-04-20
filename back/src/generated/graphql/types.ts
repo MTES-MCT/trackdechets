@@ -2430,7 +2430,7 @@ export type SignatureFormInput = {
   sentBy: Scalars["String"];
 };
 
-export type SignatureTypeInput = "EMITTER" | "TRANSPORTER" | "RECIPIENT";
+export type SignatureTypeInput = "EMISSION" | "TRANSPORT" | "OPERATION";
 
 export type SignupInput = {
   /** Email de l'utilisateur */
@@ -5827,7 +5827,7 @@ export function createBsvhuErrorMock(props: Partial<BsvhuError>): BsvhuError {
     __typename: "BsvhuError",
     message: "",
     path: "",
-    requiredFor: "EMITTER",
+    requiredFor: "EMISSION",
     ...props
   };
 }
@@ -5994,7 +5994,7 @@ export function createBsvhuSignatureInputMock(
   props: Partial<BsvhuSignatureInput>
 ): BsvhuSignatureInput {
   return {
-    type: "EMITTER",
+    type: "EMISSION",
     date: null,
     author: "",
     securityCode: null,

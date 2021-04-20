@@ -186,8 +186,11 @@ function flattenVhuDestinationInput({
       destination,
       r => r.plannedOperationCode
     ),
-    destinationReceptionQuantity: chain(destination, r =>
-      chain(r.reception, o => o.quantity)
+    destinationReceptionQuantityNumber: chain(destination, d =>
+      chain(d.reception, r => chain(r.quantity, q => q.number))
+    ),
+    destinationReceptionQuantityTons: chain(destination, d =>
+      chain(d.reception, r => chain(r.quantity, q => q.tons))
     ),
     destinationReceptionAcceptationStatus: chain(destination, r =>
       chain(r.reception, o => o.acceptationStatus)
