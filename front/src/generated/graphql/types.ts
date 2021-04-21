@@ -195,7 +195,7 @@ export enum BsvhuDestinationType {
 
 export type BsvhuDestinationWhere = {
   company: Maybe<BsvhuCompanyWhere>;
-  signature: Maybe<BsvhuSignatureWhere>;
+  operation: Maybe<BsvhuOperationWhere>;
 };
 
 export type BsvhuEdge = {
@@ -207,6 +207,10 @@ export type BsvhuEdge = {
 export type BsvhuEmission = {
   __typename?: "BsvhuEmission";
   signature: Maybe<Signature>;
+};
+
+export type BsvhuEmissionWhere = {
+  signature: Maybe<BsvhuSignatureWhere>;
 };
 
 export type BsvhuEmitter = {
@@ -228,7 +232,7 @@ export type BsvhuEmitterInput = {
 
 export type BsvhuEmitterWhere = {
   company: Maybe<BsvhuCompanyWhere>;
-  signature: Maybe<BsvhuSignatureWhere>;
+  emission: Maybe<BsvhuEmissionWhere>;
 };
 
 export type BsvhuError = {
@@ -305,6 +309,10 @@ export type BsvhuOperationInput = {
   code: Maybe<Scalars["String"]>;
   /** Broyeur de destination, à remplir uniquement lorsque la destination est lui même un centre VHU */
   nextDestination: Maybe<BsvhuNextDestinationInput>;
+};
+
+export type BsvhuOperationWhere = {
+  signature: Maybe<BsvhuSignatureWhere>;
 };
 
 export enum BsvhuPackaging {
@@ -416,12 +424,16 @@ export type BsvhuTransporterInput = {
 
 export type BsvhuTransporterWhere = {
   company: Maybe<BsvhuCompanyWhere>;
-  signature: Maybe<BsvhuSignatureWhere>;
+  transport: Maybe<BsvhuTransportWhere>;
 };
 
 export type BsvhuTransportInput = {
   /** Date de prise en charge */
   takenOverAt: Maybe<Scalars["DateTime"]>;
+};
+
+export type BsvhuTransportWhere = {
+  signature: Maybe<BsvhuSignatureWhere>;
 };
 
 export type BsvhuWhere = {
@@ -2038,8 +2050,8 @@ export enum Packagings {
 
 export type PageInfo = {
   __typename?: "PageInfo";
-  startCursor: Scalars["String"];
-  endCursor: Scalars["String"];
+  startCursor: Maybe<Scalars["String"]>;
+  endCursor: Maybe<Scalars["String"]>;
   hasNextPage: Scalars["Boolean"];
   hasPreviousPage: Scalars["Boolean"];
 };
@@ -2119,7 +2131,11 @@ export type Query = {
    * Il est valable 10 secondes
    */
   bsvhuPdf: FileDownload;
-  /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Tous les arguments sont optionnels.
+   * Par défaut, retourne les 50 premiers bordereaux associés à entreprises dont vous êtes membres
+   */
   bsvhus: BsvhuConnection;
   /** List companies for the company verfication table of the admin panel */
   companiesForVerification: CompanyForVerificationConnection;
@@ -2229,7 +2245,6 @@ export type QueryBsvhusArgs = {
   first: Maybe<Scalars["Int"]>;
   before: Maybe<Scalars["ID"]>;
   last: Maybe<Scalars["Int"]>;
-  siret: Scalars["String"];
   where: Maybe<BsvhuWhere>;
 };
 
@@ -3197,7 +3212,7 @@ export function createBsvhuDestinationWhereMock(
 ): BsvhuDestinationWhere {
   return {
     company: null,
-    signature: null,
+    operation: null,
     ...props
   };
 }
@@ -3216,6 +3231,15 @@ export function createBsvhuEmissionMock(
 ): BsvhuEmission {
   return {
     __typename: "BsvhuEmission",
+    signature: null,
+    ...props
+  };
+}
+
+export function createBsvhuEmissionWhereMock(
+  props: Partial<BsvhuEmissionWhere>
+): BsvhuEmissionWhere {
+  return {
     signature: null,
     ...props
   };
@@ -3248,7 +3272,7 @@ export function createBsvhuEmitterWhereMock(
 ): BsvhuEmitterWhere {
   return {
     company: null,
-    signature: null,
+    emission: null,
     ...props
   };
 }
@@ -3346,6 +3370,15 @@ export function createBsvhuOperationInputMock(
     date: null,
     code: null,
     nextDestination: null,
+    ...props
+  };
+}
+
+export function createBsvhuOperationWhereMock(
+  props: Partial<BsvhuOperationWhere>
+): BsvhuOperationWhere {
+  return {
+    signature: null,
     ...props
   };
 }
@@ -3481,7 +3514,7 @@ export function createBsvhuTransporterWhereMock(
 ): BsvhuTransporterWhere {
   return {
     company: null,
-    signature: null,
+    transport: null,
     ...props
   };
 }
@@ -3491,6 +3524,15 @@ export function createBsvhuTransportInputMock(
 ): BsvhuTransportInput {
   return {
     takenOverAt: null,
+    ...props
+  };
+}
+
+export function createBsvhuTransportWhereMock(
+  props: Partial<BsvhuTransportWhere>
+): BsvhuTransportWhere {
+  return {
+    signature: null,
     ...props
   };
 }
@@ -4144,8 +4186,8 @@ export function createPackagingInfoInputMock(
 export function createPageInfoMock(props: Partial<PageInfo>): PageInfo {
   return {
     __typename: "PageInfo",
-    startCursor: "",
-    endCursor: "",
+    startCursor: null,
+    endCursor: null,
     hasNextPage: false,
     hasPreviousPage: false,
     ...props

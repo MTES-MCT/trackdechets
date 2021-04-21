@@ -6,26 +6,32 @@ export const FullBsvhuFragment = gql`
     id
     isDraft
     status
-    readableId
     emitter {
       company {
         ...CompanyFragment
       }
       agrementNumber
-      signature {
-        author
-        date
+      emission {
+        signature {
+          author
+          date
+        }
       }
     }
-    recipient {
+    destination {
       type
+      plannedOperationCode
       company {
         ...CompanyFragment
       }
       agrementNumber
-      acceptance {
-        quantity
-        status
+      reception {
+        date
+        quantity {
+          number
+          tons
+        }
+        acceptationStatus
         refusalReason
         identification {
           numbers
@@ -33,15 +39,17 @@ export const FullBsvhuFragment = gql`
         }
       }
       operation {
-        planned
-        done
-      }
-      plannedBroyeurCompany {
-        ...CompanyFragment
-      }
-      signature {
-        author
+        code
         date
+        signature {
+          author
+          date
+        }
+        nextDestination {
+          company {
+            ...CompanyFragment
+          }
+        }
       }
     }
     packaging
@@ -57,16 +65,18 @@ export const FullBsvhuFragment = gql`
     transporter {
       company {
         ...CompanyFragment
+        vatNumber
       }
-      tvaIntracommunautaire
       recepisse {
         number
         department
         validityLimit
       }
-      signature {
-        author
-        date
+      transport {
+        signature {
+          author
+          date
+        }
       }
     }
   }
@@ -83,8 +93,8 @@ export const GET_VHU_FORM = gql`
 `;
 
 export const GET_VHU_FORMS = gql`
-  query Bsvhus($siret: String) {
-    bsvhus(where: { siret: $siret }) {
+  query Bsvhus() {
+    bsvhus() {
       totalCount
       pageInfo {
         hasNextPage

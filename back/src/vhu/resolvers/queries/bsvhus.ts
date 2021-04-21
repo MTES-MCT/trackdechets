@@ -1,34 +1,18 @@
-import { MissingSiret } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { QueryBsvhusArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
-import { checkIsCompanyMember } from "../../../users/permissions";
+import { getUserCompanies } from "../../../users/database";
 import { expandVhuFormFromDb } from "../../converter";
 import { getConnectionsArgs } from "../../pagination";
 import { convertWhereToDbFilter } from "../../where";
 
 export default async function bsvhus(
   _,
-  { where: whereArgs, siret, ...paginationArgs }: QueryBsvhusArgs,
+  { where: whereArgs, ...paginationArgs }: QueryBsvhusArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
-
-  const company = await getRequestCompany(user, siret);
-  if (!company) {
-    return {
-      totalCount: 0,
-      edges: [],
-      pageInfo: {
-        startCursor: "",
-        endCursor: "",
-        hasNextPage: false,
-        hasPreviousPage: false
-      }
-    };
-  }
 
   const defaultPaginateBy = 50;
   const itemsPerPage =
@@ -39,12 +23,15 @@ export default async function bsvhus(
     maxPaginateBy: 500
   });
 
+  const userCompanies = await getUserCompanies(user.id);
+  const userSirets = userCompanies.map(c => c.siret);
+
   const where = {
     ...convertWhereToDbFilter(whereArgs),
     OR: [
-      { emitterCompanySiret: siret },
-      { transporterCompanySiret: siret },
-      { destinationCompanySiret: siret }
+      { emitterCompanySiret: { in: userSirets } },
+      { transporterCompanySiret: { in: userSirets } },
+      { destinationCompanySiret: { in: userSirets } }
     ],
     isDeleted: false
   };
@@ -73,13 +60,4 @@ export default async function bsvhus(
         : false
     }
   };
-}
-
-async function getRequestCompany(user: Express.User, siret: string) {
-  if (!siret) {
-    throw new MissingSiret();
-  }
-
-  await checkIsCompanyMember({ id: user.id }, { siret });
-  return getCompanyOrCompanyNotFound({ siret });
 }

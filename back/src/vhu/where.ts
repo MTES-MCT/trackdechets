@@ -29,23 +29,34 @@ export function convertWhereToDbFilter(
 }
 
 function toPrismaFilter(where: Omit<BsvhuWhere, "_or" | "_and" | "_not">) {
-  return safeInput({
-    createdAt: where.createdAt
-      ? toPrismaDateFilter(where.createdAt)
-      : undefined,
-    updatedAt: where.updatedAt
-      ? toPrismaDateFilter(where.updatedAt)
-      : undefined,
+  return safeInput<Prisma.BsvhuFormWhereInput>({
+    createdAt: toPrismaDateFilter(where.createdAt),
+    updatedAt: toPrismaDateFilter(where.updatedAt),
     transporterCompanySiret: where.transporter?.company?.siret,
+    transporterTransportSignatureDate: toPrismaDateFilter(
+      where.transporter?.transport?.signature?.date
+    ),
     emitterCompanySiret: where.emitter?.company?.siret,
+    emitterEmissionSignatureDate: toPrismaDateFilter(
+      where.emitter?.emission?.signature?.date
+    ),
     destinationCompanySiret: where.destination?.company?.siret,
+    destinationOperationSignatureDate: toPrismaDateFilter(
+      where.destination?.operation?.signature?.date
+    ),
     status: where.status,
     isDraft: where.isDraft
   });
 }
 
-function toPrismaDateFilter(dateFilter: DateFilter): Prisma.DateTimeFilter {
-  return safeInput({
+function toPrismaDateFilter(
+  dateFilter: DateFilter | undefined
+): Prisma.DateTimeFilter {
+  if (!dateFilter) {
+    return undefined;
+  }
+
+  return safeInput<Prisma.DateTimeFilter>({
     gt: dateFilter._gt,
     gte: dateFilter._gte,
     lt: dateFilter._lt,

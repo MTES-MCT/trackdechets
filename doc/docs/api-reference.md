@@ -85,6 +85,8 @@ ID d'un bordereau
 <td>
 
 EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Tous les arguments sont optionnels.
+Par défaut, retourne les 50 premiers bordereaux associés à entreprises dont vous êtes membres
 
 </td>
 </tr>
@@ -93,7 +95,7 @@ EXPERIMENTAL - Ne pas utiliser dans un contexte de production
 <td valign="top"><a href="#id">ID</a></td>
 <td>
 
-(Optionnel) PAGINATION
+PAGINATION
 Permet en conjonction avec `first` de paginer "en avant"
 (des bordereaux les plus récents aux bordereaux les plus anciens)
 Curseur après lequel les bordereaux doivent être retournés
@@ -108,7 +110,7 @@ Le BSD précisé dans le curseur ne fait pas partie du résultat
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
-(Optionnel) PAGINATION
+PAGINATION
 Permet en conjonction avec `cursorAfter` de paginer "en avant"
 (des bordereaux les plus récents aux bordereaux les plus anciens)
 Nombre de bordereaux retournés après le `cursorAfter`
@@ -121,7 +123,7 @@ Défaut à 50, maximum à 500
 <td valign="top"><a href="#id">ID</a></td>
 <td>
 
-(Optionnel) PAGINATION
+PAGINATION
 Permet en conjonction avec `last` de paginer "en arrière"
 (des bordereaux les plus anciens aux bordereaux les plus récents)
 Curseur avant lequel les bordereaux doivent être retournés
@@ -136,25 +138,20 @@ Le BSD précisé dans le curseur ne fait pas partie du résultat
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
-(Optionnel) PAGINATION
+PAGINATION
 Nombre de bordereaux retournés avant le `cursorBefore`
 Défaut à 50, maximum à 500
 
 </td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">siret</td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td>
-
-SIRET d'un établissement dont je suis membre
-
-</td>
-</tr>
-<tr>
 <td colspan="2" align="right" valign="top">where</td>
 <td valign="top"><a href="#bsvhuwhere">BsvhuWhere</a></td>
-<td></td>
+<td>
+
+Filtres
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>companiesForVerification</strong></td>
@@ -3913,12 +3910,12 @@ Nombre de colis associés à ce conditionnement
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>startCursor</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#string">String</a></td>
 <td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>endCursor</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#string">String</a></td>
 <td></td>
 </tr>
 <tr>
@@ -5495,6 +5492,25 @@ Informations sur l'opétation de traitement
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsvhuoperationwhere">BsvhuOperationWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsvhuEmissionWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
 <td colspan="2" valign="top"><strong>signature</strong></td>
 <td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
 <td></td>
@@ -5551,8 +5567,8 @@ Coordonnées de l'entreprise émétrice
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
+<td colspan="2" valign="top"><strong>emission</strong></td>
+<td valign="top"><a href="#bsvhuemissionwhere">BsvhuEmissionWhere</a></td>
 <td></td>
 </tr>
 </tbody>
@@ -5723,6 +5739,25 @@ Opération de traitement réalisée (R4 ou R12)
 Broyeur de destination, à remplir uniquement lorsque la destination est lui même un centre VHU
 
 </td>
+</tr>
+</tbody>
+</table>
+
+### BsvhuOperationWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -5939,6 +5974,25 @@ Date de prise en charge
 </tbody>
 </table>
 
+### BsvhuTransportWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### BsvhuTransporterInput
 
 <table>
@@ -5997,8 +6051,8 @@ Informations liés au transport
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
+<td colspan="2" valign="top"><strong>transport</strong></td>
+<td valign="top"><a href="#bsvhutransportwhere">BsvhuTransportWhere</a></td>
 <td></td>
 </tr>
 </tbody>
