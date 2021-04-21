@@ -3,7 +3,7 @@ import StepList from "./BsvhuStepList";
 import React from "react";
 import { useParams } from "react-router-dom";
 import Emitter from "./Emitter";
-import Recipient from "./Recipient";
+import Recipient from "./Destination";
 import Transporter from "./Transporter";
 import WasteInfo from "./WasteInfo";
 

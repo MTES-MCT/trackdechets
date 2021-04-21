@@ -93,8 +93,8 @@ export const GET_VHU_FORM = gql`
 `;
 
 export const GET_VHU_FORMS = gql`
-  query Bsvhus() {
-    bsvhus() {
+  query Bsvhus {
+    bsvhus {
       totalCount
       pageInfo {
         hasNextPage

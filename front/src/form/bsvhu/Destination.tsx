@@ -5,7 +5,7 @@ import { Field, useFormikContext } from "formik";
 import React from "react";
 import { Bsvhu } from "generated/graphql/types";
 
-export default function Recipient({ disabled }) {
+export default function Destination({ disabled }) {
   const { setFieldValue, values } = useFormikContext<Bsvhu>();
 
   const isDangerousWasteCode = values.wasteCode === "16 01 04*";
