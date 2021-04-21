@@ -33,6 +33,7 @@
    git checkout --track origin/dev
    ```
 2. Configurer les variables d'environnements :
+
    1. Renommer le ficher `.env.model` en `.env` et le compléter en demandant les infos à un développeur de l'équipe
    2. Créer un fichier `.env` dans `front/` en s'inspirant du fichier `.env.recette`
 
@@ -72,7 +73,6 @@
 
    C'est prêt ! Rendez-vous sur l'URL `UI_HOST` configurée dans votre fichier `.env` (par ex: `http://trackdechets.local`) pour commencer à utiliser l'application ou sur `API_HOST` (par ex `http://api.trackdechets.local`) pour accéder au playground GraphQL.
 
-
 ### Installation alternative sans docker
 
 Vous pouvez également faire tourner l'ensemble des services sans docker. Veillez à utiliser la même version de Node.js que celle spécifiée dans les images Docker. Vous pouvez utiliser [NVM](https://github.com/nvm-sh/nvm) pour changer facilement de version de Node.
@@ -85,8 +85,7 @@ Vous pouvez également faire tourner l'ensemble des services sans docker. Veille
 ln -s /path/to/trackdechets/.env /path/to/trackdechets/back/.env
 ```
 
-> Il est également possible de démarrer ces trois services avec docker `docker-compose -f docker-compose.dev.yml up postgres redis nginx`. Dans ce cas, l'API doit être démarrée sur le port 4000 pour coller avec la configuration Nginx  `API_PORT=4000`.
-
+> Il est également possible de démarrer ces trois services avec docker `docker-compose -f docker-compose.dev.yml up postgres redis nginx`. Dans ce cas, l'API doit être démarrée sur le port 4000 pour coller avec la configuration Nginx `API_PORT=4000`.
 
 3. Démarrer l'API
 
@@ -217,6 +216,23 @@ Les nouvelles fonctionnalités impactant l'API doivent être documentées dans l
 Il est possible d'importer un backup d'une base de donnée d'un environnement afin de le tester en local.
 La procédure qui suit aura pour effet de remplacer vos données en local par les données du backup.
 
+#### Procédure automatique avec Docker
+
+Un script d'automatisation a été mise en place. Il permet de restaurer soit un backup local, soit le dernier backup de production.
+Assurez vous d'avoir correctement configuré vos variables d'environnement pour que le script fonctionne.
+
+```bash
+$ pwd
+~/dev/trackdechets
+$ cd scripts
+$ sudo chmod +x restore-db.sh # Si le fichier n'est pas exécutable
+$ ./restore-db.sh
+# Laissez vous guider...
+# La première question détermine si vous souhaitez utiliser un backup distant ou local
+```
+
+#### Procédure manuelle
+
 1. Télécharger un backup de la base de donnée `prisma` depuis Scaleway
 2. Démarrer le container Postgres
    ```
@@ -253,9 +269,8 @@ Pour palier à ce problème, il est possible de nourrir la base de donnée Prism
 2. Démarrer les containers `postgres` et `td-api`
 3. (Optionnel) Reset de la base de données
    3.1 Dans le container `postgres `: `psql -U trackdechets -d prisma -c "DROP SCHEMA \"default\$default\" CASCADE;"` pour supprimer les données existantes
-   3.2 Dans le container `td-api`:  `npx prisma db push --preview-feature` pour recréer les tables
+   3.2 Dans le container `td-api`: `npx prisma db push --preview-feature` pour recréer les tables
 4. Dans le container `td-api`: `npx prisma db seed --preview-feature` pour nourrir la base de données.
-
 
 ### Ajouter une nouvelle icône
 
