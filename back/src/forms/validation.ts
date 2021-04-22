@@ -284,18 +284,25 @@ export const ecoOrganismeSchema = yup.object().shape({
 // 2 - Installation de destination ou d’entreposage ou de reconditionnement prévue
 const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
   yup.object({
-    recipientCap: yup.string().nullable().test(
-      "required-when-dangerous",
-      "Le champ CAP est obligatoire pour les déchets dangereux",
-      (value, testContext) => {
-        const rootValue = testContext.parent;
+    recipientCap: yup
+      .string()
+      .nullable()
+      .test(
+        "required-when-dangerous",
+        "Le champ CAP est obligatoire pour les déchets dangereux",
+        (value, testContext) => {
+          const rootValue = testContext.parent;
 
-        if (!isDraft && rootValue?.wasteDetailsCode?.includes("*") && !value) {
-          return false;
+          if (
+            !isDraft &&
+            rootValue?.wasteDetailsCode?.includes("*") &&
+            !value
+          ) {
+            return false;
+          }
+          return true;
         }
-        return true;
-      }
-    ),
+      ),
     recipientIsTempStorage: yup.boolean().nullable(),
     recipientProcessingOperation: yup
       .string()

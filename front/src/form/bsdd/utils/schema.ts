@@ -217,7 +217,7 @@ export const formSchema = object().shape({
       .test(
         "is-valid-packaging-infos",
         "Le conditionnement ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
-        (infos) => {
+        infos => {
           const hasCiterne = infos?.find(i => i.type === "CITERNE") != null;
           const hasBenne = infos?.find(i => i.type === "BENNE") != null;
 
