@@ -30,9 +30,6 @@ export async function formsEventCallback(payload: TDEventPayload<Form>) {
     ),
     verifiyPresta(payload).catch(err =>
       console.error("Error on prestataire verification form subscription", err)
-    ),
-    mailWhenFormTraceabilityIsBroken(payload).catch(err =>
-      console.error("Error on form traceability break subscription", err)
     )
   ]);
 }
@@ -223,23 +220,4 @@ async function verifiyPresta(payload: TDEventPayload<Form>) {
         );
     }
   }
-}
-
-async function mailWhenFormTraceabilityIsBroken(payload: TDEventPayload<Form>) {
-  if (
-    !payload.updatedFields?.hasOwnProperty("noTraceability") ||
-    !payload.node ||
-    !payload.node.noTraceability
-  ) {
-    return;
-  }
-
-  const form = await prisma.form.findUnique({ where: { id: payload.node.id } });
-  return sendMail(
-    userMails.formTraceabilityBreak(
-      form.emitterCompanyMail,
-      form.emitterCompanyContact,
-      form
-    )
-  );
 }
