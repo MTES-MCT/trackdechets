@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import TdSwitch from "common/components/Switch";
+import Tooltip from "common/components/Tooltip";
 import ProcessingOperation from "form/common/components/processing-operation/ProcessingOperation";
 import { Field, useFormikContext } from "formik";
 import { Form } from "generated/graphql/types";
@@ -106,7 +107,11 @@ export default function Recipient() {
       </div>
       <div className="form__row">
         <label>
-          Numéro de CAP (optionnel)
+          Numéro de CAP
+          <Tooltip
+            msg={`Le champ CAP est obligatoire pour les déchets dangereux.
+Il est important car il qualifie les conditions de gestion et de traitement du déchets entre le producteur et l'entreprise de destination.`}
+          />
           <Field
             type="text"
             name="recipient.cap"

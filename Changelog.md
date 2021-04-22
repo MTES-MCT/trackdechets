@@ -11,6 +11,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :boom: Breaking changes
 
+- Le numéro de CAP devient obligatoire pour les déchets dangereux [PR 840](https://github.com/MTES-MCT/trackdechets/pull/840)
+
 #### :bug: Corrections de bugs
 
 #### :nail_care: Améliorations

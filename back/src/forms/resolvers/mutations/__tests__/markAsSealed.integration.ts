@@ -391,6 +391,65 @@ describe("Mutation.markAsSealed", () => {
     expect(data.markAsSealed.status).toBe("SEALED");
   });
 
+  it("should be required to provide cap for dangerous wastes", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const recipientCompany = await destinationFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        wasteDetailsCode: "05 01 04*",
+        recipientCap: null
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: [
+          "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
+          `Erreur(s): Le champ CAP est obligatoire pour les déchets dangereux`
+        ].join("\n")
+      })
+    ]);
+  });
+
+  it("should be optional to provide cap for non-dangerous wastes", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const recipientCompany = await destinationFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        wasteDetailsCode: "01 01 01",
+        recipientCap: null
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    expect(data.markAsSealed.status).toBe("SEALED");
+  });
+
   it("should mark appendix2 forms as grouped", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destination = await destinationFactory();
