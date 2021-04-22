@@ -35,8 +35,6 @@ const MARK_AS_SEALED = `
 `;
 
 describe("Mutation.markAsSealed", () => {
-  afterAll(() => resetDatabase());
-
   const OLD_ENV = process.env;
 
   beforeEach(() => {
@@ -47,6 +45,7 @@ describe("Mutation.markAsSealed", () => {
   afterEach(() => {
     jest.resetAllMocks();
     process.env = OLD_ENV;
+    return resetDatabase();
   });
 
   it("should fail if SEALED is not a possible next state", async () => {
