@@ -16,20 +16,10 @@ import { buildPdfBase64 } from "../forms/pdf/generator";
 import Dreals from "./dreals";
 import { TDEventPayload } from "./emitter";
 import { renderMail } from "../mailer/templates/renderers";
-import {
-  contentAwaitsGuest,
-  formNotAccepted,
-  formPartiallyRefused
-} from "../mailer/templates";
+import { formNotAccepted, formPartiallyRefused } from "../mailer/templates";
 
 export async function formsEventCallback(payload: TDEventPayload<Form>) {
   await Promise.all([
-    mailToInexistantRecipient(payload).catch(err =>
-      console.error("Error on inexistant recipient subscription", err)
-    ),
-    mailToInexistantEmitter(payload).catch(err =>
-      console.error("Error on inexistant emitter subscription", err)
-    ),
     mailWhenFormIsDeclined(payload).catch(err =>
       console.error("Error on declined form subscription", err)
     ),
@@ -37,73 +27,6 @@ export async function formsEventCallback(payload: TDEventPayload<Form>) {
       console.error("Error on prestataire verification form subscription", err)
     )
   ]);
-}
-
-async function mailToInexistantRecipient(payload: TDEventPayload<Form>) {
-  if (payload.updatedFields?.hasOwnProperty("isDeleted") || !payload.node) {
-    return;
-  }
-
-  const previousRecipientSiret = payload.previousNode
-    ? payload.previousNode.recipientCompanySiret
-    : null;
-  const recipientSiret = payload.node.recipientCompanySiret;
-  const recipientMail = payload.node.recipientCompanyMail;
-  const recipientName =
-    payload.node.recipientCompanyName || "Monsieur / Madame";
-
-  if (
-    !recipientSiret ||
-    !recipientMail ||
-    previousRecipientSiret === recipientSiret
-  ) {
-    return;
-  }
-
-  const companyExists = await prisma.company.findFirst({
-    where: { siret: recipientSiret }
-  });
-  if (companyExists) {
-    return;
-  }
-
-  const mail = renderMail(contentAwaitsGuest, {
-    to: [{ email: recipientMail, name: recipientName }],
-    variables: { company: { siret: recipientSiret, name: recipientName } }
-  });
-
-  return sendMail(mail);
-}
-
-async function mailToInexistantEmitter(payload: TDEventPayload<Form>) {
-  if (payload.updatedFields?.hasOwnProperty("isDeleted") || !payload.node) {
-    return;
-  }
-
-  const previousEmitterSiret = payload.previousNode
-    ? payload.previousNode.emitterCompanySiret
-    : null;
-  const emitterSiret = payload.node.emitterCompanySiret;
-  const emitterMail = payload.node.emitterCompanyMail;
-  const emitterName = payload.node.emitterCompanyName || "Monsieur / Madame";
-
-  if (!emitterSiret || !emitterMail || previousEmitterSiret === emitterSiret) {
-    return;
-  }
-
-  const companyExists = await prisma.company.findFirst({
-    where: { siret: emitterSiret }
-  });
-  if (companyExists) {
-    return;
-  }
-
-  const mail = renderMail(contentAwaitsGuest, {
-    to: [{ email: emitterMail, name: emitterName }],
-    variables: { company: { siret: emitterSiret, name: emitterName } }
-  });
-
-  return sendMail(mail);
 }
 
 /**
