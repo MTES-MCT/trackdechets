@@ -5,6 +5,24 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# Next release
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :boom: Breaking changes
+
+#### :bug: Corrections de bugs
+
+
+#### :nail_care: Améliorations
+
+- Réécriture de l'email d'information envoyé à l'adresse de contact émetteur lorsque l'établissement renseigné sur le BSD n'est pas inscrit sur Trackdéchets. On s'assure par ailleurs que cet email n'est envoyé qu'une fois à une même adresse [PR 839](https://github.com/MTES-MCT/trackdechets/pull/839)
+- Suppression de l'email envoyé à l'émetteur du bordereau lors d'une rupture de traçabilité [PR 837](https://github.com/MTES-MCT/trackdechets/pull/837)
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Refactoring du système de template d'email [PR 839](https://github.com/MTES-MCT/trackdechets/pull/839)
 # [2021.04.1] 12/04/2021
 
 #### :rocket: Nouvelles fonctionnalités
