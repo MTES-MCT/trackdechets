@@ -427,7 +427,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: "11111111111111"
+        recipientCompanySiret: "12345654327896"
       }
     });
     const { mutate } = makeClient(user);
@@ -437,7 +437,7 @@ describe("Mutation.markAsSealed", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination ou d’entreposage ou de reconditionnement qui a été renseignée en case 2 (SIRET: 11111111111111) n'est pas inscrite sur Trackdéchets`
+        message: `L'installation de destination ou d’entreposage ou de reconditionnement qui a été renseignée en case 2 (SIRET: 12345654327896) n'est pas inscrite sur Trackdéchets`
       })
     ]);
   });
@@ -491,7 +491,7 @@ describe("Mutation.markAsSealed", () => {
       where: { id: form.id },
       data: {
         temporaryStorageDetail: {
-          update: { destinationCompanySiret: "11111111111111" }
+          update: { destinationCompanySiret: "12345654327896" }
         }
       }
     });
@@ -501,7 +501,7 @@ describe("Mutation.markAsSealed", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination après entreposage provisoire ou reconditionnement qui a été renseignée en case 14 (SIRET 11111111111111) n'est pas inscrite sur Trackdéchets`
+        message: `L'installation de destination après entreposage provisoire ou reconditionnement qui a été renseignée en case 14 (SIRET 12345654327896) n'est pas inscrite sur Trackdéchets`
       })
     ]);
   });
@@ -634,7 +634,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         status: "DRAFT",
-        emitterCompanySiret: "11111111111111",
+        emitterCompanySiret: "12345654327896",
         emitterCompanyContact: "John Snow",
         emitterCompanyMail: "john.snow@trackdechets.fr",
         recipientCompanySiret: destination.siret
@@ -675,7 +675,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         status: "PROCESSED",
-        emitterCompanySiret: "11111111111111",
+        emitterCompanySiret: "12345654327896",
         emitterCompanyContact: "John Snow",
         emitterCompanyMail: "john.snow@trackdechets.fr",
         recipientCompanySiret: destination.siret
@@ -686,7 +686,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         status: "DRAFT",
-        emitterCompanySiret: "11111111111111",
+        emitterCompanySiret: "12345654327896",
         emitterCompanyContact: "John Snow",
         emitterCompanyMail: "john.snow@trackdechets.fr",
         recipientCompanySiret: destination.siret
