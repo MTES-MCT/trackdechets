@@ -85,7 +85,7 @@ describe("mutation sendMembershipRequest", () => {
       renderMail(membershipRequestMail, {
         to: [{ email: admin.email, name: admin.name }],
         variables: {
-          membershipRequestLink: `${process.env.UI_URL_SCHEME}://${process.env.UI_HOST}/membership-request/${membershipRequest.id}`,
+          membershipRequestId: membershipRequest.id,
           companyName: company.name,
           companySiret: company.siret,
           userEmail: requester.email
