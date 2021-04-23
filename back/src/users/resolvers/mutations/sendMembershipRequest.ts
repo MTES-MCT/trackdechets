@@ -13,7 +13,6 @@ import {
   membershipRequest as membershipRequestMail,
   membershipRequestConfirmation
 } from "../../../mailer/templates";
-import { getUIBaseURL } from "../../../utils";
 
 const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] = async (
   parent,
