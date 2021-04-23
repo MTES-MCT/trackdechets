@@ -248,19 +248,19 @@ describe("templates", () => {
     const userEmail = "john.snow@trackdechets.fr";
     const companyName = "ACME";
     const companySiret = "11111111111111";
-    const membershipRequestLink = "http://trackdechets.fr/join/qdhsfsdf";
+    const membershipRequestId = "4567";
     const rendered = renderMail(membershipRequest, {
       variables: {
         userEmail,
         companyName,
         companySiret,
-        membershipRequestLink
+        membershipRequestId
       },
       to
     });
     expect(rendered.body).toContain(companyName);
     expect(rendered.body).toContain(userEmail);
-    expect(rendered.body).toContain(membershipRequestLink);
+    expect(rendered.body).toContain(membershipRequestId);
   });
 
   test("membershipRequestAccepted", () => {

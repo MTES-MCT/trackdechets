@@ -13,8 +13,7 @@ import {
   membershipRequest as membershipRequestMail,
   membershipRequestConfirmation
 } from "../../../mailer/templates";
-
-const { UI_HOST, UI_URL_SCHEME } = process.env;
+import { getUIBaseURL } from "../../../utils";
 
 const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] = async (
   parent,
@@ -58,7 +57,6 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
 
   // send membership request to all admins of the company
   const recipients = admins.map(a => ({ email: a.email, name: a.name }));
-  const membershipRequestLink = `${UI_URL_SCHEME}://${UI_HOST}/membership-request/${membershipRequest.id}`;
 
   await sendMail(
     renderMail(membershipRequestMail, {
@@ -67,7 +65,7 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
         userEmail: user.email,
         companyName: company.name,
         companySiret: company.siret,
-        membershipRequestLink
+        membershipRequestId: membershipRequest.id
       }
     })
   );

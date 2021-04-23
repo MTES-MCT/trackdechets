@@ -119,7 +119,7 @@ export const membershipRequest: MailTemplate<{
   userEmail: string;
   companyName: string;
   companySiret: string;
-  membershipRequestLink: string;
+  membershipRequestId: string;
 }> = {
   subject: "Un utilisateur souhaite rejoindre votre établissement",
   body: mustacheRenderer("information-demande-de-rattachement.html"),
