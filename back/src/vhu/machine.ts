@@ -1,10 +1,10 @@
-import { BsvhuForm, BsvhuStatus } from "@prisma/client";
+import { Bsvhu, BsvhuStatus } from "@prisma/client";
 import { Machine } from "xstate";
 import { SignatureTypeInput } from "../generated/graphql/types";
 
 type Event = {
   type: SignatureTypeInput;
-  bsvhu: BsvhuForm;
+  bsvhu: Bsvhu;
 };
 
 export const machine = Machine<never, Event>(

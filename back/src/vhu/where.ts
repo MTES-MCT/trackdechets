@@ -5,7 +5,7 @@ import { BsvhuWhere, DateFilter } from "../generated/graphql/types";
 
 export function convertWhereToDbFilter(
   where: BsvhuWhere
-): Prisma.BsvhuFormWhereInput {
+): Prisma.BsvhuWhereInput {
   if (!where) {
     return {};
   }
@@ -29,7 +29,7 @@ export function convertWhereToDbFilter(
 }
 
 function toPrismaFilter(where: Omit<BsvhuWhere, "_or" | "_and" | "_not">) {
-  return safeInput<Prisma.BsvhuFormWhereInput>({
+  return safeInput<Prisma.BsvhuWhereInput>({
     createdAt: toPrismaDateFilter(where.createdAt),
     updatedAt: toPrismaDateFilter(where.updatedAt),
     transporterCompanySiret: where.transporter?.company?.siret,

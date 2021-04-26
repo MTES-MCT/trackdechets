@@ -8,7 +8,7 @@ import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb, flattenVhuInput } from "../../converter";
 import { checkIsFormContributor } from "../../permissions";
-import { validateBsvhuForm } from "../../validation";
+import { validateBsvhu } from "../../validation";
 
 type CreateBsvhu = {
   isDraft: boolean;
@@ -34,9 +34,9 @@ export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
     "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  await validateBsvhuForm(form, { emissionSignature: !isDraft });
+  await validateBsvhu(form, { emissionSignature: !isDraft });
 
-  const newForm = await prisma.bsvhuForm.create({
+  const newForm = await prisma.bsvhu.create({
     data: { ...form, id: getReadableId(ReadableIdPrefix.VHU), isDraft }
   });
 

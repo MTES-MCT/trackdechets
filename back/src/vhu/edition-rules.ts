@@ -1,4 +1,4 @@
-import { BsvhuForm as PrismaVhuForm } from "@prisma/client";
+import { Bsvhu as PrismaVhuForm } from "@prisma/client";
 import { isObject, objectDiff } from "../forms/workflow/diff";
 import {
   FormCompany,

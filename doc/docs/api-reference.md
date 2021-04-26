@@ -6,8 +6,6 @@ sidebar_label: Référence de l'API
 
 
 ## Query
-Views of the Company ressource for the admin panel
-
 <table>
 <thead>
 <tr>
@@ -152,35 +150,6 @@ Défaut à 50, maximum à 500
 Filtres
 
 </td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>companiesForVerification</strong></td>
-<td valign="top"><a href="#companyforverificationconnection">CompanyForVerificationConnection</a>!</td>
-<td>
-
-List companies for the company verfication table of the admin panel
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">first</td>
-<td valign="top"><a href="#int">Int</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">last</td>
-<td valign="top"><a href="#int">Int</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">skip</td>
-<td valign="top"><a href="#int">Int</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">where</td>
-<td valign="top"><a href="#companyforverificationwhere">CompanyForVerificationWhere</a></td>
-<td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>companyInfos</strong></td>
@@ -1356,54 +1325,10 @@ Champ libre, utilisable par exemple pour noter les tournées des transporteurs
 
 </td>
 </tr>
-<tr>
-<td colspan="2" valign="top"><strong>verifyCompanyByAdmin</strong></td>
-<td valign="top"><a href="#companyforverification">CompanyForVerification</a>!</td>
-<td>
-
-Verify a company manually
-
-</td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">input</td>
-<td valign="top"><a href="#verifycompanybyadmininput">VerifyCompanyByAdminInput</a>!</td>
-<td></td>
-</tr>
 </tbody>
 </table>
 
 ## Objects
-
-### AdminForVerification
-
-<table>
-<thead>
-<tr>
-<th align="left">Field</th>
-<th align="right">Argument</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>email</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>name</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>phone</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
 
 ### AuthPayload
 
@@ -2182,96 +2107,6 @@ Récépissé transporteur
 Informations liés au transport
 
 </td>
-</tr>
-</tbody>
-</table>
-
-### CompanyForVerification
-
-<table>
-<thead>
-<tr>
-<th align="left">Field</th>
-<th align="right">Argument</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>id</strong></td>
-<td valign="top"><a href="#id">ID</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>siret</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>name</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>companyTypes</strong></td>
-<td valign="top">[<a href="#companytype">CompanyType</a>!]!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>createdAt</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>verificationStatus</strong></td>
-<td valign="top"><a href="#companyverificationstatus">CompanyVerificationStatus</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>verificationComment</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>verificationMode</strong></td>
-<td valign="top"><a href="#companyverificationmode">CompanyVerificationMode</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>verifiedAt</strong></td>
-<td valign="top"><a href="#datetime">DateTime</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>admin</strong></td>
-<td valign="top"><a href="#adminforverification">AdminForVerification</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-
-### CompanyForVerificationConnection
-
-<table>
-<thead>
-<tr>
-<th align="left">Field</th>
-<th align="right">Argument</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>totalCount</strong></td>
-<td valign="top"><a href="#int">Int</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>companies</strong></td>
-<td valign="top">[<a href="#companyforverification">CompanyForVerification</a>!]!</td>
-<td></td>
 </tr>
 </tbody>
 </table>
@@ -6132,25 +5967,6 @@ Défaut à vide.
 </tbody>
 </table>
 
-### CompanyForVerificationWhere
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>verificationStatus</strong></td>
-<td valign="top"><a href="#companyverificationstatus">CompanyVerificationStatus</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-
 ### CompanyInput
 
 Payload d'un établissement
@@ -7817,30 +7633,6 @@ Annexe 2
 </tbody>
 </table>
 
-### VerifyCompanyByAdminInput
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>siret</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>verificationComment</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-
 ### WasteDetailsInput
 
 Payload lié au détails du déchet (case 3, 4, 5, 6)
@@ -8206,25 +7998,6 @@ Courtier
 Éco-organisme
 
 </td>
-</tr>
-</tbody>
-</table>
-
-### CompanyVerificationMode
-
-<table>
-<thead>
-<th align="left">Value</th>
-<th align="left">Description</th>
-</thead>
-<tbody>
-<tr>
-<td valign="top"><strong>LETTER</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>MANUAL</strong></td>
-<td></td>
 </tr>
 </tbody>
 </table>

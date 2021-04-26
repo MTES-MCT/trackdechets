@@ -3,17 +3,14 @@
 # Helper to restore a DB backup locally
 # -------------------------------------
 
-psql_container_id=$(docker ps -qf "name=postgres")
-api_container_id=$(docker ps -qf "name=td-api")
+psql_container_id=$(docker ps -qf "name=trackdechets_postgres")
+api_container_id=$(docker ps -qf "name=trackdechets_td-api")
 
-read -erp $'\e[1m? Do you wish to download the latest prod backup \e[m (Y/n) ' -e downloadBackup
+read -erp $'\e[1m? Do you wish to download the latest backup of your chosen database \e[m (Y/n) ' -e downloadBackup
 downloadBackup=${downloadBackup:-Y}
 
 if [ "$downloadBackup" != "${downloadBackup#[Yy]}" ]; then
     echo -e "\e[90m"
-    if [ -f ../.env ]; then
-        export $(grep -v '#' ../.env | awk '/=/ {print $1}')
-    fi
 
     backupName="db_backup.custom"
     backupPath="$(pwd)/$backupName"
@@ -21,7 +18,7 @@ if [ "$downloadBackup" != "${downloadBackup#[Yy]}" ]; then
     node ./get-db-backup-link.js | xargs wget -O "$backupPath"
     echo -e "\e[m"
 else
-    while read -erp $'\e[1m? Enter backup path location:\e[m ' backupPath; do
+    while read -erp $'\e[1m? Enter local backup path:\e[m ' backupPath; do
         if [ -f "$backupPath" ]; then
             break
         else

@@ -1,9 +1,9 @@
-import { BsvhuForm } from "@prisma/client";
+import { Bsvhu } from "@prisma/client";
 import { readFile } from "fs/promises";
 import { join } from "path";
 import { connect } from "puppeteer-core";
 
-export async function buildPdf(form: BsvhuForm) {
+export async function buildPdf(form: Bsvhu) {
   const browser = await connect({
     browserWSEndpoint: "wss://chrome.browserless.io/"
   });

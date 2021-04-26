@@ -1,4 +1,4 @@
-import { User, BsvhuForm } from "@prisma/client";
+import { User, Bsvhu } from "@prisma/client";
 import { NotFormContributor } from "../forms/errors";
 import { getFullUser } from "../users/database";
 
@@ -6,7 +6,7 @@ export async function checkIsFormContributor(
   user: User,
   form: Partial<
     Pick<
-      BsvhuForm,
+      Bsvhu,
       | "emitterCompanySiret"
       | "destinationCompanySiret"
       | "transporterCompanySiret"
@@ -23,7 +23,7 @@ export async function checkIsFormContributor(
   return true;
 }
 
-export async function isFormContributor(user: User, form: Partial<BsvhuForm>) {
+export async function isFormContributor(user: User, form: Partial<Bsvhu>) {
   const fullUser = await getFullUser(user);
   const userSirets = fullUser.companies.map(c => c.siret);
 

@@ -1,6 +1,6 @@
 import {
   Prisma,
-  BsvhuForm,
+  Bsvhu,
   BsvhuIdentificationType,
   BsvhuPackaging,
   WasteAcceptationStatus
@@ -20,7 +20,7 @@ import { FactorySchemaOf } from "../common/yup/configureYup";
 import { BsvhuDestinationType } from "../generated/graphql/types";
 
 type Emitter = Pick<
-  BsvhuForm,
+  Bsvhu,
   | "emitterAgrementNumber"
   | "emitterCompanyName"
   | "emitterCompanySiret"
@@ -31,7 +31,7 @@ type Emitter = Pick<
 >;
 
 type Destination = Pick<
-  BsvhuForm,
+  Bsvhu,
   | "destinationType"
   | "destinationAgrementNumber"
   | "destinationCompanyName"
@@ -49,7 +49,7 @@ type Destination = Pick<
 >;
 
 type Transporter = Pick<
-  BsvhuForm,
+  Bsvhu,
   | "transporterCompanyName"
   | "transporterCompanySiret"
   | "transporterCompanyAddress"
@@ -62,12 +62,12 @@ type Transporter = Pick<
 >;
 
 type Identification = Pick<
-  BsvhuForm,
+  Bsvhu,
   "identificationNumbers" | "identificationType"
 >;
 
-type Quantity = Pick<BsvhuForm, "quantityNumber" | "quantityTons">;
-type Packaging = Pick<BsvhuForm, "packaging">;
+type Quantity = Pick<Bsvhu, "quantityNumber" | "quantityTons">;
+type Packaging = Pick<Bsvhu, "packaging">;
 
 interface VhuValidationContext {
   emissionSignature?: boolean;
@@ -75,8 +75,8 @@ interface VhuValidationContext {
   operationSignature?: boolean;
 }
 
-export function validateBsvhuForm(
-  form: Partial<Prisma.BsvhuFormCreateInput>,
+export function validateBsvhu(
+  form: Partial<Prisma.BsvhuCreateInput>,
   context: VhuValidationContext
 ) {
   return emitterSchema(context)

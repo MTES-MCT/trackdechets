@@ -36,8 +36,8 @@ export default async function bsvhus(
     isDeleted: false
   };
 
-  const totalCount = await prisma.bsvhuForm.count({ where });
-  const queriedForms = await prisma.bsvhuForm.findMany({
+  const totalCount = await prisma.bsvhu.count({ where });
+  const queriedForms = await prisma.bsvhu.findMany({
     ...connectionsArgs,
     orderBy: { createdAt: "desc" },
     where

@@ -9,17 +9,17 @@ import prisma from "../../prisma";
 export const vhuFormFactory = async ({
   opt = {}
 }: {
-  opt?: Partial<Prisma.BsvhuFormCreateInput>;
+  opt?: Partial<Prisma.BsvhuCreateInput>;
 }) => {
   const formParams = { ...getVhuFormdata(), ...opt };
-  return prisma.bsvhuForm.create({
+  return prisma.bsvhu.create({
     data: {
       ...formParams
     }
   });
 };
 
-const getVhuFormdata = (): Prisma.BsvhuFormCreateInput => ({
+const getVhuFormdata = (): Prisma.BsvhuCreateInput => ({
   id: getReadableId(ReadableIdPrefix.VHU),
   emitterAgrementNumber: "agrement",
   emitterCompanyName: "emitter company",

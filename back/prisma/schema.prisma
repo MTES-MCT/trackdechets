@@ -584,7 +584,7 @@ enum BsvhuRecipientType {
   DEMOLISSEUR
 }
 
-model BsvhuForm {
+model Bsvhu {
   id        String   @id
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
