@@ -16,6 +16,10 @@ type Mutation {
   verifyCompanyByAdmin(
     input: VerifyCompanyByAdminInput!
   ): CompanyForVerification!
+
+  sendVerificationCodeLetter(
+    input: SendVerificationCodeLetterInput!
+  ): CompanyForVerification!
 }
 
 type CompanyForVerification {
@@ -54,4 +58,8 @@ input CompanyForVerificationWhere {
 input VerifyCompanyByAdminInput {
   siret: String!
   verificationComment: String
+}
+
+input SendVerificationCodeLetterInput {
+  siret: String!
 }
