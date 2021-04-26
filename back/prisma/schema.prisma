@@ -536,6 +536,12 @@ model User {
   MembershipRequest    MembershipRequest[]
   StatusLog            StatusLog[]
   UserActivationHash   UserActivationHash[]
+
+  Bsdasri Bsdasri[] @relation("BsdasriOwnedBy")
+  bsdasriEmissionSignatures Bsdasri[] @relation("BsdasriEmissionSignature")
+  bsdasriTransportSignatures Bsdasri[] @relation("BsdasriTransportSignature")
+  bsdasriReceptionSignatures Bsdasri[] @relation("BsdasriReceptionSignature")
+  bsdasriOperationignatures Bsdasri[] @relation("BsdasriOperationSignature")
 }
 
 model UserAccountHash {
@@ -648,4 +654,142 @@ model BsvhuForm {
   recipientPlannedBroyeurCompanyMail       String?
   recipientSignatureAuthor                 String?
   recipientSignatureDate                   DateTime?
+}
+
+
+// Bsdasri models
+
+enum BsdasriStatus {
+  INITIAL
+  SIGNED_BY_PRODUCER
+  SENT
+  RECEIVED
+  PROCESSED
+  REFUSED
+}
+
+enum BsdasriEmitterType {
+  PRODUCER
+  COLLECTOR
+  
+}
+
+model Bsdasri {
+  id                                 String                  @unique
+  status                             BsdasriStatus           @default(INITIAL)
+  createdAt                          DateTime                @default(now())
+  updatedAt                          DateTime                @updatedAt
+  ownerId                            String
+  owner                              User                    @relation("BsdasriOwnedBy", fields: [ownerId], references: [id])
+  isDeleted                          Boolean?                @default(false)
+  isDraft                            Boolean?                @default(false)
+  
+  // emitter
+  emitterType                        BsdasriEmitterType     @default(PRODUCER)
+  emitterOnBehalfOfEcoorganisme      Boolean?               @default(false)
+  emitterCompanyName                 String?
+  emitterCompanySiret                String?
+  emitterCompanyAddress              String?
+  emitterCompanyContact              String?
+  emitterCompanyPhone                String?
+  emitterCompanyMail                 String?
+
+  emitterWorkSiteName                String?
+  emitterWorkSiteAddress             String?
+  emitterWorkSiteCity                String?
+  emitterWorkSitePostalCode          String?
+  emitterWorkSiteInfos               String?
+
+  emitterCustomInfo                  String? // free field
+
+  // emission
+  wasteDetailsCode                   String?
+  wasteDetailsOnuCode                String?
+  
+  emitterWasteQuantity               Int? // kg
+  emitterWasteQuantityType           QuantityType?
+  emitterWasteVolume                 Int? // liters
+  emitterWastePackagingsInfo         Json?
+  handedOverToTransporterAt          DateTime?
+
+  emissionSignatory                  User? @relation("BsdasriEmissionSignature",fields: [emissionSignatoryId], references: [id])
+  emissionSignatoryId                String?
+  emissionSignatureDate              DateTime?
+  emissionSignatureAuthor            String?
+
+  isEmissionDirectTakenOver           Boolean      @default(false)
+  isEmissionTakenOverWithSecretCode   Boolean      @default(false)
+  
+// transporter
+  transporterCompanyName             String?
+  transporterCompanySiret            String?
+  transporterCompanyAddress          String?
+  transporterCompanyPhone            String?
+  transporterCompanyContact          String?
+  transporterCompanyMail             String?
+  transporterReceipt                 String?
+  transporterReceiptDepartment       String?
+  transporterReceiptValidityLimit    DateTime?
+
+  transporterCustomInfo              String? // free field
+
+  
+  // transport
+  transporterWasteAcceptationStatus  WasteAcceptationStatus?
+  transporterWasteRefusalReason      String?
+  transporterWasteRefusedQuantity    Int? // kg
+
+  transporterTakenOverAt             DateTime?
+  
+  transporterWastePackagingsInfo     Json?
+  transporterWasteQuantity           Int? // kg
+  transporterWasteQuantityType       QuantityType?
+  transporterWasteVolume             Int? // liters
+
+  handedOverToRecipientAt            DateTime?
+
+ 
+  transportSignatory                 User? @relation("BsdasriTransportSignature", fields: [transportSignatoryId], references: [id])
+  transportSignatoryId               String?
+  transportSignatureDate             DateTime?
+  transportSignatureAuthor           String?
+
+  // recipient
+  recipientCompanyName               String?
+  recipientCompanySiret              String?
+  recipientCompanyAddress            String?
+  recipientCompanyContact            String?
+  recipientCompanyPhone              String?
+  recipientCompanyMail               String?
+
+  recipientCustomInfo                String? // free field
+
+  // reception
+  recipientWastePackagingsInfo       Json?
+  recipientWasteAcceptationStatus    WasteAcceptationStatus?
+  recipientWasteRefusalReason        String?
+  recipientWasteRefusedQuantity      Int? // kg
+  recipientWasteQuantity             Int? // kg
+  recipientWasteQuantityType         QuantityType?
+
+  recipientWasteVolume               Int? // liters
+  receivedAt                         DateTime? // accepted or refused date
+  
+  processingOperation                String?
+  processedAt                        DateTime?
+
+  receptionSignatory                User? @relation("BsdasriReceptionSignature", fields: [receptionSignatoryId], references: [id])
+  receptionSignatoryId              String?
+  receptionSignatureDate            DateTime?
+  receptionSignatureAuthor          String?
+
+ 
+  operationSignatory                 User? @relation("BsdasriOperationSignature", fields: [operationSignatoryId], references: [id])
+  operationSignatoryId               String?
+  operationSignatureDate             DateTime?
+  operationSignatureAuthor           String?
+
+  regroupedBsdasris                 Bsdasri[]                  @relation("BsdasriToBsdasri")
+  regroupedOnBsdasri                Bsdasri?                   @relation("BsdasriToBsdasri", fields: [regroupedOnBsdasriId], references: [id])
+  regroupedOnBsdasriId              String?
 }
