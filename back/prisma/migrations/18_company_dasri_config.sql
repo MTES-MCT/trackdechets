@@ -1,0 +1,1 @@
+ALTER TABLE "default$default"."Company" ADD "allowBsdasriTakeOverWithoutSignature" BOOLEAN default FALSE;
