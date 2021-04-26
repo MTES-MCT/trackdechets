@@ -23,6 +23,7 @@ export default function Recipient() {
   const hasTrader = !!values.trader;
   const hasBroker = !!values.broker;
   const isTempStorage = !!values.recipient?.isTempStorage;
+  const isDangerousWaste = values.wasteDetails?.code?.includes("*");
 
   function handleNoneToggle() {
     setFieldValue("broker", null, false);
@@ -108,10 +109,14 @@ export default function Recipient() {
       <div className="form__row">
         <label>
           Numéro de CAP
-          <Tooltip
-            msg={`Le champ CAP est obligatoire pour les déchets dangereux.
+          {isDangerousWaste ? (
+            <Tooltip
+              msg={`Le champ CAP est obligatoire pour les déchets dangereux.
 Il est important car il qualifie les conditions de gestion et de traitement du déchets entre le producteur et l'entreprise de destination.`}
-          />
+            />
+          ) : (
+            " (Optionnel pour les déchets non dangereux)"
+          )}
           <Field
             type="text"
             name="recipient.cap"
