@@ -1,14 +1,18 @@
-import dasriCreate from "./mutations/dasriCreate";
-import dasriUpdate from "./mutations/dasriUpdate";
-import dasriMarkAsReady from "./mutations/dasriMarkAsReady";
-import dasriSign from "./mutations/dasriSign";
+import createBsdasri from "./mutations/createBsdasri";
+import createDraftBsdasri from "./mutations/createDraftBsdasri";
+import updateBsdasri from "./mutations/updateBsdasri";
+import publishBsdasri from "./mutations/publishBsdasri";
+import signBsdasri from "./mutations/signBsdasri";
+import signBsdasriEmissionWithSecretCode from "./mutations/signBsdasriEmissionWithSecretCode";
 import { MutationResolvers } from "../../generated/graphql/types";
 
 const Mutation: MutationResolvers = {
-  dasriCreate,
-  dasriUpdate,
-  dasriMarkAsReady,
-  dasriSign
+  createDraftBsdasri,
+  createBsdasri,
+  updateBsdasri,
+  publishBsdasri,
+  signBsdasri,
+  signBsdasriEmissionWithSecretCode
 };
 
 export default Mutation;

@@ -1,9 +1,9 @@
-import dasris from "./queries/dasris";
-import dasri from "./queries/dasri";
+import bsdasris from "./queries/bsdasris";
+import bsdasri from "./queries/bsdasri";
 import { QueryResolvers } from "../../generated/graphql/types";
 const Query: QueryResolvers = {
-  dasris,
-  dasri
+  bsdasris,
+  bsdasri
 };
 
 export default Query;
