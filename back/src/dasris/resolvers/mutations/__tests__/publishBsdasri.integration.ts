@@ -3,7 +3,6 @@ import { ErrorCode } from "../../../../common/errors";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
- 
 
 const PUBLISH_DASRI = `
 mutation PublishDasri($id: ID!){
@@ -114,8 +113,7 @@ describe("Mutation.publishBsdasri", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "emitterCompanyName est un champ requis et doit avoir une valeur",
+        message: "Émetteur: Le nom de l'entreprise est obligatoire",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

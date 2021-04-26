@@ -24,8 +24,6 @@ describe("Mutation.createDraftBsdasri", () => {
   afterEach(async () => {
     await resetDatabase();
   });
- 
-
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();

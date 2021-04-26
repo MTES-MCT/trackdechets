@@ -25,7 +25,6 @@ describe("Mutation.createDasri", () => {
     await resetDatabase();
   });
 
-
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
     const { errors } = await mutate(CREATE_DASRI, {
@@ -70,7 +69,6 @@ describe("Mutation.createDasri", () => {
   });
   it("denies dasri creation if data does not validate", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    console.log(user, company);
     const input = {
       emitter: {
         company: {
@@ -107,8 +105,8 @@ describe("Mutation.createDasri", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "wasteDetailsCode est un champ requis et doit avoir une valeur\n" +
-          "emitterCompanyMail est un champ requis et doit avoir une valeur",
+          "Le code déchet est obligatoire\n" +
+          "Émetteur: L'email de l'entreprise est obligatoire",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

@@ -132,7 +132,7 @@ export const emitterSchema: FactorySchemaOf<
       .string()
       .requiredIf(
         context.emissionSignature,
-        `Émetteur--: ${MISSING_COMPANY_NAME}`
+        `Émetteur: ${MISSING_COMPANY_NAME}`
       ),
     emitterCompanySiret: yup
       .string()
