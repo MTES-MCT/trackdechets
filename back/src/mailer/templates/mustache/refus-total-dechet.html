@@ -2,6 +2,7 @@
   Nous vous informons que la société {{form.recipientCompanyName}} a refusé le {{form.receivedAt}}, le déchet de la
   société suivante :
 </p>
+<br />
 <ul>
   <li>{{form.emitterCompanyName}} - {{form.emitterCompanyAddress}}</li>
   <li>Informations relatives aux déchets refusés :</li>
@@ -17,18 +18,23 @@
   </ul>
   <li>Transporteur :
     {{#form.transporterIsExemptedOfReceipt}}
-      <b>Exemption relevant de l'article R.541-50 du code de l'Environnement</b>{{/form.transporterIsExemptedOfReceipt}}
+    <b>Exemption relevant de l'article R.541-50 du code de l'Environnement</b>{{/form.transporterIsExemptedOfReceipt}}
     {{^form.transporterIsExemptedOfReceipt}}
-      <b>{{form.transporterCompanyName}}</b>
+    <b>{{form.transporterCompanyName}}</b>
     {{/form.transporterIsExemptedOfReceipt}}
   </li>
   <li>Responsable du site : {{form.sentBy}}</li>
 </ul>
-Vous trouverez ci-joint la copie du BSD correspondant au refus mentionné ci-dessus.
+<br />
+<p>
+  Vous trouverez ci-joint la copie du BSD correspondant au refus mentionné ci-dessus.
+</p>
+<br />
 <p>
   Comme le prévoit l'article R541-45 du code de l'environnement, l'expéditeur initial du déchet et l'inspection des
   installations classées sont tenus informés de ce refus.
 </p>
+<br />
 <p>
   <strong>Ce message est transmis par Trackdéchets automatiquement lors d'un refus de déchets. Merci de prendre les
     dispositions nécessaires pour vous assurer du bon traitement de votre déchet.</strong>
