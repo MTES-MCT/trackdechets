@@ -184,7 +184,7 @@ describe("Query.Bsdasris", () => {
     const transporterCompany = await companyFactory();
     const recipientCompany = await companyFactory();
 
-    const dasri1 = await bsdasriFactory({
+    await bsdasriFactory({
       ownerId: user.id,
       opt: {
         ...initialData(company)

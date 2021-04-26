@@ -1,19 +1,20 @@
 import { resetDatabase } from "../../../integration-tests/helper";
-import { dasriFactory } from "./factories";
+import { bsdasriFactory } from "./factories";
 import { userFactory } from "../../__tests__/factories";
 
 describe("Test Factories", () => {
-  afterAll(resetDatabase);
+  afterEach(resetDatabase);
 
-  test("should create a user", async () => {
+  test("should create a bsdasri", async () => {
     const usr = await userFactory();
 
-    const dasri = await dasriFactory({
+    const dasri = await bsdasriFactory({
       ownerId: usr.id,
       opt: { emitterCompanyName: "somecompany" }
     });
 
     expect(dasri.id).toBeTruthy();
-    expect(dasri.readableId).toBeTruthy();
+    expect(dasri.status).toEqual("INITIAL");
+    expect(dasri.isDraft).toEqual(false);
   });
 });

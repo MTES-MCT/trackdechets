@@ -182,7 +182,7 @@ describe("Mutation.updateBsdasri", () => {
         emitterCompanySiret: company.siret,
         emissionSignatureAuthor: user.name,
         emissionSignatory: { connect: { id: user.id } },
-        emissionSignatureDate: new Date()
+        emissionSignatureDate: new Date().toISOString()
       }
     });
 
@@ -221,7 +221,7 @@ describe("Mutation.updateBsdasri", () => {
         emitterCompanySiret: company.siret,
         emissionSignatureAuthor: user.name,
         emissionSignatory: { connect: { id: user.id } },
-        emissionSignatureDate: new Date()
+        emissionSignatureDate: new Date().toISOString()
       }
     });
 
@@ -261,7 +261,7 @@ describe("Mutation.updateBsdasri", () => {
         emitterCompanySiret: company.siret,
         transportSignatureAuthor: user.name,
         transportSignatory: { connect: { id: user.id } },
-        transportSignatureDate: new Date()
+        transportSignatureDate: new Date().toISOString()
       }
     });
 
@@ -305,7 +305,7 @@ describe("Mutation.updateBsdasri", () => {
         emitterCompanySiret: company.siret,
         transportSignatureAuthor: user.name,
         transportSignatory: { connect: { id: user.id } },
-        transportSignatureDate: new Date()
+        transportSignatureDate: new Date().toISOString()
       }
     });
 
@@ -314,7 +314,7 @@ describe("Mutation.updateBsdasri", () => {
       id: dasri.id,
 
       transport: {
-        handedOverAt: new Date()
+        handedOverAt: new Date().toISOString()
       }
     };
 
@@ -336,7 +336,7 @@ describe("Mutation.updateBsdasri", () => {
         emitterCompanySiret: company.siret,
         receptionSignatureAuthor: user.name,
         receptionSignatory: { connect: { id: user.id } },
-        receptionSignatureDate: new Date()
+        receptionSignatureDate: new Date().toISOString()
       }
     });
 
@@ -344,7 +344,7 @@ describe("Mutation.updateBsdasri", () => {
     const input = {
       id: dasri.id,
       transport: {
-        handedOverAt: new Date()
+        handedOverAt: new Date().toISOString()
       }
     };
     // handedOverToRecipientAt can be updated even after dasri is sent, but not when it is received
@@ -376,7 +376,7 @@ describe("Mutation.updateBsdasri", () => {
         emitterCompanySiret: company.siret,
         transportSignatureAuthor: user.name,
         transportSignatory: { connect: { id: user.id } },
-        transportSignatureDate: new Date()
+        transportSignatureDate: new Date().toISOString()
       }
     });
 
@@ -391,7 +391,7 @@ describe("Mutation.updateBsdasri", () => {
       }
     };
 
-    const { data } = await mutate(UPDATE_DASRI, {
+    await mutate(UPDATE_DASRI, {
       variables: { input }
     });
     const updatedDasri = await prisma.bsdasri.findUnique({
@@ -409,7 +409,7 @@ describe("Mutation.updateBsdasri", () => {
         emitterCompanySiret: company.siret,
         receptionSignatureAuthor: user.name,
         receptionSignatory: { connect: { id: user.id } },
-        receptionSignatureDate: new Date()
+        receptionSignatureDate: new Date().toISOString()
       }
     });
 
@@ -450,7 +450,7 @@ describe("Mutation.updateBsdasri", () => {
         emitterCompanySiret: company.siret,
         receptionSignatureAuthor: user.name,
         receptionSignatory: { connect: { id: user.id } },
-        receptionSignatureDate: new Date()
+        receptionSignatureDate: new Date().toISOString()
       }
     });
 

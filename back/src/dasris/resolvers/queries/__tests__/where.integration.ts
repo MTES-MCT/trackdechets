@@ -5,7 +5,7 @@ import { buildDbFilter } from "../where";
 const siret = "11112345611111";
 
 describe("Bsdasri where conversion", () => {
-  it.each(["_or", "_and"])("should deny nested filters in %p", cond => {
+  it.each(["_or", "_and"])("should forbid nested filters in %p", cond => {
     const where: BsdasriWhere = {
       [cond]: [{ _and: [{ isDraft: true }] }]
     };
@@ -21,20 +21,14 @@ describe("Bsdasri where conversion", () => {
 
     const dbFilter = buildDbFilter(where, [siret]);
     expect(dbFilter).toEqual({
-      AND: [
-        {
-          OR: [
-            { emitterCompanySiret: siret },
-            { transporterCompanySiret: siret },
-            { recipientCompanySiret: siret }
-          ]
-        },
-        {
-          emitterCompanySiret: "emitterSiret",
-          transporterCompanySiret: "transporterSiret",
-          recipientCompanySiret: "recipientSiret"
-        }
-      ]
+      OR: [
+        { emitterCompanySiret: { in: [siret] } },
+        { transporterCompanySiret: { in: [siret] } },
+        { recipientCompanySiret: { in: [siret] } }
+      ],
+      emitterCompanySiret: "emitterSiret",
+      transporterCompanySiret: "transporterSiret",
+      recipientCompanySiret: "recipientSiret"
     });
   });
 
@@ -45,18 +39,13 @@ describe("Bsdasri where conversion", () => {
 
     const dbFilter = buildDbFilter(where, [siret]);
     expect(dbFilter).toEqual({
-      AND: [
-        {
-          OR: [
-            { emitterCompanySiret: siret },
-            { transporterCompanySiret: siret },
-            { recipientCompanySiret: siret }
-          ]
-        },
-        {
-          processingOperation: { in: ["D9", "R1"] }
-        }
-      ]
+      OR: [
+        { emitterCompanySiret: { in: [siret] } },
+        { transporterCompanySiret: { in: [siret] } },
+        { recipientCompanySiret: { in: [siret] } }
+      ],
+
+      processingOperation: { in: ["D9", "R1"] }
     });
   });
 
@@ -69,9 +58,9 @@ describe("Bsdasri where conversion", () => {
     const dbFilter = buildDbFilter(where, [siret]);
     expect(dbFilter).toEqual({
       OR: [
-        { emitterCompanySiret: { in: [siret] }  },
-        { transporterCompanySiret: { in: [siret] }  },
-        { recipientCompanySiret: { in: [siret] }  }
+        { emitterCompanySiret: { in: [siret] } },
+        { transporterCompanySiret: { in: [siret] } },
+        { recipientCompanySiret: { in: [siret] } }
       ],
       status: "PROCESSED",
       isDraft: true

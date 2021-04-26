@@ -66,7 +66,6 @@ const createBsdasri = async (
     });
     return expandBsdasriFromDb(newDasri);
   } catch (e) {
-
     console.log(e);
   }
 };

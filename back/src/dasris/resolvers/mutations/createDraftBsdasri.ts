@@ -6,7 +6,6 @@ import { GraphQLContext } from "../../../types";
 
 import createBsdasri from "./create";
 
-
 const createDraftBsdasriResolver = async (
   parent: ResolversParentTypes["Mutation"],
   bsdasriCreateInput: MutationCreateBsdasriArgs,

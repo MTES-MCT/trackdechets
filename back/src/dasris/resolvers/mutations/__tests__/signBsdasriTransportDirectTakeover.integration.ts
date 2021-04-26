@@ -88,8 +88,7 @@ describe("Mutation.signBsdasri transport", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "wasteDetailsOnuCode est un champ requis et doit avoir une valeur"
+        message: "La mention ADR est obligatoire."
       })
     ]);
   });
