@@ -10,7 +10,7 @@ import dasriResolvers from "./dasris/resolvers";
 // Merge GraphQL schema by merging types, resolvers and shields
 // definitions from differents modules
 
-const repositories = ["users", "companies", "forms", "vhu"];
+const repositories = ["users", "companies", "forms", "vhu", "dasris"];
 
 const typeDefsPath = repositories.map(
   repository => `${__dirname}/${repository}/**/*.graphql`
