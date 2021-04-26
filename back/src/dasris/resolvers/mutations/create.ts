@@ -8,7 +8,7 @@ import {
   expandBsdasriFromDb,
   flattenBsdasriInput
 } from "../../dasri-converter";
-import getReadableId, { ReadableIdPrefix } from "../../../common/readableId";
+import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { validateBsdasri } from "../../validation";
 import { checkIsBsdasriContributor } from "../../permissions";

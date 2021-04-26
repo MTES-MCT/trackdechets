@@ -1,6 +1,6 @@
 import { expandBsdasriFromDb } from "../../dasri-converter";
 
-import { MissingIdOrReadableId } from "../../errors";
+import { MissingIdOrReadableId } from "../../../forms/errors";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsdasriOrNotFound } from "../../database";
