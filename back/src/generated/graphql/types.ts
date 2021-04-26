@@ -121,6 +121,398 @@ export type BrokerReceipt = {
   department: Scalars["String"];
 };
 
+/** Bordereau Bsdasri */
+export type Bsdasri = {
+  __typename?: "Bsdasri";
+  id: Scalars["ID"];
+  status: BsdasriStatus;
+  createdAt?: Maybe<Scalars["DateTime"]>;
+  updatedAt?: Maybe<Scalars["DateTime"]>;
+  isDraft: Scalars["Boolean"];
+  emitter?: Maybe<BsdasriEmitter>;
+  emission?: Maybe<BsdasriEmission>;
+  transporter?: Maybe<BsdasriTransporter>;
+  transport?: Maybe<BsdasriTransport>;
+  recipient?: Maybe<BsdasriRecipient>;
+  reception?: Maybe<BsdasriReception>;
+  operation?: Maybe<BsdasriOperation>;
+  /** Bordereaux regroupés */
+  regroupedBsdasris?: Maybe<Array<Scalars["ID"]>>;
+  metadata: BsdasriMetadata;
+};
+
+export type BsdasriCompanyWhere = {
+  siret: Scalars["String"];
+};
+
+export type BsdasriConnection = {
+  __typename?: "BsdasriConnection";
+  totalCount: Scalars["Int"];
+  pageInfo: PageInfo;
+  edges: Array<BsdasriEdge>;
+};
+
+export type BsdasriCreateInput = {
+  emitter?: Maybe<BsdasriEmitterInput>;
+  emission?: Maybe<BsdasriEmissionInput>;
+  transporter?: Maybe<BsdasriTransporterInput>;
+  transport?: Maybe<BsdasriTransportInput>;
+  recipient?: Maybe<BsdasriRecipientInput>;
+  reception?: Maybe<BsdasriReceptionInput>;
+  operation?: Maybe<BsdasriOperationInput>;
+  regroupedBsdasris?: Maybe<Array<Maybe<RegroupedBsdasriInput>>>;
+};
+
+export type BsdasriEdge = {
+  __typename?: "BsdasriEdge";
+  cursor: Scalars["String"];
+  node: Bsdasri;
+};
+
+/** Informations relatives au déchet émis */
+export type BsdasriEmission = {
+  __typename?: "BsdasriEmission";
+  wasteCode?: Maybe<Scalars["String"]>;
+  wasteDetails?: Maybe<BsdasriWasteDetails>;
+  handedOverAt?: Maybe<Scalars["DateTime"]>;
+  signature?: Maybe<BsdasriSignature>;
+};
+
+export type BsdasriEmissionInput = {
+  wasteCode?: Maybe<Scalars["String"]>;
+  wasteDetails?: Maybe<BsdasriWasteDetailInput>;
+  handedOverAt?: Maybe<Scalars["DateTime"]>;
+};
+
+/** Émetteur du Bsdasri, Personne responsable de l'émimination des déchets (PRED) */
+export type BsdasriEmitter = {
+  __typename?: "BsdasriEmitter";
+  /** Établissement émetteur */
+  company?: Maybe<FormCompany>;
+  /** Site d'emport du déceht, si différent de celle de l'émetteur */
+  workSite?: Maybe<WorkSite>;
+  /** Date de remise au tranporteur */
+  handOverToTransporterAt?: Maybe<Scalars["DateTime"]>;
+  /** Champ libre */
+  customInfo?: Maybe<Scalars["String"]>;
+  /** Type d'émetteur */
+  type?: Maybe<BsdasriEmitterType>;
+  /** Agit pour le compte de l'éco organisme agréé */
+  onBehalfOfEcoorganisme: Scalars["Boolean"];
+};
+
+export type BsdasriEmitterInput = {
+  /** Établissement émetteur */
+  type?: Maybe<BsdasriEmitterType>;
+  company?: Maybe<CompanyInput>;
+  workSite?: Maybe<WorkSiteInput>;
+  /** Champ libre émetteur */
+  customInfo?: Maybe<Scalars["String"]>;
+  onBehalfOfEcoorganisme?: Maybe<Scalars["Boolean"]>;
+};
+
+/** Type d'émetteur */
+export type BsdasriEmitterType =
+  /** Producteur */
+  | "PRODUCER"
+  /** Installation de regroupement */
+  | "COLLECTOR";
+
+export type BsdasriEmitterWhere = {
+  company?: Maybe<BsdasriCompanyWhere>;
+  signature?: Maybe<BsdasriSignatureWhere>;
+};
+
+export type BsdasriError = {
+  __typename?: "BsdasriError";
+  message: Scalars["String"];
+  path: Scalars["String"];
+  requiredFor: Array<BsdasriSignatureType>;
+};
+
+export type BsdasriInput = {
+  emitter?: Maybe<BsdasriEmitterInput>;
+  emission?: Maybe<BsdasriEmissionInput>;
+  transporter?: Maybe<BsdasriTransporterInput>;
+  transport?: Maybe<BsdasriTransportInput>;
+  recipient?: Maybe<BsdasriRecipientInput>;
+  reception?: Maybe<BsdasriReceptionInput>;
+  operation?: Maybe<BsdasriOperationInput>;
+};
+
+export type BsdasriMetadata = {
+  __typename?: "BsdasriMetadata";
+  errors: Array<Maybe<BsdasriError>>;
+};
+
+/** Informations relatives au traitement du Bsdasri */
+export type BsdasriOperation = {
+  __typename?: "BsdasriOperation";
+  processingOperation?: Maybe<Scalars["String"]>;
+  processedAt?: Maybe<Scalars["DateTime"]>;
+  signature?: Maybe<BsdasriSignature>;
+};
+
+export type BsdasriOperationInput = {
+  processingOperation?: Maybe<Scalars["String"]>;
+  processedAt?: Maybe<Scalars["DateTime"]>;
+};
+
+/** Informations sur le conditionnement Bsdasri */
+export type BsdasriPackagingInfo = {
+  __typename?: "BsdasriPackagingInfo";
+  /** Type de conditionnement */
+  type: BsdasriPackagings;
+  /** Description du conditionnement dans le cas où le type de conditionnement est `AUTRE` */
+  other?: Maybe<Scalars["String"]>;
+  /** Nombre de colis associés à ce conditionnement */
+  quantity: Scalars["Int"];
+  volume: Scalars["Int"];
+};
+
+export type BsdasriPackagingInfoInput = {
+  /** Type de conditionnement */
+  type: BsdasriPackagings;
+  /** Description du conditionnement dans le cas où le type de conditionnement est `AUTRE` */
+  other?: Maybe<Scalars["String"]>;
+  /** Nombre de colis associés à ce conditionnement */
+  volume: Scalars["Int"];
+  /** Nombre de colis associés à ce conditionnement */
+  quantity: Scalars["Int"];
+};
+
+/** Type de packaging du déchet */
+export type BsdasriPackagings =
+  /** Caisse en carton avec sac en plastique */
+  | "BOITE_CARTON"
+  /** Fûts ou jerrican à usage unique */
+  | "FUT"
+  /** Boîtes et Mini-collecteurs pour déchets perforants */
+  | "BOITE_PERFORANTS"
+  /** Grand emballage */
+  | "GRAND_EMBALLAGE"
+  /** Grand récipient pour vrac */
+  | "GRV"
+  /** Autre */
+  | "AUTRE";
+
+/** Informations relatives à la réception du Bsdasri */
+export type BsdasriReception = {
+  __typename?: "BsdasriReception";
+  wasteDetails?: Maybe<BsdasriWasteDetails>;
+  wasteAcceptation?: Maybe<BsdasriWasteAcceptation>;
+  receivedAt?: Maybe<Scalars["DateTime"]>;
+  signature?: Maybe<BsdasriSignature>;
+};
+
+export type BsdasriReceptionInput = {
+  wasteDetails?: Maybe<BsdasriWasteDetailInput>;
+  receivedAt?: Maybe<Scalars["DateTime"]>;
+  wasteAcceptation?: Maybe<BsdasriWasteAcceptationInput>;
+};
+
+/** Destinataire du Bsdasri */
+export type BsdasriRecipient = {
+  __typename?: "BsdasriRecipient";
+  /** Installation destinataire */
+  company?: Maybe<FormCompany>;
+  /** Champ libre */
+  customInfo?: Maybe<Scalars["String"]>;
+};
+
+export type BsdasriRecipientInput = {
+  /** Établissement émetteur */
+  company?: Maybe<CompanyInput>;
+  /** Champ libre transporteur */
+  customInfo?: Maybe<Scalars["String"]>;
+};
+
+export type BsdasriRecipientWasteDetailInput = {
+  quantity?: Maybe<Scalars["Int"]>;
+  volume?: Maybe<Scalars["Int"]>;
+};
+
+export type BsdasriRecipientWhere = {
+  company?: Maybe<BsdasriCompanyWhere>;
+  signature?: Maybe<BsdasriSignatureWhere>;
+};
+
+export type BsdasriRole =
+  /** Les Bsdasri dont je suis transporteur */
+  | "TRANSPORTER"
+  /** Les Bsdasri dont je suis la destination de traitement */
+  | "RECIPIENT"
+  /** Les Bsdasri dont je suis l'émetteur */
+  | "EMITTER";
+
+export type BsdasriSignature = {
+  __typename?: "BsdasriSignature";
+  date?: Maybe<Scalars["DateTime"]>;
+  author?: Maybe<Scalars["String"]>;
+};
+
+export type BsdasriSignatureInput = {
+  type: BsdasriSignatureType;
+  author: Scalars["String"];
+};
+
+export type BsdasriSignatureType =
+  /** Signature du cadre émetteur (PRED) */
+  | "EMISSION"
+  /** Signature du cadre émetteur (PRED) par le transporteur, grâce au code de sécurité de l'émetteur */
+  | "EMISSION_WITH_SECRET_CODE"
+  /** Signature du cadre collecteur transporteur */
+  | "TRANSPORT"
+  /** Signature de la réception du déchet */
+  | "RECEPTION"
+  /** Signature du traitement du déchet */
+  | "OPERATION";
+
+export type BsdasriSignatureWhere = {
+  date: DateFilter;
+};
+
+export type BsdasriSignatureWithSecretCodeInput = {
+  author: Scalars["String"];
+  securityCode?: Maybe<Scalars["Int"]>;
+};
+
+export type BsdasriStatus =
+  /** Bsdasri dans son état initial */
+  | "INITIAL"
+  /** Optionnel, Bsdasri signé par la PRED (émetteur) */
+  | "SIGNED_BY_PRODUCER"
+  /** Bsdasri envoyé vers l'établissement de destination */
+  | "SENT"
+  /** Bsdasri reçu par l'établissement de destination */
+  | "RECEIVED"
+  /** Bsdasri dont les déchets ont été traités */
+  | "PROCESSED"
+  /** Déchet refusé */
+  | "REFUSED";
+
+/** Informations relatives au transport du Bsdasri */
+export type BsdasriTransport = {
+  __typename?: "BsdasriTransport";
+  wasteDetails?: Maybe<BsdasriWasteDetails>;
+  wasteAcceptation?: Maybe<BsdasriWasteAcceptation>;
+  handedOverAt?: Maybe<Scalars["DateTime"]>;
+  takenOverAt?: Maybe<Scalars["DateTime"]>;
+  signature?: Maybe<BsdasriSignature>;
+};
+
+/** Collecteur transporteur */
+export type BsdasriTransporter = {
+  __typename?: "BsdasriTransporter";
+  /** Établissement de destination */
+  company?: Maybe<FormCompany>;
+  /** N° de récipissé */
+  receipt?: Maybe<Scalars["String"]>;
+  /** Département */
+  receiptDepartment?: Maybe<Scalars["String"]>;
+  /** Limite de validité du récipissé */
+  receiptValidityLimit?: Maybe<Scalars["DateTime"]>;
+  /** Champ libre */
+  customInfo?: Maybe<Scalars["String"]>;
+};
+
+export type BsdasriTransporterInput = {
+  /** Établissement collecteur - transporteur */
+  company?: Maybe<CompanyInput>;
+  /** N° de récipissé */
+  receipt?: Maybe<Scalars["String"]>;
+  /** Département */
+  receiptDepartment?: Maybe<Scalars["String"]>;
+  /** Limite de validité du récipissé */
+  receiptValidityLimit?: Maybe<Scalars["DateTime"]>;
+  /** Champ libre transporteur */
+  customInfo?: Maybe<Scalars["String"]>;
+};
+
+export type BsdasriTransporterWhere = {
+  company?: Maybe<BsdasriCompanyWhere>;
+  signature?: Maybe<BsdasriSignatureWhere>;
+};
+
+export type BsdasriTransportInput = {
+  wasteDetails?: Maybe<BsdasriWasteDetailInput>;
+  takenOverAt?: Maybe<Scalars["DateTime"]>;
+  handedOverAt?: Maybe<Scalars["DateTime"]>;
+  wasteAcceptation?: Maybe<BsdasriWasteAcceptationInput>;
+};
+
+export type BsdasriUpdateInput = {
+  /** Identifiant opaque */
+  id: Scalars["ID"];
+  /** Identifiant custom */
+  emitter?: Maybe<BsdasriEmitterInput>;
+  emission?: Maybe<BsdasriEmissionInput>;
+  transporter?: Maybe<BsdasriTransporterInput>;
+  transport?: Maybe<BsdasriTransportInput>;
+  recipient?: Maybe<BsdasriRecipientInput>;
+  reception?: Maybe<BsdasriReceptionInput>;
+  operation?: Maybe<BsdasriOperationInput>;
+  regroupedBsdasris?: Maybe<Array<Maybe<RegroupedBsdasriInput>>>;
+};
+
+/** Informations relatives à l'acceptation ou au refus du déchet (Bsdasri) */
+export type BsdasriWasteAcceptation = {
+  __typename?: "BsdasriWasteAcceptation";
+  status?: Maybe<Scalars["String"]>;
+  refusalReason?: Maybe<Scalars["String"]>;
+  refusedQuantity?: Maybe<Scalars["Int"]>;
+};
+
+export type BsdasriWasteAcceptationInput = {
+  status?: Maybe<WasteAcceptationStatusInput>;
+  refusalReason?: Maybe<Scalars["String"]>;
+  refusedQuantity?: Maybe<Scalars["Int"]>;
+};
+
+export type BsdasriWasteDetailInput = {
+  quantity?: Maybe<Scalars["Int"]>;
+  quantityType?: Maybe<QuantityType>;
+  packagingInfos?: Maybe<Array<BsdasriPackagingInfoInput>>;
+  onuCode?: Maybe<Scalars["String"]>;
+};
+
+/** Détail sur le déchet proprement dit du Bsdasri */
+export type BsdasriWasteDetails = {
+  __typename?: "BsdasriWasteDetails";
+  quantity?: Maybe<Scalars["Int"]>;
+  quantityType?: Maybe<QuantityType>;
+  volume?: Maybe<Scalars["Int"]>;
+  packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
+  onuCode?: Maybe<Scalars["String"]>;
+};
+
+export type BsdasriWhere = {
+  /** (Optionnel) Permet de récupérer uniquement les bordereaux en brouillon */
+  isDraft?: Maybe<Scalars["Boolean"]>;
+  /**
+   * (Optionnel) Filtre sur le statut des bordereaux
+   * Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
+   * Défaut à vide.
+   */
+  status?: Maybe<BsdasriStatus>;
+  createdAt?: Maybe<DateFilter>;
+  updatedAt?: Maybe<DateFilter>;
+  emitter?: Maybe<BsdasriEmitterWhere>;
+  transporter?: Maybe<BsdasriTransporterWhere>;
+  recipient?: Maybe<BsdasriRecipientWhere>;
+  processingOperation?: Maybe<Array<ProcessingOperationTypes>>;
+  /**
+   * (Optionnel) Filtre sur l'état de regroupement des bordereaux
+   * Si aucun filtre n'est passé, les bordereaux seront retournés sans filtrage supplémentaire
+   * Si groupable: true, les bordereaux retournés ne sont pas déjà regroupés et ne regroupent pas d'autres bordereaux
+   * Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne regroupent d'autres bordereaux
+   */
+  groupable?: Maybe<Scalars["Boolean"]>;
+  _and?: Maybe<Array<BsdasriWhere>>;
+  _or?: Maybe<Array<BsdasriWhere>>;
+  _not?: Maybe<Array<BsdasriWhere>>;
+};
+
 export type Bsvhu = {
   __typename?: "Bsvhu";
   /** Numéro unique attribué par Trackdéchets */
@@ -756,312 +1148,12 @@ export type CreateVhuAgrementInput = {
   department: Scalars["String"];
 };
 
-/** Bordereau Dasri */
-export type Dasri = {
-  __typename?: "Dasri";
-  id: Scalars["ID"];
-  readableId: Scalars["String"];
-  customId?: Maybe<Scalars["String"]>;
-  status: DasriStatus;
-  createdAt?: Maybe<Scalars["DateTime"]>;
-  updatedAt?: Maybe<Scalars["DateTime"]>;
-  emitter?: Maybe<DasriEmitter>;
-  emission?: Maybe<DasriEmission>;
-  transporter?: Maybe<DasriTransporter>;
-  transport?: Maybe<DasriTransport>;
-  recipient?: Maybe<DasriRecipient>;
-  reception?: Maybe<DasriReception>;
-  operation?: Maybe<DasriOperation>;
-};
-
-export type DasriCreateInput = {
-  /** Identifiant custom */
-  customId?: Maybe<Scalars["String"]>;
-  emitter?: Maybe<DasriEmitterInput>;
-  emission?: Maybe<DasriEmissionInput>;
-  transporter?: Maybe<DasriTransporterInput>;
-  transport?: Maybe<DasriTransportInput>;
-  recipient?: Maybe<DasriRecipientInput>;
-  reception?: Maybe<DasriReceptionInput>;
-  operation?: Maybe<DasriOperationInput>;
-};
-
-/** Informations relatives au déchet émis */
-export type DasriEmission = {
-  __typename?: "DasriEmission";
-  wasteCode?: Maybe<Scalars["String"]>;
-  wasteDetails?: Maybe<DasriWasteDetails>;
-  handedOverAt?: Maybe<Scalars["DateTime"]>;
-  signedBy?: Maybe<Scalars["String"]>;
-  signedAt?: Maybe<Scalars["DateTime"]>;
-};
-
-export type DasriEmissionInput = {
-  wasteCode?: Maybe<Scalars["String"]>;
-  wasteDetailsOnuCode?: Maybe<Scalars["String"]>;
-  wasteDetails?: Maybe<DasriWasteDetailInput>;
-  handedOverAt?: Maybe<Scalars["DateTime"]>;
-};
-
-/** Émetteur du Dasri, Personne responsable de l'émimination des déchets (PRED) */
-export type DasriEmitter = {
-  __typename?: "DasriEmitter";
-  /** Établissement émetteur */
-  company?: Maybe<FormCompany>;
-  /** Site d'emport du déceht, si différent de celle de l'émetteur */
-  workSite?: Maybe<WorkSite>;
-  /** Date de remise au tranporteur */
-  handOverToTransporterAt?: Maybe<Scalars["DateTime"]>;
-  /** Champ libre */
-  customInfo?: Maybe<Scalars["String"]>;
-};
-
-export type DasriEmitterInput = {
-  /** Établissement émetteur */
-  company?: Maybe<CompanyInput>;
-  workSite?: Maybe<WorkSiteInput>;
-  /** Champ libre émetteur */
-  customInfo?: Maybe<Scalars["String"]>;
-};
-
-export type DasriInput = {
-  customId?: Maybe<Scalars["String"]>;
-  emitter?: Maybe<DasriEmitterInput>;
-  emission?: Maybe<DasriEmissionInput>;
-  transporter?: Maybe<DasriTransporterInput>;
-  transport?: Maybe<DasriTransportInput>;
-  recipient?: Maybe<DasriRecipientInput>;
-  reception?: Maybe<DasriReceptionInput>;
-  operation?: Maybe<DasriOperationInput>;
-};
-
-/** Informations relatives au traitement du Dasri */
-export type DasriOperation = {
-  __typename?: "DasriOperation";
-  signedBy?: Maybe<Scalars["String"]>;
-  signedAt?: Maybe<Scalars["DateTime"]>;
-  processingOperation?: Maybe<Scalars["String"]>;
-  processedAt?: Maybe<Scalars["DateTime"]>;
-};
-
-export type DasriOperationInput = {
-  processingOperation?: Maybe<Scalars["String"]>;
-  processedAt?: Maybe<Scalars["DateTime"]>;
-};
-
-/** Informations sur le conditionnement Dasri */
-export type DasriPackagingInfo = {
-  __typename?: "DasriPackagingInfo";
-  /** Type de conditionnement */
-  type: DasriPackagings;
-  /** Description du conditionnement dans le cas où le type de conditionnement est `AUTRE` */
-  other?: Maybe<Scalars["String"]>;
-  /** Nombre de colis associés à ce conditionnement */
-  quantity: Scalars["Int"];
-  volume: Scalars["Int"];
-};
-
-export type DasriPackagingInfoInput = {
-  /** Type de conditionnement */
-  type: DasriPackagings;
-  /** Description du conditionnement dans le cas où le type de conditionnement est `AUTRE` */
-  other?: Maybe<Scalars["String"]>;
-  /** Nombre de colis associés à ce conditionnement */
-  volume: Scalars["Int"];
-  /** Nombre de colis associés à ce conditionnement */
-  quantity: Scalars["Int"];
-};
-
-/** Type de packaging du déchet */
-export type DasriPackagings =
-  /** Caisse en carton avec sac en plastique */
-  | "BOITE_CARTON"
-  /** Fûts ou jerrican à usage unique */
-  | "FUT"
-  /** Boîtes et Mini-collecteurs pour déchets perforants */
-  | "BOITE_PERFORANTS"
-  /** Grand emballage */
-  | "GRAND_EMBALLAGE"
-  /** Grand récipient pour vrac */
-  | "VRAC"
-  /** Autre */
-  | "AUTRE";
-
-/** Informations relatives à la réception du Dasri */
-export type DasriReception = {
-  __typename?: "DasriReception";
-  wasteDetails?: Maybe<DasriWasteDetails>;
-  wasteAcceptation?: Maybe<DasriWasteAcceptation>;
-  receivedAt?: Maybe<Scalars["DateTime"]>;
-  signedBy?: Maybe<Scalars["String"]>;
-  signedAt?: Maybe<Scalars["DateTime"]>;
-};
-
-export type DasriReceptionInput = {
-  wasteDetails?: Maybe<DasriWasteDetailInput>;
-  receivedAt?: Maybe<Scalars["DateTime"]>;
-};
-
-/** Destinataire du Dasri */
-export type DasriRecipient = {
-  __typename?: "DasriRecipient";
-  /** Installation destinataire */
-  company?: Maybe<FormCompany>;
-  /** Champ libre */
-  customInfo?: Maybe<Scalars["String"]>;
-};
-
-export type DasriRecipientInput = {
-  /** Établissement émetteur */
-  company?: Maybe<CompanyInput>;
-  /** Champ libre transporteur */
-  customInfo?: Maybe<Scalars["String"]>;
-};
-
-export type DasriRecipientWasteDetailInput = {
-  quantity?: Maybe<Scalars["Int"]>;
-  volume?: Maybe<Scalars["Int"]>;
-};
-
-export type DasriRole =
-  /** Les Dasri dont je suis transporteur */
-  | "TRANSPORTER"
-  /** Les Dasri dont je suis la destination de traitement */
-  | "RECIPIENT"
-  /** Les Dasri dont je suis l'émetteur */
-  | "EMITTER";
-
-export type DasriSignatureInput = {
-  type: DasriSignatureType;
-  signedBy: Scalars["String"];
-  securityCode?: Maybe<Scalars["Int"]>;
-};
-
-export type DasriSignatureType =
-  /** Signature du cadre émetteur (PRED) */
-  | "EMISSION"
-  /** Signature du cadre émetteur (PRED) par le transporteur, grâce au code de sécurité de l'émetteur */
-  | "EMISSION_WITH_SECRET_CODE"
-  /** Signature du cadre collecteur transporteur */
-  | "TRANSPORT"
-  /** Signature de la réception du déchet */
-  | "RECEPTION"
-  /** Siganture du traitement du déchet */
-  | "OPERATION";
-
-export type DasriStatus =
-  /** Dasri à l'état de brouillon */
-  | "DRAFT"
-  /** Dasri scellé (publié) */
-  | "SEALED"
-  /** Optionnel, Dasri signé par la PRED (émetteur) */
-  | "READY_FOR_TAKEOVER"
-  /** Dasri envoyé vers l'établissement de destination */
-  | "SENT"
-  /** Dasri reçu par l'établissement de destination */
-  | "RECEIVED"
-  /** Dasri dont les déchets ont été traités */
-  | "PROCESSED"
-  /** Déchet refusé */
-  | "REFUSED";
-
-/** Informations relatives au transport du Dasri */
-export type DasriTransport = {
-  __typename?: "DasriTransport";
-  wasteDetails?: Maybe<DasriWasteDetails>;
-  wasteAcceptation?: Maybe<DasriWasteAcceptation>;
-  handedOverAt?: Maybe<Scalars["DateTime"]>;
-  takenOverAt?: Maybe<Scalars["DateTime"]>;
-  signedBy?: Maybe<Scalars["String"]>;
-  signedAt?: Maybe<Scalars["DateTime"]>;
-};
-
-/** Collecteur transporteur */
-export type DasriTransporter = {
-  __typename?: "DasriTransporter";
-  /** Établissement de destination */
-  company?: Maybe<FormCompany>;
-  /** N° de récipissé */
-  receipt?: Maybe<Scalars["String"]>;
-  /** Département */
-  receiptDepartment?: Maybe<Scalars["String"]>;
-  /** Limite de validité du récipissé */
-  receiptValidityLimit?: Maybe<Scalars["DateTime"]>;
-  /** Champ libre */
-  customInfo?: Maybe<Scalars["String"]>;
-};
-
-export type DasriTransporterInput = {
-  /** Établissement collecteur - transporteur */
-  company?: Maybe<CompanyInput>;
-  /** N° de récipissé */
-  receipt?: Maybe<Scalars["String"]>;
-  /** Département */
-  receiptDepartment?: Maybe<Scalars["String"]>;
-  /** Limite de validité du récipissé */
-  receiptValidityLimit?: Maybe<Scalars["DateTime"]>;
-  /** Champ libre transporteur */
-  customInfo?: Maybe<Scalars["String"]>;
-};
-
-export type DasriTransportInput = {
-  wasteDetails?: Maybe<DasriWasteDetailInput>;
-  takenOverAt?: Maybe<Scalars["DateTime"]>;
-  handedOverAt?: Maybe<Scalars["DateTime"]>;
-  wasteAcceptation?: Maybe<DasriWasteAcceptationInput>;
-};
-
-export type DasriUpdateInput = {
-  /** Identifiant opaque */
-  id: Scalars["ID"];
-  /** Identifiant custom */
-  customId?: Maybe<Scalars["String"]>;
-  emitter?: Maybe<DasriEmitterInput>;
-  emission?: Maybe<DasriEmissionInput>;
-  transporter?: Maybe<DasriTransporterInput>;
-  transport?: Maybe<DasriTransportInput>;
-  recipient?: Maybe<DasriRecipientInput>;
-  reception?: Maybe<DasriReceptionInput>;
-  operation?: Maybe<DasriOperationInput>;
-};
-
-/** Informations relatives à l'acceptation ou au refus du déchet (Dasri) */
-export type DasriWasteAcceptation = {
-  __typename?: "DasriWasteAcceptation";
-  status?: Maybe<WasteAcceptationStatusInput>;
-  refusalReason?: Maybe<Scalars["String"]>;
-  refusedQuantity?: Maybe<Scalars["Int"]>;
-};
-
-export type DasriWasteAcceptationInput = {
-  status?: Maybe<WasteAcceptationStatusInput>;
-  refusalReason?: Maybe<Scalars["String"]>;
-  refusedQuantity?: Maybe<Scalars["Int"]>;
-};
-
-export type DasriWasteDetailInput = {
-  quantity?: Maybe<Scalars["Int"]>;
-  quantityType?: Maybe<QuantityType>;
-  packagingInfos?: Maybe<Array<DasriPackagingInfoInput>>;
-  onuCode?: Maybe<Scalars["String"]>;
-};
-
-/** Détail sur le déchet proprement dit du Dasri */
-export type DasriWasteDetails = {
-  __typename?: "DasriWasteDetails";
-  quantity?: Maybe<Scalars["Int"]>;
-  quantityType?: Maybe<QuantityType>;
-  volume?: Maybe<Scalars["Int"]>;
-  packagingInfos?: Maybe<Array<DasriPackagingInfo>>;
-  onuCode?: Maybe<Scalars["String"]>;
-};
-
 export type DateFilter = {
-  _gte?: Maybe<Scalars["DateTime"]>;
-  _gt?: Maybe<Scalars["DateTime"]>;
-  _lte?: Maybe<Scalars["DateTime"]>;
-  _lt?: Maybe<Scalars["DateTime"]>;
   _eq?: Maybe<Scalars["DateTime"]>;
+  _gt?: Maybe<Scalars["DateTime"]>;
+  _gte?: Maybe<Scalars["DateTime"]>;
+  _lt?: Maybe<Scalars["DateTime"]>;
+  _lte?: Maybe<Scalars["DateTime"]>;
 };
 
 /** Représente une ligne dans une déclaration GEREP */
@@ -1645,6 +1737,11 @@ export type Mutation = {
   createBrokerReceipt?: Maybe<BrokerReceipt>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Crée un nouveau dasri
+   */
+  createBsdasri: Bsdasri;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Crée un BSVHU
    */
   createBsvhu?: Maybe<Bsvhu>;
@@ -1653,6 +1750,11 @@ export type Mutation = {
    * Rattache un établissement à l'utilisateur authentifié
    */
   createCompany: CompanyPrivate;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Crée un nouveau dasri en brouillon
+   */
+  createDraftBsdasri: Bsdasri;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Crée un BSVHU en brouillon
@@ -1680,25 +1782,6 @@ export type Mutation = {
    * Crée un agrément VHU
    */
   createVhuAgrement?: Maybe<VhuAgrement>;
-  /** Crée un nouveau dasri */
-  dasriCreate: Dasri;
-  /** Marque un dasri brouillon comme prêt (SEALED) */
-  dasriMarkAsReady?: Maybe<Dasri>;
-  /**
-   * Appose une signature sur un Dasri, verrouille les cadres correspondant
-   *
-   * Une signature ne peut être apposée que par un membre de l'entreprise figurant sur le cadre concerné
-   * Ex: la signature TRANSPORT ne peut être apposée que par un membre de l'entreprise de transport
-   *
-   * Toutefois il existe un exception: le cadre emetteur peut être signé par le transporteur grâce au code de
-   * sécurité de l'émetteur (DasriSignatureType: EMISSION_WITH_SECRET_CODE)
-   */
-  dasriSign?: Maybe<Dasri>;
-  /**
-   * Met à jour un dasri existant
-   * Par défaut, tous les champs sont modifiables.
-   */
-  dasriUpdate: Dasri;
   /**
    * USAGE INTERNE
    * Supprime un récépissé courtier
@@ -1849,6 +1932,11 @@ export type Mutation = {
   prepareSegment?: Maybe<TransportSegment>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Marque un dasri brouillon comme publié (isDraft=false)
+   */
+  publishBsdasri?: Maybe<Bsdasri>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Permet de publier un brouillon pour le marquer comme prêt à être envoyé
    */
   publishBsvhu?: Maybe<Bsvhu>;
@@ -1891,6 +1979,23 @@ export type Mutation = {
   sendMembershipRequest?: Maybe<MembershipRequest>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Appose une signature sur un Bsdasri, verrouille les cadres correspondant
+   *
+   * Une signature ne peut être apposée que par un membre de l'entreprise figurant sur le cadre concerné
+   * Ex: la signature TRANSPORT ne peut être apposée que par un membre de l'entreprise de transport
+   *
+   * Toutefois il existe un exception: le cadre emetteur peut être signé par le transporteur grâce au code de
+   * sécurité de l'émetteur (BsdasriSignatureType: EMISSION_WITH_SECRET_CODE)
+   */
+  signBsdasri?: Maybe<Bsdasri>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Appose une signature de type EMISSION via un compte n'appartenant pas à l'émetteur.
+   * Permet de signer un enlèvement sur le device transporteur grâce au code de sécurité de l'émetteur du dasri
+   */
+  signBsdasriEmissionWithSecretCode?: Maybe<Bsdasri>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Signe un BSVHU
    */
   signBsvhu?: Maybe<Bsvhu>;
@@ -1922,6 +2027,12 @@ export type Mutation = {
    * Édite les informations d'un récépissé courtier
    */
   updateBrokerReceipt?: Maybe<BrokerReceipt>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Met à jour un dasri existant
+   * Par défaut, tous les champs sont modifiables.
+   */
+  updateBsdasri: Bsdasri;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Met à jour un BSVHU
@@ -1976,12 +2087,20 @@ export type MutationCreateBrokerReceiptArgs = {
   input: CreateBrokerReceiptInput;
 };
 
+export type MutationCreateBsdasriArgs = {
+  bsdasriCreateInput: BsdasriCreateInput;
+};
+
 export type MutationCreateBsvhuArgs = {
   input: BsvhuInput;
 };
 
 export type MutationCreateCompanyArgs = {
   companyInput: PrivateCompanyInput;
+};
+
+export type MutationCreateDraftBsdasriArgs = {
+  bsdasriCreateInput: BsdasriCreateInput;
 };
 
 export type MutationCreateDraftBsvhuArgs = {
@@ -2007,23 +2126,6 @@ export type MutationCreateUploadLinkArgs = {
 
 export type MutationCreateVhuAgrementArgs = {
   input: CreateVhuAgrementInput;
-};
-
-export type MutationDasriCreateArgs = {
-  dasriCreateInput: DasriCreateInput;
-};
-
-export type MutationDasriMarkAsReadyArgs = {
-  id: Scalars["ID"];
-};
-
-export type MutationDasriSignArgs = {
-  id: Scalars["ID"];
-  signatureInput: DasriSignatureInput;
-};
-
-export type MutationDasriUpdateArgs = {
-  dasriUpdateInput: DasriUpdateInput;
 };
 
 export type MutationDeleteBrokerReceiptArgs = {
@@ -2146,6 +2248,10 @@ export type MutationPrepareSegmentArgs = {
   nextSegmentInfo: NextSegmentInfoInput;
 };
 
+export type MutationPublishBsdasriArgs = {
+  id: Scalars["ID"];
+};
+
 export type MutationPublishBsvhuArgs = {
   id: Scalars["ID"];
 };
@@ -2180,6 +2286,16 @@ export type MutationSendMembershipRequestArgs = {
   siret: Scalars["String"];
 };
 
+export type MutationSignBsdasriArgs = {
+  id: Scalars["ID"];
+  signatureInput: BsdasriSignatureInput;
+};
+
+export type MutationSignBsdasriEmissionWithSecretCodeArgs = {
+  id: Scalars["ID"];
+  signatureInput: BsdasriSignatureWithSecretCodeInput;
+};
+
 export type MutationSignBsvhuArgs = {
   id: Scalars["ID"];
   input: BsvhuSignatureInput;
@@ -2201,6 +2317,10 @@ export type MutationTakeOverSegmentArgs = {
 
 export type MutationUpdateBrokerReceiptArgs = {
   input: UpdateBrokerReceiptInput;
+};
+
+export type MutationUpdateBsdasriArgs = {
+  bsdasriUpdateInput: BsdasriUpdateInput;
 };
 
 export type MutationUpdateBsvhuArgs = {
@@ -2312,10 +2432,10 @@ export type Packagings =
 
 export type PageInfo = {
   __typename?: "PageInfo";
-  startCursor: Scalars["String"];
   endCursor: Scalars["String"];
   hasNextPage: Scalars["Boolean"];
   hasPreviousPage: Scalars["Boolean"];
+  startCursor: Scalars["String"];
 };
 
 /** Payload permettant le rattachement d'un établissement à un utilisateur */
@@ -2367,6 +2487,8 @@ export type ProcessedFormInput = {
   noTraceability?: Maybe<Scalars["Boolean"]>;
 };
 
+export type ProcessingOperationTypes = "D9" | "D10" | "D12" | "R1" | "R12";
+
 /** Type de quantité lors de l'émission */
 export type QuantityType =
   /** Quntité réelle */
@@ -2385,6 +2507,14 @@ export type Query = {
   /** Renvoie des BSD candidats à un regroupement dans une annexe 2 */
   appendixForms: Array<Form>;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
+  bsdasri: Bsdasri;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Renvoie les Bsdasris.
+   * Par défaut, les dasris des différentes companies de l'utilisateur sont renvoyés.
+   */
+  bsdasris: BsdasriConnection;
+  /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsvhu: Bsvhu;
   /**
    * Renvoie un token pour télécharger un pdf de bordereau
@@ -2402,31 +2532,6 @@ export type Query = {
    * classées pour la protection de l'environnement (ICPE)
    */
   companyInfos: CompanyPublic;
-  dasri?: Maybe<Dasri>;
-  /**
-   * Renvoie les Dasri de l'établissement sélectionné.
-   * Si aucun SIRET n'est précisé et que l'utilisateur est membre d'une seule entreprise
-   * alors les Dasri de cette entreprise sont retournés.
-   * Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
-   * préciser un SIRET
-   * Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
-   *
-   * Vous pouvez filtrer:
-   * - par rôle que joue votre entreprise sur le Dasri via `role`
-   * - par date de dernière modification via `updatedAfter`
-   * - par date d'envoi via `sentAfter`
-   * - par statut du Dasri via `status`
-   * - par code déchet via `wasteCode`
-   * - par SIRET d'une entreprise présente n'importe où sur le bordereau via `siretPresentOnForm`
-   *
-   * Par défaut:
-   * - tous les BSD accessibles sont retournés
-   * - les BSD sont classés par date de création, de la plus récente à la plus vieille
-   * - les résultats sont paginés par 50. Il est possible de modifier cette valeur
-   * via `first` ou `last` en fonction du curseur utilisé
-   * - pour afficher la suite des résultats, utiliser `cursorAfter` ou `cursorBefore`
-   */
-  dasris: Array<Dasri>;
   /** Renvoie la liste des éco-organismes */
   ecoOrganismes: Array<EcoOrganisme>;
   /**
@@ -2512,6 +2617,20 @@ export type QueryAppendixFormsArgs = {
 };
 
 /** Views of the Company ressource for the admin panel */
+export type QueryBsdasriArgs = {
+  id: Scalars["ID"];
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsdasrisArgs = {
+  after?: Maybe<Scalars["ID"]>;
+  first?: Maybe<Scalars["Int"]>;
+  before?: Maybe<Scalars["ID"]>;
+  last?: Maybe<Scalars["Int"]>;
+  where?: Maybe<BsdasriWhere>;
+};
+
+/** Views of the Company ressource for the admin panel */
 export type QueryBsvhuArgs = {
   id: Scalars["ID"];
 };
@@ -2542,27 +2661,6 @@ export type QueryCompaniesForVerificationArgs = {
 /** Views of the Company ressource for the admin panel */
 export type QueryCompanyInfosArgs = {
   siret: Scalars["String"];
-};
-
-/** Views of the Company ressource for the admin panel */
-export type QueryDasriArgs = {
-  id?: Maybe<Scalars["ID"]>;
-  readableId?: Maybe<Scalars["String"]>;
-};
-
-/** Views of the Company ressource for the admin panel */
-export type QueryDasrisArgs = {
-  siret?: Maybe<Scalars["String"]>;
-  after?: Maybe<Scalars["ID"]>;
-  first?: Maybe<Scalars["Int"]>;
-  before?: Maybe<Scalars["ID"]>;
-  last?: Maybe<Scalars["Int"]>;
-  updatedAfter?: Maybe<Scalars["String"]>;
-  status?: Maybe<Array<DasriStatus>>;
-  siretPresentOnForm?: Maybe<Scalars["String"]>;
-  wasteCode?: Maybe<Scalars["String"]>;
-  roles?: Maybe<Array<DasriRole>>;
-  hasNextStep?: Maybe<Scalars["Boolean"]>;
 };
 
 /** Views of the Company ressource for the admin panel */
@@ -2681,6 +2779,12 @@ export type RecipientInput = {
   company?: Maybe<CompanyInput>;
   /** Si c'est un entreprosage provisoire ou reconditionnement */
   isTempStorage?: Maybe<Scalars["Boolean"]>;
+};
+
+/** Payload de regroupement */
+export type RegroupedBsdasriInput = {
+  /** Identifiant unique du bordereau */
+  id?: Maybe<Scalars["ID"]>;
 };
 
 /** Payload lié au détails du déchet du BSD suite (case 14 à 19) */
@@ -3489,6 +3593,35 @@ export type ResolversTypes = {
   StateSummary: ResolverTypeWrapper<StateSummary>;
   TransportSegment: ResolverTypeWrapper<TransportSegment>;
   TransportMode: TransportMode;
+  Bsdasri: ResolverTypeWrapper<Bsdasri>;
+  BsdasriStatus: BsdasriStatus;
+  BsdasriEmitter: ResolverTypeWrapper<BsdasriEmitter>;
+  BsdasriEmitterType: BsdasriEmitterType;
+  BsdasriEmission: ResolverTypeWrapper<BsdasriEmission>;
+  BsdasriWasteDetails: ResolverTypeWrapper<BsdasriWasteDetails>;
+  BsdasriPackagingInfo: ResolverTypeWrapper<BsdasriPackagingInfo>;
+  BsdasriPackagings: BsdasriPackagings;
+  BsdasriSignature: ResolverTypeWrapper<BsdasriSignature>;
+  BsdasriTransporter: ResolverTypeWrapper<BsdasriTransporter>;
+  BsdasriTransport: ResolverTypeWrapper<BsdasriTransport>;
+  BsdasriWasteAcceptation: ResolverTypeWrapper<BsdasriWasteAcceptation>;
+  BsdasriRecipient: ResolverTypeWrapper<BsdasriRecipient>;
+  BsdasriReception: ResolverTypeWrapper<BsdasriReception>;
+  BsdasriOperation: ResolverTypeWrapper<BsdasriOperation>;
+  BsdasriMetadata: ResolverTypeWrapper<BsdasriMetadata>;
+  BsdasriError: ResolverTypeWrapper<BsdasriError>;
+  BsdasriSignatureType: BsdasriSignatureType;
+  BsdasriWhere: BsdasriWhere;
+  DateFilter: DateFilter;
+  BsdasriEmitterWhere: BsdasriEmitterWhere;
+  BsdasriCompanyWhere: BsdasriCompanyWhere;
+  BsdasriSignatureWhere: BsdasriSignatureWhere;
+  BsdasriTransporterWhere: BsdasriTransporterWhere;
+  BsdasriRecipientWhere: BsdasriRecipientWhere;
+  processingOperationTypes: ProcessingOperationTypes;
+  BsdasriConnection: ResolverTypeWrapper<BsdasriConnection>;
+  PageInfo: ResolverTypeWrapper<PageInfo>;
+  BsdasriEdge: ResolverTypeWrapper<BsdasriEdge>;
   Bsvhu: ResolverTypeWrapper<Bsvhu>;
   BsvhuStatus: BsvhuStatus;
   BsvhuEmitter: ResolverTypeWrapper<BsvhuEmitter>;
@@ -3508,14 +3641,12 @@ export type ResolversTypes = {
   SignatureTypeInput: SignatureTypeInput;
   FileDownload: ResolverTypeWrapper<FileDownload>;
   BsvhuWhere: BsvhuWhere;
-  DateFilter: DateFilter;
   BsvhuEmitterWhere: BsvhuEmitterWhere;
   BsvhuCompanyWhere: BsvhuCompanyWhere;
   BsvhuSignatureWhere: BsvhuSignatureWhere;
   BsvhuTransporterWhere: BsvhuTransporterWhere;
   BsvhuRecipientWhere: BsvhuRecipientWhere;
   BsvhuConnection: ResolverTypeWrapper<BsvhuConnection>;
-  PageInfo: ResolverTypeWrapper<PageInfo>;
   BsvhuEdge: ResolverTypeWrapper<BsvhuEdge>;
   CompanyForVerificationWhere: CompanyForVerificationWhere;
   CompanyVerificationStatus: CompanyVerificationStatus;
@@ -3537,21 +3668,6 @@ export type ResolversTypes = {
   BrokerReceipt: ResolverTypeWrapper<BrokerReceipt>;
   VhuAgrement: ResolverTypeWrapper<VhuAgrement>;
   URL: ResolverTypeWrapper<Scalars["URL"]>;
-  Dasri: ResolverTypeWrapper<Dasri>;
-  DasriStatus: DasriStatus;
-  DasriEmitter: ResolverTypeWrapper<DasriEmitter>;
-  DasriEmission: ResolverTypeWrapper<DasriEmission>;
-  DasriWasteDetails: ResolverTypeWrapper<DasriWasteDetails>;
-  DasriPackagingInfo: ResolverTypeWrapper<DasriPackagingInfo>;
-  DasriPackagings: DasriPackagings;
-  DasriTransporter: ResolverTypeWrapper<DasriTransporter>;
-  DasriTransport: ResolverTypeWrapper<DasriTransport>;
-  DasriWasteAcceptation: ResolverTypeWrapper<DasriWasteAcceptation>;
-  WasteAcceptationStatusInput: WasteAcceptationStatusInput;
-  DasriRecipient: ResolverTypeWrapper<DasriRecipient>;
-  DasriReception: ResolverTypeWrapper<DasriReception>;
-  DasriOperation: ResolverTypeWrapper<DasriOperation>;
-  DasriRole: DasriRole;
   EcoOrganisme: ResolverTypeWrapper<EcoOrganisme>;
   FavoriteType: FavoriteType;
   CompanyFavorite: ResolverTypeWrapper<CompanyFavorite>;
@@ -3575,9 +3691,23 @@ export type ResolversTypes = {
   Stat: ResolverTypeWrapper<Stat>;
   Mutation: ResolverTypeWrapper<{}>;
   CreateBrokerReceiptInput: CreateBrokerReceiptInput;
+  BsdasriCreateInput: BsdasriCreateInput;
+  BsdasriEmitterInput: BsdasriEmitterInput;
+  CompanyInput: CompanyInput;
+  WorkSiteInput: WorkSiteInput;
+  BsdasriEmissionInput: BsdasriEmissionInput;
+  BsdasriWasteDetailInput: BsdasriWasteDetailInput;
+  BsdasriPackagingInfoInput: BsdasriPackagingInfoInput;
+  BsdasriTransporterInput: BsdasriTransporterInput;
+  BsdasriTransportInput: BsdasriTransportInput;
+  BsdasriWasteAcceptationInput: BsdasriWasteAcceptationInput;
+  WasteAcceptationStatusInput: WasteAcceptationStatusInput;
+  BsdasriRecipientInput: BsdasriRecipientInput;
+  BsdasriReceptionInput: BsdasriReceptionInput;
+  BsdasriOperationInput: BsdasriOperationInput;
+  RegroupedBsdasriInput: RegroupedBsdasriInput;
   BsvhuInput: BsvhuInput;
   BsvhuEmitterInput: BsvhuEmitterInput;
-  CompanyInput: CompanyInput;
   BsvhuIdentificationInput: BsvhuIdentificationInput;
   BsvhuQuantityInput: BsvhuQuantityInput;
   BsvhuRecipientInput: BsvhuRecipientInput;
@@ -3588,7 +3718,6 @@ export type ResolversTypes = {
   PrivateCompanyInput: PrivateCompanyInput;
   CreateFormInput: CreateFormInput;
   EmitterInput: EmitterInput;
-  WorkSiteInput: WorkSiteInput;
   RecipientInput: RecipientInput;
   TransporterInput: TransporterInput;
   WasteDetailsInput: WasteDetailsInput;
@@ -3603,20 +3732,6 @@ export type ResolversTypes = {
   CreateTransporterReceiptInput: CreateTransporterReceiptInput;
   UploadLink: ResolverTypeWrapper<UploadLink>;
   CreateVhuAgrementInput: CreateVhuAgrementInput;
-  DasriCreateInput: DasriCreateInput;
-  DasriEmitterInput: DasriEmitterInput;
-  DasriEmissionInput: DasriEmissionInput;
-  DasriWasteDetailInput: DasriWasteDetailInput;
-  DasriPackagingInfoInput: DasriPackagingInfoInput;
-  DasriTransporterInput: DasriTransporterInput;
-  DasriTransportInput: DasriTransportInput;
-  DasriWasteAcceptationInput: DasriWasteAcceptationInput;
-  DasriRecipientInput: DasriRecipientInput;
-  DasriReceptionInput: DasriReceptionInput;
-  DasriOperationInput: DasriOperationInput;
-  DasriSignatureInput: DasriSignatureInput;
-  DasriSignatureType: DasriSignatureType;
-  DasriUpdateInput: DasriUpdateInput;
   DeleteBrokerReceiptInput: DeleteBrokerReceiptInput;
   DeleteTraderReceiptInput: DeleteTraderReceiptInput;
   DeleteTransporterReceiptInput: DeleteTransporterReceiptInput;
@@ -3636,12 +3751,15 @@ export type ResolversTypes = {
   TempStoredFormInput: TempStoredFormInput;
   TempStorerAcceptedFormInput: TempStorerAcceptedFormInput;
   FormInput: FormInput;
+  BsdasriSignatureInput: BsdasriSignatureInput;
+  BsdasriSignatureWithSecretCodeInput: BsdasriSignatureWithSecretCodeInput;
   BsvhuSignatureInput: BsvhuSignatureInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignatureAuthor: SignatureAuthor;
   SignupInput: SignupInput;
   TakeOverInput: TakeOverInput;
   UpdateBrokerReceiptInput: UpdateBrokerReceiptInput;
+  BsdasriUpdateInput: BsdasriUpdateInput;
   UpdateFormInput: UpdateFormInput;
   UpdateTraderReceiptInput: UpdateTraderReceiptInput;
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
@@ -3650,8 +3768,9 @@ export type ResolversTypes = {
   VerifyCompanyByAdminInput: VerifyCompanyByAdminInput;
   Subscription: ResolverTypeWrapper<{}>;
   FormSubscription: ResolverTypeWrapper<FormSubscription>;
-  DasriRecipientWasteDetailInput: DasriRecipientWasteDetailInput;
-  DasriInput: DasriInput;
+  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
+  BsdasriInput: BsdasriInput;
+  BsdasriRole: BsdasriRole;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -3680,6 +3799,30 @@ export type ResolversParentTypes = {
   Destination: Destination;
   StateSummary: StateSummary;
   TransportSegment: TransportSegment;
+  Bsdasri: Bsdasri;
+  BsdasriEmitter: BsdasriEmitter;
+  BsdasriEmission: BsdasriEmission;
+  BsdasriWasteDetails: BsdasriWasteDetails;
+  BsdasriPackagingInfo: BsdasriPackagingInfo;
+  BsdasriSignature: BsdasriSignature;
+  BsdasriTransporter: BsdasriTransporter;
+  BsdasriTransport: BsdasriTransport;
+  BsdasriWasteAcceptation: BsdasriWasteAcceptation;
+  BsdasriRecipient: BsdasriRecipient;
+  BsdasriReception: BsdasriReception;
+  BsdasriOperation: BsdasriOperation;
+  BsdasriMetadata: BsdasriMetadata;
+  BsdasriError: BsdasriError;
+  BsdasriWhere: BsdasriWhere;
+  DateFilter: DateFilter;
+  BsdasriEmitterWhere: BsdasriEmitterWhere;
+  BsdasriCompanyWhere: BsdasriCompanyWhere;
+  BsdasriSignatureWhere: BsdasriSignatureWhere;
+  BsdasriTransporterWhere: BsdasriTransporterWhere;
+  BsdasriRecipientWhere: BsdasriRecipientWhere;
+  BsdasriConnection: BsdasriConnection;
+  PageInfo: PageInfo;
+  BsdasriEdge: BsdasriEdge;
   Bsvhu: Bsvhu;
   BsvhuEmitter: BsvhuEmitter;
   Signature: Signature;
@@ -3694,14 +3837,12 @@ export type ResolversParentTypes = {
   BsvhuError: BsvhuError;
   FileDownload: FileDownload;
   BsvhuWhere: BsvhuWhere;
-  DateFilter: DateFilter;
   BsvhuEmitterWhere: BsvhuEmitterWhere;
   BsvhuCompanyWhere: BsvhuCompanyWhere;
   BsvhuSignatureWhere: BsvhuSignatureWhere;
   BsvhuTransporterWhere: BsvhuTransporterWhere;
   BsvhuRecipientWhere: BsvhuRecipientWhere;
   BsvhuConnection: BsvhuConnection;
-  PageInfo: PageInfo;
   BsvhuEdge: BsvhuEdge;
   CompanyForVerificationWhere: CompanyForVerificationWhere;
   CompanyForVerificationConnection: CompanyForVerificationConnection;
@@ -3716,17 +3857,6 @@ export type ResolversParentTypes = {
   BrokerReceipt: BrokerReceipt;
   VhuAgrement: VhuAgrement;
   URL: Scalars["URL"];
-  Dasri: Dasri;
-  DasriEmitter: DasriEmitter;
-  DasriEmission: DasriEmission;
-  DasriWasteDetails: DasriWasteDetails;
-  DasriPackagingInfo: DasriPackagingInfo;
-  DasriTransporter: DasriTransporter;
-  DasriTransport: DasriTransport;
-  DasriWasteAcceptation: DasriWasteAcceptation;
-  DasriRecipient: DasriRecipient;
-  DasriReception: DasriReception;
-  DasriOperation: DasriOperation;
   EcoOrganisme: EcoOrganisme;
   CompanyFavorite: CompanyFavorite;
   formsLifeCycleData: FormsLifeCycleData;
@@ -3744,9 +3874,22 @@ export type ResolversParentTypes = {
   Stat: Stat;
   Mutation: {};
   CreateBrokerReceiptInput: CreateBrokerReceiptInput;
+  BsdasriCreateInput: BsdasriCreateInput;
+  BsdasriEmitterInput: BsdasriEmitterInput;
+  CompanyInput: CompanyInput;
+  WorkSiteInput: WorkSiteInput;
+  BsdasriEmissionInput: BsdasriEmissionInput;
+  BsdasriWasteDetailInput: BsdasriWasteDetailInput;
+  BsdasriPackagingInfoInput: BsdasriPackagingInfoInput;
+  BsdasriTransporterInput: BsdasriTransporterInput;
+  BsdasriTransportInput: BsdasriTransportInput;
+  BsdasriWasteAcceptationInput: BsdasriWasteAcceptationInput;
+  BsdasriRecipientInput: BsdasriRecipientInput;
+  BsdasriReceptionInput: BsdasriReceptionInput;
+  BsdasriOperationInput: BsdasriOperationInput;
+  RegroupedBsdasriInput: RegroupedBsdasriInput;
   BsvhuInput: BsvhuInput;
   BsvhuEmitterInput: BsvhuEmitterInput;
-  CompanyInput: CompanyInput;
   BsvhuIdentificationInput: BsvhuIdentificationInput;
   BsvhuQuantityInput: BsvhuQuantityInput;
   BsvhuRecipientInput: BsvhuRecipientInput;
@@ -3757,7 +3900,6 @@ export type ResolversParentTypes = {
   PrivateCompanyInput: PrivateCompanyInput;
   CreateFormInput: CreateFormInput;
   EmitterInput: EmitterInput;
-  WorkSiteInput: WorkSiteInput;
   RecipientInput: RecipientInput;
   TransporterInput: TransporterInput;
   WasteDetailsInput: WasteDetailsInput;
@@ -3772,19 +3914,6 @@ export type ResolversParentTypes = {
   CreateTransporterReceiptInput: CreateTransporterReceiptInput;
   UploadLink: UploadLink;
   CreateVhuAgrementInput: CreateVhuAgrementInput;
-  DasriCreateInput: DasriCreateInput;
-  DasriEmitterInput: DasriEmitterInput;
-  DasriEmissionInput: DasriEmissionInput;
-  DasriWasteDetailInput: DasriWasteDetailInput;
-  DasriPackagingInfoInput: DasriPackagingInfoInput;
-  DasriTransporterInput: DasriTransporterInput;
-  DasriTransportInput: DasriTransportInput;
-  DasriWasteAcceptationInput: DasriWasteAcceptationInput;
-  DasriRecipientInput: DasriRecipientInput;
-  DasriReceptionInput: DasriReceptionInput;
-  DasriOperationInput: DasriOperationInput;
-  DasriSignatureInput: DasriSignatureInput;
-  DasriUpdateInput: DasriUpdateInput;
   DeleteBrokerReceiptInput: DeleteBrokerReceiptInput;
   DeleteTraderReceiptInput: DeleteTraderReceiptInput;
   DeleteTransporterReceiptInput: DeleteTransporterReceiptInput;
@@ -3804,11 +3933,14 @@ export type ResolversParentTypes = {
   TempStoredFormInput: TempStoredFormInput;
   TempStorerAcceptedFormInput: TempStorerAcceptedFormInput;
   FormInput: FormInput;
+  BsdasriSignatureInput: BsdasriSignatureInput;
+  BsdasriSignatureWithSecretCodeInput: BsdasriSignatureWithSecretCodeInput;
   BsvhuSignatureInput: BsvhuSignatureInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignupInput: SignupInput;
   TakeOverInput: TakeOverInput;
   UpdateBrokerReceiptInput: UpdateBrokerReceiptInput;
+  BsdasriUpdateInput: BsdasriUpdateInput;
   UpdateFormInput: UpdateFormInput;
   UpdateTraderReceiptInput: UpdateTraderReceiptInput;
   UpdateTransporterReceiptInput: UpdateTransporterReceiptInput;
@@ -3817,8 +3949,8 @@ export type ResolversParentTypes = {
   VerifyCompanyByAdminInput: VerifyCompanyByAdminInput;
   Subscription: {};
   FormSubscription: FormSubscription;
-  DasriRecipientWasteDetailInput: DasriRecipientWasteDetailInput;
-  DasriInput: DasriInput;
+  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
+  BsdasriInput: BsdasriInput;
 };
 
 export type AdminForVerificationResolvers<
@@ -3871,6 +4003,368 @@ export type BrokerReceiptResolvers<
   receiptNumber?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   validityLimit?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
   department?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["Bsdasri"] = ResolversParentTypes["Bsdasri"]
+> = {
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes["BsdasriStatus"], ParentType, ContextType>;
+  createdAt?: Resolver<
+    Maybe<ResolversTypes["DateTime"]>,
+    ParentType,
+    ContextType
+  >;
+  updatedAt?: Resolver<
+    Maybe<ResolversTypes["DateTime"]>,
+    ParentType,
+    ContextType
+  >;
+  isDraft?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;
+  emitter?: Resolver<
+    Maybe<ResolversTypes["BsdasriEmitter"]>,
+    ParentType,
+    ContextType
+  >;
+  emission?: Resolver<
+    Maybe<ResolversTypes["BsdasriEmission"]>,
+    ParentType,
+    ContextType
+  >;
+  transporter?: Resolver<
+    Maybe<ResolversTypes["BsdasriTransporter"]>,
+    ParentType,
+    ContextType
+  >;
+  transport?: Resolver<
+    Maybe<ResolversTypes["BsdasriTransport"]>,
+    ParentType,
+    ContextType
+  >;
+  recipient?: Resolver<
+    Maybe<ResolversTypes["BsdasriRecipient"]>,
+    ParentType,
+    ContextType
+  >;
+  reception?: Resolver<
+    Maybe<ResolversTypes["BsdasriReception"]>,
+    ParentType,
+    ContextType
+  >;
+  operation?: Resolver<
+    Maybe<ResolversTypes["BsdasriOperation"]>,
+    ParentType,
+    ContextType
+  >;
+  regroupedBsdasris?: Resolver<
+    Maybe<Array<ResolversTypes["ID"]>>,
+    ParentType,
+    ContextType
+  >;
+  metadata?: Resolver<
+    ResolversTypes["BsdasriMetadata"],
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriConnectionResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriConnection"] = ResolversParentTypes["BsdasriConnection"]
+> = {
+  totalCount?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes["PageInfo"], ParentType, ContextType>;
+  edges?: Resolver<
+    Array<ResolversTypes["BsdasriEdge"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriEdgeResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriEdge"] = ResolversParentTypes["BsdasriEdge"]
+> = {
+  cursor?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  node?: Resolver<ResolversTypes["Bsdasri"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriEmissionResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriEmission"] = ResolversParentTypes["BsdasriEmission"]
+> = {
+  wasteCode?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  wasteDetails?: Resolver<
+    Maybe<ResolversTypes["BsdasriWasteDetails"]>,
+    ParentType,
+    ContextType
+  >;
+  handedOverAt?: Resolver<
+    Maybe<ResolversTypes["DateTime"]>,
+    ParentType,
+    ContextType
+  >;
+  signature?: Resolver<
+    Maybe<ResolversTypes["BsdasriSignature"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriEmitterResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriEmitter"] = ResolversParentTypes["BsdasriEmitter"]
+> = {
+  company?: Resolver<
+    Maybe<ResolversTypes["FormCompany"]>,
+    ParentType,
+    ContextType
+  >;
+  workSite?: Resolver<
+    Maybe<ResolversTypes["WorkSite"]>,
+    ParentType,
+    ContextType
+  >;
+  handOverToTransporterAt?: Resolver<
+    Maybe<ResolversTypes["DateTime"]>,
+    ParentType,
+    ContextType
+  >;
+  customInfo?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  type?: Resolver<
+    Maybe<ResolversTypes["BsdasriEmitterType"]>,
+    ParentType,
+    ContextType
+  >;
+  onBehalfOfEcoorganisme?: Resolver<
+    ResolversTypes["Boolean"],
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriErrorResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriError"] = ResolversParentTypes["BsdasriError"]
+> = {
+  message?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  path?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  requiredFor?: Resolver<
+    Array<ResolversTypes["BsdasriSignatureType"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriMetadataResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriMetadata"] = ResolversParentTypes["BsdasriMetadata"]
+> = {
+  errors?: Resolver<
+    Array<Maybe<ResolversTypes["BsdasriError"]>>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriOperationResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriOperation"] = ResolversParentTypes["BsdasriOperation"]
+> = {
+  processingOperation?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  processedAt?: Resolver<
+    Maybe<ResolversTypes["DateTime"]>,
+    ParentType,
+    ContextType
+  >;
+  signature?: Resolver<
+    Maybe<ResolversTypes["BsdasriSignature"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriPackagingInfoResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriPackagingInfo"] = ResolversParentTypes["BsdasriPackagingInfo"]
+> = {
+  type?: Resolver<ResolversTypes["BsdasriPackagings"], ParentType, ContextType>;
+  other?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  quantity?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  volume?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriReceptionResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriReception"] = ResolversParentTypes["BsdasriReception"]
+> = {
+  wasteDetails?: Resolver<
+    Maybe<ResolversTypes["BsdasriWasteDetails"]>,
+    ParentType,
+    ContextType
+  >;
+  wasteAcceptation?: Resolver<
+    Maybe<ResolversTypes["BsdasriWasteAcceptation"]>,
+    ParentType,
+    ContextType
+  >;
+  receivedAt?: Resolver<
+    Maybe<ResolversTypes["DateTime"]>,
+    ParentType,
+    ContextType
+  >;
+  signature?: Resolver<
+    Maybe<ResolversTypes["BsdasriSignature"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriRecipientResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriRecipient"] = ResolversParentTypes["BsdasriRecipient"]
+> = {
+  company?: Resolver<
+    Maybe<ResolversTypes["FormCompany"]>,
+    ParentType,
+    ContextType
+  >;
+  customInfo?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriSignatureResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriSignature"] = ResolversParentTypes["BsdasriSignature"]
+> = {
+  date?: Resolver<Maybe<ResolversTypes["DateTime"]>, ParentType, ContextType>;
+  author?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriTransportResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriTransport"] = ResolversParentTypes["BsdasriTransport"]
+> = {
+  wasteDetails?: Resolver<
+    Maybe<ResolversTypes["BsdasriWasteDetails"]>,
+    ParentType,
+    ContextType
+  >;
+  wasteAcceptation?: Resolver<
+    Maybe<ResolversTypes["BsdasriWasteAcceptation"]>,
+    ParentType,
+    ContextType
+  >;
+  handedOverAt?: Resolver<
+    Maybe<ResolversTypes["DateTime"]>,
+    ParentType,
+    ContextType
+  >;
+  takenOverAt?: Resolver<
+    Maybe<ResolversTypes["DateTime"]>,
+    ParentType,
+    ContextType
+  >;
+  signature?: Resolver<
+    Maybe<ResolversTypes["BsdasriSignature"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriTransporterResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriTransporter"] = ResolversParentTypes["BsdasriTransporter"]
+> = {
+  company?: Resolver<
+    Maybe<ResolversTypes["FormCompany"]>,
+    ParentType,
+    ContextType
+  >;
+  receipt?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  receiptDepartment?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  receiptValidityLimit?: Resolver<
+    Maybe<ResolversTypes["DateTime"]>,
+    ParentType,
+    ContextType
+  >;
+  customInfo?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriWasteAcceptationResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriWasteAcceptation"] = ResolversParentTypes["BsdasriWasteAcceptation"]
+> = {
+  status?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  refusalReason?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  refusedQuantity?: Resolver<
+    Maybe<ResolversTypes["Int"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriWasteDetailsResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriWasteDetails"] = ResolversParentTypes["BsdasriWasteDetails"]
+> = {
+  quantity?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
+  quantityType?: Resolver<
+    Maybe<ResolversTypes["QuantityType"]>,
+    ParentType,
+    ContextType
+  >;
+  volume?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
+  packagingInfos?: Resolver<
+    Maybe<Array<ResolversTypes["BsdasriPackagingInfo"]>>,
+    ParentType,
+    ContextType
+  >;
+  onuCode?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -4481,299 +4975,6 @@ export type CompanyStatResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type DasriResolvers<
-  ContextType = GraphQLContext,
-  ParentType extends ResolversParentTypes["Dasri"] = ResolversParentTypes["Dasri"]
-> = {
-  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
-  readableId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-  customId?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
-  status?: Resolver<ResolversTypes["DasriStatus"], ParentType, ContextType>;
-  createdAt?: Resolver<
-    Maybe<ResolversTypes["DateTime"]>,
-    ParentType,
-    ContextType
-  >;
-  updatedAt?: Resolver<
-    Maybe<ResolversTypes["DateTime"]>,
-    ParentType,
-    ContextType
-  >;
-  emitter?: Resolver<
-    Maybe<ResolversTypes["DasriEmitter"]>,
-    ParentType,
-    ContextType
-  >;
-  emission?: Resolver<
-    Maybe<ResolversTypes["DasriEmission"]>,
-    ParentType,
-    ContextType
-  >;
-  transporter?: Resolver<
-    Maybe<ResolversTypes["DasriTransporter"]>,
-    ParentType,
-    ContextType
-  >;
-  transport?: Resolver<
-    Maybe<ResolversTypes["DasriTransport"]>,
-    ParentType,
-    ContextType
-  >;
-  recipient?: Resolver<
-    Maybe<ResolversTypes["DasriRecipient"]>,
-    ParentType,
-    ContextType
-  >;
-  reception?: Resolver<
-    Maybe<ResolversTypes["DasriReception"]>,
-    ParentType,
-    ContextType
-  >;
-  operation?: Resolver<
-    Maybe<ResolversTypes["DasriOperation"]>,
-    ParentType,
-    ContextType
-  >;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type DasriEmissionResolvers<
-  ContextType = GraphQLContext,
-  ParentType extends ResolversParentTypes["DasriEmission"] = ResolversParentTypes["DasriEmission"]
-> = {
-  wasteCode?: Resolver<
-    Maybe<ResolversTypes["String"]>,
-    ParentType,
-    ContextType
-  >;
-  wasteDetails?: Resolver<
-    Maybe<ResolversTypes["DasriWasteDetails"]>,
-    ParentType,
-    ContextType
-  >;
-  handedOverAt?: Resolver<
-    Maybe<ResolversTypes["DateTime"]>,
-    ParentType,
-    ContextType
-  >;
-  signedBy?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
-  signedAt?: Resolver<
-    Maybe<ResolversTypes["DateTime"]>,
-    ParentType,
-    ContextType
-  >;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type DasriEmitterResolvers<
-  ContextType = GraphQLContext,
-  ParentType extends ResolversParentTypes["DasriEmitter"] = ResolversParentTypes["DasriEmitter"]
-> = {
-  company?: Resolver<
-    Maybe<ResolversTypes["FormCompany"]>,
-    ParentType,
-    ContextType
-  >;
-  workSite?: Resolver<
-    Maybe<ResolversTypes["WorkSite"]>,
-    ParentType,
-    ContextType
-  >;
-  handOverToTransporterAt?: Resolver<
-    Maybe<ResolversTypes["DateTime"]>,
-    ParentType,
-    ContextType
-  >;
-  customInfo?: Resolver<
-    Maybe<ResolversTypes["String"]>,
-    ParentType,
-    ContextType
-  >;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type DasriOperationResolvers<
-  ContextType = GraphQLContext,
-  ParentType extends ResolversParentTypes["DasriOperation"] = ResolversParentTypes["DasriOperation"]
-> = {
-  signedBy?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
-  signedAt?: Resolver<
-    Maybe<ResolversTypes["DateTime"]>,
-    ParentType,
-    ContextType
-  >;
-  processingOperation?: Resolver<
-    Maybe<ResolversTypes["String"]>,
-    ParentType,
-    ContextType
-  >;
-  processedAt?: Resolver<
-    Maybe<ResolversTypes["DateTime"]>,
-    ParentType,
-    ContextType
-  >;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type DasriPackagingInfoResolvers<
-  ContextType = GraphQLContext,
-  ParentType extends ResolversParentTypes["DasriPackagingInfo"] = ResolversParentTypes["DasriPackagingInfo"]
-> = {
-  type?: Resolver<ResolversTypes["DasriPackagings"], ParentType, ContextType>;
-  other?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
-  quantity?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
-  volume?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type DasriReceptionResolvers<
-  ContextType = GraphQLContext,
-  ParentType extends ResolversParentTypes["DasriReception"] = ResolversParentTypes["DasriReception"]
-> = {
-  wasteDetails?: Resolver<
-    Maybe<ResolversTypes["DasriWasteDetails"]>,
-    ParentType,
-    ContextType
-  >;
-  wasteAcceptation?: Resolver<
-    Maybe<ResolversTypes["DasriWasteAcceptation"]>,
-    ParentType,
-    ContextType
-  >;
-  receivedAt?: Resolver<
-    Maybe<ResolversTypes["DateTime"]>,
-    ParentType,
-    ContextType
-  >;
-  signedBy?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
-  signedAt?: Resolver<
-    Maybe<ResolversTypes["DateTime"]>,
-    ParentType,
-    ContextType
-  >;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type DasriRecipientResolvers<
-  ContextType = GraphQLContext,
-  ParentType extends ResolversParentTypes["DasriRecipient"] = ResolversParentTypes["DasriRecipient"]
-> = {
-  company?: Resolver<
-    Maybe<ResolversTypes["FormCompany"]>,
-    ParentType,
-    ContextType
-  >;
-  customInfo?: Resolver<
-    Maybe<ResolversTypes["String"]>,
-    ParentType,
-    ContextType
-  >;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type DasriTransportResolvers<
-  ContextType = GraphQLContext,
-  ParentType extends ResolversParentTypes["DasriTransport"] = ResolversParentTypes["DasriTransport"]
-> = {
-  wasteDetails?: Resolver<
-    Maybe<ResolversTypes["DasriWasteDetails"]>,
-    ParentType,
-    ContextType
-  >;
-  wasteAcceptation?: Resolver<
-    Maybe<ResolversTypes["DasriWasteAcceptation"]>,
-    ParentType,
-    ContextType
-  >;
-  handedOverAt?: Resolver<
-    Maybe<ResolversTypes["DateTime"]>,
-    ParentType,
-    ContextType
-  >;
-  takenOverAt?: Resolver<
-    Maybe<ResolversTypes["DateTime"]>,
-    ParentType,
-    ContextType
-  >;
-  signedBy?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
-  signedAt?: Resolver<
-    Maybe<ResolversTypes["DateTime"]>,
-    ParentType,
-    ContextType
-  >;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type DasriTransporterResolvers<
-  ContextType = GraphQLContext,
-  ParentType extends ResolversParentTypes["DasriTransporter"] = ResolversParentTypes["DasriTransporter"]
-> = {
-  company?: Resolver<
-    Maybe<ResolversTypes["FormCompany"]>,
-    ParentType,
-    ContextType
-  >;
-  receipt?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
-  receiptDepartment?: Resolver<
-    Maybe<ResolversTypes["String"]>,
-    ParentType,
-    ContextType
-  >;
-  receiptValidityLimit?: Resolver<
-    Maybe<ResolversTypes["DateTime"]>,
-    ParentType,
-    ContextType
-  >;
-  customInfo?: Resolver<
-    Maybe<ResolversTypes["String"]>,
-    ParentType,
-    ContextType
-  >;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type DasriWasteAcceptationResolvers<
-  ContextType = GraphQLContext,
-  ParentType extends ResolversParentTypes["DasriWasteAcceptation"] = ResolversParentTypes["DasriWasteAcceptation"]
-> = {
-  status?: Resolver<
-    Maybe<ResolversTypes["WasteAcceptationStatusInput"]>,
-    ParentType,
-    ContextType
-  >;
-  refusalReason?: Resolver<
-    Maybe<ResolversTypes["String"]>,
-    ParentType,
-    ContextType
-  >;
-  refusedQuantity?: Resolver<
-    Maybe<ResolversTypes["Int"]>,
-    ParentType,
-    ContextType
-  >;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type DasriWasteDetailsResolvers<
-  ContextType = GraphQLContext,
-  ParentType extends ResolversParentTypes["DasriWasteDetails"] = ResolversParentTypes["DasriWasteDetails"]
-> = {
-  quantity?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
-  quantityType?: Resolver<
-    Maybe<ResolversTypes["QuantityType"]>,
-    ParentType,
-    ContextType
-  >;
-  volume?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
-  packagingInfos?: Resolver<
-    Maybe<Array<ResolversTypes["DasriPackagingInfo"]>>,
-    ParentType,
-    ContextType
-  >;
-  onuCode?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
 export interface DateTimeScalarConfig
   extends GraphQLScalarTypeConfig<ResolversTypes["DateTime"], any> {
   name: "DateTime";
@@ -5174,6 +5375,12 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationCreateBrokerReceiptArgs, "input">
   >;
+  createBsdasri?: Resolver<
+    ResolversTypes["Bsdasri"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationCreateBsdasriArgs, "bsdasriCreateInput">
+  >;
   createBsvhu?: Resolver<
     Maybe<ResolversTypes["Bsvhu"]>,
     ParentType,
@@ -5185,6 +5392,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationCreateCompanyArgs, "companyInput">
+  >;
+  createDraftBsdasri?: Resolver<
+    ResolversTypes["Bsdasri"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationCreateDraftBsdasriArgs, "bsdasriCreateInput">
   >;
   createDraftBsvhu?: Resolver<
     Maybe<ResolversTypes["Bsvhu"]>,
@@ -5221,30 +5434,6 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationCreateVhuAgrementArgs, "input">
-  >;
-  dasriCreate?: Resolver<
-    ResolversTypes["Dasri"],
-    ParentType,
-    ContextType,
-    RequireFields<MutationDasriCreateArgs, "dasriCreateInput">
-  >;
-  dasriMarkAsReady?: Resolver<
-    Maybe<ResolversTypes["Dasri"]>,
-    ParentType,
-    ContextType,
-    RequireFields<MutationDasriMarkAsReadyArgs, "id">
-  >;
-  dasriSign?: Resolver<
-    Maybe<ResolversTypes["Dasri"]>,
-    ParentType,
-    ContextType,
-    RequireFields<MutationDasriSignArgs, "id" | "signatureInput">
-  >;
-  dasriUpdate?: Resolver<
-    ResolversTypes["Dasri"],
-    ParentType,
-    ContextType,
-    RequireFields<MutationDasriUpdateArgs, "dasriUpdateInput">
   >;
   deleteBrokerReceipt?: Resolver<
     Maybe<ResolversTypes["BrokerReceipt"]>,
@@ -5405,6 +5594,12 @@ export type MutationResolvers<
       "id" | "siret" | "nextSegmentInfo"
     >
   >;
+  publishBsdasri?: Resolver<
+    Maybe<ResolversTypes["Bsdasri"]>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationPublishBsdasriArgs, "id">
+  >;
   publishBsvhu?: Resolver<
     Maybe<ResolversTypes["Bsvhu"]>,
     ParentType,
@@ -5453,6 +5648,21 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationSendMembershipRequestArgs, "siret">
   >;
+  signBsdasri?: Resolver<
+    Maybe<ResolversTypes["Bsdasri"]>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationSignBsdasriArgs, "id" | "signatureInput">
+  >;
+  signBsdasriEmissionWithSecretCode?: Resolver<
+    Maybe<ResolversTypes["Bsdasri"]>,
+    ParentType,
+    ContextType,
+    RequireFields<
+      MutationSignBsdasriEmissionWithSecretCodeArgs,
+      "id" | "signatureInput"
+    >
+  >;
   signBsvhu?: Resolver<
     Maybe<ResolversTypes["Bsvhu"]>,
     ParentType,
@@ -5482,6 +5692,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationUpdateBrokerReceiptArgs, "input">
+  >;
+  updateBsdasri?: Resolver<
+    ResolversTypes["Bsdasri"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationUpdateBsdasriArgs, "bsdasriUpdateInput">
   >;
   updateBsvhu?: Resolver<
     Maybe<ResolversTypes["Bsvhu"]>,
@@ -5570,7 +5786,6 @@ export type PageInfoResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["PageInfo"] = ResolversParentTypes["PageInfo"]
 > = {
-  startCursor?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   endCursor?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   hasNextPage?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;
   hasPreviousPage?: Resolver<
@@ -5578,6 +5793,7 @@ export type PageInfoResolvers<
     ParentType,
     ContextType
   >;
+  startCursor?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -5591,6 +5807,18 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QueryAppendixFormsArgs, "siret">
+  >;
+  bsdasri?: Resolver<
+    ResolversTypes["Bsdasri"],
+    ParentType,
+    ContextType,
+    RequireFields<QueryBsdasriArgs, "id">
+  >;
+  bsdasris?: Resolver<
+    ResolversTypes["BsdasriConnection"],
+    ParentType,
+    ContextType,
+    RequireFields<QueryBsdasrisArgs, never>
   >;
   bsvhu?: Resolver<
     ResolversTypes["Bsvhu"],
@@ -5621,18 +5849,6 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QueryCompanyInfosArgs, "siret">
-  >;
-  dasri?: Resolver<
-    Maybe<ResolversTypes["Dasri"]>,
-    ParentType,
-    ContextType,
-    RequireFields<QueryDasriArgs, never>
-  >;
-  dasris?: Resolver<
-    Array<ResolversTypes["Dasri"]>,
-    ParentType,
-    ContextType,
-    RequireFields<QueryDasrisArgs, never>
   >;
   ecoOrganismes?: Resolver<
     Array<ResolversTypes["EcoOrganisme"]>,
@@ -6192,6 +6408,22 @@ export type Resolvers<ContextType = GraphQLContext> = {
   AuthPayload?: AuthPayloadResolvers<ContextType>;
   Broker?: BrokerResolvers<ContextType>;
   BrokerReceipt?: BrokerReceiptResolvers<ContextType>;
+  Bsdasri?: BsdasriResolvers<ContextType>;
+  BsdasriConnection?: BsdasriConnectionResolvers<ContextType>;
+  BsdasriEdge?: BsdasriEdgeResolvers<ContextType>;
+  BsdasriEmission?: BsdasriEmissionResolvers<ContextType>;
+  BsdasriEmitter?: BsdasriEmitterResolvers<ContextType>;
+  BsdasriError?: BsdasriErrorResolvers<ContextType>;
+  BsdasriMetadata?: BsdasriMetadataResolvers<ContextType>;
+  BsdasriOperation?: BsdasriOperationResolvers<ContextType>;
+  BsdasriPackagingInfo?: BsdasriPackagingInfoResolvers<ContextType>;
+  BsdasriReception?: BsdasriReceptionResolvers<ContextType>;
+  BsdasriRecipient?: BsdasriRecipientResolvers<ContextType>;
+  BsdasriSignature?: BsdasriSignatureResolvers<ContextType>;
+  BsdasriTransport?: BsdasriTransportResolvers<ContextType>;
+  BsdasriTransporter?: BsdasriTransporterResolvers<ContextType>;
+  BsdasriWasteAcceptation?: BsdasriWasteAcceptationResolvers<ContextType>;
+  BsdasriWasteDetails?: BsdasriWasteDetailsResolvers<ContextType>;
   Bsvhu?: BsvhuResolvers<ContextType>;
   BsvhuConnection?: BsvhuConnectionResolvers<ContextType>;
   BsvhuEdge?: BsvhuEdgeResolvers<ContextType>;
@@ -6215,17 +6447,6 @@ export type Resolvers<ContextType = GraphQLContext> = {
   CompanyPublic?: CompanyPublicResolvers<ContextType>;
   CompanySearchResult?: CompanySearchResultResolvers<ContextType>;
   CompanyStat?: CompanyStatResolvers<ContextType>;
-  Dasri?: DasriResolvers<ContextType>;
-  DasriEmission?: DasriEmissionResolvers<ContextType>;
-  DasriEmitter?: DasriEmitterResolvers<ContextType>;
-  DasriOperation?: DasriOperationResolvers<ContextType>;
-  DasriPackagingInfo?: DasriPackagingInfoResolvers<ContextType>;
-  DasriReception?: DasriReceptionResolvers<ContextType>;
-  DasriRecipient?: DasriRecipientResolvers<ContextType>;
-  DasriTransport?: DasriTransportResolvers<ContextType>;
-  DasriTransporter?: DasriTransporterResolvers<ContextType>;
-  DasriWasteAcceptation?: DasriWasteAcceptationResolvers<ContextType>;
-  DasriWasteDetails?: DasriWasteDetailsResolvers<ContextType>;
   DateTime?: GraphQLScalarType;
   Declaration?: DeclarationResolvers<ContextType>;
   Destination?: DestinationResolvers<ContextType>;
@@ -6354,6 +6575,475 @@ export function createBrokerReceiptMock(
     receiptNumber: "",
     validityLimit: new Date(),
     department: "",
+    ...props
+  };
+}
+
+export function createBsdasriMock(props: Partial<Bsdasri>): Bsdasri {
+  return {
+    __typename: "Bsdasri",
+    id: "",
+    status: "INITIAL",
+    createdAt: null,
+    updatedAt: null,
+    isDraft: false,
+    emitter: null,
+    emission: null,
+    transporter: null,
+    transport: null,
+    recipient: null,
+    reception: null,
+    operation: null,
+    regroupedBsdasris: null,
+    metadata: createBsdasriMetadataMock({}),
+    ...props
+  };
+}
+
+export function createBsdasriCompanyWhereMock(
+  props: Partial<BsdasriCompanyWhere>
+): BsdasriCompanyWhere {
+  return {
+    siret: "",
+    ...props
+  };
+}
+
+export function createBsdasriConnectionMock(
+  props: Partial<BsdasriConnection>
+): BsdasriConnection {
+  return {
+    __typename: "BsdasriConnection",
+    totalCount: 0,
+    pageInfo: createPageInfoMock({}),
+    edges: [],
+    ...props
+  };
+}
+
+export function createBsdasriCreateInputMock(
+  props: Partial<BsdasriCreateInput>
+): BsdasriCreateInput {
+  return {
+    emitter: null,
+    emission: null,
+    transporter: null,
+    transport: null,
+    recipient: null,
+    reception: null,
+    operation: null,
+    regroupedBsdasris: null,
+    ...props
+  };
+}
+
+export function createBsdasriEdgeMock(
+  props: Partial<BsdasriEdge>
+): BsdasriEdge {
+  return {
+    __typename: "BsdasriEdge",
+    cursor: "",
+    node: createBsdasriMock({}),
+    ...props
+  };
+}
+
+export function createBsdasriEmissionMock(
+  props: Partial<BsdasriEmission>
+): BsdasriEmission {
+  return {
+    __typename: "BsdasriEmission",
+    wasteCode: null,
+    wasteDetails: null,
+    handedOverAt: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createBsdasriEmissionInputMock(
+  props: Partial<BsdasriEmissionInput>
+): BsdasriEmissionInput {
+  return {
+    wasteCode: null,
+    wasteDetails: null,
+    handedOverAt: null,
+    ...props
+  };
+}
+
+export function createBsdasriEmitterMock(
+  props: Partial<BsdasriEmitter>
+): BsdasriEmitter {
+  return {
+    __typename: "BsdasriEmitter",
+    company: null,
+    workSite: null,
+    handOverToTransporterAt: null,
+    customInfo: null,
+    type: null,
+    onBehalfOfEcoorganisme: false,
+    ...props
+  };
+}
+
+export function createBsdasriEmitterInputMock(
+  props: Partial<BsdasriEmitterInput>
+): BsdasriEmitterInput {
+  return {
+    type: null,
+    company: null,
+    workSite: null,
+    customInfo: null,
+    onBehalfOfEcoorganisme: null,
+    ...props
+  };
+}
+
+export function createBsdasriEmitterWhereMock(
+  props: Partial<BsdasriEmitterWhere>
+): BsdasriEmitterWhere {
+  return {
+    company: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createBsdasriErrorMock(
+  props: Partial<BsdasriError>
+): BsdasriError {
+  return {
+    __typename: "BsdasriError",
+    message: "",
+    path: "",
+    requiredFor: [],
+    ...props
+  };
+}
+
+export function createBsdasriInputMock(
+  props: Partial<BsdasriInput>
+): BsdasriInput {
+  return {
+    emitter: null,
+    emission: null,
+    transporter: null,
+    transport: null,
+    recipient: null,
+    reception: null,
+    operation: null,
+    ...props
+  };
+}
+
+export function createBsdasriMetadataMock(
+  props: Partial<BsdasriMetadata>
+): BsdasriMetadata {
+  return {
+    __typename: "BsdasriMetadata",
+    errors: [],
+    ...props
+  };
+}
+
+export function createBsdasriOperationMock(
+  props: Partial<BsdasriOperation>
+): BsdasriOperation {
+  return {
+    __typename: "BsdasriOperation",
+    processingOperation: null,
+    processedAt: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createBsdasriOperationInputMock(
+  props: Partial<BsdasriOperationInput>
+): BsdasriOperationInput {
+  return {
+    processingOperation: null,
+    processedAt: null,
+    ...props
+  };
+}
+
+export function createBsdasriPackagingInfoMock(
+  props: Partial<BsdasriPackagingInfo>
+): BsdasriPackagingInfo {
+  return {
+    __typename: "BsdasriPackagingInfo",
+    type: "BOITE_CARTON",
+    other: null,
+    quantity: 0,
+    volume: 0,
+    ...props
+  };
+}
+
+export function createBsdasriPackagingInfoInputMock(
+  props: Partial<BsdasriPackagingInfoInput>
+): BsdasriPackagingInfoInput {
+  return {
+    type: "BOITE_CARTON",
+    other: null,
+    volume: 0,
+    quantity: 0,
+    ...props
+  };
+}
+
+export function createBsdasriReceptionMock(
+  props: Partial<BsdasriReception>
+): BsdasriReception {
+  return {
+    __typename: "BsdasriReception",
+    wasteDetails: null,
+    wasteAcceptation: null,
+    receivedAt: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createBsdasriReceptionInputMock(
+  props: Partial<BsdasriReceptionInput>
+): BsdasriReceptionInput {
+  return {
+    wasteDetails: null,
+    receivedAt: null,
+    wasteAcceptation: null,
+    ...props
+  };
+}
+
+export function createBsdasriRecipientMock(
+  props: Partial<BsdasriRecipient>
+): BsdasriRecipient {
+  return {
+    __typename: "BsdasriRecipient",
+    company: null,
+    customInfo: null,
+    ...props
+  };
+}
+
+export function createBsdasriRecipientInputMock(
+  props: Partial<BsdasriRecipientInput>
+): BsdasriRecipientInput {
+  return {
+    company: null,
+    customInfo: null,
+    ...props
+  };
+}
+
+export function createBsdasriRecipientWasteDetailInputMock(
+  props: Partial<BsdasriRecipientWasteDetailInput>
+): BsdasriRecipientWasteDetailInput {
+  return {
+    quantity: null,
+    volume: null,
+    ...props
+  };
+}
+
+export function createBsdasriRecipientWhereMock(
+  props: Partial<BsdasriRecipientWhere>
+): BsdasriRecipientWhere {
+  return {
+    company: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createBsdasriSignatureMock(
+  props: Partial<BsdasriSignature>
+): BsdasriSignature {
+  return {
+    __typename: "BsdasriSignature",
+    date: null,
+    author: null,
+    ...props
+  };
+}
+
+export function createBsdasriSignatureInputMock(
+  props: Partial<BsdasriSignatureInput>
+): BsdasriSignatureInput {
+  return {
+    type: "EMISSION",
+    author: "",
+    ...props
+  };
+}
+
+export function createBsdasriSignatureWhereMock(
+  props: Partial<BsdasriSignatureWhere>
+): BsdasriSignatureWhere {
+  return {
+    date: createDateFilterMock({}),
+    ...props
+  };
+}
+
+export function createBsdasriSignatureWithSecretCodeInputMock(
+  props: Partial<BsdasriSignatureWithSecretCodeInput>
+): BsdasriSignatureWithSecretCodeInput {
+  return {
+    author: "",
+    securityCode: null,
+    ...props
+  };
+}
+
+export function createBsdasriTransportMock(
+  props: Partial<BsdasriTransport>
+): BsdasriTransport {
+  return {
+    __typename: "BsdasriTransport",
+    wasteDetails: null,
+    wasteAcceptation: null,
+    handedOverAt: null,
+    takenOverAt: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createBsdasriTransporterMock(
+  props: Partial<BsdasriTransporter>
+): BsdasriTransporter {
+  return {
+    __typename: "BsdasriTransporter",
+    company: null,
+    receipt: null,
+    receiptDepartment: null,
+    receiptValidityLimit: null,
+    customInfo: null,
+    ...props
+  };
+}
+
+export function createBsdasriTransporterInputMock(
+  props: Partial<BsdasriTransporterInput>
+): BsdasriTransporterInput {
+  return {
+    company: null,
+    receipt: null,
+    receiptDepartment: null,
+    receiptValidityLimit: null,
+    customInfo: null,
+    ...props
+  };
+}
+
+export function createBsdasriTransporterWhereMock(
+  props: Partial<BsdasriTransporterWhere>
+): BsdasriTransporterWhere {
+  return {
+    company: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createBsdasriTransportInputMock(
+  props: Partial<BsdasriTransportInput>
+): BsdasriTransportInput {
+  return {
+    wasteDetails: null,
+    takenOverAt: null,
+    handedOverAt: null,
+    wasteAcceptation: null,
+    ...props
+  };
+}
+
+export function createBsdasriUpdateInputMock(
+  props: Partial<BsdasriUpdateInput>
+): BsdasriUpdateInput {
+  return {
+    id: "",
+    emitter: null,
+    emission: null,
+    transporter: null,
+    transport: null,
+    recipient: null,
+    reception: null,
+    operation: null,
+    regroupedBsdasris: null,
+    ...props
+  };
+}
+
+export function createBsdasriWasteAcceptationMock(
+  props: Partial<BsdasriWasteAcceptation>
+): BsdasriWasteAcceptation {
+  return {
+    __typename: "BsdasriWasteAcceptation",
+    status: null,
+    refusalReason: null,
+    refusedQuantity: null,
+    ...props
+  };
+}
+
+export function createBsdasriWasteAcceptationInputMock(
+  props: Partial<BsdasriWasteAcceptationInput>
+): BsdasriWasteAcceptationInput {
+  return {
+    status: null,
+    refusalReason: null,
+    refusedQuantity: null,
+    ...props
+  };
+}
+
+export function createBsdasriWasteDetailInputMock(
+  props: Partial<BsdasriWasteDetailInput>
+): BsdasriWasteDetailInput {
+  return {
+    quantity: null,
+    quantityType: null,
+    packagingInfos: null,
+    onuCode: null,
+    ...props
+  };
+}
+
+export function createBsdasriWasteDetailsMock(
+  props: Partial<BsdasriWasteDetails>
+): BsdasriWasteDetails {
+  return {
+    __typename: "BsdasriWasteDetails",
+    quantity: null,
+    quantityType: null,
+    volume: null,
+    packagingInfos: null,
+    onuCode: null,
+    ...props
+  };
+}
+
+export function createBsdasriWhereMock(
+  props: Partial<BsdasriWhere>
+): BsdasriWhere {
+  return {
+    isDraft: null,
+    status: null,
+    createdAt: null,
+    updatedAt: null,
+    emitter: null,
+    transporter: null,
+    recipient: null,
+    processingOperation: null,
+    groupable: null,
+    _and: null,
+    _or: null,
+    _not: null,
     ...props
   };
 }
@@ -6938,347 +7628,13 @@ export function createCreateVhuAgrementInputMock(
   };
 }
 
-export function createDasriMock(props: Partial<Dasri>): Dasri {
-  return {
-    __typename: "Dasri",
-    id: "",
-    readableId: "",
-    customId: null,
-    status: "DRAFT",
-    createdAt: null,
-    updatedAt: null,
-    emitter: null,
-    emission: null,
-    transporter: null,
-    transport: null,
-    recipient: null,
-    reception: null,
-    operation: null,
-    ...props
-  };
-}
-
-export function createDasriCreateInputMock(
-  props: Partial<DasriCreateInput>
-): DasriCreateInput {
-  return {
-    customId: null,
-    emitter: null,
-    emission: null,
-    transporter: null,
-    transport: null,
-    recipient: null,
-    reception: null,
-    operation: null,
-    ...props
-  };
-}
-
-export function createDasriEmissionMock(
-  props: Partial<DasriEmission>
-): DasriEmission {
-  return {
-    __typename: "DasriEmission",
-    wasteCode: null,
-    wasteDetails: null,
-    handedOverAt: null,
-    signedBy: null,
-    signedAt: null,
-    ...props
-  };
-}
-
-export function createDasriEmissionInputMock(
-  props: Partial<DasriEmissionInput>
-): DasriEmissionInput {
-  return {
-    wasteCode: null,
-    wasteDetailsOnuCode: null,
-    wasteDetails: null,
-    handedOverAt: null,
-    ...props
-  };
-}
-
-export function createDasriEmitterMock(
-  props: Partial<DasriEmitter>
-): DasriEmitter {
-  return {
-    __typename: "DasriEmitter",
-    company: null,
-    workSite: null,
-    handOverToTransporterAt: null,
-    customInfo: null,
-    ...props
-  };
-}
-
-export function createDasriEmitterInputMock(
-  props: Partial<DasriEmitterInput>
-): DasriEmitterInput {
-  return {
-    company: null,
-    workSite: null,
-    customInfo: null,
-    ...props
-  };
-}
-
-export function createDasriInputMock(props: Partial<DasriInput>): DasriInput {
-  return {
-    customId: null,
-    emitter: null,
-    emission: null,
-    transporter: null,
-    transport: null,
-    recipient: null,
-    reception: null,
-    operation: null,
-    ...props
-  };
-}
-
-export function createDasriOperationMock(
-  props: Partial<DasriOperation>
-): DasriOperation {
-  return {
-    __typename: "DasriOperation",
-    signedBy: null,
-    signedAt: null,
-    processingOperation: null,
-    processedAt: null,
-    ...props
-  };
-}
-
-export function createDasriOperationInputMock(
-  props: Partial<DasriOperationInput>
-): DasriOperationInput {
-  return {
-    processingOperation: null,
-    processedAt: null,
-    ...props
-  };
-}
-
-export function createDasriPackagingInfoMock(
-  props: Partial<DasriPackagingInfo>
-): DasriPackagingInfo {
-  return {
-    __typename: "DasriPackagingInfo",
-    type: "BOITE_CARTON",
-    other: null,
-    quantity: 0,
-    volume: 0,
-    ...props
-  };
-}
-
-export function createDasriPackagingInfoInputMock(
-  props: Partial<DasriPackagingInfoInput>
-): DasriPackagingInfoInput {
-  return {
-    type: "BOITE_CARTON",
-    other: null,
-    volume: 0,
-    quantity: 0,
-    ...props
-  };
-}
-
-export function createDasriReceptionMock(
-  props: Partial<DasriReception>
-): DasriReception {
-  return {
-    __typename: "DasriReception",
-    wasteDetails: null,
-    wasteAcceptation: null,
-    receivedAt: null,
-    signedBy: null,
-    signedAt: null,
-    ...props
-  };
-}
-
-export function createDasriReceptionInputMock(
-  props: Partial<DasriReceptionInput>
-): DasriReceptionInput {
-  return {
-    wasteDetails: null,
-    receivedAt: null,
-    ...props
-  };
-}
-
-export function createDasriRecipientMock(
-  props: Partial<DasriRecipient>
-): DasriRecipient {
-  return {
-    __typename: "DasriRecipient",
-    company: null,
-    customInfo: null,
-    ...props
-  };
-}
-
-export function createDasriRecipientInputMock(
-  props: Partial<DasriRecipientInput>
-): DasriRecipientInput {
-  return {
-    company: null,
-    customInfo: null,
-    ...props
-  };
-}
-
-export function createDasriRecipientWasteDetailInputMock(
-  props: Partial<DasriRecipientWasteDetailInput>
-): DasriRecipientWasteDetailInput {
-  return {
-    quantity: null,
-    volume: null,
-    ...props
-  };
-}
-
-export function createDasriSignatureInputMock(
-  props: Partial<DasriSignatureInput>
-): DasriSignatureInput {
-  return {
-    type: "EMISSION",
-    signedBy: "",
-    securityCode: null,
-    ...props
-  };
-}
-
-export function createDasriTransportMock(
-  props: Partial<DasriTransport>
-): DasriTransport {
-  return {
-    __typename: "DasriTransport",
-    wasteDetails: null,
-    wasteAcceptation: null,
-    handedOverAt: null,
-    takenOverAt: null,
-    signedBy: null,
-    signedAt: null,
-    ...props
-  };
-}
-
-export function createDasriTransporterMock(
-  props: Partial<DasriTransporter>
-): DasriTransporter {
-  return {
-    __typename: "DasriTransporter",
-    company: null,
-    receipt: null,
-    receiptDepartment: null,
-    receiptValidityLimit: null,
-    customInfo: null,
-    ...props
-  };
-}
-
-export function createDasriTransporterInputMock(
-  props: Partial<DasriTransporterInput>
-): DasriTransporterInput {
-  return {
-    company: null,
-    receipt: null,
-    receiptDepartment: null,
-    receiptValidityLimit: null,
-    customInfo: null,
-    ...props
-  };
-}
-
-export function createDasriTransportInputMock(
-  props: Partial<DasriTransportInput>
-): DasriTransportInput {
-  return {
-    wasteDetails: null,
-    takenOverAt: null,
-    handedOverAt: null,
-    wasteAcceptation: null,
-    ...props
-  };
-}
-
-export function createDasriUpdateInputMock(
-  props: Partial<DasriUpdateInput>
-): DasriUpdateInput {
-  return {
-    id: "",
-    customId: null,
-    emitter: null,
-    emission: null,
-    transporter: null,
-    transport: null,
-    recipient: null,
-    reception: null,
-    operation: null,
-    ...props
-  };
-}
-
-export function createDasriWasteAcceptationMock(
-  props: Partial<DasriWasteAcceptation>
-): DasriWasteAcceptation {
-  return {
-    __typename: "DasriWasteAcceptation",
-    status: null,
-    refusalReason: null,
-    refusedQuantity: null,
-    ...props
-  };
-}
-
-export function createDasriWasteAcceptationInputMock(
-  props: Partial<DasriWasteAcceptationInput>
-): DasriWasteAcceptationInput {
-  return {
-    status: null,
-    refusalReason: null,
-    refusedQuantity: null,
-    ...props
-  };
-}
-
-export function createDasriWasteDetailInputMock(
-  props: Partial<DasriWasteDetailInput>
-): DasriWasteDetailInput {
-  return {
-    quantity: null,
-    quantityType: null,
-    packagingInfos: null,
-    onuCode: null,
-    ...props
-  };
-}
-
-export function createDasriWasteDetailsMock(
-  props: Partial<DasriWasteDetails>
-): DasriWasteDetails {
-  return {
-    __typename: "DasriWasteDetails",
-    quantity: null,
-    quantityType: null,
-    volume: null,
-    packagingInfos: null,
-    onuCode: null,
-    ...props
-  };
-}
-
 export function createDateFilterMock(props: Partial<DateFilter>): DateFilter {
   return {
-    _gte: null,
-    _gt: null,
-    _lte: null,
-    _lt: null,
     _eq: null,
+    _gt: null,
+    _gte: null,
+    _lt: null,
+    _lte: null,
     ...props
   };
 }
@@ -7661,10 +8017,10 @@ export function createPackagingInfoInputMock(
 export function createPageInfoMock(props: Partial<PageInfo>): PageInfo {
   return {
     __typename: "PageInfo",
-    startCursor: "",
     endCursor: "",
     hasNextPage: false,
     hasPreviousPage: false,
+    startCursor: "",
     ...props
   };
 }
@@ -7737,6 +8093,15 @@ export function createRecipientInputMock(
     processingOperation: null,
     company: null,
     isTempStorage: null,
+    ...props
+  };
+}
+
+export function createRegroupedBsdasriInputMock(
+  props: Partial<RegroupedBsdasriInput>
+): RegroupedBsdasriInput {
+  return {
+    id: null,
     ...props
   };
 }
