@@ -2,6 +2,7 @@ import { CompanyForVerification } from "generated/graphql/types";
 import React, { useState } from "react";
 import CompanyVerifyModal from "./CompanyVerifyModal";
 import "@reach/menu-button/styles.css";
+import SendVerificationCodeLetterModal from "./SendVerificationCodeLetterModal";
 
 type VerificationActionsProps = {
   company: CompanyForVerification;
@@ -14,10 +15,25 @@ export default function CompanyVerificationActions({
   const openVerifyModal = () => setShowVerifyModal(true);
   const closeVerifyModal = () => setShowVerifyModal(false);
 
+  const [
+    showSendVerificationCodeLetterModal,
+    setSendVerificationCodeLetterModal,
+  ] = useState(false);
+  const openSendVerificationCodeModal = () =>
+    setSendVerificationCodeLetterModal(true);
+  const closeSendVerificationCodeModal = () =>
+    setSendVerificationCodeLetterModal(false);
+
   return (
-    <>
+    <div className="tw-flex tw-flex-col ">
       <button className="btn btn--primary" onClick={() => openVerifyModal()}>
         Vérifier
+      </button>
+      <button
+        className="btn btn--primary tw-mt-1"
+        onClick={() => openSendVerificationCodeModal()}
+      >
+        Envoyer un courrier
       </button>
 
       {showVerifyModal && (
@@ -27,6 +43,14 @@ export default function CompanyVerificationActions({
           company={company}
         />
       )}
-    </>
+
+      {showSendVerificationCodeLetterModal && (
+        <SendVerificationCodeLetterModal
+          isOpen={showSendVerificationCodeLetterModal}
+          onClose={() => closeSendVerificationCodeModal()}
+          company={company}
+        />
+      )}
+    </div>
   );
 }

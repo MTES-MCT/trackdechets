@@ -1676,6 +1676,7 @@ export type Mutation = {
    * l'établissement qui ont le choix de l'accepter ou de la refuser.
    */
   sendMembershipRequest?: Maybe<MembershipRequest>;
+  sendVerificationCodeLetter: CompanyForVerification;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Signe un BSVHU
@@ -1948,6 +1949,10 @@ export type MutationSaveFormArgs = {
 
 export type MutationSendMembershipRequestArgs = {
   siret: Scalars["String"];
+};
+
+export type MutationSendVerificationCodeLetterArgs = {
+  input: SendVerificationCodeLetterInput;
 };
 
 export type MutationSignBsvhuArgs = {
@@ -2490,6 +2495,10 @@ export type Rubrique = {
   unite?: Maybe<Scalars["String"]>;
   /** Type de déchets autorisé */
   wasteType?: Maybe<WasteType>;
+};
+
+export type SendVerificationCodeLetterInput = {
+  siret: Scalars["String"];
 };
 
 /** Payload de signature d'un BSD */

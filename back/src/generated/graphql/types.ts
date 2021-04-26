@@ -5854,7 +5854,7 @@ export function createBsdEdgeMock(props: Partial<BsdEdge>): BsdEdge {
   return {
     __typename: "BsdEdge",
     cursor: "",
-    node: createFormMock({}),
+    node: createBsdMock({}),
     ...props
   };
 }
