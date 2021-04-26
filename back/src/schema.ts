@@ -13,7 +13,7 @@ import dasriResolvers from "./dasris/resolvers";
 const repositories = ["users", "companies", "forms", "vhu"];
 
 const typeDefsPath = repositories.map(
-  repository => `${__dirname}/${repository}/*.graphql`
+  repository => `${__dirname}/${repository}/**/*.graphql`
 );
 
 const typeDefsArray = loadFilesSync(typeDefsPath);
