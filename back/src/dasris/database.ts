@@ -1,70 +1,48 @@
 import prisma from "../prisma";
 
-import { DasriNotFound } from "./errors";
+import { BsdasriNotFound } from "./errors";
 import { UserInputError } from "apollo-server-express";
-import { Prisma, Dasri } from "@prisma/client";
+import { Bsdasri } from "@prisma/client";
 
-import { DasriRole } from "../generated/graphql/types";
-import { FullDasri } from "./types";
+import { FullBsdasri } from "./types";
 /**
- * Retrieves a dasri by id or readableId or throw a DasriNotFound error
+ * Retrieves a dasri by id or throw a BsdasriNotFound error
  */
-export async function getDasriOrDasriNotFound({
+export async function getBsdasriOrNotFound({
   id,
-  readableId
-}: Prisma.DasriWhereUniqueInput) {
-  if (!id && !readableId) {
-    throw new UserInputError("You should specify an id or a readableId");
+  includeRegrouped = false
+}: {
+  id: string;
+  includeRegrouped?: boolean;
+}) {
+  if (!id) {
+    throw new UserInputError("You should specify an id");
   }
 
-  const dasri = await prisma.dasri.findUnique({
-    where: id ? { id } : { readableId }
+  const bsdasri = await prisma.bsdasri.findUnique({
+    where: { id },
+    ...(includeRegrouped && {
+      include: { regroupedBsdasris: { select: { id: true } } }
+    })
   });
 
-  if (dasri == null || dasri.isDeleted == true) {
-    throw new DasriNotFound(id ? id.toString() : readableId);
+  if (bsdasri == null || bsdasri.isDeleted == true) {
+    throw new BsdasriNotFound(id.toString());
   }
-  return dasri;
-}
-
-/**
- * Get a filter to retrieve dasris the passed siret has rights on
- * Optional parameter roles allows to filter on specific roles
- * For example getDasrisRightFilter(company, [TRANSPORTER]) will return a filter
- * only for the forms in which the company appears as a transporter
- * @param siret the siret to filter on
- * @param roles optional [FormRole] to refine filter
- */
-export function getDasrisRightFilter(siret: string, roles?: DasriRole[]) {
-  const filtersByRole: {
-    [key in DasriRole]: Partial<Prisma.DasriWhereInput>[];
-  } = {
-    ["RECIPIENT"]: [{ recipientCompanySiret: siret }],
-    ["EMITTER"]: [{ emitterCompanySiret: siret }],
-    ["TRANSPORTER"]: [{ transporterCompanySiret: siret }]
-  };
-
-  return {
-    OR: Object.keys(filtersByRole)
-      .filter((role: DasriRole) =>
-        roles?.length > 0 ? roles.includes(role) : true
-      )
-      .map(role => filtersByRole[role])
-      .flat()
-  };
+  return bsdasri;
 }
 
 /**
  * Returns a prisma Dasri object with its owner
- * @param dasri
+ * @param bsdasri
  */
-export async function getFullDasri(dasri: Dasri): Promise<FullDasri> {
+export async function getFullBsdasri(bsdasri: Bsdasri): Promise<FullBsdasri> {
   const owner = await prisma.form
-    .findUnique({ where: { id: dasri.id } })
+    .findUnique({ where: { id: bsdasri.id } })
     .owner();
 
   return {
-    ...dasri,
+    ...bsdasri,
     owner
   };
 }
