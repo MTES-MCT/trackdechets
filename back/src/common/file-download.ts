@@ -32,7 +32,7 @@ export async function getFileDownloadToken(
 ) {
   const token = `${type}-${new Date().getTime()}-${randomNumber(4)}`;
 
-  await setInCache(token, JSON.stringify({ type, params }), { EX: 10 });
+  await setInCache(token, JSON.stringify({ type, params }), { EX: 10000 });
   registerFileDownloader(type, downloadHandler);
 
   const API_BASE_URL = getAPIBaseURL();

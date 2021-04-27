@@ -2509,6 +2509,12 @@ export type Query = {
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsdasri: Bsdasri;
   /**
+   * Renvoie un token pour télécharger un pdf de bordereau
+   * Ce token doit être transmis à la route /download pour obtenir le fichier.
+   * Il est valable 10 secondes
+   */
+  bsdasriPdf: FileDownload;
+  /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Renvoie les Bsdasris.
    * Par défaut, les dasris des différentes companies de l'utilisateur sont renvoyés.
@@ -2619,6 +2625,11 @@ export type QueryAppendixFormsArgs = {
 /** Views of the Company ressource for the admin panel */
 export type QueryBsdasriArgs = {
   id: Scalars["ID"];
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsdasriPdfArgs = {
+  id?: Maybe<Scalars["ID"]>;
 };
 
 /** Views of the Company ressource for the admin panel */
@@ -3611,6 +3622,7 @@ export type ResolversTypes = {
   BsdasriMetadata: ResolverTypeWrapper<BsdasriMetadata>;
   BsdasriError: ResolverTypeWrapper<BsdasriError>;
   BsdasriSignatureType: BsdasriSignatureType;
+  FileDownload: ResolverTypeWrapper<FileDownload>;
   BsdasriWhere: BsdasriWhere;
   DateFilter: DateFilter;
   BsdasriEmitterWhere: BsdasriEmitterWhere;
@@ -3639,7 +3651,6 @@ export type ResolversTypes = {
   BsvhuMetadata: ResolverTypeWrapper<BsvhuMetadata>;
   BsvhuError: ResolverTypeWrapper<BsvhuError>;
   SignatureTypeInput: SignatureTypeInput;
-  FileDownload: ResolverTypeWrapper<FileDownload>;
   BsvhuWhere: BsvhuWhere;
   BsvhuEmitterWhere: BsvhuEmitterWhere;
   BsvhuCompanyWhere: BsvhuCompanyWhere;
@@ -3813,6 +3824,7 @@ export type ResolversParentTypes = {
   BsdasriOperation: BsdasriOperation;
   BsdasriMetadata: BsdasriMetadata;
   BsdasriError: BsdasriError;
+  FileDownload: FileDownload;
   BsdasriWhere: BsdasriWhere;
   DateFilter: DateFilter;
   BsdasriEmitterWhere: BsdasriEmitterWhere;
@@ -3835,7 +3847,6 @@ export type ResolversParentTypes = {
   BsvhuRecepisse: BsvhuRecepisse;
   BsvhuMetadata: BsvhuMetadata;
   BsvhuError: BsvhuError;
-  FileDownload: FileDownload;
   BsvhuWhere: BsvhuWhere;
   BsvhuEmitterWhere: BsvhuEmitterWhere;
   BsvhuCompanyWhere: BsvhuCompanyWhere;
@@ -5813,6 +5824,12 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QueryBsdasriArgs, "id">
+  >;
+  bsdasriPdf?: Resolver<
+    ResolversTypes["FileDownload"],
+    ParentType,
+    ContextType,
+    RequireFields<QueryBsdasriPdfArgs, never>
   >;
   bsdasris?: Resolver<
     ResolversTypes["BsdasriConnection"],
