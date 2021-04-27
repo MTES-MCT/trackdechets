@@ -181,7 +181,7 @@ model Company {
   vhuAgrementBroyeur       VhuAgrement?              @relation(name: "VhuAgrementBroyeur_Company", fields: [vhuAgrementBroyeurId], references: [id])
   CompanyAssociation       CompanyAssociation[]
   MembershipRequest        MembershipRequest[]
-  allowDasriTakeOverWithoutSignature Boolean @default(false)
+  allowBsdasriTakeOverWithoutSignature Boolean @default(false)
 }
 
 // Companies with restricted diffusion of SIRENE information (police, army, etc)
