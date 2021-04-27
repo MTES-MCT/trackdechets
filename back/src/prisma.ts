@@ -2,12 +2,21 @@ import { URL } from "url";
 import { unescape } from "querystring";
 import { PrismaClient } from "@prisma/client";
 
-const dbUrl = new URL(process.env.DATABASE_URL);
-dbUrl.searchParams.set("schema", "default$default");
-
 const prisma = new PrismaClient({
   datasources: {
-    db: { url: unescape(dbUrl.href) }
+    db: { url: getDbUrl() }
   }
 });
+
+function getDbUrl() {
+  try {
+    const dbUrl = new URL(process.env.DATABASE_URL);
+    dbUrl.searchParams.set("schema", "default$default");
+
+    return unescape(dbUrl.href); // unescape needed because of the `$`
+  } catch (err) {
+    return "";
+  }
+}
+
 export default prisma;
