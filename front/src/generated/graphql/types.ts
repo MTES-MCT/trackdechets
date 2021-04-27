@@ -113,6 +113,402 @@ export type BrokerReceipt = {
 
 export type Bsd = Form;
 
+/** Bordereau Bsdasri */
+export type Bsdasri = {
+  __typename?: "Bsdasri";
+  id: Scalars["ID"];
+  status: BsdasriStatus;
+  createdAt?: Maybe<Scalars["DateTime"]>;
+  updatedAt?: Maybe<Scalars["DateTime"]>;
+  isDraft: Scalars["Boolean"];
+  emitter?: Maybe<BsdasriEmitter>;
+  emission?: Maybe<BsdasriEmission>;
+  transporter?: Maybe<BsdasriTransporter>;
+  transport?: Maybe<BsdasriTransport>;
+  recipient?: Maybe<BsdasriRecipient>;
+  reception?: Maybe<BsdasriReception>;
+  operation?: Maybe<BsdasriOperation>;
+  /** Bordereaux regroupés */
+  regroupedBsdasris?: Maybe<Array<Scalars["ID"]>>;
+  metadata: BsdasriMetadata;
+};
+
+export type BsdasriCompanyWhere = {
+  siret: Scalars["String"];
+};
+
+export type BsdasriConnection = {
+  __typename?: "BsdasriConnection";
+  totalCount: Scalars["Int"];
+  pageInfo: PageInfo;
+  edges: Array<BsdasriEdge>;
+};
+
+export type BsdasriCreateInput = {
+  emitter?: Maybe<BsdasriEmitterInput>;
+  emission?: Maybe<BsdasriEmissionInput>;
+  transporter?: Maybe<BsdasriTransporterInput>;
+  transport?: Maybe<BsdasriTransportInput>;
+  recipient?: Maybe<BsdasriRecipientInput>;
+  reception?: Maybe<BsdasriReceptionInput>;
+  operation?: Maybe<BsdasriOperationInput>;
+  regroupedBsdasris?: Maybe<Array<Maybe<RegroupedBsdasriInput>>>;
+};
+
+export type BsdasriEdge = {
+  __typename?: "BsdasriEdge";
+  cursor: Scalars["String"];
+  node: Bsdasri;
+};
+
+/** Informations relatives au déchet émis */
+export type BsdasriEmission = {
+  __typename?: "BsdasriEmission";
+  wasteCode?: Maybe<Scalars["String"]>;
+  wasteDetails?: Maybe<BsdasriWasteDetails>;
+  handedOverAt?: Maybe<Scalars["DateTime"]>;
+  signature?: Maybe<BsdasriSignature>;
+};
+
+export type BsdasriEmissionInput = {
+  wasteCode?: Maybe<Scalars["String"]>;
+  wasteDetails?: Maybe<BsdasriWasteDetailInput>;
+  handedOverAt?: Maybe<Scalars["DateTime"]>;
+};
+
+/** Émetteur du Bsdasri, Personne responsable de l'émimination des déchets (PRED) */
+export type BsdasriEmitter = {
+  __typename?: "BsdasriEmitter";
+  /** Établissement émetteur */
+  company?: Maybe<FormCompany>;
+  /** Site d'emport du déceht, si différent de celle de l'émetteur */
+  workSite?: Maybe<WorkSite>;
+  /** Date de remise au tranporteur */
+  handOverToTransporterAt?: Maybe<Scalars["DateTime"]>;
+  /** Champ libre */
+  customInfo?: Maybe<Scalars["String"]>;
+  /** Type d'émetteur */
+  type?: Maybe<BsdasriEmitterType>;
+  /** Agit pour le compte de l'éco organisme agréé */
+  onBehalfOfEcoorganisme: Scalars["Boolean"];
+};
+
+export type BsdasriEmitterInput = {
+  /** Établissement émetteur */
+  type?: Maybe<BsdasriEmitterType>;
+  company?: Maybe<CompanyInput>;
+  workSite?: Maybe<WorkSiteInput>;
+  /** Champ libre émetteur */
+  customInfo?: Maybe<Scalars["String"]>;
+  onBehalfOfEcoorganisme?: Maybe<Scalars["Boolean"]>;
+};
+
+/** Type d'émetteur */
+export enum BsdasriEmitterType {
+  /** Producteur */
+  Producer = "PRODUCER",
+  /** Installation de regroupement */
+  Collector = "COLLECTOR"
+}
+
+export type BsdasriEmitterWhere = {
+  company?: Maybe<BsdasriCompanyWhere>;
+  signature?: Maybe<BsdasriSignatureWhere>;
+};
+
+export type BsdasriError = {
+  __typename?: "BsdasriError";
+  message: Scalars["String"];
+  path: Scalars["String"];
+  requiredFor: Array<BsdasriSignatureType>;
+};
+
+export type BsdasriInput = {
+  emitter?: Maybe<BsdasriEmitterInput>;
+  emission?: Maybe<BsdasriEmissionInput>;
+  transporter?: Maybe<BsdasriTransporterInput>;
+  transport?: Maybe<BsdasriTransportInput>;
+  recipient?: Maybe<BsdasriRecipientInput>;
+  reception?: Maybe<BsdasriReceptionInput>;
+  operation?: Maybe<BsdasriOperationInput>;
+};
+
+export type BsdasriMetadata = {
+  __typename?: "BsdasriMetadata";
+  errors: Array<Maybe<BsdasriError>>;
+};
+
+/** Informations relatives au traitement du Bsdasri */
+export type BsdasriOperation = {
+  __typename?: "BsdasriOperation";
+  processingOperation?: Maybe<Scalars["String"]>;
+  processedAt?: Maybe<Scalars["DateTime"]>;
+  signature?: Maybe<BsdasriSignature>;
+};
+
+export type BsdasriOperationInput = {
+  processingOperation?: Maybe<Scalars["String"]>;
+  processedAt?: Maybe<Scalars["DateTime"]>;
+};
+
+/** Informations sur le conditionnement Bsdasri */
+export type BsdasriPackagingInfo = {
+  __typename?: "BsdasriPackagingInfo";
+  /** Type de conditionnement */
+  type: BsdasriPackagings;
+  /** Description du conditionnement dans le cas où le type de conditionnement est `AUTRE` */
+  other?: Maybe<Scalars["String"]>;
+  /** Nombre de colis associés à ce conditionnement */
+  quantity: Scalars["Int"];
+  volume: Scalars["Int"];
+};
+
+export type BsdasriPackagingInfoInput = {
+  /** Type de conditionnement */
+  type: BsdasriPackagings;
+  /** Description du conditionnement dans le cas où le type de conditionnement est `AUTRE` */
+  other?: Maybe<Scalars["String"]>;
+  /** Nombre de colis associés à ce conditionnement */
+  volume: Scalars["Int"];
+  /** Nombre de colis associés à ce conditionnement */
+  quantity: Scalars["Int"];
+};
+
+/** Type de packaging du déchet */
+export enum BsdasriPackagings {
+  /** Caisse en carton avec sac en plastique */
+  BoiteCarton = "BOITE_CARTON",
+  /** Fûts ou jerrican à usage unique */
+  Fut = "FUT",
+  /** Boîtes et Mini-collecteurs pour déchets perforants */
+  BoitePerforants = "BOITE_PERFORANTS",
+  /** Grand emballage */
+  GrandEmballage = "GRAND_EMBALLAGE",
+  /** Grand récipient pour vrac */
+  Grv = "GRV",
+  /** Autre */
+  Autre = "AUTRE"
+}
+
+/** Informations relatives à la réception du Bsdasri */
+export type BsdasriReception = {
+  __typename?: "BsdasriReception";
+  wasteDetails?: Maybe<BsdasriWasteDetails>;
+  wasteAcceptation?: Maybe<BsdasriWasteAcceptation>;
+  receivedAt?: Maybe<Scalars["DateTime"]>;
+  signature?: Maybe<BsdasriSignature>;
+};
+
+export type BsdasriReceptionInput = {
+  wasteDetails?: Maybe<BsdasriWasteDetailInput>;
+  receivedAt?: Maybe<Scalars["DateTime"]>;
+  wasteAcceptation?: Maybe<BsdasriWasteAcceptationInput>;
+};
+
+/** Destinataire du Bsdasri */
+export type BsdasriRecipient = {
+  __typename?: "BsdasriRecipient";
+  /** Installation destinataire */
+  company?: Maybe<FormCompany>;
+  /** Champ libre */
+  customInfo?: Maybe<Scalars["String"]>;
+};
+
+export type BsdasriRecipientInput = {
+  /** Établissement émetteur */
+  company?: Maybe<CompanyInput>;
+  /** Champ libre transporteur */
+  customInfo?: Maybe<Scalars["String"]>;
+};
+
+export type BsdasriRecipientWasteDetailInput = {
+  quantity?: Maybe<Scalars["Int"]>;
+  volume?: Maybe<Scalars["Int"]>;
+};
+
+export type BsdasriRecipientWhere = {
+  company?: Maybe<BsdasriCompanyWhere>;
+  signature?: Maybe<BsdasriSignatureWhere>;
+};
+
+export enum BsdasriRole {
+  /** Les Bsdasri dont je suis transporteur */
+  Transporter = "TRANSPORTER",
+  /** Les Bsdasri dont je suis la destination de traitement */
+  Recipient = "RECIPIENT",
+  /** Les Bsdasri dont je suis l'émetteur */
+  Emitter = "EMITTER"
+}
+
+export type BsdasriSignature = {
+  __typename?: "BsdasriSignature";
+  date?: Maybe<Scalars["DateTime"]>;
+  author?: Maybe<Scalars["String"]>;
+};
+
+export type BsdasriSignatureInput = {
+  type: BsdasriSignatureType;
+  author: Scalars["String"];
+};
+
+export enum BsdasriSignatureType {
+  /** Signature du cadre émetteur (PRED) */
+  Emission = "EMISSION",
+  /** Signature du cadre émetteur (PRED) par le transporteur, grâce au code de sécurité de l'émetteur */
+  EmissionWithSecretCode = "EMISSION_WITH_SECRET_CODE",
+  /** Signature du cadre collecteur transporteur */
+  Transport = "TRANSPORT",
+  /** Signature de la réception du déchet */
+  Reception = "RECEPTION",
+  /** Signature du traitement du déchet */
+  Operation = "OPERATION"
+}
+
+export type BsdasriSignatureWhere = {
+  date: DateFilter;
+};
+
+export type BsdasriSignatureWithSecretCodeInput = {
+  author: Scalars["String"];
+  securityCode?: Maybe<Scalars["Int"]>;
+};
+
+export enum BsdasriStatus {
+  /** Bsdasri dans son état initial */
+  Initial = "INITIAL",
+  /** Optionnel, Bsdasri signé par la PRED (émetteur) */
+  SignedByProducer = "SIGNED_BY_PRODUCER",
+  /** Bsdasri envoyé vers l'établissement de destination */
+  Sent = "SENT",
+  /** Bsdasri reçu par l'établissement de destination */
+  Received = "RECEIVED",
+  /** Bsdasri dont les déchets ont été traités */
+  Processed = "PROCESSED",
+  /** Déchet refusé */
+  Refused = "REFUSED"
+}
+
+/** Informations relatives au transport du Bsdasri */
+export type BsdasriTransport = {
+  __typename?: "BsdasriTransport";
+  wasteDetails?: Maybe<BsdasriWasteDetails>;
+  wasteAcceptation?: Maybe<BsdasriWasteAcceptation>;
+  handedOverAt?: Maybe<Scalars["DateTime"]>;
+  takenOverAt?: Maybe<Scalars["DateTime"]>;
+  signature?: Maybe<BsdasriSignature>;
+};
+
+/** Collecteur transporteur */
+export type BsdasriTransporter = {
+  __typename?: "BsdasriTransporter";
+  /** Établissement de destination */
+  company?: Maybe<FormCompany>;
+  /** N° de récipissé */
+  receipt?: Maybe<Scalars["String"]>;
+  /** Département */
+  receiptDepartment?: Maybe<Scalars["String"]>;
+  /** Limite de validité du récipissé */
+  receiptValidityLimit?: Maybe<Scalars["DateTime"]>;
+  /** Champ libre */
+  customInfo?: Maybe<Scalars["String"]>;
+};
+
+export type BsdasriTransporterInput = {
+  /** Établissement collecteur - transporteur */
+  company?: Maybe<CompanyInput>;
+  /** N° de récipissé */
+  receipt?: Maybe<Scalars["String"]>;
+  /** Département */
+  receiptDepartment?: Maybe<Scalars["String"]>;
+  /** Limite de validité du récipissé */
+  receiptValidityLimit?: Maybe<Scalars["DateTime"]>;
+  /** Champ libre transporteur */
+  customInfo?: Maybe<Scalars["String"]>;
+};
+
+export type BsdasriTransporterWhere = {
+  company?: Maybe<BsdasriCompanyWhere>;
+  signature?: Maybe<BsdasriSignatureWhere>;
+};
+
+export type BsdasriTransportInput = {
+  wasteDetails?: Maybe<BsdasriWasteDetailInput>;
+  takenOverAt?: Maybe<Scalars["DateTime"]>;
+  handedOverAt?: Maybe<Scalars["DateTime"]>;
+  wasteAcceptation?: Maybe<BsdasriWasteAcceptationInput>;
+};
+
+export type BsdasriUpdateInput = {
+  /** Identifiant unique du bordereau */
+  id: Scalars["ID"];
+  emitter?: Maybe<BsdasriEmitterInput>;
+  emission?: Maybe<BsdasriEmissionInput>;
+  transporter?: Maybe<BsdasriTransporterInput>;
+  transport?: Maybe<BsdasriTransportInput>;
+  recipient?: Maybe<BsdasriRecipientInput>;
+  reception?: Maybe<BsdasriReceptionInput>;
+  operation?: Maybe<BsdasriOperationInput>;
+  regroupedBsdasris?: Maybe<Array<Maybe<RegroupedBsdasriInput>>>;
+};
+
+/** Informations relatives à l'acceptation ou au refus du déchet (Bsdasri) */
+export type BsdasriWasteAcceptation = {
+  __typename?: "BsdasriWasteAcceptation";
+  status?: Maybe<Scalars["String"]>;
+  refusalReason?: Maybe<Scalars["String"]>;
+  refusedQuantity?: Maybe<Scalars["Int"]>;
+};
+
+export type BsdasriWasteAcceptationInput = {
+  status?: Maybe<WasteAcceptationStatusInput>;
+  refusalReason?: Maybe<Scalars["String"]>;
+  refusedQuantity?: Maybe<Scalars["Int"]>;
+};
+
+export type BsdasriWasteDetailInput = {
+  quantity?: Maybe<Scalars["Int"]>;
+  quantityType?: Maybe<QuantityType>;
+  packagingInfos?: Maybe<Array<BsdasriPackagingInfoInput>>;
+  onuCode?: Maybe<Scalars["String"]>;
+};
+
+/** Détail sur le déchet proprement dit du Bsdasri */
+export type BsdasriWasteDetails = {
+  __typename?: "BsdasriWasteDetails";
+  quantity?: Maybe<Scalars["Int"]>;
+  quantityType?: Maybe<QuantityType>;
+  volume?: Maybe<Scalars["Int"]>;
+  packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
+  onuCode?: Maybe<Scalars["String"]>;
+};
+
+export type BsdasriWhere = {
+  /** (Optionnel) Permet de récupérer uniquement les bordereaux en brouillon */
+  isDraft?: Maybe<Scalars["Boolean"]>;
+  /**
+   * (Optionnel) Filtre sur le statut des bordereaux
+   * Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
+   * Défaut à vide.
+   */
+  status?: Maybe<BsdasriStatus>;
+  createdAt?: Maybe<DateFilter>;
+  updatedAt?: Maybe<DateFilter>;
+  emitter?: Maybe<BsdasriEmitterWhere>;
+  transporter?: Maybe<BsdasriTransporterWhere>;
+  recipient?: Maybe<BsdasriRecipientWhere>;
+  processingOperation?: Maybe<Array<ProcessingOperationTypes>>;
+  /**
+   * (Optionnel) Filtre sur l'état de regroupement des bordereaux
+   * Si aucun filtre n'est passé, les bordereaux seront retournés sans filtrage supplémentaire
+   * Si groupable: true, les bordereaux retournés ne sont pas déjà regroupés et ne regroupent pas d'autres bordereaux
+   * Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne regroupent d'autres bordereaux
+   */
+  groupable?: Maybe<Scalars["Boolean"]>;
+  _and?: Maybe<Array<BsdasriWhere>>;
+  _or?: Maybe<Array<BsdasriWhere>>;
+  _not?: Maybe<Array<BsdasriWhere>>;
+};
+
 export type BsdConnection = {
   __typename?: "BsdConnection";
   totalCount: Scalars["Int"];
@@ -848,11 +1244,11 @@ export type CreateVhuAgrementInput = {
 };
 
 export type DateFilter = {
-  _gte?: Maybe<Scalars["DateTime"]>;
-  _gt?: Maybe<Scalars["DateTime"]>;
-  _lte?: Maybe<Scalars["DateTime"]>;
-  _lt?: Maybe<Scalars["DateTime"]>;
   _eq?: Maybe<Scalars["DateTime"]>;
+  _gt?: Maybe<Scalars["DateTime"]>;
+  _gte?: Maybe<Scalars["DateTime"]>;
+  _lt?: Maybe<Scalars["DateTime"]>;
+  _lte?: Maybe<Scalars["DateTime"]>;
 };
 
 /** Représente une ligne dans une déclaration GEREP */
@@ -1451,6 +1847,11 @@ export type Mutation = {
   createBrokerReceipt?: Maybe<BrokerReceipt>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Crée un nouveau dasri
+   */
+  createBsdasri: Bsdasri;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Crée un BSVHU
    */
   createBsvhu?: Maybe<Bsvhu>;
@@ -1459,6 +1860,11 @@ export type Mutation = {
    * Rattache un établissement à l'utilisateur authentifié
    */
   createCompany: CompanyPrivate;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Crée un nouveau dasri en brouillon
+   */
+  createDraftBsdasri: Bsdasri;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Crée un BSVHU en brouillon
@@ -1636,6 +2042,11 @@ export type Mutation = {
   prepareSegment?: Maybe<TransportSegment>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Marque un dasri brouillon comme publié (isDraft=false)
+   */
+  publishBsdasri?: Maybe<Bsdasri>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Permet de publier un brouillon pour le marquer comme prêt à être envoyé
    */
   publishBsvhu?: Maybe<Bsvhu>;
@@ -1679,6 +2090,23 @@ export type Mutation = {
   sendVerificationCodeLetter: CompanyForVerification;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Appose une signature sur un Bsdasri, verrouille les cadres correspondant
+   *
+   * Une signature ne peut être apposée que par un membre de l'entreprise figurant sur le cadre concerné
+   * Ex: la signature TRANSPORT ne peut être apposée que par un membre de l'entreprise de transport
+   *
+   * Toutefois il existe un exception: le cadre emetteur peut être signé par le transporteur grâce au code de
+   * sécurité de l'émetteur (BsdasriSignatureType: EMISSION_WITH_SECRET_CODE)
+   */
+  signBsdasri?: Maybe<Bsdasri>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Appose une signature de type EMISSION via un compte n'appartenant pas à l'émetteur.
+   * Permet de signer un enlèvement sur le device transporteur grâce au code de sécurité de l'émetteur du dasri
+   */
+  signBsdasriEmissionWithSecretCode?: Maybe<Bsdasri>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Signe un BSVHU
    */
   signBsvhu?: Maybe<Bsvhu>;
@@ -1710,6 +2138,12 @@ export type Mutation = {
    * Édite les informations d'un récépissé courtier
    */
   updateBrokerReceipt?: Maybe<BrokerReceipt>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Met à jour un dasri existant
+   * Par défaut, tous les champs sont modifiables.
+   */
+  updateBsdasri: Bsdasri;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Met à jour un BSVHU
@@ -1764,12 +2198,20 @@ export type MutationCreateBrokerReceiptArgs = {
   input: CreateBrokerReceiptInput;
 };
 
+export type MutationCreateBsdasriArgs = {
+  bsdasriCreateInput: BsdasriCreateInput;
+};
+
 export type MutationCreateBsvhuArgs = {
   input: BsvhuInput;
 };
 
 export type MutationCreateCompanyArgs = {
   companyInput: PrivateCompanyInput;
+};
+
+export type MutationCreateDraftBsdasriArgs = {
+  bsdasriCreateInput: BsdasriCreateInput;
 };
 
 export type MutationCreateDraftBsvhuArgs = {
@@ -1917,6 +2359,10 @@ export type MutationPrepareSegmentArgs = {
   nextSegmentInfo: NextSegmentInfoInput;
 };
 
+export type MutationPublishBsdasriArgs = {
+  id: Scalars["ID"];
+};
+
 export type MutationPublishBsvhuArgs = {
   id: Scalars["ID"];
 };
@@ -1955,6 +2401,16 @@ export type MutationSendVerificationCodeLetterArgs = {
   input: SendVerificationCodeLetterInput;
 };
 
+export type MutationSignBsdasriArgs = {
+  id: Scalars["ID"];
+  signatureInput: BsdasriSignatureInput;
+};
+
+export type MutationSignBsdasriEmissionWithSecretCodeArgs = {
+  id: Scalars["ID"];
+  signatureInput: BsdasriSignatureWithSecretCodeInput;
+};
+
 export type MutationSignBsvhuArgs = {
   id: Scalars["ID"];
   input: BsvhuSignatureInput;
@@ -1976,6 +2432,10 @@ export type MutationTakeOverSegmentArgs = {
 
 export type MutationUpdateBrokerReceiptArgs = {
   input: UpdateBrokerReceiptInput;
+};
+
+export type MutationUpdateBsdasriArgs = {
+  bsdasriUpdateInput: BsdasriUpdateInput;
 };
 
 export type MutationUpdateBsvhuArgs = {
@@ -2101,10 +2561,10 @@ export enum Packagings {
 
 export type PageInfo = {
   __typename?: "PageInfo";
-  startCursor?: Maybe<Scalars["String"]>;
-  endCursor?: Maybe<Scalars["String"]>;
+  endCursor: Scalars["String"];
   hasNextPage: Scalars["Boolean"];
   hasPreviousPage: Scalars["Boolean"];
+  startCursor: Scalars["String"];
 };
 
 /** Payload permettant le rattachement d'un établissement à un utilisateur */
@@ -2156,6 +2616,14 @@ export type ProcessedFormInput = {
   noTraceability?: Maybe<Scalars["Boolean"]>;
 };
 
+export enum ProcessingOperationTypes {
+  D9 = "D9",
+  D10 = "D10",
+  D12 = "D12",
+  R1 = "R1",
+  R12 = "R12"
+}
+
 /** Type de quantité lors de l'émission */
 export enum QuantityType {
   /** Quntité réelle */
@@ -2174,6 +2642,20 @@ export type Query = {
   apiKey: Scalars["String"];
   /** Renvoie des BSD candidats à un regroupement dans une annexe 2 */
   appendixForms: Array<Form>;
+  /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
+  bsdasri: Bsdasri;
+  /**
+   * Renvoie un token pour télécharger un pdf de bordereau
+   * Ce token doit être transmis à la route /download pour obtenir le fichier.
+   * Il est valable 10 secondes
+   */
+  bsdasriPdf: FileDownload;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Renvoie les Bsdasris.
+   * Par défaut, les dasris des différentes companies de l'utilisateur sont renvoyés.
+   */
+  bsdasris: BsdasriConnection;
   bsds: BsdConnection;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsvhu: Bsvhu;
@@ -2279,6 +2761,25 @@ export type Query = {
 export type QueryAppendixFormsArgs = {
   siret: Scalars["String"];
   wasteCode?: Maybe<Scalars["String"]>;
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsdasriArgs = {
+  id: Scalars["ID"];
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsdasriPdfArgs = {
+  id?: Maybe<Scalars["ID"]>;
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsdasrisArgs = {
+  after?: Maybe<Scalars["ID"]>;
+  first?: Maybe<Scalars["Int"]>;
+  before?: Maybe<Scalars["ID"]>;
+  last?: Maybe<Scalars["Int"]>;
+  where?: Maybe<BsdasriWhere>;
 };
 
 /** Views of the Company ressource for the admin panel */
@@ -2438,6 +2939,12 @@ export type RecipientInput = {
   company?: Maybe<CompanyInput>;
   /** Si c'est un entreprosage provisoire ou reconditionnement */
   isTempStorage?: Maybe<Scalars["Boolean"]>;
+};
+
+/** Payload de regroupement */
+export type RegroupedBsdasriInput = {
+  /** Identifiant unique du bordereau */
+  id?: Maybe<Scalars["ID"]>;
 };
 
 /** Payload lié au détails du déchet du BSD suite (case 14 à 19) */
@@ -3113,9 +3620,9 @@ export type WorkSite = {
 
 /** Payload d'une adresse chantier */
 export type WorkSiteInput = {
-  name?: Maybe<Scalars["String"]>;
   address?: Maybe<Scalars["String"]>;
   city?: Maybe<Scalars["String"]>;
-  postalCode?: Maybe<Scalars["String"]>;
   infos?: Maybe<Scalars["String"]>;
+  name?: Maybe<Scalars["String"]>;
+  postalCode?: Maybe<Scalars["String"]>;
 };
