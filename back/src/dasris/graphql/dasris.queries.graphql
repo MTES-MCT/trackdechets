@@ -133,4 +133,11 @@ type Query {
     """
     id: ID!
   ): Bsdasri!
+
+  """
+  Renvoie un token pour télécharger un pdf de bordereau
+  Ce token doit être transmis à la route /download pour obtenir le fichier.
+  Il est valable 10 secondes
+  """
+  bsdasriPdf("ID d'un bordereau" id: ID): FileDownload!
 }

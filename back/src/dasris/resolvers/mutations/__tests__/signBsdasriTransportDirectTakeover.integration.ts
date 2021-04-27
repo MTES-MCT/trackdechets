@@ -20,7 +20,7 @@ describe("Mutation.signBsdasri transport", () => {
       user: emitter,
       company: emitterCompany
     } = await userWithCompanyFactory("MEMBER", {
-      allowDasriTakeOverWithoutSignature: true // company allow takeover without signature
+      allowBsdasriTakeOverWithoutSignature: true // company allow takeover without signature
     });
 
     const {
@@ -60,7 +60,7 @@ describe("Mutation.signBsdasri transport", () => {
       user: emitter,
       company: emitterCompany
     } = await userWithCompanyFactory("MEMBER", {
-      allowDasriTakeOverWithoutSignature: true // company allow takeover without signature
+      allowBsdasriTakeOverWithoutSignature: true // company allow takeover without signature
     });
 
     const {
