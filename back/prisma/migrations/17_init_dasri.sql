@@ -32,6 +32,7 @@ CREATE TABLE "default$default"."Bsdasri" (
     "emitterWasteVolume" INTEGER,
     "emitterWastePackagingsInfo" JSONB,
     "emitterCustomInfo" TEXT,
+    "emitterOnBehalfOfEcoorganisme" BOOLEAN DEFAULT FALSE,
     "handedOverToTransporterAt" TIMESTAMP(3),
     "emissionSignatureAuthor" TEXT,
     "emissionSignatureDate" TIMESTAMP(3),
