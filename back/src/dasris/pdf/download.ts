@@ -19,11 +19,14 @@ export default async function downloadPdf(res: Response, { id }) {
     res.status(200);
     res.type("pdf");
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment;filename=${bsdasri.id}.pdf`);
+    res.setHeader(
+      "Content-Disposition",
+      `attachment;filename=${bsdasri.id}.pdf`
+    );
 
     res.send(buffer);
   } catch (err) {
-    console.log(err)
+    console.log(err);
 
     res.status(500);
     res.send("Une erreur est survenue lors de la génération du PDF.");

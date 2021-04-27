@@ -122,10 +122,9 @@ input BsdasriCreateInput {
 }
 
 input BsdasriUpdateInput {
-  "Identifiant opaque"
+  "Identifiant unique du bordereau"
   id: ID!
 
-  "Identifiant custom"
   emitter: BsdasriEmitterInput
   emission: BsdasriEmissionInput
   transporter: BsdasriTransporterInput
