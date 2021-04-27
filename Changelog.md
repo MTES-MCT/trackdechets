@@ -142,6 +142,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Implémentation backend des bordereaux dasri (api)
 #### :boom: Breaking changes
 
 #### :bug: Corrections de bugs
