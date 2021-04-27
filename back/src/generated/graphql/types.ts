@@ -442,9 +442,8 @@ export type BsdasriTransportInput = {
 };
 
 export type BsdasriUpdateInput = {
-  /** Identifiant opaque */
+  /** Identifiant unique du bordereau */
   id: Scalars["ID"];
-  /** Identifiant custom */
   emitter?: Maybe<BsdasriEmitterInput>;
   emission?: Maybe<BsdasriEmissionInput>;
   transporter?: Maybe<BsdasriTransporterInput>;

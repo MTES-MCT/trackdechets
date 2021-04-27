@@ -7,7 +7,7 @@ import QRCode from "qrcode";
 import { format } from "date-fns";
 
 /**
- * 
+ *
  * Build a pdf via service based puppeteer (browserless.io)
  */
 export async function buildPdf(bsdasri: Bsdasri) {
