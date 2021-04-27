@@ -26,7 +26,7 @@ export const checkEmitterAllowsDirectTakeOver: checkEmitterAllowsDirectTakeOverF
     const emitterCompany = await getCompanyOrCompanyNotFound({
       siret: bsdasri.emitterCompanySiret
     });
-    if (!emitterCompany.allowDasriTakeOverWithoutSignature) {
+    if (!emitterCompany.allowBsdasriTakeOverWithoutSignature) {
       throw new UserInputError(
         "Erreur, l'émetteur n'a pas autorisé l'emport par le transporteur sans l'avoir préalablement signé"
       );
