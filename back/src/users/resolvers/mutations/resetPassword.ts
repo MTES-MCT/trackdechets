@@ -1,8 +1,9 @@
 import prisma from "../../../prisma";
 import { sendMail } from "../../../mailer/mailing";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { userMails } from "../../mails";
 import { generatePassword, hashPassword } from "../../utils";
+import { renderMail } from "../../../mailer/templates/renderers";
+import { resetPassword } from "../../../mailer/templates";
 
 const resetPasswordResolver: MutationResolvers["resetPassword"] = async (
   parent,
@@ -18,7 +19,11 @@ const resetPasswordResolver: MutationResolvers["resetPassword"] = async (
     where: { id: user.id },
     data: { password: hashedPassword }
   });
-  await sendMail(userMails.resetPassword(user.email, user.name, newPassword));
+  const mail = renderMail(resetPassword, {
+    to: [{ email: user.email, name: user.name }],
+    variables: { password: newPassword }
+  });
+  await sendMail(mail);
   return true;
 };
 

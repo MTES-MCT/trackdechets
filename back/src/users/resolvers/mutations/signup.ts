@@ -10,8 +10,9 @@ import {
 } from "../../../generated/graphql/types";
 import { sanitizeEmail } from "../../../utils";
 import { acceptNewUserCompanyInvitations, userExists } from "../../database";
-import { userMails } from "../../mails";
 import { hashPassword } from "../../utils";
+import { onSignup } from "../../../mailer/templates";
+import { renderMail } from "../../../mailer/templates/renderers";
 
 export const signupSchema = yup.object({
   userInfos: yup.object({
@@ -54,7 +55,13 @@ export async function signupFn({
 
   const userActivationHash = await createActivationHash(user);
   await acceptNewUserCompanyInvitations(user);
-  await sendMail(userMails.onSignup(user, userActivationHash.hash));
+
+  await sendMail(
+    renderMail(onSignup, {
+      to: [{ name: user.name, email: user.email }],
+      variables: { activationHash: userActivationHash.hash }
+    })
+  );
 
   return {
     ...user,

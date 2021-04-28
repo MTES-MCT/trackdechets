@@ -9,8 +9,9 @@ import {
   MembershipRequestAlreadyAccepted,
   MembershipRequestAlreadyRefused
 } from "../../errors";
-import { userMails } from "../../mails";
 import { checkIsCompanyAdmin } from "../../permissions";
+import { membershipRequestRefused } from "../../../mailer/templates";
+import { renderMail } from "../../../mailer/templates/renderers";
 
 const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipRequest"] = async (
   parent,
@@ -53,7 +54,11 @@ const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipReques
   const requester = await prisma.membershipRequest
     .findUnique({ where: { id } })
     .user();
-  await sendMail(userMails.membershipRequestRefused(requester, company));
+  const mail = renderMail(membershipRequestRefused, {
+    to: [{ email: requester.email, name: requester.name }],
+    variables: { companyName: company.name, companySiret: company.siret }
+  });
+  await sendMail(mail);
 
   const dbCompany = await prisma.company.findUnique({
     where: { id: company.id }

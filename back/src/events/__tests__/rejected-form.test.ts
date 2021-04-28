@@ -5,6 +5,7 @@ import { CompanySearchResult } from "../../companies/sirene/types";
 import { TDEventPayload } from "../emitter";
 import { mailWhenFormIsDeclined } from "../forms";
 import * as mailing from "../../mailer/mailing";
+import templateIds from "../../mailer/templates/provider/templateIds";
 
 // This form will be refused,
 const mockedForm = {
@@ -256,7 +257,7 @@ describe("mailWhenFormIsDeclined", () => {
     // check form readable id is in mail body
     expect(payload1.body).toContain("BSD-20210101-AAAAAAAA");
 
-    expect(payload1.templateId).toBeUndefined();
+    expect(payload1.templateId).toEqual(templateIds.LAYOUT);
   });
 
   it("should send mails if waste is partially refused", async () => {
@@ -313,6 +314,6 @@ describe("mailWhenFormIsDeclined", () => {
     // check form readable id is in mail body
     expect(payload1.body).toContain("BSD-20210101-AAAAAAAA");
 
-    expect(payload1.templateId).toBeUndefined();
+    expect(payload1.templateId).toEqual(templateIds.LAYOUT);
   });
 });

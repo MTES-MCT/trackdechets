@@ -13,7 +13,8 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import * as mailsHelper from "../../../../mailer/mailing";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { companyMails } from "../../../mails";
+import { renderMail } from "../../../../mailer/templates/renderers";
+import { verificationDone } from "../../../../mailer/templates";
 
 const VERIFY_COMPANY = gql`
   mutation VerifyCompany($input: VerifyCompanyInput!) {
@@ -146,10 +147,10 @@ describe("mutation verifyCompany", () => {
     expect(updatedCompany.verifiedAt).not.toBeNull();
 
     expect(sendMailSpy).toHaveBeenCalledWith(
-      companyMails.verificationDone(
-        [{ email: user.email, name: user.name }],
-        updatedCompany
-      )
+      renderMail(verificationDone, {
+        to: [{ email: user.email, name: user.name }],
+        variables: { company: updatedCompany }
+      })
     );
   });
 });

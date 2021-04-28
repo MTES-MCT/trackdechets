@@ -8,9 +8,11 @@ import {
   isCompanyMember
 } from "../../../companies/database";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { userMails } from "../../mails";
-
-const { UI_HOST, UI_URL_SCHEME } = process.env;
+import { renderMail } from "../../../mailer/templates/renderers";
+import {
+  membershipRequest as membershipRequestMail,
+  membershipRequestConfirmation
+} from "../../../mailer/templates";
 
 const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] = async (
   parent,
@@ -54,18 +56,26 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
 
   // send membership request to all admins of the company
   const recipients = admins.map(a => ({ email: a.email, name: a.name }));
-  const membershipRequestLink = `${UI_URL_SCHEME}://${UI_HOST}/membership-request/${membershipRequest.id}`;
+
   await sendMail(
-    userMails.membershipRequest(
-      recipients,
-      membershipRequestLink,
-      user,
-      company
-    )
+    renderMail(membershipRequestMail, {
+      to: recipients,
+      variables: {
+        userEmail: user.email,
+        companyName: company.name,
+        companySiret: company.siret,
+        membershipRequestId: membershipRequest.id
+      }
+    })
   );
 
   // send membership request confirmation to requester
-  await sendMail(userMails.membershipRequestConfirmation(user, company));
+  await sendMail(
+    renderMail(membershipRequestConfirmation, {
+      to: [{ email: user.email, name: user.name }],
+      variables: { companyName: company.name, companySiret: company.siret }
+    })
+  );
 
   return {
     ...membershipRequest,

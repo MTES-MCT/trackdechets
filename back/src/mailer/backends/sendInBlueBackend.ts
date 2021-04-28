@@ -1,7 +1,6 @@
 import { Mail, Contact } from "../types";
 import axios from "axios";
 import * as Sentry from "@sentry/node";
-import { templateIds } from "../helpers";
 
 const {
   SIB_APIKEY,
@@ -22,10 +21,7 @@ const sendInBlueBackend = {
   backendName: "SendInBlue",
 
   sendMail: function (mail: Mail) {
-    if (!mail.templateId) {
-      mail.templateId = templateIds.MAIN;
-    }
-    const params = { title: mail.title, body: mail.body };
+    const params = { body: mail.body ?? "" };
 
     const payload = {
       subject: mail.subject,

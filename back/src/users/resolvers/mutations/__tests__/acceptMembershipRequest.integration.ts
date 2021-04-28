@@ -7,7 +7,8 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { userMails } from "../../../mails";
+import { renderMail } from "../../../../mailer/templates/renderers";
+import { membershipRequestAccepted } from "../../../../mailer/templates";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -149,7 +150,10 @@ describe("mutation acceptMembershipRequest", () => {
       expect(companyAssociations[0].role).toEqual(role);
 
       expect(sendMailSpy).toHaveBeenCalledWith(
-        userMails.membershipRequestAccepted(requester, company)
+        renderMail(membershipRequestAccepted, {
+          to: [{ email: requester.email, name: requester.name }],
+          variables: { companyName: company.name, companySiret: company.siret }
+        })
       );
     }
   );

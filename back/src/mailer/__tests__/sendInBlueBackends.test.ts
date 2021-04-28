@@ -8,7 +8,6 @@ const mail: Mail = {
   to: [{ name: "Max La Menace", email: "max@lamenace.cia" }],
 
   subject: "lorem ipsum",
-  title: "dolor sit",
   body: "<p>Donéc non massa pretïum</p>",
 
   templateId: 33,

@@ -11,9 +11,10 @@ import {
   MembershipRequestAlreadyAccepted,
   MembershipRequestAlreadyRefused
 } from "../../errors";
-import { userMails } from "../../mails";
 import { checkIsCompanyAdmin } from "../../permissions";
 import { convertUrls } from "../../../companies/database";
+import { renderMail } from "../../../mailer/templates/renderers";
+import { membershipRequestAccepted } from "../../../mailer/templates";
 
 const acceptMembershipRequestResolver: MutationResolvers["acceptMembershipRequest"] = async (
   parent,
@@ -60,7 +61,11 @@ const acceptMembershipRequestResolver: MutationResolvers["acceptMembershipReques
   });
 
   // notify requester of acceptance
-  await sendMail(userMails.membershipRequestAccepted(requester, company));
+  const mail = renderMail(membershipRequestAccepted, {
+    variables: { companyName: company.name, companySiret: company.siret },
+    to: [{ name: requester.name, email: requester.email }]
+  });
+  await sendMail(mail);
 
   const dbCompany = await prisma.company.findUnique({
     where: { id: company.id }
