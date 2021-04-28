@@ -5,12 +5,12 @@ import { Field, useFormikContext } from "formik";
 import React from "react";
 import { Bsvhu } from "generated/graphql/types";
 
-export default function Recipient({ disabled }) {
+export default function Destination({ disabled }) {
   const { setFieldValue, values } = useFormikContext<Bsvhu>();
 
   const isDangerousWasteCode = values.wasteCode === "16 01 04*";
   if (isDangerousWasteCode) {
-    setFieldValue("recipient.type", "DEMOLISSEUR");
+    setFieldValue("destination.type", "DEMOLISSEUR");
   }
 
   return (
@@ -32,14 +32,14 @@ export default function Recipient({ disabled }) {
         <fieldset>
           <legend>L'installation de destination est un</legend>
           <Field
-            name="recipient.type"
+            name="destination.type"
             id="BROYEUR"
             label="Broyeur agréé"
             component={RadioButton}
             disabled={isDangerousWasteCode || disabled}
           />
           <Field
-            name="recipient.type"
+            name="destination.type"
             id="DEMOLISSEUR"
             label="Démolisseur agréé"
             component={RadioButton}
@@ -47,23 +47,23 @@ export default function Recipient({ disabled }) {
           />
         </fieldset>
 
-        <RedErrorMessage name="recipient.type" />
+        <RedErrorMessage name="destination.type" />
       </div>
 
       <CompanySelector
         disabled={disabled}
-        name="recipient.company"
+        name="destination.company"
         heading="Installation de destination"
-        onCompanySelected={recipient => {
+        onCompanySelected={destination => {
           const agrementNumber =
-            values.recipient?.type === "BROYEUR"
-              ? recipient?.vhuAgrementBroyeur?.agrementNumber
-              : recipient?.vhuAgrementDemolisseur?.agrementNumber;
+            values.destination?.type === "BROYEUR"
+              ? destination?.vhuAgrementBroyeur?.agrementNumber
+              : destination?.vhuAgrementDemolisseur?.agrementNumber;
 
           if (agrementNumber) {
-            setFieldValue("recipient.agrementNumber", agrementNumber);
+            setFieldValue("destination.agrementNumber", agrementNumber);
           } else {
-            setFieldValue("recipient.agrementNumber", "");
+            setFieldValue("destination.agrementNumber", "");
           }
         }}
       />
@@ -73,20 +73,20 @@ export default function Recipient({ disabled }) {
           Numéro d'agrément
           <Field
             type="text"
-            name="recipient.agrementNumber"
+            name="destination.agrementNumber"
             className="td-input"
             disabled={disabled}
           />
         </label>
 
-        <RedErrorMessage name="recipient.agrementNumber" />
+        <RedErrorMessage name="destination.agrementNumber" />
       </div>
 
       <div className="form__row">
         <label>Opération d’élimination / valorisation prévue (code D/R)</label>
         <Field
           as="select"
-          name="recipient.operation.planned"
+          name="destination.plannedOperationCode"
           className="td-select"
           disabled={disabled}
         >
@@ -101,21 +101,21 @@ export default function Recipient({ disabled }) {
         </Field>
       </div>
 
-      {values.recipient?.type === "DEMOLISSEUR" && (
+      {values.destination?.type === "DEMOLISSEUR" && (
         <CompanySelector
           disabled={disabled}
-          name="recipient.plannedBroyeurCompany"
+          name="destination.operation.nextDestination.company"
           heading="Installation de broyage prévisionelle"
-          onCompanySelected={recipient => {
+          onCompanySelected={destination => {
             const agrementNumber =
-              values.recipient?.type === "BROYEUR"
-                ? recipient?.vhuAgrementBroyeur?.agrementNumber
-                : recipient?.vhuAgrementDemolisseur?.agrementNumber;
+              values.destination?.type === "BROYEUR"
+                ? destination?.vhuAgrementBroyeur?.agrementNumber
+                : destination?.vhuAgrementDemolisseur?.agrementNumber;
 
             if (agrementNumber) {
-              setFieldValue("recipient.agrementNumber", agrementNumber);
+              setFieldValue("destination.agrementNumber", agrementNumber);
             } else {
-              setFieldValue("recipient.agrementNumber", "");
+              setFieldValue("destination.agrementNumber", "");
             }
           }}
         />

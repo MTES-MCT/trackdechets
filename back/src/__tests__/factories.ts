@@ -7,6 +7,7 @@ import {
   QuantityType,
   Status,
   UserRole,
+  User,
   Prisma
 } from "@prisma/client";
 import prisma from "../prisma";
@@ -50,7 +51,7 @@ function siretify(index) {
 }
 
 /**
- * Create a company with name, siret, security code and PORDUCER by default
+ * Create a company with name, siret, security code and PRODUCER by default
  * @param opt: extram parameters
  */
 export const companyFactory = async (
@@ -70,6 +71,29 @@ export const companyFactory = async (
       ...opts
     }
   });
+};
+
+/**
+ * Create a company with name, siret, security code and PRODUCER by default
+ * and associate that company to the user
+ * @param opt: extram parameters
+ */
+export const companyAssociatedToExistingUserFactory = async (
+  user: User,
+  role: UserRole,
+  companyOpts: Partial<Prisma.CompanyCreateInput> = {}
+) => {
+  const company = await companyFactory(companyOpts);
+
+  await prisma.companyAssociation.create({
+    data: {
+      company: { connect: { id: company.id } },
+      user: { connect: { id: user.id } },
+      role
+    }
+  });
+
+  return company;
 };
 
 /**

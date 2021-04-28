@@ -1,17 +1,16 @@
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 
 export default {
-  isDraft: true,
   emitter: {
     company: getInitialCompany(),
     agrementNumber: "",
   },
-  recipient: {
+  destination: {
     type: "BROYEUR",
     company: getInitialCompany(),
     agrementNumber: "",
-    operation: { planned: "R 4" },
-    plannedBroyeurCompany: getInitialCompany(),
+    plannedOperationCode: "R 4",
+    operation: { nextDestination: { company: getInitialCompany() } },
   },
   packaging: "UNITE",
   wasteCode: "16 01 06",
@@ -24,8 +23,10 @@ export default {
     tons: null,
   },
   transporter: {
-    company: getInitialCompany(),
-    tvaIntracommunautaire: "",
+    company: {
+      ...getInitialCompany(),
+      vatNumber: "",
+    },
     recepisse: {
       number: "",
       department: "",

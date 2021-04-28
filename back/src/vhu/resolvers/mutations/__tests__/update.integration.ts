@@ -12,7 +12,7 @@ mutation EditVhuForm($id: ID!, $input: BsvhuInput!) {
   updateBsvhu(id: $id, input: $input) {
     id
     isDraft
-    recipient {
+    destination {
       company {
         siret
       }
@@ -31,8 +31,8 @@ mutation EditVhuForm($id: ID!, $input: BsvhuInput!) {
         contact
         mail
         phone
+        vatNumber
       }
-      tvaIntracommunautaire
       recepisse {
         number
       }
@@ -142,8 +142,8 @@ describe("Mutation.Vhu.update", () => {
     const form = await vhuFormFactory({
       opt: {
         emitterCompanySiret: company.siret,
-        emitterSignatureAuthor: "The Signatory",
-        emitterSignatureDate: new Date()
+        emitterEmissionSignatureAuthor: "The Signatory",
+        emitterEmissionSignatureDate: new Date()
       }
     });
 
@@ -173,23 +173,21 @@ describe("Mutation.Vhu.update", () => {
     const form = await vhuFormFactory({
       opt: {
         emitterCompanySiret: company.siret,
-        emitterSignatureAuthor: "The Signatory",
-        emitterSignatureDate: new Date()
+        emitterEmissionSignatureAuthor: "The Signatory",
+        emitterEmissionSignatureDate: new Date()
       }
     });
 
     const { mutate } = makeClient(user);
     const input = {
       transporter: {
-        tvaIntracommunautaire: "DE 123456789"
+        company: { vatNumber: "DE 123456789" }
       }
     };
     const { data } = await mutate(UPDATE_VHU_FORM, {
       variables: { id: form.id, input }
     });
 
-    expect(data.updateBsvhu.transporter.tvaIntracommunautaire).toBe(
-      "DE 123456789"
-    );
+    expect(data.updateBsvhu.transporter.company.vatNumber).toBe("DE 123456789");
   });
 });

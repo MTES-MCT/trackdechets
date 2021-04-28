@@ -584,7 +584,7 @@ enum BsvhuRecipientType {
   DEMOLISSEUR
 }
 
-model BsvhuForm {
+model Bsvhu {
   id        String   @id
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -601,15 +601,15 @@ model BsvhuForm {
   emitterCompanyPhone   String?
   emitterCompanyMail    String?
 
-  recipientType             BsvhuRecipientType?
-  recipientOperationPlanned String?             @default("R 4")
-  recipientAgrementNumber   String?
-  recipientCompanyName      String?
-  recipientCompanySiret     String?
-  recipientCompanyAddress   String?
-  recipientCompanyContact   String?
-  recipientCompanyPhone     String?
-  recipientCompanyMail      String?
+  destinationType                 BsvhuRecipientType?
+  destinationPlannedOperationCode String?             @default("R 4")
+  destinationAgrementNumber       String?
+  destinationCompanyName          String?
+  destinationCompanySiret         String?
+  destinationCompanyAddress       String?
+  destinationCompanyContact       String?
+  destinationCompanyPhone         String?
+  destinationCompanyMail          String?
 
   wasteCode             String?                  @default("16 01 06")
   packaging             BsvhuPackaging?
@@ -618,34 +618,38 @@ model BsvhuForm {
   quantityNumber        Int?
   quantityTons          Float?
 
-  emitterSignatureAuthor String?
-  emitterSignatureDate   DateTime?
+  emitterEmissionSignatureAuthor String?
+  emitterEmissionSignatureDate   DateTime?
 
-  transporterCompanyName            String?
-  transporterCompanySiret           String?
-  transporterCompanyAddress         String?
-  transporterCompanyContact         String?
-  transporterCompanyPhone           String?
-  transporterCompanyMail            String?
-  transporterTvaIntracommunautaire  String?
-  transporterRecepisseNumber        String?
-  transporterRecepisseDepartment    String?
-  transporterRecepisseValidityLimit DateTime?
-  transporterSignatureAuthor        String?
-  transporterSignatureDate          DateTime?
+  transporterCompanyName              String?
+  transporterCompanySiret             String?
+  transporterCompanyAddress           String?
+  transporterCompanyContact           String?
+  transporterCompanyPhone             String?
+  transporterCompanyMail              String?
+  transporterCompanyVatNumber         String?
+  transporterRecepisseNumber          String?
+  transporterRecepisseDepartment      String?
+  transporterRecepisseValidityLimit   DateTime?
+  transporterTransportTakenOverAt     DateTime?
+  transporterTransportSignatureAuthor String?
+  transporterTransportSignatureDate   DateTime?
 
-  recipientAcceptanceQuantity              Float?
-  recipientAcceptanceStatus                WasteAcceptationStatus?
-  recipientAcceptanceRefusalReason         String?
-  recipientAcceptanceIdentificationNumbers String[]
-  recipientAcceptanceIdentificationType    BsvhuIdentificationType?
-  recipientOperationDone                   String?
-  recipientPlannedBroyeurCompanyName       String?
-  recipientPlannedBroyeurCompanySiret      String?
-  recipientPlannedBroyeurCompanyAddress    String?
-  recipientPlannedBroyeurCompanyContact    String?
-  recipientPlannedBroyeurCompanyPhone      String?
-  recipientPlannedBroyeurCompanyMail       String?
-  recipientSignatureAuthor                 String?
-  recipientSignatureDate                   DateTime?
+  destinationReceptionQuantityNumber                Float?
+  destinationReceptionQuantityTons                  Float?
+  destinationReceptionAcceptationStatus             WasteAcceptationStatus?
+  destinationReceptionRefusalReason                 String?
+  destinationReceptionIdentificationNumbers         String[]
+  destinationReceptionIdentificationType            BsvhuIdentificationType?
+  destinationReceptionDate                          DateTime?
+  destinationOperationDate                          DateTime?
+  destinationOperationCode                          String?
+  destinationOperationNextDestinationCompanyName    String?
+  destinationOperationNextDestinationCompanySiret   String?
+  destinationOperationNextDestinationCompanyAddress String?
+  destinationOperationNextDestinationCompanyContact String?
+  destinationOperationNextDestinationCompanyPhone   String?
+  destinationOperationNextDestinationCompanyMail    String?
+  destinationOperationSignatureAuthor               String?
+  destinationOperationSignatureDate                 DateTime?
 }

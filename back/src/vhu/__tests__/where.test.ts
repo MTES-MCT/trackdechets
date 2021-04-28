@@ -20,7 +20,7 @@ describe("Bsvhu where builder", () => {
   it("should convert basic filters to db filters", () => {
     const where: BsvhuWhere = {
       emitter: { company: { siret: "1234" } },
-      recipient: { company: { siret: "1234" } },
+      destination: { company: { siret: "1234" } },
       transporter: { company: { siret: "1234" } }
     };
 
@@ -28,7 +28,7 @@ describe("Bsvhu where builder", () => {
 
     expect(dbFilter).toEqual({
       emitterCompanySiret: "1234",
-      recipientCompanySiret: "1234",
+      destinationCompanySiret: "1234",
       transporterCompanySiret: "1234"
     });
   });

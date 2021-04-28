@@ -18,7 +18,7 @@ describe("Mutation.Vhu.sign", () => {
     const { errors } = await mutate(SIGN_VHU_FORM, {
       variables: {
         id: 1,
-        input: { type: "EMITTER", author: "The Ghost" }
+        input: { type: "EMISSION", author: "The Ghost" }
       }
     });
 

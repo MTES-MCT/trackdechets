@@ -68,10 +68,10 @@ describe("Exemples de circuit du bordereau de suivi de véhicule hors d'usage", 
                   mail: "transport.dupont@transporter.fr"
                 }
               }
-              recipient: {
+              destination: {
                 type: BROYEUR
                 agrementNumber: "456"
-                operation: { planned: "R 12" }
+                plannedOperationCode: "R 12"
                 company: {
                   siret: "${broyeurCompany.siret}"
                   name: "${broyeurCompany.name}"
@@ -98,9 +98,9 @@ describe("Exemples de circuit du bordereau de suivi de véhicule hors d'usage", 
     const producerSignatureQuery = `
         mutation {
             signBsvhu(id: "${id}", input: {
-              type: EMITTER
+              type: EMISSION
               author: "Jean VHU"
-            }) { status emitter { signature { author }} }
+            }) { status emitter { emission { signature { author }} } }
         }
         `;
 
@@ -110,7 +110,8 @@ describe("Exemples de circuit du bordereau de suivi de véhicule hors d'usage", 
       .send({ query: producerSignatureQuery });
 
     expect(
-      producerSignatureResponse.body.data.signBsvhu.emitter.signature.author
+      producerSignatureResponse.body.data.signBsvhu.emitter.emission.signature
+        .author
     ).toBe("Jean VHU");
     expect(producerSignatureResponse.body.data.signBsvhu.status).toBe(
       "SIGNED_BY_PRODUCER"
@@ -129,9 +130,9 @@ describe("Exemples de circuit du bordereau de suivi de véhicule hors d'usage", 
               }
             }) { id }
             signBsvhu(id: "${id}", input: {
-              type: TRANSPORTER
+              type: TRANSPORT
               author: "Patrick Transport"
-            }) { status transporter { signature { author }} }
+            }) { status transporter { transport { signature { author }} } }
         }
         `;
 
@@ -141,8 +142,8 @@ describe("Exemples de circuit du bordereau de suivi de véhicule hors d'usage", 
       .send({ query: transporterBsvhuQuery });
 
     expect(
-      transporterSignatureResponse.body.data.signBsvhu.transporter.signature
-        .author
+      transporterSignatureResponse.body.data.signBsvhu.transporter.transport
+        .signature.author
     ).toBe("Patrick Transport");
     expect(transporterSignatureResponse.body.data.signBsvhu.status).toBe(
       "SENT"
@@ -152,20 +153,23 @@ describe("Exemples de circuit du bordereau de suivi de véhicule hors d'usage", 
     const broyeurBsvhuQuery = `
         mutation {
             updateBsvhu(id: "${id}", input: {
-              recipient: {
-                  acceptance: {
-                  quantity: 1.4,
-                  status: ACCEPTED
+              destination: {
+                reception: {
+                  quantity: {
+                    tons: 1.4
+                  },
+                  acceptationStatus: ACCEPTED
                 }
                 operation: {
-                  done: "R 12"
+                  date: "${new Date().toISOString()}"
+                  code: "R 12"
                 }
               }
             }) { id }
             signBsvhu(id: "${id}", input: {
-              type: RECIPIENT
+              type: OPERATION
               author: "Henri Broyeur"
-            }) { status recipient { signature { author }} }
+            }) { status destination { operation { signature { author }} } }
         }
         `;
 
@@ -175,7 +179,8 @@ describe("Exemples de circuit du bordereau de suivi de véhicule hors d'usage", 
       .send({ query: broyeurBsvhuQuery });
 
     expect(
-      broyeurSignatureResponse.body.data.signBsvhu.recipient.signature.author
+      broyeurSignatureResponse.body.data.signBsvhu.destination.operation
+        .signature.author
     ).toBe("Henri Broyeur");
     expect(broyeurSignatureResponse.body.data.signBsvhu.status).toBe(
       "PROCESSED"

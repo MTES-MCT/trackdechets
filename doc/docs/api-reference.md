@@ -83,6 +83,8 @@ ID d'un bordereau
 <td>
 
 EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Tous les arguments sont optionnels.
+Par défaut, retourne les 50 premiers bordereaux associés à entreprises dont vous êtes membres
 
 </td>
 </tr>
@@ -91,7 +93,7 @@ EXPERIMENTAL - Ne pas utiliser dans un contexte de production
 <td valign="top"><a href="#id">ID</a></td>
 <td>
 
-(Optionnel) PAGINATION
+PAGINATION
 Permet en conjonction avec `first` de paginer "en avant"
 (des bordereaux les plus récents aux bordereaux les plus anciens)
 Curseur après lequel les bordereaux doivent être retournés
@@ -106,7 +108,7 @@ Le BSD précisé dans le curseur ne fait pas partie du résultat
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
-(Optionnel) PAGINATION
+PAGINATION
 Permet en conjonction avec `cursorAfter` de paginer "en avant"
 (des bordereaux les plus récents aux bordereaux les plus anciens)
 Nombre de bordereaux retournés après le `cursorAfter`
@@ -119,7 +121,7 @@ Défaut à 50, maximum à 500
 <td valign="top"><a href="#id">ID</a></td>
 <td>
 
-(Optionnel) PAGINATION
+PAGINATION
 Permet en conjonction avec `last` de paginer "en arrière"
 (des bordereaux les plus anciens aux bordereaux les plus récents)
 Curseur avant lequel les bordereaux doivent être retournés
@@ -134,25 +136,20 @@ Le BSD précisé dans le curseur ne fait pas partie du résultat
 <td valign="top"><a href="#int">Int</a></td>
 <td>
 
-(Optionnel) PAGINATION
+PAGINATION
 Nombre de bordereaux retournés avant le `cursorBefore`
 Défaut à 50, maximum à 500
 
 </td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">siret</td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-SIRET d'un établissement dont je suis membre
-
-</td>
-</tr>
-<tr>
 <td colspan="2" align="right" valign="top">where</td>
 <td valign="top"><a href="#bsvhuwhere">BsvhuWhere</a></td>
-<td></td>
+<td>
+
+Filtres
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>companyInfos</strong></td>
@@ -1496,19 +1493,18 @@ Numéro unique attribué par Trackdéchets
 <tr>
 <td colspan="2" valign="top"><strong>createdAt</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a>!</td>
-<td></td>
+<td>
+
+Date de création
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>updatedAt</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>isDeleted</strong></td>
-<td valign="top"><a href="#boolean">Boolean</a>!</td>
 <td>
 
-Indique si le bordereau a été supprimé
+Date de dernière modification
 
 </td>
 </tr>
@@ -1535,7 +1531,7 @@ Status du bordereau
 <td valign="top"><a href="#bsvhuemitter">BsvhuEmitter</a></td>
 <td>
 
-Informations sur l'émetteur
+Émetteur du bordereau
 
 </td>
 </tr>
@@ -1576,11 +1572,11 @@ Quantité de VHUs
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>recipient</strong></td>
-<td valign="top"><a href="#bsvhurecipient">BsvhuRecipient</a></td>
+<td colspan="2" valign="top"><strong>destination</strong></td>
+<td valign="top"><a href="#bsvhudestination">BsvhuDestination</a></td>
 <td>
 
-Détails sur la destination
+Destinataire du bordereau
 
 </td>
 </tr>
@@ -1589,7 +1585,7 @@ Détails sur la destination
 <td valign="top"><a href="#bsvhutransporter">BsvhuTransporter</a></td>
 <td>
 
-Détails sur le transporteur
+Transporteur
 
 </td>
 </tr>
@@ -1631,6 +1627,75 @@ Détails sur le transporteur
 </tbody>
 </table>
 
+### BsvhuDestination
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsvhudestinationtype">BsvhuDestinationType</a></td>
+<td>
+
+Type de receveur: broyeur ou second centre VHU
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>agrementNumber</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro d'agrément de receveur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+
+Coordonnées de l'entreprise qui recoit les déchets
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>plannedOperationCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Opération d'élimination / valorisation prévue (code D/R)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>reception</strong></td>
+<td valign="top"><a href="#bsvhureception">BsvhuReception</a></td>
+<td>
+
+Informations de réception
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsvhuoperation">BsvhuOperation</a></td>
+<td>
+
+Informations sur l'opétation de traitement
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### BsvhuEdge
 
 <table>
@@ -1651,6 +1716,26 @@ Détails sur le transporteur
 <tr>
 <td colspan="2" valign="top"><strong>node</strong></td>
 <td valign="top"><a href="#bsvhu">Bsvhu</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsvhuEmission
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a></td>
 <td></td>
 </tr>
 </tbody>
@@ -1687,9 +1772,13 @@ Coordonnées de l'entreprise émétrice
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#signature">Signature</a></td>
-<td></td>
+<td colspan="2" valign="top"><strong>emission</strong></td>
+<td valign="top"><a href="#bsvhuemission">BsvhuEmission</a></td>
+<td>
+
+Déclaration générale de l'émetteur du bordereau
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -1769,6 +1858,73 @@ Coordonnées de l'entreprise émétrice
 </tbody>
 </table>
 
+### BsvhuNextDestination
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsvhuOperation
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Date de réalisation
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Opération de traitement réalisée (R4 ou R12)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>nextDestination</strong></td>
+<td valign="top"><a href="#bsvhunextdestination">BsvhuNextDestination</a></td>
+<td>
+
+Broyeur de destination, à remplir uniquement lorsque la destination est lui même un centre VHU
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### BsvhuQuantity
 
 <table>
@@ -1824,7 +1980,7 @@ Coordonnées de l'entreprise émétrice
 </tbody>
 </table>
 
-### BsvhuRecipient
+### BsvhuReception
 
 <table>
 <thead>
@@ -1837,82 +1993,17 @@ Coordonnées de l'entreprise émétrice
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>type</strong></td>
-<td valign="top"><a href="#bsvhurecipienttype">BsvhuRecipientType</a></td>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
 <td>
 
-Type de receveur: broyeur ou second centre VHU
+Date de présentation sur site
 
 </td>
 </tr>
-<tr>
-<td colspan="2" valign="top"><strong>agrementNumber</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Numéro d'agrément de receveur
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#formcompany">FormCompany</a></td>
-<td>
-
-Coordonnées de l'entreprise qui recoit les déchets
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>acceptance</strong></td>
-<td valign="top"><a href="#bsvhurecipientacceptance">BsvhuRecipientAcceptance</a></td>
-<td>
-
-Informations d'acceptation
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>operation</strong></td>
-<td valign="top"><a href="#bsvhurecipientoperation">BsvhuRecipientOperation</a></td>
-<td>
-
-Informations sur l'opétation de traitement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>plannedBroyeurCompany</strong></td>
-<td valign="top"><a href="#formcompany">FormCompany</a></td>
-<td>
-
-Coordonnées de l'entreprise de broyage prévue. Utilisé uniquement lorsque le receveur est lui même un centre VHU.
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#signature">Signature</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-
-### BsvhuRecipientAcceptance
-
-<table>
-<thead>
-<tr>
-<th align="left">Field</th>
-<th align="right">Argument</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
 <tr>
 <td colspan="2" valign="top"><strong>quantity</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
+<td valign="top"><a href="#bsvhuquantity">BsvhuQuantity</a></td>
 <td>
 
 Quantité réelle reçue
@@ -1920,11 +2011,11 @@ Quantité réelle reçue
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>status</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td colspan="2" valign="top"><strong>acceptationStatus</strong></td>
+<td valign="top"><a href="#bsvhuacceptationstatus">BsvhuAcceptationStatus</a></td>
 <td>
 
-Etat d'acceptation du déchet
+Lot accepté oui/non
 
 </td>
 </tr>
@@ -1933,7 +2024,7 @@ Etat d'acceptation du déchet
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Raison du refus du déchet, dans le cas d'un refus
+Motif de refus
 
 </td>
 </tr>
@@ -1949,7 +2040,7 @@ Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)
 </tbody>
 </table>
 
-### BsvhuRecipientOperation
+### BsvhuTransport
 
 <table>
 <thead>
@@ -1962,22 +2053,18 @@ Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>planned</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td colspan="2" valign="top"><strong>takenOverAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
 <td>
 
-Opération de traitement prévue
+Date de prise en charge
 
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>done</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Opération de traitement réalisée
-
-</td>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -2004,15 +2091,6 @@ Coordonnées de l'entreprise de transport
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>tvaIntracommunautaire</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Numéro de TVA intracommunautaire, dans le cas d'un transporteur étranger
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>recepisse</strong></td>
 <td valign="top"><a href="#bsvhurecepisse">BsvhuRecepisse</a></td>
 <td>
@@ -2022,9 +2100,13 @@ Récépissé transporteur
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#signature">Signature</a></td>
-<td></td>
+<td colspan="2" valign="top"><strong>transport</strong></td>
+<td valign="top"><a href="#bsvhutransport">BsvhuTransport</a></td>
+<td>
+
+Informations liés au transport
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -3353,6 +3435,15 @@ Email du contact dans l'établissement
 
 </td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>vatNumber</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro de TVA intracommunautaire
+
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -3654,12 +3745,12 @@ Nombre de colis associés à ce conditionnement
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>startCursor</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#string">String</a></td>
 <td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>endCursor</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#string">String</a></td>
 <td></td>
 </tr>
 <tr>
@@ -5132,56 +5223,6 @@ Limite de validité
 </tbody>
 </table>
 
-### BsvhuAcceptanceInput
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>quantity</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
-<td>
-
-Quantité réelle reçue
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>status</strong></td>
-<td valign="top"><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a></td>
-<td>
-
-Status d'acceptation du déchet
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>refusalReason</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Raison du refus du déchet, dans le cas d'un refus
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>identification</strong></td>
-<td valign="top"><a href="#bsvhuidentificationinput">BsvhuIdentificationInput</a></td>
-<td>
-
-Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)
-
-</td>
-</tr>
-</tbody>
-</table>
-
 ### BsvhuCompanyWhere
 
 <table>
@@ -5196,6 +5237,117 @@ Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)
 <tr>
 <td colspan="2" valign="top"><strong>siret</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsvhuDestinationInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsvhudestinationtype">BsvhuDestinationType</a></td>
+<td>
+
+Type de receveur: broyeur ou second centre VHU
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>agrementNumber</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro d'agrément de receveur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td>
+
+Coordonnées de l'entreprise qui recoit les déchets
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>plannedOperationCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Opération d'élimination / valorisation prévue (code D/R)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>reception</strong></td>
+<td valign="top"><a href="#bsvhureceptioninput">BsvhuReceptionInput</a></td>
+<td>
+
+Informations de réception
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsvhuoperationinput">BsvhuOperationInput</a></td>
+<td>
+
+Informations sur l'opétation de traitement
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsvhuDestinationWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#bsvhucompanywhere">BsvhuCompanyWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsvhuoperationwhere">BsvhuOperationWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsvhuEmissionWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
 <td></td>
 </tr>
 </tbody>
@@ -5250,8 +5402,8 @@ Coordonnées de l'entreprise émétrice
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
+<td colspan="2" valign="top"><strong>emission</strong></td>
+<td valign="top"><a href="#bsvhuemissionwhere">BsvhuEmissionWhere</a></td>
 <td></td>
 </tr>
 </tbody>
@@ -5346,8 +5498,8 @@ Quantité de VHUs
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>recipient</strong></td>
-<td valign="top"><a href="#bsvhurecipientinput">BsvhuRecipientInput</a></td>
+<td colspan="2" valign="top"><strong>destination</strong></td>
+<td valign="top"><a href="#bsvhudestinationinput">BsvhuDestinationInput</a></td>
 <td>
 
 Détails sur la destination
@@ -5366,6 +5518,25 @@ Détails sur le transporteur
 </tbody>
 </table>
 
+### BsvhuNextDestinationInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### BsvhuOperationInput
 
 <table>
@@ -5378,22 +5549,50 @@ Détails sur le transporteur
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>planned</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
 <td>
 
-Opération de traitement prévue
+Date de réalisation
 
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>done</strong></td>
+<td colspan="2" valign="top"><strong>code</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Opération de traitement réalisée
+Opération de traitement réalisée (R4 ou R12)
 
 </td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>nextDestination</strong></td>
+<td valign="top"><a href="#bsvhunextdestinationinput">BsvhuNextDestinationInput</a></td>
+<td>
+
+Broyeur de destination, à remplir uniquement lorsque la destination est lui même un centre VHU
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsvhuOperationWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -5459,7 +5658,7 @@ Quantité en tonnes
 </tbody>
 </table>
 
-### BsvhuRecipientInput
+### BsvhuReceptionInput
 
 <table>
 <thead>
@@ -5471,82 +5670,49 @@ Quantité en tonnes
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>type</strong></td>
-<td valign="top"><a href="#bsvhurecipienttype">BsvhuRecipientType</a></td>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
 <td>
 
-Type de receveur: broyeur ou second centre VHU
+Date de présentation sur site
 
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>agrementNumber</strong></td>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#bsvhuquantityinput">BsvhuQuantityInput</a></td>
+<td>
+
+Quantité réelle reçue
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>acceptationStatus</strong></td>
+<td valign="top"><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a></td>
+<td>
+
+Lot accepté oui/non
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>refusalReason</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 
-Numéro d'agrément de receveur
+Motif de refus
 
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td colspan="2" valign="top"><strong>identification</strong></td>
+<td valign="top"><a href="#bsvhuidentificationinput">BsvhuIdentificationInput</a></td>
 <td>
 
-Coordonnées de l'entreprise qui recoit les déchets
+Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)
 
 </td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>acceptance</strong></td>
-<td valign="top"><a href="#bsvhuacceptanceinput">BsvhuAcceptanceInput</a></td>
-<td>
-
-Informations d'acceptation
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>operation</strong></td>
-<td valign="top"><a href="#bsvhuoperationinput">BsvhuOperationInput</a></td>
-<td>
-
-Informations sur l'opétation de traitement
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>plannedBroyeurCompany</strong></td>
-<td valign="top"><a href="#companyinput">CompanyInput</a></td>
-<td>
-
-Destination utérieure prévue, dans le cas d'un second centre VHU
-
-</td>
-</tr>
-</tbody>
-</table>
-
-### BsvhuRecipientWhere
-
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#bsvhucompanywhere">BsvhuCompanyWhere</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
-<td></td>
 </tr>
 </tbody>
 </table>
@@ -5620,6 +5786,48 @@ Code de sécurité de l'entreprise pour laquelle on signe. Permet de signer en t
 </tbody>
 </table>
 
+### BsvhuTransportInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>takenOverAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Date de prise en charge
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsvhuTransportWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### BsvhuTransporterInput
 
 <table>
@@ -5641,20 +5849,20 @@ Coordonnées de l'entreprise de transport
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>tvaIntracommunautaire</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-
-Numéro de TVA intracommunautaire, dans le cas d'un transporteur étranger
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>recepisse</strong></td>
 <td valign="top"><a href="#bsvhurecepisseinput">BsvhuRecepisseInput</a></td>
 <td>
 
 Récépissé transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transport</strong></td>
+<td valign="top"><a href="#bsvhutransportinput">BsvhuTransportInput</a></td>
+<td>
+
+Informations liés au transport
 
 </td>
 </tr>
@@ -5678,8 +5886,8 @@ Récépissé transporteur
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
+<td colspan="2" valign="top"><strong>transport</strong></td>
+<td valign="top"><a href="#bsvhutransportwhere">BsvhuTransportWhere</a></td>
 <td></td>
 </tr>
 </tbody>
@@ -5737,8 +5945,8 @@ Défaut à vide.
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>recipient</strong></td>
-<td valign="top"><a href="#bsvhurecipientwhere">BsvhuRecipientWhere</a></td>
+<td colspan="2" valign="top"><strong>destination</strong></td>
+<td valign="top"><a href="#bsvhudestinationwhere">BsvhuDestinationWhere</a></td>
 <td></td>
 </tr>
 <tr>
@@ -5823,6 +6031,15 @@ Email du contact dans l'établissement
 <td>
 
 Numéro de téléphone de contact dans l'établissement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>vatNumber</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro de TVA intracommunautaire
 
 </td>
 </tr>
@@ -7589,6 +7806,48 @@ Payload d'une adresse chantier
 
 ## Enums
 
+### BsvhuAcceptationStatus
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>ACCEPTED</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>REFUSED</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>PARTIALLY_REFUSED</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsvhuDestinationType
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>BROYEUR</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>DEMOLISSEUR</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### BsvhuIdentificationType
 
 <table>
@@ -7622,25 +7881,6 @@ Payload d'une adresse chantier
 </tr>
 <tr>
 <td valign="top"><strong>LOT</strong></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-
-### BsvhuRecipientType
-
-<table>
-<thead>
-<th align="left">Value</th>
-<th align="left">Description</th>
-</thead>
-<tbody>
-<tr>
-<td valign="top"><strong>BROYEUR</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>DEMOLISSEUR</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -8343,15 +8583,15 @@ L'auteur de la signature est l'éco-organisme figurant sur le BSD
 </thead>
 <tbody>
 <tr>
-<td valign="top"><strong>EMITTER</strong></td>
+<td valign="top"><strong>EMISSION</strong></td>
 <td></td>
 </tr>
 <tr>
-<td valign="top"><strong>TRANSPORTER</strong></td>
+<td valign="top"><strong>TRANSPORT</strong></td>
 <td></td>
 </tr>
 <tr>
-<td valign="top"><strong>RECIPIENT</strong></td>
+<td valign="top"><strong>OPERATION</strong></td>
 <td></td>
 </tr>
 </tbody>

@@ -30,7 +30,7 @@ interface CompanySelectorProps {
     | "trader.company"
     | "broker.company"
     | "temporaryStorageDetail.destination.company"
-    | "recipient.plannedBroyeurCompany";
+    | "destination.operation.nextDestination.company";
   onCompanySelected?: (company: CompanyFavorite) => void;
   allowForeignCompanies?: boolean;
   heading?: string;

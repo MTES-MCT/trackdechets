@@ -1,4 +1,4 @@
-import { BsvhuForm, BsvhuStatus } from "@prisma/client";
+import { Bsvhu, BsvhuStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkSecurityCode } from "../../../forms/permissions";
 import {
@@ -12,12 +12,12 @@ import { expandVhuFormFromDb } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
 import { AlreadySignedError } from "../../errors";
 import { machine } from "../../machine";
-import { validateBsvhuForm } from "../../validation";
+import { validateBsvhu } from "../../validation";
 
 type SignatureTypeInfos = {
-  dbDateKey: keyof BsvhuForm;
-  dbAuthorKey: keyof BsvhuForm;
-  getAuthorizedSiret: (form: BsvhuForm) => string;
+  dbDateKey: keyof Bsvhu;
+  dbAuthorKey: keyof Bsvhu;
+  getAuthorizedSiret: (form: Bsvhu) => string;
 };
 
 export default async function sign(
@@ -44,14 +44,16 @@ export default async function sign(
   }
 
   // Check that all necessary fields are filled
-  await validateBsvhuForm(prismaForm, {
-    emitterSignature:
-      prismaForm.emitterSignatureDate != null || input.type === "EMITTER",
-    transporterSignature:
-      prismaForm.transporterSignatureDate != null ||
-      input.type === "TRANSPORTER",
-    recipientSignature:
-      prismaForm.recipientSignatureDate != null || input.type === "RECIPIENT"
+  await validateBsvhu(prismaForm, {
+    emissionSignature:
+      prismaForm.emitterEmissionSignatureDate != null ||
+      input.type === "EMISSION",
+    transportSignature:
+      prismaForm.transporterTransportSignatureDate != null ||
+      input.type === "TRANSPORT",
+    operationSignature:
+      prismaForm.destinationOperationSignatureDate != null ||
+      input.type === "OPERATION"
   });
 
   const { value: newStatus } = machine.transition(prismaForm.status, {
@@ -59,7 +61,7 @@ export default async function sign(
     bsvhu: prismaForm
   });
   //console.log(prismaForm.status,newStatus)
-  const signedForm = await prisma.bsvhuForm.update({
+  const signedForm = await prisma.bsvhu.update({
     where: { id },
     data: {
       [signatureTypeInfos.dbAuthorKey]: input.author,
@@ -73,19 +75,19 @@ export default async function sign(
 }
 
 const signatureTypeMapping: Record<SignatureTypeInput, SignatureTypeInfos> = {
-  EMITTER: {
-    dbDateKey: "emitterSignatureDate",
-    dbAuthorKey: "emitterSignatureAuthor",
+  EMISSION: {
+    dbDateKey: "emitterEmissionSignatureDate",
+    dbAuthorKey: "emitterEmissionSignatureAuthor",
     getAuthorizedSiret: form => form.emitterCompanySiret
   },
-  RECIPIENT: {
-    dbDateKey: "recipientSignatureDate",
-    dbAuthorKey: "recipientSignatureAuthor",
-    getAuthorizedSiret: form => form.recipientCompanySiret
+  OPERATION: {
+    dbDateKey: "destinationOperationSignatureDate",
+    dbAuthorKey: "destinationOperationSignatureAuthor",
+    getAuthorizedSiret: form => form.destinationCompanySiret
   },
-  TRANSPORTER: {
-    dbDateKey: "transporterSignatureDate",
-    dbAuthorKey: "transporterSignatureAuthor",
+  TRANSPORT: {
+    dbDateKey: "transporterTransportSignatureDate",
+    dbAuthorKey: "transporterTransportSignatureAuthor",
     getAuthorizedSiret: form => form.transporterCompanySiret
   }
 };

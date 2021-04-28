@@ -1,4 +1,4 @@
-import { BsvhuForm as PrismaVhuForm } from "@prisma/client";
+import { Bsvhu as PrismaVhuForm } from "@prisma/client";
 import { isObject, objectDiff } from "../forms/workflow/diff";
 import {
   FormCompany,
@@ -77,7 +77,8 @@ const companyKeys: Array<keyof FormCompany> = [
   "mail",
   "name",
   "phone",
-  "siret"
+  "siret",
+  "vatNumber"
 ];
 
 const identificationKeys: Array<keyof BsvhuIdentification> = [
@@ -109,41 +110,57 @@ function globalNullFieldRule<Type>(keys: string[], field: keyof PrismaVhuForm) {
  */
 const vhuFormRules: InternalRules<BsvhuInput, PrismaVhuForm> = {
   emitter: {
-    agrementNumber: nullFieldRule("emitterSignatureDate"),
-    company: globalNullFieldRule(companyKeys, "emitterSignatureDate")
+    agrementNumber: nullFieldRule("emitterEmissionSignatureDate"),
+    company: globalNullFieldRule(companyKeys, "emitterEmissionSignatureDate")
   },
-  recipient: {
-    type: nullFieldRule("emitterSignatureDate"),
-    acceptance: {
-      refusalReason: nullFieldRule("recipientSignatureDate"),
-      status: nullFieldRule("recipientSignatureDate"),
-      quantity: nullFieldRule("recipientSignatureDate"),
+  destination: {
+    type: nullFieldRule("emitterEmissionSignatureDate"),
+    plannedOperationCode: nullFieldRule("emitterEmissionSignatureDate"),
+    reception: {
+      refusalReason: nullFieldRule("destinationOperationSignatureDate"),
+      acceptationStatus: nullFieldRule("destinationOperationSignatureDate"),
+      quantity: globalNullFieldRule(
+        quantityKeys,
+        "destinationOperationSignatureDate"
+      ),
       identification: globalNullFieldRule(
         identificationKeys,
-        "recipientSignatureDate"
-      )
+        "destinationOperationSignatureDate"
+      ),
+      date: nullFieldRule("destinationOperationSignatureDate")
     },
     operation: {
-      done: nullFieldRule("recipientSignatureDate"),
-      planned: nullFieldRule("emitterSignatureDate")
+      code: nullFieldRule("destinationOperationSignatureDate"),
+      date: nullFieldRule("destinationOperationSignatureDate"),
+      nextDestination: globalNullFieldRule(
+        companyKeys,
+        "destinationOperationSignatureDate"
+      )
     },
-    agrementNumber: nullFieldRule("recipientSignatureDate"),
-    company: globalNullFieldRule(companyKeys, "recipientSignatureDate"),
-    plannedBroyeurCompany: globalNullFieldRule(
+    agrementNumber: nullFieldRule("destinationOperationSignatureDate"),
+    company: globalNullFieldRule(
       companyKeys,
-      "recipientSignatureDate"
+      "destinationOperationSignatureDate"
     )
   },
-  packaging: nullFieldRule("emitterSignatureDate"),
+  packaging: nullFieldRule("emitterEmissionSignatureDate"),
   identification: globalNullFieldRule(
     identificationKeys,
-    "emitterSignatureDate"
+    "emitterEmissionSignatureDate"
   ),
-  wasteCode: nullFieldRule("emitterSignatureDate"),
-  quantity: globalNullFieldRule(quantityKeys, "emitterSignatureDate"),
+  wasteCode: nullFieldRule("emitterEmissionSignatureDate"),
+  quantity: globalNullFieldRule(quantityKeys, "emitterEmissionSignatureDate"),
   transporter: {
-    company: globalNullFieldRule(companyKeys, "transporterSignatureDate"),
-    tvaIntracommunautaire: nullFieldRule("transporterSignatureDate"),
-    recepisse: globalNullFieldRule(recepisseKeys, "transporterSignatureDate")
+    company: globalNullFieldRule(
+      companyKeys,
+      "transporterTransportSignatureDate"
+    ),
+    transport: {
+      takenOverAt: nullFieldRule("transporterTransportSignatureDate")
+    },
+    recepisse: globalNullFieldRule(
+      recepisseKeys,
+      "transporterTransportSignatureDate"
+    )
   }
 };

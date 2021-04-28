@@ -1,11 +1,14 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  companyAssociatedToExistingUserFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { vhuFormFactory } from "../../../__tests__/factories.vhu";
 
 const GET_BSVHUS = `
-  query GetBsvhus($siret: String, $where: BsvhuWhere) {
-    bsvhus(siret: $siret, where: $where) {
+  query GetBsvhus($where: BsvhuWhere) {
+    bsvhus(where: $where) {
       totalCount
       pageInfo {
         startCursor
@@ -15,7 +18,7 @@ const GET_BSVHUS = `
       edges {
         node {id
           isDraft
-          recipient {
+          destination {
             company {
               siret
             }
@@ -34,8 +37,8 @@ const GET_BSVHUS = `
               contact
               mail
               phone
+              vatNumber
             }
-            tvaIntracommunautaire
             recepisse {
               number
             }
@@ -103,13 +106,55 @@ describe("Query.Bsvhus", () => {
     await vhuFormFactory({ opt });
 
     // And 1 on recipient company
-    await vhuFormFactory({ opt: { recipientCompanySiret: company.siret } });
+    await vhuFormFactory({ opt: { destinationCompanySiret: company.siret } });
 
     const { query } = makeClient(user);
     const { data } = await query(GET_BSVHUS, {
-      variables: { where: { recipient: { company: { siret: company.siret } } } }
+      variables: {
+        where: { destination: { company: { siret: company.siret } } }
+      }
     });
 
     expect(data.bsvhus.edges.length).toBe(1);
+  });
+
+  it("should get bsvhus from every companies when no filter is passed and user belongs to several companies", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const secondCompany = await companyAssociatedToExistingUserFactory(
+      user,
+      "MEMBER"
+    );
+    const { company: outOfScopeCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    // 2 forms belonging to the current user
+    await vhuFormFactory({ opt: { emitterCompanySiret: company.siret } });
+    await vhuFormFactory({ opt: { emitterCompanySiret: secondCompany.siret } });
+    // 1 form belonging to someone else
+    await vhuFormFactory({
+      opt: { emitterCompanySiret: outOfScopeCompany.siret }
+    });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query(GET_BSVHUS);
+    expect(data.bsvhus.edges.length).toBe(2);
+  });
+
+  it("should get an empty result when trying to access bsvhus the current user isn't associated with", async () => {
+    const { user } = await userWithCompanyFactory("MEMBER");
+    const { company: outOfScopeCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    await vhuFormFactory({
+      opt: { emitterCompanySiret: outOfScopeCompany.siret }
+    });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query(GET_BSVHUS);
+    expect(data.bsvhus.edges.length).toBe(0);
   });
 });
