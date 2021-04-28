@@ -295,7 +295,7 @@ const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
 
           if (
             !isDraft &&
-            rootValue?.wasteDetailsCode?.includes("*") &&
+            isDangerous(rootValue?.wasteDetailsCode ?? "") &&
             !value
           ) {
             return false;

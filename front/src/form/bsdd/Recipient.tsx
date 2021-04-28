@@ -4,6 +4,7 @@ import TdSwitch from "common/components/Switch";
 import Tooltip from "common/components/Tooltip";
 import ProcessingOperation from "form/common/components/processing-operation/ProcessingOperation";
 import { Field, useFormikContext } from "formik";
+import { isDangerous } from "generated/constants";
 import { Form } from "generated/graphql/types";
 import React from "react";
 import CompanySelector from "../common/components/company/CompanySelector";
@@ -23,7 +24,7 @@ export default function Recipient() {
   const hasTrader = !!values.trader;
   const hasBroker = !!values.broker;
   const isTempStorage = !!values.recipient?.isTempStorage;
-  const isDangerousWaste = values.wasteDetails?.code?.includes("*");
+  const isDangerousWaste = isDangerous(values.wasteDetails?.code ?? "");
 
   function handleNoneToggle() {
     setFieldValue("broker", null, false);
