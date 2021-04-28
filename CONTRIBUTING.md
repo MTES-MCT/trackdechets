@@ -218,8 +218,10 @@ La procédure qui suit aura pour effet de remplacer vos données en local par le
 
 #### Procédure automatique avec Docker
 
-Un script d'automatisation a été mise en place. Il permet de restaurer soit un backup local, soit le dernier backup de production.
-Assurez vous d'avoir correctement configuré vos variables d'environnement pour que le script fonctionne.
+Un script d'automatisation a été mis en place. Il permet de restaurer soit un backup local, soit le dernier backup de la base de donnée distante choisie.
+Pour les backups distants, assurez vous d'avoir correctement configuré les variables d'environnement suivantes dans votre fichier `.env` local:
+- `DB_API_ID` - UUID Scaleway de la base de donnée que vous souhaitez restaurer (variable volontairement documentée dans `.env.model`)
+- `S3_SECRET_ACCESS_KEY` - clé d'API Scaleway
 
 ```bash
 $ pwd
