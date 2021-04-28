@@ -2530,10 +2530,10 @@ export type Packagings =
 
 export type PageInfo = {
   __typename?: "PageInfo";
-  endCursor: Scalars["String"];
+  startCursor?: Maybe<Scalars["String"]>;
+  endCursor?: Maybe<Scalars["String"]>;
   hasNextPage: Scalars["Boolean"];
   hasPreviousPage: Scalars["Boolean"];
-  startCursor: Scalars["String"];
 };
 
 /** Payload permettant le rattachement d'un établissement à un utilisateur */
@@ -6031,14 +6031,22 @@ export type PageInfoResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["PageInfo"] = ResolversParentTypes["PageInfo"]
 > = {
-  endCursor?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  startCursor?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  endCursor?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
   hasNextPage?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;
   hasPreviousPage?: Resolver<
     ResolversTypes["Boolean"],
     ParentType,
     ContextType
   >;
-  startCursor?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -8408,10 +8416,10 @@ export function createPackagingInfoInputMock(
 export function createPageInfoMock(props: Partial<PageInfo>): PageInfo {
   return {
     __typename: "PageInfo",
-    endCursor: "",
+    startCursor: null,
+    endCursor: null,
     hasNextPage: false,
     hasPreviousPage: false,
-    startCursor: "",
     ...props
   };
 }

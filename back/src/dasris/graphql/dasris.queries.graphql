@@ -31,12 +31,7 @@ enum processingOperationTypes {
   R1
   R12
 }
-type PageInfo {
-  startCursor: String!
-  endCursor: String!
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-}
+
 type BsdasriConnection {
   totalCount: Int!
   pageInfo: PageInfo!

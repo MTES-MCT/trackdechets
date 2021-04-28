@@ -2558,10 +2558,10 @@ export enum Packagings {
 
 export type PageInfo = {
   __typename?: "PageInfo";
-  endCursor: Scalars["String"];
+  startCursor?: Maybe<Scalars["String"]>;
+  endCursor?: Maybe<Scalars["String"]>;
   hasNextPage: Scalars["Boolean"];
   hasPreviousPage: Scalars["Boolean"];
-  startCursor: Scalars["String"];
 };
 
 /** Payload permettant le rattachement d'un établissement à un utilisateur */

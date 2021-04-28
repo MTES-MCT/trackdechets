@@ -4649,8 +4649,13 @@ Nombre de colis associés à ce conditionnement
 </thead>
 <tbody>
 <tr>
+<td colspan="2" valign="top"><strong>startCursor</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>endCursor</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#string">String</a></td>
 <td></td>
 </tr>
 <tr>
@@ -4661,11 +4666,6 @@ Nombre de colis associés à ce conditionnement
 <tr>
 <td colspan="2" valign="top"><strong>hasPreviousPage</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>startCursor</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
 <td></td>
 </tr>
 </tbody>
