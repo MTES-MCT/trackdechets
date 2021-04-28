@@ -4,7 +4,7 @@ import { registerUpdater, Updater } from "./helper/helper";
 @registerUpdater(
   "hash existing tokens",
   "retrieve existing access token and hash their token value with sha256 alg",
-  true
+  false
 )
 export class HashTokens implements Updater {
   run() {
