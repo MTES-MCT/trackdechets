@@ -74,11 +74,16 @@ export const checkEmitterAllowsSignatureWithSecretCode: checkEmitterAllowsSignat
   return true;
 };
 
+// Secret code signature rely on a specific mutation, here we use a common util to sign each dasri step
+type InternalBsdasriSignatureType =
+  | BsdasriSignatureType
+  | "EMISSION_WITH_SECRET_CODE";
+
 /**
  * Parameters to pass to state machine
  */
 export const dasriSignatureMapping: Record<
-  BsdasriSignatureType,
+  InternalBsdasriSignatureType,
   BsdasriSignatureInfos
 > = {
   EMISSION: {
