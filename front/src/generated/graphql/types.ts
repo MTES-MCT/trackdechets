@@ -354,8 +354,6 @@ export type BsdasriSignatureInput = {
 export enum BsdasriSignatureType {
   /** Signature du cadre émetteur (PRED) */
   Emission = "EMISSION",
-  /** Signature du cadre émetteur (PRED) par le transporteur, grâce au code de sécurité de l'émetteur */
-  EmissionWithSecretCode = "EMISSION_WITH_SECRET_CODE",
   /** Signature du cadre collecteur transporteur */
   Transport = "TRANSPORT",
   /** Signature de la réception du déchet */
@@ -2095,8 +2093,8 @@ export type Mutation = {
    * Une signature ne peut être apposée que par un membre de l'entreprise figurant sur le cadre concerné
    * Ex: la signature TRANSPORT ne peut être apposée que par un membre de l'entreprise de transport
    *
-   * Toutefois il existe un exception: le cadre emetteur peut être signé par le transporteur grâce au code de
-   * sécurité de l'émetteur (BsdasriSignatureType: EMISSION_WITH_SECRET_CODE)
+   * Pour signer l'emission avec un compte transpoteur (cas de lasignature sur device transporteur),
+   * utiliser la mutation signBsdasriEmissionWithSecretCode
    */
   signBsdasri?: Maybe<Bsdasri>;
   /**
