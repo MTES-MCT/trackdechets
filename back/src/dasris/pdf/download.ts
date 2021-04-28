@@ -17,11 +17,11 @@ export default async function downloadPdf(res: Response, { id }) {
   try {
     const buffer = await buildPdf(bsdasri);
     res.status(200);
-    res.type("pdf");
+    res.type("html");
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment;filename=${bsdasri.id}.pdf`
+      `attachment;filename=${bsdasri.id}.html`
     );
 
     res.send(buffer);

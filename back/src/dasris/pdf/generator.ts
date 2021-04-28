@@ -2,9 +2,10 @@ import { Bsdasri } from "@prisma/client";
 import { readFile } from "fs/promises";
 import { join } from "path";
 import { connect } from "puppeteer-core";
-import ejs from "ejs";
 import QRCode from "qrcode";
 import { format } from "date-fns";
+import Handlebars from "handlebars";
+import fs from "fs";
 
 /**
  *
@@ -12,19 +13,31 @@ import { format } from "date-fns";
  */
 export async function buildPdf(bsdasri: Bsdasri) {
   const browser = await connect({
-    browserWSEndpoint: "wss://chrome.browserless.io/"
+    browserWSEndpoint: "wss://chrome.browserless.io"
+  });
+  const dasristamp = fs
+    .readFileSync(join(__dirname, "/templates/dasristamp.handlebars"), {
+      encoding: "utf8"
+    })
+    .toString();
+  const template = fs.readFileSync(
+    join(__dirname, "/templates/dasri.handlebars"),
+    { encoding: "utf8" }
+  );
+
+  Handlebars.registerHelper("dateFmt", safeDateFmt);
+  Handlebars.registerHelper("sumPackageQuantity", sumPackageQuantity);
+  Handlebars.registerHelper("ifEquals", function (arg1, arg2, options) {
+    return arg1 == arg2 ? options.fn(this) : options.inverse(this);
   });
 
+  const qrcode = !bsdasri.isDraft
+    ? await QRCode.toString(bsdasri.id, { type: "svg" })
+    : "";
   try {
-    const tplPath = join(__dirname, "/templates/dasri.ejs");
-    const qrcode = !bsdasri.isDraft
-      ? await QRCode.toString(bsdasri.id, { type: "svg" })
-      : "";
-    const html = await ejs.renderFile(
-      tplPath,
-      { bsdasri, qrcode, sumPackageQuantity, dateFmt: safeDateFmt },
-      { error: false }
-    );
+    const source = template.toString();
+    const compiled = Handlebars.compile(source);
+    const html = compiled({ bsdasri, qrcode, dasristamp });
 
     const page = await browser.newPage();
 
@@ -41,11 +54,12 @@ export async function buildPdf(bsdasri: Bsdasri) {
     return pdfBuffer;
   } catch (err) {
     await browser.close();
+
     throw new Error("Erreur lors du téléchargement du PDF");
   }
 }
 
-const safeDateFmt = dt => {
+const safeDateFmt = (dt: Date) => {
   if (!dt) {
     return "";
   }
