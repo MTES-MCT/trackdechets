@@ -7,8 +7,8 @@ import { BsdasriStatus } from "@prisma/client";
 import prisma from "../../../../prisma";
 
 const UPDATE_DASRI = `
-mutation UpdateDasri($input: BsdasriUpdateInput!) {
-  updateBsdasri(bsdasriUpdateInput: $input) {
+mutation UpdateDasri($id: ID!, $input: BsdasriUpdateInput!) {
+  updateBsdasri(id: $id, bsdasriUpdateInput: $input) {
     id
     status
     emitter {
@@ -32,7 +32,10 @@ describe("Mutation.updateBsdasri", () => {
       }
     });
     const { errors } = await mutate(UPDATE_DASRI, {
-      variables: { input: { id: dasri.id } }
+      variables: {
+        id: dasri.id,
+        input: { emitter: { company: { mail: "test@test.test" } } }
+      }
     });
 
     expect(errors).toEqual([
@@ -60,8 +63,8 @@ describe("Mutation.updateBsdasri", () => {
     const { mutate } = makeClient(connectedUser);
     const { errors } = await mutate(UPDATE_DASRI, {
       variables: {
+        id: dasri.id,
         input: {
-          id: dasri.id,
           emitter: { company: { mail: "test@test.test" } }
         }
       }
@@ -90,12 +93,12 @@ describe("Mutation.updateBsdasri", () => {
 
     const { mutate } = makeClient(user);
     const input = {
-      id: dasri.id,
       emitter: { company: { mail: "test@test.test" } }
     };
 
     const { errors } = await mutate(UPDATE_DASRI, {
       variables: {
+        id: dasri.id,
         input
       }
     });
@@ -124,12 +127,12 @@ describe("Mutation.updateBsdasri", () => {
 
       const { mutate } = makeClient(user);
       const input = {
-        id: dasri.id,
         emitter: { company: { mail: "test@test.test" } }
       };
 
       const { errors } = await mutate(UPDATE_DASRI, {
         variables: {
+          id: dasri.id,
           input
         }
       });
@@ -159,12 +162,12 @@ describe("Mutation.updateBsdasri", () => {
 
       const { mutate } = makeClient(user);
       const input = {
-        id: dasri.id,
         emitter: { company: { mail: "test@test.test" } }
       };
 
       const { data } = await mutate(UPDATE_DASRI, {
         variables: {
+          id: dasri.id,
           input
         }
       });
@@ -188,7 +191,6 @@ describe("Mutation.updateBsdasri", () => {
 
     const { mutate } = makeClient(user);
     const input = {
-      id: dasri.id,
       emitter: {
         company: {
           mail: "test@test.test"
@@ -197,7 +199,7 @@ describe("Mutation.updateBsdasri", () => {
     };
 
     const { errors } = await mutate(UPDATE_DASRI, {
-      variables: { input }
+      variables: { id: dasri.id, input }
     });
 
     expect(errors).toEqual([
@@ -227,7 +229,6 @@ describe("Mutation.updateBsdasri", () => {
 
     const { mutate } = makeClient(user);
     const input = {
-      id: dasri.id,
       transporter: {
         company: {
           mail: "transporter@test.test"
@@ -241,7 +242,7 @@ describe("Mutation.updateBsdasri", () => {
     };
 
     await mutate(UPDATE_DASRI, {
-      variables: { input }
+      variables: { id: dasri.id, input }
     });
 
     dasri = await prisma.bsdasri.findUnique({
@@ -267,7 +268,6 @@ describe("Mutation.updateBsdasri", () => {
 
     const { mutate } = makeClient(user);
     const input = {
-      id: dasri.id,
       emitter: {
         company: {
           mail: "test@test.test"
@@ -281,7 +281,7 @@ describe("Mutation.updateBsdasri", () => {
     };
 
     const { errors } = await mutate(UPDATE_DASRI, {
-      variables: { input }
+      variables: { id: dasri.id, input }
     });
 
     expect(errors).toEqual([
@@ -311,15 +311,13 @@ describe("Mutation.updateBsdasri", () => {
 
     const { mutate } = makeClient(user);
     const input = {
-      id: dasri.id,
-
       transport: {
         handedOverAt: new Date().toISOString()
       }
     };
 
     await mutate(UPDATE_DASRI, {
-      variables: { input }
+      variables: { id: dasri.id, input }
     });
     const updatedDasri = await prisma.bsdasri.findUnique({
       where: { id: dasri.id }
@@ -342,14 +340,13 @@ describe("Mutation.updateBsdasri", () => {
 
     const { mutate } = makeClient(user);
     const input = {
-      id: dasri.id,
       transport: {
         handedOverAt: new Date().toISOString()
       }
     };
     // handedOverToRecipientAt can be updated even after dasri is sent, but not when it is received
     const { errors } = await mutate(UPDATE_DASRI, {
-      variables: { input }
+      variables: { id: dasri.id, input }
     });
 
     expect(errors).toEqual([
@@ -382,8 +379,6 @@ describe("Mutation.updateBsdasri", () => {
 
     const { mutate } = makeClient(user);
     const input = {
-      id: dasri.id,
-
       recipient: {
         company: {
           mail: "recipient@test.test"
@@ -392,7 +387,7 @@ describe("Mutation.updateBsdasri", () => {
     };
 
     await mutate(UPDATE_DASRI, {
-      variables: { input }
+      variables: { id: dasri.id, input }
     });
     const updatedDasri = await prisma.bsdasri.findUnique({
       where: { id: dasri.id }
@@ -415,8 +410,6 @@ describe("Mutation.updateBsdasri", () => {
 
     const { mutate } = makeClient(user);
     const input = {
-      id: dasri.id,
-
       recipient: {
         company: {
           mail: "test@test.test"
@@ -426,7 +419,7 @@ describe("Mutation.updateBsdasri", () => {
     };
 
     const { errors } = await mutate(UPDATE_DASRI, {
-      variables: { input }
+      variables: { id: dasri.id, input }
     });
 
     expect(errors).toEqual([
@@ -456,13 +449,11 @@ describe("Mutation.updateBsdasri", () => {
 
     const { mutate } = makeClient(user);
     const input = {
-      id: dasri.id,
-
       operation: { processingOperation: "D10" }
     };
 
     await mutate(UPDATE_DASRI, {
-      variables: { input }
+      variables: { id: dasri.id, input }
     });
 
     dasri = await prisma.bsdasri.findUnique({

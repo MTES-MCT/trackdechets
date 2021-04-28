@@ -158,8 +158,8 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
       const updateTransport = `
         mutation {
           updateBsdasri(
+            id: "${bsdasri.id}",
             bsdasriUpdateInput: {
-              id: "${bsdasri.id}"
               transport: {
                 wasteAcceptation: { status: ACCEPTED }
                 wasteDetails: {
@@ -207,8 +207,8 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
       const updateReception = `
         mutation {
           updateBsdasri(
+            id: "${bsdasri.id}",
             bsdasriUpdateInput: {
-              id: "${bsdasri.id}"
               reception: {
                 wasteAcceptation: { status: ACCEPTED }
                 wasteDetails: {
@@ -256,8 +256,8 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
       const updateOperation = `
         mutation {
           updateBsdasri(
+            id: "${bsdasri.id}",
             bsdasriUpdateInput: {
-              id: "${bsdasri.id}"
               operation: {
                 processingOperation: "D10",
                 processedAt: "2020-04-28"

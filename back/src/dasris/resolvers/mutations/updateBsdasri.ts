@@ -17,12 +17,13 @@ import { getBsdasriOrNotFound } from "../../database";
 import { validateBsdasri } from "../../validation";
 import { ForbiddenError } from "apollo-server-express";
 
-const fieldsAllowedForUpdateOnceReceived = [
+type BsdasriField = keyof Bsdasri;
+const fieldsAllowedForUpdateOnceReceived: BsdasriField[] = [
   "processingOperation",
   "processedAt"
 ];
 
-const fieldsAllowedForUpdateOnceSent = fieldsAllowedForUpdateOnceReceived.concat(
+const fieldsAllowedForUpdateOnceSent: BsdasriField[] = fieldsAllowedForUpdateOnceReceived.concat(
   [
     "recipientCompanyName",
     "recipientCompanySiret",
@@ -41,7 +42,8 @@ const fieldsAllowedForUpdateOnceSent = fieldsAllowedForUpdateOnceReceived.concat
     "recipientCustomInfo"
   ]
 );
-const fieldsAllowedForUpdateOnceSignedByEmitter = fieldsAllowedForUpdateOnceSent.concat(
+
+const fieldsAllowedForUpdateOnceSignedByEmitter: BsdasriField[] = fieldsAllowedForUpdateOnceSent.concat(
   [
     "transporterCompanyName",
     "transporterCompanySiret",
@@ -61,8 +63,6 @@ const fieldsAllowedForUpdateOnceSignedByEmitter = fieldsAllowedForUpdateOnceSent
     "transporterWasteQuantityType",
     "transporterWasteVolume",
     "handedOverToRecipientAt",
-    "transporterSignedBy",
-    "transporterSignedAt",
     "transporterCustomInfo"
   ]
 );
@@ -108,11 +108,10 @@ const dasriUpdateResolver = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const { bsdasriUpdateInput } = { ...args };
+  const { id, bsdasriUpdateInput } = { ...args };
 
   const {
     regroupedBsdasris: inputRegroupedBsdasris,
-    id,
     ...dasriContent
   } = bsdasriUpdateInput;
 

@@ -122,9 +122,6 @@ input BsdasriCreateInput {
 }
 
 input BsdasriUpdateInput {
-  "Identifiant unique du bordereau"
-  id: ID!
-
   emitter: BsdasriEmitterInput
   emission: BsdasriEmissionInput
   transporter: BsdasriTransporterInput
@@ -184,6 +181,8 @@ type Mutation {
   Par défaut, tous les champs sont modifiables.
   """
   updateBsdasri(
+    "Identifiant unique du bordereau"
+    id: ID!
     "Payload de mise à jour d'un dasri"
     bsdasriUpdateInput: BsdasriUpdateInput!
   ): Bsdasri!
@@ -201,9 +200,8 @@ type Mutation {
   Une signature ne peut être apposée que par un membre de l'entreprise figurant sur le cadre concerné
   Ex: la signature TRANSPORT ne peut être apposée que par un membre de l'entreprise de transport
 
-  Pour signer l'emission avec un compte transpoteur (cas de lasignature sur device transporteur), 
+  Pour signer l'emission avec un compte transpoteur (cas de lasignature sur device transporteur),
   utiliser la mutation signBsdasriEmissionWithSecretCode
-
   """
   signBsdasri(id: ID!, signatureInput: BsdasriSignatureInput!): Bsdasri
 

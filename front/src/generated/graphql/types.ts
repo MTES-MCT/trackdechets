@@ -437,8 +437,6 @@ export type BsdasriTransportInput = {
 };
 
 export type BsdasriUpdateInput = {
-  /** Identifiant unique du bordereau */
-  id: Scalars["ID"];
   emitter?: Maybe<BsdasriEmitterInput>;
   emission?: Maybe<BsdasriEmissionInput>;
   transporter?: Maybe<BsdasriTransporterInput>;
@@ -2433,6 +2431,7 @@ export type MutationUpdateBrokerReceiptArgs = {
 };
 
 export type MutationUpdateBsdasriArgs = {
+  id: Scalars["ID"];
   bsdasriUpdateInput: BsdasriUpdateInput;
 };
 

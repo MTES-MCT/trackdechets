@@ -1357,8 +1357,8 @@ Appose une signature sur un Bsdasri, verrouille les cadres correspondant
 Une signature ne peut être apposée que par un membre de l'entreprise figurant sur le cadre concerné
 Ex: la signature TRANSPORT ne peut être apposée que par un membre de l'entreprise de transport
 
-Toutefois il existe un exception: le cadre emetteur peut être signé par le transporteur grâce au code de
-sécurité de l'émetteur (BsdasriSignatureType: EMISSION_WITH_SECRET_CODE)
+Pour signer l'emission avec un compte transpoteur (cas de lasignature sur device transporteur),
+utiliser la mutation signBsdasriEmissionWithSecretCode
 
 </td>
 </tr>
@@ -1475,6 +1475,15 @@ Marque un segment comme pris en charge par le nouveau transporteur
 EXPERIMENTAL - Ne pas utiliser dans un contexte de production
 Met à jour un dasri existant
 Par défaut, tous les champs sont modifiables.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+Identifiant unique du bordereau
 
 </td>
 </tr>
@@ -6720,15 +6729,6 @@ Champ libre transporteur
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>id</strong></td>
-<td valign="top"><a href="#id">ID</a>!</td>
-<td>
-
-Identifiant unique du bordereau
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>emitter</strong></td>
 <td valign="top"><a href="#bsdasriemitterinput">BsdasriEmitterInput</a></td>
 <td></td>
@@ -9671,14 +9671,6 @@ Les Bsdasri dont je suis l'émetteur
 <td>
 
 Signature du cadre émetteur (PRED)
-
-</td>
-</tr>
-<tr>
-<td valign="top"><strong>EMISSION_WITH_SECRET_CODE</strong></td>
-<td>
-
-Signature du cadre émetteur (PRED) par le transporteur, grâce au code de sécurité de l'émetteur
 
 </td>
 </tr>

@@ -362,8 +362,6 @@ export type BsdasriSignatureInput = {
 export type BsdasriSignatureType =
   /** Signature du cadre émetteur (PRED) */
   | "EMISSION"
-  /** Signature du cadre émetteur (PRED) par le transporteur, grâce au code de sécurité de l'émetteur */
-  | "EMISSION_WITH_SECRET_CODE"
   /** Signature du cadre collecteur transporteur */
   | "TRANSPORT"
   /** Signature de la réception du déchet */
@@ -445,8 +443,6 @@ export type BsdasriTransportInput = {
 };
 
 export type BsdasriUpdateInput = {
-  /** Identifiant unique du bordereau */
-  id: Scalars["ID"];
   emitter?: Maybe<BsdasriEmitterInput>;
   emission?: Maybe<BsdasriEmissionInput>;
   transporter?: Maybe<BsdasriTransporterInput>;
@@ -2071,8 +2067,8 @@ export type Mutation = {
    * Une signature ne peut être apposée que par un membre de l'entreprise figurant sur le cadre concerné
    * Ex: la signature TRANSPORT ne peut être apposée que par un membre de l'entreprise de transport
    *
-   * Toutefois il existe un exception: le cadre emetteur peut être signé par le transporteur grâce au code de
-   * sécurité de l'émetteur (BsdasriSignatureType: EMISSION_WITH_SECRET_CODE)
+   * Pour signer l'emission avec un compte transpoteur (cas de lasignature sur device transporteur),
+   * utiliser la mutation signBsdasriEmissionWithSecretCode
    */
   signBsdasri?: Maybe<Bsdasri>;
   /**
@@ -2411,6 +2407,7 @@ export type MutationUpdateBrokerReceiptArgs = {
 };
 
 export type MutationUpdateBsdasriArgs = {
+  id: Scalars["ID"];
   bsdasriUpdateInput: BsdasriUpdateInput;
 };
 
@@ -5945,7 +5942,7 @@ export type MutationResolvers<
     ResolversTypes["Bsdasri"],
     ParentType,
     ContextType,
-    RequireFields<MutationUpdateBsdasriArgs, "bsdasriUpdateInput">
+    RequireFields<MutationUpdateBsdasriArgs, "id" | "bsdasriUpdateInput">
   >;
   updateBsvhu?: Resolver<
     Maybe<ResolversTypes["Bsvhu"]>,
@@ -7232,7 +7229,6 @@ export function createBsdasriUpdateInputMock(
   props: Partial<BsdasriUpdateInput>
 ): BsdasriUpdateInput {
   return {
-    id: "",
     emitter: null,
     emission: null,
     transporter: null,

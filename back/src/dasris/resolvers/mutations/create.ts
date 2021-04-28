@@ -54,20 +54,16 @@ const createBsdasri = async (
 
   await validateBsdasri(flattenedInput, signatureContext);
 
-  try {
-    const newDasri = await prisma.bsdasri.create({
-      data: {
-        ...flattenedInput,
-        id: await getReadableId(ReadableIdPrefix.DASRI),
-        owner: { connect: { id: user.id } },
-        regroupedBsdasris: { connect: regroupedBsdasris },
-        isDraft: isDraft
-      }
-    });
-    return expandBsdasriFromDb(newDasri);
-  } catch (e) {
-    console.log(e);
-  }
+  const newDasri = await prisma.bsdasri.create({
+    data: {
+      ...flattenedInput,
+      id: await getReadableId(ReadableIdPrefix.DASRI),
+      owner: { connect: { id: user.id } },
+      regroupedBsdasris: { connect: regroupedBsdasris },
+      isDraft: isDraft
+    }
+  });
+  return expandBsdasriFromDb(newDasri);
 };
 
 export default createBsdasri;
