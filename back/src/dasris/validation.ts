@@ -351,7 +351,10 @@ export const transportSchema: FactorySchemaOf<
   yup.object({
     transporterWasteAcceptationStatus: yup
       .mixed<WasteAcceptationStatus>()
-      .requiredIf(context.transportSignature, ""),
+      .requiredIf(
+        context.transportSignature,
+        "Vous devez préciser si le déchet est accepté"
+      ),
 
     transporterWasteRefusedQuantity: yup
       .number()
@@ -542,10 +545,7 @@ export const operationSchema: FactorySchemaOf<
       .label("Opération d’élimination / valorisation")
       .oneOf([...allowedOperations, "", null], INVALID_PROCESSING_OPERATION)
       .requiredIf(context.operationSignature),
-    processedAt: yup
-      .date()
-      .nullable()
-      .requiredIf(context.operationSignature, "")
+    processedAt: yup.date().nullable().requiredIf(context.operationSignature)
   });
 };
 
