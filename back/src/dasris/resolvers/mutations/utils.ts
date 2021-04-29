@@ -1,4 +1,5 @@
 import prisma from "../../../prisma";
+import { UserInputError } from "apollo-server-express";
 
 import { DASRI_GROUPING_OPERATIONS_CODES } from "../../../common/constants";
 export const checkDasrisAreGroupable = async (
@@ -35,7 +36,7 @@ export const checkDasrisAreGroupable = async (
   const diff = regroupedBsdasrisIds.filter(el => !foundIds.includes(el));
 
   if (!!diff.length) {
-    throw new Error(
+    throw new UserInputError(
       `Les dasris suivants ne peuvent pas être regroupés ${diff.join()}`
     );
   }
@@ -46,8 +47,8 @@ export const emitterIsAllowedToGroup = async emitterSiret => {
     where: { siret: emitterSiret }
   });
   if (!emitterCompany?.companyTypes.includes("COLLECTOR")) {
-    throw new Error(
-      "Le siret de l'émetteur n'est pas autorisé à regrouper des dasris"
+    throw new UserInputError(
+      `Le siret de l'émetteur n'est pas autorisé à regrouper des dasris`
     );
   }
 };
