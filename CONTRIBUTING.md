@@ -43,16 +43,18 @@
    127.0.0.1 api.trackdechets.local
    127.0.0.1 trackdechets.local
    127.0.0.1 developers.trackdechets.local
+   127.0.0.1 es.trackdechets.local
+   127.0.0.1 kibana.trackdechets.local
    ```
 
    > Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
 
-   > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `UI_HOST` et `DEVELOPERS_HOST`
+   > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `UI_HOST`, `DEVELOPERS_HOST`, `ELASTIC_SEARCH_HOST` et `KIBANA_HOST`
 
 4. Démarrer les containers
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx
+   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx elasticsearch kibana
    ```
 
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
@@ -69,7 +71,18 @@
    npx prisma db push --preview-feature
    ```
 
-6. Accéder aux différents services.
+6. Initialiser l'index Elastic Search.
+
+   Les données sont indexées dans une base de donnée Elastic Search pour la recherche.
+   Il est nécessaire de créer l'index et l'alias afin de commencer à indexer des documents.
+   À noter que ce script peut aussi être utiliser pour indexer tous les documents en base de donnée.
+
+   ```bash
+   docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
+   npm run index-elastic-search:dev
+   ```
+
+7. Accéder aux différents services.
 
    C'est prêt ! Rendez-vous sur l'URL `UI_HOST` configurée dans votre fichier `.env` (par ex: `http://trackdechets.local`) pour commencer à utiliser l'application ou sur `API_HOST` (par ex `http://api.trackdechets.local`) pour accéder au playground GraphQL.
 
@@ -220,6 +233,7 @@ La procédure qui suit aura pour effet de remplacer vos données en local par le
 
 Un script d'automatisation a été mis en place. Il permet de restaurer soit un backup local, soit le dernier backup de la base de donnée distante choisie.
 Pour les backups distants, assurez vous d'avoir correctement configuré les variables d'environnement suivantes dans votre fichier `.env` local:
+
 - `DB_API_ID` - UUID Scaleway de la base de donnée que vous souhaitez restaurer (variable volontairement documentée dans `.env.model`)
 - `S3_SECRET_ACCESS_KEY` - clé d'API Scaleway
 
@@ -248,7 +262,7 @@ $ ./restore-db.sh
    ```
 4. Accéder au container Postgres
    ```
-   docker exec -it $(docker ps -aqf "name=trackdechets_postgres_1") bash
+   docker exec -it $(docker ps -aqf "name=trackdechets_postgres") bash
    ```
 5. Restaurer le backup
    ```

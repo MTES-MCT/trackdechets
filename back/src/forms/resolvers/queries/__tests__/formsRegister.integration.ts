@@ -12,6 +12,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { Query } from "../../../../generated/graphql/types";
 
 function emitterFormFactory(ownerId: string, siret: string) {
   return formFactory({
@@ -47,7 +48,7 @@ describe("query { formsRegister }", () => {
   it("should throw exception if register is empty", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { query } = makeClient(user);
-    const { errors } = await query(`
+    const { errors } = await query<Pick<Query, "formsRegister">>(`
       query {
         formsRegister(sirets: ["${company.siret}"], exportType: OUTGOING, exportFormat: CSV) {
           token
@@ -64,7 +65,7 @@ describe("query { formsRegister }", () => {
   it("throw FORBIDDEN error if user is not member of a siret", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { query } = makeClient(user);
-    const { errors } = await query(`
+    const { errors } = await query<Pick<Query, "formsRegister">>(`
       query {
         formsRegister(sirets: ["${company.siret}", "11111111111111"], exportType: OUTGOING, exportFormat: CSV) {
           token
@@ -97,7 +98,7 @@ describe("query { formsRegister }", () => {
 
         const { query } = makeClient(user);
 
-        const { data } = await query(`
+        const { data } = await query<Pick<Query, "formsRegister">>(`
           query {
             formsRegister(sirets: ["${company.siret}"], exportType: ${exportType}, exportFormat: CSV) {
               token
@@ -151,7 +152,7 @@ describe("query { formsRegister }", () => {
 
         const { query } = makeClient(user);
 
-        const { data } = await query(`
+        const { data } = await query<Pick<Query, "formsRegister">>(`
           query {
             formsRegister(sirets: ["${company.siret}"], exportType: ${exportType}, exportFormat: XLSX) {
               token
@@ -209,7 +210,7 @@ describe("query { formsRegister }", () => {
 
     const { query } = makeClient(user);
 
-    const { data } = await query(`
+    const { data } = await query<Pick<Query, "formsRegister">>(`
       query {
         formsRegister(sirets: ["${company.siret}"], exportType: OUTGOING, exportFormat: CSV) {
           token

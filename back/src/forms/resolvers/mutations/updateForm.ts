@@ -14,9 +14,10 @@ import { WASTES_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanUpdate, checkIsFormContributor } from "../../permissions";
 import { GraphQLContext } from "../../../types";
-import { getFormOrFormNotFound } from "../../database";
+import { getFormOrFormNotFound, getFullForm } from "../../database";
 import { draftFormSchema, sealedFormSchema } from "../../validation";
 import { FormSirets } from "../../types";
+import { indexForm } from "../../elastic";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -131,6 +132,15 @@ const updateFormResolver = async (
     where: { id },
     data: formUpdateInput
   });
+
+  // TODO: create statusLog?
+  // We create a statusLog when creating a form
+  // but not when it is updated between its creation and seal
+  // so the form might have changed in-between without a proper statusLog
+
+  const fullForm = await getFullForm(updatedForm);
+  await indexForm(fullForm);
+
   return expandFormFromDb(updatedForm);
 };
 

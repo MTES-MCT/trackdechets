@@ -5,9 +5,10 @@ import { expandFormFromDb } from "../../form-converter";
 import getReadableId from "../../readableId";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getFormOrFormNotFound } from "../../database";
+import { getFormOrFormNotFound, getFullForm } from "../../database";
 import { checkCanDuplicate } from "../../permissions";
 import { eventEmitter, TDEvent } from "../../../events/emitter";
+import { indexForm } from "../../elastic";
 
 /**
  * Duplicate a form by stripping the properties that should not be copied.
@@ -147,6 +148,9 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
       loggedAt: new Date()
     }
   });
+
+  const fullForm = await getFullForm(newForm);
+  await indexForm(fullForm);
 
   return expandFormFromDb(newForm);
 };

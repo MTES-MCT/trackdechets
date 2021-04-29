@@ -1,4 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { Query } from "../../../../generated/graphql/types";
 import {
   companyAssociatedToExistingUserFactory,
   userWithCompanyFactory
@@ -68,7 +69,7 @@ describe("Query.Bsvhus", () => {
 
     const { query } = makeClient(user);
 
-    const { data } = await query(GET_BSVHUS);
+    const { data } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS);
 
     expect(data.bsvhus.edges.length).toBe(4);
   });
@@ -86,7 +87,7 @@ describe("Query.Bsvhus", () => {
 
     const { query } = makeClient(user);
 
-    const { data } = await query(GET_BSVHUS);
+    const { data } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS);
 
     expect(data.bsvhus.totalCount).toBe(4);
     expect(data.bsvhus.pageInfo.startCursor).toBe(lastForm.id);
@@ -109,7 +110,7 @@ describe("Query.Bsvhus", () => {
     await vhuFormFactory({ opt: { destinationCompanySiret: company.siret } });
 
     const { query } = makeClient(user);
-    const { data } = await query(GET_BSVHUS, {
+    const { data } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS, {
       variables: {
         where: { destination: { company: { siret: company.siret } } }
       }
@@ -138,7 +139,7 @@ describe("Query.Bsvhus", () => {
 
     const { query } = makeClient(user);
 
-    const { data } = await query(GET_BSVHUS);
+    const { data } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS);
     expect(data.bsvhus.edges.length).toBe(2);
   });
 
@@ -154,7 +155,7 @@ describe("Query.Bsvhus", () => {
 
     const { query } = makeClient(user);
 
-    const { data } = await query(GET_BSVHUS);
+    const { data } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS);
     expect(data.bsvhus.edges.length).toBe(0);
   });
 });

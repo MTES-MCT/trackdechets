@@ -1,10 +1,7 @@
 import { useMutation, useQuery } from "@apollo/client";
 import cogoToast from "cogo-toast";
-import { updateApolloCache } from "common/helper";
 import routes from "common/routes";
-import { DRAFT_TAB_FORMS } from "dashboard/bsds/queries";
 import {
-  Form,
   FormInput,
   Mutation,
   MutationCreateFormArgs,
@@ -44,24 +41,7 @@ export default function StepsList(props: Props) {
   const [createForm] = useMutation<
     Pick<Mutation, "createForm">,
     MutationCreateFormArgs
-  >(CREATE_FORM, {
-    update: (store, { data }) => {
-      if (!data?.createForm) {
-        return;
-      }
-      const createdForm = data.createForm;
-      updateApolloCache<{ forms: Form[] }>(store, {
-        query: DRAFT_TAB_FORMS,
-        variables: { siret },
-        getNewData: data => ({
-          forms: [
-            createdForm,
-            ...data.forms.filter(f => f.id !== createdForm.id),
-          ],
-        }),
-      });
-    },
-  });
+  >(CREATE_FORM);
 
   const [updateForm] = useMutation<
     Pick<Mutation, "updateForm">,

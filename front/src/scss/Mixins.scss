@@ -1,0 +1,19 @@
+@import "src/scss/Constants.scss";
+
+@mixin input {
+  width: 100%;
+  outline: none;
+  padding: 0.5em 0.875em;
+  font: inherit;
+  line-height: 1.6;
+  color: $black;
+  border-radius: $common-radius;
+  border: 1px solid $grey;
+  background: $white;
+  vertical-align: middle;
+  position: relative;
+
+  &::placeholder {
+    color: $grey-dark;
+  }
+}

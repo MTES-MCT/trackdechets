@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { generatePath, Link, useHistory, useParams } from "react-router-dom";
 
-import { useDownloadPdf } from "dashboard/components/BSDDActions/useDownloadPdf";
-import { useDuplicate } from "dashboard/components/BSDDActions/useDuplicate";
+import { useDownloadPdf } from "dashboard/components/BSDList/BSDD/BSDDActions/useDownloadPdf";
+import { useDuplicate } from "dashboard/components/BSDList/BSDD/BSDDActions/useDuplicate";
 
-import { DeleteModal } from "dashboard/components/BSDDActions/DeleteModal";
+import { DeleteModal } from "dashboard/components/BSDList/BSDD/BSDDActions/DeleteModal";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import {
   TransportSegment,
@@ -320,19 +320,16 @@ export default function BSDDetailContent({
   const history = useHistory();
   const [isDeleting, setIsDeleting] = useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
-  const [duplicate] = useDuplicate(
-    {
-      variables: { id: form.id },
-      onCompleted: () => {
-        history.push(
-          generatePath(routes.dashboard.bsds.drafts, {
-            siret,
-          })
-        );
-      },
+  const [duplicate] = useDuplicate({
+    variables: { id: form.id },
+    onCompleted: () => {
+      history.push(
+        generatePath(routes.dashboard.bsds.drafts, {
+          siret,
+        })
+      );
     },
-    siret
-  );
+  });
 
   const isMultiModal: boolean = !!form?.transportSegments?.length;
   const hasTempStorage: boolean = !!form?.temporaryStorageDetail;

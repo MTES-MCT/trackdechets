@@ -1,12 +1,5 @@
 import * as React from "react";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@apollo/client";
-import {
-  FormRole,
-  FormStatus,
-  Query,
-  QueryFormsArgs,
-} from "generated/graphql/types";
 import {
   Blankslate,
   BlankslateDescription,
@@ -15,54 +8,28 @@ import {
   Breadcrumb,
   BreadcrumbItem,
 } from "common/components";
-import { COLUMNS, BSDList } from "../../components/BSDList";
-import { GET_TRANSPORT_BSDS } from "../queries";
+import { BSDList, COLUMNS } from "../../components/BSDList";
 import illustration from "./assets/blankslateCollected.svg";
 
 const COLLECTED_COLUMNS = [
+  COLUMNS.type,
   COLUMNS.readableId,
   COLUMNS.emitter,
   COLUMNS.recipient,
   COLUMNS.waste,
-  COLUMNS.quantity,
   COLUMNS.transporterCustomInfo,
   COLUMNS.transporterNumberPlate,
+  COLUMNS.status,
 ];
 
 export function RouteTransportCollected() {
   const { siret } = useParams<{ siret: string }>();
-  const { data, loading, fetchMore, refetch } = useQuery<
-    Pick<Query, "forms">,
-    Partial<QueryFormsArgs>
-  >(GET_TRANSPORT_BSDS, {
-    variables: {
-      siret,
-      roles: [FormRole.Transporter],
-      status: [
-        FormStatus.Sealed,
-        FormStatus.Sent,
-        FormStatus.Resealed,
-        FormStatus.Resent,
-      ],
-    },
-    notifyOnNetworkStatusChange: true,
-  });
-  const forms = data?.forms ?? [];
-  const filteredForms = forms.filter(form => {
-    if (form.status === "SENT") {
-      return form.transporter?.company?.siret === siret;
-    }
-
-    if (form.status === "RESENT") {
-      return form.temporaryStorageDetail?.transporter?.company?.siret === siret;
-    }
-
-    const segments = form.transportSegments ?? [];
-    return segments.some(
-      segment =>
-        segment.takenOverAt && segment.transporter?.company?.siret === siret
-    );
-  });
+  const defaultWhere = React.useMemo(
+    () => ({
+      isCollectedFor: [siret],
+    }),
+    [siret]
+  );
 
   return (
     <>
@@ -74,12 +41,9 @@ export function RouteTransportCollected() {
       </Breadcrumb>
 
       <BSDList
-        columns={COLLECTED_COLUMNS}
-        forms={filteredForms}
         siret={siret}
-        fetchMore={fetchMore}
-        refetch={refetch}
-        loading={loading}
+        defaultWhere={defaultWhere}
+        columns={COLLECTED_COLUMNS}
         blankslate={
           <Blankslate>
             <BlankslateImg src={illustration} alt="" />

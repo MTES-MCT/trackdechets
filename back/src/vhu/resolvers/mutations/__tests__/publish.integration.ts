@@ -1,5 +1,6 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
+import { Mutation } from "../../../../generated/graphql/types";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { vhuFormFactory } from "../../../__tests__/factories.vhu";
@@ -18,11 +19,14 @@ describe("Mutation.Vhu.publish", () => {
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
-    const { errors } = await mutate(PUBLISH_VHU_FORM, {
-      variables: {
-        id: 1
+    const { errors } = await mutate<Pick<Mutation, "publishBsvhu">>(
+      PUBLISH_VHU_FORM,
+      {
+        variables: {
+          id: 1
+        }
       }
-    });
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -44,9 +48,12 @@ describe("Mutation.Vhu.publish", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(PUBLISH_VHU_FORM, {
-      variables: { id: form.id }
-    });
+    const { errors } = await mutate<Pick<Mutation, "publishBsvhu">>(
+      PUBLISH_VHU_FORM,
+      {
+        variables: { id: form.id }
+      }
+    );
 
     expect(errors[0].message).toBe(
       "Impossible de publier un bordereau qui n'est pas un brouillon"
@@ -63,9 +70,12 @@ describe("Mutation.Vhu.publish", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(PUBLISH_VHU_FORM, {
-      variables: { id: form.id }
-    });
+    const { data } = await mutate<Pick<Mutation, "publishBsvhu">>(
+      PUBLISH_VHU_FORM,
+      {
+        variables: { id: form.id }
+      }
+    );
 
     expect(data.publishBsvhu.isDraft).toBe(false);
   });

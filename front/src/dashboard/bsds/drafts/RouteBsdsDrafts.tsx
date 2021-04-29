@@ -1,4 +1,3 @@
-import { useQuery } from "@apollo/client";
 import React from "react";
 import { IconDuplicateFile } from "common/components/Icons";
 import { generatePath, Link, useParams } from "react-router-dom";
@@ -10,30 +9,18 @@ import {
   BlankslateTitle,
   BlankslateDescription,
 } from "common/components";
-import { Query, QueryFormsArgs } from "generated/graphql/types";
-import { BSDList, COLUMNS } from "../../components/BSDList";
-
 import routes from "common/routes";
-import { DRAFT_TAB_FORMS } from "../queries";
+import { BSDList } from "../../components/BSDList";
 import illustration from "./assets/blankslateDrafts.svg";
-
-const DRAFTS_COLUMNS = [
-  COLUMNS.emitter,
-  COLUMNS.recipient,
-  COLUMNS.waste,
-  COLUMNS.quantity,
-];
 
 export function RouteBsdsDrafts() {
   const { siret } = useParams<{ siret: string }>();
-  const { data, loading, fetchMore, refetch } = useQuery<
-    Pick<Query, "forms">,
-    Partial<QueryFormsArgs>
-  >(DRAFT_TAB_FORMS, {
-    variables: { siret },
-    notifyOnNetworkStatusChange: true,
-  });
-  const forms = data?.forms ?? [];
+  const defaultWhere = React.useMemo(
+    () => ({
+      isDraftFor: [siret],
+    }),
+    [siret]
+  );
 
   return (
     <>
@@ -43,12 +30,8 @@ export function RouteBsdsDrafts() {
       </Breadcrumb>
 
       <BSDList
-        loading={loading}
         siret={siret}
-        forms={forms}
-        columns={DRAFTS_COLUMNS}
-        fetchMore={fetchMore}
-        refetch={refetch}
+        defaultWhere={defaultWhere}
         blankslate={
           <Blankslate>
             <BlankslateImg src={illustration} alt="" />

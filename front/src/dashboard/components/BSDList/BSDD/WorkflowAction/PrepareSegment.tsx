@@ -3,23 +3,18 @@ import { useMutation, gql } from "@apollo/client";
 import { Field, Form as FormikForm, Formik } from "formik";
 import cogoToast from "cogo-toast";
 import {
-  Form,
   Mutation,
   MutationPrepareSegmentArgs,
   TransportMode,
-  FormRole,
-  FormStatus,
 } from "generated/graphql/types";
 import { segmentFragment } from "common/fragments";
-import { updateApolloCache } from "common/helper";
 import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
 import { NotificationError } from "common/components/Error";
 import { IconBusTransfer } from "common/components/Icons";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
-import { transportModeLabels } from "../../../constants";
-import { GET_TRANSPORT_BSDS } from "../../../transport/queries";
+import { transportModeLabels } from "../../../../constants";
 import { WorkflowActionProps } from "./WorkflowAction";
 
 const PREPARE_SEGMENT = gql`
@@ -45,26 +40,6 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
       setIsOpen(false);
       cogoToast.success("Le segment a été créé", {
         hideAfter: 5,
-      });
-    },
-    update: store => {
-      updateApolloCache<{ forms: Form[] }>(store, {
-        query: GET_TRANSPORT_BSDS,
-        variables: {
-          siret,
-          roles: [FormRole.Transporter],
-          status: [
-            FormStatus.Sealed,
-            FormStatus.Sent,
-            FormStatus.Resealed,
-            FormStatus.Resent,
-          ],
-        },
-        getNewData: data => {
-          return {
-            forms: data.forms.filter(f => f.id === form.id),
-          };
-        },
       });
     },
   });

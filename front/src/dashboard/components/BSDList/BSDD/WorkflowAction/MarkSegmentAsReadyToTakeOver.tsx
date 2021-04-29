@@ -3,19 +3,14 @@ import { useMutation, gql } from "@apollo/client";
 import { Form as FormikForm, Formik } from "formik";
 import cogoToast from "cogo-toast";
 import {
-  Form,
-  FormRole,
-  FormStatus,
   Mutation,
   MutationMarkSegmentAsReadyToTakeOverArgs,
 } from "generated/graphql/types";
 import { segmentFragment } from "common/fragments";
-import { updateApolloCache } from "common/helper";
 import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
 import { IconPaperWrite } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
-import { GET_TRANSPORT_BSDS } from "../../../transport/queries";
 import { WorkflowActionProps } from "./WorkflowAction";
 
 const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
@@ -42,24 +37,6 @@ export default function MarkSegmentAsReadyToTakeOver({
         "Le bordereau est prêt à être pris en charge par le transporteur suivant",
         { hideAfter: 5 }
       );
-    },
-    update: store => {
-      updateApolloCache<{ forms: Form[] }>(store, {
-        query: GET_TRANSPORT_BSDS,
-        variables: {
-          siret,
-          roles: [FormRole.Transporter],
-          status: [
-            FormStatus.Sealed,
-            FormStatus.Sent,
-            FormStatus.Resealed,
-            FormStatus.Resent,
-          ],
-        },
-        getNewData: data => ({
-          forms: data.forms,
-        }),
-      });
     },
   });
 

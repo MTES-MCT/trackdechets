@@ -1,4 +1,3 @@
-import { useQuery } from "@apollo/client";
 import React from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -9,24 +8,17 @@ import {
   BlankslateTitle,
   BlankslateDescription,
 } from "common/components";
-import { Query, QueryFormsArgs } from "generated/graphql/types";
 import { BSDList } from "../../components/BSDList";
-
-import { HISTORY_TAB_FORMS } from "../queries";
 import illustration from "./assets/blankslateHistory.svg";
 
 export function RouteBsdsHistory() {
   const { siret } = useParams<{ siret: string }>();
-  const { data, loading, fetchMore, refetch } = useQuery<
-    Pick<Query, "forms">,
-    Partial<QueryFormsArgs>
-  >(HISTORY_TAB_FORMS, {
-    variables: {
-      siret,
-    },
-    notifyOnNetworkStatusChange: true,
-  });
-  const forms = data?.forms ?? [];
+  const defaultWhere = React.useMemo(
+    () => ({
+      isArchivedFor: [siret],
+    }),
+    [siret]
+  );
 
   return (
     <>
@@ -36,11 +28,8 @@ export function RouteBsdsHistory() {
       </Breadcrumb>
 
       <BSDList
-        loading={loading}
         siret={siret}
-        forms={forms}
-        fetchMore={fetchMore}
-        refetch={refetch}
+        defaultWhere={defaultWhere}
         blankslate={
           <Blankslate>
             <BlankslateImg src={illustration} alt="" />

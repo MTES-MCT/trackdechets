@@ -10,6 +10,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { Query } from "../../../../generated/graphql/types";
 
 function createForms(
   userId: string,
@@ -128,7 +129,7 @@ describe("Query.forms", () => {
     ]);
 
     const { query } = makeClient(user);
-    const { data } = await query(FORMS);
+    const { data } = await query<Pick<Query, "forms">>(FORMS);
 
     expect(data.forms.length).toBe(3);
     expect(
@@ -156,7 +157,7 @@ describe("Query.forms", () => {
     });
 
     const { query } = makeClient(user);
-    const { data } = await query(FORMS);
+    const { data } = await query<Pick<Query, "forms">>(FORMS);
 
     const eoForms = data.forms.filter(
       f => f.ecoOrganisme?.siret === company.siret
@@ -188,7 +189,7 @@ describe("Query.forms", () => {
     ]);
 
     const { query } = makeClient(user);
-    const { data } = await query(FORMS, {
+    const { data } = await query<Pick<Query, "forms">>(FORMS, {
       variables: {
         siret: otherCompany.siret
       }
@@ -224,7 +225,7 @@ describe("Query.forms", () => {
     });
 
     const { query } = makeClient(user);
-    const { data, errors } = await query(FORMS);
+    const { data, errors } = await query<Pick<Query, "forms">>(FORMS);
 
     expect(errors).toBeUndefined();
     expect(data.forms.length).toBe(3);
@@ -259,7 +260,7 @@ describe("Query.forms", () => {
     ]);
 
     const { query } = makeClient(user);
-    const { data, errors } = await query(
+    const { data, errors } = await query<Pick<Query, "forms">>(
       `query {
           forms {
             wasteDetails {
@@ -310,7 +311,7 @@ describe("Query.forms", () => {
     ]);
 
     const { query } = makeClient(user);
-    const { data } = await query(FORMS);
+    const { data } = await query<Pick<Query, "forms">>(FORMS);
 
     expect(data.forms.length).toBe(2);
   });
@@ -353,17 +354,17 @@ describe("Query.forms", () => {
 
     const { query } = makeClient(user);
 
-    const { data: allForms } = await query(FORMS);
+    const { data: allForms } = await query<Pick<Query, "forms">>(FORMS);
     expect(allForms.forms.length).toBe(5);
 
-    const { data: statusFiltered } = await query(FORMS, {
+    const { data: statusFiltered } = await query<Pick<Query, "forms">>(FORMS, {
       variables: {
         status: ["DRAFT", "SENT"]
       }
     });
     expect(statusFiltered.forms.length).toBe(2);
 
-    const { data: roleFiltered } = await query(FORMS, {
+    const { data: roleFiltered } = await query<Pick<Query, "forms">>(FORMS, {
       variables: {
         roles: ["TRADER"]
       }
@@ -371,12 +372,15 @@ describe("Query.forms", () => {
 
     expect(roleFiltered.forms.length).toBe(1);
 
-    const { data: roleAndStatusFiltered } = await query(FORMS, {
-      variables: {
-        roles: ["EMITTER", "RECIPIENT"],
-        status: ["PROCESSED"]
+    const { data: roleAndStatusFiltered } = await query<Pick<Query, "forms">>(
+      FORMS,
+      {
+        variables: {
+          roles: ["EMITTER", "RECIPIENT"],
+          status: ["PROCESSED"]
+        }
       }
-    });
+    );
     expect(roleAndStatusFiltered.forms.length).toBe(1);
   });
 
@@ -389,7 +393,9 @@ describe("Query.forms", () => {
     const forms = await createNSortedForms(user.id, opts, 5);
     const f4 = forms[3];
     const { query } = makeClient(user);
-    const { data } = await query(FORMS, { variables: { first: 1, skip: 1 } });
+    const { data } = await query<Pick<Query, "forms">>(FORMS, {
+      variables: { first: 1, skip: 1 }
+    });
     const formIds = data.forms.map(f => f.id);
     expect(formIds).toEqual([f4.id]);
   });
@@ -408,12 +414,12 @@ describe("Query.forms", () => {
     const f5 = forms[4];
 
     const { query } = makeClient(user);
-    const { data: data1 } = await query(FORMS, {
+    const { data: data1 } = await query<Pick<Query, "forms">>(FORMS, {
       variables: { first: 2 }
     });
     const page1 = data1.forms.map(f => f.id);
     expect(page1).toEqual([f5.id, f4.id]);
-    const { data: data2 } = await query(FORMS, {
+    const { data: data2 } = await query<Pick<Query, "forms">>(FORMS, {
       variables: {
         first: 2,
         cursorAfter: f4.id
@@ -421,7 +427,7 @@ describe("Query.forms", () => {
     });
     const page2 = data2.forms.map(f => f.id);
     expect(page2).toEqual([f3.id, f2.id]);
-    const { data: data3 } = await query(FORMS, {
+    const { data: data3 } = await query<Pick<Query, "forms">>(FORMS, {
       variables: {
         first: 2,
         cursorAfter: f2.id
@@ -429,7 +435,7 @@ describe("Query.forms", () => {
     });
     const page3 = data3.forms.map(f => f.id);
     expect(page3).toEqual([f1.id]);
-    const { data: data4 } = await query(FORMS, {
+    const { data: data4 } = await query<Pick<Query, "forms">>(FORMS, {
       variables: { first: 2, cursorAfter: f1.id }
     });
     const page4 = data4.forms.map(f => f.id);
@@ -445,7 +451,9 @@ describe("Query.forms", () => {
     const forms = await createNSortedForms(user.id, opts, 5);
     const f2 = forms[1];
     const { query } = makeClient(user);
-    const { data } = await query(FORMS, { variables: { last: 1, skip: 1 } });
+    const { data } = await query<Pick<Query, "forms">>(FORMS, {
+      variables: { last: 1, skip: 1 }
+    });
     const formIds = data.forms.map(f => f.id);
     expect(formIds).toEqual([f2.id]);
   });
@@ -464,12 +472,12 @@ describe("Query.forms", () => {
     const f5 = forms[4];
 
     const { query } = makeClient(user);
-    const { data: data1 } = await query(FORMS, {
+    const { data: data1 } = await query<Pick<Query, "forms">>(FORMS, {
       variables: { last: 2 }
     });
     const page1 = data1.forms.map(f => f.id);
     expect(page1).toEqual([f2.id, f1.id]);
-    const { data: data2 } = await query(FORMS, {
+    const { data: data2 } = await query<Pick<Query, "forms">>(FORMS, {
       variables: {
         last: 2,
         cursorBefore: f2.id
@@ -477,7 +485,7 @@ describe("Query.forms", () => {
     });
     const page2 = data2.forms.map(f => f.id);
     expect(page2).toEqual([f4.id, f3.id]);
-    const { data: data3 } = await query(FORMS, {
+    const { data: data3 } = await query<Pick<Query, "forms">>(FORMS, {
       variables: {
         last: 2,
         cursorBefore: f4.id
@@ -485,7 +493,7 @@ describe("Query.forms", () => {
     });
     const page3 = data3.forms.map(f => f.id);
     expect(page3).toEqual([f5.id]);
-    const { data: data4 } = await query(FORMS, {
+    const { data: data4 } = await query<Pick<Query, "forms">>(FORMS, {
       variables: { last: 2, cursorBefore: f5.id }
     });
     const page4 = data4.forms.map(f => f.id);
@@ -503,7 +511,7 @@ describe("Query.forms", () => {
     );
 
     const { query } = makeClient(user);
-    const { data } = await query(FORMS);
+    const { data } = await query<Pick<Query, "forms">>(FORMS);
     expect(data.forms.length).toBe(50);
   });
 
@@ -581,7 +589,7 @@ describe("Query.forms", () => {
     ]);
 
     const { query } = makeClient(user);
-    const { data } = await query(
+    const { data } = await query<Pick<Query, "forms">>(
       `query {
           forms(siret: "${otherCompany.siret}") {
             id
@@ -614,7 +622,7 @@ describe("Query.forms", () => {
     const yesterday = format(subDays(new Date(), 1), "yyyy-MM-dd");
 
     const { query } = makeClient(user);
-    const { data: updatedAfterYesterday } = await query(
+    const { data: updatedAfterYesterday } = await query<Pick<Query, "forms">>(
       `query {
           forms(updatedAfter: "${yesterday}") {
             id
@@ -628,7 +636,7 @@ describe("Query.forms", () => {
 
     expect(updatedAfterYesterday.forms.length).toBe(2);
 
-    const { data: updatedAfterTomorrow } = await query(
+    const { data: updatedAfterTomorrow } = await query<Pick<Query, "forms">>(
       `query {
           forms(updatedAfter: "${tomorrow}") {
             id
@@ -659,7 +667,7 @@ describe("Query.forms", () => {
     ]);
 
     const { query } = makeClient(user);
-    const { data } = await query(
+    const { data } = await query<Pick<Query, "forms">>(
       `query Forms($wasteCode: String) {
           forms(wasteCode: $wasteCode) {
             id
@@ -694,7 +702,7 @@ describe("Query.forms", () => {
     ]);
 
     const { query } = makeClient(user);
-    const { data } = await query(
+    const { data } = await query<Pick<Query, "forms">>(
       `query {
           forms(siretPresentOnForm: "${otherCompany.siret}") {
             id
@@ -736,7 +744,7 @@ describe("Integration / Forms query for transporters", () => {
 
     // the transporter makes the query
     const { query } = makeClient(user);
-    const { data } = await query(FORMS, {
+    const { data } = await query<Pick<Query, "forms">>(FORMS, {
       variables: {
         siret: transporter.siret,
         roles: ["TRANSPORTER"]
@@ -776,7 +784,7 @@ describe("Integration / Forms query for transporters", () => {
 
     // the transporter makes the query
     const { query } = makeClient(user);
-    const { data } = await query(FORMS, {
+    const { data } = await query<Pick<Query, "forms">>(FORMS, {
       variables: {
         siret: transporter.siret,
         roles: ["TRANSPORTER"]

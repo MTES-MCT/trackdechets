@@ -11,13 +11,10 @@ import {
   FormStatus,
   Mutation,
   MutationMarkAsProcessedArgs,
-  Query,
 } from "generated/graphql/types";
 import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
 import { WorkflowActionProps } from "./WorkflowAction";
-import { updateApolloCache } from "common/helper";
-import { ACT_TAB_FORMS, HISTORY_TAB_FORMS } from "dashboard/bsds/queries";
 import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton } from "common/components";
 import { IconCogApproved } from "common/components/Icons";
@@ -175,28 +172,6 @@ export default function MarkAsProcessed({ form, siret }: WorkflowActionProps) {
     Pick<Mutation, "markAsProcessed">,
     MutationMarkAsProcessedArgs
   >(MARK_AS_PROCESSED, {
-    update: (cache, { data }) => {
-      if (!data?.markAsProcessed) {
-        return;
-      }
-      const processedForm = data.markAsProcessed;
-      // remove form from the action tab
-      updateApolloCache<Pick<Query, "forms">>(cache, {
-        query: ACT_TAB_FORMS,
-        variables: { siret },
-        getNewData: data => ({
-          forms: [...data.forms].filter(form => form.id !== processedForm.id),
-        }),
-      });
-      // add the form to the history tab
-      updateApolloCache<Pick<Query, "forms">>(cache, {
-        query: HISTORY_TAB_FORMS,
-        variables: { siret },
-        getNewData: data => ({
-          forms: [processedForm, ...data.forms],
-        }),
-      });
-    },
     onCompleted: data => {
       if (
         data.markAsProcessed &&

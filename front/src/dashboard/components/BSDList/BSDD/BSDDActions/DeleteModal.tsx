@@ -1,15 +1,7 @@
 import React from "react";
 import { IconTrash } from "common/components/Icons";
-import { DRAFT_TAB_FORMS, FOLLOW_TAB_FORMS } from "../../bsds/queries";
 import { gql, useMutation } from "@apollo/client";
-import { updateApolloCache } from "common/helper";
-import {
-  FormStatus,
-  Mutation,
-  MutationDeleteFormArgs,
-  Query,
-} from "generated/graphql/types";
-import { useParams } from "react-router-dom";
+import { Mutation, MutationDeleteFormArgs } from "generated/graphql/types";
 import cogoToast from "cogo-toast";
 import TdModal from "common/components/Modal";
 
@@ -31,40 +23,11 @@ export function DeleteModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const { siret } = useParams<{ siret: string }>();
   const [deleteForm] = useMutation<
     Pick<Mutation, "deleteForm">,
     MutationDeleteFormArgs
   >(DELETE_FORM, {
     variables: { id: formId },
-    update: (cache, { data }) => {
-      if (!data?.deleteForm) {
-        return;
-      }
-      const deleteForm = data.deleteForm;
-
-      if (deleteForm.status === FormStatus.Draft) {
-        // update draft tab
-        updateApolloCache<Pick<Query, "forms">>(cache, {
-          query: DRAFT_TAB_FORMS,
-          variables: { siret },
-          getNewData: data => ({
-            forms: [...data.forms.filter(f => f.id !== deleteForm.id)],
-          }),
-        });
-      } else if (deleteForm.status === FormStatus.Sealed) {
-        // update follow tab
-        updateApolloCache<Pick<Query, "forms">>(cache, {
-          query: FOLLOW_TAB_FORMS,
-          variables: {
-            siret,
-          },
-          getNewData: data => ({
-            forms: [...data.forms.filter(f => f.id !== deleteForm.id)],
-          }),
-        });
-      }
-    },
     onCompleted: () => {
       cogoToast.success("Bordereau supprimé", { hideAfter: 5 });
       !!onClose && onClose();

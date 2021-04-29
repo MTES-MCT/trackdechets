@@ -33,7 +33,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
   const { siret } = useParams<{ siret: string }>();
   const location = useLocation();
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
-  const [duplicateForm] = useDuplicate({ variables: { id: form.id } }, siret);
+  const [duplicateForm] = useDuplicate({ variables: { id: form.id } });
   const [isDeleting, setIsDeleting] = React.useState(false);
 
   return (
@@ -54,7 +54,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                 <IconChevronDown size="14px" color="blueLight" />
               )}
             </MenuButton>
-            <MenuList>
+            <MenuList className={styles.BSDDActionsMenu}>
               <MenuLink
                 as={Link}
                 to={{

@@ -7,6 +7,7 @@ import { server } from "../../../../server";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { onSignup } from "../../../../mailer/templates";
+import { Mutation } from "../../../../generated/graphql/types";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -39,7 +40,7 @@ describe("Mutation.signup", () => {
       phone: "06 00 00 00 00"
     };
 
-    const { data } = await mutate(SIGNUP, {
+    const { data } = await mutate<Pick<Mutation, "signup">>(SIGNUP, {
       variables: {
         userInfos: {
           email: user.email,

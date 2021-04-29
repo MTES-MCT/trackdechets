@@ -9,6 +9,7 @@ import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { allowedFormats } from "../../../../common/dates";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const IMPORT_PAPER_FORM = `
   mutation ImportPaperForm($input: ImportPaperFormInput!){
@@ -91,9 +92,12 @@ describe("mutation / importPaperForm", () => {
 
     it("should fail if not authenticated", async () => {
       const { mutate } = makeClient();
-      const { errors } = await mutate(IMPORT_PAPER_FORM, {
-        variables: { input: getImportPaperFormInput() }
-      });
+      const { errors } = await mutate<Pick<Mutation, "importPaperForm">>(
+        IMPORT_PAPER_FORM,
+        {
+          variables: { input: getImportPaperFormInput() }
+        }
+      );
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toEqual("Vous n'êtes pas connecté.");
     });
@@ -106,9 +110,12 @@ describe("mutation / importPaperForm", () => {
       const input = getImportPaperFormInput();
       input.recipient.company.siret = company.siret;
 
-      const { data } = await mutate(IMPORT_PAPER_FORM, {
-        variables: { input }
-      });
+      const { data } = await mutate<Pick<Mutation, "importPaperForm">>(
+        IMPORT_PAPER_FORM,
+        {
+          variables: { input }
+        }
+      );
 
       expect(data.importPaperForm.status).toEqual("PROCESSED");
       expect(data.importPaperForm.isImportedFromPaper).toEqual(true);
@@ -121,9 +128,12 @@ describe("mutation / importPaperForm", () => {
 
       const input = getImportPaperFormInput();
 
-      const { errors } = await mutate(IMPORT_PAPER_FORM, {
-        variables: { input }
-      });
+      const { errors } = await mutate<Pick<Mutation, "importPaperForm">>(
+        IMPORT_PAPER_FORM,
+        {
+          variables: { input }
+        }
+      );
 
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toEqual(
@@ -141,9 +151,12 @@ describe("mutation / importPaperForm", () => {
       // invalidate input
       input.emitter.type = null;
 
-      const { errors } = await mutate(IMPORT_PAPER_FORM, {
-        variables: { input }
-      });
+      const { errors } = await mutate<Pick<Mutation, "importPaperForm">>(
+        IMPORT_PAPER_FORM,
+        {
+          variables: { input }
+        }
+      );
 
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toEqual(
@@ -171,9 +184,12 @@ describe("mutation / importPaperForm", () => {
         name: ecoOrganisme.name
       };
 
-      const { data } = await mutate(IMPORT_PAPER_FORM, {
-        variables: { input }
-      });
+      const { data } = await mutate<Pick<Mutation, "importPaperForm">>(
+        IMPORT_PAPER_FORM,
+        {
+          variables: { input }
+        }
+      );
 
       expect(data.importPaperForm.status).toEqual("PROCESSED");
 
@@ -200,9 +216,12 @@ describe("mutation / importPaperForm", () => {
         name: "Some Eco-Organisme"
       };
 
-      const { errors } = await mutate(IMPORT_PAPER_FORM, {
-        variables: { input }
-      });
+      const { errors } = await mutate<Pick<Mutation, "importPaperForm">>(
+        IMPORT_PAPER_FORM,
+        {
+          variables: { input }
+        }
+      );
 
       expect(errors).toEqual([
         expect.objectContaining({
@@ -230,9 +249,12 @@ describe("mutation / importPaperForm", () => {
         input.receivedInfo.signedAt = format(signedAt, f);
         input.processedInfo.processedAt = format(processedAt, f);
 
-        const { data } = await mutate(IMPORT_PAPER_FORM, {
-          variables: { input }
-        });
+        const { data } = await mutate<Pick<Mutation, "importPaperForm">>(
+          IMPORT_PAPER_FORM,
+          {
+            variables: { input }
+          }
+        );
 
         expect(data.importPaperForm.status).toEqual(Status.PROCESSED);
         expect(data.importPaperForm.isImportedFromPaper).toEqual(true);
@@ -323,7 +345,7 @@ describe("mutation / importPaperForm", () => {
 
       const { mutate } = makeClient(user);
 
-      await mutate(IMPORT_PAPER_FORM, {
+      await mutate<Pick<Mutation, "importPaperForm">>(IMPORT_PAPER_FORM, {
         variables: {
           input: {
             id: form.id, // update mode
@@ -412,7 +434,7 @@ describe("mutation / importPaperForm", () => {
 
       const emitterCompanyName = "Émetteur 2";
 
-      await mutate(IMPORT_PAPER_FORM, {
+      await mutate<Pick<Mutation, "importPaperForm">>(IMPORT_PAPER_FORM, {
         variables: {
           input: {
             id: form.id, // update mode
@@ -452,14 +474,17 @@ describe("mutation / importPaperForm", () => {
 
       const { mutate } = makeClient(user);
 
-      const { errors } = await mutate(IMPORT_PAPER_FORM, {
-        variables: {
-          input: {
-            id: form.id, // update mode
-            ...importedData
+      const { errors } = await mutate<Pick<Mutation, "importPaperForm">>(
+        IMPORT_PAPER_FORM,
+        {
+          variables: {
+            input: {
+              id: form.id, // update mode
+              ...importedData
+            }
           }
         }
-      });
+      );
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toEqual(
         `Seul un BSD à l'état "scellé" (SEALED) peut être mis à jour à partir d'un BSD papier`
@@ -485,14 +510,17 @@ describe("mutation / importPaperForm", () => {
 
       const { mutate } = makeClient(user);
 
-      const { errors } = await mutate(IMPORT_PAPER_FORM, {
-        variables: {
-          input: {
-            id: form.id, // update mode
-            ...importedData
+      const { errors } = await mutate<Pick<Mutation, "importPaperForm">>(
+        IMPORT_PAPER_FORM,
+        {
+          variables: {
+            input: {
+              id: form.id, // update mode
+              ...importedData
+            }
           }
         }
-      });
+      );
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toEqual(
         "Vous devez apparaitre en tant que destinataire du bordereau (case 2) pour pouvoir mettre à jour ce bordereau"
@@ -519,18 +547,21 @@ describe("mutation / importPaperForm", () => {
 
       const { mutate } = makeClient(user);
 
-      const { errors } = await mutate(IMPORT_PAPER_FORM, {
-        variables: {
-          input: {
-            id: form.id, // update mode
-            ...importedData,
-            signingInfo: {
-              sentAt: importedData.signingInfo.sentAt,
-              sentBy: "" // invalidate data
+      const { errors } = await mutate<Pick<Mutation, "importPaperForm">>(
+        IMPORT_PAPER_FORM,
+        {
+          variables: {
+            input: {
+              id: form.id, // update mode
+              ...importedData,
+              signingInfo: {
+                sentAt: importedData.signingInfo.sentAt,
+                sentBy: "" // invalidate data
+              }
             }
           }
         }
-      });
+      );
 
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toEqual(
@@ -558,19 +589,22 @@ describe("mutation / importPaperForm", () => {
 
       const { mutate } = makeClient(user);
 
-      const { errors } = await mutate(IMPORT_PAPER_FORM, {
-        variables: {
-          input: {
-            id: form.id, // update mode
-            ...importedData,
-            emitter: {
-              company: {
-                siret: "36987459856321"
+      const { errors } = await mutate<Pick<Mutation, "importPaperForm">>(
+        IMPORT_PAPER_FORM,
+        {
+          variables: {
+            input: {
+              id: form.id, // update mode
+              ...importedData,
+              emitter: {
+                company: {
+                  siret: "36987459856321"
+                }
               }
             }
           }
         }
-      });
+      );
 
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toEqual(

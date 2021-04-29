@@ -4,6 +4,7 @@ import Form from "./Form";
 import WasteDetails from "./WasteDetails";
 import StateSummary from "./StateSummary";
 import FormCompany from "./FormCompany";
+import Bsd from "./Bsd";
 
 export default {
   Query,
@@ -11,5 +12,6 @@ export default {
   Form,
   WasteDetails,
   StateSummary,
-  FormCompany
+  FormCompany,
+  Bsd
 };

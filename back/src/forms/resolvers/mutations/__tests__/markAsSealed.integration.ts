@@ -1,5 +1,6 @@
 import { CompanyType, CompanyVerificationStatus, Status } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { Mutation } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
   companyFactory,
@@ -378,11 +379,14 @@ describe("Mutation.markAsSealed", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(MARK_AS_SEALED, {
-      variables: {
-        id: form.id
+    const { data } = await mutate<Pick<Mutation, "markAsSealed">>(
+      MARK_AS_SEALED,
+      {
+        variables: {
+          id: form.id
+        }
       }
-    });
+    );
 
     expect(data.markAsSealed.status).toBe("SEALED");
   });

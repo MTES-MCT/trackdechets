@@ -1,91 +1,147 @@
 import * as React from "react";
-import { Form } from "generated/graphql/types";
-import { ActionButtonContext } from "common/components/ActionButton";
-import { WorkflowAction } from "../WorkflowAction";
-import { BSDDActions } from "../../BSDDActions/BSDDActions";
-import { useFormsTable } from "./useFormsTable";
-import { SortableTableHeader } from "./SortableTableHeader";
-import { Column } from "../types";
+import { useTable, useFilters, useSortBy } from "react-table";
+import { Bsd, OrderType, QueryBsdsArgs } from "generated/graphql/types";
+import {
+  Table,
+  TableHead,
+  TableHeaderCell,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableSortIcon,
+} from "common/components";
+import { Column, COLUMNS_PARAMETERS_NAME, createColumn } from "../columns";
 
 interface BSDTableProps {
-  forms: Form[];
-  siret: string;
+  bsds: Bsd[];
   columns: Column[];
+  refetch: (variables: QueryBsdsArgs) => void;
 }
 
-export function BSDTable({ forms, siret, columns }: BSDTableProps) {
-  const [sortedForms, sortParams, sortBy, filter] = useFormsTable(forms);
+const ADDITIONAL_COLUMNS: Column[] = [
+  createColumn({
+    id: "workflow",
+    Header: () => null,
+    disableFilters: true,
+    disableSortBy: true,
+  }),
+  createColumn({
+    id: "actions",
+    Header: () => null,
+    disableFilters: true,
+    disableSortBy: true,
+  }),
+];
+
+export function BSDTable({ bsds, refetch, ...props }: BSDTableProps) {
+  const columns = React.useMemo(
+    () => props.columns.concat(ADDITIONAL_COLUMNS),
+    [props.columns]
+  );
+  const {
+    getTableProps,
+    headerGroups,
+    getTableBodyProps,
+    rows,
+    prepareRow,
+    state: { filters, sortBy },
+  } = useTable(
+    {
+      columns,
+      data: bsds,
+      manualFilters: true,
+      manualSortBy: true,
+    },
+    useFilters,
+    useSortBy
+  );
+  const isFirstCall = React.useRef(true);
+
+  React.useEffect(() => {
+    if (isFirstCall.current) {
+      // the first time this effect is called is when the component is "mounted"
+      // but the query has already been made with the initial paremeters so it should not refetch
+      isFirstCall.current = false;
+      return;
+    }
+
+    const variables = {
+      where: {},
+      order: {},
+    };
+
+    filters.forEach(filter => {
+      const filterName = COLUMNS_PARAMETERS_NAME[filter.id]?.filter;
+
+      if (filterName == null) {
+        console.error(
+          `The filter "${filter.id}" doesn't have an equivalent in the API, it's ignored.`
+        );
+        return;
+      }
+
+      variables.where[filterName] = filter.value;
+    });
+
+    sortBy.forEach(sort => {
+      const sortName = COLUMNS_PARAMETERS_NAME[sort.id]?.order;
+
+      if (sortName == null) {
+        console.error(
+          `The order "${sort.id}" doesn't have an equivalent in the API, it's ignored.`
+        );
+        return;
+      }
+
+      variables.order[sortName] = sort.desc ? OrderType.Desc : OrderType.Asc;
+    });
+
+    refetch(variables);
+  }, [filters, sortBy, refetch]);
 
   return (
-    <div className="td-table-wrapper">
-      <table className="td-table">
-        <thead>
-          <tr className="td-table__head-tr">
-            {columns.map(column => (
-              <React.Fragment key={column.id}>
-                {column.sortable ? (
-                  <SortableTableHeader
-                    sortFunc={sortBy}
-                    fieldName={column.id}
-                    sortParams={sortParams}
-                    caption={column.Header}
+    <Table {...getTableProps()}>
+      <TableHead>
+        {headerGroups.map(headerGroup => (
+          <TableRow {...headerGroup.getHeaderGroupProps()}>
+            {headerGroup.headers.map(column => (
+              <TableHeaderCell {...column.getHeaderProps()}>
+                <span
+                  {...(column.canSort ? column.getSortByToggleProps() : {})}
+                >
+                  {column.render("Header")}
+                  <TableSortIcon
+                    sortBy={
+                      column.isSorted
+                        ? column.isSortedDesc
+                          ? "DESC"
+                          : "ASC"
+                        : null
+                    }
                   />
-                ) : (
-                  <th>{column.Header}</th>
-                )}
-              </React.Fragment>
+                </span>
+                {column.canFilter ? column.render("Filter") : null}
+              </TableHeaderCell>
             ))}
-
-            <th></th>
-            <th></th>
-          </tr>
-          <tr className="td-table__head-tr td-table__tr">
-            {columns.map(column => (
-              <React.Fragment key={column.id}>
-                {column.filterable ? (
-                  <th>
-                    <input
-                      type="text"
-                      onChange={e => filter(column.id, e.target.value)}
-                      className="td-input"
-                      placeholder="Filtrer..."
-                    />
-                  </th>
-                ) : (
-                  <th></th>
-                )}
-              </React.Fragment>
-            ))}
-
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedForms.map(form => (
-            <tr key={form.id} className="td-table__tr">
-              {columns.map(column => (
-                <td key={column.id}>
-                  {column.Cell ? (
-                    <column.Cell value={column.accessor(form)} row={form} />
-                  ) : (
-                    column.accessor(form)
-                  )}
-                </td>
-              ))}
-
-              <td>
-                <ActionButtonContext.Provider value={{ size: "small" }}>
-                  <WorkflowAction siret={siret} form={form} />
-                </ActionButtonContext.Provider>
-              </td>
-              <td>
-                <BSDDActions form={form} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </TableRow>
+        ))}
+      </TableHead>
+      <TableBody {...getTableBodyProps()}>
+        {rows.map(row => {
+          prepareRow(row);
+          return (
+            <TableRow {...row.getRowProps()}>
+              {row.cells.map(cell => {
+                return (
+                  <TableCell {...cell.getCellProps()}>
+                    {cell.render("Cell")}
+                  </TableCell>
+                );
+              })}
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
   );
 }

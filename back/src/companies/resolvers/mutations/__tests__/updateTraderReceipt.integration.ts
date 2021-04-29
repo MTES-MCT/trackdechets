@@ -3,6 +3,7 @@ import prisma from "../../../../prisma";
 import { AuthType } from "../../../../auth";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { Mutation } from "../../../../generated/graphql/types";
 
 describe("{ mutation { updateTraderReceipt } }", () => {
   afterEach(() => resetDatabase());
@@ -40,7 +41,9 @@ describe("{ mutation { updateTraderReceipt } }", () => {
         }`;
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
-    const { data } = await mutate(mutation);
+    const { data } = await mutate<Pick<Mutation, "updateTraderReceipt">>(
+      mutation
+    );
 
     // check returned value
     expect(data.updateTraderReceipt).toEqual(update);

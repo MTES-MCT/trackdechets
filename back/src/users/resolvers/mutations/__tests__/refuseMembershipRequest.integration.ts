@@ -9,6 +9,7 @@ import * as mailsHelper from "../../../../mailer/mailing";
 import { AuthType } from "../../../../auth";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { membershipRequestRefused } from "../../../../mailer/templates";
+import { Mutation } from "../../../../generated/graphql/types";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -123,9 +124,12 @@ describe("mutation refuseMembershipRequest", () => {
       }
     });
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await mutate(REFUSE_MEMBERSHIP_REQUEST, {
-      variables: { id: membershipRequest.id }
-    });
+    const { data } = await mutate<Pick<Mutation, "refuseMembershipRequest">>(
+      REFUSE_MEMBERSHIP_REQUEST,
+      {
+        variables: { id: membershipRequest.id }
+      }
+    );
     expect(data.refuseMembershipRequest.users).toHaveLength(1);
     const refusedMembershipRequest = await prisma.membershipRequest.findUnique({
       where: {

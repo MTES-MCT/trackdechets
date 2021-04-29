@@ -15,6 +15,7 @@ import * as mailsHelper from "../../../../mailer/mailing";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { verificationDone } from "../../../../mailer/templates";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const VERIFY_COMPANY = gql`
   mutation VerifyCompany($input: VerifyCompanyInput!) {
@@ -126,11 +127,14 @@ describe("mutation verifyCompany", () => {
       verificationStatus: CompanyVerificationStatus.LETTER_SENT
     });
     const { mutate } = makeClient(user);
-    const { data } = await mutate(VERIFY_COMPANY, {
-      variables: {
-        input: { siret: company.siret, code: company.verificationCode }
+    const { data } = await mutate<Pick<Mutation, "verifyCompany">>(
+      VERIFY_COMPANY,
+      {
+        variables: {
+          input: { siret: company.siret, code: company.verificationCode }
+        }
       }
-    });
+    );
     expect(data.verifyCompany.verificationStatus).toEqual(
       CompanyVerificationStatus.VERIFIED
     );
