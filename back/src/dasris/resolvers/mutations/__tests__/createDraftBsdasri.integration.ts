@@ -5,6 +5,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const CREATE_DRAFT_DASRI = `
 mutation DasriCreate($input: BsdasriCreateInput!) {
@@ -27,9 +28,12 @@ describe("Mutation.createDraftBsdasri", () => {
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
-    const { errors } = await mutate(CREATE_DRAFT_DASRI, {
-      variables: { input: {} }
-    });
+    const { errors } = await mutate<Pick<Mutation, "createDraftBsdasri">>(
+      CREATE_DRAFT_DASRI,
+      {
+        variables: { input: {} }
+      }
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -45,17 +49,20 @@ describe("Mutation.createDraftBsdasri", () => {
     const user = await userFactory();
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_DRAFT_DASRI, {
-      variables: {
-        input: {
-          emitter: {
-            company: {
-              siret: "9999"
+    const { errors } = await mutate<Pick<Mutation, "createDraftBsdasri">>(
+      CREATE_DRAFT_DASRI,
+      {
+        variables: {
+          input: {
+            emitter: {
+              company: {
+                siret: "9999"
+              }
             }
           }
         }
       }
-    });
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -84,11 +91,14 @@ describe("Mutation.createDraftBsdasri", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_DRAFT_DASRI, {
-      variables: {
-        input
+    const { data } = await mutate<Pick<Mutation, "createDraftBsdasri">>(
+      CREATE_DRAFT_DASRI,
+      {
+        variables: {
+          input
+        }
       }
-    });
+    );
 
     expect(data.createDraftBsdasri.isDraft).toBe(true);
     expect(data.createDraftBsdasri.status).toBe("INITIAL");

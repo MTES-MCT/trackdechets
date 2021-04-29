@@ -5,7 +5,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
-
+import { Mutation } from "../../../../generated/graphql/types";
 import { SIGN_DASRI_WITH_CODE } from "./signUtils";
 
 describe("Mutation.signBsdasri emission with secret code", () => {
@@ -28,7 +28,9 @@ describe("Mutation.signBsdasri emission with secret code", () => {
     });
     const { mutate } = makeClient(transporter); // transporter
 
-    const { errors } = await mutate(SIGN_DASRI_WITH_CODE, {
+    const { errors } = await mutate<
+      Pick<Mutation, "signBsdasriEmissionWithSecretCode">
+    >(SIGN_DASRI_WITH_CODE, {
       variables: {
         id: dasri.id,
         input: {
@@ -69,15 +71,18 @@ describe("Mutation.signBsdasri emission with secret code", () => {
     });
     const { mutate } = makeClient(transporter); // emitter
 
-    await mutate(SIGN_DASRI_WITH_CODE, {
-      variables: {
-        id: dasri.id,
-        input: {
-          author: "Marcel",
-          securityCode: 1234
+    await mutate<Pick<Mutation, "signBsdasriEmissionWithSecretCode">>(
+      SIGN_DASRI_WITH_CODE,
+      {
+        variables: {
+          id: dasri.id,
+          input: {
+            author: "Marcel",
+            securityCode: 1234
+          }
         }
       }
-    });
+    );
 
     const readyTotakeOverDasri = await prisma.bsdasri.findUnique({
       where: { id: dasri.id }

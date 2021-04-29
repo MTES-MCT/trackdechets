@@ -3,6 +3,7 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
+import { Query } from "../../../../generated/graphql/types";
 
 const GET_BSDASRI = `
 query GetBsdasri($id: ID!) {
@@ -102,7 +103,7 @@ describe("Query.Bsdasri", () => {
       }
     });
 
-    const { errors } = await query(GET_BSDASRI, {
+    const { errors } = await query<Pick<Query, "bsdasri">>(GET_BSDASRI, {
       variables: { id: dasri.id }
     });
     expect(errors).toEqual([
@@ -126,7 +127,7 @@ describe("Query.Bsdasri", () => {
     const { user: otherUser } = await userWithCompanyFactory("MEMBER");
 
     const { query } = makeClient(otherUser);
-    const { errors } = await query(GET_BSDASRI, {
+    const { errors } = await query<Pick<Query, "bsdasri">>(GET_BSDASRI, {
       variables: { id: dasri.id }
     });
     expect(errors).toEqual([
@@ -150,7 +151,7 @@ describe("Query.Bsdasri", () => {
 
     const { query } = makeClient(user);
 
-    const { data } = await query(GET_BSDASRI, {
+    const { data } = await query<Pick<Query, "bsdasri">>(GET_BSDASRI, {
       variables: { id: dasri.id }
     });
 
@@ -179,7 +180,7 @@ describe("Query.Bsdasri", () => {
 
     const { query } = makeClient(user);
 
-    const { data } = await query(GET_BSDASRI, {
+    const { data } = await query<Pick<Query, "bsdasri">>(GET_BSDASRI, {
       variables: { id: dasri.id }
     });
 

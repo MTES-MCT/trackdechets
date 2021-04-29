@@ -5,6 +5,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const CREATE_DASRI = `
 mutation DasriCreate($input: BsdasriCreateInput!) {
@@ -27,9 +28,12 @@ describe("Mutation.createDasri", () => {
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
-    const { errors } = await mutate(CREATE_DASRI, {
-      variables: { input: {} }
-    });
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: { input: {} }
+      }
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -45,17 +49,20 @@ describe("Mutation.createDasri", () => {
     const user = await userFactory();
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_DASRI, {
-      variables: {
-        input: {
-          emitter: {
-            company: {
-              siret: "siret"
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input: {
+            emitter: {
+              company: {
+                siret: "siret"
+              }
             }
           }
         }
       }
-    });
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -97,11 +104,14 @@ describe("Mutation.createDasri", () => {
     };
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_DASRI, {
-      variables: {
-        input
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
       }
-    });
+    );
     expect(errors).toEqual([
       expect.objectContaining({
         message:
@@ -145,11 +155,14 @@ describe("Mutation.createDasri", () => {
     };
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_DASRI, {
-      variables: {
-        input
+    const { data } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
       }
-    });
+    );
     expect(data.createBsdasri.isDraft).toEqual(false);
     expect(data.createBsdasri.status).toEqual("INITIAL");
 

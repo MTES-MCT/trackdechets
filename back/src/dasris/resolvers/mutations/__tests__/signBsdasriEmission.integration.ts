@@ -6,6 +6,7 @@ import { BsdasriStatus } from "@prisma/client";
 import { SIGN_DASRI } from "./signUtils";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
+import { Mutation } from "../../../../generated/graphql/types";
 
 describe("Mutation.signBsdasri emission", () => {
   afterEach(resetDatabase);
@@ -19,7 +20,7 @@ describe("Mutation.signBsdasri emission", () => {
       }
     });
     const { mutate } = makeClient(); // unauthenticated user
-    const { errors } = await mutate(SIGN_DASRI, {
+    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
       variables: {
         id: dasri.id,
         input: { type: "EMISSION", author: "Marcel" }
@@ -48,7 +49,7 @@ describe("Mutation.signBsdasri emission", () => {
     });
     const { mutate } = makeClient(user); // emitter
 
-    const { errors } = await mutate(SIGN_DASRI, {
+    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
       variables: {
         id: dasri.id,
         input: { type: "EMISSION", author: "Marcel" }
@@ -73,7 +74,7 @@ describe("Mutation.signBsdasri emission", () => {
     });
     const { mutate } = makeClient(user); // emitter
 
-    await mutate(SIGN_DASRI, {
+    await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
       variables: {
         id: dasri.id,
         input: { type: "EMISSION", author: "Marcel" }

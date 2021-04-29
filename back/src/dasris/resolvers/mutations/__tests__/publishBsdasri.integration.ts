@@ -3,7 +3,7 @@ import { ErrorCode } from "../../../../common/errors";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
-
+import { Mutation } from "../../../../generated/graphql/types";
 const PUBLISH_DASRI = `
 mutation PublishDasri($id: ID!){
   publishBsdasri(id: $id)  {
@@ -25,11 +25,14 @@ describe("Mutation.publishBsdasri", () => {
       }
     });
     const { mutate } = makeClient(); // unauthenticated user
-    const { errors } = await mutate(PUBLISH_DASRI, {
-      variables: {
-        id: dasri.id
+    const { errors } = await mutate<Pick<Mutation, "publishBsdasri">>(
+      PUBLISH_DASRI,
+      {
+        variables: {
+          id: dasri.id
+        }
       }
-    });
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -54,11 +57,14 @@ describe("Mutation.publishBsdasri", () => {
 
     const { mutate } = makeClient(user); // emitter
 
-    const { data } = await mutate(PUBLISH_DASRI, {
-      variables: {
-        id: dasri.id
+    const { data } = await mutate<Pick<Mutation, "publishBsdasri">>(
+      PUBLISH_DASRI,
+      {
+        variables: {
+          id: dasri.id
+        }
       }
-    });
+    );
 
     expect(data.publishBsdasri.status).toBe("INITIAL");
     expect(data.publishBsdasri.isDraft).toBe(false);
@@ -76,11 +82,14 @@ describe("Mutation.publishBsdasri", () => {
 
     const { mutate } = makeClient(user); // emitter
 
-    const { errors } = await mutate(PUBLISH_DASRI, {
-      variables: {
-        id: dasri.id
+    const { errors } = await mutate<Pick<Mutation, "publishBsdasri">>(
+      PUBLISH_DASRI,
+      {
+        variables: {
+          id: dasri.id
+        }
       }
-    });
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -105,11 +114,14 @@ describe("Mutation.publishBsdasri", () => {
     });
     const { mutate } = makeClient(user); // emitter
 
-    const { errors } = await mutate(PUBLISH_DASRI, {
-      variables: {
-        id: dasri.id
+    const { errors } = await mutate<Pick<Mutation, "publishBsdasri">>(
+      PUBLISH_DASRI,
+      {
+        variables: {
+          id: dasri.id
+        }
       }
-    });
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({

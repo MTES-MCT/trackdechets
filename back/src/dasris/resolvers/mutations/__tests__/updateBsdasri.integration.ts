@@ -5,6 +5,7 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
 import prisma from "../../../../prisma";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const UPDATE_DASRI = `
 mutation UpdateDasri($id: ID!, $input: BsdasriUpdateInput!) {
@@ -31,12 +32,15 @@ describe("Mutation.updateBsdasri", () => {
         emitterCompanySiret: company.siret
       }
     });
-    const { errors } = await mutate(UPDATE_DASRI, {
-      variables: {
-        id: dasri.id,
-        input: { emitter: { company: { mail: "test@test.test" } } }
+    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input: { emitter: { company: { mail: "test@test.test" } } }
+        }
       }
-    });
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -61,14 +65,17 @@ describe("Mutation.updateBsdasri", () => {
 
     const { user: connectedUser } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(connectedUser);
-    const { errors } = await mutate(UPDATE_DASRI, {
-      variables: {
-        id: dasri.id,
-        input: {
-          emitter: { company: { mail: "test@test.test" } }
+    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input: {
+            emitter: { company: { mail: "test@test.test" } }
+          }
         }
       }
-    });
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -96,12 +103,15 @@ describe("Mutation.updateBsdasri", () => {
       emitter: { company: { mail: "test@test.test" } }
     };
 
-    const { errors } = await mutate(UPDATE_DASRI, {
-      variables: {
-        id: dasri.id,
-        input
+    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input
+        }
       }
-    });
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -130,12 +140,15 @@ describe("Mutation.updateBsdasri", () => {
         emitter: { company: { mail: "test@test.test" } }
       };
 
-      const { errors } = await mutate(UPDATE_DASRI, {
-        variables: {
-          id: dasri.id,
-          input
+      const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+        UPDATE_DASRI,
+        {
+          variables: {
+            id: dasri.id,
+            input
+          }
         }
-      });
+      );
 
       expect(errors).toEqual([
         expect.objectContaining({
@@ -165,12 +178,15 @@ describe("Mutation.updateBsdasri", () => {
         emitter: { company: { mail: "test@test.test" } }
       };
 
-      const { data } = await mutate(UPDATE_DASRI, {
-        variables: {
-          id: dasri.id,
-          input
+      const { data } = await mutate<Pick<Mutation, "updateBsdasri">>(
+        UPDATE_DASRI,
+        {
+          variables: {
+            id: dasri.id,
+            input
+          }
         }
-      });
+      );
 
       expect(data.updateBsdasri.emitter.company.mail).toBe("test@test.test");
     }
@@ -198,9 +214,12 @@ describe("Mutation.updateBsdasri", () => {
       }
     };
 
-    const { errors } = await mutate(UPDATE_DASRI, {
-      variables: { id: dasri.id, input }
-    });
+    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: { id: dasri.id, input }
+      }
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -241,7 +260,7 @@ describe("Mutation.updateBsdasri", () => {
       }
     };
 
-    await mutate(UPDATE_DASRI, {
+    await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
       variables: { id: dasri.id, input }
     });
 
@@ -280,9 +299,12 @@ describe("Mutation.updateBsdasri", () => {
       }
     };
 
-    const { errors } = await mutate(UPDATE_DASRI, {
-      variables: { id: dasri.id, input }
-    });
+    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: { id: dasri.id, input }
+      }
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -316,7 +338,7 @@ describe("Mutation.updateBsdasri", () => {
       }
     };
 
-    await mutate(UPDATE_DASRI, {
+    await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
       variables: { id: dasri.id, input }
     });
     const updatedDasri = await prisma.bsdasri.findUnique({
@@ -345,9 +367,12 @@ describe("Mutation.updateBsdasri", () => {
       }
     };
     // handedOverToRecipientAt can be updated even after dasri is sent, but not when it is received
-    const { errors } = await mutate(UPDATE_DASRI, {
-      variables: { id: dasri.id, input }
-    });
+    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: { id: dasri.id, input }
+      }
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -386,7 +411,7 @@ describe("Mutation.updateBsdasri", () => {
       }
     };
 
-    await mutate(UPDATE_DASRI, {
+    await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
       variables: { id: dasri.id, input }
     });
     const updatedDasri = await prisma.bsdasri.findUnique({
@@ -418,9 +443,12 @@ describe("Mutation.updateBsdasri", () => {
       reception: { wasteDetails: { quantity: 22 } }
     };
 
-    const { errors } = await mutate(UPDATE_DASRI, {
-      variables: { id: dasri.id, input }
-    });
+    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: { id: dasri.id, input }
+      }
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -452,7 +480,7 @@ describe("Mutation.updateBsdasri", () => {
       operation: { processingOperation: "D10" }
     };
 
-    await mutate(UPDATE_DASRI, {
+    await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
       variables: { id: dasri.id, input }
     });
 

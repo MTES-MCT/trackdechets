@@ -9,6 +9,7 @@ import {
   readyToTakeOverData
 } from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
+import { Mutation } from "../../../../generated/graphql/types";
 
 import { SIGN_DASRI } from "./signUtils";
 
@@ -38,7 +39,7 @@ describe("Mutation.signBsdasri transport", () => {
     });
     const { mutate } = makeClient(transporter);
 
-    await mutate(SIGN_DASRI, {
+    await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
       variables: {
         id: dasri.id,
         input: { type: "TRANSPORT", author: "Jimmy" }
@@ -80,7 +81,7 @@ describe("Mutation.signBsdasri transport", () => {
     });
     const { mutate } = makeClient(transporter);
 
-    const { errors } = await mutate(SIGN_DASRI, {
+    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
       variables: {
         id: dasri.id,
         input: { type: "TRANSPORT", author: "Jimmy" }
@@ -114,7 +115,7 @@ describe("Mutation.signBsdasri transport", () => {
     });
     const { mutate } = makeClient(transporter);
 
-    const { errors } = await mutate(SIGN_DASRI, {
+    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
       variables: {
         id: dasri.id,
         input: { type: "TRANSPORT", author: "Jimmy" }

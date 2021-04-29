@@ -5,6 +5,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { bsdasriFactory } from "../../../__tests__/factories";
 import { BsdasriStatus } from "@prisma/client";
 import prisma from "../../../../prisma";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const CREATE_DASRI = `
 mutation DasriCreate($input: BsdasriCreateInput!) {
@@ -68,11 +69,14 @@ describe("Mutation.createDasri", () => {
     };
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_DASRI, {
-      variables: {
-        input
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
       }
-    });
+    );
     expect(errors).toEqual([
       expect.objectContaining({
         message:
@@ -130,11 +134,14 @@ describe("Mutation.createDasri", () => {
     };
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_DASRI, {
-      variables: {
-        input
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
       }
-    });
+    );
     expect(errors).toEqual([
       expect.objectContaining({
         message: `Les dasris suivants ne peuvent pas être regroupés ${toRegroup1.id}`,
@@ -201,11 +208,14 @@ describe("Mutation.createDasri", () => {
     };
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_DASRI, {
-      variables: {
-        input
+    const { data } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
       }
-    });
+    );
     expect(data.createBsdasri.regroupedBsdasris).toEqual([
       toRegroup1.id,
       toRegroup2.id

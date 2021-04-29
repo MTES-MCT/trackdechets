@@ -10,6 +10,7 @@ import {
   readyToReceiveData
 } from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
+import { Mutation } from "../../../../generated/graphql/types";
 
 import { SIGN_DASRI } from "./signUtils";
 
@@ -44,7 +45,7 @@ describe("Mutation.signBsdasri reception", () => {
 
     const { mutate } = makeClient(recipient); // recipient
 
-    await mutate(SIGN_DASRI, {
+    await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
       variables: {
         id: dasri.id,
         input: { type: "RECEPTION", author: "Monique" }
@@ -93,7 +94,7 @@ describe("Mutation.signBsdasri reception", () => {
 
     const { mutate } = makeClient(recipient); // recipient
 
-    await mutate(SIGN_DASRI, {
+    await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
       variables: {
         id: dasri.id,
         input: { type: "RECEPTION", author: "Monique" }
@@ -140,7 +141,7 @@ describe("Mutation.signBsdasri reception", () => {
     });
     const { mutate } = makeClient(recipient);
 
-    await mutate(SIGN_DASRI, {
+    await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
       variables: {
         id: dasri.id,
         input: { type: "RECEPTION", author: "Caroline" }

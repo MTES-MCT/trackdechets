@@ -6,6 +6,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
+import { Query } from "../../../../generated/graphql/types";
 
 const GET_BSDASRIS = `
 query bsDasris($where: BsdasriWhere) {
@@ -119,7 +120,7 @@ describe("Query.Bsdasris", () => {
       }
     });
 
-    const { errors } = await query(GET_BSDASRIS);
+    const { errors } = await query<Pick<Query, "bsdasris">>(GET_BSDASRIS);
     expect(errors).toEqual([
       expect.objectContaining({
         message: "Vous n'êtes pas connecté.",
@@ -142,7 +143,7 @@ describe("Query.Bsdasris", () => {
 
     const { user } = await userWithCompanyFactory("MEMBER");
     const { query } = makeClient(user);
-    const { data } = await query(GET_BSDASRIS, {
+    const { data } = await query<Pick<Query, "bsdasris">>(GET_BSDASRIS, {
       variables: {
         where: { transporter: { company: { siret: "9999" } } }
       }
@@ -165,7 +166,7 @@ describe("Query.Bsdasris", () => {
 
     const { query } = makeClient(user);
 
-    const { data } = await query(GET_BSDASRIS);
+    const { data } = await query<Pick<Query, "bsdasris">>(GET_BSDASRIS);
     const ids = data.bsdasris.edges.map(edge => edge.node.id);
     expect(ids.length).toBe(3);
 
@@ -210,11 +211,16 @@ describe("Query.Bsdasris", () => {
     const { query } = makeClient(user);
 
     // retrieve dasris where transporter is otherCompany
-    const { data: queryTransporter } = await query(GET_BSDASRIS, {
-      variables: {
-        where: { transporter: { company: { siret: transporterCompany.siret } } }
+    const { data: queryTransporter } = await query<Pick<Query, "bsdasris">>(
+      GET_BSDASRIS,
+      {
+        variables: {
+          where: {
+            transporter: { company: { siret: transporterCompany.siret } }
+          }
+        }
       }
-    });
+    );
     const queryTransporterIds = queryTransporter.bsdasris.edges.map(
       edge => edge.node.id
     );
@@ -222,11 +228,14 @@ describe("Query.Bsdasris", () => {
     expect(queryTransporterIds).toStrictEqual([dasri2.id]);
 
     // retrieve dasris where recipient is otherCompany
-    const { data: queryRecipient } = await query(GET_BSDASRIS, {
-      variables: {
-        where: { recipient: { company: { siret: recipientCompany.siret } } }
+    const { data: queryRecipient } = await query<Pick<Query, "bsdasris">>(
+      GET_BSDASRIS,
+      {
+        variables: {
+          where: { recipient: { company: { siret: recipientCompany.siret } } }
+        }
       }
-    });
+    );
     const queryRecipientIids = queryRecipient.bsdasris.edges.map(
       edge => edge.node.id
     );
