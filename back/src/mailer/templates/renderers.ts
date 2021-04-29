@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import mustache from "mustache";
-import { getUIBaseURL } from "../../utils";
+import { getUIBaseURL, getAPIBaseURL } from "../../utils";
 import { Attachment, Mail, MailTemplate, Recipient } from "../types";
 
 const TEMPLATE_DIR = `${__dirname}/mustache`;
@@ -35,7 +35,7 @@ type MailRendererInput<V> = {
 };
 
 // These variables will be made available to all templates
-const context = { UI_URL: getUIBaseURL() };
+const context = { UI_URL: getUIBaseURL(), API_URL: getAPIBaseURL() };
 
 /**
  * Render a mail definition into a fully featured mail that can
