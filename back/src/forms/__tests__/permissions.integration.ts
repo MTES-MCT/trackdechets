@@ -365,8 +365,6 @@ describe("checkSecurityCode", () => {
   test("securityCode is invalid", async () => {
     const company = await companyFactory();
     const checkFn = () => checkSecurityCode(company.siret, 1258478956);
-    expect(checkFn).rejects.toThrow(
-      "Le code de signature de l'émetteur du bordereau est invalide."
-    );
+    expect(checkFn).rejects.toThrow("Le code de signature est invalide.");
   });
 });

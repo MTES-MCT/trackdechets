@@ -44,6 +44,88 @@ Siret d'un des établissements dont je suis membre
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>bsda</strong></td>
+<td valign="top"><a href="#bsda">Bsda</a>!</td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>bsdas</strong></td>
+<td valign="top"><a href="#bsdaconnection">BsdaConnection</a>!</td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">after</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Permet en conjonction avec `first` de paginer "en avant"
+(des bordereaux les plus récents aux bordereaux les plus anciens)
+Curseur après lequel les bordereaux doivent être retournés
+Attend un identifiant (propriété `id`) de BSD
+Défaut à vide, pour retourner les bordereaux les plus récents
+Le BSD précisé dans le curseur ne fait pas partie du résultat
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">first</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Permet en conjonction avec `cursorAfter` de paginer "en avant"
+(des bordereaux les plus récents aux bordereaux les plus anciens)
+Nombre de bordereaux retournés après le `cursorAfter`
+Défaut à 50, maximum à 500
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">before</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Permet en conjonction avec `last` de paginer "en arrière"
+(des bordereaux les plus anciens aux bordereaux les plus récents)
+Curseur avant lequel les bordereaux doivent être retournés
+Attend un identifiant (propriété `id`) de BSD
+Défaut à vide, pour retourner les bordereaux les plus anciens
+Le BSD précisé dans le curseur ne fait pas partie du résultat
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">last</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+(Optionnel) PAGINATION
+Nombre de bordereaux retournés avant le `cursorBefore`
+Défaut à 50, maximum à 500
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">where</td>
+<td valign="top"><a href="#bsdawhere">BsdaWhere</a></td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>bsdasri</strong></td>
 <td valign="top"><a href="#bsdasri">Bsdasri</a>!</td>
 <td>
@@ -817,6 +899,21 @@ Mutation permettant d'ajouter une fiche d'intervention à un bordereau existant.
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>createBsda</strong></td>
+<td valign="top"><a href="#bsda">Bsda</a></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Crée un Bsda
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#bsdainput">BsdaInput</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>createBsdasri</strong></td>
 <td valign="top"><a href="#bsdasri">Bsdasri</a>!</td>
 <td>
@@ -862,6 +959,21 @@ Crée un BSVHU
 <tr>
 <td colspan="2" align="right" valign="top">input</td>
 <td valign="top"><a href="#bsvhuinput">BsvhuInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>createDraftBsda</strong></td>
+<td valign="top"><a href="#bsda">Bsda</a></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Crée un Bsda en brouillon
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#bsdainput">BsdaInput</a>!</td>
 <td></td>
 </tr>
 <tr>
@@ -994,6 +1106,25 @@ Mutation permettant de supprimer une fiche d'intervention lié à un bordereau e
 <td>
 
 Supprime un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ID d'un BSD
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>duplicateBsda</strong></td>
+<td valign="top"><a href="#bsda">Bsda</a></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Duplique un Bsda
 
 </td>
 </tr>
@@ -1431,6 +1562,21 @@ Prépare un nouveau segment de transport multimodal
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>publishBsda</strong></td>
+<td valign="top"><a href="#bsda">Bsda</a></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Permet de publier un brouillon pour le marquer comme prêt à être envoyé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>publishBsdasri</strong></td>
 <td valign="top"><a href="#bsdasri">Bsdasri</a></td>
 <td>
@@ -1503,6 +1649,26 @@ l'établissement qui ont le choix de l'accepter ou de la refuser.
 <tr>
 <td colspan="2" align="right" valign="top">siret</td>
 <td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signBsda</strong></td>
+<td valign="top"><a href="#bsda">Bsda</a></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Signe un Bsda
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#bsdasignatureinput">BsdaSignatureInput</a>!</td>
 <td></td>
 </tr>
 <tr>
@@ -1653,6 +1819,26 @@ Marque un segment comme pris en charge par le nouveau transporteur
 <tr>
 <td colspan="2" align="right" valign="top">takeOverInfo</td>
 <td valign="top"><a href="#takeoverinput">TakeOverInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>updateBsda</strong></td>
+<td valign="top"><a href="#bsda">Bsda</a></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Met à jour un Bsda
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#bsdainput">BsdaInput</a>!</td>
 <td></td>
 </tr>
 <tr>
@@ -1939,6 +2125,809 @@ Limite de validité du récépissé
 <td>
 
 Département ayant enregistré la déclaration
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### Bsda
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Bordereau n°
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>createdAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Date de création
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>updatedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Date de dernière modification
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>isDraft</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+Indique si le bordereau est à l'état de brouillon
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>status</strong></td>
+<td valign="top"><a href="#bsdastatus">BsdaStatus</a>!</td>
+<td>
+
+Statur du bordereau
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsdatype">BsdaType</a></td>
+<td>
+
+Type de bordereau
+Le type de bordereau impacte le workflow et les champs obligatoires
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#bsdaemitter">BsdaEmitter</a></td>
+<td>
+
+Maitre d'ouvrage ou détenteur du déchet
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>waste</strong></td>
+<td valign="top"><a href="#bsdawaste">BsdaWaste</a></td>
+<td>
+
+Dénomination du déchet
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>packagings</strong></td>
+<td valign="top">[<a href="#bsdapackaging">BsdaPackaging</a>!]</td>
+<td>
+
+Conditionnement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#bsdaquantity">BsdaQuantity</a></td>
+<td>
+
+Quantité
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>destination</strong></td>
+<td valign="top"><a href="#bsdadestination">BsdaDestination</a></td>
+<td>
+
+Installation de destination
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>worker</strong></td>
+<td valign="top"><a href="#bsdaworker">BsdaWorker</a></td>
+<td>
+
+Entreprise de travaux
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#bsdatransporter">BsdaTransporter</a></td>
+<td>
+
+Entreprise de transport
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>associations</strong></td>
+<td valign="top">[<a href="#bsdaassociation">BsdaAssociation</a>]</td>
+<td>
+
+Précedents BSDA associés, constituant l'historique de traçabilité
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaAssociation
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>status</strong></td>
+<td valign="top"><a href="#bsdastatus">BsdaStatus</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaConnection
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>totalCount</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>pageInfo</strong></td>
+<td valign="top"><a href="#pageinfo">PageInfo</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>edges</strong></td>
+<td valign="top">[<a href="#bsdaedge">BsdaEdge</a>!]!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaDestination
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+
+Établissement de destination
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>cap</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+N° de CAP (le cas échéant)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>plannedOperationCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Opération d'élimination / valorisation prévue (code D/R)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>reception</strong></td>
+<td valign="top"><a href="#bsdareception">BsdaReception</a></td>
+<td>
+
+Expédition reçue à l'installation de destination
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsdaoperation">BsdaOperation</a></td>
+<td>
+
+Réalisation de l'opération (case 11)
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaEdge
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>cursor</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>node</strong></td>
+<td valign="top"><a href="#bsda">Bsda</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaEmission
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaEmitter
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>isPrivateIndividual</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+Indique si le détenteur est un particulier ou une entreprise
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+
+Établissement MOA/détenteur. Partiellement rempli si l'émetteur est en fait un particulier
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>worksite</strong></td>
+<td valign="top"><a href="#bsdaworksite">BsdaWorksite</a></td>
+<td>
+
+Informations chantier (si différente de l'adresse de l'entreprise)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emission</strong></td>
+<td valign="top"><a href="#bsdaemission">BsdaEmission</a></td>
+<td>
+
+Déclaration générale
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaOperation
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code D/R
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Date de réalisation de l'opération
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaPackaging
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsdapackagingtype">BsdaPackagingType</a>!</td>
+<td>
+
+Type de conditionnement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>other</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+Nombre de colis associés à ce conditionnement
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaQuantity
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsdaquantitytype">BsdaQuantityType</a></td>
+<td>
+
+Type de quantité (réelle ou estimé)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>value</strong></td>
+<td valign="top"><a href="#float">Float</a></td>
+<td>
+
+Quantité en tonne
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaRecepisse
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>number</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaReception
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Date de présentation sur site
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#bsdaquantity">BsdaQuantity</a></td>
+<td>
+
+Quantité présentée
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>acceptationStatus</strong></td>
+<td valign="top"><a href="#bsdaacceptationstatus">BsdaAcceptationStatus</a></td>
+<td>
+
+Lot accepté, accepté partiellement ou refusé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>refusalReason</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Motif de refus
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a></td>
+<td>
+
+Signature case 10
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaTransport
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaTransporter
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+
+Coordonnées de l'entreprise de transport
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>recepisse</strong></td>
+<td valign="top"><a href="#bsdarecepisse">BsdaRecepisse</a></td>
+<td>
+
+Récépissé transporteur
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transport</strong></td>
+<td valign="top"><a href="#bsdatransport">BsdaTransport</a></td>
+<td>
+
+Déclaration générale
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaWaste
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Rubrique Déchet
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Dénomination usuelle
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>familyCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code famille
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>materialName</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Nom du matériau
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>consistence</strong></td>
+<td valign="top"><a href="#bsdaconsistence">BsdaConsistence</a></td>
+<td>
+
+Consistence
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>sealNumbers</strong></td>
+<td valign="top">[<a href="#string">String</a>!]</td>
+<td>
+
+Numéros de scellés
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>adr</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Mention ADR
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaWork
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>hasEmitterPaperSignature</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+Indique si l'entreprise de travaux a une signature papier du MOA/détenteur du déchet
+Remettre une signature papier permet au détenteur de ne pas à avoir à signer sur la plateforme
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaWorker
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+
+Entreprise de travaux
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>work</strong></td>
+<td valign="top"><a href="#bsdawork">BsdaWork</a></td>
+<td>
+
+Déclaration générale
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaWorksite
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>address</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>city</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>postalCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>infos</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Autres informations, notamment le code chantier
 
 </td>
 </tr>
@@ -7071,6 +8060,910 @@ Limite de validité
 </tbody>
 </table>
 
+### BsdaCompanyWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>siret</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaDestinationInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td>
+
+Établissement de destination
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>cap</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+N° de CAP (le cas échéant)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>plannedOperationCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Opération d'élimination / valorisation prévue (code D/R)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>reception</strong></td>
+<td valign="top"><a href="#bsdareceptioninput">BsdaReceptionInput</a></td>
+<td>
+
+Expédition reçue à l'installation de destination
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsdaoperationinput">BsdaOperationInput</a></td>
+<td>
+
+Réalisation de l'opération (case 11)
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaDestinationWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#bsdacompanywhere">BsdaCompanyWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsdaoperationwhere">BsdaOperationWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaEmissionWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsdasignaturewhere">BsdaSignatureWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaEmitterInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>isPrivateIndividual</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+Indique si le détenteur est un particulier ou une entreprise
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td>
+
+Établissement MOA/détenteur. Partiellement rempli si l'émetteur est en fait un particulier
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>worksite</strong></td>
+<td valign="top"><a href="#bsdaworksiteinput">BsdaWorksiteInput</a></td>
+<td>
+
+Informations chantier (si différente de l'adresse de l'entreprise)
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaEmitterWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#bsdacompanywhere">BsdaCompanyWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emission</strong></td>
+<td valign="top"><a href="#bsdaemissionwhere">BsdaEmissionWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsdatype">BsdaType</a></td>
+<td>
+
+Type de bordereau
+Le type de bordereau impacte le workflow et les champs obligatoires
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#bsdaemitterinput">BsdaEmitterInput</a></td>
+<td>
+
+Maitre d'ouvrage ou détenteur du déchet
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>waste</strong></td>
+<td valign="top"><a href="#bsdawasteinput">BsdaWasteInput</a></td>
+<td>
+
+Dénomination du déchet
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>packagings</strong></td>
+<td valign="top">[<a href="#bsdapackaginginput">BsdaPackagingInput</a>!]</td>
+<td>
+
+Conditionnement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#bsdaquantityinput">BsdaQuantityInput</a></td>
+<td>
+
+Quantité
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>destination</strong></td>
+<td valign="top"><a href="#bsdadestinationinput">BsdaDestinationInput</a></td>
+<td>
+
+Installation de destination
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>worker</strong></td>
+<td valign="top"><a href="#bsdaworkerinput">BsdaWorkerInput</a></td>
+<td>
+
+Entreprise de travaux
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#bsdatransporterinput">BsdaTransporterInput</a></td>
+<td>
+
+ Entreprise de transport
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaOperationInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code D/R
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Date de réalisation de l'opération
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaOperationWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsdasignaturewhere">BsdaSignatureWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaPackagingInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsdapackagingtype">BsdaPackagingType</a></td>
+<td>
+
+Type de conditionnement
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>other</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+Nombre de colis associés à ce conditionnement
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaQuantityInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsdaquantitytype">BsdaQuantityType</a></td>
+<td>
+
+Type de quantité (réelle ou estimé)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>value</strong></td>
+<td valign="top"><a href="#float">Float</a></td>
+<td>
+
+Quantité en tonne
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaRecepisseInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>number</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaReceptionInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Date de présentation sur site
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#bsdaquantityinput">BsdaQuantityInput</a></td>
+<td>
+
+Quantité présentée
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>acceptationStatus</strong></td>
+<td valign="top"><a href="#bsdaacceptationstatus">BsdaAcceptationStatus</a></td>
+<td>
+
+Lot accepté, accepté partiellement ou refusé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>refusalReason</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Motif de refus
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaSignatureInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsdasignaturetype">BsdaSignatureType</a>!</td>
+<td>
+
+Type de signature apposé
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Date de la signature
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>author</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Nom et prénom du signataire
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>securityCode</strong></td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+Code de sécurité de l'entreprise pour laquelle on signe. Permet de signer en tant que. Optionnel
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaSignatureWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datefilter">DateFilter</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaTransportWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsdasignaturewhere">BsdaSignatureWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaTransporterInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td>
+
+Entreprise de transport
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>recepisse</strong></td>
+<td valign="top"><a href="#bsdarecepisseinput">BsdaRecepisseInput</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaTransporterWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#bsdacompanywhere">BsdaCompanyWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transport</strong></td>
+<td valign="top"><a href="#bsdatransportwhere">BsdaTransportWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaWasteInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Rubrique Déchet
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Dénomination usuelle
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>familyCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code famille
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>materialName</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Nom du matériau
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>consistence</strong></td>
+<td valign="top"><a href="#bsdaconsistence">BsdaConsistence</a></td>
+<td>
+
+Consistence
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>sealNumbers</strong></td>
+<td valign="top">[<a href="#string">String</a>!]</td>
+<td>
+
+Numéros de scellés
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>adr</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Mention ADR
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>isDraft</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>status</strong></td>
+<td valign="top"><a href="#bsdastatus">BsdaStatus</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>createdAt</strong></td>
+<td valign="top"><a href="#datefilter">DateFilter</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>updatedAt</strong></td>
+<td valign="top"><a href="#datefilter">DateFilter</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#bsdaemitterwhere">BsdaEmitterWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>worker</strong></td>
+<td valign="top"><a href="#bsdaworkerwhere">BsdaWorkerWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#bsdatransporterwhere">BsdaTransporterWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>destination</strong></td>
+<td valign="top"><a href="#bsdadestinationwhere">BsdaDestinationWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>_and</strong></td>
+<td valign="top">[<a href="#bsdawhere">BsdaWhere</a>!]</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>_or</strong></td>
+<td valign="top">[<a href="#bsdawhere">BsdaWhere</a>!]</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>_not</strong></td>
+<td valign="top">[<a href="#bsdawhere">BsdaWhere</a>!]</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaWorkInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>hasEmitterPaperSignature</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+
+Indique si l'entreprise de travaux a une signature papier du MOA/détenteur du déchet
+Remettre une signature papier permet au détenteur de ne pas à avoir à signer sur la plateforme
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaWorkWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsdasignaturewhere">BsdaSignatureWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaWorkerInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td>
+
+Entreprise de travaux
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>work</strong></td>
+<td valign="top"><a href="#bsdaworkinput">BsdaWorkInput</a></td>
+<td>
+
+Déclaration générale
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsdaWorkerWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#bsdacompanywhere">BsdaCompanyWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>work</strong></td>
+<td valign="top"><a href="#bsdaworkwhere">BsdaWorkWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaWorksiteInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>address</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>city</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>postalCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>infos</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Autres informations, notamment le code chantier
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### BsdasriCompanyWhere
 
 <table>
@@ -10966,6 +12859,205 @@ Payload d'une adresse chantier
 </table>
 
 ## Enums
+
+### BsdaAcceptationStatus
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>ACCEPTED</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>REFUSED</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>PARTIALLY_REFUSED</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaConsistence
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>SOLIDE</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>PULVERULENT</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>OTHER</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaPackagingType
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>PALETTE_FILME</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>BIG_BAG</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>DEPOT_BAG</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>SAC_RENFORCE</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>BODY_BENNE</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>OTHER</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaQuantityType
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>REAL</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>ESTIMATED</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaSignatureType
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>EMISSION</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>WORK</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>TRANSPORT</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>OPERATION</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaStatus
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>INITIAL</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>SIGNED_BY_PRODUCER</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>SIGNED_BY_WORKER</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>SENT</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>PROCESSED</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>REFUSED</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>AWAITING_CHILD</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsdaType
+
+4 types de bordereaux possibles:
+  - Collecte dans un établissement 2710-1 (déchetterie)
+  - Autres collectes
+  - Regroupement
+  - Ré-expédition
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>COLLECTION_2710</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>OTHER_COLLECTIONS</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>GATHERING</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>RESHIPMENT</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 
 ### BsdasriEmitterType
 

@@ -1,28 +1,28 @@
-import { Bsvhu, BsvhuStatus } from "@prisma/client";
+import { Bsda, BsdaStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkSecurityCode } from "../../../forms/permissions";
 import {
-  MutationSignBsvhuArgs,
-  SignatureTypeInput
+  BsdaSignatureType,
+  MutationSignBsdaArgs
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
-import { expandVhuFormFromDb } from "../../converter";
+import { AlreadySignedError, InvalidSignatureError } from "../../../vhu/errors";
+import { expandBsdaFormFromDb } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
-import { AlreadySignedError, InvalidSignatureError } from "../../errors";
 import { machine } from "../../machine";
-import { validateBsvhu } from "../../validation";
-import { indexBsvhu } from "../../elastic";
+import { validateBsda } from "../../validation";
+
 type SignatureTypeInfos = {
-  dbDateKey: keyof Bsvhu;
-  dbAuthorKey: keyof Bsvhu;
-  getAuthorizedSiret: (form: Bsvhu) => string;
+  dbDateKey: keyof Bsda;
+  dbAuthorKey: keyof Bsda;
+  getAuthorizedSiret: (form: Bsda) => string;
 };
 
 export default async function sign(
   _,
-  { id, input }: MutationSignBsvhuArgs,
+  { id, input }: MutationSignBsdaArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
@@ -44,10 +44,12 @@ export default async function sign(
   }
 
   // Check that all necessary fields are filled
-  await validateBsvhu(prismaForm, {
+  await validateBsda(prismaForm, {
     emissionSignature:
       prismaForm.emitterEmissionSignatureDate != null ||
       input.type === "EMISSION",
+    workSignature:
+      prismaForm.workerWorkSignatureDate != null || input.type === "WORK",
     transportSignature:
       prismaForm.transporterTransportSignatureDate != null ||
       input.type === "TRANSPORT",
@@ -58,31 +60,36 @@ export default async function sign(
 
   const { value: newStatus } = machine.transition(prismaForm.status, {
     type: input.type,
-    bsvhu: prismaForm
+    bsda: prismaForm
   });
 
   if (newStatus === prismaForm.status) {
     throw new InvalidSignatureError();
   }
 
-  const signedForm = await prisma.bsvhu.update({
+  const signedForm = await prisma.bsda.update({
     where: { id },
     data: {
       [signatureTypeInfos.dbAuthorKey]: input.author,
       [signatureTypeInfos.dbDateKey]: new Date(input.date),
-      isDraft: false, // If it was one, signing always "un-drafts" it,
-      status: newStatus as BsvhuStatus
+      isDraft: false,
+      status: newStatus as BsdaStatus
     }
   });
-  await indexBsvhu(signedForm);
-  return expandVhuFormFromDb(signedForm);
+
+  return expandBsdaFormFromDb(signedForm);
 }
 
-const signatureTypeMapping: Record<SignatureTypeInput, SignatureTypeInfos> = {
+const signatureTypeMapping: Record<BsdaSignatureType, SignatureTypeInfos> = {
   EMISSION: {
     dbDateKey: "emitterEmissionSignatureDate",
     dbAuthorKey: "emitterEmissionSignatureAuthor",
     getAuthorizedSiret: form => form.emitterCompanySiret
+  },
+  WORK: {
+    dbDateKey: "workerWorkSignatureDate",
+    dbAuthorKey: "workerWorkSignatureAuthor",
+    getAuthorizedSiret: form => form.workerCompanySiret
   },
   OPERATION: {
     dbDateKey: "destinationOperationSignatureDate",

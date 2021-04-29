@@ -787,7 +787,6 @@ model Bsdasri {
   receptionSignatureDate   DateTime?
   receptionSignatureAuthor String?
 
-
   operationSignatory       User?     @relation("BsdasriOperationSignature", fields: [operationSignatoryId], references: [id])
   operationSignatoryId     String?
   operationSignatureDate   DateTime?
@@ -891,4 +890,118 @@ model BsffFicheIntervention {
 
   Bsff   Bsff?   @relation("FicheInterventionToBsff", fields: [bsffId], references: [id])
   bsffId String?
+}
+
+// ----------------
+// BSDA FORM
+// ----------------
+enum BsdaStatus {
+  INITIAL
+  SIGNED_BY_PRODUCER
+  SIGNED_BY_WORKER
+  SENT
+  PROCESSED
+  REFUSED
+  AWAITING_CHILD
+}
+
+enum BsdaType {
+  COLLECTION_2710
+  OTHER_COLLECTIONS
+  GATHERING
+  RESHIPMENT
+}
+
+enum BsdaConsistence {
+  SOLIDE
+  PULVERULENT
+  OTHER
+}
+
+model Bsda {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDraft   Boolean  @default(false)
+  isDeleted Boolean  @default(false)
+
+  status BsdaStatus @default(INITIAL)
+  type   BsdaType   @default(OTHER_COLLECTIONS)
+
+  emitterIsPrivateIndividual     Boolean?
+  emitterCompanyName             String?
+  emitterCompanySiret            String?
+  emitterCompanyAddress          String?
+  emitterCompanyContact          String?
+  emitterCompanyPhone            String?
+  emitterCompanyMail             String?
+  emitterWorkSiteName            String?
+  emitterWorkSiteAddress         String?
+  emitterWorkSiteCity            String?
+  emitterWorkSitePostalCode      String?
+  emitterWorkSiteInfos           String?
+  emitterEmissionSignatureAuthor String?
+  emitterEmissionSignatureDate   DateTime?
+
+  wasteCode         String?
+  wasteName         String?
+  wasteFamilyCode   String?
+  wasteMaterialName String?
+  wasteConsistence  BsdaConsistence?
+  wasteSealNumbers  String[]
+  wasteAdr          String?
+
+  packagings    Json?
+  quantityType  QuantityType?
+  quantityValue Float?
+
+  destinationCompanyName          String?
+  destinationCompanySiret         String?
+  destinationCompanyAddress       String?
+  destinationCompanyContact       String?
+  destinationCompanyPhone         String?
+  destinationCompanyMail          String?
+  destinationCap                  String?
+  destinationPlannedOperationCode String?
+
+  destinationReceptionDate              DateTime?
+  destinationReceptionQuantityType      QuantityType?
+  destinationReceptionQuantityValue     Float?
+  destinationReceptionAcceptationStatus WasteAcceptationStatus?
+  destinationReceptionRefusalReason     String?
+  destinationReceptionSignatureAuthor   String?
+  destinationReceptionSignatureDate     DateTime?
+
+  destinationOperationCode            String?
+  destinationOperationDate            DateTime?
+  destinationOperationSignatureAuthor String?
+  destinationOperationSignatureDate   DateTime?
+
+  transporterCompanyName              String?
+  transporterCompanySiret             String?
+  transporterCompanyAddress           String?
+  transporterCompanyContact           String?
+  transporterCompanyPhone             String?
+  transporterCompanyMail              String?
+  transporterCompanyVatNumber         String?
+  transporterRecepisseNumber          String?
+  transporterRecepisseDepartment      String?
+  transporterRecepisseValidityLimit   DateTime?
+  transporterTransportSignatureAuthor String?
+  transporterTransportSignatureDate   DateTime?
+
+  workerCompanyName    String?
+  workerCompanySiret   String?
+  workerCompanyAddress String?
+  workerCompanyContact String?
+  workerCompanyPhone   String?
+  workerCompanyMail    String?
+
+  workerWorkHasEmitterPaperSignature Boolean?
+  workerWorkSignatureAuthor          String?
+  workerWorkSignatureDate            DateTime?
+
+  bsdas       Bsda[]  @relation("BsdasToBsda")
+  childBsda   Bsda?   @relation("BsdasToBsda", fields: [childBsdaId], references: [id])
+  childBsdaId String?
 }
