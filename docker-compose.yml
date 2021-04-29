@@ -70,6 +70,7 @@ services:
       VERIFY_COMPANY: $VERIFY_COMPANY
       X-OVH-TOKEN: $OVH_LOGS_TOKEN
       ELASTIC_SEARCH_URL: $ELASTIC_SEARCH_URL
+      SCALINGO_CERT: $SCALINGO_CERT
 
       facility: docker-td-api
     logging: *gelf-logging
