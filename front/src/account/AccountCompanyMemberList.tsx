@@ -9,6 +9,8 @@ import {
 } from "generated/graphql/types";
 import * as COMPANY_TYPES from "generated/constants/COMPANY_TYPES";
 
+const { REACT_APP_VERIFY_COMPANY } = process.env;
+
 type Props = { company: CompanyPrivate };
 
 AccountCompanyMemberList.fragments = {
@@ -38,7 +40,9 @@ export default function AccountCompanyMemberList({ company }: Props) {
 
   return (
     <>
-      {!isProfessional || (isProfessional && isVerified) ? (
+      {REACT_APP_VERIFY_COMPANY !== "true" ||
+      !isProfessional ||
+      (isProfessional && isVerified) ? (
         <AccountFormCompanyInviteNewUser
           company={filter(
             AccountFormCompanyInviteNewUser.fragments.company,

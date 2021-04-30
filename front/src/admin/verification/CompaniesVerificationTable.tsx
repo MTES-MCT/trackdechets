@@ -64,9 +64,13 @@ export default function CompaniesVerificationTable({
         disableFilters: true,
         Cell: ({ value: admin }) => (
           <>
-            <div>{admin.email}</div>
-            {admin?.name && <div>{admin?.name}</div>}
-            {admin?.phone && <div>{admin?.phone}</div>}
+            {admin && (
+              <>
+                <div>{admin.email}</div>
+                {admin?.name && <div>{admin?.name}</div>}
+                {admin?.phone && <div>{admin?.phone}</div>}
+              </>
+            )}
           </>
         ),
       },
