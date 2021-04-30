@@ -6,8 +6,7 @@ import {
   Form,
   QuantityType,
   WasteAcceptationStatus,
-  Prisma,
-  CompanyVerificationStatus
+  Prisma
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
@@ -24,8 +23,6 @@ import { PackagingInfo, Packagings } from "../generated/graphql/types";
 
 // set yup default error messages
 configureYup();
-
-const { VERIFY_COMPANY } = process.env;
 
 // ************************************************
 // BREAK DOWN FORM TYPE INTO INDIVIDUAL FRAME TYPES
