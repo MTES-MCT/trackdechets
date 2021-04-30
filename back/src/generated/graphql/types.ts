@@ -1657,6 +1657,7 @@ export type Mutation = {
    * l'établissement qui ont le choix de l'accepter ou de la refuser.
    */
   sendMembershipRequest?: Maybe<MembershipRequest>;
+  sendVerificationCodeLetter: CompanyForVerification;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Signe un BSVHU
@@ -1929,6 +1930,10 @@ export type MutationSaveFormArgs = {
 
 export type MutationSendMembershipRequestArgs = {
   siret: Scalars["String"];
+};
+
+export type MutationSendVerificationCodeLetterArgs = {
+  input: SendVerificationCodeLetterInput;
 };
 
 export type MutationSignBsvhuArgs = {
@@ -2466,6 +2471,10 @@ export type Rubrique = {
   unite?: Maybe<Scalars["String"]>;
   /** Type de déchets autorisé */
   wasteType?: Maybe<WasteType>;
+};
+
+export type SendVerificationCodeLetterInput = {
+  siret: Scalars["String"];
 };
 
 /** Payload de signature d'un BSD */
@@ -3354,6 +3363,7 @@ export type ResolversTypes = {
   TempStoredFormInput: TempStoredFormInput;
   TempStorerAcceptedFormInput: TempStorerAcceptedFormInput;
   FormInput: FormInput;
+  SendVerificationCodeLetterInput: SendVerificationCodeLetterInput;
   BsvhuSignatureInput: BsvhuSignatureInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignatureAuthor: SignatureAuthor;
@@ -3509,6 +3519,7 @@ export type ResolversParentTypes = {
   TempStoredFormInput: TempStoredFormInput;
   TempStorerAcceptedFormInput: TempStorerAcceptedFormInput;
   FormInput: FormInput;
+  SendVerificationCodeLetterInput: SendVerificationCodeLetterInput;
   BsvhuSignatureInput: BsvhuSignatureInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignupInput: SignupInput;
@@ -4918,6 +4929,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationSendMembershipRequestArgs, "siret">
+  >;
+  sendVerificationCodeLetter?: Resolver<
+    ResolversTypes["CompanyForVerification"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationSendVerificationCodeLetterArgs, "input">
   >;
   signBsvhu?: Resolver<
     Maybe<ResolversTypes["Bsvhu"]>,
@@ -7035,6 +7052,15 @@ export function createRubriqueMock(props: Partial<Rubrique>): Rubrique {
     volume: null,
     unite: null,
     wasteType: null,
+    ...props
+  };
+}
+
+export function createSendVerificationCodeLetterInputMock(
+  props: Partial<SendVerificationCodeLetterInput>
+): SendVerificationCodeLetterInput {
+  return {
+    siret: "",
     ...props
   };
 }
