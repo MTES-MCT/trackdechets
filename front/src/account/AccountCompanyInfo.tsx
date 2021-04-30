@@ -16,8 +16,6 @@ import AccountFieldCompanyVhuAgrementBroyeur from "./fields/AccountFieldCompanyV
 import AccountFieldCompanyVhuAgrementDemolisseur from "./fields/AccountFieldCompanyVhuAgrementDemolisseur";
 import * as COMPANY_TYPES from "generated/constants/COMPANY_TYPES";
 
-const { REACT_APP_VERIFY_COMPANY } = process.env;
-
 type Props = { company: CompanyPrivate };
 
 AccountCompanyInfo.fragments = {
@@ -100,7 +98,7 @@ export default function AccountCompanyInfo({ company }: Props) {
       <AccountFieldCompanyTypes
         company={filter(AccountFieldCompanyTypes.fragments.company, company)}
       />
-      {REACT_APP_VERIFY_COMPANY === "true" && isWasteProfessional && (
+      {isWasteProfessional && (
         <AccountFieldCompanyVerificationStatus
           company={filter(
             AccountFieldCompanyVerificationStatus.fragments.company,
