@@ -82,7 +82,7 @@
             <input type="checkbox" {{#ifEquals bsdasri.wasteDetailsCode "18 01 03*"}}checked{{/ifEquals}} /> 18 01 03*: DASRI origine humaine 
           </p> 
           
-          <p><input type="checkbox" {{#ifEquals bsdasri.wasteDetailsCode "18 01 02*"}}checked{{/ifEquals}}/> 18 01 02* DASRI origine animale</p>
+          <p><input type="checkbox" {{#ifEquals bsdasri.wasteDetailsCode "18 01 02*"}}checked{{/ifEquals}}/> 18 01 02*: DASRI origine animale</p>
         
      
         </div> 
@@ -173,7 +173,7 @@
             </tbody>
           </table>
           <p style="display: flex">
-            < style="flex: 50%"><strong>Nbre de contenants : </strong>{{sumPackageQuantity bsdasri.transporterWastePackagingsInfo}} </span
+            <span style="flex: 50%"><strong>Nbre de contenants : </strong>{{sumPackageQuantity bsdasri.transporterWastePackagingsInfo}} </span
             ><span style="flex: 50%"> <strong>Volume total : </strong>{{bsdasri.transporterWasteVolume}}</span>
           </p>
           <p style="display: flex">
