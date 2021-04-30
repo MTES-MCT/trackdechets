@@ -22,9 +22,14 @@ export default async function sendVerificationCodeLetters() {
           data: { verificationStatus: CompanyVerificationStatus.LETTER_SENT },
           where: { id: company.id }
         });
+        console.log(`Successfully sent letter to company ${company.siret}`);
       } catch (err) {
-        console.log(err);
+        console.log(
+          `Error sending verification code letter to company ${company.siret}`
+        );
       }
     }
+  } else {
+    console.log("Company verification is disabled, skipping script...");
   }
 }

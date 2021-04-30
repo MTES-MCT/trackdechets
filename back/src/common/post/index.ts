@@ -22,6 +22,10 @@ const template = fs.readFileSync(
   { encoding: "utf8" }
 );
 
+function truncate(s: string) {
+  return s?.slice(0, 45) ?? "";
+}
+
 export async function sendVerificationCodeLetter(company: Company) {
   const sireneInfo = await searchCompany(company.siret);
   const admin = await prisma.companyAssociation
@@ -34,12 +38,12 @@ export async function sendVerificationCodeLetter(company: Company) {
     return sendLetter({
       description: "Code de vérification",
       to: {
-        address_line1: sireneInfo.addressVoie,
-        address_city: sireneInfo.addressCity,
+        address_line1: truncate(sireneInfo.addressVoie),
+        address_city: truncate(sireneInfo.addressCity),
         address_postalcode: sireneInfo.addressPostalCode,
         address_country: "France",
-        company: company.name,
-        name: admin.name
+        company: truncate(company.name),
+        name: truncate(admin.name)
       },
       color: "bw",
       postage_type: "ecopli",
