@@ -1,10 +1,10 @@
 {
   "docs": {
-    "Introduction": ["introduction"],
+    "Introduction": [
+      "introduction"
+    ],
     "Guides": [
       "graphql",
-      "workflow",
-      "errors",
       "oauth2",
       "environments",
       "access-token",
@@ -15,6 +15,18 @@
       "roles",
       "notifications"
     ],
-    "Référence de l'API": ["api-reference", "changelog"]
+    "Bordereaux de suivi de déchets dangereux": [
+      "errors",
+      "workflow",
+      "multimodal"
+    ],
+    "Bordereaux Dasri": [
+      "dasri",
+      "regroupement-dasri"
+    ],
+    "Référence de l'API": [
+      "api-reference",
+      "changelog"
+    ]
   }
 }
