@@ -867,6 +867,25 @@ ID d'un BSD
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>duplicateBsdasri</strong></td>
+<td valign="top"><a href="#bsdasri">Bsdasri</a></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Duplique un bordereau Dasri
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ID d'un Bsdasri
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>duplicateBsvhu</strong></td>
 <td valign="top"><a href="#bsvhu">Bsvhu</a></td>
 <td>

@@ -1893,6 +1893,11 @@ export type Mutation = {
   deleteVhuAgrement?: Maybe<VhuAgrement>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Duplique un bordereau Dasri
+   */
+  duplicateBsdasri?: Maybe<Bsdasri>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Duplique un BSVHU
    */
   duplicateBsvhu?: Maybe<Bsvhu>;
@@ -2234,6 +2239,10 @@ export type MutationDeleteTransporterReceiptArgs = {
 
 export type MutationDeleteVhuAgrementArgs = {
   input: DeleteVhuAgrementInput;
+};
+
+export type MutationDuplicateBsdasriArgs = {
+  id: Scalars["ID"];
 };
 
 export type MutationDuplicateBsvhuArgs = {
@@ -5709,6 +5718,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationDeleteVhuAgrementArgs, "input">
+  >;
+  duplicateBsdasri?: Resolver<
+    Maybe<ResolversTypes["Bsdasri"]>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationDuplicateBsdasriArgs, "id">
   >;
   duplicateBsvhu?: Resolver<
     Maybe<ResolversTypes["Bsvhu"]>,
