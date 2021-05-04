@@ -9,6 +9,20 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+#### :boom: Breaking changes
+
+#### :bug: Corrections de bugs
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+# 2021.05.1
+
+#### :rocket: Nouvelles fonctionnalités
+
 - Ajout de différents filtres dans les tableaux [PR 810](https://github.com/MTES-MCT/trackdechets/pull/810)
 - Ajout d'un sélecteur de type de bordereaux dans les tableaux, en vue des prochains bordereaux [PR 810](https://github.com/MTES-MCT/trackdechets/pull/810)
 - Ajout de la possibilité de créer des bordereaux DASRI via l'API [PR 787](https://github.com/MTES-MCT/trackdechets/pull/787)
