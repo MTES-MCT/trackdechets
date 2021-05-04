@@ -16,6 +16,7 @@ import { GraphQLContext } from "../../../types";
 import { getBsdasriOrNotFound } from "../../database";
 import { validateBsdasri } from "../../validation";
 import { ForbiddenError } from "apollo-server-express";
+import { indexBsdasri } from "../../elastic";
 
 type BsdasriField = keyof Bsdasri;
 const fieldsAllowedForUpdateOnceReceived: BsdasriField[] = [
@@ -159,7 +160,10 @@ const dasriUpdateResolver = async (
       ...getRegroupedBsdasriArgs(inputRegroupedBsdasris)
     }
   });
-  return expandBsdasriFromDb(updatedDasri);
+
+  const expandedDasri = expandBsdasriFromDb(updatedDasri);
+  await indexBsdasri(updatedDasri);
+  return expandedDasri;
 };
 
 export default dasriUpdateResolver;

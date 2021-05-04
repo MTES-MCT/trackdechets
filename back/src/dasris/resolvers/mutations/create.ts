@@ -12,8 +12,8 @@ import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { validateBsdasri } from "../../validation";
 import { checkIsBsdasriContributor } from "../../permissions";
-
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
+import { indexBsdasri } from "../../elastic";
 
 const createBsdasri = async (
   parent: ResolversParentTypes["Mutation"],
@@ -63,6 +63,9 @@ const createBsdasri = async (
       isDraft: isDraft
     }
   });
+
+  await indexBsdasri(newDasri);
+
   return expandBsdasriFromDb(newDasri);
 };
 
