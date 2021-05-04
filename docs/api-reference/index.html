@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Référence de l&#x27;API · Trackdéchets Développeurs</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="## Query"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Référence de l&#x27;API · Trackdéchets Développeurs"/><meta property="og:type" content="website"/><meta property="og:url" content="undefined/"/><meta property="og:description" content="## Query"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/prism.css"/><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="Trackdéchets Développeurs"/><h2 class="headerTitleWithLogo">Trackdéchets Développeurs</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/introduction" target="_self">Documentation</a></li><li class="siteNavGroupActive siteNavItemActive"><a href="/docs/api-reference" target="_self">Référence de l&#x27;API</a></li><li class=""><a href="https://api.trackdechets.beta.gouv.fr" target="_blank">Playground</a></li><li class=""><a href="https://forum.trackdechets.beta.gouv.fr" target="_blank">Support</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Référence de l&#x27;API</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Introduction<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/introduction">API Trackdéchets</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Guides<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/graphql">Faire des appels à l&#x27;API GraphQL</a></li><li class="navListItem"><a class="navItem" href="/docs/workflow">Cycle de vie du bordereau</a></li><li class="navListItem"><a class="navItem" href="/docs/errors">Gestion des erreurs</a></li><li class="navListItem"><a class="navItem" href="/docs/oauth2">OAuth2</a></li><li class="navListItem"><a class="navItem" href="/docs/environments">Environnements de tests</a></li><li class="navListItem"><a class="navItem" href="/docs/access-token">Obtenir un jeton d&#x27;accès personnel</a></li><li class="navListItem"><a class="navItem" href="/docs/playground">Utilisation du playground</a></li><li class="navListItem"><a class="navItem" href="/docs/multimodal">Transport multimodal</a></li><li class="navListItem"><a class="navItem" href="/docs/sirene">API Sirene enrichie</a></li><li class="navListItem"><a class="navItem" href="/docs/registre">Registre</a></li><li class="navListItem"><a class="navItem" href="/docs/roles">Rôles</a></li><li class="navListItem"><a class="navItem" href="/docs/notifications">Notifications</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Référence de l&#x27;API<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem navListItemActive"><a class="navItem" href="/docs/api-reference">Référence de l&#x27;API</a></li><li class="navListItem"><a class="navItem" href="/docs/changelog">Changelog</a></li></ul></div></div></section></div><script>
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Référence de l&#x27;API · Trackdéchets Développeurs</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="## Query"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Référence de l&#x27;API · Trackdéchets Développeurs"/><meta property="og:type" content="website"/><meta property="og:url" content="undefined/"/><meta property="og:description" content="## Query"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/prism.css"/><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="Trackdéchets Développeurs"/><h2 class="headerTitleWithLogo">Trackdéchets Développeurs</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/introduction" target="_self">Documentation</a></li><li class="siteNavGroupActive siteNavItemActive"><a href="/docs/api-reference" target="_self">Référence de l&#x27;API</a></li><li class=""><a href="https://api.trackdechets.beta.gouv.fr" target="_blank">Playground</a></li><li class=""><a href="https://forum.trackdechets.beta.gouv.fr" target="_blank">Support</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Référence de l&#x27;API</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Introduction<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/introduction">API Trackdéchets</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Guides<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/graphql">Faire des appels à l&#x27;API GraphQL</a></li><li class="navListItem"><a class="navItem" href="/docs/oauth2">OAuth2</a></li><li class="navListItem"><a class="navItem" href="/docs/environments">Environnements de tests</a></li><li class="navListItem"><a class="navItem" href="/docs/access-token">Obtenir un jeton d&#x27;accès personnel</a></li><li class="navListItem"><a class="navItem" href="/docs/playground">Utilisation du playground</a></li><li class="navListItem"><a class="navItem" href="/docs/sirene">API Sirene enrichie</a></li><li class="navListItem"><a class="navItem" href="/docs/registre">Registre</a></li><li class="navListItem"><a class="navItem" href="/docs/roles">Rôles</a></li><li class="navListItem"><a class="navItem" href="/docs/notifications">Notifications</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Bordereaux de suivi de déchets dangereux<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/errors">Gestion des erreurs</a></li><li class="navListItem"><a class="navItem" href="/docs/workflow">Cycle de vie du bordereau</a></li><li class="navListItem"><a class="navItem" href="/docs/multimodal">Transport multimodal</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Bordereaux Dasri<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/dasri">Cycle de vie du Dasri</a></li><li class="navListItem"><a class="navItem" href="/docs/regroupement-dasri">Regroupement Dasri</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Référence de l&#x27;API<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem navListItemActive"><a class="navItem" href="/docs/api-reference">Référence de l&#x27;API</a></li><li class="navListItem"><a class="navItem" href="/docs/changelog">Changelog</a></li></ul></div></div></section></div><script>
             var coll = document.getElementsByClassName('collapsible');
             var checkActiveCategory = true;
             for (var i = 0; i < coll.length; i++) {
@@ -87,6 +87,98 @@
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>bsdasri</strong></td>
+<td valign="top"><a href="#bsdasri">Bsdasri</a>!</td>
+<td>
+<p>EXPERIMENTAL - Ne pas utiliser dans un contexte de production</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+<p>Identifiant du BSD</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>bsdasriPdf</strong></td>
+<td valign="top"><a href="#filedownload">FileDownload</a>!</td>
+<td>
+<p>Renvoie un token pour télécharger un pdf de bordereau
+Ce token doit être transmis à la route /download pour obtenir le fichier.
+Il est valable 10 secondes</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+<p>ID d'un bordereau</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>bsdasris</strong></td>
+<td valign="top"><a href="#bsdasriconnection">BsdasriConnection</a>!</td>
+<td>
+<p>EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Renvoie les Bsdasris.
+Par défaut, les dasris des différentes companies de l'utilisateur sont renvoyés.</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">after</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+<p>(Optionnel) PAGINATION
+Permet en conjonction avec <code>first</code> de paginer &quot;en avant&quot;
+(des Bsdasri les plus récents aux Bsdasri les plus anciens)
+Curseur après lequel les Bsdasri doivent être retournés
+Attend un identifiant (propriété <code>id</code>) de BSD
+Défaut à vide, pour retourner les Bsdasri les plus récents.
+Le BSD précisé dans le curseur ne fait pas partie du résultat</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">first</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+<p>(Optionnel) PAGINATION
+Permet en conjonction avec <code>after</code> de paginer &quot;en avant&quot;
+(des Bsdasri les plus récents aux Bsdasri les plus anciens)
+Nombre de Bsdasri retournés après le <code>cursorAfter</code>
+Défaut à 50, maximum à 500</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">before</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+<p>(Optionnel) PAGINATION
+Permet en conjonction avec <code>last</code> de paginer &quot;en arrière&quot;
+(des Bsdasri les plus anciens aux Bsdasris les plus récents)
+Curseur avant lequel les Bsdasri doivent être retournés
+Attend un identifiant (propriété <code>id</code>) de BSD
+Défaut à vide, pour retourner les Bsdasri les plus anciens
+Le BSD précisé dans le curseur ne fait pas partie du résultat</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">last</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+<p>(Optionnel) PAGINATION
+Nombre de Bsdasri retournés avant le <code>before</code>
+Défaut à 50, maximum à 500</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">where</td>
+<td valign="top"><a href="#bsdasriwhere">BsdasriWhere</a></td>
+<td>
+<p>Filtres de recherche</p>
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>bsvhu</strong></td>
 <td valign="top"><a href="#bsvhu">Bsvhu</a>!</td>
 <td>
@@ -118,14 +210,16 @@ Il est valable 10 secondes</p>
 <td colspan="2" valign="top"><strong>bsvhus</strong></td>
 <td valign="top"><a href="#bsvhuconnection">BsvhuConnection</a>!</td>
 <td>
-<p>EXPERIMENTAL - Ne pas utiliser dans un contexte de production</p>
+<p>EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Tous les arguments sont optionnels.
+Par défaut, retourne les 50 premiers bordereaux associés à entreprises dont vous êtes membres</p>
 </td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">after</td>
 <td valign="top"><a href="#id">ID</a></td>
 <td>
-<p>(Optionnel) PAGINATION
+<p>PAGINATION
 Permet en conjonction avec <code>first</code> de paginer &quot;en avant&quot;
 (des bordereaux les plus récents aux bordereaux les plus anciens)
 Curseur après lequel les bordereaux doivent être retournés
@@ -138,7 +232,7 @@ Le BSD précisé dans le curseur ne fait pas partie du résultat</p>
 <td colspan="2" align="right" valign="top">first</td>
 <td valign="top"><a href="#int">Int</a></td>
 <td>
-<p>(Optionnel) PAGINATION
+<p>PAGINATION
 Permet en conjonction avec <code>cursorAfter</code> de paginer &quot;en avant&quot;
 (des bordereaux les plus récents aux bordereaux les plus anciens)
 Nombre de bordereaux retournés après le <code>cursorAfter</code>
@@ -149,7 +243,7 @@ Défaut à 50, maximum à 500</p>
 <td colspan="2" align="right" valign="top">before</td>
 <td valign="top"><a href="#id">ID</a></td>
 <td>
-<p>(Optionnel) PAGINATION
+<p>PAGINATION
 Permet en conjonction avec <code>last</code> de paginer &quot;en arrière&quot;
 (des bordereaux les plus anciens aux bordereaux les plus récents)
 Curseur avant lequel les bordereaux doivent être retournés
@@ -162,22 +256,17 @@ Le BSD précisé dans le curseur ne fait pas partie du résultat</p>
 <td colspan="2" align="right" valign="top">last</td>
 <td valign="top"><a href="#int">Int</a></td>
 <td>
-<p>(Optionnel) PAGINATION
+<p>PAGINATION
 Nombre de bordereaux retournés avant le <code>cursorBefore</code>
 Défaut à 50, maximum à 500</p>
 </td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">siret</td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-<p>SIRET d'un établissement dont je suis membre</p>
-</td>
-</tr>
-<tr>
 <td colspan="2" align="right" valign="top">where</td>
 <td valign="top"><a href="#bsvhuwhere">BsvhuWhere</a></td>
-<td></td>
+<td>
+<p>Filtres</p>
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>companyInfos</strong></td>
@@ -598,6 +687,21 @@ sur la nom de l'établissement, ex: 'Boulangerie Dupont'</p>
 </thead>
 <tbody>
 <tr>
+<td colspan="2" valign="top"><strong>createBsdasri</strong></td>
+<td valign="top"><a href="#bsdasri">Bsdasri</a>!</td>
+<td>
+<p>EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Crée un nouveau dasri</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">bsdasriCreateInput</td>
+<td valign="top"><a href="#bsdasricreateinput">BsdasriCreateInput</a>!</td>
+<td>
+<p>Payload de création d'un dasri</p>
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>createBsvhu</strong></td>
 <td valign="top"><a href="#bsvhu">Bsvhu</a></td>
 <td>
@@ -609,6 +713,21 @@ Crée un BSVHU</p>
 <td colspan="2" align="right" valign="top">input</td>
 <td valign="top"><a href="#bsvhuinput">BsvhuInput</a>!</td>
 <td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>createDraftBsdasri</strong></td>
+<td valign="top"><a href="#bsdasri">Bsdasri</a>!</td>
+<td>
+<p>EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Crée un nouveau dasri en brouillon</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">bsdasriCreateInput</td>
+<td valign="top"><a href="#bsdasricreateinput">BsdasriCreateInput</a>!</td>
+<td>
+<p>Payload de création d'un dasri brouillon</p>
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>createDraftBsvhu</strong></td>
@@ -996,6 +1115,21 @@ doivent avoir été renseignés au préalable</p>
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>publishBsdasri</strong></td>
+<td valign="top"><a href="#bsdasri">Bsdasri</a></td>
+<td>
+<p>EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Marque un dasri brouillon comme publié (isDraft=false)</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+<p>ID d'un Bsdasri</p>
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>publishBsvhu</strong></td>
 <td valign="top"><a href="#bsvhu">Bsvhu</a></td>
 <td>
@@ -1039,6 +1173,47 @@ l'établissement qui ont le choix de l'accepter ou de la refuser.</p>
 <tr>
 <td colspan="2" align="right" valign="top">siret</td>
 <td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signBsdasri</strong></td>
+<td valign="top"><a href="#bsdasri">Bsdasri</a></td>
+<td>
+<p>EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Appose une signature sur un Bsdasri, verrouille les cadres correspondant</p>
+<p>Une signature ne peut être apposée que par un membre de l'entreprise figurant sur le cadre concerné
+Ex: la signature TRANSPORT ne peut être apposée que par un membre de l'entreprise de transport</p>
+<p>Pour signer l'emission avec un compte transpoteur (cas de lasignature sur device transporteur),
+utiliser la mutation signBsdasriEmissionWithSecretCode</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">signatureInput</td>
+<td valign="top"><a href="#bsdasrisignatureinput">BsdasriSignatureInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signBsdasriEmissionWithSecretCode</strong></td>
+<td valign="top"><a href="#bsdasri">Bsdasri</a></td>
+<td>
+<p>EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Appose une signature de type EMISSION via un compte n'appartenant pas à l'émetteur.
+Permet de signer un enlèvement sur le device transporteur grâce au code de sécurité de l'émetteur du dasri</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">signatureInput</td>
+<td valign="top"><a href="#bsdasrisignaturewithsecretcodeinput">BsdasriSignatureWithSecretCodeInput</a>!</td>
 <td></td>
 </tr>
 <tr>
@@ -1104,6 +1279,29 @@ Il faut alors fournir le code de l'éco-organisme en indiquant qu'il est l'auteu
 <td colspan="2" align="right" valign="top">takeOverInfo</td>
 <td valign="top"><a href="#takeoverinput">TakeOverInput</a>!</td>
 <td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>updateBsdasri</strong></td>
+<td valign="top"><a href="#bsdasri">Bsdasri</a>!</td>
+<td>
+<p>EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Met à jour un dasri existant
+Par défaut, tous les champs sont modifiables.</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+<p>Identifiant unique du bordereau</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">bsdasriUpdateInput</td>
+<td valign="top"><a href="#bsdasriupdateinput">BsdasriUpdateInput</a>!</td>
+<td>
+<p>Payload de mise à jour d'un dasri</p>
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>updateBsvhu</strong></td>
@@ -1280,6 +1478,589 @@ header d'autorisation <code>Authorization: Bearer ******</code></p>
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasri"></a><a href="#bsdasri" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Bsdasri</h3>
+<p>Bordereau Bsdasri</p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>status</strong></td>
+<td valign="top"><a href="#bsdasristatus">BsdasriStatus</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>createdAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>updatedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>isDraft</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#bsdasriemitter">BsdasriEmitter</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emission</strong></td>
+<td valign="top"><a href="#bsdasriemission">BsdasriEmission</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#bsdasritransporter">BsdasriTransporter</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transport</strong></td>
+<td valign="top"><a href="#bsdasritransport">BsdasriTransport</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>recipient</strong></td>
+<td valign="top"><a href="#bsdasrirecipient">BsdasriRecipient</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>reception</strong></td>
+<td valign="top"><a href="#bsdasrireception">BsdasriReception</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsdasrioperation">BsdasriOperation</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>regroupedBsdasris</strong></td>
+<td valign="top">[<a href="#id">ID</a>!]</td>
+<td>
+<p>Bordereaux regroupés</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>metadata</strong></td>
+<td valign="top"><a href="#bsdasrimetadata">BsdasriMetadata</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasriconnection"></a><a href="#bsdasriconnection" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriConnection</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>totalCount</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>pageInfo</strong></td>
+<td valign="top"><a href="#pageinfo">PageInfo</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>edges</strong></td>
+<td valign="top">[<a href="#bsdasriedge">BsdasriEdge</a>!]!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasriedge"></a><a href="#bsdasriedge" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriEdge</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>cursor</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>node</strong></td>
+<td valign="top"><a href="#bsdasri">Bsdasri</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasriemission"></a><a href="#bsdasriemission" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriEmission</h3>
+<p>Informations relatives au déchet émis</p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>wasteCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
+<td valign="top"><a href="#bsdasriwastedetails">BsdasriWasteDetails</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>handedOverAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsdasrisignature">BsdasriSignature</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasriemitter"></a><a href="#bsdasriemitter" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriEmitter</h3>
+<p>Émetteur du Bsdasri, Personne responsable de l'émimination des déchets (PRED)</p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+<p>Établissement émetteur</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>workSite</strong></td>
+<td valign="top"><a href="#worksite">WorkSite</a></td>
+<td>
+<p>Site d'emport du déceht, si différent de celle de l'émetteur</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>handOverToTransporterAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+<p>Date de remise au tranporteur</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>customInfo</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Champ libre</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsdasriemittertype">BsdasriEmitterType</a></td>
+<td>
+<p>Type d'émetteur</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>onBehalfOfEcoorganisme</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+<p>Agit pour le compte de l'éco organisme agréé</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasrierror"></a><a href="#bsdasrierror" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriError</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>message</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>path</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>requiredFor</strong></td>
+<td valign="top">[<a href="#bsdasrisignaturetype">BsdasriSignatureType</a>!]!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasrimetadata"></a><a href="#bsdasrimetadata" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriMetadata</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>errors</strong></td>
+<td valign="top">[<a href="#bsdasrierror">BsdasriError</a>]!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasrioperation"></a><a href="#bsdasrioperation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriOperation</h3>
+<p>Informations relatives au traitement du Bsdasri</p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>processingOperation</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>processedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsdasrisignature">BsdasriSignature</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasripackaginginfo"></a><a href="#bsdasripackaginginfo" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriPackagingInfo</h3>
+<p>Informations sur le conditionnement Bsdasri</p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsdasripackagings">BsdasriPackagings</a>!</td>
+<td>
+<p>Type de conditionnement</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>other</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Description du conditionnement dans le cas où le type de conditionnement est <code>AUTRE</code></p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+<p>Nombre de colis associés à ce conditionnement</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>volume</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasrireception"></a><a href="#bsdasrireception" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriReception</h3>
+<p>Informations relatives à la réception du Bsdasri</p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
+<td valign="top"><a href="#bsdasriwastedetails">BsdasriWasteDetails</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteAcceptation</strong></td>
+<td valign="top"><a href="#bsdasriwasteacceptation">BsdasriWasteAcceptation</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receivedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsdasrisignature">BsdasriSignature</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasrirecipient"></a><a href="#bsdasrirecipient" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriRecipient</h3>
+<p>Destinataire du Bsdasri</p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+<p>Installation destinataire</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>customInfo</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Champ libre</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasrisignature"></a><a href="#bsdasrisignature" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriSignature</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>author</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasritransport"></a><a href="#bsdasritransport" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriTransport</h3>
+<p>Informations relatives au transport du Bsdasri</p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
+<td valign="top"><a href="#bsdasriwastedetails">BsdasriWasteDetails</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteAcceptation</strong></td>
+<td valign="top"><a href="#bsdasriwasteacceptation">BsdasriWasteAcceptation</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>handedOverAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>takenOverAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsdasrisignature">BsdasriSignature</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasritransporter"></a><a href="#bsdasritransporter" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriTransporter</h3>
+<p>Collecteur transporteur</p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+<p>Établissement de destination</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receipt</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>N° de récipissé</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receiptDepartment</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Département</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receiptValidityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+<p>Limite de validité du récipissé</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>customInfo</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Champ libre</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasriwasteacceptation"></a><a href="#bsdasriwasteacceptation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriWasteAcceptation</h3>
+<p>Informations relatives à l'acceptation ou au refus du déchet (Bsdasri)</p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>status</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>refusalReason</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>refusedQuantity</strong></td>
+<td valign="top"><a href="#int">Int</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasriwastedetails"></a><a href="#bsdasriwastedetails" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriWasteDetails</h3>
+<p>Détail sur le déchet proprement dit du Bsdasri</p>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#int">Int</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantityType</strong></td>
+<td valign="top"><a href="#quantitytype">QuantityType</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>volume</strong></td>
+<td valign="top"><a href="#int">Int</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>packagingInfos</strong></td>
+<td valign="top">[<a href="#bsdasripackaginginfo">BsdasriPackagingInfo</a>!]</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>onuCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" aria-hidden="true" id="bsvhu"></a><a href="#bsvhu" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Bsvhu</h3>
 <table>
 <thead>
@@ -1301,18 +2082,15 @@ header d'autorisation <code>Authorization: Bearer ******</code></p>
 <tr>
 <td colspan="2" valign="top"><strong>createdAt</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a>!</td>
-<td></td>
+<td>
+<p>Date de création</p>
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>updatedAt</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a>!</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>isDeleted</strong></td>
-<td valign="top"><a href="#boolean">Boolean</a>!</td>
 <td>
-<p>Indique si le bordereau a été supprimé</p>
+<p>Date de dernière modification</p>
 </td>
 </tr>
 <tr>
@@ -1333,7 +2111,7 @@ header d'autorisation <code>Authorization: Bearer ******</code></p>
 <td colspan="2" valign="top"><strong>emitter</strong></td>
 <td valign="top"><a href="#bsvhuemitter">BsvhuEmitter</a></td>
 <td>
-<p>Informations sur l'émetteur</p>
+<p>Émetteur du bordereau</p>
 </td>
 </tr>
 <tr>
@@ -1365,17 +2143,17 @@ header d'autorisation <code>Authorization: Bearer ******</code></p>
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>recipient</strong></td>
-<td valign="top"><a href="#bsvhurecipient">BsvhuRecipient</a></td>
+<td colspan="2" valign="top"><strong>destination</strong></td>
+<td valign="top"><a href="#bsvhudestination">BsvhuDestination</a></td>
 <td>
-<p>Détails sur la destination</p>
+<p>Destinataire du bordereau</p>
 </td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>transporter</strong></td>
 <td valign="top"><a href="#bsvhutransporter">BsvhuTransporter</a></td>
 <td>
-<p>Détails sur le transporteur</p>
+<p>Transporteur</p>
 </td>
 </tr>
 <tr>
@@ -1413,6 +2191,61 @@ header d'autorisation <code>Authorization: Bearer ******</code></p>
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" aria-hidden="true" id="bsvhudestination"></a><a href="#bsvhudestination" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuDestination</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsvhudestinationtype">BsvhuDestinationType</a></td>
+<td>
+<p>Type de receveur: broyeur ou second centre VHU</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>agrementNumber</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Numéro d'agrément de receveur</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td>
+<p>Coordonnées de l'entreprise qui recoit les déchets</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>plannedOperationCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Opération d'élimination / valorisation prévue (code D/R)</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>reception</strong></td>
+<td valign="top"><a href="#bsvhureception">BsvhuReception</a></td>
+<td>
+<p>Informations de réception</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsvhuoperation">BsvhuOperation</a></td>
+<td>
+<p>Informations sur l'opétation de traitement</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" aria-hidden="true" id="bsvhuedge"></a><a href="#bsvhuedge" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuEdge</h3>
 <table>
 <thead>
@@ -1432,6 +2265,24 @@ header d'autorisation <code>Authorization: Bearer ******</code></p>
 <tr>
 <td colspan="2" valign="top"><strong>node</strong></td>
 <td valign="top"><a href="#bsvhu">Bsvhu</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsvhuemission"></a><a href="#bsvhuemission" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuEmission</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a></td>
 <td></td>
 </tr>
 </tbody>
@@ -1462,9 +2313,11 @@ header d'autorisation <code>Authorization: Bearer ******</code></p>
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#signature">Signature</a></td>
-<td></td>
+<td colspan="2" valign="top"><strong>emission</strong></td>
+<td valign="top"><a href="#bsvhuemission">BsvhuEmission</a></td>
+<td>
+<p>Déclaration générale de l'émetteur du bordereau</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -1537,6 +2390,63 @@ header d'autorisation <code>Authorization: Bearer ******</code></p>
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" aria-hidden="true" id="bsvhunextdestination"></a><a href="#bsvhunextdestination" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuNextDestination</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsvhuoperation"></a><a href="#bsvhuoperation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuOperation</h3>
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+<p>Date de réalisation</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Opération de traitement réalisée (R4 ou R12)</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>nextDestination</strong></td>
+<td valign="top"><a href="#bsvhunextdestination">BsvhuNextDestination</a></td>
+<td>
+<p>Broyeur de destination, à remplir uniquement lorsque la destination est lui même un centre VHU</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" aria-hidden="true" id="bsvhuquantity"></a><a href="#bsvhuquantity" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuQuantity</h3>
 <table>
 <thead>
@@ -1588,7 +2498,7 @@ header d'autorisation <code>Authorization: Bearer ******</code></p>
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" aria-hidden="true" id="bsvhurecipient"></a><a href="#bsvhurecipient" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuRecipient</h3>
+<h3><a class="anchor" aria-hidden="true" id="bsvhureception"></a><a href="#bsvhureception" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuReception</h3>
 <table>
 <thead>
 <tr>
@@ -1600,84 +2510,31 @@ header d'autorisation <code>Authorization: Bearer ******</code></p>
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>type</strong></td>
-<td valign="top"><a href="#bsvhurecipienttype">BsvhuRecipientType</a></td>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
 <td>
-<p>Type de receveur: broyeur ou second centre VHU</p>
+<p>Date de présentation sur site</p>
 </td>
 </tr>
-<tr>
-<td colspan="2" valign="top"><strong>agrementNumber</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-<p>Numéro d'agrément de receveur</p>
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#formcompany">FormCompany</a></td>
-<td>
-<p>Coordonnées de l'entreprise qui recoit les déchets</p>
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>acceptance</strong></td>
-<td valign="top"><a href="#bsvhurecipientacceptance">BsvhuRecipientAcceptance</a></td>
-<td>
-<p>Informations d'acceptation</p>
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>operation</strong></td>
-<td valign="top"><a href="#bsvhurecipientoperation">BsvhuRecipientOperation</a></td>
-<td>
-<p>Informations sur l'opétation de traitement</p>
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>plannedBroyeurCompany</strong></td>
-<td valign="top"><a href="#formcompany">FormCompany</a></td>
-<td>
-<p>Coordonnées de l'entreprise de broyage prévue. Utilisé uniquement lorsque le receveur est lui même un centre VHU.</p>
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#signature">Signature</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<h3><a class="anchor" aria-hidden="true" id="bsvhurecipientacceptance"></a><a href="#bsvhurecipientacceptance" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuRecipientAcceptance</h3>
-<table>
-<thead>
-<tr>
-<th align="left">Field</th>
-<th align="right">Argument</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
 <tr>
 <td colspan="2" valign="top"><strong>quantity</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
+<td valign="top"><a href="#bsvhuquantity">BsvhuQuantity</a></td>
 <td>
 <p>Quantité réelle reçue</p>
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>status</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td colspan="2" valign="top"><strong>acceptationStatus</strong></td>
+<td valign="top"><a href="#bsvhuacceptationstatus">BsvhuAcceptationStatus</a></td>
 <td>
-<p>Etat d'acceptation du déchet</p>
+<p>Lot accepté oui/non</p>
 </td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>refusalReason</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
-<p>Raison du refus du déchet, dans le cas d'un refus</p>
+<p>Motif de refus</p>
 </td>
 </tr>
 <tr>
@@ -1689,7 +2546,7 @@ header d'autorisation <code>Authorization: Bearer ******</code></p>
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" aria-hidden="true" id="bsvhurecipientoperation"></a><a href="#bsvhurecipientoperation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuRecipientOperation</h3>
+<h3><a class="anchor" aria-hidden="true" id="bsvhutransport"></a><a href="#bsvhutransport" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuTransport</h3>
 <table>
 <thead>
 <tr>
@@ -1701,18 +2558,16 @@ header d'autorisation <code>Authorization: Bearer ******</code></p>
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>planned</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td colspan="2" valign="top"><strong>takenOverAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
 <td>
-<p>Opération de traitement prévue</p>
+<p>Date de prise en charge</p>
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>done</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-<p>Opération de traitement réalisée</p>
-</td>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -1735,13 +2590,6 @@ header d'autorisation <code>Authorization: Bearer ******</code></p>
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>tvaIntracommunautaire</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-<p>Numéro de TVA intracommunautaire, dans le cas d'un transporteur étranger</p>
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>recepisse</strong></td>
 <td valign="top"><a href="#bsvhurecepisse">BsvhuRecepisse</a></td>
 <td>
@@ -1749,9 +2597,11 @@ header d'autorisation <code>Authorization: Bearer ******</code></p>
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#signature">Signature</a></td>
-<td></td>
+<td colspan="2" valign="top"><strong>transport</strong></td>
+<td valign="top"><a href="#bsvhutransport">BsvhuTransport</a></td>
+<td>
+<p>Informations liés au transport</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -2804,6 +3654,13 @@ Elle renvoi ainsi soit la quantité envoyée estimée, soit la quantitée recue 
 <p>Email du contact dans l'établissement</p>
 </td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>vatNumber</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Numéro de TVA intracommunautaire</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3><a class="anchor" aria-hidden="true" id="formecoorganisme"></a><a href="#formecoorganisme" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>FormEcoOrganisme</h3>
@@ -3048,12 +3905,12 @@ façon suivante <a href="mailto:j********w@trackdechets.fr">j********w@trackdech
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>startCursor</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#string">String</a></td>
 <td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>endCursor</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#string">String</a></td>
 <td></td>
 </tr>
 <tr>
@@ -4242,7 +5099,328 @@ Le readableId permet de le récupérer via la query form.</p>
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" aria-hidden="true" id="bsvhuacceptanceinput"></a><a href="#bsvhuacceptanceinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuAcceptanceInput</h3>
+<h3><a class="anchor" aria-hidden="true" id="bsdasricompanywhere"></a><a href="#bsdasricompanywhere" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriCompanyWhere</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>siret</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasricreateinput"></a><a href="#bsdasricreateinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriCreateInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#bsdasriemitterinput">BsdasriEmitterInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emission</strong></td>
+<td valign="top"><a href="#bsdasriemissioninput">BsdasriEmissionInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#bsdasritransporterinput">BsdasriTransporterInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transport</strong></td>
+<td valign="top"><a href="#bsdasritransportinput">BsdasriTransportInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>recipient</strong></td>
+<td valign="top"><a href="#bsdasrirecipientinput">BsdasriRecipientInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>reception</strong></td>
+<td valign="top"><a href="#bsdasrireceptioninput">BsdasriReceptionInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsdasrioperationinput">BsdasriOperationInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>regroupedBsdasris</strong></td>
+<td valign="top">[<a href="#regroupedbsdasriinput">RegroupedBsdasriInput</a>]</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasriemissioninput"></a><a href="#bsdasriemissioninput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriEmissionInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>wasteCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
+<td valign="top"><a href="#bsdasriwastedetailinput">BsdasriWasteDetailInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>handedOverAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasriemitterinput"></a><a href="#bsdasriemitterinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriEmitterInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsdasriemittertype">BsdasriEmitterType</a></td>
+<td>
+<p>Établissement émetteur</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>workSite</strong></td>
+<td valign="top"><a href="#worksiteinput">WorkSiteInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>customInfo</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Champ libre émetteur</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>onBehalfOfEcoorganisme</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasriemitterwhere"></a><a href="#bsdasriemitterwhere" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriEmitterWhere</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#bsdasricompanywhere">BsdasriCompanyWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsdasrisignaturewhere">BsdasriSignatureWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasriinput"></a><a href="#bsdasriinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#bsdasriemitterinput">BsdasriEmitterInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emission</strong></td>
+<td valign="top"><a href="#bsdasriemissioninput">BsdasriEmissionInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#bsdasritransporterinput">BsdasriTransporterInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transport</strong></td>
+<td valign="top"><a href="#bsdasritransportinput">BsdasriTransportInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>recipient</strong></td>
+<td valign="top"><a href="#bsdasrirecipientinput">BsdasriRecipientInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>reception</strong></td>
+<td valign="top"><a href="#bsdasrireceptioninput">BsdasriReceptionInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsdasrioperationinput">BsdasriOperationInput</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasrioperationinput"></a><a href="#bsdasrioperationinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriOperationInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>processingOperation</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>processedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasripackaginginfoinput"></a><a href="#bsdasripackaginginfoinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriPackagingInfoInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsdasripackagings">BsdasriPackagings</a>!</td>
+<td>
+<p>Type de conditionnement</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>other</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Description du conditionnement dans le cas où le type de conditionnement est <code>AUTRE</code></p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>volume</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+<p>Nombre de colis associés à ce conditionnement</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+<p>Nombre de colis associés à ce conditionnement</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasrireceptioninput"></a><a href="#bsdasrireceptioninput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriReceptionInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
+<td valign="top"><a href="#bsdasriwastedetailinput">BsdasriWasteDetailInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receivedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteAcceptation</strong></td>
+<td valign="top"><a href="#bsdasriwasteacceptationinput">BsdasriWasteAcceptationInput</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasrirecipientinput"></a><a href="#bsdasrirecipientinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriRecipientInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td>
+<p>Établissement émetteur</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>customInfo</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Champ libre transporteur</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasrirecipientwastedetailinput"></a><a href="#bsdasrirecipientwastedetailinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriRecipientWasteDetailInput</h3>
 <table>
 <thead>
 <tr>
@@ -4254,31 +5432,391 @@ Le readableId permet de le récupérer via la query form.</p>
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>quantity</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
+<td valign="top"><a href="#int">Int</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>volume</strong></td>
+<td valign="top"><a href="#int">Int</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasrirecipientwhere"></a><a href="#bsdasrirecipientwhere" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriRecipientWhere</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#bsdasricompanywhere">BsdasriCompanyWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsdasrisignaturewhere">BsdasriSignatureWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasrisignatureinput"></a><a href="#bsdasrisignatureinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriSignatureInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsdasrisignaturetype">BsdasriSignatureType</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>author</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasrisignaturewhere"></a><a href="#bsdasrisignaturewhere" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriSignatureWhere</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datefilter">DateFilter</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasrisignaturewithsecretcodeinput"></a><a href="#bsdasrisignaturewithsecretcodeinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriSignatureWithSecretCodeInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>author</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>securityCode</strong></td>
+<td valign="top"><a href="#int">Int</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasritransportinput"></a><a href="#bsdasritransportinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriTransportInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
+<td valign="top"><a href="#bsdasriwastedetailinput">BsdasriWasteDetailInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>takenOverAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>handedOverAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteAcceptation</strong></td>
+<td valign="top"><a href="#bsdasriwasteacceptationinput">BsdasriWasteAcceptationInput</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasritransporterinput"></a><a href="#bsdasritransporterinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriTransporterInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
 <td>
-<p>Quantité réelle reçue</p>
+<p>Établissement collecteur - transporteur</p>
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>receipt</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>N° de récipissé</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receiptDepartment</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Département</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>receiptValidityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+<p>Limite de validité du récipissé</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>customInfo</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Champ libre transporteur</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasritransporterwhere"></a><a href="#bsdasritransporterwhere" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriTransporterWhere</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#bsdasricompanywhere">BsdasriCompanyWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsdasrisignaturewhere">BsdasriSignatureWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasriupdateinput"></a><a href="#bsdasriupdateinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriUpdateInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#bsdasriemitterinput">BsdasriEmitterInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emission</strong></td>
+<td valign="top"><a href="#bsdasriemissioninput">BsdasriEmissionInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#bsdasritransporterinput">BsdasriTransporterInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transport</strong></td>
+<td valign="top"><a href="#bsdasritransportinput">BsdasriTransportInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>recipient</strong></td>
+<td valign="top"><a href="#bsdasrirecipientinput">BsdasriRecipientInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>reception</strong></td>
+<td valign="top"><a href="#bsdasrireceptioninput">BsdasriReceptionInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsdasrioperationinput">BsdasriOperationInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>regroupedBsdasris</strong></td>
+<td valign="top">[<a href="#regroupedbsdasriinput">RegroupedBsdasriInput</a>]</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasriwasteacceptationinput"></a><a href="#bsdasriwasteacceptationinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriWasteAcceptationInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
 <td colspan="2" valign="top"><strong>status</strong></td>
 <td valign="top"><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a></td>
-<td>
-<p>Status d'acceptation du déchet</p>
-</td>
+<td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>refusalReason</strong></td>
 <td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>refusedQuantity</strong></td>
+<td valign="top"><a href="#int">Int</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasriwastedetailinput"></a><a href="#bsdasriwastedetailinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriWasteDetailInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#int">Int</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantityType</strong></td>
+<td valign="top"><a href="#quantitytype">QuantityType</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>packagingInfos</strong></td>
+<td valign="top">[<a href="#bsdasripackaginginfoinput">BsdasriPackagingInfoInput</a>!]</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>onuCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasriwhere"></a><a href="#bsdasriwhere" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriWhere</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>isDraft</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
 <td>
-<p>Raison du refus du déchet, dans le cas d'un refus</p>
+<p>(Optionnel) Permet de récupérer uniquement les bordereaux en brouillon</p>
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>identification</strong></td>
-<td valign="top"><a href="#bsvhuidentificationinput">BsvhuIdentificationInput</a></td>
+<td colspan="2" valign="top"><strong>status</strong></td>
+<td valign="top"><a href="#bsdasristatus">BsdasriStatus</a></td>
 <td>
-<p>Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)</p>
+<p>(Optionnel) Filtre sur le statut des bordereaux
+Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
+Défaut à vide.</p>
 </td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>createdAt</strong></td>
+<td valign="top"><a href="#datefilter">DateFilter</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>updatedAt</strong></td>
+<td valign="top"><a href="#datefilter">DateFilter</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#bsdasriemitterwhere">BsdasriEmitterWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#bsdasritransporterwhere">BsdasriTransporterWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>recipient</strong></td>
+<td valign="top"><a href="#bsdasrirecipientwhere">BsdasriRecipientWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>processingOperation</strong></td>
+<td valign="top">[<a href="#processingoperationtypes">processingOperationTypes</a>!]</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>groupable</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td>
+<p>(Optionnel) Filtre sur l'état de regroupement des bordereaux
+Si aucun filtre n'est passé, les bordereaux seront retournés sans filtrage supplémentaire
+Si groupable: true, les bordereaux retournés ne sont pas déjà regroupés et ne regroupent pas d'autres bordereaux
+Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne regroupent d'autres bordereaux</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>_and</strong></td>
+<td valign="top">[<a href="#bsdasriwhere">BsdasriWhere</a>!]</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>_or</strong></td>
+<td valign="top">[<a href="#bsdasriwhere">BsdasriWhere</a>!]</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>_not</strong></td>
+<td valign="top">[<a href="#bsdasriwhere">BsdasriWhere</a>!]</td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -4295,6 +5833,99 @@ Le readableId permet de le récupérer via la query form.</p>
 <tr>
 <td colspan="2" valign="top"><strong>siret</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsvhudestinationinput"></a><a href="#bsvhudestinationinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuDestinationInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsvhudestinationtype">BsvhuDestinationType</a></td>
+<td>
+<p>Type de receveur: broyeur ou second centre VHU</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>agrementNumber</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Numéro d'agrément de receveur</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td>
+<p>Coordonnées de l'entreprise qui recoit les déchets</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>plannedOperationCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Opération d'élimination / valorisation prévue (code D/R)</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>reception</strong></td>
+<td valign="top"><a href="#bsvhureceptioninput">BsvhuReceptionInput</a></td>
+<td>
+<p>Informations de réception</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsvhuoperationinput">BsvhuOperationInput</a></td>
+<td>
+<p>Informations sur l'opétation de traitement</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsvhudestinationwhere"></a><a href="#bsvhudestinationwhere" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuDestinationWhere</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#bsvhucompanywhere">BsvhuCompanyWhere</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsvhuoperationwhere">BsvhuOperationWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsvhuemissionwhere"></a><a href="#bsvhuemissionwhere" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuEmissionWhere</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
 <td></td>
 </tr>
 </tbody>
@@ -4341,8 +5972,8 @@ Le readableId permet de le récupérer via la query form.</p>
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
+<td colspan="2" valign="top"><strong>emission</strong></td>
+<td valign="top"><a href="#bsvhuemissionwhere">BsvhuEmissionWhere</a></td>
 <td></td>
 </tr>
 </tbody>
@@ -4419,8 +6050,8 @@ Le readableId permet de le récupérer via la query form.</p>
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>recipient</strong></td>
-<td valign="top"><a href="#bsvhurecipientinput">BsvhuRecipientInput</a></td>
+<td colspan="2" valign="top"><strong>destination</strong></td>
+<td valign="top"><a href="#bsvhudestinationinput">BsvhuDestinationInput</a></td>
 <td>
 <p>Détails sur la destination</p>
 </td>
@@ -4431,6 +6062,23 @@ Le readableId permet de le récupérer via la query form.</p>
 <td>
 <p>Détails sur le transporteur</p>
 </td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsvhunextdestinationinput"></a><a href="#bsvhunextdestinationinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuNextDestinationInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -4445,18 +6093,42 @@ Le readableId permet de le récupérer via la query form.</p>
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>planned</strong></td>
-<td valign="top"><a href="#string">String</a></td>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
 <td>
-<p>Opération de traitement prévue</p>
+<p>Date de réalisation</p>
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>done</strong></td>
+<td colspan="2" valign="top"><strong>code</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
-<p>Opération de traitement réalisée</p>
+<p>Opération de traitement réalisée (R4 ou R12)</p>
 </td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>nextDestination</strong></td>
+<td valign="top"><a href="#bsvhunextdestinationinput">BsvhuNextDestinationInput</a></td>
+<td>
+<p>Broyeur de destination, à remplir uniquement lorsque la destination est lui même un centre VHU</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsvhuoperationwhere"></a><a href="#bsvhuoperationwhere" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuOperationWhere</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -4513,7 +6185,7 @@ Le readableId permet de le récupérer via la query form.</p>
 </tr>
 </tbody>
 </table>
-<h3><a class="anchor" aria-hidden="true" id="bsvhurecipientinput"></a><a href="#bsvhurecipientinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuRecipientInput</h3>
+<h3><a class="anchor" aria-hidden="true" id="bsvhureceptioninput"></a><a href="#bsvhureceptioninput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuReceptionInput</h3>
 <table>
 <thead>
 <tr>
@@ -4524,68 +6196,39 @@ Le readableId permet de le récupérer via la query form.</p>
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>type</strong></td>
-<td valign="top"><a href="#bsvhurecipienttype">BsvhuRecipientType</a></td>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
 <td>
-<p>Type de receveur: broyeur ou second centre VHU</p>
+<p>Date de présentation sur site</p>
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>agrementNumber</strong></td>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#bsvhuquantityinput">BsvhuQuantityInput</a></td>
+<td>
+<p>Quantité réelle reçue</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>acceptationStatus</strong></td>
+<td valign="top"><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a></td>
+<td>
+<p>Lot accepté oui/non</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>refusalReason</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
-<p>Numéro d'agrément de receveur</p>
+<p>Motif de refus</p>
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#companyinput">CompanyInput</a></td>
+<td colspan="2" valign="top"><strong>identification</strong></td>
+<td valign="top"><a href="#bsvhuidentificationinput">BsvhuIdentificationInput</a></td>
 <td>
-<p>Coordonnées de l'entreprise qui recoit les déchets</p>
+<p>Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)</p>
 </td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>acceptance</strong></td>
-<td valign="top"><a href="#bsvhuacceptanceinput">BsvhuAcceptanceInput</a></td>
-<td>
-<p>Informations d'acceptation</p>
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>operation</strong></td>
-<td valign="top"><a href="#bsvhuoperationinput">BsvhuOperationInput</a></td>
-<td>
-<p>Informations sur l'opétation de traitement</p>
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>plannedBroyeurCompany</strong></td>
-<td valign="top"><a href="#companyinput">CompanyInput</a></td>
-<td>
-<p>Destination utérieure prévue, dans le cas d'un second centre VHU</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3><a class="anchor" aria-hidden="true" id="bsvhurecipientwhere"></a><a href="#bsvhurecipientwhere" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuRecipientWhere</h3>
-<table>
-<thead>
-<tr>
-<th colspan="2" align="left">Field</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>company</strong></td>
-<td valign="top"><a href="#bsvhucompanywhere">BsvhuCompanyWhere</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
-<td></td>
 </tr>
 </tbody>
 </table>
@@ -4646,6 +6289,42 @@ Le readableId permet de le récupérer via la query form.</p>
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" aria-hidden="true" id="bsvhutransportinput"></a><a href="#bsvhutransportinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuTransportInput</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>takenOverAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+<p>Date de prise en charge</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsvhutransportwhere"></a><a href="#bsvhutransportwhere" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuTransportWhere</h3>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" aria-hidden="true" id="bsvhutransporterinput"></a><a href="#bsvhutransporterinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuTransporterInput</h3>
 <table>
 <thead>
@@ -4664,17 +6343,17 @@ Le readableId permet de le récupérer via la query form.</p>
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>tvaIntracommunautaire</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td>
-<p>Numéro de TVA intracommunautaire, dans le cas d'un transporteur étranger</p>
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>recepisse</strong></td>
 <td valign="top"><a href="#bsvhurecepisseinput">BsvhuRecepisseInput</a></td>
 <td>
 <p>Récépissé transporteur</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transport</strong></td>
+<td valign="top"><a href="#bsvhutransportinput">BsvhuTransportInput</a></td>
+<td>
+<p>Informations liés au transport</p>
 </td>
 </tr>
 </tbody>
@@ -4695,8 +6374,8 @@ Le readableId permet de le récupérer via la query form.</p>
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></td>
+<td colspan="2" valign="top"><strong>transport</strong></td>
+<td valign="top"><a href="#bsvhutransportwhere">BsvhuTransportWhere</a></td>
 <td></td>
 </tr>
 </tbody>
@@ -4748,8 +6427,8 @@ Défaut à vide.</p>
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>recipient</strong></td>
-<td valign="top"><a href="#bsvhurecipientwhere">BsvhuRecipientWhere</a></td>
+<td colspan="2" valign="top"><strong>destination</strong></td>
+<td valign="top"><a href="#bsvhudestinationwhere">BsvhuDestinationWhere</a></td>
 <td></td>
 </tr>
 <tr>
@@ -4820,6 +6499,13 @@ Défaut à vide.</p>
 <td valign="top"><a href="#string">String</a></td>
 <td>
 <p>Numéro de téléphone de contact dans l'établissement</p>
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>vatNumber</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+<p>Numéro de TVA intracommunautaire</p>
 </td>
 </tr>
 </tbody>
@@ -4917,7 +6603,7 @@ de traitement ou de tri, transit, regroupement.</p>
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>_gte</strong></td>
+<td colspan="2" valign="top"><strong>_eq</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a></td>
 <td></td>
 </tr>
@@ -4927,7 +6613,7 @@ de traitement ou de tri, transit, regroupement.</p>
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>_lte</strong></td>
+<td colspan="2" valign="top"><strong>_gte</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a></td>
 <td></td>
 </tr>
@@ -4937,7 +6623,7 @@ de traitement ou de tri, transit, regroupement.</p>
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>_eq</strong></td>
+<td colspan="2" valign="top"><strong>_lte</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a></td>
 <td></td>
 </tr>
@@ -5530,6 +7216,26 @@ ou de reconditionnement prévue (case 2)</p>
 <td valign="top"><a href="#boolean">Boolean</a></td>
 <td>
 <p>Si c'est un entreprosage provisoire ou reconditionnement</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="regroupedbsdasriinput"></a><a href="#regroupedbsdasriinput" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>RegroupedBsdasriInput</h3>
+<p>Payload de regroupement</p>
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+<p>Identifiant unique du bordereau</p>
 </td>
 </tr>
 </tbody>
@@ -6212,11 +7918,6 @@ de traitement ou de tri, transit, regroupement.</p>
 </thead>
 <tbody>
 <tr>
-<td colspan="2" valign="top"><strong>name</strong></td>
-<td valign="top"><a href="#string">String</a></td>
-<td></td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>address</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td></td>
@@ -6227,18 +7928,234 @@ de traitement ou de tri, transit, regroupement.</p>
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>postalCode</strong></td>
+<td colspan="2" valign="top"><strong>infos</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>infos</strong></td>
+<td colspan="2" valign="top"><strong>name</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>postalCode</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <h2><a class="anchor" aria-hidden="true" id="enums"></a><a href="#enums" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Enums</h2>
+<h3><a class="anchor" aria-hidden="true" id="bsdasriemittertype"></a><a href="#bsdasriemittertype" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriEmitterType</h3>
+<p>Type d'émetteur</p>
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>PRODUCER</strong></td>
+<td>
+<p>Producteur</p>
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>COLLECTOR</strong></td>
+<td>
+<p>Installation de regroupement</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasripackagings"></a><a href="#bsdasripackagings" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriPackagings</h3>
+<p>Type de packaging du déchet</p>
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>BOITE_CARTON</strong></td>
+<td>
+<p>Caisse en carton avec sac en plastique</p>
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>FUT</strong></td>
+<td>
+<p>Fûts ou jerrican à usage unique</p>
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>BOITE_PERFORANTS</strong></td>
+<td>
+<p>Boîtes et Mini-collecteurs pour déchets perforants</p>
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>GRAND_EMBALLAGE</strong></td>
+<td>
+<p>Grand emballage</p>
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>GRV</strong></td>
+<td>
+<p>Grand récipient pour vrac</p>
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>AUTRE</strong></td>
+<td>
+<p>Autre</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasrirole"></a><a href="#bsdasrirole" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriRole</h3>
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>TRANSPORTER</strong></td>
+<td>
+<p>Les Bsdasri dont je suis transporteur</p>
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>RECIPIENT</strong></td>
+<td>
+<p>Les Bsdasri dont je suis la destination de traitement</p>
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>EMITTER</strong></td>
+<td>
+<p>Les Bsdasri dont je suis l'émetteur</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasrisignaturetype"></a><a href="#bsdasrisignaturetype" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriSignatureType</h3>
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>EMISSION</strong></td>
+<td>
+<p>Signature du cadre émetteur (PRED)</p>
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>TRANSPORT</strong></td>
+<td>
+<p>Signature du cadre collecteur transporteur</p>
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>RECEPTION</strong></td>
+<td>
+<p>Signature de la réception du déchet</p>
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>OPERATION</strong></td>
+<td>
+<p>Signature du traitement du déchet</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsdasristatus"></a><a href="#bsdasristatus" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsdasriStatus</h3>
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>INITIAL</strong></td>
+<td>
+<p>Bsdasri dans son état initial</p>
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>SIGNED_BY_PRODUCER</strong></td>
+<td>
+<p>Optionnel, Bsdasri signé par la PRED (émetteur)</p>
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>SENT</strong></td>
+<td>
+<p>Bsdasri envoyé vers l'établissement de destination</p>
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>RECEIVED</strong></td>
+<td>
+<p>Bsdasri reçu par l'établissement de destination</p>
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>PROCESSED</strong></td>
+<td>
+<p>Bsdasri dont les déchets ont été traités</p>
+</td>
+</tr>
+<tr>
+<td valign="top"><strong>REFUSED</strong></td>
+<td>
+<p>Déchet refusé</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsvhuacceptationstatus"></a><a href="#bsvhuacceptationstatus" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuAcceptationStatus</h3>
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>ACCEPTED</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>REFUSED</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>PARTIALLY_REFUSED</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="bsvhudestinationtype"></a><a href="#bsvhudestinationtype" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuDestinationType</h3>
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>BROYEUR</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>DEMOLISSEUR</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <h3><a class="anchor" aria-hidden="true" id="bsvhuidentificationtype"></a><a href="#bsvhuidentificationtype" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuIdentificationType</h3>
 <table>
 <thead>
@@ -6269,23 +8186,6 @@ de traitement ou de tri, transit, regroupement.</p>
 </tr>
 <tr>
 <td valign="top"><strong>LOT</strong></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<h3><a class="anchor" aria-hidden="true" id="bsvhurecipienttype"></a><a href="#bsvhurecipienttype" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>BsvhuRecipientType</h3>
-<table>
-<thead>
-<th align="left">Value</th>
-<th align="left">Description</th>
-</thead>
-<tbody>
-<tr>
-<td valign="top"><strong>BROYEUR</strong></td>
-<td></td>
-</tr>
-<tr>
-<td valign="top"><strong>DEMOLISSEUR</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -6832,15 +8732,15 @@ Art 4: Les négociants tiennent à jour un registre chronologique des déchets d
 </thead>
 <tbody>
 <tr>
-<td valign="top"><strong>EMITTER</strong></td>
+<td valign="top"><strong>EMISSION</strong></td>
 <td></td>
 </tr>
 <tr>
-<td valign="top"><strong>TRANSPORTER</strong></td>
+<td valign="top"><strong>TRANSPORT</strong></td>
 <td></td>
 </tr>
 <tr>
-<td valign="top"><strong>RECIPIENT</strong></td>
+<td valign="top"><strong>OPERATION</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -6964,6 +8864,35 @@ pour le détail de chacun des rôles</p>
 </tr>
 </tbody>
 </table>
+<h3><a class="anchor" aria-hidden="true" id="processingoperationtypes"></a><a href="#processingoperationtypes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>processingOperationTypes</h3>
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>D9</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>D10</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>D12</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>R1</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>R12</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <h2><a class="anchor" aria-hidden="true" id="scalars"></a><a href="#scalars" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scalars</h2>
 <h3><a class="anchor" aria-hidden="true" id="boolean"></a><a href="#boolean" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Boolean</h3>
 <p>The <code>Boolean</code> scalar type represents <code>true</code> or <code>false</code>.</p>
@@ -6988,4 +8917,4 @@ formattées selon le standard ISO 8601. Exemples:</p>
 <p>The <code>String</code> scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.</p>
 <h3><a class="anchor" aria-hidden="true" id="url"></a><a href="#url" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>URL</h3>
 <p>Chaîne de caractère au format URL, débutant par un protocole http(s).</p>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/notifications"><span class="arrow-prev">← </span><span>Notifications</span></a><a class="docs-next button" href="/docs/changelog"><span>Changelog</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#query">Query</a></li><li><a href="#mutation">Mutation</a></li><li><a href="#objects">Objects</a><ul class="toc-headings"><li><a href="#authpayload">AuthPayload</a></li><li><a href="#broker">Broker</a></li><li><a href="#brokerreceipt">BrokerReceipt</a></li><li><a href="#bsvhu">Bsvhu</a></li><li><a href="#bsvhuconnection">BsvhuConnection</a></li><li><a href="#bsvhuedge">BsvhuEdge</a></li><li><a href="#bsvhuemitter">BsvhuEmitter</a></li><li><a href="#bsvhuerror">BsvhuError</a></li><li><a href="#bsvhuidentification">BsvhuIdentification</a></li><li><a href="#bsvhumetadata">BsvhuMetadata</a></li><li><a href="#bsvhuquantity">BsvhuQuantity</a></li><li><a href="#bsvhurecepisse">BsvhuRecepisse</a></li><li><a href="#bsvhurecipient">BsvhuRecipient</a></li><li><a href="#bsvhurecipientacceptance">BsvhuRecipientAcceptance</a></li><li><a href="#bsvhurecipientoperation">BsvhuRecipientOperation</a></li><li><a href="#bsvhutransporter">BsvhuTransporter</a></li><li><a href="#companymember">CompanyMember</a></li><li><a href="#companyprivate">CompanyPrivate</a></li><li><a href="#companypublic">CompanyPublic</a></li><li><a href="#companysearchresult">CompanySearchResult</a></li><li><a href="#companystat">CompanyStat</a></li><li><a href="#declaration">Declaration</a></li><li><a href="#destination">Destination</a></li><li><a href="#ecoorganisme">EcoOrganisme</a></li><li><a href="#emitter">Emitter</a></li><li><a href="#filedownload">FileDownload</a></li><li><a href="#form">Form</a></li><li><a href="#formcompany">FormCompany</a></li><li><a href="#formecoorganisme">FormEcoOrganisme</a></li><li><a href="#formsubscription">FormSubscription</a></li><li><a href="#installation">Installation</a></li><li><a href="#membershiprequest">MembershipRequest</a></li><li><a href="#nextdestination">NextDestination</a></li><li><a href="#packaginginfo">PackagingInfo</a></li><li><a href="#pageinfo">PageInfo</a></li><li><a href="#recipient">Recipient</a></li><li><a href="#rubrique">Rubrique</a></li><li><a href="#signature">Signature</a></li><li><a href="#stat">Stat</a></li><li><a href="#statesummary">StateSummary</a></li><li><a href="#statuslog">StatusLog</a></li><li><a href="#statuslogform">StatusLogForm</a></li><li><a href="#statusloguser">StatusLogUser</a></li><li><a href="#subscription">Subscription</a></li><li><a href="#temporarystoragedetail">TemporaryStorageDetail</a></li><li><a href="#temporarystorer">TemporaryStorer</a></li><li><a href="#trader">Trader</a></li><li><a href="#traderreceipt">TraderReceipt</a></li><li><a href="#transportsegment">TransportSegment</a></li><li><a href="#transporter">Transporter</a></li><li><a href="#transporterreceipt">TransporterReceipt</a></li><li><a href="#user">User</a></li><li><a href="#vhuagrement">VhuAgrement</a></li><li><a href="#wastedetails">WasteDetails</a></li><li><a href="#worksite">WorkSite</a></li><li><a href="#formslifecycledata">formsLifeCycleData</a></li></ul></li><li><a href="#inputs">Inputs</a><ul class="toc-headings"><li><a href="#acceptedforminput">AcceptedFormInput</a></li><li><a href="#appendixforminput">AppendixFormInput</a></li><li><a href="#brokerinput">BrokerInput</a></li><li><a href="#bsvhuacceptanceinput">BsvhuAcceptanceInput</a></li><li><a href="#bsvhucompanywhere">BsvhuCompanyWhere</a></li><li><a href="#bsvhuemitterinput">BsvhuEmitterInput</a></li><li><a href="#bsvhuemitterwhere">BsvhuEmitterWhere</a></li><li><a href="#bsvhuidentificationinput">BsvhuIdentificationInput</a></li><li><a href="#bsvhuinput">BsvhuInput</a></li><li><a href="#bsvhuoperationinput">BsvhuOperationInput</a></li><li><a href="#bsvhuquantityinput">BsvhuQuantityInput</a></li><li><a href="#bsvhurecepisseinput">BsvhuRecepisseInput</a></li><li><a href="#bsvhurecipientinput">BsvhuRecipientInput</a></li><li><a href="#bsvhurecipientwhere">BsvhuRecipientWhere</a></li><li><a href="#bsvhusignatureinput">BsvhuSignatureInput</a></li><li><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></li><li><a href="#bsvhutransporterinput">BsvhuTransporterInput</a></li><li><a href="#bsvhutransporterwhere">BsvhuTransporterWhere</a></li><li><a href="#bsvhuwhere">BsvhuWhere</a></li><li><a href="#companyinput">CompanyInput</a></li><li><a href="#createforminput">CreateFormInput</a></li><li><a href="#datefilter">DateFilter</a></li><li><a href="#destinationinput">DestinationInput</a></li><li><a href="#ecoorganismeinput">EcoOrganismeInput</a></li><li><a href="#emitterinput">EmitterInput</a></li><li><a href="#forminput">FormInput</a></li><li><a href="#importpaperforminput">ImportPaperFormInput</a></li><li><a href="#internationalcompanyinput">InternationalCompanyInput</a></li><li><a href="#nextdestinationinput">NextDestinationInput</a></li><li><a href="#nextsegmentinfoinput">NextSegmentInfoInput</a></li><li><a href="#packaginginfoinput">PackagingInfoInput</a></li><li><a href="#processedforminput">ProcessedFormInput</a></li><li><a href="#receivedforminput">ReceivedFormInput</a></li><li><a href="#recipientinput">RecipientInput</a></li><li><a href="#resealedforminput">ResealedFormInput</a></li><li><a href="#resentforminput">ResentFormInput</a></li><li><a href="#sentforminput">SentFormInput</a></li><li><a href="#signatureforminput">SignatureFormInput</a></li><li><a href="#takeoverinput">TakeOverInput</a></li><li><a href="#tempstoredforminput">TempStoredFormInput</a></li><li><a href="#tempstoreracceptedforminput">TempStorerAcceptedFormInput</a></li><li><a href="#temporarystoragedetailinput">TemporaryStorageDetailInput</a></li><li><a href="#traderinput">TraderInput</a></li><li><a href="#transporterinput">TransporterInput</a></li><li><a href="#transportersignatureforminput">TransporterSignatureFormInput</a></li><li><a href="#updateforminput">UpdateFormInput</a></li><li><a href="#wastedetailsinput">WasteDetailsInput</a></li><li><a href="#worksiteinput">WorkSiteInput</a></li></ul></li><li><a href="#enums">Enums</a><ul class="toc-headings"><li><a href="#bsvhuidentificationtype">BsvhuIdentificationType</a></li><li><a href="#bsvhupackaging">BsvhuPackaging</a></li><li><a href="#bsvhurecipienttype">BsvhuRecipientType</a></li><li><a href="#bsvhustatus">BsvhuStatus</a></li><li><a href="#companytype">CompanyType</a></li><li><a href="#companyverificationstatus">CompanyVerificationStatus</a></li><li><a href="#consistence">Consistence</a></li><li><a href="#emittertype">EmitterType</a></li><li><a href="#formrole">FormRole</a></li><li><a href="#formstatus">FormStatus</a></li><li><a href="#formsregisterexportformat">FormsRegisterExportFormat</a></li><li><a href="#formsregisterexporttype">FormsRegisterExportType</a></li><li><a href="#gereptype">GerepType</a></li><li><a href="#membershiprequeststatus">MembershipRequestStatus</a></li><li><a href="#packagings">Packagings</a></li><li><a href="#quantitytype">QuantityType</a></li><li><a href="#signatureauthor">SignatureAuthor</a></li><li><a href="#signaturetypeinput">SignatureTypeInput</a></li><li><a href="#transportmode">TransportMode</a></li><li><a href="#userrole">UserRole</a></li><li><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a></li><li><a href="#wastetype">WasteType</a></li></ul></li><li><a href="#scalars">Scalars</a><ul class="toc-headings"><li><a href="#boolean">Boolean</a></li><li><a href="#datetime">DateTime</a></li><li><a href="#float">Float</a></li><li><a href="#id">ID</a></li><li><a href="#int">Int</a></li><li><a href="#json">JSON</a></li><li><a href="#string">String</a></li><li><a href="#url">URL</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="Trackdéchets Développeurs" width="66" height="58"/></a><div><h5>Trackdéchets</h5><a href="https://trackdechets.beta.gouv.fr">Site web</a><a href="https://trello.com/b/2pkc7bFg/trackd%C3%A9chets-roadmap-produit">Roadmap produit</a><a href="https://cutt.ly/trackdechets">Formulaire de remontée d&#x27;infos / idées / bugs</a><a href="https://github.com/MTES-MCT/trackdechets">Code source</a><a class="github-button" href="https://github.com/MTES-MCT/trackdechets" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Communauté</h5><a href="https://forum.trackdechets.beta.gouv.fr">Forum technique</a></div><div><h5>API</h5><a href="/docs/api-reference">Référence de l&#x27;API</a><a href="https://status.trackdechets.beta.gouv.fr">Statut de l&#x27;API</a><a href="https://api.trackdechets.beta.gouv.fr">Playground</a></div></section><a href="https://beta.gouv.fr/incubateurs/mtes.html" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/logo-mtes-mef.svg" alt="La Fabrique Numérique" width="170" height="45"/></a><section class="copyright">Copyright 2021 Ministère de la Transition Écologique et Solidaire</section></footer></div></body></html>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/regroupement-dasri"><span class="arrow-prev">← </span><span>Regroupement Dasri</span></a><a class="docs-next button" href="/docs/changelog"><span>Changelog</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#query">Query</a></li><li><a href="#mutation">Mutation</a></li><li><a href="#objects">Objects</a><ul class="toc-headings"><li><a href="#authpayload">AuthPayload</a></li><li><a href="#broker">Broker</a></li><li><a href="#brokerreceipt">BrokerReceipt</a></li><li><a href="#bsdasri">Bsdasri</a></li><li><a href="#bsdasriconnection">BsdasriConnection</a></li><li><a href="#bsdasriedge">BsdasriEdge</a></li><li><a href="#bsdasriemission">BsdasriEmission</a></li><li><a href="#bsdasriemitter">BsdasriEmitter</a></li><li><a href="#bsdasrierror">BsdasriError</a></li><li><a href="#bsdasrimetadata">BsdasriMetadata</a></li><li><a href="#bsdasrioperation">BsdasriOperation</a></li><li><a href="#bsdasripackaginginfo">BsdasriPackagingInfo</a></li><li><a href="#bsdasrireception">BsdasriReception</a></li><li><a href="#bsdasrirecipient">BsdasriRecipient</a></li><li><a href="#bsdasrisignature">BsdasriSignature</a></li><li><a href="#bsdasritransport">BsdasriTransport</a></li><li><a href="#bsdasritransporter">BsdasriTransporter</a></li><li><a href="#bsdasriwasteacceptation">BsdasriWasteAcceptation</a></li><li><a href="#bsdasriwastedetails">BsdasriWasteDetails</a></li><li><a href="#bsvhu">Bsvhu</a></li><li><a href="#bsvhuconnection">BsvhuConnection</a></li><li><a href="#bsvhudestination">BsvhuDestination</a></li><li><a href="#bsvhuedge">BsvhuEdge</a></li><li><a href="#bsvhuemission">BsvhuEmission</a></li><li><a href="#bsvhuemitter">BsvhuEmitter</a></li><li><a href="#bsvhuerror">BsvhuError</a></li><li><a href="#bsvhuidentification">BsvhuIdentification</a></li><li><a href="#bsvhumetadata">BsvhuMetadata</a></li><li><a href="#bsvhunextdestination">BsvhuNextDestination</a></li><li><a href="#bsvhuoperation">BsvhuOperation</a></li><li><a href="#bsvhuquantity">BsvhuQuantity</a></li><li><a href="#bsvhurecepisse">BsvhuRecepisse</a></li><li><a href="#bsvhureception">BsvhuReception</a></li><li><a href="#bsvhutransport">BsvhuTransport</a></li><li><a href="#bsvhutransporter">BsvhuTransporter</a></li><li><a href="#companymember">CompanyMember</a></li><li><a href="#companyprivate">CompanyPrivate</a></li><li><a href="#companypublic">CompanyPublic</a></li><li><a href="#companysearchresult">CompanySearchResult</a></li><li><a href="#companystat">CompanyStat</a></li><li><a href="#declaration">Declaration</a></li><li><a href="#destination">Destination</a></li><li><a href="#ecoorganisme">EcoOrganisme</a></li><li><a href="#emitter">Emitter</a></li><li><a href="#filedownload">FileDownload</a></li><li><a href="#form">Form</a></li><li><a href="#formcompany">FormCompany</a></li><li><a href="#formecoorganisme">FormEcoOrganisme</a></li><li><a href="#formsubscription">FormSubscription</a></li><li><a href="#installation">Installation</a></li><li><a href="#membershiprequest">MembershipRequest</a></li><li><a href="#nextdestination">NextDestination</a></li><li><a href="#packaginginfo">PackagingInfo</a></li><li><a href="#pageinfo">PageInfo</a></li><li><a href="#recipient">Recipient</a></li><li><a href="#rubrique">Rubrique</a></li><li><a href="#signature">Signature</a></li><li><a href="#stat">Stat</a></li><li><a href="#statesummary">StateSummary</a></li><li><a href="#statuslog">StatusLog</a></li><li><a href="#statuslogform">StatusLogForm</a></li><li><a href="#statusloguser">StatusLogUser</a></li><li><a href="#subscription">Subscription</a></li><li><a href="#temporarystoragedetail">TemporaryStorageDetail</a></li><li><a href="#temporarystorer">TemporaryStorer</a></li><li><a href="#trader">Trader</a></li><li><a href="#traderreceipt">TraderReceipt</a></li><li><a href="#transportsegment">TransportSegment</a></li><li><a href="#transporter">Transporter</a></li><li><a href="#transporterreceipt">TransporterReceipt</a></li><li><a href="#user">User</a></li><li><a href="#vhuagrement">VhuAgrement</a></li><li><a href="#wastedetails">WasteDetails</a></li><li><a href="#worksite">WorkSite</a></li><li><a href="#formslifecycledata">formsLifeCycleData</a></li></ul></li><li><a href="#inputs">Inputs</a><ul class="toc-headings"><li><a href="#acceptedforminput">AcceptedFormInput</a></li><li><a href="#appendixforminput">AppendixFormInput</a></li><li><a href="#brokerinput">BrokerInput</a></li><li><a href="#bsdasricompanywhere">BsdasriCompanyWhere</a></li><li><a href="#bsdasricreateinput">BsdasriCreateInput</a></li><li><a href="#bsdasriemissioninput">BsdasriEmissionInput</a></li><li><a href="#bsdasriemitterinput">BsdasriEmitterInput</a></li><li><a href="#bsdasriemitterwhere">BsdasriEmitterWhere</a></li><li><a href="#bsdasriinput">BsdasriInput</a></li><li><a href="#bsdasrioperationinput">BsdasriOperationInput</a></li><li><a href="#bsdasripackaginginfoinput">BsdasriPackagingInfoInput</a></li><li><a href="#bsdasrireceptioninput">BsdasriReceptionInput</a></li><li><a href="#bsdasrirecipientinput">BsdasriRecipientInput</a></li><li><a href="#bsdasrirecipientwastedetailinput">BsdasriRecipientWasteDetailInput</a></li><li><a href="#bsdasrirecipientwhere">BsdasriRecipientWhere</a></li><li><a href="#bsdasrisignatureinput">BsdasriSignatureInput</a></li><li><a href="#bsdasrisignaturewhere">BsdasriSignatureWhere</a></li><li><a href="#bsdasrisignaturewithsecretcodeinput">BsdasriSignatureWithSecretCodeInput</a></li><li><a href="#bsdasritransportinput">BsdasriTransportInput</a></li><li><a href="#bsdasritransporterinput">BsdasriTransporterInput</a></li><li><a href="#bsdasritransporterwhere">BsdasriTransporterWhere</a></li><li><a href="#bsdasriupdateinput">BsdasriUpdateInput</a></li><li><a href="#bsdasriwasteacceptationinput">BsdasriWasteAcceptationInput</a></li><li><a href="#bsdasriwastedetailinput">BsdasriWasteDetailInput</a></li><li><a href="#bsdasriwhere">BsdasriWhere</a></li><li><a href="#bsvhucompanywhere">BsvhuCompanyWhere</a></li><li><a href="#bsvhudestinationinput">BsvhuDestinationInput</a></li><li><a href="#bsvhudestinationwhere">BsvhuDestinationWhere</a></li><li><a href="#bsvhuemissionwhere">BsvhuEmissionWhere</a></li><li><a href="#bsvhuemitterinput">BsvhuEmitterInput</a></li><li><a href="#bsvhuemitterwhere">BsvhuEmitterWhere</a></li><li><a href="#bsvhuidentificationinput">BsvhuIdentificationInput</a></li><li><a href="#bsvhuinput">BsvhuInput</a></li><li><a href="#bsvhunextdestinationinput">BsvhuNextDestinationInput</a></li><li><a href="#bsvhuoperationinput">BsvhuOperationInput</a></li><li><a href="#bsvhuoperationwhere">BsvhuOperationWhere</a></li><li><a href="#bsvhuquantityinput">BsvhuQuantityInput</a></li><li><a href="#bsvhurecepisseinput">BsvhuRecepisseInput</a></li><li><a href="#bsvhureceptioninput">BsvhuReceptionInput</a></li><li><a href="#bsvhusignatureinput">BsvhuSignatureInput</a></li><li><a href="#bsvhusignaturewhere">BsvhuSignatureWhere</a></li><li><a href="#bsvhutransportinput">BsvhuTransportInput</a></li><li><a href="#bsvhutransportwhere">BsvhuTransportWhere</a></li><li><a href="#bsvhutransporterinput">BsvhuTransporterInput</a></li><li><a href="#bsvhutransporterwhere">BsvhuTransporterWhere</a></li><li><a href="#bsvhuwhere">BsvhuWhere</a></li><li><a href="#companyinput">CompanyInput</a></li><li><a href="#createforminput">CreateFormInput</a></li><li><a href="#datefilter">DateFilter</a></li><li><a href="#destinationinput">DestinationInput</a></li><li><a href="#ecoorganismeinput">EcoOrganismeInput</a></li><li><a href="#emitterinput">EmitterInput</a></li><li><a href="#forminput">FormInput</a></li><li><a href="#importpaperforminput">ImportPaperFormInput</a></li><li><a href="#internationalcompanyinput">InternationalCompanyInput</a></li><li><a href="#nextdestinationinput">NextDestinationInput</a></li><li><a href="#nextsegmentinfoinput">NextSegmentInfoInput</a></li><li><a href="#packaginginfoinput">PackagingInfoInput</a></li><li><a href="#processedforminput">ProcessedFormInput</a></li><li><a href="#receivedforminput">ReceivedFormInput</a></li><li><a href="#recipientinput">RecipientInput</a></li><li><a href="#regroupedbsdasriinput">RegroupedBsdasriInput</a></li><li><a href="#resealedforminput">ResealedFormInput</a></li><li><a href="#resentforminput">ResentFormInput</a></li><li><a href="#sentforminput">SentFormInput</a></li><li><a href="#signatureforminput">SignatureFormInput</a></li><li><a href="#takeoverinput">TakeOverInput</a></li><li><a href="#tempstoredforminput">TempStoredFormInput</a></li><li><a href="#tempstoreracceptedforminput">TempStorerAcceptedFormInput</a></li><li><a href="#temporarystoragedetailinput">TemporaryStorageDetailInput</a></li><li><a href="#traderinput">TraderInput</a></li><li><a href="#transporterinput">TransporterInput</a></li><li><a href="#transportersignatureforminput">TransporterSignatureFormInput</a></li><li><a href="#updateforminput">UpdateFormInput</a></li><li><a href="#wastedetailsinput">WasteDetailsInput</a></li><li><a href="#worksiteinput">WorkSiteInput</a></li></ul></li><li><a href="#enums">Enums</a><ul class="toc-headings"><li><a href="#bsdasriemittertype">BsdasriEmitterType</a></li><li><a href="#bsdasripackagings">BsdasriPackagings</a></li><li><a href="#bsdasrirole">BsdasriRole</a></li><li><a href="#bsdasrisignaturetype">BsdasriSignatureType</a></li><li><a href="#bsdasristatus">BsdasriStatus</a></li><li><a href="#bsvhuacceptationstatus">BsvhuAcceptationStatus</a></li><li><a href="#bsvhudestinationtype">BsvhuDestinationType</a></li><li><a href="#bsvhuidentificationtype">BsvhuIdentificationType</a></li><li><a href="#bsvhupackaging">BsvhuPackaging</a></li><li><a href="#bsvhustatus">BsvhuStatus</a></li><li><a href="#companytype">CompanyType</a></li><li><a href="#companyverificationstatus">CompanyVerificationStatus</a></li><li><a href="#consistence">Consistence</a></li><li><a href="#emittertype">EmitterType</a></li><li><a href="#formrole">FormRole</a></li><li><a href="#formstatus">FormStatus</a></li><li><a href="#formsregisterexportformat">FormsRegisterExportFormat</a></li><li><a href="#formsregisterexporttype">FormsRegisterExportType</a></li><li><a href="#gereptype">GerepType</a></li><li><a href="#membershiprequeststatus">MembershipRequestStatus</a></li><li><a href="#packagings">Packagings</a></li><li><a href="#quantitytype">QuantityType</a></li><li><a href="#signatureauthor">SignatureAuthor</a></li><li><a href="#signaturetypeinput">SignatureTypeInput</a></li><li><a href="#transportmode">TransportMode</a></li><li><a href="#userrole">UserRole</a></li><li><a href="#wasteacceptationstatusinput">WasteAcceptationStatusInput</a></li><li><a href="#wastetype">WasteType</a></li><li><a href="#processingoperationtypes">processingOperationTypes</a></li></ul></li><li><a href="#scalars">Scalars</a><ul class="toc-headings"><li><a href="#boolean">Boolean</a></li><li><a href="#datetime">DateTime</a></li><li><a href="#float">Float</a></li><li><a href="#id">ID</a></li><li><a href="#int">Int</a></li><li><a href="#json">JSON</a></li><li><a href="#string">String</a></li><li><a href="#url">URL</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="Trackdéchets Développeurs" width="66" height="58"/></a><div><h5>Trackdéchets</h5><a href="https://trackdechets.beta.gouv.fr">Site web</a><a href="https://trello.com/b/2pkc7bFg/trackd%C3%A9chets-roadmap-produit">Roadmap produit</a><a href="https://cutt.ly/trackdechets">Formulaire de remontée d&#x27;infos / idées / bugs</a><a href="https://github.com/MTES-MCT/trackdechets">Code source</a><a class="github-button" href="https://github.com/MTES-MCT/trackdechets" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Communauté</h5><a href="https://forum.trackdechets.beta.gouv.fr">Forum technique</a></div><div><h5>API</h5><a href="/docs/api-reference">Référence de l&#x27;API</a><a href="https://status.trackdechets.beta.gouv.fr">Statut de l&#x27;API</a><a href="https://api.trackdechets.beta.gouv.fr">Playground</a></div></section><a href="https://beta.gouv.fr/incubateurs/mtes.html" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/logo-mtes-mef.svg" alt="La Fabrique Numérique" width="170" height="45"/></a><section class="copyright">Copyright 2021 Ministère de la Transition Écologique et Solidaire</section></footer></div></body></html>

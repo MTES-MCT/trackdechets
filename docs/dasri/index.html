@@ -1,0 +1,114 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Généralités et cycle de vie du dasri · Trackdéchets Développeurs</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="*Avertissement: l&#x27;implémentation Dasri et cette documentation constituent une version Beta et sont destinées à l&#x27;évaluation des intégrateurs. L&#x27;api est suceptible d&#x27;évoluer* "/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Généralités et cycle de vie du dasri · Trackdéchets Développeurs"/><meta property="og:type" content="website"/><meta property="og:url" content="undefined/"/><meta property="og:description" content="*Avertissement: l&#x27;implémentation Dasri et cette documentation constituent une version Beta et sont destinées à l&#x27;évaluation des intégrateurs. L&#x27;api est suceptible d&#x27;évoluer* "/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/img/favicon.ico"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/prism.css"/><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><img class="logo" src="/img/favicon.ico" alt="Trackdéchets Développeurs"/><h2 class="headerTitleWithLogo">Trackdéchets Développeurs</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/docs/introduction" target="_self">Documentation</a></li><li class="siteNavGroupActive"><a href="/docs/api-reference" target="_self">Référence de l&#x27;API</a></li><li class=""><a href="https://api.trackdechets.beta.gouv.fr" target="_blank">Playground</a></li><li class=""><a href="https://forum.trackdechets.beta.gouv.fr" target="_blank">Support</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Bordereaux Dasri</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Introduction<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/introduction">API Trackdéchets</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Guides<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/graphql">Faire des appels à l&#x27;API GraphQL</a></li><li class="navListItem"><a class="navItem" href="/docs/oauth2">OAuth2</a></li><li class="navListItem"><a class="navItem" href="/docs/environments">Environnements de tests</a></li><li class="navListItem"><a class="navItem" href="/docs/access-token">Obtenir un jeton d&#x27;accès personnel</a></li><li class="navListItem"><a class="navItem" href="/docs/playground">Utilisation du playground</a></li><li class="navListItem"><a class="navItem" href="/docs/sirene">API Sirene enrichie</a></li><li class="navListItem"><a class="navItem" href="/docs/registre">Registre</a></li><li class="navListItem"><a class="navItem" href="/docs/roles">Rôles</a></li><li class="navListItem"><a class="navItem" href="/docs/notifications">Notifications</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Bordereaux de suivi de déchets dangereux<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/errors">Gestion des erreurs</a></li><li class="navListItem"><a class="navItem" href="/docs/workflow">Cycle de vie du bordereau</a></li><li class="navListItem"><a class="navItem" href="/docs/multimodal">Transport multimodal</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Bordereaux Dasri<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem navListItemActive"><a class="navItem" href="/docs/dasri">Cycle de vie du Dasri</a></li><li class="navListItem"><a class="navItem" href="/docs/regroupement-dasri">Regroupement Dasri</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle collapsible">Référence de l&#x27;API<span class="arrow"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#565656" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path><path d="M0 0h24v24H0z" fill="none"></path></svg></span></h3><ul class="hide"><li class="navListItem"><a class="navItem" href="/docs/api-reference">Référence de l&#x27;API</a></li><li class="navListItem"><a class="navItem" href="/docs/changelog">Changelog</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Généralités et cycle de vie du dasri</h1></header><article><div><span><p><em>Avertissement: l'implémentation Dasri et cette documentation constituent une version Beta et sont destinées à l'évaluation des intégrateurs. L'api est suceptible d'évoluer</em></p>
+<h2><a class="anchor" aria-hidden="true" id="numéro-de-dasri"></a><a href="#numéro-de-dasri" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Numéro de DASRI</h2>
+<p>Chaque DASRI est associé à un identifiant lisible unique. Cet identifiant correspond au champ <code>id</code> et doit être utilisé lors des différentes requêtes. Cet identifiant apparait sur le bordereau dans la case &quot;Bordereau n°&quot;. L'identifiant est sous la forme <code>DASRI-{YYYYMMDD}-{identifiant aléatoire}</code> (Ex: <code>&quot;DASRI-20210118-RTAQRJA6P&quot;</code>). Il peut être utiliser pour récupérer l'identifiant opaque unique via la query <code>bsdasri</code>.</p>
+<h2><a class="anchor" aria-hidden="true" id="concepts"></a><a href="#concepts" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Concepts</h2>
+<p>Le mode opératoire diffère sensiblement de celui des BSDD.</p>
+<p>le champ <code>id</code> stocke un champ lisible (équivalent du <code>readableId</code> du bsdd). Il n'y a donc pas de champ <code>readableId</code>.
+Le <code>DRAFT</code> est sorti des statuts, c'est un boolean à part. Le passage par l'étape brouillon est facultatif.</p>
+<p>Pour donner plus de flexibilité et limiter les mutations, les principes suivants sont adoptés:</p>
+<ul>
+<li>le nombre de mutations est reduit: createBsdasri/createDraftBsdasri, publishBsdasri,updateBsdasri, signBsdasri</li>
+<li>createDraftBsdasri crée un dasri dans l'état <code>INITIAL</code>, <code>isDraft=true</code>. Cette mutation est optionelle, on peut commencer avec <code>createBsdasri</code></li>
+<li>createBsdasri crée un dasri dans l'état <code>INITIAL</code>, <code>isDraft=false</code></li>
+<li>publishBsdasri passe le dasri de <code>isDraft=true</code> à <code>isDraft=false</code></li>
+<li>la mutation updateBsdasri permet de mettre à jour les dasri pendant leur cycle de vie</li>
+<li>la mutation signBsdasri (EMISSION, TRANSPORT, RECPTION, OPERATION) appose une signature sur le cadre correspondant et verrouille les champs correspondants</li>
+<li>une fois qu'une signature est apposée, champs du cadre correspondant ne sont plus modifiables</li>
+<li>signBsdasri (EMISSION) verrouille tous les champs emitter/emission</li>
+<li>signBsdasri (TRANSPORT) verrouille tous les champs transporter/transport, sauf la date de remise à l'installation destinataire ({transport { handedOverAt}}
+)</li>
+<li>signBsdasri (RECEPTION) verrouille tous les champs recipient, et les champ reception</li>
+<li>signBsdasri (OPERATION) verrouille les champ operation</li>
+<li>si le champ wasteAcceptation ({transport {wasteAcceptation}}) est REFUSED signBsdasri (TRANSPORT) passe le dasri à l'état REFUSED</li>
+<li>si le champ wasteAcceptation ({reception {wasteAcceptation}}) est REFUSED signBsdasri (RECEPTION) passe le dasri à l'état REFUSED</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="états-du-dasri"></a><a href="#états-du-dasri" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>États du DASRI</h2>
+<p>L'ensemble des champs du BSD numérique est décrit dans la <a href="/docs/api-reference#bsdasri">référence de l'API</a>. Au cours de son cycle de vie, un BSD numérique peut passer par différents états décrits <a href="/docs/api-reference#bsdasristatus">ici</a>.</p>
+<ul>
+<li><code>INITIAL</code> (initial): C'est l'état dans lequel le dasri est créé. <code>readableId</code> est affecté.</li>
+<li><code>SIGNED_BY_PRODUCER</code> (prêt à être emporté) : Dasri signé par l'émetteur</li>
+<li><code>SENT</code> (envoyé): DASRI en transit vers l'installation de destination, d'entreposage ou de reconditionnement</li>
+<li><code>RECEIVED</code> (reçu): DASRI reçu sur l'installation de destination, d'entreposage ou de reconditionnement</li>
+<li><code>ACCEPTED</code> (accepté): DASRI accepté sur l'installation de destination, d'entreposage ou de reconditionnement</li>
+<li><code>PROCESSED</code> (traité): DASRI dont l'opération de traitement a été effectué</li>
+<li><code>REFUSED</code> (refusé): DASRI refusé, par le tranporteur ou le destinataire</li>
+</ul>
+<script src="https://unpkg.com/mermaid@8.1.0/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({startOnLoad:true});</script>
+<p>Le diagramme ci dessous retrace le cycle de vie d'un DASRI dans Trackdéchets:</p>
+<div class="mermaid">
+graph TD
+AO(NO STATE) -->|createDraftBsdasri| A
+AO(NO STATE) -->|createBsdasri| B
+A -->|"updateBsdasri (tous les champs)"| A
+B -->|"updateBsdasri (tous les champs)"| B
+C-->|"updateBsdasri (sauf champs signés)"| C
+D-->|"updateBsdasri (sauf champs signés)"| D
+E-->|"updateBsdasri (sauf champs signés)"| E
+A["INITIAL (isDraft=true)"] -->|publishBsdasri| B("INITIAL (isDraft=false)")
+B -->|"signBsdasri (EMISSION / EMISSION_WITH_SECRET_CODE)"| C(SIGNED_BY_PRODUCER)
+B -->|"signBsdasri (TRANSPORT) - si autorisé par émetteur" | D(SENT)
+C -->|"signBsdasri (TRANSPORT)"| D(SENT)
+D -->|"signBsdasri (RECEPTION)"| E(RECEIVED)
+E -->|"signBsdasri (OPERATION)"| F(PROCESSED)
+D -->|"signBsdasri (TRANSPORT *)"| G(REFUSED)
+C -->|"signBsdasri (RECEPTION *)"| G(REFUSED)
+</div>
+<p>* si champ wasteAcceptation correspondant  est REFUSED</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/docs/multimodal"><span class="arrow-prev">← </span><span>Transport multimodal</span></a><a class="docs-next button" href="/docs/regroupement-dasri"><span>Regroupement Dasri</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#numéro-de-dasri">Numéro de DASRI</a></li><li><a href="#concepts">Concepts</a></li><li><a href="#états-du-dasri">États du DASRI</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"><img src="/img/favicon.ico" alt="Trackdéchets Développeurs" width="66" height="58"/></a><div><h5>Trackdéchets</h5><a href="https://trackdechets.beta.gouv.fr">Site web</a><a href="https://trello.com/b/2pkc7bFg/trackd%C3%A9chets-roadmap-produit">Roadmap produit</a><a href="https://cutt.ly/trackdechets">Formulaire de remontée d&#x27;infos / idées / bugs</a><a href="https://github.com/MTES-MCT/trackdechets">Code source</a><a class="github-button" href="https://github.com/MTES-MCT/trackdechets" data-icon="octicon-star" data-count-href="/facebook/docusaurus/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div><div><h5>Communauté</h5><a href="https://forum.trackdechets.beta.gouv.fr">Forum technique</a></div><div><h5>API</h5><a href="/docs/api-reference">Référence de l&#x27;API</a><a href="https://status.trackdechets.beta.gouv.fr">Statut de l&#x27;API</a><a href="https://api.trackdechets.beta.gouv.fr">Playground</a></div></section><a href="https://beta.gouv.fr/incubateurs/mtes.html" target="_blank" rel="noreferrer noopener" class="fbOpenSource"><img src="/img/logo-mtes-mef.svg" alt="La Fabrique Numérique" width="170" height="45"/></a><section class="copyright">Copyright 2021 Ministère de la Transition Écologique et Solidaire</section></footer></div></body></html>
