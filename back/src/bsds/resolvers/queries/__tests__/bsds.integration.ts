@@ -178,7 +178,7 @@ describe("Query.bsds", () => {
         {
           variables: {
             where: {
-              isToCollectFor: [transporter.company.siret]
+              isFollowFor: [emitter.company.siret]
             }
           }
         }
@@ -208,7 +208,7 @@ describe("Query.bsds", () => {
     });
   });
 
-  describe("when the bsd is signed the transporter and producer", () => {
+  describe("when the bsd is signed by the transporter and the producer", () => {
     beforeAll(async () => {
       const { mutate } = makeClient(transporter.user);
       const SIGNED_BY_TRANSPORTER = `
