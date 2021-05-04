@@ -60,7 +60,7 @@
                 type="radio"
                 id="d_broyeur"
                 name="destination"
-                defaultChecked="${ form.recipientType === 'BROYEUR'}"
+                defaultChecked="${ form.destinationType === 'BROYEUR'}"
                 disabled
               />
               <label htmlFor="d_broyeur">Broyeur agréé</label>
@@ -71,7 +71,7 @@
                 type="radio"
                 id="d_demolisseur"
                 name="destination"
-                defaultChecked="${ form.recipientType === 'DEMOLISSEUR' }"
+                defaultChecked="${ form.destinationType === 'DEMOLISSEUR' }"
                 disabled
               />
               <label htmlFor="d_demolisseur">Démolisseur agréé</label>
@@ -79,16 +79,16 @@
           </div>
 
           <div>
-            <p>N° Agrément : ${form.recipientAgrementNumber}</p>
-            <p>N° SIRET : ${form.recipientCompanySiret}</p>
-            <p>NOM (Raison sociale) : ${form.recipientCompanyName}</p>
-            <p>Adresse : ${form.recipientCompanyAddress}</p>
+            <p>N° Agrément : ${form.destinationAgrementNumber}</p>
+            <p>N° SIRET : ${form.destinationCompanySiret}</p>
+            <p>NOM (Raison sociale) : ${form.destinationCompanyName}</p>
+            <p>Adresse : ${form.destinationCompanyAddress}</p>
             <div class="flex">
-              <p class="grow">Tel : ${form.recipientCompanyPhone}</p>
-              <p class="grow">Mail : ${form.recipientCompanyMail}</p>
+              <p class="grow">Tel : ${form.destinationCompanyPhone}</p>
+              <p class="grow">Mail : ${form.destinationCompanyMail}</p>
             </div>
             <p>
-              Nom de la personne à contacter : ${form.recipientCompanyContact}
+              Nom de la personne à contacter : ${form.destinationCompanyContact}
             </p>
           </div>
         </div>

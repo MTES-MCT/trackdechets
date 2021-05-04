@@ -313,6 +313,9 @@ input CompanyInput {
 
   "Numéro de téléphone de contact dans l'établissement"
   phone: String
+
+  "Numéro de TVA intracommunautaire"
+  vatNumber: String
 }
 
 """

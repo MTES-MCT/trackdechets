@@ -2,10 +2,11 @@ import { UserInputError } from "apollo-server-express";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { sendMail } from "../../../mailer/mailing";
-import { userMails } from "../../mails";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
+import { renderMail } from "../../../mailer/templates/renderers";
+import { inviteUserToJoin } from "../../../mailer/templates";
 
 const resendInvitationResolver: MutationResolvers["resendInvitation"] = async (
   parent,
@@ -13,7 +14,7 @@ const resendInvitationResolver: MutationResolvers["resendInvitation"] = async (
   context
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
-  const user = checkIsAuthenticated(context);
+  checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ siret });
 
   const invitations = await prisma.userAccountHash.findMany({
@@ -23,14 +24,14 @@ const resendInvitationResolver: MutationResolvers["resendInvitation"] = async (
   if (invitations.length === 0) {
     throw new UserInputError("Invitation non trouvée");
   }
-  await sendMail(
-    userMails.inviteUserToJoin(
-      email,
-      user.name,
-      company.name,
-      invitations[0].hash
-    )
-  );
+
+  const invitation = invitations[0];
+
+  const mail = renderMail(inviteUserToJoin, {
+    to: [{ email, name: email }],
+    variables: { hash: invitation.hash, companyName: company.name }
+  });
+  await sendMail(mail);
   return true;
 };
 

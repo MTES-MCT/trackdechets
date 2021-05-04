@@ -6,8 +6,10 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import * as mailsHelper from "../../../../mailer/mailing";
-import { userMails } from "../../../mails";
 import { AuthType } from "../../../../auth";
+import { renderMail } from "../../../../mailer/templates/renderers";
+import { membershipRequestRefused } from "../../../../mailer/templates";
+import { Mutation } from "../../../../generated/graphql/types";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -122,9 +124,12 @@ describe("mutation refuseMembershipRequest", () => {
       }
     });
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await mutate(REFUSE_MEMBERSHIP_REQUEST, {
-      variables: { id: membershipRequest.id }
-    });
+    const { data } = await mutate<Pick<Mutation, "refuseMembershipRequest">>(
+      REFUSE_MEMBERSHIP_REQUEST,
+      {
+        variables: { id: membershipRequest.id }
+      }
+    );
     expect(data.refuseMembershipRequest.users).toHaveLength(1);
     const refusedMembershipRequest = await prisma.membershipRequest.findUnique({
       where: {
@@ -142,7 +147,10 @@ describe("mutation refuseMembershipRequest", () => {
       })) != null;
     expect(associationExists).toEqual(false);
     expect(sendMailSpy).toHaveBeenCalledWith(
-      userMails.membershipRequestRefused(requester, company)
+      renderMail(membershipRequestRefused, {
+        to: [{ email: requester.email, name: requester.name }],
+        variables: { companyName: company.name, companySiret: company.siret }
+      })
     );
   });
 });

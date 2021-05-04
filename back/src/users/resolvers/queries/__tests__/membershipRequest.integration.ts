@@ -7,6 +7,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { Query } from "../../../../generated/graphql/types";
 
 const MEMBERSHIP_REQUEST = `
   query MembershipRequest($id: ID, $siret: String) {
@@ -25,7 +26,9 @@ describe("query membershipRequest", () => {
 
   it("should deny access to unauthenticated users", async () => {
     const { query } = makeClient();
-    const { errors } = await query(MEMBERSHIP_REQUEST);
+    const { errors } = await query<Pick<Query, "membershipRequest">>(
+      MEMBERSHIP_REQUEST
+    );
     expect(errors).toHaveLength(1);
     expect(errors[0].extensions.code).toEqual(ErrorCode.UNAUTHENTICATED);
   });
@@ -33,9 +36,12 @@ describe("query membershipRequest", () => {
   it("should return an error when trying to pass both id and siret", async () => {
     const user = await userFactory();
     const { query } = makeClient(user);
-    const { errors } = await query(MEMBERSHIP_REQUEST, {
-      variables: { id: "id", siret: "siret" }
-    });
+    const { errors } = await query<Pick<Query, "membershipRequest">>(
+      MEMBERSHIP_REQUEST,
+      {
+        variables: { id: "id", siret: "siret" }
+      }
+    );
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual(
       "Vous devez faire une recherche par `id` ou `siret` mais pas les deux"
@@ -45,9 +51,12 @@ describe("query membershipRequest", () => {
   it("should return error if invitation request by id does not exist", async () => {
     const user = await userFactory();
     const { query } = makeClient(user);
-    const { errors } = await query(MEMBERSHIP_REQUEST, {
-      variables: { id: "does_not_exist" }
-    });
+    const { errors } = await query<Pick<Query, "membershipRequest">>(
+      MEMBERSHIP_REQUEST,
+      {
+        variables: { id: "does_not_exist" }
+      }
+    );
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual(
       "Cette demande de rattachement n'existe pas"
@@ -58,9 +67,12 @@ describe("query membershipRequest", () => {
     const user = await userFactory();
     const company = await companyFactory();
     const { query } = makeClient(user);
-    const { data } = await query(MEMBERSHIP_REQUEST, {
-      variables: { siret: company.siret }
-    });
+    const { data } = await query<Pick<Query, "membershipRequest">>(
+      MEMBERSHIP_REQUEST,
+      {
+        variables: { siret: company.siret }
+      }
+    );
     expect(data.membershipRequest).toBeNull();
   });
 
@@ -74,9 +86,12 @@ describe("query membershipRequest", () => {
       }
     });
     const { query } = makeClient(admin);
-    const { data } = await query(MEMBERSHIP_REQUEST, {
-      variables: { id: membershipRequest.id }
-    });
+    const { data } = await query<Pick<Query, "membershipRequest">>(
+      MEMBERSHIP_REQUEST,
+      {
+        variables: { id: membershipRequest.id }
+      }
+    );
 
     expect(data.membershipRequest).toMatchObject({
       status: "PENDING",
@@ -96,9 +111,12 @@ describe("query membershipRequest", () => {
       }
     });
     const { query } = makeClient(requester);
-    const { data } = await query(MEMBERSHIP_REQUEST, {
-      variables: { siret: company.siret }
-    });
+    const { data } = await query<Pick<Query, "membershipRequest">>(
+      MEMBERSHIP_REQUEST,
+      {
+        variables: { siret: company.siret }
+      }
+    );
     expect(data.membershipRequest).toMatchObject({
       id: membershipRequest.id,
       status: "PENDING",

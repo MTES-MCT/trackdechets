@@ -1,4 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { Mutation } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
   formFactory,
@@ -107,11 +108,14 @@ describe("Mutation.duplicateForm", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(DUPLICATE_FORM, {
-      variables: {
-        id
+    const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+      DUPLICATE_FORM,
+      {
+        variables: {
+          id
+        }
       }
-    });
+    );
     const duplicatedForm = await prisma.form.findUnique({
       where: { id: data.duplicateForm.id }
     });
@@ -240,11 +244,14 @@ describe("Mutation.duplicateForm", () => {
       .temporaryStorageDetail();
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(DUPLICATE_FORM, {
-      variables: {
-        id: form.id
+    const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+      DUPLICATE_FORM,
+      {
+        variables: {
+          id: form.id
+        }
       }
-    });
+    );
     const duplicatedForm = await prisma.form.findUnique({
       where: { id: data.duplicateForm.id }
     });
@@ -304,11 +311,14 @@ describe("Mutation.duplicateForm", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(DUPLICATE_FORM, {
-      variables: {
-        id: form.id
+    const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+      DUPLICATE_FORM,
+      {
+        variables: {
+          id: form.id
+        }
       }
-    });
+    );
 
     // check relevant statusLog is created
     const statusLogs = await prisma.statusLog.findMany({

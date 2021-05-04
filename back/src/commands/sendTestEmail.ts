@@ -1,4 +1,5 @@
 import { sendMail } from "../mailer/mailing";
+import templateIds from "../mailer/templates/provider/templateIds";
 
 /**
  * Send a test email to a given address from command line
@@ -9,8 +10,8 @@ const sendtestEmail = () => {
   sendMail({
     to: [{ email: recipient, name: recipient }],
     subject: "Email de test",
-    title: "Email de test",
-    body: "Bonjour, ceci est un email de test de Trackdéchets."
+    body: "Bonjour, ceci est un email de test de Trackdéchets.",
+    templateId: templateIds.LAYOUT
   });
 };
 

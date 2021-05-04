@@ -43,7 +43,7 @@ services:
     image: node:10.14-alpine
     container_name: td-ui
     working_dir: /usr/src/front
-    command: sh -c "npm install && npm start"
+    command: sh -c "npm install && npm run dev"
     expose:
       - "3000"
     volumes:
@@ -65,7 +65,33 @@ services:
       - ./doc/website/siteConfig.js:/app/website/siteConfig.js
     working_dir: /app/website
     ports:
-      - "5000:3000"
+      - "5000:5000"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.0
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.elasticsearch == true"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.8.0
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
 
   nginx:
     image: nginx:1.19.6
@@ -78,8 +104,11 @@ services:
       UI_HOST: $UI_HOST
       DEVELOPERS_HOST: $DEVELOPERS_HOST
       NGINX_PROXY_HOST: $NGINX_PROXY_HOST
+      ELASTIC_SEARCH_HOST: $ELASTIC_SEARCH_HOST
+      KIBANA_HOST: $KIBANA_HOST
     ports:
       - "80:80"
 
 volumes:
   postgres:
+  elasticsearch:

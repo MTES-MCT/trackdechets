@@ -6,8 +6,7 @@ import {
   Form,
   QuantityType,
   WasteAcceptationStatus,
-  Prisma,
-  CompanyVerificationStatus
+  Prisma
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
@@ -24,8 +23,6 @@ import { PackagingInfo, Packagings } from "../generated/graphql/types";
 
 // set yup default error messages
 configureYup();
-
-const { VERIFY_COMPANY } = process.env;
 
 // ************************************************
 // BREAK DOWN FORM TYPE INTO INDIVIDUAL FRAME TYPES
@@ -970,15 +967,16 @@ async function checkDestination(siret: string) {
     );
   }
 
-  if (
-    VERIFY_COMPANY === "true" &&
-    company.verificationStatus !== CompanyVerificationStatus.VERIFIED
-  ) {
-    throw new UserInputError(
-      `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
-      n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 2 du bordereau.`
-    );
-  }
+  // DISABLED TEMPORARILY
+  // if (
+  //   VERIFY_COMPANY === "true" &&
+  //   company.verificationStatus !== CompanyVerificationStatus.VERIFIED
+  // ) {
+  //   throw new UserInputError(
+  //     `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
+  //     n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 2 du bordereau.`
+  //   );
+  // }
 
   return true;
 }
@@ -1009,15 +1007,16 @@ async function checkDestinationAfterTempStorage(siret: string) {
     );
   }
 
-  if (
-    VERIFY_COMPANY === "true" &&
-    company.verificationStatus !== CompanyVerificationStatus.VERIFIED
-  ) {
-    throw new UserInputError(
-      `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
-      n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 14 du bordereau.`
-    );
-  }
+  // DISABLED TEMPORARILY
+  // if (
+  //   VERIFY_COMPANY === "true" &&
+  //   company.verificationStatus !== CompanyVerificationStatus.VERIFIED
+  // ) {
+  //   throw new UserInputError(
+  //     `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
+  //     n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 14 du bordereau.`
+  //   );
+  // }
 
   return true;
 }

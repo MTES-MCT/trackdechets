@@ -1,5 +1,6 @@
 import { CompanyType, CompanyVerificationStatus, Status } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { Mutation } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
   companyFactory,
@@ -10,12 +11,19 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import * as mailer from "../../../../mailer/mailing";
+import { contentAwaitsGuest } from "../../../../mailer/templates";
+import { renderMail } from "../../../../mailer/templates/renderers";
 
 jest.mock("axios", () => ({
   default: {
     get: jest.fn(() => Promise.resolve({ data: {} }))
   }
 }));
+
+// No mails
+const sendMailSpy = jest.spyOn(mailer, "sendMail");
+sendMailSpy.mockImplementation(() => Promise.resolve());
 
 const MARK_AS_SEALED = `
   mutation MarkAsSealed($id: ID!) {
@@ -37,6 +45,7 @@ describe("Mutation.markAsSealed", () => {
   });
 
   afterEach(() => {
+    jest.resetAllMocks();
     process.env = OLD_ENV;
   });
 
@@ -370,11 +379,14 @@ describe("Mutation.markAsSealed", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(MARK_AS_SEALED, {
-      variables: {
-        id: form.id
+    const { data } = await mutate<Pick<Mutation, "markAsSealed">>(
+      MARK_AS_SEALED,
+      {
+        variables: {
+          id: form.id
+        }
       }
-    });
+    );
 
     expect(data.markAsSealed.status).toBe("SEALED");
   });
@@ -419,7 +431,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: "11111111111111"
+        recipientCompanySiret: "12345654327896"
       }
     });
     const { mutate } = makeClient(user);
@@ -429,7 +441,7 @@ describe("Mutation.markAsSealed", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination ou d’entreposage ou de reconditionnement qui a été renseignée en case 2 (SIRET: 11111111111111) n'est pas inscrite sur Trackdéchets`
+        message: `L'installation de destination ou d’entreposage ou de reconditionnement qui a été renseignée en case 2 (SIRET: 12345654327896) n'est pas inscrite sur Trackdéchets`
       })
     ]);
   });
@@ -483,7 +495,7 @@ describe("Mutation.markAsSealed", () => {
       where: { id: form.id },
       data: {
         temporaryStorageDetail: {
-          update: { destinationCompanySiret: "11111111111111" }
+          update: { destinationCompanySiret: "12345654327896" }
         }
       }
     });
@@ -493,7 +505,7 @@ describe("Mutation.markAsSealed", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination après entreposage provisoire ou reconditionnement qui a été renseignée en case 14 (SIRET 11111111111111) n'est pas inscrite sur Trackdéchets`
+        message: `L'installation de destination après entreposage provisoire ou reconditionnement qui a été renseignée en case 14 (SIRET 12345654327896) n'est pas inscrite sur Trackdéchets`
       })
     ]);
   });
@@ -538,7 +550,7 @@ describe("Mutation.markAsSealed", () => {
     ]);
   });
 
-  it("should throw an error if VERIFY_COMPANY=true and destination is not verified", async () => {
+  it.skip("should throw an error if VERIFY_COMPANY=true and destination is not verified", async () => {
     // patch process.env and reload server
     process.env.VERIFY_COMPANY = "true";
     const makeClient = require("../../../../__tests__/testClient").default;
@@ -571,7 +583,7 @@ describe("Mutation.markAsSealed", () => {
     ]);
   });
 
-  it("should throw an error if VERIFY_COMPANY=true and destination after temp storage is not verified", async () => {
+  it.skip("should throw an error if VERIFY_COMPANY=true and destination after temp storage is not verified", async () => {
     // patch process.env and reload server
     process.env.VERIFY_COMPANY = "true";
     const makeClient = require("../../../../__tests__/testClient").default;
@@ -613,5 +625,84 @@ describe("Mutation.markAsSealed", () => {
       n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 14 du bordereau.`
       })
     ]);
+  });
+
+  it("should send an email to emitter contact if emitter company is not registered", async () => {
+    const { user, company: destination } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR]
+      }
+    );
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: "12345654327896",
+        emitterCompanyContact: "John Snow",
+        emitterCompanyMail: "john.snow@trackdechets.fr",
+        recipientCompanySiret: destination.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+
+    expect(sendMailSpy).toHaveBeenCalledWith(
+      renderMail(contentAwaitsGuest, {
+        to: [
+          { email: form.emitterCompanyMail, name: form.emitterCompanyContact }
+        ],
+        variables: {
+          company: {
+            siret: form.emitterCompanySiret,
+            name: form.emitterCompanyName
+          }
+        }
+      })
+    );
+  });
+
+  it("should not send an email to emitter contact if contact email already appears in a previous BSD", async () => {
+    const { user, company: destination } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR]
+      }
+    );
+
+    // a previous non draft BSD already exists
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "PROCESSED",
+        emitterCompanySiret: "12345654327896",
+        emitterCompanyContact: "John Snow",
+        emitterCompanyMail: "john.snow@trackdechets.fr",
+        recipientCompanySiret: destination.siret
+      }
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: "12345654327896",
+        emitterCompanyContact: "John Snow",
+        emitterCompanyMail: "john.snow@trackdechets.fr",
+        recipientCompanySiret: destination.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+
+    expect(sendMailSpy).not.toHaveBeenCalled();
   });
 });

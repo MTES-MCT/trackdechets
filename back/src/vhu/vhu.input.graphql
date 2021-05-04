@@ -12,7 +12,7 @@ input BsvhuInput {
   quantity: BsvhuQuantityInput
 
   "Détails sur la destination"
-  recipient: BsvhuRecipientInput
+  destination: BsvhuDestinationInput
   "Détails sur le transporteur"
   transporter: BsvhuTransporterInput
 }
@@ -39,48 +39,60 @@ input BsvhuQuantityInput {
   tons: Float
 }
 
-input BsvhuRecipientInput {
+input BsvhuDestinationInput {
   "Type de receveur: broyeur ou second centre VHU"
-  type: BsvhuRecipientType
+  type: BsvhuDestinationType
   "Numéro d'agrément de receveur"
   agrementNumber: String
   "Coordonnées de l'entreprise qui recoit les déchets"
   company: CompanyInput
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  plannedOperationCode: String
 
-  "Informations d'acceptation"
-  acceptance: BsvhuAcceptanceInput
+  "Informations de réception"
+  reception: BsvhuReceptionInput
   "Informations sur l'opétation de traitement"
   operation: BsvhuOperationInput
-
-  "Destination utérieure prévue, dans le cas d'un second centre VHU"
-  plannedBroyeurCompany: CompanyInput
 }
 
-input BsvhuAcceptanceInput {
+input BsvhuReceptionInput {
+  "Date de présentation sur site"
+  date: DateTime
   "Quantité réelle reçue"
-  quantity: Float
-  "Status d'acceptation du déchet"
-  status: WasteAcceptationStatusInput
-  "Raison du refus du déchet, dans le cas d'un refus"
+  quantity: BsvhuQuantityInput
+  "Lot accepté oui/non"
+  acceptationStatus: WasteAcceptationStatusInput
+  "Motif de refus"
   refusalReason: String
   "Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)"
   identification: BsvhuIdentificationInput
 }
 
 input BsvhuOperationInput {
-  "Opération de traitement prévue"
-  planned: String
-  "Opération de traitement réalisée"
-  done: String
+  "Date de réalisation"
+  date: DateTime
+  "Opération de traitement réalisée (R4 ou R12)"
+  code: String
+  "Broyeur de destination, à remplir uniquement lorsque la destination est lui même un centre VHU"
+  nextDestination: BsvhuNextDestinationInput
+}
+
+input BsvhuNextDestinationInput {
+  company: CompanyInput
 }
 
 input BsvhuTransporterInput {
   "Coordonnées de l'entreprise de transport"
   company: CompanyInput
-  "Numéro de TVA intracommunautaire, dans le cas d'un transporteur étranger"
-  tvaIntracommunautaire: String
   "Récépissé transporteur"
   recepisse: BsvhuRecepisseInput
+  "Informations liés au transport"
+  transport: BsvhuTransportInput
+}
+
+input BsvhuTransportInput {
+  "Date de prise en charge"
+  takenOverAt: DateTime
 }
 
 input BsvhuRecepisseInput {
@@ -101,7 +113,7 @@ input BsvhuSignatureInput {
 }
 
 enum SignatureTypeInput {
-  EMITTER
-  TRANSPORTER
-  RECIPIENT
+  EMISSION
+  TRANSPORT
+  OPERATION
 }

@@ -14,7 +14,8 @@ import {
   getCompanyActiveUsers,
   getCompanyOrCompanyNotFound
 } from "../../database";
-import { companyMails } from "../../mails";
+import { renderMail } from "../../../mailer/templates/renderers";
+import { securityCodeRenewal } from "../../../mailer/templates";
 
 /**
  * This function is used to renew the security code
@@ -60,9 +61,11 @@ export async function renewSecurityCodeFn(
   const users = await getCompanyActiveUsers(siret);
   const recipients = users.map(({ email, name }) => ({ email, name }));
 
-  const mail = companyMails.securityCodeRenewal(recipients, {
-    siret: updatedCompany.siret,
-    name: updatedCompany.name
+  const mail = renderMail(securityCodeRenewal, {
+    to: recipients,
+    variables: {
+      company: { siret: company.siret, name: company.name }
+    }
   });
   sendMail(mail);
 

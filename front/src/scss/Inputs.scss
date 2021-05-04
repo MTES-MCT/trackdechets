@@ -1,4 +1,5 @@
 @import "src/scss/Constants.scss";
+@import "src/scss/Mixins.scss";
 
 input:focus,
 textarea:focus,
@@ -131,20 +132,7 @@ select:-moz-focusring {
 .td-radio,
 .td-checkbox,
 .td-select {
-  width: 100%;
-  outline: none;
-  padding: 0.5em 0.875em;
-  font: inherit;
-  line-height: 1.6;
-  color: #1c1c1c;
-  color: $black;
-  border-radius: $common-radius;
-  border: 1px solid #adb9c9;
-  border: 1px solid $grey;
-  background: #fff;
-  background: $white;
-  vertical-align: middle;
-  position: relative;
+  @include input;
 }
 
 .td-select {

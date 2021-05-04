@@ -1,4 +1,5 @@
 FROM node:14.15.4 AS builder
+ARG SCALINGO_CERT
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci --quiet

@@ -10,6 +10,7 @@
     "@sentry/browser": "^5.28.0",
     "@sentry/react": "^5.28.0",
     "@types/mapbox-gl": "^0.54.5",
+    "@types/react-table": "^7.0.29",
     "classnames": "^2.2.6",
     "cleave.js": "^1.6.0",
     "cogo-toast": "^4.1.3",

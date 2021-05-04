@@ -1,12 +1,11 @@
 version: "3.7"
 services:
-
   td-api:
     build:
       context: ./back
+      args:
+        - SCALINGO_CERT=${SCALINGO_CERT}
 
   td-ui:
     build:
       context: ./front
-
-

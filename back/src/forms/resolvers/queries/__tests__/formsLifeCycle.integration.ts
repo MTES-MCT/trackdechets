@@ -15,6 +15,7 @@ import {
   prepareRedis,
   storeRedisCompanyInfo
 } from "../../../__tests__/helpers";
+import { Query } from "../../../../generated/graphql/types";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -365,7 +366,9 @@ describe("Test formsLifeCycle query", () => {
 
     const { query } = makeClient(trader);
 
-    const { data } = await query<{ data }>(FORMS_LIFECYCLE);
+    const { data } = await query<Pick<Query, "formsLifeCycle">>(
+      FORMS_LIFECYCLE
+    );
     const { statusLogs } = data.formsLifeCycle;
     expect(statusLogs.length).toBe(1);
     expect(statusLogs[0].status).toBe("SENT");

@@ -1,4 +1,3 @@
-import { useQuery } from "@apollo/client";
 import React from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -9,23 +8,17 @@ import {
   BlankslateTitle,
   BlankslateDescription,
 } from "common/components";
-import { Query, QueryFormsArgs } from "generated/graphql/types";
 import { BSDList } from "../../components/BSDList";
-import { FOLLOW_TAB_FORMS } from "../queries";
 import illustration from "./assets/blankslateFollow.svg";
 
 export function RouteBsdsFollow() {
   const { siret } = useParams<{ siret: string }>();
-  const { data, loading, fetchMore, refetch } = useQuery<
-    Pick<Query, "forms">,
-    Partial<QueryFormsArgs>
-  >(FOLLOW_TAB_FORMS, {
-    variables: {
-      siret,
-    },
-    notifyOnNetworkStatusChange: true,
-  });
-  const forms = data?.forms ?? [];
+  const defaultWhere = React.useMemo(
+    () => ({
+      isFollowFor: [siret],
+    }),
+    [siret]
+  );
 
   return (
     <>
@@ -36,10 +29,7 @@ export function RouteBsdsFollow() {
 
       <BSDList
         siret={siret}
-        forms={forms}
-        loading={loading}
-        fetchMore={fetchMore}
-        refetch={refetch}
+        defaultWhere={defaultWhere}
         blankslate={
           <Blankslate>
             <BlankslateImg src={illustration} alt="" />

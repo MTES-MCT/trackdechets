@@ -1,4 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { Query } from "../../../../generated/graphql/types";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { vhuFormFactory } from "../../../__tests__/factories.vhu";
@@ -8,7 +9,7 @@ query GetBsvhu($id: ID!) {
   bsvhu(id: $id) {
     id
     isDraft
-    recipient {
+    destination {
       company {
         siret
       }
@@ -27,8 +28,8 @@ query GetBsvhu($id: ID!) {
         contact
         mail
         phone
+        vatNumber
       }
-      tvaIntracommunautaire
       recepisse {
         number
       }
@@ -53,7 +54,7 @@ describe("Query.Bsvhu", () => {
 
     const { query } = makeClient(user);
 
-    const { data } = await query(GET_BSVHU, {
+    const { data } = await query<Pick<Query, "bsvhu">>(GET_BSVHU, {
       variables: { id: form.id }
     });
 

@@ -3,6 +3,7 @@ import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import { ErrorCode } from "../../../../common/errors";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const CREATE_UPLOAD_LINK = `
   mutation CreateUploadLink($fileName: String!, $fileType: String!){
@@ -31,9 +32,12 @@ describe("createUploadLink", () => {
   it("should return a signed url", async () => {
     const user = await userFactory();
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await mutate(CREATE_UPLOAD_LINK, {
-      variables: { fileName: "awesome pdf", fileType: "application/pdf" }
-    });
+    const { data } = await mutate<Pick<Mutation, "createUploadLink">>(
+      CREATE_UPLOAD_LINK,
+      {
+        variables: { fileName: "awesome pdf", fileType: "application/pdf" }
+      }
+    );
     expect(getPutSignedUrlSpy).toHaveBeenCalledTimes(1);
     expect(data.createUploadLink.signedUrl).toEqual("signedUrl");
   });

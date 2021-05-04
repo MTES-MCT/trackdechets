@@ -1,5 +1,9 @@
 import { User } from "@prisma/client";
-import { userMails } from "../../../mails";
+import {
+  inviteUserToJoin,
+  notifyUserOfInvite
+} from "../../../../mailer/templates";
+import { renderMail } from "../../../../mailer/templates/renderers";
 import { inviteUserToCompanyFn as inviteUserToCompany } from "../inviteUserToCompany";
 
 const userMock = jest.fn();
@@ -58,12 +62,10 @@ describe("inviteUserToCompany", () => {
     );
 
     expect(sendMailMock).toHaveBeenCalledWith(
-      userMails.notifyUserOfInvite(
-        "arya.stark@trackdechets.fr",
-        "Arya Stark",
-        "John Snow",
-        "Code en Stock"
-      )
+      renderMail(notifyUserOfInvite, {
+        to: [{ email: "arya.stark@trackdechets.fr", name: "Arya Stark" }],
+        variables: { companyName: "Code en Stock" }
+      })
     );
   });
 
@@ -94,12 +96,15 @@ describe("inviteUserToCompany", () => {
     );
 
     expect(sendMailMock).toHaveBeenCalledWith(
-      userMails.inviteUserToJoin(
-        "arya.stark@trackdechets.fr",
-        "John Snow",
-        "Code en Stock",
-        "hash"
-      )
+      renderMail(inviteUserToJoin, {
+        to: [
+          {
+            name: "arya.stark@trackdechets.fr",
+            email: "arya.stark@trackdechets.fr"
+          }
+        ],
+        variables: { companyName: "Code en Stock", hash: "hash" }
+      })
     );
   });
 

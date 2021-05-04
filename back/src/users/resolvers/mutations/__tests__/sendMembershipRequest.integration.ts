@@ -8,7 +8,12 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { associateUserToCompany } from "../../../database";
-import { userMails } from "../../../mails";
+import { renderMail } from "../../../../mailer/templates/renderers";
+import {
+  membershipRequestConfirmation,
+  membershipRequest as membershipRequestMail
+} from "../../../../mailer/templates";
+import { Mutation } from "../../../../generated/graphql/types";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -47,9 +52,12 @@ describe("mutation sendMembershipRequest", () => {
     const company = await companyFactory();
     await associateUserToCompany(admin.id, company.siret, "ADMIN");
     const { mutate } = makeClient(requester);
-    const { data } = await mutate(SEND_MEMBERSHIP_REQUEST, {
-      variables: { siret: company.siret }
-    });
+    const { data } = await mutate<Pick<Mutation, "sendMembershipRequest">>(
+      SEND_MEMBERSHIP_REQUEST,
+      {
+        variables: { siret: company.siret }
+      }
+    );
     const { id, status, sentTo, email, siret } = data.sendMembershipRequest;
     expect(status).toEqual("PENDING");
     // emails should be hidden
@@ -78,17 +86,23 @@ describe("mutation sendMembershipRequest", () => {
 
     expect(sendMailSpy).toHaveBeenNthCalledWith(
       1,
-      userMails.membershipRequest(
-        [{ email: admin.email, name: admin.name }],
-        `${process.env.UI_URL_SCHEME}://${process.env.UI_HOST}/membership-request/${membershipRequest.id}`,
-        requester,
-        company
-      )
+      renderMail(membershipRequestMail, {
+        to: [{ email: admin.email, name: admin.name }],
+        variables: {
+          membershipRequestId: membershipRequest.id,
+          companyName: company.name,
+          companySiret: company.siret,
+          userEmail: requester.email
+        }
+      })
     );
 
     expect(sendMailSpy).toHaveBeenNthCalledWith(
       2,
-      userMails.membershipRequestConfirmation(requester, company)
+      renderMail(membershipRequestConfirmation, {
+        to: [{ email: requester.email, name: requester.name }],
+        variables: { companyName: company.name, companySiret: company.siret }
+      })
     );
   });
 

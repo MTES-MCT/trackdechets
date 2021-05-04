@@ -6,6 +6,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
+import { Mutation } from "../../../../generated/graphql/types";
 
 jest.mock("axios", () => ({
   default: {
@@ -37,7 +38,7 @@ describe("{ mutation { prepareSegment } }", () => {
     });
 
     const { mutate } = makeClient(firstTransporter);
-    const { data } = await mutate(
+    const { data } = await mutate<Pick<Mutation, "prepareSegment">>(
       `mutation  {
         prepareSegment(id:"${form.id}",
          siret:"${transporterSiret}",
@@ -86,7 +87,7 @@ describe("{ mutation { prepareSegment } }", () => {
     });
 
     const { mutate } = makeClient(firstTransporter);
-    const { data } = await mutate(
+    const { data } = await mutate<Pick<Mutation, "prepareSegment">>(
       `mutation  {
         prepareSegment(id:"${form.id}",
          siret:"${transporterSiret}",

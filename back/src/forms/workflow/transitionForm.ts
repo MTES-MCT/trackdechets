@@ -5,6 +5,8 @@ import machine from "./machine";
 import { InvalidTransition } from "../errors";
 import { formDiff } from "./diff";
 import { eventEmitter, TDEvent } from "../../events/emitter";
+import { indexForm } from "../elastic";
+import { getFullForm } from "../database";
 
 /**
  * Transition a form from initial state (ex: DRAFT) to next state (ex: SEALED)
@@ -75,6 +77,9 @@ export default async function transitionForm(
       updatedFields
     }
   });
+
+  const fullForm = await getFullForm(updatedForm);
+  await indexForm(fullForm);
 
   return updatedForm;
 }

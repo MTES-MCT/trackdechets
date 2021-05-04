@@ -18,3 +18,4 @@ export * from "./Label";
 export * from "./Slideshow";
 export * from "./List";
 export * from "./Blankslate";
+export * from "./Table";

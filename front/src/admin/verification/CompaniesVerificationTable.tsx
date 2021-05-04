@@ -28,7 +28,7 @@ export default function CompaniesVerificationTable({
     () => [
       {
         Header: "Date de création",
-        accessor: "createdAt",
+        accessor: "createdAt" as const,
         disableFilters: true,
         Cell: ({ value: createdAt }) =>
           createdAt && format(new Date(createdAt), "yyyy-MM-dd"),
@@ -46,7 +46,7 @@ export default function CompaniesVerificationTable({
       },
       {
         Header: "Profil",
-        accessor: "companyTypes",
+        accessor: "companyTypes" as const,
         disableFilters: true,
         Cell: ({ value: companyTypes }) => {
           return (
@@ -60,7 +60,7 @@ export default function CompaniesVerificationTable({
       },
       {
         Header: "Admin",
-        accessor: "admin",
+        accessor: "admin" as const,
         disableFilters: true,
         Cell: ({ value: admin }) => (
           <>
@@ -76,7 +76,7 @@ export default function CompaniesVerificationTable({
       },
       {
         Header: "Statut de vérification",
-        accessor: "verificationStatus",
+        accessor: "verificationStatus" as const,
         Filter: VerificationStatusFilter,
         filter: "includes",
         Cell: ({ row, value }) => {

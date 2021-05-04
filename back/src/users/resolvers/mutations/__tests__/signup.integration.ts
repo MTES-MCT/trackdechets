@@ -5,7 +5,9 @@ import { ErrorCode } from "../../../../common/errors";
 import * as mailsHelper from "../../../../mailer/mailing";
 import { server } from "../../../../server";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
-import { userMails } from "../../../mails";
+import { renderMail } from "../../../../mailer/templates/renderers";
+import { onSignup } from "../../../../mailer/templates";
+import { Mutation } from "../../../../generated/graphql/types";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -38,7 +40,7 @@ describe("Mutation.signup", () => {
       phone: "06 00 00 00 00"
     };
 
-    const { data } = await mutate(SIGNUP, {
+    const { data } = await mutate<Pick<Mutation, "signup">>(SIGNUP, {
       variables: {
         userInfos: {
           email: user.email,
@@ -61,7 +63,10 @@ describe("Mutation.signup", () => {
     expect(activationHashes.length).toEqual(1);
 
     expect(sendMailSpy).toHaveBeenCalledWith(
-      userMails.onSignup(newUser, activationHashes[0].hash)
+      renderMail(onSignup, {
+        to: [{ email: newUser.email, name: newUser.name }],
+        variables: { activationHash: activationHashes[0].hash }
+      })
     );
   });
 

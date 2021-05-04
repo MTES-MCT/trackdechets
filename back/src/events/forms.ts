@@ -13,101 +13,20 @@ import { getCompanyAdminUsers } from "../companies/database";
 import { searchCompany } from "../companies/sirene";
 import { anomalies, verifyPrestataire } from "../companies/verif";
 import { buildPdfBase64 } from "../forms/pdf/generator";
-import { userMails } from "../users/mails";
 import Dreals from "./dreals";
 import { TDEventPayload } from "./emitter";
+import { renderMail } from "../mailer/templates/renderers";
+import { formNotAccepted, formPartiallyRefused } from "../mailer/templates";
 
 export async function formsEventCallback(payload: TDEventPayload<Form>) {
   await Promise.all([
-    mailToInexistantRecipient(payload).catch(err =>
-      console.error("Error on inexistant recipient subscription", err)
-    ),
-    mailToInexistantEmitter(payload).catch(err =>
-      console.error("Error on inexistant emitter subscription", err)
-    ),
     mailWhenFormIsDeclined(payload).catch(err =>
       console.error("Error on declined form subscription", err)
     ),
     verifiyPresta(payload).catch(err =>
       console.error("Error on prestataire verification form subscription", err)
-    ),
-    mailWhenFormTraceabilityIsBroken(payload).catch(err =>
-      console.error("Error on form traceability break subscription", err)
     )
   ]);
-}
-
-async function mailToInexistantRecipient(payload: TDEventPayload<Form>) {
-  if (payload.updatedFields?.hasOwnProperty("isDeleted") || !payload.node) {
-    return;
-  }
-
-  const previousRecipientSiret = payload.previousNode
-    ? payload.previousNode.recipientCompanySiret
-    : null;
-  const recipientSiret = payload.node.recipientCompanySiret;
-  const recipientMail = payload.node.recipientCompanyMail;
-  const recipientName =
-    payload.node.recipientCompanyName || "Monsieur / Madame";
-
-  if (
-    !recipientSiret ||
-    !recipientMail ||
-    previousRecipientSiret === recipientSiret
-  ) {
-    return;
-  }
-
-  const companyExists = await prisma.company.findFirst({
-    where: { siret: recipientSiret }
-  });
-  if (companyExists) {
-    return;
-  }
-
-  return sendMail(
-    userMails.contentAwaitsGuest(
-      recipientMail,
-      recipientName,
-      payload.node.recipientCompanyName,
-      payload.node.recipientCompanySiret,
-      payload.node.emitterCompanyName
-    )
-  );
-}
-
-async function mailToInexistantEmitter(payload: TDEventPayload<Form>) {
-  if (payload.updatedFields?.hasOwnProperty("isDeleted") || !payload.node) {
-    return;
-  }
-
-  const previousEmitterSiret = payload.previousNode
-    ? payload.previousNode.emitterCompanySiret
-    : null;
-  const emitterSiret = payload.node.emitterCompanySiret;
-  const emitterMail = payload.node.emitterCompanyMail;
-  const emitterName = payload.node.emitterCompanyName || "Monsieur / Madame";
-
-  if (!emitterSiret || !emitterMail || previousEmitterSiret === emitterSiret) {
-    return;
-  }
-
-  const companyExists = await prisma.company.findFirst({
-    where: { siret: emitterSiret }
-  });
-  if (companyExists) {
-    return;
-  }
-
-  return sendMail(
-    userMails.contentAwaitsGuest(
-      emitterMail,
-      emitterName,
-      payload.node.emitterCompanyName,
-      payload.node.emitterCompanySiret,
-      payload.node.recipientCompanyName
-    )
-  );
 }
 
 /**
@@ -179,13 +98,17 @@ export async function mailWhenFormIsDeclined(payload: TDEventPayload<Form>) {
   ].map(admin => ({ email: admin.email, name: admin.name }));
 
   // Get formNotAccepted or formPartiallyRefused mail function according to wasteAcceptationStatus value
-  const mailFunction = {
-    REFUSED: userMails.formNotAccepted,
-    PARTIALLY_REFUSED: userMails.formPartiallyRefused
+  const mailTemplate = {
+    REFUSED: formNotAccepted,
+    PARTIALLY_REFUSED: formPartiallyRefused
   }[payload.node.wasteAcceptationStatus];
 
-  const mail = mailFunction(recipients, ccs, form, attachmentData);
-
+  const mail = renderMail(mailTemplate, {
+    to: recipients,
+    cc: ccs,
+    variables: { form },
+    attachment: attachmentData
+  });
   return sendMail(mail);
 }
 
@@ -223,23 +146,4 @@ async function verifiyPresta(payload: TDEventPayload<Form>) {
         );
     }
   }
-}
-
-async function mailWhenFormTraceabilityIsBroken(payload: TDEventPayload<Form>) {
-  if (
-    !payload.updatedFields?.hasOwnProperty("noTraceability") ||
-    !payload.node ||
-    !payload.node.noTraceability
-  ) {
-    return;
-  }
-
-  const form = await prisma.form.findUnique({ where: { id: payload.node.id } });
-  return sendMail(
-    userMails.formTraceabilityBreak(
-      form.emitterCompanyMail,
-      form.emitterCompanyContact,
-      form
-    )
-  );
 }

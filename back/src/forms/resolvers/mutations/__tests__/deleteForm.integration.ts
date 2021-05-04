@@ -7,6 +7,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const DELETE_FORM = `
 mutation DeleteForm($id: ID!) {
@@ -28,7 +29,7 @@ describe("Mutation.deleteForm", () => {
       opt: { status: "DRAFT" }
     });
 
-    const { errors } = await mutate(DELETE_FORM, {
+    const { errors } = await mutate<Pick<Mutation, "deleteForm">>(DELETE_FORM, {
       variables: { id: form.id }
     });
 
@@ -52,7 +53,7 @@ describe("Mutation.deleteForm", () => {
       opt: { status: "DRAFT" }
     });
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(DELETE_FORM, {
+    const { errors } = await mutate<Pick<Mutation, "deleteForm">>(DELETE_FORM, {
       variables: { id: form.id }
     });
 
@@ -75,7 +76,7 @@ describe("Mutation.deleteForm", () => {
       opt: { status: "SENT", emitterCompanySiret: company.siret }
     });
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(DELETE_FORM, {
+    const { errors } = await mutate<Pick<Mutation, "deleteForm">>(DELETE_FORM, {
       variables: { id: form.id }
     });
 
@@ -104,7 +105,7 @@ describe("Mutation.deleteForm", () => {
       });
 
       const { mutate } = makeClient(user);
-      const { data } = await mutate(DELETE_FORM, {
+      const { data } = await mutate<Pick<Mutation, "deleteForm">>(DELETE_FORM, {
         variables: { id: form.id }
       });
 
@@ -128,7 +129,7 @@ describe("Mutation.deleteForm", () => {
       });
 
       const { mutate } = makeClient(user);
-      const { data } = await mutate(DELETE_FORM, {
+      const { data } = await mutate<Pick<Mutation, "deleteForm">>(DELETE_FORM, {
         variables: { id: form.id }
       });
 

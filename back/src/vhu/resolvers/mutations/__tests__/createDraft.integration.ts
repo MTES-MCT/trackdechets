@@ -1,5 +1,6 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
+import { Mutation } from "../../../../generated/graphql/types";
 import {
   userFactory,
   userWithCompanyFactory
@@ -10,7 +11,7 @@ const CREATE_VHU_FORM = `
 mutation CreateVhuForm($input: BsvhuInput!) {
   createDraftBsvhu(input: $input) {
     id
-    recipient {
+    destination {
       company {
           siret
       }
@@ -42,9 +43,12 @@ describe("Mutation.Vhu.createDraft", () => {
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
-    const { errors } = await mutate(CREATE_VHU_FORM, {
-      variables: { input: {} }
-    });
+    const { errors } = await mutate<Pick<Mutation, "createDraftBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: { input: {} }
+      }
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -60,17 +64,20 @@ describe("Mutation.Vhu.createDraft", () => {
     const user = await userFactory();
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_VHU_FORM, {
-      variables: {
-        input: {
-          emitter: {
-            company: {
-              siret: "siret"
+    const { errors } = await mutate<Pick<Mutation, "createDraftBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input: {
+            emitter: {
+              company: {
+                siret: "siret"
+              }
             }
           }
         }
       }
-    });
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -83,7 +90,7 @@ describe("Mutation.Vhu.createDraft", () => {
     ]);
   });
 
-  it("create a form with an emitter and a recipient", async () => {
+  it("create a form with an emitter and a destination", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const input = {
@@ -92,21 +99,24 @@ describe("Mutation.Vhu.createDraft", () => {
           siret: company.siret
         }
       },
-      recipient: {
+      destination: {
         company: {
           siret: "11111111111111"
         }
       }
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_VHU_FORM, {
-      variables: {
-        input
+    const { data } = await mutate<Pick<Mutation, "createDraftBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
       }
-    });
+    );
 
-    expect(data.createDraftBsvhu.recipient.company).toMatchObject(
-      input.recipient.company
+    expect(data.createDraftBsvhu.destination.company).toMatchObject(
+      input.destination.company
     );
   });
 });

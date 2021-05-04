@@ -3,6 +3,7 @@ import prisma from "../../../../prisma";
 import { AuthType } from "../../../../auth";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const UPDATE_COMPANY = `
   mutation UpdateCompany(
@@ -50,9 +51,12 @@ describe("mutation updateCompany", () => {
       givenName: "newGivenName",
       website: "newWebsite@trackechets.fr"
     };
-    const { data } = await mutate(UPDATE_COMPANY, {
-      variables
-    });
+    const { data } = await mutate<Pick<Mutation, "updateCompany">>(
+      UPDATE_COMPANY,
+      {
+        variables
+      }
+    );
     expect(data.updateCompany.id).toEqual(company.id);
 
     const updatedCompany = await prisma.company.findUnique({

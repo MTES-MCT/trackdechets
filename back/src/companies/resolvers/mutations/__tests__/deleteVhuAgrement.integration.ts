@@ -3,6 +3,7 @@ import prisma from "../../../../prisma";
 import { AuthType } from "../../../../auth";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { Mutation } from "../../../../generated/graphql/types";
 
 describe("{ mutation { deleteVhuAgrement } }", () => {
   afterEach(() => resetDatabase());
@@ -35,7 +36,9 @@ describe("{ mutation { deleteVhuAgrement } }", () => {
       }
     `;
 
-    const { data } = await mutate(mutation);
+    const { data } = await mutate<Pick<Mutation, "deleteVhuAgrement">>(
+      mutation
+    );
     expect(data.deleteVhuAgrement.id).toEqual(createdAgrement.id);
 
     expect(await prisma.vhuAgrement.count()).toEqual(0);

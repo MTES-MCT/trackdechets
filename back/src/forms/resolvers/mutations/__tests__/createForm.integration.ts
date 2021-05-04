@@ -9,6 +9,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
@@ -84,7 +85,7 @@ describe("Mutation.createForm", () => {
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
-    const { errors } = await mutate(CREATE_FORM, {
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
       variables: { createFormInput: {} }
     });
 
@@ -102,7 +103,7 @@ describe("Mutation.createForm", () => {
     const user = await userFactory();
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_FORM, {
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
       variables: {
         createFormInput: {
           emitter: {
@@ -131,7 +132,7 @@ describe("Mutation.createForm", () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
       const { mutate } = makeClient(user);
-      const { data } = await mutate(CREATE_FORM, {
+      const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
         variables: {
           createFormInput: {
             [role]: {
@@ -159,7 +160,7 @@ describe("Mutation.createForm", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_FORM, {
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
       variables: {
         createFormInput: {
           ecoOrganisme: {
@@ -188,7 +189,7 @@ describe("Mutation.createForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_FORM, {
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
       variables: {
         createFormInput
       }
@@ -223,7 +224,7 @@ describe("Mutation.createForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_FORM, {
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
       variables: { createFormInput }
     });
 
@@ -256,7 +257,7 @@ describe("Mutation.createForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_FORM, {
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
       variables: { createFormInput }
     });
 
@@ -269,7 +270,7 @@ describe("Mutation.createForm", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_FORM, {
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
       variables: {
         createFormInput: {
           emitter: {
@@ -290,7 +291,7 @@ describe("Mutation.createForm", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_FORM, {
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
       variables: {
         createFormInput: {
           emitter: {
@@ -330,7 +331,7 @@ describe("Mutation.createForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_FORM, {
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
       variables: {
         createFormInput
       }
@@ -353,20 +354,23 @@ describe("Mutation.createForm", () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
       const { mutate } = makeClient(user);
-      const { errors } = await mutate(CREATE_FORM, {
-        variables: {
-          createFormInput: {
-            emitter: {
-              company: {
-                siret: company.siret
+      const { errors } = await mutate<Pick<Mutation, "createForm">>(
+        CREATE_FORM,
+        {
+          variables: {
+            createFormInput: {
+              emitter: {
+                company: {
+                  siret: company.siret
+                }
+              },
+              wasteDetails: {
+                code: wasteCode
               }
-            },
-            wasteDetails: {
-              code: wasteCode
             }
           }
         }
-      });
+      );
 
       expect(errors).toEqual([
         expect.objectContaining({
@@ -407,11 +411,14 @@ describe("Mutation.createForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate(CREATE_FORM, {
-      variables: {
-        createFormInput
+    const { data, errors } = await mutate<Pick<Mutation, "createForm">>(
+      CREATE_FORM,
+      {
+        variables: {
+          createFormInput
+        }
       }
-    });
+    );
 
     expect(errors).toEqual(undefined);
     expect(data.createForm.transporter).toMatchObject(
@@ -462,7 +469,7 @@ describe("Mutation.createForm", () => {
         }
       };
       const { mutate } = makeClient(user);
-      const { data } = await mutate(CREATE_FORM, {
+      const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
         variables: {
           createFormInput
         }
@@ -491,7 +498,7 @@ describe("Mutation.createForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate(CREATE_FORM, {
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
       variables: { createFormInput }
     });
 
@@ -518,7 +525,7 @@ describe("Mutation.createForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_FORM, {
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
       variables: { createFormInput }
     });
 
@@ -546,7 +553,7 @@ describe("Mutation.createForm", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_FORM, {
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
       variables: { createFormInput }
     });
 

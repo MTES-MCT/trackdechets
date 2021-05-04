@@ -50,6 +50,7 @@ export function getInitialCompany(company?: FormCompany | null) {
     contact: company?.contact ?? "",
     mail: company?.mail ?? "",
     phone: company?.phone ?? "",
+    vatNumber: company?.vatNumber ?? "",
   };
 }
 

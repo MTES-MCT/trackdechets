@@ -1,7 +1,6 @@
 import { Mail, Contact } from "../types";
 import * as Sentry from "@sentry/node";
 import * as mailjet from "node-mailjet";
-import { templateIds } from "../helpers";
 
 const {
   MJ_APIKEY_PUBLIC,
@@ -17,10 +16,6 @@ const mailjetBackend = {
   backendName: "Mailjet",
 
   sendMail: function (mail: Mail) {
-    if (!mail.templateId) {
-      mail.templateId = templateIds.MAIN;
-    }
-
     const payload = {
       From: {
         Email: SENDER_EMAIL_ADDRESS,
@@ -33,9 +28,8 @@ const mailjetBackend = {
       Variables: {
         ...mail.vars,
         subject: mail.subject,
-        title: mail.title,
-        body: mail.body,
-        baseurl: mail.baseUrl
+        title: mail.subject,
+        body: mail.body
       },
       Subject: mail.subject
     };

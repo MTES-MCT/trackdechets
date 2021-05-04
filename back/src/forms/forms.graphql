@@ -777,6 +777,9 @@ type FormCompany {
 
   "Email du contact dans l'établissement"
   mail: String
+
+  "Numéro de TVA intracommunautaire"
+  vatNumber: String
 }
 
 "Information sur l'éco-organisme responsable du BSD"

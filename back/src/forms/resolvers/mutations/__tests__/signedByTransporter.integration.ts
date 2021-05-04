@@ -10,6 +10,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
 import { Status } from "@prisma/client";
+import { Mutation } from "../../../../generated/graphql/types";
 
 jest.mock("axios", () => ({
   default: {
@@ -43,7 +44,7 @@ describe("Mutation.signedByTransporter", () => {
     });
 
     const { mutate } = makeClient(user);
-    await mutate(SIGNED_BY_TRANSPORTER, {
+    await mutate<Pick<Mutation, "signedByTransporter">>(SIGNED_BY_TRANSPORTER, {
       variables: {
         id: form.id,
         signingInfo: {
@@ -83,7 +84,7 @@ describe("Mutation.signedByTransporter", () => {
     });
 
     const { mutate } = makeClient(user);
-    await mutate(SIGNED_BY_TRANSPORTER, {
+    await mutate<Pick<Mutation, "signedByTransporter">>(SIGNED_BY_TRANSPORTER, {
       variables: {
         id: form.id,
         signingInfo: {
@@ -122,21 +123,24 @@ describe("Mutation.signedByTransporter", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(SIGNED_BY_TRANSPORTER, {
-      variables: {
-        id: form.id,
-        signingInfo: {
-          sentAt: "2018-12-11T00:00:00.000Z",
-          signedByTransporter: true,
-          securityCode: emitter.securityCode,
-          sentBy: "Roger Lapince",
-          signedByProducer: true,
-          packagingInfos: form.wasteDetailsPackagingInfos,
-          quantity: form.wasteDetailsQuantity,
-          onuCode: ""
+    const { errors } = await mutate<Pick<Mutation, "signedByTransporter">>(
+      SIGNED_BY_TRANSPORTER,
+      {
+        variables: {
+          id: form.id,
+          signingInfo: {
+            sentAt: "2018-12-11T00:00:00.000Z",
+            signedByTransporter: true,
+            securityCode: emitter.securityCode,
+            sentBy: "Roger Lapince",
+            signedByProducer: true,
+            packagingInfos: form.wasteDetailsPackagingInfos,
+            quantity: form.wasteDetailsQuantity,
+            onuCode: ""
+          }
         }
       }
-    });
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -165,7 +169,9 @@ describe("Mutation.signedByTransporter", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate(SIGNED_BY_TRANSPORTER, {
+    const { data, errors } = await mutate<
+      Pick<Mutation, "signedByTransporter">
+    >(SIGNED_BY_TRANSPORTER, {
       variables: {
         id: form.id,
         signingInfo: {
@@ -201,20 +207,23 @@ describe("Mutation.signedByTransporter", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(SIGNED_BY_TRANSPORTER, {
-      variables: {
-        id: form.id,
-        signingInfo: {
-          sentAt: "2018-12-11T00:00:00.000Z",
-          signedByTransporter: true,
-          securityCode: 4567,
-          sentBy: "Roger Lapince",
-          signedByProducer: true,
-          packagingInfos: form.wasteDetailsPackagingInfos,
-          quantity: form.wasteDetailsQuantity
+    const { errors } = await mutate<Pick<Mutation, "signedByTransporter">>(
+      SIGNED_BY_TRANSPORTER,
+      {
+        variables: {
+          id: form.id,
+          signingInfo: {
+            sentAt: "2018-12-11T00:00:00.000Z",
+            signedByTransporter: true,
+            securityCode: 4567,
+            sentBy: "Roger Lapince",
+            signedByProducer: true,
+            packagingInfos: form.wasteDetailsPackagingInfos,
+            quantity: form.wasteDetailsQuantity
+          }
         }
       }
-    });
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -243,20 +252,23 @@ describe("Mutation.signedByTransporter", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(SIGNED_BY_TRANSPORTER, {
-      variables: {
-        id: form.id,
-        signingInfo: {
-          sentAt: "2018-12-11T00:00:00.000Z",
-          signedByTransporter: true,
-          securityCode: 1234,
-          sentBy: "Roger Lapince",
-          signedByProducer: false,
-          packagingInfos: form.wasteDetailsPackagingInfos,
-          quantity: form.wasteDetailsQuantity
+    const { errors } = await mutate<Pick<Mutation, "signedByTransporter">>(
+      SIGNED_BY_TRANSPORTER,
+      {
+        variables: {
+          id: form.id,
+          signingInfo: {
+            sentAt: "2018-12-11T00:00:00.000Z",
+            signedByTransporter: true,
+            securityCode: 1234,
+            sentBy: "Roger Lapince",
+            signedByProducer: false,
+            packagingInfos: form.wasteDetailsPackagingInfos,
+            quantity: form.wasteDetailsQuantity
+          }
         }
       }
-    });
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -284,20 +296,23 @@ describe("Mutation.signedByTransporter", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(SIGNED_BY_TRANSPORTER, {
-      variables: {
-        id: form.id,
-        signingInfo: {
-          sentAt: "2018-12-11T00:00:00.000Z",
-          signedByTransporter: false,
-          securityCode: 1234,
-          sentBy: "Roger Lapince",
-          signedByProducer: true,
-          packagingInfos: form.wasteDetailsPackagingInfos,
-          quantity: form.wasteDetailsQuantity
+    const { errors } = await mutate<Pick<Mutation, "signedByTransporter">>(
+      SIGNED_BY_TRANSPORTER,
+      {
+        variables: {
+          id: form.id,
+          signingInfo: {
+            sentAt: "2018-12-11T00:00:00.000Z",
+            signedByTransporter: false,
+            securityCode: 1234,
+            sentBy: "Roger Lapince",
+            signedByProducer: true,
+            packagingInfos: form.wasteDetailsPackagingInfos,
+            quantity: form.wasteDetailsQuantity
+          }
         }
       }
-    });
+    );
 
     expect(errors).toEqual([
       expect.objectContaining({
@@ -335,21 +350,24 @@ describe("Mutation.signedByTransporter", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(SIGNED_BY_TRANSPORTER, {
-      variables: {
-        id: form.id,
-        signingInfo: {
-          sentAt: "2018-12-11T00:00:00.000Z",
-          signedByTransporter: true,
-          securityCode: ecoOrganisme.securityCode,
-          signatureAuthor: "ECO_ORGANISME",
-          sentBy: "Roger Lapince",
-          signedByProducer: true,
-          packagingInfos: form.wasteDetailsPackagingInfos,
-          quantity: form.wasteDetailsQuantity
+    const { data } = await mutate<Pick<Mutation, "signedByTransporter">>(
+      SIGNED_BY_TRANSPORTER,
+      {
+        variables: {
+          id: form.id,
+          signingInfo: {
+            sentAt: "2018-12-11T00:00:00.000Z",
+            signedByTransporter: true,
+            securityCode: ecoOrganisme.securityCode,
+            signatureAuthor: "ECO_ORGANISME",
+            sentBy: "Roger Lapince",
+            signedByProducer: true,
+            packagingInfos: form.wasteDetailsPackagingInfos,
+            quantity: form.wasteDetailsQuantity
+          }
         }
       }
-    });
+    );
 
     expect(data.signedByTransporter).toMatchObject({
       id: form.id,
@@ -394,7 +412,7 @@ describe("Mutation.signedByTransporter", () => {
     });
 
     const { mutate } = makeClient(user);
-    await mutate(SIGNED_BY_TRANSPORTER, {
+    await mutate<Pick<Mutation, "signedByTransporter">>(SIGNED_BY_TRANSPORTER, {
       variables: {
         id: form.id,
         signingInfo: {
@@ -438,21 +456,24 @@ describe("Mutation.signedByTransporter", () => {
       });
 
       const { mutate } = makeClient(user);
-      await mutate(SIGNED_BY_TRANSPORTER, {
-        variables: {
-          id: form.id,
-          signingInfo: {
-            sentAt: sentAtStr,
-            signedByTransporter: true,
-            securityCode: emitterCompany.securityCode,
-            sentBy: "Roger Lapince",
-            signedByProducer: true,
-            packagingInfos: form.wasteDetailsPackagingInfos,
-            quantity: form.wasteDetailsQuantity,
-            onuCode: "Code ONU"
+      await mutate<Pick<Mutation, "signedByTransporter">>(
+        SIGNED_BY_TRANSPORTER,
+        {
+          variables: {
+            id: form.id,
+            signingInfo: {
+              sentAt: sentAtStr,
+              signedByTransporter: true,
+              securityCode: emitterCompany.securityCode,
+              sentBy: "Roger Lapince",
+              signedByProducer: true,
+              packagingInfos: form.wasteDetailsPackagingInfos,
+              quantity: form.wasteDetailsQuantity,
+              onuCode: "Code ONU"
+            }
           }
         }
-      });
+      );
 
       const resultingForm = await prisma.form.findUnique({
         where: { id: form.id }

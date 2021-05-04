@@ -6,7 +6,7 @@ import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
 import { checkIsFormContributor } from "../../permissions";
-import { validateBsvhuForm } from "../../validation";
+import { validateBsvhu } from "../../validation";
 
 export default async function create(
   _,
@@ -28,9 +28,9 @@ export default async function create(
     );
   }
 
-  await validateBsvhuForm(prismaForm, { emitterSignature: true });
+  await validateBsvhu(prismaForm, { emissionSignature: true });
 
-  const updatedForm = await prisma.bsvhuForm.update({
+  const updatedForm = await prisma.bsvhu.update({
     where: { id },
     data: { isDraft: false }
   });

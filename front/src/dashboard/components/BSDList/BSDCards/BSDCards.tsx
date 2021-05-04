@@ -1,40 +1,49 @@
 import * as React from "react";
-import { Link, generatePath, useLocation } from "react-router-dom";
-import { Form } from "generated/graphql/types";
+import { Link, generatePath, useLocation, useParams } from "react-router-dom";
+import { CellProps } from "react-table";
+import { Bsd } from "generated/graphql/types";
 import routes from "common/routes";
 import { IconView } from "common/components/Icons";
-import { WorkflowAction } from "../WorkflowAction";
-import { Column } from "../types";
+import { WorkflowAction } from "../BSDD/WorkflowAction";
+import { Column } from "../columns";
 import styles from "./BSDCards.module.scss";
 
 interface BSDCardsProps {
-  siret: string;
-  forms: Form[];
+  bsds: Bsd[];
   columns: Column[];
 }
 
-export function BSDCards({ siret, forms, columns }: BSDCardsProps) {
+export function BSDCards({ bsds, columns }: BSDCardsProps) {
   const location = useLocation();
+  const { siret } = useParams<{ siret: string }>();
 
   return (
     <div className={styles.BSDCards}>
-      {forms.map(form => (
+      {bsds.map(form => (
         <div key={form.id} className={styles.BSDCard}>
           <ul className={styles.BSDCardList}>
-            {columns.map(column => (
-              <li key={column.id} className={styles.BSDCardListItem}>
-                <div className={styles.BSDCardListItemLabel}>
-                  {column.Header}
-                </div>
-                <div className={styles.BSDCardListItemValue}>
-                  {column.Cell ? (
-                    <column.Cell value={column.accessor(form)} row={form} />
-                  ) : (
-                    column.accessor(form)
-                  )}
-                </div>
-              </li>
-            ))}
+            {columns.map(column => {
+              const Cell = column.Cell as React.ComponentType<CellProps<Bsd>>;
+
+              return (
+                <li key={column.id} className={styles.BSDCardListItem}>
+                  <div className={styles.BSDCardListItemLabel}>
+                    {column.Header}
+                  </div>
+                  <div className={styles.BSDCardListItemValue}>
+                    <Cell
+                      value={column.accessor!(form, 0, {
+                        data: bsds,
+                        depth: 0,
+                        subRows: [],
+                      })}
+                      // @ts-ignore
+                      row={{ original: form }}
+                    />
+                  </div>
+                </li>
+              );
+            })}
           </ul>
           <div className={styles.BSDCardActions}>
             <Link

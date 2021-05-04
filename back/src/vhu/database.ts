@@ -2,7 +2,7 @@ import { FormNotFound } from "../forms/errors";
 import prisma from "../prisma";
 
 export async function getFormOrFormNotFound(id: string) {
-  const form = await prisma.bsvhuForm.findUnique({
+  const form = await prisma.bsvhu.findUnique({
     where: { id }
   });
 

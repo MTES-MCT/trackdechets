@@ -7,6 +7,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import prisma from "../../../../prisma";
 import { AuthType } from "../../../../auth";
+import { Mutation } from "../../../../generated/graphql/types";
 
 const INVITE_USER_TO_COMPANY = `
   mutation InviteUserToCompany($email: String!, $siret: String!, $role: UserRole!){
@@ -32,9 +33,12 @@ describe("mutation inviteUserToCompany", () => {
     const { user: admin, company } = await userWithCompanyFactory("ADMIN");
     const user = await userFactory();
     const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
-    const { data } = await mutate(INVITE_USER_TO_COMPANY, {
-      variables: { email: user.email, siret: company.siret, role: "MEMBER" }
-    });
+    const { data } = await mutate<Pick<Mutation, "inviteUserToCompany">>(
+      INVITE_USER_TO_COMPANY,
+      {
+        variables: { email: user.email, siret: company.siret, role: "MEMBER" }
+      }
+    );
     expect(data.inviteUserToCompany.users.length).toBe(2);
     expect(data.inviteUserToCompany.users).toEqual(
       expect.arrayContaining([{ email: admin.email }, { email: user.email }])

@@ -33,6 +33,7 @@
    git checkout --track origin/dev
    ```
 2. Configurer les variables d'environnements :
+
    1. Renommer le ficher `.env.model` en `.env` et le compléter en demandant les infos à un développeur de l'équipe
    2. Créer un fichier `.env` dans `front/` en s'inspirant du fichier `.env.recette`
 
@@ -42,16 +43,18 @@
    127.0.0.1 api.trackdechets.local
    127.0.0.1 trackdechets.local
    127.0.0.1 developers.trackdechets.local
+   127.0.0.1 es.trackdechets.local
+   127.0.0.1 kibana.trackdechets.local
    ```
 
    > Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
 
-   > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `UI_HOST` et `DEVELOPERS_HOST`
+   > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `UI_HOST`, `DEVELOPERS_HOST`, `ELASTIC_SEARCH_HOST` et `KIBANA_HOST`
 
 4. Démarrer les containers
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx
+   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx elasticsearch kibana
    ```
 
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
@@ -68,10 +71,20 @@
    npx prisma db push --preview-feature
    ```
 
-6. Accéder aux différents services.
+6. Initialiser l'index Elastic Search.
+
+   Les données sont indexées dans une base de donnée Elastic Search pour la recherche.
+   Il est nécessaire de créer l'index et l'alias afin de commencer à indexer des documents.
+   À noter que ce script peut aussi être utiliser pour indexer tous les documents en base de donnée.
+
+   ```bash
+   docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
+   npm run index-elastic-search:dev
+   ```
+
+7. Accéder aux différents services.
 
    C'est prêt ! Rendez-vous sur l'URL `UI_HOST` configurée dans votre fichier `.env` (par ex: `http://trackdechets.local`) pour commencer à utiliser l'application ou sur `API_HOST` (par ex `http://api.trackdechets.local`) pour accéder au playground GraphQL.
-
 
 ### Installation alternative sans docker
 
@@ -85,8 +98,7 @@ Vous pouvez également faire tourner l'ensemble des services sans docker. Veille
 ln -s /path/to/trackdechets/.env /path/to/trackdechets/back/.env
 ```
 
-> Il est également possible de démarrer ces trois services avec docker `docker-compose -f docker-compose.dev.yml up postgres redis nginx`. Dans ce cas, l'API doit être démarrée sur le port 4000 pour coller avec la configuration Nginx  `API_PORT=4000`.
-
+> Il est également possible de démarrer ces trois services avec docker `docker-compose -f docker-compose.dev.yml up postgres redis nginx`. Dans ce cas, l'API doit être démarrée sur le port 4000 pour coller avec la configuration Nginx `API_PORT=4000`.
 
 3. Démarrer l'API
 
@@ -217,6 +229,26 @@ Les nouvelles fonctionnalités impactant l'API doivent être documentées dans l
 Il est possible d'importer un backup d'une base de donnée d'un environnement afin de le tester en local.
 La procédure qui suit aura pour effet de remplacer vos données en local par les données du backup.
 
+#### Procédure automatique avec Docker
+
+Un script d'automatisation a été mis en place. Il permet de restaurer soit un backup local, soit le dernier backup de la base de donnée distante choisie.
+Pour les backups distants, assurez vous d'avoir correctement configuré les variables d'environnement suivantes dans votre fichier `.env` local:
+
+- `DB_API_ID` - UUID Scaleway de la base de donnée que vous souhaitez restaurer (variable volontairement documentée dans `.env.model`)
+- `S3_SECRET_ACCESS_KEY` - clé d'API Scaleway
+
+```bash
+$ pwd
+~/dev/trackdechets
+$ cd scripts
+$ sudo chmod +x restore-db.sh # Si le fichier n'est pas exécutable
+$ ./restore-db.sh
+# Laissez vous guider...
+# La première question détermine si vous souhaitez utiliser un backup distant ou local
+```
+
+#### Procédure manuelle
+
 1. Télécharger un backup de la base de donnée `prisma` depuis Scaleway
 2. Démarrer le container Postgres
    ```
@@ -230,7 +262,7 @@ La procédure qui suit aura pour effet de remplacer vos données en local par le
    ```
 4. Accéder au container Postgres
    ```
-   docker exec -it $(docker ps -aqf "name=trackdechets_postgres_1") bash
+   docker exec -it $(docker ps -aqf "name=trackdechets_postgres") bash
    ```
 5. Restaurer le backup
    ```
@@ -253,9 +285,8 @@ Pour palier à ce problème, il est possible de nourrir la base de donnée Prism
 2. Démarrer les containers `postgres` et `td-api`
 3. (Optionnel) Reset de la base de données
    3.1 Dans le container `postgres `: `psql -U trackdechets -d prisma -c "DROP SCHEMA \"default\$default\" CASCADE;"` pour supprimer les données existantes
-   3.2 Dans le container `td-api`:  `npx prisma db push --preview-feature` pour recréer les tables
+   3.2 Dans le container `td-api`: `npx prisma db push --preview-feature` pour recréer les tables
 4. Dans le container `td-api`: `npx prisma db seed --preview-feature` pour nourrir la base de données.
-
 
 ### Ajouter une nouvelle icône
 

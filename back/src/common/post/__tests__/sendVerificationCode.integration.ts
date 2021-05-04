@@ -1,5 +1,4 @@
 import { userWithCompanyFactory } from "../../../__tests__/factories";
-import axios from "axios";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { format } from "date-fns";
 
@@ -9,30 +8,34 @@ const sireneInfoMock = {
   addressPostalCode: "13001"
 };
 
-jest.mock("../../../companies/sirene", () => ({
-  searchCompany: jest.fn(() => sireneInfoMock)
-}));
-
-const axiosSpy = jest.spyOn(axios, "post");
-axiosSpy.mockImplementation(() => Promise.resolve({}));
-
 describe("send verificationEmail", () => {
   afterAll(resetDatabase);
 
   const OLD_ENV = process.env;
 
   beforeEach(() => {
-    delete process.env.POST_BACKEND;
+    jest.resetModules();
+    process.env = { ...OLD_ENV };
   });
 
-  afterEach(() => {
-    process.env = OLD_ENV;
+  afterAll(() => {
+    process.env = OLD_ENV; // Restore old environment
   });
 
   it("should send verification code letter using sendinbox backend", async () => {
     process.env.MY_SENDING_BOX_API_KEY = "secret";
-    const sendVerificationCodeLetter = require("..").sendVerificationCodeLetter;
+
     const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    // mock sirene and axios
+    const sirene = require("../../../companies/sirene");
+    const axios = require("axios");
+    const searchCompanySpy = jest.spyOn(sirene, "searchCompany");
+    const axiosSpy = jest.spyOn(axios, "post");
+    searchCompanySpy.mockResolvedValue(sireneInfoMock);
+    axiosSpy.mockImplementation(() => Promise.resolve({}));
+
+    const sendVerificationCodeLetter = require("..").sendVerificationCodeLetter;
     await sendVerificationCodeLetter(company);
     expect(axiosSpy).toHaveBeenCalledTimes(1);
     const call = axiosSpy.mock.calls[0];

@@ -7,7 +7,9 @@ import { companyFactory, userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import * as geocode from "../../../geocode";
 import { CompanyType } from "@prisma/client";
-import { companyMails } from "../../../mails";
+import { renderMail } from "../../../../mailer/templates/renderers";
+import { verificationProcessInfo } from "../../../../mailer/templates";
+import { Mutation } from "../../../../generated/graphql/types";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -55,11 +57,14 @@ describe("Mutation.createCompany", () => {
       companyTypes: ["PRODUCER"]
     };
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await mutate(CREATE_COMPANY, {
-      variables: {
-        companyInput
+    const { data } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
       }
-    });
+    );
 
     expect(data.createCompany).toMatchObject({
       siret: companyInput.siret,
@@ -108,11 +113,14 @@ describe("Mutation.createCompany", () => {
     };
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await mutate(CREATE_COMPANY, {
-      variables: {
-        companyInput
+    const { data } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
       }
-    });
+    );
 
     expect(data.createCompany.transporterReceipt.receiptNumber).toEqual(
       transporterReceipt.receiptNumber
@@ -143,11 +151,14 @@ describe("Mutation.createCompany", () => {
     };
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await mutate(CREATE_COMPANY, {
-      variables: {
-        companyInput
+    const { data } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
       }
-    });
+    );
 
     // check the traderReceipt was created in db
     expect(data.createCompany.traderReceipt.receiptNumber).toEqual(
@@ -291,11 +302,14 @@ describe("Mutation.createCompany", () => {
     });
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await mutate(CREATE_COMPANY, {
-      variables: {
-        companyInput
+    const { data } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
       }
-    });
+    );
 
     expect(data.createCompany.ecoOrganismeAgreements).toEqual(
       companyInput.ecoOrganismeAgreements
@@ -365,10 +379,10 @@ describe("Mutation.createCompany", () => {
     });
 
     expect(sendMailSpy).toHaveBeenCalledWith(
-      companyMails.verificationProcessInfo(
-        [{ name: user.name, email: user.email }],
-        company
-      )
+      renderMail(verificationProcessInfo, {
+        to: [{ email: user.email, name: user.name }],
+        variables: { company }
+      })
     );
 
     process.env = OLD_ENV;

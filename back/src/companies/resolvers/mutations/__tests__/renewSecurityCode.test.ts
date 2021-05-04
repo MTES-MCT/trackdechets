@@ -1,6 +1,8 @@
 import { renewSecurityCodeFn as renewSecurityCode } from "../renewSecurityCode";
 import { ErrorCode } from "../../../../common/errors";
-import { companyMails } from "../../../mails";
+import { renderMail } from "../../../../mailer/templates/renderers";
+import { securityCodeRenewal } from "../../../../mailer/templates";
+import * as utils from "../../../../utils";
 
 const companyMock = jest.fn();
 const updateCompanyMock = jest.fn();
@@ -10,11 +12,8 @@ jest.mock("../../../../prisma", () => ({
     update: jest.fn((...args) => updateCompanyMock(...args))
   }
 }));
-const randomNumberMock = jest.fn();
 
-jest.mock("../../../../utils", () => ({
-  randomNumber: jest.fn(() => randomNumberMock())
-}));
+const randomNumberMock = jest.spyOn(utils, "randomNumber");
 
 const sendMailMock = jest.fn();
 
@@ -56,13 +55,13 @@ describe("renewSecurityCode", () => {
     }
   });
   it("should retry getting a new security code if \
-    the new one is identitcal to the previous one", async () => {
+    the new one is identical to the previous one", async () => {
     companyMock.mockResolvedValueOnce({
-      securityCode: "1234"
+      securityCode: 1234
     });
 
     updateCompanyMock.mockReturnValueOnce({});
-    randomNumberMock.mockReturnValueOnce("1234").mockReturnValueOnce("2345");
+    randomNumberMock.mockReturnValueOnce(1234).mockReturnValueOnce(2345);
 
     getCompanyActiveUsersMock.mockReturnValueOnce([]);
     await renewSecurityCode("85001946400013");
@@ -71,14 +70,16 @@ describe("renewSecurityCode", () => {
   });
   it("should send a notification email to all users and return updated company", async () => {
     companyMock.mockResolvedValueOnce({
-      securityCode: "1234"
+      securityCode: 1234,
+      name: "Code en stock",
+      siret: "85001946400013"
     });
-    randomNumberMock.mockReturnValueOnce("4567");
+    randomNumberMock.mockReturnValueOnce(4567);
 
     updateCompanyMock.mockReturnValueOnce({
       siret: "85001946400013",
       name: "Code en stock",
-      securityCode: "4567"
+      securityCode: 4567
     });
 
     const users = [
@@ -86,14 +87,15 @@ describe("renewSecurityCode", () => {
       { email: "arya.stark@trackdechets.fr", name: "Arya Stark" }
     ];
 
-    const mail = companyMails.securityCodeRenewal(
-      users.map(u => ({ email: u.email, name: u.name })),
-      {
-        name: "Code en stock",
-        siret: "85001946400013"
+    const mail = renderMail(securityCodeRenewal, {
+      to: users.map(u => ({ email: u.email, name: u.name })),
+      variables: {
+        company: {
+          name: "Code en stock",
+          siret: "85001946400013"
+        }
       }
-    );
-
+    });
     getCompanyActiveUsersMock.mockReturnValueOnce(users);
 
     const updatedCompany = await renewSecurityCode("85001946400013");
@@ -103,7 +105,7 @@ describe("renewSecurityCode", () => {
     expect(updatedCompany).toEqual({
       siret: "85001946400013",
       name: "Code en stock",
-      securityCode: "4567"
+      securityCode: 4567
     });
   });
 });
