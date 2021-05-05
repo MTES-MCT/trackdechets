@@ -16,7 +16,6 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   await isBsffContributor(user, existingBsff);
 
   const flatInput = flattenBsffInput(input);
-  console.log(flatInput);
   await isBsffContributor(user, { ...existingBsff, ...flatInput });
 
   const bsff = await prisma.bsff.update({
