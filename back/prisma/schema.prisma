@@ -847,6 +847,14 @@ model Bsff {
   destinationCompanyPhone   String?
   destinationCompanyMail    String?
 
+  destinationReceptionDate    DateTime?
+  destinationReceptionKilos   Int?
+  destinationReceptionRefusal String?
+
+  destinationOperationCode            String?
+  destinationOperationSignatureAuthor String?
+  destinationOperationSignatureDate   DateTime?
+
   ficheInterventions BsffFicheIntervention[] @relation("FicheInterventionToBsff")
 
   bsffs  Bsff[]  @relation("BsffToBsff")

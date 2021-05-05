@@ -104,6 +104,18 @@ export function unflattenBsff(
         contact: prismaBsff.destinationCompanyContact,
         phone: prismaBsff.destinationCompanyPhone,
         mail: prismaBsff.destinationCompanyMail
+      }),
+      reception: nullIfNoValues<GraphQL.BsffReception>({
+        date: prismaBsff.destinationReceptionDate,
+        kilos: prismaBsff.destinationReceptionKilos,
+        refusal: prismaBsff.destinationReceptionRefusal
+      }),
+      operation: nullIfNoValues<GraphQL.BsffOperation>({
+        code: prismaBsff.destinationOperationCode,
+        signature: nullIfNoValues<GraphQL.Signature>({
+          author: prismaBsff.destinationOperationSignatureAuthor,
+          date: prismaBsff.destinationOperationSignatureDate
+        })
       })
     })
   };

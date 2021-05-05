@@ -116,6 +116,24 @@ type BsffTransport {
 type BsffDestination {
   "Entreprise réceptionant le déchet."
   company: FormCompany!
+  "Déclaration de réception du déchet."
+  reception: BsffReception
+  "Déclaration de traitement du déchet."
+  operation: BsffOperation
+}
+type BsffReception {
+  "Date de réception du déchet."
+  date: DateTime!
+  "Quantité totale du déchet, qu'elle soit réelle ou estimée."
+  kilos: Int!
+  "En cas de refus, le motif."
+  refusal: String
+}
+type BsffOperation {
+  "Code de l'opération de traitement."
+  code: String!
+  "Signature de la destination lors du traitement."
+  signature: Signature
 }
 
 type BsffFicheIntervention {
