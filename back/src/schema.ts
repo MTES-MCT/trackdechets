@@ -7,11 +7,20 @@ import formsResolvers from "./forms/resolvers";
 import vhuResolvers from "./vhu/resolvers";
 import bsdsResolvers from "./bsds/resolvers";
 import dasriResolvers from "./dasris/resolvers";
+import bsffResolvers from "./bsffs/resolvers";
 
 // Merge GraphQL schema by merging types, resolvers and shields
 // definitions from differents modules
 
-const repositories = ["users", "companies", "forms", "vhu", "bsds", "dasris"];
+const repositories = [
+  "users",
+  "companies",
+  "forms",
+  "vhu",
+  "bsds",
+  "dasris",
+  "bsffs"
+];
 
 const typeDefsPath = repositories.map(
   repository => `${__dirname}/${repository}/**/*.graphql`
@@ -28,7 +37,8 @@ const resolvers = [
   usersResolvers,
   vhuResolvers,
   bsdsResolvers,
-  dasriResolvers
+  dasriResolvers,
+  bsffResolvers
 ];
 
 export { typeDefs, resolvers };
