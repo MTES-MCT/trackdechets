@@ -126,6 +126,7 @@ jobs:
                 fi
                 docker-compose up -d redis td-api td-ui
                 docker exec \$(docker ps -qf 'name=td-api') npm run migrate"
+                docker exec \$(docker ps -qf 'name=td-api') npm run index-elastic-search"
 
   integration-tests:
     machine:
