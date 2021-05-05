@@ -797,3 +797,78 @@ model Bsdasri {
   regroupedOnBsdasri   Bsdasri?  @relation("BsdasriToBsdasri", fields: [regroupedOnBsdasriId], references: [id])
   regroupedOnBsdasriId String?
 }
+
+// ----------------
+// BSFF FORM
+// ----------------
+
+model Bsff {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  emitterCompanyName    String?
+  emitterCompanySiret   String?
+  emitterCompanyAddress String?
+  emitterCompanyContact String?
+  emitterCompanyPhone   String?
+  emitterCompanyMail    String?
+
+  emitterEmissionSignatureAuthor String?
+  emitterEmissionSignatureDate   DateTime?
+
+  packagings Json?
+
+  wasteCode        String?
+  wasteDescription String?
+  wasteAdr         String?
+
+  quantityKilos      Int?
+  quantityIsEstimate Boolean?
+
+  transporterCompanyName    String?
+  transporterCompanySiret   String?
+  transporterCompanyAddress String?
+  transporterCompanyContact String?
+  transporterCompanyPhone   String?
+  transporterCompanyMail    String?
+
+  transporterRecepisseNumber        String?
+  transporterRecepisseDepartment    String?
+  transporterRecepisseValidityLimit DateTime?
+
+  transporterTransportSignatureAuthor String?
+  transporterTransportSignatureDate   DateTime?
+
+  destinationCompanyName    String?
+  destinationCompanySiret   String?
+  destinationCompanyAddress String?
+  destinationCompanyContact String?
+  destinationCompanyPhone   String?
+  destinationCompanyMail    String?
+
+  ficheInterventions BsffFicheIntervention[] @relation("FicheInterventionToBsff")
+
+  bsffs  Bsff[]  @relation("BsffToBsff")
+  Bsff   Bsff?   @relation("BsffToBsff", fields: [bsffId], references: [id])
+  bsffId String?
+}
+
+model BsffFicheIntervention {
+  id         String   @id
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  numero     String
+  kilos      Int
+  postalCode String
+
+  ownerCompanyName    String?
+  ownerCompanySiret   String?
+  ownerCompanyAddress String?
+  ownerCompanyContact String?
+  ownerCompanyPhone   String?
+  ownerCompanyMail    String?
+
+  Bsff   Bsff?   @relation("FicheInterventionToBsff", fields: [bsffId], references: [id])
+  bsffId String?
+}
