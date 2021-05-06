@@ -2,9 +2,9 @@ import {
   MutationResolvers,
   BsffOperationCode as BsffOperationCodeEnum
 } from "../../generated/graphql/types";
-import createBsff from "./mutations/create";
-import updateBsff from "./mutations/update";
-import deleteBsff from "./mutations/delete";
+import createBsff from "./mutations/createBsff";
+import updateBsff from "./mutations/updateBsff";
+import deleteBsff from "./mutations/deleteBsff";
 
 const Mutation: MutationResolvers = {
   createBsff,
