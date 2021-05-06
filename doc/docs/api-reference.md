@@ -882,6 +882,21 @@ ID d'un Dasri
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>deleteBsff</strong></td>
+<td valign="top"><a href="#bsff">Bsff</a>!</td>
+<td>
+
+Mutation permettant de supprimer un bordereau existant de suivi de fluides frigorigènes.
+À condition qu'il n'ait pas encore été signé.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>deleteBsvhu</strong></td>
 <td valign="top"><a href="#bsvhu">Bsvhu</a></td>
 <td>

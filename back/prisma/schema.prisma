@@ -806,6 +806,7 @@ model Bsff {
   id        String   @id
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
 
   emitterCompanyName    String?
   emitterCompanySiret   String?

@@ -8,6 +8,12 @@ type Mutation {
   Mutation permettant de modifier un bordereau existant de suivi de fluides frigorigènes.
   """
   updateBsff(id: ID!, input: BsffInput!): Bsff!
+
+  """
+  Mutation permettant de supprimer un bordereau existant de suivi de fluides frigorigènes.
+  À condition qu'il n'ait pas encore été signé.
+  """
+  deleteBsff(id: ID!): Bsff!
 }
 
 input BsffInput {

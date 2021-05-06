@@ -2086,6 +2086,11 @@ export type Mutation = {
    */
   deleteBsdasri?: Maybe<Bsdasri>;
   /**
+   * Mutation permettant de supprimer un bordereau existant de suivi de fluides frigorigènes.
+   * À condition qu'il n'ait pas encore été signé.
+   */
+  deleteBsff: Bsff;
+  /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Supprime un BSVHU
    */
@@ -2448,6 +2453,10 @@ export type MutationDeleteBrokerReceiptArgs = {
 };
 
 export type MutationDeleteBsdasriArgs = {
+  id: Scalars["ID"];
+};
+
+export type MutationDeleteBsffArgs = {
   id: Scalars["ID"];
 };
 
@@ -6186,6 +6195,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationDeleteBsdasriArgs, "id">
+  >;
+  deleteBsff?: Resolver<
+    ResolversTypes["Bsff"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeleteBsffArgs, "id">
   >;
   deleteBsvhu?: Resolver<
     Maybe<ResolversTypes["Bsvhu"]>,

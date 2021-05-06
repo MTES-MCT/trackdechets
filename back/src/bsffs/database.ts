@@ -3,8 +3,8 @@ import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
 
 export async function getBsffOrNotFound(id: string): Promise<Bsff> {
-  const bsff = await prisma.bsff.findUnique({
-    where: { id }
+  const bsff = await prisma.bsff.findFirst({
+    where: { id, isDeleted: false }
   });
 
   if (bsff == null) {
