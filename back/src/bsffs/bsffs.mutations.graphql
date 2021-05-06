@@ -58,4 +58,5 @@ input BsffTransporterRecepisseInput {
 
 input BsffDestinationInput {
   company: CompanyInput!
+  cap: String
 }

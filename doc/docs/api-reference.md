@@ -2622,6 +2622,24 @@ Déclaration de traitement du déchet.
 
 </td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>plannedOperation</strong></td>
+<td valign="top"><a href="#bsffplannedoperation">BsffPlannedOperation</a>!</td>
+<td>
+
+Opération de traitement prévu initiallement.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>cap</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro CAP.
+
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -2758,10 +2776,19 @@ Code postal du lieu où l'intervention a eu lieu.
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>code</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a>!</td>
 <td>
 
 Code de l'opération de traitement.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>qualification</strong></td>
+<td valign="top"><a href="#bsffoperationqualification">BsffOperationQualification</a>!</td>
+<td>
+
+Qualification plus précise du type d'opération réalisée.
 
 </td>
 </tr>
@@ -2843,6 +2870,39 @@ Volume en litres des fluides à l'intérieur du contenant.
 </tbody>
 </table>
 
+### BsffPlannedOperation
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a>!</td>
+<td>
+
+Code de l'opération de traitement prévu.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>qualification</strong></td>
+<td valign="top"><a href="#bsffoperationqualification">BsffOperationQualification</a>!</td>
+<td>
+
+Qualification plus précise du type d'opération prévu.
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### BsffQuantity
 
 <table>
@@ -2915,6 +2975,15 @@ En cas de refus, le motif.
 
 </td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a></td>
+<td>
+
+Signature de la destination lors de l'acceptation ou du refus du déchet.
+
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -2931,8 +3000,17 @@ En cas de refus, le motif.
 </thead>
 <tbody>
 <tr>
+<td colspan="2" valign="top"><strong>mode</strong></td>
+<td valign="top"><a href="#transportmode">TransportMode</a>!</td>
+<td>
+
+Mode de transport utilisé.
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>signature</strong></td>
-<td valign="top"><a href="#signature">Signature</a></td>
+<td valign="top"><a href="#signature">Signature</a>!</td>
 <td>
 
 Signature du transporteur lors de l'enlèvement auprès de l'émetteur.
@@ -7635,6 +7713,11 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 <td valign="top"><a href="#companyinput">CompanyInput</a>!</td>
 <td></td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>cap</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
 </tbody>
 </table>
 
@@ -10671,6 +10754,74 @@ Déchet refusé
 </tbody>
 </table>
 
+### BsffOperationCode
+
+Liste des codes de traitement possible.
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>R2</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>R12</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>D10</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>D13</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>D14</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffOperationQualification
+
+Liste des qualifications de traitement possible.
+Attention, certaines combinaisons de code et qualification ne sont pas possibles.
+Par exemple, seul le code D 10 peut être associé à une incinération.
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>RECUPERATION_REGENERATION</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>INCINERATION</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>REGROUPEMENT</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>RECONDITIONNEMENT</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>REEXPEDITION</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### BsffPackagingType
 
 <table>
@@ -11686,3 +11837,40 @@ The `String` scalar type represents textual data, represented as UTF-8 character
 ### URL
 
 Chaîne de caractère au format URL, débutant par un protocole http(s).
+
+
+## Interfaces
+
+
+### IBsffOperation
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a>!</td>
+<td>
+
+Code de l'opération de traitement.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>qualification</strong></td>
+<td valign="top"><a href="#bsffoperationqualification">BsffOperationQualification</a>!</td>
+<td>
+
+Qualification plus précise du type d'opération réalisée.
+
+</td>
+</tr>
+</tbody>
+</table>

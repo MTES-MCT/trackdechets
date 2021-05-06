@@ -588,10 +588,15 @@ export type BsffDestination = {
   reception?: Maybe<BsffReception>;
   /** Déclaration de traitement du déchet. */
   operation?: Maybe<BsffOperation>;
+  /** Opération de traitement prévu initiallement. */
+  plannedOperation: BsffPlannedOperation;
+  /** Numéro CAP. */
+  cap?: Maybe<Scalars["String"]>;
 };
 
 export type BsffDestinationInput = {
   company: CompanyInput;
+  cap?: Maybe<Scalars["String"]>;
 };
 
 export type BsffEmission = {
@@ -641,13 +646,30 @@ export type BsffInput = {
   destination?: Maybe<BsffDestinationInput>;
 };
 
-export type BsffOperation = {
+export type BsffOperation = IBsffOperation & {
   __typename?: "BsffOperation";
   /** Code de l'opération de traitement. */
-  code: Scalars["String"];
+  code: BsffOperationCode;
+  /** Qualification plus précise du type d'opération réalisée. */
+  qualification: BsffOperationQualification;
   /** Signature de la destination lors du traitement. */
   signature?: Maybe<Signature>;
 };
+
+/** Liste des codes de traitement possible. */
+export type BsffOperationCode = "R2" | "R12" | "D10" | "D13" | "D14";
+
+/**
+ * Liste des qualifications de traitement possible.
+ * Attention, certaines combinaisons de code et qualification ne sont pas possibles.
+ * Par exemple, seul le code D 10 peut être associé à une incinération.
+ */
+export type BsffOperationQualification =
+  | "RECUPERATION_REGENERATION"
+  | "INCINERATION"
+  | "REGROUPEMENT"
+  | "RECONDITIONNEMENT"
+  | "REEXPEDITION";
 
 export type BsffOwner = {
   __typename?: "BsffOwner";
@@ -673,6 +695,14 @@ export type BsffPackagingInput = {
 
 export type BsffPackagingType = "BOUTEILLE";
 
+export type BsffPlannedOperation = IBsffOperation & {
+  __typename?: "BsffPlannedOperation";
+  /** Code de l'opération de traitement prévu. */
+  code: BsffOperationCode;
+  /** Qualification plus précise du type d'opération prévu. */
+  qualification: BsffOperationQualification;
+};
+
 export type BsffQuantity = {
   __typename?: "BsffQuantity";
   /** Poids total du déchet en kilos. */
@@ -694,12 +724,16 @@ export type BsffReception = {
   kilos: Scalars["Int"];
   /** En cas de refus, le motif. */
   refusal?: Maybe<Scalars["String"]>;
+  /** Signature de la destination lors de l'acceptation ou du refus du déchet. */
+  signature?: Maybe<Signature>;
 };
 
 export type BsffTransport = {
   __typename?: "BsffTransport";
+  /** Mode de transport utilisé. */
+  mode: TransportMode;
   /** Signature du transporteur lors de l'enlèvement auprès de l'émetteur. */
-  signature?: Maybe<Signature>;
+  signature: Signature;
 };
 
 export type BsffTransporter = {
@@ -1879,6 +1913,13 @@ export type FormSubscription = {
 
 /** Type d'une déclaration GEREP */
 export type GerepType = "Producteur" | "Traiteur";
+
+export type IBsffOperation = {
+  /** Code de l'opération de traitement. */
+  code: BsffOperationCode;
+  /** Qualification plus précise du type d'opération réalisée. */
+  qualification: BsffOperationQualification;
+};
 
 /** Payload d'import d'un BSD papier */
 export type ImportPaperFormInput = {
@@ -4130,6 +4171,12 @@ export type ResolversTypes = {
   BsffDestination: ResolverTypeWrapper<BsffDestination>;
   BsffReception: ResolverTypeWrapper<BsffReception>;
   BsffOperation: ResolverTypeWrapper<BsffOperation>;
+  IBsffOperation:
+    | ResolversTypes["BsffOperation"]
+    | ResolversTypes["BsffPlannedOperation"];
+  BsffOperationCode: BsffOperationCode;
+  BsffOperationQualification: BsffOperationQualification;
+  BsffPlannedOperation: ResolverTypeWrapper<BsffPlannedOperation>;
   BsffFicheIntervention: ResolverTypeWrapper<BsffFicheIntervention>;
   BsffOwner: ResolverTypeWrapper<BsffOwner>;
   BsvhuInput: BsvhuInput;
@@ -4351,6 +4398,10 @@ export type ResolversParentTypes = {
   BsffDestination: BsffDestination;
   BsffReception: BsffReception;
   BsffOperation: BsffOperation;
+  IBsffOperation:
+    | ResolversParentTypes["BsffOperation"]
+    | ResolversParentTypes["BsffPlannedOperation"];
+  BsffPlannedOperation: BsffPlannedOperation;
   BsffFicheIntervention: BsffFicheIntervention;
   BsffOwner: BsffOwner;
   BsvhuInput: BsvhuInput;
@@ -4921,6 +4972,12 @@ export type BsffDestinationResolvers<
     ParentType,
     ContextType
   >;
+  plannedOperation?: Resolver<
+    ResolversTypes["BsffPlannedOperation"],
+    ParentType,
+    ContextType
+  >;
+  cap?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -4961,7 +5018,12 @@ export type BsffOperationResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsffOperation"] = ResolversParentTypes["BsffOperation"]
 > = {
-  code?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  code?: Resolver<ResolversTypes["BsffOperationCode"], ParentType, ContextType>;
+  qualification?: Resolver<
+    ResolversTypes["BsffOperationQualification"],
+    ParentType,
+    ContextType
+  >;
   signature?: Resolver<
     Maybe<ResolversTypes["Signature"]>,
     ParentType,
@@ -4988,6 +5050,19 @@ export type BsffPackagingResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type BsffPlannedOperationResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffPlannedOperation"] = ResolversParentTypes["BsffPlannedOperation"]
+> = {
+  code?: Resolver<ResolversTypes["BsffOperationCode"], ParentType, ContextType>;
+  qualification?: Resolver<
+    ResolversTypes["BsffOperationQualification"],
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type BsffQuantityResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsffQuantity"] = ResolversParentTypes["BsffQuantity"]
@@ -5004,6 +5079,11 @@ export type BsffReceptionResolvers<
   date?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
   kilos?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   refusal?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  signature?: Resolver<
+    Maybe<ResolversTypes["Signature"]>,
+    ParentType,
+    ContextType
+  >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -5011,11 +5091,8 @@ export type BsffTransportResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsffTransport"] = ResolversParentTypes["BsffTransport"]
 > = {
-  signature?: Resolver<
-    Maybe<ResolversTypes["Signature"]>,
-    ParentType,
-    ContextType
-  >;
+  mode?: Resolver<ResolversTypes["TransportMode"], ParentType, ContextType>;
+  signature?: Resolver<ResolversTypes["Signature"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -6036,6 +6113,23 @@ export type FormSubscriptionResolvers<
     ContextType
   >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IBsffOperationResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["IBsffOperation"] = ResolversParentTypes["IBsffOperation"]
+> = {
+  __resolveType: TypeResolveFn<
+    "BsffOperation" | "BsffPlannedOperation",
+    ParentType,
+    ContextType
+  >;
+  code?: Resolver<ResolversTypes["BsffOperationCode"], ParentType, ContextType>;
+  qualification?: Resolver<
+    ResolversTypes["BsffOperationQualification"],
+    ParentType,
+    ContextType
+  >;
 };
 
 export type InstallationResolvers<
@@ -7240,6 +7334,7 @@ export type Resolvers<ContextType = GraphQLContext> = {
   BsffOperation?: BsffOperationResolvers<ContextType>;
   BsffOwner?: BsffOwnerResolvers<ContextType>;
   BsffPackaging?: BsffPackagingResolvers<ContextType>;
+  BsffPlannedOperation?: BsffPlannedOperationResolvers<ContextType>;
   BsffQuantity?: BsffQuantityResolvers<ContextType>;
   BsffReception?: BsffReceptionResolvers<ContextType>;
   BsffTransport?: BsffTransportResolvers<ContextType>;
@@ -7283,6 +7378,7 @@ export type Resolvers<ContextType = GraphQLContext> = {
   FormEcoOrganisme?: FormEcoOrganismeResolvers<ContextType>;
   formsLifeCycleData?: FormsLifeCycleDataResolvers<ContextType>;
   FormSubscription?: FormSubscriptionResolvers<ContextType>;
+  IBsffOperation?: IBsffOperationResolvers<ContextType>;
   Installation?: InstallationResolvers<ContextType>;
   Invitation?: InvitationResolvers<ContextType>;
   JSON?: GraphQLScalarType;
@@ -7934,6 +8030,8 @@ export function createBsffDestinationMock(
     company: createFormCompanyMock({}),
     reception: null,
     operation: null,
+    plannedOperation: createBsffPlannedOperationMock({}),
+    cap: null,
     ...props
   };
 }
@@ -7943,6 +8041,7 @@ export function createBsffDestinationInputMock(
 ): BsffDestinationInput {
   return {
     company: createCompanyInputMock({}),
+    cap: null,
     ...props
   };
 }
@@ -8008,7 +8107,8 @@ export function createBsffOperationMock(
 ): BsffOperation {
   return {
     __typename: "BsffOperation",
-    code: "",
+    code: "R2",
+    qualification: "RECUPERATION_REGENERATION",
     signature: null,
     ...props
   };
@@ -8045,6 +8145,17 @@ export function createBsffPackagingInputMock(
   };
 }
 
+export function createBsffPlannedOperationMock(
+  props: Partial<BsffPlannedOperation>
+): BsffPlannedOperation {
+  return {
+    __typename: "BsffPlannedOperation",
+    code: "R2",
+    qualification: "RECUPERATION_REGENERATION",
+    ...props
+  };
+}
+
 export function createBsffQuantityMock(
   props: Partial<BsffQuantity>
 ): BsffQuantity {
@@ -8074,6 +8185,7 @@ export function createBsffReceptionMock(
     date: new Date(),
     kilos: 0,
     refusal: null,
+    signature: null,
     ...props
   };
 }
@@ -8083,7 +8195,8 @@ export function createBsffTransportMock(
 ): BsffTransport {
   return {
     __typename: "BsffTransport",
-    signature: null,
+    mode: "ROAD",
+    signature: createSignatureMock({}),
     ...props
   };
 }

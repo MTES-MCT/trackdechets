@@ -838,6 +838,7 @@ model Bsff {
   transporterRecepisseDepartment    String?
   transporterRecepisseValidityLimit DateTime?
 
+  transporterTransportMode            TransportMode?
   transporterTransportSignatureAuthor String?
   transporterTransportSignatureDate   DateTime?
 
@@ -848,13 +849,21 @@ model Bsff {
   destinationCompanyPhone   String?
   destinationCompanyMail    String?
 
-  destinationReceptionDate    DateTime?
-  destinationReceptionKilos   Int?
-  destinationReceptionRefusal String?
+  destinationReceptionDate            DateTime?
+  destinationReceptionKilos           Int?
+  destinationReceptionRefusal         String?
+  destinationReceptionSignatureAuthor String?
+  destinationReceptionSignatureDate   DateTime?
+
+  destinationPlannedOperationCode          String?
+  destinationPlannedOperationQualification String?
 
   destinationOperationCode            String?
+  destinationOperationQualification   String?
   destinationOperationSignatureAuthor String?
   destinationOperationSignatureDate   DateTime?
+
+  destinationCap String?
 
   ficheInterventions BsffFicheIntervention[] @relation("FicheInterventionToBsff")
 

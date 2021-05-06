@@ -40,7 +40,8 @@ export function flattenBsffInput(
     destinationCompanyAddress: bsffInput.destination?.company.address,
     destinationCompanyContact: bsffInput.destination?.company.contact,
     destinationCompanyPhone: bsffInput.destination?.company.phone,
-    destinationCompanyMail: bsffInput.destination?.company.mail
+    destinationCompanyMail: bsffInput.destination?.company.mail,
+    destinationCap: bsffInput.destination?.cap
   });
 }
 
@@ -90,6 +91,7 @@ export function unflattenBsff(
         validityLimit: prismaBsff.transporterRecepisseValidityLimit
       }),
       transport: nullIfNoValues<GraphQL.BsffTransport>({
+        mode: prismaBsff.transporterTransportMode,
         signature: nullIfNoValues<GraphQL.Signature>({
           author: prismaBsff.transporterTransportSignatureAuthor,
           date: prismaBsff.transporterTransportSignatureDate
@@ -108,15 +110,25 @@ export function unflattenBsff(
       reception: nullIfNoValues<GraphQL.BsffReception>({
         date: prismaBsff.destinationReceptionDate,
         kilos: prismaBsff.destinationReceptionKilos,
-        refusal: prismaBsff.destinationReceptionRefusal
+        refusal: prismaBsff.destinationReceptionRefusal,
+        signature: nullIfNoValues<GraphQL.Signature>({
+          author: prismaBsff.destinationReceptionSignatureAuthor,
+          date: prismaBsff.destinationReceptionSignatureDate
+        })
       }),
       operation: nullIfNoValues<GraphQL.BsffOperation>({
-        code: prismaBsff.destinationOperationCode,
+        code: prismaBsff.destinationOperationCode as GraphQL.BsffOperationCode,
+        qualification: prismaBsff.destinationOperationQualification as GraphQL.BsffOperationQualification,
         signature: nullIfNoValues<GraphQL.Signature>({
           author: prismaBsff.destinationOperationSignatureAuthor,
           date: prismaBsff.destinationOperationSignatureDate
         })
-      })
+      }),
+      plannedOperation: nullIfNoValues<GraphQL.BsffPlannedOperation>({
+        code: prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode,
+        qualification: prismaBsff.destinationPlannedOperationQualification as GraphQL.BsffOperationQualification
+      }),
+      cap: prismaBsff.destinationCap
     })
   };
 }

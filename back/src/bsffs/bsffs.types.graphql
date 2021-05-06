@@ -109,8 +109,10 @@ type BsffTransporterRecepisse {
   validityLimit: DateTime!
 }
 type BsffTransport {
+  "Mode de transport utilisé."
+  mode: TransportMode!
   "Signature du transporteur lors de l'enlèvement auprès de l'émetteur."
-  signature: Signature
+  signature: Signature!
 }
 
 type BsffDestination {
@@ -120,6 +122,10 @@ type BsffDestination {
   reception: BsffReception
   "Déclaration de traitement du déchet."
   operation: BsffOperation
+  "Opération de traitement prévu initiallement."
+  plannedOperation: BsffPlannedOperation!
+  "Numéro CAP."
+  cap: String
 }
 type BsffReception {
   "Date de réception du déchet."
@@ -128,12 +134,48 @@ type BsffReception {
   kilos: Int!
   "En cas de refus, le motif."
   refusal: String
+  "Signature de la destination lors de l'acceptation ou du refus du déchet."
+  signature: Signature
 }
-type BsffOperation {
+interface IBsffOperation {
   "Code de l'opération de traitement."
-  code: String!
+  code: BsffOperationCode!
+  "Qualification plus précise du type d'opération réalisée."
+  qualification: BsffOperationQualification!
+}
+type BsffOperation implements IBsffOperation {
+  "Code de l'opération de traitement."
+  code: BsffOperationCode!
+  "Qualification plus précise du type d'opération réalisée."
+  qualification: BsffOperationQualification!
   "Signature de la destination lors du traitement."
   signature: Signature
+}
+type BsffPlannedOperation implements IBsffOperation {
+  "Code de l'opération de traitement prévu."
+  code: BsffOperationCode!
+  "Qualification plus précise du type d'opération prévu."
+  qualification: BsffOperationQualification!
+}
+"Liste des codes de traitement possible."
+enum BsffOperationCode {
+  R2
+  R12
+  D10
+  D13
+  D14
+}
+"""
+Liste des qualifications de traitement possible.
+Attention, certaines combinaisons de code et qualification ne sont pas possibles.
+Par exemple, seul le code D 10 peut être associé à une incinération.
+"""
+enum BsffOperationQualification {
+  RECUPERATION_REGENERATION
+  INCINERATION
+  REGROUPEMENT
+  RECONDITIONNEMENT
+  REEXPEDITION
 }
 
 type BsffFicheIntervention {

@@ -586,10 +586,15 @@ export type BsffDestination = {
   reception?: Maybe<BsffReception>;
   /** Déclaration de traitement du déchet. */
   operation?: Maybe<BsffOperation>;
+  /** Opération de traitement prévu initiallement. */
+  plannedOperation: BsffPlannedOperation;
+  /** Numéro CAP. */
+  cap?: Maybe<Scalars["String"]>;
 };
 
 export type BsffDestinationInput = {
   company: CompanyInput;
+  cap?: Maybe<Scalars["String"]>;
 };
 
 export type BsffEmission = {
@@ -639,13 +644,37 @@ export type BsffInput = {
   destination?: Maybe<BsffDestinationInput>;
 };
 
-export type BsffOperation = {
+export type BsffOperation = IBsffOperation & {
   __typename?: "BsffOperation";
   /** Code de l'opération de traitement. */
-  code: Scalars["String"];
+  code: BsffOperationCode;
+  /** Qualification plus précise du type d'opération réalisée. */
+  qualification: BsffOperationQualification;
   /** Signature de la destination lors du traitement. */
   signature?: Maybe<Signature>;
 };
+
+/** Liste des codes de traitement possible. */
+export enum BsffOperationCode {
+  R2 = "R2",
+  R12 = "R12",
+  D10 = "D10",
+  D13 = "D13",
+  D14 = "D14"
+}
+
+/**
+ * Liste des qualifications de traitement possible.
+ * Attention, certaines combinaisons de code et qualification ne sont pas possibles.
+ * Par exemple, seul le code D 10 peut être associé à une incinération.
+ */
+export enum BsffOperationQualification {
+  RecuperationRegeneration = "RECUPERATION_REGENERATION",
+  Incineration = "INCINERATION",
+  Regroupement = "REGROUPEMENT",
+  Reconditionnement = "RECONDITIONNEMENT",
+  Reexpedition = "REEXPEDITION"
+}
 
 export type BsffOwner = {
   __typename?: "BsffOwner";
@@ -673,6 +702,14 @@ export enum BsffPackagingType {
   Bouteille = "BOUTEILLE"
 }
 
+export type BsffPlannedOperation = IBsffOperation & {
+  __typename?: "BsffPlannedOperation";
+  /** Code de l'opération de traitement prévu. */
+  code: BsffOperationCode;
+  /** Qualification plus précise du type d'opération prévu. */
+  qualification: BsffOperationQualification;
+};
+
 export type BsffQuantity = {
   __typename?: "BsffQuantity";
   /** Poids total du déchet en kilos. */
@@ -694,12 +731,16 @@ export type BsffReception = {
   kilos: Scalars["Int"];
   /** En cas de refus, le motif. */
   refusal?: Maybe<Scalars["String"]>;
+  /** Signature de la destination lors de l'acceptation ou du refus du déchet. */
+  signature?: Maybe<Signature>;
 };
 
 export type BsffTransport = {
   __typename?: "BsffTransport";
+  /** Mode de transport utilisé. */
+  mode: TransportMode;
   /** Signature du transporteur lors de l'enlèvement auprès de l'émetteur. */
-  signature?: Maybe<Signature>;
+  signature: Signature;
 };
 
 export type BsffTransporter = {
@@ -1903,6 +1944,13 @@ export enum GerepType {
   Producteur = "Producteur",
   Traiteur = "Traiteur"
 }
+
+export type IBsffOperation = {
+  /** Code de l'opération de traitement. */
+  code: BsffOperationCode;
+  /** Qualification plus précise du type d'opération réalisée. */
+  qualification: BsffOperationQualification;
+};
 
 /** Payload d'import d'un BSD papier */
 export type ImportPaperFormInput = {
