@@ -580,6 +580,13 @@ export type Bsff = {
   bsffs: Array<Bsff>;
 };
 
+export type BsffConnection = {
+  __typename?: "BsffConnection";
+  totalCount: Scalars["Int"];
+  pageInfo: PageInfo;
+  edges: Array<BsffEdge>;
+};
+
 export type BsffDestination = {
   __typename?: "BsffDestination";
   /** Entreprise réceptionant le déchet. */
@@ -597,6 +604,12 @@ export type BsffDestination = {
 export type BsffDestinationInput = {
   company: CompanyInput;
   cap?: Maybe<Scalars["String"]>;
+};
+
+export type BsffEdge = {
+  __typename?: "BsffEdge";
+  cursor: Scalars["String"];
+  node: Bsff;
 };
 
 export type BsffEmission = {
@@ -781,6 +794,28 @@ export type BsffWasteInput = {
   code: Scalars["String"];
   description: Scalars["String"];
   adr: Scalars["String"];
+};
+
+export type BsffWhere = {
+  emitter?: Maybe<BsffWhereEmitter>;
+  transporter?: Maybe<BsffWhereTransporter>;
+  destination?: Maybe<BsffWhereDestination>;
+};
+
+export type BsffWhereCompany = {
+  siret: Scalars["String"];
+};
+
+export type BsffWhereDestination = {
+  company?: Maybe<BsffWhereCompany>;
+};
+
+export type BsffWhereEmitter = {
+  company?: Maybe<BsffWhereCompany>;
+};
+
+export type BsffWhereTransporter = {
+  company?: Maybe<BsffWhereCompany>;
 };
 
 export type Bsvhu = {
@@ -2918,6 +2953,7 @@ export type Query = {
    */
   bsdasris: BsdasriConnection;
   bsds: BsdConnection;
+  bsffs: BsffConnection;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsvhu: Bsvhu;
   /**
@@ -3050,6 +3086,15 @@ export type QueryBsdsArgs = {
   after?: Maybe<Scalars["String"]>;
   first?: Maybe<Scalars["Int"]>;
   orderBy?: Maybe<OrderBy>;
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsffsArgs = {
+  after?: Maybe<Scalars["ID"]>;
+  first?: Maybe<Scalars["Int"]>;
+  before?: Maybe<Scalars["ID"]>;
+  last?: Maybe<Scalars["Int"]>;
+  where?: Maybe<BsffWhere>;
 };
 
 /** Views of the Company ressource for the admin panel */
@@ -4081,6 +4126,34 @@ export type ResolversTypes = {
   BsvhuMetadata: ResolverTypeWrapper<BsvhuMetadata>;
   BsvhuError: ResolverTypeWrapper<BsvhuError>;
   SignatureTypeInput: SignatureTypeInput;
+  BsffWhere: BsffWhere;
+  BsffWhereEmitter: BsffWhereEmitter;
+  BsffWhereCompany: BsffWhereCompany;
+  BsffWhereTransporter: BsffWhereTransporter;
+  BsffWhereDestination: BsffWhereDestination;
+  BsffConnection: ResolverTypeWrapper<BsffConnection>;
+  BsffEdge: ResolverTypeWrapper<BsffEdge>;
+  Bsff: ResolverTypeWrapper<Bsff>;
+  BsffEmitter: ResolverTypeWrapper<BsffEmitter>;
+  BsffEmission: ResolverTypeWrapper<BsffEmission>;
+  BsffPackaging: ResolverTypeWrapper<BsffPackaging>;
+  BsffPackagingType: BsffPackagingType;
+  BsffWaste: ResolverTypeWrapper<BsffWaste>;
+  BsffQuantity: ResolverTypeWrapper<BsffQuantity>;
+  BsffTransporter: ResolverTypeWrapper<BsffTransporter>;
+  BsffTransporterRecepisse: ResolverTypeWrapper<BsffTransporterRecepisse>;
+  BsffTransport: ResolverTypeWrapper<BsffTransport>;
+  BsffDestination: ResolverTypeWrapper<BsffDestination>;
+  BsffReception: ResolverTypeWrapper<BsffReception>;
+  BsffOperation: ResolverTypeWrapper<BsffOperation>;
+  IBsffOperation:
+    | ResolversTypes["BsffOperation"]
+    | ResolversTypes["BsffPlannedOperation"];
+  BsffOperationCode: BsffOperationCode;
+  BsffOperationQualification: BsffOperationQualification;
+  BsffPlannedOperation: ResolverTypeWrapper<BsffPlannedOperation>;
+  BsffFicheIntervention: ResolverTypeWrapper<BsffFicheIntervention>;
+  BsffOwner: ResolverTypeWrapper<BsffOwner>;
   BsvhuWhere: BsvhuWhere;
   BsvhuEmitterWhere: BsvhuEmitterWhere;
   BsvhuCompanyWhere: BsvhuCompanyWhere;
@@ -4153,32 +4226,11 @@ export type ResolversTypes = {
   BsffInput: BsffInput;
   BsffEmitterInput: BsffEmitterInput;
   BsffPackagingInput: BsffPackagingInput;
-  BsffPackagingType: BsffPackagingType;
   BsffWasteInput: BsffWasteInput;
   BsffQuantityInput: BsffQuantityInput;
   BsffTransporterInput: BsffTransporterInput;
   BsffTransporterRecepisseInput: BsffTransporterRecepisseInput;
   BsffDestinationInput: BsffDestinationInput;
-  Bsff: ResolverTypeWrapper<Bsff>;
-  BsffEmitter: ResolverTypeWrapper<BsffEmitter>;
-  BsffEmission: ResolverTypeWrapper<BsffEmission>;
-  BsffPackaging: ResolverTypeWrapper<BsffPackaging>;
-  BsffWaste: ResolverTypeWrapper<BsffWaste>;
-  BsffQuantity: ResolverTypeWrapper<BsffQuantity>;
-  BsffTransporter: ResolverTypeWrapper<BsffTransporter>;
-  BsffTransporterRecepisse: ResolverTypeWrapper<BsffTransporterRecepisse>;
-  BsffTransport: ResolverTypeWrapper<BsffTransport>;
-  BsffDestination: ResolverTypeWrapper<BsffDestination>;
-  BsffReception: ResolverTypeWrapper<BsffReception>;
-  BsffOperation: ResolverTypeWrapper<BsffOperation>;
-  IBsffOperation:
-    | ResolversTypes["BsffOperation"]
-    | ResolversTypes["BsffPlannedOperation"];
-  BsffOperationCode: BsffOperationCode;
-  BsffOperationQualification: BsffOperationQualification;
-  BsffPlannedOperation: ResolverTypeWrapper<BsffPlannedOperation>;
-  BsffFicheIntervention: ResolverTypeWrapper<BsffFicheIntervention>;
-  BsffOwner: ResolverTypeWrapper<BsffOwner>;
   BsvhuInput: BsvhuInput;
   BsvhuEmitterInput: BsvhuEmitterInput;
   BsvhuIdentificationInput: BsvhuIdentificationInput;
@@ -4323,6 +4375,31 @@ export type ResolversParentTypes = {
   BsvhuTransport: BsvhuTransport;
   BsvhuMetadata: BsvhuMetadata;
   BsvhuError: BsvhuError;
+  BsffWhere: BsffWhere;
+  BsffWhereEmitter: BsffWhereEmitter;
+  BsffWhereCompany: BsffWhereCompany;
+  BsffWhereTransporter: BsffWhereTransporter;
+  BsffWhereDestination: BsffWhereDestination;
+  BsffConnection: BsffConnection;
+  BsffEdge: BsffEdge;
+  Bsff: Bsff;
+  BsffEmitter: BsffEmitter;
+  BsffEmission: BsffEmission;
+  BsffPackaging: BsffPackaging;
+  BsffWaste: BsffWaste;
+  BsffQuantity: BsffQuantity;
+  BsffTransporter: BsffTransporter;
+  BsffTransporterRecepisse: BsffTransporterRecepisse;
+  BsffTransport: BsffTransport;
+  BsffDestination: BsffDestination;
+  BsffReception: BsffReception;
+  BsffOperation: BsffOperation;
+  IBsffOperation:
+    | ResolversParentTypes["BsffOperation"]
+    | ResolversParentTypes["BsffPlannedOperation"];
+  BsffPlannedOperation: BsffPlannedOperation;
+  BsffFicheIntervention: BsffFicheIntervention;
+  BsffOwner: BsffOwner;
   BsvhuWhere: BsvhuWhere;
   BsvhuEmitterWhere: BsvhuEmitterWhere;
   BsvhuCompanyWhere: BsvhuCompanyWhere;
@@ -4386,24 +4463,6 @@ export type ResolversParentTypes = {
   BsffTransporterInput: BsffTransporterInput;
   BsffTransporterRecepisseInput: BsffTransporterRecepisseInput;
   BsffDestinationInput: BsffDestinationInput;
-  Bsff: Bsff;
-  BsffEmitter: BsffEmitter;
-  BsffEmission: BsffEmission;
-  BsffPackaging: BsffPackaging;
-  BsffWaste: BsffWaste;
-  BsffQuantity: BsffQuantity;
-  BsffTransporter: BsffTransporter;
-  BsffTransporterRecepisse: BsffTransporterRecepisse;
-  BsffTransport: BsffTransport;
-  BsffDestination: BsffDestination;
-  BsffReception: BsffReception;
-  BsffOperation: BsffOperation;
-  IBsffOperation:
-    | ResolversParentTypes["BsffOperation"]
-    | ResolversParentTypes["BsffPlannedOperation"];
-  BsffPlannedOperation: BsffPlannedOperation;
-  BsffFicheIntervention: BsffFicheIntervention;
-  BsffOwner: BsffOwner;
   BsvhuInput: BsvhuInput;
   BsvhuEmitterInput: BsvhuEmitterInput;
   BsvhuIdentificationInput: BsvhuIdentificationInput;
@@ -4957,6 +5016,16 @@ export type BsffResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type BsffConnectionResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffConnection"] = ResolversParentTypes["BsffConnection"]
+> = {
+  totalCount?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes["PageInfo"], ParentType, ContextType>;
+  edges?: Resolver<Array<ResolversTypes["BsffEdge"]>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type BsffDestinationResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsffDestination"] = ResolversParentTypes["BsffDestination"]
@@ -4978,6 +5047,15 @@ export type BsffDestinationResolvers<
     ContextType
   >;
   cap?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffEdgeResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffEdge"] = ResolversParentTypes["BsffEdge"]
+> = {
+  cursor?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  node?: Resolver<ResolversTypes["Bsff"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -6719,6 +6797,12 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QueryBsdsArgs, never>
   >;
+  bsffs?: Resolver<
+    ResolversTypes["BsffConnection"],
+    ParentType,
+    ContextType,
+    RequireFields<QueryBsffsArgs, never>
+  >;
   bsvhu?: Resolver<
     ResolversTypes["Bsvhu"],
     ParentType,
@@ -7327,7 +7411,9 @@ export type Resolvers<ContextType = GraphQLContext> = {
   BsdConnection?: BsdConnectionResolvers<ContextType>;
   BsdEdge?: BsdEdgeResolvers<ContextType>;
   Bsff?: BsffResolvers<ContextType>;
+  BsffConnection?: BsffConnectionResolvers<ContextType>;
   BsffDestination?: BsffDestinationResolvers<ContextType>;
+  BsffEdge?: BsffEdgeResolvers<ContextType>;
   BsffEmission?: BsffEmissionResolvers<ContextType>;
   BsffEmitter?: BsffEmitterResolvers<ContextType>;
   BsffFicheIntervention?: BsffFicheInterventionResolvers<ContextType>;
@@ -8022,6 +8108,18 @@ export function createBsffMock(props: Partial<Bsff>): Bsff {
   };
 }
 
+export function createBsffConnectionMock(
+  props: Partial<BsffConnection>
+): BsffConnection {
+  return {
+    __typename: "BsffConnection",
+    totalCount: 0,
+    pageInfo: createPageInfoMock({}),
+    edges: [],
+    ...props
+  };
+}
+
 export function createBsffDestinationMock(
   props: Partial<BsffDestination>
 ): BsffDestination {
@@ -8042,6 +8140,15 @@ export function createBsffDestinationInputMock(
   return {
     company: createCompanyInputMock({}),
     cap: null,
+    ...props
+  };
+}
+
+export function createBsffEdgeMock(props: Partial<BsffEdge>): BsffEdge {
+  return {
+    __typename: "BsffEdge",
+    cursor: "",
+    node: createBsffMock({}),
     ...props
   };
 }
@@ -8263,6 +8370,51 @@ export function createBsffWasteInputMock(
     code: "",
     description: "",
     adr: "",
+    ...props
+  };
+}
+
+export function createBsffWhereMock(props: Partial<BsffWhere>): BsffWhere {
+  return {
+    emitter: null,
+    transporter: null,
+    destination: null,
+    ...props
+  };
+}
+
+export function createBsffWhereCompanyMock(
+  props: Partial<BsffWhereCompany>
+): BsffWhereCompany {
+  return {
+    siret: "",
+    ...props
+  };
+}
+
+export function createBsffWhereDestinationMock(
+  props: Partial<BsffWhereDestination>
+): BsffWhereDestination {
+  return {
+    company: null,
+    ...props
+  };
+}
+
+export function createBsffWhereEmitterMock(
+  props: Partial<BsffWhereEmitter>
+): BsffWhereEmitter {
+  return {
+    company: null,
+    ...props
+  };
+}
+
+export function createBsffWhereTransporterMock(
+  props: Partial<BsffWhereTransporter>
+): BsffWhereTransporter {
+  return {
+    company: null,
     ...props
   };
 }

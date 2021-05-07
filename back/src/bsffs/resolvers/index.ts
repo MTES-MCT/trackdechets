@@ -1,10 +1,17 @@
 import {
   MutationResolvers,
-  BsffOperationCode as BsffOperationCodeEnum
+  BsffOperationCode as BsffOperationCodeEnum,
+  QueryResolvers,
+  IBsffOperationResolvers
 } from "../../generated/graphql/types";
+import bsffs from "./queries/bsffs";
 import createBsff from "./mutations/createBsff";
 import updateBsff from "./mutations/updateBsff";
 import deleteBsff from "./mutations/deleteBsff";
+
+const Query: QueryResolvers = {
+  bsffs
+};
 
 const Mutation: MutationResolvers = {
   createBsff,
@@ -20,4 +27,13 @@ const BsffOperationCode: Record<BsffOperationCodeEnum, string> = {
   D14: "D 14"
 };
 
-export default { Mutation, BsffOperationCode };
+const IBsffOperation: IBsffOperationResolvers = {
+  __resolveType: operation => {
+    if ("signature" in operation) {
+      return "BsffOperation";
+    }
+    return "BsffPlannedOperation";
+  }
+};
+
+export default { Query, Mutation, BsffOperationCode, IBsffOperation };

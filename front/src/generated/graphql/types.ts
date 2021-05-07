@@ -578,6 +578,13 @@ export type Bsff = {
   bsffs: Array<Bsff>;
 };
 
+export type BsffConnection = {
+  __typename?: "BsffConnection";
+  totalCount: Scalars["Int"];
+  pageInfo: PageInfo;
+  edges: Array<BsffEdge>;
+};
+
 export type BsffDestination = {
   __typename?: "BsffDestination";
   /** Entreprise réceptionant le déchet. */
@@ -595,6 +602,12 @@ export type BsffDestination = {
 export type BsffDestinationInput = {
   company: CompanyInput;
   cap?: Maybe<Scalars["String"]>;
+};
+
+export type BsffEdge = {
+  __typename?: "BsffEdge";
+  cursor: Scalars["String"];
+  node: Bsff;
 };
 
 export type BsffEmission = {
@@ -788,6 +801,28 @@ export type BsffWasteInput = {
   code: Scalars["String"];
   description: Scalars["String"];
   adr: Scalars["String"];
+};
+
+export type BsffWhere = {
+  emitter?: Maybe<BsffWhereEmitter>;
+  transporter?: Maybe<BsffWhereTransporter>;
+  destination?: Maybe<BsffWhereDestination>;
+};
+
+export type BsffWhereCompany = {
+  siret: Scalars["String"];
+};
+
+export type BsffWhereDestination = {
+  company?: Maybe<BsffWhereCompany>;
+};
+
+export type BsffWhereEmitter = {
+  company?: Maybe<BsffWhereCompany>;
+};
+
+export type BsffWhereTransporter = {
+  company?: Maybe<BsffWhereCompany>;
 };
 
 export type Bsvhu = {
@@ -2964,6 +2999,7 @@ export type Query = {
    */
   bsdasris: BsdasriConnection;
   bsds: BsdConnection;
+  bsffs: BsffConnection;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsvhu: Bsvhu;
   /**
@@ -3096,6 +3132,15 @@ export type QueryBsdsArgs = {
   after?: Maybe<Scalars["String"]>;
   first?: Maybe<Scalars["Int"]>;
   orderBy?: Maybe<OrderBy>;
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsffsArgs = {
+  after?: Maybe<Scalars["ID"]>;
+  first?: Maybe<Scalars["Int"]>;
+  before?: Maybe<Scalars["ID"]>;
+  last?: Maybe<Scalars["Int"]>;
+  where?: Maybe<BsffWhere>;
 };
 
 /** Views of the Company ressource for the admin panel */
