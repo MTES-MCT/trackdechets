@@ -13,7 +13,7 @@ export async function isBsffContributor(
     >
   >
 ) {
-  const association = await prisma.companyAssociation.findFirst({
+  const count = await prisma.companyAssociation.count({
     where: {
       userId: user.id,
       company: {
@@ -28,7 +28,7 @@ export async function isBsffContributor(
     }
   });
 
-  if (association == null) {
+  if (count <= 0) {
     throw new ForbiddenError(
       "Vous ne pouvez pas éditer un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas."
     );

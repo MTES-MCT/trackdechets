@@ -632,11 +632,6 @@ export type BsffEmitterInput = {
 
 export type BsffFicheIntervention = {
   __typename?: "BsffFicheIntervention";
-  /**
-   * Identifiant unique assigné par Trackdéchets.
-   * Il est à utiliser pour les échanges avec l'API.
-   */
-  id: Scalars["ID"];
   /** Numéro de la fiche d'intervention, habituellement renseigné par l'opérateur. */
   numero: Scalars["String"];
   /** Poids total des fluides récupérés lors de cette intervention. */
@@ -647,6 +642,12 @@ export type BsffFicheIntervention = {
    */
   owner: BsffOwner;
   /** Code postal du lieu où l'intervention a eu lieu. */
+  postalCode: Scalars["String"];
+};
+
+export type BsffFicheInterventionInput = {
+  kilos: Scalars["Int"];
+  owner: BsffOwnerInput;
   postalCode: Scalars["String"];
 };
 
@@ -688,6 +689,10 @@ export type BsffOwner = {
   __typename?: "BsffOwner";
   /** Entreprise détentrice de l'équipement. */
   company: FormCompany;
+};
+
+export type BsffOwnerInput = {
+  company: CompanyInput;
 };
 
 export type BsffPackaging = {
@@ -2092,6 +2097,8 @@ export type Mutation = {
    * en spécifiant le rôle accordé au nouvel utilisateur
    */
   acceptMembershipRequest: CompanyPrivate;
+  /** Mutation permettant d'ajouter une fiche d'intervention à un bordereau existant. */
+  addFicheInterventionBsff: BsffFicheIntervention;
   /**
    * USAGE INTERNE
    * Modifie le mot de passe d'un utilisateur
@@ -2171,6 +2178,8 @@ export type Mutation = {
    * Supprime un BSVHU
    */
   deleteBsvhu?: Maybe<Bsvhu>;
+  /** Mutation permettant de supprimer une fiche d'intervention lié à un bordereau existant. */
+  deleteFicheInterventionBsff: BsffFicheIntervention;
   /** Supprime un BSD */
   deleteForm?: Maybe<Form>;
   /**
@@ -2435,6 +2444,8 @@ export type Mutation = {
    * Édite les informations d'un établissement
    */
   updateCompany: CompanyPrivate;
+  /** Mutation permettant de mettre à jour une fiche d'intervention lié à un bordereau existant. */
+  updateFicheInterventionBsff: BsffFicheIntervention;
   /** Met à jour un bordereau existant */
   updateForm: Form;
   /**
@@ -2468,6 +2479,12 @@ export type Mutation = {
 export type MutationAcceptMembershipRequestArgs = {
   id: Scalars["ID"];
   role: UserRole;
+};
+
+export type MutationAddFicheInterventionBsffArgs = {
+  id: Scalars["ID"];
+  numero: Scalars["String"];
+  input: BsffFicheInterventionInput;
 };
 
 export type MutationChangePasswordArgs = {
@@ -2538,6 +2555,11 @@ export type MutationDeleteBsffArgs = {
 
 export type MutationDeleteBsvhuArgs = {
   id: Scalars["ID"];
+};
+
+export type MutationDeleteFicheInterventionBsffArgs = {
+  id: Scalars["ID"];
+  numero: Scalars["String"];
 };
 
 export type MutationDeleteFormArgs = {
@@ -2764,6 +2786,12 @@ export type MutationUpdateCompanyArgs = {
   vhuAgrementDemolisseurId?: Maybe<Scalars["String"]>;
   vhuAgrementBroyeurId?: Maybe<Scalars["String"]>;
   ecoOrganismeAgreements?: Maybe<Array<Scalars["URL"]>>;
+};
+
+export type MutationUpdateFicheInterventionBsffArgs = {
+  id: Scalars["ID"];
+  numero: Scalars["String"];
+  input: BsffFicheInterventionInput;
 };
 
 export type MutationUpdateFormArgs = {
@@ -4207,10 +4235,12 @@ export type ResolversTypes = {
   CompanyStat: ResolverTypeWrapper<CompanyStat>;
   Stat: ResolverTypeWrapper<Stat>;
   Mutation: ResolverTypeWrapper<{}>;
+  BsffFicheInterventionInput: BsffFicheInterventionInput;
+  BsffOwnerInput: BsffOwnerInput;
+  CompanyInput: CompanyInput;
   CreateBrokerReceiptInput: CreateBrokerReceiptInput;
   BsdasriCreateInput: BsdasriCreateInput;
   BsdasriEmitterInput: BsdasriEmitterInput;
-  CompanyInput: CompanyInput;
   WorkSiteInput: WorkSiteInput;
   BsdasriEmissionInput: BsdasriEmissionInput;
   BsdasriWasteDetailInput: BsdasriWasteDetailInput;
@@ -4440,10 +4470,12 @@ export type ResolversParentTypes = {
   CompanyStat: CompanyStat;
   Stat: Stat;
   Mutation: {};
+  BsffFicheInterventionInput: BsffFicheInterventionInput;
+  BsffOwnerInput: BsffOwnerInput;
+  CompanyInput: CompanyInput;
   CreateBrokerReceiptInput: CreateBrokerReceiptInput;
   BsdasriCreateInput: BsdasriCreateInput;
   BsdasriEmitterInput: BsdasriEmitterInput;
-  CompanyInput: CompanyInput;
   WorkSiteInput: WorkSiteInput;
   BsdasriEmissionInput: BsdasriEmissionInput;
   BsdasriWasteDetailInput: BsdasriWasteDetailInput;
@@ -5084,7 +5116,6 @@ export type BsffFicheInterventionResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsffFicheIntervention"] = ResolversParentTypes["BsffFicheIntervention"]
 > = {
-  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
   numero?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   kilos?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   owner?: Resolver<ResolversTypes["BsffOwner"], ParentType, ContextType>;
@@ -6278,6 +6309,15 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationAcceptMembershipRequestArgs, "id" | "role">
   >;
+  addFicheInterventionBsff?: Resolver<
+    ResolversTypes["BsffFicheIntervention"],
+    ParentType,
+    ContextType,
+    RequireFields<
+      MutationAddFicheInterventionBsffArgs,
+      "id" | "numero" | "input"
+    >
+  >;
   changePassword?: Resolver<
     ResolversTypes["User"],
     ParentType,
@@ -6379,6 +6419,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationDeleteBsvhuArgs, "id">
+  >;
+  deleteFicheInterventionBsff?: Resolver<
+    ResolversTypes["BsffFicheIntervention"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeleteFicheInterventionBsffArgs, "id" | "numero">
   >;
   deleteForm?: Resolver<
     Maybe<ResolversTypes["Form"]>,
@@ -6667,6 +6713,15 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationUpdateCompanyArgs, "siret">
+  >;
+  updateFicheInterventionBsff?: Resolver<
+    ResolversTypes["BsffFicheIntervention"],
+    ParentType,
+    ContextType,
+    RequireFields<
+      MutationUpdateFicheInterventionBsffArgs,
+      "id" | "numero" | "input"
+    >
   >;
   updateForm?: Resolver<
     ResolversTypes["Form"],
@@ -8188,10 +8243,20 @@ export function createBsffFicheInterventionMock(
 ): BsffFicheIntervention {
   return {
     __typename: "BsffFicheIntervention",
-    id: "",
     numero: "",
     kilos: 0,
     owner: createBsffOwnerMock({}),
+    postalCode: "",
+    ...props
+  };
+}
+
+export function createBsffFicheInterventionInputMock(
+  props: Partial<BsffFicheInterventionInput>
+): BsffFicheInterventionInput {
+  return {
+    kilos: 0,
+    owner: createBsffOwnerInputMock({}),
     postalCode: "",
     ...props
   };
@@ -8225,6 +8290,15 @@ export function createBsffOwnerMock(props: Partial<BsffOwner>): BsffOwner {
   return {
     __typename: "BsffOwner",
     company: createFormCompanyMock({}),
+    ...props
+  };
+}
+
+export function createBsffOwnerInputMock(
+  props: Partial<BsffOwnerInput>
+): BsffOwnerInput {
+  return {
+    company: createCompanyInputMock({}),
     ...props
   };
 }

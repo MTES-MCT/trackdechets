@@ -88,6 +88,7 @@
     "qrcode": "^1.4.4",
     "rate-limit-redis": "^2.0.0",
     "request": "^2.88.2",
+    "slugify": "^1.5.1",
     "winston": "^3.2.1",
     "winston-transport": "^4.3.0",
     "world-countries": "^4.0.0",

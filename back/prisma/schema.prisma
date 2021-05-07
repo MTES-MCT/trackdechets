@@ -880,12 +880,12 @@ model BsffFicheIntervention {
   kilos      Int
   postalCode String
 
-  ownerCompanyName    String?
-  ownerCompanySiret   String?
-  ownerCompanyAddress String?
-  ownerCompanyContact String?
-  ownerCompanyPhone   String?
-  ownerCompanyMail    String?
+  ownerCompanyName    String
+  ownerCompanySiret   String
+  ownerCompanyAddress String
+  ownerCompanyContact String
+  ownerCompanyPhone   String
+  ownerCompanyMail    String
 
   Bsff   Bsff?   @relation("FicheInterventionToBsff", fields: [bsffId], references: [id])
   bsffId String?

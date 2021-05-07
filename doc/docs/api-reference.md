@@ -793,6 +793,30 @@ Renvoie des statistiques sur le volume de déchets entrant et sortant
 </thead>
 <tbody>
 <tr>
+<td colspan="2" valign="top"><strong>addFicheInterventionBsff</strong></td>
+<td valign="top"><a href="#bsffficheintervention">BsffFicheIntervention</a>!</td>
+<td>
+
+Mutation permettant d'ajouter une fiche d'intervention à un bordereau existant.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">numero</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#bsffficheinterventioninput">BsffFicheInterventionInput</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>createBsdasri</strong></td>
 <td valign="top"><a href="#bsdasri">Bsdasri</a>!</td>
 <td>
@@ -944,6 +968,25 @@ Supprime un BSVHU
 ID d'un BSD VHU
 
 </td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>deleteFicheInterventionBsff</strong></td>
+<td valign="top"><a href="#bsffficheintervention">BsffFicheIntervention</a>!</td>
+<td>
+
+Mutation permettant de supprimer une fiche d'intervention lié à un bordereau existant.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">numero</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>deleteForm</strong></td>
@@ -1649,6 +1692,30 @@ Met à jour un BSVHU
 <tr>
 <td colspan="2" align="right" valign="top">input</td>
 <td valign="top"><a href="#bsvhuinput">BsvhuInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>updateFicheInterventionBsff</strong></td>
+<td valign="top"><a href="#bsffficheintervention">BsffFicheIntervention</a>!</td>
+<td>
+
+Mutation permettant de mettre à jour une fiche d'intervention lié à un bordereau existant.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">numero</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#bsffficheinterventioninput">BsffFicheInterventionInput</a>!</td>
 <td></td>
 </tr>
 <tr>
@@ -2797,16 +2864,6 @@ Déclaration de l'émetteur lors de l'enlèvement par le transporteur.
 </tr>
 </thead>
 <tbody>
-<tr>
-<td colspan="2" valign="top"><strong>id</strong></td>
-<td valign="top"><a href="#id">ID</a>!</td>
-<td>
-
-Identifiant unique assigné par Trackdéchets.
-Il est à utiliser pour les échanges avec l'API.
-
-</td>
-</tr>
 <tr>
 <td colspan="2" valign="top"><strong>numero</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
@@ -7825,6 +7882,35 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 </tbody>
 </table>
 
+### BsffFicheInterventionInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>kilos</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>owner</strong></td>
+<td valign="top"><a href="#bsffownerinput">BsffOwnerInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>postalCode</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### BsffInput
 
 <table>
@@ -7864,6 +7950,25 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 <tr>
 <td colspan="2" valign="top"><strong>destination</strong></td>
 <td valign="top"><a href="#bsffdestinationinput">BsffDestinationInput</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffOwnerInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a>!</td>
 <td></td>
 </tr>
 </tbody>

@@ -1,3 +1,4 @@
+import slugify from "slugify";
 import * as Prisma from ".prisma/client";
 import { nullIfNoValues, safeInput } from "../forms/form-converter";
 import * as GraphQL from "../generated/graphql/types";
@@ -131,4 +132,46 @@ export function unflattenBsff(
       cap: prismaBsff.destinationCap
     })
   };
+}
+
+export function flattenFicheInterventionBsffInput(
+  ficheInterventionInput: GraphQL.BsffFicheInterventionInput
+): Omit<Prisma.Prisma.BsffFicheInterventionCreateInput, "id" | "numero"> {
+  return {
+    kilos: ficheInterventionInput.kilos,
+    postalCode: ficheInterventionInput.postalCode,
+    ownerCompanyName: ficheInterventionInput.owner.company.name ?? "",
+    ownerCompanySiret: ficheInterventionInput.owner.company.siret ?? "",
+    ownerCompanyAddress: ficheInterventionInput.owner.company.address ?? "",
+    ownerCompanyContact: ficheInterventionInput.owner.company.contact ?? "",
+    ownerCompanyPhone: ficheInterventionInput.owner.company.phone ?? "",
+    ownerCompanyMail: ficheInterventionInput.owner.company.mail ?? ""
+  };
+}
+
+export function unflattenFicheInterventionBsff(
+  prismaFicheIntervention: Prisma.BsffFicheIntervention
+): GraphQL.BsffFicheIntervention {
+  return {
+    numero: prismaFicheIntervention.numero,
+    kilos: prismaFicheIntervention.kilos,
+    postalCode: prismaFicheIntervention.postalCode,
+    owner: {
+      company: {
+        name: prismaFicheIntervention.ownerCompanyName,
+        siret: prismaFicheIntervention.ownerCompanySiret,
+        address: prismaFicheIntervention.ownerCompanyAddress,
+        contact: prismaFicheIntervention.ownerCompanyContact,
+        phone: prismaFicheIntervention.ownerCompanyPhone,
+        mail: prismaFicheIntervention.ownerCompanyMail
+      }
+    }
+  };
+}
+
+export function generateFicheInterventionId(
+  bsffId: string,
+  ficheInterventionNumero: string
+): string {
+  return `${bsffId}-${slugify(ficheInterventionNumero, { replacement: "" })}`;
 }

@@ -179,11 +179,6 @@ enum BsffOperationQualification {
 }
 
 type BsffFicheIntervention {
-  """
-  Identifiant unique assigné par Trackdéchets.
-  Il est à utiliser pour les échanges avec l'API.
-  """
-  id: ID!
   "Numéro de la fiche d'intervention, habituellement renseigné par l'opérateur."
   numero: String!
   "Poids total des fluides récupérés lors de cette intervention."

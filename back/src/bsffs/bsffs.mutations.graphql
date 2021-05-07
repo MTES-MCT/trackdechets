@@ -14,6 +14,29 @@ type Mutation {
   À condition qu'il n'ait pas encore été signé.
   """
   deleteBsff(id: ID!): Bsff!
+
+  """
+  Mutation permettant d'ajouter une fiche d'intervention à un bordereau existant.
+  """
+  addFicheInterventionBsff(
+    id: ID!
+    numero: String!
+    input: BsffFicheInterventionInput!
+  ): BsffFicheIntervention!
+
+  """
+  Mutation permettant de mettre à jour une fiche d'intervention lié à un bordereau existant.
+  """
+  updateFicheInterventionBsff(
+    id: ID!
+    numero: String!
+    input: BsffFicheInterventionInput!
+  ): BsffFicheIntervention!
+
+  """
+  Mutation permettant de supprimer une fiche d'intervention lié à un bordereau existant.
+  """
+  deleteFicheInterventionBsff(id: ID!, numero: String!): BsffFicheIntervention!
 }
 
 input BsffInput {
@@ -59,4 +82,13 @@ input BsffTransporterRecepisseInput {
 input BsffDestinationInput {
   company: CompanyInput!
   cap: String
+}
+
+input BsffFicheInterventionInput {
+  kilos: Int!
+  owner: BsffOwnerInput!
+  postalCode: String!
+}
+input BsffOwnerInput {
+  company: CompanyInput!
 }
