@@ -35,6 +35,7 @@ services:
     environment:
       NODE_ENV: dev
       SIB_BASE_URL: "http://mailservice"
+      DATABASE_URL: "postgresql://trackdechets:pwd@postgres:5432/prisma"
     ports:
       - "4000:$API_PORT"
 
