@@ -408,11 +408,14 @@ describe("Mutation.markAsSealed", () => {
 
     const { mutate } = makeClient(user);
 
-    const { errors } = await mutate(MARK_AS_SEALED, {
-      variables: {
-        id: form.id
+    const { errors } = await mutate<Pick<Mutation, "markAsSealed">>(
+      MARK_AS_SEALED,
+      {
+        variables: {
+          id: form.id
+        }
       }
-    });
+    );
     expect(errors).toEqual([
       expect.objectContaining({
         message: [
@@ -440,11 +443,14 @@ describe("Mutation.markAsSealed", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate(MARK_AS_SEALED, {
-      variables: {
-        id: form.id
+    const { data } = await mutate<Pick<Mutation, "markAsSealed">>(
+      MARK_AS_SEALED,
+      {
+        variables: {
+          id: form.id
+        }
       }
-    });
+    );
 
     expect(data.markAsSealed.status).toBe("SEALED");
   });
