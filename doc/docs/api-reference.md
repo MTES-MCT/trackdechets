@@ -849,6 +849,26 @@ Payload de création d'un bordereau
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>deleteBsdasri</strong></td>
+<td valign="top"><a href="#bsdasri">Bsdasri</a></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Appose une signature de type EMISSION via un compte n'appartenant pas à l'émetteur.
+Permet de signer un enlèvement sur le device transporteur grâce au code de sécurité de l'émetteur du dasri
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ID d'un Dasri
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>deleteForm</strong></td>
 <td valign="top"><a href="#form">Form</a></td>
 <td>

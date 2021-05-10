@@ -5,11 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# Next release (June)
+# Next release
 
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout de la mutation de duplication bordereaux dasri [PR 848](https://github.com/MTES-MCT/trackdechets/pull/848)
+- Ajout d'une mutation de suppression de bordereau dasri [PR 852](https://github.com/MTES-MCT/trackdechets/pull/852)
 
 #### :boom: Breaking changes
 
@@ -22,20 +23,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 # [2021.05.1] 04/05/2021
-
-#### :rocket: Nouvelles fonctionnalités
-
-#### :boom: Breaking changes
-
-#### :bug: Corrections de bugs
-
-#### :nail_care: Améliorations
-
-#### :memo: Documentation
-
-#### :house: Interne
-
-# 2021.05.1
 
 #### :rocket: Nouvelles fonctionnalités
 
