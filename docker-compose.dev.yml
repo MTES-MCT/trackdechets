@@ -5,7 +5,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: trackdechets
-      POSTGRES_PASSWORD: pwd
+      POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
     volumes:
@@ -35,7 +35,7 @@ services:
     environment:
       NODE_ENV: dev
       SIB_BASE_URL: "http://mailservice"
-      DATABASE_URL: "postgresql://trackdechets:pwd@postgres:5432/prisma"
+      DATABASE_URL: "postgresql://trackdechets:password@postgres:5432/prisma"
     ports:
       - "4000:$API_PORT"
 
