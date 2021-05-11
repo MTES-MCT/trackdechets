@@ -10,7 +10,7 @@ import {
 import { getBsffOrNotFound } from "../../database";
 import { isBsffContributor } from "../../permissions";
 
-const addFicheInterventionBsff: MutationResolvers["addFicheInterventionBsff"] = async (
+const updateFicheInterventionBsff: MutationResolvers["updateFicheInterventionBsff"] = async (
   _,
   { id, numero, input },
   context
@@ -27,26 +27,18 @@ const addFicheInterventionBsff: MutationResolvers["addFicheInterventionBsff"] = 
       }
     }
   );
-  if (existingFicheIntervention) {
+  if (existingFicheIntervention == null) {
     throw new UserInputError(
-      `La fiche d'intervention n°${numero} est déjà lié au bordereau n°${bsff.id} et ne peut pas être créer à nouveau.`
+      `La fiche d'intervention n°${numero} n'existe pas pour le bordereau n°${bsff.id}.`
     );
   }
 
-  const ficheIntervention = await prisma.bsffFicheIntervention.create({
-    data: {
-      ...flattenFicheInterventionBsffInput(input),
-      id: ficheInterventionId,
-      numero,
-      Bsff: {
-        connect: {
-          id: bsff.id
-        }
-      }
-    }
+  const updatedFicheIntervention = await prisma.bsffFicheIntervention.update({
+    data: flattenFicheInterventionBsffInput(input),
+    where: { id: existingFicheIntervention.id }
   });
 
-  return unflattenFicheInterventionBsff(ficheIntervention);
+  return unflattenFicheInterventionBsff(updatedFicheIntervention);
 };
 
-export default addFicheInterventionBsff;
+export default updateFicheInterventionBsff;

@@ -169,7 +169,7 @@ export function unflattenFicheInterventionBsff(
   };
 }
 
-export function generateFicheInterventionId(
+export function getFicheInterventionId(
   bsffId: string,
   ficheInterventionNumero: string
 ): string {

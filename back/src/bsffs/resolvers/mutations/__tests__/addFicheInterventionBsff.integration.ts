@@ -8,7 +8,7 @@ import {
 import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { generateFicheInterventionId } from "../../../converter";
+import { getFicheInterventionId } from "../../../converter";
 
 const ADD_FICHE_INTERVENTION = `
   mutation AddFicheIntervention($id: ID!, $numero: String!, $input: BsffFicheInterventionInput!) {
@@ -118,7 +118,7 @@ describe("Mutation.addFicheInterventionBsff", () => {
     const bsffId = getReadableId(ReadableIdPrefix.FF);
     // the numero contains special characters on purpose
     const ficheInterventionNumero = "FI N°ABC DEF GHI";
-    const ficheInterventionId = generateFicheInterventionId(
+    const ficheInterventionId = getFicheInterventionId(
       bsffId,
       ficheInterventionNumero
     );
