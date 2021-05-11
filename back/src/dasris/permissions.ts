@@ -5,8 +5,9 @@ import { getFullUser } from "../users/database";
 import { BsdasriSirets } from "./types";
 
 import { NotFormContributor } from "../forms/errors";
+
 import { getFullBsdasri } from "./database";
-import { UserInputError } from "apollo-server-express";
+import { UserInputError, ForbiddenError } from "apollo-server-express";
 export class InvalidPublicationAttempt extends UserInputError {
   constructor() {
     super("Vous ne pouvez pas publier ce bordereau.");
@@ -75,8 +76,23 @@ export async function checkIsBsdasriPublishable(user: User, dasri: Bsdasri) {
 export async function checkCanReadBsdasri(user: User, bsdasri: Bsdasri) {
   return checkIsBsdasriContributor(
     user,
-
     await getFullBsdasri(bsdasri),
     "Vous n'êtes pas autorisé à accéder à ce bordereau"
   );
+}
+
+export async function checkCanDeleteBsdasri(user: User, bsdasri: Bsdasri) {
+  await checkIsBsdasriContributor(
+    user,
+    await getFullBsdasri(bsdasri),
+    "Vous n'êtes pas autorisé à supprimer ce bordereau."
+  );
+
+  if (bsdasri.status !== BsdasriStatus.INITIAL) {
+    throw new ForbiddenError(
+      "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés"
+    );
+  }
+
+  return true;
 }
