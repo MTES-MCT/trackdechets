@@ -10,6 +10,7 @@ import updateBsff from "./mutations/updateBsff";
 import deleteBsff from "./mutations/deleteBsff";
 import addFicheInterventionBsff from "./mutations/addFicheInterventionBsff";
 import updateFicheInterventionBsff from "./mutations/updateFicheInterventionBsff";
+import deleteFicheInterventionBsff from "./mutations/deleteFicheInterventionBsff";
 
 const Query: QueryResolvers = {
   bsffs
@@ -20,7 +21,8 @@ const Mutation: MutationResolvers = {
   updateBsff,
   deleteBsff,
   addFicheInterventionBsff,
-  updateFicheInterventionBsff
+  updateFicheInterventionBsff,
+  deleteFicheInterventionBsff
 };
 
 const BsffOperationCode: Record<BsffOperationCodeEnum, string> = {
