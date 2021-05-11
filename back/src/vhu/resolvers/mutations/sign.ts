@@ -60,7 +60,6 @@ export default async function sign(
     type: input.type,
     bsvhu: prismaForm
   });
-  //console.log(prismaForm.status,newStatus)
   const signedForm = await prisma.bsvhu.update({
     where: { id },
     data: {
