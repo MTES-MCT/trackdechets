@@ -179,8 +179,7 @@ export const client = new Client({
 });
 client.on("response", (err, result) => {
   if (err) {
-    console.error(err);
-    console.log(result);
+    console.error(JSON.stringify(result, null, 2));
   }
 });
 
