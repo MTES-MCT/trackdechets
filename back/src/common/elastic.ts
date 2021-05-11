@@ -177,6 +177,12 @@ export const client = new Client({
     ? { ca: fs.readFileSync(certPath, "utf-8") }
     : undefined
 });
+client.on("response", (err, result) => {
+  if (err) {
+    console.error(err);
+    console.log(result);
+  }
+});
 
 /**
  * Create/update a document in Elastic Search.
