@@ -31,6 +31,7 @@ export async function resetDatabase() {
   // We need a longer than 5sec timeout...
   jest.setTimeout(10000);
 
+  await refreshElasticSearch();
   await elasticSearch.deleteByQuery({
     index: index.alias,
     body: {
