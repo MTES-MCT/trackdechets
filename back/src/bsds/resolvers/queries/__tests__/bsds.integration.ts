@@ -8,15 +8,21 @@ import {
   MutationMarkAsSealedArgs,
   MutationSignedByTransporterArgs,
   MutationMarkAsReceivedArgs,
-  MutationMarkAsProcessedArgs
+  MutationMarkAsProcessedArgs,
+  EmitterType
 } from "../../../../generated/graphql/types";
 import {
   resetDatabase,
   refreshElasticSearch
 } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  userWithCompanyFactory,
+  formFactory
+} from "../../../../__tests__/factories";
 
+import { indexForm } from "../../../../forms/elastic";
+import { getFullForm } from "../../../../forms/database";
 const GET_BSDS = `
   query GetBsds($where: BsdWhere) {
     bsds(where: $where) {
@@ -30,14 +36,78 @@ const GET_BSDS = `
     }
   }
 `;
+const CREATE_FORM = `
+mutation CreateForm($createFormInput: CreateFormInput!) {
+  createForm(createFormInput: $createFormInput) {
+    id
+  }
+}
+`;
+const buildFormPayload = (
+  emitterSiret,
+  transporterSiret,
+  recipientSiret
+): MutationCreateFormArgs => ({
+  createFormInput: {
+    emitter: {
+      company: {
+        siret: emitterSiret,
+        name: "MARIE PRODUCTEUR",
+        address: "12 chemin des caravanes",
+        contact: "Marie",
+        mail: "marie@gmail.com",
+        phone: "06"
+      },
+      type: "PRODUCER" as EmitterType
+    },
+    transporter: {
+      company: {
+        siret: transporterSiret,
+        name: "JM TRANSPORT",
+        address: "2 rue des pâquerettes",
+        contact: "Jean-Michel",
+        mail: "jean.michel@gmaiL.com",
+        phone: "06"
+      },
+      receipt: "123456789",
+      department: "69",
+      validityLimit: addYears(new Date(), 1).toISOString() as any
+    },
+    recipient: {
+      company: {
+        siret: recipientSiret,
+        name: "JEANNE COLLECTEUR",
+        address: "38 bis allée des anges",
+        contact: "Jeanne",
+        mail: "jeanne@gmail.com",
+        phone: "06"
+      },
+      processingOperation: "R 1"
+    },
+    wasteDetails: {
+      code: "01 01 01",
+      name: "Stylos bille",
+      consistence: "SOLID",
+      packagingInfos: [
+        {
+          type: "BENNE",
+          quantity: 1
+        }
+      ],
+      quantityType: "ESTIMATED",
+      quantity: 1
+    }
+  }
+});
 
-describe("Query.bsds", () => {
+describe("Query.bsds workflow", () => {
   let emitter: { user: User; company: Company };
   let transporter: { user: User; company: Company };
   let recipient: { user: User; company: Company };
   let formId: string;
 
   beforeAll(async () => {
+    await resetDatabase();
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
         set: ["PRODUCER"]
@@ -59,13 +129,7 @@ describe("Query.bsds", () => {
   describe("when a bsd is freshly created", () => {
     beforeAll(async () => {
       const { mutate } = makeClient(emitter.user);
-      const CREATE_FORM = `
-        mutation CreateForm($createFormInput: CreateFormInput!) {
-          createForm(createFormInput: $createFormInput) {
-            id
-          }
-        }
-      `;
+
       const {
         data: {
           createForm: { id }
@@ -73,58 +137,11 @@ describe("Query.bsds", () => {
       } = await mutate<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
         CREATE_FORM,
         {
-          variables: {
-            createFormInput: {
-              emitter: {
-                company: {
-                  siret: emitter.company.siret,
-                  name: "MARIE PRODUCTEUR",
-                  address: "12 chemin des caravanes",
-                  contact: "Marie",
-                  mail: "marie@gmail.com",
-                  phone: "06"
-                },
-                type: "PRODUCER"
-              },
-              transporter: {
-                company: {
-                  siret: transporter.company.siret,
-                  name: "JM TRANSPORT",
-                  address: "2 rue des pâquerettes",
-                  contact: "Jean-Michel",
-                  mail: "jean.michel@gmaiL.com",
-                  phone: "06"
-                },
-                receipt: "123456789",
-                department: "69",
-                validityLimit: addYears(new Date(), 1).toISOString() as any
-              },
-              recipient: {
-                company: {
-                  siret: recipient.company.siret,
-                  name: "JEANNE COLLECTEUR",
-                  address: "38 bis allée des anges",
-                  contact: "Jeanne",
-                  mail: "jeanne@gmail.com",
-                  phone: "06"
-                },
-                processingOperation: "R 1"
-              },
-              wasteDetails: {
-                code: "01 01 01",
-                name: "Stylos bille",
-                consistence: "SOLID",
-                packagingInfos: [
-                  {
-                    type: "BENNE",
-                    quantity: 1
-                  }
-                ],
-                quantityType: "ESTIMATED",
-                quantity: 1
-              }
-            }
-          }
+          variables: buildFormPayload(
+            emitter.company.siret,
+            transporter.company.siret,
+            recipient.company.siret
+          )
         }
       );
       formId = id;
@@ -404,5 +421,79 @@ describe("Query.bsds", () => {
         expect.objectContaining({ node: { id: formId } })
       ]);
     });
+  });
+});
+
+describe("Query.bsds edge cases", () => {
+  beforeAll(async () => {
+    await resetDatabase();
+  });
+  afterAll(resetDatabase);
+
+  it("should return bsds where same company plays different roles", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+
+    const recipientAndTransporter = await userWithCompanyFactory(
+      UserRole.ADMIN,
+      {
+        companyTypes: {
+          set: ["WASTEPROCESSOR"]
+        }
+      }
+    );
+    // let's build a form where the same company is both transporter & recipient
+    // this SENT form now is collected by transporter (isCollectedFor) and awaiting reception (isForActionFor) by recipient,
+    // who are the same company (recipient)
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        transporterCompanySiret: recipientAndTransporter.company.siret,
+        recipientCompanySiret: recipientAndTransporter.company.siret,
+        status: "SENT"
+      }
+    });
+
+    const fullForm = await getFullForm(form);
+
+    await indexForm(fullForm);
+    await refreshElasticSearch();
+
+    const { query: transporterQuery } = makeClient(
+      recipientAndTransporter.user
+    );
+    // form shows when whe request `isCollectedFor`
+    let res = await transporterQuery<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {
+        variables: {
+          where: {
+            isCollectedFor: [recipientAndTransporter.company.siret]
+          }
+        }
+      }
+    );
+
+    expect(res.data.bsds.edges).toEqual([
+      expect.objectContaining({ node: { id: form.id } })
+    ]);
+
+    const { query: recipientQuery } = makeClient(recipientAndTransporter.user);
+    // form shows when whe request `isForActionFor`
+    res = await recipientQuery<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {
+      variables: {
+        where: {
+          isForActionFor: [recipientAndTransporter.company.siret]
+        }
+      }
+    });
+
+    expect(res.data.bsds.edges).toEqual([
+      expect.objectContaining({ node: { id: form.id } })
+    ]);
   });
 });
