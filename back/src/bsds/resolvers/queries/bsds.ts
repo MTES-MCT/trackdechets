@@ -179,7 +179,6 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
     }
   );
   const hits = body.hits.hits.slice(0, size);
-
   const ids = hits.reduce<Record<BsdType, string[]>>(
     (acc, { _source: { type, id } }) => ({
       ...acc,
@@ -187,7 +186,6 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
     }),
     { BSDD: [] }
   );
-
   const bsds: Record<BsdType, Bsd[]> = {
     BSDD: (
       await prisma.form.findMany({
@@ -199,7 +197,6 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
       })
     ).map(expandFormFromDb)
   };
-
   const edges = hits
     .reduce<Array<Bsd>>((acc, { _source: { type, id } }) => {
       const bsd = bsds[type].find(bsd => bsd.id === id);

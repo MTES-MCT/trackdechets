@@ -8,8 +8,7 @@ import {
   MutationMarkAsSealedArgs,
   MutationSignedByTransporterArgs,
   MutationMarkAsReceivedArgs,
-  MutationMarkAsProcessedArgs,
-  EmitterType
+  MutationMarkAsProcessedArgs
 } from "../../../../generated/graphql/types";
 import {
   resetDatabase,
@@ -43,62 +42,6 @@ mutation CreateForm($createFormInput: CreateFormInput!) {
   }
 }
 `;
-const buildFormPayload = (
-  emitterSiret,
-  transporterSiret,
-  recipientSiret
-): MutationCreateFormArgs => ({
-  createFormInput: {
-    emitter: {
-      company: {
-        siret: emitterSiret,
-        name: "MARIE PRODUCTEUR",
-        address: "12 chemin des caravanes",
-        contact: "Marie",
-        mail: "marie@gmail.com",
-        phone: "06"
-      },
-      type: "PRODUCER" as EmitterType
-    },
-    transporter: {
-      company: {
-        siret: transporterSiret,
-        name: "JM TRANSPORT",
-        address: "2 rue des pâquerettes",
-        contact: "Jean-Michel",
-        mail: "jean.michel@gmaiL.com",
-        phone: "06"
-      },
-      receipt: "123456789",
-      department: "69",
-      validityLimit: addYears(new Date(), 1).toISOString() as any
-    },
-    recipient: {
-      company: {
-        siret: recipientSiret,
-        name: "JEANNE COLLECTEUR",
-        address: "38 bis allée des anges",
-        contact: "Jeanne",
-        mail: "jeanne@gmail.com",
-        phone: "06"
-      },
-      processingOperation: "R 1"
-    },
-    wasteDetails: {
-      code: "01 01 01",
-      name: "Stylos bille",
-      consistence: "SOLID",
-      packagingInfos: [
-        {
-          type: "BENNE",
-          quantity: 1
-        }
-      ],
-      quantityType: "ESTIMATED",
-      quantity: 1
-    }
-  }
-});
 
 describe("Query.bsds workflow", () => {
   let emitter: { user: User; company: Company };
@@ -137,11 +80,58 @@ describe("Query.bsds workflow", () => {
       } = await mutate<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
         CREATE_FORM,
         {
-          variables: buildFormPayload(
-            emitter.company.siret,
-            transporter.company.siret,
-            recipient.company.siret
-          )
+          variables: {
+            createFormInput: {
+              emitter: {
+                company: {
+                  siret: emitter.company.siret,
+                  name: "MARIE PRODUCTEUR",
+                  address: "12 chemin des caravanes",
+                  contact: "Marie",
+                  mail: "marie@gmail.com",
+                  phone: "06"
+                },
+                type: "PRODUCER"
+              },
+              transporter: {
+                company: {
+                  siret: transporter.company.siret,
+                  name: "JM TRANSPORT",
+                  address: "2 rue des pâquerettes",
+                  contact: "Jean-Michel",
+                  mail: "jean.michel@gmaiL.com",
+                  phone: "06"
+                },
+                receipt: "123456789",
+                department: "69",
+                validityLimit: addYears(new Date(), 1).toISOString() as any
+              },
+              recipient: {
+                company: {
+                  siret: recipient.company.siret,
+                  name: "JEANNE COLLECTEUR",
+                  address: "38 bis allée des anges",
+                  contact: "Jeanne",
+                  mail: "jeanne@gmail.com",
+                  phone: "06"
+                },
+                processingOperation: "R 1"
+              },
+              wasteDetails: {
+                code: "01 01 01",
+                name: "Stylos bille",
+                consistence: "SOLID",
+                packagingInfos: [
+                  {
+                    type: "BENNE",
+                    quantity: 1
+                  }
+                ],
+                quantityType: "ESTIMATED",
+                quantity: 1
+              }
+            }
+          }
         }
       );
       formId = id;

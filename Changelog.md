@@ -18,6 +18,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Amélioration de l'indexation des bsdd [PR 858](https://github.com/MTES-MCT/trackdechets/pull/858)
+
 #### :memo: Documentation
 
 #### :house: Interne
