@@ -1,4 +1,5 @@
 import { UserRole } from ".prisma/client";
+import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import {
   Mutation,
@@ -17,6 +18,8 @@ const SIGN = `
 `;
 
 describe("Mutation.signBsff", () => {
+  afterEach(resetDatabase);
+
   it("should allow emitter to sign a bsff", async () => {
     const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await prisma.bsff.create({
