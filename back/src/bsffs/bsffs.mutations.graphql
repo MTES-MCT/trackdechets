@@ -37,6 +37,26 @@ type Mutation {
   Mutation permettant de supprimer une fiche d'intervention lié à un bordereau existant.
   """
   deleteFicheInterventionBsff(id: ID!, numero: String!): BsffFicheIntervention!
+
+  """
+  Mutation permettant d'apposer une signature sur le bordereau.
+  """
+  signBsff(
+    id: ID!
+    type: BsffSignatureType!
+    signature: SignatureInput!
+    securityCode: Int
+  ): Bsff!
+}
+
+enum BsffSignatureType {
+  EMITTER
+  TRANSPORTER
+}
+
+input SignatureInput {
+  date: DateTime!
+  author: String!
 }
 
 input BsffInput {

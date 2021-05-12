@@ -746,6 +746,8 @@ export type BsffReception = {
   signature?: Maybe<Signature>;
 };
 
+export type BsffSignatureType = "EMITTER" | "TRANSPORTER";
+
 export type BsffTransport = {
   __typename?: "BsffTransport";
   /** Mode de transport utilisé. */
@@ -2393,6 +2395,8 @@ export type Mutation = {
    * Permet de signer un enlèvement sur le device transporteur grâce au code de sécurité de l'émetteur du dasri
    */
   signBsdasriEmissionWithSecretCode?: Maybe<Bsdasri>;
+  /** Mutation permettant d'apposer une signature sur le bordereau. */
+  signBsff: Bsff;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Signe un BSVHU
@@ -2732,6 +2736,13 @@ export type MutationSignBsdasriArgs = {
 export type MutationSignBsdasriEmissionWithSecretCodeArgs = {
   id: Scalars["ID"];
   signatureInput: BsdasriSignatureWithSecretCodeInput;
+};
+
+export type MutationSignBsffArgs = {
+  id: Scalars["ID"];
+  type: BsffSignatureType;
+  signature: SignatureInput;
+  securityCode?: Maybe<Scalars["Int"]>;
 };
 
 export type MutationSignBsvhuArgs = {
@@ -3369,6 +3380,11 @@ export type SignatureFormInput = {
   sentAt: Scalars["DateTime"];
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
   sentBy: Scalars["String"];
+};
+
+export type SignatureInput = {
+  date: Scalars["DateTime"];
+  author: Scalars["String"];
 };
 
 export type SignatureTypeInput = "EMISSION" | "TRANSPORT" | "OPERATION";
@@ -4311,6 +4327,8 @@ export type ResolversTypes = {
   SendVerificationCodeLetterInput: SendVerificationCodeLetterInput;
   BsdasriSignatureInput: BsdasriSignatureInput;
   BsdasriSignatureWithSecretCodeInput: BsdasriSignatureWithSecretCodeInput;
+  BsffSignatureType: BsffSignatureType;
+  SignatureInput: SignatureInput;
   BsvhuSignatureInput: BsvhuSignatureInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignatureAuthor: SignatureAuthor;
@@ -4545,6 +4563,7 @@ export type ResolversParentTypes = {
   SendVerificationCodeLetterInput: SendVerificationCodeLetterInput;
   BsdasriSignatureInput: BsdasriSignatureInput;
   BsdasriSignatureWithSecretCodeInput: BsdasriSignatureWithSecretCodeInput;
+  SignatureInput: SignatureInput;
   BsvhuSignatureInput: BsvhuSignatureInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignupInput: SignupInput;
@@ -6659,6 +6678,12 @@ export type MutationResolvers<
       MutationSignBsdasriEmissionWithSecretCodeArgs,
       "id" | "signatureInput"
     >
+  >;
+  signBsff?: Resolver<
+    ResolversTypes["Bsff"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationSignBsffArgs, "id" | "type" | "signature">
   >;
   signBsvhu?: Resolver<
     Maybe<ResolversTypes["Bsvhu"]>,
@@ -9716,6 +9741,16 @@ export function createSignatureFormInputMock(
   return {
     sentAt: new Date(),
     sentBy: "",
+    ...props
+  };
+}
+
+export function createSignatureInputMock(
+  props: Partial<SignatureInput>
+): SignatureInput {
+  return {
+    date: new Date(),
+    author: "",
     ...props
   };
 }

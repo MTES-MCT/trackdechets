@@ -1553,6 +1553,35 @@ Permet de signer un enlèvement sur le device transporteur grâce au code de sé
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>signBsff</strong></td>
+<td valign="top"><a href="#bsff">Bsff</a>!</td>
+<td>
+
+Mutation permettant d'apposer une signature sur le bordereau.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">type</td>
+<td valign="top"><a href="#bsffsignaturetype">BsffSignatureType</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">signature</td>
+<td valign="top"><a href="#signatureinput">SignatureInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">securityCode</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>signBsvhu</strong></td>
 <td valign="top"><a href="#bsvhu">Bsvhu</a></td>
 <td>
@@ -10112,6 +10141,30 @@ Nom de la personne responsable de l'envoi du déchet (case 9)
 </tbody>
 </table>
 
+### SignatureInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>author</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### TakeOverInput
 
 Payload de prise en charge de segment
@@ -11127,6 +11180,25 @@ Par exemple, seul le code D 10 peut être associé à une incinération.
 <tbody>
 <tr>
 <td valign="top"><strong>BOUTEILLE</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffSignatureType
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>EMITTER</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>TRANSPORTER</strong></td>
 <td></td>
 </tr>
 </tbody>

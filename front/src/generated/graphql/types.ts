@@ -753,6 +753,11 @@ export type BsffReception = {
   signature?: Maybe<Signature>;
 };
 
+export enum BsffSignatureType {
+  Emitter = "EMITTER",
+  Transporter = "TRANSPORTER"
+}
+
 export type BsffTransport = {
   __typename?: "BsffTransport";
   /** Mode de transport utilisé. */
@@ -2428,6 +2433,8 @@ export type Mutation = {
    * Permet de signer un enlèvement sur le device transporteur grâce au code de sécurité de l'émetteur du dasri
    */
   signBsdasriEmissionWithSecretCode?: Maybe<Bsdasri>;
+  /** Mutation permettant d'apposer une signature sur le bordereau. */
+  signBsff: Bsff;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Signe un BSVHU
@@ -2767,6 +2774,13 @@ export type MutationSignBsdasriArgs = {
 export type MutationSignBsdasriEmissionWithSecretCodeArgs = {
   id: Scalars["ID"];
   signatureInput: BsdasriSignatureWithSecretCodeInput;
+};
+
+export type MutationSignBsffArgs = {
+  id: Scalars["ID"];
+  type: BsffSignatureType;
+  signature: SignatureInput;
+  securityCode?: Maybe<Scalars["Int"]>;
 };
 
 export type MutationSignBsvhuArgs = {
@@ -3416,6 +3430,11 @@ export type SignatureFormInput = {
   sentAt: Scalars["DateTime"];
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
   sentBy: Scalars["String"];
+};
+
+export type SignatureInput = {
+  date: Scalars["DateTime"];
+  author: Scalars["String"];
 };
 
 export enum SignatureTypeInput {
