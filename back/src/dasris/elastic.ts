@@ -33,47 +33,59 @@ function getWhere(
     isToCollectFor: [],
     isCollectedFor: []
   };
-  const sirets = new Map<string, keyof typeof where>(
-    [
-      bsdasri.emitterCompanySiret,
-      bsdasri.recipientCompanySiret,
-      bsdasri.transporterCompanySiret
-    ].map(siret => [siret, "isFollowFor"])
-  );
 
+  const formSirets: Record<string, string | null | undefined> = {
+    emitterCompanySiret: bsdasri.emitterCompanySiret,
+    recipientCompanySiret: bsdasri.recipientCompanySiret,
+    transporterCompanySiret: bsdasri.transporterCompanySiret
+  };
+
+  const siretsFilters = new Map<string, keyof typeof where>(
+    Object.entries(formSirets)
+      .filter(([_, siret]) => !!siret)
+      .map(([actor, _]) => [actor, "isFollowFor"])
+  );
+  type Mapping = Map<string, keyof typeof where>;
+  const setTab = (map: Mapping, key: string, newValue: keyof typeof where) => {
+    if (!map.has(key)) {
+      return;
+    }
+
+    map.set(key, newValue);
+  };
   switch (bsdasri.status) {
     case BsdasriStatus.INITIAL: {
       if (bsdasri.isDraft) {
-        for (const siret of sirets.keys()) {
-          sirets.set(siret, "isDraftFor");
+        for (const fieldName of siretsFilters.keys()) {
+          setTab(siretsFilters, fieldName, "isDraftFor");
         }
       } else {
-        sirets.set(bsdasri.emitterCompanySiret, "isForActionFor");
-        sirets.set(bsdasri.transporterCompanySiret, "isToCollectFor");
+        setTab(siretsFilters, "emitterCompanySiret", "isForActionFor");
+        setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
       }
       break;
     }
 
     case BsdasriStatus.SIGNED_BY_PRODUCER: {
-      sirets.set(bsdasri.transporterCompanySiret, "isToCollectFor");
+      setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
       break;
     }
 
     case BsdasriStatus.SENT: {
-      sirets.set(bsdasri.recipientCompanySiret, "isForActionFor");
-      sirets.set(bsdasri.transporterCompanySiret, "isCollectedFor");
+      setTab(siretsFilters, "recipientCompanySiret", "isForActionFor");
+      setTab(siretsFilters, "transporterCompanySiret", "isCollectedFor");
       break;
     }
 
     case BsdasriStatus.RECEIVED: {
-      sirets.set(bsdasri.recipientCompanySiret, "isForActionFor");
+      setTab(siretsFilters, "recipientCompanySiret", "isForActionFor");
       break;
     }
 
     case BsdasriStatus.REFUSED:
     case BsdasriStatus.PROCESSED: {
-      for (const siret of sirets.keys()) {
-        sirets.set(siret, "isArchivedFor");
+      for (const fieldName of siretsFilters.keys()) {
+        setTab(siretsFilters, fieldName, "isArchivedFor");
       }
       break;
     }
@@ -81,9 +93,9 @@ function getWhere(
       break;
   }
 
-  for (const [siret, filter] of sirets.entries()) {
-    if (siret) {
-      where[filter].push(siret);
+  for (const [fieldName, filter] of siretsFilters.entries()) {
+    if (fieldName) {
+      where[filter].push(formSirets[fieldName]);
     }
   }
 
