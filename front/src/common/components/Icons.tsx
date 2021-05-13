@@ -1255,3 +1255,22 @@ export function IconBSDD(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function IconBSDasri(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width="1em"
+      height="1em"
+      viewBox="0 0 140 140"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <g fill="none" stroke="#000" strokeLinecap="round" strokeLinejoin="round">
+        <path
+          d="M70 113.75v23.333M49.583 2.917h40.828M49.59 49.583h17.488M49.59 72.917h17.488M49.583 32.083v58.334A22.02 22.02 0 0070 113.75a22.032 22.032 0 0020.417-23.333V32.083zM61.256 2.917H78.75v29.166H61.256zM32.083 32.083h75.828"
+          strokeWidth="5.83333"
+        />
+      </g>
+    </svg>
+  );
+}

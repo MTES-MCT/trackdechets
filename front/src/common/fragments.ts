@@ -294,3 +294,78 @@ export const detailFormFragment = gql`
   }
   ${transporterFormFragment}
 `;
+
+export const dasriFragment = gql`
+  fragment DasriFragment on Bsdasri {
+    id
+    bsdasriStatus: status
+    emitter {
+      company {
+        name
+        siret
+      }
+      workSite {
+        name
+        address
+        city
+        postalCode
+      }
+    }
+    emission {
+      wasteCode
+      wasteDetails {
+        onuCode
+        quantity
+        quantityType
+      }
+      handedOverAt
+      signature {
+        author
+        date
+      }
+    }
+    transporter {
+      company {
+        siret
+      }
+    }
+    transport {
+      handedOverAt
+      takenOverAt
+      wasteDetails {
+        quantity
+        quantityType
+      }
+      wasteAcceptation {
+        status
+        refusalReason
+
+        refusedQuantity
+      }
+    }
+    recipient {
+      company {
+        name
+        siret
+      }
+    }
+    reception {
+      wasteDetails {
+        quantity
+        quantityType
+      }
+      wasteAcceptation {
+        status
+        refusalReason
+
+        refusedQuantity
+      }
+    }
+    operation {
+      processedAt
+      processingOperation
+    }
+    createdAt
+    updatedAt
+  }
+`;

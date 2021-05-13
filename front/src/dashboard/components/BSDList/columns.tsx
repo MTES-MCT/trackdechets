@@ -9,6 +9,7 @@ import { Bsd } from "generated/graphql/types";
 import { BSDTypeFilter } from "./BSDTypeFilter";
 import { TextInputFilter } from "./TextInputFilter";
 import * as bsdd from "./BSDD";
+import * as bsdasri from "./BSDasri";
 
 // This object declares the mapping between a column id
 // and its corresponding filter or order parameter name
@@ -52,6 +53,7 @@ export type Column<T extends object = Bsd> = ColumnWithLooseAccessor<T> &
 
 const TYPENAME_COLUMNS = {
   Form: bsdd.COLUMNS,
+  Bsdasri: bsdasri.COLUMNS,
 };
 
 export function createColumn(column: Column): Column {
