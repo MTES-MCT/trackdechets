@@ -6,7 +6,7 @@ import prisma from "../../../prisma";
 import { expandVhuFormFromDb } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
 import { checkIsFormContributor } from "../../permissions";
-
+import { indexBsvhu } from "../../elastic";
 export default async function duplicate(
   _,
   { id }: MutationDuplicateBsvhuArgs,
@@ -26,7 +26,7 @@ export default async function duplicate(
 
   // TODO Status log ?
   // TODO emit event ?
-
+  await indexBsvhu(newForm);
   return expandVhuFormFromDb(newForm);
 }
 

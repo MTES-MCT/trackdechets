@@ -111,7 +111,7 @@ export type BrokerReceipt = {
   department: Scalars["String"];
 };
 
-export type Bsd = Form | Bsdasri;
+export type Bsd = Form | Bsdasri | Bsvhu;
 
 /** Bordereau Bsdasri */
 export type Bsdasri = {
@@ -520,7 +520,8 @@ export type BsdEdge = {
 
 export enum BsdType {
   Bsdd = "BSDD",
-  Bsdasri = "BSDASRI"
+  Bsdasri = "BSDASRI",
+  Bsvhu = "BSVHU"
 }
 
 export type BsdWhere = {

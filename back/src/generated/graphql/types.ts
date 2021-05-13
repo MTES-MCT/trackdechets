@@ -122,7 +122,7 @@ export type BrokerReceipt = {
   department: Scalars["String"];
 };
 
-export type Bsd = Form | Bsdasri;
+export type Bsd = Form | Bsdasri | Bsvhu;
 
 /** Bordereau Bsdasri */
 export type Bsdasri = {
@@ -524,7 +524,7 @@ export type BsdEdge = {
   node: Bsd;
 };
 
-export type BsdType = "BSDD" | "BSDASRI";
+export type BsdType = "BSDD" | "BSDASRI" | "BSVHU";
 
 export type BsdWhere = {
   readableId?: Maybe<Scalars["String"]>;
@@ -3776,7 +3776,10 @@ export type ResolversTypes = {
   BsdEdge: ResolverTypeWrapper<
     Omit<BsdEdge, "node"> & { node: ResolversTypes["Bsd"] }
   >;
-  Bsd: ResolversTypes["Form"] | ResolversTypes["Bsdasri"];
+  Bsd:
+    | ResolversTypes["Form"]
+    | ResolversTypes["Bsdasri"]
+    | ResolversTypes["Bsvhu"];
   Bsvhu: ResolverTypeWrapper<Bsvhu>;
   BsvhuStatus: BsvhuStatus;
   BsvhuEmitter: ResolverTypeWrapper<BsvhuEmitter>;
@@ -3992,7 +3995,10 @@ export type ResolversParentTypes = {
   OrderBy: OrderBy;
   BsdConnection: BsdConnection;
   BsdEdge: Omit<BsdEdge, "node"> & { node: ResolversParentTypes["Bsd"] };
-  Bsd: ResolversParentTypes["Form"] | ResolversParentTypes["Bsdasri"];
+  Bsd:
+    | ResolversParentTypes["Form"]
+    | ResolversParentTypes["Bsdasri"]
+    | ResolversParentTypes["Bsvhu"];
   Bsvhu: Bsvhu;
   BsvhuEmitter: BsvhuEmitter;
   BsvhuEmission: BsvhuEmission;
@@ -4188,7 +4194,11 @@ export type BsdResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["Bsd"] = ResolversParentTypes["Bsd"]
 > = {
-  __resolveType: TypeResolveFn<"Form" | "Bsdasri", ParentType, ContextType>;
+  __resolveType: TypeResolveFn<
+    "Form" | "Bsdasri" | "Bsvhu",
+    ParentType,
+    ContextType
+  >;
 };
 
 export type BsdasriResolvers<

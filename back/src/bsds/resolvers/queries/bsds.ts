@@ -18,6 +18,7 @@ import {
 import prisma from "../../../prisma";
 import { expandFormFromDb } from "../../../forms/form-converter";
 import { expandBsdasriFromDb } from "../../../dasris/dasri-converter";
+import { expandVhuFormFromDb } from "../../../vhu/converter";
 import { getUserCompanies } from "../../../users/database";
 
 // complete Typescript example:
@@ -186,7 +187,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
       ...acc,
       [type]: acc[type].concat([id])
     }),
-    { BSDD: [], BSDASRI: [] }
+    { BSDD: [], BSDASRI: [], BSVHU: [] }
   );
 
   const bsds: Record<BsdType, Bsd[]> = {
@@ -207,7 +208,16 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
           }
         }
       })
-    ).map(expandBsdasriFromDb)
+    ).map(expandBsdasriFromDb),
+    BSVHU: (
+      await prisma.bsvhu.findMany({
+        where: {
+          id: {
+            in: ids.BSVHU
+          }
+        }
+      })
+    ).map(expandVhuFormFromDb)
   };
   const edges = hits
     .reduce<Array<Bsd>>((acc, { _source: { type, id } }) => {
