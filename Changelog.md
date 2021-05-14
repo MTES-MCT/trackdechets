@@ -18,7 +18,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
-- Amélioration de l'indexation des bsdd [PR 858](https://github.com/MTES-MCT/trackdechets/pull/858)
+- Correction de l'indexation des bsdds afin qu'ils soient listés dans tous les onglets appropriés pour une même entreprise [PR 858](https://github.com/MTES-MCT/trackdechets/pull/858)
 
 #### :memo: Documentation
 
