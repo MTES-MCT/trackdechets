@@ -1,13 +1,17 @@
 import { UserRole } from ".prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import {
   Mutation,
   MutationSignBsffArgs
 } from "../../../../generated/graphql/types";
-import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import {
+  createBsff,
+  createBsffBeforeEmission,
+  createBsffAfterEmission,
+  createBsffBeforeTransport
+} from "../../../__tests__/factories";
 
 const SIGN = `
   mutation Sign($id: ID!, $type: BsffSignatureType!, $signature: SignatureInput!, $securityCode: Int) {
@@ -21,15 +25,14 @@ describe("Mutation.signBsff", () => {
   afterEach(resetDatabase);
 
   it("should allow emitter to sign a bsff", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: company.siret
-      }
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
     });
+    const bsff = await createBsffBeforeEmission({ emitter });
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(emitter.user);
     const { data } = await mutate<
       Pick<Mutation, "signBsff">,
       MutationSignBsffArgs
@@ -39,12 +42,44 @@ describe("Mutation.signBsff", () => {
         type: "EMITTER",
         signature: {
           date: new Date().toISOString() as any,
-          author: user.name
+          author: emitter.user.name
         }
       }
     });
 
     expect(data.signBsff.id).toBeTruthy();
+  });
+
+  it("should throw an error if the bsff is missing required data when the emitter tries to sign", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
+    });
+    const bsff = await createBsff({ emitter });
+
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "signBsff">,
+      MutationSignBsffArgs
+    >(SIGN, {
+      variables: {
+        id: bsff.id,
+        type: "EMITTER",
+        signature: {
+          date: new Date().toISOString() as any,
+          author: emitter.user.name
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        extensions: {
+          code: "BAD_USER_INPUT"
+        }
+      })
+    ]);
   });
 
   it("should disallow unauthenticated user from signing a bsff", async () => {
@@ -98,15 +133,17 @@ describe("Mutation.signBsff", () => {
   });
 
   it("should allow the transporter to sign for the emitter with the security code", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret
-      }
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
     });
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
+    });
+    const bsff = await createBsffBeforeEmission({ emitter, transporter });
 
     const { mutate } = makeClient(transporter.user);
     const { data } = await mutate<
@@ -128,15 +165,17 @@ describe("Mutation.signBsff", () => {
   });
 
   it("should disallow the transporter to sign for the emitter without the security code", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret
-      }
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
     });
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
+    });
+    const bsff = await createBsffBeforeEmission({ emitter, transporter });
 
     const { mutate } = makeClient(transporter.user);
     const { errors } = await mutate<
@@ -161,15 +200,17 @@ describe("Mutation.signBsff", () => {
   });
 
   it("should disallow the transporter to sign for the emitter with a wrong security code", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret
-      }
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
     });
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
+    });
+    const bsff = await createBsffBeforeEmission({ emitter, transporter });
 
     const { mutate } = makeClient(transporter.user);
     const { errors } = await mutate<
@@ -195,16 +236,14 @@ describe("Mutation.signBsff", () => {
   });
 
   it("should throw an error when the emitter tries to sign twice", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: company.siret,
-        emitterEmissionSignatureDate: new Date().toISOString()
-      }
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
     });
+    const bsff = await createBsffAfterEmission({ emitter });
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
       Pick<Mutation, "signBsff">,
       MutationSignBsffArgs
@@ -214,28 +253,36 @@ describe("Mutation.signBsff", () => {
         type: "EMITTER",
         signature: {
           date: new Date().toISOString() as any,
-          author: user.name
+          author: emitter.user.name
         }
       }
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "L'émetteur de ce bordereau a déjà signé."
+        message: "L'entreprise émettrice a déjà signé ce bordereau"
       })
     ]);
   });
 
   it("should throw an error if the transporter tries to sign without the emitter's signature", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret
-      }
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
     });
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
+    });
+    const bsff = await createBsffBeforeTransport(
+      { emitter, transporter },
+      {
+        emitterEmissionSignatureDate: null,
+        emitterEmissionSignatureAuthor: null
+      }
+    );
 
     const { mutate } = makeClient(transporter.user);
     const { errors } = await mutate<
@@ -255,22 +302,23 @@ describe("Mutation.signBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau."
+          "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
       })
     ]);
   });
 
   it("should allow the transporter to sign after the emitter", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: emitter.company.siret,
-        emitterEmissionSignatureDate: new Date().toISOString(),
-        transporterCompanySiret: transporter.company.siret
-      }
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
     });
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
+    });
+    const bsff = await createBsffBeforeTransport({ emitter, transporter });
 
     const { mutate } = makeClient(transporter.user);
     const { data } = await mutate<
@@ -288,5 +336,42 @@ describe("Mutation.signBsff", () => {
     });
 
     expect(data.signBsff.id).toBeTruthy();
+  });
+
+  it("should throw an error if the bsff is missing required data when the transporter tries to sign", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
+    });
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
+    });
+    const bsff = await createBsffAfterEmission({ emitter, transporter });
+
+    const { mutate } = makeClient(transporter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "signBsff">,
+      MutationSignBsffArgs
+    >(SIGN, {
+      variables: {
+        id: bsff.id,
+        type: "TRANSPORTER",
+        signature: {
+          date: new Date().toISOString() as any,
+          author: transporter.user.name
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        extensions: {
+          code: "BAD_USER_INPUT"
+        }
+      })
+    ]);
   });
 });
