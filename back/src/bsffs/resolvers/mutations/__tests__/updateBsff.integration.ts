@@ -1,13 +1,12 @@
 import { UserRole } from ".prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import {
   Mutation,
   MutationUpdateBsffArgs
 } from "../../../../generated/graphql/types";
-import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { createBsff } from "../../../__tests__/factories";
 
 const UPDATE_BSFF = `
   mutation UpdateBsff($id: ID!, $input: BsffInput!) {
@@ -21,15 +20,10 @@ describe("Mutation.updateBsff", () => {
   afterEach(resetDatabase);
 
   it("should allow user to update a bsff", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
-    const { mutate } = makeClient(user);
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const { mutate } = makeClient(emitter.user);
 
-    const bsff = await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: company.siret
-      }
-    });
+    const bsff = await createBsff({ emitter });
     const { data, errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
@@ -39,7 +33,7 @@ describe("Mutation.updateBsff", () => {
         input: {
           emitter: {
             company: {
-              name: company.name
+              name: "New Name"
             }
           }
         }
@@ -75,11 +69,7 @@ describe("Mutation.updateBsff", () => {
     const { user } = await userWithCompanyFactory(UserRole.ADMIN);
     const { mutate } = makeClient(user);
 
-    const bsff = await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF)
-      }
-    });
+    const bsff = await createBsff();
     const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
@@ -120,16 +110,10 @@ describe("Mutation.updateBsff", () => {
   });
 
   it("should throw an error if the bsff being updated is deleted", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
-    const { mutate } = makeClient(user);
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const { mutate } = makeClient(emitter.user);
 
-    const bsff = await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: company.siret,
-        isDeleted: true
-      }
-    });
+    const bsff = await createBsff({ emitter }, { isDeleted: true });
     const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
@@ -139,7 +123,7 @@ describe("Mutation.updateBsff", () => {
         input: {
           emitter: {
             company: {
-              name: company.name
+              name: emitter.company.name
             }
           }
         }
@@ -154,15 +138,10 @@ describe("Mutation.updateBsff", () => {
   });
 
   it("should disallow removing a company from the bsff", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
-    const { mutate } = makeClient(user);
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const { mutate } = makeClient(emitter.user);
 
-    const bsff = await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: company.siret
-      }
-    });
+    const bsff = await createBsff({ emitter });
     const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs

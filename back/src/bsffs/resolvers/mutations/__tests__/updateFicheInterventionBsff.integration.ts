@@ -12,6 +12,7 @@ import {
   flattenFicheInterventionBsffInput,
   getFicheInterventionId
 } from "../../../converter";
+import { createBsff } from "../../../__tests__/factories";
 
 const UPDATE_FICHE_INTERVENTION = `
   mutation UpdateFicheIntervention($id: ID!, $numero: String!, $input: BsffFicheInterventionInput!) {
@@ -23,7 +24,7 @@ const UPDATE_FICHE_INTERVENTION = `
 
 describe("Mutation.updateFicheInterventionBsff", () => {
   it("should allow user to update a fiche d'intervention", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
 
     const bsffId = getReadableId(ReadableIdPrefix.FF);
     const ficheInterventionNumero = "ABCDEFGHIJK";
@@ -31,10 +32,10 @@ describe("Mutation.updateFicheInterventionBsff", () => {
       bsffId,
       ficheInterventionNumero
     );
-    await prisma.bsff.create({
-      data: {
+    await createBsff(
+      { emitter },
+      {
         id: bsffId,
-        emitterCompanySiret: company.siret,
         ficheInterventions: {
           create: {
             id: ficheInterventionId,
@@ -45,9 +46,9 @@ describe("Mutation.updateFicheInterventionBsff", () => {
           }
         }
       }
-    });
+    );
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(emitter.user);
     const { data } = await mutate<
       Pick<Mutation, "updateFicheInterventionBsff">,
       MutationUpdateFicheInterventionBsffArgs
@@ -63,35 +64,14 @@ describe("Mutation.updateFicheInterventionBsff", () => {
   });
 
   it("should disallow unauthenticated user to update a fiche d'intervention", async () => {
-    const bsffId = getReadableId(ReadableIdPrefix.FF);
-    const ficheInterventionNumero = "ABCDEFGHIJK";
-    const ficheInterventionId = getFicheInterventionId(
-      bsffId,
-      ficheInterventionNumero
-    );
-    await prisma.bsff.create({
-      data: {
-        id: bsffId,
-        ficheInterventions: {
-          create: {
-            id: ficheInterventionId,
-            numero: ficheInterventionNumero,
-            ...flattenFicheInterventionBsffInput(
-              createBsffFicheInterventionInputMock({})
-            )
-          }
-        }
-      }
-    });
-
     const { mutate } = makeClient();
     const { errors } = await mutate<
       Pick<Mutation, "updateFicheInterventionBsff">,
       MutationUpdateFicheInterventionBsffArgs
     >(UPDATE_FICHE_INTERVENTION, {
       variables: {
-        id: bsffId,
-        numero: ficheInterventionNumero,
+        id: "123",
+        numero: "456",
         input: createBsffFicheInterventionInputMock({})
       }
     });
@@ -114,8 +94,9 @@ describe("Mutation.updateFicheInterventionBsff", () => {
       bsffId,
       ficheInterventionNumero
     );
-    await prisma.bsff.create({
-      data: {
+    await createBsff(
+      {},
+      {
         id: bsffId,
         ficheInterventions: {
           create: {
@@ -127,7 +108,7 @@ describe("Mutation.updateFicheInterventionBsff", () => {
           }
         }
       }
-    });
+    );
 
     const { mutate } = makeClient(user);
     const { errors } = await mutate<
@@ -188,18 +169,18 @@ describe("Mutation.updateFicheInterventionBsff", () => {
   });
 
   it("should throw an error if the fiche d'intervention doesn't exist", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
 
     const bsffId = getReadableId(ReadableIdPrefix.FF);
     const ficheInterventionNumero = "ABCDEFGHIJK";
-    await prisma.bsff.create({
-      data: {
-        id: bsffId,
-        emitterCompanySiret: company.siret
+    await createBsff(
+      { emitter },
+      {
+        id: bsffId
       }
-    });
+    );
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
       Pick<Mutation, "updateFicheInterventionBsff">,
       MutationUpdateFicheInterventionBsffArgs
@@ -217,4 +198,8 @@ describe("Mutation.updateFicheInterventionBsff", () => {
       })
     ]);
   });
+
+  it.todo(
+    "should disallow updating a fiche d'intervention from a bsff with a signature"
+  );
 });

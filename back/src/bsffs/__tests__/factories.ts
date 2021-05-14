@@ -11,10 +11,12 @@ interface UserAndCompany {
 export function createBsff(
   {
     emitter,
-    transporter
+    transporter,
+    destination
   }: {
     emitter?: UserAndCompany;
     transporter?: UserAndCompany;
+    destination?: UserAndCompany;
   } = {},
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
@@ -45,21 +47,34 @@ export function createBsff(
     });
   }
 
+  if (destination) {
+    Object.assign(data, {
+      destinationCompanyName: destination.company.name,
+      destinationCompanySiret: destination.company.siret,
+      destinationCompanyAddress: destination.company.address,
+      destinationCompanyContact: destination.user.name,
+      destinationCompanyPhone: destination.company.contactPhone,
+      destinationCompanyMail: destination.company.contactEmail
+    });
+  }
+
   return prisma.bsff.create({ data });
 }
 
 export function createBsffBeforeEmission(
   {
     emitter,
-    transporter
+    transporter,
+    destination
   }: {
     emitter: UserAndCompany;
     transporter?: UserAndCompany;
+    destination?: UserAndCompany;
   },
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsff(
-    { emitter, transporter },
+    { emitter, transporter, destination },
     {
       wasteCode: WASTE_CODES[0],
       wasteDescription: "Fluides",
@@ -72,15 +87,17 @@ export function createBsffBeforeEmission(
 export function createBsffAfterEmission(
   {
     emitter,
-    transporter
+    transporter,
+    destination
   }: {
     emitter: UserAndCompany;
     transporter?: UserAndCompany;
+    destination?: UserAndCompany;
   },
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffBeforeEmission(
-    { emitter, transporter },
+    { emitter, transporter, destination },
     {
       emitterEmissionSignatureAuthor: emitter.user.name,
       emitterEmissionSignatureDate: new Date().toISOString(),
@@ -92,15 +109,17 @@ export function createBsffAfterEmission(
 export function createBsffBeforeTransport(
   {
     emitter,
-    transporter
+    transporter,
+    destination
   }: {
     emitter: UserAndCompany;
     transporter: UserAndCompany;
+    destination?: UserAndCompany;
   },
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffAfterEmission(
-    { emitter, transporter },
+    { emitter, transporter, destination },
     {
       packagings: [{ type: PACKAGING_TYPE.BOUTEILLE, numero: "01", litres: 1 }],
       wasteAdr: "Mention ADR",

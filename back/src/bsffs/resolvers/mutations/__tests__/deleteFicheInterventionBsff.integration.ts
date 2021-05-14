@@ -12,6 +12,7 @@ import {
   flattenFicheInterventionBsffInput,
   getFicheInterventionId
 } from "../../../converter";
+import { createBsff } from "../../../__tests__/factories";
 
 const DELETE_FICHE_INTERVENTION = `
   mutation DeleteFicheIntervention($id: ID!, $numero: String!) {
@@ -23,7 +24,7 @@ const DELETE_FICHE_INTERVENTION = `
 
 describe("Mutation.deleteFicheInterventionBsff", () => {
   it("should allow user to delete a fiche d'intervention", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
 
     const bsffId = getReadableId(ReadableIdPrefix.FF);
     const ficheInterventionNumero = "ABCDEFGHIJK";
@@ -31,10 +32,10 @@ describe("Mutation.deleteFicheInterventionBsff", () => {
       bsffId,
       ficheInterventionNumero
     );
-    await prisma.bsff.create({
-      data: {
+    await createBsff(
+      { emitter },
+      {
         id: bsffId,
-        emitterCompanySiret: company.siret,
         ficheInterventions: {
           create: {
             id: ficheInterventionId,
@@ -45,9 +46,9 @@ describe("Mutation.deleteFicheInterventionBsff", () => {
           }
         }
       }
-    });
+    );
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(emitter.user);
     const { data } = await mutate<
       Pick<Mutation, "deleteFicheInterventionBsff">,
       MutationDeleteFicheInterventionBsffArgs
@@ -62,35 +63,14 @@ describe("Mutation.deleteFicheInterventionBsff", () => {
   });
 
   it("should disallow unauthenticated user to delete a fiche d'intervention", async () => {
-    const bsffId = getReadableId(ReadableIdPrefix.FF);
-    const ficheInterventionNumero = "ABCDEFGHIJK";
-    const ficheInterventionId = getFicheInterventionId(
-      bsffId,
-      ficheInterventionNumero
-    );
-    await prisma.bsff.create({
-      data: {
-        id: bsffId,
-        ficheInterventions: {
-          create: {
-            id: ficheInterventionId,
-            numero: ficheInterventionNumero,
-            ...flattenFicheInterventionBsffInput(
-              createBsffFicheInterventionInputMock({})
-            )
-          }
-        }
-      }
-    });
-
     const { mutate } = makeClient();
     const { errors } = await mutate<
       Pick<Mutation, "deleteFicheInterventionBsff">,
       MutationDeleteFicheInterventionBsffArgs
     >(DELETE_FICHE_INTERVENTION, {
       variables: {
-        id: bsffId,
-        numero: ficheInterventionNumero
+        id: "123",
+        numero: "456"
       }
     });
 
@@ -112,8 +92,9 @@ describe("Mutation.deleteFicheInterventionBsff", () => {
       bsffId,
       ficheInterventionNumero
     );
-    await prisma.bsff.create({
-      data: {
+    await createBsff(
+      {},
+      {
         id: bsffId,
         ficheInterventions: {
           create: {
@@ -125,7 +106,7 @@ describe("Mutation.deleteFicheInterventionBsff", () => {
           }
         }
       }
-    });
+    );
 
     const { mutate } = makeClient(user);
     const { errors } = await mutate<
@@ -184,18 +165,13 @@ describe("Mutation.deleteFicheInterventionBsff", () => {
   });
 
   it("should throw an error if the fiche d'intervention doesn't exist", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
 
     const bsffId = getReadableId(ReadableIdPrefix.FF);
     const ficheInterventionNumero = "ABCDEFGHIJK";
-    await prisma.bsff.create({
-      data: {
-        id: bsffId,
-        emitterCompanySiret: company.siret
-      }
-    });
+    await createBsff({ emitter }, { id: bsffId });
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
       Pick<Mutation, "deleteFicheInterventionBsff">,
       MutationDeleteFicheInterventionBsffArgs
@@ -212,4 +188,8 @@ describe("Mutation.deleteFicheInterventionBsff", () => {
       })
     ]);
   });
+
+  it.todo(
+    "should disallow deleting a fiche d'intervention from a bsff with a signature"
+  );
 });

@@ -1,13 +1,12 @@
 import { UserRole } from ".prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import { Query, QueryBsffsArgs } from "../../../../generated/graphql/types";
-import prisma from "../../../../prisma";
 import {
   userWithCompanyFactory,
   companyAssociatedToExistingUserFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { createBsff } from "../../../__tests__/factories";
 
 const GET_BSFFS = `
   query GetBsffs($after: ID, $first: Int, $before: ID, $last: Int, $where: BsffWhere) {
@@ -25,15 +24,10 @@ describe("Query.bsffs", () => {
   afterEach(resetDatabase);
 
   it("should return bsffs associated with the user company", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
-    await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: company.siret
-      }
-    });
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    await createBsff({ emitter });
 
-    const { query } = makeClient(user);
+    const { query } = makeClient(emitter.user);
     const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
       GET_BSFFS
     );
@@ -42,21 +36,11 @@ describe("Query.bsffs", () => {
   });
 
   it("should not return bsffs not associated with the user company", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
-    await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: company.siret
-      }
-    });
-    await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: "1".repeat(14)
-      }
-    });
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    await createBsff({ emitter });
+    await createBsff();
 
-    const { query } = makeClient(user);
+    const { query } = makeClient(emitter.user);
     const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
       GET_BSFFS
     );
@@ -65,26 +49,18 @@ describe("Query.bsffs", () => {
   });
 
   it("should return bsffs associated for user with several companies", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const otherCompany = await companyAssociatedToExistingUserFactory(
-      user,
+      emitter.user,
       UserRole.ADMIN
     );
 
-    await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: company.siret
-      }
-    });
-    await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: otherCompany.siret
-      }
+    await createBsff({ emitter });
+    await createBsff({
+      emitter: { user: emitter.user, company: otherCompany }
     });
 
-    const { query } = makeClient(user);
+    const { query } = makeClient(emitter.user);
     const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
       GET_BSFFS
     );
@@ -95,28 +71,13 @@ describe("Query.bsffs", () => {
   it.each(["emitter", "transporter", "destination"])(
     "should filter bsffs where user appears as %s",
     async role => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const userAndCompany = await userWithCompanyFactory(UserRole.ADMIN);
 
-      await prisma.bsff.create({
-        data: {
-          id: getReadableId(ReadableIdPrefix.FF),
-          emitterCompanySiret: company.siret
-        }
-      });
-      await prisma.bsff.create({
-        data: {
-          id: getReadableId(ReadableIdPrefix.FF),
-          transporterCompanySiret: company.siret
-        }
-      });
-      await prisma.bsff.create({
-        data: {
-          id: getReadableId(ReadableIdPrefix.FF),
-          destinationCompanySiret: company.siret
-        }
-      });
+      await createBsff({ emitter: userAndCompany });
+      await createBsff({ transporter: userAndCompany });
+      await createBsff({ destination: userAndCompany });
 
-      const { query } = makeClient(user);
+      const { query } = makeClient(userAndCompany.user);
       const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
         GET_BSFFS,
         {
@@ -124,7 +85,7 @@ describe("Query.bsffs", () => {
             where: {
               [role]: {
                 company: {
-                  siret: company.siret
+                  siret: userAndCompany.company.siret
                 }
               }
             }
@@ -137,16 +98,10 @@ describe("Query.bsffs", () => {
   );
 
   it("should not return deleted bsffs", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
-    await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: company.siret,
-        isDeleted: true
-      }
-    });
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    await createBsff({ emitter }, { isDeleted: true });
 
-    const { query } = makeClient(user);
+    const { query } = makeClient(emitter.user);
     const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
       GET_BSFFS
     );

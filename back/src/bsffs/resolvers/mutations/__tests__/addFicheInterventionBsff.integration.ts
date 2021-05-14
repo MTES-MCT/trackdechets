@@ -5,10 +5,10 @@ import {
   Mutation,
   MutationAddFicheInterventionBsffArgs
 } from "../../../../generated/graphql/types";
-import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { getFicheInterventionId } from "../../../converter";
+import { createBsff } from "../../../__tests__/factories";
 
 const ADD_FICHE_INTERVENTION = `
   mutation AddFicheIntervention($id: ID!, $numero: String!, $input: BsffFicheInterventionInput!) {
@@ -20,14 +20,9 @@ const ADD_FICHE_INTERVENTION = `
 
 describe("Mutation.addFicheInterventionBsff", () => {
   it("should allow user to add a fiche d'intervention to a bsff", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: company.siret
-      }
-    });
-    const { mutate } = makeClient(user);
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsff({ emitter });
+    const { mutate } = makeClient(emitter.user);
     const { data } = await mutate<
       Pick<Mutation, "addFicheInterventionBsff">,
       MutationAddFicheInterventionBsffArgs
@@ -65,13 +60,9 @@ describe("Mutation.addFicheInterventionBsff", () => {
   });
 
   it("should disallow user to add a fiche d'intervention to a bsff they are not part of", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const { user } = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await prisma.bsff.create({
-      data: {
-        id: getReadableId(ReadableIdPrefix.FF),
-        emitterCompanySiret: "1".repeat(14)
-      }
-    });
+    const bsff = await createBsff({ emitter });
     const { mutate } = makeClient(user);
     const { errors } = await mutate<
       Pick<Mutation, "addFicheInterventionBsff">,
@@ -114,7 +105,7 @@ describe("Mutation.addFicheInterventionBsff", () => {
   });
 
   it("should throw an error when creating twice the same fiche d'intervention", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsffId = getReadableId(ReadableIdPrefix.FF);
     // the numero contains special characters on purpose
     const ficheInterventionNumero = "FI N°ABC DEF GHI";
@@ -122,10 +113,10 @@ describe("Mutation.addFicheInterventionBsff", () => {
       bsffId,
       ficheInterventionNumero
     );
-    const bsff = await prisma.bsff.create({
-      data: {
+    const bsff = await createBsff(
+      { emitter },
+      {
         id: bsffId,
-        emitterCompanySiret: company.siret,
         ficheInterventions: {
           create: {
             id: ficheInterventionId,
@@ -141,8 +132,8 @@ describe("Mutation.addFicheInterventionBsff", () => {
           }
         }
       }
-    });
-    const { mutate } = makeClient(user);
+    );
+    const { mutate } = makeClient(emitter.user);
     // mess up the numero by adding characters that must be stripped
     // we should still be able to match them
     const messedUpNumero = ficheInterventionNumero.split("").join(" ");
@@ -163,4 +154,8 @@ describe("Mutation.addFicheInterventionBsff", () => {
       })
     ]);
   });
+
+  it.todo(
+    "should disallow adding a fiche d'intervention to a bsff with a signature"
+  );
 });
