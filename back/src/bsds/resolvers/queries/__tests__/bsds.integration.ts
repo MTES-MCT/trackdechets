@@ -50,7 +50,6 @@ describe("Query.bsds workflow", () => {
   let formId: string;
 
   beforeAll(async () => {
-    await resetDatabase();
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
         set: ["PRODUCER"]
@@ -415,9 +414,6 @@ describe("Query.bsds workflow", () => {
 });
 
 describe("Query.bsds edge cases", () => {
-  beforeAll(async () => {
-    await resetDatabase();
-  });
   afterAll(resetDatabase);
 
   it("should return bsds where same company plays different roles", async () => {
@@ -431,13 +427,13 @@ describe("Query.bsds edge cases", () => {
       UserRole.ADMIN,
       {
         companyTypes: {
-          set: ["WASTEPROCESSOR"]
+          set: ["WASTEPROCESSOR", "TRANSPORTER"]
         }
       }
     );
     // let's build a form where the same company is both transporter & recipient
     // this SENT form now is collected by transporter (isCollectedFor) and awaiting reception (isForActionFor) by recipient,
-    // who are the same company (recipient)
+    // which are the same company (recipient)
     const form = await formFactory({
       ownerId: emitter.user.id,
       opt: {
@@ -473,7 +469,7 @@ describe("Query.bsds edge cases", () => {
     ]);
 
     const { query: recipientQuery } = makeClient(recipientAndTransporter.user);
-    // form shows when whe request `isForActionFor`
+    // form shows when we request `isForActionFor`
     res = await recipientQuery<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {
       variables: {
         where: {

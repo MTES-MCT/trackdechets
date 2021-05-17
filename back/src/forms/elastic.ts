@@ -15,7 +15,7 @@ function getWhere(
   | "isCollectedFor"
 > {
   // we build a mapping where each key has to be unique.
-  // Same siret can be used by different actors on he same form, so we can't use them as keys.
+  // Same siret can be used by different actors on the same form, so we can't use them as keys.
   // Instead we rely on field names and segments ids
   const segments = form.transportSegments
     .filter(segment => !!segment.transporterCompanySiret)
@@ -243,7 +243,7 @@ function toBsdElastic(form: FullForm): BsdElastic {
  * Index all BSDs from the forms table.
  */
 export async function indexAllForms(
-  idx: string | null | undefined,
+  idx: string,
   { skip = 0 }: { skip?: number } = {}
 ) {
   const take = 1000;
