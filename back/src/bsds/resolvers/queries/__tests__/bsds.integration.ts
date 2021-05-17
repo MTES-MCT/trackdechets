@@ -15,8 +15,13 @@ import {
   refreshElasticSearch
 } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  userWithCompanyFactory,
+  formFactory
+} from "../../../../__tests__/factories";
 
+import { indexForm } from "../../../../forms/elastic";
+import { getFullForm } from "../../../../forms/database";
 const GET_BSDS = `
   query GetBsds($where: BsdWhere) {
     bsds(where: $where) {
@@ -30,8 +35,15 @@ const GET_BSDS = `
     }
   }
 `;
+const CREATE_FORM = `
+mutation CreateForm($createFormInput: CreateFormInput!) {
+  createForm(createFormInput: $createFormInput) {
+    id
+  }
+}
+`;
 
-describe("Query.bsds", () => {
+describe("Query.bsds workflow", () => {
   let emitter: { user: User; company: Company };
   let transporter: { user: User; company: Company };
   let recipient: { user: User; company: Company };
@@ -59,13 +71,7 @@ describe("Query.bsds", () => {
   describe("when a bsd is freshly created", () => {
     beforeAll(async () => {
       const { mutate } = makeClient(emitter.user);
-      const CREATE_FORM = `
-        mutation CreateForm($createFormInput: CreateFormInput!) {
-          createForm(createFormInput: $createFormInput) {
-            id
-          }
-        }
-      `;
+
       const {
         data: {
           createForm: { id }
@@ -404,5 +410,76 @@ describe("Query.bsds", () => {
         expect.objectContaining({ node: { id: formId } })
       ]);
     });
+  });
+});
+
+describe("Query.bsds edge cases", () => {
+  afterAll(resetDatabase);
+
+  it("should return bsds where same company plays different roles", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+
+    const recipientAndTransporter = await userWithCompanyFactory(
+      UserRole.ADMIN,
+      {
+        companyTypes: {
+          set: ["WASTEPROCESSOR", "TRANSPORTER"]
+        }
+      }
+    );
+    // let's build a form where the same company is both transporter & recipient
+    // this SENT form now is collected by transporter (isCollectedFor) and awaiting reception (isForActionFor) by recipient,
+    // which are the same company (recipient)
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        transporterCompanySiret: recipientAndTransporter.company.siret,
+        recipientCompanySiret: recipientAndTransporter.company.siret,
+        status: "SENT"
+      }
+    });
+
+    const fullForm = await getFullForm(form);
+
+    await indexForm(fullForm);
+    await refreshElasticSearch();
+
+    const { query: transporterQuery } = makeClient(
+      recipientAndTransporter.user
+    );
+    // form shows when whe request `isCollectedFor`
+    let res = await transporterQuery<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {
+        variables: {
+          where: {
+            isCollectedFor: [recipientAndTransporter.company.siret]
+          }
+        }
+      }
+    );
+
+    expect(res.data.bsds.edges).toEqual([
+      expect.objectContaining({ node: { id: form.id } })
+    ]);
+
+    const { query: recipientQuery } = makeClient(recipientAndTransporter.user);
+    // form shows when we request `isForActionFor`
+    res = await recipientQuery<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {
+      variables: {
+        where: {
+          isForActionFor: [recipientAndTransporter.company.siret]
+        }
+      }
+    });
+
+    expect(res.data.bsds.edges).toEqual([
+      expect.objectContaining({ node: { id: form.id } })
+    ]);
   });
 });

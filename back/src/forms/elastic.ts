@@ -14,6 +14,30 @@ function getWhere(
   | "isToCollectFor"
   | "isCollectedFor"
 > {
+  // we build a mapping where each key has to be unique.
+  // Same siret can be used by different actors on the same form, so we can't use them as keys.
+  // Instead we rely on field names and segments ids
+  const segments = form.transportSegments
+    .filter(segment => !!segment.transporterCompanySiret)
+    .map(segment => ({
+      [`${segment.id}`]: segment.transporterCompanySiret
+    }))
+    .reduce((el, acc) => ({ ...acc, ...el }), {});
+
+  const formSirets = {
+    emitterCompanySiret: form.emitterCompanySiret,
+    recipientCompanySiret: form.recipientCompanySiret,
+    temporaryStorageDetailDestinationCompanySiret:
+      form.temporaryStorageDetail?.destinationCompanySiret,
+    temporaryStorageDetailTransporterCompanySiret:
+      form.temporaryStorageDetail?.transporterCompanySiret,
+    traderCompanySiret: form.traderCompanySiret,
+    brokerCompanySiret: form.brokerCompanySiret,
+    ecoOrganismeSiret: form.ecoOrganismeSiret,
+    transporterCompanySiret: form.transporterCompanySiret,
+    ...segments
+  };
+
   const where = {
     isDraftFor: [],
     isForActionFor: [],
@@ -22,106 +46,153 @@ function getWhere(
     isToCollectFor: [],
     isCollectedFor: []
   };
-  const sirets = new Map<string, keyof typeof where>(
-    [
-      form.emitterCompanySiret,
-      form.recipientCompanySiret,
-      form.temporaryStorageDetail?.destinationCompanySiret,
-      form.transporterCompanySiret,
-      ...form.transportSegments.map(segment => segment.transporterCompanySiret),
-      form.temporaryStorageDetail?.transporterCompanySiret,
-      form.traderCompanySiret,
-      form.brokerCompanySiret,
-      form.ecoOrganismeSiret
-    ].map(siret => [siret, "isFollowFor"])
-  );
 
+  type Mapping = Map<string, keyof typeof where>;
+  /**
+   * Set where clause to a given mapping
+   */
+  const appendToSirets = (
+    map: Mapping,
+    key: string,
+    newValue: keyof typeof where
+  ) => {
+    if (!map.has(key)) {
+      return;
+    }
+
+    map.set(key, newValue);
+  };
+
+  // build a mapping to store which actor will see this form appear on a given UI tab
+  // eg: 'transporterCompanySiret' : 'isCollectedFor'
+  const siretsFilters = new Map<string, keyof typeof where>(
+    Object.entries(formSirets)
+      .filter(item => !!item[1])
+      .map(item => [item[0], "isFollowFor"])
+  );
   switch (form.status) {
     case Status.DRAFT: {
-      for (const siret of sirets.keys()) {
-        sirets.set(siret, "isDraftFor");
+      for (const fieldName of siretsFilters.keys()) {
+        appendToSirets(siretsFilters, fieldName, "isDraftFor");
       }
       break;
     }
     case Status.SEALED: {
-      sirets.set(form.transporterCompanySiret, "isToCollectFor");
+      appendToSirets(
+        siretsFilters,
+        "transporterCompanySiret",
+        "isToCollectFor"
+      );
+
       break;
     }
     case Status.SENT: {
-      sirets.set(form.recipientCompanySiret, "isForActionFor");
-      sirets.set(form.transporterCompanySiret, "isCollectedFor");
+      appendToSirets(siretsFilters, "recipientCompanySiret", "isForActionFor");
+      appendToSirets(
+        siretsFilters,
+        "transporterCompanySiret",
+        "isCollectedFor"
+      );
 
       form.transportSegments.forEach(segment => {
         if (segment.readyToTakeOver) {
-          sirets.set(
-            segment.transporterCompanySiret,
+          appendToSirets(
+            siretsFilters,
+            segment.id,
             segment.takenOverAt ? "isCollectedFor" : "isToCollectFor"
           );
         }
       });
+
       break;
     }
     case Status.TEMP_STORED:
     case Status.TEMP_STORER_ACCEPTED: {
-      sirets.set(form.recipientCompanySiret, "isForActionFor");
-      sirets.set(form.transporterCompanySiret, "isCollectedFor");
+      appendToSirets(siretsFilters, "recipientCompanySiret", "isForActionFor");
+      appendToSirets(
+        siretsFilters,
+        "transporterCompanySiret",
+        "isCollectedFor"
+      );
 
       form.transportSegments.forEach(segment => {
-        sirets.set(segment.transporterCompanySiret, "isCollectedFor");
+        appendToSirets(siretsFilters, segment.id, "isCollectedFor");
       });
+
       break;
     }
     case Status.RESEALED: {
-      sirets.set(
-        form.temporaryStorageDetail.transporterCompanySiret,
+      appendToSirets(
+        siretsFilters,
+        "temporaryStorageDetailTransporterCompanySiret",
         "isToCollectFor"
       );
-      sirets.set(form.transporterCompanySiret, "isCollectedFor");
 
+      appendToSirets(
+        siretsFilters,
+        "transporterCompanySiret",
+        "isCollectedFor"
+      );
       form.transportSegments.forEach(segment => {
-        sirets.set(segment.transporterCompanySiret, "isCollectedFor");
+        appendToSirets(siretsFilters, segment.id, "isCollectedFor");
       });
+
       break;
     }
     case Status.RESENT:
     case Status.RECEIVED:
     case Status.ACCEPTED: {
-      sirets.set(
+      appendToSirets(
+        siretsFilters,
         form.recipientIsTempStorage
-          ? form.temporaryStorageDetail.destinationCompanySiret
-          : form.recipientCompanySiret,
+          ? "temporaryStorageDetailDestinationCompanySiret"
+          : "recipientCompanySiret",
         "isForActionFor"
       );
 
-      sirets.set(
-        form.temporaryStorageDetail?.transporterCompanySiret,
+      appendToSirets(
+        siretsFilters,
+        "temporaryStorageDetailTransporterCompanySiret",
         "isCollectedFor"
       );
-      sirets.set(form.transporterCompanySiret, "isCollectedFor");
+
+      appendToSirets(
+        siretsFilters,
+        "transporterCompanySiret",
+        "isCollectedFor"
+      );
 
       form.transportSegments.forEach(segment => {
-        sirets.set(segment.transporterCompanySiret, "isCollectedFor");
+        appendToSirets(siretsFilters, segment.id, "isCollectedFor");
       });
+
       break;
     }
     case Status.AWAITING_GROUP:
     case Status.GROUPED: {
-      sirets.set(
-        form.temporaryStorageDetail?.transporterCompanySiret,
+      appendToSirets(
+        siretsFilters,
+        "temporaryStorageDetailTransporterCompanySiret",
         "isCollectedFor"
       );
-      sirets.set(form.transporterCompanySiret, "isCollectedFor");
+
+      appendToSirets(
+        siretsFilters,
+        "transporterCompanySiret",
+        "isCollectedFor"
+      );
 
       form.transportSegments.forEach(segment => {
-        sirets.set(segment.transporterCompanySiret, "isCollectedFor");
+        appendToSirets(siretsFilters, segment.id, "isCollectedFor");
       });
+
       break;
     }
     case Status.REFUSED:
     case Status.PROCESSED:
     case Status.NO_TRACEABILITY: {
-      for (const siret of sirets.keys()) {
-        sirets.set(siret, "isArchivedFor");
+      for (const siret of siretsFilters.keys()) {
+        appendToSirets(siretsFilters, siret, "isArchivedFor");
       }
       break;
     }
@@ -129,9 +200,9 @@ function getWhere(
       break;
   }
 
-  for (const [siret, filter] of sirets.entries()) {
-    if (siret) {
-      where[filter].push(siret);
+  for (const [fieldName, filter] of siretsFilters.entries()) {
+    if (fieldName) {
+      where[filter].push(formSirets[fieldName]);
     }
   }
 
