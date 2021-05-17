@@ -1,13 +1,18 @@
 import * as React from "react";
 
-import { Bsd } from "generated/graphql/types";
+import { Bsdasri } from "generated/graphql/types";
 
 import { IconBSDasri } from "common/components/Icons";
-
-import { Column } from "../columns";
+import { CellProps, CellValue } from "react-table";
 
 // Basic implementation
-export const COLUMNS: Record<string, Pick<Column<Bsd>, "accessor" | "Cell">> = {
+export const COLUMNS: Record<
+  string,
+  {
+    accessor: (form: Bsdasri) => CellValue;
+    Cell?: React.ComponentType<CellProps<Bsdasri>>;
+  }
+> = {
   type: {
     accessor: () => null,
     Cell: () => <IconBSDasri style={{ fontSize: "24px" }} />,
@@ -22,8 +27,7 @@ export const COLUMNS: Record<string, Pick<Column<Bsd>, "accessor" | "Cell">> = {
     accessor: dasri => dasri?.recipient?.company?.name ?? "",
   },
   waste: {
-    accessor: dasri =>
-      dasri.__typename === "Bsdasri" ? dasri?.emission?.wasteCode : "",
+    accessor: dasri => dasri?.emission?.wasteCode,
   },
   transporterCustomInfo: {
     accessor: dasri => dasri.transporter?.customInfo ?? "",
@@ -34,27 +38,19 @@ export const COLUMNS: Record<string, Pick<Column<Bsd>, "accessor" | "Cell">> = {
     ),
   },
   transporterNumberPlate: {
-    accessor: dasri => null,
-    Cell: ({ value, row }) => (
-      <>
-        <span style={{ marginRight: "0.5rem" }}>{value}</span>
-      </>
-    ),
+    accessor: () => null,
+    Cell: () => null,
   },
   status: {
-    accessor: dasri =>
-      dasri.__typename === "Bsdasri"
-        ? dasri.isDraft
-          ? "Brouillon"
-          : dasri["bsdasriStatus"] // unable to use dot notation because of conflicting status fields
-        : "",
+    accessor: dasri => (dasri.isDraft ? "Brouillon" : dasri["bsdasriStatus"]), // unable to use dot notation because of conflicting status fields
   },
+
   workflow: {
     accessor: () => null,
-    Cell: ({ row }) => null, // not implemented yet
+    Cell: () => null, // not implemented yet
   },
   actions: {
     accessor: () => null,
-    Cell: () => <></>,
+    Cell: () => null, // not implemented yet
   },
 };
