@@ -352,8 +352,8 @@ const packagingInfoFn = (isDraft: boolean) =>
       .when("type", (type, schema) =>
         ["CITERNE", "BENNE"].includes(type)
           ? schema.max(
-              1,
-              "Le nombre de benne ou de citerne ne peut être supérieur à 1."
+              2,
+              "Le nombre de benne ou de citerne ne peut être supérieur à 2."
             )
           : schema
       )
