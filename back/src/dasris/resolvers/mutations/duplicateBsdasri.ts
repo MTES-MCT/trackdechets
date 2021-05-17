@@ -9,7 +9,7 @@ import prisma from "../../../prisma";
 import { expandBsdasriFromDb } from "../../dasri-converter";
 import { getBsdasriOrNotFound } from "../../database";
 import { checkIsBsdasriContributor } from "../../permissions";
-
+import { indexBsdasri } from "../../elastic";
 /**
  *
  * Duplicate a bsdasri
@@ -37,7 +37,7 @@ const duplicateBsdasriResolver: MutationResolvers["duplicateBsdasri"] = async (
   );
 
   const newBsdasri = await duplicateBsdasri(user, bsdasri);
-
+  await indexBsdasri(newBsdasri);
   return expandBsdasriFromDb(newBsdasri);
 };
 

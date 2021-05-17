@@ -12,7 +12,9 @@ import {
   Mutation,
   MutationCreateDraftBsdasriArgs,
   MutationPublishBsdasriArgs,
-  MutationSignBsdasriArgs
+  MutationSignBsdasriArgs,
+  MutationDeleteBsdasriArgs,
+  MutationDuplicateBsdasriArgs
 } from "../../../../generated/graphql/types";
 import {
   resetDatabase,
@@ -20,8 +22,10 @@ import {
 } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
-
+import { indexBsdasri } from "../../../../dasris/elastic";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import { bsdasriFactory } from "../../../../dasris/__tests__/factories";
+
 const CREATE_DRAFT_DASRI = `
 mutation CreateDraftDasri($bsdasriCreateInput: BsdasriCreateInput!) {
   createDraftBsdasri(bsdasriCreateInput: $bsdasriCreateInput)  {
@@ -61,7 +65,7 @@ const GET_BSDS = `
   }
 `;
 
-describe("Query.bsds.dasris", () => {
+describe("Query.bsds.dasris base workflow", () => {
   let emitter: { user: User; company: Company };
   let transporter: { user: User; company: Company };
   let recipient: { user: User; company: Company };
@@ -675,5 +679,118 @@ describe("Query.bsds.dasris", () => {
         expect.objectContaining({ node: { id: dasriId } })
       ]);
     });
+  });
+});
+
+describe("Query.bsds.dasris mutations", () => {
+  afterAll(resetDatabase);
+
+  it("deleted dasri should be removed from es index", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+
+    const dasri = await bsdasriFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret
+      }
+    });
+
+    await indexBsdasri(dasri);
+    await refreshElasticSearch();
+
+    const { query } = makeClient(emitter.user);
+    let res = await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {});
+
+    // created dasri is indexed
+    expect(res.data.bsds.edges).toEqual([
+      expect.objectContaining({ node: { id: dasri.id } })
+    ]);
+
+    // let's delete this dasri
+    const { mutate } = makeClient(emitter.user);
+    const DELETE_DASRI = `
+      mutation DeleteDasri($id: ID!){
+        deleteBsdasri(id: $id)  {
+          id
+        }
+      }
+    `;
+
+    await mutate<Pick<Mutation, "deleteBsdasri">, MutationDeleteBsdasriArgs>(
+      DELETE_DASRI,
+      {
+        variables: {
+          id: dasri.id
+        }
+      }
+    );
+
+    await refreshElasticSearch();
+
+    res = await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {});
+    // dasri si not indexed anymore
+    expect(res.data.bsds.edges).toEqual([]);
+  });
+
+  it("duplicated dasri should be indexed", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+
+    const dasri = await bsdasriFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret
+      }
+    });
+    await indexBsdasri(dasri);
+
+    //duplicate dasri
+    const { mutate } = makeClient(emitter.user);
+
+    const DUPLICATE_DASRI = `
+    mutation DuplicateDasri($id: ID!){
+      duplicateBsdasri(id: $id)  {
+        id
+        status
+        isDraft
+      }
+    }
+    `;
+
+    const {
+      data: { duplicateBsdasri }
+    } = await mutate<
+      Pick<Mutation, "duplicateBsdasri">,
+      MutationDuplicateBsdasriArgs
+    >(DUPLICATE_DASRI, {
+      variables: {
+        id: dasri.id
+      }
+    });
+
+    await indexBsdasri(dasri);
+    await refreshElasticSearch();
+
+    const { query } = makeClient(emitter.user);
+    const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+      GET_BSDS,
+      {}
+    );
+
+    // duplicated dasri is indexed
+    expect(data.bsds.edges.length).toEqual(2); // initial + duplicated dasri
+    expect(data.bsds.edges).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ node: { id: dasri.id } }),
+        expect.objectContaining({ node: { id: duplicateBsdasri.id } })
+      ])
+    );
   });
 });
