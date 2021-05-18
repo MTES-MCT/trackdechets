@@ -50,6 +50,7 @@ function getWhere(
 
     map.set(key, newValue);
   };
+
   switch (bsvhu.status) {
     case BsvhuStatus.INITIAL: {
       if (bsvhu.isDraft) {
@@ -125,7 +126,7 @@ export async function indexAllBsvhus(
   { skip = 0 }: { skip?: number } = {}
 ) {
   const take = 1000;
-  const bsdasris = await prisma.bsvhu.findMany({
+  const bsvhus = await prisma.bsvhu.findMany({
     skip,
     take,
     where: {
@@ -133,16 +134,16 @@ export async function indexAllBsvhus(
     }
   });
 
-  if (bsdasris.length === 0) {
+  if (bsvhus.length === 0) {
     return;
   }
 
   await indexBsds(
     idx,
-    bsdasris.map(bsvhu => toBsdElastic(bsvhu))
+    bsvhus.map(bsvhu => toBsdElastic(bsvhu))
   );
 
-  if (bsdasris.length < take) {
+  if (bsvhus.length < take) {
     // all forms have been indexed
     return;
   }
