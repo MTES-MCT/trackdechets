@@ -316,7 +316,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isToCollectFor: [transporter.company.siret]
+              isFollowFor: [recipient.company.siret]
             }
           }
         }
@@ -618,11 +618,11 @@ describe("Query.bsds.dasris base workflow", () => {
 
   describe("when the dasri is refused", () => {
     beforeAll(async () => {
-      await prisma.bsdasri.update({
+      const refusedDasri = await prisma.bsdasri.update({
         where: { id: dasriId },
         data: { status: "REFUSED" }
       });
-
+      await indexBsdasri(refusedDasri);
       await refreshElasticSearch();
     });
 
