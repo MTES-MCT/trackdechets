@@ -75,8 +75,8 @@ describe("Mutation.Vhu.update", () => {
       }
     });
 
-    const conenctedUser = await userFactory();
-    const { mutate } = makeClient(conenctedUser);
+    const connectedUser = await userFactory();
+    const { mutate } = makeClient(connectedUser);
     const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
       UPDATE_VHU_FORM,
       {
