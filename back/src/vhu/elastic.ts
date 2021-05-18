@@ -2,8 +2,6 @@ import { BsvhuStatus, Bsvhu } from "@prisma/client";
 import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 
-// import { DASRI_WASTE_CODES_MAPPING } from "../common/constants/DASRI_CONSTANTS";
-
 // | state              | emitter | transporter | destination |
 // |--------------------|---------|-------------|-------------|
 // | initial (draft)    | draft   | draft       | draft       |
