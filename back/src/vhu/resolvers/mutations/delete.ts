@@ -5,7 +5,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
 import { expandVhuFormFromDb } from "../../converter";
 import { checkCanDeleteBsdvhu } from "../../permissions";
-
+import * as elastic from "../../../common/elastic";
 /**
  *
  * Mark a VHU as deleted
@@ -27,7 +27,7 @@ const deleteBsvhuResolver: MutationResolvers["deleteBsvhu"] = async (
     data: { isDeleted: true }
   });
 
-  // TODO: update elasticsearch
+  await elastic.deleteBsd(deletedBsvhu);
 
   return expandVhuFormFromDb(deletedBsvhu);
 };
