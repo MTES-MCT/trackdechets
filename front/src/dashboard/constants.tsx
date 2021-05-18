@@ -14,6 +14,8 @@ export const statusLabels: { [key: string]: string } = {
   RESENT: "En attente de réception pour traitement",
   RESEALED:
     "En attente de collecte par le transporteur après entreposage provisoire",
+  INITIAL: "Initial",
+  SIGNED_BY_PRODUCER: "Signé par le producteur",
 };
 
 export const ITEMS_PER_PAGE = 50;

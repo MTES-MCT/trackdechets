@@ -17,6 +17,7 @@ import {
 } from "../../../common/elastic";
 import prisma from "../../../prisma";
 import { expandFormFromDb } from "../../../forms/form-converter";
+import { expandBsdasriFromDb } from "../../../dasris/dasri-converter";
 import { getUserCompanies } from "../../../users/database";
 
 // complete Typescript example:
@@ -179,13 +180,15 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
     }
   );
   const hits = body.hits.hits.slice(0, size);
+
   const ids = hits.reduce<Record<BsdType, string[]>>(
     (acc, { _source: { type, id } }) => ({
       ...acc,
       [type]: acc[type].concat([id])
     }),
-    { BSDD: [] }
+    { BSDD: [], BSDASRI: [] }
   );
+
   const bsds: Record<BsdType, Bsd[]> = {
     BSDD: (
       await prisma.form.findMany({
@@ -195,7 +198,16 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
           }
         }
       })
-    ).map(expandFormFromDb)
+    ).map(expandFormFromDb),
+    BSDASRI: (
+      await prisma.bsdasri.findMany({
+        where: {
+          id: {
+            in: ids.BSDASRI
+          }
+        }
+      })
+    ).map(expandBsdasriFromDb)
   };
   const edges = hits
     .reduce<Array<Bsd>>((acc, { _source: { type, id } }) => {
@@ -213,6 +225,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
       cursor: node.id,
       node
     }));
+
   const pageInfo = {
     // startCursor and endCursor are null if the list is empty
     // this not 100% spec compliant but there are discussions to change that:

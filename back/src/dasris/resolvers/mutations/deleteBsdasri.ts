@@ -1,7 +1,7 @@
 import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-
+import * as elastic from "../../../common/elastic";
 import { getBsdasriOrNotFound } from "../../database";
 import { expandBsdasriFromDb } from "../../dasri-converter";
 import { checkCanDeleteBsdasri } from "../../permissions";
@@ -40,7 +40,7 @@ const deleteBsdasriResolver: MutationResolvers["deleteBsdasri"] = async (
     data: { isDeleted: true }
   });
 
-  // TODO: update elasticsearch
+  await elastic.deleteBsd(deletedBsdasri);
 
   return expandBsdasriFromDb(deletedBsdasri);
 };
