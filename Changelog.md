@@ -9,17 +9,21 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
-- Intégration des dasris au moteur de recherche multi bordereaux (api)[PR 850](https://github.com/MTES-MCT/trackdechets/pull/850)
+- Intégration des bordereaux dasris au moteur de recherche multi bordereaux (api)[PR 850](https://github.com/MTES-MCT/trackdechets/pull/850)
+- Intégration des bordereaux vhus au moteur de recherche multi bordereaux (api)[PR 863](https://github.com/MTES-MCT/trackdechets/pull/863)
 
 #### :boom: Breaking changes
 
 #### :bug: Corrections de bugs
+
 - Correction du rendu pdf des dasris [PR 866](https://github.com/MTES-MCT/trackdechets/pull/866)
+
 #### :nail_care: Améliorations
 
 #### :memo: Documentation
 
 #### :house: Interne
+
 # [2021.05.1] 04/05/2021
 
 #### :rocket: Nouvelles fonctionnalités
