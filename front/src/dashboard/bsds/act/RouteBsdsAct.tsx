@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import {
   Breadcrumb,
@@ -13,7 +13,7 @@ import illustration from "./assets/blankslateAct.svg";
 
 export function RouteBsdsAct() {
   const { siret } = useParams<{ siret: string }>();
-  const defaultWhere = React.useMemo(
+  const defaultWhere = useMemo(
     () => ({
       isForActionFor: [siret],
     }),

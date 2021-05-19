@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import {
   Breadcrumb,
@@ -13,7 +13,7 @@ import illustration from "./assets/blankslateFollow.svg";
 
 export function RouteBsdsFollow() {
   const { siret } = useParams<{ siret: string }>();
-  const defaultWhere = React.useMemo(
+  const defaultWhere = useMemo(
     () => ({
       isFollowFor: [siret],
     }),

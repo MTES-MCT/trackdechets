@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { IconDuplicateFile } from "common/components/Icons";
 import { generatePath, Link, useParams } from "react-router-dom";
 import {
@@ -15,7 +15,7 @@ import illustration from "./assets/blankslateDrafts.svg";
 
 export function RouteBsdsDrafts() {
   const { siret } = useParams<{ siret: string }>();
-  const defaultWhere = React.useMemo(
+  const defaultWhere = useMemo(
     () => ({
       isDraftFor: [siret],
     }),

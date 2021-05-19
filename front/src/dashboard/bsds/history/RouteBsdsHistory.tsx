@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import {
   Breadcrumb,
@@ -13,7 +13,7 @@ import illustration from "./assets/blankslateHistory.svg";
 
 export function RouteBsdsHistory() {
   const { siret } = useParams<{ siret: string }>();
-  const defaultWhere = React.useMemo(
+  const defaultWhere = useMemo(
     () => ({
       isArchivedFor: [siret],
     }),
