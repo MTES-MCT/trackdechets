@@ -5,21 +5,7 @@ import { Bsdasri, BsdasriStatus } from "generated/graphql/types";
 import { IconBSDasri } from "common/components/Icons";
 import { CellProps, CellValue } from "react-table";
 
-// export enum BsdasriStatus {
-//   /** Bsdasri dans son état initial */
-//   Initial = "INITIAL",
-//   /** Optionnel, Bsdasri signé par la PRED (émetteur) */
-//   SignedByProducer = "SIGNED_BY_PRODUCER",
-//   /** Bsdasri envoyé vers l'établissement de destination */
-//   Sent = "SENT",
-//   /** Bsdasri reçu par l'établissement de destination */
-//   Received = "RECEIVED",
-//   /** Bsdasri dont les déchets ont été traités */
-//   Processed = "PROCESSED",
-//   /** Déchet refusé */
-//   Refused = "REFUSED"
-// }
-const vhuVerboseStatuses: Record<BsdasriStatus, string> = {
+const dasriVerboseStatuses: Record<BsdasriStatus, string> = {
   INITIAL: "Initial",
   SIGNED_BY_PRODUCER: "Signé par le producteur",
   SENT: "Envoyé",
@@ -65,7 +51,9 @@ export const COLUMNS: Record<
   },
   status: {
     accessor: dasri =>
-      dasri.isDraft ? "Brouillon" : vhuVerboseStatuses[dasri["bsdasriStatus"]], // unable to use dot notation because of conflicting status fields
+      dasri.isDraft
+        ? "Brouillon"
+        : dasriVerboseStatuses[dasri["bsdasriStatus"]], // unable to use dot notation because of conflicting status fields
   },
 
   workflow: {
