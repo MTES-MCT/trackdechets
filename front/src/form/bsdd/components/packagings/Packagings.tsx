@@ -126,7 +126,7 @@ export default function Packagings({
                               PackagingsEnum.Citerne,
                               PackagingsEnum.Benne,
                             ].includes(p.type)
-                              ? 1
+                              ? 2
                               : undefined
                           }
                         />
