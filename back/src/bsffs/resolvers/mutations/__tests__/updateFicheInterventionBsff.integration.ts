@@ -1,7 +1,7 @@
-import { UserRole } from ".prisma/client";
+import { Company, User, UserRole } from ".prisma/client";
+import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import {
-  createBsffFicheInterventionInputMock,
   Mutation,
   MutationUpdateFicheInterventionBsffArgs
 } from "../../../../generated/graphql/types";
@@ -22,41 +22,63 @@ const UPDATE_FICHE_INTERVENTION = `
   }
 `;
 
-describe("Mutation.updateFicheInterventionBsff", () => {
-  it("should allow user to update a fiche d'intervention", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-
-    const bsffId = getReadableId(ReadableIdPrefix.FF);
-    const ficheInterventionNumero = "ABCDEFGHIJK";
-    const ficheInterventionId = getFicheInterventionId(
-      bsffId,
-      ficheInterventionNumero
-    );
-    await createBsff(
-      { emitter },
-      {
-        id: bsffId,
-        ficheInterventions: {
-          create: {
-            id: ficheInterventionId,
-            numero: ficheInterventionNumero,
-            ...flattenFicheInterventionBsffInput(
-              createBsffFicheInterventionInputMock({})
-            )
-          }
-        }
+const variables: Omit<MutationUpdateFicheInterventionBsffArgs, "id"> = {
+  numero: "ABCDEFGHIJK",
+  input: {
+    kilos: 2,
+    owner: {
+      company: {
+        name: "Acme",
+        siret: "1".repeat(14),
+        address: "12 rue de la Tige, 69000",
+        mail: "contact@gmail.com",
+        phone: "06",
+        contact: "Jeanne Michelin"
       }
-    );
+    },
+    postalCode: "69000"
+  }
+};
 
+describe("Mutation.updateFicheInterventionBsff", () => {
+  afterEach(resetDatabase);
+
+  let emitter: { user: User; company: Company };
+  let bsffId: string;
+  let ficheInterventionId: string;
+
+  beforeEach(async () => {
+    emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    bsffId = getReadableId(ReadableIdPrefix.FF);
+    ficheInterventionId = getFicheInterventionId(bsffId, variables.numero);
+
+    await createBsff(
+      {
+        emitter,
+        ficheInterventions: [
+          {
+            id: ficheInterventionId,
+            numero: variables.numero,
+            ...flattenFicheInterventionBsffInput({
+              ...variables.input,
+              kilos: variables.input.kilos - 1
+            })
+          }
+        ]
+      },
+      { id: bsffId }
+    );
+  });
+
+  it("should allow user to update a fiche d'intervention", async () => {
     const { mutate } = makeClient(emitter.user);
     const { data } = await mutate<
       Pick<Mutation, "updateFicheInterventionBsff">,
       MutationUpdateFicheInterventionBsffArgs
     >(UPDATE_FICHE_INTERVENTION, {
       variables: {
-        id: bsffId,
-        numero: ficheInterventionNumero,
-        input: createBsffFicheInterventionInputMock({})
+        ...variables,
+        id: bsffId
       }
     });
 
@@ -70,9 +92,8 @@ describe("Mutation.updateFicheInterventionBsff", () => {
       MutationUpdateFicheInterventionBsffArgs
     >(UPDATE_FICHE_INTERVENTION, {
       variables: {
-        id: "123",
-        numero: "456",
-        input: createBsffFicheInterventionInputMock({})
+        ...variables,
+        id: bsffId
       }
     });
 
@@ -88,37 +109,14 @@ describe("Mutation.updateFicheInterventionBsff", () => {
   it("should disallow user to update a fiche d'intervention on a bsff they are not part of", async () => {
     const { user } = await userWithCompanyFactory(UserRole.ADMIN);
 
-    const bsffId = getReadableId(ReadableIdPrefix.FF);
-    const ficheInterventionNumero = "ABCDEFGHIJK";
-    const ficheInterventionId = getFicheInterventionId(
-      bsffId,
-      ficheInterventionNumero
-    );
-    await createBsff(
-      {},
-      {
-        id: bsffId,
-        ficheInterventions: {
-          create: {
-            id: ficheInterventionId,
-            numero: ficheInterventionNumero,
-            ...flattenFicheInterventionBsffInput(
-              createBsffFicheInterventionInputMock({})
-            )
-          }
-        }
-      }
-    );
-
     const { mutate } = makeClient(user);
     const { errors } = await mutate<
       Pick<Mutation, "updateFicheInterventionBsff">,
       MutationUpdateFicheInterventionBsffArgs
     >(UPDATE_FICHE_INTERVENTION, {
       variables: {
-        id: bsffId,
-        numero: ficheInterventionNumero,
-        input: createBsffFicheInterventionInputMock({})
+        ...variables,
+        id: bsffId
       }
     });
 
@@ -131,33 +129,30 @@ describe("Mutation.updateFicheInterventionBsff", () => {
   });
 
   it("should throw an error if the bsff doesn't exist", async () => {
-    const { user } = await userWithCompanyFactory(UserRole.ADMIN);
-
-    const bsffId = getReadableId(ReadableIdPrefix.FF);
-    const ficheInterventionNumero = "ABCDEFGHIJK";
-    const ficheInterventionId = getFicheInterventionId(
-      bsffId,
-      ficheInterventionNumero
-    );
-    await prisma.bsffFicheIntervention.create({
+    await prisma.bsffFicheIntervention.update({
       data: {
-        id: ficheInterventionId,
-        numero: ficheInterventionNumero,
-        ...flattenFicheInterventionBsffInput(
-          createBsffFicheInterventionInputMock({})
-        )
+        Bsff: {
+          disconnect: true
+        }
+      },
+      where: {
+        id: ficheInterventionId
+      }
+    });
+    await prisma.bsff.delete({
+      where: {
+        id: bsffId
       }
     });
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
       Pick<Mutation, "updateFicheInterventionBsff">,
       MutationUpdateFicheInterventionBsffArgs
     >(UPDATE_FICHE_INTERVENTION, {
       variables: {
-        id: bsffId,
-        numero: ficheInterventionNumero,
-        input: createBsffFicheInterventionInputMock({})
+        ...variables,
+        id: bsffId
       }
     });
 
@@ -169,16 +164,11 @@ describe("Mutation.updateFicheInterventionBsff", () => {
   });
 
   it("should throw an error if the fiche d'intervention doesn't exist", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-
-    const bsffId = getReadableId(ReadableIdPrefix.FF);
-    const ficheInterventionNumero = "ABCDEFGHIJK";
-    await createBsff(
-      { emitter },
-      {
-        id: bsffId
+    await prisma.bsffFicheIntervention.delete({
+      where: {
+        id: ficheInterventionId
       }
-    );
+    });
 
     const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
@@ -187,14 +177,13 @@ describe("Mutation.updateFicheInterventionBsff", () => {
     >(UPDATE_FICHE_INTERVENTION, {
       variables: {
         id: bsffId,
-        numero: ficheInterventionNumero,
-        input: createBsffFicheInterventionInputMock({})
+        ...variables
       }
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `La fiche d'intervention n°${ficheInterventionNumero} n'existe pas pour le bordereau n°${bsffId}.`
+        message: `La fiche d'intervention n°${variables.numero} n'existe pas pour le bordereau n°${bsffId}.`
       })
     ]);
   });

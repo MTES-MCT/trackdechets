@@ -2,6 +2,7 @@ import { Company, Prisma, TransportMode, User } from ".prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
 import { PACKAGING_TYPE, WASTE_CODES } from "../constants";
+import { getFicheInterventionId } from "../converter";
 
 interface UserAndCompany {
   user: User;
@@ -12,11 +13,13 @@ export function createBsff(
   {
     emitter,
     transporter,
-    destination
+    destination,
+    ficheInterventions
   }: {
     emitter?: UserAndCompany;
     transporter?: UserAndCompany;
     destination?: UserAndCompany;
+    ficheInterventions?: Prisma.BsffFicheInterventionCreateInput[];
   } = {},
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
@@ -55,6 +58,17 @@ export function createBsff(
       destinationCompanyContact: destination.user.name,
       destinationCompanyPhone: destination.company.contactPhone,
       destinationCompanyMail: destination.company.contactEmail
+    });
+  }
+
+  if (ficheInterventions) {
+    Object.assign(data, {
+      ficheInterventions: {
+        create: ficheInterventions.map(ficheIntervention => ({
+          id: getFicheInterventionId(data.id, ficheIntervention.numero),
+          ...ficheIntervention
+        }))
+      }
     });
   }
 

@@ -1,17 +1,14 @@
-import { UserRole } from ".prisma/client";
+import { Company, User, UserRole } from ".prisma/client";
+import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import {
-  createBsffFicheInterventionInputMock,
   Mutation,
   MutationDeleteFicheInterventionBsffArgs
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
-  flattenFicheInterventionBsffInput,
-  getFicheInterventionId
-} from "../../../converter";
+import { getFicheInterventionId } from "../../../converter";
 import { createBsff } from "../../../__tests__/factories";
 
 const DELETE_FICHE_INTERVENTION = `
@@ -23,31 +20,42 @@ const DELETE_FICHE_INTERVENTION = `
 `;
 
 describe("Mutation.deleteFicheInterventionBsff", () => {
-  it("should allow user to delete a fiche d'intervention", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+  afterEach(resetDatabase);
 
-    const bsffId = getReadableId(ReadableIdPrefix.FF);
-    const ficheInterventionNumero = "ABCDEFGHIJK";
-    const ficheInterventionId = getFicheInterventionId(
+  let emitter: { user: User; company: Company };
+  let bsffId: string;
+  let ficheInterventionNumero: string;
+  let ficheInterventionId: string;
+
+  beforeEach(async () => {
+    emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    bsffId = getReadableId(ReadableIdPrefix.FF);
+    ficheInterventionNumero = "ABCDEFGHIJK";
+    ficheInterventionId = getFicheInterventionId(
       bsffId,
       ficheInterventionNumero
     );
-    await createBsff(
-      { emitter },
-      {
-        id: bsffId,
-        ficheInterventions: {
-          create: {
-            id: ficheInterventionId,
-            numero: ficheInterventionNumero,
-            ...flattenFicheInterventionBsffInput(
-              createBsffFicheInterventionInputMock({})
-            )
-          }
-        }
-      }
-    );
 
+    await createBsff({
+      emitter,
+      ficheInterventions: [
+        {
+          id: ficheInterventionId,
+          numero: ficheInterventionNumero,
+          kilos: 2,
+          ownerCompanyName: "Acme",
+          ownerCompanySiret: "1".repeat(14),
+          ownerCompanyAddress: "12 rue de la Tige, 69000",
+          ownerCompanyMail: "contact@gmail.com",
+          ownerCompanyPhone: "06",
+          ownerCompanyContact: "Jeanne Michelin",
+          postalCode: "69000"
+        }
+      ]
+    });
+  });
+
+  it("should allow user to delete a fiche d'intervention", async () => {
     const { mutate } = makeClient(emitter.user);
     const { data } = await mutate<
       Pick<Mutation, "deleteFicheInterventionBsff">,
@@ -69,8 +77,8 @@ describe("Mutation.deleteFicheInterventionBsff", () => {
       MutationDeleteFicheInterventionBsffArgs
     >(DELETE_FICHE_INTERVENTION, {
       variables: {
-        id: "123",
-        numero: "456"
+        id: bsffId,
+        numero: ficheInterventionNumero
       }
     });
 
@@ -85,28 +93,6 @@ describe("Mutation.deleteFicheInterventionBsff", () => {
 
   it("should disallow user to delete a fiche d'intervention on a bsff they are not part of", async () => {
     const { user } = await userWithCompanyFactory(UserRole.ADMIN);
-
-    const bsffId = getReadableId(ReadableIdPrefix.FF);
-    const ficheInterventionNumero = "ABCDEFGHIJK";
-    const ficheInterventionId = getFicheInterventionId(
-      bsffId,
-      ficheInterventionNumero
-    );
-    await createBsff(
-      {},
-      {
-        id: bsffId,
-        ficheInterventions: {
-          create: {
-            id: ficheInterventionId,
-            numero: ficheInterventionNumero,
-            ...flattenFicheInterventionBsffInput(
-              createBsffFicheInterventionInputMock({})
-            )
-          }
-        }
-      }
-    );
 
     const { mutate } = makeClient(user);
     const { errors } = await mutate<
@@ -128,25 +114,23 @@ describe("Mutation.deleteFicheInterventionBsff", () => {
   });
 
   it("should throw an error if the bsff doesn't exist", async () => {
-    const { user } = await userWithCompanyFactory(UserRole.ADMIN);
-
-    const bsffId = getReadableId(ReadableIdPrefix.FF);
-    const ficheInterventionNumero = "ABCDEFGHIJK";
-    const ficheInterventionId = getFicheInterventionId(
-      bsffId,
-      ficheInterventionNumero
-    );
-    await prisma.bsffFicheIntervention.create({
+    await prisma.bsffFicheIntervention.update({
       data: {
-        id: ficheInterventionId,
-        numero: ficheInterventionNumero,
-        ...flattenFicheInterventionBsffInput(
-          createBsffFicheInterventionInputMock({})
-        )
+        Bsff: {
+          disconnect: true
+        }
+      },
+      where: {
+        id: ficheInterventionId
+      }
+    });
+    await prisma.bsff.delete({
+      where: {
+        id: bsffId
       }
     });
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
       Pick<Mutation, "deleteFicheInterventionBsff">,
       MutationDeleteFicheInterventionBsffArgs
@@ -165,11 +149,11 @@ describe("Mutation.deleteFicheInterventionBsff", () => {
   });
 
   it("should throw an error if the fiche d'intervention doesn't exist", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-
-    const bsffId = getReadableId(ReadableIdPrefix.FF);
-    const ficheInterventionNumero = "ABCDEFGHIJK";
-    await createBsff({ emitter }, { id: bsffId });
+    await prisma.bsffFicheIntervention.delete({
+      where: {
+        id: ficheInterventionId
+      }
+    });
 
     const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<

@@ -1,5 +1,5 @@
-import { Bsff, TransportMode } from ".prisma/client";
 import * as yup from "yup";
+import { Bsff, TransportMode, BsffFicheIntervention } from ".prisma/client";
 import { BsffPackaging, BsffPackagingType } from "../generated/graphql/types";
 import { PACKAGING_TYPE, WASTE_CODES } from "./constants";
 
@@ -162,4 +162,51 @@ export const beforeTransportSchema: yup.SchemaOf<Pick<
       "Le transporteur a déjà signé ce bordereau",
       value => value == null
     ) as any // https://github.com/jquense/yup/issues/1302
+});
+
+export const ficheInterventionSchema: yup.SchemaOf<Pick<
+  BsffFicheIntervention,
+  | "numero"
+  | "kilos"
+  | "postalCode"
+  | "ownerCompanyName"
+  | "ownerCompanySiret"
+  | "ownerCompanyAddress"
+  | "ownerCompanyContact"
+  | "ownerCompanyPhone"
+  | "ownerCompanyMail"
+>> = yup.object({
+  numero: yup
+    .string()
+    .required("Le numéro de la fiche d'intervention est requis"),
+  kilos: yup.number().required("Le poids en kilos est requis"),
+  postalCode: yup
+    .string()
+    .required("Le code postal du lieu de l'intervention est requis"),
+  ownerCompanyName: yup
+    .string()
+    .required("Le nom de l'entreprise du lieu d'intervention est requis"),
+  ownerCompanySiret: yup
+    .string()
+    .required("Le SIRET de l'entreprise du lieu d'intervention est requis")
+    .length(
+      14,
+      "Le SIRET de l'entreprise du lieu d'intervention n'est pas au bon format (${length} caractères)"
+    ),
+  ownerCompanyAddress: yup
+    .string()
+    .required("L'addresse du lieu d'intervention est requis"),
+  ownerCompanyContact: yup
+    .string()
+    .required("Le nom du contact du lieu d'intervention est requis"),
+  ownerCompanyPhone: yup
+    .string()
+    .required(
+      "Le numéro de téléphone de l'entreprise du lieu d'intervention est requis"
+    ),
+  ownerCompanyMail: yup
+    .string()
+    .required(
+      "L'addresse email de l'entreprise du lieu d'intervention est requis"
+    )
 });

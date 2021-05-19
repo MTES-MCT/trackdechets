@@ -1,7 +1,7 @@
 import { UserRole } from ".prisma/client";
+import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import {
-  createBsffFicheInterventionInputMock,
   Mutation,
   MutationAddFicheInterventionBsffArgs
 } from "../../../../generated/graphql/types";
@@ -18,7 +18,27 @@ const ADD_FICHE_INTERVENTION = `
   }
 `;
 
+const variables: Omit<MutationAddFicheInterventionBsffArgs, "id"> = {
+  numero: "ABCDEFGHIJK",
+  input: {
+    kilos: 1,
+    owner: {
+      company: {
+        name: "Acme",
+        siret: "1".repeat(14),
+        address: "12 rue de la Tige, 69000",
+        mail: "contact@gmail.com",
+        phone: "06",
+        contact: "Jeanne Michelin"
+      }
+    },
+    postalCode: "69000"
+  }
+};
+
 describe("Mutation.addFicheInterventionBsff", () => {
+  afterEach(resetDatabase);
+
   it("should allow user to add a fiche d'intervention to a bsff", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await createBsff({ emitter });
@@ -28,9 +48,8 @@ describe("Mutation.addFicheInterventionBsff", () => {
       MutationAddFicheInterventionBsffArgs
     >(ADD_FICHE_INTERVENTION, {
       variables: {
-        id: bsff.id,
-        numero: "ABCDEFGHIJK",
-        input: createBsffFicheInterventionInputMock({})
+        ...variables,
+        id: bsff.id
       }
     });
 
@@ -45,8 +64,7 @@ describe("Mutation.addFicheInterventionBsff", () => {
     >(ADD_FICHE_INTERVENTION, {
       variables: {
         id: "123",
-        numero: "ABCDEFGHIJK",
-        input: createBsffFicheInterventionInputMock({})
+        ...variables
       }
     });
 
@@ -69,9 +87,8 @@ describe("Mutation.addFicheInterventionBsff", () => {
       MutationAddFicheInterventionBsffArgs
     >(ADD_FICHE_INTERVENTION, {
       variables: {
-        id: bsff.id,
-        numero: "ABCDEFGHIJK",
-        input: createBsffFicheInterventionInputMock({})
+        ...variables,
+        id: bsff.id
       }
     });
 
@@ -91,9 +108,8 @@ describe("Mutation.addFicheInterventionBsff", () => {
       MutationAddFicheInterventionBsffArgs
     >(ADD_FICHE_INTERVENTION, {
       variables: {
-        id: "123",
-        numero: "ABCDEFGHIJK",
-        input: createBsffFicheInterventionInputMock({})
+        ...variables,
+        id: "123"
       }
     });
 
@@ -142,9 +158,9 @@ describe("Mutation.addFicheInterventionBsff", () => {
       MutationAddFicheInterventionBsffArgs
     >(ADD_FICHE_INTERVENTION, {
       variables: {
+        ...variables,
         id: bsff.id,
-        numero: messedUpNumero,
-        input: createBsffFicheInterventionInputMock({})
+        numero: messedUpNumero
       }
     });
 

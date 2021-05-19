@@ -7,6 +7,7 @@ import {
   getFicheInterventionId,
   unflattenFicheInterventionBsff
 } from "../../converter";
+import { ficheInterventionSchema } from "../../validation";
 import { getBsffOrNotFound } from "../../database";
 import { isBsffContributor } from "../../permissions";
 
@@ -33,11 +34,19 @@ const addFicheInterventionBsff: MutationResolvers["addFicheInterventionBsff"] = 
     );
   }
 
+  const ficheInterventionData = {
+    ...flattenFicheInterventionBsffInput(input),
+    id: ficheInterventionId,
+    numero
+  };
+
+  await ficheInterventionSchema.validate(ficheInterventionData, {
+    abortEarly: false
+  });
+
   const ficheIntervention = await prisma.bsffFicheIntervention.create({
     data: {
-      ...flattenFicheInterventionBsffInput(input),
-      id: ficheInterventionId,
-      numero,
+      ...ficheInterventionData,
       Bsff: {
         connect: {
           id: bsff.id
