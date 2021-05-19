@@ -5,11 +5,12 @@ import {
   FilterProps,
   CellProps,
 } from "react-table";
-import { Bsd, Bsdasri, Form } from "generated/graphql/types";
+import { Bsd, Bsdasri, Form, Bsvhu } from "generated/graphql/types";
 import { BSDTypeFilter } from "./BSDTypeFilter";
 import { TextInputFilter } from "./TextInputFilter";
 import * as bsdd from "./BSDD";
 import * as bsdasri from "./BSDasri";
+import * as bsvhu from "./BSVhu";
 
 // This object declares the mapping between a column id
 // and its corresponding filter or order parameter name
@@ -62,6 +63,9 @@ export function createColumn(column: Column): Column {
       if (bsd.__typename === "Bsdasri") {
         return bsdasri.COLUMNS[column.id]?.accessor?.(bsd);
       }
+      if (bsd.__typename === "Bsvhu") {
+        return bsvhu.COLUMNS[column.id]?.accessor?.(bsd);
+      }
       throw new Error(
         `The bsd with type "${bsd.__typename}" has no accessor for the column "${column.id}"`
       );
@@ -79,7 +83,12 @@ export function createColumn(column: Column): Column {
           return <Cell {...(props as CellProps<Bsdasri>)} />;
         }
       }
-
+      if (props.row.original.__typename === "Bsvhu") {
+        const Cell = bsvhu.COLUMNS[column.id]?.Cell;
+        if (Cell) {
+          return <Cell {...(props as CellProps<Bsvhu>)} />;
+        }
+      }
       return props.value;
     },
   };

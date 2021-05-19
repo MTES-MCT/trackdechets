@@ -541,7 +541,7 @@ export type BsdWhere = {
 export type Bsvhu = {
   __typename?: "Bsvhu";
   /** Numéro unique attribué par Trackdéchets */
-  id: Scalars["String"];
+  id: Scalars["ID"];
   /** Date de création */
   createdAt: Scalars["DateTime"];
   /** Date de dernière modification */

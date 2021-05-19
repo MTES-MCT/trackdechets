@@ -2445,7 +2445,7 @@ Détail sur le déchet proprement dit du Bsdasri
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>id</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
 Numéro unique attribué par Trackdéchets

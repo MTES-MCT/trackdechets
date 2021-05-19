@@ -199,7 +199,7 @@ type BsvhuError {
 
 type Bsvhu {
   "Numéro unique attribué par Trackdéchets"
-  id: String!
+  id: ID!
   "Date de création"
   createdAt: DateTime!
   "Date de dernière modification"

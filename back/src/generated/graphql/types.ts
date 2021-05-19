@@ -543,7 +543,7 @@ export type BsdWhere = {
 export type Bsvhu = {
   __typename?: "Bsvhu";
   /** Numéro unique attribué par Trackdéchets */
-  id: Scalars["String"];
+  id: Scalars["ID"];
   /** Date de création */
   createdAt: Scalars["DateTime"];
   /** Date de dernière modification */
@@ -4594,7 +4594,7 @@ export type BsvhuResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["Bsvhu"] = ResolversParentTypes["Bsvhu"]
 > = {
-  id?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
   isDraft?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;
