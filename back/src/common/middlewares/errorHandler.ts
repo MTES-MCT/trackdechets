@@ -17,10 +17,14 @@ export default (
   next: NextFunction
 ) => {
   logger.error(err.message, { stacktrace: err.stack });
-  if (NODE_ENV === "dev") {
-    next(err);
-  } else {
-    // do not leak errors in production
-    res.status(500).send("Erreur serveur");
+  if (res.headersSent) {
+    // see https://expressjs.com/fr/guide/error-handling.html
+    return next(err);
   }
+  if (NODE_ENV === "production") {
+    if (err instanceof SyntaxError) {
+      res.status(400).send({ error: "JSON mal formaté" });
+    }
+  }
+  next(err);
 };
