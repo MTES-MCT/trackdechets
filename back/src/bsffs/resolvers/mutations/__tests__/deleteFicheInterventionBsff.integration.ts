@@ -36,23 +36,26 @@ describe("Mutation.deleteFicheInterventionBsff", () => {
       ficheInterventionNumero
     );
 
-    await createBsff({
-      emitter,
-      ficheInterventions: [
-        {
-          id: ficheInterventionId,
-          numero: ficheInterventionNumero,
-          kilos: 2,
-          ownerCompanyName: "Acme",
-          ownerCompanySiret: "1".repeat(14),
-          ownerCompanyAddress: "12 rue de la Tige, 69000",
-          ownerCompanyMail: "contact@gmail.com",
-          ownerCompanyPhone: "06",
-          ownerCompanyContact: "Jeanne Michelin",
-          postalCode: "69000"
-        }
-      ]
-    });
+    await createBsff(
+      {
+        emitter,
+        ficheInterventions: [
+          {
+            id: ficheInterventionId,
+            numero: ficheInterventionNumero,
+            kilos: 2,
+            ownerCompanyName: "Acme",
+            ownerCompanySiret: "1".repeat(14),
+            ownerCompanyAddress: "12 rue de la Tige, 69000",
+            ownerCompanyMail: "contact@gmail.com",
+            ownerCompanyPhone: "06",
+            ownerCompanyContact: "Jeanne Michelin",
+            postalCode: "69000"
+          }
+        ]
+      },
+      { id: bsffId }
+    );
   });
 
   it("should allow user to delete a fiche d'intervention", async () => {
