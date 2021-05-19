@@ -639,7 +639,7 @@ type Form {
   nextDestination: NextDestination
 
   "Annexe 2"
-  appendix2Forms: [Form!]
+  appendix2Forms: [Appendix2Form!]
 
   ecoOrganisme: FormEcoOrganisme
 
@@ -653,6 +653,15 @@ type Form {
 
   currentTransporterSiret: String
   nextTransporterSiret: String
+}
+
+type Appendix2Form {
+  readableId: String!
+  wasteDetails: WasteDetails
+  emitter: Emitter
+  receivedAt: DateTime
+  quantityReceived: Float
+  processingOperationDone: String
 }
 
 """

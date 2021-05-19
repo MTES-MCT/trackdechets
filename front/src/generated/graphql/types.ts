@@ -48,6 +48,16 @@ export type AdminForVerification = {
   phone?: Maybe<Scalars["String"]>;
 };
 
+export type Appendix2Form = {
+  __typename?: "Appendix2Form";
+  readableId: Scalars["String"];
+  wasteDetails?: Maybe<WasteDetails>;
+  emitter?: Maybe<Emitter>;
+  receivedAt?: Maybe<Scalars["DateTime"]>;
+  quantityReceived?: Maybe<Scalars["Float"]>;
+  processingOperationDone?: Maybe<Scalars["String"]>;
+};
+
 /** Payload de création d'une annexe 2 */
 export type AppendixFormInput = {
   /** Identifiant unique du bordereau */
@@ -2258,7 +2268,7 @@ export type Form = {
   /** Destination ultérieure prévue (case 12) */
   nextDestination?: Maybe<NextDestination>;
   /** Annexe 2 */
-  appendix2Forms?: Maybe<Array<Form>>;
+  appendix2Forms?: Maybe<Array<Appendix2Form>>;
   ecoOrganisme?: Maybe<FormEcoOrganisme>;
   /** BSD suite - détail des champs de la partie entreposage provisoire ou reconditionnement */
   temporaryStorageDetail?: Maybe<TemporaryStorageDetail>;

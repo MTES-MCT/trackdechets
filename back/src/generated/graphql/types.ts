@@ -59,6 +59,16 @@ export type AdminForVerification = {
   phone?: Maybe<Scalars["String"]>;
 };
 
+export type Appendix2Form = {
+  __typename?: "Appendix2Form";
+  readableId: Scalars["String"];
+  wasteDetails?: Maybe<WasteDetails>;
+  emitter?: Maybe<Emitter>;
+  receivedAt?: Maybe<Scalars["DateTime"]>;
+  quantityReceived?: Maybe<Scalars["Float"]>;
+  processingOperationDone?: Maybe<Scalars["String"]>;
+};
+
 /** Payload de création d'une annexe 2 */
 export type AppendixFormInput = {
   /** Identifiant unique du bordereau */
@@ -2217,7 +2227,7 @@ export type Form = {
   /** Destination ultérieure prévue (case 12) */
   nextDestination?: Maybe<NextDestination>;
   /** Annexe 2 */
-  appendix2Forms?: Maybe<Array<Form>>;
+  appendix2Forms?: Maybe<Array<Appendix2Form>>;
   ecoOrganisme?: Maybe<FormEcoOrganisme>;
   /** BSD suite - détail des champs de la partie entreposage provisoire ou reconditionnement */
   temporaryStorageDetail?: Maybe<TemporaryStorageDetail>;
@@ -4661,6 +4671,7 @@ export type ResolversTypes = {
   Broker: ResolverTypeWrapper<Broker>;
   FormStatus: FormStatus;
   NextDestination: ResolverTypeWrapper<NextDestination>;
+  Appendix2Form: ResolverTypeWrapper<Appendix2Form>;
   FormEcoOrganisme: ResolverTypeWrapper<FormEcoOrganisme>;
   TemporaryStorageDetail: ResolverTypeWrapper<TemporaryStorageDetail>;
   TemporaryStorer: ResolverTypeWrapper<TemporaryStorer>;
@@ -4985,6 +4996,7 @@ export type ResolversParentTypes = {
   Trader: Trader;
   Broker: Broker;
   NextDestination: NextDestination;
+  Appendix2Form: Appendix2Form;
   FormEcoOrganisme: FormEcoOrganisme;
   TemporaryStorageDetail: TemporaryStorageDetail;
   TemporaryStorer: TemporaryStorer;
@@ -5253,6 +5265,35 @@ export type AdminForVerificationResolvers<
   email?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   name?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
   phone?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type Appendix2FormResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["Appendix2Form"] = ResolversParentTypes["Appendix2Form"]
+> = {
+  readableId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  wasteDetails?: Resolver<
+    Maybe<ResolversTypes["WasteDetails"]>,
+    ParentType,
+    ContextType
+  >;
+  emitter?: Resolver<Maybe<ResolversTypes["Emitter"]>, ParentType, ContextType>;
+  receivedAt?: Resolver<
+    Maybe<ResolversTypes["DateTime"]>,
+    ParentType,
+    ContextType
+  >;
+  quantityReceived?: Resolver<
+    Maybe<ResolversTypes["Float"]>,
+    ParentType,
+    ContextType
+  >;
+  processingOperationDone?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -7167,7 +7208,7 @@ export type FormResolvers<
     ContextType
   >;
   appendix2Forms?: Resolver<
-    Maybe<Array<ResolversTypes["Form"]>>,
+    Maybe<Array<ResolversTypes["Appendix2Form"]>>,
     ParentType,
     ContextType
   >;
@@ -8556,6 +8597,7 @@ export type WorkSiteResolvers<
 
 export type Resolvers<ContextType = GraphQLContext> = {
   AdminForVerification?: AdminForVerificationResolvers<ContextType>;
+  Appendix2Form?: Appendix2FormResolvers<ContextType>;
   AuthPayload?: AuthPayloadResolvers<ContextType>;
   Broker?: BrokerResolvers<ContextType>;
   BrokerReceipt?: BrokerReceiptResolvers<ContextType>;
@@ -8714,6 +8756,21 @@ export function createAdminForVerificationMock(
     email: "",
     name: null,
     phone: null,
+    ...props
+  };
+}
+
+export function createAppendix2FormMock(
+  props: Partial<Appendix2Form>
+): Appendix2Form {
+  return {
+    __typename: "Appendix2Form",
+    readableId: "",
+    wasteDetails: null,
+    emitter: null,
+    receivedAt: null,
+    quantityReceived: null,
+    processingOperationDone: null,
     ...props
   };
 }
