@@ -7,7 +7,12 @@ import {
   MutationSignBsffArgs
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
-import { beforeEmissionSchema, beforeTransportSchema } from "../../validation";
+import {
+  beforeEmissionSchema,
+  beforeTransportSchema,
+  beforeReceptionSchema,
+  beforeOperationSchema
+} from "../../validation";
 import { unflattenBsff } from "../../converter";
 import { getBsffOrNotFound } from "../../database";
 
@@ -57,7 +62,7 @@ const signatures: Record<
     existingBsff: Bsff
   ) => Promise<Bsff>
 > = {
-  EMITTER: async ({ id, signature, securityCode }, user, existingBsff) => {
+  EMISSION: async ({ id, signature, securityCode }, user, existingBsff) => {
     await checkIsAllowed(existingBsff.emitterCompanySiret, user, securityCode);
     await beforeEmissionSchema.validate(existingBsff, { abortEarly: false });
 
@@ -71,7 +76,7 @@ const signatures: Record<
       }
     });
   },
-  TRANSPORTER: async ({ id, signature, securityCode }, user, existingBsff) => {
+  TRANSPORT: async ({ id, signature, securityCode }, user, existingBsff) => {
     await checkIsAllowed(
       existingBsff.transporterCompanySiret,
       user,
@@ -83,6 +88,42 @@ const signatures: Record<
       data: {
         transporterTransportSignatureDate: signature.date,
         transporterTransportSignatureAuthor: signature.author
+      },
+      where: {
+        id
+      }
+    });
+  },
+  RECEPTION: async ({ id, signature, securityCode }, user, existingBsff) => {
+    await checkIsAllowed(
+      existingBsff.destinationCompanySiret,
+      user,
+      securityCode
+    );
+    await beforeReceptionSchema.validate(existingBsff, { abortEarly: false });
+
+    return prisma.bsff.update({
+      data: {
+        destinationReceptionSignatureDate: signature.date,
+        destinationReceptionSignatureAuthor: signature.author
+      },
+      where: {
+        id
+      }
+    });
+  },
+  OPERATION: async ({ id, signature, securityCode }, user, existingBsff) => {
+    await checkIsAllowed(
+      existingBsff.destinationCompanySiret,
+      user,
+      securityCode
+    );
+    await beforeOperationSchema.validate(existingBsff, { abortEarly: false });
+
+    return prisma.bsff.update({
+      data: {
+        destinationOperationSignatureDate: signature.date,
+        destinationOperationSignatureAuthor: signature.author
       },
       where: {
         id

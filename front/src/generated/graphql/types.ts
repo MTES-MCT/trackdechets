@@ -754,8 +754,10 @@ export type BsffReception = {
 };
 
 export enum BsffSignatureType {
-  Emitter = "EMITTER",
-  Transporter = "TRANSPORTER"
+  Emission = "EMISSION",
+  Transport = "TRANSPORT",
+  Reception = "RECEPTION",
+  Operation = "OPERATION"
 }
 
 export type BsffTransport = {

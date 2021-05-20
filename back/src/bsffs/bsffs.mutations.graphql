@@ -50,8 +50,10 @@ type Mutation {
 }
 
 enum BsffSignatureType {
-  EMITTER
-  TRANSPORTER
+  EMISSION
+  TRANSPORT
+  RECEPTION
+  OPERATION
 }
 
 input SignatureInput {

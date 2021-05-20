@@ -11194,11 +11194,19 @@ Par exemple, seul le code D 10 peut être associé à une incinération.
 </thead>
 <tbody>
 <tr>
-<td valign="top"><strong>EMITTER</strong></td>
+<td valign="top"><strong>EMISSION</strong></td>
 <td></td>
 </tr>
 <tr>
-<td valign="top"><strong>TRANSPORTER</strong></td>
+<td valign="top"><strong>TRANSPORT</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>RECEPTION</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>OPERATION</strong></td>
 <td></td>
 </tr>
 </tbody>

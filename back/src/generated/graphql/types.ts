@@ -746,7 +746,11 @@ export type BsffReception = {
   signature?: Maybe<Signature>;
 };
 
-export type BsffSignatureType = "EMITTER" | "TRANSPORTER";
+export type BsffSignatureType =
+  | "EMISSION"
+  | "TRANSPORT"
+  | "RECEPTION"
+  | "OPERATION";
 
 export type BsffTransport = {
   __typename?: "BsffTransport";
