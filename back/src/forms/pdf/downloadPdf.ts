@@ -1,11 +1,13 @@
-import { Response } from "express";
+import { Response, Request } from "express";
 import prisma from "../../prisma";
 import { buildPdf } from "./generator";
 
 /**
  * Render a form pdf as an HTTP response
  */
-export default async function downloadPdf(res: Response, { id }) {
+export default async function downloadPdf(req: Request, res: Response, { id }) {
+  const user = req.user;
+
   if (!id) {
     res.status(500).send("Identifiant du bordereau manquant.");
   }
@@ -13,7 +15,7 @@ export default async function downloadPdf(res: Response, { id }) {
   const form = await prisma.form.findUnique({ where: { id } });
 
   try {
-    const buffer = await buildPdf(form);
+    const buffer = await buildPdf(form, user);
 
     res.status(200);
     res.type("pdf");

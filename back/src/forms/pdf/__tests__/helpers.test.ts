@@ -1,4 +1,9 @@
-import { processMainFormParams, processSegment, dateFmt } from "../helpers";
+import {
+  processMainFormParams,
+  processSegment,
+  dateFmt,
+  extractPostalCode
+} from "../helpers";
 
 describe("processMainFormParams", () => {
   it("should format the fields", () => {
@@ -54,5 +59,16 @@ describe("processSegment", () => {
       transporterCompanySiren: params.transporterCompanySiret.slice(0, 9),
       transporterValidityLimit: dateFmt(params.transporterValidityLimit)
     });
+  });
+});
+
+describe("extractPostalCode", () => {
+  test("when there is a match", () => {
+    const address = "3 route du déchet, 07100 Annonay";
+    expect(extractPostalCode(address)).toEqual("07100");
+  });
+
+  test("when there is not match", () => {
+    expect(extractPostalCode("Somewhere")).toEqual("");
   });
 });

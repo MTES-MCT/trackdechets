@@ -1,3 +1,5 @@
+import { Form } from ".prisma/client";
+import { isFormContributor } from "../permissions";
 import { pageHeight, imageLocations } from "./settings";
 
 /**
@@ -382,6 +384,51 @@ export function processAnnexParams(params) {
     ...checkWasteDetailsQuantityReal(data),
     receivedAt: dateFmt(params.receivedAt)
   };
+}
+
+/**
+ * Hide all emitter fields to a pdf viewer that is not part
+ * of the appendix 2 form. It prevents the final destination
+ * form accessing TTR commercial info.
+ */
+export async function hideEmitterFields(appendix2: Form, user: Express.User) {
+  if (!user) {
+    // may happen when the pdf is generated for DREAL after form is declined
+    // or in case of road control
+    return appendix2;
+  }
+  const {
+    emitterCompanySiret,
+    emitterCompanyName,
+    emitterCompanyAddress,
+    emitterCompanyContact,
+    emitterCompanyMail,
+    emitterCompanyPhone,
+    ...rest
+  } = appendix2;
+  if (!(await isFormContributor(user, appendix2))) {
+    return {
+      ...rest,
+      emitterCompanySiret: "",
+      emitterCompanyName: "",
+      emitterCompanyAddress: extractPostalCode(emitterCompanyAddress),
+      emitterCompanyContact: "",
+      emitterCompanyMail: "",
+      emitterCompanyPhone: ""
+    };
+  }
+  return appendix2;
+}
+
+/**
+ *Try extracting a valid postal code
+ */
+export function extractPostalCode(address: string) {
+  const matches = address.match(/([0-9]{5})/);
+  if (matches && matches.length > 0) {
+    return matches[0];
+  }
+  return "";
 }
 
 const transportModeLabels = {

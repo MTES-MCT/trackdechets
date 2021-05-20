@@ -3,7 +3,11 @@ import { redisClient, setInCache } from "./redis";
 import { randomNumber, getAPIBaseURL } from "../utils";
 
 type DownloadInfos = { type: string; params: any };
-type DownloadHandler = (res: Response, params: any) => void | Promise<void>;
+type DownloadHandler = (
+  req: Request,
+  res: Response,
+  params: any
+) => void | Promise<void>;
 
 // TODO register downloaders on server start if code is distributed on several machines
 const fileDownloaders = {};
@@ -67,5 +71,5 @@ export async function downloadFileHandler(req: Request, res: Response) {
     return res.status(500).send("Type de fichier inconnu.");
   }
 
-  return fileDownloader(res, params);
+  return fileDownloader(req, res, params);
 }
