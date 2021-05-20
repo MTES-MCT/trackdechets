@@ -20,6 +20,12 @@ const addFicheInterventionBsff: MutationResolvers["addFicheInterventionBsff"] = 
   const bsff = await getBsffOrNotFound(id);
   await isBsffContributor(user, bsff);
 
+  if (bsff.emitterEmissionSignatureDate) {
+    throw new UserInputError(
+      `Il n'est pas possible d'éditer une fiche d'intervention après la signature de l'émetteur`
+    );
+  }
+
   const ficheInterventionId = getFicheInterventionId(id, numero);
   const existingFicheIntervention = await prisma.bsffFicheIntervention.findUnique(
     {

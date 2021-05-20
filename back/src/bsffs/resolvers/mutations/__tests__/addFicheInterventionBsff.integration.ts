@@ -8,7 +8,10 @@ import {
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { getFicheInterventionId } from "../../../converter";
-import { createBsff } from "../../../__tests__/factories";
+import {
+  createBsff,
+  createBsffAfterEmission
+} from "../../../__tests__/factories";
 
 const ADD_FICHE_INTERVENTION = `
   mutation AddFicheIntervention($id: ID!, $numero: String!, $input: BsffFicheInterventionInput!) {
@@ -171,7 +174,24 @@ describe("Mutation.addFicheInterventionBsff", () => {
     ]);
   });
 
-  it.todo(
-    "should disallow adding a fiche d'intervention to a bsff with a signature"
-  );
+  it("should disallow adding a fiche d'intervention to a bsff with a signature", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsffAfterEmission({ emitter });
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "addFicheInterventionBsff">,
+      MutationAddFicheInterventionBsffArgs
+    >(ADD_FICHE_INTERVENTION, {
+      variables: {
+        ...variables,
+        id: bsff.id
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Il n'est pas possible d'éditer une fiche d'intervention après la signature de l'émetteur`
+      })
+    ]);
+  });
 });
