@@ -411,13 +411,24 @@ export async function hideEmitterFields(appendix2: Form, user: Express.User) {
       ...rest,
       emitterCompanySiret: "",
       emitterCompanyName: "",
-      emitterCompanyAddress: "",
+      emitterCompanyAddress: extractPostalCode(emitterCompanyAddress),
       emitterCompanyContact: "",
       emitterCompanyMail: "",
       emitterCompanyPhone: ""
     };
   }
   return appendix2;
+}
+
+/**
+ *Try extracting a valid postal code
+ */
+export function extractPostalCode(address: string) {
+  const matches = address.match(/([0-9]{5})/);
+  if (matches && matches.length > 0) {
+    return matches[0];
+  }
+  return "";
 }
 
 const transportModeLabels = {
