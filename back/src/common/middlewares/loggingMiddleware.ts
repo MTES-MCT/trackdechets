@@ -27,7 +27,7 @@ export default function (graphQLPath: string) {
         http_params: req.params,
         http_query: req.query,
         http_status: res.statusCode,
-        response_body: responseBody
+        response_body: typeof responseBody === "string" ? responseBody : ""
       };
       // GraphQL specific fields
       if (req.path === graphQLPath && req.method === "POST") {
