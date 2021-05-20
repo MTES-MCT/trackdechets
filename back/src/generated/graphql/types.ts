@@ -652,9 +652,9 @@ export type BsffFicheIntervention = {
   kilos: Scalars["Int"];
   /**
    * Détenteur de l'équipement sur lequel est intervenu l'opérateur.
-   * À noter que ces informations ont une visiblité limité, afin de ne pas dévoiler d'informations commerciales.
+   * À noter que dû à la valeur commerciale de ces informations, leur visibilité est limité aux acteurs en contact direct.
    */
-  owner: BsffOwner;
+  owner?: Maybe<BsffOwner>;
   /** Code postal du lieu où l'intervention a eu lieu. */
   postalCode: Scalars["String"];
 };
@@ -5166,7 +5166,7 @@ export type BsffFicheInterventionResolvers<
 > = {
   numero?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   kilos?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
-  owner?: Resolver<ResolversTypes["BsffOwner"], ParentType, ContextType>;
+  owner?: Resolver<Maybe<ResolversTypes["BsffOwner"]>, ParentType, ContextType>;
   postalCode?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -8323,7 +8323,7 @@ export function createBsffFicheInterventionMock(
     __typename: "BsffFicheIntervention",
     numero: "",
     kilos: 0,
-    owner: createBsffOwnerMock({}),
+    owner: null,
     postalCode: "",
     ...props
   };

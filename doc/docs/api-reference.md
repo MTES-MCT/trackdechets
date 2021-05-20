@@ -2913,11 +2913,11 @@ Poids total des fluides récupérés lors de cette intervention.
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>owner</strong></td>
-<td valign="top"><a href="#bsffowner">BsffOwner</a>!</td>
+<td valign="top"><a href="#bsffowner">BsffOwner</a></td>
 <td>
 
 Détenteur de l'équipement sur lequel est intervenu l'opérateur.
-À noter que ces informations ont une visiblité limité, afin de ne pas dévoiler d'informations commerciales.
+À noter que dû à la valeur commerciale de ces informations, leur visibilité est limité aux acteurs en contact direct.
 
 </td>
 </tr>
