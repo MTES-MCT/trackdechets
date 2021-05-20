@@ -98,6 +98,9 @@ export function createBsffBeforeEmission(
       wasteCode: WASTE_CODES[0],
       wasteDescription: "Fluides",
       quantityKilos: 1,
+      destinationPlannedOperationCode: OPERATION_CODES.D10,
+      destinationPlannedOperationQualification:
+        OPERATION_QUALIFICATIONS.INCINERATION,
       ...initialData
     }
   );
