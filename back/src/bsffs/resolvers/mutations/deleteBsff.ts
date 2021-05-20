@@ -1,3 +1,4 @@
+import { UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -12,8 +13,13 @@ const deleteBsff: MutationResolvers["deleteBsff"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
   const existingBsff = await getBsffOrNotFound(id);
-
   await isBsffContributor(user, existingBsff);
+
+  if (existingBsff.emitterEmissionSignatureDate) {
+    throw new UserInputError(
+      `Il n'est pas possible d'éditer une fiche d'intervention après la signature de l'émetteur`
+    );
+  }
 
   const updatedBsff = await prisma.bsff.update({
     data: {

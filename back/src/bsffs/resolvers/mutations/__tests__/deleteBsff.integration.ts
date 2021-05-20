@@ -6,7 +6,10 @@ import {
 } from "../../../../generated/graphql/types";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { createBsff } from "../../../__tests__/factories";
+import {
+  createBsff,
+  createBsffAfterEmission
+} from "../../../__tests__/factories";
 
 const DELETE_BSFF = `
   mutation DeleteBsff($id: ID!) {
@@ -24,7 +27,7 @@ describe("Mutation.deleteBsff", () => {
     const { mutate } = makeClient(emitter.user);
 
     const bsff = await createBsff({ emitter });
-    const { data, errors } = await mutate<
+    const { data } = await mutate<
       Pick<Mutation, "deleteBsff">,
       MutationDeleteBsffArgs
     >(DELETE_BSFF, {
@@ -33,7 +36,6 @@ describe("Mutation.deleteBsff", () => {
       }
     });
 
-    expect(errors).toBeUndefined();
     expect(data.deleteBsff.id).toBeTruthy();
   });
 
@@ -120,5 +122,24 @@ describe("Mutation.deleteBsff", () => {
     ]);
   });
 
-  it.todo("should disallow deleting a bsff with a signature");
+  it("should disallow deleting a bsff with a signature", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const { mutate } = makeClient(emitter.user);
+
+    const bsff = await createBsffAfterEmission({ emitter });
+    const { errors } = await mutate<
+      Pick<Mutation, "deleteBsff">,
+      MutationDeleteBsffArgs
+    >(DELETE_BSFF, {
+      variables: {
+        id: bsff.id
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Il n'est pas possible d'éditer une fiche d'intervention après la signature de l'émetteur`
+      })
+    ]);
+  });
 });
