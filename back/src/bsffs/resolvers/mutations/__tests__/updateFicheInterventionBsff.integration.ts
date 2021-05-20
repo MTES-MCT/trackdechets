@@ -188,7 +188,27 @@ describe("Mutation.updateFicheInterventionBsff", () => {
     ]);
   });
 
-  it.todo(
-    "should disallow updating a fiche d'intervention from a bsff with a signature"
-  );
+  it("should disallow updating a fiche d'intervention from a bsff with a signature", async () => {
+    await prisma.bsff.update({
+      data: { emitterEmissionSignatureDate: new Date().toISOString() },
+      where: { id: bsffId }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateFicheInterventionBsff">,
+      MutationUpdateFicheInterventionBsffArgs
+    >(UPDATE_FICHE_INTERVENTION, {
+      variables: {
+        ...variables,
+        id: bsffId
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Il n'est pas possible d'éditer une fiche d'intervention après la signature de l'émetteur`
+      })
+    ]);
+  });
 });
