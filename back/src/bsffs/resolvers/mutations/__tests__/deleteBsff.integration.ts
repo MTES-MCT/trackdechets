@@ -138,7 +138,7 @@ describe("Mutation.deleteBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Il n'est pas possible d'éditer une fiche d'intervention après la signature de l'émetteur`
+        message: `Il n'est pas possible de supprimer un bordereau qui a été signé par un des acteurs`
       })
     ]);
   });

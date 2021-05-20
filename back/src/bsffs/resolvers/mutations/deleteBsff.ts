@@ -17,7 +17,7 @@ const deleteBsff: MutationResolvers["deleteBsff"] = async (
 
   if (existingBsff.emitterEmissionSignatureDate) {
     throw new UserInputError(
-      `Il n'est pas possible d'éditer une fiche d'intervention après la signature de l'émetteur`
+      `Il n'est pas possible de supprimer un bordereau qui a été signé par un des acteurs`
     );
   }
 
