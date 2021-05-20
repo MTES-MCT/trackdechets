@@ -656,6 +656,7 @@ type Form {
 }
 
 type Appendix2Form {
+  id: ID!
   readableId: String!
   wasteDetails: WasteDetails
   emitter: Emitter

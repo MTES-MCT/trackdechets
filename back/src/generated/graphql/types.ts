@@ -61,6 +61,7 @@ export type AdminForVerification = {
 
 export type Appendix2Form = {
   __typename?: "Appendix2Form";
+  id: Scalars["ID"];
   readableId: Scalars["String"];
   wasteDetails?: Maybe<WasteDetails>;
   emitter?: Maybe<Emitter>;
@@ -5272,6 +5273,7 @@ export type Appendix2FormResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["Appendix2Form"] = ResolversParentTypes["Appendix2Form"]
 > = {
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
   readableId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   wasteDetails?: Resolver<
     Maybe<ResolversTypes["WasteDetails"]>,
@@ -8765,6 +8767,7 @@ export function createAppendix2FormMock(
 ): Appendix2Form {
   return {
     __typename: "Appendix2Form",
+    id: "",
     readableId: "",
     wasteDetails: null,
     emitter: null,

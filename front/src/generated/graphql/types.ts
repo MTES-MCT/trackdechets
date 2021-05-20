@@ -50,6 +50,7 @@ export type AdminForVerification = {
 
 export type Appendix2Form = {
   __typename?: "Appendix2Form";
+  id: Scalars["ID"];
   readableId: Scalars["String"];
   wasteDetails?: Maybe<WasteDetails>;
   emitter?: Maybe<Emitter>;

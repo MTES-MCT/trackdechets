@@ -2005,6 +2005,11 @@ Champ libre, utilisable par exemple pour noter les tournées des transporteurs
 </thead>
 <tbody>
 <tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>readableId</strong></td>
 <td valign="top"><a href="#string">String</a>!</td>
 <td></td>

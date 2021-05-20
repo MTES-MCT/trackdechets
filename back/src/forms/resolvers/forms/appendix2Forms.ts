@@ -9,6 +9,7 @@ const appendix2FormsResolver: FormResolvers["appendix2Forms"] = async form => {
   return appendix2Forms.map(f => {
     const form = expandFormFromDb(f);
     return {
+      id: form.id,
       readableId: form.readableId,
       wasteDetails: form.wasteDetails,
       emitter: form.emitter,
