@@ -677,7 +677,7 @@ export type BsffInput = {
 export type BsffOperation = IBsffOperation & {
   __typename?: "BsffOperation";
   /** Code de l'opération de traitement. */
-  code: BsffOperationCode;
+  code?: Maybe<BsffOperationCode>;
   /** Qualification plus précise du type d'opération réalisée. */
   qualification: BsffOperationQualification;
   /** Signature de la destination lors du traitement. */
@@ -730,7 +730,7 @@ export type BsffPackagingType = "BOUTEILLE";
 export type BsffPlannedOperation = IBsffOperation & {
   __typename?: "BsffPlannedOperation";
   /** Code de l'opération de traitement prévu. */
-  code: BsffOperationCode;
+  code?: Maybe<BsffOperationCode>;
   /** Qualification plus précise du type d'opération prévu. */
   qualification: BsffOperationQualification;
 };
@@ -1981,7 +1981,7 @@ export type GerepType = "Producteur" | "Traiteur";
 
 export type IBsffOperation = {
   /** Code de l'opération de traitement. */
-  code: BsffOperationCode;
+  code?: Maybe<BsffOperationCode>;
   /** Qualification plus précise du type d'opération réalisée. */
   qualification: BsffOperationQualification;
 };
@@ -5175,7 +5175,11 @@ export type BsffOperationResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsffOperation"] = ResolversParentTypes["BsffOperation"]
 > = {
-  code?: Resolver<ResolversTypes["BsffOperationCode"], ParentType, ContextType>;
+  code?: Resolver<
+    Maybe<ResolversTypes["BsffOperationCode"]>,
+    ParentType,
+    ContextType
+  >;
   qualification?: Resolver<
     ResolversTypes["BsffOperationQualification"],
     ParentType,
@@ -5211,7 +5215,11 @@ export type BsffPlannedOperationResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsffPlannedOperation"] = ResolversParentTypes["BsffPlannedOperation"]
 > = {
-  code?: Resolver<ResolversTypes["BsffOperationCode"], ParentType, ContextType>;
+  code?: Resolver<
+    Maybe<ResolversTypes["BsffOperationCode"]>,
+    ParentType,
+    ContextType
+  >;
   qualification?: Resolver<
     ResolversTypes["BsffOperationQualification"],
     ParentType,
@@ -6281,7 +6289,11 @@ export type IBsffOperationResolvers<
     ParentType,
     ContextType
   >;
-  code?: Resolver<ResolversTypes["BsffOperationCode"], ParentType, ContextType>;
+  code?: Resolver<
+    Maybe<ResolversTypes["BsffOperationCode"]>,
+    ParentType,
+    ContextType
+  >;
   qualification?: Resolver<
     ResolversTypes["BsffOperationQualification"],
     ParentType,
@@ -8357,7 +8369,7 @@ export function createBsffOperationMock(
 ): BsffOperation {
   return {
     __typename: "BsffOperation",
-    code: "R2",
+    code: null,
     qualification: "RECUPERATION_REGENERATION",
     signature: null,
     ...props
@@ -8409,7 +8421,7 @@ export function createBsffPlannedOperationMock(
 ): BsffPlannedOperation {
   return {
     __typename: "BsffPlannedOperation",
-    code: "R2",
+    code: null,
     qualification: "RECUPERATION_REGENERATION",
     ...props
   };

@@ -82,8 +82,7 @@ export const beforeEmissionSchema: yup.SchemaOf<Pick<
     .oneOf(
       Object.values(OPERATION_CODES),
       "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
-    )
-    .required("Le code de l'opération de traitement est requis"),
+    ),
   destinationPlannedOperationQualification: yup
     .string()
     .nullable()
@@ -267,8 +266,7 @@ export const beforeOperationSchema: yup.SchemaOf<Pick<
     .oneOf(
       Object.values(OPERATION_CODES),
       "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : ${values}"
-    )
-    .required("Le code de l'opération de traitement est requis"),
+    ),
   destinationOperationQualification: yup
     .string()
     .nullable()

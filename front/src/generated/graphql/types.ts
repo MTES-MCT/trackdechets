@@ -675,7 +675,7 @@ export type BsffInput = {
 export type BsffOperation = IBsffOperation & {
   __typename?: "BsffOperation";
   /** Code de l'opération de traitement. */
-  code: BsffOperationCode;
+  code?: Maybe<BsffOperationCode>;
   /** Qualification plus précise du type d'opération réalisée. */
   qualification: BsffOperationQualification;
   /** Signature de la destination lors du traitement. */
@@ -737,7 +737,7 @@ export enum BsffPackagingType {
 export type BsffPlannedOperation = IBsffOperation & {
   __typename?: "BsffPlannedOperation";
   /** Code de l'opération de traitement prévu. */
-  code: BsffOperationCode;
+  code?: Maybe<BsffOperationCode>;
   /** Qualification plus précise du type d'opération prévu. */
   qualification: BsffOperationQualification;
 };
@@ -2013,7 +2013,7 @@ export enum GerepType {
 
 export type IBsffOperation = {
   /** Code de l'opération de traitement. */
-  code: BsffOperationCode;
+  code?: Maybe<BsffOperationCode>;
   /** Qualification plus précise du type d'opération réalisée. */
   qualification: BsffOperationQualification;
 };

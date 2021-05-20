@@ -2947,7 +2947,7 @@ Code postal du lieu où l'intervention a eu lieu.
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>code</strong></td>
-<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a>!</td>
+<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a></td>
 <td>
 
 Code de l'opération de traitement.
@@ -3055,7 +3055,7 @@ Volume en litres des fluides à l'intérieur du contenant.
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>code</strong></td>
-<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a>!</td>
+<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a></td>
 <td>
 
 Code de l'opération de traitement prévu.
@@ -12323,7 +12323,7 @@ Chaîne de caractère au format URL, débutant par un protocole http(s).
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>code</strong></td>
-<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a>!</td>
+<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a></td>
 <td>
 
 Code de l'opération de traitement.

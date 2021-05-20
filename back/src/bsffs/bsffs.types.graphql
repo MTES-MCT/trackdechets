@@ -139,13 +139,13 @@ type BsffReception {
 }
 interface IBsffOperation {
   "Code de l'opération de traitement."
-  code: BsffOperationCode!
+  code: BsffOperationCode
   "Qualification plus précise du type d'opération réalisée."
   qualification: BsffOperationQualification!
 }
 type BsffOperation implements IBsffOperation {
   "Code de l'opération de traitement."
-  code: BsffOperationCode!
+  code: BsffOperationCode
   "Qualification plus précise du type d'opération réalisée."
   qualification: BsffOperationQualification!
   "Signature de la destination lors du traitement."
@@ -153,7 +153,7 @@ type BsffOperation implements IBsffOperation {
 }
 type BsffPlannedOperation implements IBsffOperation {
   "Code de l'opération de traitement prévu."
-  code: BsffOperationCode!
+  code: BsffOperationCode
   "Qualification plus précise du type d'opération prévu."
   qualification: BsffOperationQualification!
 }
