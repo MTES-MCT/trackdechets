@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Response, Request } from "express";
 import * as Excel from "exceljs";
 import { format } from "@fast-csv/format";
 import { QueryFormsRegisterArgs } from "../../generated/graphql/types";
@@ -12,6 +12,7 @@ import { getXlsxHeaders } from "./columns";
  * Download handler for forms register
  */
 export async function downloadFormsRegister(
+  _req: Request,
   res: Response,
   args: QueryFormsRegisterArgs
 ) {
