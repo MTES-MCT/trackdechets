@@ -12,6 +12,7 @@ import updateBsvhu from "./mutations/update";
 import signBsvhu from "./mutations/sign";
 import duplicateBsvhu from "./mutations/duplicate";
 import publishBsvhu from "./mutations/publish";
+import deleteBsvhu from "./mutations/delete";
 
 import BsvhuMetadata from "./BsvhuMetadata";
 import Bsvhu from "./Bsvhu";
@@ -27,7 +28,8 @@ const Mutation: MutationResolvers = {
   updateBsvhu,
   signBsvhu,
   duplicateBsvhu,
-  publishBsvhu
+  publishBsvhu,
+  deleteBsvhu
 };
 
 export default { Query, Mutation, BsvhuMetadata, Bsvhu };

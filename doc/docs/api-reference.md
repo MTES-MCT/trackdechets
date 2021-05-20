@@ -854,8 +854,7 @@ Payload de création d'un bordereau
 <td>
 
 EXPERIMENTAL - Ne pas utiliser dans un contexte de production
-Appose une signature de type EMISSION via un compte n'appartenant pas à l'émetteur.
-Permet de signer un enlèvement sur le device transporteur grâce au code de sécurité de l'émetteur du dasri
+Supprime un BSDASRI
 
 </td>
 </tr>
@@ -865,6 +864,25 @@ Permet de signer un enlèvement sur le device transporteur grâce au code de sé
 <td>
 
 ID d'un Dasri
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>deleteBsvhu</strong></td>
+<td valign="top"><a href="#bsvhu">Bsvhu</a></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Supprime un BSVHU
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ID d'un BSD VHU
 
 </td>
 </tr>
@@ -920,7 +938,7 @@ Duplique un BSVHU
 <td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
-ID d'un BSD
+ID d'un BSD VHU
 
 </td>
 </tr>
@@ -2427,7 +2445,7 @@ Détail sur le déchet proprement dit du Bsdasri
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>id</strong></td>
-<td valign="top"><a href="#string">String</a>!</td>
+<td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
 Numéro unique attribué par Trackdéchets

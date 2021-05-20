@@ -1,6 +1,7 @@
 // This file extends react-table's types with the plugins'.
 // It was taken from:
 // https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react-table#configuration-using-declaration-merging
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   UseColumnOrderInstanceProps,
   UseColumnOrderState,
@@ -50,7 +51,7 @@ import {
   UseSortByOptions,
   UseSortByState,
 } from "react-table";
-
+/* eslint-enable */
 declare module "react-table" {
   export interface TableOptions<D extends object>
     extends UseFiltersOptions<D>,

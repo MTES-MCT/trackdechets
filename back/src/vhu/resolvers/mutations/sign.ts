@@ -13,7 +13,7 @@ import { getFormOrFormNotFound } from "../../database";
 import { AlreadySignedError } from "../../errors";
 import { machine } from "../../machine";
 import { validateBsvhu } from "../../validation";
-
+import { indexBsvhu } from "../../elastic";
 type SignatureTypeInfos = {
   dbDateKey: keyof Bsvhu;
   dbAuthorKey: keyof Bsvhu;
@@ -60,6 +60,7 @@ export default async function sign(
     type: input.type,
     bsvhu: prismaForm
   });
+
   const signedForm = await prisma.bsvhu.update({
     where: { id },
     data: {
@@ -69,7 +70,7 @@ export default async function sign(
       status: newStatus as BsvhuStatus
     }
   });
-
+  await indexBsvhu(signedForm);
   return expandVhuFormFromDb(signedForm);
 }
 

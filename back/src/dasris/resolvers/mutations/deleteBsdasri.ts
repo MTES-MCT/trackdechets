@@ -7,9 +7,8 @@ import { expandBsdasriFromDb } from "../../dasri-converter";
 import { checkCanDeleteBsdasri } from "../../permissions";
 
 /**
- * 
- * Mark a dasri as deleted 
- 
+ *
+ * Mark a dasri as deleted
  */
 const deleteBsdasriResolver: MutationResolvers["deleteBsdasri"] = async (
   parent,

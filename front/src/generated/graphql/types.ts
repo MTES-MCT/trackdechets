@@ -111,7 +111,7 @@ export type BrokerReceipt = {
   department: Scalars["String"];
 };
 
-export type Bsd = Form | Bsdasri;
+export type Bsd = Form | Bsdasri | Bsvhu;
 
 /** Bordereau Bsdasri */
 export type Bsdasri = {
@@ -520,7 +520,8 @@ export type BsdEdge = {
 
 export enum BsdType {
   Bsdd = "BSDD",
-  Bsdasri = "BSDASRI"
+  Bsdasri = "BSDASRI",
+  Bsvhu = "BSVHU"
 }
 
 export type BsdWhere = {
@@ -540,7 +541,7 @@ export type BsdWhere = {
 export type Bsvhu = {
   __typename?: "Bsvhu";
   /** Numéro unique attribué par Trackdéchets */
-  id: Scalars["String"];
+  id: Scalars["ID"];
   /** Date de création */
   createdAt: Scalars["DateTime"];
   /** Date de dernière modification */
@@ -1896,10 +1897,14 @@ export type Mutation = {
   deleteBrokerReceipt?: Maybe<BrokerReceipt>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
-   * Appose une signature de type EMISSION via un compte n'appartenant pas à l'émetteur.
-   * Permet de signer un enlèvement sur le device transporteur grâce au code de sécurité de l'émetteur du dasri
+   * Supprime un BSDASRI
    */
   deleteBsdasri?: Maybe<Bsdasri>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Supprime un BSVHU
+   */
+  deleteBsvhu?: Maybe<Bsvhu>;
   /** Supprime un BSD */
   deleteForm?: Maybe<Form>;
   /**
@@ -2252,6 +2257,10 @@ export type MutationDeleteBrokerReceiptArgs = {
 };
 
 export type MutationDeleteBsdasriArgs = {
+  id: Scalars["ID"];
+};
+
+export type MutationDeleteBsvhuArgs = {
   id: Scalars["ID"];
 };
 

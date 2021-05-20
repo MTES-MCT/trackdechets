@@ -1,6 +1,7 @@
 import { client, index } from "../../common/elastic";
 import { indexAllBsdasris } from "../../dasris/elastic";
 import { indexAllForms } from "../../forms/elastic";
+import { indexAllBsvhus } from "../../vhu/elastic";
 import prisma from "../../prisma";
 
 (async function main() {
@@ -58,6 +59,7 @@ import prisma from "../../prisma";
   );
   await indexAllForms(newIndex);
   await indexAllBsdasris(newIndex);
+  await indexAllBsvhus(newIndex);
 
   console.log(
     `All documents have been indexed, the alias "${index.alias}" will now point to the new index "${newIndex}".`

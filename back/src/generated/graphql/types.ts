@@ -122,7 +122,7 @@ export type BrokerReceipt = {
   department: Scalars["String"];
 };
 
-export type Bsd = Form | Bsdasri;
+export type Bsd = Form | Bsdasri | Bsvhu;
 
 /** Bordereau Bsdasri */
 export type Bsdasri = {
@@ -524,7 +524,7 @@ export type BsdEdge = {
   node: Bsd;
 };
 
-export type BsdType = "BSDD" | "BSDASRI";
+export type BsdType = "BSDD" | "BSDASRI" | "BSVHU";
 
 export type BsdWhere = {
   readableId?: Maybe<Scalars["String"]>;
@@ -543,7 +543,7 @@ export type BsdWhere = {
 export type Bsvhu = {
   __typename?: "Bsvhu";
   /** Numéro unique attribué par Trackdéchets */
-  id: Scalars["String"];
+  id: Scalars["ID"];
   /** Date de création */
   createdAt: Scalars["DateTime"];
   /** Date de dernière modification */
@@ -1871,10 +1871,14 @@ export type Mutation = {
   deleteBrokerReceipt?: Maybe<BrokerReceipt>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
-   * Appose une signature de type EMISSION via un compte n'appartenant pas à l'émetteur.
-   * Permet de signer un enlèvement sur le device transporteur grâce au code de sécurité de l'émetteur du dasri
+   * Supprime un BSDASRI
    */
   deleteBsdasri?: Maybe<Bsdasri>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Supprime un BSVHU
+   */
+  deleteBsvhu?: Maybe<Bsvhu>;
   /** Supprime un BSD */
   deleteForm?: Maybe<Form>;
   /**
@@ -2227,6 +2231,10 @@ export type MutationDeleteBrokerReceiptArgs = {
 };
 
 export type MutationDeleteBsdasriArgs = {
+  id: Scalars["ID"];
+};
+
+export type MutationDeleteBsvhuArgs = {
   id: Scalars["ID"];
 };
 
@@ -3776,7 +3784,10 @@ export type ResolversTypes = {
   BsdEdge: ResolverTypeWrapper<
     Omit<BsdEdge, "node"> & { node: ResolversTypes["Bsd"] }
   >;
-  Bsd: ResolversTypes["Form"] | ResolversTypes["Bsdasri"];
+  Bsd:
+    | ResolversTypes["Form"]
+    | ResolversTypes["Bsdasri"]
+    | ResolversTypes["Bsvhu"];
   Bsvhu: ResolverTypeWrapper<Bsvhu>;
   BsvhuStatus: BsvhuStatus;
   BsvhuEmitter: ResolverTypeWrapper<BsvhuEmitter>;
@@ -3992,7 +4003,10 @@ export type ResolversParentTypes = {
   OrderBy: OrderBy;
   BsdConnection: BsdConnection;
   BsdEdge: Omit<BsdEdge, "node"> & { node: ResolversParentTypes["Bsd"] };
-  Bsd: ResolversParentTypes["Form"] | ResolversParentTypes["Bsdasri"];
+  Bsd:
+    | ResolversParentTypes["Form"]
+    | ResolversParentTypes["Bsdasri"]
+    | ResolversParentTypes["Bsvhu"];
   Bsvhu: Bsvhu;
   BsvhuEmitter: BsvhuEmitter;
   BsvhuEmission: BsvhuEmission;
@@ -4188,7 +4202,11 @@ export type BsdResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["Bsd"] = ResolversParentTypes["Bsd"]
 > = {
-  __resolveType: TypeResolveFn<"Form" | "Bsdasri", ParentType, ContextType>;
+  __resolveType: TypeResolveFn<
+    "Form" | "Bsdasri" | "Bsvhu",
+    ParentType,
+    ContextType
+  >;
 };
 
 export type BsdasriResolvers<
@@ -4576,7 +4594,7 @@ export type BsvhuResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["Bsvhu"] = ResolversParentTypes["Bsvhu"]
 > = {
-  id?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
   isDraft?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;
@@ -5704,6 +5722,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationDeleteBsdasriArgs, "id">
+  >;
+  deleteBsvhu?: Resolver<
+    Maybe<ResolversTypes["Bsvhu"]>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeleteBsvhuArgs, "id">
   >;
   deleteForm?: Resolver<
     Maybe<ResolversTypes["Form"]>,

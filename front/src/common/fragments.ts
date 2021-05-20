@@ -369,3 +369,70 @@ export const dasriFragment = gql`
     updatedAt
   }
 `;
+
+export const vhuFragment = gql`
+  fragment VhuFragment on Bsvhu {
+    id
+    bsvhuStatus: status
+    isDraft
+    destination {
+      company {
+        name
+        siret
+      }
+    }
+    emitter {
+      agrementNumber
+      company {
+        name
+        siret
+      }
+    }
+    transporter {
+      company {
+        siret
+        name
+        address
+        contact
+        mail
+        phone
+        vatNumber
+      }
+      recepisse {
+        number
+      }
+    }
+    destination {
+      type
+      company {
+        siret
+        name
+        address
+        contact
+        mail
+        phone
+        vatNumber
+      }
+      reception {
+        date
+        quantity {
+          number
+          tons
+        }
+        acceptationStatus
+        refusalReason
+      }
+      operation {
+        date
+        code
+      }
+    }
+
+    wasteCode
+    packaging
+    quantity {
+      number
+      tons
+    }
+  }
+`;

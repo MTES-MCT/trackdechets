@@ -95,7 +95,14 @@ type Mutation {
   EXPERIMENTAL - Ne pas utiliser dans un contexte de production
   Duplique un BSVHU
   """
-  duplicateBsvhu("ID d'un BSD" id: ID!): Bsvhu
+  duplicateBsvhu("ID d'un BSD VHU" id: ID!): Bsvhu
+
+
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Supprime un BSVHU
+  """
+  deleteBsvhu("ID d'un BSD VHU" id: ID!): Bsvhu
 }
 
 type PageInfo {
@@ -192,7 +199,7 @@ type BsvhuError {
 
 type Bsvhu {
   "Numéro unique attribué par Trackdéchets"
-  id: String!
+  id: ID!
   "Date de création"
   createdAt: DateTime!
   "Date de dernière modification"

@@ -9,7 +9,7 @@ import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb, flattenVhuInput } from "../../converter";
 import { checkIsFormContributor } from "../../permissions";
 import { validateBsvhu } from "../../validation";
-
+import { indexBsvhu } from "../../elastic";
 type CreateBsvhu = {
   isDraft: boolean;
   input: BsvhuInput;
@@ -42,6 +42,6 @@ export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
 
   // TODO Status log ?
   // TODO emit event ?
-
+  await indexBsvhu(newForm);
   return expandVhuFormFromDb(newForm);
 }

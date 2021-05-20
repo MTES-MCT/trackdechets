@@ -1,10 +1,18 @@
 import * as React from "react";
 
-import { Bsdasri } from "generated/graphql/types";
+import { Bsdasri, BsdasriStatus } from "generated/graphql/types";
 
 import { IconBSDasri } from "common/components/Icons";
 import { CellProps, CellValue } from "react-table";
 
+const dasriVerboseStatuses: Record<BsdasriStatus, string> = {
+  INITIAL: "Initial",
+  SIGNED_BY_PRODUCER: "Signé par le producteur",
+  SENT: "Envoyé",
+  RECEIVED: "Reçu",
+  PROCESSED: "Traité",
+  REFUSED: "Refusé",
+};
 // Basic implementation
 export const COLUMNS: Record<
   string,
@@ -42,7 +50,10 @@ export const COLUMNS: Record<
     Cell: () => null,
   },
   status: {
-    accessor: dasri => (dasri.isDraft ? "Brouillon" : dasri["bsdasriStatus"]), // unable to use dot notation because of conflicting status fields
+    accessor: dasri =>
+      dasri.isDraft
+        ? "Brouillon"
+        : dasriVerboseStatuses[dasri["bsdasriStatus"]], // unable to use dot notation because of conflicting status fields
   },
 
   workflow: {

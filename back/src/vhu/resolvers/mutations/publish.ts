@@ -7,7 +7,7 @@ import { expandVhuFormFromDb } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
 import { checkIsFormContributor } from "../../permissions";
 import { validateBsvhu } from "../../validation";
-
+import { indexBsvhu } from "../../elastic";
 export default async function create(
   _,
   { id }: MutationPublishBsvhuArgs,
@@ -34,6 +34,6 @@ export default async function create(
     where: { id },
     data: { isDraft: false }
   });
-
+  await indexBsvhu(updatedForm);
   return expandVhuFormFromDb(updatedForm);
 }
