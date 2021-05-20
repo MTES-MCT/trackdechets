@@ -94,16 +94,32 @@ input BsffQuantityInput {
 input BsffTransporterInput {
   company: CompanyInput!
   recepisse: BsffTransporterRecepisseInput
+  transport: BsffTransporterTransportInput
 }
 input BsffTransporterRecepisseInput {
   number: String!
   department: String!
   validityLimit: DateTime!
 }
+input BsffTransporterTransportInput {
+  mode: TransportMode!
+}
 
 input BsffDestinationInput {
   company: CompanyInput!
   cap: String
+  reception: BsffDestinationReceptionInput
+  plannedOperation: BsffDestinationOperationInput
+  operation: BsffDestinationOperationInput
+}
+input BsffDestinationReceptionInput {
+  date: DateTime!
+  kilos: Int!
+  refusal: String
+}
+input BsffDestinationOperationInput {
+  code: BsffOperationCode!
+  qualification: BsffOperationQualification!
 }
 
 input BsffFicheInterventionInput {

@@ -7889,6 +7889,74 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 <td valign="top"><a href="#string">String</a></td>
 <td></td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>reception</strong></td>
+<td valign="top"><a href="#bsffdestinationreceptioninput">BsffDestinationReceptionInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>plannedOperation</strong></td>
+<td valign="top"><a href="#bsffdestinationoperationinput">BsffDestinationOperationInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsffdestinationoperationinput">BsffDestinationOperationInput</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffDestinationOperationInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>qualification</strong></td>
+<td valign="top"><a href="#bsffoperationqualification">BsffOperationQualification</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffDestinationReceptionInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>kilos</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>refusal</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
 </tbody>
 </table>
 
@@ -8077,6 +8145,11 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 <td valign="top"><a href="#bsfftransporterrecepisseinput">BsffTransporterRecepisseInput</a></td>
 <td></td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>transport</strong></td>
+<td valign="top"><a href="#bsfftransportertransportinput">BsffTransporterTransportInput</a></td>
+<td></td>
+</tr>
 </tbody>
 </table>
 
@@ -8104,6 +8177,25 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 <tr>
 <td colspan="2" valign="top"><strong>validityLimit</strong></td>
 <td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffTransporterTransportInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>mode</strong></td>
+<td valign="top"><a href="#transportmode">TransportMode</a>!</td>
 <td></td>
 </tr>
 </tbody>

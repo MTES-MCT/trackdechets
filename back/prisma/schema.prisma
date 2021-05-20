@@ -849,17 +849,19 @@ model Bsff {
   destinationCompanyPhone   String?
   destinationCompanyMail    String?
 
-  destinationReceptionDate            DateTime?
-  destinationReceptionKilos           Int?
-  destinationReceptionRefusal         String?
+  destinationReceptionDate    DateTime?
+  destinationReceptionKilos   Int?
+  destinationReceptionRefusal String?
+
   destinationReceptionSignatureAuthor String?
   destinationReceptionSignatureDate   DateTime?
 
   destinationPlannedOperationCode          String?
   destinationPlannedOperationQualification String?
 
-  destinationOperationCode            String?
-  destinationOperationQualification   String?
+  destinationOperationCode          String?
+  destinationOperationQualification String?
+
   destinationOperationSignatureAuthor String?
   destinationOperationSignatureDate   DateTime?
 

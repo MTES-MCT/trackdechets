@@ -36,12 +36,28 @@ export function flattenBsffInput(
     transporterRecepisseValidityLimit:
       bsffInput.transporter?.recepisse?.validityLimit,
 
+    transporterTransportMode: bsffInput.transporter?.transport?.mode,
+
     destinationCompanyName: bsffInput.destination?.company.name,
     destinationCompanySiret: bsffInput.destination?.company.siret,
     destinationCompanyAddress: bsffInput.destination?.company.address,
     destinationCompanyContact: bsffInput.destination?.company.contact,
     destinationCompanyPhone: bsffInput.destination?.company.phone,
     destinationCompanyMail: bsffInput.destination?.company.mail,
+
+    destinationReceptionDate: bsffInput.destination?.reception?.date,
+    destinationReceptionKilos: bsffInput.destination?.reception?.kilos,
+    destinationReceptionRefusal: bsffInput.destination?.reception?.refusal,
+
+    destinationOperationPlannedCode:
+      bsffInput.destination?.plannedOperation?.code,
+    destinationOperationPlannedQualification:
+      bsffInput.destination?.plannedOperation?.qualification,
+
+    destinationOperationCode: bsffInput.destination?.operation?.code,
+    destinationOperationQualification:
+      bsffInput.destination?.operation?.qualification,
+
     destinationCap: bsffInput.destination?.cap
   });
 }

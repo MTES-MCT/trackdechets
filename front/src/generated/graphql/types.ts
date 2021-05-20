@@ -602,6 +602,20 @@ export type BsffDestination = {
 export type BsffDestinationInput = {
   company: CompanyInput;
   cap?: Maybe<Scalars["String"]>;
+  reception?: Maybe<BsffDestinationReceptionInput>;
+  plannedOperation?: Maybe<BsffDestinationOperationInput>;
+  operation?: Maybe<BsffDestinationOperationInput>;
+};
+
+export type BsffDestinationOperationInput = {
+  code: BsffOperationCode;
+  qualification: BsffOperationQualification;
+};
+
+export type BsffDestinationReceptionInput = {
+  date: Scalars["DateTime"];
+  kilos: Scalars["Int"];
+  refusal?: Maybe<Scalars["String"]>;
 };
 
 export type BsffEdge = {
@@ -781,6 +795,7 @@ export type BsffTransporter = {
 export type BsffTransporterInput = {
   company: CompanyInput;
   recepisse?: Maybe<BsffTransporterRecepisseInput>;
+  transport?: Maybe<BsffTransporterTransportInput>;
 };
 
 export type BsffTransporterRecepisse = {
@@ -797,6 +812,10 @@ export type BsffTransporterRecepisseInput = {
   number: Scalars["String"];
   department: Scalars["String"];
   validityLimit: Scalars["DateTime"];
+};
+
+export type BsffTransporterTransportInput = {
+  mode: TransportMode;
 };
 
 export type BsffWaste = {

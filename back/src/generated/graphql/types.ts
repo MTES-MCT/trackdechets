@@ -604,6 +604,20 @@ export type BsffDestination = {
 export type BsffDestinationInput = {
   company: CompanyInput;
   cap?: Maybe<Scalars["String"]>;
+  reception?: Maybe<BsffDestinationReceptionInput>;
+  plannedOperation?: Maybe<BsffDestinationOperationInput>;
+  operation?: Maybe<BsffDestinationOperationInput>;
+};
+
+export type BsffDestinationOperationInput = {
+  code: BsffOperationCode;
+  qualification: BsffOperationQualification;
+};
+
+export type BsffDestinationReceptionInput = {
+  date: Scalars["DateTime"];
+  kilos: Scalars["Int"];
+  refusal?: Maybe<Scalars["String"]>;
 };
 
 export type BsffEdge = {
@@ -773,6 +787,7 @@ export type BsffTransporter = {
 export type BsffTransporterInput = {
   company: CompanyInput;
   recepisse?: Maybe<BsffTransporterRecepisseInput>;
+  transport?: Maybe<BsffTransporterTransportInput>;
 };
 
 export type BsffTransporterRecepisse = {
@@ -789,6 +804,10 @@ export type BsffTransporterRecepisseInput = {
   number: Scalars["String"];
   department: Scalars["String"];
   validityLimit: Scalars["DateTime"];
+};
+
+export type BsffTransporterTransportInput = {
+  mode: TransportMode;
 };
 
 export type BsffWaste = {
@@ -4280,7 +4299,10 @@ export type ResolversTypes = {
   BsffQuantityInput: BsffQuantityInput;
   BsffTransporterInput: BsffTransporterInput;
   BsffTransporterRecepisseInput: BsffTransporterRecepisseInput;
+  BsffTransporterTransportInput: BsffTransporterTransportInput;
   BsffDestinationInput: BsffDestinationInput;
+  BsffDestinationReceptionInput: BsffDestinationReceptionInput;
+  BsffDestinationOperationInput: BsffDestinationOperationInput;
   BsvhuInput: BsvhuInput;
   BsvhuEmitterInput: BsvhuEmitterInput;
   BsvhuIdentificationInput: BsvhuIdentificationInput;
@@ -4516,7 +4538,10 @@ export type ResolversParentTypes = {
   BsffQuantityInput: BsffQuantityInput;
   BsffTransporterInput: BsffTransporterInput;
   BsffTransporterRecepisseInput: BsffTransporterRecepisseInput;
+  BsffTransporterTransportInput: BsffTransporterTransportInput;
   BsffDestinationInput: BsffDestinationInput;
+  BsffDestinationReceptionInput: BsffDestinationReceptionInput;
+  BsffDestinationOperationInput: BsffDestinationOperationInput;
   BsvhuInput: BsvhuInput;
   BsvhuEmitterInput: BsvhuEmitterInput;
   BsvhuIdentificationInput: BsvhuIdentificationInput;
@@ -8224,6 +8249,30 @@ export function createBsffDestinationInputMock(
   return {
     company: createCompanyInputMock({}),
     cap: null,
+    reception: null,
+    plannedOperation: null,
+    operation: null,
+    ...props
+  };
+}
+
+export function createBsffDestinationOperationInputMock(
+  props: Partial<BsffDestinationOperationInput>
+): BsffDestinationOperationInput {
+  return {
+    code: "R2",
+    qualification: "RECUPERATION_REGENERATION",
+    ...props
+  };
+}
+
+export function createBsffDestinationReceptionInputMock(
+  props: Partial<BsffDestinationReceptionInput>
+): BsffDestinationReceptionInput {
+  return {
+    date: new Date(),
+    kilos: 0,
+    refusal: null,
     ...props
   };
 }
@@ -8429,6 +8478,7 @@ export function createBsffTransporterInputMock(
   return {
     company: createCompanyInputMock({}),
     recepisse: null,
+    transport: null,
     ...props
   };
 }
@@ -8452,6 +8502,15 @@ export function createBsffTransporterRecepisseInputMock(
     number: "",
     department: "",
     validityLimit: new Date(),
+    ...props
+  };
+}
+
+export function createBsffTransporterTransportInputMock(
+  props: Partial<BsffTransporterTransportInput>
+): BsffTransporterTransportInput {
+  return {
+    mode: "ROAD",
     ...props
   };
 }
