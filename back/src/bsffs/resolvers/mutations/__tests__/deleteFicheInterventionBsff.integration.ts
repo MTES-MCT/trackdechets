@@ -176,7 +176,27 @@ describe("Mutation.deleteFicheInterventionBsff", () => {
     ]);
   });
 
-  it.todo(
-    "should disallow deleting a fiche d'intervention from a bsff with a signature"
-  );
+  it("should disallow deleting a fiche d'intervention from a bsff with a signature", async () => {
+    await prisma.bsff.update({
+      data: { emitterEmissionSignatureDate: new Date().toISOString() },
+      where: { id: bsffId }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "deleteFicheInterventionBsff">,
+      MutationDeleteFicheInterventionBsffArgs
+    >(DELETE_FICHE_INTERVENTION, {
+      variables: {
+        id: bsffId,
+        numero: ficheInterventionNumero
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Il n'est pas possible d'éditer une fiche d'intervention après la signature de l'émetteur`
+      })
+    ]);
+  });
 });
