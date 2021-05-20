@@ -16,18 +16,17 @@ export async function buildPdf(bsdasri: Bsdasri) {
     browserWSEndpoint: "wss://chrome.browserless.io"
   });
   const dasristamp = fs
-    .readFileSync(join(__dirname, "/templates/dasristamp.handlebars"), {
+    .readFileSync(join(__dirname, "/templates/dasristamp.html"), {
       encoding: "utf8"
     })
     .toString();
-  const template = fs.readFileSync(
-    join(__dirname, "/templates/dasri.handlebars"),
-    { encoding: "utf8" }
-  );
+  const template = fs.readFileSync(join(__dirname, "/templates/dasri.html"), {
+    encoding: "utf8"
+  });
 
   Handlebars.registerHelper("dateFmt", safeDateFmt);
   Handlebars.registerHelper("sumPackageQuantity", sumPackageQuantity);
-  Handlebars.registerHelper("ifEquals", function (arg1, arg2, options) {
+  Handlebars.registerHelper("ifEquals", function(arg1, arg2, options) {
     return arg1 == arg2 ? options.fn(this) : options.inverse(this);
   });
 
