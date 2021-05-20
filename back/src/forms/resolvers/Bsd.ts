@@ -3,7 +3,7 @@ import { ReadableIdPrefix } from "../../forms/readableId";
 
 const bsdResolvers: BsdResolvers = {
   __resolveType: parent => {
-    if (parent.id.startsWith("DASRI")) {
+    if (parent.id.startsWith(ReadableIdPrefix.DASRI)) {
       return "Bsdasri";
     }
     if (parent.id.startsWith(ReadableIdPrefix.VHU)) {
