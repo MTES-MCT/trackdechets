@@ -9,12 +9,12 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
-- Intégration des dasris au moteur de recherche multi bordereaux (api)[PR 848](https://github.com/MTES-MCT/trackdechets/pull/850)
+- Intégration des dasris au moteur de recherche multi bordereaux (api)[PR 850](https://github.com/MTES-MCT/trackdechets/pull/850)
 
 #### :boom: Breaking changes
 
 #### :bug: Corrections de bugs
-
+- Correction du rendu pdf des dasris [PR 866](https://github.com/MTES-MCT/trackdechets/pull/866)
 #### :nail_care: Améliorations
 
 #### :memo: Documentation
