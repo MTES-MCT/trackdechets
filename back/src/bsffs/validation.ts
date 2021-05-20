@@ -20,6 +20,8 @@ export const beforeEmissionSchema: yup.SchemaOf<Pick<
   | "wasteCode"
   | "wasteDescription"
   | "quantityKilos"
+  | "destinationPlannedOperationCode"
+  | "destinationPlannedOperationQualification"
 >> = yup.object({
   emitterCompanyName: yup
     .string()
@@ -73,7 +75,23 @@ export const beforeEmissionSchema: yup.SchemaOf<Pick<
   quantityKilos: yup
     .number()
     .nullable()
-    .required("Le poids total du déchet est requis")
+    .required("Le poids total du déchet est requis"),
+  destinationPlannedOperationCode: yup
+    .string()
+    .nullable()
+    .oneOf(
+      Object.values(OPERATION_CODES),
+      "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
+    )
+    .required("Le code de l'opération de traitement est requis"),
+  destinationPlannedOperationQualification: yup
+    .string()
+    .nullable()
+    .oneOf(
+      Object.values(OPERATION_QUALIFICATIONS),
+      "La qualification du traitement prévu ne fait pas partie de la liste reconnue : ${values}"
+    )
+    .required()
 });
 
 export const beforeTransportSchema: yup.SchemaOf<Pick<
