@@ -26,7 +26,7 @@ export async function buildPdf(bsdasri: Bsdasri) {
 
   Handlebars.registerHelper("dateFmt", safeDateFmt);
   Handlebars.registerHelper("sumPackageQuantity", sumPackageQuantity);
-  Handlebars.registerHelper("ifEquals", function(arg1, arg2, options) {
+  Handlebars.registerHelper("ifEquals", function (arg1, arg2, options) {
     return arg1 == arg2 ? options.fn(this) : options.inverse(this);
   });
 
