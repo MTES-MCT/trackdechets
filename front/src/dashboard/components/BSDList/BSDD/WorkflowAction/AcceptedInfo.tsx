@@ -25,7 +25,7 @@ export type AcceptedInfoValues = {
   quantityType?: QuantityType;
 };
 
-const validationSchema: yup.ObjectSchema<AcceptedInfoValues> = yup.object({
+const validationSchema: yup.SchemaOf<AcceptedInfoValues> = yup.object({
   signedBy: yup.string().required("Le nom du responsable est un champ requis"),
   signedAt: yup.string().required("La date de signature est un champ requis"),
   quantityReceived: yup
@@ -33,9 +33,11 @@ const validationSchema: yup.ObjectSchema<AcceptedInfoValues> = yup.object({
     .nullable()
     .required("Le poids accepté est un champ requis"),
   wasteAcceptationStatus: yup
-    .string<WasteAcceptationStatus>()
+    .mixed<WasteAcceptationStatus>()
+    .oneOf(Object.values(WasteAcceptationStatus))
     .required("Le statut d'acceptation du lot est un champ requis"),
-  wasteRefusalReason: yup.string(),
+  wasteRefusalReason: yup.string().ensure(),
+  quantityType: yup.mixed<QuantityType>(),
 });
 
 /**

@@ -161,6 +161,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           }
           recipient: {
             processingOperation: "D 10"
+            cap: "it's a cap"
             company: {
               siret: "${traiteur.siret}"
               name: "${traiteur.name}"
@@ -472,6 +473,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
             }
             recipient: {
               processingOperation: "D 10"
+              cap: "it's a cap"
               company: {
                 siret: "${traiteur.siret}"
                 name: "${traiteur.name}"
@@ -735,6 +737,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           }
           recipient: {
             processingOperation: "D 13"
+            cap: "it's a cap"
             company: {
               siret: "${entreposage.siret}"
               name: "${entreposage.name}"
@@ -1266,6 +1269,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
           }
           recipient: {
             processingOperation: "D 10"
+            cap: "it's a cap"
             company: {
               siret: "${traiteur.siret}"
               name: "${traiteur.name}"

@@ -174,7 +174,7 @@ const formdata = {
   emitterWorkSiteCity: "",
   emitterWorkSitePostalCode: "",
   emitterWorkSiteInfos: "",
-  recipientCap: "",
+  recipientCap: "I am a CAP",
   emitterCompanyPhone: "06 18 76 02 96",
   isAccepted: null,
   emitterCompanyMail: "emitter@compnay.fr",
