@@ -550,7 +550,7 @@ describe("Mutation.markAsSealed", () => {
     ]);
   });
 
-  it.skip("should throw an error if VERIFY_COMPANY=true and destination is not verified", async () => {
+  it("should throw an error if VERIFY_COMPANY=true and destination is not verified", async () => {
     // patch process.env and reload server
     process.env.VERIFY_COMPANY = "true";
     const makeClient = require("../../../../__tests__/testClient").default;
@@ -583,7 +583,7 @@ describe("Mutation.markAsSealed", () => {
     ]);
   });
 
-  it.skip("should throw an error if VERIFY_COMPANY=true and destination after temp storage is not verified", async () => {
+  it("should throw an error if VERIFY_COMPANY=true and destination after temp storage is not verified", async () => {
     // patch process.env and reload server
     process.env.VERIFY_COMPANY = "true";
     const makeClient = require("../../../../__tests__/testClient").default;
