@@ -16,7 +16,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
-- Correction du rendu pdf des dasris [PR 866](https://github.com/MTES-MCT/trackdechets/pull/866)
+- Correction du rendu pdf des dasris et vhus [PR 866](https://github.com/MTES-MCT/trackdechets/pull/866) et [PR 871](https://github.com/MTES-MCT/trackdechets/pull/871)
 
 #### :nail_care: Améliorations
 
