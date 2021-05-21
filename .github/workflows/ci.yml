@@ -63,6 +63,8 @@ jobs:
         run: |
           npm run generate
           npm run types
+      - name: Check migrations
+        run: npm run check:migrations
       - name: Run tests
         run: npm test -- --forceExit
         env:
