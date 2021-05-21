@@ -4,8 +4,8 @@ import {
   companyFactory,
   formFactory,
   userWithCompanyFactory
-} from "../../../../__tests__/factories";
-import makeClient from "../../../../__tests__/testClient";
+} from "../../../__tests__/factories";
+import makeClient from "../../../__tests__/testClient";
 
 const FORM = gql`
   query Form($id: ID!) {
@@ -67,7 +67,7 @@ describe("Appendix2Form", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Vous ne pouvez pas accéder au champ `emitter` de cette annexe 2"
+          "Vous ne pouvez pas accéder au champ `emitter` de cette annexe 2 car votre SIRET apparait uniquement sur le bordereau de regroupement"
       })
     ]);
   });

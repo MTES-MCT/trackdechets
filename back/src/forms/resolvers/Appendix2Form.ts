@@ -8,7 +8,7 @@ const appendix2FormResolvers: Appendix2FormResolvers = {
     const form = await prisma.form.findUnique({ where: { id: parent.id } });
     if (!(await isFormContributor(user, form))) {
       throw new ForbiddenError(
-        "Vous ne pouvez pas accéder au champ `emitter` de cette annexe 2"
+        "Vous ne pouvez pas accéder au champ `emitter` de cette annexe 2 car votre SIRET apparait uniquement sur le bordereau de regroupement"
       );
     }
     return parent.emitter;
