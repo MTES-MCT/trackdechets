@@ -969,8 +969,6 @@ model Bsda {
   destinationReceptionQuantityValue     Float?
   destinationReceptionAcceptationStatus WasteAcceptationStatus?
   destinationReceptionRefusalReason     String?
-  destinationReceptionSignatureAuthor   String?
-  destinationReceptionSignatureDate     DateTime?
 
   destinationOperationCode            String?
   destinationOperationDate            DateTime?

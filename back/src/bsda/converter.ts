@@ -76,10 +76,6 @@ export function expandBsdaFormFromDb(form: PrismaBsda): GraphqlBsda {
         quantity: nullIfNoValues<BsdaQuantity>({
           type: form.destinationReceptionQuantityType,
           value: form.destinationReceptionQuantityValue
-        }),
-        signature: nullIfNoValues<Signature>({
-          author: form.destinationReceptionSignatureAuthor,
-          date: form.destinationReceptionSignatureDate
         })
       }),
       operation: nullIfNoValues<BsdaOperation>({

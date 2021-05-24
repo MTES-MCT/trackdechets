@@ -40,8 +40,6 @@ function duplicateForm({
   destinationReceptionQuantityType,
   destinationReceptionQuantityValue,
   destinationReceptionDate,
-  destinationReceptionSignatureAuthor,
-  destinationReceptionSignatureDate,
   destinationReceptionAcceptationStatus,
   destinationReceptionRefusalReason,
   destinationOperationCode,

@@ -53,8 +53,6 @@ CREATE TABLE "default$default"."Bsda" (
     "destinationReceptionQuantityValue" DECIMAL(65,30),
     "destinationReceptionAcceptationStatus" "default$default"."WasteAcceptationStatus",
     "destinationReceptionRefusalReason" TEXT,
-    "destinationReceptionSignatureAuthor" TEXT,
-    "destinationReceptionSignatureDate" TIMESTAMP(3),
     "destinationOperationCode" TEXT,
     "destinationOperationDate" TIMESTAMP(3),
     "destinationOperationSignatureAuthor" TEXT,
