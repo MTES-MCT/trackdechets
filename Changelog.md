@@ -12,6 +12,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Intégration des bordereaux dasris au moteur de recherche multi bordereaux (api)[PR 850](https://github.com/MTES-MCT/trackdechets/pull/850)
 - Intégration des bordereaux vhus au moteur de recherche multi bordereaux (api)[PR 863](https://github.com/MTES-MCT/trackdechets/pull/863)
 - Ajout du bordereau de fluides frigorigènes à l'API [PR 853](https://github.com/MTES-MCT/trackdechets/pull/853)
+- Ajout du bordereau de suivi des déchets amiante à l'API [PR 873](https://github.com/MTES-MCT/trackdechets/pull/873)
 
 #### :boom: Breaking changes
 
@@ -56,7 +57,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout de différents filtres dans les tableaux [PR 810](https://github.com/MTES-MCT/trackdechets/pull/810)
 - Ajout d'un sélecteur de type de bordereaux dans les tableaux, en vue des prochains bordereaux [PR 810](https://github.com/MTES-MCT/trackdechets/pull/810)
 - Ajout de la possibilité de créer des bordereaux DASRI via l'API [PR 787](https://github.com/MTES-MCT/trackdechets/pull/787)
-- Ajout du bordereau de suivi des déchets d'aminate à l'API [PR 873](https://github.com/MTES-MCT/trackdechets/pull/873)
 
 #### :boom: Breaking changes
 
