@@ -34,7 +34,11 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  await validateBsda(form, { emissionSignature: !isDraft });
+  await validateBsda(form, {
+    isPrivateIndividual: form.emitterIsPrivateIndividual,
+    isType2710: form.type === "COLLECTION_2710",
+    emissionSignature: !isDraft
+  });
 
   // TODO regroupement / transfert
 

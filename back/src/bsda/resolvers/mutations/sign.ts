@@ -45,6 +45,7 @@ export default async function sign(
 
   // Check that all necessary fields are filled
   await validateBsda(prismaForm, {
+    isPrivateIndividual: prismaForm.emitterIsPrivateIndividual,
     emissionSignature:
       prismaForm.emitterEmissionSignatureDate != null ||
       input.type === "EMISSION",

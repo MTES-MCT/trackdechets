@@ -93,6 +93,8 @@ type WasteDescription = Pick<
 >;
 
 interface BsdaValidationContext {
+  isType2710?: boolean;
+  isPrivateIndividual?: boolean;
   emissionSignature?: boolean;
   transportSignature?: boolean;
   operationSignature?: boolean;
@@ -125,39 +127,39 @@ const emitterSchema: FactorySchemaOf<
     emitterCompanyName: yup
       .string()
       .requiredIf(
-        context.emissionSignature,
+        context.emissionSignature && !context.isPrivateIndividual,
         `Émetteur: ${MISSING_COMPANY_NAME}`
       ),
     emitterCompanySiret: yup
       .string()
       .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
       .requiredIf(
-        context.emissionSignature,
+        context.emissionSignature && !context.isPrivateIndividual,
         `Émetteur: ${MISSING_COMPANY_SIRET}`
       ),
     emitterCompanyAddress: yup
       .string()
       .requiredIf(
-        context.emissionSignature,
+        context.emissionSignature && !context.isPrivateIndividual,
         `Émetteur: ${MISSING_COMPANY_ADDRESS}`
       ),
     emitterCompanyContact: yup
       .string()
       .requiredIf(
-        context.emissionSignature,
+        context.emissionSignature && !context.isPrivateIndividual,
         `Émetteur: ${MISSING_COMPANY_CONTACT}`
       ),
     emitterCompanyPhone: yup
       .string()
       .requiredIf(
-        context.emissionSignature,
+        context.emissionSignature && !context.isPrivateIndividual,
         `Émetteur: ${MISSING_COMPANY_PHONE}`
       ),
     emitterCompanyMail: yup
       .string()
       .email()
       .requiredIf(
-        context.emissionSignature,
+        context.emissionSignature && !context.isPrivateIndividual,
         `Émetteur: ${MISSING_COMPANY_EMAIL}`
       ),
     emitterWorkSiteAddress: yup.string().nullable(),
@@ -172,39 +174,39 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
     workerCompanyName: yup
       .string()
       .requiredIf(
-        context.emissionSignature,
+        context.emissionSignature && !context.isType2710,
         `Entreprise de travaux: ${MISSING_COMPANY_NAME}`
       ),
     workerCompanySiret: yup
       .string()
       .length(14, `Entreprise de travaux: ${INVALID_SIRET_LENGTH}`)
       .requiredIf(
-        context.emissionSignature,
+        context.emissionSignature && !context.isType2710,
         `Entreprise de travaux: ${MISSING_COMPANY_SIRET}`
       ),
     workerCompanyAddress: yup
       .string()
       .requiredIf(
-        context.emissionSignature,
+        context.emissionSignature && !context.isType2710,
         `Entreprise de travaux: ${MISSING_COMPANY_ADDRESS}`
       ),
     workerCompanyContact: yup
       .string()
       .requiredIf(
-        context.emissionSignature,
+        context.emissionSignature && !context.isType2710,
         `Entreprise de travaux: ${MISSING_COMPANY_CONTACT}`
       ),
     workerCompanyPhone: yup
       .string()
       .requiredIf(
-        context.emissionSignature,
+        context.emissionSignature && !context.isType2710,
         `Entreprise de travaux: ${MISSING_COMPANY_PHONE}`
       ),
     workerCompanyMail: yup
       .string()
       .email()
       .requiredIf(
-        context.emissionSignature,
+        context.emissionSignature && !context.isType2710,
         `Entreprise de travaux: ${MISSING_COMPANY_EMAIL}`
       ),
     workerWorkHasEmitterPaperSignature: yup.boolean().nullable()
