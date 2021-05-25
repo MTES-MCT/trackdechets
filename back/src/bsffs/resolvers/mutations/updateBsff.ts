@@ -74,7 +74,6 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     ]);
   }
 
-  console.log(JSON.stringify(data, null, 2));
   await isBsffContributor(user, { ...existingBsff, ...data });
 
   const bsff = await prisma.bsff.update({

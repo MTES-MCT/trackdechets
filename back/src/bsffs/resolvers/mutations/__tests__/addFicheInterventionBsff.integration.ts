@@ -133,11 +133,10 @@ describe("Mutation.addFicheInterventionBsff", () => {
       ficheInterventionNumero
     );
     const bsff = await createBsff(
-      { emitter },
       {
-        id: bsffId,
-        ficheInterventions: {
-          create: {
+        emitter,
+        ficheInterventions: [
+          {
             id: ficheInterventionId,
             numero: ficheInterventionNumero,
             kilos: 2,
@@ -149,7 +148,10 @@ describe("Mutation.addFicheInterventionBsff", () => {
             ownerCompanyMail: "carla.brownie@gmail.com",
             ownerCompanyPhone: "06"
           }
-        }
+        ]
+      },
+      {
+        id: bsffId
       }
     );
     const { mutate } = makeClient(emitter.user);

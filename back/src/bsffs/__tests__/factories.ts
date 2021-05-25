@@ -7,7 +7,6 @@ import {
   PACKAGING_TYPE,
   WASTE_CODES
 } from "../constants";
-import { getFicheInterventionId } from "../converter";
 
 interface UserAndCompany {
   user: User;
@@ -69,10 +68,7 @@ export function createBsff(
   if (ficheInterventions) {
     Object.assign(data, {
       ficheInterventions: {
-        create: ficheInterventions.map(ficheIntervention => ({
-          id: getFicheInterventionId(data.id, ficheIntervention.numero),
-          ...ficheIntervention
-        }))
+        create: ficheInterventions
       }
     });
   }
