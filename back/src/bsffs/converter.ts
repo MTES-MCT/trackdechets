@@ -49,9 +49,9 @@ export function flattenBsffInput(
     destinationReceptionKilos: bsffInput.destination?.reception?.kilos,
     destinationReceptionRefusal: bsffInput.destination?.reception?.refusal,
 
-    destinationOperationPlannedCode:
+    destinationPlannedOperationCode:
       bsffInput.destination?.plannedOperation?.code,
-    destinationOperationPlannedQualification:
+    destinationPlannedOperationQualification:
       bsffInput.destination?.plannedOperation?.qualification,
 
     destinationOperationCode: bsffInput.destination?.operation?.code,
