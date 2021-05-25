@@ -122,7 +122,7 @@ type BsffDestination {
   reception: BsffReception
   "Déclaration de traitement du déchet."
   operation: BsffOperation
-  "Opération de traitement prévu initiallement."
+  "Opération de traitement prévu initialement."
   plannedOperation: BsffPlannedOperation!
   "Numéro CAP."
   cap: String
