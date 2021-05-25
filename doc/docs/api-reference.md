@@ -2783,7 +2783,7 @@ Déclaration de traitement du déchet.
 <td valign="top"><a href="#bsffplannedoperation">BsffPlannedOperation</a>!</td>
 <td>
 
-Opération de traitement prévu initiallement.
+Opération de traitement prévu initialement.
 
 </td>
 </tr>

@@ -593,7 +593,7 @@ export type BsffDestination = {
   reception?: Maybe<BsffReception>;
   /** Déclaration de traitement du déchet. */
   operation?: Maybe<BsffOperation>;
-  /** Opération de traitement prévu initiallement. */
+  /** Opération de traitement prévu initialement. */
   plannedOperation: BsffPlannedOperation;
   /** Numéro CAP. */
   cap?: Maybe<Scalars["String"]>;
