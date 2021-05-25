@@ -1,9 +1,12 @@
+import prisma from "../../prisma";
 import {
   MutationResolvers,
   QueryResolvers,
-  IBsffOperationResolvers
+  IBsffOperationResolvers,
+  BsffResolvers
 } from "../../generated/graphql/types";
 import { OPERATION_CODES, OPERATION_QUALIFICATIONS } from "../constants";
+import { unflattenFicheInterventionBsff } from "../converter";
 import bsffs from "./queries/bsffs";
 import createBsff from "./mutations/createBsff";
 import updateBsff from "./mutations/updateBsff";
@@ -27,6 +30,17 @@ const Mutation: MutationResolvers = {
   signBsff
 };
 
+const Bsff: BsffResolvers = {
+  ficheInterventions: async parent => {
+    const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
+      where: {
+        bsffId: parent.id
+      }
+    });
+    return ficheInterventions.map(unflattenFicheInterventionBsff);
+  }
+};
+
 const IBsffOperation: IBsffOperationResolvers = {
   __resolveType: operation => {
     if ("signature" in operation) {
@@ -39,6 +53,7 @@ const IBsffOperation: IBsffOperationResolvers = {
 export default {
   Query,
   Mutation,
+  Bsff,
   BsffOperationCode: OPERATION_CODES,
   BsffOperationQualification: OPERATION_QUALIFICATIONS,
   IBsffOperation

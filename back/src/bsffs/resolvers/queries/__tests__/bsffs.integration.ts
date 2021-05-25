@@ -1,11 +1,13 @@
 import { UserRole } from ".prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import { Query, QueryBsffsArgs } from "../../../../generated/graphql/types";
 import {
   userWithCompanyFactory,
   companyAssociatedToExistingUserFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { getFicheInterventionId } from "../../../converter";
 import { createBsff } from "../../../__tests__/factories";
 
 const GET_BSFFS = `
@@ -14,6 +16,9 @@ const GET_BSFFS = `
       edges {
         node {
           id
+          ficheInterventions {
+            numero
+          }
         }
       }
     }
@@ -107,5 +112,47 @@ describe("Query.bsffs", () => {
     );
 
     expect(data.bsffs.edges.length).toBe(0);
+  });
+
+  it("should list the fiche d'interventions", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const bsffId = getReadableId(ReadableIdPrefix.FF);
+    const ficheInterventionNumero = "0000001";
+    await createBsff(
+      {
+        emitter,
+        ficheInterventions: [
+          {
+            id: getFicheInterventionId(bsffId, ficheInterventionNumero),
+            numero: ficheInterventionNumero,
+            kilos: 2,
+            ownerCompanyName: "Acme",
+            ownerCompanySiret: "1".repeat(14),
+            ownerCompanyAddress: "12 rue de la Tige, 69000",
+            ownerCompanyMail: "contact@gmail.com",
+            ownerCompanyPhone: "06",
+            ownerCompanyContact: "Jeanne Michelin",
+            postalCode: "69000"
+          }
+        ]
+      },
+      { id: bsffId }
+    );
+
+    const { query } = makeClient(emitter.user);
+    const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+      GET_BSFFS
+    );
+
+    expect(data.bsffs.edges[0].node).toEqual(
+      expect.objectContaining({
+        ficheInterventions: [
+          {
+            numero: ficheInterventionNumero
+          }
+        ]
+      })
+    );
   });
 });
