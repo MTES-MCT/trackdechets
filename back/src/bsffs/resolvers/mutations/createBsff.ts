@@ -17,10 +17,12 @@ const createBsff: MutationResolvers["createBsff"] = async (
 
   await isBsffContributor(user, flatInput);
 
-  if (flatInput.bsffs) {
+  if (input.bsffs?.length > 0) {
     const bsffs = await prisma.bsff.findMany({
       where: {
-        OR: flatInput.bsffs.connect
+        id: {
+          in: input.bsffs
+        }
       }
     });
 
@@ -49,6 +51,10 @@ const createBsff: MutationResolvers["createBsff"] = async (
         `Les bordereaux à associer ont déclaré des traitements qui divergent et ne peuvent pas être listés sur un même bordereau`
       );
     }
+
+    flatInput.bsffs = {
+      connect: input.bsffs.map(id => ({ id }))
+    };
   }
 
   const bsff = await prisma.bsff.create({

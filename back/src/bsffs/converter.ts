@@ -58,12 +58,7 @@ export function flattenBsffInput(
     destinationOperationQualification:
       bsffInput.destination?.operation?.qualification,
 
-    destinationCap: bsffInput.destination?.cap,
-
-    bsffs:
-      bsffInput.bsffs?.length > 0
-        ? { connect: bsffInput.bsffs.map(id => ({ id })) }
-        : undefined
+    destinationCap: bsffInput.destination?.cap
   });
 }
 
