@@ -1,10 +1,12 @@
-import { UserRole } from ".prisma/client";
+import { Bsff, BsffFicheIntervention, UserRole } from ".prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import { Query, QueryBsffsArgs } from "../../../../generated/graphql/types";
+import prisma from "../../../../prisma";
 import {
   userWithCompanyFactory,
-  companyAssociatedToExistingUserFactory
+  companyAssociatedToExistingUserFactory,
+  UserWithCompany
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { OPERATION_CODES, OPERATION_QUALIFICATIONS } from "../../../constants";
@@ -25,6 +27,13 @@ const GET_BSFFS = `
           }
           bsffs {
             id
+            ficheInterventions {
+              owner {
+                company {
+                  siret
+                }
+              }
+            }
           }
         }
       }
@@ -275,32 +284,121 @@ describe("Query.bsffs", () => {
     expect(data.bsffs.edges.length).toBe(1);
   });
 
-  it("should list the associated bsffs", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+  describe("when listing the associated bsffs", () => {
+    let emitter: UserWithCompany;
+    let transporter: UserWithCompany;
+    let destination: UserWithCompany;
+    let associatedBsff: Bsff;
+    let associatedBsffFicheIntervention: BsffFicheIntervention;
 
-    const associatedBsff = await createBsffAfterOperation(
-      { emitter, transporter, destination },
-      {
-        destinationOperationCode: OPERATION_CODES.R12,
-        destinationOperationQualification: OPERATION_QUALIFICATIONS.GROUPEMENT
-      }
-    );
-    await createBsff(
-      { emitter, transporter, destination },
-      { bsffs: { connect: [{ id: associatedBsff.id }] } }
-    );
+    beforeEach(async () => {
+      emitter = await userWithCompanyFactory(UserRole.ADMIN);
+      transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      destination = await userWithCompanyFactory(UserRole.ADMIN);
 
-    const { query } = makeClient(emitter.user);
-    const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
-      GET_BSFFS
-    );
+      const bsffId = getReadableId(ReadableIdPrefix.FF);
+      const ficheInterventionNumero = "00001";
+      const ficheInterventionId = getFicheInterventionId(
+        bsffId,
+        ficheInterventionNumero
+      );
+      associatedBsff = await createBsffAfterOperation(
+        {
+          emitter,
+          transporter,
+          destination,
+          ficheInterventions: [
+            {
+              id: ficheInterventionId,
+              numero: ficheInterventionNumero,
+              kilos: 2,
+              postalCode: "69000",
+              ownerCompanyName: "Acme",
+              ownerCompanySiret: "1".repeat(14),
+              ownerCompanyAddress: "12 rue Albert Lyon 69000",
+              ownerCompanyContact: "Carla Brownie",
+              ownerCompanyMail: "carla.brownie@gmail.com",
+              ownerCompanyPhone: "06"
+            }
+          ]
+        },
+        {
+          id: bsffId,
+          destinationOperationCode: OPERATION_CODES.R12,
+          destinationOperationQualification: OPERATION_QUALIFICATIONS.GROUPEMENT
+        }
+      );
+      associatedBsffFicheIntervention = await prisma.bsffFicheIntervention.findUnique(
+        { where: { id: ficheInterventionId } }
+      );
+    });
 
-    expect(data.bsffs.edges[0].node.bsffs).toEqual([
-      expect.objectContaining({
-        id: associatedBsff.id
-      })
-    ]);
+    it("should list the associated bsffs", async () => {
+      await createBsff(
+        { emitter, transporter, destination },
+        { bsffs: { connect: [{ id: associatedBsff.id }] } }
+      );
+
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+        GET_BSFFS
+      );
+
+      expect(data.bsffs.edges[0].node.bsffs).toEqual([
+        expect.objectContaining({
+          id: associatedBsff.id
+        })
+      ]);
+    });
+
+    it("should show the owner from the fiche d'interventions to companies on the bsff", async () => {
+      await createBsff(
+        { emitter, transporter, destination },
+        { bsffs: { connect: [{ id: associatedBsff.id }] } }
+      );
+
+      const { query } = makeClient(destination.user);
+      const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+        GET_BSFFS
+      );
+
+      expect(data.bsffs.edges[0].node.bsffs).toEqual([
+        expect.objectContaining({
+          ficheInterventions: [
+            {
+              owner: {
+                company: {
+                  siret: associatedBsffFicheIntervention.ownerCompanySiret
+                }
+              }
+            }
+          ]
+        })
+      ]);
+    });
+
+    it("should not show the owner from the fiche d'interventions to companies not on the bsff", async () => {
+      const newDestination = await userWithCompanyFactory(UserRole.ADMIN);
+
+      await createBsff(
+        { emitter: destination, transporter, destination: newDestination },
+        { bsffs: { connect: [{ id: associatedBsff.id }] } }
+      );
+
+      const { query } = makeClient(newDestination.user);
+      const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+        GET_BSFFS
+      );
+
+      expect(data.bsffs.edges[0].node.bsffs).toEqual([
+        expect.objectContaining({
+          ficheInterventions: [
+            {
+              owner: null
+            }
+          ]
+        })
+      ]);
+    });
   });
 });

@@ -7,6 +7,7 @@ import {
 } from "../../generated/graphql/types";
 import { OPERATION_CODES, OPERATION_QUALIFICATIONS } from "../constants";
 import { unflattenBsff, unflattenFicheInterventionBsff } from "../converter";
+import { isBsffContributor } from "../permissions";
 import bsffs from "./queries/bsffs";
 import createBsff from "./mutations/createBsff";
 import updateBsff from "./mutations/updateBsff";
@@ -31,13 +32,29 @@ const Mutation: MutationResolvers = {
 };
 
 const Bsff: BsffResolvers = {
-  ficheInterventions: async parent => {
+  ficheInterventions: async (parent, _, context) => {
     const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
       where: {
         bsffId: parent.id
       }
     });
-    return ficheInterventions.map(unflattenFicheInterventionBsff);
+    const unflattenedFicheInterventions = ficheInterventions.map(
+      unflattenFicheInterventionBsff
+    );
+
+    try {
+      await isBsffContributor(context.user, {
+        emitterCompanySiret: parent.emitter?.company?.siret,
+        transporterCompanySiret: parent.transporter?.company?.siret,
+        destinationCompanySiret: parent.destination?.company?.siret
+      });
+    } catch (err) {
+      unflattenedFicheInterventions.forEach(ficheIntervention => {
+        delete ficheIntervention.owner;
+      });
+    }
+
+    return unflattenedFicheInterventions;
   },
   bsffs: async parent => {
     const bsffs = await prisma.bsff.findMany({
