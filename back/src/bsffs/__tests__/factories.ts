@@ -1,3 +1,4 @@
+import { SetRequired } from "type-fest";
 import { Prisma, TransportMode } from ".prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
@@ -9,18 +10,20 @@ import {
   WASTE_CODES
 } from "../constants";
 
+interface CreateBsffArgs {
+  emitter?: UserWithCompany;
+  transporter?: UserWithCompany;
+  destination?: UserWithCompany;
+  ficheInterventions?: Prisma.BsffFicheInterventionCreateInput[];
+}
+
 export function createBsff(
   {
     emitter,
     transporter,
     destination,
     ficheInterventions
-  }: {
-    emitter?: UserWithCompany;
-    transporter?: UserWithCompany;
-    destination?: UserWithCompany;
-    ficheInterventions?: Prisma.BsffFicheInterventionCreateInput[];
-  } = {},
+  }: CreateBsffArgs = {},
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   const data = {
@@ -73,198 +76,94 @@ export function createBsff(
 }
 
 export function createBsffBeforeEmission(
-  {
-    emitter,
-    transporter,
-    destination,
-    ficheInterventions
-  }: {
-    emitter: UserWithCompany;
-    transporter?: UserWithCompany;
-    destination?: UserWithCompany;
-    ficheInterventions?: Prisma.BsffFicheInterventionCreateInput[];
-  },
+  args: SetRequired<CreateBsffArgs, "emitter">,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
-  return createBsff(
-    { emitter, transporter, destination, ficheInterventions },
-    {
-      wasteCode: WASTE_CODES[0],
-      wasteDescription: "Fluides",
-      quantityKilos: 1,
-      destinationPlannedOperationCode: OPERATION_CODES.D10,
-      destinationPlannedOperationQualification:
-        OPERATION_QUALIFICATIONS.INCINERATION,
-      ...initialData
-    }
-  );
+  return createBsff(args, {
+    wasteCode: WASTE_CODES[0],
+    wasteDescription: "Fluides",
+    quantityKilos: 1,
+    destinationPlannedOperationCode: OPERATION_CODES.D10,
+    destinationPlannedOperationQualification:
+      OPERATION_QUALIFICATIONS.INCINERATION,
+    ...initialData
+  });
 }
 
 export function createBsffAfterEmission(
-  {
-    emitter,
-    transporter,
-    destination,
-    ficheInterventions
-  }: {
-    emitter: UserWithCompany;
-    transporter?: UserWithCompany;
-    destination?: UserWithCompany;
-    ficheInterventions?: Prisma.BsffFicheInterventionCreateInput[];
-  },
+  args: SetRequired<CreateBsffArgs, "emitter">,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
-  return createBsffBeforeEmission(
-    { emitter, transporter, destination, ficheInterventions },
-    {
-      emitterEmissionSignatureAuthor: emitter.user.name,
-      emitterEmissionSignatureDate: new Date().toISOString(),
-      ...initialData
-    }
-  );
+  return createBsffBeforeEmission(args, {
+    emitterEmissionSignatureAuthor: args.emitter.user.name,
+    emitterEmissionSignatureDate: new Date().toISOString(),
+    ...initialData
+  });
 }
 
 export function createBsffBeforeTransport(
-  {
-    emitter,
-    transporter,
-    destination,
-    ficheInterventions
-  }: {
-    emitter: UserWithCompany;
-    transporter: UserWithCompany;
-    destination?: UserWithCompany;
-    ficheInterventions?: Prisma.BsffFicheInterventionCreateInput[];
-  },
+  args: SetRequired<CreateBsffArgs, "emitter" | "transporter">,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
-  return createBsffAfterEmission(
-    { emitter, transporter, destination, ficheInterventions },
-    {
-      packagings: [{ type: PACKAGING_TYPE.BOUTEILLE, numero: "01", litres: 1 }],
-      wasteAdr: "Mention ADR",
-      transporterTransportMode: TransportMode.ROAD,
-      ...initialData
-    }
-  );
+  return createBsffAfterEmission(args, {
+    packagings: [{ type: PACKAGING_TYPE.BOUTEILLE, numero: "01", litres: 1 }],
+    wasteAdr: "Mention ADR",
+    transporterTransportMode: TransportMode.ROAD,
+    ...initialData
+  });
 }
 
 export function createBsffAfterTransport(
-  {
-    emitter,
-    transporter,
-    destination,
-    ficheInterventions
-  }: {
-    emitter: UserWithCompany;
-    transporter: UserWithCompany;
-    destination?: UserWithCompany;
-    ficheInterventions?: Prisma.BsffFicheInterventionCreateInput[];
-  },
+  args: SetRequired<CreateBsffArgs, "emitter" | "transporter">,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
-  return createBsffBeforeTransport(
-    { emitter, transporter, destination, ficheInterventions },
-    {
-      transporterTransportSignatureAuthor: transporter.user.name,
-      transporterTransportSignatureDate: new Date().toISOString(),
-      ...initialData
-    }
-  );
+  return createBsffBeforeTransport(args, {
+    transporterTransportSignatureAuthor: args.transporter.user.name,
+    transporterTransportSignatureDate: new Date().toISOString(),
+    ...initialData
+  });
 }
 
 export function createBsffBeforeReception(
-  {
-    emitter,
-    transporter,
-    destination,
-    ficheInterventions
-  }: {
-    emitter: UserWithCompany;
-    transporter: UserWithCompany;
-    destination: UserWithCompany;
-    ficheInterventions?: Prisma.BsffFicheInterventionCreateInput[];
-  },
+  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
-  return createBsffBeforeTransport(
-    { emitter, transporter, destination, ficheInterventions },
-    {
-      destinationReceptionDate: new Date().toISOString(),
-      destinationReceptionKilos: 1,
-      ...initialData
-    }
-  );
+  return createBsffBeforeTransport(args, {
+    destinationReceptionDate: new Date().toISOString(),
+    destinationReceptionKilos: 1,
+    ...initialData
+  });
 }
 
 export function createBsffAfterReception(
-  {
-    emitter,
-    transporter,
-    destination,
-    ficheInterventions
-  }: {
-    emitter: UserWithCompany;
-    transporter: UserWithCompany;
-    destination: UserWithCompany;
-    ficheInterventions?: Prisma.BsffFicheInterventionCreateInput[];
-  },
+  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
-  return createBsffBeforeReception(
-    { emitter, transporter, destination, ficheInterventions },
-    {
-      destinationReceptionSignatureAuthor: destination.user.name,
-      destinationReceptionSignatureDate: new Date().toISOString(),
-      ...initialData
-    }
-  );
+  return createBsffBeforeReception(args, {
+    destinationReceptionSignatureAuthor: args.destination.user.name,
+    destinationReceptionSignatureDate: new Date().toISOString(),
+    ...initialData
+  });
 }
 
 export function createBsffBeforeOperation(
-  {
-    emitter,
-    transporter,
-    destination,
-    ficheInterventions
-  }: {
-    emitter: UserWithCompany;
-    transporter: UserWithCompany;
-    destination: UserWithCompany;
-    ficheInterventions?: Prisma.BsffFicheInterventionCreateInput[];
-  },
+  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
-  return createBsffAfterReception(
-    { emitter, transporter, destination, ficheInterventions },
-    {
-      destinationOperationCode: OPERATION_CODES.D10,
-      destinationOperationQualification: OPERATION_QUALIFICATIONS.INCINERATION,
-      ...initialData
-    }
-  );
+  return createBsffAfterReception(args, {
+    destinationOperationCode: OPERATION_CODES.D10,
+    destinationOperationQualification: OPERATION_QUALIFICATIONS.INCINERATION,
+    ...initialData
+  });
 }
 
 export function createBsffAfterOperation(
-  {
-    emitter,
-    transporter,
-    destination,
-    ficheInterventions
-  }: {
-    emitter: UserWithCompany;
-    transporter: UserWithCompany;
-    destination: UserWithCompany;
-    ficheInterventions?: Prisma.BsffFicheInterventionCreateInput[];
-  },
+  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
-  return createBsffAfterReception(
-    { emitter, transporter, destination, ficheInterventions },
-    {
-      destinationOperationSignatureAuthor: destination.user.name,
-      destinationOperationSignatureDate: new Date().toISOString(),
-      ...initialData
-    }
-  );
+  return createBsffAfterReception(args, {
+    destinationOperationSignatureAuthor: args.destination.user.name,
+    destinationOperationSignatureDate: new Date().toISOString(),
+    ...initialData
+  });
 }
