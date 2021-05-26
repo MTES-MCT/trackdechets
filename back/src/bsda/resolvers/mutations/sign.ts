@@ -34,7 +34,7 @@ export default async function sign(
   // - be part of that company
   // - provide the company security code
   await checkAuthorization(
-    { curretUserId: user.id, securityCode: input.securityCode },
+    { currentUserId: user.id, securityCode: input.securityCode },
     signatureTypeInfos.getAuthorizedSiret(prismaForm)
   );
 
@@ -105,7 +105,7 @@ const signatureTypeMapping: Record<BsdaSignatureType, SignatureTypeInfos> = {
 };
 
 function checkAuthorization(
-  requestInfo: { curretUserId: string; securityCode?: number },
+  requestInfo: { currentUserId: string; securityCode?: number },
   signingCompanySiret: string
 ) {
   // If there is a security code provided, it must be authorized
@@ -114,7 +114,7 @@ function checkAuthorization(
   }
 
   return checkIsCompanyMember(
-    { id: requestInfo.curretUserId },
+    { id: requestInfo.currentUserId },
     { siret: signingCompanySiret }
   );
 }
