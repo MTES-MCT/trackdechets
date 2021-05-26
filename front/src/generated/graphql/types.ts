@@ -113,6 +113,293 @@ export type BrokerReceipt = {
 
 export type Bsd = Form | Bsdasri | Bsvhu;
 
+export type Bsda = {
+  __typename?: "Bsda";
+  /** Bordereau n° */
+  id: Scalars["String"];
+  /** Date de création */
+  createdAt: Scalars["DateTime"];
+  /** Date de dernière modification */
+  updatedAt: Scalars["DateTime"];
+  /** Indique si le bordereau est à l'état de brouillon */
+  isDraft: Scalars["Boolean"];
+  /** Statur du bordereau */
+  status: BsdaStatus;
+  /**
+   * Type de bordereau
+   * Le type de bordereau impacte le workflow et les champs obligatoires
+   */
+  type?: Maybe<BsdaType>;
+  /** Maitre d'ouvrage ou détenteur du déchet */
+  emitter?: Maybe<BsdaEmitter>;
+  /** Dénomination du déchet */
+  waste?: Maybe<BsdaWaste>;
+  /** Conditionnement */
+  packagings?: Maybe<Array<BsdaPackaging>>;
+  /** Quantité */
+  quantity?: Maybe<BsdaQuantity>;
+  /** Installation de destination */
+  destination?: Maybe<BsdaDestination>;
+  /** Entreprise de travaux */
+  worker?: Maybe<BsdaWorker>;
+  /** Entreprise de transport */
+  transporter?: Maybe<BsdaTransporter>;
+  /** Précedents BSDA associés, constituant l'historique de traçabilité */
+  associations?: Maybe<Array<Maybe<BsdaAssociation>>>;
+};
+
+export enum BsdaAcceptationStatus {
+  Accepted = "ACCEPTED",
+  Refused = "REFUSED",
+  PartiallyRefused = "PARTIALLY_REFUSED"
+}
+
+export type BsdaAssociation = {
+  __typename?: "BsdaAssociation";
+  id: Scalars["ID"];
+  status: BsdaStatus;
+};
+
+export type BsdaCompanyWhere = {
+  siret: Scalars["String"];
+};
+
+export type BsdaConnection = {
+  __typename?: "BsdaConnection";
+  totalCount: Scalars["Int"];
+  pageInfo: PageInfo;
+  edges: Array<BsdaEdge>;
+};
+
+export enum BsdaConsistence {
+  Solide = "SOLIDE",
+  Pulverulent = "PULVERULENT",
+  Other = "OTHER"
+}
+
+export type BsdaDestination = {
+  __typename?: "BsdaDestination";
+  /** Établissement de destination */
+  company?: Maybe<FormCompany>;
+  /** N° de CAP (le cas échéant) */
+  cap?: Maybe<Scalars["String"]>;
+  /** Opération d'élimination / valorisation prévue (code D/R) */
+  plannedOperationCode?: Maybe<Scalars["String"]>;
+  /** Expédition reçue à l'installation de destination */
+  reception?: Maybe<BsdaReception>;
+  /** Réalisation de l'opération (case 11) */
+  operation?: Maybe<BsdaOperation>;
+};
+
+export type BsdaDestinationInput = {
+  /** Établissement de destination */
+  company?: Maybe<CompanyInput>;
+  /** N° de CAP (le cas échéant) */
+  cap?: Maybe<Scalars["String"]>;
+  /** Opération d'élimination / valorisation prévue (code D/R) */
+  plannedOperationCode?: Maybe<Scalars["String"]>;
+  /** Expédition reçue à l'installation de destination */
+  reception?: Maybe<BsdaReceptionInput>;
+  /** Réalisation de l'opération (case 11) */
+  operation?: Maybe<BsdaOperationInput>;
+};
+
+export type BsdaDestinationWhere = {
+  company?: Maybe<BsdaCompanyWhere>;
+  operation?: Maybe<BsdaOperationWhere>;
+};
+
+export type BsdaEdge = {
+  __typename?: "BsdaEdge";
+  cursor: Scalars["String"];
+  node: Bsda;
+};
+
+export type BsdaEmission = {
+  __typename?: "BsdaEmission";
+  signature?: Maybe<Signature>;
+};
+
+export type BsdaEmissionWhere = {
+  signature?: Maybe<BsdaSignatureWhere>;
+};
+
+export type BsdaEmitter = {
+  __typename?: "BsdaEmitter";
+  /** Indique si le détenteur est un particulier ou une entreprise */
+  isPrivateIndividual?: Maybe<Scalars["Boolean"]>;
+  /** Établissement MOA/détenteur. Partiellement rempli si l'émetteur est en fait un particulier */
+  company?: Maybe<FormCompany>;
+  /** Informations chantier (si différente de l'adresse de l'entreprise) */
+  worksite?: Maybe<BsdaWorksite>;
+  /** Déclaration générale */
+  emission?: Maybe<BsdaEmission>;
+};
+
+export type BsdaEmitterInput = {
+  /** Indique si le détenteur est un particulier ou une entreprise */
+  isPrivateIndividual?: Maybe<Scalars["Boolean"]>;
+  /** Établissement MOA/détenteur. Partiellement rempli si l'émetteur est en fait un particulier */
+  company?: Maybe<CompanyInput>;
+  /** Informations chantier (si différente de l'adresse de l'entreprise) */
+  worksite?: Maybe<BsdaWorksiteInput>;
+};
+
+export type BsdaEmitterWhere = {
+  company?: Maybe<BsdaCompanyWhere>;
+  emission?: Maybe<BsdaEmissionWhere>;
+};
+
+export type BsdaInput = {
+  /**
+   * Type de bordereau
+   * Le type de bordereau impacte le workflow et les champs obligatoires
+   */
+  type?: Maybe<BsdaType>;
+  /** Maitre d'ouvrage ou détenteur du déchet */
+  emitter?: Maybe<BsdaEmitterInput>;
+  /** Dénomination du déchet */
+  waste?: Maybe<BsdaWasteInput>;
+  /** Conditionnement */
+  packagings?: Maybe<Array<BsdaPackagingInput>>;
+  /** Quantité */
+  quantity?: Maybe<BsdaQuantityInput>;
+  /** Installation de destination */
+  destination?: Maybe<BsdaDestinationInput>;
+  /** Entreprise de travaux */
+  worker?: Maybe<BsdaWorkerInput>;
+  /**  Entreprise de transport */
+  transporter?: Maybe<BsdaTransporterInput>;
+};
+
+export type BsdaOperation = {
+  __typename?: "BsdaOperation";
+  /** Code D/R */
+  code?: Maybe<Scalars["String"]>;
+  /** Date de réalisation de l'opération */
+  date?: Maybe<Scalars["DateTime"]>;
+  signature?: Maybe<Signature>;
+};
+
+export type BsdaOperationInput = {
+  /** Code D/R */
+  code?: Maybe<Scalars["String"]>;
+  /** Date de réalisation de l'opération */
+  date?: Maybe<Scalars["DateTime"]>;
+};
+
+export type BsdaOperationWhere = {
+  signature?: Maybe<BsdaSignatureWhere>;
+};
+
+export type BsdaPackaging = {
+  __typename?: "BsdaPackaging";
+  /** Type de conditionnement */
+  type: BsdaPackagingType;
+  /** Description du conditionnement dans le cas où le type de conditionnement est `AUTRE` */
+  other?: Maybe<Scalars["String"]>;
+  /** Nombre de colis associés à ce conditionnement */
+  quantity: Scalars["Int"];
+};
+
+export type BsdaPackagingInput = {
+  /** Type de conditionnement */
+  type?: Maybe<BsdaPackagingType>;
+  /** Description du conditionnement dans le cas où le type de conditionnement est `AUTRE` */
+  other?: Maybe<Scalars["String"]>;
+  /** Nombre de colis associés à ce conditionnement */
+  quantity: Scalars["Int"];
+};
+
+export enum BsdaPackagingType {
+  PaletteFilme = "PALETTE_FILME",
+  BigBag = "BIG_BAG",
+  DepotBag = "DEPOT_BAG",
+  SacRenforce = "SAC_RENFORCE",
+  BodyBenne = "BODY_BENNE",
+  Other = "OTHER"
+}
+
+export type BsdaQuantity = {
+  __typename?: "BsdaQuantity";
+  /** Type de quantité (réelle ou estimé) */
+  type?: Maybe<BsdaQuantityType>;
+  /** Quantité en tonne */
+  value?: Maybe<Scalars["Float"]>;
+};
+
+export type BsdaQuantityInput = {
+  /** Type de quantité (réelle ou estimé) */
+  type?: Maybe<BsdaQuantityType>;
+  /** Quantité en tonne */
+  value?: Maybe<Scalars["Float"]>;
+};
+
+export enum BsdaQuantityType {
+  Real = "REAL",
+  Estimated = "ESTIMATED"
+}
+
+export type BsdaRecepisse = {
+  __typename?: "BsdaRecepisse";
+  number?: Maybe<Scalars["String"]>;
+  department?: Maybe<Scalars["String"]>;
+  validityLimit?: Maybe<Scalars["DateTime"]>;
+};
+
+export type BsdaRecepisseInput = {
+  number?: Maybe<Scalars["String"]>;
+  department?: Maybe<Scalars["String"]>;
+  validityLimit?: Maybe<Scalars["DateTime"]>;
+};
+
+export type BsdaReception = {
+  __typename?: "BsdaReception";
+  /** Date de présentation sur site */
+  date?: Maybe<Scalars["DateTime"]>;
+  /** Quantité présentée */
+  quantity?: Maybe<BsdaQuantity>;
+  /** Lot accepté, accepté partiellement ou refusé */
+  acceptationStatus?: Maybe<BsdaAcceptationStatus>;
+  /** Motif de refus */
+  refusalReason?: Maybe<Scalars["String"]>;
+  /** Signature case 10 */
+  signature?: Maybe<Signature>;
+};
+
+export type BsdaReceptionInput = {
+  /** Date de présentation sur site */
+  date?: Maybe<Scalars["DateTime"]>;
+  /** Quantité présentée */
+  quantity?: Maybe<BsdaQuantityInput>;
+  /** Lot accepté, accepté partiellement ou refusé */
+  acceptationStatus?: Maybe<BsdaAcceptationStatus>;
+  /** Motif de refus */
+  refusalReason?: Maybe<Scalars["String"]>;
+};
+
+export type BsdaSignatureInput = {
+  /** Type de signature apposé */
+  type: BsdaSignatureType;
+  /** Date de la signature */
+  date?: Maybe<Scalars["DateTime"]>;
+  /** Nom et prénom du signataire */
+  author: Scalars["String"];
+  /** Code de sécurité de l'entreprise pour laquelle on signe. Permet de signer en tant que. Optionnel */
+  securityCode?: Maybe<Scalars["Int"]>;
+};
+
+export enum BsdaSignatureType {
+  Emission = "EMISSION",
+  Work = "WORK",
+  Transport = "TRANSPORT",
+  Operation = "OPERATION"
+}
+
+export type BsdaSignatureWhere = {
+  date: DateFilter;
+};
+
 /** Bordereau Bsdasri */
 export type Bsdasri = {
   __typename?: "Bsdasri";
@@ -503,6 +790,170 @@ export type BsdasriWhere = {
   _and?: Maybe<Array<BsdasriWhere>>;
   _or?: Maybe<Array<BsdasriWhere>>;
   _not?: Maybe<Array<BsdasriWhere>>;
+};
+
+export enum BsdaStatus {
+  Initial = "INITIAL",
+  SignedByProducer = "SIGNED_BY_PRODUCER",
+  SignedByWorker = "SIGNED_BY_WORKER",
+  Sent = "SENT",
+  Processed = "PROCESSED",
+  Refused = "REFUSED",
+  AwaitingChild = "AWAITING_CHILD"
+}
+
+export type BsdaTransport = {
+  __typename?: "BsdaTransport";
+  signature?: Maybe<Signature>;
+};
+
+export type BsdaTransporter = {
+  __typename?: "BsdaTransporter";
+  /** Coordonnées de l'entreprise de transport */
+  company?: Maybe<FormCompany>;
+  /** Récépissé transporteur */
+  recepisse?: Maybe<BsdaRecepisse>;
+  /** Déclaration générale */
+  transport?: Maybe<BsdaTransport>;
+};
+
+export type BsdaTransporterInput = {
+  /** Entreprise de transport */
+  company?: Maybe<CompanyInput>;
+  recepisse?: Maybe<BsdaRecepisseInput>;
+};
+
+export type BsdaTransporterWhere = {
+  company?: Maybe<BsdaCompanyWhere>;
+  transport?: Maybe<BsdaTransportWhere>;
+};
+
+export type BsdaTransportWhere = {
+  signature?: Maybe<BsdaSignatureWhere>;
+};
+
+/**
+ * 4 types de bordereaux possibles:
+ *   - Collecte dans un établissement 2710-1 (déchetterie)
+ *   - Autres collectes
+ *   - Regroupement
+ *   - Ré-expédition
+ */
+export enum BsdaType {
+  Collection_2710 = "COLLECTION_2710",
+  OtherCollections = "OTHER_COLLECTIONS",
+  Gathering = "GATHERING",
+  Reshipment = "RESHIPMENT"
+}
+
+export type BsdaWaste = {
+  __typename?: "BsdaWaste";
+  /** Rubrique Déchet */
+  code?: Maybe<Scalars["String"]>;
+  /** Dénomination usuelle */
+  name?: Maybe<Scalars["String"]>;
+  /** Code famille */
+  familyCode?: Maybe<Scalars["String"]>;
+  /** Nom du matériau */
+  materialName?: Maybe<Scalars["String"]>;
+  /** Consistence */
+  consistence?: Maybe<BsdaConsistence>;
+  /** Numéros de scellés */
+  sealNumbers?: Maybe<Array<Scalars["String"]>>;
+  /** Mention ADR */
+  adr?: Maybe<Scalars["String"]>;
+};
+
+export type BsdaWasteInput = {
+  /** Rubrique Déchet */
+  code?: Maybe<Scalars["String"]>;
+  /** Dénomination usuelle */
+  name?: Maybe<Scalars["String"]>;
+  /** Code famille */
+  familyCode?: Maybe<Scalars["String"]>;
+  /** Nom du matériau */
+  materialName?: Maybe<Scalars["String"]>;
+  /** Consistence */
+  consistence?: Maybe<BsdaConsistence>;
+  /** Numéros de scellés */
+  sealNumbers?: Maybe<Array<Scalars["String"]>>;
+  /** Mention ADR */
+  adr?: Maybe<Scalars["String"]>;
+};
+
+export type BsdaWhere = {
+  isDraft?: Maybe<Scalars["Boolean"]>;
+  status?: Maybe<BsdaStatus>;
+  createdAt?: Maybe<DateFilter>;
+  updatedAt?: Maybe<DateFilter>;
+  emitter?: Maybe<BsdaEmitterWhere>;
+  worker?: Maybe<BsdaWorkerWhere>;
+  transporter?: Maybe<BsdaTransporterWhere>;
+  destination?: Maybe<BsdaDestinationWhere>;
+  _and?: Maybe<Array<BsdaWhere>>;
+  _or?: Maybe<Array<BsdaWhere>>;
+  _not?: Maybe<Array<BsdaWhere>>;
+};
+
+export type BsdaWork = {
+  __typename?: "BsdaWork";
+  /**
+   * Indique si l'entreprise de travaux a une signature papier du MOA/détenteur du déchet
+   * Remettre une signature papier permet au détenteur de ne pas à avoir à signer sur la plateforme
+   */
+  hasEmitterPaperSignature?: Maybe<Scalars["Boolean"]>;
+  signature?: Maybe<Signature>;
+};
+
+export type BsdaWorker = {
+  __typename?: "BsdaWorker";
+  /** Entreprise de travaux */
+  company?: Maybe<FormCompany>;
+  /** Déclaration générale */
+  work?: Maybe<BsdaWork>;
+};
+
+export type BsdaWorkerInput = {
+  /** Entreprise de travaux */
+  company?: Maybe<CompanyInput>;
+  /** Déclaration générale */
+  work?: Maybe<BsdaWorkInput>;
+};
+
+export type BsdaWorkerWhere = {
+  company?: Maybe<BsdaCompanyWhere>;
+  work?: Maybe<BsdaWorkWhere>;
+};
+
+export type BsdaWorkInput = {
+  /**
+   * Indique si l'entreprise de travaux a une signature papier du MOA/détenteur du déchet
+   * Remettre une signature papier permet au détenteur de ne pas à avoir à signer sur la plateforme
+   */
+  hasEmitterPaperSignature?: Maybe<Scalars["Boolean"]>;
+};
+
+export type BsdaWorksite = {
+  __typename?: "BsdaWorksite";
+  name?: Maybe<Scalars["String"]>;
+  address?: Maybe<Scalars["String"]>;
+  city?: Maybe<Scalars["String"]>;
+  postalCode?: Maybe<Scalars["String"]>;
+  /** Autres informations, notamment le code chantier */
+  infos?: Maybe<Scalars["String"]>;
+};
+
+export type BsdaWorksiteInput = {
+  name?: Maybe<Scalars["String"]>;
+  address?: Maybe<Scalars["String"]>;
+  city?: Maybe<Scalars["String"]>;
+  postalCode?: Maybe<Scalars["String"]>;
+  /** Autres informations, notamment le code chantier */
+  infos?: Maybe<Scalars["String"]>;
+};
+
+export type BsdaWorkWhere = {
+  signature?: Maybe<BsdaSignatureWhere>;
 };
 
 export type BsdConnection = {
@@ -2172,6 +2623,11 @@ export type Mutation = {
   createBrokerReceipt?: Maybe<BrokerReceipt>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Crée un Bsda
+   */
+  createBsda?: Maybe<Bsda>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Crée un nouveau dasri
    */
   createBsdasri: Bsdasri;
@@ -2187,6 +2643,11 @@ export type Mutation = {
    * Rattache un établissement à l'utilisateur authentifié
    */
   createCompany: CompanyPrivate;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Crée un Bsda en brouillon
+   */
+  createDraftBsda?: Maybe<Bsda>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Crée un nouveau dasri en brouillon
@@ -2263,6 +2724,11 @@ export type Mutation = {
    * Supprime un agrément VHU
    */
   deleteVhuAgrement?: Maybe<VhuAgrement>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Duplique un Bsda
+   */
+  duplicateBsda?: Maybe<Bsda>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Duplique un bordereau Dasri
@@ -2391,6 +2857,11 @@ export type Mutation = {
   prepareSegment?: Maybe<TransportSegment>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Permet de publier un brouillon pour le marquer comme prêt à être envoyé
+   */
+  publishBsda?: Maybe<Bsda>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Marque un dasri brouillon comme publié (isDraft=false)
    */
   publishBsdasri?: Maybe<Bsdasri>;
@@ -2437,6 +2908,11 @@ export type Mutation = {
    */
   sendMembershipRequest?: Maybe<MembershipRequest>;
   sendVerificationCodeLetter: CompanyForVerification;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Signe un Bsda
+   */
+  signBsda?: Maybe<Bsda>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Appose une signature sur un Bsdasri, verrouille les cadres correspondant
@@ -2489,6 +2965,11 @@ export type Mutation = {
    * Édite les informations d'un récépissé courtier
    */
   updateBrokerReceipt?: Maybe<BrokerReceipt>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Met à jour un Bsda
+   */
+  updateBsda?: Maybe<Bsda>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Met à jour un dasri existant
@@ -2559,6 +3040,10 @@ export type MutationCreateBrokerReceiptArgs = {
   input: CreateBrokerReceiptInput;
 };
 
+export type MutationCreateBsdaArgs = {
+  input: BsdaInput;
+};
+
 export type MutationCreateBsdasriArgs = {
   bsdasriCreateInput: BsdasriCreateInput;
 };
@@ -2573,6 +3058,10 @@ export type MutationCreateBsvhuArgs = {
 
 export type MutationCreateCompanyArgs = {
   companyInput: PrivateCompanyInput;
+};
+
+export type MutationCreateDraftBsdaArgs = {
+  input: BsdaInput;
 };
 
 export type MutationCreateDraftBsdasriArgs = {
@@ -2644,6 +3133,10 @@ export type MutationDeleteTransporterReceiptArgs = {
 
 export type MutationDeleteVhuAgrementArgs = {
   input: DeleteVhuAgrementInput;
+};
+
+export type MutationDuplicateBsdaArgs = {
+  id: Scalars["ID"];
 };
 
 export type MutationDuplicateBsdasriArgs = {
@@ -2745,6 +3238,10 @@ export type MutationPrepareSegmentArgs = {
   nextSegmentInfo: NextSegmentInfoInput;
 };
 
+export type MutationPublishBsdaArgs = {
+  id: Scalars["ID"];
+};
+
 export type MutationPublishBsdasriArgs = {
   id: Scalars["ID"];
 };
@@ -2787,6 +3284,11 @@ export type MutationSendVerificationCodeLetterArgs = {
   input: SendVerificationCodeLetterInput;
 };
 
+export type MutationSignBsdaArgs = {
+  id: Scalars["ID"];
+  input: BsdaSignatureInput;
+};
+
 export type MutationSignBsdasriArgs = {
   id: Scalars["ID"];
   signatureInput: BsdasriSignatureInput;
@@ -2825,6 +3327,11 @@ export type MutationTakeOverSegmentArgs = {
 
 export type MutationUpdateBrokerReceiptArgs = {
   input: UpdateBrokerReceiptInput;
+};
+
+export type MutationUpdateBsdaArgs = {
+  id: Scalars["ID"];
+  input: BsdaInput;
 };
 
 export type MutationUpdateBsdasriArgs = {
@@ -3048,6 +3555,10 @@ export type Query = {
   /** Renvoie des BSD candidats à un regroupement dans une annexe 2 */
   appendixForms: Array<Form>;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
+  bsda: Bsda;
+  /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
+  bsdas: BsdaConnection;
+  /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsdasri: Bsdasri;
   /**
    * Renvoie un token pour télécharger un pdf de bordereau
@@ -3167,6 +3678,20 @@ export type Query = {
 export type QueryAppendixFormsArgs = {
   siret: Scalars["String"];
   wasteCode?: Maybe<Scalars["String"]>;
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsdaArgs = {
+  id: Scalars["ID"];
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsdasArgs = {
+  after?: Maybe<Scalars["ID"]>;
+  first?: Maybe<Scalars["Int"]>;
+  before?: Maybe<Scalars["ID"]>;
+  last?: Maybe<Scalars["Int"]>;
+  where?: Maybe<BsdaWhere>;
 };
 
 /** Views of the Company ressource for the admin panel */

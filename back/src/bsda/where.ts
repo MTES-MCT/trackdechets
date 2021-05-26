@@ -1,11 +1,12 @@
 import { Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { safeInput } from "../forms/form-converter";
-import { BsvhuWhere, DateFilter } from "../generated/graphql/types";
+import { BsdaWhere } from "../generated/graphql/types";
+import { toPrismaDateFilter } from "../vhu/where";
 
 export function convertWhereToDbFilter(
-  where: BsvhuWhere
-): Prisma.BsvhuWhereInput {
+  where: BsdaWhere
+): Prisma.BsdaWhereInput {
   if (!where) {
     return {};
   }
@@ -28,8 +29,8 @@ export function convertWhereToDbFilter(
   });
 }
 
-function toPrismaFilter(where: Omit<BsvhuWhere, "_or" | "_and" | "_not">) {
-  return safeInput<Prisma.BsvhuWhereInput>({
+function toPrismaFilter(where: Omit<BsdaWhere, "_or" | "_and" | "_not">) {
+  return safeInput<Prisma.BsdaWhereInput>({
     createdAt: toPrismaDateFilter(where.createdAt),
     updatedAt: toPrismaDateFilter(where.updatedAt),
     transporterCompanySiret: where.transporter?.company?.siret,
@@ -44,23 +45,11 @@ function toPrismaFilter(where: Omit<BsvhuWhere, "_or" | "_and" | "_not">) {
     destinationOperationSignatureDate: toPrismaDateFilter(
       where.destination?.operation?.signature?.date
     ),
+    workerCompanySiret: where.worker?.company?.siret,
+    workerWorkSignatureDate: toPrismaDateFilter(
+      where.worker?.work?.signature?.date
+    ),
     status: where.status,
     isDraft: where.isDraft
-  });
-}
-
-export function toPrismaDateFilter(
-  dateFilter: DateFilter | undefined
-): Prisma.DateTimeFilter {
-  if (!dateFilter) {
-    return undefined;
-  }
-
-  return safeInput<Prisma.DateTimeFilter>({
-    gt: dateFilter._gt,
-    gte: dateFilter._gte,
-    lt: dateFilter._lt,
-    lte: dateFilter._lte,
-    equals: dateFilter._eq
   });
 }

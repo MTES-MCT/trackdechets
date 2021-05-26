@@ -58,7 +58,7 @@ export class CountryNotFound extends UserInputError {
 
 export class InvaliSecurityCode extends ForbiddenError {
   constructor() {
-    super("Le code de signature de l'émetteur du bordereau est invalide.");
+    super("Le code de signature est invalide.");
   }
 }
 

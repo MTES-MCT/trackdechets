@@ -6,6 +6,12 @@ export class AlreadySignedError extends UserInputError {
   }
 }
 
+export class InvalidSignatureError extends UserInputError {
+  constructor() {
+    super("Vous ne pouvez pas apposer cette signature sur le bordereau.");
+  }
+}
+
 export class SealedFieldsError extends ForbiddenError {
   constructor(fields) {
     super(

@@ -1,17 +1,16 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationUpdateBsvhuArgs } from "../../../generated/graphql/types";
+import { MutationUpdateBsdaArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
-import { expandVhuFormFromDb, flattenVhuInput } from "../../converter";
+import { SealedFieldsError } from "../../../vhu/errors";
+import { expandBsdaFormFromDb, flattenBsdaInput } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
-import { getNotEditableKeys } from "../../edition-rules";
-import { SealedFieldsError } from "../../errors";
 import { checkIsFormContributor } from "../../permissions";
-import { validateBsvhu } from "../../validation";
-import { indexBsvhu } from "../../elastic";
+import { validateBsda } from "../../validation";
+
 export default async function edit(
   _,
-  { id, input }: MutationUpdateBsvhuArgs,
+  { id, input }: MutationUpdateBsdaArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
@@ -23,12 +22,12 @@ export default async function edit(
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  const invalidKeys = getNotEditableKeys(input, prismaForm);
+  const invalidKeys = []; // TODO getNotEditableKeys(input, prismaForm);
   if (invalidKeys.length) {
     throw new SealedFieldsError(invalidKeys);
   }
 
-  const formUpdate = flattenVhuInput(input);
+  const formUpdate = flattenBsdaInput(input);
 
   const resultingForm = { ...prismaForm, ...formUpdate };
   await checkIsFormContributor(
@@ -37,17 +36,17 @@ export default async function edit(
     "Vous ne pouvez pas enlever votre établissement du bordereau"
   );
 
-  await validateBsvhu(resultingForm, {
+  await validateBsda(resultingForm, {
     emissionSignature: prismaForm.emitterEmissionSignatureAuthor != null,
+    workSignature: prismaForm.workerWorkSignatureAuthor != null,
     operationSignature: prismaForm.destinationOperationSignatureAuthor != null,
     transportSignature: prismaForm.transporterTransportSignatureAuthor != null
   });
 
-  const updatedForm = await prisma.bsvhu.update({
+  const updatedForm = await prisma.bsda.update({
     where: { id },
     data: formUpdate
   });
 
-  await indexBsvhu(updatedForm);
-  return expandVhuFormFromDb(updatedForm);
+  return expandBsdaFormFromDb(updatedForm);
 }
