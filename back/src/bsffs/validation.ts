@@ -1,7 +1,10 @@
 import * as yup from "yup";
+import { UserInputError } from "apollo-server-express";
 import { Bsff, TransportMode, BsffFicheIntervention } from ".prisma/client";
+import prisma from "../prisma";
 import { BsffPackaging, BsffPackagingType } from "../generated/graphql/types";
 import {
+  GROUPING_CODES,
   OPERATION_CODES,
   OPERATION_QUALIFICATIONS,
   PACKAGING_TYPE,
@@ -331,3 +334,39 @@ export const ficheInterventionSchema: yup.SchemaOf<Pick<
       "L'addresse email de l'entreprise du lieu d'intervention est requis"
     )
 });
+
+export async function canAssociateBsffs(ids: string[]) {
+  const bsffs = await prisma.bsff.findMany({
+    where: {
+      id: {
+        in: ids
+      }
+    }
+  });
+
+  if (
+    bsffs.some(
+      bsff =>
+        !GROUPING_CODES.includes(bsff.destinationOperationCode) &&
+        bsff.destinationOperationQualification !==
+          OPERATION_QUALIFICATIONS.REEXPEDITION
+    )
+  ) {
+    throw new UserInputError(
+      `Les bordereaux à associer ont déclaré un traitement qui ne permet pas de leur donner suite`
+    );
+  }
+
+  if (
+    bsffs.some(
+      bsff =>
+        bsff.destinationOperationCode !== bsffs[0].destinationOperationCode ||
+        bsff.destinationOperationQualification !==
+          bsffs[0].destinationOperationQualification
+    )
+  ) {
+    throw new UserInputError(
+      `Les bordereaux à associer ont déclaré des traitements qui divergent et ne peuvent pas être listés sur un même bordereau`
+    );
+  }
+}
