@@ -1,3 +1,4 @@
+import { Prisma } from ".prisma/client";
 import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -18,7 +19,7 @@ const createBsff: MutationResolvers["createBsff"] = async (
 
   if (input.bsffs?.length > 0) {
     await canAssociateBsffs(input.bsffs);
-    flatInput.bsffs = {
+    (flatInput as Prisma.BsffCreateInput).bsffs = {
       connect: input.bsffs.map(id => ({ id }))
     };
   }
