@@ -22,7 +22,7 @@ const addFicheInterventionBsff: MutationResolvers["addFicheInterventionBsff"] = 
 
   if (bsff.emitterEmissionSignatureDate) {
     throw new UserInputError(
-      `Il n'est pas possible d'éditer une fiche d'intervention après la signature de l'émetteur`
+      `Il n'est pas possible d'ajouter une fiche d'intervention après la signature de l'émetteur`
     );
   }
 

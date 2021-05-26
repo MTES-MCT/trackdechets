@@ -195,7 +195,7 @@ describe("Mutation.deleteFicheInterventionBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Il n'est pas possible d'éditer une fiche d'intervention après la signature de l'émetteur`
+        message: `Il n'est pas possible de supprimer une fiche d'intervention après la signature de l'émetteur`
       })
     ]);
   });
