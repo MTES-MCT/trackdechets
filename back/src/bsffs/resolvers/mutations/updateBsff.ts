@@ -1,11 +1,13 @@
 import { UserInputError } from "apollo-server-express";
 import omit from "object.omit";
+import { Prisma } from ".prisma/client";
 import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound } from "../../database";
 import { flattenBsffInput, unflattenBsff } from "../../converter";
 import { isBsffContributor } from "../../permissions";
+import { canAssociateBsffs } from "../../validation";
 
 const updateBsff: MutationResolvers["updateBsff"] = async (
   _,
@@ -76,11 +78,16 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   await isBsffContributor(user, { ...existingBsff, ...data });
 
+  if (input.bsffs?.length > 0) {
+    await canAssociateBsffs(input.bsffs);
+    (data as Prisma.BsffUpdateInput).bsffs = {
+      set: input.bsffs.map(id => ({ id }))
+    };
+  }
+
   const bsff = await prisma.bsff.update({
-    data: data,
-    where: {
-      id
-    }
+    data,
+    where: { id }
   });
   return {
     ...unflattenBsff(bsff),

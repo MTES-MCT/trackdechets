@@ -5,7 +5,7 @@ import * as GraphQL from "../generated/graphql/types";
 
 export function flattenBsffInput(
   bsffInput: GraphQL.BsffInput
-): Omit<Prisma.Prisma.BsffCreateInput, "id"> {
+): Omit<Prisma.Prisma.BsffCreateInput, "id" | "bsffs" | "Bsff"> {
   return safeInput({
     emitterCompanyName: bsffInput.emitter?.company.name,
     emitterCompanySiret: bsffInput.emitter?.company.siret,
