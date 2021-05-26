@@ -1,17 +1,13 @@
-import { Company, Prisma, TransportMode, User } from ".prisma/client";
+import { Prisma, TransportMode } from ".prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
+import { UserWithCompany } from "../../__tests__/factories";
 import {
   OPERATION_CODES,
   OPERATION_QUALIFICATIONS,
   PACKAGING_TYPE,
   WASTE_CODES
 } from "../constants";
-
-interface UserAndCompany {
-  user: User;
-  company: Company;
-}
 
 export function createBsff(
   {
@@ -20,9 +16,9 @@ export function createBsff(
     destination,
     ficheInterventions
   }: {
-    emitter?: UserAndCompany;
-    transporter?: UserAndCompany;
-    destination?: UserAndCompany;
+    emitter?: UserWithCompany;
+    transporter?: UserWithCompany;
+    destination?: UserWithCompany;
     ficheInterventions?: Prisma.BsffFicheInterventionCreateInput[];
   } = {},
   initialData: Partial<Prisma.BsffCreateInput> = {}
@@ -82,9 +78,9 @@ export function createBsffBeforeEmission(
     transporter,
     destination
   }: {
-    emitter: UserAndCompany;
-    transporter?: UserAndCompany;
-    destination?: UserAndCompany;
+    emitter: UserWithCompany;
+    transporter?: UserWithCompany;
+    destination?: UserWithCompany;
   },
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
@@ -108,9 +104,9 @@ export function createBsffAfterEmission(
     transporter,
     destination
   }: {
-    emitter: UserAndCompany;
-    transporter?: UserAndCompany;
-    destination?: UserAndCompany;
+    emitter: UserWithCompany;
+    transporter?: UserWithCompany;
+    destination?: UserWithCompany;
   },
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
@@ -130,9 +126,9 @@ export function createBsffBeforeTransport(
     transporter,
     destination
   }: {
-    emitter: UserAndCompany;
-    transporter: UserAndCompany;
-    destination?: UserAndCompany;
+    emitter: UserWithCompany;
+    transporter: UserWithCompany;
+    destination?: UserWithCompany;
   },
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
@@ -153,9 +149,9 @@ export function createBsffAfterTransport(
     transporter,
     destination
   }: {
-    emitter: UserAndCompany;
-    transporter: UserAndCompany;
-    destination?: UserAndCompany;
+    emitter: UserWithCompany;
+    transporter: UserWithCompany;
+    destination?: UserWithCompany;
   },
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
@@ -175,9 +171,9 @@ export function createBsffBeforeReception(
     transporter,
     destination
   }: {
-    emitter: UserAndCompany;
-    transporter: UserAndCompany;
-    destination: UserAndCompany;
+    emitter: UserWithCompany;
+    transporter: UserWithCompany;
+    destination: UserWithCompany;
   },
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
@@ -197,16 +193,16 @@ export function createBsffAfterReception(
     transporter,
     destination
   }: {
-    emitter: UserAndCompany;
-    transporter: UserAndCompany;
-    destination: UserAndCompany;
+    emitter: UserWithCompany;
+    transporter: UserWithCompany;
+    destination: UserWithCompany;
   },
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffBeforeReception(
     { emitter, transporter, destination },
     {
-      destinationReceptionSignatureAuthor: transporter.user.name,
+      destinationReceptionSignatureAuthor: destination.user.name,
       destinationReceptionSignatureDate: new Date().toISOString(),
       ...initialData
     }
@@ -219,9 +215,9 @@ export function createBsffBeforeOperation(
     transporter,
     destination
   }: {
-    emitter: UserAndCompany;
-    transporter: UserAndCompany;
-    destination: UserAndCompany;
+    emitter: UserWithCompany;
+    transporter: UserWithCompany;
+    destination: UserWithCompany;
   },
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
@@ -230,6 +226,28 @@ export function createBsffBeforeOperation(
     {
       destinationOperationCode: OPERATION_CODES.D10,
       destinationOperationQualification: OPERATION_QUALIFICATIONS.INCINERATION,
+      ...initialData
+    }
+  );
+}
+
+export function createBsffAfterOperation(
+  {
+    emitter,
+    transporter,
+    destination
+  }: {
+    emitter: UserWithCompany;
+    transporter: UserWithCompany;
+    destination: UserWithCompany;
+  },
+  initialData: Partial<Prisma.BsffCreateInput> = {}
+) {
+  return createBsffAfterReception(
+    { emitter, transporter, destination },
+    {
+      destinationOperationSignatureAuthor: destination.user.name,
+      destinationOperationSignatureDate: new Date().toISOString(),
       ...initialData
     }
   );

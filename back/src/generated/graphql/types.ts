@@ -1166,6 +1166,7 @@ export type BsffInput = {
   quantity?: Maybe<BsffQuantityInput>;
   transporter?: Maybe<BsffTransporterInput>;
   destination?: Maybe<BsffDestinationInput>;
+  bsffs?: Maybe<Array<Scalars["ID"]>>;
 };
 
 export type BsffOperation = IBsffOperation & {
@@ -10076,6 +10077,7 @@ export function createBsffInputMock(props: Partial<BsffInput>): BsffInput {
     quantity: null,
     transporter: null,
     destination: null,
+    bsffs: null,
     ...props
   };
 }

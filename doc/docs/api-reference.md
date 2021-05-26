@@ -10138,6 +10138,11 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 <td valign="top"><a href="#bsffdestinationinput">BsffDestinationInput</a></td>
 <td></td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>bsffs</strong></td>
+<td valign="top">[<a href="#id">ID</a>!]</td>
+<td></td>
+</tr>
 </tbody>
 </table>
 

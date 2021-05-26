@@ -68,6 +68,7 @@ input BsffInput {
   quantity: BsffQuantityInput
   transporter: BsffTransporterInput
   destination: BsffDestinationInput
+  bsffs: [ID!]
 }
 
 input BsffEmitterInput {

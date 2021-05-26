@@ -12,6 +12,12 @@ export const OPERATION_CODES: Record<BsffOperationCode, string> = {
   D14: "D 14"
 };
 
+export const GROUPING_CODES = [
+  OPERATION_CODES.R12,
+  OPERATION_CODES.D13,
+  OPERATION_CODES.D14
+];
+
 export const OPERATION_QUALIFICATIONS: Record<
   BsffOperationQualification,
   string
