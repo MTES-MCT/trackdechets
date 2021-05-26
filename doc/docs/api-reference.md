@@ -156,6 +156,36 @@ Filtres de recherche
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>bsffs</strong></td>
+<td valign="top"><a href="#bsffconnection">BsffConnection</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">after</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">first</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">before</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">last</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">where</td>
+<td valign="top"><a href="#bsffwhere">BsffWhere</a></td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>bsvhu</strong></td>
 <td valign="top"><a href="#bsvhu">Bsvhu</a>!</td>
 <td>
@@ -763,6 +793,30 @@ Renvoie des statistiques sur le volume de déchets entrant et sortant
 </thead>
 <tbody>
 <tr>
+<td colspan="2" valign="top"><strong>addFicheInterventionBsff</strong></td>
+<td valign="top"><a href="#bsffficheintervention">BsffFicheIntervention</a>!</td>
+<td>
+
+Mutation permettant d'ajouter une fiche d'intervention à un bordereau existant.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">numero</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#bsffficheinterventioninput">BsffFicheInterventionInput</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>createBsdasri</strong></td>
 <td valign="top"><a href="#bsdasri">Bsdasri</a>!</td>
 <td>
@@ -780,6 +834,20 @@ Crée un nouveau dasri
 Payload de création d'un dasri
 
 </td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>createBsff</strong></td>
+<td valign="top"><a href="#bsff">Bsff</a>!</td>
+<td>
+
+Mutation permettant de créer un nouveau bordereau de suivi de fluides frigorigènes.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#bsffinput">BsffInput</a>!</td>
+<td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>createBsvhu</strong></td>
@@ -868,6 +936,21 @@ ID d'un Dasri
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>deleteBsff</strong></td>
+<td valign="top"><a href="#bsff">Bsff</a>!</td>
+<td>
+
+Mutation permettant de supprimer un bordereau existant de suivi de fluides frigorigènes.
+À condition qu'il n'ait pas encore été signé.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>deleteBsvhu</strong></td>
 <td valign="top"><a href="#bsvhu">Bsvhu</a></td>
 <td>
@@ -885,6 +968,25 @@ Supprime un BSVHU
 ID d'un BSD VHU
 
 </td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>deleteFicheInterventionBsff</strong></td>
+<td valign="top"><a href="#bsffficheintervention">BsffFicheIntervention</a>!</td>
+<td>
+
+Mutation permettant de supprimer une fiche d'intervention lié à un bordereau existant.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">numero</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>deleteForm</strong></td>
@@ -1451,6 +1553,35 @@ Permet de signer un enlèvement sur le device transporteur grâce au code de sé
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>signBsff</strong></td>
+<td valign="top"><a href="#bsff">Bsff</a>!</td>
+<td>
+
+Mutation permettant d'apposer une signature sur le bordereau.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">type</td>
+<td valign="top"><a href="#bsffsignaturetype">BsffSignatureType</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">signature</td>
+<td valign="top"><a href="#signatureinput">SignatureInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">securityCode</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>signBsvhu</strong></td>
 <td valign="top"><a href="#bsvhu">Bsvhu</a></td>
 <td>
@@ -1554,6 +1685,25 @@ Payload de mise à jour d'un dasri
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>updateBsff</strong></td>
+<td valign="top"><a href="#bsff">Bsff</a>!</td>
+<td>
+
+Mutation permettant de modifier un bordereau existant de suivi de fluides frigorigènes.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#bsffinput">BsffInput</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>updateBsvhu</strong></td>
 <td valign="top"><a href="#bsvhu">Bsvhu</a></td>
 <td>
@@ -1571,6 +1721,30 @@ Met à jour un BSVHU
 <tr>
 <td colspan="2" align="right" valign="top">input</td>
 <td valign="top"><a href="#bsvhuinput">BsvhuInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>updateFicheInterventionBsff</strong></td>
+<td valign="top"><a href="#bsffficheintervention">BsffFicheIntervention</a>!</td>
+<td>
+
+Mutation permettant de mettre à jour une fiche d'intervention lié à un bordereau existant.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">numero</td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">input</td>
+<td valign="top"><a href="#bsffficheinterventioninput">BsffFicheInterventionInput</a>!</td>
 <td></td>
 </tr>
 <tr>
@@ -2427,6 +2601,718 @@ Détail sur le déchet proprement dit du Bsdasri
 <td colspan="2" valign="top"><strong>onuCode</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td></td>
+</tr>
+</tbody>
+</table>
+
+### Bsff
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+Identifiant unique assigné par Trackdéchets.
+Il est à utiliser pour les échanges avec l'API.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#bsffemitter">BsffEmitter</a></td>
+<td>
+
+Émetteur du déchet, qui n'est pas nécessairement le producteur.
+Il s'agit par exemple de l'opérateur ayant collecté des fluides lors d'interventions,
+ou alors d'une installation de collecte qui procède à la réexpédition pour traitement final.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>packagings</strong></td>
+<td valign="top">[<a href="#bsffpackaging">BsffPackaging</a>!]!</td>
+<td>
+
+Liste des contenants utilisés pour le transport des fluides.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>waste</strong></td>
+<td valign="top"><a href="#bsffwaste">BsffWaste</a></td>
+<td>
+
+Description du déchet et ses mentions associées.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#bsffquantity">BsffQuantity</a></td>
+<td>
+
+Quantité totale du déchet, qu'elle soit réelle ou estimée.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#bsfftransporter">BsffTransporter</a></td>
+<td>
+
+Transporteur du déchet, effectue l'enlèvement du déchet auprès de l'émetteur et vers la destination.
+À noter que l'émetteur peut également être transporteur,
+par exemple dans le cas de l'opérateur qui dépose lui même ses contenants auprès d'une installation de collecte.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>destination</strong></td>
+<td valign="top"><a href="#bsffdestination">BsffDestination</a></td>
+<td>
+
+Destination du déchet, qui peut le réceptionner pour traitement, regroupement, reconditionnement ou réexpedition.
+Un nouveau bordereau doit être créé si le déchet connaît un nouveau parcours,
+par exemple si il quitte une installation de collecte pour un centre de traitement.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>ficheInterventions</strong></td>
+<td valign="top">[<a href="#bsffficheintervention">BsffFicheIntervention</a>!]!</td>
+<td>
+
+Liste des fiches d'intervention associés à ce bordereau.
+Habituellement renseigné par un opérateur lors de son intervention.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>bsffs</strong></td>
+<td valign="top">[<a href="#bsff">Bsff</a>!]!</td>
+<td>
+
+Liste des bordereaux que celui-ci regroupe, dans le cas d'un regroupement, reconditionnement ou d'une réexpédition.
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsffConnection
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>totalCount</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>pageInfo</strong></td>
+<td valign="top"><a href="#pageinfo">PageInfo</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>edges</strong></td>
+<td valign="top">[<a href="#bsffedge">BsffEdge</a>!]!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffDestination
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a>!</td>
+<td>
+
+Entreprise réceptionant le déchet.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>reception</strong></td>
+<td valign="top"><a href="#bsffreception">BsffReception</a></td>
+<td>
+
+Déclaration de réception du déchet.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsffoperation">BsffOperation</a></td>
+<td>
+
+Déclaration de traitement du déchet.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>plannedOperation</strong></td>
+<td valign="top"><a href="#bsffplannedoperation">BsffPlannedOperation</a>!</td>
+<td>
+
+Opération de traitement prévu initialement.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>cap</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Numéro CAP.
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsffEdge
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>cursor</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>node</strong></td>
+<td valign="top"><a href="#bsff">Bsff</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffEmission
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a>!</td>
+<td>
+
+Signature de l'émetteur lors de l'enlèvement par le transporteur.
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsffEmitter
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a>!</td>
+<td>
+
+Entreprise émettant le déchet.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emission</strong></td>
+<td valign="top"><a href="#bsffemission">BsffEmission</a></td>
+<td>
+
+Déclaration de l'émetteur lors de l'enlèvement par le transporteur.
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsffFicheIntervention
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>numero</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Numéro de la fiche d'intervention, habituellement renseigné par l'opérateur.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>kilos</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+Poids total des fluides récupérés lors de cette intervention.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>owner</strong></td>
+<td valign="top"><a href="#bsffowner">BsffOwner</a></td>
+<td>
+
+Détenteur de l'équipement sur lequel est intervenu l'opérateur.
+À noter que dû à la valeur commerciale de ces informations, leur visibilité est limité aux acteurs en contact direct.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>postalCode</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Code postal du lieu où l'intervention a eu lieu.
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsffOperation
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a></td>
+<td>
+
+Code de l'opération de traitement.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>qualification</strong></td>
+<td valign="top"><a href="#bsffoperationqualification">BsffOperationQualification</a>!</td>
+<td>
+
+Qualification plus précise du type d'opération réalisée.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a></td>
+<td>
+
+Signature de la destination lors du traitement.
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsffOwner
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a>!</td>
+<td>
+
+Entreprise détentrice de l'équipement.
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsffPackaging
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>numero</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Numéro du contenant.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsffpackagingtype">BsffPackagingType</a>!</td>
+<td>
+
+Type de contenant.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>litres</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+Volume en litres des fluides à l'intérieur du contenant.
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsffPlannedOperation
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a></td>
+<td>
+
+Code de l'opération de traitement prévu.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>qualification</strong></td>
+<td valign="top"><a href="#bsffoperationqualification">BsffOperationQualification</a>!</td>
+<td>
+
+Qualification plus précise du type d'opération prévu.
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsffQuantity
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>kilos</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+Poids total du déchet en kilos.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>isEstimate</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td>
+
+Si il s'agit d'une estimation ou d'un poids réel.
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsffReception
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Date de réception du déchet.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>kilos</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td>
+
+Quantité totale du déchet, qu'elle soit réelle ou estimée.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>refusal</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+En cas de refus, le motif.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a></td>
+<td>
+
+Signature de la destination lors de l'acceptation ou du refus du déchet.
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsffTransport
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>mode</strong></td>
+<td valign="top"><a href="#transportmode">TransportMode</a>!</td>
+<td>
+
+Mode de transport utilisé.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signature</strong></td>
+<td valign="top"><a href="#signature">Signature</a>!</td>
+<td>
+
+Signature du transporteur lors de l'enlèvement auprès de l'émetteur.
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsffTransporter
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a>!</td>
+<td>
+
+Entreprise responsable du transport du déchet.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>recepisse</strong></td>
+<td valign="top"><a href="#bsfftransporterrecepisse">BsffTransporterRecepisse</a></td>
+<td>
+
+Récépissé du transporteur, à moins d'être exempté.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transport</strong></td>
+<td valign="top"><a href="#bsfftransport">BsffTransport</a></td>
+<td>
+
+Déclaration du transporteur lors de l'enlèvement auprès de l'émetteur.
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsffTransporterRecepisse
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>number</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Numéro du récépissé.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Département auquel est lié le récépissé.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td>
+
+Date limite de validité du récépissé.
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### BsffWaste
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Code déchet.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>description</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Description du déchet, permet de le qualifier de façon plus précise.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>adr</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Mention ADR.
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -6982,6 +7868,473 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 </tbody>
 </table>
 
+### BsffDestinationInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>cap</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>reception</strong></td>
+<td valign="top"><a href="#bsffdestinationreceptioninput">BsffDestinationReceptionInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>plannedOperation</strong></td>
+<td valign="top"><a href="#bsffdestinationoperationinput">BsffDestinationOperationInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsffdestinationoperationinput">BsffDestinationOperationInput</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffDestinationOperationInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>qualification</strong></td>
+<td valign="top"><a href="#bsffoperationqualification">BsffOperationQualification</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffDestinationReceptionInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>kilos</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>refusal</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffEmitterInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffFicheInterventionInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>kilos</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>owner</strong></td>
+<td valign="top"><a href="#bsffownerinput">BsffOwnerInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>postalCode</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#bsffemitterinput">BsffEmitterInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>packagings</strong></td>
+<td valign="top">[<a href="#bsffpackaginginput">BsffPackagingInput</a>!]</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>waste</strong></td>
+<td valign="top"><a href="#bsffwasteinput">BsffWasteInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#bsffquantityinput">BsffQuantityInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#bsfftransporterinput">BsffTransporterInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>destination</strong></td>
+<td valign="top"><a href="#bsffdestinationinput">BsffDestinationInput</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffOwnerInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffPackagingInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>numero</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>type</strong></td>
+<td valign="top"><a href="#bsffpackagingtype">BsffPackagingType</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>litres</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffQuantityInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>kilos</strong></td>
+<td valign="top"><a href="#int">Int</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>isEstimate</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffTransporterInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>recepisse</strong></td>
+<td valign="top"><a href="#bsfftransporterrecepisseinput">BsffTransporterRecepisseInput</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transport</strong></td>
+<td valign="top"><a href="#bsfftransportertransportinput">BsffTransporterTransportInput</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffTransporterRecepisseInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>number</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>department</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>validityLimit</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffTransporterTransportInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>mode</strong></td>
+<td valign="top"><a href="#transportmode">TransportMode</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffWasteInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>description</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>adr</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffWhere
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#bsffwhereemitter">BsffWhereEmitter</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>transporter</strong></td>
+<td valign="top"><a href="#bsffwheretransporter">BsffWhereTransporter</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>destination</strong></td>
+<td valign="top"><a href="#bsffwheredestination">BsffWhereDestination</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffWhereCompany
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>siret</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffWhereDestination
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#bsffwherecompany">BsffWhereCompany</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffWhereEmitter
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#bsffwherecompany">BsffWhereCompany</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffWhereTransporter
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#bsffwherecompany">BsffWhereCompany</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### BsvhuCompanyWhere
 
 <table>
@@ -8880,6 +10233,30 @@ Nom de la personne responsable de l'envoi du déchet (case 9)
 </tbody>
 </table>
 
+### SignatureInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>date</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>author</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### TakeOverInput
 
 Payload de prise en charge de segment
@@ -9813,6 +11190,116 @@ Bsdasri dont les déchets ont été traités
 Déchet refusé
 
 </td>
+</tr>
+</tbody>
+</table>
+
+### BsffOperationCode
+
+Liste des codes de traitement possible.
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>R2</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>R12</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>D10</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>D13</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>D14</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffOperationQualification
+
+Liste des qualifications de traitement possible.
+Attention, certaines combinaisons de code et qualification ne sont pas possibles.
+Par exemple, seul le code D 10 peut être associé à une incinération.
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>RECUPERATION_REGENERATION</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>INCINERATION</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>REGROUPEMENT</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>RECONDITIONNEMENT</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>REEXPEDITION</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffPackagingType
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>BOUTEILLE</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffSignatureType
+
+<table>
+<thead>
+<th align="left">Value</th>
+<th align="left">Description</th>
+</thead>
+<tbody>
+<tr>
+<td valign="top"><strong>EMISSION</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>TRANSPORT</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>RECEPTION</strong></td>
+<td></td>
+</tr>
+<tr>
+<td valign="top"><strong>OPERATION</strong></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -10817,3 +12304,40 @@ The `String` scalar type represents textual data, represented as UTF-8 character
 ### URL
 
 Chaîne de caractère au format URL, débutant par un protocole http(s).
+
+
+## Interfaces
+
+
+### IBsffOperation
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a></td>
+<td>
+
+Code de l'opération de traitement.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>qualification</strong></td>
+<td valign="top"><a href="#bsffoperationqualification">BsffOperationQualification</a>!</td>
+<td>
+
+Qualification plus précise du type d'opération réalisée.
+
+</td>
+</tr>
+</tbody>
+</table>

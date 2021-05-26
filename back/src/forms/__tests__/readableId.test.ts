@@ -8,7 +8,7 @@ describe("getReadableId", () => {
   it.each([
     ReadableIdPrefix.BSD,
     ReadableIdPrefix.DASRI,
-    ReadableIdPrefix.HFC,
+    ReadableIdPrefix.FF,
     ReadableIdPrefix.VHU
   ])("should return a well formatted readableId for %p", prefix => {
     const readableId = getReadableId(prefix);

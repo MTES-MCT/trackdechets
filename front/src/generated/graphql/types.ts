@@ -538,6 +538,324 @@ export type BsdWhere = {
   isCollectedFor?: Maybe<Array<Scalars["String"]>>;
 };
 
+export type Bsff = {
+  __typename?: "Bsff";
+  /**
+   * Identifiant unique assigné par Trackdéchets.
+   * Il est à utiliser pour les échanges avec l'API.
+   */
+  id: Scalars["ID"];
+  /**
+   * Émetteur du déchet, qui n'est pas nécessairement le producteur.
+   * Il s'agit par exemple de l'opérateur ayant collecté des fluides lors d'interventions,
+   * ou alors d'une installation de collecte qui procède à la réexpédition pour traitement final.
+   */
+  emitter?: Maybe<BsffEmitter>;
+  /** Liste des contenants utilisés pour le transport des fluides. */
+  packagings: Array<BsffPackaging>;
+  /** Description du déchet et ses mentions associées. */
+  waste?: Maybe<BsffWaste>;
+  /** Quantité totale du déchet, qu'elle soit réelle ou estimée. */
+  quantity?: Maybe<BsffQuantity>;
+  /**
+   * Transporteur du déchet, effectue l'enlèvement du déchet auprès de l'émetteur et vers la destination.
+   * À noter que l'émetteur peut également être transporteur,
+   * par exemple dans le cas de l'opérateur qui dépose lui même ses contenants auprès d'une installation de collecte.
+   */
+  transporter?: Maybe<BsffTransporter>;
+  /**
+   * Destination du déchet, qui peut le réceptionner pour traitement, regroupement, reconditionnement ou réexpedition.
+   * Un nouveau bordereau doit être créé si le déchet connaît un nouveau parcours,
+   * par exemple si il quitte une installation de collecte pour un centre de traitement.
+   */
+  destination?: Maybe<BsffDestination>;
+  /**
+   * Liste des fiches d'intervention associés à ce bordereau.
+   * Habituellement renseigné par un opérateur lors de son intervention.
+   */
+  ficheInterventions: Array<BsffFicheIntervention>;
+  /** Liste des bordereaux que celui-ci regroupe, dans le cas d'un regroupement, reconditionnement ou d'une réexpédition. */
+  bsffs: Array<Bsff>;
+};
+
+export type BsffConnection = {
+  __typename?: "BsffConnection";
+  totalCount: Scalars["Int"];
+  pageInfo: PageInfo;
+  edges: Array<BsffEdge>;
+};
+
+export type BsffDestination = {
+  __typename?: "BsffDestination";
+  /** Entreprise réceptionant le déchet. */
+  company: FormCompany;
+  /** Déclaration de réception du déchet. */
+  reception?: Maybe<BsffReception>;
+  /** Déclaration de traitement du déchet. */
+  operation?: Maybe<BsffOperation>;
+  /** Opération de traitement prévu initialement. */
+  plannedOperation: BsffPlannedOperation;
+  /** Numéro CAP. */
+  cap?: Maybe<Scalars["String"]>;
+};
+
+export type BsffDestinationInput = {
+  company: CompanyInput;
+  cap?: Maybe<Scalars["String"]>;
+  reception?: Maybe<BsffDestinationReceptionInput>;
+  plannedOperation?: Maybe<BsffDestinationOperationInput>;
+  operation?: Maybe<BsffDestinationOperationInput>;
+};
+
+export type BsffDestinationOperationInput = {
+  code: BsffOperationCode;
+  qualification: BsffOperationQualification;
+};
+
+export type BsffDestinationReceptionInput = {
+  date: Scalars["DateTime"];
+  kilos: Scalars["Int"];
+  refusal?: Maybe<Scalars["String"]>;
+};
+
+export type BsffEdge = {
+  __typename?: "BsffEdge";
+  cursor: Scalars["String"];
+  node: Bsff;
+};
+
+export type BsffEmission = {
+  __typename?: "BsffEmission";
+  /** Signature de l'émetteur lors de l'enlèvement par le transporteur. */
+  signature: Signature;
+};
+
+export type BsffEmitter = {
+  __typename?: "BsffEmitter";
+  /** Entreprise émettant le déchet. */
+  company: FormCompany;
+  /** Déclaration de l'émetteur lors de l'enlèvement par le transporteur. */
+  emission?: Maybe<BsffEmission>;
+};
+
+export type BsffEmitterInput = {
+  company: CompanyInput;
+};
+
+export type BsffFicheIntervention = {
+  __typename?: "BsffFicheIntervention";
+  /** Numéro de la fiche d'intervention, habituellement renseigné par l'opérateur. */
+  numero: Scalars["String"];
+  /** Poids total des fluides récupérés lors de cette intervention. */
+  kilos: Scalars["Int"];
+  /**
+   * Détenteur de l'équipement sur lequel est intervenu l'opérateur.
+   * À noter que dû à la valeur commerciale de ces informations, leur visibilité est limité aux acteurs en contact direct.
+   */
+  owner?: Maybe<BsffOwner>;
+  /** Code postal du lieu où l'intervention a eu lieu. */
+  postalCode: Scalars["String"];
+};
+
+export type BsffFicheInterventionInput = {
+  kilos: Scalars["Int"];
+  owner: BsffOwnerInput;
+  postalCode: Scalars["String"];
+};
+
+export type BsffInput = {
+  emitter?: Maybe<BsffEmitterInput>;
+  packagings?: Maybe<Array<BsffPackagingInput>>;
+  waste?: Maybe<BsffWasteInput>;
+  quantity?: Maybe<BsffQuantityInput>;
+  transporter?: Maybe<BsffTransporterInput>;
+  destination?: Maybe<BsffDestinationInput>;
+};
+
+export type BsffOperation = IBsffOperation & {
+  __typename?: "BsffOperation";
+  /** Code de l'opération de traitement. */
+  code?: Maybe<BsffOperationCode>;
+  /** Qualification plus précise du type d'opération réalisée. */
+  qualification: BsffOperationQualification;
+  /** Signature de la destination lors du traitement. */
+  signature?: Maybe<Signature>;
+};
+
+/** Liste des codes de traitement possible. */
+export enum BsffOperationCode {
+  R2 = "R2",
+  R12 = "R12",
+  D10 = "D10",
+  D13 = "D13",
+  D14 = "D14"
+}
+
+/**
+ * Liste des qualifications de traitement possible.
+ * Attention, certaines combinaisons de code et qualification ne sont pas possibles.
+ * Par exemple, seul le code D 10 peut être associé à une incinération.
+ */
+export enum BsffOperationQualification {
+  RecuperationRegeneration = "RECUPERATION_REGENERATION",
+  Incineration = "INCINERATION",
+  Regroupement = "REGROUPEMENT",
+  Reconditionnement = "RECONDITIONNEMENT",
+  Reexpedition = "REEXPEDITION"
+}
+
+export type BsffOwner = {
+  __typename?: "BsffOwner";
+  /** Entreprise détentrice de l'équipement. */
+  company: FormCompany;
+};
+
+export type BsffOwnerInput = {
+  company: CompanyInput;
+};
+
+export type BsffPackaging = {
+  __typename?: "BsffPackaging";
+  /** Numéro du contenant. */
+  numero: Scalars["String"];
+  /** Type de contenant. */
+  type: BsffPackagingType;
+  /** Volume en litres des fluides à l'intérieur du contenant. */
+  litres: Scalars["Int"];
+};
+
+export type BsffPackagingInput = {
+  numero: Scalars["String"];
+  type: BsffPackagingType;
+  litres: Scalars["Int"];
+};
+
+export enum BsffPackagingType {
+  Bouteille = "BOUTEILLE"
+}
+
+export type BsffPlannedOperation = IBsffOperation & {
+  __typename?: "BsffPlannedOperation";
+  /** Code de l'opération de traitement prévu. */
+  code?: Maybe<BsffOperationCode>;
+  /** Qualification plus précise du type d'opération prévu. */
+  qualification: BsffOperationQualification;
+};
+
+export type BsffQuantity = {
+  __typename?: "BsffQuantity";
+  /** Poids total du déchet en kilos. */
+  kilos: Scalars["Int"];
+  /** Si il s'agit d'une estimation ou d'un poids réel. */
+  isEstimate: Scalars["Boolean"];
+};
+
+export type BsffQuantityInput = {
+  kilos: Scalars["Int"];
+  isEstimate: Scalars["Boolean"];
+};
+
+export type BsffReception = {
+  __typename?: "BsffReception";
+  /** Date de réception du déchet. */
+  date: Scalars["DateTime"];
+  /** Quantité totale du déchet, qu'elle soit réelle ou estimée. */
+  kilos: Scalars["Int"];
+  /** En cas de refus, le motif. */
+  refusal?: Maybe<Scalars["String"]>;
+  /** Signature de la destination lors de l'acceptation ou du refus du déchet. */
+  signature?: Maybe<Signature>;
+};
+
+export enum BsffSignatureType {
+  Emission = "EMISSION",
+  Transport = "TRANSPORT",
+  Reception = "RECEPTION",
+  Operation = "OPERATION"
+}
+
+export type BsffTransport = {
+  __typename?: "BsffTransport";
+  /** Mode de transport utilisé. */
+  mode: TransportMode;
+  /** Signature du transporteur lors de l'enlèvement auprès de l'émetteur. */
+  signature: Signature;
+};
+
+export type BsffTransporter = {
+  __typename?: "BsffTransporter";
+  /** Entreprise responsable du transport du déchet. */
+  company: FormCompany;
+  /** Récépissé du transporteur, à moins d'être exempté. */
+  recepisse?: Maybe<BsffTransporterRecepisse>;
+  /** Déclaration du transporteur lors de l'enlèvement auprès de l'émetteur. */
+  transport?: Maybe<BsffTransport>;
+};
+
+export type BsffTransporterInput = {
+  company: CompanyInput;
+  recepisse?: Maybe<BsffTransporterRecepisseInput>;
+  transport?: Maybe<BsffTransporterTransportInput>;
+};
+
+export type BsffTransporterRecepisse = {
+  __typename?: "BsffTransporterRecepisse";
+  /** Numéro du récépissé. */
+  number: Scalars["String"];
+  /** Département auquel est lié le récépissé. */
+  department: Scalars["String"];
+  /** Date limite de validité du récépissé. */
+  validityLimit: Scalars["DateTime"];
+};
+
+export type BsffTransporterRecepisseInput = {
+  number: Scalars["String"];
+  department: Scalars["String"];
+  validityLimit: Scalars["DateTime"];
+};
+
+export type BsffTransporterTransportInput = {
+  mode: TransportMode;
+};
+
+export type BsffWaste = {
+  __typename?: "BsffWaste";
+  /** Code déchet. */
+  code: Scalars["String"];
+  /** Description du déchet, permet de le qualifier de façon plus précise. */
+  description: Scalars["String"];
+  /** Mention ADR. */
+  adr: Scalars["String"];
+};
+
+export type BsffWasteInput = {
+  code: Scalars["String"];
+  description: Scalars["String"];
+  adr: Scalars["String"];
+};
+
+export type BsffWhere = {
+  emitter?: Maybe<BsffWhereEmitter>;
+  transporter?: Maybe<BsffWhereTransporter>;
+  destination?: Maybe<BsffWhereDestination>;
+};
+
+export type BsffWhereCompany = {
+  siret: Scalars["String"];
+};
+
+export type BsffWhereDestination = {
+  company?: Maybe<BsffWhereCompany>;
+};
+
+export type BsffWhereEmitter = {
+  company?: Maybe<BsffWhereCompany>;
+};
+
+export type BsffWhereTransporter = {
+  company?: Maybe<BsffWhereCompany>;
+};
+
 export type Bsvhu = {
   __typename?: "Bsvhu";
   /** Numéro unique attribué par Trackdéchets */
@@ -1693,6 +2011,13 @@ export enum GerepType {
   Traiteur = "Traiteur"
 }
 
+export type IBsffOperation = {
+  /** Code de l'opération de traitement. */
+  code?: Maybe<BsffOperationCode>;
+  /** Qualification plus précise du type d'opération réalisée. */
+  qualification: BsffOperationQualification;
+};
+
 /** Payload d'import d'un BSD papier */
 export type ImportPaperFormInput = {
   /**
@@ -1833,6 +2158,8 @@ export type Mutation = {
    * en spécifiant le rôle accordé au nouvel utilisateur
    */
   acceptMembershipRequest: CompanyPrivate;
+  /** Mutation permettant d'ajouter une fiche d'intervention à un bordereau existant. */
+  addFicheInterventionBsff: BsffFicheIntervention;
   /**
    * USAGE INTERNE
    * Modifie le mot de passe d'un utilisateur
@@ -1848,6 +2175,8 @@ export type Mutation = {
    * Crée un nouveau dasri
    */
   createBsdasri: Bsdasri;
+  /** Mutation permettant de créer un nouveau bordereau de suivi de fluides frigorigènes. */
+  createBsff: Bsff;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Crée un BSVHU
@@ -1901,10 +2230,17 @@ export type Mutation = {
    */
   deleteBsdasri?: Maybe<Bsdasri>;
   /**
+   * Mutation permettant de supprimer un bordereau existant de suivi de fluides frigorigènes.
+   * À condition qu'il n'ait pas encore été signé.
+   */
+  deleteBsff: Bsff;
+  /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Supprime un BSVHU
    */
   deleteBsvhu?: Maybe<Bsvhu>;
+  /** Mutation permettant de supprimer une fiche d'intervention lié à un bordereau existant. */
+  deleteFicheInterventionBsff: BsffFicheIntervention;
   /** Supprime un BSD */
   deleteForm?: Maybe<Form>;
   /**
@@ -2118,6 +2454,8 @@ export type Mutation = {
    * Permet de signer un enlèvement sur le device transporteur grâce au code de sécurité de l'émetteur du dasri
    */
   signBsdasriEmissionWithSecretCode?: Maybe<Bsdasri>;
+  /** Mutation permettant d'apposer une signature sur le bordereau. */
+  signBsff: Bsff;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Signe un BSVHU
@@ -2157,6 +2495,8 @@ export type Mutation = {
    * Par défaut, tous les champs sont modifiables.
    */
   updateBsdasri: Bsdasri;
+  /** Mutation permettant de modifier un bordereau existant de suivi de fluides frigorigènes. */
+  updateBsff: Bsff;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Met à jour un BSVHU
@@ -2167,6 +2507,8 @@ export type Mutation = {
    * Édite les informations d'un établissement
    */
   updateCompany: CompanyPrivate;
+  /** Mutation permettant de mettre à jour une fiche d'intervention lié à un bordereau existant. */
+  updateFicheInterventionBsff: BsffFicheIntervention;
   /** Met à jour un bordereau existant */
   updateForm: Form;
   /**
@@ -2202,6 +2544,12 @@ export type MutationAcceptMembershipRequestArgs = {
   role: UserRole;
 };
 
+export type MutationAddFicheInterventionBsffArgs = {
+  id: Scalars["ID"];
+  numero: Scalars["String"];
+  input: BsffFicheInterventionInput;
+};
+
 export type MutationChangePasswordArgs = {
   oldPassword: Scalars["String"];
   newPassword: Scalars["String"];
@@ -2213,6 +2561,10 @@ export type MutationCreateBrokerReceiptArgs = {
 
 export type MutationCreateBsdasriArgs = {
   bsdasriCreateInput: BsdasriCreateInput;
+};
+
+export type MutationCreateBsffArgs = {
+  input: BsffInput;
 };
 
 export type MutationCreateBsvhuArgs = {
@@ -2260,8 +2612,17 @@ export type MutationDeleteBsdasriArgs = {
   id: Scalars["ID"];
 };
 
+export type MutationDeleteBsffArgs = {
+  id: Scalars["ID"];
+};
+
 export type MutationDeleteBsvhuArgs = {
   id: Scalars["ID"];
+};
+
+export type MutationDeleteFicheInterventionBsffArgs = {
+  id: Scalars["ID"];
+  numero: Scalars["String"];
 };
 
 export type MutationDeleteFormArgs = {
@@ -2436,6 +2797,13 @@ export type MutationSignBsdasriEmissionWithSecretCodeArgs = {
   signatureInput: BsdasriSignatureWithSecretCodeInput;
 };
 
+export type MutationSignBsffArgs = {
+  id: Scalars["ID"];
+  type: BsffSignatureType;
+  signature: SignatureInput;
+  securityCode?: Maybe<Scalars["Int"]>;
+};
+
 export type MutationSignBsvhuArgs = {
   id: Scalars["ID"];
   input: BsvhuSignatureInput;
@@ -2464,6 +2832,11 @@ export type MutationUpdateBsdasriArgs = {
   bsdasriUpdateInput: BsdasriUpdateInput;
 };
 
+export type MutationUpdateBsffArgs = {
+  id: Scalars["ID"];
+  input: BsffInput;
+};
+
 export type MutationUpdateBsvhuArgs = {
   id: Scalars["ID"];
   input: BsvhuInput;
@@ -2483,6 +2856,12 @@ export type MutationUpdateCompanyArgs = {
   vhuAgrementDemolisseurId?: Maybe<Scalars["String"]>;
   vhuAgrementBroyeurId?: Maybe<Scalars["String"]>;
   ecoOrganismeAgreements?: Maybe<Array<Scalars["URL"]>>;
+};
+
+export type MutationUpdateFicheInterventionBsffArgs = {
+  id: Scalars["ID"];
+  numero: Scalars["String"];
+  input: BsffFicheInterventionInput;
 };
 
 export type MutationUpdateFormArgs = {
@@ -2683,6 +3062,7 @@ export type Query = {
    */
   bsdasris: BsdasriConnection;
   bsds: BsdConnection;
+  bsffs: BsffConnection;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsvhu: Bsvhu;
   /**
@@ -2815,6 +3195,15 @@ export type QueryBsdsArgs = {
   after?: Maybe<Scalars["String"]>;
   first?: Maybe<Scalars["Int"]>;
   orderBy?: Maybe<OrderBy>;
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsffsArgs = {
+  after?: Maybe<Scalars["ID"]>;
+  first?: Maybe<Scalars["Int"]>;
+  before?: Maybe<Scalars["ID"]>;
+  last?: Maybe<Scalars["Int"]>;
+  where?: Maybe<BsffWhere>;
 };
 
 /** Views of the Company ressource for the admin panel */
@@ -3062,6 +3451,11 @@ export type SignatureFormInput = {
   sentAt: Scalars["DateTime"];
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
   sentBy: Scalars["String"];
+};
+
+export type SignatureInput = {
+  date: Scalars["DateTime"];
+  author: Scalars["String"];
 };
 
 export enum SignatureTypeInput {

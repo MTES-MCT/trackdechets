@@ -540,6 +540,314 @@ export type BsdWhere = {
   isCollectedFor?: Maybe<Array<Scalars["String"]>>;
 };
 
+export type Bsff = {
+  __typename?: "Bsff";
+  /**
+   * Identifiant unique assigné par Trackdéchets.
+   * Il est à utiliser pour les échanges avec l'API.
+   */
+  id: Scalars["ID"];
+  /**
+   * Émetteur du déchet, qui n'est pas nécessairement le producteur.
+   * Il s'agit par exemple de l'opérateur ayant collecté des fluides lors d'interventions,
+   * ou alors d'une installation de collecte qui procède à la réexpédition pour traitement final.
+   */
+  emitter?: Maybe<BsffEmitter>;
+  /** Liste des contenants utilisés pour le transport des fluides. */
+  packagings: Array<BsffPackaging>;
+  /** Description du déchet et ses mentions associées. */
+  waste?: Maybe<BsffWaste>;
+  /** Quantité totale du déchet, qu'elle soit réelle ou estimée. */
+  quantity?: Maybe<BsffQuantity>;
+  /**
+   * Transporteur du déchet, effectue l'enlèvement du déchet auprès de l'émetteur et vers la destination.
+   * À noter que l'émetteur peut également être transporteur,
+   * par exemple dans le cas de l'opérateur qui dépose lui même ses contenants auprès d'une installation de collecte.
+   */
+  transporter?: Maybe<BsffTransporter>;
+  /**
+   * Destination du déchet, qui peut le réceptionner pour traitement, regroupement, reconditionnement ou réexpedition.
+   * Un nouveau bordereau doit être créé si le déchet connaît un nouveau parcours,
+   * par exemple si il quitte une installation de collecte pour un centre de traitement.
+   */
+  destination?: Maybe<BsffDestination>;
+  /**
+   * Liste des fiches d'intervention associés à ce bordereau.
+   * Habituellement renseigné par un opérateur lors de son intervention.
+   */
+  ficheInterventions: Array<BsffFicheIntervention>;
+  /** Liste des bordereaux que celui-ci regroupe, dans le cas d'un regroupement, reconditionnement ou d'une réexpédition. */
+  bsffs: Array<Bsff>;
+};
+
+export type BsffConnection = {
+  __typename?: "BsffConnection";
+  totalCount: Scalars["Int"];
+  pageInfo: PageInfo;
+  edges: Array<BsffEdge>;
+};
+
+export type BsffDestination = {
+  __typename?: "BsffDestination";
+  /** Entreprise réceptionant le déchet. */
+  company: FormCompany;
+  /** Déclaration de réception du déchet. */
+  reception?: Maybe<BsffReception>;
+  /** Déclaration de traitement du déchet. */
+  operation?: Maybe<BsffOperation>;
+  /** Opération de traitement prévu initialement. */
+  plannedOperation: BsffPlannedOperation;
+  /** Numéro CAP. */
+  cap?: Maybe<Scalars["String"]>;
+};
+
+export type BsffDestinationInput = {
+  company: CompanyInput;
+  cap?: Maybe<Scalars["String"]>;
+  reception?: Maybe<BsffDestinationReceptionInput>;
+  plannedOperation?: Maybe<BsffDestinationOperationInput>;
+  operation?: Maybe<BsffDestinationOperationInput>;
+};
+
+export type BsffDestinationOperationInput = {
+  code: BsffOperationCode;
+  qualification: BsffOperationQualification;
+};
+
+export type BsffDestinationReceptionInput = {
+  date: Scalars["DateTime"];
+  kilos: Scalars["Int"];
+  refusal?: Maybe<Scalars["String"]>;
+};
+
+export type BsffEdge = {
+  __typename?: "BsffEdge";
+  cursor: Scalars["String"];
+  node: Bsff;
+};
+
+export type BsffEmission = {
+  __typename?: "BsffEmission";
+  /** Signature de l'émetteur lors de l'enlèvement par le transporteur. */
+  signature: Signature;
+};
+
+export type BsffEmitter = {
+  __typename?: "BsffEmitter";
+  /** Entreprise émettant le déchet. */
+  company: FormCompany;
+  /** Déclaration de l'émetteur lors de l'enlèvement par le transporteur. */
+  emission?: Maybe<BsffEmission>;
+};
+
+export type BsffEmitterInput = {
+  company: CompanyInput;
+};
+
+export type BsffFicheIntervention = {
+  __typename?: "BsffFicheIntervention";
+  /** Numéro de la fiche d'intervention, habituellement renseigné par l'opérateur. */
+  numero: Scalars["String"];
+  /** Poids total des fluides récupérés lors de cette intervention. */
+  kilos: Scalars["Int"];
+  /**
+   * Détenteur de l'équipement sur lequel est intervenu l'opérateur.
+   * À noter que dû à la valeur commerciale de ces informations, leur visibilité est limité aux acteurs en contact direct.
+   */
+  owner?: Maybe<BsffOwner>;
+  /** Code postal du lieu où l'intervention a eu lieu. */
+  postalCode: Scalars["String"];
+};
+
+export type BsffFicheInterventionInput = {
+  kilos: Scalars["Int"];
+  owner: BsffOwnerInput;
+  postalCode: Scalars["String"];
+};
+
+export type BsffInput = {
+  emitter?: Maybe<BsffEmitterInput>;
+  packagings?: Maybe<Array<BsffPackagingInput>>;
+  waste?: Maybe<BsffWasteInput>;
+  quantity?: Maybe<BsffQuantityInput>;
+  transporter?: Maybe<BsffTransporterInput>;
+  destination?: Maybe<BsffDestinationInput>;
+};
+
+export type BsffOperation = IBsffOperation & {
+  __typename?: "BsffOperation";
+  /** Code de l'opération de traitement. */
+  code?: Maybe<BsffOperationCode>;
+  /** Qualification plus précise du type d'opération réalisée. */
+  qualification: BsffOperationQualification;
+  /** Signature de la destination lors du traitement. */
+  signature?: Maybe<Signature>;
+};
+
+/** Liste des codes de traitement possible. */
+export type BsffOperationCode = "R2" | "R12" | "D10" | "D13" | "D14";
+
+/**
+ * Liste des qualifications de traitement possible.
+ * Attention, certaines combinaisons de code et qualification ne sont pas possibles.
+ * Par exemple, seul le code D 10 peut être associé à une incinération.
+ */
+export type BsffOperationQualification =
+  | "RECUPERATION_REGENERATION"
+  | "INCINERATION"
+  | "REGROUPEMENT"
+  | "RECONDITIONNEMENT"
+  | "REEXPEDITION";
+
+export type BsffOwner = {
+  __typename?: "BsffOwner";
+  /** Entreprise détentrice de l'équipement. */
+  company: FormCompany;
+};
+
+export type BsffOwnerInput = {
+  company: CompanyInput;
+};
+
+export type BsffPackaging = {
+  __typename?: "BsffPackaging";
+  /** Numéro du contenant. */
+  numero: Scalars["String"];
+  /** Type de contenant. */
+  type: BsffPackagingType;
+  /** Volume en litres des fluides à l'intérieur du contenant. */
+  litres: Scalars["Int"];
+};
+
+export type BsffPackagingInput = {
+  numero: Scalars["String"];
+  type: BsffPackagingType;
+  litres: Scalars["Int"];
+};
+
+export type BsffPackagingType = "BOUTEILLE";
+
+export type BsffPlannedOperation = IBsffOperation & {
+  __typename?: "BsffPlannedOperation";
+  /** Code de l'opération de traitement prévu. */
+  code?: Maybe<BsffOperationCode>;
+  /** Qualification plus précise du type d'opération prévu. */
+  qualification: BsffOperationQualification;
+};
+
+export type BsffQuantity = {
+  __typename?: "BsffQuantity";
+  /** Poids total du déchet en kilos. */
+  kilos: Scalars["Int"];
+  /** Si il s'agit d'une estimation ou d'un poids réel. */
+  isEstimate: Scalars["Boolean"];
+};
+
+export type BsffQuantityInput = {
+  kilos: Scalars["Int"];
+  isEstimate: Scalars["Boolean"];
+};
+
+export type BsffReception = {
+  __typename?: "BsffReception";
+  /** Date de réception du déchet. */
+  date: Scalars["DateTime"];
+  /** Quantité totale du déchet, qu'elle soit réelle ou estimée. */
+  kilos: Scalars["Int"];
+  /** En cas de refus, le motif. */
+  refusal?: Maybe<Scalars["String"]>;
+  /** Signature de la destination lors de l'acceptation ou du refus du déchet. */
+  signature?: Maybe<Signature>;
+};
+
+export type BsffSignatureType =
+  | "EMISSION"
+  | "TRANSPORT"
+  | "RECEPTION"
+  | "OPERATION";
+
+export type BsffTransport = {
+  __typename?: "BsffTransport";
+  /** Mode de transport utilisé. */
+  mode: TransportMode;
+  /** Signature du transporteur lors de l'enlèvement auprès de l'émetteur. */
+  signature: Signature;
+};
+
+export type BsffTransporter = {
+  __typename?: "BsffTransporter";
+  /** Entreprise responsable du transport du déchet. */
+  company: FormCompany;
+  /** Récépissé du transporteur, à moins d'être exempté. */
+  recepisse?: Maybe<BsffTransporterRecepisse>;
+  /** Déclaration du transporteur lors de l'enlèvement auprès de l'émetteur. */
+  transport?: Maybe<BsffTransport>;
+};
+
+export type BsffTransporterInput = {
+  company: CompanyInput;
+  recepisse?: Maybe<BsffTransporterRecepisseInput>;
+  transport?: Maybe<BsffTransporterTransportInput>;
+};
+
+export type BsffTransporterRecepisse = {
+  __typename?: "BsffTransporterRecepisse";
+  /** Numéro du récépissé. */
+  number: Scalars["String"];
+  /** Département auquel est lié le récépissé. */
+  department: Scalars["String"];
+  /** Date limite de validité du récépissé. */
+  validityLimit: Scalars["DateTime"];
+};
+
+export type BsffTransporterRecepisseInput = {
+  number: Scalars["String"];
+  department: Scalars["String"];
+  validityLimit: Scalars["DateTime"];
+};
+
+export type BsffTransporterTransportInput = {
+  mode: TransportMode;
+};
+
+export type BsffWaste = {
+  __typename?: "BsffWaste";
+  /** Code déchet. */
+  code: Scalars["String"];
+  /** Description du déchet, permet de le qualifier de façon plus précise. */
+  description: Scalars["String"];
+  /** Mention ADR. */
+  adr: Scalars["String"];
+};
+
+export type BsffWasteInput = {
+  code: Scalars["String"];
+  description: Scalars["String"];
+  adr: Scalars["String"];
+};
+
+export type BsffWhere = {
+  emitter?: Maybe<BsffWhereEmitter>;
+  transporter?: Maybe<BsffWhereTransporter>;
+  destination?: Maybe<BsffWhereDestination>;
+};
+
+export type BsffWhereCompany = {
+  siret: Scalars["String"];
+};
+
+export type BsffWhereDestination = {
+  company?: Maybe<BsffWhereCompany>;
+};
+
+export type BsffWhereEmitter = {
+  company?: Maybe<BsffWhereCompany>;
+};
+
+export type BsffWhereTransporter = {
+  company?: Maybe<BsffWhereCompany>;
+};
+
 export type Bsvhu = {
   __typename?: "Bsvhu";
   /** Numéro unique attribué par Trackdéchets */
@@ -1671,6 +1979,13 @@ export type FormSubscription = {
 /** Type d'une déclaration GEREP */
 export type GerepType = "Producteur" | "Traiteur";
 
+export type IBsffOperation = {
+  /** Code de l'opération de traitement. */
+  code?: Maybe<BsffOperationCode>;
+  /** Qualification plus précise du type d'opération réalisée. */
+  qualification: BsffOperationQualification;
+};
+
 /** Payload d'import d'un BSD papier */
 export type ImportPaperFormInput = {
   /**
@@ -1807,6 +2122,8 @@ export type Mutation = {
    * en spécifiant le rôle accordé au nouvel utilisateur
    */
   acceptMembershipRequest: CompanyPrivate;
+  /** Mutation permettant d'ajouter une fiche d'intervention à un bordereau existant. */
+  addFicheInterventionBsff: BsffFicheIntervention;
   /**
    * USAGE INTERNE
    * Modifie le mot de passe d'un utilisateur
@@ -1822,6 +2139,8 @@ export type Mutation = {
    * Crée un nouveau dasri
    */
   createBsdasri: Bsdasri;
+  /** Mutation permettant de créer un nouveau bordereau de suivi de fluides frigorigènes. */
+  createBsff: Bsff;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Crée un BSVHU
@@ -1875,10 +2194,17 @@ export type Mutation = {
    */
   deleteBsdasri?: Maybe<Bsdasri>;
   /**
+   * Mutation permettant de supprimer un bordereau existant de suivi de fluides frigorigènes.
+   * À condition qu'il n'ait pas encore été signé.
+   */
+  deleteBsff: Bsff;
+  /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Supprime un BSVHU
    */
   deleteBsvhu?: Maybe<Bsvhu>;
+  /** Mutation permettant de supprimer une fiche d'intervention lié à un bordereau existant. */
+  deleteFicheInterventionBsff: BsffFicheIntervention;
   /** Supprime un BSD */
   deleteForm?: Maybe<Form>;
   /**
@@ -2092,6 +2418,8 @@ export type Mutation = {
    * Permet de signer un enlèvement sur le device transporteur grâce au code de sécurité de l'émetteur du dasri
    */
   signBsdasriEmissionWithSecretCode?: Maybe<Bsdasri>;
+  /** Mutation permettant d'apposer une signature sur le bordereau. */
+  signBsff: Bsff;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Signe un BSVHU
@@ -2131,6 +2459,8 @@ export type Mutation = {
    * Par défaut, tous les champs sont modifiables.
    */
   updateBsdasri: Bsdasri;
+  /** Mutation permettant de modifier un bordereau existant de suivi de fluides frigorigènes. */
+  updateBsff: Bsff;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Met à jour un BSVHU
@@ -2141,6 +2471,8 @@ export type Mutation = {
    * Édite les informations d'un établissement
    */
   updateCompany: CompanyPrivate;
+  /** Mutation permettant de mettre à jour une fiche d'intervention lié à un bordereau existant. */
+  updateFicheInterventionBsff: BsffFicheIntervention;
   /** Met à jour un bordereau existant */
   updateForm: Form;
   /**
@@ -2176,6 +2508,12 @@ export type MutationAcceptMembershipRequestArgs = {
   role: UserRole;
 };
 
+export type MutationAddFicheInterventionBsffArgs = {
+  id: Scalars["ID"];
+  numero: Scalars["String"];
+  input: BsffFicheInterventionInput;
+};
+
 export type MutationChangePasswordArgs = {
   oldPassword: Scalars["String"];
   newPassword: Scalars["String"];
@@ -2187,6 +2525,10 @@ export type MutationCreateBrokerReceiptArgs = {
 
 export type MutationCreateBsdasriArgs = {
   bsdasriCreateInput: BsdasriCreateInput;
+};
+
+export type MutationCreateBsffArgs = {
+  input: BsffInput;
 };
 
 export type MutationCreateBsvhuArgs = {
@@ -2234,8 +2576,17 @@ export type MutationDeleteBsdasriArgs = {
   id: Scalars["ID"];
 };
 
+export type MutationDeleteBsffArgs = {
+  id: Scalars["ID"];
+};
+
 export type MutationDeleteBsvhuArgs = {
   id: Scalars["ID"];
+};
+
+export type MutationDeleteFicheInterventionBsffArgs = {
+  id: Scalars["ID"];
+  numero: Scalars["String"];
 };
 
 export type MutationDeleteFormArgs = {
@@ -2410,6 +2761,13 @@ export type MutationSignBsdasriEmissionWithSecretCodeArgs = {
   signatureInput: BsdasriSignatureWithSecretCodeInput;
 };
 
+export type MutationSignBsffArgs = {
+  id: Scalars["ID"];
+  type: BsffSignatureType;
+  signature: SignatureInput;
+  securityCode?: Maybe<Scalars["Int"]>;
+};
+
 export type MutationSignBsvhuArgs = {
   id: Scalars["ID"];
   input: BsvhuSignatureInput;
@@ -2438,6 +2796,11 @@ export type MutationUpdateBsdasriArgs = {
   bsdasriUpdateInput: BsdasriUpdateInput;
 };
 
+export type MutationUpdateBsffArgs = {
+  id: Scalars["ID"];
+  input: BsffInput;
+};
+
 export type MutationUpdateBsvhuArgs = {
   id: Scalars["ID"];
   input: BsvhuInput;
@@ -2457,6 +2820,12 @@ export type MutationUpdateCompanyArgs = {
   vhuAgrementDemolisseurId?: Maybe<Scalars["String"]>;
   vhuAgrementBroyeurId?: Maybe<Scalars["String"]>;
   ecoOrganismeAgreements?: Maybe<Array<Scalars["URL"]>>;
+};
+
+export type MutationUpdateFicheInterventionBsffArgs = {
+  id: Scalars["ID"];
+  numero: Scalars["String"];
+  input: BsffFicheInterventionInput;
 };
 
 export type MutationUpdateFormArgs = {
@@ -2646,6 +3015,7 @@ export type Query = {
    */
   bsdasris: BsdasriConnection;
   bsds: BsdConnection;
+  bsffs: BsffConnection;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsvhu: Bsvhu;
   /**
@@ -2778,6 +3148,15 @@ export type QueryBsdsArgs = {
   after?: Maybe<Scalars["String"]>;
   first?: Maybe<Scalars["Int"]>;
   orderBy?: Maybe<OrderBy>;
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsffsArgs = {
+  after?: Maybe<Scalars["ID"]>;
+  first?: Maybe<Scalars["Int"]>;
+  before?: Maybe<Scalars["ID"]>;
+  last?: Maybe<Scalars["Int"]>;
+  where?: Maybe<BsffWhere>;
 };
 
 /** Views of the Company ressource for the admin panel */
@@ -3024,6 +3403,11 @@ export type SignatureFormInput = {
   sentAt: Scalars["DateTime"];
   /** Nom de la personne responsable de l'envoi du déchet (case 9) */
   sentBy: Scalars["String"];
+};
+
+export type SignatureInput = {
+  date: Scalars["DateTime"];
+  author: Scalars["String"];
 };
 
 export type SignatureTypeInput = "EMISSION" | "TRANSPORT" | "OPERATION";
@@ -3809,6 +4193,34 @@ export type ResolversTypes = {
   BsvhuMetadata: ResolverTypeWrapper<BsvhuMetadata>;
   BsvhuError: ResolverTypeWrapper<BsvhuError>;
   SignatureTypeInput: SignatureTypeInput;
+  BsffWhere: BsffWhere;
+  BsffWhereEmitter: BsffWhereEmitter;
+  BsffWhereCompany: BsffWhereCompany;
+  BsffWhereTransporter: BsffWhereTransporter;
+  BsffWhereDestination: BsffWhereDestination;
+  BsffConnection: ResolverTypeWrapper<BsffConnection>;
+  BsffEdge: ResolverTypeWrapper<BsffEdge>;
+  Bsff: ResolverTypeWrapper<Bsff>;
+  BsffEmitter: ResolverTypeWrapper<BsffEmitter>;
+  BsffEmission: ResolverTypeWrapper<BsffEmission>;
+  BsffPackaging: ResolverTypeWrapper<BsffPackaging>;
+  BsffPackagingType: BsffPackagingType;
+  BsffWaste: ResolverTypeWrapper<BsffWaste>;
+  BsffQuantity: ResolverTypeWrapper<BsffQuantity>;
+  BsffTransporter: ResolverTypeWrapper<BsffTransporter>;
+  BsffTransporterRecepisse: ResolverTypeWrapper<BsffTransporterRecepisse>;
+  BsffTransport: ResolverTypeWrapper<BsffTransport>;
+  BsffDestination: ResolverTypeWrapper<BsffDestination>;
+  BsffReception: ResolverTypeWrapper<BsffReception>;
+  BsffOperation: ResolverTypeWrapper<BsffOperation>;
+  IBsffOperation:
+    | ResolversTypes["BsffOperation"]
+    | ResolversTypes["BsffPlannedOperation"];
+  BsffOperationCode: BsffOperationCode;
+  BsffOperationQualification: BsffOperationQualification;
+  BsffPlannedOperation: ResolverTypeWrapper<BsffPlannedOperation>;
+  BsffFicheIntervention: ResolverTypeWrapper<BsffFicheIntervention>;
+  BsffOwner: ResolverTypeWrapper<BsffOwner>;
   BsvhuWhere: BsvhuWhere;
   BsvhuEmitterWhere: BsvhuEmitterWhere;
   BsvhuCompanyWhere: BsvhuCompanyWhere;
@@ -3862,10 +4274,12 @@ export type ResolversTypes = {
   CompanyStat: ResolverTypeWrapper<CompanyStat>;
   Stat: ResolverTypeWrapper<Stat>;
   Mutation: ResolverTypeWrapper<{}>;
+  BsffFicheInterventionInput: BsffFicheInterventionInput;
+  BsffOwnerInput: BsffOwnerInput;
+  CompanyInput: CompanyInput;
   CreateBrokerReceiptInput: CreateBrokerReceiptInput;
   BsdasriCreateInput: BsdasriCreateInput;
   BsdasriEmitterInput: BsdasriEmitterInput;
-  CompanyInput: CompanyInput;
   WorkSiteInput: WorkSiteInput;
   BsdasriEmissionInput: BsdasriEmissionInput;
   BsdasriWasteDetailInput: BsdasriWasteDetailInput;
@@ -3878,6 +4292,17 @@ export type ResolversTypes = {
   BsdasriReceptionInput: BsdasriReceptionInput;
   BsdasriOperationInput: BsdasriOperationInput;
   RegroupedBsdasriInput: RegroupedBsdasriInput;
+  BsffInput: BsffInput;
+  BsffEmitterInput: BsffEmitterInput;
+  BsffPackagingInput: BsffPackagingInput;
+  BsffWasteInput: BsffWasteInput;
+  BsffQuantityInput: BsffQuantityInput;
+  BsffTransporterInput: BsffTransporterInput;
+  BsffTransporterRecepisseInput: BsffTransporterRecepisseInput;
+  BsffTransporterTransportInput: BsffTransporterTransportInput;
+  BsffDestinationInput: BsffDestinationInput;
+  BsffDestinationReceptionInput: BsffDestinationReceptionInput;
+  BsffDestinationOperationInput: BsffDestinationOperationInput;
   BsvhuInput: BsvhuInput;
   BsvhuEmitterInput: BsvhuEmitterInput;
   BsvhuIdentificationInput: BsvhuIdentificationInput;
@@ -3928,6 +4353,8 @@ export type ResolversTypes = {
   SendVerificationCodeLetterInput: SendVerificationCodeLetterInput;
   BsdasriSignatureInput: BsdasriSignatureInput;
   BsdasriSignatureWithSecretCodeInput: BsdasriSignatureWithSecretCodeInput;
+  BsffSignatureType: BsffSignatureType;
+  SignatureInput: SignatureInput;
   BsvhuSignatureInput: BsvhuSignatureInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignatureAuthor: SignatureAuthor;
@@ -4022,6 +4449,31 @@ export type ResolversParentTypes = {
   BsvhuTransport: BsvhuTransport;
   BsvhuMetadata: BsvhuMetadata;
   BsvhuError: BsvhuError;
+  BsffWhere: BsffWhere;
+  BsffWhereEmitter: BsffWhereEmitter;
+  BsffWhereCompany: BsffWhereCompany;
+  BsffWhereTransporter: BsffWhereTransporter;
+  BsffWhereDestination: BsffWhereDestination;
+  BsffConnection: BsffConnection;
+  BsffEdge: BsffEdge;
+  Bsff: Bsff;
+  BsffEmitter: BsffEmitter;
+  BsffEmission: BsffEmission;
+  BsffPackaging: BsffPackaging;
+  BsffWaste: BsffWaste;
+  BsffQuantity: BsffQuantity;
+  BsffTransporter: BsffTransporter;
+  BsffTransporterRecepisse: BsffTransporterRecepisse;
+  BsffTransport: BsffTransport;
+  BsffDestination: BsffDestination;
+  BsffReception: BsffReception;
+  BsffOperation: BsffOperation;
+  IBsffOperation:
+    | ResolversParentTypes["BsffOperation"]
+    | ResolversParentTypes["BsffPlannedOperation"];
+  BsffPlannedOperation: BsffPlannedOperation;
+  BsffFicheIntervention: BsffFicheIntervention;
+  BsffOwner: BsffOwner;
   BsvhuWhere: BsvhuWhere;
   BsvhuEmitterWhere: BsvhuEmitterWhere;
   BsvhuCompanyWhere: BsvhuCompanyWhere;
@@ -4062,10 +4514,12 @@ export type ResolversParentTypes = {
   CompanyStat: CompanyStat;
   Stat: Stat;
   Mutation: {};
+  BsffFicheInterventionInput: BsffFicheInterventionInput;
+  BsffOwnerInput: BsffOwnerInput;
+  CompanyInput: CompanyInput;
   CreateBrokerReceiptInput: CreateBrokerReceiptInput;
   BsdasriCreateInput: BsdasriCreateInput;
   BsdasriEmitterInput: BsdasriEmitterInput;
-  CompanyInput: CompanyInput;
   WorkSiteInput: WorkSiteInput;
   BsdasriEmissionInput: BsdasriEmissionInput;
   BsdasriWasteDetailInput: BsdasriWasteDetailInput;
@@ -4077,6 +4531,17 @@ export type ResolversParentTypes = {
   BsdasriReceptionInput: BsdasriReceptionInput;
   BsdasriOperationInput: BsdasriOperationInput;
   RegroupedBsdasriInput: RegroupedBsdasriInput;
+  BsffInput: BsffInput;
+  BsffEmitterInput: BsffEmitterInput;
+  BsffPackagingInput: BsffPackagingInput;
+  BsffWasteInput: BsffWasteInput;
+  BsffQuantityInput: BsffQuantityInput;
+  BsffTransporterInput: BsffTransporterInput;
+  BsffTransporterRecepisseInput: BsffTransporterRecepisseInput;
+  BsffTransporterTransportInput: BsffTransporterTransportInput;
+  BsffDestinationInput: BsffDestinationInput;
+  BsffDestinationReceptionInput: BsffDestinationReceptionInput;
+  BsffDestinationOperationInput: BsffDestinationOperationInput;
   BsvhuInput: BsvhuInput;
   BsvhuEmitterInput: BsvhuEmitterInput;
   BsvhuIdentificationInput: BsvhuIdentificationInput;
@@ -4127,6 +4592,7 @@ export type ResolversParentTypes = {
   SendVerificationCodeLetterInput: SendVerificationCodeLetterInput;
   BsdasriSignatureInput: BsdasriSignatureInput;
   BsdasriSignatureWithSecretCodeInput: BsdasriSignatureWithSecretCodeInput;
+  SignatureInput: SignatureInput;
   BsvhuSignatureInput: BsvhuSignatureInput;
   TransporterSignatureFormInput: TransporterSignatureFormInput;
   SignupInput: SignupInput;
@@ -4587,6 +5053,249 @@ export type BsdEdgeResolvers<
 > = {
   cursor?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   node?: Resolver<ResolversTypes["Bsd"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["Bsff"] = ResolversParentTypes["Bsff"]
+> = {
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
+  emitter?: Resolver<
+    Maybe<ResolversTypes["BsffEmitter"]>,
+    ParentType,
+    ContextType
+  >;
+  packagings?: Resolver<
+    Array<ResolversTypes["BsffPackaging"]>,
+    ParentType,
+    ContextType
+  >;
+  waste?: Resolver<Maybe<ResolversTypes["BsffWaste"]>, ParentType, ContextType>;
+  quantity?: Resolver<
+    Maybe<ResolversTypes["BsffQuantity"]>,
+    ParentType,
+    ContextType
+  >;
+  transporter?: Resolver<
+    Maybe<ResolversTypes["BsffTransporter"]>,
+    ParentType,
+    ContextType
+  >;
+  destination?: Resolver<
+    Maybe<ResolversTypes["BsffDestination"]>,
+    ParentType,
+    ContextType
+  >;
+  ficheInterventions?: Resolver<
+    Array<ResolversTypes["BsffFicheIntervention"]>,
+    ParentType,
+    ContextType
+  >;
+  bsffs?: Resolver<Array<ResolversTypes["Bsff"]>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffConnectionResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffConnection"] = ResolversParentTypes["BsffConnection"]
+> = {
+  totalCount?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes["PageInfo"], ParentType, ContextType>;
+  edges?: Resolver<Array<ResolversTypes["BsffEdge"]>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffDestinationResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffDestination"] = ResolversParentTypes["BsffDestination"]
+> = {
+  company?: Resolver<ResolversTypes["FormCompany"], ParentType, ContextType>;
+  reception?: Resolver<
+    Maybe<ResolversTypes["BsffReception"]>,
+    ParentType,
+    ContextType
+  >;
+  operation?: Resolver<
+    Maybe<ResolversTypes["BsffOperation"]>,
+    ParentType,
+    ContextType
+  >;
+  plannedOperation?: Resolver<
+    ResolversTypes["BsffPlannedOperation"],
+    ParentType,
+    ContextType
+  >;
+  cap?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffEdgeResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffEdge"] = ResolversParentTypes["BsffEdge"]
+> = {
+  cursor?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  node?: Resolver<ResolversTypes["Bsff"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffEmissionResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffEmission"] = ResolversParentTypes["BsffEmission"]
+> = {
+  signature?: Resolver<ResolversTypes["Signature"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffEmitterResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffEmitter"] = ResolversParentTypes["BsffEmitter"]
+> = {
+  company?: Resolver<ResolversTypes["FormCompany"], ParentType, ContextType>;
+  emission?: Resolver<
+    Maybe<ResolversTypes["BsffEmission"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffFicheInterventionResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffFicheIntervention"] = ResolversParentTypes["BsffFicheIntervention"]
+> = {
+  numero?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  kilos?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  owner?: Resolver<Maybe<ResolversTypes["BsffOwner"]>, ParentType, ContextType>;
+  postalCode?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffOperationResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffOperation"] = ResolversParentTypes["BsffOperation"]
+> = {
+  code?: Resolver<
+    Maybe<ResolversTypes["BsffOperationCode"]>,
+    ParentType,
+    ContextType
+  >;
+  qualification?: Resolver<
+    ResolversTypes["BsffOperationQualification"],
+    ParentType,
+    ContextType
+  >;
+  signature?: Resolver<
+    Maybe<ResolversTypes["Signature"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffOwnerResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffOwner"] = ResolversParentTypes["BsffOwner"]
+> = {
+  company?: Resolver<ResolversTypes["FormCompany"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffPackagingResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffPackaging"] = ResolversParentTypes["BsffPackaging"]
+> = {
+  numero?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  type?: Resolver<ResolversTypes["BsffPackagingType"], ParentType, ContextType>;
+  litres?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffPlannedOperationResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffPlannedOperation"] = ResolversParentTypes["BsffPlannedOperation"]
+> = {
+  code?: Resolver<
+    Maybe<ResolversTypes["BsffOperationCode"]>,
+    ParentType,
+    ContextType
+  >;
+  qualification?: Resolver<
+    ResolversTypes["BsffOperationQualification"],
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffQuantityResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffQuantity"] = ResolversParentTypes["BsffQuantity"]
+> = {
+  kilos?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  isEstimate?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffReceptionResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffReception"] = ResolversParentTypes["BsffReception"]
+> = {
+  date?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
+  kilos?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  refusal?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  signature?: Resolver<
+    Maybe<ResolversTypes["Signature"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffTransportResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffTransport"] = ResolversParentTypes["BsffTransport"]
+> = {
+  mode?: Resolver<ResolversTypes["TransportMode"], ParentType, ContextType>;
+  signature?: Resolver<ResolversTypes["Signature"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffTransporterResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffTransporter"] = ResolversParentTypes["BsffTransporter"]
+> = {
+  company?: Resolver<ResolversTypes["FormCompany"], ParentType, ContextType>;
+  recepisse?: Resolver<
+    Maybe<ResolversTypes["BsffTransporterRecepisse"]>,
+    ParentType,
+    ContextType
+  >;
+  transport?: Resolver<
+    Maybe<ResolversTypes["BsffTransport"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffTransporterRecepisseResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffTransporterRecepisse"] = ResolversParentTypes["BsffTransporterRecepisse"]
+> = {
+  number?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  department?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  validityLimit?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffWasteResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffWaste"] = ResolversParentTypes["BsffWaste"]
+> = {
+  code?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  description?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  adr?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -5571,6 +6280,27 @@ export type FormSubscriptionResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type IBsffOperationResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["IBsffOperation"] = ResolversParentTypes["IBsffOperation"]
+> = {
+  __resolveType: TypeResolveFn<
+    "BsffOperation" | "BsffPlannedOperation",
+    ParentType,
+    ContextType
+  >;
+  code?: Resolver<
+    Maybe<ResolversTypes["BsffOperationCode"]>,
+    ParentType,
+    ContextType
+  >;
+  qualification?: Resolver<
+    ResolversTypes["BsffOperationQualification"],
+    ParentType,
+    ContextType
+  >;
+};
+
 export type InstallationResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["Installation"] = ResolversParentTypes["Installation"]
@@ -5639,6 +6369,15 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationAcceptMembershipRequestArgs, "id" | "role">
   >;
+  addFicheInterventionBsff?: Resolver<
+    ResolversTypes["BsffFicheIntervention"],
+    ParentType,
+    ContextType,
+    RequireFields<
+      MutationAddFicheInterventionBsffArgs,
+      "id" | "numero" | "input"
+    >
+  >;
   changePassword?: Resolver<
     ResolversTypes["User"],
     ParentType,
@@ -5656,6 +6395,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationCreateBsdasriArgs, "bsdasriCreateInput">
+  >;
+  createBsff?: Resolver<
+    ResolversTypes["Bsff"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationCreateBsffArgs, "input">
   >;
   createBsvhu?: Resolver<
     Maybe<ResolversTypes["Bsvhu"]>,
@@ -5723,11 +6468,23 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationDeleteBsdasriArgs, "id">
   >;
+  deleteBsff?: Resolver<
+    ResolversTypes["Bsff"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeleteBsffArgs, "id">
+  >;
   deleteBsvhu?: Resolver<
     Maybe<ResolversTypes["Bsvhu"]>,
     ParentType,
     ContextType,
     RequireFields<MutationDeleteBsvhuArgs, "id">
+  >;
+  deleteFicheInterventionBsff?: Resolver<
+    ResolversTypes["BsffFicheIntervention"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeleteFicheInterventionBsffArgs, "id" | "numero">
   >;
   deleteForm?: Resolver<
     Maybe<ResolversTypes["Form"]>,
@@ -5963,6 +6720,12 @@ export type MutationResolvers<
       "id" | "signatureInput"
     >
   >;
+  signBsff?: Resolver<
+    ResolversTypes["Bsff"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationSignBsffArgs, "id" | "type" | "signature">
+  >;
   signBsvhu?: Resolver<
     Maybe<ResolversTypes["Bsvhu"]>,
     ParentType,
@@ -5999,6 +6762,12 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationUpdateBsdasriArgs, "id" | "bsdasriUpdateInput">
   >;
+  updateBsff?: Resolver<
+    ResolversTypes["Bsff"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationUpdateBsffArgs, "id" | "input">
+  >;
   updateBsvhu?: Resolver<
     Maybe<ResolversTypes["Bsvhu"]>,
     ParentType,
@@ -6010,6 +6779,15 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationUpdateCompanyArgs, "siret">
+  >;
+  updateFicheInterventionBsff?: Resolver<
+    ResolversTypes["BsffFicheIntervention"],
+    ParentType,
+    ContextType,
+    RequireFields<
+      MutationUpdateFicheInterventionBsffArgs,
+      "id" | "numero" | "input"
+    >
   >;
   updateForm?: Resolver<
     ResolversTypes["Form"],
@@ -6139,6 +6917,12 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QueryBsdsArgs, never>
+  >;
+  bsffs?: Resolver<
+    ResolversTypes["BsffConnection"],
+    ParentType,
+    ContextType,
+    RequireFields<QueryBsffsArgs, never>
   >;
   bsvhu?: Resolver<
     ResolversTypes["Bsvhu"],
@@ -6747,6 +7531,23 @@ export type Resolvers<ContextType = GraphQLContext> = {
   BsdasriWasteDetails?: BsdasriWasteDetailsResolvers<ContextType>;
   BsdConnection?: BsdConnectionResolvers<ContextType>;
   BsdEdge?: BsdEdgeResolvers<ContextType>;
+  Bsff?: BsffResolvers<ContextType>;
+  BsffConnection?: BsffConnectionResolvers<ContextType>;
+  BsffDestination?: BsffDestinationResolvers<ContextType>;
+  BsffEdge?: BsffEdgeResolvers<ContextType>;
+  BsffEmission?: BsffEmissionResolvers<ContextType>;
+  BsffEmitter?: BsffEmitterResolvers<ContextType>;
+  BsffFicheIntervention?: BsffFicheInterventionResolvers<ContextType>;
+  BsffOperation?: BsffOperationResolvers<ContextType>;
+  BsffOwner?: BsffOwnerResolvers<ContextType>;
+  BsffPackaging?: BsffPackagingResolvers<ContextType>;
+  BsffPlannedOperation?: BsffPlannedOperationResolvers<ContextType>;
+  BsffQuantity?: BsffQuantityResolvers<ContextType>;
+  BsffReception?: BsffReceptionResolvers<ContextType>;
+  BsffTransport?: BsffTransportResolvers<ContextType>;
+  BsffTransporter?: BsffTransporterResolvers<ContextType>;
+  BsffTransporterRecepisse?: BsffTransporterRecepisseResolvers<ContextType>;
+  BsffWaste?: BsffWasteResolvers<ContextType>;
   Bsvhu?: BsvhuResolvers<ContextType>;
   BsvhuConnection?: BsvhuConnectionResolvers<ContextType>;
   BsvhuDestination?: BsvhuDestinationResolvers<ContextType>;
@@ -6784,6 +7585,7 @@ export type Resolvers<ContextType = GraphQLContext> = {
   FormEcoOrganisme?: FormEcoOrganismeResolvers<ContextType>;
   formsLifeCycleData?: FormsLifeCycleDataResolvers<ContextType>;
   FormSubscription?: FormSubscriptionResolvers<ContextType>;
+  IBsffOperation?: IBsffOperationResolvers<ContextType>;
   Installation?: InstallationResolvers<ContextType>;
   Invitation?: InvitationResolvers<ContextType>;
   JSON?: GraphQLScalarType;
@@ -7407,6 +8209,386 @@ export function createBsdWhereMock(props: Partial<BsdWhere>): BsdWhere {
     isArchivedFor: null,
     isToCollectFor: null,
     isCollectedFor: null,
+    ...props
+  };
+}
+
+export function createBsffMock(props: Partial<Bsff>): Bsff {
+  return {
+    __typename: "Bsff",
+    id: "",
+    emitter: null,
+    packagings: [],
+    waste: null,
+    quantity: null,
+    transporter: null,
+    destination: null,
+    ficheInterventions: [],
+    bsffs: [],
+    ...props
+  };
+}
+
+export function createBsffConnectionMock(
+  props: Partial<BsffConnection>
+): BsffConnection {
+  return {
+    __typename: "BsffConnection",
+    totalCount: 0,
+    pageInfo: createPageInfoMock({}),
+    edges: [],
+    ...props
+  };
+}
+
+export function createBsffDestinationMock(
+  props: Partial<BsffDestination>
+): BsffDestination {
+  return {
+    __typename: "BsffDestination",
+    company: createFormCompanyMock({}),
+    reception: null,
+    operation: null,
+    plannedOperation: createBsffPlannedOperationMock({}),
+    cap: null,
+    ...props
+  };
+}
+
+export function createBsffDestinationInputMock(
+  props: Partial<BsffDestinationInput>
+): BsffDestinationInput {
+  return {
+    company: createCompanyInputMock({}),
+    cap: null,
+    reception: null,
+    plannedOperation: null,
+    operation: null,
+    ...props
+  };
+}
+
+export function createBsffDestinationOperationInputMock(
+  props: Partial<BsffDestinationOperationInput>
+): BsffDestinationOperationInput {
+  return {
+    code: "R2",
+    qualification: "RECUPERATION_REGENERATION",
+    ...props
+  };
+}
+
+export function createBsffDestinationReceptionInputMock(
+  props: Partial<BsffDestinationReceptionInput>
+): BsffDestinationReceptionInput {
+  return {
+    date: new Date(),
+    kilos: 0,
+    refusal: null,
+    ...props
+  };
+}
+
+export function createBsffEdgeMock(props: Partial<BsffEdge>): BsffEdge {
+  return {
+    __typename: "BsffEdge",
+    cursor: "",
+    node: createBsffMock({}),
+    ...props
+  };
+}
+
+export function createBsffEmissionMock(
+  props: Partial<BsffEmission>
+): BsffEmission {
+  return {
+    __typename: "BsffEmission",
+    signature: createSignatureMock({}),
+    ...props
+  };
+}
+
+export function createBsffEmitterMock(
+  props: Partial<BsffEmitter>
+): BsffEmitter {
+  return {
+    __typename: "BsffEmitter",
+    company: createFormCompanyMock({}),
+    emission: null,
+    ...props
+  };
+}
+
+export function createBsffEmitterInputMock(
+  props: Partial<BsffEmitterInput>
+): BsffEmitterInput {
+  return {
+    company: createCompanyInputMock({}),
+    ...props
+  };
+}
+
+export function createBsffFicheInterventionMock(
+  props: Partial<BsffFicheIntervention>
+): BsffFicheIntervention {
+  return {
+    __typename: "BsffFicheIntervention",
+    numero: "",
+    kilos: 0,
+    owner: null,
+    postalCode: "",
+    ...props
+  };
+}
+
+export function createBsffFicheInterventionInputMock(
+  props: Partial<BsffFicheInterventionInput>
+): BsffFicheInterventionInput {
+  return {
+    kilos: 0,
+    owner: createBsffOwnerInputMock({}),
+    postalCode: "",
+    ...props
+  };
+}
+
+export function createBsffInputMock(props: Partial<BsffInput>): BsffInput {
+  return {
+    emitter: null,
+    packagings: null,
+    waste: null,
+    quantity: null,
+    transporter: null,
+    destination: null,
+    ...props
+  };
+}
+
+export function createBsffOperationMock(
+  props: Partial<BsffOperation>
+): BsffOperation {
+  return {
+    __typename: "BsffOperation",
+    code: null,
+    qualification: "RECUPERATION_REGENERATION",
+    signature: null,
+    ...props
+  };
+}
+
+export function createBsffOwnerMock(props: Partial<BsffOwner>): BsffOwner {
+  return {
+    __typename: "BsffOwner",
+    company: createFormCompanyMock({}),
+    ...props
+  };
+}
+
+export function createBsffOwnerInputMock(
+  props: Partial<BsffOwnerInput>
+): BsffOwnerInput {
+  return {
+    company: createCompanyInputMock({}),
+    ...props
+  };
+}
+
+export function createBsffPackagingMock(
+  props: Partial<BsffPackaging>
+): BsffPackaging {
+  return {
+    __typename: "BsffPackaging",
+    numero: "",
+    type: "BOUTEILLE",
+    litres: 0,
+    ...props
+  };
+}
+
+export function createBsffPackagingInputMock(
+  props: Partial<BsffPackagingInput>
+): BsffPackagingInput {
+  return {
+    numero: "",
+    type: "BOUTEILLE",
+    litres: 0,
+    ...props
+  };
+}
+
+export function createBsffPlannedOperationMock(
+  props: Partial<BsffPlannedOperation>
+): BsffPlannedOperation {
+  return {
+    __typename: "BsffPlannedOperation",
+    code: null,
+    qualification: "RECUPERATION_REGENERATION",
+    ...props
+  };
+}
+
+export function createBsffQuantityMock(
+  props: Partial<BsffQuantity>
+): BsffQuantity {
+  return {
+    __typename: "BsffQuantity",
+    kilos: 0,
+    isEstimate: false,
+    ...props
+  };
+}
+
+export function createBsffQuantityInputMock(
+  props: Partial<BsffQuantityInput>
+): BsffQuantityInput {
+  return {
+    kilos: 0,
+    isEstimate: false,
+    ...props
+  };
+}
+
+export function createBsffReceptionMock(
+  props: Partial<BsffReception>
+): BsffReception {
+  return {
+    __typename: "BsffReception",
+    date: new Date(),
+    kilos: 0,
+    refusal: null,
+    signature: null,
+    ...props
+  };
+}
+
+export function createBsffTransportMock(
+  props: Partial<BsffTransport>
+): BsffTransport {
+  return {
+    __typename: "BsffTransport",
+    mode: "ROAD",
+    signature: createSignatureMock({}),
+    ...props
+  };
+}
+
+export function createBsffTransporterMock(
+  props: Partial<BsffTransporter>
+): BsffTransporter {
+  return {
+    __typename: "BsffTransporter",
+    company: createFormCompanyMock({}),
+    recepisse: null,
+    transport: null,
+    ...props
+  };
+}
+
+export function createBsffTransporterInputMock(
+  props: Partial<BsffTransporterInput>
+): BsffTransporterInput {
+  return {
+    company: createCompanyInputMock({}),
+    recepisse: null,
+    transport: null,
+    ...props
+  };
+}
+
+export function createBsffTransporterRecepisseMock(
+  props: Partial<BsffTransporterRecepisse>
+): BsffTransporterRecepisse {
+  return {
+    __typename: "BsffTransporterRecepisse",
+    number: "",
+    department: "",
+    validityLimit: new Date(),
+    ...props
+  };
+}
+
+export function createBsffTransporterRecepisseInputMock(
+  props: Partial<BsffTransporterRecepisseInput>
+): BsffTransporterRecepisseInput {
+  return {
+    number: "",
+    department: "",
+    validityLimit: new Date(),
+    ...props
+  };
+}
+
+export function createBsffTransporterTransportInputMock(
+  props: Partial<BsffTransporterTransportInput>
+): BsffTransporterTransportInput {
+  return {
+    mode: "ROAD",
+    ...props
+  };
+}
+
+export function createBsffWasteMock(props: Partial<BsffWaste>): BsffWaste {
+  return {
+    __typename: "BsffWaste",
+    code: "",
+    description: "",
+    adr: "",
+    ...props
+  };
+}
+
+export function createBsffWasteInputMock(
+  props: Partial<BsffWasteInput>
+): BsffWasteInput {
+  return {
+    code: "",
+    description: "",
+    adr: "",
+    ...props
+  };
+}
+
+export function createBsffWhereMock(props: Partial<BsffWhere>): BsffWhere {
+  return {
+    emitter: null,
+    transporter: null,
+    destination: null,
+    ...props
+  };
+}
+
+export function createBsffWhereCompanyMock(
+  props: Partial<BsffWhereCompany>
+): BsffWhereCompany {
+  return {
+    siret: "",
+    ...props
+  };
+}
+
+export function createBsffWhereDestinationMock(
+  props: Partial<BsffWhereDestination>
+): BsffWhereDestination {
+  return {
+    company: null,
+    ...props
+  };
+}
+
+export function createBsffWhereEmitterMock(
+  props: Partial<BsffWhereEmitter>
+): BsffWhereEmitter {
+  return {
+    company: null,
+    ...props
+  };
+}
+
+export function createBsffWhereTransporterMock(
+  props: Partial<BsffWhereTransporter>
+): BsffWhereTransporter {
+  return {
+    company: null,
     ...props
   };
 }
@@ -8634,6 +9816,16 @@ export function createSignatureFormInputMock(
   return {
     sentAt: new Date(),
     sentBy: "",
+    ...props
+  };
+}
+
+export function createSignatureInputMock(
+  props: Partial<SignatureInput>
+): SignatureInput {
+  return {
+    date: new Date(),
+    author: "",
     ...props
   };
 }
