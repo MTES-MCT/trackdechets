@@ -1189,7 +1189,7 @@ export type BsffOperationCode = "R2" | "R12" | "D10" | "D13" | "D14";
 export type BsffOperationQualification =
   | "RECUPERATION_REGENERATION"
   | "INCINERATION"
-  | "REGROUPEMENT"
+  | "GROUPEMENT"
   | "RECONDITIONNEMENT"
   | "REEXPEDITION";
 

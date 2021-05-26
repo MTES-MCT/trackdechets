@@ -13617,7 +13617,7 @@ Par exemple, seul le code D 10 peut être associé à une incinération.
 <td></td>
 </tr>
 <tr>
-<td valign="top"><strong>REGROUPEMENT</strong></td>
+<td valign="top"><strong>GROUPEMENT</strong></td>
 <td></td>
 </tr>
 <tr>

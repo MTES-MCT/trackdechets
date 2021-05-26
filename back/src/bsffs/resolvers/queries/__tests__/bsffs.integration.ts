@@ -245,7 +245,7 @@ describe("Query.bsffs", () => {
       { emitter },
       {
         destinationOperationCode: OPERATION_CODES.R12,
-        destinationOperationQualification: OPERATION_QUALIFICATIONS.REGROUPEMENT
+        destinationOperationQualification: OPERATION_QUALIFICATIONS.GROUPEMENT
       }
     );
 

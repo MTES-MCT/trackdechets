@@ -1210,7 +1210,7 @@ export enum BsffOperationCode {
 export enum BsffOperationQualification {
   RecuperationRegeneration = "RECUPERATION_REGENERATION",
   Incineration = "INCINERATION",
-  Regroupement = "REGROUPEMENT",
+  Groupement = "GROUPEMENT",
   Reconditionnement = "RECONDITIONNEMENT",
   Reexpedition = "REEXPEDITION"
 }

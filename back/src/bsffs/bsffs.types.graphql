@@ -173,7 +173,7 @@ Par exemple, seul le code D 10 peut être associé à une incinération.
 enum BsffOperationQualification {
   RECUPERATION_REGENERATION
   INCINERATION
-  REGROUPEMENT
+  GROUPEMENT
   RECONDITIONNEMENT
   REEXPEDITION
 }
