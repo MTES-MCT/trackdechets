@@ -6,7 +6,7 @@ import {
   BsffResolvers
 } from "../../generated/graphql/types";
 import { OPERATION_CODES, OPERATION_QUALIFICATIONS } from "../constants";
-import { unflattenFicheInterventionBsff } from "../converter";
+import { unflattenBsff, unflattenFicheInterventionBsff } from "../converter";
 import bsffs from "./queries/bsffs";
 import createBsff from "./mutations/createBsff";
 import updateBsff from "./mutations/updateBsff";
@@ -38,6 +38,18 @@ const Bsff: BsffResolvers = {
       }
     });
     return ficheInterventions.map(unflattenFicheInterventionBsff);
+  },
+  bsffs: async parent => {
+    const bsffs = await prisma.bsff.findMany({
+      where: {
+        bsffId: parent.id
+      }
+    });
+    return bsffs.map(bsff => ({
+      ...unflattenBsff(bsff),
+      ficheInterventions: [],
+      bsffs: []
+    }));
   }
 };
 
