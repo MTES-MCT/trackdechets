@@ -1332,10 +1332,16 @@ export type BsffWhereCompany = {
 
 export type BsffWhereDestination = {
   company?: Maybe<BsffWhereCompany>;
+  operation?: Maybe<BsffWhereOperation>;
 };
 
 export type BsffWhereEmitter = {
   company?: Maybe<BsffWhereCompany>;
+};
+
+export type BsffWhereOperation = {
+  code?: Maybe<BsffOperationCode>;
+  qualification?: Maybe<BsffOperationQualification>;
 };
 
 export type BsffWhereTransporter = {
@@ -4838,6 +4844,9 @@ export type ResolversTypes = {
   BsffWhereCompany: BsffWhereCompany;
   BsffWhereTransporter: BsffWhereTransporter;
   BsffWhereDestination: BsffWhereDestination;
+  BsffWhereOperation: BsffWhereOperation;
+  BsffOperationCode: BsffOperationCode;
+  BsffOperationQualification: BsffOperationQualification;
   BsffConnection: ResolverTypeWrapper<BsffConnection>;
   BsffEdge: ResolverTypeWrapper<BsffEdge>;
   Bsff: ResolverTypeWrapper<Bsff>;
@@ -4856,8 +4865,6 @@ export type ResolversTypes = {
   IBsffOperation:
     | ResolversTypes["BsffOperation"]
     | ResolversTypes["BsffPlannedOperation"];
-  BsffOperationCode: BsffOperationCode;
-  BsffOperationQualification: BsffOperationQualification;
   BsffPlannedOperation: ResolverTypeWrapper<BsffPlannedOperation>;
   BsffFicheIntervention: ResolverTypeWrapper<BsffFicheIntervention>;
   BsffOwner: ResolverTypeWrapper<BsffOwner>;
@@ -5142,6 +5149,7 @@ export type ResolversParentTypes = {
   BsffWhereCompany: BsffWhereCompany;
   BsffWhereTransporter: BsffWhereTransporter;
   BsffWhereDestination: BsffWhereDestination;
+  BsffWhereOperation: BsffWhereOperation;
   BsffConnection: BsffConnection;
   BsffEdge: BsffEdge;
   Bsff: Bsff;
@@ -10279,6 +10287,7 @@ export function createBsffWhereDestinationMock(
 ): BsffWhereDestination {
   return {
     company: null,
+    operation: null,
     ...props
   };
 }
@@ -10288,6 +10297,16 @@ export function createBsffWhereEmitterMock(
 ): BsffWhereEmitter {
   return {
     company: null,
+    ...props
+  };
+}
+
+export function createBsffWhereOperationMock(
+  props: Partial<BsffWhereOperation>
+): BsffWhereOperation {
+  return {
+    code: null,
+    qualification: null,
     ...props
   };
 }

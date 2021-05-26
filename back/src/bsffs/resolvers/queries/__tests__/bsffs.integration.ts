@@ -7,6 +7,7 @@ import {
   companyAssociatedToExistingUserFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { OPERATION_CODES, OPERATION_QUALIFICATIONS } from "../../../constants";
 import { getFicheInterventionId } from "../../../converter";
 import { createBsff } from "../../../__tests__/factories";
 
@@ -154,5 +155,117 @@ describe("Query.bsffs", () => {
         ]
       })
     );
+  });
+
+  it("should filter bsffs with a given operation code", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    await createBsff(
+      { emitter },
+      {
+        destinationOperationCode: OPERATION_CODES.D10,
+        destinationOperationQualification: OPERATION_QUALIFICATIONS.INCINERATION
+      }
+    );
+    await createBsff(
+      { emitter },
+      {
+        destinationOperationCode: OPERATION_CODES.R12,
+        destinationOperationQualification:
+          OPERATION_QUALIFICATIONS.RECONDITIONNEMENT
+      }
+    );
+
+    const { query } = makeClient(emitter.user);
+    const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+      GET_BSFFS,
+      {
+        variables: {
+          where: {
+            destination: {
+              operation: {
+                code: "D10"
+              }
+            }
+          }
+        }
+      }
+    );
+
+    expect(data.bsffs.edges.length).toBe(1);
+  });
+
+  it("should filter bsffs with a given operation qualification", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    await createBsff(
+      { emitter },
+      {
+        destinationOperationCode: OPERATION_CODES.D10,
+        destinationOperationQualification: OPERATION_QUALIFICATIONS.INCINERATION
+      }
+    );
+    await createBsff(
+      { emitter },
+      {
+        destinationOperationCode: OPERATION_CODES.R12,
+        destinationOperationQualification:
+          OPERATION_QUALIFICATIONS.RECONDITIONNEMENT
+      }
+    );
+
+    const { query } = makeClient(emitter.user);
+    const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+      GET_BSFFS,
+      {
+        variables: {
+          where: {
+            destination: {
+              operation: {
+                qualification: "INCINERATION"
+              }
+            }
+          }
+        }
+      }
+    );
+
+    expect(data.bsffs.edges.length).toBe(1);
+  });
+
+  it("should filter bsffs with a given operation code and qualification", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    await createBsff(
+      { emitter },
+      {
+        destinationOperationCode: OPERATION_CODES.R12,
+        destinationOperationQualification:
+          OPERATION_QUALIFICATIONS.RECONDITIONNEMENT
+      }
+    );
+    await createBsff(
+      { emitter },
+      {
+        destinationOperationCode: OPERATION_CODES.R12,
+        destinationOperationQualification: OPERATION_QUALIFICATIONS.REGROUPEMENT
+      }
+    );
+
+    const { query } = makeClient(emitter.user);
+    const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+      GET_BSFFS,
+      {
+        variables: {
+          where: {
+            destination: {
+              operation: {
+                code: "R12",
+                qualification: "RECONDITIONNEMENT"
+              }
+            }
+          }
+        }
+      }
+    );
+
+    expect(data.bsffs.edges.length).toBe(1);
   });
 });

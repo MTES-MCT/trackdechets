@@ -10383,6 +10383,11 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 <td valign="top"><a href="#bsffwherecompany">BsffWhereCompany</a></td>
 <td></td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>operation</strong></td>
+<td valign="top"><a href="#bsffwhereoperation">BsffWhereOperation</a></td>
+<td></td>
+</tr>
 </tbody>
 </table>
 
@@ -10400,6 +10405,30 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 <tr>
 <td colspan="2" valign="top"><strong>company</strong></td>
 <td valign="top"><a href="#bsffwherecompany">BsffWhereCompany</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffWhereOperation
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>qualification</strong></td>
+<td valign="top"><a href="#bsffoperationqualification">BsffOperationQualification</a></td>
 <td></td>
 </tr>
 </tbody>

@@ -1357,10 +1357,16 @@ export type BsffWhereCompany = {
 
 export type BsffWhereDestination = {
   company?: Maybe<BsffWhereCompany>;
+  operation?: Maybe<BsffWhereOperation>;
 };
 
 export type BsffWhereEmitter = {
   company?: Maybe<BsffWhereCompany>;
+};
+
+export type BsffWhereOperation = {
+  code?: Maybe<BsffOperationCode>;
+  qualification?: Maybe<BsffOperationQualification>;
 };
 
 export type BsffWhereTransporter = {

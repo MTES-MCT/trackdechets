@@ -13,15 +13,24 @@ input BsffWhere {
   transporter: BsffWhereTransporter
   destination: BsffWhereDestination
 }
+
 input BsffWhereEmitter {
   company: BsffWhereCompany
 }
+
 input BsffWhereTransporter {
   company: BsffWhereCompany
 }
+
 input BsffWhereDestination {
   company: BsffWhereCompany
+  operation: BsffWhereOperation
 }
+input BsffWhereOperation {
+  code: BsffOperationCode
+  qualification: BsffOperationQualification
+}
+
 input BsffWhereCompany {
   siret: String!
 }
