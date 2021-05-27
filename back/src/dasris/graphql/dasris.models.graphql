@@ -139,6 +139,8 @@ type BsdasriEmission {
   wasteDetails: BsdasriWasteDetails
   handedOverAt: DateTime
   signature: BsdasriSignature
+  isDirectTakenOver: Boolean
+  isTakenOverWithSecretCode: Boolean
 }
 
 "Informations relatives à l'acceptation ou au refus du déchet (Bsdasri)"

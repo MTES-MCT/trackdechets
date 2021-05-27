@@ -3114,6 +3114,16 @@ Informations relatives au déchet émis
 <td valign="top"><a href="#bsdasrisignature">BsdasriSignature</a></td>
 <td></td>
 </tr>
+<tr>
+<td colspan="2" valign="top"><strong>isDirectTakenOver</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>isTakenOverWithSecretCode</strong></td>
+<td valign="top"><a href="#boolean">Boolean</a></td>
+<td></td>
+</tr>
 </tbody>
 </table>
 

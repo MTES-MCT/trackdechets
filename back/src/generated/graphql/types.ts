@@ -452,6 +452,8 @@ export type BsdasriEmission = {
   wasteDetails?: Maybe<BsdasriWasteDetails>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
   signature?: Maybe<BsdasriSignature>;
+  isDirectTakenOver?: Maybe<Scalars["Boolean"]>;
+  isTakenOverWithSecretCode?: Maybe<Scalars["Boolean"]>;
 };
 
 export type BsdasriEmissionInput = {
@@ -5261,6 +5263,16 @@ export type BrokerResolvers<
     ParentType,
     ContextType
   >;
+  isDirectTakenOver?: Resolver<
+    Maybe<ResolversTypes["Boolean"]>,
+    ParentType,
+    ContextType
+  >;
+  isTakenOverWithSecretCode?: Resolver<
+    Maybe<ResolversTypes["Boolean"]>,
+    ParentType,
+    ContextType
+  >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -9116,6 +9128,8 @@ export function createBsdasriEmissionMock(
     wasteDetails: null,
     handedOverAt: null,
     signature: null,
+    isDirectTakenOver: null,
+    isTakenOverWithSecretCode: null,
     ...props
   };
 }
