@@ -4,6 +4,7 @@ import { Bsdasri, BsdasriStatus } from "generated/graphql/types";
 
 import { IconBSDasri } from "common/components/Icons";
 import { CellProps, CellValue } from "react-table";
+import { BSDAsriActions } from "dashboard/components/BSDList/BSDasri/BSDasriActions/BSDasriActions";
 
 const dasriVerboseStatuses: Record<BsdasriStatus, string> = {
   INITIAL: "Initial",
@@ -62,6 +63,6 @@ export const COLUMNS: Record<
   },
   actions: {
     accessor: () => null,
-    Cell: () => null, // not implemented yet
+    Cell: ({ row }) => <BSDAsriActions form={row.original} />,
   },
 };

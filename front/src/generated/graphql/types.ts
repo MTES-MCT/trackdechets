@@ -455,6 +455,10 @@ export type BsdasriEmission = {
   wasteDetails?: Maybe<BsdasriWasteDetails>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
   signature?: Maybe<BsdasriSignature>;
+  /** Emporté sans signature PRED avec son autorisation prélalable */
+  isTakenOverWithoutEmitterSignature?: Maybe<Scalars["Boolean"]>;
+  /** Signature PRED avec code de sécurité */
+  isTakenOverWithSecretCode?: Maybe<Scalars["Boolean"]>;
 };
 
 export type BsdasriEmissionInput = {

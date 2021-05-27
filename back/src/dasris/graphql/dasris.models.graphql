@@ -139,7 +139,9 @@ type BsdasriEmission {
   wasteDetails: BsdasriWasteDetails
   handedOverAt: DateTime
   signature: BsdasriSignature
-  isDirectTakenOver: Boolean
+  "Emporté sans signature PRED avec son autorisation prélalable"
+  isTakenOverWithoutEmitterSignature: Boolean
+  "Signature PRED avec code de sécurité"
   isTakenOverWithSecretCode: Boolean
 }
 

@@ -23,6 +23,7 @@ import {
   IconPaperWrite,
   IconDuplicateFile,
   IconTrash,
+  IconBSDD,
 } from "common/components/Icons";
 import routes from "common/routes";
 
@@ -30,12 +31,17 @@ import {
   getVerboseConsistence,
   getVerboseAcceptationStatus,
   getVerboseQuantityType,
-} from "./utils";
+} from "dashboard/detail/common/utils";
 import QRCodeIcon from "react-qr-code";
 
-import styles from "./BSDDetailContent.module.scss";
+import styles from "dashboard/detail/common/BSDDetailContent.module.scss";
 
-import { DateRow, DetailRow, YesNoRow, PackagingRow } from "./Components";
+import {
+  DateRow,
+  DetailRow,
+  YesNoRow,
+  PackagingRow,
+} from "dashboard/detail/common/Components";
 import { WorkflowAction } from "dashboard/components/BSDList";
 import EditSegment from "./EditSegment";
 
@@ -339,6 +345,8 @@ export default function BSDDetailContent({
       <div className={styles.detail}>
         <div className={styles.detailSummary}>
           <h4 className={styles.detailTitle}>
+            <IconBSDD className="tw-mr-2" />
+
             <span className={styles.detailStatus}>
               [{statusLabels[form.status]}]
             </span>

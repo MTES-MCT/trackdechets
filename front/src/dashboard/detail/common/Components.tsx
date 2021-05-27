@@ -3,7 +3,15 @@ import { formatDate } from "common/datetime";
 import { PackagingInfo } from "generated/graphql/types";
 import { getPackagingInfosSummary } from "form/bsdd/utils/packagings";
 
-export const DetailRow = ({ value, label }) => {
+export const DetailRow = ({
+  value,
+  label,
+  units = null,
+}: {
+  value: string | number | undefined | null;
+  label: string;
+  units?: string | undefined | null;
+}) => {
   if (!value) {
     return null;
   }
@@ -11,7 +19,9 @@ export const DetailRow = ({ value, label }) => {
   return (
     <>
       <dt>{label}</dt>
-      <dd>{value}</dd>
+      <dd>
+        {value} {value ? units : null}
+      </dd>
     </>
   );
 };

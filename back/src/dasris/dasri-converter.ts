@@ -54,7 +54,7 @@ export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
     emission: nullIfNoValues<BsdasriEmission>({
       wasteCode: bsdasri.wasteDetailsCode,
       handedOverAt: bsdasri.handedOverToTransporterAt,
-      isDirectTakenOver: bsdasri.isEmissionDirectTakenOver,
+      isTakenOverWithoutEmitterSignature: bsdasri.isEmissionDirectTakenOver,
       isTakenOverWithSecretCode: bsdasri.isEmissionTakenOverWithSecretCode,
       signature: nullIfNoValues<BsdasriSignature>({
         author: bsdasri.emissionSignatureAuthor,

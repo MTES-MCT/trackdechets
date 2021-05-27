@@ -3115,14 +3115,22 @@ Informations relatives au déchet émis
 <td></td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>isDirectTakenOver</strong></td>
+<td colspan="2" valign="top"><strong>isTakenOverWithoutEmitterSignature</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a></td>
-<td></td>
+<td>
+
+Emporté sans signature PRED avec son autorisation prélalable
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>isTakenOverWithSecretCode</strong></td>
 <td valign="top"><a href="#boolean">Boolean</a></td>
-<td></td>
+<td>
+
+Signature PRED avec code de sécurité
+
+</td>
 </tr>
 </tbody>
 </table>

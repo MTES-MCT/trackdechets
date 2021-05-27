@@ -6,6 +6,7 @@
     margin-bottom: 1rem;
     font-size: 1.5rem;
     display: flex;
+    align-items: center;
   }
   &Status {
     color: $grey-darker;
@@ -55,6 +56,10 @@
     }
     dd {
       overflow-wrap: break-word;
+    }
+    .spanWidth {
+      grid-column-start: 1;
+      grid-column-end: 3;
     }
   }
   &Summary {
@@ -139,5 +144,25 @@
     @include desktop {
       flex-direction: row;
     }
+  }
+}
+.WastePackaging {
+  &Caption {
+    color: $grey-dark;
+    font-weight: bold;
+    text-align: center;
+  }
+  border-top: 1px solid $grey;
+  border-bottom: 1px solid $grey;
+  thead {
+    th {
+      border-bottom: 1px solid $grey;
+    }
+  }
+  th {
+    text-align: left;
+  }
+  tr:nth-child(even) {
+    background-color: $grey-lightest;
   }
 }
