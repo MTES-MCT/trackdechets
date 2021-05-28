@@ -100,6 +100,25 @@ describe("Error handling", () => {
     expect(error.message).toEqual("Erreur serveur");
   });
 
+  test("Sentry id should be displayed when available", async () => {
+    process.env.NODE_ENV = "production";
+    const server = require("../server").server;
+    const { query } = createTestClient(server);
+    mockFoo.mockImplementationOnce(() => {
+      const error = new ApolloError("Bang");
+      error.sentryId = "sentry_id";
+      throw error;
+    });
+    const { errors } = await query({ query: FOO });
+    expect(errors).toHaveLength(1);
+
+    const error = errors[0];
+    expect(error.extensions.code).toEqual("INTERNAL_SERVER_ERROR");
+    expect(error.message).toEqual(
+      "Erreur serveur : rapport d'erreur sentry_id"
+    );
+  });
+
   test("the message of unhandled errors thrown should be masked", async () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;

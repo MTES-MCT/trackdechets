@@ -93,10 +93,10 @@ export const server = new ApolloServer({
       }
       // Do not leak error for internal server error in production
       const sentryId = (err?.originalError as any)?.sentryId;
-      const defaultErrorMessage =
-        "Erreur serveur" + (sentryId ? ` : Rapport d'erreur ${sentryId}` : "");
       return new ApolloError(
-        defaultErrorMessage,
+        sentryId
+          ? `Erreur serveur : rapport d'erreur ${sentryId}`
+          : "Erreur serveur",
         ErrorCode.INTERNAL_SERVER_ERROR
       );
     }
