@@ -50,6 +50,10 @@ const sentryReporter: ApolloServerPlugin = {
           });
 
           const sentryId = Sentry.captureException(err, scope);
+
+          // kinda of a hack but seems to be the only way to pass
+          // info down to formatError. See also
+          // https://github.com/apollographql/apollo-server/issues/4010
           (err as any).sentryId = sentryId;
         }
       }
