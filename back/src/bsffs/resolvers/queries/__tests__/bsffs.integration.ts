@@ -59,7 +59,9 @@ describe("Query.bsffs", () => {
   it("should not return bsffs not associated with the user company", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     await createBsff({ emitter });
-    await createBsff();
+
+    const otherEmitter = await userWithCompanyFactory(UserRole.ADMIN);
+    await createBsff({ emitter: otherEmitter });
 
     const { query } = makeClient(emitter.user);
     const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
