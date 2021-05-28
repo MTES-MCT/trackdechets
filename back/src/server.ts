@@ -199,6 +199,14 @@ app.get("/exports", (_, res) =>
 // Apply passport auth middlewares to the graphQL endpoint
 app.use(graphQLPath, passportBearerMiddleware, passportJwtMiddleware);
 
+// Returns 404 Not Found for every routes not handled by apollo
+app.use((req, res, next) => {
+  const healthCheckPath = "/.well-known/apollo/server-health";
+  if (![graphQLPath, healthCheckPath].includes(req.path)) {
+    return res.status(404).send("Not found");
+  }
+  next();
+});
 /**
  * Wire up ApolloServer to /
  * UI_BASE_URL is explicitly set in the origin list
