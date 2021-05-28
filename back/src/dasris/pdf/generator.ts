@@ -51,10 +51,8 @@ export async function buildPdf(bsdasri: Bsdasri) {
     await browser.close();
 
     return pdfBuffer;
-  } catch (err) {
+  } finally {
     await browser.close();
-
-    throw new Error("Erreur lors du téléchargement du PDF");
   }
 }
 
