@@ -14,16 +14,10 @@ interface CreateBsffArgs {
   emitter?: UserWithCompany;
   transporter?: UserWithCompany;
   destination?: UserWithCompany;
-  ficheInterventions?: Prisma.BsffFicheInterventionCreateInput[];
 }
 
 export function createBsff(
-  {
-    emitter,
-    transporter,
-    destination,
-    ficheInterventions
-  }: CreateBsffArgs = {},
+  { emitter, transporter, destination }: CreateBsffArgs = {},
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   const data = {
@@ -61,14 +55,6 @@ export function createBsff(
       destinationCompanyContact: destination.user.name,
       destinationCompanyPhone: destination.company.contactPhone,
       destinationCompanyMail: destination.company.contactEmail
-    });
-  }
-
-  if (ficheInterventions) {
-    Object.assign(data, {
-      ficheInterventions: {
-        create: ficheInterventions
-      }
     });
   }
 

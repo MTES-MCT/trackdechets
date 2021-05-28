@@ -1,4 +1,6 @@
 type Query {
+  bsff(id: ID!): Bsff!
+
   bsffs(
     after: ID
     first: Int

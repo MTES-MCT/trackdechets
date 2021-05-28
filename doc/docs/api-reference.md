@@ -258,6 +258,16 @@ Filtres de recherche
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>bsff</strong></td>
+<td valign="top"><a href="#bsff">Bsff</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td></td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>bsffs</strong></td>
 <td valign="top"><a href="#bsffconnection">BsffConnection</a>!</td>
 <td></td>

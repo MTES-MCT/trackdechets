@@ -139,23 +139,27 @@ describe("Query.bsffs", () => {
     const ficheInterventionNumero = "0000001";
     await createBsff(
       {
-        emitter,
-        ficheInterventions: [
-          {
-            id: getFicheInterventionId(bsffId, ficheInterventionNumero),
-            numero: ficheInterventionNumero,
-            kilos: 2,
-            ownerCompanyName: "Acme",
-            ownerCompanySiret: "1".repeat(14),
-            ownerCompanyAddress: "12 rue de la Tige, 69000",
-            ownerCompanyMail: "contact@gmail.com",
-            ownerCompanyPhone: "06",
-            ownerCompanyContact: "Jeanne Michelin",
-            postalCode: "69000"
-          }
-        ]
+        emitter
       },
-      { id: bsffId }
+      {
+        id: bsffId,
+        ficheInterventions: {
+          create: [
+            {
+              id: getFicheInterventionId(bsffId, ficheInterventionNumero),
+              numero: ficheInterventionNumero,
+              kilos: 2,
+              ownerCompanyName: "Acme",
+              ownerCompanySiret: "1".repeat(14),
+              ownerCompanyAddress: "12 rue de la Tige, 69000",
+              ownerCompanyMail: "contact@gmail.com",
+              ownerCompanyPhone: "06",
+              ownerCompanyContact: "Jeanne Michelin",
+              postalCode: "69000"
+            }
+          ]
+        }
+      }
     );
 
     const { query } = makeClient(emitter.user);
@@ -308,26 +312,29 @@ describe("Query.bsffs", () => {
         {
           emitter,
           transporter,
-          destination,
-          ficheInterventions: [
-            {
-              id: ficheInterventionId,
-              numero: ficheInterventionNumero,
-              kilos: 2,
-              postalCode: "69000",
-              ownerCompanyName: "Acme",
-              ownerCompanySiret: "1".repeat(14),
-              ownerCompanyAddress: "12 rue Albert Lyon 69000",
-              ownerCompanyContact: "Carla Brownie",
-              ownerCompanyMail: "carla.brownie@gmail.com",
-              ownerCompanyPhone: "06"
-            }
-          ]
+          destination
         },
         {
           id: bsffId,
           destinationOperationCode: OPERATION_CODES.R12,
-          destinationOperationQualification: OPERATION_QUALIFICATIONS.GROUPEMENT
+          destinationOperationQualification:
+            OPERATION_QUALIFICATIONS.GROUPEMENT,
+          ficheInterventions: {
+            create: [
+              {
+                id: ficheInterventionId,
+                numero: ficheInterventionNumero,
+                kilos: 2,
+                postalCode: "69000",
+                ownerCompanyName: "Acme",
+                ownerCompanySiret: "1".repeat(14),
+                ownerCompanyAddress: "12 rue Albert Lyon 69000",
+                ownerCompanyContact: "Carla Brownie",
+                ownerCompanyMail: "carla.brownie@gmail.com",
+                ownerCompanyPhone: "06"
+              }
+            ]
+          }
         }
       );
       associatedBsffFicheIntervention = await prisma.bsffFicheIntervention.findUnique(

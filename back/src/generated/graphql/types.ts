@@ -3593,6 +3593,7 @@ export type Query = {
    */
   bsdasris: BsdasriConnection;
   bsds: BsdConnection;
+  bsff: Bsff;
   bsffs: BsffConnection;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsvhu: Bsvhu;
@@ -3745,6 +3746,11 @@ export type QueryBsdsArgs = {
   after?: Maybe<Scalars["String"]>;
   first?: Maybe<Scalars["Int"]>;
   orderBy?: Maybe<OrderBy>;
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsffArgs = {
+  id: Scalars["ID"];
 };
 
 /** Views of the Company ressource for the admin panel */
@@ -4840,16 +4846,6 @@ export type ResolversTypes = {
   BsvhuMetadata: ResolverTypeWrapper<BsvhuMetadata>;
   BsvhuError: ResolverTypeWrapper<BsvhuError>;
   SignatureTypeInput: SignatureTypeInput;
-  BsffWhere: BsffWhere;
-  BsffWhereEmitter: BsffWhereEmitter;
-  BsffWhereCompany: BsffWhereCompany;
-  BsffWhereTransporter: BsffWhereTransporter;
-  BsffWhereDestination: BsffWhereDestination;
-  BsffWhereOperation: BsffWhereOperation;
-  BsffOperationCode: BsffOperationCode;
-  BsffOperationQualification: BsffOperationQualification;
-  BsffConnection: ResolverTypeWrapper<BsffConnection>;
-  BsffEdge: ResolverTypeWrapper<BsffEdge>;
   Bsff: ResolverTypeWrapper<Bsff>;
   BsffEmitter: ResolverTypeWrapper<BsffEmitter>;
   BsffEmission: ResolverTypeWrapper<BsffEmission>;
@@ -4866,9 +4862,19 @@ export type ResolversTypes = {
   IBsffOperation:
     | ResolversTypes["BsffOperation"]
     | ResolversTypes["BsffPlannedOperation"];
+  BsffOperationCode: BsffOperationCode;
+  BsffOperationQualification: BsffOperationQualification;
   BsffPlannedOperation: ResolverTypeWrapper<BsffPlannedOperation>;
   BsffFicheIntervention: ResolverTypeWrapper<BsffFicheIntervention>;
   BsffOwner: ResolverTypeWrapper<BsffOwner>;
+  BsffWhere: BsffWhere;
+  BsffWhereEmitter: BsffWhereEmitter;
+  BsffWhereCompany: BsffWhereCompany;
+  BsffWhereTransporter: BsffWhereTransporter;
+  BsffWhereDestination: BsffWhereDestination;
+  BsffWhereOperation: BsffWhereOperation;
+  BsffConnection: ResolverTypeWrapper<BsffConnection>;
+  BsffEdge: ResolverTypeWrapper<BsffEdge>;
   BsvhuWhere: BsvhuWhere;
   BsvhuEmitterWhere: BsvhuEmitterWhere;
   BsvhuCompanyWhere: BsvhuCompanyWhere;
@@ -5145,14 +5151,6 @@ export type ResolversParentTypes = {
   BsvhuTransport: BsvhuTransport;
   BsvhuMetadata: BsvhuMetadata;
   BsvhuError: BsvhuError;
-  BsffWhere: BsffWhere;
-  BsffWhereEmitter: BsffWhereEmitter;
-  BsffWhereCompany: BsffWhereCompany;
-  BsffWhereTransporter: BsffWhereTransporter;
-  BsffWhereDestination: BsffWhereDestination;
-  BsffWhereOperation: BsffWhereOperation;
-  BsffConnection: BsffConnection;
-  BsffEdge: BsffEdge;
   Bsff: Bsff;
   BsffEmitter: BsffEmitter;
   BsffEmission: BsffEmission;
@@ -5171,6 +5169,14 @@ export type ResolversParentTypes = {
   BsffPlannedOperation: BsffPlannedOperation;
   BsffFicheIntervention: BsffFicheIntervention;
   BsffOwner: BsffOwner;
+  BsffWhere: BsffWhere;
+  BsffWhereEmitter: BsffWhereEmitter;
+  BsffWhereCompany: BsffWhereCompany;
+  BsffWhereTransporter: BsffWhereTransporter;
+  BsffWhereDestination: BsffWhereDestination;
+  BsffWhereOperation: BsffWhereOperation;
+  BsffConnection: BsffConnection;
+  BsffEdge: BsffEdge;
   BsvhuWhere: BsvhuWhere;
   BsvhuEmitterWhere: BsvhuEmitterWhere;
   BsvhuCompanyWhere: BsvhuCompanyWhere;
@@ -8088,6 +8094,12 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QueryBsdsArgs, never>
+  >;
+  bsff?: Resolver<
+    ResolversTypes["Bsff"],
+    ParentType,
+    ContextType,
+    RequireFields<QueryBsffArgs, "id">
   >;
   bsffs?: Resolver<
     ResolversTypes["BsffConnection"],

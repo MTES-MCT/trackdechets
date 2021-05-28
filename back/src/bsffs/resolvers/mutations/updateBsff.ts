@@ -16,7 +16,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const existingBsff = await getBsffOrNotFound(id);
+  const existingBsff = await getBsffOrNotFound({ id });
   await isBsffContributor(user, existingBsff);
 
   if (existingBsff.destinationOperationSignatureDate) {
