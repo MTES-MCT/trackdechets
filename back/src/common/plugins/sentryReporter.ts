@@ -5,6 +5,10 @@ import * as Sentry from "@sentry/node";
 
 const knownErrors = [ApolloError, ValidationError];
 
+/**
+ * Apollo server plugin used to capture unhandled errors in Sentry
+ * https://www.apollographql.com/docs/apollo-server/integrations/plugins/
+ */
 const sentryReporter: ApolloServerPlugin = {
   requestDidStart(requestContext) {
     return {
