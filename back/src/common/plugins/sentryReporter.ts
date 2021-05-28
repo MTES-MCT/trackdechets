@@ -1,4 +1,4 @@
-import { ApolloError } from "apollo-server-errors";
+import { ApolloError } from "apollo-server-express";
 import { ApolloServerPlugin } from "apollo-server-plugin-base";
 import { ValidationError } from "yup";
 import * as Sentry from "@sentry/node";
