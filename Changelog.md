@@ -5,8 +5,17 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2021.06.1] 02/06/2021
+# Next release
 
+#### :rocket: Nouvelles fonctionnalités
+#### :boom: Breaking changes
+#### :bug: Corrections de bugs
+#### :nail_care: Améliorations
+#### :memo: Documentation
+#### :house: Interne
+
+- Seul les erreurs non gérées sont capturées par Sentry [PR 874](https://github.com/MTES-MCT/trackdechets/pull/874)
+# [2021.06.1] 02/06/2021
 #### :rocket: Nouvelles fonctionnalités
 
 - Intégration des bordereaux dasris au moteur de recherche multi bordereaux (api)[PR 850](https://github.com/MTES-MCT/trackdechets/pull/850)
