@@ -5265,16 +5265,6 @@ export type BrokerResolvers<
     ParentType,
     ContextType
   >;
-  isTakenOverWithoutEmitterSignature?: Resolver<
-    Maybe<ResolversTypes["Boolean"]>,
-    ParentType,
-    ContextType
-  >;
-  isTakenOverWithSecretCode?: Resolver<
-    Maybe<ResolversTypes["Boolean"]>,
-    ParentType,
-    ContextType
-  >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -5636,6 +5626,16 @@ export type BsdasriEmissionResolvers<
   >;
   signature?: Resolver<
     Maybe<ResolversTypes["BsdasriSignature"]>,
+    ParentType,
+    ContextType
+  >;
+  isTakenOverWithoutEmitterSignature?: Resolver<
+    Maybe<ResolversTypes["Boolean"]>,
+    ParentType,
+    ContextType
+  >;
+  isTakenOverWithSecretCode?: Resolver<
+    Maybe<ResolversTypes["Boolean"]>,
     ParentType,
     ContextType
   >;

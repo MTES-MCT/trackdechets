@@ -8,14 +8,23 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 # Next release
 
 #### :rocket: Nouvelles fonctionnalités
+
+- Affiche le détail d'un bordereau dasri [PR 876](https://github.com/MTES-MCT/trackdechets/pull/876)
+
 #### :boom: Breaking changes
+
 #### :bug: Corrections de bugs
+
 #### :nail_care: Améliorations
+
 #### :memo: Documentation
+
 #### :house: Interne
 
 - Seul les erreurs non gérées sont capturées par Sentry [PR 874](https://github.com/MTES-MCT/trackdechets/pull/874)
+
 # [2021.06.1] 02/06/2021
+
 #### :rocket: Nouvelles fonctionnalités
 
 - Intégration des bordereaux dasris au moteur de recherche multi bordereaux (api)[PR 850](https://github.com/MTES-MCT/trackdechets/pull/850)
@@ -33,6 +42,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Masquage des informations liées à l'émetteur initial d'une annexe 2 dans le PDF d'un bordereau de regroupement lorsqu'il est téléchargé par un autre acteur que l'installation effectuant le regroupement [PR 865](https://github.com/MTES-MCT/trackdechets/pull/865)
 - Ajout d'un mécanisme permettant de renvoyer un email d'activation [PR 874](https://github.com/MTES-MCT/trackdechets/pull/874)
+
 #### :memo: Documentation
 
 #### :house: Interne
