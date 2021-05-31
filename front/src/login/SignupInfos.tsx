@@ -17,7 +17,7 @@ export default function SignupInfo() {
         <h2 className="h2 tw-mb-6">On y est presque !</h2>
 
         <p className="lead-text tw-mb-6">
-          Un mail de confirmation vous a été envoyé à l'adresse {signupEmail}
+          Un email de confirmation vous a été envoyé à l'adresse {signupEmail}
           <span role="img" aria-label="Valise" className="tw-ml-1">
             📨
           </span>
@@ -53,6 +53,20 @@ export default function SignupInfo() {
             </span>
             Pour recevoir nos emails sans encombres, vous pouvez ajouter
             hello@trackdechets.beta.gouv.fr à votre liste de contacts
+          </li>
+          <li>
+            <span
+              role="img"
+              aria-label="Index d'une main pointant à droite"
+              className="tw-mr-1"
+            >
+              👉
+            </span>
+            Si vous n'avez pas reçu l'email de confirmation au bout d'une heure,
+            vous pouvez le renvoyer depuis{" "}
+            <Link to={routes.resendActivationEmail} className="link">
+              cette page
+            </Link>
           </li>
         </ul>
         <p className="lead-text tw-mb-5">
