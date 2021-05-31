@@ -5,6 +5,18 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# Unplanified release
+
+#### :rocket: Nouvelles fonctionnalités
+#### :boom: Breaking changes
+#### :bug: Corrections de bugs
+#### :nail_care: Améliorations
+
+- Ajout d'un mécanisme permettant de renvoyer un email d'activation [PR 874](https://github.com/MTES-MCT/trackdechets/pull/874)
+
+#### :memo: Documentation
+#### :house: Interne
+
 # Next release (June)
 
 #### :rocket: Nouvelles fonctionnalités
