@@ -18,7 +18,7 @@ const RESEND_ACTIVATION_EMAIL = gql`
 const sendMailSpy = jest.spyOn(mailing, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
 
-describe("mutation resendActivationLink", () => {
+describe("mutation resendActivationEmail", () => {
   afterAll(resetDatabase);
 
   it("should resend activation email to user", async () => {
