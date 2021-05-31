@@ -108,6 +108,13 @@ export default withRouter(function Login(
             </Link>
           </p>
           <p className="tw-my-5">
+            Vous n'avez pas reçu d'email d'activation suite à votre inscription
+            ?{" "}
+            <Link to={routes.resendActivationEmail} className="link">
+              Renvoyez l'email d'activation
+            </Link>
+          </p>
+          <p className="tw-my-5">
             Vous avez perdu votre mot de passe ?{" "}
             <Link to={routes.resetPassword} className="link">
               Réinitialisez le

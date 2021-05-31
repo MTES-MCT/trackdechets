@@ -2887,6 +2887,11 @@ export type Mutation = {
   renewSecurityCode: CompanyPrivate;
   /**
    * USAGE INTERNE
+   * Renvoie un email d'activation
+   */
+  resendActivationEmail: Scalars["Boolean"];
+  /**
+   * USAGE INTERNE
    * Renvoie l'email d'invitation à un établissement
    */
   resendInvitation: Scalars["Boolean"];
@@ -3261,6 +3266,10 @@ export type MutationRemoveUserFromCompanyArgs = {
 
 export type MutationRenewSecurityCodeArgs = {
   siret: Scalars["String"];
+};
+
+export type MutationResendActivationEmailArgs = {
+  email: Scalars["String"];
 };
 
 export type MutationResendInvitationArgs = {

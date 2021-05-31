@@ -22,6 +22,12 @@ type Mutation {
 
   """
   USAGE INTERNE
+  Renvoie un email d'activation
+  """
+  resendActivationEmail(email: String!): Boolean!
+
+  """
+  USAGE INTERNE
   Modifie le mot de passe d'un utilisateur
   """
   changePassword(oldPassword: String!, newPassword: String!): User!

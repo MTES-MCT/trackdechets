@@ -11,6 +11,7 @@ export default {
     details: "/signup/details",
     activation: "/signup/activation",
   },
+  resendActivationEmail: "/resend-activation-email",
   resetPassword: "/reset-password",
   company: "/company/:siret",
   wasteTree: "/wasteTree",
