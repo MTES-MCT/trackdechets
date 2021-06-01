@@ -1114,11 +1114,17 @@ export type BsffDestinationInput = {
   company: CompanyInput;
   cap?: Maybe<Scalars["String"]>;
   reception?: Maybe<BsffDestinationReceptionInput>;
-  plannedOperation?: Maybe<BsffDestinationOperationInput>;
+  plannedOperation?: Maybe<BsffDestinationPlannedOperationInput>;
   operation?: Maybe<BsffDestinationOperationInput>;
 };
 
 export type BsffDestinationOperationInput = {
+  code: BsffOperationCode;
+  qualification: BsffOperationQualification;
+  nextDestination?: Maybe<BsffOperationNextDestinationInput>;
+};
+
+export type BsffDestinationPlannedOperationInput = {
   code: BsffOperationCode;
   qualification: BsffOperationQualification;
 };
@@ -1184,12 +1190,19 @@ export type BsffInput = {
   bsffs?: Maybe<Array<Scalars["ID"]>>;
 };
 
-export type BsffOperation = IBsffOperation & {
+export type BsffNextDestination = {
+  __typename?: "BsffNextDestination";
+  company: FormCompany;
+};
+
+export type BsffOperation = {
   __typename?: "BsffOperation";
   /** Code de l'opération de traitement. */
   code?: Maybe<BsffOperationCode>;
   /** Qualification plus précise du type d'opération réalisée. */
   qualification: BsffOperationQualification;
+  /** Destination ultérieure prévue, dans le cas d'un envoi vers l'étranger. */
+  nextDestination?: Maybe<BsffNextDestination>;
   /** Signature de la destination lors du traitement. */
   signature?: Maybe<Signature>;
 };
@@ -1202,6 +1215,10 @@ export enum BsffOperationCode {
   D13 = "D13",
   D14 = "D14"
 }
+
+export type BsffOperationNextDestinationInput = {
+  company: CompanyInput;
+};
 
 /**
  * Liste des qualifications de traitement possible.
@@ -1246,7 +1263,7 @@ export enum BsffPackagingType {
   Bouteille = "BOUTEILLE"
 }
 
-export type BsffPlannedOperation = IBsffOperation & {
+export type BsffPlannedOperation = {
   __typename?: "BsffPlannedOperation";
   /** Code de l'opération de traitement prévu. */
   code?: Maybe<BsffOperationCode>;
@@ -2521,13 +2538,6 @@ export enum GerepType {
   Producteur = "Producteur",
   Traiteur = "Traiteur"
 }
-
-export type IBsffOperation = {
-  /** Code de l'opération de traitement. */
-  code?: Maybe<BsffOperationCode>;
-  /** Qualification plus précise du type d'opération réalisée. */
-  qualification: BsffOperationQualification;
-};
 
 /** Payload d'import d'un BSD papier */
 export type ImportPaperFormInput = {

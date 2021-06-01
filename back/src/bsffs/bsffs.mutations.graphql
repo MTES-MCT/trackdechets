@@ -110,7 +110,7 @@ input BsffDestinationInput {
   company: CompanyInput!
   cap: String
   reception: BsffDestinationReceptionInput
-  plannedOperation: BsffDestinationOperationInput
+  plannedOperation: BsffDestinationPlannedOperationInput
   operation: BsffDestinationOperationInput
 }
 input BsffDestinationReceptionInput {
@@ -118,9 +118,17 @@ input BsffDestinationReceptionInput {
   kilos: Int!
   refusal: String
 }
+input BsffDestinationPlannedOperationInput {
+  code: BsffOperationCode!
+  qualification: BsffOperationQualification!
+}
 input BsffDestinationOperationInput {
   code: BsffOperationCode!
   qualification: BsffOperationQualification!
+  nextDestination: BsffOperationNextDestinationInput
+}
+input BsffOperationNextDestinationInput {
+  company: CompanyInput!
 }
 
 input BsffFicheInterventionInput {

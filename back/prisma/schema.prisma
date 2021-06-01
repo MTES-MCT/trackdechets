@@ -861,6 +861,13 @@ model Bsff {
   destinationOperationCode          String?
   destinationOperationQualification String?
 
+  destinationOperationNextDestinationCompanyName    String?
+  destinationOperationNextDestinationCompanySiret   String?
+  destinationOperationNextDestinationCompanyAddress String?
+  destinationOperationNextDestinationCompanyContact String?
+  destinationOperationNextDestinationCompanyPhone   String?
+  destinationOperationNextDestinationCompanyMail    String?
+
   destinationOperationSignatureAuthor String?
   destinationOperationSignatureDate   DateTime?
 

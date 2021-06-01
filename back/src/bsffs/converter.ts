@@ -58,6 +58,19 @@ export function flattenBsffInput(
     destinationOperationQualification:
       bsffInput.destination?.operation?.qualification,
 
+    destinationOperationNextDestinationCompanyName:
+      bsffInput.destination?.operation?.nextDestination?.company.name,
+    destinationOperationNextDestinationCompanySiret:
+      bsffInput.destination?.operation?.nextDestination?.company.siret,
+    destinationOperationNextDestinationCompanyAddress:
+      bsffInput.destination?.operation?.nextDestination?.company.address,
+    destinationOperationNextDestinationCompanyContact:
+      bsffInput.destination?.operation?.nextDestination?.company.contact,
+    destinationOperationNextDestinationCompanyPhone:
+      bsffInput.destination?.operation?.nextDestination?.company.phone,
+    destinationOperationNextDestinationCompanyMail:
+      bsffInput.destination?.operation?.nextDestination?.company.mail,
+
     destinationCap: bsffInput.destination?.cap
   });
 }
@@ -136,6 +149,18 @@ export function unflattenBsff(
       operation: nullIfNoValues<GraphQL.BsffOperation>({
         code: prismaBsff.destinationOperationCode as GraphQL.BsffOperationCode,
         qualification: prismaBsff.destinationOperationQualification as GraphQL.BsffOperationQualification,
+        nextDestination: nullIfNoValues<GraphQL.BsffNextDestination>({
+          company: nullIfNoValues<GraphQL.FormCompany>({
+            name: prismaBsff.destinationOperationNextDestinationCompanyName,
+            siret: prismaBsff.destinationOperationNextDestinationCompanySiret,
+            address:
+              prismaBsff.destinationOperationNextDestinationCompanyAddress,
+            contact:
+              prismaBsff.destinationOperationNextDestinationCompanyContact,
+            phone: prismaBsff.destinationOperationNextDestinationCompanyPhone,
+            mail: prismaBsff.destinationOperationNextDestinationCompanyMail
+          })
+        }),
         signature: nullIfNoValues<GraphQL.Signature>({
           author: prismaBsff.destinationOperationSignatureAuthor,
           date: prismaBsff.destinationOperationSignatureDate

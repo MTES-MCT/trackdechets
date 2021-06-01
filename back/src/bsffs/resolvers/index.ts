@@ -2,7 +2,6 @@ import prisma from "../../prisma";
 import {
   MutationResolvers,
   QueryResolvers,
-  IBsffOperationResolvers,
   BsffResolvers
 } from "../../generated/graphql/types";
 import { OPERATION_CODES, OPERATION_QUALIFICATIONS } from "../constants";
@@ -72,20 +71,10 @@ const Bsff: BsffResolvers = {
   }
 };
 
-const IBsffOperation: IBsffOperationResolvers = {
-  __resolveType: operation => {
-    if ("signature" in operation) {
-      return "BsffOperation";
-    }
-    return "BsffPlannedOperation";
-  }
-};
-
 export default {
   Query,
   Mutation,
   Bsff,
   BsffOperationCode: OPERATION_CODES,
-  BsffOperationQualification: OPERATION_QUALIFICATIONS,
-  IBsffOperation
+  BsffOperationQualification: OPERATION_QUALIFICATIONS
 };

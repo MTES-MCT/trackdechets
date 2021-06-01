@@ -4130,6 +4130,26 @@ Code postal du lieu où l'intervention a eu lieu.
 </tbody>
 </table>
 
+### BsffNextDestination
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#formcompany">FormCompany</a>!</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ### BsffOperation
 
 <table>
@@ -4157,6 +4177,15 @@ Code de l'opération de traitement.
 <td>
 
 Qualification plus précise du type d'opération réalisée.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>nextDestination</strong></td>
+<td valign="top"><a href="#bsffnextdestination">BsffNextDestination</a></td>
+<td>
+
+Destination ultérieure prévue, dans le cas d'un envoi vers l'étranger.
 
 </td>
 </tr>
@@ -9995,7 +10024,7 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>plannedOperation</strong></td>
-<td valign="top"><a href="#bsffdestinationoperationinput">BsffDestinationOperationInput</a></td>
+<td valign="top"><a href="#bsffdestinationplannedoperationinput">BsffDestinationPlannedOperationInput</a></td>
 <td></td>
 </tr>
 <tr>
@@ -10007,6 +10036,35 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 </table>
 
 ### BsffDestinationOperationInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>code</strong></td>
+<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>qualification</strong></td>
+<td valign="top"><a href="#bsffoperationqualification">BsffOperationQualification</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>nextDestination</strong></td>
+<td valign="top"><a href="#bsffoperationnextdestinationinput">BsffOperationNextDestinationInput</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffDestinationPlannedOperationInput
 
 <table>
 <thead>
@@ -10151,6 +10209,25 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 <tr>
 <td colspan="2" valign="top"><strong>bsffs</strong></td>
 <td valign="top">[<a href="#id">ID</a>!]</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+### BsffOperationNextDestinationInput
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>company</strong></td>
+<td valign="top"><a href="#companyinput">CompanyInput</a>!</td>
 <td></td>
 </tr>
 </tbody>
@@ -14688,40 +14765,3 @@ The `String` scalar type represents textual data, represented as UTF-8 character
 ### URL
 
 Chaîne de caractère au format URL, débutant par un protocole http(s).
-
-
-## Interfaces
-
-
-### IBsffOperation
-
-<table>
-<thead>
-<tr>
-<th align="left">Field</th>
-<th align="right">Argument</th>
-<th align="left">Type</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td colspan="2" valign="top"><strong>code</strong></td>
-<td valign="top"><a href="#bsffoperationcode">BsffOperationCode</a></td>
-<td>
-
-Code de l'opération de traitement.
-
-</td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>qualification</strong></td>
-<td valign="top"><a href="#bsffoperationqualification">BsffOperationQualification</a>!</td>
-<td>
-
-Qualification plus précise du type d'opération réalisée.
-
-</td>
-</tr>
-</tbody>
-</table>

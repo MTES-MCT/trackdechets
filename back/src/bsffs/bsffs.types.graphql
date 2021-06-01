@@ -137,21 +137,17 @@ type BsffReception {
   "Signature de la destination lors de l'acceptation ou du refus du déchet."
   signature: Signature
 }
-interface IBsffOperation {
+type BsffOperation {
   "Code de l'opération de traitement."
   code: BsffOperationCode
   "Qualification plus précise du type d'opération réalisée."
   qualification: BsffOperationQualification!
-}
-type BsffOperation implements IBsffOperation {
-  "Code de l'opération de traitement."
-  code: BsffOperationCode
-  "Qualification plus précise du type d'opération réalisée."
-  qualification: BsffOperationQualification!
+  "Destination ultérieure prévue, dans le cas d'un envoi vers l'étranger."
+  nextDestination: BsffNextDestination
   "Signature de la destination lors du traitement."
   signature: Signature
 }
-type BsffPlannedOperation implements IBsffOperation {
+type BsffPlannedOperation {
   "Code de l'opération de traitement prévu."
   code: BsffOperationCode
   "Qualification plus précise du type d'opération prévu."
@@ -176,6 +172,9 @@ enum BsffOperationQualification {
   GROUPEMENT
   RECONDITIONNEMENT
   REEXPEDITION
+}
+type BsffNextDestination {
+  company: FormCompany!
 }
 
 type BsffFicheIntervention {

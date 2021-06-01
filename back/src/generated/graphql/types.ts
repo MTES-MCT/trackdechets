@@ -1099,11 +1099,17 @@ export type BsffDestinationInput = {
   company: CompanyInput;
   cap?: Maybe<Scalars["String"]>;
   reception?: Maybe<BsffDestinationReceptionInput>;
-  plannedOperation?: Maybe<BsffDestinationOperationInput>;
+  plannedOperation?: Maybe<BsffDestinationPlannedOperationInput>;
   operation?: Maybe<BsffDestinationOperationInput>;
 };
 
 export type BsffDestinationOperationInput = {
+  code: BsffOperationCode;
+  qualification: BsffOperationQualification;
+  nextDestination?: Maybe<BsffOperationNextDestinationInput>;
+};
+
+export type BsffDestinationPlannedOperationInput = {
   code: BsffOperationCode;
   qualification: BsffOperationQualification;
 };
@@ -1169,18 +1175,29 @@ export type BsffInput = {
   bsffs?: Maybe<Array<Scalars["ID"]>>;
 };
 
-export type BsffOperation = IBsffOperation & {
+export type BsffNextDestination = {
+  __typename?: "BsffNextDestination";
+  company: FormCompany;
+};
+
+export type BsffOperation = {
   __typename?: "BsffOperation";
   /** Code de l'opération de traitement. */
   code?: Maybe<BsffOperationCode>;
   /** Qualification plus précise du type d'opération réalisée. */
   qualification: BsffOperationQualification;
+  /** Destination ultérieure prévue, dans le cas d'un envoi vers l'étranger. */
+  nextDestination?: Maybe<BsffNextDestination>;
   /** Signature de la destination lors du traitement. */
   signature?: Maybe<Signature>;
 };
 
 /** Liste des codes de traitement possible. */
 export type BsffOperationCode = "R2" | "R12" | "D10" | "D13" | "D14";
+
+export type BsffOperationNextDestinationInput = {
+  company: CompanyInput;
+};
 
 /**
  * Liste des qualifications de traitement possible.
@@ -1222,7 +1239,7 @@ export type BsffPackagingInput = {
 
 export type BsffPackagingType = "BOUTEILLE";
 
-export type BsffPlannedOperation = IBsffOperation & {
+export type BsffPlannedOperation = {
   __typename?: "BsffPlannedOperation";
   /** Code de l'opération de traitement prévu. */
   code?: Maybe<BsffOperationCode>;
@@ -2472,13 +2489,6 @@ export type FormSubscription = {
 
 /** Type d'une déclaration GEREP */
 export type GerepType = "Producteur" | "Traiteur";
-
-export type IBsffOperation = {
-  /** Code de l'opération de traitement. */
-  code?: Maybe<BsffOperationCode>;
-  /** Qualification plus précise du type d'opération réalisée. */
-  qualification: BsffOperationQualification;
-};
 
 /** Payload d'import d'un BSD papier */
 export type ImportPaperFormInput = {
@@ -4859,11 +4869,9 @@ export type ResolversTypes = {
   BsffDestination: ResolverTypeWrapper<BsffDestination>;
   BsffReception: ResolverTypeWrapper<BsffReception>;
   BsffOperation: ResolverTypeWrapper<BsffOperation>;
-  IBsffOperation:
-    | ResolversTypes["BsffOperation"]
-    | ResolversTypes["BsffPlannedOperation"];
   BsffOperationCode: BsffOperationCode;
   BsffOperationQualification: BsffOperationQualification;
+  BsffNextDestination: ResolverTypeWrapper<BsffNextDestination>;
   BsffPlannedOperation: ResolverTypeWrapper<BsffPlannedOperation>;
   BsffFicheIntervention: ResolverTypeWrapper<BsffFicheIntervention>;
   BsffOwner: ResolverTypeWrapper<BsffOwner>;
@@ -4969,7 +4977,9 @@ export type ResolversTypes = {
   BsffTransporterTransportInput: BsffTransporterTransportInput;
   BsffDestinationInput: BsffDestinationInput;
   BsffDestinationReceptionInput: BsffDestinationReceptionInput;
+  BsffDestinationPlannedOperationInput: BsffDestinationPlannedOperationInput;
   BsffDestinationOperationInput: BsffDestinationOperationInput;
+  BsffOperationNextDestinationInput: BsffOperationNextDestinationInput;
   BsvhuInput: BsvhuInput;
   BsvhuEmitterInput: BsvhuEmitterInput;
   BsvhuIdentificationInput: BsvhuIdentificationInput;
@@ -5163,9 +5173,7 @@ export type ResolversParentTypes = {
   BsffDestination: BsffDestination;
   BsffReception: BsffReception;
   BsffOperation: BsffOperation;
-  IBsffOperation:
-    | ResolversParentTypes["BsffOperation"]
-    | ResolversParentTypes["BsffPlannedOperation"];
+  BsffNextDestination: BsffNextDestination;
   BsffPlannedOperation: BsffPlannedOperation;
   BsffFicheIntervention: BsffFicheIntervention;
   BsffOwner: BsffOwner;
@@ -5257,7 +5265,9 @@ export type ResolversParentTypes = {
   BsffTransporterTransportInput: BsffTransporterTransportInput;
   BsffDestinationInput: BsffDestinationInput;
   BsffDestinationReceptionInput: BsffDestinationReceptionInput;
+  BsffDestinationPlannedOperationInput: BsffDestinationPlannedOperationInput;
   BsffDestinationOperationInput: BsffDestinationOperationInput;
+  BsffOperationNextDestinationInput: BsffOperationNextDestinationInput;
   BsvhuInput: BsvhuInput;
   BsvhuEmitterInput: BsvhuEmitterInput;
   BsvhuIdentificationInput: BsvhuIdentificationInput;
@@ -6290,6 +6300,14 @@ export type BsffFicheInterventionResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type BsffNextDestinationResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffNextDestination"] = ResolversParentTypes["BsffNextDestination"]
+> = {
+  company?: Resolver<ResolversTypes["FormCompany"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type BsffOperationResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsffOperation"] = ResolversParentTypes["BsffOperation"]
@@ -6301,6 +6319,11 @@ export type BsffOperationResolvers<
   >;
   qualification?: Resolver<
     ResolversTypes["BsffOperationQualification"],
+    ParentType,
+    ContextType
+  >;
+  nextDestination?: Resolver<
+    Maybe<ResolversTypes["BsffNextDestination"]>,
     ParentType,
     ContextType
   >;
@@ -7392,27 +7415,6 @@ export type FormSubscriptionResolvers<
     ContextType
   >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type IBsffOperationResolvers<
-  ContextType = GraphQLContext,
-  ParentType extends ResolversParentTypes["IBsffOperation"] = ResolversParentTypes["IBsffOperation"]
-> = {
-  __resolveType: TypeResolveFn<
-    "BsffOperation" | "BsffPlannedOperation",
-    ParentType,
-    ContextType
-  >;
-  code?: Resolver<
-    Maybe<ResolversTypes["BsffOperationCode"]>,
-    ParentType,
-    ContextType
-  >;
-  qualification?: Resolver<
-    ResolversTypes["BsffOperationQualification"],
-    ParentType,
-    ContextType
-  >;
 };
 
 export type InstallationResolvers<
@@ -8743,6 +8745,7 @@ export type Resolvers<ContextType = GraphQLContext> = {
   BsffEmission?: BsffEmissionResolvers<ContextType>;
   BsffEmitter?: BsffEmitterResolvers<ContextType>;
   BsffFicheIntervention?: BsffFicheInterventionResolvers<ContextType>;
+  BsffNextDestination?: BsffNextDestinationResolvers<ContextType>;
   BsffOperation?: BsffOperationResolvers<ContextType>;
   BsffOwner?: BsffOwnerResolvers<ContextType>;
   BsffPackaging?: BsffPackagingResolvers<ContextType>;
@@ -8790,7 +8793,6 @@ export type Resolvers<ContextType = GraphQLContext> = {
   FormEcoOrganisme?: FormEcoOrganismeResolvers<ContextType>;
   formsLifeCycleData?: FormsLifeCycleDataResolvers<ContextType>;
   FormSubscription?: FormSubscriptionResolvers<ContextType>;
-  IBsffOperation?: IBsffOperationResolvers<ContextType>;
   Installation?: InstallationResolvers<ContextType>;
   Invitation?: InvitationResolvers<ContextType>;
   JSON?: GraphQLScalarType;
@@ -10003,6 +10005,17 @@ export function createBsffDestinationOperationInputMock(
   return {
     code: "R2",
     qualification: "RECUPERATION_REGENERATION",
+    nextDestination: null,
+    ...props
+  };
+}
+
+export function createBsffDestinationPlannedOperationInputMock(
+  props: Partial<BsffDestinationPlannedOperationInput>
+): BsffDestinationPlannedOperationInput {
+  return {
+    code: "R2",
+    qualification: "RECUPERATION_REGENERATION",
     ...props
   };
 }
@@ -10094,6 +10107,16 @@ export function createBsffInputMock(props: Partial<BsffInput>): BsffInput {
   };
 }
 
+export function createBsffNextDestinationMock(
+  props: Partial<BsffNextDestination>
+): BsffNextDestination {
+  return {
+    __typename: "BsffNextDestination",
+    company: createFormCompanyMock({}),
+    ...props
+  };
+}
+
 export function createBsffOperationMock(
   props: Partial<BsffOperation>
 ): BsffOperation {
@@ -10101,7 +10124,17 @@ export function createBsffOperationMock(
     __typename: "BsffOperation",
     code: null,
     qualification: "RECUPERATION_REGENERATION",
+    nextDestination: null,
     signature: null,
+    ...props
+  };
+}
+
+export function createBsffOperationNextDestinationInputMock(
+  props: Partial<BsffOperationNextDestinationInput>
+): BsffOperationNextDestinationInput {
+  return {
+    company: createCompanyInputMock({}),
     ...props
   };
 }
