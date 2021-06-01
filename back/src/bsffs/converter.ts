@@ -25,6 +25,7 @@ export function flattenBsffInput(
 
     transporterCompanyName: bsffInput.transporter?.company.name,
     transporterCompanySiret: bsffInput.transporter?.company.siret,
+    transporterCompanyVatNumber: bsffInput.transporter?.company.vatNumber,
     transporterCompanyAddress: bsffInput.transporter?.company.address,
     transporterCompanyContact: bsffInput.transporter?.company.contact,
     transporterCompanyPhone: bsffInput.transporter?.company.phone,
@@ -62,6 +63,8 @@ export function flattenBsffInput(
       bsffInput.destination?.operation?.nextDestination?.company.name,
     destinationOperationNextDestinationCompanySiret:
       bsffInput.destination?.operation?.nextDestination?.company.siret,
+    destinationOperationNextDestinationCompanyVatNumber:
+      bsffInput.destination?.operation?.nextDestination?.company.vatNumber,
     destinationOperationNextDestinationCompanyAddress:
       bsffInput.destination?.operation?.nextDestination?.company.address,
     destinationOperationNextDestinationCompanyContact:
@@ -110,6 +113,7 @@ export function unflattenBsff(
       company: nullIfNoValues<GraphQL.FormCompany>({
         name: prismaBsff.transporterCompanyName,
         siret: prismaBsff.transporterCompanySiret,
+        vatNumber: prismaBsff.transporterCompanyVatNumber,
         address: prismaBsff.transporterCompanyAddress,
         contact: prismaBsff.transporterCompanyContact,
         phone: prismaBsff.transporterCompanyPhone,
@@ -153,6 +157,8 @@ export function unflattenBsff(
           company: nullIfNoValues<GraphQL.FormCompany>({
             name: prismaBsff.destinationOperationNextDestinationCompanyName,
             siret: prismaBsff.destinationOperationNextDestinationCompanySiret,
+            vatNumber:
+              prismaBsff.destinationOperationNextDestinationCompanyVatNumber,
             address:
               prismaBsff.destinationOperationNextDestinationCompanyAddress,
             contact:

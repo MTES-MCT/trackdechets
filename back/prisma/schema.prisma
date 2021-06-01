@@ -826,12 +826,13 @@ model Bsff {
   quantityKilos      Int?
   quantityIsEstimate Boolean @default(false)
 
-  transporterCompanyName    String?
-  transporterCompanySiret   String?
-  transporterCompanyAddress String?
-  transporterCompanyContact String?
-  transporterCompanyPhone   String?
-  transporterCompanyMail    String?
+  transporterCompanyName      String?
+  transporterCompanySiret     String?
+  transporterCompanyVatNumber String?
+  transporterCompanyAddress   String?
+  transporterCompanyContact   String?
+  transporterCompanyPhone     String?
+  transporterCompanyMail      String?
 
   transporterRecepisseNumber        String?
   transporterRecepisseDepartment    String?
@@ -861,12 +862,13 @@ model Bsff {
   destinationOperationCode          String?
   destinationOperationQualification String?
 
-  destinationOperationNextDestinationCompanyName    String?
-  destinationOperationNextDestinationCompanySiret   String?
-  destinationOperationNextDestinationCompanyAddress String?
-  destinationOperationNextDestinationCompanyContact String?
-  destinationOperationNextDestinationCompanyPhone   String?
-  destinationOperationNextDestinationCompanyMail    String?
+  destinationOperationNextDestinationCompanyName      String?
+  destinationOperationNextDestinationCompanySiret     String?
+  destinationOperationNextDestinationCompanyVatNumber String?
+  destinationOperationNextDestinationCompanyAddress   String?
+  destinationOperationNextDestinationCompanyContact   String?
+  destinationOperationNextDestinationCompanyPhone     String?
+  destinationOperationNextDestinationCompanyMail      String?
 
   destinationOperationSignatureAuthor String?
   destinationOperationSignatureDate   DateTime?
