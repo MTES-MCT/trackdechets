@@ -2253,7 +2253,7 @@ export type Form = {
   processedBy?: Maybe<Scalars["String"]>;
   /** Date à laquelle le déchet a été traité */
   processedAt?: Maybe<Scalars["DateTime"]>;
-  /** Si oui ou non il y a eu perte de traçabalité */
+  /** Si oui ou non il y a eu rupture de traçabilité */
   noTraceability?: Maybe<Scalars["Boolean"]>;
   /** Destination ultérieure prévue (case 12) */
   nextDestination?: Maybe<NextDestination>;

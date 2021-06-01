@@ -6181,7 +6181,7 @@ Date à laquelle le déchet a été traité
 <td valign="top"><a href="#boolean">Boolean</a></td>
 <td>
 
-Si oui ou non il y a eu perte de traçabalité
+Si oui ou non il y a eu rupture de traçabilité
 
 </td>
 </tr>

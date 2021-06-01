@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Field, Form, useFormikContext } from "formik";
 import {
   PROCESSING_OPERATIONS,
@@ -36,10 +36,12 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
     setFieldValue,
   } = useFormikContext<MutationMarkAsProcessedArgs["processedInfo"]>();
 
+  const isGroupement =
+    processingOperationDone &&
+    PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(processingOperationDone);
+
   useEffect(() => {
-    if (
-      PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(processingOperationDone)
-    ) {
+    if (isGroupement) {
       if (nextDestination == null) {
         setFieldValue("nextDestination", {
           processingOperation: "",
@@ -55,6 +57,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
       }
     } else {
       setFieldValue("nextDestination", null);
+      setFieldValue("noTraceability", false);
     }
   }, [processingOperationDone, nextDestination, setFieldValue]);
 
@@ -111,20 +114,23 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
           />
         </label>
       </div>
-      <div className="form__row form__row--inline">
-        <Field
-          type="checkbox"
-          name="noTraceability"
-          id="id_noTraceability"
-          className="td-checkbox"
-        />
+      {isGroupement && (
+        <div className="form__row form__row--inline">
+          <Field
+            type="checkbox"
+            name="noTraceability"
+            id="id_noTraceability"
+            className="td-checkbox"
+          />
 
-        <label htmlFor="id_noTraceability">
-          {" "}
-          Rupture de traçabilité autorisée par arrêté préfectoral pour ce déchet
-          - la responsabilité du producteur du déchet est transférée
-        </label>
-      </div>
+          <label htmlFor="id_noTraceability">
+            {" "}
+            Rupture de traçabilité autorisée par arrêté préfectoral pour ce
+            déchet - la responsabilité du producteur du déchet est transférée
+          </label>
+        </div>
+      )}
+
       {nextDestination && (
         <div className="form__row">
           <h4>Destination ultérieure prévue</h4>
