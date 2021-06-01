@@ -5,18 +5,6 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# Unplanified release
-
-#### :rocket: Nouvelles fonctionnalités
-#### :boom: Breaking changes
-#### :bug: Corrections de bugs
-#### :nail_care: Améliorations
-
-- Ajout d'un mécanisme permettant de renvoyer un email d'activation [PR 874](https://github.com/MTES-MCT/trackdechets/pull/874)
-
-#### :memo: Documentation
-#### :house: Interne
-
 # Next release (June)
 
 #### :rocket: Nouvelles fonctionnalités
@@ -35,7 +23,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Masquage des informations liées à l'émetteur initial d'une annexe 2 dans le PDF d'un bordereau de regroupement lorsqu'il est téléchargé par un autre acteur que l'installation effectuant le regroupement [PR 865](https://github.com/MTES-MCT/trackdechets/pull/865)
-
+- Ajout d'un mécanisme permettant de renvoyer un email d'activation [PR 874](https://github.com/MTES-MCT/trackdechets/pull/874)
 #### :memo: Documentation
 
 #### :house: Interne
