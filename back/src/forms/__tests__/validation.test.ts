@@ -183,6 +183,53 @@ describe("sealedFormSchema", () => {
     });
   });
 
+  test("when there is 2 bennes", async () => {
+    const testForm = {
+      ...form,
+      wasteDetailsPackagingInfos: [{ type: "BENNE", other: null, quantity: 2 }]
+    };
+
+    const isValid = await sealedFormSchema.isValid(testForm);
+    expect(isValid).toEqual(true);
+  });
+
+  test("when there is 2 citernes", async () => {
+    const testForm = {
+      ...form,
+      wasteDetailsPackagingInfos: [
+        { type: "CITERNE", other: null, quantity: 2 }
+      ]
+    };
+
+    const isValid = await sealedFormSchema.isValid(testForm);
+    expect(isValid).toEqual(true);
+  });
+
+  test("when there is more than 2 bennes", async () => {
+    const testForm = {
+      ...form,
+      wasteDetailsPackagingInfos: [{ type: "BENNE", other: null, quantity: 3 }]
+    };
+    const validateFn = () => sealedFormSchema.validate(testForm);
+    await expect(validateFn()).rejects.toThrow(
+      "Le nombre de benne ou de citerne ne peut être supérieur à 2."
+    );
+  });
+
+  test("when there is more than 2 citernes", async () => {
+    const testForm = {
+      ...form,
+      wasteDetailsPackagingInfos: [
+        { type: "CITERNE", other: null, quantity: 3 }
+      ]
+    };
+
+    const validateFn = () => sealedFormSchema.validate(testForm);
+    await expect(validateFn()).rejects.toThrow(
+      "Le nombre de benne ou de citerne ne peut être supérieur à 2."
+    );
+  });
+
   test("when there is no waste details quantity", async () => {
     const testForm = {
       ...form,

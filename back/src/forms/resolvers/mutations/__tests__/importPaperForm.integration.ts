@@ -40,6 +40,7 @@ describe("mutation / importPaperForm", () => {
         },
         recipient: {
           processingOperation: "R 1",
+          cap: "It's a cap",
           company: {
             siret: "98017829178192",
             name: "Destination",
@@ -290,6 +291,7 @@ describe("mutation / importPaperForm", () => {
       recipientCompanyPhone: "0000000000",
       recipientCompanyContact: "Mr Destination",
       recipientCompanyMail: "recipient@trackdechets.fr",
+      recipientCap: "it's a CAP",
       transporterIsExemptedOfReceipt: true,
       transporterCompanySiret: "09167289178291",
       transporterCompanyName: "Transporteur",

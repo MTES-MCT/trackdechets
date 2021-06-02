@@ -1,11 +1,15 @@
-import { Response } from "express";
+import { Response, Request } from "express";
 import prisma from "../../prisma";
 import { buildPdf } from "./generator";
 
 /**
  * Render a dasri pdf as an HTTP response
  */
-export default async function downloadPdf(res: Response, { id }) {
+export default async function downloadPdf(
+  _req: Request,
+  res: Response,
+  { id }
+) {
   if (!id) {
     res.status(500).send("Identifiant du bordereau manquant.");
   }

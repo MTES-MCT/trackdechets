@@ -12,7 +12,7 @@ import {
   checkEmitterAllowsSignatureWithSecretCode,
   getFieldsUpdate
 } from "./signatureUtils";
-
+import { indexBsdasri } from "../../elastic";
 const basesign = async ({
   id,
   signatureInput,
@@ -66,7 +66,9 @@ const basesign = async ({
     { isEmissionDirectTakenOver, isEmissionTakenOverWithSecretCode }
   );
 
-  return expandBsdasriFromDb(updatedDasri);
+  const expandedDasri = expandBsdasriFromDb(updatedDasri);
+  await indexBsdasri(updatedDasri);
+  return expandedDasri;
 };
 
 export default basesign;

@@ -49,7 +49,7 @@ function toPrismaFilter(where: Omit<BsvhuWhere, "_or" | "_and" | "_not">) {
   });
 }
 
-function toPrismaDateFilter(
+export function toPrismaDateFilter(
   dateFilter: DateFilter | undefined
 ): Prisma.DateTimeFilter {
   if (!dateFilter) {

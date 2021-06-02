@@ -12,8 +12,8 @@ import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { validateBsdasri } from "../../validation";
 import { checkIsBsdasriContributor } from "../../permissions";
-
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
+import { indexBsdasri } from "../../elastic";
 
 const createBsdasri = async (
   parent: ResolversParentTypes["Mutation"],
@@ -57,12 +57,15 @@ const createBsdasri = async (
   const newDasri = await prisma.bsdasri.create({
     data: {
       ...flattenedInput,
-      id: await getReadableId(ReadableIdPrefix.DASRI),
+      id: getReadableId(ReadableIdPrefix.DASRI),
       owner: { connect: { id: user.id } },
       regroupedBsdasris: { connect: regroupedBsdasris },
       isDraft: isDraft
     }
   });
+
+  await indexBsdasri(newDasri);
+
   return expandBsdasriFromDb(newDasri);
 };
 

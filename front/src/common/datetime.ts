@@ -1,4 +1,6 @@
+// eslint-disable-next-line import/no-duplicates
 import { parseISO, format, toDate } from "date-fns";
+// eslint-disable-next-line import/no-duplicates
 import fr from "date-fns/locale/fr";
 
 export function parseDate(date: Date | number | string): Date {

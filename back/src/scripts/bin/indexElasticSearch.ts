@@ -1,5 +1,7 @@
 import { client, index } from "../../common/elastic";
+import { indexAllBsdasris } from "../../dasris/elastic";
 import { indexAllForms } from "../../forms/elastic";
+import { indexAllBsvhus } from "../../vhu/elastic";
 import prisma from "../../prisma";
 
 (async function main() {
@@ -56,6 +58,8 @@ import prisma from "../../prisma";
     `All the documents are being indexed in the new index "${newIndex}" while the alias "${index.alias}" still points to the old index.`
   );
   await indexAllForms(newIndex);
+  await indexAllBsdasris(newIndex);
+  await indexAllBsvhus(newIndex);
 
   console.log(
     `All documents have been indexed, the alias "${index.alias}" will now point to the new index "${newIndex}".`

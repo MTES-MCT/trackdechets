@@ -8,6 +8,7 @@ import {
   checkIsBsdasriPublishable
 } from "../../permissions";
 import prisma from "../../../prisma";
+import { indexBsdasri } from "../../elastic";
 
 const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
   _,
@@ -29,7 +30,9 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
     where: { id: bsdasri.id },
     data: { isDraft: false }
   });
-  return expandBsdasriFromDb(publishedBsdasri);
+  const expandedDasri = expandBsdasriFromDb(publishedBsdasri);
+  await indexBsdasri(publishedBsdasri);
+  return expandedDasri;
 };
 
 export default publishBsdasriResolver;

@@ -7,7 +7,8 @@ import {
   fillFields,
   drawImage,
   processSegment,
-  processAnnexParams
+  processAnnexParams,
+  hideEmitterFields
 } from "./helpers";
 import {
   pageHeight,
@@ -29,10 +30,11 @@ const multimodalYOffset = 85;
  * @param params - payload
  * @return Buffer
  */
-export const buildPdf = async (form: Form) => {
+export const buildPdf = async (form: Form, user?: Express.User | null) => {
   const appendix2Forms = await prisma.form
     .findUnique({ where: { id: form.id } })
     .appendix2Forms();
+
   const segments = await prisma.form
     .findUnique({ where: { id: form.id } })
     .transportSegments();
@@ -454,6 +456,7 @@ export const buildPdf = async (form: Form) => {
       subFormCounter = pageSubFormCounter + sheetCounter * formsByAppendix;
 
       let appendix = appendix2Forms[subFormCounter];
+      appendix = await hideEmitterFields(appendix, user);
       // process each annex and add numbering
       appendix = {
         ...processAnnexParams(appendix),

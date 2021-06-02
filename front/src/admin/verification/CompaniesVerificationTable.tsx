@@ -3,7 +3,7 @@ import {
   CompanyVerificationStatus,
   CompanyVerificationMode,
 } from "generated/graphql/types";
-import React from "react";
+import React, { useMemo, useEffect } from "react";
 import { useTable, usePagination, useFilters } from "react-table";
 import { format } from "date-fns";
 import "./CompaniesVerificationTable.scss";
@@ -24,7 +24,7 @@ export default function CompaniesVerificationTable({
   totalCount,
   pageSize,
 }: Props) {
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
       {
         Header: "Date de création",
@@ -108,7 +108,7 @@ export default function CompaniesVerificationTable({
     []
   );
 
-  const defaultColumn = React.useMemo(
+  const defaultColumn = useMemo(
     () => ({
       // Let's set up our default Filter UI
       Filter: DefaultColumnFilter,
@@ -149,7 +149,7 @@ export default function CompaniesVerificationTable({
   } = tableInstance;
 
   // Listen for changes in pagination and filters and use the state to fetch our new data
-  React.useEffect(() => {
+  useEffect(() => {
     fetchData({ pageIndex, pageSize, filters });
   }, [fetchData, pageIndex, pageSize, filters]);
 

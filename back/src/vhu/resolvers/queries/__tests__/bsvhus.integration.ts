@@ -17,7 +17,8 @@ const GET_BSVHUS = `
         hasNextPage
       }
       edges {
-        node {id
+        node {
+          id
           isDraft
           destination {
             company {

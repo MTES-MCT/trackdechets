@@ -8,7 +8,7 @@ import { userWithCompanyFactory } from "../../__tests__/factories";
 const request = supertest(app);
 
 describe("Exemples de circuit du bordereau de suivi de véhicule hors d'usage", () => {
-  afterEach(() => resetDatabase());
+  afterEach(resetDatabase);
 
   async function apiKey(user: User) {
     const { clearToken } = await createAccessToken(user);
@@ -185,5 +185,5 @@ describe("Exemples de circuit du bordereau de suivi de véhicule hors d'usage", 
     expect(broyeurSignatureResponse.body.data.signBsvhu.status).toBe(
       "PROCESSED"
     );
-  });
+  }, 10000);
 });

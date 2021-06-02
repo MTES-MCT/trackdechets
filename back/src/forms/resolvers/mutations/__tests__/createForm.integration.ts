@@ -511,7 +511,7 @@ describe("Mutation.createForm", () => {
     );
   });
 
-  it("should disallow a form with several CITERNE", async () => {
+  it(`should disallow a form with more than two "citernes"`, async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const createFormInput = {
@@ -531,7 +531,7 @@ describe("Mutation.createForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Le nombre de benne ou de citerne ne peut être supérieur à 1.",
+        message: "Le nombre de benne ou de citerne ne peut être supérieur à 2.",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -539,7 +539,7 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
-  it("should disallow a form with several BENNE", async () => {
+  it(`should disallow a form with more than two "bennes"`, async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const createFormInput = {
@@ -559,7 +559,7 @@ describe("Mutation.createForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Le nombre de benne ou de citerne ne peut être supérieur à 1.",
+        message: "Le nombre de benne ou de citerne ne peut être supérieur à 2.",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

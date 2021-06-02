@@ -2,7 +2,7 @@ import * as React from "react";
 import { generatePath, Link } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import classNames from "classnames";
-import useMedia from "use-media";
+import { useMedia } from "use-media";
 import { Query, QueryBsdsArgs, BsdWhere } from "generated/graphql/types";
 import { MEDIA_QUERIES } from "common/config";
 import { GET_BSDS } from "common/queries";

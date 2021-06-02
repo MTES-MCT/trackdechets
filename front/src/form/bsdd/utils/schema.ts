@@ -6,10 +6,9 @@ import {
   array,
   boolean,
   setLocale,
-  LocaleObject,
   StringSchema,
   mixed,
-  ObjectSchema,
+  SchemaOf,
 } from "yup";
 import countries from "world-countries";
 
@@ -28,7 +27,7 @@ setLocale({
   mixed: {
     notType: "Ce champ ne peut pas être nul",
   },
-} as LocaleObject);
+});
 
 const companySchema = object().shape({
   name: string().required(),
@@ -88,22 +87,27 @@ const destinationSchema = companySchema.concat(
   })
 );
 
-const packagingInfo: ObjectSchema<PackagingInfo> = object().shape({
+const packagingInfo: SchemaOf<Omit<
+  PackagingInfo,
+  "__typename"
+>> = object().shape({
   type: mixed<Packagings>().required(
     "Le type de conditionnement doit être précisé."
   ),
-  other: string().when("type", (type, schema) =>
-    type === "AUTRE"
-      ? schema.required(
-          "La description doit être précisée pour le conditionnement 'AUTRE'."
-        )
-      : schema
-          .nullable()
-          .max(
-            0,
-            "Le description du conditionnement ne peut être renseignée que lorsque le type de conditionnement est 'AUTRE'."
+  other: string()
+    .ensure()
+    .when("type", (type, schema) =>
+      type === "AUTRE"
+        ? schema.required(
+            "La description doit être précisée pour le conditionnement 'AUTRE'."
           )
-  ),
+        : schema
+            .nullable()
+            .max(
+              0,
+              "Le description du conditionnement ne peut être renseignée que lorsque le type de conditionnement est 'AUTRE'."
+            )
+    ),
   quantity: number()
     .required(
       "Le nombre de colis associé au conditionnement doit être précisé."
@@ -113,8 +117,8 @@ const packagingInfo: ObjectSchema<PackagingInfo> = object().shape({
     .when("type", (type, schema) =>
       ["CITERNE", "BENNE"].includes(type)
         ? schema.max(
-            1,
-            "Le nombre de benne ou de citerne ne peut être supérieur à 1."
+            2,
+            "Le nombre de benne ou de citerne ne peut être supérieur à 2."
           )
         : schema
     ),
@@ -143,9 +147,23 @@ export const formSchema = object().shape({
       .test(
         "selected",
         "Vous devez sélectionner une valeur",
-        (v: string) => v !== ""
+        (v: string | undefined) => v !== ""
       ),
-    cap: string().nullable(true),
+    cap: string()
+      .nullable(true)
+      .test(
+        "required-when-dangerous",
+        "Le champ CAP est obligatoire pour les déchets dangereux",
+        (value, testContext) => {
+          const from = (testContext as any).from; // Typings are still missing from the lib. Original PR here https://github.com/jquense/yup/pull/556
+          const { value: rootValue } = from[1]; // from is an array of parents. Each index goes one step further. Root is 2 steps away so its from[1]
+
+          if (rootValue?.wasteDetails?.code?.includes("*") && !value) {
+            return false;
+          }
+          return true;
+        }
+      ),
     company: destinationSchema,
   }),
   transporter: object().shape({
@@ -194,11 +212,12 @@ export const formSchema = object().shape({
     }),
     packagingInfos: array()
       .required()
+      .min(1)
       .of(packagingInfo)
       .test(
         "is-valid-packaging-infos",
         "Le conditionnement ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
-        (infos: PackagingInfo[]) => {
+        infos => {
           const hasCiterne = infos?.find(i => i.type === "CITERNE") != null;
           const hasBenne = infos?.find(i => i.type === "BENNE") != null;
 
@@ -207,7 +226,7 @@ export const formSchema = object().shape({
           }
 
           const hasOtherPackaging = infos?.find(
-            i => !["CITERNE", "BENNE"].includes(i.type)
+            i => i.type && !["CITERNE", "BENNE"].includes(i.type)
           );
           if ((hasCiterne || hasBenne) && hasOtherPackaging) {
             return false;

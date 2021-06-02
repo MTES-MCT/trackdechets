@@ -35,8 +35,6 @@ const MARK_AS_SEALED = `
 `;
 
 describe("Mutation.markAsSealed", () => {
-  afterAll(() => resetDatabase());
-
   const OLD_ENV = process.env;
 
   beforeEach(() => {
@@ -47,6 +45,7 @@ describe("Mutation.markAsSealed", () => {
   afterEach(() => {
     jest.resetAllMocks();
     process.env = OLD_ENV;
+    return resetDatabase();
   });
 
   it("should fail if SEALED is not a possible next state", async () => {
@@ -391,6 +390,71 @@ describe("Mutation.markAsSealed", () => {
     expect(data.markAsSealed.status).toBe("SEALED");
   });
 
+  it("should be required to provide cap for dangerous wastes", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const recipientCompany = await destinationFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        wasteDetailsCode: "05 01 04*",
+        recipientCap: null
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const { errors } = await mutate<Pick<Mutation, "markAsSealed">>(
+      MARK_AS_SEALED,
+      {
+        variables: {
+          id: form.id
+        }
+      }
+    );
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: [
+          "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
+          `Erreur(s): Le champ CAP est obligatoire pour les déchets dangereux`
+        ].join("\n")
+      })
+    ]);
+  });
+
+  it("should be optional to provide cap for non-dangerous wastes", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const recipientCompany = await destinationFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        wasteDetailsCode: "01 01 01",
+        recipientCap: null
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "markAsSealed">>(
+      MARK_AS_SEALED,
+      {
+        variables: {
+          id: form.id
+        }
+      }
+    );
+
+    expect(data.markAsSealed.status).toBe("SEALED");
+  });
+
   it("should mark appendix2 forms as grouped", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destination = await destinationFactory();
@@ -550,7 +614,7 @@ describe("Mutation.markAsSealed", () => {
     ]);
   });
 
-  it.skip("should throw an error if VERIFY_COMPANY=true and destination is not verified", async () => {
+  it("should throw an error if VERIFY_COMPANY=true and destination is not verified", async () => {
     // patch process.env and reload server
     process.env.VERIFY_COMPANY = "true";
     const makeClient = require("../../../../__tests__/testClient").default;
@@ -583,7 +647,7 @@ describe("Mutation.markAsSealed", () => {
     ]);
   });
 
-  it.skip("should throw an error if VERIFY_COMPANY=true and destination after temp storage is not verified", async () => {
+  it("should throw an error if VERIFY_COMPANY=true and destination after temp storage is not verified", async () => {
     // patch process.env and reload server
     process.env.VERIFY_COMPANY = "true";
     const makeClient = require("../../../../__tests__/testClient").default;

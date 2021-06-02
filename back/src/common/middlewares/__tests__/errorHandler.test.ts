@@ -1,5 +1,6 @@
 import express from "express";
 import supertest from "supertest";
+import { json } from "body-parser";
 
 const originalConsole = global.console;
 global.console = { error: jest.fn() } as any;
@@ -17,12 +18,17 @@ describe("errorHandler", () => {
     const app = express();
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const errorHandler = require("../errorHandler").default;
-    app.use(() => {
-      throw new Error("Bang");
+
+    app.use(json());
+
+    app.get("/bim", () => {
+      throw new Error("Bam Boom");
     });
-    app.get("/hello", (_req, res) => {
-      res.status(200).send("world");
+
+    app.post("/echo", (req, res) => {
+      res.status(200).send(req.body);
     });
+
     app.use(errorHandler);
 
     request = supertest(app);
@@ -40,16 +46,38 @@ describe("errorHandler", () => {
   it("should not leak error in production", async () => {
     process.env.NODE_ENV = "production";
     setup();
-    const response = await request.get("/hello");
+    const response = await request.get("/bim");
     expect(response.status).toEqual(500);
-    expect(response.text).toEqual("Erreur serveur");
+    expect(response.text).toEqual(
+      `<!DOCTYPE html>\n` +
+        `<html lang="en">\n` +
+        `<head>\n` +
+        `<meta charset="utf-8">\n` +
+        `<title>Error</title>\n` +
+        `</head>\n` +
+        `<body>\n` +
+        `<pre>Internal Server Error</pre>\n` +
+        `</body>\n` +
+        `</html>\n`
+    );
   });
 
   it("should display error message in development", async () => {
     process.env.NODE_ENV = "dev";
     setup();
-    const response = await request.get("/hello");
+    const response = await request.get("/bim");
     expect(response.status).toEqual(500);
-    expect(response.text).toContain("Bang");
+    expect(response.text).toContain("Bam Boom");
+  });
+
+  it("should tell consumer when JSON is not correctly formatted", async () => {
+    process.env.NODE_ENV = "production";
+    setup();
+    const response = await request
+      .post("/echo")
+      .set("Content-Type", "application/json")
+      .send(`{"query: "{ me { name } }"}`);
+    expect(response.status).toEqual(400);
+    expect(response.text).toEqual(`{"error":"JSON mal formaté"}`);
   });
 });

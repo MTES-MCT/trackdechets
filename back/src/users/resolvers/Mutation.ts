@@ -3,6 +3,7 @@ import signup from "./mutations/signup";
 import login from "./mutations/login";
 import changePassword from "./mutations/changePassword";
 import resetPassword from "./mutations/resetPassword";
+import resendActivationEmail from "./mutations/resendActivationEmail";
 import editProfile from "./mutations/editProfile";
 import inviteUserToCompany from "./mutations/inviteUserToCompany";
 import deleteInvitation from "./mutations/deleteInvitation";
@@ -26,7 +27,8 @@ const Mutation: MutationResolvers = {
   removeUserFromCompany,
   sendMembershipRequest,
   acceptMembershipRequest,
-  refuseMembershipRequest
+  refuseMembershipRequest,
+  resendActivationEmail
 };
 
 export default Mutation;

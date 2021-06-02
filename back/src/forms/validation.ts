@@ -6,7 +6,8 @@ import {
   Form,
   QuantityType,
   WasteAcceptationStatus,
-  Prisma
+  Prisma,
+  CompanyVerificationStatus
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
@@ -23,6 +24,8 @@ import { PackagingInfo, Packagings } from "../generated/graphql/types";
 
 // set yup default error messages
 configureYup();
+
+const { VERIFY_COMPANY } = process.env;
 
 // ************************************************
 // BREAK DOWN FORM TYPE INTO INDIVIDUAL FRAME TYPES
@@ -284,7 +287,25 @@ export const ecoOrganismeSchema = yup.object().shape({
 // 2 - Installation de destination ou d’entreposage ou de reconditionnement prévue
 const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
   yup.object({
-    recipientCap: yup.string().nullable(),
+    recipientCap: yup
+      .string()
+      .nullable()
+      .test(
+        "required-when-dangerous",
+        "Le champ CAP est obligatoire pour les déchets dangereux",
+        (value, testContext) => {
+          const rootValue = testContext.parent;
+
+          if (
+            !isDraft &&
+            isDangerous(rootValue?.wasteDetailsCode ?? "") &&
+            !value
+          ) {
+            return false;
+          }
+          return true;
+        }
+      ),
     recipientIsTempStorage: yup.boolean().nullable(),
     recipientProcessingOperation: yup
       .string()
@@ -352,8 +373,8 @@ const packagingInfoFn = (isDraft: boolean) =>
       .when("type", (type, schema) =>
         ["CITERNE", "BENNE"].includes(type)
           ? schema.max(
-              1,
-              "Le nombre de benne ou de citerne ne peut être supérieur à 1."
+              2,
+              "Le nombre de benne ou de citerne ne peut être supérieur à 2."
             )
           : schema
       )
@@ -967,16 +988,15 @@ async function checkDestination(siret: string) {
     );
   }
 
-  // DISABLED TEMPORARILY
-  // if (
-  //   VERIFY_COMPANY === "true" &&
-  //   company.verificationStatus !== CompanyVerificationStatus.VERIFIED
-  // ) {
-  //   throw new UserInputError(
-  //     `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
-  //     n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 2 du bordereau.`
-  //   );
-  // }
+  if (
+    VERIFY_COMPANY === "true" &&
+    company.verificationStatus !== CompanyVerificationStatus.VERIFIED
+  ) {
+    throw new UserInputError(
+      `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
+      n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 2 du bordereau.`
+    );
+  }
 
   return true;
 }
@@ -1007,16 +1027,15 @@ async function checkDestinationAfterTempStorage(siret: string) {
     );
   }
 
-  // DISABLED TEMPORARILY
-  // if (
-  //   VERIFY_COMPANY === "true" &&
-  //   company.verificationStatus !== CompanyVerificationStatus.VERIFIED
-  // ) {
-  //   throw new UserInputError(
-  //     `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
-  //     n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 14 du bordereau.`
-  //   );
-  // }
+  if (
+    VERIFY_COMPANY === "true" &&
+    company.verificationStatus !== CompanyVerificationStatus.VERIFIED
+  ) {
+    throw new UserInputError(
+      `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${company.siret}
+      n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 14 du bordereau.`
+    );
+  }
 
   return true;
 }

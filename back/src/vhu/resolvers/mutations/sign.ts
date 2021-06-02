@@ -10,10 +10,10 @@ import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { expandVhuFormFromDb } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
-import { AlreadySignedError } from "../../errors";
+import { AlreadySignedError, InvalidSignatureError } from "../../errors";
 import { machine } from "../../machine";
 import { validateBsvhu } from "../../validation";
-
+import { indexBsvhu } from "../../elastic";
 type SignatureTypeInfos = {
   dbDateKey: keyof Bsvhu;
   dbAuthorKey: keyof Bsvhu;
@@ -60,7 +60,11 @@ export default async function sign(
     type: input.type,
     bsvhu: prismaForm
   });
-  //console.log(prismaForm.status,newStatus)
+
+  if (newStatus === prismaForm.status) {
+    throw new InvalidSignatureError();
+  }
+
   const signedForm = await prisma.bsvhu.update({
     where: { id },
     data: {
@@ -70,7 +74,7 @@ export default async function sign(
       status: newStatus as BsvhuStatus
     }
   });
-
+  await indexBsvhu(signedForm);
   return expandVhuFormFromDb(signedForm);
 }
 

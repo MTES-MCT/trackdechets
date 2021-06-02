@@ -8,7 +8,7 @@ import { getNotEditableKeys } from "../../edition-rules";
 import { SealedFieldsError } from "../../errors";
 import { checkIsFormContributor } from "../../permissions";
 import { validateBsvhu } from "../../validation";
-
+import { indexBsvhu } from "../../elastic";
 export default async function edit(
   _,
   { id, input }: MutationUpdateBsvhuArgs,
@@ -48,8 +48,6 @@ export default async function edit(
     data: formUpdate
   });
 
-  // TODO Status log ?
-  // TODO emit event ?
-
+  await indexBsvhu(updatedForm);
   return expandVhuFormFromDb(updatedForm);
 }

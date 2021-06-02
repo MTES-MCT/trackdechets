@@ -3,8 +3,9 @@ import { base32Encode } from "../utils";
 export enum ReadableIdPrefix {
   BSD = "BSD", // Bordereau de suivi des déchets dangereux "générique" (CERFA n° 12571*01)
   DASRI = "DASRI", // Bordereau de suivi des déchets d'activités de soins à risque infectieux
-  HFC = "HFC", // Bordereau de suivi de déchets fluides frigorigènes
-  VHU = "VHU" // Bordereau de suivi des véhicules hors d'usage
+  FF = "FF", // Bordereau de suivi de déchets fluides frigorigènes
+  VHU = "VHU", // Bordereau de suivi des véhicules hors d'usage
+  BSDA = "BSDA" // Bordereau de suivi des déchets d'amiante
 }
 
 /**

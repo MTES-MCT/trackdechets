@@ -5,21 +5,52 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# Next release
+# Next release (June)
 
 #### :rocket: Nouvelles fonctionnalités
+
+- Intégration des bordereaux dasris au moteur de recherche multi bordereaux (api)[PR 850](https://github.com/MTES-MCT/trackdechets/pull/850)
+- Intégration des bordereaux vhus au moteur de recherche multi bordereaux (api)[PR 863](https://github.com/MTES-MCT/trackdechets/pull/863)
+- Ajout du bordereau de fluides frigorigènes à l'API [PR 853](https://github.com/MTES-MCT/trackdechets/pull/853)
+- Ajout du bordereau de suivi des déchets amiante à l'API [PR 873](https://github.com/MTES-MCT/trackdechets/pull/873)
 
 #### :boom: Breaking changes
 
 #### :bug: Corrections de bugs
 
+- Correction du rendu pdf des dasris et vhus [PR 866](https://github.com/MTES-MCT/trackdechets/pull/866) et [PR 871](https://github.com/MTES-MCT/trackdechets/pull/871)
+
 #### :nail_care: Améliorations
+
+- Masquage des informations liées à l'émetteur initial d'une annexe 2 dans le PDF d'un bordereau de regroupement lorsqu'il est téléchargé par un autre acteur que l'installation effectuant le regroupement [PR 865](https://github.com/MTES-MCT/trackdechets/pull/865)
+- Ajout d'un mécanisme permettant de renvoyer un email d'activation [PR 874](https://github.com/MTES-MCT/trackdechets/pull/874)
+#### :memo: Documentation
+
+#### :house: Interne
+
+# [2021.05.1] 04/05/2021
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout de la mutation de duplication bordereaux dasri [PR 848](https://github.com/MTES-MCT/trackdechets/pull/848)
+- Ajout d'une mutation de suppression de bordereau dasri [PR 852](https://github.com/MTES-MCT/trackdechets/pull/852)
+
+#### :boom: Breaking changes
+
+- Le numéro de CAP devient obligatoire pour les déchets dangereux [PR 840](https://github.com/MTES-MCT/trackdechets/pull/840)
+
+#### :bug: Corrections de bugs
+
+#### :nail_care: Améliorations
+
+- Correction de l'indexation des bsdds afin qu'ils soient listés dans tous les onglets appropriés pour une même entreprise [PR 858](https://github.com/MTES-MCT/trackdechets/pull/858)
+- Augmentation de la limite des conditionnements "benne" et "citerne" à 2 (au lieu de 1) [PR 864](https://github.com/MTES-MCT/trackdechets/pull/864)
 
 #### :memo: Documentation
 
 #### :house: Interne
 
-# 2021.05.1
+# [2021.05.1] 04/05/2021
 
 #### :rocket: Nouvelles fonctionnalités
 

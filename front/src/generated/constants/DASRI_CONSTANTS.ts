@@ -16,6 +16,11 @@ export const DASRI_WASTE_CODES = [
     description: "DASRI d'origine animale"
   }
 ];
+
+export const DASRI_WASTE_CODES_MAPPING = DASRI_WASTE_CODES.reduce(
+  (acc, item) => ({ ...acc, ...{ [item.code]: item.description } }),
+  {}
+);
 export const DASRI_PROCESSING_OPERATIONS = [
   {
     type: DasriProcessingOperationType.Pretraitement,

@@ -15,6 +15,7 @@ import Layout from "./Layout";
 import routes from "common/routes";
 import { useQuery, gql } from "@apollo/client";
 import { Query } from "../generated/graphql/types";
+import ResendActivationEmail from "login/ResendActivationEmail";
 
 const Admin = lazy(() => import("admin/Admin"));
 const Dashboard = lazy(() => import("dashboard/Dashboard"));
@@ -122,6 +123,10 @@ export default withRouter(function LayoutContainer({ history }) {
 
               <Route exact path={routes.resetPassword}>
                 <ResetPassword />
+              </Route>
+
+              <Route exact path={routes.resendActivationEmail}>
+                <ResendActivationEmail />
               </Route>
 
               <Route exact path={routes.company}>

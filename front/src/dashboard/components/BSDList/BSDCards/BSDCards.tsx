@@ -59,7 +59,9 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
               <IconView size="24px" style={{ marginRight: "1rem" }} />
               Aperçu
             </Link>
-            <WorkflowAction siret={siret} form={form} />
+            {form.__typename === "Form" ? (
+              <WorkflowAction siret={siret} form={form} />
+            ) : null}
           </div>
         </div>
       ))}

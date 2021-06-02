@@ -21,9 +21,9 @@ const to = [{ name: "John Snow", email: "john.snow@trackdechets.fr" }];
 
 describe("templates", () => {
   test("onSignup", () => {
-    const activationHash = "abcd";
+    const activationHash = "abcd/";
     const rendered = renderMail(onSignup, {
-      variables: { activationHash: "abcd" },
+      variables: { activationHash: "abcd/" },
       to
     });
     expect(rendered.body).toContain(activationHash);

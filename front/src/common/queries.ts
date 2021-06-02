@@ -1,5 +1,10 @@
 import { gql } from "@apollo/client";
-import { detailFormFragment, fullFormFragment } from "./fragments";
+import {
+  detailFormFragment,
+  fullFormFragment,
+  dasriFragment,
+  vhuFragment,
+} from "./fragments";
 
 // full fledged form to display in detailled views
 export const GET_DETAIL_FORM = gql`
@@ -31,6 +36,12 @@ export const GET_BSDS = gql`
           ... on Form {
             ...FullForm
           }
+          ... on Bsdasri {
+            ...DasriFragment
+          }
+          ... on Bsvhu {
+            ...VhuFragment
+          }
         }
       }
       pageInfo {
@@ -41,4 +52,6 @@ export const GET_BSDS = gql`
     }
   }
   ${fullFormFragment}
+  ${dasriFragment}
+  ${vhuFragment}
 `;

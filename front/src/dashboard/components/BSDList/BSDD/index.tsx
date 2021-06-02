@@ -1,17 +1,20 @@
 import * as React from "react";
 import { useParams } from "react-router";
 import { Form } from "generated/graphql/types";
+import { CellProps, CellValue } from "react-table";
 import { ActionButtonContext } from "common/components/ActionButton";
 import { BSDDActions } from "dashboard/components/BSDList/BSDD/BSDDActions/BSDDActions";
 import { IconBSDD } from "common/components/Icons";
 import { statusLabels } from "../../../constants";
 import TransporterInfoEdit from "../TransporterInfoEdit";
-import { Column } from "../columns";
 import { WorkflowAction } from "./WorkflowAction";
 
 export const COLUMNS: Record<
   string,
-  Pick<Column<Form>, "accessor" | "Cell">
+  {
+    accessor: (form: Form) => CellValue;
+    Cell?: React.ComponentType<CellProps<Form>>;
+  }
 > = {
   type: {
     accessor: () => null,

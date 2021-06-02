@@ -214,4 +214,15 @@ type Mutation {
     id: ID!
     signatureInput: BsdasriSignatureWithSecretCodeInput!
   ): Bsdasri
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Duplique un bordereau Dasri
+  """
+  duplicateBsdasri("ID d'un Bsdasri" id: ID!): Bsdasri
+
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Supprime un BSDASRI
+  """
+  deleteBsdasri("ID d'un Dasri" id: ID!): Bsdasri
 }

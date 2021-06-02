@@ -1,8 +1,10 @@
 import classNames from "classnames";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import TdSwitch from "common/components/Switch";
+import Tooltip from "common/components/Tooltip";
 import ProcessingOperation from "form/common/components/processing-operation/ProcessingOperation";
 import { Field, useFormikContext } from "formik";
+import { isDangerous } from "generated/constants";
 import { Form } from "generated/graphql/types";
 import React from "react";
 import CompanySelector from "../common/components/company/CompanySelector";
@@ -22,6 +24,7 @@ export default function Recipient() {
   const hasTrader = !!values.trader;
   const hasBroker = !!values.broker;
   const isTempStorage = !!values.recipient?.isTempStorage;
+  const isDangerousWaste = isDangerous(values.wasteDetails?.code ?? "");
 
   function handleNoneToggle() {
     setFieldValue("broker", null, false);
@@ -106,7 +109,15 @@ export default function Recipient() {
       </div>
       <div className="form__row">
         <label>
-          Numéro de CAP (optionnel)
+          Numéro de CAP
+          {isDangerousWaste ? (
+            <Tooltip
+              msg={`Le champ CAP est obligatoire pour les déchets dangereux.
+Il est important car il qualifie les conditions de gestion et de traitement du déchets entre le producteur et l'entreprise de destination.`}
+            />
+          ) : (
+            " (Optionnel pour les déchets non dangereux)"
+          )}
           <Field
             type="text"
             name="recipient.cap"
