@@ -82,5 +82,11 @@ type Mutation {
   EXPERIMENTAL - Ne pas utiliser dans un contexte de production
   Duplique un Bsda
   """
-  duplicateBsda("ID d'un BSD" id: ID!): Bsda
+  duplicateBsda("ID d'un BSDA" id: ID!): Bsda
+
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Supprime un Bsda
+  """
+  deleteBsda("ID d'un BSDA" id: ID!): Bsda
 }

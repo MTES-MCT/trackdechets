@@ -14,6 +14,9 @@ const GET_BSDAS = `
       edges {
         node {
           id
+          associations {
+            id
+          }
         }
       }
     }
@@ -142,5 +145,33 @@ describe("Query.bsdas", () => {
     );
 
     expect(data.bsdas.edges.length).toBe(0);
+  });
+
+  it("should list the associated bsdas", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const associatedBsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        status: "AWAITING_CHILD"
+      }
+    });
+    await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        bsdas: { connect: [{ id: associatedBsda.id }] }
+      }
+    });
+
+    const { query } = makeClient(emitter.user);
+    const { data } = await query<Pick<Query, "bsdas">, QueryBsdasArgs>(
+      GET_BSDAS
+    );
+
+    expect(data.bsdas.edges[0].node.associations).toEqual([
+      expect.objectContaining({
+        id: associatedBsda.id
+      })
+    ]);
   });
 });

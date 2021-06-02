@@ -2,10 +2,13 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationUpdateBsdaArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
-import { SealedFieldsError } from "../../../vhu/errors";
-import { expandBsdaFormFromDb, flattenBsdaInput } from "../../converter";
+import { expandBsdaFromDb, flattenBsdaInput } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
-import { checkIsFormContributor } from "../../permissions";
+import { checkKeysEditability } from "../../edition-rules";
+import {
+  checkCanAssociateBsdas,
+  checkIsFormContributor
+} from "../../permissions";
 import { validateBsda } from "../../validation";
 
 export default async function edit(
@@ -22,10 +25,7 @@ export default async function edit(
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  const invalidKeys = []; // TODO getNotEditableKeys(input, prismaForm);
-  if (invalidKeys.length) {
-    throw new SealedFieldsError(invalidKeys);
-  }
+  checkKeysEditability(input, prismaForm);
 
   const formUpdate = flattenBsdaInput(input);
 
@@ -43,10 +43,18 @@ export default async function edit(
     transportSignature: prismaForm.transporterTransportSignatureAuthor != null
   });
 
+  await checkCanAssociateBsdas(input.associations);
+  const bsdas = input.associations
+    ? { set: input.associations.map(id => ({ id })) }
+    : undefined;
+
   const updatedForm = await prisma.bsda.update({
     where: { id },
-    data: formUpdate
+    data: {
+      ...formUpdate,
+      bsdas
+    }
   });
 
-  return expandBsdaFormFromDb(updatedForm);
+  return expandBsdaFromDb(updatedForm);
 }

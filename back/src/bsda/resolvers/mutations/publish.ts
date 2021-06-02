@@ -3,7 +3,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationPublishBsdaArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
-import { expandBsdaFormFromDb } from "../../converter";
+import { expandBsdaFromDb } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
 import { checkIsFormContributor } from "../../permissions";
 import { validateBsda } from "../../validation";
@@ -35,5 +35,5 @@ export default async function create(
     data: { isDraft: false }
   });
 
-  return expandBsdaFormFromDb(updatedForm);
+  return expandBsdaFromDb(updatedForm);
 }

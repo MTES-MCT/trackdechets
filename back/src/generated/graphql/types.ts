@@ -316,8 +316,10 @@ export type BsdaInput = {
   destination?: Maybe<BsdaDestinationInput>;
   /** Entreprise de travaux */
   worker?: Maybe<BsdaWorkerInput>;
-  /**  Entreprise de transport */
+  /** Entreprise de transport */
   transporter?: Maybe<BsdaTransporterInput>;
+  /** Précédents bordereaux à associer à celui ci - cas du transit, entreposage provisoire ou groupement */
+  associations?: Maybe<Array<Scalars["ID"]>>;
 };
 
 export type BsdaOperation = {
@@ -2685,6 +2687,11 @@ export type Mutation = {
   deleteBrokerReceipt?: Maybe<BrokerReceipt>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Supprime un Bsda
+   */
+  deleteBsda?: Maybe<Bsda>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Supprime un BSDASRI
    */
   deleteBsdasri?: Maybe<Bsdasri>;
@@ -3098,6 +3105,10 @@ export type MutationCreateVhuAgrementArgs = {
 
 export type MutationDeleteBrokerReceiptArgs = {
   input: DeleteBrokerReceiptInput;
+};
+
+export type MutationDeleteBsdaArgs = {
+  id: Scalars["ID"];
 };
 
 export type MutationDeleteBsdasriArgs = {
@@ -7549,6 +7560,12 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationDeleteBrokerReceiptArgs, "input">
   >;
+  deleteBsda?: Resolver<
+    Maybe<ResolversTypes["Bsda"]>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeleteBsdaArgs, "id">
+  >;
   deleteBsdasri?: Resolver<
     Maybe<ResolversTypes["Bsdasri"]>,
     ParentType,
@@ -9034,6 +9051,7 @@ export function createBsdaInputMock(props: Partial<BsdaInput>): BsdaInput {
     destination: null,
     worker: null,
     transporter: null,
+    associations: null,
     ...props
   };
 }

@@ -6,8 +6,11 @@ import {
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
-import { expandBsdaFormFromDb, flattenBsdaInput } from "../../converter";
-import { checkIsFormContributor } from "../../permissions";
+import { expandBsdaFromDb, flattenBsdaInput } from "../../converter";
+import {
+  checkCanAssociateBsdas,
+  checkIsFormContributor
+} from "../../permissions";
 import { validateBsda } from "../../validation";
 
 type CreateBsda = {
@@ -40,11 +43,16 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     emissionSignature: !isDraft
   });
 
-  // TODO regroupement / transfert
+  await checkCanAssociateBsdas(input.associations);
 
   const newForm = await prisma.bsda.create({
-    data: { ...form, id: getReadableId(ReadableIdPrefix.BSDA), isDraft }
+    data: {
+      ...form,
+      id: getReadableId(ReadableIdPrefix.BSDA),
+      isDraft,
+      bsdas: { connect: input.associations?.map(id => ({ id })) }
+    }
   });
 
-  return expandBsdaFormFromDb(newForm);
+  return expandBsdaFromDb(newForm);
 }

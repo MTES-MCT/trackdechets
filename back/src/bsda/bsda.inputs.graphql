@@ -72,8 +72,11 @@ input BsdaInput {
 
   "Entreprise de travaux"
   worker: BsdaWorkerInput
-  " Entreprise de transport"
+  "Entreprise de transport"
   transporter: BsdaTransporterInput
+
+  "Précédents bordereaux à associer à celui ci - cas du transit, entreposage provisoire ou groupement"
+  associations: [ID!]
 }
 
 input BsdaEmitterInput {
@@ -184,6 +187,7 @@ input BsdaRecepisseInput {
   department: String
   validityLimit: DateTime
 }
+
 input BsdaSignatureInput {
   "Type de signature apposé"
   type: BsdaSignatureType!

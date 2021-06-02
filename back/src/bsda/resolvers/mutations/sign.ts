@@ -9,7 +9,7 @@ import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { AlreadySignedError, InvalidSignatureError } from "../../../vhu/errors";
-import { expandBsdaFormFromDb } from "../../converter";
+import { expandBsdaFromDb } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
 import { machine } from "../../machine";
 import { validateBsda } from "../../validation";
@@ -78,7 +78,7 @@ export default async function sign(
     }
   });
 
-  return expandBsdaFormFromDb(signedForm);
+  return expandBsdaFromDb(signedForm);
 }
 
 const signatureTypeMapping: Record<BsdaSignatureType, SignatureTypeInfos> = {
