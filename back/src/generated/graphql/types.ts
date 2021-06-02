@@ -2835,6 +2835,11 @@ export type Mutation = {
   renewSecurityCode: CompanyPrivate;
   /**
    * USAGE INTERNE
+   * Renvoie un email d'activation
+   */
+  resendActivationEmail: Scalars["Boolean"];
+  /**
+   * USAGE INTERNE
    * Renvoie l'email d'invitation à un établissement
    */
   resendInvitation: Scalars["Boolean"];
@@ -3209,6 +3214,10 @@ export type MutationRemoveUserFromCompanyArgs = {
 
 export type MutationRenewSecurityCodeArgs = {
   siret: Scalars["String"];
+};
+
+export type MutationResendActivationEmailArgs = {
+  email: Scalars["String"];
 };
 
 export type MutationResendInvitationArgs = {
@@ -7637,6 +7646,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationRenewSecurityCodeArgs, "siret">
+  >;
+  resendActivationEmail?: Resolver<
+    ResolversTypes["Boolean"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationResendActivationEmailArgs, "email">
   >;
   resendInvitation?: Resolver<
     ResolversTypes["Boolean"],

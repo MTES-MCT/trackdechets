@@ -185,5 +185,5 @@ describe("Exemples de circuit du bordereau de suivi de véhicule hors d'usage", 
     expect(broyeurSignatureResponse.body.data.signBsvhu.status).toBe(
       "PROCESSED"
     );
-  });
+  }, 10000);
 });
