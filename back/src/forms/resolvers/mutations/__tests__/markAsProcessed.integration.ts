@@ -275,7 +275,7 @@ describe("mutation.markAsProcessed", () => {
         id: form.id,
         processedInfo: {
           processingOperationDescription: "Une description",
-          processingOperationDone: "D 13",
+          processingOperationDone: "D 1",
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           noTraceability: true
