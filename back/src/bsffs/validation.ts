@@ -7,6 +7,7 @@ import {
   GROUPING_CODES,
   OPERATION_CODES,
   OPERATION_QUALIFICATIONS,
+  OPERATION_QUALIFICATIONS_TO_CODES,
   PACKAGING_TYPE,
   WASTE_CODES
 } from "./constants";
@@ -239,7 +240,7 @@ export const beforeReceptionSchema: yup.SchemaOf<Pick<
   destinationReceptionKilos: yup
     .number()
     .nullable()
-    .required("Le poids en kilos du déchet reàu est requis"),
+    .required("Le poids en kilos du déchet reçu est requis"),
   destinationReceptionSignatureDate: yup
     .date()
     .nullable()
@@ -267,7 +268,7 @@ export const beforeOperationSchema: yup.SchemaOf<Pick<
     .string()
     .nullable()
     .oneOf(
-      Object.values(OPERATION_CODES),
+      [null, ...Object.values(OPERATION_CODES)],
       "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : ${values}"
     ),
   destinationOperationQualification: yup
@@ -277,7 +278,21 @@ export const beforeOperationSchema: yup.SchemaOf<Pick<
       Object.values(OPERATION_QUALIFICATIONS),
       "La qualification du traitement ne fait pas partie de la liste reconnue : ${values}"
     )
-    .required(),
+    .required()
+    .test(
+      "operation_qualifications_to_codes",
+      "La qualification ${value} n'est pas compatible avec le code de traitement renseigné",
+      (qualification, context) => {
+        const { destinationOperationCode: code } = context.parent;
+        const codes = OPERATION_QUALIFICATIONS_TO_CODES[qualification] ?? [];
+
+        if (codes.length === 0 && code == null) {
+          return true;
+        }
+
+        return codes.includes(code);
+      }
+    ),
   destinationOperationSignatureDate: yup
     .date()
     .nullable()

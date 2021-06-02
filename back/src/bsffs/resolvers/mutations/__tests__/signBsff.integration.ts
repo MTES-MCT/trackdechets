@@ -9,6 +9,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { OPERATION_CODES, OPERATION_QUALIFICATIONS } from "../../../constants";
 import {
   createBsff,
   createBsffBeforeEmission,
@@ -421,6 +422,113 @@ describe("Mutation.signBsff", () => {
         transporter,
         destination
       });
+
+      const { mutate } = makeClient(destination.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsff">,
+        MutationSignBsffArgs
+      >(SIGN, {
+        variables: {
+          id: bsff.id,
+          type: "OPERATION",
+          signature: {
+            date: new Date().toISOString() as any,
+            author: destination.user.name
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    });
+
+    it("should throw an error if operation code and qualification are incompatible", async () => {
+      const bsff = await createBsffBeforeOperation(
+        {
+          emitter,
+          transporter,
+          destination
+        },
+        {
+          destinationOperationCode: OPERATION_CODES.D10,
+          destinationOperationQualification: OPERATION_QUALIFICATIONS.GROUPEMENT
+        }
+      );
+
+      const { mutate } = makeClient(destination.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsff">,
+        MutationSignBsffArgs
+      >(SIGN, {
+        variables: {
+          id: bsff.id,
+          type: "OPERATION",
+          signature: {
+            date: new Date().toISOString() as any,
+            author: destination.user.name
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    });
+
+    it("should allow signing a bsff for reexpedition", async () => {
+      const bsff = await createBsffBeforeOperation(
+        {
+          emitter,
+          transporter,
+          destination
+        },
+        {
+          destinationOperationCode: null,
+          destinationOperationQualification:
+            OPERATION_QUALIFICATIONS.REEXPEDITION
+        }
+      );
+
+      const { mutate } = makeClient(destination.user);
+      const { data } = await mutate<
+        Pick<Mutation, "signBsff">,
+        MutationSignBsffArgs
+      >(SIGN, {
+        variables: {
+          id: bsff.id,
+          type: "OPERATION",
+          signature: {
+            date: new Date().toISOString() as any,
+            author: destination.user.name
+          }
+        }
+      });
+
+      expect(data.signBsff.id).toBeTruthy();
+    });
+
+    it("should disallow having an operation code with a reexpedition qualification", async () => {
+      const bsff = await createBsffBeforeOperation(
+        {
+          emitter,
+          transporter,
+          destination
+        },
+        {
+          destinationOperationCode: OPERATION_CODES.R12,
+          destinationOperationQualification:
+            OPERATION_QUALIFICATIONS.REEXPEDITION
+        }
+      );
 
       const { mutate } = makeClient(destination.user);
       const { errors } = await mutate<
