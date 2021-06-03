@@ -93,6 +93,7 @@ const Emitter = ({ form }: { form: Bsdasri }) => {
           label="Volume"
           units="l"
         />
+
         <Dasripackaging
           packagingInfos={emission?.wasteDetails?.packagingInfos}
         />
@@ -149,6 +150,7 @@ const Transporter = ({ form }: { form: Bsdasri }) => {
           label="Volume"
           units="l"
         />
+
         <Dasripackaging
           packagingInfos={transport?.wasteDetails?.packagingInfos}
         />
@@ -167,7 +169,7 @@ const Transporter = ({ form }: { form: Bsdasri }) => {
         <DateRow value={transport?.takenOverAt} label="Emporté le" />
         <DateRow
           value={transport?.handedOverAt}
-          label="Date de remise à l'installation destinataire"
+          label="Remise à l'inst. destinataire"
         />
 
         <DateRow value={transport?.signature?.date} label="Signé le" />
@@ -363,31 +365,33 @@ const Dasripackaging = ({
     return null;
   }
   return (
-    <div className={classNames(styles.spanWidth)}>
-      <p className={classNames(styles.WastePackagingCaption)}>
-        Conditionnement
-      </p>
-      <table className={classNames(styles.WastePackaging)}>
-        <thead>
-          <tr className="td-table__head-trs">
-            <th>Type</th>
-            <th>Qté.</th>
-            <th>Vol.</th>
-          </tr>
-        </thead>
-        {packagingInfos.map(row => (
-          <tr className="td-table__tr">
-            <td>
-              {`${getVerbosePackagingType(row.type).substring(0, 20).trim()}…`}
-              {row.other}
-            </td>
+    <>
+      <div className={classNames(styles.spanWidth)}>
+        <table className={classNames(styles.WastePackaging)}>
+          <caption>Conditionnement</caption>
+          <thead>
+            <tr className="td-table__head-trs">
+              <th>Type</th>
+              <th>Qté.</th>
+              <th>Vol.</th>
+            </tr>
+          </thead>
+          {packagingInfos.map(row => (
+            <tr className="td-table__tr">
+              <td>
+                {`${getVerbosePackagingType(row.type)
+                  .substring(0, 20)
+                  .trim()}…`}
+                {row.other}
+              </td>
 
-            <td>{row.quantity}</td>
-            <td>{row.volume} l</td>
-          </tr>
-        ))}
-      </table>
-    </div>
+              <td>{row.quantity}</td>
+              <td>{row.volume} l</td>
+            </tr>
+          ))}
+        </table>
+      </div>
+    </>
   );
 };
 
