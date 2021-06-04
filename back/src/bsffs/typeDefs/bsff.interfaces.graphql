@@ -1,0 +1,6 @@
+interface IBsffOperation {
+  "Code de l'opération de traitement."
+  code: BsffOperationCode
+  "Qualification plus précise du type d'opération réalisée."
+  qualification: BsffOperationQualification!
+}

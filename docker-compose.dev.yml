@@ -52,22 +52,6 @@ services:
     ports:
       - "3000:3000"
 
-  td-doc:
-    image: td-doc
-    build:
-      context: ./doc
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ./doc/docs:/app/docs
-      - ./doc/website/core:/app/website/core
-      - ./doc/website/pages:/app/website/pages
-      - ./doc/website/static:/app/website/static
-      - ./doc/website/sidebars.json:/app/website/sidebars.json
-      - ./doc/website/siteConfig.js:/app/website/siteConfig.js
-    working_dir: /app/website
-    ports:
-      - "5000:5000"
-
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.8.0
     environment:

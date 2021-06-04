@@ -1,0 +1,37 @@
+type Mutation {
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Crée un Bsda
+  """
+  createBsda(input: BsdaInput!): Bsda
+
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Crée un Bsda en brouillon
+  """
+  createDraftBsda(input: BsdaInput!): Bsda
+
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Met à jour un Bsda
+  """
+  updateBsda(id: ID!, input: BsdaInput!): Bsda
+
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Permet de publier un brouillon pour le marquer comme prêt à être envoyé
+  """
+  publishBsda(id: ID!): Bsda
+
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Signe un Bsda
+  """
+  signBsda(id: ID!, input: BsdaSignatureInput!): Bsda
+
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Duplique un Bsda
+  """
+  duplicateBsda("ID d'un BSD" id: ID!): Bsda
+}

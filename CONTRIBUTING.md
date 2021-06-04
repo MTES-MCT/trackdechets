@@ -59,8 +59,6 @@
 
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
 
-   Vous pouvez également démarrer le service `td-doc` il n'est pas essentiel au fonctionnement de l'API ou de l'interface utilisateur.
-
 5. Synchroniser la base de données avec le schéma prisma.
 
    Les modèles de données sont définis dans les fichiers `back/prisma/schema.prisma`.

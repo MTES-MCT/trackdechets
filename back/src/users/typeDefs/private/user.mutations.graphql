@@ -1,0 +1,78 @@
+type Mutation {
+  """
+  USAGE INTERNE
+  Permet de créer un nouvel utilisateur
+  """
+  signup(userInfos: SignupInput!): User!
+
+  """
+  USAGE INTERNE
+  Renvoie un email d'activation
+  """
+  resendActivationEmail(email: String!): Boolean!
+
+  """
+  USAGE INTERNE
+  Modifie le mot de passe d'un utilisateur
+  """
+  changePassword(oldPassword: String!, newPassword: String!): User!
+
+  """
+  USAGE INTERNE
+  Envoie un email pour la réinitialisation du mot de passe
+  """
+  resetPassword(email: String!): Boolean!
+
+  """
+  USAGE INTERNE
+  Met à jour les informations de l'utilisateur
+  """
+  editProfile(name: String, phone: String, email: String): User!
+
+  """
+  USAGE INTERNE
+  Invite un nouvel utilisateur à un établissement
+  """
+  inviteUserToCompany(
+    email: String!
+    siret: String!
+    role: UserRole!
+  ): CompanyPrivate!
+
+  """
+  USAGE INTERNE
+  Renvoie l'email d'invitation à un établissement
+  """
+  resendInvitation(email: String!, siret: String!): Boolean!
+
+  """
+  USAGE INTERNE
+  Active le compte d'un utilisateur invité
+  """
+  joinWithInvite(inviteHash: String!, name: String!, password: String!): User!
+
+  """
+  USAGE INTERNE
+  Supprime les droits d'un utilisateurs sur un établissement
+  """
+  removeUserFromCompany(userId: ID!, siret: String!): CompanyPrivate!
+
+  """
+  USAGE INTERNE
+  Supprime une invitation à un établissement
+  """
+  deleteInvitation(email: String!, siret: String!): CompanyPrivate!
+
+  """
+  USAGE INTERNE
+  Accepte une demande de rattachement à un établissement
+  en spécifiant le rôle accordé au nouvel utilisateur
+  """
+  acceptMembershipRequest(id: ID!, role: UserRole!): CompanyPrivate!
+
+  """
+  USAGE INTERNE
+  Refuse une demande de rattachement à un un établissement
+  """
+  refuseMembershipRequest(id: ID!): CompanyPrivate!
+}

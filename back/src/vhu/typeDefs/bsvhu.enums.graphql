@@ -1,0 +1,34 @@
+enum BsvhuStatus {
+  INITIAL
+  SIGNED_BY_PRODUCER
+  SENT
+  PROCESSED
+  REFUSED
+}
+
+enum BsvhuPackaging {
+  UNITE
+  LOT
+}
+
+enum BsvhuIdentificationType {
+  NUMERO_ORDRE_REGISTRE_POLICE
+  NUMERO_ORDRE_LOTS_SORTANTS
+}
+
+enum BsvhuDestinationType {
+  BROYEUR
+  DEMOLISSEUR
+}
+
+enum SignatureTypeInput {
+  EMISSION
+  TRANSPORT
+  OPERATION
+}
+
+enum BsvhuAcceptationStatus {
+  ACCEPTED
+  REFUSED
+  PARTIALLY_REFUSED
+}

@@ -1,0 +1,11 @@
+type Subscription {
+  """
+  DEPRECATED - Privilégier l'utilisation d'un polling régulier sur la query `formsLifeCycle`
+
+  Permet de s'abonner aux changements de statuts d'un BSD
+  """
+  forms(
+    "Token permettant de s'authentifier à l'API"
+    token: String!
+  ): FormSubscription
+}
