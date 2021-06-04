@@ -4,6 +4,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { generatePassword, hashPassword } from "../../utils";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { resetPassword } from "../../../mailer/templates";
+import { UserInputError } from "apollo-server-express";
 
 const resetPasswordResolver: MutationResolvers["resetPassword"] = async (
   parent,
@@ -11,7 +12,7 @@ const resetPasswordResolver: MutationResolvers["resetPassword"] = async (
 ) => {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    throw new Error(`Cet email n'existe pas sur notre plateforme.`);
+    throw new UserInputError(`Cet email n'existe pas sur notre plateforme.`);
   }
   const newPassword = generatePassword();
   const hashedPassword = await hashPassword(newPassword);
