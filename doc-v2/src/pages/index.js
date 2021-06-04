@@ -31,7 +31,7 @@ export default function Home() {
   return (
     <Layout
       title={`${siteConfig.title}`}
-      description={`${siteConfig.description}`}
+      description="Documentation de l'API Trackdéchets, plateforme de traçabilité des déchets du Ministère de la Transition Écologique"
     >
       <HomepageHeader />
       <main>

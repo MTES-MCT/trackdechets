@@ -1,43 +1,51 @@
-import React from 'react';
-import clsx from 'clsx';
-import styles from './HomepageFeatures.module.css';
+import React from "react";
+import clsx from "clsx";
+import styles from "./HomepageFeatures.module.css";
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
-    Svg: require('../../static/img/undraw_docusaurus_mountain.svg').default,
+    title: "La mission de Trackdéchets",
+    Svg: require("../../static/img/undraw_factory.svg").default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Trackdéchets est une plateforme développé par le Ministère de la
+        Transition Écologique et Solidaire afin de simplifier la gestion
+        quotidienne de la traçabilité des déchets dangereux pour tous les
+        acteurs de la chaîne, grâce à la dématérialisation du bordereau de suivi
+        de déchets dangereux.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('../../static/img/undraw_docusaurus_tree.svg').default,
+    title: "Pourquoi se connecter à Trackdéchets ?",
+    Svg: require("../../static/img/undraw_instant_information.svg").default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Trackdéchets assure un rôle d’interface qui permet le partage
+        d’informations entre les différents acteurs de la chaîne de traçabilité.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
+    title: "Comment ça marche ?",
+    Svg: require("../../static/img/undraw_online_transactions.svg").default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Trackdéchets a deux composantes distinctes : un moteur de gestion des
+        BSD (constitutif de l’API GraphQL Trackdéchets) et une interface
+        graphique. Que vous soyez professionnel du déchet (SI métier) ou un SaaS
+        de gestion des déchets, en vous connectant à l’API Trackdéchets, vous
+        pourrez échanger des données avec tous les acteurs connectés à
+        Trackdéchets et rendre possible la dématérialisation totale de la chaîne
+        de traçabilité du BSD.
       </>
     ),
   },
 ];
 
-function Feature({Svg, title, description}) {
+function Feature({ Svg, title, description }) {
   return (
-    <div className={clsx('col col--4')}>
+    <div className={clsx("col col--4")}>
       <div className="text--center">
         <Svg className={styles.featureSvg} alt={title} />
       </div>

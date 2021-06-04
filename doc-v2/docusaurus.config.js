@@ -1,23 +1,23 @@
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: "Documentation de l'API Trackdéchets",
-  description:
-    "Documentation de l'API Trackdéchets, plateforme de traçabilité des déchets dangeureux",
-  tagline:
-    "Connectez facilement vos systèmes d'information à l'API Trackdéchets",
-  url: "https://your-docusaurus-test-site.com",
+  tagline: "Connectez vos systèmes d'information à l'API Trackdéchets",
+  url: "https://developers.trackdechets.beta.gouv.fr",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
-  favicon: "img/favicon.ico",
+  favicon: "img/trackdechets.png",
   organizationName: "facebook", // Usually your GitHub org/user name.
   projectName: "docusaurus", // Usually your repo name.
   themeConfig: {
+    colorMode: {
+      disableSwitch: true,
+    },
     navbar: {
       title: "Trackdéchets",
       logo: {
-        alt: "Logo Trackdéchets",
-        src: "img/trackdechets.png",
+        alt: "Logo Ministère de la Transition Écologique",
+        src: "img/mte.svg",
       },
       items: [
         {
