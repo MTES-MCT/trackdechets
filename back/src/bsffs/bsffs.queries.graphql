@@ -1,6 +1,8 @@
 type Query {
   bsff(id: ID!): Bsff!
 
+  bsffPdf(id: ID!): FileDownload!
+
   bsffs(
     after: ID
     first: Int

@@ -3604,6 +3604,7 @@ export type Query = {
   bsdasris: BsdasriConnection;
   bsds: BsdConnection;
   bsff: Bsff;
+  bsffPdf: FileDownload;
   bsffs: BsffConnection;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsvhu: Bsvhu;
@@ -3760,6 +3761,11 @@ export type QueryBsdsArgs = {
 
 /** Views of the Company ressource for the admin panel */
 export type QueryBsffArgs = {
+  id: Scalars["ID"];
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsffPdfArgs = {
   id: Scalars["ID"];
 };
 
@@ -8102,6 +8108,12 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QueryBsffArgs, "id">
+  >;
+  bsffPdf?: Resolver<
+    ResolversTypes["FileDownload"],
+    ParentType,
+    ContextType,
+    RequireFields<QueryBsffPdfArgs, "id">
   >;
   bsffs?: Resolver<
     ResolversTypes["BsffConnection"],
