@@ -10,8 +10,8 @@ slug: interfaces
 
 <p style={{ marginBottom: "0.4em" }}><strong>Implemented by</strong></p>
 
-- [BsffOperation](/api/objects#bsffoperation)
-- [BsffPlannedOperation](/api/objects#bsffplannedoperation)
+- [BsffOperation](/api-reference/bsff/objects#bsffoperation)
+- [BsffPlannedOperation](/api-reference/bsff/objects#bsffplannedoperation)
 
 <p style={{ marginBottom: "0.4em" }}><strong>Fields</strong></p>
 
@@ -21,7 +21,7 @@ slug: interfaces
 <tr>
 <td>
 code<br />
-<a href="/api/enums#bsffoperationcode"><code>BsffOperationCode</code></a>
+<a href="/api-reference/bsff/enums#bsffoperationcode"><code>BsffOperationCode</code></a>
 </td>
 <td>
 <p>Code de l&#39;opération de traitement.</p>
@@ -30,7 +30,7 @@ code<br />
 <tr>
 <td>
 qualification<br />
-<a href="/api/enums#bsffoperationqualification"><code>BsffOperationQualification!</code></a>
+<a href="/api-reference/bsff/enums#bsffoperationqualification"><code>BsffOperationQualification!</code></a>
 </td>
 <td>
 <p>Qualification plus précise du type d&#39;opération réalisée.</p>

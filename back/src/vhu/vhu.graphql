@@ -97,19 +97,11 @@ type Mutation {
   """
   duplicateBsvhu("ID d'un BSD VHU" id: ID!): Bsvhu
 
-
   """
   EXPERIMENTAL - Ne pas utiliser dans un contexte de production
   Supprime un BSVHU
   """
   deleteBsvhu("ID d'un BSD VHU" id: ID!): Bsvhu
-}
-
-type PageInfo {
-  startCursor: String
-  endCursor: String
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
 }
 
 type BsvhuConnection {
@@ -142,14 +134,6 @@ input BsvhuWhere {
   _and: [BsvhuWhere!]
   _or: [BsvhuWhere!]
   _not: [BsvhuWhere!]
-}
-
-input DateFilter {
-  _gte: DateTime
-  _gt: DateTime
-  _lte: DateTime
-  _lt: DateTime
-  _eq: DateTime
 }
 
 input BsvhuEmitterWhere {
@@ -327,11 +311,6 @@ type BsvhuOperation {
 
 type BsvhuNextDestination {
   company: FormCompany
-}
-
-type Signature {
-  date: DateTime
-  author: String
 }
 
 type BsvhuIdentification {

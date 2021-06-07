@@ -56,18 +56,6 @@ input SignatureFormInput {
   sentBy: String!
 }
 
-"Statut d'acceptation d'un déchet"
-enum WasteAcceptationStatusInput {
-  "Accepté en totalité"
-  ACCEPTED
-
-  "Refusé"
-  REFUSED
-
-  "Refus partiel"
-  PARTIALLY_REFUSED
-}
-
 input AcceptedFormInput {
   "Statut d'acceptation du déchet (case 10)"
   wasteAcceptationStatus: WasteAcceptationStatusInput!
@@ -292,30 +280,6 @@ input DestinationInput {
 
   "Opération d'élimination / valorisation prévue (code D/R)"
   processingOperation: String
-}
-
-"Payload d'un établissement"
-input CompanyInput {
-  "SIRET de l'établissement"
-  siret: String
-
-  "Nom de l'établissement"
-  name: String
-
-  "Adresse de l'établissement"
-  address: String
-
-  "Nom du contact dans l'établissement"
-  contact: String
-
-  "Email du contact dans l'établissement"
-  mail: String
-
-  "Numéro de téléphone de contact dans l'établissement"
-  phone: String
-
-  "Numéro de TVA intracommunautaire"
-  vatNumber: String
 }
 
 """

@@ -1,5 +1,3 @@
-scalar DateTime
-
 enum BsdasriRole {
   "Les Bsdasri dont je suis transporteur"
   TRANSPORTER

@@ -1,7 +1,7 @@
 ---
 title: Gestion des erreurs
 description: Gestion des erreurs
-sidebar_position: 1
+sidebar_position: 10
 ---
 
 ## Formattage des erreurs

@@ -30,10 +30,52 @@ generates:
     hooks:
       afterOneFileWrite:
         - prettier --config .prettierrc --write
-  ../doc-v2/schema.graphql:
+  ../doc-v2/graphql/user.graphql:
     schema:
-      - ./src/**/*.graphql
-      - "!./src/dasris/**/*.{private,admin}.graphql"
+      - ./src/common/graphql/scalars.graphql
+      - ./src/companies/**/*.graphql
+      - ./src/users/**/*.graphql
+      - "!./src/**/*.{private,admin}.graphql"
+    plugins:
+      - schema-ast
+    config:
+      includeDirectives: true
+      commentDescriptions: true
+      sort: true
+  ../doc-v2/graphql/bsdd.graphql:
+    schema:
+      - ./src/common/graphql/*.graphql
+      - ./src/forms/**/*.graphql
+    plugins:
+      - schema-ast
+    config:
+      includeDirectives: true
+      commentDescriptions: true
+      sort: true
+  ../doc-v2/graphql/bsdasri.graphql:
+    schema:
+      - ./src/common/graphql/*.graphql
+      - ./src/dasris/**/*.graphql
+    plugins:
+      - schema-ast
+    config:
+      includeDirectives: true
+      commentDescriptions: true
+      sort: true
+  ../doc-v2/graphql/bsff.graphql:
+    schema:
+      - ./src/common/graphql/*.graphql
+      - ./src/bsffs/**/*.graphql
+    plugins:
+      - schema-ast
+    config:
+      includeDirectives: true
+      commentDescriptions: true
+      sort: true
+  ../doc-v2/graphql/bsda.graphql:
+    schema:
+      - ./src/common/graphql/*.graphql
+      - ./src/bsda/**/*.graphql
     plugins:
       - schema-ast
     config:

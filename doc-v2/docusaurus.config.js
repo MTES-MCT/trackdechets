@@ -27,8 +27,8 @@ module.exports = {
           label: "Documentation",
         },
         {
-          href: "https://github.com/MTES-MCT/trackdechets",
-          label: "Code source",
+          href: "https://api.trackdechets.beta.gouv.fr",
+          label: "Playground",
           position: "right",
         },
       ],
@@ -111,9 +111,41 @@ module.exports = {
     [
       "docusaurus-graphql-plugin",
       {
-        // can be a path, a glob or an URL
-        schema: "schema.graphql",
-        routeBasePath: "/api/",
+        id: "user",
+        schema: "graphql/user.graphql",
+        routeBasePath: "/api-reference/user",
+      },
+    ],
+    [
+      "docusaurus-graphql-plugin",
+      {
+        id: "bsdd",
+        schema: "graphql/bsdd.graphql",
+        routeBasePath: "/api-reference/bsdd",
+      },
+    ],
+    [
+      "docusaurus-graphql-plugin",
+      {
+        id: "bsdasri",
+        schema: "graphql/bsdasri.graphql",
+        routeBasePath: "/api-reference/bsdasri",
+      },
+    ],
+    [
+      "docusaurus-graphql-plugin",
+      {
+        id: "bsff",
+        schema: "graphql/bsff.graphql",
+        routeBasePath: "/api-reference/bsff",
+      },
+    ],
+    [
+      "docusaurus-graphql-plugin",
+      {
+        id: "bsda",
+        schema: "graphql/bsda.graphql",
+        routeBasePath: "/api-reference/bsda",
       },
     ],
   ],

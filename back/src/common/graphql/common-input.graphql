@@ -1,0 +1,43 @@
+"Payload d'un établissement"
+input CompanyInput {
+  "SIRET de l'établissement"
+  siret: String
+
+  "Nom de l'établissement"
+  name: String
+
+  "Adresse de l'établissement"
+  address: String
+
+  "Nom du contact dans l'établissement"
+  contact: String
+
+  "Email du contact dans l'établissement"
+  mail: String
+
+  "Numéro de téléphone de contact dans l'établissement"
+  phone: String
+
+  "Numéro de TVA intracommunautaire"
+  vatNumber: String
+}
+
+"Statut d'acceptation d'un déchet"
+enum WasteAcceptationStatusInput {
+  "Accepté en totalité"
+  ACCEPTED
+
+  "Refusé"
+  REFUSED
+
+  "Refus partiel"
+  PARTIALLY_REFUSED
+}
+
+input DateFilter {
+  _gte: DateTime
+  _gt: DateTime
+  _lte: DateTime
+  _lt: DateTime
+  _eq: DateTime
+}

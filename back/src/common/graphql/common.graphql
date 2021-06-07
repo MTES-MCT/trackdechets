@@ -1,0 +1,81 @@
+"""
+URL de téléchargement accompagné d'un token
+permettant de valider le téléchargement.
+"""
+type FileDownload {
+  "Token ayant une durée de validité de 10s"
+  token: String
+
+  "Lien de téléchargement"
+  downloadLink: String
+}
+
+type PageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}
+
+"Information sur un établissement dans un BSD"
+type FormCompany {
+  "Nom de l'établissement"
+  name: String
+
+  "SIRET de l'établissement"
+  siret: String
+
+  "Adresse de l'établissement"
+  address: String
+
+  """
+  Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+  https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+
+  Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
+  """
+  country: String
+
+  "Nom du contact dans l'établissement"
+  contact: String
+
+  "Numéro de téléphone de contact dans l'établissement"
+  phone: String
+
+  "Email du contact dans l'établissement"
+  mail: String
+
+  "Numéro de TVA intracommunautaire"
+  vatNumber: String
+}
+
+"Informations sur une adresse chantier"
+type WorkSite {
+  name: String
+  address: String
+  city: String
+  postalCode: String
+  infos: String
+}
+
+"Type de quantité lors de l'émission"
+enum QuantityType {
+  "Quntité réelle"
+  REAL
+
+  "Quantité estimée"
+  ESTIMATED
+}
+
+type Signature {
+  date: DateTime
+  author: String
+}
+
+enum TransportMode {
+  ROAD
+  RAIL
+  AIR
+  RIVER
+  SEA
+}

@@ -1,11 +1,3 @@
-input DateFilter {
-  _gte: DateTime
-  _gt: DateTime
-  _lte: DateTime
-  _lt: DateTime
-  _eq: DateTime
-}
-
 input BsdasriCompanyWhere {
   siret: String!
 }

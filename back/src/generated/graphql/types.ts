@@ -1972,11 +1972,11 @@ export type CreateVhuAgrementInput = {
 };
 
 export type DateFilter = {
-  _eq?: Maybe<Scalars["DateTime"]>;
-  _gt?: Maybe<Scalars["DateTime"]>;
   _gte?: Maybe<Scalars["DateTime"]>;
-  _lt?: Maybe<Scalars["DateTime"]>;
+  _gt?: Maybe<Scalars["DateTime"]>;
   _lte?: Maybe<Scalars["DateTime"]>;
+  _lt?: Maybe<Scalars["DateTime"]>;
+  _eq?: Maybe<Scalars["DateTime"]>;
 };
 
 /** Représente une ligne dans une déclaration GEREP */
@@ -4938,8 +4938,8 @@ export type ResolversTypes = {
   VerifyCompanyByAdminInput: VerifyCompanyByAdminInput;
   Subscription: ResolverTypeWrapper<{}>;
   FormSubscription: ResolverTypeWrapper<FormSubscription>;
-  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
   BsdasriInput: BsdasriInput;
+  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
   BsdasriRole: BsdasriRole;
 };
 
@@ -5218,8 +5218,8 @@ export type ResolversParentTypes = {
   VerifyCompanyByAdminInput: VerifyCompanyByAdminInput;
   Subscription: {};
   FormSubscription: FormSubscription;
-  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
   BsdasriInput: BsdasriInput;
+  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
 };
 
 export type AdminForVerificationResolvers<
@@ -10765,11 +10765,11 @@ export function createCreateVhuAgrementInputMock(
 
 export function createDateFilterMock(props: Partial<DateFilter>): DateFilter {
   return {
-    _eq: null,
-    _gt: null,
     _gte: null,
-    _lt: null,
+    _gt: null,
     _lte: null,
+    _lt: null,
+    _eq: null,
     ...props
   };
 }

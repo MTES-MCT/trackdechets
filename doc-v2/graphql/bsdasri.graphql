@@ -1,0 +1,655 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Query {
+  """EXPERIMENTAL - Ne pas utiliser dans un contexte de production"""
+  bsdasri(
+    """Identifiant du BSD"""
+    id: ID!
+  ): Bsdasri!
+  """
+  Renvoie un token pour télécharger un pdf de bordereau
+  Ce token doit être transmis à la route /download pour obtenir le fichier.
+  Il est valable 10 secondes
+  """
+  bsdasriPdf(
+    """ID d'un bordereau"""
+    id: ID
+  ): FileDownload!
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Renvoie les Bsdasris.
+  Par défaut, les dasris des différentes companies de l'utilisateur sont renvoyés.
+  """
+  bsdasris(
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `first` de paginer "en avant"
+    (des Bsdasri les plus récents aux Bsdasri les plus anciens)
+    Curseur après lequel les Bsdasri doivent être retournés
+    Attend un identifiant (propriété `id`) de BSD
+    Défaut à vide, pour retourner les Bsdasri les plus récents.
+    Le BSD précisé dans le curseur ne fait pas partie du résultat
+    """
+    after: ID
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `last` de paginer "en arrière"
+    (des Bsdasri les plus anciens aux Bsdasris les plus récents)
+    Curseur avant lequel les Bsdasri doivent être retournés
+    Attend un identifiant (propriété `id`) de BSD
+    Défaut à vide, pour retourner les Bsdasri les plus anciens
+    Le BSD précisé dans le curseur ne fait pas partie du résultat
+    """
+    before: ID
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `after` de paginer "en avant"
+    (des Bsdasri les plus récents aux Bsdasri les plus anciens)
+    Nombre de Bsdasri retournés après le `cursorAfter`
+    Défaut à 50, maximum à 500
+    """
+    first: Int
+    """
+    (Optionnel) PAGINATION
+    Nombre de Bsdasri retournés avant le `before`
+    Défaut à 50, maximum à 500
+    """
+    last: Int
+    """Filtres de recherche"""
+    where: BsdasriWhere
+  ): BsdasriConnection!
+}
+
+"""Bordereau Bsdasri"""
+type Bsdasri {
+  createdAt: DateTime
+  emission: BsdasriEmission
+  emitter: BsdasriEmitter
+  id: ID!
+  isDraft: Boolean!
+  metadata: BsdasriMetadata!
+  operation: BsdasriOperation
+  reception: BsdasriReception
+  recipient: BsdasriRecipient
+  """Bordereaux regroupés"""
+  regroupedBsdasris: [ID!]
+  status: BsdasriStatus!
+  transport: BsdasriTransport
+  transporter: BsdasriTransporter
+  updatedAt: DateTime
+}
+
+"""
+Le scalaire `DateTime` accepte des chaines de caractères
+formattées selon le standard ISO 8601. Exemples:
+- "yyyy-MM-dd" (eg. 2020-11-23)
+- "yyyy-MM-ddTHH:mm:ss" (eg. 2020-11-23T13:34:55)
+- "yyyy-MM-ddTHH:mm:ssX" (eg. 2020-11-23T13:34:55Z)
+- "yyyy-MM-dd'T'HH:mm:ss.SSS" (eg. 2020-11-23T13:34:55.987)
+- "yyyy-MM-dd'T'HH:mm:ss.SSSX" (eg. 2020-11-23T13:34:55.987Z)
+"""
+scalar DateTime
+
+"""Informations relatives au déchet émis"""
+type BsdasriEmission {
+  handedOverAt: DateTime
+  signature: BsdasriSignature
+  wasteCode: String
+  wasteDetails: BsdasriWasteDetails
+}
+
+type BsdasriSignature {
+  author: String
+  date: DateTime
+}
+
+"""Détail sur le déchet proprement dit du Bsdasri"""
+type BsdasriWasteDetails {
+  onuCode: String
+  packagingInfos: [BsdasriPackagingInfo!]
+  quantity: Int
+  quantityType: QuantityType
+  volume: Int
+}
+
+"""Informations sur le conditionnement Bsdasri"""
+type BsdasriPackagingInfo {
+  """Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"""
+  other: String
+  """Nombre de colis associés à ce conditionnement"""
+  quantity: Int!
+  """Type de conditionnement"""
+  type: BsdasriPackagings!
+  volume: Int!
+}
+
+"""Type de packaging du déchet"""
+enum BsdasriPackagings {
+  """Autre"""
+  AUTRE
+  """Caisse en carton avec sac en plastique"""
+  BOITE_CARTON
+  """Boîtes et Mini-collecteurs pour déchets perforants"""
+  BOITE_PERFORANTS
+  """Fûts ou jerrican à usage unique"""
+  FUT
+  """Grand emballage"""
+  GRAND_EMBALLAGE
+  """Grand récipient pour vrac"""
+  GRV
+}
+
+"""Type de quantité lors de l'émission"""
+enum QuantityType {
+  """Quantité estimée"""
+  ESTIMATED
+  """Quntité réelle"""
+  REAL
+}
+
+"""Émetteur du Bsdasri, Personne responsable de l'émimination des déchets (PRED)"""
+type BsdasriEmitter {
+  """Établissement émetteur"""
+  company: FormCompany
+  """Champ libre"""
+  customInfo: String
+  """Date de remise au tranporteur"""
+  handOverToTransporterAt: DateTime
+  """Agit pour le compte de l'éco organisme agréé"""
+  onBehalfOfEcoorganisme: Boolean!
+  """Type d'émetteur"""
+  type: BsdasriEmitterType
+  """Site d'emport du déceht, si différent de celle de l'émetteur"""
+  workSite: WorkSite
+}
+
+"""Information sur un établissement dans un BSD"""
+type FormCompany {
+  """Adresse de l'établissement"""
+  address: String
+  """Nom du contact dans l'établissement"""
+  contact: String
+  """
+  Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+  https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+  
+  Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
+  """
+  country: String
+  """Email du contact dans l'établissement"""
+  mail: String
+  """Nom de l'établissement"""
+  name: String
+  """Numéro de téléphone de contact dans l'établissement"""
+  phone: String
+  """SIRET de l'établissement"""
+  siret: String
+  """Numéro de TVA intracommunautaire"""
+  vatNumber: String
+}
+
+"""Type d'émetteur"""
+enum BsdasriEmitterType {
+  """Installation de regroupement"""
+  COLLECTOR
+  """Producteur"""
+  PRODUCER
+}
+
+"""Informations sur une adresse chantier"""
+type WorkSite {
+  address: String
+  city: String
+  infos: String
+  name: String
+  postalCode: String
+}
+
+type BsdasriMetadata {
+  errors: [BsdasriError]!
+}
+
+type BsdasriError {
+  message: String!
+  path: String!
+  requiredFor: [BsdasriSignatureType!]!
+}
+
+enum BsdasriSignatureType {
+  """Signature du cadre émetteur (PRED)"""
+  EMISSION
+  """Signature du traitement du déchet"""
+  OPERATION
+  """Signature de la réception du déchet"""
+  RECEPTION
+  """Signature du cadre collecteur transporteur"""
+  TRANSPORT
+}
+
+"""Informations relatives au traitement du Bsdasri"""
+type BsdasriOperation {
+  processedAt: DateTime
+  processingOperation: String
+  signature: BsdasriSignature
+}
+
+"""Informations relatives à la réception du Bsdasri"""
+type BsdasriReception {
+  receivedAt: DateTime
+  signature: BsdasriSignature
+  wasteAcceptation: BsdasriWasteAcceptation
+  wasteDetails: BsdasriWasteDetails
+}
+
+"""Informations relatives à l'acceptation ou au refus du déchet (Bsdasri)"""
+type BsdasriWasteAcceptation {
+  refusalReason: String
+  refusedQuantity: Int
+  status: String
+}
+
+"""Destinataire du Bsdasri"""
+type BsdasriRecipient {
+  """Installation destinataire"""
+  company: FormCompany
+  """Champ libre"""
+  customInfo: String
+}
+
+enum BsdasriStatus {
+  """Bsdasri dans son état initial"""
+  INITIAL
+  """Bsdasri dont les déchets ont été traités"""
+  PROCESSED
+  """Bsdasri reçu par l'établissement de destination"""
+  RECEIVED
+  """Déchet refusé"""
+  REFUSED
+  """Bsdasri envoyé vers l'établissement de destination"""
+  SENT
+  """Optionnel, Bsdasri signé par la PRED (émetteur)"""
+  SIGNED_BY_PRODUCER
+}
+
+"""Informations relatives au transport du Bsdasri"""
+type BsdasriTransport {
+  handedOverAt: DateTime
+  signature: BsdasriSignature
+  takenOverAt: DateTime
+  wasteAcceptation: BsdasriWasteAcceptation
+  wasteDetails: BsdasriWasteDetails
+}
+
+"""Collecteur transporteur"""
+type BsdasriTransporter {
+  """Établissement de destination"""
+  company: FormCompany
+  """Champ libre"""
+  customInfo: String
+  """N° de récipissé"""
+  receipt: String
+  """Département"""
+  receiptDepartment: String
+  """Limite de validité du récipissé"""
+  receiptValidityLimit: DateTime
+}
+
+"""
+URL de téléchargement accompagné d'un token
+permettant de valider le téléchargement.
+"""
+type FileDownload {
+  """Lien de téléchargement"""
+  downloadLink: String
+  """Token ayant une durée de validité de 10s"""
+  token: String
+}
+
+input BsdasriWhere {
+  _and: [BsdasriWhere!]
+  _not: [BsdasriWhere!]
+  _or: [BsdasriWhere!]
+  createdAt: DateFilter
+  emitter: BsdasriEmitterWhere
+  """
+  (Optionnel) Filtre sur l'état de regroupement des bordereaux
+  Si aucun filtre n'est passé, les bordereaux seront retournés sans filtrage supplémentaire
+  Si groupable: true, les bordereaux retournés ne sont pas déjà regroupés et ne regroupent pas d'autres bordereaux
+  Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne regroupent d'autres bordereaux
+  """
+  groupable: Boolean
+  """(Optionnel) Permet de récupérer uniquement les bordereaux en brouillon"""
+  isDraft: Boolean
+  processingOperation: [processingOperationTypes!]
+  recipient: BsdasriRecipientWhere
+  """
+  (Optionnel) Filtre sur le statut des bordereaux
+  Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
+  Défaut à vide.
+  """
+  status: BsdasriStatus
+  transporter: BsdasriTransporterWhere
+  updatedAt: DateFilter
+}
+
+input DateFilter {
+  _eq: DateTime
+  _gt: DateTime
+  _gte: DateTime
+  _lt: DateTime
+  _lte: DateTime
+}
+
+input BsdasriEmitterWhere {
+  company: BsdasriCompanyWhere
+  signature: BsdasriSignatureWhere
+}
+
+input BsdasriCompanyWhere {
+  siret: String!
+}
+
+input BsdasriSignatureWhere {
+  date: DateFilter!
+}
+
+enum processingOperationTypes {
+  D10
+  D12
+  D9
+  R1
+  R12
+}
+
+input BsdasriRecipientWhere {
+  company: BsdasriCompanyWhere
+  signature: BsdasriSignatureWhere
+}
+
+input BsdasriTransporterWhere {
+  company: BsdasriCompanyWhere
+  signature: BsdasriSignatureWhere
+}
+
+type BsdasriConnection {
+  edges: [BsdasriEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type BsdasriEdge {
+  cursor: String!
+  node: Bsdasri!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
+type Mutation {
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Crée un nouveau dasri
+  """
+  createBsdasri(
+    """Payload de création d'un dasri"""
+    bsdasriCreateInput: BsdasriCreateInput!
+  ): Bsdasri!
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Crée un nouveau dasri en brouillon
+  """
+  createDraftBsdasri(
+    """Payload de création d'un dasri brouillon"""
+    bsdasriCreateInput: BsdasriCreateInput!
+  ): Bsdasri!
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Supprime un BSDASRI
+  """
+  deleteBsdasri(
+    """ID d'un Dasri"""
+    id: ID!
+  ): Bsdasri
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Duplique un bordereau Dasri
+  """
+  duplicateBsdasri(
+    """ID d'un Bsdasri"""
+    id: ID!
+  ): Bsdasri
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Marque un dasri brouillon comme publié (isDraft=false)
+  """
+  publishBsdasri(
+    """ID d'un Bsdasri"""
+    id: ID!
+  ): Bsdasri
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Appose une signature sur un Bsdasri, verrouille les cadres correspondant
+  
+  Une signature ne peut être apposée que par un membre de l'entreprise figurant sur le cadre concerné
+  Ex: la signature TRANSPORT ne peut être apposée que par un membre de l'entreprise de transport
+  
+  Pour signer l'emission avec un compte transpoteur (cas de lasignature sur device transporteur),
+  utiliser la mutation signBsdasriEmissionWithSecretCode
+  """
+  signBsdasri(id: ID!, signatureInput: BsdasriSignatureInput!): Bsdasri
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Appose une signature de type EMISSION via un compte n'appartenant pas à l'émetteur.
+  Permet de signer un enlèvement sur le device transporteur grâce au code de sécurité de l'émetteur du dasri
+  """
+  signBsdasriEmissionWithSecretCode(id: ID!, signatureInput: BsdasriSignatureWithSecretCodeInput!): Bsdasri
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Met à jour un dasri existant
+  Par défaut, tous les champs sont modifiables.
+  """
+  updateBsdasri(
+    """Payload de mise à jour d'un dasri"""
+    bsdasriUpdateInput: BsdasriUpdateInput!
+    """Identifiant unique du bordereau"""
+    id: ID!
+  ): Bsdasri!
+}
+
+input BsdasriCreateInput {
+  emission: BsdasriEmissionInput
+  emitter: BsdasriEmitterInput
+  operation: BsdasriOperationInput
+  reception: BsdasriReceptionInput
+  recipient: BsdasriRecipientInput
+  regroupedBsdasris: [RegroupedBsdasriInput]
+  transport: BsdasriTransportInput
+  transporter: BsdasriTransporterInput
+}
+
+input BsdasriEmissionInput {
+  handedOverAt: DateTime
+  wasteCode: String
+  wasteDetails: BsdasriWasteDetailInput
+}
+
+input BsdasriWasteDetailInput {
+  onuCode: String
+  packagingInfos: [BsdasriPackagingInfoInput!]
+  quantity: Int
+  quantityType: QuantityType
+}
+
+input BsdasriPackagingInfoInput {
+  """Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"""
+  other: String
+  """Nombre de colis associés à ce conditionnement"""
+  quantity: Int!
+  """Type de conditionnement"""
+  type: BsdasriPackagings!
+  """Nombre de colis associés à ce conditionnement"""
+  volume: Int!
+}
+
+input BsdasriEmitterInput {
+  company: CompanyInput
+  """Champ libre émetteur"""
+  customInfo: String
+  onBehalfOfEcoorganisme: Boolean
+  """Établissement émetteur"""
+  type: BsdasriEmitterType
+  workSite: WorkSiteInput
+}
+
+"""Payload d'un établissement"""
+input CompanyInput {
+  """Adresse de l'établissement"""
+  address: String
+  """Nom du contact dans l'établissement"""
+  contact: String
+  """Email du contact dans l'établissement"""
+  mail: String
+  """Nom de l'établissement"""
+  name: String
+  """Numéro de téléphone de contact dans l'établissement"""
+  phone: String
+  """SIRET de l'établissement"""
+  siret: String
+  """Numéro de TVA intracommunautaire"""
+  vatNumber: String
+}
+
+input WorkSiteInput {
+  address: String
+  city: String
+  infos: String
+  name: String
+  postalCode: String
+}
+
+input BsdasriOperationInput {
+  processedAt: DateTime
+  processingOperation: String
+}
+
+input BsdasriReceptionInput {
+  receivedAt: DateTime
+  wasteAcceptation: BsdasriWasteAcceptationInput
+  wasteDetails: BsdasriWasteDetailInput
+}
+
+input BsdasriWasteAcceptationInput {
+  refusalReason: String
+  refusedQuantity: Int
+  status: WasteAcceptationStatusInput
+}
+
+"""Statut d'acceptation d'un déchet"""
+enum WasteAcceptationStatusInput {
+  """Accepté en totalité"""
+  ACCEPTED
+  """Refus partiel"""
+  PARTIALLY_REFUSED
+  """Refusé"""
+  REFUSED
+}
+
+input BsdasriRecipientInput {
+  """Établissement émetteur"""
+  company: CompanyInput
+  """Champ libre transporteur"""
+  customInfo: String
+}
+
+"""Payload de regroupement"""
+input RegroupedBsdasriInput {
+  """Identifiant unique du bordereau"""
+  id: ID
+}
+
+input BsdasriTransportInput {
+  handedOverAt: DateTime
+  takenOverAt: DateTime
+  wasteAcceptation: BsdasriWasteAcceptationInput
+  wasteDetails: BsdasriWasteDetailInput
+}
+
+input BsdasriTransporterInput {
+  """Établissement collecteur - transporteur"""
+  company: CompanyInput
+  """Champ libre transporteur"""
+  customInfo: String
+  """N° de récipissé"""
+  receipt: String
+  """Département"""
+  receiptDepartment: String
+  """Limite de validité du récipissé"""
+  receiptValidityLimit: DateTime
+}
+
+input BsdasriSignatureInput {
+  author: String!
+  type: BsdasriSignatureType!
+}
+
+input BsdasriSignatureWithSecretCodeInput {
+  author: String!
+  securityCode: Int
+}
+
+input BsdasriUpdateInput {
+  emission: BsdasriEmissionInput
+  emitter: BsdasriEmitterInput
+  operation: BsdasriOperationInput
+  reception: BsdasriReceptionInput
+  recipient: BsdasriRecipientInput
+  regroupedBsdasris: [RegroupedBsdasriInput]
+  transport: BsdasriTransportInput
+  transporter: BsdasriTransporterInput
+}
+
+input BsdasriInput {
+  emission: BsdasriEmissionInput
+  emitter: BsdasriEmitterInput
+  operation: BsdasriOperationInput
+  reception: BsdasriReceptionInput
+  recipient: BsdasriRecipientInput
+  transport: BsdasriTransportInput
+  transporter: BsdasriTransporterInput
+}
+
+input BsdasriRecipientWasteDetailInput {
+  quantity: Int
+  volume: Int
+}
+
+enum BsdasriRole {
+  """Les Bsdasri dont je suis l'émetteur"""
+  EMITTER
+  """Les Bsdasri dont je suis la destination de traitement"""
+  RECIPIENT
+  """Les Bsdasri dont je suis transporteur"""
+  TRANSPORTER
+}
+
+scalar JSON
+
+type Signature {
+  author: String
+  date: DateTime
+}
+
+enum TransportMode {
+  AIR
+  RAIL
+  RIVER
+  ROAD
+  SEA
+}

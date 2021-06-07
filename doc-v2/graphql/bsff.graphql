@@ -1,0 +1,463 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Query {
+  bsffs(after: ID, before: ID, first: Int, last: Int, where: BsffWhere): BsffConnection!
+}
+
+input BsffWhere {
+  destination: BsffWhereDestination
+  emitter: BsffWhereEmitter
+  transporter: BsffWhereTransporter
+}
+
+input BsffWhereDestination {
+  company: BsffWhereCompany
+}
+
+input BsffWhereCompany {
+  siret: String!
+}
+
+input BsffWhereEmitter {
+  company: BsffWhereCompany
+}
+
+input BsffWhereTransporter {
+  company: BsffWhereCompany
+}
+
+type BsffConnection {
+  edges: [BsffEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type BsffEdge {
+  cursor: String!
+  node: Bsff!
+}
+
+type Bsff {
+  """Liste des bordereaux que celui-ci regroupe, dans le cas d'un regroupement, reconditionnement ou d'une réexpédition."""
+  bsffs: [Bsff!]!
+  """
+  Destination du déchet, qui peut le réceptionner pour traitement, regroupement, reconditionnement ou réexpedition.
+  Un nouveau bordereau doit être créé si le déchet connaît un nouveau parcours,
+  par exemple si il quitte une installation de collecte pour un centre de traitement.
+  """
+  destination: BsffDestination
+  """
+  Émetteur du déchet, qui n'est pas nécessairement le producteur.
+  Il s'agit par exemple de l'opérateur ayant collecté des fluides lors d'interventions,
+  ou alors d'une installation de collecte qui procède à la réexpédition pour traitement final.
+  """
+  emitter: BsffEmitter
+  """
+  Liste des fiches d'intervention associés à ce bordereau.
+  Habituellement renseigné par un opérateur lors de son intervention.
+  """
+  ficheInterventions: [BsffFicheIntervention!]!
+  """
+  Identifiant unique assigné par Trackdéchets.
+  Il est à utiliser pour les échanges avec l'API.
+  """
+  id: ID!
+  """Liste des contenants utilisés pour le transport des fluides."""
+  packagings: [BsffPackaging!]!
+  """Quantité totale du déchet, qu'elle soit réelle ou estimée."""
+  quantity: BsffQuantity
+  """
+  Transporteur du déchet, effectue l'enlèvement du déchet auprès de l'émetteur et vers la destination.
+  À noter que l'émetteur peut également être transporteur,
+  par exemple dans le cas de l'opérateur qui dépose lui même ses contenants auprès d'une installation de collecte.
+  """
+  transporter: BsffTransporter
+  """Description du déchet et ses mentions associées."""
+  waste: BsffWaste
+}
+
+type BsffDestination {
+  """Numéro CAP."""
+  cap: String
+  """Entreprise réceptionant le déchet."""
+  company: FormCompany!
+  """Déclaration de traitement du déchet."""
+  operation: BsffOperation
+  """Opération de traitement prévu initialement."""
+  plannedOperation: BsffPlannedOperation!
+  """Déclaration de réception du déchet."""
+  reception: BsffReception
+}
+
+"""Information sur un établissement dans un BSD"""
+type FormCompany {
+  """Adresse de l'établissement"""
+  address: String
+  """Nom du contact dans l'établissement"""
+  contact: String
+  """
+  Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
+  https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
+  
+  Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
+  """
+  country: String
+  """Email du contact dans l'établissement"""
+  mail: String
+  """Nom de l'établissement"""
+  name: String
+  """Numéro de téléphone de contact dans l'établissement"""
+  phone: String
+  """SIRET de l'établissement"""
+  siret: String
+  """Numéro de TVA intracommunautaire"""
+  vatNumber: String
+}
+
+type BsffOperation implements IBsffOperation {
+  """Code de l'opération de traitement."""
+  code: BsffOperationCode
+  """Qualification plus précise du type d'opération réalisée."""
+  qualification: BsffOperationQualification!
+  """Signature de la destination lors du traitement."""
+  signature: Signature
+}
+
+interface IBsffOperation {
+  """Code de l'opération de traitement."""
+  code: BsffOperationCode
+  """Qualification plus précise du type d'opération réalisée."""
+  qualification: BsffOperationQualification!
+}
+
+"""Liste des codes de traitement possible."""
+enum BsffOperationCode {
+  D10
+  D13
+  D14
+  R12
+  R2
+}
+
+"""
+Liste des qualifications de traitement possible.
+Attention, certaines combinaisons de code et qualification ne sont pas possibles.
+Par exemple, seul le code D 10 peut être associé à une incinération.
+"""
+enum BsffOperationQualification {
+  INCINERATION
+  RECONDITIONNEMENT
+  RECUPERATION_REGENERATION
+  REEXPEDITION
+  REGROUPEMENT
+}
+
+type Signature {
+  author: String
+  date: DateTime
+}
+
+"""
+Le scalaire `DateTime` accepte des chaines de caractères
+formattées selon le standard ISO 8601. Exemples:
+- "yyyy-MM-dd" (eg. 2020-11-23)
+- "yyyy-MM-ddTHH:mm:ss" (eg. 2020-11-23T13:34:55)
+- "yyyy-MM-ddTHH:mm:ssX" (eg. 2020-11-23T13:34:55Z)
+- "yyyy-MM-dd'T'HH:mm:ss.SSS" (eg. 2020-11-23T13:34:55.987)
+- "yyyy-MM-dd'T'HH:mm:ss.SSSX" (eg. 2020-11-23T13:34:55.987Z)
+"""
+scalar DateTime
+
+type BsffPlannedOperation implements IBsffOperation {
+  """Code de l'opération de traitement prévu."""
+  code: BsffOperationCode
+  """Qualification plus précise du type d'opération prévu."""
+  qualification: BsffOperationQualification!
+}
+
+type BsffReception {
+  """Date de réception du déchet."""
+  date: DateTime!
+  """Quantité totale du déchet, qu'elle soit réelle ou estimée."""
+  kilos: Int!
+  """En cas de refus, le motif."""
+  refusal: String
+  """Signature de la destination lors de l'acceptation ou du refus du déchet."""
+  signature: Signature
+}
+
+type BsffEmitter {
+  """Entreprise émettant le déchet."""
+  company: FormCompany!
+  """Déclaration de l'émetteur lors de l'enlèvement par le transporteur."""
+  emission: BsffEmission
+}
+
+type BsffEmission {
+  """Signature de l'émetteur lors de l'enlèvement par le transporteur."""
+  signature: Signature!
+}
+
+type BsffFicheIntervention {
+  """Poids total des fluides récupérés lors de cette intervention."""
+  kilos: Int!
+  """Numéro de la fiche d'intervention, habituellement renseigné par l'opérateur."""
+  numero: String!
+  """
+  Détenteur de l'équipement sur lequel est intervenu l'opérateur.
+  À noter que dû à la valeur commerciale de ces informations, leur visibilité est limité aux acteurs en contact direct.
+  """
+  owner: BsffOwner
+  """Code postal du lieu où l'intervention a eu lieu."""
+  postalCode: String!
+}
+
+type BsffOwner {
+  """Entreprise détentrice de l'équipement."""
+  company: FormCompany!
+}
+
+type BsffPackaging {
+  """Volume en litres des fluides à l'intérieur du contenant."""
+  litres: Int!
+  """Numéro du contenant."""
+  numero: String!
+  """Type de contenant."""
+  type: BsffPackagingType!
+}
+
+enum BsffPackagingType {
+  BOUTEILLE
+}
+
+type BsffQuantity {
+  """Si il s'agit d'une estimation ou d'un poids réel."""
+  isEstimate: Boolean!
+  """Poids total du déchet en kilos."""
+  kilos: Int!
+}
+
+type BsffTransporter {
+  """Entreprise responsable du transport du déchet."""
+  company: FormCompany!
+  """Récépissé du transporteur, à moins d'être exempté."""
+  recepisse: BsffTransporterRecepisse
+  """Déclaration du transporteur lors de l'enlèvement auprès de l'émetteur."""
+  transport: BsffTransport
+}
+
+type BsffTransporterRecepisse {
+  """Département auquel est lié le récépissé."""
+  department: String!
+  """Numéro du récépissé."""
+  number: String!
+  """Date limite de validité du récépissé."""
+  validityLimit: DateTime!
+}
+
+type BsffTransport {
+  """Mode de transport utilisé."""
+  mode: TransportMode!
+  """Signature du transporteur lors de l'enlèvement auprès de l'émetteur."""
+  signature: Signature!
+}
+
+enum TransportMode {
+  AIR
+  RAIL
+  RIVER
+  ROAD
+  SEA
+}
+
+type BsffWaste {
+  """Mention ADR."""
+  adr: String!
+  """Code déchet."""
+  code: String!
+  """Description du déchet, permet de le qualifier de façon plus précise."""
+  description: String!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
+type Mutation {
+  """Mutation permettant d'ajouter une fiche d'intervention à un bordereau existant."""
+  addFicheInterventionBsff(id: ID!, input: BsffFicheInterventionInput!, numero: String!): BsffFicheIntervention!
+  """Mutation permettant de créer un nouveau bordereau de suivi de fluides frigorigènes."""
+  createBsff(input: BsffInput!): Bsff!
+  """
+  Mutation permettant de supprimer un bordereau existant de suivi de fluides frigorigènes.
+  À condition qu'il n'ait pas encore été signé.
+  """
+  deleteBsff(id: ID!): Bsff!
+  """Mutation permettant de supprimer une fiche d'intervention lié à un bordereau existant."""
+  deleteFicheInterventionBsff(id: ID!, numero: String!): BsffFicheIntervention!
+  """Mutation permettant d'apposer une signature sur le bordereau."""
+  signBsff(id: ID!, securityCode: Int, signature: SignatureInput!, type: BsffSignatureType!): Bsff!
+  """Mutation permettant de modifier un bordereau existant de suivi de fluides frigorigènes."""
+  updateBsff(id: ID!, input: BsffInput!): Bsff!
+  """Mutation permettant de mettre à jour une fiche d'intervention lié à un bordereau existant."""
+  updateFicheInterventionBsff(id: ID!, input: BsffFicheInterventionInput!, numero: String!): BsffFicheIntervention!
+}
+
+input BsffFicheInterventionInput {
+  kilos: Int!
+  owner: BsffOwnerInput!
+  postalCode: String!
+}
+
+input BsffOwnerInput {
+  company: CompanyInput!
+}
+
+"""Payload d'un établissement"""
+input CompanyInput {
+  """Adresse de l'établissement"""
+  address: String
+  """Nom du contact dans l'établissement"""
+  contact: String
+  """Email du contact dans l'établissement"""
+  mail: String
+  """Nom de l'établissement"""
+  name: String
+  """Numéro de téléphone de contact dans l'établissement"""
+  phone: String
+  """SIRET de l'établissement"""
+  siret: String
+  """Numéro de TVA intracommunautaire"""
+  vatNumber: String
+}
+
+input BsffInput {
+  destination: BsffDestinationInput
+  emitter: BsffEmitterInput
+  packagings: [BsffPackagingInput!]
+  quantity: BsffQuantityInput
+  transporter: BsffTransporterInput
+  waste: BsffWasteInput
+}
+
+input BsffDestinationInput {
+  cap: String
+  company: CompanyInput!
+  operation: BsffDestinationOperationInput
+  plannedOperation: BsffDestinationOperationInput
+  reception: BsffDestinationReceptionInput
+}
+
+input BsffDestinationOperationInput {
+  code: BsffOperationCode!
+  qualification: BsffOperationQualification!
+}
+
+input BsffDestinationReceptionInput {
+  date: DateTime!
+  kilos: Int!
+  refusal: String
+}
+
+input BsffEmitterInput {
+  company: CompanyInput!
+}
+
+input BsffPackagingInput {
+  litres: Int!
+  numero: String!
+  type: BsffPackagingType!
+}
+
+input BsffQuantityInput {
+  isEstimate: Boolean!
+  kilos: Int!
+}
+
+input BsffTransporterInput {
+  company: CompanyInput!
+  recepisse: BsffTransporterRecepisseInput
+  transport: BsffTransporterTransportInput
+}
+
+input BsffTransporterRecepisseInput {
+  department: String!
+  number: String!
+  validityLimit: DateTime!
+}
+
+input BsffTransporterTransportInput {
+  mode: TransportMode!
+}
+
+input BsffWasteInput {
+  adr: String!
+  code: String!
+  description: String!
+}
+
+input SignatureInput {
+  author: String!
+  date: DateTime!
+}
+
+enum BsffSignatureType {
+  EMISSION
+  OPERATION
+  RECEPTION
+  TRANSPORT
+}
+
+input DateFilter {
+  _eq: DateTime
+  _gt: DateTime
+  _gte: DateTime
+  _lt: DateTime
+  _lte: DateTime
+}
+
+"""
+URL de téléchargement accompagné d'un token
+permettant de valider le téléchargement.
+"""
+type FileDownload {
+  """Lien de téléchargement"""
+  downloadLink: String
+  """Token ayant une durée de validité de 10s"""
+  token: String
+}
+
+scalar JSON
+
+"""Type de quantité lors de l'émission"""
+enum QuantityType {
+  """Quantité estimée"""
+  ESTIMATED
+  """Quntité réelle"""
+  REAL
+}
+
+"""Statut d'acceptation d'un déchet"""
+enum WasteAcceptationStatusInput {
+  """Accepté en totalité"""
+  ACCEPTED
+  """Refus partiel"""
+  PARTIALLY_REFUSED
+  """Refusé"""
+  REFUSED
+}
+
+"""Informations sur une adresse chantier"""
+type WorkSite {
+  address: String
+  city: String
+  infos: String
+  name: String
+  postalCode: String
+}

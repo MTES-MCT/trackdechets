@@ -1,16 +1,3 @@
-"""
-Le scalaire `DateTime` accepte des chaines de caractères
-formattées selon le standard ISO 8601. Exemples:
-- "yyyy-MM-dd" (eg. 2020-11-23)
-- "yyyy-MM-ddTHH:mm:ss" (eg. 2020-11-23T13:34:55)
-- "yyyy-MM-ddTHH:mm:ssX" (eg. 2020-11-23T13:34:55Z)
-- "yyyy-MM-dd'T'HH:mm:ss.SSS" (eg. 2020-11-23T13:34:55.987)
-- "yyyy-MM-dd'T'HH:mm:ss.SSSX" (eg. 2020-11-23T13:34:55.987Z)
-"""
-scalar DateTime
-
-scalar JSON
-
 type Query {
   "Renvoie un BSD sélectionné par son ID (opaque ou lisible, l'un des deux doit être fourni)"
   form(
@@ -750,38 +737,6 @@ type Destination {
   isFilledByEmitter: Boolean
 }
 
-"Information sur un établissement dans un BSD"
-type FormCompany {
-  "Nom de l'établissement"
-  name: String
-
-  "SIRET de l'établissement"
-  siret: String
-
-  "Adresse de l'établissement"
-  address: String
-
-  """
-  Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
-  https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
-
-  Seul la destination ultérieure case 12 (`form.nextDestination.company`) peut être à l'étranger.
-  """
-  country: String
-
-  "Nom du contact dans l'établissement"
-  contact: String
-
-  "Numéro de téléphone de contact dans l'établissement"
-  phone: String
-
-  "Email du contact dans l'établissement"
-  mail: String
-
-  "Numéro de TVA intracommunautaire"
-  vatNumber: String
-}
-
 "Information sur l'éco-organisme responsable du BSD"
 type FormEcoOrganisme {
   name: String!
@@ -801,15 +756,6 @@ enum EmitterType {
 
   "Personne ayant transformé ou réalisé un traitement dont la provenance des déchets reste identifiable"
   APPENDIX2
-}
-
-"Informations sur une adresse chantier"
-type WorkSite {
-  name: String
-  address: String
-  city: String
-  postalCode: String
-  infos: String
 }
 
 "Émetteur du BSD (case 1)"
@@ -877,15 +823,6 @@ type NextDestination {
 
   "Établissement ultérieure"
   company: FormCompany
-}
-
-"Type de quantité lors de l'émission"
-enum QuantityType {
-  "Quntité réelle"
-  REAL
-
-  "Quantité estimée"
-  ESTIMATED
 }
 
 "Type de packaging du déchet"
@@ -1021,18 +958,6 @@ type Stat {
 }
 
 """
-URL de téléchargement accompagné d'un token
-permettant de valider le téléchargement.
-"""
-type FileDownload {
-  "Token ayant une durée de validité de 10s"
-  token: String
-
-  "Lien de téléchargement"
-  downloadLink: String
-}
-
-"""
 Modèle de registre réglementaire tels que décrits dans l'arrêté du 29 février 2012 fixant
 le contenu des registres mnetionnées aux articles R. 541-43 et R. 541-46 du code de l'environnement
 https://www.legifrance.gouv.fr/affichTexte.do?cidTexte=JORFTEXT000025454959&categorieLien=id
@@ -1149,14 +1074,6 @@ type formsLifeCycleData {
 
   "Nombre de changements de statuts renvoyés"
   count: Int
-}
-
-enum TransportMode {
-  ROAD
-  RAIL
-  AIR
-  RIVER
-  SEA
 }
 
 type TransportSegment {
