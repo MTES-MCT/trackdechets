@@ -1,7 +1,7 @@
 overwrite: true
-schema: ./src/**/*.graphql
 generates:
   ./src/generated/graphql/types.ts:
+    schema: ./src/**/*.graphql
     plugins:
       - typescript
       - typescript-resolvers
@@ -19,6 +19,7 @@ generates:
       afterOneFileWrite:
         - prettier --config .prettierrc --write
   ../front/src/generated/graphql/types.ts:
+    schema: ./src/**/*.graphql
     plugins:
       - typescript
       - typescript-operations
@@ -29,7 +30,13 @@ generates:
     hooks:
       afterOneFileWrite:
         - prettier --config .prettierrc --write
-  ../doc/docs/api-reference.md:
-    schema: "!./src/**/*.{private,admin}.graphql"
+  ../doc-v2/schema.graphql:
+    schema:
+      - ./src/**/*.graphql
+      - "!./src/dasris/**/*.{private,admin}.graphql"
     plugins:
-      - graphql-markdown-plugin.js
+      - schema-ast
+    config:
+      includeDirectives: true
+      commentDescriptions: true
+      sort: true
