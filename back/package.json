@@ -100,7 +100,8 @@
   },
   "devDependencies": {
     "@fast-csv/parse": "^4.3.0",
-    "@graphql-codegen/cli": "^1.20.0",
+    "@graphql-codegen/cli": "^1.21.5",
+    "@graphql-codegen/schema-ast": "^1.18.3",
     "@graphql-codegen/typescript": "^1.20.0",
     "@graphql-codegen/typescript-operations": "^1.17.13",
     "@graphql-codegen/typescript-resolvers": "^1.18.1",
