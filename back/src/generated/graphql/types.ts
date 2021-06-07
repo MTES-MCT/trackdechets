@@ -452,6 +452,10 @@ export type BsdasriEmission = {
   wasteDetails?: Maybe<BsdasriWasteDetails>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
   signature?: Maybe<BsdasriSignature>;
+  /** Emporté sans signature PRED avec son autorisation prélalable */
+  isTakenOverWithoutEmitterSignature?: Maybe<Scalars["Boolean"]>;
+  /** Signature PRED avec code de sécurité */
+  isTakenOverWithSecretCode?: Maybe<Scalars["Boolean"]>;
 };
 
 export type BsdasriEmissionInput = {
@@ -5625,6 +5629,16 @@ export type BsdasriEmissionResolvers<
     ParentType,
     ContextType
   >;
+  isTakenOverWithoutEmitterSignature?: Resolver<
+    Maybe<ResolversTypes["Boolean"]>,
+    ParentType,
+    ContextType
+  >;
+  isTakenOverWithSecretCode?: Resolver<
+    Maybe<ResolversTypes["Boolean"]>,
+    ParentType,
+    ContextType
+  >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -9116,6 +9130,8 @@ export function createBsdasriEmissionMock(
     wasteDetails: null,
     handedOverAt: null,
     signature: null,
+    isTakenOverWithoutEmitterSignature: null,
+    isTakenOverWithSecretCode: null,
     ...props
   };
 }

@@ -6,7 +6,7 @@ import {
   vhuFragment,
 } from "./fragments";
 
-// full fledged form to display in detailled views
+// full fledged bsd to display in detailled views
 export const GET_DETAIL_FORM = gql`
   query Form($id: ID) {
     form(id: $id) {
@@ -14,6 +14,15 @@ export const GET_DETAIL_FORM = gql`
     }
   }
   ${detailFormFragment}
+`;
+
+export const GET_DETAIL_DASRI = gql`
+  query Bsdasri($id: ID!) {
+    bsdasri(id: $id) {
+      ...DasriFragment
+    }
+  }
+  ${dasriFragment}
 `;
 
 export const GET_BSDS = gql`
