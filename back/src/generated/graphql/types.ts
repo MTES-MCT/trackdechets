@@ -164,7 +164,7 @@ export type BrokerReceipt = {
   department: Scalars["String"];
 };
 
-export type Bsd = Form | Bsdasri | Bsvhu;
+export type Bsd = Form | Bsdasri | Bsvhu | Bsda;
 
 export type Bsda = {
   __typename?: "Bsda";
@@ -1018,7 +1018,7 @@ export type BsdEdge = {
   node: Bsd;
 };
 
-export type BsdType = "BSDD" | "BSDASRI" | "BSVHU";
+export type BsdType = "BSDD" | "BSDASRI" | "BSVHU" | "BSDA";
 
 export type BsdWhere = {
   readableId?: Maybe<Scalars["String"]>;
@@ -4800,7 +4800,8 @@ export type ResolversTypes = {
   Bsd:
     | ResolversTypes["Form"]
     | ResolversTypes["Bsdasri"]
-    | ResolversTypes["Bsvhu"];
+    | ResolversTypes["Bsvhu"]
+    | ResolversTypes["Bsda"];
   Bsvhu: ResolverTypeWrapper<Bsvhu>;
   BsvhuStatus: BsvhuStatus;
   BsvhuEmitter: ResolverTypeWrapper<BsvhuEmitter>;
@@ -5109,7 +5110,8 @@ export type ResolversParentTypes = {
   Bsd:
     | ResolversParentTypes["Form"]
     | ResolversParentTypes["Bsdasri"]
-    | ResolversParentTypes["Bsvhu"];
+    | ResolversParentTypes["Bsvhu"]
+    | ResolversParentTypes["Bsda"];
   Bsvhu: Bsvhu;
   BsvhuEmitter: BsvhuEmitter;
   BsvhuEmission: BsvhuEmission;
@@ -5394,7 +5396,7 @@ export type BsdResolvers<
   ParentType extends ResolversParentTypes["Bsd"] = ResolversParentTypes["Bsd"]
 > = {
   __resolveType: TypeResolveFn<
-    "Form" | "Bsdasri" | "Bsvhu",
+    "Form" | "Bsdasri" | "Bsvhu" | "Bsda",
     ParentType,
     ContextType
   >;

@@ -1,16 +1,17 @@
-import prisma from "../../../prisma";
+import { deleteBsd } from "../../../common/elastic";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationResolvers } from "../../../generated/graphql/types";
-
-import { getFormOrFormNotFound } from "../../database";
+import { MutationDeleteBsdaArgs } from "../../../generated/graphql/types";
+import prisma from "../../../prisma";
 import { expandBsdaFromDb } from "../../converter";
+import { getFormOrFormNotFound } from "../../database";
 import { checkCanDeleteBsdvhu } from "../../permissions";
+import { GraphQLContext } from "../../../types";
 
-const deleteBsdaResolver: MutationResolvers["deleteBsda"] = async (
+export default async function deleteBsda(
   _,
-  { id },
-  context
-) => {
+  { id }: MutationDeleteBsdaArgs,
+  context: GraphQLContext
+) {
   const user = checkIsAuthenticated(context);
 
   const bshvhu = await getFormOrFormNotFound(id);
@@ -21,9 +22,7 @@ const deleteBsdaResolver: MutationResolvers["deleteBsda"] = async (
     data: { isDeleted: true }
   });
 
-  // TODO await elastic.deleteBsd(deletedBsda);
+  await deleteBsd(deletedBsda);
 
   return expandBsdaFromDb(deletedBsda);
-};
-
-export default deleteBsdaResolver;
+}

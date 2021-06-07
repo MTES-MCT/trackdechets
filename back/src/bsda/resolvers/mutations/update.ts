@@ -5,6 +5,7 @@ import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb, flattenBsdaInput } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
 import { checkKeysEditability } from "../../edition-rules";
+import { indexBsda } from "../../elastic";
 import {
   checkCanAssociateBsdas,
   checkIsFormContributor
@@ -48,7 +49,7 @@ export default async function edit(
     ? { set: input.associations.map(id => ({ id })) }
     : undefined;
 
-  const updatedForm = await prisma.bsda.update({
+  const updatedBsda = await prisma.bsda.update({
     where: { id },
     data: {
       ...formUpdate,
@@ -56,5 +57,7 @@ export default async function edit(
     }
   });
 
-  return expandBsdaFromDb(updatedForm);
+  await indexBsda(updatedBsda);
+
+  return expandBsdaFromDb(updatedBsda);
 }

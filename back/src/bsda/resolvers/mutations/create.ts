@@ -7,6 +7,7 @@ import {
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb, flattenBsdaInput } from "../../converter";
+import { indexBsda } from "../../elastic";
 import {
   checkCanAssociateBsdas,
   checkIsFormContributor
@@ -45,7 +46,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
 
   await checkCanAssociateBsdas(input.associations);
 
-  const newForm = await prisma.bsda.create({
+  const newBsda = await prisma.bsda.create({
     data: {
       ...form,
       id: getReadableId(ReadableIdPrefix.BSDA),
@@ -54,5 +55,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     }
   });
 
-  return expandBsdaFromDb(newForm);
+  await indexBsda(newBsda);
+
+  return expandBsdaFromDb(newBsda);
 }

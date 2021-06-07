@@ -125,7 +125,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
           date: form.transporterTransportSignatureDate
         })
       })
-    }),
+    })
   };
 }
 

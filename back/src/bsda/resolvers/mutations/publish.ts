@@ -5,6 +5,7 @@ import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
+import { indexBsda } from "../../elastic";
 import { checkIsFormContributor } from "../../permissions";
 import { validateBsda } from "../../validation";
 
@@ -30,10 +31,12 @@ export default async function create(
 
   await validateBsda(prismaForm, { emissionSignature: true });
 
-  const updatedForm = await prisma.bsda.update({
+  const updatedBsda = await prisma.bsda.update({
     where: { id },
     data: { isDraft: false }
   });
 
-  return expandBsdaFromDb(updatedForm);
+  await indexBsda(updatedBsda);
+
+  return expandBsdaFromDb(updatedBsda);
 }

@@ -5,6 +5,7 @@ import { MutationDuplicateBsdaArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { expandBsdaFromDb } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
+import { indexBsda } from "../../elastic";
 import { checkIsFormContributor } from "../../permissions";
 
 export default async function duplicate(
@@ -22,9 +23,10 @@ export default async function duplicate(
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  const newForm = await duplicateForm(prismaForm);
+  const newBsda = await duplicateForm(prismaForm);
+  await indexBsda(newBsda);
 
-  return expandBsdaFromDb(newForm);
+  return expandBsdaFromDb(newBsda);
 }
 
 function duplicateForm({
@@ -51,7 +53,7 @@ function duplicateForm({
   return prisma.bsda.create({
     data: {
       ...rest,
-      id: getReadableId(ReadableIdPrefix.VHU),
+      id: getReadableId(ReadableIdPrefix.BSDA),
       status: BsdaStatus.INITIAL,
       isDraft: true
     }
