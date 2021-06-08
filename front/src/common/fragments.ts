@@ -317,6 +317,20 @@ const dasriWasteDetailsFragment = gql`
   }
 `;
 
+const dasriEmissionWasteDetailsFragment = gql`
+  fragment DasriEmissionWasteDetailsFragment on BsdasriEmissionWasteDetails {
+    onuCode
+    quantity
+    quantityType
+    volume
+    packagingInfos {
+      type
+      other
+      quantity
+      volume
+    }
+  }
+`;
 const wasteAcceptationFragment = gql`
   fragment WasteAcceptationFragment on BsdasriWasteAcceptation {
     status
@@ -339,6 +353,7 @@ export const dasriFragment = gql`
         address
         city
         postalCode
+        infos
       }
       customInfo
     }
@@ -348,7 +363,7 @@ export const dasriFragment = gql`
       isTakenOverWithSecretCode
       wasteDetails {
         onuCode
-        ...DasriWasteDetailsFragment
+        ...DasriEmissionWasteDetailsFragment
       }
       handedOverAt
       signature {
@@ -390,9 +405,11 @@ export const dasriFragment = gql`
       wasteAcceptation {
         ...WasteAcceptationFragment
       }
+
       signature {
         ...SignatureFragment
       }
+      receivedAt
     }
     operation {
       processedAt
@@ -407,6 +424,7 @@ export const dasriFragment = gql`
   ${companyFragment}
   ${signatureFragment}
   ${dasriWasteDetailsFragment}
+  ${dasriEmissionWasteDetailsFragment}
   ${wasteAcceptationFragment}
 `;
 
