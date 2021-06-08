@@ -11,7 +11,8 @@ select:focus {
 }
 
 input:disabled,
-select:disabled {
+select:disabled,
+textarea:disabled {
   background-color: #ebeff3;
   background-color: $grey-lighter;
 }
@@ -134,7 +135,13 @@ select:-moz-focusring {
 .td-select {
   @include input;
 }
-
+.td-date-wrapper {
+  width: 120px;
+}
+.td-department {
+  width: 100px;
+  display: block;
+}
 .td-select {
   appearance: none;
   padding-right: 1.75rem;

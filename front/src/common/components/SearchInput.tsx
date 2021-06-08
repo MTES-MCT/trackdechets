@@ -8,12 +8,14 @@ export default function SearchInput({
   placeholder = "",
   className = "",
   value = "",
+  disabled = false,
 }: {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   id: string;
   className?: string;
   placeholder?: string;
   value?: string;
+  disabled?: boolean;
 }) {
   return (
     <div className={styles.SearchField}>
@@ -23,6 +25,7 @@ export default function SearchInput({
         className={`td-input ${className}`}
         onChange={e => onChange(e)}
         placeholder={placeholder}
+        disabled={disabled}
         {...(!!value ? { value: value } : {})}
       />
       <i className={styles.SearchIcon} aria-label="Recherche">

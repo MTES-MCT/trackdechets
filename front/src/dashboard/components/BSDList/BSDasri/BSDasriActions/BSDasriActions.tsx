@@ -8,8 +8,9 @@ import {
   IconChevronDown,
   IconChevronUp,
   IconView,
+  IconPaperWrite,
 } from "common/components/Icons";
-import { Bsdasri } from "generated/graphql/types";
+import { Bsdasri, BsdasriStatus } from "generated/graphql/types";
 
 import styles from "../../BSDActions.module.scss";
 
@@ -53,6 +54,22 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
+              {![BsdasriStatus.Processed, BsdasriStatus.Refused].includes(
+                form.status
+              ) && (
+                <>
+                  <MenuLink
+                    as={Link}
+                    to={generatePath(routes.dashboard.bsdasris.edit, {
+                      siret,
+                      id: form.id,
+                    })}
+                  >
+                    <IconPaperWrite size="24px" color="blueLight" />
+                    Modifier
+                  </MenuLink>
+                </>
+              )}
             </MenuList>
           </>
         )}
