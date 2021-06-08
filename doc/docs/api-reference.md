@@ -924,7 +924,7 @@ Crée un nouveau dasri
 </td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">bsdasriCreateInput</td>
+<td colspan="2" align="right" valign="top">input</td>
 <td valign="top"><a href="#bsdasricreateinput">BsdasriCreateInput</a>!</td>
 <td>
 
@@ -987,7 +987,7 @@ Crée un nouveau dasri en brouillon
 </td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">bsdasriCreateInput</td>
+<td colspan="2" align="right" valign="top">input</td>
 <td valign="top"><a href="#bsdasricreateinput">BsdasriCreateInput</a>!</td>
 <td>
 
@@ -1862,7 +1862,7 @@ Identifiant unique du bordereau
 </td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">bsdasriUpdateInput</td>
+<td colspan="2" align="right" valign="top">input</td>
 <td valign="top"><a href="#bsdasriupdateinput">BsdasriUpdateInput</a>!</td>
 <td>
 
@@ -3101,7 +3101,7 @@ Informations relatives au déchet émis
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>wasteDetails</strong></td>
-<td valign="top"><a href="#bsdasriwastedetails">BsdasriWasteDetails</a></td>
+<td valign="top"><a href="#bsdasriemissionwastedetails">BsdasriEmissionWasteDetails</a></td>
 <td></td>
 </tr>
 <tr>
@@ -3131,6 +3131,48 @@ Emporté sans signature PRED avec son autorisation prélalable
 Signature PRED avec code de sécurité
 
 </td>
+</tr>
+</tbody>
+</table>
+
+### BsdasriEmissionWasteDetails
+
+Détail sur le déchet emis du Bsdasri
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#int">Int</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantityType</strong></td>
+<td valign="top"><a href="#quantitytype">QuantityType</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>volume</strong></td>
+<td valign="top"><a href="#int">Int</a></td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>packagingInfos</strong></td>
+<td valign="top">[<a href="#bsdasripackaginginfo">BsdasriPackagingInfo</a>!]</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>onuCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -3572,7 +3614,7 @@ Informations relatives à l'acceptation ou au refus du déchet (Bsdasri)
 
 ### BsdasriWasteDetails
 
-Détail sur le déchet proprement dit du Bsdasri
+Détail sur le déchet transporté ou reçu du Bsdasri
 
 <table>
 <thead>
@@ -3602,11 +3644,6 @@ Détail sur le déchet proprement dit du Bsdasri
 <tr>
 <td colspan="2" valign="top"><strong>packagingInfos</strong></td>
 <td valign="top">[<a href="#bsdasripackaginginfo">BsdasriPackagingInfo</a>!]</td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" valign="top"><strong>onuCode</strong></td>
-<td valign="top"><a href="#string">String</a></td>
 <td></td>
 </tr>
 </tbody>
