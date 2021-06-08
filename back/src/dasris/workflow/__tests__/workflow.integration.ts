@@ -73,7 +73,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
       const createBsdasri = `
         mutation {
           createBsdasri(
-            bsdasriCreateInput: {
+            input: {
               emitter: {
                 company: {
                   siret: "${pred.siret}"
@@ -159,7 +159,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
         mutation {
           updateBsdasri(
             id: "${bsdasri.id}",
-            bsdasriUpdateInput: {
+            input: {
               transport: {
                 wasteAcceptation: { status: ACCEPTED }
                 wasteDetails: {
@@ -208,7 +208,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
         mutation {
           updateBsdasri(
             id: "${bsdasri.id}",
-            bsdasriUpdateInput: {
+            input: {
               reception: {
                 wasteAcceptation: { status: ACCEPTED }
                 wasteDetails: {
@@ -257,7 +257,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
         mutation {
           updateBsdasri(
             id: "${bsdasri.id}",
-            bsdasriUpdateInput: {
+            input: {
               operation: {
                 processingOperation: "D10",
                 processedAt: "2020-04-28"

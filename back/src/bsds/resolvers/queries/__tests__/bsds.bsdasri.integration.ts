@@ -27,8 +27,8 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import { bsdasriFactory } from "../../../../dasris/__tests__/factories";
 
 const CREATE_DRAFT_DASRI = `
-mutation CreateDraftDasri($bsdasriCreateInput: BsdasriCreateInput!) {
-  createDraftBsdasri(bsdasriCreateInput: $bsdasriCreateInput)  {
+mutation CreateDraftDasri($input: BsdasriCreateInput!) {
+  createDraftBsdasri(input: $input)  {
     id
   }
 }
@@ -103,7 +103,7 @@ describe("Query.bsds.dasris base workflow", () => {
         MutationCreateDraftBsdasriArgs
       >(CREATE_DRAFT_DASRI, {
         variables: {
-          bsdasriCreateInput: {
+          input: {
             emitter: {
               company: {
                 name: "hopital blanc",

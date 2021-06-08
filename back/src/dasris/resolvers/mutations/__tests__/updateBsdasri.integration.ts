@@ -9,7 +9,7 @@ import { Mutation } from "../../../../generated/graphql/types";
 
 const UPDATE_DASRI = `
 mutation UpdateDasri($id: ID!, $input: BsdasriUpdateInput!) {
-  updateBsdasri(id: $id, bsdasriUpdateInput: $input) {
+  updateBsdasri(id: $id, input: $input) {
     id
     status
     emitter {

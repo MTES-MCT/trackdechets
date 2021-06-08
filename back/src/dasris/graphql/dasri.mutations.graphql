@@ -163,7 +163,7 @@ type Mutation {
   """
   createDraftBsdasri(
     "Payload de création d'un dasri brouillon"
-    bsdasriCreateInput: BsdasriCreateInput!
+    input: BsdasriCreateInput!
   ): Bsdasri!
 
   """
@@ -172,7 +172,7 @@ type Mutation {
   """
   createBsdasri(
     "Payload de création d'un dasri"
-    bsdasriCreateInput: BsdasriCreateInput!
+    input: BsdasriCreateInput!
   ): Bsdasri!
 
   """
@@ -184,7 +184,7 @@ type Mutation {
     "Identifiant unique du bordereau"
     id: ID!
     "Payload de mise à jour d'un dasri"
-    bsdasriUpdateInput: BsdasriUpdateInput!
+    input: BsdasriUpdateInput!
   ): Bsdasri!
 
   """

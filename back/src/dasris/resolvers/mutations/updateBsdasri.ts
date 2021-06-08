@@ -109,12 +109,12 @@ const dasriUpdateResolver = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const { id, bsdasriUpdateInput } = { ...args };
+  const { id, input } = { ...args };
 
   const {
     regroupedBsdasris: inputRegroupedBsdasris,
     ...dasriContent
-  } = bsdasriUpdateInput;
+  } = input;
 
   const {
     regroupedBsdasris: dbRegroupedBsdasris,

@@ -124,8 +124,8 @@ type BsdasriPackagingInfo {
 
   volume: Int!
 }
-"Détail sur le déchet proprement dit du Bsdasri"
-type BsdasriWasteDetails {
+"Détail sur le déchet emis du Bsdasri"
+type BsdasriEmissionWasteDetails {
   quantity: Int
   quantityType: QuantityType
   volume: Int
@@ -133,10 +133,18 @@ type BsdasriWasteDetails {
   onuCode: String
 }
 
+"Détail sur le déchet transporté ou reçu du Bsdasri"
+type BsdasriWasteDetails {
+  quantity: Int
+  quantityType: QuantityType
+  volume: Int
+  packagingInfos: [BsdasriPackagingInfo!]
+}
+
 "Informations relatives au déchet émis"
 type BsdasriEmission {
   wasteCode: String
-  wasteDetails: BsdasriWasteDetails
+  wasteDetails: BsdasriEmissionWasteDetails
   handedOverAt: DateTime
   signature: BsdasriSignature
   "Emporté sans signature PRED avec son autorisation prélalable"
