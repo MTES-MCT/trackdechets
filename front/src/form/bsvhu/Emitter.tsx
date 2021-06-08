@@ -10,8 +10,8 @@ export default function Emitter({ disabled }) {
     <>
       {disabled && (
         <div className="notification notification--error">
-          Les champs ci-dessous ont été scéllés via signature et ne sont plus
-          modifiables.
+          Les champs grisés ci-dessous ont été scellés via signature et ne sont
+          plus modifiables.
         </div>
       )}
       <CompanySelector
