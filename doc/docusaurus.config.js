@@ -7,7 +7,7 @@ module.exports = {
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/trackdechets.png",
-  organizationName: "Ministère de la Transition Écologique",
+  organizationName: "MTES-MCT",
   projectName: "trackdechets",
   themeConfig: {
     colorMode: {
