@@ -1,11 +1,23 @@
 import TdSwitch from "common/components/Switch";
-import { getInitialEmitterWorkSite } from "../../utils/initial-state";
+
 import { Field, useFormikContext } from "formik";
 import { Form } from "generated/graphql/types";
 import React from "react";
 import WorkSiteAddress from "./WorkSiteAddress";
 
-export default function WorkSite() {
+export default function WorkSite({
+  switchLabel,
+  headingTitle,
+  designation,
+  getInitialEmitterWorkSiteFn,
+  disabled = false,
+}: {
+  switchLabel: string;
+  headingTitle: string;
+  designation: string;
+  getInitialEmitterWorkSiteFn: () => any;
+  disabled?: boolean;
+}) {
   const { values, setFieldValue } = useFormikContext<Form>();
 
   const showWorkSite = !!values.emitter?.workSite;
@@ -14,7 +26,7 @@ export default function WorkSite() {
     if (showWorkSite) {
       setFieldValue("emitter.workSite", null, false);
     } else {
-      setFieldValue("emitter.workSite", getInitialEmitterWorkSite(), false);
+      setFieldValue("emitter.workSite", getInitialEmitterWorkSiteFn(), false);
     }
   }
 
@@ -26,24 +38,27 @@ export default function WorkSite() {
 
   return (
     <div className="form__row">
-      <TdSwitch
-        checked={showWorkSite}
-        onChange={handleWorksiteToggle}
-        label="Je souhaite ajouter une adresse de chantier ou de collecte"
-      />
+      {!disabled && (
+        <TdSwitch
+          checked={showWorkSite}
+          onChange={handleWorksiteToggle}
+          label={switchLabel}
+        />
+      )}
 
       {showWorkSite && values.emitter?.workSite && (
         <>
-          <h4 className="form__section-heading">Adresse chantier</h4>
+          <h4 className="form__section-heading">{headingTitle}</h4>
 
           <div className="form__row">
             <label>
-              Nom de l'entreprise
+              Nom {designation}
               <Field
                 type="text"
                 name="emitter.workSite.name"
                 placeholder="Intitulé"
                 className="td-input"
+                disabled={disabled}
               />
             </label>
           </div>
@@ -54,6 +69,8 @@ export default function WorkSite() {
               city={values.emitter?.workSite?.city}
               postalCode={values.emitter?.workSite?.postalCode}
               onAddressSelection={details => setAddress(details)}
+              designation={designation}
+              disabled={disabled}
             />
           </div>
 
@@ -65,6 +82,7 @@ export default function WorkSite() {
                 className="textarea-pickup-site td-textarea"
                 placeholder="Champ libre pour préciser..."
                 name="emitter.workSite.infos"
+                disabled={disabled}
               />
             </label>
           </div>
