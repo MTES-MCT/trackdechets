@@ -11,7 +11,7 @@ Avant de pouvoir implémenter le procotole OAuth2, vous aurez besoin d'une appli
 - Nom de l'application
 - Logo de l’application au format png, jpeg ou svg
 - Une liste d’urls de redirection valides
-  :::
+:::
 
 Le [protocole OAuth2](https://tools.ietf.org/html/rfc6749) permet à des logiciels tiers type SaaS déchets ("client") d'accéder à l'API Trackdéchets ("ressource server") pour le compte d'utilisateurs ("ressource owner") sans exposer le mot de passe de celui-ci.
 

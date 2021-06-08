@@ -8,7 +8,7 @@ sidebar_position: 6
 
 Nous exposons une query `companyInfos` qui interroge la base SIRENE (via [https://entreprise.data.gouv.fr](https://entreprise.data.gouv.fr)), la base des installations classées pour la protection de l'environnement (ICPE) et la base Trackdéchets pour obtenir des informations sur un établissement à partir de son numéro SIRET.
 
-La query renvoie un objet de type [`CompanyPublic`](https://developers.trackdechets.beta.gouv.fr/docs/api-reference/#companypublic) et permet notamment de savoir si un établissement est inscrit sur Trackdéchets grâce au champ `isRegistered`.
+La query renvoie un objet de type [`CompanyPublic`](../api-reference/user-company/objects#companypublic) et permet notamment de savoir si un établissement est inscrit sur Trackdéchets grâce au champ `isRegistered`.
 
 Exemple d'utilisation:
 

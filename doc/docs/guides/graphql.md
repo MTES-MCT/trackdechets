@@ -56,10 +56,9 @@ curl \
  } \
 " https://api.trackdechets.beta.gouv.fr/
 ```
-
-!!! note
-    La chaîne de caractères de `"query"` doit échapper les sauts de lignes pour être correctement lue par le serveur. Pour le corps du message `POST`, il faut utiliser des guillemets doubles à l'extérieur et échapper tous les guillements doubles à l'intérieur du message.
-
+:::note
+La chaîne de caractères de `"query"` doit échapper les sauts de lignes pour être correctement lue par le serveur. Pour le corps du message `POST`, il faut utiliser des guillemets doubles à l'extérieur et échapper tous les guillements doubles à l'intérieur du message.
+:::
 
 ## À propos des opérations de type `query` et `mutation`
 

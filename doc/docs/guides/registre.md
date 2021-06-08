@@ -13,7 +13,7 @@ Il est possible d'exporter les données Trackdéchets correspondant aux différe
 
 Les données peuvent être sélectionnées par siret, date de début, date de fin ou code déchet. Le format de l'export peut être csv (`CSV`) ou Excel (`XLXS`)
 
-Pour ce faire vous devez utiliser la query `formsRegister` de la façon suivante
+Pour ce faire vous devez utiliser la query [`formsRegister`](../api-reference/bsdd/queries#formsregister) de la façon suivante
 
 ```
 query {
@@ -36,6 +36,5 @@ Vous recevrez en réponse un lien de téléchargement à utiliser pour télécha
 
 ```
 
-Plus de précisions sur la [référence de l'API](./api-reference)
 
 

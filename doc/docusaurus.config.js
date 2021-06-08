@@ -21,10 +21,9 @@ module.exports = {
       },
       items: [
         {
-          type: "doc",
-          docId: "intro",
-          position: "left",
-          label: "Documentation",
+          href: "https://forum.trackdechets.beta.gouv.fr",
+          label: "Support",
+          position: "right",
         },
         {
           href: "https://api.trackdechets.beta.gouv.fr",
@@ -41,11 +40,7 @@ module.exports = {
           items: [
             {
               label: "Documentation",
-              to: "/docs/intro",
-            },
-            {
-              label: "Référence de l'API",
-              to: "/docs/api-reference",
+              to: "/",
             },
             {
               label: "Statut de l'API",

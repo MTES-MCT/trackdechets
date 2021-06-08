@@ -133,8 +133,7 @@ L'URL a une durée de validité de 10 secondes.
 
 Il est possible d'accéder à un flux des modifications d'états qui ont eu lieu sur un BSD en particulier ou sur l'ensemble des BSD's liés à un établissement. En faisant des appels réguliers sur ce flux, il est possible d'implémenter des systèmes de notifications en quasi temps réel pour vos utilisateurs (par exemple lors du traitement d'un déchets).
 
-Ce flux est accessible via la query `formsLifeCycle`. Pour plus d'informations se référer à la [référence de l'API](api-reference/#query)
-
+Ce flux est accessible via la query [`formsLifeCycle`](../api-reference/bsdd/queries#formslifecycle).
 ## Import d'un BSD signé papier
 
 L'installation de traitement a la possibilité d'importer un BSD signé papier dans Trackdéchet après l'étape de traitement final dans

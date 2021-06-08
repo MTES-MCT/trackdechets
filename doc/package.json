@@ -1,6 +1,6 @@
 {
-  "name": "doc-v-2",
-  "version": "0.0.0",
+  "name": "td-doc",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",

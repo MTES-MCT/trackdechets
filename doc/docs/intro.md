@@ -28,13 +28,13 @@ L'interface graphique Trackdéchets n'a pas vocation à se substituer à des sol
 
 ## HTTP / GraphQL
 
-L'API Trackdéchets est un service web basé sur le protocole HTTP, et peut donc fonctionner avec n'importe quelle librairie HTTP dans le langage de programmation de votre choix. Le standard [GraphQL](https://graphql.org/) est utilisé pour le requêtage de l'API. Les actions possibles sont catégorisées entre `queries` (lecture de données) et `mutations` (création, modification, suppression de données). L'ensemble des types, requêtes et mutations est documenté dans la [référence de l'API](api-reference/api-reference).
+L'API Trackdéchets est un service web basé sur le protocole HTTP, et peut donc fonctionner avec n'importe quelle librairie HTTP dans le langage de programmation de votre choix. Le standard [GraphQL](https://graphql.org/) est utilisé pour le requêtage de l'API. Les actions possibles sont catégorisées entre `queries` (lecture de données) et `mutations` (création, modification, suppression de données). L'ensemble des types, requêtes et mutations est documenté dans la référence des APIs.
 
-Voir la rubrique [Faire des appels à l'API GraphQL](graphql.md) pour un guide d'utilisation de l'API.
+Voir la rubrique [Faire des appels à l'API GraphQL](./guides/graphql.md) pour un guide d'utilisation de l'API.
 
 ## Évolutions de l'API
 
-Le développement du projet Trackdéchets se fait en mode agile, c'est à dire que le produit est en constante évolution pour s'adapter aux besoins des utilisateurs de la plateforme. Ceci étant dit nous nous efforçons de limiter les changements non rétro-compatibles apportés à l'API publique et lorsqu'ils sont nécessaires de les annoncer assez de temps à l'avance. Les changements apportés à l'API sont documentés dans un [Changelog](changelog.md)
+Le développement du projet Trackdéchets se fait en mode agile, c'est à dire que le produit est en constante évolution pour s'adapter aux besoins des utilisateurs de la plateforme. Ceci étant dit nous nous efforçons de limiter les changements non rétro-compatibles apportés à l'API publique et lorsqu'ils sont nécessaires de les annoncer assez de temps à l'avance. Les changements apportés à l'API sont documentés dans un [Changelog](api-reference/changelog.md)
 
 ## Limitations
 
