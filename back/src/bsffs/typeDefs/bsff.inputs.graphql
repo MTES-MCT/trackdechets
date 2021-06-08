@@ -1,0 +1,92 @@
+input BsffWhere {
+  emitter: BsffWhereEmitter
+  transporter: BsffWhereTransporter
+  destination: BsffWhereDestination
+}
+input BsffWhereEmitter {
+  company: BsffWhereCompany
+}
+input BsffWhereTransporter {
+  company: BsffWhereCompany
+}
+input BsffWhereDestination {
+  company: BsffWhereCompany
+}
+input BsffWhereCompany {
+  siret: String!
+}
+
+input SignatureInput {
+  date: DateTime!
+  author: String!
+}
+
+input BsffInput {
+  emitter: BsffEmitterInput
+  packagings: [BsffPackagingInput!]
+  waste: BsffWasteInput
+  quantity: BsffQuantityInput
+  transporter: BsffTransporterInput
+  destination: BsffDestinationInput
+}
+
+input BsffEmitterInput {
+  company: CompanyInput!
+}
+
+input BsffPackagingInput {
+  numero: String!
+  type: BsffPackagingType!
+  litres: Int!
+}
+
+input BsffWasteInput {
+  code: String!
+  description: String!
+  adr: String!
+}
+
+input BsffQuantityInput {
+  kilos: Int!
+  isEstimate: Boolean!
+}
+
+input BsffTransporterInput {
+  company: CompanyInput!
+  recepisse: BsffTransporterRecepisseInput
+  transport: BsffTransporterTransportInput
+}
+input BsffTransporterRecepisseInput {
+  number: String!
+  department: String!
+  validityLimit: DateTime!
+}
+input BsffTransporterTransportInput {
+  mode: TransportMode!
+}
+
+input BsffDestinationInput {
+  company: CompanyInput!
+  cap: String
+  reception: BsffDestinationReceptionInput
+  plannedOperation: BsffDestinationOperationInput
+  operation: BsffDestinationOperationInput
+}
+input BsffDestinationReceptionInput {
+  date: DateTime!
+  kilos: Int!
+  refusal: String
+}
+input BsffDestinationOperationInput {
+  code: BsffOperationCode!
+  qualification: BsffOperationQualification!
+}
+
+input BsffFicheInterventionInput {
+  kilos: Int!
+  owner: BsffOwnerInput!
+  postalCode: String!
+}
+input BsffOwnerInput {
+  company: CompanyInput!
+}

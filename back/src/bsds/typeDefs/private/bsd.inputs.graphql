@@ -1,0 +1,21 @@
+input BsdWhere {
+  readableId: String
+  emitter: String
+  recipient: String
+  waste: String
+  types: [BsdType!]
+  isDraftFor: [String!]
+  isForActionFor: [String!]
+  isFollowFor: [String!]
+  isArchivedFor: [String!]
+  isToCollectFor: [String!]
+  isCollectedFor: [String!]
+}
+
+input OrderBy {
+  type: OrderType
+  readableId: OrderType
+  emitter: OrderType
+  recipient: OrderType
+  waste: OrderType
+}

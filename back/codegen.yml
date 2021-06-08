@@ -1,4 +1,6 @@
 overwrite: true
+schema:
+  - ./src/scalars/typeDefs/*.graphql
 generates:
   ./src/generated/graphql/types.ts:
     schema: ./src/**/*.graphql
@@ -30,52 +32,59 @@ generates:
     hooks:
       afterOneFileWrite:
         - prettier --config .prettierrc --write
-  ../doc-v2/graphql/user.graphql:
+  ../doc-v2/typeDefs/user-company.graphql:
     schema:
-      - ./src/common/graphql/scalars.graphql
-      - ./src/companies/**/*.graphql
-      - ./src/users/**/*.graphql
-      - "!./src/**/*.{private,admin}.graphql"
+      - "./src/{users,companies}/typeDefs/*.graphql"
     plugins:
       - schema-ast
     config:
       includeDirectives: true
       commentDescriptions: true
       sort: true
-  ../doc-v2/graphql/bsdd.graphql:
+  ../doc-v2/typeDefs/bsdd.graphql:
     schema:
-      - ./src/common/graphql/*.graphql
-      - ./src/forms/**/*.graphql
+      - ./src/bsds/typeDefs/*.graphql
+      - ./src/forms/typeDefs/*.graphql
     plugins:
       - schema-ast
     config:
       includeDirectives: true
       commentDescriptions: true
       sort: true
-  ../doc-v2/graphql/bsdasri.graphql:
+  ../doc-v2/typeDefs/bsdasri.graphql:
     schema:
-      - ./src/common/graphql/*.graphql
-      - ./src/dasris/**/*.graphql
+      - ./src/bsds/typeDefs/*.graphql
+      - ./src/dasris/typeDefs/*.graphql
     plugins:
       - schema-ast
     config:
       includeDirectives: true
       commentDescriptions: true
       sort: true
-  ../doc-v2/graphql/bsff.graphql:
+  ../doc-v2/typeDefs/bsff.graphql:
     schema:
-      - ./src/common/graphql/*.graphql
-      - ./src/bsffs/**/*.graphql
+      - ./src/bsds/typeDefs/*.graphql
+      - ./src/bsdffs/typeDefs/*.graphql
     plugins:
       - schema-ast
     config:
       includeDirectives: true
       commentDescriptions: true
       sort: true
-  ../doc-v2/graphql/bsda.graphql:
+  ../doc-v2/typeDefs/bsda.graphql:
     schema:
-      - ./src/common/graphql/*.graphql
-      - ./src/bsda/**/*.graphql
+      - ./src/bsds/typeDefs/*.graphql
+      - ./src/bsda/typeDefs/*.graphql
+    plugins:
+      - schema-ast
+    config:
+      includeDirectives: true
+      commentDescriptions: true
+      sort: true
+  ../doc-v2/typeDefs/bsvhu.graphql:
+    schema:
+      - ./src/bsds/typeDefs/*.graphql
+      - ./src/vhu/typeDefs/*.graphql
     plugins:
       - schema-ast
     config:

@@ -1,0 +1,80 @@
+enum BsdasriRole {
+  "Les Bsdasri dont je suis transporteur"
+  TRANSPORTER
+  "Les Bsdasri dont je suis la destination de traitement"
+  RECIPIENT
+  "Les Bsdasri dont je suis l'émetteur"
+  EMITTER
+}
+
+enum BsdasriStatus {
+  "Bsdasri dans son état initial"
+  INITIAL
+
+  "Optionnel, Bsdasri signé par la PRED (émetteur)"
+  SIGNED_BY_PRODUCER
+
+  "Bsdasri envoyé vers l'établissement de destination"
+  SENT
+
+  "Bsdasri reçu par l'établissement de destination"
+  RECEIVED
+
+  "Bsdasri dont les déchets ont été traités"
+  PROCESSED
+
+  "Déchet refusé"
+  REFUSED
+}
+
+"Type de packaging du déchet"
+enum BsdasriPackagings {
+  "Caisse en carton avec sac en plastique"
+  BOITE_CARTON
+
+  "Fûts ou jerrican à usage unique"
+  FUT
+
+  "Boîtes et Mini-collecteurs pour déchets perforants"
+  BOITE_PERFORANTS
+
+  "Grand emballage"
+  GRAND_EMBALLAGE
+
+  "Grand récipient pour vrac"
+  GRV
+
+  "Autre"
+  AUTRE
+}
+
+"Type d'émetteur"
+enum BsdasriEmitterType {
+  "Producteur"
+  PRODUCER
+
+  "Installation de regroupement"
+  COLLECTOR
+}
+
+enum processingOperationTypes {
+  D9
+  D10
+  D12
+  R1
+  R12
+}
+
+enum BsdasriSignatureType {
+  "Signature du cadre émetteur (PRED)"
+  EMISSION
+
+  "Signature du cadre collecteur transporteur"
+  TRANSPORT
+
+  "Signature de la réception du déchet"
+  RECEPTION
+
+  "Signature du traitement du déchet"
+  OPERATION
+}

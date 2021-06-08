@@ -1,0 +1,50 @@
+type Mutation {
+  """
+  Mutation permettant de créer un nouveau bordereau de suivi de fluides frigorigènes.
+  """
+  createBsff(input: BsffInput!): Bsff!
+
+  """
+  Mutation permettant de modifier un bordereau existant de suivi de fluides frigorigènes.
+  """
+  updateBsff(id: ID!, input: BsffInput!): Bsff!
+
+  """
+  Mutation permettant de supprimer un bordereau existant de suivi de fluides frigorigènes.
+  À condition qu'il n'ait pas encore été signé.
+  """
+  deleteBsff(id: ID!): Bsff!
+
+  """
+  Mutation permettant d'ajouter une fiche d'intervention à un bordereau existant.
+  """
+  addFicheInterventionBsff(
+    id: ID!
+    numero: String!
+    input: BsffFicheInterventionInput!
+  ): BsffFicheIntervention!
+
+  """
+  Mutation permettant de mettre à jour une fiche d'intervention lié à un bordereau existant.
+  """
+  updateFicheInterventionBsff(
+    id: ID!
+    numero: String!
+    input: BsffFicheInterventionInput!
+  ): BsffFicheIntervention!
+
+  """
+  Mutation permettant de supprimer une fiche d'intervention lié à un bordereau existant.
+  """
+  deleteFicheInterventionBsff(id: ID!, numero: String!): BsffFicheIntervention!
+
+  """
+  Mutation permettant d'apposer une signature sur le bordereau.
+  """
+  signBsff(
+    id: ID!
+    type: BsffSignatureType!
+    signature: SignatureInput!
+    securityCode: Int
+  ): Bsff!
+}

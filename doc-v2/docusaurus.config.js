@@ -111,16 +111,16 @@ module.exports = {
     [
       "docusaurus-graphql-plugin",
       {
-        id: "user",
-        schema: "graphql/user.graphql",
-        routeBasePath: "/api-reference/user",
+        id: "user-company",
+        schema: "typeDefs/user-company.graphql",
+        routeBasePath: "/api-reference/user-company",
       },
     ],
     [
       "docusaurus-graphql-plugin",
       {
         id: "bsdd",
-        schema: "graphql/bsdd.graphql",
+        schema: "typeDefs/bsdd.graphql",
         routeBasePath: "/api-reference/bsdd",
       },
     ],
@@ -128,7 +128,7 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "bsdasri",
-        schema: "graphql/bsdasri.graphql",
+        schema: "typeDefs/bsdasri.graphql",
         routeBasePath: "/api-reference/bsdasri",
       },
     ],
@@ -136,7 +136,7 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "bsff",
-        schema: "graphql/bsff.graphql",
+        schema: "typeDefs/bsff.graphql",
         routeBasePath: "/api-reference/bsff",
       },
     ],
@@ -144,8 +144,16 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "bsda",
-        schema: "graphql/bsda.graphql",
+        schema: "typeDefs/bsda.graphql",
         routeBasePath: "/api-reference/bsda",
+      },
+    ],
+    [
+      "docusaurus-graphql-plugin",
+      {
+        id: "bsvhu",
+        schema: "typeDefs/bsvhu.graphql",
+        routeBasePath: "/api-reference/bsvhu",
       },
     ],
   ],

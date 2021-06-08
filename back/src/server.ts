@@ -26,7 +26,7 @@ import loggingMiddleware from "./common/middlewares/loggingMiddleware";
 import { redisClient } from "./common/redis";
 import { authRouter } from "./routers/auth-router";
 import { oauth2Router } from "./routers/oauth2-router";
-import { resolvers, typeDefs } from "./schema";
+import { typeDefs, resolvers } from "./schema";
 import { userActivationHandler } from "./users/activation";
 import { getUIBaseURL } from "./utils";
 import sentryReporter from "./common/plugins/sentryReporter";

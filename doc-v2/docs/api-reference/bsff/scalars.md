@@ -18,14 +18,6 @@ formattées selon le standard ISO 8601. Exemples:
 - "yyyy-MM-dd'T'HH:mm:ss.SSS" (eg. 2020-11-23T13:34:55.987)
 - "yyyy-MM-dd'T'HH:mm:ss.SSSX" (eg. 2020-11-23T13:34:55.987Z)
 
-## ID
-
-The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
-
-## Int
-
-The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.
-
 ## JSON
 
 
@@ -33,4 +25,8 @@ The `Int` scalar type represents non-fractional signed whole numeric values. Int
 ## String
 
 The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+
+## URL
+
+Chaîne de caractère au format URL, débutant par un protocole http(s).
 

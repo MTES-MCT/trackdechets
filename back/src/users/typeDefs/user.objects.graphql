@@ -1,0 +1,60 @@
+"Cet objet est renvoyé par la mutation login qui est dépréciée"
+type AuthPayload {
+  """
+  Bearer token à durée illimité permettant de s'authentifier
+  à l'API Trackdéchets. Pour ce faire, il doit être passé dans le
+  header d'autorisation `Authorization: Bearer ******`
+  """
+  token: String!
+
+  "Utilisateur lié au token"
+  user: User!
+}
+
+"Représente un utilisateur sur la plateforme Trackdéchets"
+type User {
+  "Identifiant opaque"
+  id: ID!
+
+  "Email de l'utiliateur"
+  email: String!
+
+  "Nom de l'utilisateur"
+  name: String
+
+  "Qualité d'administrateur. Rôle reservé aux agents de l'administration"
+  isAdmin: Boolean
+
+  "Numéro de téléphone de l'utilisateur"
+  phone: String
+
+  "Liste des établissements dont l'utilisateur est membre"
+  companies: [CompanyPrivate!]!
+}
+
+"""
+Demande de rattachement à un établissement effectué par
+un utilisateur.
+"""
+type MembershipRequest {
+  id: ID!
+
+  "Email de l'utilisateur faisant la demande"
+  email: String!
+
+  "SIRET de l'établissement"
+  siret: String!
+
+  "Nom de l'établissement"
+  name: String!
+
+  "Statut de la demande de rattachement"
+  status: MembershipRequestStatus!
+
+  """
+  Liste des adresses email correspondant aux comptes administrateurs à qui la demande
+  de rattachement a été envoyée. Les adresses emails sont partiellement masquées de la
+  façon suivante j********w@trackdechets.fr
+  """
+  sentTo: [String!]!
+}

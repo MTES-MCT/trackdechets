@@ -1,0 +1,14 @@
+type Query {
+  """
+  USAGE INTERNE > Mon Compte > Générer un token
+  Renvoie un token permettant de s'authentifier à l'API Trackdéchets
+  """
+  apiKey: String!
+
+  """
+  USAGE INTERNE
+  Recherche une invitation à rejoindre une entreprise
+  par son hash
+  """
+  invitation(hash: String!): Invitation
+}
