@@ -111,10 +111,7 @@ const dasriUpdateResolver = async (
 
   const { id, input } = { ...args };
 
-  const {
-    regroupedBsdasris: inputRegroupedBsdasris,
-    ...dasriContent
-  } = input;
+  const { regroupedBsdasris: inputRegroupedBsdasris, ...dasriContent } = input;
 
   const {
     regroupedBsdasris: dbRegroupedBsdasris,
