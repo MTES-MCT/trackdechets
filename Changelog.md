@@ -11,6 +11,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Affiche le détail d'un bordereau dasri [PR 876](https://github.com/MTES-MCT/trackdechets/pull/876)
 - Edition de bordereaux dasri [PR 886](https://github.com/MTES-MCT/trackdechets/pull/886)
+- Publication de bordereaux dasri [PR 888](https://github.com/MTES-MCT/trackdechets/pull/888)
 
 #### :boom: Breaking changes
 
