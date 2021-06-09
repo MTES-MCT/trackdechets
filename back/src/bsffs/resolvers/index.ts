@@ -8,6 +8,7 @@ import { OPERATION_CODES, OPERATION_QUALIFICATIONS } from "../constants";
 import { unflattenBsff, unflattenFicheInterventionBsff } from "../converter";
 import { isBsffContributor } from "../permissions";
 import bsff from "./queries/bsff";
+import bsffPdf from "./queries/bsffPdf";
 import bsffs from "./queries/bsffs";
 import createBsff from "./mutations/createBsff";
 import updateBsff from "./mutations/updateBsff";
@@ -19,6 +20,7 @@ import signBsff from "./mutations/signBsff";
 
 const Query: QueryResolvers = {
   bsff,
+  bsffPdf,
   bsffs
 };
 
