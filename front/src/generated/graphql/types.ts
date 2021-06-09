@@ -1131,7 +1131,7 @@ export type BsffDestinationPlannedOperationInput = {
 
 export type BsffDestinationReceptionInput = {
   date: Scalars["DateTime"];
-  kilos: Scalars["Int"];
+  kilos: Scalars["Float"];
   refusal?: Maybe<Scalars["String"]>;
 };
 
@@ -1175,7 +1175,7 @@ export type BsffFicheIntervention = {
 };
 
 export type BsffFicheInterventionInput = {
-  kilos: Scalars["Int"];
+  kilos: Scalars["Float"];
   owner: BsffOwnerInput;
   postalCode: Scalars["String"];
 };
@@ -1256,7 +1256,7 @@ export type BsffPackaging = {
 export type BsffPackagingInput = {
   numero: Scalars["String"];
   type: BsffPackagingType;
-  litres: Scalars["Int"];
+  litres: Scalars["Float"];
 };
 
 export enum BsffPackagingType {
@@ -1280,7 +1280,7 @@ export type BsffQuantity = {
 };
 
 export type BsffQuantityInput = {
-  kilos: Scalars["Int"];
+  kilos: Scalars["Float"];
   isEstimate: Scalars["Boolean"];
 };
 

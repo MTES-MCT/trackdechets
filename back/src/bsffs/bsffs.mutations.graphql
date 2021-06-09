@@ -78,7 +78,7 @@ input BsffEmitterInput {
 input BsffPackagingInput {
   numero: String!
   type: BsffPackagingType!
-  litres: Int!
+  litres: Float!
 }
 
 input BsffWasteInput {
@@ -88,7 +88,7 @@ input BsffWasteInput {
 }
 
 input BsffQuantityInput {
-  kilos: Int!
+  kilos: Float!
   isEstimate: Boolean!
 }
 
@@ -115,7 +115,7 @@ input BsffDestinationInput {
 }
 input BsffDestinationReceptionInput {
   date: DateTime!
-  kilos: Int!
+  kilos: Float!
   refusal: String
 }
 input BsffDestinationPlannedOperationInput {
@@ -132,7 +132,7 @@ input BsffOperationNextDestinationInput {
 }
 
 input BsffFicheInterventionInput {
-  kilos: Int!
+  kilos: Float!
   owner: BsffOwnerInput!
   postalCode: String!
 }

@@ -10116,7 +10116,7 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>kilos</strong></td>
-<td valign="top"><a href="#int">Int</a>!</td>
+<td valign="top"><a href="#float">Float</a>!</td>
 <td></td>
 </tr>
 <tr>
@@ -10159,7 +10159,7 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>kilos</strong></td>
-<td valign="top"><a href="#int">Int</a>!</td>
+<td valign="top"><a href="#float">Float</a>!</td>
 <td></td>
 </tr>
 <tr>
@@ -10285,7 +10285,7 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>litres</strong></td>
-<td valign="top"><a href="#int">Int</a>!</td>
+<td valign="top"><a href="#float">Float</a>!</td>
 <td></td>
 </tr>
 </tbody>
@@ -10304,7 +10304,7 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>kilos</strong></td>
-<td valign="top"><a href="#int">Int</a>!</td>
+<td valign="top"><a href="#float">Float</a>!</td>
 <td></td>
 </tr>
 <tr>

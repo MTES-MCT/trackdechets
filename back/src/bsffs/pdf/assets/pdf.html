@@ -26,19 +26,25 @@
         <div class="BoxRow">
           <div class="BoxCol">
             <p>
-              J'édite un BSFF pour : <input type="checkbox" /> la collecte de
-              petites quantités <input type="checkbox" /> tracer un fluide
-              frigorigène <input type="checkbox" /> le groupement de
-              contenants/BSFF <input type="checkbox" /> le reconditionnement de
-              un ou plusieurs contenants <input type="checkbox" /> la
-              réexpédition suite à entreposage provisoire
+              J'édite un BSFF pour : <input type="checkbox"
+              {{#bsffType.isCollecte}}checked{{/bsffType.isCollecte}} /> la
+              collecte de petites quantités <input type="checkbox"
+              {{#bsffType.isCollecte}}checked{{/bsffType.isCollecte}} /> tracer
+              un fluide frigorigène <input type="checkbox"
+              {{#bsffType.isGroupement}}checked{{/bsffType.isGroupement}} /> le
+              groupement de contenants/BSFF <input type="checkbox"
+              {{#bsffType.isReconditionnement}}checked{{/bsffType.isReconditionnement}}
+              /> le reconditionnement de un ou plusieurs contenants <input
+              type="checkbox"
+              {{#bsffType.isReexpedition}}checked{{/bsffType.isReexpedition}} />
+              la réexpédition suite à entreposage provisoire
             </p>
           </div>
         </div>
 
         <div class="BoxRow">
           <div class="BoxCol">
-            <p><strong>N° bordereau :</strong></p>
+            <p><strong>N° bordereau :</strong> {{ bsff.id }}</p>
           </div>
         </div>
 
@@ -46,39 +52,45 @@
           <div class="BoxCol">
             <p><strong>1. Producteur ou détenteur du déchet</strong></p>
             <p>
-              N° SIRET : <br />
-              Nom (raison sociale) : <br />
-              Adresse :
+              N° SIRET : {{ bsff.emitterCompanySiret }}<br />
+              Nom (raison sociale) : {{ bsff.emitterCompanyName }}<br />
+              Adresse : {{ bsff.emitterCompanyAddress }}
               <span class="Row">
                 <span class="Col">
-                  Tél :
+                  Tél : {{ bsff.emitterCompanyPhone }}
                 </span>
                 <span class="Col">
-                  Mail :
+                  Mail : {{ bsff.emitterCompanyMail }}
                 </span>
               </span>
             </p>
-            <p>Nom de la personne à contacter :</p>
+            <p>
+              Nom de la personne à contacter : {{ bsff.emitterCompanyContact }}
+            </p>
           </div>
           <div class="BoxCol">
             <p><strong>2. Installation de destination</strong></p>
             <p>
-              N° SIRET : <br />
-              Nom (raison sociale) : <br />
-              Adresse :
+              N° SIRET : {{ bsff.destinationCompanySiret }}<br />
+              Nom (raison sociale) : {{ bsff.destinationCompanyName }}<br />
+              Adresse : {{ bsff.destinationCompanyAddress }}
               <span class="Row">
                 <span class="Col">
-                  Tél :
+                  Tél : {{ bsff.destinationCompanyPhone }}
                 </span>
                 <span class="Col">
-                  Mail :
+                  Mail : {{ bsff.destinationCompanyMail }}
                 </span>
               </span>
             </p>
-            <p>Nom de la personne à contacter :</p>
             <p>
-              N° CAP (le cas échéant) : <br />
-              Code D/R prévu :
+              Nom de la personne à contacter : {{ bsff.destinationCompanyContact
+              }}
+            </p>
+            <p>
+              N° CAP (le cas échéant) : {{ bsff.destinationCap }}<br />
+              Code D/R prévu : {{ bsff.destinationPlannedOperationCode }} {{
+              bsff.destinationPlannedOperationQualification }}
             </p>
           </div>
         </div>
@@ -86,6 +98,7 @@
         <div class="BoxRow">
           <div class="BoxCol" style="min-height: 4rem;">
             <p><strong>3. Contenants</strong> (numéro, volume, type)</p>
+            {{ packagings }}
           </div>
         </div>
 
@@ -93,17 +106,22 @@
           <div class="BoxCol">
             <p><strong>4. Code déchet</strong></p>
             <p>
-              <strong>14 06 01*</strong> : chlorofluorocarbones, HCFC, HFC<br />
-              Nom usuel : <br />
-              Code UN / Mention ADR :
+              <strong>{{ bsff.wasteCode }}</strong> : chlorofluorocarbones,
+              HCFC, HFC<br />
+              Nom usuel : {{ bsff.wasteDescription }}<br />
+              Code UN / Mention ADR : {{ bsff.wasteAdr }}
             </p>
           </div>
           <div class="BoxCol">
             <p><strong>5. Quantité totale</strong></p>
             <p>
-              <input type="checkbox" /> Réelle <input type="checkbox" /> Estimée
+              <input type="checkbox"
+              {{#bsff.quantityIsEstimate}}{{/bsff.quantityIsEstimate}}{{^bsff.quantityIsEstimate}}checked{{/bsff.quantityIsEstimate}}
+              /> Réelle <input type="checkbox"
+              {{#bsff.quantityIsEstimate}}checked{{/bsff.quantityIsEstimate}}{{^bsff.quantityIsEstimate}}{{/bsff.quantityIsEstimate}}
+              /> Estimée
             </p>
-            <p>kilo(s) :</p>
+            <p>kilo(s) : {{ bsff.quantityKilos }}</p>
           </div>
         </div>
 
@@ -115,12 +133,14 @@
               >
             </p>
             <p>
-              Je soussigné (nom, prénom) : <br />
+              Je soussigné (nom, prénom) : {{
+              bsff.emitterEmissionSignatureAuthor }}<br />
               Certifie que les renseignements portés dans les cadres ci-dessus
               sont exacts et de bonne foi. <br />
-              Date : __/__/____
+              Date : {{#formatDate}}{{ bsff.emitterEmissionSignatureDate
+              }}{{/formatDate}}
             </p>
-            <p>Signature (et cachet le cas échéant)</p>
+            <p>Signature (et cachet le cas échéant) :</p>
           </div>
         </div>
 
@@ -130,40 +150,46 @@
               <strong>7. Transporteur</strong>
             </p>
             <p>
-              N° SIRET : <br />
-              Nom (raison sociale) : <br />
-              Adresse :
+              N° SIRET : {{ bsff.transporterCompanySiret }}<br />
+              Nom (raison sociale) : {{ bsff.transporterCompanyName }}<br />
+              Adresse : {{ bsff.transporterCompanyAddress }}
               <span class="Row">
                 <span class="Col">
-                  Tél :
+                  Tél : {{ bsff.transporterCompanyPhone }}
                 </span>
                 <span class="Col">
-                  Mail :
+                  Mail : {{ bsff.transporterCompanyMail }}
                 </span>
               </span>
             </p>
-            <p>Nom de la personne à contacter :</p>
+            <p>
+              Nom de la personne à contacter : {{ bsff.transporterCompanyContact
+              }}
+            </p>
           </div>
           <div class="BoxCol">
             <p>
-              <input type="checkbox" /> Le transporteur déclare être exempté de
-              récépissé conformément aux dispositions de l'article R.541-50 du
-              code de l'environnement.
+              <input type="checkbox"
+              {{#bsff.transporterRecepisseNumber}}{{/bsff.transporterRecepisseNumber}}{{^bsff.transporterRecepisseNumber}}checked{{/bsff.transporterRecepisseNumber}}
+              /> Le transporteur déclare être exempté de récépissé conformément
+              aux dispositions de l'article R.541-50 du code de l'environnement.
             </p>
             <p>
               <span class="Row">
                 <span class="Col">
-                  Récépissé n° :
+                  Récépissé n° : {{ bsff.transporterRecepisseNumber }}
                 </span>
                 <span class="Col">
-                  Département :
+                  Département : {{ bsff.transporterRecepisseDepartment }}
                 </span>
               </span>
-              Date limite de validité : __/__/____
+              Date limite de validité : {{#formatDate}}{{
+              bsff.transporterRecepisseValidityLimit }}{{/formatDate}}
             </p>
             <p>
-              Date de prise en charge : __/__/____ <br />
-              Mode de transport : <br />
+              Date de prise en charge : {{#formatDate}}{{
+              bsff.transporterTransportSignatureDate }}{{/formatDate}} <br />
+              Mode de transport : {{ bsff.transporterTransportMode }}<br />
               Signature :
             </p>
           </div>
@@ -175,15 +201,23 @@
               <strong>8. Installation de destination</strong>
             </p>
             <p>
-              Nom de la personne responsable : <br />
-              Date de présentation sur site : __/__/____ <br />
-              Quantité réelle présentée en kilo(s) :
+              Nom de la personne responsable : {{
+              bsff.destinationReceptionSignatureAuthor }}<br />
+              Date de présentation sur site : {{#formatDate}}{{
+              bsff.destinationReceptionDate }}{{/formatDate}}<br />
+              Quantité réelle présentée en kilo(s) : {{
+              bsff.destinationReceptionKilos }}
             </p>
             <p>
-              Lot accepté : <input type="checkbox" /> Oui
-              <input type="checkbox" /> Non <br />
-              Date d'acceptation / refus : __/__/____<br />
-              Motif de refus (le cas échéant) :
+              Lot accepté : <input type="checkbox"
+              {{#bsff.destinationReceptionRefusal}}{{/bsff.destinationReceptionRefusal}}{{^bsff.destinationReceptionRefusal}}checked{{/bsff.destinationReceptionRefusal}}
+              /> Oui <input type="checkbox"
+              {{#bsff.destinationReceptionRefusal}}checked{{/bsff.destinationReceptionRefusal}}{{^bsff.destinationReceptionRefusal}}{{/bsff.destinationReceptionRefusal}}
+              /> Non <br />
+              Date d'acceptation / refus : {{#formatDate}}{{
+              bsff.destinationReceptionSignatureDate }}{{/formatDate}}<br />
+              Motif de refus (le cas échéant) : {{
+              bsff.destinationReceptionRefusal }}
             </p>
             <p>Signature :</p>
           </div>
@@ -192,21 +226,33 @@
               <strong>9. Réalisation de l'opération</strong>
             </p>
             <p>
-              Récupération ou régénération des solvants
-              <input type="checkbox" /> R 2 <br />
-              Incinération à terre <input type="checkbox" /> D 10 <br />
-              Groupement de contenants <input type="checkbox" /> R12
-              <input type="checkbox" /> D13 <br />
-              Reconditionnement dans un nouveau contenant
-              <input type="checkbox" /> R12 <input type="checkbox" /> D14 <br />
-              Réexpédition suite à entreposage provisoire
-              <input type="checkbox" />
+              Récupération ou régénération des solvants <input type="checkbox"
+              {{#bsffOperation.isRecuperationR2}}checked{{/bsffOperation.isRecuperationR2}}
+              /> R 2 <br />
+              Incinération à terre <input type="checkbox"
+              {{#bsffOperation.isIncinerationD10}}checked{{/bsffOperation.isIncinerationD10}}
+              /> D 10 <br />
+              Groupement de contenants <input type="checkbox"
+              {{#bsffOperation.isGroupementR12}}checked{{/bsffOperation.isGroupementR12}}
+              /> R12 <input type="checkbox"
+              {{#bsffOperation.isGroupementD13}}checked{{/bsffOperation.isGroupementD13}}
+              /> D13 <br />
+              Reconditionnement dans un nouveau contenant <input type="checkbox"
+              {{#bsffOperation.isReconditionnementR12}}checked{{/bsffOperation.isReconditionnementR12}}
+              /> R12 <input type="checkbox"
+              {{#bsffOperation.isReconditionnementD14}}checked{{/bsffOperation.isReconditionnementD14}}
+              /> D14 <br />
+              Réexpédition suite à entreposage provisoire <input type="checkbox"
+              {{#bsffOperation.isReexpedition}}checked{{/bsffOperation.isReexpedition}}
+              />
             </p>
             <p>
-              Date de réalisation : __/__/____
+              Date de réalisation : {{#formatDate}}{{
+              bsff.destinationOperationSignatureDate }}{{/formatDate}}
             </p>
             <p>
-              Je soussigné (nom, prénom) : <br />
+              Je soussigné (nom, prénom) : {{
+              bsff.destinationOperationSignatureAuthor }}<br />
               Certifie que les mentions dans les cadres 9 et 10 sont exactes et
               que l'opération indiquée ci-dessus a été réalisée. <br />
               Signature (cachet le cas échéant) : <br />
@@ -258,7 +304,7 @@
 
     <div class="Page">
       <h1 class="TextAlignCenter">
-        Traçabilité associée au BSD n°
+        Traçabilité associée au BSD n°{{ bsff.id }}
       </h1>
 
       <br /><br />
@@ -280,39 +326,22 @@
           <div class="BoxCol"><p>Quantité fluide en kilo(s)</p></div>
           <div class="BoxCol"><p>Code postal lieu de collecte</p></div>
         </div>
+        {{#ficheInterventions}}
         <div class="BoxRow">
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
+          <div class="BoxCol"><p>{{ numero }}&nbsp;</p></div>
+          <div class="BoxCol"><p>{{ kilos }}&nbsp;</p></div>
+          <div class="BoxCol"><p>{{ postalCode }}&nbsp;</p></div>
         </div>
-        <div class="BoxRow">
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-        </div>
-        <div class="BoxRow">
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-        </div>
-        <div class="BoxRow">
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-        </div>
-        <div class="BoxRow">
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-        </div>
+        {{/ficheInterventions}}
       </div>
       <p class="TextAlignCenter" style="margin-top: 0.5rem;">
         <strong>Ou</strong>
       </p>
       <p>
-        <input type="checkbox" /> Déclaration d'exemption de fiche
-        d'intervention pour certaines activités relevant R. 543-82 de code de
-        l'environnement.
+        <input type="checkbox"
+        {{#ficheInterventions}}{{/ficheInterventions}}{{^ficheInterventions}}checked{{/ficheInterventions}}
+        /> Déclaration d'exemption de fiche d'intervention pour certaines
+        activités relevant R. 543-82 de code de l'environnement.
       </p>
 
       <br /><br />
@@ -335,36 +364,14 @@
           <div class="BoxCol"><p>Quantité fluide en kilo(s)</p></div>
           <div class="BoxCol"><p>Code postal lieu de collecte</p></div>
         </div>
+        {{#associatedBsffs}}
         <div class="BoxRow">
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
+          <div class="BoxCol"><p>{{ id }}&nbsp;</p></div>
+          <div class="BoxCol"><p>{{ destinationCap }}&nbsp;</p></div>
+          <div class="BoxCol"><p>{{ quantityKilos }}&nbsp;</p></div>
+          <div class="BoxCol"><p>???&nbsp;</p></div>
         </div>
-        <div class="BoxRow">
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-        </div>
-        <div class="BoxRow">
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-        </div>
-        <div class="BoxRow">
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-        </div>
-        <div class="BoxRow">
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-          <div class="BoxCol"><p></p></div>
-        </div>
+        {{/associatedBsffs}}
       </div>
     </div>
   </body>
