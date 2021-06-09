@@ -126,6 +126,7 @@ type BsdasriPackagingInfo {
 }
 "Détail sur le déchet emis du Bsdasri"
 type BsdasriEmissionWasteDetails {
+  "Quantité en kg"
   quantity: Int
   quantityType: QuantityType
   volume: Int
@@ -135,6 +136,7 @@ type BsdasriEmissionWasteDetails {
 
 "Détail sur le déchet transporté ou reçu du Bsdasri"
 type BsdasriWasteDetails {
+  "Quantité en kg"
   quantity: Int
   quantityType: QuantityType
   volume: Int

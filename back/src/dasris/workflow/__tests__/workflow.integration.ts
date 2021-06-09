@@ -138,7 +138,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
         mutation {
           signBsdasri(
             id : "${bsdasri.id}"
-            signatureInput: { type: EMISSION, author: "Dr Brun" }
+            input: { type: EMISSION, author: "Dr Brun" }
           ) {
             id
             status
@@ -188,7 +188,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
         mutation {
           signBsdasri(
             id: "${bsdasri.id}"
-            signatureInput: { type: TRANSPORT author: "John" }
+            input: { type: TRANSPORT author: "John" }
           ){
             id
             status
@@ -237,7 +237,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
         mutation {
           signBsdasri(
             id: "${bsdasri.id}"
-            signatureInput: { type: RECEPTION, author: "Bob" }
+            input: { type: RECEPTION, author: "Bob" }
           ){
             id
             status
@@ -281,7 +281,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
         mutation {
           signBsdasri(
             id: "${bsdasri.id}"
-            signatureInput: { type: OPERATION, author: "Bob" }
+            input: { type: OPERATION, author: "Bob" }
           ){
             id
             status

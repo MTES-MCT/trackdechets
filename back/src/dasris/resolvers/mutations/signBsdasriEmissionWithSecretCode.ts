@@ -6,14 +6,14 @@ import {
 
 const signBsdasriEmissionWithSecretCode: MutationResolvers["signBsdasriEmissionWithSecretCode"] = async (
   _,
-  { id, signatureInput }: MutationSignBsdasriEmissionWithSecretCodeArgs,
+  { id, input }: MutationSignBsdasriEmissionWithSecretCodeArgs,
   context
 ) => {
   return sign({
     id,
-    signatureInput,
+    input,
     context,
-    securityCode: signatureInput.securityCode
+    securityCode: input.securityCode
   });
 };
 

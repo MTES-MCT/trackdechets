@@ -203,7 +203,7 @@ type Mutation {
   Pour signer l'emission avec un compte transpoteur (cas de lasignature sur device transporteur),
   utiliser la mutation signBsdasriEmissionWithSecretCode
   """
-  signBsdasri(id: ID!, signatureInput: BsdasriSignatureInput!): Bsdasri
+  signBsdasri(id: ID!, input: BsdasriSignatureInput!): Bsdasri
 
   """
   EXPERIMENTAL - Ne pas utiliser dans un contexte de production
@@ -212,7 +212,7 @@ type Mutation {
   """
   signBsdasriEmissionWithSecretCode(
     id: ID!
-    signatureInput: BsdasriSignatureWithSecretCodeInput!
+    input: BsdasriSignatureWithSecretCodeInput!
   ): Bsdasri
   """
   EXPERIMENTAL - Ne pas utiliser dans un contexte de production
