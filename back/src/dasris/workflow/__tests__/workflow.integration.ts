@@ -17,6 +17,7 @@ const request = supertest(app);
 
 describe("Exemples de circuit du bordereau de suivi DASRI", () => {
   beforeEach(resetDatabase);
+  beforeAll(resetDatabase);
 
   /**
    * Helper function to return a user token
