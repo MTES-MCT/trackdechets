@@ -82,7 +82,7 @@ export default function Emitter({ status }) {
         disabled={disabled}
       />
 
-      <h4 className="form__section-heading">Quantité en tonnes</h4>
+      <h4 className="form__section-heading">Quantité en kg</h4>
 
       <div className="form__row">
         <label>

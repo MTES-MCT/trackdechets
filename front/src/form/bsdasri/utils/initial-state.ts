@@ -44,11 +44,19 @@ const initialState = {
   transporter: {
     company: getInitialCompany(),
     customInfo: null,
+    receipt: null,
+    receiptDepartment: null,
+    receiptValidityLimit: null,
   },
   transport: {
-    wasteDetails: { packagingInfos: [] },
+    wasteDetails: { packagingInfos: [], quantity: null, quantityType: null },
     takenOverAt: null,
     handedOverAt: null,
+    wasteAcceptation: {
+      status: null,
+      refusalReason: null,
+      refusedQuantity: null,
+    },
   },
 };
 

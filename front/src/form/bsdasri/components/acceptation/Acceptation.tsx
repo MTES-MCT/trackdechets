@@ -1,6 +1,6 @@
 import RedErrorMessage from "common/components/RedErrorMessage";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { Field, FieldProps } from "formik";
+import { Field, FieldProps, useFormikContext } from "formik";
 import { BsdasriWasteAcceptation } from "generated/graphql/types";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import React, { InputHTMLAttributes } from "react";
@@ -12,6 +12,13 @@ export default function Acceptation({
   ...props
 }: FieldProps<BsdasriWasteAcceptation | null> &
   InputHTMLAttributes<HTMLInputElement>) {
+  const { setFieldValue } = useFormikContext();
+
+  function handleAcceptationToggle() {
+    setFieldValue(`${name}.refusedQuantity`, null);
+    setFieldValue(`${name}.refusalReason`, null);
+    setFieldValue(`${name}.status`, "ACCEPTED");
+  }
   return (
     <div>
       <div className="form__row">
@@ -23,6 +30,7 @@ export default function Acceptation({
             label="Accepté en totalité"
             component={RadioButton}
             disabled={props?.disabled}
+            onChange={handleAcceptationToggle}
           />
           <Field
             name={`${name}.status`}

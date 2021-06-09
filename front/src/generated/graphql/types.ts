@@ -470,6 +470,7 @@ export type BsdasriEmissionInput = {
 /** Détail sur le déchet emis du Bsdasri */
 export type BsdasriEmissionWasteDetails = {
   __typename?: "BsdasriEmissionWasteDetails";
+  /** Quantité en kg */
   quantity?: Maybe<Scalars["Int"]>;
   quantityType?: Maybe<QuantityType>;
   volume?: Maybe<Scalars["Int"]>;
@@ -772,6 +773,7 @@ export type BsdasriWasteDetailInput = {
 /** Détail sur le déchet transporté ou reçu du Bsdasri */
 export type BsdasriWasteDetails = {
   __typename?: "BsdasriWasteDetails";
+  /** Quantité en kg */
   quantity?: Maybe<Scalars["Int"]>;
   quantityType?: Maybe<QuantityType>;
   volume?: Maybe<Scalars["Int"]>;
@@ -3313,12 +3315,12 @@ export type MutationSignBsdaArgs = {
 
 export type MutationSignBsdasriArgs = {
   id: Scalars["ID"];
-  signatureInput: BsdasriSignatureInput;
+  input: BsdasriSignatureInput;
 };
 
 export type MutationSignBsdasriEmissionWithSecretCodeArgs = {
   id: Scalars["ID"];
-  signatureInput: BsdasriSignatureWithSecretCodeInput;
+  input: BsdasriSignatureWithSecretCodeInput;
 };
 
 export type MutationSignBsffArgs = {

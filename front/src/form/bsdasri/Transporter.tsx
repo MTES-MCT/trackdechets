@@ -6,6 +6,8 @@ import { BsdasriStatus } from "generated/graphql/types";
 import React from "react";
 import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 import Packagings from "./components/packagings/Packagings";
+import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
+import NumberInput from "form/common/components/custom-inputs/NumberInput";
 
 export default function Transporter({ status }) {
   const { setFieldValue } = useFormikContext();
@@ -58,10 +60,10 @@ export default function Transporter({ status }) {
         <label>
           Champ libre
           <Field
-            disabled={false}
             component="textarea"
             name="transporter.customInfo"
             className="td-textarea"
+            disabled={disabled}
           />
         </label>
       </div>
@@ -112,7 +114,7 @@ export default function Transporter({ status }) {
 
       <h4 className="form__section-heading">Transport du déchet</h4>
       <Field
-        name="reception.wasteAcceptation"
+        name="transport.wasteAcceptation"
         component={Acceptation}
         disabled={disabled}
       />
@@ -136,6 +138,45 @@ export default function Transporter({ status }) {
             component={Packagings}
             disabled={disabled}
           />
+          <h4 className="form__section-heading">Quantité en kg</h4>
+
+          <div className="form__row">
+            <label>
+              Quantité transportée :
+              <Field
+                component={NumberInput}
+                name="transport.wasteDetails.quantity"
+                className="td-input dasri__waste-details__quantity"
+                disabled={disabled}
+                placeholder="En kg"
+                min="0"
+                step="1"
+              />
+              <span className="tw-ml-2">kg</span>
+            </label>
+
+            <RedErrorMessage name="transport.wasteDetails.quantity" />
+          </div>
+
+          <div className="form__row">
+            <fieldset>
+              <legend className="tw-font-semibold">Cette quantité est</legend>
+              <Field
+                name="transport.wasteDetails.quantityType"
+                id="REAL"
+                label="Réélle"
+                component={RadioButton}
+                disabled={disabled}
+              />
+              <Field
+                name="transport.wasteDetails.quantityType"
+                id="ESTIMATED"
+                label="Estimée"
+                component={RadioButton}
+                disabled={disabled}
+              />
+            </fieldset>
+          </div>
         </>
       ) : (
         <p>Cette section sera disponible quand le déchet aura été envoyé</p>

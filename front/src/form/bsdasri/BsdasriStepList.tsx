@@ -75,7 +75,7 @@ export default function BsdasriStepsList(props: Props) {
         dasri?.emission?.wasteDetails?.packagingInfos;
     }
     if (!dasri?.reception?.wasteDetails?.packagingInfos?.length) {
-      dasri.transport.wasteDetails.packagingInfos =
+      dasri.reception.wasteDetails.packagingInfos =
         dasri?.emission?.wasteDetails?.packagingInfos;
     }
     return dasri;

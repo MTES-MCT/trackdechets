@@ -1693,7 +1693,7 @@ utiliser la mutation signBsdasriEmissionWithSecretCode
 <td></td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">signatureInput</td>
+<td colspan="2" align="right" valign="top">input</td>
 <td valign="top"><a href="#bsdasrisignatureinput">BsdasriSignatureInput</a>!</td>
 <td></td>
 </tr>
@@ -1714,7 +1714,7 @@ Permet de signer un enlèvement sur le device transporteur grâce au code de sé
 <td></td>
 </tr>
 <tr>
-<td colspan="2" align="right" valign="top">signatureInput</td>
+<td colspan="2" align="right" valign="top">input</td>
 <td valign="top"><a href="#bsdasrisignaturewithsecretcodeinput">BsdasriSignatureWithSecretCodeInput</a>!</td>
 <td></td>
 </tr>
@@ -3152,7 +3152,11 @@ Détail sur le déchet emis du Bsdasri
 <tr>
 <td colspan="2" valign="top"><strong>quantity</strong></td>
 <td valign="top"><a href="#int">Int</a></td>
-<td></td>
+<td>
+
+Quantité en kg
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>quantityType</strong></td>
@@ -3629,7 +3633,11 @@ Détail sur le déchet transporté ou reçu du Bsdasri
 <tr>
 <td colspan="2" valign="top"><strong>quantity</strong></td>
 <td valign="top"><a href="#int">Int</a></td>
-<td></td>
+<td>
+
+Quantité en kg
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>quantityType</strong></td>

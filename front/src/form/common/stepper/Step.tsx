@@ -51,7 +51,7 @@ export function Step(props: IStepProps) {
           isActive={props.displayNext}
           goToNextStep={() => props.goToNextStep()}
         />
-        <Submit isActive={true} caption={submitCaption} />
+        <Submit isActive={props.displaySubmit} caption={submitCaption} />
       </div>
     </>
   );

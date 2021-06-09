@@ -12,11 +12,8 @@ import NumberInput from "form/common/components/custom-inputs/NumberInput";
 export default function Recipient({ status }) {
   const receptionDisabled = BsdasriStatus.Received === status;
   // it's pointless to show reception or operation fields until form has relevant signatures
-  const showReceptionFields = BsdasriStatus.Sent === status;
-  const showOperationFields = [
-    BsdasriStatus.Sent,
-    BsdasriStatus.Received,
-  ].includes(status);
+  const showReceptionFields = status === BsdasriStatus.Sent;
+  const showOperationFields = status === BsdasriStatus.Received;
 
   return (
     <>
@@ -40,6 +37,7 @@ export default function Recipient({ status }) {
             component="textarea"
             name="recipient.customInfo"
             className="td-textarea"
+            disabled={receptionDisabled}
           />
         </label>
       </div>
@@ -68,7 +66,7 @@ export default function Recipient({ status }) {
             disabled={receptionDisabled}
           />
 
-          <h4 className="form__section-heading">Quantité en tonnes</h4>
+          <h4 className="form__section-heading">Quantité en kg</h4>
 
           <div className="form__row">
             <label>
