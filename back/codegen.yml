@@ -1,7 +1,7 @@
 overwrite: true
+schema: ./src/**/*.graphql
 generates:
   ./src/generated/graphql/types.ts:
-    schema: ./src/**/*.graphql
     plugins:
       - typescript
       - typescript-resolvers
@@ -19,7 +19,6 @@ generates:
       afterOneFileWrite:
         - prettier --config .prettierrc --write
   ../front/src/generated/graphql/types.ts:
-    schema: ./src/**/*.graphql
     plugins:
       - typescript
       - typescript-operations
