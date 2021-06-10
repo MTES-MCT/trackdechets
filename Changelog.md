@@ -19,10 +19,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :memo: Documentation
 
+- Amélioration de la référence de l'API [PR 885](https://github.com/MTES-MCT/trackdechets/pull/885)
 #### :house: Interne
 
 - Seul les erreurs non gérées sont capturées par Sentry [PR 874](https://github.com/MTES-MCT/trackdechets/pull/874)
-
+- Passage à Docusaurus 2 [PR 885](https://github.com/MTES-MCT/trackdechets/pull/885)
 # [2021.06.1] 02/06/2021
 
 #### :rocket: Nouvelles fonctionnalités
