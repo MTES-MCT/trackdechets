@@ -1974,7 +1974,7 @@ export type CreateFormInput = {
   recipient?: Maybe<RecipientInput>;
   /** Transporteur du déchet (case 8) */
   transporter?: Maybe<TransporterInput>;
-  /** Détails du déchet (case 3) */
+  /** Détails du déchet (case 3 à 6) */
   wasteDetails?: Maybe<WasteDetailsInput>;
   /** Négociant (case 7) */
   trader?: Maybe<TraderInput>;
@@ -2317,7 +2317,7 @@ export type FormInput = {
   recipient?: Maybe<RecipientInput>;
   /** Transporteur du déchet (case 8) */
   transporter?: Maybe<TransporterInput>;
-  /** Détails du déchet (case 3) */
+  /** Détails du déchet (case 3 à 6) */
   wasteDetails?: Maybe<WasteDetailsInput>;
   /** Négociant (case 7) */
   trader?: Maybe<TraderInput>;
@@ -2496,7 +2496,7 @@ export type ImportPaperFormInput = {
   recipient?: Maybe<RecipientInput>;
   /** Transporteur du déchet (case 8) */
   transporter?: Maybe<TransporterInput>;
-  /** Détails du déchet (case 3) */
+  /** Détails du déchet (case 3 à 6) */
   wasteDetails?: Maybe<WasteDetailsInput>;
   /** Négociant (case 7) */
   trader?: Maybe<TraderInput>;
@@ -3905,7 +3905,7 @@ export type ResealedFormInput = {
   /** Destination finale du déchet (case 14) */
   destination?: Maybe<DestinationInput>;
   /** Détail du déchet en cas de reconditionnement (case 15 à 19) */
-  wasteDetails?: Maybe<WasteDetailsInput>;
+  wasteDetails?: Maybe<WasteDetailsRepackagingInput>;
   /** Transporteur du déchet reconditionné */
   transporter?: Maybe<TransporterInput>;
 };
@@ -3915,7 +3915,7 @@ export type ResentFormInput = {
   /** Destination finale du déchet (case 14) */
   destination?: Maybe<DestinationInput>;
   /** Détail du déchet en cas de reconditionnement (case 15 à 19) */
-  wasteDetails?: Maybe<WasteDetailsInput>;
+  wasteDetails?: Maybe<WasteDetailsRepackagingInput>;
   /** Transporteur du déchet reconditionné */
   transporter?: Maybe<TransporterInput>;
   /** Nom du signataire du BSD suite  (case 19) */
@@ -4350,7 +4350,7 @@ export type UpdateFormInput = {
   recipient?: Maybe<RecipientInput>;
   /** Transporteur du déchet (case 8) */
   transporter?: Maybe<TransporterInput>;
-  /** Détails du déchet (case 3) */
+  /** Détails du déchet (case 3 à 6) */
   wasteDetails?: Maybe<WasteDetailsInput>;
   /** Négociant (case 7) */
   trader?: Maybe<TraderInput>;
@@ -4513,7 +4513,7 @@ export type WasteDetails = {
   pop?: Maybe<Scalars["Boolean"]>;
 };
 
-/** Payload lié au détails du déchet (case 3, 4, 5, 6) */
+/** Payload lié au détails du déchet (case 3 à 6) */
 export type WasteDetailsInput = {
   /**
    * Code du déchet dangereux ou non-dangereux qui doit faire partie de la liste officielle du code de l'environnement :
@@ -4554,6 +4554,18 @@ export type WasteDetailsInput = {
   consistence?: Maybe<Consistence>;
   /** Contient des Polluants Organiques Persistants (POP) oui / non */
   pop?: Maybe<Scalars["Boolean"]>;
+};
+
+/** Payload lié au reconditionnement (case 15 à 17) */
+export type WasteDetailsRepackagingInput = {
+  /** Code ONU */
+  onuCode?: Maybe<Scalars["String"]>;
+  /** Conditionnements */
+  packagingInfos?: Maybe<Array<PackagingInfoInput>>;
+  /** Quantité en tonnes */
+  quantity?: Maybe<Scalars["Float"]>;
+  /** Réelle ou estimée */
+  quantityType?: Maybe<QuantityType>;
 };
 
 /** Type de déchets autorisé pour une rubrique */

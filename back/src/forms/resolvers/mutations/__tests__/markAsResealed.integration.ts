@@ -154,6 +154,62 @@ describe("Mutation markAsResealed", () => {
     expect(resealedForm.status).toEqual("RESEALED");
   });
 
+  test("when resealedInfos contains repackaging data", async () => {
+    const owner = await userFactory();
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      { companyTypes: { set: [CompanyType.COLLECTOR] } }
+    );
+
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      verificationStatus: CompanyVerificationStatus.VERIFIED
+    });
+
+    const { mutate } = makeClient(user);
+
+    const form = await formWithTempStorageFactory({
+      ownerId: owner.id,
+      opt: {
+        status: "TEMP_STORER_ACCEPTED",
+        recipientCompanySiret: collector.siret
+      },
+      tempStorageOpts: {
+        destinationCompanySiret: destination.siret
+      }
+    });
+
+    const repackaging = {
+      packagingInfos: [{ type: "FUT", other: null, quantity: 1 }],
+      onuCode: "adr",
+      quantity: 0.01,
+      quantityType: "ESTIMATED"
+    };
+
+    // add a repackaging
+    await mutate(MARK_AS_RESEALED, {
+      variables: {
+        id: form.id,
+        resealedInfos: {
+          wasteDetails: repackaging
+        }
+      }
+    });
+    const tempStorage = await prisma.form
+      .findUnique({
+        where: { id: form.id }
+      })
+      .temporaryStorageDetail();
+    expect(tempStorage.wasteDetailsPackagingInfos).toEqual(
+      repackaging.packagingInfos
+    );
+    expect(tempStorage.wasteDetailsOnuCode).toEqual(repackaging.onuCode);
+    expect(tempStorage.wasteDetailsQuantity).toEqual(repackaging.quantity);
+    expect(tempStorage.wasteDetailsQuantityType).toEqual(
+      repackaging.quantityType
+    );
+  });
+
   it("should fail if destination after temp storage is not registered in TD", async () => {
     const owner = await userFactory();
     const { user, company: collector } = await userWithCompanyFactory(
@@ -189,7 +245,7 @@ describe("Mutation markAsResealed", () => {
     ]);
   });
 
-  it("should fail if destination after temp storage is not resgistered as COLLECTOR or WASTEPROCESSOR", async () => {
+  it("should fail if destination after temp storage is not registered as COLLECTOR or WASTEPROCESSOR", async () => {
     const owner = await userFactory();
     const { user, company: collector } = await userWithCompanyFactory(
       "MEMBER",
