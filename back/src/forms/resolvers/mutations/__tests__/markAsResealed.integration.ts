@@ -162,8 +162,7 @@ describe("Mutation markAsResealed", () => {
     );
 
     const destination = await companyFactory({
-      companyTypes: [CompanyType.WASTEPROCESSOR],
-      verificationStatus: CompanyVerificationStatus.VERIFIED
+      companyTypes: [CompanyType.WASTEPROCESSOR]
     });
 
     const { mutate } = makeClient(user);
