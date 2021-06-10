@@ -1,6 +1,4 @@
 overwrite: true
-schema:
-  - ./src/scalars/typeDefs/*.graphql
 generates:
   ./src/generated/graphql/types.ts:
     schema: ./src/**/*.graphql
