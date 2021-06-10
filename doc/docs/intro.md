@@ -34,7 +34,7 @@ Voir la rubrique [Faire des appels à l'API GraphQL](./guides/graphql.md) pour u
 
 ## Évolutions de l'API
 
-Le développement du projet Trackdéchets se fait en mode agile, c'est à dire que le produit est en constante évolution pour s'adapter aux besoins des utilisateurs de la plateforme. Ceci étant dit nous nous efforçons de limiter les changements non rétro-compatibles apportés à l'API publique et lorsqu'ils sont nécessaires de les annoncer assez de temps à l'avance. Les changements apportés à l'API sont documentés dans un [Changelog](api-reference/changelog.md)
+Le développement du projet Trackdéchets se fait en mode agile, c'est à dire que le produit est en constante évolution pour s'adapter aux besoins des utilisateurs de la plateforme. Ceci étant dit nous nous efforçons de limiter les changements non rétro-compatibles apportés à l'API publique et lorsqu'ils sont nécessaires de les annoncer assez de temps à l'avance. Les changements apportés à l'API sont documentés dans un [Changelog](changelog.md)
 
 ## Limitations
 

@@ -21,4 +21,5 @@ yarn-error.log*
 
 /typeDefs
 
-/docs/api-reference
+/docs/api-reference/*
+!/docs/api-reference/_category_.json
