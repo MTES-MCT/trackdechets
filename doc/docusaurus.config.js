@@ -107,7 +107,7 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "user-company",
-        schema: "typeDefs/user-company.graphql",
+        schema: "../back/src/{scalars,users,companies}/typeDefs/*.graphql",
         routeBasePath: "/api-reference/user-company",
       },
     ],
@@ -115,7 +115,7 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "bsdd",
-        schema: "typeDefs/bsdd.graphql",
+        schema: "../back/src/{scalars,bsds,forms}/typeDefs/*.graphql",
         routeBasePath: "/api-reference/bsdd",
       },
     ],
@@ -123,7 +123,7 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "bsdasri",
-        schema: "typeDefs/bsdasri.graphql",
+        schema: "../back/src/{scalars,bsds,dasris}/typeDefs/*.graphql",
         routeBasePath: "/api-reference/bsdasri",
       },
     ],
@@ -131,7 +131,7 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "bsff",
-        schema: "typeDefs/bsff.graphql",
+        schema: "../back/src/{scalars,bsds,bsffs}/typeDefs/*.graphql",
         routeBasePath: "/api-reference/bsff",
       },
     ],
@@ -139,7 +139,7 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "bsda",
-        schema: "typeDefs/bsda.graphql",
+        schema: "../back/src/{scalars,bsds,bsda}/typeDefs/*.graphql",
         routeBasePath: "/api-reference/bsda",
       },
     ],
@@ -147,7 +147,7 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "bsvhu",
-        schema: "typeDefs/bsvhu.graphql",
+        schema: "../back/src/{scalars,bsds,vhu}/typeDefs/*.graphql",
         routeBasePath: "/api-reference/bsvhu",
       },
     ],
