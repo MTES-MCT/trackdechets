@@ -3563,6 +3563,12 @@ export type Query = {
   appendixForms: Array<Form>;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsda: Bsda;
+  /**
+   * Renvoie un token pour télécharger un pdf de bordereau
+   * Ce token doit être transmis à la route /download pour obtenir le fichier.
+   * Il est valable 10 secondes
+   */
+  bsdaPdf: FileDownload;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsdas: BsdaConnection;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
@@ -3690,6 +3696,11 @@ export type QueryAppendixFormsArgs = {
 /** Views of the Company ressource for the admin panel */
 export type QueryBsdaArgs = {
   id: Scalars["ID"];
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsdaPdfArgs = {
+  id?: Maybe<Scalars["ID"]>;
 };
 
 /** Views of the Company ressource for the admin panel */
@@ -4745,6 +4756,7 @@ export type ResolversTypes = {
   BsdaRecepisse: ResolverTypeWrapper<BsdaRecepisse>;
   BsdaTransport: ResolverTypeWrapper<BsdaTransport>;
   BsdaAssociation: ResolverTypeWrapper<BsdaAssociation>;
+  FileDownload: ResolverTypeWrapper<FileDownload>;
   BsdaWhere: BsdaWhere;
   DateFilter: DateFilter;
   BsdaEmitterWhere: BsdaEmitterWhere;
@@ -4779,7 +4791,6 @@ export type ResolversTypes = {
   BsdasriMetadata: ResolverTypeWrapper<BsdasriMetadata>;
   BsdasriError: ResolverTypeWrapper<BsdasriError>;
   BsdasriSignatureType: BsdasriSignatureType;
-  FileDownload: ResolverTypeWrapper<FileDownload>;
   BsdasriWhere: BsdasriWhere;
   BsdasriEmitterWhere: BsdasriEmitterWhere;
   BsdasriCompanyWhere: BsdasriCompanyWhere;
@@ -5064,6 +5075,7 @@ export type ResolversParentTypes = {
   BsdaRecepisse: BsdaRecepisse;
   BsdaTransport: BsdaTransport;
   BsdaAssociation: BsdaAssociation;
+  FileDownload: FileDownload;
   BsdaWhere: BsdaWhere;
   DateFilter: DateFilter;
   BsdaEmitterWhere: BsdaEmitterWhere;
@@ -5094,7 +5106,6 @@ export type ResolversParentTypes = {
   BsdasriOperation: BsdasriOperation;
   BsdasriMetadata: BsdasriMetadata;
   BsdasriError: BsdasriError;
-  FileDownload: FileDownload;
   BsdasriWhere: BsdasriWhere;
   BsdasriEmitterWhere: BsdasriEmitterWhere;
   BsdasriCompanyWhere: BsdasriCompanyWhere;
@@ -8032,6 +8043,12 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QueryBsdaArgs, "id">
+  >;
+  bsdaPdf?: Resolver<
+    ResolversTypes["FileDownload"],
+    ParentType,
+    ContextType,
+    RequireFields<QueryBsdaPdfArgs, never>
   >;
   bsdas?: Resolver<
     ResolversTypes["BsdaConnection"],

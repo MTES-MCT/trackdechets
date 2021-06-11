@@ -58,6 +58,26 @@ EXPERIMENTAL - Ne pas utiliser dans un contexte de production
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>bsdaPdf</strong></td>
+<td valign="top"><a href="#filedownload">FileDownload</a>!</td>
+<td>
+
+Renvoie un token pour télécharger un pdf de bordereau
+Ce token doit être transmis à la route /download pour obtenir le fichier.
+Il est valable 10 secondes
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+ID d'un bordereau
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>bsdas</strong></td>
 <td valign="top"><a href="#bsdaconnection">BsdaConnection</a>!</td>
 <td>

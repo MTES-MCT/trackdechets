@@ -5,6 +5,7 @@ import {
 
 import bsda from "./queries/bsda";
 import bsdas from "./queries/bsdas";
+import bsdaPdf from "./queries/bsdaPdf";
 import createBsda from "./mutations/create";
 import createDraftBsda from "./mutations/createDraft";
 import updateBsda from "./mutations/update";
@@ -16,7 +17,8 @@ import { Bsda } from "./Bsda";
 
 const Query: QueryResolvers = {
   bsda,
-  bsdas
+  bsdas,
+  bsdaPdf
 };
 const Mutation: MutationResolvers = {
   createBsda,
