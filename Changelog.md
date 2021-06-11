@@ -16,6 +16,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :boom: Breaking changes
 
+- Suppression du champ `Form`.`actualQuantity` qui n'était pas implémenté. [PR 879](https://github.com/MTES-MCT/trackdechets/pull/879)
+
 #### :bug: Corrections de bugs
 
 - Correction du rendu pdf des dasris et vhus [PR 866](https://github.com/MTES-MCT/trackdechets/pull/866) et [PR 871](https://github.com/MTES-MCT/trackdechets/pull/871)
