@@ -31,17 +31,13 @@ export type Scalars = {
 export type AcceptedFormInput = {
   /** Statut d'acceptation du déchet (case 10) */
   wasteAcceptationStatus: WasteAcceptationStatusInput;
-  /** Raison du refus (case 10). Obligatoire en cas de refus de déchet */
+  /** Raison du refus (case 10) */
   wasteRefusalReason?: Maybe<Scalars["String"]>;
   /** Date à laquelle le déchet a été accepté ou refusé (case 10) */
   signedAt: Scalars["DateTime"];
   /** Nom de la personne en charge de l'acceptation' du déchet (case 10) */
   signedBy: Scalars["String"];
-  /**
-   * Quantité réelle présentée (case 10).
-   *  Doit être supérieure à 0 lorsque le déchet est accepté.
-   *  Doit être égale à 0 lorsque le déchet est refusé.
-   */
+  /** Quantité réelle présentée (case 10) */
   quantityReceived: Scalars["Float"];
 };
 
@@ -162,7 +158,7 @@ export type Bsd = Form | Bsdasri | Bsvhu | Bsda | Bsff;
 export type Bsda = {
   __typename?: "Bsda";
   /** Bordereau n° */
-  id: Scalars["ID"];
+  id: Scalars["String"];
   /** Date de création */
   createdAt: Scalars["DateTime"];
   /** Date de dernière modification */
@@ -199,7 +195,7 @@ export type Bsda = {
 export enum BsdaAcceptationStatus {
   Accepted = "ACCEPTED",
   Refused = "REFUSED",
-  PartiallyRefused = "PARTIALLY_REFUSED"
+  PartiallyRefused = "PARTIALLY_REFUSED",
 }
 
 export type BsdaAssociation = {
@@ -244,7 +240,7 @@ export type BsdaConnection = {
 export enum BsdaConsistence {
   Solide = "SOLIDE",
   Pulverulent = "PULVERULENT",
-  Other = "OTHER"
+  Other = "OTHER",
 }
 
 export type BsdaDestination = {
@@ -371,8 +367,6 @@ export type BsdaOperation = {
   code?: Maybe<Scalars["String"]>;
   /** Date de réalisation de l'opération */
   date?: Maybe<Scalars["DateTime"]>;
-  /** Exutoire final (si la destination ne l'est pas) */
-  nextDestination?: Maybe<BsdaNextDestination>;
   signature?: Maybe<Signature>;
 };
 
@@ -381,8 +375,6 @@ export type BsdaOperationInput = {
   code?: Maybe<Scalars["String"]>;
   /** Date de réalisation de l'opération */
   date?: Maybe<Scalars["DateTime"]>;
-  /** Exutoire final (si la destination ne l'est pas) */
-  nextDestination?: Maybe<BsdaNextDestinationInput>;
 };
 
 export type BsdaOperationWhere = {
@@ -414,7 +406,7 @@ export enum BsdaPackagingType {
   DepotBag = "DEPOT_BAG",
   SacRenforce = "SAC_RENFORCE",
   BodyBenne = "BODY_BENNE",
-  Other = "OTHER"
+  Other = "OTHER",
 }
 
 export type BsdaQuantity = {
@@ -434,29 +426,19 @@ export type BsdaQuantityInput = {
 
 export enum BsdaQuantityType {
   Real = "REAL",
-  Estimated = "ESTIMATED"
+  Estimated = "ESTIMATED",
 }
 
 export type BsdaRecepisse = {
   __typename?: "BsdaRecepisse";
-  /** Exemption de récépissé (conformément aux dispositions de l'article R.541-50 du code de l'environnement) */
-  isExempted?: Maybe<Scalars["Boolean"]>;
-  /** Numéro de récépissé */
   number?: Maybe<Scalars["String"]>;
-  /** Département */
   department?: Maybe<Scalars["String"]>;
-  /** Date limite de validité */
   validityLimit?: Maybe<Scalars["DateTime"]>;
 };
 
 export type BsdaRecepisseInput = {
-  /** Exemption de récépissé (conformément aux dispositions de l'article R.541-50 du code de l'environnement) */
-  isExempted?: Maybe<Scalars["Boolean"]>;
-  /** Numéro de récépissé */
   number?: Maybe<Scalars["String"]>;
-  /** Département */
   department?: Maybe<Scalars["String"]>;
-  /** Date limite de validité */
   validityLimit?: Maybe<Scalars["DateTime"]>;
 };
 
@@ -500,7 +482,7 @@ export enum BsdaSignatureType {
   Emission = "EMISSION",
   Work = "WORK",
   Transport = "TRANSPORT",
-  Operation = "OPERATION"
+  Operation = "OPERATION",
 }
 
 export type BsdaSignatureWhere = {
@@ -512,7 +494,6 @@ export type Bsdasri = {
   __typename?: "Bsdasri";
   id: Scalars["ID"];
   status: BsdasriStatus;
-  bsdasriType: BsdasriType;
   createdAt?: Maybe<Scalars["DateTime"]>;
   updatedAt?: Maybe<Scalars["DateTime"]>;
   isDraft: Scalars["Boolean"];
@@ -561,7 +542,7 @@ export type BsdasriEdge = {
 export type BsdasriEmission = {
   __typename?: "BsdasriEmission";
   wasteCode?: Maybe<Scalars["String"]>;
-  wasteDetails?: Maybe<BsdasriEmissionWasteDetails>;
+  wasteDetails?: Maybe<BsdasriWasteDetails>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
   signature?: Maybe<BsdasriSignature>;
   /** Emporté sans signature PRED avec son autorisation prélalable */
@@ -572,7 +553,7 @@ export type BsdasriEmission = {
 
 export type BsdasriEmissionInput = {
   wasteCode?: Maybe<Scalars["String"]>;
-  wasteDetails?: Maybe<BsdasriWasteDetailEmissionInput>;
+  wasteDetails?: Maybe<BsdasriWasteDetailInput>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
 };
 
@@ -619,7 +600,7 @@ export enum BsdasriEmitterType {
   /** Producteur */
   Producer = "PRODUCER",
   /** Installation de regroupement */
-  Collector = "COLLECTOR"
+  Collector = "COLLECTOR",
 }
 
 export type BsdasriEmitterWhere = {
@@ -652,21 +633,12 @@ export type BsdasriMetadata = {
 /** Informations relatives au traitement du Bsdasri */
 export type BsdasriOperation = {
   __typename?: "BsdasriOperation";
-  /** Quantité traitée */
-  quantity?: Maybe<BsdasriOperationQuantity>;
-  /** Code de l'opération de traitement */
   processingOperation?: Maybe<Scalars["String"]>;
-  /** Date de l'opération de traitement */
   processedAt?: Maybe<Scalars["DateTime"]>;
   signature?: Maybe<BsdasriSignature>;
 };
 
 export type BsdasriOperationInput = {
-  quantity?: Maybe<BsdasriQuantityInput>;
-  /**
-   * Code de traitement
-   * Les codes R12 et D12 ne sont autorisé que si le destinataire est une installation TTR (tri transit regroupement).
-   */
   processingOperation?: Maybe<Scalars["String"]>;
   processedAt?: Maybe<Scalars["DateTime"]>;
 };
@@ -694,7 +666,7 @@ export type BsdasriPackagingInfoInput = {
   type: BsdasriPackagings;
   /** Description du conditionnement dans le cas où le type de conditionnement est `AUTRE` */
   other?: Maybe<Scalars["String"]>;
-  /** Volume de chaque colis associé à ce conditionnement */
+  /** Nombre de colis associés à ce conditionnement */
   volume: Scalars["Int"];
   /** Nombre de colis associés à ce conditionnement */
   quantity: Scalars["Int"];
@@ -713,7 +685,7 @@ export enum BsdasriPackagings {
   /** Grand récipient pour vrac */
   Grv = "GRV",
   /** Autre */
-  Autre = "AUTRE"
+  Autre = "AUTRE",
 }
 
 export type BsdasriQuantity = {
@@ -732,14 +704,14 @@ export type BsdasriQuantityInput = {
 /** Informations relatives à la réception du Bsdasri */
 export type BsdasriReception = {
   __typename?: "BsdasriReception";
-  wasteDetails?: Maybe<BsdasriReceptionWasteDetails>;
+  wasteDetails?: Maybe<BsdasriWasteDetails>;
   wasteAcceptation?: Maybe<BsdasriWasteAcceptation>;
   receivedAt?: Maybe<Scalars["DateTime"]>;
   signature?: Maybe<BsdasriSignature>;
 };
 
 export type BsdasriReceptionInput = {
-  wasteDetails?: Maybe<BsdasriRecipientWasteDetailInput>;
+  wasteDetails?: Maybe<BsdasriWasteDetailInput>;
   receivedAt?: Maybe<Scalars["DateTime"]>;
   wasteAcceptation?: Maybe<BsdasriWasteAcceptationInput>;
 };
@@ -768,8 +740,8 @@ export type BsdasriRecipientInput = {
 };
 
 export type BsdasriRecipientWasteDetailInput = {
+  quantity?: Maybe<Scalars["Int"]>;
   volume?: Maybe<Scalars["Int"]>;
-  packagingInfos?: Maybe<Array<BsdasriPackagingInfoInput>>;
 };
 
 export type BsdasriRecipientWhere = {
@@ -783,7 +755,7 @@ export enum BsdasriRole {
   /** Les Bsdasri dont je suis la destination de traitement */
   Recipient = "RECIPIENT",
   /** Les Bsdasri dont je suis l'émetteur */
-  Emitter = "EMITTER"
+  Emitter = "EMITTER",
 }
 
 export type BsdasriSignature = {
@@ -805,7 +777,7 @@ export enum BsdasriSignatureType {
   /** Signature de la réception du déchet */
   Reception = "RECEPTION",
   /** Signature du traitement du déchet */
-  Operation = "OPERATION"
+  Operation = "OPERATION",
 }
 
 export type BsdasriSignatureWhere = {
@@ -829,13 +801,13 @@ export enum BsdasriStatus {
   /** Bsdasri dont les déchets ont été traités */
   Processed = "PROCESSED",
   /** Déchet refusé */
-  Refused = "REFUSED"
+  Refused = "REFUSED",
 }
 
 /** Informations relatives au transport du Bsdasri */
 export type BsdasriTransport = {
   __typename?: "BsdasriTransport";
-  wasteDetails?: Maybe<BsdasriTransportWasteDetails>;
+  wasteDetails?: Maybe<BsdasriWasteDetails>;
   wasteAcceptation?: Maybe<BsdasriWasteAcceptation>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
   takenOverAt?: Maybe<Scalars["DateTime"]>;
@@ -877,7 +849,7 @@ export type BsdasriTransporterWhere = {
 };
 
 export type BsdasriTransportInput = {
-  wasteDetails?: Maybe<BsdasriWasteDetailTransportInput>;
+  wasteDetails?: Maybe<BsdasriWasteDetailInput>;
   takenOverAt?: Maybe<Scalars["DateTime"]>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
   wasteAcceptation?: Maybe<BsdasriWasteAcceptationInput>;
@@ -899,7 +871,7 @@ export enum BsdasriType {
   /** Bordereau dasri de groupement */
   Grouping = "GROUPING",
   /** (Bientôt disponible) - Bordereau dasri de synthèse */
-  Synthesis = "SYNTHESIS"
+  Synthesis = "SYNTHESIS",
 }
 
 export type BsdasriUpdateInput = {
@@ -918,24 +890,30 @@ export type BsdasriWasteAcceptation = {
   __typename?: "BsdasriWasteAcceptation";
   status?: Maybe<Scalars["String"]>;
   refusalReason?: Maybe<Scalars["String"]>;
-  refusedQuantity?: Maybe<Scalars["Float"]>;
+  refusedQuantity?: Maybe<Scalars["Int"]>;
 };
 
 export type BsdasriWasteAcceptationInput = {
   status?: Maybe<WasteAcceptationStatusInput>;
   refusalReason?: Maybe<Scalars["String"]>;
-  refusedQuantity?: Maybe<Scalars["Float"]>;
+  refusedQuantity?: Maybe<Scalars["Int"]>;
 };
 
-export type BsdasriWasteDetailEmissionInput = {
-  quantity?: Maybe<BsdasriQuantityInput>;
+export type BsdasriWasteDetailInput = {
+  quantity?: Maybe<Scalars["Int"]>;
+  quantityType?: Maybe<QuantityType>;
   packagingInfos?: Maybe<Array<BsdasriPackagingInfoInput>>;
   onuCode?: Maybe<Scalars["String"]>;
 };
 
-export type BsdasriWasteDetailTransportInput = {
-  quantity?: Maybe<BsdasriQuantityInput>;
-  packagingInfos?: Maybe<Array<BsdasriPackagingInfoInput>>;
+/** Détail sur le déchet proprement dit du Bsdasri */
+export type BsdasriWasteDetails = {
+  __typename?: "BsdasriWasteDetails";
+  quantity?: Maybe<Scalars["Int"]>;
+  quantityType?: Maybe<QuantityType>;
+  volume?: Maybe<Scalars["Int"]>;
+  packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
+  onuCode?: Maybe<Scalars["String"]>;
 };
 
 export type BsdasriWhere = {
@@ -974,17 +952,11 @@ export enum BsdaStatus {
   Sent = "SENT",
   Processed = "PROCESSED",
   Refused = "REFUSED",
-  AwaitingChild = "AWAITING_CHILD"
+  AwaitingChild = "AWAITING_CHILD",
 }
 
 export type BsdaTransport = {
   __typename?: "BsdaTransport";
-  /** Mode de transport */
-  mode?: Maybe<TransportMode>;
-  /** Plaque(s) d'immatriculation */
-  plates?: Maybe<Array<Scalars["String"]>>;
-  /** Date de prise en charge */
-  takenOverAt?: Maybe<Scalars["DateTime"]>;
   signature?: Maybe<Signature>;
 };
 
@@ -1034,7 +1006,7 @@ export enum BsdaType {
   Collection_2710 = "COLLECTION_2710",
   OtherCollections = "OTHER_COLLECTIONS",
   Gathering = "GATHERING",
-  Reshipment = "RESHIPMENT"
+  Reshipment = "RESHIPMENT",
 }
 
 export type BsdaWaste = {
@@ -1164,8 +1136,6 @@ export enum BsdType {
   Bsdd = "BSDD",
   Bsdasri = "BSDASRI",
   Bsvhu = "BSVHU",
-  Bsda = "BSDA",
-  Bsff = "BSFF"
 }
 
 export type BsdWhere = {
@@ -1189,12 +1159,6 @@ export type Bsff = {
    * Il est à utiliser pour les échanges avec l'API.
    */
   id: Scalars["ID"];
-  /** Si ce BSFF est à l'état de brouillon ou pas. */
-  isDraft: Scalars["Boolean"];
-  /** Type de BSFF. */
-  type: BsffType;
-  /** Statut qui synthétise où en est le déchet dans son cheminement. */
-  status: BsffStatus;
   /**
    * Émetteur du déchet, qui n'est pas nécessairement le producteur.
    * Il s'agit par exemple de l'opérateur ayant collecté des fluides lors d'interventions,
@@ -1258,7 +1222,7 @@ export type BsffDestination = {
 };
 
 export type BsffDestinationInput = {
-  company?: Maybe<CompanyInput>;
+  company: CompanyInput;
   cap?: Maybe<Scalars["String"]>;
   reception?: Maybe<BsffDestinationReceptionInput>;
   plannedOperation?: Maybe<BsffDestinationPlannedOperationInput>;
@@ -1276,7 +1240,7 @@ export type BsffDestinationPlannedOperationInput = {
 
 export type BsffDestinationReceptionInput = {
   date: Scalars["DateTime"];
-  kilos: Scalars["Float"];
+  kilos: Scalars["Int"];
   refusal?: Maybe<Scalars["String"]>;
 };
 
@@ -1316,25 +1280,22 @@ export type BsffEmitterInput = {
 
 export type BsffFicheIntervention = {
   __typename?: "BsffFicheIntervention";
-  /** Identifiant unique de la fiche d'intervention. */
-  id: Scalars["ID"];
   /** Numéro de la fiche d'intervention, habituellement renseigné par l'opérateur. */
   numero: Scalars["String"];
   /** Poids total des fluides récupérés lors de cette intervention. */
-  kilos: Scalars["Float"];
-  /** Détenteur de l'équipement sur lequel est intervenu l'opérateur. */
-  detenteur?: Maybe<BsffDetenteur>;
-  /** Opérateur à l'origine de l'intervention. */
-  operateur?: Maybe<BsffOperateur>;
+  kilos: Scalars["Int"];
+  /**
+   * Détenteur de l'équipement sur lequel est intervenu l'opérateur.
+   * À noter que dû à la valeur commerciale de ces informations, leur visibilité est limité aux acteurs en contact direct.
+   */
+  owner?: Maybe<BsffOwner>;
   /** Code postal du lieu où l'intervention a eu lieu. */
   postalCode: Scalars["String"];
 };
 
 export type BsffFicheInterventionInput = {
-  numero: Scalars["String"];
-  kilos: Scalars["Float"];
-  detenteur: BsffDetenteurInput;
-  operateur: BsffOperateurInput;
+  kilos: Scalars["Int"];
+  owner: BsffOwnerInput;
   postalCode: Scalars["String"];
 };
 
@@ -1350,22 +1311,7 @@ export type BsffInput = {
   previousBsffs?: Maybe<Array<Scalars["ID"]>>;
 };
 
-export type BsffNextDestination = {
-  __typename?: "BsffNextDestination";
-  company: FormCompany;
-};
-
-export type BsffOperateur = {
-  __typename?: "BsffOperateur";
-  /** Entreprise dont l'opérateur fait partie. */
-  company: FormCompany;
-};
-
-export type BsffOperateurInput = {
-  company: CompanyInput;
-};
-
-export type BsffOperation = {
+export type BsffOperation = IBsffOperation & {
   __typename?: "BsffOperation";
   /** Code de l'opération de traitement. */
   code?: Maybe<BsffOperationCode>;
@@ -1379,41 +1325,55 @@ export type BsffOperation = {
 export enum BsffOperationCode {
   R2 = "R2",
   R12 = "R12",
-  R13 = "R13",
   D10 = "D10",
   D13 = "D13",
   D14 = "D14",
-  D15 = "D15"
 }
 
-export type BsffOperationNextDestinationInput = {
+/**
+ * Liste des qualifications de traitement possible.
+ * Attention, certaines combinaisons de code et qualification ne sont pas possibles.
+ * Par exemple, seul le code D 10 peut être associé à une incinération.
+ */
+export enum BsffOperationQualification {
+  RecuperationRegeneration = "RECUPERATION_REGENERATION",
+  Incineration = "INCINERATION",
+  Regroupement = "REGROUPEMENT",
+  Reconditionnement = "RECONDITIONNEMENT",
+  Reexpedition = "REEXPEDITION",
+}
+
+export type BsffOwner = {
+  __typename?: "BsffOwner";
+  /** Entreprise détentrice de l'équipement. */
+  company: FormCompany;
+};
+
+export type BsffOwnerInput = {
   company: CompanyInput;
 };
 
 export type BsffPackaging = {
   __typename?: "BsffPackaging";
-  /** Dénomination du contenant. */
-  name: Scalars["String"];
-  /** Volume du contenant. */
-  volume?: Maybe<Scalars["Float"]>;
   /** Numéro du contenant. */
   numero: Scalars["String"];
-  /** Poids en kilos. */
-  kilos: Scalars["Float"];
+  /** Type de contenant. */
+  type: BsffPackagingType;
+  /** Volume en litres des fluides à l'intérieur du contenant. */
+  litres: Scalars["Int"];
 };
 
 export type BsffPackagingInput = {
-  /** Dénomination du contenant. */
-  name: Scalars["String"];
-  /** Volume du contenant. */
-  volume?: Maybe<Scalars["Float"]>;
-  /** Numéro du contenant. */
   numero: Scalars["String"];
-  /** Poids en kilos. */
-  kilos: Scalars["Float"];
+  type: BsffPackagingType;
+  litres: Scalars["Int"];
 };
 
-export type BsffPlannedOperation = {
+export enum BsffPackagingType {
+  Bouteille = "BOUTEILLE",
+}
+
+export type BsffPlannedOperation = IBsffOperation & {
   __typename?: "BsffPlannedOperation";
   /** Code de l'opération de traitement prévu. */
   code?: Maybe<BsffOperationCode>;
@@ -1422,13 +1382,13 @@ export type BsffPlannedOperation = {
 export type BsffQuantity = {
   __typename?: "BsffQuantity";
   /** Poids total du déchet en kilos. */
-  kilos: Scalars["Float"];
+  kilos: Scalars["Int"];
   /** Si il s'agit d'une estimation ou d'un poids réel. */
   isEstimate: Scalars["Boolean"];
 };
 
 export type BsffQuantityInput = {
-  kilos: Scalars["Float"];
+  kilos: Scalars["Int"];
   isEstimate: Scalars["Boolean"];
 };
 
@@ -1437,7 +1397,7 @@ export type BsffReception = {
   /** Date de réception du déchet. */
   date: Scalars["DateTime"];
   /** Quantité totale du déchet, qu'elle soit réelle ou estimée. */
-  kilos: Scalars["Float"];
+  kilos: Scalars["Int"];
   /** En cas de refus, le motif. */
   refusal?: Maybe<Scalars["String"]>;
   /** Signature de la destination lors de l'acceptation ou du refus du déchet. */
@@ -1448,7 +1408,7 @@ export enum BsffSignatureType {
   Emission = "EMISSION",
   Transport = "TRANSPORT",
   Reception = "RECEPTION",
-  Operation = "OPERATION"
+  Operation = "OPERATION",
 }
 
 export enum BsffStatus {
@@ -1468,7 +1428,7 @@ export enum BsffStatus {
   /** Le déchet a été traité par l'installation de destination. */
   Processed = "PROCESSED",
   /** Le déchet a été refusé par l'installation de traitement. */
-  Refused = "REFUSED"
+  Refused = "REFUSED",
 }
 
 export type BsffTransport = {
@@ -1526,22 +1486,22 @@ export enum BsffType {
   /** BSFF qui reconditionne un ou plusieurs autres BSFFs. */
   Reconditionnement = "RECONDITIONNEMENT",
   /** BSFF qui réexpédie un autre BSFF. */
-  Reexpedition = "REEXPEDITION"
+  Reexpedition = "REEXPEDITION",
 }
 
 export type BsffWaste = {
   __typename?: "BsffWaste";
   /** Code déchet. */
   code: Scalars["String"];
-  /** Nature du fluide, laisser vide lorsqu'il est inconnu. */
-  nature?: Maybe<Scalars["String"]>;
+  /** Description du déchet, permet de le qualifier de façon plus précise. */
+  description: Scalars["String"];
   /** Mention ADR. */
   adr: Scalars["String"];
 };
 
 export type BsffWasteInput = {
   code: Scalars["String"];
-  nature?: Maybe<Scalars["String"]>;
+  description: Scalars["String"];
   adr: Scalars["String"];
 };
 
@@ -1589,9 +1549,9 @@ export type Bsvhu = {
   /** Numéro unique attribué par Trackdéchets */
   id: Scalars["ID"];
   /** Date de création */
-  createdAt?: Maybe<Scalars["DateTime"]>;
+  createdAt: Scalars["DateTime"];
   /** Date de dernière modification */
-  updatedAt?: Maybe<Scalars["DateTime"]>;
+  updatedAt: Scalars["DateTime"];
   /** Indique si le bordereau est à l'état de brouillon */
   isDraft: Scalars["Boolean"];
   /** Status du bordereau */
@@ -1616,7 +1576,7 @@ export type Bsvhu = {
 export enum BsvhuAcceptationStatus {
   Accepted = "ACCEPTED",
   Refused = "REFUSED",
-  PartiallyRefused = "PARTIALLY_REFUSED"
+  PartiallyRefused = "PARTIALLY_REFUSED",
 }
 
 export type BsvhuCompanyWhere = {
@@ -1663,7 +1623,7 @@ export type BsvhuDestinationInput = {
 
 export enum BsvhuDestinationType {
   Broyeur = "BROYEUR",
-  Demolisseur = "DEMOLISSEUR"
+  Demolisseur = "DEMOLISSEUR",
 }
 
 export type BsvhuDestinationWhere = {
@@ -1730,7 +1690,7 @@ export type BsvhuIdentificationInput = {
 
 export enum BsvhuIdentificationType {
   NumeroOrdreRegistrePolice = "NUMERO_ORDRE_REGISTRE_POLICE",
-  NumeroOrdreLotsSortants = "NUMERO_ORDRE_LOTS_SORTANTS"
+  NumeroOrdreLotsSortants = "NUMERO_ORDRE_LOTS_SORTANTS",
 }
 
 export type BsvhuInput = {
@@ -1790,7 +1750,7 @@ export type BsvhuOperationWhere = {
 
 export enum BsvhuPackaging {
   Unite = "UNITE",
-  Lot = "LOT"
+  Lot = "LOT",
 }
 
 export type BsvhuQuantity = {
@@ -1866,7 +1826,7 @@ export enum BsvhuStatus {
   SignedByProducer = "SIGNED_BY_PRODUCER",
   Sent = "SENT",
   Processed = "PROCESSED",
-  Refused = "REFUSED"
+  Refused = "REFUSED",
 }
 
 export type BsvhuTransport = {
@@ -1985,7 +1945,7 @@ export type CompanyForVerificationWhere = {
 
 /** Payload d'un établissement */
 export type CompanyInput = {
-  /** SIRET de l'établissement composé de 14 caractères numériques */
+  /** SIRET de l'établissement */
   siret?: Maybe<Scalars["String"]>;
   /** Nom de l'établissement */
   name?: Maybe<Scalars["String"]>;
@@ -2075,7 +2035,6 @@ export type CompanyPrivate = {
   vhuAgrementBroyeur?: Maybe<VhuAgrement>;
   /** Liste des agréments de l'éco-organisme */
   ecoOrganismeAgreements: Array<Scalars["URL"]>;
-  allowBsdasriTakeOverWithoutSignature: Scalars["Boolean"];
 };
 
 /** Information sur un établissement accessible publiquement */
@@ -2124,8 +2083,6 @@ export type CompanyPublic = {
   vhuAgrementBroyeur?: Maybe<VhuAgrement>;
   /** Liste des agréments de l'éco-organisme */
   ecoOrganismeAgreements: Array<Scalars["URL"]>;
-  /** L'entreprise autorise l'enlèvement d'un Dasri sans sa signature */
-  allowBsdasriTakeOverWithoutSignature?: Maybe<Scalars["Boolean"]>;
 };
 
 /** Information sur un établissement accessible publiquement en recherche */
@@ -2190,12 +2147,12 @@ export enum CompanyType {
   /** Courtier */
   Broker = "BROKER",
   /** Éco-organisme */
-  EcoOrganisme = "ECO_ORGANISME"
+  EcoOrganisme = "ECO_ORGANISME",
 }
 
 export enum CompanyVerificationMode {
   Letter = "LETTER",
-  Manual = "MANUAL"
+  Manual = "MANUAL",
 }
 
 /** État du processus de vérification de l'établissement */
@@ -2208,7 +2165,7 @@ export enum CompanyVerificationStatus {
    * Les vérifications manuelles n'ont pas abouties, une lettre a été envoyée à l'adresse enregistrée
    * auprès du registre du commerce et des sociétés
    */
-  LetterSent = "LETTER_SENT"
+  LetterSent = "LETTER_SENT",
 }
 
 /** Consistance du déchet */
@@ -2220,7 +2177,7 @@ export enum Consistence {
   /** Gazeux */
   Gaseous = "GASEOUS",
   /** Pâteux */
-  Doughy = "DOUGHY"
+  Doughy = "DOUGHY",
 }
 
 /** Payload de création d'un récépissé courtier */
@@ -2354,7 +2311,7 @@ export type DestinationInput = {
    * de traitement ou de tri, transit, regroupement.
    */
   company?: Maybe<CompanyInput>;
-  /** N° de CAP prévu (le cas échéant). Le champ CAP est obligatoire pour les déchets dangereux. */
+  /** N° de CAP prévu (le cas échéant) */
   cap?: Maybe<Scalars["String"]>;
   /** Opération d'élimination / valorisation prévue (code D/R) */
   processingOperation?: Maybe<Scalars["String"]>;
@@ -2381,10 +2338,6 @@ export type EcoOrganisme = {
 /** Payload de liaison d'un BSD à un eco-organisme */
 export type EcoOrganismeInput = {
   name: Scalars["String"];
-  /**
-   * SIRET composé de 14 caractères correspondant à un éco-organisme. La liste des éco-organismes
-   * est disponible via la [query ecoOrganismes](../user-company/queries#ecoorganismes)
-   */
   siret: Scalars["String"];
 };
 
@@ -2425,7 +2378,7 @@ export enum EmitterType {
   /** Collecteur de petites quantités de déchets relevant de la même rubrique */
   Appendix1 = "APPENDIX1",
   /** Personne ayant transformé ou réalisé un traitement dont la provenance des déchets reste identifiable */
-  Appendix2 = "APPENDIX2"
+  Appendix2 = "APPENDIX2",
 }
 
 /** Type d'établissement favoris */
@@ -2437,7 +2390,7 @@ export enum FavoriteType {
   Broker = "BROKER",
   NextDestination = "NEXT_DESTINATION",
   TemporaryStorageDetail = "TEMPORARY_STORAGE_DETAIL",
-  Destination = "DESTINATION"
+  Destination = "DESTINATION",
 }
 
 /**
@@ -2514,6 +2467,13 @@ export type Form = {
   signedAt?: Maybe<Scalars["DateTime"]>;
   /** Quantité réelle présentée (case 10) */
   quantityReceived?: Maybe<Scalars["Float"]>;
+  /**
+   * Quantité actuellement connue en tonnes.
+   * Elle est calculée en fonction des autres champs pour renvoyer la dernière quantité connue.
+   * Elle renvoi ainsi soit la quantité envoyée estimée, soit la quantitée recue
+   * sur le site d'entreposage, soit la quantitée réelle recue.
+   */
+  actualQuantity?: Maybe<Scalars["Float"]>;
   /** Traitement réalisé (code D/R) */
   processingOperationDone?: Maybe<Scalars["String"]>;
   /** Description de l'opération d’élimination / valorisation (case 11) */
@@ -2522,7 +2482,7 @@ export type Form = {
   processedBy?: Maybe<Scalars["String"]>;
   /** Date à laquelle le déchet a été traité */
   processedAt?: Maybe<Scalars["DateTime"]>;
-  /** Si oui ou non il y a eu rupture de traçabilité */
+  /** Si oui ou non il y a eu perte de traçabalité */
   noTraceability?: Maybe<Scalars["Boolean"]>;
   /** Destination ultérieure prévue (case 12) */
   nextDestination?: Maybe<NextDestination>;
@@ -2614,7 +2574,7 @@ export enum FormRole {
   /** Les BSD's dont je suis le courtier */
   Broker = "BROKER",
   /** Les BSD's dont je suis éco-organisme */
-  EcoOrganisme = "ECO_ORGANISME"
+  EcoOrganisme = "ECO_ORGANISME",
 }
 
 /** Informations du cycle de vie des bordereaux */
@@ -2639,7 +2599,7 @@ export enum FormsRegisterExportFormat {
   /** Fichier csv */
   Csv = "CSV",
   /** Fichier Excel */
-  Xlsx = "XLSX"
+  Xlsx = "XLSX",
 }
 
 /**
@@ -2675,7 +2635,7 @@ export enum FormsRegisterExportType {
    */
   Traded = "TRADED",
   /** Registre courtier */
-  Brokered = "BROKERED"
+  Brokered = "BROKERED",
 }
 
 /** Différents statuts d'un BSD au cours de son cycle de vie */
@@ -2713,7 +2673,7 @@ export enum FormStatus {
   /** Déchet avec les cadres 14-19 complétées (si besoin), prêt à partir du site d'entreposage ou reconditionnement */
   Resealed = "RESEALED",
   /** Déchet envoyé du site d'entreposage ou reconditionnement vers sa destination de traitement */
-  Resent = "RESENT"
+  Resent = "RESENT",
 }
 
 /**
@@ -2736,7 +2696,7 @@ export type FormSubscription = {
 /** Type d'une déclaration GEREP */
 export enum GerepType {
   Producteur = "Producteur",
-  Traiteur = "Traiteur"
+  Traiteur = "Traiteur",
 }
 
 /** Payload d'import d'un BSD papier */
@@ -2868,7 +2828,7 @@ export type MembershipRequest = {
 export enum MembershipRequestStatus {
   Pending = "PENDING",
   Accepted = "ACCEPTED",
-  Refused = "REFUSED"
+  Refused = "REFUSED",
 }
 
 export type Mutation = {
@@ -3317,6 +3277,12 @@ export type MutationAcceptMembershipRequestArgs = {
   role: UserRole;
 };
 
+export type MutationAddFicheInterventionBsffArgs = {
+  id: Scalars["ID"];
+  numero: Scalars["String"];
+  input: BsffFicheInterventionInput;
+};
+
 export type MutationChangePasswordArgs = {
   oldPassword: Scalars["String"];
   newPassword: Scalars["String"];
@@ -3354,16 +3320,8 @@ export type MutationCreateDraftBsdasriArgs = {
   input: BsdasriCreateInput;
 };
 
-export type MutationCreateDraftBsffArgs = {
-  input: BsffInput;
-};
-
 export type MutationCreateDraftBsvhuArgs = {
   input: BsvhuInput;
-};
-
-export type MutationCreateFicheInterventionBsffArgs = {
-  input: BsffFicheInterventionInput;
 };
 
 export type MutationCreateFormArgs = {
@@ -3391,10 +3349,6 @@ export type MutationDeleteBrokerReceiptArgs = {
   input: DeleteBrokerReceiptInput;
 };
 
-export type MutationDeleteBsdaArgs = {
-  id: Scalars["ID"];
-};
-
 export type MutationDeleteBsdasriArgs = {
   id: Scalars["ID"];
 };
@@ -3405,6 +3359,11 @@ export type MutationDeleteBsffArgs = {
 
 export type MutationDeleteBsvhuArgs = {
   id: Scalars["ID"];
+};
+
+export type MutationDeleteFicheInterventionBsffArgs = {
+  id: Scalars["ID"];
+  numero: Scalars["String"];
 };
 
 export type MutationDeleteFormArgs = {
@@ -3539,10 +3498,6 @@ export type MutationPublishBsdasriArgs = {
   id: Scalars["ID"];
 };
 
-export type MutationPublishBsffArgs = {
-  id: Scalars["ID"];
-};
-
 export type MutationPublishBsvhuArgs = {
   id: Scalars["ID"];
 };
@@ -3592,12 +3547,12 @@ export type MutationSignBsdaArgs = {
 
 export type MutationSignBsdasriArgs = {
   id: Scalars["ID"];
-  input: BsdasriSignatureInput;
+  signatureInput: BsdasriSignatureInput;
 };
 
 export type MutationSignBsdasriEmissionWithSecretCodeArgs = {
   id: Scalars["ID"];
-  input: BsdasriSignatureWithSecretCodeInput;
+  signatureInput: BsdasriSignatureWithSecretCodeInput;
 };
 
 export type MutationSignBsffArgs = {
@@ -3637,7 +3592,7 @@ export type MutationUpdateBsdaArgs = {
 
 export type MutationUpdateBsdasriArgs = {
   id: Scalars["ID"];
-  input: BsdasriUpdateInput;
+  bsdasriUpdateInput: BsdasriUpdateInput;
 };
 
 export type MutationUpdateBsffArgs = {
@@ -3664,11 +3619,11 @@ export type MutationUpdateCompanyArgs = {
   vhuAgrementDemolisseurId?: Maybe<Scalars["String"]>;
   vhuAgrementBroyeurId?: Maybe<Scalars["String"]>;
   ecoOrganismeAgreements?: Maybe<Array<Scalars["URL"]>>;
-  allowBsdasriTakeOverWithoutSignature?: Maybe<Scalars["Boolean"]>;
 };
 
 export type MutationUpdateFicheInterventionBsffArgs = {
   id: Scalars["ID"];
+  numero: Scalars["String"];
   input: BsffFicheInterventionInput;
 };
 
@@ -3734,7 +3689,7 @@ export type OrderBy = {
 
 export enum OrderType {
   Asc = "ASC",
-  Desc = "DESC"
+  Desc = "DESC",
 }
 
 /** Informations sur le conditionnement */
@@ -3752,12 +3707,9 @@ export type PackagingInfo = {
 export type PackagingInfoInput = {
   /** Type de conditionnement */
   type: Packagings;
-  /** Description du conditionnement dans le cas où le type de conditionnement est `OTHER` */
+  /** Description du conditionnement dans le cas où le type de conditionnement est `AUTRE` */
   other?: Maybe<Scalars["String"]>;
-  /**
-   * Nombre de colis associés à ce conditionnement. Dans le cas d'un conditionnemt BENNE ou CITERNE,
-   * le nombre de colis ne peut être supérieur à 2.
-   */
+  /** Nombre de colis associés à ce conditionnement */
   quantity: Scalars["Int"];
 };
 
@@ -3772,7 +3724,7 @@ export enum Packagings {
   /** Benne */
   Benne = "BENNE",
   /** Autre */
-  Autre = "AUTRE"
+  Autre = "AUTRE",
 }
 
 export type PageInfo = {
@@ -3837,7 +3789,7 @@ export enum ProcessingOperationTypes {
   D10 = "D10",
   D12 = "D12",
   R1 = "R1",
-  R12 = "R12"
+  R12 = "R12",
 }
 
 /** Type de quantité lors de l'émission */
@@ -3845,7 +3797,7 @@ export enum QuantityType {
   /** Quntité réelle */
   Real = "REAL",
   /** Quantité estimée */
-  Estimated = "ESTIMATED"
+  Estimated = "ESTIMATED",
 }
 
 /** Views of the Company ressource for the admin panel */
@@ -4055,8 +4007,8 @@ export type QueryBsffPdfArgs = {
 /** Views of the Company ressource for the admin panel */
 export type QueryBsffsArgs = {
   after?: Maybe<Scalars["ID"]>;
-  before?: Maybe<Scalars["ID"]>;
   first?: Maybe<Scalars["Int"]>;
+  before?: Maybe<Scalars["ID"]>;
   last?: Maybe<Scalars["Int"]>;
   where?: Maybe<BsffWhere>;
 };
@@ -4172,15 +4124,11 @@ export type ReceivedFormInput = {
   receivedAt: Scalars["DateTime"];
   /** Statut d'acceptation du déchet (case 10) */
   wasteAcceptationStatus?: Maybe<WasteAcceptationStatusInput>;
-  /** Raison du refus (case 10). Obligatoire en cas de refus de déchet */
+  /** Raison du refus (case 10) */
   wasteRefusalReason?: Maybe<Scalars["String"]>;
   /** Date à laquelle le déchet a été accepté ou refusé (case 10) */
   signedAt?: Maybe<Scalars["DateTime"]>;
-  /**
-   * Quantité réelle présentée (case 10).
-   *  Doit être supérieure à 0 lorsque le déchet est accepté.
-   *  Doit être égale à 0 lorsque le déchet est refusé.
-   */
+  /** Quantité réelle présentée (case 10) */
   quantityReceived?: Maybe<Scalars["Float"]>;
 };
 
@@ -4301,7 +4249,7 @@ export enum SignatureAuthor {
   /** L'auteur de la signature est l'émetteur du déchet */
   Emitter = "EMITTER",
   /** L'auteur de la signature est l'éco-organisme figurant sur le BSD */
-  EcoOrganisme = "ECO_ORGANISME"
+  EcoOrganisme = "ECO_ORGANISME",
 }
 
 /** Payload simplifié de signature d'un BSD par un transporteur */
@@ -4320,7 +4268,7 @@ export type SignatureInput = {
 export enum SignatureTypeInput {
   Emission = "EMISSION",
   Transport = "TRANSPORT",
-  Operation = "OPERATION"
+  Operation = "OPERATION",
 }
 
 export type SignupInput = {
@@ -4474,7 +4422,7 @@ export type TemporaryStorer = {
 export type TempStoredFormInput = {
   /** Statut d'acceptation du déchet (case 13) */
   wasteAcceptationStatus?: Maybe<WasteAcceptationStatusInput>;
-  /** Raison du refus (case 13). Obligatoire en cas de refus de déchet */
+  /** Raison du refus (case 13) */
   wasteRefusalReason?: Maybe<Scalars["String"]>;
   /** Nom de la personne en charge de la réception du déchet (case 13) */
   receivedBy: Scalars["String"];
@@ -4482,11 +4430,7 @@ export type TempStoredFormInput = {
   receivedAt: Scalars["DateTime"];
   /** Date à laquelle le déchet a été accepté ou refusé (case 13). Défaut à la date d'aujourd'hui. */
   signedAt?: Maybe<Scalars["DateTime"]>;
-  /**
-   * Quantité réelle présentée (case 13)
-   *  Doit être supérieure à 0 lorsque le déchet est accepté.
-   *  Doit être égale à 0 lorsque le déchet est refusé.
-   */
+  /** Quantité réelle présentée (case 13) */
   quantityReceived: Scalars["Float"];
   /** Réelle ou estimée */
   quantityType: QuantityType;
@@ -4499,13 +4443,9 @@ export type TempStorerAcceptedFormInput = {
   signedBy: Scalars["String"];
   /** Statut d'acceptation du déchet (case 13) */
   wasteAcceptationStatus: WasteAcceptationStatusInput;
-  /** Raison du refus (case 13). Obligatoire en cas de refus de déchet */
+  /** Raison du refus (case 13) */
   wasteRefusalReason?: Maybe<Scalars["String"]>;
-  /**
-   * Quantité réelle présentée (case 13)
-   *  Doit être supérieure à 0 lorsque le déchet est accepté.
-   *  Doit être égale à 0 lorsque le déchet est refusé.
-   */
+  /** Quantité réelle présentée (case 13) */
   quantityReceived: Scalars["Float"];
   /** Réelle ou estimée */
   quantityType: QuantityType;
@@ -4571,13 +4511,13 @@ export type Transporter = {
 export type TransporterInput = {
   /** Établissement collecteur - transporteur */
   company?: Maybe<CompanyInput>;
-  /** Exemption de récépissé */
+  /** Exemption de récipissé */
   isExemptedOfReceipt?: Maybe<Scalars["Boolean"]>;
-  /** N° de récipissé. Obligatoire lorsque l'exemption de récépissé n'est pas précisée */
+  /** N° de récipissé */
   receipt?: Maybe<Scalars["String"]>;
-  /** Département du récépissé. Obligatoire lorsque l'exemption de récépissé n'est pas précisée */
+  /** Département */
   department?: Maybe<Scalars["String"]>;
-  /** Limite de validité du récépissé. Obligatoire lorsque l'exemption de récépissé n'est pas précisée */
+  /** Limite de validité du récipissé */
   validityLimit?: Maybe<Scalars["DateTime"]>;
   /** Numéro de plaque d'immatriculation */
   numberPlate?: Maybe<Scalars["String"]>;
@@ -4626,7 +4566,7 @@ export enum TransportMode {
   Rail = "RAIL",
   Air = "AIR",
   River = "RIVER",
-  Sea = "SEA"
+  Sea = "SEA",
 }
 
 export type TransportSegment = {
@@ -4768,7 +4708,7 @@ export type User = {
  */
 export enum UserRole {
   Member = "MEMBER",
-  Admin = "ADMIN"
+  Admin = "ADMIN",
 }
 
 export type VerifyCompanyByAdminInput = {
@@ -4800,7 +4740,7 @@ export enum WasteAcceptationStatusInput {
   /** Refusé */
   Refused = "REFUSED",
   /** Refus partiel */
-  PartiallyRefused = "PARTIALLY_REFUSED"
+  PartiallyRefused = "PARTIALLY_REFUSED",
 }
 
 /** Détails du déchet (case 3, 4, 5, 6) */
@@ -4862,9 +4802,9 @@ export type WasteDetailsInput = {
   code?: Maybe<Scalars["String"]>;
   /** Dénomination usuelle */
   name?: Maybe<Scalars["String"]>;
-  /** Code ONU. Obligatoire pour les déchets dangereux. Merci d'indiquer 'non soumis' si nécessaire. */
+  /** Code ONU */
   onuCode?: Maybe<Scalars["String"]>;
-  /** Liste de conditionnements. Les conditionnements CITERNE et BENNE ne peuvent pas être associés à un autre conditionnement */
+  /** Conditionnements */
   packagingInfos?: Maybe<Array<PackagingInfoInput>>;
   /** DEPRECATED - Conditionnement */
   packagings?: Maybe<Array<Maybe<Packagings>>>;
@@ -4901,7 +4841,7 @@ export enum WasteType {
   /** Déchet non dangereux */
   NotDangerous = "NOT_DANGEROUS",
   /** Déchet dangereux */
-  Dangerous = "DANGEROUS"
+  Dangerous = "DANGEROUS",
 }
 
 /** Informations sur une adresse chantier */
