@@ -23,9 +23,10 @@ const FORM = gql`
             name
           }
         }
-        receivedAt
+        signedAt
         quantityReceived
         processingOperationDone
+        emitterPostalCode
       }
     }
   }
@@ -64,6 +65,7 @@ describe("appendix2Forms resolver", () => {
       ownerId: emitter.id,
       opt: {
         emitterCompanySiret: emitterCompany.siret,
+        emitterCompanyAddress: "40 boulevard Voltaire 13001 Marseille",
         recipientCompanySiret: collectorCompany.siret
       }
     });
@@ -92,9 +94,10 @@ describe("appendix2Forms resolver", () => {
             name: appendix2.emitterCompanyName
           }
         },
-        receivedAt: appendix2.receivedAt,
+        signedAt: appendix2.signedAt,
         quantityReceived: appendix2.quantityReceived,
-        processingOperationDone: appendix2.processingOperationDone
+        processingOperationDone: appendix2.processingOperationDone,
+        emitterPostalCode: "13001"
       }
     ]);
   });
