@@ -1,5 +1,6 @@
 import { FormResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
+import { extractPostalCode } from "../../../utils";
 import { expandFormFromDb } from "../../form-converter";
 
 const appendix2FormsResolver: FormResolvers["appendix2Forms"] = async form => {
@@ -13,7 +14,8 @@ const appendix2FormsResolver: FormResolvers["appendix2Forms"] = async form => {
       readableId: form.readableId,
       wasteDetails: form.wasteDetails,
       emitter: form.emitter,
-      receivedAt: form.receivedAt,
+      emitterPostalCode: extractPostalCode(form.emitter?.company?.address),
+      signedAt: form.signedAt,
       quantityReceived: form.quantityReceived,
       processingOperationDone: form.processingOperationDone
     };

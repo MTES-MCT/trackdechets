@@ -1,4 +1,5 @@
 import { Form } from ".prisma/client";
+import { extractPostalCode } from "../../utils";
 import { isFormContributor } from "../permissions";
 import { pageHeight, imageLocations } from "./settings";
 
@@ -418,17 +419,6 @@ export async function hideEmitterFields(appendix2: Form, user: Express.User) {
     };
   }
   return appendix2;
-}
-
-/**
- *Try extracting a valid postal code
- */
-export function extractPostalCode(address: string) {
-  const matches = address.match(/([0-9]{5})/);
-  if (matches && matches.length > 0) {
-    return matches[0];
-  }
-  return "";
 }
 
 const transportModeLabels = {
