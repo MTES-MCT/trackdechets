@@ -1,6 +1,8 @@
 "Payload d'un établissement"
 input CompanyInput {
-  "SIRET de l'établissement"
+  """
+  SIRET de l'établissement composé de 14 caractères numériques
+  """
   siret: String
 
   "Nom de l'établissement"
