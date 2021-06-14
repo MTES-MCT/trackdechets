@@ -17,6 +17,11 @@ export default function Transporter({ status }) {
     BsdasriStatus.SignedByProducer,
     BsdasriStatus.Sent,
   ].includes(status);
+  // handedOverAt is editable even after dasri reception
+  const showHandedOverAtField = [
+    BsdasriStatus.Sent,
+    BsdasriStatus.Received,
+  ].includes(status);
 
   const disabled = [BsdasriStatus.Sent, BsdasriStatus.Received].includes(
     status
@@ -58,7 +63,7 @@ export default function Transporter({ status }) {
       />
       <div className="form__row">
         <label>
-          Champ libre
+          Champ libre (optionnel)
           <Field
             component="textarea"
             name="transporter.customInfo"
@@ -113,13 +118,14 @@ export default function Transporter({ status }) {
       </div>
 
       <h4 className="form__section-heading">Transport du déchet</h4>
-      <Field
-        name="transport.wasteAcceptation"
-        component={Acceptation}
-        disabled={disabled}
-      />
+
       {showTransportFields ? (
         <>
+          <Field
+            name="transport.wasteAcceptation"
+            component={Acceptation}
+            disabled={disabled}
+          />
           <div className="form__row">
             <label>
               Date de prise en charge
@@ -179,21 +185,31 @@ export default function Transporter({ status }) {
           </div>
         </>
       ) : (
-        <p>Cette section sera disponible quand le déchet aura été envoyé</p>
+        <p>
+          Cette section sera disponible quand le bordereau aura été signé par le
+          producteur
+        </p>
       )}
 
-      <div className="form__row">
-        <label>
-          Date de remise à l'installation destinataire
-          <div className="td-date-wrapper">
-            <Field
-              name="transport.handedOverAt"
-              component={DateInput}
-              className="td-input"
-            />
-          </div>
-        </label>
-      </div>
+      {showHandedOverAtField ? (
+        <div className="form__row">
+          <label>
+            Date de remise à l'installation destinataire (optionnel)
+            <div className="td-date-wrapper">
+              <Field
+                name="transport.handedOverAt"
+                component={DateInput}
+                className="td-input"
+              />
+            </div>
+          </label>
+        </div>
+      ) : (
+        <p className="tw-mt-2">
+          La date de remise à l'installation destinataire sera éditable après
+          l'emport du déchet
+        </p>
+      )}
     </>
   );
 }

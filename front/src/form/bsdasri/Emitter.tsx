@@ -138,7 +138,7 @@ export default function Emitter({ status }) {
 
       <div className="form__row">
         <label>
-          Champ libre
+          Champ libre (optionnel)
           <Field
             disabled={disabled}
             component="textarea"
