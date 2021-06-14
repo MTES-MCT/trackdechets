@@ -13,20 +13,13 @@ import {
   getFieldsUpdate
 } from "./signatureUtils";
 import { indexBsdasri } from "../../elastic";
-const basesign = async ({
-  id,
-  signatureInput,
-  context,
-  securityCode = null
-}) => {
+const basesign = async ({ id, input, context, securityCode = null }) => {
   const user = checkIsAuthenticated(context);
   const bsdasri = await getBsdasriOrNotFound({ id });
   if (bsdasri.isDraft) {
     throw new InvalidTransition();
   }
-  const signatureType = securityCode
-    ? "EMISSION_WITH_SECRET_CODE"
-    : signatureInput.type;
+  const signatureType = securityCode ? "EMISSION_WITH_SECRET_CODE" : input.type;
   const signatureParams = dasriSignatureMapping[signatureType];
 
   // Which siret is involved in curent signature process ?
@@ -48,10 +41,10 @@ const basesign = async ({
   );
 
   const data = {
-    [signatureParams.author]: signatureInput.author,
+    [signatureParams.author]: input.author,
     [signatureParams.date]: new Date(),
     [signatureParams.signatoryField]: { connect: { id: user.id } },
-    ...getFieldsUpdate({ bsdasri, signatureInput })
+    ...getFieldsUpdate({ bsdasri, input })
   };
 
   const updatedDasri = await dasriTransition(

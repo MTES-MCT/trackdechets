@@ -449,7 +449,7 @@ export type BsdasriEdge = {
 export type BsdasriEmission = {
   __typename?: "BsdasriEmission";
   wasteCode?: Maybe<Scalars["String"]>;
-  wasteDetails?: Maybe<BsdasriWasteDetails>;
+  wasteDetails?: Maybe<BsdasriEmissionWasteDetails>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
   signature?: Maybe<BsdasriSignature>;
   /** Emporté sans signature PRED avec son autorisation prélalable */
@@ -462,6 +462,17 @@ export type BsdasriEmissionInput = {
   wasteCode?: Maybe<Scalars["String"]>;
   wasteDetails?: Maybe<BsdasriWasteDetailInput>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
+};
+
+/** Détail sur le déchet emis du Bsdasri */
+export type BsdasriEmissionWasteDetails = {
+  __typename?: "BsdasriEmissionWasteDetails";
+  /** Quantité en kg */
+  quantity?: Maybe<Scalars["Int"]>;
+  quantityType?: Maybe<QuantityType>;
+  volume?: Maybe<Scalars["Int"]>;
+  packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
+  onuCode?: Maybe<Scalars["String"]>;
 };
 
 /** Émetteur du Bsdasri, Personne responsable de l'émimination des déchets (PRED) */
@@ -751,14 +762,14 @@ export type BsdasriWasteDetailInput = {
   onuCode?: Maybe<Scalars["String"]>;
 };
 
-/** Détail sur le déchet proprement dit du Bsdasri */
+/** Détail sur le déchet transporté ou reçu du Bsdasri */
 export type BsdasriWasteDetails = {
   __typename?: "BsdasriWasteDetails";
+  /** Quantité en kg */
   quantity?: Maybe<Scalars["Int"]>;
   quantityType?: Maybe<QuantityType>;
   volume?: Maybe<Scalars["Int"]>;
   packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
-  onuCode?: Maybe<Scalars["String"]>;
 };
 
 export type BsdasriWhere = {
@@ -3002,7 +3013,7 @@ export type MutationCreateBsdaArgs = {
 };
 
 export type MutationCreateBsdasriArgs = {
-  bsdasriCreateInput: BsdasriCreateInput;
+  input: BsdasriCreateInput;
 };
 
 export type MutationCreateBsffArgs = {
@@ -3022,7 +3033,7 @@ export type MutationCreateDraftBsdaArgs = {
 };
 
 export type MutationCreateDraftBsdasriArgs = {
-  bsdasriCreateInput: BsdasriCreateInput;
+  input: BsdasriCreateInput;
 };
 
 export type MutationCreateDraftBsvhuArgs = {
@@ -3252,12 +3263,12 @@ export type MutationSignBsdaArgs = {
 
 export type MutationSignBsdasriArgs = {
   id: Scalars["ID"];
-  signatureInput: BsdasriSignatureInput;
+  input: BsdasriSignatureInput;
 };
 
 export type MutationSignBsdasriEmissionWithSecretCodeArgs = {
   id: Scalars["ID"];
-  signatureInput: BsdasriSignatureWithSecretCodeInput;
+  input: BsdasriSignatureWithSecretCodeInput;
 };
 
 export type MutationSignBsffArgs = {
@@ -3297,7 +3308,7 @@ export type MutationUpdateBsdaArgs = {
 
 export type MutationUpdateBsdasriArgs = {
   id: Scalars["ID"];
-  bsdasriUpdateInput: BsdasriUpdateInput;
+  input: BsdasriUpdateInput;
 };
 
 export type MutationUpdateBsffArgs = {
@@ -4695,12 +4706,13 @@ export type ResolversTypes = {
   BsdasriEmitter: ResolverTypeWrapper<BsdasriEmitter>;
   BsdasriEmitterType: BsdasriEmitterType;
   BsdasriEmission: ResolverTypeWrapper<BsdasriEmission>;
-  BsdasriWasteDetails: ResolverTypeWrapper<BsdasriWasteDetails>;
+  BsdasriEmissionWasteDetails: ResolverTypeWrapper<BsdasriEmissionWasteDetails>;
   BsdasriPackagingInfo: ResolverTypeWrapper<BsdasriPackagingInfo>;
   BsdasriPackagings: BsdasriPackagings;
   BsdasriSignature: ResolverTypeWrapper<BsdasriSignature>;
   BsdasriTransporter: ResolverTypeWrapper<BsdasriTransporter>;
   BsdasriTransport: ResolverTypeWrapper<BsdasriTransport>;
+  BsdasriWasteDetails: ResolverTypeWrapper<BsdasriWasteDetails>;
   BsdasriWasteAcceptation: ResolverTypeWrapper<BsdasriWasteAcceptation>;
   BsdasriRecipient: ResolverTypeWrapper<BsdasriRecipient>;
   BsdasriReception: ResolverTypeWrapper<BsdasriReception>;
@@ -5008,11 +5020,12 @@ export type ResolversParentTypes = {
   Bsdasri: Bsdasri;
   BsdasriEmitter: BsdasriEmitter;
   BsdasriEmission: BsdasriEmission;
-  BsdasriWasteDetails: BsdasriWasteDetails;
+  BsdasriEmissionWasteDetails: BsdasriEmissionWasteDetails;
   BsdasriPackagingInfo: BsdasriPackagingInfo;
   BsdasriSignature: BsdasriSignature;
   BsdasriTransporter: BsdasriTransporter;
   BsdasriTransport: BsdasriTransport;
+  BsdasriWasteDetails: BsdasriWasteDetails;
   BsdasriWasteAcceptation: BsdasriWasteAcceptation;
   BsdasriRecipient: BsdasriRecipient;
   BsdasriReception: BsdasriReception;
@@ -5615,7 +5628,7 @@ export type BsdasriEmissionResolvers<
     ContextType
   >;
   wasteDetails?: Resolver<
-    Maybe<ResolversTypes["BsdasriWasteDetails"]>,
+    Maybe<ResolversTypes["BsdasriEmissionWasteDetails"]>,
     ParentType,
     ContextType
   >;
@@ -5639,6 +5652,26 @@ export type BsdasriEmissionResolvers<
     ParentType,
     ContextType
   >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriEmissionWasteDetailsResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriEmissionWasteDetails"] = ResolversParentTypes["BsdasriEmissionWasteDetails"]
+> = {
+  quantity?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
+  quantityType?: Resolver<
+    Maybe<ResolversTypes["QuantityType"]>,
+    ParentType,
+    ContextType
+  >;
+  volume?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
+  packagingInfos?: Resolver<
+    Maybe<Array<ResolversTypes["BsdasriPackagingInfo"]>>,
+    ParentType,
+    ContextType
+  >;
+  onuCode?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -5885,7 +5918,6 @@ export type BsdasriWasteDetailsResolvers<
     ParentType,
     ContextType
   >;
-  onuCode?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -7362,7 +7394,7 @@ export type MutationResolvers<
     ResolversTypes["Bsdasri"],
     ParentType,
     ContextType,
-    RequireFields<MutationCreateBsdasriArgs, "bsdasriCreateInput">
+    RequireFields<MutationCreateBsdasriArgs, "input">
   >;
   createBsff?: Resolver<
     ResolversTypes["Bsff"],
@@ -7392,7 +7424,7 @@ export type MutationResolvers<
     ResolversTypes["Bsdasri"],
     ParentType,
     ContextType,
-    RequireFields<MutationCreateDraftBsdasriArgs, "bsdasriCreateInput">
+    RequireFields<MutationCreateDraftBsdasriArgs, "input">
   >;
   createDraftBsvhu?: Resolver<
     Maybe<ResolversTypes["Bsvhu"]>,
@@ -7707,16 +7739,13 @@ export type MutationResolvers<
     Maybe<ResolversTypes["Bsdasri"]>,
     ParentType,
     ContextType,
-    RequireFields<MutationSignBsdasriArgs, "id" | "signatureInput">
+    RequireFields<MutationSignBsdasriArgs, "id" | "input">
   >;
   signBsdasriEmissionWithSecretCode?: Resolver<
     Maybe<ResolversTypes["Bsdasri"]>,
     ParentType,
     ContextType,
-    RequireFields<
-      MutationSignBsdasriEmissionWithSecretCodeArgs,
-      "id" | "signatureInput"
-    >
+    RequireFields<MutationSignBsdasriEmissionWithSecretCodeArgs, "id" | "input">
   >;
   signBsff?: Resolver<
     ResolversTypes["Bsff"],
@@ -7764,7 +7793,7 @@ export type MutationResolvers<
     ResolversTypes["Bsdasri"],
     ParentType,
     ContextType,
-    RequireFields<MutationUpdateBsdasriArgs, "id" | "bsdasriUpdateInput">
+    RequireFields<MutationUpdateBsdasriArgs, "id" | "input">
   >;
   updateBsff?: Resolver<
     ResolversTypes["Bsff"],
@@ -8545,6 +8574,9 @@ export type Resolvers<ContextType = GraphQLContext> = {
   BsdasriConnection?: BsdasriConnectionResolvers<ContextType>;
   BsdasriEdge?: BsdasriEdgeResolvers<ContextType>;
   BsdasriEmission?: BsdasriEmissionResolvers<ContextType>;
+  BsdasriEmissionWasteDetails?: BsdasriEmissionWasteDetailsResolvers<
+    ContextType
+  >;
   BsdasriEmitter?: BsdasriEmitterResolvers<ContextType>;
   BsdasriError?: BsdasriErrorResolvers<ContextType>;
   BsdasriMetadata?: BsdasriMetadataResolvers<ContextType>;
@@ -9147,6 +9179,20 @@ export function createBsdasriEmissionInputMock(
   };
 }
 
+export function createBsdasriEmissionWasteDetailsMock(
+  props: Partial<BsdasriEmissionWasteDetails>
+): BsdasriEmissionWasteDetails {
+  return {
+    __typename: "BsdasriEmissionWasteDetails",
+    quantity: null,
+    quantityType: null,
+    volume: null,
+    packagingInfos: null,
+    onuCode: null,
+    ...props
+  };
+}
+
 export function createBsdasriEmitterMock(
   props: Partial<BsdasriEmitter>
 ): BsdasriEmitter {
@@ -9497,7 +9543,6 @@ export function createBsdasriWasteDetailsMock(
     quantityType: null,
     volume: null,
     packagingInfos: null,
-    onuCode: null,
     ...props
   };
 }

@@ -31,6 +31,8 @@ export default function WorkSiteAddress({
   city,
   postalCode,
   onAddressSelection,
+  designation,
+  disabled = false,
 }) {
   const [state, dispatch] = useReducer(
     reducer,
@@ -66,7 +68,7 @@ export default function WorkSiteAddress({
 
   return (
     <div className="form__row">
-      <label>Adresse de l'entreprise</label>
+      <label>Adresse {designation}</label>
 
       <SearchInput
         id="eco-search"
@@ -76,6 +78,7 @@ export default function WorkSiteAddress({
           dispatch({ type: "search_input", payload: e.target.value })
         }
         value={state.searchInput}
+        disabled={disabled}
       />
 
       {state.searchResults.map(feature => (

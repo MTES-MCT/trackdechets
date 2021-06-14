@@ -17,18 +17,18 @@ import { indexBsdasri } from "../../elastic";
 
 const createBsdasri = async (
   parent: ResolversParentTypes["Mutation"],
-  { bsdasriCreateInput: input }: MutationCreateBsdasriArgs,
+  { input: input }: MutationCreateBsdasriArgs,
   context: GraphQLContext,
   isDraft: boolean
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const { regroupedBsdasris, ...bsdasriCreateInput } = input;
+  const { regroupedBsdasris, ...rest } = input;
 
   const formSirets = {
-    emitterCompanySiret: bsdasriCreateInput.emitter?.company?.siret,
-    recipientCompanySiret: bsdasriCreateInput.recipient?.company?.siret,
-    transporterCompanySiret: bsdasriCreateInput.transporter?.company?.siret
+    emitterCompanySiret: input.emitter?.company?.siret,
+    recipientCompanySiret: input.recipient?.company?.siret,
+    transporterCompanySiret: input.transporter?.company?.siret
   };
 
   await checkIsBsdasriContributor(
@@ -37,7 +37,7 @@ const createBsdasri = async (
     "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparaît pas"
   );
 
-  const flattenedInput = flattenBsdasriInput(bsdasriCreateInput);
+  const flattenedInput = flattenBsdasriInput(rest);
   const isRegrouping = !!regroupedBsdasris && !!regroupedBsdasris.length;
 
   if (isRegrouping) {

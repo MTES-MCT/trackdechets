@@ -1,10 +1,11 @@
-import CompanySelector from "form/common/components//company/CompanySelector";
-import { RadioButton } from "form/common/components//custom-inputs/RadioButton";
+import CompanySelector from "form/common/components/company/CompanySelector";
+import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useFormikContext } from "formik";
 import { Form } from "generated/graphql/types";
 import React, { useEffect, useState } from "react";
 import EcoOrganismes from "./components/eco-organismes/EcoOrganismes";
-import WorkSite from "./components/work-site/WorkSite";
+import WorkSite from "form/common/components/work-site/WorkSite";
+import { getInitialEmitterWorkSite } from "form/bsdd/utils/initial-state";
 import "./Emitter.scss";
 
 export default function Emitter() {
@@ -82,7 +83,12 @@ export default function Emitter() {
 
       <CompanySelector name="emitter.company" heading="Entreprise émettrice" />
 
-      <WorkSite />
+      <WorkSite
+        switchLabel="Je souhaite ajouter une adresse de chantier ou de collecte"
+        headingTitle="Adresse chantier"
+        designation="de l'entreprise"
+        getInitialEmitterWorkSiteFn={getInitialEmitterWorkSite}
+      />
     </>
   );
 }

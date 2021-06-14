@@ -121,6 +121,12 @@ export function BSDList({
         >
           Créer un bordereau
         </Link>
+        <Link
+          to={generatePath(routes.dashboard.bsdasris.create, { siret })}
+          className="btn btn--primary"
+        >
+          Créer un dasri
+        </Link>
         <button
           className="btn btn--primary"
           onClick={() => refetch()}

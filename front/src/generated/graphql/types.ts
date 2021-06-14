@@ -452,7 +452,7 @@ export type BsdasriEdge = {
 export type BsdasriEmission = {
   __typename?: "BsdasriEmission";
   wasteCode?: Maybe<Scalars["String"]>;
-  wasteDetails?: Maybe<BsdasriWasteDetails>;
+  wasteDetails?: Maybe<BsdasriEmissionWasteDetails>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
   signature?: Maybe<BsdasriSignature>;
   /** Emporté sans signature PRED avec son autorisation prélalable */
@@ -465,6 +465,17 @@ export type BsdasriEmissionInput = {
   wasteCode?: Maybe<Scalars["String"]>;
   wasteDetails?: Maybe<BsdasriWasteDetailInput>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
+};
+
+/** Détail sur le déchet emis du Bsdasri */
+export type BsdasriEmissionWasteDetails = {
+  __typename?: "BsdasriEmissionWasteDetails";
+  /** Quantité en kg */
+  quantity?: Maybe<Scalars["Int"]>;
+  quantityType?: Maybe<QuantityType>;
+  volume?: Maybe<Scalars["Int"]>;
+  packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
+  onuCode?: Maybe<Scalars["String"]>;
 };
 
 /** Émetteur du Bsdasri, Personne responsable de l'émimination des déchets (PRED) */
@@ -759,14 +770,14 @@ export type BsdasriWasteDetailInput = {
   onuCode?: Maybe<Scalars["String"]>;
 };
 
-/** Détail sur le déchet proprement dit du Bsdasri */
+/** Détail sur le déchet transporté ou reçu du Bsdasri */
 export type BsdasriWasteDetails = {
   __typename?: "BsdasriWasteDetails";
+  /** Quantité en kg */
   quantity?: Maybe<Scalars["Int"]>;
   quantityType?: Maybe<QuantityType>;
   volume?: Maybe<Scalars["Int"]>;
   packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
-  onuCode?: Maybe<Scalars["String"]>;
 };
 
 export type BsdasriWhere = {
@@ -3054,7 +3065,7 @@ export type MutationCreateBsdaArgs = {
 };
 
 export type MutationCreateBsdasriArgs = {
-  bsdasriCreateInput: BsdasriCreateInput;
+  input: BsdasriCreateInput;
 };
 
 export type MutationCreateBsffArgs = {
@@ -3074,7 +3085,7 @@ export type MutationCreateDraftBsdaArgs = {
 };
 
 export type MutationCreateDraftBsdasriArgs = {
-  bsdasriCreateInput: BsdasriCreateInput;
+  input: BsdasriCreateInput;
 };
 
 export type MutationCreateDraftBsvhuArgs = {
@@ -3304,12 +3315,12 @@ export type MutationSignBsdaArgs = {
 
 export type MutationSignBsdasriArgs = {
   id: Scalars["ID"];
-  signatureInput: BsdasriSignatureInput;
+  input: BsdasriSignatureInput;
 };
 
 export type MutationSignBsdasriEmissionWithSecretCodeArgs = {
   id: Scalars["ID"];
-  signatureInput: BsdasriSignatureWithSecretCodeInput;
+  input: BsdasriSignatureWithSecretCodeInput;
 };
 
 export type MutationSignBsffArgs = {
@@ -3349,7 +3360,7 @@ export type MutationUpdateBsdaArgs = {
 
 export type MutationUpdateBsdasriArgs = {
   id: Scalars["ID"];
-  bsdasriUpdateInput: BsdasriUpdateInput;
+  input: BsdasriUpdateInput;
 };
 
 export type MutationUpdateBsffArgs = {

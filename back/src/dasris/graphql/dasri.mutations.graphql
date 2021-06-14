@@ -163,7 +163,7 @@ type Mutation {
   """
   createDraftBsdasri(
     "Payload de création d'un dasri brouillon"
-    bsdasriCreateInput: BsdasriCreateInput!
+    input: BsdasriCreateInput!
   ): Bsdasri!
 
   """
@@ -172,7 +172,7 @@ type Mutation {
   """
   createBsdasri(
     "Payload de création d'un dasri"
-    bsdasriCreateInput: BsdasriCreateInput!
+    input: BsdasriCreateInput!
   ): Bsdasri!
 
   """
@@ -184,7 +184,7 @@ type Mutation {
     "Identifiant unique du bordereau"
     id: ID!
     "Payload de mise à jour d'un dasri"
-    bsdasriUpdateInput: BsdasriUpdateInput!
+    input: BsdasriUpdateInput!
   ): Bsdasri!
 
   """
@@ -203,7 +203,7 @@ type Mutation {
   Pour signer l'emission avec un compte transpoteur (cas de lasignature sur device transporteur),
   utiliser la mutation signBsdasriEmissionWithSecretCode
   """
-  signBsdasri(id: ID!, signatureInput: BsdasriSignatureInput!): Bsdasri
+  signBsdasri(id: ID!, input: BsdasriSignatureInput!): Bsdasri
 
   """
   EXPERIMENTAL - Ne pas utiliser dans un contexte de production
@@ -212,7 +212,7 @@ type Mutation {
   """
   signBsdasriEmissionWithSecretCode(
     id: ID!
-    signatureInput: BsdasriSignatureWithSecretCodeInput!
+    input: BsdasriSignatureWithSecretCodeInput!
   ): Bsdasri
   """
   EXPERIMENTAL - Ne pas utiliser dans un contexte de production

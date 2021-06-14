@@ -17,6 +17,7 @@ const request = supertest(app);
 
 describe("Exemples de circuit du bordereau de suivi DASRI", () => {
   beforeEach(resetDatabase);
+  beforeAll(resetDatabase);
 
   /**
    * Helper function to return a user token
@@ -73,7 +74,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
       const createBsdasri = `
         mutation {
           createBsdasri(
-            bsdasriCreateInput: {
+            input: {
               emitter: {
                 company: {
                   siret: "${pred.siret}"
@@ -138,7 +139,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
         mutation {
           signBsdasri(
             id : "${bsdasri.id}"
-            signatureInput: { type: EMISSION, author: "Dr Brun" }
+            input: { type: EMISSION, author: "Dr Brun" }
           ) {
             id
             status
@@ -159,7 +160,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
         mutation {
           updateBsdasri(
             id: "${bsdasri.id}",
-            bsdasriUpdateInput: {
+            input: {
               transport: {
                 wasteAcceptation: { status: ACCEPTED }
                 wasteDetails: {
@@ -188,7 +189,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
         mutation {
           signBsdasri(
             id: "${bsdasri.id}"
-            signatureInput: { type: TRANSPORT author: "John" }
+            input: { type: TRANSPORT author: "John" }
           ){
             id
             status
@@ -208,7 +209,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
         mutation {
           updateBsdasri(
             id: "${bsdasri.id}",
-            bsdasriUpdateInput: {
+            input: {
               reception: {
                 wasteAcceptation: { status: ACCEPTED }
                 wasteDetails: {
@@ -237,7 +238,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
         mutation {
           signBsdasri(
             id: "${bsdasri.id}"
-            signatureInput: { type: RECEPTION, author: "Bob" }
+            input: { type: RECEPTION, author: "Bob" }
           ){
             id
             status
@@ -257,7 +258,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
         mutation {
           updateBsdasri(
             id: "${bsdasri.id}",
-            bsdasriUpdateInput: {
+            input: {
               operation: {
                 processingOperation: "D10",
                 processedAt: "2020-04-28"
@@ -281,7 +282,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
         mutation {
           signBsdasri(
             id: "${bsdasri.id}"
-            signatureInput: { type: OPERATION, author: "Bob" }
+            input: { type: OPERATION, author: "Bob" }
           ){
             id
             status
