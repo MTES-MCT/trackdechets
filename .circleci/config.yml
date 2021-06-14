@@ -3,7 +3,7 @@ version: 2.1
 executors:
   node:
     docker:
-      - image: circleci/node:10.13.0-browsers
+      - image: circleci/node:14.17.0-browsers
     working_directory: ~/project/trackdechets
 
 jobs:
@@ -16,11 +16,17 @@ jobs:
           name: "back: Install dependencies"
           command: npm ci --prefix back
       - run:
+          name: "back: Generate files"
+          command: npm run generate --prefix back
+      - run:
           name: "back: Run linter"
           command: npm run lint --prefix back
       - run:
           name: "front: Install dependencies"
           command: npm ci --prefix front
+      - run:
+          name: "front: Generate files"
+          command: npm run generate --prefix front
       - run:
           name: "front: Run linter"
           command: npm run lint --prefix front
@@ -34,7 +40,7 @@ jobs:
           name: "back: Install dependencies"
           command: npm ci --prefix back
       - run:
-          name: "back: Generate Prisma client"
+          name: "back: Generate files"
           command: npm run generate --prefix back
       - run:
           name: "back: Run typecheck"
@@ -42,6 +48,9 @@ jobs:
       - run:
           name: "front: Install dependencies"
           command: npm ci --prefix front
+      - run:
+          name: "back: Generate files"
+          command: npm run generate --prefix front
       - run:
           name: "front: Run typecheck"
           command: npm run types --prefix front

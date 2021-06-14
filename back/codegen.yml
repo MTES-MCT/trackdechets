@@ -18,14 +18,3 @@ generates:
     hooks:
       afterOneFileWrite:
         - prettier --config .prettierrc --write
-  ../front/src/generated/graphql/types.ts:
-    plugins:
-      - typescript
-      - typescript-operations
-    config:
-      scalars:
-        DateTime: string
-        URL: string
-    hooks:
-      afterOneFileWrite:
-        - prettier --config .prettierrc --write
