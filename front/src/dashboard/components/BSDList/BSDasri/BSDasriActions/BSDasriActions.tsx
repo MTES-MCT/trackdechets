@@ -11,7 +11,9 @@ import "@reach/menu-button/styles.css";
 import classNames from "classnames";
 import routes from "common/routes";
 import { useBsdasriDuplicate } from "./useDuplicate";
+import { DeleteBsdasriModal } from "./DeleteModal";
 import {
+  IconTrash,
   IconChevronDown,
   IconChevronUp,
   IconView,
@@ -32,6 +34,7 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
   const [duplicateBsdasri] = useBsdasriDuplicate({
     variables: { id: form.id },
   });
+  const [isDeleting, setIsDeleting] = React.useState(false);
 
   return (
     <>
@@ -65,8 +68,14 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
+              {form["bsdasriStatus"] === BsdasriStatus.Initial && (
+                <MenuItem onSelect={() => setIsDeleting(true)}>
+                  <IconTrash color="blueLight" size="24px" />
+                  Supprimer
+                </MenuItem>
+              )}
               {![BsdasriStatus.Processed, BsdasriStatus.Refused].includes(
-                form.status
+                form["bsdasriStatus"]
               ) && (
                 <>
                   <MenuLink
@@ -89,6 +98,13 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
           </>
         )}
       </Menu>
+      {isDeleting && (
+        <DeleteBsdasriModal
+          isOpen
+          onClose={() => setIsDeleting(false)}
+          formId={form.id}
+        />
+      )}
     </>
   );
 };
