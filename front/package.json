@@ -48,9 +48,9 @@
     "zxcvbn": "^4.4.2"
   },
   "scripts": {
-    "generate": "npm run generate:constants && npm run generate:types",
+    "generate": "npm run generate:constants && npm run generate:graphql",
     "generate:constants": "copyfiles ../back/src/common/constants/** ./src/generated/constants --flat",
-    "generate:types": "graphql-codegen --config codegen.yml",
+    "generate:graphql": "graphql-codegen --config codegen.yml",
     "predev": "npm run generate",
     "prebuild": "npm run generate",
     "dev": "react-scripts start",
