@@ -41,7 +41,7 @@ services:
 
   td-ui:
     stdin_open: true
-    image: node:10.14-alpine
+    image: node:14.15.4
     container_name: td-ui
     working_dir: /usr/src/front
     command: sh -c "npm install && npm run dev"
@@ -49,6 +49,7 @@ services:
       - "3000"
     volumes:
       - ./front/:/usr/src/front
+      - ./back/:/usr/src/back
     ports:
       - "3000:3000"
 
