@@ -1,4 +1,6 @@
 import React from "react";
+import { useBsdasriDuplicate } from "dashboard/components/BSDList/BSDasri/BSDasriActions/useDuplicate";
+import { generatePath, useHistory, useParams } from "react-router-dom";
 
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import {
@@ -6,13 +8,14 @@ import {
   FormCompany,
   BsdasriPackagingInfo,
 } from "generated/graphql/types";
-
+import routes from "common/routes";
 import { statusLabels } from "../../constants";
 import {
   IconWarehouseDelivery,
   IconWaterDam,
   IconRenewableEnergyEarth,
   IconBSDasri,
+  IconDuplicateFile,
 } from "common/components/Icons";
 
 import QRCodeIcon from "react-qr-code";
@@ -49,7 +52,7 @@ const Company = ({ company, label }: CompanyProps) => (
 );
 
 type SlipDetailContentProps = {
-  form: Bsdasri | null | undefined;
+  form: Bsdasri;
   children?: React.ReactNode;
   refetch?: () => void;
 };
@@ -267,10 +270,19 @@ export default function BsdasriDetailContent({
   children = null,
   refetch,
 }: SlipDetailContentProps) {
-  if (!form) {
-    return <div></div>;
-  }
+  const { siret } = useParams<{ siret: string }>();
+  const history = useHistory();
 
+  const [duplicate] = useBsdasriDuplicate({
+    variables: { id: form.id },
+    onCompleted: () => {
+      history.push(
+        generatePath(routes.dashboard.bsds.drafts, {
+          siret,
+        })
+      );
+    },
+  });
   return (
     <div className={styles.detail}>
       <div className={styles.detailSummary}>
@@ -352,7 +364,15 @@ export default function BsdasriDetailContent({
           </TabPanel>
         </div>
       </Tabs>
-      <div className={styles.detailActions}></div>
+      <div className={styles.detailActions}>
+        <button
+          className="btn btn--outline-primary"
+          onClick={() => duplicate()}
+        >
+          <IconDuplicateFile size="24px" color="blueLight" />
+          <span>Dupliquer</span>
+        </button>
+      </div>
     </div>
   );
 }
