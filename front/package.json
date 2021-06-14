@@ -52,7 +52,6 @@
     "generate:constants": "copyfiles ../back/src/common/constants/** ./src/generated/constants --flat",
     "generate:graphql": "graphql-codegen --config codegen.yml",
     "predev": "npm run generate",
-    "prebuild": "npm run generate",
     "dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
