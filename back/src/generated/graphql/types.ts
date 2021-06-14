@@ -2750,7 +2750,6 @@ export type Mutation = {
    * Finalise un BSD
    * Les champs suivants sont obligatoires pour pouvoir finaliser un bordereau et
    * doivent avoir été renseignés au préalable
-   *
    * ```
    * emitter: {
    *   type
@@ -2765,6 +2764,7 @@ export type Mutation = {
    * }
    * recipient: {
    *   processingOperation
+   *   cap // requis pour les déchets dangereux uniquement
    *   company: {
    *     siret
    *     name
@@ -2783,21 +2783,25 @@ export type Mutation = {
    *     mail
    *     phone
    *   }
+   *   isExemptedOfReceipt
    *   receipt
-   *   department
-   *   validityLimit
-   *   numberPlate
+   *   department // non requis si isExemptedOfReceipt=true
+   *   validityLimit // peut-être omis si isExemptedOfReceipt=true
+   *   numberPlate // peut-être omis si isExemptedOfReceipt=true
    * }
    * wasteDetails: {
    *   code
-   *   // onuCode est optionnel pour les déchets non-dangereux
-   *   onuCode
+   *   onuCode // requis pour les déchets dangereux uniquement
    *   name
-   *   packagings
-   *   numberOfPackages
+   *   packagings {
+   *     type
+   *     other // requis si type=OTHER
+   *     quantity
+   *   }
    *   quantity
    *   quantityType
    *   consistence
+   *   pop
    * }
    * ```
    */
