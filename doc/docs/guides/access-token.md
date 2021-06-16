@@ -1,7 +1,5 @@
 ---
 title: Obtenir un jeton d'accès personnel
-description: Obtenir un jeton d'accès personnel
-sidebar_position: 4
 ---
 
 Pour obtenir un token d'authentification à l'API, vous devez vous connecter à votre compte Trackdéchets sur [https://trackdechets.beta.gouv.fr](https://trackdechets.beta.gouv.fr). Rendez-vous ensuite dans *Mon Compte* > *Intégration API* puis *Générer un token*

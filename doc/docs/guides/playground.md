@@ -1,7 +1,5 @@
 ---
 title: Utilisation du playground
-description: Utilisation du playground
-sidebar_position: 5
 ---
 
 

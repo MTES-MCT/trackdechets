@@ -1,7 +1,5 @@
 ---
 title: Transport multi-modal
-description: Transport multi-modal
-sidebar_position: 2
 ---
 
 ## Multimodal

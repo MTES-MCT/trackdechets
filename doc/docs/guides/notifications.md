@@ -1,7 +1,5 @@
 ---
 title: Notifications
-description: Notifications
-sidebar_position: 8
 ---
 
 

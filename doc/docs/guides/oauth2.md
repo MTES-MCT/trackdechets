@@ -1,7 +1,5 @@
 ---
-id: oauth2
 title: OAuth2
-sidebar_position: 2
 ---
 
 :::note

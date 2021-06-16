@@ -1,7 +1,5 @@
 ---
-id: dasri
 title: Cycle de vie du BSDASRI
-sidebar_label: Cycle de vie du BSDASRI
 ---
 
 import Mermaid from '../../src/components/Mermaid';

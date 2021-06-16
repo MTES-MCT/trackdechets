@@ -1,7 +1,5 @@
 ---
 title: Environnements de tests
-description: Environnements de tests
-sidebar_position: 3
 ---
 
 Afin de permettre la réalisation de tests d'intégration, nous avons mis en place un environnement "bac à sable", miroir de la production mais avec une base de données séparée. Vous pouvez créer, modifier ou supprimer autant de BSD's de test que vous voulez sur cet environnement.

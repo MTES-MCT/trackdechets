@@ -1,7 +1,5 @@
 ---
-id: regroupement-dasri
-title: Regroupement de bordereaux dasri
-sidebar_label: Regroupement Dasri
+title: Regroupement
 ---
 
 _Avertissement: l'implémentation Dasri et cette documentation constituent une version Beta et sont destinées à l'évaluation des intégrateurs. L'api est suceptible d'évoluer_
@@ -61,9 +59,9 @@ Réponse
     "bsdasri": {
         "id": "DASRI-2021…",
       "regroupedBsdasris": [
-        "DASRI-2021…",  
-        "DASRI-2021…",  
-        "DASRI-2021…",  
+        "DASRI-2021…",
+        "DASRI-2021…",
+        "DASRI-2021…",
         "DASRI-2021…"
       ],
       "status": "PROCESSED"

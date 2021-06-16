@@ -1,7 +1,5 @@
 ---
 title: Faire des appels à l'API GraphQL
-description: description
-sidebar_position: 1
 ---
 
 

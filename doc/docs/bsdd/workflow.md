@@ -1,7 +1,5 @@
 ---
 title: Cycle de vie du BSDD
-description: Cycle de vie du bordereau
-sidebar_position: 2
 ---
 
 import Mermaid from '../../src/components/Mermaid';

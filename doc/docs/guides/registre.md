@@ -1,7 +1,5 @@
 ---
 title: Registre
-description: Registre
-sidebar_position: 6
 ---
 
 Il est possible d'exporter les données Trackdéchets correspondant aux différents types de registres réglementaires:
