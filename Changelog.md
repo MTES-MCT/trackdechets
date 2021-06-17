@@ -15,6 +15,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Signature de bordereaux dasri [PR 891](https://github.com/MTES-MCT/trackdechets/pull/891)
 - Duplication de bordereaux dasri [PR 892](https://github.com/MTES-MCT/trackdechets/pull/892)
 - Suppression de bordereaux dasri [PR 893](https://github.com/MTES-MCT/trackdechets/pull/893)
+- Gnération du pdf de bordereaux dasri [PR 898](https://github.com/MTES-MCT/trackdechets/pull/898)
+
 
 #### :boom: Breaking changes
 
