@@ -5,6 +5,7 @@ import { Bsd } from "generated/graphql/types";
 import routes from "common/routes";
 import { IconView } from "common/components/Icons";
 import { WorkflowAction } from "../BSDD/WorkflowAction";
+import { WorkflowAction as BsdasriWorkflowAction } from "../BSDasri/WorkflowAction";
 import { Column } from "../columns";
 import styles from "./BSDCards.module.scss";
 import { BsdTypename } from "dashboard/constants";
@@ -63,6 +64,9 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
             )}
             {form.__typename === "Form" ? (
               <WorkflowAction siret={siret} form={form} />
+            ) : null}
+            {form.__typename === "Bsdasri" ? (
+              <BsdasriWorkflowAction siret={siret} form={form} />
             ) : null}
           </div>
         </div>

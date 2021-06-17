@@ -32,7 +32,7 @@ export default function Recipient({ status }) {
 
       <div className="form__row">
         <label>
-          Champ libre
+          Champ libre (optionnel)
           <Field
             component="textarea"
             name="recipient.customInfo"
