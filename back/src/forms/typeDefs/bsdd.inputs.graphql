@@ -52,7 +52,7 @@ input AcceptedFormInput {
   "Statut d'acceptation du déchet (case 10)"
   wasteAcceptationStatus: WasteAcceptationStatusInput!
 
-  "Raison du refus (case 10)"
+  "Raison du refus (case 10). Obligatoire en cas de refus de déchet"
   wasteRefusalReason: String
 
   "Date à laquelle le déchet a été accepté ou refusé (case 10)"
@@ -61,7 +61,11 @@ input AcceptedFormInput {
   "Nom de la personne en charge de l'acceptation' du déchet (case 10)"
   signedBy: String!
 
-  "Quantité réelle présentée (case 10)"
+  """
+  Quantité réelle présentée (case 10).
+   Doit être supérieure à 0 lorsque le déchet est accepté.
+   Doit être égale à 0 lorsque le déchet est refusé.
+  """
   quantityReceived: Float!
 }
 
@@ -76,13 +80,17 @@ input ReceivedFormInput {
   "Statut d'acceptation du déchet (case 10)"
   wasteAcceptationStatus: WasteAcceptationStatusInput
 
-  "Raison du refus (case 10)"
+  "Raison du refus (case 10). Obligatoire en cas de refus de déchet"
   wasteRefusalReason: String
 
   "Date à laquelle le déchet a été accepté ou refusé (case 10)"
   signedAt: DateTime
 
-  "Quantité réelle présentée (case 10)"
+  """
+  Quantité réelle présentée (case 10).
+   Doit être supérieure à 0 lorsque le déchet est accepté.
+   Doit être égale à 0 lorsque le déchet est refusé.
+  """
   quantityReceived: Float
 }
 
@@ -249,9 +257,13 @@ input AppendixFormInput {
   readableId: ID
 }
 
-"Payload de liason d'un BSD à un eco-organisme"
+"Payload de liaison d'un BSD à un eco-organisme"
 input EcoOrganismeInput {
   name: String!
+  """
+  SIRET composé de 14 caractères correspondant à un éco-organisme. La liste des éco-organismes
+  est disponible via la [query ecoOrganismes](../user-company/queries#ecoorganismes)
+  """
   siret: String!
 }
 
@@ -267,7 +279,7 @@ input DestinationInput {
   """
   company: CompanyInput
 
-  "N° de CAP prévu (le cas échéant)"
+  "N° de CAP prévu (le cas échéant). Le champ CAP est obligatoire pour les déchets dangereux."
   cap: String
 
   "Opération d'élimination / valorisation prévue (code D/R)"
@@ -317,7 +329,7 @@ input WorkSiteInput {
 
 "Payload lié à un l'émetteur du BSD (case 1)"
 input EmitterInput {
-  "Type d'émetteur"
+  "Type d'émetteur. Le type d'émetteur doit être `OTHER` lorsqu'un éco-organisme est responsable du déchet"
   type: EmitterType
 
   "Adresse du chantier"
@@ -353,16 +365,16 @@ input TransporterInput {
   "Établissement collecteur - transporteur"
   company: CompanyInput
 
-  "Exemption de récipissé"
+  "Exemption de récépissé"
   isExemptedOfReceipt: Boolean
 
-  "N° de récipissé"
+  "N° de récipissé. Obligatoire lorsque l'exemption de récépissé n'est pas précisée"
   receipt: String
 
-  "Département"
+  "Département du récépissé. Obligatoire lorsque l'exemption de récépissé n'est pas précisée"
   department: String
 
-  "Limite de validité du récipissé"
+  "Limite de validité du récépissé. Obligatoire lorsque l'exemption de récépissé n'est pas précisée"
   validityLimit: DateTime
 
   "Numéro de plaque d'immatriculation"
@@ -407,10 +419,13 @@ input PackagingInfoInput {
   "Type de conditionnement"
   type: Packagings!
 
-  "Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"
+  "Description du conditionnement dans le cas où le type de conditionnement est `OTHER`"
   other: String
 
-  "Nombre de colis associés à ce conditionnement"
+  """
+  Nombre de colis associés à ce conditionnement. Dans le cas d'un conditionnemt BENNE ou CITERNE,
+  le nombre de colis ne peut être supérieur à 2.
+  """
   quantity: Int!
 }
 
@@ -439,10 +454,10 @@ input WasteDetailsInput {
   "Dénomination usuelle"
   name: String
 
-  "Code ONU"
+  "Code ONU. Obligatoire pour les déchets dangereux. Merci d'indiquer 'non soumis' si nécessaire."
   onuCode: String
 
-  "Conditionnements"
+  "Liste de conditionnements. Les conditionnements CITERNE et BENNE ne peuvent pas être associés à un autre conditionnement"
   packagingInfos: [PackagingInfoInput!]
 
   "DEPRECATED - Conditionnement"
@@ -477,10 +492,14 @@ input TempStorerAcceptedFormInput {
   "Statut d'acceptation du déchet (case 13)"
   wasteAcceptationStatus: WasteAcceptationStatusInput!
 
-  "Raison du refus (case 13)"
+  "Raison du refus (case 13). Obligatoire en cas de refus de déchet"
   wasteRefusalReason: String
 
-  "Quantité réelle présentée (case 13)"
+  """
+  Quantité réelle présentée (case 13)
+   Doit être supérieure à 0 lorsque le déchet est accepté.
+   Doit être égale à 0 lorsque le déchet est refusé.
+  """
   quantityReceived: Float!
 
   "Réelle ou estimée"
@@ -491,7 +510,7 @@ input TempStoredFormInput {
   "Statut d'acceptation du déchet (case 13)"
   wasteAcceptationStatus: WasteAcceptationStatusInput
 
-  "Raison du refus (case 13)"
+  "Raison du refus (case 13). Obligatoire en cas de refus de déchet"
   wasteRefusalReason: String
 
   "Nom de la personne en charge de la réception du déchet (case 13)"
@@ -503,7 +522,11 @@ input TempStoredFormInput {
   "Date à laquelle le déchet a été accepté ou refusé (case 13). Défaut à la date d'aujourd'hui."
   signedAt: DateTime
 
-  "Quantité réelle présentée (case 13)"
+  """
+  Quantité réelle présentée (case 13)
+   Doit être supérieure à 0 lorsque le déchet est accepté.
+   Doit être égale à 0 lorsque le déchet est refusé.
+  """
   quantityReceived: Float!
 
   "Réelle ou estimée"
