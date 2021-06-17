@@ -11171,7 +11171,7 @@ Transporteur du déchet (case 8)
 <td valign="top"><a href="#wastedetailsinput">WasteDetailsInput</a></td>
 <td>
 
-Détails du déchet (case 3)
+Détails du déchet (case 3 à 6)
 
 </td>
 </tr>
@@ -11441,7 +11441,7 @@ Transporteur du déchet (case 8)
 <td valign="top"><a href="#wastedetailsinput">WasteDetailsInput</a></td>
 <td>
 
-Détails du déchet (case 3)
+Détails du déchet (case 3 à 6)
 
 </td>
 </tr>
@@ -11553,7 +11553,7 @@ Transporteur du déchet (case 8)
 <td valign="top"><a href="#wastedetailsinput">WasteDetailsInput</a></td>
 <td>
 
-Détails du déchet (case 3)
+Détails du déchet (case 3 à 6)
 
 </td>
 </tr>
@@ -12041,7 +12041,7 @@ Destination finale du déchet (case 14)
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>wasteDetails</strong></td>
-<td valign="top"><a href="#wastedetailsinput">WasteDetailsInput</a></td>
+<td valign="top"><a href="#wastedetailsrepackaginginput">WasteDetailsRepackagingInput</a></td>
 <td>
 
 Détail du déchet en cas de reconditionnement (case 15 à 19)
@@ -12084,7 +12084,7 @@ Destination finale du déchet (case 14)
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>wasteDetails</strong></td>
-<td valign="top"><a href="#wastedetailsinput">WasteDetailsInput</a></td>
+<td valign="top"><a href="#wastedetailsrepackaginginput">WasteDetailsRepackagingInput</a></td>
 <td>
 
 Détail du déchet en cas de reconditionnement (case 15 à 19)
@@ -12706,7 +12706,7 @@ Transporteur du déchet (case 8)
 <td valign="top"><a href="#wastedetailsinput">WasteDetailsInput</a></td>
 <td>
 
-Détails du déchet (case 3)
+Détails du déchet (case 3 à 6)
 
 </td>
 </tr>
@@ -12752,7 +12752,7 @@ Annexe 2
 
 ### WasteDetailsInput
 
-Payload lié au détails du déchet (case 3, 4, 5, 6)
+Payload lié au détails du déchet (case 3 à 6)
 
 <table>
 <thead>
@@ -12874,6 +12874,58 @@ Consistance
 <td>
 
 Contient des Polluants Organiques Persistants (POP) oui / non
+
+</td>
+</tr>
+</tbody>
+</table>
+
+### WasteDetailsRepackagingInput
+
+Payload lié au reconditionnement (case 15 à 17)
+
+<table>
+<thead>
+<tr>
+<th colspan="2" align="left">Field</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>onuCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code ONU
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>packagingInfos</strong></td>
+<td valign="top">[<a href="#packaginginfoinput">PackagingInfoInput</a>!]</td>
+<td>
+
+Conditionnements
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantity</strong></td>
+<td valign="top"><a href="#float">Float</a></td>
+<td>
+
+Quantité en tonnes
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantityType</strong></td>
+<td valign="top"><a href="#quantitytype">QuantityType</a></td>
+<td>
+
+Réelle ou estimée
 
 </td>
 </tr>

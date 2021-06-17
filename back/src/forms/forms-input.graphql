@@ -159,7 +159,7 @@ input CreateFormInput {
   "Transporteur du déchet (case 8)"
   transporter: TransporterInput
 
-  "Détails du déchet (case 3)"
+  "Détails du déchet (case 3 à 6)"
   wasteDetails: WasteDetailsInput
 
   "Négociant (case 7)"
@@ -199,7 +199,7 @@ input UpdateFormInput {
   "Transporteur du déchet (case 8)"
   transporter: TransporterInput
 
-  "Détails du déchet (case 3)"
+  "Détails du déchet (case 3 à 6)"
   wasteDetails: WasteDetailsInput
 
   "Négociant (case 7)"
@@ -239,7 +239,7 @@ input FormInput {
   "Transporteur du déchet (case 8)"
   transporter: TransporterInput
 
-  "Détails du déchet (case 3)"
+  "Détails du déchet (case 3 à 6)"
   wasteDetails: WasteDetailsInput
 
   "Négociant (case 7)"
@@ -458,7 +458,7 @@ input PackagingInfoInput {
   quantity: Int!
 }
 
-"Payload lié au détails du déchet (case 3, 4, 5, 6)"
+"Payload lié au détails du déchet (case 3 à 6)"
 input WasteDetailsInput {
   """
   Code du déchet dangereux ou non-dangereux qui doit faire partie de la liste officielle du code de l'environnement :
@@ -511,6 +511,23 @@ input WasteDetailsInput {
   pop: Boolean
 }
 
+"""
+Payload lié au reconditionnement (case 15 à 17)
+"""
+input WasteDetailsRepackagingInput {
+  "Code ONU"
+  onuCode: String
+
+  "Conditionnements"
+  packagingInfos: [PackagingInfoInput!]
+
+  "Quantité en tonnes"
+  quantity: Float
+
+  "Réelle ou estimée"
+  quantityType: QuantityType
+}
+
 input TempStorerAcceptedFormInput {
   "Date à laquelle le déchet a été accepté ou refusé (case 13)."
   signedAt: DateTime!
@@ -560,7 +577,7 @@ input ResentFormInput {
   destination: DestinationInput
 
   "Détail du déchet en cas de reconditionnement (case 15 à 19)"
-  wasteDetails: WasteDetailsInput
+  wasteDetails: WasteDetailsRepackagingInput
 
   "Transporteur du déchet reconditionné"
   transporter: TransporterInput
@@ -578,7 +595,7 @@ input ResealedFormInput {
   destination: DestinationInput
 
   "Détail du déchet en cas de reconditionnement (case 15 à 19)"
-  wasteDetails: WasteDetailsInput
+  wasteDetails: WasteDetailsRepackagingInput
 
   "Transporteur du déchet reconditionné"
   transporter: TransporterInput
@@ -623,7 +640,7 @@ input ImportPaperFormInput {
   "Transporteur du déchet (case 8)"
   transporter: TransporterInput
 
-  "Détails du déchet (case 3)"
+  "Détails du déchet (case 3 à 6)"
   wasteDetails: WasteDetailsInput
 
   "Négociant (case 7)"
