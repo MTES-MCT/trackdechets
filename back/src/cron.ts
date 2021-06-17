@@ -1,28 +1,43 @@
 import * as cron from "cron";
 import {
-  sendOnboardingFirstStepMails,
-  sendOnboardingSecondStepMails
+  sendFirstOnboardingEmail,
+  sendSecondOnboardingEmail
 } from "./commands/onboarding.helpers";
 
-const everyMorning = "0 8 * * *";
+const {
+  FIRST_ONBOARDING_TEMPLATE_ID,
+  PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID,
+  PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
+} = process.env;
 
-const sendOnbardingEmailsEveryMorning = [
-  // first onboarding email
-  new cron.CronJob({
-    cronTime: everyMorning,
-    onTick: async function () {
-      await sendOnboardingFirstStepMails();
-    },
-    timeZone: "Europe/Paris"
-  }),
-  // second onbarding email
-  new cron.CronJob({
-    cronTime: everyMorning,
-    onTick: async function () {
-      await sendOnboardingSecondStepMails();
-    },
-    timeZone: "Europe/Paris"
-  })
-];
+let jobs = [];
 
-sendOnbardingEmailsEveryMorning.forEach(job => job.start());
+const shouldOnboard =
+  !!FIRST_ONBOARDING_TEMPLATE_ID &&
+  !!PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID &&
+  !!PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID;
+
+if (shouldOnboard) {
+  const everyMorning = "0 8 * * *";
+  jobs = [
+    ...jobs,
+    // first onboarding email
+    new cron.CronJob({
+      cronTime: everyMorning,
+      onTick: async function () {
+        await sendFirstOnboardingEmail();
+      },
+      timeZone: "Europe/Paris"
+    }),
+    // second onbarding email
+    new cron.CronJob({
+      cronTime: everyMorning,
+      onTick: async function () {
+        await sendSecondOnboardingEmail();
+      },
+      timeZone: "Europe/Paris"
+    })
+  ];
+}
+
+jobs.forEach(job => job.start());
