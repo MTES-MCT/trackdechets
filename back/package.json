@@ -57,6 +57,7 @@
     "camel-case": "^4.1.1",
     "connect-redis": "^4.0.4",
     "cors": "^2.8.5",
+    "cron": "^1.8.2",
     "csv-parser": "^2.3.3",
     "dataloader": "^1.4.0",
     "date-fns": "^2.14.0",
