@@ -2204,13 +2204,6 @@ export type Form = {
   signedAt?: Maybe<Scalars["DateTime"]>;
   /** Quantité réelle présentée (case 10) */
   quantityReceived?: Maybe<Scalars["Float"]>;
-  /**
-   * Quantité actuellement connue en tonnes.
-   * Elle est calculée en fonction des autres champs pour renvoyer la dernière quantité connue.
-   * Elle renvoi ainsi soit la quantité envoyée estimée, soit la quantitée recue
-   * sur le site d'entreposage, soit la quantitée réelle recue.
-   */
-  actualQuantity?: Maybe<Scalars["Float"]>;
   /** Traitement réalisé (code D/R) */
   processingOperationDone?: Maybe<Scalars["String"]>;
   /** Description de l'opération d’élimination / valorisation (case 11) */
@@ -7143,11 +7136,6 @@ export type FormResolvers<
     ParentType,
     ContextType
   >;
-  actualQuantity?: Resolver<
-    Maybe<ResolversTypes["Float"]>,
-    ParentType,
-    ContextType
-  >;
   processingOperationDone?: Resolver<
     Maybe<ResolversTypes["String"]>,
     ParentType,
@@ -11004,7 +10992,6 @@ export function createFormMock(props: Partial<Form>): Form {
     receivedAt: null,
     signedAt: null,
     quantityReceived: null,
-    actualQuantity: null,
     processingOperationDone: null,
     processingOperationDescription: null,
     processedBy: null,

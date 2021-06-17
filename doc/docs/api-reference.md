@@ -6141,17 +6141,6 @@ Quantité réelle présentée (case 10)
 </td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><strong>actualQuantity</strong></td>
-<td valign="top"><a href="#float">Float</a></td>
-<td>
-
-Quantité actuellement connue en tonnes.
-Elle est calculée en fonction des autres champs pour renvoyer la dernière quantité connue.
-Elle renvoi ainsi soit la quantité envoyée estimée, soit la quantitée recue sur le site d'entreposage, soit la quantitée réelle recue.
-
-</td>
-</tr>
-<tr>
 <td colspan="2" valign="top"><strong>processingOperationDone</strong></td>
 <td valign="top"><a href="#string">String</a></td>
 <td>
