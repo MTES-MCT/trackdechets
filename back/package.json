@@ -109,6 +109,7 @@
     "@types/body-parser": "^1.17.1",
     "@types/connect-redis": "^0.0.14",
     "@types/cors": "^2.8.6",
+    "@types/cron": "^1.7.2",
     "@types/express-rate-limit": "^5.1.0",
     "@types/express-serve-static-core": "^4.17.8",
     "@types/express-session": "^1.15.16",
