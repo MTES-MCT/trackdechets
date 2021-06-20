@@ -8,6 +8,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 # Next release
 
 #### :rocket: Nouvelles fonctionnalités
+- Ajout d'un bouton pour choisir le type de bordereau à créer [PR 899](https://github.com/MTES-MCT/trackdechets/pull/899)
 
 #### :boom: Breaking changes
 
