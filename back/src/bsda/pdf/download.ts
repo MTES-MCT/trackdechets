@@ -18,18 +18,11 @@ export default async function downloadPdf(
     where: { id }
   });
 
-  try {
-    const buffer = await buildPdf(bsda);
-    res.status(200);
-    res.type("html");
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment;filename=${bsda.id}.html`);
+  const buffer = await buildPdf(bsda);
+  res.status(200);
+  res.type("html");
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `attachment;filename=${bsda.id}.pdf`);
 
-    res.send(buffer);
-  } catch (err) {
-    console.log(err);
-
-    res.status(500);
-    res.send("Une erreur est survenue lors de la génération du PDF.");
-  }
+  res.send(buffer);
 }

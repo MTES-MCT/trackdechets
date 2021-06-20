@@ -42,7 +42,7 @@ export async function isFormContributor(user: User, form: Partial<Bsda>) {
   return siretsInCommon.length;
 }
 
-export async function checkCanDeleteBsdvhu(user: User, form: Bsda) {
+export async function checkCanDeleteBsda(user: User, form: Bsda) {
   await checkIsFormContributor(
     user,
     form,
