@@ -1,12 +1,10 @@
 import * as React from "react";
-import { generatePath, Link } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import classNames from "classnames";
 import { useMedia } from "use-media";
 import { Query, QueryBsdsArgs, BsdWhere } from "generated/graphql/types";
 import { MEDIA_QUERIES } from "common/config";
 import { GET_BSDS } from "common/queries";
-import routes from "common/routes";
 import Loader from "common/components/Loaders";
 import {
   IconLayout2,
@@ -18,6 +16,7 @@ import { BSDTable } from "./BSDTable";
 import { BSDCards } from "./BSDCards";
 import { COLUMNS, Column } from "./columns";
 import styles from "./BSDList.module.scss";
+import { NewBSDDropdown } from "./NewBSDDropdown";
 
 const DEFAULT_COLUMNS = [
   COLUMNS.type,
@@ -115,20 +114,7 @@ export function BSDList({
   return (
     <>
       <div className={styles.BSDListActions}>
-        <div>
-          <Link
-            to={generatePath(routes.dashboard.bsdds.create, { siret })}
-            className="btn btn--primary"
-          >
-            Créer un BSDD
-          </Link>
-          <Link
-            to={generatePath(routes.dashboard.bsdasris.create, { siret })}
-            className="btn btn--primary tw-ml-1"
-          >
-            Créer un BSDASRI
-          </Link>
-        </div>
+        <NewBSDDropdown siret={siret} />
         <button
           className="btn btn--primary"
           onClick={() => refetch()}
