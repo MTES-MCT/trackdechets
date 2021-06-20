@@ -3,7 +3,7 @@ import classNames from "classnames";
 import {
   IconLayout2,
   IconLayoutModule1,
-  IconRefresh
+  IconRefresh,
 } from "common/components/Icons";
 import Loader from "common/components/Loaders";
 import { MEDIA_QUERIES } from "common/config";
