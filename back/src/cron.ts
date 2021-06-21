@@ -22,7 +22,8 @@ const shouldOnboard =
   !!PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID;
 
 if (shouldOnboard) {
-  const everyMorning = "0 8 * * *";
+  // every morning at 8h08. Avoid sending it at 8h00 to prevent traffic congestions.
+  const everyMorning = "8 8 * * *";
   jobs = [
     ...jobs,
     // first onboarding email
