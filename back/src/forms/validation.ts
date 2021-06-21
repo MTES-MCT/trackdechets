@@ -700,6 +700,20 @@ const withoutNextDestination = yup.object().shape({
     .max(0, EXTRANEOUS_NEXT_DESTINATION)
 });
 
+const traceabilityBreakAllowed = yup.object({
+  noTraceability: yup.boolean().nullable()
+});
+
+const traceabilityBreakForbidden = yup.object({
+  noTraceability: yup
+    .boolean()
+    .nullable()
+    .notOneOf(
+      [true],
+      "Vous ne pouvez pas indiquer une rupture de traçabilité avec un code de traitement final"
+    )
+});
+
 // 11 - Réalisation de l’opération :
 const processedInfoSchemaFn: (
   value: any
@@ -713,15 +727,14 @@ const processedInfoSchemaFn: (
     processingOperationDone: yup
       .string()
       .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION),
-    processingOperationDescription: yup.string().nullable(),
-    noTraceability: yup.boolean().nullable()
+    processingOperationDescription: yup.string().nullable()
   });
 
   return PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
     value?.processingOperationDone
   )
-    ? base.concat(withNextDestination)
-    : base.concat(withoutNextDestination);
+    ? base.concat(withNextDestination).concat(traceabilityBreakAllowed)
+    : base.concat(withoutNextDestination).concat(traceabilityBreakForbidden);
 };
 
 export const processedInfoSchema = yup.lazy(processedInfoSchemaFn);

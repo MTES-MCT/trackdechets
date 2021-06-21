@@ -130,7 +130,7 @@ export const PROCESSING_OPERATIONS: ProcessingOperation[] = [
       "Traitement biologique non spécifié ailleurs dans la présente liste, aboutissant à des composés ou à des mélanges qui sont éliminés selon l'un des procédés numérotés D1 à D12"
   },
   {
-    type: ProcessingOperationType.Eliminiation,
+    type: ProcessingOperationType.Groupement,
     code: "D 9",
     description:
       "Traitement physico-chimique non spécifié ailleurs dans la présente liste, aboutissant à des composés ou à des mélanges qui sont éliminés selon l'un des procédés numérotés D1 à D12 ( par exemple, évaporation, séchage, calcination, etc …)"

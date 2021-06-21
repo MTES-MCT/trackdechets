@@ -7,7 +7,7 @@ export const statusLabels: { [key: string]: string } = {
   PROCESSED: "Traité",
   AWAITING_GROUP: "Traité, en attente de regroupement",
   GROUPED: "Annexé à un bordereau de regroupement",
-  NO_TRACEABILITY: "Regroupé, avec autorisation de perte de traçabilité",
+  NO_TRACEABILITY: "Regroupé, avec autorisation de rupture de traçabilité",
   REFUSED: "Refusé",
   TEMP_STORED: "Arrivé à l'entreposage provisoire, en attente d'acceptation",
   TEMP_STORER_ACCEPTED: "Entreposé temporairement ou en reconditionnement",

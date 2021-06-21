@@ -632,7 +632,7 @@ type Form {
   "Date à laquelle le déchet a été traité"
   processedAt: DateTime
 
-  "Si oui ou non il y a eu perte de traçabalité"
+  "Si oui ou non il y a eu rupture de traçabilité"
   noTraceability: Boolean
 
   "Destination ultérieure prévue (case 12)"
