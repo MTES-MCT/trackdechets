@@ -23,15 +23,14 @@ export default function FormContainer() {
                   title="PRED"
                   status={state}
                 />
-
-                <StepContainer
-                  component={Recipient}
-                  title="Installation destinataire"
-                  status={state}
-                />
                 <StepContainer
                   component={Transporter}
                   title="Collecteur - Transporteur"
+                  status={state}
+                />
+                <StepContainer
+                  component={Recipient}
+                  title="Installation destinataire"
                   status={state}
                 />
               </>

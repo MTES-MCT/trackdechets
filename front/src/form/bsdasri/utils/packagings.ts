@@ -42,5 +42,5 @@ export function getDasriPackagingInfosSummary(
     })
     .join(", ");
 
-  return `${total} colis : ${packages} Volume Total: ${totalVolume} l`;
+  return `${total} colis : ${packages} -  Volume Total: ${totalVolume} l`;
 }
