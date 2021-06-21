@@ -1,6 +1,4 @@
 import {
-  Company,
-  CompanyType,
   Consistence,
   EmitterType,
   Form,
@@ -21,7 +19,7 @@ import {
 } from "../common/constants";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { PackagingInfo, Packagings } from "../generated/graphql/types";
-
+import { isCollector, isWasteProcessor } from "../companies/validation";
 // set yup default error messages
 configureYup();
 
@@ -952,14 +950,6 @@ export async function checkCanBeSealed(form: Form) {
       throw err;
     }
   }
-}
-
-function isCollector(company: Company) {
-  return company.companyTypes.includes(CompanyType.COLLECTOR);
-}
-
-function isWasteProcessor(company: Company) {
-  return company.companyTypes.includes(CompanyType.WASTEPROCESSOR);
 }
 
 /**

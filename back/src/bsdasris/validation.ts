@@ -1,9 +1,11 @@
 import { WasteAcceptationStatus, QuantityType, Prisma } from "@prisma/client";
+import { isWasteProcessor } from "../companies/validation";
 
 import * as yup from "yup";
 import {
   DASRI_WASTE_CODES,
   DASRI_ALL_OPERATIONS_CODES,
+  DASRI_GROUPING_OPERATIONS_CODES,
   DASRI_PROCESSING_OPERATIONS_CODES
 } from "../common/constants";
 import configureYup from "../common/yup/configureYup";
@@ -12,6 +14,7 @@ import {
   BsdasriPackagings,
   BsdasriSignatureType
 } from "../generated/graphql/types";
+import prisma from "../prisma";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
 // set yup default error messages
@@ -544,7 +547,30 @@ export const operationSchema: FactorySchemaOf<
       .string()
       .label("Opération d’élimination / valorisation")
       .oneOf([...allowedOperations, "", null], INVALID_PROCESSING_OPERATION)
-      .requiredIf(context.operationSignature),
+
+      .requiredIf(context.operationSignature)
+      .test(
+        "recipientIsWasteProcessorForGroupingCodes",
+        "Les codes R12 et D12 sont réservés aux installations de tri transit regroupement",
+        async (value, ctx) => {
+          const recipientSiret = ctx.parent.recipientCompanySiret;
+
+          if (
+            DASRI_GROUPING_OPERATIONS_CODES.includes(value) &&
+            !!recipientSiret
+          ) {
+            const recipientCompany = await prisma.company.findUnique({
+              where: {
+                siret: recipientSiret
+              }
+            });
+
+            return isWasteProcessor(recipientCompany);
+          }
+
+          return true;
+        }
+      ),
     processedAt: yup.date().nullable().requiredIf(context.operationSignature)
   });
 };
@@ -567,6 +593,7 @@ export function validateBsdasri(
     .concat(recipientSchema(context))
     .concat(receptionSchema(context))
     .concat(operationSchema(context))
+
     .validate(dasri, { abortEarly: false });
 }
 

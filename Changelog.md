@@ -21,6 +21,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Suppression du statut de vérification de l'établissement dans Mon Compte en sandbox [PR 895](https://github.com/MTES-MCT/trackdechets/pull/895)
+- Les codes R12 et D12 autorisés uniquement si le destinataire est TTR [PR 901](https://github.com/MTES-MCT/trackdechets/pull/901)
+
 #### :memo: Documentation
 
 #### :house: Interne
