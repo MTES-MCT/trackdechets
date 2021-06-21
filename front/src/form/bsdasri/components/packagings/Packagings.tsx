@@ -46,6 +46,18 @@ export default function DasriPackagings({
                 >
                   <div className="tw-flex tw-mb-4 tw-items-end">
                     <div className="tw-w-11/12 tw-flex">
+                      <div className="tw-w-1/3 tw-px-2">
+                        <Field
+                          label="Nombre de colis"
+                          component={NumberInput}
+                          className="td-input"
+                          name={`${name}.${idx}.quantity`}
+                          placeholder="Nombre de colis"
+                          min="1"
+                          max={10}
+                          disabled={disabled}
+                        />
+                      </div>
                       <div className="tw-w-1/3 tw-pr-2">
                         <label>
                           Type
@@ -92,18 +104,7 @@ export default function DasriPackagings({
                           </label>
                         )}
                       </div>
-                      <div className="tw-w-1/3 tw-px-2">
-                        <Field
-                          label="Colis"
-                          component={NumberInput}
-                          className="td-input"
-                          name={`${name}.${idx}.quantity`}
-                          placeholder="Nombre de colis"
-                          min="1"
-                          max={10}
-                          disabled={disabled}
-                        />
-                      </div>
+
                       <div className="tw-w-1/3 tw-px-2">
                         <Field
                           label="Volume"
