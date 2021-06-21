@@ -5,6 +5,22 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# July release
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :boom: Breaking changes
+
+#### :bug: Corrections de bugs
+
+#### :nail_care: Améliorations
+
+- Les codes R12 et D12 autorisés uniquement si le destinataire est TTR [PR 901](https://github.com/MTES-MCT/trackdechets/pull/901)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # Next release
 
 #### :rocket: Nouvelles fonctionnalités
@@ -18,6 +34,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Correction du typage de `ResealedFormInput.wasteDetails` [PR 889](https://github.com/MTES-MCT/trackdechets/pull/889)
+
 #### :nail_care: Améliorations
 
 - Suppression du statut de vérification de l'établissement dans Mon Compte en sandbox [PR 895](https://github.com/MTES-MCT/trackdechets/pull/895)

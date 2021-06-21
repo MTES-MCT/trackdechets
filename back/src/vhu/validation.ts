@@ -159,7 +159,7 @@ const destinationSchema: FactorySchemaOf<
       .string()
       .requiredIf(
         context.operationSignature,
-        `Destinataire: le numéro d'agréément est obligatoire`
+        `Destinataire: le numéro d'agrément est obligatoire`
       ),
     destinationReceptionAcceptationStatus: yup
       .mixed<WasteAcceptationStatus>()
