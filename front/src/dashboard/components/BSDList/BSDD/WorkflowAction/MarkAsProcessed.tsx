@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Formik, Field, Form, useFormikContext } from "formik";
 import {
   PROCESSING_OPERATIONS,
@@ -32,7 +32,7 @@ const MARK_AS_PROCESSED = gql`
 
 function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   const {
-    values: { processingOperationDone, nextDestination },
+    values: { processingOperationDone, noTraceability, nextDestination },
     setFieldValue,
   } = useFormikContext<MutationMarkAsProcessedArgs["processedInfo"]>();
 
@@ -55,11 +55,14 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
           },
         });
       }
+      if (noTraceability == null) {
+        setFieldValue("noTraceability", false);
+      }
     } else {
       setFieldValue("nextDestination", null);
-      setFieldValue("noTraceability", false);
+      setFieldValue("noTraceability", null);
     }
-  }, [processingOperationDone, nextDestination, setFieldValue]);
+  }, [isGroupement, nextDestination, noTraceability, setFieldValue]);
 
   return (
     <Form>
@@ -209,7 +212,7 @@ export default function MarkAsProcessed({ form, siret }: WorkflowActionProps) {
               processedBy: "",
               processedAt: new Date().toISOString(),
               nextDestination: null,
-              noTraceability: false,
+              noTraceability: null,
             }}
             onSubmit={values => {
               markAsProcessed({
