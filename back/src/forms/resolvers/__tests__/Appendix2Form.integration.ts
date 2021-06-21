@@ -1,5 +1,6 @@
 import { CompanyType, Status, UserRole } from ".prisma/client";
 import { gql } from "apollo-server-express";
+import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   companyFactory,
   formFactory,
@@ -23,6 +24,8 @@ const FORM = gql`
 `;
 
 describe("Appendix2Form", () => {
+  afterAll(resetDatabase);
+
   it("should deny access to `emitter` field is user is not form contributor", async () => {
     const {
       user: emitterUser,
