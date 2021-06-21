@@ -1,5 +1,5 @@
 import { client, index } from "../../common/elastic";
-import { indexAllBsdasris } from "../../dasris/elastic";
+import { indexAllBsdasris } from "../../bsdasris/elastic";
 import { indexAllForms } from "../../forms/elastic";
 import { indexAllBsvhus } from "../../vhu/elastic";
 import prisma from "../../prisma";

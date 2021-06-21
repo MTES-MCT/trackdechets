@@ -22,9 +22,9 @@ import {
 } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
-import { indexBsdasri } from "../../../../dasris/elastic";
+import { indexBsdasri } from "../../../../bsdasris/elastic";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
-import { bsdasriFactory } from "../../../../dasris/__tests__/factories";
+import { bsdasriFactory } from "../../../../bsdasris/__tests__/factories";
 
 const CREATE_DRAFT_DASRI = `
 mutation CreateDraftDasri($input: BsdasriCreateInput!) {

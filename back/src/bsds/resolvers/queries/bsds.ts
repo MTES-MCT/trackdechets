@@ -17,7 +17,7 @@ import {
 } from "../../../common/elastic";
 import prisma from "../../../prisma";
 import { expandFormFromDb } from "../../../forms/form-converter";
-import { expandBsdasriFromDb } from "../../../dasris/dasri-converter";
+import { expandBsdasriFromDb } from "../../../bsdasris/dasri-converter";
 import { expandVhuFormFromDb } from "../../../vhu/converter";
 import { getUserCompanies } from "../../../users/database";
 
