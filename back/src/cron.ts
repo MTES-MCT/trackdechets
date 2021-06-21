@@ -1,17 +1,14 @@
 import * as cron from "cron";
-import * as Sentry from "@sentry/node";
 import {
   sendFirstOnboardingEmail,
   sendSecondOnboardingEmail
 } from "./commands/onboarding.helpers";
-import { CaptureConsole } from "@sentry/integrations";
+import { initSentry } from "./common/sentry";
 
 const {
   FIRST_ONBOARDING_TEMPLATE_ID,
   PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID,
-  PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID,
-  SENTRY_DSN,
-  SENTRY_ENVIRONMENT
+  PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
 } = process.env;
 
 let jobs = [];
@@ -45,13 +42,9 @@ if (shouldOnboard) {
   ];
 }
 
-if (SENTRY_DSN) {
-  Sentry.init({
-    dsn: SENTRY_DSN,
-    environment: SENTRY_ENVIRONMENT,
-    integrations: [new CaptureConsole({ levels: ["error"] })]
-  });
+const Sentry = initSentry();
 
+if (Sentry) {
   jobs.forEach(job => {
     const onTick = job.onTick;
     job.onTick = async () => {
