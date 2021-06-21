@@ -48,6 +48,48 @@ export type AdminForVerification = {
   phone?: Maybe<Scalars["String"]>;
 };
 
+/**
+ * Information sur le bordereau initial lors d'une réexpédition après transformation ou traitement aboutissant
+ * à des déchets dont la provenance reste identifiable (annexe 2)
+ */
+export type Appendix2Form = {
+  __typename?: "Appendix2Form";
+  /** Identifiant unique du bordereau initial */
+  id: Scalars["ID"];
+  /** Identifiant lisible du bordereau initial */
+  readableId: Scalars["String"];
+  /** Détails du déchet du bordereau initial (case 3) */
+  wasteDetails?: Maybe<WasteDetails>;
+  /**
+   * Émetteur du bordereau initial
+   * Les établissements apparaissant sur le bordereau de regroupement mais pas sur le bordereau initial (ex: l'exutoire finale)
+   * n'ont pas accès à ce champs pour préserver les informations commerciales de l'établissement effectuant le regroupemnt
+   */
+  emitter?: Maybe<Emitter>;
+  /**
+   * Code postal de l'émetteur du bordereau initial permettant aux établissements
+   * qui apparaissent sur le bordereau de regroupement
+   * mais pas sur le bordereau initial (ex: l'exutoire finale) de connaitre la zone de chalandise de l'émetteur initial.
+   */
+  emitterPostalCode?: Maybe<Scalars["String"]>;
+  /**
+   * Date d’acceptation du lot initial par l’installation réalisant une
+   * transformation ou un traitement aboutissant à des déchets
+   * dont la provenance reste identifiable. C'est la date qui figure au cadre 10 du bordereau initial.
+   */
+  signedAt?: Maybe<Scalars["DateTime"]>;
+  /**
+   * Quantité reçue par l’installation réalisant une transformation ou un traitement aboutissant à des déchets
+   * dont la provenance reste identifiable
+   */
+  quantityReceived?: Maybe<Scalars["Float"]>;
+  /**
+   * Opération de transformation ou un traitement aboutissant à des déchets dont la provenance reste identifiable effectuée
+   * par l'installation de regroupement
+   */
+  processingOperationDone?: Maybe<Scalars["String"]>;
+};
+
 /** Payload de création d'une annexe 2 */
 export type AppendixFormInput = {
   /** Identifiant unique du bordereau */
@@ -2258,7 +2300,7 @@ export type Form = {
   /** Destination ultérieure prévue (case 12) */
   nextDestination?: Maybe<NextDestination>;
   /** Annexe 2 */
-  appendix2Forms?: Maybe<Array<Form>>;
+  appendix2Forms?: Maybe<Array<Appendix2Form>>;
   ecoOrganisme?: Maybe<FormEcoOrganisme>;
   /** BSD suite - détail des champs de la partie entreposage provisoire ou reconditionnement */
   temporaryStorageDetail?: Maybe<TemporaryStorageDetail>;

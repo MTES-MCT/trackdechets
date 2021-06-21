@@ -1992,6 +1992,102 @@ Champ libre, utilisable par exemple pour noter les tournées des transporteurs
 
 ## Objects
 
+### Appendix2Form
+
+Information sur le bordereau initial lors d'une réexpédition après transformation ou traitement aboutissant
+à des déchets dont la provenance reste identifiable (annexe 2)
+
+<table>
+<thead>
+<tr>
+<th align="left">Field</th>
+<th align="right">Argument</th>
+<th align="left">Type</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="2" valign="top"><strong>id</strong></td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+Identifiant unique du bordereau initial
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>readableId</strong></td>
+<td valign="top"><a href="#string">String</a>!</td>
+<td>
+
+Identifiant lisible du bordereau initial
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>wasteDetails</strong></td>
+<td valign="top"><a href="#wastedetails">WasteDetails</a></td>
+<td>
+
+Détails du déchet du bordereau initial (case 3)
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emitter</strong></td>
+<td valign="top"><a href="#emitter">Emitter</a></td>
+<td>
+
+Émetteur du bordereau initial
+Les établissements apparaissant sur le bordereau de regroupement mais pas sur le bordereau initial (ex: l'exutoire finale)
+n'ont pas accès à ce champs pour préserver les informations commerciales de l'établissement effectuant le regroupemnt
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>emitterPostalCode</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Code postal de l'émetteur du bordereau initial permettant aux établissements qui apparaissent sur le bordereau de regroupement
+mais pas sur le bordereau initial (ex: l'exutoire finale) de connaitre la zone de chalandise de l'émetteur initial.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>signedAt</strong></td>
+<td valign="top"><a href="#datetime">DateTime</a></td>
+<td>
+
+Date d’acceptation du lot initial par l’installation réalisant une transformation ou un traitement aboutissant à des déchets
+dont la provenance reste identifiable. C'est la date qui figure au cadre 10 du bordereau initial.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>quantityReceived</strong></td>
+<td valign="top"><a href="#float">Float</a></td>
+<td>
+
+Quantité reçue par l’installation réalisant une transformation ou un traitement aboutissant à des déchets
+dont la provenance reste identifiable
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>processingOperationDone</strong></td>
+<td valign="top"><a href="#string">String</a></td>
+<td>
+
+Opération de transformation ou un traitement aboutissant à des déchets dont la provenance reste identifiable effectuée
+par l'installation de regroupement
+
+</td>
+</tr>
+</tbody>
+</table>
+
 ### AuthPayload
 
 Cet objet est renvoyé par la mutation login qui est dépréciée
@@ -6196,7 +6292,7 @@ Destination ultérieure prévue (case 12)
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>appendix2Forms</strong></td>
-<td valign="top">[<a href="#form">Form</a>!]</td>
+<td valign="top">[<a href="#appendix2form">Appendix2Form</a>!]</td>
 <td>
 
 Annexe 2

@@ -639,7 +639,7 @@ type Form {
   nextDestination: NextDestination
 
   "Annexe 2"
-  appendix2Forms: [Form!]
+  appendix2Forms: [Appendix2Form!]
 
   ecoOrganisme: FormEcoOrganisme
 
@@ -653,6 +653,45 @@ type Form {
 
   currentTransporterSiret: String
   nextTransporterSiret: String
+}
+
+"""
+Information sur le bordereau initial lors d'une réexpédition après transformation ou traitement aboutissant
+à des déchets dont la provenance reste identifiable (annexe 2)
+"""
+type Appendix2Form {
+  "Identifiant unique du bordereau initial"
+  id: ID!
+  "Identifiant lisible du bordereau initial"
+  readableId: String!
+  "Détails du déchet du bordereau initial (case 3)"
+  wasteDetails: WasteDetails
+  """
+  Émetteur du bordereau initial
+  Les établissements apparaissant sur le bordereau de regroupement mais pas sur le bordereau initial (ex: l'exutoire finale)
+  n'ont pas accès à ce champs pour préserver les informations commerciales de l'établissement effectuant le regroupemnt
+  """
+  emitter: Emitter
+  """
+  Code postal de l'émetteur du bordereau initial permettant aux établissements qui apparaissent sur le bordereau de regroupement
+  mais pas sur le bordereau initial (ex: l'exutoire finale) de connaitre la zone de chalandise de l'émetteur initial.
+  """
+  emitterPostalCode: String
+  """
+  Date d’acceptation du lot initial par l’installation réalisant une transformation ou un traitement aboutissant à des déchets
+  dont la provenance reste identifiable. C'est la date qui figure au cadre 10 du bordereau initial.
+  """
+  signedAt: DateTime
+  """
+  Quantité reçue par l’installation réalisant une transformation ou un traitement aboutissant à des déchets
+  dont la provenance reste identifiable
+  """
+  quantityReceived: Float
+  """
+  Opération de transformation ou un traitement aboutissant à des déchets dont la provenance reste identifiable effectuée
+  par l'installation de regroupement
+  """
+  processingOperationDone: String
 }
 
 """
