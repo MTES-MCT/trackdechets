@@ -1,14 +1,22 @@
 import * as React from "react";
 import { Link, generatePath, useParams, useLocation } from "react-router-dom";
-import { Menu, MenuButton, MenuList, MenuLink } from "@reach/menu-button";
+import {
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuLink,
+  MenuItem,
+} from "@reach/menu-button";
 import "@reach/menu-button/styles.css";
 import classNames from "classnames";
 import routes from "common/routes";
+import { useBsdasriDuplicate } from "./useDuplicate";
 import {
   IconChevronDown,
   IconChevronUp,
   IconView,
   IconPaperWrite,
+  IconDuplicateFile,
 } from "common/components/Icons";
 import { Bsdasri, BsdasriStatus } from "generated/graphql/types";
 
@@ -21,6 +29,9 @@ interface BSDAsriActionsProps {
 export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
   const { siret } = useParams<{ siret: string }>();
   const location = useLocation();
+  const [duplicateBsdasri] = useBsdasriDuplicate({
+    variables: { id: form.id },
+  });
 
   return (
     <>
@@ -70,6 +81,10 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
                   </MenuLink>
                 </>
               )}
+              <MenuItem onSelect={() => duplicateBsdasri()}>
+                <IconDuplicateFile size="24px" color="blueLight" />
+                Dupliquer
+              </MenuItem>
             </MenuList>
           </>
         )}
