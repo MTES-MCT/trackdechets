@@ -132,7 +132,7 @@ const emitterSchema: FactorySchemaOf<VhuValidationContext, Emitter> = context =>
       .string()
       .requiredIf(
         context.emissionSignature,
-        `Émetteur: le numéro d'agréément est obligatoire`
+        `Émetteur: le numéro d'agrément est obligatoire`
       )
   });
 
