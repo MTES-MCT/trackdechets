@@ -13,22 +13,23 @@ const createBsff: MutationResolvers["createBsff"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
-  const flatInput = flattenBsffInput(input);
+  const flatInput: Prisma.BsffCreateInput = {
+    ...flattenBsffInput(input),
+    id: getReadableId(ReadableIdPrefix.FF)
+  };
 
   await isBsffContributor(user, flatInput);
 
   if (input.bsffs?.length > 0) {
     await canAssociateBsffs(input.bsffs);
-    (flatInput as Prisma.BsffCreateInput).bsffs = {
+    flatInput.bsffs = {
       connect: input.bsffs.map(id => ({ id }))
     };
   }
 
+  const data: Prisma.BsffCreateInput = flatInput;
   const bsff = await prisma.bsff.create({
-    data: {
-      id: getReadableId(ReadableIdPrefix.FF),
-      ...flatInput
-    }
+    data
   });
   return {
     ...unflattenBsff(bsff),

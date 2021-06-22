@@ -25,10 +25,10 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     );
   }
 
-  let data = flattenBsffInput(input);
+  let flatInput = flattenBsffInput(input);
 
   if (existingBsff.emitterEmissionSignatureDate) {
-    data = omit(data, [
+    flatInput = omit(flatInput, [
       "emitterCompanyAddress",
       "emitterCompanyContact",
       "emitterCompanyMail",
@@ -45,7 +45,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   }
 
   if (existingBsff.transporterTransportSignatureDate) {
-    data = omit(data, [
+    flatInput = omit(flatInput, [
       "transporterCompanyAddress",
       "transporterCompanyContact",
       "transporterCompanyMail",
@@ -63,7 +63,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   }
 
   if (existingBsff.destinationReceptionDate) {
-    data = omit(data, [
+    flatInput = omit(flatInput, [
       "destinationCompanyAddress",
       "destinationCompanyContact",
       "destinationCompanyMail",
@@ -77,11 +77,13 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     ]);
   }
 
-  await isBsffContributor(user, { ...existingBsff, ...data });
+  await isBsffContributor(user, { ...existingBsff, ...flatInput });
+
+  const data: Prisma.BsffUpdateInput = flatInput;
 
   if (input.bsffs?.length > 0) {
     await canAssociateBsffs(input.bsffs);
-    (data as Prisma.BsffUpdateInput).bsffs = {
+    data.bsffs = {
       set: input.bsffs.map(id => ({ id }))
     };
   }
