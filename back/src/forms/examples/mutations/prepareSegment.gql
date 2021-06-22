@@ -1,0 +1,10 @@
+mutation PrepareSegment(
+  $id: ID!
+  $siret: String!
+  $nextSegmentInfo: NextSegmentInfoInput!
+) {
+  prepareSegment(id: $id, siret: $siret, nextSegmentInfo: $nextSegmentInfo) {
+    id
+    mode
+  }
+}

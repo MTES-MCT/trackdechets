@@ -15,7 +15,7 @@
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
     "docs": "yarn docs:user-company && yarn docs:bsdd && yarn docs:bsdasri && yarn docs:bsff && yarn docs:bsda && yarn docs:bsvhu",
-    "docs:user-company":"docusaurus docs:generate:graphql:user-company",
+    "docs:user-company": "docusaurus docs:generate:graphql:user-company",
     "docs:bsdd": "docusaurus docs:generate:graphql:bsdd",
     "docs:bsdasri": "docusaurus docs:generate:graphql:bsdasri",
     "docs:bsff": "docusaurus docs:generate:graphql:bsff",
@@ -23,14 +23,15 @@
     "docs:bsvhu": "docusaurus docs:generate:graphql:bsvhu"
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-beta.0",
-    "@docusaurus/preset-classic": "2.0.0-beta.0",
+    "@docusaurus/core": "2.0.0-beta.2",
+    "@docusaurus/preset-classic": "2.0.0-beta.2",
     "@mdx-js/react": "^1.6.21",
     "@svgr/webpack": "^5.5.0",
     "clsx": "^1.1.1",
     "docusaurus-graphql-plugin": "^0.4.0",
     "file-loader": "^6.2.0",
     "mermaid": "^8.10.2",
+    "raw-loader": "^4.0.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "url-loader": "^4.1.1"

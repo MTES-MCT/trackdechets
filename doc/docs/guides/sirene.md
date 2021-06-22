@@ -1,14 +1,10 @@
 ---
-title: API SIRENE enrichie
-description: API SIRENE enrichie
-sidebar_position: 6
+title: Rechercher un établissement partenaire par son n° SIRET
 ---
 
-### Rechercher un établissement par son SIRET
+Nous exposons une query `companyInfos` qui interroge la base SIRENE (via [l'API de l'INSEE](https://api.insee.fr/catalogue/)), la base des installations classées pour la protection de l'environnement (ICPE) et la base Trackdéchets pour obtenir des informations sur un établissement à partir de son numéro SIRET.
 
-Nous exposons une query `companyInfos` qui interroge la base SIRENE (via [https://entreprise.data.gouv.fr](https://entreprise.data.gouv.fr)), la base des installations classées pour la protection de l'environnement (ICPE) et la base Trackdéchets pour obtenir des informations sur un établissement à partir de son numéro SIRET.
-
-La query renvoie un objet de type [`CompanyPublic`](../api-reference/user-company/objects#companypublic) et permet notamment de savoir si un établissement est inscrit sur Trackdéchets grâce au champ `isRegistered`.
+La query renvoie un objet de type [`CompanyPublic`](../reference/api-reference/user-company/objects#companypublic) et permet notamment de savoir si un établissement est inscrit sur Trackdéchets grâce au champ `isRegistered`. Voir le détail de la query dans la [référence de l'API](../reference/api-reference/user-company/queries#companyinfos).
 
 Exemple d'utilisation:
 
