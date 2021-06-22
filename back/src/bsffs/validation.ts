@@ -381,7 +381,7 @@ export async function canAssociateBsffs(ids: string[]) {
     )
   ) {
     throw new UserInputError(
-      `Les bordereaux à associer ont déclaré des traitements qui divergent et ne peuvent pas être listés sur un même bordereau`
+      `Les bordereaux à associer ont déclaré des traitements différents et ne peuvent pas être listés sur un même bordereau`
     );
   }
 }
