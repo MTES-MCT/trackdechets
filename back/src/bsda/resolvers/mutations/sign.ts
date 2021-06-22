@@ -8,7 +8,7 @@ import {
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
-import { AlreadySignedError, InvalidSignatureError } from "../../../vhu/errors";
+import { AlreadySignedError, InvalidSignatureError } from "../../../bsvhu/errors";
 import { expandBsdaFromDb } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
 import { indexBsda } from "../../elastic";

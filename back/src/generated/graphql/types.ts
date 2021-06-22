@@ -1421,9 +1421,9 @@ export type Bsvhu = {
   /** Numéro unique attribué par Trackdéchets */
   id: Scalars["ID"];
   /** Date de création */
-  createdAt: Scalars["DateTime"];
+  createdAt?: Maybe<Scalars["DateTime"]>;
   /** Date de dernière modification */
-  updatedAt: Scalars["DateTime"];
+  updatedAt?: Maybe<Scalars["DateTime"]>;
   /** Indique si le bordereau est à l'état de brouillon */
   isDraft: Scalars["Boolean"];
   /** Status du bordereau */
@@ -6579,8 +6579,16 @@ export type BsvhuResolvers<
   ParentType extends ResolversParentTypes["Bsvhu"] = ResolversParentTypes["Bsvhu"]
 > = {
   id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
-  createdAt?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
-  updatedAt?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
+  createdAt?: Resolver<
+    Maybe<ResolversTypes["DateTime"]>,
+    ParentType,
+    ContextType
+  >;
+  updatedAt?: Resolver<
+    Maybe<ResolversTypes["DateTime"]>,
+    ParentType,
+    ContextType
+  >;
   isDraft?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;
   status?: Resolver<ResolversTypes["BsvhuStatus"], ParentType, ContextType>;
   emitter?: Resolver<
@@ -10575,8 +10583,8 @@ export function createBsvhuMock(props: Partial<Bsvhu>): Bsvhu {
   return {
     __typename: "Bsvhu",
     id: "",
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: null,
+    updatedAt: null,
     isDraft: false,
     status: "INITIAL",
     emitter: null,
