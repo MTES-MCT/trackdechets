@@ -270,7 +270,7 @@ describe("Mutation.createBsff", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message: `Les bordereaux à associer ont déclaré des traitements qui différents et ne peuvent pas être listés sur un même bordereau`
+          message: `Les bordereaux à associer ont déclaré des traitements différents et ne peuvent pas être listés sur un même bordereau`
         })
       ]);
     });
@@ -318,7 +318,7 @@ describe("Mutation.createBsff", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message: `Les bordereaux à associer ont déclaré des traitements qui différents et ne peuvent pas être listés sur un même bordereau`
+          message: `Les bordereaux à associer ont déclaré des traitements différents et ne peuvent pas être listés sur un même bordereau`
         })
       ]);
     });
