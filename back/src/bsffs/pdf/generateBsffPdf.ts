@@ -85,7 +85,7 @@ export async function generateBsffPdf(bsff: Bsff) {
       bsff,
       bsffType,
       bsffOperation,
-      packagings: (bsff.packagings as BsffPackaging[])
+      packagings: ((bsff.packagings ?? []) as BsffPackaging[])
         .map(
           packaging =>
             `${packaging.type} ${packaging.numero} : ${packaging.litres} litre(s)`
