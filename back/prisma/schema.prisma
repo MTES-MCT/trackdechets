@@ -823,7 +823,7 @@ model Bsff {
   wasteDescription String?
   wasteAdr         String?
 
-  quantityKilos      Int?
+  quantityKilos      Float?
   quantityIsEstimate Boolean @default(false)
 
   transporterCompanyName      String?
@@ -850,7 +850,7 @@ model Bsff {
   destinationCompanyMail    String?
 
   destinationReceptionDate    DateTime?
-  destinationReceptionKilos   Int?
+  destinationReceptionKilos   Float?
   destinationReceptionRefusal String?
 
   destinationReceptionSignatureAuthor String?
@@ -887,7 +887,7 @@ model BsffFicheIntervention {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   numero     String
-  kilos      Int
+  kilos      Float
   postalCode String
 
   ownerCompanyName    String
