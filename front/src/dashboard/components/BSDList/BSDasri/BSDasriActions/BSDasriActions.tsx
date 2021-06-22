@@ -19,9 +19,10 @@ import {
   IconView,
   IconPaperWrite,
   IconDuplicateFile,
+  IconPdf,
 } from "common/components/Icons";
 import { Bsdasri, BsdasriStatus } from "generated/graphql/types";
-
+import { useDownloadPdf } from "./useDownloadPdf";
 import styles from "../../BSDActions.module.scss";
 
 interface BSDAsriActionsProps {
@@ -35,6 +36,7 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
     variables: { id: form.id },
   });
   const [isDeleting, setIsDeleting] = React.useState(false);
+  const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
 
   return (
     <>
@@ -72,6 +74,12 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
                 <MenuItem onSelect={() => setIsDeleting(true)}>
                   <IconTrash color="blueLight" size="24px" />
                   Supprimer
+                </MenuItem>
+              )}
+              {!form.isDraft && (
+                <MenuItem onSelect={() => downloadPdf()}>
+                  <IconPdf size="24px" color="blueLight" />
+                  Pdf
                 </MenuItem>
               )}
               {![BsdasriStatus.Processed, BsdasriStatus.Refused].includes(
