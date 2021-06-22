@@ -164,7 +164,7 @@ export type BrokerReceipt = {
   department: Scalars["String"];
 };
 
-export type Bsd = Form | Bsdasri | Bsvhu;
+export type Bsd = Form | Bsdasri | Bsvhu | Bsda;
 
 export type Bsda = {
   __typename?: "Bsda";
@@ -316,8 +316,10 @@ export type BsdaInput = {
   destination?: Maybe<BsdaDestinationInput>;
   /** Entreprise de travaux */
   worker?: Maybe<BsdaWorkerInput>;
-  /**  Entreprise de transport */
+  /** Entreprise de transport */
   transporter?: Maybe<BsdaTransporterInput>;
+  /** Précédents bordereaux à associer à celui ci - cas du transit, entreposage provisoire ou groupement */
+  associations?: Maybe<Array<Scalars["ID"]>>;
 };
 
 export type BsdaOperation = {
@@ -1016,7 +1018,7 @@ export type BsdEdge = {
   node: Bsd;
 };
 
-export type BsdType = "BSDD" | "BSDASRI" | "BSVHU";
+export type BsdType = "BSDD" | "BSDASRI" | "BSVHU" | "BSDA";
 
 export type BsdWhere = {
   readableId?: Maybe<Scalars["String"]>;
@@ -2685,6 +2687,11 @@ export type Mutation = {
   deleteBrokerReceipt?: Maybe<BrokerReceipt>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Supprime un Bsda
+   */
+  deleteBsda?: Maybe<Bsda>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Supprime un BSDASRI
    */
   deleteBsdasri?: Maybe<Bsdasri>;
@@ -3098,6 +3105,10 @@ export type MutationCreateVhuAgrementArgs = {
 
 export type MutationDeleteBrokerReceiptArgs = {
   input: DeleteBrokerReceiptInput;
+};
+
+export type MutationDeleteBsdaArgs = {
+  id: Scalars["ID"];
 };
 
 export type MutationDeleteBsdasriArgs = {
@@ -3552,6 +3563,12 @@ export type Query = {
   appendixForms: Array<Form>;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsda: Bsda;
+  /**
+   * Renvoie un token pour télécharger un pdf de bordereau
+   * Ce token doit être transmis à la route /download pour obtenir le fichier.
+   * Il est valable 10 secondes
+   */
+  bsdaPdf: FileDownload;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsdas: BsdaConnection;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
@@ -3679,6 +3696,11 @@ export type QueryAppendixFormsArgs = {
 /** Views of the Company ressource for the admin panel */
 export type QueryBsdaArgs = {
   id: Scalars["ID"];
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsdaPdfArgs = {
+  id?: Maybe<Scalars["ID"]>;
 };
 
 /** Views of the Company ressource for the admin panel */
@@ -4734,6 +4756,7 @@ export type ResolversTypes = {
   BsdaRecepisse: ResolverTypeWrapper<BsdaRecepisse>;
   BsdaTransport: ResolverTypeWrapper<BsdaTransport>;
   BsdaAssociation: ResolverTypeWrapper<BsdaAssociation>;
+  FileDownload: ResolverTypeWrapper<FileDownload>;
   BsdaWhere: BsdaWhere;
   DateFilter: DateFilter;
   BsdaEmitterWhere: BsdaEmitterWhere;
@@ -4768,7 +4791,6 @@ export type ResolversTypes = {
   BsdasriMetadata: ResolverTypeWrapper<BsdasriMetadata>;
   BsdasriError: ResolverTypeWrapper<BsdasriError>;
   BsdasriSignatureType: BsdasriSignatureType;
-  FileDownload: ResolverTypeWrapper<FileDownload>;
   BsdasriWhere: BsdasriWhere;
   BsdasriEmitterWhere: BsdasriEmitterWhere;
   BsdasriCompanyWhere: BsdasriCompanyWhere;
@@ -4789,7 +4811,8 @@ export type ResolversTypes = {
   Bsd:
     | ResolversTypes["Form"]
     | ResolversTypes["Bsdasri"]
-    | ResolversTypes["Bsvhu"];
+    | ResolversTypes["Bsvhu"]
+    | ResolversTypes["Bsda"];
   Bsvhu: ResolverTypeWrapper<Bsvhu>;
   BsvhuStatus: BsvhuStatus;
   BsvhuEmitter: ResolverTypeWrapper<BsvhuEmitter>;
@@ -5052,6 +5075,7 @@ export type ResolversParentTypes = {
   BsdaRecepisse: BsdaRecepisse;
   BsdaTransport: BsdaTransport;
   BsdaAssociation: BsdaAssociation;
+  FileDownload: FileDownload;
   BsdaWhere: BsdaWhere;
   DateFilter: DateFilter;
   BsdaEmitterWhere: BsdaEmitterWhere;
@@ -5082,7 +5106,6 @@ export type ResolversParentTypes = {
   BsdasriOperation: BsdasriOperation;
   BsdasriMetadata: BsdasriMetadata;
   BsdasriError: BsdasriError;
-  FileDownload: FileDownload;
   BsdasriWhere: BsdasriWhere;
   BsdasriEmitterWhere: BsdasriEmitterWhere;
   BsdasriCompanyWhere: BsdasriCompanyWhere;
@@ -5098,7 +5121,8 @@ export type ResolversParentTypes = {
   Bsd:
     | ResolversParentTypes["Form"]
     | ResolversParentTypes["Bsdasri"]
-    | ResolversParentTypes["Bsvhu"];
+    | ResolversParentTypes["Bsvhu"]
+    | ResolversParentTypes["Bsda"];
   Bsvhu: Bsvhu;
   BsvhuEmitter: BsvhuEmitter;
   BsvhuEmission: BsvhuEmission;
@@ -5383,7 +5407,7 @@ export type BsdResolvers<
   ParentType extends ResolversParentTypes["Bsd"] = ResolversParentTypes["Bsd"]
 > = {
   __resolveType: TypeResolveFn<
-    "Form" | "Bsdasri" | "Bsvhu",
+    "Form" | "Bsdasri" | "Bsvhu" | "Bsda",
     ParentType,
     ContextType
   >;
@@ -7549,6 +7573,12 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationDeleteBrokerReceiptArgs, "input">
   >;
+  deleteBsda?: Resolver<
+    Maybe<ResolversTypes["Bsda"]>,
+    ParentType,
+    ContextType,
+    RequireFields<MutationDeleteBsdaArgs, "id">
+  >;
   deleteBsdasri?: Resolver<
     Maybe<ResolversTypes["Bsdasri"]>,
     ParentType,
@@ -8013,6 +8043,12 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QueryBsdaArgs, "id">
+  >;
+  bsdaPdf?: Resolver<
+    ResolversTypes["FileDownload"],
+    ParentType,
+    ContextType,
+    RequireFields<QueryBsdaPdfArgs, never>
   >;
   bsdas?: Resolver<
     ResolversTypes["BsdaConnection"],
@@ -9034,6 +9070,7 @@ export function createBsdaInputMock(props: Partial<BsdaInput>): BsdaInput {
     destination: null,
     worker: null,
     transporter: null,
+    associations: null,
     ...props
   };
 }

@@ -19,7 +19,7 @@ type BsdEdge {
   node: Bsd!
 }
 
-union Bsd = Form | Bsdasri | Bsvhu
+union Bsd = Form | Bsdasri | Bsvhu | Bsda
 
 input BsdWhere {
   readableId: String
@@ -52,4 +52,5 @@ enum BsdType {
   BSDD
   BSDASRI
   BSVHU
+  BSDA
 }

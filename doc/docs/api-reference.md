@@ -58,6 +58,26 @@ EXPERIMENTAL - Ne pas utiliser dans un contexte de production
 <td></td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>bsdaPdf</strong></td>
+<td valign="top"><a href="#filedownload">FileDownload</a>!</td>
+<td>
+
+Renvoie un token pour télécharger un pdf de bordereau
+Ce token doit être transmis à la route /download pour obtenir le fichier.
+Il est valable 10 secondes
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a></td>
+<td>
+
+ID d'un bordereau
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>bsdas</strong></td>
 <td valign="top"><a href="#bsdaconnection">BsdaConnection</a>!</td>
 <td>
@@ -1029,6 +1049,25 @@ Payload de création d'un bordereau
 </td>
 </tr>
 <tr>
+<td colspan="2" valign="top"><strong>deleteBsda</strong></td>
+<td valign="top"><a href="#bsda">Bsda</a></td>
+<td>
+
+EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+Supprime un Bsda
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">id</td>
+<td valign="top"><a href="#id">ID</a>!</td>
+<td>
+
+ID d'un BSDA
+
+</td>
+</tr>
+<tr>
 <td colspan="2" valign="top"><strong>deleteBsdasri</strong></td>
 <td valign="top"><a href="#bsdasri">Bsdasri</a></td>
 <td>
@@ -1133,7 +1172,7 @@ Duplique un Bsda
 <td valign="top"><a href="#id">ID</a>!</td>
 <td>
 
-ID d'un BSD
+ID d'un BSDA
 
 </td>
 </tr>
@@ -8474,7 +8513,16 @@ Entreprise de travaux
 <td valign="top"><a href="#bsdatransporterinput">BsdaTransporterInput</a></td>
 <td>
 
- Entreprise de transport
+Entreprise de transport
+
+</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>associations</strong></td>
+<td valign="top">[<a href="#id">ID</a>!]</td>
+<td>
+
+Précédents bordereaux à associer à celui ci - cas du transit, entreposage provisoire ou groupement
 
 </td>
 </tr>

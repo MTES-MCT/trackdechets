@@ -27,4 +27,4 @@ export const transportModeLabels: { [key: string]: string } = {
   RIVER: "Voie fluviale",
 };
 
-export type BsdTypename = "Form" | "Bsdasri" | "Bsvhu";
+export type BsdTypename = "Form" | "Bsdasri" | "Bsvhu" | "Bsda";

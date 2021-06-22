@@ -153,7 +153,7 @@ export type BrokerReceipt = {
   department: Scalars["String"];
 };
 
-export type Bsd = Form | Bsdasri | Bsvhu;
+export type Bsd = Form | Bsdasri | Bsvhu | Bsda;
 
 export type Bsda = {
   __typename?: "Bsda";
@@ -310,8 +310,10 @@ export type BsdaInput = {
   destination?: Maybe<BsdaDestinationInput>;
   /** Entreprise de travaux */
   worker?: Maybe<BsdaWorkerInput>;
-  /**  Entreprise de transport */
+  /** Entreprise de transport */
   transporter?: Maybe<BsdaTransporterInput>;
+  /** Précédents bordereaux à associer à celui ci - cas du transit, entreposage provisoire ou groupement */
+  associations?: Maybe<Array<Scalars["ID"]>>;
 };
 
 export type BsdaOperation = {
@@ -1029,7 +1031,8 @@ export type BsdEdge = {
 export enum BsdType {
   Bsdd = "BSDD",
   Bsdasri = "BSDASRI",
-  Bsvhu = "BSVHU"
+  Bsvhu = "BSVHU",
+  Bsda = "BSDA"
 }
 
 export type BsdWhere = {
@@ -2737,6 +2740,11 @@ export type Mutation = {
   deleteBrokerReceipt?: Maybe<BrokerReceipt>;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+   * Supprime un Bsda
+   */
+  deleteBsda?: Maybe<Bsda>;
+  /**
+   * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Supprime un BSDASRI
    */
   deleteBsdasri?: Maybe<Bsdasri>;
@@ -3150,6 +3158,10 @@ export type MutationCreateVhuAgrementArgs = {
 
 export type MutationDeleteBrokerReceiptArgs = {
   input: DeleteBrokerReceiptInput;
+};
+
+export type MutationDeleteBsdaArgs = {
+  id: Scalars["ID"];
 };
 
 export type MutationDeleteBsdasriArgs = {
@@ -3615,6 +3627,12 @@ export type Query = {
   appendixForms: Array<Form>;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsda: Bsda;
+  /**
+   * Renvoie un token pour télécharger un pdf de bordereau
+   * Ce token doit être transmis à la route /download pour obtenir le fichier.
+   * Il est valable 10 secondes
+   */
+  bsdaPdf: FileDownload;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsdas: BsdaConnection;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
@@ -3742,6 +3760,11 @@ export type QueryAppendixFormsArgs = {
 /** Views of the Company ressource for the admin panel */
 export type QueryBsdaArgs = {
   id: Scalars["ID"];
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsdaPdfArgs = {
+  id?: Maybe<Scalars["ID"]>;
 };
 
 /** Views of the Company ressource for the admin panel */
