@@ -1,9 +1,13 @@
 import * as yup from "yup";
+import { UserInputError } from "apollo-server-express";
 import { Bsff, TransportMode, BsffFicheIntervention } from ".prisma/client";
+import prisma from "../prisma";
 import { BsffPackaging, BsffPackagingType } from "../generated/graphql/types";
 import {
+  GROUPING_CODES,
   OPERATION_CODES,
   OPERATION_QUALIFICATIONS,
+  OPERATION_QUALIFICATIONS_TO_CODES,
   PACKAGING_TYPE,
   WASTE_CODES
 } from "./constants";
@@ -236,7 +240,7 @@ export const beforeReceptionSchema: yup.SchemaOf<Pick<
   destinationReceptionKilos: yup
     .number()
     .nullable()
-    .required("Le poids en kilos du déchet reàu est requis"),
+    .required("Le poids en kilos du déchet reçu est requis"),
   destinationReceptionSignatureDate: yup
     .date()
     .nullable()
@@ -264,7 +268,7 @@ export const beforeOperationSchema: yup.SchemaOf<Pick<
     .string()
     .nullable()
     .oneOf(
-      Object.values(OPERATION_CODES),
+      [null, ...Object.values(OPERATION_CODES)],
       "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : ${values}"
     ),
   destinationOperationQualification: yup
@@ -274,7 +278,21 @@ export const beforeOperationSchema: yup.SchemaOf<Pick<
       Object.values(OPERATION_QUALIFICATIONS),
       "La qualification du traitement ne fait pas partie de la liste reconnue : ${values}"
     )
-    .required(),
+    .required()
+    .test(
+      "operation_qualifications_to_codes",
+      "La qualification ${value} n'est pas compatible avec le code de traitement renseigné",
+      (qualification, context) => {
+        const { destinationOperationCode: code } = context.parent;
+        const codes = OPERATION_QUALIFICATIONS_TO_CODES[qualification] ?? [];
+
+        if (codes.length === 0 && code == null) {
+          return true;
+        }
+
+        return codes.includes(code);
+      }
+    ),
   destinationOperationSignatureDate: yup
     .date()
     .nullable()
@@ -331,3 +349,45 @@ export const ficheInterventionSchema: yup.SchemaOf<Pick<
       "L'addresse email de l'entreprise du lieu d'intervention est requis"
     )
 });
+
+export async function canAssociateBsffs(ids: string[]) {
+  const bsffs = await prisma.bsff.findMany({
+    where: {
+      id: {
+        in: ids
+      }
+    }
+  });
+
+  if (bsffs.some(bsff => bsff.destinationOperationSignatureDate == null)) {
+    throw new UserInputError(
+      `Certains des bordereaux à associer n'ont pas toutes les signatures requises`
+    );
+  }
+
+  if (
+    bsffs.some(
+      bsff =>
+        !GROUPING_CODES.includes(bsff.destinationOperationCode) &&
+        bsff.destinationOperationQualification !==
+          OPERATION_QUALIFICATIONS.REEXPEDITION
+    )
+  ) {
+    throw new UserInputError(
+      `Les bordereaux à associer ont déclaré un traitement qui ne permet pas de leur donner suite`
+    );
+  }
+
+  if (
+    bsffs.some(
+      bsff =>
+        bsff.destinationOperationCode !== bsffs[0].destinationOperationCode ||
+        bsff.destinationOperationQualification !==
+          bsffs[0].destinationOperationQualification
+    )
+  ) {
+    throw new UserInputError(
+      `Les bordereaux à associer ont déclaré des traitements différents et ne peuvent pas être listés sur un même bordereau`
+    );
+  }
+}

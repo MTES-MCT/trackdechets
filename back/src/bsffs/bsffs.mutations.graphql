@@ -68,6 +68,7 @@ input BsffInput {
   quantity: BsffQuantityInput
   transporter: BsffTransporterInput
   destination: BsffDestinationInput
+  bsffs: [ID!]
 }
 
 input BsffEmitterInput {
@@ -77,7 +78,7 @@ input BsffEmitterInput {
 input BsffPackagingInput {
   numero: String!
   type: BsffPackagingType!
-  litres: Int!
+  litres: Float!
 }
 
 input BsffWasteInput {
@@ -87,7 +88,7 @@ input BsffWasteInput {
 }
 
 input BsffQuantityInput {
-  kilos: Int!
+  kilos: Float!
   isEstimate: Boolean!
 }
 
@@ -109,21 +110,29 @@ input BsffDestinationInput {
   company: CompanyInput!
   cap: String
   reception: BsffDestinationReceptionInput
-  plannedOperation: BsffDestinationOperationInput
+  plannedOperation: BsffDestinationPlannedOperationInput
   operation: BsffDestinationOperationInput
 }
 input BsffDestinationReceptionInput {
   date: DateTime!
-  kilos: Int!
+  kilos: Float!
   refusal: String
+}
+input BsffDestinationPlannedOperationInput {
+  code: BsffOperationCode!
+  qualification: BsffOperationQualification!
 }
 input BsffDestinationOperationInput {
   code: BsffOperationCode!
   qualification: BsffOperationQualification!
+  nextDestination: BsffOperationNextDestinationInput
+}
+input BsffOperationNextDestinationInput {
+  company: CompanyInput!
 }
 
 input BsffFicheInterventionInput {
-  kilos: Int!
+  kilos: Float!
   owner: BsffOwnerInput!
   postalCode: String!
 }

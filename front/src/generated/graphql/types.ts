@@ -1114,18 +1114,24 @@ export type BsffDestinationInput = {
   company: CompanyInput;
   cap?: Maybe<Scalars["String"]>;
   reception?: Maybe<BsffDestinationReceptionInput>;
-  plannedOperation?: Maybe<BsffDestinationOperationInput>;
+  plannedOperation?: Maybe<BsffDestinationPlannedOperationInput>;
   operation?: Maybe<BsffDestinationOperationInput>;
 };
 
 export type BsffDestinationOperationInput = {
   code: BsffOperationCode;
   qualification: BsffOperationQualification;
+  nextDestination?: Maybe<BsffOperationNextDestinationInput>;
+};
+
+export type BsffDestinationPlannedOperationInput = {
+  code: BsffOperationCode;
+  qualification: BsffOperationQualification;
 };
 
 export type BsffDestinationReceptionInput = {
   date: Scalars["DateTime"];
-  kilos: Scalars["Int"];
+  kilos: Scalars["Float"];
   refusal?: Maybe<Scalars["String"]>;
 };
 
@@ -1169,7 +1175,7 @@ export type BsffFicheIntervention = {
 };
 
 export type BsffFicheInterventionInput = {
-  kilos: Scalars["Int"];
+  kilos: Scalars["Float"];
   owner: BsffOwnerInput;
   postalCode: Scalars["String"];
 };
@@ -1181,14 +1187,22 @@ export type BsffInput = {
   quantity?: Maybe<BsffQuantityInput>;
   transporter?: Maybe<BsffTransporterInput>;
   destination?: Maybe<BsffDestinationInput>;
+  bsffs?: Maybe<Array<Scalars["ID"]>>;
 };
 
-export type BsffOperation = IBsffOperation & {
+export type BsffNextDestination = {
+  __typename?: "BsffNextDestination";
+  company: FormCompany;
+};
+
+export type BsffOperation = {
   __typename?: "BsffOperation";
   /** Code de l'opération de traitement. */
   code?: Maybe<BsffOperationCode>;
   /** Qualification plus précise du type d'opération réalisée. */
   qualification: BsffOperationQualification;
+  /** Destination ultérieure prévue, dans le cas d'un envoi vers l'étranger. */
+  nextDestination?: Maybe<BsffNextDestination>;
   /** Signature de la destination lors du traitement. */
   signature?: Maybe<Signature>;
 };
@@ -1202,6 +1216,10 @@ export enum BsffOperationCode {
   D14 = "D14"
 }
 
+export type BsffOperationNextDestinationInput = {
+  company: CompanyInput;
+};
+
 /**
  * Liste des qualifications de traitement possible.
  * Attention, certaines combinaisons de code et qualification ne sont pas possibles.
@@ -1210,7 +1228,7 @@ export enum BsffOperationCode {
 export enum BsffOperationQualification {
   RecuperationRegeneration = "RECUPERATION_REGENERATION",
   Incineration = "INCINERATION",
-  Regroupement = "REGROUPEMENT",
+  Groupement = "GROUPEMENT",
   Reconditionnement = "RECONDITIONNEMENT",
   Reexpedition = "REEXPEDITION"
 }
@@ -1238,14 +1256,14 @@ export type BsffPackaging = {
 export type BsffPackagingInput = {
   numero: Scalars["String"];
   type: BsffPackagingType;
-  litres: Scalars["Int"];
+  litres: Scalars["Float"];
 };
 
 export enum BsffPackagingType {
   Bouteille = "BOUTEILLE"
 }
 
-export type BsffPlannedOperation = IBsffOperation & {
+export type BsffPlannedOperation = {
   __typename?: "BsffPlannedOperation";
   /** Code de l'opération de traitement prévu. */
   code?: Maybe<BsffOperationCode>;
@@ -1262,7 +1280,7 @@ export type BsffQuantity = {
 };
 
 export type BsffQuantityInput = {
-  kilos: Scalars["Int"];
+  kilos: Scalars["Float"];
   isEstimate: Scalars["Boolean"];
 };
 
@@ -1357,10 +1375,16 @@ export type BsffWhereCompany = {
 
 export type BsffWhereDestination = {
   company?: Maybe<BsffWhereCompany>;
+  operation?: Maybe<BsffWhereOperation>;
 };
 
 export type BsffWhereEmitter = {
   company?: Maybe<BsffWhereCompany>;
+};
+
+export type BsffWhereOperation = {
+  code?: Maybe<BsffOperationCode>;
+  qualification?: Maybe<BsffOperationQualification>;
 };
 
 export type BsffWhereTransporter = {
@@ -2515,13 +2539,6 @@ export enum GerepType {
   Traiteur = "Traiteur"
 }
 
-export type IBsffOperation = {
-  /** Code de l'opération de traitement. */
-  code?: Maybe<BsffOperationCode>;
-  /** Qualification plus précise du type d'opération réalisée. */
-  qualification: BsffOperationQualification;
-};
-
 /** Payload d'import d'un BSD papier */
 export type ImportPaperFormInput = {
   /**
@@ -3650,6 +3667,8 @@ export type Query = {
    */
   bsdasris: BsdasriConnection;
   bsds: BsdConnection;
+  bsff: Bsff;
+  bsffPdf: FileDownload;
   bsffs: BsffConnection;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsvhu: Bsvhu;
@@ -3802,6 +3821,16 @@ export type QueryBsdsArgs = {
   after?: Maybe<Scalars["String"]>;
   first?: Maybe<Scalars["Int"]>;
   orderBy?: Maybe<OrderBy>;
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsffArgs = {
+  id: Scalars["ID"];
+};
+
+/** Views of the Company ressource for the admin panel */
+export type QueryBsffPdfArgs = {
+  id: Scalars["ID"];
 };
 
 /** Views of the Company ressource for the admin panel */

@@ -12,7 +12,7 @@ const deleteBsff: MutationResolvers["deleteBsff"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
-  const existingBsff = await getBsffOrNotFound(id);
+  const existingBsff = await getBsffOrNotFound({ id });
   await isBsffContributor(user, existingBsff);
 
   if (existingBsff.emitterEmissionSignatureDate) {

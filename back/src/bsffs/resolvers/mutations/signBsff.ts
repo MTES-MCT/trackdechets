@@ -134,7 +134,7 @@ const signatures: Record<
 
 const signBsff: MutationResolvers["signBsff"] = async (_, args, context) => {
   const user = checkIsAuthenticated(context);
-  const existingBsff = await getBsffOrNotFound(args.id);
+  const existingBsff = await getBsffOrNotFound({ id: args.id });
   const sign = signatures[args.type];
   const updatedBsff = await sign(args, user, existingBsff);
 

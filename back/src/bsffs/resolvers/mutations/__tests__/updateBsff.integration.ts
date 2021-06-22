@@ -4,12 +4,18 @@ import {
   Mutation,
   MutationUpdateBsffArgs
 } from "../../../../generated/graphql/types";
+import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { WASTE_CODES } from "../../../constants";
+import {
+  OPERATION_CODES,
+  OPERATION_QUALIFICATIONS,
+  WASTE_CODES
+} from "../../../constants";
 import {
   createBsff,
   createBsffAfterEmission,
+  createBsffAfterOperation,
   createBsffAfterReception,
   createBsffAfterTransport
 } from "../../../__tests__/factories";
@@ -454,5 +460,52 @@ describe("Mutation.updateBsff", () => {
         }
       })
     );
+  });
+
+  it("should update the list of associated bsffs", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const associatedBsff = await createBsffAfterOperation(
+      { emitter, transporter, destination },
+      {
+        destinationOperationCode: OPERATION_CODES.R12,
+        destinationOperationQualification: OPERATION_QUALIFICATIONS.GROUPEMENT
+      }
+    );
+    const bsffToAssociate = await createBsffAfterOperation(
+      { emitter, transporter, destination },
+      {
+        destinationOperationCode: OPERATION_CODES.R12,
+        destinationOperationQualification: OPERATION_QUALIFICATIONS.GROUPEMENT
+      }
+    );
+    const bsff = await createBsff(
+      { emitter },
+      { bsffs: { connect: [{ id: associatedBsff.id }] } }
+    );
+
+    const { mutate } = makeClient(emitter.user);
+    const { data } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          bsffs: [bsffToAssociate.id]
+        }
+      }
+    });
+
+    const associatedBsffs = await prisma.bsff
+      .findUnique({ where: { id: data.updateBsff.id } })
+      .bsffs();
+    expect(associatedBsffs).toEqual([
+      expect.objectContaining({
+        id: bsffToAssociate.id
+      })
+    ]);
   });
 });
