@@ -11,7 +11,10 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { OPERATION_CODES, OPERATION_QUALIFICATIONS } from "../../../constants";
-import { createBsffAfterOperation } from "../../../__tests__/factories";
+import {
+  createBsffAfterEmission,
+  createBsffAfterOperation
+} from "../../../__tests__/factories";
 
 const CREATE_BSFF = `
   mutation CreateBsff($input: BsffInput!) {
@@ -319,6 +322,46 @@ describe("Mutation.createBsff", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message: `Les bordereaux à associer ont déclaré des traitements différents et ne peuvent pas être listés sur un même bordereau`
+        })
+      ]);
+    });
+
+    it("should disallow associating bsffs with missing signatures", async () => {
+      const bsffs = await Promise.all([
+        createBsffAfterEmission(
+          { emitter, transporter, destination },
+          {
+            destinationOperationCode: OPERATION_CODES.R12,
+            destinationOperationQualification:
+              OPERATION_QUALIFICATIONS.GROUPEMENT
+          }
+        )
+      ]);
+
+      const { mutate } = makeClient(destination.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createBsff">,
+        MutationCreateBsffArgs
+      >(CREATE_BSFF, {
+        variables: {
+          input: {
+            destination: {
+              company: {
+                name: destination.company.name,
+                siret: destination.company.siret,
+                address: destination.company.address,
+                contact: destination.user.name,
+                mail: destination.user.email
+              }
+            },
+            bsffs: bsffs.map(bsff => bsff.id)
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: `Certains des bordereaux à associer n'ont pas toutes les signatures requises`
         })
       ]);
     });

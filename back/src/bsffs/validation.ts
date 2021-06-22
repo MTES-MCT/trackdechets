@@ -359,6 +359,12 @@ export async function canAssociateBsffs(ids: string[]) {
     }
   });
 
+  if (bsffs.some(bsff => bsff.destinationOperationSignatureDate == null)) {
+    throw new UserInputError(
+      `Certains des bordereaux à associer n'ont pas toutes les signatures requises`
+    );
+  }
+
   if (
     bsffs.some(
       bsff =>
