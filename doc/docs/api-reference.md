@@ -260,52 +260,92 @@ Filtres de recherche
 <tr>
 <td colspan="2" valign="top"><strong>bsff</strong></td>
 <td valign="top"><a href="#bsff">Bsff</a>!</td>
-<td></td>
+<td>
+
+Retourne un bordereau avec l'identifiant donné.
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">id</td>
 <td valign="top"><a href="#id">ID</a>!</td>
-<td></td>
+<td>
+
+Identifiant du bordereau à retrouver.
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>bsffPdf</strong></td>
 <td valign="top"><a href="#filedownload">FileDownload</a>!</td>
-<td></td>
+<td>
+
+Retourne un lien de téléchargement au format PDF du bordereau avec l'identifiant donné.
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">id</td>
 <td valign="top"><a href="#id">ID</a>!</td>
-<td></td>
+<td>
+
+Identifiant du bordereau à retrouver.
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>bsffs</strong></td>
 <td valign="top"><a href="#bsffconnection">BsffConnection</a>!</td>
-<td></td>
+<td>
+
+Retourne tous les bordereaux de l'utilisateur connecté, en respectant les différents filtres.
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">after</td>
 <td valign="top"><a href="#id">ID</a></td>
-<td></td>
-</tr>
-<tr>
-<td colspan="2" align="right" valign="top">first</td>
-<td valign="top"><a href="#int">Int</a></td>
-<td></td>
+<td>
+
+Retourne les bordereaux après celui qui correspond à l'identifiant donné.
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">before</td>
 <td valign="top"><a href="#id">ID</a></td>
-<td></td>
+<td>
+
+Retourne les bordereaux avant celui qui correspond à l'identifiant donné.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">first</td>
+<td valign="top"><a href="#int">Int</a></td>
+<td>
+
+Retourne les x premiers bordereaux.
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">last</td>
 <td valign="top"><a href="#int">Int</a></td>
-<td></td>
+<td>
+
+Retourne les x derniers bordereaux.
+
+</td>
 </tr>
 <tr>
 <td colspan="2" align="right" valign="top">where</td>
 <td valign="top"><a href="#bsffwhere">BsffWhere</a></td>
-<td></td>
+<td>
+
+Filtre les résultats d'après certains critères.
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>bsvhu</strong></td>
@@ -3918,6 +3958,8 @@ Liste des bordereaux que celui-ci regroupe, dans le cas d'un regroupement, recon
 
 ### BsffConnection
 
+Résultats de bordereaux paginés.
+
 <table>
 <thead>
 <tr>
@@ -4111,7 +4153,7 @@ Numéro de la fiche d'intervention, habituellement renseigné par l'opérateur.
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>kilos</strong></td>
-<td valign="top"><a href="#int">Int</a>!</td>
+<td valign="top"><a href="#float">Float</a>!</td>
 <td>
 
 Poids total des fluides récupérés lors de cette intervention.
@@ -4267,7 +4309,7 @@ Type de contenant.
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>litres</strong></td>
-<td valign="top"><a href="#int">Int</a>!</td>
+<td valign="top"><a href="#float">Float</a>!</td>
 <td>
 
 Volume en litres des fluides à l'intérieur du contenant.
@@ -4324,7 +4366,7 @@ Qualification plus précise du type d'opération prévu.
 <tbody>
 <tr>
 <td colspan="2" valign="top"><strong>kilos</strong></td>
-<td valign="top"><a href="#int">Int</a>!</td>
+<td valign="top"><a href="#float">Float</a>!</td>
 <td>
 
 Poids total du déchet en kilos.
@@ -4366,7 +4408,7 @@ Date de réception du déchet.
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>kilos</strong></td>
-<td valign="top"><a href="#int">Int</a>!</td>
+<td valign="top"><a href="#float">Float</a>!</td>
 <td>
 
 Quantité totale du déchet, qu'elle soit réelle ou estimée.
@@ -10423,6 +10465,8 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 
 ### BsffWhere
 
+Filtres possibles pour la récupération de bordereaux.
+
 <table>
 <thead>
 <tr>
@@ -10435,22 +10479,36 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 <tr>
 <td colspan="2" valign="top"><strong>emitter</strong></td>
 <td valign="top"><a href="#bsffwhereemitter">BsffWhereEmitter</a></td>
-<td></td>
+<td>
+
+Filtrer sur le champ emitter.
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>transporter</strong></td>
 <td valign="top"><a href="#bsffwheretransporter">BsffWhereTransporter</a></td>
-<td></td>
+<td>
+
+Filtrer sur le champ transporter.
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>destination</strong></td>
 <td valign="top"><a href="#bsffwheredestination">BsffWhereDestination</a></td>
-<td></td>
+<td>
+
+Filtrer sur le champ destination.
+
+</td>
 </tr>
 </tbody>
 </table>
 
 ### BsffWhereCompany
+
+Filtres sur une entreprise.
 
 <table>
 <thead>
@@ -10470,6 +10528,8 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 </table>
 
 ### BsffWhereDestination
+
+Champs possible pour le filtre sur destination.
 
 <table>
 <thead>
@@ -10495,6 +10555,8 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 
 ### BsffWhereEmitter
 
+Champs possible pour le filtre sur l'emitter.
+
 <table>
 <thead>
 <tr>
@@ -10513,6 +10575,8 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 </table>
 
 ### BsffWhereOperation
+
+Champs possible pour le filtre sur l'opération.
 
 <table>
 <thead>
@@ -10537,6 +10601,8 @@ Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne r
 </table>
 
 ### BsffWhereTransporter
+
+Champs possible pour le filtre sur transporter.
 
 <table>
 <thead>

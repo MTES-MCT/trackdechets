@@ -1089,6 +1089,7 @@ export type Bsff = {
   bsffs: Array<Bsff>;
 };
 
+/** Résultats de bordereaux paginés. */
 export type BsffConnection = {
   __typename?: "BsffConnection";
   totalCount: Scalars["Int"];
@@ -1164,7 +1165,7 @@ export type BsffFicheIntervention = {
   /** Numéro de la fiche d'intervention, habituellement renseigné par l'opérateur. */
   numero: Scalars["String"];
   /** Poids total des fluides récupérés lors de cette intervention. */
-  kilos: Scalars["Int"];
+  kilos: Scalars["Float"];
   /**
    * Détenteur de l'équipement sur lequel est intervenu l'opérateur.
    * À noter que dû à la valeur commerciale de ces informations, leur visibilité est limité aux acteurs en contact direct.
@@ -1250,7 +1251,7 @@ export type BsffPackaging = {
   /** Type de contenant. */
   type: BsffPackagingType;
   /** Volume en litres des fluides à l'intérieur du contenant. */
-  litres: Scalars["Int"];
+  litres: Scalars["Float"];
 };
 
 export type BsffPackagingInput = {
@@ -1274,7 +1275,7 @@ export type BsffPlannedOperation = {
 export type BsffQuantity = {
   __typename?: "BsffQuantity";
   /** Poids total du déchet en kilos. */
-  kilos: Scalars["Int"];
+  kilos: Scalars["Float"];
   /** Si il s'agit d'une estimation ou d'un poids réel. */
   isEstimate: Scalars["Boolean"];
 };
@@ -1289,7 +1290,7 @@ export type BsffReception = {
   /** Date de réception du déchet. */
   date: Scalars["DateTime"];
   /** Quantité totale du déchet, qu'elle soit réelle ou estimée. */
-  kilos: Scalars["Int"];
+  kilos: Scalars["Float"];
   /** En cas de refus, le motif. */
   refusal?: Maybe<Scalars["String"]>;
   /** Signature de la destination lors de l'acceptation ou du refus du déchet. */
@@ -1363,30 +1364,39 @@ export type BsffWasteInput = {
   adr: Scalars["String"];
 };
 
+/** Filtres possibles pour la récupération de bordereaux. */
 export type BsffWhere = {
+  /** Filtrer sur le champ emitter. */
   emitter?: Maybe<BsffWhereEmitter>;
+  /** Filtrer sur le champ transporter. */
   transporter?: Maybe<BsffWhereTransporter>;
+  /** Filtrer sur le champ destination. */
   destination?: Maybe<BsffWhereDestination>;
 };
 
+/** Filtres sur une entreprise. */
 export type BsffWhereCompany = {
   siret: Scalars["String"];
 };
 
+/** Champs possible pour le filtre sur destination. */
 export type BsffWhereDestination = {
   company?: Maybe<BsffWhereCompany>;
   operation?: Maybe<BsffWhereOperation>;
 };
 
+/** Champs possible pour le filtre sur l'emitter. */
 export type BsffWhereEmitter = {
   company?: Maybe<BsffWhereCompany>;
 };
 
+/** Champs possible pour le filtre sur l'opération. */
 export type BsffWhereOperation = {
   code?: Maybe<BsffOperationCode>;
   qualification?: Maybe<BsffOperationQualification>;
 };
 
+/** Champs possible pour le filtre sur transporter. */
 export type BsffWhereTransporter = {
   company?: Maybe<BsffWhereCompany>;
 };
@@ -3667,8 +3677,11 @@ export type Query = {
    */
   bsdasris: BsdasriConnection;
   bsds: BsdConnection;
+  /** Retourne un bordereau avec l'identifiant donné. */
   bsff: Bsff;
+  /** Retourne un lien de téléchargement au format PDF du bordereau avec l'identifiant donné. */
   bsffPdf: FileDownload;
+  /** Retourne tous les bordereaux de l'utilisateur connecté, en respectant les différents filtres. */
   bsffs: BsffConnection;
   /** EXPERIMENTAL - Ne pas utiliser dans un contexte de production */
   bsvhu: Bsvhu;
@@ -3836,8 +3849,8 @@ export type QueryBsffPdfArgs = {
 /** Views of the Company ressource for the admin panel */
 export type QueryBsffsArgs = {
   after?: Maybe<Scalars["ID"]>;
-  first?: Maybe<Scalars["Int"]>;
   before?: Maybe<Scalars["ID"]>;
+  first?: Maybe<Scalars["Int"]>;
   last?: Maybe<Scalars["Int"]>;
   where?: Maybe<BsffWhere>;
 };
