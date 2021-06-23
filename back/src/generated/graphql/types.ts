@@ -1865,6 +1865,7 @@ export type CompanyPrivate = {
   vhuAgrementBroyeur?: Maybe<VhuAgrement>;
   /** Liste des agréments de l'éco-organisme */
   ecoOrganismeAgreements: Array<Scalars["URL"]>;
+  allowBsdasriTakeOverWithoutSignature: Scalars["Boolean"];
 };
 
 /** Information sur un établissement accessible publiquement */
@@ -3423,6 +3424,7 @@ export type MutationUpdateCompanyArgs = {
   vhuAgrementDemolisseurId?: Maybe<Scalars["String"]>;
   vhuAgrementBroyeurId?: Maybe<Scalars["String"]>;
   ecoOrganismeAgreements?: Maybe<Array<Scalars["URL"]>>;
+  allowBsdasriTakeOverWithoutSignature?: Maybe<Scalars["Boolean"]>;
 };
 
 export type MutationUpdateFicheInterventionBsffArgs = {
@@ -6992,6 +6994,11 @@ export type CompanyPrivateResolvers<
   >;
   ecoOrganismeAgreements?: Resolver<
     Array<ResolversTypes["URL"]>,
+    ParentType,
+    ContextType
+  >;
+  allowBsdasriTakeOverWithoutSignature?: Resolver<
+    ResolversTypes["Boolean"],
     ParentType,
     ContextType
   >;
@@ -10956,6 +10963,7 @@ export function createCompanyPrivateMock(
     vhuAgrementDemolisseur: null,
     vhuAgrementBroyeur: null,
     ecoOrganismeAgreements: [],
+    allowBsdasriTakeOverWithoutSignature: false,
     ...props
   };
 }

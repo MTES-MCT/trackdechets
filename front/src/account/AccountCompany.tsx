@@ -16,7 +16,7 @@ type Props = {
 
 export enum Link {
   Info = "Information",
-  Security = "Code signature",
+  Signature = "Signature",
   Members = "Membres",
   CompanyPage = "Fiche Entreprise",
 }
@@ -51,7 +51,7 @@ export default function AccountCompany({ company }: Props) {
     />
   );
 
-  const security = (
+  const signature = (
     <AccountCompanySecurity
       company={filter(AccountCompanySecurity.fragments.company, company)}
     />
@@ -75,8 +75,8 @@ export default function AccountCompany({ company }: Props) {
     case Link.Info:
       activeContent = info;
       break;
-    case Link.Security:
-      activeContent = security;
+    case Link.Signature:
+      activeContent = signature;
       break;
     case Link.Members:
       activeContent = members;
@@ -87,8 +87,8 @@ export default function AccountCompany({ company }: Props) {
   }
 
   const links = isAdmin
-    ? [Link.Info, Link.Security, Link.Members, Link.CompanyPage]
-    : [Link.Info, Link.Security, Link.CompanyPage];
+    ? [Link.Info, Link.Signature, Link.Members, Link.CompanyPage]
+    : [Link.Info, Link.Signature, Link.CompanyPage];
 
   return (
     <div className={["panel", styles.company].join(" ")}>
