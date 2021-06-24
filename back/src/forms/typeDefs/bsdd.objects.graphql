@@ -116,6 +116,10 @@ type Form {
   nextTransporterSiret: String
 }
 
+"""
+Information sur le bordereau initial lors d'une réexpédition après transformation ou traitement aboutissant
+à des déchets dont la provenance reste identifiable (annexe 2)
+"""
 type Appendix2Form {
   "Identifiant unique du bordereau initial"
   id: ID!
