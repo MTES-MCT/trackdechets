@@ -7,6 +7,8 @@ import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton } from "common/components";
 import { IconPaperWrite } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
+import { Link, generatePath } from "react-router-dom";
+import routes from "common/routes";
 
 import cogoToast from "cogo-toast";
 
@@ -19,7 +21,7 @@ const PUBLISH_BSDASRI = gql`
   }
 `;
 
-export default function PublishBsdasri({ form }: WorkflowActionProps) {
+export default function PublishBsdasri({ form, siret }: WorkflowActionProps) {
   const [publishBsdasri, { error }] = useMutation<
     Pick<Mutation, "publishBsdasri">,
     MutationPublishBsdasriArgs
@@ -52,6 +54,7 @@ export default function PublishBsdasri({ form }: WorkflowActionProps) {
             tableau de bord transporteur. Le bordereau pourra toujours être
             modifié ou supprimé depuis l'onglet "Suivi".
           </p>
+          <p className="tw-mt-1">Le statut du bordereau passera de "brouillon" à "initial"</p>
           <div className="td-modal-actions">
             <button className="btn btn--outline-primary" onClick={close}>
               Annuler
@@ -66,12 +69,22 @@ export default function PublishBsdasri({ form }: WorkflowActionProps) {
                 })
               }
             >
-              <span> Publier le bordereau</span>
+              <span>Publier le bordereau</span>
             </button>
           </div>
 
-          {error && (
+          {error && (<>
             <NotificationError className="action-error" apolloError={error} />
+            <Link
+                to={generatePath(routes.dashboard.bsdasris.edit, {
+                  siret,
+                  id: form.id,
+                })}
+                className="btn btn--primary"
+              >
+                Mettre le bordereau à jour pour le publier
+              </Link>
+            </>
           )}
         </div>
       )}
