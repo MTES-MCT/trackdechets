@@ -521,6 +521,7 @@ export type BsdasriEmissionWasteDetails = {
   /** Quantité en kg */
   quantity?: Maybe<Scalars["Int"]>;
   quantityType?: Maybe<QuantityType>;
+  /** Volume en litres */
   volume?: Maybe<Scalars["Int"]>;
   packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
   onuCode?: Maybe<Scalars["String"]>;

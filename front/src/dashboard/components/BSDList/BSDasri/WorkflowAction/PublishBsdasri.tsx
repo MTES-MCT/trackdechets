@@ -54,7 +54,11 @@ export default function PublishBsdasri({ form, siret }: WorkflowActionProps) {
             tableau de bord transporteur. Le bordereau pourra toujours être
             modifié ou supprimé depuis l'onglet "Suivi".
           </p>
-          <p className="tw-mt-1">Le statut du bordereau passera de "brouillon" à "initial"</p>
+          <p className="tw-mt-1">
+            Le statut du bordereau passera de "brouillon" à "initial".
+            <br />
+            Une fois publié, le bordereau sera prêt pour l'enlèvement.
+          </p>
           <div className="td-modal-actions">
             <button className="btn btn--outline-primary" onClick={close}>
               Annuler
@@ -73,9 +77,10 @@ export default function PublishBsdasri({ form, siret }: WorkflowActionProps) {
             </button>
           </div>
 
-          {error && (<>
-            <NotificationError className="action-error" apolloError={error} />
-            <Link
+          {error && (
+            <>
+              <NotificationError className="action-error" apolloError={error} />
+              <Link
                 to={generatePath(routes.dashboard.bsdasris.edit, {
                   siret,
                   id: form.id,

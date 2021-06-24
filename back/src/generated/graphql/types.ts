@@ -518,6 +518,7 @@ export type BsdasriEmissionWasteDetails = {
   /** Quantité en kg */
   quantity?: Maybe<Scalars["Int"]>;
   quantityType?: Maybe<QuantityType>;
+  /** Volume en litres */
   volume?: Maybe<Scalars["Int"]>;
   packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
   onuCode?: Maybe<Scalars["String"]>;
@@ -5093,9 +5094,9 @@ export type ResolversTypes = {
   VerifyCompanyByAdminInput: VerifyCompanyByAdminInput;
   Subscription: ResolverTypeWrapper<{}>;
   FormSubscription: ResolverTypeWrapper<FormSubscription>;
-  BsdasriRole: BsdasriRole;
-  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
   BsdasriInput: BsdasriInput;
+  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
+  BsdasriRole: BsdasriRole;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -5378,8 +5379,8 @@ export type ResolversParentTypes = {
   VerifyCompanyByAdminInput: VerifyCompanyByAdminInput;
   Subscription: {};
   FormSubscription: FormSubscription;
-  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
   BsdasriInput: BsdasriInput;
+  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
 };
 
 export type AdminForVerificationResolvers<

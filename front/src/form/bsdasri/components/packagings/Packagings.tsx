@@ -145,6 +145,7 @@ export default function DasriPackagings({
                     type: PackagingsEnum.Autre,
                     other: "",
                     quantity: 1,
+                    volume: 0,
                   })
                 }
               >
