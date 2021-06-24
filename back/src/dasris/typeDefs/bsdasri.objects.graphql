@@ -68,6 +68,7 @@ type BsdasriEmissionWasteDetails {
   "Quantité en kg"
   quantity: Int
   quantityType: QuantityType
+  ""
   volume: Int
   packagingInfos: [BsdasriPackagingInfo!]
   onuCode: String
