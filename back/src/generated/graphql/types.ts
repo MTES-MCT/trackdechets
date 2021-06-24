@@ -42,13 +42,17 @@ export type Scalars = {
 export type AcceptedFormInput = {
   /** Statut d'acceptation du déchet (case 10) */
   wasteAcceptationStatus: WasteAcceptationStatusInput;
-  /** Raison du refus (case 10) */
+  /** Raison du refus (case 10). Obligatoire en cas de refus de déchet */
   wasteRefusalReason?: Maybe<Scalars["String"]>;
   /** Date à laquelle le déchet a été accepté ou refusé (case 10) */
   signedAt: Scalars["DateTime"];
   /** Nom de la personne en charge de l'acceptation' du déchet (case 10) */
   signedBy: Scalars["String"];
-  /** Quantité réelle présentée (case 10) */
+  /**
+   * Quantité réelle présentée (case 10).
+   *  Doit être supérieure à 0 lorsque le déchet est accepté.
+   *  Doit être égale à 0 lorsque le déchet est refusé.
+   */
   quantityReceived: Scalars["Float"];
 };
 
@@ -1768,7 +1772,7 @@ export type CompanyForVerificationWhere = {
 
 /** Payload d'un établissement */
 export type CompanyInput = {
-  /** SIRET de l'établissement */
+  /** SIRET de l'établissement composé de 14 caractères numériques */
   siret?: Maybe<Scalars["String"]>;
   /** Nom de l'établissement */
   name?: Maybe<Scalars["String"]>;
@@ -2065,11 +2069,11 @@ export type CreateVhuAgrementInput = {
 };
 
 export type DateFilter = {
-  _eq?: Maybe<Scalars["DateTime"]>;
-  _gt?: Maybe<Scalars["DateTime"]>;
   _gte?: Maybe<Scalars["DateTime"]>;
-  _lt?: Maybe<Scalars["DateTime"]>;
+  _gt?: Maybe<Scalars["DateTime"]>;
   _lte?: Maybe<Scalars["DateTime"]>;
+  _lt?: Maybe<Scalars["DateTime"]>;
+  _eq?: Maybe<Scalars["DateTime"]>;
 };
 
 /** Représente une ligne dans une déclaration GEREP */
@@ -2128,7 +2132,7 @@ export type DestinationInput = {
    * de traitement ou de tri, transit, regroupement.
    */
   company?: Maybe<CompanyInput>;
-  /** N° de CAP prévu (le cas échéant) */
+  /** N° de CAP prévu (le cas échéant). Le champ CAP est obligatoire pour les déchets dangereux. */
   cap?: Maybe<Scalars["String"]>;
   /** Opération d'élimination / valorisation prévue (code D/R) */
   processingOperation?: Maybe<Scalars["String"]>;
@@ -2152,9 +2156,13 @@ export type EcoOrganisme = {
   address: Scalars["String"];
 };
 
-/** Payload de liason d'un BSD à un eco-organisme */
+/** Payload de liaison d'un BSD à un eco-organisme */
 export type EcoOrganismeInput = {
   name: Scalars["String"];
+  /**
+   * SIRET composé de 14 caractères correspondant à un éco-organisme. La liste des éco-organismes
+   * est disponible via la [query ecoOrganismes](../user-company/queries#ecoorganismes)
+   */
   siret: Scalars["String"];
 };
 
@@ -2176,7 +2184,7 @@ export type Emitter = {
 
 /** Payload lié à un l'émetteur du BSD (case 1) */
 export type EmitterInput = {
-  /** Type d'émetteur */
+  /** Type d'émetteur. Le type d'émetteur doit être `OTHER` lorsqu'un éco-organisme est responsable du déchet */
   type?: Maybe<EmitterType>;
   /** Adresse du chantier */
   workSite?: Maybe<WorkSiteInput>;
@@ -2822,7 +2830,6 @@ export type Mutation = {
    * Finalise un BSD
    * Les champs suivants sont obligatoires pour pouvoir finaliser un bordereau et
    * doivent avoir été renseignés au préalable
-   *
    * ```
    * emitter: {
    *   type
@@ -2837,6 +2844,7 @@ export type Mutation = {
    * }
    * recipient: {
    *   processingOperation
+   *   cap // requis pour les déchets dangereux uniquement
    *   company: {
    *     siret
    *     name
@@ -2855,21 +2863,25 @@ export type Mutation = {
    *     mail
    *     phone
    *   }
+   *   isExemptedOfReceipt
    *   receipt
-   *   department
-   *   validityLimit
-   *   numberPlate
+   *   department // non requis si isExemptedOfReceipt=true
+   *   validityLimit // peut-être omis si isExemptedOfReceipt=true
+   *   numberPlate // peut-être omis si isExemptedOfReceipt=true
    * }
    * wasteDetails: {
    *   code
-   *   // onuCode est optionnel pour les déchets non-dangereux
-   *   onuCode
+   *   onuCode // requis pour les déchets dangereux uniquement
    *   name
-   *   packagings
-   *   numberOfPackages
+   *   packagings {
+   *     type
+   *     other // requis si type=OTHER
+   *     quantity
+   *   }
    *   quantity
    *   quantityType
    *   consistence
+   *   pop
    * }
    * ```
    */
@@ -3493,9 +3505,12 @@ export type PackagingInfo = {
 export type PackagingInfoInput = {
   /** Type de conditionnement */
   type: Packagings;
-  /** Description du conditionnement dans le cas où le type de conditionnement est `AUTRE` */
+  /** Description du conditionnement dans le cas où le type de conditionnement est `OTHER` */
   other?: Maybe<Scalars["String"]>;
-  /** Nombre de colis associés à ce conditionnement */
+  /**
+   * Nombre de colis associés à ce conditionnement. Dans le cas d'un conditionnemt BENNE ou CITERNE,
+   * le nombre de colis ne peut être supérieur à 2.
+   */
   quantity: Scalars["Int"];
 };
 
@@ -3902,11 +3917,15 @@ export type ReceivedFormInput = {
   receivedAt: Scalars["DateTime"];
   /** Statut d'acceptation du déchet (case 10) */
   wasteAcceptationStatus?: Maybe<WasteAcceptationStatusInput>;
-  /** Raison du refus (case 10) */
+  /** Raison du refus (case 10). Obligatoire en cas de refus de déchet */
   wasteRefusalReason?: Maybe<Scalars["String"]>;
   /** Date à laquelle le déchet a été accepté ou refusé (case 10) */
   signedAt?: Maybe<Scalars["DateTime"]>;
-  /** Quantité réelle présentée (case 10) */
+  /**
+   * Quantité réelle présentée (case 10).
+   *  Doit être supérieure à 0 lorsque le déchet est accepté.
+   *  Doit être égale à 0 lorsque le déchet est refusé.
+   */
   quantityReceived?: Maybe<Scalars["Float"]>;
 };
 
@@ -4195,7 +4214,7 @@ export type TemporaryStorer = {
 export type TempStoredFormInput = {
   /** Statut d'acceptation du déchet (case 13) */
   wasteAcceptationStatus?: Maybe<WasteAcceptationStatusInput>;
-  /** Raison du refus (case 13) */
+  /** Raison du refus (case 13). Obligatoire en cas de refus de déchet */
   wasteRefusalReason?: Maybe<Scalars["String"]>;
   /** Nom de la personne en charge de la réception du déchet (case 13) */
   receivedBy: Scalars["String"];
@@ -4203,7 +4222,11 @@ export type TempStoredFormInput = {
   receivedAt: Scalars["DateTime"];
   /** Date à laquelle le déchet a été accepté ou refusé (case 13). Défaut à la date d'aujourd'hui. */
   signedAt?: Maybe<Scalars["DateTime"]>;
-  /** Quantité réelle présentée (case 13) */
+  /**
+   * Quantité réelle présentée (case 13)
+   *  Doit être supérieure à 0 lorsque le déchet est accepté.
+   *  Doit être égale à 0 lorsque le déchet est refusé.
+   */
   quantityReceived: Scalars["Float"];
   /** Réelle ou estimée */
   quantityType: QuantityType;
@@ -4216,9 +4239,13 @@ export type TempStorerAcceptedFormInput = {
   signedBy: Scalars["String"];
   /** Statut d'acceptation du déchet (case 13) */
   wasteAcceptationStatus: WasteAcceptationStatusInput;
-  /** Raison du refus (case 13) */
+  /** Raison du refus (case 13). Obligatoire en cas de refus de déchet */
   wasteRefusalReason?: Maybe<Scalars["String"]>;
-  /** Quantité réelle présentée (case 13) */
+  /**
+   * Quantité réelle présentée (case 13)
+   *  Doit être supérieure à 0 lorsque le déchet est accepté.
+   *  Doit être égale à 0 lorsque le déchet est refusé.
+   */
   quantityReceived: Scalars["Float"];
   /** Réelle ou estimée */
   quantityType: QuantityType;
@@ -4284,13 +4311,13 @@ export type Transporter = {
 export type TransporterInput = {
   /** Établissement collecteur - transporteur */
   company?: Maybe<CompanyInput>;
-  /** Exemption de récipissé */
+  /** Exemption de récépissé */
   isExemptedOfReceipt?: Maybe<Scalars["Boolean"]>;
-  /** N° de récipissé */
+  /** N° de récipissé. Obligatoire lorsque l'exemption de récépissé n'est pas précisée */
   receipt?: Maybe<Scalars["String"]>;
-  /** Département */
+  /** Département du récépissé. Obligatoire lorsque l'exemption de récépissé n'est pas précisée */
   department?: Maybe<Scalars["String"]>;
-  /** Limite de validité du récipissé */
+  /** Limite de validité du récépissé. Obligatoire lorsque l'exemption de récépissé n'est pas précisée */
   validityLimit?: Maybe<Scalars["DateTime"]>;
   /** Numéro de plaque d'immatriculation */
   numberPlate?: Maybe<Scalars["String"]>;
@@ -4461,18 +4488,15 @@ export type User = {
 /**
  * Liste les différents rôles d'un utilisateur au sein
  * d'un établissement.
- *
  * Les admins peuvent:
  * * consulter/éditer les bordereaux
  * * gérer les utilisateurs de l'établissement
  * * éditer les informations de la fiche entreprise
  * * demander le renouvellement du code de signature
  * * Éditer les informations de la fiche entreprise
- *
  * Les membres peuvent:
  * * consulter/éditer les bordereaux
  * * consulter le reste des informations
- *
  * Vous pouvez consulter [cette page](https://docs.google.com/spreadsheets/d/12K9Bd2k5l4uqXhS0h5uI00lNEzW7C-1t-NDOyxy8aKk/edit#gid=0)
  * pour le détail de chacun des rôles
  */
@@ -4568,9 +4592,9 @@ export type WasteDetailsInput = {
   code?: Maybe<Scalars["String"]>;
   /** Dénomination usuelle */
   name?: Maybe<Scalars["String"]>;
-  /** Code ONU */
+  /** Code ONU. Obligatoire pour les déchets dangereux. Merci d'indiquer 'non soumis' si nécessaire. */
   onuCode?: Maybe<Scalars["String"]>;
-  /** Conditionnements */
+  /** Liste de conditionnements. Les conditionnements CITERNE et BENNE ne peuvent pas être associés à un autre conditionnement */
   packagingInfos?: Maybe<Array<PackagingInfoInput>>;
   /** DEPRECATED - Conditionnement */
   packagings?: Maybe<Array<Maybe<Packagings>>>;
@@ -5069,8 +5093,8 @@ export type ResolversTypes = {
   VerifyCompanyByAdminInput: VerifyCompanyByAdminInput;
   Subscription: ResolverTypeWrapper<{}>;
   FormSubscription: ResolverTypeWrapper<FormSubscription>;
-  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
   BsdasriInput: BsdasriInput;
+  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
   BsdasriRole: BsdasriRole;
 };
 
@@ -5354,8 +5378,8 @@ export type ResolversParentTypes = {
   VerifyCompanyByAdminInput: VerifyCompanyByAdminInput;
   Subscription: {};
   FormSubscription: FormSubscription;
-  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
   BsdasriInput: BsdasriInput;
+  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
 };
 
 export type AdminForVerificationResolvers<
@@ -11053,11 +11077,11 @@ export function createCreateVhuAgrementInputMock(
 
 export function createDateFilterMock(props: Partial<DateFilter>): DateFilter {
   return {
-    _eq: null,
-    _gt: null,
     _gte: null,
-    _lt: null,
+    _gt: null,
     _lte: null,
+    _lt: null,
+    _eq: null,
     ...props
   };
 }

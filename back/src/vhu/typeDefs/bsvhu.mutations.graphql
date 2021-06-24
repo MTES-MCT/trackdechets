@@ -1,0 +1,43 @@
+type Mutation {
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Crée un BSVHU
+  """
+  createBsvhu(input: BsvhuInput!): Bsvhu
+
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Crée un BSVHU en brouillon
+  """
+  createDraftBsvhu(input: BsvhuInput!): Bsvhu
+
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Met à jour un BSVHU
+  """
+  updateBsvhu(id: ID!, input: BsvhuInput!): Bsvhu
+
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Permet de publier un brouillon pour le marquer comme prêt à être envoyé
+  """
+  publishBsvhu(id: ID!): Bsvhu
+
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Signe un BSVHU
+  """
+  signBsvhu(id: ID!, input: BsvhuSignatureInput!): Bsvhu
+
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Duplique un BSVHU
+  """
+  duplicateBsvhu("ID d'un BSD VHU" id: ID!): Bsvhu
+
+  """
+  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
+  Supprime un BSVHU
+  """
+  deleteBsvhu("ID d'un BSD VHU" id: ID!): Bsvhu
+}

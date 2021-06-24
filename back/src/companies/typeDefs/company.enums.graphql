@@ -1,0 +1,42 @@
+"Profil entreprise"
+enum CompanyType {
+  "Producteur de déchet"
+  PRODUCER
+
+  "Installation de Transit, regroupement ou tri de déchets"
+  COLLECTOR
+
+  "Installation de traitement"
+  WASTEPROCESSOR
+
+  "Transporteur"
+  TRANSPORTER
+
+  "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)"
+  WASTE_VEHICLES
+
+  "Installation de collecte de déchets apportés par le producteur initial"
+  WASTE_CENTER
+
+  "Négociant"
+  TRADER
+
+  "Courtier"
+  BROKER
+
+  "Éco-organisme"
+  ECO_ORGANISME
+}
+
+"État du processus de vérification de l'établissement"
+enum CompanyVerificationStatus {
+  "L'établissement est vérifié"
+  VERIFIED
+  "L'établissement vient d'être crée, en attente de vérifications manuelles par l'équipe Trackdéchets"
+  TO_BE_VERIFIED
+  """
+  Les vérifications manuelles n'ont pas abouties, une lettre a été envoyée à l'adresse enregistrée
+  auprès du registre du commerce et des sociétés
+  """
+  LETTER_SENT
+}

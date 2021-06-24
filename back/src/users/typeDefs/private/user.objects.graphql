@@ -1,0 +1,24 @@
+"""
+Invitation à rejoindre une entreprise
+lorsque l'utilisateur invité n'est pas encore inscrit
+sur Trackdéchets
+"""
+type Invitation {
+  "Identifiant unique"
+  id: ID!
+
+  "Email de l'utilisateur invité"
+  email: String!
+
+  "Siret de l'entreprise à laquelle l'utilisateur est invité"
+  companySiret: String!
+
+  "Hash unique inclus dans le lien d'invitation envoyé par email"
+  hash: String!
+
+  "Rôle de l'utilisateur au sein de l'entreprise"
+  role: UserRole!
+
+  "Date when the invitation was accepted and the user joined"
+  acceptedAt: DateTime
+}

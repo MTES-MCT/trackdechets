@@ -1,0 +1,9 @@
+type Query {
+  bsds(
+    clue: String
+    where: BsdWhere
+    after: String
+    first: Int
+    orderBy: OrderBy
+  ): BsdConnection!
+}

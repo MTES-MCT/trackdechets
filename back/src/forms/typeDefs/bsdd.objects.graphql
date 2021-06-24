@@ -1,0 +1,516 @@
+"""
+Bordereau de suivi de déchets (BSD)
+Version dématérialisée du [CERFA n°12571*01](https://www.service-public.fr/professionnels-entreprises/vosdroits/R14334)
+"""
+type Form {
+  "Identifiant unique du bordereau."
+  id: ID!
+
+  """
+  Identifiant lisible utilisé comme numéro sur le CERFA (case "Bordereau n°****").
+  Il est possible de l'utiliser pour récupérer l'identifiant unique du bordereau via la query form,
+  utilisé pour le reste des opérations.
+  Cet identifiant possède le format BSD-{yyyyMMdd}-{XXXXXXXX} où yyyyMMdd est la date du jour
+  et XXXXXXXXX une chaine de 9 caractères alphanumériques. Ex: BSD-20210101-HY87F54D1
+  """
+  readableId: String!
+
+  """
+  Identifiant personnalisé permettant de faire le lien avec un
+  objet un système d'information tierce
+  """
+  customId: String
+
+  """
+  Permet de savoir si les données du BSD ont été importées depuis un
+  bordereau signé papier via la mutation `importPaperForm`
+  """
+  isImportedFromPaper: Boolean!
+
+  "Établissement émetteur/producteur du déchet (case 1)"
+  emitter: Emitter
+
+  "Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)"
+  recipient: Recipient
+
+  "Transporteur du déchet (case 8)"
+  transporter: Transporter
+
+  "Détails du déchet (case 3)"
+  wasteDetails: WasteDetails
+
+  "Négociant (case 7)"
+  trader: Trader
+
+  "Courtier"
+  broker: Broker
+
+  "Date de création du BSD"
+  createdAt: DateTime
+
+  "Date de la dernière modification du BSD"
+  updatedAt: DateTime
+
+  "Statut du BSD (brouillon, envoyé, reçu, traité, etc)"
+  status: FormStatus!
+
+  "Si oui ou non le BSD a été signé par un transporteur"
+  signedByTransporter: Boolean
+
+  "Date de l'envoi du déchet par l'émetteur (case 9)"
+  sentAt: DateTime
+
+  "Nom de la personne responsable de l'envoi du déchet (case 9)"
+  sentBy: String
+
+  "Statut d'acceptation du déchet (case 10)"
+  wasteAcceptationStatus: String
+
+  "Raison du refus (case 10)"
+  wasteRefusalReason: String
+
+  "Nom de la personne en charge de la réception du déchet (case 10)"
+  receivedBy: String
+
+  "Date à laquelle le déchet a été reçu (case 10)"
+  receivedAt: DateTime
+
+  "Date à laquelle le déchet a été accepté ou refusé (case 10)"
+  signedAt: DateTime
+
+  "Quantité réelle présentée (case 10)"
+  quantityReceived: Float
+
+  "Traitement réalisé (code D/R)"
+  processingOperationDone: String
+
+  "Description de l'opération d’élimination / valorisation (case 11)"
+  processingOperationDescription: String
+
+  "Personne en charge du traitement"
+  processedBy: String
+
+  "Date à laquelle le déchet a été traité"
+  processedAt: DateTime
+
+  "Si oui ou non il y a eu rupture de traçabilité"
+  noTraceability: Boolean
+
+  "Destination ultérieure prévue (case 12)"
+  nextDestination: NextDestination
+
+  "Annexe 2"
+  appendix2Forms: [Appendix2Form!]
+
+  ecoOrganisme: FormEcoOrganisme
+
+  "BSD suite - détail des champs de la partie entreposage provisoire ou reconditionnement"
+  temporaryStorageDetail: TemporaryStorageDetail
+
+  "Résumé des valeurs clés du bordereau à l'instant T"
+  stateSummary: StateSummary
+
+  transportSegments: [TransportSegment!]
+
+  currentTransporterSiret: String
+  nextTransporterSiret: String
+}
+
+type Appendix2Form {
+  "Identifiant unique du bordereau initial"
+  id: ID!
+  "Identifiant lisible du bordereau initial"
+  readableId: String!
+  "Détails du déchet du bordereau initial (case 3)"
+  wasteDetails: WasteDetails
+  """
+  Émetteur du bordereau initial
+  Les établissements apparaissant sur le bordereau de regroupement mais pas sur le bordereau initial (ex: l'exutoire finale)
+  n'ont pas accès à ce champs pour préserver les informations commerciales de l'établissement effectuant le regroupemnt
+  """
+  emitter: Emitter
+  """
+  Code postal de l'émetteur du bordereau initial permettant aux établissements qui apparaissent sur le bordereau de regroupement
+  mais pas sur le bordereau initial (ex: l'exutoire finale) de connaitre la zone de chalandise de l'émetteur initial.
+  """
+  emitterPostalCode: String
+  """
+  Date d’acceptation du lot initial par l’installation réalisant une transformation ou un traitement aboutissant à des déchets
+  dont la provenance reste identifiable. C'est la date qui figure au cadre 10 du bordereau initial.
+  """
+  signedAt: DateTime
+  """
+  Quantité reçue par l’installation réalisant une transformation ou un traitement aboutissant à des déchets
+  dont la provenance reste identifiable
+  """
+  quantityReceived: Float
+  """
+  Opération de transformation ou un traitement aboutissant à des déchets dont la provenance reste identifiable effectuée
+  par l'installation de regroupement
+  """
+  processingOperationDone: String
+}
+
+"""
+En fonction du statut du bordereau, différentes informations sont à lire pour connaitre vraiment l'étast du bordereau:
+- la quantité peut changer entre émission, réception, entreposage provisoire...
+- le bordereau peut naviguer entre plusieurs entreprises.
+- quand le bordereau a-t-il été modifié pour la dernière fois ? (création, signature, traitement... ?)
+- si c'est un bordereau avec conditionnement et qu'on attend un transporteur, quel est-il ?
+
+Cet objet `StateSummary` vise à simplifier ces questions. Il renverra toujours la valeur pour un instant T donné.
+"""
+type StateSummary {
+  "Quantité la plus à jour"
+  quantity: Float
+
+  "DEPRECATED Packaging le plus à jour"
+  packagings: [Packagings!]! @deprecated(reason: "Utiliser packagingInfos")
+
+  "Packaging le plus à jour"
+  packagingInfos: [PackagingInfo!]!
+
+  "Code ONU le plus à jour"
+  onuCode: String
+
+  "Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18)"
+  transporter: FormCompany
+
+  "Numéro de plaque d'immatriculation"
+  transporterNumberPlate: String
+
+  "Information libre, destinée aux transporteurs"
+  transporterCustomInfo: String
+
+  "Prochaine entreprise à recevoir le déchet (entreprise en case 2 ou 14)"
+  recipient: FormCompany
+
+  "Prochaine entreprise à émettre le déchet (entreprise en case 1 ou 13)"
+  emitter: FormCompany
+
+  "Date de la dernière action sur le bordereau"
+  lastActionOn: DateTime
+}
+
+"Données du BSD suite sur la partie entreposage provisoire ou reconditionnement, rattachées à un BSD existant"
+type TemporaryStorageDetail {
+  "Établissement qui stocke temporairement le déchet (case 13)"
+  temporaryStorer: TemporaryStorer
+
+  """
+  Installation de destination prévue (case 14) à remplir par le producteur ou
+  le site d'entreposage provisoire
+  """
+  destination: Destination
+
+  "Détails du déchet (cases 15, 16 et 17)"
+  wasteDetails: WasteDetails
+
+  "Transporteur du déchet (case 18)"
+  transporter: Transporter
+
+  "Nom du signataire du BSD suite  (case 19)"
+  signedBy: String
+  "Date de signature du BSD suite (case 19)"
+  signedAt: DateTime
+}
+
+type TemporaryStorer {
+  quantityType: QuantityType
+  quantityReceived: Float
+  wasteAcceptationStatus: String
+  wasteRefusalReason: String
+
+  receivedAt: DateTime
+  receivedBy: String
+}
+
+type Destination {
+  "N° de CAP (le cas échéant)"
+  cap: String
+
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  processingOperation: String
+
+  "Établissement de destination"
+  company: FormCompany
+
+  "Indique si l'information a été saisie par l'émetteur du bordereau ou l'installation d'entreposage"
+  isFilledByEmitter: Boolean
+}
+
+"Information sur l'éco-organisme responsable du BSD"
+type FormEcoOrganisme {
+  name: String!
+  siret: String!
+}
+
+"Émetteur du BSD (case 1)"
+type Emitter {
+  "Type d'émetteur"
+  type: EmitterType
+
+  "Adresse du chantier"
+  workSite: WorkSite
+
+  "DEPRECATED - Ancienne adresse chantier"
+  pickupSite: String
+    @deprecated(reason: "Migration vers `workSite` obligatoire")
+
+  "Établissement émetteur"
+  company: FormCompany
+}
+
+"""
+Installation de destination ou d'entreprosage
+ou de reconditionnement prévue (case 2)
+"""
+type Recipient {
+  "N° de CAP (le cas échéant)"
+  cap: String
+
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  processingOperation: String
+
+  "Établissement de destination"
+  company: FormCompany
+
+  "Indique si c'est un établissement d'entreposage temporaire ou de reocnditionnement"
+  isTempStorage: Boolean
+}
+
+"Collecteur - transporteur (case 8)"
+type Transporter {
+  "Établissement collecteur - transporteur"
+  company: FormCompany
+
+  "Exemption de récipissé"
+  isExemptedOfReceipt: Boolean
+
+  "N° de récipissé"
+  receipt: String
+
+  "Département"
+  department: String
+
+  "Limite de validité du récipissé"
+  validityLimit: DateTime
+
+  "Numéro de plaque d'immatriculation"
+  numberPlate: String
+
+  "Information libre, destinée aux transporteurs"
+  customInfo: String
+}
+
+"Destination ultérieure prévue (case 12)"
+type NextDestination {
+  "Traitement prévue (code D/R)"
+  processingOperation: String
+
+  "Établissement ultérieure"
+  company: FormCompany
+}
+
+"""
+DEPRECATED - Privilégier l'utilisation d'un polling régulier sur la query `formsLifeCycle`
+
+Mise à jour d'un BSD
+"""
+type FormSubscription {
+  "Type de mutation"
+  mutation: String
+
+  "BSD concerné"
+  node: Form
+
+  "Liste des champs mis à jour"
+  updatedFields: [String]
+
+  "Ancienne valeurs"
+  previousValues: Form
+}
+
+"Informations sur le conditionnement"
+type PackagingInfo {
+  "Type de conditionnement"
+  type: Packagings!
+
+  "Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"
+  other: String
+
+  "Nombre de colis associés à ce conditionnement"
+  quantity: Int!
+}
+
+"Détails du déchet (case 3, 4, 5, 6)"
+type WasteDetails {
+  "Rubrique déchet au format |_|_| |_|_| |_|_| (*)"
+  code: String
+
+  "Dénomination usuelle"
+  name: String
+
+  "Code ONU"
+  onuCode: String
+
+  "Conditionnements"
+  packagingInfos: [PackagingInfo!]
+
+  "Conditionnement"
+  packagings: [Packagings!] @deprecated(reason: "Utiliser `packagingInfos`")
+
+  "Autre packaging (préciser)"
+  otherPackaging: String @deprecated(reason: "Utiliser `packagingInfos`")
+
+  "Nombre de colis"
+  numberOfPackages: Int @deprecated(reason: "Utiliser `packagingInfos`")
+
+  "Quantité en tonnes"
+  quantity: Float
+
+  "Réelle ou estimée"
+  quantityType: QuantityType
+
+  "Consistance"
+  consistence: Consistence
+
+  "Contient des Polluants Organiques Persistants (POP) oui / non"
+  pop: Boolean
+}
+
+"Négociant (case 7)"
+type Trader {
+  "Établissement négociant"
+  company: FormCompany
+
+  "N° de récipissé"
+  receipt: String
+
+  "Département"
+  department: String
+
+  "Limite de validité"
+  validityLimit: DateTime
+}
+
+"Courtier"
+type Broker {
+  "Établissement courtier"
+  company: FormCompany
+
+  "N° de récipissé"
+  receipt: String
+
+  "Département"
+  department: String
+
+  "Limite de validité"
+  validityLimit: DateTime
+}
+
+"Information sur un BSD dans les logs de modifications de statuts"
+type StatusLogForm {
+  "Identifiant du BSD"
+  id: ID
+
+  "N° du bordereau"
+  readableId: String
+    @deprecated(
+      reason: "Le readableId apparaît sur le CERFA mais l'id doit être utilisé comme identifiant."
+    )
+}
+
+"Utilisateur ayant modifié le BSD"
+type StatusLogUser {
+  id: ID
+  email: String
+}
+
+"Changement de statut d'un bordereau"
+type StatusLog {
+  "Identifiant du log"
+  id: ID
+
+  "Statut du bordereau après le changement de statut"
+  status: FormStatus
+
+  "Date à laquelle le changement de statut a été effectué"
+  loggedAt: DateTime
+
+  "Valeur des champs transmis lors du changement de statut (eg. receivedBY, processingOperationDescription)"
+  updatedFields: JSON
+
+  "BSD concerné"
+  form: StatusLogForm
+
+  "Utilisateur à l'origine de la modification"
+  user: StatusLogUser
+}
+
+"Informations du cycle de vie des bordereaux"
+type formsLifeCycleData {
+  "Liste des changements de statuts"
+  statusLogs: [StatusLog!]!
+
+  "pagination, indique si d'autres pages existent après"
+  hasNextPage: Boolean
+
+  "pagination, indique si d'autres pages existent avant"
+  hasPreviousPage: Boolean
+
+  "Premier id de la page, à passer dans cursorAfter ou cursorBefore de la query formsLifeCycle"
+  startCursor: ID
+
+  "Dernier ID de la page, à passer dans cursorAfter ou cursorBefore de la query formsLifeCycle"
+  endCursor: ID
+
+  "Nombre de changements de statuts renvoyés"
+  count: Int
+}
+
+type TransportSegment {
+  id: ID!
+
+  "Siret du transporteur précédent"
+  previousTransporterCompanySiret: String
+
+  "Transporteur du segment"
+  transporter: Transporter
+
+  "Mode de transport"
+  mode: TransportMode
+
+  "Date de prise en charge"
+  takenOverAt: DateTime
+
+  "Reponsable de la prise en charge"
+  takenOverBy: String
+
+  "Prêt à être pris en charge"
+  readyToTakeOver: Boolean
+
+  "Numéro du segment"
+  segmentNumber: Int
+}
+
+"Statistiques d'un établissement"
+type CompanyStat {
+  "Établissement"
+  company: FormCompany
+
+  "Liste des statistiques"
+  stats: [Stat!]!
+}
+
+"Statistiques"
+type Stat {
+  "Code déchet"
+  wasteCode: String!
+
+  "Quantité entrante"
+  incoming: Float!
+
+  "Qantité sortante"
+  outgoing: Float!
+}
