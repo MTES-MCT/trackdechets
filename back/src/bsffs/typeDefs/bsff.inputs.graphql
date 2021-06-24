@@ -21,6 +21,7 @@ input BsffWhereTransporter {
 "Champs possible pour le filtre sur destination."
 input BsffWhereDestination {
   company: BsffWhereCompany
+  operation: BsffWhereOperation
 }
 
 "Champs possible pour le filtre sur l'opération."
@@ -93,9 +94,19 @@ input BsffDestinationInput {
 }
 input BsffDestinationReceptionInput {
   date: DateTime!
-  kilos: Int!
+  kilos: Float!
   refusal: String
 }
+
+input BsffDestinationPlannedOperationInput {
+  code: BsffOperationCode!
+  qualification: BsffOperationQualification!
+}
+
+input BsffOperationNextDestinationInput {
+  company: CompanyInput!
+}
+
 input BsffDestinationOperationInput {
   code: BsffOperationCode!
   qualification: BsffOperationQualification!
