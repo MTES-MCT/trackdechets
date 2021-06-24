@@ -70,7 +70,7 @@ type BsffPackaging {
   "Type de contenant."
   type: BsffPackagingType!
   "Volume en litres des fluides à l'intérieur du contenant."
-  litres: Int!
+  litres: Float!
 }
 
 type BsffWaste {
@@ -84,7 +84,7 @@ type BsffWaste {
 
 type BsffQuantity {
   "Poids total du déchet en kilos."
-  kilos: Int!
+  kilos: Float!
   "Si il s'agit d'une estimation ou d'un poids réel."
   isEstimate: Boolean!
 }
@@ -128,23 +128,29 @@ type BsffReception {
   "Date de réception du déchet."
   date: DateTime!
   "Quantité totale du déchet, qu'elle soit réelle ou estimée."
-  kilos: Int!
+  kilos: Float!
   "En cas de refus, le motif."
   refusal: String
   "Signature de la destination lors de l'acceptation ou du refus du déchet."
   signature: Signature
 }
 
-type BsffOperation implements IBsffOperation {
+type BsffNextDestination {
+  company: FormCompany!
+}
+
+type BsffOperation {
   "Code de l'opération de traitement."
   code: BsffOperationCode
   "Qualification plus précise du type d'opération réalisée."
   qualification: BsffOperationQualification!
+  "Destination ultérieure prévue, dans le cas d'un envoi vers l'étranger."
+  nextDestination: BsffNextDestination
   "Signature de la destination lors du traitement."
   signature: Signature
 }
 
-type BsffPlannedOperation implements IBsffOperation {
+type BsffPlannedOperation {
   "Code de l'opération de traitement prévu."
   code: BsffOperationCode
   "Qualification plus précise du type d'opération prévu."
@@ -155,7 +161,7 @@ type BsffFicheIntervention {
   "Numéro de la fiche d'intervention, habituellement renseigné par l'opérateur."
   numero: String!
   "Poids total des fluides récupérés lors de cette intervention."
-  kilos: Int!
+  kilos: Float!
   """
   Détenteur de l'équipement sur lequel est intervenu l'opérateur.
   À noter que dû à la valeur commerciale de ces informations, leur visibilité est limité aux acteurs en contact direct.
@@ -169,6 +175,7 @@ type BsffOwner {
   company: FormCompany!
 }
 
+"Résultats de bordereaux paginés."
 type BsffConnection {
   totalCount: Int!
   pageInfo: PageInfo!

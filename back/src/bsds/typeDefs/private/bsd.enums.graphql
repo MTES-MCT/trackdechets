@@ -7,4 +7,5 @@ enum BsdType {
   BSDD
   BSDASRI
   BSVHU
+  BSDA
 }

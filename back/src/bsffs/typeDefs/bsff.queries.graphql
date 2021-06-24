@@ -1,9 +1,21 @@
 type Query {
+  "Retourne un bordereau avec l'identifiant donné."
+  bsff("Identifiant du bordereau à retrouver." id: ID!): Bsff!
+
+  "Retourne un lien de téléchargement au format PDF du bordereau avec l'identifiant donné."
+  bsffPdf("Identifiant du bordereau à retrouver." id: ID!): FileDownload!
+
+  "Retourne tous les bordereaux de l'utilisateur connecté, en respectant les différents filtres."
   bsffs(
+    "Retourne les bordereaux après celui qui correspond à l'identifiant donné."
     after: ID
-    first: Int
+    "Retourne les bordereaux avant celui qui correspond à l'identifiant donné."
     before: ID
+    "Retourne les x premiers bordereaux."
+    first: Int
+    "Retourne les x derniers bordereaux."
     last: Int
+    "Filtre les résultats d'après certains critères."
     where: BsffWhere
   ): BsffConnection!
 }

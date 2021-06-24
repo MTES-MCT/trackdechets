@@ -1,17 +1,35 @@
+"Filtres possibles pour la récupération de bordereaux."
 input BsffWhere {
+  "Filtrer sur le champ emitter."
   emitter: BsffWhereEmitter
+  "Filtrer sur le champ transporter."
   transporter: BsffWhereTransporter
+  "Filtrer sur le champ destination."
   destination: BsffWhereDestination
 }
+
+"Champs possible pour le filtre sur l'emitter."
 input BsffWhereEmitter {
   company: BsffWhereCompany
 }
+
+"Champs possible pour le filtre sur transporter."
 input BsffWhereTransporter {
   company: BsffWhereCompany
 }
+
+"Champs possible pour le filtre sur destination."
 input BsffWhereDestination {
   company: BsffWhereCompany
 }
+
+"Champs possible pour le filtre sur l'opération."
+input BsffWhereOperation {
+  code: BsffOperationCode
+  qualification: BsffOperationQualification
+}
+
+"Filtres sur une entreprise."
 input BsffWhereCompany {
   siret: String!
 }
@@ -28,6 +46,7 @@ input BsffInput {
   quantity: BsffQuantityInput
   transporter: BsffTransporterInput
   destination: BsffDestinationInput
+  bsffs: [ID!]
 }
 
 input BsffEmitterInput {
@@ -37,7 +56,7 @@ input BsffEmitterInput {
 input BsffPackagingInput {
   numero: String!
   type: BsffPackagingType!
-  litres: Int!
+  litres: Float!
 }
 
 input BsffWasteInput {
@@ -47,7 +66,7 @@ input BsffWasteInput {
 }
 
 input BsffQuantityInput {
-  kilos: Int!
+  kilos: Float!
   isEstimate: Boolean!
 }
 
@@ -69,7 +88,7 @@ input BsffDestinationInput {
   company: CompanyInput!
   cap: String
   reception: BsffDestinationReceptionInput
-  plannedOperation: BsffDestinationOperationInput
+  plannedOperation: BsffDestinationPlannedOperationInput
   operation: BsffDestinationOperationInput
 }
 input BsffDestinationReceptionInput {
@@ -80,10 +99,11 @@ input BsffDestinationReceptionInput {
 input BsffDestinationOperationInput {
   code: BsffOperationCode!
   qualification: BsffOperationQualification!
+  nextDestination: BsffOperationNextDestinationInput
 }
 
 input BsffFicheInterventionInput {
-  kilos: Int!
+  kilos: Float!
   owner: BsffOwnerInput!
   postalCode: String!
 }

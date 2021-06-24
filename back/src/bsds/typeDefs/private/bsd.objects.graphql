@@ -9,4 +9,4 @@ type BsdEdge {
   node: Bsd!
 }
 
-union Bsd = Form | Bsdasri | Bsvhu
+union Bsd = Form | Bsdasri | Bsvhu | Bsda
