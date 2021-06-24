@@ -15,7 +15,7 @@ const deleteFicheInterventionBsff: MutationResolvers["deleteFicheInterventionBsf
   context
 ) => {
   const user = checkIsAuthenticated(context);
-  const bsff = await getBsffOrNotFound(id);
+  const bsff = await getBsffOrNotFound({ id });
   await isBsffContributor(user, bsff);
 
   if (bsff.emitterEmissionSignatureDate) {

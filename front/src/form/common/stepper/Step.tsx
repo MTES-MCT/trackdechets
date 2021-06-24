@@ -19,10 +19,14 @@ export interface IStepContainerProps {
   children?: JSX.Element;
   title: string;
   disabled?: boolean;
+  status?: string;
 }
 export function StepContainer(props: IStepContainerProps) {
   return props.component
-    ? createElement(props.component, { disabled: props.disabled })
+    ? createElement(props.component, {
+        disabled: props.disabled,
+        status: props.status,
+      })
     : props.children
     ? props.children
     : null;

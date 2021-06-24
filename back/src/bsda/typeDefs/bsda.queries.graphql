@@ -44,4 +44,11 @@ type Query {
 
     where: BsdaWhere
   ): BsdaConnection!
+
+  """
+  Renvoie un token pour télécharger un pdf de bordereau
+  Ce token doit être transmis à la route /download pour obtenir le fichier.
+  Il est valable 10 secondes
+  """
+  bsdaPdf("ID d'un bordereau" id: ID): FileDownload!
 }

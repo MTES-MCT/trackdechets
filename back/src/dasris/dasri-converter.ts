@@ -4,6 +4,7 @@ import {
   BsdasriTransporter,
   BsdasriRecipient,
   BsdasriWasteDetails,
+  BsdasriEmissionWasteDetails,
   FormCompany,
   BsdasriInput,
   BsdasriEmitterInput,
@@ -54,20 +55,20 @@ export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
     emission: nullIfNoValues<BsdasriEmission>({
       wasteCode: bsdasri.wasteDetailsCode,
       handedOverAt: bsdasri.handedOverToTransporterAt,
-      isTakenOverWithoutEmitterSignature: bsdasri.isEmissionDirectTakenOver,
-      isTakenOverWithSecretCode: bsdasri.isEmissionTakenOverWithSecretCode,
       signature: nullIfNoValues<BsdasriSignature>({
         author: bsdasri.emissionSignatureAuthor,
         date: bsdasri.emissionSignatureDate
       }),
 
-      wasteDetails: nullIfNoValues<BsdasriWasteDetails>({
+      wasteDetails: nullIfNoValues<BsdasriEmissionWasteDetails>({
         quantity: bsdasri.emitterWasteQuantity,
         quantityType: bsdasri.emitterWasteQuantityType as QuantityType,
         volume: bsdasri.emitterWasteVolume,
         packagingInfos: bsdasri.emitterWastePackagingsInfo as BsdasriPackagingInfo[],
         onuCode: bsdasri.wasteDetailsOnuCode
-      })
+      }),
+      isTakenOverWithoutEmitterSignature: bsdasri.isEmissionDirectTakenOver,
+      isTakenOverWithSecretCode: bsdasri.isEmissionTakenOverWithSecretCode
     }),
 
     transporter: nullIfNoValues<BsdasriTransporter>({

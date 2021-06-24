@@ -149,7 +149,6 @@ type BsffOperation {
   "Signature de la destination lors du traitement."
   signature: Signature
 }
-
 type BsffPlannedOperation {
   "Code de l'opération de traitement prévu."
   code: BsffOperationCode

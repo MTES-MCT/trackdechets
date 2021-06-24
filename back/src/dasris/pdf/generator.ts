@@ -1,7 +1,7 @@
 import { Bsdasri } from "@prisma/client";
 import { readFile } from "fs/promises";
 import { join } from "path";
-import { connect } from "puppeteer-core";
+import { connect } from "puppeteer";
 import QRCode from "qrcode";
 import { format } from "date-fns";
 import Handlebars from "handlebars";

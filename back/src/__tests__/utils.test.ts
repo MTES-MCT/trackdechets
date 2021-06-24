@@ -3,7 +3,8 @@ import {
   sameDayMidnight,
   daysBetween,
   base32Encode,
-  hashToken
+  hashToken,
+  extractPostalCode
 } from "../utils";
 
 test("getUid returns a unique identifier of fixed length", () => {
@@ -45,5 +46,24 @@ describe("base32Encode", () => {
       "97706c213b37c5347a40da50f4ae1f34ef18503cd4ef33fd5e2780b0ed0bb3a7"
     );
     process.env = { ...OLD_ENV };
+  });
+});
+
+describe("extractPostalCode", () => {
+  test("when there is a match", () => {
+    const address = "3 route du déchet, 07100 Annonay";
+    expect(extractPostalCode(address)).toEqual("07100");
+  });
+
+  test("when there is not match", () => {
+    expect(extractPostalCode("Somewhere")).toEqual("");
+  });
+
+  test("when address is empty", () => {
+    expect(extractPostalCode("")).toEqual("");
+  });
+
+  test("when address is null", () => {
+    expect(extractPostalCode(null)).toEqual("");
   });
 });

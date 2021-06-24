@@ -3,7 +3,8 @@ import {
   draftFormSchema,
   sealedFormSchema,
   ecoOrganismeSchema,
-  receivedInfoSchema
+  receivedInfoSchema,
+  processedInfoSchema
 } from "../validation";
 import { ReceivedFormInput } from "../../generated/graphql/types";
 
@@ -413,5 +414,129 @@ describe("draftFormSchema", () => {
     await expect(validateFn()).rejects.toThrow(
       "emitterCompanyMail must be a valid email"
     );
+  });
+});
+
+describe("processedInfoSchema", () => {
+  test("noTraceability can be true when processing operation is groupement", () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 13",
+      processingOperationDescription: "Regroupement",
+      noTraceability: true,
+      nextDestinationProcessingOperation: "D 8",
+      nextDestinationCompanyName: "Exutoire",
+      nextDestinationCompanySiret: "11111111111111",
+      nextDestinationCompanyAddress: "4 rue du déchet",
+      nextDestinationCompanyCountry: "FR",
+      nextDestinationCompanyContact: "Arya Stark",
+      nextDestinationCompanyPhone: "06 XX XX XX XX",
+      nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
+    };
+    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+  });
+
+  test("noTraceability can be false when processing operation is groupement", () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 13",
+      processingOperationDescription: "Regroupement",
+      noTraceability: false,
+      nextDestinationProcessingOperation: "D 8",
+      nextDestinationCompanyName: "Exutoire",
+      nextDestinationCompanySiret: "11111111111111",
+      nextDestinationCompanyAddress: "4 rue du déchet",
+      nextDestinationCompanyCountry: "FR",
+      nextDestinationCompanyContact: "Arya Stark",
+      nextDestinationCompanyPhone: "06 XX XX XX XX",
+      nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
+    };
+    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+  });
+
+  test("noTraceability can be undefined when processing operation is groupement", () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 13",
+      processingOperationDescription: "Regroupement",
+      nextDestinationProcessingOperation: "D 8",
+      nextDestinationCompanyName: "Exutoire",
+      nextDestinationCompanySiret: "11111111111111",
+      nextDestinationCompanyAddress: "4 rue du déchet",
+      nextDestinationCompanyCountry: "FR",
+      nextDestinationCompanyContact: "Arya Stark",
+      nextDestinationCompanyPhone: "06 XX XX XX XX",
+      nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
+    };
+    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+  });
+
+  test("noTraceability can be null when processing operation is groupement", () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 13",
+      processingOperationDescription: "Regroupement",
+      noTraceability: false,
+      nextDestinationProcessingOperation: "D 8",
+      nextDestinationCompanyName: "Exutoire",
+      nextDestinationCompanySiret: "11111111111111",
+      nextDestinationCompanyAddress: "4 rue du déchet",
+      nextDestinationCompanyCountry: "FR",
+      nextDestinationCompanyContact: "Arya Stark",
+      nextDestinationCompanyPhone: "06 XX XX XX XX",
+      nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
+    };
+    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+  });
+
+  test("noTraceability cannot be true when processing operation is not groupement", async () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 8",
+      processingOperationDescription: "Traitement biologique",
+      noTraceability: true
+    };
+    const validateFn = () => processedInfoSchema.validate(processedInfo);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Vous ne pouvez pas indiquer une rupture de traçabilité avec un code de traitement final"
+    );
+  });
+
+  test("noTraceability can be false when processing operation is not groupement", () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 8",
+      processingOperationDescription: "Traitement biologique",
+      noTraceability: false
+    };
+    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+  });
+
+  test("noTraceability can be undefined when processing operation is not groupement", () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 8",
+      processingOperationDescription: "Traitement biologique"
+    };
+    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+  });
+
+  test("noTraceability can be null when processing operation is not groupement", () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 8",
+      processingOperationDescription: "Traitement biologique",
+      noTraceability: null
+    };
+    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
   });
 });

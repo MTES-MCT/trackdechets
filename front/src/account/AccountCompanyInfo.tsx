@@ -53,6 +53,8 @@ AccountCompanyInfo.fragments = {
   `,
 };
 
+const { REACT_APP_VERIFY_COMPANY } = process.env;
+
 export default function AccountCompanyInfo({ company }: Props) {
   const isWasteProfessional = company.companyTypes.some(ct =>
     COMPANY_TYPES.PROFESSIONALS.includes(ct)
@@ -98,7 +100,7 @@ export default function AccountCompanyInfo({ company }: Props) {
       <AccountFieldCompanyTypes
         company={filter(AccountFieldCompanyTypes.fragments.company, company)}
       />
-      {isWasteProfessional && (
+      {isWasteProfessional && REACT_APP_VERIFY_COMPANY === "true" && (
         <AccountFieldCompanyVerificationStatus
           company={filter(
             AccountFieldCompanyVerificationStatus.fragments.company,

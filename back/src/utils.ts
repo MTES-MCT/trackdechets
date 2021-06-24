@@ -94,3 +94,16 @@ export const hashToken = (token: string) =>
     .createHmac("sha256", process.env.API_TOKEN_SECRET)
     .update(token)
     .digest("hex");
+
+/**
+ *Try extracting a valid postal code
+ */
+export function extractPostalCode(address: string) {
+  if (address) {
+    const matches = address.match(/([0-9]{5})/);
+    if (matches && matches.length > 0) {
+      return matches[0];
+    }
+  }
+  return "";
+}

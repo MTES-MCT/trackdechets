@@ -1,16 +1,28 @@
 import * as React from "react";
 import { Link, generatePath, useParams, useLocation } from "react-router-dom";
-import { Menu, MenuButton, MenuList, MenuLink } from "@reach/menu-button";
+import {
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuLink,
+  MenuItem,
+} from "@reach/menu-button";
 import "@reach/menu-button/styles.css";
 import classNames from "classnames";
 import routes from "common/routes";
+import { useBsdasriDuplicate } from "./useDuplicate";
+import { DeleteBsdasriModal } from "./DeleteModal";
 import {
+  IconTrash,
   IconChevronDown,
   IconChevronUp,
   IconView,
+  IconPaperWrite,
+  IconDuplicateFile,
+  IconPdf,
 } from "common/components/Icons";
-import { Bsdasri } from "generated/graphql/types";
-
+import { Bsdasri, BsdasriStatus } from "generated/graphql/types";
+import { useDownloadPdf } from "./useDownloadPdf";
 import styles from "../../BSDActions.module.scss";
 
 interface BSDAsriActionsProps {
@@ -20,6 +32,11 @@ interface BSDAsriActionsProps {
 export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
   const { siret } = useParams<{ siret: string }>();
   const location = useLocation();
+  const [duplicateBsdasri] = useBsdasriDuplicate({
+    variables: { id: form.id },
+  });
+  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
 
   return (
     <>
@@ -53,10 +70,49 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
+              {form["bsdasriStatus"] === BsdasriStatus.Initial && (
+                <MenuItem onSelect={() => setIsDeleting(true)}>
+                  <IconTrash color="blueLight" size="24px" />
+                  Supprimer
+                </MenuItem>
+              )}
+              {!form.isDraft && (
+                <MenuItem onSelect={() => downloadPdf()}>
+                  <IconPdf size="24px" color="blueLight" />
+                  Pdf
+                </MenuItem>
+              )}
+              {![BsdasriStatus.Processed, BsdasriStatus.Refused].includes(
+                form["bsdasriStatus"]
+              ) && (
+                <>
+                  <MenuLink
+                    as={Link}
+                    to={generatePath(routes.dashboard.bsdasris.edit, {
+                      siret,
+                      id: form.id,
+                    })}
+                  >
+                    <IconPaperWrite size="24px" color="blueLight" />
+                    Modifier
+                  </MenuLink>
+                </>
+              )}
+              <MenuItem onSelect={() => duplicateBsdasri()}>
+                <IconDuplicateFile size="24px" color="blueLight" />
+                Dupliquer
+              </MenuItem>
             </MenuList>
           </>
         )}
       </Menu>
+      {isDeleting && (
+        <DeleteBsdasriModal
+          isOpen
+          onClose={() => setIsDeleting(false)}
+          formId={form.id}
+        />
+      )}
     </>
   );
 };

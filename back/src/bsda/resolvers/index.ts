@@ -5,16 +5,20 @@ import {
 
 import bsda from "./queries/bsda";
 import bsdas from "./queries/bsdas";
+import bsdaPdf from "./queries/bsdaPdf";
 import createBsda from "./mutations/create";
 import createDraftBsda from "./mutations/createDraft";
 import updateBsda from "./mutations/update";
 import signBsda from "./mutations/sign";
 import duplicateBsda from "./mutations/duplicate";
 import publishBsda from "./mutations/publish";
+import deleteBsda from "./mutations/delete";
+import { Bsda } from "./Bsda";
 
 const Query: QueryResolvers = {
   bsda,
-  bsdas
+  bsdas,
+  bsdaPdf
 };
 const Mutation: MutationResolvers = {
   createBsda,
@@ -22,7 +26,8 @@ const Mutation: MutationResolvers = {
   updateBsda,
   signBsda,
   duplicateBsda,
-  publishBsda
+  publishBsda,
+  deleteBsda
 };
 
-export default { Query, Mutation };
+export default { Query, Mutation, Bsda };

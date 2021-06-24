@@ -1,11 +1,13 @@
 import * as React from "react";
 
 import { Bsdasri, BsdasriStatus } from "generated/graphql/types";
+import { ActionButtonContext } from "common/components/ActionButton";
+import { useParams } from "react-router";
 
 import { IconBSDasri } from "common/components/Icons";
 import { CellProps, CellValue } from "react-table";
 import { BSDAsriActions } from "dashboard/components/BSDList/BSDasri/BSDasriActions/BSDasriActions";
-
+import { WorkflowAction } from "./WorkflowAction";
 const dasriVerboseStatuses: Record<BsdasriStatus, string> = {
   INITIAL: "Initial",
   SIGNED_BY_PRODUCER: "Signé par le producteur",
@@ -59,7 +61,14 @@ export const COLUMNS: Record<
 
   workflow: {
     accessor: () => null,
-    Cell: () => null, // not implemented yet
+    Cell: ({ row }) => {
+      const { siret } = useParams<{ siret: string }>();
+      return (
+        <ActionButtonContext.Provider value={{ size: "small" }}>
+          <WorkflowAction siret={siret} form={row.original} />
+        </ActionButtonContext.Provider>
+      );
+    },
   },
   actions: {
     accessor: () => null,

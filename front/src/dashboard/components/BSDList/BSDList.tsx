@@ -115,12 +115,20 @@ export function BSDList({
   return (
     <>
       <div className={styles.BSDListActions}>
-        <Link
-          to={generatePath(routes.dashboard.bsdds.create, { siret })}
-          className="btn btn--primary"
-        >
-          Créer un bordereau
-        </Link>
+        <div>
+          <Link
+            to={generatePath(routes.dashboard.bsdds.create, { siret })}
+            className="btn btn--primary"
+          >
+            Créer un BSDD
+          </Link>
+          <Link
+            to={generatePath(routes.dashboard.bsdasris.create, { siret })}
+            className="btn btn--primary tw-ml-1"
+          >
+            Créer un BSDASRI
+          </Link>
+        </div>
         <button
           className="btn btn--primary"
           onClick={() => refetch()}

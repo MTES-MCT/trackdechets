@@ -4,7 +4,7 @@ import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { getConnectionsArgs } from "../../../vhu/pagination";
-import { expandBsdaFormFromDb } from "../../converter";
+import { expandBsdaFromDb } from "../../converter";
 import { convertWhereToDbFilter } from "../../where";
 
 export default async function bsdas(
@@ -46,7 +46,7 @@ export default async function bsdas(
 
   const edges = queriedForms
     .slice(0, itemsPerPage)
-    .map(f => ({ cursor: f.id, node: expandBsdaFormFromDb(f) }));
+    .map(f => ({ cursor: f.id, node: expandBsdaFromDb(f) }));
   return {
     totalCount,
     edges,

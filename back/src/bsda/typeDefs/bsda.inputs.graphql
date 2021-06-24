@@ -187,6 +187,7 @@ input BsdaRecepisseInput {
   department: String
   validityLimit: DateTime
 }
+
 input BsdaSignatureInput {
   "Type de signature apposé"
   type: BsdaSignatureType!

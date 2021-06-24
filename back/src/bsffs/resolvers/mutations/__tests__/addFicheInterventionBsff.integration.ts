@@ -134,24 +134,26 @@ describe("Mutation.addFicheInterventionBsff", () => {
     );
     const bsff = await createBsff(
       {
-        emitter,
-        ficheInterventions: [
-          {
-            id: ficheInterventionId,
-            numero: ficheInterventionNumero,
-            kilos: 2,
-            postalCode: "69000",
-            ownerCompanyName: "Acme",
-            ownerCompanySiret: "1".repeat(14),
-            ownerCompanyAddress: "12 rue Albert Lyon 69000",
-            ownerCompanyContact: "Carla Brownie",
-            ownerCompanyMail: "carla.brownie@gmail.com",
-            ownerCompanyPhone: "06"
-          }
-        ]
+        emitter
       },
       {
-        id: bsffId
+        id: bsffId,
+        ficheInterventions: {
+          create: [
+            {
+              id: ficheInterventionId,
+              numero: ficheInterventionNumero,
+              kilos: 2,
+              postalCode: "69000",
+              ownerCompanyName: "Acme",
+              ownerCompanySiret: "1".repeat(14),
+              ownerCompanyAddress: "12 rue Albert Lyon 69000",
+              ownerCompanyContact: "Carla Brownie",
+              ownerCompanyMail: "carla.brownie@gmail.com",
+              ownerCompanyPhone: "06"
+            }
+          ]
+        }
       }
     );
     const { mutate } = makeClient(emitter.user);

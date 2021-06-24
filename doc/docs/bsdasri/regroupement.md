@@ -17,7 +17,7 @@ Le dasris à regrouper doivent:
 
 ```graphql
 mutation createBsdasri($input: BsdasriCreateInput!) {
-  createBsdasri(bsdasriCreateInput: $input) {
+  createBsdasri(input: $input) {
     id
     status
   }

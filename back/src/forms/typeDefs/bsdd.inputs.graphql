@@ -482,6 +482,23 @@ input WasteDetailsInput {
   pop: Boolean
 }
 
+"""
+Payload lié au reconditionnement (case 15 à 17)
+"""
+input WasteDetailsRepackagingInput {
+  "Code ONU"
+  onuCode: String
+
+  "Conditionnements"
+  packagingInfos: [PackagingInfoInput!]
+
+  "Quantité en tonnes"
+  quantity: Float
+
+  "Réelle ou estimée"
+  quantityType: QuantityType
+}
+
 input TempStorerAcceptedFormInput {
   "Date à laquelle le déchet a été accepté ou refusé (case 13)."
   signedAt: DateTime!

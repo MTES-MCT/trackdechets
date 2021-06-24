@@ -9,7 +9,7 @@ import { Mutation } from "../../../../generated/graphql/types";
 
 const CREATE_DRAFT_DASRI = `
 mutation DasriCreate($input: BsdasriCreateInput!) {
-  createDraftBsdasri(bsdasriCreateInput: $input)  {
+  createDraftBsdasri(input: $input)  {
     id
     isDraft
     status

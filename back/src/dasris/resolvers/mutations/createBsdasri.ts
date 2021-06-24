@@ -8,10 +8,10 @@ import createBsdasri from "./create";
 
 const createBsdasriResolver = async (
   parent: ResolversParentTypes["Mutation"],
-  bsdasriCreateInput: MutationCreateBsdasriArgs,
+  input: MutationCreateBsdasriArgs,
   context: GraphQLContext
 ) => {
-  return createBsdasri(parent, bsdasriCreateInput, context, false);
+  return createBsdasri(parent, input, context, false);
 };
 
 export default createBsdasriResolver;
