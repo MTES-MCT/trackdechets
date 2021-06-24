@@ -545,7 +545,11 @@ export const operationSchema: FactorySchemaOf<
       .label("Opération d’élimination / valorisation")
       .oneOf([...allowedOperations, "", null], INVALID_PROCESSING_OPERATION)
       .requiredIf(context.operationSignature),
-    processedAt: yup.date().nullable().requiredIf(context.operationSignature)
+    processedAt: yup
+      .date()
+      .label("Date de traitement")
+      .nullable()
+      .requiredIf(context.operationSignature)
   });
 };
 
