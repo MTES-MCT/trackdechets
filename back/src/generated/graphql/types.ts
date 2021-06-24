@@ -737,6 +737,7 @@ export type BsdasriTransport = {
   handedOverAt?: Maybe<Scalars["DateTime"]>;
   takenOverAt?: Maybe<Scalars["DateTime"]>;
   signature?: Maybe<BsdasriSignature>;
+  mode: TransportMode;
 };
 
 /** Collecteur transporteur */
@@ -777,6 +778,7 @@ export type BsdasriTransportInput = {
   takenOverAt?: Maybe<Scalars["DateTime"]>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
   wasteAcceptation?: Maybe<BsdasriWasteAcceptationInput>;
+  mode?: Maybe<TransportMode>;
 };
 
 export type BsdasriUpdateInput = {
@@ -6032,6 +6034,7 @@ export type BsdasriTransportResolvers<
     ParentType,
     ContextType
   >;
+  mode?: Resolver<ResolversTypes["TransportMode"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -9639,6 +9642,7 @@ export function createBsdasriTransportMock(
     handedOverAt: null,
     takenOverAt: null,
     signature: null,
+    mode: "ROAD",
     ...props
   };
 }
@@ -9688,6 +9692,7 @@ export function createBsdasriTransportInputMock(
     takenOverAt: null,
     handedOverAt: null,
     wasteAcceptation: null,
+    mode: null,
     ...props
   };
 }

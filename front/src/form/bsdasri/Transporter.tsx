@@ -8,6 +8,7 @@ import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 import Packagings from "./components/packagings/Packagings";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import { transportModeLabels } from "dashboard/constants";
 
 export default function Transporter({ status }) {
   const { setFieldValue } = useFormikContext();
@@ -121,6 +122,21 @@ export default function Transporter({ status }) {
 
       {showTransportFields ? (
         <>
+          <div className="form__row">
+            <label>Mode de transport</label>
+            <Field
+              as="select"
+              name="transport.mode"
+              id="id_mode"
+              className="td-select"
+            >
+              {Object.entries(transportModeLabels).map(([k, v]) => (
+                <option value={`${k}`} key={k}>
+                  {v}
+                </option>
+              ))}
+            </Field>
+          </div>
           <Field
             name="transport.wasteAcceptation"
             component={Acceptation}
