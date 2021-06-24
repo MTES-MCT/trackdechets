@@ -1,6 +1,12 @@
 import * as React from "react";
 import { Link, generatePath, useParams, useLocation } from "react-router-dom";
-import { Menu, MenuButton, MenuList, MenuLink } from "@reach/menu-button";
+import {
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuLink,
+  MenuItem,
+} from "@reach/menu-button";
 import "@reach/menu-button/styles.css";
 import classNames from "classnames";
 import routes from "common/routes";
@@ -9,8 +15,14 @@ import {
   IconChevronUp,
   IconView,
   IconPaperWrite,
+  IconPdf,
+  IconDuplicateFile,
+  IconTrash,
 } from "common/components/Icons";
 import { Bsvhu, BsvhuStatus } from "generated/graphql/types";
+import { DeleteBsvhuModal } from "./DeleteModal";
+import { useDownloadPdf } from "./useDownloadPdf";
+import { useDuplicate } from "./useDuplicate";
 
 import styles from "../../BSDActions.module.scss";
 
@@ -21,6 +33,12 @@ interface BSVhuActionsProps {
 export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
   const { siret } = useParams<{ siret: string }>();
   const location = useLocation();
+
+  const [duplicateBsvhu] = useDuplicate({
+    variables: { id: form.id },
+  });
+  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
 
   return (
     <>
@@ -54,8 +72,14 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
+              {!form.isDraft && (
+                <MenuItem onSelect={() => downloadPdf()}>
+                  <IconPdf size="24px" color="blueLight" />
+                  Pdf
+                </MenuItem>
+              )}
               {![BsvhuStatus.Processed, BsvhuStatus.Refused].includes(
-                form.status
+                form["bsvhuStatus"]
               ) && (
                 <>
                   <MenuLink
@@ -70,10 +94,27 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
                   </MenuLink>
                 </>
               )}
+              <MenuItem onSelect={() => duplicateBsvhu()}>
+                <IconDuplicateFile size="24px" color="blueLight" />
+                Dupliquer
+              </MenuItem>
+              {form["bsvhuStatus"] === BsvhuStatus.Initial && (
+                <MenuItem onSelect={() => setIsDeleting(true)}>
+                  <IconTrash color="blueLight" size="24px" />
+                  Supprimer
+                </MenuItem>
+              )}
             </MenuList>
           </>
         )}
       </Menu>
+      {isDeleting && (
+        <DeleteBsvhuModal
+          isOpen
+          onClose={() => setIsDeleting(false)}
+          formId={form.id}
+        />
+      )}
     </>
   );
 };

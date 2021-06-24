@@ -1,5 +1,5 @@
 import { Bsda, BsdaType } from "@prisma/client";
-import { SealedFieldsError } from "../../vhu/errors";
+import { SealedFieldsError } from "../../bsvhu/errors";
 import { checkKeysEditability } from "../edition-rules";
 
 describe("Bsda edition rules", () => {

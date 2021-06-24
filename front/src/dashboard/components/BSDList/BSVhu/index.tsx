@@ -3,6 +3,9 @@ import { CellProps, CellValue } from "react-table";
 import { IconBSVhu } from "common/components/Icons";
 import { Bsvhu, BsvhuStatus } from "generated/graphql/types";
 import { BSVhuActions } from "./BSVhuActions/BSVhuActions";
+import { useParams } from "react-router-dom";
+import { ActionButtonContext } from "common/components/ActionButton";
+import { WorkflowAction } from "./WorkflowAction";
 
 const vhuVerboseStatuses: Record<BsvhuStatus, string> = {
   INITIAL: "Initial",
@@ -51,7 +54,14 @@ export const COLUMNS: Record<
 
   workflow: {
     accessor: () => null,
-    Cell: () => null, // not implemented yet
+    Cell: ({ row }) => {
+      const { siret } = useParams<{ siret: string }>();
+      return (
+        <ActionButtonContext.Provider value={{ size: "small" }}>
+          <WorkflowAction siret={siret} form={row.original} />
+        </ActionButtonContext.Provider>
+      );
+    },
   },
   actions: {
     accessor: () => null,

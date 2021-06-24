@@ -18,6 +18,7 @@ server {
 
 server {
     listen 80;
+    listen [::]:80;
     server_name $API_HOST;
 
     location / {
@@ -31,6 +32,7 @@ server {
 
 server {
     listen 80;
+    listen [::]:80;
     server_name $DEVELOPERS_HOST;
 
     location / {
@@ -44,6 +46,7 @@ server {
 
 server {
     listen 80;
+    listen [::]:80;
     server_name $ELASTIC_SEARCH_HOST;
 
     location / {
@@ -57,6 +60,7 @@ server {
 
 server {
     listen 80;
+    listen [::]:80;
     server_name $KIBANA_HOST;
 
     location / {
