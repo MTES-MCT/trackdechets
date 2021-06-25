@@ -1369,8 +1369,6 @@ export type BsffWaste = {
   code: Scalars["String"];
   /** Nature du fluide, laisser vide lorsqu'il est inconnu. */
   nature?: Maybe<Scalars["String"]>;
-  /** Description du déchet, permet de le qualifier de façon plus précise. */
-  description: Scalars["String"];
   /** Mention ADR. */
   adr: Scalars["String"];
 };
@@ -1378,7 +1376,6 @@ export type BsffWaste = {
 export type BsffWasteInput = {
   code: Scalars["String"];
   nature?: Maybe<Scalars["String"]>;
-  description: Scalars["String"];
   adr: Scalars["String"];
 };
 
@@ -6575,7 +6572,6 @@ export type BsffWasteResolvers<
 > = {
   code?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   nature?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
-  description?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   adr?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -10505,7 +10501,6 @@ export function createBsffWasteMock(props: Partial<BsffWaste>): BsffWaste {
     __typename: "BsffWaste",
     code: "",
     nature: null,
-    description: "",
     adr: "",
     ...props
   };
@@ -10517,7 +10512,6 @@ export function createBsffWasteInputMock(
   return {
     code: "",
     nature: null,
-    description: "",
     adr: "",
     ...props
   };
