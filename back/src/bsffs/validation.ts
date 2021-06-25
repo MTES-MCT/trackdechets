@@ -249,6 +249,8 @@ export const beforeOperationSchema: yup.SchemaOf<Pick<
     ) as any, // https://github.com/jquense/yup/issues/1302
   destinationOperationCode: yup
     .string()
+    // Operation code can be null when the waste is temporarily stored and sent somewhere else.
+    // It received no treatment, it was only stored in its current form.
     .nullable()
     .oneOf(
       [null, ...Object.values(OPERATION_CODES)],
@@ -327,7 +329,12 @@ export async function canAssociateBsffs(ids: string[]) {
   }
 
   if (
-    bsffs.some(bsff => !GROUPING_CODES.includes(bsff.destinationOperationCode))
+    !bsffs.every(
+      bsff =>
+        // operation code is null when the waste is temporarily stored and receives no treatment
+        bsff.destinationOperationCode == null ||
+        GROUPING_CODES.includes(bsff.destinationOperationCode)
+    )
   ) {
     throw new UserInputError(
       `Les bordereaux à associer ont déclaré un traitement qui ne permet pas de leur donner suite`

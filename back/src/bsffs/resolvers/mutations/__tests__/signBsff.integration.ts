@@ -415,37 +415,6 @@ describe("Mutation.signBsff", () => {
       expect(data.signBsff.id).toBeTruthy();
     });
 
-    it("should disallow destination to sign operation when required data is missing", async () => {
-      const bsff = await createBsffAfterReception({
-        emitter,
-        transporter,
-        destination
-      });
-
-      const { mutate } = makeClient(destination.user);
-      const { errors } = await mutate<
-        Pick<Mutation, "signBsff">,
-        MutationSignBsffArgs
-      >(SIGN, {
-        variables: {
-          id: bsff.id,
-          type: "OPERATION",
-          signature: {
-            date: new Date().toISOString() as any,
-            author: destination.user.name
-          }
-        }
-      });
-
-      expect(errors).toEqual([
-        expect.objectContaining({
-          extensions: {
-            code: "BAD_USER_INPUT"
-          }
-        })
-      ]);
-    });
-
     it("should allow signing a bsff for reexpedition", async () => {
       const bsff = await createBsffBeforeOperation(
         {
