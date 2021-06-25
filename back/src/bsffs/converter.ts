@@ -56,12 +56,12 @@ export function flattenBsffInput(
 
     transporterTransportMode: bsffInput.transporter?.transport?.mode,
 
-    destinationCompanyName: bsffInput.destination?.company.name,
-    destinationCompanySiret: bsffInput.destination?.company.siret,
-    destinationCompanyAddress: bsffInput.destination?.company.address,
-    destinationCompanyContact: bsffInput.destination?.company.contact,
-    destinationCompanyPhone: bsffInput.destination?.company.phone,
-    destinationCompanyMail: bsffInput.destination?.company.mail,
+    destinationCompanyName: bsffInput.destination?.company?.name,
+    destinationCompanySiret: bsffInput.destination?.company?.siret,
+    destinationCompanyAddress: bsffInput.destination?.company?.address,
+    destinationCompanyContact: bsffInput.destination?.company?.contact,
+    destinationCompanyPhone: bsffInput.destination?.company?.phone,
+    destinationCompanyMail: bsffInput.destination?.company?.mail,
 
     destinationReceptionDate: bsffInput.destination?.reception?.date,
     destinationReceptionKilos: bsffInput.destination?.reception?.kilos,
@@ -69,12 +69,8 @@ export function flattenBsffInput(
 
     destinationPlannedOperationCode:
       bsffInput.destination?.plannedOperation?.code,
-    destinationPlannedOperationQualification:
-      bsffInput.destination?.plannedOperation?.qualification,
 
     destinationOperationCode: bsffInput.destination?.operation?.code,
-    destinationOperationQualification:
-      bsffInput.destination?.operation?.qualification,
 
     destinationOperationNextDestinationCompanyName:
       bsffInput.destination?.operation?.nextDestination?.company.name,
@@ -169,7 +165,6 @@ export function unflattenBsff(
       }),
       operation: nullIfNoValues<GraphQL.BsffOperation>({
         code: prismaBsff.destinationOperationCode as GraphQL.BsffOperationCode,
-        qualification: prismaBsff.destinationOperationQualification as GraphQL.BsffOperationQualification,
         nextDestination: nullIfNoValues<GraphQL.BsffNextDestination>({
           company: nullIfNoValues<GraphQL.FormCompany>({
             name: prismaBsff.destinationOperationNextDestinationCompanyName,
@@ -190,8 +185,7 @@ export function unflattenBsff(
         })
       }),
       plannedOperation: nullIfNoValues<GraphQL.BsffPlannedOperation>({
-        code: prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode,
-        qualification: prismaBsff.destinationPlannedOperationQualification as GraphQL.BsffOperationQualification
+        code: prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode
       }),
       cap: prismaBsff.destinationCap
     })

@@ -1152,7 +1152,7 @@ export type BsffDestination = {
 };
 
 export type BsffDestinationInput = {
-  company: CompanyInput;
+  company?: Maybe<CompanyInput>;
   cap?: Maybe<Scalars["String"]>;
   reception?: Maybe<BsffDestinationReceptionInput>;
   plannedOperation?: Maybe<BsffDestinationPlannedOperationInput>;
@@ -1161,13 +1161,11 @@ export type BsffDestinationInput = {
 
 export type BsffDestinationOperationInput = {
   code: BsffOperationCode;
-  qualification: BsffOperationQualification;
   nextDestination?: Maybe<BsffOperationNextDestinationInput>;
 };
 
 export type BsffDestinationPlannedOperationInput = {
   code: BsffOperationCode;
-  qualification: BsffOperationQualification;
 };
 
 export type BsffDestinationReceptionInput = {
@@ -1240,8 +1238,6 @@ export type BsffOperation = {
   __typename?: "BsffOperation";
   /** Code de l'opération de traitement. */
   code?: Maybe<BsffOperationCode>;
-  /** Qualification plus précise du type d'opération réalisée. */
-  qualification: BsffOperationQualification;
   /** Destination ultérieure prévue, dans le cas d'un envoi vers l'étranger. */
   nextDestination?: Maybe<BsffNextDestination>;
   /** Signature de la destination lors du traitement. */
@@ -1260,19 +1256,6 @@ export enum BsffOperationCode {
 export type BsffOperationNextDestinationInput = {
   company: CompanyInput;
 };
-
-/**
- * Liste des qualifications de traitement possible.
- * Attention, certaines combinaisons de code et qualification ne sont pas possibles.
- * Par exemple, seul le code D 10 peut être associé à une incinération.
- */
-export enum BsffOperationQualification {
-  RecuperationRegeneration = "RECUPERATION_REGENERATION",
-  Incineration = "INCINERATION",
-  Groupement = "GROUPEMENT",
-  Reconditionnement = "RECONDITIONNEMENT",
-  Reexpedition = "REEXPEDITION"
-}
 
 export type BsffOwner = {
   __typename?: "BsffOwner";
@@ -1308,8 +1291,6 @@ export type BsffPlannedOperation = {
   __typename?: "BsffPlannedOperation";
   /** Code de l'opération de traitement prévu. */
   code?: Maybe<BsffOperationCode>;
-  /** Qualification plus précise du type d'opération prévu. */
-  qualification: BsffOperationQualification;
 };
 
 export type BsffQuantity = {
@@ -1433,7 +1414,6 @@ export type BsffWhereEmitter = {
 /** Champs possible pour le filtre sur l'opération. */
 export type BsffWhereOperation = {
   code?: Maybe<BsffOperationCode>;
-  qualification?: Maybe<BsffOperationQualification>;
 };
 
 /** Champs possible pour le filtre sur transporter. */

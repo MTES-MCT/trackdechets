@@ -857,11 +857,9 @@ model Bsff {
   destinationReceptionSignatureAuthor String?
   destinationReceptionSignatureDate   DateTime?
 
-  destinationPlannedOperationCode          String?
-  destinationPlannedOperationQualification String?
+  destinationPlannedOperationCode String?
 
-  destinationOperationCode          String?
-  destinationOperationQualification String?
+  destinationOperationCode String?
 
   destinationOperationNextDestinationCompanyName      String?
   destinationOperationNextDestinationCompanySiret     String?

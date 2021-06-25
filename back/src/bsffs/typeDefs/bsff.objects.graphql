@@ -142,8 +142,6 @@ type BsffNextDestination {
 type BsffOperation {
   "Code de l'opération de traitement."
   code: BsffOperationCode
-  "Qualification plus précise du type d'opération réalisée."
-  qualification: BsffOperationQualification!
   "Destination ultérieure prévue, dans le cas d'un envoi vers l'étranger."
   nextDestination: BsffNextDestination
   "Signature de la destination lors du traitement."
@@ -152,8 +150,6 @@ type BsffOperation {
 type BsffPlannedOperation {
   "Code de l'opération de traitement prévu."
   code: BsffOperationCode
-  "Qualification plus précise du type d'opération prévu."
-  qualification: BsffOperationQualification!
 }
 
 type BsffFicheIntervention {

@@ -11,19 +11,6 @@ enum BsffOperationCode {
   D14
 }
 
-"""
-Liste des qualifications de traitement possible.
-Attention, certaines combinaisons de code et qualification ne sont pas possibles.
-Par exemple, seul le code D 10 peut être associé à une incinération.
-"""
-enum BsffOperationQualification {
-  RECUPERATION_REGENERATION
-  INCINERATION
-  GROUPEMENT
-  RECONDITIONNEMENT
-  REEXPEDITION
-}
-
 enum BsffSignatureType {
   EMISSION
   TRANSPORT

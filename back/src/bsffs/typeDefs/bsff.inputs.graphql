@@ -27,7 +27,6 @@ input BsffWhereDestination {
 "Champs possible pour le filtre sur l'opération."
 input BsffWhereOperation {
   code: BsffOperationCode
-  qualification: BsffOperationQualification
 }
 
 "Filtres sur une entreprise."
@@ -86,7 +85,7 @@ input BsffTransporterTransportInput {
 }
 
 input BsffDestinationInput {
-  company: CompanyInput!
+  company: CompanyInput
   cap: String
   reception: BsffDestinationReceptionInput
   plannedOperation: BsffDestinationPlannedOperationInput
@@ -100,7 +99,6 @@ input BsffDestinationReceptionInput {
 
 input BsffDestinationPlannedOperationInput {
   code: BsffOperationCode!
-  qualification: BsffOperationQualification!
 }
 
 input BsffOperationNextDestinationInput {
@@ -109,7 +107,6 @@ input BsffOperationNextDestinationInput {
 
 input BsffDestinationOperationInput {
   code: BsffOperationCode!
-  qualification: BsffOperationQualification!
   nextDestination: BsffOperationNextDestinationInput
 }
 

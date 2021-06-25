@@ -7,11 +7,7 @@ import {
 import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
-  OPERATION_CODES,
-  OPERATION_QUALIFICATIONS,
-  WASTE_CODES
-} from "../../../constants";
+import { OPERATION_CODES, WASTE_CODES } from "../../../constants";
 import {
   createBsff,
   createBsffAfterEmission,
@@ -470,15 +466,13 @@ describe("Mutation.updateBsff", () => {
     const associatedBsff = await createBsffAfterOperation(
       { emitter, transporter, destination },
       {
-        destinationOperationCode: OPERATION_CODES.R12,
-        destinationOperationQualification: OPERATION_QUALIFICATIONS.GROUPEMENT
+        destinationOperationCode: OPERATION_CODES.R12
       }
     );
     const bsffToAssociate = await createBsffAfterOperation(
       { emitter, transporter, destination },
       {
-        destinationOperationCode: OPERATION_CODES.R12,
-        destinationOperationQualification: OPERATION_QUALIFICATIONS.GROUPEMENT
+        destinationOperationCode: OPERATION_CODES.R12
       }
     );
     const bsff = await createBsff(

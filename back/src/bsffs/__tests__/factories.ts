@@ -3,12 +3,7 @@ import { Prisma, TransportMode } from ".prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
 import { UserWithCompany } from "../../__tests__/factories";
-import {
-  OPERATION_CODES,
-  OPERATION_QUALIFICATIONS,
-  PACKAGING_TYPE,
-  WASTE_CODES
-} from "../constants";
+import { OPERATION_CODES, PACKAGING_TYPE, WASTE_CODES } from "../constants";
 
 interface CreateBsffArgs {
   emitter?: UserWithCompany;
@@ -70,8 +65,6 @@ export function createBsffBeforeEmission(
     wasteDescription: "Fluides",
     quantityKilos: 1,
     destinationPlannedOperationCode: OPERATION_CODES.D10,
-    destinationPlannedOperationQualification:
-      OPERATION_QUALIFICATIONS.INCINERATION,
     ...initialData
   });
 }
@@ -138,7 +131,6 @@ export function createBsffBeforeOperation(
 ) {
   return createBsffAfterReception(args, {
     destinationOperationCode: OPERATION_CODES.D10,
-    destinationOperationQualification: OPERATION_QUALIFICATIONS.INCINERATION,
     ...initialData
   });
 }

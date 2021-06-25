@@ -9,7 +9,7 @@ import {
   UserWithCompany
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { OPERATION_CODES, OPERATION_QUALIFICATIONS } from "../../../constants";
+import { OPERATION_CODES } from "../../../constants";
 import { getFicheInterventionId } from "../../../converter";
 import {
   createBsff,
@@ -183,16 +183,13 @@ describe("Query.bsffs", () => {
     await createBsff(
       { emitter },
       {
-        destinationOperationCode: OPERATION_CODES.D10,
-        destinationOperationQualification: OPERATION_QUALIFICATIONS.INCINERATION
+        destinationOperationCode: OPERATION_CODES.D10
       }
     );
     await createBsff(
       { emitter },
       {
-        destinationOperationCode: OPERATION_CODES.R12,
-        destinationOperationQualification:
-          OPERATION_QUALIFICATIONS.RECONDITIONNEMENT
+        destinationOperationCode: OPERATION_CODES.R12
       }
     );
 
@@ -205,81 +202,6 @@ describe("Query.bsffs", () => {
             destination: {
               operation: {
                 code: "D10"
-              }
-            }
-          }
-        }
-      }
-    );
-
-    expect(data.bsffs.edges.length).toBe(1);
-  });
-
-  it("should filter bsffs with a given operation qualification", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    await createBsff(
-      { emitter },
-      {
-        destinationOperationCode: OPERATION_CODES.D10,
-        destinationOperationQualification: OPERATION_QUALIFICATIONS.INCINERATION
-      }
-    );
-    await createBsff(
-      { emitter },
-      {
-        destinationOperationCode: OPERATION_CODES.R12,
-        destinationOperationQualification:
-          OPERATION_QUALIFICATIONS.RECONDITIONNEMENT
-      }
-    );
-
-    const { query } = makeClient(emitter.user);
-    const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
-      GET_BSFFS,
-      {
-        variables: {
-          where: {
-            destination: {
-              operation: {
-                qualification: "INCINERATION"
-              }
-            }
-          }
-        }
-      }
-    );
-
-    expect(data.bsffs.edges.length).toBe(1);
-  });
-
-  it("should filter bsffs with a given operation code and qualification", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    await createBsff(
-      { emitter },
-      {
-        destinationOperationCode: OPERATION_CODES.R12,
-        destinationOperationQualification:
-          OPERATION_QUALIFICATIONS.RECONDITIONNEMENT
-      }
-    );
-    await createBsff(
-      { emitter },
-      {
-        destinationOperationCode: OPERATION_CODES.R12,
-        destinationOperationQualification: OPERATION_QUALIFICATIONS.GROUPEMENT
-      }
-    );
-
-    const { query } = makeClient(emitter.user);
-    const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
-      GET_BSFFS,
-      {
-        variables: {
-          where: {
-            destination: {
-              operation: {
-                code: "R12",
-                qualification: "RECONDITIONNEMENT"
               }
             }
           }
@@ -317,8 +239,6 @@ describe("Query.bsffs", () => {
         {
           id: bsffId,
           destinationOperationCode: OPERATION_CODES.R12,
-          destinationOperationQualification:
-            OPERATION_QUALIFICATIONS.GROUPEMENT,
           ficheInterventions: {
             create: [
               {

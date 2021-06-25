@@ -6,11 +6,78 @@ import { Bsff } from ".prisma/client";
 import prisma from "../../prisma";
 import { BsffPackaging } from "../../generated/graphql/types";
 import { generatePdf } from "../../common/pdf";
-import { OPERATION_CODES, OPERATION_QUALIFICATIONS } from "../constants";
+import { GROUPING_CODES, OPERATION_CODES } from "../constants";
 
 const templatePath = require.resolve(
   path.join(__dirname, "assets", "pdf.html")
 );
+
+function isSamePackaging(a: BsffPackaging, b: BsffPackaging): boolean {
+  return a.type === b.type && a.kilos === b.kilos && a.numero === b.numero;
+}
+
+/*
+ * A groupement is when the packagings don't change,
+ * they're just grouped together.
+ *
+ * This function checks that the bsff lists all the packagings
+ * from the associated bsffs, unchanged.
+ */
+function isGroupement(bsff: Bsff, associatedBsff: Bsff[]): boolean {
+  if (!GROUPING_CODES.includes(bsff.destinationOperationCode)) {
+    return false;
+  }
+
+  const packagings = ((bsff.packagings ?? []) as BsffPackaging[]).slice();
+  const associatedPackagings = associatedBsff.flatMap(
+    bsff => (bsff.packagings ?? []) as BsffPackaging[]
+  );
+
+  if (associatedPackagings.length !== packagings.length) {
+    return false;
+  }
+
+  for (const associatedPackaging of associatedPackagings) {
+    const packagingIndex = packagings.findIndex(packaging =>
+      isSamePackaging(packaging, associatedPackaging)
+    );
+    if (packagingIndex === -1) {
+      return false;
+    }
+
+    packagings.splice(packagingIndex, 1);
+  }
+
+  return true;
+}
+
+/*
+ * A reconditionnement is when the packagings have changed.
+ *
+ * This function does the opposite of isGroupement: it checks that
+ * the bsff lists different packagigns than the associated ones.
+ */
+function isReconditionnement(bsff: Bsff, associatedBsffs: Bsff[]): boolean {
+  return (
+    GROUPING_CODES.includes(bsff.destinationOperationCode) &&
+    !isGroupement(bsff, associatedBsffs)
+  );
+}
+
+/*
+ * A reexpedition is when a single packaging was stored temporarily
+ * before being sent elsewhere.
+ */
+function isReexpedition(bsff: Bsff, associatedBsffs: Bsff[]): boolean {
+  return (
+    bsff.destinationOperationCode == null &&
+    associatedBsffs.length === 1 &&
+    isSamePackaging(
+      (bsff.packagings ?? []) as BsffPackaging,
+      (associatedBsffs[0].packagings ?? []) as BsffPackaging
+    )
+  );
+}
 
 export async function generateBsffPdf(bsff: Bsff) {
   const associatedBsffs = await prisma.bsff.findMany({
@@ -18,67 +85,45 @@ export async function generateBsffPdf(bsff: Bsff) {
       bsffId: bsff.id
     }
   });
-
-  const bsffType = {
-    isCollecte: false,
-    isGroupement: false,
-    isReconditionnement: false,
-    isReexpedition: false
-  };
-  switch (associatedBsffs[0]?.destinationOperationQualification) {
-    case OPERATION_QUALIFICATIONS.GROUPEMENT: {
-      bsffType.isGroupement = true;
-      break;
-    }
-    case OPERATION_QUALIFICATIONS.RECONDITIONNEMENT: {
-      bsffType.isReconditionnement = true;
-      break;
-    }
-    case OPERATION_QUALIFICATIONS.REEXPEDITION: {
-      bsffType.isReexpedition = true;
-      break;
-    }
-    default: {
-      bsffType.isCollecte = true;
-      break;
-    }
-  }
-
-  const bsffOperation = {
-    isRecuperationR2:
-      bsff.destinationOperationCode === OPERATION_CODES.R2 &&
-      bsff.destinationOperationQualification ===
-        OPERATION_QUALIFICATIONS.RECUPERATION_REGENERATION,
-    isIncinerationD10:
-      bsff.destinationOperationCode === OPERATION_CODES.D10 &&
-      bsff.destinationOperationQualification ===
-        OPERATION_QUALIFICATIONS.INCINERATION,
-    isGroupementR12:
-      bsff.destinationOperationCode === OPERATION_CODES.R12 &&
-      bsff.destinationOperationQualification ===
-        OPERATION_QUALIFICATIONS.GROUPEMENT,
-    isGroupementD13:
-      bsff.destinationOperationCode === OPERATION_CODES.D13 &&
-      bsff.destinationOperationQualification ===
-        OPERATION_QUALIFICATIONS.GROUPEMENT,
-    isReconditionnementR12:
-      bsff.destinationOperationCode === OPERATION_CODES.R12 &&
-      bsff.destinationOperationQualification ===
-        OPERATION_QUALIFICATIONS.RECONDITIONNEMENT,
-    isReconditionnementD14:
-      bsff.destinationOperationCode === OPERATION_CODES.D14 &&
-      bsff.destinationOperationQualification ===
-        OPERATION_QUALIFICATIONS.RECONDITIONNEMENT,
-    isReexpedition:
-      bsff.destinationOperationQualification ===
-      OPERATION_QUALIFICATIONS.REEXPEDITION
-  };
-
   const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
     where: {
       bsffId: bsff.id
     }
   });
+
+  const bsffType = {
+    isSingleCollecte: false,
+    isMultiCollecte: false,
+    isGroupement: false,
+    isReconditionnement: false,
+    isReexpedition: false
+  };
+  if (isGroupement(bsff, associatedBsffs)) {
+    bsffType.isGroupement = true;
+  } else if (isReconditionnement(bsff, associatedBsffs)) {
+    bsffType.isReconditionnement = true;
+  } else if (isReexpedition(bsff, associatedBsffs)) {
+    bsffType.isReexpedition = true;
+  } else if (ficheInterventions.length > 1) {
+    bsffType.isMultiCollecte = true;
+  } else {
+    bsffType.isSingleCollecte = true;
+  }
+
+  const bsffOperation = {
+    isRecuperationR2: bsff.destinationOperationCode === OPERATION_CODES.R2,
+    isIncinerationD10: bsff.destinationOperationCode === OPERATION_CODES.D10,
+    isGroupementR12:
+      bsff.destinationOperationCode === OPERATION_CODES.R12 &&
+      bsffType.isGroupement,
+    isGroupementD13: bsff.destinationOperationCode === OPERATION_CODES.D13,
+    isReconditionnementR12:
+      bsff.destinationOperationCode === OPERATION_CODES.R12 &&
+      bsffType.isReconditionnement,
+    isReconditionnementD14:
+      bsff.destinationOperationCode === OPERATION_CODES.D14,
+    isReexpedition: bsffType.isReexpedition
+  };
 
   return generatePdf(
     mustache.render(await fs.readFile(templatePath, "utf-8"), {

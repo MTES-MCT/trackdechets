@@ -1137,7 +1137,7 @@ export type BsffDestination = {
 };
 
 export type BsffDestinationInput = {
-  company: CompanyInput;
+  company?: Maybe<CompanyInput>;
   cap?: Maybe<Scalars["String"]>;
   reception?: Maybe<BsffDestinationReceptionInput>;
   plannedOperation?: Maybe<BsffDestinationPlannedOperationInput>;
@@ -1146,13 +1146,11 @@ export type BsffDestinationInput = {
 
 export type BsffDestinationOperationInput = {
   code: BsffOperationCode;
-  qualification: BsffOperationQualification;
   nextDestination?: Maybe<BsffOperationNextDestinationInput>;
 };
 
 export type BsffDestinationPlannedOperationInput = {
   code: BsffOperationCode;
-  qualification: BsffOperationQualification;
 };
 
 export type BsffDestinationReceptionInput = {
@@ -1225,8 +1223,6 @@ export type BsffOperation = {
   __typename?: "BsffOperation";
   /** Code de l'opération de traitement. */
   code?: Maybe<BsffOperationCode>;
-  /** Qualification plus précise du type d'opération réalisée. */
-  qualification: BsffOperationQualification;
   /** Destination ultérieure prévue, dans le cas d'un envoi vers l'étranger. */
   nextDestination?: Maybe<BsffNextDestination>;
   /** Signature de la destination lors du traitement. */
@@ -1239,18 +1235,6 @@ export type BsffOperationCode = "R2" | "R12" | "D10" | "D13" | "D14";
 export type BsffOperationNextDestinationInput = {
   company: CompanyInput;
 };
-
-/**
- * Liste des qualifications de traitement possible.
- * Attention, certaines combinaisons de code et qualification ne sont pas possibles.
- * Par exemple, seul le code D 10 peut être associé à une incinération.
- */
-export type BsffOperationQualification =
-  | "RECUPERATION_REGENERATION"
-  | "INCINERATION"
-  | "GROUPEMENT"
-  | "RECONDITIONNEMENT"
-  | "REEXPEDITION";
 
 export type BsffOwner = {
   __typename?: "BsffOwner";
@@ -1284,8 +1268,6 @@ export type BsffPlannedOperation = {
   __typename?: "BsffPlannedOperation";
   /** Code de l'opération de traitement prévu. */
   code?: Maybe<BsffOperationCode>;
-  /** Qualification plus précise du type d'opération prévu. */
-  qualification: BsffOperationQualification;
 };
 
 export type BsffQuantity = {
@@ -1408,7 +1390,6 @@ export type BsffWhereEmitter = {
 /** Champs possible pour le filtre sur l'opération. */
 export type BsffWhereOperation = {
   code?: Maybe<BsffOperationCode>;
-  qualification?: Maybe<BsffOperationQualification>;
 };
 
 /** Champs possible pour le filtre sur transporter. */
@@ -4958,7 +4939,6 @@ export type ResolversTypes = {
   BsffReception: ResolverTypeWrapper<BsffReception>;
   BsffOperation: ResolverTypeWrapper<BsffOperation>;
   BsffOperationCode: BsffOperationCode;
-  BsffOperationQualification: BsffOperationQualification;
   BsffNextDestination: ResolverTypeWrapper<BsffNextDestination>;
   BsffPlannedOperation: ResolverTypeWrapper<BsffPlannedOperation>;
   BsffFicheIntervention: ResolverTypeWrapper<BsffFicheIntervention>;
@@ -6452,11 +6432,6 @@ export type BsffOperationResolvers<
     ParentType,
     ContextType
   >;
-  qualification?: Resolver<
-    ResolversTypes["BsffOperationQualification"],
-    ParentType,
-    ContextType
-  >;
   nextDestination?: Resolver<
     Maybe<ResolversTypes["BsffNextDestination"]>,
     ParentType,
@@ -6494,11 +6469,6 @@ export type BsffPlannedOperationResolvers<
 > = {
   code?: Resolver<
     Maybe<ResolversTypes["BsffOperationCode"]>,
-    ParentType,
-    ContextType
-  >;
-  qualification?: Resolver<
-    ResolversTypes["BsffOperationQualification"],
     ParentType,
     ContextType
   >;
@@ -10196,7 +10166,7 @@ export function createBsffDestinationInputMock(
   props: Partial<BsffDestinationInput>
 ): BsffDestinationInput {
   return {
-    company: createCompanyInputMock({}),
+    company: null,
     cap: null,
     reception: null,
     plannedOperation: null,
@@ -10210,7 +10180,6 @@ export function createBsffDestinationOperationInputMock(
 ): BsffDestinationOperationInput {
   return {
     code: "R2",
-    qualification: "RECUPERATION_REGENERATION",
     nextDestination: null,
     ...props
   };
@@ -10221,7 +10190,6 @@ export function createBsffDestinationPlannedOperationInputMock(
 ): BsffDestinationPlannedOperationInput {
   return {
     code: "R2",
-    qualification: "RECUPERATION_REGENERATION",
     ...props
   };
 }
@@ -10329,7 +10297,6 @@ export function createBsffOperationMock(
   return {
     __typename: "BsffOperation",
     code: null,
-    qualification: "RECUPERATION_REGENERATION",
     nextDestination: null,
     signature: null,
     ...props
@@ -10391,7 +10358,6 @@ export function createBsffPlannedOperationMock(
   return {
     __typename: "BsffPlannedOperation",
     code: null,
-    qualification: "RECUPERATION_REGENERATION",
     ...props
   };
 }
@@ -10559,7 +10525,6 @@ export function createBsffWhereOperationMock(
 ): BsffWhereOperation {
   return {
     code: null,
-    qualification: null,
     ...props
   };
 }

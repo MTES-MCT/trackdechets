@@ -39,8 +39,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       "wasteNature",
       "quantityKilos",
       "quantityIsEstimate",
-      "destinationPlannedOperationCode",
-      "destinationPlannedOperationQualification"
+      "destinationPlannedOperationCode"
     ]);
   }
 
