@@ -36,7 +36,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       "emitterCompanyPhone",
       "emitterCompanySiret",
       "wasteCode",
-      "wasteDescription",
+      "wasteNature",
       "quantityKilos",
       "quantityIsEstimate",
       "destinationPlannedOperationCode",

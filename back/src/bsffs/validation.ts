@@ -22,7 +22,6 @@ export const beforeEmissionSchema: yup.SchemaOf<Pick<
   | "emitterCompanyMail"
   | "emitterEmissionSignatureDate"
   | "wasteCode"
-  | "wasteDescription"
   | "quantityKilos"
   | "destinationPlannedOperationCode"
   | "destinationPlannedOperationQualification"
@@ -72,10 +71,6 @@ export const beforeEmissionSchema: yup.SchemaOf<Pick<
       WASTE_CODES,
       "Le code déchet ne fait pas partie de la liste reconnue : ${values}"
     ),
-  wasteDescription: yup
-    .string()
-    .nullable()
-    .required("La description du déchet est requise"),
   quantityKilos: yup
     .number()
     .nullable()
