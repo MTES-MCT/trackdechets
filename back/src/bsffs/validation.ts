@@ -129,10 +129,10 @@ export const beforeTransportSchema: yup.SchemaOf<Pick<
             "Le type du contenant ne fait pas partie de la liste reconnue : ${values}"
           )
           .required("Le type de contenant est requis"),
-        litres: yup
+        kilos: yup
           .number()
           .nullable()
-          .required("Le volume du contenant est requis")
+          .required("Le poids du contenant est requis")
       })
     )
     .required("Le conditionnement est requis")

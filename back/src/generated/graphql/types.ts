@@ -1268,14 +1268,14 @@ export type BsffPackaging = {
   numero: Scalars["String"];
   /** Type de contenant. */
   type: BsffPackagingType;
-  /** Volume en litres des fluides à l'intérieur du contenant. */
-  litres: Scalars["Float"];
+  /** Poids en kilos. */
+  kilos: Scalars["Float"];
 };
 
 export type BsffPackagingInput = {
   numero: Scalars["String"];
   type: BsffPackagingType;
-  litres: Scalars["Float"];
+  kilos: Scalars["Float"];
 };
 
 export type BsffPackagingType = "BOUTEILLE";
@@ -6484,7 +6484,7 @@ export type BsffPackagingResolvers<
 > = {
   numero?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   type?: Resolver<ResolversTypes["BsffPackagingType"], ParentType, ContextType>;
-  litres?: Resolver<ResolversTypes["Float"], ParentType, ContextType>;
+  kilos?: Resolver<ResolversTypes["Float"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -10369,7 +10369,7 @@ export function createBsffPackagingMock(
     __typename: "BsffPackaging",
     numero: "",
     type: "BOUTEILLE",
-    litres: 0,
+    kilos: 0,
     ...props
   };
 }
@@ -10380,7 +10380,7 @@ export function createBsffPackagingInputMock(
   return {
     numero: "",
     type: "BOUTEILLE",
-    litres: 0,
+    kilos: 0,
     ...props
   };
 }

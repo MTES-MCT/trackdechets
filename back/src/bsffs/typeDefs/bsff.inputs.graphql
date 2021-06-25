@@ -57,7 +57,7 @@ input BsffEmitterInput {
 input BsffPackagingInput {
   numero: String!
   type: BsffPackagingType!
-  litres: Float!
+  kilos: Float!
 }
 
 input BsffWasteInput {

@@ -1290,14 +1290,14 @@ export type BsffPackaging = {
   numero: Scalars["String"];
   /** Type de contenant. */
   type: BsffPackagingType;
-  /** Volume en litres des fluides à l'intérieur du contenant. */
-  litres: Scalars["Float"];
+  /** Poids en kilos. */
+  kilos: Scalars["Float"];
 };
 
 export type BsffPackagingInput = {
   numero: Scalars["String"];
   type: BsffPackagingType;
-  litres: Scalars["Float"];
+  kilos: Scalars["Float"];
 };
 
 export enum BsffPackagingType {

@@ -92,7 +92,7 @@ export function createBsffBeforeTransport(
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffAfterEmission(args, {
-    packagings: [{ type: PACKAGING_TYPE.BOUTEILLE, numero: "01", litres: 1 }],
+    packagings: [{ type: PACKAGING_TYPE.BOUTEILLE, numero: "01", kilos: 1 }],
     wasteAdr: "Mention ADR",
     transporterTransportMode: TransportMode.ROAD,
     ...initialData

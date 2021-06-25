@@ -69,8 +69,8 @@ type BsffPackaging {
   numero: String!
   "Type de contenant."
   type: BsffPackagingType!
-  "Volume en litres des fluides à l'intérieur du contenant."
-  litres: Float!
+  "Poids en kilos."
+  kilos: Float!
 }
 
 type BsffWaste {
