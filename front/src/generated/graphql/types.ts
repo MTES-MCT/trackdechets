@@ -1392,6 +1392,8 @@ export type BsffWaste = {
   __typename?: "BsffWaste";
   /** Code déchet. */
   code: Scalars["String"];
+  /** Nature du fluide, laisser vide lorsqu'il est inconnu. */
+  nature?: Maybe<Scalars["String"]>;
   /** Description du déchet, permet de le qualifier de façon plus précise. */
   description: Scalars["String"];
   /** Mention ADR. */
@@ -1400,6 +1402,7 @@ export type BsffWaste = {
 
 export type BsffWasteInput = {
   code: Scalars["String"];
+  nature?: Maybe<Scalars["String"]>;
   description: Scalars["String"];
   adr: Scalars["String"];
 };

@@ -34,6 +34,7 @@ export function flattenBsffInput(
     packagings: bsffInput.packagings,
 
     wasteCode: bsffInput.waste?.code,
+    wasteNature: bsffInput.waste?.nature,
     wasteDescription: bsffInput.waste?.description,
     wasteAdr: bsffInput.waste?.adr,
 
@@ -119,6 +120,7 @@ export function unflattenBsff(
     packagings: prismaBsff.packagings as GraphQL.BsffPackaging[],
     waste: nullIfNoValues<GraphQL.BsffWaste>({
       code: prismaBsff.wasteCode,
+      nature: prismaBsff.wasteNature,
       description: prismaBsff.wasteDescription,
       adr: prismaBsff.wasteAdr
     }),

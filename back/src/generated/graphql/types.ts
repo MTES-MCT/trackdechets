@@ -1367,6 +1367,8 @@ export type BsffWaste = {
   __typename?: "BsffWaste";
   /** Code déchet. */
   code: Scalars["String"];
+  /** Nature du fluide, laisser vide lorsqu'il est inconnu. */
+  nature?: Maybe<Scalars["String"]>;
   /** Description du déchet, permet de le qualifier de façon plus précise. */
   description: Scalars["String"];
   /** Mention ADR. */
@@ -1375,6 +1377,7 @@ export type BsffWaste = {
 
 export type BsffWasteInput = {
   code: Scalars["String"];
+  nature?: Maybe<Scalars["String"]>;
   description: Scalars["String"];
   adr: Scalars["String"];
 };
@@ -5142,6 +5145,7 @@ export type ResolversTypes = {
   Subscription: ResolverTypeWrapper<{}>;
   FormSubscription: ResolverTypeWrapper<FormSubscription>;
   BsdasriInput: BsdasriInput;
+  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
   BsdasriRole: BsdasriRole;
 };
 
@@ -5432,6 +5436,7 @@ export type ResolversParentTypes = {
   Subscription: {};
   FormSubscription: FormSubscription;
   BsdasriInput: BsdasriInput;
+  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
 };
 
 export type AdminForVerificationResolvers<
@@ -6569,6 +6574,7 @@ export type BsffWasteResolvers<
   ParentType extends ResolversParentTypes["BsffWaste"] = ResolversParentTypes["BsffWaste"]
 > = {
   code?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  nature?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
   description?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   adr?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -10498,6 +10504,7 @@ export function createBsffWasteMock(props: Partial<BsffWaste>): BsffWaste {
   return {
     __typename: "BsffWaste",
     code: "",
+    nature: null,
     description: "",
     adr: "",
     ...props
@@ -10509,6 +10516,7 @@ export function createBsffWasteInputMock(
 ): BsffWasteInput {
   return {
     code: "",
+    nature: null,
     description: "",
     adr: "",
     ...props

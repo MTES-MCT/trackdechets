@@ -62,6 +62,7 @@ input BsffPackagingInput {
 
 input BsffWasteInput {
   code: String!
+  nature: String
   description: String!
   adr: String!
 }
