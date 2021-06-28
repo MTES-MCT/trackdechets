@@ -15,7 +15,6 @@ import {
   createBsffAfterEmission,
   createBsffBeforeTransport,
   createBsffBeforeReception,
-  createBsffAfterReception,
   createBsffAfterTransport,
   createBsffBeforeOperation
 } from "../../../__tests__/factories";

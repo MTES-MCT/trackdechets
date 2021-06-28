@@ -153,6 +153,8 @@ type BsffPlannedOperation {
 }
 
 type BsffFicheIntervention {
+  "Identifiant unique de la fiche d'intervention."
+  id: ID!
   "Numéro de la fiche d'intervention, habituellement renseigné par l'opérateur."
   numero: String!
   "Poids total des fluides récupérés lors de cette intervention."

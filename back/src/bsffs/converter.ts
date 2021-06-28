@@ -1,4 +1,3 @@
-import slugify from "slugify";
 import * as Prisma from ".prisma/client";
 import { nullIfNoValues, safeInput } from "../forms/form-converter";
 import * as GraphQL from "../generated/graphql/types";
@@ -194,8 +193,9 @@ export function unflattenBsff(
 
 export function flattenFicheInterventionBsffInput(
   ficheInterventionInput: GraphQL.BsffFicheInterventionInput
-): Omit<Prisma.Prisma.BsffFicheInterventionCreateInput, "id" | "numero"> {
+): Prisma.Prisma.BsffFicheInterventionCreateInput {
   return {
+    numero: ficheInterventionInput.numero,
     kilos: ficheInterventionInput.kilos,
     postalCode: ficheInterventionInput.postalCode,
     ownerCompanyName: ficheInterventionInput.owner.company.name ?? "",
@@ -211,6 +211,7 @@ export function unflattenFicheInterventionBsff(
   prismaFicheIntervention: Prisma.BsffFicheIntervention
 ): GraphQL.BsffFicheIntervention {
   return {
+    id: prismaFicheIntervention.id,
     numero: prismaFicheIntervention.numero,
     kilos: prismaFicheIntervention.kilos,
     postalCode: prismaFicheIntervention.postalCode,
@@ -225,11 +226,4 @@ export function unflattenFicheInterventionBsff(
       }
     }
   };
-}
-
-export function getFicheInterventionId(
-  bsffId: string,
-  ficheInterventionNumero: string
-): string {
-  return `${bsffId}-${slugify(ficheInterventionNumero, { replacement: "" })}`;
 }

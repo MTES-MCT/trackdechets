@@ -10,7 +10,6 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { OPERATION_CODES } from "../../../constants";
-import { getFicheInterventionId } from "../../../converter";
 import {
   createBsff,
   createBsffAfterOperation
@@ -146,7 +145,6 @@ describe("Query.bsffs", () => {
         ficheInterventions: {
           create: [
             {
-              id: getFicheInterventionId(bsffId, ficheInterventionNumero),
               numero: ficheInterventionNumero,
               kilos: 2,
               ownerCompanyName: "Acme",
@@ -226,10 +224,6 @@ describe("Query.bsffs", () => {
 
       const bsffId = getReadableId(ReadableIdPrefix.FF);
       const ficheInterventionNumero = "00001";
-      const ficheInterventionId = getFicheInterventionId(
-        bsffId,
-        ficheInterventionNumero
-      );
       associatedBsff = await createBsffAfterOperation(
         {
           emitter,
@@ -242,7 +236,6 @@ describe("Query.bsffs", () => {
           ficheInterventions: {
             create: [
               {
-                id: ficheInterventionId,
                 numero: ficheInterventionNumero,
                 kilos: 2,
                 postalCode: "69000",
@@ -257,8 +250,8 @@ describe("Query.bsffs", () => {
           }
         }
       );
-      associatedBsffFicheIntervention = await prisma.bsffFicheIntervention.findUnique(
-        { where: { id: ficheInterventionId } }
+      associatedBsffFicheIntervention = await prisma.bsffFicheIntervention.findFirst(
+        { where: { bsffId: associatedBsff.id } }
       );
     });
 

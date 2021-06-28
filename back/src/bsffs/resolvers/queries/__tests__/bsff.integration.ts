@@ -8,7 +8,6 @@ import {
   createBsffAfterOperation
 } from "../../../__tests__/factories";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
-import { getFicheInterventionId } from "../../../converter";
 
 const GET_BSFF = `
   query GetBsff($id: ID!) {
@@ -114,10 +113,6 @@ describe("Query.bsff", () => {
 
     const bsffId = getReadableId(ReadableIdPrefix.FF);
     const ficheInterventionNumero = "0000001";
-    const ficheInterventionId = getFicheInterventionId(
-      bsffId,
-      ficheInterventionNumero
-    );
     const bsff = await createBsff(
       {
         emitter
@@ -127,7 +122,6 @@ describe("Query.bsff", () => {
         ficheInterventions: {
           create: [
             {
-              id: ficheInterventionId,
               numero: ficheInterventionNumero,
               kilos: 2,
               ownerCompanyName: "Acme",
