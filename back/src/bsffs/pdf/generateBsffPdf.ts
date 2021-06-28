@@ -12,22 +12,10 @@ const templatePath = require.resolve(
   path.join(__dirname, "assets", "pdf.html")
 );
 
-function isSamePackaging(a: BsffPackaging, b: BsffPackaging): boolean {
-  return a.type === b.type && a.kilos === b.kilos && a.numero === b.numero;
-}
-
 /*
- * A groupement is when the packagings don't change,
- * they're just grouped together.
- *
- * This function checks that the bsff lists all the packagings
- * from the associated bsffs, unchanged.
+ * Check if the bsff lists all the packagings from the associated bsffs.
  */
-function isGroupement(bsff: Bsff, associatedBsff: Bsff[]): boolean {
-  if (!GROUPING_CODES.includes(bsff.destinationOperationCode)) {
-    return false;
-  }
-
+function hasSamePackagings(bsff: Bsff, associatedBsff: Bsff[]): boolean {
   const packagings = ((bsff.packagings ?? []) as BsffPackaging[]).slice();
   const associatedPackagings = associatedBsff.flatMap(
     bsff => (bsff.packagings ?? []) as BsffPackaging[]
@@ -38,8 +26,11 @@ function isGroupement(bsff: Bsff, associatedBsff: Bsff[]): boolean {
   }
 
   for (const associatedPackaging of associatedPackagings) {
-    const packagingIndex = packagings.findIndex(packaging =>
-      isSamePackaging(packaging, associatedPackaging)
+    const packagingIndex = packagings.findIndex(
+      packaging =>
+        packaging.type === associatedPackaging.type &&
+        packaging.kilos === associatedPackaging.kilos &&
+        packaging.numero === associatedPackaging.numero
     );
     if (packagingIndex === -1) {
       return false;
@@ -47,20 +38,26 @@ function isGroupement(bsff: Bsff, associatedBsff: Bsff[]): boolean {
 
     packagings.splice(packagingIndex, 1);
   }
+}
 
-  return true;
+/*
+ * A groupement is when the packagings don't change,
+ * they're just grouped together.
+ */
+function isGroupement(bsff: Bsff, associatedBsff: Bsff[]): boolean {
+  return (
+    GROUPING_CODES.includes(bsff.destinationOperationCode) &&
+    hasSamePackagings(bsff, associatedBsff)
+  );
 }
 
 /*
  * A reconditionnement is when the packagings have changed.
- *
- * This function does the opposite of isGroupement: it checks that
- * the bsff lists different packagigns than the associated ones.
  */
 function isReconditionnement(bsff: Bsff, associatedBsffs: Bsff[]): boolean {
   return (
     GROUPING_CODES.includes(bsff.destinationOperationCode) &&
-    !isGroupement(bsff, associatedBsffs)
+    !hasSamePackagings(bsff, associatedBsffs)
   );
 }
 
@@ -72,10 +69,7 @@ function isReexpedition(bsff: Bsff, associatedBsffs: Bsff[]): boolean {
   return (
     bsff.destinationOperationCode == null &&
     associatedBsffs.length === 1 &&
-    isSamePackaging(
-      (bsff.packagings ?? []) as BsffPackaging,
-      (associatedBsffs[0].packagings ?? []) as BsffPackaging
-    )
+    hasSamePackagings(bsff, associatedBsffs)
   );
 }
 
