@@ -241,13 +241,6 @@ export const emissionSchema: FactorySchemaOf<
       .string()
       .ensure()
       .requiredIf(context.emissionSignature, `La mention ADR est obligatoire.`),
-    emitterWasteQuantity: yup
-      .number()
-      .requiredIf(
-        context.emissionSignature,
-        "La quantité du déchet émis en kg est obligatoire"
-      )
-      .min(0, "La quantité émise doit être supérieure à 0"),
     emitterWasteVolume: yup
       .number()
       .requiredIf(
@@ -255,12 +248,28 @@ export const emissionSchema: FactorySchemaOf<
         "La quantité du déchet émis en litres est obligatoire"
       )
       .min(0, "La quantité émise doit être supérieure à 0"),
+    emitterWasteQuantity: yup
+      .number()
+      .nullable()
+      .test(
+        "emission-quantity-required-if-type-is-provided",
+        "La quantité du déchet émis en kg est obligatoire si vous renseignez le type de quantité",
+        function (value) {
+          return !!this.parent.emitterWasteQuantityType ? !!value : true;
+        }
+      )
+      .min(0, "La quantité émise doit être supérieure à 0"),
+
     emitterWasteQuantityType: yup
       .mixed<QuantityType>()
-      .requiredIf(
-        context.emissionSignature,
-        "Le type de quantité (réelle ou estimée) émis doit être précisé"
+      .test(
+        "emission-quantity-type-required-if-quantity-is-provided",
+        "Le type de quantité (réelle ou estimée) émise doit être précisé si vous renseignez une quantité",
+        function (value) {
+          return !!this.parent.emitterWasteQuantity ? !!value : true;
+        }
       ),
+
     emitterWastePackagingsInfo: yup
       .array()
       .requiredIf(
@@ -388,11 +397,26 @@ export const transportSchema: FactorySchemaOf<
       ),
     transporterWasteQuantity: yup
       .number()
-      .requiredIf(
-        context.transportSignature,
-        "La quantité du déchet transporté en kg est obligatoire"
+      .nullable()
+      .test(
+        "transport-quantity-required-if-type-is-provided",
+        "La quantité du déchet transporté en kg est obligatoire si vous renseignez le type de quantité",
+        function (value) {
+          return !!this.parent.transporterWasteQuantityType ? !!value : true;
+        }
       )
       .min(0, "La quantité transportée doit être supérieure à 0"),
+    transporterWasteQuantityType: yup
+      .mixed<QuantityType>()
+
+      .test(
+        "emission-quantity-type-required-if-quantity-is-provided",
+        "Le type de quantité (réelle ou estimée) transportée doit être précisé si vous renseignez une quantité",
+        function (value) {
+          return !!this.parent.transporterWasteQuantity ? !!value : true;
+        }
+      ),
+
     transporterWasteVolume: yup
       .number()
       .requiredIf(
@@ -400,12 +424,6 @@ export const transportSchema: FactorySchemaOf<
         "La quantité du déchet transporté en litres est obligatoire"
       )
       .min(0, "La quantité transportée doit être supérieure à 0"),
-    transporterWasteQuantityType: yup
-      .mixed<QuantityType>()
-      .requiredIf(
-        context.transportSignature,
-        "Le type de quantité (réelle ou estimée) transportée doit être précisé"
-      ),
 
     transporterWastePackagingsInfo: yup
       .array()
