@@ -9,6 +9,20 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+#### :boom: Breaking changes
+
+#### :bug: Corrections de bugs
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+# [2021.06.2] 28/06/2021
+
+#### :rocket: Nouvelles fonctionnalités
+
 - Affiche le détail d'un bordereau dasri [PR 876](https://github.com/MTES-MCT/trackdechets/pull/876)
 - Edition de bordereaux dasri [PR 886](https://github.com/MTES-MCT/trackdechets/pull/886)
 - Publication de bordereaux dasri [PR 888](https://github.com/MTES-MCT/trackdechets/pull/888)
@@ -36,10 +50,12 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Amélioration de la référence de l'API [PR 885](https://github.com/MTES-MCT/trackdechets/pull/885)
 - Documentation des validations effectuées dans la référence de l'API [PR 894](https://github.com/MTES-MCT/trackdechets/pull/894)
+
 #### :house: Interne
 
 - Seul les erreurs non gérées sont capturées par Sentry [PR 874](https://github.com/MTES-MCT/trackdechets/pull/874)
 - Passage à Docusaurus 2 [PR 885](https://github.com/MTES-MCT/trackdechets/pull/885)
+
 # [2021.06.1] 02/06/2021
 
 #### :rocket: Nouvelles fonctionnalités
