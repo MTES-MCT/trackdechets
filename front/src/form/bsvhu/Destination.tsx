@@ -17,7 +17,7 @@ export default function Destination({ disabled }) {
     <>
       {disabled && (
         <div className="notification notification--error">
-          Les champs ci-dessous ont été scéllés via signature et ne sont plus
+          Les champs ci-dessous ont été scellés via signature et ne sont plus
           modifiables.
         </div>
       )}

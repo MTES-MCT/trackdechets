@@ -9,8 +9,9 @@ import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { AlreadySignedError, InvalidSignatureError } from "../../../vhu/errors";
-import { expandBsdaFormFromDb } from "../../converter";
+import { expandBsdaFromDb } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
+import { indexBsda } from "../../elastic";
 import { machine } from "../../machine";
 import { validateBsda } from "../../validation";
 
@@ -68,7 +69,7 @@ export default async function sign(
     throw new InvalidSignatureError();
   }
 
-  const signedForm = await prisma.bsda.update({
+  const signedBsda = await prisma.bsda.update({
     where: { id },
     data: {
       [signatureTypeInfos.dbAuthorKey]: input.author,
@@ -78,7 +79,9 @@ export default async function sign(
     }
   });
 
-  return expandBsdaFormFromDb(signedForm);
+  await indexBsda(signedBsda);
+
+  return expandBsdaFromDb(signedBsda);
 }
 
 const signatureTypeMapping: Record<BsdaSignatureType, SignatureTypeInfos> = {

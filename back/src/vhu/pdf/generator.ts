@@ -1,7 +1,7 @@
 import { Bsvhu } from "@prisma/client";
 import { readFile } from "fs/promises";
 import { join } from "path";
-import { connect } from "puppeteer-core";
+import { connect } from "puppeteer";
 
 export async function buildPdf(form: Bsvhu) {
   const browser = await connect({
@@ -24,9 +24,8 @@ export async function buildPdf(form: Bsvhu) {
     await browser.close();
 
     return pdfBuffer;
-  } catch (err) {
+  } finally {
     await browser.close();
-    throw new Error("Erreur lors du téléchargement du PDF");
   }
 }
 

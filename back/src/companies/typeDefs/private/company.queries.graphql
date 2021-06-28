@@ -1,0 +1,23 @@
+"""
+Views of the Company ressource for the admin panel
+"""
+type Query {
+  """
+  Renvoie les établissements favoris de l'utilisateur. C'est à dire les
+  établissements qui font souvent partis des BSD édités
+  """
+  favorites(
+    "siret de l'entreprise pour laquelle retourner les favoris"
+    siret: String!
+    "type de favoris"
+    type: FavoriteType!
+  ): [CompanyFavorite!]!
+
+  "List companies for the company verfication table of the admin panel"
+  companiesForVerification(
+    first: Int
+    last: Int
+    skip: Int
+    where: CompanyForVerificationWhere
+  ): CompanyForVerificationConnection!
+}

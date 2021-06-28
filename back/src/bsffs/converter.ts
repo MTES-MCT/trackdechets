@@ -5,7 +5,24 @@ import * as GraphQL from "../generated/graphql/types";
 
 export function flattenBsffInput(
   bsffInput: GraphQL.BsffInput
-): Omit<Prisma.Prisma.BsffCreateInput, "id"> {
+): Partial<
+  Omit<
+    Prisma.Bsff,
+    | "id"
+    | "createdAt"
+    | "updatedAt"
+    | "isDeleted"
+    | "emitterEmissionSignatureAuthor"
+    | "emitterEmissionSignatureDate"
+    | "transporterTransportSignatureAuthor"
+    | "transporterTransportSignatureDate"
+    | "destinationReceptionSignatureAuthor"
+    | "destinationReceptionSignatureDate"
+    | "destinationOperationSignatureAuthor"
+    | "destinationOperationSignatureDate"
+    | "bsffId"
+  >
+> {
   return safeInput({
     emitterCompanyName: bsffInput.emitter?.company.name,
     emitterCompanySiret: bsffInput.emitter?.company.siret,
@@ -25,6 +42,7 @@ export function flattenBsffInput(
 
     transporterCompanyName: bsffInput.transporter?.company.name,
     transporterCompanySiret: bsffInput.transporter?.company.siret,
+    transporterCompanyVatNumber: bsffInput.transporter?.company.vatNumber,
     transporterCompanyAddress: bsffInput.transporter?.company.address,
     transporterCompanyContact: bsffInput.transporter?.company.contact,
     transporterCompanyPhone: bsffInput.transporter?.company.phone,
@@ -57,6 +75,21 @@ export function flattenBsffInput(
     destinationOperationCode: bsffInput.destination?.operation?.code,
     destinationOperationQualification:
       bsffInput.destination?.operation?.qualification,
+
+    destinationOperationNextDestinationCompanyName:
+      bsffInput.destination?.operation?.nextDestination?.company.name,
+    destinationOperationNextDestinationCompanySiret:
+      bsffInput.destination?.operation?.nextDestination?.company.siret,
+    destinationOperationNextDestinationCompanyVatNumber:
+      bsffInput.destination?.operation?.nextDestination?.company.vatNumber,
+    destinationOperationNextDestinationCompanyAddress:
+      bsffInput.destination?.operation?.nextDestination?.company.address,
+    destinationOperationNextDestinationCompanyContact:
+      bsffInput.destination?.operation?.nextDestination?.company.contact,
+    destinationOperationNextDestinationCompanyPhone:
+      bsffInput.destination?.operation?.nextDestination?.company.phone,
+    destinationOperationNextDestinationCompanyMail:
+      bsffInput.destination?.operation?.nextDestination?.company.mail,
 
     destinationCap: bsffInput.destination?.cap
   });
@@ -97,6 +130,7 @@ export function unflattenBsff(
       company: nullIfNoValues<GraphQL.FormCompany>({
         name: prismaBsff.transporterCompanyName,
         siret: prismaBsff.transporterCompanySiret,
+        vatNumber: prismaBsff.transporterCompanyVatNumber,
         address: prismaBsff.transporterCompanyAddress,
         contact: prismaBsff.transporterCompanyContact,
         phone: prismaBsff.transporterCompanyPhone,
@@ -136,6 +170,20 @@ export function unflattenBsff(
       operation: nullIfNoValues<GraphQL.BsffOperation>({
         code: prismaBsff.destinationOperationCode as GraphQL.BsffOperationCode,
         qualification: prismaBsff.destinationOperationQualification as GraphQL.BsffOperationQualification,
+        nextDestination: nullIfNoValues<GraphQL.BsffNextDestination>({
+          company: nullIfNoValues<GraphQL.FormCompany>({
+            name: prismaBsff.destinationOperationNextDestinationCompanyName,
+            siret: prismaBsff.destinationOperationNextDestinationCompanySiret,
+            vatNumber:
+              prismaBsff.destinationOperationNextDestinationCompanyVatNumber,
+            address:
+              prismaBsff.destinationOperationNextDestinationCompanyAddress,
+            contact:
+              prismaBsff.destinationOperationNextDestinationCompanyContact,
+            phone: prismaBsff.destinationOperationNextDestinationCompanyPhone,
+            mail: prismaBsff.destinationOperationNextDestinationCompanyMail
+          })
+        }),
         signature: nullIfNoValues<GraphQL.Signature>({
           author: prismaBsff.destinationOperationSignatureAuthor,
           date: prismaBsff.destinationOperationSignatureDate

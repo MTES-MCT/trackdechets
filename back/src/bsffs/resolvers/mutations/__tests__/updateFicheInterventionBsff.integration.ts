@@ -54,19 +54,23 @@ describe("Mutation.updateFicheInterventionBsff", () => {
 
     await createBsff(
       {
-        emitter,
-        ficheInterventions: [
-          {
-            id: ficheInterventionId,
-            numero: variables.numero,
-            ...flattenFicheInterventionBsffInput({
-              ...variables.input,
-              kilos: variables.input.kilos - 1
-            })
-          }
-        ]
+        emitter
       },
-      { id: bsffId }
+      {
+        id: bsffId,
+        ficheInterventions: {
+          create: [
+            {
+              id: ficheInterventionId,
+              numero: variables.numero,
+              ...flattenFicheInterventionBsffInput({
+                ...variables.input,
+                kilos: variables.input.kilos - 1
+              })
+            }
+          ]
+        }
+      }
     );
   });
 

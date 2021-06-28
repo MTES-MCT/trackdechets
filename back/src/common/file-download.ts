@@ -11,7 +11,7 @@ type DownloadHandler = (
 
 // TODO register downloaders on server start if code is distributed on several machines
 const fileDownloaders = {};
-function registerFileDownloader(
+export function registerFileDownloader(
   type: string,
   downloadHandler: DownloadHandler
 ) {

@@ -1,0 +1,84 @@
+"""
+Information sur établissement accessible dans la liste des favoris
+La liste des favoris est constituée à partir de l'historique des
+BSD édités
+"""
+type CompanyFavorite {
+  "Nom de l'établissement"
+  name: String
+
+  "SIRET de l'établissement"
+  siret: String
+
+  "Adresse de l'établissement"
+  address: String
+
+  "Nom du contact"
+  contact: String
+
+  "Numéro de téléphone"
+  phone: String
+
+  "Email de contact"
+  mail: String
+
+  """
+  Récépissé transporteur associé à cet établissement (le cas échéant)
+  """
+  transporterReceipt: TransporterReceipt
+
+  """
+  Récépissé négociant associé à cet établissement (le cas échant)
+  """
+  traderReceipt: TraderReceipt
+
+  """
+  Récépissé courtier associé à cet établissement (le cas échant)
+  """
+  brokerReceipt: BrokerReceipt
+
+  """
+  Agrément VHU démolisseur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementDemolisseur: VhuAgrement
+
+  """
+  Agrément VHU broyeur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementBroyeur: VhuAgrement
+}
+
+"""
+Lien d'upload
+"""
+type UploadLink {
+  "URL signé permettant d'uploader un fichier"
+  signedUrl: String
+
+  "Clé permettant l'upload du fichier"
+  key: String
+}
+
+type CompanyForVerification {
+  id: ID!
+  siret: String!
+  name: String!
+  companyTypes: [CompanyType!]!
+  createdAt: DateTime!
+  verificationStatus: CompanyVerificationStatus!
+  verificationComment: String
+  verificationMode: CompanyVerificationMode
+  verifiedAt: DateTime
+  admin: AdminForVerification
+}
+
+type AdminForVerification {
+  email: String!
+  name: String
+  phone: String
+}
+
+type CompanyForVerificationConnection {
+  totalCount: Int!
+  companies: [CompanyForVerification!]!
+}

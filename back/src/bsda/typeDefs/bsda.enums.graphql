@@ -1,0 +1,56 @@
+"""
+4 types de bordereaux possibles:
+  - Collecte dans un établissement 2710-1 (déchetterie)
+  - Autres collectes
+  - Regroupement
+  - Ré-expédition
+"""
+enum BsdaType {
+  COLLECTION_2710
+  OTHER_COLLECTIONS
+  GATHERING
+  RESHIPMENT
+}
+
+enum BsdaStatus {
+  INITIAL
+  SIGNED_BY_PRODUCER
+  SIGNED_BY_WORKER
+  SENT
+  PROCESSED
+  REFUSED
+  AWAITING_CHILD
+}
+
+enum BsdaPackagingType {
+  PALETTE_FILME
+  BIG_BAG
+  DEPOT_BAG
+  SAC_RENFORCE
+  BODY_BENNE
+  OTHER
+}
+
+enum BsdaQuantityType {
+  REAL
+  ESTIMATED
+}
+
+enum BsdaConsistence {
+  SOLIDE
+  PULVERULENT
+  OTHER
+}
+
+enum BsdaAcceptationStatus {
+  ACCEPTED
+  REFUSED
+  PARTIALLY_REFUSED
+}
+
+enum BsdaSignatureType {
+  EMISSION
+  WORK
+  TRANSPORT
+  OPERATION
+}

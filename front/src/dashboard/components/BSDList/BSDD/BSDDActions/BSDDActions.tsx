@@ -23,7 +23,7 @@ import { Form, FormStatus } from "generated/graphql/types";
 import { DeleteModal } from "./DeleteModal";
 import { useDuplicate } from "./useDuplicate";
 import { useDownloadPdf } from "./useDownloadPdf";
-import styles from "./BSDDActions.module.scss";
+import styles from "../../BSDActions.module.scss";
 
 interface BSDDActionsProps {
   form: Form;

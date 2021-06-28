@@ -31,6 +31,11 @@ export default {
       edit: "/dashboard/:siret/bsdds/edit/:id",
       view: "/dashboard/:siret/bsdds/view/:id",
     },
+    bsdasris: {
+      view: "/dashboard/:siret/bsdasris/view/:id",
+      create: "/dashboard/:siret/bsdasris/create",
+      edit: "/dashboard/:siret/bsdasris/edit/:id",
+    },
     bsvhus: {
       create: "/dashboard/:siret/bsvhus/create",
       edit: "/dashboard/:siret/bsvhus/edit/:id",

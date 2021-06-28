@@ -245,7 +245,7 @@ export const emissionSchema: FactorySchemaOf<
       .number()
       .requiredIf(
         context.emissionSignature,
-        "La quantité du déchet émis en tonnes est obligatoire"
+        "La quantité du déchet émis en kg est obligatoire"
       )
       .min(0, "La quantité émise doit être supérieure à 0"),
     emitterWasteVolume: yup
@@ -390,7 +390,7 @@ export const transportSchema: FactorySchemaOf<
       .number()
       .requiredIf(
         context.transportSignature,
-        "La quantité du déchet transporté en tonnes est obligatoire"
+        "La quantité du déchet transporté en kg est obligatoire"
       )
       .min(0, "La quantité transportée doit être supérieure à 0"),
     transporterWasteVolume: yup
@@ -495,7 +495,7 @@ export const receptionSchema: FactorySchemaOf<
       .number()
       .requiredIf(
         context.receptionSignature,
-        "La quantité du déchet en tonnes est obligatoire"
+        "La quantité du déchet en kg est obligatoire"
       )
       .min(0, "La quantité doit être supérieure à 0"),
     recipientWasteRefusalReason: yup
@@ -545,7 +545,11 @@ export const operationSchema: FactorySchemaOf<
       .label("Opération d’élimination / valorisation")
       .oneOf([...allowedOperations, "", null], INVALID_PROCESSING_OPERATION)
       .requiredIf(context.operationSignature),
-    processedAt: yup.date().nullable().requiredIf(context.operationSignature)
+    processedAt: yup
+      .date()
+      .label("Date de traitement")
+      .nullable()
+      .requiredIf(context.operationSignature)
   });
 };
 

@@ -77,6 +77,22 @@ jobs:
           PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID: "9"
           SECURITY_CODE_RENEWAL_TEMPLATE_ID: "6"
 
+  doc:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: doc
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - name: Test Build
+        run: |
+          yarn install --frozen-lockfile
+          yarn build
+
   integration-tests:
     runs-on: ubuntu-latest
     defaults:

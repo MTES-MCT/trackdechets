@@ -1,0 +1,28 @@
+"Statut d'acceptation d'un déchet"
+enum WasteAcceptationStatusInput {
+  "Accepté en totalité"
+  ACCEPTED
+
+  "Refusé"
+  REFUSED
+
+  "Refus partiel"
+  PARTIALLY_REFUSED
+}
+
+"Type de quantité lors de l'émission"
+enum QuantityType {
+  "Quntité réelle"
+  REAL
+
+  "Quantité estimée"
+  ESTIMATED
+}
+
+enum TransportMode {
+  ROAD
+  RAIL
+  AIR
+  RIVER
+  SEA
+}

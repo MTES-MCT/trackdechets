@@ -294,80 +294,138 @@ export const detailFormFragment = gql`
   }
   ${transporterFormFragment}
 `;
+// Dasris
 
+const signatureFragment = gql`
+  fragment SignatureFragment on BsdasriSignature {
+    date
+    author
+  }
+`;
+
+const dasriWasteDetailsFragment = gql`
+  fragment DasriWasteDetailsFragment on BsdasriWasteDetails {
+    quantity
+    quantityType
+    volume
+    packagingInfos {
+      type
+      other
+      quantity
+      volume
+    }
+  }
+`;
+
+const dasriEmissionWasteDetailsFragment = gql`
+  fragment DasriEmissionWasteDetailsFragment on BsdasriEmissionWasteDetails {
+    onuCode
+    quantity
+    quantityType
+    volume
+    packagingInfos {
+      type
+      other
+      quantity
+      volume
+    }
+  }
+`;
+const wasteAcceptationFragment = gql`
+  fragment WasteAcceptationFragment on BsdasriWasteAcceptation {
+    status
+    refusalReason
+    refusedQuantity
+  }
+`;
 export const dasriFragment = gql`
   fragment DasriFragment on Bsdasri {
     id
     bsdasriStatus: status
+    isDraft
     emitter {
+      onBehalfOfEcoorganisme
       company {
-        name
-        siret
+        ...CompanyFragment
       }
       workSite {
         name
         address
         city
         postalCode
+        infos
       }
+      customInfo
     }
     emission {
       wasteCode
+      isTakenOverWithoutEmitterSignature
+      isTakenOverWithSecretCode
       wasteDetails {
         onuCode
-        quantity
-        quantityType
+        ...DasriEmissionWasteDetailsFragment
       }
       handedOverAt
       signature {
-        author
-        date
+        ...SignatureFragment
       }
     }
     transporter {
       company {
-        siret
+        ...CompanyFragment
       }
+      receipt
+      receiptDepartment
+      receiptValidityLimit
+      customInfo
     }
     transport {
       handedOverAt
       takenOverAt
       wasteDetails {
-        quantity
-        quantityType
+        ...DasriWasteDetailsFragment
       }
       wasteAcceptation {
-        status
-        refusalReason
-
-        refusedQuantity
+        ...WasteAcceptationFragment
+      }
+      signature {
+        ...SignatureFragment
       }
     }
     recipient {
       company {
-        name
-        siret
+        ...CompanyFragment
       }
+      customInfo
     }
     reception {
       wasteDetails {
-        quantity
-        quantityType
+        ...DasriWasteDetailsFragment
       }
       wasteAcceptation {
-        status
-        refusalReason
-
-        refusedQuantity
+        ...WasteAcceptationFragment
       }
+
+      signature {
+        ...SignatureFragment
+      }
+      receivedAt
     }
     operation {
       processedAt
       processingOperation
+      signature {
+        ...SignatureFragment
+      }
     }
     createdAt
     updatedAt
   }
+  ${companyFragment}
+  ${signatureFragment}
+  ${dasriWasteDetailsFragment}
+  ${dasriEmissionWasteDetailsFragment}
+  ${wasteAcceptationFragment}
 `;
 
 export const vhuFragment = gql`

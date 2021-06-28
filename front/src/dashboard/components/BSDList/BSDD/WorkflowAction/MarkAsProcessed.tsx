@@ -32,14 +32,16 @@ const MARK_AS_PROCESSED = gql`
 
 function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   const {
-    values: { processingOperationDone, nextDestination },
+    values: { processingOperationDone, noTraceability, nextDestination },
     setFieldValue,
   } = useFormikContext<MutationMarkAsProcessedArgs["processedInfo"]>();
 
+  const isGroupement =
+    processingOperationDone &&
+    PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(processingOperationDone);
+
   useEffect(() => {
-    if (
-      PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(processingOperationDone)
-    ) {
+    if (isGroupement) {
       if (nextDestination == null) {
         setFieldValue("nextDestination", {
           processingOperation: "",
@@ -53,10 +55,14 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
           },
         });
       }
+      if (noTraceability == null) {
+        setFieldValue("noTraceability", false);
+      }
     } else {
       setFieldValue("nextDestination", null);
+      setFieldValue("noTraceability", null);
     }
-  }, [processingOperationDone, nextDestination, setFieldValue]);
+  }, [isGroupement, nextDestination, noTraceability, setFieldValue]);
 
   return (
     <Form>
@@ -111,20 +117,23 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
           />
         </label>
       </div>
-      <div className="form__row form__row--inline">
-        <Field
-          type="checkbox"
-          name="noTraceability"
-          id="id_noTraceability"
-          className="td-checkbox"
-        />
+      {isGroupement && (
+        <div className="form__row form__row--inline">
+          <Field
+            type="checkbox"
+            name="noTraceability"
+            id="id_noTraceability"
+            className="td-checkbox"
+          />
 
-        <label htmlFor="id_noTraceability">
-          {" "}
-          Rupture de traçabilité autorisée par arrêté préfectoral pour ce déchet
-          - la responsabilité du producteur du déchet est transférée
-        </label>
-      </div>
+          <label htmlFor="id_noTraceability">
+            {" "}
+            Rupture de traçabilité autorisée par arrêté préfectoral pour ce
+            déchet - la responsabilité du producteur du déchet est transférée
+          </label>
+        </div>
+      )}
+
       {nextDestination && (
         <div className="form__row">
           <h4>Destination ultérieure prévue</h4>
@@ -203,7 +212,7 @@ export default function MarkAsProcessed({ form, siret }: WorkflowActionProps) {
               processedBy: "",
               processedAt: new Date().toISOString(),
               nextDestination: null,
-              noTraceability: false,
+              noTraceability: null,
             }}
             onSubmit={values => {
               markAsProcessed({

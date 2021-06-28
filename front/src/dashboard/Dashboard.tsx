@@ -29,7 +29,8 @@ import {
   RouteBsdsFollow,
   RouteBsdsHistory,
 } from "./bsds";
-import { RouteBSDDsView } from "./bsdds";
+
+import { RouteBSDasrisView, RouteBSDDsView } from "./detail";
 import { RouteTransportToCollect, RouteTransportCollected } from "./transport";
 
 export const GET_ME = gql`
@@ -116,6 +117,9 @@ export default function Dashboard() {
             <Route path={routes.dashboard.bsdds.view}>
               <RouteBSDDsView />
             </Route>
+            <Route path={routes.dashboard.bsdasris.view}>
+              <RouteBSDasrisView />
+            </Route>
             <Route path={routes.dashboard.bsds.drafts}>
               <RouteBsdsDrafts />
             </Route>
@@ -159,6 +163,17 @@ export default function Dashboard() {
                   wide={true}
                 >
                   <RouteBSDDsView />
+                </Modal>
+              </Route>
+              <Route path={routes.dashboard.bsdasris.view}>
+                <Modal
+                  onClose={() => history.goBack()}
+                  ariaLabel="Aperçu du bordereau"
+                  isOpen
+                  padding={false}
+                  wide={true}
+                >
+                  <RouteBSDasrisView />
                 </Modal>
               </Route>
             </Switch>

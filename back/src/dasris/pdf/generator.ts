@@ -1,7 +1,7 @@
 import { Bsdasri } from "@prisma/client";
 import { readFile } from "fs/promises";
 import { join } from "path";
-import { connect } from "puppeteer-core";
+import { connect } from "puppeteer";
 import QRCode from "qrcode";
 import { format } from "date-fns";
 import Handlebars from "handlebars";
@@ -51,10 +51,8 @@ export async function buildPdf(bsdasri: Bsdasri) {
     await browser.close();
 
     return pdfBuffer;
-  } catch (err) {
+  } finally {
     await browser.close();
-
-    throw new Error("Erreur lors du téléchargement du PDF");
   }
 }
 

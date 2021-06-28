@@ -1,0 +1,13 @@
+input SignupInput {
+  "Email de l'utilisateur"
+  email: String!
+
+  "Mot de passe de l'utilisateur"
+  password: String!
+
+  "Nom de l'utilisateur"
+  name: String!
+
+  "Numéro de téléphone de l'utilisateur"
+  phone: String
+}

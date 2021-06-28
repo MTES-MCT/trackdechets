@@ -8,7 +8,8 @@ import {
   Status,
   UserRole,
   User,
-  Prisma
+  Prisma,
+  Company
 } from "@prisma/client";
 import prisma from "../prisma";
 import { hashToken } from "../utils";
@@ -96,6 +97,11 @@ export const companyAssociatedToExistingUserFactory = async (
   return company;
 };
 
+export interface UserWithCompany {
+  user: User;
+  company: Company;
+}
+
 /**
  * Create a company and a member
  * @param role: user role in the company
@@ -103,7 +109,7 @@ export const companyAssociatedToExistingUserFactory = async (
 export const userWithCompanyFactory = async (
   role: UserRole,
   companyOpts: Partial<Prisma.CompanyCreateInput> = {}
-) => {
+): Promise<UserWithCompany> => {
   const company = await companyFactory(companyOpts);
 
   const user = await userFactory({

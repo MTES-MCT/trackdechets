@@ -27,14 +27,10 @@ export function getCompanyThrottled(
 export async function sirenify(
   company: CompanyRow
 ): Promise<CompanyRow & CompanyInfo> {
-  try {
-    const { naf: codeNaf, name } = await getCompanyThrottled(company.siret);
-    return {
-      ...company,
-      codeNaf,
-      name
-    };
-  } catch (err) {
-    throw new Error(`SIRET ${company.siret} does not exist`);
-  }
+  const { naf: codeNaf, name } = await getCompanyThrottled(company.siret);
+  return {
+    ...company,
+    codeNaf,
+    name
+  };
 }

@@ -275,10 +275,21 @@ describe("mutation.markAsProcessed", () => {
         id: form.id,
         processedInfo: {
           processingOperationDescription: "Une description",
-          processingOperationDone: "D 1",
+          processingOperationDone: "D 13",
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
-          noTraceability: true
+          noTraceability: true,
+          nextDestination: {
+            processingOperation: "D 1",
+            company: {
+              mail: "m@m.fr",
+              siret: "97874512984578",
+              name: "company",
+              phone: "0101010101",
+              contact: "The famous bot",
+              address: "A beautiful place..."
+            }
+          }
         }
       }
     });

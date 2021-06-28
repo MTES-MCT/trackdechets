@@ -46,17 +46,11 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     companyInput.ecoOrganismeAgreements?.map(a => a.href) || [];
   const siret = companyInput.siret.replace(/\s+/g, "");
 
-  const existingCompany = await prisma.company
-    .findUnique({
-      where: {
-        siret
-      }
-    })
-    .catch(() => {
-      throw new Error(
-        "Erreur lors de la vérification du SIRET. Merci de réessayer."
-      );
-    });
+  const existingCompany = await prisma.company.findUnique({
+    where: {
+      siret
+    }
+  });
 
   if (existingCompany) {
     throw new UserInputError(

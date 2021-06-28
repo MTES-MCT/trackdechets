@@ -1,0 +1,238 @@
+type Query {
+  "Renvoie un BSD sélectionné par son ID (opaque ou lisible, l'un des deux doit être fourni)"
+  form(
+    "Identifiant opaque du BSD"
+    id: ID
+    "Identifiant lisible du BSD"
+    readableId: String
+  ): Form!
+
+  """
+  Renvoie les BSDs de l'établissement sélectionné.
+  Si aucun SIRET n'est précisé et que l'utilisateur est membre d'une seule entreprise
+  alors les BSD de cette entreprise sont retournés.
+  Si l'utilisateur est membre de 2 entreprises ou plus, vous devez obligatoirement
+  préciser un SIRET
+  Si l'utilisateur n'est membre d'aucune entreprise, un tableau vide sera renvoyé
+
+  Vous pouvez filtrer:
+  - par rôle que joue votre entreprise sur le BSD via `role`
+  - par date de dernière modification via `updatedAfter`
+  - par date d'envoi via `sentAfter`
+  - par statut du BSD via `status`
+  - les BSD qui attendent une action (ou non) de votre part via `hasNextStep`
+  - par code déchet via `wasteCode`
+  - par SIRET d'une entreprise présente n'importe où sur le bordereau via `siretPresentOnForm`
+
+  Par défaut:
+  - tous les BSD accessibles sont retournés
+  - les BSD sont classés par date de création, de la plus récente à la plus vieille
+  - les résultats sont paginés par 50. Il est possible de modifier cette valeur via `first` ou `last` en fonction du curseur utilisé
+  - pour afficher la suite des résultats, utiliser `cursorAfter` ou `cursorBefore`
+  """
+  forms(
+    "SIRET d'un établissement dont je suis membre"
+    siret: String
+
+    """
+    DEPRECATED - (Optionnel) PAGINATION
+    Nombre d'éléments à ne pas récupérer en début de liste dans le mode de pagination par "offset"
+    Utiliser en conjonction avec `first` pour paginer "en avant" (des plus récents aux plus anciens)
+    Utiliser en conjonction avec `last` pour paginer "en arrière" (des plus anciens aux plus récents)
+    Défaut à 0
+    """
+    skip: Int
+
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `first` de paginer "en avant"
+    (des bordereaux les plus récents aux bordereaux les plus anciens)
+    Curseur après lequel les bordereaux doivent être retournés
+    Attend un identifiant (propriété `id`) de BSD
+    Défaut à vide, pour retourner les bordereaux les plus récents
+    Le BSD précisé dans le curseur ne fait pas partie du résultat
+    """
+    cursorAfter: ID
+
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `cursorAfter` de paginer "en avant"
+    (des bordereaux les plus récents aux bordereaux les plus anciens)
+    Nombre de bordereaux retournés après le `cursorAfter`
+    Défaut à 50, maximum à 500
+    """
+    first: Int
+
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `last` de paginer "en arrière"
+    (des bordereaux les plus anciens aux bordereaux les plus récents)
+    Curseur avant lequel les bordereaux doivent être retournés
+    Attend un identifiant (propriété `id`) de BSD
+    Défaut à vide, pour retourner les bordereaux les plus anciens
+    Le BSD précisé dans le curseur ne fait pas partie du résultat
+    """
+    cursorBefore: ID
+
+    """
+    (Optionnel) PAGINATION
+    Nombre de bordereaux retournés avant le `cursorBefore`
+    Défaut à 50, maximum à 500
+    """
+    last: Int
+
+    """
+    (Optionnel) Retourne les BSD envoyés après la date
+    Filtre sur la date d'envoi (date de la case 9 du bordereau)
+    Au format (YYYY-MM-DD)
+    Par défaut vide, aucun filtre n'est appliqué
+    """
+    sentAfter: String
+
+    """
+    (Optionnel) Retourne les BSD modifiés après la date
+    Filtre sur la date de dernière modification
+    Au format (YYYY-MM-DD)
+    Par défaut vide, aucun filtre n'est appliqué
+    """
+    updatedAfter: String
+
+    """
+    (Optionnel) Filtre sur les statuts des bordereaux
+    Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
+    Défaut à vide.
+    """
+    status: [FormStatus!]
+
+    """
+    (Optionnel) Filtre sur le role de demandeur dams le bordereau
+    Par exemple:
+     - `roles: [TRANSPORTER]` renverra les bordereaux pour lesquels je suis transporteur
+     - `roles: [EMITTER, RECIPIENT]` renverra les bordereaux dont je suis l'émetteur ou le destinataire final
+    Voir `FormRole` pour la liste des roles sur lesquels il est possible de filtrer.
+    Si aucune filtre n'est passé, les bordereaux seront retournés quel que soit votre role dessus.
+    Défaut à vide.
+    """
+    roles: [FormRole!]
+
+    """
+    (Optionnel) Permet de filtrer sur les bordereaux en attente d'une action de votre part
+    Si `true`, seul les bordereaux attendant une action sont renvoyés
+    Si `false`, seul les bordereaux n'attendant aucune action son renvoyés
+    Si vide, tous les bordereaux sont renvoyés
+    Défaut à vide.
+    """
+    hasNextStep: Boolean
+
+    """
+    (Optionnel) Siret d'une autre entreprise présente sur le bordereau
+    Vous n'avez pas besoin d'être membre de cette entreprise.
+    Seuls les bordereaux ou cette entreprise apparait (dans n'importe quel cadre) seront retournés.
+    Défaut à vide.
+    """
+    siretPresentOnForm: String
+
+    """
+    (Optionnel) Code déchet pour affiner la recherche
+    Ex: 01 03 04* (Veillez à bien respecter les espaces).
+    Défaut à vide.
+    """
+    wasteCode: String
+  ): [Form!]!
+
+  "Renvoie des statistiques sur le volume de déchets entrant et sortant"
+  stats: [CompanyStat!]!
+
+  "Renvoie des BSD candidats à un regroupement dans une annexe 2"
+  appendixForms(
+    "Siret d'un des établissements dont je suis membre"
+    siret: String!
+    "(Optionnel) Code déchet pour affiner la recherche"
+    wasteCode: String
+  ): [Form!]!
+
+  """
+  Renvoie un token pour télécharger un pdf de BSD
+  Ce token doit être transmis à la route /download pour obtenir le fichier.
+  Il est valable 10 secondes
+  """
+  formPdf("ID d'un BSD" id: ID): FileDownload!
+
+  """
+  Renvoie un token pour télécharger un csv du regsitre
+  Ce token doit être transmis à la route /download pour obtenir le fichier.
+  Il est valable 10 secondes
+  """
+  formsRegister(
+    """
+    Liste de SIRET pour lesquelles exporter le registre
+    """
+    sirets: [String!]!
+
+    """
+    (Optionnel) Modèle de registre (exhaustif, entrants, sortants, transport, négociants)
+    Défaut: ALL
+    """
+    exportType: FormsRegisterExportType
+
+    """
+    (Optionnel) Filtre les données par une date de début
+    Défaut: aucune valeur
+    """
+    startDate: DateTime
+
+    """
+    (Optionnel) Filtre les données par une date de fin
+    Défaut: aucune valeur
+    """
+    endDate: DateTime
+
+    """
+    (Optionnel) Filtre les données par code déchet
+    Défaut: Tous les codes déchets
+    """
+    wasteCode: String
+
+    """
+    (Optionnel) Format de l'export
+    Défaut: csv
+    """
+    exportFormat: FormsRegisterExportFormat
+  ): FileDownload!
+
+  """
+  Renvoie les changements de statut des bordereaux de l'entreprise sélectionnée.
+  La liste est paginée par pages de 100 items, ordonnée par date décroissante (champ `loggedAt`)
+  Seuls les changements de statut disposant d'un champ `loggedAt` non nul sont retournés
+  """
+  formsLifeCycle(
+    "(Optionnel) SIRET d'un établissement dont je suis membre"
+    siret: String
+    "(Optionnel) Date formatée après laquelle les changements de statut doivent être retournés (YYYY-MM-DD)"
+    loggedBefore: String
+    "(Optionnel) Date formatée avant laquelle les changements de statut doivent être retournés (YYYY-MM-DD), optionnel"
+    loggedAfter: String
+    """
+    (Optionnel) PAGINATION
+    Permet de paginer les changements de statut "en avant"
+    (des changements de statut les plus récents aux changements de statut les plus anciens)
+    Curseur après lequel les changements de statut doivent être retournés
+    Attend un identifiant (propriété `id`) d'un changement de statut
+    Défaut à vide, pour retourner les changements de statut les plus récents
+    Le changement de statut précisé dans le curseur ne fait pas partie du résultat
+    """
+    cursorAfter: String
+    """
+    (Optionnel) PAGINATION
+    Permet de paginer les changements de statut "en arrière"
+    (des changements de statut les plus anciens aux changements de statut les plus récents)
+    Curseur avant lequel les changements de statut doivent être retournés
+    Attend un identifiant (propriété `id`) d'un changement de statut
+    Défaut à vide, pour retourner les changements de statut les plus anciens
+    Le changement de statut précisé dans le curseur ne fait pas partie du résultat
+    """
+    cursorBefore: String
+    "(Optionnel) ID d'un BSD en particulier"
+    formId: ID
+  ): formsLifeCycleData!
+}

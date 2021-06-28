@@ -1,0 +1,193 @@
+type Mutation {
+  "Crée un nouveau bordereau"
+  createForm(
+    "Payload de création d'un bordereau"
+    createFormInput: CreateFormInput!
+  ): Form!
+
+  "Met à jour un bordereau existant"
+  updateForm(
+    "Payload de mise à jour d'un bordereau"
+    updateFormInput: UpdateFormInput!
+  ): Form!
+
+  "DEPRECATED - Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)"
+  saveForm("Payload du BSD" formInput: FormInput!): Form
+    @deprecated(reason: "Utiliser createForm / updateForm selon le besoin")
+
+  "Met à jour la plaque d'immatriculation ou le champ libre du transporteur"
+  updateTransporterFields(
+    "ID d'un BSD"
+    id: ID!
+    "Plaque d'immatriculation du transporteur"
+    transporterNumberPlate: String
+    "Champ libre, utilisable par exemple pour noter les tournées des transporteurs"
+    transporterCustomInfo: String
+  ): Form
+
+  "Supprime un BSD"
+  deleteForm("ID d'un BSD" id: ID!): Form
+
+  "Duplique un BSD"
+  duplicateForm("ID d'un BSD" id: ID!): Form
+
+  """
+  Finalise un BSD
+  Les champs suivants sont obligatoires pour pouvoir finaliser un bordereau et
+  doivent avoir été renseignés au préalable
+  ```
+  emitter: {
+    type
+    company: {
+      siret
+      name
+      address
+      contact
+      phone
+      mail
+    }
+  }
+  recipient: {
+    processingOperation
+    cap // requis pour les déchets dangereux uniquement
+    company: {
+      siret
+      name
+      address
+      contact
+      phone
+      mail
+    }
+  }
+  transporter: {
+    company: {
+      siret
+      name
+      address
+      contact
+      mail
+      phone
+    }
+    isExemptedOfReceipt
+    receipt
+    department // non requis si isExemptedOfReceipt=true
+    validityLimit // peut-être omis si isExemptedOfReceipt=true
+    numberPlate // peut-être omis si isExemptedOfReceipt=true
+  }
+  wasteDetails: {
+    code
+    onuCode // requis pour les déchets dangereux uniquement
+    name
+    packagings {
+      type
+      other // requis si type=OTHER
+      quantity
+    }
+    quantity
+    quantityType
+    consistence
+    pop
+  }
+  ```
+  """
+  markAsSealed("ID d'un BSD" id: ID!): Form
+
+  "Valide l'envoi d'un BSD"
+  markAsSent(
+    "ID d'un BSD"
+    id: ID!
+    "Informations liées à l'envoi"
+    sentInfo: SentFormInput!
+  ): Form
+    @deprecated(
+      reason: "Utiliser la mutation signedByTransporter permettant d'apposer les signatures collecteur-transporteur (case 8) et émetteur (case 9)"
+    )
+
+  "Valide l'acceptation du BSD"
+  markAsAccepted(
+    "ID d'un BSD"
+    id: ID!
+    "Informations liées à l'arrivée"
+    acceptedInfo: AcceptedFormInput!
+  ): Form
+
+  "Valide la réception d'un BSD"
+  markAsReceived(
+    "ID d'un BSD"
+    id: ID!
+    "Informations liées à la réception"
+    receivedInfo: ReceivedFormInput!
+  ): Form
+
+  "Valide le traitement d'un BSD"
+  markAsProcessed(
+    "ID d'un BSD"
+    id: ID!
+    "Informations liées au traitement"
+    processedInfo: ProcessedFormInput!
+  ): Form
+
+  """
+  Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
+  ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
+  Cette mutation doit être appelée avec le token du collecteur-transporteur.
+  L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui
+  grâce à son code de signature disponible sur le tableau de bord Trackdéchets (Mon Compte > Établissements > Sécurité).
+  D'un point de vue pratique, cela implique qu'un responsable de l'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement)
+  renseigne le code de signature sur le terminal du collecteur-transporteur.
+  Dans le cas où un éco-organisme figure sur le BSD, il est également possible de signer avec son code plutôt que celui de l'émetteur.
+  Il faut alors fournir le code de l'éco-organisme en indiquant qu'il est l'auteur de la signature (signingInfo.signatureAuthor doit valoir ECO_ORGANISME).
+  """
+  signedByTransporter(
+    "ID d'un BSD"
+    id: ID!
+    "Informations liées aux signatures transporteur et émetteur (case 8 et 9)"
+    signingInfo: TransporterSignatureFormInput!
+  ): Form
+
+  "Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement"
+  markAsTempStored(id: ID!, tempStoredInfos: TempStoredFormInput!): Form
+
+  "Valide l'acceptation ou le refus d'un BSD d'un entreposage provisoire ou reconditionnement"
+  markAsTempStorerAccepted(
+    id: ID!
+    tempStorerAcceptedInfo: TempStorerAcceptedFormInput!
+  ): Form
+
+  "Valide la complétion des cadres 14 à 19 lors d'un entreposage provisoire ou reconditionnement"
+  markAsResealed(id: ID!, resealedInfos: ResealedFormInput!): Form
+
+  "Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement"
+  markAsResent(id: ID!, resentInfos: ResentFormInput!): Form
+    @deprecated(
+      reason: "Utiliser la mutation signedByTransporter permettant d'apposer les signatures du collecteur-transporteur (case 18) et de l'exploitant du site d'entreposage provisoire ou de reconditionnement (case 19)"
+    )
+
+  """
+  Permet d'importer les informations d'un BSD papier dans Trackdéchet après la réalisation de l'opération
+  de traitement. Le BSD signé papier original doit être conservé à l'installation de destination qui doit
+  être en mesure de retrouver le bordereau papier correspondant à un bordereau numérique. Le champ `customId`
+  de l'input peut-être utilisé pour faire le lien.
+  """
+  importPaperForm(input: ImportPaperFormInput!): Form
+
+  "Prépare un nouveau segment de transport multimodal"
+  prepareSegment(
+    id: ID!
+    siret: String!
+    nextSegmentInfo: NextSegmentInfoInput!
+  ): TransportSegment
+
+  "Marque un segment de transport comme prêt à être emporté"
+  markSegmentAsReadyToTakeOver(id: ID!): TransportSegment
+
+  "Marque un segment comme pris en charge par le nouveau transporteur"
+  takeOverSegment(id: ID!, takeOverInfo: TakeOverInput!): TransportSegment
+
+  "Édite un segment existant"
+  editSegment(
+    id: ID!
+    siret: String!
+    nextSegmentInfo: NextSegmentInfoInput!
+  ): TransportSegment
+}

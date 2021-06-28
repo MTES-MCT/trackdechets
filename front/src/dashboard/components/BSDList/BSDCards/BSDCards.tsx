@@ -5,9 +5,10 @@ import { Bsd } from "generated/graphql/types";
 import routes from "common/routes";
 import { IconView } from "common/components/Icons";
 import { WorkflowAction } from "../BSDD/WorkflowAction";
+import { WorkflowAction as BsdasriWorkflowAction } from "../BSDasri/WorkflowAction";
 import { Column } from "../columns";
 import styles from "./BSDCards.module.scss";
-
+import { BsdTypename } from "dashboard/constants";
 interface BSDCardsProps {
   bsds: Bsd[];
   columns: Column[];
@@ -46,21 +47,26 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
             })}
           </ul>
           <div className={styles.BSDCardActions}>
-            <Link
-              to={{
-                pathname: generatePath(routes.dashboard.bsdds.view, {
-                  siret,
-                  id: form.id,
-                }),
-                state: { background: location },
-              }}
-              className="btn btn--outline-primary"
-            >
-              <IconView size="24px" style={{ marginRight: "1rem" }} />
-              Aperçu
-            </Link>
+            {!!form.__typename && (
+              <Link
+                to={{
+                  pathname: generatePath(getViewRoute(form.__typename), {
+                    siret,
+                    id: form.id,
+                  }),
+                  state: { background: location },
+                }}
+                className="btn btn--outline-primary"
+              >
+                <IconView size="24px" style={{ marginRight: "1rem" }} />
+                Aperçu
+              </Link>
+            )}
             {form.__typename === "Form" ? (
               <WorkflowAction siret={siret} form={form} />
+            ) : null}
+            {form.__typename === "Bsdasri" ? (
+              <BsdasriWorkflowAction siret={siret} form={form} />
             ) : null}
           </div>
         </div>
@@ -68,3 +74,9 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
     </div>
   );
 }
+
+const getViewRoute = (bsdTypename: BsdTypename): string =>
+  ({
+    Form: routes.dashboard.bsdds.view,
+    Bsdasri: routes.dashboard.bsdasris.view,
+  }[bsdTypename]);

@@ -12,6 +12,7 @@ import {
   VhuAgrementNotFound
 } from "./errors";
 import { CompanyMember } from "../generated/graphql/types";
+import { UserInputError } from "apollo-server-express";
 
 /**
  * Retrieves a company by siret or or throw a CompanyNotFound error
@@ -21,7 +22,7 @@ export async function getCompanyOrCompanyNotFound({
   siret
 }: Prisma.CompanyWhereUniqueInput) {
   if (!id && !siret) {
-    throw new Error("You should specify an id or a siret");
+    throw new UserInputError("You should specify an id or a siret");
   }
   const company = await prisma.company.findUnique({
     where: id ? { id } : { siret }

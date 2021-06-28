@@ -27,8 +27,8 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import { bsdasriFactory } from "../../../../dasris/__tests__/factories";
 
 const CREATE_DRAFT_DASRI = `
-mutation CreateDraftDasri($bsdasriCreateInput: BsdasriCreateInput!) {
-  createDraftBsdasri(bsdasriCreateInput: $bsdasriCreateInput)  {
+mutation CreateDraftDasri($input: BsdasriCreateInput!) {
+  createDraftBsdasri(input: $input)  {
     id
   }
 }
@@ -44,9 +44,9 @@ mutation PublishDasri($id:  ID!){
 }
 `;
 export const SIGN_DASRI = `
-mutation SignDasri($id: ID!, $signatureInput: BsdasriSignatureInput
+mutation SignDasri($id: ID!, $input: BsdasriSignatureInput
 !) {
-  signBsdasri(id: $id, signatureInput: $signatureInput	) {
+  signBsdasri(id: $id, input: $input	) {
     id
   }
 }
@@ -103,7 +103,7 @@ describe("Query.bsds.dasris base workflow", () => {
         MutationCreateDraftBsdasriArgs
       >(CREATE_DRAFT_DASRI, {
         variables: {
-          bsdasriCreateInput: {
+          input: {
             emitter: {
               company: {
                 name: "hopital blanc",
@@ -337,7 +337,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             id: dasriId,
-            signatureInput: { type: "EMISSION", author: "Marcel" }
+            input: { type: "EMISSION", author: "Marcel" }
           }
         }
       );
@@ -409,7 +409,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             id: dasriId,
-            signatureInput: { type: "TRANSPORT", author: "Bill" }
+            input: { type: "TRANSPORT", author: "Bill" }
           }
         }
       );
@@ -481,7 +481,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             id: dasriId,
-            signatureInput: { type: "RECEPTION", author: "Bill" }
+            input: { type: "RECEPTION", author: "Bill" }
           }
         }
       );
@@ -553,7 +553,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             id: dasriId,
-            signatureInput: { type: "OPERATION", author: "Bill" }
+            input: { type: "OPERATION", author: "Bill" }
           }
         }
       );

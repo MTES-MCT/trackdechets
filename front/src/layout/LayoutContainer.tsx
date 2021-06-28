@@ -25,6 +25,7 @@ const AccountMembershipRequest = lazy(() =>
 );
 const FormContainer = lazy(() => import("form/bsdd/FormContainer"));
 const BsvhuFormContainer = lazy(() => import("form/bsvhu/FormContainer"));
+const BsdasriFormContainer = lazy(() => import("form/bsdasri/FormContainer"));
 const SignupInfo = lazy(() => import("login/SignupInfos"));
 const WasteSelector = lazy(() => import("login/WasteSelector"));
 
@@ -190,6 +191,21 @@ export default withRouter(function LayoutContainer({ history }) {
                 <BsvhuFormContainer />
               </PrivateRoute>
 
+              <PrivateRoute
+                path={routes.dashboard.bsdasris.create}
+                isAuthenticated={isAuthenticated}
+                exact
+              >
+                <BsdasriFormContainer />
+              </PrivateRoute>
+
+              <PrivateRoute
+                path={routes.dashboard.bsdasris.edit}
+                isAuthenticated={isAuthenticated}
+                exact
+              >
+                <BsdasriFormContainer />
+              </PrivateRoute>
               <PrivateRoute
                 path={routes.dashboard.index}
                 isAuthenticated={isAuthenticated}

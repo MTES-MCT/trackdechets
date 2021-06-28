@@ -132,18 +132,15 @@ export const dasriSignatureMapping: Record<
 
 type getFieldsUpdateFn = ({
   bsdasri: Dasri,
-  signatureInput: BsdasriSignatureInput
+  input: BsdasriSignatureInput
 }) => Partial<Bsdasri>;
 
 /**
  * A few fields obey to a custom logic
  */
-export const getFieldsUpdate: getFieldsUpdateFn = ({
-  bsdasri,
-  signatureInput
-}) => {
+export const getFieldsUpdate: getFieldsUpdateFn = ({ bsdasri, input }) => {
   // on reception signature, fill handedOverToRecipientAt if not already completed
-  if (signatureInput.type === "RECEPTION" && !bsdasri.handedOverToRecipientAt) {
+  if (input.type === "RECEPTION" && !bsdasri.handedOverToRecipientAt) {
     return {
       handedOverToRecipientAt: bsdasri.receivedAt
     };

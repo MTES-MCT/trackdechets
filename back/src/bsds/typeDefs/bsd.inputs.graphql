@@ -1,0 +1,33 @@
+"Payload d'un établissement"
+input CompanyInput {
+  """
+  SIRET de l'établissement composé de 14 caractères numériques
+  """
+  siret: String
+
+  "Nom de l'établissement"
+  name: String
+
+  "Adresse de l'établissement"
+  address: String
+
+  "Nom du contact dans l'établissement"
+  contact: String
+
+  "Email du contact dans l'établissement"
+  mail: String
+
+  "Numéro de téléphone de contact dans l'établissement"
+  phone: String
+
+  "Numéro de TVA intracommunautaire"
+  vatNumber: String
+}
+
+input DateFilter {
+  _gte: DateTime
+  _gt: DateTime
+  _lte: DateTime
+  _lt: DateTime
+  _eq: DateTime
+}

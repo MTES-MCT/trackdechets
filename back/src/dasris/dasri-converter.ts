@@ -4,6 +4,7 @@ import {
   BsdasriTransporter,
   BsdasriRecipient,
   BsdasriWasteDetails,
+  BsdasriEmissionWasteDetails,
   FormCompany,
   BsdasriInput,
   BsdasriEmitterInput,
@@ -37,7 +38,8 @@ export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
         siret: bsdasri.emitterCompanySiret,
         address: bsdasri.emitterCompanyAddress,
         phone: bsdasri.emitterCompanyPhone,
-        mail: bsdasri.emitterCompanyMail
+        mail: bsdasri.emitterCompanyMail,
+        contact: bsdasri.emitterCompanyContact
       }),
       onBehalfOfEcoorganisme: bsdasri.emitterOnBehalfOfEcoorganisme,
       customInfo: bsdasri.emitterCustomInfo,
@@ -58,13 +60,15 @@ export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
         date: bsdasri.emissionSignatureDate
       }),
 
-      wasteDetails: nullIfNoValues<BsdasriWasteDetails>({
+      wasteDetails: nullIfNoValues<BsdasriEmissionWasteDetails>({
         quantity: bsdasri.emitterWasteQuantity,
         quantityType: bsdasri.emitterWasteQuantityType as QuantityType,
         volume: bsdasri.emitterWasteVolume,
         packagingInfos: bsdasri.emitterWastePackagingsInfo as BsdasriPackagingInfo[],
         onuCode: bsdasri.wasteDetailsOnuCode
-      })
+      }),
+      isTakenOverWithoutEmitterSignature: bsdasri.isEmissionDirectTakenOver,
+      isTakenOverWithSecretCode: bsdasri.isEmissionTakenOverWithSecretCode
     }),
 
     transporter: nullIfNoValues<BsdasriTransporter>({
@@ -73,7 +77,8 @@ export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
         siret: bsdasri.transporterCompanySiret,
         address: bsdasri.transporterCompanyAddress,
         phone: bsdasri.transporterCompanyPhone,
-        mail: bsdasri.transporterCompanyMail
+        mail: bsdasri.transporterCompanyMail,
+        contact: bsdasri.transporterCompanyContact
       }),
       customInfo: bsdasri.transporterCustomInfo,
       receipt: bsdasri.transporterReceipt,
@@ -106,7 +111,8 @@ export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
         siret: bsdasri.recipientCompanySiret,
         address: bsdasri.recipientCompanyAddress,
         phone: bsdasri.recipientCompanyPhone,
-        mail: bsdasri.recipientCompanyMail
+        mail: bsdasri.recipientCompanyMail,
+        contact: bsdasri.recipientCompanyContact
       }),
       customInfo: bsdasri.recipientCustomInfo
     }),

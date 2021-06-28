@@ -16,7 +16,10 @@ const bsffs: QueryResolvers["bsffs"] = async (_, args, context) => {
     ...safeInput<Prisma.BsffWhereInput>({
       emitterCompanySiret: args.where?.emitter?.company?.siret,
       transporterCompanySiret: args.where?.transporter?.company?.siret,
-      destinationCompanySiret: args.where?.destination?.company?.siret
+      destinationCompanySiret: args.where?.destination?.company?.siret,
+      destinationOperationCode: args.where?.destination?.operation?.code,
+      destinationOperationQualification:
+        args.where?.destination?.operation?.qualification
     }),
     OR: [
       { emitterCompanySiret: { in: sirets } },
