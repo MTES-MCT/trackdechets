@@ -7,7 +7,7 @@ import {
 } from "../../converter";
 import { ficheInterventionSchema } from "../../validation";
 
-const addFicheInterventionBsff: MutationResolvers["addFicheInterventionBsff"] = async (
+const createFicheInterventionBsff: MutationResolvers["createFicheInterventionBsff"] = async (
   _,
   { input },
   context
@@ -27,4 +27,4 @@ const addFicheInterventionBsff: MutationResolvers["addFicheInterventionBsff"] = 
   return unflattenFicheInterventionBsff(ficheIntervention);
 };
 
-export default addFicheInterventionBsff;
+export default createFicheInterventionBsff;
