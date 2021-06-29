@@ -494,3 +494,25 @@ export const vhuFragment = gql`
     }
   }
 `;
+
+export const bsdaFragment = gql`
+  fragment BsdaFragment on Bsda {
+    id
+    bsdaStatus: status
+    emitter {
+      company {
+        name
+        siret
+      }
+    }
+    destination {
+      company {
+        name
+        siret
+      }
+    }
+    waste {
+      materialName
+    }
+  }
+`;

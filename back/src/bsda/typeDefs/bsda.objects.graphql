@@ -11,7 +11,7 @@ type BsdaEdge {
 
 type Bsda {
   "Bordereau n°"
-  id: String!
+  id: ID!
   "Date de création"
   createdAt: DateTime!
   "Date de dernière modification"
