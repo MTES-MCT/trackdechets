@@ -6,7 +6,7 @@ import usersResolvers from "./users/resolvers";
 import formsResolvers from "./forms/resolvers";
 import vhuResolvers from "./vhu/resolvers";
 import bsdsResolvers from "./bsds/resolvers";
-import dasriResolvers from "./dasris/resolvers";
+import dasriResolvers from "./bsdasris/resolvers";
 import bsffResolvers from "./bsffs/resolvers";
 import bsdaResolvers from "./bsda/resolvers";
 
@@ -20,7 +20,7 @@ const repositories = [
   "forms",
   "vhu",
   "bsds",
-  "dasris",
+  "bsdasris",
   "bsffs",
   "bsda"
 ];
