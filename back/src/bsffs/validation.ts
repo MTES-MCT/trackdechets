@@ -271,12 +271,18 @@ export const ficheInterventionSchema: yup.SchemaOf<Pick<
   | "numero"
   | "kilos"
   | "postalCode"
-  | "ownerCompanyName"
-  | "ownerCompanySiret"
-  | "ownerCompanyAddress"
-  | "ownerCompanyContact"
-  | "ownerCompanyPhone"
-  | "ownerCompanyMail"
+  | "detenteurCompanyName"
+  | "detenteurCompanySiret"
+  | "detenteurCompanyAddress"
+  | "detenteurCompanyContact"
+  | "detenteurCompanyPhone"
+  | "detenteurCompanyMail"
+  | "operateurCompanyName"
+  | "operateurCompanySiret"
+  | "operateurCompanyAddress"
+  | "operateurCompanyContact"
+  | "operateurCompanyPhone"
+  | "operateurCompanyMail"
 >> = yup.object({
   numero: yup
     .string()
@@ -285,32 +291,60 @@ export const ficheInterventionSchema: yup.SchemaOf<Pick<
   postalCode: yup
     .string()
     .required("Le code postal du lieu de l'intervention est requis"),
-  ownerCompanyName: yup
+  detenteurCompanyName: yup
     .string()
-    .required("Le nom de l'entreprise du lieu d'intervention est requis"),
-  ownerCompanySiret: yup
+    .required("Le nom de l'entreprise détentrice de l'équipement est requis"),
+  detenteurCompanySiret: yup
     .string()
-    .required("Le SIRET de l'entreprise du lieu d'intervention est requis")
+    .required("Le SIRET de l'entreprise détentrice de l'équipement est requis")
     .length(
       14,
-      "Le SIRET de l'entreprise du lieu d'intervention n'est pas au bon format (${length} caractères)"
+      "Le SIRET de l'entreprise détentrice de l'équipement n'est pas au bon format (${length} caractères)"
     ),
-  ownerCompanyAddress: yup
-    .string()
-    .required("L'addresse du lieu d'intervention est requis"),
-  ownerCompanyContact: yup
-    .string()
-    .required("Le nom du contact du lieu d'intervention est requis"),
-  ownerCompanyPhone: yup
+  detenteurCompanyAddress: yup
     .string()
     .required(
-      "Le numéro de téléphone de l'entreprise du lieu d'intervention est requis"
+      "L'addresse de l'entreprise détentrice de l'équipement est requise"
     ),
-  ownerCompanyMail: yup
+  detenteurCompanyContact: yup
     .string()
     .required(
-      "L'addresse email de l'entreprise du lieu d'intervention est requis"
-    )
+      "Le nom du contact de l'entreprise détentrice de l'équipement est requis"
+    ),
+  detenteurCompanyPhone: yup
+    .string()
+    .required(
+      "Le numéro de téléphone de l'entreprise détentrice de l'équipement est requis"
+    ),
+  detenteurCompanyMail: yup
+    .string()
+    .required(
+      "L'addresse email de l'entreprise détentrice de l'équipement est requis"
+    ),
+  operateurCompanyName: yup
+    .string()
+    .required("Le nom de l'entreprise de l'opérateur est requis"),
+  operateurCompanySiret: yup
+    .string()
+    .required("Le SIRET de l'entreprise de l'opérateur est requis")
+    .length(
+      14,
+      "Le SIRET de l'entreprise de l'opérateur n'est pas au bon format (${length} caractères)"
+    ),
+  operateurCompanyAddress: yup
+    .string()
+    .required("L'addresse de l'entreprise de l'opérateur est requis"),
+  operateurCompanyContact: yup
+    .string()
+    .required("Le nom du contact de l'entreprise de l'opérateur est requis"),
+  operateurCompanyPhone: yup
+    .string()
+    .required(
+      "Le numéro de téléphone de l'entreprise de l'opérateur est requis"
+    ),
+  operateurCompanyMail: yup
+    .string()
+    .required("L'addresse email de l'entreprise de l'opérateur est requis")
 });
 
 export async function canAssociateBsffs(ids: string[]) {

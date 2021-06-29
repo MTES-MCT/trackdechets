@@ -889,12 +889,19 @@ model BsffFicheIntervention {
   kilos      Float
   postalCode String
 
-  ownerCompanyName    String
-  ownerCompanySiret   String
-  ownerCompanyAddress String
-  ownerCompanyContact String
-  ownerCompanyPhone   String
-  ownerCompanyMail    String
+  detenteurCompanyName    String
+  detenteurCompanySiret   String
+  detenteurCompanyAddress String
+  detenteurCompanyContact String
+  detenteurCompanyPhone   String
+  detenteurCompanyMail    String
+
+  operateurCompanyName    String
+  operateurCompanySiret   String
+  operateurCompanyAddress String
+  operateurCompanyContact String
+  operateurCompanyPhone   String
+  operateurCompanyMail    String
 
   Bsff   Bsff?   @relation("FicheInterventionToBsff", fields: [bsffId], references: [id])
   bsffId String?

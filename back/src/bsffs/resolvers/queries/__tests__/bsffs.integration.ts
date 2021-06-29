@@ -27,7 +27,7 @@ const GET_BSFFS = `
           bsffs {
             id
             ficheInterventions {
-              owner {
+              detenteur {
                 company {
                   siret
                 }
@@ -147,12 +147,18 @@ describe("Query.bsffs", () => {
             {
               numero: ficheInterventionNumero,
               kilos: 2,
-              ownerCompanyName: "Acme",
-              ownerCompanySiret: "1".repeat(14),
-              ownerCompanyAddress: "12 rue de la Tige, 69000",
-              ownerCompanyMail: "contact@gmail.com",
-              ownerCompanyPhone: "06",
-              ownerCompanyContact: "Jeanne Michelin",
+              detenteurCompanyName: "Acme",
+              detenteurCompanySiret: "1".repeat(14),
+              detenteurCompanyAddress: "12 rue de la Tige, 69000",
+              detenteurCompanyMail: "contact@gmail.com",
+              detenteurCompanyPhone: "06",
+              detenteurCompanyContact: "Jeanne Michelin",
+              operateurCompanyName: "Clim'op",
+              operateurCompanySiret: "2".repeat(14),
+              operateurCompanyAddress: "12 rue de la Tige, 69000",
+              operateurCompanyMail: "contact@climop.com",
+              operateurCompanyPhone: "06",
+              operateurCompanyContact: "Jean Dupont",
               postalCode: "69000"
             }
           ]
@@ -239,12 +245,18 @@ describe("Query.bsffs", () => {
                 numero: ficheInterventionNumero,
                 kilos: 2,
                 postalCode: "69000",
-                ownerCompanyName: "Acme",
-                ownerCompanySiret: "1".repeat(14),
-                ownerCompanyAddress: "12 rue Albert Lyon 69000",
-                ownerCompanyContact: "Carla Brownie",
-                ownerCompanyMail: "carla.brownie@gmail.com",
-                ownerCompanyPhone: "06"
+                detenteurCompanyName: "Acme",
+                detenteurCompanySiret: "1".repeat(14),
+                detenteurCompanyAddress: "12 rue Albert Lyon 69000",
+                detenteurCompanyContact: "Carla Brownie",
+                detenteurCompanyMail: "carla.brownie@gmail.com",
+                detenteurCompanyPhone: "06",
+                operateurCompanyName: "Clim'op",
+                operateurCompanySiret: "2".repeat(14),
+                operateurCompanyAddress: "12 rue Albert Lyon 69000",
+                operateurCompanyContact: "Dupont Jean",
+                operateurCompanyMail: "contact@climop.com",
+                operateurCompanyPhone: "06"
               }
             ]
           }
@@ -273,7 +285,7 @@ describe("Query.bsffs", () => {
       ]);
     });
 
-    it("should show the owner from the fiche d'interventions to companies on the bsff", async () => {
+    it("should show the detenteur from the fiche d'interventions to companies on the bsff", async () => {
       await createBsff(
         { emitter, transporter, destination },
         { bsffs: { connect: [{ id: associatedBsff.id }] } }
@@ -288,9 +300,9 @@ describe("Query.bsffs", () => {
         expect.objectContaining({
           ficheInterventions: [
             {
-              owner: {
+              detenteur: {
                 company: {
-                  siret: associatedBsffFicheIntervention.ownerCompanySiret
+                  siret: associatedBsffFicheIntervention.detenteurCompanySiret
                 }
               }
             }
@@ -299,7 +311,7 @@ describe("Query.bsffs", () => {
       ]);
     });
 
-    it("should not show the owner from the fiche d'interventions to companies not on the bsff", async () => {
+    it("should not show the detenteur from the fiche d'interventions to companies not on the bsff", async () => {
       const newDestination = await userWithCompanyFactory(UserRole.ADMIN);
 
       await createBsff(
@@ -316,7 +328,7 @@ describe("Query.bsffs", () => {
         expect.objectContaining({
           ficheInterventions: [
             {
-              owner: null
+              detenteur: null
             }
           ]
         })

@@ -1159,6 +1159,16 @@ export type BsffDestinationReceptionInput = {
   refusal?: Maybe<Scalars["String"]>;
 };
 
+export type BsffDetenteur = {
+  __typename?: "BsffDetenteur";
+  /** Entreprise détentrice de l'équipement. */
+  company: FormCompany;
+};
+
+export type BsffDetenteurInput = {
+  company: CompanyInput;
+};
+
 export type BsffEdge = {
   __typename?: "BsffEdge";
   cursor: Scalars["String"];
@@ -1191,11 +1201,10 @@ export type BsffFicheIntervention = {
   numero: Scalars["String"];
   /** Poids total des fluides récupérés lors de cette intervention. */
   kilos: Scalars["Float"];
-  /**
-   * Détenteur de l'équipement sur lequel est intervenu l'opérateur.
-   * À noter que dû à la valeur commerciale de ces informations, leur visibilité est limité aux acteurs en contact direct.
-   */
-  owner?: Maybe<BsffOwner>;
+  /** Détenteur de l'équipement sur lequel est intervenu l'opérateur. */
+  detenteur?: Maybe<BsffDetenteur>;
+  /** Opérateur à l'origine de l'intervention. */
+  operateur?: Maybe<BsffOperateur>;
   /** Code postal du lieu où l'intervention a eu lieu. */
   postalCode: Scalars["String"];
 };
@@ -1203,7 +1212,8 @@ export type BsffFicheIntervention = {
 export type BsffFicheInterventionInput = {
   numero: Scalars["String"];
   kilos: Scalars["Float"];
-  owner: BsffOwnerInput;
+  detenteur: BsffDetenteurInput;
+  operateur: BsffOperateurInput;
   postalCode: Scalars["String"];
 };
 
@@ -1222,6 +1232,16 @@ export type BsffNextDestination = {
   company: FormCompany;
 };
 
+export type BsffOperateur = {
+  __typename?: "BsffOperateur";
+  /** Entreprise dont l'opérateur fait partie. */
+  company: FormCompany;
+};
+
+export type BsffOperateurInput = {
+  company: CompanyInput;
+};
+
 export type BsffOperation = {
   __typename?: "BsffOperation";
   /** Code de l'opération de traitement. */
@@ -1236,16 +1256,6 @@ export type BsffOperation = {
 export type BsffOperationCode = "R2" | "R12" | "D10" | "D13" | "D14";
 
 export type BsffOperationNextDestinationInput = {
-  company: CompanyInput;
-};
-
-export type BsffOwner = {
-  __typename?: "BsffOwner";
-  /** Entreprise détentrice de l'équipement. */
-  company: FormCompany;
-};
-
-export type BsffOwnerInput = {
   company: CompanyInput;
 };
 
@@ -4935,7 +4945,8 @@ export type ResolversTypes = {
   BsffNextDestination: ResolverTypeWrapper<BsffNextDestination>;
   BsffPlannedOperation: ResolverTypeWrapper<BsffPlannedOperation>;
   BsffFicheIntervention: ResolverTypeWrapper<BsffFicheIntervention>;
-  BsffOwner: ResolverTypeWrapper<BsffOwner>;
+  BsffDetenteur: ResolverTypeWrapper<BsffDetenteur>;
+  BsffOperateur: ResolverTypeWrapper<BsffOperateur>;
   BsffWhere: BsffWhere;
   BsffWhereEmitter: BsffWhereEmitter;
   BsffWhereCompany: BsffWhereCompany;
@@ -5055,7 +5066,8 @@ export type ResolversTypes = {
   BsvhuTransportInput: BsvhuTransportInput;
   PrivateCompanyInput: PrivateCompanyInput;
   BsffFicheInterventionInput: BsffFicheInterventionInput;
-  BsffOwnerInput: BsffOwnerInput;
+  BsffDetenteurInput: BsffDetenteurInput;
+  BsffOperateurInput: BsffOperateurInput;
   CreateFormInput: CreateFormInput;
   EmitterInput: EmitterInput;
   RecipientInput: RecipientInput;
@@ -5243,7 +5255,8 @@ export type ResolversParentTypes = {
   BsffNextDestination: BsffNextDestination;
   BsffPlannedOperation: BsffPlannedOperation;
   BsffFicheIntervention: BsffFicheIntervention;
-  BsffOwner: BsffOwner;
+  BsffDetenteur: BsffDetenteur;
+  BsffOperateur: BsffOperateur;
   BsffWhere: BsffWhere;
   BsffWhereEmitter: BsffWhereEmitter;
   BsffWhereCompany: BsffWhereCompany;
@@ -5349,7 +5362,8 @@ export type ResolversParentTypes = {
   BsvhuTransportInput: BsvhuTransportInput;
   PrivateCompanyInput: PrivateCompanyInput;
   BsffFicheInterventionInput: BsffFicheInterventionInput;
-  BsffOwnerInput: BsffOwnerInput;
+  BsffDetenteurInput: BsffDetenteurInput;
+  BsffOperateurInput: BsffOperateurInput;
   CreateFormInput: CreateFormInput;
   EmitterInput: EmitterInput;
   RecipientInput: RecipientInput;
@@ -6367,6 +6381,14 @@ export type BsffDestinationResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type BsffDetenteurResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffDetenteur"] = ResolversParentTypes["BsffDetenteur"]
+> = {
+  company?: Resolver<ResolversTypes["FormCompany"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type BsffEdgeResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsffEdge"] = ResolversParentTypes["BsffEdge"]
@@ -6404,7 +6426,16 @@ export type BsffFicheInterventionResolvers<
   id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
   numero?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   kilos?: Resolver<ResolversTypes["Float"], ParentType, ContextType>;
-  owner?: Resolver<Maybe<ResolversTypes["BsffOwner"]>, ParentType, ContextType>;
+  detenteur?: Resolver<
+    Maybe<ResolversTypes["BsffDetenteur"]>,
+    ParentType,
+    ContextType
+  >;
+  operateur?: Resolver<
+    Maybe<ResolversTypes["BsffOperateur"]>,
+    ParentType,
+    ContextType
+  >;
   postalCode?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -6412,6 +6443,14 @@ export type BsffFicheInterventionResolvers<
 export type BsffNextDestinationResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsffNextDestination"] = ResolversParentTypes["BsffNextDestination"]
+> = {
+  company?: Resolver<ResolversTypes["FormCompany"], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsffOperateurResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsffOperateur"] = ResolversParentTypes["BsffOperateur"]
 > = {
   company?: Resolver<ResolversTypes["FormCompany"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -6436,14 +6475,6 @@ export type BsffOperationResolvers<
     ParentType,
     ContextType
   >;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type BsffOwnerResolvers<
-  ContextType = GraphQLContext,
-  ParentType extends ResolversParentTypes["BsffOwner"] = ResolversParentTypes["BsffOwner"]
-> = {
-  company?: Resolver<ResolversTypes["FormCompany"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -8846,13 +8877,14 @@ export type Resolvers<ContextType = GraphQLContext> = {
   Bsff?: BsffResolvers<ContextType>;
   BsffConnection?: BsffConnectionResolvers<ContextType>;
   BsffDestination?: BsffDestinationResolvers<ContextType>;
+  BsffDetenteur?: BsffDetenteurResolvers<ContextType>;
   BsffEdge?: BsffEdgeResolvers<ContextType>;
   BsffEmission?: BsffEmissionResolvers<ContextType>;
   BsffEmitter?: BsffEmitterResolvers<ContextType>;
   BsffFicheIntervention?: BsffFicheInterventionResolvers<ContextType>;
   BsffNextDestination?: BsffNextDestinationResolvers<ContextType>;
+  BsffOperateur?: BsffOperateurResolvers<ContextType>;
   BsffOperation?: BsffOperationResolvers<ContextType>;
-  BsffOwner?: BsffOwnerResolvers<ContextType>;
   BsffPackaging?: BsffPackagingResolvers<ContextType>;
   BsffPlannedOperation?: BsffPlannedOperationResolvers<ContextType>;
   BsffQuantity?: BsffQuantityResolvers<ContextType>;
@@ -10187,6 +10219,25 @@ export function createBsffDestinationReceptionInputMock(
   };
 }
 
+export function createBsffDetenteurMock(
+  props: Partial<BsffDetenteur>
+): BsffDetenteur {
+  return {
+    __typename: "BsffDetenteur",
+    company: createFormCompanyMock({}),
+    ...props
+  };
+}
+
+export function createBsffDetenteurInputMock(
+  props: Partial<BsffDetenteurInput>
+): BsffDetenteurInput {
+  return {
+    company: createCompanyInputMock({}),
+    ...props
+  };
+}
+
 export function createBsffEdgeMock(props: Partial<BsffEdge>): BsffEdge {
   return {
     __typename: "BsffEdge",
@@ -10234,7 +10285,8 @@ export function createBsffFicheInterventionMock(
     id: "",
     numero: "",
     kilos: 0,
-    owner: null,
+    detenteur: null,
+    operateur: null,
     postalCode: "",
     ...props
   };
@@ -10246,7 +10298,8 @@ export function createBsffFicheInterventionInputMock(
   return {
     numero: "",
     kilos: 0,
-    owner: createBsffOwnerInputMock({}),
+    detenteur: createBsffDetenteurInputMock({}),
+    operateur: createBsffOperateurInputMock({}),
     postalCode: "",
     ...props
   };
@@ -10275,6 +10328,25 @@ export function createBsffNextDestinationMock(
   };
 }
 
+export function createBsffOperateurMock(
+  props: Partial<BsffOperateur>
+): BsffOperateur {
+  return {
+    __typename: "BsffOperateur",
+    company: createFormCompanyMock({}),
+    ...props
+  };
+}
+
+export function createBsffOperateurInputMock(
+  props: Partial<BsffOperateurInput>
+): BsffOperateurInput {
+  return {
+    company: createCompanyInputMock({}),
+    ...props
+  };
+}
+
 export function createBsffOperationMock(
   props: Partial<BsffOperation>
 ): BsffOperation {
@@ -10290,23 +10362,6 @@ export function createBsffOperationMock(
 export function createBsffOperationNextDestinationInputMock(
   props: Partial<BsffOperationNextDestinationInput>
 ): BsffOperationNextDestinationInput {
-  return {
-    company: createCompanyInputMock({}),
-    ...props
-  };
-}
-
-export function createBsffOwnerMock(props: Partial<BsffOwner>): BsffOwner {
-  return {
-    __typename: "BsffOwner",
-    company: createFormCompanyMock({}),
-    ...props
-  };
-}
-
-export function createBsffOwnerInputMock(
-  props: Partial<BsffOwnerInput>
-): BsffOwnerInput {
   return {
     company: createCompanyInputMock({}),
     ...props

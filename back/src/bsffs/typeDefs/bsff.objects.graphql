@@ -159,16 +159,19 @@ type BsffFicheIntervention {
   numero: String!
   "Poids total des fluides récupérés lors de cette intervention."
   kilos: Float!
-  """
-  Détenteur de l'équipement sur lequel est intervenu l'opérateur.
-  À noter que dû à la valeur commerciale de ces informations, leur visibilité est limité aux acteurs en contact direct.
-  """
-  owner: BsffOwner
+  "Détenteur de l'équipement sur lequel est intervenu l'opérateur."
+  detenteur: BsffDetenteur
+  "Opérateur à l'origine de l'intervention."
+  operateur: BsffOperateur
   "Code postal du lieu où l'intervention a eu lieu."
   postalCode: String!
 }
-type BsffOwner {
+type BsffDetenteur {
   "Entreprise détentrice de l'équipement."
+  company: FormCompany!
+}
+type BsffOperateur {
+  "Entreprise dont l'opérateur fait partie."
   company: FormCompany!
 }
 

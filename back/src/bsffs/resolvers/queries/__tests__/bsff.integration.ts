@@ -124,12 +124,18 @@ describe("Query.bsff", () => {
             {
               numero: ficheInterventionNumero,
               kilos: 2,
-              ownerCompanyName: "Acme",
-              ownerCompanySiret: "1".repeat(14),
-              ownerCompanyAddress: "12 rue de la Tige, 69000",
-              ownerCompanyMail: "contact@gmail.com",
-              ownerCompanyPhone: "06",
-              ownerCompanyContact: "Jeanne Michelin",
+              detenteurCompanyName: "Acme",
+              detenteurCompanySiret: "1".repeat(14),
+              detenteurCompanyAddress: "12 rue de la Tige, 69000",
+              detenteurCompanyMail: "contact@gmail.com",
+              detenteurCompanyPhone: "06",
+              detenteurCompanyContact: "Jeanne Michelin",
+              operateurCompanyName: "Clim'op",
+              operateurCompanySiret: "2".repeat(14),
+              operateurCompanyAddress: "12 rue de la Tige, 69000",
+              operateurCompanyMail: "contact@climop.com",
+              operateurCompanyPhone: "06",
+              operateurCompanyContact: "Jean Dupont",
               postalCode: "69000"
             }
           ]

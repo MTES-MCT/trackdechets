@@ -198,12 +198,24 @@ export function flattenFicheInterventionBsffInput(
     numero: ficheInterventionInput.numero,
     kilos: ficheInterventionInput.kilos,
     postalCode: ficheInterventionInput.postalCode,
-    ownerCompanyName: ficheInterventionInput.owner.company.name ?? "",
-    ownerCompanySiret: ficheInterventionInput.owner.company.siret ?? "",
-    ownerCompanyAddress: ficheInterventionInput.owner.company.address ?? "",
-    ownerCompanyContact: ficheInterventionInput.owner.company.contact ?? "",
-    ownerCompanyPhone: ficheInterventionInput.owner.company.phone ?? "",
-    ownerCompanyMail: ficheInterventionInput.owner.company.mail ?? ""
+
+    detenteurCompanyName: ficheInterventionInput.detenteur.company.name ?? "",
+    detenteurCompanySiret: ficheInterventionInput.detenteur.company.siret ?? "",
+    detenteurCompanyAddress:
+      ficheInterventionInput.detenteur.company.address ?? "",
+    detenteurCompanyContact:
+      ficheInterventionInput.detenteur.company.contact ?? "",
+    detenteurCompanyPhone: ficheInterventionInput.detenteur.company.phone ?? "",
+    detenteurCompanyMail: ficheInterventionInput.detenteur.company.mail ?? "",
+
+    operateurCompanyName: ficheInterventionInput.operateur.company.name ?? "",
+    operateurCompanySiret: ficheInterventionInput.operateur.company.siret ?? "",
+    operateurCompanyAddress:
+      ficheInterventionInput.operateur.company.address ?? "",
+    operateurCompanyContact:
+      ficheInterventionInput.operateur.company.contact ?? "",
+    operateurCompanyPhone: ficheInterventionInput.operateur.company.phone ?? "",
+    operateurCompanyMail: ficheInterventionInput.operateur.company.mail ?? ""
   };
 }
 
@@ -215,14 +227,24 @@ export function unflattenFicheInterventionBsff(
     numero: prismaFicheIntervention.numero,
     kilos: prismaFicheIntervention.kilos,
     postalCode: prismaFicheIntervention.postalCode,
-    owner: {
+    detenteur: {
       company: {
-        name: prismaFicheIntervention.ownerCompanyName,
-        siret: prismaFicheIntervention.ownerCompanySiret,
-        address: prismaFicheIntervention.ownerCompanyAddress,
-        contact: prismaFicheIntervention.ownerCompanyContact,
-        phone: prismaFicheIntervention.ownerCompanyPhone,
-        mail: prismaFicheIntervention.ownerCompanyMail
+        name: prismaFicheIntervention.detenteurCompanyName,
+        siret: prismaFicheIntervention.detenteurCompanySiret,
+        address: prismaFicheIntervention.detenteurCompanyAddress,
+        contact: prismaFicheIntervention.detenteurCompanyContact,
+        phone: prismaFicheIntervention.detenteurCompanyPhone,
+        mail: prismaFicheIntervention.detenteurCompanyMail
+      }
+    },
+    operateur: {
+      company: {
+        name: prismaFicheIntervention.operateurCompanyName,
+        siret: prismaFicheIntervention.operateurCompanySiret,
+        address: prismaFicheIntervention.operateurCompanyAddress,
+        contact: prismaFicheIntervention.operateurCompanyContact,
+        phone: prismaFicheIntervention.operateurCompanyPhone,
+        mail: prismaFicheIntervention.operateurCompanyMail
       }
     }
   };

@@ -113,9 +113,13 @@ input BsffDestinationOperationInput {
 input BsffFicheInterventionInput {
   numero: String!
   kilos: Float!
-  owner: BsffOwnerInput!
+  detenteur: BsffDetenteurInput!
+  operateur: BsffOperateurInput!
   postalCode: String!
 }
-input BsffOwnerInput {
+input BsffDetenteurInput {
+  company: CompanyInput!
+}
+input BsffOperateurInput {
   company: CompanyInput!
 }

@@ -1174,6 +1174,16 @@ export type BsffDestinationReceptionInput = {
   refusal?: Maybe<Scalars["String"]>;
 };
 
+export type BsffDetenteur = {
+  __typename?: "BsffDetenteur";
+  /** Entreprise détentrice de l'équipement. */
+  company: FormCompany;
+};
+
+export type BsffDetenteurInput = {
+  company: CompanyInput;
+};
+
 export type BsffEdge = {
   __typename?: "BsffEdge";
   cursor: Scalars["String"];
@@ -1206,11 +1216,10 @@ export type BsffFicheIntervention = {
   numero: Scalars["String"];
   /** Poids total des fluides récupérés lors de cette intervention. */
   kilos: Scalars["Float"];
-  /**
-   * Détenteur de l'équipement sur lequel est intervenu l'opérateur.
-   * À noter que dû à la valeur commerciale de ces informations, leur visibilité est limité aux acteurs en contact direct.
-   */
-  owner?: Maybe<BsffOwner>;
+  /** Détenteur de l'équipement sur lequel est intervenu l'opérateur. */
+  detenteur?: Maybe<BsffDetenteur>;
+  /** Opérateur à l'origine de l'intervention. */
+  operateur?: Maybe<BsffOperateur>;
   /** Code postal du lieu où l'intervention a eu lieu. */
   postalCode: Scalars["String"];
 };
@@ -1218,7 +1227,8 @@ export type BsffFicheIntervention = {
 export type BsffFicheInterventionInput = {
   numero: Scalars["String"];
   kilos: Scalars["Float"];
-  owner: BsffOwnerInput;
+  detenteur: BsffDetenteurInput;
+  operateur: BsffOperateurInput;
   postalCode: Scalars["String"];
 };
 
@@ -1235,6 +1245,16 @@ export type BsffInput = {
 export type BsffNextDestination = {
   __typename?: "BsffNextDestination";
   company: FormCompany;
+};
+
+export type BsffOperateur = {
+  __typename?: "BsffOperateur";
+  /** Entreprise dont l'opérateur fait partie. */
+  company: FormCompany;
+};
+
+export type BsffOperateurInput = {
+  company: CompanyInput;
 };
 
 export type BsffOperation = {
@@ -1257,16 +1277,6 @@ export enum BsffOperationCode {
 }
 
 export type BsffOperationNextDestinationInput = {
-  company: CompanyInput;
-};
-
-export type BsffOwner = {
-  __typename?: "BsffOwner";
-  /** Entreprise détentrice de l'équipement. */
-  company: FormCompany;
-};
-
-export type BsffOwnerInput = {
   company: CompanyInput;
 };
 
