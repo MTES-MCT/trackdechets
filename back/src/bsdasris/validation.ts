@@ -4,7 +4,8 @@ import * as yup from "yup";
 import {
   DASRI_WASTE_CODES,
   DASRI_ALL_OPERATIONS_CODES,
-  DASRI_PROCESSING_OPERATIONS_CODES,DASRI_GROUPING_OPERATIONS_CODES
+  DASRI_PROCESSING_OPERATIONS_CODES,
+  DASRI_GROUPING_OPERATIONS_CODES
 } from "../common/constants";
 import configureYup from "../common/yup/configureYup";
 import prisma from "../prisma";

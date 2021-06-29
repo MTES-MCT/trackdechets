@@ -1,6 +1,4 @@
 import {
-
-
   Consistence,
   EmitterType,
   Form,
@@ -966,8 +964,6 @@ export async function checkCanBeSealed(form: Form) {
     }
   }
 }
-
- 
 
 /**
  * Check company in frame 2 is verified and registered with profile
