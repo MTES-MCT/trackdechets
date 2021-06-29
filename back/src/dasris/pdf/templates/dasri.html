@@ -58,8 +58,7 @@
           <p>
             <strong>Personne à contacter : </strong>{{bsdasri.emitterCompanyContact}}
           </p>
-          <p >
-     
+          <p>
           <strong>Adresse email : </strong>{{bsdasri.emitterCompanyMail}}
           </p>
           <p>      
@@ -129,12 +128,11 @@
 
 
           <p><strong>Personne à contacter :</strong>{{bsdasri.transporterCompanyContact}}</p>
-          <p>
- <strong>Adresse email :</strong>{{bsdasri.transporterCompanyMail}}</p>
-    <p>  <strong>Téléphone :</strong>{{bsdasri.transporterCompanyPhone}}</p>
-
+          <p><strong>Adresse email :</strong>{{bsdasri.transporterCompanyMail}}</p>
+          <p><strong>Téléphone :</strong>{{bsdasri.transporterCompanyPhone}}</p>
+          <p><strong>Mode de transport :</strong>{{verboseTransportMode bsdasri.transportMode}}</p>
           <p><strong>Nom et signature : </strong>{{bsdasri.transportSignatureAuthor}}</p>
-                <p>{{#if bsdasri.transportSignatureAuthor}}{{{dasristamp}}}{{/if}}</p>
+          <p>{{#if bsdasri.transportSignatureAuthor}}{{{dasristamp}}}{{/if}}</p>
 
           <p><strong>Date de remise à l'installation destinataire :</strong>
            {{dateFmt bsdasri.handedOverToRecipientAt}} </p>
