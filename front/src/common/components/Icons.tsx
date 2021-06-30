@@ -1297,3 +1297,33 @@ export function IconBSVhu(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function IconBSDa(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width="1em"
+      height="1em"
+      viewBox="0 0 25 24"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <g fill="none" fillRule="evenodd" stroke="#000">
+        <g stroke="#000" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M23.278 20.128A3 3 0 0120.3 23.5H4.1a3 3 0 01-2.978-3.372L2.7 7.5h19l1.578 12.628zM6.2 5H4.766a1 1 0 00-.857.486L2.7 7.5h19l-1.209-2.014A1 1 0 0019.634 5H18.2" />
+          <path d="M16.2 4.5a4 4 0 10-8 0v3h8v-3z" />
+        </g>
+        <text
+          fontFamily="SourceSansPro-Semibold, Source Sans Pro"
+          fontSize="16"
+          fontWeight="500"
+          fill="#000"
+          transform="translate(1)"
+        >
+          <tspan x="7.2" y="20">
+            a
+          </tspan>
+        </text>
+      </g>
+    </svg>
+  );
+}

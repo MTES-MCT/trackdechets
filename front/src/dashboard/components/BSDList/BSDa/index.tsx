@@ -2,7 +2,7 @@ import * as React from "react";
 import { CellProps, CellValue } from "react-table";
 
 import { Bsda, BsdaStatus } from "generated/graphql/types";
-import { IconBSDasri } from "common/components/Icons";
+import { IconBSDa } from "common/components/Icons";
 
 const bsdaVerboseStatuses: Record<BsdaStatus, string> = {
   INITIAL: "Initial",
@@ -24,7 +24,7 @@ export const COLUMNS: Record<
 > = {
   type: {
     accessor: () => null,
-    Cell: () => <IconBSDasri style={{ fontSize: "24px" }} />,
+    Cell: () => <IconBSDa style={{ fontSize: "24px" }} />,
   },
   readableId: {
     accessor: bsda => bsda.id,
