@@ -5094,8 +5094,8 @@ export type ResolversTypes = {
   VerifyCompanyByAdminInput: VerifyCompanyByAdminInput;
   Subscription: ResolverTypeWrapper<{}>;
   FormSubscription: ResolverTypeWrapper<FormSubscription>;
-  BsdasriInput: BsdasriInput;
   BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
+  BsdasriInput: BsdasriInput;
   BsdasriRole: BsdasriRole;
 };
 
@@ -5379,8 +5379,8 @@ export type ResolversParentTypes = {
   VerifyCompanyByAdminInput: VerifyCompanyByAdminInput;
   Subscription: {};
   FormSubscription: FormSubscription;
-  BsdasriInput: BsdasriInput;
   BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
+  BsdasriInput: BsdasriInput;
 };
 
 export type AdminForVerificationResolvers<
