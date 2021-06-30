@@ -163,6 +163,11 @@ describe("Query.bsds.dasris base workflow", () => {
             },
             reception: {
               wasteDetails: {
+<<<<<<< HEAD
+=======
+                quantity: { value: 99, type: "REAL" },
+
+>>>>>>> Dasri schema update and final quantity validation
                 packagingInfos: [{ type: "FUT", quantity: 44, volume: 123 }]
               },
               wasteAcceptation: { status: WasteAcceptationStatus.ACCEPTED },

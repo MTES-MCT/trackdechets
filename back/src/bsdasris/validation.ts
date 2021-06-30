@@ -254,7 +254,7 @@ export const emissionSchema: FactorySchemaOf<
       .test(
         "emission-quantity-required-if-type-is-provided",
         "La quantité du déchet émis en kg est obligatoire si vous renseignez le type de quantité",
-        function (value) {
+        function(value) {
           return !!this.parent.emitterWasteQuantityType ? !!value : true;
         }
       )
@@ -265,7 +265,7 @@ export const emissionSchema: FactorySchemaOf<
       .test(
         "emission-quantity-type-required-if-quantity-is-provided",
         "Le type de quantité (réelle ou estimée) émise doit être précisé si vous renseignez une quantité",
-        function (value) {
+        function(value) {
           return !!this.parent.emitterWasteQuantity ? !!value : true;
         }
       ),
@@ -401,7 +401,7 @@ export const transportSchema: FactorySchemaOf<
       .test(
         "transport-quantity-required-if-type-is-provided",
         "La quantité du déchet transporté en kg est obligatoire si vous renseignez le type de quantité",
-        function (value) {
+        function(value) {
           return !!this.parent.transporterWasteQuantityType ? !!value : true;
         }
       )
@@ -411,7 +411,7 @@ export const transportSchema: FactorySchemaOf<
       .test(
         "emission-quantity-type-required-if-quantity-is-provided",
         "Le type de quantité (réelle ou estimée) transportée doit être précisé si vous renseignez une quantité",
-        function (value) {
+        function(value) {
           return !!this.parent.transporterWasteQuantity ? !!value : true;
         }
       ),
@@ -554,7 +554,7 @@ export const operationSchema: FactorySchemaOf<
       .test(
         "operation-quantity-required-if-final-processing-operation",
         "La quantité du déchet traité en kg est obligatoire si le code correspond à un traitement final",
-        function (value) {
+        function(value) {
           return DASRI_PROCESSING_OPERATIONS_CODES.includes(
             this.parent.processingOperation
           )
@@ -587,10 +587,10 @@ export const operationSchema: FactorySchemaOf<
 
             return isCollector(recipientCompany);
           }
-
           return true;
         }
       ),
+
     processedAt: yup
       .date()
       .label("Date de traitement")
@@ -635,13 +635,19 @@ export const select = (arr: string[], truthTable: boolean[]): string[] =>
  */
 export const getRequiredFor = (path: string) => {
   const emission = Object.keys(
-    emitterSchema({}).concat(emissionSchema({})).describe().fields
+    emitterSchema({})
+      .concat(emissionSchema({}))
+      .describe().fields
   );
   const transport = Object.keys(
-    transporterSchema({}).concat(transportSchema({})).describe().fields
+    transporterSchema({})
+      .concat(transportSchema({}))
+      .describe().fields
   );
   const reception = Object.keys(
-    recipientSchema({}).concat(receptionSchema({})).describe().fields
+    recipientSchema({})
+      .concat(receptionSchema({}))
+      .describe().fields
   );
 
   const operation = Object.keys(operationSchema({}).describe().fields);
