@@ -440,7 +440,7 @@ describe("Mutation.updateBsdasri", () => {
           mail: "test@test.test"
         }
       },
-      reception: { wasteDetails: { quantity: 22 } }
+      reception: { wasteAcceptation: { status: "ACCEPTED" } }
     };
 
     const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
@@ -453,7 +453,7 @@ describe("Mutation.updateBsdasri", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés: recipientCompanyMail,recipientWasteQuantity",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés: recipientCompanyMail,recipientWasteAcceptationStatus",
 
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN

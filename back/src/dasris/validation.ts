@@ -89,13 +89,12 @@ type Reception = Pick<
   | "recipientWasteAcceptationStatus"
   | "recipientWasteRefusalReason"
   | "recipientWasteRefusedQuantity"
-  | "recipientWasteQuantity"
   | "recipientWasteVolume"
   | "receivedAt"
 >;
 type Operation = Pick<
   Prisma.BsdasriCreateInput,
-  "processingOperation" | "processedAt"
+  "processingOperation" | "processedAt" | "recipientWasteQuantity"
 >;
 
 // *********************
@@ -408,7 +407,6 @@ export const transportSchema: FactorySchemaOf<
       .min(0, "La quantité transportée doit être supérieure à 0"),
     transporterWasteQuantityType: yup
       .mixed<QuantityType>()
-
       .test(
         "emission-quantity-type-required-if-quantity-is-provided",
         "Le type de quantité (réelle ou estimée) transportée doit être précisé si vous renseignez une quantité",
@@ -448,7 +446,6 @@ export const recipientSchema: FactorySchemaOf<
   yup.object().shape({
     recipientCompanyName: yup
       .string()
-
       .requiredIf(
         context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_NAME}`
@@ -503,19 +500,12 @@ export const receptionSchema: FactorySchemaOf<
         context.receptionSignature,
         "Vous devez préciser si le déchet est accepté"
       ),
-
     recipientWasteRefusedQuantity: yup
       .number()
       .nullable()
       .notRequired()
       .min(0, "La quantité doit être supérieure à 0"),
-    recipientWasteQuantity: yup
-      .number()
-      .requiredIf(
-        context.receptionSignature,
-        "La quantité du déchet en kg est obligatoire"
-      )
-      .min(0, "La quantité doit être supérieure à 0"),
+
     recipientWasteRefusalReason: yup
       .string()
       .when("recipientWasteAcceptationStatus", (type, schema) =>
@@ -558,11 +548,27 @@ export const operationSchema: FactorySchemaOf<
     : DASRI_ALL_OPERATIONS_CODES;
 
   return yup.object({
+    recipientWasteQuantity: yup
+      .number()
+      .test(
+        "operation-quantity-required-if-final-processing-operation",
+        "La quantité du déchet traité en kg est obligatoire si le code correspond à un traitement final",
+        function (value) {
+          return DASRI_PROCESSING_OPERATIONS_CODES.includes(
+            this.parent.processingOperation
+          )
+            ? !!value
+            : true;
+        }
+      )
+      .nullable()
+      .min(0, "La quantité doit être supérieure à 0"),
     processingOperation: yup
       .string()
       .label("Opération d’élimination / valorisation")
       .oneOf([...allowedOperations, "", null], INVALID_PROCESSING_OPERATION)
       .requiredIf(context.operationSignature),
+
     processedAt: yup
       .date()
       .label("Date de traitement")

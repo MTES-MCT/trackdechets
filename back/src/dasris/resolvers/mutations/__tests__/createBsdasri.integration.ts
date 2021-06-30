@@ -90,8 +90,8 @@ describe("Mutation.createDasri", () => {
       },
       emission: {
         wasteDetails: {
-          quantity: 23, //missing waste code
-          quantityType: "REAL",
+          quantity: { value: 23, type: "REAL" }, //missing waste code
+
           onuCode: "xyz 33",
           packagingInfos: [
             {
@@ -141,8 +141,8 @@ describe("Mutation.createDasri", () => {
       emission: {
         wasteCode: "18 01 03*",
         wasteDetails: {
-          quantity: 23,
-          quantityType: "REAL",
+          quantity: { value: 23, type: "REAL" },
+
           onuCode: "xyz 33",
           packagingInfos: [
             {
@@ -192,7 +192,7 @@ describe("Mutation.createDasri validation scenarii", () => {
       emission: {
         wasteCode: "18 01 03*",
         wasteDetails: {
-          quantity: 15, // quantity provided, not quantityType
+          quantity: { value: 15 }, // quantity  value provided, not type
 
           onuCode: "xyz 33",
           packagingInfos: [
@@ -241,7 +241,7 @@ describe("Mutation.createDasri validation scenarii", () => {
       emission: {
         wasteCode: "18 01 03*",
         wasteDetails: {
-          quantityType: "REAL", // quantityType provided, not quantity
+          quantity: { type: "REAL" }, // quantity type provided, not value
 
           onuCode: "xyz 33",
           packagingInfos: [
@@ -357,7 +357,7 @@ describe("Mutation.createDasri validation scenarii", () => {
       },
       transport: {
         wasteDetails: {
-          quantity: 22,
+          quantity: { value: 22 }, // type not provided
           packagingInfos: [
             {
               type: "BOITE_CARTON",
@@ -427,7 +427,7 @@ describe("Mutation.createDasri validation scenarii", () => {
       },
       transport: {
         wasteDetails: {
-          quantityType: "ESTIMATED",
+          quantity: { type: "ESTIMATED" }, // value not provided
           packagingInfos: [
             {
               type: "BOITE_CARTON",
@@ -458,6 +458,7 @@ describe("Mutation.createDasri validation scenarii", () => {
       })
     ]);
   });
+
   it("create a dasri without transport quantity and type", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const transporterCompany = await companyFactory();
@@ -521,5 +522,101 @@ describe("Mutation.createDasri validation scenarii", () => {
     expect(data.createBsdasri.status).toEqual("INITIAL");
 
     expect(data.createBsdasri.emitter.company.siret).toEqual(company.siret);
+  });
+
+  it("Operation quantity is required when operation code is final  ", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const input = {
+      emitter: {
+        company: {
+          mail: "emitter@test.fr",
+          name: "hopital blanc",
+          siret: company.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          address: "avenue de la mer"
+        }
+      },
+      emission: {
+        wasteCode: "18 01 03*",
+        wasteDetails: {
+          onuCode: "xyz 33",
+          packagingInfos: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+      operation: {
+        processingOperation: "D9" // quantity is expected
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "La quantité du déchet traité en kg est obligatoire si le code correspond à un traitement final",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("Operation quantity is not required when operation code is not final  ", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const input = {
+      emitter: {
+        company: {
+          mail: "emitter@test.fr",
+          name: "hopital blanc",
+          siret: company.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          address: "avenue de la mer"
+        }
+      },
+      emission: {
+        wasteCode: "18 01 03*",
+        wasteDetails: {
+          onuCode: "xyz 33",
+          packagingInfos: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+      operation: {
+        processingOperation: "D12" // quantity is not expected for grouping code
+      }
+    };
+
+    const { mutate } = makeClient(user);
+
+    const { data } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(data.createBsdasri.status).toEqual("INITIAL");
   });
 });

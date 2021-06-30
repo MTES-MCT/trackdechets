@@ -508,16 +508,15 @@ export type BsdasriEmission = {
 
 export type BsdasriEmissionInput = {
   wasteCode?: Maybe<Scalars["String"]>;
-  wasteDetails?: Maybe<BsdasriWasteDetailInput>;
+  wasteDetails?: Maybe<BsdasriWasteDetailEmissionInput>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
 };
 
 /** Détail sur le déchet emis du Bsdasri */
 export type BsdasriEmissionWasteDetails = {
   __typename?: "BsdasriEmissionWasteDetails";
-  /** Quantité en kg */
-  quantity?: Maybe<Scalars["Int"]>;
-  quantityType?: Maybe<QuantityType>;
+  /** Quantité émise */
+  quantity?: Maybe<BsdasriQuantity>;
   /** Volume en litres */
   volume?: Maybe<Scalars["Int"]>;
   packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
@@ -588,14 +587,25 @@ export type BsdasriMetadata = {
 /** Informations relatives au traitement du Bsdasri */
 export type BsdasriOperation = {
   __typename?: "BsdasriOperation";
+  /** Quantité traitée */
+  quantity?: Maybe<BsdasriOperationQuantity>;
+  /** Code de l'opération de traitement */
   processingOperation?: Maybe<Scalars["String"]>;
+  /** Date de l'opération de traitement */
   processedAt?: Maybe<Scalars["DateTime"]>;
   signature?: Maybe<BsdasriSignature>;
 };
 
 export type BsdasriOperationInput = {
+  quantity?: Maybe<BsdasriQuantityInput>;
   processingOperation?: Maybe<Scalars["String"]>;
   processedAt?: Maybe<Scalars["DateTime"]>;
+};
+
+export type BsdasriOperationQuantity = {
+  __typename?: "BsdasriOperationQuantity";
+  /** Quantité en kg */
+  value?: Maybe<Scalars["Int"]>;
 };
 
 /** Informations sur le conditionnement Bsdasri */
@@ -615,7 +625,7 @@ export type BsdasriPackagingInfoInput = {
   type: BsdasriPackagings;
   /** Description du conditionnement dans le cas où le type de conditionnement est `AUTRE` */
   other?: Maybe<Scalars["String"]>;
-  /** Nombre de colis associés à ce conditionnement */
+  /** Volume de chaque colis associé à ce conditionnement */
   volume: Scalars["Int"];
   /** Nombre de colis associés à ce conditionnement */
   quantity: Scalars["Int"];
@@ -636,19 +646,39 @@ export type BsdasriPackagings =
   /** Autre */
   | "AUTRE";
 
+export type BsdasriQuantity = {
+  __typename?: "BsdasriQuantity";
+  /** Quantité en kg */
+  value?: Maybe<Scalars["Int"]>;
+  /** Quantité réélle (pesée ou estimée) */
+  type?: Maybe<QuantityType>;
+};
+
+export type BsdasriQuantityInput = {
+  value?: Maybe<Scalars["Int"]>;
+  type?: Maybe<QuantityType>;
+};
+
 /** Informations relatives à la réception du Bsdasri */
 export type BsdasriReception = {
   __typename?: "BsdasriReception";
-  wasteDetails?: Maybe<BsdasriWasteDetails>;
+  wasteDetails?: Maybe<BsdasriReceptionWasteDetails>;
   wasteAcceptation?: Maybe<BsdasriWasteAcceptation>;
   receivedAt?: Maybe<Scalars["DateTime"]>;
   signature?: Maybe<BsdasriSignature>;
 };
 
 export type BsdasriReceptionInput = {
-  wasteDetails?: Maybe<BsdasriWasteDetailInput>;
+  wasteDetails?: Maybe<BsdasriRecipientWasteDetailInput>;
   receivedAt?: Maybe<Scalars["DateTime"]>;
   wasteAcceptation?: Maybe<BsdasriWasteAcceptationInput>;
+};
+
+/** Détail sur le déchet reçu du Bsdasri */
+export type BsdasriReceptionWasteDetails = {
+  __typename?: "BsdasriReceptionWasteDetails";
+  volume?: Maybe<Scalars["Int"]>;
+  packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
 };
 
 /** Destinataire du Bsdasri */
@@ -668,8 +698,8 @@ export type BsdasriRecipientInput = {
 };
 
 export type BsdasriRecipientWasteDetailInput = {
-  quantity?: Maybe<Scalars["Int"]>;
   volume?: Maybe<Scalars["Int"]>;
+  packagingInfos?: Maybe<Array<BsdasriPackagingInfoInput>>;
 };
 
 export type BsdasriRecipientWhere = {
@@ -732,7 +762,7 @@ export type BsdasriStatus =
 /** Informations relatives au transport du Bsdasri */
 export type BsdasriTransport = {
   __typename?: "BsdasriTransport";
-  wasteDetails?: Maybe<BsdasriWasteDetails>;
+  wasteDetails?: Maybe<BsdasriTransportWasteDetails>;
   wasteAcceptation?: Maybe<BsdasriWasteAcceptation>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
   takenOverAt?: Maybe<Scalars["DateTime"]>;
@@ -774,11 +804,20 @@ export type BsdasriTransporterWhere = {
 };
 
 export type BsdasriTransportInput = {
-  wasteDetails?: Maybe<BsdasriWasteDetailInput>;
+  wasteDetails?: Maybe<BsdasriWasteDetailTransportInput>;
   takenOverAt?: Maybe<Scalars["DateTime"]>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
   wasteAcceptation?: Maybe<BsdasriWasteAcceptationInput>;
   mode?: Maybe<TransportMode>;
+};
+
+/** Détail sur le déchet transporté */
+export type BsdasriTransportWasteDetails = {
+  __typename?: "BsdasriTransportWasteDetails";
+  /** Quantité transportée */
+  quantity?: Maybe<BsdasriQuantity>;
+  volume?: Maybe<Scalars["Int"]>;
+  packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
 };
 
 export type BsdasriUpdateInput = {
@@ -806,21 +845,15 @@ export type BsdasriWasteAcceptationInput = {
   refusedQuantity?: Maybe<Scalars["Int"]>;
 };
 
-export type BsdasriWasteDetailInput = {
-  quantity?: Maybe<Scalars["Int"]>;
-  quantityType?: Maybe<QuantityType>;
+export type BsdasriWasteDetailEmissionInput = {
+  quantity?: Maybe<BsdasriQuantityInput>;
   packagingInfos?: Maybe<Array<BsdasriPackagingInfoInput>>;
   onuCode?: Maybe<Scalars["String"]>;
 };
 
-/** Détail sur le déchet transporté ou reçu du Bsdasri */
-export type BsdasriWasteDetails = {
-  __typename?: "BsdasriWasteDetails";
-  /** Quantité en kg */
-  quantity?: Maybe<Scalars["Int"]>;
-  quantityType?: Maybe<QuantityType>;
-  volume?: Maybe<Scalars["Int"]>;
-  packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
+export type BsdasriWasteDetailTransportInput = {
+  quantity?: Maybe<BsdasriQuantityInput>;
+  packagingInfos?: Maybe<Array<BsdasriPackagingInfoInput>>;
 };
 
 export type BsdasriWhere = {
@@ -4849,16 +4882,23 @@ export type ResolversTypes = {
   BsdasriEmitterType: BsdasriEmitterType;
   BsdasriEmission: ResolverTypeWrapper<BsdasriEmission>;
   BsdasriEmissionWasteDetails: ResolverTypeWrapper<BsdasriEmissionWasteDetails>;
+  BsdasriQuantity: ResolverTypeWrapper<BsdasriQuantity>;
   BsdasriPackagingInfo: ResolverTypeWrapper<BsdasriPackagingInfo>;
   BsdasriPackagings: BsdasriPackagings;
   BsdasriSignature: ResolverTypeWrapper<BsdasriSignature>;
   BsdasriTransporter: ResolverTypeWrapper<BsdasriTransporter>;
   BsdasriTransport: ResolverTypeWrapper<BsdasriTransport>;
-  BsdasriWasteDetails: ResolverTypeWrapper<BsdasriWasteDetails>;
+  BsdasriTransportWasteDetails: ResolverTypeWrapper<
+    BsdasriTransportWasteDetails
+  >;
   BsdasriWasteAcceptation: ResolverTypeWrapper<BsdasriWasteAcceptation>;
   BsdasriRecipient: ResolverTypeWrapper<BsdasriRecipient>;
   BsdasriReception: ResolverTypeWrapper<BsdasriReception>;
+  BsdasriReceptionWasteDetails: ResolverTypeWrapper<
+    BsdasriReceptionWasteDetails
+  >;
   BsdasriOperation: ResolverTypeWrapper<BsdasriOperation>;
+  BsdasriOperationQuantity: ResolverTypeWrapper<BsdasriOperationQuantity>;
   BsdasriMetadata: ResolverTypeWrapper<BsdasriMetadata>;
   BsdasriError: ResolverTypeWrapper<BsdasriError>;
   BsdasriSignatureType: BsdasriSignatureType;
@@ -5005,14 +5045,17 @@ export type ResolversTypes = {
   BsdasriEmitterInput: BsdasriEmitterInput;
   WorkSiteInput: WorkSiteInput;
   BsdasriEmissionInput: BsdasriEmissionInput;
-  BsdasriWasteDetailInput: BsdasriWasteDetailInput;
+  BsdasriWasteDetailEmissionInput: BsdasriWasteDetailEmissionInput;
+  BsdasriQuantityInput: BsdasriQuantityInput;
   BsdasriPackagingInfoInput: BsdasriPackagingInfoInput;
   BsdasriTransporterInput: BsdasriTransporterInput;
   BsdasriTransportInput: BsdasriTransportInput;
+  BsdasriWasteDetailTransportInput: BsdasriWasteDetailTransportInput;
   BsdasriWasteAcceptationInput: BsdasriWasteAcceptationInput;
   WasteAcceptationStatusInput: WasteAcceptationStatusInput;
   BsdasriRecipientInput: BsdasriRecipientInput;
   BsdasriReceptionInput: BsdasriReceptionInput;
+  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
   BsdasriOperationInput: BsdasriOperationInput;
   RegroupedBsdasriInput: RegroupedBsdasriInput;
   BsffInput: BsffInput;
@@ -5167,15 +5210,18 @@ export type ResolversParentTypes = {
   BsdasriEmitter: BsdasriEmitter;
   BsdasriEmission: BsdasriEmission;
   BsdasriEmissionWasteDetails: BsdasriEmissionWasteDetails;
+  BsdasriQuantity: BsdasriQuantity;
   BsdasriPackagingInfo: BsdasriPackagingInfo;
   BsdasriSignature: BsdasriSignature;
   BsdasriTransporter: BsdasriTransporter;
   BsdasriTransport: BsdasriTransport;
-  BsdasriWasteDetails: BsdasriWasteDetails;
+  BsdasriTransportWasteDetails: BsdasriTransportWasteDetails;
   BsdasriWasteAcceptation: BsdasriWasteAcceptation;
   BsdasriRecipient: BsdasriRecipient;
   BsdasriReception: BsdasriReception;
+  BsdasriReceptionWasteDetails: BsdasriReceptionWasteDetails;
   BsdasriOperation: BsdasriOperation;
+  BsdasriOperationQuantity: BsdasriOperationQuantity;
   BsdasriMetadata: BsdasriMetadata;
   BsdasriError: BsdasriError;
   BsdasriWhere: BsdasriWhere;
@@ -5294,13 +5340,16 @@ export type ResolversParentTypes = {
   BsdasriEmitterInput: BsdasriEmitterInput;
   WorkSiteInput: WorkSiteInput;
   BsdasriEmissionInput: BsdasriEmissionInput;
-  BsdasriWasteDetailInput: BsdasriWasteDetailInput;
+  BsdasriWasteDetailEmissionInput: BsdasriWasteDetailEmissionInput;
+  BsdasriQuantityInput: BsdasriQuantityInput;
   BsdasriPackagingInfoInput: BsdasriPackagingInfoInput;
   BsdasriTransporterInput: BsdasriTransporterInput;
   BsdasriTransportInput: BsdasriTransportInput;
+  BsdasriWasteDetailTransportInput: BsdasriWasteDetailTransportInput;
   BsdasriWasteAcceptationInput: BsdasriWasteAcceptationInput;
   BsdasriRecipientInput: BsdasriRecipientInput;
   BsdasriReceptionInput: BsdasriReceptionInput;
+  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
   BsdasriOperationInput: BsdasriOperationInput;
   RegroupedBsdasriInput: RegroupedBsdasriInput;
   BsffInput: BsffInput;
@@ -5842,9 +5891,8 @@ export type BsdasriEmissionWasteDetailsResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsdasriEmissionWasteDetails"] = ResolversParentTypes["BsdasriEmissionWasteDetails"]
 > = {
-  quantity?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
-  quantityType?: Resolver<
-    Maybe<ResolversTypes["QuantityType"]>,
+  quantity?: Resolver<
+    Maybe<ResolversTypes["BsdasriQuantity"]>,
     ParentType,
     ContextType
   >;
@@ -5925,6 +5973,11 @@ export type BsdasriOperationResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsdasriOperation"] = ResolversParentTypes["BsdasriOperation"]
 > = {
+  quantity?: Resolver<
+    Maybe<ResolversTypes["BsdasriOperationQuantity"]>,
+    ParentType,
+    ContextType
+  >;
   processingOperation?: Resolver<
     Maybe<ResolversTypes["String"]>,
     ParentType,
@@ -5943,6 +5996,14 @@ export type BsdasriOperationResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type BsdasriOperationQuantityResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriOperationQuantity"] = ResolversParentTypes["BsdasriOperationQuantity"]
+> = {
+  value?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type BsdasriPackagingInfoResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsdasriPackagingInfo"] = ResolversParentTypes["BsdasriPackagingInfo"]
@@ -5954,12 +6015,25 @@ export type BsdasriPackagingInfoResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type BsdasriQuantityResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriQuantity"] = ResolversParentTypes["BsdasriQuantity"]
+> = {
+  value?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
+  type?: Resolver<
+    Maybe<ResolversTypes["QuantityType"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type BsdasriReceptionResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsdasriReception"] = ResolversParentTypes["BsdasriReception"]
 > = {
   wasteDetails?: Resolver<
-    Maybe<ResolversTypes["BsdasriWasteDetails"]>,
+    Maybe<ResolversTypes["BsdasriReceptionWasteDetails"]>,
     ParentType,
     ContextType
   >;
@@ -5975,6 +6049,19 @@ export type BsdasriReceptionResolvers<
   >;
   signature?: Resolver<
     Maybe<ResolversTypes["BsdasriSignature"]>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BsdasriReceptionWasteDetailsResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriReceptionWasteDetails"] = ResolversParentTypes["BsdasriReceptionWasteDetails"]
+> = {
+  volume?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
+  packagingInfos?: Resolver<
+    Maybe<Array<ResolversTypes["BsdasriPackagingInfo"]>>,
     ParentType,
     ContextType
   >;
@@ -6012,7 +6099,7 @@ export type BsdasriTransportResolvers<
   ParentType extends ResolversParentTypes["BsdasriTransport"] = ResolversParentTypes["BsdasriTransport"]
 > = {
   wasteDetails?: Resolver<
-    Maybe<ResolversTypes["BsdasriWasteDetails"]>,
+    Maybe<ResolversTypes["BsdasriTransportWasteDetails"]>,
     ParentType,
     ContextType
   >;
@@ -6068,6 +6155,24 @@ export type BsdasriTransporterResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type BsdasriTransportWasteDetailsResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends ResolversParentTypes["BsdasriTransportWasteDetails"] = ResolversParentTypes["BsdasriTransportWasteDetails"]
+> = {
+  quantity?: Resolver<
+    Maybe<ResolversTypes["BsdasriQuantity"]>,
+    ParentType,
+    ContextType
+  >;
+  volume?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
+  packagingInfos?: Resolver<
+    Maybe<Array<ResolversTypes["BsdasriPackagingInfo"]>>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type BsdasriWasteAcceptationResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsdasriWasteAcceptation"] = ResolversParentTypes["BsdasriWasteAcceptation"]
@@ -6080,25 +6185,6 @@ export type BsdasriWasteAcceptationResolvers<
   >;
   refusedQuantity?: Resolver<
     Maybe<ResolversTypes["Int"]>,
-    ParentType,
-    ContextType
-  >;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type BsdasriWasteDetailsResolvers<
-  ContextType = GraphQLContext,
-  ParentType extends ResolversParentTypes["BsdasriWasteDetails"] = ResolversParentTypes["BsdasriWasteDetails"]
-> = {
-  quantity?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
-  quantityType?: Resolver<
-    Maybe<ResolversTypes["QuantityType"]>,
-    ParentType,
-    ContextType
-  >;
-  volume?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
-  packagingInfos?: Resolver<
-    Maybe<Array<ResolversTypes["BsdasriPackagingInfo"]>>,
     ParentType,
     ContextType
   >;
@@ -8782,14 +8868,21 @@ export type Resolvers<ContextType = GraphQLContext> = {
   BsdasriError?: BsdasriErrorResolvers<ContextType>;
   BsdasriMetadata?: BsdasriMetadataResolvers<ContextType>;
   BsdasriOperation?: BsdasriOperationResolvers<ContextType>;
+  BsdasriOperationQuantity?: BsdasriOperationQuantityResolvers<ContextType>;
   BsdasriPackagingInfo?: BsdasriPackagingInfoResolvers<ContextType>;
+  BsdasriQuantity?: BsdasriQuantityResolvers<ContextType>;
   BsdasriReception?: BsdasriReceptionResolvers<ContextType>;
+  BsdasriReceptionWasteDetails?: BsdasriReceptionWasteDetailsResolvers<
+    ContextType
+  >;
   BsdasriRecipient?: BsdasriRecipientResolvers<ContextType>;
   BsdasriSignature?: BsdasriSignatureResolvers<ContextType>;
   BsdasriTransport?: BsdasriTransportResolvers<ContextType>;
   BsdasriTransporter?: BsdasriTransporterResolvers<ContextType>;
+  BsdasriTransportWasteDetails?: BsdasriTransportWasteDetailsResolvers<
+    ContextType
+  >;
   BsdasriWasteAcceptation?: BsdasriWasteAcceptationResolvers<ContextType>;
-  BsdasriWasteDetails?: BsdasriWasteDetailsResolvers<ContextType>;
   BsdaTransport?: BsdaTransportResolvers<ContextType>;
   BsdaTransporter?: BsdaTransporterResolvers<ContextType>;
   BsdaWaste?: BsdaWasteResolvers<ContextType>;
@@ -9404,7 +9497,6 @@ export function createBsdasriEmissionWasteDetailsMock(
   return {
     __typename: "BsdasriEmissionWasteDetails",
     quantity: null,
-    quantityType: null,
     volume: null,
     packagingInfos: null,
     onuCode: null,
@@ -9492,6 +9584,7 @@ export function createBsdasriOperationMock(
 ): BsdasriOperation {
   return {
     __typename: "BsdasriOperation",
+    quantity: null,
     processingOperation: null,
     processedAt: null,
     signature: null,
@@ -9503,8 +9596,19 @@ export function createBsdasriOperationInputMock(
   props: Partial<BsdasriOperationInput>
 ): BsdasriOperationInput {
   return {
+    quantity: null,
     processingOperation: null,
     processedAt: null,
+    ...props
+  };
+}
+
+export function createBsdasriOperationQuantityMock(
+  props: Partial<BsdasriOperationQuantity>
+): BsdasriOperationQuantity {
+  return {
+    __typename: "BsdasriOperationQuantity",
+    value: null,
     ...props
   };
 }
@@ -9534,6 +9638,27 @@ export function createBsdasriPackagingInfoInputMock(
   };
 }
 
+export function createBsdasriQuantityMock(
+  props: Partial<BsdasriQuantity>
+): BsdasriQuantity {
+  return {
+    __typename: "BsdasriQuantity",
+    value: null,
+    type: null,
+    ...props
+  };
+}
+
+export function createBsdasriQuantityInputMock(
+  props: Partial<BsdasriQuantityInput>
+): BsdasriQuantityInput {
+  return {
+    value: null,
+    type: null,
+    ...props
+  };
+}
+
 export function createBsdasriReceptionMock(
   props: Partial<BsdasriReception>
 ): BsdasriReception {
@@ -9554,6 +9679,17 @@ export function createBsdasriReceptionInputMock(
     wasteDetails: null,
     receivedAt: null,
     wasteAcceptation: null,
+    ...props
+  };
+}
+
+export function createBsdasriReceptionWasteDetailsMock(
+  props: Partial<BsdasriReceptionWasteDetails>
+): BsdasriReceptionWasteDetails {
+  return {
+    __typename: "BsdasriReceptionWasteDetails",
+    volume: null,
+    packagingInfos: null,
     ...props
   };
 }
@@ -9583,8 +9719,8 @@ export function createBsdasriRecipientWasteDetailInputMock(
   props: Partial<BsdasriRecipientWasteDetailInput>
 ): BsdasriRecipientWasteDetailInput {
   return {
-    quantity: null,
     volume: null,
+    packagingInfos: null,
     ...props
   };
 }
@@ -9704,6 +9840,18 @@ export function createBsdasriTransportInputMock(
   };
 }
 
+export function createBsdasriTransportWasteDetailsMock(
+  props: Partial<BsdasriTransportWasteDetails>
+): BsdasriTransportWasteDetails {
+  return {
+    __typename: "BsdasriTransportWasteDetails",
+    quantity: null,
+    volume: null,
+    packagingInfos: null,
+    ...props
+  };
+}
+
 export function createBsdasriUpdateInputMock(
   props: Partial<BsdasriUpdateInput>
 ): BsdasriUpdateInput {
@@ -9743,26 +9891,22 @@ export function createBsdasriWasteAcceptationInputMock(
   };
 }
 
-export function createBsdasriWasteDetailInputMock(
-  props: Partial<BsdasriWasteDetailInput>
-): BsdasriWasteDetailInput {
+export function createBsdasriWasteDetailEmissionInputMock(
+  props: Partial<BsdasriWasteDetailEmissionInput>
+): BsdasriWasteDetailEmissionInput {
   return {
     quantity: null,
-    quantityType: null,
     packagingInfos: null,
     onuCode: null,
     ...props
   };
 }
 
-export function createBsdasriWasteDetailsMock(
-  props: Partial<BsdasriWasteDetails>
-): BsdasriWasteDetails {
+export function createBsdasriWasteDetailTransportInputMock(
+  props: Partial<BsdasriWasteDetailTransportInput>
+): BsdasriWasteDetailTransportInput {
   return {
-    __typename: "BsdasriWasteDetails",
     quantity: null,
-    quantityType: null,
-    volume: null,
     packagingInfos: null,
     ...props
   };

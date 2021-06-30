@@ -21,7 +21,8 @@ import { indexBsdasri } from "../../elastic";
 type BsdasriField = keyof Bsdasri;
 const fieldsAllowedForUpdateOnceReceived: BsdasriField[] = [
   "processingOperation",
-  "processedAt"
+  "processedAt",
+  "recipientWasteQuantity"
 ];
 
 const fieldsAllowedForUpdateOnceSent: BsdasriField[] = fieldsAllowedForUpdateOnceReceived.concat(
@@ -36,7 +37,6 @@ const fieldsAllowedForUpdateOnceSent: BsdasriField[] = fieldsAllowedForUpdateOnc
     "recipientWasteAcceptationStatus",
     "recipientWasteRefusalReason",
     "recipientWasteRefusedQuantity",
-    "recipientWasteQuantity",
     "recipientWasteVolume",
     "receivedAt",
     "handedOverToRecipientAt",
