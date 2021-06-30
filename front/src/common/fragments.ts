@@ -380,6 +380,7 @@ export const dasriFragment = gql`
       customInfo
     }
     transport {
+      mode
       handedOverAt
       takenOverAt
       wasteDetails {

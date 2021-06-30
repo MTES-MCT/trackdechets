@@ -86,6 +86,7 @@ export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
       receiptValidityLimit: bsdasri.transporterReceiptValidityLimit
     }),
     transport: nullIfNoValues<BsdasriTransport>({
+      mode: bsdasri.transportMode,
       wasteDetails: nullIfNoValues<BsdasriWasteDetails>({
         quantity: bsdasri.transporterWasteQuantity,
         quantityType: bsdasri.transporterWasteQuantityType as QuantityType,
@@ -276,6 +277,7 @@ function flattenTransportInput(input: { transport?: BsdasriTransportInput }) {
     chain(t.wasteDetails, w => w.packagingInfos)
   );
   return {
+    transportMode: chain(input.transport, t => t.mode),
     transporterTakenOverAt: chain(input.transport, t =>
       t.takenOverAt ? new Date(t.takenOverAt) : t.takenOverAt
     ),

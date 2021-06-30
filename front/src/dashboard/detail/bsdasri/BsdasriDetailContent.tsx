@@ -1,7 +1,7 @@
 import React from "react";
 import { useBsdasriDuplicate } from "dashboard/components/BSDList/BSDasri/BSDasriActions/useDuplicate";
 import { generatePath, useHistory, useParams } from "react-router-dom";
-
+import { transportModeLabels, statusLabels } from "dashboard/constants";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import {
   Bsdasri,
@@ -9,7 +9,7 @@ import {
   BsdasriPackagingInfo,
 } from "generated/graphql/types";
 import routes from "common/routes";
-import { statusLabels } from "../../constants";
+
 import {
   IconWarehouseDelivery,
   IconWaterDam,
@@ -139,6 +139,10 @@ const Transporter = ({ form }: { form: Bsdasri }) => {
         />
       </div>
       <div className={styles.detailGrid}>
+        <DetailRow
+          value={transport?.mode ? transportModeLabels[transport?.mode] : null}
+          label="Mode de transport"
+        />
         <DetailRow
           value={transport?.wasteDetails?.quantity}
           label="Quantité"

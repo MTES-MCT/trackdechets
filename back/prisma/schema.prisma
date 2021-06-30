@@ -739,6 +739,7 @@ model Bsdasri {
   transporterCustomInfo String? // free field
 
   // transport
+  transportMode                     TransportMode? @default(ROAD)
   transporterWasteAcceptationStatus WasteAcceptationStatus?
   transporterWasteRefusalReason     String?
   transporterWasteRefusedQuantity   Int? // kg

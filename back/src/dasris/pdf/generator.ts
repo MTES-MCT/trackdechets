@@ -6,7 +6,7 @@ import QRCode from "qrcode";
 import { format } from "date-fns";
 import Handlebars from "handlebars";
 import fs from "fs";
-
+import { transportModeLabels } from "../../common/pdf/helpers";
 /**
  *
  * Build a pdf via service based puppeteer (browserless.io)
@@ -28,6 +28,12 @@ export async function buildPdf(bsdasri: Bsdasri) {
   Handlebars.registerHelper("sumPackageQuantity", sumPackageQuantity);
   Handlebars.registerHelper("ifEquals", function (arg1, arg2, options) {
     return arg1 == arg2 ? options.fn(this) : options.inverse(this);
+  });
+  Handlebars.registerHelper("verboseTransportMode", function (transportMode) {
+    if (!transportMode) {
+      return "";
+    }
+    return transportModeLabels[transportMode];
   });
 
   const qrcode = !bsdasri.isDraft

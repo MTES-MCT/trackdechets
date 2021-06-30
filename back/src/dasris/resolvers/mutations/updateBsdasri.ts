@@ -64,7 +64,8 @@ const fieldsAllowedForUpdateOnceSignedByEmitter: BsdasriField[] = fieldsAllowedF
     "transporterWasteQuantityType",
     "transporterWasteVolume",
     "handedOverToRecipientAt",
-    "transporterCustomInfo"
+    "transporterCustomInfo",
+    "transportMode"
   ]
 );
 

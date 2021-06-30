@@ -102,6 +102,7 @@ input BsdasriTransportInput {
   takenOverAt: DateTime
   handedOverAt: DateTime
   wasteAcceptation: BsdasriWasteAcceptationInput
+  mode: TransportMode
 }
 
 input BsdasriTransporterInput {
