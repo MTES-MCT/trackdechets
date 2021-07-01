@@ -1194,7 +1194,7 @@ export type BsffEdge = {
 export type BsffEmission = {
   __typename?: "BsffEmission";
   /** Signature de l'émetteur lors de l'enlèvement par le transporteur. */
-  signature: Signature;
+  signature?: Maybe<Signature>;
 };
 
 export type BsffEmitter = {
@@ -1344,7 +1344,7 @@ export type BsffTransport = {
   /** Mode de transport utilisé. */
   mode: TransportMode;
   /** Signature du transporteur lors de l'enlèvement auprès de l'émetteur. */
-  signature: Signature;
+  signature?: Maybe<Signature>;
 };
 
 export type BsffTransporter = {

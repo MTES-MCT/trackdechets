@@ -1178,7 +1178,7 @@ export type BsffEdge = {
 export type BsffEmission = {
   __typename?: "BsffEmission";
   /** Signature de l'émetteur lors de l'enlèvement par le transporteur. */
-  signature: Signature;
+  signature?: Maybe<Signature>;
 };
 
 export type BsffEmitter = {
@@ -1319,7 +1319,7 @@ export type BsffTransport = {
   /** Mode de transport utilisé. */
   mode: TransportMode;
   /** Signature du transporteur lors de l'enlèvement auprès de l'émetteur. */
-  signature: Signature;
+  signature?: Maybe<Signature>;
 };
 
 export type BsffTransporter = {
@@ -6404,7 +6404,11 @@ export type BsffEmissionResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsffEmission"] = ResolversParentTypes["BsffEmission"]
 > = {
-  signature?: Resolver<ResolversTypes["Signature"], ParentType, ContextType>;
+  signature?: Resolver<
+    Maybe<ResolversTypes["Signature"]>,
+    ParentType,
+    ContextType
+  >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -6531,7 +6535,11 @@ export type BsffTransportResolvers<
   ParentType extends ResolversParentTypes["BsffTransport"] = ResolversParentTypes["BsffTransport"]
 > = {
   mode?: Resolver<ResolversTypes["TransportMode"], ParentType, ContextType>;
-  signature?: Resolver<ResolversTypes["Signature"], ParentType, ContextType>;
+  signature?: Resolver<
+    Maybe<ResolversTypes["Signature"]>,
+    ParentType,
+    ContextType
+  >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -10254,7 +10262,7 @@ export function createBsffEmissionMock(
 ): BsffEmission {
   return {
     __typename: "BsffEmission",
-    signature: createSignatureMock({}),
+    signature: null,
     ...props
   };
 }
@@ -10443,7 +10451,7 @@ export function createBsffTransportMock(
   return {
     __typename: "BsffTransport",
     mode: "ROAD",
-    signature: createSignatureMock({}),
+    signature: null,
     ...props
   };
 }

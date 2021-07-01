@@ -61,7 +61,7 @@ type BsffEmitter {
 }
 type BsffEmission {
   "Signature de l'émetteur lors de l'enlèvement par le transporteur."
-  signature: Signature!
+  signature: Signature
 }
 
 type BsffPackaging {
@@ -109,7 +109,7 @@ type BsffTransport {
   "Mode de transport utilisé."
   mode: TransportMode!
   "Signature du transporteur lors de l'enlèvement auprès de l'émetteur."
-  signature: Signature!
+  signature: Signature
 }
 
 type BsffDestination {
