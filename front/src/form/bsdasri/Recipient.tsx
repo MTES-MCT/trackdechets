@@ -30,6 +30,7 @@ export default function Recipient({ status }) {
         name="recipient.company"
         heading="Installation destinataire"
         disabled={receptionDisabled}
+        optionalMail={true}
       />
 
       <div className="form__row">

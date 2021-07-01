@@ -42,6 +42,7 @@ export default function Transporter({ status }) {
         disabled={disabled}
         name="transporter.company"
         heading="Entreprise de transport"
+        optionalMail={true}
         onCompanySelected={transporter => {
           if (transporter.transporterReceipt) {
             setFieldValue(

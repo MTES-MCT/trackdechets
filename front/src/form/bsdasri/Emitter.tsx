@@ -30,6 +30,7 @@ export default function Emitter({ status }) {
         disabled={disabled}
         name="emitter.company"
         heading="Personne responsable de l'élimination des déchets"
+        optionalMail={true}
       />
       <WorkSite
         disabled={disabled}
