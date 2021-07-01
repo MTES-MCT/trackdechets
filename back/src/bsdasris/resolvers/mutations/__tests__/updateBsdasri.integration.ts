@@ -480,7 +480,7 @@ describe("Mutation.updateBsdasri", () => {
       operation: { processingOperation: "D10", quantity: { value: 20 } }
     };
 
-    await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
+    const err = await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
       variables: { id: dasri.id, input }
     });
 

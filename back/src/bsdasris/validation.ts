@@ -158,7 +158,7 @@ export const emitterSchema: FactorySchemaOf<
         context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_PHONE}`
       ),
-    emitterCompanyMail: yup.string().email(),
+    emitterCompanyMail: yup.string().email().ensure(),
 
     emitterWorkSiteName: yup.string().nullable(),
     emitterWorkSiteAddress: yup.string().nullable(),
@@ -312,7 +312,7 @@ export const transporterSchema: FactorySchemaOf<
         context.transportSignature,
         `Transporteur: ${MISSING_COMPANY_PHONE}`
       ),
-    transporterCompanyMail: yup.string().email(),
+    transporterCompanyMail: yup.string().email().ensure(),
     transporterReceipt: yup
       .string()
       .ensure()
@@ -464,7 +464,7 @@ export const recipientSchema: FactorySchemaOf<
         context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_PHONE}`
       ),
-    recipientCompanyMail: yup.string().email()
+    recipientCompanyMail: yup.string().email().ensure()
   });
 
 export const receptionSchema: FactorySchemaOf<

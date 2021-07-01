@@ -116,7 +116,7 @@ describe("Mutation.createDasri", () => {
       expect.objectContaining({
         message:
           "Le code déchet est obligatoire\n" +
-          "Émetteur: L'email de l'entreprise est obligatoire",
+          "Émetteur: Le contact dans l'entreprise est obligatoire",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
