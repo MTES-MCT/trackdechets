@@ -51,6 +51,23 @@ export const GET_BSDS = gql`
           ... on Bsvhu {
             ...VhuFragment
           }
+          ... on Bsff {
+            id
+            bsffEmitter: emitter {
+              company {
+                name
+              }
+            }
+            bsffDestination: destination {
+              company {
+                name
+              }
+            }
+            waste {
+              code
+              nature
+            }
+          }
         }
       }
       pageInfo {
