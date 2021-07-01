@@ -802,10 +802,11 @@ model Bsdasri {
 // ----------------
 
 model Bsff {
-  id        String   @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  isDeleted Boolean  @default(false)
+  id        String     @id
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  isDeleted Boolean    @default(false)
+  status    BsffStatus @default(INITIAL)
 
   emitterCompanyName    String?
   emitterCompanySiret   String?
@@ -879,6 +880,15 @@ model Bsff {
   bsffs  Bsff[]  @relation("BsffToBsff")
   Bsff   Bsff?   @relation("BsffToBsff", fields: [bsffId], references: [id])
   bsffId String?
+}
+
+enum BsffStatus {
+  INITIAL
+  SIGNED_BY_EMITTER
+  SENT
+  RECEIVED
+  PROCESSED
+  REFUSED
 }
 
 model BsffFicheIntervention {

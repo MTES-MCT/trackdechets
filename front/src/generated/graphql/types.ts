@@ -1097,6 +1097,8 @@ export type Bsff = {
    * Il est à utiliser pour les échanges avec l'API.
    */
   id: Scalars["ID"];
+  /** Statut qui synthétise où en est le déchet dans son cheminement. */
+  status: BsffStatus;
   /**
    * Émetteur du déchet, qui n'est pas nécessairement le producteur.
    * Il s'agit par exemple de l'opérateur ayant collecté des fluides lors d'interventions,
@@ -1337,6 +1339,21 @@ export enum BsffSignatureType {
   Transport = "TRANSPORT",
   Reception = "RECEPTION",
   Operation = "OPERATION"
+}
+
+export enum BsffStatus {
+  /** Le bordereau ne comporte aucune signature. */
+  Initial = "INITIAL",
+  /** Le bordereau a été signé par l'emitter. */
+  SignedByEmitter = "SIGNED_BY_EMITTER",
+  /** Le bordereau a été signé par le transporteur. */
+  Sent = "SENT",
+  /** Le bordereau a été reçu par l'installation de destination. */
+  Received = "RECEIVED",
+  /** Le déchet a été traité par l'installation de destination. */
+  Processed = "PROCESSED",
+  /** Le déchet a été refusé par l'installation de traitement. */
+  Refused = "REFUSED"
 }
 
 export type BsffTransport = {

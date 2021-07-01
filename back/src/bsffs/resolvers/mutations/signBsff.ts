@@ -1,4 +1,4 @@
-import { Bsff } from ".prisma/client";
+import { BsffStatus, Bsff } from ".prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -69,6 +69,7 @@ const signatures: Record<
 
     return prisma.bsff.update({
       data: {
+        status: BsffStatus.SIGNED_BY_EMITTER,
         emitterEmissionSignatureDate: signature.date,
         emitterEmissionSignatureAuthor: signature.author
       },
@@ -87,6 +88,7 @@ const signatures: Record<
 
     return prisma.bsff.update({
       data: {
+        status: BsffStatus.SENT,
         transporterTransportSignatureDate: signature.date,
         transporterTransportSignatureAuthor: signature.author
       },
@@ -105,6 +107,9 @@ const signatures: Record<
 
     return prisma.bsff.update({
       data: {
+        status: existingBsff.destinationReceptionRefusal
+          ? BsffStatus.REFUSED
+          : BsffStatus.RECEIVED,
         destinationReceptionSignatureDate: signature.date,
         destinationReceptionSignatureAuthor: signature.author
       },
@@ -123,6 +128,7 @@ const signatures: Record<
 
     return prisma.bsff.update({
       data: {
+        status: BsffStatus.PROCESSED,
         destinationOperationSignatureDate: signature.date,
         destinationOperationSignatureAuthor: signature.author
       },

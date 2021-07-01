@@ -1081,6 +1081,8 @@ export type Bsff = {
    * Il est à utiliser pour les échanges avec l'API.
    */
   id: Scalars["ID"];
+  /** Statut qui synthétise où en est le déchet dans son cheminement. */
+  status: BsffStatus;
   /**
    * Émetteur du déchet, qui n'est pas nécessairement le producteur.
    * Il s'agit par exemple de l'opérateur ayant collecté des fluides lors d'interventions,
@@ -1313,6 +1315,20 @@ export type BsffSignatureType =
   | "TRANSPORT"
   | "RECEPTION"
   | "OPERATION";
+
+export type BsffStatus =
+  /** Le bordereau ne comporte aucune signature. */
+  | "INITIAL"
+  /** Le bordereau a été signé par l'emitter. */
+  | "SIGNED_BY_EMITTER"
+  /** Le bordereau a été signé par le transporteur. */
+  | "SENT"
+  /** Le bordereau a été reçu par l'installation de destination. */
+  | "RECEIVED"
+  /** Le déchet a été traité par l'installation de destination. */
+  | "PROCESSED"
+  /** Le déchet a été refusé par l'installation de traitement. */
+  | "REFUSED";
 
 export type BsffTransport = {
   __typename?: "BsffTransport";
@@ -4930,6 +4946,7 @@ export type ResolversTypes = {
   BsvhuError: ResolverTypeWrapper<BsvhuError>;
   SignatureTypeInput: SignatureTypeInput;
   Bsff: ResolverTypeWrapper<Bsff>;
+  BsffStatus: BsffStatus;
   BsffEmitter: ResolverTypeWrapper<BsffEmitter>;
   BsffEmission: ResolverTypeWrapper<BsffEmission>;
   BsffPackaging: ResolverTypeWrapper<BsffPackaging>;
@@ -6314,6 +6331,7 @@ export type BsffResolvers<
   ParentType extends ResolversParentTypes["Bsff"] = ResolversParentTypes["Bsff"]
 > = {
   id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes["BsffStatus"], ParentType, ContextType>;
   emitter?: Resolver<
     Maybe<ResolversTypes["BsffEmitter"]>,
     ParentType,
@@ -10148,6 +10166,7 @@ export function createBsffMock(props: Partial<Bsff>): Bsff {
   return {
     __typename: "Bsff",
     id: "",
+    status: "INITIAL",
     emitter: null,
     packagings: [],
     waste: null,
