@@ -1,9 +1,20 @@
 import * as React from "react";
 import { CellProps, CellValue } from "react-table";
+import { BsffStatus } from "generated/graphql/types";
 import { IconBSFF } from "common/components/Icons";
+
+const bsffVerboseStatuses: Record<BsffStatus, string> = {
+  INITIAL: "Initial",
+  SIGNED_BY_EMITTER: "Signé par l'émetteur",
+  SENT: "Envoyé",
+  RECEIVED: "Reçu",
+  PROCESSED: "Traité",
+  REFUSED: "Refusé",
+};
 
 export interface BsffFragment {
   id: string;
+  bsffStatus: BsffStatus;
   bsffEmitter?: {
     company?: {
       name?: string;
@@ -53,7 +64,7 @@ export const COLUMNS: Record<
     Cell: () => null,
   },
   status: {
-    accessor: bsff => null,
+    accessor: bsff => bsffVerboseStatuses[bsff.bsffStatus],
   },
   workflow: {
     accessor: () => null,

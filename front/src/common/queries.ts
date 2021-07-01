@@ -53,6 +53,7 @@ export const GET_BSDS = gql`
           }
           ... on Bsff {
             id
+            bsffStatus: status
             bsffEmitter: emitter {
               company {
                 name

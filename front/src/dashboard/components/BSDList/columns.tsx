@@ -67,7 +67,9 @@ export function createColumn(column: Column): Column {
         return bsvhu.COLUMNS[column.id]?.accessor?.(bsd);
       }
       if (bsd.__typename === "Bsff") {
-        return bsff.COLUMNS[column.id]?.accessor?.(bsd as bsff.BsffFragment);
+        return bsff.COLUMNS[column.id]?.accessor?.(
+          (bsd as unknown) as bsff.BsffFragment
+        );
       }
       throw new Error(
         `The bsd with type "${bsd.__typename}" has no accessor for the column "${column.id}"`

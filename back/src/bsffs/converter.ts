@@ -95,6 +95,7 @@ export function unflattenBsff(
 ): Omit<GraphQL.Bsff, "ficheInterventions" | "bsffs"> {
   return {
     id: prismaBsff.id,
+    status: prismaBsff.status,
     emitter: nullIfNoValues<GraphQL.BsffEmitter>({
       company: nullIfNoValues<GraphQL.FormCompany>({
         name: prismaBsff.emitterCompanyName,
