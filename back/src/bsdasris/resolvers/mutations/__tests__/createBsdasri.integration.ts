@@ -80,10 +80,9 @@ describe("Mutation.createDasri", () => {
     const input = {
       emitter: {
         company: {
-          //missing mail
           name: "hopital blanc",
           siret: company.siret,
-          contact: "jean durand",
+          //missing contact
           phone: "06 18 76 02 00",
           address: "avenue de la mer"
         }
@@ -134,7 +133,7 @@ describe("Mutation.createDasri", () => {
           siret: company.siret,
           contact: "jean durand",
           phone: "06 18 76 02 00",
-          mail: "emitter@test.fr",
+          // email not required
           address: "avenue de la mer"
         }
       },
