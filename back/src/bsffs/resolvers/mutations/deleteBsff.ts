@@ -1,6 +1,7 @@
 import { UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
+import * as elastic from "../../../common/elastic";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { unflattenBsff } from "../../converter";
 import { isBsffContributor } from "../../permissions";
@@ -29,6 +30,8 @@ const deleteBsff: MutationResolvers["deleteBsff"] = async (
       id
     }
   });
+
+  await elastic.deleteBsd(updatedBsff);
 
   return {
     ...unflattenBsff(updatedBsff),

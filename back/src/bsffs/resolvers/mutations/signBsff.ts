@@ -15,6 +15,7 @@ import {
 } from "../../validation";
 import { unflattenBsff } from "../../converter";
 import { getBsffOrNotFound } from "../../database";
+import { indexBsff } from "../../elastic";
 
 async function checkIsAllowed(
   siret: string | null,
@@ -137,6 +138,8 @@ const signBsff: MutationResolvers["signBsff"] = async (_, args, context) => {
   const existingBsff = await getBsffOrNotFound({ id: args.id });
   const sign = signatures[args.type];
   const updatedBsff = await sign(args, user, existingBsff);
+
+  await indexBsff(updatedBsff);
 
   return {
     ...unflattenBsff(updatedBsff),
