@@ -1,4 +1,4 @@
-import { Bsff } from "@prisma/client";
+import { Bsff, BsffStatus } from "@prisma/client";
 import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 
@@ -24,36 +24,53 @@ function toBsdElastic(bsff: Bsff): BsdElastic {
     ]
   };
 
-  if (bsff.emitterEmissionSignatureDate == null) {
-    bsd.isDraftFor.push(
-      bsff.emitterCompanySiret,
-      bsff.transporterCompanySiret,
-      bsff.destinationCompanySiret
-    );
-    bsd.isForActionFor.push(bsff.emitterCompanySiret);
-    bsd.isToCollectFor.push(bsff.transporterCompanySiret);
-  } else if (bsff.transporterTransportSignatureDate == null) {
-    bsd.isToCollectFor.push(bsff.transporterCompanySiret);
-    bsd.isFollowFor.push(
-      bsff.emitterCompanySiret,
-      bsff.destinationCompanySiret
-    );
-  } else if (
-    bsff.destinationReceptionSignatureDate == null ||
-    bsff.destinationOperationSignatureDate == null
-  ) {
-    bsd.isCollectedFor.push(bsff.transporterCompanySiret);
-    bsd.isFollowFor.push(
-      bsff.emitterCompanySiret,
-      bsff.transporterCompanySiret
-    );
-    bsd.isForActionFor.push(bsff.destinationCompanySiret);
-  } else {
-    bsd.isArchivedFor.push(
-      bsff.emitterCompanySiret,
-      bsff.transporterCompanySiret,
-      bsff.destinationCompanySiret
-    );
+  switch (bsff.status) {
+    case BsffStatus.INITIAL: {
+      bsd.isDraftFor.push(
+        bsff.emitterCompanySiret,
+        bsff.transporterCompanySiret,
+        bsff.destinationCompanySiret
+      );
+      bsd.isForActionFor.push(bsff.emitterCompanySiret);
+      bsd.isToCollectFor.push(bsff.transporterCompanySiret);
+      break;
+    }
+    case BsffStatus.SIGNED_BY_EMITTER: {
+      bsd.isToCollectFor.push(bsff.transporterCompanySiret);
+      bsd.isFollowFor.push(
+        bsff.emitterCompanySiret,
+        bsff.destinationCompanySiret
+      );
+      break;
+    }
+    case BsffStatus.SENT: {
+      bsd.isCollectedFor.push(bsff.transporterCompanySiret);
+      bsd.isFollowFor.push(
+        bsff.emitterCompanySiret,
+        bsff.transporterCompanySiret
+      );
+      bsd.isForActionFor.push(bsff.destinationCompanySiret);
+      break;
+    }
+    case BsffStatus.RECEIVED: {
+      bsd.isFollowFor.push(
+        bsff.emitterCompanySiret,
+        bsff.transporterCompanySiret
+      );
+      bsd.isForActionFor.push(bsff.destinationCompanySiret);
+      break;
+    }
+    case BsffStatus.REFUSED:
+    case BsffStatus.PROCESSED: {
+      bsd.isArchivedFor.push(
+        bsff.emitterCompanySiret,
+        bsff.transporterCompanySiret,
+        bsff.destinationCompanySiret
+      );
+      break;
+    }
+    default:
+      break;
   }
 
   return bsd;
