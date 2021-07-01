@@ -82,14 +82,14 @@ export default function Emitter({ status }) {
         disabled={disabled}
       />
 
-      <h4 className="form__section-heading">Quantité en kg</h4>
+      <h4 className="form__section-heading">Quantité remise</h4>
 
       <div className="form__row">
         <label>
-          Quantité remise :
+          Quantité en kg :
           <Field
             component={NumberInput}
-            name="emission.wasteDetails.quantity"
+            name="emission.wasteDetails.quantity.value"
             className="td-input dasri__waste-details__quantity"
             disabled={disabled}
             placeholder="En kg"
@@ -99,21 +99,21 @@ export default function Emitter({ status }) {
           <span className="tw-ml-2">kg</span>
         </label>
 
-        <RedErrorMessage name="emission.wasteDetails.quantity" />
+        <RedErrorMessage name="emission.wasteDetails.quantity.value" />
       </div>
 
       <div className="form__row">
         <fieldset>
           <legend className="tw-font-semibold">Cette quantité est</legend>
           <Field
-            name="emission.wasteDetails.quantityType"
+            name="emission.wasteDetails.quantity.type"
             id="REAL"
             label="Réélle"
             component={RadioButton}
             disabled={disabled}
           />
           <Field
-            name="emission.wasteDetails.quantityType"
+            name="emission.wasteDetails.quantity.type"
             id="ESTIMATED"
             label="Estimée"
             component={RadioButton}
