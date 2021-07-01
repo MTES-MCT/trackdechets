@@ -163,14 +163,13 @@ describe("Query.bsds.dasris base workflow", () => {
             },
             reception: {
               wasteDetails: {
-                quantity: { value: 99, type: "REAL" },
-
                 packagingInfos: [{ type: "FUT", quantity: 44, volume: 123 }]
               },
               wasteAcceptation: { status: WasteAcceptationStatus.ACCEPTED },
               receivedAt: new Date().toISOString() as any
             },
             operation: {
+              quantity: { value: 99 },
               processingOperation: "D10",
               processedAt: new Date().toISOString() as any
             }
