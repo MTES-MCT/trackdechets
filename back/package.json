@@ -66,6 +66,7 @@
     "express": "^4.17.1",
     "express-rate-limit": "^5.1.3",
     "express-session": "^1.17.1",
+    "gotenberg-js-client": "^0.7.0",
     "graphql": "^14.5.8",
     "graphql-codegen-factories": "0.0.9",
     "graphql-depth-limit": "^1.1.0",

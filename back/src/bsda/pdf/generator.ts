@@ -4,6 +4,15 @@ import { readFile } from "fs/promises";
 import Handlebars from "handlebars";
 import { join } from "path";
 import QRCode from "qrcode";
+import { pipe, gotenberg, convert, html, please } from 'gotenberg-js-client'
+
+
+const toPDF = pipe(
+  gotenberg('https://trackdechetsv2131avx-gotenberg.functions.fnc.fr-par.scw.cloud'),
+  convert,
+  html,
+  please
+)
 
 export async function buildPdf(bsda: Bsda) {
   const signatureStamp = await readFile(
@@ -27,6 +36,11 @@ export async function buildPdf(bsda: Bsda) {
 
   // TODO do smthing with generated HTML. Waiting for gotenberg to be setup
   console.log(html);
+  const pdf = await toPDF({
+    'index.html': html,
+    'bsda.css': 'todo',
+    "OpenSans-Regular.ttf": ""
+  })
 
   return null;
 }
