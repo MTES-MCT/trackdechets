@@ -63,22 +63,39 @@ type BsdasriPackagingInfo {
 
   volume: Int!
 }
+
+type BsdasriQuantity {
+  "Quantité en kg"
+  value: Int
+  "Quantité réélle (pesée ou estimée)"
+  type: QuantityType
+}
+type BsdasriOperationQuantity {
+  "Quantité en kg"
+  value: Int
+}
+
 "Détail sur le déchet emis du Bsdasri"
 type BsdasriEmissionWasteDetails {
-  "Quantité en kg"
-  quantity: Int
-  quantityType: QuantityType
+  "Quantité émise"
+  quantity: BsdasriQuantity
   "Volume en litres"
   volume: Int
   packagingInfos: [BsdasriPackagingInfo!]
   onuCode: String
 }
 
-"Détail sur le déchet transporté ou reçu du Bsdasri"
-type BsdasriWasteDetails {
-  "Quantité en kg"
-  quantity: Int
-  quantityType: QuantityType
+"Détail sur le déchet transporté"
+type BsdasriTransportWasteDetails {
+  "Quantité transportée"
+  quantity: BsdasriQuantity
+ 
+  volume: Int
+  packagingInfos: [BsdasriPackagingInfo!]
+}
+
+"Détail sur le déchet reçu du Bsdasri"
+type BsdasriReceptionWasteDetails {
   volume: Int
   packagingInfos: [BsdasriPackagingInfo!]
 }
@@ -104,7 +121,7 @@ type BsdasriWasteAcceptation {
 
 "Informations relatives au transport du Bsdasri"
 type BsdasriTransport {
-  wasteDetails: BsdasriWasteDetails
+  wasteDetails: BsdasriTransportWasteDetails
   wasteAcceptation: BsdasriWasteAcceptation
   handedOverAt: DateTime
   takenOverAt: DateTime
@@ -114,7 +131,7 @@ type BsdasriTransport {
 
 "Informations relatives à la réception du Bsdasri"
 type BsdasriReception {
-  wasteDetails: BsdasriWasteDetails
+  wasteDetails: BsdasriReceptionWasteDetails
   wasteAcceptation: BsdasriWasteAcceptation
   receivedAt: DateTime
   signature: BsdasriSignature
@@ -122,7 +139,11 @@ type BsdasriReception {
 
 "Informations relatives au traitement du Bsdasri"
 type BsdasriOperation {
+  "Quantité traitée"
+  quantity: BsdasriOperationQuantity
+  "Code de l'opération de traitement"
   processingOperation: String
+  "Date de l'opération de traitement"
   processedAt: DateTime
   signature: BsdasriSignature
 }

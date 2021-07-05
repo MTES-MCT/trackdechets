@@ -3,8 +3,11 @@ import {
   BsdasriEmitter,
   BsdasriTransporter,
   BsdasriRecipient,
-  BsdasriWasteDetails,
+  BsdasriTransportWasteDetails,
+  BsdasriQuantity,
+  BsdasriOperationQuantity,
   BsdasriEmissionWasteDetails,
+  BsdasriReceptionWasteDetails,
   FormCompany,
   BsdasriInput,
   BsdasriEmitterInput,
@@ -25,7 +28,7 @@ import {
   BsdasriSignature
 } from "../generated/graphql/types";
 import { chain, nullIfNoValues, safeInput } from "../forms/form-converter";
-import { Prisma, Bsdasri, BsdasriStatus, QuantityType } from "@prisma/client";
+import { Prisma, Bsdasri, BsdasriStatus } from "@prisma/client";
 
 export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
   return {
@@ -61,8 +64,11 @@ export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
       }),
 
       wasteDetails: nullIfNoValues<BsdasriEmissionWasteDetails>({
-        quantity: bsdasri.emitterWasteQuantity,
-        quantityType: bsdasri.emitterWasteQuantityType as QuantityType,
+        quantity: nullIfNoValues<BsdasriQuantity>({
+          value: bsdasri.emitterWasteQuantity,
+          type: bsdasri.emitterWasteQuantityType
+        }),
+
         volume: bsdasri.emitterWasteVolume,
         packagingInfos: bsdasri.emitterWastePackagingsInfo as BsdasriPackagingInfo[],
         onuCode: bsdasri.wasteDetailsOnuCode
@@ -87,9 +93,12 @@ export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
     }),
     transport: nullIfNoValues<BsdasriTransport>({
       mode: bsdasri.transportMode,
-      wasteDetails: nullIfNoValues<BsdasriWasteDetails>({
-        quantity: bsdasri.transporterWasteQuantity,
-        quantityType: bsdasri.transporterWasteQuantityType as QuantityType,
+      wasteDetails: nullIfNoValues<BsdasriTransportWasteDetails>({
+        quantity: nullIfNoValues<BsdasriQuantity>({
+          value: bsdasri.transporterWasteQuantity,
+          type: bsdasri.transporterWasteQuantityType
+        }),
+
         volume: bsdasri.transporterWasteVolume,
         packagingInfos: bsdasri.transporterWastePackagingsInfo as BsdasriPackagingInfo[]
       }),
@@ -119,9 +128,7 @@ export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
     }),
 
     reception: nullIfNoValues<BsdasriReception>({
-      wasteDetails: nullIfNoValues<BsdasriWasteDetails>({
-        quantity: bsdasri.recipientWasteQuantity,
-        quantityType: bsdasri.recipientWasteQuantityType as QuantityType,
+      wasteDetails: nullIfNoValues<BsdasriReceptionWasteDetails>({
         volume: bsdasri.recipientWasteVolume,
         packagingInfos: bsdasri.recipientWastePackagingsInfo as BsdasriPackagingInfo[]
       }),
@@ -137,6 +144,9 @@ export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
       })
     }),
     operation: nullIfNoValues<BsdasriOperation>({
+      quantity: nullIfNoValues<BsdasriOperationQuantity>({
+        value: bsdasri.recipientWasteQuantity
+      }),
       processingOperation: bsdasri.processingOperation,
       processedAt: bsdasri.processedAt,
       signature: nullIfNoValues<BsdasriSignature>({
@@ -227,10 +237,10 @@ function flattenEmissionInput(input: { emission?: BsdasriEmissionInput }) {
       e.handedOverAt ? new Date(e.handedOverAt) : null
     ),
     emitterWasteQuantity: chain(input.emission, e =>
-      chain(e.wasteDetails, w => w.quantity)
+      chain(e.wasteDetails, w => chain(w.quantity, q => q.value))
     ),
     emitterWasteQuantityType: chain(input.emission, e =>
-      chain(e.wasteDetails, w => w.quantityType)
+      chain(e.wasteDetails, w => chain(w.quantity, q => q.type))
     ),
     emitterWasteVolume: computeTotalVolume(emitterWastePackagingsInfo),
     emitterWastePackagingsInfo
@@ -285,10 +295,10 @@ function flattenTransportInput(input: { transport?: BsdasriTransportInput }) {
       t.handedOverAt ? new Date(t.handedOverAt) : t.handedOverAt
     ),
     transporterWasteQuantity: chain(input.transport, t =>
-      chain(t.wasteDetails, w => w.quantity)
+      chain(t.wasteDetails, w => chain(w.quantity, q => q.value))
     ),
     transporterWasteQuantityType: chain(input.transport, t =>
-      chain(t.wasteDetails, w => w.quantityType)
+      chain(t.wasteDetails, w => chain(w.quantity, q => q.type))
     ),
     transporterWasteAcceptationStatus: chain(input.transport, t =>
       chain(t.wasteAcceptation, w => w.status)
@@ -333,9 +343,6 @@ function flattenReceptiontInput(input: { reception?: BsdasriReceptionInput }) {
     chain(r.wasteDetails, w => w.packagingInfos)
   );
   return {
-    recipientWasteQuantity: chain(input.reception, r =>
-      chain(r.wasteDetails, w => w.quantity)
-    ),
     recipientWasteVolume: computeTotalVolume(recipientWastePackagingsInfo),
     receivedAt: chain(input.reception, r =>
       r.receivedAt ? new Date(r.receivedAt) : r.receivedAt
@@ -355,9 +362,13 @@ function flattenReceptiontInput(input: { reception?: BsdasriReceptionInput }) {
 
 function flattenOperationInput(input: { operation?: BsdasriOperationInput }) {
   return {
-    processingOperation: chain(input.operation, r => r.processingOperation),
-    processedAt: chain(input.operation, r =>
-      r.processedAt ? new Date(r.processedAt) : r.processedAt
+    processingOperation: chain(input.operation, o => o.processingOperation),
+    recipientWasteQuantity: chain(input.operation, o =>
+      chain(o.quantity, q => q.value)
+    ),
+
+    processedAt: chain(input.operation, o =>
+      o.processedAt ? new Date(o.processedAt) : o.processedAt
     )
   };
 }

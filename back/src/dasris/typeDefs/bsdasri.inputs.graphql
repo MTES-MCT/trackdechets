@@ -52,7 +52,7 @@ input BsdasriPackagingInfoInput {
   "Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"
   other: String
 
-  "Nombre de colis associés à ce conditionnement"
+  "Volume de chaque colis associé à ce conditionnement"
   volume: Int!
 
   "Nombre de colis associés à ce conditionnement"
@@ -77,15 +77,25 @@ input BsdasriEmitterInput {
   onBehalfOfEcoorganisme: Boolean
 }
 
-input BsdasriWasteDetailInput {
-  quantity: Int
-  quantityType: QuantityType
+input BsdasriQuantityInput {
+  value: Int
+  type: QuantityType
+}
+
+input BsdasriWasteDetailEmissionInput {
+  quantity: BsdasriQuantityInput
   packagingInfos: [BsdasriPackagingInfoInput!]
   onuCode: String
 }
+
+input BsdasriWasteDetailTransportInput {
+  quantity: BsdasriQuantityInput
+  packagingInfos: [BsdasriPackagingInfoInput!]
+}
 input BsdasriRecipientWasteDetailInput {
-  quantity: Int
   volume: Int
+  packagingInfos: [BsdasriPackagingInfoInput!]
+
 }
 input BsdasriWasteAcceptationInput {
   status: WasteAcceptationStatusInput
@@ -94,11 +104,11 @@ input BsdasriWasteAcceptationInput {
 }
 input BsdasriEmissionInput {
   wasteCode: String
-  wasteDetails: BsdasriWasteDetailInput
+  wasteDetails: BsdasriWasteDetailEmissionInput
   handedOverAt: DateTime
 }
 input BsdasriTransportInput {
-  wasteDetails: BsdasriWasteDetailInput
+  wasteDetails: BsdasriWasteDetailTransportInput
   takenOverAt: DateTime
   handedOverAt: DateTime
   wasteAcceptation: BsdasriWasteAcceptationInput
@@ -131,12 +141,13 @@ input BsdasriRecipientInput {
 }
 
 input BsdasriReceptionInput {
-  wasteDetails: BsdasriWasteDetailInput
+  wasteDetails: BsdasriRecipientWasteDetailInput
   receivedAt: DateTime
   wasteAcceptation: BsdasriWasteAcceptationInput
 }
 
 input BsdasriOperationInput {
+  quantity: BsdasriQuantityInput
   processingOperation: String
   processedAt: DateTime
 }

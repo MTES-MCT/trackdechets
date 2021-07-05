@@ -5,14 +5,16 @@ import { Field } from "formik";
 import React from "react";
 import { BsdasriStatus } from "generated/graphql/types";
 import Packagings from "./components/packagings/Packagings";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 
 export default function Recipient({ status }) {
   const receptionDisabled = BsdasriStatus.Received === status;
   // it's pointless to show reception or operation fields until form has relevant signatures
-  const showReceptionFields = status === BsdasriStatus.Sent;
+  const showReceptionFields = [
+    BsdasriStatus.Sent,
+    BsdasriStatus.Received,
+  ].includes(status);
   const showOperationFields = status === BsdasriStatus.Received;
 
   return (
@@ -65,46 +67,6 @@ export default function Recipient({ status }) {
             component={Packagings}
             disabled={receptionDisabled}
           />
-
-          <h4 className="form__section-heading">Quantité en kg</h4>
-
-          <div className="form__row">
-            <label>
-              Quantité réceptionnée :
-              <Field
-                component={NumberInput}
-                name="reception.wasteDetails.quantity"
-                className="td-input dasri__waste-details__quantity"
-                disabled={receptionDisabled}
-                placeholder="En kg"
-                min="0"
-                step="1"
-              />
-              <span className="tw-ml-2">kg</span>
-            </label>
-
-            <RedErrorMessage name="emission.wasteDetails.quantity" />
-          </div>
-
-          <div className="form__row">
-            <fieldset>
-              <legend className="tw-font-semibold">Cette quantité est</legend>
-              <Field
-                name="reception.wasteDetails.quantityType"
-                id="REAL"
-                label="Réélle"
-                component={RadioButton}
-                disabled={receptionDisabled}
-              />
-              <Field
-                name="reception.wasteDetails.quantityType"
-                id="ESTIMATED"
-                label="Estimée"
-                component={RadioButton}
-                disabled={receptionDisabled}
-              />
-            </fieldset>
-          </div>
         </>
       ) : (
         <p>Cette section sera disponible quand le déchet aura été envoyé</p>
@@ -146,6 +108,25 @@ export default function Recipient({ status }) {
                 />
               </div>
             </label>
+          </div>
+
+          <h4 className="form__section-heading">Quantité traitée</h4>
+
+          <div className="form__row">
+            <label>
+              Quantité en kg :
+              <Field
+                component={NumberInput}
+                name="operation.quantity.value"
+                className="td-input dasri__waste-details__quantity"
+                placeholder="En kg"
+                min="0"
+                step="1"
+              />
+              <span className="tw-ml-2">kg</span>
+            </label>
+
+            <RedErrorMessage name="operation.quantity.value" />
           </div>
         </>
       ) : (

@@ -40,8 +40,8 @@ query bsDasris($where: BsdasriWhere) {
           wasteDetails {
             onuCode
             volume
-            quantity
-            quantityType
+            quantity { value type}
+    
           }
           handedOverAt
           signature {
@@ -59,8 +59,8 @@ query bsDasris($where: BsdasriWhere) {
           handedOverAt
           takenOverAt
           wasteDetails {
-            quantity
-            quantityType
+            quantity { value type}
+ 
             volume
           }
           wasteAcceptation {
@@ -83,8 +83,6 @@ query bsDasris($where: BsdasriWhere) {
         reception {
           wasteDetails {
             volume
-            quantity
-            quantityType
           }
           wasteAcceptation {
             status
@@ -96,6 +94,11 @@ query bsDasris($where: BsdasriWhere) {
             author
             date
           }
+        }
+        operation {
+          quantity { value }
+          processingOperation
+          processedAt
         }
         createdAt
         updatedAt

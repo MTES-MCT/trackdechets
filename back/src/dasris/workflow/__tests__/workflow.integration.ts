@@ -89,8 +89,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
               emission: {
                 wasteCode: "18 01 03*"
                 wasteDetails: {
-                  quantity: 1
-                  quantityType: REAL
+                  quantity: { value:1, type: REAL},
                   onuCode: "non soumis"
                   packagingInfos: [{type: BOITE_CARTON, quantity: 1, volume: 1}]
                 }
@@ -164,8 +163,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
               transport: {
                 wasteAcceptation: { status: ACCEPTED }
                 wasteDetails: {
-                  quantity: 1
-                  quantityType: REAL
+                  quantity:   { value:1,  type: REAL },
                   packagingInfos: [{ type: BOITE_CARTON, quantity: 1, volume: 1 }]
                 }
                 takenOverAt: "2022-04-27"
@@ -213,8 +211,6 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
               reception: {
                 wasteAcceptation: { status: ACCEPTED }
                 wasteDetails: {
-                  quantity: 1
-                  quantityType: REAL
                   packagingInfos: [{ type: BOITE_CARTON, quantity: 1, volume: 1 }]
                 }
                 receivedAt: "2021-04-27"
@@ -260,6 +256,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
             id: "${bsdasri.id}",
             input: {
               operation: {
+                quantity: { value:1,  type: REAL },
                 processingOperation: "D10",
                 processedAt: "2020-04-28"
               }

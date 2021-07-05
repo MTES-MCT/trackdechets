@@ -511,16 +511,15 @@ export type BsdasriEmission = {
 
 export type BsdasriEmissionInput = {
   wasteCode?: Maybe<Scalars["String"]>;
-  wasteDetails?: Maybe<BsdasriWasteDetailInput>;
+  wasteDetails?: Maybe<BsdasriWasteDetailEmissionInput>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
 };
 
 /** Détail sur le déchet emis du Bsdasri */
 export type BsdasriEmissionWasteDetails = {
   __typename?: "BsdasriEmissionWasteDetails";
-  /** Quantité en kg */
-  quantity?: Maybe<Scalars["Int"]>;
-  quantityType?: Maybe<QuantityType>;
+  /** Quantité émise */
+  quantity?: Maybe<BsdasriQuantity>;
   /** Volume en litres */
   volume?: Maybe<Scalars["Int"]>;
   packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
@@ -592,14 +591,25 @@ export type BsdasriMetadata = {
 /** Informations relatives au traitement du Bsdasri */
 export type BsdasriOperation = {
   __typename?: "BsdasriOperation";
+  /** Quantité traitée */
+  quantity?: Maybe<BsdasriOperationQuantity>;
+  /** Code de l'opération de traitement */
   processingOperation?: Maybe<Scalars["String"]>;
+  /** Date de l'opération de traitement */
   processedAt?: Maybe<Scalars["DateTime"]>;
   signature?: Maybe<BsdasriSignature>;
 };
 
 export type BsdasriOperationInput = {
+  quantity?: Maybe<BsdasriQuantityInput>;
   processingOperation?: Maybe<Scalars["String"]>;
   processedAt?: Maybe<Scalars["DateTime"]>;
+};
+
+export type BsdasriOperationQuantity = {
+  __typename?: "BsdasriOperationQuantity";
+  /** Quantité en kg */
+  value?: Maybe<Scalars["Int"]>;
 };
 
 /** Informations sur le conditionnement Bsdasri */
@@ -619,7 +629,7 @@ export type BsdasriPackagingInfoInput = {
   type: BsdasriPackagings;
   /** Description du conditionnement dans le cas où le type de conditionnement est `AUTRE` */
   other?: Maybe<Scalars["String"]>;
-  /** Nombre de colis associés à ce conditionnement */
+  /** Volume de chaque colis associé à ce conditionnement */
   volume: Scalars["Int"];
   /** Nombre de colis associés à ce conditionnement */
   quantity: Scalars["Int"];
@@ -641,19 +651,39 @@ export enum BsdasriPackagings {
   Autre = "AUTRE"
 }
 
+export type BsdasriQuantity = {
+  __typename?: "BsdasriQuantity";
+  /** Quantité en kg */
+  value?: Maybe<Scalars["Int"]>;
+  /** Quantité réélle (pesée ou estimée) */
+  type?: Maybe<QuantityType>;
+};
+
+export type BsdasriQuantityInput = {
+  value?: Maybe<Scalars["Int"]>;
+  type?: Maybe<QuantityType>;
+};
+
 /** Informations relatives à la réception du Bsdasri */
 export type BsdasriReception = {
   __typename?: "BsdasriReception";
-  wasteDetails?: Maybe<BsdasriWasteDetails>;
+  wasteDetails?: Maybe<BsdasriReceptionWasteDetails>;
   wasteAcceptation?: Maybe<BsdasriWasteAcceptation>;
   receivedAt?: Maybe<Scalars["DateTime"]>;
   signature?: Maybe<BsdasriSignature>;
 };
 
 export type BsdasriReceptionInput = {
-  wasteDetails?: Maybe<BsdasriWasteDetailInput>;
+  wasteDetails?: Maybe<BsdasriRecipientWasteDetailInput>;
   receivedAt?: Maybe<Scalars["DateTime"]>;
   wasteAcceptation?: Maybe<BsdasriWasteAcceptationInput>;
+};
+
+/** Détail sur le déchet reçu du Bsdasri */
+export type BsdasriReceptionWasteDetails = {
+  __typename?: "BsdasriReceptionWasteDetails";
+  volume?: Maybe<Scalars["Int"]>;
+  packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
 };
 
 /** Destinataire du Bsdasri */
@@ -673,8 +703,8 @@ export type BsdasriRecipientInput = {
 };
 
 export type BsdasriRecipientWasteDetailInput = {
-  quantity?: Maybe<Scalars["Int"]>;
   volume?: Maybe<Scalars["Int"]>;
+  packagingInfos?: Maybe<Array<BsdasriPackagingInfoInput>>;
 };
 
 export type BsdasriRecipientWhere = {
@@ -740,7 +770,7 @@ export enum BsdasriStatus {
 /** Informations relatives au transport du Bsdasri */
 export type BsdasriTransport = {
   __typename?: "BsdasriTransport";
-  wasteDetails?: Maybe<BsdasriWasteDetails>;
+  wasteDetails?: Maybe<BsdasriTransportWasteDetails>;
   wasteAcceptation?: Maybe<BsdasriWasteAcceptation>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
   takenOverAt?: Maybe<Scalars["DateTime"]>;
@@ -782,11 +812,20 @@ export type BsdasriTransporterWhere = {
 };
 
 export type BsdasriTransportInput = {
-  wasteDetails?: Maybe<BsdasriWasteDetailInput>;
+  wasteDetails?: Maybe<BsdasriWasteDetailTransportInput>;
   takenOverAt?: Maybe<Scalars["DateTime"]>;
   handedOverAt?: Maybe<Scalars["DateTime"]>;
   wasteAcceptation?: Maybe<BsdasriWasteAcceptationInput>;
   mode?: Maybe<TransportMode>;
+};
+
+/** Détail sur le déchet transporté */
+export type BsdasriTransportWasteDetails = {
+  __typename?: "BsdasriTransportWasteDetails";
+  /** Quantité transportée */
+  quantity?: Maybe<BsdasriQuantity>;
+  volume?: Maybe<Scalars["Int"]>;
+  packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
 };
 
 export type BsdasriUpdateInput = {
@@ -814,21 +853,15 @@ export type BsdasriWasteAcceptationInput = {
   refusedQuantity?: Maybe<Scalars["Int"]>;
 };
 
-export type BsdasriWasteDetailInput = {
-  quantity?: Maybe<Scalars["Int"]>;
-  quantityType?: Maybe<QuantityType>;
+export type BsdasriWasteDetailEmissionInput = {
+  quantity?: Maybe<BsdasriQuantityInput>;
   packagingInfos?: Maybe<Array<BsdasriPackagingInfoInput>>;
   onuCode?: Maybe<Scalars["String"]>;
 };
 
-/** Détail sur le déchet transporté ou reçu du Bsdasri */
-export type BsdasriWasteDetails = {
-  __typename?: "BsdasriWasteDetails";
-  /** Quantité en kg */
-  quantity?: Maybe<Scalars["Int"]>;
-  quantityType?: Maybe<QuantityType>;
-  volume?: Maybe<Scalars["Int"]>;
-  packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
+export type BsdasriWasteDetailTransportInput = {
+  quantity?: Maybe<BsdasriQuantityInput>;
+  packagingInfos?: Maybe<Array<BsdasriPackagingInfoInput>>;
 };
 
 export type BsdasriWhere = {

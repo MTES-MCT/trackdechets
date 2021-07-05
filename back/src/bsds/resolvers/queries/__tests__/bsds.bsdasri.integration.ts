@@ -117,8 +117,8 @@ describe("Query.bsds.dasris base workflow", () => {
             emission: {
               wasteCode: "18 01 03*",
               wasteDetails: {
-                quantity: 23,
-                quantityType: "REAL",
+                quantity: { value: 23, type: "REAL" },
+
                 onuCode: "xyz 33",
                 packagingInfos: [
                   {
@@ -145,8 +145,8 @@ describe("Query.bsds.dasris base workflow", () => {
             transport: {
               takenOverAt: new Date().toISOString() as any,
               wasteDetails: {
-                quantity: 99,
-                quantityType: "REAL",
+                quantity: { value: 99, type: "REAL" },
+
                 packagingInfos: [{ type: "FUT", quantity: 44, volume: 123 }]
               },
               wasteAcceptation: { status: WasteAcceptationStatus.ACCEPTED }
@@ -163,14 +163,13 @@ describe("Query.bsds.dasris base workflow", () => {
             },
             reception: {
               wasteDetails: {
-                quantity: 99,
-                quantityType: "REAL",
                 packagingInfos: [{ type: "FUT", quantity: 44, volume: 123 }]
               },
               wasteAcceptation: { status: WasteAcceptationStatus.ACCEPTED },
               receivedAt: new Date().toISOString() as any
             },
             operation: {
+              quantity: { value: 99 },
               processingOperation: "D10",
               processedAt: new Date().toISOString() as any
             }
