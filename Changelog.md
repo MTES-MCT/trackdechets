@@ -18,6 +18,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :memo: Documentation
 
+- Re-structuration de la documentation et ajout d'exemples de bout en bout [PR 905](https://github.com/MTES-MCT/trackdechets/pull/905)
 #### :house: Interne
 
 # [2021.06.2] 28/06/2021
