@@ -2,8 +2,10 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import {
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  companyFactory
 } from "../../../../__tests__/factories";
+import { CompanyType } from "@prisma/client";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
 
@@ -106,4 +108,91 @@ describe("Mutation.createDraftBsdasri", () => {
       input.recipient.company
     );
   });
+
+  it.each(["R12", "D12"])(
+    "should disallow R12 & D12 for non waste processor recipient ",
+    async code => {
+      // both R12 & D12 operation codes require the recipient to be a COLLECTOR
+
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const recipientCompany = await companyFactory({
+        companyTypes: {
+          set: [CompanyType.WASTE_CENTER]
+        }
+      });
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<Pick<Mutation, "createDraftBsdasri">>(
+        CREATE_DRAFT_DASRI,
+        {
+          variables: {
+            input: {
+              emitter: {
+                company: {
+                  siret: company.siret
+                }
+              },
+              recipient: {
+                company: {
+                  siret: recipientCompany.siret
+                }
+              },
+              operation: {
+                processingOperation: code
+              }
+            }
+          }
+        }
+      );
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Les codes R12 et D12 sont réservés aux installations de tri transit regroupement",
+          extensions: expect.objectContaining({
+            code: ErrorCode.BAD_USER_INPUT
+          })
+        })
+      ]);
+    }
+  );
+  it.each(["R12", "D12"])(
+    "should allow R12 & D12 for waste processor ",
+    async code => {
+      // both R12 & D12 operation codes require the recipient to be a COLLECTOR
+
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const recipientCompany = await companyFactory({
+        companyTypes: {
+          set: [CompanyType.COLLECTOR]
+        }
+      });
+      const { mutate } = makeClient(user);
+      const { data } = await mutate<Pick<Mutation, "createDraftBsdasri">>(
+        CREATE_DRAFT_DASRI,
+        {
+          variables: {
+            input: {
+              emitter: {
+                company: {
+                  siret: company.siret
+                }
+              },
+              recipient: {
+                company: {
+                  siret: recipientCompany.siret
+                }
+              },
+              operation: {
+                processingOperation: code
+              }
+            }
+          }
+        }
+      );
+
+      expect(data.createDraftBsdasri.isDraft).toBe(true);
+    }
+  );
 });

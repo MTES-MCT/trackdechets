@@ -49,7 +49,9 @@ L'ensemble des champs du BSD numérique est décrit dans la [référence de l'AP
 - `PROCESSED` (traité): DASRI dont l'opération de traitement a été effectué
 - `REFUSED` (refusé): DASRI refusé, par le tranporteur ou le destinataire
 
+## Codes déchets
 
+Les codes R12 et D12 ne sont autorisé que si le destinatire est une installation TTR (tri transit regroupement).
 
 Le diagramme ci dessous retrace le cycle de vie d'un DASRI dans Trackdéchets:
 
