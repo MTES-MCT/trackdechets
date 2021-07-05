@@ -112,7 +112,7 @@ describe("Mutation.createDraftBsdasri", () => {
   it.each(["R12", "D12"])(
     "should disallow R12 & D12 for non waste processor recipient ",
     async code => {
-      // both R12 & D12 operation codes require the recipient to be a WASTE_PROCESSOR
+      // both R12 & D12 operation codes require the recipient to be a COLLECTOR
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -159,13 +159,13 @@ describe("Mutation.createDraftBsdasri", () => {
   it.each(["R12", "D12"])(
     "should allow R12 & D12 for waste processor ",
     async code => {
-      // both R12 & D12 operation codes require the recipient to be a WASTE_PROCESSOR
+      // both R12 & D12 operation codes require the recipient to be a COLLECTOR
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
       const recipientCompany = await companyFactory({
         companyTypes: {
-          set: [CompanyType.WASTEPROCESSOR]
+          set: [CompanyType.COLLECTOR]
         }
       });
       const { mutate } = makeClient(user);

@@ -1,5 +1,5 @@
 import { WasteAcceptationStatus, QuantityType, Prisma } from "@prisma/client";
-import { isWasteProcessor } from "../companies/validation";
+import { isCollector } from "../companies/validation";
 import * as yup from "yup";
 import {
   DASRI_WASTE_CODES,
@@ -585,7 +585,7 @@ export const operationSchema: FactorySchemaOf<
               }
             });
 
-            return isWasteProcessor(recipientCompany);
+            return isCollector(recipientCompany);
           }
 
           return true;
