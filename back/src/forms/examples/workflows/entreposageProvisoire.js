@@ -12,6 +12,14 @@ const { markAsProcessed } = require("../steps/markAsProcessed");
 
 module.exports = {
   title: "Entreposage provisoire",
+  description: `Les informations principales du BSDD sont remplies par l'émetteur du bordereau
+en précisant isTempStorage=true dans les informations de destination. Le destinataire correspond à
+l'installation d'entreposage provisoire. La signature de l'envoi se fait sur le terminal du transporteur
+grâce au code de signature de l'émetteur. L'installation d'entreposage provisoire accepte les déchets
+et complète les informations du second transporteur et de la destination finale (si ce n'est pas déjà fait par l'émetteur).
+La signature de l'envoi après entreposage provisoire se fait sur le terminal du transporteur n°2 grâce au code de signature de
+l'installation d'entreposage provisoire. L'installation de destination finale accepte le déchet et valide
+le traitement.`,
   companies: [
     { name: "producteur", companyTypes: ["PRODUCER"] },
     { name: "transporteur1", companyTypes: ["TRANSPORTER"] },
@@ -36,5 +44,15 @@ module.exports = {
     traiteur: { siret: "SIRET_TRAITEUR" },
     transporteur2: { siret: "SIRET_TRANSPORTEUR_2" },
     bsd: { id: "ID_BSD" }
-  }
+  },
+  chart: `
+graph LR
+AO(NO STATE) -->|createForm| A
+A(DRAFT) -->|markAsSealed| B(SEALED)
+B -->|signedByTransporter| C(SENT)
+C -->|markAsTempStored| D1(TEMP_STORER_ACCEPTED)
+D2(TEMP_STORER_ACCEPTED) --> |markAsResealed| E(RESEALED)
+E --> |signedByTransporter| F(RESENT)
+F --> |markAsReceived| G(RECEIVED)
+G --> |markAsProcessed| H(PROCESSED)`
 };

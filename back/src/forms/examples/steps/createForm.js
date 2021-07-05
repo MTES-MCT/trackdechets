@@ -3,8 +3,9 @@ const { createForm: createFormMutation } = require("../mutations");
 const fixtures = require("../fixtures");
 
 const createForm = company => ({
-  description:
-    "Le bordereau de suivi de déchets est rempli par l'émetteur du bordereau",
+  description: `Les informations du BSDD sont remplies. Cette action peut-être effectuée
+par n'importe quel établissement apparaissant sur le BSDD. À ce stade il est toujours possible
+d'effectuer des modifications grâce à la mutation updateForm.`,
   mutation: createFormMutation,
   variables: ({ producteur, transporteur, traiteur }) => ({
     createFormInput: {

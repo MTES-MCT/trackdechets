@@ -6,6 +6,7 @@ function loadWorkflow(path) {
   return {
     title: workflow.title,
     description: workflow.description,
+    chart: workflow.chart,
     steps: workflow.steps.map((step) => ({
       description: step.description,
       mutation: step.mutation,

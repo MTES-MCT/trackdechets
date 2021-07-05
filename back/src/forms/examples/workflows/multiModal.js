@@ -40,5 +40,15 @@ mis à jour au fur et mesure de la prise en charge du déchet sur les différent
     traiteur: { siret: "SIRET_TRAITEUR" },
     bsd: { id: "ID_BSD" },
     transportSegment: { id: "ID_TRANSPORT_SEGMENT" }
-  }
+  },
+  chart: `
+graph LR
+AO(NO STATE) -->|createForm| A
+A(DRAFT) -->|markAsSealed| B(SEALED)
+B -->|signedByTransporter| C(SENT)
+C -->|prepareSegment| C2(SENT)
+C3(SENT) -->|markSegmentAsReadyToTakeOver| C4(SENT)
+C4 -->|takeOverSegment| C5(SENT)
+C5 --> |markAsReceived| D(ACCEPTED)
+D --> |markAsProcessed| E(PROCESSED)`
 };
