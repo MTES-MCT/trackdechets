@@ -38,6 +38,14 @@ module.exports = function plugin() {
             path.join(backSrc, "forms/examples/workflows/importBsdPapier.js")
           ),
         },
+        bsdasri: {
+          acheminementDirect: loadWorkflow(
+            path.join(
+              backSrc,
+              "dasris/examples/workflows/acheminementDirect.js"
+            )
+          ),
+        },
       };
     },
     // make workflows data available to components through the `useGlobalData` hook

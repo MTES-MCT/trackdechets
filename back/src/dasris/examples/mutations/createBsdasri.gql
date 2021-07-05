@@ -1,0 +1,6 @@
+mutation CreateBsdasri($input: BsdasriCreateInput!) {
+  createBsdasri(input: $input) {
+    id
+    status
+  }
+}

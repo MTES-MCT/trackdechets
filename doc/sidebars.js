@@ -53,6 +53,7 @@ module.exports = {
                 "tutoriels/examples/bsdd/entreposage-provisoire",
                 "tutoriels/examples/bsdd/import-bsd-papier",
               ],
+              BSDASRI: ["tutoriels/examples/bsdasri/acheminement-direct"],
             },
           ],
         },
