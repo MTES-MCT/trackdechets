@@ -63,6 +63,7 @@ module.exports = {
       Guides: [
         "guides/playground",
         "guides/language",
+        "guides/pdf",
         "guides/registre",
         "guides/sirene",
         "guides/oauth2",
@@ -73,9 +74,14 @@ module.exports = {
         {
           "Référence API ": [...apiReference, "reference/changelog"],
         },
+        {
+          Statuts: ["reference/statuts/bsdd", "reference/statuts/bsdasri"],
+        },
+        "reference/multi-bsd",
         "reference/environments/environments",
         "reference/authentification",
         "reference/permissions",
+        "reference/identifiants",
         "reference/errors",
         "reference/notifications",
         "reference/limitations",
