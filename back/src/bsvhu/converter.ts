@@ -192,12 +192,19 @@ function flattenVhuDestinationInput({
     destinationReceptionQuantityTons: chain(destination, d =>
       chain(d.reception, r => chain(r.quantity, q => q.tons))
     ),
+    destinationReceptionIdentificationNumbers: chain(destination, d =>
+      chain(d.reception, r => chain(r.identification, i => i.numbers))
+    ),
+    destinationReceptionIdentificationType: chain(destination, d =>
+      chain(d.reception, r => chain(r.identification, i => i.type))
+    ),
     destinationReceptionAcceptationStatus: chain(destination, r =>
       chain(r.reception, o => o.acceptationStatus)
     ) as WasteAcceptationStatus,
     destinationReceptionRefusalReason: chain(destination, r =>
       chain(r.reception, o => o.refusalReason)
     ),
+    destinationReceptionDate: chain(destination, d => chain(d.reception, r => r.date)),
     destinationOperationCode: chain(destination, r =>
       chain(r.operation, o => o.code)
     ),
@@ -206,6 +213,7 @@ function flattenVhuDestinationInput({
         chain(o.nextDestination, nd => chain(nd.company, c => c.name))
       )
     ),
+    destinationOperationDate: chain(destination, d => chain(d.operation, o => o.date)),
     destinationOperationNextDestinationCompanySiret: chain(destination, d =>
       chain(d.operation, o =>
         chain(o.nextDestination, nd => chain(nd.company, c => c.siret))

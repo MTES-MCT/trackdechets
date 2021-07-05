@@ -642,7 +642,7 @@ model Bsvhu {
   transporterTransportSignatureAuthor String?
   transporterTransportSignatureDate   DateTime?
 
-  destinationReceptionQuantityNumber                Float?
+  destinationReceptionQuantityNumber                Int?
   destinationReceptionQuantityTons                  Float?
   destinationReceptionAcceptationStatus             WasteAcceptationStatus?
   destinationReceptionRefusalReason                 String?

@@ -1,11 +1,24 @@
+import {
+  IconBSVhu,
+  IconRenewableEnergyEarth,
+  IconWarehouseDelivery,
+  IconWaterDam,
+} from "common/components/Icons";
+import { Bsvhu, FormCompany } from "generated/graphql/types";
 import React from "react";
 import QRCodeIcon from "react-qr-code";
-import { Bsvhu } from "generated/graphql/types";
-import { IconBSVhu } from "common/components/Icons";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
 import { statusLabels } from "../../constants";
-import { DateRow } from "../common/Components";
+import { DateRow, DetailRow } from "../common/Components";
+
 import styles from "../common/BSDDetailContent.module.scss";
+import { getVerboseAcceptationStatus } from "../common/utils";
+
+type CompanyProps = {
+  company?: FormCompany | null;
+  label: string;
+};
 
 type Props = { form: Bsvhu };
 export function BsvhuDetailContent({ form }: Props) {
@@ -15,7 +28,7 @@ export function BsvhuDetailContent({ form }: Props) {
         <h4 className={styles.detailTitle}>
           <IconBSVhu className="tw-mr-2" />
           <span className={styles.detailStatus}>
-            [{form.isDraft ? "Brouillon" : statusLabels[form["bsdasriStatus"]]}]
+            [{form.isDraft ? "Brouillon" : statusLabels[form.status]}]
           </span>
           {!form.isDraft && <span>{form.id}</span>}
         </h4>
@@ -34,18 +47,218 @@ export function BsvhuDetailContent({ form }: Props) {
               value={form.updatedAt}
               label="Dernière action sur le BSD"
             />
+            <DetailRow value={form.quantity?.number} label="Quantité" />
             <dt>Code déchet</dt>
             <dd>{form.wasteCode}</dd>
-            <dt>Nom Usuel</dt>
-            <dd></dd>
-          </div>
-
-          <div className={styles.detailGrid}>
-            <dt>Code onu</dt>
-            <dd></dd>
           </div>
         </div>
       </div>
+
+      <Tabs selectedTabClassName={styles.detailTabSelected}>
+        {/* Tabs menu */}
+        <TabList className={styles.detailTabs}>
+          <Tab className={styles.detailTab}>
+            <IconWaterDam size="25px" />
+            <span className={styles.detailTabCaption}>Producteur</span>
+          </Tab>
+
+          <Tab className={styles.detailTab}>
+            <IconWarehouseDelivery size="25px" />
+            <span className={styles.detailTabCaption}>
+              <span> Transporteur</span>
+            </span>
+          </Tab>
+
+          <Tab className={styles.detailTab}>
+            <IconRenewableEnergyEarth size="25px" />
+            <span className={styles.detailTabCaption}>Destinataire</span>
+          </Tab>
+        </TabList>
+        {/* Tabs content */}
+        <div className={styles.detailTabPanels}>
+          {/* Emitter tab panel */}
+          <TabPanel className={styles.detailTabPanel}>
+            <Emitter form={form} />
+          </TabPanel>
+
+          {/* Transporter tab panel */}
+          <TabPanel className={styles.detailTabPanel}>
+            <Transporter form={form} />
+          </TabPanel>
+
+          {/* Recipient  tab panel */}
+          <TabPanel className={styles.detailTabPanel}>
+            <div className={styles.detailColumns}>
+              <Destination form={form} />
+            </div>
+          </TabPanel>
+        </div>
+      </Tabs>
     </div>
+  );
+}
+
+function Company({ company, label }: CompanyProps) {
+  return (
+    <>
+      <dt>{label}</dt> <dd>{company?.name}</dd>
+      <dt>Siret</dt> <dd>{company?.siret}</dd>
+      <dt>Adresse</dt> <dd>{company?.address}</dd>
+      <dt>Tél</dt> <dd>{company?.phone}</dd>
+      <dt>Mél</dt> <dd>{company?.mail}</dd>
+      <dt>Contact</dt> <dd>{company?.contact}</dd>
+    </>
+  );
+}
+
+function Emitter({ form }: { form: Bsvhu }) {
+  const { emitter, quantity, packaging, identification } = form;
+  return (
+    <div className={styles.detailColumns}>
+      <div className={styles.detailGrid}>
+        <Company label="Émetteur" company={emitter?.company} />
+      </div>
+      <div className={styles.detailGrid}>
+        <DetailRow value={identification?.type} label="Type d'indentifiant" />
+        <DetailRow
+          value={identification?.numbers?.join(", ")}
+          label="Identifications"
+        />
+        <DetailRow value={packaging} label="Conditionnement" />
+
+        <DetailRow value={quantity?.number} label="Quantité" />
+        <DetailRow value={quantity?.tons} label="Poids" units="tonnes" />
+      </div>
+      <div className={styles.detailGrid}>
+        <DateRow value={emitter?.emission?.signature?.date} label="Signé le" />
+        <DetailRow
+          value={emitter?.emission?.signature?.author}
+          label="Signé par"
+        />
+      </div>
+    </div>
+  );
+}
+
+function Transporter({ form }: { form: Bsvhu }) {
+  const { transporter, identification, packaging, quantity } = form;
+  return (
+    <>
+      <div className={styles.detailGrid}>
+        <Company label="Transporteur" company={transporter?.company} />
+      </div>
+      <div className={styles.detailGrid}>
+        <DetailRow
+          value={transporter?.recepisse?.number}
+          label="Numéro de récépissé"
+        />
+        <DetailRow
+          value={transporter?.recepisse?.department}
+          label="Département"
+        />
+        <DateRow
+          value={transporter?.recepisse?.validityLimit}
+          label="Date de validité"
+        />
+      </div>
+      <div className={styles.detailGrid}>
+        <DetailRow value={identification?.type} label="Type d'indentifiant" />
+        <DetailRow
+          value={identification?.numbers?.join(", ")}
+          label="Numéros"
+        />
+        <DetailRow value={packaging} label="Conditionnement" />
+
+        <DetailRow value={quantity?.number} label="Quantité" />
+        <DetailRow value={quantity?.tons} label="Poids" units="tonnes" />
+      </div>
+      <div className={`${styles.detailGrid} `}>
+        <DateRow
+          value={transporter?.transport?.takenOverAt}
+          label="Emporté le"
+        />
+
+        <DateRow
+          value={transporter?.transport?.signature?.date}
+          label="Signé le"
+        />
+        <DetailRow
+          value={transporter?.transport?.signature?.author}
+          label="Signé par"
+        />
+      </div>
+    </>
+  );
+}
+
+function Destination({ form }: { form: Bsvhu }) {
+  const { destination, quantity, identification, packaging } = form;
+
+  return (
+    <>
+      <div className={styles.detailGrid}>
+        <Company label="Destinataire" company={destination?.company} />
+      </div>
+      <div className={styles.detailGrid}>
+        <DetailRow value={identification?.type} label="Type d'indentifiant" />
+        <DetailRow
+          value={identification?.numbers?.join(", ")}
+          label="Numéros"
+        />
+        <DetailRow value={packaging} label="Conditionnement" />
+
+        <DetailRow value={quantity?.number} label="Quantité" />
+        <DetailRow value={quantity?.tons} label="Poids" units="tonnes" />
+        <DetailRow value={destination?.agrementNumber} label="Agrément" />
+        <DetailRow
+          value={destination?.plannedOperationCode}
+          label="Opération prévue"
+        />
+      </div>
+      <div className={styles.detailGrid}>
+        <DetailRow
+          value={getVerboseAcceptationStatus(
+            destination?.reception?.acceptationStatus
+          )}
+          label="Lot accepté"
+        />
+        <DetailRow
+          value={destination?.reception?.refusalReason}
+          label="Motif de refus"
+        />
+        <DetailRow
+          value={destination?.reception?.quantity?.number}
+          label="Quantité réelle reçue"
+        />
+        <DetailRow
+          value={destination?.reception?.quantity?.tons}
+          label="Poids réel reçu"
+          units="tonnes"
+        />
+        <DateRow
+          value={destination?.reception?.date}
+          label="Réception signée par"
+        />
+      </div>
+      <div className={styles.detailGrid}>
+        <DetailRow
+          value={destination?.operation?.code}
+          label="Opération de traitement"
+        />
+        <DateRow
+          value={destination?.operation?.date}
+          label="Traitement effectué le"
+        />
+
+        <DetailRow
+          value={destination?.operation?.signature?.author}
+          label="Traitement signé par"
+        />
+        <DateRow
+          value={destination?.operation?.signature?.date}
+          label="Traitement signé le"
+        />
+      </div>
+    </>
   );
 }

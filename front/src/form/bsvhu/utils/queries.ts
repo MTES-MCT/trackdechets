@@ -6,6 +6,8 @@ export const FullBsvhuFragment = gql`
     id
     isDraft
     status
+    createdAt
+    updatedAt
     emitter {
       company {
         ...CompanyFragment
