@@ -5142,7 +5142,6 @@ export type ResolversTypes = {
   Subscription: ResolverTypeWrapper<{}>;
   FormSubscription: ResolverTypeWrapper<FormSubscription>;
   BsdasriInput: BsdasriInput;
-  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
   BsdasriRole: BsdasriRole;
 };
 
@@ -5433,7 +5432,6 @@ export type ResolversParentTypes = {
   Subscription: {};
   FormSubscription: FormSubscription;
   BsdasriInput: BsdasriInput;
-  BsdasriRecipientWasteDetailInput: BsdasriRecipientWasteDetailInput;
 };
 
 export type AdminForVerificationResolvers<
