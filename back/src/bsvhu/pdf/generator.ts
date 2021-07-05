@@ -1,32 +1,42 @@
 import { Bsvhu } from "@prisma/client";
 import { readFile } from "fs/promises";
 import { join } from "path";
-import { connect } from "puppeteer";
+import {
+  pipe,
+  gotenberg,
+  convert,
+  html,
+  please,
+  to,
+  adjust
+} from "gotenberg-js-client";
+
+const toPDF = pipe(
+  gotenberg(
+    "https://trackdechetsv2131avx-gotenberg.functions.fnc.fr-par.scw.cloud"
+  ),
+  adjust({ headers: { Authorization: "Bearer TODO" } }),
+  convert,
+  html,
+  to({
+    marginTop: 0.2,
+    marginBottom: 0.2,
+    marginLeft: 0.2,
+    marginRight: 0.2,
+  }),
+  please
+);
 
 export async function buildPdf(form: Bsvhu) {
-  const browser = await connect({
-    browserWSEndpoint: "wss://chrome.browserless.io/"
-  });
+  const htmlModel = await getTemplateStringFile("model.html");
+  const htmlDocument = render(htmlModel, { form });
 
-  try {
-    const page = await browser.newPage();
+  const files = {
+    "index.html": htmlDocument,
+    "model.css": await getTemplateStringFile("model.css"),
+  };
 
-    const htmlModel = await getTemplateStringFile("model.html");
-    const htmlDocument = render(htmlModel, { form });
-    await page.setContent(htmlDocument);
-
-    const paperCss = await getTemplateStringFile("paper.min.css");
-    await page.addStyleTag({ content: paperCss });
-    const htmlModelStyle = await getTemplateStringFile("model.css");
-    await page.addStyleTag({ content: htmlModelStyle });
-
-    const pdfBuffer = await page.pdf({ format: "a4" });
-    await browser.close();
-
-    return pdfBuffer;
-  } finally {
-    await browser.close();
-  }
+  return toPDF(files);
 }
 
 async function getTemplateStringFile(filename: string) {
