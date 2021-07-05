@@ -23,3 +23,11 @@
 .input {
   min-width: 400px;
 }
+.checkbox__row {
+  display: flex;
+  padding-right: 1rem;
+ 
+  label {
+    flex: 1;
+  }
+}

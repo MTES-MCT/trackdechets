@@ -9,13 +9,14 @@ type Props = {
   company: CompanyPrivate;
 };
 
-AccountFielCompanySecurityCode.fragments = {
+AccountFieldCompanySecurityCode.fragments = {
   company: gql`
-    fragment AccountFielCompanySecurityCodeFragment on CompanyPrivate {
+    fragment AccountFieldCompanySecurityCodeFragment on CompanyPrivate {
       id
       siret
       userRole
       securityCode
+      allowBsdasriTakeOverWithoutSignature
     }
   `,
 };
@@ -26,7 +27,7 @@ const tooltip =
 const fieldName = "securityCode";
 const fieldLabel = "Code de signature";
 
-export default function AccountFielCompanySecurityCode({ company }: Props) {
+export default function AccountFieldCompanySecurityCode({ company }: Props) {
   return (
     <>
       {company.userRole === UserRole.Admin ? (

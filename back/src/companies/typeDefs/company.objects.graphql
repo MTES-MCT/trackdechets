@@ -86,6 +86,8 @@ type CompanyPrivate {
   Liste des agréments de l'éco-organisme
   """
   ecoOrganismeAgreements: [URL!]!
+
+  allowBsdasriTakeOverWithoutSignature: Boolean!
 }
 
 "Information sur un établissement accessible publiquement"
