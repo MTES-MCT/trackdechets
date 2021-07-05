@@ -6,7 +6,7 @@
   "scripts": {
     "predev": "copyfiles src/common/constants/** ../front/src/generated/constants --flat && npx prisma generate",
     "dev": "concurrently npm:watch-node npm:watch-graphql",
-    "watch-node": "npx nodemon -r dotenv/config -L --watch src --exec \"ts-node\" src/index.ts",
+    "watch-node": "npx nodemon -r dotenv/config --watch src --exec \"ts-eager\" src/index.ts",
     "watch-graphql": "npm run graphql-codegen -- --watch",
     "start": "node dist/src/index.js",
     "update": "node prisma/scripts/index.js",
@@ -148,6 +148,7 @@
     "prettier": "^2.0.5",
     "superagent-mock": "^3.7.0",
     "supertest": "^4.0.2",
+    "ts-eager": "^2.0.2",
     "ts-jest": "^26.5.4",
     "ts-node": "^8.10.2",
     "type-fest": "^1.1.3",
