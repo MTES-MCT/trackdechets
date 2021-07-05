@@ -17,10 +17,13 @@ export default function Destination({ disabled }) {
   return (
     <>
       {disabled && (
-        <div className="notification notification--error">
-          Les champs ci-dessous ont été scellés via signature et ne sont plus
-          modifiables.
-        </div>
+        <>
+          <Operation />
+          <div className="notification notification--error">
+            Les champs ci-dessous ont été scellés via signature et ne sont plus
+            modifiables.
+          </div>
+        </>
       )}
       <div className="form__row">
         {isDangerousWasteCode && (
@@ -121,8 +124,6 @@ export default function Destination({ disabled }) {
           }}
         />
       )}
-
-      {disabled && <Operation />}
     </>
   );
 }
