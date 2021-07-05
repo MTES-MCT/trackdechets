@@ -39,10 +39,12 @@ const UPDATE_DASRI_DIRECT_TAKEOVER = gql`
     }
   }
 `;
-const fieldLabel = `En cochant cette case, j'atteste avoir signé une convention avec un collecteur pour mes DASRI et j'accepte que ce collecteur les prenne en charge sans ma signature (lors de la collecte) si je ne suis pas disponible.
-Dans ce cas, je suis informé que je pourrais suivre les bordereaux sur Trackdéchets et disposer de leur archivage sur la plateforme`;
+const fieldLabel = `J'autorise l'emport direct de DASRI`;
 const fieldName = "allowBsdasriTakeOverWithoutSignature";
-const fieldTitle = "Producteur dasri";
+
+const fieldTitle = "Emport direct de DASRI autorisé";
+const tooltip = `En cochant cette case, j'atteste avoir signé une convention avec un collecteur pour mes DASRI et j'accepte que ce collecteur les prenne en charge sans ma signature (lors de la collecte) si je ne suis pas disponible.
+Dans ce cas, je suis informé que je pourrais suivre les bordereaux sur Trackdéchets et disposer de leur archivage sur la plateforme`;
 
 export default function AccountFieldCompanyDasriDirectTakeOver({
   company,
@@ -53,20 +55,27 @@ export default function AccountFieldCompanyDasriDirectTakeOver({
         name={fieldName}
         editable={company.userRole === UserRole.Admin}
         title={fieldTitle}
+        tooltip={tooltip}
         value={company.allowBsdasriTakeOverWithoutSignature}
-        renderForm={(toggleEdition, isEditing) => (
-          <AccountFormCheckboxInput<Partial<MutationUpdateCompanyArgs>>
-            name="allowBsdasriTakeOverWithoutSignature"
-            label={fieldLabel}
-            value={company.allowBsdasriTakeOverWithoutSignature}
-            mutation={UPDATE_DASRI_DIRECT_TAKEOVER}
-            mutationArgs={{ siret: company.siret }}
-            isEditing={isEditing}
-            toggleEdition={() => {
-              toggleEdition();
-            }}
-          />
-        )}
+        renderForm={(toggleEdition, isEditing) =>
+          isEditing ? (
+            <AccountFormCheckboxInput<Partial<MutationUpdateCompanyArgs>>
+              name="allowBsdasriTakeOverWithoutSignature"
+              label={fieldLabel}
+              value={company.allowBsdasriTakeOverWithoutSignature}
+              mutation={UPDATE_DASRI_DIRECT_TAKEOVER}
+              mutationArgs={{ siret: company.siret }}
+              isEditing={isEditing}
+              toggleEdition={() => {
+                toggleEdition();
+              }}
+            />
+          ) : (
+            <span>
+              {company.allowBsdasriTakeOverWithoutSignature ? "Oui" : "Non"}
+            </span>
+          )
+        }
       />
     </>
   );

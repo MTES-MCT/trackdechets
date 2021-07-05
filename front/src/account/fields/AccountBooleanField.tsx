@@ -1,6 +1,7 @@
 import React, { ReactNode, useState } from "react";
 import styles from "./AccountField.module.scss";
 import classNames from "classnames";
+import Tooltip from "common/components/Tooltip";
 
 type Props = {
   // the name of the field
@@ -12,6 +13,8 @@ type Props = {
   // the value of the field
   value: string | number | ReactNode;
   // a render props for the form
+  // an optional tooltip to display next to the label
+  tooltip?: string;
   renderForm: (toggleEdition: () => void, editing: boolean) => ReactNode;
 };
 
@@ -26,6 +29,7 @@ export default function AccountBooleanField({
   editable,
   value,
   renderForm,
+  tooltip,
 }: Props) {
   const [editing, setEditing] = useState(false);
 
@@ -40,7 +44,9 @@ export default function AccountBooleanField({
 
   return (
     <div className={classNames(styles.field, { [styles.editing]: editing })}>
-      <span className={styles.label}>{title}</span>
+      <span className={styles.label}>
+        {title} {tooltip && <Tooltip msg={tooltip} />}
+      </span>
       {form}
 
       {editable && (
