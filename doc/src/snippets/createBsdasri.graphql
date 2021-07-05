@@ -1,5 +1,0 @@
-mutation {
-  createBsdasri(){
-    TODO
-  }
-}
