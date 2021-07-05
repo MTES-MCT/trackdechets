@@ -54,6 +54,7 @@ module.exports = {
                 "tutoriels/examples/bsdd/import-bsd-papier",
               ],
               BSDASRI: ["tutoriels/examples/bsdasri/acheminement-direct"],
+              BSVHU: ["tutoriels/examples/bsvhu/vhu-vers-broyeur"],
             },
           ],
         },

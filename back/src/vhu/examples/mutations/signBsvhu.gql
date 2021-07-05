@@ -1,0 +1,6 @@
+mutation SignBsvhu($id: ID!, $input: BsvhuSignatureInput!) {
+  signBsvhu(id: $id, input: $input) {
+    id
+    status
+  }
+}

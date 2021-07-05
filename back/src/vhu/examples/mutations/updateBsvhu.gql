@@ -1,0 +1,6 @@
+mutation UpdateBsvhu($id: ID!, $input: BsvhuInput!) {
+  updateBsvhu(id: $id, input: $input) {
+    id
+    status
+  }
+}

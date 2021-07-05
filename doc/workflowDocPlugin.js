@@ -46,6 +46,11 @@ module.exports = function plugin() {
             )
           ),
         },
+        bsvhu: {
+          vhuVersBroyeur: loadWorkflow(
+            path.join(backSrc, "vhu/examples/workflows/vhuVersBroyeur.js")
+          ),
+        },
       };
     },
     // make workflows data available to components through the `useGlobalData` hook

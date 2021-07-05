@@ -94,7 +94,7 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/MTES-MCT/trackdechets/doc",
+          editUrl: "https://github.com/MTES-MCT/trackdechets/edit/dev/doc",
           routeBasePath: "/",
         },
         theme: {
