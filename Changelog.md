@@ -34,6 +34,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Gnération du pdf de bordereaux dasri [PR 898](https://github.com/MTES-MCT/trackdechets/pull/898)
 - Ajout du groupement, de la génération du PDF à l'API BSDA, intégration de ces bordereaux à la query Elastic Search, et ajout de la mutation de suppression [882](https://github.com/MTES-MCT/trackdechets/pull/882)
 - Ajout du groupement, reconditionnement, de la réexpédition, de l'envoi à l'étranger et de la génération du PDF à l'API BSFF [875](https://github.com/MTES-MCT/trackdechets/pull/875)
+- Ajout d'éléments UI pour les VHU: actions depuis le dashboard et aperçu du bordereau
 
 #### :boom: Breaking changes
 

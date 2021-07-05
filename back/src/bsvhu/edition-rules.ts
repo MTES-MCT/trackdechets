@@ -136,7 +136,7 @@ const vhuFormRules: InternalRules<BsvhuInput, PrismaVhuForm> = {
         company: globalNullFieldRule(
           companyKeys,
           "destinationOperationSignatureDate"
-        ),
+        )
       }
     },
     agrementNumber: nullFieldRule("destinationOperationSignatureDate"),
