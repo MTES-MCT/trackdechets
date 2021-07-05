@@ -6,7 +6,7 @@ import { vhuFragment } from "common/fragments";
 const DUPLICATE_BSVHU = gql`
   mutation DuplicateBsvhu($id: ID!) {
     duplicateBsvhu(id: $id) {
-      ...vhuFragment
+      ...VhuFragment
     }
   }
   ${vhuFragment}
