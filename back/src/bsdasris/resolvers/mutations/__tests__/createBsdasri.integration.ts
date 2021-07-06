@@ -80,10 +80,9 @@ describe("Mutation.createDasri", () => {
     const input = {
       emitter: {
         company: {
-          //missing mail
           name: "hopital blanc",
           siret: company.siret,
-          contact: "jean durand",
+          //missing contact
           phone: "06 18 76 02 00",
           address: "avenue de la mer"
         }
@@ -117,7 +116,7 @@ describe("Mutation.createDasri", () => {
       expect.objectContaining({
         message:
           "Le code déchet est obligatoire\n" +
-          "Émetteur: L'email de l'entreprise est obligatoire",
+          "Émetteur: Le contact dans l'entreprise est obligatoire",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -134,7 +133,7 @@ describe("Mutation.createDasri", () => {
           siret: company.siret,
           contact: "jean durand",
           phone: "06 18 76 02 00",
-          mail: "emitter@test.fr",
+          // email not required
           address: "avenue de la mer"
         }
       },

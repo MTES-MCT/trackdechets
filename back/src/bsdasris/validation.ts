@@ -107,7 +107,6 @@ const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
 const MISSING_COMPANY_ADDRESS = "L'adresse de l'entreprise est obligatoire";
 const MISSING_COMPANY_CONTACT = "Le contact dans l'entreprise est obligatoire";
 const MISSING_COMPANY_PHONE = "Le téléphone de l'entreprise est obligatoire";
-const MISSING_COMPANY_EMAIL = "L'email de l'entreprise est obligatoire";
 
 const INVALID_SIRET_LENGTH = "Le SIRET doit faire 14 caractères numériques";
 
@@ -143,14 +142,12 @@ export const emitterSchema: FactorySchemaOf<
       ),
     emitterCompanyAddress: yup
       .string()
-
       .requiredIf(
         context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_ADDRESS}`
       ),
     emitterCompanyContact: yup
       .string()
-
       .requiredIf(
         context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_CONTACT}`
@@ -161,13 +158,8 @@ export const emitterSchema: FactorySchemaOf<
         context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_PHONE}`
       ),
-    emitterCompanyMail: yup
-      .string()
-      .email()
-      .requiredIf(
-        context.emissionSignature,
-        `Émetteur: ${MISSING_COMPANY_EMAIL}`
-      ),
+    emitterCompanyMail: yup.string().email().ensure(),
+
     emitterWorkSiteName: yup.string().nullable(),
     emitterWorkSiteAddress: yup.string().nullable(),
     emitterWorkSiteCity: yup.string().nullable(),
@@ -320,15 +312,7 @@ export const transporterSchema: FactorySchemaOf<
         context.transportSignature,
         `Transporteur: ${MISSING_COMPANY_PHONE}`
       ),
-    transporterCompanyMail: yup
-      .string()
-      .email()
-      .ensure()
-      .requiredIf(
-        context.transportSignature,
-        `Transporteur: ${MISSING_COMPANY_EMAIL}`
-      ),
-
+    transporterCompanyMail: yup.string().email().ensure(),
     transporterReceipt: yup
       .string()
       .ensure()
@@ -480,14 +464,7 @@ export const recipientSchema: FactorySchemaOf<
         context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_PHONE}`
       ),
-    recipientCompanyMail: yup
-      .string()
-      .email()
-      .ensure()
-      .requiredIf(
-        context.receptionSignature,
-        `Destinataire: ${MISSING_COMPANY_EMAIL}`
-      )
+    recipientCompanyMail: yup.string().email().ensure()
   });
 
 export const receptionSchema: FactorySchemaOf<
@@ -587,10 +564,10 @@ export const operationSchema: FactorySchemaOf<
 
             return isCollector(recipientCompany);
           }
-
           return true;
         }
       ),
+
     processedAt: yup
       .date()
       .label("Date de traitement")
