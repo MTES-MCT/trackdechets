@@ -25,17 +25,17 @@ export const DASRI_PROCESSING_OPERATIONS = [
   {
     type: DasriProcessingOperationType.Pretraitement,
     code: "D9",
-    description: "Prétraitement par désinfection"
+    description: "Prétraitement par désinfection  - Banaliseur"
   },
   {
     type: DasriProcessingOperationType.Incineration,
     code: "D10",
-    description: "DASRI d'origine humaine"
+    description: "Incinération"
   },
   {
     type: DasriProcessingOperationType.IncinerationValorisation,
     code: "R1",
-    description: "DASRI d'origine animale"
+    description: "Incinération + valorisation énergétique"
   }
 ];
 
@@ -43,12 +43,12 @@ export const DASRI_GROUPING_OPERATIONS = [
   {
     type: DasriProcessingOperationType.RegroupementPrealableD9D10,
     code: "D12",
-    description: "Regroupement D12 Préalable à D9 ou D10"
+    description: "Groupement avant désinfection en D9 ou incinération en D10 sur un site relevant de la rubrique 2718"
   },
   {
     type: DasriProcessingOperationType.RegroupementPrealableR1,
     code: "R12",
-    description: "Regroupement R12 Préalable à R1"
+    description: "Groupement avant incinération en R1, sur un site relevant de la rubrique 2718"
   }
 ];
 

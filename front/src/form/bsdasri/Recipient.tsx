@@ -84,17 +84,21 @@ export default function Recipient({ status }) {
             >
               <option value="">-----</option>
 
-              <option value="D9">D9 - Prétraitement par désinfection</option>
-              <option value="D10">
-                D10 - Incinération DASRI d'origine humaine
+              <option value="D9">
+                D9 - Prétraitement par désinfection - Banaliseur
               </option>
+              <option value="D10">D10 - Incinération</option>
               <option value="R1">
-                R1 - Incinération DASRI d'origine animale
+                R1 - Incinération + valorisation énergétique
               </option>
               <option value="D12">
-                D12 - Regroupement D12 Préalable à D9 ou D10
+                D12 - Groupement avant désinfection en D9 ou incinération en D10
+                sur un site relevant de la rubrique 2718
               </option>
-              <option value="R12">R12 - Regroupement R12 Préalable à R1</option>
+              <option value="R12">
+                R12 - Groupement avant incinération en R1, sur un site relevant
+                de la rubrique 2718
+              </option>
             </Field>
           </div>
           <div className="form__row">
