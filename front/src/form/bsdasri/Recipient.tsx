@@ -5,10 +5,11 @@ import { Field } from "formik";
 import React from "react";
 import { BsdasriStatus } from "generated/graphql/types";
 import Packagings from "./components/packagings/Packagings";
+import { FillFieldsInfo, DisabledFieldsInfo } from "./utils/commons";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
-
-export default function Recipient({ status }) {
+import classNames from "classnames";
+export default function Recipient({ status, stepName }) {
   const receptionDisabled = BsdasriStatus.Received === status;
   // it's pointless to show reception or operation fields until form has relevant signatures
   const showReceptionFields = [
@@ -16,23 +17,25 @@ export default function Recipient({ status }) {
     BsdasriStatus.Received,
   ].includes(status);
   const showOperationFields = status === BsdasriStatus.Received;
+  const operationEmphasis = stepName === "operation";
+  const receptionEmphasis = stepName === "reception";
 
   return (
     <>
-      {receptionDisabled && (
-        <div className="notification notification--error">
-          Les champs grisés ci-dessous ont été scellés via signature et ne sont
-          plus modifiables.
-        </div>
-      )}
-
-      <CompanySelector
-        name="recipient.company"
-        heading="Installation destinataire"
-        disabled={receptionDisabled}
-        optionalMail={true}
-      />
-
+      {(operationEmphasis || receptionEmphasis) && <FillFieldsInfo />}
+      {receptionDisabled && <DisabledFieldsInfo />}
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": receptionEmphasis,
+        })}
+      >
+        <CompanySelector
+          name="recipient.company"
+          heading="Installation destinataire"
+          disabled={receptionDisabled}
+          optionalMail={true}
+        />
+      </div>
       <div className="form__row">
         <label>
           Champ libre (optionnel)
@@ -47,8 +50,22 @@ export default function Recipient({ status }) {
       <h4 className="form__section-heading">Réception du déchet</h4>
       {showReceptionFields ? (
         <>
-          <Field name="reception.wasteAcceptation" component={Acceptation} />
-          <div className="form__row">
+          <div
+            className={classNames("form__row", {
+              "field-emphasis": receptionEmphasis,
+            })}
+          >
+            <Field
+              name="reception.wasteAcceptation"
+              component={Acceptation}
+              disabled={receptionDisabled}
+            />
+          </div>
+          <div
+            className={classNames("form__row", {
+              "field-emphasis": receptionEmphasis,
+            })}
+          >
             <label>
               Date de réception
               <div className="td-date-wrapper">
@@ -62,21 +79,30 @@ export default function Recipient({ status }) {
             </label>
             <RedErrorMessage name="reception.receivedAt" />
           </div>
-
-          <Field
-            name="reception.wasteDetails.packagingInfos"
-            component={Packagings}
-            disabled={receptionDisabled}
-          />
+          <div
+            className={classNames("form__row", {
+              "field-emphasis": receptionEmphasis,
+            })}
+          >
+            <Field
+              name="reception.wasteDetails.packagingInfos"
+              component={Packagings}
+              disabled={receptionDisabled}
+            />
+          </div>
         </>
       ) : (
         <p>Cette section sera disponible quand le déchet aura été envoyé</p>
       )}
       <h4 className="form__section-heading">Traitement du déchet</h4>
-      {/*No need to disable operation fields, processed form are not editable */}
+      {/*No need to disable operation fields, processed forms are not editable */}
       {showOperationFields ? (
         <>
-          <div className="form__row">
+          <div
+            className={classNames("form__row", {
+              "field-emphasis": operationEmphasis,
+            })}
+          >
             <label>Opération réalisée</label>
             <Field
               as="select"
@@ -102,7 +128,11 @@ export default function Recipient({ status }) {
               </option>
             </Field>
           </div>
-          <div className="form__row">
+          <div
+            className={classNames("form__row", {
+              "field-emphasis": operationEmphasis,
+            })}
+          >
             <label>
               Date de l'opération :
               <div className="td-date-wrapper">
@@ -117,13 +147,17 @@ export default function Recipient({ status }) {
 
           <h4 className="form__section-heading">Quantité traitée</h4>
 
-          <div className="form__row">
+          <div
+            className={classNames("form__row", {
+              "field-emphasis": operationEmphasis,
+            })}
+          >
             <label>
               Quantité en kg :
               <Field
                 component={NumberInput}
                 name="operation.quantity.value"
-                className="td-input dasri__waste-details__quantity"
+                className="td-input dasri__waste-details__quantity-input"
                 placeholder="En kg"
                 min="0"
                 step="0.1"

@@ -46,7 +46,6 @@ type Emission = Pick<
   | "wasteDetailsOnuCode"
   | "emitterWasteQuantity"
   | "emitterWasteQuantityType"
-  | "emitterWasteVolume"
   | "emitterWastePackagingsInfo"
   | "handedOverToTransporterAt"
 >;
@@ -72,7 +71,6 @@ type Transport = Pick<
   | "transporterWastePackagingsInfo"
   | "transporterWasteQuantity"
   | "transporterWasteQuantityType"
-  | "transporterWasteVolume"
   | "handedOverToRecipientAt"
 >;
 type Recipient = Pick<
@@ -90,7 +88,6 @@ type Reception = Pick<
   | "recipientWasteAcceptationStatus"
   | "recipientWasteRefusalReason"
   | "recipientWasteRefusedQuantity"
-  | "recipientWasteVolume"
   | "receivedAt"
 >;
 type Operation = Pick<
@@ -225,13 +222,7 @@ export const emissionSchema: FactorySchemaOf<
       .string()
       .ensure()
       .requiredIf(context.emissionSignature, `La mention ADR est obligatoire.`),
-    emitterWasteVolume: yup
-      .number()
-      .requiredIf(
-        context.emissionSignature,
-        "La quantité du déchet émis en litres est obligatoire"
-      )
-      .min(0, "La quantité émise doit être supérieure à 0"),
+
     emitterWasteQuantity: yup
       .number()
       .nullable()
@@ -258,9 +249,17 @@ export const emissionSchema: FactorySchemaOf<
       .array()
       .requiredIf(
         context.emissionSignature,
-        "Le détail du conditionnement émis est obligatoire"
+        `Le détail du conditionnement émis est obligatoire.`
       )
-      .of(packagingInfo(true)),
+      .of(packagingInfo(true))
+      .test(
+        "packaging-info-required",
+        "Le détail du conditionnement émis est obligatoire",
+        function (value) {
+          return !!context.emissionSignature ? !!value && !!value.length : true;
+        }
+      ),
+
     handedOverToTransporterAt: yup.date().nullable()
   });
 
@@ -392,19 +391,21 @@ export const transportSchema: FactorySchemaOf<
         }
       ),
 
-    transporterWasteVolume: yup
-      .number()
-      .requiredIf(
-        context.transportSignature,
-        "La quantité du déchet transporté en litres est obligatoire"
-      )
-      .min(0, "La quantité transportée doit être supérieure à 0"),
-
     transporterWastePackagingsInfo: yup
       .array()
       .requiredIf(
         context.transportSignature,
-        "Le détail du conditionnement transporté est obligatoire"
+        "Le détail du conditionnement est obligatoire"
+      )
+
+      .test(
+        "packaging-info-required",
+        "Le détail du conditionnement transporté est obligatoire",
+        function (value) {
+          return !!context.transportSignature
+            ? !!value && !!value.length
+            : true;
+        }
       )
       .of(packagingInfo(true)),
     transporterTakenOverAt: yup
@@ -490,19 +491,21 @@ export const receptionSchema: FactorySchemaOf<
                 v => !v
               )
       ),
-    recipientWasteVolume: yup
-      .number()
-      .requiredIf(
-        context.receptionSignature,
-        "La quantité du déchet émis en litres est obligatoire"
-      )
-      .min(0, "La quantité émise doit être supérieure à 0"),
 
     recipientWastePackagingsInfo: yup
       .array()
       .requiredIf(
         context.receptionSignature,
         "Le détail du conditionnement est obligatoire"
+      )
+      .test(
+        "packaging-info-required",
+        "Le détail du conditionnement reçu est obligatoire",
+        function (value) {
+          return !!context.receptionSignature
+            ? !!value && !!value.length
+            : true;
+        }
       )
       .of(packagingInfo(true)),
     receivedAt: yup.date().nullable()
