@@ -10,7 +10,7 @@ export default function sanitizeGraphqlMiddleware(graphQLPath: string) {
 
     /**
      * As easy as Stringify -> Sanitize -> Parse
-     * 
+     *
      * | Variables                            | Stringify                                 | Sanitize            | Parse          |
      * |--------------------------------------|-------------------------------------------|---------------------|----------------|
      * | { foo: "bar" }                       | "{\"foo\":\"bar\"}"                       | "{\"foo\":\"bar\"}" | { foo: "bar" } |
