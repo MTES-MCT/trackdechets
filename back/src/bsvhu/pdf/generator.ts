@@ -23,7 +23,7 @@ const toPDF = pipe(
     marginLeft: 0.2,
     marginRight: 0.2
   }),
-  adjust({headers: {"X-Auth-Token": GOTENBERG_TOKEN ?? ""}}),
+  adjust({ headers: { "X-Auth-Token": GOTENBERG_TOKEN ?? "" } }),
   please
 );
 

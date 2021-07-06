@@ -25,7 +25,7 @@ export async function buildPdf(bsda: Bsda) {
   const compiled = Handlebars.compile(source);
   const html = compiled({ bsda, qrcode, signatureStamp });
 
-  console.log(html)
+  console.log(html);
   return null;
 }
 
