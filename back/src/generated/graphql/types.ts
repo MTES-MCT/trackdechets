@@ -173,7 +173,7 @@ export type Bsd = Form | Bsdasri | Bsvhu | Bsda;
 export type Bsda = {
   __typename?: "Bsda";
   /** Bordereau n° */
-  id: Scalars["String"];
+  id: Scalars["ID"];
   /** Date de création */
   createdAt: Scalars["DateTime"];
   /** Date de dernière modification */
@@ -5486,7 +5486,7 @@ export type BsdaResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["Bsda"] = ResolversParentTypes["Bsda"]
 > = {
-  id?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
   isDraft?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;

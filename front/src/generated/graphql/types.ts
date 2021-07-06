@@ -162,7 +162,7 @@ export type Bsd = Form | Bsdasri | Bsvhu | Bsda;
 export type Bsda = {
   __typename?: "Bsda";
   /** Bordereau n° */
-  id: Scalars["String"];
+  id: Scalars["ID"];
   /** Date de création */
   createdAt: Scalars["DateTime"];
   /** Date de dernière modification */
