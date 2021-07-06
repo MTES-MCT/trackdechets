@@ -1,5 +1,5 @@
 import { SetRequired } from "type-fest";
-import { Prisma, TransportMode } from ".prisma/client";
+import { Prisma, TransportMode, BsffStatus } from ".prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
 import { UserWithCompany } from "../../__tests__/factories";
@@ -17,6 +17,7 @@ export function createBsff(
 ) {
   const data = {
     id: getReadableId(ReadableIdPrefix.FF),
+    status: BsffStatus.INITIAL,
     ...initialData
   };
 
@@ -74,6 +75,7 @@ export function createBsffAfterEmission(
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffBeforeEmission(args, {
+    status: BsffStatus.SIGNED_BY_EMITTER,
     emitterEmissionSignatureAuthor: args.emitter.user.name,
     emitterEmissionSignatureDate: new Date().toISOString(),
     ...initialData
@@ -97,6 +99,7 @@ export function createBsffAfterTransport(
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffBeforeTransport(args, {
+    status: BsffStatus.SENT,
     transporterTransportSignatureAuthor: args.transporter.user.name,
     transporterTransportSignatureDate: new Date().toISOString(),
     ...initialData
@@ -119,6 +122,9 @@ export function createBsffAfterReception(
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffBeforeReception(args, {
+    status: initialData.destinationReceptionRefusal
+      ? BsffStatus.REFUSED
+      : BsffStatus.RECEIVED,
     destinationReceptionSignatureAuthor: args.destination.user.name,
     destinationReceptionSignatureDate: new Date().toISOString(),
     ...initialData
@@ -140,6 +146,7 @@ export function createBsffAfterOperation(
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffAfterReception(args, {
+    status: BsffStatus.PROCESSED,
     destinationOperationSignatureAuthor: args.destination.user.name,
     destinationOperationSignatureDate: new Date().toISOString(),
     ...initialData
