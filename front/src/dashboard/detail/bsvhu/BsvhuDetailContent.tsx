@@ -21,6 +21,17 @@ type CompanyProps = {
 };
 
 type Props = { form: Bsvhu };
+
+const INDENTIFICATION_TYPES_LABELS = {
+  NUMERO_ORDRE_REGISTRE_POLICE:
+    "N° d'ordre tels qu'ils figurent dans le registre de police",
+  NUMERO_ORDRE_LOTS_SORTANTS: "N° d'ordre des lots sortants",
+};
+const PACKAGING_LABELS = {
+  UNITE: "En unités",
+  LOT: "En lots",
+};
+
 export function BsvhuDetailContent({ form }: Props) {
   return (
     <div>
@@ -119,12 +130,22 @@ function Emitter({ form }: { form: Bsvhu }) {
         <Company label="Émetteur" company={emitter?.company} />
       </div>
       <div className={styles.detailGrid}>
-        <DetailRow value={identification?.type} label="Type d'indentifiant" />
+        <DetailRow
+          value={
+            identification?.type
+              ? INDENTIFICATION_TYPES_LABELS[identification.type]
+              : null
+          }
+          label="Type d'identifiant"
+        />
         <DetailRow
           value={identification?.numbers?.join(", ")}
           label="Identifications"
         />
-        <DetailRow value={packaging} label="Conditionnement" />
+        <DetailRow
+          value={packaging ? PACKAGING_LABELS[packaging] : null}
+          label="Conditionnement"
+        />
 
         <DetailRow value={quantity?.number} label="Quantité" />
         <DetailRow value={quantity?.tons} label="Poids" units="tonnes" />
@@ -162,12 +183,22 @@ function Transporter({ form }: { form: Bsvhu }) {
         />
       </div>
       <div className={styles.detailGrid}>
-        <DetailRow value={identification?.type} label="Type d'indentifiant" />
+        <DetailRow
+          value={
+            identification?.type
+              ? INDENTIFICATION_TYPES_LABELS[identification.type]
+              : null
+          }
+          label="Type d'indentifiant"
+        />
         <DetailRow
           value={identification?.numbers?.join(", ")}
           label="Numéros"
         />
-        <DetailRow value={packaging} label="Conditionnement" />
+        <DetailRow
+          value={packaging ? PACKAGING_LABELS[packaging] : null}
+          label="Conditionnement"
+        />
 
         <DetailRow value={quantity?.number} label="Quantité" />
         <DetailRow value={quantity?.tons} label="Poids" units="tonnes" />
@@ -200,12 +231,22 @@ function Destination({ form }: { form: Bsvhu }) {
         <Company label="Destinataire" company={destination?.company} />
       </div>
       <div className={styles.detailGrid}>
-        <DetailRow value={identification?.type} label="Type d'indentifiant" />
+        <DetailRow
+          value={
+            identification?.type
+              ? INDENTIFICATION_TYPES_LABELS[identification.type]
+              : null
+          }
+          label="Type d'indentifiant"
+        />
         <DetailRow
           value={identification?.numbers?.join(", ")}
           label="Numéros"
         />
-        <DetailRow value={packaging} label="Conditionnement" />
+        <DetailRow
+          value={packaging ? PACKAGING_LABELS[packaging] : null}
+          label="Conditionnement"
+        />
 
         <DetailRow value={quantity?.number} label="Quantité" />
         <DetailRow value={quantity?.tons} label="Poids" units="tonnes" />

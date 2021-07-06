@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Field, useFormikContext } from "formik";
 import { RedErrorMessage } from "common/components";
 import CompanySelector from "form/common/components/company/CompanySelector";
@@ -10,9 +10,11 @@ export default function Destination({ disabled }) {
   const { setFieldValue, values } = useFormikContext<Bsvhu>();
 
   const isDangerousWasteCode = values.wasteCode === "16 01 04*";
-  if (isDangerousWasteCode) {
-    setFieldValue("destination.type", "DEMOLISSEUR");
-  }
+  useEffect(() => {
+    if (isDangerousWasteCode) {
+      setFieldValue("destination.type", "DEMOLISSEUR");
+    }
+  }, [isDangerousWasteCode]);
 
   return (
     <>
