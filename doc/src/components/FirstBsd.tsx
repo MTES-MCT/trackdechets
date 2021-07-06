@@ -6,7 +6,7 @@ import CodeBlock from "@theme/CodeBlock";
 import { resolve } from "../utils";
 
 const FirstBsd = () => {
-  const { workflows } = usePluginData("workflow-doc-plugin");
+  const { workflows } = usePluginData<any>("workflow-doc-plugin");
   const firstBsdd = resolve("bsdd.acheminementDirect", workflows).steps[0];
 
   return (

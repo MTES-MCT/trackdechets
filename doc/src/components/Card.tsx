@@ -3,16 +3,16 @@ import Link from "@docusaurus/Link";
 
 const Card = ({ title, description, link }) => {
   return (
-    <div class="card">
-      <div class="card__header">
+    <div className="card">
+      <div className="card__header">
         <h3>{title}</h3>
       </div>
-      <div class="card__body">
+      <div className="card__body">
         <p>{description}</p>
       </div>
-      <div class="card__footer">
+      <div className="card__footer">
         <Link to={link}>
-          <button class="button button--primary">{title}</button>
+          <button className="button button--primary">{title}</button>
         </Link>
       </div>
     </div>
