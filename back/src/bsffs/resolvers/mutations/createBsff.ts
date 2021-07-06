@@ -6,6 +6,7 @@ import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { flattenBsffInput, unflattenBsff } from "../../converter";
 import { isBsffContributor } from "../../permissions";
 import { canAssociateBsffs } from "../../validation";
+import { indexBsff } from "../../elastic";
 
 const createBsff: MutationResolvers["createBsff"] = async (
   _,
@@ -31,6 +32,9 @@ const createBsff: MutationResolvers["createBsff"] = async (
   const bsff = await prisma.bsff.create({
     data
   });
+
+  await indexBsff(bsff);
+
   return {
     ...unflattenBsff(bsff),
     ficheInterventions: [],

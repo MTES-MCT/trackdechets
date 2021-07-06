@@ -1,13 +1,16 @@
 import * as yup from "yup";
 import { UserInputError } from "apollo-server-express";
-import { Bsff, TransportMode, BsffFicheIntervention } from ".prisma/client";
+import {
+  Bsff,
+  TransportMode,
+  BsffFicheIntervention,
+  BsffStatus
+} from "@prisma/client";
 import prisma from "../prisma";
 import { BsffPackaging, BsffPackagingType } from "../generated/graphql/types";
 import {
   GROUPING_CODES,
   OPERATION_CODES,
-  OPERATION_QUALIFICATIONS,
-  OPERATION_QUALIFICATIONS_TO_CODES,
   PACKAGING_TYPE,
   WASTE_CODES
 } from "./constants";
@@ -22,10 +25,8 @@ export const beforeEmissionSchema: yup.SchemaOf<Pick<
   | "emitterCompanyMail"
   | "emitterEmissionSignatureDate"
   | "wasteCode"
-  | "wasteDescription"
   | "quantityKilos"
   | "destinationPlannedOperationCode"
-  | "destinationPlannedOperationQualification"
 >> = yup.object({
   emitterCompanyName: yup
     .string()
@@ -72,10 +73,6 @@ export const beforeEmissionSchema: yup.SchemaOf<Pick<
       WASTE_CODES,
       "Le code déchet ne fait pas partie de la liste reconnue : ${values}"
     ),
-  wasteDescription: yup
-    .string()
-    .nullable()
-    .required("La description du déchet est requise"),
   quantityKilos: yup
     .number()
     .nullable()
@@ -86,15 +83,7 @@ export const beforeEmissionSchema: yup.SchemaOf<Pick<
     .oneOf(
       Object.values(OPERATION_CODES),
       "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
-    ),
-  destinationPlannedOperationQualification: yup
-    .string()
-    .nullable()
-    .oneOf(
-      Object.values(OPERATION_QUALIFICATIONS),
-      "La qualification du traitement prévu ne fait pas partie de la liste reconnue : ${values}"
     )
-    .required()
 });
 
 export const beforeTransportSchema: yup.SchemaOf<Pick<
@@ -134,10 +123,10 @@ export const beforeTransportSchema: yup.SchemaOf<Pick<
             "Le type du contenant ne fait pas partie de la liste reconnue : ${values}"
           )
           .required("Le type de contenant est requis"),
-        litres: yup
+        kilos: yup
           .number()
           .nullable()
-          .required("Le volume du contenant est requis")
+          .required("Le poids du contenant est requis")
       })
     )
     .required("Le conditionnement est requis")
@@ -255,7 +244,6 @@ export const beforeOperationSchema: yup.SchemaOf<Pick<
   Bsff,
   | "destinationReceptionSignatureDate"
   | "destinationOperationCode"
-  | "destinationOperationQualification"
   | "destinationOperationSignatureDate"
 >> = yup.object({
   destinationReceptionSignatureDate: yup
@@ -266,32 +254,12 @@ export const beforeOperationSchema: yup.SchemaOf<Pick<
     ) as any, // https://github.com/jquense/yup/issues/1302
   destinationOperationCode: yup
     .string()
+    // Operation code can be null when the waste is temporarily stored and sent somewhere else.
+    // It received no treatment, it was only stored in its current form.
     .nullable()
     .oneOf(
       [null, ...Object.values(OPERATION_CODES)],
       "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : ${values}"
-    ),
-  destinationOperationQualification: yup
-    .string()
-    .nullable()
-    .oneOf(
-      Object.values(OPERATION_QUALIFICATIONS),
-      "La qualification du traitement ne fait pas partie de la liste reconnue : ${values}"
-    )
-    .required()
-    .test(
-      "operation_qualifications_to_codes",
-      "La qualification ${value} n'est pas compatible avec le code de traitement renseigné",
-      (qualification, context) => {
-        const { destinationOperationCode: code } = context.parent;
-        const codes = OPERATION_QUALIFICATIONS_TO_CODES[qualification] ?? [];
-
-        if (codes.length === 0 && code == null) {
-          return true;
-        }
-
-        return codes.includes(code);
-      }
     ),
   destinationOperationSignatureDate: yup
     .date()
@@ -308,12 +276,18 @@ export const ficheInterventionSchema: yup.SchemaOf<Pick<
   | "numero"
   | "kilos"
   | "postalCode"
-  | "ownerCompanyName"
-  | "ownerCompanySiret"
-  | "ownerCompanyAddress"
-  | "ownerCompanyContact"
-  | "ownerCompanyPhone"
-  | "ownerCompanyMail"
+  | "detenteurCompanyName"
+  | "detenteurCompanySiret"
+  | "detenteurCompanyAddress"
+  | "detenteurCompanyContact"
+  | "detenteurCompanyPhone"
+  | "detenteurCompanyMail"
+  | "operateurCompanyName"
+  | "operateurCompanySiret"
+  | "operateurCompanyAddress"
+  | "operateurCompanyContact"
+  | "operateurCompanyPhone"
+  | "operateurCompanyMail"
 >> = yup.object({
   numero: yup
     .string()
@@ -322,32 +296,60 @@ export const ficheInterventionSchema: yup.SchemaOf<Pick<
   postalCode: yup
     .string()
     .required("Le code postal du lieu de l'intervention est requis"),
-  ownerCompanyName: yup
+  detenteurCompanyName: yup
     .string()
-    .required("Le nom de l'entreprise du lieu d'intervention est requis"),
-  ownerCompanySiret: yup
+    .required("Le nom de l'entreprise détentrice de l'équipement est requis"),
+  detenteurCompanySiret: yup
     .string()
-    .required("Le SIRET de l'entreprise du lieu d'intervention est requis")
+    .required("Le SIRET de l'entreprise détentrice de l'équipement est requis")
     .length(
       14,
-      "Le SIRET de l'entreprise du lieu d'intervention n'est pas au bon format (${length} caractères)"
+      "Le SIRET de l'entreprise détentrice de l'équipement n'est pas au bon format (${length} caractères)"
     ),
-  ownerCompanyAddress: yup
-    .string()
-    .required("L'addresse du lieu d'intervention est requis"),
-  ownerCompanyContact: yup
-    .string()
-    .required("Le nom du contact du lieu d'intervention est requis"),
-  ownerCompanyPhone: yup
+  detenteurCompanyAddress: yup
     .string()
     .required(
-      "Le numéro de téléphone de l'entreprise du lieu d'intervention est requis"
+      "L'addresse de l'entreprise détentrice de l'équipement est requise"
     ),
-  ownerCompanyMail: yup
+  detenteurCompanyContact: yup
     .string()
     .required(
-      "L'addresse email de l'entreprise du lieu d'intervention est requis"
-    )
+      "Le nom du contact de l'entreprise détentrice de l'équipement est requis"
+    ),
+  detenteurCompanyPhone: yup
+    .string()
+    .required(
+      "Le numéro de téléphone de l'entreprise détentrice de l'équipement est requis"
+    ),
+  detenteurCompanyMail: yup
+    .string()
+    .required(
+      "L'addresse email de l'entreprise détentrice de l'équipement est requis"
+    ),
+  operateurCompanyName: yup
+    .string()
+    .required("Le nom de l'entreprise de l'opérateur est requis"),
+  operateurCompanySiret: yup
+    .string()
+    .required("Le SIRET de l'entreprise de l'opérateur est requis")
+    .length(
+      14,
+      "Le SIRET de l'entreprise de l'opérateur n'est pas au bon format (${length} caractères)"
+    ),
+  operateurCompanyAddress: yup
+    .string()
+    .required("L'addresse de l'entreprise de l'opérateur est requis"),
+  operateurCompanyContact: yup
+    .string()
+    .required("Le nom du contact de l'entreprise de l'opérateur est requis"),
+  operateurCompanyPhone: yup
+    .string()
+    .required(
+      "Le numéro de téléphone de l'entreprise de l'opérateur est requis"
+    ),
+  operateurCompanyMail: yup
+    .string()
+    .required("L'addresse email de l'entreprise de l'opérateur est requis")
 });
 
 export async function canAssociateBsffs(ids: string[]) {
@@ -359,35 +361,22 @@ export async function canAssociateBsffs(ids: string[]) {
     }
   });
 
-  if (bsffs.some(bsff => bsff.destinationOperationSignatureDate == null)) {
+  if (bsffs.some(bsff => bsff.status !== BsffStatus.PROCESSED)) {
     throw new UserInputError(
       `Certains des bordereaux à associer n'ont pas toutes les signatures requises`
     );
   }
 
   if (
-    bsffs.some(
+    !bsffs.every(
       bsff =>
-        !GROUPING_CODES.includes(bsff.destinationOperationCode) &&
-        bsff.destinationOperationQualification !==
-          OPERATION_QUALIFICATIONS.REEXPEDITION
+        // operation code is null when the waste is temporarily stored and receives no treatment
+        bsff.destinationOperationCode == null ||
+        GROUPING_CODES.includes(bsff.destinationOperationCode)
     )
   ) {
     throw new UserInputError(
       `Les bordereaux à associer ont déclaré un traitement qui ne permet pas de leur donner suite`
-    );
-  }
-
-  if (
-    bsffs.some(
-      bsff =>
-        bsff.destinationOperationCode !== bsffs[0].destinationOperationCode ||
-        bsff.destinationOperationQualification !==
-          bsffs[0].destinationOperationQualification
-    )
-  ) {
-    throw new UserInputError(
-      `Les bordereaux à associer ont déclaré des traitements différents et ne peuvent pas être listés sur un même bordereau`
     );
   }
 }

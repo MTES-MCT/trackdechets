@@ -8,7 +8,6 @@ import {
   createBsffAfterOperation
 } from "../../../__tests__/factories";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
-import { getFicheInterventionId } from "../../../converter";
 
 const GET_BSFF = `
   query GetBsff($id: ID!) {
@@ -114,10 +113,6 @@ describe("Query.bsff", () => {
 
     const bsffId = getReadableId(ReadableIdPrefix.FF);
     const ficheInterventionNumero = "0000001";
-    const ficheInterventionId = getFicheInterventionId(
-      bsffId,
-      ficheInterventionNumero
-    );
     const bsff = await createBsff(
       {
         emitter
@@ -127,15 +122,20 @@ describe("Query.bsff", () => {
         ficheInterventions: {
           create: [
             {
-              id: ficheInterventionId,
               numero: ficheInterventionNumero,
               kilos: 2,
-              ownerCompanyName: "Acme",
-              ownerCompanySiret: "1".repeat(14),
-              ownerCompanyAddress: "12 rue de la Tige, 69000",
-              ownerCompanyMail: "contact@gmail.com",
-              ownerCompanyPhone: "06",
-              ownerCompanyContact: "Jeanne Michelin",
+              detenteurCompanyName: "Acme",
+              detenteurCompanySiret: "1".repeat(14),
+              detenteurCompanyAddress: "12 rue de la Tige, 69000",
+              detenteurCompanyMail: "contact@gmail.com",
+              detenteurCompanyPhone: "06",
+              detenteurCompanyContact: "Jeanne Michelin",
+              operateurCompanyName: "Clim'op",
+              operateurCompanySiret: "2".repeat(14),
+              operateurCompanyAddress: "12 rue de la Tige, 69000",
+              operateurCompanyMail: "contact@climop.com",
+              operateurCompanyPhone: "06",
+              operateurCompanyContact: "Jean Dupont",
               postalCode: "69000"
             }
           ]

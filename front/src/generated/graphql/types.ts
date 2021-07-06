@@ -157,7 +157,7 @@ export type BrokerReceipt = {
   department: Scalars["String"];
 };
 
-export type Bsd = Form | Bsdasri | Bsvhu | Bsda;
+export type Bsd = Form | Bsdasri | Bsvhu | Bsda | Bsff;
 
 export type Bsda = {
   __typename?: "Bsda";
@@ -1072,7 +1072,8 @@ export enum BsdType {
   Bsdd = "BSDD",
   Bsdasri = "BSDASRI",
   Bsvhu = "BSVHU",
-  Bsda = "BSDA"
+  Bsda = "BSDA",
+  Bsff = "BSFF"
 }
 
 export type BsdWhere = {
@@ -1096,6 +1097,8 @@ export type Bsff = {
    * Il est à utiliser pour les échanges avec l'API.
    */
   id: Scalars["ID"];
+  /** Statut qui synthétise où en est le déchet dans son cheminement. */
+  status: BsffStatus;
   /**
    * Émetteur du déchet, qui n'est pas nécessairement le producteur.
    * Il s'agit par exemple de l'opérateur ayant collecté des fluides lors d'interventions,
@@ -1152,7 +1155,7 @@ export type BsffDestination = {
 };
 
 export type BsffDestinationInput = {
-  company: CompanyInput;
+  company?: Maybe<CompanyInput>;
   cap?: Maybe<Scalars["String"]>;
   reception?: Maybe<BsffDestinationReceptionInput>;
   plannedOperation?: Maybe<BsffDestinationPlannedOperationInput>;
@@ -1161,19 +1164,27 @@ export type BsffDestinationInput = {
 
 export type BsffDestinationOperationInput = {
   code: BsffOperationCode;
-  qualification: BsffOperationQualification;
   nextDestination?: Maybe<BsffOperationNextDestinationInput>;
 };
 
 export type BsffDestinationPlannedOperationInput = {
   code: BsffOperationCode;
-  qualification: BsffOperationQualification;
 };
 
 export type BsffDestinationReceptionInput = {
   date: Scalars["DateTime"];
   kilos: Scalars["Float"];
   refusal?: Maybe<Scalars["String"]>;
+};
+
+export type BsffDetenteur = {
+  __typename?: "BsffDetenteur";
+  /** Entreprise détentrice de l'équipement. */
+  company: FormCompany;
+};
+
+export type BsffDetenteurInput = {
+  company: CompanyInput;
 };
 
 export type BsffEdge = {
@@ -1185,7 +1196,7 @@ export type BsffEdge = {
 export type BsffEmission = {
   __typename?: "BsffEmission";
   /** Signature de l'émetteur lors de l'enlèvement par le transporteur. */
-  signature: Signature;
+  signature?: Maybe<Signature>;
 };
 
 export type BsffEmitter = {
@@ -1202,22 +1213,25 @@ export type BsffEmitterInput = {
 
 export type BsffFicheIntervention = {
   __typename?: "BsffFicheIntervention";
+  /** Identifiant unique de la fiche d'intervention. */
+  id: Scalars["ID"];
   /** Numéro de la fiche d'intervention, habituellement renseigné par l'opérateur. */
   numero: Scalars["String"];
   /** Poids total des fluides récupérés lors de cette intervention. */
   kilos: Scalars["Float"];
-  /**
-   * Détenteur de l'équipement sur lequel est intervenu l'opérateur.
-   * À noter que dû à la valeur commerciale de ces informations, leur visibilité est limité aux acteurs en contact direct.
-   */
-  owner?: Maybe<BsffOwner>;
+  /** Détenteur de l'équipement sur lequel est intervenu l'opérateur. */
+  detenteur?: Maybe<BsffDetenteur>;
+  /** Opérateur à l'origine de l'intervention. */
+  operateur?: Maybe<BsffOperateur>;
   /** Code postal du lieu où l'intervention a eu lieu. */
   postalCode: Scalars["String"];
 };
 
 export type BsffFicheInterventionInput = {
+  numero: Scalars["String"];
   kilos: Scalars["Float"];
-  owner: BsffOwnerInput;
+  detenteur: BsffDetenteurInput;
+  operateur: BsffOperateurInput;
   postalCode: Scalars["String"];
 };
 
@@ -1236,12 +1250,20 @@ export type BsffNextDestination = {
   company: FormCompany;
 };
 
+export type BsffOperateur = {
+  __typename?: "BsffOperateur";
+  /** Entreprise dont l'opérateur fait partie. */
+  company: FormCompany;
+};
+
+export type BsffOperateurInput = {
+  company: CompanyInput;
+};
+
 export type BsffOperation = {
   __typename?: "BsffOperation";
   /** Code de l'opération de traitement. */
   code?: Maybe<BsffOperationCode>;
-  /** Qualification plus précise du type d'opération réalisée. */
-  qualification: BsffOperationQualification;
   /** Destination ultérieure prévue, dans le cas d'un envoi vers l'étranger. */
   nextDestination?: Maybe<BsffNextDestination>;
   /** Signature de la destination lors du traitement. */
@@ -1261,43 +1283,20 @@ export type BsffOperationNextDestinationInput = {
   company: CompanyInput;
 };
 
-/**
- * Liste des qualifications de traitement possible.
- * Attention, certaines combinaisons de code et qualification ne sont pas possibles.
- * Par exemple, seul le code D 10 peut être associé à une incinération.
- */
-export enum BsffOperationQualification {
-  RecuperationRegeneration = "RECUPERATION_REGENERATION",
-  Incineration = "INCINERATION",
-  Groupement = "GROUPEMENT",
-  Reconditionnement = "RECONDITIONNEMENT",
-  Reexpedition = "REEXPEDITION"
-}
-
-export type BsffOwner = {
-  __typename?: "BsffOwner";
-  /** Entreprise détentrice de l'équipement. */
-  company: FormCompany;
-};
-
-export type BsffOwnerInput = {
-  company: CompanyInput;
-};
-
 export type BsffPackaging = {
   __typename?: "BsffPackaging";
   /** Numéro du contenant. */
   numero: Scalars["String"];
   /** Type de contenant. */
   type: BsffPackagingType;
-  /** Volume en litres des fluides à l'intérieur du contenant. */
-  litres: Scalars["Float"];
+  /** Poids en kilos. */
+  kilos: Scalars["Float"];
 };
 
 export type BsffPackagingInput = {
   numero: Scalars["String"];
   type: BsffPackagingType;
-  litres: Scalars["Float"];
+  kilos: Scalars["Float"];
 };
 
 export enum BsffPackagingType {
@@ -1308,8 +1307,6 @@ export type BsffPlannedOperation = {
   __typename?: "BsffPlannedOperation";
   /** Code de l'opération de traitement prévu. */
   code?: Maybe<BsffOperationCode>;
-  /** Qualification plus précise du type d'opération prévu. */
-  qualification: BsffOperationQualification;
 };
 
 export type BsffQuantity = {
@@ -1344,12 +1341,27 @@ export enum BsffSignatureType {
   Operation = "OPERATION"
 }
 
+export enum BsffStatus {
+  /** Le bordereau ne comporte aucune signature. */
+  Initial = "INITIAL",
+  /** Le bordereau a été signé par l'emitter. */
+  SignedByEmitter = "SIGNED_BY_EMITTER",
+  /** Le bordereau a été signé par le transporteur. */
+  Sent = "SENT",
+  /** Le bordereau a été reçu par l'installation de destination. */
+  Received = "RECEIVED",
+  /** Le déchet a été traité par l'installation de destination. */
+  Processed = "PROCESSED",
+  /** Le déchet a été refusé par l'installation de traitement. */
+  Refused = "REFUSED"
+}
+
 export type BsffTransport = {
   __typename?: "BsffTransport";
   /** Mode de transport utilisé. */
   mode: TransportMode;
   /** Signature du transporteur lors de l'enlèvement auprès de l'émetteur. */
-  signature: Signature;
+  signature?: Maybe<Signature>;
 };
 
 export type BsffTransporter = {
@@ -1392,15 +1404,15 @@ export type BsffWaste = {
   __typename?: "BsffWaste";
   /** Code déchet. */
   code: Scalars["String"];
-  /** Description du déchet, permet de le qualifier de façon plus précise. */
-  description: Scalars["String"];
+  /** Nature du fluide, laisser vide lorsqu'il est inconnu. */
+  nature?: Maybe<Scalars["String"]>;
   /** Mention ADR. */
   adr: Scalars["String"];
 };
 
 export type BsffWasteInput = {
   code: Scalars["String"];
-  description: Scalars["String"];
+  nature?: Maybe<Scalars["String"]>;
   adr: Scalars["String"];
 };
 
@@ -1433,7 +1445,6 @@ export type BsffWhereEmitter = {
 /** Champs possible pour le filtre sur l'opération. */
 export type BsffWhereOperation = {
   code?: Maybe<BsffOperationCode>;
-  qualification?: Maybe<BsffOperationQualification>;
 };
 
 /** Champs possible pour le filtre sur transporter. */
@@ -2734,8 +2745,6 @@ export type Mutation = {
    * en spécifiant le rôle accordé au nouvel utilisateur
    */
   acceptMembershipRequest: CompanyPrivate;
-  /** Mutation permettant d'ajouter une fiche d'intervention à un bordereau existant. */
-  addFicheInterventionBsff: BsffFicheIntervention;
   /**
    * USAGE INTERNE
    * Modifie le mot de passe d'un utilisateur
@@ -2783,6 +2792,8 @@ export type Mutation = {
    * Crée un BSVHU en brouillon
    */
   createDraftBsvhu?: Maybe<Bsvhu>;
+  /** Mutation permettant de créer une fiche d'intervention. */
+  createFicheInterventionBsff: BsffFicheIntervention;
   /** Crée un nouveau bordereau */
   createForm: Form;
   /**
@@ -2830,8 +2841,6 @@ export type Mutation = {
    * Supprime un BSVHU
    */
   deleteBsvhu?: Maybe<Bsvhu>;
-  /** Mutation permettant de supprimer une fiche d'intervention lié à un bordereau existant. */
-  deleteFicheInterventionBsff: BsffFicheIntervention;
   /** Supprime un BSD */
   deleteForm?: Maybe<Form>;
   /**
@@ -3127,7 +3136,7 @@ export type Mutation = {
    * Édite les informations d'un établissement
    */
   updateCompany: CompanyPrivate;
-  /** Mutation permettant de mettre à jour une fiche d'intervention lié à un bordereau existant. */
+  /** Mutation permettant de mettre à jour une fiche d'intervention. */
   updateFicheInterventionBsff: BsffFicheIntervention;
   /** Met à jour un bordereau existant */
   updateForm: Form;
@@ -3162,12 +3171,6 @@ export type Mutation = {
 export type MutationAcceptMembershipRequestArgs = {
   id: Scalars["ID"];
   role: UserRole;
-};
-
-export type MutationAddFicheInterventionBsffArgs = {
-  id: Scalars["ID"];
-  numero: Scalars["String"];
-  input: BsffFicheInterventionInput;
 };
 
 export type MutationChangePasswordArgs = {
@@ -3211,6 +3214,10 @@ export type MutationCreateDraftBsvhuArgs = {
   input: BsvhuInput;
 };
 
+export type MutationCreateFicheInterventionBsffArgs = {
+  input: BsffFicheInterventionInput;
+};
+
 export type MutationCreateFormArgs = {
   createFormInput: CreateFormInput;
 };
@@ -3250,11 +3257,6 @@ export type MutationDeleteBsffArgs = {
 
 export type MutationDeleteBsvhuArgs = {
   id: Scalars["ID"];
-};
-
-export type MutationDeleteFicheInterventionBsffArgs = {
-  id: Scalars["ID"];
-  numero: Scalars["String"];
 };
 
 export type MutationDeleteFormArgs = {
@@ -3515,7 +3517,6 @@ export type MutationUpdateCompanyArgs = {
 
 export type MutationUpdateFicheInterventionBsffArgs = {
   id: Scalars["ID"];
-  numero: Scalars["String"];
   input: BsffFicheInterventionInput;
 };
 

@@ -6,6 +6,11 @@ type Bsff {
   id: ID!
 
   """
+  Statut qui synthétise où en est le déchet dans son cheminement.
+  """
+  status: BsffStatus!
+
+  """
   Émetteur du déchet, qui n'est pas nécessairement le producteur.
   Il s'agit par exemple de l'opérateur ayant collecté des fluides lors d'interventions,
   ou alors d'une installation de collecte qui procède à la réexpédition pour traitement final.
@@ -61,7 +66,7 @@ type BsffEmitter {
 }
 type BsffEmission {
   "Signature de l'émetteur lors de l'enlèvement par le transporteur."
-  signature: Signature!
+  signature: Signature
 }
 
 type BsffPackaging {
@@ -69,15 +74,15 @@ type BsffPackaging {
   numero: String!
   "Type de contenant."
   type: BsffPackagingType!
-  "Volume en litres des fluides à l'intérieur du contenant."
-  litres: Float!
+  "Poids en kilos."
+  kilos: Float!
 }
 
 type BsffWaste {
   "Code déchet."
   code: String!
-  "Description du déchet, permet de le qualifier de façon plus précise."
-  description: String!
+  "Nature du fluide, laisser vide lorsqu'il est inconnu."
+  nature: String
   "Mention ADR."
   adr: String!
 }
@@ -109,7 +114,7 @@ type BsffTransport {
   "Mode de transport utilisé."
   mode: TransportMode!
   "Signature du transporteur lors de l'enlèvement auprès de l'émetteur."
-  signature: Signature!
+  signature: Signature
 }
 
 type BsffDestination {
@@ -142,8 +147,6 @@ type BsffNextDestination {
 type BsffOperation {
   "Code de l'opération de traitement."
   code: BsffOperationCode
-  "Qualification plus précise du type d'opération réalisée."
-  qualification: BsffOperationQualification!
   "Destination ultérieure prévue, dans le cas d'un envoi vers l'étranger."
   nextDestination: BsffNextDestination
   "Signature de la destination lors du traitement."
@@ -152,25 +155,28 @@ type BsffOperation {
 type BsffPlannedOperation {
   "Code de l'opération de traitement prévu."
   code: BsffOperationCode
-  "Qualification plus précise du type d'opération prévu."
-  qualification: BsffOperationQualification!
 }
 
 type BsffFicheIntervention {
+  "Identifiant unique de la fiche d'intervention."
+  id: ID!
   "Numéro de la fiche d'intervention, habituellement renseigné par l'opérateur."
   numero: String!
   "Poids total des fluides récupérés lors de cette intervention."
   kilos: Float!
-  """
-  Détenteur de l'équipement sur lequel est intervenu l'opérateur.
-  À noter que dû à la valeur commerciale de ces informations, leur visibilité est limité aux acteurs en contact direct.
-  """
-  owner: BsffOwner
+  "Détenteur de l'équipement sur lequel est intervenu l'opérateur."
+  detenteur: BsffDetenteur
+  "Opérateur à l'origine de l'intervention."
+  operateur: BsffOperateur
   "Code postal du lieu où l'intervention a eu lieu."
   postalCode: String!
 }
-type BsffOwner {
+type BsffDetenteur {
   "Entreprise détentrice de l'équipement."
+  company: FormCompany!
+}
+type BsffOperateur {
+  "Entreprise dont l'opérateur fait partie."
   company: FormCompany!
 }
 

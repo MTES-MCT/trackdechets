@@ -16,29 +16,6 @@ type Mutation {
   deleteBsff(id: ID!): Bsff!
 
   """
-  Mutation permettant d'ajouter une fiche d'intervention à un bordereau existant.
-  """
-  addFicheInterventionBsff(
-    id: ID!
-    numero: String!
-    input: BsffFicheInterventionInput!
-  ): BsffFicheIntervention!
-
-  """
-  Mutation permettant de mettre à jour une fiche d'intervention lié à un bordereau existant.
-  """
-  updateFicheInterventionBsff(
-    id: ID!
-    numero: String!
-    input: BsffFicheInterventionInput!
-  ): BsffFicheIntervention!
-
-  """
-  Mutation permettant de supprimer une fiche d'intervention lié à un bordereau existant.
-  """
-  deleteFicheInterventionBsff(id: ID!, numero: String!): BsffFicheIntervention!
-
-  """
   Mutation permettant d'apposer une signature sur le bordereau.
   """
   signBsff(
@@ -47,4 +24,19 @@ type Mutation {
     signature: SignatureInput!
     securityCode: Int
   ): Bsff!
+
+  """
+  Mutation permettant de créer une fiche d'intervention.
+  """
+  createFicheInterventionBsff(
+    input: BsffFicheInterventionInput!
+  ): BsffFicheIntervention!
+
+  """
+  Mutation permettant de mettre à jour une fiche d'intervention.
+  """
+  updateFicheInterventionBsff(
+    id: ID!
+    input: BsffFicheInterventionInput!
+  ): BsffFicheIntervention!
 }

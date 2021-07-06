@@ -802,10 +802,11 @@ model Bsdasri {
 // ----------------
 
 model Bsff {
-  id        String   @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  isDeleted Boolean  @default(false)
+  id        String     @id
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  isDeleted Boolean    @default(false)
+  status    BsffStatus @default(INITIAL)
 
   emitterCompanyName    String?
   emitterCompanySiret   String?
@@ -820,6 +821,7 @@ model Bsff {
   packagings Json?
 
   wasteCode        String?
+  wasteNature      String?
   wasteDescription String?
   wasteAdr         String?
 
@@ -856,11 +858,9 @@ model Bsff {
   destinationReceptionSignatureAuthor String?
   destinationReceptionSignatureDate   DateTime?
 
-  destinationPlannedOperationCode          String?
-  destinationPlannedOperationQualification String?
+  destinationPlannedOperationCode String?
 
-  destinationOperationCode          String?
-  destinationOperationQualification String?
+  destinationOperationCode String?
 
   destinationOperationNextDestinationCompanyName      String?
   destinationOperationNextDestinationCompanySiret     String?
@@ -882,20 +882,36 @@ model Bsff {
   bsffId String?
 }
 
+enum BsffStatus {
+  INITIAL
+  SIGNED_BY_EMITTER
+  SENT
+  RECEIVED
+  PROCESSED
+  REFUSED
+}
+
 model BsffFicheIntervention {
-  id         String   @id
+  id         String   @id @default(cuid())
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   numero     String
   kilos      Float
   postalCode String
 
-  ownerCompanyName    String
-  ownerCompanySiret   String
-  ownerCompanyAddress String
-  ownerCompanyContact String
-  ownerCompanyPhone   String
-  ownerCompanyMail    String
+  detenteurCompanyName    String
+  detenteurCompanySiret   String
+  detenteurCompanyAddress String
+  detenteurCompanyContact String
+  detenteurCompanyPhone   String
+  detenteurCompanyMail    String
+
+  operateurCompanyName    String
+  operateurCompanySiret   String
+  operateurCompanyAddress String
+  operateurCompanyContact String
+  operateurCompanyPhone   String
+  operateurCompanyMail    String
 
   Bsff   Bsff?   @relation("FicheInterventionToBsff", fields: [bsffId], references: [id])
   bsffId String?

@@ -1297,3 +1297,21 @@ export function IconBSVhu(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function IconBSFF(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} width="1em" height="1em" xmlns="http://www.w3.org/2000/svg">
+      <g
+        transform="translate(1)"
+        stroke="currentColor"
+        fill="none"
+        fillRule="evenodd"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx={4.15} cy={3.499} r={3} />
+        <path d="M3.65 3.5l1-1m3.7 9h0a4 4 0 10-8 0v11h0a1 1 0 001 1h6a1 1 0 001-1v-11zm-8 2h8m-8 6h8" />
+      </g>
+    </svg>
+  );
+}

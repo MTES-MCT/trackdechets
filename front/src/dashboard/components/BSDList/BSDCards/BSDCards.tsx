@@ -9,6 +9,7 @@ import { WorkflowAction as BsdasriWorkflowAction } from "../BSDasri/WorkflowActi
 import { Column } from "../columns";
 import styles from "./BSDCards.module.scss";
 import { BsdTypename } from "dashboard/constants";
+
 interface BSDCardsProps {
   bsds: Bsd[];
   columns: Column[];

@@ -10,7 +10,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { OPERATION_CODES, OPERATION_QUALIFICATIONS } from "../../../constants";
+import { OPERATION_CODES } from "../../../constants";
 import {
   createBsffAfterEmission,
   createBsffAfterOperation
@@ -117,8 +117,7 @@ describe("Mutation.createBsff", () => {
       const bsffToAssociate = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
-          destinationOperationCode: OPERATION_CODES.R12,
-          destinationOperationQualification: OPERATION_QUALIFICATIONS.GROUPEMENT
+          destinationOperationCode: OPERATION_CODES.R12
         }
       );
 
@@ -153,9 +152,7 @@ describe("Mutation.createBsff", () => {
       const bsffToAssociate = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
-          destinationOperationCode: null,
-          destinationOperationQualification:
-            OPERATION_QUALIFICATIONS.REEXPEDITION
+          destinationOperationCode: null
         }
       );
 
@@ -186,154 +183,12 @@ describe("Mutation.createBsff", () => {
       expect(associatedBsffs).toHaveLength(1);
     });
 
-    it.each([
-      [OPERATION_CODES.R2, OPERATION_QUALIFICATIONS.RECUPERATION_REGENERATION],
-      [OPERATION_CODES.D10, OPERATION_QUALIFICATIONS.INCINERATION]
-    ])(
-      "should disallow associating a bsff with the non-grouping code %s",
-      async ([operationCode, operationQualification]) => {
-        const bsffToGroup = await createBsffAfterOperation(
-          { emitter, transporter, destination },
-          {
-            destinationOperationCode: operationCode,
-            destinationOperationQualification: operationQualification
-          }
-        );
-
-        const { mutate } = makeClient(destination.user);
-        const { errors } = await mutate<
-          Pick<Mutation, "createBsff">,
-          MutationCreateBsffArgs
-        >(CREATE_BSFF, {
-          variables: {
-            input: {
-              destination: {
-                company: {
-                  name: destination.company.name,
-                  siret: destination.company.siret,
-                  address: destination.company.address,
-                  contact: destination.user.name,
-                  mail: destination.user.email
-                }
-              },
-              bsffs: [bsffToGroup.id]
-            }
-          }
-        });
-
-        expect(errors).toEqual([
-          expect.objectContaining({
-            message: `Les bordereaux à associer ont déclaré un traitement qui ne permet pas de leur donner suite`
-          })
-        ]);
-      }
-    );
-
-    // FIXME: double check that, perhaps it's ok to mix R12 and D13 as long as they're both declared as "groupement"
-    it("should disallow associating bsffs with different codes", async () => {
-      const bsffs = await Promise.all([
-        createBsffAfterOperation(
-          { emitter, transporter, destination },
-          {
-            destinationOperationCode: OPERATION_CODES.R12,
-            destinationOperationQualification:
-              OPERATION_QUALIFICATIONS.GROUPEMENT
-          }
-        ),
-        createBsffAfterOperation(
-          { emitter, transporter, destination },
-          {
-            destinationOperationCode: OPERATION_CODES.D13,
-            destinationOperationQualification:
-              OPERATION_QUALIFICATIONS.GROUPEMENT
-          }
-        )
-      ]);
-
-      const { mutate } = makeClient(destination.user);
-      const { errors } = await mutate<
-        Pick<Mutation, "createBsff">,
-        MutationCreateBsffArgs
-      >(CREATE_BSFF, {
-        variables: {
-          input: {
-            destination: {
-              company: {
-                name: destination.company.name,
-                siret: destination.company.siret,
-                address: destination.company.address,
-                contact: destination.user.name,
-                mail: destination.user.email
-              }
-            },
-            bsffs: bsffs.map(bsff => bsff.id)
-          }
-        }
-      });
-
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message: `Les bordereaux à associer ont déclaré des traitements différents et ne peuvent pas être listés sur un même bordereau`
-        })
-      ]);
-    });
-
-    it("should disallow associating bsffs with different qualifications", async () => {
-      const bsffs = await Promise.all([
-        createBsffAfterOperation(
-          { emitter, transporter, destination },
-          {
-            destinationOperationCode: OPERATION_CODES.R12,
-            destinationOperationQualification:
-              OPERATION_QUALIFICATIONS.GROUPEMENT
-          }
-        ),
-        createBsffAfterOperation(
-          { emitter, transporter, destination },
-          {
-            destinationOperationCode: OPERATION_CODES.R12,
-            destinationOperationQualification:
-              OPERATION_QUALIFICATIONS.RECONDITIONNEMENT
-          }
-        )
-      ]);
-
-      const { mutate } = makeClient(destination.user);
-      const { errors } = await mutate<
-        Pick<Mutation, "createBsff">,
-        MutationCreateBsffArgs
-      >(CREATE_BSFF, {
-        variables: {
-          input: {
-            destination: {
-              company: {
-                name: destination.company.name,
-                siret: destination.company.siret,
-                address: destination.company.address,
-                contact: destination.user.name,
-                mail: destination.user.email
-              }
-            },
-            bsffs: bsffs.map(bsff => bsff.id)
-          }
-        }
-      });
-
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message: `Les bordereaux à associer ont déclaré des traitements différents et ne peuvent pas être listés sur un même bordereau`
-        })
-      ]);
-    });
-
     it("should disallow associating bsffs with missing signatures", async () => {
       const bsffs = await Promise.all([
         createBsffAfterEmission(
           { emitter, transporter, destination },
           {
-            destinationOperationCode: OPERATION_CODES.R12,
-            destinationOperationQualification:
-              OPERATION_QUALIFICATIONS.GROUPEMENT
+            destinationOperationCode: OPERATION_CODES.R12
           }
         )
       ]);

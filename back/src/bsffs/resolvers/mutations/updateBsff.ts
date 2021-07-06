@@ -8,6 +8,7 @@ import { getBsffOrNotFound } from "../../database";
 import { flattenBsffInput, unflattenBsff } from "../../converter";
 import { isBsffContributor } from "../../permissions";
 import { canAssociateBsffs } from "../../validation";
+import { indexBsff } from "../../elastic";
 
 const updateBsff: MutationResolvers["updateBsff"] = async (
   _,
@@ -36,11 +37,10 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       "emitterCompanyPhone",
       "emitterCompanySiret",
       "wasteCode",
-      "wasteDescription",
+      "wasteNature",
       "quantityKilos",
       "quantityIsEstimate",
-      "destinationPlannedOperationCode",
-      "destinationPlannedOperationQualification"
+      "destinationPlannedOperationCode"
     ]);
   }
 
@@ -88,12 +88,15 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     };
   }
 
-  const bsff = await prisma.bsff.update({
+  const updatedBsff = await prisma.bsff.update({
     data,
     where: { id }
   });
+
+  await indexBsff(updatedBsff);
+
   return {
-    ...unflattenBsff(bsff),
+    ...unflattenBsff(updatedBsff),
     ficheInterventions: [],
     bsffs: []
   };
