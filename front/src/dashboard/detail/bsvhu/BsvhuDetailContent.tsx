@@ -22,7 +22,7 @@ type CompanyProps = {
 
 type Props = { form: Bsvhu };
 
-const INDENTIFICATION_TYPES_LABELS = {
+const IDENTIFICATION_TYPES_LABELS = {
   NUMERO_ORDRE_REGISTRE_POLICE:
     "N° d'ordre tels qu'ils figurent dans le registre de police",
   NUMERO_ORDRE_LOTS_SORTANTS: "N° d'ordre des lots sortants",
@@ -133,7 +133,7 @@ function Emitter({ form }: { form: Bsvhu }) {
         <DetailRow
           value={
             identification?.type
-              ? INDENTIFICATION_TYPES_LABELS[identification.type]
+              ? IDENTIFICATION_TYPES_LABELS[identification.type]
               : null
           }
           label="Type d'identifiant"
@@ -186,10 +186,10 @@ function Transporter({ form }: { form: Bsvhu }) {
         <DetailRow
           value={
             identification?.type
-              ? INDENTIFICATION_TYPES_LABELS[identification.type]
+              ? IDENTIFICATION_TYPES_LABELS[identification.type]
               : null
           }
-          label="Type d'indentifiant"
+          label="Type d'identifiant"
         />
         <DetailRow
           value={identification?.numbers?.join(", ")}
@@ -234,10 +234,10 @@ function Destination({ form }: { form: Bsvhu }) {
         <DetailRow
           value={
             identification?.type
-              ? INDENTIFICATION_TYPES_LABELS[identification.type]
+              ? IDENTIFICATION_TYPES_LABELS[identification.type]
               : null
           }
-          label="Type d'indentifiant"
+          label="Type d'identifiant"
         />
         <DetailRow
           value={identification?.numbers?.join(", ")}
