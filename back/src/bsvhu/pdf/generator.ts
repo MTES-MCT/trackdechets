@@ -11,19 +11,19 @@ import {
   adjust
 } from "gotenberg-js-client";
 
+const { GOTENBERG_TOKEN, GOTENBERG_URL } = process.env;
+
 const toPDF = pipe(
-  gotenberg(
-    "https://trackdechetsv2131avx-gotenberg.functions.fnc.fr-par.scw.cloud"
-  ),
-  adjust({ headers: { Authorization: "Bearer TODO" } }),
+  gotenberg(GOTENBERG_URL),
   convert,
   html,
   to({
     marginTop: 0.2,
     marginBottom: 0.2,
     marginLeft: 0.2,
-    marginRight: 0.2,
+    marginRight: 0.2
   }),
+  adjust({headers: {"X-Auth-Token": GOTENBERG_TOKEN ?? ""}}),
   please
 );
 
@@ -33,7 +33,7 @@ export async function buildPdf(form: Bsvhu) {
 
   const files = {
     "index.html": htmlDocument,
-    "model.css": await getTemplateStringFile("model.css"),
+    "model.css": await getTemplateStringFile("model.css")
   };
 
   return toPDF(files);

@@ -16,17 +16,11 @@ export default async function downloadPdf(
 
   const form = await prisma.bsvhu.findUnique({ where: { id } });
 
-  try {
-    const readableStream = await buildPdf(form);
-    res.status(200);
-    res.type("pdf");
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment;filename=${form.id}.pdf`);
+  const readableStream = await buildPdf(form);
+  res.status(200);
+  res.type("pdf");
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `attachment;filename=${form.id}.pdf`);
 
-    readableStream.pipe(res);
-  } catch (err) {
-    console.log(err)
-    res.status(500);
-    res.send("Une erreur est survenue lors de la génération du PDF.");
-  }
+  readableStream.pipe(res);
 }
