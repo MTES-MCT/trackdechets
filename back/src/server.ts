@@ -21,6 +21,7 @@ import { downloadFileHandler } from "./common/file-download";
 import errorHandler from "./common/middlewares/errorHandler";
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
+import sanitizeGraphqlMiddleware from "./common/middlewares/sanitizeGraphql";
 import { redisClient } from "./common/redis";
 import { authRouter } from "./routers/auth-router";
 import { oauth2Router } from "./routers/oauth2-router";
@@ -198,6 +199,10 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+// GraphQL sanitization middleware
+app.use(sanitizeGraphqlMiddleware(graphQLPath));
+
 /**
  * Wire up ApolloServer to /
  * UI_BASE_URL is explicitly set in the origin list
