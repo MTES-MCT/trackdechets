@@ -77,7 +77,7 @@ export default function PublishBsvhu({ form, siret }: WorkflowActionProps) {
             <>
               <NotificationError className="action-error" apolloError={error} />
               <Link
-                to={generatePath(routes.dashboard.bsdasris.edit, {
+                to={generatePath(routes.dashboard.bsvhus.edit, {
                   siret,
                   id: form.id,
                 })}
