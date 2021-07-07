@@ -4,7 +4,7 @@ describe("sanitizeGraphqlMiddleware", () => {
   const callMiddleware = body => {
     const middleware = sanitizeGraphql("/");
     const req: any = { path: "/", body };
-    middleware(req, null, () => {});
+    middleware(req, null, () => null);
   };
 
   it("should not modify valid variables", async () => {
