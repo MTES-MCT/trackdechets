@@ -1159,13 +1159,13 @@ export type BsffConnection = {
 export type BsffDestination = {
   __typename?: "BsffDestination";
   /** Entreprise réceptionant le déchet. */
-  company: FormCompany;
+  company?: Maybe<FormCompany>;
   /** Déclaration de réception du déchet. */
   reception?: Maybe<BsffReception>;
   /** Déclaration de traitement du déchet. */
   operation?: Maybe<BsffOperation>;
   /** Opération de traitement prévu initialement. */
-  plannedOperation: BsffPlannedOperation;
+  plannedOperation?: Maybe<BsffPlannedOperation>;
   /** Numéro CAP. */
   cap?: Maybe<Scalars["String"]>;
 };
@@ -1218,13 +1218,13 @@ export type BsffEmission = {
 export type BsffEmitter = {
   __typename?: "BsffEmitter";
   /** Entreprise émettant le déchet. */
-  company: FormCompany;
+  company?: Maybe<FormCompany>;
   /** Déclaration de l'émetteur lors de l'enlèvement par le transporteur. */
   emission?: Maybe<BsffEmission>;
 };
 
 export type BsffEmitterInput = {
-  company: CompanyInput;
+  company?: Maybe<CompanyInput>;
 };
 
 export type BsffFicheIntervention = {
@@ -1382,7 +1382,7 @@ export type BsffTransport = {
 export type BsffTransporter = {
   __typename?: "BsffTransporter";
   /** Entreprise responsable du transport du déchet. */
-  company: FormCompany;
+  company?: Maybe<FormCompany>;
   /** Récépissé du transporteur, à moins d'être exempté. */
   recepisse?: Maybe<BsffTransporterRecepisse>;
   /** Déclaration du transporteur lors de l'enlèvement auprès de l'émetteur. */
@@ -1390,7 +1390,7 @@ export type BsffTransporter = {
 };
 
 export type BsffTransporterInput = {
-  company: CompanyInput;
+  company?: Maybe<CompanyInput>;
   recepisse?: Maybe<BsffTransporterRecepisseInput>;
   transport?: Maybe<BsffTransporterTransportInput>;
 };

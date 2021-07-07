@@ -1142,13 +1142,13 @@ export type BsffConnection = {
 export type BsffDestination = {
   __typename?: "BsffDestination";
   /** Entreprise réceptionant le déchet. */
-  company: FormCompany;
+  company?: Maybe<FormCompany>;
   /** Déclaration de réception du déchet. */
   reception?: Maybe<BsffReception>;
   /** Déclaration de traitement du déchet. */
   operation?: Maybe<BsffOperation>;
   /** Opération de traitement prévu initialement. */
-  plannedOperation: BsffPlannedOperation;
+  plannedOperation?: Maybe<BsffPlannedOperation>;
   /** Numéro CAP. */
   cap?: Maybe<Scalars["String"]>;
 };
@@ -1201,13 +1201,13 @@ export type BsffEmission = {
 export type BsffEmitter = {
   __typename?: "BsffEmitter";
   /** Entreprise émettant le déchet. */
-  company: FormCompany;
+  company?: Maybe<FormCompany>;
   /** Déclaration de l'émetteur lors de l'enlèvement par le transporteur. */
   emission?: Maybe<BsffEmission>;
 };
 
 export type BsffEmitterInput = {
-  company: CompanyInput;
+  company?: Maybe<CompanyInput>;
 };
 
 export type BsffFicheIntervention = {
@@ -1357,7 +1357,7 @@ export type BsffTransport = {
 export type BsffTransporter = {
   __typename?: "BsffTransporter";
   /** Entreprise responsable du transport du déchet. */
-  company: FormCompany;
+  company?: Maybe<FormCompany>;
   /** Récépissé du transporteur, à moins d'être exempté. */
   recepisse?: Maybe<BsffTransporterRecepisse>;
   /** Déclaration du transporteur lors de l'enlèvement auprès de l'émetteur. */
@@ -1365,7 +1365,7 @@ export type BsffTransporter = {
 };
 
 export type BsffTransporterInput = {
-  company: CompanyInput;
+  company?: Maybe<CompanyInput>;
   recepisse?: Maybe<BsffTransporterRecepisseInput>;
   transport?: Maybe<BsffTransporterTransportInput>;
 };
@@ -6402,7 +6402,11 @@ export type BsffDestinationResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsffDestination"] = ResolversParentTypes["BsffDestination"]
 > = {
-  company?: Resolver<ResolversTypes["FormCompany"], ParentType, ContextType>;
+  company?: Resolver<
+    Maybe<ResolversTypes["FormCompany"]>,
+    ParentType,
+    ContextType
+  >;
   reception?: Resolver<
     Maybe<ResolversTypes["BsffReception"]>,
     ParentType,
@@ -6414,7 +6418,7 @@ export type BsffDestinationResolvers<
     ContextType
   >;
   plannedOperation?: Resolver<
-    ResolversTypes["BsffPlannedOperation"],
+    Maybe<ResolversTypes["BsffPlannedOperation"]>,
     ParentType,
     ContextType
   >;
@@ -6455,7 +6459,11 @@ export type BsffEmitterResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsffEmitter"] = ResolversParentTypes["BsffEmitter"]
 > = {
-  company?: Resolver<ResolversTypes["FormCompany"], ParentType, ContextType>;
+  company?: Resolver<
+    Maybe<ResolversTypes["FormCompany"]>,
+    ParentType,
+    ContextType
+  >;
   emission?: Resolver<
     Maybe<ResolversTypes["BsffEmission"]>,
     ParentType,
@@ -6586,7 +6594,11 @@ export type BsffTransporterResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsffTransporter"] = ResolversParentTypes["BsffTransporter"]
 > = {
-  company?: Resolver<ResolversTypes["FormCompany"], ParentType, ContextType>;
+  company?: Resolver<
+    Maybe<ResolversTypes["FormCompany"]>,
+    ParentType,
+    ContextType
+  >;
   recepisse?: Resolver<
     Maybe<ResolversTypes["BsffTransporterRecepisse"]>,
     ParentType,
@@ -10232,10 +10244,10 @@ export function createBsffDestinationMock(
 ): BsffDestination {
   return {
     __typename: "BsffDestination",
-    company: createFormCompanyMock({}),
+    company: null,
     reception: null,
     operation: null,
-    plannedOperation: createBsffPlannedOperationMock({}),
+    plannedOperation: null,
     cap: null,
     ...props
   };
@@ -10327,7 +10339,7 @@ export function createBsffEmitterMock(
 ): BsffEmitter {
   return {
     __typename: "BsffEmitter",
-    company: createFormCompanyMock({}),
+    company: null,
     emission: null,
     ...props
   };
@@ -10337,7 +10349,7 @@ export function createBsffEmitterInputMock(
   props: Partial<BsffEmitterInput>
 ): BsffEmitterInput {
   return {
-    company: createCompanyInputMock({}),
+    company: null,
     ...props
   };
 }
@@ -10516,7 +10528,7 @@ export function createBsffTransporterMock(
 ): BsffTransporter {
   return {
     __typename: "BsffTransporter",
-    company: createFormCompanyMock({}),
+    company: null,
     recepisse: null,
     transport: null,
     ...props
@@ -10527,7 +10539,7 @@ export function createBsffTransporterInputMock(
   props: Partial<BsffTransporterInput>
 ): BsffTransporterInput {
   return {
-    company: createCompanyInputMock({}),
+    company: null,
     recepisse: null,
     transport: null,
     ...props

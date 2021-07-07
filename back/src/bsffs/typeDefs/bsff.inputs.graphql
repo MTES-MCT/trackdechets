@@ -50,7 +50,7 @@ input BsffInput {
 }
 
 input BsffEmitterInput {
-  company: CompanyInput!
+  company: CompanyInput
 }
 
 input BsffPackagingInput {
@@ -74,7 +74,7 @@ input BsffQuantityInput {
 }
 
 input BsffTransporterInput {
-  company: CompanyInput!
+  company: CompanyInput
   recepisse: BsffTransporterRecepisseInput
   transport: BsffTransporterTransportInput
 }

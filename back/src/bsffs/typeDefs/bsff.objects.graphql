@@ -60,7 +60,7 @@ type Bsff {
 
 type BsffEmitter {
   "Entreprise émettant le déchet."
-  company: FormCompany!
+  company: FormCompany
   "Déclaration de l'émetteur lors de l'enlèvement par le transporteur."
   emission: BsffEmission
 }
@@ -96,7 +96,7 @@ type BsffQuantity {
 
 type BsffTransporter {
   "Entreprise responsable du transport du déchet."
-  company: FormCompany!
+  company: FormCompany
   "Récépissé du transporteur, à moins d'être exempté."
   recepisse: BsffTransporterRecepisse
   "Déclaration du transporteur lors de l'enlèvement auprès de l'émetteur."
@@ -119,13 +119,13 @@ type BsffTransport {
 
 type BsffDestination {
   "Entreprise réceptionant le déchet."
-  company: FormCompany!
+  company: FormCompany
   "Déclaration de réception du déchet."
   reception: BsffReception
   "Déclaration de traitement du déchet."
   operation: BsffOperation
   "Opération de traitement prévu initialement."
-  plannedOperation: BsffPlannedOperation!
+  plannedOperation: BsffPlannedOperation
   "Numéro CAP."
   cap: String
 }
