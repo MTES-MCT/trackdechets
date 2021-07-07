@@ -1,16 +1,16 @@
-/* eslint @typescript-eslint/no-var-requires: "off" */
-const { createFormTempStorage: createForm } = require("../steps/createForm");
-const { markAsSealed } = require("../steps/markAsSealed");
-const {
+import { createFormTempStorage } from "../steps/createForm";
+import { markAsSealed } from "../steps/markAsSealed";
+import {
   signedByTransporter,
   signedByTransporterAfterTempStorage
-} = require("../steps/signedByTransporter");
-const { markAsTempStored } = require("../steps/markAsTempStored");
-const { markAsResealed } = require("../steps/markAsResealed");
-const { markAsReceived } = require("../steps/markAsReceived");
-const { markAsProcessed } = require("../steps/markAsProcessed");
+} from "../steps/signedByTransporter";
+import { markAsTempStored } from "../steps/markAsTempStored";
+import { markAsResealed } from "../steps/markAsResealed";
+import { markAsReceived } from "../steps/markAsReceived";
+import { markAsProcessed } from "../steps/markAsProcessed";
+import { Workflow } from "../../../common/workflow";
 
-module.exports = {
+const workflow: Workflow = {
   title: "Entreposage provisoire",
   description: `Les informations principales du BSDD sont remplies par l'émetteur du bordereau
 en précisant isTempStorage=true dans les informations de destination. Le destinataire correspond à
@@ -28,7 +28,7 @@ le traitement.`,
     { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
   ],
   steps: [
-    createForm("producteur"),
+    createFormTempStorage("producteur"),
     markAsSealed("producteur"),
     signedByTransporter("transporteur1"),
     markAsTempStored("ttr"),
@@ -56,3 +56,5 @@ E --> |signedByTransporter| F(RESENT)
 F --> |markAsReceived| G(RECEIVED)
 G --> |markAsProcessed| H(PROCESSED)`
 };
+
+export default workflow;

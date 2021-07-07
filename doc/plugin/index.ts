@@ -1,9 +1,8 @@
-import path from "path";
 import { Plugin } from "@docusaurus/types";
+import bsdWorkflows from "../../back/src/forms/examples/workflows";
 
 // parse workflow definition files
-function loadWorkflow(path: string) {
-  const workflow = require(path);
+function parseWorkflow(workflow) {
   return {
     title: workflow.title,
     description: workflow.description,
@@ -23,35 +22,26 @@ export default function plugin(): Plugin<any> {
     async loadContent() {
       return {
         bsdd: {
-          acheminementDirect: loadWorkflow(
-            path.join(backSrc, "forms/examples/workflows/acheminementDirect.js")
+          acheminementDirect: parseWorkflow(bsdWorkflows.acheminementDirect),
+          multiModal: parseWorkflow(bsdWorkflows.multiModal),
+          entreposageProvisoire: parseWorkflow(
+            bsdWorkflows.entreposageProvisoire
           ),
-          multiModal: loadWorkflow(
-            path.join(backSrc, "forms/examples/workflows/multiModal.js")
-          ),
-          entreposageProvisoire: loadWorkflow(
-            path.join(
-              backSrc,
-              "forms/examples/workflows/entreposageProvisoire.js"
-            )
-          ),
-          importBsdPapier: loadWorkflow(
-            path.join(backSrc, "forms/examples/workflows/importBsdPapier.js")
-          ),
+          importBsdPapier: parseWorkflow(bsdWorkflows.importBsdPapier),
         },
-        bsdasri: {
-          acheminementDirect: loadWorkflow(
-            path.join(
-              backSrc,
-              "dasris/examples/workflows/acheminementDirect.js"
-            )
-          ),
-        },
-        bsvhu: {
-          vhuVersBroyeur: loadWorkflow(
-            path.join(backSrc, "vhu/examples/workflows/vhuVersBroyeur.js")
-          ),
-        },
+        // bsdasri: {
+        //   acheminementDirect: loadWorkflow(
+        //     path.join(
+        //       backSrc,
+        //       "dasris/examples/workflows/acheminementDirect.js"
+        //     )
+        //   ),
+        // },
+        // bsvhu: {
+        //   vhuVersBroyeur: loadWorkflow(
+        //     path.join(backSrc, "vhu/examples/workflows/vhuVersBroyeur.js")
+        //   ),
+        // },
       };
     },
     // make workflows data available to components through the `useGlobalData` hook

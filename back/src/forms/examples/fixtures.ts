@@ -2,47 +2,53 @@
  * Fixtures used as building blocks of mutations inputs
  */
 
-import { WorkSite } from "../../generated/graphql/types";
+function emitterCompanyInput(siret: string) {
+  return {
+    siret,
+    name: "Déchets & Co",
+    address: "1 rue de paradis, 75010 PARIS",
+    contact: "Jean Dupont",
+    phone: "01 00 00 00 00",
+    mail: "jean.dupont@dechets.org"
+  };
+}
 
-const emitterCompanyInput = siret => ({
-  siret,
-  name: "Déchets & Co",
-  address: "1 rue de paradis, 75010 PARIS",
-  contact: "Jean Dupont",
-  phone: "01 00 00 00 00",
-  mail: "jean.dupont@dechets.org"
-});
-
-const workSiteInput: WorkSite = {
+const workSiteInput = {
   address: "5 rue du chantier",
   postalCode: "75010",
   city: "Paris",
   infos: "Site de stockage de boues"
 };
 
-const emitterInput = siret => ({
-  type: "PRODUCER",
-  workSite: workSiteInput,
-  company: emitterCompanyInput(siret)
-});
+function emitterInput(siret: string) {
+  return {
+    type: "PRODUCER",
+    workSite: workSiteInput,
+    company: emitterCompanyInput(siret)
+  };
+}
 
-const transporterCompanyInput = siret => ({
-  siret,
-  name: "Transport & Co",
-  address: "1 rue des 6 chemins, 07100 ANNONAY",
-  contact: "Claire Dupuis",
-  mail: "claire.dupuis@transportco.fr",
-  phone: "04 00 00 00 00"
-});
+function transporterCompanyInput(siret: string) {
+  return {
+    siret,
+    name: "Transport & Co",
+    address: "1 rue des 6 chemins, 07100 ANNONAY",
+    contact: "Claire Dupuis",
+    mail: "claire.dupuis@transportco.fr",
+    phone: "04 00 00 00 00"
+  };
+}
 
-const transporter2CompanyInput = siret => ({
-  siret,
-  name: "Fret & Co",
-  address: "1 rue de la gare, 07100 ANNONAY",
-  contact: "Jean Le Cheminot",
-  mail: "jean.lecheminot@fretco.fr",
-  phone: "04 00 00 00 00"
-});
+function transporter2CompanyInput(siret: string) {
+  return {
+    siret,
+    name: "Fret & Co",
+    address: "1 rue de la gare, 07100 ANNONAY",
+    contact: "Jean Le Cheminot",
+    mail: "jean.lecheminot@fretco.fr",
+    phone: "04 00 00 00 00"
+  };
+}
 
 const receiptInput = {
   receipt: "12379",
@@ -51,41 +57,51 @@ const receiptInput = {
   numberPlate: "AD-007-TS"
 };
 
-const transporterInput = siret => ({
-  company: transporterCompanyInput(siret),
-  ...receiptInput
-});
+function transporterInput(siret: string) {
+  return {
+    company: transporterCompanyInput(siret),
+    ...receiptInput
+  };
+}
 
-const traiteurCompanyInput = siret => ({
-  siret,
-  name: "Traiteur & Co",
-  address: "1 avenue de l'incinérateur 67100 Strasbourg",
-  contact: "Thomas Largeron",
-  phone: "03 00 00 00 00",
-  mail: "thomas.largeron@incinerateur.fr"
-});
+function traiteurCompanyInput(siret: string) {
+  return {
+    siret,
+    name: "Traiteur & Co",
+    address: "1 avenue de l'incinérateur 67100 Strasbourg",
+    contact: "Thomas Largeron",
+    phone: "03 00 00 00 00",
+    mail: "thomas.largeron@incinerateur.fr"
+  };
+}
 
-const ttrCompanyInput = siret => ({
-  siret,
-  name: "Entreposage & Co",
-  address: "1 rue du stock 68100 Mulhouse",
-  contact: "Antoine Quistock",
-  phone: "03 00 00 00 00",
-  mail: "antoine.quistock@entreposage.fr"
-});
+function ttrCompanyInput(siret: string) {
+  return {
+    siret,
+    name: "Entreposage & Co",
+    address: "1 rue du stock 68100 Mulhouse",
+    contact: "Antoine Quistock",
+    phone: "03 00 00 00 00",
+    mail: "antoine.quistock@entreposage.fr"
+  };
+}
 
-const recipientInput = siret => ({
-  processingOperation: "D 10",
-  cap: "CAP",
-  company: traiteurCompanyInput(siret)
-});
+function recipientInput(siret: string) {
+  return {
+    processingOperation: "D 10",
+    cap: "CAP",
+    company: traiteurCompanyInput(siret)
+  };
+}
 
-const recipientIsTempStorageInput = siret => ({
-  processingOperation: "D 13",
-  cap: "CAP",
-  company: ttrCompanyInput(siret),
-  isTempStorage: true
-});
+function recipientIsTempStorageInput(siret: string) {
+  return {
+    processingOperation: "D 13",
+    cap: "CAP",
+    company: ttrCompanyInput(siret),
+    isTempStorage: true
+  };
+}
 
 const wasteDetailsInput = {
   code: "06 05 02*",
@@ -97,15 +113,17 @@ const wasteDetailsInput = {
   consistence: "LIQUID"
 };
 
-const signingInfoInput = securityCode => ({
-  sentAt: "2020-04-03T14:48:00",
-  sentBy: "Isabelle Guichard",
-  onuCode: "non soumis",
-  quantity: 1,
-  signedByTransporter: true,
-  signedByProducer: true,
-  securityCode
-});
+function signingInfoInput(securityCode: number) {
+  return {
+    sentAt: "2020-04-03T14:48:00",
+    sentBy: "Isabelle Guichard",
+    onuCode: "non soumis",
+    quantity: 1,
+    signedByTransporter: true,
+    signedByProducer: true,
+    securityCode
+  };
+}
 
 const receivedInfoInput = {
   wasteAcceptationStatus: "ACCEPTED",
@@ -131,17 +149,21 @@ const tempStoredInfosInput = {
   quantityType: "REAL"
 };
 
-const resealedInfosInput = siret => ({
-  transporter: transporterInput(siret)
-});
+function resealedInfosInput(siret: string) {
+  return {
+    transporter: transporterInput(siret)
+  };
+}
 
-const nextSegmentInfoInput = siret => ({
-  transporter: {
-    company: transporter2CompanyInput(siret),
-    ...receiptInput
-  },
-  mode: "RAIL"
-});
+function nextSegmentInfoInput(siret: string) {
+  return {
+    transporter: {
+      company: transporter2CompanyInput(siret),
+      ...receiptInput
+    },
+    mode: "RAIL"
+  };
+}
 
 const takeOverInfoInput = {
   takenOverAt: "2020-04-04T09:00:00.000Z",

@@ -1,16 +1,14 @@
-/* eslint @typescript-eslint/no-var-requires: "off" */
-const { createFormMultiModal } = require("../steps/createForm");
-const { markAsSealed } = require("../steps/markAsSealed");
-const {
-  markSegmentAsReadyToTakeOver
-} = require("../steps/markSegmentAsReadyToTakeOver");
-const { prepareSegment } = require("../steps/prepareSegment");
-const { takeOverSegment } = require("../steps/takeOverSegment");
-const { signedByTransporter } = require("../steps/signedByTransporter");
-const { markAsReceived } = require("../steps/markAsReceived");
-const { markAsProcessed } = require("../steps/markAsProcessed");
+import { createFormMultiModal } from "../steps/createForm";
+import { markAsSealed } from "../steps/markAsSealed";
+import { markSegmentAsReadyToTakeOver } from "../steps/markSegmentAsReadyToTakeOver";
+import { prepareSegment } from "../steps/prepareSegment";
+import { takeOverSegment } from "../steps/takeOverSegment";
+import { signedByTransporter } from "../steps/signedByTransporter";
+import { markAsReceived } from "../steps/markAsReceived";
+import { markAsProcessed } from "../steps/markAsProcessed";
+import { Workflow } from "../../../common/workflow";
 
-module.exports = {
+const workflow: Workflow = {
   title: "Transport multi-modal",
   description: `Lors d'un transport multimodal simple, un bordereau est transmis
 sans scission ni regroupement d'un transporteur à un autre, du producteur jusqu'à
@@ -52,3 +50,5 @@ C4 -->|takeOverSegment| C5(SENT)
 C5 --> |markAsReceived| D(ACCEPTED)
 D --> |markAsProcessed| E(PROCESSED)`
 };
+
+export default workflow;

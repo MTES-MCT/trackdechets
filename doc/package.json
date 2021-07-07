@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "prebuild": "yarn workflow && yarn docs",
-    "prestart": "yarn workflow && yarn docs",
+    "prebuild": "yarn build-workflow-plugin && yarn docs",
+    "prestart": "yarn build-workflow-plugin && yarn docs",
     "start": "docusaurus start",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
@@ -21,7 +21,8 @@
     "docs:bsff": "docusaurus docs:generate:graphql:bsff",
     "docs:bsda": "docusaurus docs:generate:graphql:bsda",
     "docs:bsvhu": "docusaurus docs:generate:graphql:bsvhu",
-    "workflow": "tsc plugin/index.ts --outfile plugin/build/index.js"
+    "build-workflow-plugin": "tsc --project plugin/tsconfig.json && copyfiles -u 1 ../back/src/**/*.gql plugin/build"
+
   },
   "dependencies": {
     "@docusaurus/core": "2.0.0-beta.3",
@@ -54,6 +55,7 @@
     "@docusaurus/types": "^2.0.0-beta.3",
     "@tsconfig/docusaurus": "^1.0.2",
     "@types/react": "^17.0.13",
+    "copyfiles": "^2.4.1",
     "typescript": "^4.3.5"
   }
 }

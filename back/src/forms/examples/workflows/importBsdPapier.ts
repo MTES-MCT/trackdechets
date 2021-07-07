@@ -1,9 +1,9 @@
-/* eslint @typescript-eslint/no-var-requires: "off" */
-const { createForm } = require("../steps/createForm");
-const { markAsSealed } = require("../steps/markAsSealed");
-const { importPaperForm } = require("../steps/importPaperForm");
+import { createForm } from "../steps/createForm";
+import { markAsSealed } from "../steps/markAsSealed";
+import { importPaperForm } from "../steps/importPaperForm";
+import { Workflow } from "../../../common/workflow";
 
-module.exports = {
+const workflow: Workflow = {
   title: `Acheminement direct du producteur à l'installation de traitement avec import de BSD signé papier.`,
   description: `Le bordereau est préparé initialement dans Trackdéchets puis imprimé
 au moment de l'enlèvement par le transporteur. Le BSD papier accompagne
@@ -31,3 +31,5 @@ AO(NO STATE) -->|createForm| A
 A(DRAFT) -->|markAsSealed| B(SEALED)
 B -->|importPaperForm| C(PROCESSED)`
 };
+
+export default workflow;

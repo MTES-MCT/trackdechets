@@ -1,11 +1,11 @@
-/* eslint @typescript-eslint/no-var-requires: "off" */
-const fixtures = require("../fixtures");
-const { markAsResealed } = require("../mutations");
+import mutations from "../mutations";
+import fixtures from "../fixtures";
+import { WorkflowStep } from "../../../common/workflow";
 
-module.exports = {
-  markAsResealed: company => ({
+export function markAsResealed(company: string): WorkflowStep {
+  return {
     description: `Complète et valide les cadres 13 à 19`,
-    mutation: markAsResealed,
+    mutation: mutations.markAsResealed,
     variables: ({ bsd, transporteur2 }) => ({
       id: bsd.id,
       resealedInfos: fixtures.resealedInfosInput(transporteur2.siret)
@@ -14,5 +14,5 @@ module.exports = {
     data: response => response.markAsResealed,
     company,
     setContext: (ctx, data) => ({ ...ctx, bsd: data })
-  })
-};
+  };
+}

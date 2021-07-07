@@ -153,6 +153,6 @@ module.exports = {
       },
     ],
     // plugin used to make workflows examples available with `usePluginData`
-    path.join(__dirname, "plugin", "build", "index.js"),
+    path.join(__dirname, "plugin", "build", "doc", "plugin", "index.js"),
   ],
 };

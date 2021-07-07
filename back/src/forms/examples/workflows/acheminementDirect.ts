@@ -1,20 +1,11 @@
 import { Workflow } from "../../../common/workflow";
+import { createForm } from "../steps/createForm";
+import { markAsSealed } from "../steps/markAsSealed";
+import { signedByTransporter } from "../steps/signedByTransporter";
+import { markAsReceived } from "../steps/markAsReceived";
+import { markAsProcessed } from "../steps/markAsProcessed";
 
-/* eslint @typescript-eslint/no-var-requires: "off" */
-const { createForm } = require("../steps/createForm");
-const { markAsSealed } = require("../steps/markAsSealed");
-const { signedByTransporter } = require("../steps/signedByTransporter");
-const { markAsReceived } = require("../steps/markAsReceived");
-const { markAsProcessed } = require("../steps/markAsProcessed");
-
-type Context = {
-  producteur: { siret: string; securityCode: number };
-  transporteur: { siret: string };
-  traiteur: { siret: string };
-  bsd: { id: string };
-};
-
-const workflow: Workflow<Context> = {
+const workflow: Workflow = {
   title: "Acheminement direct du producteur à l'installation de traitement",
   description: `Les informations du BSDD sont remplies par le producteur du déchet.
 La signature de l'envoi se déroule sur le terminal du transporteur grâce au

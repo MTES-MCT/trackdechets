@@ -1,12 +1,12 @@
-/* eslint @typescript-eslint/no-var-requires: "off" */
-const { markAsProcessed } = require("../mutations");
-const fixtures = require("../fixtures");
+import { WorkflowStep } from "../../../common/workflow";
+import mutations from "../mutations";
+import fixtures from "../fixtures";
 
-module.exports = {
-  markAsProcessed: company => ({
+export function markAsProcessed(company: string): WorkflowStep {
+  return {
     description: `L'opération d'élimination / valorisation est effectuée
-    par l'installation de destination prévue`,
-    mutation: markAsProcessed,
+      par l'installation de destination prévue`,
+    mutation: mutations.markAsProcessed,
     variables: ({ bsd }) => ({
       id: bsd.id,
       processedInfo: fixtures.processedInfoInput
@@ -15,5 +15,5 @@ module.exports = {
     data: response => response.markAsProcessed,
     company,
     setContext: (ctx, data) => ({ ...ctx, bsd: data })
-  })
-};
+  };
+}

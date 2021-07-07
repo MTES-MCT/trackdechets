@@ -1,19 +1,18 @@
-export type Step<Context, MutationArgs, R> = (
-  company: string
-) => {
+export type WorkflowStep = {
   description: string;
   mutation: string;
-  variables: (ctx: Context) => MutationArgs;
+  variables: (ctx: any) => any;
   expected: any;
   company: string;
-  setContext: (ctx: Context, data: R) => Context;
+  data: (response: any) => any;
+  setContext?: (ctx: Context, data: any) => Context;
 };
 
-export type Workflow<Context> = {
+export type Workflow = {
   title: string;
   description?: string;
   companies: { name: string; companyTypes: string[] }[];
-  steps: Step<Context>[];
-  docContext: Context;
+  steps: WorkflowStep[];
+  docContext: any;
   chart?: string;
 };
