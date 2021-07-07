@@ -1,7 +1,7 @@
 import { Bsda } from "@prisma/client";
 import { isObject, objectDiff } from "../forms/workflow/diff";
 import { BsdaInput, BsdaSignatureType } from "../generated/graphql/types";
-import { SealedFieldsError } from "../vhu/errors";
+import { SealedFieldsError } from "../bsvhu/errors";
 import { expandBsdaFromDb } from "./converter";
 
 const signatureToFieldMapping: { [key in BsdaSignatureType]: keyof Bsda } = {

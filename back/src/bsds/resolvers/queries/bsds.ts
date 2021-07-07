@@ -18,7 +18,7 @@ import {
 import prisma from "../../../prisma";
 import { expandFormFromDb } from "../../../forms/form-converter";
 import { expandBsdasriFromDb } from "../../../bsdasris/dasri-converter";
-import { expandVhuFormFromDb } from "../../../vhu/converter";
+import { expandVhuFormFromDb } from "../../../bsvhu/converter";
 import { expandBsdaFromDb } from "../../../bsda/converter";
 import { getUserCompanies } from "../../../users/database";
 import { unflattenBsff } from "../../../bsffs/converter";

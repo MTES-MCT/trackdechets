@@ -32,14 +32,14 @@ export default function FormContainer() {
                   disabled={emitterSigned}
                 />
                 <StepContainer
-                  component={Recipient}
-                  title="Destination du déchet"
-                  disabled={emitterSigned}
-                />
-                <StepContainer
                   component={Transporter}
                   title="Transporteur du déchet"
                   disabled={transporterSigned}
+                />
+                <StepContainer
+                  component={Recipient}
+                  title="Destination du déchet"
+                  disabled={emitterSigned}
                 />
               </>
             );

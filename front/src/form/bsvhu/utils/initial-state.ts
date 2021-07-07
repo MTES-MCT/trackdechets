@@ -10,7 +10,23 @@ export default {
     company: getInitialCompany(),
     agrementNumber: "",
     plannedOperationCode: "R 4",
-    operation: { nextDestination: { company: getInitialCompany() } },
+    reception: {
+      date: null,
+      acceptationStatus: null,
+      refusalReason: "",
+      quantity: {
+        number: null,
+        tons: null,
+      },
+      identification: {
+        numbers: [],
+      },
+    },
+    operation: {
+      date: null,
+      code: "",
+      nextDestination: { company: getInitialCompany() },
+    },
   },
   packaging: "UNITE",
   wasteCode: "16 01 06",

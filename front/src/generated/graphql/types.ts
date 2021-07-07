@@ -1457,9 +1457,9 @@ export type Bsvhu = {
   /** Numéro unique attribué par Trackdéchets */
   id: Scalars["ID"];
   /** Date de création */
-  createdAt: Scalars["DateTime"];
+  createdAt?: Maybe<Scalars["DateTime"]>;
   /** Date de dernière modification */
-  updatedAt: Scalars["DateTime"];
+  updatedAt?: Maybe<Scalars["DateTime"]>;
   /** Indique si le bordereau est à l'état de brouillon */
   isDraft: Scalars["Boolean"];
   /** Status du bordereau */

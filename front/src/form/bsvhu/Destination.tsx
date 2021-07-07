@@ -1,25 +1,31 @@
+import React, { useEffect } from "react";
+import { Field, useFormikContext } from "formik";
 import { RedErrorMessage } from "common/components";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
-import { Field, useFormikContext } from "formik";
-import React from "react";
+import Operation from "./Operation";
 import { Bsvhu } from "generated/graphql/types";
 
 export default function Destination({ disabled }) {
   const { setFieldValue, values } = useFormikContext<Bsvhu>();
 
   const isDangerousWasteCode = values.wasteCode === "16 01 04*";
-  if (isDangerousWasteCode) {
-    setFieldValue("destination.type", "DEMOLISSEUR");
-  }
+  useEffect(() => {
+    if (isDangerousWasteCode) {
+      setFieldValue("destination.type", "DEMOLISSEUR");
+    }
+  }, [isDangerousWasteCode]);
 
   return (
     <>
       {disabled && (
-        <div className="notification notification--error">
-          Les champs ci-dessous ont été scellés via signature et ne sont plus
-          modifiables.
-        </div>
+        <>
+          <Operation />
+          <div className="notification notification--error">
+            Les champs ci-dessous ont été scellés via signature et ne sont plus
+            modifiables.
+          </div>
+        </>
       )}
       <div className="form__row">
         {isDangerousWasteCode && (

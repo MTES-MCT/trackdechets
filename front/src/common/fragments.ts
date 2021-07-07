@@ -453,28 +453,15 @@ export const vhuFragment = gql`
     id
     bsvhuStatus: status
     isDraft
-    destination {
-      company {
-        name
-        siret
-      }
-    }
     emitter {
       agrementNumber
       company {
-        name
-        siret
+        ...CompanyFragment
       }
     }
     transporter {
       company {
-        siret
-        name
-        address
-        contact
-        mail
-        phone
-        vatNumber
+        ...CompanyFragment
       }
       recepisse {
         number
@@ -483,13 +470,7 @@ export const vhuFragment = gql`
     destination {
       type
       company {
-        siret
-        name
-        address
-        contact
-        mail
-        phone
-        vatNumber
+        ...CompanyFragment
       }
       reception {
         date
@@ -505,7 +486,6 @@ export const vhuFragment = gql`
         code
       }
     }
-
     wasteCode
     packaging
     quantity {
@@ -513,4 +493,5 @@ export const vhuFragment = gql`
       tons
     }
   }
+  ${companyFragment}
 `;
