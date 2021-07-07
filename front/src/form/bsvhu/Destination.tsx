@@ -14,7 +14,7 @@ export default function Destination({ disabled }) {
     if (isDangerousWasteCode) {
       setFieldValue("destination.type", "DEMOLISSEUR");
     }
-  }, [isDangerousWasteCode]);
+  }, [isDangerousWasteCode, setFieldValue]);
 
   return (
     <>
