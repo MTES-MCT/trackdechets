@@ -2,6 +2,8 @@
  * Fixtures used as building blocks of mutations inputs
  */
 
+import { WorkSite } from "../../generated/graphql/types";
+
 const emitterCompanyInput = siret => ({
   siret,
   name: "Déchets & Co",
@@ -11,7 +13,7 @@ const emitterCompanyInput = siret => ({
   mail: "jean.dupont@dechets.org"
 });
 
-const workSiteInput = {
+const workSiteInput: WorkSite = {
   address: "5 rue du chantier",
   postalCode: "75010",
   city: "Paris",
@@ -146,7 +148,7 @@ const takeOverInfoInput = {
   takenOverBy: "Transporteur 2"
 };
 
-module.exports = {
+export default {
   emitterCompanyInput,
   emitterInput,
   transporterCompanyInput,

@@ -1,12 +1,12 @@
 /* eslint @typescript-eslint/no-var-requires: "off" */
-const { createForm: createFormMutation } = require("../mutations");
-const fixtures = require("../fixtures");
+import mutations from "../mutations";
+import fixtures from "../fixtures";
 
-const createForm = company => ({
+const createForm: WorkflowStep = company => ({
   description: `Les informations du BSDD sont remplies. Cette action peut-être effectuée
 par n'importe quel établissement apparaissant sur le BSDD. À ce stade il est toujours possible
 d'effectuer des modifications grâce à la mutation updateForm.`,
-  mutation: createFormMutation,
+  mutation: mutations.createForm,
   variables: ({ producteur, transporteur, traiteur }) => ({
     createFormInput: {
       emitter: fixtures.emitterInput(producteur.siret),

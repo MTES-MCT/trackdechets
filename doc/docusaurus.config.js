@@ -152,6 +152,7 @@ module.exports = {
         routeBasePath: "/reference/api-reference/bsvhu",
       },
     ],
-    path.join(__dirname, "workflowDocPlugin"),
+    // plugin used to make workflows examples available with `usePluginData`
+    path.join(__dirname, "plugin", "build", "index.js"),
   ],
 };

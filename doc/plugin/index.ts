@@ -1,7 +1,8 @@
-const path = require("path");
+import path from "path";
+import { Plugin } from "@docusaurus/types";
 
 // parse workflow definition files
-function loadWorkflow(path) {
+function loadWorkflow(path: string) {
   const workflow = require(path);
   return {
     title: workflow.title,
@@ -15,8 +16,8 @@ function loadWorkflow(path) {
   };
 }
 
-module.exports = function plugin() {
-  const backSrc = "../back/src";
+export default function plugin(): Plugin<any> {
+  const backSrc = "../../../back/src";
   return {
     name: "workflow-doc-plugin",
     async loadContent() {
@@ -59,4 +60,4 @@ module.exports = function plugin() {
       setGlobalData({ workflows: content });
     },
   };
-};
+}

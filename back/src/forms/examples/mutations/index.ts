@@ -1,12 +1,11 @@
-/* eslint @typescript-eslint/no-var-requires: "off" */
-const { readFileSync } = require("fs");
-const path = require("path");
+import path from "path";
+import { readFileSync } from "fs";
 
-function loadMutation(name) {
+function loadMutation(name: string) {
   return readFileSync(path.join(__dirname, `${name}.gql`), "utf-8");
 }
 
-module.exports = {
+export default {
   createForm: loadMutation("createForm"),
   markAsSealed: loadMutation("markAsSealed"),
   signedByTransporter: loadMutation("signedByTransporter"),

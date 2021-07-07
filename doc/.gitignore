@@ -22,3 +22,5 @@ yarn-error.log*
 /typeDefs
 
 /docs/reference/api-reference/*
+
+/plugin/build
