@@ -177,6 +177,44 @@ describe("POST /login", () => {
 
     process.env = OLD_ENV;
   });
+
+  it("should authenticate with invalid password if already connected user is admin", async () => {
+    const admin = await userFactory({ isAdmin: true });
+
+    // Login as admin
+    await request
+      .post("/login")
+      .send(`email=${admin.email.toUpperCase()}`)
+      .send(`password=pass`);
+
+    // Then login as someone else (req.user is not null)
+    const user = await userFactory();
+    const login = await request
+      .post("/login")
+      .send(`email=${user.email.toUpperCase()}`)
+      .send(`password=invalidPwd`);
+
+    expect(login.header["set-cookie"]).toHaveLength(1);
+  });
+
+  it("should not authenticate with invalid password if connected user is not admin", async () => {
+    const nonAdmin = await userFactory({ isAdmin: false });
+
+    // Login as non-admin user
+    await request
+      .post("/login")
+      .send(`email=${nonAdmin.email.toUpperCase()}`)
+      .send(`password=pass`);
+
+    // Then login as someone else (req.user is not null)
+    const user = await userFactory();
+    const login = await request
+      .post("/login")
+      .send(`email=${user.email.toUpperCase()}`)
+      .send(`password=invalidPwd`);
+
+    expect(login.header["set-cookie"]).toHaveLength(1);
+  });
 });
 
 describe("POST /logout", () => {

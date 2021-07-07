@@ -4,12 +4,11 @@ import querystring from "querystring";
 import { getUIBaseURL } from "../utils";
 import { sess } from "../server";
 import nocache from "../common/middlewares/nocache";
-import { impersonationMiddleware } from "../common/middlewares/impersonation";
 
 const UI_BASE_URL = getUIBaseURL();
 
 export const authRouter = Router();
-authRouter.post("/login", impersonationMiddleware, (req, res, next) => {
+authRouter.post("/login", (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
       return next(err);
