@@ -1,5 +1,3 @@
-import { BsffPackagingType } from "../generated/graphql/types";
-
 export const OPERATION_CODES = {
   R2: "R 2",
   R12: "R 12",
@@ -15,7 +13,3 @@ export const GROUPING_CODES = [
 ];
 
 export const WASTE_CODES = ["14 06 01*"];
-
-export const PACKAGING_TYPE: Record<BsffPackagingType, BsffPackagingType> = {
-  BOUTEILLE: "BOUTEILLE"
-};

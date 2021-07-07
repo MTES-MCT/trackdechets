@@ -70,10 +70,10 @@ type BsffEmission {
 }
 
 type BsffPackaging {
+  "Dénomination du contenant."
+  name: String!
   "Numéro du contenant."
   numero: String!
-  "Type de contenant."
-  type: BsffPackagingType!
   "Poids en kilos."
   kilos: Float!
 }

@@ -7,13 +7,8 @@ import {
   BsffStatus
 } from "@prisma/client";
 import prisma from "../prisma";
-import { BsffPackaging, BsffPackagingType } from "../generated/graphql/types";
-import {
-  GROUPING_CODES,
-  OPERATION_CODES,
-  PACKAGING_TYPE,
-  WASTE_CODES
-} from "./constants";
+import { BsffPackaging } from "../generated/graphql/types";
+import { GROUPING_CODES, OPERATION_CODES, WASTE_CODES } from "./constants";
 
 export const beforeEmissionSchema: yup.SchemaOf<Pick<
   Bsff,
@@ -111,18 +106,14 @@ export const beforeTransportSchema: yup.SchemaOf<Pick<
     .nullable()
     .of<yup.SchemaOf<Omit<BsffPackaging, "__typename">>>(
       yup.object({
+        name: yup
+          .string()
+          .nullable()
+          .required("La dénomination du contenant est requise"),
         numero: yup
           .string()
           .nullable()
           .required("Le numéro identifiant du contenant est requis"),
-        type: yup
-          .mixed<BsffPackagingType>()
-          .nullable()
-          .oneOf(
-            Object.values(PACKAGING_TYPE),
-            "Le type du contenant ne fait pas partie de la liste reconnue : ${values}"
-          )
-          .required("Le type de contenant est requis"),
         kilos: yup
           .number()
           .nullable()

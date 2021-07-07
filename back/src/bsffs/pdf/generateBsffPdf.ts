@@ -28,7 +28,7 @@ function hasSamePackagings(bsff: Bsff, associatedBsff: Bsff[]): boolean {
   for (const associatedPackaging of associatedPackagings) {
     const packagingIndex = packagings.findIndex(
       packaging =>
-        packaging.type === associatedPackaging.type &&
+        packaging.name === associatedPackaging.name &&
         packaging.kilos === associatedPackaging.kilos &&
         packaging.numero === associatedPackaging.numero
     );
@@ -127,7 +127,7 @@ export async function generateBsffPdf(bsff: Bsff) {
       packagings: ((bsff.packagings ?? []) as BsffPackaging[])
         .map(
           packaging =>
-            `${packaging.type} ${packaging.numero} : ${packaging.kilos} kilo(s)`
+            `${packaging.name} ${packaging.numero} : ${packaging.kilos} kilo(s)`
         )
         .join(", "),
       ficheInterventions: [

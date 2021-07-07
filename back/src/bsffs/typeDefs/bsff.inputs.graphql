@@ -54,8 +54,11 @@ input BsffEmitterInput {
 }
 
 input BsffPackagingInput {
+  "Dénomination du contenant."
+  name: String!
+  "Numéro du contenant."
   numero: String!
-  type: BsffPackagingType!
+  "Poids en kilos."
   kilos: Float!
 }
 

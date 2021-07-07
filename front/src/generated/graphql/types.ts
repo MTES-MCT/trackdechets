@@ -1301,23 +1301,22 @@ export type BsffOperationNextDestinationInput = {
 
 export type BsffPackaging = {
   __typename?: "BsffPackaging";
+  /** Dénomination du contenant. */
+  name: Scalars["String"];
   /** Numéro du contenant. */
   numero: Scalars["String"];
-  /** Type de contenant. */
-  type: BsffPackagingType;
   /** Poids en kilos. */
   kilos: Scalars["Float"];
 };
 
 export type BsffPackagingInput = {
+  /** Dénomination du contenant. */
+  name: Scalars["String"];
+  /** Numéro du contenant. */
   numero: Scalars["String"];
-  type: BsffPackagingType;
+  /** Poids en kilos. */
   kilos: Scalars["Float"];
 };
-
-export enum BsffPackagingType {
-  Bouteille = "BOUTEILLE"
-}
 
 export type BsffPlannedOperation = {
   __typename?: "BsffPlannedOperation";

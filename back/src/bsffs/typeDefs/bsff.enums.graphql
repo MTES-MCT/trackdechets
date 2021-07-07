@@ -13,10 +13,6 @@ enum BsffStatus {
   REFUSED
 }
 
-enum BsffPackagingType {
-  BOUTEILLE
-}
-
 "Liste des codes de traitement possible."
 enum BsffOperationCode {
   R2

@@ -1278,21 +1278,22 @@ export type BsffOperationNextDestinationInput = {
 
 export type BsffPackaging = {
   __typename?: "BsffPackaging";
+  /** Dénomination du contenant. */
+  name: Scalars["String"];
   /** Numéro du contenant. */
   numero: Scalars["String"];
-  /** Type de contenant. */
-  type: BsffPackagingType;
   /** Poids en kilos. */
   kilos: Scalars["Float"];
 };
 
 export type BsffPackagingInput = {
+  /** Dénomination du contenant. */
+  name: Scalars["String"];
+  /** Numéro du contenant. */
   numero: Scalars["String"];
-  type: BsffPackagingType;
+  /** Poids en kilos. */
   kilos: Scalars["Float"];
 };
-
-export type BsffPackagingType = "BOUTEILLE";
 
 export type BsffPlannedOperation = {
   __typename?: "BsffPlannedOperation";
@@ -4968,7 +4969,6 @@ export type ResolversTypes = {
   BsffEmitter: ResolverTypeWrapper<BsffEmitter>;
   BsffEmission: ResolverTypeWrapper<BsffEmission>;
   BsffPackaging: ResolverTypeWrapper<BsffPackaging>;
-  BsffPackagingType: BsffPackagingType;
   BsffWaste: ResolverTypeWrapper<BsffWaste>;
   BsffQuantity: ResolverTypeWrapper<BsffQuantity>;
   BsffTransporter: ResolverTypeWrapper<BsffTransporter>;
@@ -6527,8 +6527,8 @@ export type BsffPackagingResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsffPackaging"] = ResolversParentTypes["BsffPackaging"]
 > = {
+  name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   numero?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-  type?: Resolver<ResolversTypes["BsffPackagingType"], ParentType, ContextType>;
   kilos?: Resolver<ResolversTypes["Float"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -10438,8 +10438,8 @@ export function createBsffPackagingMock(
 ): BsffPackaging {
   return {
     __typename: "BsffPackaging",
+    name: "",
     numero: "",
-    type: "BOUTEILLE",
     kilos: 0,
     ...props
   };
@@ -10449,8 +10449,8 @@ export function createBsffPackagingInputMock(
   props: Partial<BsffPackagingInput>
 ): BsffPackagingInput {
   return {
+    name: "",
     numero: "",
-    type: "BOUTEILLE",
     kilos: 0,
     ...props
   };
