@@ -1,0 +1,27 @@
+type Query {
+  """
+  Renvoie des informations publiques sur un établissement
+  extrait de la base SIRENE et de la base des installations
+  classées pour la protection de l'environnement (ICPE)
+  """
+  companyInfos("SIRET de l'établissement" siret: String!): CompanyPublic!
+
+  """
+  Effectue une recherche floue sur la base SIRENE et enrichit
+  les résultats avec des informations provenant de Trackdéchets
+  """
+  searchCompanies(
+    """
+    Champ utilisé pour faire une recherche floue
+    sur la nom de l'établissement, ex: 'Boulangerie Dupont'
+    """
+    clue: String!
+    "(Optionnel) Filtre les résultats par numéro de département"
+    department: String
+  ): [CompanySearchResult!]!
+
+  """
+  Renvoie la liste des éco-organismes
+  """
+  ecoOrganismes: [EcoOrganisme!]!
+}

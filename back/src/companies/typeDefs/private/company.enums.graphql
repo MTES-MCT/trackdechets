@@ -1,0 +1,16 @@
+"Type d'établissement favoris"
+enum FavoriteType {
+  EMITTER
+  TRANSPORTER
+  RECIPIENT
+  TRADER
+  BROKER
+  NEXT_DESTINATION
+  TEMPORARY_STORAGE_DETAIL
+  DESTINATION
+}
+
+enum CompanyVerificationMode {
+  LETTER
+  MANUAL
+}

@@ -1,0 +1,12 @@
+enum OrderType {
+  ASC
+  DESC
+}
+
+enum BsdType {
+  BSDD
+  BSDASRI
+  BSVHU
+  BSDA
+  BSFF
+}

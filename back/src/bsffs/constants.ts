@@ -1,10 +1,6 @@
-import {
-  BsffOperationCode,
-  BsffOperationQualification,
-  BsffPackagingType
-} from "../generated/graphql/types";
+import { BsffPackagingType } from "../generated/graphql/types";
 
-export const OPERATION_CODES: Record<BsffOperationCode, string> = {
+export const OPERATION_CODES = {
   R2: "R 2",
   R12: "R 12",
   D10: "D 10",
@@ -12,16 +8,11 @@ export const OPERATION_CODES: Record<BsffOperationCode, string> = {
   D14: "D 14"
 };
 
-export const OPERATION_QUALIFICATIONS: Record<
-  BsffOperationQualification,
-  string
-> = {
-  INCINERATION: "INCINERATION",
-  RECONDITIONNEMENT: "RECONDITIONNEMENT",
-  RECUPERATION_REGENERATION: "RECUPERATION_REGENERATION",
-  REEXPEDITION: "REEXPEDITION",
-  REGROUPEMENT: "REGROUPEMENT"
-};
+export const GROUPING_CODES = [
+  OPERATION_CODES.R12,
+  OPERATION_CODES.D13,
+  OPERATION_CODES.D14
+];
 
 export const WASTE_CODES = ["14 06 01*"];
 

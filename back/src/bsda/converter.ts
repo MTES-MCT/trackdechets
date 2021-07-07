@@ -20,7 +20,7 @@ import {
 } from "../generated/graphql/types";
 import { Prisma, Bsda as PrismaBsda } from "@prisma/client";
 
-export function expandBsdaFormFromDb(form: PrismaBsda): GraphqlBsda {
+export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
   return {
     id: form.id,
     createdAt: form.createdAt,

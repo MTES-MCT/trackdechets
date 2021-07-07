@@ -8,6 +8,7 @@ import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 import Packagings from "./components/packagings/Packagings";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import { transportModeLabels } from "dashboard/constants";
 
 export default function Transporter({ status }) {
   const { setFieldValue } = useFormikContext();
@@ -16,6 +17,12 @@ export default function Transporter({ status }) {
   const showTransportFields = [
     BsdasriStatus.SignedByProducer,
     BsdasriStatus.Sent,
+    BsdasriStatus.Received,
+  ].includes(status);
+  // handedOverAt is editable even after dasri reception
+  const showHandedOverAtField = [
+    BsdasriStatus.Sent,
+    BsdasriStatus.Received,
   ].includes(status);
 
   const disabled = [BsdasriStatus.Sent, BsdasriStatus.Received].includes(
@@ -35,6 +42,7 @@ export default function Transporter({ status }) {
         disabled={disabled}
         name="transporter.company"
         heading="Entreprise de transport"
+        optionalMail={true}
         onCompanySelected={transporter => {
           if (transporter.transporterReceipt) {
             setFieldValue(
@@ -58,7 +66,7 @@ export default function Transporter({ status }) {
       />
       <div className="form__row">
         <label>
-          Champ libre
+          Champ libre (optionnel)
           <Field
             component="textarea"
             name="transporter.customInfo"
@@ -113,13 +121,29 @@ export default function Transporter({ status }) {
       </div>
 
       <h4 className="form__section-heading">Transport du déchet</h4>
-      <Field
-        name="transport.wasteAcceptation"
-        component={Acceptation}
-        disabled={disabled}
-      />
+
       {showTransportFields ? (
         <>
+          <div className="form__row">
+            <label>Mode de transport</label>
+            <Field
+              as="select"
+              name="transport.mode"
+              id="id_mode"
+              className="td-select"
+            >
+              {Object.entries(transportModeLabels).map(([k, v]) => (
+                <option value={`${k}`} key={k}>
+                  {v}
+                </option>
+              ))}
+            </Field>
+          </div>
+          <Field
+            name="transport.wasteAcceptation"
+            component={Acceptation}
+            disabled={disabled}
+          />
           <div className="form__row">
             <label>
               Date de prise en charge
@@ -138,14 +162,14 @@ export default function Transporter({ status }) {
             component={Packagings}
             disabled={disabled}
           />
-          <h4 className="form__section-heading">Quantité en kg</h4>
+          <h4 className="form__section-heading">Quantité transportée</h4>
 
           <div className="form__row">
             <label>
-              Quantité transportée :
+              Quantité en kg :
               <Field
                 component={NumberInput}
-                name="transport.wasteDetails.quantity"
+                name="transport.wasteDetails.quantity.value"
                 className="td-input dasri__waste-details__quantity"
                 disabled={disabled}
                 placeholder="En kg"
@@ -155,21 +179,21 @@ export default function Transporter({ status }) {
               <span className="tw-ml-2">kg</span>
             </label>
 
-            <RedErrorMessage name="transport.wasteDetails.quantity" />
+            <RedErrorMessage name="transport.wasteDetails.quantity.value" />
           </div>
 
           <div className="form__row">
             <fieldset>
               <legend className="tw-font-semibold">Cette quantité est</legend>
               <Field
-                name="transport.wasteDetails.quantityType"
+                name="transport.wasteDetails.quantity.type"
                 id="REAL"
                 label="Réélle"
                 component={RadioButton}
                 disabled={disabled}
               />
               <Field
-                name="transport.wasteDetails.quantityType"
+                name="transport.wasteDetails.quantity.type"
                 id="ESTIMATED"
                 label="Estimée"
                 component={RadioButton}
@@ -179,21 +203,31 @@ export default function Transporter({ status }) {
           </div>
         </>
       ) : (
-        <p>Cette section sera disponible quand le déchet aura été envoyé</p>
+        <p>
+          Cette section sera disponible quand le bordereau aura été signé par le
+          producteur
+        </p>
       )}
 
-      <div className="form__row">
-        <label>
-          Date de remise à l'installation destinataire
-          <div className="td-date-wrapper">
-            <Field
-              name="transport.handedOverAt"
-              component={DateInput}
-              className="td-input"
-            />
-          </div>
-        </label>
-      </div>
+      {showHandedOverAtField ? (
+        <div className="form__row">
+          <label>
+            Date de remise à l'installation destinataire (optionnel)
+            <div className="td-date-wrapper">
+              <Field
+                name="transport.handedOverAt"
+                component={DateInput}
+                className="td-input"
+              />
+            </div>
+          </label>
+        </div>
+      ) : (
+        <p className="tw-mt-2">
+          La date de remise à l'installation destinataire sera éditable après
+          l'emport du déchet
+        </p>
+      )}
     </>
   );
 }

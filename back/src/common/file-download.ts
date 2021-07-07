@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { redisClient, setInCache } from "./redis";
+import { redisClient, setInCache, SetOptions } from "./redis";
 import { randomNumber, getAPIBaseURL } from "../utils";
 
 type DownloadInfos = { type: string; params: any };
@@ -11,7 +11,7 @@ type DownloadHandler = (
 
 // TODO register downloaders on server start if code is distributed on several machines
 const fileDownloaders = {};
-function registerFileDownloader(
+export function registerFileDownloader(
   type: string,
   downloadHandler: DownloadHandler
 ) {
@@ -36,7 +36,13 @@ export async function getFileDownloadToken(
 ) {
   const token = `${type}-${new Date().getTime()}-${randomNumber(4)}`;
 
-  await setInCache(token, JSON.stringify({ type, params }), { EX: 10 });
+  const options: SetOptions = {};
+
+  if (process.env.NODE_ENV === "production") {
+    options.EX = 10;
+  }
+
+  await setInCache(token, JSON.stringify({ type, params }), options);
   registerFileDownloader(type, downloadHandler);
 
   const API_BASE_URL = getAPIBaseURL();

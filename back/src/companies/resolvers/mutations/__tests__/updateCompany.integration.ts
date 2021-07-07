@@ -16,7 +16,8 @@ const UPDATE_COMPANY = `
     $givenName: String,
     $transporterReceiptId: String,
     $traderReceiptId: String,
-    $ecoOrganismeAgreements: [URL!]
+    $ecoOrganismeAgreements: [URL!],
+    $allowBsdasriTakeOverWithoutSignature: Boolean
     ){
       updateCompany(
         siret: $siret,
@@ -28,7 +29,8 @@ const UPDATE_COMPANY = `
         givenName: $givenName,
         transporterReceiptId: $transporterReceiptId,
         traderReceiptId: $traderReceiptId,
-        ecoOrganismeAgreements: $ecoOrganismeAgreements
+        ecoOrganismeAgreements: $ecoOrganismeAgreements,
+        allowBsdasriTakeOverWithoutSignature: $allowBsdasriTakeOverWithoutSignature,
       ){
         id
       }
@@ -49,7 +51,8 @@ describe("mutation updateCompany", () => {
       contactEmail: "newContact@trackdechets.fr",
       contactPhone: "1111111111",
       givenName: "newGivenName",
-      website: "newWebsite@trackechets.fr"
+      website: "newWebsite@trackechets.fr",
+      allowBsdasriTakeOverWithoutSignature: true
     };
     const { data } = await mutate<Pick<Mutation, "updateCompany">>(
       UPDATE_COMPANY,

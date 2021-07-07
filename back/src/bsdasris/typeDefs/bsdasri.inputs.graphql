@@ -1,0 +1,203 @@
+input BsdasriCompanyWhere {
+  siret: String!
+}
+input BsdasriSignatureWhere {
+  date: DateFilter!
+}
+input BsdasriEmitterWhere {
+  company: BsdasriCompanyWhere
+  signature: BsdasriSignatureWhere
+}
+input BsdasriTransporterWhere {
+  company: BsdasriCompanyWhere
+  signature: BsdasriSignatureWhere
+}
+input BsdasriRecipientWhere {
+  company: BsdasriCompanyWhere
+  signature: BsdasriSignatureWhere
+}
+
+input BsdasriWhere {
+  "(Optionnel) Permet de récupérer uniquement les bordereaux en brouillon"
+  isDraft: Boolean
+  """
+  (Optionnel) Filtre sur le statut des bordereaux
+  Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
+  Défaut à vide.
+  """
+  status: BsdasriStatus
+
+  createdAt: DateFilter
+  updatedAt: DateFilter
+  emitter: BsdasriEmitterWhere
+  transporter: BsdasriTransporterWhere
+  recipient: BsdasriRecipientWhere
+  processingOperation: [processingOperationTypes!]
+  """
+  (Optionnel) Filtre sur l'état de regroupement des bordereaux
+  Si aucun filtre n'est passé, les bordereaux seront retournés sans filtrage supplémentaire
+  Si groupable: true, les bordereaux retournés ne sont pas déjà regroupés et ne regroupent pas d'autres bordereaux
+  Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne regroupent d'autres bordereaux
+  """
+  groupable: Boolean
+  _and: [BsdasriWhere!]
+  _or: [BsdasriWhere!]
+  _not: [BsdasriWhere!]
+}
+
+input BsdasriPackagingInfoInput {
+  "Type de conditionnement"
+  type: BsdasriPackagings!
+
+  "Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"
+  other: String
+
+  "Volume de chaque colis associé à ce conditionnement"
+  volume: Int!
+
+  "Nombre de colis associés à ce conditionnement"
+  quantity: Int!
+}
+
+input WorkSiteInput {
+  name: String
+  address: String
+  city: String
+  postalCode: String
+  infos: String
+}
+
+input BsdasriEmitterInput {
+  "Établissement émetteur"
+  type: BsdasriEmitterType
+  company: CompanyInput
+  workSite: WorkSiteInput
+  "Champ libre émetteur"
+  customInfo: String
+  onBehalfOfEcoorganisme: Boolean
+}
+
+input BsdasriQuantityInput {
+  value: Int
+  type: QuantityType
+}
+
+input BsdasriWasteDetailEmissionInput {
+  quantity: BsdasriQuantityInput
+  packagingInfos: [BsdasriPackagingInfoInput!]
+  onuCode: String
+}
+
+input BsdasriWasteDetailTransportInput {
+  quantity: BsdasriQuantityInput
+  packagingInfos: [BsdasriPackagingInfoInput!]
+}
+input BsdasriRecipientWasteDetailInput {
+  volume: Int
+  packagingInfos: [BsdasriPackagingInfoInput!]
+
+}
+input BsdasriWasteAcceptationInput {
+  status: WasteAcceptationStatusInput
+  refusalReason: String
+  refusedQuantity: Int
+}
+input BsdasriEmissionInput {
+  wasteCode: String
+  wasteDetails: BsdasriWasteDetailEmissionInput
+  handedOverAt: DateTime
+}
+input BsdasriTransportInput {
+  wasteDetails: BsdasriWasteDetailTransportInput
+  takenOverAt: DateTime
+  handedOverAt: DateTime
+  wasteAcceptation: BsdasriWasteAcceptationInput
+  mode: TransportMode
+}
+
+input BsdasriTransporterInput {
+  "Établissement collecteur - transporteur"
+  company: CompanyInput
+
+  "N° de récipissé"
+  receipt: String
+
+  "Département"
+  receiptDepartment: String
+
+  "Limite de validité du récipissé"
+  receiptValidityLimit: DateTime
+
+  "Champ libre transporteur"
+  customInfo: String
+}
+
+input BsdasriRecipientInput {
+  "Établissement émetteur"
+  company: CompanyInput
+
+  "Champ libre transporteur"
+  customInfo: String
+}
+
+input BsdasriReceptionInput {
+  wasteDetails: BsdasriRecipientWasteDetailInput
+  receivedAt: DateTime
+  wasteAcceptation: BsdasriWasteAcceptationInput
+}
+
+input BsdasriOperationInput {
+  quantity: BsdasriQuantityInput
+  processingOperation: String
+  processedAt: DateTime
+}
+
+input BsdasriInput {
+  emitter: BsdasriEmitterInput
+  emission: BsdasriEmissionInput
+  transporter: BsdasriTransporterInput
+  transport: BsdasriTransportInput
+  recipient: BsdasriRecipientInput
+  reception: BsdasriReceptionInput
+  operation: BsdasriOperationInput
+}
+
+"Payload de regroupement"
+input RegroupedBsdasriInput {
+  "Identifiant unique du bordereau"
+  id: ID
+}
+
+input BsdasriCreateInput {
+  emitter: BsdasriEmitterInput
+  emission: BsdasriEmissionInput
+  transporter: BsdasriTransporterInput
+  transport: BsdasriTransportInput
+  recipient: BsdasriRecipientInput
+  reception: BsdasriReceptionInput
+  operation: BsdasriOperationInput
+
+  regroupedBsdasris: [RegroupedBsdasriInput]
+}
+
+input BsdasriUpdateInput {
+  emitter: BsdasriEmitterInput
+  emission: BsdasriEmissionInput
+  transporter: BsdasriTransporterInput
+  transport: BsdasriTransportInput
+  recipient: BsdasriRecipientInput
+  reception: BsdasriReceptionInput
+  operation: BsdasriOperationInput
+
+  regroupedBsdasris: [RegroupedBsdasriInput]
+}
+
+input BsdasriSignatureInput {
+  type: BsdasriSignatureType!
+  author: String!
+}
+
+input BsdasriSignatureWithSecretCodeInput {
+  author: String!
+  securityCode: Int
+}

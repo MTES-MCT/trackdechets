@@ -1,0 +1,169 @@
+input BsvhuWhere {
+  "(Optionnel) Permet de récupérer uniquement les bordereaux en brouillon"
+  isDraft: Boolean
+
+  """
+  (Optionnel) Filtre sur le statut des bordereaux
+  Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
+  Défaut à vide.
+  """
+  status: BsvhuStatus
+
+  createdAt: DateFilter
+  updatedAt: DateFilter
+  emitter: BsvhuEmitterWhere
+  transporter: BsvhuTransporterWhere
+  destination: BsvhuDestinationWhere
+  _and: [BsvhuWhere!]
+  _or: [BsvhuWhere!]
+  _not: [BsvhuWhere!]
+}
+
+input BsvhuEmitterWhere {
+  company: BsvhuCompanyWhere
+  emission: BsvhuEmissionWhere
+}
+
+input BsvhuEmissionWhere {
+  signature: BsvhuSignatureWhere
+}
+
+input BsvhuTransporterWhere {
+  company: BsvhuCompanyWhere
+  transport: BsvhuTransportWhere
+}
+
+input BsvhuTransportWhere {
+  signature: BsvhuSignatureWhere
+}
+
+input BsvhuDestinationWhere {
+  company: BsvhuCompanyWhere
+  operation: BsvhuOperationWhere
+}
+
+input BsvhuOperationWhere {
+  signature: BsvhuSignatureWhere
+}
+
+input BsvhuCompanyWhere {
+  siret: String!
+}
+
+input BsvhuSignatureWhere {
+  date: DateFilter!
+}
+
+input BsvhuInput {
+  "Détails sur l'émetteur"
+  emitter: BsvhuEmitterInput
+
+  "Code déchet. Presque toujours 16 01 06"
+  wasteCode: String
+  "Conditionnement du déchet"
+  packaging: BsvhuPackaging
+  "Identification des VHUs"
+  identification: BsvhuIdentificationInput
+  "Quantité de VHUs"
+  quantity: BsvhuQuantityInput
+
+  "Détails sur la destination"
+  destination: BsvhuDestinationInput
+  "Détails sur le transporteur"
+  transporter: BsvhuTransporterInput
+}
+
+input BsvhuEmitterInput {
+  "Numéro d'agrément émetteur"
+  agrementNumber: String
+
+  "Coordonnées de l'entreprise émétrice"
+  company: CompanyInput
+}
+
+input BsvhuIdentificationInput {
+  "Numéros d'identification"
+  numbers: [String]
+  "Type de numéros d'indentification"
+  type: BsvhuIdentificationType
+}
+
+input BsvhuQuantityInput {
+  "Quantité en nombre (nombre de lots ou nombre de numéros d'ordre)"
+  number: Int
+  "Quantité en tonnes"
+  tons: Float
+}
+
+input BsvhuDestinationInput {
+  "Type de receveur: broyeur ou second centre VHU"
+  type: BsvhuDestinationType
+  "Numéro d'agrément de receveur"
+  agrementNumber: String
+  "Coordonnées de l'entreprise qui recoit les déchets"
+  company: CompanyInput
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  plannedOperationCode: String
+
+  "Informations de réception"
+  reception: BsvhuReceptionInput
+  "Informations sur l'opétation de traitement"
+  operation: BsvhuOperationInput
+}
+
+input BsvhuReceptionInput {
+  "Date de présentation sur site"
+  date: DateTime
+  "Quantité réelle reçue"
+  quantity: BsvhuQuantityInput
+  "Lot accepté oui/non"
+  acceptationStatus: WasteAcceptationStatusInput
+  "Motif de refus"
+  refusalReason: String
+  "Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)"
+  identification: BsvhuIdentificationInput
+}
+
+input BsvhuOperationInput {
+  "Date de réalisation"
+  date: DateTime
+  "Opération de traitement réalisée (R4 ou R12)"
+  code: String
+  "Broyeur de destination, à remplir uniquement lorsque la destination est lui même un centre VHU"
+  nextDestination: BsvhuNextDestinationInput
+}
+
+input BsvhuNextDestinationInput {
+  company: CompanyInput
+}
+
+input BsvhuTransporterInput {
+  "Coordonnées de l'entreprise de transport"
+  company: CompanyInput
+  "Récépissé transporteur"
+  recepisse: BsvhuRecepisseInput
+  "Informations liés au transport"
+  transport: BsvhuTransportInput
+}
+
+input BsvhuTransportInput {
+  "Date de prise en charge"
+  takenOverAt: DateTime
+}
+
+input BsvhuRecepisseInput {
+  number: String
+  department: String
+  validityLimit: DateTime
+}
+
+input BsvhuSignatureInput {
+  "Type de signature apposé"
+  type: SignatureTypeInput!
+  "Date de la signature"
+  date: DateTime
+  "Nom et prénom du signataire"
+  author: String!
+  "Code de sécurité de l'entreprise pour laquelle on signe. Permet de signer en tant que. Optionnel"
+  securityCode: Int
+}

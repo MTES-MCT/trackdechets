@@ -1,0 +1,283 @@
+"""
+Payload de création d'un récépissé transporteur
+"""
+input CreateTransporterReceiptInput {
+  """
+  Numéro de récépissé transporteur
+  """
+  receiptNumber: String!
+
+  """
+  Limite de validité du récépissé
+  """
+  validityLimit: DateTime!
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String!
+}
+
+"""
+Payload d'édition d'un récépissé transporteur
+"""
+input UpdateTransporterReceiptInput {
+  """
+  The id of the transporter receipt to modify
+  """
+  id: ID!
+
+  """
+  Numéro de récépissé transporteur
+  """
+  receiptNumber: String
+
+  """
+  Limite de validité du récépissé
+  """
+  validityLimit: DateTime
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String
+}
+
+"""
+Payload de suppression d'un récépissé transporteur
+"""
+input DeleteTransporterReceiptInput {
+  """
+  The id of the transporter receipt to delete
+  """
+  id: ID!
+}
+
+"""
+Payload de création d'un récépissé négociant
+"""
+input CreateTraderReceiptInput {
+  """
+  Numéro de récépissé négociant
+  """
+  receiptNumber: String!
+
+  """
+  Limite de validité du récépissé
+  """
+  validityLimit: DateTime!
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String!
+}
+
+"""
+Payload d'édition d'un récépissé négociant
+"""
+input UpdateTraderReceiptInput {
+  """
+  The id of the trader receipt to modify
+  """
+  id: ID!
+
+  """
+  Numéro de récépissé négociant
+  """
+  receiptNumber: String
+
+  """
+  Limite de validité du récépissé
+  """
+  validityLimit: DateTime
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String
+}
+
+"""
+Payload de suppression d'un récépissé négociant
+"""
+input DeleteTraderReceiptInput {
+  """
+  The id of the trader receipt to delete
+  """
+  id: ID!
+}
+
+"""
+Payload de création d'un récépissé courtier
+"""
+input CreateBrokerReceiptInput {
+  """
+  Numéro de récépissé courtier
+  """
+  receiptNumber: String!
+
+  """
+  Limite de validité du récépissé
+  """
+  validityLimit: DateTime!
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String!
+}
+
+"""
+Payload de création d'un agrément VHU
+"""
+input CreateVhuAgrementInput {
+  """
+  Numéro d'agrément VHU
+  """
+  agrementNumber: String!
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String!
+}
+
+"""
+Payload d'édition d'un récépissé courtier
+"""
+input UpdateBrokerReceiptInput {
+  """
+  The id of the broker receipt to modify
+  """
+  id: ID!
+
+  """
+  Numéro de récépissé courtier
+  """
+  receiptNumber: String
+
+  """
+  Limite de validité du récépissé
+  """
+  validityLimit: DateTime
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String
+}
+
+"""
+Payload d'édition d'un agrément VHU
+"""
+input UpdateVhuAgrementInput {
+  """
+  ID de l'agrément VHU à modifier
+  """
+  id: ID!
+
+  """
+  Numéro d'agrément VHU
+  """
+  agrementNumber: String
+
+  """
+  Département ayant enregistré la déclaration
+  """
+  department: String
+}
+
+"""
+Payload de suppression d'un récépissé courtier
+"""
+input DeleteBrokerReceiptInput {
+  """
+  The id of the broker receipt to delete
+  """
+  id: ID!
+}
+
+input VerifyCompanyInput {
+  "Le SIRET de l'établissement à vérifier"
+  siret: String!
+  "Le code de vérification de l'établissement envoyé par courrier"
+  code: String!
+}
+
+"""
+Payload de suppression d'un agrément VHU
+"""
+input DeleteVhuAgrementInput {
+  """
+  ID de l'agrément VHU à supprimer
+  """
+  id: ID!
+}
+
+"Payload permettant le rattachement d'un établissement à un utilisateur"
+input PrivateCompanyInput {
+  "SIRET de l'établissement"
+  siret: String!
+
+  "Identifiant GEREP de l'établissement"
+  gerepId: String
+
+  "Profil de l'établissement"
+  companyTypes: [CompanyType!]!
+
+  "Code NAF"
+  codeNaf: String
+
+  "Nom de l'établissement"
+  companyName: String
+
+  "Nom d'usage de l'établissement"
+  givenName: String
+
+  "Adresse de l'établissement"
+  address: String
+
+  """
+  Récipissé transporteur (le cas échéant, pour les profils transporteur)
+  """
+  transporterReceiptId: String
+
+  """
+  Récipissé négociant (le cas échéant, pour les profils négociant)
+  """
+  traderReceiptId: String
+
+  """
+  Récipissé courtier (le cas échéant, pour les profils courtier)
+  """
+  brokerReceiptId: String
+
+  """
+  Agrément VHU démolisseur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementDemolisseurId: String
+
+  """
+  Agrément VHU broyeur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementBroyeurId: String
+
+  """
+  Liste des agréments de l'éco-organisme
+  """
+  ecoOrganismeAgreements: [URL!]
+}
+
+input CompanyForVerificationWhere {
+  verificationStatus: CompanyVerificationStatus
+}
+
+input VerifyCompanyByAdminInput {
+  siret: String!
+  verificationComment: String
+}
+
+input SendVerificationCodeLetterInput {
+  siret: String!
+}

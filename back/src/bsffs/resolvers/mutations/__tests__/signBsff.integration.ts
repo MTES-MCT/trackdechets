@@ -4,7 +4,10 @@ import {
   Mutation,
   MutationSignBsffArgs
 } from "../../../../generated/graphql/types";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  UserWithCompany,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import {
   createBsff,
@@ -12,7 +15,6 @@ import {
   createBsffAfterEmission,
   createBsffBeforeTransport,
   createBsffBeforeReception,
-  createBsffAfterReception,
   createBsffAfterTransport,
   createBsffBeforeOperation
 } from "../../../__tests__/factories";
@@ -27,6 +29,28 @@ const SIGN = `
 
 describe("Mutation.signBsff", () => {
   afterEach(resetDatabase);
+
+  let emitter: UserWithCompany;
+  let transporter: UserWithCompany;
+  let destination: UserWithCompany;
+
+  beforeEach(async () => {
+    emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
+    });
+    transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
+    });
+    destination = await userWithCompanyFactory(UserRole.ADMIN, {
+      address: "12 rue de la Grue, 69000 Lyon",
+      contactPhone: "06",
+      contactEmail: "contact@gmail.com"
+    });
+  });
 
   it("should disallow unauthenticated user from signing a bsff", async () => {
     const { mutate } = makeClient();
@@ -54,9 +78,7 @@ describe("Mutation.signBsff", () => {
   });
 
   it("should throw an error if the bsff being signed doesn't exist", async () => {
-    const { user } = await userWithCompanyFactory(UserRole.ADMIN);
-
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
       Pick<Mutation, "signBsff">,
       MutationSignBsffArgs
@@ -66,7 +88,7 @@ describe("Mutation.signBsff", () => {
         type: "EMISSION",
         signature: {
           date: new Date().toISOString() as any,
-          author: user.name
+          author: emitter.user.name
         }
       }
     });
@@ -80,11 +102,6 @@ describe("Mutation.signBsff", () => {
 
   describe("EMISSION", () => {
     it("should allow emitter to sign", async () => {
-      const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
       const bsff = await createBsffBeforeEmission({ emitter });
 
       const { mutate } = makeClient(emitter.user);
@@ -106,11 +123,6 @@ describe("Mutation.signBsff", () => {
     });
 
     it("should throw an error if the bsff is missing required data when the emitter tries to sign", async () => {
-      const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
       const bsff = await createBsff({ emitter });
 
       const { mutate } = makeClient(emitter.user);
@@ -138,16 +150,6 @@ describe("Mutation.signBsff", () => {
     });
 
     it("should allow the transporter to sign for the emitter with the security code", async () => {
-      const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
-      const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
       const bsff = await createBsffBeforeEmission({ emitter, transporter });
 
       const { mutate } = makeClient(transporter.user);
@@ -170,16 +172,6 @@ describe("Mutation.signBsff", () => {
     });
 
     it("should disallow the transporter to sign for the emitter without the security code", async () => {
-      const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
-      const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
       const bsff = await createBsffBeforeEmission({ emitter, transporter });
 
       const { mutate } = makeClient(transporter.user);
@@ -205,16 +197,6 @@ describe("Mutation.signBsff", () => {
     });
 
     it("should disallow the transporter to sign for the emitter with a wrong security code", async () => {
-      const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
-      const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
       const bsff = await createBsffBeforeEmission({ emitter, transporter });
 
       const { mutate } = makeClient(transporter.user);
@@ -241,11 +223,6 @@ describe("Mutation.signBsff", () => {
     });
 
     it("should throw an error when the emitter tries to sign twice", async () => {
-      const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
       const bsff = await createBsffAfterEmission({ emitter });
 
       const { mutate } = makeClient(emitter.user);
@@ -271,16 +248,6 @@ describe("Mutation.signBsff", () => {
     });
 
     it("should throw an error if the transporter tries to sign without the emitter's signature", async () => {
-      const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
-      const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
       const bsff = await createBsffBeforeTransport(
         { emitter, transporter },
         {
@@ -315,16 +282,6 @@ describe("Mutation.signBsff", () => {
 
   describe("TRANSPORT", () => {
     it("should allow transporter to sign transport", async () => {
-      const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
-      const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
       const bsff = await createBsffBeforeTransport({ emitter, transporter });
 
       const { mutate } = makeClient(transporter.user);
@@ -346,16 +303,6 @@ describe("Mutation.signBsff", () => {
     });
 
     it("should disallow transporter to sign transport when required data is missing", async () => {
-      const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
-      const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
       const bsff = await createBsffAfterEmission({ emitter, transporter });
 
       const { mutate } = makeClient(transporter.user);
@@ -385,21 +332,6 @@ describe("Mutation.signBsff", () => {
 
   describe("RECEPTION", () => {
     it("should allow destination to sign reception", async () => {
-      const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
-      const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
-      const destination = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
       const bsff = await createBsffBeforeReception({
         emitter,
         transporter,
@@ -425,21 +357,6 @@ describe("Mutation.signBsff", () => {
     });
 
     it("should disallow destination to sign reception when required data is missing", async () => {
-      const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
-      const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
-      const destination = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
       const bsff = await createBsffAfterTransport({
         emitter,
         transporter,
@@ -473,21 +390,6 @@ describe("Mutation.signBsff", () => {
 
   describe("OPERATION", () => {
     it("should allow destination to sign operation", async () => {
-      const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
-      const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
-      const destination = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
       const bsff = await createBsffBeforeOperation({
         emitter,
         transporter,
@@ -512,30 +414,20 @@ describe("Mutation.signBsff", () => {
       expect(data.signBsff.id).toBeTruthy();
     });
 
-    it("should disallow destination to sign operation when required data is missing", async () => {
-      const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
-      const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
-      const destination = await userWithCompanyFactory(UserRole.ADMIN, {
-        address: "12 rue de la Grue, 69000 Lyon",
-        contactPhone: "06",
-        contactEmail: "contact@gmail.com"
-      });
-      const bsff = await createBsffAfterReception({
-        emitter,
-        transporter,
-        destination
-      });
+    it("should allow signing a bsff for reexpedition", async () => {
+      const bsff = await createBsffBeforeOperation(
+        {
+          emitter,
+          transporter,
+          destination
+        },
+        {
+          destinationOperationCode: null
+        }
+      );
 
       const { mutate } = makeClient(destination.user);
-      const { errors } = await mutate<
+      const { data } = await mutate<
         Pick<Mutation, "signBsff">,
         MutationSignBsffArgs
       >(SIGN, {
@@ -549,13 +441,7 @@ describe("Mutation.signBsff", () => {
         }
       });
 
-      expect(errors).toEqual([
-        expect.objectContaining({
-          extensions: {
-            code: "BAD_USER_INPUT"
-          }
-        })
-      ]);
+      expect(data.signBsff.id).toBeTruthy();
     });
   });
 });

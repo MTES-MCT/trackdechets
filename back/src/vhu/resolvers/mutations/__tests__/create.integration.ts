@@ -194,7 +194,7 @@ describe("Mutation.Vhu.create", () => {
     );
 
     expect(errors[0].message).toBe(
-      "Émetteur: le numéro d'agréément est obligatoire"
+      "Émetteur: le numéro d'agrément est obligatoire"
     );
   });
 });

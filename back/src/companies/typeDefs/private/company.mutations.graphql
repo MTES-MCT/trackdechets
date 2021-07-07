@@ -1,0 +1,154 @@
+type Mutation {
+  """
+  USAGE INTERNE
+  Renouvelle le code de signature de l'établissement
+  """
+  renewSecurityCode(siret: String!): CompanyPrivate!
+
+  """
+  USAGE INTERNE
+  Édite les informations d'un établissement
+  """
+  updateCompany(
+    "SIRET de l'établissement"
+    siret: String!
+    "Identifiant GEREP"
+    gerepId: String
+    "Email de contact"
+    contactEmail: String
+    "Numéro de téléphone de contact"
+    contactPhone: String
+    "Site web"
+    website: String
+    "Profil de l'établissement"
+    companyTypes: [CompanyType]
+    "Nom d'usage de l'établissement"
+    givenName: String
+    "Identifiant d'un récépissé transporteur"
+    transporterReceiptId: String
+    "Identifiant d'un récépissé négociant"
+    traderReceiptId: String
+    "Identifiant d'un récépissé courtier"
+    brokerReceiptId: String
+    "Identifiant d'un agrément VHU démolisseur"
+    vhuAgrementDemolisseurId: String
+    "Identifiant d'un agrément VHU broyeur"
+    vhuAgrementBroyeurId: String
+    "Agréments de l'éco-organisme"
+    ecoOrganismeAgreements: [URL!]
+    "L'entreprise autorise l'enlèvement d'un Dasri sans sa signature"
+    allowBsdasriTakeOverWithoutSignature: Boolean
+  ): CompanyPrivate!
+
+  """
+  USAGE INTERNE
+  Permet de vérifier un établissement à partir du code de vérification
+  envoyé par courrier à l'adresse de l'établissement renseigné au
+  registre du commerce et des sociétés
+  """
+  verifyCompany(input: VerifyCompanyInput!): CompanyPrivate!
+
+  """
+  USAGE INTERNE
+  Crée un récépissé transporteur
+  """
+  createTransporterReceipt(
+    input: CreateTransporterReceiptInput!
+  ): TransporterReceipt
+
+  """
+  USAGE INTERNE
+  Édite les informations d'un récépissé transporteur
+  """
+  updateTransporterReceipt(
+    input: UpdateTransporterReceiptInput!
+  ): TransporterReceipt
+
+  """
+  USAGE INTERNE
+  Supprime un récépissé transporteur
+  """
+  deleteTransporterReceipt(
+    input: DeleteTransporterReceiptInput!
+  ): TransporterReceipt
+
+  """
+  USAGE INTERNE
+  Crée un récépissé négociant
+  """
+  createTraderReceipt(input: CreateTraderReceiptInput!): TraderReceipt
+
+  """
+  USAGE INTERNE
+  Édite les informations d'un récépissé négociant
+  """
+  updateTraderReceipt(input: UpdateTraderReceiptInput!): TraderReceipt
+
+  """
+  USAGE INTERNE
+  Supprime un récépissé négociant
+  """
+  deleteTraderReceipt(input: DeleteTraderReceiptInput!): TraderReceipt
+
+  """
+  USAGE INTERNE
+  Crée un récépissé courtier
+  """
+  createBrokerReceipt(input: CreateBrokerReceiptInput!): BrokerReceipt
+
+  """
+  USAGE INTERNE
+  Édite les informations d'un récépissé courtier
+  """
+  updateBrokerReceipt(input: UpdateBrokerReceiptInput!): BrokerReceipt
+
+  """
+  USAGE INTERNE
+  Supprime un récépissé courtier
+  """
+  deleteBrokerReceipt(input: DeleteBrokerReceiptInput!): BrokerReceipt
+
+  """
+  USAGE INTERNE
+  Crée un agrément VHU
+  """
+  createVhuAgrement(input: CreateVhuAgrementInput!): VhuAgrement
+
+  """
+  USAGE INTERNE
+  Édite un agrément VHU
+  """
+  updateVhuAgrement(input: UpdateVhuAgrementInput!): VhuAgrement
+
+  """
+  USAGE INTERNE
+  Supprime un agrément VHU
+  """
+  deleteVhuAgrement(input: DeleteVhuAgrementInput!): VhuAgrement
+
+  """
+  USAGE INTERNE
+  Rattache un établissement à l'utilisateur authentifié
+  """
+  createCompany(companyInput: PrivateCompanyInput!): CompanyPrivate!
+
+  """
+  USAGE INTERNE
+  Récupère une URL signé pour l'upload d'un fichier
+  """
+  createUploadLink(
+    "nom du fichier"
+    fileName: String!
+    "type de fichier"
+    fileType: String!
+  ): UploadLink!
+
+  "Verify a company manually"
+  verifyCompanyByAdmin(
+    input: VerifyCompanyByAdminInput!
+  ): CompanyForVerification!
+
+  sendVerificationCodeLetter(
+    input: SendVerificationCodeLetterInput!
+  ): CompanyForVerification!
+}

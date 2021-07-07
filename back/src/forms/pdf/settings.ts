@@ -197,7 +197,8 @@ export const temporaryStorageDetailsFieldSettings = {
   wasteDetailsPackagingsCiterne: { x: 179, y: 370, fontSize: 12 },
   wasteDetailsPackagingsGrv: { x: 230, y: 370, fontSize: 12 },
   wasteDetailsPackagingsFut: { x: 279, y: 370, fontSize: 12 },
-  wasteDetailsPackagingsOther: { x: 319, y: 370, fontSize: 12 },
+  wasteDetailsPackagingsAutre: { x: 319, y: 370, fontSize: 12 },
+  wasteDetailsPackagingsAutreDetails: { x: 382, y: 367, maxLength: 15 },
   wasteDetailsNumberOfPackages: { x: 520, y: 369 },
 
   wasteDetailsQuantityReal: { x: 112, y: 390, fontSize: 12 },

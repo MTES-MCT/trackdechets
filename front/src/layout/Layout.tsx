@@ -25,7 +25,7 @@ export default function Layout({
             fontWeight: "bold",
             color: "#721c24",
           }}
-          className="text-center"
+          className="tw-text-center"
         >
           {REACT_APP_WARNING_MESSAGE}
         </div>

@@ -1,4 +1,4 @@
-import { Bsff } from ".prisma/client";
+import { BsffStatus, Bsff } from ".prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -15,6 +15,7 @@ import {
 } from "../../validation";
 import { unflattenBsff } from "../../converter";
 import { getBsffOrNotFound } from "../../database";
+import { indexBsff } from "../../elastic";
 
 async function checkIsAllowed(
   siret: string | null,
@@ -68,6 +69,7 @@ const signatures: Record<
 
     return prisma.bsff.update({
       data: {
+        status: BsffStatus.SIGNED_BY_EMITTER,
         emitterEmissionSignatureDate: signature.date,
         emitterEmissionSignatureAuthor: signature.author
       },
@@ -86,6 +88,7 @@ const signatures: Record<
 
     return prisma.bsff.update({
       data: {
+        status: BsffStatus.SENT,
         transporterTransportSignatureDate: signature.date,
         transporterTransportSignatureAuthor: signature.author
       },
@@ -104,6 +107,9 @@ const signatures: Record<
 
     return prisma.bsff.update({
       data: {
+        status: existingBsff.destinationReceptionRefusal
+          ? BsffStatus.REFUSED
+          : BsffStatus.RECEIVED,
         destinationReceptionSignatureDate: signature.date,
         destinationReceptionSignatureAuthor: signature.author
       },
@@ -122,6 +128,7 @@ const signatures: Record<
 
     return prisma.bsff.update({
       data: {
+        status: BsffStatus.PROCESSED,
         destinationOperationSignatureDate: signature.date,
         destinationOperationSignatureAuthor: signature.author
       },
@@ -134,9 +141,11 @@ const signatures: Record<
 
 const signBsff: MutationResolvers["signBsff"] = async (_, args, context) => {
   const user = checkIsAuthenticated(context);
-  const existingBsff = await getBsffOrNotFound(args.id);
+  const existingBsff = await getBsffOrNotFound({ id: args.id });
   const sign = signatures[args.type];
   const updatedBsff = await sign(args, user, existingBsff);
+
+  await indexBsff(updatedBsff);
 
   return {
     ...unflattenBsff(updatedBsff),

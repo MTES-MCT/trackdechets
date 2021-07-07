@@ -1,0 +1,125 @@
+"Filtres possibles pour la récupération de bordereaux."
+input BsffWhere {
+  "Filtrer sur le champ emitter."
+  emitter: BsffWhereEmitter
+  "Filtrer sur le champ transporter."
+  transporter: BsffWhereTransporter
+  "Filtrer sur le champ destination."
+  destination: BsffWhereDestination
+}
+
+"Champs possible pour le filtre sur l'emitter."
+input BsffWhereEmitter {
+  company: BsffWhereCompany
+}
+
+"Champs possible pour le filtre sur transporter."
+input BsffWhereTransporter {
+  company: BsffWhereCompany
+}
+
+"Champs possible pour le filtre sur destination."
+input BsffWhereDestination {
+  company: BsffWhereCompany
+  operation: BsffWhereOperation
+}
+
+"Champs possible pour le filtre sur l'opération."
+input BsffWhereOperation {
+  code: BsffOperationCode
+}
+
+"Filtres sur une entreprise."
+input BsffWhereCompany {
+  siret: String!
+}
+
+input SignatureInput {
+  date: DateTime!
+  author: String!
+}
+
+input BsffInput {
+  emitter: BsffEmitterInput
+  packagings: [BsffPackagingInput!]
+  waste: BsffWasteInput
+  quantity: BsffQuantityInput
+  transporter: BsffTransporterInput
+  destination: BsffDestinationInput
+  bsffs: [ID!]
+}
+
+input BsffEmitterInput {
+  company: CompanyInput!
+}
+
+input BsffPackagingInput {
+  numero: String!
+  type: BsffPackagingType!
+  kilos: Float!
+}
+
+input BsffWasteInput {
+  code: String!
+  nature: String
+  adr: String!
+}
+
+input BsffQuantityInput {
+  kilos: Float!
+  isEstimate: Boolean!
+}
+
+input BsffTransporterInput {
+  company: CompanyInput!
+  recepisse: BsffTransporterRecepisseInput
+  transport: BsffTransporterTransportInput
+}
+input BsffTransporterRecepisseInput {
+  number: String!
+  department: String!
+  validityLimit: DateTime!
+}
+input BsffTransporterTransportInput {
+  mode: TransportMode!
+}
+
+input BsffDestinationInput {
+  company: CompanyInput
+  cap: String
+  reception: BsffDestinationReceptionInput
+  plannedOperation: BsffDestinationPlannedOperationInput
+  operation: BsffDestinationOperationInput
+}
+input BsffDestinationReceptionInput {
+  date: DateTime!
+  kilos: Float!
+  refusal: String
+}
+
+input BsffDestinationPlannedOperationInput {
+  code: BsffOperationCode!
+}
+
+input BsffOperationNextDestinationInput {
+  company: CompanyInput!
+}
+
+input BsffDestinationOperationInput {
+  code: BsffOperationCode!
+  nextDestination: BsffOperationNextDestinationInput
+}
+
+input BsffFicheInterventionInput {
+  numero: String!
+  kilos: Float!
+  detenteur: BsffDetenteurInput!
+  operateur: BsffOperateurInput!
+  postalCode: String!
+}
+input BsffDetenteurInput {
+  company: CompanyInput!
+}
+input BsffOperateurInput {
+  company: CompanyInput!
+}

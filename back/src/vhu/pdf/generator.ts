@@ -1,7 +1,7 @@
 import { Bsvhu } from "@prisma/client";
 import { readFile } from "fs/promises";
 import { join } from "path";
-import { connect } from "puppeteer-core";
+import { connect } from "puppeteer";
 
 export async function buildPdf(form: Bsvhu) {
   const browser = await connect({

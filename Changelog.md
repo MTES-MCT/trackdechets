@@ -9,8 +9,15 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
-- Affiche le détail d'un bordereau dasri [PR 876](https://github.com/MTES-MCT/trackdechets/pull/876)
-- Edition de bordereaux dasri [PR 886](https://github.com/MTES-MCT/trackdechets/pull/886)
+- Ajout d'un bouton pour choisir le type de bordereau à créer [PR 899](https://github.com/MTES-MCT/trackdechets/pull/899)
+- Les producteurs peuvent autoriser l'emport de dasri sans leur signature depuis l'UI[PR 904] (https://github.com/MTES-MCT/trackdechets/pull/904)
+- Ajout des BSFFs au tableau de bord [PR 909](https://github.com/MTES-MCT/trackdechets/pull/909)
+- Évolutions de l'API BSFF suite aux retours de nos partenaires [PR 909][https://github.com/mtes-mct/trackdechets/pull/909]
+  - Refonte de la gestion des fiches d'intervention : modification du modèle et des mutations
+  - Suppression des champs `BsffOperation.qualification` et `BsffPlannedOperation.qualification`
+  - Renommage du champ `BsffPackaging.litres` en `BsffPackaging.kilos`
+  - Renommage du champ `BsffWaste.description` en `BsffWaste.nature`
+  - Ajout du champ `Bsff.status`
 
 #### :boom: Breaking changes
 
@@ -18,12 +25,58 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Les codes R12 et D12 autorisés uniquement si le destinataire est TTR [PR 914](https://github.com/MTES-MCT/trackdechets/pull/914)
+- Les champs emails du bordereau dasri sont facultatifs [PR 916](https://github.com/MTES-MCT/trackdechets/pull/916)
+
 #### :memo: Documentation
 
 #### :house: Interne
 
-- Seul les erreurs non gérées sont capturées par Sentry [PR 874](https://github.com/MTES-MCT/trackdechets/pull/874)
+- Indexation des BSFF dans Elastic Search [PR 909](https://github.com/MTES-MCT/trackdechets/pull/909)
 - Intégration des jobs CRON dans le code grâce à node-cron [PR 896](https://github.com/MTES-MCT/trackdechets/pull/896)
+
+# [2021.06.2] 28/06/2021
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Affiche le détail d'un bordereau dasri [PR 876](https://github.com/MTES-MCT/trackdechets/pull/876)
+- Edition de bordereaux dasri [PR 886](https://github.com/MTES-MCT/trackdechets/pull/886)
+- Publication de bordereaux dasri [PR 888](https://github.com/MTES-MCT/trackdechets/pull/888)
+- Signature de bordereaux dasri [PR 891](https://github.com/MTES-MCT/trackdechets/pull/891)
+- Duplication de bordereaux dasri [PR 892](https://github.com/MTES-MCT/trackdechets/pull/892)
+- Suppression de bordereaux dasri [PR 893](https://github.com/MTES-MCT/trackdechets/pull/893)
+- Gnération du pdf de bordereaux dasri [PR 898](https://github.com/MTES-MCT/trackdechets/pull/898)
+- Ajout du groupement, de la génération du PDF à l'API BSDA, intégration de ces bordereaux à la query Elastic Search, et ajout de la mutation de suppression [882](https://github.com/MTES-MCT/trackdechets/pull/882)
+- Ajout du groupement, reconditionnement, de la réexpédition, de l'envoi à l'étranger et de la génération du PDF à l'API BSFF [875](https://github.com/MTES-MCT/trackdechets/pull/875)
+
+#### :boom: Breaking changes
+
+- Les établissements apparaissant sur le bordereau de regroupement mais pas sur le bordereau annexé (ex: l'exutoire finale) n'ont plus accès à toutes les informations du bordereau annexé pour préserver les infos commerciales de l'établissement effectuant le regroupement [PR 872](https://github.com/MTES-MCT/trackdechets/pull/872).
+- Sur le bsdasri, nouvelles règles pour la gestion des quantités [PR 910](https://github.com/MTES-MCT/trackdechets/pull/910):
+  - les champs quantity et quantityType deviennent quantity { value type }
+  - la pesée finale est transférée de reception à operation
+  - les quantity sont facultatives pour le producteur et le transporteur
+  - si la quantité (value) est renseignée, le type doit l'être également
+  - la quantity est obligatoire pour le destinatire si le code correspond à un traitement final
+
+#### :bug: Corrections de bugs
+
+- Correction du typage de `ResealedFormInput.wasteDetails` [PR 889](https://github.com/MTES-MCT/trackdechets/pull/889)
+
+#### :nail_care: Améliorations
+
+- Suppression du statut de vérification de l'établissement dans Mon Compte en sandbox [PR 895](https://github.com/MTES-MCT/trackdechets/pull/895)
+- Limite la rupture de traçabilité aux opérations correspondant à un regroupement [PR 878](https://github.com/MTES-MCT/trackdechets/pull/878)
+
+#### :memo: Documentation
+
+- Amélioration de la référence de l'API [PR 885](https://github.com/MTES-MCT/trackdechets/pull/885)
+- Documentation des validations effectuées dans la référence de l'API [PR 894](https://github.com/MTES-MCT/trackdechets/pull/894)
+
+#### :house: Interne
+
+- Seul les erreurs non gérées sont capturées par Sentry [PR 874](https://github.com/MTES-MCT/trackdechets/pull/874)
+- Passage à Docusaurus 2 [PR 885](https://github.com/MTES-MCT/trackdechets/pull/885)
 
 # [2021.06.1] 02/06/2021
 
@@ -35,6 +88,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout du bordereau de suivi des déchets amiante à l'API [PR 873](https://github.com/MTES-MCT/trackdechets/pull/873)
 
 #### :boom: Breaking changes
+
+- Suppression du champ `Form`.`actualQuantity` qui n'était pas implémenté. [PR 879](https://github.com/MTES-MCT/trackdechets/pull/879)
 
 #### :bug: Corrections de bugs
 

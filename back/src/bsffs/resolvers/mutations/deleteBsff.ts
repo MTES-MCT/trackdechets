@@ -1,6 +1,7 @@
 import { UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
+import * as elastic from "../../../common/elastic";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { unflattenBsff } from "../../converter";
 import { isBsffContributor } from "../../permissions";
@@ -12,7 +13,7 @@ const deleteBsff: MutationResolvers["deleteBsff"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
-  const existingBsff = await getBsffOrNotFound(id);
+  const existingBsff = await getBsffOrNotFound({ id });
   await isBsffContributor(user, existingBsff);
 
   if (existingBsff.emitterEmissionSignatureDate) {
@@ -29,6 +30,8 @@ const deleteBsff: MutationResolvers["deleteBsff"] = async (
       id
     }
   });
+
+  await elastic.deleteBsd(updatedBsff);
 
   return {
     ...unflattenBsff(updatedBsff),
