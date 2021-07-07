@@ -182,7 +182,7 @@ describe("POST /login", () => {
     const admin = await userFactory({ isAdmin: true });
 
     // Login as admin
-    await request
+    const adminLogin = await request
       .post("/login")
       .send(`email=${admin.email.toUpperCase()}`)
       .send(`password=pass`);
@@ -191,6 +191,7 @@ describe("POST /login", () => {
     const user = await userFactory();
     const login = await request
       .post("/login")
+      .set("Cookie", adminLogin.header["set-cookie"])
       .send(`email=${user.email.toUpperCase()}`)
       .send(`password=invalidPwd`);
 
@@ -201,7 +202,7 @@ describe("POST /login", () => {
     const nonAdmin = await userFactory({ isAdmin: false });
 
     // Login as non-admin user
-    await request
+    const nonAdminLogin = await request
       .post("/login")
       .send(`email=${nonAdmin.email.toUpperCase()}`)
       .send(`password=pass`);
@@ -210,10 +211,23 @@ describe("POST /login", () => {
     const user = await userFactory();
     const login = await request
       .post("/login")
+      .set("Cookie", nonAdminLogin.header["set-cookie"])
       .send(`email=${user.email.toUpperCase()}`)
       .send(`password=invalidPwd`);
 
-    expect(login.header["set-cookie"]).toHaveLength(1);
+    // should not set a session cookie
+    expect(login.header["set-cookie"]).toBeUndefined();
+
+    // should redirect to /login with error message
+    expect(login.status).toBe(302);
+    const redirect = login.header.location;
+    expect(redirect).toContain(`http://${UI_HOST}/login`);
+    expect(redirect).toContain(
+      queryString.escape(loginError.INVALID_PASSWORD.message)
+    );
+    expect(redirect).toContain(
+      queryString.escape(loginError.INVALID_PASSWORD.errorField)
+    );
   });
 });
 
