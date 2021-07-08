@@ -1,14 +1,13 @@
-/* eslint @typescript-eslint/no-var-requires: "off" */
-const { createBsdasri } = require("../steps/createBsdasri");
-const { signForProducer } = require("../steps/signForProducer");
-const { signOperation } = require("../steps/signOperation");
-const { signReception } = require("../steps/signReception");
-const { signTransport } = require("../steps/signTransport");
-const { updateReception } = require("../steps/updateReception");
-const { updateOperation } = require("../steps/updateOperation");
-const { updateTransport } = require("../steps/updateTransport");
+import { createBsdasri } from "../steps/createBsdasri";
+import { signForProducer } from "../steps/signForProducer";
+import { signOperation } from "../steps/signOperation";
+import { signReception } from "../steps/signReception";
+import { signTransport } from "../steps/signTransport";
+import { updateReception } from "../steps/updateReception";
+import { updateOperation } from "../steps/updateOperation";
+import { updateTransport } from "../steps/updateTransport";
 
-module.exports = {
+export default {
   title: `Acheminement direct de la personne responsable de l'élimination
  des déchets PRED vers l'installation destinataire`,
   companies: [

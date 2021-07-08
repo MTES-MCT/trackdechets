@@ -1,12 +1,11 @@
-/* eslint @typescript-eslint/no-var-requires: "off" */
-const { readFileSync } = require("fs");
-const path = require("path");
+import { readFileSync } from "fs";
+import path from "path";
 
-function loadMutation(name) {
+function loadMutation(name: string) {
   return readFileSync(path.join(__dirname, `${name}.gql`), "utf-8");
 }
 
-module.exports = {
+export default {
   createBsdasri: loadMutation("createBsdasri"),
   updateBsdasri: loadMutation("updateBsdasri"),
   signBsdasri: loadMutation("signBsdasri")

@@ -1,5 +1,6 @@
 import { Plugin } from "@docusaurus/types";
 import bsdWorkflows from "../../back/src/forms/examples/workflows";
+import bsdasriWorkflows from "../../back/src/dasris/examples/workflows";
 
 // parse workflow definition files
 function parseWorkflow(workflow) {
@@ -16,7 +17,6 @@ function parseWorkflow(workflow) {
 }
 
 export default function plugin(): Plugin<any> {
-  const backSrc = "../../../back/src";
   return {
     name: "workflow-doc-plugin",
     async loadContent() {
@@ -29,14 +29,11 @@ export default function plugin(): Plugin<any> {
           ),
           importBsdPapier: parseWorkflow(bsdWorkflows.importBsdPapier),
         },
-        // bsdasri: {
-        //   acheminementDirect: loadWorkflow(
-        //     path.join(
-        //       backSrc,
-        //       "dasris/examples/workflows/acheminementDirect.js"
-        //     )
-        //   ),
-        // },
+        bsdasri: {
+          acheminementDirect: parseWorkflow(
+            bsdasriWorkflows.acheminementDirect
+          ),
+        },
         // bsvhu: {
         //   vhuVersBroyeur: loadWorkflow(
         //     path.join(backSrc, "vhu/examples/workflows/vhuVersBroyeur.js")
