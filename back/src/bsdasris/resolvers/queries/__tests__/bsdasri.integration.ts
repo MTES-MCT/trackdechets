@@ -32,8 +32,8 @@ query GetBsdasri($id: ID!) {
       wasteDetails {
         onuCode
         volume
-        quantity
-        quantityType
+        quantity { value type}
+ 
       }
       handedOverAt
       signature {
@@ -51,8 +51,11 @@ query GetBsdasri($id: ID!) {
       handedOverAt
       takenOverAt
       wasteDetails {
-        quantity
-        quantityType
+        quantity { 
+          value
+           type
+          }
+         
         volume
       }
       wasteAcceptation {
@@ -75,14 +78,21 @@ query GetBsdasri($id: ID!) {
     reception {
       wasteDetails {
         volume
-        quantity
-        quantityType
+    
+   
       }
       wasteAcceptation {
         status
         refusalReason
         refusedQuantity
       }
+    }
+    operation {
+      processingOperation
+      processedAt
+      quantity { 
+        value
+        }
     }
     createdAt
     updatedAt

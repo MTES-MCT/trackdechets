@@ -53,8 +53,8 @@ describe("Mutation.createDasri", () => {
       emission: {
         wasteCode: "18 01 03*",
         wasteDetails: {
-          quantity: 23,
-          quantityType: "REAL",
+          quantity: { value: 23, type: "REAL" },
+
           onuCode: "xyz 33",
           packagingInfos: [
             {
@@ -118,8 +118,8 @@ describe("Mutation.createDasri", () => {
       emission: {
         wasteCode: "18 01 03*",
         wasteDetails: {
-          quantity: 23,
-          quantityType: "REAL",
+          quantity: { value: 23, type: "REAL" },
+
           onuCode: "xyz 33",
           packagingInfos: [
             {
@@ -192,8 +192,8 @@ describe("Mutation.createDasri", () => {
       emission: {
         wasteCode: "18 01 03*",
         wasteDetails: {
-          quantity: 23,
-          quantityType: "REAL",
+          quantity: { value: 23, type: "REAL" },
+
           onuCode: "xyz 33",
           packagingInfos: [
             {

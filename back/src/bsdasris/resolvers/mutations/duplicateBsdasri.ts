@@ -74,7 +74,6 @@ function duplicateBsdasri(
     recipientWasteRefusalReason,
     recipientWasteRefusedQuantity,
     recipientWasteQuantity,
-    recipientWasteQuantityType,
     recipientWasteVolume,
     receivedAt,
 

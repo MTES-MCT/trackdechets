@@ -1,13 +1,14 @@
 import { WasteAcceptationStatus, QuantityType, Prisma } from "@prisma/client";
-
+import { isCollector } from "../companies/validation";
 import * as yup from "yup";
 import {
   DASRI_WASTE_CODES,
   DASRI_ALL_OPERATIONS_CODES,
-  DASRI_PROCESSING_OPERATIONS_CODES
+  DASRI_PROCESSING_OPERATIONS_CODES,
+  DASRI_GROUPING_OPERATIONS_CODES
 } from "../common/constants";
 import configureYup from "../common/yup/configureYup";
-
+import prisma from "../prisma";
 import {
   BsdasriPackagings,
   BsdasriSignatureType
@@ -89,13 +90,12 @@ type Reception = Pick<
   | "recipientWasteAcceptationStatus"
   | "recipientWasteRefusalReason"
   | "recipientWasteRefusedQuantity"
-  | "recipientWasteQuantity"
   | "recipientWasteVolume"
   | "receivedAt"
 >;
 type Operation = Pick<
   Prisma.BsdasriCreateInput,
-  "processingOperation" | "processedAt"
+  "processingOperation" | "processedAt" | "recipientWasteQuantity"
 >;
 
 // *********************
@@ -107,7 +107,6 @@ const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
 const MISSING_COMPANY_ADDRESS = "L'adresse de l'entreprise est obligatoire";
 const MISSING_COMPANY_CONTACT = "Le contact dans l'entreprise est obligatoire";
 const MISSING_COMPANY_PHONE = "Le téléphone de l'entreprise est obligatoire";
-const MISSING_COMPANY_EMAIL = "L'email de l'entreprise est obligatoire";
 
 const INVALID_SIRET_LENGTH = "Le SIRET doit faire 14 caractères numériques";
 
@@ -143,14 +142,12 @@ export const emitterSchema: FactorySchemaOf<
       ),
     emitterCompanyAddress: yup
       .string()
-
       .requiredIf(
         context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_ADDRESS}`
       ),
     emitterCompanyContact: yup
       .string()
-
       .requiredIf(
         context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_CONTACT}`
@@ -161,13 +158,8 @@ export const emitterSchema: FactorySchemaOf<
         context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_PHONE}`
       ),
-    emitterCompanyMail: yup
-      .string()
-      .email()
-      .requiredIf(
-        context.emissionSignature,
-        `Émetteur: ${MISSING_COMPANY_EMAIL}`
-      ),
+    emitterCompanyMail: yup.string().email().ensure(),
+
     emitterWorkSiteName: yup.string().nullable(),
     emitterWorkSiteAddress: yup.string().nullable(),
     emitterWorkSiteCity: yup.string().nullable(),
@@ -241,13 +233,6 @@ export const emissionSchema: FactorySchemaOf<
       .string()
       .ensure()
       .requiredIf(context.emissionSignature, `La mention ADR est obligatoire.`),
-    emitterWasteQuantity: yup
-      .number()
-      .requiredIf(
-        context.emissionSignature,
-        "La quantité du déchet émis en kg est obligatoire"
-      )
-      .min(0, "La quantité émise doit être supérieure à 0"),
     emitterWasteVolume: yup
       .number()
       .requiredIf(
@@ -255,12 +240,28 @@ export const emissionSchema: FactorySchemaOf<
         "La quantité du déchet émis en litres est obligatoire"
       )
       .min(0, "La quantité émise doit être supérieure à 0"),
+    emitterWasteQuantity: yup
+      .number()
+      .nullable()
+      .test(
+        "emission-quantity-required-if-type-is-provided",
+        "La quantité du déchet émis en kg est obligatoire si vous renseignez le type de quantité",
+        function (value) {
+          return !!this.parent.emitterWasteQuantityType ? !!value : true;
+        }
+      )
+      .min(0, "La quantité émise doit être supérieure à 0"),
+
     emitterWasteQuantityType: yup
       .mixed<QuantityType>()
-      .requiredIf(
-        context.emissionSignature,
-        "Le type de quantité (réelle ou estimée) émis doit être précisé"
+      .test(
+        "emission-quantity-type-required-if-quantity-is-provided",
+        "Le type de quantité (réelle ou estimée) émise doit être précisé si vous renseignez une quantité",
+        function (value) {
+          return !!this.parent.emitterWasteQuantity ? !!value : true;
+        }
       ),
+
     emitterWastePackagingsInfo: yup
       .array()
       .requiredIf(
@@ -311,15 +312,7 @@ export const transporterSchema: FactorySchemaOf<
         context.transportSignature,
         `Transporteur: ${MISSING_COMPANY_PHONE}`
       ),
-    transporterCompanyMail: yup
-      .string()
-      .email()
-      .ensure()
-      .requiredIf(
-        context.transportSignature,
-        `Transporteur: ${MISSING_COMPANY_EMAIL}`
-      ),
-
+    transporterCompanyMail: yup.string().email().ensure(),
     transporterReceipt: yup
       .string()
       .ensure()
@@ -388,11 +381,25 @@ export const transportSchema: FactorySchemaOf<
       ),
     transporterWasteQuantity: yup
       .number()
-      .requiredIf(
-        context.transportSignature,
-        "La quantité du déchet transporté en kg est obligatoire"
+      .nullable()
+      .test(
+        "transport-quantity-required-if-type-is-provided",
+        "La quantité du déchet transporté en kg est obligatoire si vous renseignez le type de quantité",
+        function (value) {
+          return !!this.parent.transporterWasteQuantityType ? !!value : true;
+        }
       )
       .min(0, "La quantité transportée doit être supérieure à 0"),
+    transporterWasteQuantityType: yup
+      .mixed<QuantityType>()
+      .test(
+        "emission-quantity-type-required-if-quantity-is-provided",
+        "Le type de quantité (réelle ou estimée) transportée doit être précisé si vous renseignez une quantité",
+        function (value) {
+          return !!this.parent.transporterWasteQuantity ? !!value : true;
+        }
+      ),
+
     transporterWasteVolume: yup
       .number()
       .requiredIf(
@@ -400,12 +407,6 @@ export const transportSchema: FactorySchemaOf<
         "La quantité du déchet transporté en litres est obligatoire"
       )
       .min(0, "La quantité transportée doit être supérieure à 0"),
-    transporterWasteQuantityType: yup
-      .mixed<QuantityType>()
-      .requiredIf(
-        context.transportSignature,
-        "Le type de quantité (réelle ou estimée) transportée doit être précisé"
-      ),
 
     transporterWastePackagingsInfo: yup
       .array()
@@ -430,7 +431,6 @@ export const recipientSchema: FactorySchemaOf<
   yup.object().shape({
     recipientCompanyName: yup
       .string()
-
       .requiredIf(
         context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_NAME}`
@@ -464,14 +464,7 @@ export const recipientSchema: FactorySchemaOf<
         context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_PHONE}`
       ),
-    recipientCompanyMail: yup
-      .string()
-      .email()
-      .ensure()
-      .requiredIf(
-        context.receptionSignature,
-        `Destinataire: ${MISSING_COMPANY_EMAIL}`
-      )
+    recipientCompanyMail: yup.string().email().ensure()
   });
 
 export const receptionSchema: FactorySchemaOf<
@@ -485,19 +478,12 @@ export const receptionSchema: FactorySchemaOf<
         context.receptionSignature,
         "Vous devez préciser si le déchet est accepté"
       ),
-
     recipientWasteRefusedQuantity: yup
       .number()
       .nullable()
       .notRequired()
       .min(0, "La quantité doit être supérieure à 0"),
-    recipientWasteQuantity: yup
-      .number()
-      .requiredIf(
-        context.receptionSignature,
-        "La quantité du déchet en kg est obligatoire"
-      )
-      .min(0, "La quantité doit être supérieure à 0"),
+
     recipientWasteRefusalReason: yup
       .string()
       .when("recipientWasteAcceptationStatus", (type, schema) =>
@@ -540,11 +526,48 @@ export const operationSchema: FactorySchemaOf<
     : DASRI_ALL_OPERATIONS_CODES;
 
   return yup.object({
+    recipientWasteQuantity: yup
+      .number()
+      .test(
+        "operation-quantity-required-if-final-processing-operation",
+        "La quantité du déchet traité en kg est obligatoire si le code correspond à un traitement final",
+        function (value) {
+          return DASRI_PROCESSING_OPERATIONS_CODES.includes(
+            this.parent.processingOperation
+          )
+            ? !!value
+            : true;
+        }
+      )
+      .nullable()
+      .min(0, "La quantité doit être supérieure à 0"),
     processingOperation: yup
       .string()
       .label("Opération d’élimination / valorisation")
       .oneOf([...allowedOperations, "", null], INVALID_PROCESSING_OPERATION)
-      .requiredIf(context.operationSignature),
+      .requiredIf(context.operationSignature)
+      .test(
+        "recipientIsWasteProcessorForGroupingCodes",
+        "Les codes R12 et D12 sont réservés aux installations de tri transit regroupement",
+        async (value, ctx) => {
+          const recipientSiret = ctx.parent.recipientCompanySiret;
+
+          if (
+            DASRI_GROUPING_OPERATIONS_CODES.includes(value) &&
+            !!recipientSiret
+          ) {
+            const recipientCompany = await prisma.company.findUnique({
+              where: {
+                siret: recipientSiret
+              }
+            });
+
+            return isCollector(recipientCompany);
+          }
+          return true;
+        }
+      ),
+
     processedAt: yup
       .date()
       .label("Date de traitement")
