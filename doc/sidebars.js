@@ -18,7 +18,7 @@ function makeReference(apiId) {
 }
 
 const referenceDefs = [
-  { id: "bsdd", label: "Déchets dangeureux" },
+  { id: "bsdd", label: "Déchets dangereux" },
   { id: "bsdasri", label: "DASRI" },
   { id: "bsvhu", label: "VHU" },
   { id: "bsff", label: "Fluides Frigorigènes" },
