@@ -1,13 +1,12 @@
-/* eslint @typescript-eslint/no-var-requires: "off" */
+import { Workflow } from "../../../common/workflow";
+import { createBsvhu } from "../steps/createBsvhu";
+import { signForProducer } from "../steps/signForProducer";
+import { signOperation } from "../steps/signOperation";
+import { signTransport } from "../steps/signTransport";
+import { updateDestination } from "../steps/updateDestination";
+import { updateTransporter } from "../steps/updateTransporter";
 
-const { createBsvhu } = require("../steps/createBsvhu");
-const { signForProducer } = require("../steps/signForProducer");
-const { signOperation } = require("../steps/signOperation");
-const { signTransport } = require("../steps/signTransport");
-const { updateDestination } = require("../steps/updateDestination");
-const { updateTransporter } = require("../steps/updateTransporter");
-
-module.exports = {
+const workflow: Workflow = {
   title: `Acheminement d'un centre VHU vers un broyeur`,
   companies: [
     { name: "producteur", companyTypes: ["PRODUCER"] },
@@ -37,3 +36,5 @@ B -->|"signBsvhu (TRANSPORT)"| C(SENT)
 C -->|updateBsvhu| C
 C -->|"signBsvhu (OPERATION)"| D(PROCESSED)`
 };
+
+export default workflow;

@@ -1,9 +1,11 @@
 import { Plugin } from "@docusaurus/types";
 import bsdWorkflows from "../../back/src/forms/examples/workflows";
 import bsdasriWorkflows from "../../back/src/dasris/examples/workflows";
+import bsvhuWorkflows from "../../back/src/vhu/examples/workflows";
+import { Workflow } from "../../back/src/common/workflow";
 
 // parse workflow definition files
-function parseWorkflow(workflow) {
+function parseWorkflow(workflow: Workflow) {
   return {
     title: workflow.title,
     description: workflow.description,
@@ -34,11 +36,9 @@ export default function plugin(): Plugin<any> {
             bsdasriWorkflows.acheminementDirect
           ),
         },
-        // bsvhu: {
-        //   vhuVersBroyeur: loadWorkflow(
-        //     path.join(backSrc, "vhu/examples/workflows/vhuVersBroyeur.js")
-        //   ),
-        // },
+        bsvhu: {
+          vhuVersBroyeur: parseWorkflow(bsvhuWorkflows.vhuVersBroyeur),
+        },
       };
     },
     // make workflows data available to components through the `useGlobalData` hook
