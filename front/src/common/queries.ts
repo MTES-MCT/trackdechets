@@ -70,11 +70,19 @@ export const GET_BSDS = gql`
             bsffStatus: status
             bsffEmitter: emitter {
               company {
+                siret
+                name
+              }
+            }
+            bsffTransporter: transporter {
+              company {
+                siret
                 name
               }
             }
             bsffDestination: destination {
               company {
+                siret
                 name
               }
             }
