@@ -53,7 +53,7 @@ const sentryReporter: ApolloServerPlugin = {
             }
           });
 
-          const sentryId = Sentry.captureException(err, scope);
+          const sentryId = Sentry.captureException(error, scope);
 
           // kinda of a hack but seems to be the only way to pass
           // info down to formatError. See also
