@@ -1,12 +1,15 @@
 import React from "react";
-import { BsvhuDetailContent } from "./BsvhuDetailContent";
-import Loader from "common/components/Loaders";
-import { useQuery } from "@apollo/client";
-import { Query, QueryBsvhuArgs } from "generated/graphql/types";
 import { useParams } from "react-router-dom";
+import { useQuery } from "@apollo/client";
+
+import { Query, QueryBsvhuArgs } from "generated/graphql/types";
+import Loader from "common/components/Loaders";
 import { GET_VHU_FORM } from "form/bsvhu/utils/queries";
 import { InlineError } from "common/components/Error";
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
+
+import { BsvhuDetailContent } from "./BsvhuDetailContent";
+
 export function RouteBsvhusView() {
   const { id: formId } = useParams<{ id: string }>();
   const { error, data, loading } = useQuery<

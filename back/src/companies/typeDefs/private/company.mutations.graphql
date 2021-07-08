@@ -36,6 +36,8 @@ type Mutation {
     vhuAgrementBroyeurId: String
     "Agréments de l'éco-organisme"
     ecoOrganismeAgreements: [URL!]
+    "L'entreprise autorise l'enlèvement d'un Dasri sans sa signature"
+    allowBsdasriTakeOverWithoutSignature: Boolean
   ): CompanyPrivate!
 
   """

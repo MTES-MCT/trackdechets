@@ -22,9 +22,9 @@ import {
 } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
-import { indexBsvhu } from "../../../../vhu/elastic";
+import { indexBsvhu } from "../../../../bsvhu/elastic";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
-import { vhuFormFactory } from "../../../../vhu/__tests__/factories.vhu";
+import { vhuFormFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 
 const GET_BSDS = `
   query GetBsds($where: BsdWhere) {

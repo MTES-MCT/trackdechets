@@ -7,11 +7,7 @@ import {
 import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
-  OPERATION_CODES,
-  OPERATION_QUALIFICATIONS,
-  WASTE_CODES
-} from "../../../constants";
+import { OPERATION_CODES, WASTE_CODES } from "../../../constants";
 import {
   createBsff,
   createBsffAfterEmission,
@@ -31,7 +27,7 @@ const UPDATE_BSFF = `
       }
       waste {
         code
-        description
+        nature
         adr
       }
       quantity {
@@ -270,7 +266,7 @@ describe("Mutation.updateBsff", () => {
     const input = {
       waste: {
         code: WASTE_CODES[0],
-        description: "Description",
+        nature: "R10",
         adr: "Mention ADR"
       },
       quantity: {
@@ -300,7 +296,7 @@ describe("Mutation.updateBsff", () => {
     const input = {
       waste: {
         code: WASTE_CODES[0],
-        description: "Description",
+        nature: "R10",
         adr: "Mention ADR"
       },
       quantity: {
@@ -322,7 +318,7 @@ describe("Mutation.updateBsff", () => {
       expect.objectContaining({
         waste: {
           code: bsff.wasteCode,
-          description: bsff.wasteDescription,
+          nature: bsff.wasteNature,
           adr: input.waste.adr
         },
         quantity: {
@@ -470,15 +466,13 @@ describe("Mutation.updateBsff", () => {
     const associatedBsff = await createBsffAfterOperation(
       { emitter, transporter, destination },
       {
-        destinationOperationCode: OPERATION_CODES.R12,
-        destinationOperationQualification: OPERATION_QUALIFICATIONS.GROUPEMENT
+        destinationOperationCode: OPERATION_CODES.R12
       }
     );
     const bsffToAssociate = await createBsffAfterOperation(
       { emitter, transporter, destination },
       {
-        destinationOperationCode: OPERATION_CODES.R12,
-        destinationOperationQualification: OPERATION_QUALIFICATIONS.GROUPEMENT
+        destinationOperationCode: OPERATION_CODES.R12
       }
     );
     const bsff = await createBsff(

@@ -35,6 +35,7 @@ interface CompanySelectorProps {
   allowForeignCompanies?: boolean;
   heading?: string;
   disabled?: boolean;
+  optionalMail?: boolean;
 }
 
 export default function CompanySelector({
@@ -43,6 +44,7 @@ export default function CompanySelector({
   allowForeignCompanies,
   heading,
   disabled,
+  optionalMail = false,
 }: CompanySelectorProps) {
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
@@ -314,7 +316,7 @@ export default function CompanySelector({
       </div>
       <div className="form__row">
         <label>
-          Mail
+          Mail {optionalMail ? "(optionnel)" : null}
           <Field
             type="email"
             name={`${field.name}.mail`}

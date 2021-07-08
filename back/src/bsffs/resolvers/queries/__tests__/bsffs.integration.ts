@@ -9,8 +9,7 @@ import {
   UserWithCompany
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { OPERATION_CODES, OPERATION_QUALIFICATIONS } from "../../../constants";
-import { getFicheInterventionId } from "../../../converter";
+import { OPERATION_CODES } from "../../../constants";
 import {
   createBsff,
   createBsffAfterOperation
@@ -28,7 +27,7 @@ const GET_BSFFS = `
           bsffs {
             id
             ficheInterventions {
-              owner {
+              detenteur {
                 company {
                   siret
                 }
@@ -146,15 +145,20 @@ describe("Query.bsffs", () => {
         ficheInterventions: {
           create: [
             {
-              id: getFicheInterventionId(bsffId, ficheInterventionNumero),
               numero: ficheInterventionNumero,
               kilos: 2,
-              ownerCompanyName: "Acme",
-              ownerCompanySiret: "1".repeat(14),
-              ownerCompanyAddress: "12 rue de la Tige, 69000",
-              ownerCompanyMail: "contact@gmail.com",
-              ownerCompanyPhone: "06",
-              ownerCompanyContact: "Jeanne Michelin",
+              detenteurCompanyName: "Acme",
+              detenteurCompanySiret: "1".repeat(14),
+              detenteurCompanyAddress: "12 rue de la Tige, 69000",
+              detenteurCompanyMail: "contact@gmail.com",
+              detenteurCompanyPhone: "06",
+              detenteurCompanyContact: "Jeanne Michelin",
+              operateurCompanyName: "Clim'op",
+              operateurCompanySiret: "2".repeat(14),
+              operateurCompanyAddress: "12 rue de la Tige, 69000",
+              operateurCompanyMail: "contact@climop.com",
+              operateurCompanyPhone: "06",
+              operateurCompanyContact: "Jean Dupont",
               postalCode: "69000"
             }
           ]
@@ -183,16 +187,13 @@ describe("Query.bsffs", () => {
     await createBsff(
       { emitter },
       {
-        destinationOperationCode: OPERATION_CODES.D10,
-        destinationOperationQualification: OPERATION_QUALIFICATIONS.INCINERATION
+        destinationOperationCode: OPERATION_CODES.D10
       }
     );
     await createBsff(
       { emitter },
       {
-        destinationOperationCode: OPERATION_CODES.R12,
-        destinationOperationQualification:
-          OPERATION_QUALIFICATIONS.RECONDITIONNEMENT
+        destinationOperationCode: OPERATION_CODES.R12
       }
     );
 
@@ -205,81 +206,6 @@ describe("Query.bsffs", () => {
             destination: {
               operation: {
                 code: "D10"
-              }
-            }
-          }
-        }
-      }
-    );
-
-    expect(data.bsffs.edges.length).toBe(1);
-  });
-
-  it("should filter bsffs with a given operation qualification", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    await createBsff(
-      { emitter },
-      {
-        destinationOperationCode: OPERATION_CODES.D10,
-        destinationOperationQualification: OPERATION_QUALIFICATIONS.INCINERATION
-      }
-    );
-    await createBsff(
-      { emitter },
-      {
-        destinationOperationCode: OPERATION_CODES.R12,
-        destinationOperationQualification:
-          OPERATION_QUALIFICATIONS.RECONDITIONNEMENT
-      }
-    );
-
-    const { query } = makeClient(emitter.user);
-    const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
-      GET_BSFFS,
-      {
-        variables: {
-          where: {
-            destination: {
-              operation: {
-                qualification: "INCINERATION"
-              }
-            }
-          }
-        }
-      }
-    );
-
-    expect(data.bsffs.edges.length).toBe(1);
-  });
-
-  it("should filter bsffs with a given operation code and qualification", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    await createBsff(
-      { emitter },
-      {
-        destinationOperationCode: OPERATION_CODES.R12,
-        destinationOperationQualification:
-          OPERATION_QUALIFICATIONS.RECONDITIONNEMENT
-      }
-    );
-    await createBsff(
-      { emitter },
-      {
-        destinationOperationCode: OPERATION_CODES.R12,
-        destinationOperationQualification: OPERATION_QUALIFICATIONS.GROUPEMENT
-      }
-    );
-
-    const { query } = makeClient(emitter.user);
-    const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
-      GET_BSFFS,
-      {
-        variables: {
-          where: {
-            destination: {
-              operation: {
-                code: "R12",
-                qualification: "RECONDITIONNEMENT"
               }
             }
           }
@@ -304,10 +230,6 @@ describe("Query.bsffs", () => {
 
       const bsffId = getReadableId(ReadableIdPrefix.FF);
       const ficheInterventionNumero = "00001";
-      const ficheInterventionId = getFicheInterventionId(
-        bsffId,
-        ficheInterventionNumero
-      );
       associatedBsff = await createBsffAfterOperation(
         {
           emitter,
@@ -317,28 +239,31 @@ describe("Query.bsffs", () => {
         {
           id: bsffId,
           destinationOperationCode: OPERATION_CODES.R12,
-          destinationOperationQualification:
-            OPERATION_QUALIFICATIONS.GROUPEMENT,
           ficheInterventions: {
             create: [
               {
-                id: ficheInterventionId,
                 numero: ficheInterventionNumero,
                 kilos: 2,
                 postalCode: "69000",
-                ownerCompanyName: "Acme",
-                ownerCompanySiret: "1".repeat(14),
-                ownerCompanyAddress: "12 rue Albert Lyon 69000",
-                ownerCompanyContact: "Carla Brownie",
-                ownerCompanyMail: "carla.brownie@gmail.com",
-                ownerCompanyPhone: "06"
+                detenteurCompanyName: "Acme",
+                detenteurCompanySiret: "1".repeat(14),
+                detenteurCompanyAddress: "12 rue Albert Lyon 69000",
+                detenteurCompanyContact: "Carla Brownie",
+                detenteurCompanyMail: "carla.brownie@gmail.com",
+                detenteurCompanyPhone: "06",
+                operateurCompanyName: "Clim'op",
+                operateurCompanySiret: "2".repeat(14),
+                operateurCompanyAddress: "12 rue Albert Lyon 69000",
+                operateurCompanyContact: "Dupont Jean",
+                operateurCompanyMail: "contact@climop.com",
+                operateurCompanyPhone: "06"
               }
             ]
           }
         }
       );
-      associatedBsffFicheIntervention = await prisma.bsffFicheIntervention.findUnique(
-        { where: { id: ficheInterventionId } }
+      associatedBsffFicheIntervention = await prisma.bsffFicheIntervention.findFirst(
+        { where: { bsffId: associatedBsff.id } }
       );
     });
 
@@ -360,7 +285,7 @@ describe("Query.bsffs", () => {
       ]);
     });
 
-    it("should show the owner from the fiche d'interventions to companies on the bsff", async () => {
+    it("should show the detenteur from the fiche d'interventions to companies on the bsff", async () => {
       await createBsff(
         { emitter, transporter, destination },
         { bsffs: { connect: [{ id: associatedBsff.id }] } }
@@ -375,9 +300,9 @@ describe("Query.bsffs", () => {
         expect.objectContaining({
           ficheInterventions: [
             {
-              owner: {
+              detenteur: {
                 company: {
-                  siret: associatedBsffFicheIntervention.ownerCompanySiret
+                  siret: associatedBsffFicheIntervention.detenteurCompanySiret
                 }
               }
             }
@@ -386,7 +311,7 @@ describe("Query.bsffs", () => {
       ]);
     });
 
-    it("should not show the owner from the fiche d'interventions to companies not on the bsff", async () => {
+    it("should not show the detenteur from the fiche d'interventions to companies not on the bsff", async () => {
       const newDestination = await userWithCompanyFactory(UserRole.ADMIN);
 
       await createBsff(
@@ -403,7 +328,7 @@ describe("Query.bsffs", () => {
         expect.objectContaining({
           ficheInterventions: [
             {
-              owner: null
+              detenteur: null
             }
           ]
         })

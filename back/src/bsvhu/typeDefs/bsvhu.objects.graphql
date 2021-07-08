@@ -23,9 +23,9 @@ type Bsvhu {
   "Numéro unique attribué par Trackdéchets"
   id: ID!
   "Date de création"
-  createdAt: DateTime!
+  createdAt: DateTime
   "Date de dernière modification"
-  updatedAt: DateTime!
+  updatedAt: DateTime
   "Indique si le bordereau est à l'état de brouillon"
   isDraft: Boolean!
   "Status du bordereau"

@@ -18,9 +18,10 @@ import {
 import prisma from "../../../prisma";
 import { expandFormFromDb } from "../../../forms/form-converter";
 import { expandBsdasriFromDb } from "../../../bsdasris/dasri-converter";
-import { expandVhuFormFromDb } from "../../../vhu/converter";
+import { expandVhuFormFromDb } from "../../../bsvhu/converter";
 import { expandBsdaFromDb } from "../../../bsda/converter";
 import { getUserCompanies } from "../../../users/database";
+import { unflattenBsff } from "../../../bsffs/converter";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -188,7 +189,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
       ...acc,
       [type]: acc[type].concat([id])
     }),
-    { BSDD: [], BSDASRI: [], BSVHU: [], BSDA: [] }
+    { BSDD: [], BSDASRI: [], BSVHU: [], BSDA: [], BSFF: [] }
   );
 
   const bsds: Record<BsdType, Bsd[]> = {
@@ -227,7 +228,20 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
           }
         }
       })
-    ).map(expandBsdaFromDb)
+    ).map(expandBsdaFromDb),
+    BSFF: (
+      await prisma.bsff.findMany({
+        where: {
+          id: {
+            in: ids.BSFF
+          }
+        }
+      })
+    ).map(bsff => ({
+      ...unflattenBsff(bsff),
+      ficheInterventions: [],
+      bsffs: []
+    }))
   };
   const edges = hits
     .reduce<Array<Bsd>>((acc, { _source: { type, id } }) => {
@@ -248,7 +262,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
 
   const pageInfo = {
     // startCursor and endCursor are null if the list is empty
-    // this not 100% spec compliant but there are discussions to change that:
+    // this is not 100% spec compliant but there are discussions to change that:
     // https://github.com/facebook/relay/issues/1852
     // https://github.com/facebook/relay/pull/2655
     startCursor: edges[0]?.cursor || null,

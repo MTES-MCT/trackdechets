@@ -1,7 +1,7 @@
 import { Plugin } from "@docusaurus/types";
 import bsdWorkflows from "../../back/src/forms/examples/workflows";
 import bsdasriWorkflows from "../../back/src/bsdasris/examples/workflows";
-import bsvhuWorkflows from "../../back/src/vhu/examples/workflows";
+import bsvhuWorkflows from "../../back/src/bsvhu/examples/workflows";
 import { Workflow } from "../../back/src/common/workflow";
 
 // parse workflow definition files

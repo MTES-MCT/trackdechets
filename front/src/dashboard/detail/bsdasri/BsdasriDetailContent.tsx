@@ -83,12 +83,12 @@ const Emitter = ({ form }: { form: Bsdasri }) => {
       </div>
       <div className={styles.detailGrid}>
         <DetailRow
-          value={emission?.wasteDetails?.quantity}
+          value={emission?.wasteDetails?.quantity?.value}
           label="Quantité"
           units="kg"
         />
         <DetailRow
-          value={getVerboseQuantityType(emission?.wasteDetails?.quantityType)}
+          value={getVerboseQuantityType(emission?.wasteDetails?.quantity?.type)}
           label="Quantité"
         />
         <DetailRow
@@ -144,12 +144,14 @@ const Transporter = ({ form }: { form: Bsdasri }) => {
           label="Mode de transport"
         />
         <DetailRow
-          value={transport?.wasteDetails?.quantity}
+          value={transport?.wasteDetails?.quantity?.value}
           label="Quantité"
           units="kg"
         />
         <DetailRow
-          value={getVerboseQuantityType(transport?.wasteDetails?.quantityType)}
+          value={getVerboseQuantityType(
+            transport?.wasteDetails?.quantity?.type
+          )}
           label="Quantité"
         />
         <DetailRow
@@ -200,15 +202,6 @@ const Recipient = ({ form }: { form: Bsdasri }) => {
       </div>
       <div className={styles.detailGrid}>
         <DetailRow
-          value={reception?.wasteDetails?.quantity}
-          label="Quantité"
-          units="kg"
-        />
-        <DetailRow
-          value={getVerboseQuantityType(reception?.wasteDetails?.quantityType)}
-          label="Quantité"
-        />
-        <DetailRow
           value={reception?.wasteDetails?.volume}
           label="Volume"
           units="l"
@@ -243,6 +236,12 @@ const Recipient = ({ form }: { form: Bsdasri }) => {
         />
       </div>
       <div className={styles.detailGrid}>
+        <DetailRow
+          value={operation?.quantity?.value}
+          label="Quantité"
+          units="kg"
+        />
+
         <DetailRow
           value={operation?.processingOperation}
           label="Opération de traitement"

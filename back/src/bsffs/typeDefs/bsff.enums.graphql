@@ -1,3 +1,18 @@
+enum BsffStatus {
+  "Le bordereau ne comporte aucune signature."
+  INITIAL
+  "Le bordereau a été signé par l'emitter."
+  SIGNED_BY_EMITTER
+  "Le bordereau a été signé par le transporteur."
+  SENT
+  "Le bordereau a été reçu par l'installation de destination."
+  RECEIVED
+  "Le déchet a été traité par l'installation de destination."
+  PROCESSED
+  "Le déchet a été refusé par l'installation de traitement."
+  REFUSED
+}
+
 enum BsffPackagingType {
   BOUTEILLE
 }
@@ -9,19 +24,6 @@ enum BsffOperationCode {
   D10
   D13
   D14
-}
-
-"""
-Liste des qualifications de traitement possible.
-Attention, certaines combinaisons de code et qualification ne sont pas possibles.
-Par exemple, seul le code D 10 peut être associé à une incinération.
-"""
-enum BsffOperationQualification {
-  RECUPERATION_REGENERATION
-  INCINERATION
-  GROUPEMENT
-  RECONDITIONNEMENT
-  REEXPEDITION
 }
 
 enum BsffSignatureType {

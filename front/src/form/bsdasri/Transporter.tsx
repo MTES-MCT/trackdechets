@@ -17,6 +17,7 @@ export default function Transporter({ status }) {
   const showTransportFields = [
     BsdasriStatus.SignedByProducer,
     BsdasriStatus.Sent,
+    BsdasriStatus.Received,
   ].includes(status);
   // handedOverAt is editable even after dasri reception
   const showHandedOverAtField = [
@@ -41,6 +42,7 @@ export default function Transporter({ status }) {
         disabled={disabled}
         name="transporter.company"
         heading="Entreprise de transport"
+        optionalMail={true}
         onCompanySelected={transporter => {
           if (transporter.transporterReceipt) {
             setFieldValue(
@@ -160,14 +162,14 @@ export default function Transporter({ status }) {
             component={Packagings}
             disabled={disabled}
           />
-          <h4 className="form__section-heading">Quantité en kg</h4>
+          <h4 className="form__section-heading">Quantité transportée</h4>
 
           <div className="form__row">
             <label>
-              Quantité transportée :
+              Quantité en kg :
               <Field
                 component={NumberInput}
-                name="transport.wasteDetails.quantity"
+                name="transport.wasteDetails.quantity.value"
                 className="td-input dasri__waste-details__quantity"
                 disabled={disabled}
                 placeholder="En kg"
@@ -177,21 +179,21 @@ export default function Transporter({ status }) {
               <span className="tw-ml-2">kg</span>
             </label>
 
-            <RedErrorMessage name="transport.wasteDetails.quantity" />
+            <RedErrorMessage name="transport.wasteDetails.quantity.value" />
           </div>
 
           <div className="form__row">
             <fieldset>
               <legend className="tw-font-semibold">Cette quantité est</legend>
               <Field
-                name="transport.wasteDetails.quantityType"
+                name="transport.wasteDetails.quantity.type"
                 id="REAL"
                 label="Réélle"
                 component={RadioButton}
                 disabled={disabled}
               />
               <Field
-                name="transport.wasteDetails.quantityType"
+                name="transport.wasteDetails.quantity.type"
                 id="ESTIMATED"
                 label="Estimée"
                 component={RadioButton}

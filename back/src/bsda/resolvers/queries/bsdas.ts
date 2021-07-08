@@ -3,7 +3,7 @@ import { QueryBsdasArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
-import { getConnectionsArgs } from "../../../vhu/pagination";
+import { getConnectionsArgs } from "../../../bsvhu/pagination";
 import { expandBsdaFromDb } from "../../converter";
 import { convertWhereToDbFilter } from "../../where";
 

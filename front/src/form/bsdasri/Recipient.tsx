@@ -5,14 +5,16 @@ import { Field } from "formik";
 import React from "react";
 import { BsdasriStatus } from "generated/graphql/types";
 import Packagings from "./components/packagings/Packagings";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 
 export default function Recipient({ status }) {
   const receptionDisabled = BsdasriStatus.Received === status;
   // it's pointless to show reception or operation fields until form has relevant signatures
-  const showReceptionFields = status === BsdasriStatus.Sent;
+  const showReceptionFields = [
+    BsdasriStatus.Sent,
+    BsdasriStatus.Received,
+  ].includes(status);
   const showOperationFields = status === BsdasriStatus.Received;
 
   return (
@@ -28,6 +30,7 @@ export default function Recipient({ status }) {
         name="recipient.company"
         heading="Installation destinataire"
         disabled={receptionDisabled}
+        optionalMail={true}
       />
 
       <div className="form__row">
@@ -65,46 +68,6 @@ export default function Recipient({ status }) {
             component={Packagings}
             disabled={receptionDisabled}
           />
-
-          <h4 className="form__section-heading">Quantité en kg</h4>
-
-          <div className="form__row">
-            <label>
-              Quantité réceptionnée :
-              <Field
-                component={NumberInput}
-                name="reception.wasteDetails.quantity"
-                className="td-input dasri__waste-details__quantity"
-                disabled={receptionDisabled}
-                placeholder="En kg"
-                min="0"
-                step="1"
-              />
-              <span className="tw-ml-2">kg</span>
-            </label>
-
-            <RedErrorMessage name="emission.wasteDetails.quantity" />
-          </div>
-
-          <div className="form__row">
-            <fieldset>
-              <legend className="tw-font-semibold">Cette quantité est</legend>
-              <Field
-                name="reception.wasteDetails.quantityType"
-                id="REAL"
-                label="Réélle"
-                component={RadioButton}
-                disabled={receptionDisabled}
-              />
-              <Field
-                name="reception.wasteDetails.quantityType"
-                id="ESTIMATED"
-                label="Estimée"
-                component={RadioButton}
-                disabled={receptionDisabled}
-              />
-            </fieldset>
-          </div>
         </>
       ) : (
         <p>Cette section sera disponible quand le déchet aura été envoyé</p>
@@ -122,17 +85,21 @@ export default function Recipient({ status }) {
             >
               <option value="">-----</option>
 
-              <option value="D9">D9 - Prétraitement par désinfection</option>
-              <option value="D10">
-                D10 - Incinération DASRI d'origine humaine
+              <option value="D9">
+                D9 - Prétraitement par désinfection - Banaliseur
               </option>
+              <option value="D10">D10 - Incinération</option>
               <option value="R1">
-                R1 - Incinération DASRI d'origine animale
+                R1 - Incinération + valorisation énergétique
               </option>
               <option value="D12">
-                D12 - Regroupement D12 Préalable à D9 ou D10
+                D12 - Groupement avant désinfection en D9 ou incinération en D10
+                sur un site relevant de la rubrique 2718
               </option>
-              <option value="R12">R12 - Regroupement R12 Préalable à R1</option>
+              <option value="R12">
+                R12 - Groupement avant incinération en R1, sur un site relevant
+                de la rubrique 2718
+              </option>
             </Field>
           </div>
           <div className="form__row">
@@ -146,6 +113,25 @@ export default function Recipient({ status }) {
                 />
               </div>
             </label>
+          </div>
+
+          <h4 className="form__section-heading">Quantité traitée</h4>
+
+          <div className="form__row">
+            <label>
+              Quantité en kg :
+              <Field
+                component={NumberInput}
+                name="operation.quantity.value"
+                className="td-input dasri__waste-details__quantity"
+                placeholder="En kg"
+                min="0"
+                step="1"
+              />
+              <span className="tw-ml-2">kg</span>
+            </label>
+
+            <RedErrorMessage name="operation.quantity.value" />
           </div>
         </>
       ) : (

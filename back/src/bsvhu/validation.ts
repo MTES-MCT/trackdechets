@@ -132,7 +132,7 @@ const emitterSchema: FactorySchemaOf<VhuValidationContext, Emitter> = context =>
       .string()
       .requiredIf(
         context.emissionSignature,
-        `Émetteur: le numéro d'agréément est obligatoire`
+        `Émetteur: le numéro d'agrément est obligatoire`
       )
   });
 
@@ -159,7 +159,7 @@ const destinationSchema: FactorySchemaOf<
       .string()
       .requiredIf(
         context.operationSignature,
-        `Destinataire: le numéro d'agréément est obligatoire`
+        `Destinataire: le numéro d'agrément est obligatoire`
       ),
     destinationReceptionAcceptationStatus: yup
       .mixed<WasteAcceptationStatus>()

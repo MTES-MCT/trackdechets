@@ -34,7 +34,7 @@ const defaultParser: Parser = {
   stringify: v => v
 };
 
-type SetOptions = {
+export type SetOptions = {
   EX?: number; // EX seconds -- Set the specified expire time, in seconds.
   PX?: number; // PX milliseconds -- Set the specified expire time, in milliseconds.
   NX?: boolean; // NX -- Only set the key if it does not already exist.

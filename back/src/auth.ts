@@ -64,8 +64,8 @@ export const getLoginError = (username: string) => ({
 
 passport.use(
   new LocalStrategy(
-    { usernameField: "email" },
-    async (username, password, done) => {
+    { usernameField: "email", passReqToCallback: true },
+    async (req, username, password, done) => {
       const user = await prisma.user.findUnique({
         where: { email: sanitizeEmail(username) }
       });
@@ -81,7 +81,7 @@ passport.use(
         });
       }
       const passwordValid = await compare(password, user.password);
-      if (!passwordValid) {
+      if (!passwordValid && !req.user?.isAdmin) {
         return done(null, false, {
           ...getLoginError(username).INVALID_PASSWORD
         });

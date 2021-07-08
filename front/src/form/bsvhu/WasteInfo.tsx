@@ -97,11 +97,7 @@ export default function WasteInfo({ disabled }) {
         <label>
           Détail des identifications
           <Tooltip msg="Saisissez les identifications une par une. Appuyez sur la touche <Entrée> pour valider chacune" />
-          <TagsInput
-            name="identification.numbers"
-            onChange={val => console.log(val)}
-            disabled={disabled}
-          />
+          <TagsInput name="identification.numbers" disabled={disabled} />
         </label>
       </div>
 
@@ -130,7 +126,7 @@ export default function WasteInfo({ disabled }) {
               component={NumberInput}
               name="quantity.tons"
               className="td-input waste-details__quantity"
-              placeholder="2"
+              placeholder="0"
               min="0"
               step="1"
             />

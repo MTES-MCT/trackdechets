@@ -1,0 +1,1 @@
+ALTER TABLE "default$default"."Bsdasri" DROP COLUMN "recipientWasteQuantityType";

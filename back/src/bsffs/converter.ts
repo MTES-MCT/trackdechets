@@ -1,4 +1,3 @@
-import slugify from "slugify";
 import * as Prisma from ".prisma/client";
 import { nullIfNoValues, safeInput } from "../forms/form-converter";
 import * as GraphQL from "../generated/graphql/types";
@@ -34,7 +33,7 @@ export function flattenBsffInput(
     packagings: bsffInput.packagings,
 
     wasteCode: bsffInput.waste?.code,
-    wasteDescription: bsffInput.waste?.description,
+    wasteNature: bsffInput.waste?.nature,
     wasteAdr: bsffInput.waste?.adr,
 
     quantityKilos: bsffInput.quantity?.kilos,
@@ -56,12 +55,12 @@ export function flattenBsffInput(
 
     transporterTransportMode: bsffInput.transporter?.transport?.mode,
 
-    destinationCompanyName: bsffInput.destination?.company.name,
-    destinationCompanySiret: bsffInput.destination?.company.siret,
-    destinationCompanyAddress: bsffInput.destination?.company.address,
-    destinationCompanyContact: bsffInput.destination?.company.contact,
-    destinationCompanyPhone: bsffInput.destination?.company.phone,
-    destinationCompanyMail: bsffInput.destination?.company.mail,
+    destinationCompanyName: bsffInput.destination?.company?.name,
+    destinationCompanySiret: bsffInput.destination?.company?.siret,
+    destinationCompanyAddress: bsffInput.destination?.company?.address,
+    destinationCompanyContact: bsffInput.destination?.company?.contact,
+    destinationCompanyPhone: bsffInput.destination?.company?.phone,
+    destinationCompanyMail: bsffInput.destination?.company?.mail,
 
     destinationReceptionDate: bsffInput.destination?.reception?.date,
     destinationReceptionKilos: bsffInput.destination?.reception?.kilos,
@@ -69,12 +68,8 @@ export function flattenBsffInput(
 
     destinationPlannedOperationCode:
       bsffInput.destination?.plannedOperation?.code,
-    destinationPlannedOperationQualification:
-      bsffInput.destination?.plannedOperation?.qualification,
 
     destinationOperationCode: bsffInput.destination?.operation?.code,
-    destinationOperationQualification:
-      bsffInput.destination?.operation?.qualification,
 
     destinationOperationNextDestinationCompanyName:
       bsffInput.destination?.operation?.nextDestination?.company.name,
@@ -100,6 +95,7 @@ export function unflattenBsff(
 ): Omit<GraphQL.Bsff, "ficheInterventions" | "bsffs"> {
   return {
     id: prismaBsff.id,
+    status: prismaBsff.status,
     emitter: nullIfNoValues<GraphQL.BsffEmitter>({
       company: nullIfNoValues<GraphQL.FormCompany>({
         name: prismaBsff.emitterCompanyName,
@@ -119,7 +115,7 @@ export function unflattenBsff(
     packagings: prismaBsff.packagings as GraphQL.BsffPackaging[],
     waste: nullIfNoValues<GraphQL.BsffWaste>({
       code: prismaBsff.wasteCode,
-      description: prismaBsff.wasteDescription,
+      nature: prismaBsff.wasteNature,
       adr: prismaBsff.wasteAdr
     }),
     quantity: nullIfNoValues<GraphQL.BsffQuantity>({
@@ -169,7 +165,6 @@ export function unflattenBsff(
       }),
       operation: nullIfNoValues<GraphQL.BsffOperation>({
         code: prismaBsff.destinationOperationCode as GraphQL.BsffOperationCode,
-        qualification: prismaBsff.destinationOperationQualification as GraphQL.BsffOperationQualification,
         nextDestination: nullIfNoValues<GraphQL.BsffNextDestination>({
           company: nullIfNoValues<GraphQL.FormCompany>({
             name: prismaBsff.destinationOperationNextDestinationCompanyName,
@@ -190,8 +185,7 @@ export function unflattenBsff(
         })
       }),
       plannedOperation: nullIfNoValues<GraphQL.BsffPlannedOperation>({
-        code: prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode,
-        qualification: prismaBsff.destinationPlannedOperationQualification as GraphQL.BsffOperationQualification
+        code: prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode
       }),
       cap: prismaBsff.destinationCap
     })
@@ -200,16 +194,29 @@ export function unflattenBsff(
 
 export function flattenFicheInterventionBsffInput(
   ficheInterventionInput: GraphQL.BsffFicheInterventionInput
-): Omit<Prisma.Prisma.BsffFicheInterventionCreateInput, "id" | "numero"> {
+): Prisma.Prisma.BsffFicheInterventionCreateInput {
   return {
+    numero: ficheInterventionInput.numero,
     kilos: ficheInterventionInput.kilos,
     postalCode: ficheInterventionInput.postalCode,
-    ownerCompanyName: ficheInterventionInput.owner.company.name ?? "",
-    ownerCompanySiret: ficheInterventionInput.owner.company.siret ?? "",
-    ownerCompanyAddress: ficheInterventionInput.owner.company.address ?? "",
-    ownerCompanyContact: ficheInterventionInput.owner.company.contact ?? "",
-    ownerCompanyPhone: ficheInterventionInput.owner.company.phone ?? "",
-    ownerCompanyMail: ficheInterventionInput.owner.company.mail ?? ""
+
+    detenteurCompanyName: ficheInterventionInput.detenteur.company.name ?? "",
+    detenteurCompanySiret: ficheInterventionInput.detenteur.company.siret ?? "",
+    detenteurCompanyAddress:
+      ficheInterventionInput.detenteur.company.address ?? "",
+    detenteurCompanyContact:
+      ficheInterventionInput.detenteur.company.contact ?? "",
+    detenteurCompanyPhone: ficheInterventionInput.detenteur.company.phone ?? "",
+    detenteurCompanyMail: ficheInterventionInput.detenteur.company.mail ?? "",
+
+    operateurCompanyName: ficheInterventionInput.operateur.company.name ?? "",
+    operateurCompanySiret: ficheInterventionInput.operateur.company.siret ?? "",
+    operateurCompanyAddress:
+      ficheInterventionInput.operateur.company.address ?? "",
+    operateurCompanyContact:
+      ficheInterventionInput.operateur.company.contact ?? "",
+    operateurCompanyPhone: ficheInterventionInput.operateur.company.phone ?? "",
+    operateurCompanyMail: ficheInterventionInput.operateur.company.mail ?? ""
   };
 }
 
@@ -217,25 +224,29 @@ export function unflattenFicheInterventionBsff(
   prismaFicheIntervention: Prisma.BsffFicheIntervention
 ): GraphQL.BsffFicheIntervention {
   return {
+    id: prismaFicheIntervention.id,
     numero: prismaFicheIntervention.numero,
     kilos: prismaFicheIntervention.kilos,
     postalCode: prismaFicheIntervention.postalCode,
-    owner: {
+    detenteur: {
       company: {
-        name: prismaFicheIntervention.ownerCompanyName,
-        siret: prismaFicheIntervention.ownerCompanySiret,
-        address: prismaFicheIntervention.ownerCompanyAddress,
-        contact: prismaFicheIntervention.ownerCompanyContact,
-        phone: prismaFicheIntervention.ownerCompanyPhone,
-        mail: prismaFicheIntervention.ownerCompanyMail
+        name: prismaFicheIntervention.detenteurCompanyName,
+        siret: prismaFicheIntervention.detenteurCompanySiret,
+        address: prismaFicheIntervention.detenteurCompanyAddress,
+        contact: prismaFicheIntervention.detenteurCompanyContact,
+        phone: prismaFicheIntervention.detenteurCompanyPhone,
+        mail: prismaFicheIntervention.detenteurCompanyMail
+      }
+    },
+    operateur: {
+      company: {
+        name: prismaFicheIntervention.operateurCompanyName,
+        siret: prismaFicheIntervention.operateurCompanySiret,
+        address: prismaFicheIntervention.operateurCompanyAddress,
+        contact: prismaFicheIntervention.operateurCompanyContact,
+        phone: prismaFicheIntervention.operateurCompanyPhone,
+        mail: prismaFicheIntervention.operateurCompanyMail
       }
     }
   };
-}
-
-export function getFicheInterventionId(
-  bsffId: string,
-  ficheInterventionNumero: string
-): string {
-  return `${bsffId}-${slugify(ficheInterventionNumero, { replacement: "" })}`;
 }
