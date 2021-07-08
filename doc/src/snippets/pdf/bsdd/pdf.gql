@@ -1,0 +1,5 @@
+query {
+  formPdf(id: "BSD_ID") {
+    downloadLink
+  }
+}

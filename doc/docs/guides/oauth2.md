@@ -1,9 +1,9 @@
 ---
-title: OAuth2
+title: Créer une application OAuth2
 ---
 
 :::note
-Avant de pouvoir implémenter le procotole OAuth2, vous aurez besoin d'une application sur la plateforme Trackdéchets. Pour ce faire, merci de nous envoyer un email à l'adresse tech@trackdechets.beta.gouv.fr en spécifiant l'environnement concerné, (production ou ["bac à sable"](environments.md)) ainsi que les informations suivantes:
+Avant de pouvoir implémenter le procotole OAuth2, vous aurez besoin d'une application sur la plateforme Trackdéchets. Pour ce faire, merci de nous envoyer un email à l'adresse tech@trackdechets.beta.gouv.fr en spécifiant l'environnement concerné, (production ou ["bac à sable"](../reference/environments/environments)) ainsi que les informations suivantes:
 
 - Email associé à un compte Trackdéchets existant
 - Nom de l'application
@@ -126,7 +126,7 @@ Pragma: no-cache
 
 **Le token émit a une durée de vie infinie, il n'y a pas besoin de le rafraichir**. Il pourra toutefois être révoqué par l'utilisateur dans son espace client Trackdéchets.
 
-Vous pouvez ensuite stocker ce token et l'utiliser pour accéder aux ressources de l'utilisateur sur la plateforme Trackdéchets. Cf [Faire des appels à l'API GraphQL](graphql.md).
+Vous pouvez ensuite stocker ce token et l'utiliser pour accéder aux ressources de l'utilisateur sur la plateforme Trackdéchets.
 
 Si la requête échoue, le serveur répond par un message d'erreur tel que décrit [ici](https://tools.ietf.org/html/rfc6749#section-5.2)
 

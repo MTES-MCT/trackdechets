@@ -598,6 +598,10 @@ export type BsdasriOperation = {
 
 export type BsdasriOperationInput = {
   quantity?: Maybe<BsdasriQuantityInput>;
+  /**
+   * Code de traitement
+   * Les codes R12 et D12 ne sont autorisé que si le destinataire est une installation TTR (tri transit regroupement).
+   */
   processingOperation?: Maybe<Scalars["String"]>;
   processedAt?: Maybe<Scalars["DateTime"]>;
 };

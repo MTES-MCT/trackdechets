@@ -1,4 +1,6 @@
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
+const path = require("path");
+
 module.exports = {
   title: "Documentation de l'API Trackdéchets",
   tagline: "Connectez vos systèmes d'information à l'API Trackdéchets",
@@ -92,7 +94,7 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/MTES-MCT/trackdechets/doc",
+          editUrl: "https://github.com/MTES-MCT/trackdechets/edit/dev/doc",
           routeBasePath: "/",
         },
         theme: {
@@ -107,7 +109,7 @@ module.exports = {
       {
         id: "user-company",
         schema: "../back/src/{scalars,users,companies}/typeDefs/*.graphql",
-        routeBasePath: "/api-reference/user-company",
+        routeBasePath: "/reference/api-reference/user-company",
       },
     ],
     [
@@ -115,15 +117,15 @@ module.exports = {
       {
         id: "bsdd",
         schema: "../back/src/{scalars,bsds,forms}/typeDefs/*.graphql",
-        routeBasePath: "/api-reference/bsdd",
+        routeBasePath: "/reference/api-reference/bsdd",
       },
     ],
     [
       "docusaurus-graphql-plugin",
       {
         id: "bsdasri",
-        schema: "../back/src/{scalars,bsds,dasris}/typeDefs/*.graphql",
-        routeBasePath: "/api-reference/bsdasri",
+        schema: "../back/src/{scalars,bsds,bsdasris}/typeDefs/*.graphql",
+        routeBasePath: "/reference/api-reference/bsdasri",
       },
     ],
     [
@@ -131,7 +133,7 @@ module.exports = {
       {
         id: "bsff",
         schema: "../back/src/{scalars,bsds,bsffs}/typeDefs/*.graphql",
-        routeBasePath: "/api-reference/bsff",
+        routeBasePath: "/reference/api-reference/bsff",
       },
     ],
     [
@@ -139,16 +141,18 @@ module.exports = {
       {
         id: "bsda",
         schema: "../back/src/{scalars,bsds,bsda}/typeDefs/*.graphql",
-        routeBasePath: "/api-reference/bsda",
+        routeBasePath: "/reference/api-reference/bsda",
       },
     ],
     [
       "docusaurus-graphql-plugin",
       {
         id: "bsvhu",
-        schema: "../back/src/{scalars,bsds,vhu}/typeDefs/*.graphql",
-        routeBasePath: "/api-reference/bsvhu",
+        schema: "../back/src/{scalars,bsds,bsvhu}/typeDefs/*.graphql",
+        routeBasePath: "/reference/api-reference/bsvhu",
       },
     ],
+    // plugin used to make workflows examples available with `usePluginData`
+    path.join(__dirname, "plugin", "build", "doc", "plugin", "index.js"),
   ],
 };

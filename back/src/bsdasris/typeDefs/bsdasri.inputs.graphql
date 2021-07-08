@@ -95,7 +95,6 @@ input BsdasriWasteDetailTransportInput {
 input BsdasriRecipientWasteDetailInput {
   volume: Int
   packagingInfos: [BsdasriPackagingInfoInput!]
-
 }
 input BsdasriWasteAcceptationInput {
   status: WasteAcceptationStatusInput
@@ -148,6 +147,10 @@ input BsdasriReceptionInput {
 
 input BsdasriOperationInput {
   quantity: BsdasriQuantityInput
+  """
+  Code de traitement
+  Les codes R12 et D12 ne sont autorisé que si le destinataire est une installation TTR (tri transit regroupement).
+  """
   processingOperation: String
   processedAt: DateTime
 }

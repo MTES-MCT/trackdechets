@@ -1,0 +1,6 @@
+mutation TakeOverSegment($id: ID!, $takeOverInfo: TakeOverInput!) {
+  takeOverSegment(id: $id, takeOverInfo: $takeOverInfo) {
+    id
+    takenOverBy
+  }
+}

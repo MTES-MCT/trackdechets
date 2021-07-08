@@ -1,0 +1,5 @@
+query {
+  bsvhuPdf(id: "BSD_ID") {
+    downloadLink
+  }
+}

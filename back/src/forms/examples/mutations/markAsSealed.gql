@@ -1,0 +1,6 @@
+mutation MarkAsSealed($id: ID!) {
+  markAsSealed(id: $id) {
+    id
+    status
+  }
+}

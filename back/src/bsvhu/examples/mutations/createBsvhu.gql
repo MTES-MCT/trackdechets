@@ -1,0 +1,6 @@
+mutation CreateBsvhu($input: BsvhuInput!) {
+  createBsvhu(input: $input) {
+    id
+    status
+  }
+}
