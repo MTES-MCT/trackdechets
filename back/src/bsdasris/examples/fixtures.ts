@@ -19,8 +19,10 @@ function emitterInput(siret: string) {
 const emissionInput = {
   wasteCode: "18 01 03*",
   wasteDetails: {
-    quantity: 1,
-    quantityType: "REAL",
+    quantity: {
+      value: 1,
+      type: "REAL"
+    },
     onuCode: "non soumis",
     packagingInfos: [{ type: "BOITE_CARTON", quantity: 1, volume: 1 }]
   }
@@ -53,8 +55,10 @@ function transporterInput(siret: string) {
 const transportInput = {
   wasteAcceptation: { status: "ACCEPTED" },
   wasteDetails: {
-    quantity: 1,
-    quantityType: "REAL",
+    quantity: {
+      value: 1,
+      type: "REAL"
+    },
     packagingInfos: [{ type: "BOITE_CARTON", quantity: 1, volume: 1 }]
   },
   takenOverAt: "2022-04-27"
@@ -80,14 +84,17 @@ function recipientInput(siret: string) {
 const receptionInput = {
   wasteAcceptation: { status: "ACCEPTED" },
   wasteDetails: {
-    quantity: 1,
-    quantityType: "REAL",
+    volume: 1,
     packagingInfos: [{ type: "BOITE_CARTON", quantity: 1, volume: 1 }]
   },
   receivedAt: "2021-04-27"
 };
 
 const operationInput = {
+  quantity: {
+    value: 1,
+    type: "REAL"
+  },
   processingOperation: "D10",
   processedAt: "2020-04-28"
 };

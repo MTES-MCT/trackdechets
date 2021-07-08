@@ -124,7 +124,7 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "bsdasri",
-        schema: "../back/src/{scalars,bsds,dasris}/typeDefs/*.graphql",
+        schema: "../back/src/{scalars,bsds,bsdasris}/typeDefs/*.graphql",
         routeBasePath: "/reference/api-reference/bsdasri",
       },
     ],
@@ -148,7 +148,7 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "bsvhu",
-        schema: "../back/src/{scalars,bsds,vhu}/typeDefs/*.graphql",
+        schema: "../back/src/{scalars,bsds,bsvhu}/typeDefs/*.graphql",
         routeBasePath: "/reference/api-reference/bsvhu",
       },
     ],
