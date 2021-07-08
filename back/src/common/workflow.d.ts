@@ -1,5 +1,5 @@
 /**
- * A workflow defines a series of steps applied to BSD in a particular
+ * A workflow defines a series of steps applied to a BSD in a particular
  * traceability use case (acheminement direct, regroupement, reconditionnement, multi-modal, etc)
  * The different steps should be composables and testables.
  * A context containing runtime variables is passed from one step to the other.
