@@ -4,6 +4,7 @@ import {
   fullFormFragment,
   dasriFragment,
   vhuFragment,
+  bsdaFragment,
 } from "./fragments";
 
 // full fledged bsd to display in detailled views
@@ -69,6 +70,9 @@ export const GET_BSDS = gql`
               nature
             }
           }
+          ... on Bsda {
+            ...BsdaFragment
+          }
         }
       }
       pageInfo {
@@ -81,4 +85,5 @@ export const GET_BSDS = gql`
   ${fullFormFragment}
   ${dasriFragment}
   ${vhuFragment}
+  ${bsdaFragment}
 `;
