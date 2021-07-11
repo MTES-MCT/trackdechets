@@ -1,8 +1,8 @@
-import sanitizeGraphql from "../sanitizeGraphql";
+import sanitizePathBody from "../sanitizePathBody";
 
-describe("sanitizeGraphqlMiddleware", () => {
+describe("sanitizePathBodyMiddleware", () => {
   const callMiddleware = body => {
-    const middleware = sanitizeGraphql("/");
+    const middleware = sanitizePathBody("/");
     const req: any = { path: "/", body };
     middleware(req, null, () => null);
   };

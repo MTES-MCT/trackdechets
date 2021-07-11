@@ -21,7 +21,7 @@ import { downloadFileHandler } from "./common/file-download";
 import errorHandler from "./common/middlewares/errorHandler";
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
-import sanitizeGraphqlMiddleware from "./common/middlewares/sanitizeGraphql";
+import sanitizePathBodyMiddleware from "./common/middlewares/sanitizePathBody";
 import { redisClient } from "./common/redis";
 import { authRouter } from "./routers/auth-router";
 import { oauth2Router } from "./routers/oauth2-router";
@@ -201,7 +201,7 @@ app.use((req, res, next) => {
 });
 
 // GraphQL sanitization middleware
-app.use(sanitizeGraphqlMiddleware(graphQLPath));
+app.use(sanitizePathBodyMiddleware(graphQLPath));
 
 /**
  * Wire up ApolloServer to /

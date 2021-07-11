@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import sanitizeHtml from "sanitize-html";
 
-export default function sanitizeGraphqlMiddleware(graphQLPath: string) {
+export default function sanitizePathBodyMiddleware(graphQLPath: string) {
   return function (req: Request, res: Response, next: NextFunction) {
-    // We only sanitize GraphQL variables
-    if (req.path !== graphQLPath || !req.body.variables) {
+    // We only sanitize GraphQL requests
+    if (req.path !== graphQLPath) {
       return next();
     }
 
@@ -17,9 +17,9 @@ export default function sanitizeGraphqlMiddleware(graphQLPath: string) {
      * | { foo: "<script>" }                  | "{\"foo\":\"<script>\"}"                  | "{\"foo\":\""       | Error          |
      * | { foo: "<script>alert(1)</script>" } | "{\"foo\":\"<script>alert(1)</script>\"}" | "{\"foo\":\"\"}"    | { foo: "" }    |
      */
-    const stringifiedVariables = JSON.stringify(req.body.variables);
-    const sanitizedStringifiedVariables = sanitizeHtml(stringifiedVariables);
-    req.body.variables = JSON.parse(sanitizedStringifiedVariables);
+    const stringifiedBody = JSON.stringify(req.body);
+    const sanitizedStringifiedBody = sanitizeHtml(stringifiedBody);
+    req.body = JSON.parse(sanitizedStringifiedBody);
 
     next();
   };
