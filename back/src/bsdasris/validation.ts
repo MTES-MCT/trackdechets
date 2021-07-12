@@ -165,15 +165,7 @@ export const emitterSchema: FactorySchemaOf<
     emitterWorkSiteCity: yup.string().nullable(),
     emitterWorkSitePostalCode: yup.string().nullable(),
     emitterWorkSiteInfos: yup.string().nullable(),
-    emitterOnBehalfOfEcoorganisme: yup
-      .boolean()
-      .notRequired()
-      .nullable()
-      .test(
-        "no-ecoorg-if-not-regrouping",
-        "Émetteur: le champ onBehalfOfEcoorganisme n'est à remplir que pour les bordereaux de regroupement",
-        v => (!context.isRegrouping ? !v : true)
-      )
+    emitterOnBehalfOfEcoorganisme: yup.boolean().notRequired().nullable()
   });
 
 const packagingsTypes: BsdasriPackagings[] = [
