@@ -174,7 +174,7 @@ export default function Transporter({ status }) {
                 disabled={disabled}
                 placeholder="En kg"
                 min="0"
-                step="1"
+                step="0.1"
               />
               <span className="tw-ml-2">kg</span>
             </label>
