@@ -1961,6 +1961,8 @@ export type CompanyPublic = {
   vhuAgrementBroyeur?: Maybe<VhuAgrement>;
   /** Liste des agréments de l'éco-organisme */
   ecoOrganismeAgreements: Array<Scalars["URL"]>;
+  /** L'entreprise autorise l'enlèvement d'un Dasri sans sa signature */
+  allowBsdasriTakeOverWithoutSignature?: Maybe<Scalars["Boolean"]>;
 };
 
 /** Information sur un établissement accessible publiquement en recherche */
@@ -7198,6 +7200,11 @@ export type CompanyPublicResolvers<
     ParentType,
     ContextType
   >;
+  allowBsdasriTakeOverWithoutSignature?: Resolver<
+    Maybe<ResolversTypes["Boolean"]>,
+    ParentType,
+    ContextType
+  >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -11178,6 +11185,7 @@ export function createCompanyPublicMock(
     vhuAgrementDemolisseur: null,
     vhuAgrementBroyeur: null,
     ecoOrganismeAgreements: [],
+    allowBsdasriTakeOverWithoutSignature: null,
     ...props
   };
 }
