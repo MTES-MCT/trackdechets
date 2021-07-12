@@ -746,7 +746,7 @@ model Bsdasri {
   transporterCustomInfo String? // free field
 
   // transport
-  transportMode                     TransportMode? @default(ROAD)
+  transportMode                     TransportMode?          @default(ROAD)
   transporterWasteAcceptationStatus WasteAcceptationStatus?
   transporterWasteRefusalReason     String?
   transporterWasteRefusedQuantity   Float? // kg
@@ -987,6 +987,16 @@ model Bsda {
   quantityType  QuantityType?
   quantityValue Float?
 
+  brokerCompanyName    String?
+  brokerCompanySiret   String?
+  brokerCompanyAddress String?
+  brokerCompanyContact String?
+  brokerCompanyPhone   String?
+  brokerCompanyMail    String?
+  brokerRecepisseNumber        String?
+  brokerRecepisseDepartment     String?
+  brokerRecepisseValidityLimit  DateTime?
+
   destinationCompanyName          String?
   destinationCompanySiret         String?
   destinationCompanyAddress       String?
@@ -1007,16 +1017,32 @@ model Bsda {
   destinationOperationSignatureAuthor String?
   destinationOperationSignatureDate   DateTime?
 
-  transporterCompanyName              String?
-  transporterCompanySiret             String?
-  transporterCompanyAddress           String?
-  transporterCompanyContact           String?
-  transporterCompanyPhone             String?
-  transporterCompanyMail              String?
-  transporterCompanyVatNumber         String?
-  transporterRecepisseNumber          String?
-  transporterRecepisseDepartment      String?
-  transporterRecepisseValidityLimit   DateTime?
+  destinationOperationNextDestinationCompanySiret         String?
+  destinationOperationNextDestinationCompanyVatNumber     String?
+  destinationOperationNextDestinationCompanyName          String?
+  destinationOperationNextDestinationCompanyAddress       String?
+  destinationOperationNextDestinationCompanyContact       String?
+  destinationOperationNextDestinationCompanyPhone         String?
+  destinationOperationNextDestinationCompanyMail          String?
+  destinationOperationNextDestinationCap                  String?
+  destinationOperationNextDestinationPlannedOperationCode String?
+
+  transporterCompanyName      String?
+  transporterCompanySiret     String?
+  transporterCompanyAddress   String?
+  transporterCompanyContact   String?
+  transporterCompanyPhone     String?
+  transporterCompanyMail      String?
+  transporterCompanyVatNumber String?
+
+  transporterRecepisseIsExempted    Boolean?
+  transporterRecepisseNumber        String?
+  transporterRecepisseDepartment    String?
+  transporterRecepisseValidityLimit DateTime?
+
+  transporterTransportMode            TransportMode?
+  transporterTransportPlates          String[]
+  transporterTransportTakenOverAt     DateTime?
   transporterTransportSignatureAuthor String?
   transporterTransportSignatureDate   DateTime?
 

@@ -60,6 +60,9 @@ input BsdaInput {
   "Maitre d'ouvrage ou détenteur du déchet"
   emitter: BsdaEmitterInput
 
+  "Courtier"
+  broker: BsdaBrokerInput
+
   "Dénomination du déchet"
   waste: BsdaWasteInput
   "Conditionnement"
@@ -159,6 +162,17 @@ input BsdaOperationInput {
   code: String
   "Date de réalisation de l'opération"
   date: DateTime
+  "Exutoire final (si la destination ne l'est pas)"
+  nextDestination: BsdaNextDestinationInput
+}
+
+input BsdaNextDestinationInput {
+  "Entreprise de travaux"
+  company: CompanyInput
+  "N° de CAP (le cas échéant)"
+  cap: String
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  plannedOperationCode: String
 }
 
 input BsdaWorkerInput {
@@ -180,12 +194,34 @@ input BsdaTransporterInput {
   "Entreprise de transport"
   company: CompanyInput
   recepisse: BsdaRecepisseInput
+  transport: BsdaTransportInput
 }
 
 input BsdaRecepisseInput {
+  "Exemption de récépissé (conformément aux dispositions de l'article R.541-50 du code de l'environnement)"
+  isExempted: Boolean
+  "Numéro de récépissé"
   number: String
+  "Département"
   department: String
+  "Date limite de validité"
   validityLimit: DateTime
+}
+
+input BsdaTransportInput {
+  "Mode de transport"
+  mode: TransportMode
+  "Plaque(s) d'immatriculation"
+  plates: [String!]
+  "Date de prise en charge"
+  takenOverAt: DateTime
+}
+
+input BsdaBrokerInput {
+  "Coordonnées de l'entreprise courtier"
+  company: CompanyInput
+  "Récépissé courtier"
+  recepisse: BsdaRecepisseInput
 }
 
 input BsdaSignatureInput {
