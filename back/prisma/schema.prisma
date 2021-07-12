@@ -711,7 +711,7 @@ model Bsdasri {
   wasteDetailsCode    String?
   wasteDetailsOnuCode String?
 
-  emitterWasteQuantity       Int? // kg
+  emitterWasteQuantity       Float? // kg
   emitterWasteQuantityType   QuantityType?
   emitterWasteVolume         Int? // liters
   emitterWastePackagingsInfo Json?
@@ -742,12 +742,12 @@ model Bsdasri {
   transportMode                     TransportMode? @default(ROAD)
   transporterWasteAcceptationStatus WasteAcceptationStatus?
   transporterWasteRefusalReason     String?
-  transporterWasteRefusedQuantity   Int? // kg
+  transporterWasteRefusedQuantity   Float? // kg
 
   transporterTakenOverAt DateTime?
 
   transporterWastePackagingsInfo Json?
-  transporterWasteQuantity       Int? // kg
+  transporterWasteQuantity       Float? // kg
   transporterWasteQuantityType   QuantityType?
   transporterWasteVolume         Int? // liters
 
@@ -773,8 +773,8 @@ model Bsdasri {
   recipientWastePackagingsInfo    Json?
   recipientWasteAcceptationStatus WasteAcceptationStatus?
   recipientWasteRefusalReason     String?
-  recipientWasteRefusedQuantity   Int? // kg
-  recipientWasteQuantity          Int? // kg
+  recipientWasteRefusedQuantity   Float? // kg
+  recipientWasteQuantity          Float? // kg
 
   recipientWasteVolume Int? // liters
   receivedAt           DateTime? // accepted or refused date

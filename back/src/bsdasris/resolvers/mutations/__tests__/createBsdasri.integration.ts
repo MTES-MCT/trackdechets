@@ -140,7 +140,7 @@ describe("Mutation.createDasri", () => {
       emission: {
         wasteCode: "18 01 03*",
         wasteDetails: {
-          quantity: { value: 23, type: "REAL" },
+          quantity: { value: 23.2, type: "REAL" },
 
           onuCode: "xyz 33",
           packagingInfos: [

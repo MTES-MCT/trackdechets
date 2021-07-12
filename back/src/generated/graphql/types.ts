@@ -609,7 +609,7 @@ export type BsdasriOperationInput = {
 export type BsdasriOperationQuantity = {
   __typename?: "BsdasriOperationQuantity";
   /** Quantité en kg */
-  value?: Maybe<Scalars["Int"]>;
+  value?: Maybe<Scalars["Float"]>;
 };
 
 /** Informations sur le conditionnement Bsdasri */
@@ -653,13 +653,13 @@ export type BsdasriPackagings =
 export type BsdasriQuantity = {
   __typename?: "BsdasriQuantity";
   /** Quantité en kg */
-  value?: Maybe<Scalars["Int"]>;
+  value?: Maybe<Scalars["Float"]>;
   /** Quantité réélle (pesée ou estimée) */
   type?: Maybe<QuantityType>;
 };
 
 export type BsdasriQuantityInput = {
-  value?: Maybe<Scalars["Int"]>;
+  value?: Maybe<Scalars["Float"]>;
   type?: Maybe<QuantityType>;
 };
 
@@ -840,13 +840,13 @@ export type BsdasriWasteAcceptation = {
   __typename?: "BsdasriWasteAcceptation";
   status?: Maybe<Scalars["String"]>;
   refusalReason?: Maybe<Scalars["String"]>;
-  refusedQuantity?: Maybe<Scalars["Int"]>;
+  refusedQuantity?: Maybe<Scalars["Float"]>;
 };
 
 export type BsdasriWasteAcceptationInput = {
   status?: Maybe<WasteAcceptationStatusInput>;
   refusalReason?: Maybe<Scalars["String"]>;
-  refusedQuantity?: Maybe<Scalars["Int"]>;
+  refusedQuantity?: Maybe<Scalars["Float"]>;
 };
 
 export type BsdasriWasteDetailEmissionInput = {
@@ -6010,7 +6010,7 @@ export type BsdasriOperationQuantityResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsdasriOperationQuantity"] = ResolversParentTypes["BsdasriOperationQuantity"]
 > = {
-  value?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
+  value?: Resolver<Maybe<ResolversTypes["Float"]>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -6029,7 +6029,7 @@ export type BsdasriQuantityResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsdasriQuantity"] = ResolversParentTypes["BsdasriQuantity"]
 > = {
-  value?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
+  value?: Resolver<Maybe<ResolversTypes["Float"]>, ParentType, ContextType>;
   type?: Resolver<
     Maybe<ResolversTypes["QuantityType"]>,
     ParentType,
@@ -6194,7 +6194,7 @@ export type BsdasriWasteAcceptationResolvers<
     ContextType
   >;
   refusedQuantity?: Resolver<
-    Maybe<ResolversTypes["Int"]>,
+    Maybe<ResolversTypes["Float"]>,
     ParentType,
     ContextType
   >;
