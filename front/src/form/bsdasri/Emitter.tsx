@@ -3,12 +3,15 @@ import CompanySelector from "form/common/components/company/CompanySelector";
 import { Field } from "formik";
 import React from "react";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import Packagings from "./components/packagings/Packagings";
 import "./Bsdasri.scss";
-import { getInitialEmitterWorkSite } from "./utils/initial-state";
+import {
+  getInitialEmitterWorkSite,
+  getInitialQuantityFn,
+} from "./utils/initial-state";
 import WorkSite from "form/common/components/work-site/WorkSite";
 import DateInput from "form/common/components/custom-inputs/DateInput";
+import QuantityWidget from "./components/Quantity";
 import { BsdasriStatus } from "generated/graphql/types";
 import { FillFieldsInfo, DisabledFieldsInfo } from "./utils/commons";
 import classNames from "classnames";
@@ -95,49 +98,18 @@ export default function Emitter({ status, stepName }) {
         />
       </div>
       <h4 className="form__section-heading">Quantité remise</h4>
-
       <div
         className={classNames("form__row", {
           "field-emphasis": emissionEmphasis,
         })}
       >
-        <label>
-          Quantité en kg :
-          <Field
-            component={NumberInput}
-            name="emission.wasteDetails.quantity.value"
-            className="td-input dasri__waste-details__quantity"
-            disabled={disabled}
-            placeholder="En kg"
-            min="0"
-            step="0.1"
-          />
-          <span className="tw-ml-2">kg</span>
-        </label>
-
-        <RedErrorMessage name="emission.wasteDetails.quantity.value" />
+        <QuantityWidget
+          disabled={disabled}
+          switchLabel="Je souhaite ajouter une quantité"
+          dasriSection="emission"
+          getInitialQuantityFn={getInitialQuantityFn}
+        />
       </div>
-
-      <div className="form__row">
-        <fieldset>
-          <legend className="tw-font-semibold">Cette quantité est</legend>
-          <Field
-            name="emission.wasteDetails.quantity.type"
-            id="REAL"
-            label="Réélle"
-            component={RadioButton}
-            disabled={disabled}
-          />
-          <Field
-            name="emission.wasteDetails.quantity.type"
-            id="ESTIMATED"
-            label="Estimée"
-            component={RadioButton}
-            disabled={disabled}
-          />
-        </fieldset>
-      </div>
-
       <div
         className={classNames("form__row", {
           "field-emphasis": emissionEmphasis,

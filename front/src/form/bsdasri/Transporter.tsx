@@ -6,11 +6,12 @@ import { BsdasriStatus } from "generated/graphql/types";
 import React from "react";
 import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 import Packagings from "./components/packagings/Packagings";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import { getInitialQuantityFn } from "./utils/initial-state";
 import { transportModeLabels } from "dashboard/constants";
 import { FillFieldsInfo, DisabledFieldsInfo } from "./utils/commons";
 import classNames from "classnames";
+import QuantityWidget from "./components/Quantity";
+
 export default function Transporter({ status, stepName }) {
   const { setFieldValue } = useFormikContext();
 
@@ -192,43 +193,12 @@ export default function Transporter({ status, stepName }) {
           </div>
           <h4 className="form__section-heading">Quantité transportée</h4>
 
-          <div className="form__row">
-            <label>
-              Quantité en kg :
-              <Field
-                component={NumberInput}
-                name="transport.wasteDetails.quantity.value"
-                className="td-input dasri__waste-details__quantity"
-                disabled={disabled}
-                placeholder="En kg"
-                min="0"
-                step="0.1"
-              />
-              <span className="tw-ml-2">kg</span>
-            </label>
-
-            <RedErrorMessage name="transport.wasteDetails.quantity.value" />
-          </div>
-
-          <div className="form__row">
-            <fieldset>
-              <legend className="tw-font-semibold">Cette quantité est</legend>
-              <Field
-                name="transport.wasteDetails.quantity.type"
-                id="REAL"
-                label="Réélle"
-                component={RadioButton}
-                disabled={disabled}
-              />
-              <Field
-                name="transport.wasteDetails.quantity.type"
-                id="ESTIMATED"
-                label="Estimée"
-                component={RadioButton}
-                disabled={disabled}
-              />
-            </fieldset>
-          </div>
+          <QuantityWidget
+            disabled={disabled}
+            switchLabel="Je souhaite ajouter une quantité"
+            dasriSection="transport"
+            getInitialQuantityFn={getInitialQuantityFn}
+          />
         </>
       ) : (
         <p>
