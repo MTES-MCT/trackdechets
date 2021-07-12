@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { safeInput } from "../forms/form-converter";
 import { BsdaWhere } from "../generated/graphql/types";
-import { toPrismaDateFilter } from "../vhu/where";
+import { toPrismaDateFilter } from "../bsvhu/where";
 
 export function convertWhereToDbFilter(
   where: BsdaWhere

@@ -1,7 +1,7 @@
 import React from "react";
 import { useBsdasriDuplicate } from "dashboard/components/BSDList/BSDasri/BSDasriActions/useDuplicate";
 import { generatePath, useHistory, useParams } from "react-router-dom";
-
+import { transportModeLabels, statusLabels } from "dashboard/constants";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import {
   Bsdasri,
@@ -9,7 +9,7 @@ import {
   BsdasriPackagingInfo,
 } from "generated/graphql/types";
 import routes from "common/routes";
-import { statusLabels } from "../../constants";
+
 import {
   IconWarehouseDelivery,
   IconWaterDam,
@@ -83,12 +83,12 @@ const Emitter = ({ form }: { form: Bsdasri }) => {
       </div>
       <div className={styles.detailGrid}>
         <DetailRow
-          value={emission?.wasteDetails?.quantity}
+          value={emission?.wasteDetails?.quantity?.value}
           label="Quantité"
           units="kg"
         />
         <DetailRow
-          value={getVerboseQuantityType(emission?.wasteDetails?.quantityType)}
+          value={getVerboseQuantityType(emission?.wasteDetails?.quantity?.type)}
           label="Quantité"
         />
         <DetailRow
@@ -140,12 +140,18 @@ const Transporter = ({ form }: { form: Bsdasri }) => {
       </div>
       <div className={styles.detailGrid}>
         <DetailRow
-          value={transport?.wasteDetails?.quantity}
+          value={transport?.mode ? transportModeLabels[transport?.mode] : null}
+          label="Mode de transport"
+        />
+        <DetailRow
+          value={transport?.wasteDetails?.quantity?.value}
           label="Quantité"
           units="kg"
         />
         <DetailRow
-          value={getVerboseQuantityType(transport?.wasteDetails?.quantityType)}
+          value={getVerboseQuantityType(
+            transport?.wasteDetails?.quantity?.type
+          )}
           label="Quantité"
         />
         <DetailRow
@@ -196,15 +202,6 @@ const Recipient = ({ form }: { form: Bsdasri }) => {
       </div>
       <div className={styles.detailGrid}>
         <DetailRow
-          value={reception?.wasteDetails?.quantity}
-          label="Quantité"
-          units="kg"
-        />
-        <DetailRow
-          value={getVerboseQuantityType(reception?.wasteDetails?.quantityType)}
-          label="Quantité"
-        />
-        <DetailRow
           value={reception?.wasteDetails?.volume}
           label="Volume"
           units="l"
@@ -239,6 +236,12 @@ const Recipient = ({ form }: { form: Bsdasri }) => {
         />
       </div>
       <div className={styles.detailGrid}>
+        <DetailRow
+          value={operation?.quantity?.value}
+          label="Quantité"
+          units="kg"
+        />
+
         <DetailRow
           value={operation?.processingOperation}
           label="Opération de traitement"

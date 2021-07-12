@@ -1,0 +1,7 @@
+{
+  "data": {
+    "bsdasriPdf": {
+      "downloadLink": "https://api.trackdechets.beta.gouv.fr/download?token=form_pdf-xxxxxxxxx-xxxx"
+    }
+  }
+}

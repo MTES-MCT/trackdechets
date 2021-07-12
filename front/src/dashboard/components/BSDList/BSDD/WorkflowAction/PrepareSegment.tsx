@@ -14,7 +14,7 @@ import { NotificationError } from "common/components/Error";
 import { IconBusTransfer } from "common/components/Icons";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
-import { transportModeLabels } from "../../../../constants";
+import { transportModeLabels } from "dashboard/constants";
 import { WorkflowActionProps } from "./WorkflowAction";
 
 const PREPARE_SEGMENT = gql`

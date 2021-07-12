@@ -1,9 +1,5 @@
 import makeClient from "../../../../__tests__/testClient";
-import {
-  OPERATION_CODES,
-  OPERATION_QUALIFICATIONS,
-  PACKAGING_TYPE
-} from "../../../constants";
+import { OPERATION_CODES, PACKAGING_TYPE } from "../../../constants";
 
 const GET_ENUM = `
   query GetEnum($name: String!) {
@@ -21,7 +17,6 @@ interface GetEnumQuery {
 describe("Bsff enums", () => {
   it.each([
     ["BsffOperationCode", Object.keys(OPERATION_CODES)],
-    ["BsffOperationQualification", Object.keys(OPERATION_QUALIFICATIONS)],
     ["BsffPackagingType", Object.keys(PACKAGING_TYPE)]
   ])("should list all %s values", async (name, keys) => {
     const { query } = makeClient();

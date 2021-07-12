@@ -1,0 +1,66 @@
+---
+title: BSDD
+---
+
+import Mermaid from '../../../src/components/Mermaid';
+
+Au cours de son cycle de vie, un BSDD numérique peut passer par différents états décrits [ici](../api-reference/bsdd/enums.md#formstatus).
+
+- `DRAFT` (brouillon): État initial à la création d'un BSD. Des champs obligatoires peuvent manquer.
+- `SEALED` (finalisé): BSD finalisé. Les données sont validées et un numéro de BSD `readableId` est affecté.
+- `SENT` (envoyé): BSD en transit vers l'installation de destination, d'entreposage ou de reconditionnement
+- `RECEIVED` (reçu): BSD reçu sur l'installation de destination, d'entreposage ou de reconditionnement
+- `ACCEPTED` (accepté): BSD accepté sur l'installation de destination, d'entreposage ou de reconditionnement
+- `REFUSED` (refusé): Déchet refusé
+- `PROCESSED` (traité): BSD dont l'opération de traitement a été effectué
+- `NO_TRACEABILITY` (rupture de traçabilité): Rupture de traçabilité autorisée par arrêté préfectoral avec transfert de responsabilité.
+- `AWAITING_GROUP`: BSD en attente de regroupement (code de traitement D 13, D 14, D 15, R 12, R 13)
+- `GROUPED`: BSD qui a été ajouté à une annexe 2
+
+Chaque changement d'état s'effectue grâce à une mutation.
+
+| Mutation                   | Transition                                                                                                                      | Données                                                                           | Permissions                                                                                                                                                                             |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `createForm`               | `-> DRAFT` <br />                                                                                                               | [FormInput](../api-reference/bsdd/inputObjects#forminput)                                           | <div><ul><li>émetteur</li><li>destinataire</li><li>transporteur</li><li>négociant</li><li>éco-organisme</li></ul></div>                                                                 |
+| `updateForm`               | `DRAFT -> DRAFT` <br />                                                                                                         | [FormInput](../api-reference/bsdd/inputObjects#forminput)                                           | <div><ul><li>émetteur</li><li>destinataire</li><li>transporteur</li><li>négociant</li><li>éco-organisme</li></ul></div>                                                                 |
+| `markAsSealed`             | `DRAFT -> SEALED`                                                                                                               |                                                                                   | <div><ul><li>émetteur</li><li>destinataire</li><li>transporteur</li><li>négociant</li><li>éco-organisme</li></ul></div>                                                                 |
+| `signedByTransporter`      | <div><ul><li>`SEALED -> SENT`</li><li>`RESEALED -> RESENT`</li></ul></div>                                                      | [TransporterSignatureFormInput](../api-reference/bsdd/inputObjects#transportersignatureforminput) | Uniquement le collecteur-transporteur, l'émetteur ou le site d'entreposage provisoire/reconditionnement étant authentifié grâce au code de sécurité présent en paramètre de la mutation |
+| `markAsReceived`           | <div><ul><li>`SENT -> ACCEPTED`</li><li>`SENT -> RECEIVED`</li><li>`SENT -> REFUSED`</li></ul></div>                            | [ReceivedFormInput](../api-reference/bsdd/inputObjects#receivedforminput)                           | Uniquement le destinataire du BSD                                                                                                                                                       |
+| `markAsAccepted`           | `RECEIVED -> ACCEPTED`                                                                                                          | [AcceptedFormInput](../api-reference/bsdd/inputObjects#acceptedforminput)                           | Uniquement le destinataire du BSD                                                                                                                                                       |
+| `markAsProcessed`          | <div><ul><li>`RECEIVED -> PROCESSED`</li><li>`RECEIVED -> NO_TRACEABILITY`</li><li>`RECEIVED -> AWAITING_GROUP`</li></ul></div> | [ProcessedFormInput](../api-reference/bsdd/inputObjects#processedforminput)                         | Uniquement le destinataire du BSD                                                                                                                                                       |
+| `markAsTempStored`         | <div><ul><li>`SENT -> TEMP_STORER_ACCEPTED`</li><li>`SENT -> TEMP_STORED`</li><li>`SENT -> REFUSED`</li></ul></div>             | [TempStoredFormInput](../api-reference/bsdd/inputObjects#tempstoredforminput)                       | Uniquement le site d'entreposage temporaire ou de reconditionnement                                                                                                                     |
+| `markAsTempStorerAccepted` | `TEMP_STORED -> TEMP_STORER_ACCEPTED`                                                                                           | [TempStorerAcceptedFormInput](../api-reference/bsdd/inputObjects#tempstoreracceptedforminput)       | Uniquement le site d'entreposage temporaire ou de reconditionnement                                                                                                                     |
+| `markAsResealed`           | `TEMP_STORED -> RESEALED`                                                                                                       | [ResealedFormInput](../api-reference/bsdd/inputObjects#resealedtoredforminput)                      | Uniquement le site d'entreposage temporaire ou de reconditionnement                                                                                                                     |
+| `importPaperForm`          | `SEALED -> PROCESSED`                                                                                                           | [ImportPaperFormInput](../api-reference/bsdd/inputObjects#importpaperforminput)                        | Uniquement l'entreprise de destination                                                                                                                                                  |
+
+Le diagramme ci dessous retrace le cycle de vie d'un BSD dans Trackdéchets:
+
+<Mermaid chart={`
+graph TD
+AO(NO STATE) -->|createForm| A
+A -->|updateForm| A
+B -->|updateForm| B
+A[DRAFT] -->|markAsSealed| B(SEALED)
+B -->|signedByTransporter| C(SENT)
+B -->|importPaperForm| E(PROCESSED)
+C -->|markAsReceived| D(ACCEPTED)
+C -->|markAsReceived - sans signature| M(RECEIVED)
+M -->|markAsAccepted| D
+M -->|markAsReceived - avec refus| I
+D -->|markAsProcessed| E(PROCESSED)
+D -->|markAsProcessed - avec rupture de traçabalité |G(NO_TRACEABILITY)
+D -->|markAsProcessed - avec opération de regroupement | F(AWAITING_GROUP)
+C -->|markAsReceived - avec refus| I(REFUSED)
+C -->|markAsTempStored - avec refus| I
+F.->|createForm - appendix2Forms |A
+F-->|Lorsque markAsSealed est appelé sur le BSD de regroupement avec annexe 2|H[GROUPED]
+H-->|Lorsque markAsProcessed est appelé sur le BSD  de regroupement avec annexe 2|E
+C -->|markAsTempStored - |J(TEMP_STORED)
+C -->|markAsTempStored|N
+J -->|markAsTempStorerAccepted - avec refus|I
+J -->|markAsTempStorerAccepted|N(TEMP_STORER_ACCEPTED)
+N -->|markAsResealed| K(RESEALED)
+K -->|signedByTransporter| L(RESENT)
+L --> D
+`}/>
+

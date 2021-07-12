@@ -27,10 +27,10 @@
           <div class="BoxCol">
             <p>
               J'édite un BSFF pour : <input type="checkbox"
-              {{#bsffType.isCollecte}}checked{{/bsffType.isCollecte}} /> la
-              collecte de petites quantités <input type="checkbox"
-              {{#bsffType.isCollecte}}checked{{/bsffType.isCollecte}} /> tracer
-              un fluide frigorigène <input type="checkbox"
+              {{#bsffType.isMultiCollecte}}checked{{/bsffType.isMultiCollecte}}
+              /> la collecte de petites quantités <input type="checkbox"
+              {{#bsffType.isSingleCollecte}}checked{{/bsffType.isSingleCollecte}}
+              /> tracer un fluide frigorigène <input type="checkbox"
               {{#bsffType.isGroupement}}checked{{/bsffType.isGroupement}} /> le
               groupement de contenants/BSFF <input type="checkbox"
               {{#bsffType.isReconditionnement}}checked{{/bsffType.isReconditionnement}}
@@ -89,15 +89,14 @@
             </p>
             <p>
               N° CAP (le cas échéant) : {{ bsff.destinationCap }}<br />
-              Code D/R prévu : {{ bsff.destinationPlannedOperationCode }} {{
-              bsff.destinationPlannedOperationQualification }}
+              Code D/R prévu : {{ bsff.destinationPlannedOperationCode }}
             </p>
           </div>
         </div>
 
         <div class="BoxRow">
           <div class="BoxCol" style="min-height: 4rem;">
-            <p><strong>3. Contenants</strong> (numéro, volume, type)</p>
+            <p><strong>3. Contenant(s)</strong> (numéro, volume, type)</p>
             {{ packagings }}
           </div>
         </div>

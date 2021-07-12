@@ -22,7 +22,8 @@ export const Bsff: BsffResolvers = {
       });
     } catch (err) {
       unflattenedFicheInterventions.forEach(ficheIntervention => {
-        delete ficheIntervention.owner;
+        delete ficheIntervention.detenteur;
+        delete ficheIntervention.operateur;
       });
     }
 

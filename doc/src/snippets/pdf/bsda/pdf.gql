@@ -1,0 +1,5 @@
+query {
+  bsdaPdf(id: "BSD_ID") {
+    downloadLink
+  }
+}

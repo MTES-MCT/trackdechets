@@ -51,7 +51,7 @@ export const getRecentlyAssociatedUsers = async ({
 /**
  * Send first step onboarding email to active users who suscribed yesterday
  */
-export const sendOnboardingFirstStepMails = async () => {
+export const sendFirstOnboardingEmail = async () => {
   const recipients = await getRecentlyAssociatedUsers({ daysAgo: 1 });
   await Promise.all(
     recipients.map(recipient => {
@@ -94,7 +94,7 @@ export const selectSecondOnboardingEmail = (recipient: recipientType) => {
  * email function (and template id) depends upon user profile
  */
 
-export const sendOnboardingSecondStepMails = async () => {
+export const sendSecondOnboardingEmail = async () => {
   // we explictly retrieve user companies to tell apart producers from waste
   // professionals to selectthe right email template
   const recipients = await getRecentlyAssociatedUsers({

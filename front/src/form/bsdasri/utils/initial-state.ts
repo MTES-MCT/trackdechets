@@ -21,11 +21,20 @@ const initialState = {
     wasteCode: "18 01 03*",
     wasteDetails: {
       packagingInfos: [],
-      quantity: null,
-      quantityType: null,
+      quantity: { value: null, type: null },
       onuCode: null,
     },
     handedOverAt: null,
+  },
+  transport: {
+    wasteDetails: { packagingInfos: [], quantity: { value: null, type: null } },
+    takenOverAt: null,
+    handedOverAt: null,
+    wasteAcceptation: {
+      status: null,
+      refusalReason: null,
+      refusedQuantity: null,
+    },
   },
   recipient: {
     company: getInitialCompany(),
@@ -34,29 +43,21 @@ const initialState = {
   reception: {
     wasteDetails: {
       packagingInfos: [],
-      quantity: null,
-      quantityType: null,
     },
     wasteAcceptation: null,
     receivedAt: null,
   },
-  operation: { processingOperation: null, processedAt: null },
+  operation: {
+    processingOperation: null,
+    processedAt: null,
+    quantity: { value: null },
+  },
   transporter: {
     company: getInitialCompany(),
     customInfo: null,
     receipt: null,
     receiptDepartment: null,
     receiptValidityLimit: null,
-  },
-  transport: {
-    wasteDetails: { packagingInfos: [], quantity: null, quantityType: null },
-    takenOverAt: null,
-    handedOverAt: null,
-    wasteAcceptation: {
-      status: null,
-      refusalReason: null,
-      refusedQuantity: null,
-    },
   },
 };
 

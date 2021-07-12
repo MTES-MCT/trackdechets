@@ -1,0 +1,6 @@
+mutation MarkSegmentAsReadyToTakeOver($id: ID!) {
+  markSegmentAsReadyToTakeOver(id: $id) {
+    id
+    readyToTakeOver
+  }
+}

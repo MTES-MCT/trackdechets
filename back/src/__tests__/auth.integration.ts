@@ -177,6 +177,58 @@ describe("POST /login", () => {
 
     process.env = OLD_ENV;
   });
+
+  it("should authenticate with invalid password if already connected user is admin", async () => {
+    const admin = await userFactory({ isAdmin: true });
+
+    // Login as admin
+    const adminLogin = await request
+      .post("/login")
+      .send(`email=${admin.email.toUpperCase()}`)
+      .send(`password=pass`);
+
+    // Then login as someone else (req.user is not null)
+    const user = await userFactory();
+    const login = await request
+      .post("/login")
+      .set("Cookie", adminLogin.header["set-cookie"])
+      .send(`email=${user.email.toUpperCase()}`)
+      .send(`password=invalidPwd`);
+
+    expect(login.header["set-cookie"]).toHaveLength(1);
+  });
+
+  it("should not authenticate with invalid password if connected user is not admin", async () => {
+    const nonAdmin = await userFactory({ isAdmin: false });
+
+    // Login as non-admin user
+    const nonAdminLogin = await request
+      .post("/login")
+      .send(`email=${nonAdmin.email.toUpperCase()}`)
+      .send(`password=pass`);
+
+    // Then login as someone else (req.user is not null)
+    const user = await userFactory();
+    const login = await request
+      .post("/login")
+      .set("Cookie", nonAdminLogin.header["set-cookie"])
+      .send(`email=${user.email.toUpperCase()}`)
+      .send(`password=invalidPwd`);
+
+    // should not set a session cookie
+    expect(login.header["set-cookie"]).toBeUndefined();
+
+    // should redirect to /login with error message
+    expect(login.status).toBe(302);
+    const redirect = login.header.location;
+    expect(redirect).toContain(`http://${UI_HOST}/login`);
+    expect(redirect).toContain(
+      queryString.escape(loginError.INVALID_PASSWORD.message)
+    );
+    expect(redirect).toContain(
+      queryString.escape(loginError.INVALID_PASSWORD.errorField)
+    );
+  });
 });
 
 describe("POST /logout", () => {

@@ -1,0 +1,6 @@
+mutation MarkAsReceived($id: ID!, $receivedInfo: ReceivedFormInput!) {
+  markAsReceived(id: $id, receivedInfo: $receivedInfo) {
+    id
+    status
+  }
+}

@@ -40,7 +40,6 @@ export const wasteDetailsFragment = gql`
       quantity
     }
     quantity
-    quantityType
     consistence
     pop
   }
@@ -303,10 +302,13 @@ const signatureFragment = gql`
   }
 `;
 
-const dasriWasteDetailsFragment = gql`
-  fragment DasriWasteDetailsFragment on BsdasriWasteDetails {
-    quantity
-    quantityType
+const dasriEmissionWasteDetailsFragment = gql`
+  fragment DasriEmissionWasteDetailsFragment on BsdasriEmissionWasteDetails {
+    onuCode
+    quantity {
+      type
+      value
+    }
     volume
     packagingInfos {
       type
@@ -317,11 +319,12 @@ const dasriWasteDetailsFragment = gql`
   }
 `;
 
-const dasriEmissionWasteDetailsFragment = gql`
-  fragment DasriEmissionWasteDetailsFragment on BsdasriEmissionWasteDetails {
-    onuCode
-    quantity
-    quantityType
+const dasriTransportWasteDetailsFragment = gql`
+  fragment DasriTransportWasteDetailsFragment on BsdasriTransportWasteDetails {
+    quantity {
+      type
+      value
+    }
     volume
     packagingInfos {
       type
@@ -331,6 +334,18 @@ const dasriEmissionWasteDetailsFragment = gql`
     }
   }
 `;
+const dasriReceptionWasteDetailsFragment = gql`
+  fragment DasriReceptionWasteDetailsFragment on BsdasriReceptionWasteDetails {
+    volume
+    packagingInfos {
+      type
+      other
+      quantity
+      volume
+    }
+  }
+`;
+
 const wasteAcceptationFragment = gql`
   fragment WasteAcceptationFragment on BsdasriWasteAcceptation {
     status
@@ -362,7 +377,6 @@ export const dasriFragment = gql`
       isTakenOverWithoutEmitterSignature
       isTakenOverWithSecretCode
       wasteDetails {
-        onuCode
         ...DasriEmissionWasteDetailsFragment
       }
       handedOverAt
@@ -380,10 +394,11 @@ export const dasriFragment = gql`
       customInfo
     }
     transport {
+      mode
       handedOverAt
       takenOverAt
       wasteDetails {
-        ...DasriWasteDetailsFragment
+        ...DasriTransportWasteDetailsFragment
       }
       wasteAcceptation {
         ...WasteAcceptationFragment
@@ -400,7 +415,7 @@ export const dasriFragment = gql`
     }
     reception {
       wasteDetails {
-        ...DasriWasteDetailsFragment
+        ...DasriReceptionWasteDetailsFragment
       }
       wasteAcceptation {
         ...WasteAcceptationFragment
@@ -412,6 +427,9 @@ export const dasriFragment = gql`
       receivedAt
     }
     operation {
+      quantity {
+        value
+      }
       processedAt
       processingOperation
       signature {
@@ -423,8 +441,10 @@ export const dasriFragment = gql`
   }
   ${companyFragment}
   ${signatureFragment}
-  ${dasriWasteDetailsFragment}
+
   ${dasriEmissionWasteDetailsFragment}
+  ${dasriTransportWasteDetailsFragment}
+  ${dasriReceptionWasteDetailsFragment}
   ${wasteAcceptationFragment}
 `;
 
@@ -433,28 +453,15 @@ export const vhuFragment = gql`
     id
     bsvhuStatus: status
     isDraft
-    destination {
-      company {
-        name
-        siret
-      }
-    }
     emitter {
       agrementNumber
       company {
-        name
-        siret
+        ...CompanyFragment
       }
     }
     transporter {
       company {
-        siret
-        name
-        address
-        contact
-        mail
-        phone
-        vatNumber
+        ...CompanyFragment
       }
       recepisse {
         number
@@ -463,13 +470,7 @@ export const vhuFragment = gql`
     destination {
       type
       company {
-        siret
-        name
-        address
-        contact
-        mail
-        phone
-        vatNumber
+        ...CompanyFragment
       }
       reception {
         date
@@ -485,7 +486,6 @@ export const vhuFragment = gql`
         code
       }
     }
-
     wasteCode
     packaging
     quantity {
@@ -493,6 +493,7 @@ export const vhuFragment = gql`
       tons
     }
   }
+  ${companyFragment}
 `;
 
 export const bsdaFragment = gql`

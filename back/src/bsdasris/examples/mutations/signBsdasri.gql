@@ -1,0 +1,6 @@
+mutation SignBsdasri($id: ID!, $input: BsdasriSignatureInput!) {
+  signBsdasri(id: $id, input: $input) {
+    id
+    status
+  }
+}

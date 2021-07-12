@@ -23,7 +23,8 @@ export async function updateCompanyFn({
   brokerReceiptId,
   vhuAgrementDemolisseurId,
   vhuAgrementBroyeurId,
-  ecoOrganismeAgreements
+  ecoOrganismeAgreements,
+  allowBsdasriTakeOverWithoutSignature
 }: MutationUpdateCompanyArgs): Promise<CompanyPrivate> {
   const data = {
     ...(companyTypes != null ? { companyTypes: { set: companyTypes } } : {}),
@@ -32,6 +33,9 @@ export async function updateCompanyFn({
     ...(contactPhone != null ? { contactPhone } : {}),
     ...(website != null ? { website } : {}),
     ...(givenName != null ? { givenName } : {}),
+    ...(allowBsdasriTakeOverWithoutSignature !== null
+      ? { allowBsdasriTakeOverWithoutSignature }
+      : {}),
     ...(transporterReceiptId
       ? { transporterReceipt: { connect: { id: transporterReceiptId } } }
       : {}),

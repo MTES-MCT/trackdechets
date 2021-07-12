@@ -11,6 +11,7 @@ import { TextInputFilter } from "./TextInputFilter";
 import * as bsdd from "./BSDD";
 import * as bsdasri from "./BSDasri";
 import * as bsvhu from "./BSVhu";
+import * as bsff from "./BSFF";
 import * as bsda from "./BSDa";
 
 // This object declares the mapping between a column id
@@ -56,7 +57,6 @@ export type Column<T extends object = Bsd> = ColumnWithLooseAccessor<T> &
 export function createColumn(column: Column): Column {
   return {
     ...column,
-
     accessor: bsd => {
       if (bsd.__typename === "Form") {
         return bsdd.COLUMNS[column.id]?.accessor?.(bsd);
@@ -66,6 +66,11 @@ export function createColumn(column: Column): Column {
       }
       if (bsd.__typename === "Bsvhu") {
         return bsvhu.COLUMNS[column.id]?.accessor?.(bsd);
+      }
+      if (bsd.__typename === "Bsff") {
+        return bsff.COLUMNS[column.id]?.accessor?.(
+          (bsd as unknown) as bsff.BsffFragment
+        );
       }
       if (bsd.__typename === "Bsda") {
         return bsda.COLUMNS[column.id]?.accessor?.(bsd);
@@ -91,6 +96,14 @@ export function createColumn(column: Column): Column {
         const Cell = bsvhu.COLUMNS[column.id]?.Cell;
         if (Cell) {
           return <Cell {...(props as CellProps<Bsvhu>)} />;
+        }
+      }
+      if (props.row.original.__typename === "Bsff") {
+        const Cell = bsff.COLUMNS[column.id]?.Cell;
+        if (Cell) {
+          return (
+            <Cell {...((props as unknown) as CellProps<bsff.BsffFragment>)} />
+          );
         }
       }
       if (props.row.original.__typename === "Bsda") {

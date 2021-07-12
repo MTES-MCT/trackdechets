@@ -27,7 +27,6 @@ input BsffWhereDestination {
 "Champs possible pour le filtre sur l'opération."
 input BsffWhereOperation {
   code: BsffOperationCode
-  qualification: BsffOperationQualification
 }
 
 "Filtres sur une entreprise."
@@ -57,12 +56,12 @@ input BsffEmitterInput {
 input BsffPackagingInput {
   numero: String!
   type: BsffPackagingType!
-  litres: Float!
+  kilos: Float!
 }
 
 input BsffWasteInput {
   code: String!
-  description: String!
+  nature: String
   adr: String!
 }
 
@@ -86,7 +85,7 @@ input BsffTransporterTransportInput {
 }
 
 input BsffDestinationInput {
-  company: CompanyInput!
+  company: CompanyInput
   cap: String
   reception: BsffDestinationReceptionInput
   plannedOperation: BsffDestinationPlannedOperationInput
@@ -100,7 +99,6 @@ input BsffDestinationReceptionInput {
 
 input BsffDestinationPlannedOperationInput {
   code: BsffOperationCode!
-  qualification: BsffOperationQualification!
 }
 
 input BsffOperationNextDestinationInput {
@@ -109,15 +107,19 @@ input BsffOperationNextDestinationInput {
 
 input BsffDestinationOperationInput {
   code: BsffOperationCode!
-  qualification: BsffOperationQualification!
   nextDestination: BsffOperationNextDestinationInput
 }
 
 input BsffFicheInterventionInput {
+  numero: String!
   kilos: Float!
-  owner: BsffOwnerInput!
+  detenteur: BsffDetenteurInput!
+  operateur: BsffOperateurInput!
   postalCode: String!
 }
-input BsffOwnerInput {
+input BsffDetenteurInput {
+  company: CompanyInput!
+}
+input BsffOperateurInput {
   company: CompanyInput!
 }

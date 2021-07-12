@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { InlineError } from "common/components/Error";
 import "./Company.scss";
-import CompanyActivity from "./CompanyActivity";
 import CompanyContact from "./CompanyContact";
 import CompanyDisclaimer from "./CompanyDisclaimer";
 import CompanyHeader from "./CompanyHeader";
@@ -118,9 +117,10 @@ export default function CompanyInfo() {
             )}
           </div>
 
+          {/* disabled until ICPE data is up to date
           {company.installation && (
             <CompanyActivity installation={company.installation} />
-          )}
+          )} */}
         </div>
       </div>
     );

@@ -1,0 +1,6 @@
+mutation MarkAsTempStored($id: ID!, $tempStoredInfos: TempStoredFormInput!) {
+  markAsTempStored(id: $id, tempStoredInfos: $tempStoredInfos) {
+    id
+    status
+  }
+}

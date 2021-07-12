@@ -1,0 +1,6 @@
+mutation UpdateBsdasri($id: ID!, $input: BsdasriUpdateInput!) {
+  updateBsdasri(id: $id, input: $input) {
+    id
+    status
+  }
+}

@@ -6,6 +6,8 @@ export const FullBsvhuFragment = gql`
     id
     isDraft
     status
+    createdAt
+    updatedAt
     emitter {
       company {
         ...CompanyFragment
@@ -126,8 +128,8 @@ export const DUPLICATE_VHU_FORM = gql`
 `;
 
 export const CREATE_VHU_FORM = gql`
-  mutation CreateBsvhu($input: BsvhuInput!) {
-    createBsvhu(input: $input) {
+  mutation CreateDraftBsvhu($input: BsvhuInput!) {
+    createDraftBsvhu(input: $input) {
       ...FullBsvhu
     }
   }

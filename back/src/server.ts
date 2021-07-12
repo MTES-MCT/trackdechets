@@ -1,5 +1,3 @@
-import { CaptureConsole } from "@sentry/integrations";
-import * as Sentry from "@sentry/node";
 import {
   ApolloError,
   ApolloServer,
@@ -30,10 +28,9 @@ import { typeDefs, resolvers } from "./schema";
 import { userActivationHandler } from "./users/activation";
 import { getUIBaseURL } from "./utils";
 import sentryReporter from "./common/plugins/sentryReporter";
+import { initSentry } from "./common/sentry";
 
 const {
-  SENTRY_DSN,
-  SENTRY_ENVIRONMENT,
   SESSION_SECRET,
   SESSION_COOKIE_HOST,
   SESSION_COOKIE_SECURE,
@@ -42,13 +39,7 @@ const {
   NODE_ENV
 } = process.env;
 
-if (SENTRY_DSN) {
-  Sentry.init({
-    dsn: SENTRY_DSN,
-    environment: SENTRY_ENVIRONMENT,
-    integrations: [new CaptureConsole({ levels: ["error"] })]
-  });
-}
+const Sentry = initSentry();
 
 const UI_BASE_URL = getUIBaseURL();
 
@@ -103,12 +94,12 @@ export const server = new ApolloServer({
 
     return err;
   },
-  plugins: [...(SENTRY_DSN ? [sentryReporter] : [])]
+  plugins: [...(Sentry ? [sentryReporter] : [])]
 });
 
 export const app = express();
 
-if (SENTRY_DSN) {
+if (Sentry) {
   // The request handler must be the first middleware on the app
   app.use(Sentry.Handlers.requestHandler());
 }
@@ -179,9 +170,6 @@ app.use(session(sess));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Load passport configuration
-import("./auth");
-
 // authentification routes used by td-ui (/login /logout, /isAuthenticated)
 app.use(authRouter);
 app.use(oauth2Router);
@@ -225,7 +213,7 @@ server.applyMiddleware({
   path: graphQLPath
 });
 
-if (SENTRY_DSN) {
+if (Sentry) {
   // The error handler must be before any other error middleware and after all controllers
   app.use(Sentry.Handlers.errorHandler());
 }

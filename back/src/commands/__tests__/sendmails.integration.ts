@@ -3,8 +3,8 @@ import { resetDatabase } from "../../../integration-tests/helper";
 import { CompanyType } from "@prisma/client";
 
 import {
-  sendOnboardingFirstStepMails,
-  sendOnboardingSecondStepMails
+  sendFirstOnboardingEmail,
+  sendSecondOnboardingEmail
 } from "../onboarding.helpers";
 
 import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
@@ -33,7 +33,7 @@ describe("sendOnboardingFirstStepMails", () => {
     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
     await userFactory({ firstAssociationDate: twoDaysAgo });
 
-    await sendOnboardingFirstStepMails();
+    await sendFirstOnboardingEmail();
 
     expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
     expect(mockedAxiosPost).toHaveBeenCalledWith(
@@ -104,7 +104,7 @@ describe("sendOnboardingSecondStepMails", () => {
         })
       );
 
-      await sendOnboardingSecondStepMails();
+      await sendSecondOnboardingEmail();
 
       expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(0);
     }
@@ -130,7 +130,7 @@ describe("sendOnboardingSecondStepMails", () => {
       })
     );
 
-    await sendOnboardingSecondStepMails();
+    await sendSecondOnboardingEmail();
 
     expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
     expect(mockedAxiosPost).toHaveBeenCalledWith(
@@ -184,7 +184,7 @@ describe("sendOnboardingSecondStepMails", () => {
       })
     );
 
-    await sendOnboardingSecondStepMails();
+    await sendSecondOnboardingEmail();
 
     expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
     expect(mockedAxiosPost).toHaveBeenCalledWith(

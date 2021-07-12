@@ -1,0 +1,6 @@
+mutation ImportPaperForm($input: ImportPaperFormInput!) {
+  importPaperForm(input: $input) {
+    id
+    status
+  }
+}

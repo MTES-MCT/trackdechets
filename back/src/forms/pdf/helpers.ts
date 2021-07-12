@@ -2,7 +2,7 @@ import { Form } from ".prisma/client";
 import { extractPostalCode } from "../../utils";
 import { isFormContributor } from "../permissions";
 import { pageHeight, imageLocations } from "./settings";
-
+import { transportModeLabels } from "../../common/pdf/helpers";
 /**
  * Write text on the pdf by retrieving field params in fieldSettings object
  *  Can right align, limit content length or split content according to fieldSettings params.
@@ -420,13 +420,6 @@ export async function hideEmitterFields(appendix2: Form, user: Express.User) {
   }
   return appendix2;
 }
-
-const transportModeLabels = {
-  ROAD: "Route",
-  AIR: "Voie aérienne",
-  RAIL: "Voie ferrée",
-  RIVER: "Voie fluviale"
-};
 
 function verboseMode(mode) {
   if (!mode) {

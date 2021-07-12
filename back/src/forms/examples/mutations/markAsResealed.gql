@@ -1,0 +1,6 @@
+mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {
+  markAsResealed(id: $id, resealedInfos: $resealedInfos) {
+    id
+    status
+  }
+}

@@ -1,60 +1,53 @@
 ---
-title: Utilisation du playground
+title: Utiliser le playground
 ---
 
 
-## Accès
+Le playground GraphQL est un environnement de développement intégré au navigateur web qui permet de facilement tester des requêtes à l'API Trackdéchets.
+Il s'affiche par défaut lors d'une connexion à la racine de l'API via un navigateur. Pour rappel :
 
-Si vous accédez au point de terminaison de l'API GraphQL depuis un navigateur, vous aurez accès à un éditeur interactif de requête GraphQL.
+| Environnement | URL de l'API |
+|-------------| -----|
+| Sandbox | https://api.sandbox.trackdechets.beta.gouv.fr  |
+| Production | https://api.trackdechets.beta.gouv.fr |
+## Présentation du playground
 
+Le playground GraphQL est composé de différentes zones :
+- une zone de texte éditable permettant d'écrire des queries et des mutations GraphQL. Vous pouvez utiliser les fonctionnalités d'auto-complétion et le boutton "Prettify" pour formatter les requêtes.
+- une zone de texte pour visualiser les réponses à vos requêtes
+- un panneau latéral permettant d'accéder à la documentation des champs de l'API et au schéma GraphQL
+- un onglet permettant de spécifier des variables à injecter dans vos *queries* ou *mutations*
+- un onglet "HTTP Headers" permettant d'ajouter l'en-tête d'authentification
 
-:::note
-Les différents points de terminaisons GraphQL en fonction des environnements sont les suivants:
+![playground](../../static/img/playground-guide.png)
 
-* [https://api.trackdechets.beta.gouv.fr](https://api.trackdechets.beta.gouv.fr) (production)
-* [https://api.sandbox.trackdechets.beta.gouv.fr](https://api.sandbox.trackdechets.beta.gouv.fr) (bac à sable)
-* [https://api.trackdechets.fr](https://api.trackdechets.fr) (recette)
+## Renseigner son token
 
-Voir aussi [la documentation sur les environnements](environments.md)
+Le token (voir [Authentification](../reference/authentification)) doit être renseigné dans l'onglet "HTTP Headers" de la façon suivante :
+
+![playground-token](../../static/img/playground-token.png)
+## Exécuter une requête GraphQL
+
+Vous pouvez écrire des requêtes GraphQL dans la zone de texte à gauche. Exemple avec la reqête `companyInfos` permettant d'obtenir des informations sur un établissement partenaire :
+
+![playground-query](../../static/img/playground-query.png)
+
+:::tip
+Utiliser le bouton "Prettify" pour valider et formatter vos requêtes
 :::
 
-## Authentification
+## Utiliser les variables
 
-La plupart des requêtes nécessitant d'être authentifié, vous devrez donc [récupérer un jeton d'accès](access-token.md)
+Vous pouvez également utiliser l'onglet "Variables" pour injecter les variables dans votre requête de la façon suivante :
 
-Le token doit être inséré dans le cadre inférieur gauche de l'écran sous la forme d'un header d'autorisation de type "Bearer"
+![playground-variables](../../static/img/playground-variables.png)
 
-```json
-{
-  "Authorization": "Bearer ACCESS_TOKEN"
-}
-```
+## Parcourir la documentation de l'API
 
-où `ACCESS_TOKEN` représente le token que vous avez récupéré depuis votre compte Trackdéchets (Mon Compte > Intégration API).
+L'onglet de droite "Docs" vous permet de parcourir la référence de l'API. Vous y retrouverez les différentes Query et Mutation disponibles ainsi que les variables et les types de retours. La référence de l'API est également disponible dans la section [Référence API](../reference/api-reference/bsdd/queries)
 
+![playground-docs](../../static/img/playground-docs.png)
 
-![playground](../../static/img/playground.png)
+## Télécharger le schéma
 
-## Votre premiere requête
-
-
-Une fois le token renseigné, vous pourrez écrire `queries` et `mutations` dans le cadre de gauche, et voir le résultat dans celle de droite après avoir cliqué sur le bouton central.
-
-Dans la zone de gauche, copiez cette requête.
-
-```graphql
-query {
-  me {
-    id
-    email
-  }
-}
-```
-
-En cliquant sur le bouton central, vous verrez la réponse dans la zone de droite.
-
-Notez qu’il est possible d’exporter vos requêtes au format cURL en cliquant sur le bouton situé en haut à droite.
-
-### Documentation
-
-Un onglet docs à droite de la fenêtre vous présente une vue exhaustive des requêtes disponibles.
+Vous pouvez télécharger le schéma GraphQL en cliquant sur le panneau latéral "Schema", puis "DOWNLOAD". Le schéma permet notamment de construire des clients grâce à des librairies dans le langage de votre choix. Voir la liste complète des librairies GraphQL sur le site [graphql.org](https://graphql.org/code/).

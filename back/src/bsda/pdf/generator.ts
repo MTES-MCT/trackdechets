@@ -25,9 +25,7 @@ export async function buildPdf(bsda: Bsda) {
   const compiled = Handlebars.compile(source);
   const html = compiled({ bsda, qrcode, signatureStamp });
 
-  // TODO do smthing with generated HTML. Waiting for gotenberg to be setup
   console.log(html);
-
   return null;
 }
 
