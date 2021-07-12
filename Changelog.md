@@ -28,7 +28,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Les codes R12 et D12 autorisés uniquement si le destinataire est TTR [PR 914](https://github.com/MTES-MCT/trackdechets/pull/914)
 - Les champs emails du bordereau dasri sont facultatifs [PR 916](https://github.com/MTES-MCT/trackdechets/pull/916)
-- Les différentes quatités (masses) du Bsdasri deviennent des flottants, le champ `onBehalfOfEcoorganisme` n'est plus réservé au Bsdasri de groupement [PR 928](https://github.com/MTES-MCT/trackdechets/pull/928)
+- Les différentes quantités (masses) du Bsdasri deviennent des flottants, le champ `onBehalfOfEcoorganisme` n'est plus réservé au Bsdasri de groupement [PR 928](https://github.com/MTES-MCT/trackdechets/pull/928)
 
 #### :memo: Documentation
 
