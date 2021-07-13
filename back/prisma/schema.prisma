@@ -746,7 +746,7 @@ model Bsdasri {
   transporterCustomInfo String? // free field
 
   // transport
-  transportMode                     TransportMode? @default(ROAD)
+  transportMode                     TransportMode?          @default(ROAD)
   transporterWasteAcceptationStatus WasteAcceptationStatus?
   transporterWasteRefusalReason     String?
   transporterWasteRefusedQuantity   Float? // kg
@@ -825,7 +825,7 @@ model Bsff {
   emitterEmissionSignatureAuthor String?
   emitterEmissionSignatureDate   DateTime?
 
-  packagings Json?
+  packagings Json @default("[]")
 
   wasteCode        String?
   wasteNature      String?
