@@ -126,7 +126,7 @@ export default function Recipient({ status }) {
                 className="td-input dasri__waste-details__quantity"
                 placeholder="En kg"
                 min="0"
-                step="1"
+                step="0.1"
               />
               <span className="tw-ml-2">kg</span>
             </label>

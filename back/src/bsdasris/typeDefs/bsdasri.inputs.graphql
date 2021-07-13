@@ -78,7 +78,7 @@ input BsdasriEmitterInput {
 }
 
 input BsdasriQuantityInput {
-  value: Int
+  value: Float
   type: QuantityType
 }
 
@@ -99,7 +99,7 @@ input BsdasriRecipientWasteDetailInput {
 input BsdasriWasteAcceptationInput {
   status: WasteAcceptationStatusInput
   refusalReason: String
-  refusedQuantity: Int
+  refusedQuantity: Float
 }
 input BsdasriEmissionInput {
   wasteCode: String
