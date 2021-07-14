@@ -450,6 +450,7 @@ export type Bsdasri = {
   __typename?: "Bsdasri";
   id: Scalars["ID"];
   status: BsdasriStatus;
+  bsdasriType: BsdasriType;
   createdAt?: Maybe<Scalars["DateTime"]>;
   updatedAt?: Maybe<Scalars["DateTime"]>;
   isDraft: Scalars["Boolean"];
@@ -824,6 +825,14 @@ export type BsdasriTransportWasteDetails = {
   packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
 };
 
+export type BsdasriType =
+  /** Bordereau dasri simple */
+  | "SIMPLE"
+  /** Bordereau dasri de groupement */
+  | "GROUPING"
+  /** (Bientôt disponible) - Bordereau dasri de synthèse */
+  | "SYNTHESIS";
+
 export type BsdasriUpdateInput = {
   emitter?: Maybe<BsdasriEmitterInput>;
   emission?: Maybe<BsdasriEmissionInput>;
@@ -869,6 +878,7 @@ export type BsdasriWhere = {
    * Défaut à vide.
    */
   status?: Maybe<BsdasriStatus>;
+  ids?: Maybe<Array<Scalars["ID"]>>;
   createdAt?: Maybe<DateFilter>;
   updatedAt?: Maybe<DateFilter>;
   emitter?: Maybe<BsdasriEmitterWhere>;
@@ -4884,6 +4894,7 @@ export type ResolversTypes = {
   BsdaEdge: ResolverTypeWrapper<BsdaEdge>;
   Bsdasri: ResolverTypeWrapper<Bsdasri>;
   BsdasriStatus: BsdasriStatus;
+  BsdasriType: BsdasriType;
   BsdasriEmitter: ResolverTypeWrapper<BsdasriEmitter>;
   BsdasriEmitterType: BsdasriEmitterType;
   BsdasriEmission: ResolverTypeWrapper<BsdasriEmission>;
@@ -5778,6 +5789,11 @@ export type BsdasriResolvers<
 > = {
   id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
   status?: Resolver<ResolversTypes["BsdasriStatus"], ParentType, ContextType>;
+  bsdasriType?: Resolver<
+    ResolversTypes["BsdasriType"],
+    ParentType,
+    ContextType
+  >;
   createdAt?: Resolver<
     Maybe<ResolversTypes["DateTime"]>,
     ParentType,
@@ -9430,6 +9446,7 @@ export function createBsdasriMock(props: Partial<Bsdasri>): Bsdasri {
     __typename: "Bsdasri",
     id: "",
     status: "INITIAL",
+    bsdasriType: "SIMPLE",
     createdAt: null,
     updatedAt: null,
     isDraft: false,
@@ -9947,6 +9964,7 @@ export function createBsdasriWhereMock(
   return {
     isDraft: null,
     status: null,
+    ids: null,
     createdAt: null,
     updatedAt: null,
     emitter: null,

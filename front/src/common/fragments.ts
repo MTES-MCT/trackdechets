@@ -357,6 +357,7 @@ export const dasriFragment = gql`
   fragment DasriFragment on Bsdasri {
     id
     bsdasriStatus: status
+    bsdasriType
     isDraft
     emitter {
       onBehalfOfEcoorganisme
@@ -436,6 +437,7 @@ export const dasriFragment = gql`
         ...SignatureFragment
       }
     }
+    regroupedBsdasris
     createdAt
     updatedAt
   }

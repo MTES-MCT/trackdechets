@@ -245,4 +245,44 @@ describe("Query.Bsdasris", () => {
 
     expect(queryRecipientIids).toStrictEqual([dasri3.id]);
   });
+
+  it("should get dasris which id are requested", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    await bsdasriFactory({
+      ownerId: user.id,
+      opt: {
+        ...initialData(company)
+      }
+    });
+    const dasri2 = await bsdasriFactory({
+      ownerId: user.id,
+      opt: {
+        ...initialData(company)
+      }
+    });
+
+    const dasri3 = await bsdasriFactory({
+      ownerId: user.id,
+      opt: {
+        ...initialData(company)
+      }
+    });
+
+    const { query } = makeClient(user);
+
+    // retrieve dasris which ids are requested
+    const { data } = await query<Pick<Query, "bsdasris">>(GET_BSDASRIS, {
+      variables: {
+        where: {
+          ids: [dasri2.id, dasri3.id]
+        }
+      }
+    });
+    const ids = data.bsdasris.edges.map(edge => edge.node.id);
+
+    expect(ids.length).toEqual(2);
+    expect(ids).toContain(dasri2.id);
+    expect(ids).toContain(dasri3.id);
+  });
 });

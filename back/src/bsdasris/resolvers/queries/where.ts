@@ -44,8 +44,12 @@ export function buildDbFilter(
 
 const getGroupableCondition = (groupable?: boolean) => {
   // groupable dasris should not regroup or be regrouped
+
   if (!!groupable) {
-    return { regroupedBsdasris: { none: {} }, regroupedOnBsdasri: null };
+    return {
+      regroupedBsdasris: { none: {} },
+      regroupedOnBsdasri: null
+    };
   }
   if (groupable === false) {
     return {
@@ -66,9 +70,9 @@ function toPrismaFilter(where: Omit<BsdasriWhere, "_or" | "_and" | "_not">) {
     updatedAt: where.updatedAt
       ? toPrismaDateFilter(where.updatedAt)
       : undefined,
+    ...(where.ids ? { id: { in: where.ids } } : {}),
     emitterCompanySiret: where.emitter?.company?.siret,
     transporterCompanySiret: where.transporter?.company?.siret,
-
     recipientCompanySiret: where.recipient?.company?.siret,
     ...(!!where.processingOperation
       ? { processingOperation: { in: where.processingOperation } }

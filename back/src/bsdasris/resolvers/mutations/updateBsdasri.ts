@@ -80,13 +80,11 @@ const getFieldsAllorwedForUpdate = (bsdasri: Bsdasri) => {
 };
 const getRegroupedBsdasriArgs = inputRegroupedBsdasris => {
   if (inputRegroupedBsdasris === null) {
-    return { set: [] };
+    return { regroupedBsdasris: { set: [] }, bsdasriType: "SIMPLE" };
   }
 
-  const args = !!inputRegroupedBsdasris
-    ? { connect: inputRegroupedBsdasris }
-    : {};
-  return { regroupedBsdasris: args };
+  const args = !!inputRegroupedBsdasris ? { set: inputRegroupedBsdasris } : {};
+  return { regroupedBsdasris: args, bsdasriType: "GROUPING" };
 };
 const getIsRegrouping = (dbRegroupedBsdasris, regroupedBsdasris) => {
   if (regroupedBsdasris === null) {
@@ -103,6 +101,12 @@ const getIsRegrouping = (dbRegroupedBsdasris, regroupedBsdasris) => {
     return { isRegrouping: true };
   }
 };
+
+/**
+ * Bsdasri update mutation
+ * sets bsdasriType to `GROUPING` if a non empty array of regroupedBsdasris is provided
+ * sets bsdasriType to `SIMPLE` if a null regroupedBsdasris field is provided
+ */
 const dasriUpdateResolver = async (
   parent: ResolversParentTypes["Mutation"],
   args: MutationUpdateBsdasriArgs,
@@ -122,7 +126,7 @@ const dasriUpdateResolver = async (
   await checkIsBsdasriContributor(
     user,
     dbBsdasri,
-    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
+    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparaît pas"
   );
 
   if (["PROCESSED", "REFUSED"].includes(dbBsdasri.status)) {
@@ -133,8 +137,12 @@ const dasriUpdateResolver = async (
 
   const expectedBsdasri = { ...dbBsdasri, ...flattenedInput };
   // Validate form input
+  const isRegrouping = getIsRegrouping(
+    dbRegroupedBsdasris,
+    inputRegroupedBsdasris
+  );
   await validateBsdasri(expectedBsdasri, {
-    ...getIsRegrouping(dbRegroupedBsdasris, inputRegroupedBsdasris)
+    ...isRegrouping
   });
 
   const flattenedFields = Object.keys(flattenedInput);

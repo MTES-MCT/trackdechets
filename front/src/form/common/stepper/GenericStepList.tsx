@@ -75,7 +75,6 @@ export default function GenericStepList({
 
   if (loading) return <p>Chargement...</p>;
   if (error) return <InlineError apolloError={error} />;
-
   return (
     <div>
       <Stepper>
