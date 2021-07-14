@@ -83,6 +83,35 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
         />
       </div>
 
+      {disabled && (
+        <div className="notification notification--error">
+          Les champs grisés ci-dessous ont été scellés via signature et ne sont
+          plus modifiables.
+        </div>
+      )}
+
+      {isRegrouping && (
+        <>
+          <h3 className="form__section-heading">
+            Bordereau dasri de groupement
+          </h3>
+
+          {values?.emitter?.company?.siret && !isUserCurrentEmitter && (
+            <p className="notification notification--error">
+              Pour préparer un bordereau de regroupement, vous devez y figurer
+              comme producteur
+            </p>
+          )}
+        </>
+      )}
+
+      <CompanySelector
+        disabled={disabled}
+        name="emitter.company"
+        heading="Personne responsable de l'élimination des déchets"
+        optionalMail={true}
+      />
+
       <WorkSite
         disabled={disabled}
         switchLabel="Je souhaite ajouter une adresse de collecte ou d'enlèvement"

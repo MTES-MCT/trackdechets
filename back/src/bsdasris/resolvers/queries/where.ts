@@ -70,7 +70,9 @@ function toPrismaFilter(where: Omit<BsdasriWhere, "_or" | "_and" | "_not">) {
     updatedAt: where.updatedAt
       ? toPrismaDateFilter(where.updatedAt)
       : undefined,
+
     ...(where.id_in ? { id: { in: where.id_in } } : {}),
+
     emitterCompanySiret: where.emitter?.company?.siret,
     transporterCompanySiret: where.transporter?.company?.siret,
     recipientCompanySiret: where.recipient?.company?.siret,
