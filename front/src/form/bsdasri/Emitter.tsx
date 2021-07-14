@@ -24,6 +24,7 @@ import { useParams } from "react-router-dom";
  *
  * Emitter component with widget to group dasris
  */
+
 export function RegroupingEmitter({ status, stepName }) {
   return (
     <BaseEmitter status={status} isRegrouping={true} stepName={stepName} />
@@ -39,10 +40,12 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
     BsdasriStatus.Sent,
     BsdasriStatus.Received,
   ].includes(status);
+
   const emissionEmphasis = stepName === "emission";
   const { values } = useFormikContext<Bsdasri>();
   const { siret } = useParams<{ siret: string }>();
   const isUserCurrentEmitter = values?.emitter?.company?.siret === siret;
+
   return (
     <>
       {emissionEmphasis && <FillFieldsInfo />}
@@ -141,6 +144,7 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
         <RedErrorMessage name="emitter.onBehalfOfEcoorganisme" />
       </div>
       <h4 className="form__section-heading">Détail du déchet</h4>
+
       <div
         className={classNames("form__row", {
           "field-emphasis": emissionEmphasis,
