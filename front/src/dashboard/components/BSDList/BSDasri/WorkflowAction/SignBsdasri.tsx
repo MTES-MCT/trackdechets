@@ -2,7 +2,7 @@ import React from "react";
 import { RedErrorMessage, ActionButton } from "common/components";
 import * as yup from "yup";
 import Loader from "common/components/Loaders";
-import qs from "qs";
+import * as queryString from "query-string";
 import { Formik, Field, Form } from "formik";
 import {
   Mutation,
@@ -115,7 +115,7 @@ const UpdateLink = ({
     id: formId,
   });
   const url = !!stepName
-    ? `${baseUrl}?${qs.stringify({ step: stepName })}`
+    ? `${baseUrl}?${queryString.stringify({ step: stepName })}`
     : baseUrl;
   return (
     <Link to={url} className="btn btn--primary">

@@ -5,16 +5,18 @@ import { useParams, useLocation } from "react-router-dom";
 import Emitter from "./Emitter";
 import Recipient from "./Recipient";
 import Transporter from "./Transporter";
-import qs from "qs";
+import * as queryString from "query-string";
+
 export default function FormContainer() {
   const { id } = useParams<{ id?: string }>();
   const location = useLocation();
-  const parsed = qs.parse(location.search, {
-    ignoreQueryPrefix: true,
-    parameterLimit: 1,
-  });
+  const parsed = queryString.parse(location.search);
 
-  const stepName = parsed?.step;
+  const parseStepName = parsed?.step;
+  const stepName =
+    !!parseStepName && !Array.isArray(parseStepName)
+      ? parseStepName
+      : "emission";
   const stepMapping = { emission: 0, transport: 1, reception: 2, operation: 2 };
 
   const initialStep = stepMapping[stepName] || 0;
