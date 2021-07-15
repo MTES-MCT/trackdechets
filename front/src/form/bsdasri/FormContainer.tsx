@@ -16,7 +16,7 @@ export default function FormContainer() {
   const stepName =
     !!parseStepName && !Array.isArray(parseStepName)
       ? parseStepName
-      : "emission";
+      : "";
   const stepMapping = { emission: 0, transport: 1, reception: 2, operation: 2 };
 
   const initialStep = stepMapping[stepName] || 0;
