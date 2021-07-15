@@ -43,7 +43,7 @@ const fieldLabel = `J'autorise l'emport direct de DASRI`;
 const fieldName = "allowBsdasriTakeOverWithoutSignature";
 
 const fieldTitle = "Emport direct de DASRI autorisé";
-const tooltip = `En cochant cette case, j'atteste avoir signé une convention avec un collecteur pour mes DASRI et j'accepte que ce collecteur les prenne en charge sans ma signature (lors de la collecte) si je ne suis pas disponible.
+const explanation = `En cochant cette case, j'atteste avoir signé une convention avec un collecteur pour mes DASRI et j'accepte que ce collecteur les prenne en charge sans ma signature (lors de la collecte) si je ne suis pas disponible.
 Dans ce cas, je suis informé que je pourrais suivre les bordereaux sur Trackdéchets et disposer de leur archivage sur la plateforme`;
 
 export default function AccountFieldCompanyDasriDirectTakeOver({
@@ -55,13 +55,13 @@ export default function AccountFieldCompanyDasriDirectTakeOver({
         name={fieldName}
         editable={company.userRole === UserRole.Admin}
         title={fieldTitle}
-        tooltip={tooltip}
+        tooltip={explanation}
         value={company.allowBsdasriTakeOverWithoutSignature}
         renderForm={(toggleEdition, isEditing) =>
           isEditing ? (
             <AccountFormCheckboxInput<Partial<MutationUpdateCompanyArgs>>
               name="allowBsdasriTakeOverWithoutSignature"
-              label={fieldLabel}
+              label={`${fieldLabel} - ${explanation}`}
               value={company.allowBsdasriTakeOverWithoutSignature}
               mutation={UPDATE_DASRI_DIRECT_TAKEOVER}
               mutationArgs={{ siret: company.siret }}
