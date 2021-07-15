@@ -6,7 +6,8 @@ import { Bsdasri, BsdasriStatus } from "@prisma/client";
 import prisma from "../../../prisma";
 import {
   ResolversParentTypes,
-  MutationUpdateBsdasriArgs
+  MutationUpdateBsdasriArgs,
+  RegroupedBsdasriInput
 } from "../../../generated/graphql/types";
 
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -78,7 +79,10 @@ const getFieldsAllorwedForUpdate = (bsdasri: Bsdasri) => {
   };
   return allowedFields[bsdasri.status];
 };
-const getRegroupedBsdasriArgs = inputRegroupedBsdasris => {
+
+const getRegroupedBsdasriArgs = (
+  inputRegroupedBsdasris: RegroupedBsdasriInput[] | null | undefined
+) => {
   if (inputRegroupedBsdasris === null) {
     return { regroupedBsdasris: { set: [] }, bsdasriType: "SIMPLE" };
   }
@@ -86,6 +90,7 @@ const getRegroupedBsdasriArgs = inputRegroupedBsdasris => {
   const args = !!inputRegroupedBsdasris ? { set: inputRegroupedBsdasris } : {};
   return { regroupedBsdasris: args, bsdasriType: "GROUPING" };
 };
+
 const getIsRegrouping = (dbRegroupedBsdasris, regroupedBsdasris) => {
   if (regroupedBsdasris === null) {
     return { isRegrouping: false };
@@ -163,7 +168,8 @@ const dasriUpdateResolver = async (
     where: { id },
     data: {
       ...flattenedInput,
-      ...getRegroupedBsdasriArgs(inputRegroupedBsdasris)
+      ...getRegroupedBsdasriArgs(inputRegroupedBsdasris),
+      bsdasriType: "SIMPLE"
     }
   });
 
