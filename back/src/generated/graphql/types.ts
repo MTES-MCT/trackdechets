@@ -464,6 +464,7 @@ export type Bsdasri = {
   /** Bordereaux regroupés */
   regroupedBsdasris?: Maybe<Array<Scalars["ID"]>>;
   metadata: BsdasriMetadata;
+  allowDirectTakeOver?: Maybe<Scalars["Boolean"]>;
 };
 
 export type BsdasriCompanyWhere = {
@@ -5851,6 +5852,11 @@ export type BsdasriResolvers<
     ParentType,
     ContextType
   >;
+  allowDirectTakeOver?: Resolver<
+    Maybe<ResolversTypes["Boolean"]>,
+    ParentType,
+    ContextType
+  >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -9460,6 +9466,7 @@ export function createBsdasriMock(props: Partial<Bsdasri>): Bsdasri {
     operation: null,
     regroupedBsdasris: null,
     metadata: createBsdasriMetadataMock({}),
+    allowDirectTakeOver: null,
     ...props
   };
 }
