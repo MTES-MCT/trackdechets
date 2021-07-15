@@ -105,12 +105,18 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
         </>
       )}
 
-      <CompanySelector
-        disabled={disabled}
-        name="emitter.company"
-        heading="Personne responsable de l'élimination des déchets"
-        optionalMail={true}
-      />
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": emissionEmphasis,
+        })}
+      >
+        <CompanySelector
+          disabled={disabled}
+          name="emitter.company"
+          heading="Personne responsable de l'élimination des déchets"
+          optionalMail={true}
+        />
+      </div>
 
       <WorkSite
         disabled={disabled}
