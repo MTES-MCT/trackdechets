@@ -25,14 +25,16 @@ import { useParams } from "react-router-dom";
  *
  * Emitter component with widget to group dasris
  */
-export function RegroupingEmitter({ status }) {
-  return <BaseEmitter status={status} isRegrouping={true} />;
+export function RegroupingEmitter({ status, stepName }) {
+  return (
+    <BaseEmitter status={status} isRegrouping={true} stepName={stepName} />
+  );
 }
-export default function Emitter({ status }) {
-  return <BaseEmitter status={status} />;
+export default function Emitter({ status, stepName }) {
+  return <BaseEmitter status={status} stepName={stepName} />;
 }
 
-export function BaseEmitter({ status, isRegrouping = false }) {
+export function BaseEmitter({ status, stepName, isRegrouping = false }) {
   const disabled = [
     BsdasriStatus.SignedByProducer,
     BsdasriStatus.Sent,
@@ -46,18 +48,6 @@ export function BaseEmitter({ status, isRegrouping = false }) {
     <>
       {emissionEmphasis && <FillFieldsInfo />}
       {disabled && <DisabledFieldsInfo />}
-      <div
-        className={classNames("form__row", {
-          "field-emphasis": emissionEmphasis,
-        })}
-      >
-        <CompanySelector
-          disabled={disabled}
-          name="emitter.company"
-          heading="Personne responsable de l'élimination des déchets"
-          optionalMail={true}
-        />
-      </div>
 
       {disabled && (
         <div className="notification notification--error">
@@ -81,12 +71,19 @@ export function BaseEmitter({ status, isRegrouping = false }) {
         </>
       )}
 
-      <CompanySelector
-        disabled={disabled}
-        name="emitter.company"
-        heading="Personne responsable de l'élimination des déchets"
-        optionalMail={true}
-      />
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": emissionEmphasis,
+        })}
+      >
+        <CompanySelector
+          disabled={disabled}
+          name="emitter.company"
+          heading="Personne responsable de l'élimination des déchets"
+          optionalMail={true}
+        />
+      </div>
+
       <WorkSite
         disabled={disabled}
         switchLabel="Je souhaite ajouter une adresse de collecte ou d'enlèvement"

@@ -1,13 +1,10 @@
 import { StepContainer } from "form/common/stepper/Step";
 import StepList from "./BsdasriStepList";
 import React from "react";
-<<<<<<< HEAD
+
 import { useParams, useLocation } from "react-router-dom";
-import Emitter from "./Emitter";
-=======
-import { useParams } from "react-router-dom";
 import Emitter, { RegroupingEmitter } from "./Emitter";
->>>>>>> Add dasri grouping UI
+
 import Recipient from "./Recipient";
 import Transporter from "./Transporter";
 import * as queryString from "query-string";
@@ -33,8 +30,11 @@ export default function FormContainer({
   return (
     <main className="main">
       <div className="container">
-        <StepList formId={id} initialStep={initialStep} bsdasriFormType={bsdasriFormType}>
- 
+        <StepList
+          formId={id}
+          initialStep={initialStep}
+          bsdasriFormType={bsdasriFormType}
+        >
           {bsdasri => {
             const state = !!bsdasri ? bsdasri["bsdasriStatus"] : "";
             // Use a tweaked emitter component when creating or updating a grouping bsdasri

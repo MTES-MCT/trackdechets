@@ -83,12 +83,12 @@ const getFieldsAllorwedForUpdate = (bsdasri: Bsdasri) => {
 const getRegroupedBsdasriArgs = (
   inputRegroupedBsdasris: RegroupedBsdasriInput[] | null | undefined
 ) => {
-  if (inputRegroupedBsdasris === null) {
-    return { regroupedBsdasris: { set: [] }, bsdasriType: "SIMPLE" };
+  if (inputRegroupedBsdasris === null || inputRegroupedBsdasris?.length === 0) {
+    return { regroupedBsdasris: { set: [] } };
   }
 
   const args = !!inputRegroupedBsdasris ? { set: inputRegroupedBsdasris } : {};
-  return { regroupedBsdasris: args, bsdasriType: "GROUPING" };
+  return { regroupedBsdasris: args };
 };
 
 const getIsRegrouping = (dbRegroupedBsdasris, regroupedBsdasris) => {
@@ -169,7 +169,10 @@ const dasriUpdateResolver = async (
     data: {
       ...flattenedInput,
       ...getRegroupedBsdasriArgs(inputRegroupedBsdasris),
-      bsdasriType: "SIMPLE"
+      bsdasriType:
+        inputRegroupedBsdasris === null || inputRegroupedBsdasris?.length === 0
+          ? "SIMPLE"
+          : "GROUPING"
     }
   });
 
