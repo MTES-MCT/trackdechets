@@ -15,14 +15,15 @@ const initialState = {
   emitter: {
     company: getInitialCompany(),
     workSite: null,
-    customInfo: null,
+    customInfo: "",
   },
   emission: {
     wasteCode: "18 01 03*",
     wasteDetails: {
       packagingInfos: [],
       quantity: { value: null, type: null },
-      onuCode: null,
+
+      onuCode: "",
     },
     handedOverAt: null,
   },

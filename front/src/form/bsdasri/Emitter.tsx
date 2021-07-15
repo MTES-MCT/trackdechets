@@ -10,28 +10,31 @@ import { getInitialEmitterWorkSite } from "./utils/initial-state";
 import WorkSite from "form/common/components/work-site/WorkSite";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { BsdasriStatus } from "generated/graphql/types";
-
-export default function Emitter({ status }) {
+import { FillFieldsInfo, DisabledFieldsInfo } from "./utils/commons";
+import classNames from "classnames";
+export default function Emitter({ status, stepName }) {
   const disabled = [
     BsdasriStatus.SignedByProducer,
     BsdasriStatus.Sent,
     BsdasriStatus.Received,
   ].includes(status);
-
+  const emissionEmphasis = stepName === "emission";
   return (
     <>
-      {disabled && (
-        <div className="notification notification--error">
-          Les champs grisés ci-dessous ont été scellés via signature et ne sont
-          plus modifiables.
-        </div>
-      )}
-      <CompanySelector
-        disabled={disabled}
-        name="emitter.company"
-        heading="Personne responsable de l'élimination des déchets"
-        optionalMail={true}
-      />
+      {emissionEmphasis && <FillFieldsInfo />}
+      {disabled && <DisabledFieldsInfo />}
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": emissionEmphasis,
+        })}
+      >
+        <CompanySelector
+          disabled={disabled}
+          name="emitter.company"
+          heading="Personne responsable de l'élimination des déchets"
+          optionalMail={true}
+        />
+      </div>
       <WorkSite
         disabled={disabled}
         switchLabel="Je souhaite ajouter une adresse de collecte ou d'enlèvement"
@@ -55,7 +58,11 @@ export default function Emitter({ status }) {
         <RedErrorMessage name="emitter.onBehalfOfEcoorganisme" />
       </div>
       <h4 className="form__section-heading">Détail du déchet</h4>
-      <div className="form__row">
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": emissionEmphasis,
+        })}
+      >
         <fieldset>
           <legend className="tw-font-semibold">Code déchet</legend>
           <Field
@@ -76,16 +83,24 @@ export default function Emitter({ status }) {
       </div>
 
       <h4 className="form__section-heading">Conditionnement</h4>
-
-      <Field
-        name="emission.wasteDetails.packagingInfos"
-        component={Packagings}
-        disabled={disabled}
-      />
-
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": emissionEmphasis,
+        })}
+      >
+        <Field
+          name="emission.wasteDetails.packagingInfos"
+          component={Packagings}
+          disabled={disabled}
+        />
+      </div>
       <h4 className="form__section-heading">Quantité remise</h4>
 
-      <div className="form__row">
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": emissionEmphasis,
+        })}
+      >
         <label>
           Quantité en kg :
           <Field
@@ -123,7 +138,11 @@ export default function Emitter({ status }) {
         </fieldset>
       </div>
 
-      <div className="form__row">
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": emissionEmphasis,
+        })}
+      >
         <label>
           Code ADR
           <Field
@@ -149,7 +168,11 @@ export default function Emitter({ status }) {
         </label>
       </div>
 
-      <div className="form__row">
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": emissionEmphasis,
+        })}
+      >
         <label>
           Date de remise au collecteur transporteur
           <div className="td-date-wrapper">
