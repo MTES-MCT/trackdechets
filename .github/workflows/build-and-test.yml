@@ -1,9 +1,7 @@
 
 name: Build and unit tests
 
-on:
-  push
-  pull_request
+on: [push, pull_request]
 
 jobs:
   build-and-test-front:
