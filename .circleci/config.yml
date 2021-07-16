@@ -147,63 +147,63 @@ workflows:
       - lint
       - types
       - test
-      - integration-tests
-      - build-and-push:
-          name: build-and-push-prod
-          requires:
-            - lint
-            - types
-            - test
-            - integration-tests
-          filters:
-            branches:
-              only: master
-      - build-and-push:
-          name: build-and-push-sandbox
-          extra-cfg: "-f docker-compose.sandbox.yml"
-          build-args: "--build-arg build_env=sandbox"
-          requires:
-            - lint
-            - types
-            - test
-            - integration-tests
-          filters:
-            branches:
-              only: master
-      - build-and-push:
-          name: build-and-push-recette
-          extra-cfg: "-f docker-compose.val.yml"
-          build-args: "--build-arg build_env=recette"
-          requires:
-            - lint
-            - types
-            - test
-            - integration-tests
-          filters:
-            branches:
-              only: dev
-      - deploy:
-          name: deploy-prod
-          requires:
-            - build-and-push-prod
-          filters:
-            branches:
-              only: master
-      - deploy:
-          name: deploy-sandbox
-          host: SSH_HOST_SANDBOX
-          extra-cfg: "docker-compose.sandbox.yml"
-          requires:
-            - build-and-push-sandbox
-          filters:
-            branches:
-              only: master
-      - deploy:
-          name: deploy-recette
-          host: SSH_HOST_RECETTE
-          extra-cfg: "docker-compose.val.yml"
-          requires:
-            - build-and-push-recette
-          filters:
-            branches:
-              only: dev
+      # - integration-tests
+      # - build-and-push:
+      #     name: build-and-push-prod
+      #     requires:
+      #       - lint
+      #       - types
+      #       - test
+      #       - integration-tests
+      #     filters:
+      #       branches:
+      #         only: master
+      # - build-and-push:
+      #     name: build-and-push-sandbox
+      #     extra-cfg: "-f docker-compose.sandbox.yml"
+      #     build-args: "--build-arg build_env=sandbox"
+      #     requires:
+      #       - lint
+      #       - types
+      #       - test
+      #       - integration-tests
+      #     filters:
+      #       branches:
+      #         only: master
+      # - build-and-push:
+      #     name: build-and-push-recette
+      #     extra-cfg: "-f docker-compose.val.yml"
+      #     build-args: "--build-arg build_env=recette"
+      #     requires:
+      #       - lint
+      #       - types
+      #       - test
+      #       - integration-tests
+      #     filters:
+      #       branches:
+      #         only: dev
+      # - deploy:
+      #     name: deploy-prod
+      #     requires:
+      #       - build-and-push-prod
+      #     filters:
+      #       branches:
+      #         only: master
+      # - deploy:
+      #     name: deploy-sandbox
+      #     host: SSH_HOST_SANDBOX
+      #     extra-cfg: "docker-compose.sandbox.yml"
+      #     requires:
+      #       - build-and-push-sandbox
+      #     filters:
+      #       branches:
+      #         only: master
+      # - deploy:
+      #     name: deploy-recette
+      #     host: SSH_HOST_RECETTE
+      #     extra-cfg: "docker-compose.val.yml"
+      #     requires:
+      #       - build-and-push-recette
+      #     filters:
+      #       branches:
+      #         only: dev
