@@ -887,7 +887,8 @@ export type BsdasriWhere = {
    * Défaut à vide.
    */
   status?: Maybe<BsdasriStatus>;
-  ids?: Maybe<Array<Scalars["ID"]>>;
+  /** Expérimental : Filtre le résultat sur l'ID des bordereaux */
+  id_in?: Maybe<Array<Scalars["ID"]>>;
   createdAt?: Maybe<DateFilter>;
   updatedAt?: Maybe<DateFilter>;
   emitter?: Maybe<BsdasriEmitterWhere>;

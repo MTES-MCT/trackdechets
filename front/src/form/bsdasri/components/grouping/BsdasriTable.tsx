@@ -54,7 +54,7 @@ export default function BsdasriTable({
   >(GET_GROUPABLE_BSDASRIS, {
     variables: {
       where: {
-        _or: [{ groupable: true }, { ids: regroupedInDB }],
+        _or: [{ groupable: true }, { id_in: regroupedInDB }],
         processingOperation: [
           ProcessingOperationTypes.D12,
           ProcessingOperationTypes.R12,

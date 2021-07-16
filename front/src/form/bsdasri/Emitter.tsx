@@ -11,10 +11,9 @@ import {
 } from "./utils/initial-state";
 import WorkSite from "form/common/components/work-site/WorkSite";
 import DateInput from "form/common/components/custom-inputs/DateInput";
- 
+
 import QuantityWidget from "./components/Quantity";
- 
- 
+
 import { FillFieldsInfo, DisabledFieldsInfo } from "./utils/commons";
 import classNames from "classnames";
 

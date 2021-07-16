@@ -275,7 +275,7 @@ describe("Query.Bsdasris", () => {
     const { data } = await query<Pick<Query, "bsdasris">>(GET_BSDASRIS, {
       variables: {
         where: {
-          ids: [dasri2.id, dasri3.id]
+          id_in: [dasri2.id, dasri3.id]
         }
       }
     });

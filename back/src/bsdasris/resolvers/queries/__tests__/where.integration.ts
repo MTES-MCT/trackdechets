@@ -124,9 +124,9 @@ describe("Bsdasri where conversion", () => {
     });
   });
 
-  it("should convert filter on request ids", () => {
+  it("should convert filter on request ids (id_in)", () => {
     const where: BsdasriWhere = {
-      ids: ["x", "y", "z"]
+      id_in: ["x", "y", "z"]
     };
 
     const dbFilter = buildDbFilter(where, [siret]);
