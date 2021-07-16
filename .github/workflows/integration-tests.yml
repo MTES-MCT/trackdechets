@@ -5,7 +5,7 @@ on:
  - pull_request
 
 jobs:
-  integration-tests:
+  back:
     runs-on: ubuntu-latest
     defaults:
       run:
