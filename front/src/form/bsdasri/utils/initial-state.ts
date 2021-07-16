@@ -1,6 +1,6 @@
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 
-import { WorkSite } from "generated/graphql/types";
+import { WorkSite, BsdasriQuantity, Bsdasri } from "generated/graphql/types";
 
 export function getInitialEmitterWorkSite(workSite?: WorkSite | null) {
   return {
@@ -11,7 +11,13 @@ export function getInitialEmitterWorkSite(workSite?: WorkSite | null) {
     infos: workSite?.infos ?? "",
   };
 }
-const initialState = {
+
+export const getInitialQuantityFn = (quantity?: BsdasriQuantity | null) => ({
+  value: quantity?.value,
+  type: quantity?.type,
+});
+
+const getInitialState = (f?: Bsdasri | null) => ({
   emitter: {
     company: getInitialCompany(),
     workSite: null,
@@ -21,14 +27,20 @@ const initialState = {
     wasteCode: "18 01 03*",
     wasteDetails: {
       packagingInfos: [],
-      quantity: { value: null, type: null },
-
-      onuCode: "",
+      quantity: !!f?.emission?.wasteDetails?.quantity
+        ? getInitialQuantityFn(f?.emission?.wasteDetails?.quantity)
+        : null,
+      onuCode: null,
     },
     handedOverAt: null,
   },
   transport: {
-    wasteDetails: { packagingInfos: [], quantity: { value: null, type: null } },
+    wasteDetails: {
+      packagingInfos: [],
+      quantity: !!f?.transport?.wasteDetails?.quantity
+        ? getInitialQuantityFn(f?.transport?.wasteDetails?.quantity)
+        : null,
+    },
     takenOverAt: null,
     handedOverAt: null,
     wasteAcceptation: {
@@ -60,8 +72,6 @@ const initialState = {
     receiptDepartment: null,
     receiptValidityLimit: null,
   },
-};
-
-const getInitialState = () => initialState;
+});
 
 export default getInitialState;
