@@ -1,13 +1,10 @@
 
 name: Build & Test
 
-on:
- - push
- - pull_request
+on: push
 
 jobs:
   build-and-test-front:
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -34,7 +31,6 @@ jobs:
         run: npm test
 
   build-and-test-back:
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -74,7 +70,6 @@ jobs:
           SECURITY_CODE_RENEWAL_TEMPLATE_ID: "6"
 
   build-doc:
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -88,19 +83,5 @@ jobs:
         run: |
           yarn install --frozen-lockfile
           yarn build
-
-  # run-back-integration-tests:
-  #   if: github.event_name == 'pull_request'
-  #   needs: build-and-test-back
-  #   runs-on: ubuntu-latest
-  #   defaults:
-  #     run:
-  #       working-directory: back/integration-tests
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Run integration tests
-  #       run: |
-  #         chmod +x ./run.sh
-  #         ./run.sh
 
 
