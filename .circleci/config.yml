@@ -141,12 +141,18 @@ jobs:
             sudo chmod +x ./run.sh
             ./run.sh
 
+  checkout:
+    description: "Simple placeholder job"
+    executor: node
+    steps:
+      - checkout
+
 workflows:
   build-and-deploy:
     jobs:
-      - lint
-      - types
-      - test
+      - checkout
+      # - types
+      # - test
       # - integration-tests
       # - build-and-push:
       #     name: build-and-push-prod
