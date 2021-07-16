@@ -1,5 +1,5 @@
 
-name: Build and unit tests
+name: Build & Test
 
 on: [push, pull_request]
 
@@ -84,18 +84,18 @@ jobs:
           yarn install --frozen-lockfile
           yarn build
 
-  run-back-integration-tests:
-    if: github.event_name != 'pull_request'
-    needs: build-and-test-back
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: back/integration-tests
-    steps:
-      - uses: actions/checkout@v2
-      - name: Run integration tests
-        run: |
-          chmod +x ./run.sh
-          ./run.sh
+  # run-back-integration-tests:
+  #   if: github.event_name != 'pull_request'
+  #   needs: build-and-test-back
+  #   runs-on: ubuntu-latest
+  #   defaults:
+  #     run:
+  #       working-directory: back/integration-tests
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Run integration tests
+  #       run: |
+  #         chmod +x ./run.sh
+  #         ./run.sh
 
 

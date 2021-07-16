@@ -1,6 +1,6 @@
 
 
-name: Deploy documentation with Github Pages and front to S3 bucket
+name: Deploy
 
 on:
   push:
