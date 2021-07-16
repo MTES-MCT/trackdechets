@@ -24,7 +24,7 @@ const GET_BSFFS = `
           ficheInterventions {
             numero
           }
-          bsffs {
+          children {
             id
             ficheInterventions {
               detenteur {
@@ -270,7 +270,7 @@ describe("Query.bsffs", () => {
     it("should list the associated bsffs", async () => {
       await createBsff(
         { emitter, transporter, destination },
-        { bsffs: { connect: [{ id: associatedBsff.id }] } }
+        { children: { connect: [{ id: associatedBsff.id }] } }
       );
 
       const { query } = makeClient(emitter.user);
@@ -278,7 +278,7 @@ describe("Query.bsffs", () => {
         GET_BSFFS
       );
 
-      expect(data.bsffs.edges[0].node.bsffs).toEqual([
+      expect(data.bsffs.edges[0].node.children).toEqual([
         expect.objectContaining({
           id: associatedBsff.id
         })
@@ -288,7 +288,7 @@ describe("Query.bsffs", () => {
     it("should show the detenteur from the fiche d'interventions to companies on the bsff", async () => {
       await createBsff(
         { emitter, transporter, destination },
-        { bsffs: { connect: [{ id: associatedBsff.id }] } }
+        { children: { connect: [{ id: associatedBsff.id }] } }
       );
 
       const { query } = makeClient(destination.user);
@@ -296,7 +296,7 @@ describe("Query.bsffs", () => {
         GET_BSFFS
       );
 
-      expect(data.bsffs.edges[0].node.bsffs).toEqual([
+      expect(data.bsffs.edges[0].node.children).toEqual([
         expect.objectContaining({
           ficheInterventions: [
             {
@@ -316,7 +316,7 @@ describe("Query.bsffs", () => {
 
       await createBsff(
         { emitter: destination, transporter, destination: newDestination },
-        { bsffs: { connect: [{ id: associatedBsff.id }] } }
+        { children: { connect: [{ id: associatedBsff.id }] } }
       );
 
       const { query } = makeClient(newDestination.user);
@@ -324,7 +324,7 @@ describe("Query.bsffs", () => {
         GET_BSFFS
       );
 
-      expect(data.bsffs.edges[0].node.bsffs).toEqual([
+      expect(data.bsffs.edges[0].node.children).toEqual([
         expect.objectContaining({
           ficheInterventions: [
             {

@@ -137,14 +137,14 @@ describe("Mutation.createBsff", () => {
                 mail: destination.user.email
               }
             },
-            bsffs: [bsffToAssociate.id]
+            children: [bsffToAssociate.id]
           }
         }
       });
 
       const associatedBsffs = await prisma.bsff
         .findUnique({ where: { id: data.createBsff.id } })
-        .bsffs();
+        .children();
       expect(associatedBsffs).toHaveLength(1);
     });
 
@@ -172,19 +172,19 @@ describe("Mutation.createBsff", () => {
                 mail: destination.user.email
               }
             },
-            bsffs: [bsffToAssociate.id]
+            children: [bsffToAssociate.id]
           }
         }
       });
 
       const associatedBsffs = await prisma.bsff
         .findUnique({ where: { id: data.createBsff.id } })
-        .bsffs();
+        .children();
       expect(associatedBsffs).toHaveLength(1);
     });
 
     it("should disallow associating bsffs with missing signatures", async () => {
-      const bsffs = await Promise.all([
+      const children = await Promise.all([
         createBsffAfterEmission(
           { emitter, transporter, destination },
           {
@@ -209,7 +209,7 @@ describe("Mutation.createBsff", () => {
                 mail: destination.user.email
               }
             },
-            bsffs: bsffs.map(bsff => bsff.id)
+            children: children.map(bsff => bsff.id)
           }
         }
       });

@@ -477,7 +477,7 @@ describe("Mutation.updateBsff", () => {
     );
     const bsff = await createBsff(
       { emitter },
-      { bsffs: { connect: [{ id: associatedBsff.id }] } }
+      { children: { connect: [{ id: associatedBsff.id }] } }
     );
 
     const { mutate } = makeClient(emitter.user);
@@ -488,14 +488,14 @@ describe("Mutation.updateBsff", () => {
       variables: {
         id: bsff.id,
         input: {
-          bsffs: [bsffToAssociate.id]
+          children: [bsffToAssociate.id]
         }
       }
     });
 
     const associatedBsffs = await prisma.bsff
       .findUnique({ where: { id: data.updateBsff.id } })
-      .bsffs();
+      .children();
     expect(associatedBsffs).toEqual([
       expect.objectContaining({
         id: bsffToAssociate.id

@@ -44,7 +44,7 @@ const bsffs: QueryResolvers["bsffs"] = async (_, args, context) => {
       node: {
         ...unflattenBsff(bsff),
         ficheInterventions: [],
-        bsffs: []
+        children: []
       },
       cursor: bsff.id
     })),

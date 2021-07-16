@@ -1145,7 +1145,7 @@ export type Bsff = {
    */
   ficheInterventions: Array<BsffFicheIntervention>;
   /** Liste des bordereaux que celui-ci regroupe, dans le cas d'un regroupement, reconditionnement ou d'une réexpédition. */
-  bsffs: Array<Bsff>;
+  children: Array<Bsff>;
 };
 
 /** Résultats de bordereaux paginés. */
@@ -1258,7 +1258,7 @@ export type BsffInput = {
   quantity?: Maybe<BsffQuantityInput>;
   transporter?: Maybe<BsffTransporterInput>;
   destination?: Maybe<BsffDestinationInput>;
-  bsffs?: Maybe<Array<Scalars["ID"]>>;
+  children?: Maybe<Array<Scalars["ID"]>>;
 };
 
 export type BsffNextDestination = {

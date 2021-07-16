@@ -36,7 +36,7 @@ const deleteBsff: MutationResolvers["deleteBsff"] = async (
   return {
     ...unflattenBsff(updatedBsff),
     ficheInterventions: [],
-    bsffs: []
+    children: []
   };
 };
 

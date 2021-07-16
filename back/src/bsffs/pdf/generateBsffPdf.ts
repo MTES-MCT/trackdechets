@@ -15,9 +15,9 @@ const templatePath = require.resolve(
 /*
  * Check if the bsff lists all the packagings from the associated bsffs.
  */
-function hasSamePackagings(bsff: Bsff, associatedBsff: Bsff[]): boolean {
+function hasSamePackagings(bsff: Bsff, children: Bsff[]): boolean {
   const packagings = ((bsff.packagings ?? []) as BsffPackaging[]).slice();
-  const associatedPackagings = associatedBsff.flatMap(
+  const associatedPackagings = children.flatMap(
     bsff => (bsff.packagings ?? []) as BsffPackaging[]
   );
 
@@ -76,7 +76,7 @@ function isReexpedition(bsff: Bsff, associatedBsffs: Bsff[]): boolean {
 export async function generateBsffPdf(bsff: Bsff) {
   const associatedBsffs = await prisma.bsff.findMany({
     where: {
-      bsffId: bsff.id
+      parentId: bsff.id
     }
   });
   const ficheInterventions = await prisma.bsffFicheIntervention.findMany({

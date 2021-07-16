@@ -21,10 +21,10 @@ const createBsff: MutationResolvers["createBsff"] = async (
 
   await isBsffContributor(user, flatInput);
 
-  if (input.bsffs?.length > 0) {
-    await canAssociateBsffs(input.bsffs);
-    flatInput.bsffs = {
-      connect: input.bsffs.map(id => ({ id }))
+  if (input.children?.length > 0) {
+    await canAssociateBsffs(input.children);
+    flatInput.children = {
+      connect: input.children.map(id => ({ id }))
     };
   }
 
@@ -38,7 +38,7 @@ const createBsff: MutationResolvers["createBsff"] = async (
   return {
     ...unflattenBsff(bsff),
     ficheInterventions: [],
-    bsffs: []
+    children: []
   };
 };
 

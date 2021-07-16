@@ -16,7 +16,7 @@ const GET_BSFF = `
       ficheInterventions {
         numero
       }
-      bsffs {
+      children {
         id
       }
     }
@@ -176,7 +176,7 @@ describe("Query.bsff", () => {
         emitter: destination
       },
       {
-        bsffs: {
+        children: {
           connect: {
             id: bsffToAssociate.id
           }
@@ -193,7 +193,7 @@ describe("Query.bsff", () => {
 
     expect(data.bsff).toEqual(
       expect.objectContaining({
-        bsffs: [
+        children: [
           {
             id: bsffToAssociate.id
           }

@@ -29,16 +29,16 @@ export const Bsff: BsffResolvers = {
 
     return unflattenedFicheInterventions;
   },
-  bsffs: async parent => {
-    const bsffs = await prisma.bsff.findMany({
+  children: async parent => {
+    const children = await prisma.bsff.findMany({
       where: {
-        bsffId: parent.id
+        parentId: parent.id
       }
     });
-    return bsffs.map(bsff => ({
+    return children.map(bsff => ({
       ...unflattenBsff(bsff),
       ficheInterventions: [],
-      bsffs: []
+      children: []
     }));
   }
 };

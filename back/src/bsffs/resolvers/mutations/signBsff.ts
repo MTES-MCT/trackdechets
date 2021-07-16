@@ -150,7 +150,7 @@ const signBsff: MutationResolvers["signBsff"] = async (_, args, context) => {
   return {
     ...unflattenBsff(updatedBsff),
     ficheInterventions: [],
-    bsffs: []
+    children: []
   };
 };
 

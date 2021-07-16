@@ -1128,7 +1128,7 @@ export type Bsff = {
    */
   ficheInterventions: Array<BsffFicheIntervention>;
   /** Liste des bordereaux que celui-ci regroupe, dans le cas d'un regroupement, reconditionnement ou d'une réexpédition. */
-  bsffs: Array<Bsff>;
+  children: Array<Bsff>;
 };
 
 /** Résultats de bordereaux paginés. */
@@ -1241,7 +1241,7 @@ export type BsffInput = {
   quantity?: Maybe<BsffQuantityInput>;
   transporter?: Maybe<BsffTransporterInput>;
   destination?: Maybe<BsffDestinationInput>;
-  bsffs?: Maybe<Array<Scalars["ID"]>>;
+  children?: Maybe<Array<Scalars["ID"]>>;
 };
 
 export type BsffNextDestination = {
@@ -6384,7 +6384,7 @@ export type BsffResolvers<
     ParentType,
     ContextType
   >;
-  bsffs?: Resolver<Array<ResolversTypes["Bsff"]>, ParentType, ContextType>;
+  children?: Resolver<Array<ResolversTypes["Bsff"]>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -10222,7 +10222,7 @@ export function createBsffMock(props: Partial<Bsff>): Bsff {
     transporter: null,
     destination: null,
     ficheInterventions: [],
-    bsffs: [],
+    children: [],
     ...props
   };
 }
@@ -10390,7 +10390,7 @@ export function createBsffInputMock(props: Partial<BsffInput>): BsffInput {
     quantity: null,
     transporter: null,
     destination: null,
-    bsffs: null,
+    children: null,
     ...props
   };
 }

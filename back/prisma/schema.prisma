@@ -884,9 +884,9 @@ model Bsff {
 
   ficheInterventions BsffFicheIntervention[] @relation("FicheInterventionToBsff")
 
-  bsffs  Bsff[]  @relation("BsffToBsff")
-  Bsff   Bsff?   @relation("BsffToBsff", fields: [bsffId], references: [id])
-  bsffId String?
+  children Bsff[]  @relation("BsffToBsff")
+  parent   Bsff?   @relation("BsffToBsff", fields: [parentId], references: [id])
+  parentId String?
 }
 
 enum BsffStatus {

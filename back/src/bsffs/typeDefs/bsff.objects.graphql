@@ -55,7 +55,7 @@ type Bsff {
   """
   Liste des bordereaux que celui-ci regroupe, dans le cas d'un regroupement, reconditionnement ou d'une réexpédition.
   """
-  bsffs: [Bsff!]!
+  children: [Bsff!]!
 }
 
 type BsffEmitter {

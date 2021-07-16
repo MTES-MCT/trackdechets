@@ -81,10 +81,10 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   const data: Prisma.BsffUpdateInput = flatInput;
 
-  if (input.bsffs?.length > 0) {
-    await canAssociateBsffs(input.bsffs);
-    data.bsffs = {
-      set: input.bsffs.map(id => ({ id }))
+  if (input.children?.length > 0) {
+    await canAssociateBsffs(input.children);
+    data.children = {
+      set: input.children.map(id => ({ id }))
     };
   }
 
@@ -98,7 +98,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   return {
     ...unflattenBsff(updatedBsff),
     ficheInterventions: [],
-    bsffs: []
+    children: []
   };
 };
 

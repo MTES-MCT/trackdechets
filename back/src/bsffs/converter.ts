@@ -92,7 +92,7 @@ export function flattenBsffInput(
 
 export function unflattenBsff(
   prismaBsff: Prisma.Bsff
-): Omit<GraphQL.Bsff, "ficheInterventions" | "bsffs"> {
+): Omit<GraphQL.Bsff, "ficheInterventions" | "children"> {
   return {
     id: prismaBsff.id,
     status: prismaBsff.status,
