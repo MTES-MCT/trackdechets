@@ -35,11 +35,7 @@ const createBsff: MutationResolvers["createBsff"] = async (
 
   await indexBsff(bsff);
 
-  return {
-    ...unflattenBsff(bsff),
-    ficheInterventions: [],
-    children: []
-  };
+  return unflattenBsff(bsff);
 };
 
 export default createBsff;

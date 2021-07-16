@@ -237,11 +237,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
           }
         }
       })
-    ).map(bsff => ({
-      ...unflattenBsff(bsff),
-      ficheInterventions: [],
-      children: []
-    }))
+    ).map(unflattenBsff)
   };
   const edges = hits
     .reduce<Array<Bsd>>((acc, { _source: { type, id } }) => {

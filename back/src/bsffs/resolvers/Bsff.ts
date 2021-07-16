@@ -35,10 +35,6 @@ export const Bsff: BsffResolvers = {
         parentId: parent.id
       }
     });
-    return children.map(bsff => ({
-      ...unflattenBsff(bsff),
-      ficheInterventions: [],
-      children: []
-    }));
+    return children.map(unflattenBsff);
   }
 };

@@ -17,11 +17,7 @@ const bsff: QueryResolvers["bsff"] = async (_, { id }, context) => {
     ]
   });
 
-  return {
-    ...unflattenBsff(bsff),
-    ficheInterventions: [],
-    children: []
-  };
+  return unflattenBsff(bsff);
 };
 
 export default bsff;

@@ -95,11 +95,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   await indexBsff(updatedBsff);
 
-  return {
-    ...unflattenBsff(updatedBsff),
-    ficheInterventions: [],
-    children: []
-  };
+  return unflattenBsff(updatedBsff);
 };
 
 export default updateBsff;

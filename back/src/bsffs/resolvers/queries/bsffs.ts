@@ -41,11 +41,7 @@ const bsffs: QueryResolvers["bsffs"] = async (_, args, context) => {
 
   return {
     edges: bsffs.map(bsff => ({
-      node: {
-        ...unflattenBsff(bsff),
-        ficheInterventions: [],
-        children: []
-      },
+      node: unflattenBsff(bsff),
       cursor: bsff.id
     })),
     totalCount,

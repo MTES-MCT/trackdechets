@@ -33,11 +33,7 @@ const deleteBsff: MutationResolvers["deleteBsff"] = async (
 
   await elastic.deleteBsd(updatedBsff);
 
-  return {
-    ...unflattenBsff(updatedBsff),
-    ficheInterventions: [],
-    children: []
-  };
+  return unflattenBsff(updatedBsff);
 };
 
 export default deleteBsff;
