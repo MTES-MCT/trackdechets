@@ -34,6 +34,7 @@ export default {
     bsdasris: {
       view: "/dashboard/:siret/bsdasris/view/:id",
       create: "/dashboard/:siret/bsdasris/create",
+      createGroup: "/dashboard/:siret/bsdasris/create-group",
       edit: "/dashboard/:siret/bsdasris/edit/:id",
     },
     bsvhus: {

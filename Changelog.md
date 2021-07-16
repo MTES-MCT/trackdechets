@@ -5,12 +5,27 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# Next release
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :boom: Breaking changes
+
+#### :bug: Corrections de bugs
+
+#### :nail_care: Améliorations
+
+- Création et édition de bordereaux Dasri de groupement [PR934](https://github.com/MTES-MCT/trackdechets/pull/934)
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2021.07.1] 12/07/2021
 
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'un bouton pour choisir le type de bordereau à créer [PR 899](https://github.com/MTES-MCT/trackdechets/pull/899)
-- Les producteurs peuvent autoriser l'emport de dasri sans leur signature depuis l'UI[PR 904] (https://github.com/MTES-MCT/trackdechets/pull/904)
+- Les producteurs peuvent autoriser l'emport de dasri sans leur signature depuis l'UI[PR 904](https://github.com/MTES-MCT/trackdechets/pull/904)
 - Ajout des BSFFs au tableau de bord [PR 909](https://github.com/MTES-MCT/trackdechets/pull/909)
 - Évolutions de l'API BSFF suite aux retours de nos partenaires [PR 909][https://github.com/mtes-mct/trackdechets/pull/909]
   - Refonte de la gestion des fiches d'intervention : modification du modèle et des mutations
@@ -40,6 +55,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :memo: Documentation
 
 - Re-structuration de la documentation et ajout d'exemples de bout en bout [PR 905](https://github.com/MTES-MCT/trackdechets/pull/905)
+
 #### :house: Interne
 
 - Indexation des BSFF dans Elastic Search [PR 909](https://github.com/MTES-MCT/trackdechets/pull/909)

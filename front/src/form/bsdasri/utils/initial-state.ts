@@ -72,6 +72,7 @@ const getInitialState = (f?: Bsdasri | null) => ({
     receiptDepartment: null,
     receiptValidityLimit: null,
   },
+  regroupedBsdasris: [],
 });
 
 export default getInitialState;

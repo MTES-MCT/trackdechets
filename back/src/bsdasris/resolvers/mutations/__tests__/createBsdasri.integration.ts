@@ -13,6 +13,7 @@ mutation DasriCreate($input: BsdasriCreateInput!) {
   createBsdasri(input: $input)  {
     id
     isDraft
+    bsdasriType
     status
     emitter {
       company {
@@ -165,6 +166,7 @@ describe("Mutation.createDasri", () => {
     );
     expect(data.createBsdasri.isDraft).toEqual(false);
     expect(data.createBsdasri.status).toEqual("INITIAL");
+    expect(data.createBsdasri.bsdasriType).toEqual("SIMPLE");
 
     expect(data.createBsdasri.emitter.company.siret).toEqual(company.siret);
   });

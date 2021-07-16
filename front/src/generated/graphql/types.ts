@@ -453,6 +453,7 @@ export type Bsdasri = {
   __typename?: "Bsdasri";
   id: Scalars["ID"];
   status: BsdasriStatus;
+  bsdasriType: BsdasriType;
   createdAt?: Maybe<Scalars["DateTime"]>;
   updatedAt?: Maybe<Scalars["DateTime"]>;
   isDraft: Scalars["Boolean"];
@@ -832,6 +833,15 @@ export type BsdasriTransportWasteDetails = {
   packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
 };
 
+export enum BsdasriType {
+  /** Bordereau dasri simple */
+  Simple = "SIMPLE",
+  /** Bordereau dasri de groupement */
+  Grouping = "GROUPING",
+  /** (Bientôt disponible) - Bordereau dasri de synthèse */
+  Synthesis = "SYNTHESIS"
+}
+
 export type BsdasriUpdateInput = {
   emitter?: Maybe<BsdasriEmitterInput>;
   emission?: Maybe<BsdasriEmissionInput>;
@@ -877,6 +887,8 @@ export type BsdasriWhere = {
    * Défaut à vide.
    */
   status?: Maybe<BsdasriStatus>;
+  /** Expérimental : Filtre le résultat sur l'ID des bordereaux */
+  id_in?: Maybe<Array<Scalars["ID"]>>;
   createdAt?: Maybe<DateFilter>;
   updatedAt?: Maybe<DateFilter>;
   emitter?: Maybe<BsdasriEmitterWhere>;

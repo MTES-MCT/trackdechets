@@ -679,8 +679,15 @@ enum BsdasriEmitterType {
   COLLECTOR
 }
 
+enum BsdasriType {
+  SIMPLE
+  GROUPING
+  SYNTHESIS
+}
+
 model Bsdasri {
   id        String        @unique
+  bsdasriType BsdasriType @default(SIMPLE)
   status    BsdasriStatus @default(INITIAL)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt

@@ -15,6 +15,10 @@ import { checkIsBsdasriContributor } from "../../permissions";
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
 import { indexBsdasri } from "../../elastic";
 
+/**
+ * Bsdasri creation mutation
+ * sets bsdasriType to `GROUPING` if a non empty array of regroupedBsdasris is provided
+ */
 const createBsdasri = async (
   parent: ResolversParentTypes["Mutation"],
   { input: input }: MutationCreateBsdasriArgs,
@@ -58,6 +62,7 @@ const createBsdasri = async (
     data: {
       ...flattenedInput,
       id: getReadableId(ReadableIdPrefix.DASRI),
+      bsdasriType: isRegrouping ? "GROUPING" : "SIMPLE",
       owner: { connect: { id: user.id } },
       regroupedBsdasris: { connect: regroupedBsdasris },
       isDraft: isDraft

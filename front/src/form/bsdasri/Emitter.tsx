@@ -1,6 +1,6 @@
 import { RedErrorMessage, Label } from "common/components";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import { Field } from "formik";
+import { Field, useFormikContext } from "formik";
 import React from "react";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import Packagings from "./components/packagings/Packagings";
@@ -11,21 +11,65 @@ import {
 } from "./utils/initial-state";
 import WorkSite from "form/common/components/work-site/WorkSite";
 import DateInput from "form/common/components/custom-inputs/DateInput";
+
 import QuantityWidget from "./components/Quantity";
-import { BsdasriStatus } from "generated/graphql/types";
+
 import { FillFieldsInfo, DisabledFieldsInfo } from "./utils/commons";
 import classNames from "classnames";
+
+import { BsdasriStatus, Bsdasri } from "generated/graphql/types";
+import BsdasriSelector from "form/bsdasri/components/grouping/BsdasriSelector";
+import { useParams } from "react-router-dom";
+/**
+ *
+ * Emitter component with widget to group dasris
+ */
+export function RegroupingEmitter({ status, stepName }) {
+  return (
+    <BaseEmitter status={status} isRegrouping={true} stepName={stepName} />
+  );
+}
 export default function Emitter({ status, stepName }) {
+  return <BaseEmitter status={status} stepName={stepName} />;
+}
+
+export function BaseEmitter({ status, stepName, isRegrouping = false }) {
   const disabled = [
     BsdasriStatus.SignedByProducer,
     BsdasriStatus.Sent,
     BsdasriStatus.Received,
   ].includes(status);
   const emissionEmphasis = stepName === "emission";
+  const { values } = useFormikContext<Bsdasri>();
+  const { siret } = useParams<{ siret: string }>();
+  const isUserCurrentEmitter = values?.emitter?.company?.siret === siret;
   return (
     <>
       {emissionEmphasis && <FillFieldsInfo />}
       {disabled && <DisabledFieldsInfo />}
+
+      {disabled && (
+        <div className="notification notification--error">
+          Les champs grisés ci-dessous ont été scellés via signature et ne sont
+          plus modifiables.
+        </div>
+      )}
+
+      {isRegrouping && (
+        <>
+          <h3 className="form__section-heading">
+            Bordereau dasri de groupement
+          </h3>
+
+          {values?.emitter?.company?.siret && !isUserCurrentEmitter && (
+            <p className="notification notification--error">
+              Pour préparer un bordereau de regroupement, vous devez y figurer
+              comme producteur
+            </p>
+          )}
+        </>
+      )}
+
       <div
         className={classNames("form__row", {
           "field-emphasis": emissionEmphasis,
@@ -38,6 +82,7 @@ export default function Emitter({ status, stepName }) {
           optionalMail={true}
         />
       </div>
+
       <WorkSite
         disabled={disabled}
         switchLabel="Je souhaite ajouter une adresse de collecte ou d'enlèvement"
@@ -84,7 +129,9 @@ export default function Emitter({ status, stepName }) {
           />
         </fieldset>
       </div>
-
+      {isRegrouping && isUserCurrentEmitter && (
+        <BsdasriSelector name="regroupedBsdasris" />
+      )}
       <h4 className="form__section-heading">Conditionnement</h4>
       <div
         className={classNames("form__row", {

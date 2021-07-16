@@ -78,3 +78,13 @@ enum BsdasriSignatureType {
   "Signature du traitement du déchet"
   OPERATION
 }
+enum BsdasriType{
+  "Bordereau dasri simple"
+  SIMPLE
+
+  "Bordereau dasri de groupement"
+  GROUPING
+
+  "(Bientôt disponible) - Bordereau dasri de synthèse"
+  SYNTHESIS
+}

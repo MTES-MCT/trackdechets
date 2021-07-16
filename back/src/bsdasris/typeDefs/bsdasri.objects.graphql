@@ -152,6 +152,7 @@ type BsdasriOperation {
 type Bsdasri {
   id: ID!
   status: BsdasriStatus!
+  bsdasriType: BsdasriType!
   createdAt: DateTime
   updatedAt: DateTime
   isDraft: Boolean!
@@ -168,7 +169,7 @@ type Bsdasri {
 
   "Bordereaux regroupés"
   regroupedBsdasris: [ID!]
-
+  
   metadata: BsdasriMetadata!
 }
 
