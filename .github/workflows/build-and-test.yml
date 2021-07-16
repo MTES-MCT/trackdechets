@@ -1,18 +1,12 @@
-name: Build, test and deploy app
+
+name: Build and unit tests
 
 on:
-  pull_request:
-    branches:
-      - master
-      - dev
-  push:
-    branches:
-      - master
-      - dev
-      - staging-*
+  push
+  pull_request
 
 jobs:
-  front:
+  build-and-test-front:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -38,7 +32,7 @@ jobs:
       - name: Run tests
         run: npm test
 
-  back:
+  build-and-test-back:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -77,8 +71,7 @@ jobs:
           PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID: "9"
           SECURITY_CODE_RENEWAL_TEMPLATE_ID: "6"
 
-  doc:
-    if: github.event_name != 'push'
+  build-doc:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -93,7 +86,9 @@ jobs:
           yarn install --frozen-lockfile
           yarn build
 
-  integration-tests:
+  run-back-integration-tests:
+    if: github.event_name != 'pull_request'
+    needs: build-and-test-back
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -105,68 +100,4 @@ jobs:
           chmod +x ./run.sh
           ./run.sh
 
-  deploy-backend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: scripts
-    needs: [front, back, integration-tests]
-    if: github.event_name == 'push'
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Add SSH key
-        uses: shimataro/ssh-key-action@v2.3.0
-        with:
-          key: ${{ secrets.CI_SSH_KEY }}
-          known_hosts: ${{ secrets.CI_KNOWN_HOST }}
-      - name: Deploy backend
-        run: |
-          chmod +x ./deploy-back.sh
-          ./deploy-back.sh
-        env:
-          GIT_STAGING_1_BACK: ${{ secrets.GIT_STAGING_1_BACK }}
-          GIT_PROD_BACK: "TODO"
-          GIT_SANDBOX_BACK: "TODO"
-          GIT_DEV_BACK: "TODO"
 
-  deploy-frontend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: front
-    needs: [front, back, integration-tests]
-    if: github.event_name == 'push'
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Setup Node
-        uses: actions/setup-node@v2.1.2
-        with:
-          node-version: "12.x"
-      - uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Install dependencies
-        run: npm ci
-      - name: Build
-        run: npm run build
-      - name: Set bucket name
-        run: |
-          cd ../scripts
-          chmod +x ./set-bucket.sh
-          ./set-bucket.sh
-      - uses: jakejarvis/s3-sync-action@v0.5.1
-        with:
-          args: --follow-symlinks --delete
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_S3_ENDPOINT: "https://s3.fr-par.scw.cloud"
-          AWS_REGION: "fr-par"
-          SOURCE_DIR: "front/build"

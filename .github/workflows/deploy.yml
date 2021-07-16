@@ -1,18 +1,16 @@
-#  Taken from https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus
 
-name: github pages
+
+name: Deploy documentation with Github Pages and front to S3 bucket
 
 on:
   push:
     branches:
       - master
-    paths:
-      - '.github/workflows/deploy.yml'
-      - 'doc/**'
 
 jobs:
-  deploy:
-    runs-on: ubuntu-18.04
+  deploy-doc:
+    # Taken from https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: doc
@@ -44,3 +42,40 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./doc/build
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: "12.x"
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Set bucket name
+        run: |
+          cd ../scripts
+          chmod +x ./set-bucket.sh
+          ./set-bucket.sh
+      - uses: jakejarvis/s3-sync-action@v0.5.1
+        with:
+          args: --follow-symlinks --delete
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_S3_ENDPOINT: "https://s3.fr-par.scw.cloud"
+          AWS_REGION: "fr-par"
+          SOURCE_DIR: "front/build"
