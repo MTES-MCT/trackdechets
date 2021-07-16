@@ -10,6 +10,9 @@ case $BRANCH_NAME in
     staging-1)
         BACK_GIT_URL=$GIT_STAGING_1_BACK
         ;;
+    mod/ci)
+        BACK_GIT_URL=$GIT_RECETTE_BACK
+        ;;
     dev)
         echo "⚠ Not handled yet, exiting."
         exit 0
