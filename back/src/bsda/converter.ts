@@ -220,15 +220,51 @@ function flattenBsdaDestinationInput({
     destinationOperationDate: chain(destination, d =>
       chain(d.operation, o => o.date)
     ),
-    destinationOperationNextDestinationCompanyName: chain(destination, d => chain(d.operation, o => chain(o.nextDestination, nd => chain(nd.company, c => c.name)))),
-    destinationOperationNextDestinationCompanySiret: chain(destination, d => chain(d.operation, o => chain(o.nextDestination, nd => chain(nd.company, c => c.siret)))),
-    destinationOperationNextDestinationCompanyVatNumber: chain(destination, d => chain(d.operation, o => chain(o.nextDestination, nd => chain(nd.company, c => c.vatNumber)))),
-    destinationOperationNextDestinationCompanyAddress: chain(destination, d => chain(d.operation, o => chain(o.nextDestination, nd => chain(nd.company, c => c.address)))),
-    destinationOperationNextDestinationCompanyContact: chain(destination, d => chain(d.operation, o => chain(o.nextDestination, nd => chain(nd.company, c => c.contact)))),
-    destinationOperationNextDestinationCompanyPhone: chain(destination, d => chain(d.operation, o => chain(o.nextDestination, nd => chain(nd.company, c => c.phone)))),
-    destinationOperationNextDestinationCompanyMail: chain(destination, d => chain(d.operation, o => chain(o.nextDestination, nd => chain(nd.company, c => c.mail)))),
-    destinationOperationNextDestinationCap: chain(destination, d => chain(d.operation, o => chain(o.nextDestination, nd => nd.cap))),
-    destinationOperationNextDestinationPlannedOperationCode: chain(destination, d => chain(d.operation, o => chain(o.nextDestination, nd => nd.plannedOperationCode)))
+    destinationOperationNextDestinationCompanyName: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.name))
+      )
+    ),
+    destinationOperationNextDestinationCompanySiret: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.siret))
+      )
+    ),
+    destinationOperationNextDestinationCompanyVatNumber: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.vatNumber))
+      )
+    ),
+    destinationOperationNextDestinationCompanyAddress: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.address))
+      )
+    ),
+    destinationOperationNextDestinationCompanyContact: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.contact))
+      )
+    ),
+    destinationOperationNextDestinationCompanyPhone: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.phone))
+      )
+    ),
+    destinationOperationNextDestinationCompanyMail: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.mail))
+      )
+    ),
+    destinationOperationNextDestinationCap: chain(destination, d =>
+      chain(d.operation, o => chain(o.nextDestination, nd => nd.cap))
+    ),
+    destinationOperationNextDestinationPlannedOperationCode: chain(
+      destination,
+      d =>
+        chain(d.operation, o =>
+          chain(o.nextDestination, nd => nd.plannedOperationCode)
+        )
+    )
   };
 }
 
@@ -257,7 +293,9 @@ function flattenBsdaTransporterInput({
     transporterCompanyVatNumber: chain(transporter, t =>
       chain(t.company, c => c.vatNumber)
     ),
-    transporterRecepisseIsExempted: chain(transporter, t => chain(t.recepisse, r => r.isExempted)),
+    transporterRecepisseIsExempted: chain(transporter, t =>
+      chain(t.recepisse, r => r.isExempted)
+    ),
     transporterRecepisseNumber: chain(transporter, t =>
       chain(t.recepisse, r => r.number)
     ),
@@ -301,9 +339,15 @@ function flattenBsdaBrokerInput({ broker }: Pick<BsdaInput, "broker">) {
     brokerCompanyContact: chain(broker, b => chain(b.company, c => c.contact)),
     brokerCompanyPhone: chain(broker, b => chain(b.company, c => c.phone)),
     brokerCompanyMail: chain(broker, b => chain(b.company, c => c.mail)),
-    brokerRecepisseNumber: chain(broker, b => chain(b.recepisse, r => r.number)),
-    brokerRecepisseDepartment: chain(broker, b => chain(b.recepisse, r => r.department)),
-    brokerRecepisseValidityLimit: chain(broker, b => chain(b.recepisse, r => r.validityLimit)),
+    brokerRecepisseNumber: chain(broker, b =>
+      chain(b.recepisse, r => r.number)
+    ),
+    brokerRecepisseDepartment: chain(broker, b =>
+      chain(b.recepisse, r => r.department)
+    ),
+    brokerRecepisseValidityLimit: chain(broker, b =>
+      chain(b.recepisse, r => r.validityLimit)
+    )
   };
 }
 
