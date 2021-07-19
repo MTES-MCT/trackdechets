@@ -178,6 +178,8 @@ export type Bsda = {
   type?: Maybe<BsdaType>;
   /** Maitre d'ouvrage ou détenteur du déchet */
   emitter?: Maybe<BsdaEmitter>;
+  /** Courtier */
+  broker?: Maybe<BsdaBroker>;
   /** Dénomination du déchet */
   waste?: Maybe<BsdaWaste>;
   /** Conditionnement */
@@ -204,6 +206,21 @@ export type BsdaAssociation = {
   __typename?: "BsdaAssociation";
   id: Scalars["ID"];
   status: BsdaStatus;
+};
+
+export type BsdaBroker = {
+  __typename?: "BsdaBroker";
+  /** Coordonnées de l'entreprise courtier */
+  company?: Maybe<FormCompany>;
+  /** Récépissé courtier */
+  recepisse?: Maybe<BsdaRecepisse>;
+};
+
+export type BsdaBrokerInput = {
+  /** Coordonnées de l'entreprise courtier */
+  company?: Maybe<CompanyInput>;
+  /** Récépissé courtier */
+  recepisse?: Maybe<BsdaRecepisseInput>;
 };
 
 export type BsdaCompanyWhere = {
@@ -304,6 +321,8 @@ export type BsdaInput = {
   type?: Maybe<BsdaType>;
   /** Maitre d'ouvrage ou détenteur du déchet */
   emitter?: Maybe<BsdaEmitterInput>;
+  /** Courtier */
+  broker?: Maybe<BsdaBrokerInput>;
   /** Dénomination du déchet */
   waste?: Maybe<BsdaWasteInput>;
   /** Conditionnement */
@@ -320,12 +339,33 @@ export type BsdaInput = {
   associations?: Maybe<Array<Scalars["ID"]>>;
 };
 
+export type BsdaNextDestination = {
+  __typename?: "BsdaNextDestination";
+  /** Coordonnées de l'éxutoire final */
+  company?: Maybe<FormCompany>;
+  /** N° de CAP (le cas échéant) */
+  cap?: Maybe<Scalars["String"]>;
+  /** Opération d'élimination / valorisation prévue (code D/R) */
+  plannedOperationCode?: Maybe<Scalars["String"]>;
+};
+
+export type BsdaNextDestinationInput = {
+  /** Entreprise de travaux */
+  company?: Maybe<CompanyInput>;
+  /** N° de CAP (le cas échéant) */
+  cap?: Maybe<Scalars["String"]>;
+  /** Opération d'élimination / valorisation prévue (code D/R) */
+  plannedOperationCode?: Maybe<Scalars["String"]>;
+};
+
 export type BsdaOperation = {
   __typename?: "BsdaOperation";
   /** Code D/R */
   code?: Maybe<Scalars["String"]>;
   /** Date de réalisation de l'opération */
   date?: Maybe<Scalars["DateTime"]>;
+  /** Exutoire final (si la destination ne l'est pas) */
+  nextDestination?: Maybe<BsdaNextDestination>;
   signature?: Maybe<Signature>;
 };
 
@@ -334,6 +374,8 @@ export type BsdaOperationInput = {
   code?: Maybe<Scalars["String"]>;
   /** Date de réalisation de l'opération */
   date?: Maybe<Scalars["DateTime"]>;
+  /** Exutoire final (si la destination ne l'est pas) */
+  nextDestination?: Maybe<BsdaNextDestinationInput>;
 };
 
 export type BsdaOperationWhere = {
@@ -390,14 +432,24 @@ export enum BsdaQuantityType {
 
 export type BsdaRecepisse = {
   __typename?: "BsdaRecepisse";
+  /** Exemption de récépissé (conformément aux dispositions de l'article R.541-50 du code de l'environnement) */
+  isExempted?: Maybe<Scalars["Boolean"]>;
+  /** Numéro de récépissé */
   number?: Maybe<Scalars["String"]>;
+  /** Département */
   department?: Maybe<Scalars["String"]>;
+  /** Date limite de validité */
   validityLimit?: Maybe<Scalars["DateTime"]>;
 };
 
 export type BsdaRecepisseInput = {
+  /** Exemption de récépissé (conformément aux dispositions de l'article R.541-50 du code de l'environnement) */
+  isExempted?: Maybe<Scalars["Boolean"]>;
+  /** Numéro de récépissé */
   number?: Maybe<Scalars["String"]>;
+  /** Département */
   department?: Maybe<Scalars["String"]>;
+  /** Date limite de validité */
   validityLimit?: Maybe<Scalars["DateTime"]>;
 };
 
@@ -920,6 +972,12 @@ export enum BsdaStatus {
 
 export type BsdaTransport = {
   __typename?: "BsdaTransport";
+  /** Mode de transport */
+  mode?: Maybe<TransportMode>;
+  /** Plaque(s) d'immatriculation */
+  plates?: Maybe<Array<Scalars["String"]>>;
+  /** Date de prise en charge */
+  takenOverAt?: Maybe<Scalars["DateTime"]>;
   signature?: Maybe<Signature>;
 };
 
@@ -937,11 +995,21 @@ export type BsdaTransporterInput = {
   /** Entreprise de transport */
   company?: Maybe<CompanyInput>;
   recepisse?: Maybe<BsdaRecepisseInput>;
+  transport?: Maybe<BsdaTransportInput>;
 };
 
 export type BsdaTransporterWhere = {
   company?: Maybe<BsdaCompanyWhere>;
   transport?: Maybe<BsdaTransportWhere>;
+};
+
+export type BsdaTransportInput = {
+  /** Mode de transport */
+  mode?: Maybe<TransportMode>;
+  /** Plaque(s) d'immatriculation */
+  plates?: Maybe<Array<Scalars["String"]>>;
+  /** Date de prise en charge */
+  takenOverAt?: Maybe<Scalars["DateTime"]>;
 };
 
 export type BsdaTransportWhere = {
