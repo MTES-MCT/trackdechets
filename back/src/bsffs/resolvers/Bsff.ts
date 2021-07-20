@@ -48,11 +48,11 @@ export const Bsff: BsffResolvers = {
     return nextBsffs.map(unflattenBsff);
   },
   previousBsffs: async ({ id }) => {
-    const children = await prisma.bsff.findMany({
+    const previousBsffs = await prisma.bsff.findMany({
       where: {
         nextBsffId: id
       }
     });
-    return children.map(unflattenBsff);
+    return previousBsffs.map(unflattenBsff);
   }
 };

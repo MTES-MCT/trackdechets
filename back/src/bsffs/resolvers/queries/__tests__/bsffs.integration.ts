@@ -24,7 +24,7 @@ const GET_BSFFS = `
           ficheInterventions {
             numero
           }
-          children {
+          previousBsffs {
             id
             ficheInterventions {
               detenteur {

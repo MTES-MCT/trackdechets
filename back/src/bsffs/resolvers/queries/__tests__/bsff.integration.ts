@@ -16,7 +16,7 @@ const GET_BSFF = `
       ficheInterventions {
         numero
       }
-      children {
+      previousBsffs {
         id
       }
     }
@@ -193,7 +193,7 @@ describe("Query.bsff", () => {
 
     expect(data.bsff).toEqual(
       expect.objectContaining({
-        children: [
+        previousBsffs: [
           {
             id: previousBsff.id
           }

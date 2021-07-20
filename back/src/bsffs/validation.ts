@@ -344,7 +344,7 @@ export const ficheInterventionSchema: yup.SchemaOf<Pick<
 });
 
 export async function canAddPreviousBsffs(ids: string[]) {
-  const children = await prisma.bsff.findMany({
+  const previousBsffs = await prisma.bsff.findMany({
     where: {
       id: {
         in: ids
@@ -352,14 +352,14 @@ export async function canAddPreviousBsffs(ids: string[]) {
     }
   });
 
-  if (children.some(bsff => bsff.status !== BsffStatus.PROCESSED)) {
+  if (previousBsffs.some(bsff => bsff.status !== BsffStatus.PROCESSED)) {
     throw new UserInputError(
       `Certains des bordereaux à associer n'ont pas toutes les signatures requises`
     );
   }
 
   if (
-    !children.every(
+    !previousBsffs.every(
       bsff =>
         // operation code is null when the waste is temporarily stored and receives no treatment
         bsff.destinationOperationCode == null ||
