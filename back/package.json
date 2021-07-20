@@ -18,7 +18,7 @@
     "types": "tsc --noEmit",
     "generate": "npx prisma generate",
     "prebuild": "npm run generate",
-    "build": "tsc && copyfiles -e **/*.ts src/**/*.{graphql,pdf,png,ttf,html,css} prisma/**/*.{prisma,sql} dist/ && npm run download-scalingo-cert",
+    "build": "tsc && copyfiles -e **/*.ts src/**/*.{graphql,pdf,png,ttf,html,css} prisma/**/*.{prisma,sql} dist/",
     "download-scalingo-cert": "node dist/src/scripts/bin/downloadScalingoCert.js",
     "download-scalingo-cert:dev": "ts-node -r dotenv/config ./src/scripts/bin/downloadScalingoCert.ts",
     "scalingo-postbuild": "npm run build && cd dist && npm run migrate && npm run index-elastic-search",
