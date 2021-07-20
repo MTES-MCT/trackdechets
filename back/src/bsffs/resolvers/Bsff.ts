@@ -34,7 +34,7 @@ export const Bsff: BsffResolvers = {
       where: { id }
     });
     const nextBsff = await prisma.bsff.findUnique({
-      where: { id: prismaBsff.parentId }
+      where: { id: prismaBsff.nextBsffId }
     });
 
     return unflattenBsff(nextBsff);
@@ -50,7 +50,7 @@ export const Bsff: BsffResolvers = {
   previousBsffs: async ({ id }) => {
     const children = await prisma.bsff.findMany({
       where: {
-        parentId: id
+        nextBsffId: id
       }
     });
     return children.map(unflattenBsff);

@@ -343,7 +343,7 @@ export const ficheInterventionSchema: yup.SchemaOf<Pick<
     .required("L'addresse email de l'entreprise de l'opérateur est requis")
 });
 
-export async function canAssociateBsffs(ids: string[]) {
+export async function canAddPreviousBsffs(ids: string[]) {
   const children = await prisma.bsff.findMany({
     where: {
       id: {

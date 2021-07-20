@@ -161,12 +161,12 @@ describe("Query.bsff", () => {
     );
   });
 
-  it("should list the bsff's grouped bsffs", async () => {
+  it("should list the bsff's previous bsffs", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
 
-    const bsffToAssociate = await createBsffAfterOperation({
+    const previousBsff = await createBsffAfterOperation({
       emitter,
       transporter,
       destination
@@ -176,9 +176,9 @@ describe("Query.bsff", () => {
         emitter: destination
       },
       {
-        children: {
+        previousBsffs: {
           connect: {
-            id: bsffToAssociate.id
+            id: previousBsff.id
           }
         }
       }
@@ -195,7 +195,7 @@ describe("Query.bsff", () => {
       expect.objectContaining({
         children: [
           {
-            id: bsffToAssociate.id
+            id: previousBsff.id
           }
         ]
       })
