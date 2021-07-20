@@ -142,10 +142,10 @@ describe("Mutation.createBsff", () => {
         }
       });
 
-      const associatedBsffs = await prisma.bsff
+      const groupedBsffs = await prisma.bsff
         .findUnique({ where: { id: data.createBsff.id } })
         .children();
-      expect(associatedBsffs).toHaveLength(1);
+      expect(groupedBsffs).toHaveLength(1);
     });
 
     it("should associate bsffs for réexpédition", async () => {
@@ -177,10 +177,10 @@ describe("Mutation.createBsff", () => {
         }
       });
 
-      const associatedBsffs = await prisma.bsff
+      const groupedBsffs = await prisma.bsff
         .findUnique({ where: { id: data.createBsff.id } })
         .children();
-      expect(associatedBsffs).toHaveLength(1);
+      expect(groupedBsffs).toHaveLength(1);
     });
 
     it("should disallow associating bsffs with missing signatures", async () => {

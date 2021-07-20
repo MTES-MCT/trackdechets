@@ -53,9 +53,20 @@ type Bsff {
   ficheInterventions: [BsffFicheIntervention!]!
 
   """
-  Liste des bordereaux que celui-ci regroupe, dans le cas d'un regroupement, reconditionnement ou d'une réexpédition.
+  Bordereau qui a groupé, reconditionné ou réexpédié celui-ci.
   """
-  children: [Bsff!]!
+  nextBsff: Bsff
+
+  """
+  Bordereaux qui ont successivement groupé, reconditionné ou réexpédié celui-ci.
+  Cette liste permet d'accéder à la traçabilité complète d'un bordereau.
+  """
+  nextBsffs: [Bsff!]!
+
+  """
+  Bordereaux que celui-ci groupe, reconditionne ou réexpédie.
+  """
+  previousBsffs: [Bsff!]!
 }
 
 type BsffEmitter {

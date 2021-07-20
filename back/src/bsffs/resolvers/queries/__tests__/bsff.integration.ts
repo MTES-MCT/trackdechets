@@ -161,7 +161,7 @@ describe("Query.bsff", () => {
     );
   });
 
-  it("should list the bsff's associated bsffs", async () => {
+  it("should list the bsff's grouped bsffs", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);

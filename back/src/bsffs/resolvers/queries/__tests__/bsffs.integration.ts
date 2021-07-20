@@ -43,7 +43,7 @@ const GET_BSFFS = `
 describe("Query.bsffs", () => {
   afterEach(resetDatabase);
 
-  it("should return bsffs associated with the user company", async () => {
+  it("should return bsffs for the user's company", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     await createBsff({ emitter });
 
@@ -55,7 +55,7 @@ describe("Query.bsffs", () => {
     expect(data.bsffs.edges.length).toBe(1);
   });
 
-  it("should not return bsffs not associated with the user company", async () => {
+  it("should filter out bsffs where the user's company doesn't appear", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     await createBsff({ emitter });
 
@@ -70,7 +70,7 @@ describe("Query.bsffs", () => {
     expect(data.bsffs.edges.length).toBe(1);
   });
 
-  it("should return bsffs associated for user with several companies", async () => {
+  it("should return bsffs for the user with several companies", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const otherCompany = await companyAssociatedToExistingUserFactory(
       emitter.user,
@@ -216,12 +216,12 @@ describe("Query.bsffs", () => {
     expect(data.bsffs.edges.length).toBe(1);
   });
 
-  describe("when listing the associated bsffs", () => {
+  describe("when listing the grouped bsffs", () => {
     let emitter: UserWithCompany;
     let transporter: UserWithCompany;
     let destination: UserWithCompany;
-    let associatedBsff: Bsff;
-    let associatedBsffFicheIntervention: BsffFicheIntervention;
+    let groupedBsff: Bsff;
+    let groupedBsffFicheIntervention: BsffFicheIntervention;
 
     beforeEach(async () => {
       emitter = await userWithCompanyFactory(UserRole.ADMIN);
@@ -230,7 +230,7 @@ describe("Query.bsffs", () => {
 
       const bsffId = getReadableId(ReadableIdPrefix.FF);
       const ficheInterventionNumero = "00001";
-      associatedBsff = await createBsffAfterOperation(
+      groupedBsff = await createBsffAfterOperation(
         {
           emitter,
           transporter,
@@ -262,15 +262,15 @@ describe("Query.bsffs", () => {
           }
         }
       );
-      associatedBsffFicheIntervention = await prisma.bsffFicheIntervention.findFirst(
-        { where: { bsffId: associatedBsff.id } }
+      groupedBsffFicheIntervention = await prisma.bsffFicheIntervention.findFirst(
+        { where: { bsffId: groupedBsff.id } }
       );
     });
 
-    it("should list the associated bsffs", async () => {
+    it("should list the grouped bsffs", async () => {
       await createBsff(
         { emitter, transporter, destination },
-        { children: { connect: [{ id: associatedBsff.id }] } }
+        { children: { connect: [{ id: groupedBsff.id }] } }
       );
 
       const { query } = makeClient(emitter.user);
@@ -280,7 +280,7 @@ describe("Query.bsffs", () => {
 
       expect(data.bsffs.edges[0].node.children).toEqual([
         expect.objectContaining({
-          id: associatedBsff.id
+          id: groupedBsff.id
         })
       ]);
     });
@@ -288,7 +288,7 @@ describe("Query.bsffs", () => {
     it("should show the detenteur from the fiche d'interventions to companies on the bsff", async () => {
       await createBsff(
         { emitter, transporter, destination },
-        { children: { connect: [{ id: associatedBsff.id }] } }
+        { children: { connect: [{ id: groupedBsff.id }] } }
       );
 
       const { query } = makeClient(destination.user);
@@ -302,7 +302,7 @@ describe("Query.bsffs", () => {
             {
               detenteur: {
                 company: {
-                  siret: associatedBsffFicheIntervention.detenteurCompanySiret
+                  siret: groupedBsffFicheIntervention.detenteurCompanySiret
                 }
               }
             }
@@ -316,7 +316,7 @@ describe("Query.bsffs", () => {
 
       await createBsff(
         { emitter: destination, transporter, destination: newDestination },
-        { children: { connect: [{ id: associatedBsff.id }] } }
+        { children: { connect: [{ id: groupedBsff.id }] } }
       );
 
       const { query } = makeClient(newDestination.user);

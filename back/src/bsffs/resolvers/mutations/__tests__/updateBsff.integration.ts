@@ -458,12 +458,12 @@ describe("Mutation.updateBsff", () => {
     );
   });
 
-  it("should update the list of associated bsffs", async () => {
+  it("should update the list of grouped bsffs", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
 
-    const associatedBsff = await createBsffAfterOperation(
+    const groupedBsff = await createBsffAfterOperation(
       { emitter, transporter, destination },
       {
         destinationOperationCode: OPERATION_CODES.R12
@@ -477,7 +477,7 @@ describe("Mutation.updateBsff", () => {
     );
     const bsff = await createBsff(
       { emitter },
-      { children: { connect: [{ id: associatedBsff.id }] } }
+      { children: { connect: [{ id: groupedBsff.id }] } }
     );
 
     const { mutate } = makeClient(emitter.user);
@@ -493,10 +493,10 @@ describe("Mutation.updateBsff", () => {
       }
     });
 
-    const associatedBsffs = await prisma.bsff
+    const groupedBsffs = await prisma.bsff
       .findUnique({ where: { id: data.updateBsff.id } })
       .children();
-    expect(associatedBsffs).toEqual([
+    expect(groupedBsffs).toEqual([
       expect.objectContaining({
         id: bsffToAssociate.id
       })

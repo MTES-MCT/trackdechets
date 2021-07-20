@@ -13,24 +13,24 @@ const templatePath = require.resolve(
 );
 
 /*
- * Check if the bsff lists all the packagings from the associated bsffs.
+ * Check if the bsff lists all the packagings from the grouped bsffs.
  */
 function hasSamePackagings(bsff: Bsff, children: Bsff[]): boolean {
   const packagings = ((bsff.packagings ?? []) as BsffPackaging[]).slice();
-  const associatedPackagings = children.flatMap(
+  const groupedPackagings = children.flatMap(
     bsff => (bsff.packagings ?? []) as BsffPackaging[]
   );
 
-  if (associatedPackagings.length !== packagings.length) {
+  if (groupedPackagings.length !== packagings.length) {
     return false;
   }
 
-  for (const associatedPackaging of associatedPackagings) {
+  for (const groupedPackaging of groupedPackagings) {
     const packagingIndex = packagings.findIndex(
       packaging =>
-        packaging.name === associatedPackaging.name &&
-        packaging.kilos === associatedPackaging.kilos &&
-        packaging.numero === associatedPackaging.numero
+        packaging.name === groupedPackaging.name &&
+        packaging.kilos === groupedPackaging.kilos &&
+        packaging.numero === groupedPackaging.numero
     );
     if (packagingIndex === -1) {
       return false;
@@ -44,20 +44,20 @@ function hasSamePackagings(bsff: Bsff, children: Bsff[]): boolean {
  * A groupement is when the packagings don't change,
  * they're just grouped together.
  */
-function isGroupement(bsff: Bsff, associatedBsff: Bsff[]): boolean {
+function isGroupement(bsff: Bsff, groupedBsff: Bsff[]): boolean {
   return (
     GROUPING_CODES.includes(bsff.destinationOperationCode) &&
-    hasSamePackagings(bsff, associatedBsff)
+    hasSamePackagings(bsff, groupedBsff)
   );
 }
 
 /*
  * A reconditionnement is when the packagings have changed.
  */
-function isReconditionnement(bsff: Bsff, associatedBsffs: Bsff[]): boolean {
+function isReconditionnement(bsff: Bsff, groupedBsff: Bsff[]): boolean {
   return (
     GROUPING_CODES.includes(bsff.destinationOperationCode) &&
-    !hasSamePackagings(bsff, associatedBsffs)
+    !hasSamePackagings(bsff, groupedBsff)
   );
 }
 
@@ -65,16 +65,16 @@ function isReconditionnement(bsff: Bsff, associatedBsffs: Bsff[]): boolean {
  * A reexpedition is when a single packaging was stored temporarily
  * before being sent elsewhere.
  */
-function isReexpedition(bsff: Bsff, associatedBsffs: Bsff[]): boolean {
+function isReexpedition(bsff: Bsff, groupedBsffs: Bsff[]): boolean {
   return (
     bsff.destinationOperationCode == null &&
-    associatedBsffs.length === 1 &&
-    hasSamePackagings(bsff, associatedBsffs)
+    groupedBsffs.length === 1 &&
+    hasSamePackagings(bsff, groupedBsffs)
   );
 }
 
 export async function generateBsffPdf(bsff: Bsff) {
-  const associatedBsffs = await prisma.bsff.findMany({
+  const groupedBsffs = await prisma.bsff.findMany({
     where: {
       parentId: bsff.id
     }
@@ -92,11 +92,11 @@ export async function generateBsffPdf(bsff: Bsff) {
     isReconditionnement: false,
     isReexpedition: false
   };
-  if (isGroupement(bsff, associatedBsffs)) {
+  if (isGroupement(bsff, groupedBsffs)) {
     bsffType.isGroupement = true;
-  } else if (isReconditionnement(bsff, associatedBsffs)) {
+  } else if (isReconditionnement(bsff, groupedBsffs)) {
     bsffType.isReconditionnement = true;
-  } else if (isReexpedition(bsff, associatedBsffs)) {
+  } else if (isReexpedition(bsff, groupedBsffs)) {
     bsffType.isReexpedition = true;
   } else if (ficheInterventions.length > 1) {
     bsffType.isMultiCollecte = true;
@@ -136,8 +136,8 @@ export async function generateBsffPdf(bsff: Bsff) {
         // Show a minimum of 5 rows
         ...Array.from({ length: 5 - ficheInterventions.length }).fill({})
       ],
-      associatedBsffs: [
-        ...associatedBsffs,
+      groupedBsffs: [
+        ...groupedBsffs,
 
         // Show a minimum of 5 rows
         ...Array.from({ length: 5 - ficheInterventions.length }).fill({})

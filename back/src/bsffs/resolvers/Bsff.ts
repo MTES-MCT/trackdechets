@@ -2,12 +2,16 @@ import prisma from "../../prisma";
 import { BsffResolvers } from "../../generated/graphql/types";
 import { unflattenBsff, unflattenFicheInterventionBsff } from "../converter";
 import { isBsffContributor } from "../permissions";
+import { getNextBsffs } from "../database";
 
 export const Bsff: BsffResolvers = {
-  ficheInterventions: async (parent, _, context) => {
+  ficheInterventions: async ({ id }, _, context) => {
+    const prismaBsff = await prisma.bsff.findUnique({
+      where: { id }
+    });
     const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
       where: {
-        bsffId: parent.id
+        bsffId: prismaBsff.id
       }
     });
     const unflattenedFicheInterventions = ficheInterventions.map(
@@ -15,11 +19,7 @@ export const Bsff: BsffResolvers = {
     );
 
     try {
-      await isBsffContributor(context.user, {
-        emitterCompanySiret: parent.emitter?.company?.siret,
-        transporterCompanySiret: parent.transporter?.company?.siret,
-        destinationCompanySiret: parent.destination?.company?.siret
-      });
+      await isBsffContributor(context.user, prismaBsff);
     } catch (err) {
       unflattenedFicheInterventions.forEach(ficheIntervention => {
         delete ficheIntervention.detenteur;
@@ -29,10 +29,28 @@ export const Bsff: BsffResolvers = {
 
     return unflattenedFicheInterventions;
   },
-  children: async parent => {
+  nextBsff: async ({ id }) => {
+    const prismaBsff = await prisma.bsff.findUnique({
+      where: { id }
+    });
+    const nextBsff = await prisma.bsff.findUnique({
+      where: { id: prismaBsff.parentId }
+    });
+
+    return unflattenBsff(nextBsff);
+  },
+  nextBsffs: async ({ id }) => {
+    const prismaBsff = await prisma.bsff.findUnique({
+      where: { id }
+    });
+    const nextBsffs = await getNextBsffs(prismaBsff);
+
+    return nextBsffs.map(unflattenBsff);
+  },
+  previousBsffs: async ({ id }) => {
     const children = await prisma.bsff.findMany({
       where: {
-        parentId: parent.id
+        parentId: id
       }
     });
     return children.map(unflattenBsff);

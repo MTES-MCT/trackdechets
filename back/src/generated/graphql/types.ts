@@ -1127,8 +1127,15 @@ export type Bsff = {
    * Habituellement renseigné par un opérateur lors de son intervention.
    */
   ficheInterventions: Array<BsffFicheIntervention>;
-  /** Liste des bordereaux que celui-ci regroupe, dans le cas d'un regroupement, reconditionnement ou d'une réexpédition. */
-  children: Array<Bsff>;
+  /** Bordereau qui a groupé, reconditionné ou réexpédié celui-ci. */
+  nextBsff?: Maybe<Bsff>;
+  /**
+   * Bordereaux qui ont successivement groupé, reconditionné ou réexpédié celui-ci.
+   * Cette liste permet d'accéder à la traçabilité complète d'un bordereau.
+   */
+  nextBsffs: Array<Bsff>;
+  /** Bordereaux que celui-ci groupe, reconditionne ou réexpédie. */
+  previousBsffs: Array<Bsff>;
 };
 
 /** Résultats de bordereaux paginés. */
@@ -6384,7 +6391,13 @@ export type BsffResolvers<
     ParentType,
     ContextType
   >;
-  children?: Resolver<Array<ResolversTypes["Bsff"]>, ParentType, ContextType>;
+  nextBsff?: Resolver<Maybe<ResolversTypes["Bsff"]>, ParentType, ContextType>;
+  nextBsffs?: Resolver<Array<ResolversTypes["Bsff"]>, ParentType, ContextType>;
+  previousBsffs?: Resolver<
+    Array<ResolversTypes["Bsff"]>,
+    ParentType,
+    ContextType
+  >;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -10222,7 +10235,9 @@ export function createBsffMock(props: Partial<Bsff>): Bsff {
     transporter: null,
     destination: null,
     ficheInterventions: [],
-    children: [],
+    nextBsff: null,
+    nextBsffs: [],
+    previousBsffs: [],
     ...props
   };
 }

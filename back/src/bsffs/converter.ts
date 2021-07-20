@@ -188,7 +188,9 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
       cap: prismaBsff.destinationCap
     }),
     ficheInterventions: [],
-    children: []
+    nextBsff: null,
+    nextBsffs: [],
+    previousBsffs: []
   };
 }
 
