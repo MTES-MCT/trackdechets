@@ -206,6 +206,13 @@ export type BsdaAssociation = {
   __typename?: "BsdaAssociation";
   id: Scalars["ID"];
   status: BsdaStatus;
+  cap: Scalars["String"];
+  wasteCode: Scalars["String"];
+  wasteDescription: Scalars["String"];
+  wasteSealNumbers?: Maybe<Array<Scalars["String"]>>;
+  wasteAdr?: Maybe<Scalars["String"]>;
+  totalQuantity: Scalars["Float"];
+  emissionDate: Scalars["DateTime"];
 };
 
 export type BsdaBroker = {

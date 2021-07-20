@@ -216,6 +216,13 @@ export type BsdaAssociation = {
   __typename?: "BsdaAssociation";
   id: Scalars["ID"];
   status: BsdaStatus;
+  cap: Scalars["String"];
+  wasteCode: Scalars["String"];
+  wasteDescription: Scalars["String"];
+  wasteSealNumbers?: Maybe<Array<Scalars["String"]>>;
+  wasteAdr?: Maybe<Scalars["String"]>;
+  totalQuantity: Scalars["Float"];
+  emissionDate: Scalars["DateTime"];
 };
 
 export type BsdaBroker = {
@@ -5696,6 +5703,21 @@ export type BsdaAssociationResolvers<
 > = {
   id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
   status?: Resolver<ResolversTypes["BsdaStatus"], ParentType, ContextType>;
+  cap?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  wasteCode?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  wasteDescription?: Resolver<
+    ResolversTypes["String"],
+    ParentType,
+    ContextType
+  >;
+  wasteSealNumbers?: Resolver<
+    Maybe<Array<ResolversTypes["String"]>>,
+    ParentType,
+    ContextType
+  >;
+  wasteAdr?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  totalQuantity?: Resolver<ResolversTypes["Float"], ParentType, ContextType>;
+  emissionDate?: Resolver<ResolversTypes["DateTime"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -9310,6 +9332,13 @@ export function createBsdaAssociationMock(
     __typename: "BsdaAssociation",
     id: "",
     status: "INITIAL",
+    cap: "",
+    wasteCode: "",
+    wasteDescription: "",
+    wasteSealNumbers: null,
+    wasteAdr: null,
+    totalQuantity: 0,
+    emissionDate: new Date(),
     ...props
   };
 }

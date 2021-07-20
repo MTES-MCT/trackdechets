@@ -8,9 +8,23 @@ export const Bsda: BsdaResolvers = {
         childBsdaId: parent.id
       }
     });
+
     return bsdas.map(bsda => ({
       id: bsda.id,
-      status: bsda.status
+      status: bsda.status,
+      cap: bsda.destinationCap,
+      wasteCode: bsda.wasteCode,
+      wasteDescription: [
+        bsda.wasteName,
+        bsda.wasteFamilyCode,
+        bsda.wasteMaterialName
+      ]
+        .filter(Boolean)
+        .join(" - "),
+      wasteSealNumbers: bsda.wasteSealNumbers,
+      wasteAdr: bsda.wasteAdr,
+      totalQuantity: bsda.destinationReceptionQuantityValue,
+      emissionDate: bsda.emitterEmissionSignatureDate
     }));
   }
 };

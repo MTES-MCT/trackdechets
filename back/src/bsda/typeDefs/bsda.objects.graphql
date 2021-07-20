@@ -208,6 +208,13 @@ type BsdaRecepisse {
 type BsdaAssociation {
   id: ID!
   status: BsdaStatus!
+  cap: String!
+  wasteCode: String!
+  wasteDescription: String!
+  wasteSealNumbers: [String!]
+  wasteAdr: String
+  totalQuantity: Float!
+  emissionDate: DateTime!
 }
 
 type BsdaBroker {
