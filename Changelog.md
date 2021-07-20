@@ -16,6 +16,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Création et édition de bordereaux Dasri de groupement [PR934](https://github.com/MTES-MCT/trackdechets/pull/934)
+- Ajout de champs sur le BSDA: courtier, mode de transport, immatriculations, exemption de récépissé transporteur et destination ultérieure prévue [PR 938](https://github.com/MTES-MCT/trackdechets/pull/938)
+
 #### :memo: Documentation
 
 #### :house: Interne
