@@ -110,6 +110,7 @@ export const beforeTransportSchema: yup.SchemaOf<Pick<
           .string()
           .nullable()
           .required("La dénomination du contenant est requise"),
+        volume: yup.number().nullable(),
         numero: yup
           .string()
           .nullable()

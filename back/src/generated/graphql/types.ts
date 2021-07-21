@@ -1287,6 +1287,8 @@ export type BsffPackaging = {
   __typename?: "BsffPackaging";
   /** Dénomination du contenant. */
   name: Scalars["String"];
+  /** Volume du contenant. */
+  volume?: Maybe<Scalars["Float"]>;
   /** Numéro du contenant. */
   numero: Scalars["String"];
   /** Poids en kilos. */
@@ -1296,6 +1298,8 @@ export type BsffPackaging = {
 export type BsffPackagingInput = {
   /** Dénomination du contenant. */
   name: Scalars["String"];
+  /** Volume du contenant. */
+  volume?: Maybe<Scalars["Float"]>;
   /** Numéro du contenant. */
   numero: Scalars["String"];
   /** Poids en kilos. */
@@ -6549,6 +6553,7 @@ export type BsffPackagingResolvers<
   ParentType extends ResolversParentTypes["BsffPackaging"] = ResolversParentTypes["BsffPackaging"]
 > = {
   name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  volume?: Resolver<Maybe<ResolversTypes["Float"]>, ParentType, ContextType>;
   numero?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   kilos?: Resolver<ResolversTypes["Float"], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -10466,6 +10471,7 @@ export function createBsffPackagingMock(
   return {
     __typename: "BsffPackaging",
     name: "",
+    volume: null,
     numero: "",
     kilos: 0,
     ...props
@@ -10477,6 +10483,7 @@ export function createBsffPackagingInputMock(
 ): BsffPackagingInput {
   return {
     name: "",
+    volume: null,
     numero: "",
     kilos: 0,
     ...props

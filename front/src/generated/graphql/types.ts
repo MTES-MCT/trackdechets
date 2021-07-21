@@ -1310,6 +1310,8 @@ export type BsffPackaging = {
   __typename?: "BsffPackaging";
   /** Dénomination du contenant. */
   name: Scalars["String"];
+  /** Volume du contenant. */
+  volume?: Maybe<Scalars["Float"]>;
   /** Numéro du contenant. */
   numero: Scalars["String"];
   /** Poids en kilos. */
@@ -1319,6 +1321,8 @@ export type BsffPackaging = {
 export type BsffPackagingInput = {
   /** Dénomination du contenant. */
   name: Scalars["String"];
+  /** Volume du contenant. */
+  volume?: Maybe<Scalars["Float"]>;
   /** Numéro du contenant. */
   numero: Scalars["String"];
   /** Poids en kilos. */
