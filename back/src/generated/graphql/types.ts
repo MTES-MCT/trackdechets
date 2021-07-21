@@ -2278,7 +2278,8 @@ export type FavoriteType =
   | "BROKER"
   | "NEXT_DESTINATION"
   | "TEMPORARY_STORAGE_DETAIL"
-  | "DESTINATION";
+  | "DESTINATION"
+  | "WORKER";
 
 /**
  * URL de téléchargement accompagné d'un token

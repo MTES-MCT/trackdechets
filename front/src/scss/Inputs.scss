@@ -135,6 +135,14 @@ select:-moz-focusring {
 .td-select {
   @include input;
 }
+.td-input--small {
+  width: 150px;
+  display: block;
+}
+.td-input--medium {
+  width: 400px;
+  display: block;
+}
 .td-date-wrapper {
   width: 120px;
 }

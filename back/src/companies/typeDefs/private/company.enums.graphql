@@ -8,6 +8,7 @@ enum FavoriteType {
   NEXT_DESTINATION
   TEMPORARY_STORAGE_DETAIL
   DESTINATION
+  WORKER
 }
 
 enum CompanyVerificationMode {

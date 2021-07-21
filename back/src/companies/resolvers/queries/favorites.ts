@@ -26,6 +26,7 @@ function matchesFavoriteType(
     "WASTE_VEHICLES",
     "WASTE_CENTER"
   ];
+  const WORKER: CompanyType[] = ["PRODUCER"];
   const DESTINATION = RECIPIENT;
   const NEXT_DESTINATION = RECIPIENT;
   const TEMPORARY_STORAGE_DETAIL = RECIPIENT;
@@ -38,7 +39,8 @@ function matchesFavoriteType(
     RECIPIENT,
     DESTINATION,
     NEXT_DESTINATION,
-    TEMPORARY_STORAGE_DETAIL
+    TEMPORARY_STORAGE_DETAIL,
+    WORKER
   };
 
   return COMPANY_TYPES[favoriteType].some(matchingCompanyType =>

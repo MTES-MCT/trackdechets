@@ -29,6 +29,7 @@ interface CompanySelectorProps {
     | "recipient.company"
     | "trader.company"
     | "broker.company"
+    | "worker.company"
     | "temporaryStorageDetail.destination.company"
     | "destination.operation.nextDestination.company";
   onCompanySelected?: (company: CompanyFavorite) => void;

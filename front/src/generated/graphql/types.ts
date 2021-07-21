@@ -2321,7 +2321,8 @@ export enum FavoriteType {
   Broker = "BROKER",
   NextDestination = "NEXT_DESTINATION",
   TemporaryStorageDetail = "TEMPORARY_STORAGE_DETAIL",
-  Destination = "DESTINATION"
+  Destination = "DESTINATION",
+  Worker = "WORKER"
 }
 
 /**
