@@ -1,11 +1,7 @@
 
 name: Build & Test
 
-on:
-  push:
-    branches-ignore:
-      - dev
-      - master
+on: push
 
 jobs:
   front:
