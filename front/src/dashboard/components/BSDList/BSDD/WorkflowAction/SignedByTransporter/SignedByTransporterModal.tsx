@@ -11,6 +11,7 @@ import {
 } from "generated/graphql/types";
 import { Stepper, StepperItem, Modal } from "common/components";
 import steps from "./steps";
+import * as yup from "yup";
 
 const SIGNED_BY_TRANSPORTER = gql`
   mutation SignedByTransporter(
@@ -54,6 +55,13 @@ export function SignedByTransporterModal({
 
   const { Component } = steps[stepIndex];
 
+  const validationSchema = yup.object({
+    securityCode: yup.number().required("Le code de signature est obligatoire"),
+    sentBy: yup
+      .string()
+      .required("Le nom et prénom du contact est obligatoire"),
+  });
+
   return (
     <Modal isOpen onClose={onClose} ariaLabel="Signer l'enlèvement">
       <h2 className="td-modal-title">Signature</h2>
@@ -95,6 +103,7 @@ export function SignedByTransporterModal({
               onuCode: form.stateSummary?.onuCode ?? "",
             } as TransporterSignatureFormInput
           }
+          validationSchema={validationSchema}
           onSubmit={values =>
             signedByTransporter({
               variables: {
