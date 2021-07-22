@@ -20,6 +20,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Mise à jour de l'intégration continue [PR 937](https://github.com/MTES-MCT/trackdechets/pull/937)
+
 # [2021.07.1] 12/07/2021
 
 #### :rocket: Nouvelles fonctionnalités
