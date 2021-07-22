@@ -23,7 +23,7 @@ export default (
   }
   if (NODE_ENV === "production") {
     if (err instanceof SyntaxError) {
-      return res.status(400).send({ error: "JSON mal formaté" });
+      return res.status(400).send({ error: "JSON mal formaté ou invalide" });
     }
   }
   return next(err);
