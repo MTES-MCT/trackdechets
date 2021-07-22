@@ -1,7 +1,5 @@
 # Trackdéchets
 
-[![CircleCI](https://circleci.com/gh/MTES-MCT/trackdechets/tree/dev.svg?style=svg)](https://circleci.com/gh/MTES-MCT/trackdechets/tree/dev)
-
 **Gérer la traçabilité des déchets en toute sécurité**
 
 <img height="100px" style="margin-right: 20px" src="./front/public/trackdechets.png" alt="logo"></img>

@@ -450,6 +450,7 @@ export type Bsdasri = {
   __typename?: "Bsdasri";
   id: Scalars["ID"];
   status: BsdasriStatus;
+  bsdasriType: BsdasriType;
   createdAt?: Maybe<Scalars["DateTime"]>;
   updatedAt?: Maybe<Scalars["DateTime"]>;
   isDraft: Scalars["Boolean"];
@@ -609,7 +610,7 @@ export type BsdasriOperationInput = {
 export type BsdasriOperationQuantity = {
   __typename?: "BsdasriOperationQuantity";
   /** Quantité en kg */
-  value?: Maybe<Scalars["Int"]>;
+  value?: Maybe<Scalars["Float"]>;
 };
 
 /** Informations sur le conditionnement Bsdasri */
@@ -653,13 +654,13 @@ export type BsdasriPackagings =
 export type BsdasriQuantity = {
   __typename?: "BsdasriQuantity";
   /** Quantité en kg */
-  value?: Maybe<Scalars["Int"]>;
+  value?: Maybe<Scalars["Float"]>;
   /** Quantité réélle (pesée ou estimée) */
   type?: Maybe<QuantityType>;
 };
 
 export type BsdasriQuantityInput = {
-  value?: Maybe<Scalars["Int"]>;
+  value?: Maybe<Scalars["Float"]>;
   type?: Maybe<QuantityType>;
 };
 
@@ -824,6 +825,14 @@ export type BsdasriTransportWasteDetails = {
   packagingInfos?: Maybe<Array<BsdasriPackagingInfo>>;
 };
 
+export type BsdasriType =
+  /** Bordereau dasri simple */
+  | "SIMPLE"
+  /** Bordereau dasri de groupement */
+  | "GROUPING"
+  /** (Bientôt disponible) - Bordereau dasri de synthèse */
+  | "SYNTHESIS";
+
 export type BsdasriUpdateInput = {
   emitter?: Maybe<BsdasriEmitterInput>;
   emission?: Maybe<BsdasriEmissionInput>;
@@ -840,13 +849,13 @@ export type BsdasriWasteAcceptation = {
   __typename?: "BsdasriWasteAcceptation";
   status?: Maybe<Scalars["String"]>;
   refusalReason?: Maybe<Scalars["String"]>;
-  refusedQuantity?: Maybe<Scalars["Int"]>;
+  refusedQuantity?: Maybe<Scalars["Float"]>;
 };
 
 export type BsdasriWasteAcceptationInput = {
   status?: Maybe<WasteAcceptationStatusInput>;
   refusalReason?: Maybe<Scalars["String"]>;
-  refusedQuantity?: Maybe<Scalars["Int"]>;
+  refusedQuantity?: Maybe<Scalars["Float"]>;
 };
 
 export type BsdasriWasteDetailEmissionInput = {
@@ -869,6 +878,8 @@ export type BsdasriWhere = {
    * Défaut à vide.
    */
   status?: Maybe<BsdasriStatus>;
+  /** Expérimental : Filtre le résultat sur l'ID des bordereaux */
+  id_in?: Maybe<Array<Scalars["ID"]>>;
   createdAt?: Maybe<DateFilter>;
   updatedAt?: Maybe<DateFilter>;
   emitter?: Maybe<BsdasriEmitterWhere>;
@@ -1961,6 +1972,8 @@ export type CompanyPublic = {
   vhuAgrementBroyeur?: Maybe<VhuAgrement>;
   /** Liste des agréments de l'éco-organisme */
   ecoOrganismeAgreements: Array<Scalars["URL"]>;
+  /** L'entreprise autorise l'enlèvement d'un Dasri sans sa signature */
+  allowBsdasriTakeOverWithoutSignature?: Maybe<Scalars["Boolean"]>;
 };
 
 /** Information sur un établissement accessible publiquement en recherche */
@@ -4882,6 +4895,7 @@ export type ResolversTypes = {
   BsdaEdge: ResolverTypeWrapper<BsdaEdge>;
   Bsdasri: ResolverTypeWrapper<Bsdasri>;
   BsdasriStatus: BsdasriStatus;
+  BsdasriType: BsdasriType;
   BsdasriEmitter: ResolverTypeWrapper<BsdasriEmitter>;
   BsdasriEmitterType: BsdasriEmitterType;
   BsdasriEmission: ResolverTypeWrapper<BsdasriEmission>;
@@ -5776,6 +5790,11 @@ export type BsdasriResolvers<
 > = {
   id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
   status?: Resolver<ResolversTypes["BsdasriStatus"], ParentType, ContextType>;
+  bsdasriType?: Resolver<
+    ResolversTypes["BsdasriType"],
+    ParentType,
+    ContextType
+  >;
   createdAt?: Resolver<
     Maybe<ResolversTypes["DateTime"]>,
     ParentType,
@@ -6008,7 +6027,7 @@ export type BsdasriOperationQuantityResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsdasriOperationQuantity"] = ResolversParentTypes["BsdasriOperationQuantity"]
 > = {
-  value?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
+  value?: Resolver<Maybe<ResolversTypes["Float"]>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -6027,7 +6046,7 @@ export type BsdasriQuantityResolvers<
   ContextType = GraphQLContext,
   ParentType extends ResolversParentTypes["BsdasriQuantity"] = ResolversParentTypes["BsdasriQuantity"]
 > = {
-  value?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
+  value?: Resolver<Maybe<ResolversTypes["Float"]>, ParentType, ContextType>;
   type?: Resolver<
     Maybe<ResolversTypes["QuantityType"]>,
     ParentType,
@@ -6192,7 +6211,7 @@ export type BsdasriWasteAcceptationResolvers<
     ContextType
   >;
   refusedQuantity?: Resolver<
-    Maybe<ResolversTypes["Int"]>,
+    Maybe<ResolversTypes["Float"]>,
     ParentType,
     ContextType
   >;
@@ -7195,6 +7214,11 @@ export type CompanyPublicResolvers<
   >;
   ecoOrganismeAgreements?: Resolver<
     Array<ResolversTypes["URL"]>,
+    ParentType,
+    ContextType
+  >;
+  allowBsdasriTakeOverWithoutSignature?: Resolver<
+    Maybe<ResolversTypes["Boolean"]>,
     ParentType,
     ContextType
   >;
@@ -9423,6 +9447,7 @@ export function createBsdasriMock(props: Partial<Bsdasri>): Bsdasri {
     __typename: "Bsdasri",
     id: "",
     status: "INITIAL",
+    bsdasriType: "SIMPLE",
     createdAt: null,
     updatedAt: null,
     isDraft: false,
@@ -9940,6 +9965,7 @@ export function createBsdasriWhereMock(
   return {
     isDraft: null,
     status: null,
+    id_in: null,
     createdAt: null,
     updatedAt: null,
     emitter: null,
@@ -11178,6 +11204,7 @@ export function createCompanyPublicMock(
     vhuAgrementDemolisseur: null,
     vhuAgrementBroyeur: null,
     ecoOrganismeAgreements: [],
+    allowBsdasriTakeOverWithoutSignature: null,
     ...props
   };
 }

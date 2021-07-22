@@ -29,6 +29,7 @@ import {
 import { DateRow, DetailRow } from "dashboard/detail/common/Components";
 
 import classNames from "classnames";
+
 const getVerboseWasteName = (code: string): string => {
   const desc = {
     "18 01 03*": "DASRI origine humaine ",
@@ -295,6 +296,9 @@ export default function BsdasriDetailContent({
             [{form.isDraft ? "Brouillon" : statusLabels[form["bsdasriStatus"]]}]
           </span>
           {!form.isDraft && <span>{form.id}</span>}
+          {form?.regroupedBsdasris?.length && (
+            <span>Bordereau de groupement</span>
+          )}
         </h4>
 
         <div className={styles.detailContent}>
@@ -323,6 +327,15 @@ export default function BsdasriDetailContent({
           <div className={styles.detailGrid}>
             <dt>Code onu</dt>
             <dd>{form?.emission?.wasteDetails?.onuCode}</dd>
+          </div>
+
+          <div className={styles.detailGrid}>
+            {form?.regroupedBsdasris?.length && (
+              <>
+                <dt>Bordereau groupés:</dt>
+                <dd> {form?.regroupedBsdasris?.join(", ")}</dd>
+              </>
+            )}
           </div>
         </div>
       </div>

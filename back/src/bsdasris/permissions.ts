@@ -9,8 +9,8 @@ import { NotFormContributor } from "../forms/errors";
 import { getFullBsdasri } from "./database";
 import { UserInputError, ForbiddenError } from "apollo-server-express";
 export class InvalidPublicationAttempt extends UserInputError {
-  constructor() {
-    super("Vous ne pouvez pas publier ce bordereau.");
+  constructor(reason?: string) {
+    super(`Vous ne pouvez pas publier ce bordereau.${reason ?? ""}`);
   }
 }
 
@@ -67,10 +67,21 @@ export async function checkIsBsdasriContributor(
 
   return true;
 }
-export async function checkIsBsdasriPublishable(user: User, dasri: Bsdasri) {
+export async function checkIsBsdasriPublishable(
+  user: User,
+  dasri: Bsdasri,
+  regroupedBsdasris?: string[]
+) {
   if (!dasri.isDraft || dasri.status !== BsdasriStatus.INITIAL) {
     throw new InvalidPublicationAttempt();
   }
+  // This case shouldn't happen, but let's enforce the rules
+  if (dasri.bsdasriType === "GROUPING" && !regroupedBsdasris?.length) {
+    throw new InvalidPublicationAttempt(
+      "Un bordereau de regroupement doit comporter des bordereaux regroupés"
+    );
+  }
+
   return true;
 }
 export async function checkCanReadBsdasri(user: User, bsdasri: Bsdasri) {

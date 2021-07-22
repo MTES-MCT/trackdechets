@@ -80,7 +80,7 @@ describe("Mutation.updateBsdasri", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas",
+          "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparaît pas",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })

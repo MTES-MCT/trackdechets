@@ -224,6 +224,42 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
     expect(response.data.companyInfos.traderReceipt).toEqual(receipt);
   });
 
+  test("Company with direct dasri takeover allowance", async () => {
+    searchCompanySpy.mockResolvedValueOnce({
+      siret: "85001946400013",
+      etatAdministratif: "A",
+      name: "CODE EN STOCK",
+      address: "4 Boulevard Longchamp 13001 Marseille",
+      codeCommune: "13201",
+      naf: "62.01Z",
+      libelleNaf: "Programmation informatique",
+      addressVoie: "4 boulevard Longchamp",
+      addressCity: "Marseille",
+      addressPostalCode: "13001"
+    });
+
+    await companyFactory({
+      siret: "85001946400013",
+      name: "Code en Stock",
+      securityCode: 1234,
+      contactEmail: "john.snow@trackdechets.fr",
+      contactPhone: "0600000000",
+      website: "https://trackdechets.beta.gouv.fr",
+      allowBsdasriTakeOverWithoutSignature: true
+    });
+
+    const gqlquery = `
+      query {
+        companyInfos(siret: "85001946400013") {
+          allowBsdasriTakeOverWithoutSignature
+        }
+      }`;
+    const response = await query<any>(gqlquery);
+    expect(
+      response.data.companyInfos.allowBsdasriTakeOverWithoutSignature
+    ).toEqual(true);
+  });
+
   test.skip("Closed company", async () => {
     // This test is skipped because it make a real call to SIRENE API
     // It can be used to check our code is working well on closed companies

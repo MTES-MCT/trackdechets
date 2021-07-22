@@ -1,0 +1,87 @@
+
+name: Build & Test
+
+on: pull_request
+
+jobs:
+  front:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: "12.x"
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install dependencies
+        run: npm ci
+      - name: Run linter
+        run: npm run lint
+      - name: Run typecheck
+        run: npm run types
+      - name: Run tests
+        run: npm test
+
+  back:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: "12.x"
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install dependencies
+        run: npm ci
+      - name: Run linter
+        run: npm run lint
+      - name: Run typecheck
+        run: |
+          npm run generate
+          npm run types
+      - name: Check migrations
+        run: npm run check:migrations
+      - name: Run tests
+        run: npm test -- --forceExit
+        env:
+          JWT_SECRET: "xxx"
+          EMAIL_BACKEND: "console"
+          SIB_BASE_URL: "http://mailservice"
+          MAIN_TEMPLATE_ID: "9"
+          ONBOARDING_TEMPLATE_ID: "8"
+          PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID: "7"
+          PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID: "9"
+          SECURITY_CODE_RENEWAL_TEMPLATE_ID: "6"
+
+  doc:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: doc
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - name: Test Build
+        run: |
+          yarn install --frozen-lockfile
+          yarn build
+
+

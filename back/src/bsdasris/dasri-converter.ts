@@ -34,7 +34,7 @@ export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
   return {
     id: bsdasri.id,
     isDraft: bsdasri.isDraft,
-
+    bsdasriType: bsdasri.bsdasriType,
     emitter: nullIfNoValues<BsdasriEmitter>({
       company: nullIfNoValues<FormCompany>({
         name: bsdasri.emitterCompanyName,

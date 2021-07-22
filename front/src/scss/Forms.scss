@@ -9,7 +9,6 @@
   }
 }
 
-
 .form {
   &__row {
     margin-top: 0.75rem;
@@ -51,4 +50,18 @@
 }
 .td-modal-actions {
   @extend %actions;
+}
+
+@keyframes emphasis-animation {
+  0% {
+    border-color: rgb(24, 0, 159);
+  }
+  100% {
+    border-color: rgba(24, 0, 159, 0.2);
+  }
+}
+.field-emphasis {
+  border-left: 5px solid white;
+  padding-left: 5px;
+  animation: emphasis-animation 1s alternate infinite;
 }

@@ -6,7 +6,8 @@ import { Bsdasri, BsdasriStatus } from "@prisma/client";
 import prisma from "../../../prisma";
 import {
   ResolversParentTypes,
-  MutationUpdateBsdasriArgs
+  MutationUpdateBsdasriArgs,
+  RegroupedBsdasriInput
 } from "../../../generated/graphql/types";
 
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -78,16 +79,18 @@ const getFieldsAllorwedForUpdate = (bsdasri: Bsdasri) => {
   };
   return allowedFields[bsdasri.status];
 };
-const getRegroupedBsdasriArgs = inputRegroupedBsdasris => {
-  if (inputRegroupedBsdasris === null) {
-    return { set: [] };
+
+const getRegroupedBsdasriArgs = (
+  inputRegroupedBsdasris: RegroupedBsdasriInput[] | null | undefined
+) => {
+  if (inputRegroupedBsdasris === null || inputRegroupedBsdasris?.length === 0) {
+    return { regroupedBsdasris: { set: [] } };
   }
 
-  const args = !!inputRegroupedBsdasris
-    ? { connect: inputRegroupedBsdasris }
-    : {};
+  const args = !!inputRegroupedBsdasris ? { set: inputRegroupedBsdasris } : {};
   return { regroupedBsdasris: args };
 };
+
 const getIsRegrouping = (dbRegroupedBsdasris, regroupedBsdasris) => {
   if (regroupedBsdasris === null) {
     return { isRegrouping: false };
@@ -103,6 +106,12 @@ const getIsRegrouping = (dbRegroupedBsdasris, regroupedBsdasris) => {
     return { isRegrouping: true };
   }
 };
+
+/**
+ * Bsdasri update mutation
+ * sets bsdasriType to `GROUPING` if a non empty array of regroupedBsdasris is provided
+ * sets bsdasriType to `SIMPLE` if a null regroupedBsdasris field is provided
+ */
 const dasriUpdateResolver = async (
   parent: ResolversParentTypes["Mutation"],
   args: MutationUpdateBsdasriArgs,
@@ -122,7 +131,7 @@ const dasriUpdateResolver = async (
   await checkIsBsdasriContributor(
     user,
     dbBsdasri,
-    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
+    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparaît pas"
   );
 
   if (["PROCESSED", "REFUSED"].includes(dbBsdasri.status)) {
@@ -133,8 +142,12 @@ const dasriUpdateResolver = async (
 
   const expectedBsdasri = { ...dbBsdasri, ...flattenedInput };
   // Validate form input
+  const isRegrouping = getIsRegrouping(
+    dbRegroupedBsdasris,
+    inputRegroupedBsdasris
+  );
   await validateBsdasri(expectedBsdasri, {
-    ...getIsRegrouping(dbRegroupedBsdasris, inputRegroupedBsdasris)
+    ...isRegrouping
   });
 
   const flattenedFields = Object.keys(flattenedInput);
@@ -155,7 +168,11 @@ const dasriUpdateResolver = async (
     where: { id },
     data: {
       ...flattenedInput,
-      ...getRegroupedBsdasriArgs(inputRegroupedBsdasris)
+      ...getRegroupedBsdasriArgs(inputRegroupedBsdasris),
+      bsdasriType:
+        inputRegroupedBsdasris === null || inputRegroupedBsdasris?.length === 0
+          ? "SIMPLE"
+          : "GROUPING"
     }
   });
 

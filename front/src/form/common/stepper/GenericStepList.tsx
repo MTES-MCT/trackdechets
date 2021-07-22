@@ -18,14 +18,25 @@ interface Props {
   formId?: string;
   initialValues: any;
   validationSchema: any;
+  initialStep?: number;
   formQuery: QueryResult<any, any>;
   onSubmit: (e, values) => void;
 }
-export default function GenericStepList(props: Props) {
-  const [currentStep, setCurrentStep] = useState(0);
-  const totalSteps = props.children.length - 1;
+export default function GenericStepList({
+  children,
+  formId,
+  formQuery,
+  onSubmit,
+  initialValues,
+  validationSchema,
+  initialStep = 0,
+}: Props) {
+  const totalSteps = children.length - 1;
+  const [currentStep, setCurrentStep] = useState(
+    initialStep <= totalSteps ? initialStep : 0
+  );
 
-  const { loading, error } = props.formQuery;
+  const { loading, error } = formQuery;
 
   useEffect(() => window.scrollTo(0, 0), [currentStep]);
 
@@ -46,7 +57,7 @@ export default function GenericStepList(props: Props) {
     };
   });
 
-  const children = Children.map(props.children, (child, index) => {
+  const childrenComponents = Children.map(children, (child, index) => {
     return createElement(
       Step,
       {
@@ -56,7 +67,7 @@ export default function GenericStepList(props: Props) {
         displaySubmit: currentStep === totalSteps,
         goToPreviousStep: () => setCurrentStep(currentStep - 1),
         goToNextStep: () => setCurrentStep(currentStep + 1),
-        formId: props.formId,
+        formId: formId,
       },
       child
     );
@@ -64,11 +75,10 @@ export default function GenericStepList(props: Props) {
 
   if (loading) return <p>Chargement...</p>;
   if (error) return <InlineError apolloError={error} />;
-
   return (
     <div>
       <Stepper>
-        {Children.map(props.children, (child, index) => (
+        {Children.map(children, (child, index) => (
           <StepperItem
             variant={
               index === currentStep
@@ -86,13 +96,13 @@ export default function GenericStepList(props: Props) {
       <div className="step-content">
         <Formik
           innerRef={formikForm}
-          initialValues={props.initialValues}
-          validationSchema={props.validationSchema}
+          initialValues={initialValues}
+          validationSchema={validationSchema}
           onSubmit={() => Promise.resolve()}
         >
           {({ values }) => {
             return (
-              <form onSubmit={e => props.onSubmit(e, values)}>
+              <form onSubmit={e => onSubmit(e, values)}>
                 <div
                   onKeyPress={e => {
                     // Disable submit on Enter key press
@@ -102,7 +112,7 @@ export default function GenericStepList(props: Props) {
                     }
                   }}
                 >
-                  {children}
+                  {childrenComponents}
                 </div>
               </form>
             );

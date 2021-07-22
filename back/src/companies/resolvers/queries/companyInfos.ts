@@ -36,7 +36,8 @@ export async function getCompanyInfos(siret: string): Promise<CompanyPublic> {
       contactEmail: true,
       contactPhone: true,
       website: true,
-      ecoOrganismeAgreements: true
+      ecoOrganismeAgreements: true,
+      allowBsdasriTakeOverWithoutSignature: true
     }
   });
 

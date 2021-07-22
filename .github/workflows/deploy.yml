@@ -1,18 +1,18 @@
-#  Taken from https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus
 
-name: github pages
+
+# Workflow de déploiement
+# Le front et le back ne sont pas inclut dans ce fichier car leur déploiement
+# se fait automatiquement via l'intégration Scalingo <> Github
+name: Deploy
 
 on:
   push:
     branches:
       - master
-    paths:
-      - '.github/workflows/deploy.yml'
-      - 'doc/**'
-
 jobs:
-  deploy:
-    runs-on: ubuntu-18.04
+  doc:
+    # Taken from https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: doc

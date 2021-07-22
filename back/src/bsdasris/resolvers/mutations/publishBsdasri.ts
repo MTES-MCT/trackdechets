@@ -16,13 +16,20 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
-  const bsdasri = await getBsdasriOrNotFound({ id });
+  const { regroupedBsdasris, ...bsdasri } = await getBsdasriOrNotFound({
+    id,
+    includeRegrouped: true
+  });
   await checkIsBsdasriContributor(
     user,
     bsdasri,
     "Vous ne pouvez publier ce bordereau si vous ne figurez pas dessus"
   );
-  await checkIsBsdasriPublishable(user, bsdasri);
+  await checkIsBsdasriPublishable(
+    user,
+    bsdasri,
+    regroupedBsdasris.map(el => el.id)
+  );
 
   await validateBsdasri(bsdasri, { emissionSignature: true });
   // publish  dasri

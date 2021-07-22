@@ -17,7 +17,7 @@ export const checkDasrisAreGroupable = async (
   // whose id is in regroupedBsdasrisIds array
   // which are in PROCESSED status
   // whose processingOperation is either D12 or  R12
-  // which are not already grouped
+  // which are not already grouped or are grouped on an initial dasri
   // which are not regrouping other dasris
   // whose recipient in current emitter
   const found = await prisma.bsdasri.findMany({
