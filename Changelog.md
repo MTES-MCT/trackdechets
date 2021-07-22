@@ -9,6 +9,16 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Ajout du BSFF à l'interface [PR 940](https://github.com/MTES-MCT/trackdechets/pull/940)
+  - Formulaire de création et d'édition
+  - Écrans de signature de l'émetteur et du transporteur
+  - Aperçu détaillé
+- Évolutions de l'API BSFF [PR 940](https://github.com/MTES-MCT/trackdechets/pull/940)
+  - Renommage de la propriété `bsffs` en `previousBsffs`.
+  - Ajout de la propriété `nextBsff` et `nextBsffs`.
+  - Ajout de la propriété `volume` à `BsffPackaging`.
+  - Remplacement de la propriété `type` de `BsffPackaging` par un champ libre `name`.
+
 #### :boom: Breaking changes
 
 #### :bug: Corrections de bugs
@@ -16,6 +26,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Création et édition de bordereaux Dasri de groupement [PR934](https://github.com/MTES-MCT/trackdechets/pull/934)
+
 #### :memo: Documentation
 
 #### :house: Interne
