@@ -7,7 +7,7 @@ import {
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound } from "../../database";
 import { isBsffContributor } from "../../permissions";
-import { sendPdf } from "../../../common/pdf";
+import { createPDFResponse } from "../../../common/pdf";
 import { generateBsffPdf } from "../../pdf";
 
 const TYPE = "bsff_pdf";
@@ -21,9 +21,9 @@ async function sendBsffPdf(
   { id }: { id: string }
 ) {
   const bsff = await getBsffOrNotFound({ id });
-  const buffer = await generateBsffPdf(bsff);
+  const readableStream = await generateBsffPdf(bsff);
 
-  sendPdf(res, buffer, bsff.id);
+  readableStream.pipe(createPDFResponse(res, bsff.id));
 }
 
 const bsffPdf: QueryResolvers["bsffPdf"] = async (_, { id }, context) => {
