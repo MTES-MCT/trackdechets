@@ -5,12 +5,15 @@ import { format } from "date-fns";
 import { Bsff } from ".prisma/client";
 import prisma from "../../prisma";
 import { BsffPackaging } from "../../generated/graphql/types";
-import { generatePdf } from "../../common/pdf";
+import { toPDF } from "../../common/pdf";
 import { GROUPING_CODES, OPERATION_CODES } from "../constants";
 
-const templatePath = require.resolve(
-  path.join(__dirname, "assets", "pdf.html")
-);
+const assetsPath = path.join(__dirname, "assets");
+const templatePath = path.join(assetsPath, "index.html");
+const cssPaths = [
+  path.join(assetsPath, "modern-normalize.css"),
+  path.join(assetsPath, "styles.css")
+];
 
 /*
  * Check if the bsff lists all the packagings from the associated bsffs.
@@ -118,35 +121,40 @@ export async function generateBsffPdf(bsff: Bsff) {
       bsff.destinationOperationCode === OPERATION_CODES.D14,
     isReexpedition: bsffType.isReexpedition
   };
+  const html = mustache.render(await fs.readFile(templatePath, "utf-8"), {
+    bsff,
+    bsffType,
+    bsffOperation,
+    packagings: ((bsff.packagings ?? []) as BsffPackaging[])
+      .map(
+        packaging =>
+          `${packaging.type} ${packaging.numero} : ${packaging.kilos} kilo(s)`
+      )
+      .join(", "),
+    ficheInterventions: [
+      ...ficheInterventions,
 
-  return generatePdf(
-    mustache.render(await fs.readFile(templatePath, "utf-8"), {
-      bsff,
-      bsffType,
-      bsffOperation,
-      packagings: ((bsff.packagings ?? []) as BsffPackaging[])
-        .map(
-          packaging =>
-            `${packaging.type} ${packaging.numero} : ${packaging.kilos} kilo(s)`
-        )
-        .join(", "),
-      ficheInterventions: [
-        ...ficheInterventions,
+      // Show a minimum of 5 rows
+      ...Array.from({ length: 5 - ficheInterventions.length }).fill({})
+    ],
+    associatedBsffs: [
+      ...associatedBsffs,
 
-        // Show a minimum of 5 rows
-        ...Array.from({ length: 5 - ficheInterventions.length }).fill({})
-      ],
-      associatedBsffs: [
-        ...associatedBsffs,
+      // Show a minimum of 5 rows
+      ...Array.from({ length: 5 - ficheInterventions.length }).fill({})
+    ],
 
-        // Show a minimum of 5 rows
-        ...Array.from({ length: 5 - ficheInterventions.length }).fill({})
-      ],
+    formatDate: () => (str: string, render: typeof mustache.render) => {
+      const dateStr = render(str, {});
+      return dateStr ? format(new Date(dateStr), "dd/MM/yyyy") : "__/__/____";
+    }
+  });
+  const files = { "index.html": html };
 
-      formatDate: () => (str: string, render: typeof mustache.render) => {
-        const dateStr = render(str, {});
-        return dateStr ? format(new Date(dateStr), "dd/MM/yyyy") : "__/__/____";
-      }
-    })
-  );
+  for (const cssPath of cssPaths) {
+    const content = await fs.readFile(cssPath, "utf-8");
+    files[path.basename(cssPath)] = content;
+  }
+
+  return toPDF(files);
 }

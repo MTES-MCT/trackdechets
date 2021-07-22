@@ -1,28 +1,21 @@
 import { Bsdasri } from "@prisma/client";
-import { readFile } from "fs/promises";
-import { join } from "path";
-import { connect } from "puppeteer";
+import fs from "fs/promises";
+import path from "path";
 import QRCode from "qrcode";
 import { format } from "date-fns";
 import Handlebars from "handlebars";
-import fs from "fs";
+import { toPDF } from "../../common/pdf";
 import { transportModeLabels } from "../../common/pdf/helpers";
-/**
- *
- * Build a pdf via service based puppeteer (browserless.io)
- */
+
 export async function buildPdf(bsdasri: Bsdasri) {
-  const browser = await connect({
-    browserWSEndpoint: "wss://chrome.browserless.io"
-  });
-  const dasristamp = fs
-    .readFileSync(join(__dirname, "/templates/dasristamp.html"), {
-      encoding: "utf8"
-    })
-    .toString();
-  const template = fs.readFileSync(join(__dirname, "/templates/dasri.html"), {
-    encoding: "utf8"
-  });
+  const dasristamp = await fs.readFile(
+    path.join(__dirname, "/templates/dasristamp.html"),
+    "utf-8"
+  );
+  const template = await fs.readFile(
+    path.join(__dirname, "/templates/dasri.html"),
+    "utf-8"
+  );
 
   Handlebars.registerHelper("dateFmt", safeDateFmt);
   Handlebars.registerHelper("sumPackageQuantity", sumPackageQuantity);
@@ -39,27 +32,16 @@ export async function buildPdf(bsdasri: Bsdasri) {
   const qrcode = !bsdasri.isDraft
     ? await QRCode.toString(bsdasri.id, { type: "svg" })
     : "";
-  try {
-    const source = template.toString();
-    const compiled = Handlebars.compile(source);
-    const html = compiled({ bsdasri, qrcode, dasristamp });
 
-    const page = await browser.newPage();
+  const source = template.toString();
+  const compiled = Handlebars.compile(source);
+  const html = compiled({ bsdasri, qrcode, dasristamp });
 
-    await page.setContent(html);
-
-    const paperCss = await getStyleFile("paper.min.css");
-    await page.addStyleTag({ content: paperCss });
-    const dasriCss = await getStyleFile("dasri.css");
-    await page.addStyleTag({ content: dasriCss });
-
-    const pdfBuffer = await page.pdf({ format: "a4" });
-    await browser.close();
-
-    return pdfBuffer;
-  } finally {
-    await browser.close();
-  }
+  return toPDF({
+    "index.html": html,
+    "paper.css": await getStyleFile("paper.css"),
+    "dasri.css": await getStyleFile("dasri.css")
+  });
 }
 
 const safeDateFmt = (dt: Date) => {
@@ -78,7 +60,6 @@ const sumPackageQuantity = packagingInfos => {
     .reduce((acc, val) => acc + val, 0);
 };
 
-async function getStyleFile(filename: string) {
-  const buffer = await readFile(join(__dirname, "styles", filename));
-  return buffer.toString();
+function getStyleFile(filename: string) {
+  return fs.readFile(path.join(__dirname, "styles", filename), "utf-8");
 }
