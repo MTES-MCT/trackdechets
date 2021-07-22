@@ -24,7 +24,7 @@ const GET_BSFFS = `
           ficheInterventions {
             numero
           }
-          bsffs {
+          previousBsffs {
             id
             ficheInterventions {
               detenteur {
@@ -43,7 +43,7 @@ const GET_BSFFS = `
 describe("Query.bsffs", () => {
   afterEach(resetDatabase);
 
-  it("should return bsffs associated with the user company", async () => {
+  it("should return bsffs for the user's company", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     await createBsff({ emitter });
 
@@ -55,7 +55,7 @@ describe("Query.bsffs", () => {
     expect(data.bsffs.edges.length).toBe(1);
   });
 
-  it("should not return bsffs not associated with the user company", async () => {
+  it("should filter out bsffs where the user's company doesn't appear", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     await createBsff({ emitter });
 
@@ -70,7 +70,7 @@ describe("Query.bsffs", () => {
     expect(data.bsffs.edges.length).toBe(1);
   });
 
-  it("should return bsffs associated for user with several companies", async () => {
+  it("should return bsffs for the user with several companies", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const otherCompany = await companyAssociatedToExistingUserFactory(
       emitter.user,
@@ -216,12 +216,12 @@ describe("Query.bsffs", () => {
     expect(data.bsffs.edges.length).toBe(1);
   });
 
-  describe("when listing the associated bsffs", () => {
+  describe("when listing the previous bsffs", () => {
     let emitter: UserWithCompany;
     let transporter: UserWithCompany;
     let destination: UserWithCompany;
-    let associatedBsff: Bsff;
-    let associatedBsffFicheIntervention: BsffFicheIntervention;
+    let previousBsff: Bsff;
+    let previousBsffFicheIntervention: BsffFicheIntervention;
 
     beforeEach(async () => {
       emitter = await userWithCompanyFactory(UserRole.ADMIN);
@@ -230,7 +230,7 @@ describe("Query.bsffs", () => {
 
       const bsffId = getReadableId(ReadableIdPrefix.FF);
       const ficheInterventionNumero = "00001";
-      associatedBsff = await createBsffAfterOperation(
+      previousBsff = await createBsffAfterOperation(
         {
           emitter,
           transporter,
@@ -262,15 +262,15 @@ describe("Query.bsffs", () => {
           }
         }
       );
-      associatedBsffFicheIntervention = await prisma.bsffFicheIntervention.findFirst(
-        { where: { bsffId: associatedBsff.id } }
+      previousBsffFicheIntervention = await prisma.bsffFicheIntervention.findFirst(
+        { where: { bsffId: previousBsff.id } }
       );
     });
 
-    it("should list the associated bsffs", async () => {
+    it("should list the previous bsffs", async () => {
       await createBsff(
         { emitter, transporter, destination },
-        { bsffs: { connect: [{ id: associatedBsff.id }] } }
+        { previousBsffs: { connect: [{ id: previousBsff.id }] } }
       );
 
       const { query } = makeClient(emitter.user);
@@ -278,9 +278,9 @@ describe("Query.bsffs", () => {
         GET_BSFFS
       );
 
-      expect(data.bsffs.edges[0].node.bsffs).toEqual([
+      expect(data.bsffs.edges[0].node.previousBsffs).toEqual([
         expect.objectContaining({
-          id: associatedBsff.id
+          id: previousBsff.id
         })
       ]);
     });
@@ -288,7 +288,7 @@ describe("Query.bsffs", () => {
     it("should show the detenteur from the fiche d'interventions to companies on the bsff", async () => {
       await createBsff(
         { emitter, transporter, destination },
-        { bsffs: { connect: [{ id: associatedBsff.id }] } }
+        { previousBsffs: { connect: [{ id: previousBsff.id }] } }
       );
 
       const { query } = makeClient(destination.user);
@@ -296,13 +296,13 @@ describe("Query.bsffs", () => {
         GET_BSFFS
       );
 
-      expect(data.bsffs.edges[0].node.bsffs).toEqual([
+      expect(data.bsffs.edges[0].node.previousBsffs).toEqual([
         expect.objectContaining({
           ficheInterventions: [
             {
               detenteur: {
                 company: {
-                  siret: associatedBsffFicheIntervention.detenteurCompanySiret
+                  siret: previousBsffFicheIntervention.detenteurCompanySiret
                 }
               }
             }
@@ -316,7 +316,7 @@ describe("Query.bsffs", () => {
 
       await createBsff(
         { emitter: destination, transporter, destination: newDestination },
-        { bsffs: { connect: [{ id: associatedBsff.id }] } }
+        { previousBsffs: { connect: [{ id: previousBsff.id }] } }
       );
 
       const { query } = makeClient(newDestination.user);
@@ -324,7 +324,7 @@ describe("Query.bsffs", () => {
         GET_BSFFS
       );
 
-      expect(data.bsffs.edges[0].node.bsffs).toEqual([
+      expect(data.bsffs.edges[0].node.previousBsffs).toEqual([
         expect.objectContaining({
           ficheInterventions: [
             {

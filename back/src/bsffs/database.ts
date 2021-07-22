@@ -3,6 +3,19 @@ import { Bsff, BsffFicheIntervention, Prisma } from ".prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
 
+export async function getNextBsffs(
+  bsff: Bsff,
+  nextBsffs: Bsff[] = []
+): Promise<Bsff[]> {
+  if (bsff.nextBsffId) {
+    const nextBsff = await prisma.bsff.findUnique({
+      where: { id: bsff.nextBsffId }
+    });
+    return getNextBsffs(nextBsff, nextBsffs.concat([nextBsff]));
+  }
+  return nextBsffs;
+}
+
 export async function getBsffOrNotFound(
   where: SetRequired<Prisma.BsffWhereInput, "id">
 ): Promise<Bsff> {

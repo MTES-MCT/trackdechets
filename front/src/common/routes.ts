@@ -42,6 +42,11 @@ export default {
       edit: "/dashboard/:siret/bsvhus/edit/:id",
       view: "/dashboard/:siret/bsvhus/view/:id",
     },
+    bsffs: {
+      create: "/dashboard/:siret/bsffs/create",
+      edit: "/dashboard/:siret/bsffs/edit/:id",
+      view: "/dashboard/:siret/bsffs/view/:id",
+    },
     transport: {
       index: "/dashboard/:siret/transport",
       toCollect: "/dashboard/:siret/transport/to-collect",
