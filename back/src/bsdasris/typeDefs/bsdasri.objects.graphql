@@ -89,7 +89,7 @@ type BsdasriEmissionWasteDetails {
 type BsdasriTransportWasteDetails {
   "Quantité transportée"
   quantity: BsdasriQuantity
- 
+
   volume: Int
   packagingInfos: [BsdasriPackagingInfo!]
 }
@@ -169,8 +169,10 @@ type Bsdasri {
 
   "Bordereaux regroupés"
   regroupedBsdasris: [ID!]
-  
+
   metadata: BsdasriMetadata!
+
+  allowDirectTakeOver: Boolean
 }
 
 type BsdasriError {

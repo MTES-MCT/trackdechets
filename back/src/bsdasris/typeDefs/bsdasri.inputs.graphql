@@ -30,6 +30,7 @@ input BsdasriWhere {
   Expérimental : Filtre le résultat sur l'ID des bordereaux
   """
   id_in: [ID!]
+
   createdAt: DateFilter
   updatedAt: DateFilter
   emitter: BsdasriEmitterWhere

@@ -356,6 +356,7 @@ const wasteAcceptationFragment = gql`
 export const dasriFragment = gql`
   fragment DasriFragment on Bsdasri {
     id
+
     bsdasriStatus: status
     bsdasriType
     isDraft
@@ -440,6 +441,7 @@ export const dasriFragment = gql`
     regroupedBsdasris
     createdAt
     updatedAt
+    allowDirectTakeOver
   }
   ${companyFragment}
   ${signatureFragment}

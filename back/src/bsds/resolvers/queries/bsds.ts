@@ -15,6 +15,7 @@ import {
   getKeywordFieldNameFromName,
   getFieldNameFromKeyword
 } from "../../../common/elastic";
+import { Bsdasri } from "@prisma/client";
 import prisma from "../../../prisma";
 import { expandFormFromDb } from "../../../forms/form-converter";
 import { expandBsdasriFromDb } from "../../../bsdasris/dasri-converter";
@@ -154,6 +155,41 @@ async function buildSearchAfter(
   );
 }
 
+/**
+ * This function takes an array of dasris and, expand them and add `allowDirectTakeOver` boolean field by
+ * requesting emittercompany to know wether direct takeover is allowed
+ */
+async function buildDasris(dasris: Bsdasri[]) {
+  // build a list of emitter siret from dasris, non-INITIAL bsds are ignored
+  const emitterSirets = dasris
+    .filter(bsd => !!bsd.emitterCompanySiret && bsd.status === "INITIAL")
+    .map(bsd => bsd.emitterCompanySiret);
+
+  // depduplicate sirets
+  const uniqueSirets = Array.from(new Set(emitterSirets));
+
+  // build an array of sirets allwoing direct takeover
+  const allows = (
+    await prisma.company.findMany({
+      where: {
+        siret: { in: uniqueSirets },
+        allowBsdasriTakeOverWithoutSignature: true
+      },
+      select: {
+        siret: true
+      }
+    })
+  ).map(comp => comp.siret);
+
+  // expand dasris and insert `allowDirectTakeOver`
+  const res = dasris.map(bsd => ({
+    ...expandBsdasriFromDb(bsd),
+    allowDirectTakeOver: allows.includes(bsd.emitterCompanySiret)
+  }));
+
+  return res;
+}
+
 const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
@@ -191,6 +227,15 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
     }),
     { BSDD: [], BSDASRI: [], BSVHU: [], BSDA: [], BSFF: [] }
   );
+  const dasris = await prisma.bsdasri.findMany({
+    where: {
+      id: {
+        in: ids.BSDASRI
+      }
+    }
+  });
+
+  const expandedDasris = await buildDasris(dasris);
 
   const bsds: Record<BsdType, Bsd[]> = {
     BSDD: (
@@ -202,15 +247,8 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
         }
       })
     ).map(expandFormFromDb),
-    BSDASRI: (
-      await prisma.bsdasri.findMany({
-        where: {
-          id: {
-            in: ids.BSDASRI
-          }
-        }
-      })
-    ).map(expandBsdasriFromDb),
+    BSDASRI: expandedDasris,
+
     BSVHU: (
       await prisma.bsvhu.findMany({
         where: {

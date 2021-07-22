@@ -6,8 +6,10 @@ import { useParams, useLocation } from "react-router-dom";
 import Emitter, { RegroupingEmitter } from "./Emitter";
 
 import Recipient from "./Recipient";
-import Transporter from "./Transporter";
+
 import * as queryString from "query-string";
+
+import Transporter, { TransporterShowingTakeOverFields } from "./Transporter";
 
 type BsdasriFormType = "bsdasri" | "bsdasriRegroup";
 
@@ -16,7 +18,7 @@ export default function FormContainer({
 }: {
   bsdasriFormType?: BsdasriFormType;
 }) {
-  const { id } = useParams<{ id?: string }>();
+  const { id, siret } = useParams<{ id?: string; siret: string }>();
   const location = useLocation();
   const parsed = queryString.parse(location.search);
 
@@ -43,6 +45,16 @@ export default function FormContainer({
               bsdasri?.bsdasriType === "GROUPING"
                 ? RegroupingEmitter
                 : Emitter;
+
+            // When transporter proceeds to direct takeover, form has to display some transporter tab fields
+            // which are usually not displayed yet
+            const transporterComponent =
+              state === "INITIAL" &&
+              !bsdasri?.isDraft &&
+              siret === bsdasri?.transporter?.company?.siret
+                ? TransporterShowingTakeOverFields
+                : Transporter;
+
             return (
               <>
                 <StepContainer
@@ -52,7 +64,7 @@ export default function FormContainer({
                   stepName={stepName}
                 />
                 <StepContainer
-                  component={Transporter}
+                  component={transporterComponent}
                   title="Collecteur - Transporteur"
                   status={state}
                   stepName={stepName}

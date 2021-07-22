@@ -16,6 +16,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Création et édition de bordereaux Dasri de groupement [PR934](https://github.com/MTES-MCT/trackdechets/pull/934)
+- Emport direct de bordereaux Dasris quand le producteur l'a autorisé [935](https://github.com/MTES-MCT/trackdechets/pull/935)
+
 #### :memo: Documentation
 
 #### :house: Interne

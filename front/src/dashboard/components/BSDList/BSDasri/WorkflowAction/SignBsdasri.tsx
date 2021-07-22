@@ -1,9 +1,10 @@
 import React from "react";
 import { RedErrorMessage, ActionButton } from "common/components";
-import * as yup from "yup";
+
 import Loader from "common/components/Loaders";
 import * as queryString from "query-string";
 import { Formik, Field, Form } from "formik";
+
 import {
   Mutation,
   Query,
@@ -13,7 +14,9 @@ import {
   BsdasriSignatureType,
   BsdasriStatus,
 } from "generated/graphql/types";
-import { gql, useMutation, useQuery } from "@apollo/client";
+
+import { useMutation, useQuery } from "@apollo/client";
+
 import { Link, generatePath } from "react-router-dom";
 import routes from "common/routes";
 import { WorkflowActionProps } from "./WorkflowAction";
@@ -22,20 +25,10 @@ import { TdModalTrigger } from "common/components/Modal";
 import { IconCheckCircle1 } from "common/components/Icons";
 
 import { NotificationError } from "common/components/Error";
-import { GET_DASRI_METADATA } from "common/queries";
-const SIGN_BSDASRI = gql`
-  mutation SignBsdasri($id: ID!, $input: BsdasriSignatureInput!) {
-    signBsdasri(id: $id, input: $input) {
-      id
-      status
-    }
-  }
-`;
 
-const validationSchema = (form: Bsdasri) =>
-  yup.object({
-    author: yup.string().nullable().required("Le nom du signataire est requis"),
-  });
+import { GET_DASRI_METADATA } from "common/queries";
+
+import { validationSchema, SIGN_BSDASRI } from "./utils";
 
 const settings: {
   [id: string]: {

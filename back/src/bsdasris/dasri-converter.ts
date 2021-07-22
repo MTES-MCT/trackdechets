@@ -157,7 +157,8 @@ export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
     createdAt: bsdasri.createdAt,
     updatedAt: bsdasri.updatedAt,
     status: bsdasri.status as BsdasriStatus,
-    metadata: null
+    metadata: null,
+    allowDirectTakeOver: null
   };
 }
 
