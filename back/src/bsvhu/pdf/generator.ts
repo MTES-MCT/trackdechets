@@ -1,31 +1,7 @@
 import { Bsvhu } from "@prisma/client";
 import { readFile } from "fs/promises";
 import { join } from "path";
-import {
-  pipe,
-  gotenberg,
-  convert,
-  html,
-  please,
-  to,
-  adjust
-} from "gotenberg-js-client";
-
-const { GOTENBERG_TOKEN, GOTENBERG_URL } = process.env;
-
-const toPDF = pipe(
-  gotenberg(GOTENBERG_URL),
-  convert,
-  html,
-  to({
-    marginTop: 0.2,
-    marginBottom: 0.2,
-    marginLeft: 0.2,
-    marginRight: 0.2
-  }),
-  adjust({ headers: { "X-Auth-Token": GOTENBERG_TOKEN ?? "" } }),
-  please
-);
+import { toPDF } from "../../common/pdf";
 
 export async function buildPdf(form: Bsvhu) {
   const htmlModel = await getTemplateStringFile("model.html");
