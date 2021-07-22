@@ -1,12 +1,14 @@
 
 
+# Workflow de déploiement
+# Le front et le back ne sont pas inclut dans ce fichier car leur déploiement
+# se fait automatiquement via l'intégration Scalingo <> Github
 name: Deploy
 
 on:
   push:
     branches:
       - master
-
 jobs:
   doc:
     # Taken from https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus
