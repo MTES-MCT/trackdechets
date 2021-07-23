@@ -55,6 +55,7 @@ export default function BsdasriTable({
     variables: {
       where: {
         _or: [{ groupable: true }, { id_in: regroupedInDB }],
+
         processingOperation: [
           ProcessingOperationTypes.D12,
           ProcessingOperationTypes.R12,

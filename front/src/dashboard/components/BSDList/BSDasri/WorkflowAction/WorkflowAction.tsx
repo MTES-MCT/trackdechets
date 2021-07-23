@@ -6,6 +6,7 @@ import {
 } from "generated/graphql/types";
 import PublishBsdasri from "./PublishBsdasri";
 import SignBsdasri from "./SignBsdasri";
+import SignBsdasriDirectTakeover from "./SignBsdasriDirectTakeover";
 
 export interface WorkflowActionProps {
   form: Bsdasri;
@@ -32,6 +33,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       if (form.isDraft) {
         return null;
       }
+
       if (siret === form.emitter?.company?.siret) {
         return (
           <SignBsdasri
@@ -39,6 +41,12 @@ export function WorkflowAction(props: WorkflowActionProps) {
             signatureType={BsdasriSignatureType.Emission}
           />
         );
+      }
+      if (
+        siret === form.transporter?.company?.siret &&
+        form?.allowDirectTakeOver
+      ) {
+        return <SignBsdasriDirectTakeover {...props} />;
       }
       return null;
     }

@@ -467,6 +467,7 @@ export type Bsdasri = {
   /** Bordereaux regroupés */
   regroupedBsdasris?: Maybe<Array<Scalars["ID"]>>;
   metadata: BsdasriMetadata;
+  allowDirectTakeOver?: Maybe<Scalars["Boolean"]>;
 };
 
 export type BsdasriCompanyWhere = {

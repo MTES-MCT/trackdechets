@@ -10,17 +10,37 @@ import { getInitialQuantityFn } from "./utils/initial-state";
 import { transportModeLabels } from "dashboard/constants";
 import { FillFieldsInfo, DisabledFieldsInfo } from "./utils/commons";
 import classNames from "classnames";
+
 import QuantityWidget from "./components/Quantity";
 
+/**
+ *
+ * Tweaked Transporter component where takeover fields can be displayed on demand
+ * This is useful to edit these fields for direct takeover, as they're usually hidden as long as the dasri is not SIGNED_BY_TRANPORTER
+ */
+export function TransporterShowingTakeOverFields({ status, stepName }) {
+  return (
+    <BaseTransporter
+      status={status}
+      displayTakeoverFields={true}
+      stepName={stepName}
+    />
+  );
+}
+
 export default function Transporter({ status, stepName }) {
+  return <BaseTransporter status={status} stepName={stepName} />;
+}
+function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
   const { setFieldValue } = useFormikContext();
 
   // it's pointless to show transport fields until form is signed by producer
-  const showTransportFields = [
-    BsdasriStatus.SignedByProducer,
-    BsdasriStatus.Sent,
-    BsdasriStatus.Received,
-  ].includes(status);
+  const showTransportFields =
+    [
+      BsdasriStatus.SignedByProducer,
+      BsdasriStatus.Sent,
+      BsdasriStatus.Received,
+    ].includes(status) || displayTakeoverFields;
   // handedOverAt is editable even after dasri reception
   const showHandedOverAtField = [
     BsdasriStatus.Sent,
