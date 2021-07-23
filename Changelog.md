@@ -23,6 +23,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Mise à jour de l'intégration continue [PR 937](https://github.com/MTES-MCT/trackdechets/pull/937)
+- Stabilisation de la génération des PDFs via Gotenberg [PR944](https://github.com/MTES-MCT/trackdechets/pull/944)
 
 # [2021.07.1] 12/07/2021
 
