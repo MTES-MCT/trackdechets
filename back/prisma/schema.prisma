@@ -191,6 +191,9 @@ model Company {
 // Dans ce cas les API SIRENE ne diffusent pas les informations de cette entreprise dans
 // les résultats de recherche. Pour des raisons de sécurité, certaines associations et les
 // organismes relevant du Ministère de la Défense ne sont pas diffusibles non plus."
+//
+// Cette table permet également de stocker de "faux établissements" pouvant être visés lors
+// du rattachement d'établissements de test sur l'environnement sandbox
 model AnonymousCompany {
   id          String @id @default(cuid())
   siret       String @unique

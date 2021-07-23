@@ -2816,6 +2816,12 @@ export type Mutation = {
   createForm: Form;
   /**
    * USAGE INTERNE
+   * Creates a new record in the anonymous company table
+   * with auto generated data and returns the SIRET
+   */
+  createTestCompany: Scalars["String"];
+  /**
+   * USAGE INTERNE
    * Crée un récépissé négociant
    */
   createTraderReceipt?: Maybe<TraderReceipt>;
