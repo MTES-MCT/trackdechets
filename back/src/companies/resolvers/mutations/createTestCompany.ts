@@ -25,6 +25,15 @@ async function generateTestSiret() {
   return (Number(last.siret) + 1).toString().padStart(14, "0");
 }
 
+// auto-generated data for test companies
+const fixtures = {
+  name: "Établissement de test",
+  address: "Adresse test",
+  codeNaf: "XXXXX",
+  libelleNaf: "Entreprise de test",
+  codeCommune: "00000"
+};
+
 const createTestCompany: MutationResolvers["createTestCompany"] = async (
   parent,
   args,
@@ -34,11 +43,7 @@ const createTestCompany: MutationResolvers["createTestCompany"] = async (
   checkIsAuthenticated(context);
   const createInput = {
     siret: await generateTestSiret(),
-    name: "Établissement de test",
-    address: "1 rue des acacias, 07100 Annonay",
-    codeNaf: "XXXXX",
-    libelleNaf: "Entreprise de test",
-    codeCommune: "07010"
+    ...fixtures
   };
   const company = await prisma.anonymousCompany.create({ data: createInput });
   return company.siret;

@@ -2816,8 +2816,8 @@ export type Mutation = {
   createForm: Form;
   /**
    * USAGE INTERNE
-   * Creates a new record in the anonymous company table
-   * with auto generated data and returns the SIRET
+   * Génère un N°SIRET factice pouvant être utilisé pour le
+   * rattachement d'un établissement de test
    */
   createTestCompany: Scalars["String"];
   /**

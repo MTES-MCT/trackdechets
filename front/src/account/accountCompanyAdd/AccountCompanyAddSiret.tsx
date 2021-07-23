@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLazyQuery } from "@apollo/client";
+import { gql, useLazyQuery, useMutation } from "@apollo/client";
 import { Field, Form, Formik } from "formik";
 import cogoToast from "cogo-toast";
 import { COMPANY_INFOS } from "form/common/components/company/query";
@@ -7,11 +7,18 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import AutoFormattingSiret from "common/components/AutoFormattingSiret";
 import { NotificationError } from "common/components/Error";
 import styles from "../AccountCompanyAdd.module.scss";
-import { Query } from "generated/graphql/types";
+import { Mutation, Query } from "generated/graphql/types";
+import Tooltip from "common/components/Tooltip";
 
 type IProps = {
   onCompanyInfos: (companyInfos) => void;
 };
+
+const CREATE_TEST_COMPANY = gql`
+  mutation CreateTestCompany {
+    createTestCompany
+  }
+`;
 
 /**
  * SIRET Formik field for company creation
@@ -42,6 +49,10 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
     },
     fetchPolicy: "no-cache",
   });
+
+  const [createTestCompany] = useMutation<Pick<Mutation, "createTestCompany">>(
+    CREATE_TEST_COMPANY
+  );
 
   return (
     <>
@@ -75,6 +86,23 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
                     setFieldValue("siret", e.target.value);
                   }}
                 />
+                {process.env.REACT_APP_ALLOW_TEST_COMPANY === "true" && (
+                  <button
+                    className={`tw-block tw-mt-1 tw-underline ${styles.smaller}`}
+                    type="button"
+                    onClick={() =>
+                      createTestCompany().then(response => {
+                        setFieldValue(
+                          "siret",
+                          response.data?.createTestCompany
+                        );
+                      })
+                    }
+                  >
+                    Obtenir un n°SIRET factice{" "}
+                    <Tooltip msg="Génère un n°SIRET unique permettant la création d'un établissement factice pour la réalisation de vos tests" />
+                  </button>
+                )}
                 {isRegistered && (
                   <p className="error-message">
                     Cet établissement existe déjà dans Trackdéchets
