@@ -4,6 +4,7 @@ import { readFile } from "fs/promises";
 import Handlebars from "handlebars";
 import { join } from "path";
 import QRCode from "qrcode";
+import { toPDF } from "../../common/pdf";
 
 export async function buildPdf(bsda: Bsda) {
   const signatureStamp = await readFile(
@@ -25,8 +26,13 @@ export async function buildPdf(bsda: Bsda) {
   const compiled = Handlebars.compile(source);
   const html = compiled({ bsda, qrcode, signatureStamp });
 
-  console.log(html);
-  return null;
+  return toPDF({
+    "index.html": html,
+    "bsda.css": await readFile(
+      join(__dirname, "templates", "bsda.css"),
+      "utf-8"
+    )
+  });
 }
 
 const safeDateFmt = (dt: Date) => {
