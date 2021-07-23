@@ -78,6 +78,6 @@ describe("errorHandler", () => {
       .set("Content-Type", "application/json")
       .send(`{"query: "{ me { name } }"}`);
     expect(response.status).toEqual(400);
-    expect(response.text).toEqual(`{"error":"JSON mal formaté"}`);
+    expect(response.text).toEqual(`{"error":"JSON mal formaté ou invalide"}`);
   });
 });
