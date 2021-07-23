@@ -9,6 +9,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Ajout de la possibilité de générer un n°SIRET factice pour la création d'établissements de test [PR 945](https://github.com/MTES-MCT/trackdechets/pull/945)
 #### :boom: Breaking changes
 
 #### :bug: Corrections de bugs
