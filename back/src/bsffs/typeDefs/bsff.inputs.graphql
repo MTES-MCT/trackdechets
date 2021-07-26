@@ -46,16 +46,21 @@ input BsffInput {
   quantity: BsffQuantityInput
   transporter: BsffTransporterInput
   destination: BsffDestinationInput
-  bsffs: [ID!]
+  previousBsffs: [ID!]
 }
 
 input BsffEmitterInput {
-  company: CompanyInput!
+  company: CompanyInput
 }
 
 input BsffPackagingInput {
+  "Dénomination du contenant."
+  name: String!
+  "Volume du contenant."
+  volume: Float
+  "Numéro du contenant."
   numero: String!
-  type: BsffPackagingType!
+  "Poids en kilos."
   kilos: Float!
 }
 
@@ -71,7 +76,7 @@ input BsffQuantityInput {
 }
 
 input BsffTransporterInput {
-  company: CompanyInput!
+  company: CompanyInput
   recepisse: BsffTransporterRecepisseInput
   transport: BsffTransporterTransportInput
 }

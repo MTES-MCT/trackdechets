@@ -1220,8 +1220,15 @@ export type Bsff = {
    * Habituellement renseigné par un opérateur lors de son intervention.
    */
   ficheInterventions: Array<BsffFicheIntervention>;
-  /** Liste des bordereaux que celui-ci regroupe, dans le cas d'un regroupement, reconditionnement ou d'une réexpédition. */
-  bsffs: Array<Bsff>;
+  /** Bordereau qui a groupé, reconditionné ou réexpédié celui-ci. */
+  nextBsff?: Maybe<Bsff>;
+  /**
+   * Bordereaux qui ont successivement groupé, reconditionné ou réexpédié celui-ci.
+   * Cette liste permet d'accéder à la traçabilité complète d'un bordereau.
+   */
+  nextBsffs: Array<Bsff>;
+  /** Bordereaux que celui-ci groupe, reconditionne ou réexpédie. */
+  previousBsffs: Array<Bsff>;
 };
 
 /** Résultats de bordereaux paginés. */
@@ -1235,13 +1242,13 @@ export type BsffConnection = {
 export type BsffDestination = {
   __typename?: "BsffDestination";
   /** Entreprise réceptionant le déchet. */
-  company: FormCompany;
+  company?: Maybe<FormCompany>;
   /** Déclaration de réception du déchet. */
   reception?: Maybe<BsffReception>;
   /** Déclaration de traitement du déchet. */
   operation?: Maybe<BsffOperation>;
   /** Opération de traitement prévu initialement. */
-  plannedOperation: BsffPlannedOperation;
+  plannedOperation?: Maybe<BsffPlannedOperation>;
   /** Numéro CAP. */
   cap?: Maybe<Scalars["String"]>;
 };
@@ -1294,13 +1301,13 @@ export type BsffEmission = {
 export type BsffEmitter = {
   __typename?: "BsffEmitter";
   /** Entreprise émettant le déchet. */
-  company: FormCompany;
+  company?: Maybe<FormCompany>;
   /** Déclaration de l'émetteur lors de l'enlèvement par le transporteur. */
   emission?: Maybe<BsffEmission>;
 };
 
 export type BsffEmitterInput = {
-  company: CompanyInput;
+  company?: Maybe<CompanyInput>;
 };
 
 export type BsffFicheIntervention = {
@@ -1334,7 +1341,7 @@ export type BsffInput = {
   quantity?: Maybe<BsffQuantityInput>;
   transporter?: Maybe<BsffTransporterInput>;
   destination?: Maybe<BsffDestinationInput>;
-  bsffs?: Maybe<Array<Scalars["ID"]>>;
+  previousBsffs?: Maybe<Array<Scalars["ID"]>>;
 };
 
 export type BsffNextDestination = {
@@ -1377,23 +1384,26 @@ export type BsffOperationNextDestinationInput = {
 
 export type BsffPackaging = {
   __typename?: "BsffPackaging";
+  /** Dénomination du contenant. */
+  name: Scalars["String"];
+  /** Volume du contenant. */
+  volume?: Maybe<Scalars["Float"]>;
   /** Numéro du contenant. */
   numero: Scalars["String"];
-  /** Type de contenant. */
-  type: BsffPackagingType;
   /** Poids en kilos. */
   kilos: Scalars["Float"];
 };
 
 export type BsffPackagingInput = {
+  /** Dénomination du contenant. */
+  name: Scalars["String"];
+  /** Volume du contenant. */
+  volume?: Maybe<Scalars["Float"]>;
+  /** Numéro du contenant. */
   numero: Scalars["String"];
-  type: BsffPackagingType;
+  /** Poids en kilos. */
   kilos: Scalars["Float"];
 };
-
-export enum BsffPackagingType {
-  Bouteille = "BOUTEILLE"
-}
 
 export type BsffPlannedOperation = {
   __typename?: "BsffPlannedOperation";
@@ -1459,7 +1469,7 @@ export type BsffTransport = {
 export type BsffTransporter = {
   __typename?: "BsffTransporter";
   /** Entreprise responsable du transport du déchet. */
-  company: FormCompany;
+  company?: Maybe<FormCompany>;
   /** Récépissé du transporteur, à moins d'être exempté. */
   recepisse?: Maybe<BsffTransporterRecepisse>;
   /** Déclaration du transporteur lors de l'enlèvement auprès de l'émetteur. */
@@ -1467,7 +1477,7 @@ export type BsffTransporter = {
 };
 
 export type BsffTransporterInput = {
-  company: CompanyInput;
+  company?: Maybe<CompanyInput>;
   recepisse?: Maybe<BsffTransporterRecepisseInput>;
   transport?: Maybe<BsffTransporterTransportInput>;
 };

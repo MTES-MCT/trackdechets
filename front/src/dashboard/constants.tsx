@@ -16,6 +16,7 @@ export const statusLabels: { [key: string]: string } = {
     "En attente de collecte par le transporteur après entreposage provisoire",
   INITIAL: "Initial",
   SIGNED_BY_PRODUCER: "Signé par le producteur",
+  SIGNED_BY_EMITTER: "Signé par l'émetteur",
 };
 
 export const ITEMS_PER_PAGE = 50;

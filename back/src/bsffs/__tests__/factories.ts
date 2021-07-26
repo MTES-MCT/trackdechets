@@ -3,7 +3,7 @@ import { Prisma, TransportMode, BsffStatus } from ".prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
 import { UserWithCompany } from "../../__tests__/factories";
-import { OPERATION_CODES, PACKAGING_TYPE, WASTE_CODES } from "../constants";
+import { OPERATION_CODES, WASTE_CODES } from "../constants";
 
 interface CreateBsffArgs {
   emitter?: UserWithCompany;
@@ -87,7 +87,7 @@ export function createBsffBeforeTransport(
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffAfterEmission(args, {
-    packagings: [{ type: PACKAGING_TYPE.BOUTEILLE, numero: "01", kilos: 1 }],
+    packagings: [{ name: "BOUTEILLE 2L", numero: "01", kilos: 1 }],
     wasteAdr: "Mention ADR",
     transporterTransportMode: TransportMode.ROAD,
     ...initialData

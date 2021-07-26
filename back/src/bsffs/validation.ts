@@ -7,13 +7,8 @@ import {
   BsffStatus
 } from "@prisma/client";
 import prisma from "../prisma";
-import { BsffPackaging, BsffPackagingType } from "../generated/graphql/types";
-import {
-  GROUPING_CODES,
-  OPERATION_CODES,
-  PACKAGING_TYPE,
-  WASTE_CODES
-} from "./constants";
+import { BsffPackaging } from "../generated/graphql/types";
+import { GROUPING_CODES, OPERATION_CODES, WASTE_CODES } from "./constants";
 
 export const beforeEmissionSchema: yup.SchemaOf<Pick<
   Bsff,
@@ -111,18 +106,15 @@ export const beforeTransportSchema: yup.SchemaOf<Pick<
     .nullable()
     .of<yup.SchemaOf<Omit<BsffPackaging, "__typename">>>(
       yup.object({
+        name: yup
+          .string()
+          .nullable()
+          .required("La dénomination du contenant est requise"),
+        volume: yup.number().nullable(),
         numero: yup
           .string()
           .nullable()
           .required("Le numéro identifiant du contenant est requis"),
-        type: yup
-          .mixed<BsffPackagingType>()
-          .nullable()
-          .oneOf(
-            Object.values(PACKAGING_TYPE),
-            "Le type du contenant ne fait pas partie de la liste reconnue : ${values}"
-          )
-          .required("Le type de contenant est requis"),
         kilos: yup
           .number()
           .nullable()
@@ -352,8 +344,8 @@ export const ficheInterventionSchema: yup.SchemaOf<Pick<
     .required("L'addresse email de l'entreprise de l'opérateur est requis")
 });
 
-export async function canAssociateBsffs(ids: string[]) {
-  const bsffs = await prisma.bsff.findMany({
+export async function canAddPreviousBsffs(ids: string[]) {
+  const previousBsffs = await prisma.bsff.findMany({
     where: {
       id: {
         in: ids
@@ -361,14 +353,14 @@ export async function canAssociateBsffs(ids: string[]) {
     }
   });
 
-  if (bsffs.some(bsff => bsff.status !== BsffStatus.PROCESSED)) {
+  if (previousBsffs.some(bsff => bsff.status !== BsffStatus.PROCESSED)) {
     throw new UserInputError(
       `Certains des bordereaux à associer n'ont pas toutes les signatures requises`
     );
   }
 
   if (
-    !bsffs.every(
+    !previousBsffs.every(
       bsff =>
         // operation code is null when the waste is temporarily stored and receives no treatment
         bsff.destinationOperationCode == null ||

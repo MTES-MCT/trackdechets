@@ -147,11 +147,7 @@ const signBsff: MutationResolvers["signBsff"] = async (_, args, context) => {
 
   await indexBsff(updatedBsff);
 
-  return {
-    ...unflattenBsff(updatedBsff),
-    ficheInterventions: [],
-    bsffs: []
-  };
+  return unflattenBsff(updatedBsff);
 };
 
 export default signBsff;

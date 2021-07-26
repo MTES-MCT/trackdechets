@@ -828,7 +828,7 @@ model Bsff {
   emitterEmissionSignatureAuthor String?
   emitterEmissionSignatureDate   DateTime?
 
-  packagings Json?
+  packagings Json @default("[]")
 
   wasteCode        String?
   wasteNature      String?
@@ -887,9 +887,9 @@ model Bsff {
 
   ficheInterventions BsffFicheIntervention[] @relation("FicheInterventionToBsff")
 
-  bsffs  Bsff[]  @relation("BsffToBsff")
-  Bsff   Bsff?   @relation("BsffToBsff", fields: [bsffId], references: [id])
-  bsffId String?
+  previousBsffs Bsff[]  @relation("BsffToBsff")
+  nextBsff      Bsff?   @relation("BsffToBsff", fields: [nextBsffId], references: [id])
+  nextBsffId    String?
 }
 
 enum BsffStatus {

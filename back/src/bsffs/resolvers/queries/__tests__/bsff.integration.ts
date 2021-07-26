@@ -16,7 +16,7 @@ const GET_BSFF = `
       ficheInterventions {
         numero
       }
-      bsffs {
+      previousBsffs {
         id
       }
     }
@@ -161,12 +161,12 @@ describe("Query.bsff", () => {
     );
   });
 
-  it("should list the bsff's associated bsffs", async () => {
+  it("should list the bsff's previous bsffs", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
 
-    const bsffToAssociate = await createBsffAfterOperation({
+    const previousBsff = await createBsffAfterOperation({
       emitter,
       transporter,
       destination
@@ -176,9 +176,9 @@ describe("Query.bsff", () => {
         emitter: destination
       },
       {
-        bsffs: {
+        previousBsffs: {
           connect: {
-            id: bsffToAssociate.id
+            id: previousBsff.id
           }
         }
       }
@@ -193,9 +193,9 @@ describe("Query.bsff", () => {
 
     expect(data.bsff).toEqual(
       expect.objectContaining({
-        bsffs: [
+        previousBsffs: [
           {
-            id: bsffToAssociate.id
+            id: previousBsff.id
           }
         ]
       })
