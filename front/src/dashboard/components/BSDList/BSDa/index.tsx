@@ -3,6 +3,10 @@ import { CellProps, CellValue } from "react-table";
 
 import { Bsda, BsdaStatus } from "generated/graphql/types";
 import { IconBSDa } from "common/components/Icons";
+import { BSDaActions } from "./BSDaActions/BSDaActions";
+import { useParams } from "react-router-dom";
+import { ActionButtonContext } from "common/components/ActionButton";
+import { WorkflowAction } from "./WorkflowAction/WorkflowAction";
 
 const bsdaVerboseStatuses: Record<BsdaStatus, string> = {
   INITIAL: "Initial",
@@ -56,10 +60,17 @@ export const COLUMNS: Record<
   },
   workflow: {
     accessor: () => null,
-    Cell: () => null, // not implemented yet
+    Cell: ({ row }) => {
+      const { siret } = useParams<{ siret: string }>();
+      return (
+        <ActionButtonContext.Provider value={{ size: "small" }}>
+          <WorkflowAction siret={siret} form={row.original} />
+        </ActionButtonContext.Provider>
+      );
+    },
   },
   actions: {
     accessor: () => null,
-    Cell: () => null, // not implemented yet
+    Cell: ({ row }) => <BSDaActions form={row.original} />,
   },
 };
