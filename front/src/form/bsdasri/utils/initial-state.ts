@@ -27,6 +27,7 @@ const getInitialState = (f?: Bsdasri | null) => ({
     wasteCode: "18 01 03*",
     wasteDetails: {
       packagingInfos: [],
+
       quantity: !!f?.emission?.wasteDetails?.quantity
         ? getInitialQuantityFn(f?.emission?.wasteDetails?.quantity)
         : null,

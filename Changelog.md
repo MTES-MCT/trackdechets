@@ -19,6 +19,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
   - Ajout de la propriété `volume` à `BsffPackaging`.
   - Remplacement de la propriété `type` de `BsffPackaging` par un champ libre `name`.
 
+- Ajout de la possibilité de générer un n°SIRET factice pour la création d'établissements de test [PR 945](https://github.com/MTES-MCT/trackdechets/pull/945)
 #### :boom: Breaking changes
 
 #### :bug: Corrections de bugs
@@ -26,12 +27,15 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Création et édition de bordereaux Dasri de groupement [PR934](https://github.com/MTES-MCT/trackdechets/pull/934)
+- Emport direct de bordereaux Dasris quand le producteur l'a autorisé [935](https://github.com/MTES-MCT/trackdechets/pull/935)
+- Ajout de champs sur le BSDA: courtier, mode de transport, immatriculations, exemption de récépissé transporteur et destination ultérieure prévue [PR 938](https://github.com/MTES-MCT/trackdechets/pull/938)
 
 #### :memo: Documentation
 
 #### :house: Interne
 
 - Mise à jour de l'intégration continue [PR 937](https://github.com/MTES-MCT/trackdechets/pull/937)
+- Stabilisation de la génération des PDFs via Gotenberg [PR944](https://github.com/MTES-MCT/trackdechets/pull/944)
 
 # [2021.07.1] 12/07/2021
 
