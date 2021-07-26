@@ -7,7 +7,9 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 
 export function Worker({ disabled }) {
   const { setFieldValue, values } = useFormikContext<Bsda>();
-  const [hasBroker, setHasBroker] = useState(Boolean(false)); // TODO after rebase: Boolean(values.broker.company.siret != null)
+  const [hasBroker, setHasBroker] = useState(
+    Boolean(values.broker?.company?.siret)
+  );
 
   return (
     <>
@@ -17,6 +19,12 @@ export function Worker({ disabled }) {
           plus modifiables.
         </div>
       )}
+
+      <CompanySelector
+        disabled={disabled}
+        name="worker.company"
+        heading="Entreprise de travaux"
+      />
 
       <div className="form__row">
         <label>
@@ -30,12 +38,6 @@ export function Worker({ disabled }) {
           Je suis passé par un courtier
         </label>
       </div>
-
-      <CompanySelector
-        disabled={disabled}
-        name="worker.company"
-        heading="Entreprise de travaux"
-      />
 
       {hasBroker && (
         <div className="form__row">

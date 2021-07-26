@@ -5,6 +5,7 @@ import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import Packagings from "form/bsda/components/packagings/Packagings";
 import Tooltip from "common/components/Tooltip";
 import TagsInput from "form/bsvhu/components/tags-input/TagsInput";
+import { BsdaConsistence } from "generated/graphql/types";
 
 export function WasteInfo({ disabled }) {
   return (
@@ -79,6 +80,23 @@ export function WasteInfo({ disabled }) {
 
       <h4 className="form__section-heading">Conditionnement</h4>
       <Field disabled={disabled} name="packagings" component={Packagings} />
+
+      <div className="form__row">
+        <label>
+          Consistance
+          <Field
+            as="select"
+            name="waste.consistence"
+            id="id_mode"
+            className="td-select td-input--small"
+            disabled={disabled}
+          >
+            <option value={BsdaConsistence.Solide}>Solide</option>
+            <option value={BsdaConsistence.Pulverulent}>Pulvérulents</option>
+            <option value={BsdaConsistence.Other}>Autre</option>
+          </Field>
+        </label>
+      </div>
 
       <h4 className="form__section-heading">Quantité</h4>
       <div className="form__row">

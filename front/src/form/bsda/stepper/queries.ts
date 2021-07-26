@@ -12,7 +12,6 @@ export const FullBsdaFragment = gql`
       company {
         ...CompanyFragment
       }
-      agrementNumber
       emission {
         signature {
           author
@@ -21,24 +20,19 @@ export const FullBsdaFragment = gql`
       }
     }
     destination {
-      type
+      cap
       plannedOperationCode
       company {
         ...CompanyFragment
       }
-      agrementNumber
       reception {
         date
         quantity {
-          number
-          tons
+          value
+          type
         }
         acceptationStatus
         refusalReason
-        identification {
-          numbers
-          type
-        }
       }
       operation {
         code
@@ -54,15 +48,23 @@ export const FullBsdaFragment = gql`
         }
       }
     }
-    packaging
-    wasteCode
-    identification {
-      numbers
+    packagings {
+      other
+      quantity
       type
     }
+    waste {
+      code
+      name
+      familyCode
+      materialName
+      consistence
+      sealNumbers
+      adr
+    }
     quantity {
-      number
-      tons
+      value
+      type
     }
     transporter {
       company {

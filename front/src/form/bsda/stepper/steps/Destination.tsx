@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Field, useFormikContext } from "formik";
 import CompanySelector from "form/common/components/company/CompanySelector";
+import { Bsda } from "generated/graphql/types";
 
 export function Destination({ disabled }) {
-  const [hasNextDestination, setHasNextDestination] = useState(Boolean(false)); // TODO after rebase: Boolean(values.destination.operation.nextDestination.company.siret != null)
+  const { values } = useFormikContext<Bsda>();
+  const [hasNextDestination, setHasNextDestination] = useState(
+    Boolean(values.destination?.operation?.nextDestination?.company?.siret)
+  );
 
   return (
     <>
@@ -41,6 +45,30 @@ export function Destination({ disabled }) {
           />
         </>
       )}
+
+      <div className="form__row">
+        <label>
+          N° CAP:
+          <Field
+            disabled={disabled}
+            type="text"
+            name="destination.cap"
+            className="td-input td-input--medium"
+          />
+        </label>
+      </div>
+
+      <div className="form__row">
+        <label>
+          Code D/R prévu:
+          <Field
+            disabled={disabled}
+            type="text"
+            name="destination.plannedOperationCode"
+            className="td-input td-input--medium"
+          />
+        </label>
+      </div>
     </>
   );
 }

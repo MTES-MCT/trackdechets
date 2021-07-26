@@ -1,9 +1,12 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Field, useFormikContext } from "formik";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { RedErrorMessage } from "common/components";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { Bsda } from "generated/graphql/types";
+import Tooltip from "common/components/Tooltip";
+import TagsInput from "form/bsvhu/components/tags-input/TagsInput";
+import { transportModeLabels } from "dashboard/constants";
 
 export function Transporter({ disabled }) {
   const { setFieldValue, values } = useFormikContext<Bsda>();
@@ -98,6 +101,46 @@ export function Transporter({ disabled }) {
           </div>
         </>
       )}
+
+      <h4 className="form__section-heading">Détails</h4>
+      <div className="form__row">
+        <label>
+          Mode de transport:
+          <Field
+            as="select"
+            name="transporter.transport.mode"
+            id="id_mode"
+            className="td-select td-input--small"
+            disabled={disabled}
+          >
+            {Object.entries(transportModeLabels).map(([k, v]) => (
+              <option value={`${k}`} key={k}>
+                {v}
+              </option>
+            ))}
+          </Field>
+        </label>
+      </div>
+
+      <div className="form__row">
+        <label>
+          Immatriculations
+          <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> pour valider chacun" />
+          <TagsInput name="transporter.transport.plates" disabled={disabled} />
+        </label>
+      </div>
+
+      <div className="form__row">
+        <label>
+          Date de prise en charge
+          <Field
+            component={DateInput}
+            name="transporter.transport.takenOverAt"
+            className={`td-input td-input--small`}
+            disabled={disabled}
+          />
+        </label>
+      </div>
     </>
   );
 }

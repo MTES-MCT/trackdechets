@@ -1,18 +1,22 @@
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import { QuantityType } from "generated/graphql/types";
+import {
+  BsdaConsistence,
+  QuantityType,
+  TransportMode,
+} from "generated/graphql/types";
 
 export default {
   emitter: {
     company: getInitialCompany(),
     isPrivateIndividual: false,
-    workSite: null,
+    worksite: null,
   },
   waste: {
     code: "",
     name: "",
     familyCode: "",
     materialName: "",
-    consistence: "",
+    consistence: BsdaConsistence.Solide,
     sealNumbers: [],
     adr: "",
   },
@@ -23,7 +27,9 @@ export default {
   },
   worker: {
     company: getInitialCompany(),
-    hasEmitterPaperSignature: false,
+    work: {
+      hasEmitterPaperSignature: false,
+    },
   },
   transporter: {
     company: {
@@ -35,11 +41,17 @@ export default {
       department: "",
       validityLimit: null,
     },
+    transport: {
+      plates: [],
+      mode: TransportMode.Road,
+    },
   },
   broker: {
     company: getInitialCompany(),
   },
   destination: {
+    cap: "",
+    plannedOperationCode: "",
     company: getInitialCompany(),
     operation: {
       nextDestination: {

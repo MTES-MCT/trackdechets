@@ -16,8 +16,6 @@ const PACKAGINGS_NAMES = {
 
 export default function Packagings({
   field: { name, value },
-  form,
-  id,
   disabled,
 }: FieldProps<BsdaPackaging[] | null> & InputHTMLAttributes<HTMLInputElement>) {
   const { setFieldValue } = useFormikContext();
