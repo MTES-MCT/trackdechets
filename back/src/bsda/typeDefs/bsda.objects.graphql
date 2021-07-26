@@ -30,6 +30,9 @@ type Bsda {
   "Maitre d'ouvrage ou détenteur du déchet"
   emitter: BsdaEmitter
 
+  "Courtier"
+  broker: BsdaBroker
+
   "Dénomination du déchet"
   waste: BsdaWaste
   "Conditionnement"
@@ -142,7 +145,18 @@ type BsdaOperation {
   code: String
   "Date de réalisation de l'opération"
   date: DateTime
+  "Exutoire final (si la destination ne l'est pas)"
+  nextDestination: BsdaNextDestination
   signature: Signature
+}
+
+type BsdaNextDestination {
+  "Coordonnées de l'éxutoire final"
+  company: FormCompany
+  "N° de CAP (le cas échéant)"
+  cap: String
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  plannedOperationCode: String
 }
 
 type BsdaWorker {
@@ -171,16 +185,41 @@ type BsdaTransporter {
 }
 
 type BsdaTransport {
+  "Mode de transport"
+  mode: TransportMode
+  "Plaque(s) d'immatriculation"
+  plates: [String!]
+  "Date de prise en charge"
+  takenOverAt: DateTime
   signature: Signature
 }
 
 type BsdaRecepisse {
+  "Exemption de récépissé (conformément aux dispositions de l'article R.541-50 du code de l'environnement)"
+  isExempted: Boolean
+  "Numéro de récépissé"
   number: String
+  "Département"
   department: String
+  "Date limite de validité"
   validityLimit: DateTime
 }
 
 type BsdaAssociation {
   id: ID!
   status: BsdaStatus!
+  cap: String!
+  wasteCode: String!
+  wasteDescription: String!
+  wasteSealNumbers: [String!]
+  wasteAdr: String
+  totalQuantity: Float!
+  emissionDate: DateTime!
+}
+
+type BsdaBroker {
+  "Coordonnées de l'entreprise courtier"
+  company: FormCompany
+  "Récépissé courtier"
+  recepisse: BsdaRecepisse
 }

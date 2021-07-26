@@ -40,6 +40,7 @@ const editableFields = {
     company: ifAwaitingSignature("EMISSION"),
     work: ifAwaitingSignature("WORK")
   },
+  broker: ifAwaitingSignature("EMISSION"),
   transporter: ifAwaitingSignature("TRANSPORT"),
   associations: ifAwaitingSignature("EMISSION")
 };
