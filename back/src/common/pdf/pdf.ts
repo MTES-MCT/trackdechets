@@ -1,46 +1,34 @@
-import path from "path";
-import fs from "fs/promises";
 import { Response } from "express";
-import { connect, launch } from "puppeteer";
+import {
+  pipe,
+  gotenberg,
+  convert,
+  html,
+  please,
+  to,
+  adjust
+} from "gotenberg-js-client";
 
-const cssPaths = [
-  require.resolve("modern-normalize/modern-normalize.css"),
-  require.resolve(path.join(__dirname, "assets", "pdf.css"))
-];
+export const toPDF = pipe(
+  gotenberg(process.env.GOTENBERG_URL),
+  convert,
+  html,
+  to({
+    marginTop: 0.2,
+    marginBottom: 0.2,
+    marginLeft: 0.2,
+    marginRight: 0.2
+  }),
+  adjust({ headers: { "X-Auth-Token": process.env.GOTENBERG_TOKEN ?? "" } }),
+  please
+);
 
-export async function generatePdf(content: string): Promise<Buffer> {
-  const browser =
-    process.env.NODE_ENV === "production"
-      ? await connect({
-          browserWSEndpoint: "wss://chrome.browserless.io/"
-        })
-      : await launch();
-
-  try {
-    const page = await browser.newPage();
-
-    await page.setContent(content);
-
-    await Promise.all(
-      cssPaths.map(async cssPath =>
-        page.addStyleTag({ content: await fs.readFile(cssPath, "utf-8") })
-      )
-    );
-
-    const buffer = await page.pdf({ format: "a4" });
-
-    return buffer;
-  } finally {
-    await browser.close();
-  }
-}
-
-export function sendPdf(res: Response, buffer: Buffer, filename: string) {
+export function createPDFResponse(res: Response, filename: string) {
   res.type("pdf");
 
   if (process.env.NODE_ENV === "production") {
     res.attachment(`${filename}.pdf`);
   }
 
-  res.send(buffer);
+  return res;
 }
