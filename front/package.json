@@ -48,11 +48,13 @@
     "zxcvbn": "^4.4.2"
   },
   "scripts": {
-    "generate": "npm run generate:constants && npm run generate:graphql",
+    "generate": "npm run generate:constants && npm run generate:graphql && npm run generate:tailwind",
     "generate:constants": "copyfiles ../back/src/common/constants/** ./src/generated/constants --flat",
     "generate:graphql": "graphql-codegen --config codegen.yml",
+    "generate:tailwind": "tailwindcss build src/tailwind.css -o src/generated/css/tailwind.generated.css",
     "predev": "npm run generate",
     "dev": "react-scripts start",
+    "prebuild": "npm run generate",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "build:recette": "env-cmd -f .env.recette npm run build",
@@ -60,11 +62,13 @@
     "build:production": "npm run build",
     "start": "npx serve -s build -l $PORT",
     "scalingo-postbuild": "npm run build:$BUILD_ENV",
+    "pretypes": "npm run generate",
     "types": "tsc --noEmit",
     "eject": "react-scripts eject",
     "supportedBrowsers": "echo \"// eslint-disable-next-line\nmodule.exports = $(browserslist-useragent-regexp --allowHigherVersions);\" > src/supportedBrowsers.js",
-    "build:tailwind": "tailwindcss build src/tailwind.css -o src/generated/css/tailwind.generated.css",
+    "prelint": "npm run generate",
     "lint": "eslint --ext .ts,.tsx ./src",
+    "prelint:fix": "npm run generate",
     "lint:fix": "eslint --fix --ext .ts,.tsx ./src"
   },
   "engines": {

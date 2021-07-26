@@ -26,5 +26,4 @@ yarn-debug.log*
 yarn-error.log*
 
 # generated files
-/src/generated/constants
-/src/generated/graphql
+/src/generated
