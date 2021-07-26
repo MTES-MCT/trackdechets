@@ -2837,6 +2837,12 @@ export type Mutation = {
   createForm: Form;
   /**
    * USAGE INTERNE
+   * Génère un N°SIRET factice pouvant être utilisé pour le
+   * rattachement d'un établissement de test
+   */
+  createTestCompany: Scalars["String"];
+  /**
+   * USAGE INTERNE
    * Crée un récépissé négociant
    */
   createTraderReceipt?: Maybe<TraderReceipt>;
@@ -7924,6 +7930,11 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationCreateFormArgs, "createFormInput">
+  >;
+  createTestCompany?: Resolver<
+    ResolversTypes["String"],
+    ParentType,
+    ContextType
   >;
   createTraderReceipt?: Resolver<
     Maybe<ResolversTypes["TraderReceipt"]>,

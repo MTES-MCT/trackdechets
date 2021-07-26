@@ -2892,6 +2892,12 @@ export type Mutation = {
   createForm: Form;
   /**
    * USAGE INTERNE
+   * Génère un N°SIRET factice pouvant être utilisé pour le
+   * rattachement d'un établissement de test
+   */
+  createTestCompany: Scalars["String"];
+  /**
+   * USAGE INTERNE
    * Crée un récépissé négociant
    */
   createTraderReceipt?: Maybe<TraderReceipt>;
