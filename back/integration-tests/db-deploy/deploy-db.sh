@@ -26,5 +26,3 @@ until docker exec -t $api_container_id bash -c "curl -XGET http://elasticsearch:
   >&2 echo "⏳ Elastic Search is unavailable - sleeping"
   sleep 1
 done
-
-docker exec -t $api_container_id bash -c "npm run index-elastic-search:dev"
