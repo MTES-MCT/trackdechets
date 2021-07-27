@@ -15,7 +15,7 @@
     "check:migrations": "pg-validate-migrations ./prisma/migrations",
     "test": "jest",
     "preintegration-tests": "npm run generate && npm run index-elastic-search:dev",
-    "integration-tests": "jest --config ./integration-tests/jest.config.js",
+    "integration-tests": "jest --config ./integration-tests/jest.config.js -i --forceExit",
     "types": "tsc --noEmit",
     "generate": "npm run generate:prisma && npm run generate:graphql",
     "generate:prisma": "npx prisma generate",
