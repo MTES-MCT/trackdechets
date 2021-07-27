@@ -1,15 +1,15 @@
 import { gql, MutationHookOptions, useMutation } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import { Mutation, MutationDuplicateBsdaArgs } from "generated/graphql/types";
-import { vhuFragment } from "common/fragments";
+import { bsdaFragment } from "common/fragments";
 
 const DUPLICATE_BSDA = gql`
   mutation DuplicateBsda($id: ID!) {
     duplicateBsda(id: $id) {
-      ...VhuFragment
+      ...BsdaFragment
     }
   }
-  ${vhuFragment}
+  ${bsdaFragment}
 `;
 
 export function useDuplicate(

@@ -3,7 +3,7 @@ import { Query, QueryBsdaPdfArgs } from "generated/graphql/types";
 
 export const BSDA_PDF = gql`
   query Bsdasridf($id: ID) {
-    BsdaPdf(id: $id) {
+    bsdaPdf(id: $id) {
       downloadLink
       token
     }
