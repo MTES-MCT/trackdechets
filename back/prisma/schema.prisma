@@ -456,6 +456,7 @@ model TemporaryStorageDetail {
   transporterDepartment            String?
   transporterValidityLimit         DateTime?
   transporterNumberPlate           String?
+  transporterCustomInfo            String?
   signedByTransporter              Boolean?
   signedBy                         String?
   signedAt                         DateTime?

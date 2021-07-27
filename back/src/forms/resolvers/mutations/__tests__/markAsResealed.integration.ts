@@ -209,6 +209,58 @@ describe("Mutation markAsResealed", () => {
     );
   });
 
+  test("when resealedInfos contains transporter data", async () => {
+    const owner = await userFactory();
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const destination = await destinationFactory();
+    const transporter = await companyFactory();
+
+    const { mutate } = makeClient(user);
+
+    const form = await formWithTempStorageFactory({
+      ownerId: owner.id,
+      opt: {
+        status: "TEMP_STORER_ACCEPTED",
+        recipientCompanySiret: collector.siret
+      },
+      tempStorageOpts: { destinationCompanySiret: destination.siret }
+    });
+
+    await mutate(MARK_AS_RESEALED, {
+      variables: {
+        id: form.id,
+        resealedInfos: {
+          transporter: {
+            isExemptedOfReceipt: false,
+            receipt: "333",
+            department: "27",
+            numberPlate: "",
+            validityLimit: "2021-12-31",
+            customInfo: "Route",
+            company: {
+              name: "Transporteur",
+              siret: transporter.siret,
+              address: "rue des 6 chemins",
+              contact: ".",
+              phone: ".",
+              mail: "contact@transport.fr"
+            }
+          }
+        }
+      }
+    });
+
+    const resealedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
+    expect(resealedForm.status).toEqual("RESEALED");
+  });
+
   it("should fail if destination after temp storage is not registered in TD", async () => {
     const owner = await userFactory();
     const { user, company: collector } = await userWithCompanyFactory(

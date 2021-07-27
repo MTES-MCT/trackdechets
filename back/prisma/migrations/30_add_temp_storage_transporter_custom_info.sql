@@ -1,0 +1,1 @@
+ALTER TABLE "default$default"."TemporaryStorageDetail" ADD COLUMN "transporterCustomInfo" TEXT;
