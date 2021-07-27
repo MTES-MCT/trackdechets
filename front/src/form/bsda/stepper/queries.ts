@@ -66,6 +66,16 @@ export const FullBsdaFragment = gql`
       value
       type
     }
+    worker {
+      company {
+        ...CompanyFragment
+      }
+    }
+    broker {
+      company {
+        ...CompanyFragment
+      }
+    }
     transporter {
       company {
         ...CompanyFragment
