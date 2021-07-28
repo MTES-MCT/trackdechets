@@ -1,11 +1,15 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import AccountField from "./AccountField";
-import { CompanyPrivate } from "generated/graphql/types";
+import { CompanyPrivate, UserRole } from "generated/graphql/types";
 import AccountFormCompanyVhuAgrementDemolisseur from "./forms/AccountFormCompanyAddVhuAgrementDemolisseur";
+import AccountFieldNotEditable from "./AccountFieldNotEditable";
 
 type Props = {
-  company: Pick<CompanyPrivate, "id" | "siret" | "vhuAgrementDemolisseur">;
+  company: Pick<
+    CompanyPrivate,
+    "id" | "siret" | "vhuAgrementDemolisseur" | "userRole"
+  >;
 };
 
 AccountFieldCompanyVhuAgrementDemolisseur.fragments = {
@@ -41,16 +45,26 @@ export default function AccountFieldCompanyVhuAgrementDemolisseur({
   ) : null;
 
   return (
-    <AccountField
-      name="vhuAgrementDemolisseur"
-      label="Agrément Demolisseur VHU"
-      value={vhuAgrementDemolisseur}
-      renderForm={toggleEdition => (
-        <AccountFormCompanyVhuAgrementDemolisseur
-          company={company}
-          toggleEdition={toggleEdition}
+    <>
+      {company.userRole === UserRole.Admin ? (
+        <AccountField
+          name="vhuAgrementDemolisseur"
+          label="Agrément Demolisseur VHU"
+          value={vhuAgrementDemolisseur}
+          renderForm={toggleEdition => (
+            <AccountFormCompanyVhuAgrementDemolisseur
+              company={company}
+              toggleEdition={toggleEdition}
+            />
+          )}
+        />
+      ) : (
+        <AccountFieldNotEditable
+          name="vhuAgrementDemolisseur"
+          label="Agrément Demolisseur VHU"
+          value={vhuAgrementDemolisseur}
         />
       )}
-    />
+    </>
   );
 }

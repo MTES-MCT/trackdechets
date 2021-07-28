@@ -5,7 +5,9 @@ import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
 import {
   CompanyPrivate,
   MutationUpdateCompanyArgs,
+  UserRole,
 } from "generated/graphql/types";
+import AccountFieldNotEditable from "./AccountFieldNotEditable";
 
 type Props = {
   company: CompanyPrivate;
@@ -32,23 +34,33 @@ const UPDATE_GEREP_ID = gql`
 
 export default function AccountFielCompanyGerepId({ company }: Props) {
   return (
-    <AccountField
-      name="gerepId"
-      label="Identifiant GEREP"
-      value={company.gerepId}
-      renderForm={toggleEdition => (
-        <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
+    <>
+      {company.userRole === UserRole.Admin ? (
+        <AccountField
           name="gerepId"
-          type="text"
+          label="Identifiant GEREP"
           value={company.gerepId}
-          placeHolder="Identifiant GEREP"
-          mutation={UPDATE_GEREP_ID}
-          mutationArgs={{ siret: company.siret }}
-          toggleEdition={() => {
-            toggleEdition();
-          }}
+          renderForm={toggleEdition => (
+            <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
+              name="gerepId"
+              type="text"
+              value={company.gerepId}
+              placeHolder="Identifiant GEREP"
+              mutation={UPDATE_GEREP_ID}
+              mutationArgs={{ siret: company.siret }}
+              toggleEdition={() => {
+                toggleEdition();
+              }}
+            />
+          )}
+        />
+      ) : (
+        <AccountFieldNotEditable
+          name="gerepId"
+          label="Identifiant GEREP"
+          value={company.gerepId}
         />
       )}
-    />
+    </>
   );
 }

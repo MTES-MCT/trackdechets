@@ -3,7 +3,8 @@ import { gql } from "@apollo/client";
 import AccountField from "./AccountField";
 import AccountFormCompanyTypes from "./forms/AccountFormCompanyTypes";
 import { COMPANY_TYPES } from "../../login/CompanyType";
-import { CompanyPrivate } from "generated/graphql/types";
+import { CompanyPrivate, UserRole } from "generated/graphql/types";
+import AccountFieldNotEditable from "./AccountFieldNotEditable";
 
 type Props = {
   company: CompanyPrivate;
@@ -35,18 +36,28 @@ export default function AccountFieldCompanyTypes({ company }: Props) {
   );
 
   return (
-    <AccountField
-      name="companyTypes"
-      label="Profil de l'entreprise"
-      value={v}
-      renderForm={toggleEdition => (
-        <AccountFormCompanyTypes
+    <>
+      {company.userRole === UserRole.Admin ? (
+        <AccountField
           name="companyTypes"
-          siret={company.siret}
-          companyTypes={companyTypes}
-          toggleEdition={toggleEdition}
+          label="Profil de l'entreprise"
+          value={v}
+          renderForm={toggleEdition => (
+            <AccountFormCompanyTypes
+              name="companyTypes"
+              siret={company.siret}
+              companyTypes={companyTypes}
+              toggleEdition={toggleEdition}
+            />
+          )}
+        />
+      ) : (
+        <AccountFieldNotEditable
+          name="companyTypes"
+          label="Profil de l'entreprise"
+          value={v}
         />
       )}
-    />
+    </>
   );
 }

@@ -3,10 +3,11 @@ import { gql } from "@apollo/client";
 import { formatDate } from "common/datetime";
 import AccountField from "./AccountField";
 import AccountFormCompanyTraderReceipt from "./forms/AccountFormCompanyTraderReceipt";
-import { CompanyPrivate } from "generated/graphql/types";
+import { CompanyPrivate, UserRole } from "generated/graphql/types";
+import AccountFieldNotEditable from "./AccountFieldNotEditable";
 
 type Props = {
-  company: Pick<CompanyPrivate, "id" | "siret" | "traderReceipt">;
+  company: Pick<CompanyPrivate, "id" | "siret" | "traderReceipt" | "userRole">;
 };
 
 AccountFieldCompanyTraderReceipt.fragments = {
@@ -45,16 +46,26 @@ export default function AccountFieldCompanyTraderReceipt({ company }: Props) {
   ) : null;
 
   return (
-    <AccountField
-      name="traderReceipt"
-      label="Récépissé négociant"
-      value={traderReceipt}
-      renderForm={toggleEdition => (
-        <AccountFormCompanyTraderReceipt
-          company={company}
-          toggleEdition={toggleEdition}
+    <>
+      {company.userRole === UserRole.Admin ? (
+        <AccountField
+          name="traderReceipt"
+          label="Récépissé négociant"
+          value={traderReceipt}
+          renderForm={toggleEdition => (
+            <AccountFormCompanyTraderReceipt
+              company={company}
+              toggleEdition={toggleEdition}
+            />
+          )}
+        />
+      ) : (
+        <AccountFieldNotEditable
+          name="traderReceipt"
+          label="Récépissé négociant"
+          value={traderReceipt}
         />
       )}
-    />
+    </>
   );
 }
