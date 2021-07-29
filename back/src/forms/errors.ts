@@ -89,3 +89,11 @@ export class HasSegmentToTakeOverError extends UserInputError {
     );
   }
 }
+
+export class FormAlreadyInAppendix2 extends UserInputError {
+  constructor() {
+    super(
+      "Vous ne pouvez pas passer ajouter ce bordereau à l'annexe, il est déjà associé à une autre annexe 2."
+    );
+  }
+}

@@ -3,12 +3,13 @@ import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId from "../../readableId";
 import {
+  AppendixFormInput,
   MutationCreateFormArgs,
   ResolversParentTypes
 } from "../../../generated/graphql/types";
 import { eventEmitter, TDEvent } from "../../../events/emitter";
 import { GraphQLContext } from "../../../types";
-import { MissingTempStorageFlag } from "../../errors";
+import { FormAlreadyInAppendix2, MissingTempStorageFlag } from "../../errors";
 import {
   expandFormFromDb,
   flattenFormInput,
@@ -53,6 +54,20 @@ const createFormResolver = async (
     formSirets,
     "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
   );
+
+  if (appendix2Forms) {
+    const appendix2FormsIds = appendix2Forms.map(({ id }) => id).filter(Boolean);
+    if (appendix2FormsIds.length !== appendix2Forms.length) {
+      throw new Error("Pour les bordereaux en annexe, vous devez renseigner son ID.");
+    }
+    const appendix2FormsInDb = await prisma.form.findMany({
+      where: { id: { in: appendix2FormsIds } }
+    });
+
+    if (appendix2FormsInDb.some(form => form.appendix2RootFormId != null)) {
+      throw new FormAlreadyInAppendix2();
+    }
+  }
 
   const form = flattenFormInput(formContent);
   const formCreateInput: Prisma.FormCreateInput = {

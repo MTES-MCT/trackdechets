@@ -4,6 +4,7 @@ import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
 import {
   companyFactory,
+  formFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -75,6 +76,9 @@ const CREATE_FORM = `
           other
           quantity
         }
+      }
+      appendix2Forms {
+        id
       }
     }
   }
@@ -560,6 +564,82 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message: "Le nombre de benne ou de citerne ne peut être supérieur à 2.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should allow creating a form with an appendix 2", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "AWAITING_GROUP"
+      }
+    });
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      appendix2Forms: [{ id: appendix2.id }]
+    };
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<Pick<Mutation, "createForm">>(
+      CREATE_FORM,
+      {
+        variables: { createFormInput }
+      }
+    );
+
+    expect(errors).toEqual(undefined);
+    expect(data.createForm.appendix2Forms[0].id).toBe(appendix2.id);
+  });
+
+  it("should disallow creating a form with an appendix 2 if the appendix2 form is already part of another appendix", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "AWAITING_GROUP"
+      }
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+    await prisma.form.update({
+      where: { id: form.id },
+      data: { appendix2Forms: { connect: [{ id: appendix2.id }] } }
+    });
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      appendix2Forms: [{ id: appendix2.id }]
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous ne pouvez pas passer ajouter ce bordereau à l'annexe, il est déjà associé à une autre annexe 2.",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

@@ -56,6 +56,16 @@ describe("Test appendixForms", () => {
         status: "RECEIVED"
       }
     });
+    await formFactory({
+      ownerId: emitter.id,
+      opt: {
+        emitterCompanyName: emitterCompany.name,
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        status: "AWAITING_GROUP",
+        appendix2RootForm: { connect: { id: form.id } } // Dummy link between forms
+      }
+    });
 
     const { query } = makeClient(recipient);
     const {
