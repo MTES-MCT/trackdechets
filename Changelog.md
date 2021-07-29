@@ -9,6 +9,20 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+#### :boom: Breaking changes
+
+#### :bug: Corrections de bugs
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+# [2021.08.1] 03/08/2021
+
+#### :rocket: Nouvelles fonctionnalités
+
 - Ajout du BSFF à l'interface [PR 940](https://github.com/MTES-MCT/trackdechets/pull/940)
   - Formulaire de création et d'édition
   - Écrans de signature de l'émetteur et du transporteur
@@ -18,8 +32,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
   - Ajout de la propriété `nextBsff` et `nextBsffs`.
   - Ajout de la propriété `volume` à `BsffPackaging`.
   - Remplacement de la propriété `type` de `BsffPackaging` par un champ libre `name`.
-
 - Ajout de la possibilité de générer un n°SIRET factice pour la création d'établissements de test [PR 945](https://github.com/MTES-MCT/trackdechets/pull/945)
+
 #### :boom: Breaking changes
 
 #### :bug: Corrections de bugs
