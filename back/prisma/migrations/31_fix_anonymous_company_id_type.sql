@@ -1,0 +1,1 @@
+ALTER TABLE "default$default"."AnonymousCompany" ALTER COLUMN "id" SET DATA TYPE TEXT;
