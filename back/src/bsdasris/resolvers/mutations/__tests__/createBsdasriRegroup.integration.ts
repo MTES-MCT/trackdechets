@@ -12,6 +12,7 @@ mutation DasriCreate($input: BsdasriCreateInput!) {
   createBsdasri(input: $input)  {
     id
     isDraft
+    bsdasriType
     status
     emitter {
       company {
@@ -220,7 +221,7 @@ describe("Mutation.createDasri", () => {
       toRegroup1.id,
       toRegroup2.id
     ]);
-
+    expect(data.createBsdasri.bsdasriType).toEqual("GROUPING");
     const regrouped1 = await prisma.bsdasri.findUnique({
       where: { id: toRegroup1.id }
     });

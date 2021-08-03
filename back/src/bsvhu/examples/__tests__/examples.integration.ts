@@ -5,7 +5,11 @@ import vhuVersBroyeurWorkflow from "../workflows/vhuVersBroyeur";
 describe("Exemples de circuit du bordereau de suivi DASRI", () => {
   afterEach(resetDatabase);
 
-  test(vhuVersBroyeurWorkflow.title, async () => {
-    await testWorkflow(vhuVersBroyeurWorkflow);
-  });
+  test(
+    vhuVersBroyeurWorkflow.title,
+    async () => {
+      await testWorkflow(vhuVersBroyeurWorkflow);
+    },
+    10000
+  );
 });

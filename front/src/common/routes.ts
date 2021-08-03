@@ -34,12 +34,18 @@ export default {
     bsdasris: {
       view: "/dashboard/:siret/bsdasris/view/:id",
       create: "/dashboard/:siret/bsdasris/create",
+      createGroup: "/dashboard/:siret/bsdasris/create-group",
       edit: "/dashboard/:siret/bsdasris/edit/:id",
     },
     bsvhus: {
       create: "/dashboard/:siret/bsvhus/create",
       edit: "/dashboard/:siret/bsvhus/edit/:id",
       view: "/dashboard/:siret/bsvhus/view/:id",
+    },
+    bsffs: {
+      create: "/dashboard/:siret/bsffs/create",
+      edit: "/dashboard/:siret/bsffs/edit/:id",
+      view: "/dashboard/:siret/bsffs/view/:id",
     },
     transport: {
       index: "/dashboard/:siret/transport",

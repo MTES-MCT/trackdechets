@@ -11,7 +11,12 @@ const links = [
     title: "Bordereau de suivi DASRI",
     route: routes.dashboard.bsdasris.create,
   },
+  {
+    title: "Bordereau de groupement DASRI",
+    route: routes.dashboard.bsdasris.createGroup,
+  },
   { title: "Bordereau de suivi VHU", route: routes.dashboard.bsvhus.create },
+  { title: "Bordereau de suivi FF", route: routes.dashboard.bsffs.create },
 ];
 
 export function NewBSDDropdown({ siret }: Props) {

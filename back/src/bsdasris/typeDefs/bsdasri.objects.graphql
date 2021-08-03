@@ -66,13 +66,13 @@ type BsdasriPackagingInfo {
 
 type BsdasriQuantity {
   "Quantité en kg"
-  value: Int
+  value: Float
   "Quantité réélle (pesée ou estimée)"
   type: QuantityType
 }
 type BsdasriOperationQuantity {
   "Quantité en kg"
-  value: Int
+  value: Float
 }
 
 "Détail sur le déchet emis du Bsdasri"
@@ -89,7 +89,7 @@ type BsdasriEmissionWasteDetails {
 type BsdasriTransportWasteDetails {
   "Quantité transportée"
   quantity: BsdasriQuantity
- 
+
   volume: Int
   packagingInfos: [BsdasriPackagingInfo!]
 }
@@ -116,7 +116,7 @@ type BsdasriEmission {
 type BsdasriWasteAcceptation {
   status: String
   refusalReason: String
-  refusedQuantity: Int
+  refusedQuantity: Float
 }
 
 "Informations relatives au transport du Bsdasri"
@@ -152,6 +152,7 @@ type BsdasriOperation {
 type Bsdasri {
   id: ID!
   status: BsdasriStatus!
+  bsdasriType: BsdasriType!
   createdAt: DateTime
   updatedAt: DateTime
   isDraft: Boolean!
@@ -170,6 +171,8 @@ type Bsdasri {
   regroupedBsdasris: [ID!]
 
   metadata: BsdasriMetadata!
+
+  allowDirectTakeOver: Boolean
 }
 
 type BsdasriError {

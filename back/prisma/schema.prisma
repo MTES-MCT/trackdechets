@@ -191,6 +191,9 @@ model Company {
 // Dans ce cas les API SIRENE ne diffusent pas les informations de cette entreprise dans
 // les résultats de recherche. Pour des raisons de sécurité, certaines associations et les
 // organismes relevant du Ministère de la Défense ne sont pas diffusibles non plus."
+//
+// Cette table permet également de stocker de "faux établissements" pouvant être visés lors
+// du rattachement d'établissements de test sur l'environnement sandbox
 model AnonymousCompany {
   id          String @id @default(cuid())
   siret       String @unique
@@ -453,6 +456,7 @@ model TemporaryStorageDetail {
   transporterDepartment            String?
   transporterValidityLimit         DateTime?
   transporterNumberPlate           String?
+  transporterCustomInfo            String?
   signedByTransporter              Boolean?
   signedBy                         String?
   signedAt                         DateTime?
@@ -679,8 +683,15 @@ enum BsdasriEmitterType {
   COLLECTOR
 }
 
+enum BsdasriType {
+  SIMPLE
+  GROUPING
+  SYNTHESIS
+}
+
 model Bsdasri {
   id        String        @unique
+  bsdasriType BsdasriType @default(SIMPLE)
   status    BsdasriStatus @default(INITIAL)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
@@ -711,7 +722,7 @@ model Bsdasri {
   wasteDetailsCode    String?
   wasteDetailsOnuCode String?
 
-  emitterWasteQuantity       Int? // kg
+  emitterWasteQuantity       Float? // kg
   emitterWasteQuantityType   QuantityType?
   emitterWasteVolume         Int? // liters
   emitterWastePackagingsInfo Json?
@@ -739,15 +750,15 @@ model Bsdasri {
   transporterCustomInfo String? // free field
 
   // transport
-  transportMode                     TransportMode? @default(ROAD)
+  transportMode                     TransportMode?          @default(ROAD)
   transporterWasteAcceptationStatus WasteAcceptationStatus?
   transporterWasteRefusalReason     String?
-  transporterWasteRefusedQuantity   Int? // kg
+  transporterWasteRefusedQuantity   Float? // kg
 
   transporterTakenOverAt DateTime?
 
   transporterWastePackagingsInfo Json?
-  transporterWasteQuantity       Int? // kg
+  transporterWasteQuantity       Float? // kg
   transporterWasteQuantityType   QuantityType?
   transporterWasteVolume         Int? // liters
 
@@ -773,8 +784,8 @@ model Bsdasri {
   recipientWastePackagingsInfo    Json?
   recipientWasteAcceptationStatus WasteAcceptationStatus?
   recipientWasteRefusalReason     String?
-  recipientWasteRefusedQuantity   Int? // kg
-  recipientWasteQuantity          Int? // kg
+  recipientWasteRefusedQuantity   Float? // kg
+  recipientWasteQuantity          Float? // kg
 
   recipientWasteVolume Int? // liters
   receivedAt           DateTime? // accepted or refused date
@@ -818,7 +829,7 @@ model Bsff {
   emitterEmissionSignatureAuthor String?
   emitterEmissionSignatureDate   DateTime?
 
-  packagings Json?
+  packagings Json @default("[]")
 
   wasteCode        String?
   wasteNature      String?
@@ -877,9 +888,9 @@ model Bsff {
 
   ficheInterventions BsffFicheIntervention[] @relation("FicheInterventionToBsff")
 
-  bsffs  Bsff[]  @relation("BsffToBsff")
-  Bsff   Bsff?   @relation("BsffToBsff", fields: [bsffId], references: [id])
-  bsffId String?
+  previousBsffs Bsff[]  @relation("BsffToBsff")
+  nextBsff      Bsff?   @relation("BsffToBsff", fields: [nextBsffId], references: [id])
+  nextBsffId    String?
 }
 
 enum BsffStatus {
@@ -980,6 +991,16 @@ model Bsda {
   quantityType  QuantityType?
   quantityValue Float?
 
+  brokerCompanyName    String?
+  brokerCompanySiret   String?
+  brokerCompanyAddress String?
+  brokerCompanyContact String?
+  brokerCompanyPhone   String?
+  brokerCompanyMail    String?
+  brokerRecepisseNumber        String?
+  brokerRecepisseDepartment     String?
+  brokerRecepisseValidityLimit  DateTime?
+
   destinationCompanyName          String?
   destinationCompanySiret         String?
   destinationCompanyAddress       String?
@@ -1000,16 +1021,32 @@ model Bsda {
   destinationOperationSignatureAuthor String?
   destinationOperationSignatureDate   DateTime?
 
-  transporterCompanyName              String?
-  transporterCompanySiret             String?
-  transporterCompanyAddress           String?
-  transporterCompanyContact           String?
-  transporterCompanyPhone             String?
-  transporterCompanyMail              String?
-  transporterCompanyVatNumber         String?
-  transporterRecepisseNumber          String?
-  transporterRecepisseDepartment      String?
-  transporterRecepisseValidityLimit   DateTime?
+  destinationOperationNextDestinationCompanySiret         String?
+  destinationOperationNextDestinationCompanyVatNumber     String?
+  destinationOperationNextDestinationCompanyName          String?
+  destinationOperationNextDestinationCompanyAddress       String?
+  destinationOperationNextDestinationCompanyContact       String?
+  destinationOperationNextDestinationCompanyPhone         String?
+  destinationOperationNextDestinationCompanyMail          String?
+  destinationOperationNextDestinationCap                  String?
+  destinationOperationNextDestinationPlannedOperationCode String?
+
+  transporterCompanyName      String?
+  transporterCompanySiret     String?
+  transporterCompanyAddress   String?
+  transporterCompanyContact   String?
+  transporterCompanyPhone     String?
+  transporterCompanyMail      String?
+  transporterCompanyVatNumber String?
+
+  transporterRecepisseIsExempted    Boolean?
+  transporterRecepisseNumber        String?
+  transporterRecepisseDepartment    String?
+  transporterRecepisseValidityLimit DateTime?
+
+  transporterTransportMode            TransportMode?
+  transporterTransportPlates          String[]
+  transporterTransportTakenOverAt     DateTime?
   transporterTransportSignatureAuthor String?
   transporterTransportSignatureDate   DateTime?
 

@@ -2,6 +2,11 @@ import * as React from "react";
 import { CellProps, CellValue } from "react-table";
 import { BsffStatus } from "generated/graphql/types";
 import { IconBSFF } from "common/components/Icons";
+import { BsffActions } from "./BsffActions/BsffActions";
+import { BsffFragment } from "./types";
+import { ActionButtonContext } from "common/components/ActionButton";
+import { WorkflowAction } from "./WorkflowAction";
+import { useParams } from "react-router-dom";
 
 const bsffVerboseStatuses: Record<BsffStatus, string> = {
   INITIAL: "Initial",
@@ -11,25 +16,6 @@ const bsffVerboseStatuses: Record<BsffStatus, string> = {
   PROCESSED: "Traité",
   REFUSED: "Refusé",
 };
-
-export interface BsffFragment {
-  id: string;
-  bsffStatus: BsffStatus;
-  bsffEmitter?: {
-    company?: {
-      name?: string;
-    };
-  };
-  bsffDestination?: {
-    company?: {
-      name?: string;
-    };
-  };
-  waste?: {
-    code?: string;
-    nature?: string;
-  };
-}
 
 export const COLUMNS: Record<
   string,
@@ -68,10 +54,19 @@ export const COLUMNS: Record<
   },
   workflow: {
     accessor: () => null,
-    Cell: () => null,
+    Cell: ({ row }) => {
+      const { siret } = useParams<{ siret: string }>();
+      return (
+        <ActionButtonContext.Provider value={{ size: "small" }}>
+          <WorkflowAction siret={siret} form={row.original} />
+        </ActionButtonContext.Provider>
+      );
+    },
   },
   actions: {
     accessor: () => null,
-    Cell: () => null,
+    Cell: ({ row }) => <BsffActions form={row.original} />,
   },
 };
+
+export * from "./types";

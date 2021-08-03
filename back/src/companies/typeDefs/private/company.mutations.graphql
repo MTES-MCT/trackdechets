@@ -151,4 +151,11 @@ type Mutation {
   sendVerificationCodeLetter(
     input: SendVerificationCodeLetterInput!
   ): CompanyForVerification!
+
+  """
+  USAGE INTERNE
+  Génère un N°SIRET factice pouvant être utilisé pour le
+  rattachement d'un établissement de test
+  """
+  createTestCompany: String!
 }

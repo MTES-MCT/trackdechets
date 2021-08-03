@@ -6,19 +6,41 @@ import { BsdasriStatus } from "generated/graphql/types";
 import React from "react";
 import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 import Packagings from "./components/packagings/Packagings";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import { getInitialQuantityFn } from "./utils/initial-state";
 import { transportModeLabels } from "dashboard/constants";
+import { FillFieldsInfo, DisabledFieldsInfo } from "./utils/commons";
+import classNames from "classnames";
 
-export default function Transporter({ status }) {
+import QuantityWidget from "./components/Quantity";
+
+/**
+ *
+ * Tweaked Transporter component where takeover fields can be displayed on demand
+ * This is useful to edit these fields for direct takeover, as they're usually hidden as long as the dasri is not SIGNED_BY_TRANPORTER
+ */
+export function TransporterShowingTakeOverFields({ status, stepName }) {
+  return (
+    <BaseTransporter
+      status={status}
+      displayTakeoverFields={true}
+      stepName={stepName}
+    />
+  );
+}
+
+export default function Transporter({ status, stepName }) {
+  return <BaseTransporter status={status} stepName={stepName} />;
+}
+function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
   const { setFieldValue } = useFormikContext();
 
   // it's pointless to show transport fields until form is signed by producer
-  const showTransportFields = [
-    BsdasriStatus.SignedByProducer,
-    BsdasriStatus.Sent,
-    BsdasriStatus.Received,
-  ].includes(status);
+  const showTransportFields =
+    [
+      BsdasriStatus.SignedByProducer,
+      BsdasriStatus.Sent,
+      BsdasriStatus.Received,
+    ].includes(status) || displayTakeoverFields;
   // handedOverAt is editable even after dasri reception
   const showHandedOverAtField = [
     BsdasriStatus.Sent,
@@ -28,42 +50,43 @@ export default function Transporter({ status }) {
   const disabled = [BsdasriStatus.Sent, BsdasriStatus.Received].includes(
     status
   );
-
+  const transportEmphasis = stepName === "transport";
   return (
     <>
-      {disabled && (
-        <div className="notification notification--error">
-          Les champs grisés ci-dessous ont été scellés via signature et ne sont
-          plus modifiables.
-        </div>
-      )}
-
-      <CompanySelector
-        disabled={disabled}
-        name="transporter.company"
-        heading="Entreprise de transport"
-        optionalMail={true}
-        onCompanySelected={transporter => {
-          if (transporter.transporterReceipt) {
-            setFieldValue(
-              "transporter.receipt",
-              transporter.transporterReceipt.receiptNumber
-            );
-            setFieldValue(
-              "transporter.receiptValidityLimit",
-              transporter.transporterReceipt.validityLimit
-            );
-            setFieldValue(
-              "transporter.receiptDepartment",
-              transporter.transporterReceipt.department
-            );
-          } else {
-            setFieldValue("transporter.receipt", "");
-            setFieldValue("transporter.receiptValidityLimit", null);
-            setFieldValue("transporter.receiptDepartment", "");
-          }
-        }}
-      />
+      {transportEmphasis && <FillFieldsInfo />}
+      {disabled && <DisabledFieldsInfo />}
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": transportEmphasis,
+        })}
+      >
+        <CompanySelector
+          disabled={disabled}
+          name="transporter.company"
+          heading="Entreprise de transport"
+          optionalMail={true}
+          onCompanySelected={transporter => {
+            if (transporter.transporterReceipt) {
+              setFieldValue(
+                "transporter.receipt",
+                transporter.transporterReceipt.receiptNumber
+              );
+              setFieldValue(
+                "transporter.receiptValidityLimit",
+                transporter.transporterReceipt.validityLimit
+              );
+              setFieldValue(
+                "transporter.receiptDepartment",
+                transporter.transporterReceipt.department
+              );
+            } else {
+              setFieldValue("transporter.receipt", "");
+              setFieldValue("transporter.receiptValidityLimit", null);
+              setFieldValue("transporter.receiptDepartment", "");
+            }
+          }}
+        />
+      </div>
       <div className="form__row">
         <label>
           Champ libre (optionnel)
@@ -75,9 +98,12 @@ export default function Transporter({ status }) {
           />
         </label>
       </div>
-
       <h4 className="form__section-heading">Autorisations</h4>
-      <div className="form__row">
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": transportEmphasis,
+        })}
+      >
         <label>
           Numéro de récépissé
           <Field
@@ -90,7 +116,11 @@ export default function Transporter({ status }) {
 
         <RedErrorMessage name="transporter.receipt" />
       </div>
-      <div className="form__row">
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": transportEmphasis,
+        })}
+      >
         <label>
           Département
           <Field
@@ -104,7 +134,11 @@ export default function Transporter({ status }) {
 
         <RedErrorMessage name="transporter.receiptDepartment" />
       </div>
-      <div className="form__row">
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": transportEmphasis,
+        })}
+      >
         <label>
           Limite de validité
           <div className="td-date-wrapper">
@@ -119,9 +153,7 @@ export default function Transporter({ status }) {
 
         <RedErrorMessage name="transporter.receiptValidityLimit" />
       </div>
-
       <h4 className="form__section-heading">Transport du déchet</h4>
-
       {showTransportFields ? (
         <>
           <div className="form__row">
@@ -131,6 +163,7 @@ export default function Transporter({ status }) {
               name="transport.mode"
               id="id_mode"
               className="td-select"
+              disabled={disabled}
             >
               {Object.entries(transportModeLabels).map(([k, v]) => (
                 <option value={`${k}`} key={k}>
@@ -139,12 +172,22 @@ export default function Transporter({ status }) {
               ))}
             </Field>
           </div>
-          <Field
-            name="transport.wasteAcceptation"
-            component={Acceptation}
-            disabled={disabled}
-          />
-          <div className="form__row">
+          <div
+            className={classNames("form__row", {
+              "field-emphasis": transportEmphasis,
+            })}
+          >
+            <Field
+              name="transport.wasteAcceptation"
+              component={Acceptation}
+              disabled={disabled}
+            />
+          </div>
+          <div
+            className={classNames("form__row", {
+              "field-emphasis": transportEmphasis,
+            })}
+          >
             <label>
               Date de prise en charge
               <div className="td-date-wrapper">
@@ -157,50 +200,25 @@ export default function Transporter({ status }) {
               </div>
             </label>
           </div>
-          <Field
-            name="transport.wasteDetails.packagingInfos"
-            component={Packagings}
-            disabled={disabled}
-          />
+          <div
+            className={classNames("form__row", {
+              "field-emphasis": transportEmphasis,
+            })}
+          >
+            <Field
+              name="transport.wasteDetails.packagingInfos"
+              component={Packagings}
+              disabled={disabled}
+            />
+          </div>
           <h4 className="form__section-heading">Quantité transportée</h4>
 
-          <div className="form__row">
-            <label>
-              Quantité en kg :
-              <Field
-                component={NumberInput}
-                name="transport.wasteDetails.quantity.value"
-                className="td-input dasri__waste-details__quantity"
-                disabled={disabled}
-                placeholder="En kg"
-                min="0"
-                step="1"
-              />
-              <span className="tw-ml-2">kg</span>
-            </label>
-
-            <RedErrorMessage name="transport.wasteDetails.quantity.value" />
-          </div>
-
-          <div className="form__row">
-            <fieldset>
-              <legend className="tw-font-semibold">Cette quantité est</legend>
-              <Field
-                name="transport.wasteDetails.quantity.type"
-                id="REAL"
-                label="Réélle"
-                component={RadioButton}
-                disabled={disabled}
-              />
-              <Field
-                name="transport.wasteDetails.quantity.type"
-                id="ESTIMATED"
-                label="Estimée"
-                component={RadioButton}
-                disabled={disabled}
-              />
-            </fieldset>
-          </div>
+          <QuantityWidget
+            disabled={disabled}
+            switchLabel="Je souhaite ajouter une quantité"
+            dasriSection="transport"
+            getInitialQuantityFn={getInitialQuantityFn}
+          />
         </>
       ) : (
         <p>
@@ -208,9 +226,12 @@ export default function Transporter({ status }) {
           producteur
         </p>
       )}
-
       {showHandedOverAtField ? (
-        <div className="form__row">
+        <div
+          className={classNames("form__row", {
+            "field-emphasis": transportEmphasis,
+          })}
+        >
           <label>
             Date de remise à l'installation destinataire (optionnel)
             <div className="td-date-wrapper">

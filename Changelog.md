@@ -9,8 +9,54 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+#### :boom: Breaking changes
+
+#### :bug: Corrections de bugs
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+# [2021.08.1] 03/08/2021
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout du BSFF à l'interface [PR 940](https://github.com/MTES-MCT/trackdechets/pull/940)
+  - Formulaire de création et d'édition
+  - Écrans de signature de l'émetteur et du transporteur
+  - Aperçu détaillé
+- Évolutions de l'API BSFF [PR 940](https://github.com/MTES-MCT/trackdechets/pull/940)
+  - Renommage de la propriété `bsffs` en `previousBsffs`.
+  - Ajout de la propriété `nextBsff` et `nextBsffs`.
+  - Ajout de la propriété `volume` à `BsffPackaging`.
+  - Remplacement de la propriété `type` de `BsffPackaging` par un champ libre `name`.
+- Ajout de la possibilité de générer un n°SIRET factice pour la création d'établissements de test [PR 945](https://github.com/MTES-MCT/trackdechets/pull/945)
+
+#### :boom: Breaking changes
+
+#### :bug: Corrections de bugs
+
+#### :nail_care: Améliorations
+
+- Création et édition de bordereaux Dasri de groupement [PR934](https://github.com/MTES-MCT/trackdechets/pull/934)
+- Emport direct de bordereaux Dasris quand le producteur l'a autorisé [935](https://github.com/MTES-MCT/trackdechets/pull/935)
+- Ajout de champs sur le BSDA: courtier, mode de transport, immatriculations, exemption de récépissé transporteur et destination ultérieure prévue [PR 938](https://github.com/MTES-MCT/trackdechets/pull/938)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Mise à jour de l'intégration continue [PR 937](https://github.com/MTES-MCT/trackdechets/pull/937)
+- Stabilisation de la génération des PDFs via Gotenberg [PR944](https://github.com/MTES-MCT/trackdechets/pull/944)
+
+# [2021.07.1] 12/07/2021
+
+#### :rocket: Nouvelles fonctionnalités
+
 - Ajout d'un bouton pour choisir le type de bordereau à créer [PR 899](https://github.com/MTES-MCT/trackdechets/pull/899)
-- Les producteurs peuvent autoriser l'emport de dasri sans leur signature depuis l'UI[PR 904] (https://github.com/MTES-MCT/trackdechets/pull/904)
+- Les producteurs peuvent autoriser l'emport de dasri sans leur signature depuis l'UI[PR 904](https://github.com/MTES-MCT/trackdechets/pull/904)
 - Ajout des BSFFs au tableau de bord [PR 909](https://github.com/MTES-MCT/trackdechets/pull/909)
 - Évolutions de l'API BSFF suite aux retours de nos partenaires [PR 909][https://github.com/mtes-mct/trackdechets/pull/909]
   - Refonte de la gestion des fiches d'intervention : modification du modèle et des mutations
@@ -18,6 +64,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
   - Renommage du champ `BsffPackaging.litres` en `BsffPackaging.kilos`
   - Renommage du champ `BsffWaste.description` en `BsffWaste.nature`
   - Ajout du champ `Bsff.status`
+- Le champ `allowBsdasriTakeOverWithoutSignature` est disponible sur companyPublic [PR 928][https://github.com/mtes-mct/trackdechets/pull/928]
 
 #### :boom: Breaking changes
 
@@ -34,10 +81,12 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Les codes R12 et D12 autorisés uniquement si le destinataire est TTR [PR 914](https://github.com/MTES-MCT/trackdechets/pull/914)
 - Les champs emails du bordereau dasri sont facultatifs [PR 916](https://github.com/MTES-MCT/trackdechets/pull/916)
+- Les différentes quantités (masses) du Bsdasri deviennent des flottants, le champ `onBehalfOfEcoorganisme` n'est plus réservé au Bsdasri de groupement [PR 928](https://github.com/MTES-MCT/trackdechets/pull/928)
 
 #### :memo: Documentation
 
 - Re-structuration de la documentation et ajout d'exemples de bout en bout [PR 905](https://github.com/MTES-MCT/trackdechets/pull/905)
+
 #### :house: Interne
 
 - Indexation des BSFF dans Elastic Search [PR 909](https://github.com/MTES-MCT/trackdechets/pull/909)
@@ -70,6 +119,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Suppression du statut de vérification de l'établissement dans Mon Compte en sandbox [PR 895](https://github.com/MTES-MCT/trackdechets/pull/895)
 - Limite la rupture de traçabilité aux opérations correspondant à un regroupement [PR 878](https://github.com/MTES-MCT/trackdechets/pull/878)
+- Amélioration de l'UI de signature DASRI avec pré-validation des champs, renvoi vers l'onglet concerné du formulaire avec mise en valeur des champs à mettre à jour [PR 924](https://github.com/MTES-MCT/trackdechets/pull/924).
 
 #### :memo: Documentation
 

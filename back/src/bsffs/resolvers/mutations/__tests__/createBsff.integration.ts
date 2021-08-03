@@ -102,7 +102,7 @@ describe("Mutation.createBsff", () => {
     ]);
   });
 
-  describe("when associating bsffs", () => {
+  describe("when adding previous bsffs", () => {
     let emitter: UserWithCompany;
     let transporter: UserWithCompany;
     let destination: UserWithCompany;
@@ -113,8 +113,8 @@ describe("Mutation.createBsff", () => {
       destination = await userWithCompanyFactory(UserRole.ADMIN);
     });
 
-    it("should associate bsffs for groupement", async () => {
-      const bsffToAssociate = await createBsffAfterOperation(
+    it("should add bsffs for groupement", async () => {
+      const previousBsff = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
           destinationOperationCode: OPERATION_CODES.R12
@@ -137,19 +137,19 @@ describe("Mutation.createBsff", () => {
                 mail: destination.user.email
               }
             },
-            bsffs: [bsffToAssociate.id]
+            previousBsffs: [previousBsff.id]
           }
         }
       });
 
-      const associatedBsffs = await prisma.bsff
+      const previousBsffs = await prisma.bsff
         .findUnique({ where: { id: data.createBsff.id } })
-        .bsffs();
-      expect(associatedBsffs).toHaveLength(1);
+        .previousBsffs();
+      expect(previousBsffs).toHaveLength(1);
     });
 
-    it("should associate bsffs for réexpédition", async () => {
-      const bsffToAssociate = await createBsffAfterOperation(
+    it("should add bsffs for réexpédition", async () => {
+      const previousBsff = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
           destinationOperationCode: null
@@ -172,19 +172,19 @@ describe("Mutation.createBsff", () => {
                 mail: destination.user.email
               }
             },
-            bsffs: [bsffToAssociate.id]
+            previousBsffs: [previousBsff.id]
           }
         }
       });
 
-      const associatedBsffs = await prisma.bsff
+      const previousBsffs = await prisma.bsff
         .findUnique({ where: { id: data.createBsff.id } })
-        .bsffs();
-      expect(associatedBsffs).toHaveLength(1);
+        .previousBsffs();
+      expect(previousBsffs).toHaveLength(1);
     });
 
-    it("should disallow associating bsffs with missing signatures", async () => {
-      const bsffs = await Promise.all([
+    it("should disallow adding bsffs with missing signatures", async () => {
+      const previousBsffs = await Promise.all([
         createBsffAfterEmission(
           { emitter, transporter, destination },
           {
@@ -209,7 +209,7 @@ describe("Mutation.createBsff", () => {
                 mail: destination.user.email
               }
             },
-            bsffs: bsffs.map(bsff => bsff.id)
+            previousBsffs: previousBsffs.map(bsff => bsff.id)
           }
         }
       });

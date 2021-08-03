@@ -5,7 +5,11 @@ import acheminementDirectWorkflow from "../workflows/acheminementDirect";
 describe("Exemples de circuit du bordereau de suivi DASRI", () => {
   afterEach(resetDatabase);
 
-  test(acheminementDirectWorkflow.title, async () => {
-    await testWorkflow(acheminementDirectWorkflow);
-  });
+  test(
+    acheminementDirectWorkflow.title,
+    async () => {
+      await testWorkflow(acheminementDirectWorkflow);
+    },
+    10000
+  );
 });

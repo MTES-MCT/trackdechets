@@ -161,6 +161,9 @@ type CompanyPublic {
   Liste des agréments de l'éco-organisme
   """
   ecoOrganismeAgreements: [URL!]!
+
+  "L'entreprise autorise l'enlèvement d'un Dasri sans sa signature"
+  allowBsdasriTakeOverWithoutSignature: Boolean
 }
 
 "Information sur un établissement accessible publiquement en recherche"

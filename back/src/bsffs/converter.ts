@@ -90,9 +90,7 @@ export function flattenBsffInput(
   });
 }
 
-export function unflattenBsff(
-  prismaBsff: Prisma.Bsff
-): Omit<GraphQL.Bsff, "ficheInterventions" | "bsffs"> {
+export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
   return {
     id: prismaBsff.id,
     status: prismaBsff.status,
@@ -188,7 +186,11 @@ export function unflattenBsff(
         code: prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode
       }),
       cap: prismaBsff.destinationCap
-    })
+    }),
+    ficheInterventions: [],
+    nextBsff: null,
+    nextBsffs: [],
+    previousBsffs: []
   };
 }
 

@@ -164,6 +164,7 @@ export function SignatureEmitter({
           style={{ width: "100px" }}
         />
       </div>
+      <RedErrorMessage name="securityCode" />
       <div className="form__row">
         <Label htmlFor="id_sentBy">Nom et prénom</Label>
         <Field
@@ -174,6 +175,7 @@ export function SignatureEmitter({
           style={{ width: "350px" }}
         />
       </div>
+      <RedErrorMessage name="sentBy" />
       {error && <NotificationError apolloError={error} />}
       <div className="form__actions mb-2">
         <PreviousButton onClick={onPrevious} />

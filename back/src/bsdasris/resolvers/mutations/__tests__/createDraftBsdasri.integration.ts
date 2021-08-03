@@ -14,6 +14,7 @@ mutation DasriCreate($input: BsdasriCreateInput!) {
   createDraftBsdasri(input: $input)  {
     id
     isDraft
+    bsdasriType
     status
     recipient {
       company {
@@ -104,6 +105,7 @@ describe("Mutation.createDraftBsdasri", () => {
 
     expect(data.createDraftBsdasri.isDraft).toBe(true);
     expect(data.createDraftBsdasri.status).toBe("INITIAL");
+    expect(data.createDraftBsdasri.bsdasriType).toBe("SIMPLE");
     expect(data.createDraftBsdasri.recipient.company).toMatchObject(
       input.recipient.company
     );

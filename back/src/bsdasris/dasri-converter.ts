@@ -34,7 +34,7 @@ export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
   return {
     id: bsdasri.id,
     isDraft: bsdasri.isDraft,
-
+    bsdasriType: bsdasri.bsdasriType,
     emitter: nullIfNoValues<BsdasriEmitter>({
       company: nullIfNoValues<FormCompany>({
         name: bsdasri.emitterCompanyName,
@@ -157,7 +157,8 @@ export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
     createdAt: bsdasri.createdAt,
     updatedAt: bsdasri.updatedAt,
     status: bsdasri.status as BsdasriStatus,
-    metadata: null
+    metadata: null,
+    allowDirectTakeOver: null
   };
 }
 

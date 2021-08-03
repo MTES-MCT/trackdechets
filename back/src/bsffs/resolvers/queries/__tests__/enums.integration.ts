@@ -1,5 +1,5 @@
 import makeClient from "../../../../__tests__/testClient";
-import { OPERATION_CODES, PACKAGING_TYPE } from "../../../constants";
+import { OPERATION_CODES } from "../../../constants";
 
 const GET_ENUM = `
   query GetEnum($name: String!) {
@@ -15,19 +15,19 @@ interface GetEnumQuery {
 }
 
 describe("Bsff enums", () => {
-  it.each([
-    ["BsffOperationCode", Object.keys(OPERATION_CODES)],
-    ["BsffPackagingType", Object.keys(PACKAGING_TYPE)]
-  ])("should list all %s values", async (name, keys) => {
-    const { query } = makeClient();
-    const { data } = await query<GetEnumQuery>(GET_ENUM, {
-      variables: {
-        name
-      }
-    });
+  it.each([["BsffOperationCode", Object.keys(OPERATION_CODES)]])(
+    "should list all %s values",
+    async (name, keys) => {
+      const { query } = makeClient();
+      const { data } = await query<GetEnumQuery>(GET_ENUM, {
+        variables: {
+          name
+        }
+      });
 
-    expect(data.__type.enumValues.map(({ name }) => name).sort()).toEqual(
-      keys.sort()
-    );
-  });
+      expect(data.__type.enumValues.map(({ name }) => name).sort()).toEqual(
+        keys.sort()
+      );
+    }
+  );
 });

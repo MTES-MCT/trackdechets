@@ -24,6 +24,8 @@ import { CREATE_BSDASRI, GET_BSDASRI, UPDATE_BSDASRI } from "./utils/queries";
 interface Props {
   children: (dasriForm: Bsdasri | undefined) => ReactElement;
   formId?: string;
+  initialStep?: number;
+  bsdasriFormType?: string;
 }
 /**
  * Do not resend sections locked by relevant signatures
@@ -69,6 +71,7 @@ export default function BsdasriStepsList(props: Props) {
     }
   );
 
+  // prefill packaging info with previous dasri actor data
   const prefillWasteDetails = dasri => {
     if (!dasri?.transport?.wasteDetails?.packagingInfos?.length) {
       dasri.transport.wasteDetails.packagingInfos =
@@ -76,19 +79,27 @@ export default function BsdasriStepsList(props: Props) {
     }
     if (!dasri?.reception?.wasteDetails?.packagingInfos?.length) {
       dasri.reception.wasteDetails.packagingInfos =
-        dasri?.emission?.wasteDetails?.packagingInfos;
+        dasri?.transport?.wasteDetails?.packagingInfos;
     }
     return dasri;
   };
+  const mapRegrouped = dasri => ({
+    ...dasri,
+    regroupedBsdasris: dasri?.regroupedBsdasris.map(r => ({
+      id: r,
+    })),
+  });
 
   const formState = useMemo(
     () =>
       prefillWasteDetails(
-        getComputedState(getInitialState(), formQuery.data?.bsdasri)
+        getComputedState(
+          getInitialState(),
+          mapRegrouped(formQuery.data?.bsdasri)
+        )
       ),
     [formQuery.data]
   );
-
   const status = formState.id
     ? formQuery?.data?.bsdasri?.["bsdasriStatus"]
     : "INITIAL";
@@ -119,6 +130,17 @@ export default function BsdasriStepsList(props: Props) {
     // As we want to be able to save draft, we skip validation on submit
     // and don't use the classic Formik mechanism
 
+    if (
+      props.bsdasriFormType === "bsdasriRegroup" ||
+      formQuery.data?.bsdasri?.bsdasriType === "GROUPING"
+    ) {
+      if (!values?.regroupedBsdasris?.length) {
+        cogoToast.error("Vous devez sélectionner des bordereaux à regrouper", {
+          hideAfter: 7,
+        });
+        return;
+      }
+    }
     const { id, ...input } = values;
     saveForm(input)
       .then(_ => {
@@ -154,6 +176,7 @@ export default function BsdasriStepsList(props: Props) {
       onSubmit={onSubmit}
       initialValues={formState}
       validationSchema={null}
+      initialStep={props?.initialStep}
     />
   );
 }

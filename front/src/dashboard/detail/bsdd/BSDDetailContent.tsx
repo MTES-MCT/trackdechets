@@ -209,6 +209,7 @@ const Trader = ({ trader }) => (
         <dd>{trader.company?.mail}</dd>
 
         <dt>Contact</dt>
+        <dd>{trader.company?.contact}</dd>
       </div>
       <div className={styles.detailGrid}>
         <DetailRow value={trader.receipt} label="Récépissé" />
@@ -238,6 +239,7 @@ const Broker = ({ broker }) => (
         <dd>{broker.company?.mail}</dd>
 
         <dt>Contact</dt>
+        <dd>{broker.company?.contact}</dd>
       </div>
       <div className={styles.detailGrid}>
         <DetailRow value={broker.receipt} label="Récépissé" />

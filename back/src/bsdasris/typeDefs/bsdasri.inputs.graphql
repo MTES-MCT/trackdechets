@@ -26,6 +26,10 @@ input BsdasriWhere {
   Défaut à vide.
   """
   status: BsdasriStatus
+  """
+  Expérimental : Filtre le résultat sur l'ID des bordereaux
+  """
+  id_in: [ID!]
 
   createdAt: DateFilter
   updatedAt: DateFilter
@@ -78,7 +82,7 @@ input BsdasriEmitterInput {
 }
 
 input BsdasriQuantityInput {
-  value: Int
+  value: Float
   type: QuantityType
 }
 
@@ -99,7 +103,7 @@ input BsdasriRecipientWasteDetailInput {
 input BsdasriWasteAcceptationInput {
   status: WasteAcceptationStatusInput
   refusalReason: String
-  refusedQuantity: Int
+  refusedQuantity: Float
 }
 input BsdasriEmissionInput {
   wasteCode: String

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>{{ bsff.id }}</title>
+    <link rel="stylesheet" href="modern-normalize.css" />
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="Page">
@@ -96,7 +98,10 @@
 
         <div class="BoxRow">
           <div class="BoxCol" style="min-height: 4rem;">
-            <p><strong>3. Contenant(s)</strong> (numéro, volume, type)</p>
+            <p>
+              <strong>3. Contenant(s)</strong> (dénomination, volume, numéro,
+              poids)
+            </p>
             {{ packagings }}
           </div>
         </div>
@@ -363,14 +368,14 @@
           <div class="BoxCol"><p>Quantité fluide en kilo(s)</p></div>
           <div class="BoxCol"><p>Code postal lieu de collecte</p></div>
         </div>
-        {{#associatedBsffs}}
+        {{#previousBsffs}}
         <div class="BoxRow">
           <div class="BoxCol"><p>{{ id }}&nbsp;</p></div>
           <div class="BoxCol"><p>{{ destinationCap }}&nbsp;</p></div>
           <div class="BoxCol"><p>{{ quantityKilos }}&nbsp;</p></div>
           <div class="BoxCol"><p>???&nbsp;</p></div>
         </div>
-        {{/associatedBsffs}}
+        {{/previousBsffs}}
       </div>
     </div>
   </body>

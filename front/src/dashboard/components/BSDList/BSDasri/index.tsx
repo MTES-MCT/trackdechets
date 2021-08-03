@@ -25,8 +25,13 @@ export const COLUMNS: Record<
   }
 > = {
   type: {
-    accessor: () => null,
-    Cell: () => <IconBSDasri style={{ fontSize: "24px" }} />,
+    accessor: dasri => dasri.bsdasriType,
+    Cell: ({ value }) => (
+      <>
+        <IconBSDasri style={{ fontSize: "24px" }} />
+        {value === "GROUPING" && <span>Grp</span>}
+      </>
+    ),
   },
   readableId: {
     accessor: dasri => dasri.id,

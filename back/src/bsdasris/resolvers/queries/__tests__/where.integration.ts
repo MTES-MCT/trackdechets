@@ -123,4 +123,20 @@ describe("Bsdasri where conversion", () => {
       createdAt: { gt: now, lt: now }
     });
   });
+
+  it("should convert filter on request ids (id_in)", () => {
+    const where: BsdasriWhere = {
+      id_in: ["x", "y", "z"]
+    };
+
+    const dbFilter = buildDbFilter(where, [siret]);
+    expect(dbFilter).toEqual({
+      OR: [
+        { emitterCompanySiret: { in: [siret] } },
+        { transporterCompanySiret: { in: [siret] } },
+        { recipientCompanySiret: { in: [siret] } }
+      ],
+      id: { in: ["x", "y", "z"] }
+    });
+  });
 });
