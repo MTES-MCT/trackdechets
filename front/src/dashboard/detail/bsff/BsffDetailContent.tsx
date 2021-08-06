@@ -90,6 +90,11 @@ export function BsffDetailContent({ form }: Props) {
               <IconRenewableEnergyEarth size="25px" />
               <span className={styles.detailTabCaption}>Destinataire</span>
             </Tab>
+
+            <Tab className={styles.detailTab}>
+              <IconRenewableEnergyEarth size="25px" />
+              <span className={styles.detailTabCaption}>FIs</span>
+            </Tab>
           </TabList>
           {/* Tabs content */}
           <div className={styles.detailTabPanels}>
@@ -107,6 +112,13 @@ export function BsffDetailContent({ form }: Props) {
             <TabPanel className={styles.detailTabPanel}>
               <div className={styles.detailColumns}>
                 <Destination form={form} />
+              </div>
+            </TabPanel>
+
+            {/* Fiche d'interventions */}
+            <TabPanel className={styles.detailTabPanel}>
+              <div className={styles.detailColumns}>
+                <FicheInterventions form={form} />
               </div>
             </TabPanel>
           </div>
@@ -308,5 +320,28 @@ function Destination({ form }: { form: Bsff }) {
         />
       </div>
     </>
+  );
+}
+
+function FicheInterventions({ form }: { form: Bsff }) {
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>N° fiche d'intervention</th>
+          <th>Quantité fluide en kilos</th>
+          <th>Code postal lieu de collecte</th>
+        </tr>
+      </thead>
+      <tbody>
+        {form.ficheInterventions.map(ficheIntervention => (
+          <tr key={ficheIntervention.id}>
+            <td>{ficheIntervention.numero}</td>
+            <td>{ficheIntervention.kilos}</td>
+            <td>{ficheIntervention.postalCode}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }

@@ -77,6 +77,12 @@ export const FullBsffFragment = gql`
       }
       cap
     }
+    ficheInterventions {
+      id
+      numero
+      kilos
+      postalCode
+    }
   }
   ${companyFragment}
 `;

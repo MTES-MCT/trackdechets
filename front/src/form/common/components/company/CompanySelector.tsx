@@ -21,16 +21,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useParams } from "react-router-dom";
 
 interface CompanySelectorProps {
-  name:
-    | "nextDestination.company"
-    | "destination.company"
-    | "transporter.company"
-    | "emitter.company"
-    | "recipient.company"
-    | "trader.company"
-    | "broker.company"
-    | "temporaryStorageDetail.destination.company"
-    | "destination.operation.nextDestination.company";
+  name: string;
   onCompanySelected?: (company: CompanyFavorite) => void;
   allowForeignCompanies?: boolean;
   heading?: string;
@@ -58,6 +49,8 @@ export default function CompanySelector({
   ] = useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
     SEARCH_COMPANIES
   );
+  // The favorite type is inferred from the name's prefix
+  const favoriteType = constantCase(field.name.split(".")[0]) as FavoriteType;
   const {
     loading: isLoadingFavorites,
     data: favoritesData,
@@ -65,9 +58,10 @@ export default function CompanySelector({
   } = useQuery<Pick<Query, "favorites">, QueryFavoritesArgs>(FAVORITES, {
     variables: {
       siret,
-      // Load different favorites depending on the object we are filling
-      type: constantCase(field.name.split(".")[0]) as FavoriteType,
+      type: favoriteType,
     },
+    // Skip this query if the name's prefix is not a known favorite
+    skip: !Object.values(FavoriteType).includes(favoriteType),
   });
   const selectCompany = useCallback(
     (company: CompanyFavorite) => {
