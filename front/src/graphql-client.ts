@@ -46,4 +46,5 @@ export default new ApolloClient({
     },
   }),
   link: ApolloLink.from([cleanTypeNameLink, httpLink]),
+  name: "trackdechets-front",
 });
