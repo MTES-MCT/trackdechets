@@ -42,7 +42,7 @@
     "@graphql-toolkit/file-loading": "^0.10.7",
     "@graphql-toolkit/schema-merging": "^0.10.7",
     "@graphql-tools/load-files": "^6.0.15",
-    "@graphql-tools/merge": "^6.0.15",
+    "@graphql-tools/merge": "^6.2.14",
     "@pdf-lib/fontkit": "^1.1.0",
     "@prisma/cli": "^2.15.0",
     "@prisma/client": "^2.15.0",
