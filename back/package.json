@@ -71,7 +71,7 @@
     "graphql-codegen-factories": "0.0.9",
     "graphql-depth-limit": "^1.1.0",
     "graphql-middleware": "^4.0.2",
-    "graphql-scalars": "^1.2.7",
+    "graphql-scalars": "^1.10.0",
     "graphql-tools": "^6.0.14",
     "graylog2": "^0.2.1",
     "handlebars": "^4.7.7",
