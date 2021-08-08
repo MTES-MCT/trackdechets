@@ -138,20 +138,7 @@ const updateFormResolver = async (
     data: formUpdateInput
   });
 
-  // Mark potential additions to the appendix 2 as Grouped if the form is sealed already
-  if (updatedForm.status === Status.SEALED) {
-    const appendix2Forms = await prisma.form
-      .findUnique({ where: { id: updatedForm.id } })
-      .appendix2Forms();
-    const promises = appendix2Forms
-      .filter(form => form.status !== Status.GROUPED)
-      .map(appendix => {
-        return transitionForm(user, appendix, {
-          type: EventType.MarkAsGrouped
-        });
-      });
-    await Promise.all(promises);
-  }
+  await handleFormsAddedToAppendix(updatedForm, user);
 
   // TODO: create statusLog?
   // We create a statusLog when creating a form
@@ -195,4 +182,26 @@ async function handleFormsRemovedFromAppendix(
       status: Status.AWAITING_GROUP
     }
   });
+}
+
+async function handleFormsAddedToAppendix(
+  updatedForm: Form,
+  user: Express.User
+) {
+  if (updatedForm.status !== Status.SEALED) {
+    return;
+  }
+
+  // Mark potential additions to the appendix 2 as Grouped if the form is already sealed
+  const appendix2Forms = await prisma.form
+    .findUnique({ where: { id: updatedForm.id } })
+    .appendix2Forms();
+  const promises = appendix2Forms
+    .filter(form => form.status !== Status.GROUPED)
+    .map(appendix => {
+      return transitionForm(user, appendix, {
+        type: EventType.MarkAsGrouped
+      });
+    });
+  await Promise.all(promises);
 }
