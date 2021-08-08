@@ -3,7 +3,6 @@ import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId from "../../readableId";
 import {
-  AppendixFormInput,
   MutationCreateFormArgs,
   ResolversParentTypes
 } from "../../../generated/graphql/types";
@@ -56,9 +55,13 @@ const createFormResolver = async (
   );
 
   if (appendix2Forms) {
-    const appendix2FormsIds = appendix2Forms.map(({ id }) => id).filter(Boolean);
+    const appendix2FormsIds = appendix2Forms
+      .map(({ id }) => id)
+      .filter(Boolean);
     if (appendix2FormsIds.length !== appendix2Forms.length) {
-      throw new Error("Pour les bordereaux en annexe, vous devez renseigner son ID.");
+      throw new Error(
+        "Pour les bordereaux en annexe, vous devez renseigner son ID."
+      );
     }
     const appendix2FormsInDb = await prisma.form.findMany({
       where: { id: { in: appendix2FormsIds } }
