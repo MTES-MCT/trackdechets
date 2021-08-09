@@ -25,7 +25,7 @@ describe("formsReader", () => {
     });
 
     // wait until all chunks are consumed
-    await new Promise(resolve => {
+    await new Promise<void>(resolve => {
       reader.on("end", () => resolve());
     });
 

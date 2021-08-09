@@ -60,7 +60,9 @@ describe("Test appendixForms", () => {
     const { query } = makeClient(recipient);
     const {
       data: { appendixForms }
-    } = await query(buildQuery(recipientCompany.siret));
+    } = await query<{ appendixForms: { id: string }[] }>(
+      buildQuery(recipientCompany.siret)
+    );
 
     expect(appendixForms.length).toBe(1);
     expect(appendixForms[0].id).toBe(form.id);
