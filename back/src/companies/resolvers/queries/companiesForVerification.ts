@@ -1,4 +1,4 @@
-import { CompanyType, Prisma } from ".prisma/client";
+import { CompanyType, Prisma } from "@prisma/client";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import { getConnectionsArgs } from "../../../forms/pagination";

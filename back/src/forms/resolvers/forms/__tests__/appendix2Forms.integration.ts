@@ -1,4 +1,4 @@
-import { UserRole } from ".prisma/client";
+import { UserRole } from "@prisma/client";
 import { gql } from "apollo-server-express";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Query } from "../../../../generated/graphql/types";

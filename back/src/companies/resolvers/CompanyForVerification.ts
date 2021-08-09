@@ -1,4 +1,4 @@
-import { UserRole } from ".prisma/client";
+import { UserRole } from "@prisma/client";
 import { CompanyForVerificationResolvers } from "../../generated/graphql/types";
 import prisma from "../../prisma";
 

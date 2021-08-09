@@ -1,4 +1,4 @@
-import { Form } from ".prisma/client";
+import { Form } from "@prisma/client";
 import {
   onSignup,
   inviteUserToJoin,

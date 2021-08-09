@@ -2,7 +2,7 @@ import {
   CompanyVerificationMode,
   CompanyVerificationStatus,
   UserRole
-} from ".prisma/client";
+} from "@prisma/client";
 import { gql } from "apollo-server-express";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";

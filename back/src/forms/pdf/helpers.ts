@@ -1,4 +1,4 @@
-import { Form } from ".prisma/client";
+import { Form } from "@prisma/client";
 import { extractPostalCode } from "../../utils";
 import { isFormContributor } from "../permissions";
 import { pageHeight, imageLocations } from "./settings";

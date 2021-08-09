@@ -112,13 +112,6 @@ const INVALID_DASRI_WASTE_CODE =
 const INVALID_PROCESSING_OPERATION =
   "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée";
 
-interface DasriValidationContext {
-  emissionSignature?: boolean;
-  transportSignature?: boolean;
-  receptionSignature?: boolean;
-  operationSignature?: boolean;
-}
-
 export const emitterSchema: FactorySchemaOf<
   BsdasriValidationContext,
   Emitter

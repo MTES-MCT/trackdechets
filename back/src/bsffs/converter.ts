@@ -1,4 +1,4 @@
-import * as Prisma from ".prisma/client";
+import * as Prisma from "@prisma/client";
 import { nullIfNoValues, safeInput } from "../forms/form-converter";
 import * as GraphQL from "../generated/graphql/types";
 
