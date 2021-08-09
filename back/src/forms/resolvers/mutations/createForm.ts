@@ -1,24 +1,25 @@
 import { Prisma, Status } from "@prisma/client";
-import prisma from "../../../prisma";
+import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import getReadableId from "../../readableId";
+import { eventEmitter, TDEvent } from "../../../events/emitter";
 import {
   MutationCreateFormArgs,
   ResolversParentTypes
 } from "../../../generated/graphql/types";
-import { eventEmitter, TDEvent } from "../../../events/emitter";
+import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
+import { getFullForm } from "../../database";
+import { indexForm } from "../../elastic";
 import { FormAlreadyInAppendix2, MissingTempStorageFlag } from "../../errors";
 import {
   expandFormFromDb,
   flattenFormInput,
   flattenTemporaryStorageDetailInput
 } from "../../form-converter";
-import { draftFormSchema } from "../../validation";
 import { checkIsFormContributor } from "../../permissions";
+import getReadableId from "../../readableId";
 import { FormSirets } from "../../types";
-import { indexForm } from "../../elastic";
-import { getFullForm } from "../../database";
+import { draftFormSchema } from "../../validation";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -59,7 +60,7 @@ const createFormResolver = async (
       .map(({ id }) => id)
       .filter(Boolean);
     if (appendix2FormsIds.length !== appendix2Forms.length) {
-      throw new Error(
+      throw new UserInputError(
         "Pour les bordereaux en annexe, vous devez renseigner son ID."
       );
     }
