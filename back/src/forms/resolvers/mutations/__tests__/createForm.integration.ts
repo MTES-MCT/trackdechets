@@ -639,7 +639,7 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Vous ne pouvez pas passer ajouter ce bordereau à l'annexe, il est déjà associé à une autre annexe 2.",
+          "Vous ne pouvez pas ajouter ce bordereau à l'annexe, il est déjà associé à une autre annexe 2.",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
