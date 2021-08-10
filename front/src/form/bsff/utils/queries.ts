@@ -139,9 +139,13 @@ export const UPDATE_BSFF_FORM = gql`
   ${FullBsffFragment}
 `;
 
-export const SIGN_BSFF_FORM = gql`
-  mutation SignBsff($id: ID!, $input: BsffSignatureInput!) {
-    signBsff(id: $id, input: $input) {
+export const SIGN_BSFF = gql`
+  mutation SignBsff(
+    $id: ID!
+    $type: BsffSignatureType!
+    $signature: SignatureInput!
+  ) {
+    signBsff(id: $id, type: $type, signature: $signature) {
       ...FullBsff
     }
   }

@@ -6,26 +6,14 @@ import {
   MutationSignBsffArgs,
   BsffSignatureType,
 } from "generated/graphql/types";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { Link, generatePath } from "react-router-dom";
 import routes from "common/routes";
 import { TdModalTrigger } from "common/components/Modal";
 import { IconCheckCircle1 } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 import { WorkflowActionProps } from "./WorkflowAction";
-
-const SIGN_BSFF = gql`
-  mutation SignBsff(
-    $id: ID!
-    $type: BsffSignatureType!
-    $signature: SignatureInput!
-  ) {
-    signBsff(id: $id, type: $type, signature: $signature) {
-      id
-      status
-    }
-  }
-`;
+import { SIGN_BSFF } from "form/bsff/utils/queries";
 
 export default function SignBsff({
   form,

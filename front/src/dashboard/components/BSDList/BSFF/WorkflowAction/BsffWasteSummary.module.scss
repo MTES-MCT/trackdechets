@@ -1,0 +1,28 @@
+@import "src/scss/Constants.scss";
+
+.WasteSummary {
+  &:not(:last-child) {
+    padding-bottom: 2rem;
+  }
+}
+
+.WasteSummaryRow {
+  display: flex;
+
+  &:not(:last-child) {
+    padding-bottom: 0.5rem;
+  }
+}
+
+.WasteSummaryRowItem {
+  flex: 1;
+}
+.WasteSummaryRowItemLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.025rem;
+  font-weight: bold;
+  color: $grey-darker;
+}
+.WasteSummaryRowItemContent {
+}
