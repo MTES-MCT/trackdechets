@@ -36,4 +36,5 @@ export default {
     kilos: 0,
     isEstimate: false,
   },
+  ficheInterventions: [],
 };

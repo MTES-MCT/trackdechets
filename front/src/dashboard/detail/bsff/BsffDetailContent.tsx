@@ -325,23 +325,27 @@ function Destination({ form }: { form: Bsff }) {
 
 function FicheInterventions({ form }: { form: Bsff }) {
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>N° fiche d'intervention</th>
-          <th>Quantité fluide en kilos</th>
-          <th>Code postal lieu de collecte</th>
-        </tr>
-      </thead>
-      <tbody>
-        {form.ficheInterventions.map(ficheIntervention => (
-          <tr key={ficheIntervention.id}>
-            <td>{ficheIntervention.numero}</td>
-            <td>{ficheIntervention.kilos}</td>
-            <td>{ficheIntervention.postalCode}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div style={{ display: "flex", flexWrap: "wrap" }}>
+      {form.ficheInterventions.map(ficheIntervention => (
+        <div
+          key={ficheIntervention.id}
+          className={styles.detailGrid}
+          style={{ flex: "0 0 50%", padding: "0 0 2rem 0", margin: "0" }}
+        >
+          <DetailRow
+            label="Numéro fiche d'intervention"
+            value={ficheIntervention.numero}
+          />
+          <DetailRow
+            label="Quantité fluides en kilo(s)"
+            value={ficheIntervention.kilos}
+          />
+          <DetailRow
+            label="Code postal lieu de collecte"
+            value={ficheIntervention.postalCode}
+          />
+        </div>
+      ))}
+    </div>
   );
 }

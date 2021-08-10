@@ -1,6 +1,15 @@
 import { gql } from "@apollo/client";
 import { companyFragment } from "common/fragments";
 
+export const FicheInterventionFragment = gql`
+  fragment FicheInterventionFragment on BsffFicheIntervention {
+    id
+    numero
+    kilos
+    postalCode
+  }
+`;
+
 export const FullBsffFragment = gql`
   fragment FullBsff on Bsff {
     id
@@ -78,13 +87,11 @@ export const FullBsffFragment = gql`
       cap
     }
     ficheInterventions {
-      id
-      numero
-      kilos
-      postalCode
+      ...FicheInterventionFragment
     }
   }
   ${companyFragment}
+  ${FicheInterventionFragment}
 `;
 
 export const GET_BSFF_FORM = gql`

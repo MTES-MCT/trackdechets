@@ -3,23 +3,27 @@ import { gql, useMutation } from "@apollo/client";
 import { Formik, Form, Field } from "formik";
 import * as yup from "yup";
 import {
+  BsffFicheIntervention,
   BsffFicheInterventionInput,
   CompanyInput,
   Mutation,
   MutationCreateFicheInterventionBsffArgs,
 } from "generated/graphql/types";
 import { Modal, RedErrorMessage } from "common/components";
+import { IconClose } from "common/components/Icons";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import { NotificationError } from "common/components/Error";
+import { FicheInterventionFragment } from "./utils/queries";
 
 const CREATE_BSFF_FICHE_INTERVENTION = gql`
   mutation CreateBsffFicheIntervention($input: BsffFicheInterventionInput!) {
     createFicheInterventionBsff(input: $input) {
-      id
+      ...FicheInterventionFragment
     }
   }
+  ${FicheInterventionFragment}
 `;
 
 const companySchema: yup.SchemaOf<CompanyInput> = yup.object({
@@ -53,15 +57,17 @@ const ficheInterventionSchema: yup.SchemaOf<BsffFicheInterventionInput> = yup.ob
 
 interface AddFicheInterventionModalProps {
   initialOperateurCompany: BsffFicheInterventionInput["operateur"]["company"];
+  onAddFicheIntervention: (ficheIntervention: BsffFicheIntervention) => void;
   onClose: () => void;
 }
 
 function AddFicheInterventionModal({
   initialOperateurCompany,
+  onAddFicheIntervention,
   onClose,
 }: AddFicheInterventionModalProps) {
   const [createFicheIntervention, { loading, error }] = useMutation<
-    Mutation["createFicheInterventionBsff"],
+    Pick<Mutation, "createFicheInterventionBsff">,
     MutationCreateFicheInterventionBsffArgs
   >(CREATE_BSFF_FICHE_INTERVENTION);
 
@@ -85,13 +91,18 @@ function AddFicheInterventionModal({
           },
           postalCode: "",
         }}
-        onSubmit={values =>
-          createFicheIntervention({
+        onSubmit={async values => {
+          const { data } = await createFicheIntervention({
             variables: {
               input: values,
             },
-          })
-        }
+          });
+
+          if (data) {
+            onAddFicheIntervention(data.createFicheInterventionBsff);
+            onClose();
+          }
+        }}
         validationSchema={ficheInterventionSchema}
       >
         <Form>
@@ -151,17 +162,78 @@ function AddFicheInterventionModal({
 }
 
 interface FicheInterventionListProps {
+  ficheInterventions: BsffFicheIntervention[];
   initialOperateurCompany: BsffFicheInterventionInput["operateur"]["company"];
+  onAddFicheIntervention: (ficheIntervention: BsffFicheIntervention) => void;
+  onRemoveFicheIntervention: (ficheIntervention: BsffFicheIntervention) => void;
 }
 
 export function FicheInterventionList({
+  ficheInterventions,
   initialOperateurCompany,
+  onAddFicheIntervention,
+  onRemoveFicheIntervention,
 }: FicheInterventionListProps) {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   return (
     <>
       <h4 className="form__section-heading">Fiche(s) d'intervention</h4>
+
+      {ficheInterventions.map(ficheIntervention => (
+        <div
+          key={ficheIntervention.id}
+          className="tw-border-2 tw-border-gray-400 tw-border-solid tw-rounded-md tw-px-4 tw-py-2 tw-mb-2"
+        >
+          <div className="tw-flex tw-mb-4 tw-items-end">
+            <div className="tw-w-11/12 tw-flex">
+              <div className="tw-w-1/3 tw-px-2">
+                <label>
+                  Numéro fiche d'intervention
+                  <input
+                    type="text"
+                    className="td-input"
+                    value={ficheIntervention.numero}
+                    disabled
+                  />
+                </label>
+              </div>
+              <div className="tw-w-1/3 tw-px-2">
+                <label>
+                  Quantité fluides en kilo(s)
+                  <input
+                    type="text"
+                    className="td-input"
+                    value={ficheIntervention.kilos}
+                    disabled
+                  />
+                </label>
+              </div>
+
+              <div className="tw-w-1/3 tw-px-2">
+                <label>
+                  Code postal du lieu de collecte
+                  <input
+                    type="text"
+                    className="td-input"
+                    value={ficheIntervention.postalCode}
+                    disabled
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="tw-px-2">
+              <button
+                type="button"
+                onClick={() => onRemoveFicheIntervention(ficheIntervention)}
+              >
+                <IconClose />
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+
       <button
         type="button"
         className="btn btn--outline-primary"
@@ -169,9 +241,11 @@ export function FicheInterventionList({
       >
         Ajouter une fiche d'intervention
       </button>
+
       {isModalOpen && (
         <AddFicheInterventionModal
           initialOperateurCompany={initialOperateurCompany}
+          onAddFicheIntervention={onAddFicheIntervention}
           onClose={() => setIsModalOpen(false)}
         />
       )}

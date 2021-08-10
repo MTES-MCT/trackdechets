@@ -1,11 +1,14 @@
 import React from "react";
-import { useField } from "formik";
-import { CompanyInput } from "generated/graphql/types";
+import { FieldArray, useField } from "formik";
+import { BsffFicheIntervention, CompanyInput } from "generated/graphql/types";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { FicheInterventionList } from "./FicheInterventionList";
 
 export default function Emitter({ disabled }) {
   const [emitterCompanyField] = useField<CompanyInput>("emitter.company");
+  const [ficheInterventionsField] = useField<BsffFicheIntervention[]>(
+    "ficheInterventions"
+  );
 
   return (
     <>
@@ -22,8 +25,25 @@ export default function Emitter({ disabled }) {
         heading="Entreprise émettrice"
       />
 
-      <FicheInterventionList
-        initialOperateurCompany={emitterCompanyField.value}
+      <FieldArray
+        name="ficheInterventions"
+        render={({ push, remove }) => (
+          <FicheInterventionList
+            ficheInterventions={ficheInterventionsField.value}
+            initialOperateurCompany={emitterCompanyField.value}
+            onAddFicheIntervention={ficheIntervention =>
+              push(ficheIntervention)
+            }
+            onRemoveFicheIntervention={ficheIntervention =>
+              remove(
+                ficheInterventionsField.value.findIndex(
+                  otherFicheIntervention =>
+                    otherFicheIntervention.id === ficheIntervention.id
+                )
+              )
+            }
+          />
+        )}
       />
     </>
   );

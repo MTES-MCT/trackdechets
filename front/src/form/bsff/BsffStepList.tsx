@@ -71,8 +71,13 @@ export default function BsffStepsList(props: Props) {
     // As we want to be able to save draft, we skip validation on submit
     // and don't use the classic Formik mechanism
 
-    const { id, ...input } = values;
-    saveForm(input)
+    const { id, ficheInterventions, ...input } = values;
+    saveForm({
+      ...input,
+      ficheInterventions: ficheInterventions.map(
+        ficheIntervention => ficheIntervention.id
+      ),
+    })
       .then(_ => {
         const redirectTo = generatePath(routes.dashboard.bsds.drafts, {
           siret,

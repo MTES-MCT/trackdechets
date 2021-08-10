@@ -5,7 +5,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { flattenBsffInput, unflattenBsff } from "../../converter";
 import { isBsffContributor } from "../../permissions";
-import { canAddPreviousBsffs } from "../../validation";
+import { isValidPreviousBsffs } from "../../validation";
 import { indexBsff } from "../../elastic";
 
 const createBsff: MutationResolvers["createBsff"] = async (
@@ -22,9 +22,15 @@ const createBsff: MutationResolvers["createBsff"] = async (
   await isBsffContributor(user, flatInput);
 
   if (input.previousBsffs?.length > 0) {
-    await canAddPreviousBsffs(input.previousBsffs);
+    await isValidPreviousBsffs(input.previousBsffs);
     flatInput.previousBsffs = {
       connect: input.previousBsffs.map(id => ({ id }))
+    };
+  }
+
+  if (input.ficheInterventions?.length > 0) {
+    flatInput.ficheInterventions = {
+      connect: input.ficheInterventions.map(id => ({ id }))
     };
   }
 

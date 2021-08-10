@@ -46,6 +46,7 @@ input BsffInput {
   quantity: BsffQuantityInput
   transporter: BsffTransporterInput
   destination: BsffDestinationInput
+  ficheInterventions: [ID!]
   previousBsffs: [ID!]
 }
 

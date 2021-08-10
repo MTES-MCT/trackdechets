@@ -7,7 +7,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound } from "../../database";
 import { flattenBsffInput, unflattenBsff } from "../../converter";
 import { isBsffContributor } from "../../permissions";
-import { canAddPreviousBsffs } from "../../validation";
+import { isValidPreviousBsffs } from "../../validation";
 import { indexBsff } from "../../elastic";
 
 const updateBsff: MutationResolvers["updateBsff"] = async (
@@ -42,6 +42,9 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       "quantityIsEstimate",
       "destinationPlannedOperationCode"
     ]);
+
+    delete input.previousBsffs;
+    delete input.ficheInterventions;
   }
 
   if (existingBsff.transporterTransportSignatureDate) {
@@ -81,10 +84,16 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   const data: Prisma.BsffUpdateInput = flatInput;
 
-  if (input.previousBsffs?.length > 0) {
-    await canAddPreviousBsffs(input.previousBsffs);
+  if (input.previousBsffs) {
+    await isValidPreviousBsffs(input.previousBsffs);
     data.previousBsffs = {
       set: input.previousBsffs.map(id => ({ id }))
+    };
+  }
+
+  if (input.ficheInterventions) {
+    data.ficheInterventions = {
+      set: input.ficheInterventions.map(id => ({ id }))
     };
   }
 

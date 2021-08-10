@@ -1341,6 +1341,7 @@ export type BsffInput = {
   quantity?: Maybe<BsffQuantityInput>;
   transporter?: Maybe<BsffTransporterInput>;
   destination?: Maybe<BsffDestinationInput>;
+  ficheInterventions?: Maybe<Array<Scalars["ID"]>>;
   previousBsffs?: Maybe<Array<Scalars["ID"]>>;
 };
 
