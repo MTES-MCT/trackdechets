@@ -170,9 +170,9 @@ async function handleFormsRemovedFromAppendix(
     return;
   }
 
-  const nexAppendix2Ids = appendix2Forms.map(form => form.id);
+  const nextAppendix2Ids = appendix2Forms.map(form => form.id);
   const appendix2ToUngroup = previousAppendix2Forms.filter(
-    groupedAppendix => !nexAppendix2Ids.includes(groupedAppendix.id)
+    groupedAppendix => !nextAppendix2Ids.includes(groupedAppendix.id)
   );
   await prisma.form.updateMany({
     where: {
