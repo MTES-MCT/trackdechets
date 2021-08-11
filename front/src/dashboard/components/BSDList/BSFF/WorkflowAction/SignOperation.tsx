@@ -4,37 +4,38 @@ import { Formik, Form, Field } from "formik";
 import * as yup from "yup";
 import {
   Bsff,
+  BsffOperationCode,
   BsffSignatureType,
   Mutation,
   MutationSignBsffArgs,
   MutationUpdateBsffArgs,
 } from "generated/graphql/types";
-import { RedErrorMessage, Switch } from "common/components";
+import { RedErrorMessage } from "common/components";
 import { NotificationError } from "common/components/Error";
-import DateInput from "form/common/components/custom-inputs/DateInput";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { SIGN_BSFF, UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
+import { OPERATION_CODES } from "form/bsff/utils/constants";
 import { SignBsff } from "./SignBsff";
 
 const validationSchema = yup.object({
-  receptionDate: yup.date().required(),
-  receptionKilos: yup.number().required(),
-  receptionRefusal: yup
+  operationCode: yup
     .string()
-    .nullable()
-    .min(1, "Le motif du refus doit être complété"),
+    .oneOf(
+      OPERATION_CODES.map(operation => operation.value),
+      "Le code de traitement doit faire partie de la liste reconnue"
+    )
+    .required(),
   signatureAuthor: yup
     .string()
     .ensure()
     .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
 });
 
-interface SignReceptionModalProps {
+interface SignOperationModalProps {
   bsff: Bsff;
   onCancel: () => void;
 }
 
-function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
+function SignOperationModal({ bsff, onCancel }: SignOperationModalProps) {
   const [updateBsff, updateBsffResult] = useMutation<
     Pick<Mutation, "updateBsff">,
     MutationUpdateBsffArgs
@@ -50,11 +51,7 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
   return (
     <Formik
       initialValues={{
-        receptionDate:
-          bsff.destination?.reception?.date ?? new Date().toISOString(),
-        receptionKilos:
-          bsff.destination?.reception?.kilos ?? bsff.quantity?.kilos ?? 0,
-        receptionRefusal: null,
+        operationCode: "",
         signatureAuthor: "",
       }}
       validationSchema={validationSchema}
@@ -64,10 +61,8 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
             id: bsff.id,
             input: {
               destination: {
-                reception: {
-                  date: values.receptionDate,
-                  kilos: values.receptionKilos,
-                  refusal: values.receptionRefusal,
+                operation: {
+                  code: values.operationCode as BsffOperationCode,
                 },
               },
             },
@@ -76,7 +71,7 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
         await signBsff({
           variables: {
             id: bsff.id,
-            type: BsffSignatureType.Reception,
+            type: BsffSignatureType.Operation,
             signature: {
               author: values.signatureAuthor,
               date: new Date().toISOString(),
@@ -86,58 +81,27 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
         onCancel();
       }}
     >
-      {({ values, setFieldValue }) => (
+      {() => (
         <Form>
           <p>
             En qualité de <strong>destinataire du déchet</strong>, j'atteste que
             les informations ci-dessus sont corrects. En signant ce document, je
-            déclare réceptionner le déchet.
+            déclare avoir traité le déchet.
           </p>
           <div className="form__row">
             <label>
-              Date de réception
-              <Field
-                className="td-input"
-                name="receptionDate"
-                component={DateInput}
-              />
+              Code de traitement
+              <Field as="select" name="operationCode" className="td-select">
+                <option />
+                {OPERATION_CODES.map(({ value, description }) => (
+                  <option key={value} value={value}>
+                    {value} - {description}
+                  </option>
+                ))}
+              </Field>
             </label>
-            <RedErrorMessage name="receptionDate" />
+            <RedErrorMessage name="operationCode" />
           </div>
-          <div className="form__row">
-            <label>
-              Quantité de fluides reçu (en kilo(s))
-              <Field
-                className="td-input"
-                name="receptionKilos"
-                component={NumberInput}
-              />
-            </label>
-            <RedErrorMessage name="receptionKilos" />
-          </div>
-          <div className="form__row">
-            <label>
-              <Switch
-                label="Le déchet a été refusé"
-                onChange={checked =>
-                  setFieldValue("receptionRefusal", checked ? "" : null)
-                }
-                checked={values.receptionRefusal != null}
-              />
-            </label>
-          </div>
-          {values.receptionRefusal != null && (
-            <div className="form__row">
-              <label>
-                <Field
-                  as="textarea"
-                  className="td-input"
-                  name="receptionRefusal"
-                  placeholder="Motif du refus"
-                />
-              </label>
-            </div>
-          )}
           <div className="form__row">
             <label>
               NOM et prénom du signataire
@@ -174,15 +138,15 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
   );
 }
 
-interface SignReceptionProps {
+interface SignOperationProps {
   bsffId: string;
 }
 
-export function SignReception({ bsffId }: SignReceptionProps) {
+export function SignOperation({ bsffId }: SignOperationProps) {
   return (
-    <SignBsff title="Signer la réception" bsffId={bsffId}>
+    <SignBsff title="Signer le traitement" bsffId={bsffId}>
       {({ bsff, onClose }) => (
-        <SignReceptionModal bsff={bsff} onCancel={onClose} />
+        <SignOperationModal bsff={bsff} onCancel={onClose} />
       )}
     </SignBsff>
   );

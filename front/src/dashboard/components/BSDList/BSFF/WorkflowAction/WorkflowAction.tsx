@@ -1,9 +1,10 @@
 import React from "react";
 import { BsffStatus } from "generated/graphql/types";
+import { BsffFragment } from "../types";
 import { SignEmission } from "./SignEmission";
 import { SignTransport } from "./SignTransport";
 import { SignReception } from "./SignReception";
-import { BsffFragment } from "../types";
+import { SignOperation } from "./SignOperation";
 
 export interface WorkflowActionProps {
   form: BsffFragment;
@@ -25,6 +26,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
     case BsffStatus.Sent:
       if (siret !== form.bsffDestination?.company?.siret) return null;
       return <SignReception bsffId={form.id} />;
+
+    case BsffStatus.Received:
+      if (siret !== form.bsffDestination?.company?.siret) return null;
+      return <SignOperation bsffId={form.id} />;
 
     default:
       return null;

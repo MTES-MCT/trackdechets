@@ -1,6 +1,7 @@
 import React from "react";
 import { Field } from "formik";
 import CompanySelector from "form/common/components/company/CompanySelector";
+import { OPERATION_CODES } from "./utils/constants";
 
 export default function Destination({ disabled }) {
   return (
@@ -27,22 +28,11 @@ export default function Destination({ disabled }) {
           disabled={disabled}
         >
           <option />
-          <option value="R2">
-            R2 - Récupération ou régénération des solvants
-          </option>
-          <option value="R12">
-            R12 - Échange de déchets en vue de les soumettre à l'une des
-            opérations numérotées R1 à R11
-          </option>
-          <option value="D10">D10 - Incinération à terre</option>
-          <option value="D13">
-            D13 - Regroupement préalablement à l'une des opérations numérotées
-            D1 à D12
-          </option>
-          <option value="D14">
-            D14 - Reconditionnement préalablement à l’une des opérations
-            numérotées D1 à D13
-          </option>
+          {OPERATION_CODES.map(operation => (
+            <option key={operation.value} value={operation.value}>
+              {operation.value} - {operation.description}
+            </option>
+          ))}
         </Field>
       </div>
     </>

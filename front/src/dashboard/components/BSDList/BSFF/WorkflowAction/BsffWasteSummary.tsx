@@ -26,8 +26,14 @@ export function BsffWasteSummary({ bsff }: BsffWasteSummaryProps) {
       <div className={styles.WasteSummaryItem}>
         <div className={styles.WasteSummaryItemLabel}>Quantité de fluides</div>
         <div className={styles.WasteSummaryItemContent}>
-          {bsff.quantity?.kilos} kilo(s){" "}
-          {bsff.quantity?.isEstimate && <>(estimé(s))</>}
+          {bsff.destination?.reception?.kilos == null ? (
+            <>
+              {bsff.quantity?.kilos} kilo(s){" "}
+              {bsff.quantity?.isEstimate && <>(estimé(s))</>}
+            </>
+          ) : (
+            <>{bsff.destination.reception.kilos} kilo(s)</>
+          )}
         </div>
       </div>
       <div className={styles.WasteSummaryItem}>
