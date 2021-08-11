@@ -1,28 +1,36 @@
 @import "src/scss/Constants.scss";
+@import "src/scss/Breakpoints";
 
 .WasteSummary {
+  display: flex;
+  flex-wrap: wrap;
+
   &:not(:last-child) {
-    padding-bottom: 2rem;
+    padding-bottom: 1rem;
   }
 }
 
-.WasteSummaryRow {
-  display: flex;
+.WasteSummaryItem {
+  width: 100%;
 
   &:not(:last-child) {
     padding-bottom: 0.5rem;
   }
-}
 
-.WasteSummaryRowItem {
-  flex: 1;
+  @include tablet {
+    width: 50%;
+  }
+
+  @include lg-desktop {
+    width: 33.33%;
+  }
 }
-.WasteSummaryRowItemLabel {
+.WasteSummaryItemLabel {
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.025rem;
   font-weight: bold;
   color: $grey-darker;
 }
-.WasteSummaryRowItemContent {
+.WasteSummaryItemContent {
 }

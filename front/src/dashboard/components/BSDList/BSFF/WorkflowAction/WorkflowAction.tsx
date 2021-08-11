@@ -1,6 +1,7 @@
 import React from "react";
-import { BsffStatus, BsffSignatureType } from "generated/graphql/types";
-import SignBsff from "./SignBsff";
+import { BsffStatus } from "generated/graphql/types";
+import { SignEmission } from "./SignEmission";
+import { SignTransport } from "./SignTransport";
 import { SignReception } from "./SignReception";
 import { BsffFragment } from "../types";
 
@@ -15,25 +16,11 @@ export function WorkflowAction(props: WorkflowActionProps) {
   switch (form.bsffStatus) {
     case BsffStatus.Initial:
       if (siret !== form.bsffEmitter?.company?.siret) return null;
-      return (
-        <SignBsff
-          {...props}
-          signatureType={BsffSignatureType.Emission}
-          label="Signature émetteur"
-          helptext="En signant, je confirme la remise du déchet au transporteur. La signature est horodatée."
-        />
-      );
+      return <SignEmission bsffId={form.id} />;
 
     case BsffStatus.SignedByEmitter:
       if (siret !== form.bsffTransporter?.company?.siret) return null;
-      return (
-        <SignBsff
-          {...props}
-          signatureType={BsffSignatureType.Transport}
-          label="Signature transporteur"
-          helptext="En signant, je confirme l'emport du déchet. La signature est horodatée."
-        />
-      );
+      return <SignTransport bsffId={form.id} />;
 
     case BsffStatus.Sent:
       if (siret !== form.bsffDestination?.company?.siret) return null;

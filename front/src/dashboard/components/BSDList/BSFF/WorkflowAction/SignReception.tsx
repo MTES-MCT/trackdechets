@@ -15,6 +15,7 @@ import {
   Modal,
   Loader,
   RedErrorMessage,
+  Switch,
 } from "common/components";
 import { NotificationError } from "common/components/Error";
 import DateInput from "form/common/components/custom-inputs/DateInput";
@@ -30,6 +31,10 @@ import { BsffSummary } from "./BsffSummary";
 const validationSchema = yup.object({
   receptionDate: yup.date().required(),
   receptionKilos: yup.number().required(),
+  receptionRefusal: yup
+    .string()
+    .nullable()
+    .min(1, "Le motif du refus doit être complété"),
   signatureAuthor: yup
     .string()
     .ensure()
@@ -61,7 +66,7 @@ function SignReceptionModal({ bsffId, onClose }: SignReceptionModalProps) {
   }
 
   const { bsff } = data;
-  const title = `Réceptionner le BSFF n°${bsff.id}`;
+  const title = `Accuser réception`;
   const loading = updateBsffResult.loading || signBsffResult.loading;
   const error = updateBsffResult.error ?? signBsffResult.error;
 
@@ -75,7 +80,8 @@ function SignReceptionModal({ bsffId, onClose }: SignReceptionModalProps) {
             bsff.destination?.reception?.date ?? new Date().toISOString(),
           receptionKilos:
             bsff.destination?.reception?.kilos ?? bsff.quantity?.kilos ?? 0,
-          signatureAuthor: bsff.destination?.reception?.signature?.author ?? "",
+          receptionRefusal: null,
+          signatureAuthor: "",
         }}
         validationSchema={validationSchema}
         onSubmit={async values => {
@@ -87,6 +93,7 @@ function SignReceptionModal({ bsffId, onClose }: SignReceptionModalProps) {
                   reception: {
                     date: values.receptionDate,
                     kilos: values.receptionKilos,
+                    refusal: values.receptionRefusal,
                   },
                 },
               },
@@ -105,8 +112,13 @@ function SignReceptionModal({ bsffId, onClose }: SignReceptionModalProps) {
           onClose();
         }}
       >
-        {() => (
+        {({ values, setFieldValue }) => (
           <Form>
+            <p>
+              En qualité de <strong>destinataire du déchet</strong>, j'atteste
+              que les informations ci-dessus sont corrects. En signant ce
+              document, je déclare réceptionner le déchet.
+            </p>
             <div className="form__row">
               <label>
                 Date de réception
@@ -131,8 +143,35 @@ function SignReceptionModal({ bsffId, onClose }: SignReceptionModalProps) {
             </div>
             <div className="form__row">
               <label>
-                Nom et prénom
-                <Field className="td-input" name="signatureAuthor" />
+                <Switch
+                  label="Le déchet a été refusé"
+                  onChange={checked =>
+                    setFieldValue("receptionRefusal", checked ? "" : null)
+                  }
+                  checked={values.receptionRefusal != null}
+                />
+              </label>
+            </div>
+            {values.receptionRefusal != null && (
+              <div className="form__row">
+                <label>
+                  <Field
+                    as="textarea"
+                    className="td-input"
+                    name="receptionRefusal"
+                    placeholder="Motif du refus"
+                  />
+                </label>
+              </div>
+            )}
+            <div className="form__row">
+              <label>
+                NOM et prénom du signataire
+                <Field
+                  className="td-input"
+                  name="signatureAuthor"
+                  placeholder="NOM Prénom"
+                />
               </label>
               <RedErrorMessage name="signatureAuthor" />
             </div>
@@ -140,7 +179,11 @@ function SignReceptionModal({ bsffId, onClose }: SignReceptionModalProps) {
             {error && <NotificationError apolloError={error} />}
 
             <div className="td-modal-actions">
-              <button className="btn btn--outline-primary" onClick={onClose}>
+              <button
+                type="button"
+                className="btn btn--outline-primary"
+                onClick={onClose}
+              >
                 Annuler
               </button>
               <button
@@ -171,7 +214,7 @@ export function SignReception({ bsffId }: SignReceptionProps) {
         icon={<IconCheckCircle1 size="24px" />}
         onClick={() => setIsOpen(true)}
       >
-        Réceptionner
+        Signer la réception
       </ActionButton>
       {isOpen && (
         <SignReceptionModal bsffId={bsffId} onClose={() => setIsOpen(false)} />
