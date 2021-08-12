@@ -22,7 +22,7 @@ const createBsff: MutationResolvers["createBsff"] = async (
   await isBsffContributor(user, flatInput);
 
   if (input.previousBsffs?.length > 0) {
-    await isValidPreviousBsffs(input.previousBsffs);
+    await isValidPreviousBsffs(flatInput.type, input.previousBsffs);
     flatInput.previousBsffs = {
       connect: input.previousBsffs.map(id => ({ id }))
     };

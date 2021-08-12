@@ -7,8 +7,12 @@ import {
   BsffStatus
 } from "@prisma/client";
 import prisma from "../prisma";
-import { BsffPackaging } from "../generated/graphql/types";
-import { GROUPING_CODES, OPERATION_CODES, WASTE_CODES } from "./constants";
+import {
+  BsffOperationCode,
+  BsffPackaging,
+  BsffType
+} from "../generated/graphql/types";
+import { BSFF_TYPE, OPERATION, WASTE_CODES } from "./constants";
 
 export const beforeEmissionSchema: yup.SchemaOf<Pick<
   Bsff,
@@ -76,7 +80,7 @@ export const beforeEmissionSchema: yup.SchemaOf<Pick<
     .string()
     .nullable()
     .oneOf(
-      Object.values(OPERATION_CODES),
+      Object.keys(OPERATION),
       "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
     )
 });
@@ -250,7 +254,7 @@ export const beforeOperationSchema: yup.SchemaOf<Pick<
     // It received no treatment, it was only stored in its current form.
     .nullable()
     .oneOf(
-      [null, ...Object.values(OPERATION_CODES)],
+      [null, ...Object.keys(OPERATION)],
       "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : ${values}"
     ),
   destinationOperationSignatureDate: yup
@@ -344,7 +348,7 @@ export const ficheInterventionSchema: yup.SchemaOf<Pick<
     .required("L'addresse email de l'entreprise de l'opérateur est requis")
 });
 
-export async function isValidPreviousBsffs(ids: string[]) {
+export async function isValidPreviousBsffs(type: BsffType, ids: string[]) {
   const previousBsffs = await prisma.bsff.findMany({
     where: {
       id: {
@@ -363,8 +367,11 @@ export async function isValidPreviousBsffs(ids: string[]) {
     !previousBsffs.every(
       bsff =>
         // operation code is null when the waste is temporarily stored and receives no treatment
-        bsff.destinationOperationCode == null ||
-        GROUPING_CODES.includes(bsff.destinationOperationCode)
+        (bsff.destinationOperationCode == null &&
+          type === BSFF_TYPE.REEXPEDITION) ||
+        OPERATION[
+          bsff.destinationOperationCode as BsffOperationCode
+        ].successors.includes(type)
     )
   ) {
     throw new UserInputError(

@@ -1172,6 +1172,8 @@ export type Bsff = {
    * Il est à utiliser pour les échanges avec l'API.
    */
   id: Scalars["ID"];
+  /** Type de BSFF. */
+  type: BsffType;
   /** Statut qui synthétise où en est le déchet dans son cheminement. */
   status: BsffStatus;
   /**
@@ -1318,6 +1320,7 @@ export type BsffFicheInterventionInput = {
 };
 
 export type BsffInput = {
+  type?: Maybe<BsffType>;
   emitter?: Maybe<BsffEmitterInput>;
   packagings?: Maybe<Array<BsffPackagingInput>>;
   waste?: Maybe<BsffWasteInput>;
@@ -1478,6 +1481,19 @@ export type BsffTransporterTransportInput = {
   mode: TransportMode;
 };
 
+/** Représente les différents types de BSFF possibles. */
+export type BsffType =
+  /** BSFF qui trace un fluide provenant d'une seule origine. */
+  | "TRACER_FLUIDE"
+  /** BSFF qui trace des fluides provenant de différentes origines. */
+  | "COLLECTE_PETITES_QUANTITES"
+  /** BSFF qui groupe plusieurs autres BSFFs. */
+  | "GROUPEMENT"
+  /** BSFF qui reconditionne un ou plusieurs autres BSFFs. */
+  | "RECONDITIONNEMENT"
+  /** BSFF qui réexpédie un autre BSFF. */
+  | "REEXPEDITION";
+
 export type BsffWaste = {
   __typename?: "BsffWaste";
   /** Code déchet. */
@@ -1504,8 +1520,6 @@ export type BsffWhere = {
   transporter?: Maybe<BsffWhereTransporter>;
   /** Filtrer sur le champ destination. */
   destination?: Maybe<BsffWhereDestination>;
-  /** Filtrer sur le BSFF suivant. */
-  nextBsff?: Maybe<BsffWhereNextBsff>;
 };
 
 /** Filtres sur une entreprise. */
@@ -1522,11 +1536,6 @@ export type BsffWhereDestination = {
 /** Champs possible pour le filtre sur l'emitter. */
 export type BsffWhereEmitter = {
   company?: Maybe<BsffWhereCompany>;
-};
-
-/** Champs possible pour le filtre sur le BSFF suivant. */
-export type BsffWhereNextBsff = {
-  id?: Maybe<Scalars["String"]>;
 };
 
 /** Champs possible pour le filtre sur l'opération. */
@@ -5071,6 +5080,7 @@ export type ResolversTypes = {
   BsvhuError: ResolverTypeWrapper<BsvhuError>;
   SignatureTypeInput: SignatureTypeInput;
   Bsff: ResolverTypeWrapper<Bsff>;
+  BsffType: BsffType;
   BsffStatus: BsffStatus;
   BsffEmitter: ResolverTypeWrapper<BsffEmitter>;
   BsffEmission: ResolverTypeWrapper<BsffEmission>;
@@ -5095,7 +5105,6 @@ export type ResolversTypes = {
   BsffWhereTransporter: BsffWhereTransporter;
   BsffWhereDestination: BsffWhereDestination;
   BsffWhereOperation: BsffWhereOperation;
-  BsffWhereNextBsff: BsffWhereNextBsff;
   BsffConnection: ResolverTypeWrapper<BsffConnection>;
   BsffEdge: ResolverTypeWrapper<BsffEdge>;
   BsvhuWhere: BsvhuWhere;
@@ -5411,7 +5420,6 @@ export type ResolversParentTypes = {
   BsffWhereTransporter: BsffWhereTransporter;
   BsffWhereDestination: BsffWhereDestination;
   BsffWhereOperation: BsffWhereOperation;
-  BsffWhereNextBsff: BsffWhereNextBsff;
   BsffConnection: BsffConnection;
   BsffEdge: BsffEdge;
   BsvhuWhere: BsvhuWhere;
@@ -6553,6 +6561,7 @@ export type BsffResolvers<
   ParentType extends ResolversParentTypes["Bsff"] = ResolversParentTypes["Bsff"]
 > = {
   id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
+  type?: Resolver<ResolversTypes["BsffType"], ParentType, ContextType>;
   status?: Resolver<ResolversTypes["BsffStatus"], ParentType, ContextType>;
   emitter?: Resolver<
     Maybe<ResolversTypes["BsffEmitter"]>,
@@ -10500,6 +10509,7 @@ export function createBsffMock(props: Partial<Bsff>): Bsff {
   return {
     __typename: "Bsff",
     id: "",
+    type: "TRACER_FLUIDE",
     status: "INITIAL",
     emitter: null,
     packagings: [],
@@ -10672,6 +10682,7 @@ export function createBsffFicheInterventionInputMock(
 
 export function createBsffInputMock(props: Partial<BsffInput>): BsffInput {
   return {
+    type: null,
     emitter: null,
     packagings: null,
     waste: null,
@@ -10896,7 +10907,6 @@ export function createBsffWhereMock(props: Partial<BsffWhere>): BsffWhere {
     emitter: null,
     transporter: null,
     destination: null,
-    nextBsff: null,
     ...props
   };
 }
@@ -10925,15 +10935,6 @@ export function createBsffWhereEmitterMock(
 ): BsffWhereEmitter {
   return {
     company: null,
-    ...props
-  };
-}
-
-export function createBsffWhereNextBsffMock(
-  props: Partial<BsffWhereNextBsff>
-): BsffWhereNextBsff {
-  return {
-    id: null,
     ...props
   };
 }

@@ -1,6 +1,6 @@
 import { UserInputError } from "apollo-server-express";
 import omit from "object.omit";
-import { Prisma } from "@prisma/client";
+import { Prisma, Bsff } from "@prisma/client";
 import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -30,6 +30,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   if (existingBsff.emitterEmissionSignatureDate) {
     flatInput = omit(flatInput, [
+      "type",
       "emitterCompanyAddress",
       "emitterCompanyContact",
       "emitterCompanyMail",
@@ -80,12 +81,13 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     ]);
   }
 
-  await isBsffContributor(user, { ...existingBsff, ...flatInput });
+  const futureBsff: Bsff = { ...existingBsff, ...flatInput };
+  await isBsffContributor(user, futureBsff);
 
   const data: Prisma.BsffUpdateInput = flatInput;
 
   if (input.previousBsffs) {
-    await isValidPreviousBsffs(input.previousBsffs);
+    await isValidPreviousBsffs(futureBsff.type, input.previousBsffs);
     data.previousBsffs = {
       set: input.previousBsffs.map(id => ({ id }))
     };

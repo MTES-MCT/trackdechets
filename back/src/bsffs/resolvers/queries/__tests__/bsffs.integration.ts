@@ -9,7 +9,7 @@ import {
   UserWithCompany
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { OPERATION_CODES } from "../../../constants";
+import { OPERATION } from "../../../constants";
 import {
   createBsff,
   createBsffAfterOperation
@@ -187,13 +187,13 @@ describe("Query.bsffs", () => {
     await createBsff(
       { emitter },
       {
-        destinationOperationCode: OPERATION_CODES.D10
+        destinationOperationCode: OPERATION.D10.code
       }
     );
     await createBsff(
       { emitter },
       {
-        destinationOperationCode: OPERATION_CODES.R12
+        destinationOperationCode: OPERATION.R12.code
       }
     );
 
@@ -238,7 +238,7 @@ describe("Query.bsffs", () => {
         },
         {
           id: bsffId,
-          destinationOperationCode: OPERATION_CODES.R12,
+          destinationOperationCode: OPERATION.R12.code,
           ficheInterventions: {
             create: [
               {

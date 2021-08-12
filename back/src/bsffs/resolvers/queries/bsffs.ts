@@ -20,8 +20,7 @@ const bsffs: QueryResolvers["bsffs"] = async (_, args, context) => {
       destinationCompanySiret: args.where?.destination?.company?.siret,
       destinationOperationCode: args.where?.destination?.operation?.code_in
         ? { in: args.where?.destination?.operation?.code_in }
-        : args.where?.destination?.operation?.code,
-      nextBsff: args.where?.nextBsff
+        : args.where?.destination?.operation?.code
     }),
     OR: [
       { emitterCompanySiret: { in: sirets } },

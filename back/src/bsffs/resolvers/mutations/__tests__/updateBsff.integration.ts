@@ -7,7 +7,7 @@ import {
 import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { OPERATION_CODES, WASTE_CODES } from "../../../constants";
+import { OPERATION, WASTE_CODES } from "../../../constants";
 import {
   createBsff,
   createBsffAfterEmission,
@@ -466,13 +466,13 @@ describe("Mutation.updateBsff", () => {
     const oldPreviousBsff = await createBsffAfterOperation(
       { emitter, transporter, destination },
       {
-        destinationOperationCode: OPERATION_CODES.R12
+        destinationOperationCode: OPERATION.R12.code
       }
     );
     const nextPreviousBsff = await createBsffAfterOperation(
       { emitter, transporter, destination },
       {
-        destinationOperationCode: OPERATION_CODES.R12
+        destinationOperationCode: OPERATION.R12.code
       }
     );
     const bsff = await createBsff(

@@ -6,6 +6,11 @@ type Bsff {
   id: ID!
 
   """
+  Type de BSFF.
+  """
+  type: BsffType!
+
+  """
   Statut qui synthétise où en est le déchet dans son cheminement.
   """
   status: BsffStatus!

@@ -10,7 +10,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { OPERATION_CODES } from "../../../constants";
+import { OPERATION } from "../../../constants";
 import {
   createBsffAfterEmission,
   createBsffAfterOperation
@@ -117,7 +117,7 @@ describe("Mutation.createBsff", () => {
       const previousBsff = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
-          destinationOperationCode: OPERATION_CODES.R12
+          destinationOperationCode: OPERATION.R12.code
         }
       );
 
@@ -188,7 +188,7 @@ describe("Mutation.createBsff", () => {
         createBsffAfterEmission(
           { emitter, transporter, destination },
           {
-            destinationOperationCode: OPERATION_CODES.R12
+            destinationOperationCode: OPERATION.R12.code
           }
         )
       ]);

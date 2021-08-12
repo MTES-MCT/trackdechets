@@ -8,8 +8,6 @@ input BsffWhere {
   transporter: BsffWhereTransporter
   "Filtrer sur le champ destination."
   destination: BsffWhereDestination
-  "Filtrer sur le BSFF suivant."
-  nextBsff: BsffWhereNextBsff
 }
 
 "Champs possible pour le filtre sur l'emitter."
@@ -39,17 +37,13 @@ input BsffWhereCompany {
   siret: String!
 }
 
-"Champs possible pour le filtre sur le BSFF suivant."
-input BsffWhereNextBsff {
-  id: String
-}
-
 input SignatureInput {
   date: DateTime!
   author: String!
 }
 
 input BsffInput {
+  type: BsffType
   emitter: BsffEmitterInput
   packagings: [BsffPackagingInput!]
   waste: BsffWasteInput

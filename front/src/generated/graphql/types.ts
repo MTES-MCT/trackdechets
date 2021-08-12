@@ -1189,6 +1189,8 @@ export type Bsff = {
    * Il est à utiliser pour les échanges avec l'API.
    */
   id: Scalars["ID"];
+  /** Type de BSFF. */
+  type: BsffType;
   /** Statut qui synthétise où en est le déchet dans son cheminement. */
   status: BsffStatus;
   /**
@@ -1335,6 +1337,7 @@ export type BsffFicheInterventionInput = {
 };
 
 export type BsffInput = {
+  type?: Maybe<BsffType>;
   emitter?: Maybe<BsffEmitterInput>;
   packagings?: Maybe<Array<BsffPackagingInput>>;
   waste?: Maybe<BsffWasteInput>;
@@ -1503,6 +1506,20 @@ export type BsffTransporterTransportInput = {
   mode: TransportMode;
 };
 
+/** Représente les différents types de BSFF possibles. */
+export enum BsffType {
+  /** BSFF qui trace un fluide provenant d'une seule origine. */
+  TracerFluide = "TRACER_FLUIDE",
+  /** BSFF qui trace des fluides provenant de différentes origines. */
+  CollectePetitesQuantites = "COLLECTE_PETITES_QUANTITES",
+  /** BSFF qui groupe plusieurs autres BSFFs. */
+  Groupement = "GROUPEMENT",
+  /** BSFF qui reconditionne un ou plusieurs autres BSFFs. */
+  Reconditionnement = "RECONDITIONNEMENT",
+  /** BSFF qui réexpédie un autre BSFF. */
+  Reexpedition = "REEXPEDITION"
+}
+
 export type BsffWaste = {
   __typename?: "BsffWaste";
   /** Code déchet. */
@@ -1529,8 +1546,6 @@ export type BsffWhere = {
   transporter?: Maybe<BsffWhereTransporter>;
   /** Filtrer sur le champ destination. */
   destination?: Maybe<BsffWhereDestination>;
-  /** Filtrer sur le BSFF suivant. */
-  nextBsff?: Maybe<BsffWhereNextBsff>;
 };
 
 /** Filtres sur une entreprise. */
@@ -1547,11 +1562,6 @@ export type BsffWhereDestination = {
 /** Champs possible pour le filtre sur l'emitter. */
 export type BsffWhereEmitter = {
   company?: Maybe<BsffWhereCompany>;
-};
-
-/** Champs possible pour le filtre sur le BSFF suivant. */
-export type BsffWhereNextBsff = {
-  id?: Maybe<Scalars["String"]>;
 };
 
 /** Champs possible pour le filtre sur l'opération. */

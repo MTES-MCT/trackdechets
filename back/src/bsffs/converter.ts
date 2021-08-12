@@ -23,6 +23,8 @@ export function flattenBsffInput(
   >
 > {
   return safeInput({
+    type: bsffInput.type,
+
     emitterCompanyName: bsffInput.emitter?.company.name,
     emitterCompanySiret: bsffInput.emitter?.company.siret,
     emitterCompanyAddress: bsffInput.emitter?.company.address,
@@ -93,6 +95,7 @@ export function flattenBsffInput(
 export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
   return {
     id: prismaBsff.id,
+    type: prismaBsff.type,
     status: prismaBsff.status,
     emitter: nullIfNoValues<GraphQL.BsffEmitter>({
       company: nullIfNoValues<GraphQL.FormCompany>({
