@@ -1496,12 +1496,16 @@ export type BsffWasteInput = {
 
 /** Filtres possibles pour la récupération de bordereaux. */
 export type BsffWhere = {
+  /** Filtrer sur le champ status. */
+  status?: Maybe<BsffStatus>;
   /** Filtrer sur le champ emitter. */
   emitter?: Maybe<BsffWhereEmitter>;
   /** Filtrer sur le champ transporter. */
   transporter?: Maybe<BsffWhereTransporter>;
   /** Filtrer sur le champ destination. */
   destination?: Maybe<BsffWhereDestination>;
+  /** Filtrer sur le BSFF suivant. */
+  nextBsff?: Maybe<BsffWhereNextBsff>;
 };
 
 /** Filtres sur une entreprise. */
@@ -1520,9 +1524,15 @@ export type BsffWhereEmitter = {
   company?: Maybe<BsffWhereCompany>;
 };
 
+/** Champs possible pour le filtre sur le BSFF suivant. */
+export type BsffWhereNextBsff = {
+  id?: Maybe<Scalars["String"]>;
+};
+
 /** Champs possible pour le filtre sur l'opération. */
 export type BsffWhereOperation = {
   code?: Maybe<BsffOperationCode>;
+  code_in?: Maybe<Array<BsffOperationCode>>;
 };
 
 /** Champs possible pour le filtre sur transporter. */
@@ -5085,6 +5095,7 @@ export type ResolversTypes = {
   BsffWhereTransporter: BsffWhereTransporter;
   BsffWhereDestination: BsffWhereDestination;
   BsffWhereOperation: BsffWhereOperation;
+  BsffWhereNextBsff: BsffWhereNextBsff;
   BsffConnection: ResolverTypeWrapper<BsffConnection>;
   BsffEdge: ResolverTypeWrapper<BsffEdge>;
   BsvhuWhere: BsvhuWhere;
@@ -5400,6 +5411,7 @@ export type ResolversParentTypes = {
   BsffWhereTransporter: BsffWhereTransporter;
   BsffWhereDestination: BsffWhereDestination;
   BsffWhereOperation: BsffWhereOperation;
+  BsffWhereNextBsff: BsffWhereNextBsff;
   BsffConnection: BsffConnection;
   BsffEdge: BsffEdge;
   BsvhuWhere: BsvhuWhere;
@@ -10880,9 +10892,11 @@ export function createBsffWasteInputMock(
 
 export function createBsffWhereMock(props: Partial<BsffWhere>): BsffWhere {
   return {
+    status: null,
     emitter: null,
     transporter: null,
     destination: null,
+    nextBsff: null,
     ...props
   };
 }
@@ -10915,11 +10929,21 @@ export function createBsffWhereEmitterMock(
   };
 }
 
+export function createBsffWhereNextBsffMock(
+  props: Partial<BsffWhereNextBsff>
+): BsffWhereNextBsff {
+  return {
+    id: null,
+    ...props
+  };
+}
+
 export function createBsffWhereOperationMock(
   props: Partial<BsffWhereOperation>
 ): BsffWhereOperation {
   return {
     code: null,
+    code_in: null,
     ...props
   };
 }

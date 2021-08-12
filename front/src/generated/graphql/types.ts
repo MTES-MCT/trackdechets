@@ -1521,12 +1521,16 @@ export type BsffWasteInput = {
 
 /** Filtres possibles pour la récupération de bordereaux. */
 export type BsffWhere = {
+  /** Filtrer sur le champ status. */
+  status?: Maybe<BsffStatus>;
   /** Filtrer sur le champ emitter. */
   emitter?: Maybe<BsffWhereEmitter>;
   /** Filtrer sur le champ transporter. */
   transporter?: Maybe<BsffWhereTransporter>;
   /** Filtrer sur le champ destination. */
   destination?: Maybe<BsffWhereDestination>;
+  /** Filtrer sur le BSFF suivant. */
+  nextBsff?: Maybe<BsffWhereNextBsff>;
 };
 
 /** Filtres sur une entreprise. */
@@ -1545,9 +1549,15 @@ export type BsffWhereEmitter = {
   company?: Maybe<BsffWhereCompany>;
 };
 
+/** Champs possible pour le filtre sur le BSFF suivant. */
+export type BsffWhereNextBsff = {
+  id?: Maybe<Scalars["String"]>;
+};
+
 /** Champs possible pour le filtre sur l'opération. */
 export type BsffWhereOperation = {
   code?: Maybe<BsffOperationCode>;
+  code_in?: Maybe<Array<BsffOperationCode>>;
 };
 
 /** Champs possible pour le filtre sur transporter. */

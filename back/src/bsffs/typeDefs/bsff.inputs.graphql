@@ -1,11 +1,15 @@
 "Filtres possibles pour la récupération de bordereaux."
 input BsffWhere {
+  "Filtrer sur le champ status."
+  status: BsffStatus
   "Filtrer sur le champ emitter."
   emitter: BsffWhereEmitter
   "Filtrer sur le champ transporter."
   transporter: BsffWhereTransporter
   "Filtrer sur le champ destination."
   destination: BsffWhereDestination
+  "Filtrer sur le BSFF suivant."
+  nextBsff: BsffWhereNextBsff
 }
 
 "Champs possible pour le filtre sur l'emitter."
@@ -27,11 +31,17 @@ input BsffWhereDestination {
 "Champs possible pour le filtre sur l'opération."
 input BsffWhereOperation {
   code: BsffOperationCode
+  code_in: [BsffOperationCode!]
 }
 
 "Filtres sur une entreprise."
 input BsffWhereCompany {
   siret: String!
+}
+
+"Champs possible pour le filtre sur le BSFF suivant."
+input BsffWhereNextBsff {
+  id: String
 }
 
 input SignatureInput {
