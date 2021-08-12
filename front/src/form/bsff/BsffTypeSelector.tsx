@@ -82,7 +82,7 @@ function PreviousBsffsPicker({ code_in }: PreviousBsffsPickerProps) {
     {
       variables: {
         where: {
-          status: BsffStatus.Processed,
+          status: BsffStatus.IntermediatelyProcessed,
           destination: {
             operation: {
               code_in,

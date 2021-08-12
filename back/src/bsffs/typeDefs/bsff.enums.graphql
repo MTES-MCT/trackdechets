@@ -21,6 +21,11 @@ enum BsffStatus {
   SENT
   "Le bordereau a été reçu par l'installation de destination."
   RECEIVED
+  """
+  Le déchet a subit un groupement, reconditionnement ou un entreposage provisoire.
+  Il est en attente de la création d'un nouveau BSFF pour finaliser le traitement.
+  """
+  INTERMEDIATELY_PROCESSED
   "Le déchet a été traité par l'installation de destination."
   PROCESSED
   "Le déchet a été refusé par l'installation de traitement."

@@ -1456,6 +1456,11 @@ export enum BsffStatus {
   Sent = "SENT",
   /** Le bordereau a été reçu par l'installation de destination. */
   Received = "RECEIVED",
+  /**
+   * Le déchet a subit un groupement, reconditionnement ou un entreposage provisoire.
+   * Il est en attente de la création d'un nouveau BSFF pour finaliser le traitement.
+   */
+  IntermediatelyProcessed = "INTERMEDIATELY_PROCESSED",
   /** Le déchet a été traité par l'installation de destination. */
   Processed = "PROCESSED",
   /** Le déchet a été refusé par l'installation de traitement. */
