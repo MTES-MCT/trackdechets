@@ -9,12 +9,13 @@ import { WorkflowAction } from "./WorkflowAction";
 import { useParams } from "react-router-dom";
 
 const bsffVerboseStatuses: Record<BsffStatus, string> = {
-  INITIAL: "Initial",
+  INITIAL: "En attente d'enlèvement",
   SIGNED_BY_EMITTER: "Signé par l'émetteur",
-  SENT: "Envoyé",
-  RECEIVED: "Reçu",
+  SENT: "Signé par le transporteur",
+  RECEIVED: "Reçu par le destinataire",
+  INTERMEDIATELY_PROCESSED: "Traité, en attente de suivi",
   PROCESSED: "Traité",
-  REFUSED: "Refusé",
+  REFUSED: "Refusé par le destinataire",
 };
 
 export const COLUMNS: Record<
