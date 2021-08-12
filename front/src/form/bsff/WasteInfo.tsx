@@ -1,10 +1,13 @@
 import { FieldSwitch, RedErrorMessage } from "common/components";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { Field } from "formik";
+import { Field, useField } from "formik";
+import { BsffType } from "generated/graphql/types";
 import React from "react";
 import Packagings from "./components/packagings/Packagings";
 
 export default function WasteInfo({ disabled }) {
+  const [{ value: type }] = useField<BsffType>("type");
+
   return (
     <>
       {disabled && (
@@ -52,7 +55,15 @@ export default function WasteInfo({ disabled }) {
 
       <h4 className="form__section-heading">Contenants</h4>
 
-      <Field name="packagings" component={Packagings} disabled={disabled} />
+      {type === BsffType.Groupement ? (
+        <div className="notification warning">
+          Le groupement ne permet pas de modifier le(s) contenant(s) des BSFFs à
+          grouper. Si vous souhaitez changer de contenant(s), vous devez
+          sélectionner un reconditionnement à l'étape "Type de bordereau".
+        </div>
+      ) : (
+        <Field name="packagings" component={Packagings} disabled={disabled} />
+      )}
 
       <h4 className="form__section-heading">Quantité</h4>
 

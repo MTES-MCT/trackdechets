@@ -6,6 +6,7 @@ import Emitter from "./Emitter";
 import Recipient from "./Destination";
 import Transporter from "./Transporter";
 import WasteInfo from "./WasteInfo";
+import { BsffTypeSelector } from "./BsffTypeSelector";
 
 export default function FormContainer() {
   const { id } = useParams<{ id?: string }>();
@@ -21,6 +22,10 @@ export default function FormContainer() {
 
             return (
               <>
+                <StepContainer
+                  component={BsffTypeSelector}
+                  title="Type de bordereau"
+                />
                 <StepContainer
                   component={WasteInfo}
                   title="Détail du déchet"

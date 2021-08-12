@@ -1,7 +1,7 @@
 import React from "react";
 import { Field } from "formik";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import { OPERATION_CODES } from "./utils/constants";
+import { OPERATION } from "./utils/constants";
 
 export default function Destination({ disabled }) {
   return (
@@ -28,9 +28,9 @@ export default function Destination({ disabled }) {
           disabled={disabled}
         >
           <option />
-          {OPERATION_CODES.map(operation => (
-            <option key={operation.value} value={operation.value}>
-              {operation.value} - {operation.description}
+          {Object.values(OPERATION).map(operation => (
+            <option key={operation.code} value={operation.code}>
+              {operation.code} - {operation.description}
             </option>
           ))}
         </Field>

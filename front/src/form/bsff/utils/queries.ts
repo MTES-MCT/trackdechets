@@ -13,6 +13,7 @@ export const FicheInterventionFragment = gql`
 export const FullBsffFragment = gql`
   fragment FullBsff on Bsff {
     id
+    type
     status
     emitter {
       company {
@@ -89,6 +90,9 @@ export const FullBsffFragment = gql`
     ficheInterventions {
       ...FicheInterventionFragment
     }
+    previousBsffs {
+      id
+    }
   }
   ${companyFragment}
   ${FicheInterventionFragment}
@@ -104,8 +108,8 @@ export const GET_BSFF_FORM = gql`
 `;
 
 export const GET_BSFF_FORMS = gql`
-  query Bsffs {
-    bsffs {
+  query Bsffs($where: BsffWhere) {
+    bsffs(where: $where) {
       totalCount
       pageInfo {
         hasNextPage

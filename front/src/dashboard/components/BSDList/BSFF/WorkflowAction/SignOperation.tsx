@@ -13,14 +13,14 @@ import {
 import { RedErrorMessage } from "common/components";
 import { NotificationError } from "common/components/Error";
 import { SIGN_BSFF, UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
-import { OPERATION_CODES } from "form/bsff/utils/constants";
+import { OPERATION } from "form/bsff/utils/constants";
 import { SignBsff } from "./SignBsff";
 
 const validationSchema = yup.object({
   operationCode: yup
     .string()
     .oneOf(
-      OPERATION_CODES.map(operation => operation.value),
+      Object.keys(OPERATION),
       "Le code de traitement doit faire partie de la liste reconnue"
     )
     .required(),
@@ -51,7 +51,7 @@ function SignOperationModal({ bsff, onCancel }: SignOperationModalProps) {
   return (
     <Formik
       initialValues={{
-        operationCode: "",
+        operationCode: bsff.destination?.plannedOperation?.code ?? "",
         signatureAuthor: "",
       }}
       validationSchema={validationSchema}
@@ -93,9 +93,9 @@ function SignOperationModal({ bsff, onCancel }: SignOperationModalProps) {
               Code de traitement
               <Field as="select" name="operationCode" className="td-select">
                 <option />
-                {OPERATION_CODES.map(({ value, description }) => (
-                  <option key={value} value={value}>
-                    {value} - {description}
+                {Object.values(OPERATION).map(operation => (
+                  <option key={operation.code} value={operation.code}>
+                    {operation.code} - {operation.description}
                   </option>
                 ))}
               </Field>

@@ -1,14 +1,19 @@
 import React from "react";
 import { FieldArray, useField } from "formik";
-import { BsffFicheIntervention, CompanyInput } from "generated/graphql/types";
+import {
+  Bsff,
+  BsffFicheIntervention,
+  CompanyInput,
+} from "generated/graphql/types";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { FicheInterventionList } from "./FicheInterventionList";
 
 export default function Emitter({ disabled }) {
-  const [emitterCompanyField] = useField<CompanyInput>("emitter.company");
-  const [ficheInterventionsField] = useField<BsffFicheIntervention[]>(
+  const [{ value: emitterCompany }] = useField<CompanyInput>("emitter.company");
+  const [{ value: ficheInterventions }] = useField<BsffFicheIntervention[]>(
     "ficheInterventions"
   );
+  const [{ value: previousBsffs }] = useField<Bsff[]>("previousBsffs");
 
   return (
     <>
@@ -25,26 +30,31 @@ export default function Emitter({ disabled }) {
         heading="Entreprise émettrice"
       />
 
-      <FieldArray
-        name="ficheInterventions"
-        render={({ push, remove }) => (
-          <FicheInterventionList
-            ficheInterventions={ficheInterventionsField.value}
-            initialOperateurCompany={emitterCompanyField.value}
-            onAddFicheIntervention={ficheIntervention =>
-              push(ficheIntervention)
-            }
-            onRemoveFicheIntervention={ficheIntervention =>
-              remove(
-                ficheInterventionsField.value.findIndex(
-                  otherFicheIntervention =>
-                    otherFicheIntervention.id === ficheIntervention.id
-                )
-              )
-            }
+      {
+        // Fiche d'interventions can be added to the very first BSFF, not the following ones
+        previousBsffs.length <= 0 && (
+          <FieldArray
+            name="ficheInterventions"
+            render={({ push, remove }) => (
+              <FicheInterventionList
+                ficheInterventions={ficheInterventions}
+                initialOperateurCompany={emitterCompany}
+                onAddFicheIntervention={ficheIntervention =>
+                  push(ficheIntervention)
+                }
+                onRemoveFicheIntervention={ficheIntervention =>
+                  remove(
+                    ficheInterventions.findIndex(
+                      otherFicheIntervention =>
+                        otherFicheIntervention.id === ficheIntervention.id
+                    )
+                  )
+                }
+              />
+            )}
           />
-        )}
-      />
+        )
+      }
     </>
   );
 }

@@ -1,7 +1,8 @@
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import { TransportMode } from "generated/graphql/types";
+import { BsffType, TransportMode } from "generated/graphql/types";
 
 export default {
+  type: BsffType.TracerFluide,
   emitter: {
     company: getInitialCompany(),
   },
@@ -37,4 +38,5 @@ export default {
     isEstimate: false,
   },
   ficheInterventions: [],
+  previousBsffs: [],
 };
