@@ -1,6 +1,7 @@
 import React from "react";
 import { BsffStatus } from "generated/graphql/types";
 import { BsffFragment } from "../types";
+import { PublishBsff } from "./PublishBsff";
 import { SignEmission } from "./SignEmission";
 import { SignTransport } from "./SignTransport";
 import { SignReception } from "./SignReception";
@@ -13,6 +14,10 @@ export interface WorkflowActionProps {
 
 export function WorkflowAction(props: WorkflowActionProps) {
   const { form, siret } = props;
+
+  if (form.isDraft) {
+    return <PublishBsff bsffId={form.id} />;
+  }
 
   switch (form.bsffStatus) {
     case BsffStatus.Initial:

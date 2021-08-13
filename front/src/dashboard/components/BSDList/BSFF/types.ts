@@ -2,6 +2,7 @@ import { BsffStatus } from "generated/graphql/types";
 
 export interface BsffFragment {
   id: string;
+  isDraft: boolean;
   bsffStatus: BsffStatus;
   bsffEmitter?: {
     company?: {

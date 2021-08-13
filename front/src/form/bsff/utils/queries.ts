@@ -125,9 +125,9 @@ export const GET_BSFF_FORMS = gql`
   ${FullBsffFragment}
 `;
 
-export const CREATE_BSFF_FORM = gql`
-  mutation CreateBsff($input: BsffInput!) {
-    createBsff(input: $input) {
+export const CREATE_DRAFT_BSFF = gql`
+  mutation CreateDraftBsff($input: BsffInput!) {
+    createDraftBsff(input: $input) {
       ...FullBsff
     }
   }

@@ -5,9 +5,19 @@ type Mutation {
   createBsff(input: BsffInput!): Bsff!
 
   """
+  Mutation permettant de créer un nouveau bordereau de suivi de fluides frigorigènes, à l'état de brouillon.
+  """
+  createDraftBsff(input: BsffInput!): Bsff!
+
+  """
   Mutation permettant de modifier un bordereau existant de suivi de fluides frigorigènes.
   """
   updateBsff(id: ID!, input: BsffInput!): Bsff!
+
+  """
+  Mutation permettant de publier un brouillon.
+  """
+  publishBsff(id: ID!): Bsff!
 
   """
   Mutation permettant de supprimer un bordereau existant de suivi de fluides frigorigènes.

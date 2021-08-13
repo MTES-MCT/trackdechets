@@ -6,6 +6,11 @@ type Bsff {
   id: ID!
 
   """
+  Si ce BSFF est à l'état de brouillon ou pas.
+  """
+  isDraft: Boolean!
+
+  """
   Type de BSFF.
   """
   type: BsffType!

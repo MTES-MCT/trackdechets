@@ -1189,6 +1189,8 @@ export type Bsff = {
    * Il est à utiliser pour les échanges avec l'API.
    */
   id: Scalars["ID"];
+  /** Si ce BSFF est à l'état de brouillon ou pas. */
+  isDraft: Scalars["Boolean"];
   /** Type de BSFF. */
   type: BsffType;
   /** Statut qui synthétise où en est le déchet dans son cheminement. */
@@ -2919,6 +2921,8 @@ export type Mutation = {
    * Crée un nouveau dasri en brouillon
    */
   createDraftBsdasri: Bsdasri;
+  /** Mutation permettant de créer un nouveau bordereau de suivi de fluides frigorigènes, à l'état de brouillon. */
+  createDraftBsff: Bsff;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Crée un BSVHU en brouillon
@@ -3146,6 +3150,8 @@ export type Mutation = {
    * Marque un dasri brouillon comme publié (isDraft=false)
    */
   publishBsdasri?: Maybe<Bsdasri>;
+  /** Mutation permettant de publier un brouillon. */
+  publishBsff: Bsff;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Permet de publier un brouillon pour le marquer comme prêt à être envoyé
@@ -3348,6 +3354,10 @@ export type MutationCreateDraftBsdasriArgs = {
   input: BsdasriCreateInput;
 };
 
+export type MutationCreateDraftBsffArgs = {
+  input: BsffInput;
+};
+
 export type MutationCreateDraftBsvhuArgs = {
   input: BsvhuInput;
 };
@@ -3526,6 +3536,10 @@ export type MutationPublishBsdaArgs = {
 };
 
 export type MutationPublishBsdasriArgs = {
+  id: Scalars["ID"];
+};
+
+export type MutationPublishBsffArgs = {
   id: Scalars["ID"];
 };
 

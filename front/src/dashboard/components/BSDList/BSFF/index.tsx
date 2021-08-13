@@ -51,7 +51,8 @@ export const COLUMNS: Record<
     Cell: () => null,
   },
   status: {
-    accessor: bsff => bsffVerboseStatuses[bsff.bsffStatus],
+    accessor: bsff =>
+      bsff.isDraft ? "Brouillon" : bsffVerboseStatuses[bsff.bsffStatus],
   },
   workflow: {
     accessor: () => null,

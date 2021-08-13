@@ -8,6 +8,7 @@ export function flattenBsffInput(
   Omit<
     Prisma.Bsff,
     | "id"
+    | "isDraft"
     | "createdAt"
     | "updatedAt"
     | "isDeleted"
@@ -95,6 +96,7 @@ export function flattenBsffInput(
 export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
   return {
     id: prismaBsff.id,
+    isDraft: prismaBsff.isDraft,
     type: prismaBsff.type,
     status: prismaBsff.status,
     emitter: nullIfNoValues<GraphQL.BsffEmitter>({

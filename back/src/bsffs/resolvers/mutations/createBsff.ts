@@ -1,6 +1,6 @@
 import { BsffType, Prisma } from "@prisma/client";
 import prisma from "../../../prisma";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import { BsffInput, MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { flattenBsffInput, unflattenBsff } from "../../converter";
@@ -8,12 +8,11 @@ import { isBsffContributor } from "../../permissions";
 import { isValidPreviousBsffs } from "../../validation";
 import { indexBsff } from "../../elastic";
 
-const createBsff: MutationResolvers["createBsff"] = async (
-  _,
-  { input },
-  context
-) => {
-  const user = checkIsAuthenticated(context);
+export async function createBsff(
+  user: Express.User,
+  input: BsffInput,
+  additionalData: Partial<Prisma.BsffCreateInput> = {}
+) {
   const flatInput: Prisma.BsffCreateInput = {
     id: getReadableId(ReadableIdPrefix.FF),
     type:
@@ -47,12 +46,24 @@ const createBsff: MutationResolvers["createBsff"] = async (
 
   const data: Prisma.BsffCreateInput = flatInput;
   const bsff = await prisma.bsff.create({
-    data
+    data: {
+      ...data,
+      ...additionalData
+    }
   });
 
   await indexBsff(bsff);
 
   return unflattenBsff(bsff);
+}
+
+const createBsffResolver: MutationResolvers["createBsff"] = async (
+  _,
+  { input },
+  context
+) => {
+  const user = checkIsAuthenticated(context);
+  return createBsff(user, input);
 };
 
-export default createBsff;
+export default createBsffResolver;

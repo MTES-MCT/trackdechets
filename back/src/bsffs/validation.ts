@@ -13,6 +13,7 @@ import { OPERATION, WASTE_CODES } from "./constants";
 
 export const beforeEmissionSchema: yup.SchemaOf<Pick<
   Bsff,
+  | "isDraft"
   | "emitterCompanyName"
   | "emitterCompanySiret"
   | "emitterCompanyAddress"
@@ -24,6 +25,12 @@ export const beforeEmissionSchema: yup.SchemaOf<Pick<
   | "quantityKilos"
   | "destinationPlannedOperationCode"
 >> = yup.object({
+  isDraft: yup
+    .boolean()
+    .oneOf(
+      [false],
+      "Il n'est pas possible de signer un BSFF à l'état de brouillon"
+    ),
   emitterCompanyName: yup
     .string()
     .nullable()
