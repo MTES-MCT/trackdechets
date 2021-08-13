@@ -247,11 +247,8 @@ export const beforeOperationSchema: yup.SchemaOf<Pick<
     ) as any, // https://github.com/jquense/yup/issues/1302
   destinationOperationCode: yup
     .string()
-    // Operation code can be null when the waste is temporarily stored and sent somewhere else.
-    // It received no treatment, it was only stored in its current form.
-    .nullable()
     .oneOf(
-      [null, ...Object.keys(OPERATION)],
+      Object.keys(OPERATION),
       "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : ${values}"
     ),
   destinationOperationSignatureDate: yup
@@ -354,32 +351,31 @@ export async function isValidPreviousBsffs(type: BsffType, ids: string[]) {
     }
   });
 
-  const errors = [];
-
-  for (const previousBsff of previousBsffs) {
+  const errors = previousBsffs.reduce<string[]>((acc, previousBsff) => {
     if (previousBsff.status === BsffStatus.PROCESSED) {
-      errors.push(
+      return acc.concat([
         `Le bordereau n°${previousBsff.id} a déjà reçu son traitement final.`
-      );
+      ]);
     }
 
     if (previousBsff.status !== BsffStatus.INTERMEDIATELY_PROCESSED) {
-      errors.push(
+      return acc.concat([
         `Le bordereau n°${previousBsff.id} n'a pas toutes les signatures requises.`
-      );
+      ]);
     }
 
     if (
-      previousBsff.destinationOperationCode &&
       !OPERATION[previousBsff.destinationOperationCode].successors.includes(
         type
       )
     ) {
-      errors.push(
+      return acc.concat([
         `Le bordereau n°${previousBsff.id} a déclaré un traitement qui ne permet pas de lui donner la suite voulue.`
-      );
+      ]);
     }
-  }
+
+    return acc;
+  }, []);
 
   if (errors.length > 0) {
     throw new UserInputError(errors.join("\n"));

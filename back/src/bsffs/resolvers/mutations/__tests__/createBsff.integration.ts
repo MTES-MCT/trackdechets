@@ -157,7 +157,7 @@ describe("Mutation.createBsff", () => {
         { emitter, transporter, destination },
         {
           status: BsffStatus.INTERMEDIATELY_PROCESSED,
-          destinationOperationCode: null
+          destinationOperationCode: OPERATION.R13.code
         }
       );
 

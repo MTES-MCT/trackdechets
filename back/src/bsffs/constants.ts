@@ -1,17 +1,6 @@
 import * as Prisma from "@prisma/client";
 import * as GraphQL from "../generated/graphql/types";
 
-export const OPERATION_CODE: Record<
-  GraphQL.BsffOperationCode,
-  GraphQL.BsffOperationCode
-> = {
-  R2: "R2",
-  R12: "R12",
-  D10: "D10",
-  D13: "D13",
-  D14: "D14"
-};
-
 export const OPERATION: Record<
   GraphQL.BsffOperationCode,
   {
@@ -31,6 +20,12 @@ export const OPERATION: Record<
       "Échange de déchets en vue de les soumettre à l'une des opérations numérotées R1 à R11",
     successors: [Prisma.BsffType.GROUPEMENT, Prisma.BsffType.RECONDITIONNEMENT]
   },
+  R13: {
+    code: "R13",
+    description:
+      "Stockage de déchets préalablement à l’une des opérations R1 à R12 (à l’exclusion du stockage temporaire, avant collecte, sur le site de production).",
+    successors: [Prisma.BsffType.REEXPEDITION]
+  },
   D10: {
     code: "D10",
     description: "Incinération à terre",
@@ -47,6 +42,12 @@ export const OPERATION: Record<
     description:
       "Reconditionnement préalablement à l’une des opérations numérotées D1 à D13",
     successors: [Prisma.BsffType.RECONDITIONNEMENT]
+  },
+  D15: {
+    code: "D15",
+    description:
+      "Stockage préalablement à l’une des opérations D1 à D14 (à l’exclusion du stockage temporaire, avant collecte, sur le site de production).",
+    successors: [Prisma.BsffType.REEXPEDITION]
   }
 };
 

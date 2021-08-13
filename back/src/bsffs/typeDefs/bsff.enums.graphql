@@ -36,9 +36,11 @@ enum BsffStatus {
 enum BsffOperationCode {
   R2
   R12
+  R13
   D10
   D13
   D14
+  D15
 }
 
 enum BsffSignatureType {

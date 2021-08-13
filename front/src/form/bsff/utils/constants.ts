@@ -15,6 +15,12 @@ export const OPERATION: Record<
       "Échange de déchets en vue de les soumettre à l'une des opérations numérotées R1 à R11",
     successors: [BsffType.Groupement, BsffType.Reconditionnement],
   },
+  [BsffOperationCode.R13]: {
+    code: BsffOperationCode.R13,
+    description:
+      "Stockage de déchets préalablement à l’une des opérations R1 à R12 (à l’exclusion du stockage temporaire, avant collecte, sur le site de production).",
+    successors: [BsffType.Reexpedition],
+  },
   [BsffOperationCode.D10]: {
     code: BsffOperationCode.D10,
     description: "Incinération à terre",
@@ -31,5 +37,11 @@ export const OPERATION: Record<
     description:
       "Reconditionnement préalablement à l’une des opérations numérotées D1 à D13",
     successors: [BsffType.Reconditionnement],
+  },
+  [BsffOperationCode.D15]: {
+    code: BsffOperationCode.D15,
+    description:
+      "Stockage préalablement à l’une des opérations D1 à D14 (à l’exclusion du stockage temporaire, avant collecte, sur le site de production).",
+    successors: [BsffType.Reexpedition],
   },
 };

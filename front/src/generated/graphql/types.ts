@@ -1377,9 +1377,11 @@ export type BsffOperation = {
 export enum BsffOperationCode {
   R2 = "R2",
   R12 = "R12",
+  R13 = "R13",
   D10 = "D10",
   D13 = "D13",
-  D14 = "D14"
+  D14 = "D14",
+  D15 = "D15"
 }
 
 export type BsffOperationNextDestinationInput = {

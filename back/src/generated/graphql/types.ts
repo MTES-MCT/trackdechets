@@ -1357,7 +1357,14 @@ export type BsffOperation = {
 };
 
 /** Liste des codes de traitement possible. */
-export type BsffOperationCode = "R2" | "R12" | "D10" | "D13" | "D14";
+export type BsffOperationCode =
+  | "R2"
+  | "R12"
+  | "R13"
+  | "D10"
+  | "D13"
+  | "D14"
+  | "D15";
 
 export type BsffOperationNextDestinationInput = {
   company: CompanyInput;
