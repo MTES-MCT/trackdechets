@@ -44,6 +44,7 @@ export default function BsffPackagings({
                         <label>
                           Volume
                           <Field
+                            component={NumberInput}
                             className="td-input"
                             name={`${fieldName}.volume`}
                             disabled={disabled}

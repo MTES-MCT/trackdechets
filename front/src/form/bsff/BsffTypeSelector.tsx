@@ -70,13 +70,37 @@ const options = [
       </div>
     ),
   },
+  {
+    value: BsffType.Reexpedition,
+    label: "Réexpédition d'un BSFF",
+    Component: () => (
+      <div style={{ padding: "1rem 0" }}>
+        <p style={{ marginBottom: "0.25rem" }}>
+          Retrouvez ci-dessous la liste des BSFFs qui sont en attente d'une
+          réexpédition.
+        </p>
+        <PreviousBsffsPicker
+          code_in={Object.values(OPERATION)
+            .filter(operation =>
+              operation.successors.includes(BsffType.Reexpedition)
+            )
+            .map(operation => operation.code)}
+          max={1}
+        />
+      </div>
+    ),
+  },
 ];
 
 interface PreviousBsffsPickerProps {
   code_in: BsffOperationCode[];
+  max?: number;
 }
 
-function PreviousBsffsPicker({ code_in }: PreviousBsffsPickerProps) {
+function PreviousBsffsPicker({
+  code_in,
+  max = Infinity,
+}: PreviousBsffsPickerProps) {
   const { data } = useQuery<Pick<Query, "bsffs">, QueryBsffsArgs>(
     GET_BSFF_FORMS,
     {
@@ -123,9 +147,20 @@ function PreviousBsffsPicker({ code_in }: PreviousBsffsPickerProps) {
               return (
                 <TableRow
                   key={bsff.id}
-                  onClick={() =>
-                    isSelected ? remove(previousBsffIndex) : push(bsff)
-                  }
+                  onClick={() => {
+                    if (previousBsffs.length >= max) {
+                      window.alert(
+                        `Vous ne pouvez pas sélectionner plus de ${max} BSFFs avec ce type de BSFF.`
+                      );
+                      return;
+                    }
+
+                    if (isSelected) {
+                      remove(previousBsffIndex);
+                    } else {
+                      push(bsff);
+                    }
+                  }}
                 >
                   <TableCell>
                     <input
@@ -276,6 +311,43 @@ export function BsffTypeSelector() {
                     }
 
                     setPreviousBsffs([]);
+                    setFicheInterventions([]);
+                    setType(option.value);
+                    return;
+                  }
+
+                  if (option.value === BsffType.Reexpedition) {
+                    const errors = [
+                      ...(previousBsffs.length > 0
+                        ? [
+                            `Ce BSFF fait actuellement référénce à ${previousBsffs.length} précédents BSFFs. Hors certains d'entre eux peuvent avoir déclaré un traitement incompatible avec une réexpédition.`,
+                            `Pour continuer, ces BSFFs vont être dissociés.`,
+                          ]
+                        : []),
+                      ...(packagings.length > 0
+                        ? [
+                            `Ce BSFF liste actuellement ${packagings.length} contenants. Hors la réexpédition ne permet pas de changer les contenants du BSFF réexpédié.`,
+                            `Pour continuer, les contenants actuels vont être retirés.`,
+                          ]
+                        : []),
+                      ...(ficheInterventions.length > 0
+                        ? [
+                            `Ce BSFF liste actuellement ${ficheInterventions.length} fiches d'intervention. Hors la réexpédition ne fait pas suite à une intervention.`,
+                            `Pour continuer, les fiches d'intervention vont être dissociées.`,
+                          ]
+                        : []),
+                    ];
+                    if (
+                      errors.length > 0 &&
+                      !window.confirm(
+                        [...errors, `Souhaitez-vous continuer ?`].join("\n\n")
+                      )
+                    ) {
+                      return;
+                    }
+
+                    setPreviousBsffs([]);
+                    setPackagings([]);
                     setFicheInterventions([]);
                     setType(option.value);
                     return;

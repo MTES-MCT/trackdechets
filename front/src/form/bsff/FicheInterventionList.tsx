@@ -162,6 +162,7 @@ function AddFicheInterventionModal({
 }
 
 interface FicheInterventionListProps {
+  max?: number;
   ficheInterventions: BsffFicheIntervention[];
   initialOperateurCompany: BsffFicheInterventionInput["operateur"]["company"];
   onAddFicheIntervention: (ficheIntervention: BsffFicheIntervention) => void;
@@ -169,6 +170,7 @@ interface FicheInterventionListProps {
 }
 
 export function FicheInterventionList({
+  max = Infinity,
   ficheInterventions,
   initialOperateurCompany,
   onAddFicheIntervention,
@@ -237,7 +239,16 @@ export function FicheInterventionList({
       <button
         type="button"
         className="btn btn--outline-primary"
-        onClick={() => setIsModalOpen(true)}
+        onClick={() => {
+          if (ficheInterventions.length >= max) {
+            window.alert(
+              `Vous ne pouvez pas ajouter plus de ${max} fiche(s) d'intervention avec ce type de BSFF.`
+            );
+            return;
+          }
+
+          setIsModalOpen(true);
+        }}
       >
         Ajouter une fiche d'intervention
       </button>

@@ -1,8 +1,8 @@
 import React from "react";
 import { FieldArray, useField } from "formik";
 import {
-  Bsff,
   BsffFicheIntervention,
+  BsffType,
   CompanyInput,
 } from "generated/graphql/types";
 import CompanySelector from "form/common/components/company/CompanySelector";
@@ -13,7 +13,7 @@ export default function Emitter({ disabled }) {
   const [{ value: ficheInterventions }] = useField<BsffFicheIntervention[]>(
     "ficheInterventions"
   );
-  const [{ value: previousBsffs }] = useField<Bsff[]>("previousBsffs");
+  const [{ value: type }] = useField<BsffType>("type");
 
   return (
     <>
@@ -30,31 +30,31 @@ export default function Emitter({ disabled }) {
         heading="Entreprise émettrice"
       />
 
-      {
-        // Fiche d'interventions can be added to the very first BSFF, not the following ones
-        previousBsffs.length <= 0 && (
-          <FieldArray
-            name="ficheInterventions"
-            render={({ push, remove }) => (
-              <FicheInterventionList
-                ficheInterventions={ficheInterventions}
-                initialOperateurCompany={emitterCompany}
-                onAddFicheIntervention={ficheIntervention =>
-                  push(ficheIntervention)
-                }
-                onRemoveFicheIntervention={ficheIntervention =>
-                  remove(
-                    ficheInterventions.findIndex(
-                      otherFicheIntervention =>
-                        otherFicheIntervention.id === ficheIntervention.id
-                    )
+      {[BsffType.TracerFluide, BsffType.CollectePetitesQuantites].includes(
+        type
+      ) && (
+        <FieldArray
+          name="ficheInterventions"
+          render={({ push, remove }) => (
+            <FicheInterventionList
+              max={type === BsffType.TracerFluide ? 1 : undefined}
+              ficheInterventions={ficheInterventions}
+              initialOperateurCompany={emitterCompany}
+              onAddFicheIntervention={ficheIntervention =>
+                push(ficheIntervention)
+              }
+              onRemoveFicheIntervention={ficheIntervention =>
+                remove(
+                  ficheInterventions.findIndex(
+                    otherFicheIntervention =>
+                      otherFicheIntervention.id === ficheIntervention.id
                   )
-                }
-              />
-            )}
-          />
-        )
-      }
+                )
+              }
+            />
+          )}
+        />
+      )}
     </>
   );
 }

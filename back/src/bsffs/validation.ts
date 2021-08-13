@@ -122,8 +122,7 @@ export const beforeTransportSchema: yup.SchemaOf<Pick<
           .required("Le poids du contenant est requis")
       })
     )
-    .required("Le conditionnement est requis")
-    .min(1, "Le conditionnement est requis"),
+    .required("Le conditionnement est requis"),
   wasteAdr: yup.string().nullable().required("La mention ADR est requise"),
   transporterCompanyName: yup
     .string()

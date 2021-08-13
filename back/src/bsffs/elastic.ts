@@ -60,6 +60,13 @@ function toBsdElastic(bsff: Bsff): BsdElastic {
       bsd.isForActionFor.push(bsff.destinationCompanySiret);
       break;
     }
+    case BsffStatus.INTERMEDIATELY_PROCESSED: {
+      bsd.isFollowFor.push(
+        bsff.emitterCompanySiret,
+        bsff.transporterCompanySiret,
+        bsff.destinationCompanySiret
+      );
+    }
     case BsffStatus.REFUSED:
     case BsffStatus.PROCESSED: {
       bsd.isArchivedFor.push(

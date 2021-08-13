@@ -55,10 +55,10 @@ export default function WasteInfo({ disabled }) {
 
       <h4 className="form__section-heading">Contenants</h4>
 
-      {type === BsffType.Groupement ? (
+      {[BsffType.Groupement, BsffType.Reexpedition].includes(type) ? (
         <div className="notification warning">
-          Le groupement ne permet pas de modifier le(s) contenant(s) des BSFFs à
-          grouper. Si vous souhaitez changer de contenant(s), vous devez
+          Le type de BSFF que vous avez choisit ne permet pas de modifier les
+          contenants. Si vous souhaitez changer de contenants, vous devez
           sélectionner un reconditionnement à l'étape "Type de bordereau".
         </div>
       ) : (
