@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { BsffType, Prisma } from "@prisma/client";
 import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -15,8 +15,19 @@ const createBsff: MutationResolvers["createBsff"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
   const flatInput: Prisma.BsffCreateInput = {
-    ...flattenBsffInput(input),
-    id: getReadableId(ReadableIdPrefix.FF)
+    id: getReadableId(ReadableIdPrefix.FF),
+    type:
+      input.previousBsffs?.length > 0
+        ? input.packagings?.length > 0
+          ? BsffType.RECONDITIONNEMENT
+          : input.previousBsffs?.length === 1
+          ? BsffType.REEXPEDITION
+          : BsffType.GROUPEMENT
+        : input.ficheInterventions?.length > 1
+        ? BsffType.COLLECTE_PETITES_QUANTITES
+        : BsffType.TRACER_FLUIDE,
+
+    ...flattenBsffInput(input)
   };
 
   await isBsffContributor(user, flatInput);
