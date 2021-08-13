@@ -4,10 +4,11 @@ import {
   Bsff,
   TransportMode,
   BsffFicheIntervention,
-  BsffStatus
+  BsffStatus,
+  BsffType
 } from "@prisma/client";
 import prisma from "../prisma";
-import { BsffPackaging, BsffType } from "../generated/graphql/types";
+import { BsffPackaging } from "../generated/graphql/types";
 import { OPERATION, WASTE_CODES } from "./constants";
 
 export const beforeEmissionSchema: yup.SchemaOf<Pick<
