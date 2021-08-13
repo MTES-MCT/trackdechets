@@ -7,12 +7,8 @@ import {
   BsffStatus
 } from "@prisma/client";
 import prisma from "../prisma";
-import {
-  BsffOperationCode,
-  BsffPackaging,
-  BsffType
-} from "../generated/graphql/types";
-import { BSFF_TYPE, OPERATION, WASTE_CODES } from "./constants";
+import { BsffPackaging, BsffType } from "../generated/graphql/types";
+import { OPERATION, WASTE_CODES } from "./constants";
 
 export const beforeEmissionSchema: yup.SchemaOf<Pick<
   Bsff,

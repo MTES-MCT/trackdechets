@@ -1,9 +1,9 @@
 import { SetRequired } from "type-fest";
-import { Prisma, TransportMode, BsffStatus } from "@prisma/client";
+import { Prisma, TransportMode, BsffStatus, BsffType } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
 import { UserWithCompany } from "../../__tests__/factories";
-import { BSFF_TYPE, OPERATION, WASTE_CODES } from "../constants";
+import { OPERATION, WASTE_CODES } from "../constants";
 
 interface CreateBsffArgs {
   emitter?: UserWithCompany;
@@ -17,7 +17,7 @@ export function createBsff(
 ) {
   const data = {
     id: getReadableId(ReadableIdPrefix.FF),
-    type: BSFF_TYPE.TRACER_FLUIDE,
+    type: BsffType.TRACER_FLUIDE,
     status: BsffStatus.INITIAL,
     ...initialData
   };

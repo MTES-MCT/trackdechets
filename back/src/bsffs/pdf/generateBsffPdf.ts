@@ -2,11 +2,11 @@ import path from "path";
 import fs from "fs/promises";
 import mustache from "mustache";
 import { format } from "date-fns";
-import { Bsff } from "@prisma/client";
+import { Bsff, BsffType } from "@prisma/client";
 import prisma from "../../prisma";
 import { BsffPackaging } from "../../generated/graphql/types";
 import { toPDF } from "../../common/pdf";
-import { BSFF_TYPE, OPERATION } from "../constants";
+import { OPERATION } from "../constants";
 
 const assetsPath = path.join(__dirname, "assets");
 const templatePath = path.join(assetsPath, "index.html");
@@ -28,12 +28,12 @@ export async function generateBsffPdf(bsff: Bsff) {
   });
 
   const bsffType = {
-    isTracerFluide: bsff.type === BSFF_TYPE.TRACER_FLUIDE,
+    isTracerFluide: bsff.type === BsffType.TRACER_FLUIDE,
     isCollectePetitesQuantites:
-      bsff.type === BSFF_TYPE.COLLECTE_PETITES_QUANTITES,
-    isGroupement: bsff.type === BSFF_TYPE.GROUPEMENT,
-    isReconditionnement: bsff.type === BSFF_TYPE.RECONDITIONNEMENT,
-    isReexpedition: bsff.type === BSFF_TYPE.REEXPEDITION
+      bsff.type === BsffType.COLLECTE_PETITES_QUANTITES,
+    isGroupement: bsff.type === BsffType.GROUPEMENT,
+    isReconditionnement: bsff.type === BsffType.RECONDITIONNEMENT,
+    isReexpedition: bsff.type === BsffType.REEXPEDITION
   };
   const bsffOperation = {
     isRecuperationR2: bsff.destinationOperationCode === OPERATION.R2.code,
