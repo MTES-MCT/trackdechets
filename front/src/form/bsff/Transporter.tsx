@@ -1,3 +1,4 @@
+import { Switch } from "common/components";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
@@ -5,9 +6,11 @@ import { Field, useFormikContext } from "formik";
 import { Bsff } from "generated/graphql/types";
 import React from "react";
 import styles from "./Transporter.module.scss";
+import initialState from "./utils/initial-state";
 
 export default function Transporter({ disabled }) {
   const { setFieldValue, values } = useFormikContext<Bsff>();
+
   return (
     <>
       {disabled && (
@@ -59,43 +62,61 @@ export default function Transporter({ disabled }) {
         <>
           <h4 className="form__section-heading">Autorisations</h4>
           <div className="form__row">
-            <label>
-              Numéro de récépissé
-              <Field
-                type="text"
-                name="transporter.recepisse.number"
-                className="td-input"
-                disabled={disabled}
-              />
-            </label>
-
-            <RedErrorMessage name="transporter.recepisse.number" />
-
-            <label>
-              Département
-              <Field
-                type="text"
-                name="transporter.recepisse.department"
-                placeholder="Ex: 83"
-                className={`td-input ${styles.transporterDepartment}`}
-                disabled={disabled}
-              />
-            </label>
-
-            <RedErrorMessage name="transporter.recepisse.department" />
-
-            <label>
-              Limite de validité
-              <Field
-                component={DateInput}
-                name="transporter.recepisse.validityLimit"
-                className={`td-input ${styles.transporterValidityLimit}`}
-                disabled={disabled}
-              />
-            </label>
-
-            <RedErrorMessage name="transporter.recepisse.validityLimit" />
+            <Switch
+              checked={values.transporter?.recepisse == null}
+              onChange={() =>
+                setFieldValue(
+                  "transporter.recepisse",
+                  values.transporter?.recepisse == null
+                    ? initialState.transporter.recepisse
+                    : null
+                )
+              }
+              label="Le transporteur déclare être exempté de récépissé conformément aux dispositions de l'article R.541-50 du code de l'environnement."
+            />
           </div>
+          {values.transporter?.recepisse != null && (
+            <>
+              <div className="form__row">
+                <label>
+                  Numéro de récépissé
+                  <Field
+                    type="text"
+                    name="transporter.recepisse.number"
+                    className="td-input"
+                    disabled={disabled}
+                  />
+                </label>
+
+                <RedErrorMessage name="transporter.recepisse.number" />
+
+                <label>
+                  Département
+                  <Field
+                    type="text"
+                    name="transporter.recepisse.department"
+                    placeholder="Ex: 83"
+                    className={`td-input ${styles.transporterDepartment}`}
+                    disabled={disabled}
+                  />
+                </label>
+
+                <RedErrorMessage name="transporter.recepisse.department" />
+
+                <label>
+                  Limite de validité
+                  <Field
+                    component={DateInput}
+                    name="transporter.recepisse.validityLimit"
+                    className={`td-input ${styles.transporterValidityLimit}`}
+                    disabled={disabled}
+                  />
+                </label>
+
+                <RedErrorMessage name="transporter.recepisse.validityLimit" />
+              </div>
+            </>
+          )}
         </>
       )}
     </>
