@@ -357,13 +357,19 @@ export async function isValidPreviousBsffs(type: BsffType, ids: string[]) {
     }
   });
 
-  const errors = previousBsffs.map(previousBsff => {
+  const errors = [];
+
+  for (const previousBsff of previousBsffs) {
     if (previousBsff.status === BsffStatus.PROCESSED) {
-      return `Le bordereau n°${previousBsff.id} a déjà reçu son traitement final.`;
+      errors.push(
+        `Le bordereau n°${previousBsff.id} a déjà reçu son traitement final.`
+      );
     }
 
     if (previousBsff.status !== BsffStatus.INTERMEDIATELY_PROCESSED) {
-      return `Le bordereau n°${previousBsff.id} n'a pas toutes les signatures requises.`;
+      errors.push(
+        `Le bordereau n°${previousBsff.id} n'a pas toutes les signatures requises.`
+      );
     }
 
     if (
@@ -372,9 +378,11 @@ export async function isValidPreviousBsffs(type: BsffType, ids: string[]) {
         type
       )
     ) {
-      return `Le bordereau n°${previousBsff.id} a déclaré un traitement qui ne permet pas de lui donner la suite voulue.`;
+      errors.push(
+        `Le bordereau n°${previousBsff.id} a déclaré un traitement qui ne permet pas de lui donner la suite voulue.`
+      );
     }
-  });
+  }
 
   if (errors.length > 0) {
     throw new UserInputError(errors.join("\n"));

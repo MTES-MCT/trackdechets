@@ -427,7 +427,7 @@ describe("Mutation.signBsff", () => {
       );
 
       const { mutate } = makeClient(destination.user);
-      const { data } = await mutate<
+      const { data, errors } = await mutate<
         Pick<Mutation, "signBsff">,
         MutationSignBsffArgs
       >(SIGN, {
@@ -441,6 +441,7 @@ describe("Mutation.signBsff", () => {
         }
       });
 
+      expect(errors).toBeUndefined();
       expect(data.signBsff.id).toBeTruthy();
     });
   });

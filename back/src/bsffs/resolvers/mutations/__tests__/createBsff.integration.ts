@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { UserRole, BsffStatus, BsffType } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -117,17 +117,19 @@ describe("Mutation.createBsff", () => {
       const previousBsff = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED,
           destinationOperationCode: OPERATION.R12.code
         }
       );
 
       const { mutate } = makeClient(destination.user);
-      const { data } = await mutate<
+      const { data, errors } = await mutate<
         Pick<Mutation, "createBsff">,
         MutationCreateBsffArgs
       >(CREATE_BSFF, {
         variables: {
           input: {
+            type: BsffType.GROUPEMENT,
             destination: {
               company: {
                 name: destination.company.name,
@@ -141,6 +143,8 @@ describe("Mutation.createBsff", () => {
           }
         }
       });
+
+      expect(errors).toBeUndefined();
 
       const previousBsffs = await prisma.bsff
         .findUnique({ where: { id: data.createBsff.id } })
@@ -152,17 +156,19 @@ describe("Mutation.createBsff", () => {
       const previousBsff = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED,
           destinationOperationCode: null
         }
       );
 
       const { mutate } = makeClient(destination.user);
-      const { data } = await mutate<
+      const { data, errors } = await mutate<
         Pick<Mutation, "createBsff">,
         MutationCreateBsffArgs
       >(CREATE_BSFF, {
         variables: {
           input: {
+            type: BsffType.REEXPEDITION,
             destination: {
               company: {
                 name: destination.company.name,
@@ -177,6 +183,8 @@ describe("Mutation.createBsff", () => {
         }
       });
 
+      expect(errors).toBeUndefined();
+
       const previousBsffs = await prisma.bsff
         .findUnique({ where: { id: data.createBsff.id } })
         .previousBsffs();
@@ -185,12 +193,7 @@ describe("Mutation.createBsff", () => {
 
     it("should disallow adding bsffs with missing signatures", async () => {
       const previousBsffs = await Promise.all([
-        createBsffAfterEmission(
-          { emitter, transporter, destination },
-          {
-            destinationOperationCode: OPERATION.R12.code
-          }
-        )
+        createBsffAfterEmission({ emitter, transporter, destination })
       ]);
 
       const { mutate } = makeClient(destination.user);
@@ -200,6 +203,7 @@ describe("Mutation.createBsff", () => {
       >(CREATE_BSFF, {
         variables: {
           input: {
+            type: BsffType.GROUPEMENT,
             destination: {
               company: {
                 name: destination.company.name,
@@ -209,14 +213,19 @@ describe("Mutation.createBsff", () => {
                 mail: destination.user.email
               }
             },
-            previousBsffs: previousBsffs.map(bsff => bsff.id)
+            previousBsffs: previousBsffs.map(previousBsff => previousBsff.id)
           }
         }
       });
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message: `Certains des bordereaux à associer n'ont pas toutes les signatures requises`
+          message: previousBsffs
+            .map(
+              previousBsff =>
+                `Le bordereau n°${previousBsff.id} n'a pas toutes les signatures requises.`
+            )
+            .join("\n")
         })
       ]);
     });

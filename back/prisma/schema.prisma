@@ -838,7 +838,7 @@ model Bsff {
   wasteAdr         String?
 
   quantityKilos      Float?
-  quantityIsEstimate Boolean @default(false)
+  quantityIsEstimate Boolean?
 
   transporterCompanyName      String?
   transporterCompanySiret     String?
