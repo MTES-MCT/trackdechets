@@ -51,17 +51,10 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
       {emissionEmphasis && <FillFieldsInfo />}
       {disabled && <DisabledFieldsInfo />}
 
-      {disabled && (
-        <div className="notification notification--error">
-          Les champs grisés ci-dessous ont été scellés via signature et ne sont
-          plus modifiables.
-        </div>
-      )}
-
-      {isRegrouping && (
+      {isRegrouping ? (
         <>
           <h3 className="form__section-heading">
-            Bordereau dasri de groupement
+            Bordereau de groupement DASRI
           </h3>
 
           {values?.emitter?.company?.siret && !isUserCurrentEmitter && (
@@ -71,41 +64,8 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
             </p>
           )}
         </>
-      )}
-
-      <div
-        className={classNames("form__row", {
-          "field-emphasis": emissionEmphasis,
-        })}
-      >
-        <CompanySelector
-          disabled={disabled}
-          name="emitter.company"
-          heading="Personne responsable de l'élimination des déchets"
-          optionalMail={true}
-        />
-      </div>
-
-      {disabled && (
-        <div className="notification notification--error">
-          Les champs grisés ci-dessous ont été scellés via signature et ne sont
-          plus modifiables.
-        </div>
-      )}
-
-      {isRegrouping && (
-        <>
-          <h3 className="form__section-heading">
-            Bordereau dasri de groupement
-          </h3>
-
-          {values?.emitter?.company?.siret && !isUserCurrentEmitter && (
-            <p className="notification notification--error">
-              Pour préparer un bordereau de regroupement, vous devez y figurer
-              comme producteur
-            </p>
-          )}
-        </>
+      ) : (
+        <h3 className="form__section-heading">Bordereau de suivi DASRI</h3>
       )}
 
       <div
