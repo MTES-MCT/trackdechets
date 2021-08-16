@@ -162,7 +162,7 @@ export const COLUMNS: Record<string, Column> = {
   }),
   status: createColumn({
     id: "status",
-    Header: "Status",
+    Header: "Statut",
     disableFilters: true,
     disableSortBy: true,
   }),
