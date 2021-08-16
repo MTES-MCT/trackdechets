@@ -157,7 +157,7 @@ export default function Recipient({ status, stepName }) {
               <Field
                 component={NumberInput}
                 name="operation.quantity.value"
-                className="td-input dasri__waste-details__quantity-input"
+                className="td-input dasri__waste-details__quantity"
                 placeholder="En kg"
                 min="0"
                 step="0.1"
