@@ -92,19 +92,15 @@ const getRegroupedBsdasriArgs = (
 };
 
 const getIsRegrouping = (dbRegroupedBsdasris, regroupedBsdasris) => {
-  if (regroupedBsdasris === null) {
-    return { isRegrouping: false };
-  }
+  // new input does not provide info about regrouped dasris: use db value
   if (regroupedBsdasris === undefined) {
     return {
-      isRegrouping:
-        (!!regroupedBsdasris && !!regroupedBsdasris.length) ||
-        !!dbRegroupedBsdasris.length
+      isRegrouping: !!dbRegroupedBsdasris.length
     };
   }
-  if (!!regroupedBsdasris) {
-    return { isRegrouping: true };
-  }
+  // else use provided input value
+
+  return { isRegrouping: !!regroupedBsdasris?.length };
 };
 
 /**
@@ -146,6 +142,7 @@ const dasriUpdateResolver = async (
     dbRegroupedBsdasris,
     inputRegroupedBsdasris
   );
+
   await validateBsdasri(expectedBsdasri, {
     ...isRegrouping
   });
