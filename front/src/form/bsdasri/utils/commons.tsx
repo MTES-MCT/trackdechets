@@ -1,8 +1,8 @@
 import React from "react";
 export const FillFieldsInfo = () => (
   <p className="notification notification--warning">
-    Veuillez vous assurer que les mis en valeur soient remplis afin de pouvoir
-    signer
+    Veuillez vous assurer que les champs mis en valeur soient remplis afin de
+    pouvoir signer
   </p>
 );
 export const DisabledFieldsInfo = () => (
