@@ -296,7 +296,7 @@ export default function BsdasriDetailContent({
             [{form.isDraft ? "Brouillon" : statusLabels[form["bsdasriStatus"]]}]
           </span>
           {!form.isDraft && <span>{form.id}</span>}
-          {form?.regroupedBsdasris?.length && (
+          {!!form?.regroupedBsdasris?.length && (
             <span>Bordereau de groupement</span>
           )}
         </h4>
