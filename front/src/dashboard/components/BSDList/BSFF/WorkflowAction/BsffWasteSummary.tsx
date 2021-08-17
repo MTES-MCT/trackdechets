@@ -1,6 +1,11 @@
 import * as React from "react";
 import { Bsff } from "generated/graphql/types";
-import styles from "./BsffWasteSummary.module.scss";
+import {
+  DataList,
+  DataListItem,
+  DataListTerm,
+  DataListDescription,
+} from "common/components";
 
 interface BsffWasteSummaryProps {
   bsff: Bsff;
@@ -8,24 +13,24 @@ interface BsffWasteSummaryProps {
 
 export function BsffWasteSummary({ bsff }: BsffWasteSummaryProps) {
   return (
-    <div className={styles.WasteSummary}>
-      <div className={styles.WasteSummaryItem}>
-        <div className={styles.WasteSummaryItemLabel}>BSFF n°</div>
-        <div className={styles.WasteSummaryItemContent}>{bsff.id}</div>
-      </div>
-      <div className={styles.WasteSummaryItem}>
-        <div className={styles.WasteSummaryItemLabel}>Code déchet</div>
-        <div className={styles.WasteSummaryItemContent}>{bsff.waste?.code}</div>
-      </div>
-      <div className={styles.WasteSummaryItem}>
-        <div className={styles.WasteSummaryItemLabel}>Nature du fluide</div>
-        <div className={styles.WasteSummaryItemContent}>
+    <DataList>
+      <DataListItem>
+        <DataListTerm>BSFF n°</DataListTerm>
+        <DataListDescription>{bsff.id}</DataListDescription>
+      </DataListItem>
+      <DataListItem>
+        <DataListTerm>Code déchet</DataListTerm>
+        <DataListDescription>{bsff.waste?.code}</DataListDescription>
+      </DataListItem>
+      <DataListItem>
+        <DataListTerm>Nature du fluide</DataListTerm>
+        <DataListDescription>
           {bsff.waste?.nature || "inconnue"}
-        </div>
-      </div>
-      <div className={styles.WasteSummaryItem}>
-        <div className={styles.WasteSummaryItemLabel}>Quantité de fluides</div>
-        <div className={styles.WasteSummaryItemContent}>
+        </DataListDescription>
+      </DataListItem>
+      <DataListItem>
+        <DataListTerm>Quantité de fluides</DataListTerm>
+        <DataListDescription>
           {bsff.destination?.reception?.kilos == null ? (
             <>
               {bsff.quantity?.kilos} kilo(s){" "}
@@ -34,19 +39,19 @@ export function BsffWasteSummary({ bsff }: BsffWasteSummaryProps) {
           ) : (
             <>{bsff.destination.reception.kilos} kilo(s)</>
           )}
-        </div>
-      </div>
-      <div className={styles.WasteSummaryItem}>
-        <div className={styles.WasteSummaryItemLabel}>Contenant(s)</div>
-        <div className={styles.WasteSummaryItemContent}>
+        </DataListDescription>
+      </DataListItem>
+      <DataListItem>
+        <DataListTerm>Contenant(s)</DataListTerm>
+        <DataListDescription>
           {bsff.packagings
             .map(
               packaging =>
                 `${packaging.name} n°${packaging.numero} (${packaging.kilos} kilo(s))`
             )
             .join(", ")}
-        </div>
-      </div>
-    </div>
+        </DataListDescription>
+      </DataListItem>
+    </DataList>
   );
 }

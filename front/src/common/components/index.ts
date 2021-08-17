@@ -22,3 +22,4 @@ export * from "./List";
 export * from "./Blankslate";
 export * from "./Table";
 export * from "./Journey";
+export * from "./DataList";

@@ -1,7 +1,7 @@
 @import "src/scss/Constants.scss";
 @import "src/scss/Breakpoints";
 
-.WasteSummary {
+.DataList {
   display: flex;
   flex-wrap: wrap;
 
@@ -10,7 +10,7 @@
   }
 }
 
-.WasteSummaryItem {
+.DataListItem {
   width: 100%;
 
   &:not(:last-child) {
@@ -25,12 +25,14 @@
     width: 33.33%;
   }
 }
-.WasteSummaryItemLabel {
-  font-size: 10px;
+
+.DataListTerm {
+  font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.025rem;
   font-weight: bold;
   color: $grey-darker;
 }
-.WasteSummaryItemContent {
+
+.DataListDescription {
 }
