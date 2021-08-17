@@ -527,6 +527,10 @@ export const operationSchema: FactorySchemaOf<
         "operation-quantity-required-if-final-processing-operation",
         "La quantité du déchet traité en kg est obligatoire si le code correspond à un traitement final",
         function (value) {
+          // We do not run this validator until processing signature because fields are not avilable in UI until then
+          if (!context.operationSignature) {
+            return true;
+          }
           return DASRI_PROCESSING_OPERATIONS_CODES.includes(
             this.parent.processingOperation
           )
@@ -542,7 +546,7 @@ export const operationSchema: FactorySchemaOf<
       .oneOf([...allowedOperations, "", null], INVALID_PROCESSING_OPERATION)
       .requiredIf(context.operationSignature)
       .test(
-        "recipientIsWasteProcessorForGroupingCodes",
+        "recipientIsCollectorForGroupingCodes",
         "Les codes R12 et D12 sont réservés aux installations de tri transit regroupement",
         async (value, ctx) => {
           const recipientSiret = ctx.parent.recipientCompanySiret;

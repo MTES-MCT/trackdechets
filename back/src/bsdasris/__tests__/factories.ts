@@ -80,10 +80,10 @@ export const readyToReceiveData = company => ({
   ],
   recipientWasteVolume: 66,
   recipientWasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
-  recipientWasteQuantity: 70,
   receivedAt: new Date()
 });
 export const readyToProcessData = {
   processingOperation: "D10",
+  recipientWasteQuantity: 70,
   processedAt: new Date()
 };
