@@ -9,6 +9,21 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Nouveaux éléments d'interface pour les BSFFs [PR 955](https://github.com/MTES-MCT/trackdechets/pull/955).
+  - Ajout de la gestion des fiches d'intervention.
+  - Ajout des écrans de réception par l'installation de destination et de signature du traitement final.
+  - Ajout de la possibilité de grouper, reconditionner et réexpédier.
+  - Ajout du champ "volume" pour les contenants.
+  - Ajout de la case à cocher d'exemption du récépissé pour les transporteurs.
+- Nouveaux éléments d'API pour les BSFFs [PR 955](https://github.com/MTES-MCT/trackdechets/pull/955).
+  - Ajout du champ `Bsff.type` et `BsffInput.type` qui sont un enum `BsffType` permettant de différencier entre groupement, reconditionnement, réexpédition, collecte de petites quantités ou suivi d'un fluide.
+  - Ajout de `INTERMEDIATELY_PROCESSED` à l'enum `BsffStatus`, qui indique qu'un déchet est en attente d'un groupement, reconditionnement ou d'une réexpédition. Le BSFF passe au statut `PROCESSED` lorsque le déchet a reçu son traitement final.
+  - Ajout des valeurs `R13` et `D15` à l'enum `BsffOperationCode` qui sont les codes correspondants à une réexpédition.
+  - Ajout du filtre `BsffWhere.status` qui permet de retrouver les BSFFs avec un statut particulier.
+  - Ajout du filtre `BsffWhereOperation.code_in` qui permet de retrouver les BSFFs ayant subit un traitement faisant partie d'une liste de codes donnée.
+  - Ajout du champ `BsffInput.ficheInterventions` permettant de lier des fiches d'intervention.
+  - Ajout du champ `Bsff.isDraft` et des mutations `createDraftBsff` ainsi que `publishBsff` qui sont principalement utilisés par l'interface Trackdéchets.
+
 #### :boom: Breaking changes
 
 #### :bug: Corrections de bugs
