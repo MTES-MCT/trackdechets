@@ -817,7 +817,7 @@ model Bsff {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   isDeleted Boolean    @default(false)
-  isDraft   Boolean?   @default(false)
+  isDraft   Boolean    @default(false)
   type      BsffType   @default(TRACER_FLUIDE)
   status    BsffStatus @default(INITIAL)
 
