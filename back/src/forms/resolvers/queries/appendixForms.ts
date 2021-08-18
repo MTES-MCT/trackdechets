@@ -17,7 +17,8 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
       ...(wasteCode && { wasteDetailsCode: wasteCode }),
       status: "AWAITING_GROUP",
       recipientCompanySiret: siret,
-      isDeleted: false
+      isDeleted: false,
+      appendix2RootFormId: null
     }
   });
 

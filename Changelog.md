@@ -38,6 +38,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Corrections de bugs sur l'annexe 2: il n'est plus possible d'ajouter un même bordereau sur plusieurs annexes, et la modification des annexe via `updateForm` est désormais correctement prise en compte [PR958](https://github.com/MTES-MCT/trackdechets/pull/958)
+
 #### :nail_care: Améliorations
 
 - Création et édition de bordereaux Dasri de groupement [PR934](https://github.com/MTES-MCT/trackdechets/pull/934)
