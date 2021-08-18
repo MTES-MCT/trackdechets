@@ -22,7 +22,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
   - Ajout du filtre `BsffWhere.status` qui permet de retrouver les BSFFs avec un statut particulier.
   - Ajout du filtre `BsffWhereOperation.code_in` qui permet de retrouver les BSFFs ayant subit un traitement faisant partie d'une liste de codes donnée.
   - Ajout du champ `BsffInput.ficheInterventions` permettant de lier des fiches d'intervention.
-  - Ajout du champ `Bsff.isDraft` et des mutations `createDraftBsff` ainsi que `publishBsff` qui sont principalement utilisés par l'interface Trackdéchets.
+  - Ajout de la mutation `createDraftBsff` qui permet de créer un BSFF incomplet et de le compléter au fur et à mesure.
+  - Ajout de la mutation `publishBsff` qui permet de passer d'un BSFF en brouillon à un BSFF publié.
+  - Ajout du champ `Bsff.isDraft` qui permet de distinguer entre un BSFF en brouillon et publié.
 
 #### :boom: Breaking changes
 
