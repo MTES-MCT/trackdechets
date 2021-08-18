@@ -4,12 +4,27 @@ import { IconTriangleDown, IconTriangleUp } from "./Icons";
 import styles from "./Table.module.scss";
 
 interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
+  isSelectable?: boolean;
   children: React.ReactNode;
 }
 
-export function Table({ children, className, ...props }: TableProps) {
+export function Table({
+  children,
+  className,
+  isSelectable,
+  ...props
+}: TableProps) {
   return (
-    <table {...props} className={classNames(styles.Table, className)}>
+    <table
+      {...props}
+      className={classNames(
+        styles.Table,
+        {
+          [styles.TableSelectable]: isSelectable,
+        },
+        className
+      )}
+    >
       {children}
     </table>
   );
@@ -53,7 +68,7 @@ export function TableRow({ children, className, ...props }: TableRowProps) {
 
 interface TableHeaderCellProps
   extends React.HTMLAttributes<HTMLTableHeaderCellElement> {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export function TableHeaderCell({

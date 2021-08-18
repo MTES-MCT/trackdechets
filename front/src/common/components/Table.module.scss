@@ -3,6 +3,12 @@
 .Table {
   width: 100%;
 }
+.TableSelectable .TableBody .TableRow {
+  &:focus,
+  &:hover {
+    background-color: $grey-lighter;
+  }
+}
 
 .TableHead {
   background-color: $grey-light;

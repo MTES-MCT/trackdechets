@@ -1,13 +1,13 @@
 import { UserInputError } from "apollo-server-express";
 import omit from "object.omit";
-import { Prisma } from "@prisma/client";
+import { Prisma, Bsff } from "@prisma/client";
 import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound } from "../../database";
 import { flattenBsffInput, unflattenBsff } from "../../converter";
 import { isBsffContributor } from "../../permissions";
-import { canAddPreviousBsffs } from "../../validation";
+import { isValidPreviousBsffs } from "../../validation";
 import { indexBsff } from "../../elastic";
 
 const updateBsff: MutationResolvers["updateBsff"] = async (
@@ -30,6 +30,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   if (existingBsff.emitterEmissionSignatureDate) {
     flatInput = omit(flatInput, [
+      "type",
       "emitterCompanyAddress",
       "emitterCompanyContact",
       "emitterCompanyMail",
@@ -42,6 +43,9 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       "quantityIsEstimate",
       "destinationPlannedOperationCode"
     ]);
+
+    delete input.previousBsffs;
+    delete input.ficheInterventions;
   }
 
   if (existingBsff.transporterTransportSignatureDate) {
@@ -77,14 +81,21 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     ]);
   }
 
-  await isBsffContributor(user, { ...existingBsff, ...flatInput });
+  const futureBsff: Bsff = { ...existingBsff, ...flatInput };
+  await isBsffContributor(user, futureBsff);
 
   const data: Prisma.BsffUpdateInput = flatInput;
 
-  if (input.previousBsffs?.length > 0) {
-    await canAddPreviousBsffs(input.previousBsffs);
+  if (input.previousBsffs) {
+    await isValidPreviousBsffs(futureBsff.type, input.previousBsffs);
     data.previousBsffs = {
       set: input.previousBsffs.map(id => ({ id }))
+    };
+  }
+
+  if (input.ficheInterventions) {
+    data.ficheInterventions = {
+      set: input.ficheInterventions.map(id => ({ id }))
     };
   }
 

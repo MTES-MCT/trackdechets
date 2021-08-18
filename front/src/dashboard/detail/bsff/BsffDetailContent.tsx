@@ -12,7 +12,7 @@ import React, { useState } from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
-import { statusLabels } from "../../constants";
+import { bsffVerboseStatuses } from "form/bsff/utils/constants";
 import { DateRow, DetailRow } from "../common/Components";
 
 import styles from "../common/BSDDetailContent.module.scss";
@@ -41,7 +41,7 @@ export function BsffDetailContent({ form }: Props) {
           <h4 className={styles.detailTitle}>
             <IconBSFF className="tw-mr-2" />
             <span className={styles.detailStatus}>
-              [{statusLabels[form.status]}]
+              [{form.isDraft ? "Brouillon" : bsffVerboseStatuses[form.status]}]
             </span>
             <span>{form.id}</span>
           </h4>
@@ -90,6 +90,11 @@ export function BsffDetailContent({ form }: Props) {
               <IconRenewableEnergyEarth size="25px" />
               <span className={styles.detailTabCaption}>Destinataire</span>
             </Tab>
+
+            <Tab className={styles.detailTab}>
+              <IconRenewableEnergyEarth size="25px" />
+              <span className={styles.detailTabCaption}>FIs</span>
+            </Tab>
           </TabList>
           {/* Tabs content */}
           <div className={styles.detailTabPanels}>
@@ -107,6 +112,13 @@ export function BsffDetailContent({ form }: Props) {
             <TabPanel className={styles.detailTabPanel}>
               <div className={styles.detailColumns}>
                 <Destination form={form} />
+              </div>
+            </TabPanel>
+
+            {/* Fiche d'interventions */}
+            <TabPanel className={styles.detailTabPanel}>
+              <div className={styles.detailColumns}>
+                <FicheInterventions form={form} />
               </div>
             </TabPanel>
           </div>
@@ -308,5 +320,32 @@ function Destination({ form }: { form: Bsff }) {
         />
       </div>
     </>
+  );
+}
+
+function FicheInterventions({ form }: { form: Bsff }) {
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap" }}>
+      {form.ficheInterventions.map(ficheIntervention => (
+        <div
+          key={ficheIntervention.id}
+          className={styles.detailGrid}
+          style={{ flex: "0 0 50%", padding: "0 0 2rem 0", margin: "0" }}
+        >
+          <DetailRow
+            label="Numéro fiche d'intervention"
+            value={ficheIntervention.numero}
+          />
+          <DetailRow
+            label="Quantité fluides en kilo(s)"
+            value={ficheIntervention.kilos}
+          />
+          <DetailRow
+            label="Code postal lieu de collecte"
+            value={ficheIntervention.postalCode}
+          />
+        </div>
+      ))}
+    </div>
   );
 }

@@ -1,9 +1,19 @@
 import { gql } from "@apollo/client";
 import { companyFragment } from "common/fragments";
 
+export const FicheInterventionFragment = gql`
+  fragment FicheInterventionFragment on BsffFicheIntervention {
+    id
+    numero
+    kilos
+    postalCode
+  }
+`;
+
 export const FullBsffFragment = gql`
   fragment FullBsff on Bsff {
     id
+    type
     status
     emitter {
       company {
@@ -77,8 +87,15 @@ export const FullBsffFragment = gql`
       }
       cap
     }
+    ficheInterventions {
+      ...FicheInterventionFragment
+    }
+    previousBsffs {
+      id
+    }
   }
   ${companyFragment}
+  ${FicheInterventionFragment}
 `;
 
 export const GET_BSFF_FORM = gql`
@@ -91,8 +108,8 @@ export const GET_BSFF_FORM = gql`
 `;
 
 export const GET_BSFF_FORMS = gql`
-  query Bsffs {
-    bsffs {
+  query Bsffs($where: BsffWhere) {
+    bsffs(where: $where) {
       totalCount
       pageInfo {
         hasNextPage
@@ -108,9 +125,9 @@ export const GET_BSFF_FORMS = gql`
   ${FullBsffFragment}
 `;
 
-export const CREATE_BSFF_FORM = gql`
-  mutation CreateBsff($input: BsffInput!) {
-    createBsff(input: $input) {
+export const CREATE_DRAFT_BSFF = gql`
+  mutation CreateDraftBsff($input: BsffInput!) {
+    createDraftBsff(input: $input) {
       ...FullBsff
     }
   }
@@ -126,9 +143,13 @@ export const UPDATE_BSFF_FORM = gql`
   ${FullBsffFragment}
 `;
 
-export const SIGN_BSFF_FORM = gql`
-  mutation SignBsff($id: ID!, $input: BsffSignatureInput!) {
-    signBsff(id: $id, input: $input) {
+export const SIGN_BSFF = gql`
+  mutation SignBsff(
+    $id: ID!
+    $type: BsffSignatureType!
+    $signature: SignatureInput!
+  ) {
+    signBsff(id: $id, type: $type, signature: $signature) {
       ...FullBsff
     }
   }

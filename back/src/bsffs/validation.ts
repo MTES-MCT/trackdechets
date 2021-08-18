@@ -4,14 +4,16 @@ import {
   Bsff,
   TransportMode,
   BsffFicheIntervention,
-  BsffStatus
+  BsffStatus,
+  BsffType
 } from "@prisma/client";
 import prisma from "../prisma";
 import { BsffPackaging } from "../generated/graphql/types";
-import { GROUPING_CODES, OPERATION_CODES, WASTE_CODES } from "./constants";
+import { OPERATION, WASTE_CODES } from "./constants";
 
 export const beforeEmissionSchema: yup.SchemaOf<Pick<
   Bsff,
+  | "isDraft"
   | "emitterCompanyName"
   | "emitterCompanySiret"
   | "emitterCompanyAddress"
@@ -23,6 +25,12 @@ export const beforeEmissionSchema: yup.SchemaOf<Pick<
   | "quantityKilos"
   | "destinationPlannedOperationCode"
 >> = yup.object({
+  isDraft: yup
+    .boolean()
+    .oneOf(
+      [false],
+      "Il n'est pas possible de signer un BSFF à l'état de brouillon"
+    ),
   emitterCompanyName: yup
     .string()
     .nullable()
@@ -76,7 +84,7 @@ export const beforeEmissionSchema: yup.SchemaOf<Pick<
     .string()
     .nullable()
     .oneOf(
-      Object.values(OPERATION_CODES),
+      Object.keys(OPERATION),
       "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
     )
 });
@@ -121,8 +129,7 @@ export const beforeTransportSchema: yup.SchemaOf<Pick<
           .required("Le poids du contenant est requis")
       })
     )
-    .required("Le conditionnement est requis")
-    .min(1, "Le conditionnement est requis"),
+    .required("Le conditionnement est requis"),
   wasteAdr: yup.string().nullable().required("La mention ADR est requise"),
   transporterCompanyName: yup
     .string()
@@ -246,11 +253,8 @@ export const beforeOperationSchema: yup.SchemaOf<Pick<
     ) as any, // https://github.com/jquense/yup/issues/1302
   destinationOperationCode: yup
     .string()
-    // Operation code can be null when the waste is temporarily stored and sent somewhere else.
-    // It received no treatment, it was only stored in its current form.
-    .nullable()
     .oneOf(
-      [null, ...Object.values(OPERATION_CODES)],
+      Object.keys(OPERATION),
       "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : ${values}"
     ),
   destinationOperationSignatureDate: yup
@@ -344,7 +348,7 @@ export const ficheInterventionSchema: yup.SchemaOf<Pick<
     .required("L'addresse email de l'entreprise de l'opérateur est requis")
 });
 
-export async function canAddPreviousBsffs(ids: string[]) {
+export async function isValidPreviousBsffs(type: BsffType, ids: string[]) {
   const previousBsffs = await prisma.bsff.findMany({
     where: {
       id: {
@@ -353,22 +357,33 @@ export async function canAddPreviousBsffs(ids: string[]) {
     }
   });
 
-  if (previousBsffs.some(bsff => bsff.status !== BsffStatus.PROCESSED)) {
-    throw new UserInputError(
-      `Certains des bordereaux à associer n'ont pas toutes les signatures requises`
-    );
-  }
+  const errors = previousBsffs.reduce<string[]>((acc, previousBsff) => {
+    if (previousBsff.status === BsffStatus.PROCESSED) {
+      return acc.concat([
+        `Le bordereau n°${previousBsff.id} a déjà reçu son traitement final.`
+      ]);
+    }
 
-  if (
-    !previousBsffs.every(
-      bsff =>
-        // operation code is null when the waste is temporarily stored and receives no treatment
-        bsff.destinationOperationCode == null ||
-        GROUPING_CODES.includes(bsff.destinationOperationCode)
-    )
-  ) {
-    throw new UserInputError(
-      `Les bordereaux à associer ont déclaré un traitement qui ne permet pas de leur donner suite`
-    );
+    if (previousBsff.status !== BsffStatus.INTERMEDIATELY_PROCESSED) {
+      return acc.concat([
+        `Le bordereau n°${previousBsff.id} n'a pas toutes les signatures requises.`
+      ]);
+    }
+
+    if (
+      !OPERATION[previousBsff.destinationOperationCode].successors.includes(
+        type
+      )
+    ) {
+      return acc.concat([
+        `Le bordereau n°${previousBsff.id} a déclaré un traitement qui ne permet pas de lui donner la suite voulue.`
+      ]);
+    }
+
+    return acc;
+  }, []);
+
+  if (errors.length > 0) {
+    throw new UserInputError(errors.join("\n"));
   }
 }

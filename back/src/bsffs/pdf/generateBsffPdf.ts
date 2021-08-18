@@ -2,11 +2,11 @@ import path from "path";
 import fs from "fs/promises";
 import mustache from "mustache";
 import { format } from "date-fns";
-import { Bsff } from "@prisma/client";
+import { Bsff, BsffType } from "@prisma/client";
 import prisma from "../../prisma";
 import { BsffPackaging } from "../../generated/graphql/types";
 import { toPDF } from "../../common/pdf";
-import { GROUPING_CODES, OPERATION_CODES } from "../constants";
+import { OPERATION } from "../constants";
 
 const assetsPath = path.join(__dirname, "assets");
 const templatePath = path.join(assetsPath, "index.html");
@@ -14,38 +14,6 @@ const cssPaths = [
   path.join(assetsPath, "modern-normalize.css"),
   path.join(assetsPath, "styles.css")
 ];
-
-/*
- * A groupement is when several bsffs are grouped but the packagings are unchanged.
- */
-function isGroupement(bsff: Bsff): boolean {
-  return (
-    GROUPING_CODES.includes(bsff.destinationOperationCode) &&
-    // this bsff doesn't list any packagings because they are identical to the previous bsffs
-    ((bsff.packagings ?? []) as BsffPackaging[]).length === 0
-  );
-}
-
-/*
- * A reconditionnement is when bsffs are grouped and the packagings are changed.
- */
-function isReconditionnement(bsff: Bsff): boolean {
-  return (
-    GROUPING_CODES.includes(bsff.destinationOperationCode) &&
-    ((bsff.packagings ?? []) as BsffPackaging[]).length > 0
-  );
-}
-
-/*
- * A reexpedition is when there's a single bsff with unchanged packagings and no operation.
- */
-function isReexpedition(bsff: Bsff, previousBsffs: Bsff[]): boolean {
-  return (
-    bsff.destinationOperationCode == null &&
-    previousBsffs.length === 1 &&
-    ((bsff.packagings ?? []) as BsffPackaging[]).length === 0
-  );
-}
 
 export async function generateBsffPdf(bsff: Bsff) {
   const previousBsffs = await prisma.bsff.findMany({
@@ -60,36 +28,25 @@ export async function generateBsffPdf(bsff: Bsff) {
   });
 
   const bsffType = {
-    isSingleCollecte: false,
-    isMultiCollecte: false,
-    isGroupement: false,
-    isReconditionnement: false,
-    isReexpedition: false
+    isTracerFluide: bsff.type === BsffType.TRACER_FLUIDE,
+    isCollectePetitesQuantites:
+      bsff.type === BsffType.COLLECTE_PETITES_QUANTITES,
+    isGroupement: bsff.type === BsffType.GROUPEMENT,
+    isReconditionnement: bsff.type === BsffType.RECONDITIONNEMENT,
+    isReexpedition: bsff.type === BsffType.REEXPEDITION
   };
-  if (isGroupement(bsff)) {
-    bsffType.isGroupement = true;
-  } else if (isReconditionnement(bsff)) {
-    bsffType.isReconditionnement = true;
-  } else if (isReexpedition(bsff, previousBsffs)) {
-    bsffType.isReexpedition = true;
-  } else if (ficheInterventions.length > 1) {
-    bsffType.isMultiCollecte = true;
-  } else {
-    bsffType.isSingleCollecte = true;
-  }
-
   const bsffOperation = {
-    isRecuperationR2: bsff.destinationOperationCode === OPERATION_CODES.R2,
-    isIncinerationD10: bsff.destinationOperationCode === OPERATION_CODES.D10,
+    isRecuperationR2: bsff.destinationOperationCode === OPERATION.R2.code,
+    isIncinerationD10: bsff.destinationOperationCode === OPERATION.D10.code,
     isGroupementR12:
-      bsff.destinationOperationCode === OPERATION_CODES.R12 &&
+      bsff.destinationOperationCode === OPERATION.R12.code &&
       bsffType.isGroupement,
-    isGroupementD13: bsff.destinationOperationCode === OPERATION_CODES.D13,
+    isGroupementD13: bsff.destinationOperationCode === OPERATION.D13.code,
     isReconditionnementR12:
-      bsff.destinationOperationCode === OPERATION_CODES.R12 &&
+      bsff.destinationOperationCode === OPERATION.R12.code &&
       bsffType.isReconditionnement,
     isReconditionnementD14:
-      bsff.destinationOperationCode === OPERATION_CODES.D14,
+      bsff.destinationOperationCode === OPERATION.D14.code,
     isReexpedition: bsffType.isReexpedition
   };
   const html = mustache.render(await fs.readFile(templatePath, "utf-8"), {

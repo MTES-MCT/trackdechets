@@ -24,53 +24,64 @@ function toBsdElastic(bsff: Bsff): BsdElastic {
     ]
   };
 
-  switch (bsff.status) {
-    case BsffStatus.INITIAL: {
-      bsd.isDraftFor.push(
-        bsff.emitterCompanySiret,
-        bsff.transporterCompanySiret,
-        bsff.destinationCompanySiret
-      );
-      bsd.isForActionFor.push(bsff.emitterCompanySiret);
-      bsd.isToCollectFor.push(bsff.transporterCompanySiret);
-      break;
+  if (bsff.isDraft) {
+    bsd.isDraftFor.push(
+      bsff.emitterCompanySiret,
+      bsff.transporterCompanySiret,
+      bsff.destinationCompanySiret
+    );
+  } else {
+    switch (bsff.status) {
+      case BsffStatus.INITIAL: {
+        bsd.isForActionFor.push(bsff.emitterCompanySiret);
+        bsd.isFollowFor.push(
+          bsff.transporterCompanySiret,
+          bsff.destinationCompanySiret
+        );
+        break;
+      }
+      case BsffStatus.SIGNED_BY_EMITTER: {
+        bsd.isToCollectFor.push(bsff.transporterCompanySiret);
+        bsd.isFollowFor.push(
+          bsff.emitterCompanySiret,
+          bsff.destinationCompanySiret
+        );
+        break;
+      }
+      case BsffStatus.SENT: {
+        bsd.isCollectedFor.push(bsff.transporterCompanySiret);
+        bsd.isFollowFor.push(bsff.emitterCompanySiret);
+        bsd.isForActionFor.push(bsff.destinationCompanySiret);
+        break;
+      }
+      case BsffStatus.RECEIVED: {
+        bsd.isFollowFor.push(
+          bsff.emitterCompanySiret,
+          bsff.transporterCompanySiret
+        );
+        bsd.isForActionFor.push(bsff.destinationCompanySiret);
+        break;
+      }
+      case BsffStatus.INTERMEDIATELY_PROCESSED: {
+        bsd.isFollowFor.push(
+          bsff.emitterCompanySiret,
+          bsff.transporterCompanySiret,
+          bsff.destinationCompanySiret
+        );
+        break;
+      }
+      case BsffStatus.REFUSED:
+      case BsffStatus.PROCESSED: {
+        bsd.isArchivedFor.push(
+          bsff.emitterCompanySiret,
+          bsff.transporterCompanySiret,
+          bsff.destinationCompanySiret
+        );
+        break;
+      }
+      default:
+        break;
     }
-    case BsffStatus.SIGNED_BY_EMITTER: {
-      bsd.isToCollectFor.push(bsff.transporterCompanySiret);
-      bsd.isFollowFor.push(
-        bsff.emitterCompanySiret,
-        bsff.destinationCompanySiret
-      );
-      break;
-    }
-    case BsffStatus.SENT: {
-      bsd.isCollectedFor.push(bsff.transporterCompanySiret);
-      bsd.isFollowFor.push(
-        bsff.emitterCompanySiret,
-        bsff.transporterCompanySiret
-      );
-      bsd.isForActionFor.push(bsff.destinationCompanySiret);
-      break;
-    }
-    case BsffStatus.RECEIVED: {
-      bsd.isFollowFor.push(
-        bsff.emitterCompanySiret,
-        bsff.transporterCompanySiret
-      );
-      bsd.isForActionFor.push(bsff.destinationCompanySiret);
-      break;
-    }
-    case BsffStatus.REFUSED:
-    case BsffStatus.PROCESSED: {
-      bsd.isArchivedFor.push(
-        bsff.emitterCompanySiret,
-        bsff.transporterCompanySiret,
-        bsff.destinationCompanySiret
-      );
-      break;
-    }
-    default:
-      break;
   }
 
   return bsd;

@@ -7,7 +7,7 @@ import GenericStepList, {
 import { IStepContainerProps } from "form/common/stepper/Step";
 import {
   Mutation,
-  MutationCreateBsffArgs,
+  MutationCreateDraftBsffArgs,
   MutationUpdateBsffArgs,
   QueryBsffArgs,
   Query,
@@ -18,7 +18,7 @@ import React, { ReactElement, useMemo } from "react";
 import { generatePath, useHistory, useParams } from "react-router-dom";
 import initialState from "./utils/initial-state";
 import {
-  CREATE_BSFF_FORM,
+  CREATE_DRAFT_BSFF,
   UPDATE_BSFF_FORM,
   GET_BSFF_FORM,
 } from "./utils/queries";
@@ -48,10 +48,10 @@ export default function BsffStepsList(props: Props) {
     [formQuery.data]
   );
 
-  const [createBsffForm] = useMutation<
-    Pick<Mutation, "createBsff">,
-    MutationCreateBsffArgs
-  >(CREATE_BSFF_FORM);
+  const [createDraftBsff] = useMutation<
+    Pick<Mutation, "createDraftBsff">,
+    MutationCreateDraftBsffArgs
+  >(CREATE_DRAFT_BSFF);
 
   const [updateBsffForm] = useMutation<
     Pick<Mutation, "updateBsff">,
@@ -63,7 +63,7 @@ export default function BsffStepsList(props: Props) {
       ? updateBsffForm({
           variables: { id: formState.id, input },
         })
-      : createBsffForm({ variables: { input } });
+      : createDraftBsff({ variables: { input } });
   }
 
   function onSubmit(e, values) {
@@ -71,8 +71,14 @@ export default function BsffStepsList(props: Props) {
     // As we want to be able to save draft, we skip validation on submit
     // and don't use the classic Formik mechanism
 
-    const { id, ...input } = values;
-    saveForm(input)
+    const { id, ficheInterventions, previousBsffs, ...input } = values;
+    saveForm({
+      ...input,
+      ficheInterventions: ficheInterventions.map(
+        ficheIntervention => ficheIntervention.id
+      ),
+      previousBsffs: previousBsffs.map(previousBsff => previousBsff.id),
+    })
       .then(_ => {
         const redirectTo = generatePath(routes.dashboard.bsds.drafts, {
           siret,

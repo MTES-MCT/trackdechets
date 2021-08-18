@@ -1,3 +1,17 @@
+"Représente les différents types de BSFF possibles."
+enum BsffType {
+  "BSFF qui trace un fluide provenant d'une seule origine."
+  TRACER_FLUIDE
+  "BSFF qui trace des fluides provenant de différentes origines."
+  COLLECTE_PETITES_QUANTITES
+  "BSFF qui groupe plusieurs autres BSFFs."
+  GROUPEMENT
+  "BSFF qui reconditionne un ou plusieurs autres BSFFs."
+  RECONDITIONNEMENT
+  "BSFF qui réexpédie un autre BSFF."
+  REEXPEDITION
+}
+
 enum BsffStatus {
   "Le bordereau ne comporte aucune signature."
   INITIAL
@@ -7,6 +21,11 @@ enum BsffStatus {
   SENT
   "Le bordereau a été reçu par l'installation de destination."
   RECEIVED
+  """
+  Le déchet a subit un groupement, reconditionnement ou un entreposage provisoire.
+  Il est en attente de la création d'un nouveau BSFF pour finaliser le traitement.
+  """
+  INTERMEDIATELY_PROCESSED
   "Le déchet a été traité par l'installation de destination."
   PROCESSED
   "Le déchet a été refusé par l'installation de traitement."
@@ -17,9 +36,11 @@ enum BsffStatus {
 enum BsffOperationCode {
   R2
   R12
+  R13
   D10
   D13
   D14
+  D15
 }
 
 enum BsffSignatureType {

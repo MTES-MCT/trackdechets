@@ -690,15 +690,15 @@ enum BsdasriType {
 }
 
 model Bsdasri {
-  id        String        @unique
-  bsdasriType BsdasriType @default(SIMPLE)
-  status    BsdasriStatus @default(INITIAL)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  ownerId   String
-  owner     User          @relation("BsdasriOwnedBy", fields: [ownerId], references: [id])
-  isDeleted Boolean?      @default(false)
-  isDraft   Boolean?      @default(false)
+  id          String        @unique
+  bsdasriType BsdasriType   @default(SIMPLE)
+  status      BsdasriStatus @default(INITIAL)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  ownerId     String
+  owner       User          @relation("BsdasriOwnedBy", fields: [ownerId], references: [id])
+  isDeleted   Boolean?      @default(false)
+  isDraft     Boolean?      @default(false)
 
   // emitter
   emitterType                   BsdasriEmitterType @default(PRODUCER)
@@ -817,6 +817,8 @@ model Bsff {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   isDeleted Boolean    @default(false)
+  isDraft   Boolean    @default(false)
+  type      BsffType   @default(TRACER_FLUIDE)
   status    BsffStatus @default(INITIAL)
 
   emitterCompanyName    String?
@@ -837,7 +839,7 @@ model Bsff {
   wasteAdr         String?
 
   quantityKilos      Float?
-  quantityIsEstimate Boolean @default(false)
+  quantityIsEstimate Boolean?
 
   transporterCompanyName      String?
   transporterCompanySiret     String?
@@ -893,11 +895,20 @@ model Bsff {
   nextBsffId    String?
 }
 
+enum BsffType {
+  TRACER_FLUIDE
+  COLLECTE_PETITES_QUANTITES
+  GROUPEMENT
+  RECONDITIONNEMENT
+  REEXPEDITION
+}
+
 enum BsffStatus {
   INITIAL
   SIGNED_BY_EMITTER
   SENT
   RECEIVED
+  INTERMEDIATELY_PROCESSED
   PROCESSED
   REFUSED
 }
@@ -991,15 +1002,15 @@ model Bsda {
   quantityType  QuantityType?
   quantityValue Float?
 
-  brokerCompanyName    String?
-  brokerCompanySiret   String?
-  brokerCompanyAddress String?
-  brokerCompanyContact String?
-  brokerCompanyPhone   String?
-  brokerCompanyMail    String?
+  brokerCompanyName            String?
+  brokerCompanySiret           String?
+  brokerCompanyAddress         String?
+  brokerCompanyContact         String?
+  brokerCompanyPhone           String?
+  brokerCompanyMail            String?
   brokerRecepisseNumber        String?
-  brokerRecepisseDepartment     String?
-  brokerRecepisseValidityLimit  DateTime?
+  brokerRecepisseDepartment    String?
+  brokerRecepisseValidityLimit DateTime?
 
   destinationCompanyName          String?
   destinationCompanySiret         String?

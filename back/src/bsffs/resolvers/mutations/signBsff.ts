@@ -16,6 +16,7 @@ import {
 import { unflattenBsff } from "../../converter";
 import { getBsffOrNotFound } from "../../database";
 import { indexBsff } from "../../elastic";
+import { OPERATION } from "../../constants";
 
 async function checkIsAllowed(
   siret: string | null,
@@ -126,9 +127,25 @@ const signatures: Record<
     );
     await beforeOperationSchema.validate(existingBsff, { abortEarly: false });
 
+    const status =
+      OPERATION[existingBsff.destinationOperationCode].successors.length > 0
+        ? BsffStatus.INTERMEDIATELY_PROCESSED
+        : BsffStatus.PROCESSED;
+
+    if (status === BsffStatus.PROCESSED) {
+      await prisma.bsff.updateMany({
+        data: {
+          status: BsffStatus.PROCESSED
+        },
+        where: {
+          nextBsffId: existingBsff.id
+        }
+      });
+    }
+
     return prisma.bsff.update({
       data: {
-        status: BsffStatus.PROCESSED,
+        status,
         destinationOperationSignatureDate: signature.date,
         destinationOperationSignatureAuthor: signature.author
       },

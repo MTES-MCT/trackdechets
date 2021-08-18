@@ -29,7 +29,7 @@ export default function BsffPackagings({
                 >
                   <div className="tw-flex tw-mb-4 tw-items-end">
                     <div className="tw-w-11/12 tw-flex">
-                      <div className="tw-w-1/3 tw-px-2">
+                      <div className="tw-w-1/4 tw-px-2">
                         <label>
                           Dénomination
                           <Field
@@ -39,7 +39,20 @@ export default function BsffPackagings({
                           />
                         </label>
                       </div>
-                      <div className="tw-w-1/3 tw-px-2">
+
+                      <div className="tw-w-1/4 tw-px-2">
+                        <label>
+                          Volume
+                          <Field
+                            component={NumberInput}
+                            className="td-input"
+                            name={`${fieldName}.volume`}
+                            disabled={disabled}
+                          />
+                        </label>
+                      </div>
+
+                      <div className="tw-w-1/4 tw-px-2">
                         <label>
                           Numéro
                           <Field
@@ -50,7 +63,7 @@ export default function BsffPackagings({
                         </label>
                       </div>
 
-                      <div className="tw-w-1/3 tw-px-2">
+                      <div className="tw-w-1/4 tw-px-2">
                         <label>
                           Poids en kilos
                           <Field

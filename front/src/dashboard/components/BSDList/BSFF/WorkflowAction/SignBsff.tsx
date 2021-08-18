@@ -1,138 +1,76 @@
-import React from "react";
-import { RedErrorMessage, ActionButton } from "common/components";
-import { Formik, Field, Form } from "formik";
-import {
-  Mutation,
-  MutationSignBsffArgs,
-  BsffSignatureType,
-} from "generated/graphql/types";
-import { gql, useMutation } from "@apollo/client";
-import { Link, generatePath } from "react-router-dom";
-import routes from "common/routes";
-import { TdModalTrigger } from "common/components/Modal";
+import * as React from "react";
+import { useQuery } from "@apollo/client";
+import { Bsff, Query, QueryBsffArgs } from "generated/graphql/types";
+import { ActionButton, Modal, Loader } from "common/components";
 import { IconCheckCircle1 } from "common/components/Icons";
-import { NotificationError } from "common/components/Error";
-import { WorkflowActionProps } from "./WorkflowAction";
+import { GET_BSFF_FORM } from "form/bsff/utils/queries";
+import { BsffSummary } from "./BsffSummary";
 
-const SIGN_BSFF = gql`
-  mutation SignBsff(
-    $id: ID!
-    $type: BsffSignatureType!
-    $signature: SignatureInput!
-  ) {
-    signBsff(id: $id, type: $type, signature: $signature) {
-      id
-      status
-    }
+interface ChildrenProps {
+  bsff: Bsff;
+  onClose: () => void;
+}
+
+interface SignEmissionModalProps {
+  title: string;
+  bsffId: string;
+  children: (props: ChildrenProps) => React.ReactNode;
+  onClose: () => void;
+}
+
+function SignBsffModal({
+  title,
+  bsffId,
+  children,
+  onClose,
+}: SignEmissionModalProps) {
+  const { data } = useQuery<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF_FORM, {
+    variables: {
+      id: bsffId,
+    },
+  });
+
+  if (data == null) {
+    return <Loader />;
   }
-`;
 
-export default function SignBsff({
-  form,
-  siret,
-  signatureType,
-  label,
-  helptext,
-}: WorkflowActionProps & {
-  signatureType: BsffSignatureType;
-  label: string;
-  helptext: string;
-}) {
-  const [signBsff, { error }] = useMutation<
-    Pick<Mutation, "signBsff">,
-    MutationSignBsffArgs
-  >(SIGN_BSFF);
+  const { bsff } = data;
 
   return (
-    <TdModalTrigger
-      ariaLabel={label}
-      trigger={open => (
-        <ActionButton icon={<IconCheckCircle1 size="24px" />} onClick={open}>
-          {label}
-        </ActionButton>
+    <Modal onClose={onClose} ariaLabel={title} isOpen>
+      <h2 className="td-modal-title">{title}</h2>
+      <BsffSummary bsff={bsff} />
+      {children({ bsff, onClose })}
+    </Modal>
+  );
+}
+
+interface SignBsffProps {
+  title: string;
+  bsffId: string;
+  children: (props: ChildrenProps) => React.ReactNode;
+}
+
+export function SignBsff({ title, bsffId, children }: SignBsffProps) {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  return (
+    <>
+      <ActionButton
+        icon={<IconCheckCircle1 size="24px" />}
+        onClick={() => setIsOpen(true)}
+      >
+        {title}
+      </ActionButton>
+      {isOpen && (
+        <SignBsffModal
+          title={title}
+          bsffId={bsffId}
+          onClose={() => setIsOpen(false)}
+        >
+          {children}
+        </SignBsffModal>
       )}
-      modalContent={close => (
-        <div>
-          <Formik
-            initialValues={{
-              author: "",
-            }}
-            onSubmit={async ({ author }) => {
-              await signBsff({
-                variables: {
-                  id: form.id,
-                  type: signatureType,
-                  signature: {
-                    author,
-                    date: new Date().toISOString(),
-                  },
-                },
-              });
-              close();
-            }}
-          >
-            {({ isSubmitting, handleReset }) => (
-              <Form>
-                <div>{helptext}</div>
-                <div className="form__row">
-                  <label>
-                    Nom du signataire
-                    <Field
-                      type="text"
-                      name="author"
-                      placeholder="NOM Prénom"
-                      className="td-input"
-                      required
-                    />
-                  </label>
-                  <RedErrorMessage name="author" />
-                </div>
-
-                <div className="form__actions">
-                  <button
-                    type="button"
-                    className="btn btn--outline-primary"
-                    onClick={() => {
-                      handleReset();
-                      close();
-                    }}
-                  >
-                    Annuler
-                  </button>
-
-                  <button
-                    type="submit"
-                    className="btn btn--primary"
-                    disabled={isSubmitting}
-                  >
-                    Signer
-                  </button>
-                </div>
-              </Form>
-            )}
-          </Formik>
-
-          {error && (
-            <>
-              <p className="tw-mt-2 tw-text-red-700">
-                Vous devez mettre à jour le bordereau et renseigner les champs
-                nécessaires avant de le signer.
-              </p>
-              <NotificationError className="action-error" apolloError={error} />
-
-              <Link
-                to={generatePath(routes.dashboard.bsffs.edit, {
-                  siret,
-                  id: form.id,
-                })}
-                className="btn btn--primary"
-              >
-                Mettre le bordereau à jour pour le signer
-              </Link>
-            </>
-          )}
-        </div>
-      )}
-    />
+    </>
   );
 }

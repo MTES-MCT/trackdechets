@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { UserRole, BsffStatus, BsffType } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -7,7 +7,7 @@ import {
 import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { OPERATION_CODES, WASTE_CODES } from "../../../constants";
+import { OPERATION, WASTE_CODES } from "../../../constants";
 import {
   createBsff,
   createBsffAfterEmission,
@@ -466,39 +466,46 @@ describe("Mutation.updateBsff", () => {
     const oldPreviousBsff = await createBsffAfterOperation(
       { emitter, transporter, destination },
       {
-        destinationOperationCode: OPERATION_CODES.R12
+        destinationOperationCode: OPERATION.R12.code,
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
       }
     );
-    const nextPreviousBsff = await createBsffAfterOperation(
+    const newPreviousBsff = await createBsffAfterOperation(
       { emitter, transporter, destination },
       {
-        destinationOperationCode: OPERATION_CODES.R12
+        destinationOperationCode: OPERATION.R12.code,
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
       }
     );
     const bsff = await createBsff(
       { emitter },
-      { previousBsffs: { connect: [{ id: oldPreviousBsff.id }] } }
+      {
+        type: BsffType.GROUPEMENT,
+        previousBsffs: { connect: [{ id: oldPreviousBsff.id }] }
+      }
     );
 
     const { mutate } = makeClient(emitter.user);
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
       variables: {
         id: bsff.id,
         input: {
-          previousBsffs: [nextPreviousBsff.id]
+          previousBsffs: [newPreviousBsff.id]
         }
       }
     });
+
+    expect(errors).toBeUndefined();
 
     const previousBsffs = await prisma.bsff
       .findUnique({ where: { id: data.updateBsff.id } })
       .previousBsffs();
     expect(previousBsffs).toEqual([
       expect.objectContaining({
-        id: nextPreviousBsff.id
+        id: newPreviousBsff.id
       })
     ]);
   });

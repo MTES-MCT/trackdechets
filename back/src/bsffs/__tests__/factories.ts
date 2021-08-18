@@ -1,9 +1,9 @@
 import { SetRequired } from "type-fest";
-import { Prisma, TransportMode, BsffStatus } from "@prisma/client";
+import { Prisma, TransportMode, BsffStatus, BsffType } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
 import { UserWithCompany } from "../../__tests__/factories";
-import { OPERATION_CODES, WASTE_CODES } from "../constants";
+import { OPERATION, WASTE_CODES } from "../constants";
 
 interface CreateBsffArgs {
   emitter?: UserWithCompany;
@@ -17,6 +17,7 @@ export function createBsff(
 ) {
   const data = {
     id: getReadableId(ReadableIdPrefix.FF),
+    type: BsffType.TRACER_FLUIDE,
     status: BsffStatus.INITIAL,
     ...initialData
   };
@@ -65,7 +66,8 @@ export function createBsffBeforeEmission(
     wasteCode: WASTE_CODES[0],
     wasteDescription: "Fluides",
     quantityKilos: 1,
-    destinationPlannedOperationCode: OPERATION_CODES.D10,
+    quantityIsEstimate: false,
+    destinationPlannedOperationCode: OPERATION.D10.code,
     ...initialData
   });
 }
@@ -136,7 +138,7 @@ export function createBsffBeforeOperation(
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffAfterReception(args, {
-    destinationOperationCode: OPERATION_CODES.D10,
+    destinationOperationCode: OPERATION.D10.code,
     ...initialData
   });
 }
