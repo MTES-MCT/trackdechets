@@ -9,6 +9,20 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+#### :boom: Breaking changes
+
+#### :bug: Corrections de bugs
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+# [2021.08.2] 24/08/2021
+
+#### :rocket: Nouvelles fonctionnalités
+
 - Nouveaux éléments d'interface pour les BSFFs [PR 955](https://github.com/MTES-MCT/trackdechets/pull/955).
   - Ajout de la gestion des fiches d'intervention.
   - Ajout des écrans de réception par l'installation de destination et de signature du traitement final.
