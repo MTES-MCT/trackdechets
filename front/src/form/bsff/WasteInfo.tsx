@@ -57,7 +57,7 @@ export default function WasteInfo({ disabled }) {
 
       {[BsffType.Groupement, BsffType.Reexpedition].includes(type) ? (
         <div className="notification warning">
-          Le type de BSFF que vous avez choisit ne permet pas de modifier les
+          Le type de BSFF que vous avez choisi ne permet pas de modifier les
           contenants. Si vous souhaitez changer de contenants, vous devez
           sélectionner un reconditionnement à l'étape "Type de bordereau".
         </div>

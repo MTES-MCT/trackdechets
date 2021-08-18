@@ -68,6 +68,7 @@ function toBsdElastic(bsff: Bsff): BsdElastic {
           bsff.transporterCompanySiret,
           bsff.destinationCompanySiret
         );
+        break;
       }
       case BsffStatus.REFUSED:
       case BsffStatus.PROCESSED: {

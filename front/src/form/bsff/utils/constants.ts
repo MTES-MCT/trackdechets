@@ -1,4 +1,18 @@
-import { BsffOperationCode, BsffType } from "generated/graphql/types";
+import {
+  BsffOperationCode,
+  BsffStatus,
+  BsffType,
+} from "generated/graphql/types";
+
+export const bsffVerboseStatuses: Record<BsffStatus, string> = {
+  INITIAL: "En attente d'enlèvement",
+  SIGNED_BY_EMITTER: "Signé par l'émetteur",
+  SENT: "Signé par le transporteur",
+  RECEIVED: "Reçu par le destinataire",
+  INTERMEDIATELY_PROCESSED: "Traité, en attente de suivi",
+  PROCESSED: "Traité",
+  REFUSED: "Refusé par le destinataire",
+};
 
 export const OPERATION: Record<
   BsffOperationCode,

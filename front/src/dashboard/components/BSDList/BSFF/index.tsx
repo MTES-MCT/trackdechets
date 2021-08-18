@@ -1,22 +1,12 @@
 import * as React from "react";
 import { CellProps, CellValue } from "react-table";
-import { BsffStatus } from "generated/graphql/types";
 import { IconBSFF } from "common/components/Icons";
 import { BsffActions } from "./BsffActions/BsffActions";
 import { BsffFragment } from "./types";
 import { ActionButtonContext } from "common/components/ActionButton";
 import { WorkflowAction } from "./WorkflowAction";
 import { useParams } from "react-router-dom";
-
-const bsffVerboseStatuses: Record<BsffStatus, string> = {
-  INITIAL: "En attente d'enlèvement",
-  SIGNED_BY_EMITTER: "Signé par l'émetteur",
-  SENT: "Signé par le transporteur",
-  RECEIVED: "Reçu par le destinataire",
-  INTERMEDIATELY_PROCESSED: "Traité, en attente de suivi",
-  PROCESSED: "Traité",
-  REFUSED: "Refusé par le destinataire",
-};
+import { bsffVerboseStatuses } from "form/bsff/utils/constants";
 
 export const COLUMNS: Record<
   string,

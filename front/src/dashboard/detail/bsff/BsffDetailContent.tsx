@@ -12,7 +12,7 @@ import React, { useState } from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
-import { statusLabels } from "../../constants";
+import { bsffVerboseStatuses } from "form/bsff/utils/constants";
 import { DateRow, DetailRow } from "../common/Components";
 
 import styles from "../common/BSDDetailContent.module.scss";
@@ -41,7 +41,7 @@ export function BsffDetailContent({ form }: Props) {
           <h4 className={styles.detailTitle}>
             <IconBSFF className="tw-mr-2" />
             <span className={styles.detailStatus}>
-              [{statusLabels[form.status]}]
+              [{form.isDraft ? "Brouillon" : bsffVerboseStatuses[form.status]}]
             </span>
             <span>{form.id}</span>
           </h4>

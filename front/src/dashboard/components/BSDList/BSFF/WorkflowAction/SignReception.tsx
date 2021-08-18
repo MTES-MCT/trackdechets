@@ -90,8 +90,8 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
         <Form>
           <p>
             En qualité de <strong>destinataire du déchet</strong>, j'atteste que
-            les informations ci-dessus sont corrects. En signant ce document, je
-            déclare réceptionner le déchet.
+            les informations ci-dessus sont correctes. En signant ce document,
+            je déclare réceptionner le déchet.
           </p>
           <div className="form__row">
             <label>

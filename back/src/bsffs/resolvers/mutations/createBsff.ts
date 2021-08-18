@@ -8,6 +8,26 @@ import { isBsffContributor } from "../../permissions";
 import { isValidPreviousBsffs } from "../../validation";
 import { indexBsff } from "../../elastic";
 
+function getBsffType(input: BsffInput): BsffType {
+  if (input.previousBsffs?.length > 0) {
+    if (input.packagings?.length > 0) {
+      return BsffType.RECONDITIONNEMENT;
+    }
+
+    if (input.previousBsffs?.length === 1) {
+      return BsffType.REEXPEDITION;
+    }
+
+    return BsffType.GROUPEMENT;
+  }
+
+  if (input.ficheInterventions?.length === 1) {
+    return BsffType.TRACER_FLUIDE;
+  }
+
+  return BsffType.COLLECTE_PETITES_QUANTITES;
+}
+
 export async function createBsff(
   user: Express.User,
   input: BsffInput,
@@ -15,16 +35,7 @@ export async function createBsff(
 ) {
   const flatInput: Prisma.BsffCreateInput = {
     id: getReadableId(ReadableIdPrefix.FF),
-    type:
-      input.previousBsffs?.length > 0
-        ? input.packagings?.length > 0
-          ? BsffType.RECONDITIONNEMENT
-          : input.previousBsffs?.length === 1
-          ? BsffType.REEXPEDITION
-          : BsffType.GROUPEMENT
-        : input.ficheInterventions?.length > 1
-        ? BsffType.COLLECTE_PETITES_QUANTITES
-        : BsffType.TRACER_FLUIDE,
+    type: getBsffType(input),
 
     ...flattenBsffInput(input)
   };
