@@ -1,5 +1,5 @@
 import type { SetRequired } from "type-fest";
-import { Bsff, BsffFicheIntervention, Prisma } from ".prisma/client";
+import { Bsff, BsffFicheIntervention, Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
 

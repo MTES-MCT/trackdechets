@@ -1,7 +1,7 @@
 import {
   CompanyVerificationMode,
   CompanyVerificationStatus
-} from ".prisma/client";
+} from "@prisma/client";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import { sendVerificationCodeLetter } from "../../../common/post";

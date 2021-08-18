@@ -1,4 +1,4 @@
-import { Bsff, BsffFicheIntervention, UserRole } from ".prisma/client";
+import { Bsff, BsffFicheIntervention, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import { Query, QueryBsffsArgs } from "../../../../generated/graphql/types";

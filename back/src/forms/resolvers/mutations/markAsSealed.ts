@@ -10,7 +10,7 @@ import { EventType } from "../../workflow/types";
 import { sendMail } from "../../../mailer/mailing";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { contentAwaitsGuest } from "../../../mailer/templates";
-import { Form, Status } from ".prisma/client";
+import { Form, Status } from "@prisma/client";
 
 const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   parent,

@@ -4,7 +4,7 @@ import { unflattenBsff } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getUserCompanies } from "../../../users/database";
 import { safeInput } from "../../../forms/form-converter";
-import { Prisma } from ".prisma/client";
+import { Prisma } from "@prisma/client";
 import { getConnectionsArgs } from "../../../bsvhu/pagination";
 
 const bsffs: QueryResolvers["bsffs"] = async (_, args, context) => {

@@ -1,11 +1,13 @@
 import * as yup from "yup";
 import { AnyObject } from "yup/lib/types";
 
+/* eslint-disable */
 declare module "yup" {
   interface BaseSchema<TCast = any, TContext = AnyObject, TOutput = any> {
     requiredIf<T>(condition: boolean, message?: string): this;
   }
 }
+/* eslint-enable */
 
 export type FactorySchemaOf<Context, Type> = (
   context: Context

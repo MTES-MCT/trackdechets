@@ -68,25 +68,6 @@ const takeOverInfoSchema = Yup.object<any>().shape({
   takenOverBy: Yup.string().required("Le nom du responsable est obligatoire")
 });
 
-type FormSiretsAndSegments = {
-  recipientCompanySiret: string;
-  status: string;
-  emitterCompanySiret: string;
-  transporterCompanySiret: string;
-  traderCompanySiret: string;
-  brokerCompanySiret: string;
-  ecoOrganisme: { siret: string };
-  temporaryStorageDetail: {
-    destinationCompanySiret: string;
-    transporterCompanySiret: string;
-  };
-  transportSegments: [{ transporterCompanySiret: string }];
-  owner: { id: string };
-  currentTransporterSiret: string;
-  nextTransporterSiret: string;
-  currentSegment: string;
-};
-
 const getForm = async formId => {
   const form = await prisma.form.findUnique({
     where: { id: formId },

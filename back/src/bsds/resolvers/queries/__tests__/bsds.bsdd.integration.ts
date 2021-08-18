@@ -1,5 +1,5 @@
 import { addYears } from "date-fns";
-import { Company, User, UserRole } from ".prisma/client";
+import { Company, User, UserRole } from "@prisma/client";
 import {
   Query,
   QueryBsdsArgs,

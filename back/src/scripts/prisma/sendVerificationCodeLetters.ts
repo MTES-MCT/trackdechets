@@ -1,4 +1,4 @@
-import { CompanyVerificationStatus } from ".prisma/client";
+import { CompanyVerificationStatus } from "@prisma/client";
 import { sendVerificationCodeLetter } from "../../common/post";
 import * as COMPANY_TYPES from "../../common/constants/COMPANY_TYPES";
 import prisma from "../../prisma";

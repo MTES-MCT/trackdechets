@@ -117,7 +117,9 @@ describe("mutation.markAsProcessed", () => {
       data: {
         markAsProcessed: { processingOperationDescription }
       }
-    } = await mutate(MARK_AS_PROCESSED, {
+    } = await mutate<{
+      markAsProcessed: { processingOperationDescription: string };
+    }>(MARK_AS_PROCESSED, {
       variables: {
         id: form.id,
         processedInfo: {

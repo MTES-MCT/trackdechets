@@ -1,5 +1,5 @@
 import { SetRequired } from "type-fest";
-import { Prisma, TransportMode, BsffStatus } from ".prisma/client";
+import { Prisma, TransportMode, BsffStatus } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
 import { UserWithCompany } from "../../__tests__/factories";

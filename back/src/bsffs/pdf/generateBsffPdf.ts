@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs/promises";
 import mustache from "mustache";
 import { format } from "date-fns";
-import { Bsff } from ".prisma/client";
+import { Bsff } from "@prisma/client";
 import prisma from "../../prisma";
 import { BsffPackaging } from "../../generated/graphql/types";
 import { toPDF } from "../../common/pdf";

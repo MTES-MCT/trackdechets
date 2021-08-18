@@ -1,4 +1,4 @@
-import { Prisma } from ".prisma/client";
+import { Prisma } from "@prisma/client";
 import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";

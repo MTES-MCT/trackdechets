@@ -1,4 +1,4 @@
-import { BsffStatus, Bsff } from ".prisma/client";
+import { BsffStatus, Bsff } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
