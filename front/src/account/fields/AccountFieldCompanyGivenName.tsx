@@ -5,7 +5,9 @@ import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
 import {
   CompanyPrivate,
   MutationUpdateCompanyArgs,
+  UserRole,
 } from "generated/graphql/types";
+import AccountFieldNotEditable from "./AccountFieldNotEditable";
 
 type Props = {
   company: CompanyPrivate;
@@ -35,24 +37,34 @@ export const tooltip =
 
 export default function AccountFielCompanyGivenName({ company }: Props) {
   return (
-    <AccountField
-      name="givenName"
-      label="Nom Usuel"
-      value={company.givenName}
-      tooltip={tooltip}
-      renderForm={toggleEdition => (
-        <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
+    <>
+      {company.userRole === UserRole.Admin ? (
+        <AccountField
           name="givenName"
-          type="text"
-          value={company.givenName || ""}
-          placeHolder="Nom usuel"
-          mutation={UPDATE_GIVEN_NAME}
-          mutationArgs={{ siret: company.siret }}
-          toggleEdition={() => {
-            toggleEdition();
-          }}
+          label="Nom Usuel"
+          value={company.givenName}
+          tooltip={tooltip}
+          renderForm={toggleEdition => (
+            <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
+              name="givenName"
+              type="text"
+              value={company.givenName || ""}
+              placeHolder="Nom usuel"
+              mutation={UPDATE_GIVEN_NAME}
+              mutationArgs={{ siret: company.siret }}
+              toggleEdition={() => {
+                toggleEdition();
+              }}
+            />
+          )}
+        />
+      ) : (
+        <AccountFieldNotEditable
+          name="givenName"
+          label="Nom Usuel"
+          value={company.givenName}
         />
       )}
-    />
+    </>
   );
 }
