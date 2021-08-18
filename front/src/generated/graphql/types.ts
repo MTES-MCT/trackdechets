@@ -3178,7 +3178,7 @@ export type Mutation = {
    * Une signature ne peut être apposée que par un membre de l'entreprise figurant sur le cadre concerné
    * Ex: la signature TRANSPORT ne peut être apposée que par un membre de l'entreprise de transport
    *
-   * Pour signer l'emission avec un compte transpoteur (cas de lasignature sur device transporteur),
+   * Pour signer l'emission avec un compte transporteur (cas de la signature sur device transporteur),
    * utiliser la mutation signBsdasriEmissionWithSecretCode
    */
   signBsdasri?: Maybe<Bsdasri>;
