@@ -16,7 +16,6 @@
   - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
   - [Nourrir la base de donnée avec des données par défaut](#nourrir-la-base-de-donnée-avec-des-données-par-défaut)
   - [Ajouter une nouvelle icône](#ajouter-une-nouvelle-icône)
-  - [Créer des comptes en masse](#créer-des-comptes-en-masse)
 
 ## Mise en route
 
@@ -299,42 +298,3 @@ Voilà la procédure pour ajouter une icône au fichier `Icons.tsx` :
 3. [Convertir le SVG en JSX](https://react-svgr.com/playground/?expandProps=start&icon=true&replaceAttrValues=%23000%3D%22currentColor%22&typescript=true) et l'ajouter au fichier (adapter le code selon les exemples existants : props, remplacer `width`/`height` et `"currentColor"`).
 
 Pour s'y retrouver plus facilement, suivre la convention de nommage en place et utiliser le nom donné par streamlineicons.
-
-### Créer des comptes en masse
-
-Nous possédons un script permettant de créer des établissements et comptes utilisateur en masse.
-Les pré-requis sont détaillés ici : https://faq.trackdechets.fr/informations-generiques/sinscrire/je-cree-de-compte/creer-des-comptes-en-masse
-
-Afin de faire fonctionner le script, deux fichiers CSV sont nécessaires :
-
-- etablissements.csv
-- roles.csv
-
-Le script fait un certain nombre de vérifications pour éviter les erreurs mais il est toujours préférable de faire un contrôle du contenu.
-
-Le script est à faire tourner sur l'environnement qui vous intéresse.
-Il faudra l'exécuter sur l'environnement de recette pour créer les comptes sur recette, sur sandbox pour sandbox et sur la production pour la production.
-
-La démarche est la suivante :
-
-1. Créer un répertoire `csv` qui contient les fichiers `etablissements.csv` et `roles.csv`.
-2. Se connecter à la machine qui vous intéresse en faisant au passage l'upload des fichiers :
-   ```
-   scalingo --app trackdechets-production-api run --file ~/Desktop/csv bash
-   ```
-   Le répertoire `csv` va être envoyé sous la forme d'une archive `.tar` dans le répertoire `/tmp/uploads`.
-3. À ce stade, vous devriez avoir un accès bash à la machine. Commencez par désarchiver votre répertoire :
-   ```
-   tar -C /tmp -xvf /tmp/uploads/csv.tar.gz
-   ```
-4. Éxécutez le script :
-   ```
-   node ./dist/src/users/bulk-creation/index.js --validateOnly --csvDir=/tmp/
-   ```
-   Note : le flag `--validateOnly` permet de faire une simple vérification sans créer les comptes.
-   Relancez la commande sans ce flag pour créer les comptes.
-
-Pour plus de détails sur l'exécution de tâches dans une application Scalingo, voir :
-
-- https://doc.scalingo.com/platform/cli/features#run-custom-job
-- https://doc.scalingo.com/platform/app/tasks
