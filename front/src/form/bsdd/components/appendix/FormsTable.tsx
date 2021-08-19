@@ -8,6 +8,7 @@ import { Form, Query, QueryAppendixFormsArgs } from "generated/graphql/types";
 const GET_APPENDIX_FORMS = gql`
   query AppendixForms($siret: String!, $wasteCode: String) {
     appendixForms(siret: $siret, wasteCode: $wasteCode) {
+      id
       readableId
       emitter {
         company {
@@ -82,7 +83,7 @@ export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
       <tbody>
         {forms.map(form => (
           <tr
-            key={form.readableId}
+            key={form.id}
             onClick={() => onToggle(form)}
             className="td-table__tr"
           >
@@ -90,7 +91,7 @@ export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
               <input
                 type="checkbox"
                 className="td-checkbox"
-                checked={selectedItems.indexOf(form.readableId) > -1}
+                checked={selectedItems.indexOf(form.id) > -1}
                 onChange={() => true}
               />
             </td>
