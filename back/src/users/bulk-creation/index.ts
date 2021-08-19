@@ -4,7 +4,7 @@ import { loadCompanies, loadRoles } from "./loaders";
 import { validateCompany, validateRoleGenerator } from "./validations";
 import { sirenify } from "./sirene";
 import { hashPassword, generatePassword } from "../utils";
-import { randomNumber, getUIBaseURL } from "../../utils";
+import { randomNumber, getUIBaseURL, sanitizeEmail } from "../../utils";
 import { groupBy } from "./utils";
 import { sendMail } from "../../mailer/mailing";
 import { UserInputError } from "apollo-server-express";
@@ -89,7 +89,10 @@ export async function bulkCreate(opts: Opts): Promise<void> {
 
   for (const role of rolesRows) {
     try {
-      const validRole = await validateRole(role);
+      const validRole = await validateRole({
+        ...role,
+        email: role.email ? sanitizeEmail(role.email) : undefined
+      });
       roles.push(validRole);
     } catch (err) {
       isValid = false;

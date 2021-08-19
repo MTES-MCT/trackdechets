@@ -102,9 +102,7 @@ export const roleValidationSchema = (companies: CompanyRow[]) =>
   });
 
 /** Generates a validateRole function */
-export function validateRoleGenerator(
-  companies: CompanyRow[]
-): (role: any) => Promise<any> {
+export function validateRoleGenerator(companies: CompanyRow[]) {
   const schema = roleValidationSchema(companies);
-  return role => schema.validate(role);
+  return (role: any) => schema.validate(role);
 }
