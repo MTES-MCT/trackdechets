@@ -74,22 +74,28 @@ export async function bulkCreate(opts: Opts): Promise<void> {
   // perform validation
   for (const company of companiesRows) {
     console.info(`Validate company ${company.siret}`);
-    const validCompany = await validateCompany(company).catch(err => {
+    try {
+      const validCompany = await validateCompany(company);
+      companies.push(validCompany);
+    } catch (err) {
       isValid = false;
       console.error(err);
-    });
-    companies.push(validCompany);
+    }
   }
 
   // validate roles
   const validateRole = validateRoleGenerator(companies);
-  const rolesPromises = rolesRows.map(role => {
-    return validateRole(role).catch(err => {
+  const roles = [];
+
+  for (const role of rolesRows) {
+    try {
+      const validRole = await validateRole(role);
+      roles.push(validRole);
+    } catch (err) {
       isValid = false;
       console.error(err);
-    });
-  });
-  const roles = await Promise.all(rolesPromises);
+    }
+  }
 
   if (isValid) {
     console.info("Validation successful");
