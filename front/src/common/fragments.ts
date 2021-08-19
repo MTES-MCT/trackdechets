@@ -125,6 +125,7 @@ export const temporaryStorageDetailFragment = gql`
       }
       cap
       processingOperation
+      isFilledByEmitter
     }
     wasteDetails {
       onuCode
@@ -198,6 +199,7 @@ const mutableFieldsFragment = gql`
       ...WasteDetailsFragment
     }
     appendix2Forms {
+      id
       readableId
     }
     ecoOrganisme {
