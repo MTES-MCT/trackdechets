@@ -17,19 +17,19 @@ function reducer(
     case "select":
       const sp = action.payload as Form;
       return {
-        selected: [sp.readableId, ...state.selected],
+        selected: [sp.id, ...state.selected],
         quantity: round(state.quantity + (sp.quantityReceived || 0)),
       };
     case "unselect":
       const usp = action.payload as Form;
       return {
-        selected: state.selected.filter(v => v !== usp.readableId),
+        selected: state.selected.filter(v => v !== usp.id),
         quantity: round(state.quantity - (usp.quantityReceived || 0)),
       };
     case "selectAll":
       const sap = action.payload as Form[];
       return {
-        selected: sap.map((v: Form) => v.readableId),
+        selected: sap.map((v: Form) => v.id),
         quantity: round(
           sap.reduce(
             (prev: number, cur: Form) => (prev += cur.quantityReceived || 0),
@@ -52,14 +52,14 @@ export default function FormsSelector({ name }) {
   }, [wasteCodeFilter]);
 
   const [state, dispatch] = useReducer(reducer, {
-    selected: getIn(values, name).map(f => f.readableId),
+    selected: getIn(values, name).map(f => f.id),
     quantity: getIn(values, "wasteDetails.quantity"),
   });
 
   useEffect(() => {
     setFieldValue(
       name,
-      state.selected.map(s => ({ readableId: s }))
+      state.selected.map(s => ({ id: s }))
     );
     setFieldValue("wasteDetails.quantity", state.quantity);
   }, [state, name, setFieldValue]);
@@ -72,7 +72,7 @@ export default function FormsSelector({ name }) {
       });
     }
 
-    state.selected.find(s => s === payload.readableId)
+    state.selected.find(s => s === payload.id)
       ? dispatch({ type: "unselect", payload })
       : dispatch({ type: "select", payload });
   }
