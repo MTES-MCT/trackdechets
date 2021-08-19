@@ -235,8 +235,13 @@ export async function bulkCreate(opts: Opts): Promise<void> {
 }
 
 if (require.main === module) {
-  run().catch(err => {
-    console.error(err);
-    process.exit(1);
-  });
+  run()
+    .then(() => {
+      console.log("All done");
+      prisma.$disconnect();
+    })
+    .catch(err => {
+      console.error(err);
+      process.exit(1);
+    });
 }
