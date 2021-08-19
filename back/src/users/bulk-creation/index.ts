@@ -137,7 +137,8 @@ export async function bulkCreate(opts: Opts): Promise<void> {
         givenName: company.givenName,
         contactEmail: company.contactEmail,
         contactPhone: company.contactPhone,
-        website: company.website
+        website: company.website,
+        verificationCode: randomNumber(5).toString()
       });
     }
   }
