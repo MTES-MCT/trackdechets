@@ -17,6 +17,7 @@ AccountFieldCompanyVhuAgrementDemolisseur.fragments = {
     fragment AccountFieldCompanyVhuAgrementDemolisseurFragment on CompanyPrivate {
       id
       siret
+      userRole
       vhuAgrementDemolisseur {
         id
         agrementNumber
