@@ -18,6 +18,7 @@ AccountFielCompanyGerepId.fragments = {
     fragment AccountFieldCompanyGerepIdFragment on CompanyPrivate {
       siret
       gerepId
+      userRole
     }
   `,
 };

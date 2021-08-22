@@ -15,6 +15,7 @@ AccountFieldCompanyTypes.fragments = {
     fragment AccountFieldCompanyTypesFragment on CompanyPrivate {
       siret
       companyTypes
+      userRole
     }
   `,
 };
