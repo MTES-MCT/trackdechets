@@ -24,7 +24,6 @@ services:
     build:
       context: ./back
       dockerfile: Dockerfile.dev
-    command: npm run dev
     volumes:
       - ./back/src:/usr/src/app/src
       - ./doc/docs:/usr/src/doc/docs
@@ -36,12 +35,14 @@ services:
       NODE_ENV: dev
       SIB_BASE_URL: "http://mailservice"
       DATABASE_URL: "postgresql://trackdechets:password@postgres:5432/prisma"
+      REDIS_URL: "redis:6379"
+      API_PORT: "4000"
     ports:
       - "4000:$API_PORT"
 
   td-ui:
     stdin_open: true
-    image: node:10.14-alpine
+    image: node:14.15.4
     container_name: td-ui
     working_dir: /usr/src/front
     command: sh -c "npm install && npm run dev"
@@ -49,6 +50,7 @@ services:
       - "3000"
     volumes:
       - ./front/:/usr/src/front
+      - ./back/:/usr/src/back
     ports:
       - "3000:3000"
 
