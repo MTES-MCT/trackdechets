@@ -1,3 +1,4 @@
+import { Bsdasri } from "@prisma/client";
 import {
   BsdasriMetadata,
   BsdasriMetadataResolvers
@@ -7,7 +8,7 @@ import { validateBsdasri, getRequiredFor } from "../validation";
 
 const bsdasriMetadataResolvers: BsdasriMetadataResolvers = {
   errors: async (metadata: BsdasriMetadata & { id: string }) => {
-    const bsdasri = await getBsdasriOrNotFound({ id: metadata.id });
+    const bsdasri: Bsdasri = await getBsdasriOrNotFound({ id: metadata.id });
 
     try {
       await validateBsdasri(bsdasri, {

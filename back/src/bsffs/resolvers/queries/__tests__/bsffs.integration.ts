@@ -1,4 +1,4 @@
-import { Bsff, BsffFicheIntervention, UserRole } from ".prisma/client";
+import { Bsff, BsffFicheIntervention, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import { Query, QueryBsffsArgs } from "../../../../generated/graphql/types";
@@ -9,7 +9,7 @@ import {
   UserWithCompany
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { OPERATION_CODES } from "../../../constants";
+import { OPERATION } from "../../../constants";
 import {
   createBsff,
   createBsffAfterOperation
@@ -187,13 +187,13 @@ describe("Query.bsffs", () => {
     await createBsff(
       { emitter },
       {
-        destinationOperationCode: OPERATION_CODES.D10
+        destinationOperationCode: OPERATION.D10.code
       }
     );
     await createBsff(
       { emitter },
       {
-        destinationOperationCode: OPERATION_CODES.R12
+        destinationOperationCode: OPERATION.R12.code
       }
     );
 
@@ -238,7 +238,7 @@ describe("Query.bsffs", () => {
         },
         {
           id: bsffId,
-          destinationOperationCode: OPERATION_CODES.R12,
+          destinationOperationCode: OPERATION.R12.code,
           ficheInterventions: {
             create: [
               {
@@ -268,7 +268,7 @@ describe("Query.bsffs", () => {
     });
 
     it("should list the previous bsffs", async () => {
-      await createBsff(
+      const bsff = await createBsff(
         { emitter, transporter, destination },
         { previousBsffs: { connect: [{ id: previousBsff.id }] } }
       );
@@ -278,15 +278,24 @@ describe("Query.bsffs", () => {
         GET_BSFFS
       );
 
-      expect(data.bsffs.edges[0].node.previousBsffs).toEqual([
-        expect.objectContaining({
-          id: previousBsff.id
-        })
-      ]);
+      expect(data.bsffs.edges).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            node: expect.objectContaining({
+              id: bsff.id,
+              previousBsffs: [
+                expect.objectContaining({
+                  id: previousBsff.id
+                })
+              ]
+            })
+          })
+        ])
+      );
     });
 
     it("should show the detenteur from the fiche d'interventions to companies on the bsff", async () => {
-      await createBsff(
+      const bsff = await createBsff(
         { emitter, transporter, destination },
         { previousBsffs: { connect: [{ id: previousBsff.id }] } }
       );
@@ -296,25 +305,36 @@ describe("Query.bsffs", () => {
         GET_BSFFS
       );
 
-      expect(data.bsffs.edges[0].node.previousBsffs).toEqual([
-        expect.objectContaining({
-          ficheInterventions: [
-            {
-              detenteur: {
-                company: {
-                  siret: previousBsffFicheIntervention.detenteurCompanySiret
-                }
-              }
-            }
-          ]
-        })
-      ]);
+      expect(data.bsffs.edges).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            node: expect.objectContaining({
+              id: bsff.id,
+              previousBsffs: [
+                expect.objectContaining({
+                  id: previousBsff.id,
+                  ficheInterventions: [
+                    expect.objectContaining({
+                      detenteur: {
+                        company: {
+                          siret:
+                            previousBsffFicheIntervention.detenteurCompanySiret
+                        }
+                      }
+                    })
+                  ]
+                })
+              ]
+            })
+          })
+        ])
+      );
     });
 
     it("should not show the detenteur from the fiche d'interventions to companies not on the bsff", async () => {
       const newDestination = await userWithCompanyFactory(UserRole.ADMIN);
 
-      await createBsff(
+      const bsff = await createBsff(
         { emitter: destination, transporter, destination: newDestination },
         { previousBsffs: { connect: [{ id: previousBsff.id }] } }
       );
@@ -324,15 +344,25 @@ describe("Query.bsffs", () => {
         GET_BSFFS
       );
 
-      expect(data.bsffs.edges[0].node.previousBsffs).toEqual([
-        expect.objectContaining({
-          ficheInterventions: [
-            {
-              detenteur: null
-            }
-          ]
-        })
-      ]);
+      expect(data.bsffs.edges).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            node: expect.objectContaining({
+              id: bsff.id,
+              previousBsffs: [
+                expect.objectContaining({
+                  id: previousBsff.id,
+                  ficheInterventions: [
+                    expect.objectContaining({
+                      detenteur: null
+                    })
+                  ]
+                })
+              ]
+            })
+          })
+        ])
+      );
     });
   });
 });

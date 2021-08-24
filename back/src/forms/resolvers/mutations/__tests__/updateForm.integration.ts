@@ -711,4 +711,57 @@ describe("Mutation.updateForm", () => {
       ]);
     }
   );
+
+  it("should update appendix2 status", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const originalRecipientCompany = await companyFactory();
+
+    const appendixForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        emitterCompanySiret: company.siret
+      }
+    });
+    const toBeAppendixForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "AWAITING_GROUP",
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: originalRecipientCompany.siret,
+        appendix2Forms: { connect: { id: appendixForm.id } }
+      }
+    });
+
+    const updateFormInput = {
+      id: form.id,
+      appendix2Forms: [{ id: toBeAppendixForm.id }]
+    };
+    const { mutate } = makeClient(user);
+    await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput
+      }
+    });
+
+    // Old appendix form is back to AWAITING_GROUP
+    const oldAppendix2Form = await prisma.form.findUnique({
+      where: { id: appendixForm.id }
+    });
+    expect(oldAppendix2Form.status).toBe("AWAITING_GROUP");
+
+    // New appendix form is now GROUPED
+    const newAppendix2Form = await prisma.form.findUnique({
+      where: { id: toBeAppendixForm.id }
+    });
+    expect(newAppendix2Form.status).toBe("GROUPED");
+  });
 });

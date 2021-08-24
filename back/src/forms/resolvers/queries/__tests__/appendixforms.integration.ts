@@ -56,11 +56,23 @@ describe("Test appendixForms", () => {
         status: "RECEIVED"
       }
     });
+    await formFactory({
+      ownerId: emitter.id,
+      opt: {
+        emitterCompanyName: emitterCompany.name,
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        status: "AWAITING_GROUP",
+        appendix2RootForm: { connect: { id: form.id } } // Dummy link between forms
+      }
+    });
 
     const { query } = makeClient(recipient);
     const {
       data: { appendixForms }
-    } = await query(buildQuery(recipientCompany.siret));
+    } = await query<{ appendixForms: { id: string }[] }>(
+      buildQuery(recipientCompany.siret)
+    );
 
     expect(appendixForms.length).toBe(1);
     expect(appendixForms[0].id).toBe(form.id);

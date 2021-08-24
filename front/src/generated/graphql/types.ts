@@ -1189,6 +1189,10 @@ export type Bsff = {
    * Il est à utiliser pour les échanges avec l'API.
    */
   id: Scalars["ID"];
+  /** Si ce BSFF est à l'état de brouillon ou pas. */
+  isDraft: Scalars["Boolean"];
+  /** Type de BSFF. */
+  type: BsffType;
   /** Statut qui synthétise où en est le déchet dans son cheminement. */
   status: BsffStatus;
   /**
@@ -1335,12 +1339,14 @@ export type BsffFicheInterventionInput = {
 };
 
 export type BsffInput = {
+  type?: Maybe<BsffType>;
   emitter?: Maybe<BsffEmitterInput>;
   packagings?: Maybe<Array<BsffPackagingInput>>;
   waste?: Maybe<BsffWasteInput>;
   quantity?: Maybe<BsffQuantityInput>;
   transporter?: Maybe<BsffTransporterInput>;
   destination?: Maybe<BsffDestinationInput>;
+  ficheInterventions?: Maybe<Array<Scalars["ID"]>>;
   previousBsffs?: Maybe<Array<Scalars["ID"]>>;
 };
 
@@ -1373,9 +1379,11 @@ export type BsffOperation = {
 export enum BsffOperationCode {
   R2 = "R2",
   R12 = "R12",
+  R13 = "R13",
   D10 = "D10",
   D13 = "D13",
-  D14 = "D14"
+  D14 = "D14",
+  D15 = "D15"
 }
 
 export type BsffOperationNextDestinationInput = {
@@ -1452,6 +1460,11 @@ export enum BsffStatus {
   Sent = "SENT",
   /** Le bordereau a été reçu par l'installation de destination. */
   Received = "RECEIVED",
+  /**
+   * Le déchet a subit un groupement, reconditionnement ou un entreposage provisoire.
+   * Il est en attente de la création d'un nouveau BSFF pour finaliser le traitement.
+   */
+  IntermediatelyProcessed = "INTERMEDIATELY_PROCESSED",
   /** Le déchet a été traité par l'installation de destination. */
   Processed = "PROCESSED",
   /** Le déchet a été refusé par l'installation de traitement. */
@@ -1502,6 +1515,20 @@ export type BsffTransporterTransportInput = {
   mode: TransportMode;
 };
 
+/** Représente les différents types de BSFF possibles. */
+export enum BsffType {
+  /** BSFF qui trace un fluide provenant d'une seule origine. */
+  TracerFluide = "TRACER_FLUIDE",
+  /** BSFF qui trace des fluides provenant de différentes origines. */
+  CollectePetitesQuantites = "COLLECTE_PETITES_QUANTITES",
+  /** BSFF qui groupe plusieurs autres BSFFs. */
+  Groupement = "GROUPEMENT",
+  /** BSFF qui reconditionne un ou plusieurs autres BSFFs. */
+  Reconditionnement = "RECONDITIONNEMENT",
+  /** BSFF qui réexpédie un autre BSFF. */
+  Reexpedition = "REEXPEDITION"
+}
+
 export type BsffWaste = {
   __typename?: "BsffWaste";
   /** Code déchet. */
@@ -1520,6 +1547,8 @@ export type BsffWasteInput = {
 
 /** Filtres possibles pour la récupération de bordereaux. */
 export type BsffWhere = {
+  /** Filtrer sur le champ status. */
+  status?: Maybe<BsffStatus>;
   /** Filtrer sur le champ emitter. */
   emitter?: Maybe<BsffWhereEmitter>;
   /** Filtrer sur le champ transporter. */
@@ -1547,6 +1576,7 @@ export type BsffWhereEmitter = {
 /** Champs possible pour le filtre sur l'opération. */
 export type BsffWhereOperation = {
   code?: Maybe<BsffOperationCode>;
+  code_in?: Maybe<Array<BsffOperationCode>>;
 };
 
 /** Champs possible pour le filtre sur transporter. */
@@ -2891,6 +2921,8 @@ export type Mutation = {
    * Crée un nouveau dasri en brouillon
    */
   createDraftBsdasri: Bsdasri;
+  /** Mutation permettant de créer un nouveau bordereau de suivi de fluides frigorigènes, à l'état de brouillon. */
+  createDraftBsff: Bsff;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Crée un BSVHU en brouillon
@@ -3118,6 +3150,8 @@ export type Mutation = {
    * Marque un dasri brouillon comme publié (isDraft=false)
    */
   publishBsdasri?: Maybe<Bsdasri>;
+  /** Mutation permettant de publier un brouillon. */
+  publishBsff: Bsff;
   /**
    * EXPERIMENTAL - Ne pas utiliser dans un contexte de production
    * Permet de publier un brouillon pour le marquer comme prêt à être envoyé
@@ -3178,7 +3212,7 @@ export type Mutation = {
    * Une signature ne peut être apposée que par un membre de l'entreprise figurant sur le cadre concerné
    * Ex: la signature TRANSPORT ne peut être apposée que par un membre de l'entreprise de transport
    *
-   * Pour signer l'emission avec un compte transpoteur (cas de lasignature sur device transporteur),
+   * Pour signer l'emission avec un compte transporteur (cas de la signature sur device transporteur),
    * utiliser la mutation signBsdasriEmissionWithSecretCode
    */
   signBsdasri?: Maybe<Bsdasri>;
@@ -3318,6 +3352,10 @@ export type MutationCreateDraftBsdaArgs = {
 
 export type MutationCreateDraftBsdasriArgs = {
   input: BsdasriCreateInput;
+};
+
+export type MutationCreateDraftBsffArgs = {
+  input: BsffInput;
 };
 
 export type MutationCreateDraftBsvhuArgs = {
@@ -3498,6 +3536,10 @@ export type MutationPublishBsdaArgs = {
 };
 
 export type MutationPublishBsdasriArgs = {
+  id: Scalars["ID"];
+};
+
+export type MutationPublishBsffArgs = {
   id: Scalars["ID"];
 };
 

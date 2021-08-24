@@ -19,7 +19,7 @@ export async function closeServer() {
     return Promise.resolve();
   }
 
-  return new Promise(resolve => {
+  return new Promise<void>(resolve => {
     httpServerInstance.close(() => {
       httpServerInstance = null;
       resolve();

@@ -4,7 +4,7 @@ import { unflattenBsff } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getUserCompanies } from "../../../users/database";
 import { safeInput } from "../../../forms/form-converter";
-import { Prisma } from ".prisma/client";
+import { Prisma } from "@prisma/client";
 import { getConnectionsArgs } from "../../../bsvhu/pagination";
 
 const bsffs: QueryResolvers["bsffs"] = async (_, args, context) => {
@@ -14,10 +14,13 @@ const bsffs: QueryResolvers["bsffs"] = async (_, args, context) => {
 
   const where = {
     ...safeInput<Prisma.BsffWhereInput>({
+      status: args.where?.status,
       emitterCompanySiret: args.where?.emitter?.company?.siret,
       transporterCompanySiret: args.where?.transporter?.company?.siret,
       destinationCompanySiret: args.where?.destination?.company?.siret,
-      destinationOperationCode: args.where?.destination?.operation?.code
+      destinationOperationCode: args.where?.destination?.operation?.code_in
+        ? { in: args.where?.destination?.operation?.code_in }
+        : args.where?.destination?.operation?.code
     }),
     OR: [
       { emitterCompanySiret: { in: sirets } },
@@ -36,7 +39,7 @@ const bsffs: QueryResolvers["bsffs"] = async (_, args, context) => {
   const bsffs = await prisma.bsff.findMany({
     ...paginationArgs,
     where,
-    orderBy: { createdAt: "desc" }
+    orderBy: { updatedAt: "desc" }
   });
 
   return {

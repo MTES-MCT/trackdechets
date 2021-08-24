@@ -1,4 +1,4 @@
-import { UserRole } from ".prisma/client";
+import { UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Query, QueryBsdasArgs } from "../../../../generated/graphql/types";
 import {

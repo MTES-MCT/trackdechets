@@ -48,7 +48,7 @@ describe("throttled decorator", () => {
     await setInCache(cacheKey, "true", { EX: 1 });
 
     // wait for the throttle period to expires
-    await new Promise(resolve => setTimeout(() => resolve(), 1500));
+    await new Promise<void>(resolve => setTimeout(() => resolve(), 1500));
 
     fn.mockResolvedValueOnce({ status: 200 });
 

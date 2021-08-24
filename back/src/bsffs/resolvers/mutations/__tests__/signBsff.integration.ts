@@ -1,4 +1,4 @@
-import { UserRole } from ".prisma/client";
+import { UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -9,6 +9,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { OPERATION } from "../../../constants";
 import {
   createBsff,
   createBsffBeforeEmission,
@@ -422,12 +423,12 @@ describe("Mutation.signBsff", () => {
           destination
         },
         {
-          destinationOperationCode: null
+          destinationOperationCode: OPERATION.R13.code
         }
       );
 
       const { mutate } = makeClient(destination.user);
-      const { data } = await mutate<
+      const { data, errors } = await mutate<
         Pick<Mutation, "signBsff">,
         MutationSignBsffArgs
       >(SIGN, {
@@ -441,6 +442,7 @@ describe("Mutation.signBsff", () => {
         }
       });
 
+      expect(errors).toBeUndefined();
       expect(data.signBsff.id).toBeTruthy();
     });
   });

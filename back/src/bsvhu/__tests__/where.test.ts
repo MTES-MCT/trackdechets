@@ -1,4 +1,4 @@
-import { BsvhuStatus } from ".prisma/client";
+import { BsvhuStatus } from "@prisma/client";
 import { BsvhuWhere } from "../../generated/graphql/types";
 import { convertWhereToDbFilter } from "../where";
 

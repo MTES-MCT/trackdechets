@@ -2,11 +2,15 @@ import React from "react";
 import { gql } from "@apollo/client";
 import { formatDate } from "common/datetime";
 import AccountField from "./AccountField";
-import { CompanyPrivate } from "generated/graphql/types";
+import { CompanyPrivate, UserRole } from "generated/graphql/types";
 import AccountFormCompanyTransporterReceipt from "./forms/AccountFormCompanyTransporterReceipt";
+import AccountFieldNotEditable from "./AccountFieldNotEditable";
 
 type Props = {
-  company: Pick<CompanyPrivate, "id" | "siret" | "transporterReceipt">;
+  company: Pick<
+    CompanyPrivate,
+    "id" | "siret" | "transporterReceipt" | "userRole"
+  >;
 };
 
 AccountFieldCompanyTransporterReceipt.fragments = {
@@ -47,16 +51,26 @@ export default function AccountFieldCompanyTransporterReceipt({
   ) : null;
 
   return (
-    <AccountField
-      name="transporterReceipt"
-      label="Récépissé transporteur"
-      value={transporterReceipt}
-      renderForm={toggleEdition => (
-        <AccountFormCompanyTransporterReceipt
-          company={company}
-          toggleEdition={toggleEdition}
+    <>
+      {company.userRole === UserRole.Admin ? (
+        <AccountField
+          name="transporterReceipt"
+          label="Récépissé transporteur"
+          value={transporterReceipt}
+          renderForm={toggleEdition => (
+            <AccountFormCompanyTransporterReceipt
+              company={company}
+              toggleEdition={toggleEdition}
+            />
+          )}
         />
-      )}
-    />
+      ) : (
+        <AccountFieldNotEditable
+          name="transporterReceipt"
+          label="Récépissé transporteur"
+          value={transporterReceipt}
+        />
+      )}{" "}
+    </>
   );
 }

@@ -1,7 +1,10 @@
+import { addYears, startOfYear } from "date-fns";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import { TransportMode } from "generated/graphql/types";
+import { BsffType, TransportMode } from "generated/graphql/types";
+import { OPERATION } from "./constants";
 
 export default {
+  type: BsffType.TracerFluide,
   emitter: {
     company: getInitialCompany(),
   },
@@ -13,7 +16,7 @@ export default {
     recepisse: {
       number: "",
       department: "",
-      validityLimit: null,
+      validityLimit: startOfYear(addYears(new Date(), 1)).toISOString(),
     },
     transport: {
       mode: TransportMode.Road,
@@ -23,7 +26,7 @@ export default {
     company: getInitialCompany(),
     cap: "",
     plannedOperation: {
-      code: "",
+      code: OPERATION.R2.code,
     },
   },
   packagings: [],
@@ -36,4 +39,6 @@ export default {
     kilos: 0,
     isEstimate: false,
   },
+  ficheInterventions: [],
+  previousBsffs: [],
 };

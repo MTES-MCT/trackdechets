@@ -6,6 +6,16 @@ type Bsff {
   id: ID!
 
   """
+  Si ce BSFF est à l'état de brouillon ou pas.
+  """
+  isDraft: Boolean!
+
+  """
+  Type de BSFF.
+  """
+  type: BsffType!
+
+  """
   Statut qui synthétise où en est le déchet dans son cheminement.
   """
   status: BsffStatus!

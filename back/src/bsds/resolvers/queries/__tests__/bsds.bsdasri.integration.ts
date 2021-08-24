@@ -4,7 +4,7 @@ import {
   User,
   UserRole,
   WasteAcceptationStatus
-} from ".prisma/client";
+} from "@prisma/client";
 import prisma from "../../../../prisma";
 import {
   Query,

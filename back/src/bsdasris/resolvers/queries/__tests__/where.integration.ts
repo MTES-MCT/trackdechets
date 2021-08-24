@@ -1,4 +1,4 @@
-import { BsdasriStatus } from ".prisma/client";
+import { BsdasriStatus } from "@prisma/client";
 import { BsdasriWhere } from "../../../../generated/graphql/types";
 import { buildDbFilter } from "../where";
 
