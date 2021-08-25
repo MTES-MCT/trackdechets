@@ -7,7 +7,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound } from "../../database";
 import { flattenBsffInput, unflattenBsff } from "../../converter";
 import { isBsffContributor } from "../../permissions";
-import { isValidPreviousBsffs } from "../../validation";
+import { bsffSchema, isValidPreviousBsffs } from "../../validation";
 import { indexBsff } from "../../elastic";
 
 const updateBsff: MutationResolvers["updateBsff"] = async (
@@ -83,6 +83,9 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   const futureBsff: Bsff = { ...existingBsff, ...flatInput };
   await isBsffContributor(user, futureBsff);
+  await bsffSchema.validate(futureBsff, {
+    abortEarly: false
+  });
 
   const data: Prisma.BsffUpdateInput = flatInput;
 

@@ -13,7 +13,8 @@ import {
   createBsffAfterEmission,
   createBsffAfterOperation,
   createBsffAfterReception,
-  createBsffAfterTransport
+  createBsffAfterTransport,
+  createBsffBeforeEmission
 } from "../../../__tests__/factories";
 
 const UPDATE_BSFF = `
@@ -36,6 +37,7 @@ const UPDATE_BSFF = `
       }
       transporter {
         company {
+          siret
           name
         }
       }
@@ -53,10 +55,10 @@ describe("Mutation.updateBsff", () => {
 
   it("should allow user to update a bsff", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsff({ emitter });
+    const bsff = await createBsff({ emitter }, { isDraft: true });
 
     const { mutate } = makeClient(emitter.user);
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
@@ -72,6 +74,7 @@ describe("Mutation.updateBsff", () => {
       }
     });
 
+    expect(errors).toBeUndefined();
     expect(data.updateBsff.id).toBeTruthy();
   });
 
@@ -98,7 +101,7 @@ describe("Mutation.updateBsff", () => {
 
   it("should disallow user that is not a contributor on the bsff", async () => {
     const { user } = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsff();
+    const bsff = await createBsff({});
 
     const { mutate } = makeClient(user);
     const { errors } = await mutate<
@@ -168,9 +171,9 @@ describe("Mutation.updateBsff", () => {
     ]);
   });
 
-  it("should disallow removing a company from the bsff", async () => {
+  it("prevent user from removing their own company from the bsff", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsff({ emitter });
+    const bsff = await createBsff({ emitter }, { isDraft: true });
 
     const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
@@ -199,7 +202,13 @@ describe("Mutation.updateBsff", () => {
 
   it("should allow updating emitter if they didn't sign", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsff({ emitter });
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsffBeforeEmission({
+      emitter,
+      transporter,
+      destination
+    });
 
     const { mutate } = makeClient(emitter.user);
 
@@ -210,7 +219,7 @@ describe("Mutation.updateBsff", () => {
         }
       }
     };
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
@@ -220,12 +229,19 @@ describe("Mutation.updateBsff", () => {
       }
     });
 
+    expect(errors).toBeUndefined();
     expect(data.updateBsff).toEqual(expect.objectContaining(input));
   });
 
   it("should not update emitter if they signed already", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsffAfterEmission({ emitter });
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsffAfterEmission({
+      emitter,
+      transporter,
+      destination
+    });
 
     const { mutate } = makeClient(emitter.user);
 
@@ -236,7 +252,7 @@ describe("Mutation.updateBsff", () => {
         }
       }
     };
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
@@ -246,6 +262,7 @@ describe("Mutation.updateBsff", () => {
       }
     });
 
+    expect(errors).toBeUndefined();
     expect(data.updateBsff).toEqual(
       expect.objectContaining({
         emitter: {
@@ -259,7 +276,13 @@ describe("Mutation.updateBsff", () => {
 
   it("should allow updating waste and quantity if emitter didn't sign", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsff({ emitter });
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsffBeforeEmission({
+      emitter,
+      transporter,
+      destination
+    });
 
     const { mutate } = makeClient(emitter.user);
 
@@ -274,7 +297,7 @@ describe("Mutation.updateBsff", () => {
         isEstimate: false
       }
     };
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
@@ -284,12 +307,19 @@ describe("Mutation.updateBsff", () => {
       }
     });
 
+    expect(errors).toBeUndefined();
     expect(data.updateBsff).toEqual(expect.objectContaining(input));
   });
 
   it("should not update waste and quantity if emitter signed already", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsffAfterEmission({ emitter });
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsffAfterEmission({
+      emitter,
+      transporter,
+      destination
+    });
 
     const { mutate } = makeClient(emitter.user);
 
@@ -304,7 +334,7 @@ describe("Mutation.updateBsff", () => {
         isEstimate: false
       }
     };
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
@@ -314,6 +344,7 @@ describe("Mutation.updateBsff", () => {
       }
     });
 
+    expect(errors).toBeUndefined();
     expect(data.updateBsff).toEqual(
       expect.objectContaining({
         waste: {
@@ -331,7 +362,13 @@ describe("Mutation.updateBsff", () => {
 
   it("should allow updating transporter if they didn't sign", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsffAfterEmission({ emitter });
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsffAfterEmission({
+      emitter,
+      transporter,
+      destination
+    });
 
     const { mutate } = makeClient(emitter.user);
 
@@ -342,7 +379,7 @@ describe("Mutation.updateBsff", () => {
         }
       }
     };
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
@@ -352,13 +389,21 @@ describe("Mutation.updateBsff", () => {
       }
     });
 
-    expect(data.updateBsff).toEqual(expect.objectContaining(input));
+    expect(errors).toBeUndefined();
+    expect(data.updateBsff.transporter.company).toEqual(
+      expect.objectContaining(input.transporter.company)
+    );
   });
 
   it("should not update transporter if they signed already", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsffAfterTransport({ emitter, transporter });
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsffAfterTransport({
+      emitter,
+      transporter,
+      destination
+    });
 
     const { mutate } = makeClient(emitter.user);
 
@@ -369,7 +414,7 @@ describe("Mutation.updateBsff", () => {
         }
       }
     };
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
@@ -379,13 +424,10 @@ describe("Mutation.updateBsff", () => {
       }
     });
 
-    expect(data.updateBsff).toEqual(
+    expect(errors).toBeUndefined();
+    expect(data.updateBsff.transporter.company).toEqual(
       expect.objectContaining({
-        transporter: {
-          company: {
-            name: bsff.transporterCompanyName
-          }
-        }
+        name: bsff.transporterCompanyName
       })
     );
   });
@@ -393,7 +435,12 @@ describe("Mutation.updateBsff", () => {
   it("should allow updating destination if they didn't sign", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsffAfterTransport({ emitter, transporter });
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsffAfterTransport({
+      emitter,
+      transporter,
+      destination
+    });
 
     const { mutate } = makeClient(emitter.user);
 
@@ -404,7 +451,7 @@ describe("Mutation.updateBsff", () => {
         }
       }
     };
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
@@ -414,6 +461,7 @@ describe("Mutation.updateBsff", () => {
       }
     });
 
+    expect(errors).toBeUndefined();
     expect(data.updateBsff).toEqual(expect.objectContaining(input));
   });
 
@@ -477,8 +525,8 @@ describe("Mutation.updateBsff", () => {
         status: BsffStatus.INTERMEDIATELY_PROCESSED
       }
     );
-    const bsff = await createBsff(
-      { emitter },
+    const bsff = await createBsffBeforeEmission(
+      { emitter, transporter, destination },
       {
         type: BsffType.GROUPEMENT,
         previousBsffs: { connect: [{ id: oldPreviousBsff.id }] }
@@ -508,5 +556,40 @@ describe("Mutation.updateBsff", () => {
         id: newPreviousBsff.id
       })
     ]);
+  });
+
+  it("should change the initial transporter", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const otherTransporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsffAfterEmission({
+      emitter,
+      transporter,
+      destination
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    const input = {
+      transporter: {
+        company: {
+          siret: otherTransporter.company.siret,
+          name: otherTransporter.company.name
+        }
+      }
+    };
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.updateBsff).toEqual(expect.objectContaining(input));
   });
 });

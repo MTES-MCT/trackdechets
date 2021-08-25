@@ -11,7 +11,6 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { OPERATION } from "../../../constants";
 import {
-  createBsff,
   createBsffBeforeEmission,
   createBsffAfterEmission,
   createBsffBeforeTransport,
@@ -103,10 +102,14 @@ describe("Mutation.signBsff", () => {
 
   describe("EMISSION", () => {
     it("should allow emitter to sign", async () => {
-      const bsff = await createBsffBeforeEmission({ emitter });
+      const bsff = await createBsffBeforeEmission({
+        emitter,
+        transporter,
+        destination
+      });
 
       const { mutate } = makeClient(emitter.user);
-      const { data } = await mutate<
+      const { data, errors } = await mutate<
         Pick<Mutation, "signBsff">,
         MutationSignBsffArgs
       >(SIGN, {
@@ -120,41 +123,19 @@ describe("Mutation.signBsff", () => {
         }
       });
 
+      expect(errors).toBeUndefined();
       expect(data.signBsff.id).toBeTruthy();
     });
 
-    it("should throw an error if the bsff is missing required data when the emitter tries to sign", async () => {
-      const bsff = await createBsff({ emitter });
-
-      const { mutate } = makeClient(emitter.user);
-      const { errors } = await mutate<
-        Pick<Mutation, "signBsff">,
-        MutationSignBsffArgs
-      >(SIGN, {
-        variables: {
-          id: bsff.id,
-          type: "EMISSION",
-          signature: {
-            date: new Date().toISOString() as any,
-            author: emitter.user.name
-          }
-        }
+    it("should allow the transporter to sign for the emitter with the security code", async () => {
+      const bsff = await createBsffBeforeEmission({
+        emitter,
+        transporter,
+        destination
       });
 
-      expect(errors).toEqual([
-        expect.objectContaining({
-          extensions: {
-            code: "BAD_USER_INPUT"
-          }
-        })
-      ]);
-    });
-
-    it("should allow the transporter to sign for the emitter with the security code", async () => {
-      const bsff = await createBsffBeforeEmission({ emitter, transporter });
-
       const { mutate } = makeClient(transporter.user);
-      const { data } = await mutate<
+      const { data, errors } = await mutate<
         Pick<Mutation, "signBsff">,
         MutationSignBsffArgs
       >(SIGN, {
@@ -169,11 +150,16 @@ describe("Mutation.signBsff", () => {
         }
       });
 
+      expect(errors).toBeUndefined();
       expect(data.signBsff.id).toBeTruthy();
     });
 
     it("should disallow the transporter to sign for the emitter without the security code", async () => {
-      const bsff = await createBsffBeforeEmission({ emitter, transporter });
+      const bsff = await createBsffBeforeEmission({
+        emitter,
+        transporter,
+        destination
+      });
 
       const { mutate } = makeClient(transporter.user);
       const { errors } = await mutate<
@@ -198,7 +184,11 @@ describe("Mutation.signBsff", () => {
     });
 
     it("should disallow the transporter to sign for the emitter with a wrong security code", async () => {
-      const bsff = await createBsffBeforeEmission({ emitter, transporter });
+      const bsff = await createBsffBeforeEmission({
+        emitter,
+        transporter,
+        destination
+      });
 
       const { mutate } = makeClient(transporter.user);
       const { errors } = await mutate<
@@ -224,7 +214,11 @@ describe("Mutation.signBsff", () => {
     });
 
     it("should throw an error when the emitter tries to sign twice", async () => {
-      const bsff = await createBsffAfterEmission({ emitter });
+      const bsff = await createBsffAfterEmission({
+        emitter,
+        transporter,
+        destination
+      });
 
       const { mutate } = makeClient(emitter.user);
       const { errors } = await mutate<
@@ -250,7 +244,7 @@ describe("Mutation.signBsff", () => {
 
     it("should throw an error if the transporter tries to sign without the emitter's signature", async () => {
       const bsff = await createBsffBeforeTransport(
-        { emitter, transporter },
+        { emitter, transporter, destination },
         {
           emitterEmissionSignatureDate: null,
           emitterEmissionSignatureAuthor: null
@@ -283,10 +277,14 @@ describe("Mutation.signBsff", () => {
 
   describe("TRANSPORT", () => {
     it("should allow transporter to sign transport", async () => {
-      const bsff = await createBsffBeforeTransport({ emitter, transporter });
+      const bsff = await createBsffBeforeTransport({
+        emitter,
+        transporter,
+        destination
+      });
 
       const { mutate } = makeClient(transporter.user);
-      const { data } = await mutate<
+      const { data, errors } = await mutate<
         Pick<Mutation, "signBsff">,
         MutationSignBsffArgs
       >(SIGN, {
@@ -300,11 +298,16 @@ describe("Mutation.signBsff", () => {
         }
       });
 
+      expect(errors).toBeUndefined();
       expect(data.signBsff.id).toBeTruthy();
     });
 
     it("should disallow transporter to sign transport when required data is missing", async () => {
-      const bsff = await createBsffAfterEmission({ emitter, transporter });
+      const bsff = await createBsffAfterEmission({
+        emitter,
+        transporter,
+        destination
+      });
 
       const { mutate } = makeClient(transporter.user);
       const { errors } = await mutate<
@@ -340,7 +343,7 @@ describe("Mutation.signBsff", () => {
       });
 
       const { mutate } = makeClient(destination.user);
-      const { data } = await mutate<
+      const { data, errors } = await mutate<
         Pick<Mutation, "signBsff">,
         MutationSignBsffArgs
       >(SIGN, {
@@ -354,6 +357,7 @@ describe("Mutation.signBsff", () => {
         }
       });
 
+      expect(errors).toBeUndefined();
       expect(data.signBsff.id).toBeTruthy();
     });
 
@@ -398,7 +402,7 @@ describe("Mutation.signBsff", () => {
       });
 
       const { mutate } = makeClient(destination.user);
-      const { data } = await mutate<
+      const { data, errors } = await mutate<
         Pick<Mutation, "signBsff">,
         MutationSignBsffArgs
       >(SIGN, {
@@ -412,6 +416,7 @@ describe("Mutation.signBsff", () => {
         }
       });
 
+      expect(errors).toBeUndefined();
       expect(data.signBsff.id).toBeTruthy();
     });
 

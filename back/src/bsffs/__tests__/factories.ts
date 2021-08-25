@@ -1,4 +1,3 @@
-import { SetRequired } from "type-fest";
 import { Prisma, TransportMode, BsffStatus, BsffType } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
@@ -6,13 +5,13 @@ import { UserWithCompany } from "../../__tests__/factories";
 import { OPERATION, WASTE_CODES } from "../constants";
 
 interface CreateBsffArgs {
-  emitter?: UserWithCompany;
-  transporter?: UserWithCompany;
-  destination?: UserWithCompany;
+  emitter: UserWithCompany;
+  transporter: UserWithCompany;
+  destination: UserWithCompany;
 }
 
 export function createBsff(
-  { emitter, transporter, destination }: CreateBsffArgs = {},
+  { emitter, transporter, destination }: Partial<CreateBsffArgs> = {},
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   const data = {
@@ -59,21 +58,24 @@ export function createBsff(
 }
 
 export function createBsffBeforeEmission(
-  args: SetRequired<CreateBsffArgs, "emitter">,
+  args: CreateBsffArgs,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsff(args, {
+    isDraft: false,
     wasteCode: WASTE_CODES[0],
     wasteDescription: "Fluides",
+    wasteAdr: "Mention ADR",
     quantityKilos: 1,
     quantityIsEstimate: false,
     destinationPlannedOperationCode: OPERATION.D10.code,
+    packagings: [{ name: "BOUTEILLE 2L", numero: "01", kilos: 1 }],
     ...initialData
   });
 }
 
 export function createBsffAfterEmission(
-  args: SetRequired<CreateBsffArgs, "emitter">,
+  args: CreateBsffArgs,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffBeforeEmission(args, {
@@ -85,11 +87,10 @@ export function createBsffAfterEmission(
 }
 
 export function createBsffBeforeTransport(
-  args: SetRequired<CreateBsffArgs, "emitter" | "transporter">,
+  args: CreateBsffArgs,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffAfterEmission(args, {
-    packagings: [{ name: "BOUTEILLE 2L", numero: "01", kilos: 1 }],
     wasteAdr: "Mention ADR",
     transporterTransportMode: TransportMode.ROAD,
     ...initialData
@@ -97,7 +98,7 @@ export function createBsffBeforeTransport(
 }
 
 export function createBsffAfterTransport(
-  args: SetRequired<CreateBsffArgs, "emitter" | "transporter">,
+  args: CreateBsffArgs,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffBeforeTransport(args, {
@@ -109,10 +110,10 @@ export function createBsffAfterTransport(
 }
 
 export function createBsffBeforeReception(
-  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
+  args: CreateBsffArgs,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
-  return createBsffBeforeTransport(args, {
+  return createBsffAfterTransport(args, {
     destinationReceptionDate: new Date().toISOString(),
     destinationReceptionKilos: 1,
     ...initialData
@@ -120,7 +121,7 @@ export function createBsffBeforeReception(
 }
 
 export function createBsffAfterReception(
-  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
+  args: CreateBsffArgs,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffBeforeReception(args, {
@@ -134,7 +135,7 @@ export function createBsffAfterReception(
 }
 
 export function createBsffBeforeOperation(
-  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
+  args: CreateBsffArgs,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffAfterReception(args, {
@@ -144,10 +145,10 @@ export function createBsffBeforeOperation(
 }
 
 export function createBsffAfterOperation(
-  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
+  args: CreateBsffArgs,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
-  return createBsffAfterReception(args, {
+  return createBsffBeforeOperation(args, {
     status: BsffStatus.PROCESSED,
     destinationOperationSignatureAuthor: args.destination.user.name,
     destinationOperationSignatureDate: new Date().toISOString(),

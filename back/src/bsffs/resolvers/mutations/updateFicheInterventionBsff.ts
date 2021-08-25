@@ -28,7 +28,9 @@ const updateFicheInterventionBsff: MutationResolvers["updateFicheInterventionBsf
   };
   await isFicheInterventionOperateur(user, newFicheInterventionData);
 
-  await ficheInterventionSchema.validate(newFicheInterventionData);
+  await ficheInterventionSchema.validate(newFicheInterventionData, {
+    abortEarly: false
+  });
 
   const updatedFicheIntervention = await prisma.bsffFicheIntervention.update({
     data: ficheInterventionData,
