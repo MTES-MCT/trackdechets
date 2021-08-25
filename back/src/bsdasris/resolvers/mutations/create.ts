@@ -12,8 +12,13 @@ import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { validateBsdasri } from "../../validation";
 import { checkIsBsdasriContributor } from "../../permissions";
-import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
+import {
+  emitterIsAllowedToGroup,
+  checkDasrisAreAssociable,
+  getBsdasriType
+} from "./utils";
 import { indexBsdasri } from "../../elastic";
+import { BsdasriGroupingParameterError } from "../../errors";
 
 /**
  * Bsdasri creation mutation
@@ -27,13 +32,18 @@ const createBsdasri = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const { regroupedBsdasris, ...rest } = input;
+  const { regroupedBsdasris, synthesizedBsdasris, ...rest } = input;
+
+  if (!!regroupedBsdasris?.length && !!synthesizedBsdasris?.length) {
+    throw new BsdasriGroupingParameterError();
+  }
 
   const formSirets = {
     emitterCompanySiret: input.emitter?.company?.siret,
     recipientCompanySiret: input.recipient?.company?.siret,
     transporterCompanySiret: input.transporter?.company?.siret
   };
+  ``;
 
   await checkIsBsdasriContributor(
     user,
@@ -42,19 +52,30 @@ const createBsdasri = async (
   );
 
   const flattenedInput = flattenBsdasriInput(rest);
-  const isRegrouping = !!regroupedBsdasris && !!regroupedBsdasris.length;
-
-  if (isRegrouping) {
-    await emitterIsAllowedToGroup(flattenedInput?.emitterCompanySiret);
-    await checkDasrisAreGroupable(
-      regroupedBsdasris,
-      flattenedInput.emitterCompanySiret
-    );
+  const isRegrouping = !!regroupedBsdasris?.length;
+  const isSynthesizing = !!synthesizedBsdasris?.length;
+  if (isRegrouping && isSynthesizing) {
+    throw new BsdasriGroupingParameterError();
   }
-
+  if (isRegrouping) {
+    // Only some actors all allowed to group dasris
+    await emitterIsAllowedToGroup(flattenedInput?.emitterCompanySiret);
+    await checkDasrisAreAssociable({
+      bsdasrisToAssociate: regroupedBsdasris,
+      emitterSiret: flattenedInput.emitterCompanySiret,
+      associationType: "group"
+    });
+  }
+  if (isSynthesizing) {
+    await checkDasrisAreAssociable({
+      bsdasrisToAssociate: synthesizedBsdasris,
+      emitterSiret: flattenedInput.emitterCompanySiret,
+      associationType: "synthesis"
+    });
+  }
   const signatureContext = isDraft
-    ? { isRegrouping }
-    : { emissionSignature: true, isRegrouping };
+    ? { isRegrouping: isRegrouping || isSynthesizing }
+    : { emissionSignature: true, isRegrouping: isRegrouping || isSynthesizing };
 
   await validateBsdasri(flattenedInput, signatureContext);
 
@@ -62,9 +83,10 @@ const createBsdasri = async (
     data: {
       ...flattenedInput,
       id: getReadableId(ReadableIdPrefix.DASRI),
-      bsdasriType: isRegrouping ? "GROUPING" : "SIMPLE",
+      bsdasriType: getBsdasriType(isRegrouping, isSynthesizing),
       owner: { connect: { id: user.id } },
       regroupedBsdasris: { connect: regroupedBsdasris },
+      synthesizedBsdasris: { connect: synthesizedBsdasris },
       isDraft: isDraft
     }
   });

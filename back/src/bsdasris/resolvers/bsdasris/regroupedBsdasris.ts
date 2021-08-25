@@ -1,6 +1,5 @@
 import { BsdasriResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
-// import { stringifyDates } from "../../database";
 
 const regroupedBsdasris: BsdasriResolvers["regroupedBsdasris"] = async bsdasri => {
   const regroupedBsdasris = await prisma.bsdasri

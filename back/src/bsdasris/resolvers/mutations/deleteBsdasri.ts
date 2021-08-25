@@ -17,9 +17,14 @@ const deleteBsdasriResolver: MutationResolvers["deleteBsdasri"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const { regroupedBsdasris, ...bsdasri } = await getBsdasriOrNotFound({
+  const {
+    regroupedBsdasris,
+    synthesizedBsdasris,
+    ...bsdasri
+  } = await getBsdasriOrNotFound({
     id,
-    includeRegrouped: true
+    includeRegrouped: true,
+    includeSynthesized: true
   });
   // user must belong to the dasri, and status must be INITIAL
   // if this dasri is regrouped by an other, it should be in another status thus being not deletable
@@ -27,13 +32,21 @@ const deleteBsdasriResolver: MutationResolvers["deleteBsdasri"] = async (
 
   // are any dasris regrouped on the dasri we want to mark as deleted ?
   if (!!regroupedBsdasris.length) {
-    // let's set their fk to null
+    // let's set their regroupedOnBsdasriId fk to null
     await prisma.bsdasri.updateMany({
       where: { id: { in: regroupedBsdasris.map(dasri => dasri.id) } },
       data: { regroupedOnBsdasriId: null }
     });
   }
 
+  // are any dasris synthesized on the dasri we want to mark as deleted ?
+  if (!!synthesizedBsdasris.length) {
+    // let's set their synthesizedOnBsdasriId fk to null
+    await prisma.bsdasri.updateMany({
+      where: { id: { in: synthesizedBsdasris.map(dasri => dasri.id) } },
+      data: { synthesizedOnBsdasriId: null }
+    });
+  }
   const deletedBsdasri = await prisma.bsdasri.update({
     where: { id },
     data: { isDeleted: true }

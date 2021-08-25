@@ -167,8 +167,11 @@ type Bsdasri {
   reception: BsdasriReception
   operation: BsdasriOperation
 
-  "Bordereaux regroupés"
+  "Bordereaux groupés"
   regroupedBsdasris: [ID!]
+
+  "Bordereaux de synthèse associés"
+  synthesizedBsdasris: [ID!]
 
   metadata: BsdasriMetadata!
 

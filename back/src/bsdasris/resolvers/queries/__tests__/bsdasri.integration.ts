@@ -12,6 +12,7 @@ query GetBsdasri($id: ID!) {
     status
     isDraft
     regroupedBsdasris
+    synthesizedBsdasris
     emitter {
       onBehalfOfEcoorganisme
       type
@@ -168,6 +169,7 @@ describe("Query.Bsdasri", () => {
     expect(data.bsdasri.id).toBe(dasri.id);
     expect(data.bsdasri.status).toBe("INITIAL");
     expect(data.bsdasri.regroupedBsdasris).toStrictEqual([]);
+    expect(data.bsdasri.synthesizedBsdasris).toStrictEqual([]);
   });
 
   it("should retrieve regrouped dasris", async () => {
@@ -196,5 +198,35 @@ describe("Query.Bsdasri", () => {
 
     expect(data.bsdasri.id).toBe(dasri.id);
     expect(data.bsdasri.regroupedBsdasris).toStrictEqual([toRegroup.id]);
+    expect(data.bsdasri.synthesizedBsdasris).toStrictEqual([]);
+  });
+
+  it("should retrieve synthesized dasris", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const toAssociate = await bsdasriFactory({
+      ownerId: user.id,
+      opt: {
+        ...initialData(company),
+        status: "PROCESSED"
+      }
+    });
+    const dasri = await bsdasriFactory({
+      ownerId: user.id,
+      opt: {
+        ...initialData(company),
+        synthesizedBsdasris: { connect: [{ id: toAssociate.id }] }
+      }
+    });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query<Pick<Query, "bsdasri">>(GET_BSDASRI, {
+      variables: { id: dasri.id }
+    });
+
+    expect(data.bsdasri.id).toBe(dasri.id);
+    expect(data.bsdasri.synthesizedBsdasris).toStrictEqual([toAssociate.id]);
+    expect(data.bsdasri.regroupedBsdasris).toStrictEqual([]);
   });
 });

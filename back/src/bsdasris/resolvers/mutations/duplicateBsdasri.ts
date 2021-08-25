@@ -1,4 +1,4 @@
-import { Bsdasri, BsdasriStatus, User } from "@prisma/client";
+import { Bsdasri, BsdasriStatus, User, BsdasriType } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import {
@@ -87,6 +87,7 @@ function duplicateBsdasri(
     operationSignatureDate,
     operationSignatureAuthor,
     regroupedOnBsdasriId,
+    synthesizedOnBsdasriId,
     ownerId,
     ...fieldsToCopy
   }: Bsdasri
@@ -95,6 +96,7 @@ function duplicateBsdasri(
     data: {
       ...fieldsToCopy,
       id: getReadableId(ReadableIdPrefix.DASRI),
+      bsdasriType: BsdasriType.SIMPLE,
       status: BsdasriStatus.INITIAL,
       isDraft: true,
       owner: { connect: { id: user.id } }

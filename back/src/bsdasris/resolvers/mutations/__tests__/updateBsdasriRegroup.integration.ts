@@ -29,15 +29,17 @@ describe("Mutation.updateBsdasri", () => {
         set: ["COLLECTOR"]
       }
     });
+
     const toRegroup = await bsdasriFactory({
       ownerId: user.id,
       opt: {
         status: BsdasriStatus.PROCESSED,
         emitterCompanySiret: "1234",
         recipientCompanySiret: company.siret,
-        processingOperation: "R1"
+        processingOperation: "R12"
       }
     });
+
     const dasri = await bsdasriFactory({
       ownerId: user.id,
       opt: {
@@ -45,7 +47,6 @@ describe("Mutation.updateBsdasri", () => {
         emitterCompanySiret: company.siret
       }
     });
-
     const { mutate } = makeClient(user);
 
     const { data } = await mutate<Pick<Mutation, "updateBsdasri">>(
@@ -57,6 +58,7 @@ describe("Mutation.updateBsdasri", () => {
         }
       }
     );
+
     expect(data.updateBsdasri.regroupedBsdasris).toEqual([toRegroup.id]);
     expect(data.updateBsdasri.bsdasriType).toEqual("GROUPING");
   });

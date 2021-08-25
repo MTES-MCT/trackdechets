@@ -7,7 +7,7 @@ import prisma from "../../../prisma";
 import {
   ResolversParentTypes,
   MutationUpdateBsdasriArgs,
-  RegroupedBsdasriInput
+  SynthesisedBsdasriInput
 } from "../../../generated/graphql/types";
 
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -18,7 +18,12 @@ import { getBsdasriOrNotFound } from "../../database";
 import { validateBsdasri } from "../../validation";
 import { ForbiddenError } from "apollo-server-express";
 import { indexBsdasri } from "../../elastic";
-
+import { BsdasriGroupingParameterError } from "../../errors";
+import {
+  emitterIsAllowedToGroup,
+  checkDasrisAreAssociable,
+  getBsdasriType
+} from "./utils";
 type BsdasriField = keyof Bsdasri;
 const fieldsAllowedForUpdateOnceReceived: BsdasriField[] = [
   "processingOperation",
@@ -80,27 +85,43 @@ const getFieldsAllorwedForUpdate = (bsdasri: Bsdasri) => {
   return allowedFields[bsdasri.status];
 };
 
-const getRegroupedBsdasriArgs = (
-  inputRegroupedBsdasris: RegroupedBsdasriInput[] | null | undefined
+const getBsdasriAssociationArgs = (
+  inputAssociatedBsdasris: SynthesisedBsdasriInput[] | null | undefined
 ) => {
-  if (inputRegroupedBsdasris === null || inputRegroupedBsdasris?.length === 0) {
-    return { regroupedBsdasris: { set: [] } };
+  if (
+    inputAssociatedBsdasris === null ||
+    inputAssociatedBsdasris?.length === 0
+  ) {
+    return { set: [] };
   }
 
-  const args = !!inputRegroupedBsdasris ? { set: inputRegroupedBsdasris } : {};
-  return { regroupedBsdasris: args };
+  const args = !!inputAssociatedBsdasris
+    ? { set: inputAssociatedBsdasris }
+    : {};
+  return args;
 };
 
-const getIsRegrouping = (dbRegroupedBsdasris, regroupedBsdasris) => {
-  // new input does not provide info about regrouped dasris: use db value
-  if (regroupedBsdasris === undefined) {
+/**
+ *
+ * Is this dasri grouping or synthesizing other dasris
+ */
+const isDasriAssociating = ({
+  dbAssociatedBsdasris,
+  inputAssociatedBsdasris,
+  parameterName
+}: {
+  dbAssociatedBsdasris: { id?: string }[] | null | undefined;
+  inputAssociatedBsdasris: { id?: string }[] | null | undefined;
+  parameterName: "isRegrouping" | "isSynthesizing";
+}) => {
+  // new input does not provide info about synthesized dasris: use db value
+  if (inputAssociatedBsdasris === undefined) {
     return {
-      isRegrouping: !!dbRegroupedBsdasris.length
+      [parameterName]: !!dbAssociatedBsdasris?.length
     };
   }
   // else use provided input value
-
-  return { isRegrouping: !!regroupedBsdasris?.length };
+  return { [parameterName]: !!inputAssociatedBsdasris?.length };
 };
 
 /**
@@ -117,12 +138,25 @@ const dasriUpdateResolver = async (
 
   const { id, input } = { ...args };
 
-  const { regroupedBsdasris: inputRegroupedBsdasris, ...dasriContent } = input;
+  const {
+    regroupedBsdasris: inputRegroupedBsdasris,
+    synthesizedBsdasris: inputSynthesizedBsdasris,
+    ...dasriContent
+  } = input;
+
+  if (!!inputRegroupedBsdasris?.length && !!inputSynthesizedBsdasris?.length) {
+    throw new BsdasriGroupingParameterError();
+  }
 
   const {
     regroupedBsdasris: dbRegroupedBsdasris,
+    synthesizedBsdasris: dbSynthesizedBsdasris,
     ...dbBsdasri
-  } = await getBsdasriOrNotFound({ id, includeRegrouped: true });
+  } = await getBsdasriOrNotFound({
+    id,
+    includeRegrouped: true,
+    includeSynthesized: true
+  });
 
   await checkIsBsdasriContributor(
     user,
@@ -134,15 +168,60 @@ const dasriUpdateResolver = async (
     throw new ForbiddenError("Ce bordereau n'est plus modifiable");
   }
 
+  const isRegrouping = isDasriAssociating({
+    dbAssociatedBsdasris: dbRegroupedBsdasris,
+    inputAssociatedBsdasris: inputRegroupedBsdasris,
+    parameterName: "isRegrouping"
+  });
+
+  const isSynthesizing = isDasriAssociating({
+    dbAssociatedBsdasris: dbSynthesizedBsdasris,
+    inputAssociatedBsdasris: inputSynthesizedBsdasris,
+    parameterName: "isSynthesizing"
+  });
+
+  // Final dasri can't be both grouping and synthesizing other dasris
+  if (isRegrouping.isRegrouping && isSynthesizing.isSynthesizing) {
+    throw new BsdasriGroupingParameterError();
+  }
+
   const flattenedInput = flattenBsdasriInput(dasriContent);
-
   const expectedBsdasri = { ...dbBsdasri, ...flattenedInput };
-  // Validate form input
-  const isRegrouping = getIsRegrouping(
-    dbRegroupedBsdasris,
-    inputRegroupedBsdasris
-  );
+  const dbRegroupedBsdasrisIds = dbRegroupedBsdasris?.map(bsd => bsd.id);
+  const dbSynthesizedBsdasrisIds = dbSynthesizedBsdasris.map(bsd => bsd.id);
 
+  if (isRegrouping.isRegrouping) {
+    // is emitter allowed to group dasris ?
+    await emitterIsAllowedToGroup(expectedBsdasri?.emitterCompanySiret);
+
+    // are the provided dasris groupable ?
+    // we filter out already associated bsd
+    await checkDasrisAreAssociable({
+      bsdasrisToAssociate: inputRegroupedBsdasris?.filter(
+        bsd =>
+          !dbRegroupedBsdasrisIds?.includes(bsd.id) &&
+          !dbSynthesizedBsdasrisIds?.includes(bsd.id)
+      ),
+      emitterSiret: expectedBsdasri.emitterCompanySiret,
+      associationType: "group"
+    });
+  }
+  if (isSynthesizing.isSynthesizing) {
+    // todo : check if emitter is allowed to update a synthesis dasri
+    // are the provided dasris suitable for a synthesis dasri ?
+    // we filter out already associated bsds
+    await checkDasrisAreAssociable({
+      bsdasrisToAssociate: inputSynthesizedBsdasris?.filter(
+        bsd =>
+          !dbRegroupedBsdasrisIds?.includes(bsd.id) &&
+          !dbSynthesizedBsdasrisIds?.includes(bsd.id)
+      ),
+      emitterSiret: expectedBsdasri.emitterCompanySiret,
+      associationType: "synthesis"
+    });
+  }
+
+  // Validate form input
   await validateBsdasri(expectedBsdasri, {
     ...isRegrouping
   });
@@ -165,11 +244,13 @@ const dasriUpdateResolver = async (
     where: { id },
     data: {
       ...flattenedInput,
-      ...getRegroupedBsdasriArgs(inputRegroupedBsdasris),
-      bsdasriType:
-        inputRegroupedBsdasris === null || inputRegroupedBsdasris?.length === 0
-          ? "SIMPLE"
-          : "GROUPING"
+
+      regroupedBsdasris: getBsdasriAssociationArgs(inputRegroupedBsdasris),
+      synthesizedBsdasris: getBsdasriAssociationArgs(inputSynthesizedBsdasris),
+      bsdasriType: getBsdasriType(
+        isRegrouping.isRegrouping,
+        isSynthesizing.isSynthesizing
+      )
     }
   });
 

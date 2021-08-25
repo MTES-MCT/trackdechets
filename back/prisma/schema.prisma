@@ -806,6 +806,10 @@ model Bsdasri {
   regroupedBsdasris    Bsdasri[] @relation("BsdasriToBsdasri")
   regroupedOnBsdasri   Bsdasri?  @relation("BsdasriToBsdasri", fields: [regroupedOnBsdasriId], references: [id])
   regroupedOnBsdasriId String?
+
+  synthesizedBsdasris    Bsdasri[] @relation("SynthesisBsdasriToBsdasri")
+  synthesizedOnBsdasri   Bsdasri?  @relation("SynthesisBsdasriToBsdasri", fields: [synthesizedOnBsdasriId], references: [id])
+  synthesizedOnBsdasriId String?
 }
 
 // ----------------

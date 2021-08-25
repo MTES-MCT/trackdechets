@@ -80,7 +80,9 @@ describe("Bsdasri where conversion", () => {
         { recipientCompanySiret: { in: [siret] } }
       ],
       regroupedBsdasris: { none: {} },
-      regroupedOnBsdasri: null
+      regroupedOnBsdasri: null,
+      synthesizedBsdasris: { none: {} },
+      synthesizedOnBsdasri: null
     });
   });
   it("should convert complex filters to db filters", () => {

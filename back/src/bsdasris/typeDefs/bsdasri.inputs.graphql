@@ -41,7 +41,7 @@ input BsdasriWhere {
   (Optionnel) Filtre sur l'état de regroupement des bordereaux
   Si aucun filtre n'est passé, les bordereaux seront retournés sans filtrage supplémentaire
   Si groupable: true, les bordereaux retournés ne sont pas déjà regroupés et ne regroupent pas d'autres bordereaux
-  Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne regroupent d'autres bordereaux
+  Si groupable: false, les bordereaux retournés sont déjà regroupés ou regroupent d'autres bordereaux
   """
   groupable: Boolean
   _and: [BsdasriWhere!]
@@ -169,8 +169,14 @@ input BsdasriInput {
   operation: BsdasriOperationInput
 }
 
-"Payload de regroupement"
+"Payload de dasri de regroupement"
 input RegroupedBsdasriInput {
+  "Identifiant unique du bordereau"
+  id: ID
+}
+
+"Payload de dasri de synthèse"
+input SynthesisedBsdasriInput {
   "Identifiant unique du bordereau"
   id: ID
 }
@@ -185,6 +191,7 @@ input BsdasriCreateInput {
   operation: BsdasriOperationInput
 
   regroupedBsdasris: [RegroupedBsdasriInput]
+  synthesizedBsdasris: [SynthesisedBsdasriInput]
 }
 
 input BsdasriUpdateInput {
@@ -197,6 +204,7 @@ input BsdasriUpdateInput {
   operation: BsdasriOperationInput
 
   regroupedBsdasris: [RegroupedBsdasriInput]
+  synthesizedBsdasris: [SynthesisedBsdasriInput]
 }
 
 input BsdasriSignatureInput {

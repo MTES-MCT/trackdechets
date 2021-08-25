@@ -43,19 +43,24 @@ export function buildDbFilter(
 }
 
 const getGroupableCondition = (groupable?: boolean) => {
-  // groupable dasris should not regroup or be regrouped
-
+  // groupable dasris should:
+  // neither regroup not be regrouped
+  // neither synthesize not be synthesized
   if (!!groupable) {
     return {
       regroupedBsdasris: { none: {} },
-      regroupedOnBsdasri: null
+      regroupedOnBsdasri: null,
+      synthesizedBsdasris: { none: {} },
+      synthesizedOnBsdasri: null
     };
   }
   if (groupable === false) {
     return {
       OR: [
         { regroupedBsdasris: { some: {} } },
-        { NOT: { regroupedOnBsdasri: null } }
+        { NOT: { regroupedOnBsdasri: null } },
+        { synthesizedBsdasris: { some: {} } },
+        { NOT: { synthesizedOnBsdasri: null } }
       ]
     };
   }

@@ -78,7 +78,7 @@ export async function checkIsBsdasriPublishable(
   // This case shouldn't happen, but let's enforce the rules
   if (dasri.bsdasriType === "GROUPING" && !regroupedBsdasris?.length) {
     throw new InvalidPublicationAttempt(
-      "Un bordereau de regroupement doit comporter des bordereaux regroupés"
+      "Un bordereau de groupement doit comporter des bordereaux regroupés"
     );
   }
 

@@ -145,7 +145,7 @@ describe("Mutation.createDasri", () => {
     );
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Les dasris suivants ne peuvent pas être regroupés ${toRegroup1.id}`,
+        message: `Les dasris suivants ne peuvent pas être associés à un bordereau de groupement: ${toRegroup1.id}`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

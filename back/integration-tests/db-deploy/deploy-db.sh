@@ -15,7 +15,7 @@ docker exec -t $psql_container_id bash -c "psql -U test -c \"DROP DATABASE IF EX
 docker exec -t $psql_container_id bash -c "psql -U test -c \"CREATE DATABASE prisma;\"";
 
 echo "2/4 - Restore DB model";
-docker exec -t $api_container_id bash -c "npx prisma db push --preview-feature"
+docker exec -t $api_container_id bash -c "npx prisma db push"
 
 echo "3/4 - Create truncating function";
 docker cp ./db-deploy/truncate.sql $psql_container_id:/tmp

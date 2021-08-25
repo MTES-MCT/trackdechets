@@ -246,7 +246,7 @@ describe("Query.Bsdasris", () => {
     expect(queryRecipientIids).toStrictEqual([dasri3.id]);
   });
 
-  it("should get dasris which id are requested", async () => {
+  it("should get dasris whose ids are requested", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     await bsdasriFactory({

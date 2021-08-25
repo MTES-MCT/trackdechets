@@ -6,13 +6,18 @@ import {
   Prisma
 } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
-
+import { getBsdasriType } from "../resolvers/mutations/utils";
 const dasriData = () => ({
   status: "INITIAL" as BsdasriStatus,
   id: getReadableId(ReadableIdPrefix.DASRI),
   isDeleted: false
 });
 
+/**
+ *
+ * Build a dasri object
+ * bsdasriType is infered from opt data
+ */
 export const bsdasriFactory = async ({
   ownerId,
   opt = {}
@@ -21,9 +26,21 @@ export const bsdasriFactory = async ({
   opt?: Partial<Prisma.BsdasriCreateInput>;
 }) => {
   const dasriParams = { ...dasriData(), ...opt };
+  if (
+    !!opt?.regroupedBsdasris?.connect &&
+    !!opt?.synthesizedBsdasris?.connect
+  ) {
+    throw Error(
+      "This factory can't receive grouping and synthesis args at the same time"
+    );
+  }
   return prisma.bsdasri.create({
     data: {
       ...dasriParams,
+      bsdasriType: getBsdasriType(
+        !!opt?.regroupedBsdasris?.connect,
+        !!opt?.synthesizedBsdasris?.connect
+      ),
       owner: { connect: { id: ownerId } }
     }
   });
