@@ -1,3 +1,4 @@
+import type { SetRequired } from "type-fest";
 import * as yup from "yup";
 import { UserInputError } from "apollo-server-express";
 import {
@@ -110,7 +111,10 @@ const bsffSchema: yup.SchemaOf<Pick<
 });
 
 export async function validateBsff(
-  bsff: Pick<Bsff, "type" | "emitterCompanySiret">,
+  bsff: SetRequired<
+    Partial<Pick<Bsff, "type" | "emitterCompanySiret">>,
+    "type"
+  >,
   previousBsffs: Bsff[],
   ficheInterventions: BsffFicheIntervention[]
 ) {
@@ -122,7 +126,10 @@ export async function validateBsff(
 }
 
 async function validatePreviousBsffs(
-  bsff: Pick<Bsff, "type" | "emitterCompanySiret">,
+  bsff: SetRequired<
+    Partial<Pick<Bsff, "type" | "emitterCompanySiret">>,
+    "type"
+  >,
   previousBsffs: Bsff[]
 ) {
   if (previousBsffs.length === 0) {
