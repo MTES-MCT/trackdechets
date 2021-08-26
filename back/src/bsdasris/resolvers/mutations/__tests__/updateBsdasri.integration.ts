@@ -12,6 +12,7 @@ mutation UpdateDasri($id: ID!, $input: BsdasriUpdateInput!) {
   updateBsdasri(id: $id, input: $input) {
     id
     status
+    bsdasriType
     emitter {
        company {
           mail
@@ -189,6 +190,7 @@ describe("Mutation.updateBsdasri", () => {
       );
 
       expect(data.updateBsdasri.emitter.company.mail).toBe("test@test.test");
+      expect(data.updateBsdasri.bsdasriType).toBe("SIMPLE");
     }
   );
 
@@ -270,6 +272,7 @@ describe("Mutation.updateBsdasri", () => {
 
     expect(dasri.recipientCompanyMail).toEqual("recipient@test.test");
     expect(dasri.transporterCompanyMail).toEqual("transporter@test.test");
+    expect(dasri.bsdasriType).toBe("SIMPLE");
   });
 
   it("should disallow emitter and transporter fields update after transport signature", async () => {
