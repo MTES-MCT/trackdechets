@@ -12,7 +12,6 @@ import {
   associateUserToCompany,
   acceptNewUserCompanyInvitations
 } from "../database";
-import { companyFactory } from "../../__tests__/factories";
 import templateIds from "../../mailer/templates/provider/templateIds";
 
 function printHelp() {
@@ -136,18 +135,20 @@ export async function bulkCreate(opts: Opts): Promise<void> {
     });
     if (!existingCompany) {
       console.info(`Create company ${company.siret}`);
-      await companyFactory({
-        siret: company.siret,
-        codeNaf: company.codeNaf,
-        gerepId: company.gerepId,
-        name: company.name,
-        companyTypes: { set: company.companyTypes },
-        securityCode: randomNumber(4),
-        givenName: company.givenName,
-        contactEmail: company.contactEmail,
-        contactPhone: company.contactPhone,
-        website: company.website,
-        verificationCode: randomNumber(5).toString()
+      await prisma.company.create({
+        data: {
+          siret: company.siret,
+          codeNaf: company.codeNaf,
+          gerepId: company.gerepId,
+          name: company.name,
+          companyTypes: { set: company.companyTypes },
+          securityCode: randomNumber(4),
+          givenName: company.givenName,
+          contactEmail: company.contactEmail,
+          contactPhone: company.contactPhone,
+          website: company.website,
+          verificationCode: randomNumber(5).toString()
+        }
       });
     }
   }
