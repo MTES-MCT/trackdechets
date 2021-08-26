@@ -9,7 +9,6 @@ import {
   BsffQuantityInput,
   BsffStatus,
   BsffType,
-  BsffWasteInput,
   FormCompany,
   Query,
   QueryBsffsArgs,
@@ -199,7 +198,6 @@ export function BsffTypeSelector() {
   const [, , { setValue: setEmitterCompany }] = useField<FormCompany>(
     "emitter.company"
   );
-  const [, , { setValue: setWaste }] = useField<BsffWasteInput>("waste");
   const [, , { setValue: setQuantity }] = useField<BsffQuantityInput>(
     "quantity"
   );
