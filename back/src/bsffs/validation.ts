@@ -7,10 +7,8 @@ import {
   BsffStatus,
   BsffType
 } from "@prisma/client";
-import type { SetRequired } from "type-fest";
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { OPERATION, WASTE_CODES } from "./constants";
-import { flattenBsffInput } from "./converter";
 
 const bsffSchema: yup.SchemaOf<Pick<
   Bsff,
@@ -24,20 +22,6 @@ const bsffSchema: yup.SchemaOf<Pick<
   | "wasteCode"
   | "quantityKilos"
   | "destinationPlannedOperationCode"
-  | "packagings"
-  | "wasteAdr"
-  | "transporterCompanyName"
-  | "transporterCompanySiret"
-  | "transporterCompanyAddress"
-  | "transporterCompanyContact"
-  | "transporterCompanyPhone"
-  | "transporterCompanyMail"
-  | "destinationCompanyName"
-  | "destinationCompanySiret"
-  | "destinationCompanyAddress"
-  | "destinationCompanyContact"
-  | "destinationCompanyPhone"
-  | "destinationCompanyMail"
 >> = yup.object({
   isDraft: yup.boolean().nullable(),
   emitterCompanyName: yup
@@ -122,7 +106,177 @@ const bsffSchema: yup.SchemaOf<Pick<
     .oneOf(
       [null, ...Object.keys(OPERATION)],
       "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
+    )
+});
+
+export async function validateBsff(
+  bsff: Pick<Bsff, "type" | "emitterCompanySiret">,
+  previousBsffs: Bsff[],
+  ficheInterventions: BsffFicheIntervention[]
+) {
+  await bsffSchema.validate(bsff, {
+    abortEarly: false
+  });
+  await validatePreviousBsffs(bsff, previousBsffs);
+  await validateFicheInterventions(bsff, ficheInterventions);
+}
+
+async function validatePreviousBsffs(
+  bsff: Pick<Bsff, "type" | "emitterCompanySiret">,
+  previousBsffs: Bsff[]
+) {
+  if (previousBsffs.length === 0) {
+    return;
+  }
+
+  const previousBsffsWithDestination = previousBsffs.filter(
+    previousBsff => previousBsff.destinationCompanySiret
+  );
+
+  if (
+    bsff.emitterCompanySiret &&
+    previousBsffsWithDestination.some(
+      previousBsff =>
+        previousBsff.destinationCompanySiret !== bsff.emitterCompanySiret
+    )
+  ) {
+    throw new UserInputError(
+      `Certains des bordereaux à associer ne sont pas en la possession du nouvel émetteur.`
+    );
+  }
+
+  const firstPreviousBsffWithDestination = previousBsffsWithDestination[0];
+  if (
+    previousBsffsWithDestination.some(
+      previousBsff =>
+        previousBsff.destinationCompanySiret !==
+        firstPreviousBsffWithDestination.destinationCompanySiret
+    )
+  ) {
+    throw new UserInputError(
+      `Certains des bordereaux à associer ne sont pas en possession du même établissement.`
+    );
+  }
+
+  const errors = previousBsffs.reduce<string[]>((acc, previousBsff) => {
+    if (previousBsff.status === BsffStatus.PROCESSED) {
+      return acc.concat([
+        `Le bordereau n°${previousBsff.id} a déjà reçu son traitement final.`
+      ]);
+    }
+
+    if (previousBsff.status !== BsffStatus.INTERMEDIATELY_PROCESSED) {
+      return acc.concat([
+        `Le bordereau n°${previousBsff.id} n'a pas toutes les signatures requises.`
+      ]);
+    }
+
+    if (previousBsff.nextBsffId) {
+      return acc.concat([
+        `Le bordereau n°${previousBsff.id} est déjà associé à un autre bordereau.`
+      ]);
+    }
+
+    const operation =
+      OPERATION[previousBsff.destinationOperationCode as BsffOperationCode];
+    if (!operation.successors.includes(bsff.type)) {
+      return acc.concat([
+        `Le bordereau n°${previousBsff.id} a déclaré un traitement qui ne permet pas de lui donner la suite voulue.`
+      ]);
+    }
+
+    return acc;
+  }, []);
+
+  if (errors.length > 0) {
+    throw new UserInputError(errors.join("\n"));
+  }
+}
+
+async function validateFicheInterventions(
+  bsff: Pick<Bsff, "type">,
+  ficheInterventions: BsffFicheIntervention[]
+) {
+  if (ficheInterventions.length === 0) {
+    return;
+  }
+
+  const allowedTypes: BsffType[] = [
+    BsffType.TRACER_FLUIDE,
+    BsffType.COLLECTE_PETITES_QUANTITES
+  ];
+  if (!allowedTypes.includes(bsff.type)) {
+    throw new UserInputError(
+      `Le type de bordereau choisi ne permet pas d'associer des fiches d'intervention.`
+    );
+  }
+
+  if (bsff.type === BsffType.TRACER_FLUIDE && ficheInterventions.length > 1) {
+    throw new UserInputError(
+      `Le type de bordereau choisi ne permet pas d'associer plusieurs fiches d'intervention.`
+    );
+  }
+
+  const errors = ficheInterventions.reduce<string[]>(
+    (acc, ficheIntervention) => {
+      if (ficheIntervention.bsffId) {
+        return acc.concat([
+          `La fiche d'intervention n°${ficheIntervention.numero} est déjà associé à un BSFF.`
+        ]);
+      }
+
+      return acc;
+    },
+    []
+  );
+
+  if (errors.length > 0) {
+    throw new UserInputError(errors.join("\n"));
+  }
+}
+
+const beforeEmissionSchema: yup.SchemaOf<Pick<
+  Bsff,
+  "isDraft" | "emitterEmissionSignatureDate"
+>> = yup.object({
+  isDraft: yup
+    .boolean()
+    .oneOf(
+      [false],
+      "Il n'est pas possible de signer un BSFF à l'état de brouillon"
     ),
+  emitterEmissionSignatureDate: yup
+    .date()
+    .nullable()
+    .test(
+      "is-not-signed",
+      "L'entreprise émettrice a déjà signé ce bordereau",
+      value => value == null
+    ) as any // https://github.com/jquense/yup/issues/1302
+});
+
+export function validateBeforeEmission(
+  bsff: typeof beforeEmissionSchema["__outputType"]
+) {
+  return beforeEmissionSchema.validate(bsff, {
+    abortEarly: false
+  });
+}
+
+const beforeTransportSchema: yup.SchemaOf<Pick<
+  Bsff,
+  | "packagings"
+  | "wasteAdr"
+  | "transporterCompanyName"
+  | "transporterCompanySiret"
+  | "transporterCompanyAddress"
+  | "transporterCompanyContact"
+  | "transporterCompanyPhone"
+  | "transporterCompanyMail"
+  | "emitterEmissionSignatureDate"
+  | "transporterTransportSignatureDate"
+  | "transporterTransportMode"
+>> = yup.object({
   packagings: yup
     .array()
     .nullable()
@@ -208,6 +362,51 @@ const bsffSchema: yup.SchemaOf<Pick<
       otherwise: schema =>
         schema.required("L'adresse email du transporteur est requis")
     }),
+  emitterEmissionSignatureDate: yup
+    .date()
+    .nullable()
+    .required(
+      "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
+    ) as any, // https://github.com/jquense/yup/issues/1302
+  transporterTransportSignatureDate: yup
+    .date()
+    .nullable()
+    .test(
+      "is-not-signed",
+      "Le transporteur a déjà signé ce bordereau",
+      value => value == null
+    ) as any, // https://github.com/jquense/yup/issues/1302
+  transporterTransportMode: yup
+    .mixed<TransportMode>()
+    .nullable()
+    .oneOf(
+      [null, ...Object.values(TransportMode)],
+      "Le mode de transport ne fait pas partie de la liste reconnue : ${values}"
+    )
+    .required("Le mode de transport utilisé par le transporteur est requis")
+});
+
+export function validateBeforeTransport(
+  bsff: typeof beforeTransportSchema["__outputType"]
+) {
+  return beforeTransportSchema.validate(bsff, {
+    abortEarly: false
+  });
+}
+
+const beforeReceptionSchema: yup.SchemaOf<Pick<
+  Bsff,
+  | "destinationCompanyName"
+  | "destinationCompanySiret"
+  | "destinationCompanyAddress"
+  | "destinationCompanyContact"
+  | "destinationCompanyPhone"
+  | "destinationCompanyMail"
+  | "transporterTransportSignatureDate"
+  | "destinationReceptionSignatureDate"
+  | "destinationReceptionDate"
+  | "destinationReceptionKilos"
+>> = yup.object({
   destinationCompanyName: yup
     .string()
     .nullable()
@@ -268,208 +467,7 @@ const bsffSchema: yup.SchemaOf<Pick<
         schema.required(
           "L'adresse email de l'installation de destination est requis"
         )
-    })
-});
-
-export async function validateBsff(
-  bsff: SetRequired<ReturnType<typeof flattenBsffInput>, "type">,
-  previousBsffs: Bsff[],
-  ficheInterventions: BsffFicheIntervention[]
-) {
-  await bsffSchema.validate(bsff, {
-    abortEarly: false
-  });
-  await validatePreviousBsffs(bsff, previousBsffs);
-  await validateFicheInterventions(bsff, ficheInterventions);
-}
-
-async function validatePreviousBsffs(
-  bsff: SetRequired<ReturnType<typeof flattenBsffInput>, "type">,
-  previousBsffs: Bsff[]
-) {
-  if (previousBsffs.length === 0) {
-    return;
-  }
-
-  const previousBsffsWithDestination = previousBsffs.filter(
-    previousBsff => previousBsff.destinationCompanySiret
-  );
-
-  if (
-    bsff.emitterCompanySiret &&
-    previousBsffsWithDestination.some(
-      previousBsff =>
-        previousBsff.destinationCompanySiret !== bsff.emitterCompanySiret
-    )
-  ) {
-    throw new UserInputError(
-      `Certains des bordereaux à associer ne sont pas en la possession du nouvel émetteur.`
-    );
-  }
-
-  const firstPreviousBsffWithDestination = previousBsffsWithDestination[0];
-  if (
-    previousBsffsWithDestination.some(
-      previousBsff =>
-        previousBsff.destinationCompanySiret !==
-        firstPreviousBsffWithDestination.destinationCompanySiret
-    )
-  ) {
-    throw new UserInputError(
-      `Certains des bordereaux à associer ne sont pas en possession du même établissement.`
-    );
-  }
-
-  const errors = previousBsffs.reduce<string[]>((acc, previousBsff) => {
-    if (previousBsff.status === BsffStatus.PROCESSED) {
-      return acc.concat([
-        `Le bordereau n°${previousBsff.id} a déjà reçu son traitement final.`
-      ]);
-    }
-
-    if (previousBsff.status !== BsffStatus.INTERMEDIATELY_PROCESSED) {
-      return acc.concat([
-        `Le bordereau n°${previousBsff.id} n'a pas toutes les signatures requises.`
-      ]);
-    }
-
-    if (previousBsff.nextBsffId) {
-      return acc.concat([
-        `Le bordereau n°${previousBsff.id} est déjà associé à un autre bordereau.`
-      ]);
-    }
-
-    const operation =
-      OPERATION[previousBsff.destinationOperationCode as BsffOperationCode];
-    if (!operation.successors.includes(bsff.type)) {
-      return acc.concat([
-        `Le bordereau n°${previousBsff.id} a déclaré un traitement qui ne permet pas de lui donner la suite voulue.`
-      ]);
-    }
-
-    return acc;
-  }, []);
-
-  if (errors.length > 0) {
-    throw new UserInputError(errors.join("\n"));
-  }
-}
-
-async function validateFicheInterventions(
-  bsff: SetRequired<ReturnType<typeof flattenBsffInput>, "type">,
-  ficheInterventions: BsffFicheIntervention[]
-) {
-  if (ficheInterventions.length === 0) {
-    return;
-  }
-
-  const allowedTypes: BsffType[] = [
-    BsffType.TRACER_FLUIDE,
-    BsffType.COLLECTE_PETITES_QUANTITES
-  ];
-  if (!allowedTypes.includes(bsff.type)) {
-    throw new UserInputError(
-      `Le type de bordereau choisi ne permet pas d'associer des fiches d'intervention.`
-    );
-  }
-
-  if (bsff.type === BsffType.TRACER_FLUIDE && ficheInterventions.length > 1) {
-    throw new UserInputError(
-      `Le type de bordereau choisi ne permet pas d'associer plusieurs fiches d'intervention.`
-    );
-  }
-
-  const errors = ficheInterventions.reduce<string[]>(
-    (acc, ficheIntervention) => {
-      if (ficheIntervention.bsffId) {
-        return acc.concat([
-          `La fiche d'intervention n°${ficheIntervention.numero} est déjà associé à un BSFF.`
-        ]);
-      }
-
-      return acc;
-    },
-    []
-  );
-
-  if (errors.length > 0) {
-    throw new UserInputError(errors.join("\n"));
-  }
-}
-
-const beforeEmissionSchema: yup.SchemaOf<Pick<
-  Bsff,
-  "emitterEmissionSignatureDate" | "isDraft"
->> = yup.object({
-  emitterEmissionSignatureDate: yup
-    .date()
-    .nullable()
-    .test(
-      "is-not-signed",
-      "L'entreprise émettrice a déjà signé ce bordereau",
-      value => value == null
-    ) as any, // https://github.com/jquense/yup/issues/1302
-  isDraft: yup
-    .boolean()
-    .oneOf(
-      [false],
-      "Il n'est pas possible de signer un BSFF à l'état de brouillon"
-    )
-});
-
-export function validateBeforeEmission(
-  bsff: typeof beforeEmissionSchema["__outputType"]
-) {
-  return beforeEmissionSchema.validate(bsff, {
-    abortEarly: false
-  });
-}
-
-const beforeTransportSchema: yup.SchemaOf<Pick<
-  Bsff,
-  | "emitterEmissionSignatureDate"
-  | "transporterTransportSignatureDate"
-  | "transporterTransportMode"
->> = yup.object({
-  emitterEmissionSignatureDate: yup
-    .date()
-    .nullable()
-    .required(
-      "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
-    ) as any, // https://github.com/jquense/yup/issues/1302
-  transporterTransportSignatureDate: yup
-    .date()
-    .nullable()
-    .test(
-      "is-not-signed",
-      "Le transporteur a déjà signé ce bordereau",
-      value => value == null
-    ) as any, // https://github.com/jquense/yup/issues/1302
-  transporterTransportMode: yup
-    .mixed<TransportMode>()
-    .nullable()
-    .oneOf(
-      [null, ...Object.values(TransportMode)],
-      "Le mode de transport ne fait pas partie de la liste reconnue : ${values}"
-    )
-    .required("Le mode de transport utilisé par le transporteur est requis")
-});
-
-export function validateBeforeTransport(
-  bsff: typeof beforeTransportSchema["__outputType"]
-) {
-  return beforeTransportSchema.validate(bsff, {
-    abortEarly: false
-  });
-}
-
-const beforeReceptionSchema: yup.SchemaOf<Pick<
-  Bsff,
-  | "transporterTransportSignatureDate"
-  | "destinationReceptionSignatureDate"
-  | "destinationReceptionDate"
-  | "destinationReceptionKilos"
->> = yup.object({
+    }),
   transporterTransportSignatureDate: yup
     .date()
     .nullable()
