@@ -1,13 +1,10 @@
 import { FieldSwitch, RedErrorMessage } from "common/components";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { Field, useField } from "formik";
-import { BsffType } from "generated/graphql/types";
+import { Field } from "formik";
 import React from "react";
 import Packagings from "./components/packagings/Packagings";
 
 export default function WasteInfo({ disabled }) {
-  const [{ value: type }] = useField<BsffType>("type");
-
   return (
     <>
       {disabled && (
@@ -55,15 +52,7 @@ export default function WasteInfo({ disabled }) {
 
       <h4 className="form__section-heading">Contenants</h4>
 
-      {[BsffType.Groupement, BsffType.Reexpedition].includes(type) ? (
-        <div className="notification warning">
-          Le type de BSFF que vous avez choisi ne permet pas de modifier les
-          contenants. Si vous souhaitez changer de contenants, vous devez
-          sélectionner un reconditionnement à l'étape "Type de bordereau".
-        </div>
-      ) : (
-        <Field name="packagings" component={Packagings} disabled={disabled} />
-      )}
+      <Field name="packagings" component={Packagings} disabled={disabled} />
 
       <h4 className="form__section-heading">Quantité</h4>
 
