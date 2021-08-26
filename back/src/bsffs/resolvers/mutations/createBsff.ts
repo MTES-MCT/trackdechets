@@ -5,7 +5,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { flattenBsffInput, unflattenBsff } from "../../converter";
 import { isBsffContributor } from "../../permissions";
-import { bsffSchema, isValidPreviousBsffs } from "../../validation";
+import { validateBsff } from "../../validation";
 import { indexBsff } from "../../elastic";
 
 function getBsffType(input: BsffInput): BsffType {
@@ -34,38 +34,44 @@ export async function createBsff(
   additionalData: Partial<Bsff> = {}
 ) {
   const flatInput = {
+    id: getReadableId(ReadableIdPrefix.FF),
     type: getBsffType(input),
 
     ...flattenBsffInput(input),
     ...additionalData
   };
 
+  const previousBsffs =
+    input.previousBsffs?.length > 0
+      ? await prisma.bsff.findMany({
+          where: { id: { in: input.previousBsffs } }
+        })
+      : [];
+  const ficheInterventions =
+    input.ficheInterventions?.length > 0
+      ? await prisma.bsffFicheIntervention.findMany({
+          where: { id: { in: input.ficheInterventions } }
+        })
+      : [];
+
   await isBsffContributor(user, flatInput);
-  await bsffSchema.validate(flatInput, {
-    abortEarly: false
-  });
+  await validateBsff(flatInput, previousBsffs, ficheInterventions);
 
-  const data: Prisma.BsffCreateInput = {
-    id: getReadableId(ReadableIdPrefix.FF),
-    ...flatInput
-  };
+  const data: Prisma.BsffCreateInput = flatInput;
 
-  if (input.previousBsffs?.length > 0) {
-    await isValidPreviousBsffs(data.type, input.previousBsffs);
+  if (previousBsffs.length > 0) {
     data.previousBsffs = {
-      connect: input.previousBsffs.map(id => ({ id }))
+      connect: previousBsffs.map(({ id }) => ({ id }))
     };
   }
 
-  if (input.ficheInterventions?.length > 0) {
+  if (ficheInterventions.length > 0) {
     data.ficheInterventions = {
-      connect: input.ficheInterventions.map(id => ({ id }))
+      connect: ficheInterventions.map(({ id }) => ({ id }))
     };
   }
 
-  const bsff = await prisma.bsff.create({
-    data
-  });
+  const bsff = await prisma.bsff.create({ data });
 
   await indexBsff(bsff);
 

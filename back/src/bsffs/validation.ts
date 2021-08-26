@@ -7,11 +7,12 @@ import {
   BsffStatus,
   BsffType
 } from "@prisma/client";
-import prisma from "../prisma";
-import { BsffPackaging } from "../generated/graphql/types";
+import type { SetRequired } from "type-fest";
+import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { OPERATION, WASTE_CODES } from "./constants";
+import { flattenBsffInput } from "./converter";
 
-export const bsffSchema: yup.SchemaOf<Pick<
+const bsffSchema: yup.SchemaOf<Pick<
   Bsff,
   | "isDraft"
   | "emitterCompanyName"
@@ -270,7 +271,133 @@ export const bsffSchema: yup.SchemaOf<Pick<
     })
 });
 
-export const beforeEmissionSchema: yup.SchemaOf<Pick<
+export async function validateBsff(
+  bsff: SetRequired<ReturnType<typeof flattenBsffInput>, "type">,
+  previousBsffs: Bsff[],
+  ficheInterventions: BsffFicheIntervention[]
+) {
+  await bsffSchema.validate(bsff, {
+    abortEarly: false
+  });
+  await validatePreviousBsffs(bsff, previousBsffs);
+  await validateFicheInterventions(bsff, ficheInterventions);
+}
+
+async function validatePreviousBsffs(
+  bsff: SetRequired<ReturnType<typeof flattenBsffInput>, "type">,
+  previousBsffs: Bsff[]
+) {
+  if (previousBsffs.length === 0) {
+    return;
+  }
+
+  const previousBsffsWithDestination = previousBsffs.filter(
+    previousBsff => previousBsff.destinationCompanySiret
+  );
+
+  if (
+    bsff.emitterCompanySiret &&
+    previousBsffsWithDestination.some(
+      previousBsff =>
+        previousBsff.destinationCompanySiret !== bsff.emitterCompanySiret
+    )
+  ) {
+    throw new UserInputError(
+      `Certains des bordereaux à associer ne sont pas en la possession du nouvel émetteur.`
+    );
+  }
+
+  const firstPreviousBsffWithDestination = previousBsffsWithDestination[0];
+  if (
+    previousBsffsWithDestination.some(
+      previousBsff =>
+        previousBsff.destinationCompanySiret !==
+        firstPreviousBsffWithDestination.destinationCompanySiret
+    )
+  ) {
+    throw new UserInputError(
+      `Certains des bordereaux à associer ne sont pas en possession du même établissement.`
+    );
+  }
+
+  const errors = previousBsffs.reduce<string[]>((acc, previousBsff) => {
+    if (previousBsff.status === BsffStatus.PROCESSED) {
+      return acc.concat([
+        `Le bordereau n°${previousBsff.id} a déjà reçu son traitement final.`
+      ]);
+    }
+
+    if (previousBsff.status !== BsffStatus.INTERMEDIATELY_PROCESSED) {
+      return acc.concat([
+        `Le bordereau n°${previousBsff.id} n'a pas toutes les signatures requises.`
+      ]);
+    }
+
+    if (previousBsff.nextBsffId) {
+      return acc.concat([
+        `Le bordereau n°${previousBsff.id} est déjà associé à un autre bordereau.`
+      ]);
+    }
+
+    const operation =
+      OPERATION[previousBsff.destinationOperationCode as BsffOperationCode];
+    if (!operation.successors.includes(bsff.type)) {
+      return acc.concat([
+        `Le bordereau n°${previousBsff.id} a déclaré un traitement qui ne permet pas de lui donner la suite voulue.`
+      ]);
+    }
+
+    return acc;
+  }, []);
+
+  if (errors.length > 0) {
+    throw new UserInputError(errors.join("\n"));
+  }
+}
+
+async function validateFicheInterventions(
+  bsff: SetRequired<ReturnType<typeof flattenBsffInput>, "type">,
+  ficheInterventions: BsffFicheIntervention[]
+) {
+  if (ficheInterventions.length === 0) {
+    return;
+  }
+
+  const allowedTypes: BsffType[] = [
+    BsffType.TRACER_FLUIDE,
+    BsffType.COLLECTE_PETITES_QUANTITES
+  ];
+  if (!allowedTypes.includes(bsff.type)) {
+    throw new UserInputError(
+      `Le type de bordereau choisi ne permet pas d'associer des fiches d'intervention.`
+    );
+  }
+
+  if (bsff.type === BsffType.TRACER_FLUIDE && ficheInterventions.length > 1) {
+    throw new UserInputError(
+      `Le type de bordereau choisi ne permet pas d'associer plusieurs fiches d'intervention.`
+    );
+  }
+
+  const errors = ficheInterventions.reduce<string[]>(
+    (acc, ficheIntervention) => {
+      if (ficheIntervention.bsffId) {
+        return acc.concat([
+          `La fiche d'intervention n°${ficheIntervention.numero} est déjà associé à un BSFF.`
+        ]);
+      }
+
+      return acc;
+    },
+    []
+  );
+
+  if (errors.length > 0) {
+    throw new UserInputError(errors.join("\n"));
+  }
+}
+
+const beforeEmissionSchema: yup.SchemaOf<Pick<
   Bsff,
   "emitterEmissionSignatureDate" | "isDraft"
 >> = yup.object({
@@ -290,7 +417,15 @@ export const beforeEmissionSchema: yup.SchemaOf<Pick<
     )
 });
 
-export const beforeTransportSchema: yup.SchemaOf<Pick<
+export function validateBeforeEmission(
+  bsff: typeof beforeEmissionSchema["__outputType"]
+) {
+  return beforeEmissionSchema.validate(bsff, {
+    abortEarly: false
+  });
+}
+
+const beforeTransportSchema: yup.SchemaOf<Pick<
   Bsff,
   | "emitterEmissionSignatureDate"
   | "transporterTransportSignatureDate"
@@ -320,7 +455,15 @@ export const beforeTransportSchema: yup.SchemaOf<Pick<
     .required("Le mode de transport utilisé par le transporteur est requis")
 });
 
-export const beforeReceptionSchema: yup.SchemaOf<Pick<
+export function validateBeforeTransport(
+  bsff: typeof beforeTransportSchema["__outputType"]
+) {
+  return beforeTransportSchema.validate(bsff, {
+    abortEarly: false
+  });
+}
+
+const beforeReceptionSchema: yup.SchemaOf<Pick<
   Bsff,
   | "transporterTransportSignatureDate"
   | "destinationReceptionSignatureDate"
@@ -351,7 +494,15 @@ export const beforeReceptionSchema: yup.SchemaOf<Pick<
     .required("Le poids en kilos du déchet reçu est requis")
 });
 
-export const beforeOperationSchema: yup.SchemaOf<Pick<
+export function validateBeforeReception(
+  bsff: typeof beforeReceptionSchema["__outputType"]
+) {
+  return beforeReceptionSchema.validate(bsff, {
+    abortEarly: false
+  });
+}
+
+const beforeOperationSchema: yup.SchemaOf<Pick<
   Bsff,
   | "destinationReceptionSignatureDate"
   | "destinationOperationSignatureDate"
@@ -379,7 +530,15 @@ export const beforeOperationSchema: yup.SchemaOf<Pick<
     )
 });
 
-export const ficheInterventionSchema: yup.SchemaOf<Pick<
+export function validateBeforeOperation(
+  bsff: typeof beforeOperationSchema["__outputType"]
+) {
+  return beforeOperationSchema.validate(bsff, {
+    abortEarly: false
+  });
+}
+
+const ficheInterventionSchema: yup.SchemaOf<Pick<
   BsffFicheIntervention,
   | "numero"
   | "kilos"
@@ -460,48 +619,10 @@ export const ficheInterventionSchema: yup.SchemaOf<Pick<
     .required("L'addresse email de l'entreprise de l'opérateur est requis")
 });
 
-export async function isValidPreviousBsffs(type: BsffType, ids: string[]) {
-  const previousBsffs = await prisma.bsff.findMany({
-    where: {
-      id: {
-        in: ids
-      }
-    }
+export function validateFicheIntervention(
+  ficheIntervention: typeof ficheInterventionSchema["__outputType"]
+) {
+  return ficheInterventionSchema.validate(ficheIntervention, {
+    abortEarly: false
   });
-
-  const errors = previousBsffs.reduce<string[]>((acc, previousBsff) => {
-    if (previousBsff.status === BsffStatus.PROCESSED) {
-      return acc.concat([
-        `Le bordereau n°${previousBsff.id} a déjà reçu son traitement final.`
-      ]);
-    }
-
-    if (previousBsff.status !== BsffStatus.INTERMEDIATELY_PROCESSED) {
-      return acc.concat([
-        `Le bordereau n°${previousBsff.id} n'a pas toutes les signatures requises.`
-      ]);
-    }
-
-    if (previousBsff.nextBsffId) {
-      return acc.concat([
-        `Le bordereau n°${previousBsff.id} est déjà lié à un autre bordereau.`
-      ]);
-    }
-
-    if (
-      !OPERATION[previousBsff.destinationOperationCode].successors.includes(
-        type
-      )
-    ) {
-      return acc.concat([
-        `Le bordereau n°${previousBsff.id} a déclaré un traitement qui ne permet pas de lui donner la suite voulue.`
-      ]);
-    }
-
-    return acc;
-  }, []);
-
-  if (errors.length > 0) {
-    throw new UserInputError(errors.join("\n"));
-  }
 }

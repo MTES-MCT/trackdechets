@@ -131,7 +131,7 @@ describe("Mutation.createDraftBsff", () => {
         variables: {
           input: {
             type: BsffType.GROUPEMENT,
-            destination: {
+            emitter: {
               company: {
                 name: destination.company.name,
                 siret: destination.company.siret,
@@ -154,13 +154,15 @@ describe("Mutation.createDraftBsff", () => {
     });
 
     it("should add bsffs for réexpédition", async () => {
-      const previousBsff = await createBsffAfterOperation(
-        { emitter, transporter, destination },
-        {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED,
-          destinationOperationCode: OPERATION.R13.code
-        }
-      );
+      const previousBsffs = await Promise.all([
+        createBsffAfterOperation(
+          { emitter, transporter, destination },
+          {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED,
+            destinationOperationCode: OPERATION.R13.code
+          }
+        )
+      ]);
 
       const { mutate } = makeClient(destination.user);
       const { data, errors } = await mutate<
@@ -170,7 +172,7 @@ describe("Mutation.createDraftBsff", () => {
         variables: {
           input: {
             type: BsffType.REEXPEDITION,
-            destination: {
+            emitter: {
               company: {
                 name: destination.company.name,
                 siret: destination.company.siret,
@@ -179,17 +181,17 @@ describe("Mutation.createDraftBsff", () => {
                 mail: destination.user.email
               }
             },
-            previousBsffs: [previousBsff.id]
+            previousBsffs: previousBsffs.map(previousBsff => previousBsff.id)
           }
         }
       });
 
       expect(errors).toBeUndefined();
 
-      const previousBsffs = await prisma.bsff
+      const actualPreviousBsffs = await prisma.bsff
         .findUnique({ where: { id: data.createDraftBsff.id } })
         .previousBsffs();
-      expect(previousBsffs).toHaveLength(1);
+      expect(actualPreviousBsffs).toHaveLength(previousBsffs.length);
     });
 
     it("should disallow adding bsffs with missing signatures", async () => {
@@ -205,7 +207,7 @@ describe("Mutation.createDraftBsff", () => {
         variables: {
           input: {
             type: BsffType.GROUPEMENT,
-            destination: {
+            emitter: {
               company: {
                 name: destination.company.name,
                 siret: destination.company.siret,
@@ -229,6 +231,143 @@ describe("Mutation.createDraftBsff", () => {
             .join("\n")
         })
       ]);
+    });
+
+    it("should throw an error when emitter is not previous bsffs' destination", async () => {
+      const otherDestination = await userWithCompanyFactory(UserRole.ADMIN);
+      const previousBsff = await createBsffAfterOperation(
+        { emitter, transporter, destination: otherDestination },
+        {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED,
+          destinationOperationCode: OPERATION.R12.code
+        }
+      );
+
+      const { mutate } = makeClient(destination.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createDraftBsff">,
+        MutationCreateDraftBsffArgs
+      >(CREATE_DRAFT_BSFF, {
+        variables: {
+          input: {
+            type: BsffType.GROUPEMENT,
+            emitter: {
+              company: {
+                name: destination.company.name,
+                siret: destination.company.siret,
+                address: destination.company.address,
+                contact: destination.user.name,
+                mail: destination.user.email
+              }
+            },
+            previousBsffs: [previousBsff.id]
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Certains des bordereaux à associer ne sont pas en la possession du nouvel émetteur."
+        })
+      ]);
+    });
+
+    it("should throw an error if previous bsffs don't have the same destination", async () => {
+      const otherDestination = await userWithCompanyFactory(UserRole.ADMIN);
+      const previousBsffs = await Promise.all([
+        createBsffAfterOperation(
+          { emitter, transporter, destination },
+          {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED,
+            destinationOperationCode: OPERATION.R12.code
+          }
+        ),
+        createBsffAfterOperation(
+          { emitter, transporter, destination: otherDestination },
+          {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED,
+            destinationOperationCode: OPERATION.R12.code
+          }
+        )
+      ]);
+
+      const { mutate } = makeClient(transporter.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createDraftBsff">,
+        MutationCreateDraftBsffArgs
+      >(CREATE_DRAFT_BSFF, {
+        variables: {
+          input: {
+            type: BsffType.GROUPEMENT,
+            transporter: {
+              company: {
+                name: transporter.company.name,
+                siret: transporter.company.siret,
+                address: transporter.company.address,
+                contact: transporter.user.name,
+                mail: transporter.user.email
+              }
+            },
+            previousBsffs: previousBsffs.map(previousBsff => previousBsff.id)
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Certains des bordereaux à associer ne sont pas en possession du même établissement."
+        })
+      ]);
+    });
+
+    it("should allow creating a bsff with previous bsffs but no emitter", async () => {
+      const previousBsffs = await Promise.all([
+        createBsffAfterOperation(
+          { emitter, transporter, destination },
+          {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED,
+            destinationOperationCode: OPERATION.R12.code
+          }
+        ),
+        createBsffAfterOperation(
+          { emitter, transporter, destination },
+          {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED,
+            destinationOperationCode: OPERATION.R12.code
+          }
+        )
+      ]);
+
+      const { mutate } = makeClient(transporter.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createDraftBsff">,
+        MutationCreateDraftBsffArgs
+      >(CREATE_DRAFT_BSFF, {
+        variables: {
+          input: {
+            type: BsffType.GROUPEMENT,
+            transporter: {
+              company: {
+                name: transporter.company.name,
+                siret: transporter.company.siret,
+                address: transporter.company.address,
+                contact: transporter.user.name,
+                mail: transporter.user.email
+              }
+            },
+            previousBsffs: previousBsffs.map(previousBsff => previousBsff.id)
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+
+      const actualPreviousBsffs = await prisma.bsff
+        .findUnique({ where: { id: data.createDraftBsff.id } })
+        .previousBsffs();
+      expect(actualPreviousBsffs).toHaveLength(previousBsffs.length);
     });
   });
 });

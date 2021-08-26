@@ -8,10 +8,10 @@ import {
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import {
-  beforeEmissionSchema,
-  beforeTransportSchema,
-  beforeReceptionSchema,
-  beforeOperationSchema
+  validateBeforeEmission,
+  validateBeforeOperation,
+  validateBeforeReception,
+  validateBeforeTransport
 } from "../../validation";
 import { unflattenBsff } from "../../converter";
 import { getBsffOrNotFound } from "../../database";
@@ -66,7 +66,7 @@ const signatures: Record<
 > = {
   EMISSION: async ({ id, signature, securityCode }, user, existingBsff) => {
     await checkIsAllowed(existingBsff.emitterCompanySiret, user, securityCode);
-    await beforeEmissionSchema.validate(existingBsff, { abortEarly: false });
+    await validateBeforeEmission(existingBsff);
 
     return prisma.bsff.update({
       data: {
@@ -85,7 +85,7 @@ const signatures: Record<
       user,
       securityCode
     );
-    await beforeTransportSchema.validate(existingBsff, { abortEarly: false });
+    await validateBeforeTransport(existingBsff);
 
     return prisma.bsff.update({
       data: {
@@ -104,7 +104,7 @@ const signatures: Record<
       user,
       securityCode
     );
-    await beforeReceptionSchema.validate(existingBsff, { abortEarly: false });
+    await validateBeforeReception(existingBsff);
 
     return prisma.bsff.update({
       data: {
@@ -125,7 +125,7 @@ const signatures: Record<
       user,
       securityCode
     );
-    await beforeOperationSchema.validate(existingBsff, { abortEarly: false });
+    await validateBeforeOperation(existingBsff);
 
     const status =
       OPERATION[existingBsff.destinationOperationCode].successors.length > 0

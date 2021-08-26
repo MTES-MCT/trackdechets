@@ -1,4 +1,4 @@
-import { UserRole, BsffStatus, BsffType } from "@prisma/client";
+import { UserRole, BsffType, BsffStatus } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -508,28 +508,43 @@ describe("Mutation.updateBsff", () => {
 
   it("should update the list of previous bsffs", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-    const destination = await userWithCompanyFactory(UserRole.ADMIN);
 
-    const oldPreviousBsff = await createBsffAfterOperation(
-      { emitter, transporter, destination },
-      {
-        destinationOperationCode: OPERATION.R12.code,
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      }
-    );
-    const newPreviousBsff = await createBsffAfterOperation(
-      { emitter, transporter, destination },
-      {
-        destinationOperationCode: OPERATION.R12.code,
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      }
-    );
+    const oldPreviousBsffs = await Promise.all([
+      createBsffAfterOperation(
+        {
+          emitter: await userWithCompanyFactory(UserRole.ADMIN),
+          transporter: await userWithCompanyFactory(UserRole.ADMIN),
+          destination: emitter
+        },
+        {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED,
+          destinationOperationCode: OPERATION.R12.code
+        }
+      )
+    ]);
+    const newPreviousBsffs = await Promise.all([
+      createBsffAfterOperation(
+        {
+          emitter: await userWithCompanyFactory(UserRole.ADMIN),
+          transporter: await userWithCompanyFactory(UserRole.ADMIN),
+          destination: emitter
+        },
+        {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED,
+          destinationOperationCode: OPERATION.R12.code
+        }
+      )
+    ]);
+
     const bsff = await createBsffBeforeEmission(
-      { emitter, transporter, destination },
+      {
+        emitter,
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: await userWithCompanyFactory(UserRole.ADMIN)
+      },
       {
         type: BsffType.GROUPEMENT,
-        previousBsffs: { connect: [{ id: oldPreviousBsff.id }] }
+        previousBsffs: { connect: oldPreviousBsffs.map(({ id }) => ({ id })) }
       }
     );
 
@@ -541,21 +556,19 @@ describe("Mutation.updateBsff", () => {
       variables: {
         id: bsff.id,
         input: {
-          previousBsffs: [newPreviousBsff.id]
+          previousBsffs: newPreviousBsffs.map(({ id }) => id)
         }
       }
     });
 
     expect(errors).toBeUndefined();
 
-    const previousBsffs = await prisma.bsff
+    const actualPreviousBsffs = await prisma.bsff
       .findUnique({ where: { id: data.updateBsff.id } })
       .previousBsffs();
-    expect(previousBsffs).toEqual([
-      expect.objectContaining({
-        id: newPreviousBsff.id
-      })
-    ]);
+    expect(actualPreviousBsffs).toEqual(
+      newPreviousBsffs.map(({ id }) => expect.objectContaining({ id }))
+    );
   });
 
   it("should change the initial transporter", async () => {

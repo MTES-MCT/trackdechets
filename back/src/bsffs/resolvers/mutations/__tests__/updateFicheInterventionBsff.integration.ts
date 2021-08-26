@@ -70,7 +70,7 @@ describe("Mutation.updateFicheInterventionBsff", () => {
 
   it("should allow user to update a fiche d'intervention", async () => {
     const { mutate } = makeClient(emitter.user);
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "updateFicheInterventionBsff">,
       MutationUpdateFicheInterventionBsffArgs
     >(UPDATE_FICHE_INTERVENTION, {
@@ -80,6 +80,7 @@ describe("Mutation.updateFicheInterventionBsff", () => {
       }
     });
 
+    expect(errors).toBeUndefined();
     expect(data.updateFicheInterventionBsff.id).toBe(ficheInterventionId);
   });
 
