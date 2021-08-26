@@ -166,10 +166,7 @@ const dasriUpdateResolver = async (
     data: {
       ...flattenedInput,
       ...getRegroupedBsdasriArgs(inputRegroupedBsdasris),
-      bsdasriType:
-        inputRegroupedBsdasris === null || inputRegroupedBsdasris?.length === 0
-          ? "SIMPLE"
-          : "GROUPING"
+      bsdasriType: isRegrouping.isRegrouping ? "GROUPING" : "SIMPLE"
     }
   });
 
