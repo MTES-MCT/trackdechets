@@ -41,6 +41,8 @@ export async function createBsff(
     ...additionalData
   };
 
+  await isBsffContributor(user, flatInput);
+
   const previousBsffs =
     input.previousBsffs?.length > 0
       ? await prisma.bsff.findMany({
@@ -54,7 +56,6 @@ export async function createBsff(
         })
       : [];
 
-  await isBsffContributor(user, flatInput);
   await validateBsff(flatInput, previousBsffs, ficheInterventions);
 
   const data: Prisma.BsffCreateInput = flatInput;
