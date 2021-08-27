@@ -1,11 +1,25 @@
 type Mutation {
   """
   Mutation permettant de créer un nouveau bordereau de suivi de fluides frigorigènes.
+
+  Ces champs sont requis :
+  - emitter.company.name
+  - emitter.company.siret
+  - emitter.company.address
+  - emitter.company.contact
+  - emitter.company.phone
+  - emitter.company.mail
+  - waste.code
+  - waste.adr
+  - quantity.kilos
+
+  Si vous souhaitez créer un BSFF sans ces informations, utilisez createDraftBsff.
   """
   createBsff(input: BsffInput!): Bsff!
 
   """
   Mutation permettant de créer un nouveau bordereau de suivi de fluides frigorigènes, à l'état de brouillon.
+  Un brouillon n'a pas de champs requis, la validation se fait au moment de le publier.
   """
   createDraftBsff(input: BsffInput!): Bsff!
 
