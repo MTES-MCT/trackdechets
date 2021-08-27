@@ -21,6 +21,7 @@ const bsffSchema: yup.SchemaOf<Pick<
   | "emitterCompanyPhone"
   | "emitterCompanyMail"
   | "wasteCode"
+  | "wasteAdr"
   | "quantityKilos"
   | "destinationPlannedOperationCode"
 >> = yup.object({
@@ -92,6 +93,13 @@ const bsffSchema: yup.SchemaOf<Pick<
     .when("isDraft", {
       is: true,
       otherwise: schema => schema.required("Le code déchet est requis")
+    }),
+  wasteAdr: yup
+    .string()
+    .nullable()
+    .when("isDraft", {
+      is: true,
+      otherwise: schema => schema.required("La mention ADR est requise")
     }),
   quantityKilos: yup
     .number()
@@ -273,7 +281,6 @@ export function validateBeforeEmission(
 const beforeTransportSchema: yup.SchemaOf<Pick<
   Bsff,
   | "packagings"
-  | "wasteAdr"
   | "transporterCompanyName"
   | "transporterCompanySiret"
   | "transporterCompanyAddress"
@@ -304,24 +311,11 @@ const beforeTransportSchema: yup.SchemaOf<Pick<
           .required("Le poids du contenant est requis")
       })
     )
-    .when("isDraft", {
-      is: true,
-      otherwise: schema => schema.required("Le conditionnement est requis")
-    }),
-  wasteAdr: yup
-    .string()
-    .nullable()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema => schema.required("La mention ADR est requise")
-    }),
+    .required("Le conditionnement est requis"),
   transporterCompanyName: yup
     .string()
     .nullable()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema => schema.required("Le nom du transporteur est requis")
-    }),
+    .required("Le nom du transporteur est requis"),
   transporterCompanySiret: yup
     .string()
     .nullable()
@@ -329,46 +323,24 @@ const beforeTransportSchema: yup.SchemaOf<Pick<
       14,
       "Le SIRET du transporteur n'est pas au bon format (${length} caractères)"
     )
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required("Le SIRET du transporteur est requis")
-    }),
+    .required("Le SIRET du transporteur est requis"),
   transporterCompanyAddress: yup
     .string()
     .nullable()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required("L'adresse du transporteur est requise")
-    }),
+    .required("L'adresse du transporteur est requise"),
   transporterCompanyContact: yup
     .string()
     .nullable()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required(
-          "Le nom du contact dans l'entreprise émettrice est requis"
-        )
-    }),
+    .required("Le nom du contact dans l'entreprise émettrice est requis"),
   transporterCompanyPhone: yup
     .string()
     .nullable()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required("Le numéro de téléphone du transporteur est requis")
-    }),
+    .required("Le numéro de téléphone du transporteur est requis"),
   transporterCompanyMail: yup
     .string()
     .nullable()
     .email()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required("L'adresse email du transporteur est requis")
-    }),
+    .required("L'adresse email du transporteur est requis"),
   emitterEmissionSignatureDate: yup
     .date()
     .nullable()
@@ -417,11 +389,7 @@ const beforeReceptionSchema: yup.SchemaOf<Pick<
   destinationCompanyName: yup
     .string()
     .nullable()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required("Le nom de l'installation de destination est requis")
-    }),
+    .required("Le nom de l'installation de destination est requis"),
   destinationCompanySiret: yup
     .string()
     .nullable()
@@ -429,52 +397,26 @@ const beforeReceptionSchema: yup.SchemaOf<Pick<
       14,
       "Le SIRET de l'installation de destination n'est pas au bon format (${length} caractères)"
     )
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required("Le SIRET de l'installation de destination est requis")
-    }),
+    .required("Le SIRET de l'installation de destination est requis"),
   destinationCompanyAddress: yup
     .string()
     .nullable()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required(
-          "L'adresse de l'installation de destination est requise"
-        )
-    }),
+    .required("L'adresse de l'installation de destination est requise"),
   destinationCompanyContact: yup
     .string()
     .nullable()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required(
-          "Le nom du contact dans l'entreprise émettrice est requis"
-        )
-    }),
+    .required("Le nom du contact dans l'entreprise émettrice est requis"),
   destinationCompanyPhone: yup
     .string()
     .nullable()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required(
-          "Le numéro de téléphone de l'installation de destination est requis"
-        )
-    }),
+    .required(
+      "Le numéro de téléphone de l'installation de destination est requis"
+    ),
   destinationCompanyMail: yup
     .string()
     .nullable()
     .email()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required(
-          "L'adresse email de l'installation de destination est requis"
-        )
-    }),
+    .required("L'adresse email de l'installation de destination est requis"),
   transporterTransportSignatureDate: yup
     .date()
     .nullable()

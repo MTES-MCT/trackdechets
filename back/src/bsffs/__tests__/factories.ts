@@ -65,6 +65,7 @@ export function createBsffBeforeEmission(
   return createBsff(args, {
     isDraft: false,
     wasteCode: WASTE_CODES[0],
+    wasteAdr: "Mention ADR",
     wasteDescription: "Fluides",
     quantityKilos: 1,
     quantityIsEstimate: false,
@@ -90,9 +91,8 @@ export function createBsffBeforeTransport(
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffAfterEmission(args, {
-    wasteAdr: "Mention ADR",
-    transporterTransportMode: TransportMode.ROAD,
     packagings: [{ name: "BOUTEILLE 2L", numero: "01", kilos: 1 }],
+    transporterTransportMode: TransportMode.ROAD,
     ...initialData
   });
 }
