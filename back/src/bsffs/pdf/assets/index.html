@@ -22,7 +22,11 @@
           <div class="BoxCol TextAlignCenter">
             <h1>Bordereau de suivi de Fluides gazeux (frigorigènes)</h1>
           </div>
-          <div class="BoxCol TextAlignCenter"></div>
+          <div class="BoxCol TextAlignCenter">
+            <div class="QrCode">
+              {{{ qrCode }}}
+            </div>
+          </div>
         </div>
 
         <div class="BoxRow">
@@ -75,7 +79,7 @@
             <p>
               N° SIRET : {{ bsff.destinationCompanySiret }}<br />
               Nom (raison sociale) : {{ bsff.destinationCompanyName }}<br />
-              Adresse : {{ bsff.destinationCompanyAddress }}
+              Adresse : {{ bsff.destinationCompanyAddress }}<br />
               <span class="Row">
                 <span class="Col">
                   Tél : {{ bsff.destinationCompanyPhone }}
@@ -84,12 +88,9 @@
                   Mail : {{ bsff.destinationCompanyMail }}
                 </span>
               </span>
-            </p>
-            <p>
+              <br />
               Nom de la personne à contacter : {{ bsff.destinationCompanyContact
-              }}
-            </p>
-            <p>
+              }}<br />
               N° CAP (le cas échéant) : {{ bsff.destinationCap }}<br />
               Code D/R prévu : {{ bsff.destinationPlannedOperationCode }}
             </p>
@@ -143,8 +144,12 @@
               sont exacts et de bonne foi. <br />
               Date : {{#formatDate}}{{ bsff.emitterEmissionSignatureDate
               }}{{/formatDate}}
+              <br />
+              Signature (et cachet le cas échéant) :
             </p>
-            <p>Signature (et cachet le cas échéant) :</p>
+            <div class="Signature">
+              {{{ signatures.emission }}}
+            </div>
           </div>
         </div>
 
@@ -165,8 +170,7 @@
                   Mail : {{ bsff.transporterCompanyMail }}
                 </span>
               </span>
-            </p>
-            <p>
+              <br />
               Nom de la personne à contacter : {{ bsff.transporterCompanyContact
               }}
             </p>
@@ -176,9 +180,8 @@
               <input type="checkbox"
               {{#bsff.transporterRecepisseNumber}}{{/bsff.transporterRecepisseNumber}}{{^bsff.transporterRecepisseNumber}}checked{{/bsff.transporterRecepisseNumber}}
               /> Le transporteur déclare être exempté de récépissé conformément
-              aux dispositions de l'article R.541-50 du code de l'environnement.
-            </p>
-            <p>
+              aux dispositions de l'article R.541-50 du code de
+              l'environnement.<br />
               <span class="Row">
                 <span class="Col">
                   Récépissé n° : {{ bsff.transporterRecepisseNumber }}
@@ -188,14 +191,17 @@
                 </span>
               </span>
               Date limite de validité : {{#formatDate}}{{
-              bsff.transporterRecepisseValidityLimit }}{{/formatDate}}
-            </p>
-            <p>
+              bsff.transporterRecepisseValidityLimit }}{{/formatDate}}<br />
               Date de prise en charge : {{#formatDate}}{{
               bsff.transporterTransportSignatureDate }}{{/formatDate}} <br />
               Mode de transport : {{ bsff.transporterTransportMode }}<br />
+            </p>
+            <p>
               Signature :
             </p>
+            <div class="Signature">
+              {{{ signatures.transport }}}
+            </div>
           </div>
         </div>
 
@@ -210,9 +216,7 @@
               Date de présentation sur site : {{#formatDate}}{{
               bsff.destinationReceptionDate }}{{/formatDate}}<br />
               Quantité réelle présentée en kilo(s) : {{
-              bsff.destinationReceptionKilos }}
-            </p>
-            <p>
+              bsff.destinationReceptionKilos }}<br />
               Lot accepté : <input type="checkbox"
               {{#bsff.destinationReceptionRefusal}}{{/bsff.destinationReceptionRefusal}}{{^bsff.destinationReceptionRefusal}}checked{{/bsff.destinationReceptionRefusal}}
               /> Oui <input type="checkbox"
@@ -224,6 +228,9 @@
               bsff.destinationReceptionRefusal }}
             </p>
             <p>Signature :</p>
+            <div class="Signature">
+              {{{ signatures.reception }}}
+            </div>
           </div>
           <div class="BoxCol">
             <p>
@@ -248,9 +255,7 @@
               /> D14 <br />
               Réexpédition suite à entreposage provisoire <input type="checkbox"
               {{#bsffOperation.isReexpedition}}checked{{/bsffOperation.isReexpedition}}
-              />
-            </p>
-            <p>
+              /> <br />
               Date de réalisation : {{#formatDate}}{{
               bsff.destinationOperationSignatureDate }}{{/formatDate}}
             </p>
@@ -261,6 +266,9 @@
               que l'opération indiquée ci-dessus a été réalisée. <br />
               Signature (cachet le cas échéant) : <br />
             </p>
+            <div class="Signature">
+              {{{ signatures.operation }}}
+            </div>
           </div>
         </div>
 
@@ -286,8 +294,6 @@
                   Pays :
                 </span>
               </span>
-            </p>
-            <p>
               <span class="Row">
                 <span class="Col">
                   Tél :
@@ -299,8 +305,8 @@
                   Nom de la personne à contacter :
                 </span>
               </span>
+              Code D/R prévu :
             </p>
-            <p>Code D/R prévu :</p>
           </div>
         </div>
       </div>

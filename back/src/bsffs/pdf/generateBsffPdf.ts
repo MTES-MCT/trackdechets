@@ -3,6 +3,7 @@ import fs from "fs/promises";
 import mustache from "mustache";
 import { format } from "date-fns";
 import { Bsff, BsffType } from "@prisma/client";
+import * as QRCode from "qrcode";
 import prisma from "../../prisma";
 import { BsffPackaging } from "../../generated/graphql/types";
 import { toPDF } from "../../common/pdf";
@@ -10,6 +11,7 @@ import { OPERATION } from "../constants";
 
 const assetsPath = path.join(__dirname, "assets");
 const templatePath = path.join(assetsPath, "index.html");
+const signaturePath = path.join(assetsPath, "signature.svg");
 const cssPaths = [
   path.join(assetsPath, "modern-normalize.css"),
   path.join(assetsPath, "styles.css")
@@ -49,14 +51,26 @@ export async function generateBsffPdf(bsff: Bsff) {
       bsff.destinationOperationCode === OPERATION.D14.code,
     isReexpedition: bsffType.isReexpedition
   };
+
+  const qrCode = await QRCode.toString(bsff.id, { type: "svg" });
+
+  const signature = await fs.readFile(signaturePath, "utf-8");
+  const signatures = {
+    emission: bsff.emitterEmissionSignatureDate ? signature : "",
+    transport: bsff.transporterTransportSignatureDate ? signature : "",
+    reception: bsff.destinationReceptionDate ? signature : "",
+    operation: bsff.destinationOperationSignatureDate ? signature : ""
+  };
+
   const html = mustache.render(await fs.readFile(templatePath, "utf-8"), {
+    qrCode,
     bsff,
     bsffType,
     bsffOperation,
     packagings: ((bsff.packagings ?? []) as BsffPackaging[])
       .map(
         packaging =>
-          `${[packaging.name, packaging.volume, `n°${packaging.numero}`]
+          `${[packaging.name, `${packaging.volume}L`, `n°${packaging.numero}`]
             .filter(Boolean)
             .join(" ")} : ${packaging.kilos} kilo(s)`
       )
@@ -73,6 +87,7 @@ export async function generateBsffPdf(bsff: Bsff) {
       // Show a minimum of 5 rows
       ...Array.from({ length: 5 - ficheInterventions.length }).fill({})
     ],
+    signatures,
 
     formatDate: () => (str: string, render: typeof mustache.render) => {
       const dateStr = render(str, {});

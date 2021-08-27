@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { readFile } from "fs/promises";
 import Handlebars from "handlebars";
 import { join } from "path";
-import QRCode from "qrcode";
+import * as QRCode from "qrcode";
 import { toPDF } from "../../common/pdf";
 
 export async function buildPdf(bsda: Bsda) {
