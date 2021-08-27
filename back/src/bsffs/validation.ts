@@ -1,4 +1,4 @@
-import type { SetRequired } from "type-fest";
+import type { SetOptional } from "type-fest";
 import * as yup from "yup";
 import { UserInputError } from "apollo-server-express";
 import {
@@ -119,9 +119,9 @@ const bsffSchema: yup.SchemaOf<Pick<
 });
 
 export async function validateBsff(
-  bsff: SetRequired<
-    Partial<Pick<Bsff, "type" | "emitterCompanySiret">>,
-    "type"
+  bsff: SetOptional<
+    Pick<Bsff, "id" | "type" | "emitterCompanySiret">,
+    "emitterCompanySiret"
   >,
   previousBsffs: Bsff[],
   ficheInterventions: BsffFicheIntervention[]
@@ -134,9 +134,9 @@ export async function validateBsff(
 }
 
 async function validatePreviousBsffs(
-  bsff: SetRequired<
-    Partial<Pick<Bsff, "type" | "emitterCompanySiret">>,
-    "type"
+  bsff: SetOptional<
+    Pick<Bsff, "id" | "type" | "emitterCompanySiret">,
+    "emitterCompanySiret"
   >,
   previousBsffs: Bsff[]
 ) {
@@ -186,7 +186,7 @@ async function validatePreviousBsffs(
       ]);
     }
 
-    if (previousBsff.nextBsffId) {
+    if (previousBsff.nextBsffId && previousBsff.nextBsffId !== bsff.id) {
       return acc.concat([
         `Le bordereau n°${previousBsff.id} est déjà associé à un autre bordereau.`
       ]);
@@ -209,7 +209,7 @@ async function validatePreviousBsffs(
 }
 
 async function validateFicheInterventions(
-  bsff: Pick<Bsff, "type">,
+  bsff: Pick<Bsff, "id" | "type">,
   ficheInterventions: BsffFicheIntervention[]
 ) {
   if (ficheInterventions.length === 0) {
@@ -234,7 +234,7 @@ async function validateFicheInterventions(
 
   const errors = ficheInterventions.reduce<string[]>(
     (acc, ficheIntervention) => {
-      if (ficheIntervention.bsffId) {
+      if (ficheIntervention.bsffId && ficheIntervention.bsffId !== bsff.id) {
         return acc.concat([
           `La fiche d'intervention n°${ficheIntervention.numero} est déjà associé à un BSFF.`
         ]);

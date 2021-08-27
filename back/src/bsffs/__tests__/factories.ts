@@ -15,7 +15,7 @@ export function createBsff(
   { emitter, transporter, destination }: CreateBsffArgs = {},
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
-  const data = {
+  const data: Prisma.BsffCreateInput = {
     id: getReadableId(ReadableIdPrefix.FF),
     type: BsffType.TRACER_FLUIDE,
     status: BsffStatus.INITIAL,
@@ -154,4 +154,34 @@ export function createBsffAfterOperation(
     destinationOperationSignatureDate: new Date().toISOString(),
     ...initialData
   });
+}
+
+interface CreateFicheInterventionArgs {
+  operateur: UserWithCompany;
+  detenteur: UserWithCompany;
+}
+
+export function createFicheIntervention({
+  operateur,
+  detenteur
+}: CreateFicheInterventionArgs) {
+  const data: Prisma.BsffFicheInterventionCreateInput = {
+    operateurCompanyAddress: operateur.company.address,
+    operateurCompanyContact: operateur.user.name,
+    operateurCompanyMail: operateur.company.contactEmail,
+    operateurCompanyName: operateur.company.name,
+    operateurCompanyPhone: operateur.company.contactPhone,
+    operateurCompanySiret: operateur.company.siret,
+    detenteurCompanyAddress: detenteur.company.address,
+    detenteurCompanyContact: detenteur.user.name,
+    detenteurCompanyMail: detenteur.company.contactEmail,
+    detenteurCompanyName: detenteur.company.name,
+    detenteurCompanyPhone: detenteur.company.contactPhone,
+    detenteurCompanySiret: detenteur.company.siret,
+    postalCode: "75000",
+    kilos: 1,
+    numero: "123"
+  };
+
+  return prisma.bsffFicheIntervention.create({ data });
 }

@@ -14,7 +14,8 @@ import {
   createBsffAfterOperation,
   createBsffAfterReception,
   createBsffAfterTransport,
-  createBsffBeforeEmission
+  createBsffBeforeEmission,
+  createFicheIntervention
 } from "../../../__tests__/factories";
 
 const UPDATE_BSFF = `
@@ -604,5 +605,87 @@ describe("Mutation.updateBsff", () => {
 
     expect(errors).toBeUndefined();
     expect(data.updateBsff).toEqual(expect.objectContaining(input));
+  });
+
+  it("should update a bsff with previous bsffs", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const previousBsffs = await Promise.all([
+      createBsffAfterOperation(
+        {
+          emitter: await userWithCompanyFactory(UserRole.ADMIN),
+          transporter: await userWithCompanyFactory(UserRole.ADMIN),
+          destination: emitter
+        },
+        {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED,
+          destinationOperationCode: OPERATION.R12.code
+        }
+      )
+    ]);
+    const bsff = await createBsffBeforeEmission(
+      { emitter },
+      {
+        type: BsffType.GROUPEMENT,
+        previousBsffs: { connect: previousBsffs.map(({ id }) => ({ id })) }
+      }
+    );
+
+    const { mutate } = makeClient(emitter.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          emitter: {
+            company: {
+              name: "New Name"
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.updateBsff.id).toBeTruthy();
+  });
+
+  it("should update a bsff with fiches d'intervention", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const ficheInterventions = await Promise.all([
+      createFicheIntervention({
+        operateur: emitter,
+        detenteur: await userWithCompanyFactory(UserRole.ADMIN)
+      })
+    ]);
+    const bsff = await createBsffBeforeEmission(
+      { emitter },
+      {
+        ficheInterventions: {
+          connect: ficheInterventions.map(({ id }) => ({ id }))
+        }
+      }
+    );
+
+    const { mutate } = makeClient(emitter.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          emitter: {
+            company: {
+              name: "New Name"
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.updateBsff.id).toBeTruthy();
   });
 });
