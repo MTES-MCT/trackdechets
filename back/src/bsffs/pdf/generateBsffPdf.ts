@@ -49,7 +49,12 @@ export async function generateBsffPdf(bsff: Bsff) {
       bsffType.isReconditionnement,
     isReconditionnementD14:
       bsff.destinationOperationCode === OPERATION.D14.code,
-    isReexpedition: bsffType.isReexpedition
+    isReexpeditionR13:
+      bsffType.isReexpedition &&
+      bsff.destinationOperationCode === OPERATION.R13.code,
+    isReexpeditionD15:
+      bsffType.isReexpedition &&
+      bsff.destinationOperationCode === OPERATION.D15.code
   };
 
   const qrCode = await QRCode.toString(bsff.id, { type: "svg" });
@@ -75,6 +80,10 @@ export async function generateBsffPdf(bsff: Bsff) {
             .join(" ")} : ${packaging.kilos} kilo(s)`
       )
       .join(", "),
+    receptionAccepted:
+      !!bsff.destinationReceptionDate && !bsff.destinationReceptionRefusal,
+    recepetionRefused:
+      !!bsff.destinationReceptionDate && !!bsff.destinationReceptionRefusal,
     ficheInterventions: [
       ...ficheInterventions,
 

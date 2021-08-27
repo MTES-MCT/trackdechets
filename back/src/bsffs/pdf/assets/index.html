@@ -218,9 +218,8 @@
               Quantité réelle présentée en kilo(s) : {{
               bsff.destinationReceptionKilos }}<br />
               Lot accepté : <input type="checkbox"
-              {{#bsff.destinationReceptionRefusal}}{{/bsff.destinationReceptionRefusal}}{{^bsff.destinationReceptionRefusal}}checked{{/bsff.destinationReceptionRefusal}}
-              /> Oui <input type="checkbox"
-              {{#bsff.destinationReceptionRefusal}}checked{{/bsff.destinationReceptionRefusal}}{{^bsff.destinationReceptionRefusal}}{{/bsff.destinationReceptionRefusal}}
+              {{#receptionAccepted}}checked{{/receptionAccepted}} /> Oui <input
+              type="checkbox" {{#receptionRefused}}checked{{/receptionRefused}}
               /> Non <br />
               Date d'acceptation / refus : {{#formatDate}}{{
               bsff.destinationReceptionSignatureDate }}{{/formatDate}}<br />
@@ -253,9 +252,11 @@
               /> R12 <input type="checkbox"
               {{#bsffOperation.isReconditionnementD14}}checked{{/bsffOperation.isReconditionnementD14}}
               /> D14 <br />
-              Réexpédition suite à entreposage provisoire <input type="checkbox"
-              {{#bsffOperation.isReexpedition}}checked{{/bsffOperation.isReexpedition}}
-              /> <br />
+              Entreposage provisoire avant réexpédition <input type="checkbox"
+              {{#bsffOperation.isReexpeditionR13}}checked{{/bsffOperation.isReexpeditionR13}}
+              /> R13 <input type="checkbox"
+              {{#bsffOperation.isReexpeditionD15}}checked{{/bsffOperation.isReexpeditionD15}}
+              /> D15 <br />
               Date de réalisation : {{#formatDate}}{{
               bsff.destinationOperationSignatureDate }}{{/formatDate}}
             </p>
@@ -372,14 +373,12 @@
           <div class="BoxCol"><p>Numéro bordereau</p></div>
           <div class="BoxCol"><p>CAP</p></div>
           <div class="BoxCol"><p>Quantité fluide en kilo(s)</p></div>
-          <div class="BoxCol"><p>Code postal lieu de collecte</p></div>
         </div>
         {{#previousBsffs}}
         <div class="BoxRow">
           <div class="BoxCol"><p>{{ id }}&nbsp;</p></div>
           <div class="BoxCol"><p>{{ destinationCap }}&nbsp;</p></div>
           <div class="BoxCol"><p>{{ quantityKilos }}&nbsp;</p></div>
-          <div class="BoxCol"><p>???&nbsp;</p></div>
         </div>
         {{/previousBsffs}}
       </div>
