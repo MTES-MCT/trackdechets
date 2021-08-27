@@ -9,7 +9,7 @@ import {
   BsffQuantityInput,
   BsffStatus,
   BsffType,
-  FormCompany,
+  CompanyInput,
   Query,
   QueryBsffsArgs,
 } from "generated/graphql/types";
@@ -195,7 +195,7 @@ export function BsffTypeSelector() {
   const [{ value: packagings }, , { setValue: setPackagings }] = useField<
     BsffPackagingInput[]
   >("packagings");
-  const [, , { setValue: setEmitterCompany }] = useField<FormCompany>(
+  const [, , { setValue: setEmitterCompany }] = useField<CompanyInput>(
     "emitter.company"
   );
   const [, , { setValue: setQuantity }] = useField<BsffQuantityInput>(
@@ -222,7 +222,11 @@ export function BsffTypeSelector() {
       previousBsff => previousBsff.destination?.company?.siret
     );
     if (firstPreviousBsffWithDestination) {
-      setEmitterCompany(firstPreviousBsffWithDestination.destination!.company!);
+      const {
+        country,
+        ...company
+      } = firstPreviousBsffWithDestination.destination!.company!;
+      setEmitterCompany(company);
     }
 
     if ([BsffType.Reexpedition, BsffType.Groupement].includes(type)) {
