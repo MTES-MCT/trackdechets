@@ -15,6 +15,7 @@ AccountFieldCompanyTraderReceipt.fragments = {
     fragment AccountFieldCompanyTraderReceiptFragment on CompanyPrivate {
       id
       siret
+      userRole
       traderReceipt {
         id
         receiptNumber
