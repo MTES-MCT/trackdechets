@@ -7,7 +7,6 @@ import { resolve } from "../utils";
 export default function Workflow({ path }) {
   const { workflows } = usePluginData<any>("workflow-doc-plugin");
   const workflow = resolve(path, workflows);
-  console.log(workflows);
   return (
     <div>
       {workflow.description && <div>{workflow.description}</div>}

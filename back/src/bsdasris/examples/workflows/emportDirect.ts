@@ -6,8 +6,12 @@ import { updateReception } from "../steps/updateReception";
 import { updateOperation } from "../steps/updateOperation";
 import { updateTransportBeforeDirectTakeover } from "../steps/updateTransportBeforeDirectTakeover";
 export default {
-  title: `Emport direct d'un dasri dans signature producteur`,
-  description: `L'emport d'un dasri (hors groupement) par un transporteur, sans signature producteur, est possible si ce dernier l'a autorisé (champ allowBsdasriTakeOverWithoutSignature).`,
+  title: `Emport direct d'un dasri sans signature producteur`,
+  description: `Habituellement, l'emport d'un dasri nécessite la signature du producteur. 
+  Néanmoins, ce dernier peut autoriser l'emport direct par un transporteur, sans signature producteur. 
+  Cette facilité est possible pour les dasris simples (hors groupement).
+  Le producteur doit pour ce faire cocher la case "Emport direct de DASRI autorisé" dans Mon compte > Établissements.
+  En termes d'api, ce paramétrage correspond au champ "allowBsdasriTakeOverWithoutSignature" accessible sur la query "companyInfos".`,
   companies: [
     {
       name: "pred",
