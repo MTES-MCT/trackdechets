@@ -10,7 +10,7 @@ import { WorkflowAction } from "./WorkflowAction";
 const vhuVerboseStatuses: Record<BsvhuStatus, string> = {
   INITIAL: "Initial",
   SIGNED_BY_PRODUCER: "Signé par le producteur",
-  SENT: "Envoyé",
+  SENT: "En cours d'acheminement",
   PROCESSED: "Traité",
   REFUSED: "Refusé",
 };
