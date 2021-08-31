@@ -1,6 +1,6 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { createBsff } from "./createBsff";
+import { createBsff } from "../../database";
 
 const createDraftBsffResolver: MutationResolvers["createDraftBsff"] = async (
   _,
