@@ -30,7 +30,6 @@ prisma.$on("query" as any, async (e: any) => {
   const span = tracer.scope().active();
 
   span?.setTag("resource.name", e.query);
-  console.log(span);
 });
 
 function getDbUrl() {
