@@ -210,6 +210,19 @@ export function BsffTypeSelector() {
     Bsff[]
   >("previousBsffs");
 
+  // formik's value and callback are hardly memoizable
+  // so for now they are triggering useEffects too often
+  // that's why we are using a ref here
+  // it should be fixed in formik v3: https://github.com/formium/formik/issues/2268
+  const setters = React.useRef({
+    setEmitterCompany,
+    setQuantity,
+    setPackagings,
+  });
+  setters.current.setEmitterCompany = setEmitterCompany;
+  setters.current.setQuantity = setQuantity;
+  setters.current.setPackagings = setPackagings;
+
   // When selecting the previous bsffs, prefill the fields with what we already know
   React.useEffect(() => {
     if (
@@ -226,11 +239,11 @@ export function BsffTypeSelector() {
         country,
         ...company
       } = firstPreviousBsffWithDestination.destination!.company!;
-      setEmitterCompany(company);
+      setters.current.setEmitterCompany(company);
     }
 
     if ([BsffType.Reexpedition, BsffType.Groupement].includes(type)) {
-      setQuantity(
+      setters.current.setQuantity(
         previousBsffs.reduce<BsffQuantityInput>(
           (acc, previousBsff) => {
             if (previousBsff.destination?.reception?.kilos) {
@@ -256,7 +269,7 @@ export function BsffTypeSelector() {
         )
       );
 
-      setPackagings(
+      setters.current.setPackagings(
         previousBsffs.reduce<BsffPackagingInput[]>(
           (acc, previousBsff) => acc.concat(previousBsff.packagings),
           []
