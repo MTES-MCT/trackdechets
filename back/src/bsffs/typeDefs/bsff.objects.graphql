@@ -10,7 +10,7 @@ type Bsff {
 
   Il y a principalement deux différences entre un brouillon et un BSFF publié :
   - Il n'y a pas de champs requis sur un brouillon, là où il faut un minimum d'informations pour créer un BSFF publié.
-  - L'état de brouillon peut permettre de distinguer un BSFF prêt à circuler d'un BSFF encore en prépration. Par exemple, sur l'interface Trackdéchets les brouillons sont dans l'onglet "brouillon" et non pas "pour action" ou "à collecter".
+  - L'état de brouillon peut permettre de distinguer un BSFF prêt à circuler d'un BSFF encore en préparation. Par exemple, sur l'interface Trackdéchets les brouillons sont dans l'onglet "brouillon" et non pas "pour action" ou "à collecter".
   """
   isDraft: Boolean!
 
@@ -56,7 +56,7 @@ type Bsff {
 
   """
   Destination du déchet, qui peut le réceptionner pour traitement, groupement, reconditionnement ou réexpedition.
-  Un nouveau bordereau doit être créé si le déchet connaît un nouveau parcours, par exemple si il quitte une installation de collecte pour un centre de traitement.
+  Un nouveau bordereau doit être créé si le déchet connaît un nouveau parcours, par exemple s'il quitte une installation de collecte pour un centre de traitement.
 
   Pour plus de détails sur les différents types de bordereau, voir l'enum BsffType.
   """
@@ -126,7 +126,7 @@ type BsffQuantity {
 type BsffTransporter {
   "Entreprise responsable du transport du déchet."
   company: FormCompany
-  "Récépissé du transporteur, laisser vide si il déclare être exempté."
+  "Récépissé du transporteur, laisser vide s'il déclare être exempté."
   recepisse: BsffTransporterRecepisse
   "Déclaration du transporteur lors de l'enlèvement auprès de l'émetteur."
   transport: BsffTransport
