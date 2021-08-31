@@ -3977,10 +3977,10 @@ dns-txt@^2.0.2:
   dependencies:
     buffer-indexof "^1.0.0"
 
-docusaurus-graphql-plugin@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/docusaurus-graphql-plugin/-/docusaurus-graphql-plugin-0.4.0.tgz#a22570ca737d4ffe335a88bec99bf7a41c120e0e"
-  integrity sha512-Zu4NN1bKNA8j5GuCQmjNoPVcMYTn3jPNRFQVU0pHu6dKJqK+9HN0WjiKNzTo0xEeHZk/j/Mlqaq/0ccQ7vMDmg==
+docusaurus-graphql-plugin@^0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/docusaurus-graphql-plugin/-/docusaurus-graphql-plugin-0.6.1.tgz#5ff51b372f7f5ebf8bd2faaead3009affb344272"
+  integrity sha512-iCT490KfubhChLqH0Rc1nAIg0ns92NWuTsXnRSlnsTXrUOrJ3iTjXGS5B2Vnq1/uJhsnAFIxlnEYxnyMoF9DTg==
   dependencies:
     "@graphql-tools/graphql-file-loader" "^6.2.7"
     "@graphql-tools/json-file-loader" "^6.2.6"

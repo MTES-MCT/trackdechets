@@ -22,7 +22,6 @@
     "docs:bsda": "docusaurus docs:generate:graphql:bsda",
     "docs:bsvhu": "docusaurus docs:generate:graphql:bsvhu",
     "build-workflow-plugin": "tsc --project plugin/tsconfig.json && copyfiles -u 1 ../back/src/**/*.gql plugin/build"
-
   },
   "dependencies": {
     "@docusaurus/core": "2.0.0-beta.3",
@@ -30,7 +29,7 @@
     "@mdx-js/react": "^1.6.21",
     "@svgr/webpack": "^5.5.0",
     "clsx": "^1.1.1",
-    "docusaurus-graphql-plugin": "^0.4.0",
+    "docusaurus-graphql-plugin": "^0.6.1",
     "file-loader": "^6.2.0",
     "mermaid": "^8.10.2",
     "raw-loader": "^4.0.2",
