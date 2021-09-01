@@ -6,17 +6,17 @@ async function testWorkflow(workflow) {
   let context = {};
 
   // create the different companies used in this workflow
-  for (const worflowCompany of workflow.companies) {
+  for (const workflowCompany of workflow.companies) {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
-      companyTypes: worflowCompany.companyTypes
+      companyTypes: workflowCompany.companyTypes,
+      ...(workflowCompany?.opt || {})
     });
-    context = { ...context, [worflowCompany.name]: { ...company, user } };
+    context = { ...context, [workflowCompany.name]: { ...company, user } };
   }
 
   // run the steps one by one
   for (const step of workflow.steps) {
     const { mutate } = makeClient(context[step.company].user);
-
     const { data: response } = await mutate(step.mutation, {
       variables: step.variables(context)
     });

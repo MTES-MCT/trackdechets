@@ -44,7 +44,8 @@ export function WorkflowAction(props: WorkflowActionProps) {
       }
       if (
         siret === form.transporter?.company?.siret &&
-        form?.allowDirectTakeOver
+        form?.allowDirectTakeOver &&
+        form.bsdasriType === "SIMPLE" // grouping dasri can't be directly taken over
       ) {
         return <SignBsdasriDirectTakeover {...props} />;
       }

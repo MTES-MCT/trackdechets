@@ -12,7 +12,7 @@ const graphqlTypes = [
 ];
 
 function makeReference(apiId) {
-  return graphqlTypes.map((t) =>
+  return graphqlTypes.map(t =>
     path.join("reference", "api-reference", apiId, t)
   );
 }
@@ -53,12 +53,15 @@ module.exports = {
                 "tutoriels/examples/bsdd/entreposage-provisoire",
                 "tutoriels/examples/bsdd/import-bsd-papier",
               ],
-              BSDASRI: ["tutoriels/examples/bsdasri/acheminement-direct"],
-              BSVHU: ["tutoriels/examples/bsvhu/vhu-vers-broyeur"],
-            },
-          ],
-        },
-      ],
+              BSDASRI: [
+                "tutoriels/examples/bsdasri/acheminement-direct",
+                "tutoriels/examples/bsdasri/emport-direct",
+              ],
+              BSVHU: ["tutoriels/examples/bsvhu/vhu-vers-broyeur",],
+            }
+          ]
+        }
+      ]
     },
     {
       Guides: [
