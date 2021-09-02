@@ -1,3 +1,5 @@
+import "./tracer";
+
 import {
   ApolloError,
   ApolloServer,
