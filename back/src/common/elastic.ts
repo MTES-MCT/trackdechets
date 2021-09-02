@@ -21,6 +21,29 @@ export interface BsdElastic {
   sirets: string[];
 }
 
+const settings = {
+  analysis: {
+    analyzer: {
+      readableId: {
+        tokenizer: "readableId_ngram",
+        filter: ["lowercase"]
+      },
+      readableId_search: {
+        tokenizer: "standard",
+        filter: ["lowercase"]
+      }
+    },
+    tokenizer: {
+      readableId_ngram: {
+        type: "ngram",
+        min_gram: 2,
+        max_gram: 9,
+        token_chars: ["letter", "digit"]
+      }
+    }
+  }
+};
+
 const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   // "keyword" is used for exact matches
   // "text" for fuzzy matches
@@ -31,6 +54,7 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   },
   readableId: {
     type: "text",
+    analyzer: "readableId",
     fields: {
       keyword: {
         type: "keyword"
@@ -101,7 +125,7 @@ export const index = {
   // The next major version of Elastic Search doesn't use "type" anymore
   // so while it's required for the current version, we are not using it too much
   type: "_doc",
-
+  settings,
   mappings: {
     properties
   }
