@@ -13,9 +13,17 @@ const prisma = new PrismaClient({
       level: "query"
     },
     {
-      emit: 'stdout',
-      level: 'info',
+      emit: "stdout",
+      level: "error"
     },
+    {
+      emit: "stdout",
+      level: "info"
+    },
+    {
+      emit: "stdout",
+      level: "warn"
+    }
   ]
 });
 
@@ -33,7 +41,9 @@ prisma.$use(async (params, next) => {
 prisma.$on("query" as any, async (e: any) => {
   const span = tracer.scope().active();
 
-  span?.setTag("resource.name", e.query);
+  span?.setTag("prisma.query", e.query);
+  span?.setTag("prisma.params", e.params);
+  span?.setTag("prisma.duration", e.duration);
 });
 
 function getDbUrl() {
