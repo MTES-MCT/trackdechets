@@ -18,6 +18,7 @@ AccountFielCompanyGivenName.fragments = {
     fragment AccountFieldCompanyGivenNameFragment on CompanyPrivate {
       siret
       givenName
+      userRole
     }
   `,
 };
