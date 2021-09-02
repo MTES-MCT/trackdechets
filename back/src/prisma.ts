@@ -11,7 +11,11 @@ const prisma = new PrismaClient({
     {
       emit: "event",
       level: "query"
-    }
+    },
+    {
+      emit: 'stdout',
+      level: 'info',
+    },
   ]
 });
 
