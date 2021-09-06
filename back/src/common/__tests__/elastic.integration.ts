@@ -114,8 +114,7 @@ describe("readableId analyzer", () => {
         query: {
           match: {
             readableId: {
-              query: "1004",
-              operator: "and"
+              query: "1004"
             }
           }
         }

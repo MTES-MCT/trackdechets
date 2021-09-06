@@ -91,7 +91,7 @@ async function buildQuery(
         readableId: {
           query: where.readableId,
           // we need `and` operator here because the different components of
-          // the readableId (prefix, date and random chars) emits different tokens
+          // the readableId (prefix, date and random chars) emit different tokens
           operator: "and"
         }
       }
