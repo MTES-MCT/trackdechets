@@ -21,10 +21,8 @@ export interface BsdElastic {
   sirets: string[];
 }
 
-// Customize `readableId` and `waste.ngram` analyzer in order to perform substring match queries
-// The idea is to run an ngram analyzer at index time and no analyzer at search time
-// For the `readableId` field, the tokenizer is set to split on "-" to search on each component of
-// the id separately
+// Custom analyzers for readableId and waste fields
+// See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/analysis-ngram-tokenizer.html
 const settings = {
   analysis: {
     analyzer: {
@@ -40,7 +38,7 @@ const settings = {
         filter: ["lowercase"]
       },
       waste_text: {
-        tokenizer: "letter",
+        tokenizer: "letter", // remove waste code from index
         filter: ["lowercase", "asciifolding", "stemmer"]
       },
       // 01 01 01* => ["01", "01 ", "1 ", .. "01 01 01*"]
@@ -56,8 +54,8 @@ const settings = {
       readableId_ngram: {
         type: "ngram",
         min_gram: 2,
-        max_gram: 9,
-        token_chars: ["letter", "digit"]
+        max_gram: 9, // max token length is the random part of the readableId
+        token_chars: ["letter", "digit"] // split on "-"
       },
       readableId_char_group: {
         type: "char_group",
@@ -66,7 +64,8 @@ const settings = {
       waste_ngram: {
         type: "ngram",
         min_gram: 1, // allow to search on "*" to get dangerous waste only
-        max_gram: 9,
+        max_gram: 9, // "xx xx xx*" is 9 char length
+        // do not include letter in `token_chars` to discard waste description from the index
         token_chars: ["digit", "whitespace", "punctuation", "symbol"]
       }
     }

@@ -90,6 +90,8 @@ async function buildQuery(
       match: {
         readableId: {
           query: where.readableId,
+          // we need `and` operator here because the different components of
+          // the readableId (prefix, date and random chars) emits different tokens
           operator: "and"
         }
       }
@@ -100,8 +102,10 @@ async function buildQuery(
     query.bool.must.push({
       bool: {
         should: [
+          // behaves like an OR
           {
             match: {
+              // match on waste code
               "waste.ngram": {
                 query: where.waste
               }
@@ -110,6 +114,7 @@ async function buildQuery(
           {
             match: {
               waste: {
+                // match on waste description
                 query: where.waste,
                 fuzziness: "AUTO"
               }
