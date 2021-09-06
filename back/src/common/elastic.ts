@@ -29,7 +29,7 @@ const settings = {
         filter: ["lowercase"]
       },
       readableId_search: {
-        tokenizer: "standard",
+        tokenizer: "readableId_char_group",
         filter: ["lowercase"]
       }
     },
@@ -39,6 +39,10 @@ const settings = {
         min_gram: 2,
         max_gram: 9,
         token_chars: ["letter", "digit"]
+      },
+      readableId_char_group: {
+        type: "char_group",
+        tokenize_on_chars: ["whitespace", "-"]
       }
     }
   }
