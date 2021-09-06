@@ -4,6 +4,7 @@ import {
 } from "../../../integration-tests/helper";
 import { BsdType } from "../../generated/graphql/types";
 import { BsdElastic, client, index, indexBsds } from "../elastic";
+import getReadableId from "../../forms/readableId";
 
 describe("readableId analyzer", () => {
   beforeAll(async () => {
@@ -23,7 +24,7 @@ describe("readableId analyzer", () => {
 
     const bsds: BsdElastic[] = [
       {
-        id: "BSD-20211004-KU76G98FRT",
+        id: "BSD-20211004-KU76G98FR",
         type: "BSDD" as BsdType
       },
       {
@@ -49,7 +50,7 @@ describe("readableId analyzer", () => {
         query: {
           match: {
             readableId: {
-              query: "BSD-20211004-KU76G98FRT",
+              query: "BSD-20211004-KU76G98FR",
               operator: "and"
             }
           }
@@ -60,7 +61,7 @@ describe("readableId analyzer", () => {
     const hits = result.body.hits.hits;
 
     expect(hits).toHaveLength(1);
-    expect(hits[0]._source.readableId).toEqual("BSD-20211004-KU76G98FRT");
+    expect(hits[0]._source.readableId).toEqual("BSD-20211004-KU76G98FR");
   });
 
   test("partial match", async () => {
@@ -81,7 +82,7 @@ describe("readableId analyzer", () => {
     const hits = result.body.hits.hits;
 
     expect(hits).toHaveLength(1);
-    expect(hits[0]._source.readableId).toEqual("BSD-20211004-KU76G98FRT");
+    expect(hits[0]._source.readableId).toEqual("BSD-20211004-KU76G98FR");
   });
 
   test("search by substring in bsd type component", async () => {
@@ -102,7 +103,7 @@ describe("readableId analyzer", () => {
 
     expect(hits).toHaveLength(2);
     const matches = hits.map(hit => hit._source.readableId);
-    expect(matches).toContain("BSD-20211004-KU76G98FRT");
+    expect(matches).toContain("BSD-20211004-KU76G98FR");
     expect(matches).toContain("BSD-20211005-JUGTDR876");
   });
 
@@ -124,7 +125,7 @@ describe("readableId analyzer", () => {
     const hits = result.body.hits.hits;
 
     expect(hits).toHaveLength(1);
-    expect(hits[0]._source.readableId).toEqual("BSD-20211004-KU76G98FRT");
+    expect(hits[0]._source.readableId).toEqual("BSD-20211004-KU76G98FR");
   });
 
   test("search by substring in random id component", async () => {
@@ -144,6 +145,83 @@ describe("readableId analyzer", () => {
     const hits = result.body.hits.hits;
 
     expect(hits).toHaveLength(1);
-    expect(hits[0]._source.readableId).toEqual("BSD-20211004-KU76G98FRT");
+    expect(hits[0]._source.readableId).toEqual("BSD-20211004-KU76G98FR");
+  });
+});
+
+describe("waste code analyzer", () => {
+  beforeAll(async () => {
+    const defaultOpts = {
+      type: "BSDD" as BsdType,
+      emitter: "emitter",
+      recipient: "recipient",
+      createdAt: new Date().getMilliseconds(),
+      isDraftFor: [],
+      isForActionFor: [],
+      isFollowFor: [],
+      isArchivedFor: [],
+      isToCollectFor: [],
+      isCollectedFor: [],
+      sirets: []
+    };
+
+    const bsds: BsdElastic[] = ["01 01 01", "02 01 08*", "10 01 05*"].map(
+      waste => {
+        const id = getReadableId();
+        return {
+          id,
+          readableId: id,
+          waste,
+          ...defaultOpts
+        };
+      }
+    );
+
+    await indexBsds(index.alias, bsds);
+    await refreshElasticSearch();
+  });
+
+  afterAll(resetDatabase);
+
+  test("exact match", async () => {
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: {
+          match: {
+            waste: {
+              query: "01 01 01"
+            }
+          }
+        }
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(1);
+    expect(hits[0]._source.waste).toEqual("01 01 01");
+  });
+
+  test("dangerous only", async () => {
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: {
+          match: {
+            waste: {
+              query: "*"
+            }
+          }
+        }
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(2);
+    const matches = hits.map(hit => hit._source.waste);
+    expect(matches).toContain("02 01 08*");
+    expect(matches).toContain("10 01 05*");
   });
 });

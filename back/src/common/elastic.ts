@@ -21,16 +21,31 @@ export interface BsdElastic {
   sirets: string[];
 }
 
+// Customize readableId and waste analyzer in order to perform substring match queries
+// * readableId :
+//    * Ngram analyzer at index time
+//    * char_group analyzer at search time
 const settings = {
   analysis: {
     analyzer: {
+      // BSD-20210101-H7F59G71G => [bs, bsd, sd, 20, 201, ..., 20210101, ..., h7f59g71, hf59g71g]
       readableId: {
         tokenizer: "readableId_ngram",
         filter: ["lowercase"]
       },
+      // BSD-20210101-H7F59G71G => [bsd, 20210101, hf59g71g]
+      // H7F5 => [h7f5]
       readableId_search: {
         tokenizer: "readableId_char_group",
         filter: ["lowercase"]
+      },
+      // 01 01 01* => ["01", "01 ", "1 ", .. "01 01 01*"]
+      waste: {
+        tokenizer: "waste_ngram"
+      },
+      // accepts whatever text it is given and outputs the exact same text as a single term
+      waste_search: {
+        tokenizer: "keyword"
       }
     },
     tokenizer: {
@@ -43,6 +58,11 @@ const settings = {
       readableId_char_group: {
         type: "char_group",
         tokenize_on_chars: ["whitespace", "-"]
+      },
+      waste_ngram: {
+        type: "ngram",
+        min_gram: 1,
+        max_gram: 9
       }
     }
   }
@@ -59,6 +79,7 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   readableId: {
     type: "text",
     analyzer: "readableId",
+    search_analyzer: "readableId_search",
     fields: {
       keyword: {
         type: "keyword"
@@ -86,6 +107,8 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   },
   waste: {
     type: "text",
+    analyzer: "waste",
+    search_analyzer: "waste_search",
     fields: {
       keyword: {
         type: "keyword"
