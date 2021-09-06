@@ -149,7 +149,11 @@ describe("readableId analyzer", () => {
   });
 });
 
-describe("waste code analyzer", () => {
+describe("waste.ngram analyzer", () => {
+  const waste1 = "01 01 01 minéraux";
+  const waste2 = "02 01 08* déchets agro";
+  const waste3 = "10 01 05* désulfuration gaz";
+
   beforeAll(async () => {
     const defaultOpts = {
       type: "BSDD" as BsdType,
@@ -165,17 +169,15 @@ describe("waste code analyzer", () => {
       sirets: []
     };
 
-    const bsds: BsdElastic[] = ["01 01 01", "02 01 08*", "10 01 05*"].map(
-      waste => {
-        const id = getReadableId();
-        return {
-          id,
-          readableId: id,
-          waste,
-          ...defaultOpts
-        };
-      }
-    );
+    const bsds: BsdElastic[] = [waste1, waste2, waste3].map(waste => {
+      const id = getReadableId();
+      return {
+        id,
+        readableId: id,
+        waste,
+        ...defaultOpts
+      };
+    });
 
     await indexBsds(index.alias, bsds);
     await refreshElasticSearch();
@@ -189,7 +191,7 @@ describe("waste code analyzer", () => {
       body: {
         query: {
           match: {
-            waste: {
+            "waste.ngram": {
               query: "01 01 01"
             }
           }
@@ -200,10 +202,112 @@ describe("waste code analyzer", () => {
     const hits = result.body.hits.hits;
 
     expect(hits).toHaveLength(1);
-    expect(hits[0]._source.waste).toEqual("01 01 01");
+    expect(hits[0]._source.waste).toEqual(waste1);
   });
 
   test("partial match", async () => {
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: {
+          match: {
+            "waste.ngram": {
+              query: "01"
+            }
+          }
+        }
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(3);
+    const matches = hits.map(hit => hit._source.waste);
+    expect(matches).toContain(waste1);
+    expect(matches).toContain(waste2);
+    expect(matches).toContain(waste3);
+  });
+
+  test("dangerous only", async () => {
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: {
+          match: {
+            "waste.ngram": {
+              query: "*"
+            }
+          }
+        }
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(2);
+    const matches = hits.map(hit => hit._source.waste);
+    expect(matches).toContain(waste2);
+    expect(matches).toContain(waste3);
+  });
+});
+
+describe("waste text analyzer", () => {
+  const waste1 = "01 01 01 minéraux";
+  const waste2 = "02 01 08* déchets agro";
+  const waste3 = "10 01 05* désulfuration gaz";
+
+  beforeAll(async () => {
+    const defaultOpts = {
+      type: "BSDD" as BsdType,
+      emitter: "emitter",
+      recipient: "recipient",
+      createdAt: new Date().getMilliseconds(),
+      isDraftFor: [],
+      isForActionFor: [],
+      isFollowFor: [],
+      isArchivedFor: [],
+      isToCollectFor: [],
+      isCollectedFor: [],
+      sirets: []
+    };
+
+    const bsds: BsdElastic[] = [waste1, waste2, waste3].map(waste => {
+      const id = getReadableId();
+      return {
+        id,
+        readableId: id,
+        waste,
+        ...defaultOpts
+      };
+    });
+
+    await indexBsds(index.alias, bsds);
+    await refreshElasticSearch();
+  });
+
+  afterAll(resetDatabase);
+
+  test("full text search", async () => {
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: {
+          match: {
+            waste: {
+              query: "désulfuration"
+            }
+          }
+        }
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(1);
+    expect(hits[0]._source.waste).toEqual(waste3);
+  });
+
+  it("should discard digits", async () => {
     const result = await client.search({
       index: index.alias,
       body: {
@@ -219,32 +323,6 @@ describe("waste code analyzer", () => {
 
     const hits = result.body.hits.hits;
 
-    expect(hits).toHaveLength(3);
-    const matches = hits.map(hit => hit._source.waste);
-    expect(matches).toContain("01 01 01");
-    expect(matches).toContain("02 01 08*");
-    expect(matches).toContain("10 01 05*");
-  });
-
-  test("dangerous only", async () => {
-    const result = await client.search({
-      index: index.alias,
-      body: {
-        query: {
-          match: {
-            waste: {
-              query: "*"
-            }
-          }
-        }
-      }
-    });
-
-    const hits = result.body.hits.hits;
-
-    expect(hits).toHaveLength(2);
-    const matches = hits.map(hit => hit._source.waste);
-    expect(matches).toContain("02 01 08*");
-    expect(matches).toContain("10 01 05*");
+    expect(hits).toHaveLength(0);
   });
 });

@@ -70,10 +70,8 @@ async function buildQuery(
     });
 
   Object.entries({
-    readableId: where.readableId,
     emitter: where.emitter,
-    recipient: where.recipient,
-    waste: where.waste
+    recipient: where.recipient
   })
     .filter(([_, value]) => value != null)
     .forEach(([key, value]) => {
@@ -86,6 +84,41 @@ async function buildQuery(
         }
       });
     });
+
+  if (where.readableId) {
+    query.bool.must.push({
+      match: {
+        readableId: {
+          query: where.readableId,
+          operator: "and"
+        }
+      }
+    });
+  }
+
+  if (where.waste) {
+    query.bool.must.push({
+      bool: {
+        should: [
+          {
+            match: {
+              "waste.ngram": {
+                query: where.waste
+              }
+            }
+          },
+          {
+            match: {
+              waste: {
+                query: where.waste,
+                fuzziness: "AUTO"
+              }
+            }
+          }
+        ]
+      }
+    });
+  }
 
   if (clue) {
     query.bool.must.push({

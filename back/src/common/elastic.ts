@@ -21,7 +21,7 @@ export interface BsdElastic {
   sirets: string[];
 }
 
-// Customize `readableId` and `waste` analyzer in order to perform substring match queries
+// Customize `readableId` and `waste.ngram` analyzer in order to perform substring match queries
 // The idea is to run an ngram analyzer at index time and no analyzer at search time
 // For the `readableId` field, the tokenizer is set to split on "-" to search on each component of
 // the id separately
@@ -39,12 +39,16 @@ const settings = {
         tokenizer: "readableId_char_group",
         filter: ["lowercase"]
       },
+      waste_text: {
+        tokenizer: "letter",
+        filter: ["lowercase", "asciifolding", "stemmer"]
+      },
       // 01 01 01* => ["01", "01 ", "1 ", .. "01 01 01*"]
-      waste: {
+      waste_ngram: {
         tokenizer: "waste_ngram"
       },
       // accepts whatever text it is given and outputs the exact same text as a single term
-      waste_search: {
+      waste_ngram_search: {
         tokenizer: "keyword"
       }
     },
@@ -62,7 +66,8 @@ const settings = {
       waste_ngram: {
         type: "ngram",
         min_gram: 1, // allow to search on "*" to get dangerous waste only
-        max_gram: 9
+        max_gram: 9,
+        token_chars: ["digit", "whitespace", "punctuation", "symbol"]
       }
     }
   }
@@ -107,11 +112,15 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   },
   waste: {
     type: "text",
-    analyzer: "waste",
-    search_analyzer: "waste_search",
+    analyzer: "waste_text",
     fields: {
       keyword: {
         type: "keyword"
+      },
+      ngram: {
+        type: "text",
+        analyzer: "waste_ngram",
+        search_analyzer: "waste_ngram_search"
       }
     }
   },
