@@ -203,6 +203,29 @@ describe("waste code analyzer", () => {
     expect(hits[0]._source.waste).toEqual("01 01 01");
   });
 
+  test("partial match", async () => {
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: {
+          match: {
+            waste: {
+              query: "01"
+            }
+          }
+        }
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(3);
+    const matches = hits.map(hit => hit._source.waste);
+    expect(matches).toContain("01 01 01");
+    expect(matches).toContain("02 01 08*");
+    expect(matches).toContain("10 01 05*");
+  });
+
   test("dangerous only", async () => {
     const result = await client.search({
       index: index.alias,

@@ -21,10 +21,10 @@ export interface BsdElastic {
   sirets: string[];
 }
 
-// Customize readableId and waste analyzer in order to perform substring match queries
-// * readableId :
-//    * Ngram analyzer at index time
-//    * char_group analyzer at search time
+// Customize `readableId` and `waste` analyzer in order to perform substring match queries
+// The idea is to run an ngram analyzer at index time and no analyzer at search time
+// For the `readableId` field, the tokenizer is set to split on "-" to search on each component of
+// the id separately
 const settings = {
   analysis: {
     analyzer: {
@@ -61,7 +61,7 @@ const settings = {
       },
       waste_ngram: {
         type: "ngram",
-        min_gram: 1,
+        min_gram: 1, // allow to search on "*" to get dangerous waste only
         max_gram: 9
       }
     }
