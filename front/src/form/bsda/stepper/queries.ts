@@ -70,6 +70,12 @@ export const FullBsdaFragment = gql`
       company {
         ...CompanyFragment
       }
+      work {
+        signature {
+          author
+          date
+        }
+      }
     }
     broker {
       company {
@@ -91,6 +97,12 @@ export const FullBsdaFragment = gql`
           author
           date
         }
+      }
+    }
+    metadata {
+      errors {
+        message
+        requiredFor
       }
     }
   }

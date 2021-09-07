@@ -1,7 +1,10 @@
 import React from "react";
 import { Bsda, BsdaStatus, BsdaSignatureType } from "generated/graphql/types";
 import PublishBsda from "./PublishBsda";
-import SignBsda from "./SignBsda";
+import { SignEmission } from "./SignEmission";
+import { SignWork } from "./SignWork";
+import { SignTransport } from "./SignTransport";
+import { SignOperation } from "./SignOperation";
 
 export interface WorkflowActionProps {
   form: Bsda;
@@ -17,23 +20,19 @@ export function WorkflowAction(props: WorkflowActionProps) {
   switch (form["bsdaStatus"]) {
     case BsdaStatus.Initial:
       if (siret !== form.emitter?.company?.siret) return null;
-      return <SignBsda {...props} signatureType={BsdaSignatureType.Emission} />;
+      return <SignEmission {...props} bsdaId={form.id} />;
 
     case BsdaStatus.SignedByProducer:
       if (siret !== form.worker?.company?.siret) return null;
-      return <SignBsda {...props} signatureType={BsdaSignatureType.Work} />;
+      return <SignWork {...props} bsdaId={form.id} />;
 
     case BsdaStatus.SignedByWorker:
       if (siret !== form.transporter?.company?.siret) return null;
-      return (
-        <SignBsda {...props} signatureType={BsdaSignatureType.Transport} />
-      );
+      return <SignTransport {...props} bsdaId={form.id} />;
 
     case BsdaStatus.Sent:
       if (siret !== form.destination?.company?.siret) return null;
-      return (
-        <SignBsda {...props} signatureType={BsdaSignatureType.Operation} />
-      );
+      return <SignOperation {...props} bsdaId={form.id} />;
 
     default:
       return null;

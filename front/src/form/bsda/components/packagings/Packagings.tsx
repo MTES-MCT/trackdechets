@@ -6,7 +6,7 @@ import { BsdaPackaging, BsdaPackagingType } from "generated/graphql/types";
 import React, { InputHTMLAttributes } from "react";
 import "./Packagings.scss";
 
-const PACKAGINGS_NAMES = {
+export const PACKAGINGS_NAMES = {
   [BsdaPackagingType.BigBag]: "Big-bag",
   [BsdaPackagingType.DepotBag]: "Dépôt-bag",
   [BsdaPackagingType.PaletteFilme]: "Palette filmée",

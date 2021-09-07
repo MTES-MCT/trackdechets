@@ -51,6 +51,9 @@ type Bsda {
 
   "Précedents BSDA associés, constituant l'historique de traçabilité"
   associations: [BsdaAssociation]
+
+  "Metadata associées au bordereau"
+  metadata: BsdaMetadata!
 }
 
 type BsdaEmitter {
@@ -222,4 +225,14 @@ type BsdaBroker {
   company: FormCompany
   "Récépissé courtier"
   recepisse: BsdaRecepisse
+}
+
+type BsdaMetadata {
+  errors: [BsdaError!]!
+}
+
+type BsdaError {
+  message: String!
+  path: String!
+  requiredFor: BsdaSignatureType!
 }

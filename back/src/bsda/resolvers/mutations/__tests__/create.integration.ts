@@ -81,7 +81,7 @@ describe("Mutation.Bsda.create", () => {
           siret: company.siret,
           name: "The crusher",
           address: "Rue de la carcasse",
-          contact: "Un centre VHU",
+          contact: "Centre amiante",
           phone: "0101010101",
           mail: "emitter@mail.com"
         }
@@ -146,7 +146,7 @@ describe("Mutation.Bsda.create", () => {
           siret: company.siret,
           name: "The crusher",
           address: "Rue de la carcasse",
-          contact: "Un centre VHU",
+          contact: "Centre amiante",
           phone: "0101010101",
           mail: "emitter@mail.com"
         }
