@@ -87,7 +87,6 @@ export function SignOperation({ siret, bsdaId }: Props) {
             validationSchema={validationSchema}
             onSubmit={async values => {
               const { id, author, ...update } = values;
-              console.log(update);
               await updateBsda({
                 variables: {
                   id: bsda.id,
