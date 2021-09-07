@@ -2,11 +2,13 @@ import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import Operation from "form/bsvhu/Operation";
+import { UPDATE_VHU_FORM } from "form/bsvhu/utils/queries";
 import { getComputedState } from "form/common/stepper/GenericStepList";
 import { Field, Form, Formik } from "formik";
 import {
   Mutation,
   MutationSignBsvhuArgs,
+  MutationUpdateBsvhuArgs,
   SignatureTypeInput,
 } from "generated/graphql/types";
 import React from "react";
@@ -22,6 +24,10 @@ const validationSchema = yup.object({
 
 type Props = { siret: string; bsvhuId: string };
 export function SignOperation({ siret, bsvhuId }: Props) {
+  const [updateBsvhu] = useMutation<
+    Pick<Mutation, "updateBsvhu">,
+    MutationUpdateBsvhuArgs
+  >(UPDATE_VHU_FORM);
   const [signBsvhu, { loading }] = useMutation<
     Pick<Mutation, "signBsvhu">,
     MutationSignBsvhuArgs
@@ -60,6 +66,13 @@ export function SignOperation({ siret, bsvhuId }: Props) {
           }}
           validationSchema={validationSchema}
           onSubmit={async values => {
+            const { id, author, ...update } = values;
+            await updateBsvhu({
+              variables: {
+                id: bsvhuId,
+                input: update,
+              },
+            });
             await signBsvhu({
               variables: {
                 id: bsvhu.id,
