@@ -1,6 +1,8 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
+import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import Operation from "form/bsvhu/Operation";
+import { getComputedState } from "form/common/stepper/GenericStepList";
 import { Field, Form, Formik } from "formik";
 import {
   Mutation,
@@ -26,14 +28,35 @@ export function SignOperation({ siret, bsvhuId }: Props) {
   >(SIGN_BSVHU);
 
   return (
-    <SignBsvhu
-      title="Signer le traitement"
-      bsvhuId={bsvhuId}
-    >
+    <SignBsvhu title="Signer le traitement" bsvhuId={bsvhuId}>
       {({ bsvhu, onClose }) => (
         <Formik
           initialValues={{
             author: "",
+            ...getComputedState(
+              {
+                destination: {
+                  reception: {
+                    date: null,
+                    acceptationStatus: null,
+                    refusalReason: "",
+                    quantity: {
+                      number: null,
+                      tons: null,
+                    },
+                    identification: {
+                      numbers: [],
+                    },
+                  },
+                  operation: {
+                    date: null,
+                    code: "",
+                    nextDestination: { company: getInitialCompany() },
+                  },
+                },
+              },
+              bsvhu
+            ),
           }}
           validationSchema={validationSchema}
           onSubmit={async values => {
