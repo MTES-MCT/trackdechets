@@ -269,9 +269,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
       .set("Authorization", `Bearer ${destinationToken}`)
       .send({ query: destinationBsdaQuery });
 
-    expect(destinationBsdaResponse.body.data.signBsda.status).toBe(
-      "PROCESSED"
-    );
+    expect(destinationBsdaResponse.body.data.signBsda.status).toBe("PROCESSED");
   });
 
   it("Déchet collecté chez un professionnel, curcuit complet", async () => {
@@ -472,8 +470,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
       .set("Authorization", `Bearer ${destinationToken}`)
       .send({ query: destinationBsdaQuery });
 
-    expect(destinationBsdaResponse.body.data.signBsda.status).toBe(
-      "PROCESSED"
-    );
+    expect(destinationBsdaResponse.body.data.signBsda.status).toBe("PROCESSED");
   });
 });

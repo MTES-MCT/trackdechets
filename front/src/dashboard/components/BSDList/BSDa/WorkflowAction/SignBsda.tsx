@@ -1,9 +1,8 @@
 import { gql } from "@apollo/client";
 import { ActionButton } from "common/components";
 import { IconCheckCircle1 } from "common/components/Icons";
-import React from "react";
+import React, { useState } from "react";
 import { SignBsdaModal } from "./SignBsdaModal";
-
 
 export const SIGN_BSDA = gql`
   mutation SignBsda($id: ID!, $input: BsdaSignatureInput!) {
@@ -21,7 +20,7 @@ type Props = {
 };
 
 export function SignBsda({ title, bsdaId, children }: Props) {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <>
       <ActionButton

@@ -13,7 +13,7 @@ import signBsda from "./mutations/sign";
 import duplicateBsda from "./mutations/duplicate";
 import publishBsda from "./mutations/publish";
 import deleteBsda from "./mutations/delete";
-import {Metadata as BsdaMetadata} from "./BsdaMetadata";
+import { Metadata as BsdaMetadata } from "./BsdaMetadata";
 import { Bsda } from "./Bsda";
 
 const Query: QueryResolvers = {
