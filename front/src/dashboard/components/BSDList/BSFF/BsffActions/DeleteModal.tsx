@@ -4,6 +4,8 @@ import { gql, useMutation } from "@apollo/client";
 import { Mutation, MutationDeleteBsffArgs } from "generated/graphql/types";
 import cogoToast from "cogo-toast";
 import TdModal from "common/components/Modal";
+import { GET_BSDS } from "common/queries";
+import { Loader } from "common/components";
 
 const DELETE_BSFF = gql`
   mutation DeleteBsff($id: ID!) {
@@ -23,11 +25,13 @@ export function DeleteBsffModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const [deleteBsff] = useMutation<
+  const [deleteBsff, { loading }] = useMutation<
     Pick<Mutation, "deleteBsff">,
     MutationDeleteBsffArgs
   >(DELETE_BSFF, {
     variables: { id: formId },
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: () => {
       cogoToast.success("Bordereau supprimé", { hideAfter: 5 });
       !!onClose && onClose();
@@ -57,6 +61,7 @@ export function DeleteBsffModal({
           <span> Supprimer</span>
         </button>
       </div>
+      {loading && <Loader />}
     </TdModal>
   );
 }

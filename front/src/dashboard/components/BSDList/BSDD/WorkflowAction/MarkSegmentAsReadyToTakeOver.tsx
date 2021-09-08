@@ -12,6 +12,8 @@ import ActionButton from "common/components/ActionButton";
 import { IconPaperWrite } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 import { WorkflowActionProps } from "./WorkflowAction";
+import { GET_BSDS } from "common/queries";
+import { Loader } from "common/components";
 
 const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
   mutation markSegmentAsReadyToTakeOver($id: ID!) {
@@ -27,10 +29,12 @@ export default function MarkSegmentAsReadyToTakeOver({
   siret,
 }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [markSegmentAsReadyToTakeOver, { error }] = useMutation<
+  const [markSegmentAsReadyToTakeOver, { loading, error }] = useMutation<
     Pick<Mutation, "markSegmentAsReadyToTakeOver">,
     MutationMarkSegmentAsReadyToTakeOverArgs
   >(MARK_SEGMENT_AS_READY_TO_TAKE_OVER, {
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: () => {
       setIsOpen(false);
       cogoToast.success(
@@ -95,6 +99,7 @@ export default function MarkSegmentAsReadyToTakeOver({
               </FormikForm>
             )}
           </Formik>
+          {loading && <Loader />}
         </TdModal>
       )}
     </>

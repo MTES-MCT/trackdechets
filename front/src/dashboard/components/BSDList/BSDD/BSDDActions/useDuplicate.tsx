@@ -2,6 +2,7 @@ import { gql, MutationHookOptions, useMutation } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import { Mutation, MutationDuplicateFormArgs } from "generated/graphql/types";
 import { fullFormFragment } from "common/fragments";
+import { GET_BSDS } from "common/queries";
 
 const DUPLICATE_FORM = gql`
   mutation DuplicateForm($id: ID!) {
@@ -23,6 +24,8 @@ export function useDuplicate(
     MutationDuplicateFormArgs
   >(DUPLICATE_FORM, {
     ...options,
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: (...args) => {
       cogoToast.success(
         `Le bordereau a été dupliqué, il est disponible dans l'onglet "Brouillons"`

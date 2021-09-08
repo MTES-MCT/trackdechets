@@ -38,7 +38,7 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
     data: { isDraft: false }
   });
   const expandedDasri = expandBsdasriFromDb(publishedBsdasri);
-  await indexBsdasri(publishedBsdasri);
+  await indexBsdasri(publishedBsdasri, context);
   return expandedDasri;
 };
 

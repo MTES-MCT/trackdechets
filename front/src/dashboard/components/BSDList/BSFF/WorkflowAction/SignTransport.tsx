@@ -12,6 +12,7 @@ import { RedErrorMessage } from "common/components";
 import { NotificationError } from "common/components/Error";
 import { SIGN_BSFF } from "form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
+import { GET_BSDS } from "common/queries";
 
 const validationSchema = yup.object({
   signatureAuthor: yup
@@ -29,7 +30,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
   const [signBsff, signBsffResult] = useMutation<
     Pick<Mutation, "signBsff">,
     MutationSignBsffArgs
-  >(SIGN_BSFF);
+  >(SIGN_BSFF, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   return (
     <Formik

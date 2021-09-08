@@ -39,7 +39,7 @@ const deleteBsdasriResolver: MutationResolvers["deleteBsdasri"] = async (
     data: { isDeleted: true }
   });
 
-  await elastic.deleteBsd(deletedBsdasri);
+  await elastic.deleteBsd(deletedBsdasri, context);
 
   return expandBsdasriFromDb(deletedBsdasri);
 };

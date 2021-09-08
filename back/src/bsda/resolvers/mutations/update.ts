@@ -57,7 +57,7 @@ export default async function edit(
     }
   });
 
-  await indexBsda(updatedBsda);
+  await indexBsda(updatedBsda, context);
 
   return expandBsdaFromDb(updatedBsda);
 }

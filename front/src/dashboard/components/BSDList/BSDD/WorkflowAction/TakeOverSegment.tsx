@@ -9,6 +9,8 @@ import TdModal from "common/components/Modal";
 import { NotificationError } from "common/components/Error";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { WorkflowActionProps } from "./WorkflowAction";
+import { GET_BSDS } from "common/queries";
+import { Loader } from "common/components";
 
 const TAKE_OVER_SEGMENT = gql`
   mutation takeOverSegment($id: ID!, $takeOverInfo: TakeOverInput!) {
@@ -20,10 +22,12 @@ const TAKE_OVER_SEGMENT = gql`
 
 export default function TakeOverSegment({ form }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [takeOverSegment, { error }] = useMutation<
+  const [takeOverSegment, { loading, error }] = useMutation<
     Pick<Mutation, "takeOverSegment">,
     MutationTakeOverSegmentArgs
   >(TAKE_OVER_SEGMENT, {
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: () => {
       setIsOpen(false);
       cogoToast.success("La prise en charge du bordereau est validée", {
@@ -105,6 +109,7 @@ export default function TakeOverSegment({ form }: WorkflowActionProps) {
               </FormikForm>
             )}
           </Formik>
+          {loading && <Loader />}
         </TdModal>
       )}
     </>

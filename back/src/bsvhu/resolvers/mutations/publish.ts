@@ -34,6 +34,6 @@ export default async function create(
     where: { id },
     data: { isDraft: false }
   });
-  await indexBsvhu(updatedForm);
+  await indexBsvhu(updatedForm, context);
   return expandVhuFormFromDb(updatedForm);
 }

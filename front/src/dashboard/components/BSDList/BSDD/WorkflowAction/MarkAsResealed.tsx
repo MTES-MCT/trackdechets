@@ -10,13 +10,14 @@ import { FormStatus, Mutation, WasteDetails } from "generated/graphql/types";
 import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "common/components/Modal";
-import { ActionButton } from "common/components";
+import { ActionButton, Loader } from "common/components";
 import { IconPaperWrite } from "common/components/Icons";
 import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
 import { NotificationError } from "common/components/Error";
 import cogoToast from "cogo-toast";
 import Transporter from "form/bsdd/Transporter";
+import { GET_BSDS } from "common/queries";
 
 const MARK_RESEALED = gql`
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {
@@ -75,9 +76,11 @@ export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
     }
   }
 
-  const [markAsResealed, { error }] = useMutation<
+  const [markAsResealed, { error, loading }] = useMutation<
     Pick<Mutation, "markAsResealed">
   >(MARK_RESEALED, {
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: data => {
       if (
         data.markAsResealed &&
@@ -242,6 +245,7 @@ export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
           {error && (
             <NotificationError className="action-error" apolloError={error} />
           )}
+          {loading && <Loader />}
         </div>
       )}
     />

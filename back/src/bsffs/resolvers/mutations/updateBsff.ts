@@ -119,7 +119,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     where: { id }
   });
 
-  await indexBsff(updatedBsff);
+  await indexBsff(updatedBsff, context);
 
   return unflattenBsff(updatedBsff);
 };

@@ -60,7 +60,7 @@ const basesign = async ({ id, input, context, securityCode = null }) => {
   );
 
   const expandedDasri = expandBsdasriFromDb(updatedDasri);
-  await indexBsdasri(updatedDasri);
+  await indexBsdasri(updatedDasri, context);
   return expandedDasri;
 };
 

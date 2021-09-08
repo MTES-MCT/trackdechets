@@ -24,6 +24,7 @@ import { DeleteModal } from "./DeleteModal";
 import { useDuplicate } from "./useDuplicate";
 import { useDownloadPdf } from "./useDownloadPdf";
 import styles from "../../BSDActions.module.scss";
+import { Loader } from "common/components";
 
 interface BSDDActionsProps {
   form: Form;
@@ -33,7 +34,9 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
   const { siret } = useParams<{ siret: string }>();
   const location = useLocation();
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
-  const [duplicateForm] = useDuplicate({ variables: { id: form.id } });
+  const [duplicateForm, { loading: isDuplicating }] = useDuplicate({
+    variables: { id: form.id },
+  });
   const [isDeleting, setIsDeleting] = React.useState(false);
 
   return (
@@ -107,6 +110,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
           formId={form.id}
         />
       )}
+      {isDuplicating && <Loader />}
     </>
   );
 };
