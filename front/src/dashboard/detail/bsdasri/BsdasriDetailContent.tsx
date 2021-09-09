@@ -412,19 +412,21 @@ const Dasripackaging = ({
               <th>Vol.</th>
             </tr>
           </thead>
-          {packagingInfos.map(row => (
-            <tr className="td-table__tr">
-              <td>
-                {`${getVerbosePackagingType(row.type)
-                  .substring(0, 20)
-                  .trim()}…`}
-                {row.other}
-              </td>
+          <tbody>
+            {packagingInfos.map((row, idx) => (
+              <tr className="td-table__tr" key={idx}>
+                <td>
+                  {`${getVerbosePackagingType(row.type)
+                    .substring(0, 20)
+                    .trim()}…`}
+                  {row.other}
+                </td>
 
-              <td>{row.quantity}</td>
-              <td>{row.volume} l</td>
-            </tr>
-          ))}
+                <td>{row.quantity}</td>
+                <td>{row.volume} l</td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
     </>

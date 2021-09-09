@@ -34,13 +34,6 @@ export default function Transporter({ status, stepName }) {
 function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
   const { setFieldValue } = useFormikContext();
 
-  // it's pointless to show transport fields until form is signed by producer
-  const showTransportFields =
-    [
-      BsdasriStatus.SignedByProducer,
-      BsdasriStatus.Sent,
-      BsdasriStatus.Received,
-    ].includes(status) || displayTakeoverFields;
   // handedOverAt is editable even after dasri reception
   const showHandedOverAtField = [
     BsdasriStatus.Sent,
@@ -154,78 +147,71 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
         <RedErrorMessage name="transporter.receiptValidityLimit" />
       </div>
       <h4 className="form__section-heading">Transport du déchet</h4>
-      {showTransportFields ? (
-        <>
-          <div className="form__row">
-            <label>Mode de transport</label>
-            <Field
-              as="select"
-              name="transport.mode"
-              id="id_mode"
-              className="td-select"
-              disabled={disabled}
-            >
-              {Object.entries(transportModeLabels).map(([k, v]) => (
-                <option value={`${k}`} key={k}>
-                  {v}
-                </option>
-              ))}
-            </Field>
-          </div>
-          <div
-            className={classNames("form__row", {
-              "field-emphasis": transportEmphasis,
-            })}
-          >
-            <Field
-              name="transport.wasteAcceptation"
-              component={Acceptation}
-              disabled={disabled}
-            />
-          </div>
-          <div
-            className={classNames("form__row", {
-              "field-emphasis": transportEmphasis,
-            })}
-          >
-            <label>
-              Date de prise en charge
-              <div className="td-date-wrapper">
-                <Field
-                  name="transport.takenOverAt"
-                  component={DateInput}
-                  className="td-input"
-                  disabled={disabled}
-                />
-              </div>
-            </label>
-          </div>
-          <div
-            className={classNames("form__row", {
-              "field-emphasis": transportEmphasis,
-            })}
-          >
-            <Field
-              name="transport.wasteDetails.packagingInfos"
-              component={Packagings}
-              disabled={disabled}
-            />
-          </div>
-          <h4 className="form__section-heading">Quantité transportée</h4>
 
-          <QuantityWidget
-            disabled={disabled}
-            switchLabel="Je souhaite ajouter une quantité"
-            dasriSection="transport"
-            getInitialQuantityFn={getInitialQuantityFn}
-          />
-        </>
-      ) : (
-        <p>
-          Cette section sera disponible quand le bordereau aura été signé par le
-          producteur
-        </p>
-      )}
+      <div className="form__row">
+        <label>Mode de transport</label>
+        <Field
+          as="select"
+          name="transport.mode"
+          id="id_mode"
+          className="td-select"
+          disabled={disabled}
+        >
+          {Object.entries(transportModeLabels).map(([k, v]) => (
+            <option value={`${k}`} key={k}>
+              {v}
+            </option>
+          ))}
+        </Field>
+      </div>
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": transportEmphasis,
+        })}
+      >
+        <Field
+          name="transport.wasteAcceptation"
+          component={Acceptation}
+          disabled={disabled}
+        />
+      </div>
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": transportEmphasis,
+        })}
+      >
+        <label>
+          Date de prise en charge
+          <div className="td-date-wrapper">
+            <Field
+              name="transport.takenOverAt"
+              component={DateInput}
+              className="td-input"
+              disabled={disabled}
+            />
+          </div>
+        </label>
+      </div>
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": transportEmphasis,
+        })}
+      >
+        <Field
+          name="transport.wasteDetails.packagingInfos"
+          component={Packagings}
+          disabled={disabled}
+        />
+      </div>
+      <h4 className="form__section-heading">Quantité transportée</h4>
+
+      <QuantityWidget
+        disabled={disabled}
+        switchLabel="Je souhaite ajouter une quantité"
+        dasriSection="transport"
+        getInitialQuantityFn={getInitialQuantityFn}
+      />
+
       {showHandedOverAtField ? (
         <div
           className={classNames("form__row", {

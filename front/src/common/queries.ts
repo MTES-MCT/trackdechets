@@ -26,6 +26,21 @@ export const GET_DETAIL_DASRI = gql`
   ${dasriFragment}
 `;
 
+export const GET_DETAIL_DASRI_WITH_METADATA = gql`
+  query Bsdasri($id: ID!) {
+    bsdasri(id: $id) {
+      ...DasriFragment
+      metadata {
+        errors {
+          message
+          requiredFor
+        }
+      }
+    }
+  }
+  ${dasriFragment}
+`;
+
 export const GET_DASRI_METADATA = gql`
   query Bsdasri($id: ID!) {
     bsdasri(id: $id) {

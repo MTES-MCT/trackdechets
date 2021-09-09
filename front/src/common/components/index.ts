@@ -1,4 +1,4 @@
-import ActionButton from "./ActionButton";
+import ActionButton, { ActionLink } from "./ActionButton";
 import Modal from "./Modal";
 import RedErrorMessage from "./RedErrorMessage";
 import DownloadFileLink from "./DownloadFileLink";
@@ -7,6 +7,7 @@ import Loader from "./Loaders";
 
 export {
   ActionButton,
+  ActionLink,
   Modal,
   RedErrorMessage,
   DownloadFileLink,
