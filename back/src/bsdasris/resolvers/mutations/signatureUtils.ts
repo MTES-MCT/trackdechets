@@ -127,7 +127,7 @@ export const dasriSignatureMapping: Record<
     authorizedSiret: bsdasri => bsdasri.recipientCompanySiret
   },
   OPERATION: {
-    author: "operationSignatureAuthor", // changeme
+    author: "operationSignatureAuthor",
     date: "operationSignatureDate",
     eventType: BsdasriEventType.SignOperation,
     validationContext: { operationSignature: true },

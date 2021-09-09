@@ -150,8 +150,8 @@ export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
       processingOperation: bsdasri.processingOperation,
       processedAt: bsdasri.processedAt,
       signature: nullIfNoValues<BsdasriSignature>({
-        author: bsdasri.receptionSignatureAuthor,
-        date: bsdasri.receptionSignatureDate
+        author: bsdasri.operationSignatureAuthor,
+        date: bsdasri.operationSignatureDate
       })
     }),
     createdAt: bsdasri.createdAt,

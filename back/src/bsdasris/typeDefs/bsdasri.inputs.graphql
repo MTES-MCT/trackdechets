@@ -206,5 +206,5 @@ input BsdasriSignatureInput {
 
 input BsdasriSignatureWithSecretCodeInput {
   author: String!
-  securityCode: Int
+  securityCode: Int!
 }

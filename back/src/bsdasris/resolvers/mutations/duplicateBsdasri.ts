@@ -54,6 +54,7 @@ function duplicateBsdasri(
 
     isEmissionDirectTakenOver,
     isEmissionTakenOverWithSecretCode,
+    handedOverToTransporterAt,
 
     transporterWasteAcceptationStatus,
     transporterWasteRefusalReason,
@@ -64,7 +65,6 @@ function duplicateBsdasri(
     transporterWasteQuantityType,
     transporterWasteVolume,
     handedOverToRecipientAt,
-
     transportSignatoryId,
     transportSignatureDate,
     transportSignatureAuthor,
