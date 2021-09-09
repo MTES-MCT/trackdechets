@@ -219,6 +219,7 @@ passport.use(new ClientPasswordStrategy(verifyClient));
  * will be handled in resolvers
  */
 async function passportCallback(
+  err: Error,
   req: express.Request,
   next: express.NextFunction,
   user: Express.User,
@@ -226,11 +227,11 @@ async function passportCallback(
 ) {
   if (user) {
     req.logIn(user, { session: false }, null);
+    if (callback) {
+      await callback();
+    }
   }
-  if (callback) {
-    await callback();
-  }
-  next();
+  next(err);
 }
 
 /**
@@ -263,8 +264,8 @@ export const passportBearerMiddleware = (
     req,
     res,
     next,
-    passport.authenticate("bearer", { session: false }, (_err, user) => {
-      passportCallback(req, next, user);
+    passport.authenticate("bearer", { session: false }, (err, user) => {
+      passportCallback(err, req, next, user);
     })
   );
 };
@@ -285,9 +286,9 @@ export const passportJwtMiddleware = (
     req,
     res,
     next,
-    passport.authenticate("jwt", { session: false }, (_err, user, opts) => {
+    passport.authenticate("jwt", { session: false }, (err, user, opts) => {
       opts = opts ? opts : {};
-      passportCallback(req, next, user, () => {
+      passportCallback(err, req, next, user, () => {
         if (user && opts.token) {
           const token: string = opts.token;
           // save this token to the OAuth access token table
