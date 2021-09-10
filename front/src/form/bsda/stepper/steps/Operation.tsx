@@ -48,7 +48,7 @@ export default function Operation() {
           />
         </fieldset>
 
-        {!!["REFUSED", "PARTIALLY_REFUSED"].includes(
+        {["REFUSED", "PARTIALLY_REFUSED"].includes(
           values.destination?.reception?.acceptationStatus ?? ""
         ) ? (
           <div className="form__row">

@@ -62,12 +62,12 @@ type BsdaEmitter {
   "Établissement MOA/détenteur. Partiellement rempli si l'émetteur est en fait un particulier"
   company: FormCompany
   "Informations chantier (si différente de l'adresse de l'entreprise)"
-  worksite: BsdaWorksite
+  workSite: BsdaWorkSite
   "Déclaration générale"
   emission: BsdaEmission
 }
 
-type BsdaWorksite {
+type BsdaWorkSite {
   name: String
   address: String
   city: String

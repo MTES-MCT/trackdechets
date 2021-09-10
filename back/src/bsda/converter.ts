@@ -159,15 +159,15 @@ function flattenBsdaEmitterInput({ emitter }: Pick<BsdaInput, "emitter">) {
     ),
     emitterCompanyPhone: chain(emitter, e => chain(e.company, c => c.phone)),
     emitterCompanyMail: chain(emitter, e => chain(e.company, c => c.mail)),
-    emitterWorkSiteName: chain(emitter, e => chain(e.worksite, w => w.name)),
+    emitterWorkSiteName: chain(emitter, e => chain(e.workSite, w => w.name)),
     emitterWorkSiteAddress: chain(emitter, e =>
-      chain(e.worksite, w => w.address)
+      chain(e.workSite, w => w.address)
     ),
-    emitterWorkSiteCity: chain(emitter, e => chain(e.worksite, w => w.city)),
+    emitterWorkSiteCity: chain(emitter, e => chain(e.workSite, w => w.city)),
     emitterWorkSitePostalCode: chain(emitter, e =>
-      chain(e.worksite, w => w.postalCode)
+      chain(e.workSite, w => w.postalCode)
     ),
-    emitterWorkSiteInfos: chain(emitter, e => chain(e.worksite, w => w.infos))
+    emitterWorkSiteInfos: chain(emitter, e => chain(e.workSite, w => w.infos))
   };
 }
 

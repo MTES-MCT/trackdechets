@@ -67,7 +67,7 @@ export function SignOperation({ siret, bsdaId }: Props) {
                   destination: {
                     reception: {
                       date: null,
-                      acceptationStatus: null,
+                      acceptationStatus: "ACCEPTED",
                       refusalReason: "",
                       quantity: {
                         type: "REAL",

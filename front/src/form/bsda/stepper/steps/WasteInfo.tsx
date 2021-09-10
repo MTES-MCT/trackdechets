@@ -68,7 +68,7 @@ export function WasteInfo({ disabled }) {
 
       <div className="form__row">
         <label>
-          Mention au titre des règlements ADR/RID/ADN/IMDG (le cas échéant):
+          Mention au titre des règlements ADR/RID/ADN/IMDG (Optionnel):
           <Field
             disabled={disabled}
             type="text"

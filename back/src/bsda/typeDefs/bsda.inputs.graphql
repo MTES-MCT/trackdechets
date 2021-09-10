@@ -88,10 +88,10 @@ input BsdaEmitterInput {
   "Établissement MOA/détenteur. Partiellement rempli si l'émetteur est en fait un particulier"
   company: CompanyInput
   "Informations chantier (si différente de l'adresse de l'entreprise)"
-  worksite: BsdaWorksiteInput
+  workSite: BsdaWorkSiteInput
 }
 
-input BsdaWorksiteInput {
+input BsdaWorkSiteInput {
   name: String
   address: String
   city: String

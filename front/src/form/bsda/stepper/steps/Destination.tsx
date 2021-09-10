@@ -59,15 +59,23 @@ export function Destination({ disabled }) {
       </div>
 
       <div className="form__row">
-        <label>
-          Code D/R prévu:
-          <Field
-            disabled={disabled}
-            type="text"
-            name="destination.plannedOperationCode"
-            className="td-input td-input--medium"
-          />
-        </label>
+        <label>Opération d’élimination / valorisation prévue (code D/R)</label>
+        <Field
+          as="select"
+          name="destination.plannedOperationCode"
+          className="td-select"
+          disabled={disabled}
+        >
+          <option />
+          <option value="R 4">
+            R 4 - Recyclage ou récupération des métaux et des composés
+            métalliques
+          </option>
+          <option value="R 12">
+            R 12 - Échange de déchets en vue de les soumettre à l'une des
+            opérations numérotées R1 à R11
+          </option>
+        </Field>
       </div>
     </>
   );
