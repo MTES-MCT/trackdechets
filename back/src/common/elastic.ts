@@ -21,6 +21,57 @@ export interface BsdElastic {
   sirets: string[];
 }
 
+// Custom analyzers for readableId and waste fields
+// See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/analysis-ngram-tokenizer.html
+const settings = {
+  analysis: {
+    analyzer: {
+      // BSD-20210101-H7F59G71G => [bs, bsd, sd, 20, 201, ..., 20210101, ..., h7f59g71, hf59g71g]
+      readableId: {
+        tokenizer: "readableId_ngram",
+        filter: ["lowercase"]
+      },
+      // BSD-20210101-H7F59G71G => [bsd, 20210101, hf59g71g]
+      // H7F5 => [h7f5]
+      readableId_search: {
+        tokenizer: "readableId_char_group",
+        filter: ["lowercase"]
+      },
+      waste_text: {
+        tokenizer: "letter", // remove waste code from index
+        filter: ["lowercase", "asciifolding", "stemmer"]
+      },
+      // 01 01 01* => ["01", "01 ", "1 ", .. "01 01 01*"]
+      waste_ngram: {
+        tokenizer: "waste_ngram"
+      },
+      // accepts whatever text it is given and outputs the exact same text as a single term
+      waste_ngram_search: {
+        tokenizer: "keyword"
+      }
+    },
+    tokenizer: {
+      readableId_ngram: {
+        type: "ngram",
+        min_gram: 2,
+        max_gram: 9, // max token length is the random part of the readableId
+        token_chars: ["letter", "digit"] // split on "-"
+      },
+      readableId_char_group: {
+        type: "char_group",
+        tokenize_on_chars: ["whitespace", "-"]
+      },
+      waste_ngram: {
+        type: "ngram",
+        min_gram: 1, // allow to search on "*" to get dangerous waste only
+        max_gram: 9, // "xx xx xx*" is 9 char length
+        // do not include letter in `token_chars` to discard waste description from the index
+        token_chars: ["digit", "whitespace", "punctuation", "symbol"]
+      }
+    }
+  }
+};
+
 const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   // "keyword" is used for exact matches
   // "text" for fuzzy matches
@@ -31,6 +82,8 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   },
   readableId: {
     type: "text",
+    analyzer: "readableId",
+    search_analyzer: "readableId_search",
     fields: {
       keyword: {
         type: "keyword"
@@ -58,9 +111,15 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   },
   waste: {
     type: "text",
+    analyzer: "waste_text",
     fields: {
       keyword: {
         type: "keyword"
+      },
+      ngram: {
+        type: "text",
+        analyzer: "waste_ngram",
+        search_analyzer: "waste_ngram_search"
       }
     }
   },
@@ -101,7 +160,7 @@ export const index = {
   // The next major version of Elastic Search doesn't use "type" anymore
   // so while it's required for the current version, we are not using it too much
   type: "_doc",
-
+  settings,
   mappings: {
     properties
   }
