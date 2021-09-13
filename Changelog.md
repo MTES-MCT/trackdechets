@@ -363,6 +363,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Nouveaux éléments d'interface pour le BSDA (forumulaire de création & signatures) [947](https://github.com/MTES-MCT/trackdechets/pull/947)
+
 #### :boom: Breaking changes
 
 #### :bug: Corrections de bugs

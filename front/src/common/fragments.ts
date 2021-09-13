@@ -518,6 +518,18 @@ export const bsdaFragment = gql`
         siret
       }
     }
+    worker {
+      company {
+        name
+        siret
+      }
+    }
+    transporter {
+      company {
+        name
+        siret
+      }
+    }
     waste {
       materialName
     }

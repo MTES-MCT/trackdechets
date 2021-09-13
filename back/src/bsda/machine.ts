@@ -52,7 +52,7 @@ export const machine = Machine<never, Event>(
           OPERATION: [
             {
               target: BsdaStatus.REFUSED,
-              cond: "isBsvhuRefused"
+              cond: "isBsdaRefused"
             },
             {
               target: BsdaStatus.AWAITING_CHILD,
@@ -71,7 +71,7 @@ export const machine = Machine<never, Event>(
   },
   {
     guards: {
-      isBsvhuRefused: (_, event) =>
+      isBsdaRefused: (_, event) =>
         event.bsda?.destinationReceptionAcceptationStatus ===
         BsdaStatus.REFUSED,
       workerHasEmitterPaperSignature: (_, event) =>

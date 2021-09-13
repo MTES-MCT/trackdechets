@@ -51,6 +51,9 @@ type Bsda {
 
   "Précedents BSDA associés, constituant l'historique de traçabilité"
   associations: [BsdaAssociation]
+
+  "Metadata associées au bordereau"
+  metadata: BsdaMetadata!
 }
 
 type BsdaEmitter {
@@ -59,12 +62,12 @@ type BsdaEmitter {
   "Établissement MOA/détenteur. Partiellement rempli si l'émetteur est en fait un particulier"
   company: FormCompany
   "Informations chantier (si différente de l'adresse de l'entreprise)"
-  worksite: BsdaWorksite
+  workSite: BsdaWorkSite
   "Déclaration générale"
   emission: BsdaEmission
 }
 
-type BsdaWorksite {
+type BsdaWorkSite {
   name: String
   address: String
   city: String
@@ -222,4 +225,14 @@ type BsdaBroker {
   company: FormCompany
   "Récépissé courtier"
   recepisse: BsdaRecepisse
+}
+
+type BsdaMetadata {
+  errors: [BsdaError!]!
+}
+
+type BsdaError {
+  message: String!
+  path: String!
+  requiredFor: BsdaSignatureType!
 }

@@ -26,5 +26,11 @@ export const Bsda: BsdaResolvers = {
       totalQuantity: bsda.destinationReceptionQuantityValue,
       emissionDate: bsda.emitterEmissionSignatureDate
     }));
+  },
+  metadata: bsda => {
+    return {
+      id: bsda.id,
+      status: bsda.status
+    } as any;
   }
 };
