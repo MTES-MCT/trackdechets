@@ -19,15 +19,20 @@ export function WasteInfo({ disabled }) {
 
       <h4 className="form__section-heading">Description du déchet</h4>
       <div className="form__row">
-        <label>
-          Code déchet
-          <Field
-            disabled={disabled}
-            type="text"
-            name="waste.code"
-            className="td-input td-input--small"
-          />
-        </label>
+        <label>Code déchet</label>
+        <Field as="select" name="waste.code" className="td-select">
+          <option value="15 02 02*">15 02 02*</option>
+          <option value="16 01 11*">16 01 11*</option>
+          <option value="16 02 12*">16 02 12*</option>
+          <option value="17 01 06*">17 01 06*</option>
+          <option value="17 02 04*">17 02 04*</option>
+          <option value="17 03 01*">17 03 01*</option>
+          <option value="17 06 01*">17 06 01*</option>
+          <option value="17 06 03*">17 06 03*</option>
+          <option value="17 06 05*">17 06 05*</option>
+          <option value="17 08 01*">17 08 01*</option>
+          <option value="17 09 03*">17 09 03*</option>
+        </Field>
       </div>
 
       <div className="form__row">
