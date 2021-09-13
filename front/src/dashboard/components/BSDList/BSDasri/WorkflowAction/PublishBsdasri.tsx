@@ -2,6 +2,7 @@ import React from "react";
 import { Mutation, MutationPublishBsdasriArgs } from "generated/graphql/types";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { gql, useMutation } from "@apollo/client";
+import { BdasriSummary } from "dashboard/components/BSDList/BSDasri/Summary/BsdasriSummary";
 
 import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton } from "common/components";
@@ -48,6 +49,7 @@ export default function PublishBsdasri({ form, siret }: WorkflowActionProps) {
       )}
       modalContent={close => (
         <div>
+          <BdasriSummary bsdasri={form} />
           <p>
             Cette action aura pour effet de démarrer le cycle de vie du
             bordereau en le faisant apparaître dans l'onglet "À collecter" du

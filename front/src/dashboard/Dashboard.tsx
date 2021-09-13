@@ -19,8 +19,9 @@ import "./Dashboard.scss";
 import DashboardMenu from "./DashboardMenu";
 import Exports from "./exports/Exports";
 import { OnboardingSlideshow } from "./components/OnboardingSlideshow";
+import { ExtraSignatureType } from "dashboard/components/BSDList/BSDasri/types";
 
-import { Query } from "generated/graphql/types";
+import { Query, BsdasriSignatureType } from "generated/graphql/types";
 import Stats from "./stats/Stats";
 import { DisclaimerBanner } from "./DisclaimerBanner";
 import {
@@ -29,7 +30,8 @@ import {
   RouteBsdsFollow,
   RouteBsdsHistory,
 } from "./bsds";
-
+import { RouteBSDasrisSignEmissionSecretCode } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasriSecretCode";
+import { RouteSignBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
 import {
   RouteBSDasrisView,
   RouteBsvhusView,
@@ -60,6 +62,16 @@ export default function Dashboard() {
   const history = useHistory();
   const location = useLocation<{ background?: Location }>();
   const backgroundLocation = location.state?.background;
+  const toCollectDashboard = {
+    pathname: generatePath(routes.dashboard.transport.toCollect, {
+      siret,
+    }),
+  };
+  const actionDashboard = {
+    pathname: generatePath(routes.dashboard.bsds.act, {
+      siret,
+    }),
+  };
 
   if (data?.me == null) {
     return <Loader />;
@@ -163,6 +175,7 @@ export default function Dashboard() {
               })}
             />
           </Switch>
+
           {backgroundLocation && (
             <Switch location={location}>
               <Route path={routes.dashboard.bsdds.view}>
@@ -174,6 +187,70 @@ export default function Dashboard() {
                   wide={true}
                 >
                   <RouteBSDDsView />
+                </Modal>
+              </Route>
+              <Route path={routes.dashboard.bsdasris.sign.emissionSecretCode}>
+                <Modal
+                  onClose={() => history.push(toCollectDashboard)}
+                  ariaLabel="Signature producteur avec code de sécurité"
+                  isOpen
+                >
+                  <RouteBSDasrisSignEmissionSecretCode />
+                </Modal>
+              </Route>
+              <Route path={routes.dashboard.bsdasris.sign.directTakeover}>
+                <Modal
+                  onClose={() => history.push(toCollectDashboard)}
+                  ariaLabel="Emport direct transporteur"
+                  isOpen
+                >
+                  <RouteSignBsdasri
+                    UIsignatureType={ExtraSignatureType.DirectTakeover}
+                  />
+                </Modal>
+              </Route>
+              <Route path={routes.dashboard.bsdasris.sign.transporter}>
+                <Modal
+                  onClose={() => history.push(actionDashboard)}
+                  ariaLabel="Signature transporteur"
+                  isOpen
+                >
+                  <RouteSignBsdasri
+                    UIsignatureType={BsdasriSignatureType.Transport}
+                  />
+                </Modal>
+              </Route>
+              <Route path={routes.dashboard.bsdasris.sign.emission}>
+                <Modal
+                  onClose={() => history.push(actionDashboard)}
+                  ariaLabel="Signature producteur"
+                  isOpen
+                >
+                  <RouteSignBsdasri
+                    UIsignatureType={BsdasriSignatureType.Emission}
+                  />
+                </Modal>
+              </Route>
+              <Route path={routes.dashboard.bsdasris.sign.reception}>
+                <Modal
+                  onClose={() => history.push(actionDashboard)}
+                  ariaLabel="Signature réception"
+                  isOpen
+                >
+                  <RouteSignBsdasri
+                    UIsignatureType={BsdasriSignatureType.Reception}
+                  />
+                </Modal>
+              </Route>
+              <Route path={routes.dashboard.bsdasris.sign.operation}>
+                <Modal
+                  onClose={() => history.push(actionDashboard)}
+                  ariaLabel="Signature traitement"
+                  isOpen
+                >
+                  <RouteSignBsdasri
+                    UIsignatureType={BsdasriSignatureType.Operation}
+                  />
                 </Modal>
               </Route>
               <Route path={routes.dashboard.bsdasris.view}>
