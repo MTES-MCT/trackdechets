@@ -9,7 +9,7 @@ export default {
   emitter: {
     company: getInitialCompany(),
     isPrivateIndividual: false,
-    worksite: null,
+    workSite: null,
   },
   waste: {
     code: "",
