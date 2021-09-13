@@ -67,6 +67,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
         return (
           <>
             <ActionLink
+              className="tw-mb-1"
               icon={<IconCheckCircle1 size="24px" />}
               to={{
                 pathname: generatePath(
