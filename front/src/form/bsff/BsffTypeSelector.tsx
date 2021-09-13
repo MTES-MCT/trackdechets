@@ -5,9 +5,11 @@ import {
   Bsff,
   BsffFicheIntervention,
   BsffOperationCode,
-  BsffPackaging,
+  BsffPackagingInput,
+  BsffQuantityInput,
   BsffStatus,
   BsffType,
+  CompanyInput,
   Query,
   QueryBsffsArgs,
 } from "generated/graphql/types";
@@ -190,17 +192,91 @@ function PreviousBsffsPicker({
 
 export function BsffTypeSelector() {
   const [{ value: type }, , { setValue: setType }] = useField<BsffType>("type");
-  const [{ value: previousBsffs }, , { setValue: setPreviousBsffs }] = useField<
-    Bsff[]
-  >("previousBsffs");
   const [{ value: packagings }, , { setValue: setPackagings }] = useField<
-    BsffPackaging[]
+    BsffPackagingInput[]
   >("packagings");
+  const [, , { setValue: setEmitterCompany }] = useField<CompanyInput>(
+    "emitter.company"
+  );
+  const [, , { setValue: setQuantity }] = useField<BsffQuantityInput>(
+    "quantity"
+  );
   const [
     { value: ficheInterventions },
     ,
     { setValue: setFicheInterventions },
   ] = useField<BsffFicheIntervention[]>("ficheInterventions");
+  const [{ value: previousBsffs }, , { setValue: setPreviousBsffs }] = useField<
+    Bsff[]
+  >("previousBsffs");
+
+  // formik's value and callback are hardly memoizable
+  // so for now they are triggering useEffects too often
+  // that's why we are using a ref here
+  // it should be fixed in formik v3: https://github.com/formium/formik/issues/2268
+  const setters = React.useRef({
+    setEmitterCompany,
+    setQuantity,
+    setPackagings,
+  });
+  setters.current.setEmitterCompany = setEmitterCompany;
+  setters.current.setQuantity = setQuantity;
+  setters.current.setPackagings = setPackagings;
+
+  // When selecting the previous bsffs, prefill the fields with what we already know
+  React.useEffect(() => {
+    if (
+      [BsffType.TracerFluide, BsffType.CollectePetitesQuantites].includes(type)
+    ) {
+      return;
+    }
+
+    const firstPreviousBsffWithDestination = previousBsffs.find(
+      previousBsff => previousBsff.destination?.company?.siret
+    );
+    if (firstPreviousBsffWithDestination) {
+      const {
+        country,
+        ...company
+      } = firstPreviousBsffWithDestination.destination!.company!;
+      setters.current.setEmitterCompany(company);
+    }
+
+    if ([BsffType.Reexpedition, BsffType.Groupement].includes(type)) {
+      setters.current.setQuantity(
+        previousBsffs.reduce<BsffQuantityInput>(
+          (acc, previousBsff) => {
+            if (previousBsff.destination?.reception?.kilos) {
+              return {
+                ...acc,
+                kilos: acc.kilos + previousBsff.destination.reception.kilos,
+              };
+            }
+
+            if (previousBsff.quantity) {
+              return {
+                ...acc,
+                ...previousBsff.quantity,
+              };
+            }
+
+            return acc;
+          },
+          {
+            kilos: 0,
+            isEstimate: false,
+          }
+        )
+      );
+
+      setters.current.setPackagings(
+        previousBsffs.reduce<BsffPackagingInput[]>(
+          (acc, previousBsff) => acc.concat(previousBsff.packagings),
+          []
+        )
+      );
+    }
+  }, [type, previousBsffs]);
 
   return (
     <>

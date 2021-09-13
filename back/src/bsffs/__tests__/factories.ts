@@ -1,4 +1,4 @@
-import { SetRequired } from "type-fest";
+import type { SetRequired } from "type-fest";
 import { Prisma, TransportMode, BsffStatus, BsffType } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
@@ -15,7 +15,7 @@ export function createBsff(
   { emitter, transporter, destination }: CreateBsffArgs = {},
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
-  const data = {
+  const data: Prisma.BsffCreateInput = {
     id: getReadableId(ReadableIdPrefix.FF),
     type: BsffType.TRACER_FLUIDE,
     status: BsffStatus.INITIAL,
@@ -63,7 +63,9 @@ export function createBsffBeforeEmission(
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsff(args, {
+    isDraft: false,
     wasteCode: WASTE_CODES[0],
+    wasteAdr: "Mention ADR",
     wasteDescription: "Fluides",
     quantityKilos: 1,
     quantityIsEstimate: false,
@@ -90,7 +92,6 @@ export function createBsffBeforeTransport(
 ) {
   return createBsffAfterEmission(args, {
     packagings: [{ name: "BOUTEILLE 2L", numero: "01", kilos: 1 }],
-    wasteAdr: "Mention ADR",
     transporterTransportMode: TransportMode.ROAD,
     ...initialData
   });
@@ -112,7 +113,7 @@ export function createBsffBeforeReception(
   args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
-  return createBsffBeforeTransport(args, {
+  return createBsffAfterTransport(args, {
     destinationReceptionDate: new Date().toISOString(),
     destinationReceptionKilos: 1,
     ...initialData
@@ -147,10 +148,40 @@ export function createBsffAfterOperation(
   args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
-  return createBsffAfterReception(args, {
+  return createBsffBeforeOperation(args, {
     status: BsffStatus.PROCESSED,
     destinationOperationSignatureAuthor: args.destination.user.name,
     destinationOperationSignatureDate: new Date().toISOString(),
     ...initialData
   });
+}
+
+interface CreateFicheInterventionArgs {
+  operateur: UserWithCompany;
+  detenteur: UserWithCompany;
+}
+
+export function createFicheIntervention({
+  operateur,
+  detenteur
+}: CreateFicheInterventionArgs) {
+  const data: Prisma.BsffFicheInterventionCreateInput = {
+    operateurCompanyAddress: operateur.company.address,
+    operateurCompanyContact: operateur.user.name,
+    operateurCompanyMail: operateur.company.contactEmail,
+    operateurCompanyName: operateur.company.name,
+    operateurCompanyPhone: operateur.company.contactPhone,
+    operateurCompanySiret: operateur.company.siret,
+    detenteurCompanyAddress: detenteur.company.address,
+    detenteurCompanyContact: detenteur.user.name,
+    detenteurCompanyMail: detenteur.company.contactEmail,
+    detenteurCompanyName: detenteur.company.name,
+    detenteurCompanyPhone: detenteur.company.contactPhone,
+    detenteurCompanySiret: detenteur.company.siret,
+    postalCode: "75000",
+    kilos: 1,
+    numero: "123"
+  };
+
+  return prisma.bsffFicheIntervention.create({ data });
 }

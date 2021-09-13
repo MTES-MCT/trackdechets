@@ -5,7 +5,7 @@ import {
   flattenFicheInterventionBsffInput,
   unflattenFicheInterventionBsff
 } from "../../converter";
-import { ficheInterventionSchema } from "../../validation";
+import { validateFicheIntervention } from "../../validation";
 import { getFicheInterventionBsffOrNotFound } from "../../database";
 import { isFicheInterventionOperateur } from "../../permissions";
 
@@ -22,13 +22,13 @@ const updateFicheInterventionBsff: MutationResolvers["updateFicheInterventionBsf
   });
   await isFicheInterventionOperateur(user, existingFicheIntervention);
 
-  const newFicheInterventionData = {
+  const futureFicheIntervention = {
     ...existingFicheIntervention,
     ...ficheInterventionData
   };
-  await isFicheInterventionOperateur(user, newFicheInterventionData);
+  await isFicheInterventionOperateur(user, futureFicheIntervention);
 
-  await ficheInterventionSchema.validate(newFicheInterventionData);
+  await validateFicheIntervention(futureFicheIntervention);
 
   const updatedFicheIntervention = await prisma.bsffFicheIntervention.update({
     data: ficheInterventionData,

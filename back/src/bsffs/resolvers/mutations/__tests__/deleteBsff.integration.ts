@@ -124,9 +124,15 @@ describe("Mutation.deleteBsff", () => {
 
   it("should disallow deleting a bsff with a signature", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
     const { mutate } = makeClient(emitter.user);
 
-    const bsff = await createBsffAfterEmission({ emitter });
+    const bsff = await createBsffAfterEmission({
+      emitter,
+      transporter,
+      destination
+    });
     const { errors } = await mutate<
       Pick<Mutation, "deleteBsff">,
       MutationDeleteBsffArgs

@@ -6,7 +6,7 @@ import {
   unflattenFicheInterventionBsff
 } from "../../converter";
 import { isFicheInterventionOperateur } from "../../permissions";
-import { ficheInterventionSchema } from "../../validation";
+import { validateFicheIntervention } from "../../validation";
 
 const createFicheInterventionBsff: MutationResolvers["createFicheInterventionBsff"] = async (
   _,
@@ -15,15 +15,13 @@ const createFicheInterventionBsff: MutationResolvers["createFicheInterventionBsf
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const ficheInterventionData = flattenFicheInterventionBsffInput(input);
-  await isFicheInterventionOperateur(user, ficheInterventionData);
+  const flatInput = flattenFicheInterventionBsffInput(input);
+  await isFicheInterventionOperateur(user, flatInput);
 
-  await ficheInterventionSchema.validate(ficheInterventionData, {
-    abortEarly: false
-  });
+  await validateFicheIntervention(flatInput);
 
   const ficheIntervention = await prisma.bsffFicheIntervention.create({
-    data: ficheInterventionData
+    data: flatInput
   });
 
   return unflattenFicheInterventionBsff(ficheIntervention);
