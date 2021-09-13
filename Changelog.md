@@ -21,7 +21,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - L'emport direct de dasris (sans signature producteur) est limité aux bordereaux simples (hors regroupement) [972](https://github.com/MTES-MCT/trackdechets/pull/972)
 - Sur l'interface Trackdéchets, les champs se pré-remplissent désormais lors d'un groupement, réexpédition ou reconditionnement d'un BSFF [PR 971](https://github.com/MTES-MCT/trackdechets/pull/971).
-- La validation du groupement, réexpédition et reconditionnement d'un BSFF a été renforcée [PR 971](https://github.com/MTES-MCT/trackdechets/pull/971).
+- La validation du groupement, réexpédition et reconditionnement d'un BSFF a été renforcée [PR 971](https://github.com/MTES-MCT/trackdechets/pull/97
+- Améliorations des filtres sur les champs "Numéro de BSD" et "Déchet" dans le tableau de bord de l'interface Trackdéchets [PR 983](https://github.com/MTES-MCT/trackdechets/pull/983)
+
 
 #### :memo: Documentation
 

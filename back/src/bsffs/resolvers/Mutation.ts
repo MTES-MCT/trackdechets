@@ -1,5 +1,5 @@
 import { MutationResolvers } from "../../generated/graphql/types";
-import createBsff from "./mutations/createBsff";
+import createBsffResolver from "./mutations/createBsff";
 import createDraftBsff from "./mutations/createDraftBsff";
 import publishBsff from "./mutations/publishBsff";
 import updateBsff from "./mutations/updateBsff";
@@ -9,7 +9,7 @@ import updateFicheInterventionBsff from "./mutations/updateFicheInterventionBsff
 import signBsff from "./mutations/signBsff";
 
 export const Mutation: MutationResolvers = {
-  createBsff,
+  createBsff: createBsffResolver,
   createDraftBsff,
   publishBsff,
   updateBsff,

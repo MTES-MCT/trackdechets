@@ -42,7 +42,10 @@ import prisma from "../../prisma";
     console.log(`Creating the new index "${newIndex}".`);
     await client.indices.create({
       index: newIndex,
-      body: { mappings: { [index.type]: index.mappings } }
+      body: {
+        mappings: { [index.type]: index.mappings },
+        settings: index.settings
+      }
     });
 
     if (statusCode === 404) {

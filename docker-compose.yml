@@ -1,8 +1,7 @@
-version: "3.7"
 services:
   postgres:
     image: postgres:10.5
-    restart: always
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     environment:
       POSTGRES_USER: trackdechets
       POSTGRES_PASSWORD: password
@@ -13,7 +12,7 @@ services:
 
   redis:
     image: redis:5.0-alpine
-    restart: always
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     sysctls:
       - net.core.somaxconn=511
     ports:
@@ -21,6 +20,7 @@ services:
 
   td-api:
     image: td-api
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     build:
       context: ./back
       dockerfile: Dockerfile.dev
@@ -33,29 +33,26 @@ services:
       - .env
     environment:
       NODE_ENV: dev
-      SIB_BASE_URL: "http://mailservice"
-      DATABASE_URL: "postgresql://trackdechets:password@postgres:5432/prisma"
-      REDIS_URL: "redis:6379"
-      API_PORT: "4000"
     ports:
       - "4000:$API_PORT"
 
   td-ui:
     stdin_open: true
     image: node:14.15.4
-    container_name: td-ui
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     working_dir: /usr/src/front
     command: sh -c "npm install && npm run dev"
     expose:
       - "3000"
     volumes:
-      - ./front/:/usr/src/front
-      - ./back/:/usr/src/back
+      - ./front:/usr/src/front
+      - ./back/src:/usr/src/back/src
     ports:
       - "3000:3000"
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.8.0
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - discovery.type=single-node
@@ -74,6 +71,7 @@ services:
 
   kibana:
     image: docker.elastic.co/kibana/kibana:6.8.0
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     ports:
       - "5601:5601"
     environment:
@@ -82,6 +80,7 @@ services:
 
   nginx:
     image: nginx:1.19.6
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     network_mode: $NGINX_NETWORK_MODE
     volumes:
       - ./nginx/templates:/etc/nginx/templates

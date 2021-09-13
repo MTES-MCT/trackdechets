@@ -3,7 +3,8 @@ import { BsvhuResolvers } from "../../generated/graphql/types";
 const bsvhuResolvers: BsvhuResolvers = {
   metadata: bsvhu => {
     return {
-      id: bsvhu.id
+      id: bsvhu.id,
+      status: bsvhu.status
     } as any;
   }
 };
