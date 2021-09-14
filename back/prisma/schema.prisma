@@ -866,7 +866,8 @@ model Bsff {
 
   destinationReceptionDate    DateTime?
   destinationReceptionKilos   Float?
-  destinationReceptionRefusal String?
+  destinationReceptionAcceptationStatus WasteAcceptationStatus?
+  destinationReceptionRefusalReason String?
 
   destinationReceptionSignatureAuthor String?
   destinationReceptionSignatureDate   DateTime?
