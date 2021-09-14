@@ -121,8 +121,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         address: form.brokerCompanyAddress,
         contact: form.brokerCompanyContact,
         phone: form.brokerCompanyPhone,
-        mail: form.brokerCompanyMail,
-        vatNumber: form.brokerCompanyVatNumber
+        mail: form.brokerCompanyMail
       }),
       recepisse: nullIfNoValues<BsdaRecepisse>({
         department: form.brokerRecepisseDepartment,
