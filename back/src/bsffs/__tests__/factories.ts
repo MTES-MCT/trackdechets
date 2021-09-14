@@ -1,5 +1,11 @@
 import type { SetRequired } from "type-fest";
-import { Prisma, TransportMode, BsffStatus, BsffType } from "@prisma/client";
+import {
+  Prisma,
+  TransportMode,
+  BsffStatus,
+  BsffType,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
 import { UserWithCompany } from "../../__tests__/factories";
@@ -116,6 +122,19 @@ export function createBsffBeforeReception(
   return createBsffAfterTransport(args, {
     destinationReceptionDate: new Date().toISOString(),
     destinationReceptionKilos: 1,
+    destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
+    ...initialData
+  });
+}
+
+export function createBsffBeforeRefusal(
+  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
+  initialData: Partial<Prisma.BsffCreateInput> = {}
+) {
+  return createBsffAfterTransport(args, {
+    destinationReceptionDate: new Date().toISOString(),
+    destinationReceptionKilos: 0,
+    destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
     ...initialData
   });
 }
@@ -125,9 +144,11 @@ export function createBsffAfterReception(
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffBeforeReception(args, {
-    status: initialData.destinationReceptionRefusal
-      ? BsffStatus.REFUSED
-      : BsffStatus.RECEIVED,
+    status:
+      initialData.destinationReceptionAcceptationStatus ===
+      WasteAcceptationStatus.ACCEPTED
+        ? BsffStatus.RECEIVED
+        : BsffStatus.REFUSED,
     destinationReceptionSignatureAuthor: args.destination.user.name,
     destinationReceptionSignatureDate: new Date().toISOString(),
     ...initialData

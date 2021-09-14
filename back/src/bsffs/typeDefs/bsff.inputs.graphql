@@ -104,7 +104,8 @@ input BsffDestinationInput {
 input BsffDestinationReceptionInput {
   date: DateTime!
   kilos: Float!
-  refusal: String
+  acceptationStatus: BsffAcceptationStatus!
+  refusalReason: String
 }
 
 input BsffDestinationPlannedOperationInput {

@@ -16,7 +16,8 @@ import {
   createBsffBeforeTransport,
   createBsffBeforeReception,
   createBsffAfterTransport,
-  createBsffBeforeOperation
+  createBsffBeforeOperation,
+  createBsffBeforeRefusal
 } from "../../../__tests__/factories";
 
 const SIGN = `
@@ -337,6 +338,32 @@ describe("Mutation.signBsff", () => {
   describe("RECEPTION", () => {
     it("should allow destination to sign reception", async () => {
       const bsff = await createBsffBeforeReception({
+        emitter,
+        transporter,
+        destination
+      });
+
+      const { mutate } = makeClient(destination.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "signBsff">,
+        MutationSignBsffArgs
+      >(SIGN, {
+        variables: {
+          id: bsff.id,
+          type: "RECEPTION",
+          signature: {
+            date: new Date().toISOString() as any,
+            author: destination.user.name
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.signBsff.id).toBeTruthy();
+    });
+
+    it("should allow destination to sign refusal", async () => {
+      const bsff = await createBsffBeforeRefusal({
         emitter,
         transporter,
         destination
