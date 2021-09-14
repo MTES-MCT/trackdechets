@@ -6,7 +6,8 @@ import {
   TransportMode,
   BsffFicheIntervention,
   BsffStatus,
-  BsffType
+  BsffType,
+  WasteAcceptationStatus
 } from "@prisma/client";
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { OPERATION, WASTE_CODES } from "./constants";
@@ -435,10 +436,40 @@ const beforeReceptionSchema: yup.SchemaOf<Pick<
     .date()
     .nullable()
     .required("La date de réception du déchet est requise") as any, // https://github.com/jquense/yup/issues/1302
+  destinationReceptionAcceptationStatus: yup
+    .mixed<WasteAcceptationStatus>()
+    .required()
+    .oneOf(
+      [WasteAcceptationStatus.ACCEPTED, WasteAcceptationStatus.REFUSED],
+      "Le refus partiel n'est pas autorisé dans le cas d'un BSFF"
+    ),
   destinationReceptionKilos: yup
     .number()
     .nullable()
     .required("Le poids en kilos du déchet reçu est requis")
+    .when(
+      "destinationReceptionAcceptationStatus",
+      (acceptationStatus, schema) =>
+        acceptationStatus == WasteAcceptationStatus.REFUSED
+          ? schema.test(
+              "is-zero",
+              "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé",
+              v => v === 0
+            )
+          : schema
+    )
+    // if waste is accepted, we check it is a positive value
+    .when(
+      "destinationReceptionAcceptationStatus",
+      (acceptationStatus, schema) =>
+        acceptationStatus == WasteAcceptationStatus.ACCEPTED
+          ? schema.test(
+              "is-strictly-positive",
+              "Vous devez saisir une quantité reçue supérieure à 0.",
+              v => v > 0
+            )
+          : schema
+    )
 });
 
 export function validateBeforeReception(

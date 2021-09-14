@@ -67,7 +67,8 @@ export function flattenBsffInput(
 
     destinationReceptionDate: bsffInput.destination?.reception?.date,
     destinationReceptionKilos: bsffInput.destination?.reception?.kilos,
-    destinationReceptionRefusal: bsffInput.destination?.reception?.refusal,
+    destinationReceptionRefusalReason:
+      bsffInput.destination?.reception?.refusalReason,
 
     destinationPlannedOperationCode:
       bsffInput.destination?.plannedOperation?.code,
@@ -160,7 +161,8 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
       reception: nullIfNoValues<GraphQL.BsffReception>({
         date: prismaBsff.destinationReceptionDate,
         kilos: prismaBsff.destinationReceptionKilos,
-        refusal: prismaBsff.destinationReceptionRefusal,
+        acceptationStatus: prismaBsff.destinationReceptionAcceptationStatus,
+        refusalReason: prismaBsff.destinationReceptionRefusalReason,
         signature: nullIfNoValues<GraphQL.Signature>({
           author: prismaBsff.destinationReceptionSignatureAuthor,
           date: prismaBsff.destinationReceptionSignatureDate

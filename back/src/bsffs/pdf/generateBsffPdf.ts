@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs/promises";
 import mustache from "mustache";
 import { format } from "date-fns";
-import { Bsff, BsffType } from "@prisma/client";
+import { Bsff, BsffType, WasteAcceptationStatus } from "@prisma/client";
 import * as QRCode from "qrcode";
 import prisma from "../../prisma";
 import { BsffPackaging } from "../../generated/graphql/types";
@@ -85,9 +85,13 @@ export async function generateBsffPdf(bsff: Bsff) {
       )
       .join(", "),
     receptionAccepted:
-      !!bsff.destinationReceptionDate && !bsff.destinationReceptionRefusal,
+      !!bsff.destinationReceptionDate &&
+      bsff.destinationReceptionAcceptationStatus ===
+        WasteAcceptationStatus.ACCEPTED,
     recepetionRefused:
-      !!bsff.destinationReceptionDate && !!bsff.destinationReceptionRefusal,
+      !!bsff.destinationReceptionDate &&
+      bsff.destinationReceptionAcceptationStatus ===
+        WasteAcceptationStatus.REFUSED,
     ficheInterventions: [
       ...ficheInterventions,
 

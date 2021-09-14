@@ -77,7 +77,8 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       "destinationCap",
       "destinationReceptionDate",
       "destinationReceptionKilos",
-      "destinationReceptionRefusal"
+      "destinationReceptionAcceptationStatus",
+      "destinationReceptionRefusalReason"
     ]);
   }
 
