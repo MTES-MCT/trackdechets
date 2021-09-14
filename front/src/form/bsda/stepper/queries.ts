@@ -18,6 +18,13 @@ export const FullBsdaFragment = gql`
           date
         }
       }
+      workSite {
+        address
+        city
+        infos
+        name
+        postalCode
+      }
     }
     destination {
       cap
@@ -81,6 +88,11 @@ export const FullBsdaFragment = gql`
       company {
         ...CompanyFragment
       }
+      recepisse {
+        number
+        department
+        validityLimit
+      }
     }
     transporter {
       company {
@@ -93,6 +105,9 @@ export const FullBsdaFragment = gql`
         validityLimit
       }
       transport {
+        mode
+        plates
+        takenOverAt
         signature {
           author
           date

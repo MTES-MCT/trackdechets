@@ -42,12 +42,10 @@ export default {
       validityLimit: null,
     },
     transport: {
+      takenOverAt: null,
       plates: [],
       mode: TransportMode.Road,
     },
-  },
-  broker: {
-    company: getInitialCompany(),
   },
   destination: {
     cap: "",

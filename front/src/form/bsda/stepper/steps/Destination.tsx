@@ -67,14 +67,17 @@ export function Destination({ disabled }) {
           disabled={disabled}
         >
           <option />
-          <option value="R 4">
-            R 4 - Recyclage ou récupération des métaux et des composés
-            métalliques
+          <option value="D 5">
+            D 5 - Mise en décharge aménagée et autorisée en ISDD
           </option>
-          <option value="R 12">
-            R 12 - Échange de déchets en vue de les soumettre à l'une des
-            opérations numérotées R1 à R11
+          <option value="D 5">
+            D 5 - Mise en décharge aménagée et autorisée en ISDND
           </option>
+          <option value="D 9">D 9 - Vitrification</option>
+          <option value="D 9">D 9 - Traitement chimique</option>
+          <option value="D 9">D 9 - Prétraitement</option>
+          <option value="D 13">D 13 - Groupement de déchets</option>
+          <option value="D 15">D 15 - Entreposage provisoire</option>
         </Field>
       </div>
     </>
