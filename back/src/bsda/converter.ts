@@ -16,7 +16,9 @@ import {
   BsdaTransport,
   BsdaRecepisse,
   BsdaInput,
-  BsdaWork
+  BsdaWork,
+  BsdaBroker,
+  BsdaWorkSite
 } from "../generated/graphql/types";
 import { Prisma, Bsda as PrismaBsda } from "@prisma/client";
 
@@ -29,6 +31,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
     status: form.status,
     type: form.type,
     emitter: nullIfNoValues<BsdaEmitter>({
+      isPrivateIndividual: form.emitterIsPrivateIndividual,
       company: nullIfNoValues<FormCompany>({
         name: form.emitterCompanyName,
         siret: form.emitterCompanySiret,
@@ -42,6 +45,13 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
           author: form.emitterEmissionSignatureAuthor,
           date: form.emitterEmissionSignatureDate
         })
+      }),
+      workSite: nullIfNoValues<BsdaWorkSite>({
+        address:form.emitterWorkSiteAddress,
+        city:form.emitterWorkSiteCity,
+        infos:form.emitterWorkSiteInfos,
+        name:form.emitterWorkSiteName,
+        postalCode:form.emitterWorkSitePostalCode
       })
     }),
     packagings: form.packagings as BsdaPackaging[],
@@ -104,6 +114,22 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         })
       })
     }),
+    broker: nullIfNoValues<BsdaBroker>({
+      company: nullIfNoValues<FormCompany>({
+        name: form.brokerCompanyName,
+        siret: form.brokerCompanySiret,
+        address: form.brokerCompanyAddress,
+        contact: form.brokerCompanyContact,
+        phone: form.brokerCompanyPhone,
+        mail: form.brokerCompanyMail,
+        vatNumber: form.brokerCompanyVatNumber
+      }),
+      recepisse: nullIfNoValues<BsdaRecepisse>({
+        department: form.brokerRecepisseDepartment,
+        number: form.brokerRecepisseNumber,
+        validityLimit: form.brokerRecepisseValidityLimit
+      }),
+    }),
     transporter: nullIfNoValues<BsdaTransporter>({
       company: nullIfNoValues<FormCompany>({
         name: form.transporterCompanyName,
@@ -120,6 +146,9 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         validityLimit: form.transporterRecepisseValidityLimit
       }),
       transport: nullIfNoValues<BsdaTransport>({
+        mode: form.transporterTransportMode,
+        plates: form.transporterTransportPlates,
+        takenOverAt: form.transporterTransportTakenOverAt,
         signature: nullIfNoValues<Signature>({
           author: form.transporterTransportSignatureAuthor,
           date: form.transporterTransportSignatureDate
