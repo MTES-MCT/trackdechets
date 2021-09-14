@@ -47,11 +47,11 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         })
       }),
       workSite: nullIfNoValues<BsdaWorkSite>({
-        address:form.emitterWorkSiteAddress,
-        city:form.emitterWorkSiteCity,
-        infos:form.emitterWorkSiteInfos,
-        name:form.emitterWorkSiteName,
-        postalCode:form.emitterWorkSitePostalCode
+        address: form.emitterWorkSiteAddress,
+        city: form.emitterWorkSiteCity,
+        infos: form.emitterWorkSiteInfos,
+        name: form.emitterWorkSiteName,
+        postalCode: form.emitterWorkSitePostalCode
       })
     }),
     packagings: form.packagings as BsdaPackaging[],
@@ -128,7 +128,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         department: form.brokerRecepisseDepartment,
         number: form.brokerRecepisseNumber,
         validityLimit: form.brokerRecepisseValidityLimit
-      }),
+      })
     }),
     transporter: nullIfNoValues<BsdaTransporter>({
       company: nullIfNoValues<FormCompany>({
