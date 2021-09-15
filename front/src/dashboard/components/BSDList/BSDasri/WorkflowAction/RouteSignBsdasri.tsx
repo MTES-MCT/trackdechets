@@ -136,13 +136,17 @@ export function RouteSignBsdasri({
     }),
   };
 
+  const formState = prefillWasteDetails(
+    getComputedState(getInitialState(), bsdasri)
+  );
+
   return (
     <div>
       <h2 className="td-modal-title">{config.label}</h2>
       <BdasriSummary bsdasri={bsdasri} />
       <Formik
         initialValues={{
-          ...prefillWasteDetails(getComputedState(getInitialState(), bsdasri)),
+          ...formState,
           signature: { author: "" },
         }}
         validationSchema={() => signatureValidationSchema(bsdasri)}

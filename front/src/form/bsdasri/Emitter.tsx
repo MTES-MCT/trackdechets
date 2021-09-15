@@ -6,13 +6,12 @@ import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import Packagings from "./components/packagings/Packagings";
 import "./Bsdasri.scss";
 import {
-  getInitialEmitterWorkSite,
-  getInitialQuantityFn,
+  getInitialEmitterPickupSiteFn,
+  getInitialWeightFn,
 } from "./utils/initial-state";
-import WorkSite from "form/common/components/work-site/WorkSite";
-import DateInput from "form/common/components/custom-inputs/DateInput";
+import PickupSite from "form/common/components/pickup-site/PickupSite";
 
-import QuantityWidget from "./components/Quantity";
+import WeightWidget from "./components/Weight";
 
 import { FillFieldsInfo, DisabledFieldsInfo } from "./utils/commons";
 import classNames from "classnames";
@@ -45,7 +44,7 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
   const { values } = useFormikContext<Bsdasri>();
   const { siret } = useParams<{ siret: string }>();
   const isUserCurrentEmitter = values?.emitter?.company?.siret === siret;
-
+  console.log(values);
   return (
     <>
       {emissionEmphasis && <FillFieldsInfo />}
@@ -81,12 +80,12 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
         />
       </div>
 
-      <WorkSite
+      <PickupSite
         disabled={disabled}
         switchLabel="Je souhaite ajouter une adresse de collecte ou d'enlèvement"
         headingTitle="Adresse d'enlèvement"
         designation="du site d'enlèvement"
-        getInitialEmitterWorkSiteFn={getInitialEmitterWorkSite}
+        getInitialEmitterPickupSiteFn={getInitialEmitterPickupSiteFn}
       />
 
       <div className="form__row">
@@ -113,14 +112,14 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
         <fieldset>
           <legend className="tw-font-semibold">Code déchet</legend>
           <Field
-            name="emission.wasteCode"
+            name="waste.code"
             id="18 01 03*"
             label="18 01 03* DASRI d'origine humaine"
             component={RadioButton}
             disabled={disabled}
           />
           <Field
-            name="emission.wasteCode"
+            name="waste.code"
             id="18 01 02*"
             label="18 01 02* DASRI d'origine animale"
             component={RadioButton}
@@ -129,7 +128,7 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
         </fieldset>
       </div>
       {isRegrouping && isUserCurrentEmitter && (
-        <BsdasriSelector name="regroupedBsdasris" />
+        <BsdasriSelector name="grouping" />
       )}
       <h4 className="form__section-heading">Conditionnement</h4>
       <div
@@ -138,7 +137,7 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
         })}
       >
         <Field
-          name="emission.wasteDetails.packagingInfos"
+          name="emitter.emission.packagingInfos"
           component={Packagings}
           disabled={disabled}
         />
@@ -149,11 +148,11 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
           "field-emphasis": emissionEmphasis,
         })}
       >
-        <QuantityWidget
+        <WeightWidget
           disabled={disabled}
-          switchLabel="Je souhaite ajouter une quantité"
-          dasriSection="emission"
-          getInitialQuantityFn={getInitialQuantityFn}
+          switchLabel="Je souhaite ajouter un poids"
+          dasriPath="emitter.emission"
+          getInitialWeightFn={getInitialWeightFn}
         />
       </div>
       <div
@@ -166,12 +165,12 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
           <Field
             disabled={disabled}
             type="text"
-            name="emission.wasteDetails.onuCode"
+            name="waste.adr"
             className="td-input"
           />
         </label>
 
-        <RedErrorMessage name="emission.wasteDetails.onuCode" />
+        <RedErrorMessage name="waste.adr" />
       </div>
 
       <div className="form__row">
@@ -183,24 +182,6 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
             name="emitter.customInfo"
             className="td-textarea"
           />
-        </label>
-      </div>
-
-      <div
-        className={classNames("form__row", {
-          "field-emphasis": emissionEmphasis,
-        })}
-      >
-        <label>
-          Date de remise au collecteur transporteur
-          <div className="td-date-wrapper">
-            <Field
-              name="emission.handedOverAt"
-              component={DateInput}
-              className="td-input"
-              disabled={disabled}
-            />
-          </div>
         </label>
       </div>
     </>

@@ -42,7 +42,7 @@ export default function FormContainer({
             // Use a tweaked emitter component when creating or updating a grouping bsdasri
             const emitterComponent =
               bsdasriFormType === "bsdasriRegroup" ||
-              bsdasri?.bsdasriType === "GROUPING"
+              bsdasri?.type === "GROUPING"
                 ? RegroupingEmitter
                 : Emitter;
 

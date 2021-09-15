@@ -1,7 +1,7 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getBsdasriOrNotFound } from "../../database";
-import { expandBsdasriFromDb } from "../../dasri-converter";
+import { unflattenBsdasri } from "../../converter";
 import { validateBsdasri } from "../../validation";
 import {
   checkIsBsdasriContributor,
@@ -16,9 +16,9 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
-  const { regroupedBsdasris, ...bsdasri } = await getBsdasriOrNotFound({
+  const { grouping, ...bsdasri } = await getBsdasriOrNotFound({
     id,
-    includeRegrouped: true
+    includeGrouped: true
   });
   await checkIsBsdasriContributor(
     user,
@@ -28,7 +28,7 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
   await checkIsBsdasriPublishable(
     user,
     bsdasri,
-    regroupedBsdasris.map(el => el.id)
+    grouping.map(el => el.id)
   );
 
   await validateBsdasri(bsdasri, { emissionSignature: true });
@@ -37,8 +37,8 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
     where: { id: bsdasri.id },
     data: { isDraft: false }
   });
-  const expandedDasri = expandBsdasriFromDb(publishedBsdasri);
-  await indexBsdasri(publishedBsdasri, context);
+  const expandedDasri = unflattenBsdasri(publishedBsdasri);
+  await indexBsdasri(publishedBsdasri);
   return expandedDasri;
 };
 

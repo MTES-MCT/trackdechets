@@ -28,27 +28,25 @@ export function BsdasriWasteSummary({ bsdasri }: BsdasriWasteSummaryProps) {
       </DataListItem>
       <DataListItem>
         <DataListTerm>Code déchet</DataListTerm>
-        <DataListDescription>
-          {bsdasri?.emission?.wasteCode}
-        </DataListDescription>
+        <DataListDescription>{bsdasri?.waste?.code}</DataListDescription>
       </DataListItem>
       <DataListItem>
         <DataListTerm>Code traitement</DataListTerm>
         <DataListDescription>
-          {bsdasri?.operation?.processingOperation || "Non renseigné"}
+          {bsdasri?.destination?.operation?.code || "Non renseigné"}
         </DataListDescription>
       </DataListItem>
       <DataListItem>
         <DataListTerm>Volume</DataListTerm>
         <DataListDescription>
-          {bsdasri?.[section]?.wasteDetails?.volume} litres
+          {bsdasri?.[section]?.volume} litres
         </DataListDescription>
       </DataListItem>
       <DataListItem>
         <DataListTerm>Contenant(s)</DataListTerm>
         <DataListDescription>
-          {!!bsdasri[section]?.wasteDetails?.packagingInfos?.length &&
-            bsdasri[section]?.wasteDetails?.packagingInfos
+          {!!bsdasri[section]?.packagingInfos?.length &&
+            bsdasri[section]?.packagingInfos
               .map(
                 packaging =>
                   `${packaging.quantity}  ${packaging.other} ${packaging.type} (${packaging.volume} litre(s))`

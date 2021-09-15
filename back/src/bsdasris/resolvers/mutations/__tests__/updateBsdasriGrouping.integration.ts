@@ -7,39 +7,37 @@ import { BsdasriStatus } from "@prisma/client";
 import { Mutation } from "../../../../generated/graphql/types";
 
 const UPDATE_DASRI = `
-mutation UpdateDasri($id: ID!, $input: BsdasriUpdateInput!) {
+mutation UpdateDasri($id: ID!, $input: BsdasriInput!) {
   updateBsdasri(id: $id, input: $input) {
     id
     status
-    bsdasriType
+    type
     emitter {
        company {
           mail
         }
       }
-    regroupedBsdasris
+      grouping { id }
   }
 }`;
 describe("Mutation.updateBsdasri", () => {
   afterEach(resetDatabase);
 
-  it("should set dasri type to GROUPING when regrouping", async () => {
+  it("should set dasri type to GROUPING when grouping", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
         set: ["COLLECTOR"]
       }
     });
     const toRegroup = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         status: BsdasriStatus.PROCESSED,
         emitterCompanySiret: "1234",
-        recipientCompanySiret: company.siret,
-        processingOperation: "R1"
+        destinationCompanySiret: company.siret,
+        destinationOperationCode: "R1"
       }
     });
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         status: BsdasriStatus.INITIAL,
         emitterCompanySiret: company.siret
@@ -53,12 +51,13 @@ describe("Mutation.updateBsdasri", () => {
       {
         variables: {
           id: dasri.id,
-          input: { regroupedBsdasris: [{ id: toRegroup.id }] }
+          input: { grouping: [toRegroup.id] }
         }
       }
     );
-    expect(data.updateBsdasri.regroupedBsdasris).toEqual([toRegroup.id]);
-    expect(data.updateBsdasri.bsdasriType).toEqual("GROUPING");
+
+    expect(data.updateBsdasri.grouping).toEqual([{ id: toRegroup.id }]);
+    expect(data.updateBsdasri.type).toEqual("GROUPING");
   });
 
   it("should set dasri type to SIMPLE when ungrouping", async () => {
@@ -69,11 +68,10 @@ describe("Mutation.updateBsdasri", () => {
     });
 
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         status: BsdasriStatus.INITIAL,
         emitterCompanySiret: company.siret,
-        bsdasriType: "GROUPING"
+        type: "GROUPING"
       }
     });
 
@@ -84,11 +82,11 @@ describe("Mutation.updateBsdasri", () => {
       {
         variables: {
           id: dasri.id,
-          input: { regroupedBsdasris: null }
+          input: { grouping: null }
         }
       }
     );
-    expect(data.updateBsdasri.regroupedBsdasris).toEqual([]);
-    expect(data.updateBsdasri.bsdasriType).toEqual("SIMPLE");
+    expect(data.updateBsdasri.grouping).toEqual([]);
+    expect(data.updateBsdasri.type).toEqual("SIMPLE");
   });
 });

@@ -1,42 +1,37 @@
 type Mutation {
   """
-  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
   Crée un nouveau dasri en brouillon
   """
   createDraftBsdasri(
     "Payload de création d'un dasri brouillon"
-    input: BsdasriCreateInput!
+    input: BsdasriInput!
   ): Bsdasri!
 
   """
-  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
   Crée un nouveau dasri
   """
   createBsdasri(
     "Payload de création d'un dasri"
-    input: BsdasriCreateInput!
+    input: BsdasriInput!
   ): Bsdasri!
 
   """
-  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
-  Met à jour un dasri existant
+  Met à jour un dasri existant.
   Par défaut, tous les champs sont modifiables.
   """
   updateBsdasri(
     "Identifiant unique du bordereau"
     id: ID!
     "Payload de mise à jour d'un dasri"
-    input: BsdasriUpdateInput!
+    input: BsdasriInput!
   ): Bsdasri!
 
   """
-  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
   Marque un dasri brouillon comme publié (isDraft=false)
   """
   publishBsdasri("ID d'un Bsdasri" id: ID!): Bsdasri
 
   """
-  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
   Appose une signature sur un Bsdasri, verrouille les cadres correspondant
 
   Une signature ne peut être apposée que par un membre de l'entreprise figurant sur le cadre concerné
@@ -48,7 +43,6 @@ type Mutation {
   signBsdasri(id: ID!, input: BsdasriSignatureInput!): Bsdasri
 
   """
-  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
   Appose une signature de type EMISSION via un compte n'appartenant pas à l'émetteur.
   Permet de signer un enlèvement sur le device transporteur grâce au code de sécurité de l'émetteur du dasri
   """
@@ -57,13 +51,11 @@ type Mutation {
     input: BsdasriSignatureWithSecretCodeInput!
   ): Bsdasri
   """
-  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
   Duplique un bordereau Dasri
   """
   duplicateBsdasri("ID d'un Bsdasri" id: ID!): Bsdasri
 
   """
-  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
   Supprime un BSDASRI
   """
   deleteBsdasri("ID d'un Dasri" id: ID!): Bsdasri

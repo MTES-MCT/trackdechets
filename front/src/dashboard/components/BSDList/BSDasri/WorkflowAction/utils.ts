@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { BsdasriQuantity, Bsdasri } from "generated/graphql/types";
+import { Bsdasri } from "generated/graphql/types";
 
 export const signatureValidationSchema = (form: Bsdasri) =>
   yup.object({
@@ -18,19 +18,14 @@ export const emissionSignatureSecretCodeValidationSchema = yup.object({
   }),
 });
 
-export const getInitialQuantityFn = (quantity?: BsdasriQuantity | null) => ({
-  value: quantity?.value,
-  type: quantity?.type,
-});
-
 export const prefillWasteDetails = dasri => {
-  if (!dasri?.transport?.wasteDetails?.packagingInfos?.length) {
-    dasri.transport.wasteDetails.packagingInfos =
-      dasri?.emission?.wasteDetails?.packagingInfos;
+  if (!dasri?.transporter?.transport?.packagingInfos?.length) {
+    dasri.transporter.transport.packagingInfos =
+      dasri?.emitter?.emission?.packagingInfos;
   }
-  if (!dasri?.reception?.wasteDetails?.packagingInfos?.length) {
-    dasri.reception.wasteDetails.packagingInfos =
-      dasri?.transport?.wasteDetails?.packagingInfos;
+  if (!dasri?.destination?.reception?.packagingInfos?.length) {
+    dasri.destination.reception.packagingInfos =
+      dasri?.transporter?.transport?.packagingInfos;
   }
   return dasri;
 };

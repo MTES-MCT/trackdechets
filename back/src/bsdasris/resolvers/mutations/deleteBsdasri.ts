@@ -3,7 +3,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import * as elastic from "../../../common/elastic";
 import { getBsdasriOrNotFound } from "../../database";
-import { expandBsdasriFromDb } from "../../dasri-converter";
+import { unflattenBsdasri } from "../../converter";
 import { checkCanDeleteBsdasri } from "../../permissions";
 
 /**
@@ -17,20 +17,20 @@ const deleteBsdasriResolver: MutationResolvers["deleteBsdasri"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const { regroupedBsdasris, ...bsdasri } = await getBsdasriOrNotFound({
+  const { grouping, ...bsdasri } = await getBsdasriOrNotFound({
     id,
-    includeRegrouped: true
+    includeGrouped: true
   });
   // user must belong to the dasri, and status must be INITIAL
   // if this dasri is regrouped by an other, it should be in another status thus being not deletable
   await checkCanDeleteBsdasri(user, bsdasri);
 
-  // are any dasris regrouped on the dasri we want to mark as deleted ?
-  if (!!regroupedBsdasris.length) {
+  // are any dasris grouped on the dasri we want to mark as deleted ?
+  if (!!grouping.length) {
     // let's set their fk to null
     await prisma.bsdasri.updateMany({
-      where: { id: { in: regroupedBsdasris.map(dasri => dasri.id) } },
-      data: { regroupedOnBsdasriId: null }
+      where: { id: { in: grouping.map(dasri => dasri.id) } },
+      data: { groupedInId: null }
     });
   }
 
@@ -41,7 +41,7 @@ const deleteBsdasriResolver: MutationResolvers["deleteBsdasri"] = async (
 
   await elastic.deleteBsd(deletedBsdasri, context);
 
-  return expandBsdasriFromDb(deletedBsdasri);
+  return unflattenBsdasri(deletedBsdasri);
 };
 
 export default deleteBsdasriResolver;
