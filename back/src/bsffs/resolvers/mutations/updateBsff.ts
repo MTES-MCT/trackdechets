@@ -66,7 +66,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     ]);
   }
 
-  if (existingBsff.destinationReceptionDate) {
+  if (existingBsff.destinationReceptionSignatureDate) {
     flatInput = omit(flatInput, [
       "destinationCompanyAddress",
       "destinationCompanyContact",

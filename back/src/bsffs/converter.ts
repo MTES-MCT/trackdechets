@@ -67,6 +67,8 @@ export function flattenBsffInput(
 
     destinationReceptionDate: bsffInput.destination?.reception?.date,
     destinationReceptionKilos: bsffInput.destination?.reception?.kilos,
+    destinationReceptionAcceptationStatus:
+      bsffInput.destination?.reception?.acceptationStatus,
     destinationReceptionRefusalReason:
       bsffInput.destination?.reception?.refusalReason,
 
