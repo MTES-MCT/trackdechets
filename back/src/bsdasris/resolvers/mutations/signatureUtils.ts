@@ -23,7 +23,7 @@ export const checkEmitterAllowsDirectTakeOver: checkEmitterAllowsDirectTakeOverF
     signatureParams.eventType === BsdasriEventType.SignTransport &&
     bsdasri.status === BsdasriStatus.INITIAL
   ) {
-    if (bsdasri.bsdasriType !== BsdasriType.SIMPLE) {
+    if (bsdasri.type !== BsdasriType.SIMPLE) {
       throw new UserInputError(
         "L'emport direct est interdit pour les bordereaux dasri de groupement"
       );
@@ -93,24 +93,24 @@ export const dasriSignatureMapping: Record<
   BsdasriSignatureInfos
 > = {
   EMISSION: {
-    author: "emissionSignatureAuthor",
-    date: "emissionSignatureDate",
+    author: "emitterEmissionSignatureAuthor",
+    date: "emitterEmissionSignatureDate",
     eventType: BsdasriEventType.SignEmission,
     validationContext: { emissionSignature: true },
     signatoryField: "emissionSignatory",
     authorizedSiret: bsdasri => bsdasri.emitterCompanySiret
   },
   EMISSION_WITH_SECRET_CODE: {
-    author: "emissionSignatureAuthor",
-    date: "emissionSignatureDate",
+    author: "emitterEmissionSignatureAuthor",
+    date: "emitterEmissionSignatureDate",
     eventType: BsdasriEventType.SignEmissionWithSecretCode,
     validationContext: { emissionSignature: true },
     signatoryField: "emissionSignatory",
     authorizedSiret: bsdasri => bsdasri.transporterCompanySiret // transporter can sign with emitter secret code (trs device)
   },
   TRANSPORT: {
-    author: "transportSignatureAuthor",
-    date: "transportSignatureDate",
+    author: "transporterTransportSignatureAuthor",
+    date: "transporterTransportSignatureDate",
     eventType: BsdasriEventType.SignTransport,
     validationContext: { emissionSignature: true, transportSignature: true }, // validate emission in case of direct takeover
 
@@ -119,20 +119,20 @@ export const dasriSignatureMapping: Record<
   },
 
   RECEPTION: {
-    author: "receptionSignatureAuthor",
-    date: "receptionSignatureDate",
+    author: "destinationReceptionSignatureAuthor",
+    date: "destinationReceptionSignatureDate",
     eventType: BsdasriEventType.SignReception,
     validationContext: { receptionSignature: true },
     signatoryField: "receptionSignatory",
-    authorizedSiret: bsdasri => bsdasri.recipientCompanySiret
+    authorizedSiret: bsdasri => bsdasri.destinationCompanySiret
   },
   OPERATION: {
-    author: "operationSignatureAuthor",
-    date: "operationSignatureDate",
+    author: "destinationOperationSignatureAuthor",
+    date: "destinationOperationSignatureDate",
     eventType: BsdasriEventType.SignOperation,
     validationContext: { operationSignature: true },
     signatoryField: "operationSignatory",
-    authorizedSiret: bsdasri => bsdasri.recipientCompanySiret
+    authorizedSiret: bsdasri => bsdasri.destinationCompanySiret
   }
 };
 
@@ -148,7 +148,7 @@ export const getFieldsUpdate: getFieldsUpdateFn = ({ bsdasri, input }) => {
   // on reception signature, fill handedOverToRecipientAt if not already completed
   if (input.type === "RECEPTION" && !bsdasri.handedOverToRecipientAt) {
     return {
-      handedOverToRecipientAt: bsdasri.receivedAt
+      handedOverToRecipientAt: bsdasri.destinationReceptionDate
     };
   }
   return {};
@@ -156,15 +156,15 @@ export const getFieldsUpdate: getFieldsUpdateFn = ({ bsdasri, input }) => {
 
 type BsdasriSignatureInfos = {
   author:
-    | "emissionSignatureAuthor"
-    | "transportSignatureAuthor"
-    | "receptionSignatureAuthor"
-    | "operationSignatureAuthor";
+    | "emitterEmissionSignatureAuthor"
+    | "transporterTransportSignatureAuthor"
+    | "destinationReceptionSignatureAuthor"
+    | "destinationOperationSignatureAuthor";
   date:
-    | "emissionSignatureDate"
-    | "transportSignatureDate"
-    | "receptionSignatureDate"
-    | "operationSignatureDate";
+    | "emitterEmissionSignatureDate"
+    | "transporterTransportSignatureDate"
+    | "destinationReceptionSignatureDate"
+    | "destinationOperationSignatureDate";
   eventType: BsdasriEventType;
   authorizedSiret: (bsdasri: Bsdasri) => string;
   validationContext: BsdasriValidationContext;

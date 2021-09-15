@@ -18,26 +18,22 @@ describe("Mutation.signBsdasri reception", () => {
   afterEach(resetDatabase);
 
   it("should put reception signature on a dasri and fill handedOverToRecipientAt", async () => {
-    // When a reception is signed, handedOverToRecipientAt is filled with receivedAt field
-    const {
-      user: emitter,
-      company: emitterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    // When a reception is signed, handedOverToRecipientAt is filled with destinationReceptionDate field
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
     const {
       user: recipient,
-      company: recipientCompany
+      company: destinationCompany
     } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
-      ownerId: emitter.id,
       opt: {
         ...initialData(emitterCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(recipientCompany),
-        receivedAt: new Date("2020-12-15T11:00:00.000Z"),
+        ...readyToReceiveData(destinationCompany),
+        destinationReceptionDate: new Date("2020-12-15T11:00:00.000Z"),
         status: BsdasriStatus.SENT
       }
     });
@@ -56,8 +52,10 @@ describe("Mutation.signBsdasri reception", () => {
       where: { id: dasri.id }
     });
     expect(receivedDasri.status).toEqual("RECEIVED");
-    expect(receivedDasri.receptionSignatureAuthor).toEqual("Monique");
-    expect(receivedDasri.receptionSignatureDate).toBeTruthy();
+    expect(receivedDasri.destinationReceptionSignatureAuthor).toEqual(
+      "Monique"
+    );
+    expect(receivedDasri.destinationReceptionSignatureDate).toBeTruthy();
     expect(receivedDasri.receptionSignatoryId).toEqual(recipient.id);
     expect(receivedDasri.handedOverToRecipientAt).not.toBeNull();
 
@@ -69,24 +67,20 @@ describe("Mutation.signBsdasri reception", () => {
   it("should put reception signature on a dasri and preserver handedOverToRecipientAt", async () => {
     // When a reception is signed, handedOverToRecipientAt must be kept if already filled
 
-    const {
-      user: emitter,
-      company: emitterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
     const {
       user: recipient,
-      company: recipientCompany
+      company: destinationCompany
     } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
-      ownerId: emitter.id,
       opt: {
         ...initialData(emitterCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(recipientCompany),
+        ...readyToReceiveData(destinationCompany),
         handedOverToRecipientAt: new Date("2020-12-20T11:00:00.000Z"),
         status: BsdasriStatus.SENT
       }
@@ -105,8 +99,10 @@ describe("Mutation.signBsdasri reception", () => {
       where: { id: dasri.id }
     });
     expect(receivedDasri.status).toEqual("RECEIVED");
-    expect(receivedDasri.receptionSignatureAuthor).toEqual("Monique");
-    expect(receivedDasri.receptionSignatureDate).toBeTruthy();
+    expect(receivedDasri.destinationReceptionSignatureAuthor).toEqual(
+      "Monique"
+    );
+    expect(receivedDasri.destinationReceptionSignatureDate).toBeTruthy();
     expect(receivedDasri.receptionSignatoryId).toEqual(recipient.id);
     expect(receivedDasri.handedOverToRecipientAt).toEqual(
       new Date("2020-12-20T11:00:00.000Z")
@@ -114,27 +110,23 @@ describe("Mutation.signBsdasri reception", () => {
   });
 
   it("should mark a dasri as refused when reception acceptation is refused", async () => {
-    const {
-      user: emitter,
-      company: emitterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
     const {
       user: recipient,
-      company: recipientCompany
+      company: destinationCompany
     } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
-      ownerId: emitter.id,
       opt: {
         ...initialData(emitterCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(recipientCompany),
-        recipientWasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
-        recipientWasteRefusalReason: "Non conforme",
-        recipientWasteRefusedQuantity: 66,
+        ...readyToReceiveData(destinationCompany),
+        destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
+        destinationReceptionWasteRefusalReason: "Non conforme",
+        destinationReceptionWasteRefusedWeightValue: 66,
 
         status: BsdasriStatus.SENT
       }
@@ -152,8 +144,10 @@ describe("Mutation.signBsdasri reception", () => {
       where: { id: dasri.id }
     });
     expect(readyTotakeOverDasri.status).toEqual("REFUSED");
-    expect(readyTotakeOverDasri.receptionSignatureAuthor).toEqual("Caroline");
-    expect(readyTotakeOverDasri.receptionSignatureDate).toBeTruthy();
+    expect(readyTotakeOverDasri.destinationReceptionSignatureAuthor).toEqual(
+      "Caroline"
+    );
+    expect(readyTotakeOverDasri.destinationReceptionSignatureDate).toBeTruthy();
     expect(readyTotakeOverDasri.receptionSignatoryId).toEqual(recipient.id);
   });
 });

@@ -29,6 +29,16 @@ export const workSiteFragment = gql`
   }
 `;
 
+export const pickupSiteFragment = gql`
+  fragment PickupSiteFragment on PickupSite {
+    name
+    address
+    city
+    postalCode
+    infos
+  }
+`;
+
 export const wasteDetailsFragment = gql`
   fragment WasteDetailsFragment on WasteDetails {
     code
@@ -305,11 +315,10 @@ const signatureFragment = gql`
 `;
 
 const dasriEmissionWasteDetailsFragment = gql`
-  fragment DasriEmissionWasteDetailsFragment on BsdasriEmissionWasteDetails {
-    onuCode
-    quantity {
-      type
+  fragment DasriEmissionWasteDetailsFragment on BsdasriEmission {
+    weight {
       value
+      isEstimate
     }
     volume
     packagingInfos {
@@ -322,10 +331,10 @@ const dasriEmissionWasteDetailsFragment = gql`
 `;
 
 const dasriTransportWasteDetailsFragment = gql`
-  fragment DasriTransportWasteDetailsFragment on BsdasriTransportWasteDetails {
-    quantity {
-      type
+  fragment DasriTransportWasteDetailsFragment on BsdasriTransport {
+    weight {
       value
+      isEstimate
     }
     volume
     packagingInfos {
@@ -337,7 +346,7 @@ const dasriTransportWasteDetailsFragment = gql`
   }
 `;
 const dasriReceptionWasteDetailsFragment = gql`
-  fragment DasriReceptionWasteDetailsFragment on BsdasriReceptionWasteDetails {
+  fragment DasriReceptionWasteDetailsFragment on BsdasriReception {
     volume
     packagingInfos {
       type
@@ -352,101 +361,106 @@ const wasteAcceptationFragment = gql`
   fragment WasteAcceptationFragment on BsdasriWasteAcceptation {
     status
     refusalReason
-    refusedQuantity
+    refusedWeight
   }
 `;
 export const dasriFragment = gql`
   fragment DasriFragment on Bsdasri {
     id
-
     bsdasriStatus: status
-    bsdasriType
+    type
     isDraft
+    waste {
+      adr
+      code
+    }
     emitter {
       onBehalfOfEcoorganisme
       company {
         ...CompanyFragment
       }
-      workSite {
-        name
-        address
-        city
-        postalCode
-        infos
+      pickupSite {
+        ...PickupSiteFragment
       }
       customInfo
-    }
-    emission {
-      wasteCode
-      isTakenOverWithoutEmitterSignature
-      isTakenOverWithSecretCode
-      wasteDetails {
+
+      emission {
+        isTakenOverWithoutEmitterSignature
+        isTakenOverWithSecretCode
+
         ...DasriEmissionWasteDetailsFragment
-      }
-      handedOverAt
-      signature {
-        ...SignatureFragment
+
+        signature {
+          ...SignatureFragment
+        }
       }
     }
+
     transporter {
       company {
         ...CompanyFragment
       }
-      receipt
-      receiptDepartment
-      receiptValidityLimit
+      recepisse {
+        number
+        department
+        validityLimit
+      }
+
       customInfo
-    }
-    transport {
-      mode
-      handedOverAt
-      takenOverAt
-      wasteDetails {
+      transport {
+        mode
+        handedOverAt
+        takenOverAt
+
         ...DasriTransportWasteDetailsFragment
-      }
-      wasteAcceptation {
-        ...WasteAcceptationFragment
-      }
-      signature {
-        ...SignatureFragment
+
+        wasteAcceptation {
+          ...WasteAcceptationFragment
+        }
+        signature {
+          ...SignatureFragment
+        }
       }
     }
-    recipient {
+
+    destination {
       company {
         ...CompanyFragment
       }
       customInfo
-    }
-    reception {
-      wasteDetails {
+      reception {
         ...DasriReceptionWasteDetailsFragment
-      }
-      wasteAcceptation {
-        ...WasteAcceptationFragment
-      }
 
-      signature {
-        ...SignatureFragment
+        wasteAcceptation {
+          ...WasteAcceptationFragment
+        }
+
+        signature {
+          ...SignatureFragment
+        }
+        date
       }
-      receivedAt
+      operation {
+        weight {
+          value
+        }
+        code
+        date
+        signature {
+          ...SignatureFragment
+        }
+      }
     }
-    operation {
-      quantity {
-        value
-      }
-      processedAt
-      processingOperation
-      signature {
-        ...SignatureFragment
-      }
+    grouping {
+      id
     }
-    regroupedBsdasris
     createdAt
     updatedAt
     allowDirectTakeOver
   }
   ${companyFragment}
   ${signatureFragment}
+  ${pickupSiteFragment}
 
   ${dasriEmissionWasteDetailsFragment}
   ${dasriTransportWasteDetailsFragment}

@@ -74,6 +74,7 @@ export default function DasriPackagings({
                                     ? p.other
                                     : "",
                                 quantity: p.quantity,
+                                volume: p.volume || 0,
                               });
                             }}
                           >

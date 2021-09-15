@@ -19,9 +19,8 @@ describe("Mutation.deleteBsdasri", () => {
   afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret
       }
@@ -47,13 +46,9 @@ describe("Mutation.deleteBsdasri", () => {
   });
   it("should disallow users not belonging to the deleted dasri", async () => {
     const { user } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: otherUser,
-      company: otherCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { company: otherCompany } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
-      ownerId: otherUser.id,
       opt: {
         ...initialData(otherCompany)
       }
@@ -84,7 +79,6 @@ describe("Mutation.deleteBsdasri", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company),
         status: "SENT"
@@ -117,7 +111,6 @@ describe("Mutation.deleteBsdasri", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company)
       }

@@ -18,7 +18,7 @@ import {
 import { Bsdasri } from "@prisma/client";
 import prisma from "../../../prisma";
 import { expandFormFromDb } from "../../../forms/form-converter";
-import { expandBsdasriFromDb } from "../../../bsdasris/dasri-converter";
+import { unflattenBsdasri } from "../../../bsdasris/converter";
 import { expandVhuFormFromDb } from "../../../bsvhu/converter";
 import { expandBsdaFromDb } from "../../../bsda/converter";
 import { getUserCompanies } from "../../../users/database";
@@ -217,7 +217,7 @@ async function buildDasris(dasris: Bsdasri[]) {
     .filter(bsd => !!bsd.emitterCompanySiret && bsd.status === "INITIAL")
     .map(bsd => bsd.emitterCompanySiret);
 
-  // depduplicate sirets
+  // deduplicate sirets
   const uniqueSirets = Array.from(new Set(emitterSirets));
 
   // build an array of sirets allwoing direct takeover
@@ -234,12 +234,10 @@ async function buildDasris(dasris: Bsdasri[]) {
   ).map(comp => comp.siret);
 
   // expand dasris and insert `allowDirectTakeOver`
-  const res = dasris.map(bsd => ({
-    ...expandBsdasriFromDb(bsd),
+  return dasris.map(bsd => ({
+    ...unflattenBsdasri(bsd),
     allowDirectTakeOver: allows.includes(bsd.emitterCompanySiret)
   }));
-
-  return res;
 }
 
 const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {

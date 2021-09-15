@@ -4,10 +4,7 @@ import {
   ResolversParentTypes
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
-import {
-  expandBsdasriFromDb,
-  flattenBsdasriInput
-} from "../../dasri-converter";
+import { unflattenBsdasri, flattenBsdasriInput } from "../../converter";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { validateBsdasri } from "../../validation";
@@ -17,7 +14,7 @@ import { indexBsdasri } from "../../elastic";
 
 /**
  * Bsdasri creation mutation
- * sets bsdasriType to `GROUPING` if a non empty array of regroupedBsdasris is provided
+ * sets bsdasri type to `GROUPING` if a non empty array of grouping dasris is provided
  */
 const createBsdasri = async (
   parent: ResolversParentTypes["Mutation"],
@@ -27,11 +24,11 @@ const createBsdasri = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const { regroupedBsdasris, ...rest } = input;
+  const { grouping, ...rest } = input;
 
   const formSirets = {
     emitterCompanySiret: input.emitter?.company?.siret,
-    recipientCompanySiret: input.recipient?.company?.siret,
+    destinationCompanySiret: input.destination?.company?.siret,
     transporterCompanySiret: input.transporter?.company?.siret
   };
 
@@ -42,14 +39,11 @@ const createBsdasri = async (
   );
 
   const flattenedInput = flattenBsdasriInput(rest);
-  const isRegrouping = !!regroupedBsdasris && !!regroupedBsdasris.length;
+  const isRegrouping = !!grouping && !!grouping.length;
 
   if (isRegrouping) {
     await emitterIsAllowedToGroup(flattenedInput?.emitterCompanySiret);
-    await checkDasrisAreGroupable(
-      regroupedBsdasris,
-      flattenedInput.emitterCompanySiret
-    );
+    await checkDasrisAreGroupable(grouping, flattenedInput.emitterCompanySiret);
   }
 
   const signatureContext = isDraft
@@ -62,16 +56,15 @@ const createBsdasri = async (
     data: {
       ...flattenedInput,
       id: getReadableId(ReadableIdPrefix.DASRI),
-      bsdasriType: isRegrouping ? "GROUPING" : "SIMPLE",
-      owner: { connect: { id: user.id } },
-      regroupedBsdasris: { connect: regroupedBsdasris },
+      type: isRegrouping ? "GROUPING" : "SIMPLE",
+      grouping: { connect: grouping },
       isDraft: isDraft
     }
   });
 
   await indexBsdasri(newDasri, context);
 
-  return expandBsdasriFromDb(newDasri);
+  return unflattenBsdasri(newDasri);
 };
 
 export default createBsdasri;

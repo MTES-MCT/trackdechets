@@ -542,7 +542,6 @@ model User {
   StatusLog            StatusLog[]
   UserActivationHash   UserActivationHash[]
 
-  Bsdasri                    Bsdasri[] @relation("BsdasriOwnedBy")
   bsdasriEmissionSignatures  Bsdasri[] @relation("BsdasriEmissionSignature")
   bsdasriTransportSignatures Bsdasri[] @relation("BsdasriTransportSignature")
   bsdasriReceptionSignatures Bsdasri[] @relation("BsdasriReceptionSignature")
@@ -690,122 +689,97 @@ enum BsdasriType {
 }
 
 model Bsdasri {
-  id          String        @unique
-  bsdasriType BsdasriType   @default(SIMPLE)
-  status      BsdasriStatus @default(INITIAL)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  ownerId     String
-  owner       User          @relation("BsdasriOwnedBy", fields: [ownerId], references: [id])
-  isDeleted   Boolean?      @default(false)
-  isDraft     Boolean?      @default(false)
-
+  id                                          String                  @unique
+  type                                        BsdasriType             @default(SIMPLE)
+  status                                      BsdasriStatus           @default(INITIAL)
+  createdAt                                   DateTime                @default(now())
+  updatedAt                                   DateTime                @updatedAt
+  isDeleted                                   Boolean?                @default(false)
+  isDraft                                     Boolean?                @default(false)
   // emitter
-  emitterType                   BsdasriEmitterType @default(PRODUCER)
-  emitterOnBehalfOfEcoorganisme Boolean?           @default(false)
-  emitterCompanyName            String?
-  emitterCompanySiret           String?
-  emitterCompanyAddress         String?
-  emitterCompanyContact         String?
-  emitterCompanyPhone           String?
-  emitterCompanyMail            String?
-
-  emitterWorkSiteName       String?
-  emitterWorkSiteAddress    String?
-  emitterWorkSiteCity       String?
-  emitterWorkSitePostalCode String?
-  emitterWorkSiteInfos      String?
-
-  emitterCustomInfo String? // free field
-
+  emitterOnBehalfOfEcoorganisme               Boolean?                @default(false)
+  emitterCompanyName                          String?
+  emitterCompanySiret                         String?
+  emitterCompanyAddress                       String?
+  emitterCompanyContact                       String?
+  emitterCompanyPhone                         String?
+  emitterCompanyMail                          String?
+  emitterPickupSiteName                       String?
+  emitterPickupSiteAddress                    String?
+  emitterPickupSiteCity                       String?
+  emitterPickupSitePostalCode                 String?
+  emitterPickupSiteInfos                      String?
+  emitterCustomInfo                           String? // free field
   // emission
-  wasteDetailsCode    String?
-  wasteDetailsOnuCode String?
-
-  emitterWasteQuantity       Float? // kg
-  emitterWasteQuantityType   QuantityType?
-  emitterWasteVolume         Int? // liters
-  emitterWastePackagingsInfo Json?
-  handedOverToTransporterAt  DateTime?
-
-  emissionSignatory       User?     @relation("BsdasriEmissionSignature", fields: [emissionSignatoryId], references: [id])
-  emissionSignatoryId     String?
-  emissionSignatureDate   DateTime?
-  emissionSignatureAuthor String?
-
-  isEmissionDirectTakenOver         Boolean @default(false)
-  isEmissionTakenOverWithSecretCode Boolean @default(false)
-
+  wasteCode                                   String?
+  wasteAdr                                    String?
+  emitterWasteWeightValue                     Float? // kg
+  emitterWasteWeightIsEstimate                Boolean?
+  emitterWasteVolume                          Int? // liters
+  emitterWastePackagingsInfo                  Json?
+  emissionSignatory                           User?                   @relation("BsdasriEmissionSignature", fields: [emissionSignatoryId], references: [id])
+  emissionSignatoryId                         String?
+  emitterEmissionSignatureDate                DateTime?
+  emitterEmissionSignatureAuthor              String?
+  isEmissionDirectTakenOver                   Boolean                 @default(false)
+  isEmissionTakenOverWithSecretCode           Boolean                 @default(false)
   // transporter
-  transporterCompanyName          String?
-  transporterCompanySiret         String?
-  transporterCompanyAddress       String?
-  transporterCompanyPhone         String?
-  transporterCompanyContact       String?
-  transporterCompanyMail          String?
-  transporterReceipt              String?
-  transporterReceiptDepartment    String?
-  transporterReceiptValidityLimit DateTime?
-
-  transporterCustomInfo String? // free field
-
+  transporterCompanyName                      String?
+  transporterCompanySiret                     String?
+  transporterCompanyAddress                   String?
+  transporterCompanyPhone                     String?
+  transporterCompanyContact                   String?
+  transporterCompanyMail                      String?
+  transporterRecepisseNumber                  String?
+  transporterRecepisseDepartment              String?
+  transporterRecepisseValidityLimit           DateTime?
+  transporterCustomInfo                       String? // free field
   // transport
-  transportMode                     TransportMode?          @default(ROAD)
-  transporterWasteAcceptationStatus WasteAcceptationStatus?
-  transporterWasteRefusalReason     String?
-  transporterWasteRefusedQuantity   Float? // kg
-
-  transporterTakenOverAt DateTime?
-
-  transporterWastePackagingsInfo Json?
-  transporterWasteQuantity       Float? // kg
-  transporterWasteQuantityType   QuantityType?
-  transporterWasteVolume         Int? // liters
-
-  handedOverToRecipientAt DateTime?
-
-
-  transportSignatory       User?     @relation("BsdasriTransportSignature", fields: [transportSignatoryId], references: [id])
-  transportSignatoryId     String?
-  transportSignatureDate   DateTime?
-  transportSignatureAuthor String?
-
-  // recipient
-  recipientCompanyName    String?
-  recipientCompanySiret   String?
-  recipientCompanyAddress String?
-  recipientCompanyContact String?
-  recipientCompanyPhone   String?
-  recipientCompanyMail    String?
-
-  recipientCustomInfo String? // free field
-
+  transporterTransportMode                    TransportMode?          @default(ROAD)
+  transporterAcceptationStatus                WasteAcceptationStatus?
+  transporterWasteRefusalReason               String?
+  transporterWasteRefusedWeightValue          Float? // kg
+  transporterTakenOverAt                      DateTime?
+  transporterWastePackagingsInfo              Json?
+  transporterWasteWeightValue                 Float? // kg
+  transporterWasteWeightIsEstimate            Boolean?
+  transporterWasteVolume                      Int? // liters
+  handedOverToRecipientAt                     DateTime?
+  transportSignatory                          User?                   @relation("BsdasriTransportSignature", fields: [transportSignatoryId], references: [id])
+  transportSignatoryId                        String?
+  transporterTransportSignatureDate           DateTime?
+  transporterTransportSignatureAuthor         String?
+  // destination
+  destinationCompanyName                      String?
+  destinationCompanySiret                     String?
+  destinationCompanyAddress                   String?
+  destinationCompanyContact                   String?
+  destinationCompanyPhone                     String?
+  destinationCompanyMail                      String?
+  destinationCustomInfo                       String? // free field
   // reception
-  recipientWastePackagingsInfo    Json?
-  recipientWasteAcceptationStatus WasteAcceptationStatus?
-  recipientWasteRefusalReason     String?
-  recipientWasteRefusedQuantity   Float? // kg
-  recipientWasteQuantity          Float? // kg
-
-  recipientWasteVolume Int? // liters
-  receivedAt           DateTime? // accepted or refused date
-
-  processingOperation String?
-  processedAt         DateTime?
-
-  receptionSignatory       User?     @relation("BsdasriReceptionSignature", fields: [receptionSignatoryId], references: [id])
-  receptionSignatoryId     String?
-  receptionSignatureDate   DateTime?
-  receptionSignatureAuthor String?
-
-  operationSignatory       User?     @relation("BsdasriOperationSignature", fields: [operationSignatoryId], references: [id])
-  operationSignatoryId     String?
-  operationSignatureDate   DateTime?
-  operationSignatureAuthor String?
-
-  regroupedBsdasris    Bsdasri[] @relation("BsdasriToBsdasri")
-  regroupedOnBsdasri   Bsdasri?  @relation("BsdasriToBsdasri", fields: [regroupedOnBsdasriId], references: [id])
-  regroupedOnBsdasriId String?
+  destinationWastePackagingsInfo              Json?
+  destinationReceptionAcceptationStatus       WasteAcceptationStatus?
+  destinationReceptionWasteRefusalReason      String?
+  destinationReceptionWasteRefusedWeightValue Float? // kg
+  destinationReceptionWasteWeightValue        Float? // kg
+  destinationReceptionWasteVolume             Int? // liters
+  destinationReceptionDate                    DateTime? // accepted or refused date
+  // processing
+  destinationOperationCode                    String?
+  destinationOperationDate                    DateTime?
+  receptionSignatory                          User?                   @relation("BsdasriReceptionSignature", fields: [receptionSignatoryId], references: [id])
+  receptionSignatoryId                        String?
+  destinationReceptionSignatureDate           DateTime?
+  destinationReceptionSignatureAuthor         String?
+  operationSignatory                          User?                   @relation("BsdasriOperationSignature", fields: [operationSignatoryId], references: [id])
+  operationSignatoryId                        String?
+  destinationOperationSignatureDate           DateTime?
+  destinationOperationSignatureAuthor         String?
+  // associations
+  grouping                                    Bsdasri[]               @relation("BsdasriToBsdasri")
+  groupingIn                                  Bsdasri?                @relation("BsdasriToBsdasri", fields: [groupingInId], references: [id])
+  groupingInId                                String?
 }
 
 // ----------------

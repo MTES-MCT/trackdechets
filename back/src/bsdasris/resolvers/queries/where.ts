@@ -11,7 +11,7 @@ export function buildDbFilter(
     OR: [
       { emitterCompanySiret: { in: userSirets } },
       { transporterCompanySiret: { in: userSirets } },
-      { recipientCompanySiret: { in: userSirets } }
+      { destinationCompanySiret: { in: userSirets } }
     ]
   };
 
@@ -47,16 +47,13 @@ const getGroupableCondition = (groupable?: boolean) => {
 
   if (!!groupable) {
     return {
-      regroupedBsdasris: { none: {} },
-      regroupedOnBsdasri: null
+      grouping: { none: {} },
+      groupingIn: null
     };
   }
   if (groupable === false) {
     return {
-      OR: [
-        { regroupedBsdasris: { some: {} } },
-        { NOT: { regroupedOnBsdasri: null } }
-      ]
+      OR: [{ grouping: { some: {} } }, { NOT: { groupingIn: null } }]
     };
   }
   return {};
@@ -75,9 +72,9 @@ function toPrismaFilter(where: Omit<BsdasriWhere, "_or" | "_and" | "_not">) {
 
     emitterCompanySiret: where.emitter?.company?.siret,
     transporterCompanySiret: where.transporter?.company?.siret,
-    recipientCompanySiret: where.recipient?.company?.siret,
-    ...(!!where.processingOperation
-      ? { processingOperation: { in: where.processingOperation } }
+    destinationCompanySiret: where.destination?.company?.siret,
+    ...(!!where.destinationOperationCode
+      ? { destinationOperationCode: { in: where.destinationOperationCode } }
       : {}),
     status: where.status,
     isDraft: where.isDraft,

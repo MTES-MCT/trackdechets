@@ -1,4 +1,4 @@
-import { expandBsdasriFromDb } from "../../dasri-converter";
+import { unflattenBsdasri } from "../../converter";
 
 import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -39,7 +39,7 @@ export default async function dasris(_, args, context: GraphQLContext) {
   const totalCount = await prisma.bsdasri.count({ where });
   const queriedCount = queried.length;
 
-  const expanded = queried.map(f => expandBsdasriFromDb(f));
+  const expanded = queried.map(f => unflattenBsdasri(f));
   const pageInfo = {
     startCursor: expanded[0]?.id || "",
     endCursor: expanded[queriedCount - 1]?.id || "",
