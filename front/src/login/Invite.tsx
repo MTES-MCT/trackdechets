@@ -22,7 +22,7 @@ import routes from "common/routes";
 import PasswordMeter from "common/components/PasswordMeter";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "./Invite.module.scss";
-
+import querystring from "querystring";
 const INVITATION = gql`
   query Invitation($hash: String!) {
     invitation(hash: $hash) {
@@ -119,7 +119,14 @@ function AlreadyAccepted({ invitation }: { invitation: Invitation }) {
 export default function Invite() {
   // Extract invitation hash from URL
   const location = useLocation();
-  const hash = decodeURIComponent(location.search.replace("?hash=", ""));
+
+  // parse qs and get rid of extra parameters
+  const parsedQs = querystring.parse(location.search);
+  const { hash: qsHash } = parsedQs;
+
+  const hash = Array.isArray(qsHash)
+    ? decodeURIComponent(qsHash[0])
+    : decodeURIComponent(qsHash);
 
   const [passwordType, setPasswordType] = useState("password");
 
