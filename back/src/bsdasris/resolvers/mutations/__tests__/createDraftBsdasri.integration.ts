@@ -8,21 +8,16 @@ import {
 import { CompanyType } from "@prisma/client";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
+import { fullBsdasriFragment } from "../../../fragments";
+import { gql } from "apollo-server-express";
 
-const CREATE_DRAFT_DASRI = `
-mutation DasriCreate($input: BsdasriCreateInput!) {
-  createDraftBsdasri(input: $input)  {
-    id
-    isDraft
-    bsdasriType
-    status
-    recipient {
-      company {
-        siret
-      }
+const CREATE_DRAFT_DASRI = gql`
+  ${fullBsdasriFragment}
+  mutation DasriCreate($input: BsdasriInput!) {
+    createDraftBsdasri(input: $input) {
+      ...FullBsdasriFragment
     }
   }
-}
 `;
 describe("Mutation.createDraftBsdasri", () => {
   afterEach(async () => {
@@ -78,7 +73,7 @@ describe("Mutation.createDraftBsdasri", () => {
     ]);
   });
 
-  it("create a draft dasri with an emitter and a recipient", async () => {
+  it("create a draft dasri with an emitter and a destination", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const input = {
@@ -87,7 +82,7 @@ describe("Mutation.createDraftBsdasri", () => {
           siret: company.siret
         }
       },
-      recipient: {
+      destination: {
         company: {
           siret: "11111111111111"
         }
@@ -105,20 +100,20 @@ describe("Mutation.createDraftBsdasri", () => {
 
     expect(data.createDraftBsdasri.isDraft).toBe(true);
     expect(data.createDraftBsdasri.status).toBe("INITIAL");
-    expect(data.createDraftBsdasri.bsdasriType).toBe("SIMPLE");
-    expect(data.createDraftBsdasri.recipient.company).toMatchObject(
-      input.recipient.company
+    expect(data.createDraftBsdasri.type).toBe("SIMPLE");
+    expect(data.createDraftBsdasri.destination.company).toMatchObject(
+      input.destination.company
     );
   });
 
   it.each(["R12", "D12"])(
-    "should disallow R12 & D12 for non waste processor recipient ",
+    "should disallow R12 & D12 for non waste processor destination ",
     async code => {
-      // both R12 & D12 operation codes require the recipient to be a COLLECTOR
+      // both R12 & D12 operation codes require the destination to be a COLLECTOR
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const recipientCompany = await companyFactory({
+      const destinationCompany = await companyFactory({
         companyTypes: {
           set: [CompanyType.WASTE_CENTER]
         }
@@ -134,13 +129,13 @@ describe("Mutation.createDraftBsdasri", () => {
                   siret: company.siret
                 }
               },
-              recipient: {
+              destination: {
                 company: {
-                  siret: recipientCompany.siret
+                  siret: destinationCompany.siret
+                },
+                operation: {
+                  code
                 }
-              },
-              operation: {
-                processingOperation: code
               }
             }
           }
@@ -161,11 +156,11 @@ describe("Mutation.createDraftBsdasri", () => {
   it.each(["R12", "D12"])(
     "should allow R12 & D12 for waste processor ",
     async code => {
-      // both R12 & D12 operation codes require the recipient to be a COLLECTOR
+      // both R12 & D12 operation codes require the destination to be a COLLECTOR
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const recipientCompany = await companyFactory({
+      const destinationCompany = await companyFactory({
         companyTypes: {
           set: [CompanyType.COLLECTOR]
         }
@@ -181,13 +176,13 @@ describe("Mutation.createDraftBsdasri", () => {
                   siret: company.siret
                 }
               },
-              recipient: {
+              destination: {
                 company: {
-                  siret: recipientCompany.siret
+                  siret: destinationCompany.siret
+                },
+                operation: {
+                  code
                 }
-              },
-              operation: {
-                processingOperation: code
               }
             }
           }

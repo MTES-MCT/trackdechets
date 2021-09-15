@@ -10,7 +10,7 @@ export function updateTransportBeforeDirectTakeover(
     mutation: mutations.updateBsdasri,
     variables: ({ bsd }) => ({
       id: bsd.id,
-      input: { transport: fixtures.transportInput }
+      input: { transporter: { transport: fixtures.transportInput } }
     }),
     expected: { status: "INITIAL" },
     data: response => response.updateBsdasri,

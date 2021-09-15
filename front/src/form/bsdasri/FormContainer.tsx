@@ -1,12 +1,9 @@
 import { StepContainer } from "form/common/stepper/Step";
 import StepList from "./BsdasriStepList";
 import React from "react";
-
 import { useParams, useLocation } from "react-router-dom";
 import Emitter, { RegroupingEmitter } from "./Emitter";
-
-import Recipient from "./Recipient";
-
+import Destination from "./Destination";
 import * as queryString from "query-string";
 
 import Transporter, { TransporterShowingTakeOverFields } from "./Transporter";
@@ -42,7 +39,7 @@ export default function FormContainer({
             // Use a tweaked emitter component when creating or updating a grouping bsdasri
             const emitterComponent =
               bsdasriFormType === "bsdasriRegroup" ||
-              bsdasri?.bsdasriType === "GROUPING"
+              bsdasri?.type === "GROUPING"
                 ? RegroupingEmitter
                 : Emitter;
 
@@ -70,7 +67,7 @@ export default function FormContainer({
                   stepName={stepName}
                 />
                 <StepContainer
-                  component={Recipient}
+                  component={Destination}
                   title="Installation destinataire"
                   status={state}
                   stepName={stepName}

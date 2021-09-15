@@ -31,3 +31,26 @@ input DateFilter {
   _lt: DateTime
   _eq: DateTime
 }
+
+"Filtre pour les identifiants"
+input IdFilter {
+  _eq: ID
+  _in: [ID!]
+}
+
+"Filtre pour les champs textuelles"
+input StringFilter {
+  _eq: String
+  _in: [String!]
+  _contains: String
+}
+
+"Filtre pour les établissement"
+input CompanyWhere {
+  siret: StringFilter
+}
+
+"Filtre pour les signatures"
+input SignatureWhere {
+  date: DateFilter
+}

@@ -2,102 +2,23 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
-import { bsdasriFactory, initialData } from "../../../__tests__/factories";
+import {
+  bsdasriFactory,
+  initialData,
+  readyToReceiveData,
+  readyToProcessData
+} from "../../../__tests__/factories";
 import { Query } from "../../../../generated/graphql/types";
+import { fullGroupingBsdasriFragment } from "../../../fragments";
+import { gql } from "apollo-server-express";
 
-const GET_BSDASRI = `
-query GetBsdasri($id: ID!) {
-  bsdasri(id: $id) {
-    id
-    status
-    isDraft
-    regroupedBsdasris
-    emitter {
-      onBehalfOfEcoorganisme
-      type
-      company {
-        name
-        siret
-      }
-      workSite {
-        name
-        address
-        city
-        postalCode
-      }
+const GET_BSDASRI = gql`
+  ${fullGroupingBsdasriFragment}
+  query GetBsdasri($id: ID!) {
+    bsdasri(id: $id) {
+      ...FullGroupingBsdasriFragment
     }
-    emission {
-      wasteCode
-
-      wasteDetails {
-        onuCode
-        volume
-        quantity { value type}
- 
-      }
-      handedOverAt
-      signature {
-        author
-        date
-      }
-    }
-
-    transporter {
-      company {
-        siret
-      }
-    }
-    transport {
-      handedOverAt
-      takenOverAt
-      wasteDetails {
-        quantity { 
-          value
-           type
-          }
-         
-        volume
-      }
-      wasteAcceptation {
-        status
-        refusalReason
-
-        refusedQuantity
-      }
-      signature {
-        author
-        date
-      }
-    }
-    recipient {
-      company {
-        name
-        siret
-      }
-    }
-    reception {
-      wasteDetails {
-        volume
-    
-   
-      }
-      wasteAcceptation {
-        status
-        refusalReason
-        refusedQuantity
-      }
-    }
-    operation {
-      processingOperation
-      processedAt
-      quantity { 
-        value
-        }
-    }
-    createdAt
-    updatedAt
   }
-}
 `;
 
 describe("Query.Bsdasri", () => {
@@ -105,9 +26,8 @@ describe("Query.Bsdasri", () => {
 
   it("should disallow unauthenticated user", async () => {
     const { query } = makeClient();
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company)
       }
@@ -127,9 +47,8 @@ describe("Query.Bsdasri", () => {
   });
 
   it("should forbid access to user not on the bsd", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company)
       }
@@ -153,7 +72,6 @@ describe("Query.Bsdasri", () => {
   it("should get a dasri by id", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company)
       }
@@ -167,24 +85,27 @@ describe("Query.Bsdasri", () => {
 
     expect(data.bsdasri.id).toBe(dasri.id);
     expect(data.bsdasri.status).toBe("INITIAL");
-    expect(data.bsdasri.regroupedBsdasris).toStrictEqual([]);
+    expect(data.bsdasri.grouping).toStrictEqual([]);
   });
 
   it("should retrieve regrouped dasris", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-
+    const transporterTakenOverAt = new Date();
     const toRegroup = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company),
-        status: "PROCESSED"
+        ...readyToReceiveData(company),
+        ...readyToProcessData,
+        status: "PROCESSED",
+        transporterTakenOverAt
       }
     });
+
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company),
-        regroupedBsdasris: { connect: [{ id: toRegroup.id }] }
+
+        grouping: { connect: [{ id: toRegroup.id }] }
       }
     });
 
@@ -195,6 +116,17 @@ describe("Query.Bsdasri", () => {
     });
 
     expect(data.bsdasri.id).toBe(dasri.id);
-    expect(data.bsdasri.regroupedBsdasris).toStrictEqual([toRegroup.id]);
+    const expectedRegroupedInfo = [
+      {
+        id: toRegroup.id,
+        quantity: 3,
+        volume: 66,
+        postalCode: "92200",
+        weight: 70,
+        takenOverAt: transporterTakenOverAt.toISOString()
+      }
+    ];
+
+    expect(data.bsdasri.grouping).toStrictEqual(expectedRegroupedInfo);
   });
 });

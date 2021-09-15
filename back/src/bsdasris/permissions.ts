@@ -6,7 +6,6 @@ import { BsdasriSirets } from "./types";
 
 import { NotFormContributor } from "../forms/errors";
 
-import { getFullBsdasri } from "./database";
 import { UserInputError, ForbiddenError } from "apollo-server-express";
 export class InvalidPublicationAttempt extends UserInputError {
   constructor(reason?: string) {
@@ -26,11 +25,11 @@ function isDasriRecipient(
   user: { companies: Company[] },
   dasri: BsdasriSirets
 ) {
-  if (!dasri.recipientCompanySiret) {
+  if (!dasri.destinationCompanySiret) {
     return false;
   }
   const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(dasri.recipientCompanySiret);
+  return sirets.includes(dasri.destinationCompanySiret);
 }
 
 function isDasriTransporter(
@@ -70,13 +69,13 @@ export async function checkIsBsdasriContributor(
 export async function checkIsBsdasriPublishable(
   user: User,
   dasri: Bsdasri,
-  regroupedBsdasris?: string[]
+  grouping?: string[]
 ) {
   if (!dasri.isDraft || dasri.status !== BsdasriStatus.INITIAL) {
     throw new InvalidPublicationAttempt();
   }
   // This case shouldn't happen, but let's enforce the rules
-  if (dasri.bsdasriType === "GROUPING" && !regroupedBsdasris?.length) {
+  if (dasri.type === "GROUPING" && !grouping?.length) {
     throw new InvalidPublicationAttempt(
       "Un bordereau de regroupement doit comporter des bordereaux regroupés"
     );
@@ -87,7 +86,7 @@ export async function checkIsBsdasriPublishable(
 export async function checkCanReadBsdasri(user: User, bsdasri: Bsdasri) {
   return checkIsBsdasriContributor(
     user,
-    await getFullBsdasri(bsdasri),
+    bsdasri,
     "Vous n'êtes pas autorisé à accéder à ce bordereau"
   );
 }
@@ -95,7 +94,7 @@ export async function checkCanReadBsdasri(user: User, bsdasri: Bsdasri) {
 export async function checkCanDeleteBsdasri(user: User, bsdasri: Bsdasri) {
   await checkIsBsdasriContributor(
     user,
-    await getFullBsdasri(bsdasri),
+    bsdasri,
     "Vous n'êtes pas autorisé à supprimer ce bordereau."
   );
 

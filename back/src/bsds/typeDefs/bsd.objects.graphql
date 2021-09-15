@@ -58,6 +58,15 @@ type WorkSite {
   infos: String
 }
 
+"Informations sur une adresse d'enlèvement"
+type PickupSite {
+  name: String
+  address: String
+  city: String
+  postalCode: String
+  infos: String
+}
+
 type Signature {
   date: DateTime
   author: String

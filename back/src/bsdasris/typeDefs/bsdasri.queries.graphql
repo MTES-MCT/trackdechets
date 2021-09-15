@@ -1,6 +1,5 @@
 type Query {
   """
-  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
   Renvoie les Bsdasris.
   Par défaut, les dasris des différentes companies de l'utilisateur sont renvoyés.
   """
@@ -48,9 +47,7 @@ type Query {
     where: BsdasriWhere
   ): BsdasriConnection!
 
-  """
-  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
-  """
+ 
   bsdasri(
     """
     Identifiant du BSD

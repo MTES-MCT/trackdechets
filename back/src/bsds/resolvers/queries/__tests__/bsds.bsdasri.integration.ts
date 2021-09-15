@@ -27,7 +27,7 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import { bsdasriFactory } from "../../../../bsdasris/__tests__/factories";
 
 const CREATE_DRAFT_DASRI = `
-mutation CreateDraftDasri($input: BsdasriCreateInput!) {
+mutation CreateDraftDasri($input: BsdasriInput!) {
   createDraftBsdasri(input: $input)  {
     id
   }
@@ -68,7 +68,7 @@ const GET_BSDS = `
 describe("Query.bsds.dasris base workflow", () => {
   let emitter: { user: User; company: Company };
   let transporter: { user: User; company: Company };
-  let recipient: { user: User; company: Company };
+  let destination: { user: User; company: Company };
   let dasriId: string;
 
   beforeAll(async () => {
@@ -82,7 +82,7 @@ describe("Query.bsds.dasris base workflow", () => {
         set: ["TRANSPORTER"]
       }
     });
-    recipient = await userWithCompanyFactory(UserRole.ADMIN, {
+    destination = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
         set: ["WASTEPROCESSOR"]
       }
@@ -104,6 +104,10 @@ describe("Query.bsds.dasris base workflow", () => {
       >(CREATE_DRAFT_DASRI, {
         variables: {
           input: {
+            waste: {
+              code: "18 01 03*",
+              adr: "xyz 33"
+            },
             emitter: {
               company: {
                 name: "hopital blanc",
@@ -112,15 +116,10 @@ describe("Query.bsds.dasris base workflow", () => {
                 phone: "06 18 76 02 00",
                 mail: "emitter@test.fr",
                 address: "avenue de la mer"
-              }
-            },
-            emission: {
-              wasteCode: "18 01 03*",
-              wasteDetails: {
-                quantity: { value: 23, type: "REAL" },
-
-                onuCode: "xyz 33",
-                packagingInfos: [
+              },
+              emission: {
+                weight: { value: 23, isEstimate: false },
+                packagings: [
                   {
                     type: "BOITE_CARTON",
                     volume: 22,
@@ -129,6 +128,7 @@ describe("Query.bsds.dasris base workflow", () => {
                 ]
               }
             },
+
             transporter: {
               company: {
                 siret: transporter.company.siret,
@@ -138,40 +138,40 @@ describe("Query.bsds.dasris base workflow", () => {
                 mail: "jean.michel@gmaiL.com",
                 phone: "06"
               },
-              receipt: "123456789",
-              receiptDepartment: "69",
-              receiptValidityLimit: addYears(new Date(), 1).toISOString() as any
-            },
-            transport: {
-              takenOverAt: new Date().toISOString() as any,
-              wasteDetails: {
-                quantity: { value: 99, type: "REAL" },
-
-                packagingInfos: [{ type: "FUT", quantity: 44, volume: 123 }]
+              recepisse: {
+                number: "123456789",
+                department: "69",
+                validityLimit: addYears(new Date(), 1).toISOString() as any
               },
-              wasteAcceptation: { status: WasteAcceptationStatus.ACCEPTED }
+              transport: {
+                takenOverAt: new Date().toISOString() as any,
+
+                weight: { value: 99, isEstimate: false },
+
+                packagings: [{ type: "FUT", quantity: 44, volume: 123 }],
+
+                acceptation: { status: WasteAcceptationStatus.ACCEPTED }
+              }
             },
-            recipient: {
+            destination: {
               company: {
-                siret: recipient.company.siret,
+                siret: destination.company.siret,
                 name: "JEANNE COLLECTEUR",
                 address: "38 bis allée des anges",
                 contact: "Jeanne",
                 mail: "jeanne@gmail.com",
                 phone: "06"
-              }
-            },
-            reception: {
-              wasteDetails: {
-                packagingInfos: [{ type: "FUT", quantity: 44, volume: 123 }]
               },
-              wasteAcceptation: { status: WasteAcceptationStatus.ACCEPTED },
-              receivedAt: new Date().toISOString() as any
-            },
-            operation: {
-              quantity: { value: 99 },
-              processingOperation: "D10",
-              processedAt: new Date().toISOString() as any
+              reception: {
+                packagings: [{ type: "FUT", quantity: 44, volume: 123 }],
+                acceptation: { status: WasteAcceptationStatus.ACCEPTED },
+                date: new Date().toISOString() as any
+              },
+              operation: {
+                weight: { value: 99 },
+                code: "D10",
+                date: new Date().toISOString() as any
+              }
             }
           }
         }
@@ -237,14 +237,14 @@ describe("Query.bsds.dasris base workflow", () => {
         expect.objectContaining({ node: { id: dasriId } })
       ]);
     });
-    it("draft dasri should be isDraftFor recipient", async () => {
-      const { query } = makeClient(recipient.user);
+    it("draft dasri should be isDraftFor destination", async () => {
+      const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
         {
           variables: {
             where: {
-              isDraftFor: [recipient.company.siret]
+              isDraftFor: [destination.company.siret]
             }
           }
         }
@@ -308,14 +308,14 @@ describe("Query.bsds.dasris base workflow", () => {
       ]);
     });
 
-    it("published dasri should be isFollowFor recipient", async () => {
-      const { query } = makeClient(recipient.user);
+    it("published dasri should be isFollowFor destination", async () => {
+      const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
         {
           variables: {
             where: {
-              isFollowFor: [recipient.company.siret]
+              isFollowFor: [destination.company.siret]
             }
           }
         }
@@ -380,14 +380,14 @@ describe("Query.bsds.dasris base workflow", () => {
       ]);
     });
 
-    it("signed by emitter dasri should be isFollowFor recipient", async () => {
-      const { query } = makeClient(recipient.user);
+    it("signed by emitter dasri should be isFollowFor destination", async () => {
+      const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
         {
           variables: {
             where: {
-              isFollowFor: [recipient.company.siret]
+              isFollowFor: [destination.company.siret]
             }
           }
         }
@@ -452,14 +452,14 @@ describe("Query.bsds.dasris base workflow", () => {
       ]);
     });
 
-    it("sent by emitter dasri should be isForActionFor recipient", async () => {
-      const { query } = makeClient(recipient.user);
+    it("sent by emitter dasri should be isForActionFor destination", async () => {
+      const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
         {
           variables: {
             where: {
-              isForActionFor: [recipient.company.siret]
+              isForActionFor: [destination.company.siret]
             }
           }
         }
@@ -471,9 +471,9 @@ describe("Query.bsds.dasris base workflow", () => {
     });
   });
 
-  describe("when the dasri reception is signed by the recipient", () => {
+  describe("when the dasri reception is signed by the destination", () => {
     beforeAll(async () => {
-      const { mutate } = makeClient(recipient.user);
+      const { mutate } = makeClient(destination.user);
 
       await mutate<Pick<Mutation, "signBsdasri">, MutationSignBsdasriArgs>(
         SIGN_DASRI,
@@ -524,14 +524,14 @@ describe("Query.bsds.dasris base workflow", () => {
       ]);
     });
 
-    it("received by emitter dasri should be isForActionFor recipient", async () => {
-      const { query } = makeClient(recipient.user);
+    it("received by emitter dasri should be isForActionFor destination", async () => {
+      const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
         {
           variables: {
             where: {
-              isForActionFor: [recipient.company.siret]
+              isForActionFor: [destination.company.siret]
             }
           }
         }
@@ -543,9 +543,9 @@ describe("Query.bsds.dasris base workflow", () => {
     });
   });
 
-  describe("when the dasri operation is signed by the recipient", () => {
+  describe("when the dasri operation is signed by the destination", () => {
     beforeAll(async () => {
-      const { mutate } = makeClient(recipient.user);
+      const { mutate } = makeClient(destination.user);
 
       await mutate<Pick<Mutation, "signBsdasri">, MutationSignBsdasriArgs>(
         SIGN_DASRI,
@@ -596,14 +596,14 @@ describe("Query.bsds.dasris base workflow", () => {
       ]);
     });
 
-    it("processed  dasri should be isArchivedFor recipient", async () => {
-      const { query } = makeClient(recipient.user);
+    it("processed  dasri should be isArchivedFor destination", async () => {
+      const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
         {
           variables: {
             where: {
-              isArchivedFor: [recipient.company.siret]
+              isArchivedFor: [destination.company.siret]
             }
           }
         }
@@ -661,14 +661,14 @@ describe("Query.bsds.dasris base workflow", () => {
       ]);
     });
 
-    it("refused  dasri should be isArchivedFor recipient", async () => {
-      const { query } = makeClient(recipient.user);
+    it("refused  dasri should be isArchivedFor destination", async () => {
+      const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
         {
           variables: {
             where: {
-              isArchivedFor: [recipient.company.siret]
+              isArchivedFor: [destination.company.siret]
             }
           }
         }
@@ -692,7 +692,6 @@ describe("Query.bsds.dasris mutations", () => {
     });
 
     const dasri = await bsdasriFactory({
-      ownerId: emitter.user.id,
       opt: {
         emitterCompanySiret: emitter.company.siret
       }
@@ -743,7 +742,6 @@ describe("Query.bsds.dasris mutations", () => {
     });
 
     const dasri = await bsdasriFactory({
-      ownerId: emitter.user.id,
       opt: {
         emitterCompanySiret: emitter.company.siret
       }

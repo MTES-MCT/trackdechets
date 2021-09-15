@@ -7,106 +7,26 @@ import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
 import { Query } from "../../../../generated/graphql/types";
+import { fullBsdasriFragment } from "../../../fragments";
+import { gql } from "apollo-server-express";
 
-const GET_BSDASRIS = `
-query bsDasris($where: BsdasriWhere) {
-  bsdasris(where: $where) {
-    totalCount
-    pageInfo {
-      startCursor
-      endCursor
-      hasNextPage
-    }
-    edges {
-
-      node {
-        id
-        status
-        emitter {
-          company {
-            name
-            siret
-          }
-          workSite {
-            name
-            address
-            city
-            postalCode
-          }
+const GET_BSDASRIS = gql`
+  ${fullBsdasriFragment}
+  query bsDasris($where: BsdasriWhere) {
+    bsdasris(where: $where) {
+      totalCount
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+      }
+      edges {
+        node {
+          ...FullBsdasriFragment
         }
-        emission {
-          wasteCode
-
-          wasteDetails {
-            onuCode
-            volume
-            quantity { value type}
-    
-          }
-          handedOverAt
-          signature {
-            author
-            date
-          }
-        }
-
-        transporter {
-          company {
-            siret
-          }
-        }
-        transport {
-          handedOverAt
-          takenOverAt
-          wasteDetails {
-            quantity { value type}
- 
-            volume
-          }
-          wasteAcceptation {
-            status
-            refusalReason
-
-            refusedQuantity
-          }
-          signature {
-            author
-            date
-          }
-        }
-        recipient {
-          company {
-            name
-            siret
-          }
-        }
-        reception {
-          wasteDetails {
-            volume
-          }
-          wasteAcceptation {
-            status
-            refusalReason
-
-            refusedQuantity
-          }
-          signature {
-            author
-            date
-          }
-        }
-        operation {
-          quantity { value }
-          processingOperation
-          processedAt
-        }
-        createdAt
-        updatedAt
       }
     }
   }
-}
-
 `;
 
 describe("Query.Bsdasris", () => {
@@ -114,10 +34,9 @@ describe("Query.Bsdasris", () => {
 
   it("should disallow unauthenticated user", async () => {
     const { query } = makeClient();
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company } = await userWithCompanyFactory("MEMBER");
 
     await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company)
       }
@@ -135,9 +54,8 @@ describe("Query.Bsdasris", () => {
   });
 
   it("should return an empty list if requested sirets do not belong to user", async () => {
-    const { user: otherUser, company } = await userWithCompanyFactory("MEMBER");
+    const { company } = await userWithCompanyFactory("MEMBER");
     const params = {
-      ownerId: otherUser.id,
       opt: {
         ...initialData(company)
       }
@@ -148,7 +66,7 @@ describe("Query.Bsdasris", () => {
     const { query } = makeClient(user);
     const { data } = await query<Pick<Query, "bsdasris">>(GET_BSDASRIS, {
       variables: {
-        where: { transporter: { company: { siret: "9999" } } }
+        where: { transporter: { company: { siret: { _eq: "9999" } } } }
       }
     });
 
@@ -158,7 +76,6 @@ describe("Query.Bsdasris", () => {
   it("should get user dasris", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const params = {
-      ownerId: user.id,
       opt: {
         ...initialData(company)
       }
@@ -186,16 +103,14 @@ describe("Query.Bsdasris", () => {
   it("should get filtered dasris", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const transporterCompany = await companyFactory();
-    const recipientCompany = await companyFactory();
+    const destinationCompany = await companyFactory();
 
     await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company)
       }
     });
     const dasri2 = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company),
         transporterCompanySiret: transporterCompany.siret
@@ -204,10 +119,9 @@ describe("Query.Bsdasris", () => {
 
     // let's create a dasri with specific recipient to filter on its siret
     const dasri3 = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company),
-        recipientCompanySiret: recipientCompany.siret
+        destinationCompanySiret: destinationCompany.siret
       }
     });
 
@@ -219,7 +133,9 @@ describe("Query.Bsdasris", () => {
       {
         variables: {
           where: {
-            transporter: { company: { siret: transporterCompany.siret } }
+            transporter: {
+              company: { siret: { _eq: transporterCompany.siret } }
+            }
           }
         }
       }
@@ -231,39 +147,40 @@ describe("Query.Bsdasris", () => {
     expect(queryTransporterIds).toStrictEqual([dasri2.id]);
 
     // retrieve dasris where recipient is otherCompany
-    const { data: queryRecipient } = await query<Pick<Query, "bsdasris">>(
+    const { data: queryDestination } = await query<Pick<Query, "bsdasris">>(
       GET_BSDASRIS,
       {
         variables: {
-          where: { recipient: { company: { siret: recipientCompany.siret } } }
+          where: {
+            destination: {
+              company: { siret: { _eq: destinationCompany.siret } }
+            }
+          }
         }
       }
     );
-    const queryRecipientIids = queryRecipient.bsdasris.edges.map(
+    const queryDestinationIds = queryDestination.bsdasris.edges.map(
       edge => edge.node.id
     );
 
-    expect(queryRecipientIids).toStrictEqual([dasri3.id]);
+    expect(queryDestinationIds).toStrictEqual([dasri3.id]);
   });
 
   it("should get dasris which id are requested", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company)
       }
     });
     const dasri2 = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company)
       }
     });
 
     const dasri3 = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company)
       }
@@ -275,7 +192,7 @@ describe("Query.Bsdasris", () => {
     const { data } = await query<Pick<Query, "bsdasris">>(GET_BSDASRIS, {
       variables: {
         where: {
-          id_in: [dasri2.id, dasri3.id]
+          id: { _in: [dasri2.id, dasri3.id] }
         }
       }
     });

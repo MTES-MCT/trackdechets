@@ -8,7 +8,7 @@ export function updateOperation(company: string): WorkflowStep {
     mutation: mutations.updateBsdasri,
     variables: ({ bsd }) => ({
       id: bsd.id,
-      input: { operation: fixtures.operationInput }
+      input: { destination: { operation: fixtures.operationInput } }
     }),
     expected: { status: "RECEIVED" },
     data: response => response.updateBsdasri,

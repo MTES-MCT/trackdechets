@@ -20,6 +20,7 @@ async function testWorkflow(workflow) {
     const { data: response } = await mutate(step.mutation, {
       variables: step.variables(context)
     });
+
     const data = step.data(response);
     expect(data).toEqual(expect.objectContaining(step.expected));
     if (step.setContext) {
