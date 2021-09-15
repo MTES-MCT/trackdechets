@@ -4,6 +4,7 @@ import { Formik, Form, Field } from "formik";
 import * as yup from "yup";
 import {
   Bsff,
+  BsffAcceptationStatus,
   BsffSignatureType,
   Mutation,
   MutationSignBsffArgs,
@@ -20,10 +21,14 @@ import { GET_BSDS } from "common/queries";
 const validationSchema = yup.object({
   receptionDate: yup.date().required(),
   receptionKilos: yup.number().required(),
-  receptionRefusal: yup
-    .string()
-    .nullable()
-    .min(1, "Le motif du refus doit être complété"),
+  receptionRefusalReason: yup.string().when("receptionAcceptationStatus", {
+    is: value => value === BsffAcceptationStatus.Refused,
+    then: schema =>
+      schema
+        .ensure()
+        .min(1, "Le motif du refus doit être complété en cas de refus"),
+    otherwise: schema => schema.nullable(),
+  }),
   signatureAuthor: yup
     .string()
     .ensure()
@@ -55,7 +60,11 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
           bsff.destination?.reception?.date ?? new Date().toISOString(),
         receptionKilos:
           bsff.destination?.reception?.kilos ?? bsff.quantity?.kilos ?? 0,
-        receptionRefusal: null,
+        receptionAcceptationStatus:
+          bsff.destination?.reception?.acceptationStatus ??
+          BsffAcceptationStatus.Accepted,
+        receptionRefusalReason:
+          bsff.destination?.reception?.refusalReason ?? null,
         signatureAuthor: "",
       }}
       validationSchema={validationSchema}
@@ -68,7 +77,8 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
                 reception: {
                   date: values.receptionDate,
                   kilos: values.receptionKilos,
-                  refusal: values.receptionRefusal,
+                  refusalReason: values.receptionRefusalReason,
+                  acceptationStatus: values.receptionAcceptationStatus,
                 },
               },
             },
@@ -87,7 +97,7 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
         onCancel();
       }}
     >
-      {({ values, setFieldValue }) => (
+      {({ values, setValues }) => (
         <Form>
           <p>
             En qualité de <strong>destinataire du déchet</strong>, j'atteste que
@@ -121,22 +131,33 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
               <Switch
                 label="Le déchet a été refusé"
                 onChange={checked =>
-                  setFieldValue("receptionRefusal", checked ? "" : null)
+                  setValues({
+                    ...values,
+                    receptionAcceptationStatus: checked
+                      ? BsffAcceptationStatus.Refused
+                      : BsffAcceptationStatus.Accepted,
+                    receptionRefusalReason: checked ? "" : null,
+                  })
                 }
-                checked={values.receptionRefusal != null}
+                checked={
+                  values.receptionAcceptationStatus ===
+                  BsffAcceptationStatus.Refused
+                }
               />
             </label>
           </div>
-          {values.receptionRefusal != null && (
+          {values.receptionAcceptationStatus ===
+            BsffAcceptationStatus.Refused && (
             <div className="form__row">
               <label>
                 <Field
                   as="textarea"
                   className="td-input"
-                  name="receptionRefusal"
+                  name="receptionRefusalReason"
                   placeholder="Motif du refus"
                 />
               </label>
+              <RedErrorMessage name="receptionRefusalReason" />
             </div>
           )}
           <div className="form__row">

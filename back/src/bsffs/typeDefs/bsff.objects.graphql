@@ -164,7 +164,7 @@ type BsffReception {
   "Quantité totale du déchet, qu'elle soit réelle ou estimée. Doit être à 0 dans le cas d'un refus"
   kilos: Float!
   "Accepté ou refusé"
-  acceptationStatus: BsffAcceptationStatus!
+  acceptationStatus: BsffAcceptationStatus
   "En cas de refus, le motif."
   refusalReason: String
   "Signature de la destination lors de l'acceptation ou du refus du déchet."

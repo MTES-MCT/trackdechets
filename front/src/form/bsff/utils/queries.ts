@@ -65,7 +65,8 @@ export const FullBsffFragment = gql`
       reception {
         date
         kilos
-        refusal
+        acceptationStatus
+        refusalReason
         signature {
           author
           date
