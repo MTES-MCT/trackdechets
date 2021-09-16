@@ -90,6 +90,8 @@ type BsffEmitter {
   company: FormCompany
   "Déclaration de l'émetteur lors de l'enlèvement par le transporteur."
   emission: BsffEmission
+  "Champ libre"
+  customInfo: String
 }
 type BsffEmission {
   "Signature de l'émetteur lors de l'enlèvement par le transporteur."
@@ -130,6 +132,8 @@ type BsffTransporter {
   recepisse: BsffTransporterRecepisse
   "Déclaration du transporteur lors de l'enlèvement auprès de l'émetteur."
   transport: BsffTransport
+  "Champ libre"
+  customInfo: String
 }
 type BsffTransporterRecepisse {
   "Numéro du récépissé."
@@ -157,6 +161,8 @@ type BsffDestination {
   plannedOperation: BsffPlannedOperation
   "Numéro CAP."
   cap: String
+  "Champ libre"
+  customInfo: String
 }
 type BsffReception {
   "Date de réception du déchet."

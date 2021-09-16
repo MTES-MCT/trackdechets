@@ -827,6 +827,7 @@ model Bsff {
   emitterCompanyContact String?
   emitterCompanyPhone   String?
   emitterCompanyMail    String?
+  emitterCustomInfo     String?
 
   emitterEmissionSignatureAuthor String?
   emitterEmissionSignatureDate   DateTime?
@@ -849,6 +850,8 @@ model Bsff {
   transporterCompanyPhone     String?
   transporterCompanyMail      String?
 
+  transporterCustomInfo String?
+
   transporterRecepisseNumber        String?
   transporterRecepisseDepartment    String?
   transporterRecepisseValidityLimit DateTime?
@@ -864,10 +867,12 @@ model Bsff {
   destinationCompanyPhone   String?
   destinationCompanyMail    String?
 
-  destinationReceptionDate    DateTime?
-  destinationReceptionKilos   Float?
+  destinationCustomInfo String?
+
+  destinationReceptionDate              DateTime?
+  destinationReceptionKilos             Float?
   destinationReceptionAcceptationStatus WasteAcceptationStatus?
-  destinationReceptionRefusalReason String?
+  destinationReceptionRefusalReason     String?
 
   destinationReceptionSignatureAuthor String?
   destinationReceptionSignatureDate   DateTime?
@@ -990,6 +995,7 @@ model Bsda {
   emitterWorkSiteInfos           String?
   emitterEmissionSignatureAuthor String?
   emitterEmissionSignatureDate   DateTime?
+
 
   wasteCode         String?
   wasteName         String?

@@ -135,6 +135,7 @@ export function createBsffBeforeRefusal(
     destinationReceptionDate: new Date().toISOString(),
     destinationReceptionKilos: 0,
     destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
+    destinationReceptionRefusalReason: "non conforme",
     ...initialData
   });
 }
