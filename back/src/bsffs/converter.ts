@@ -32,6 +32,7 @@ export function flattenBsffInput(
     emitterCompanyContact: bsffInput.emitter?.company.contact,
     emitterCompanyPhone: bsffInput.emitter?.company.phone,
     emitterCompanyMail: bsffInput.emitter?.company.mail,
+    emitterCustomInfo: bsffInput.emitter?.customInfo,
 
     packagings: bsffInput.packagings,
 
@@ -49,6 +50,7 @@ export function flattenBsffInput(
     transporterCompanyContact: bsffInput.transporter?.company.contact,
     transporterCompanyPhone: bsffInput.transporter?.company.phone,
     transporterCompanyMail: bsffInput.transporter?.company.mail,
+    transporterCustomInfo: bsffInput.transporter?.customInfo,
 
     transporterRecepisseNumber: bsffInput.transporter?.recepisse?.number,
     transporterRecepisseDepartment:
@@ -64,6 +66,7 @@ export function flattenBsffInput(
     destinationCompanyContact: bsffInput.destination?.company?.contact,
     destinationCompanyPhone: bsffInput.destination?.company?.phone,
     destinationCompanyMail: bsffInput.destination?.company?.mail,
+    destinationCustomInfo: bsffInput.destination?.customInfo,
 
     destinationReceptionDate: bsffInput.destination?.reception?.date,
     destinationReceptionKilos: bsffInput.destination?.reception?.kilos,
@@ -111,6 +114,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
         phone: prismaBsff.emitterCompanyPhone,
         mail: prismaBsff.emitterCompanyMail
       }),
+      customInfo: prismaBsff.emitterCustomInfo,
       emission: nullIfNoValues<GraphQL.BsffEmission>({
         signature: nullIfNoValues<GraphQL.Signature>({
           author: prismaBsff.emitterEmissionSignatureAuthor,
@@ -143,6 +147,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
         department: prismaBsff.transporterRecepisseDepartment,
         validityLimit: prismaBsff.transporterRecepisseValidityLimit
       }),
+      customInfo: prismaBsff.transporterCustomInfo,
       transport: nullIfNoValues<GraphQL.BsffTransport>({
         mode: prismaBsff.transporterTransportMode,
         signature: nullIfNoValues<GraphQL.Signature>({
@@ -160,6 +165,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
         phone: prismaBsff.destinationCompanyPhone,
         mail: prismaBsff.destinationCompanyMail
       }),
+      customInfo: prismaBsff.destinationCustomInfo,
       reception: nullIfNoValues<GraphQL.BsffReception>({
         date: prismaBsff.destinationReceptionDate,
         kilos: prismaBsff.destinationReceptionKilos,
