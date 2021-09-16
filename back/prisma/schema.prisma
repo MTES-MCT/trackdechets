@@ -899,7 +899,28 @@ model Bsff {
   previousBsffs Bsff[]  @relation("BsffToBsff")
   nextBsff      Bsff?   @relation("BsffToBsff", fields: [nextBsffId], references: [id])
   nextBsffId    String?
+
+  // regroupedIn BsffRegroupement[] @relation("RegroupedIn")
+  // regrouping BsffRegroupement[] @relation("Regrouping")
+
+  // forwarding  Bsff? @relation("Forwarding", fields: [forwardingId], references: [id])
+  // forwardingId String?
+  // forwardedIn Bsff?
+
+  // synthesizing Bsff[]  @relation("Synthesizing")
+  // synthesizingId String?
+  // synthesizedIn Bsff?
 }
+
+
+// model BsffRegroupement {
+//   id         String          @id @default(cuid())
+//   previous   Bsff            @relation("Regrouping", fields: [previousId], references: [id])
+//   previousId String
+//   next       Bsff            @relation("RegroupedIn", fields: [nextId], references: [id])
+//   nextId     String
+//   quantity   Int?
+// }
 
 enum BsffType {
   TRACER_FLUIDE
