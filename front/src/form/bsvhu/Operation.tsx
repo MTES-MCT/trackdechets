@@ -66,6 +66,22 @@ export default function Operation() {
         ) : null}
       </div>
 
+      <div className="form__row">
+        <label>
+          En tonnes
+          <Field
+            component={NumberInput}
+            name="destination.reception.quantity.tons"
+            className="td-input td-input--small"
+            placeholder="0"
+            min="0"
+            step="1"
+          />
+        </label>
+
+        <RedErrorMessage name="destination.reception.quantity.tons" />
+      </div>
+
       <h4 className="form__section-heading">Identification & Quantité</h4>
       <div className="form__row">
         <label>
@@ -86,22 +102,6 @@ export default function Operation() {
         </label>
 
         <RedErrorMessage name="destination.reception.quantity.number" />
-      </div>
-
-      <div className="form__row">
-        <label>
-          En tonnes
-          <Field
-            component={NumberInput}
-            name="destination.reception.quantity.tons"
-            className="td-input td-input--small"
-            placeholder="0"
-            min="0"
-            step="1"
-          />
-        </label>
-
-        <RedErrorMessage name="destination.reception.quantity.tons" />
       </div>
 
       <h4 className="form__section-heading">Opération</h4>

@@ -32,7 +32,7 @@ export default function Emitter({ disabled }) {
 
       <div className="form__row">
         <label>
-          Numéro d'agrément
+          Numéro d'agrément démolisseur
           <Field
             disabled={disabled}
             type="text"
