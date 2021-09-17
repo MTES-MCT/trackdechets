@@ -19,8 +19,10 @@ function searchResponseToCompany({
 }: SearchResponseDataGouv): CompanySearchResult {
   const addressVoie = buildAddress([
     etablissement.numero_voie,
+    etablissement.indice_repetition,
     etablissement.type_voie,
-    etablissement.libelle_voie
+    etablissement.libelle_voie,
+    etablissement.complement_adresse
   ]);
 
   const fullAddress = etablissement.geo_adresse

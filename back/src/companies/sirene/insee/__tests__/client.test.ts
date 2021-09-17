@@ -32,7 +32,9 @@ describe("searchCompany", () => {
           },
           adresseEtablissement: {
             numeroVoieEtablissement: "4",
+            indiceRepetitionEtablissement: "bis",
             typeVoieEtablissement: "BD",
+            complementAdresseEtablissement: "Bat G",
             libelleVoieEtablissement: "LONGCHAMP",
             codePostalEtablissement: "13001",
             libelleCommuneEtablissement: "Marseille",
@@ -46,8 +48,8 @@ describe("searchCompany", () => {
     const expected = {
       siret: "85001946400013",
       etatAdministratif: "A",
-      address: "4 BD LONGCHAMP 13001 Marseille",
-      addressVoie: "4 BD LONGCHAMP",
+      address: "4 bis BD LONGCHAMP Bat G 13001 Marseille",
+      addressVoie: "4 bis BD LONGCHAMP Bat G",
       addressPostalCode: "13001",
       addressCity: "Marseille",
       codeCommune: "13201",
