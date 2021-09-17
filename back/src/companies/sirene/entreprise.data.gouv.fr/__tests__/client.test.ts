@@ -17,12 +17,13 @@ describe("searchCompany", () => {
           siret: "85001946400013",
           etat_administratif: "A",
           numero_voie: "4",
+          indice_repetition: "bis",
           type_voie: "BD",
           libelle_voie: "LONGCHAMP",
+          complement_adresse: "Bat G",
           code_postal: "13001",
           code_commune: "13201",
           libelle_commune: "MARSEILLE",
-          geo_adresse: "4 Boulevard Longchamp 13001 Marseille",
           unite_legale: {
             denomination: "CODE EN STOCK",
             activite_principale: "62.01Z"
@@ -34,8 +35,8 @@ describe("searchCompany", () => {
     const expected = {
       siret: "85001946400013",
       etatAdministratif: "A",
-      address: "4 Boulevard Longchamp 13001 Marseille",
-      addressVoie: "4 BD LONGCHAMP",
+      address: "4 bis BD LONGCHAMP Bat G 13001 MARSEILLE",
+      addressVoie: "4 bis BD LONGCHAMP Bat G",
       addressPostalCode: "13001",
       addressCity: "MARSEILLE",
       codeCommune: "13201",
