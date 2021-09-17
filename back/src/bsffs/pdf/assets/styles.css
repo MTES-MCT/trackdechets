@@ -59,6 +59,23 @@ h2 {
   border-bottom: 0;
 }
 .BoxCol {
+  position: relative;
   border-right: 1px solid var(--color-black);
   padding: var(--spacing-gutter);
+}
+
+.QrCode svg {
+  height: 80px;
+  width: auto;
+}
+
+.Signature {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: var(--spacing-gutter);
+}
+.Signature svg {
+  width: 80px;
+  height: auto;
 }

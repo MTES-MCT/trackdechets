@@ -22,7 +22,7 @@ const basesign = async ({ id, input, context, securityCode = null }) => {
   const signatureType = securityCode ? "EMISSION_WITH_SECRET_CODE" : input.type;
   const signatureParams = dasriSignatureMapping[signatureType];
 
-  // Which siret is involved in curent signature process ?
+  // Which siret is involved in current signature process ?
   const siretWhoSigns = signatureParams.authorizedSiret(bsdasri);
   // Is this siret belonging to a concrete user ?
   await checkIsCompanyMember({ id: user.id }, { siret: siretWhoSigns });

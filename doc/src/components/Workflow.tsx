@@ -12,8 +12,8 @@ export default function Workflow({ path }) {
       {workflow.description && <div>{workflow.description}</div>}
       {workflow.chart && <Mermaid chart={workflow.chart} />}
       <hr />
-      {workflow.steps.map((step) => (
-        <div>
+      {workflow.steps.map((step, idx) => (
+        <div key={idx}>
           <div className="margin-bottom--sm">{step.description}</div>
           <div className="margin-bottom--lg">
             <CodeBlock className="graphql">{step.mutation}</CodeBlock>

@@ -24,6 +24,7 @@ const TdTooltip = ({ msg }: Props) => {
         borderRadius: "3px",
         padding: "0.5em 1em",
         whiteSpace: "pre-wrap",
+        zIndex: 999,
       }}
     >
       <button className={style.tdTooltip} type="button">

@@ -36,6 +36,16 @@ export default {
       create: "/dashboard/:siret/bsdasris/create",
       createGroup: "/dashboard/:siret/bsdasris/create-group",
       edit: "/dashboard/:siret/bsdasris/edit/:id",
+      sign: {
+        publish: "/dashboard/:siret/bsdasris/publish/:id",
+        directTakeover: "/dashboard/:siret/bsdasris/direct-takeover/:id",
+        emission: "/dashboard/:siret/bsdasris/emission/:id",
+        emissionSecretCode:
+          "/dashboard/:siret/bsdasris/sign-emitter-secret/:id",
+        transporter: "/dashboard/:siret/bsdasris/sign-transporter/:id",
+        reception: "/dashboard/:siret/bsdasris/sign-reception/:id",
+        operation: "/dashboard/:siret/bsdasris/sign-operation/:id",
+      },
     },
     bsvhus: {
       create: "/dashboard/:siret/bsvhus/create",
@@ -46,6 +56,11 @@ export default {
       create: "/dashboard/:siret/bsffs/create",
       edit: "/dashboard/:siret/bsffs/edit/:id",
       view: "/dashboard/:siret/bsffs/view/:id",
+    },
+    bsdas: {
+      create: "/dashboard/:siret/bsdas/create",
+      edit: "/dashboard/:siret/bsdas/edit/:id",
+      view: "/dashboard/:siret/bsdas/view/:id",
     },
     transport: {
       index: "/dashboard/:siret/transport",

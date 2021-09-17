@@ -4,11 +4,13 @@ export interface SearchResponseDataGouv {
     siret: string;
     etat_administratif: string;
     numero_voie: string;
+    indice_repetition: string;
     type_voie: string;
     libelle_voie: string;
     code_postal: string;
     code_commune: string;
     libelle_commune: string;
+    complement_adresse: string;
     geo_adresse: string;
     unite_legale: {
       denomination: string;
@@ -32,6 +34,8 @@ interface EtablissementInsee {
   };
   adresseEtablissement: {
     numeroVoieEtablissement: string;
+    indiceRepetitionEtablissement: string;
+    complementAdresseEtablissement: string;
     typeVoieEtablissement: string;
     libelleVoieEtablissement: string;
     codePostalEtablissement: string;

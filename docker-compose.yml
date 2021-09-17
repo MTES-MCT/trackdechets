@@ -1,91 +1,100 @@
-version: "3.7"
-x-logging: &gelf-logging
-  driver: gelf
-  options:
-    gelf-address: udp://$OVH_LOGS_HOST:$OVH_LOGS_PORT
-    env: X-OVH-TOKEN,facility
 services:
+  postgres:
+    image: postgres:10.5
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    environment:
+      POSTGRES_USER: trackdechets
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
   redis:
     image: redis:5.0-alpine
-    restart: always
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     sysctls:
       - net.core.somaxconn=511
-    environment:
-      X-OVH-TOKEN: $OVH_LOGS_TOKEN
-      facility: docker-redis
-    logging: *gelf-logging
-  td-api:
-    image: betagouv/trackdechets-api:master
-    restart: always
-    environment:
-      NODE_ENV: production
-      VIRTUAL_HOST: $API_HOST
-      LETSENCRYPT_HOST: $API_HOST
-      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
-      TRELLO_API_KEY: $TRELLO_API_KEY
-      TRELLO_TOKEN: $TRELLO_TOKEN
-      TRELLO_ALERTS_LIST_ID: $TRELLO_ALERTS_LIST_ID
-      SENTRY_DSN: $SENTRY_DSN
-      SENTRY_ENVIRONMENT: $SENTRY_ENVIRONMENT
-      EMAIL_BACKEND: $EMAIL_BACKEND
-      SENDER_EMAIL_ADDRESS: $SENDER_EMAIL_ADDRESS
-      SENDER_NAME: $SENDER_NAME
-      MAIN_TEMPLATE_ID: $MAIN_TEMPLATE_ID
-      FIRST_ONBOARDING_TEMPLATE_ID: $FIRST_ONBOARDING_TEMPLATE_ID
-      PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID: $PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID
-      PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID: $PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
-      SECURITY_CODE_RENEWAL_TEMPLATE_ID: $SECURITY_CODE_RENEWAL_TEMPLATE_ID
-      MJ_APIKEY_PUBLIC: $MJ_APIKEY_PUBLIC
-      MJ_APIKEY_PRIVATE: $MJ_APIKEY_PRIVATE
-      SIB_APIKEY: $SIB_APIKEY
-      SIB_BASE_URL: $SIB_BASE_URL
-      MY_SENDING_BOX_API_KEY: $MY_SENDING_BOX_API_KEY
-      NOTIFY_DREAL_WHEN_FORM_DECLINED: $NOTIFY_DREAL_WHEN_FORM_DECLINED
-      DATABASE_URL: $DATABASE_URL
-      POSTGRES_USER: $POSTGRES_USER
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-      POSTGRES_HOST: $POSTGRES_HOST
-      POSTGRES_PORT: $POSTGRES_PORT
-      SESSION_SECRET: $SESSION_SECRET
-      SESSION_NAME: $SESSION_NAME
-      SESSION_COOKIE_HOST: $SESSION_COOKIE_HOST
-      SESSION_COOKIE_SECURE: $SESSION_COOKIE_SECURE
-      JWT_SECRET: $JWT_SECRET
-      INSEE_SECRET: $INSEE_SECRET
-      API_TOKEN_SECRET: $API_TOKEN_SECRET
-      UI_HOST: $UI_HOST
-      UI_URL_SCHEME: $UI_URL_SCHEME
-      API_HOST: $API_HOST
-      API_URL_SCHEME: $API_URL_SCHEME
-      S3_ENDPOINT: $S3_ENDPOINT
-      S3_REGION: $S3_REGION
-      S3_ACCESS_KEY_ID: $S3_ACCESS_KEY_ID
-      S3_SECRET_ACCESS_KEY: $S3_SECRET_ACCESS_KEY
-      S3_BUCKET: $S3_BUCKET
-      OVH_LOGS_ACTIVATED: "true"
-      OVH_LOGS_TOKEN: $OVH_LOGS_TOKEN
-      OVH_LOGS_HOST: $OVH_LOGS_HOST
-      OVH_LOGS_PORT: $OVH_LOGS_PORT
-      PDF_WATERMARK: $PDF_WATERMARK
-      VERIFY_COMPANY: $VERIFY_COMPANY
-      X-OVH-TOKEN: $OVH_LOGS_TOKEN
-      ELASTIC_SEARCH_URL: $ELASTIC_SEARCH_URL
-      SCALINGO_CERT: $SCALINGO_CERT
+    ports:
+      - "6379:6379"
 
-      facility: docker-td-api
-    logging: *gelf-logging
-  td-ui:
-    image: betagouv/trackdechets-ui:master
-    restart: always
+  td-api:
+    image: td-api
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    build:
+      context: ./back
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./back/src:/usr/src/app/src
+      - ./doc/docs:/usr/src/doc/docs
+      - ./front/src/generated:/usr/src/front/src/generated
+      - ./back/prisma:/usr/src/app/prisma
+    env_file:
+      - .env
     environment:
-      VIRTUAL_HOST: $UI_HOST
-      LETSENCRYPT_HOST: $UI_HOST
-      LETSENCRYPT_EMAIL: $EMAIL_LETS_ENCRYPT
+      NODE_ENV: dev
+    ports:
+      - "4000:$API_PORT"
+
+  td-ui:
+    stdin_open: true
+    image: node:14.15.4
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    working_dir: /usr/src/front
+    command: sh -c "npm install && npm run dev"
+    expose:
+      - "3000"
+    volumes:
+      - ./front:/usr/src/front
+      - ./back/src:/usr/src/back/src
+    ports:
+      - "3000:3000"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.0
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.elasticsearch == true"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.8.0
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+
+  nginx:
+    image: nginx:1.19.6
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    network_mode: $NGINX_NETWORK_MODE
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates
+    environment:
+      API_HOST: $API_HOST
+      API_PORT: $API_PORT
+      UI_HOST: $UI_HOST
+      DEVELOPERS_HOST: $DEVELOPERS_HOST
+      NGINX_PROXY_HOST: $NGINX_PROXY_HOST
+      ELASTIC_SEARCH_HOST: $ELASTIC_SEARCH_HOST
+      KIBANA_HOST: $KIBANA_HOST
+    ports:
+      - "80:80"
 
 volumes:
   postgres:
-
-networks:
-  default:
-    external:
-      name: nginx-proxy
+  elasticsearch:

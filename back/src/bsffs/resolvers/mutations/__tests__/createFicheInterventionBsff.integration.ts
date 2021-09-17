@@ -52,13 +52,14 @@ describe("Mutation.createFicheInterventionBsff", () => {
       name: variables.input.operateur.company.name
     });
     const { mutate } = makeClient(emitter.user);
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "createFicheInterventionBsff">,
       MutationCreateFicheInterventionBsffArgs
     >(ADD_FICHE_INTERVENTION, {
       variables
     });
 
+    expect(errors).toBeUndefined();
     expect(data.createFicheInterventionBsff.numero).toBe(
       variables.input.numero
     );

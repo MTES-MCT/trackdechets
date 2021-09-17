@@ -20,7 +20,7 @@ export default function Operation() {
           <Field
             component={DateInput}
             name="destination.reception.date"
-            className={`td-input`}
+            className="td-input td-input--small"
           />
         </label>
 
@@ -66,10 +66,27 @@ export default function Operation() {
         ) : null}
       </div>
 
+      <div className="form__row">
+        <label>
+          En tonnes
+          <Field
+            component={NumberInput}
+            name="destination.reception.quantity.tons"
+            className="td-input td-input--small"
+            placeholder="0"
+            min="0"
+            step="1"
+          />
+        </label>
+
+        <RedErrorMessage name="destination.reception.quantity.tons" />
+      </div>
+
       <h4 className="form__section-heading">Identification & Quantité</h4>
       <div className="form__row">
         <label>
-          Détail des identifications
+          Identification des numeros entrant des lots ou des VHU (livre de
+          police)
           <Tooltip msg="Saisissez les identifications une par une. Appuyez sur la touche <Entrée> pour valider chacune" />
           <TagsInput name="destination.reception.identification.numbers" />
         </label>
@@ -80,27 +97,11 @@ export default function Operation() {
           <Field
             component={NumberInput}
             name="destination.reception.quantity.number"
-            className="td-input waste-details__quantity"
+            className="td-input td-input--small"
           />
         </label>
 
         <RedErrorMessage name="destination.reception.quantity.number" />
-      </div>
-
-      <div className="form__row">
-        <label>
-          En tonnes
-          <Field
-            component={NumberInput}
-            name="destination.reception.quantity.tons"
-            className="td-input waste-details__quantity"
-            placeholder="0"
-            min="0"
-            step="1"
-          />
-        </label>
-
-        <RedErrorMessage name="destination.reception.quantity.tons" />
       </div>
 
       <h4 className="form__section-heading">Opération</h4>
@@ -110,26 +111,14 @@ export default function Operation() {
           <Field
             component={DateInput}
             name="destination.operation.date"
-            className={`td-input`}
+            className="td-input td-input--small"
           />
         </label>
 
         <RedErrorMessage name="destination.operation.date" />
       </div>
-      <div className="form__row">
-        <label>
-          Numéro d'agrément
-          <Field
-            type="text"
-            name="destination.agrementNumber"
-            className="td-input"
-          />
-        </label>
 
-        <RedErrorMessage name="destination.agrementNumber" />
-      </div>
-
-      <div className="form__row">
+      <div className="form__row tw-pb-6">
         <label>Opération d’élimination / valorisation effectuée</label>
         <Field
           as="select"

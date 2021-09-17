@@ -12,6 +12,7 @@ enum BsffType {
   REEXPEDITION
 }
 
+"Statut qui résume là où en est le BSFF dans son parcours."
 enum BsffStatus {
   "Le bordereau ne comporte aucune signature."
   INITIAL
@@ -43,9 +44,14 @@ enum BsffOperationCode {
   D15
 }
 
+"Liste des différentes signatures possibles."
 enum BsffSignatureType {
+  "Signature de l'émetteur, avant enlèvement."
   EMISSION
+  "Signature du transporteur, lors de l'enlèvement."
   TRANSPORT
+  "Signature de la destination, lors de la réception."
   RECEPTION
+  "Signature de la destination, lors du traitement."
   OPERATION
 }

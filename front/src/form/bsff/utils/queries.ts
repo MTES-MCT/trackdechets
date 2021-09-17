@@ -29,6 +29,7 @@ export const FullBsffFragment = gql`
     packagings {
       name
       numero
+      volume
       kilos
     }
     waste {

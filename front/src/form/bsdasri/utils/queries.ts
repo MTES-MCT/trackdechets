@@ -26,3 +26,23 @@ export const UPDATE_BSDASRI = gql`
     }
   }
 `;
+
+export const SIGN_BSDASRI = gql`
+  mutation SignBsdasri($id: ID!, $input: BsdasriSignatureInput!) {
+    signBsdasri(id: $id, input: $input) {
+      id
+      status
+    }
+  }
+`;
+export const SIGN_BSDASRI_EMISSION_WITH_SECRET_CODE = gql`
+  mutation SignBsdasriEmissionWithSecretCode(
+    $id: ID!
+    $input: BsdasriSignatureWithSecretCodeInput!
+  ) {
+    signBsdasriEmissionWithSecretCode(id: $id, input: $input) {
+      id
+      status
+    }
+  }
+`;

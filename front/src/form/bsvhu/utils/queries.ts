@@ -89,6 +89,13 @@ export const GET_VHU_FORM = gql`
   query Bsvhu($id: ID!) {
     bsvhu(id: $id) {
       ...FullBsvhu
+      metadata {
+        errors {
+          message
+          path
+          requiredFor
+        }
+      }
     }
   }
   ${FullBsvhuFragment}
@@ -109,6 +116,7 @@ export const GET_VHU_FORMS = gql`
             errors {
               message
               path
+              requiredFor
             }
           }
         }

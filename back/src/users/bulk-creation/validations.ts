@@ -1,19 +1,8 @@
-import prisma from "../../prisma";
+import { CompanyType, UserRole } from "@prisma/client";
 import * as yup from "yup";
+import prisma from "../../prisma";
 import { getCompanyThrottled } from "./sirene";
 import { CompanyRow } from "./types";
-
-const COMPANY_TYPES = [
-  "PRODUCER",
-  "COLLECTOR",
-  "WASTEPROCESSOR",
-  "TRANSPORTER",
-  "WASTE_VEHICLES",
-  "WASTE_CENTER",
-  "TRADER"
-];
-
-const ROLES = ["MEMBER", "ADMIN"];
 
 /**
  * Validation schema for company
@@ -53,7 +42,7 @@ export const companyValidationSchema = yup.object({
   gerepId: yup.string().notRequired(),
   companyTypes: yup
     .array()
-    .of(yup.string().oneOf(COMPANY_TYPES))
+    .of(yup.string().oneOf(Object.values(CompanyType)))
     .ensure()
     .compact()
     .required()
@@ -109,13 +98,11 @@ export const roleValidationSchema = (companies: CompanyRow[]) =>
           return true;
         }
       ),
-    role: yup.string().required().oneOf(ROLES)
+    role: yup.string().required().oneOf(Object.values(UserRole))
   });
 
 /** Generates a validateRole function */
-export function validateRoleGenerator(
-  companies: CompanyRow[]
-): (role: any) => Promise<any> {
+export function validateRoleGenerator(companies: CompanyRow[]) {
   const schema = roleValidationSchema(companies);
-  return role => schema.validate(role);
+  return (role: any) => schema.validate(role);
 }

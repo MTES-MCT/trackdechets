@@ -7,6 +7,7 @@ import { IconView } from "common/components/Icons";
 import { WorkflowAction } from "../BSDD/WorkflowAction";
 import { WorkflowAction as BsdasriWorkflowAction } from "../BSDasri/WorkflowAction";
 import { WorkflowAction as BsffWorkflowAction } from "../BSFF/WorkflowAction";
+import { WorkflowAction as BsvhuWorkflowAction } from "../BSVhu/WorkflowAction";
 import { Column } from "../columns";
 import styles from "./BSDCards.module.scss";
 import { BsdTypename } from "dashboard/constants";
@@ -77,6 +78,9 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
                 form={(form as unknown) as BsffFragment}
               />
             ) : null}
+            {form.__typename === "Bsvhu" ? (
+              <BsvhuWorkflowAction siret={siret} form={form} />
+            ) : null}
           </div>
         </div>
       ))}
@@ -89,4 +93,5 @@ const getViewRoute = (bsdTypename: BsdTypename): string =>
     Form: routes.dashboard.bsdds.view,
     Bsdasri: routes.dashboard.bsdasris.view,
     Bsff: routes.dashboard.bsffs.view,
+    Bsvhu: routes.dashboard.bsvhus.view,
   }[bsdTypename]);

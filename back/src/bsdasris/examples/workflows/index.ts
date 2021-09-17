@@ -1,5 +1,7 @@
 import acheminementDirect from "./acheminementDirect";
+import emportDirect from "./emportDirect";
 
 export default {
-  acheminementDirect
+  acheminementDirect,
+  emportDirect
 };

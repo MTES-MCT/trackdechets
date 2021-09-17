@@ -18,8 +18,10 @@ function searchResponseToCompany({
 }: SearchResponseInsee): CompanySearchResult {
   const addressVoie = buildAddress([
     etablissement.adresseEtablissement.numeroVoieEtablissement,
+    etablissement.adresseEtablissement.indiceRepetitionEtablissement,
     etablissement.adresseEtablissement.typeVoieEtablissement,
-    etablissement.adresseEtablissement.libelleVoieEtablissement
+    etablissement.adresseEtablissement.libelleVoieEtablissement,
+    etablissement.adresseEtablissement.complementAdresseEtablissement
   ]);
 
   const fullAddress = buildAddress([

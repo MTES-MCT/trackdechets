@@ -7,7 +7,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound } from "../../database";
 import { flattenBsffInput, unflattenBsff } from "../../converter";
 import { isBsffContributor } from "../../permissions";
-import { isValidPreviousBsffs } from "../../validation";
+import { validateBsff } from "../../validation";
 import { indexBsff } from "../../elastic";
 
 const updateBsff: MutationResolvers["updateBsff"] = async (
@@ -82,20 +82,35 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   }
 
   const futureBsff: Bsff = { ...existingBsff, ...flatInput };
+
   await isBsffContributor(user, futureBsff);
+
+  const previousBsffs = await prisma.bsff.findMany({
+    where:
+      input.previousBsffs?.length > 0
+        ? { id: { in: input.previousBsffs } }
+        : { nextBsffId: existingBsff.id }
+  });
+  const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
+    where:
+      input.ficheInterventions?.length > 0
+        ? { id: { in: input.ficheInterventions } }
+        : { bsffId: existingBsff.id }
+  });
+
+  await validateBsff(futureBsff, previousBsffs, ficheInterventions);
 
   const data: Prisma.BsffUpdateInput = flatInput;
 
-  if (input.previousBsffs) {
-    await isValidPreviousBsffs(futureBsff.type, input.previousBsffs);
+  if (previousBsffs.length > 0) {
     data.previousBsffs = {
-      set: input.previousBsffs.map(id => ({ id }))
+      set: previousBsffs.map(({ id }) => ({ id }))
     };
   }
 
-  if (input.ficheInterventions) {
+  if (ficheInterventions.length > 0) {
     data.ficheInterventions = {
-      set: input.ficheInterventions.map(id => ({ id }))
+      set: ficheInterventions.map(({ id }) => ({ id }))
     };
   }
 

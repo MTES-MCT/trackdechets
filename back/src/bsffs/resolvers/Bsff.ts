@@ -18,6 +18,10 @@ export const Bsff: BsffResolvers = {
       unflattenFicheInterventionBsff
     );
 
+    // the user trying to read ficheInterventions might not be a contributor of the bsff
+    // for example they could be reading the ficheInterventions of a bsff they are grouping:
+    // bsffs { previousBsffs { ficheInterventions } }
+    // in this case, they are still allowed to read ficheInterventions but not all fields
     try {
       await isBsffContributor(context.user, prismaBsff);
     } catch (err) {

@@ -37,6 +37,7 @@ export default function FormsTable({ wasteCode, selectedItems, onToggle }) {
       siret: values.emitter?.company?.siret as string,
     },
     skip: !values.emitter?.company?.siret,
+    fetchPolicy: "network-only",
   });
 
   if (loading) return <p>Chargement...</p>;

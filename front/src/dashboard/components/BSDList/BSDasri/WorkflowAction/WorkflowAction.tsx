@@ -1,12 +1,16 @@
 import React from "react";
-import {
-  Bsdasri,
-  BsdasriStatus,
-  BsdasriSignatureType,
-} from "generated/graphql/types";
+
 import PublishBsdasri from "./PublishBsdasri";
-import SignBsdasri from "./SignBsdasri";
-import SignBsdasriDirectTakeover from "./SignBsdasriDirectTakeover";
+
+import { ActionLink } from "common/components";
+import { generatePath, useLocation, useRouteMatch } from "react-router-dom";
+
+import "@reach/menu-button/styles.css";
+import { IconCheckCircle1 } from "common/components/Icons";
+
+import routes from "common/routes";
+
+import { Bsdasri, BsdasriStatus } from "generated/graphql/types";
 
 export interface WorkflowActionProps {
   form: Bsdasri;
@@ -24,6 +28,9 @@ const isPublishable = (form: Bsdasri) => {
 };
 export function WorkflowAction(props: WorkflowActionProps) {
   const { form, siret } = props;
+  const location = useLocation();
+  const matchAct = !!useRouteMatch(routes.dashboard.bsds.act);
+  const matchToCollect = !!useRouteMatch(routes.dashboard.transport.toCollect);
 
   if (isPublishable(form)) {
     return <PublishBsdasri {...props} />;
@@ -34,51 +41,134 @@ export function WorkflowAction(props: WorkflowActionProps) {
         return null;
       }
 
-      if (siret === form.emitter?.company?.siret) {
+      if (siret === form.emitter?.company?.siret && matchAct) {
         return (
-          <SignBsdasri
-            {...props}
-            signatureType={BsdasriSignatureType.Emission}
-          />
+          <>
+            <ActionLink
+              icon={<IconCheckCircle1 size="24px" />}
+              to={{
+                pathname: generatePath(
+                  routes.dashboard.bsdasris.sign.emission,
+                  {
+                    siret,
+                    id: form.id,
+                  }
+                ),
+                state: { background: location },
+              }}
+            >
+              Signature producteur
+            </ActionLink>
+          </>
         );
       }
-      if (
-        siret === form.transporter?.company?.siret &&
-        form?.allowDirectTakeOver
-      ) {
-        return <SignBsdasriDirectTakeover {...props} />;
+
+      if (siret === form.transporter?.company?.siret && matchToCollect) {
+        return (
+          <>
+            <ActionLink
+              className="tw-mb-1"
+              icon={<IconCheckCircle1 size="24px" />}
+              to={{
+                pathname: generatePath(
+                  routes.dashboard.bsdasris.sign.emissionSecretCode,
+                  {
+                    siret,
+                    id: form.id,
+                  }
+                ),
+                state: { background: location },
+              }}
+            >
+              Signature producteur (code secret)
+            </ActionLink>
+
+            {form?.allowDirectTakeOver &&
+            form.bsdasriType === "SIMPLE" && ( // grouping dasri can't be directly taken over
+                <ActionLink
+                  icon={<IconCheckCircle1 size="24px" />}
+                  to={{
+                    pathname: generatePath(
+                      routes.dashboard.bsdasris.sign.directTakeover,
+                      {
+                        siret,
+                        id: form.id,
+                      }
+                    ),
+                    state: { background: location },
+                  }}
+                >
+                  Emport direct transporteur
+                </ActionLink>
+              )}
+          </>
+        );
       }
       return null;
     }
     case BsdasriStatus.SignedByProducer: {
-      if (siret === form.transporter?.company?.siret) {
+      if (siret === form.transporter?.company?.siret && matchToCollect) {
         return (
-          <SignBsdasri
-            {...props}
-            signatureType={BsdasriSignatureType.Transport}
-          />
+          <>
+            <ActionLink
+              icon={<IconCheckCircle1 size="24px" />}
+              to={{
+                pathname: generatePath(
+                  routes.dashboard.bsdasris.sign.transporter,
+                  {
+                    siret,
+                    id: form.id,
+                  }
+                ),
+                state: { background: location },
+              }}
+            >
+              Signature transporteur
+            </ActionLink>
+          </>
         );
       }
       return null;
     }
     case BsdasriStatus.Sent: {
-      if (siret === form.recipient?.company?.siret) {
+      if (siret === form.recipient?.company?.siret && matchAct) {
         return (
-          <SignBsdasri
-            {...props}
-            signatureType={BsdasriSignatureType.Reception}
-          />
+          <ActionLink
+            icon={<IconCheckCircle1 size="24px" />}
+            to={{
+              pathname: generatePath(routes.dashboard.bsdasris.sign.reception, {
+                siret,
+                id: form.id,
+              }),
+              state: { background: location },
+            }}
+          >
+            Signature reception
+          </ActionLink>
         );
       }
       return null;
     }
     case BsdasriStatus.Received: {
-      if (siret === form.recipient?.company?.siret) {
+      if (siret === form.recipient?.company?.siret && matchAct) {
         return (
-          <SignBsdasri
-            {...props}
-            signatureType={BsdasriSignatureType.Operation}
-          />
+          <>
+            <ActionLink
+              icon={<IconCheckCircle1 size="24px" />}
+              to={{
+                pathname: generatePath(
+                  routes.dashboard.bsdasris.sign.operation,
+                  {
+                    siret,
+                    id: form.id,
+                  }
+                ),
+                state: { background: location },
+              }}
+            >
+              Signature traitement
+            </ActionLink>
+          </>
         );
       }
       return null;

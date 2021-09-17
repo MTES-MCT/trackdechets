@@ -69,6 +69,9 @@ export const companyFactory = async (
       name: `company_${companyIndex}`,
       securityCode: 1234,
       verificationCode: "34567",
+      address: "Champ de Mars, 5 Av. Anatole France, 75007 Paris",
+      contactEmail: `contact_${companyIndex}@gmail.com`,
+      contactPhone: `+${companyIndex} 606060606`,
       ...opts
     }
   });

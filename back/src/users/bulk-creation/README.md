@@ -1,28 +1,35 @@
-Script for bulk creating accounts and companies from csv files
-Cf [Création de comptes Trackdéchets en masse](https://forum.trackdechets.beta.gouv.fr/t/creation-de-comptes-trackdechets-en-masse/31)
+Nous possédons un script permettant de créer des établissements et comptes utilisateur en masse.
+Les pré-requis sont détaillés ici : https://faq.trackdechets.fr/informations-generiques/sinscrire/je-cree-de-compte/creer-des-comptes-en-masse
 
-The script should be executed from within the container,
-Provided you have a csv folder on your host, you can add it
-to the container with. Two csv files should be present:
+Afin de faire fonctionner le script, deux fichiers CSV sont nécessaires :
 
-* etablissements.csv
-* roles.csv
+- etablissements.csv
+- roles.csv
 
-```
-docker cp csv {container_id}:/usr/src/app/csv`
-docker exec -it {container_id} bash
-npm run bulk-create-account -- --validateOnly
-```
+Le script fait un certain nombre de vérifications pour éviter les erreurs mais il est toujours préférable de faire un contrôle du contenu.
 
+Le script est à faire tourner sur l'environnement qui vous intéresse.
+Il faudra l'exécuter sur l'environnement de recette pour créer les comptes sur recette, sur sandbox pour sandbox et sur la production pour la production.
 
-```
-Usage npm run bulk-create-account [options]
+La démarche est la suivante :
 
-Bulk load a list of companies and users to Trackdéchets
+1. Sur votre machine, créer un répertoire `csv` qui contient les fichiers `etablissements.csv` et `roles.csv`.
+2. Se connecter à la machine qui vous intéresse en faisant au passage l'upload des fichiers :
+   ```
+   scalingo --app trackdechets-production-api run --file ~/Desktop/csv bash
+   ```
+   Le répertoire `csv` va être envoyé sous la forme d'une archive `.tar` dans le répertoire `/tmp/uploads`.
+3. À ce stade, vous devriez avoir un accès bash à la machine. Commencez par désarchiver votre répertoire :
+   ```
+   tar -C /tmp -xvf /tmp/uploads/csv.tar.gz
+   ```
+4. Éxécutez le script :
+   ```
+   node ./dist/src/users/bulk-creation/index.js --validateOnly --csvDir=/tmp/
+   ```
+   Note : le flag `--validateOnly` permet de faire une simple vérification sans créer les comptes.
+   Relancez la commande sans ce flag pour créer les comptes.
 
-Options:
+Pour plus de détails sur l'exécution de tâches dans une application Scalingo, voir :
 
--- --help                       Print help
--- --validateOnly               Only perform validation csv files
--- --csvDir=/path/to/csv/dir    Specify custom csv directory, default to /usr/src/app/csv
-```
+- https://doc.scalingo.com/platform/app/tasks

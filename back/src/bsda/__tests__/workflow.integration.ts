@@ -214,7 +214,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
     );
 
     // Ensuite le transporteur édite ses données, puis signe
-    const transporterBsvhuQuery = `
+    const transporterBsdaQuery = `
         mutation {
             updateBsda(id: "${id}", input: {
               transporter: {
@@ -235,11 +235,11 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
     const transporterSignatureResponse = await request
       .post("/")
       .set("Authorization", `Bearer ${transporterToken}`)
-      .send({ query: transporterBsvhuQuery });
+      .send({ query: transporterBsdaQuery });
     expect(transporterSignatureResponse.body.data.signBsda.status).toBe("SENT");
 
     // Enfin la destination édite ses données puis signe
-    const destinationBsvhuQuery = `
+    const destinationBsdaQuery = `
         mutation {
             updateBsda(id: "${id}", input: {
               destination: {
@@ -264,14 +264,12 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
         }
         `;
 
-    const destinationBsvhuResponse = await request
+    const destinationBsdaResponse = await request
       .post("/")
       .set("Authorization", `Bearer ${destinationToken}`)
-      .send({ query: destinationBsvhuQuery });
+      .send({ query: destinationBsdaQuery });
 
-    expect(destinationBsvhuResponse.body.data.signBsda.status).toBe(
-      "PROCESSED"
-    );
+    expect(destinationBsdaResponse.body.data.signBsda.status).toBe("PROCESSED");
   });
 
   it("Déchet collecté chez un professionnel, curcuit complet", async () => {
@@ -391,7 +389,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
     );
 
     // Ensuite l'entreprise de travaux édite ses données, puis signe
-    const workerBsvhuQuery = `
+    const workerBsdaQuery = `
     mutation {
         updateBsda(id: "${id}", input: {
           worker: {
@@ -410,14 +408,14 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
     const workerSignatureResponse = await request
       .post("/")
       .set("Authorization", `Bearer ${workerToken}`)
-      .send({ query: workerBsvhuQuery });
+      .send({ query: workerBsdaQuery });
 
     expect(workerSignatureResponse.body.data.signBsda.status).toBe(
       "SIGNED_BY_WORKER"
     );
 
     // Ensuite le transporteur édite ses données, puis signe
-    const transporterBsvhuQuery = `
+    const transporterBsdaQuery = `
         mutation {
             updateBsda(id: "${id}", input: {
               transporter: {
@@ -438,11 +436,11 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
     const transporterSignatureResponse = await request
       .post("/")
       .set("Authorization", `Bearer ${transporterToken}`)
-      .send({ query: transporterBsvhuQuery });
+      .send({ query: transporterBsdaQuery });
     expect(transporterSignatureResponse.body.data.signBsda.status).toBe("SENT");
 
     // Enfin la destination édite ses données puis signe
-    const destinationBsvhuQuery = `
+    const destinationBsdaQuery = `
         mutation {
             updateBsda(id: "${id}", input: {
               destination: {
@@ -467,13 +465,11 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
         }
         `;
 
-    const destinationBsvhuResponse = await request
+    const destinationBsdaResponse = await request
       .post("/")
       .set("Authorization", `Bearer ${destinationToken}`)
-      .send({ query: destinationBsvhuQuery });
+      .send({ query: destinationBsdaQuery });
 
-    expect(destinationBsvhuResponse.body.data.signBsda.status).toBe(
-      "PROCESSED"
-    );
+    expect(destinationBsdaResponse.body.data.signBsda.status).toBe("PROCESSED");
   });
 });

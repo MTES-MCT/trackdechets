@@ -1,11 +1,9 @@
 import React from "react";
-import {
-  Bsvhu,
-  BsvhuStatus,
-  SignatureTypeInput,
-} from "generated/graphql/types";
+import { Bsvhu, BsvhuStatus } from "generated/graphql/types";
 import PublishBsvhu from "./PublishBsvhu";
-import SignBsvhu from "./SignBsvhu";
+import { SignEmission } from "./SignEmission";
+import { SignTransport } from "./SignTransport";
+import { SignOperation } from "./SignOperation";
 
 export interface WorkflowActionProps {
   form: Bsvhu;
@@ -21,21 +19,15 @@ export function WorkflowAction(props: WorkflowActionProps) {
   switch (form["bsvhuStatus"]) {
     case BsvhuStatus.Initial:
       if (siret !== form.emitter?.company?.siret) return null;
-      return (
-        <SignBsvhu {...props} signatureType={SignatureTypeInput.Emission} />
-      );
+      return <SignEmission {...props} bsvhuId={form.id} />;
 
     case BsvhuStatus.SignedByProducer:
       if (siret !== form.transporter?.company?.siret) return null;
-      return (
-        <SignBsvhu {...props} signatureType={SignatureTypeInput.Transport} />
-      );
+      return <SignTransport {...props} bsvhuId={form.id} />;
 
     case BsvhuStatus.Sent:
       if (siret !== form.destination?.company?.siret) return null;
-      return (
-        <SignBsvhu {...props} signatureType={SignatureTypeInput.Operation} />
-      );
+      return <SignOperation {...props} bsvhuId={form.id} />;
 
     default:
       return null;

@@ -1,7 +1,7 @@
 import { Bsdasri } from "@prisma/client";
 import fs from "fs/promises";
 import path from "path";
-import QRCode from "qrcode";
+import * as QRCode from "qrcode";
 import { format } from "date-fns";
 import Handlebars from "handlebars";
 import { toPDF } from "../../common/pdf";

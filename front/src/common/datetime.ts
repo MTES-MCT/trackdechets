@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-duplicates
-import { parseISO, format, toDate } from "date-fns";
+import { parseISO, format, toDate, isValid } from "date-fns";
 // eslint-disable-next-line import/no-duplicates
 import fr from "date-fns/locale/fr";
 
@@ -12,7 +12,10 @@ export function parseDate(date: Date | number | string): Date {
 }
 
 export function formatDate(date: Date | number | string): string {
-  return format(parseDate(date), "dd/MM/y", {
+  const parsedDate = parseDate(date);
+  if (!isValid(parsedDate)) return "";
+
+  return format(parsedDate, "dd/MM/y", {
     locale: fr,
   });
 }

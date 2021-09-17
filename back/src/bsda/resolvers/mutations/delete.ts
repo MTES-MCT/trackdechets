@@ -14,8 +14,8 @@ export default async function deleteBsda(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const bshvhu = await getFormOrFormNotFound(id);
-  await checkCanDeleteBsda(user, bshvhu);
+  const bsda = await getFormOrFormNotFound(id);
+  await checkCanDeleteBsda(user, bsda);
 
   const deletedBsda = await prisma.bsda.update({
     where: { id },

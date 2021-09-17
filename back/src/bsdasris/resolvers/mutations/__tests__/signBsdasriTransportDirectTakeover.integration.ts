@@ -56,6 +56,44 @@ describe("Mutation.signBsdasri transport", () => {
     expect(readyTotakeOverDasri.isEmissionDirectTakenOver).toEqual(true);
   });
 
+  it("should forbid transport signature on an INITIAL grouping dasri", async () => {
+    const {
+      user: emitter,
+      company: emitterCompany
+    } = await userWithCompanyFactory("MEMBER", {
+      allowBsdasriTakeOverWithoutSignature: true // company allow takeover without signature
+    });
+
+    const {
+      user: transporter,
+      company: transporterCompany
+    } = await userWithCompanyFactory("MEMBER");
+
+    const groupingDasri = await bsdasriFactory({
+      ownerId: emitter.id,
+      opt: {
+        ...initialData(emitterCompany),
+        ...readyToTakeOverData(transporterCompany),
+        status: BsdasriStatus.INITIAL,
+        bsdasriType: "GROUPING"
+      }
+    });
+    const { mutate } = makeClient(transporter);
+
+    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
+      variables: {
+        id: groupingDasri.id,
+        input: { type: "TRANSPORT", author: "Jimmy" }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "L'emport direct est interdit pour les bordereaux dasri de groupement"
+      })
+    ]);
+  });
   it("should not put transport signature on an INITIAL dasri if required field is missing", async () => {
     const {
       user: emitter,

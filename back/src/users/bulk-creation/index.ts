@@ -4,7 +4,7 @@ import { loadCompanies, loadRoles } from "./loaders";
 import { validateCompany, validateRoleGenerator } from "./validations";
 import { sirenify } from "./sirene";
 import { hashPassword, generatePassword } from "../utils";
-import { randomNumber, getUIBaseURL } from "../../utils";
+import { randomNumber, getUIBaseURL, sanitizeEmail } from "../../utils";
 import { groupBy } from "./utils";
 import { sendMail } from "../../mailer/mailing";
 import { UserInputError } from "apollo-server-express";
@@ -12,7 +12,6 @@ import {
   associateUserToCompany,
   acceptNewUserCompanyInvitations
 } from "../database";
-import { companyFactory } from "../../__tests__/factories";
 import templateIds from "../../mailer/templates/provider/templateIds";
 
 function printHelp() {
@@ -74,22 +73,31 @@ export async function bulkCreate(opts: Opts): Promise<void> {
   // perform validation
   for (const company of companiesRows) {
     console.info(`Validate company ${company.siret}`);
-    const validCompany = await validateCompany(company).catch(err => {
+    try {
+      const validCompany = await validateCompany(company);
+      companies.push(validCompany);
+    } catch (err) {
       isValid = false;
       console.error(err);
-    });
-    companies.push(validCompany);
+    }
   }
 
   // validate roles
   const validateRole = validateRoleGenerator(companies);
-  const rolesPromises = rolesRows.map(role => {
-    return validateRole(role).catch(err => {
+  const roles = [];
+
+  for (const role of rolesRows) {
+    try {
+      const validRole = await validateRole({
+        ...role,
+        email: role.email ? sanitizeEmail(role.email) : undefined
+      });
+      roles.push(validRole);
+    } catch (err) {
       isValid = false;
       console.error(err);
-    });
-  });
-  const roles = await Promise.all(rolesPromises);
+    }
+  }
 
   if (isValid) {
     console.info("Validation successful");
@@ -127,17 +135,20 @@ export async function bulkCreate(opts: Opts): Promise<void> {
     });
     if (!existingCompany) {
       console.info(`Create company ${company.siret}`);
-      await companyFactory({
-        siret: company.siret,
-        codeNaf: company.codeNaf,
-        gerepId: company.gerepId,
-        name: company.name,
-        companyTypes: { set: company.companyTypes },
-        securityCode: randomNumber(4),
-        givenName: company.givenName,
-        contactEmail: company.contactEmail,
-        contactPhone: company.contactPhone,
-        website: company.website
+      await prisma.company.create({
+        data: {
+          siret: company.siret,
+          codeNaf: company.codeNaf,
+          gerepId: company.gerepId,
+          name: company.name,
+          companyTypes: { set: company.companyTypes },
+          securityCode: randomNumber(4),
+          givenName: company.givenName,
+          contactEmail: company.contactEmail,
+          contactPhone: company.contactPhone,
+          website: company.website,
+          verificationCode: randomNumber(5).toString()
+        }
       });
     }
   }
@@ -235,8 +246,13 @@ export async function bulkCreate(opts: Opts): Promise<void> {
 }
 
 if (require.main === module) {
-  run().catch(err => {
-    console.error(err);
-    process.exit(1);
-  });
+  run()
+    .then(() => {
+      console.log("All done");
+      prisma.$disconnect();
+    })
+    .catch(err => {
+      console.error(err);
+      process.exit(1);
+    });
 }

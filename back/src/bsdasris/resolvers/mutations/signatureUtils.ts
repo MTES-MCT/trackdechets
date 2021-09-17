@@ -3,7 +3,7 @@ import { BsdasriValidationContext } from "../../validation";
 
 import { BsdasriSignatureType } from "../../../generated/graphql/types";
 import { UserInputError } from "apollo-server-express";
-import { Bsdasri, BsdasriStatus } from "@prisma/client";
+import { Bsdasri, BsdasriStatus, BsdasriType } from "@prisma/client";
 
 import { BsdasriEventType } from "../../workflow/types";
 type checkEmitterAllowsDirectTakeOverFn = ({
@@ -23,6 +23,12 @@ export const checkEmitterAllowsDirectTakeOver: checkEmitterAllowsDirectTakeOverF
     signatureParams.eventType === BsdasriEventType.SignTransport &&
     bsdasri.status === BsdasriStatus.INITIAL
   ) {
+    if (bsdasri.bsdasriType !== BsdasriType.SIMPLE) {
+      throw new UserInputError(
+        "L'emport direct est interdit pour les bordereaux dasri de groupement"
+      );
+    }
+
     const emitterCompany = await getCompanyOrCompanyNotFound({
       siret: bsdasri.emitterCompanySiret
     });
@@ -121,7 +127,7 @@ export const dasriSignatureMapping: Record<
     authorizedSiret: bsdasri => bsdasri.recipientCompanySiret
   },
   OPERATION: {
-    author: "operationSignatureAuthor", // changeme
+    author: "operationSignatureAuthor",
     date: "operationSignatureDate",
     eventType: BsdasriEventType.SignOperation,
     validationContext: { operationSignature: true },

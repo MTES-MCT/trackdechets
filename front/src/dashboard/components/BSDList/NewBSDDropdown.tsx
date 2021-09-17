@@ -17,6 +17,7 @@ const links = [
   },
   { title: "Bordereau de suivi VHU", route: routes.dashboard.bsvhus.create },
   { title: "Bordereau de suivi FF", route: routes.dashboard.bsffs.create },
+  { title: "Bordereau de suivi amiante", route: routes.dashboard.bsdas.create },
 ];
 
 export function NewBSDDropdown({ siret }: Props) {

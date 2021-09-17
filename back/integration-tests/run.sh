@@ -25,7 +25,7 @@ stopcontainers(){
 
 runtest(){
     api_container_id=$(docker ps -qf "name=integration_td-api")
-    docker exec -e NODE_OPTIONS=--max_old_space_size=4096 -t $api_container_id npx jest --config ./integration-tests/jest.config.js -i --forceExit $1
+    docker exec -e NODE_OPTIONS=--max_old_space_size=4096 -t $api_container_id npm run integration-tests $1
     EXIT_CODE=$?
 }
 
