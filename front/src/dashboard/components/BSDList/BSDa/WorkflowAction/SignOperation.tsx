@@ -37,7 +37,7 @@ export function SignOperation({ siret, bsdaId }: Props) {
   >(SIGN_BSDA);
 
   return (
-    <SignBsda title="Signer l'enlèvement" bsdaId={bsdaId}>
+    <SignBsda title="Signer le traitement" bsdaId={bsdaId}>
       {({ bsda, onClose }) =>
         bsda.metadata?.errors.some(
           error => error.requiredFor === SignatureTypeInput.Emission

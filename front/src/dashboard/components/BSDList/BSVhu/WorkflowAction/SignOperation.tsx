@@ -76,11 +76,7 @@ export function SignOperation({ siret, bsvhuId }: Props) {
             await signBsvhu({
               variables: {
                 id: bsvhu.id,
-                input: {
-                  ...update,
-                  author,
-                  type: SignatureTypeInput.Operation,
-                },
+                input: { author, type: SignatureTypeInput.Operation },
               },
             });
             onClose();

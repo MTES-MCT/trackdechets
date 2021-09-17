@@ -21,6 +21,7 @@ export function WasteInfo({ disabled }) {
       <div className="form__row">
         <label>Code déchet</label>
         <Field as="select" name="waste.code" className="td-select">
+          <option />
           <option value="15 02 02*">15 02 02*</option>
           <option value="16 01 11*">16 01 11*</option>
           <option value="16 02 12*">16 02 12*</option>
