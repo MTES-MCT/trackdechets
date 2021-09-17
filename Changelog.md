@@ -17,7 +17,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Correctifs divers sur la version PDF du BSFF [PR 971](https://github.com/MTES-MCT/trackdechets/pull/971).
-- Le client SIRENE ne prenait pas compte les indices de répétition (bis, ter, ...) ni les compléments (Bat G, Escalier H, ...) [PR 993](https://github.com/MTES-MCT/trackdechets/pull/993)
+- Le client SIRENE ne prenait pas en compte les indices de répétition (bis, ter, ...) ni les compléments (Bat G, Escalier H, ...) [PR 993](https://github.com/MTES-MCT/trackdechets/pull/993)
 
 #### :nail_care: Améliorations
 
