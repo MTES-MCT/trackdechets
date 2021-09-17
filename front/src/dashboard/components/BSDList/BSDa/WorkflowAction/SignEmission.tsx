@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client";
-import { Loader, RedErrorMessage } from "common/components";
+import { RedErrorMessage } from "common/components";
 import { GET_BSDS } from "common/queries";
 import routes from "common/routes";
 import { Field, Form, Formik } from "formik";
