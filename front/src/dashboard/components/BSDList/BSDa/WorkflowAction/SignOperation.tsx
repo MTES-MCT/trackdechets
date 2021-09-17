@@ -1,5 +1,6 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
+import { GET_BSDS } from "common/queries";
 import routes from "common/routes";
 import { UPDATE_BSDA } from "form/bsda/stepper/queries";
 import Operation from "form/bsda/stepper/steps/Operation";
@@ -34,7 +35,10 @@ export function SignOperation({ siret, bsdaId }: Props) {
   const [signBsda, { loading }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs
-  >(SIGN_BSDA);
+  >(SIGN_BSDA, {
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
+  });
 
   return (
     <SignBsda title="Signer le traitement" bsdaId={bsdaId}>

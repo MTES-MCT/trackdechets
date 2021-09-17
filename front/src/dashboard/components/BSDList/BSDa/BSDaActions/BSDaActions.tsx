@@ -25,6 +25,7 @@ import { useDownloadPdf } from "./useDownloadPdf";
 import { useDuplicate } from "./useDuplicate";
 
 import styles from "../../BSDActions.module.scss";
+import { Loader } from "common/components";
 
 interface BSdaActionsProps {
   form: Bsda;
@@ -34,7 +35,7 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
   const { siret } = useParams<{ siret: string }>();
   const location = useLocation();
 
-  const [duplicateBsda] = useDuplicate({
+  const [duplicateBsda, { loading }] = useDuplicate({
     variables: { id: form.id },
   });
   const [isDeleting, setIsDeleting] = React.useState(false);
@@ -108,6 +109,7 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
           </>
         )}
       </Menu>
+      {loading && <Loader />}
       {isDeleting && (
         <DeleteBsdaModal
           isOpen
