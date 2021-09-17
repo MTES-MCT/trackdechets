@@ -505,6 +505,7 @@ export const vhuFragment = gql`
 export const bsdaFragment = gql`
   fragment BsdaFragment on Bsda {
     id
+    isDraft
     bsdaStatus: status
     emitter {
       company {
