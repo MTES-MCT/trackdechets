@@ -98,6 +98,19 @@ async function buildQuery(
     });
   }
 
+  if (where.transporterNumberPlate) {
+    query.bool.must.push({
+      match: {
+        transporterNumberPlate: {
+          query: where.transporterNumberPlate,
+          // we need `and` operator here because the different components of
+          // the number plate emit different tokens
+          operator: "and"
+        }
+      }
+    });
+  }
+
   if (where.waste) {
     query.bool.must.push({
       bool: {

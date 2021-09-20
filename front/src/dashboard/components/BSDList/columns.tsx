@@ -38,6 +38,10 @@ export const COLUMNS_PARAMETERS_NAME = {
     filter: "recipient",
     order: "recipient",
   },
+  transporterNumberPlate: {
+    filter: "transporterNumberPlate",
+    order: "transporterNumberPlate",
+  },
   waste: {
     filter: "waste",
     order: "waste",
@@ -157,8 +161,8 @@ export const COLUMNS: Record<string, Column> = {
   transporterNumberPlate: createColumn({
     id: "transporterNumberPlate",
     Header: "Plaque immat.",
-    disableFilters: true,
-    disableSortBy: true,
+    filter: "text",
+    Filter: TextInputFilter,
   }),
   status: createColumn({
     id: "status",
