@@ -234,6 +234,7 @@ function toBsdElastic(form: FullForm): BsdElastic {
     emitter: form.emitterCompanyName ?? "",
     recipient: getRecipient(form) ?? "",
     transporterNumberPlate: form.transporterNumberPlate,
+    transporterCustomInfo: form.transporterCustomInfo,
     waste: getWaste(form),
     createdAt: form.createdAt.getTime(),
     ...where,

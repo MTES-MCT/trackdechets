@@ -71,7 +71,8 @@ async function buildQuery(
 
   Object.entries({
     emitter: where.emitter,
-    recipient: where.recipient
+    recipient: where.recipient,
+    transporterCustomInfo: where.transporterCustomInfo
   })
     .filter(([_, value]) => value != null)
     .forEach(([key, value]) => {

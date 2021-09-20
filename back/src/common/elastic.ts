@@ -13,6 +13,7 @@ export interface BsdElastic {
   recipient: string;
   waste: string;
   transporterNumberPlate?: string;
+  transporterCustomInfo?: string;
   createdAt: number;
 
   isDraftFor: string[];
@@ -148,6 +149,14 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
     type: "text",
     analyzer: "numberPlate",
     search_analyzer: "numberPlate_search",
+    fields: {
+      keyword: {
+        type: "keyword"
+      }
+    }
+  },
+  transporterCustomInfo: {
+    type: "text",
     fields: {
       keyword: {
         type: "keyword"
