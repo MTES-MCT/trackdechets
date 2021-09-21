@@ -71,12 +71,12 @@ type Bsff {
   """
   Bordereau que celui-ci réexpédie ou reconditionne
   """
-  forwarding: Bsff!
+  forwarding: Bsff
 
   """
   Bordereau qui réexpédie ou recondtionne celui-ci
   """
-  forwardedIn: Bsff!
+  forwardedIn: Bsff
 
   """
   Bordereaux que celui-ci groupe
