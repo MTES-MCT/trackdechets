@@ -839,8 +839,8 @@ model Bsff {
   wasteDescription String?
   wasteAdr         String?
 
-  quantityKilos      Float?
-  quantityIsEstimate Boolean?
+  weightValue      Float?
+  weightIsEstimate Boolean?
 
   transporterCompanyName      String?
   transporterCompanySiret     String?
@@ -870,7 +870,7 @@ model Bsff {
   destinationCustomInfo String?
 
   destinationReceptionDate              DateTime?
-  destinationReceptionKilos             Float?
+  destinationReceptionWeight            Float?
   destinationReceptionAcceptationStatus WasteAcceptationStatus?
   destinationReceptionRefusalReason     String?
 
@@ -912,7 +912,6 @@ model Bsff {
   // synthesizedIn Bsff?
 }
 
-
 // model BsffRegroupement {
 //   id         String          @id @default(cuid())
 //   previous   Bsff            @relation("Regrouping", fields: [previousId], references: [id])
@@ -945,7 +944,7 @@ model BsffFicheIntervention {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   numero     String
-  kilos      Float
+  weight     Float
   postalCode String
 
   detenteurCompanyName    String

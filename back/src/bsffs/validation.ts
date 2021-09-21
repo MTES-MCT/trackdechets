@@ -23,7 +23,7 @@ const bsffSchema: yup.SchemaOf<Pick<
   | "emitterCompanyMail"
   | "wasteCode"
   | "wasteAdr"
-  | "quantityKilos"
+  | "weightValue"
   | "destinationPlannedOperationCode"
 >> = yup.object({
   isDraft: yup.boolean().nullable(),
@@ -102,7 +102,7 @@ const bsffSchema: yup.SchemaOf<Pick<
       is: true,
       otherwise: schema => schema.required("La mention ADR est requise")
     }),
-  quantityKilos: yup
+  weightValue: yup
     .number()
     .nullable()
     .when("isDraft", {
@@ -306,7 +306,7 @@ const beforeTransportSchema: yup.SchemaOf<Pick<
           .string()
           .nullable()
           .required("Le numéro identifiant du contenant est requis"),
-        kilos: yup
+        weight: yup
           .number()
           .nullable()
           .required("Le poids du contenant est requis")
@@ -385,7 +385,7 @@ export const beforeReceptionSchema: yup.SchemaOf<Pick<
   | "transporterTransportSignatureDate"
   | "destinationReceptionSignatureDate"
   | "destinationReceptionDate"
-  | "destinationReceptionKilos"
+  | "destinationReceptionWeight"
 >> = yup.object({
   destinationCompanyName: yup
     .string()
@@ -457,7 +457,7 @@ export const beforeReceptionSchema: yup.SchemaOf<Pick<
                 "Le motif du refus ne doit pas être renseigné si le déchet est accepté"
               )
     ),
-  destinationReceptionKilos: yup
+  destinationReceptionWeight: yup
     .number()
     .nullable()
     .required("Le poids en kilos du déchet reçu est requis")
@@ -520,7 +520,7 @@ export function validateBeforeOperation(
 const ficheInterventionSchema: yup.SchemaOf<Pick<
   BsffFicheIntervention,
   | "numero"
-  | "kilos"
+  | "weight"
   | "postalCode"
   | "detenteurCompanyName"
   | "detenteurCompanySiret"
@@ -538,7 +538,7 @@ const ficheInterventionSchema: yup.SchemaOf<Pick<
   numero: yup
     .string()
     .required("Le numéro de la fiche d'intervention est requis"),
-  kilos: yup.number().required("Le poids en kilos est requis"),
+  weight: yup.number().required("Le poids en kilos est requis"),
   postalCode: yup
     .string()
     .required("Le code postal du lieu de l'intervention est requis"),

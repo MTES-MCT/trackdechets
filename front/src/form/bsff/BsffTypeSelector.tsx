@@ -6,7 +6,7 @@ import {
   BsffFicheIntervention,
   BsffOperationCode,
   BsffPackagingInput,
-  BsffQuantityInput,
+  BsffWeightInput,
   BsffStatus,
   BsffType,
   CompanyInput,
@@ -198,9 +198,7 @@ export function BsffTypeSelector() {
   const [, , { setValue: setEmitterCompany }] = useField<CompanyInput>(
     "emitter.company"
   );
-  const [, , { setValue: setQuantity }] = useField<BsffQuantityInput>(
-    "quantity"
-  );
+  const [, , { setValue: setQuantity }] = useField<BsffWeightInput>("quantity");
   const [
     { value: ficheInterventions },
     ,
@@ -244,26 +242,26 @@ export function BsffTypeSelector() {
 
     if ([BsffType.Reexpedition, BsffType.Groupement].includes(type)) {
       setters.current.setQuantity(
-        previousBsffs.reduce<BsffQuantityInput>(
+        previousBsffs.reduce<BsffWeightInput>(
           (acc, previousBsff) => {
-            if (previousBsff.destination?.reception?.kilos) {
+            if (previousBsff.destination?.reception?.weight) {
               return {
                 ...acc,
-                kilos: acc.kilos + previousBsff.destination.reception.kilos,
+                weight: acc.value + previousBsff.destination.reception.weight,
               };
             }
 
-            if (previousBsff.quantity) {
+            if (previousBsff.weight) {
               return {
                 ...acc,
-                ...previousBsff.quantity,
+                ...previousBsff.weight,
               };
             }
 
             return acc;
           },
           {
-            kilos: 0,
+            value: 0,
             isEstimate: false,
           }
         )

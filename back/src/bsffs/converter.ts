@@ -40,8 +40,8 @@ export function flattenBsffInput(
     wasteNature: bsffInput.waste?.nature,
     wasteAdr: bsffInput.waste?.adr,
 
-    quantityKilos: bsffInput.quantity?.kilos,
-    quantityIsEstimate: bsffInput.quantity?.isEstimate,
+    weightValue: bsffInput.weight?.value,
+    weightIsEstimate: bsffInput.weight?.isEstimate,
 
     transporterCompanyName: bsffInput.transporter?.company.name,
     transporterCompanySiret: bsffInput.transporter?.company.siret,
@@ -69,7 +69,7 @@ export function flattenBsffInput(
     destinationCustomInfo: bsffInput.destination?.customInfo,
 
     destinationReceptionDate: bsffInput.destination?.reception?.date,
-    destinationReceptionKilos: bsffInput.destination?.reception?.kilos,
+    destinationReceptionWeight: bsffInput.destination?.reception?.weight,
     destinationReceptionAcceptationStatus:
       bsffInput.destination?.reception?.acceptationStatus,
     destinationReceptionRefusalReason:
@@ -128,9 +128,9 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
       nature: prismaBsff.wasteNature,
       adr: prismaBsff.wasteAdr
     }),
-    quantity: nullIfNoValues<GraphQL.BsffQuantity>({
-      kilos: prismaBsff.quantityKilos,
-      isEstimate: prismaBsff.quantityIsEstimate
+    weight: nullIfNoValues<GraphQL.BsffWeight>({
+      value: prismaBsff.weightValue,
+      isEstimate: prismaBsff.weightIsEstimate
     }),
     transporter: nullIfNoValues<GraphQL.BsffTransporter>({
       company: nullIfNoValues<GraphQL.FormCompany>({
@@ -168,7 +168,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
       customInfo: prismaBsff.destinationCustomInfo,
       reception: nullIfNoValues<GraphQL.BsffReception>({
         date: prismaBsff.destinationReceptionDate,
-        kilos: prismaBsff.destinationReceptionKilos,
+        weight: prismaBsff.destinationReceptionWeight,
         acceptationStatus: prismaBsff.destinationReceptionAcceptationStatus,
         refusalReason: prismaBsff.destinationReceptionRefusalReason,
         signature: nullIfNoValues<GraphQL.Signature>({
@@ -214,7 +214,7 @@ export function flattenFicheInterventionBsffInput(
 ): Prisma.Prisma.BsffFicheInterventionCreateInput {
   return {
     numero: ficheInterventionInput.numero,
-    kilos: ficheInterventionInput.kilos,
+    weight: ficheInterventionInput.weight,
     postalCode: ficheInterventionInput.postalCode,
 
     detenteurCompanyName: ficheInterventionInput.detenteur.company.name ?? "",
@@ -243,7 +243,7 @@ export function unflattenFicheInterventionBsff(
   return {
     id: prismaFicheIntervention.id,
     numero: prismaFicheIntervention.numero,
-    kilos: prismaFicheIntervention.kilos,
+    weight: prismaFicheIntervention.weight,
     postalCode: prismaFicheIntervention.postalCode,
     detenteur: {
       company: {

@@ -61,7 +61,7 @@ export default function WasteInfo({ disabled }) {
           Poids total en kilos
           <Field
             component={NumberInput}
-            name="quantity.kilos"
+            name="weight.value"
             disabled={disabled}
             className="td-input"
           />
@@ -73,7 +73,7 @@ export default function WasteInfo({ disabled }) {
           name="quantity.isEstimate"
           disabled={disabled}
         />
-        <RedErrorMessage name="quantity.kilos" />
+        <RedErrorMessage name="weight.value" />
       </div>
     </>
   );

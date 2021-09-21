@@ -73,8 +73,8 @@ export function createBsffBeforeEmission(
     wasteCode: WASTE_CODES[0],
     wasteAdr: "Mention ADR",
     wasteDescription: "Fluides",
-    quantityKilos: 1,
-    quantityIsEstimate: false,
+    weightValue: 1,
+    weightIsEstimate: false,
     destinationPlannedOperationCode: OPERATION.D10.code,
     ...initialData
   });
@@ -97,7 +97,7 @@ export function createBsffBeforeTransport(
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffAfterEmission(args, {
-    packagings: [{ name: "BOUTEILLE 2L", numero: "01", kilos: 1 }],
+    packagings: [{ name: "BOUTEILLE 2L", numero: "01", weight: 1 }],
     transporterTransportMode: TransportMode.ROAD,
     ...initialData
   });
@@ -121,7 +121,7 @@ export function createBsffBeforeReception(
 ) {
   return createBsffAfterTransport(args, {
     destinationReceptionDate: new Date().toISOString(),
-    destinationReceptionKilos: 1,
+    destinationReceptionWeight: 1,
     destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
     ...initialData
   });
@@ -133,7 +133,7 @@ export function createBsffBeforeRefusal(
 ) {
   return createBsffAfterTransport(args, {
     destinationReceptionDate: new Date().toISOString(),
-    destinationReceptionKilos: 0,
+    destinationReceptionWeight: 0,
     destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
     destinationReceptionRefusalReason: "non conforme",
     ...initialData
@@ -201,7 +201,7 @@ export function createFicheIntervention({
     detenteurCompanyPhone: detenteur.company.contactPhone,
     detenteurCompanySiret: detenteur.company.siret,
     postalCode: "75000",
-    kilos: 1,
+    weight: 1,
     numero: "123"
   };
 

@@ -5,7 +5,7 @@ export const FicheInterventionFragment = gql`
   fragment FicheInterventionFragment on BsffFicheIntervention {
     id
     numero
-    kilos
+    weight
     postalCode
   }
 `;
@@ -30,15 +30,15 @@ export const FullBsffFragment = gql`
       name
       numero
       volume
-      kilos
+      weight
     }
     waste {
       code
       nature
       adr
     }
-    quantity {
-      kilos
+    weight {
+      value
       isEstimate
     }
     transporter {
@@ -64,7 +64,7 @@ export const FullBsffFragment = gql`
       }
       reception {
         date
-        kilos
+        weight
         acceptationStatus
         refusalReason
         signature {

@@ -47,7 +47,7 @@ input BsffInput {
   emitter: BsffEmitterInput
   packagings: [BsffPackagingInput!]
   waste: BsffWasteInput
-  quantity: BsffQuantityInput
+  weight: BsffWeightInput
   transporter: BsffTransporterInput
   destination: BsffDestinationInput
   ficheInterventions: [ID!]
@@ -67,8 +67,8 @@ input BsffPackagingInput {
   volume: Float
   "Numéro du contenant."
   numero: String!
-  "Poids en kilos."
-  kilos: Float!
+  "Poids en kilogrammes"
+  weight: Float!
 }
 
 input BsffWasteInput {
@@ -77,8 +77,9 @@ input BsffWasteInput {
   adr: String!
 }
 
-input BsffQuantityInput {
-  kilos: Float!
+input BsffWeightInput {
+  "Poids en kilogrammes"
+  value: Float!
   isEstimate: Boolean!
 }
 
@@ -109,7 +110,8 @@ input BsffDestinationInput {
 }
 input BsffDestinationReceptionInput {
   date: DateTime!
-  kilos: Float!
+  "Poids en kilogrammes"
+  weight: Float!
   acceptationStatus: BsffAcceptationStatus!
   refusalReason: String
 }
@@ -129,7 +131,8 @@ input BsffDestinationOperationInput {
 
 input BsffFicheInterventionInput {
   numero: String!
-  kilos: Float!
+  "Poids en kilogrammes"
+  weight: Float!
   detenteur: BsffDetenteurInput!
   operateur: BsffOperateurInput!
   postalCode: String!

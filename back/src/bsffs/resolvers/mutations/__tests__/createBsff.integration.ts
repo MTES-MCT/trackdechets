@@ -65,15 +65,15 @@ describe("Mutation.createBsff", () => {
             adr: "Mention ADR",
             nature: "R410"
           },
-          quantity: {
-            kilos: 1,
+          weight: {
+            value: 1,
             isEstimate: true
           },
           packagings: [
             {
               name: "BOUTEILLE",
               numero: "123",
-              kilos: 1
+              weight: 1
             }
           ]
         }

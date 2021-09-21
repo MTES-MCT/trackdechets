@@ -32,8 +32,8 @@ const UPDATE_BSFF = `
         nature
         adr
       }
-      quantity {
-        kilos
+      weight {
+        value
         isEstimate
       }
       transporter {
@@ -293,8 +293,8 @@ describe("Mutation.updateBsff", () => {
         nature: "R10",
         adr: "Mention ADR"
       },
-      quantity: {
-        kilos: 1,
+      weight: {
+        value: 1,
         isEstimate: false
       }
     };
@@ -330,8 +330,8 @@ describe("Mutation.updateBsff", () => {
         nature: "R10",
         adr: "Mention ADR"
       },
-      quantity: {
-        kilos: 6,
+      weight: {
+        value: 6,
         isEstimate: false
       }
     };
@@ -353,9 +353,9 @@ describe("Mutation.updateBsff", () => {
           nature: bsff.wasteNature,
           adr: input.waste.adr
         },
-        quantity: {
-          kilos: bsff.quantityKilos,
-          isEstimate: bsff.quantityIsEstimate
+        weight: {
+          value: bsff.weightValue,
+          isEstimate: bsff.weightIsEstimate
         }
       })
     );

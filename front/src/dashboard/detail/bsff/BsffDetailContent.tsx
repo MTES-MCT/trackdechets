@@ -59,7 +59,7 @@ export function BsffDetailContent({ form }: Props) {
               label="Dernière action sur le BSD"
             /> */}
               <DetailRow
-                value={form.quantity?.kilos}
+                value={form.weight?.value}
                 label="Poids total"
                 units="kg"
               />
@@ -221,17 +221,13 @@ function Emitter({ form }: { form: Bsff }) {
           value={(form.packagings ?? [])
             .map(
               packaging =>
-                `${packaging.name} ${packaging.numero} (${packaging.kilos}kg)`
+                `${packaging.name} ${packaging.numero} (${packaging.weight}kg)`
             )
             .join(", ")}
           label="Conditionnement"
         />
 
-        <DetailRow
-          value={form.quantity?.kilos}
-          label="Poids total"
-          units="kg"
-        />
+        <DetailRow value={form.weight?.value} label="Poids total" units="kg" />
       </div>
       <div className={styles.detailGrid}>
         <DateRow
@@ -338,7 +334,7 @@ function FicheInterventions({ form }: { form: Bsff }) {
           />
           <DetailRow
             label="Quantité fluides en kilo(s)"
-            value={ficheIntervention.kilos}
+            value={ficheIntervention.weight}
           />
           <DetailRow
             label="Code postal lieu de collecte"
