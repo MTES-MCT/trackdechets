@@ -97,7 +97,7 @@ Lien avec un bordereau de groupement
 type BsffSplit {
   "Bordereau de groupement"
   bsff: Bsff!
-  "Portion du bordereau inclut dans le groupement. Égale au poids total du bordereau initial par défaut"
+  "Portion du bordereau inclus dans le groupement. Égale au poids total du bordereau initial par défaut"
   weight: Float!
 }
 
