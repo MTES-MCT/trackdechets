@@ -35,8 +35,8 @@ export default {
     nature: null,
     adr: "UN 1078, Gaz frigorifique NSA (Gaz réfrigérant, NSA), 2.2 (C/E)",
   },
-  quantity: {
-    kilos: 0,
+  weight: {
+    value: 0,
     isEstimate: false,
   },
   ficheInterventions: [],

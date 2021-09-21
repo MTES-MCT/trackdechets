@@ -39,8 +39,8 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       "emitterCompanySiret",
       "wasteCode",
       "wasteNature",
-      "quantityKilos",
-      "quantityIsEstimate",
+      "weightValue",
+      "weightIsEstimate",
       "destinationPlannedOperationCode"
     ]);
 
@@ -76,7 +76,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       "destinationCompanySiret",
       "destinationCap",
       "destinationReceptionDate",
-      "destinationReceptionKilos",
+      "destinationReceptionWeight",
       "destinationReceptionAcceptationStatus",
       "destinationReceptionRefusalReason"
     ]);

@@ -42,9 +42,9 @@ type Bsff {
   waste: BsffWaste
 
   """
-  Quantité totale du déchet, il peut s'agir d'une estimation.
+  Quantité totale du déchet en kilogrammes, il peut s'agir d'une estimation.
   """
-  quantity: BsffQuantity
+  weight: BsffWeight
 
   """
   Transporteur du déchet, effectue l'enlèvement du déchet auprès de l'émetteur et l'emporte à la destination.
@@ -105,8 +105,8 @@ type BsffPackaging {
   volume: Float
   "Numéro du contenant."
   numero: String!
-  "Poids en kilos."
-  kilos: Float!
+  "Poids en kilogrammes."
+  weight: Float!
 }
 
 type BsffWaste {
@@ -118,9 +118,9 @@ type BsffWaste {
   adr: String!
 }
 
-type BsffQuantity {
-  "Poids total du déchet en kilos."
-  kilos: Float!
+type BsffWeight {
+  "Poids total du déchet en kilogrammes."
+  value: Float!
   "Si il s'agit d'une estimation ou d'un poids réel."
   isEstimate: Boolean!
 }
@@ -167,8 +167,8 @@ type BsffDestination {
 type BsffReception {
   "Date de réception du déchet."
   date: DateTime!
-  "Quantité totale du déchet, qu'elle soit réelle ou estimée. Doit être à 0 dans le cas d'un refus"
-  kilos: Float!
+  "Quantité totale du déchet en kilogrammes, qu'elle soit réelle ou estimée. Doit être à 0 dans le cas d'un refus"
+  weight: Float!
   "Accepté ou refusé"
   acceptationStatus: BsffAcceptationStatus
   "En cas de refus, le motif."
@@ -200,8 +200,8 @@ type BsffFicheIntervention {
   id: ID!
   "Numéro de la fiche d'intervention, habituellement renseigné par l'opérateur."
   numero: String!
-  "Poids total des fluides récupérés lors de cette intervention."
-  kilos: Float!
+  "Poids total en kilogrammes des fluides récupérés lors de cette intervention."
+  weight: Float!
   "Détenteur de l'équipement sur lequel est intervenu l'opérateur."
   detenteur: BsffDetenteur
   "Opérateur à l'origine de l'intervention."

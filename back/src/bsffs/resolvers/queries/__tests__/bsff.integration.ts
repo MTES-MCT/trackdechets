@@ -123,7 +123,7 @@ describe("Query.bsff", () => {
           create: [
             {
               numero: ficheInterventionNumero,
-              kilos: 2,
+              weight: 2,
               detenteurCompanyName: "Acme",
               detenteurCompanySiret: "1".repeat(14),
               detenteurCompanyAddress: "12 rue de la Tige, 69000",

@@ -20,7 +20,7 @@ import { GET_BSDS } from "common/queries";
 
 const validationSchema = yup.object({
   receptionDate: yup.date().required(),
-  receptionKilos: yup.number().required(),
+  receptionWeight: yup.number().required(),
   receptionRefusalReason: yup.string().when("receptionAcceptationStatus", {
     is: value => value === BsffAcceptationStatus.Refused,
     then: schema =>
@@ -58,8 +58,8 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
       initialValues={{
         receptionDate:
           bsff.destination?.reception?.date ?? new Date().toISOString(),
-        receptionKilos:
-          bsff.destination?.reception?.kilos ?? bsff.quantity?.kilos ?? 0,
+        receptionWeight:
+          bsff.destination?.reception?.weight ?? bsff.weight?.value ?? 0,
         receptionAcceptationStatus:
           bsff.destination?.reception?.acceptationStatus ??
           BsffAcceptationStatus.Accepted,
@@ -76,7 +76,7 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
               destination: {
                 reception: {
                   date: values.receptionDate,
-                  kilos: values.receptionKilos,
+                  weight: values.receptionWeight,
                   refusalReason: values.receptionRefusalReason,
                   acceptationStatus: values.receptionAcceptationStatus,
                 },
@@ -120,11 +120,11 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
               Quantité de fluides reçu (en kilo(s))
               <Field
                 className="td-input"
-                name="receptionKilos"
+                name="receptionWeight"
                 component={NumberInput}
               />
             </label>
-            <RedErrorMessage name="receptionKilos" />
+            <RedErrorMessage name="receptionWeight" />
           </div>
           <div className="form__row">
             <label>

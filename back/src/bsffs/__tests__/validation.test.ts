@@ -16,7 +16,7 @@ describe("beforeReceptionSchema", () => {
     destinationReceptionSignatureDate: null,
     destinationReceptionDate: new Date("2021-09-02"),
     destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
-    destinationReceptionKilos: 1,
+    destinationReceptionWeight: 1,
     destinationReceptionRefusalReason: null
   };
 
@@ -25,11 +25,11 @@ describe("beforeReceptionSchema", () => {
     expect(beforeReceptionSchema.isValidSync(data)).toEqual(true);
   });
 
-  it("should be invalid when reception is accepted but kilos = 0", async () => {
+  it("should be invalid when reception is accepted but weight = 0", async () => {
     const data = {
       ...destination,
       ...reception,
-      destinationReceptionKilos: 0
+      destinationReceptionWeight: 0
     };
     const validateFn = () => beforeReceptionSchema.validate(data);
     await expect(validateFn()).rejects.toThrow(
@@ -54,18 +54,18 @@ describe("beforeReceptionSchema", () => {
       ...destination,
       ...reception,
       destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
-      destinationReceptionKilos: 0,
+      destinationReceptionWeigth: 0,
       destinationReceptionRefusalReason: "parce que"
     };
     expect(beforeReceptionSchema.isValidSync(data)).toEqual(true);
   });
 
-  it("should be invalid when reception is refused and kilos > 0", async () => {
+  it("should be invalid when reception is refused and weight > 0", async () => {
     const data = {
       ...destination,
       ...reception,
       destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
-      destinationReceptionKilos: 1,
+      destinationReceptionWeight: 1,
       destinationReceptionRefusalReason: "parce que"
     };
     const validateFn = () => beforeReceptionSchema.validate(data);
@@ -79,7 +79,7 @@ describe("beforeReceptionSchema", () => {
       ...destination,
       ...reception,
       destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
-      destinationReceptionKilos: 0,
+      destinationReceptionWeigth: 0,
       destinationReceptionRefusalReason: null
     };
     const validateFn = () => beforeReceptionSchema.validate(data);

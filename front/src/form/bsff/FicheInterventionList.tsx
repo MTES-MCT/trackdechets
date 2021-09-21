@@ -48,7 +48,7 @@ const operateurSchema: yup.SchemaOf<
 const ficheInterventionSchema: yup.SchemaOf<BsffFicheInterventionInput> = yup.object(
   {
     numero: yup.string().required(),
-    kilos: yup.number().required(),
+    weight: yup.number().required(),
     postalCode: yup.string().required(),
     detenteur: detenteurSchema,
     operateur: operateurSchema,
@@ -81,7 +81,7 @@ function AddFicheInterventionModal({
 
       <Formik<BsffFicheInterventionInput>
         initialValues={{
-          kilos: 0,
+          weight: 0,
           numero: "",
           detenteur: {
             company: getInitialCompany(),
@@ -120,9 +120,9 @@ function AddFicheInterventionModal({
               <Field
                 component={NumberInput}
                 className="td-input"
-                name="kilos"
+                name="weight"
               />
-              <RedErrorMessage name="kilos" />
+              <RedErrorMessage name="weight" />
             </label>
           </div>
 
@@ -206,7 +206,7 @@ export function FicheInterventionList({
                   <input
                     type="text"
                     className="td-input"
-                    value={ficheIntervention.kilos}
+                    value={ficheIntervention.weight}
                     disabled
                   />
                 </label>
