@@ -54,7 +54,7 @@ describe("beforeReceptionSchema", () => {
       ...destination,
       ...reception,
       destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
-      destinationReceptionWeigth: 0,
+      destinationReceptionWeight: 0,
       destinationReceptionRefusalReason: "parce que"
     };
     expect(beforeReceptionSchema.isValidSync(data)).toEqual(true);
@@ -79,7 +79,7 @@ describe("beforeReceptionSchema", () => {
       ...destination,
       ...reception,
       destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
-      destinationReceptionWeigth: 0,
+      destinationReceptionWeight: 0,
       destinationReceptionRefusalReason: null
     };
     const validateFn = () => beforeReceptionSchema.validate(data);
