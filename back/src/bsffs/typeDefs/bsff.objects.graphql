@@ -69,20 +69,53 @@ type Bsff {
   ficheInterventions: [BsffFicheIntervention!]!
 
   """
-  Bordereau qui a groupé, reconditionné ou réexpédié celui-ci.
+  Bordereau que celui-ci réexpédie ou reconditionne
   """
-  nextBsff: Bsff
+  forwarding: Bsff!
 
   """
-  Bordereaux qui ont successivement groupé, reconditionné ou réexpédié celui-ci.
-  Cette liste permet d'accéder à la traçabilité complète d'un bordereau.
+  Bordereau qui réexpédie ou recondtionne celui-ci
   """
-  nextBsffs: [Bsff!]!
+  forwardedIn: Bsff!
 
   """
-  Bordereaux que celui-ci groupe, reconditionne ou réexpédie.
+  Bordereaux que celui-ci groupe
   """
-  previousBsffs: [Bsff!]!
+  grouping: [InitialBsffSplit!]!
+
+  """
+  Bordereaux dans lequel celui-ci est groupé. Contient un seul bordereau dans la majorité des cas.
+  Peut contenir plusieurs bordereaux en cas de consommation du bordereau en plusieurs fois
+  (scission du bordereau initial)
+  """
+  groupedIn: [BsffSplit!]!
+}
+
+"""
+Lien avec un bordereau de groupement
+"""
+type BsffSplit {
+  "Bordereau de groupement"
+  bsff: Bsff!
+  "Portion du bordereau inclut dans le groupement. Égale au poids total du bordereau initial par défaut"
+  weight: Float!
+}
+
+"""
+Lien avec un bordereau initial dans le cadre d'un groupement
+"""
+type InitialBsffSplit {
+  "Bordereau initial inclus dans le groupement"
+  bsff: InitialBsff!
+  "Portion du bordereau inclus dans le groupement. Égale au poids total du bordereau initial par défaut"
+  weight: Float!
+}
+
+"""
+Extrait du bordereau initial accessible sur le bordereau de groupement.
+"""
+type InitialBsff {
+  id: ID!
 }
 
 type BsffEmitter {
