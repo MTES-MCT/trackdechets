@@ -1,27 +1,27 @@
 import type { SetRequired } from "type-fest";
-import { Bsff, BsffFicheIntervention, BsffType, Prisma } from "@prisma/client";
+import {
+  Bsff,
+  BsffFicheIntervention as PrismaBsffFicheIntervention,
+  BsffType,
+  Prisma
+} from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
-import { BsffInput } from "../generated/graphql/types";
+import {
+  BsffFicheIntervention,
+  BsffInput,
+  BsffSplitInput
+} from "../generated/graphql/types";
 import getReadableId, { ReadableIdPrefix } from "../forms/readableId";
-import { flattenBsffInput, unflattenBsff } from "./converter";
+import {
+  flattenBsffInput,
+  unflattenBsff,
+  unflattenFicheInterventionBsff
+} from "./converter";
 import { isBsffContributor } from "./permissions";
 import { validateBsff } from "./validation";
 import { indexBsff } from "./elastic";
 import { GraphQLContext } from "../types";
-
-export async function getNextBsffs(
-  bsff: Bsff,
-  nextBsffs: Bsff[] = []
-): Promise<Bsff[]> {
-  if (bsff.nextBsffId) {
-    const nextBsff = await prisma.bsff.findUnique({
-      where: { id: bsff.nextBsffId }
-    });
-    return getNextBsffs(nextBsff, nextBsffs.concat([nextBsff]));
-  }
-  return nextBsffs;
-}
 
 export async function getBsffOrNotFound(
   where: SetRequired<Prisma.BsffWhereInput, "id">
@@ -41,7 +41,7 @@ export async function getBsffOrNotFound(
 
 export async function getFicheInterventionBsffOrNotFound(
   where: SetRequired<Prisma.BsffFicheInterventionWhereInput, "id">
-): Promise<BsffFicheIntervention> {
+): Promise<PrismaBsffFicheIntervention> {
   const ficheIntervention = await prisma.bsffFicheIntervention.findFirst({
     where
   });
@@ -53,17 +53,83 @@ export async function getFicheInterventionBsffOrNotFound(
   return ficheIntervention;
 }
 
+/**
+ * Return the "ficheInterventions" of a bsff, hiding some fields depending
+ * on the user reading it
+ * @param param0
+ */
+export async function getFicheInterventions({
+  bsff,
+  context
+}: {
+  bsff: Bsff;
+  context: GraphQLContext;
+}): Promise<BsffFicheIntervention[]> {
+  const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
+    where: {
+      bsffId: bsff.id
+    }
+  });
+
+  const unflattenedFicheInterventions = ficheInterventions.map(
+    unflattenFicheInterventionBsff
+  );
+
+  // the user trying to read ficheInterventions might not be a contributor of the bsff
+  // for example they could be reading the ficheInterventions of a bsff that was forwarded:
+  // bsffs { forwarding { ficheInterventions } }
+  // in this case, they are still allowed to read ficheInterventions but not all fields
+  try {
+    await isBsffContributor(context.user, bsff);
+  } catch (err) {
+    unflattenedFicheInterventions.forEach(ficheIntervention => {
+      delete ficheIntervention.detenteur;
+      delete ficheIntervention.operateur;
+    });
+  }
+
+  return unflattenedFicheInterventions;
+}
+
+/** Returns BSFF splits grouped into this one */
+export async function getGroupingBsffsSplits(bsffId: string) {
+  const bsffGroupement = await prisma.bsffGroupement.findMany({
+    where: { next: { id: bsffId } },
+    include: { previous: true }
+  });
+  return bsffGroupement.map(({ previous, weight }) => ({
+    bsff: previous,
+    weight
+  }));
+}
+
+export async function getGroupingBsffs(bsffId: string) {
+  const splits = await getGroupingBsffsSplits(bsffId);
+  return splits.map(s => s.bsff);
+}
+
+/** Returns the different groupement splits of a BSFF */
+export async function getGroupedInBsffsSplits(bsffId: string) {
+  const bsffGroupement = await prisma.bsffGroupement.findMany({
+    where: { previous: { id: bsffId } },
+    include: { next: true }
+  });
+  return bsffGroupement.map(({ next, weight }) => ({
+    bsff: next,
+    weight
+  }));
+}
+
 function getBsffType(input: BsffInput): BsffType {
-  if (input.previousBsffs?.length > 0) {
+  if (input.grouping?.length > 0) {
+    return BsffType.GROUPEMENT;
+  }
+
+  if (input.forwarding) {
     if (input.packagings?.length > 0) {
       return BsffType.RECONDITIONNEMENT;
     }
-
-    if (input.previousBsffs?.length === 1) {
-      return BsffType.REEXPEDITION;
-    }
-
-    return BsffType.GROUPEMENT;
+    return BsffType.REEXPEDITION;
   }
 
   if (input.ficheInterventions?.length === 1) {
@@ -71,6 +137,26 @@ function getBsffType(input: BsffInput): BsffType {
   }
 
   return BsffType.COLLECTE_PETITES_QUANTITES;
+}
+
+export async function getBsffCreateGroupementInput(
+  splits: BsffSplitInput[]
+): Promise<Prisma.BsffGroupementCreateNestedManyWithoutNextInput> {
+  // set default weight to previous BSFF destination weight
+  const destinationReceptionWeight = async (bsffId: string) => {
+    const bsff = await prisma.bsff.findUnique({ where: { id: bsffId } });
+    return bsff.destinationReceptionWeight;
+  };
+  const createInput = splits.map(async ({ bsffId, weight }) => {
+    return {
+      previousId: bsffId,
+      weight: weight ?? (await destinationReceptionWeight(bsffId))
+    };
+  });
+
+  return {
+    create: await Promise.all(createInput)
+  };
 }
 
 export async function createBsff(
@@ -88,12 +174,21 @@ export async function createBsff(
 
   await isBsffContributor(user, flatInput);
 
-  const previousBsffs =
-    input.previousBsffs?.length > 0
+  const groupingBsffs =
+    input.grouping?.length > 0
       ? await prisma.bsff.findMany({
-          where: { id: { in: input.previousBsffs } }
+          where: { id: { in: input.grouping.map(({ bsffId }) => bsffId) } }
         })
       : [];
+  const forwardingBsff = input.forwarding
+    ? await getBsffOrNotFound({ id: input.forwarding })
+    : null;
+
+  const previousBsffs = groupingBsffs;
+  if (forwardingBsff) {
+    previousBsffs.push(forwardingBsff);
+  }
+
   const ficheInterventions =
     input.ficheInterventions?.length > 0
       ? await prisma.bsffFicheIntervention.findMany({
@@ -105,10 +200,12 @@ export async function createBsff(
 
   const data: Prisma.BsffCreateInput = flatInput;
 
-  if (previousBsffs.length > 0) {
-    data.previousBsffs = {
-      connect: previousBsffs.map(({ id }) => ({ id }))
-    };
+  if (input.grouping?.length > 0) {
+    data.grouping = await getBsffCreateGroupementInput(input.grouping);
+  }
+
+  if (input.forwarding) {
+    data.forwarding = { connect: { id: input.forwarding } };
   }
 
   if (ficheInterventions.length > 0) {

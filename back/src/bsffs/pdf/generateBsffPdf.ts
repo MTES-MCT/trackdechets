@@ -18,11 +18,14 @@ const cssPaths = [
 ];
 
 export async function generateBsffPdf(bsff: Bsff) {
-  const previousBsffs = await prisma.bsff.findMany({
-    where: {
-      nextBsffId: bsff.id
-    }
-  });
+  const groupement = await prisma.bsff
+    .findUnique({
+      where: { id: bsff.id },
+      include: { grouping: true }
+    })
+    .grouping({ include: { previous: true } });
+
+  const previousBsffs = groupement.map(({ previous }) => previous);
   const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
     where: {
       bsffId: bsff.id

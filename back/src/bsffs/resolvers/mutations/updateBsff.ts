@@ -4,7 +4,11 @@ import { Prisma, Bsff } from "@prisma/client";
 import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getBsffOrNotFound } from "../../database";
+import {
+  getBsffCreateGroupementInput,
+  getBsffOrNotFound,
+  getGroupingBsffs
+} from "../../database";
 import { flattenBsffInput, unflattenBsff } from "../../converter";
 import { isBsffContributor } from "../../permissions";
 import { validateBsff } from "../../validation";
@@ -44,7 +48,8 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       "destinationPlannedOperationCode"
     ]);
 
-    delete input.previousBsffs;
+    delete input.grouping;
+    delete input.forwarding;
     delete input.ficheInterventions;
   }
 
@@ -86,12 +91,24 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   await isBsffContributor(user, futureBsff);
 
-  const previousBsffs = await prisma.bsff.findMany({
-    where:
-      input.previousBsffs?.length > 0
-        ? { id: { in: input.previousBsffs } }
-        : { nextBsffId: existingBsff.id }
-  });
+  const groupingBsffs =
+    input.grouping?.length > 0
+      ? await prisma.bsff.findMany({
+          where: { id: { in: input.grouping.map(({ bsffId }) => bsffId) } }
+        })
+      : await getGroupingBsffs(existingBsff.id);
+
+  const forwardingBsff = input.forwarding
+    ? await getBsffOrNotFound({ id: input.forwarding })
+    : existingBsff.forwardingId
+    ? await prisma.bsff.findUnique({ where: { id: existingBsff.forwardingId } })
+    : null;
+
+  const previousBsffs = groupingBsffs;
+  if (forwardingBsff) {
+    previousBsffs.push(forwardingBsff);
+  }
+
   const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
     where:
       input.ficheInterventions?.length > 0
@@ -103,10 +120,21 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   const data: Prisma.BsffUpdateInput = flatInput;
 
-  if (previousBsffs.length > 0) {
-    data.previousBsffs = {
-      set: previousBsffs.map(({ id }) => ({ id }))
-    };
+  if (input.grouping?.length > 0) {
+    // delete previous groupements
+    await prisma.bsffGroupement.deleteMany({
+      where: { nextId: existingBsff.id }
+    });
+    data.grouping = await getBsffCreateGroupementInput(input.grouping);
+  }
+
+  if (input.forwarding) {
+    // disconnect previous relation
+    await prisma.bsff.update({
+      where: { id },
+      data: { forwarding: { disconnect: true } }
+    });
+    data.forwarding = { connect: { id: input.forwarding } };
   }
 
   if (ficheInterventions.length > 0) {

@@ -116,6 +116,7 @@ Extrait du bordereau initial accessible sur le bordereau de groupement.
 """
 type InitialBsff {
   id: ID!
+  ficheInterventions: [BsffFicheIntervention!]!
 }
 
 type BsffEmitter {

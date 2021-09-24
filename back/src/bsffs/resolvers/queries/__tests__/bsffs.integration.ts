@@ -24,12 +24,14 @@ const GET_BSFFS = `
           ficheInterventions {
             numero
           }
-          previousBsffs {
-            id
-            ficheInterventions {
-              detenteur {
-                company {
-                  siret
+          grouping {
+            bsff {
+              id
+              ficheInterventions {
+                detenteur {
+                  company {
+                    siret
+                  }
                 }
               }
             }
@@ -216,7 +218,7 @@ describe("Query.bsffs", () => {
     expect(data.bsffs.edges.length).toBe(1);
   });
 
-  describe("when listing the previous bsffs", () => {
+  describe("when listing the BSFFs that are grouped into this one", () => {
     let emitter: UserWithCompany;
     let transporter: UserWithCompany;
     let destination: UserWithCompany;
@@ -267,10 +269,10 @@ describe("Query.bsffs", () => {
       );
     });
 
-    it("should list the previous bsffs", async () => {
+    it("should list the grouping bsffs", async () => {
       const bsff = await createBsff(
         { emitter, transporter, destination },
-        { previousBsffs: { connect: [{ id: previousBsff.id }] } }
+        { grouping: { create: [{ previousId: previousBsff.id, weight: 1 }] } }
       );
 
       const { query } = makeClient(emitter.user);
@@ -283,9 +285,11 @@ describe("Query.bsffs", () => {
           expect.objectContaining({
             node: expect.objectContaining({
               id: bsff.id,
-              previousBsffs: [
+              grouping: [
                 expect.objectContaining({
-                  id: previousBsff.id
+                  bsff: expect.objectContaining({
+                    id: previousBsff.id
+                  })
                 })
               ]
             })
@@ -297,7 +301,7 @@ describe("Query.bsffs", () => {
     it("should show the detenteur from the fiche d'interventions to companies on the bsff", async () => {
       const bsff = await createBsff(
         { emitter, transporter, destination },
-        { previousBsffs: { connect: [{ id: previousBsff.id }] } }
+        { grouping: { create: [{ previousId: previousBsff.id, weight: 1 }] } }
       );
 
       const { query } = makeClient(destination.user);
@@ -310,19 +314,21 @@ describe("Query.bsffs", () => {
           expect.objectContaining({
             node: expect.objectContaining({
               id: bsff.id,
-              previousBsffs: [
+              grouping: [
                 expect.objectContaining({
-                  id: previousBsff.id,
-                  ficheInterventions: [
-                    expect.objectContaining({
-                      detenteur: {
-                        company: {
-                          siret:
-                            previousBsffFicheIntervention.detenteurCompanySiret
+                  bsff: expect.objectContaining({
+                    id: previousBsff.id,
+                    ficheInterventions: [
+                      expect.objectContaining({
+                        detenteur: {
+                          company: {
+                            siret:
+                              previousBsffFicheIntervention.detenteurCompanySiret
+                          }
                         }
-                      }
-                    })
-                  ]
+                      })
+                    ]
+                  })
                 })
               ]
             })
@@ -336,7 +342,7 @@ describe("Query.bsffs", () => {
 
       const bsff = await createBsff(
         { emitter: destination, transporter, destination: newDestination },
-        { previousBsffs: { connect: [{ id: previousBsff.id }] } }
+        { grouping: { create: [{ previousId: previousBsff.id, weight: 1 }] } }
       );
 
       const { query } = makeClient(newDestination.user);
@@ -349,14 +355,16 @@ describe("Query.bsffs", () => {
           expect.objectContaining({
             node: expect.objectContaining({
               id: bsff.id,
-              previousBsffs: [
+              grouping: [
                 expect.objectContaining({
-                  id: previousBsff.id,
-                  ficheInterventions: [
-                    expect.objectContaining({
-                      detenteur: null
-                    })
-                  ]
+                  bsff: expect.objectContaining({
+                    id: previousBsff.id,
+                    ficheInterventions: [
+                      expect.objectContaining({
+                        detenteur: null
+                      })
+                    ]
+                  })
                 })
               ]
             })
