@@ -8,6 +8,7 @@ import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { OPERATION, WASTE_CODES } from "../../../constants";
+import { getBsffCreateGroupementInput } from "../../../database";
 import {
   createBsff,
   createBsffAfterEmission,
@@ -507,10 +508,10 @@ describe("Mutation.updateBsff", () => {
     );
   });
 
-  it("should update the list of previous bsffs", async () => {
+  it("should update the list of grouping bsffs", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
 
-    const oldPreviousBsffs = await Promise.all([
+    const oldGroupingBsffs = await Promise.all([
       createBsffAfterOperation(
         {
           emitter: await userWithCompanyFactory(UserRole.ADMIN),
@@ -523,7 +524,7 @@ describe("Mutation.updateBsff", () => {
         }
       )
     ]);
-    const newPreviousBsffs = await Promise.all([
+    const newGroupingBsffs = await Promise.all([
       createBsffAfterOperation(
         {
           emitter: await userWithCompanyFactory(UserRole.ADMIN),
@@ -545,7 +546,11 @@ describe("Mutation.updateBsff", () => {
       },
       {
         type: BsffType.GROUPEMENT,
-        previousBsffs: { connect: oldPreviousBsffs.map(({ id }) => ({ id })) }
+        grouping: await getBsffCreateGroupementInput(
+          oldGroupingBsffs.map(bsff => ({
+            bsffId: bsff.id
+          }))
+        )
       }
     );
 
@@ -557,19 +562,81 @@ describe("Mutation.updateBsff", () => {
       variables: {
         id: bsff.id,
         input: {
-          previousBsffs: newPreviousBsffs.map(({ id }) => id)
+          grouping: newGroupingBsffs.map(({ id }) => ({ bsffId: id }))
         }
       }
     });
 
     expect(errors).toBeUndefined();
 
-    const actualPreviousBsffs = await prisma.bsff
-      .findUnique({ where: { id: data.updateBsff.id } })
-      .previousBsffs();
-    expect(actualPreviousBsffs).toEqual(
-      newPreviousBsffs.map(({ id }) => expect.objectContaining({ id }))
+    const actualGroupingBsffs = await prisma.bsff
+      .findUnique({
+        where: { id: data.updateBsff.id }
+      })
+      .grouping();
+    expect(actualGroupingBsffs.map(g => g.previousId)).toEqual(
+      newGroupingBsffs.map(({ id }) => id)
     );
+  });
+
+  it("should update the forwarded BSFF", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const oldForwarded = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED,
+        destinationOperationCode: OPERATION.R13.code
+      }
+    );
+
+    const bsff = await createBsffBeforeEmission(
+      {
+        emitter: ttr,
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: await userWithCompanyFactory(UserRole.ADMIN)
+      },
+      {
+        type: BsffType.REEXPEDITION,
+        forwarding: { connect: { id: oldForwarded.id } }
+      }
+    );
+
+    const newForwarded = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED,
+        destinationOperationCode: OPERATION.R13.code
+      }
+    );
+
+    const { mutate } = makeClient(ttr.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          forwarding: newForwarded.id
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const actualForwarded = await prisma.bsff
+      .findUnique({ where: { id: bsff.id } })
+      .forwarding();
+
+    expect(actualForwarded.id).toEqual(newForwarded.id);
   });
 
   it("should change the initial transporter", async () => {
@@ -609,7 +676,7 @@ describe("Mutation.updateBsff", () => {
 
   it("should update a bsff with previous bsffs", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const previousBsffs = await Promise.all([
+    const groupingBsffs = await Promise.all([
       createBsffAfterOperation(
         {
           emitter: await userWithCompanyFactory(UserRole.ADMIN),
@@ -626,11 +693,57 @@ describe("Mutation.updateBsff", () => {
       { emitter },
       {
         type: BsffType.GROUPEMENT,
-        previousBsffs: { connect: previousBsffs.map(({ id }) => ({ id })) }
+        grouping: await getBsffCreateGroupementInput(
+          groupingBsffs.map(bsff => ({
+            bsffId: bsff.id
+          }))
+        )
       }
     );
 
     const { mutate } = makeClient(emitter.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          emitter: {
+            company: {
+              name: "New Name"
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.updateBsff.id).toBeTruthy();
+  });
+
+  it("should update a bsff with a forwarding BSFF", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const forwardedBsff = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED,
+        destinationOperationCode: OPERATION.R13.code
+      }
+    );
+    const bsff = await createBsffBeforeEmission(
+      { emitter: ttr },
+      {
+        type: BsffType.REEXPEDITION,
+        forwarding: { connect: { id: forwardedBsff.id } }
+      }
+    );
+
+    const { mutate } = makeClient(ttr.user);
     const { data, errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs

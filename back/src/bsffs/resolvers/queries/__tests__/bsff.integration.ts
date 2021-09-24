@@ -16,7 +16,20 @@ const GET_BSFF = `
       ficheInterventions {
         numero
       }
-      previousBsffs {
+      grouping {
+        bsff {
+          id
+        }
+      }
+      groupedIn {
+        bsff {
+          id
+        }
+      }
+      forwarding {
+        id
+      }
+      forwardedIn {
         id
       }
     }
@@ -161,7 +174,7 @@ describe("Query.bsff", () => {
     );
   });
 
-  it("should list the bsff's previous bsffs", async () => {
+  it("should list the BSFFs regrouped in this one", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
@@ -176,9 +189,10 @@ describe("Query.bsff", () => {
         emitter: destination
       },
       {
-        previousBsffs: {
-          connect: {
-            id: previousBsff.id
+        grouping: {
+          create: {
+            previousId: previousBsff.id,
+            weight: 1
           }
         }
       }
@@ -193,11 +207,140 @@ describe("Query.bsff", () => {
 
     expect(data.bsff).toEqual(
       expect.objectContaining({
-        previousBsffs: [
+        grouping: [
           {
-            id: previousBsff.id
+            bsff: { id: previousBsff.id }
           }
         ]
+      })
+    );
+  });
+
+  it("should list the BSFFs this one has been grouped into", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const bsff = await createBsffAfterOperation({
+      emitter,
+      transporter,
+      destination
+    });
+    const nextBsff1 = await createBsff(
+      {
+        emitter: destination
+      },
+      {
+        grouping: {
+          create: {
+            previousId: bsff.id,
+            weight: 0.5
+          }
+        }
+      }
+    );
+
+    const nextBsff2 = await createBsff(
+      {
+        emitter: destination
+      },
+      {
+        grouping: {
+          create: {
+            previousId: bsff.id,
+            weight: 0.5
+          }
+        }
+      }
+    );
+
+    const { query } = makeClient(destination.user);
+    const { data } = await query<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF, {
+      variables: {
+        id: bsff.id
+      }
+    });
+
+    expect(data.bsff).toEqual(
+      expect.objectContaining({
+        groupedIn: [
+          {
+            bsff: { id: nextBsff1.id }
+          },
+          {
+            bsff: { id: nextBsff2.id }
+          }
+        ]
+      })
+    );
+  });
+
+  it("should return the BSFF forwarded by this one", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const forwardedBsff = await createBsffAfterOperation({
+      emitter,
+      transporter,
+      destination
+    });
+    const bsff = await createBsff(
+      {
+        emitter: destination
+      },
+      {
+        forwarding: {
+          connect: {
+            id: forwardedBsff.id
+          }
+        }
+      }
+    );
+    const { query } = makeClient(destination.user);
+    const { data } = await query<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF, {
+      variables: {
+        id: bsff.id
+      }
+    });
+    expect(data.bsff).toEqual(
+      expect.objectContaining({
+        forwarding: { id: forwardedBsff.id }
+      })
+    );
+  });
+
+  it("should return the BSFF this one has been forwarded in", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const bsff = await createBsffAfterOperation({
+      emitter,
+      transporter,
+      destination
+    });
+    const nextBsff = await createBsff(
+      {
+        emitter: destination
+      },
+      {
+        forwarding: {
+          connect: {
+            id: bsff.id
+          }
+        }
+      }
+    );
+    const { query } = makeClient(destination.user);
+    const { data } = await query<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF, {
+      variables: {
+        id: bsff.id
+      }
+    });
+    expect(data.bsff).toEqual(
+      expect.objectContaining({
+        forwardedIn: { id: nextBsff.id }
       })
     );
   });

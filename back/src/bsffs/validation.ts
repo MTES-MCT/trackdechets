@@ -11,6 +11,7 @@ import {
 } from "@prisma/client";
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { OPERATION, WASTE_CODES } from "./constants";
+import prisma from "../prisma";
 
 const bsffSchema: yup.SchemaOf<Pick<
   Bsff,
@@ -174,7 +175,12 @@ async function validatePreviousBsffs(
     );
   }
 
-  const errors = previousBsffs.reduce<string[]>((acc, previousBsff) => {
+  const fullPreviousBsffs = await prisma.bsff.findMany({
+    where: { id: { in: previousBsffs.map(bsff => bsff.id) } },
+    include: { forwardedIn: true, groupedIn: true }
+  });
+
+  const errors = fullPreviousBsffs.reduce<string[]>((acc, previousBsff) => {
     if (previousBsff.status === BsffStatus.PROCESSED) {
       return acc.concat([
         `Le bordereau n°${previousBsff.id} a déjà reçu son traitement final.`
@@ -187,10 +193,22 @@ async function validatePreviousBsffs(
       ]);
     }
 
-    if (previousBsff.nextBsffId && previousBsff.nextBsffId !== bsff.id) {
+    if (previousBsff.forwardedIn && previousBsff.forwardedIn.id !== bsff.id) {
       return acc.concat([
-        `Le bordereau n°${previousBsff.id} est déjà associé à un autre bordereau.`
+        `Le bordereau n°${previousBsff.id} a déjà été réexpédié ou reconditionné.`
       ]);
+    }
+
+    if (previousBsff.groupedIn?.length > 0) {
+      const alreadyGroupedWeight = previousBsff.groupedIn.reduce(
+        (acc, { weight }) => {
+          return acc + weight;
+        },
+        0
+      );
+      if (previousBsff.destinationReceptionWeight >= alreadyGroupedWeight) {
+        `La totalité du bordereau n°${previousBsff.id} a déjà été groupé`;
+      }
     }
 
     const operation =

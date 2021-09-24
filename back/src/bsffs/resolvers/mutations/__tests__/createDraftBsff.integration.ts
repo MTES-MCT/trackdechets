@@ -140,17 +140,17 @@ describe("Mutation.createDraftBsff", () => {
                 mail: destination.user.email
               }
             },
-            previousBsffs: [previousBsff.id]
+            grouping: [{ bsffId: previousBsff.id }]
           }
         }
       });
 
       expect(errors).toBeUndefined();
 
-      const previousBsffs = await prisma.bsff
+      const groupement = await prisma.bsff
         .findUnique({ where: { id: data.createDraftBsff.id } })
-        .previousBsffs();
-      expect(previousBsffs).toHaveLength(1);
+        .grouping();
+      expect(groupement).toHaveLength(1);
     });
 
     it("should add bsffs for réexpédition", async () => {
@@ -181,17 +181,19 @@ describe("Mutation.createDraftBsff", () => {
                 mail: destination.user.email
               }
             },
-            previousBsffs: previousBsffs.map(previousBsff => previousBsff.id)
+            grouping: previousBsffs.map(previousBsff => ({
+              bsffId: previousBsff.id
+            }))
           }
         }
       });
 
       expect(errors).toBeUndefined();
 
-      const actualPreviousBsffs = await prisma.bsff
+      const actualGroupement = await prisma.bsff
         .findUnique({ where: { id: data.createDraftBsff.id } })
-        .previousBsffs();
-      expect(actualPreviousBsffs).toHaveLength(previousBsffs.length);
+        .grouping();
+      expect(actualGroupement).toHaveLength(previousBsffs.length);
     });
 
     it("should disallow adding bsffs with missing signatures", async () => {
@@ -216,7 +218,9 @@ describe("Mutation.createDraftBsff", () => {
                 mail: destination.user.email
               }
             },
-            previousBsffs: previousBsffs.map(previousBsff => previousBsff.id)
+            grouping: previousBsffs.map(previousBsff => ({
+              bsffId: previousBsff.id
+            }))
           }
         }
       });
@@ -260,7 +264,7 @@ describe("Mutation.createDraftBsff", () => {
                 mail: destination.user.email
               }
             },
-            previousBsffs: [previousBsff.id]
+            grouping: [{ bsffId: previousBsff.id }]
           }
         }
       });
@@ -309,7 +313,9 @@ describe("Mutation.createDraftBsff", () => {
                 mail: transporter.user.email
               }
             },
-            previousBsffs: previousBsffs.map(previousBsff => previousBsff.id)
+            grouping: previousBsffs.map(previousBsff => ({
+              bsffId: previousBsff.id
+            }))
           }
         }
       });
@@ -357,17 +363,19 @@ describe("Mutation.createDraftBsff", () => {
                 mail: transporter.user.email
               }
             },
-            previousBsffs: previousBsffs.map(previousBsff => previousBsff.id)
+            grouping: previousBsffs.map(previousBsff => ({
+              bsffId: previousBsff.id
+            }))
           }
         }
       });
 
       expect(errors).toBeUndefined();
 
-      const actualPreviousBsffs = await prisma.bsff
+      const actualGroupement = await prisma.bsff
         .findUnique({ where: { id: data.createDraftBsff.id } })
-        .previousBsffs();
-      expect(actualPreviousBsffs).toHaveLength(previousBsffs.length);
+        .grouping();
+      expect(actualGroupement).toHaveLength(previousBsffs.length);
     });
   });
 });

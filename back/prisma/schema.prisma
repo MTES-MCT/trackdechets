@@ -896,30 +896,22 @@ model Bsff {
 
   ficheInterventions BsffFicheIntervention[] @relation("FicheInterventionToBsff")
 
-  previousBsffs Bsff[]  @relation("BsffToBsff")
-  nextBsff      Bsff?   @relation("BsffToBsff", fields: [nextBsffId], references: [id])
-  nextBsffId    String?
+  groupedIn BsffGroupement[] @relation("RegroupedIn")
+  grouping  BsffGroupement[] @relation("Regrouping")
 
-  // regroupedIn BsffRegroupement[] @relation("RegroupedIn")
-  // regrouping BsffRegroupement[] @relation("Regrouping")
-
-  // forwarding  Bsff? @relation("Forwarding", fields: [forwardingId], references: [id])
-  // forwardingId String?
-  // forwardedIn Bsff?
-
-  // synthesizing Bsff[]  @relation("Synthesizing")
-  // synthesizingId String?
-  // synthesizedIn Bsff?
+  forwarding   Bsff?   @relation("Forwarding", fields: [forwardingId], references: [id])
+  forwardingId String?
+  forwardedIn  Bsff?   @relation("Forwarding")
 }
 
-// model BsffRegroupement {
-//   id         String          @id @default(cuid())
-//   previous   Bsff            @relation("Regrouping", fields: [previousId], references: [id])
-//   previousId String
-//   next       Bsff            @relation("RegroupedIn", fields: [nextId], references: [id])
-//   nextId     String
-//   quantity   Int?
-// }
+model BsffGroupement {
+  id         String @id @default(cuid())
+  previous   Bsff   @relation("RegroupedIn", fields: [previousId], references: [id])
+  previousId String
+  next       Bsff   @relation("Regrouping", fields: [nextId], references: [id])
+  nextId     String
+  weight     Float
+}
 
 enum BsffType {
   TRACER_FLUIDE

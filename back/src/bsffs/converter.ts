@@ -202,10 +202,10 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
       }),
       cap: prismaBsff.destinationCap
     }),
+    // the following relations will be set in Bsff resolver
     ficheInterventions: [],
-    nextBsff: null,
-    nextBsffs: [],
-    previousBsffs: []
+    groupedIn: [],
+    grouping: []
   };
 }
 
