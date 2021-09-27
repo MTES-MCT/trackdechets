@@ -103,7 +103,7 @@ export async function getGroupingBsffsSplits(bsffId: string) {
   }));
 }
 
-export async function getGroupingBsffs(bsffId: string) {
+export async function getGroupedBsffs(bsffId: string) {
   const splits = await getGroupingBsffsSplits(bsffId);
   return splits.map(s => s.bsff);
 }
@@ -125,10 +125,11 @@ function getBsffType(input: BsffInput): BsffType {
     return BsffType.GROUPEMENT;
   }
 
+  if (input.repackaging?.length > 0) {
+    return BsffType.RECONDITIONNEMENT;
+  }
+
   if (input.forwarding) {
-    if (input.packagings?.length > 0) {
-      return BsffType.RECONDITIONNEMENT;
-    }
     return BsffType.REEXPEDITION;
   }
 
@@ -174,20 +175,37 @@ export async function createBsff(
 
   await isBsffContributor(user, flatInput);
 
-  const groupingBsffs =
-    input.grouping?.length > 0
-      ? await prisma.bsff.findMany({
-          where: { id: { in: input.grouping.map(({ bsffId }) => bsffId) } }
-        })
-      : [];
-  const forwardingBsff = input.forwarding
+  const isForwarding = !!input.forwarding;
+  const isRepackaging = input.repackaging?.length > 0;
+  const isGrouping = input.grouping?.length > 0;
+
+  if ([isForwarding, isRepackaging, isGrouping].filter(b => b).length > 1) {
+    throw new UserInputError(
+      "Les opérations d'entreposage provisoire, reconditionnement et groupement ne sont pas compatibles entre elles"
+    );
+  }
+
+  // bordereau qui est réexpédié par celui-ci
+  const forwardedBsff = isForwarding
     ? await getBsffOrNotFound({ id: input.forwarding })
     : null;
 
-  const previousBsffs = groupingBsffs;
-  if (forwardingBsff) {
-    previousBsffs.push(forwardingBsff);
-  }
+  // bordereaux qui sont reconditionnés dans celui-ci
+  const repackagedBsffs = isRepackaging
+    ? await prisma.bsff.findMany({ where: { id: { in: input.repackaging } } })
+    : null;
+  // bordereaux qui sont groupés dans celui-ci
+  const groupedBsffs = isGrouping
+    ? await prisma.bsff.findMany({
+        where: { id: { in: input.grouping.map(({ bsffId }) => bsffId) } }
+      })
+    : [];
+
+  const previousBsffs = [
+    ...(input.forwarding ? [forwardedBsff] : []),
+    ...(input.grouping ? groupedBsffs : []),
+    ...(input.repackaging ? repackagedBsffs : [])
+  ];
 
   const ficheInterventions =
     input.ficheInterventions?.length > 0
@@ -200,12 +218,20 @@ export async function createBsff(
 
   const data: Prisma.BsffCreateInput = flatInput;
 
-  if (input.grouping?.length > 0) {
+  if (isForwarding) {
+    data.forwarding = { connect: { id: input.forwarding } };
+  }
+
+  if (isGrouping) {
     data.grouping = await getBsffCreateGroupementInput(input.grouping);
   }
 
-  if (input.forwarding) {
-    data.forwarding = { connect: { id: input.forwarding } };
+  if (isRepackaging) {
+    data.repackaging = {
+      connect: input.repackaging.map(id => ({
+        id
+      }))
+    };
   }
 
   if (ficheInterventions.length > 0) {

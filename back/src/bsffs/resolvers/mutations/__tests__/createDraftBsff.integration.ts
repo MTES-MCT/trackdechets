@@ -153,17 +153,14 @@ describe("Mutation.createDraftBsff", () => {
       expect(groupement).toHaveLength(1);
     });
 
-    it("should add bsffs for réexpédition", async () => {
-      const previousBsffs = await Promise.all([
-        createBsffAfterOperation(
-          { emitter, transporter, destination },
-          {
-            status: BsffStatus.INTERMEDIATELY_PROCESSED,
-            destinationOperationCode: OPERATION.R13.code
-          }
-        )
-      ]);
-
+    it("should add a bsff for réexpedition", async () => {
+      const forwarded = await createBsffAfterOperation(
+        { emitter, transporter, destination },
+        {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED,
+          destinationOperationCode: OPERATION.R13.code
+        }
+      );
       const { mutate } = makeClient(destination.user);
       const { data, errors } = await mutate<
         Pick<Mutation, "createDraftBsff">,
@@ -181,19 +178,58 @@ describe("Mutation.createDraftBsff", () => {
                 mail: destination.user.email
               }
             },
-            grouping: previousBsffs.map(previousBsff => ({
-              bsffId: previousBsff.id
-            }))
+            forwarding: forwarded.id
           }
         }
       });
 
       expect(errors).toBeUndefined();
 
-      const actualGroupement = await prisma.bsff
+      const actualforwarding = await prisma.bsff
         .findUnique({ where: { id: data.createDraftBsff.id } })
-        .grouping();
-      expect(actualGroupement).toHaveLength(previousBsffs.length);
+        .forwarding();
+      expect(actualforwarding.id).toEqual(forwarded.id);
+    });
+
+    it("should add bsffs for repackaging", async () => {
+      const previousBsffs = await Promise.all([
+        createBsffAfterOperation(
+          { emitter, transporter, destination },
+          {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED,
+            destinationOperationCode: OPERATION.D14.code
+          }
+        )
+      ]);
+
+      const { mutate } = makeClient(destination.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createDraftBsff">,
+        MutationCreateDraftBsffArgs
+      >(CREATE_DRAFT_BSFF, {
+        variables: {
+          input: {
+            type: BsffType.RECONDITIONNEMENT,
+            emitter: {
+              company: {
+                name: destination.company.name,
+                siret: destination.company.siret,
+                address: destination.company.address,
+                contact: destination.user.name,
+                mail: destination.user.email
+              }
+            },
+            repackaging: previousBsffs.map(previousBsff => previousBsff.id)
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+
+      const actualRepackaging = await prisma.bsff
+        .findUnique({ where: { id: data.createDraftBsff.id } })
+        .repackaging();
+      expect(actualRepackaging).toHaveLength(previousBsffs.length);
     });
 
     it("should disallow adding bsffs with missing signatures", async () => {

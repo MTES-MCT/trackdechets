@@ -61,10 +61,12 @@ input BsffInput {
   transporter: BsffTransporterInput
   destination: BsffDestinationInput
   ficheInterventions: [ID!]
+  "Bordereau que celui-ci reéxpédie"
+  forwarding: ID
+  "Liste des bordereaux que celui-ci reconditionne"
+  repackaging: [ID!]
   "Liste des bordereaux que celui-ci groupe"
   grouping: [BsffSplitInput!]
-  "Bordereau que celui-ci reéxpédie ou reconditionne"
-  forwarding: ID
 }
 
 input BsffEmitterInput {

@@ -28,7 +28,27 @@ export const Bsff: BsffResolvers = {
         where: { id }
       })
       .forwarding();
-    return unflattenBsff(forwarding);
+    return {
+      id: forwarding.id,
+      // ficheInterventions will be resolved in InitialBsff resolver
+      ficheInterventions: []
+    };
+  },
+  repackagedIn: async ({ id }) => {
+    const repackagedIn = await prisma.bsff
+      .findUnique({ where: { id } })
+      .repackagedIn();
+    return unflattenBsff(repackagedIn);
+  },
+  repackaging: async ({ id }) => {
+    const repackaging = await prisma.bsff
+      .findUnique({ where: { id } })
+      .repackaging();
+    return repackaging.map(bsff => ({
+      id: bsff.id,
+      // ficheInterventions will be resolved in InitialBsff resolver
+      ficheInterventions: []
+    }));
   },
   grouping: async ({ id }) => {
     const previousBsffs = await getGroupingBsffsSplits(id);

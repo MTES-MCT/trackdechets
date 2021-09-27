@@ -14,7 +14,7 @@ import {
   validateBeforeTransport
 } from "../../validation";
 import { unflattenBsff } from "../../converter";
-import { getBsffOrNotFound, getGroupingBsffs } from "../../database";
+import { getBsffOrNotFound, getGroupedBsffs } from "../../database";
 import { indexBsff } from "../../elastic";
 import { OPERATION } from "../../constants";
 
@@ -134,7 +134,7 @@ const signatures: Record<
         ? BsffStatus.INTERMEDIATELY_PROCESSED
         : BsffStatus.PROCESSED;
 
-    const groupingBsffs = await getGroupingBsffs(existingBsff.id);
+    const groupingBsffs = await getGroupedBsffs(existingBsff.id);
     const forwardingBsff = existingBsff.forwardingId
       ? await prisma.bsff.findUnique({
           where: { id: existingBsff.forwardingId }

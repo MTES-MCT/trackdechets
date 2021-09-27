@@ -7,7 +7,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   getBsffCreateGroupementInput,
   getBsffOrNotFound,
-  getGroupingBsffs
+  getGroupedBsffs
 } from "../../database";
 import { flattenBsffInput, unflattenBsff } from "../../converter";
 import { isBsffContributor } from "../../permissions";
@@ -91,23 +91,38 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   await isBsffContributor(user, futureBsff);
 
-  const groupingBsffs =
-    input.grouping?.length > 0
-      ? await prisma.bsff.findMany({
-          where: { id: { in: input.grouping.map(({ bsffId }) => bsffId) } }
-        })
-      : await getGroupingBsffs(existingBsff.id);
-
-  const forwardingBsff = input.forwarding
+  const forwardedBsff = input.forwarding
     ? await getBsffOrNotFound({ id: input.forwarding })
     : existingBsff.forwardingId
     ? await prisma.bsff.findUnique({ where: { id: existingBsff.forwardingId } })
     : null;
 
-  const previousBsffs = groupingBsffs;
-  if (forwardingBsff) {
-    previousBsffs.push(forwardingBsff);
+  const repackagedBsffs = input.repackaging
+    ? await prisma.bsff.findMany({ where: { id: { in: input.repackaging } } })
+    : await prisma.bsff.findFirst({ where: { id } }).repackaging();
+
+  const groupedBsffs =
+    input.grouping?.length > 0
+      ? await prisma.bsff.findMany({
+          where: { id: { in: input.grouping.map(({ bsffId }) => bsffId) } }
+        })
+      : await getGroupedBsffs(existingBsff.id);
+
+  const isForwarding = !!forwardedBsff;
+  const isRepackaging = repackagedBsffs.length > 0;
+  const isGrouping = groupedBsffs.length > 0;
+
+  if ([isForwarding, isRepackaging, isGrouping].filter(b => b).length > 1) {
+    throw new UserInputError(
+      "Les opérations d'entreposage provisoire, reconditionnement et groupement ne sont pas compatibles entre elles"
+    );
   }
+
+  const previousBsffs = [
+    ...(isForwarding ? [forwardedBsff] : []),
+    ...groupedBsffs,
+    ...repackagedBsffs
+  ];
 
   const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
     where:
@@ -121,15 +136,35 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   const data: Prisma.BsffUpdateInput = flatInput;
 
   if (input.grouping?.length > 0) {
-    // delete previous groupements
+    // delete current groupement
     await prisma.bsffGroupement.deleteMany({
       where: { nextId: existingBsff.id }
     });
     data.grouping = await getBsffCreateGroupementInput(input.grouping);
   }
 
+  if (input.repackaging?.length > 0) {
+    // disconnect current relations
+    const currentRepackaging = await prisma.bsff
+      .findFirst({ where: { id } })
+      .repackaging();
+    await prisma.bsff.update({
+      where: { id },
+      data: {
+        repackaging: {
+          disconnect: currentRepackaging.map(({ id }) => ({ id }))
+        }
+      }
+    });
+    data.repackaging = {
+      connect: input.repackaging.map(id => ({
+        id
+      }))
+    };
+  }
+
   if (input.forwarding) {
-    // disconnect previous relation
+    // disconnect current relation
     await prisma.bsff.update({
       where: { id },
       data: { forwarding: { disconnect: true } }

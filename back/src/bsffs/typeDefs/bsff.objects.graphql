@@ -69,14 +69,24 @@ type Bsff {
   ficheInterventions: [BsffFicheIntervention!]!
 
   """
-  Bordereau que celui-ci réexpédie ou reconditionne
+  Bordereau que celui-ci réexpédie
   """
-  forwarding: Bsff
+  forwarding: InitialBsff
 
   """
-  Bordereau qui réexpédie ou recondtionne celui-ci
+  Bordereau dans lequel celui-ci est réexpédié
   """
   forwardedIn: Bsff
+
+  """
+  Bordereaux que celui-ci reconditionne
+  """
+  repackaging: [InitialBsff!]!
+
+  """
+  Bordereau dans lequel celui-ci est reconditionné
+  """
+  repackagedIn: Bsff
 
   """
   Bordereaux que celui-ci groupe
@@ -112,7 +122,7 @@ type InitialBsffSplit {
 }
 
 """
-Extrait du bordereau initial accessible sur le bordereau de groupement.
+Extrait d'un bordereau initial dans le cas d'une réexpedition, d'un reconditionnement ou d'un groupement
 """
 type InitialBsff {
   id: ID!
