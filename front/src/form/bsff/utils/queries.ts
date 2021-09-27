@@ -92,7 +92,12 @@ export const FullBsffFragment = gql`
     ficheInterventions {
       ...FicheInterventionFragment
     }
-    previousBsffs {
+    grouping {
+      bsff {
+        id
+      }
+    }
+    forwarding {
       id
     }
   }
