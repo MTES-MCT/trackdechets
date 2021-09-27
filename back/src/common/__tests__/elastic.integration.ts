@@ -325,3 +325,103 @@ describe("waste text analyzer", () => {
     expect(hits).toHaveLength(0);
   });
 });
+
+describe("transporterNumberPlate analyzer", () => {
+  const plates = ["GT-086-HY", "GT-022-VC", "AD-022-DA"];
+
+  beforeAll(async () => {
+    const defaultOpts = {
+      type: "BSDD" as BsdType,
+      emitter: "emitter",
+      recipient: "recipient",
+      waste: "01 01 01",
+      createdAt: new Date().getMilliseconds(),
+      isDraftFor: [],
+      isForActionFor: [],
+      isFollowFor: [],
+      isArchivedFor: [],
+      isToCollectFor: [],
+      isCollectedFor: [],
+      sirets: []
+    };
+
+    const bsds: BsdElastic[] = plates.map(plate => {
+      const id = getReadableId();
+      return {
+        id,
+        readableId: id,
+        transporterNumberPlate: plate,
+        ...defaultOpts
+      };
+    });
+
+    await indexBsds(index.alias, bsds);
+    await refreshElasticSearch();
+  });
+
+  afterAll(resetDatabase);
+
+  test("exact match", async () => {
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: {
+          match: {
+            transporterNumberPlate: {
+              query: plates[0],
+              operator: "and"
+            }
+          }
+        }
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(1);
+    expect(hits[0]._source.transporterNumberPlate).toEqual(plates[0]);
+  });
+
+  test("lower case match", async () => {
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: {
+          match: {
+            transporterNumberPlate: {
+              query: plates[0].toLowerCase(),
+              operator: "and"
+            }
+          }
+        }
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(1);
+    expect(hits[0]._source.transporterNumberPlate).toEqual(plates[0]);
+  });
+
+  test("partial match ", async () => {
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: {
+          match: {
+            transporterNumberPlate: {
+              query: "GT"
+            }
+          }
+        }
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(2);
+    const expected = [plates[0], plates[1]];
+    expect(expected).toContain(hits[0]._source.transporterNumberPlate);
+    expect(expected).toContain(hits[1]._source.transporterNumberPlate);
+  });
+});

@@ -17,6 +17,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Rafraichissement automatique de la liste des bordereaux dans l'UI Trackdéchets [PR 985](https://github.com/MTES-MCT/trackdechets/pull/985)
+- Ajout d'un filtre sur les champs "Plaque d'immatriculation" et "Champ libre" dans le tableau de bord transporteur [PR 998](https://github.com/MTES-MCT/trackdechets/pull/998)
 #### :memo: Documentation
 
 #### :house: Interne

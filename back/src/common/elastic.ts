@@ -12,6 +12,8 @@ export interface BsdElastic {
   emitter: string;
   recipient: string;
   waste: string;
+  transporterNumberPlate?: string;
+  transporterCustomInfo?: string;
   createdAt: number;
 
   isDraftFor: string[];
@@ -50,6 +52,14 @@ const settings = {
       // accepts whatever text it is given and outputs the exact same text as a single term
       waste_ngram_search: {
         tokenizer: "keyword"
+      },
+      numberPlate: {
+        tokenizer: "numberPlate_ngram",
+        filter: ["lowercase"]
+      },
+      numberPlate_search: {
+        tokenizer: "numberPlate_char_group",
+        filter: ["lowercase"]
       }
     },
     tokenizer: {
@@ -69,6 +79,16 @@ const settings = {
         max_gram: 9, // "xx xx xx*" is 9 char length
         // do not include letter in `token_chars` to discard waste description from the index
         token_chars: ["digit", "whitespace", "punctuation", "symbol"]
+      },
+      numberPlate_ngram: {
+        type: "ngram",
+        min_gram: 2,
+        max_gram: 3,
+        token_chars: ["letter", "digit"]
+      },
+      numberPlate_char_group: {
+        type: "char_group",
+        tokenize_on_chars: ["whitespace", "-"]
       }
     }
   }
@@ -125,6 +145,24 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
       }
     }
   },
+  transporterNumberPlate: {
+    type: "text",
+    analyzer: "numberPlate",
+    search_analyzer: "numberPlate_search",
+    fields: {
+      keyword: {
+        type: "keyword"
+      }
+    }
+  },
+  transporterCustomInfo: {
+    type: "text",
+    fields: {
+      keyword: {
+        type: "keyword"
+      }
+    }
+  },
   createdAt: {
     type: "date"
   },
@@ -157,7 +195,7 @@ export const index = {
   // Changing the value of index is a way to "bump" the model
   // Doing so will cause all BSDs to be reindexed in Elastic Search
   // when running the appropriate script
-  index: "bsds_0.1.2",
+  index: "bsds_0.1.3",
 
   // The next major version of Elastic Search doesn't use "type" anymore
   // so while it's required for the current version, we are not using it too much
