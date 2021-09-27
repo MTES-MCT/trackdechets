@@ -1,6 +1,6 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getBsffOrNotFound, getGroupingBsffs } from "../../database";
+import { getBsffOrNotFound, getGroupedBsffs } from "../../database";
 import { isBsffContributor } from "../../permissions";
 import prisma from "../../../prisma";
 import { unflattenBsff } from "../../converter";
@@ -17,7 +17,7 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
 
   await isBsffContributor(user, existingBsff);
 
-  const groupingBsffs = await getGroupingBsffs(id);
+  const groupingBsffs = await getGroupedBsffs(id);
   const forwardingBsff = await prisma.bsff.findUnique({
     where: { id: existingBsff.forwardingId }
   });

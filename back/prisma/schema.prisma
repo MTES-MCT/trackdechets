@@ -899,6 +899,10 @@ model Bsff {
   groupedIn BsffGroupement[] @relation("RegroupedIn")
   grouping  BsffGroupement[] @relation("Regrouping")
 
+  repackaging    Bsff[]  @relation("Repackaging")
+  repackagedIn   Bsff?   @relation("Repackaging", fields: [repackagedInId], references: [id])
+  repackagedInId String?
+
   forwarding   Bsff?   @relation("Forwarding", fields: [forwardingId], references: [id])
   forwardingId String?
   forwardedIn  Bsff?   @relation("Forwarding")

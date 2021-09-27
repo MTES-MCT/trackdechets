@@ -205,7 +205,8 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
     // the following relations will be set in Bsff resolver
     ficheInterventions: [],
     groupedIn: [],
-    grouping: []
+    grouping: [],
+    repackaging: []
   };
 }
 

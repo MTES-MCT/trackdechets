@@ -508,7 +508,7 @@ describe("Mutation.updateBsff", () => {
     );
   });
 
-  it("should update the list of grouping bsffs", async () => {
+  it("should update the list of grouped BSFFs", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
 
     const oldGroupingBsffs = await Promise.all([
@@ -637,6 +637,67 @@ describe("Mutation.updateBsff", () => {
       .forwarding();
 
     expect(actualForwarded.id).toEqual(newForwarded.id);
+  });
+
+  it("should update the list of repackaged BSFF", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const oldRepackaged = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED,
+        destinationOperationCode: OPERATION.D14.code
+      }
+    );
+
+    const bsff = await createBsffBeforeEmission(
+      {
+        emitter: ttr,
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: await userWithCompanyFactory(UserRole.ADMIN)
+      },
+      {
+        type: BsffType.RECONDITIONNEMENT,
+        repackaging: { connect: [{ id: oldRepackaged.id }] }
+      }
+    );
+
+    const newRepackaged = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED,
+        destinationOperationCode: OPERATION.D14.code
+      }
+    );
+
+    const { mutate } = makeClient(ttr.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          repackaging: [newRepackaged.id]
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const actualRepackaged = await prisma.bsff
+      .findUnique({ where: { id: bsff.id } })
+      .repackaging();
+
+    expect(actualRepackaged).toHaveLength(1);
+    expect(actualRepackaged[0].id).toEqual(newRepackaged.id);
   });
 
   it("should change the initial transporter", async () => {
