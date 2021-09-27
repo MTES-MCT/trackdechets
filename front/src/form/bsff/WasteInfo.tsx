@@ -70,7 +70,7 @@ export default function WasteInfo({ disabled }) {
           type="checkbox"
           label="Il s'agit d'une estimation"
           component={FieldSwitch}
-          name="quantity.isEstimate"
+          name="weight.isEstimate"
           disabled={disabled}
         />
         <RedErrorMessage name="weight.value" />
