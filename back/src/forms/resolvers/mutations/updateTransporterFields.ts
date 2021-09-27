@@ -30,7 +30,7 @@ const updateTransporterFieldsResolver: MutationResolvers["updateTransporterField
   });
 
   const fullForm = await getFullForm(updatedForm);
-  await indexForm(fullForm);
+  await indexForm(fullForm, context);
 
   return expandFormFromDb(updatedForm);
 };
