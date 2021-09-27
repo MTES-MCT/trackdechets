@@ -74,7 +74,7 @@ export default async function sign(
       status: newStatus as BsvhuStatus
     }
   });
-  await indexBsvhu(signedForm);
+  await indexBsvhu(signedForm, context);
   return expandVhuFormFromDb(signedForm);
 }
 

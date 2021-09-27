@@ -1,5 +1,7 @@
 import { useMutation, useQuery } from "@apollo/client";
 import cogoToast from "cogo-toast";
+import { Loader } from "common/components";
+import { GET_BSDS } from "common/queries";
 import routes from "common/routes";
 import GenericStepList, {
   getComputedState,
@@ -42,15 +44,21 @@ export default function BsdaStepsList(props: Props) {
     [formQuery.data]
   );
 
-  const [createdaForm] = useMutation<
+  const [createdaForm, { loading: creating }] = useMutation<
     Pick<Mutation, "createBsda">,
     MutationCreateBsdaArgs
-  >(CREATE_BSDA);
+  >(CREATE_BSDA, {
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
+  });
 
-  const [updatedaForm] = useMutation<
+  const [updatedaForm, { loading: updating }] = useMutation<
     Pick<Mutation, "updateBsda">,
     MutationUpdateBsdaArgs
-  >(UPDATE_BSDA);
+  >(UPDATE_BSDA, {
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
+  });
 
   function saveForm(input: BsdaInput): Promise<any> {
     return formState.id
@@ -88,14 +96,17 @@ export default function BsdaStepsList(props: Props) {
   >[];
 
   return (
-    <GenericStepList
-      children={steps}
-      formId={props.formId}
-      formQuery={formQuery}
-      onSubmit={onSubmit}
-      initialValues={formState}
-      validationSchema={null}
-      initialStep={props.initialStep}
-    />
+    <>
+      <GenericStepList
+        children={steps}
+        formId={props.formId}
+        formQuery={formQuery}
+        onSubmit={onSubmit}
+        initialValues={formState}
+        validationSchema={null}
+        initialStep={props.initialStep}
+      />
+      {(creating || updating) && <Loader />}
+    </>
   );
 }

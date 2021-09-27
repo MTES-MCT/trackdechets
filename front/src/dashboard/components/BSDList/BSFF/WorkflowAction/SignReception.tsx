@@ -15,6 +15,7 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { SIGN_BSFF, UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
+import { GET_BSDS } from "common/queries";
 
 const validationSchema = yup.object({
   receptionDate: yup.date().required(),
@@ -42,7 +43,7 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
   const [signBsff, signBsffResult] = useMutation<
     Pick<Mutation, "signBsff">,
     MutationSignBsffArgs
-  >(SIGN_BSFF);
+  >(SIGN_BSFF, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   const loading = updateBsffResult.loading || signBsffResult.loading;
   const error = updateBsffResult.error ?? signBsffResult.error;

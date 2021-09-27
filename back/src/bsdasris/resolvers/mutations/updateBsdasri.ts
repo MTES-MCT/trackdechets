@@ -171,7 +171,7 @@ const dasriUpdateResolver = async (
   });
 
   const expandedDasri = expandBsdasriFromDb(updatedDasri);
-  await indexBsdasri(updatedDasri);
+  await indexBsdasri(updatedDasri, context);
   return expandedDasri;
 };
 

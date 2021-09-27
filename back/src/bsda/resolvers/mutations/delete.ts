@@ -22,7 +22,7 @@ export default async function deleteBsda(
     data: { isDeleted: true }
   });
 
-  await deleteBsd(deletedBsda);
+  await deleteBsd(deletedBsda, context);
 
   return expandBsdaFromDb(deletedBsda);
 }

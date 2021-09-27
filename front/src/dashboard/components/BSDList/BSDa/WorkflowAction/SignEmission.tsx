@@ -1,5 +1,6 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
+import { GET_BSDS } from "common/queries";
 import routes from "common/routes";
 import { Field, Form, Formik } from "formik";
 import {
@@ -25,7 +26,10 @@ export function SignEmission({ siret, bsdaId }: Props) {
   const [signBsda, { loading }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs
-  >(SIGN_BSDA);
+  >(SIGN_BSDA, {
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
+  });
 
   return (
     <SignBsda title="Signer l'enlèvement" bsdaId={bsdaId}>

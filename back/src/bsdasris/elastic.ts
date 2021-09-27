@@ -3,6 +3,7 @@ import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 
 import { DASRI_WASTE_CODES_MAPPING } from "../common/constants/DASRI_CONSTANTS";
+import { GraphQLContext } from "../types";
 
 // | state              | emitter | transporter | recipient |
 // |--------------------|---------|-------------|-----------|
@@ -163,6 +164,6 @@ export async function indexAllBsdasris(
   return indexAllBsdasris(idx, { skip: skip + take });
 }
 
-export function indexBsdasri(bsdasri: Bsdasri) {
-  return indexBsd(toBsdElastic(bsdasri));
+export function indexBsdasri(bsdasri: Bsdasri, ctx?: GraphQLContext) {
+  return indexBsd(toBsdElastic(bsdasri), ctx);
 }

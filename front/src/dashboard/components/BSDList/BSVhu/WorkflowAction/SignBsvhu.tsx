@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { ActionButton } from "common/components";
 import { IconCheckCircle1 } from "common/components/Icons";
-import React from "react";
+import React, { useState } from "react";
 import { SignBsvhuModal } from "./SignBsvhuModal";
 
 export const SIGN_BSVHU = gql`
@@ -20,7 +20,7 @@ type Props = {
 };
 
 export function SignBsvhu({ title, bsvhuId, children }: Props) {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>

@@ -5,13 +5,14 @@ import { gql, useMutation } from "@apollo/client";
 import { BdasriSummary } from "dashboard/components/BSDList/BSDasri/Summary/BsdasriSummary";
 
 import { TdModalTrigger } from "common/components/Modal";
-import { ActionButton } from "common/components";
+import { ActionButton, Loader } from "common/components";
 import { IconPaperWrite } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 import { Link, generatePath } from "react-router-dom";
 import routes from "common/routes";
 
 import cogoToast from "cogo-toast";
+import { GET_BSDS } from "common/queries";
 
 const PUBLISH_BSDASRI = gql`
   mutation PublishBsdasri($id: ID!) {
@@ -23,11 +24,13 @@ const PUBLISH_BSDASRI = gql`
 `;
 
 export default function PublishBsdasri({ form, siret }: WorkflowActionProps) {
-  const [publishBsdasri, { error }] = useMutation<
+  const [publishBsdasri, { loading, error }] = useMutation<
     Pick<Mutation, "publishBsdasri">,
     MutationPublishBsdasriArgs
   >(PUBLISH_BSDASRI, {
     variables: { id: form.id },
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: () => {
       cogoToast.success(`Bordereau ${form.id} publié`, { hideAfter: 5 });
     },
@@ -93,6 +96,7 @@ export default function PublishBsdasri({ form, siret }: WorkflowActionProps) {
               </Link>
             </>
           )}
+          {loading && <Loader />}
         </div>
       )}
     />

@@ -1,6 +1,7 @@
 import { BsvhuStatus, Bsvhu } from "@prisma/client";
 import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
+import { GraphQLContext } from "../types";
 
 // | state              | emitter | transporter | destination |
 // |--------------------|---------|-------------|-------------|
@@ -151,6 +152,6 @@ export async function indexAllBsvhus(
   return indexAllBsvhus(idx, { skip: skip + take });
 }
 
-export function indexBsvhu(bsvhu: Bsvhu) {
-  return indexBsd(toBsdElastic(bsvhu));
+export function indexBsvhu(bsvhu: Bsvhu, ctx?: GraphQLContext) {
+  return indexBsd(toBsdElastic(bsvhu), ctx);
 }

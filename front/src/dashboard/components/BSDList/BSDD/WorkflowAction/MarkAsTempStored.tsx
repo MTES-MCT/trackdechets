@@ -9,10 +9,11 @@ import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "common/components/Modal";
-import { ActionButton } from "common/components";
+import { ActionButton, Loader } from "common/components";
 import { IconWarehouseStorage } from "common/components/Icons";
 import ReceivedInfo from "./ReceivedInfo";
 import { NotificationError } from "common/components/Error";
+import { GET_BSDS } from "common/queries";
 
 const MARK_AS_TEMP_STORED = gql`
   mutation MarkAsTempStored($id: ID!, $tempStoredInfos: TempStoredFormInput!) {
@@ -24,10 +25,13 @@ const MARK_AS_TEMP_STORED = gql`
 `;
 
 export default function MarkAsTempStored({ form }: WorkflowActionProps) {
-  const [markAsTempStored, { error }] = useMutation<
+  const [markAsTempStored, { loading, error }] = useMutation<
     Pick<Mutation, "markAsTempStored">,
     MutationMarkAsTempStoredArgs
-  >(MARK_AS_TEMP_STORED);
+  >(MARK_AS_TEMP_STORED, {
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
+  });
 
   const actionLabel = "Valider l'entreposage provisoire";
 
@@ -67,6 +71,7 @@ export default function MarkAsTempStored({ form }: WorkflowActionProps) {
             {error && (
               <NotificationError className="action-error" apolloError={error} />
             )}
+            {loading && <Loader />}
           </div>
         )}
       />

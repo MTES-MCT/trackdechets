@@ -5,6 +5,7 @@ import {
   MutationDuplicateBsdasriArgs,
 } from "generated/graphql/types";
 import { dasriFragment } from "common/fragments";
+import { GET_BSDS } from "common/queries";
 
 const DUPLICATE_BSDASRI = gql`
   mutation DuplicateBsdasri($id: ID!) {
@@ -26,6 +27,8 @@ export function useBsdasriDuplicate(
     MutationDuplicateBsdasriArgs
   >(DUPLICATE_BSDASRI, {
     ...options,
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: (...args) => {
       cogoToast.success(
         `Le bordereau a été dupliqué, il est disponible dans l'onglet "Brouillons"`

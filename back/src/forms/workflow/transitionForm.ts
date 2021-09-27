@@ -7,6 +7,7 @@ import { formDiff } from "./diff";
 import { eventEmitter, TDEvent } from "../../events/emitter";
 import { indexForm } from "../elastic";
 import { getFullForm } from "../database";
+import { GraphQLContext } from "../../types";
 
 /**
  * Transition a form from initial state (ex: DRAFT) to next state (ex: SEALED)
@@ -79,7 +80,7 @@ export default async function transitionForm(
   });
 
   const fullForm = await getFullForm(updatedForm);
-  await indexForm(fullForm);
+  await indexForm(fullForm, { user } as GraphQLContext);
 
   return updatedForm;
 }

@@ -1,5 +1,6 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
+import { GET_BSDS } from "common/queries";
 import routes from "common/routes";
 import { Field, Form, Formik } from "formik";
 import {
@@ -24,7 +25,7 @@ export function SignTransport({ siret, bsvhuId }: Props) {
   const [signBsvhu, { loading }] = useMutation<
     Pick<Mutation, "signBsvhu">,
     MutationSignBsvhuArgs
-  >(SIGN_BSVHU);
+  >(SIGN_BSVHU, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   return (
     <SignBsvhu title="Signer l'enlèvement" bsvhuId={bsvhuId}>

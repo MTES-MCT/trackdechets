@@ -44,6 +44,7 @@ import {
 } from "dashboard/detail/common/Components";
 import { WorkflowAction } from "dashboard/components/BSDList";
 import EditSegment from "./EditSegment";
+import { Loader } from "common/components";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -328,7 +329,7 @@ export default function BSDDetailContent({
   const history = useHistory();
   const [isDeleting, setIsDeleting] = useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
-  const [duplicate] = useDuplicate({
+  const [duplicate, { loading: isDuplicating }] = useDuplicate({
     variables: { id: form.id },
     onCompleted: () => {
       history.push(
@@ -611,6 +612,7 @@ export default function BSDDetailContent({
           onClose={() => setIsDeleting(false)}
         />
       )}
+      {isDuplicating && <Loader />}
     </>
   );
 }

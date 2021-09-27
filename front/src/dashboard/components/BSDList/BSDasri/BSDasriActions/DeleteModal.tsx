@@ -4,6 +4,8 @@ import { gql, useMutation } from "@apollo/client";
 import { Mutation, MutationDeleteBsdasriArgs } from "generated/graphql/types";
 import cogoToast from "cogo-toast";
 import TdModal from "common/components/Modal";
+import { GET_BSDS } from "common/queries";
+import { Loader } from "common/components";
 
 const DELETE_BSDASRI = gql`
   mutation DeleteBsdasri($id: ID!) {
@@ -23,11 +25,13 @@ export function DeleteBsdasriModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const [deleteBsdasri] = useMutation<
+  const [deleteBsdasri, { loading }] = useMutation<
     Pick<Mutation, "deleteBsdasri">,
     MutationDeleteBsdasriArgs
   >(DELETE_BSDASRI, {
     variables: { id: formId },
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: () => {
       cogoToast.success("Bordereau supprimé", { hideAfter: 5 });
       !!onClose && onClose();
@@ -57,6 +61,7 @@ export function DeleteBsdasriModal({
           <span> Supprimer</span>
         </button>
       </div>
+      {loading && <Loader />}
     </TdModal>
   );
 }

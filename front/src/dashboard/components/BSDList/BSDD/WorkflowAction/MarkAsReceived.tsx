@@ -4,10 +4,11 @@ import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "common/components/Modal";
-import { ActionButton } from "common/components";
+import { ActionButton, Loader } from "common/components";
 import { IconWaterDam } from "common/components/Icons";
 import ReceivedInfo from "./ReceivedInfo";
 import { NotificationError } from "common/components/Error";
+import { GET_BSDS } from "common/queries";
 
 const MARK_AS_RECEIVED = gql`
   mutation MarkAsReceived($id: ID!, $receivedInfo: ReceivedFormInput!) {
@@ -19,10 +20,13 @@ const MARK_AS_RECEIVED = gql`
 `;
 
 export default function MarkAsReceived({ form }: WorkflowActionProps) {
-  const [markAsReceived, { error }] = useMutation<
+  const [markAsReceived, { loading, error }] = useMutation<
     Pick<Mutation, "markAsReceived">,
     MutationMarkAsReceivedArgs
-  >(MARK_AS_RECEIVED);
+  >(MARK_AS_RECEIVED, {
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
+  });
 
   const actionLabel = "Valider la réception";
 
@@ -52,6 +56,7 @@ export default function MarkAsReceived({ form }: WorkflowActionProps) {
             {error && (
               <NotificationError className="action-error" apolloError={error} />
             )}
+            {loading && <Loader />}
           </div>
         )}
       />

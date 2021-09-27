@@ -24,7 +24,7 @@ export default async function duplicate(
   );
 
   const newBsda = await duplicateForm(prismaForm);
-  await indexBsda(newBsda);
+  await indexBsda(newBsda, context);
 
   return expandBsdaFromDb(newBsda);
 }

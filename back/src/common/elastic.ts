@@ -1,7 +1,9 @@
 import fs from "fs";
 import path from "path";
-import { Client } from "@elastic/elasticsearch";
+import { Client, RequestParams } from "@elastic/elasticsearch";
 import { BsdType } from "../generated/graphql/types";
+import { GraphQLContext } from "../types";
+import { AuthType } from "../auth";
 
 export interface BsdElastic {
   id: string;
@@ -238,14 +240,26 @@ export const client = new Client({
 });
 
 /**
+ * Set refresh parameter to `wait_for` when user is logged in from UI
+ * It allows to refresh the BSD list in real time after a create, update or delete operation from UI
+ * https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-refresh.html
+ */
+function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
+  return ctx?.user?.auth === AuthType.Session
+    ? { refresh: "wait_for" }
+    : { refresh: "false" };
+}
+
+/**
  * Create/update a document in Elastic Search.
  */
-export function indexBsd(bsd: BsdElastic) {
+export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
   return client.index({
     index: index.alias,
     type: index.type,
     id: bsd.id,
-    body: bsd
+    body: bsd,
+    ...refresh(ctx)
   });
 }
 
@@ -270,12 +284,16 @@ export function indexBsds(idx: string, bsds: BsdElastic[]) {
 /**
  * Delete a document in Elastic Search.
  */
-export function deleteBsd<T extends { id: string }>({ id }: T) {
+export function deleteBsd<T extends { id: string }>(
+  { id }: T,
+  ctx?: GraphQLContext
+) {
   return client.delete(
     {
       index: index.alias,
       type: index.type,
-      id
+      id,
+      ...refresh(ctx)
     },
     { ignore: [404] }
   );

@@ -74,6 +74,7 @@ export function BSDList({
     variables: {
       where: defaultWhere,
     },
+    fetchPolicy: "cache-and-network",
     notifyOnNetworkStatusChange: true,
   });
 

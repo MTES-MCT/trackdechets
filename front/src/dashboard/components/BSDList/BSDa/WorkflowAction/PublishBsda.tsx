@@ -4,13 +4,14 @@ import { WorkflowActionProps } from "./WorkflowAction";
 import { gql, useMutation } from "@apollo/client";
 
 import { TdModalTrigger } from "common/components/Modal";
-import { ActionButton } from "common/components";
+import { ActionButton, Loader } from "common/components";
 import { IconPaperWrite } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 
 import cogoToast from "cogo-toast";
 import { generatePath, Link } from "react-router-dom";
 import routes from "common/routes";
+import { GET_BSDS } from "common/queries";
 
 const PUBLISH_BSDA = gql`
   mutation PublishBsda($id: ID!) {
@@ -22,11 +23,13 @@ const PUBLISH_BSDA = gql`
 `;
 
 export default function PublishBsda({ form, siret }: WorkflowActionProps) {
-  const [publishBsda, { error }] = useMutation<
+  const [publishBsda, { error, loading }] = useMutation<
     Pick<Mutation, "publishBsda">,
     MutationPublishBsdaArgs
   >(PUBLISH_BSDA, {
     variables: { id: form.id },
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: () => {
       cogoToast.success(`Bordereau ${form.id} publié`, { hideAfter: 5 });
     },
@@ -72,7 +75,7 @@ export default function PublishBsda({ form, siret }: WorkflowActionProps) {
               <span>Publier le bordereau</span>
             </button>
           </div>
-
+          {loading && <Loader />}
           {error && (
             <>
               <NotificationError className="action-error" apolloError={error} />

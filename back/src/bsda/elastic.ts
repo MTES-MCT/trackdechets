@@ -1,6 +1,7 @@
 import { Bsda, BsdaStatus } from "@prisma/client";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 import prisma from "../prisma";
+import { GraphQLContext } from "../types";
 
 // | state              | emitter          | worker           | transporter | destination      |
 // |--------------------|------------------|------------------|-------------|------------------|
@@ -157,6 +158,6 @@ export async function indexAllBsdas(
   return indexAllBsdas(idx, { skip: skip + take });
 }
 
-export function indexBsda(bsda: Bsda) {
-  return indexBsd(toBsdElastic(bsda));
+export function indexBsda(bsda: Bsda, ctx?: GraphQLContext) {
+  return indexBsd(toBsdElastic(bsda), ctx);
 }

@@ -55,7 +55,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     }
   });
 
-  await indexBsda(newBsda);
+  await indexBsda(newBsda, context);
 
   return expandBsdaFromDb(newBsda);
 }

@@ -17,6 +17,8 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 import { transportModeLabels } from "dashboard/constants";
 import { WorkflowActionProps } from "./WorkflowAction";
 import TdSwitch from "common/components/Switch";
+import { GET_BSDS } from "common/queries";
+import { Loader } from "common/components";
 
 const PREPARE_SEGMENT = gql`
   mutation prepareSegment(
@@ -33,10 +35,12 @@ const PREPARE_SEGMENT = gql`
 
 export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [prepareSegment, { error }] = useMutation<
+  const [prepareSegment, { loading, error }] = useMutation<
     Pick<Mutation, "prepareSegment">,
     MutationPrepareSegmentArgs
   >(PREPARE_SEGMENT, {
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: () => {
       setIsOpen(false);
       cogoToast.success("Le segment a été créé", {
@@ -209,6 +213,7 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
               </FormikForm>
             )}
           </Formik>
+          {loading && <Loader />}
         </TdModal>
       )}
     </>

@@ -9,9 +9,10 @@ import {
   SignatureAuthor,
   TransporterSignatureFormInput,
 } from "generated/graphql/types";
-import { Stepper, StepperItem, Modal } from "common/components";
+import { Stepper, StepperItem, Modal, Loader } from "common/components";
 import steps from "./steps";
 import * as yup from "yup";
+import { GET_BSDS } from "common/queries";
 
 const SIGNED_BY_TRANSPORTER = gql`
   mutation SignedByTransporter(
@@ -41,10 +42,12 @@ export function SignedByTransporterModal({
   onClose,
 }: SignedByTransporterModalProps) {
   const [stepIndex, setStepIndex] = React.useState(0);
-  const [signedByTransporter, { error }] = useMutation<
+  const [signedByTransporter, { error, loading }] = useMutation<
     Pick<Mutation, "signedByTransporter">,
     MutationSignedByTransporterArgs
   >(SIGNED_BY_TRANSPORTER, {
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: () => {
       cogoToast.success("La prise en charge du bordereau est validée", {
         hideAfter: 5,
@@ -136,6 +139,7 @@ export function SignedByTransporterModal({
           )}
         </Formik>
       </div>
+      {loading && <Loader />}
     </Modal>
   );
 }

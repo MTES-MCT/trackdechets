@@ -8,6 +8,7 @@ import { flattenBsffInput, unflattenBsff } from "./converter";
 import { isBsffContributor } from "./permissions";
 import { validateBsff } from "./validation";
 import { indexBsff } from "./elastic";
+import { GraphQLContext } from "../types";
 
 export async function getNextBsffs(
   bsff: Bsff,
@@ -118,7 +119,7 @@ export async function createBsff(
 
   const bsff = await prisma.bsff.create({ data });
 
-  await indexBsff(bsff);
+  await indexBsff(bsff, { user } as GraphQLContext);
 
   return unflattenBsff(bsff);
 }

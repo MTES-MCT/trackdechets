@@ -25,6 +25,7 @@ import { useDownloadPdf } from "./useDownloadPdf";
 import { useDuplicate } from "./useDuplicate";
 
 import styles from "../../BSDActions.module.scss";
+import { Loader } from "common/components";
 
 interface BSVhuActionsProps {
   form: Bsvhu;
@@ -34,7 +35,7 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
   const { siret } = useParams<{ siret: string }>();
   const location = useLocation();
 
-  const [duplicateBsvhu] = useDuplicate({
+  const [duplicateBsvhu, { loading: isDuplicating }] = useDuplicate({
     variables: { id: form.id },
   });
   const [isDeleting, setIsDeleting] = React.useState(false);
@@ -115,6 +116,7 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
           formId={form.id}
         />
       )}
+      {isDuplicating && <Loader />}
     </>
   );
 };

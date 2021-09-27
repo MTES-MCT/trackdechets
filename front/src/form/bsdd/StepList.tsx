@@ -16,6 +16,8 @@ import { formSchema } from "./utils/schema";
 import GenericStepList from "../common/stepper/GenericStepList";
 import { CREATE_FORM, GET_FORM, UPDATE_FORM } from "./utils/queries";
 import { IStepContainerProps } from "../common/stepper/Step";
+import { GET_BSDS } from "common/queries";
+import { Loader } from "common/components";
 
 interface Props {
   children: ReactElement<IStepContainerProps>[];
@@ -38,15 +40,15 @@ export default function StepsList(props: Props) {
     formQuery.data,
   ]);
 
-  const [createForm] = useMutation<
+  const [createForm, { loading: creating }] = useMutation<
     Pick<Mutation, "createForm">,
     MutationCreateFormArgs
-  >(CREATE_FORM);
+  >(CREATE_FORM, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
-  const [updateForm] = useMutation<
+  const [updateForm, { loading: updating }] = useMutation<
     Pick<Mutation, "updateForm">,
     MutationUpdateFormArgs
-  >(UPDATE_FORM);
+  >(UPDATE_FORM, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   function saveForm(formInput: FormInput): Promise<any> {
     const { id, ...input } = formInput;
@@ -89,13 +91,16 @@ export default function StepsList(props: Props) {
   }
 
   return (
-    <GenericStepList
-      children={props.children}
-      formId={props.formId}
-      formQuery={formQuery}
-      onSubmit={onSubmit}
-      initialValues={formState}
-      validationSchema={formSchema}
-    />
+    <>
+      <GenericStepList
+        children={props.children}
+        formId={props.formId}
+        formQuery={formQuery}
+        onSubmit={onSubmit}
+        initialValues={formState}
+        validationSchema={formSchema}
+      />
+      {(creating || updating) && <Loader />}
+    </>
   );
 }

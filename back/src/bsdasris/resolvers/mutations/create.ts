@@ -69,7 +69,7 @@ const createBsdasri = async (
     }
   });
 
-  await indexBsdasri(newDasri);
+  await indexBsdasri(newDasri, context);
 
   return expandBsdasriFromDb(newDasri);
 };

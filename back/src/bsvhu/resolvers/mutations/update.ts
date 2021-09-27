@@ -48,6 +48,6 @@ export default async function edit(
     data: formUpdate
   });
 
-  await indexBsvhu(updatedForm);
+  await indexBsvhu(updatedForm, context);
   return expandVhuFormFromDb(updatedForm);
 }
