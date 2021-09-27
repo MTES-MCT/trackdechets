@@ -176,7 +176,7 @@ export async function warnIfUserCreatesTooManyCompanies(
         "Alerte: Grand mombre de compagnies créées par un même utilisateur",
       to: [
         {
-          email: "tech@trackdechets.beta.gouv.fr ",
+          email: "alerts@trackdechets.beta.gouv.fr ",
           name: "Equipe Trackdéchets"
         }
       ],
