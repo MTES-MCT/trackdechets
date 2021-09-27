@@ -13,6 +13,7 @@ import {
   Query,
   Bsff,
   BsffInput,
+  BsffType,
 } from "generated/graphql/types";
 import React, { ReactElement, useMemo } from "react";
 import { generatePath, useHistory, useParams } from "react-router-dom";
@@ -72,12 +73,24 @@ export default function BsffStepsList(props: Props) {
     // and don't use the classic Formik mechanism
 
     const { id, ficheInterventions, previousBsffs, ...input } = values;
+
     saveForm({
       ...input,
       ficheInterventions: ficheInterventions.map(
         ficheIntervention => ficheIntervention.id
       ),
-      previousBsffs: previousBsffs.map(previousBsff => previousBsff.id),
+      forwarding:
+        input.type === BsffType.Reexpedition ? previousBsffs[0].id : null,
+      repackaging:
+        input.type === BsffType.Reconditionnement
+          ? previousBsffs.map(previousBsff => previousBsff.id)
+          : [],
+      grouping:
+        input.type === BsffType.Groupement
+          ? previousBsffs.map(previousBsff => ({
+              bsffId: previousBsff.id,
+            }))
+          : [],
     })
       .then(_ => {
         const redirectTo = generatePath(routes.dashboard.bsds.drafts, {

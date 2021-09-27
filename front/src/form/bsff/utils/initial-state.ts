@@ -40,6 +40,5 @@ export default {
     isEstimate: false,
   },
   ficheInterventions: [],
-  grouping: [],
-  forwarding: null,
+  previousBsffs: [],
 };
