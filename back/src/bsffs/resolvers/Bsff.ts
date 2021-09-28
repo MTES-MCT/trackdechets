@@ -20,7 +20,7 @@ export const Bsff: BsffResolvers = {
         where: { id }
       })
       .forwardedIn();
-    return unflattenBsff(forwardedIn);
+    return forwardedIn ? unflattenBsff(forwardedIn) : null;
   },
   forwarding: async ({ id }) => {
     const forwarding = await prisma.bsff
@@ -28,17 +28,19 @@ export const Bsff: BsffResolvers = {
         where: { id }
       })
       .forwarding();
-    return {
-      id: forwarding.id,
-      // ficheInterventions will be resolved in InitialBsff resolver
-      ficheInterventions: []
-    };
+    return forwarding
+      ? {
+          id: forwarding.id,
+          // ficheInterventions will be resolved in InitialBsff resolver
+          ficheInterventions: []
+        }
+      : null;
   },
   repackagedIn: async ({ id }) => {
     const repackagedIn = await prisma.bsff
       .findUnique({ where: { id } })
       .repackagedIn();
-    return unflattenBsff(repackagedIn);
+    return repackagedIn ? unflattenBsff(repackagedIn) : null;
   },
   repackaging: async ({ id }) => {
     const repackaging = await prisma.bsff
@@ -51,8 +53,8 @@ export const Bsff: BsffResolvers = {
     }));
   },
   grouping: async ({ id }) => {
-    const previousBsffs = await getGroupingBsffsSplits(id);
-    return previousBsffs.map(({ bsff, weight }) => ({
+    const bsffSplits = await getGroupingBsffsSplits(id);
+    return bsffSplits.map(({ bsff, weight }) => ({
       bsff: {
         id: bsff.id,
         // ficheInterventions will be resolved in InitialBsff resolver
@@ -62,8 +64,8 @@ export const Bsff: BsffResolvers = {
     }));
   },
   groupedIn: async ({ id }) => {
-    const nextBsffs = await getGroupedInBsffsSplits(id);
-    return nextBsffs.map(({ bsff, weight }) => ({
+    const bsffSplits = await getGroupedInBsffsSplits(id);
+    return bsffSplits.map(({ bsff, weight }) => ({
       bsff: unflattenBsff(bsff),
       weight
     }));

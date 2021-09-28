@@ -202,9 +202,9 @@ export async function createBsff(
     : [];
 
   const previousBsffs = [
-    ...(input.forwarding ? [forwardedBsff] : []),
-    ...(input.grouping ? groupedBsffs : []),
-    ...(input.repackaging ? repackagedBsffs : [])
+    ...(isForwarding ? [forwardedBsff] : []),
+    ...(isGrouping ? groupedBsffs : []),
+    ...(isRepackaging ? repackagedBsffs : [])
   ];
 
   const ficheInterventions =

@@ -97,6 +97,9 @@ export const FullBsffFragment = gql`
         id
       }
     }
+    repackaging {
+      id
+    }
     forwarding {
       id
     }
