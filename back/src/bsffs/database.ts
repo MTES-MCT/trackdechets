@@ -246,3 +246,45 @@ export async function createBsff(
 
   return unflattenBsff(bsff);
 }
+
+/**
+ * Returns direct parents of a BSFF
+ */
+export async function getPreviousBsffs(bsff: Bsff) {
+  const forwardedBsff = bsff.forwardingId
+    ? await prisma.bsff.findUnique({ where: { id: bsff.forwardingId } })
+    : null;
+
+  const repackagedBsffs = await prisma.bsff
+    .findFirst({ where: { id: bsff.id } })
+    .repackaging();
+
+  const groupedBsffs = await getGroupedBsffs(bsff.id);
+
+  const previousBsffs = [
+    ...(!!forwardedBsff ? [forwardedBsff] : []),
+    ...groupedBsffs,
+    ...repackagedBsffs
+  ];
+  return previousBsffs;
+}
+
+/**
+ * Return all the BSFFs in the traceability history of this one
+ */
+export async function getBsffHistory(bsff: Bsff): Promise<Bsff[]> {
+  async function inner(bsffs: Bsff[], history: Bsff[]) {
+    const previous = await Promise.all(
+      bsffs.map(bsff => getPreviousBsffs(bsff))
+    );
+    const previousFlattened = previous.reduce((ps, curr) => {
+      return [...ps, ...curr];
+    });
+    if (previousFlattened.length === 0) {
+      return history;
+    }
+    return inner(previousFlattened, [...previousFlattened, ...history]);
+  }
+
+  return inner([bsff], []);
+}

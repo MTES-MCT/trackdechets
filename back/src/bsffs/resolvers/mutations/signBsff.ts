@@ -14,7 +14,7 @@ import {
   validateBeforeTransport
 } from "../../validation";
 import { unflattenBsff } from "../../converter";
-import { getBsffOrNotFound, getGroupedBsffs } from "../../database";
+import { getBsffHistory, getBsffOrNotFound } from "../../database";
 import { indexBsff } from "../../elastic";
 import { OPERATION } from "../../constants";
 
@@ -134,21 +134,13 @@ const signatures: Record<
         ? BsffStatus.INTERMEDIATELY_PROCESSED
         : BsffStatus.PROCESSED;
 
-    const groupingBsffs = await getGroupedBsffs(existingBsff.id);
-    const forwardingBsff = existingBsff.forwardingId
-      ? await prisma.bsff.findUnique({
-          where: { id: existingBsff.forwardingId }
-        })
-      : null;
-
-    const previousBsffsIds = groupingBsffs.map(bsff => bsff.id);
-    if (forwardingBsff) {
-      previousBsffsIds.push(forwardingBsff.id);
-    }
+    const previousBsffsIds = (await getBsffHistory(existingBsff)).map(
+      bsff => bsff.id
+    );
 
     if (status === BsffStatus.PROCESSED && previousBsffsIds.length > 0) {
-      // FIXME this is not exactly correct if the initial BSFF has been split during groupement
-      // because we need to check all splits has been processed
+      // FIXME this is not exactly correct if a BSFF in the history has been
+      // split during groupement because we need to check all splits has been processed
       await prisma.bsff.updateMany({
         data: {
           status: BsffStatus.PROCESSED
