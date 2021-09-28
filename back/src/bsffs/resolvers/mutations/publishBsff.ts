@@ -1,10 +1,6 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
-  getBsffOrNotFound,
-  getGroupedBsffs,
-  getPreviousBsffs
-} from "../../database";
+import { getBsffOrNotFound, getPreviousBsffs } from "../../database";
 import { isBsffContributor } from "../../permissions";
 import prisma from "../../../prisma";
 import { unflattenBsff } from "../../converter";
