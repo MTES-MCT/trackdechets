@@ -198,7 +198,7 @@ export function BsffTypeSelector() {
   const [, , { setValue: setEmitterCompany }] = useField<CompanyInput>(
     "emitter.company"
   );
-  const [, , { setValue: setQuantity }] = useField<BsffWeightInput>("quantity");
+  const [, , { setValue: setWeight }] = useField<BsffWeightInput>("weight");
   const [
     { value: ficheInterventions },
     ,
@@ -214,11 +214,11 @@ export function BsffTypeSelector() {
   // it should be fixed in formik v3: https://github.com/formium/formik/issues/2268
   const setters = React.useRef({
     setEmitterCompany,
-    setQuantity,
+    setWeight,
     setPackagings,
   });
   setters.current.setEmitterCompany = setEmitterCompany;
-  setters.current.setQuantity = setQuantity;
+  setters.current.setWeight = setWeight;
   setters.current.setPackagings = setPackagings;
 
   // When selecting the previous bsffs, prefill the fields with what we already know
@@ -241,13 +241,13 @@ export function BsffTypeSelector() {
     }
 
     if ([BsffType.Reexpedition, BsffType.Groupement].includes(type)) {
-      setters.current.setQuantity(
+      setters.current.setWeight(
         previousBsffs.reduce<BsffWeightInput>(
           (acc, previousBsff) => {
             if (previousBsff.destination?.reception?.weight) {
               return {
                 ...acc,
-                weight: acc.value + previousBsff.destination.reception.weight,
+                value: acc.value + previousBsff.destination.reception.weight,
               };
             }
 

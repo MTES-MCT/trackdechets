@@ -17,11 +17,21 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
 
   await isBsffContributor(user, existingBsff);
 
-  const groupingBsffs = await getGroupedBsffs(id);
-  const forwardingBsff = await prisma.bsff.findUnique({
-    where: { id: existingBsff.forwardingId }
-  });
-  const previousBsffs = [...groupingBsffs, forwardingBsff];
+  const forwardedBsff = existingBsff.forwardingId
+    ? await prisma.bsff.findUnique({ where: { id: existingBsff.forwardingId } })
+    : null;
+
+  const repackagedBsffs = await prisma.bsff
+    .findFirst({ where: { id } })
+    .repackaging();
+
+  const groupedBsffs = await getGroupedBsffs(existingBsff.id);
+
+  const previousBsffs = [
+    ...(!!forwardedBsff ? [forwardedBsff] : []),
+    ...groupedBsffs,
+    ...repackagedBsffs
+  ];
 
   const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
     where: { bsffId: existingBsff.id }
