@@ -906,6 +906,11 @@ model Bsff {
   forwarding   Bsff?   @relation("Forwarding", fields: [forwardingId], references: [id])
   forwardingId String?
   forwardedIn  Bsff?   @relation("Forwarding")
+
+  // DEPRECATED relations, to be deleted after data migration
+  previousBsffs Bsff[]  @relation("BsffToBsff")
+  nextBsff      Bsff?   @relation("BsffToBsff", fields: [nextBsffId], references: [id])
+  nextBsffId    String?
 }
 
 model BsffGroupement {
