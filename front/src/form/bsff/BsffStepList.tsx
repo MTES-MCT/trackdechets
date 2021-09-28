@@ -44,10 +44,19 @@ export default function BsffStepsList(props: Props) {
     }
   );
 
-  const formState = useMemo(
-    () => getComputedState(initialState, formQuery.data?.bsff),
-    [formQuery.data]
-  );
+  const formState = useMemo(() => {
+    function getCurrentState(bsff: Bsff) {
+      const { forwarding, repackaging, grouping } = bsff;
+      const previousBsffs = [
+        ...(forwarding ? [forwarding] : []),
+        ...repackaging,
+        ...grouping,
+      ];
+      return { ...formQuery.data?.bsff, previousBsffs };
+    }
+    const bsff = formQuery.data?.bsff;
+    return getComputedState(initialState, bsff ? getCurrentState(bsff) : null);
+  }, [formQuery.data]);
 
   const [createDraftBsff] = useMutation<
     Pick<Mutation, "createDraftBsff">,
