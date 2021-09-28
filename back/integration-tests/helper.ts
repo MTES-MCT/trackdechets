@@ -41,7 +41,7 @@ export async function resetDatabase() {
     },
     refresh: true
   });
-  await prisma.$executeRaw("SELECT truncate_tables();");
+  await prisma.$executeRaw`SELECT truncate_tables();`;
 }
 
 export function refreshElasticSearch() {
