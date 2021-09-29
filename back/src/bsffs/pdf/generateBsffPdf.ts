@@ -8,6 +8,7 @@ import prisma from "../../prisma";
 import { BsffPackaging } from "../../generated/graphql/types";
 import { toPDF } from "../../common/pdf";
 import { OPERATION } from "../constants";
+import { getBsffHistory } from "../database";
 
 const assetsPath = path.join(__dirname, "assets");
 const templatePath = path.join(assetsPath, "index.html");
@@ -18,14 +19,7 @@ const cssPaths = [
 ];
 
 export async function generateBsffPdf(bsff: Bsff) {
-  const groupement = await prisma.bsff
-    .findUnique({
-      where: { id: bsff.id },
-      include: { grouping: true }
-    })
-    .grouping({ include: { previous: true } });
-
-  const previousBsffs = groupement.map(({ previous }) => previous);
+  const previousBsffs = await getBsffHistory(bsff);
   const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
     where: {
       bsffId: bsff.id
