@@ -25,10 +25,6 @@ export const toPDF = pipe(
 
 export function createPDFResponse(res: Response, filename: string) {
   res.type("pdf");
-
-  if (process.env.NODE_ENV === "production") {
-    res.attachment(`${filename}.pdf`);
-  }
-
+  res.attachment(`${filename}.pdf`);
   return res;
 }
