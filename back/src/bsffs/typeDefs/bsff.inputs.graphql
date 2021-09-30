@@ -118,7 +118,7 @@ input BsffDestinationInput {
   company: CompanyInput
   cap: String
   reception: BsffDestinationReceptionInput
-  plannedOperation: BsffDestinationPlannedOperationInput
+  plannedOperationCode: BsffOperationCode
   operation: BsffDestinationOperationInput
   "Champ libre"
   customInfo: String
@@ -129,10 +129,6 @@ input BsffDestinationReceptionInput {
   weight: Float!
   acceptationStatus: BsffAcceptationStatus!
   refusalReason: String
-}
-
-input BsffDestinationPlannedOperationInput {
-  code: BsffOperationCode!
 }
 
 input BsffOperationNextDestinationInput {

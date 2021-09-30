@@ -76,7 +76,7 @@ export function flattenBsffInput(
       bsffInput.destination?.reception?.refusalReason,
 
     destinationPlannedOperationCode:
-      bsffInput.destination?.plannedOperation?.code,
+      bsffInput.destination?.plannedOperationCode,
 
     destinationOperationCode: bsffInput.destination?.operation?.code,
 
@@ -102,6 +102,8 @@ export function flattenBsffInput(
 export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
   return {
     id: prismaBsff.id,
+    createdAt: prismaBsff.createdAt,
+    updatedAt: prismaBsff.updatedAt,
     isDraft: prismaBsff.isDraft,
     type: prismaBsff.type,
     status: prismaBsff.status,
@@ -197,9 +199,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
           date: prismaBsff.destinationOperationSignatureDate
         })
       }),
-      plannedOperation: nullIfNoValues<GraphQL.BsffPlannedOperation>({
-        code: prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode
-      }),
+      plannedOperationCode: prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode,
       cap: prismaBsff.destinationCap
     }),
     // the following relations will be set in Bsff resolver

@@ -8,32 +8,16 @@ import {
   createBsffAfterOperation
 } from "../../../__tests__/factories";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
+import { gql } from "apollo-server-express";
+import { fullBsff } from "../../../fragments";
 
-const GET_BSFF = `
+const GET_BSFF = gql`
   query GetBsff($id: ID!) {
     bsff(id: $id) {
-      id
-      ficheInterventions {
-        numero
-      }
-      grouping {
-        bsff {
-          id
-        }
-      }
-      groupedIn {
-        bsff {
-          id
-        }
-      }
-      forwarding {
-        id
-      }
-      forwardedIn {
-        id
-      }
+      ...FullBsff
     }
   }
+  ${fullBsff}
 `;
 
 describe("Query.bsff", () => {
@@ -166,9 +150,9 @@ describe("Query.bsff", () => {
     expect(data.bsff).toEqual(
       expect.objectContaining({
         ficheInterventions: [
-          {
+          expect.objectContaining({
             numero: ficheInterventionNumero
-          }
+          })
         ]
       })
     );

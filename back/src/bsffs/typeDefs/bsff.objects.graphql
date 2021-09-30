@@ -5,6 +5,12 @@ type Bsff {
   """
   id: ID!
 
+  "Date de création"
+  createdAt: DateTime!
+
+  "Date de dernière modification"
+  updatedAt: DateTime!
+
   """
   Si ce BSFF est à l'état de brouillon ou pas.
 
@@ -202,7 +208,7 @@ type BsffDestination {
   "Déclaration de traitement du déchet."
   operation: BsffOperation
   "Opération de traitement prévu initialement."
-  plannedOperation: BsffPlannedOperation
+  plannedOperationCode: BsffOperationCode
   "Numéro CAP."
   cap: String
   "Champ libre"
@@ -233,10 +239,6 @@ type BsffOperation {
   nextDestination: BsffNextDestination
   "Signature de la destination lors du traitement."
   signature: Signature
-}
-type BsffPlannedOperation {
-  "Code de l'opération de traitement prévu."
-  code: BsffOperationCode
 }
 
 type BsffFicheIntervention {
