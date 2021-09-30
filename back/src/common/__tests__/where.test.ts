@@ -1,9 +1,9 @@
 import { Prisma } from ".prisma/client";
-import { toPrismaDateFilter } from "../../bsvhu/where";
 import { safeInput } from "../../forms/form-converter";
 import { BsffWhere } from "../../generated/graphql/types";
 import {
   NestingWhereError,
+  toPrismaDateFilter,
   toPrismaIdFilter,
   toPrismaNestedWhereInput
 } from "../where";
