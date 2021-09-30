@@ -1,5 +1,5 @@
 import { Prisma } from ".prisma/client";
-import { UserInputError } from "apollo-server-errors";
+import { UserInputError } from "apollo-server-express";
 import { safeInput } from "../forms/form-converter";
 import { DateFilter, StringFilter, IdFilter } from "../generated/graphql/types";
 
