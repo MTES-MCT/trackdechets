@@ -267,6 +267,11 @@ input PrivateCompanyInput {
   Liste des agréments de l'éco-organisme
   """
   ecoOrganismeAgreements: [URL!]
+
+  """
+  L'entreprise autorise l'enlèvement d'un Dasri sans sa signature
+  """
+  allowBsdasriTakeOverWithoutSignature: Boolean
 }
 
 input CompanyForVerificationWhere {

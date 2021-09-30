@@ -5,6 +5,22 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# Next Release (~25/10)
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :boom: Breaking changes
+ 
+#### :bug: Corrections de bugs
+ 
+#### :nail_care: Améliorations
+
+- À la création d'une entreprise, le réglage "j'autorise l'emport direct de dasris" est proposé [PR 1006](https://github.com/MTES-MCT/trackdechets/pull/1006)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2021.10.1] 04/10/2021
 
 #### :rocket: Nouvelles fonctionnalités

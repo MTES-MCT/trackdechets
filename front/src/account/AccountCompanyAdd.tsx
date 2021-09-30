@@ -23,7 +23,8 @@ import {
 } from "generated/graphql/types";
 import Tooltip from "common/components/Tooltip";
 import AccountCompanyAddVhuAgrement from "./accountCompanyAdd/AccountCompanyAddVhuAgrement";
-
+import { InlineRadioButton } from "form/common/components/custom-inputs/RadioButton";
+import classNames from "classnames";
 const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
     createCompany(companyInput: $companyInput) {
@@ -98,6 +99,8 @@ export default function AccountCompanyAdd() {
 
   // STATE
   const [companyInfos, setCompanyInfos] = useState<CompanyPublic | null>(null);
+
+  // const [willManageDasris, setWillManageDasris] = useState(false);
 
   // QUERIES AND MUTATIONS
   const [createCompany, { error: savingError }] = useMutation<
@@ -174,6 +177,7 @@ export default function AccountCompanyAdd() {
   async function onSubmit(values: Values) {
     const {
       isAllowed,
+      willManageDasris,
       transporterReceiptNumber,
       transporterReceiptValidity,
       transporterReceiptDepartment,
@@ -188,6 +192,7 @@ export default function AccountCompanyAdd() {
       vhuAgrementDemolisseurDepartment,
       vhuAgrementBroyeurNumber,
       vhuAgrementBroyeurDepartment,
+      allowBsdasriTakeOverWithoutSignature,
       ...companyInput
     } = values;
 
@@ -313,6 +318,9 @@ export default function AccountCompanyAdd() {
           vhuAgrementBroyeurId,
           // Filter out empty agreements
           ecoOrganismeAgreements: ecoOrganismeAgreements.filter(Boolean),
+          ...(allowBsdasriTakeOverWithoutSignature !== null
+            ? { allowBsdasriTakeOverWithoutSignature }
+            : {}),
         },
       },
     });
@@ -359,6 +367,8 @@ export default function AccountCompanyAdd() {
             gerepId: companyInfos?.installation?.codeS3ic ?? "",
             codeNaf: companyInfos?.naf ?? "",
             isAllowed: false,
+            willManageDasris: false,
+            allowBsdasriTakeOverWithoutSignature: null,
             transporterReceiptNumber: "",
             transporterReceiptValidity: "",
             transporterReceiptDepartment: "",
@@ -400,6 +410,11 @@ export default function AccountCompanyAdd() {
             const isBroker_ = isBroker(values.companyTypes);
 
             return {
+              ...(values.willManageDasris &&
+                values.allowBsdasriTakeOverWithoutSignature === null && {
+                  allowBsdasriTakeOverWithoutSignature:
+                    "Si établissement est susceptible de produire des DASRI, ce choix est obligatoire",
+                }),
               ...(values.companyTypes.length === 0 && {
                 companyTypes: "Vous devez préciser le type d'établissement",
               }),
@@ -582,9 +597,92 @@ export default function AccountCompanyAdd() {
                 </div>
               </div>
 
+              <div className={classNames(styles.field)}>
+                <div>
+                  <label className="tw-flex tw-items-center">
+                    <Field
+                      type="checkbox"
+                      name="willManageDasris"
+                      className="td-checkbox"
+                      onChange={() => {
+                        setFieldValue(
+                          "allowBsdasriTakeOverWithoutSignature",
+                          null
+                        );
+                        setFieldValue(
+                          "willManageDasris",
+                          !values.willManageDasris
+                        );
+                      }}
+                    />
+                    Cet établissement est susceptible de produire des DASRI
+                    (déchets d'activité de soins à risques infectieux)
+                  </label>
+                  {values.willManageDasris && (
+                    <>
+                      <div className="form__row">
+                        <fieldset className="tw-flex tw-items-center">
+                          <legend className="tw-font-semibold tw-mb-3">
+                            J'autorise l'emport direct de Dasri
+                          </legend>
+                          <Field
+                            name="allowBsdasriTakeOverWithoutSignature"
+                            checked={
+                              values.allowBsdasriTakeOverWithoutSignature ===
+                              true
+                            }
+                            id="Oui"
+                            label="Oui"
+                            component={InlineRadioButton}
+                            onChange={() =>
+                              setFieldValue(
+                                "allowBsdasriTakeOverWithoutSignature",
+                                true
+                              )
+                            }
+                          />
+                          <Field
+                            name="allowBsdasriTakeOverWithoutSignature"
+                            checked={
+                              values.allowBsdasriTakeOverWithoutSignature ===
+                              false
+                            }
+                            id="Non"
+                            label="Non"
+                            component={InlineRadioButton}
+                            onChange={() =>
+                              setFieldValue(
+                                "allowBsdasriTakeOverWithoutSignature",
+                                false
+                              )
+                            }
+                          />
+                        </fieldset>
+                        <RedErrorMessage name="allowBsdasriTakeOverWithoutSignature" />
+                        <div className="notification tw-mt-2">
+                          <p className="tw-italic">
+                            En cochant "oui", j'atteste avoir signé une
+                            convention avec un collecteur pour mes DASRI et
+                            j'accepte que ce collecteur les prenne en charge
+                            sans ma signature (lors de la collecte) si je ne
+                            suis pas disponible. Dans ce cas, je suis informé
+                            que je pourrai suivre les bordereaux sur
+                            Trackdéchets et disposer de leur archivage sur la
+                            plateforme.
+                          </p>
+                          <p className="tw-italic">
+                            Je pourrai modifier ce choix ultérieurement.
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+              <hr />
               <div className={styles.field}>
-                <div className={styles.field__value}>
-                  <label>
+                <div>
+                  <label className="tw-flex tw-items-center">
                     <Field
                       type="checkbox"
                       name="isAllowed"
