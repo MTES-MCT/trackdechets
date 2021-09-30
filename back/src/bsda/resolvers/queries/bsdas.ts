@@ -5,7 +5,8 @@ import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { getConnectionsArgs } from "../../../bsvhu/pagination";
 import { expandBsdaFromDb } from "../../converter";
-import { convertWhereToDbFilter } from "../../where";
+import { toPrismaWhereInput } from "../../where";
+import { applyMask } from "../../../common/where";
 
 export default async function bsdas(
   _,
@@ -26,16 +27,21 @@ export default async function bsdas(
   const userCompanies = await getUserCompanies(user.id);
   const userSirets = userCompanies.map(c => c.siret);
 
-  const where = {
-    ...convertWhereToDbFilter(whereArgs),
+  const mask = {
     OR: [
       { emitterCompanySiret: { in: userSirets } },
       { workerCompanySiret: { in: userSirets } },
       { transporterCompanySiret: { in: userSirets } },
       { destinationCompanySiret: { in: userSirets } }
-    ],
+    ]
+  };
+
+  const prismaWhere = {
+    ...(whereArgs ? toPrismaWhereInput(whereArgs) : {}),
     isDeleted: false
   };
+
+  const where = applyMask(prismaWhere, mask);
 
   const totalCount = await prisma.bsda.count({ where });
   const queriedForms = await prisma.bsda.findMany({

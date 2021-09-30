@@ -109,7 +109,7 @@ describe("Query.bsffs", () => {
             where: {
               [role]: {
                 company: {
-                  siret: userAndCompany.company.siret
+                  siret: { _eq: userAndCompany.company.siret }
                 }
               }
             }
@@ -207,7 +207,7 @@ describe("Query.bsffs", () => {
           where: {
             destination: {
               operation: {
-                code: "D10"
+                code: { _eq: "D10" }
               }
             }
           }
@@ -365,6 +365,49 @@ describe("Query.bsffs", () => {
           })
         ])
       );
+    });
+
+    it("should work with a nested _or filter", async () => {
+      const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsff1 = await createBsff(
+        { emitter },
+        {
+          destinationCompanySiret: "00000000000000"
+        }
+      );
+      const bsff2 = await createBsff(
+        { emitter },
+        {
+          destinationCompanySiret: "11111111111111"
+        }
+      );
+      await createBsff(
+        { emitter },
+        {
+          destinationCompanySiret: "22222222222222"
+        }
+      );
+
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+        GET_BSFFS,
+        {
+          variables: {
+            where: {
+              _or: [
+                {
+                  destination: { company: { siret: { _eq: "00000000000000" } } }
+                },
+                {
+                  destination: { company: { siret: { _eq: "11111111111111" } } }
+                }
+              ]
+            }
+          }
+        }
+      );
+      const bsffIds = data.bsffs.edges.map(({ node }) => node.id);
+      expect(bsffIds).toEqual([bsff2.id, bsff1.id]);
     });
   });
 });
