@@ -25,9 +25,7 @@ export default {
   destination: {
     company: getInitialCompany(),
     cap: "",
-    plannedOperation: {
-      code: OPERATION.R2.code,
-    },
+    plannedOperationCode: OPERATION.R2.code,
   },
   packagings: [],
   waste: {
