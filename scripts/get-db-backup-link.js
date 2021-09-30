@@ -73,7 +73,7 @@ function buildFetcher(API_KEY) {
       const req = https.request(options, (res) => {
         if (res.statusCode < 200 || res.statusCode >= 300) {
           console.log(res.statusMessage);
-          return reject(new Error(`${statusMessage} - code ${res.statusCode}`));
+          return reject(new Error(`${res.statusMessage} - code ${res.statusCode}`));
         }
 
         const data = [];
