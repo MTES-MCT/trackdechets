@@ -1,53 +1,85 @@
+"Filtres possibles pour la récupération de bordereaux."
 input BsdaWhere {
+  "Filtre sur l'ID"
+  id: IdFilter
+  "Filtre sur le statut de brouillon."
   isDraft: Boolean
-  status: BsdaStatus
-
+  "Filtre sur le statt"
+  status: BsdaStatusFilter
+  "Filtre sur la date de création"
   createdAt: DateFilter
   updatedAt: DateFilter
+  "Filtre sur le champ emitter."
   emitter: BsdaEmitterWhere
+  "Filtre sur le champ worker."
   worker: BsdaWorkerWhere
+  "Filtre sur le champ transporter."
   transporter: BsdaTransporterWhere
+  "Filtre sur le champ destination."
   destination: BsdaDestinationWhere
+  "ET logique"
   _and: [BsdaWhere!]
+  "OU logique"
   _or: [BsdaWhere!]
-  _not: [BsdaWhere!]
+  "NON logique"
+  _not: BsdaWhere
 }
 
+"Filtre sur le statut"
+input BsdaStatusFilter {
+  _eq: BsdaStatus
+  _in: [BsdaStatus!]
+}
+
+"Champs possible pour le filtre sur l'émetteur."
 input BsdaEmitterWhere {
-  company: BsdaCompanyWhere
+  company: CompanyWhere
   emission: BsdaEmissionWhere
 }
+
+"Champs possibles pour le filtre sur l'émission"
 input BsdaEmissionWhere {
-  signature: BsdaSignatureWhere
+  signature: SignatureWhere
 }
+
+"Champs possible pour le filtre sur le transporteur."
 input BsdaTransporterWhere {
-  company: BsdaCompanyWhere
+  company: CompanyWhere
   transport: BsdaTransportWhere
 }
+
+"Champs possible pour le filtre sur le transport."
 input BsdaTransportWhere {
-  signature: BsdaSignatureWhere
+  signature: SignatureWhere
 }
+
+"Champs possible pour le filtre sur la destination."
 input BsdaDestinationWhere {
-  company: BsdaCompanyWhere
+  company: CompanyWhere
+  reception: BsdaReceptionWhere
   operation: BsdaOperationWhere
 }
-input BsdaOperationWhere {
-  signature: BsdaSignatureWhere
+
+"Champs possibles pour le filtre sur la réception"
+input BsdaReceptionWhere {
+  date: DateFilter
 }
+
+"Champs possible pour le filtre sur l'opération."
+input BsdaOperationWhere {
+  code: StringFilter
+  signature: SignatureWhere
+}
+
+"Champs possible pour le filtre sur l'entreprise de travaux."
 input BsdaWorkerWhere {
-  company: BsdaCompanyWhere
+  company: CompanyWhere
   work: BsdaWorkWhere
 }
+
+"Champs possible pour le filtre sur les travaux."
 input BsdaWorkWhere {
-  signature: BsdaSignatureWhere
-}
-
-input BsdaCompanyWhere {
-  siret: String!
-}
-
-input BsdaSignatureWhere {
-  date: DateFilter!
+  signature: SignatureWhere
 }
 
 input BsdaInput {
