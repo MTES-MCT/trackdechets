@@ -108,10 +108,10 @@ function PreviousBsffsPicker({
     {
       variables: {
         where: {
-          status: BsffStatus.IntermediatelyProcessed,
+          status: { _eq: BsffStatus.IntermediatelyProcessed },
           destination: {
             operation: {
-              code_in,
+              code: { _in: code_in },
             },
           },
         },

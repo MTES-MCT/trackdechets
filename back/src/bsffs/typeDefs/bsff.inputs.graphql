@@ -33,7 +33,7 @@ input BsffStatusFilter {
 "Filtre sur l'opération de traitement effectuée"
 input BsffOperationCodeFilter {
   _eq: BsffOperationCode
-  in: [BsffOperationCode!]
+  _in: [BsffOperationCode!]
 }
 
 "Champs possible pour le filtre sur l'émetteur."
