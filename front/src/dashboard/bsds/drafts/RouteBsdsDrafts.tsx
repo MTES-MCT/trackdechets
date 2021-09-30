@@ -47,7 +47,7 @@ export function RouteBsdsDrafts() {
               </Link>
               ou dupliquer un bordereau déjà existant dans un autre onglet grâce
               à l'icône{" "}
-              <span style={{ display: "inline" }}>
+              <span className="tw-inline-flex tw-ml-1">
                 <IconDuplicateFile color="blueLight" />
               </span>
             </BlankslateDescription>
