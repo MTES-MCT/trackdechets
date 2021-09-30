@@ -84,9 +84,7 @@ export const FullBsffFragment = gql`
           date
         }
       }
-      plannedOperation {
-        code
-      }
+      plannedOperationCode
       cap
     }
     ficheInterventions {

@@ -52,7 +52,7 @@ function SignOperationModal({ bsff, onCancel }: SignOperationModalProps) {
   return (
     <Formik
       initialValues={{
-        operationCode: bsff.destination?.plannedOperation?.code ?? "",
+        operationCode: bsff.destination?.plannedOperationCode ?? "",
         signatureAuthor: "",
       }}
       validationSchema={validationSchema}

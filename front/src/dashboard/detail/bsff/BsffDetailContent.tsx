@@ -285,7 +285,7 @@ function Destination({ form }: { form: Bsff }) {
       </div>
       <div className={styles.detailGrid}>
         <DetailRow
-          value={form.destination?.plannedOperation?.code}
+          value={form.destination?.plannedOperationCode}
           label="Opération prévue"
         />
       </div>
