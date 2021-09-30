@@ -3,9 +3,8 @@ import { QueryResolvers } from "../../../generated/graphql/types";
 import { unflattenBsff } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getUserCompanies } from "../../../users/database";
-import { safeInput } from "../../../forms/form-converter";
-import { Prisma } from "@prisma/client";
 import { getConnectionsArgs } from "../../../bsvhu/pagination";
+import { toPrismaWhereInput } from "../../where";
 
 const bsffs: QueryResolvers["bsffs"] = async (_, args, context) => {
   const user = checkIsAuthenticated(context);
@@ -13,15 +12,7 @@ const bsffs: QueryResolvers["bsffs"] = async (_, args, context) => {
   const sirets = companies.map(company => company.siret);
 
   const where = {
-    ...safeInput<Prisma.BsffWhereInput>({
-      status: args.where?.status,
-      emitterCompanySiret: args.where?.emitter?.company?.siret,
-      transporterCompanySiret: args.where?.transporter?.company?.siret,
-      destinationCompanySiret: args.where?.destination?.company?.siret,
-      destinationOperationCode: args.where?.destination?.operation?.code_in
-        ? { in: args.where?.destination?.operation?.code_in }
-        : args.where?.destination?.operation?.code
-    }),
+    ...(args.where ? toPrismaWhereInput(args.where) : {}),
     OR: [
       { emitterCompanySiret: { in: sirets } },
       { transporterCompanySiret: { in: sirets } },

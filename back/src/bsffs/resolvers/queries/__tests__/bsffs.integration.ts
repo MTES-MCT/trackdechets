@@ -205,7 +205,7 @@ describe("Query.bsffs", () => {
           where: {
             destination: {
               operation: {
-                code: "D10"
+                code: { _eq: "D10" }
               }
             }
           }

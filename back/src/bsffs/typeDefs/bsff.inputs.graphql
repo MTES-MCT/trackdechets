@@ -1,40 +1,78 @@
 "Filtres possibles pour la récupération de bordereaux."
 input BsffWhere {
-  "Filtrer sur le champ status."
-  status: BsffStatus
-  "Filtrer sur le champ emitter."
-  emitter: BsffWhereEmitter
-  "Filtrer sur le champ transporter."
-  transporter: BsffWhereTransporter
-  "Filtrer sur le champ destination."
-  destination: BsffWhereDestination
+  "Filtre sur l'ID"
+  id: IdFilter
+  "Filtre sur le statut de brouillon."
+  isDraft: Boolean
+  "Filtre sur le statt"
+  status: BsffStatusFilter
+  "Filtre sur la date de création"
+  createdAt: DateFilter
+  updatedAt: DateFilter
+  "Filtre sur le champ emitter."
+  emitter: BsffEmitterWhere
+  "Filtre sur le champ transporter."
+  transporter: BsffTransporterWhere
+  "Filtre sur le champ destination."
+  destination: BsffDestinationWhere
+  "ET logique"
+  _and: [BsffWhere!]
+  "OU logique"
+  _or: [BsffWhere!]
+  "NON logique"
+  _not: BsffWhere
 }
 
-"Champs possible pour le filtre sur l'emitter."
-input BsffWhereEmitter {
-  company: BsffWhereCompany
+"Filtre sur le statut"
+input BsffStatusFilter {
+  _eq: BsffStatus
+  _in: [BsffStatus!]
 }
 
-"Champs possible pour le filtre sur transporter."
-input BsffWhereTransporter {
-  company: BsffWhereCompany
+"Filtre sur l'opération de traitement effectuée"
+input BsffOperationCodeFilter {
+  _eq: BsffOperationCode
+  in: [BsffOperationCode!]
 }
 
-"Champs possible pour le filtre sur destination."
-input BsffWhereDestination {
-  company: BsffWhereCompany
-  operation: BsffWhereOperation
+"Champs possible pour le filtre sur l'émetteur."
+input BsffEmitterWhere {
+  company: CompanyWhere
+  emission: BsffEmissionWhere
+}
+
+"Champs possibles pour le filtre sur l'émission"
+input BsffEmissionWhere {
+  signature: SignatureWhere
+}
+
+"Champs possible pour le filtre sur le transporteur."
+input BsffTransporterWhere {
+  company: CompanyWhere
+  transport: BsffTransportWhere
+}
+
+"Champs possible pour le filtre sur le transport."
+input BsffTransportWhere {
+  signature: SignatureWhere
+}
+
+"Champs possible pour le filtre sur la destination."
+input BsffDestinationWhere {
+  company: CompanyWhere
+  reception: BsffReceptionWhere
+  operation: BsffOperationWhere
+}
+
+"Champs possibles pour le filtre sur la réception"
+input BsffReceptionWhere {
+  signature: SignatureWhere
 }
 
 "Champs possible pour le filtre sur l'opération."
-input BsffWhereOperation {
-  code: BsffOperationCode
-  code_in: [BsffOperationCode!]
-}
-
-"Filtres sur une entreprise."
-input BsffWhereCompany {
-  siret: String!
+input BsffOperationWhere {
+  code: BsffOperationCodeFilter
+  signature: SignatureWhere
 }
 
 input SignatureInput {
