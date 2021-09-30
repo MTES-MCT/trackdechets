@@ -1,4 +1,5 @@
 import { Bsff, BsffFicheIntervention, UserRole } from "@prisma/client";
+import { gql } from "apollo-server-express";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import { Query, QueryBsffsArgs } from "../../../../generated/graphql/types";
@@ -10,36 +11,35 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { OPERATION } from "../../../constants";
+import { fullBsff } from "../../../fragments";
 import {
   createBsff,
   createBsffAfterOperation
 } from "../../../__tests__/factories";
 
-const GET_BSFFS = `
-  query GetBsffs($after: ID, $first: Int, $before: ID, $last: Int, $where: BsffWhere) {
-    bsffs(after: $after, first: $first, before: $before, last: $last, where: $where) {
+const GET_BSFFS = gql`
+  query GetBsffs(
+    $after: ID
+    $first: Int
+    $before: ID
+    $last: Int
+    $where: BsffWhere
+  ) {
+    bsffs(
+      after: $after
+      first: $first
+      before: $before
+      last: $last
+      where: $where
+    ) {
       edges {
         node {
-          id
-          ficheInterventions {
-            numero
-          }
-          grouping {
-            bsff {
-              id
-              ficheInterventions {
-                detenteur {
-                  company {
-                    siret
-                  }
-                }
-              }
-            }
-          }
+          ...FullBsff
         }
       }
     }
   }
+  ${fullBsff}
 `;
 
 describe("Query.bsffs", () => {
@@ -176,9 +176,9 @@ describe("Query.bsffs", () => {
     expect(data.bsffs.edges[0].node).toEqual(
       expect.objectContaining({
         ficheInterventions: [
-          {
+          expect.objectContaining({
             numero: ficheInterventionNumero
-          }
+          })
         ]
       })
     );
@@ -320,12 +320,12 @@ describe("Query.bsffs", () => {
                     id: previousBsff.id,
                     ficheInterventions: [
                       expect.objectContaining({
-                        detenteur: {
-                          company: {
+                        detenteur: expect.objectContaining({
+                          company: expect.objectContaining({
                             siret:
                               previousBsffFicheIntervention.detenteurCompanySiret
-                          }
-                        }
+                          })
+                        })
                       })
                     ]
                   })
