@@ -4,10 +4,11 @@ input BsffWhere {
   id: IdFilter
   "Filtre sur le statut de brouillon."
   isDraft: Boolean
-  "Filtre sur le statt"
+  "Filtre sur le statut"
   status: BsffStatusFilter
   "Filtre sur la date de création"
   createdAt: DateFilter
+  "Filtre sur la date de dernière modification"
   updatedAt: DateFilter
   "Filtre sur le champ emitter."
   emitter: BsffEmitterWhere

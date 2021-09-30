@@ -5,12 +5,14 @@ import {
   toPrismaDateFilter,
   toPrismaStringFilter,
   toPrismaNestedWhereInput,
-  toPrismaGenericWhereInput
+  toPrismaGenericWhereInput,
+  toPrismaEnumFilter
 } from "../common/where";
 
 function toPrismaBsdaWhereInput(where: BsdaWhere): Prisma.BsdaWhereInput {
   return safeInput<Prisma.BsdaWhereInput>({
     ...toPrismaGenericWhereInput(where),
+    status: toPrismaEnumFilter(where.status),
     emitterCompanySiret: toPrismaStringFilter(where.emitter?.company?.siret),
     emitterEmissionSignatureDate: toPrismaDateFilter(
       where.emitter?.emission?.signature?.date

@@ -5,7 +5,7 @@ import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { expandVhuFormFromDb } from "../../converter";
 import { getConnectionsArgs } from "../../pagination";
-import { convertWhereToDbFilter } from "../../where";
+import { toPrismaWhereInput } from "../../where";
 
 export default async function bsvhus(
   _,
@@ -27,7 +27,7 @@ export default async function bsvhus(
   const userSirets = userCompanies.map(c => c.siret);
 
   const where = {
-    ...convertWhereToDbFilter(whereArgs),
+    ...(whereArgs ? toPrismaWhereInput(whereArgs) : {}),
     OR: [
       { emitterCompanySiret: { in: userSirets } },
       { transporterCompanySiret: { in: userSirets } },
