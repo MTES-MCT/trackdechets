@@ -193,7 +193,7 @@ describe("Query.bsff", () => {
       expect.objectContaining({
         grouping: [
           {
-            bsff: { id: previousBsff.id }
+            bsff: expect.objectContaining({ id: previousBsff.id })
           }
         ]
       })
