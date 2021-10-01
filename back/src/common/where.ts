@@ -8,7 +8,7 @@ type EnumFilter<E> = {
   _eq?: E;
 };
 
-export type ComposableWhere<W> = {
+export type NestedWhere<W> = {
   _or?: W[];
   _and?: W[];
   _not?: W;
@@ -34,7 +34,7 @@ export class NestingWhereError extends UserInputError {
  * Recursively compose where input with OR, AND and NOT logic
  * until depth limit is reached
  */
-export function toPrismaNestedWhereInput<W extends ComposableWhere<W>, P>(
+export function toPrismaNestedWhereInput<W extends NestedWhere<W>, P>(
   where: W,
   converter: (where: W) => P,
   depthLimit = 2
