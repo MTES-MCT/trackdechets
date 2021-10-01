@@ -177,7 +177,11 @@ async function validatePreviousBsffs(
 
   const fullPreviousBsffs = await prisma.bsff.findMany({
     where: { id: { in: previousBsffs.map(bsff => bsff.id) } },
-    include: { forwardedIn: true, groupedIn: true }
+    include: {
+      forwardedIn: true,
+      repackagedIn: true,
+      groupedIn: { include: { next: true } }
+    }
   });
 
   const errors = fullPreviousBsffs.reduce<string[]>((acc, previousBsff) => {
@@ -193,9 +197,19 @@ async function validatePreviousBsffs(
       ]);
     }
 
-    if (previousBsff.forwardedIn && previousBsff.forwardedIn.id !== bsff.id) {
+    const { forwardedIn, repackagedIn, groupedIn } = previousBsff;
+    // nextBsffs of previous
+    const nextBsffs = [
+      ...(forwardedIn ? [forwardedIn] : []),
+      ...(repackagedIn ? [repackagedIn] : []),
+      ...groupedIn.map(bsffSplit => bsffSplit.next)
+    ];
+    if (
+      nextBsffs.length > 0 &&
+      !nextBsffs.map(bsff => bsff.id).includes(bsff.id)
+    ) {
       return acc.concat([
-        `Le bordereau n°${previousBsff.id} a déjà été réexpédié ou reconditionné.`
+        `Le bordereau n°${previousBsff.id} a déjà été réexpédié, reconditionné ou groupé.`
       ]);
     }
 
