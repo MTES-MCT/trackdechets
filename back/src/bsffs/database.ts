@@ -92,7 +92,7 @@ export async function getFicheInterventions({
 }
 
 /** Returns BSFF splits grouped into this one */
-export async function getGroupingBsffsSplits(bsffId: string) {
+export async function getGroupedBsffsSplits(bsffId: string) {
   const bsffGroupement = await prisma.bsffGroupement.findMany({
     where: { next: { id: bsffId } },
     include: { previous: true }
@@ -104,12 +104,12 @@ export async function getGroupingBsffsSplits(bsffId: string) {
 }
 
 export async function getGroupedBsffs(bsffId: string) {
-  const splits = await getGroupingBsffsSplits(bsffId);
+  const splits = await getGroupedBsffsSplits(bsffId);
   return splits.map(s => s.bsff);
 }
 
-/** Returns the different groupement splits of a BSFF */
-export async function getGroupedInBsffsSplits(bsffId: string) {
+/** Returns the different groupement splits of an intitial BSFF */
+export async function getGroupingBsffsSplits(bsffId: string) {
   const bsffGroupement = await prisma.bsffGroupement.findMany({
     where: { previous: { id: bsffId } },
     include: { next: true }
