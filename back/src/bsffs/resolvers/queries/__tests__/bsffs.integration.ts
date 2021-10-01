@@ -107,7 +107,7 @@ describe("Query.bsffs", () => {
             where: {
               [role]: {
                 company: {
-                  siret: userAndCompany.company.siret
+                  siret: { _eq: userAndCompany.company.siret }
                 }
               }
             }
