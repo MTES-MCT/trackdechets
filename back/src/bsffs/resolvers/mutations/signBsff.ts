@@ -149,6 +149,10 @@ const signatures: Record<
           id: { in: previousBsffsIds }
         }
       });
+      const updatedBsffs = await prisma.bsff.findMany({
+        where: { id: { in: previousBsffsIds } }
+      });
+      await Promise.all(updatedBsffs.map(bsff => indexBsff(bsff)));
     }
 
     return prisma.bsff.update({
