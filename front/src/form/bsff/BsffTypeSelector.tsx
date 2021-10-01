@@ -116,6 +116,8 @@ function PreviousBsffsPicker({
           },
         },
       },
+      // make sure we have fresh data here
+      fetchPolicy: "cache-and-network",
     }
   );
   const [{ value: previousBsffs }] = useField<Bsff[]>("previousBsffs");
@@ -123,6 +125,13 @@ function PreviousBsffsPicker({
   if (data == null) {
     return <Loader />;
   }
+
+  // remove bsffs that have already been grouped, forwarded or repackaged
+  const pickableBsffs = data.bsffs.edges
+    .map(({ node: bsff }) => bsff)
+    .filter(bsff => {
+      return !bsff.groupedIn.length && !bsff.repackagedIn && !bsff.forwardedIn;
+    });
 
   return (
     <FieldArray
@@ -140,7 +149,7 @@ function PreviousBsffsPicker({
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.bsffs.edges.map(({ node: bsff }) => {
+            {pickableBsffs.map(bsff => {
               const previousBsffIndex = previousBsffs.findIndex(
                 previousBsff => previousBsff.id === bsff.id
               );

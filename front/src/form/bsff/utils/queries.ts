@@ -95,10 +95,21 @@ export const FullBsffFragment = gql`
         id
       }
     }
+    groupedIn {
+      bsff {
+        id
+      }
+    }
     repackaging {
       id
     }
+    repackagedIn {
+      id
+    }
     forwarding {
+      id
+    }
+    forwardedIn {
       id
     }
   }
