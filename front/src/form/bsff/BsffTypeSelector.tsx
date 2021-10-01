@@ -150,16 +150,15 @@ function PreviousBsffsPicker({
                 <TableRow
                   key={bsff.id}
                   onClick={() => {
-                    if (previousBsffs.length >= max) {
-                      window.alert(
-                        `Vous ne pouvez pas sélectionner plus de ${max} BSFFs avec ce type de BSFF.`
-                      );
-                      return;
-                    }
-
                     if (isSelected) {
                       remove(previousBsffIndex);
                     } else {
+                      if (previousBsffs.length >= max) {
+                        window.alert(
+                          `Vous ne pouvez pas sélectionner plus de ${max} BSFFs avec ce type de BSFF.`
+                        );
+                        return;
+                      }
                       push(bsff);
                     }
                   }}
