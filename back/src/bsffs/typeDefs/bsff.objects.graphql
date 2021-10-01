@@ -131,7 +131,42 @@ type InitialBsffSplit {
 Extrait d'un bordereau initial dans le cas d'une réexpedition, d'un reconditionnement ou d'un groupement
 """
 type InitialBsff {
+  """
+  Identifiant unique assigné par Trackdéchets.
+  Il est à utiliser pour les échanges avec l'API.
+  """
   id: ID!
+
+  """
+  Émetteur du déchet, qui n'est pas nécessairement le producteur.
+  Il s'agit par exemple de l'opérateur ayant collecté des fluides lors d'interventions,
+  ou alors d'une installation de collecte qui procède à la réexpédition pour traitement final.
+  """
+  emitter: BsffEmitter
+  """
+  Destination du déchet, qui peut le réceptionner pour traitement, groupement, reconditionnement ou réexpedition.
+  Un nouveau bordereau doit être créé si le déchet connaît un nouveau parcours, par exemple s'il quitte une installation de collecte pour un centre de traitement.
+
+  Pour plus de détails sur les différents types de bordereau, voir l'enum BsffType.
+  """
+  destination: BsffDestination
+  """
+  Détails du déchet.
+  """
+  waste: BsffWaste
+
+  """
+  Quantité totale du déchet en kilogrammes, il peut s'agir d'une estimation.
+  """
+  weight: BsffWeight
+  """
+  Liste des contenants utilisés pour le transport du déchet.
+  """
+  packagings: [BsffPackaging!]!
+  """
+  Liste des fiches d'intervention associés à ce bordereau.
+  Habituellement renseigné par un opérateur lors de son intervention.
+  """
   ficheInterventions: [BsffFicheIntervention!]!
 }
 
