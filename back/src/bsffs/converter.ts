@@ -268,3 +268,22 @@ export function unflattenFicheInterventionBsff(
     }
   };
 }
+
+/**
+ * Only returns fields that can be read from the child BSFF in
+ * case of a forwarding, repackaging or grouping
+ */
+export function toInitialBsff(bsff: GraphQL.Bsff): GraphQL.InitialBsff {
+  return {
+    id: bsff.id,
+    // emitter can only be read by someone who is contributor of the initial BSFF, this
+    // logic is implemented in the InitialBsff resolver
+    emitter: bsff.emitter,
+    waste: bsff.waste,
+    weight: bsff.weight,
+    destination: bsff.destination,
+    packagings: bsff.packagings,
+    // ficheInterventions will be returned in InitialBsff resolver
+    ficheInterventions: []
+  };
+}
