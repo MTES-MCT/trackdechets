@@ -12,6 +12,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { OPERATION } from "../../../constants";
 import {
+  createBsff,
   createBsffAfterEmission,
   createBsffAfterOperation
 } from "../../../__tests__/factories";
@@ -412,6 +413,56 @@ describe("Mutation.createDraftBsff", () => {
         .findUnique({ where: { id: data.createDraftBsff.id } })
         .grouping();
       expect(actualGroupement).toHaveLength(previousBsffs.length);
+    });
+
+    it("should throw an error if initial BSFF has already been forwarded, grouped or repackaged", async () => {
+      const anotherGroupingBsff = await createBsff({});
+      const previousBsffs = await Promise.all([
+        createBsffAfterOperation(
+          { emitter, transporter, destination },
+          {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED,
+            destinationOperationCode: OPERATION.R12.code,
+            groupedIn: { create: { nextId: anotherGroupingBsff.id, weight: 1 } }
+          }
+        ),
+        createBsffAfterOperation(
+          { emitter, transporter, destination },
+          {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED,
+            destinationOperationCode: OPERATION.R12.code
+          }
+        )
+      ]);
+      const { mutate } = makeClient(transporter.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createDraftBsff">,
+        MutationCreateDraftBsffArgs
+      >(CREATE_DRAFT_BSFF, {
+        variables: {
+          input: {
+            type: BsffType.GROUPEMENT,
+            transporter: {
+              company: {
+                name: transporter.company.name,
+                siret: transporter.company.siret,
+                address: transporter.company.address,
+                contact: transporter.user.name,
+                mail: transporter.user.email
+              }
+            },
+            grouping: previousBsffs.map(previousBsff => ({
+              bsffId: previousBsff.id
+            }))
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: `Le bordereau n°${previousBsffs[0].id} a déjà été réexpédié, reconditionné ou groupé.`
+        })
+      ]);
     });
   });
 });
