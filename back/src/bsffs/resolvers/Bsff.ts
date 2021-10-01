@@ -3,8 +3,8 @@ import { BsffResolvers } from "../../generated/graphql/types";
 import { toInitialBsff, unflattenBsff } from "../converter";
 import {
   getFicheInterventions,
-  getGroupedInBsffsSplits,
-  getGroupingBsffsSplits
+  getGroupingBsffsSplits,
+  getGroupedBsffsSplits
 } from "../database";
 
 export const Bsff: BsffResolvers = {
@@ -43,14 +43,14 @@ export const Bsff: BsffResolvers = {
     return repackagedBsffs.map(bsff => toInitialBsff(unflattenBsff(bsff)));
   },
   grouping: async ({ id }) => {
-    const bsffSplits = await getGroupingBsffsSplits(id);
+    const bsffSplits = await getGroupedBsffsSplits(id);
     return bsffSplits.map(({ bsff, weight }) => ({
       bsff: toInitialBsff(unflattenBsff(bsff)),
       weight
     }));
   },
   groupedIn: async ({ id }) => {
-    const bsffSplits = await getGroupedInBsffsSplits(id);
+    const bsffSplits = await getGroupingBsffsSplits(id);
     return bsffSplits.map(({ bsff, weight }) => ({
       bsff: unflattenBsff(bsff),
       weight
