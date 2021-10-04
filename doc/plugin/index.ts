@@ -2,6 +2,7 @@ import { Plugin } from "@docusaurus/types";
 import bsdWorkflows from "../../back/src/forms/examples/workflows";
 import bsdasriWorkflows from "../../back/src/bsdasris/examples/workflows";
 import bsvhuWorkflows from "../../back/src/bsvhu/examples/workflows";
+import bsffWorkflows from "../../back/src/bsffs/examples/workflows";
 import { Workflow } from "../../back/src/common/workflow";
 
 // parse workflow definition files
@@ -35,12 +36,15 @@ export default function plugin(): Plugin<any> {
           acheminementDirect: parseWorkflow(
             bsdasriWorkflows.acheminementDirect
           ),
-          emportDirect: parseWorkflow(
-            bsdasriWorkflows.emportDirect
-          ),
+          emportDirect: parseWorkflow(bsdasriWorkflows.emportDirect),
         },
         bsvhu: {
           vhuVersBroyeur: parseWorkflow(bsvhuWorkflows.vhuVersBroyeur),
+        },
+        bsff: {
+          collectePetitesQuantites: parseWorkflow(
+            bsffWorkflows.collectePetitesQuantites
+          ),
         },
       };
     },
