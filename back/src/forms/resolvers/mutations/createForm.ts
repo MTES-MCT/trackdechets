@@ -124,7 +124,7 @@ const createFormResolver = async (
   });
 
   const fullForm = await getFullForm(newForm);
-  await indexForm(fullForm);
+  await indexForm(fullForm, context);
 
   return expandFormFromDb(newForm);
 };

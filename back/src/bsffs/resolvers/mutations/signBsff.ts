@@ -162,7 +162,7 @@ const signBsff: MutationResolvers["signBsff"] = async (_, args, context) => {
   const sign = signatures[args.type];
   const updatedBsff = await sign(args, user, existingBsff);
 
-  await indexBsff(updatedBsff);
+  await indexBsff(updatedBsff, context);
 
   return unflattenBsff(updatedBsff);
 };

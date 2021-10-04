@@ -24,7 +24,7 @@ const deleteFormResolver: MutationResolvers["deleteForm"] = async (
 
   // TODO: create a statusLog
 
-  await elastic.deleteBsd(deletedForm);
+  await elastic.deleteBsd(deletedForm, context);
 
   return expandFormFromDb(deletedForm);
 };

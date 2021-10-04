@@ -8,10 +8,11 @@ import { WorkflowActionProps } from "./WorkflowAction";
 import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
 import { TdModalTrigger } from "common/components/Modal";
-import { ActionButton } from "common/components";
+import { ActionButton, Loader } from "common/components";
 import { IconWarehouseStorage } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 import AcceptedInfo from "./AcceptedInfo";
+import { GET_BSDS } from "common/queries";
 
 const MARK_TEMP_STORER_ACCEPTED = gql`
   mutation MarkAsTempStorerAccepted(
@@ -32,10 +33,13 @@ export default function MarkAsTempStorerAccepted({
   form,
   siret,
 }: WorkflowActionProps) {
-  const [markAsTempStorerAccepted, { error }] = useMutation<
+  const [markAsTempStorerAccepted, { loading, error }] = useMutation<
     Pick<Mutation, "markAsTempStorerAccepted">,
     MutationMarkAsTempStorerAcceptedArgs
-  >(MARK_TEMP_STORER_ACCEPTED);
+  >(MARK_TEMP_STORER_ACCEPTED, {
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
+  });
 
   const actionLabel = "Valider l'acceptation de l'entreposage provisoire";
 
@@ -72,6 +76,7 @@ export default function MarkAsTempStorerAccepted({
           {error && (
             <NotificationError className="action-error" apolloError={error} />
           )}
+          {loading && <Loader />}
         </div>
       )}
     />

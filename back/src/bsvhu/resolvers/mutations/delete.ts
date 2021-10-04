@@ -27,7 +27,7 @@ const deleteBsvhuResolver: MutationResolvers["deleteBsvhu"] = async (
     data: { isDeleted: true }
   });
 
-  await elastic.deleteBsd(deletedBsvhu);
+  await elastic.deleteBsd(deletedBsvhu, context);
 
   return expandVhuFormFromDb(deletedBsvhu);
 };

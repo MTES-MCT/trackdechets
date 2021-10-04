@@ -82,7 +82,7 @@ export default async function sign(
     }
   });
 
-  await indexBsda(signedBsda);
+  await indexBsda(signedBsda, context);
 
   return expandBsdaFromDb(signedBsda);
 }

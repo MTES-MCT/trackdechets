@@ -4,10 +4,11 @@ import { WorkflowActionProps } from "./WorkflowAction";
 import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
 import { TdModalTrigger } from "common/components/Modal";
-import { ActionButton } from "common/components";
+import { ActionButton, Loader } from "common/components";
 import { IconWaterDam } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 import AcceptedInfo from "./AcceptedInfo";
+import { GET_BSDS } from "common/queries";
 
 const MARK_AS_ACCEPTED = gql`
   mutation MarkAsAccepted($id: ID!, $acceptedInfo: AcceptedFormInput!) {
@@ -19,10 +20,13 @@ const MARK_AS_ACCEPTED = gql`
 `;
 
 export default function MarkAsAccepted({ form }: WorkflowActionProps) {
-  const [markAsAccepted, { error }] = useMutation<
+  const [markAsAccepted, { loading, error }] = useMutation<
     Pick<Mutation, "markAsAccepted">,
     MutationMarkAsAcceptedArgs
-  >(MARK_AS_ACCEPTED);
+  >(MARK_AS_ACCEPTED, {
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
+  });
 
   const actionLabel = "Valider l'acceptation";
 
@@ -55,6 +59,7 @@ export default function MarkAsAccepted({ form }: WorkflowActionProps) {
           {error && (
             <NotificationError className="action-error" apolloError={error} />
           )}
+          {loading && <Loader />}
         </div>
       )}
     />

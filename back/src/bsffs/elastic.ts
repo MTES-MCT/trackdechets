@@ -1,6 +1,7 @@
 import { Bsff, BsffStatus } from "@prisma/client";
 import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
+import { GraphQLContext } from "../types";
 
 function toBsdElastic(bsff: Bsff): BsdElastic {
   const bsd = {
@@ -117,6 +118,6 @@ export async function indexAllBsffs(
   return indexAllBsffs(idx, { skip: skip + take });
 }
 
-export function indexBsff(form: Bsff) {
-  return indexBsd(toBsdElastic(form));
+export function indexBsff(form: Bsff, ctx?: GraphQLContext) {
+  return indexBsd(toBsdElastic(form), ctx);
 }

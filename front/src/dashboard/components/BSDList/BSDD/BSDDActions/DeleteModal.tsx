@@ -4,6 +4,8 @@ import { gql, useMutation } from "@apollo/client";
 import { Mutation, MutationDeleteFormArgs } from "generated/graphql/types";
 import cogoToast from "cogo-toast";
 import TdModal from "common/components/Modal";
+import { GET_BSDS } from "common/queries";
+import { Loader } from "common/components";
 
 const DELETE_FORM = gql`
   mutation DeleteForm($id: ID!) {
@@ -23,11 +25,13 @@ export function DeleteModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const [deleteForm] = useMutation<
+  const [deleteForm, { loading }] = useMutation<
     Pick<Mutation, "deleteForm">,
     MutationDeleteFormArgs
   >(DELETE_FORM, {
     variables: { id: formId },
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: () => {
       cogoToast.success("Bordereau supprimé", { hideAfter: 5 });
       !!onClose && onClose();
@@ -57,6 +61,7 @@ export function DeleteModal({
           <span> Supprimer</span>
         </button>
       </div>
+      {loading && <Loader />}
     </TdModal>
   );
 }

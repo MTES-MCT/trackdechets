@@ -146,7 +146,7 @@ const updateFormResolver = async (
   // so the form might have changed in-between without a proper statusLog
 
   const fullForm = await getFullForm(updatedForm);
-  await indexForm(fullForm);
+  await indexForm(fullForm, context);
 
   return expandFormFromDb(updatedForm);
 };

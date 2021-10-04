@@ -1,7 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import React from "react";
 import { statusChangeFragment } from "common/fragments";
-import { ActionButton } from "common/components";
+import { ActionButton, Loader } from "common/components";
 import { IconPaperWrite } from "common/components/Icons";
 import {
   FormStatus,
@@ -12,6 +12,7 @@ import { WorkflowActionProps } from "./WorkflowAction";
 import { NotificationError } from "common/components/Error";
 import { TdModalTrigger } from "common/components/Modal";
 import cogoToast from "cogo-toast";
+import { GET_BSDS } from "common/queries";
 
 const MARK_AS_SEALED = gql`
   mutation MarkAsSealed($id: ID!) {
@@ -24,11 +25,13 @@ const MARK_AS_SEALED = gql`
 `;
 
 export default function MarkAsSealed({ form, siret }: WorkflowActionProps) {
-  const [markAsSealed, { error }] = useMutation<
+  const [markAsSealed, { loading, error }] = useMutation<
     Pick<Mutation, "markAsSealed">,
     MutationMarkAsSealedArgs
   >(MARK_AS_SEALED, {
     variables: { id: form.id },
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: data => {
       if (data.markAsSealed) {
         const sealedForm = data.markAsSealed;
@@ -84,6 +87,7 @@ export default function MarkAsSealed({ form, siret }: WorkflowActionProps) {
           {error && (
             <NotificationError className="action-error" apolloError={error} />
           )}
+          {loading && <Loader />}
         </div>
       )}
     />

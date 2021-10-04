@@ -36,7 +36,7 @@ export default async function create(
     data: { isDraft: false }
   });
 
-  await indexBsda(updatedBsda);
+  await indexBsda(updatedBsda, context);
 
   return expandBsdaFromDb(updatedBsda);
 }

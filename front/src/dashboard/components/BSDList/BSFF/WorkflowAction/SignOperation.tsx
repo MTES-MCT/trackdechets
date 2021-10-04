@@ -15,6 +15,7 @@ import { NotificationError } from "common/components/Error";
 import { SIGN_BSFF, UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { OPERATION } from "form/bsff/utils/constants";
 import { SignBsff } from "./SignBsff";
+import { GET_BSDS } from "common/queries";
 
 const validationSchema = yup.object({
   operationCode: yup
@@ -43,7 +44,7 @@ function SignOperationModal({ bsff, onCancel }: SignOperationModalProps) {
   const [signBsff, signBsffResult] = useMutation<
     Pick<Mutation, "signBsff">,
     MutationSignBsffArgs
-  >(SIGN_BSFF);
+  >(SIGN_BSFF, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   const loading = updateBsffResult.loading || signBsffResult.loading;
   const error = updateBsffResult.error ?? signBsffResult.error;

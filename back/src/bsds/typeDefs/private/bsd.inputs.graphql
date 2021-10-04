@@ -3,6 +3,8 @@ input BsdWhere {
   emitter: String
   recipient: String
   waste: String
+  transporterNumberPlate: String
+  transporterCustomInfo: String
   types: [BsdType!]
   isDraftFor: [String!]
   isForActionFor: [String!]

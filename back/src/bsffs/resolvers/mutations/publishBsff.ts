@@ -35,7 +35,7 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
     }
   });
 
-  await indexBsff(updatedBsff);
+  await indexBsff(updatedBsff, context);
 
   return unflattenBsff(updatedBsff);
 };

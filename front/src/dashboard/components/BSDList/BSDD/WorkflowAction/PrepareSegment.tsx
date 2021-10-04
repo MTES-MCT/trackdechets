@@ -16,6 +16,9 @@ import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { transportModeLabels } from "dashboard/constants";
 import { WorkflowActionProps } from "./WorkflowAction";
+import TdSwitch from "common/components/Switch";
+import { GET_BSDS } from "common/queries";
+import { Loader } from "common/components";
 
 const PREPARE_SEGMENT = gql`
   mutation prepareSegment(
@@ -32,10 +35,12 @@ const PREPARE_SEGMENT = gql`
 
 export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [prepareSegment, { error }] = useMutation<
+  const [prepareSegment, { loading, error }] = useMutation<
     Pick<Mutation, "prepareSegment">,
     MutationPrepareSegmentArgs
   >(PREPARE_SEGMENT, {
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: () => {
       setIsOpen(false);
       cogoToast.success("Le segment a été créé", {
@@ -145,19 +150,22 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
                 />
                 <h4 className="form__section-heading">Autorisations</h4>
 
-                <label htmlFor="isExemptedOfReceipt" className="tw-mb-2">
-                  <Field
-                    type="checkbox"
-                    name="transporter.isExemptedOfReceipt"
-                    id="isExemptedOfReceipt"
-                    checked={values.transporter.isExemptedOfReceipt}
+                <div className="form__row">
+                  <TdSwitch
+                    checked={!!values.transporter.isExemptedOfReceipt}
+                    onChange={() =>
+                      setFieldValue(
+                        "transporter.isExemptedOfReceipt",
+                        !values.transporter.isExemptedOfReceipt
+                      )
+                    }
+                    label="Le transporteur déclare être exempté de récépissé conformément
+                    aux dispositions de l'article R.541-50 du code de
+                    l'environnement."
                   />
-                  Le transporteur déclare être exempté de récépissé conformément
-                  aux dispositions de l'article R.541-50 du code de
-                  l'environnement.
-                </label>
+                </div>
                 {!values.transporter.isExemptedOfReceipt && (
-                  <>
+                  <div className="form__row">
                     <label htmlFor="id_receipt">Numéro de récépissé</label>
                     <Field
                       type="text"
@@ -186,7 +194,7 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
                       id="id_numberPlate"
                       className="td-input"
                     />
-                  </>
+                  </div>
                 )}
                 {error && <NotificationError apolloError={error} />}
 
@@ -205,6 +213,7 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
               </FormikForm>
             )}
           </Formik>
+          {loading && <Loader />}
         </TdModal>
       )}
     </>

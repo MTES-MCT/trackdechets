@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Field, useFormikContext } from "formik";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { Bsda } from "generated/graphql/types";

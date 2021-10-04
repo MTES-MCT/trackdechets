@@ -24,7 +24,7 @@ export default async function duplicate(
 
   const newForm = await duplicateForm(prismaForm);
 
-  await indexBsvhu(newForm);
+  await indexBsvhu(newForm, context);
   return expandVhuFormFromDb(newForm);
 }
 

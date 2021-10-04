@@ -16,10 +16,11 @@ import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "common/components/Modal";
-import { ActionButton } from "common/components";
+import { ActionButton, Loader } from "common/components";
 import { IconCogApproved } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 import cogoToast from "cogo-toast";
+import { GET_BSDS } from "common/queries";
 
 const MARK_AS_PROCESSED = gql`
   mutation MarkAsProcessed($id: ID!, $processedInfo: ProcessedFormInput!) {
@@ -177,10 +178,12 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
 }
 
 export default function MarkAsProcessed({ form, siret }: WorkflowActionProps) {
-  const [markAsProcessed, { error }] = useMutation<
+  const [markAsProcessed, { loading, error }] = useMutation<
     Pick<Mutation, "markAsProcessed">,
     MutationMarkAsProcessedArgs
   >(MARK_AS_PROCESSED, {
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: data => {
       if (
         data.markAsProcessed &&
@@ -225,6 +228,7 @@ export default function MarkAsProcessed({ form, siret }: WorkflowActionProps) {
           {error && (
             <NotificationError className="action-error" apolloError={error} />
           )}
+          {loading && <Loader />}
         </div>
       )}
     />

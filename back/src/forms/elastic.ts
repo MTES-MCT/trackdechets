@@ -2,6 +2,7 @@ import { Status } from "@prisma/client";
 import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 import { FullForm } from "./types";
+import { GraphQLContext } from "../types";
 
 function getWhere(
   form: FullForm
@@ -232,6 +233,8 @@ function toBsdElastic(form: FullForm): BsdElastic {
     type: "BSDD",
     emitter: form.emitterCompanyName ?? "",
     recipient: getRecipient(form) ?? "",
+    transporterNumberPlate: form.transporterNumberPlate,
+    transporterCustomInfo: form.transporterCustomInfo,
     waste: getWaste(form),
     createdAt: form.createdAt.getTime(),
     ...where,
@@ -276,6 +279,6 @@ export async function indexAllForms(
   return indexAllForms(idx, { skip: skip + take });
 }
 
-export function indexForm(form: FullForm) {
-  return indexBsd(toBsdElastic(form));
+export function indexForm(form: FullForm, ctx?: GraphQLContext) {
+  return indexBsd(toBsdElastic(form), ctx);
 }

@@ -4,13 +4,14 @@ import { WorkflowActionProps } from "./WorkflowAction";
 import { gql, useMutation } from "@apollo/client";
 
 import { TdModalTrigger } from "common/components/Modal";
-import { ActionButton } from "common/components";
+import { ActionButton, Loader } from "common/components";
 import { IconPaperWrite } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 
 import cogoToast from "cogo-toast";
 import { generatePath, Link } from "react-router-dom";
 import routes from "common/routes";
+import { GET_BSDS } from "common/queries";
 
 const PUBLISH_BSVHU = gql`
   mutation PublishBsvhu($id: ID!) {
@@ -22,11 +23,13 @@ const PUBLISH_BSVHU = gql`
 `;
 
 export default function PublishBsvhu({ form, siret }: WorkflowActionProps) {
-  const [publishBsvhu, { error }] = useMutation<
+  const [publishBsvhu, { loading, error }] = useMutation<
     Pick<Mutation, "publishBsvhu">,
     MutationPublishBsvhuArgs
   >(PUBLISH_BSVHU, {
     variables: { id: form.id },
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: () => {
       cogoToast.success(`Bordereau ${form.id} publié`, { hideAfter: 5 });
     },
@@ -87,6 +90,7 @@ export default function PublishBsvhu({ form, siret }: WorkflowActionProps) {
               </Link>
             </>
           )}
+          {loading && <Loader />}
         </div>
       )}
     />

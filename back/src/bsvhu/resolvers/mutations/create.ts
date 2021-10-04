@@ -42,6 +42,6 @@ export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
 
   // TODO Status log ?
   // TODO emit event ?
-  await indexBsvhu(newForm);
+  await indexBsvhu(newForm, context);
   return expandVhuFormFromDb(newForm);
 }

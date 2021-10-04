@@ -71,7 +71,8 @@ async function buildQuery(
 
   Object.entries({
     emitter: where.emitter,
-    recipient: where.recipient
+    recipient: where.recipient,
+    transporterCustomInfo: where.transporterCustomInfo
   })
     .filter(([_, value]) => value != null)
     .forEach(([key, value]) => {
@@ -92,6 +93,19 @@ async function buildQuery(
           query: where.readableId,
           // we need `and` operator here because the different components of
           // the readableId (prefix, date and random chars) emit different tokens
+          operator: "and"
+        }
+      }
+    });
+  }
+
+  if (where.transporterNumberPlate) {
+    query.bool.must.push({
+      match: {
+        transporterNumberPlate: {
+          query: where.transporterNumberPlate,
+          // we need `and` operator here because the different components of
+          // the number plate emit different tokens
           operator: "and"
         }
       }
