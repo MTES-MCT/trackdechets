@@ -6,7 +6,7 @@ import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb } from "../../converter";
 import { getFormOrFormNotFound } from "../../database";
 import { indexBsda } from "../../elastic";
-import { checkIsFormContributor } from "../../permissions";
+import { checkIsBsdaContributor } from "../../permissions";
 import { validateBsda } from "../../validation";
 
 export default async function create(
@@ -17,7 +17,7 @@ export default async function create(
   const user = checkIsAuthenticated(context);
 
   const prismaForm = await getFormOrFormNotFound(id);
-  await checkIsFormContributor(
+  await checkIsBsdaContributor(
     user,
     prismaForm,
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
