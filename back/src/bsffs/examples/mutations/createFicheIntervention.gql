@@ -1,0 +1,6 @@
+mutation CreateFicheIntervention($input: BsffFicheInterventionInput!) {
+  createFicheInterventionBsff(input: $input) {
+    id
+    numero
+  }
+}
