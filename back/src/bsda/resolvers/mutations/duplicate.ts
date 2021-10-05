@@ -4,7 +4,7 @@ import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { MutationDuplicateBsdaArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { expandBsdaFromDb } from "../../converter";
-import { getFormOrFormNotFound } from "../../database";
+import { getBsdaOrNotFound } from "../../database";
 import { indexBsda } from "../../elastic";
 import { checkIsBsdaContributor } from "../../permissions";
 
@@ -15,7 +15,7 @@ export default async function duplicate(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const prismaForm = await getFormOrFormNotFound(id);
+  const prismaForm = await getBsdaOrNotFound(id);
 
   await checkIsBsdaContributor(
     user,
@@ -39,8 +39,7 @@ function duplicateForm({
   workerWorkSignatureDate,
   transporterTransportSignatureAuthor,
   transporterTransportSignatureDate,
-  destinationReceptionQuantityType,
-  destinationReceptionQuantityValue,
+  destinationReceptionWeight,
   destinationReceptionDate,
   destinationReceptionAcceptationStatus,
   destinationReceptionRefusalReason,
@@ -55,7 +54,7 @@ function duplicateForm({
       ...rest,
       id: getReadableId(ReadableIdPrefix.BSDA),
       status: BsdaStatus.INITIAL,
-      isDraft: true
-    }
+      isDraft: true,
+    },
   });
 }

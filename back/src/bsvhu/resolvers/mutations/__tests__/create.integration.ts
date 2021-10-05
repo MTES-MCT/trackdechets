@@ -3,7 +3,7 @@ import { ErrorCode } from "../../../../common/errors";
 import { Mutation } from "../../../../generated/graphql/types";
 import {
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
@@ -31,8 +31,8 @@ mutation CreateVhuForm($input: BsvhuInput!) {
         phone
       }
     }
-    quantity {
-      number
+    weight {
+      value
     }
   }
 }
@@ -46,7 +46,7 @@ describe("Mutation.Vhu.create", () => {
     const { errors } = await mutate<Pick<Mutation, "createBsvhu">>(
       CREATE_VHU_FORM,
       {
-        variables: { input: {} }
+        variables: { input: {} },
       }
     );
 
@@ -54,9 +54,9 @@ describe("Mutation.Vhu.create", () => {
       expect.objectContaining({
         message: "Vous n'êtes pas connecté.",
         extensions: expect.objectContaining({
-          code: ErrorCode.UNAUTHENTICATED
-        })
-      })
+          code: ErrorCode.UNAUTHENTICATED,
+        }),
+      }),
     ]);
   });
 
@@ -71,11 +71,11 @@ describe("Mutation.Vhu.create", () => {
           input: {
             emitter: {
               company: {
-                siret: "siret"
-              }
-            }
-          }
-        }
+                siret: "siret",
+              },
+            },
+          },
+        },
       }
     );
 
@@ -84,9 +84,9 @@ describe("Mutation.Vhu.create", () => {
         message:
           "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas",
         extensions: expect.objectContaining({
-          code: ErrorCode.FORBIDDEN
-        })
-      })
+          code: ErrorCode.FORBIDDEN,
+        }),
+      }),
     ]);
   });
 
@@ -101,19 +101,20 @@ describe("Mutation.Vhu.create", () => {
           address: "Rue de la carcasse",
           contact: "Un centre VHU",
           phone: "0101010101",
-          mail: "emitter@mail.com"
+          mail: "emitter@mail.com",
         },
-        agrementNumber: "1234"
+        agrementNumber: "1234",
       },
       wasteCode: "16 01 06",
       packaging: "UNITE",
       identification: {
         numbers: ["123", "456"],
-        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+        type: "NUMERO_ORDRE_REGISTRE_POLICE",
       },
-      quantity: {
-        number: 2,
-        tons: 1.3
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3,
       },
       destination: {
         type: "BROYEUR",
@@ -124,17 +125,17 @@ describe("Mutation.Vhu.create", () => {
           address: "address",
           contact: "contactEmail",
           phone: "contactPhone",
-          mail: "contactEmail@mail.com"
-        }
-      }
+          mail: "contactEmail@mail.com",
+        },
+      },
     };
     const { mutate } = makeClient(user);
     const { data } = await mutate<Pick<Mutation, "createBsvhu">>(
       CREATE_VHU_FORM,
       {
         variables: {
-          input
-        }
+          input,
+        },
       }
     );
 
@@ -157,18 +158,19 @@ describe("Mutation.Vhu.create", () => {
           address: "Rue de la carcasse",
           contact: "Un centre VHU",
           phone: "0101010101",
-          mail: "emitter@mail.com"
-        }
+          mail: "emitter@mail.com",
+        },
       },
       wasteCode: "16 01 06",
       packaging: "UNITE",
       identification: {
         numbers: ["123", "456"],
-        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+        type: "NUMERO_ORDRE_REGISTRE_POLICE",
       },
-      quantity: {
-        number: 2,
-        tons: 1.3
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3,
       },
       destination: {
         type: "BROYEUR",
@@ -179,17 +181,17 @@ describe("Mutation.Vhu.create", () => {
           address: "address",
           contact: "contactEmail",
           phone: "contactPhone",
-          mail: "contactEmail@mail.com"
-        }
-      }
+          mail: "contactEmail@mail.com",
+        },
+      },
     };
     const { mutate } = makeClient(user);
     const { errors } = await mutate<Pick<Mutation, "createBsvhu">>(
       CREATE_VHU_FORM,
       {
         variables: {
-          input
-        }
+          input,
+        },
       }
     );
 

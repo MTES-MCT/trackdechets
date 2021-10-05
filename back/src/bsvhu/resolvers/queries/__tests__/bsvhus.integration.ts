@@ -45,8 +45,8 @@ const GET_BSVHUS = `
               number
             }
           }
-          quantity {
-            number
+          weight {
+            value
           }
         }
       }

@@ -3,7 +3,7 @@ import { ErrorCode } from "../../../../common/errors";
 import { vhuFormFactory } from "../../../__tests__/factories.vhu";
 import {
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
@@ -38,8 +38,8 @@ mutation EditVhuForm($id: ID!, $input: BsvhuInput!) {
         number
       }
     }
-    quantity {
-      number
+    weight {
+      value
     }
   }
 }
@@ -53,7 +53,7 @@ describe("Mutation.Vhu.update", () => {
     const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
       UPDATE_VHU_FORM,
       {
-        variables: { id: 1, input: {} }
+        variables: { id: 1, input: {} },
       }
     );
 
@@ -61,9 +61,9 @@ describe("Mutation.Vhu.update", () => {
       expect.objectContaining({
         message: "Vous n'êtes pas connecté.",
         extensions: expect.objectContaining({
-          code: ErrorCode.UNAUTHENTICATED
-        })
-      })
+          code: ErrorCode.UNAUTHENTICATED,
+        }),
+      }),
     ]);
   });
 
@@ -71,8 +71,8 @@ describe("Mutation.Vhu.update", () => {
     const { company } = await userWithCompanyFactory("MEMBER");
     const form = await vhuFormFactory({
       opt: {
-        emitterCompanySiret: company.siret
-      }
+        emitterCompanySiret: company.siret,
+      },
     });
 
     const connectedUser = await userFactory();
@@ -83,11 +83,9 @@ describe("Mutation.Vhu.update", () => {
         variables: {
           id: form.id,
           input: {
-            quantity: {
-              number: 4
-            }
-          }
-        }
+            quantity: 4,
+          },
+        },
       }
     );
 
@@ -96,9 +94,9 @@ describe("Mutation.Vhu.update", () => {
         message:
           "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas",
         extensions: expect.objectContaining({
-          code: ErrorCode.FORBIDDEN
-        })
-      })
+          code: ErrorCode.FORBIDDEN,
+        }),
+      }),
     ]);
   });
 
@@ -106,44 +104,44 @@ describe("Mutation.Vhu.update", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await vhuFormFactory({
       opt: {
-        emitterCompanySiret: company.siret
-      }
+        emitterCompanySiret: company.siret,
+      },
     });
 
     const { mutate } = makeClient(user);
     const input = {
-      quantity: {
-        number: 4
-      }
+      weight: {
+        value: 4,
+      },
     };
     const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
       UPDATE_VHU_FORM,
       {
-        variables: { id: form.id, input }
+        variables: { id: form.id, input },
       }
     );
 
-    expect(data.updateBsvhu.quantity.number).toBe(4);
+    expect(data.updateBsvhu.weight.value).toBe(4);
   });
 
   it("should allow emitter fields update before emitter signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await vhuFormFactory({
       opt: {
-        emitterCompanySiret: company.siret
-      }
+        emitterCompanySiret: company.siret,
+      },
     });
 
     const { mutate } = makeClient(user);
     const input = {
       emitter: {
-        agrementNumber: "new agrement"
-      }
+        agrementNumber: "new agrement",
+      },
     };
     const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
       UPDATE_VHU_FORM,
       {
-        variables: { id: form.id, input }
+        variables: { id: form.id, input },
       }
     );
 
@@ -156,20 +154,20 @@ describe("Mutation.Vhu.update", () => {
       opt: {
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureAuthor: "The Signatory",
-        emitterEmissionSignatureDate: new Date()
-      }
+        emitterEmissionSignatureDate: new Date(),
+      },
     });
 
     const { mutate } = makeClient(user);
     const input = {
       emitter: {
-        agrementNumber: "new agrement"
-      }
+        agrementNumber: "new agrement",
+      },
     };
     const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
       UPDATE_VHU_FORM,
       {
-        variables: { id: form.id, input }
+        variables: { id: form.id, input },
       }
     );
 
@@ -178,9 +176,9 @@ describe("Mutation.Vhu.update", () => {
         message:
           "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: emitter.agrementNumber",
         extensions: expect.objectContaining({
-          code: ErrorCode.FORBIDDEN
-        })
-      })
+          code: ErrorCode.FORBIDDEN,
+        }),
+      }),
     ]);
   });
 
@@ -190,20 +188,20 @@ describe("Mutation.Vhu.update", () => {
       opt: {
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureAuthor: "The Signatory",
-        emitterEmissionSignatureDate: new Date()
-      }
+        emitterEmissionSignatureDate: new Date(),
+      },
     });
 
     const { mutate } = makeClient(user);
     const input = {
       transporter: {
-        company: { vatNumber: "DE 123456789" }
-      }
+        company: { vatNumber: "DE 123456789" },
+      },
     };
     const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
       UPDATE_VHU_FORM,
       {
-        variables: { id: form.id, input }
+        variables: { id: form.id, input },
       }
     );
 

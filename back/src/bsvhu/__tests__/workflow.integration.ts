@@ -54,9 +54,10 @@ describe("Exemples de circuit du bordereau de suivi de véhicule hors d'usage", 
                 numbers: ["123", "456"]
                 type: NUMERO_ORDRE_REGISTRE_POLICE
               }
-              quantity: {
-                number: 2,
-                tons: 1.3
+              quantity: 2
+              weight: {
+                isEstimate: false,
+                value: 1.3
               }
               transporter: {
                 company: {
@@ -155,9 +156,7 @@ describe("Exemples de circuit du bordereau de suivi de véhicule hors d'usage", 
             updateBsvhu(id: "${id}", input: {
               destination: {
                 reception: {
-                  quantity: {
-                    tons: 1.4
-                  },
+                  weight: 1.4
                   acceptationStatus: ACCEPTED
                 }
                 operation: {

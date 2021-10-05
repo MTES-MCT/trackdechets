@@ -1,17 +1,18 @@
+import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import {
   BsdaInput,
-  MutationCreateBsdaArgs
+  MutationCreateBsdaArgs,
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb, flattenBsdaInput } from "../../converter";
-import { indexBsda } from "../../elastic";
 import {
-  checkCanAssociateBsdas,
-  checkIsBsdaContributor
-} from "../../permissions";
+  getBsdaOrNotFound,
+} from "../../database";
+import { indexBsda } from "../../elastic";
+import { checkIsBsdaContributor } from "../../permissions";
 import { validateBsda } from "../../validation";
 
 type CreateBsda = {
@@ -31,28 +32,54 @@ export default async function create(
 export async function genericCreate({ isDraft, input, context }: CreateBsda) {
   const user = checkIsAuthenticated(context);
 
-  const form = flattenBsdaInput(input);
+  const bsda = flattenBsdaInput(input);
   await checkIsBsdaContributor(
     user,
-    form,
+    bsda,
     "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  await validateBsda(form, {
-    isPrivateIndividual: form.emitterIsPrivateIndividual,
-    isType2710: form.type === "COLLECTION_2710",
-    emissionSignature: !isDraft
-  });
+  const isForwarding = Boolean(input.forwarding);
+  const isGrouping = input.grouping?.length > 0;
 
-  await checkCanAssociateBsdas(input.associations);
+  if ([isForwarding, isGrouping].filter((b) => b).length > 1) {
+    throw new UserInputError(
+      "Les opérations d'entreposage provisoire et groupement ne sont pas compatibles entre elles"
+    );
+  }
+
+  const forwardedBsda = isForwarding
+    ? await getBsdaOrNotFound(input.forwarding)
+    : null;
+  const groupedBsdas = isGrouping
+    ? await prisma.bsda.findMany({
+        where: { id: { in: input.grouping } },
+      })
+    : [];
+
+  const previousBsdas = [
+    ...(isForwarding ? [forwardedBsda] : []),
+    ...(isGrouping ? groupedBsdas : []),
+  ];
+
+  await validateBsda(bsda, previousBsdas, {
+    isPrivateIndividual: bsda.emitterIsPrivateIndividual,
+    isType2710: bsda.type === "COLLECTION_2710",
+    emissionSignature: !isDraft,
+  });
 
   const newBsda = await prisma.bsda.create({
     data: {
-      ...form,
+      ...bsda,
       id: getReadableId(ReadableIdPrefix.BSDA),
       isDraft,
-      bsdas: { connect: input.associations?.map(id => ({ id })) }
-    }
+      ...(isForwarding && {
+        forwarding: { connect: { id: input.forwarding } },
+      }),
+      ...(isGrouping && {
+        grouping: { connect: groupedBsdas.map(({ id }) => ({ id })) },
+      }),
+    },
   });
 
   await indexBsda(newBsda, context);
