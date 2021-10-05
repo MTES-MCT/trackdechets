@@ -6,6 +6,7 @@ import {
 import { libelleFromCodeNaf, buildAddress } from "../utils";
 import { UserInputError } from "apollo-server-express";
 import { authorizedAxiosGet } from "./token";
+import { AnonymousCompanyError } from "../errors";
 
 const SIRENE_API_BASE_URL = "https://api.insee.fr/entreprises/sirene/V3";
 
@@ -82,6 +83,10 @@ export function searchCompany(siret: string): Promise<CompanySearchResult> {
           invalidArgs: ["siret"]
         });
       }
+      if (error.response?.status === 403) {
+        throw new AnonymousCompanyError();
+      }
+
       throw error;
     });
 }

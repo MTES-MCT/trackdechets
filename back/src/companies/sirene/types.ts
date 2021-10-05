@@ -3,6 +3,7 @@ export interface SearchResponseDataGouv {
   etablissement: {
     siret: string;
     etat_administratif: string;
+    statut_diffusion: string;
     numero_voie: string;
     indice_repetition: string;
     type_voie: string;

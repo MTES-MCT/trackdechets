@@ -7,6 +7,8 @@ import {
   FullTextSearchResponseDataGouv,
   CompanySearchResult
 } from "../types";
+import { AnonymousCompanyError } from "../errors";
+import { searchAnonymousCompany } from "../anonymous";
 
 const SIRENE_API_BASE_URL = "https://entreprise.data.gouv.fr/api/sirene";
 
@@ -72,8 +74,15 @@ function searchResponseToCompany({
  */
 export function searchCompany(siret: string): Promise<CompanySearchResult> {
   const searchUrl = `${SIRENE_API_BASE_URL}/v3/etablissements/${siret}`;
+
   return axios
     .get<SearchResponseDataGouv>(searchUrl)
+    .then(async r => {
+      if (r.data?.etablissement?.statut_diffusion === "N") {
+        throw new AnonymousCompanyError();
+      }
+      return r;
+    })
     .then(r => searchResponseToCompany(r.data))
     .catch((error: AxiosError) => {
       // The request was made and the server responded with a status code
