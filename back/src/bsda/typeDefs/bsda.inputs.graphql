@@ -68,7 +68,7 @@ input BsdaInput {
   "Conditionnement"
   packagings: [BsdaPackagingInput!]
   "Quantité"
-  quantity: BsdaQuantityInput
+  weight: BsdaWeightInput
 
   "Installation de destination"
   destination: BsdaDestinationInput
@@ -78,8 +78,11 @@ input BsdaInput {
   "Entreprise de transport"
   transporter: BsdaTransporterInput
 
-  "Précédents bordereaux à associer à celui ci - cas du transit, entreposage provisoire ou groupement"
-  associations: [ID!]
+  "Bordereau que celui-ci reéxpédie"
+  forwarding: ID
+
+  "Liste des bordereaux que celui-ci groupe"
+  grouping: [ID!]
 }
 
 input BsdaEmitterInput {
@@ -88,10 +91,12 @@ input BsdaEmitterInput {
   "Établissement MOA/détenteur. Partiellement rempli si l'émetteur est en fait un particulier"
   company: CompanyInput
   "Informations chantier (si différente de l'adresse de l'entreprise)"
-  workSite: BsdaWorkSiteInput
+  pickupSite: BsdaPickupSiteInput
+  "Champ libre"
+  customInfo: String
 }
 
-input BsdaWorkSiteInput {
+input BsdaPickupSiteInput {
   name: String
   address: String
   city: String
@@ -126,9 +131,9 @@ input BsdaPackagingInput {
   quantity: Int!
 }
 
-input BsdaQuantityInput {
+input BsdaWeightInput {
   "Type de quantité (réelle ou estimé)"
-  type: BsdaQuantityType
+  isEstimate: Boolean
   "Quantité en tonne"
   value: Float
 }
@@ -144,13 +149,15 @@ input BsdaDestinationInput {
   reception: BsdaReceptionInput
   "Réalisation de l'opération (case 11)"
   operation: BsdaOperationInput
+  "Champ libre"
+  customInfo: String
 }
 
 input BsdaReceptionInput {
   "Date de présentation sur site"
   date: DateTime
   "Quantité présentée"
-  quantity: BsdaQuantityInput
+  weight: Float
   "Lot accepté, accepté partiellement ou refusé"
   acceptationStatus: BsdaAcceptationStatus
   "Motif de refus"
@@ -193,6 +200,8 @@ input BsdaWorkInput {
 input BsdaTransporterInput {
   "Entreprise de transport"
   company: CompanyInput
+  "Champ libre"
+  customInfo: String
   recepisse: BsdaRecepisseInput
   transport: BsdaTransportInput
 }

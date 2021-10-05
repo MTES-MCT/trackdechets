@@ -3,17 +3,17 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkSecurityCode } from "../../../forms/permissions";
 import {
   BsdaSignatureType,
-  MutationSignBsdaArgs
+  MutationSignBsdaArgs,
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import {
   AlreadySignedError,
-  InvalidSignatureError
+  InvalidSignatureError,
 } from "../../../bsvhu/errors";
 import { expandBsdaFromDb } from "../../converter";
-import { getFormOrFormNotFound } from "../../database";
+import { getBsdaHistory, getBsdaOrNotFound } from "../../database";
 import { indexBsda } from "../../elastic";
 import { machine } from "../../machine";
 import { validateBsda } from "../../validation";
@@ -32,7 +32,7 @@ export default async function sign(
   const user = checkIsAuthenticated(context);
 
   const signatureTypeInfos = signatureTypeMapping[input.type];
-  const prismaForm = await getFormOrFormNotFound(id);
+  const prismaForm = await getBsdaOrNotFound(id);
 
   // To sign a form for a company, you must either:
   // - be part of that company
@@ -48,7 +48,7 @@ export default async function sign(
   }
 
   // Check that all necessary fields are filled
-  await validateBsda(prismaForm, {
+  await validateBsda(prismaForm, [], {
     isPrivateIndividual: prismaForm.emitterIsPrivateIndividual,
     emissionSignature:
       prismaForm.emitterEmissionSignatureDate != null ||
@@ -60,12 +60,12 @@ export default async function sign(
       input.type === "TRANSPORT",
     operationSignature:
       prismaForm.destinationOperationSignatureDate != null ||
-      input.type === "OPERATION"
+      input.type === "OPERATION",
   });
 
   const { value: newStatus } = machine.transition(prismaForm.status, {
     type: input.type,
-    bsda: prismaForm
+    bsda: prismaForm,
   });
 
   if (newStatus === prismaForm.status) {
@@ -78,9 +78,25 @@ export default async function sign(
       [signatureTypeInfos.dbAuthorKey]: input.author,
       [signatureTypeInfos.dbDateKey]: new Date(input.date),
       isDraft: false,
-      status: newStatus as BsdaStatus
-    }
+      status: newStatus as BsdaStatus,
+    },
   });
+
+  if (newStatus === BsdaStatus.PROCESSED) {
+    const previousBsdas = await getBsdaHistory(signedBsda);
+    await prisma.bsda.updateMany({
+      data: {
+        status: BsdaStatus.PROCESSED,
+      },
+      where: {
+        id: { in: previousBsdas.map((bsff) => bsff.id) },
+      },
+    });
+    const updatedBsdas = await prisma.bsda.findMany({
+      where: { id: { in: previousBsdas.map((bsff) => bsff.id) } },
+    });
+    await Promise.all(updatedBsdas.map((bsda) => indexBsda(bsda)));
+  }
 
   await indexBsda(signedBsda, context);
 
@@ -91,23 +107,23 @@ const signatureTypeMapping: Record<BsdaSignatureType, SignatureTypeInfos> = {
   EMISSION: {
     dbDateKey: "emitterEmissionSignatureDate",
     dbAuthorKey: "emitterEmissionSignatureAuthor",
-    getAuthorizedSiret: form => form.emitterCompanySiret
+    getAuthorizedSiret: (form) => form.emitterCompanySiret,
   },
   WORK: {
     dbDateKey: "workerWorkSignatureDate",
     dbAuthorKey: "workerWorkSignatureAuthor",
-    getAuthorizedSiret: form => form.workerCompanySiret
+    getAuthorizedSiret: (form) => form.workerCompanySiret,
   },
   OPERATION: {
     dbDateKey: "destinationOperationSignatureDate",
     dbAuthorKey: "destinationOperationSignatureAuthor",
-    getAuthorizedSiret: form => form.destinationCompanySiret
+    getAuthorizedSiret: (form) => form.destinationCompanySiret,
   },
   TRANSPORT: {
     dbDateKey: "transporterTransportSignatureDate",
     dbAuthorKey: "transporterTransportSignatureAuthor",
-    getAuthorizedSiret: form => form.transporterCompanySiret
-  }
+    getAuthorizedSiret: (form) => form.transporterCompanySiret,
+  },
 };
 
 function checkAuthorization(

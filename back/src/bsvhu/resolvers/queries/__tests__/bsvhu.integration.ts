@@ -34,8 +34,8 @@ query GetBsvhu($id: ID!) {
         number
       }
     }
-    quantity {
-      number
+    weight {
+      value
     }
   }
 }

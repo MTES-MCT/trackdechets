@@ -3,7 +3,7 @@ import { ErrorCode } from "../../../../common/errors";
 import { BsdaInput, Mutation } from "../../../../generated/graphql/types";
 import {
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
@@ -31,16 +31,16 @@ describe("Mutation.Bsda.create", () => {
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
     const { errors } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
-      variables: { input: {} }
+      variables: { input: {} },
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
         message: "Vous n'êtes pas connecté.",
         extensions: expect.objectContaining({
-          code: ErrorCode.UNAUTHENTICATED
-        })
-      })
+          code: ErrorCode.UNAUTHENTICATED,
+        }),
+      }),
     ]);
   });
 
@@ -53,11 +53,11 @@ describe("Mutation.Bsda.create", () => {
         input: {
           emitter: {
             company: {
-              siret: "siret"
-            }
-          }
-        }
-      }
+              siret: "siret",
+            },
+          },
+        },
+      },
     });
 
     expect(errors).toEqual([
@@ -65,9 +65,9 @@ describe("Mutation.Bsda.create", () => {
         message:
           "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas",
         extensions: expect.objectContaining({
-          code: ErrorCode.FORBIDDEN
-        })
-      })
+          code: ErrorCode.FORBIDDEN,
+        }),
+      }),
     ]);
   });
 
@@ -83,8 +83,8 @@ describe("Mutation.Bsda.create", () => {
           address: "Rue de la carcasse",
           contact: "Centre amiante",
           phone: "0101010101",
-          mail: "emitter@mail.com"
-        }
+          mail: "emitter@mail.com",
+        },
       },
       worker: {
         company: {
@@ -93,8 +93,8 @@ describe("Mutation.Bsda.create", () => {
           address: "address",
           contact: "contactEmail",
           phone: "contactPhone",
-          mail: "contactEmail@mail.com"
-        }
+          mail: "contactEmail@mail.com",
+        },
       },
       waste: {
         code: "16 01 06",
@@ -103,29 +103,29 @@ describe("Mutation.Bsda.create", () => {
         familyCode: "Code famille",
         materialName: "A material",
         name: "Amiante",
-        sealNumbers: ["1", "2"]
+        sealNumbers: ["1", "2"],
       },
       packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
-      quantity: { type: "ESTIMATED", value: 1.2 },
+      weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "R 12",
+        plannedOperationCode: "D 9",
         company: {
           siret: "11111111111111",
           name: "destination",
           address: "address",
           contact: "contactEmail",
           phone: "contactPhone",
-          mail: "contactEmail@mail.com"
-        }
-      }
+          mail: "contactEmail@mail.com",
+        },
+      },
     };
 
     const { mutate } = makeClient(user);
     const { data } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
       variables: {
-        input
-      }
+        input,
+      },
     });
 
     expect(data.createBsda.id).toMatch(
@@ -148,8 +148,8 @@ describe("Mutation.Bsda.create", () => {
           address: "Rue de la carcasse",
           contact: "Centre amiante",
           phone: "0101010101",
-          mail: "emitter@mail.com"
-        }
+          mail: "emitter@mail.com",
+        },
       },
       worker: {
         company: {
@@ -158,8 +158,8 @@ describe("Mutation.Bsda.create", () => {
           address: "address",
           contact: "contactEmail",
           phone: "contactPhone",
-          mail: "contactEmail@mail.com"
-        }
+          mail: "contactEmail@mail.com",
+        },
       },
       waste: {
         // code: "16 01 06",
@@ -168,29 +168,29 @@ describe("Mutation.Bsda.create", () => {
         familyCode: "Code famille",
         materialName: "A material",
         name: "Amiante",
-        sealNumbers: ["1", "2"]
+        sealNumbers: ["1", "2"],
       },
       packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
-      quantity: { type: "ESTIMATED", value: 1.2 },
+      weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "R 12",
+        plannedOperationCode: "D 9",
         company: {
           siret: "11111111111111",
           name: "destination",
           address: "address",
           contact: "contactEmail",
           phone: "contactPhone",
-          mail: "contactEmail@mail.com"
-        }
-      }
+          mail: "contactEmail@mail.com",
+        },
+      },
     };
 
     const { mutate } = makeClient(user);
     const { errors } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
       variables: {
-        input
-      }
+        input,
+      },
     });
 
     expect(errors[0].message).toBe("Le code déchet est obligatoire");

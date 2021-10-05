@@ -3,15 +3,15 @@ import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
 
 export const bsdaFactory = async ({
-  opt = {}
+  opt = {},
 }: {
   opt?: Partial<Prisma.BsdaCreateInput>;
 }) => {
   const formParams = { ...getBsdaObject(), ...opt };
   return prisma.bsda.create({
     data: {
-      ...formParams
-    }
+      ...formParams,
+    },
   });
 };
 
@@ -38,12 +38,12 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
 
   packagings: [
     { type: "PALETTE_FILME", quantity: 1 },
-    { type: "BIG_BAG", quantity: 2 }
+    { type: "BIG_BAG", quantity: 2 },
   ],
-  quantityType: "REAL",
-  quantityValue: 25.4,
+  weightIsEstimate: false,
+  weightValue: 25.4,
 
-  destinationPlannedOperationCode: "R 4",
+  destinationPlannedOperationCode: "D 5",
   destinationCompanyName: "I reveive waste INC",
   destinationCompanySiret: "13254678974589",
   destinationCompanyAddress: "14 boulevard Recipient, Recipient City",
@@ -63,11 +63,10 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   transporterRecepisseValidityLimit: "2019-11-27T00:00:00.000Z",
 
   destinationReceptionDate: "2019-11-27T00:00:00.000Z",
-  destinationReceptionQuantityType: "REAL",
-  destinationReceptionQuantityValue: 1.2,
+  destinationReceptionWeight: 1.2,
   destinationReceptionAcceptationStatus: "ACCEPTED",
   destinationReceptionRefusalReason: null,
-  destinationOperationCode: "D 10",
+  destinationOperationCode: "D 9",
   destinationOperationDate: "2019-11-27T00:00:00.000Z",
 
   workerCompanyName: "Entreprise de travaux",
@@ -75,5 +74,5 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   workerCompanyAddress: "1 route du travail, Travaux city",
   workerCompanyContact: "Jack Travaux",
   workerCompanyPhone: "05 05 05 05 05",
-  workerCompanyMail: "travaux@td.io"
+  workerCompanyMail: "travaux@td.io",
 });

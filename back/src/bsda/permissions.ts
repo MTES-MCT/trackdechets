@@ -1,8 +1,10 @@
 import { User, Bsda, BsdaStatus, BsdaType } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { NotFormContributor } from "../forms/errors";
+import { BsdaInput } from "../generated/graphql/types";
 import prisma from "../prisma";
 import { getFullUser } from "../users/database";
+import { getBsdaOrNotFound } from "./database";
 
 export async function checkIsFormContributor(
   user: User,
@@ -28,16 +30,18 @@ export async function checkIsFormContributor(
 
 export async function isFormContributor(user: User, form: Partial<Bsda>) {
   const fullUser = await getFullUser(user);
-  const userSirets = fullUser.companies.map(c => c.siret);
+  const userSirets = fullUser.companies.map((c) => c.siret);
 
   const formSirets = [
     form.emitterCompanySiret,
     form.destinationCompanySiret,
     form.transporterCompanySiret,
-    form.workerCompanySiret
+    form.workerCompanySiret,
   ];
 
-  const siretsInCommon = userSirets.filter(siret => formSirets.includes(siret));
+  const siretsInCommon = userSirets.filter((siret) =>
+    formSirets.includes(siret)
+  );
 
   return siretsInCommon.length;
 }
@@ -56,30 +60,4 @@ export async function checkCanDeleteBsda(user: User, form: Bsda) {
   }
 
   return true;
-}
-
-export async function checkCanAssociateBsdas(ids: string[]) {
-  if (!ids || ids.length === 0) {
-    return;
-  }
-
-  const bsdas = await prisma.bsda.findMany({
-    where: {
-      id: {
-        in: ids
-      }
-    }
-  });
-
-  if (
-    bsdas.some(
-      bsda =>
-        ![BsdaType.GATHERING, BsdaType.RESHIPMENT].includes(bsda.type as any) ||
-        bsda.status !== "AWAITING_CHILD"
-    )
-  ) {
-    throw new UserInputError(
-      `Les bordereaux ne peuvent pas être associés à un bordereau enfant.`
-    );
-  }
 }
