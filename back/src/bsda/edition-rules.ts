@@ -8,7 +8,7 @@ const signatureToFieldMapping: { [key in BsdaSignatureType]: keyof Bsda } = {
   EMISSION: "emitterEmissionSignatureDate",
   WORK: "workerWorkSignatureDate",
   TRANSPORT: "transporterTransportSignatureDate",
-  OPERATION: "destinationOperationSignatureDate"
+  OPERATION: "destinationOperationSignatureDate",
 };
 
 export function checkKeysEditability(updates: BsdaInput, bsda: Bsda) {
@@ -31,18 +31,19 @@ const editableFields = {
     cap: ifAwaitingSignature("EMISSION"),
     plannedOperationCode: ifAwaitingSignature("EMISSION"),
     reception: ifAwaitingSignature("OPERATION"),
-    operation: ifAwaitingSignature("OPERATION")
+    operation: ifAwaitingSignature("OPERATION"),
   },
   waste: ifAwaitingSignature("EMISSION"),
   packagings: ifAwaitingSignature("WORK"),
-  quantity: ifAwaitingSignature("WORK"),
+  weight: ifAwaitingSignature("WORK"),
   worker: {
     company: ifAwaitingSignature("EMISSION"),
-    work: ifAwaitingSignature("WORK")
+    work: ifAwaitingSignature("WORK"),
   },
   broker: ifAwaitingSignature("EMISSION"),
   transporter: ifAwaitingSignature("TRANSPORT"),
-  associations: ifAwaitingSignature("EMISSION")
+  grouping: ifAwaitingSignature("EMISSION"),
+  forwarding: ifAwaitingSignature("EMISSION"),
 };
 
 function ifAwaitingSignature(signature: BsdaSignatureType) {
@@ -70,7 +71,7 @@ function recursiveGetFlatKeys(
   prevKeys: string[] = []
 ): { keys: string[] }[] {
   return Object.keys(updates)
-    .map(key => {
+    .map((key) => {
       const keysList = [...prevKeys, key];
       if (isObject(updates[key])) {
         return recursiveGetFlatKeys(updates[key], keysList);

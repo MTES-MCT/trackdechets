@@ -3,7 +3,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Query, QueryBsdasArgs } from "../../../../generated/graphql/types";
 import {
   userWithCompanyFactory,
-  companyAssociatedToExistingUserFactory
+  companyAssociatedToExistingUserFactory,
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../__tests__/factories";
@@ -14,7 +14,10 @@ const GET_BSDAS = `
       edges {
         node {
           id
-          associations {
+          grouping {
+            id
+          }
+          forwarding {
             id
           }
         }
@@ -30,8 +33,8 @@ describe("Query.bsdas", () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     await bsdaFactory({
       opt: {
-        emitterCompanySiret: company.siret
-      }
+        emitterCompanySiret: company.siret,
+      },
     });
 
     const { query } = makeClient(user);
@@ -46,8 +49,8 @@ describe("Query.bsdas", () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     await bsdaFactory({
       opt: {
-        emitterCompanySiret: company.siret
-      }
+        emitterCompanySiret: company.siret,
+      },
     });
     await bsdaFactory({});
 
@@ -67,13 +70,13 @@ describe("Query.bsdas", () => {
     );
     await bsdaFactory({
       opt: {
-        emitterCompanySiret: company.siret
-      }
+        emitterCompanySiret: company.siret,
+      },
     });
     await bsdaFactory({
       opt: {
-        emitterCompanySiret: otherCompany.siret
-      }
+        emitterCompanySiret: otherCompany.siret,
+      },
     });
 
     const { query } = makeClient(user);
@@ -86,28 +89,28 @@ describe("Query.bsdas", () => {
 
   it.each(["emitter", "worker", "transporter", "destination"])(
     "should filter bsdas where user appears as %s",
-    async role => {
+    async (role) => {
       const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
 
       await bsdaFactory({
         opt: {
-          emitterCompanySiret: company.siret
-        }
+          emitterCompanySiret: company.siret,
+        },
       });
       await bsdaFactory({
         opt: {
-          workerCompanySiret: company.siret
-        }
+          workerCompanySiret: company.siret,
+        },
       });
       await bsdaFactory({
         opt: {
-          transporterCompanySiret: company.siret
-        }
+          transporterCompanySiret: company.siret,
+        },
       });
       await bsdaFactory({
         opt: {
-          destinationCompanySiret: company.siret
-        }
+          destinationCompanySiret: company.siret,
+        },
       });
 
       const { query } = makeClient(user);
@@ -118,11 +121,11 @@ describe("Query.bsdas", () => {
             where: {
               [role]: {
                 company: {
-                  siret: company.siret
-                }
-              }
-            }
-          }
+                  siret: company.siret,
+                },
+              },
+            },
+          },
         }
       );
 
@@ -135,8 +138,8 @@ describe("Query.bsdas", () => {
     await bsdaFactory({
       opt: {
         isDeleted: true,
-        emitterCompanySiret: company.siret
-      }
+        emitterCompanySiret: company.siret,
+      },
     });
 
     const { query } = makeClient(user);
@@ -150,17 +153,24 @@ describe("Query.bsdas", () => {
   it("should list the associated bsdas", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
 
-    const associatedBsda = await bsdaFactory({
+    const groupedBsda = await bsdaFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        status: "AWAITING_CHILD"
-      }
+        status: "AWAITING_CHILD",
+      },
+    });
+    const forwardedBsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        status: "AWAITING_CHILD",
+      },
     });
     await bsdaFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        bsdas: { connect: [{ id: associatedBsda.id }] }
-      }
+        grouping: { connect: [{ id: groupedBsda.id }] },
+        forwarding: { connect: { id: forwardedBsda.id } },
+      },
     });
 
     const { query } = makeClient(emitter.user);
@@ -168,10 +178,15 @@ describe("Query.bsdas", () => {
       GET_BSDAS
     );
 
-    expect(data.bsdas.edges[0].node.associations).toEqual([
+    expect(data.bsdas.edges[0].node.grouping).toEqual([
       expect.objectContaining({
-        id: associatedBsda.id
-      })
+        id: groupedBsda.id,
+      }),
     ]);
+    expect(data.bsdas.edges[0].node.forwarding).toEqual(
+      expect.objectContaining({
+        id: forwardedBsda.id,
+      }),
+    );
   });
 });

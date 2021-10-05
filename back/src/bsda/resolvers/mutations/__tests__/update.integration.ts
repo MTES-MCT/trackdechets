@@ -2,7 +2,7 @@ import { UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
-  MutationUpdateBsdaArgs
+  MutationUpdateBsdaArgs,
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
@@ -42,8 +42,8 @@ describe("Mutation.updateBsda", () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
       opt: {
-        emitterCompanySiret: company.siret
-      }
+        emitterCompanySiret: company.siret,
+      },
     });
 
     const { mutate } = makeClient(user);
@@ -56,11 +56,11 @@ describe("Mutation.updateBsda", () => {
         input: {
           emitter: {
             company: {
-              name: "New Name"
-            }
-          }
-        }
-      }
+              name: "New Name",
+            },
+          },
+        },
+      },
     });
 
     expect(data.updateBsda.id).toBeTruthy();
@@ -74,23 +74,23 @@ describe("Mutation.updateBsda", () => {
     >(UPDATE_BSDA, {
       variables: {
         id: "123",
-        input: {}
-      }
+        input: {},
+      },
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
         extensions: {
-          code: "UNAUTHENTICATED"
-        }
-      })
+          code: "UNAUTHENTICATED",
+        },
+      }),
     ]);
   });
 
   it("should disallow user that is not a contributor on the bsda", async () => {
     const { user } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
-      opt: {}
+      opt: {},
     });
 
     const { mutate } = makeClient(user);
@@ -100,15 +100,15 @@ describe("Mutation.updateBsda", () => {
     >(UPDATE_BSDA, {
       variables: {
         id: bsda.id,
-        input: {}
-      }
+        input: {},
+      },
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
-      })
+          "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas",
+      }),
     ]);
   });
 
@@ -122,14 +122,14 @@ describe("Mutation.updateBsda", () => {
     >(UPDATE_BSDA, {
       variables: {
         id: "123",
-        input: {}
-      }
+        input: {},
+      },
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le bordereau avec l'identifiant "123" n'existe pas.`
-      })
+        message: `Le bordereau avec l'identifiant "123" n'existe pas.`,
+      }),
     ]);
   });
 
@@ -138,8 +138,8 @@ describe("Mutation.updateBsda", () => {
     const bsda = await bsdaFactory({
       opt: {
         emitterCompanySiret: company.siret,
-        isDeleted: true
-      }
+        isDeleted: true,
+      },
     });
 
     const { mutate } = makeClient(user);
@@ -152,17 +152,17 @@ describe("Mutation.updateBsda", () => {
         input: {
           emitter: {
             company: {
-              name: company.name
-            }
-          }
-        }
-      }
+              name: company.name,
+            },
+          },
+        },
+      },
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le bordereau avec l'identifiant "${bsda.id}" n'existe pas.`
-      })
+        message: `Le bordereau avec l'identifiant "${bsda.id}" n'existe pas.`,
+      }),
     ]);
   });
 
@@ -170,8 +170,8 @@ describe("Mutation.updateBsda", () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
       opt: {
-        emitterCompanySiret: company.siret
-      }
+        emitterCompanySiret: company.siret,
+      },
     });
 
     const { mutate } = makeClient(user);
@@ -184,17 +184,17 @@ describe("Mutation.updateBsda", () => {
         input: {
           emitter: {
             company: {
-              siret: "1".repeat(14)
-            }
-          }
-        }
-      }
+              siret: "1".repeat(14),
+            },
+          },
+        },
+      },
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Vous ne pouvez pas enlever votre établissement du bordereau"
-      })
+        message: "Vous ne pouvez pas enlever votre établissement du bordereau",
+      }),
     ]);
   });
 
@@ -202,8 +202,8 @@ describe("Mutation.updateBsda", () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
       opt: {
-        emitterCompanySiret: company.siret
-      }
+        emitterCompanySiret: company.siret,
+      },
     });
 
     const { mutate } = makeClient(user);
@@ -211,9 +211,9 @@ describe("Mutation.updateBsda", () => {
     const input = {
       emitter: {
         company: {
-          name: "Another name"
-        }
-      }
+          name: "Another name",
+        },
+      },
     };
     const { data } = await mutate<
       Pick<Mutation, "updateBsda">,
@@ -221,8 +221,8 @@ describe("Mutation.updateBsda", () => {
     >(UPDATE_BSDA, {
       variables: {
         id: bsda.id,
-        input
-      }
+        input,
+      },
     });
 
     expect(data.updateBsda).toEqual(expect.objectContaining(input));
@@ -233,8 +233,8 @@ describe("Mutation.updateBsda", () => {
     const bsda = await bsdaFactory({
       opt: {
         emitterCompanySiret: company.siret,
-        emitterEmissionSignatureDate: new Date()
-      }
+        emitterEmissionSignatureDate: new Date(),
+      },
     });
 
     const { mutate } = makeClient(user);
@@ -242,9 +242,9 @@ describe("Mutation.updateBsda", () => {
     const input = {
       emitter: {
         company: {
-          name: "Another name"
-        }
-      }
+          name: "Another name",
+        },
+      },
     };
     const { errors } = await mutate<
       Pick<Mutation, "updateBsda">,
@@ -252,15 +252,15 @@ describe("Mutation.updateBsda", () => {
     >(UPDATE_BSDA, {
       variables: {
         id: bsda.id,
-        input
-      }
+        input,
+      },
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: emitter.company.name"
-      })
+          "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: emitter.company.name",
+      }),
     ]);
   });
 
@@ -269,8 +269,8 @@ describe("Mutation.updateBsda", () => {
     const bsda = await bsdaFactory({
       opt: {
         emitterCompanySiret: company.siret,
-        emitterEmissionSignatureDate: new Date()
-      }
+        emitterEmissionSignatureDate: new Date(),
+      },
     });
 
     const { mutate } = makeClient(user);
@@ -278,9 +278,9 @@ describe("Mutation.updateBsda", () => {
     const input = {
       transporter: {
         company: {
-          name: "Another name"
-        }
-      }
+          name: "Another name",
+        },
+      },
     };
     const { data } = await mutate<
       Pick<Mutation, "updateBsda">,
@@ -288,8 +288,8 @@ describe("Mutation.updateBsda", () => {
     >(UPDATE_BSDA, {
       variables: {
         id: bsda.id,
-        input
-      }
+        input,
+      },
     });
 
     expect(data.updateBsda).toEqual(expect.objectContaining(input));
@@ -303,8 +303,8 @@ describe("Mutation.updateBsda", () => {
         emitterCompanySiret: emitter.company.siret,
         transporterCompanySiret: transporter.company.siret,
         emitterEmissionSignatureDate: new Date(),
-        transporterTransportSignatureDate: new Date()
-      }
+        transporterTransportSignatureDate: new Date(),
+      },
     });
 
     const { mutate } = makeClient(emitter.user);
@@ -312,9 +312,9 @@ describe("Mutation.updateBsda", () => {
     const input = {
       transporter: {
         company: {
-          name: "Another name"
-        }
-      }
+          name: "Another name",
+        },
+      },
     };
     const { errors } = await mutate<
       Pick<Mutation, "updateBsda">,
@@ -322,19 +322,19 @@ describe("Mutation.updateBsda", () => {
     >(UPDATE_BSDA, {
       variables: {
         id: bsda.id,
-        input
-      }
+        input,
+      },
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: transporter.company.name"
-      })
+          "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: transporter.company.name",
+      }),
     ]);
   });
 
-  it("should update the list of associated bsdas", async () => {
+  it("should update the list of grouped bsdas", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
@@ -345,28 +345,28 @@ describe("Mutation.updateBsda", () => {
         emitterCompanySiret: emitter.company.siret,
         destinationCompanySiret: destination.company.siret,
         transporterCompanySiret: transporter.company.siret,
-        destinationOperationCode: "D 13"
-      }
+        destinationOperationCode: "D 13",
+      },
     });
-    const bsdaToAssociate = await bsdaFactory({
+    const bsdaToGroup = await bsdaFactory({
       opt: {
         type: "RESHIPMENT",
         status: "AWAITING_CHILD",
         emitterCompanySiret: emitter.company.siret,
         destinationCompanySiret: destination.company.siret,
         transporterCompanySiret: transporter.company.siret,
-        destinationOperationCode: "D 13"
-      }
+        destinationOperationCode: "D 13",
+      },
     });
 
     const bsda = await bsdaFactory({
       opt: {
-        emitterCompanySiret: emitter.company.siret,
-        bsdas: { connect: [{ id: associatedBsda.id }] }
-      }
+        emitterCompanySiret: destination.company.siret,
+        grouping: { connect: [{ id: associatedBsda.id }] },
+      },
     });
 
-    const { mutate } = makeClient(emitter.user);
+    const { mutate } = makeClient(destination.user);
     const { data } = await mutate<
       Pick<Mutation, "updateBsda">,
       MutationUpdateBsdaArgs
@@ -374,18 +374,77 @@ describe("Mutation.updateBsda", () => {
       variables: {
         id: bsda.id,
         input: {
-          associations: [bsdaToAssociate.id]
-        }
-      }
+          grouping: [bsdaToGroup.id],
+        },
+      },
     });
 
-    const associatedBsdas = await prisma.bsda
+    const groupedBsdas = await prisma.bsda
       .findUnique({ where: { id: data.updateBsda.id } })
-      .bsdas();
-    expect(associatedBsdas).toEqual([
+      .grouping();
+    expect(groupedBsdas).toEqual([
       expect.objectContaining({
-        id: bsdaToAssociate.id
-      })
+        id: bsdaToGroup.id,
+      }),
     ]);
+  });
+
+  it("should update the forwarded BSDA", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const oldForwarded = await bsdaFactory({
+      opt: {
+        status: "AWAITING_CHILD",
+        emitterCompanySiret: emitter.company.siret,
+        destinationCompanySiret: destination.company.siret,
+        transporterCompanySiret: transporter.company.siret,
+        destinationOperationCode: "D 13",
+      },
+    });
+
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "INITIAL",
+        emitterCompanySiret: ttr.company.siret,
+        destinationCompanySiret: destination.company.siret,
+        transporterCompanySiret: transporter.company.siret,
+        destinationOperationCode: "D 13",
+        forwarding: { connect: { id: oldForwarded.id } },
+      },
+    });
+
+    const newForwarded = await bsdaFactory({
+      opt: {
+        status: "AWAITING_CHILD",
+        emitterCompanySiret: emitter.company.siret,
+        destinationCompanySiret: ttr.company.siret,
+        transporterCompanySiret: transporter.company.siret,
+        destinationOperationCode: "D 13",
+      },
+    });
+
+    const { mutate } = makeClient(ttr.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input: {
+          forwarding: newForwarded.id,
+        },
+      },
+    });
+
+    expect(errors).toBeUndefined();
+
+    const actualForwarded = await prisma.bsda
+      .findUnique({ where: { id: bsda.id } })
+      .forwarding();
+
+    expect(actualForwarded.id).toEqual(newForwarded.id);
   });
 });

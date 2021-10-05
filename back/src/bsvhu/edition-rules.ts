@@ -4,8 +4,8 @@ import {
   FormCompany,
   BsvhuInput,
   BsvhuIdentification,
-  BsvhuQuantity,
-  BsvhuRecepisse
+  BsvhuWeight,
+  BsvhuRecepisse,
 } from "../generated/graphql/types";
 import { expandVhuFormFromDb } from "./converter";
 
@@ -48,7 +48,7 @@ function recursiveGetNotEditableKeys(
   prevKeys: string[] = []
 ): string[] {
   return Object.keys(updates)
-    .map(key => {
+    .map((key) => {
       const keysList = [...prevKeys, key];
       if (isObject(updates[key])) {
         return recursiveGetNotEditableKeys(
@@ -78,18 +78,18 @@ const companyKeys: Array<keyof FormCompany> = [
   "name",
   "phone",
   "siret",
-  "vatNumber"
+  "vatNumber",
 ];
 
 const identificationKeys: Array<keyof BsvhuIdentification> = [
   "numbers",
-  "type"
+  "type",
 ];
-const quantityKeys: Array<keyof BsvhuQuantity> = ["number", "tons"];
+const weightKeys: Array<keyof BsvhuWeight> = ["value", "isEstimate"];
 const recepisseKeys: Array<keyof BsvhuRecepisse> = [
   "number",
   "validityLimit",
-  "department"
+  "department",
 ];
 
 function nullFieldRule(field: keyof PrismaVhuForm) {
@@ -97,7 +97,7 @@ function nullFieldRule(field: keyof PrismaVhuForm) {
 }
 
 function globalNullFieldRule<Type>(keys: string[], field: keyof PrismaVhuForm) {
-  const rule = item => item[field] == null;
+  const rule = (item) => item[field] == null;
 
   return keys.reduce((prev, cur) => {
     prev[cur] = rule;
@@ -111,7 +111,7 @@ function globalNullFieldRule<Type>(keys: string[], field: keyof PrismaVhuForm) {
 const vhuFormRules: InternalRules<BsvhuInput, PrismaVhuForm> = {
   emitter: {
     agrementNumber: nullFieldRule("emitterEmissionSignatureDate"),
-    company: globalNullFieldRule(companyKeys, "emitterEmissionSignatureDate")
+    company: globalNullFieldRule(companyKeys, "emitterEmissionSignatureDate"),
   },
   destination: {
     type: nullFieldRule("emitterEmissionSignatureDate"),
@@ -119,15 +119,12 @@ const vhuFormRules: InternalRules<BsvhuInput, PrismaVhuForm> = {
     reception: {
       refusalReason: nullFieldRule("destinationOperationSignatureDate"),
       acceptationStatus: nullFieldRule("destinationOperationSignatureDate"),
-      quantity: globalNullFieldRule(
-        quantityKeys,
-        "destinationOperationSignatureDate"
-      ),
+      weight: nullFieldRule("destinationOperationSignatureDate"),
       identification: globalNullFieldRule(
         identificationKeys,
         "destinationOperationSignatureDate"
       ),
-      date: nullFieldRule("destinationOperationSignatureDate")
+      date: nullFieldRule("destinationOperationSignatureDate"),
     },
     operation: {
       code: nullFieldRule("destinationOperationSignatureDate"),
@@ -136,14 +133,14 @@ const vhuFormRules: InternalRules<BsvhuInput, PrismaVhuForm> = {
         company: globalNullFieldRule(
           companyKeys,
           "destinationOperationSignatureDate"
-        )
-      }
+        ),
+      },
     },
     agrementNumber: nullFieldRule("destinationOperationSignatureDate"),
     company: globalNullFieldRule(
       companyKeys,
       "destinationOperationSignatureDate"
-    )
+    ),
   },
   packaging: nullFieldRule("emitterEmissionSignatureDate"),
   identification: globalNullFieldRule(
@@ -151,18 +148,19 @@ const vhuFormRules: InternalRules<BsvhuInput, PrismaVhuForm> = {
     "emitterEmissionSignatureDate"
   ),
   wasteCode: nullFieldRule("emitterEmissionSignatureDate"),
-  quantity: globalNullFieldRule(quantityKeys, "emitterEmissionSignatureDate"),
+  quantity: nullFieldRule("emitterEmissionSignatureDate"),
+  weight: globalNullFieldRule(weightKeys, "emitterEmissionSignatureDate"),
   transporter: {
     company: globalNullFieldRule(
       companyKeys,
       "transporterTransportSignatureDate"
     ),
     transport: {
-      takenOverAt: nullFieldRule("transporterTransportSignatureDate")
+      takenOverAt: nullFieldRule("transporterTransportSignatureDate"),
     },
     recepisse: globalNullFieldRule(
       recepisseKeys,
       "transporterTransportSignatureDate"
-    )
-  }
+    ),
+  },
 };
