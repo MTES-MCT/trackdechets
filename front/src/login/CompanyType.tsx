@@ -74,7 +74,7 @@ export default function CompanyTypeField({
           {COMPANY_TYPES.map((companyType, idx) => (
             <div key={idx}>
               <label
-                style={{ display: "inline-block" }}
+                className="tw-flex tw-items-center"
                 key={companyType.value}
               >
                 <input
