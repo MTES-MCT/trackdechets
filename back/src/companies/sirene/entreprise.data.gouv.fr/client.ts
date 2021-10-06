@@ -8,7 +8,6 @@ import {
   CompanySearchResult
 } from "../types";
 import { AnonymousCompanyError } from "../errors";
-import { searchAnonymousCompany } from "../anonymous";
 
 const SIRENE_API_BASE_URL = "https://entreprise.data.gouv.fr/api/sirene";
 
