@@ -414,6 +414,7 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
     wasteDetailsPackagingInfos: yup
       .array()
       .requiredIf(!isDraft, "Le détail du conditionnement est obligatoire")
+      .min(isDraft ? 0 : 1, "Le nombre de contenants doit être supérieur à 0")
       .of(packagingInfoFn(isDraft))
       .test(
         "is-valid-packaging-infos",
