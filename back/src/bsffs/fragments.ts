@@ -156,17 +156,13 @@ export const fullBsff = gql`
       id
     }
     grouping {
-      bsff {
-        id
-        ficheInterventions {
-          ...FullFicheIntervention
-        }
+      id
+      ficheInterventions {
+        ...FullFicheIntervention
       }
     }
     groupedIn {
-      bsff {
-        id
-      }
+      id
     }
   }
   ${fullFicheIntervention}

@@ -139,8 +139,6 @@ const signatures: Record<
     );
 
     if (status === BsffStatus.PROCESSED && previousBsffsIds.length > 0) {
-      // FIXME this is not exactly correct if a BSFF in the history has been
-      // split during groupement because we need to check all splits has been processed
       await prisma.bsff.updateMany({
         data: {
           status: BsffStatus.PROCESSED

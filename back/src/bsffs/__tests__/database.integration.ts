@@ -29,10 +29,7 @@ describe("getBsffHistory", () => {
       {
         id: "bsff6",
         grouping: {
-          create: [
-            { previousId: bsff4.id, weight: 1 },
-            { previousId: bsff5.id, weight: 1 }
-          ]
+          connect: [{ id: bsff4.id }, { id: bsff5.id }]
         }
       }
     );

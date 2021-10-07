@@ -180,7 +180,7 @@ async function validatePreviousBsffs(
     include: {
       forwardedIn: true,
       repackagedIn: true,
-      groupedIn: { include: { next: true } }
+      groupedIn: true
     }
   });
 
@@ -202,7 +202,7 @@ async function validatePreviousBsffs(
     const nextBsffs = [
       ...(forwardedIn ? [forwardedIn] : []),
       ...(repackagedIn ? [repackagedIn] : []),
-      ...groupedIn.map(bsffSplit => bsffSplit.next)
+      ...(groupedIn ? [groupedIn] : [])
     ];
     if (
       nextBsffs.length > 0 &&
@@ -211,18 +211,6 @@ async function validatePreviousBsffs(
       return acc.concat([
         `Le bordereau n°${previousBsff.id} a déjà été réexpédié, reconditionné ou groupé.`
       ]);
-    }
-
-    if (previousBsff.groupedIn?.length > 0) {
-      const alreadyGroupedWeight = previousBsff.groupedIn.reduce(
-        (acc, { weight }) => {
-          return acc + weight;
-        },
-        0
-      );
-      if (previousBsff.destinationReceptionWeight >= alreadyGroupedWeight) {
-        `La totalité du bordereau n°${previousBsff.id} a déjà été groupé`;
-      }
     }
 
     const operation =

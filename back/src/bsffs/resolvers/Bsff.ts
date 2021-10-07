@@ -1,11 +1,7 @@
 import prisma from "../../prisma";
 import { BsffResolvers } from "../../generated/graphql/types";
 import { toInitialBsff, unflattenBsff } from "../converter";
-import {
-  getFicheInterventions,
-  getGroupingBsffsSplits,
-  getGroupedBsffsSplits
-} from "../database";
+import { getFicheInterventions } from "../database";
 
 export const Bsff: BsffResolvers = {
   ficheInterventions: async ({ id }, _, context) => {
@@ -42,18 +38,16 @@ export const Bsff: BsffResolvers = {
       .repackaging();
     return repackagedBsffs.map(bsff => toInitialBsff(unflattenBsff(bsff)));
   },
-  grouping: async ({ id }) => {
-    const bsffSplits = await getGroupedBsffsSplits(id);
-    return bsffSplits.map(({ bsff, weight }) => ({
-      bsff: toInitialBsff(unflattenBsff(bsff)),
-      weight
-    }));
-  },
   groupedIn: async ({ id }) => {
-    const bsffSplits = await getGroupingBsffsSplits(id);
-    return bsffSplits.map(({ bsff, weight }) => ({
-      bsff: unflattenBsff(bsff),
-      weight
-    }));
+    const groupingBsff = await prisma.bsff
+      .findUnique({ where: { id } })
+      .repackagedIn();
+    return groupingBsff ? unflattenBsff(groupingBsff) : null;
+  },
+  grouping: async ({ id }) => {
+    const groupedBsffs = await prisma.bsff
+      .findUnique({ where: { id } })
+      .grouping();
+    return groupedBsffs.map(bsff => toInitialBsff(unflattenBsff(bsff)));
   }
 };

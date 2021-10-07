@@ -141,7 +141,7 @@ describe("Mutation.createDraftBsff", () => {
                 mail: destination.user.email
               }
             },
-            grouping: [{ bsffId: previousBsff.id }]
+            grouping: [previousBsff.id]
           }
         }
       });
@@ -255,9 +255,7 @@ describe("Mutation.createDraftBsff", () => {
                 mail: destination.user.email
               }
             },
-            grouping: previousBsffs.map(previousBsff => ({
-              bsffId: previousBsff.id
-            }))
+            grouping: previousBsffs.map(previousBsff => previousBsff.id)
           }
         }
       });
@@ -301,7 +299,7 @@ describe("Mutation.createDraftBsff", () => {
                 mail: destination.user.email
               }
             },
-            grouping: [{ bsffId: previousBsff.id }]
+            grouping: [previousBsff.id]
           }
         }
       });
@@ -350,9 +348,7 @@ describe("Mutation.createDraftBsff", () => {
                 mail: transporter.user.email
               }
             },
-            grouping: previousBsffs.map(previousBsff => ({
-              bsffId: previousBsff.id
-            }))
+            grouping: previousBsffs.map(previousBsff => previousBsff.id)
           }
         }
       });
@@ -400,9 +396,7 @@ describe("Mutation.createDraftBsff", () => {
                 mail: transporter.user.email
               }
             },
-            grouping: previousBsffs.map(previousBsff => ({
-              bsffId: previousBsff.id
-            }))
+            grouping: previousBsffs.map(previousBsff => previousBsff.id)
           }
         }
       });
@@ -423,7 +417,7 @@ describe("Mutation.createDraftBsff", () => {
           {
             status: BsffStatus.INTERMEDIATELY_PROCESSED,
             destinationOperationCode: OPERATION.R12.code,
-            groupedIn: { create: { nextId: anotherGroupingBsff.id, weight: 1 } }
+            groupedIn: { connect: { id: anotherGroupingBsff.id } }
           }
         ),
         createBsffAfterOperation(
@@ -451,9 +445,7 @@ describe("Mutation.createDraftBsff", () => {
                 mail: transporter.user.email
               }
             },
-            grouping: previousBsffs.map(previousBsff => ({
-              bsffId: previousBsff.id
-            }))
+            grouping: previousBsffs.map(previousBsff => previousBsff.id)
           }
         }
       });

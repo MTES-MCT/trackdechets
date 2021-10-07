@@ -4,11 +4,7 @@ import { Prisma, Bsff } from "@prisma/client";
 import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
-  getBsffCreateGroupementInput,
-  getBsffOrNotFound,
-  getGroupedBsffs
-} from "../../database";
+import { getBsffOrNotFound } from "../../database";
 import { flattenBsffInput, unflattenBsff } from "../../converter";
 import { isBsffContributor } from "../../permissions";
 import { validateBsff } from "../../validation";
@@ -97,16 +93,15 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     ? await prisma.bsff.findUnique({ where: { id: existingBsff.forwardingId } })
     : null;
 
-  const repackagedBsffs = input.repackaging
-    ? await prisma.bsff.findMany({ where: { id: { in: input.repackaging } } })
-    : await prisma.bsff.findFirst({ where: { id } }).repackaging();
+  const repackagedBsffs =
+    input.repackaging?.length > 0
+      ? await prisma.bsff.findMany({ where: { id: { in: input.repackaging } } })
+      : await prisma.bsff.findFirst({ where: { id } }).repackaging();
 
   const groupedBsffs =
     input.grouping?.length > 0
-      ? await prisma.bsff.findMany({
-          where: { id: { in: input.grouping.map(({ bsffId }) => bsffId) } }
-        })
-      : await getGroupedBsffs(existingBsff.id);
+      ? await prisma.bsff.findMany({ where: { id: { in: input.grouping } } })
+      : await prisma.bsff.findFirst({ where: { id } }).grouping();
 
   const isForwarding = !!forwardedBsff;
   const isRepackaging = repackagedBsffs.length > 0;
@@ -136,28 +131,16 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   const data: Prisma.BsffUpdateInput = flatInput;
 
   if (input.grouping?.length > 0) {
-    // delete current groupement
-    await prisma.bsffGroupement.deleteMany({
-      where: { nextId: existingBsff.id }
-    });
-    data.grouping = await getBsffCreateGroupementInput(input.grouping);
+    data.grouping = {
+      set: input.grouping.map(id => ({
+        id
+      }))
+    };
   }
 
   if (input.repackaging?.length > 0) {
-    // disconnect current relations
-    const currentRepackaging = await prisma.bsff
-      .findFirst({ where: { id } })
-      .repackaging();
-    await prisma.bsff.update({
-      where: { id },
-      data: {
-        repackaging: {
-          disconnect: currentRepackaging.map(({ id }) => ({ id }))
-        }
-      }
-    });
     data.repackaging = {
-      connect: input.repackaging.map(id => ({
+      set: input.repackaging.map(id => ({
         id
       }))
     };
