@@ -287,9 +287,7 @@ describe("Query.bsffs", () => {
               id: bsff.id,
               grouping: [
                 expect.objectContaining({
-                  bsff: expect.objectContaining({
-                    id: previousBsff.id
-                  })
+                  id: previousBsff.id
                 })
               ]
             })
@@ -357,14 +355,12 @@ describe("Query.bsffs", () => {
               id: bsff.id,
               grouping: [
                 expect.objectContaining({
-                  bsff: expect.objectContaining({
-                    id: previousBsff.id,
-                    ficheInterventions: [
-                      expect.objectContaining({
-                        detenteur: null
-                      })
-                    ]
-                  })
+                  id: previousBsff.id,
+                  ficheInterventions: [
+                    expect.objectContaining({
+                      detenteur: null
+                    })
+                  ]
                 })
               ]
             })

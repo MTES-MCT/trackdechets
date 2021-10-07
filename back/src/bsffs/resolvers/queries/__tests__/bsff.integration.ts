@@ -186,16 +186,12 @@ describe("Query.bsff", () => {
 
     expect(data.bsff).toEqual(
       expect.objectContaining({
-        grouping: [
-          {
-            bsff: expect.objectContaining({ id: previousBsff.id })
-          }
-        ]
+        grouping: [expect.objectContaining({ id: previousBsff.id })]
       })
     );
   });
 
-  it("should list the BSFF this one has been grouped into", async () => {
+  it("should return the BSFF this one has been grouped into", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
@@ -221,7 +217,7 @@ describe("Query.bsff", () => {
 
     expect(data.bsff).toEqual(
       expect.objectContaining({
-        groupedIn: [expect.objectContaining({ id: nextBsff.id })]
+        groupedIn: expect.objectContaining({ id: nextBsff.id })
       })
     );
   });
