@@ -173,12 +173,7 @@ describe("Query.bsff", () => {
         emitter: destination
       },
       {
-        grouping: {
-          create: {
-            previousId: previousBsff.id,
-            weight: 1
-          }
-        }
+        grouping: { connect: [{ id: previousBsff.id }] }
       }
     );
 
@@ -200,7 +195,7 @@ describe("Query.bsff", () => {
     );
   });
 
-  it("should list the BSFFs this one has been grouped into", async () => {
+  it("should list the BSFF this one has been grouped into", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
@@ -210,32 +205,11 @@ describe("Query.bsff", () => {
       transporter,
       destination
     });
-    const nextBsff1 = await createBsff(
+    const nextBsff = await createBsff(
       {
         emitter: destination
       },
-      {
-        grouping: {
-          create: {
-            previousId: bsff.id,
-            weight: 0.5
-          }
-        }
-      }
-    );
-
-    const nextBsff2 = await createBsff(
-      {
-        emitter: destination
-      },
-      {
-        grouping: {
-          create: {
-            previousId: bsff.id,
-            weight: 0.5
-          }
-        }
-      }
+      { grouping: { connect: [{ id: bsff.id }] } }
     );
 
     const { query } = makeClient(destination.user);
@@ -247,14 +221,7 @@ describe("Query.bsff", () => {
 
     expect(data.bsff).toEqual(
       expect.objectContaining({
-        groupedIn: [
-          {
-            bsff: { id: nextBsff1.id }
-          },
-          {
-            bsff: { id: nextBsff2.id }
-          }
-        ]
+        groupedIn: [expect.objectContaining({ id: nextBsff.id })]
       })
     );
   });

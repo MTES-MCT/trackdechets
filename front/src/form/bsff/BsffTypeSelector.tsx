@@ -130,7 +130,7 @@ function PreviousBsffsPicker({
   const pickableBsffs = data.bsffs.edges
     .map(({ node: bsff }) => bsff)
     .filter(bsff => {
-      return !bsff.groupedIn.length && !bsff.repackagedIn && !bsff.forwardedIn;
+      return !bsff.groupedIn && !bsff.repackagedIn && !bsff.forwardedIn;
     });
 
   return (

@@ -91,14 +91,10 @@ export const FullBsffFragment = gql`
       ...FicheInterventionFragment
     }
     grouping {
-      bsff {
-        id
-      }
+      id
     }
     groupedIn {
-      bsff {
-        id
-      }
+      id
     }
     repackaging {
       id

@@ -272,7 +272,7 @@ describe("Query.bsffs", () => {
     it("should list the grouping bsffs", async () => {
       const bsff = await createBsff(
         { emitter, transporter, destination },
-        { grouping: { create: [{ previousId: previousBsff.id, weight: 1 }] } }
+        { grouping: { connect: [{ id: previousBsff.id }] } }
       );
 
       const { query } = makeClient(emitter.user);
@@ -301,7 +301,7 @@ describe("Query.bsffs", () => {
     it("should show the detenteur from the fiche d'interventions to companies on the bsff", async () => {
       const bsff = await createBsff(
         { emitter, transporter, destination },
-        { grouping: { create: [{ previousId: previousBsff.id, weight: 1 }] } }
+        { grouping: { connect: [{ id: previousBsff.id }] } }
       );
 
       const { query } = makeClient(destination.user);
@@ -342,7 +342,7 @@ describe("Query.bsffs", () => {
 
       const bsff = await createBsff(
         { emitter: destination, transporter, destination: newDestination },
-        { grouping: { create: [{ previousId: previousBsff.id, weight: 1 }] } }
+        { grouping: { connect: [{ id: previousBsff.id }] } }
       );
 
       const { query } = makeClient(newDestination.user);
