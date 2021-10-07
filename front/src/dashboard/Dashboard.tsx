@@ -23,7 +23,6 @@ import { ExtraSignatureType } from "dashboard/components/BSDList/BSDasri/types";
 
 import { Query, BsdasriSignatureType } from "generated/graphql/types";
 import Stats from "./stats/Stats";
-import { DisclaimerBanner } from "./DisclaimerBanner";
 import {
   RouteBsdsAct,
   RouteBsdsDrafts,
@@ -111,7 +110,6 @@ export default function Dashboard() {
         />
 
         <div className="dashboard-content">
-          <DisclaimerBanner />
           <Switch location={backgroundLocation ?? location}>
             <Route path="/dashboard/:siret/slips/view/:id" exact>
               {({
