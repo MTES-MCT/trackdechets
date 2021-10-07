@@ -227,15 +227,21 @@ type BsffDestination {
   "Champ libre"
   customInfo: String
 }
+
+type BsffAcceptation {
+  "Accepté ou refusé"
+  status: BsffAcceptationStatus!
+  "En cas de refus, la raison"
+  refusalReason: String
+}
+
 type BsffReception {
   "Date de réception du déchet."
   date: DateTime!
   "Quantité totale du déchet en kilogrammes, qu'elle soit réelle ou estimée. Doit être à 0 dans le cas d'un refus"
   weight: Float!
-  "Accepté ou refusé"
-  acceptationStatus: BsffAcceptationStatus
-  "En cas de refus, le motif."
-  refusalReason: String
+  "Statut d'acceptation du déchet"
+  acceptation: BsffAcceptation
   "Signature de la destination lors de l'acceptation ou du refus du déchet."
   signature: Signature
 }

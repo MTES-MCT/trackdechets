@@ -61,10 +61,10 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
         receptionWeight:
           bsff.destination?.reception?.weight ?? bsff.weight?.value ?? 0,
         receptionAcceptationStatus:
-          bsff.destination?.reception?.acceptationStatus ??
+          bsff.destination?.reception?.acceptation?.status ??
           BsffAcceptationStatus.Accepted,
         receptionRefusalReason:
-          bsff.destination?.reception?.refusalReason ?? null,
+          bsff.destination?.reception?.acceptation?.refusalReason ?? null,
         signatureAuthor: "",
       }}
       validationSchema={validationSchema}
@@ -77,8 +77,10 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
                 reception: {
                   date: values.receptionDate,
                   weight: values.receptionWeight,
-                  refusalReason: values.receptionRefusalReason,
-                  acceptationStatus: values.receptionAcceptationStatus,
+                  acceptation: {
+                    status: values.receptionAcceptationStatus,
+                    refusalReason: values.receptionRefusalReason,
+                  },
                 },
               },
             },

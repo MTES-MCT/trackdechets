@@ -113,12 +113,19 @@ input BsffDestinationInput {
   "Champ libre"
   customInfo: String
 }
+
+input BsffAcceptationInput {
+  "Accepté ou refusé"
+  status: BsffAcceptationStatus!
+  "En cas de refus, la raison"
+  refusalReason: String
+}
+
 input BsffDestinationReceptionInput {
   date: DateTime!
   "Poids en kilogrammes"
   weight: Float!
-  acceptationStatus: BsffAcceptationStatus!
-  refusalReason: String
+  acceptation: BsffAcceptationInput!
 }
 
 input BsffOperationNextDestinationInput {
