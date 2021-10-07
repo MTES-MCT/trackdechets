@@ -33,11 +33,10 @@ export class UpdateBsff implements Updater {
             }))
           };
         }
-        if (bsff.type === BsffType.RECONDITIONNEMENT) {
+        if (bsff.type === BsffType.GROUPEMENT) {
           data.grouping = {
-            create: bsff.previousBsffs.map(previousBsff => ({
-              previousId: previousBsff.id,
-              weight: previousBsff.destinationReceptionWeight
+            connect: bsff.previousBsffs.map(previousBsff => ({
+              id: previousBsff.id
             }))
           };
         }

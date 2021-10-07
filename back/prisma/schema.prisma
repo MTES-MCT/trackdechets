@@ -896,8 +896,10 @@ model Bsff {
 
   ficheInterventions BsffFicheIntervention[] @relation("FicheInterventionToBsff")
 
-  groupedIn BsffGroupement[] @relation("RegroupedIn")
-  grouping  BsffGroupement[] @relation("Regrouping")
+  grouping    Bsff[]  @relation("Grouping")
+  groupedIn   Bsff?   @relation("Grouping", fields: [groupedInId], references: [id])
+  groupedInId String?
+
 
   repackaging    Bsff[]  @relation("Repackaging")
   repackagedIn   Bsff?   @relation("Repackaging", fields: [repackagedInId], references: [id])
@@ -913,14 +915,6 @@ model Bsff {
   nextBsffId    String?
 }
 
-model BsffGroupement {
-  id         String @id @default(cuid())
-  previous   Bsff   @relation("RegroupedIn", fields: [previousId], references: [id])
-  previousId String
-  next       Bsff   @relation("Regrouping", fields: [nextId], references: [id])
-  nextId     String
-  weight     Float
-}
 
 enum BsffType {
   TRACER_FLUIDE
