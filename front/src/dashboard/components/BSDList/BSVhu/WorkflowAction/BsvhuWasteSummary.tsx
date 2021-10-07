@@ -31,15 +31,15 @@ export function BsvhuWasteSummary({ bsvhu }: Props) {
       <DataListItem>
         <DataListTerm>Nombre & poids</DataListTerm>
         <DataListDescription>
-          {bsvhu.destination?.reception?.quantity?.number == null ? (
+          {bsvhu.destination?.reception?.quantity == null ? (
             <>
-              {bsvhu.quantity?.number ?? 0} unité(s){" "}
-              {bsvhu.quantity?.tons && <>(tonne(s))</>}
+              {bsvhu.quantity ?? 0} unité(s){" "}
+              {bsvhu.weight?.value && <>(tonne(s))</>}
             </>
           ) : (
             <>
-              {bsvhu.destination.reception.quantity.number} unité(s){" "}
-              {bsvhu.destination.reception.quantity?.tons && <>(tonne(s))</>}
+              {bsvhu.destination.reception.quantity} unité(s){" "}
+              {bsvhu.destination.reception.weight && <>(tonne(s))</>}
             </>
           )}
         </DataListDescription>

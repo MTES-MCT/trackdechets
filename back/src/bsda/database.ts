@@ -1,10 +1,10 @@
-import { Bsda, Prisma } from "@prisma/client";
+import { Bsda } from "@prisma/client";
 import { FormNotFound } from "../forms/errors";
 import prisma from "../prisma";
 
 export async function getBsdaOrNotFound(id: string) {
   const form = await prisma.bsda.findUnique({
-    where: { id },
+    where: { id }
   });
 
   if (form == null || form.isDeleted == true) {
@@ -35,7 +35,7 @@ export async function getPreviousBsdas(bsda: Bsda) {
 export async function getBsdaHistory(bsda: Bsda): Promise<Bsda[]> {
   async function recursiveGetBsdaHistory(bsdas: Bsda[], history: Bsda[]) {
     const previous = await Promise.all(
-      bsdas.map((bsda) => getPreviousBsdas(bsda))
+      bsdas.map(bsda => getPreviousBsdas(bsda))
     );
     const previousFlattened = previous.reduce((ps, curr) => {
       return [...ps, ...curr];
@@ -45,7 +45,7 @@ export async function getBsdaHistory(bsda: Bsda): Promise<Bsda[]> {
     }
     return recursiveGetBsdaHistory(previousFlattened, [
       ...previousFlattened,
-      ...history,
+      ...history
     ]);
   }
 

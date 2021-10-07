@@ -54,7 +54,7 @@ function duplicateForm({
       ...rest,
       id: getReadableId(ReadableIdPrefix.BSDA),
       status: BsdaStatus.INITIAL,
-      isDraft: true,
-    },
+      isDraft: true
+    }
   });
 }

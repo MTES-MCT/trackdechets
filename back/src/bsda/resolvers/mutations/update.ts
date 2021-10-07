@@ -44,7 +44,7 @@ export default async function edit(
   const groupedBsdas =
     input.grouping?.length > 0
       ? await prisma.bsda.findMany({
-          where: { id: { in: input.grouping } },
+          where: { id: { in: input.grouping } }
         })
       : await prisma.bsda
           .findUnique({ where: { id: existingBsda.id } })
@@ -53,7 +53,7 @@ export default async function edit(
   const isForwarding = Boolean(forwardedBsda);
   const isGrouping = groupedBsdas.length > 0;
 
-  if ([isForwarding, isGrouping].filter((b) => b).length > 1) {
+  if ([isForwarding, isGrouping].filter(b => b).length > 1) {
     throw new UserInputError(
       "Les opérations d'entreposage provisoire et groupement ne sont pas compatibles entre elles"
     );
@@ -66,8 +66,7 @@ export default async function edit(
     workSignature: existingBsda.workerWorkSignatureAuthor != null,
     operationSignature:
       existingBsda.destinationOperationSignatureAuthor != null,
-    transportSignature:
-      existingBsda.transporterTransportSignatureAuthor != null,
+    transportSignature: existingBsda.transporterTransportSignatureAuthor != null
   });
 
   const updatedBsda = await prisma.bsda.update({
@@ -75,12 +74,12 @@ export default async function edit(
     data: {
       ...data,
       ...(isGrouping && {
-        grouping: { set: input.grouping.map((id) => ({ id })) },
+        grouping: { set: input.grouping.map(id => ({ id })) }
       }),
       ...(isForwarding && {
-        forwarding: { connect: { id: input.forwarding } },
-      }),
-    },
+        forwarding: { connect: { id: input.forwarding } }
+      })
+    }
   });
 
   await indexBsda(updatedBsda, context);

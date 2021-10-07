@@ -3,14 +3,14 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkSecurityCode } from "../../../forms/permissions";
 import {
   BsdaSignatureType,
-  MutationSignBsdaArgs,
+  MutationSignBsdaArgs
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import {
   AlreadySignedError,
-  InvalidSignatureError,
+  InvalidSignatureError
 } from "../../../bsvhu/errors";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaHistory, getBsdaOrNotFound } from "../../database";
@@ -60,12 +60,12 @@ export default async function sign(
       input.type === "TRANSPORT",
     operationSignature:
       prismaForm.destinationOperationSignatureDate != null ||
-      input.type === "OPERATION",
+      input.type === "OPERATION"
   });
 
   const { value: newStatus } = machine.transition(prismaForm.status, {
     type: input.type,
-    bsda: prismaForm,
+    bsda: prismaForm
   });
 
   if (newStatus === prismaForm.status) {
@@ -78,24 +78,24 @@ export default async function sign(
       [signatureTypeInfos.dbAuthorKey]: input.author,
       [signatureTypeInfos.dbDateKey]: new Date(input.date),
       isDraft: false,
-      status: newStatus as BsdaStatus,
-    },
+      status: newStatus as BsdaStatus
+    }
   });
 
   if (newStatus === BsdaStatus.PROCESSED) {
     const previousBsdas = await getBsdaHistory(signedBsda);
     await prisma.bsda.updateMany({
       data: {
-        status: BsdaStatus.PROCESSED,
+        status: BsdaStatus.PROCESSED
       },
       where: {
-        id: { in: previousBsdas.map((bsff) => bsff.id) },
-      },
+        id: { in: previousBsdas.map(bsff => bsff.id) }
+      }
     });
     const updatedBsdas = await prisma.bsda.findMany({
-      where: { id: { in: previousBsdas.map((bsff) => bsff.id) } },
+      where: { id: { in: previousBsdas.map(bsff => bsff.id) } }
     });
-    await Promise.all(updatedBsdas.map((bsda) => indexBsda(bsda)));
+    await Promise.all(updatedBsdas.map(bsda => indexBsda(bsda)));
   }
 
   await indexBsda(signedBsda, context);
@@ -107,23 +107,23 @@ const signatureTypeMapping: Record<BsdaSignatureType, SignatureTypeInfos> = {
   EMISSION: {
     dbDateKey: "emitterEmissionSignatureDate",
     dbAuthorKey: "emitterEmissionSignatureAuthor",
-    getAuthorizedSiret: (form) => form.emitterCompanySiret,
+    getAuthorizedSiret: form => form.emitterCompanySiret
   },
   WORK: {
     dbDateKey: "workerWorkSignatureDate",
     dbAuthorKey: "workerWorkSignatureAuthor",
-    getAuthorizedSiret: (form) => form.workerCompanySiret,
+    getAuthorizedSiret: form => form.workerCompanySiret
   },
   OPERATION: {
     dbDateKey: "destinationOperationSignatureDate",
     dbAuthorKey: "destinationOperationSignatureAuthor",
-    getAuthorizedSiret: (form) => form.destinationCompanySiret,
+    getAuthorizedSiret: form => form.destinationCompanySiret
   },
   TRANSPORT: {
     dbDateKey: "transporterTransportSignatureDate",
     dbAuthorKey: "transporterTransportSignatureAuthor",
-    getAuthorizedSiret: (form) => form.transporterCompanySiret,
-  },
+    getAuthorizedSiret: form => form.transporterCompanySiret
+  }
 };
 
 function checkAuthorization(

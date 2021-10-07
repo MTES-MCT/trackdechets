@@ -2,7 +2,6 @@
 ALTER TABLE "Bsda"
   RENAME COLUMN "quantityValue" TO "weightValue",
   ADD COLUMN    "weightIsEstimate" BOOLEAN,
-  DROP COLUMN "quantityType",
   DROP COLUMN "destinationReceptionQuantityType",
   RENAME COLUMN "destinationReceptionQuantityValue" TO "destinationReceptionWeight",
   RENAME COLUMN "emitterWorkSiteName" TO "emitterPickupSiteName",

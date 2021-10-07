@@ -58,7 +58,7 @@ export function BsvhuDetailContent({ form }: Props) {
               value={form.updatedAt}
               label="Dernière action sur le BSD"
             />
-            <DetailRow value={form.quantity?.number} label="Quantité" />
+            <DetailRow value={form.quantity} label="Quantité" />
             <dt>Code déchet</dt>
             <dd>{form.wasteCode}</dd>
           </div>
@@ -123,7 +123,7 @@ function Company({ company, label }: CompanyProps) {
 }
 
 function Emitter({ form }: { form: Bsvhu }) {
-  const { emitter, quantity, packaging, identification } = form;
+  const { emitter, quantity, packaging, identification, weight } = form;
   return (
     <div className={styles.detailColumns}>
       <div className={styles.detailGrid}>
@@ -147,8 +147,8 @@ function Emitter({ form }: { form: Bsvhu }) {
           label="Conditionnement"
         />
 
-        <DetailRow value={quantity?.number} label="Quantité" />
-        <DetailRow value={quantity?.tons} label="Poids" units="tonnes" />
+        <DetailRow value={quantity} label="Quantité" />
+        <DetailRow value={weight?.value} label="Poids" units="tonnes" />
       </div>
       <div className={styles.detailGrid}>
         <DateRow value={emitter?.emission?.signature?.date} label="Signé le" />
@@ -162,7 +162,7 @@ function Emitter({ form }: { form: Bsvhu }) {
 }
 
 function Transporter({ form }: { form: Bsvhu }) {
-  const { transporter, identification, packaging, quantity } = form;
+  const { transporter, identification, packaging, quantity, weight } = form;
   return (
     <>
       <div className={styles.detailGrid}>
@@ -200,8 +200,8 @@ function Transporter({ form }: { form: Bsvhu }) {
           label="Conditionnement"
         />
 
-        <DetailRow value={quantity?.number} label="Quantité" />
-        <DetailRow value={quantity?.tons} label="Poids" units="tonnes" />
+        <DetailRow value={quantity} label="Quantité" />
+        <DetailRow value={weight?.value} label="Poids" units="tonnes" />
       </div>
       <div className={`${styles.detailGrid} `}>
         <DateRow
@@ -223,7 +223,7 @@ function Transporter({ form }: { form: Bsvhu }) {
 }
 
 function Destination({ form }: { form: Bsvhu }) {
-  const { destination, quantity, identification, packaging } = form;
+  const { destination, quantity, identification, packaging, weight } = form;
 
   return (
     <>
@@ -248,8 +248,8 @@ function Destination({ form }: { form: Bsvhu }) {
           label="Conditionnement"
         />
 
-        <DetailRow value={quantity?.number} label="Quantité" />
-        <DetailRow value={quantity?.tons} label="Poids" units="tonnes" />
+        <DetailRow value={quantity} label="Quantité" />
+        <DetailRow value={weight?.value} label="Poids" units="tonnes" />
         <DetailRow value={destination?.agrementNumber} label="Agrément" />
         <DetailRow
           value={destination?.plannedOperationCode}
@@ -268,11 +268,11 @@ function Destination({ form }: { form: Bsvhu }) {
           label="Motif de refus"
         />
         <DetailRow
-          value={destination?.reception?.quantity?.number}
+          value={destination?.reception?.quantity}
           label="Quantité réelle reçue"
         />
         <DetailRow
-          value={destination?.reception?.quantity?.tons}
+          value={destination?.reception?.weight}
           label="Poids réel reçu"
           units="tonnes"
         />

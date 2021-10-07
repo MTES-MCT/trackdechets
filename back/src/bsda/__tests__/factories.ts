@@ -3,15 +3,15 @@ import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
 
 export const bsdaFactory = async ({
-  opt = {},
+  opt = {}
 }: {
   opt?: Partial<Prisma.BsdaCreateInput>;
 }) => {
   const formParams = { ...getBsdaObject(), ...opt };
   return prisma.bsda.create({
     data: {
-      ...formParams,
-    },
+      ...formParams
+    }
   });
 };
 
@@ -38,7 +38,7 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
 
   packagings: [
     { type: "PALETTE_FILME", quantity: 1 },
-    { type: "BIG_BAG", quantity: 2 },
+    { type: "BIG_BAG", quantity: 2 }
   ],
   weightIsEstimate: false,
   weightValue: 25.4,
@@ -74,5 +74,5 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   workerCompanyAddress: "1 route du travail, Travaux city",
   workerCompanyContact: "Jack Travaux",
   workerCompanyPhone: "05 05 05 05 05",
-  workerCompanyMail: "travaux@td.io",
+  workerCompanyMail: "travaux@td.io"
 });

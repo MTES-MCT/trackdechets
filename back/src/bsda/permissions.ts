@@ -1,10 +1,7 @@
-import { User, Bsda, BsdaStatus, BsdaType } from "@prisma/client";
-import { ForbiddenError, UserInputError } from "apollo-server-express";
+import { Bsda, BsdaStatus, User } from "@prisma/client";
+import { ForbiddenError } from "apollo-server-express";
 import { NotFormContributor } from "../forms/errors";
-import { BsdaInput } from "../generated/graphql/types";
-import prisma from "../prisma";
 import { getFullUser } from "../users/database";
-import { getBsdaOrNotFound } from "./database";
 
 export async function checkIsBsdaContributor(
   user: User,
@@ -31,7 +28,7 @@ export async function checkIsBsdaContributor(
 
 export async function isBsdaContributor(user: User, form: Partial<Bsda>) {
   const fullUser = await getFullUser(user);
-  const userSirets = fullUser.companies.map((c) => c.siret);
+  const userSirets = fullUser.companies.map(c => c.siret);
 
   const formSirets = [
     form.emitterCompanySiret,
@@ -41,9 +38,7 @@ export async function isBsdaContributor(user: User, form: Partial<Bsda>) {
     form.brokerCompanySiret
   ];
 
-  const siretsInCommon = userSirets.filter((siret) =>
-    formSirets.includes(siret)
-  );
+  const siretsInCommon = userSirets.filter(siret => formSirets.includes(siret));
 
   return siretsInCommon.length;
 }

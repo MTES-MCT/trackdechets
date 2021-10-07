@@ -34,7 +34,7 @@ export default async function create(
 
   const updatedBsda = await prisma.bsda.update({
     where: { id },
-    data: { isDraft: false },
+    data: { isDraft: false }
   });
 
   await indexBsda(updatedBsda, context);

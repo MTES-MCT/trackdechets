@@ -4,8 +4,8 @@ ALTER TABLE "Bsvhu"
   RENAME COLUMN "quantityTons" TO "weightValue",
   RENAME COLUMN "destinationReceptionQuantityNumber" TO "destinationReceptionQuantity",
   RENAME COLUMN "destinationReceptionQuantityTons" TO "destinationReceptionWeight",
-  ADD COLUMN    "destinationOperationNextDestinationCompanyVatNumber" TEXT,
   ADD COLUMN    "weightIsEstimate" BOOLEAN,
+  ADD COLUMN    "destinationOperationNextDestinationCompanyVatNumber" TEXT,
   ADD COLUMN    "emitterCustomInfo" TEXT,
   ADD COLUMN    "destinationCustomInfo" TEXT,
   ADD COLUMN    "transporterCustomInfo" TEXT;
