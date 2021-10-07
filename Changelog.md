@@ -10,13 +10,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 #### :boom: Breaking changes
- 
+
 #### :bug: Corrections de bugs
- 
 #### :nail_care: Améliorations
-
 - À la création d'une entreprise, le réglage "j'autorise l'emport direct de dasris" est proposé [PR 1006](https://github.com/MTES-MCT/trackdechets/pull/1006)
-
+- Ajout d'un message d'erreur lorsque l'on requête un établissement non diffusable [PR 1009](https://github.com/MTES-MCT/trackdechets/pull/1009)
 #### :memo: Documentation
 
 #### :house: Interne
