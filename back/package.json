@@ -21,7 +21,7 @@
     "generate:prisma": "npx prisma generate",
     "generate:graphql": "graphql-codegen --config codegen.yml",
     "prebuild": "npm run generate",
-    "build": "tsc && copyfiles -e **/*.ts src/**/*.{graphql,pdf,png,ttf,html,css} prisma/**/*.{prisma,sql} dist/",
+    "build": "tsc && copyfiles -e **/*.ts src/**/*.{graphql,pdf,png,ttf,html,css,svg} prisma/**/*.{prisma,sql} dist/",
     "scalingo-postbuild": "npm run build && npm prune --production && cd dist && npm run migrate && npm run index-elastic-search",
     "lint": "eslint -c .eslintrc.js --ext .ts ./src",
     "lint:fix": "eslint -c .eslintrc.js --fix --ext .ts ./src",
