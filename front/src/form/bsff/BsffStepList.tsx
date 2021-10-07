@@ -96,9 +96,7 @@ export default function BsffStepsList(props: Props) {
           : [],
       grouping:
         input.type === BsffType.Groupement
-          ? previousBsffs.map(previousBsff => ({
-              bsffId: previousBsff.id,
-            }))
+          ? previousBsffs.map(previousBsff => previousBsff.id)
           : [],
     })
       .then(_ => {
