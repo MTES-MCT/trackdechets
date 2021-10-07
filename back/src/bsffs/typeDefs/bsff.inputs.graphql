@@ -42,16 +42,6 @@ input SignatureInput {
   author: String!
 }
 
-input BsffSplitInput {
-  "Identifiant du bordereau initial inclus dans le groupement"
-  bsffId: ID!
-  """
-  Portion du bordereau inclus dans le groupement. Laisser null si le bordereau est
-  inclus dans sa totalité
-  """
-  weight: Float
-}
-
 input BsffInput {
   type: BsffType
   emitter: BsffEmitterInput
@@ -66,7 +56,7 @@ input BsffInput {
   "Liste des bordereaux que celui-ci reconditionne"
   repackaging: [ID!]
   "Liste des bordereaux que celui-ci groupe"
-  grouping: [BsffSplitInput!]
+  grouping: [ID!]
 }
 
 input BsffEmitterInput {

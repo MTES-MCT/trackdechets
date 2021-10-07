@@ -8,7 +8,6 @@ import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { OPERATION, WASTE_CODES } from "../../../constants";
-import { getBsffCreateGroupementInput } from "../../../database";
 import {
   createBsff,
   createBsffAfterEmission,
@@ -546,11 +545,11 @@ describe("Mutation.updateBsff", () => {
       },
       {
         type: BsffType.GROUPEMENT,
-        grouping: await getBsffCreateGroupementInput(
-          oldGroupingBsffs.map(bsff => ({
-            bsffId: bsff.id
+        grouping: {
+          connect: oldGroupingBsffs.map(bsff => ({
+            id: bsff.id
           }))
-        )
+        }
       }
     );
 
@@ -562,7 +561,7 @@ describe("Mutation.updateBsff", () => {
       variables: {
         id: bsff.id,
         input: {
-          grouping: newGroupingBsffs.map(({ id }) => ({ bsffId: id }))
+          grouping: newGroupingBsffs.map(({ id }) => id)
         }
       }
     });
@@ -574,8 +573,8 @@ describe("Mutation.updateBsff", () => {
         where: { id: data.updateBsff.id }
       })
       .grouping();
-    expect(actualGroupingBsffs.map(g => g.previousId)).toEqual(
-      newGroupingBsffs.map(({ id }) => id)
+    expect(actualGroupingBsffs).toEqual(
+      newGroupingBsffs.map(({ id }) => expect.objectContaining({ id }))
     );
   });
 
@@ -754,11 +753,7 @@ describe("Mutation.updateBsff", () => {
       { emitter },
       {
         type: BsffType.GROUPEMENT,
-        grouping: await getBsffCreateGroupementInput(
-          groupingBsffs.map(bsff => ({
-            bsffId: bsff.id
-          }))
-        )
+        grouping: { connect: groupingBsffs.map(({ id }) => ({ id })) }
       }
     );
 

@@ -97,34 +97,12 @@ type Bsff {
   """
   Bordereaux que celui-ci groupe
   """
-  grouping: [InitialBsffSplit!]!
+  grouping: [InitialBsff!]!
 
   """
-  Bordereaux dans lequel celui-ci est groupé. Contient un seul bordereau dans la majorité des cas.
-  Peut contenir plusieurs bordereaux en cas de consommation du bordereau en plusieurs fois
-  (scission du bordereau initial)
+  Bordereau dans lequel celui-ci est groupé.
   """
-  groupedIn: [BsffSplit!]!
-}
-
-"""
-Lien avec un bordereau de groupement
-"""
-type BsffSplit {
-  "Bordereau de groupement"
-  bsff: Bsff!
-  "Portion du bordereau inclus dans le groupement. Égale au poids total du bordereau initial par défaut"
-  weight: Float!
-}
-
-"""
-Lien avec un bordereau initial dans le cadre d'un groupement
-"""
-type InitialBsffSplit {
-  "Bordereau initial inclus dans le groupement"
-  bsff: InitialBsff!
-  "Portion du bordereau inclus dans le groupement. Égale au poids total du bordereau initial par défaut"
-  weight: Float!
+  groupedIn: Bsff
 }
 
 """

@@ -7,11 +7,7 @@ import {
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
-import {
-  BsffFicheIntervention,
-  BsffInput,
-  BsffSplitInput
-} from "../generated/graphql/types";
+import { BsffFicheIntervention, BsffInput } from "../generated/graphql/types";
 import getReadableId, { ReadableIdPrefix } from "../forms/readableId";
 import {
   flattenBsffInput,
@@ -91,35 +87,6 @@ export async function getFicheInterventions({
   return unflattenedFicheInterventions;
 }
 
-/** Returns BSFF splits grouped into this one */
-export async function getGroupedBsffsSplits(bsffId: string) {
-  const bsffGroupement = await prisma.bsffGroupement.findMany({
-    where: { next: { id: bsffId } },
-    include: { previous: true }
-  });
-  return bsffGroupement.map(({ previous, weight }) => ({
-    bsff: previous,
-    weight
-  }));
-}
-
-export async function getGroupedBsffs(bsffId: string) {
-  const splits = await getGroupedBsffsSplits(bsffId);
-  return splits.map(s => s.bsff);
-}
-
-/** Returns the different groupement splits of an intitial BSFF */
-export async function getGroupingBsffsSplits(bsffId: string) {
-  const bsffGroupement = await prisma.bsffGroupement.findMany({
-    where: { previous: { id: bsffId } },
-    include: { next: true }
-  });
-  return bsffGroupement.map(({ next, weight }) => ({
-    bsff: next,
-    weight
-  }));
-}
-
 function getBsffType(input: BsffInput): BsffType {
   if (input.grouping?.length > 0) {
     return BsffType.GROUPEMENT;
@@ -138,26 +105,6 @@ function getBsffType(input: BsffInput): BsffType {
   }
 
   return BsffType.COLLECTE_PETITES_QUANTITES;
-}
-
-export async function getBsffCreateGroupementInput(
-  splits: BsffSplitInput[]
-): Promise<Prisma.BsffGroupementCreateNestedManyWithoutNextInput> {
-  // set default weight to previous BSFF destination weight
-  const destinationReceptionWeight = async (bsffId: string) => {
-    const bsff = await prisma.bsff.findUnique({ where: { id: bsffId } });
-    return bsff.destinationReceptionWeight;
-  };
-  const createInput = splits.map(async ({ bsffId, weight }) => {
-    return {
-      previousId: bsffId,
-      weight: weight ?? (await destinationReceptionWeight(bsffId))
-    };
-  });
-
-  return {
-    create: await Promise.all(createInput)
-  };
 }
 
 export async function createBsff(
@@ -195,11 +142,10 @@ export async function createBsff(
     ? await prisma.bsff.findMany({ where: { id: { in: input.repackaging } } })
     : null;
   // bordereaux qui sont groupés dans celui-ci
+
   const groupedBsffs = isGrouping
-    ? await prisma.bsff.findMany({
-        where: { id: { in: input.grouping.map(({ bsffId }) => bsffId) } }
-      })
-    : [];
+    ? await prisma.bsff.findMany({ where: { id: { in: input.grouping } } })
+    : null;
 
   const previousBsffs = [
     ...(isForwarding ? [forwardedBsff] : []),
@@ -223,7 +169,11 @@ export async function createBsff(
   }
 
   if (isGrouping) {
-    data.grouping = await getBsffCreateGroupementInput(input.grouping);
+    data.grouping = {
+      connect: input.grouping.map(id => ({
+        id
+      }))
+    };
   }
 
   if (isRepackaging) {
@@ -259,7 +209,9 @@ export async function getPreviousBsffs(bsff: Bsff) {
     .findFirst({ where: { id: bsff.id } })
     .repackaging();
 
-  const groupedBsffs = await getGroupedBsffs(bsff.id);
+  const groupedBsffs = await prisma.bsff
+    .findFirst({ where: { id: bsff.id } })
+    .grouping();
 
   const previousBsffs = [
     ...(!!forwardedBsff ? [forwardedBsff] : []),
