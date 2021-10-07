@@ -121,9 +121,10 @@ describe("Query.bsds.vhus base workflow", () => {
               numbers: ["123", "456"],
               type: "NUMERO_ORDRE_REGISTRE_POLICE"
             },
-            quantity: {
-              number: 2,
-              tons: 1.3
+            quantity: 2,
+            weight: {
+              isEstimate: true,
+              value: 1.3
             },
             destination: {
               type: "BROYEUR",
@@ -456,8 +457,8 @@ describe("Query.bsds.vhus base workflow", () => {
           id: vhuId
         },
         data: {
-          destinationReceptionQuantityNumber: 10.0,
-          destinationReceptionQuantityTons: 10.0,
+          destinationReceptionQuantity: 10.0,
+          destinationReceptionWeight: 10.0,
           destinationReceptionAcceptationStatus:
             WasteAcceptationStatus.ACCEPTED,
           destinationOperationCode: "R 4"

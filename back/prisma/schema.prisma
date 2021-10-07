@@ -1009,6 +1009,8 @@ model Bsda {
   wasteAdr          String?
 
   packagings       Json?
+  // DEPRECATED - remove after migration
+  quantityType     QuantityType?
   weightIsEstimate Boolean?
   weightValue      Float?
 

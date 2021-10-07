@@ -10,7 +10,7 @@ describe("getBsdaHistory", () => {
 
     // bsda2 is forwarding bsda1
     const bsda2 = await bsdaFactory({
-      opt: { id: "bsda2", forwarding: { connect: { id: bsda1.id } } },
+      opt: { id: "bsda2", forwarding: { connect: { id: bsda1.id } } }
     });
 
     const bsda3 = await bsdaFactory({ opt: { id: "bsda3" } });
@@ -21,17 +21,17 @@ describe("getBsdaHistory", () => {
       opt: {
         id: "bsda5",
         grouping: {
-          connect: [{ id: bsda3.id }, { id: bsda4.id }],
+          connect: [{ id: bsda3.id }, { id: bsda4.id }]
         },
-        forwarding: { connect: { id: bsda2.id } },
-      },
+        forwarding: { connect: { id: bsda2.id } }
+      }
     });
     const history = await getBsdaHistory(bsda5);
-    expect(history.map((bsda) => bsda.id)).toEqual([
+    expect(history.map(bsda => bsda.id)).toEqual([
       bsda1.id,
       bsda2.id,
       bsda3.id,
-      bsda4.id,
+      bsda4.id
     ]);
   });
 });

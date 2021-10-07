@@ -1,21 +1,21 @@
 import {
   BsvhuIdentificationType,
   BsvhuPackaging,
-  Prisma,
+  Prisma
 } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
 
 export const vhuFormFactory = async ({
-  opt = {},
+  opt = {}
 }: {
   opt?: Partial<Prisma.BsvhuCreateInput>;
 }) => {
   const formParams = { ...getVhuFormdata(), ...opt };
   return prisma.bsvhu.create({
     data: {
-      ...formParams,
-    },
+      ...formParams
+    }
   });
 };
 
@@ -59,5 +59,5 @@ const getVhuFormdata = (): Prisma.BsvhuCreateInput => ({
   destinationReceptionWeight: null,
   destinationReceptionAcceptationStatus: null,
   destinationReceptionRefusalReason: null,
-  destinationOperationCode: null,
+  destinationOperationCode: null
 });

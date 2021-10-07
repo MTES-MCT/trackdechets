@@ -3,7 +3,7 @@ import {
   Bsvhu,
   BsvhuIdentificationType,
   BsvhuPackaging,
-  WasteAcceptationStatus,
+  WasteAcceptationStatus
 } from "@prisma/client";
 import { PROCESSING_OPERATIONS_CODES } from "../common/constants";
 import {
@@ -13,7 +13,7 @@ import {
   MISSING_COMPANY_EMAIL,
   MISSING_COMPANY_NAME,
   MISSING_COMPANY_PHONE,
-  MISSING_COMPANY_SIRET,
+  MISSING_COMPANY_SIRET
 } from "../forms/validation";
 import * as yup from "yup";
 import { FactorySchemaOf } from "../common/yup/configureYup";
@@ -87,9 +87,7 @@ export function validateBsvhu(
     .validate(form, { abortEarly: false });
 }
 
-const emitterSchema: FactorySchemaOf<VhuValidationContext, Emitter> = (
-  context
-) =>
+const emitterSchema: FactorySchemaOf<VhuValidationContext, Emitter> = context =>
   yup.object({
     emitterCompanyName: yup
       .string()
@@ -134,12 +132,13 @@ const emitterSchema: FactorySchemaOf<VhuValidationContext, Emitter> = (
       .requiredIf(
         context.emissionSignature,
         `Émetteur: le numéro d'agrément est obligatoire`
-      ),
+      )
   });
 
-const destinationSchema: FactorySchemaOf<VhuValidationContext, Destination> = (
-  context
-) =>
+const destinationSchema: FactorySchemaOf<
+  VhuValidationContext,
+  Destination
+> = context =>
   yup.object({
     destinationType: yup
       .mixed<BsvhuDestinationType>()
@@ -195,8 +194,8 @@ const destinationSchema: FactorySchemaOf<VhuValidationContext, Destination> = (
       ),
     destinationCompanyAddress: yup.string().when("$emitterSignature", {
       is: true,
-      then: (s) => s.required(`Destination: ${MISSING_COMPANY_ADDRESS}`),
-      otherwise: (s) => s.nullable(),
+      then: s => s.required(`Destination: ${MISSING_COMPANY_ADDRESS}`),
+      otherwise: s => s.nullable()
     }),
     destinationCompanyContact: yup
       .string()
@@ -216,12 +215,13 @@ const destinationSchema: FactorySchemaOf<VhuValidationContext, Destination> = (
       .requiredIf(
         context.emissionSignature,
         `Destinataire: ${MISSING_COMPANY_EMAIL}`
-      ),
+      )
   });
 
-const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> = (
-  context
-) =>
+const transporterSchema: FactorySchemaOf<
+  VhuValidationContext,
+  Transporter
+> = context =>
   yup.object({
     transporterRecepisseDepartment: yup
       .string()
@@ -293,13 +293,13 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> = (
       .requiredIf(
         context.transportSignature,
         `Transporteur: ${MISSING_COMPANY_EMAIL}`
-      ),
+      )
   });
 
 const identificationSchema: FactorySchemaOf<
   VhuValidationContext,
   Identification
-> = (context) =>
+> = context =>
   yup.object({
     identificationNumbers: yup.array().ensure().of(yup.string()) as any,
     identificationType: yup
@@ -307,10 +307,10 @@ const identificationSchema: FactorySchemaOf<
       .requiredIf(
         context.emissionSignature,
         `Déchet: le type d'indentification est obligatoire`
-      ),
+      )
   });
 
-const weightSchema: FactorySchemaOf<VhuValidationContext, Weight> = (context) =>
+const weightSchema: FactorySchemaOf<VhuValidationContext, Weight> = context =>
   yup.object({
     weightValue: yup
       .number()
@@ -318,17 +318,18 @@ const weightSchema: FactorySchemaOf<VhuValidationContext, Weight> = (context) =>
         context.emissionSignature,
         `Déchet: la quantité est obligatoire`
       ),
-    weightIsEstimate: yup.boolean().nullable(),
+    weightIsEstimate: yup.boolean().nullable()
   });
 
-const packagingSchema: FactorySchemaOf<VhuValidationContext, Packaging> = (
-  context
-) =>
+const packagingSchema: FactorySchemaOf<
+  VhuValidationContext,
+  Packaging
+> = context =>
   yup.object({
     packaging: yup
       .mixed<BsvhuPackaging>()
       .requiredIf(
         context.emissionSignature,
         `Déchet: le type d'empaquetage' est obligatoire`
-      ),
+      )
   });
