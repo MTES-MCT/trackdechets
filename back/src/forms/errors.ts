@@ -82,14 +82,6 @@ export class DestinationCannotTempStore extends UserInputError {
   }
 }
 
-export class HasSegmentToTakeOverError extends UserInputError {
-  constructor() {
-    super(
-      "Vous ne pouvez pas passer ce bordereau à l'état souhaité, il n'est pas encore pris en charge par le dernier transporteur"
-    );
-  }
-}
-
 export class FormAlreadyInAppendix2 extends UserInputError {
   constructor() {
     super(

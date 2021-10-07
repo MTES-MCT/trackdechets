@@ -6,10 +6,7 @@ import { checkCanMarkAsReceived } from "../../permissions";
 import { receivedInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
 import { expandFormFromDb } from "../../form-converter";
-import {
-  HasSegmentToTakeOverError,
-  TemporaryStorageCannotReceive
-} from "../../errors";
+import { TemporaryStorageCannotReceive } from "../../errors";
 import prisma from "../../../prisma";
 
 const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
@@ -34,17 +31,6 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
     }
   }
 
-  // check all multi-modal transport segments (if any) have been taken over
-  const transportSegments = await prisma.form
-    .findUnique({ where: { id: form.id } })
-    .transportSegments();
-  if (transportSegments.length > 0) {
-    const hasSegmentToTakeOver = transportSegments.some(f => !f.takenOverAt);
-    if (hasSegmentToTakeOver) {
-      throw new HasSegmentToTakeOverError();
-    }
-  }
-
   await receivedInfoSchema.validate(receivedInfo);
   const formUpdateInput = {
     ...receivedInfo,
@@ -54,6 +40,20 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
     type: EventType.MarkAsReceived,
     formUpdateInput
   });
+
+  // check for stale transport segments and delete them
+  const transportSegments = await prisma.form
+    .findUnique({ where: { id: form.id } })
+    .transportSegments();
+  if (transportSegments.length > 0) {
+    const staleSegments = transportSegments
+      .filter(f => !f.takenOverAt)
+      .map(s => s.id);
+    await prisma.transportSegment.deleteMany({
+      where: { id: { in: staleSegments } }
+    });
+  }
+
   return expandFormFromDb(receivedForm);
 };
 

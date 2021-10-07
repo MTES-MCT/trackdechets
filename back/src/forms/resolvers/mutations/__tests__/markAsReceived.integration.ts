@@ -476,7 +476,7 @@ describe("Test Form reception", () => {
     expect(logs[0].status).toBe("ACCEPTED");
   });
 
-  it("should not mark as received a form with segment not taken over", async () => {
+  it("should delete stale transport segments not yet taken over after a reception occured", async () => {
     const {
       emitterCompany,
       recipient,
@@ -499,8 +499,8 @@ describe("Test Form reception", () => {
       }
     });
 
-    // this segment is still not yet taken over, the form should not be accepted
-    await transportSegmentFactory({
+    // this segment has not been taken over yet
+    const staleSegment = await transportSegmentFactory({
       formId: form.id,
       segmentPayload: { transporterCompanySiret: "7777", readyToTakeOver: true }
     });
@@ -511,6 +511,7 @@ describe("Test Form reception", () => {
 
     const { mutate } = makeClient(recipient);
 
+    // the truck finally goes directly to the destination
     await mutate(MARK_AS_RECEIVED, {
       variables: {
         id: form.id,
@@ -525,16 +526,15 @@ describe("Test Form reception", () => {
 
     const frm = await prisma.form.findUnique({ where: { id: form.id } });
 
-    expect(frm.status).toBe("SENT");
+    expect(frm.status).toBe("ACCEPTED");
 
-    // currentTransporterSiret was not cleaned up
-    expect(frm.currentTransporterSiret).toEqual("5678");
+    // currentTransporterSiret was cleaned up
+    expect(frm.currentTransporterSiret).toEqual("");
 
-    // A StatusLog object is created
-    const logs = await prisma.statusLog.findMany({
-      where: { form: { id: frm.id }, user: { id: recipient.id } }
+    const deleted = await prisma.transportSegment.findFirst({
+      where: { id: staleSegment.id }
     });
-    expect(logs.length).toBe(0);
+    expect(deleted).toEqual(null);
   });
 
   it("should fail if recipient is temp storage", async () => {
