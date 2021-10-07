@@ -3,14 +3,12 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import {
   BsdaInput,
-  MutationCreateBsdaArgs,
+  MutationCreateBsdaArgs
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb, flattenBsdaInput } from "../../converter";
-import {
-  getBsdaOrNotFound,
-} from "../../database";
+import { getBsdaOrNotFound } from "../../database";
 import { indexBsda } from "../../elastic";
 import { checkIsBsdaContributor } from "../../permissions";
 import { validateBsda } from "../../validation";
@@ -42,7 +40,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
   const isForwarding = Boolean(input.forwarding);
   const isGrouping = input.grouping?.length > 0;
 
-  if ([isForwarding, isGrouping].filter((b) => b).length > 1) {
+  if ([isForwarding, isGrouping].filter(b => b).length > 1) {
     throw new UserInputError(
       "Les opérations d'entreposage provisoire et groupement ne sont pas compatibles entre elles"
     );
@@ -53,19 +51,19 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     : null;
   const groupedBsdas = isGrouping
     ? await prisma.bsda.findMany({
-        where: { id: { in: input.grouping } },
+        where: { id: { in: input.grouping } }
       })
     : [];
 
   const previousBsdas = [
     ...(isForwarding ? [forwardedBsda] : []),
-    ...(isGrouping ? groupedBsdas : []),
+    ...(isGrouping ? groupedBsdas : [])
   ];
 
   await validateBsda(bsda, previousBsdas, {
     isPrivateIndividual: bsda.emitterIsPrivateIndividual,
     isType2710: bsda.type === "COLLECTION_2710",
-    emissionSignature: !isDraft,
+    emissionSignature: !isDraft
   });
 
   const newBsda = await prisma.bsda.create({
@@ -74,12 +72,12 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
       id: getReadableId(ReadableIdPrefix.BSDA),
       isDraft,
       ...(isForwarding && {
-        forwarding: { connect: { id: input.forwarding } },
+        forwarding: { connect: { id: input.forwarding } }
       }),
       ...(isGrouping && {
-        grouping: { connect: groupedBsdas.map(({ id }) => ({ id })) },
-      }),
-    },
+        grouping: { connect: groupedBsdas.map(({ id }) => ({ id })) }
+      })
+    }
   });
 
   await indexBsda(newBsda, context);

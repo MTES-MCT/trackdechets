@@ -3,7 +3,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import {
   Mutation,
-  MutationSignBsdaArgs,
+  MutationSignBsdaArgs
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
@@ -26,17 +26,17 @@ describe("Mutation.Bsda.sign", () => {
     const { errors } = await mutate(SIGN_BSDA, {
       variables: {
         id: 1,
-        input: { type: "EMISSION", author: "The Ghost" },
-      },
+        input: { type: "EMISSION", author: "The Ghost" }
+      }
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
         message: "Vous n'êtes pas connecté.",
         extensions: expect.objectContaining({
-          code: ErrorCode.UNAUTHENTICATED,
-        }),
-      }),
+          code: ErrorCode.UNAUTHENTICATED
+        })
+      })
     ]);
   });
 
@@ -52,15 +52,15 @@ describe("Mutation.Bsda.sign", () => {
         id: "123",
         input: {
           author: user.name,
-          type: "EMISSION",
-        },
-      },
+          type: "EMISSION"
+        }
+      }
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Le bordereau avec l'identifiant \"123\" n'existe pas.",
-      }),
+        message: "Le bordereau avec l'identifiant \"123\" n'existe pas."
+      })
     ]);
   });
 
@@ -69,8 +69,8 @@ describe("Mutation.Bsda.sign", () => {
       const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
       const bsda = await bsdaFactory({
         opt: {
-          emitterCompanySiret: company.siret,
-        },
+          emitterCompanySiret: company.siret
+        }
       });
 
       const { mutate } = makeClient(user);
@@ -82,9 +82,9 @@ describe("Mutation.Bsda.sign", () => {
           id: bsda.id,
           input: {
             author: user.name,
-            type: "EMISSION",
-          },
-        },
+            type: "EMISSION"
+          }
+        }
       });
 
       expect(data.signBsda.id).toBeTruthy();
@@ -95,8 +95,8 @@ describe("Mutation.Bsda.sign", () => {
       const bsda = await bsdaFactory({
         opt: {
           emitterCompanySiret: company.siret,
-          wasteCode: null, // missing field
-        },
+          wasteCode: null // missing field
+        }
       });
 
       const { mutate } = makeClient(user);
@@ -108,17 +108,17 @@ describe("Mutation.Bsda.sign", () => {
           id: bsda.id,
           input: {
             author: user.name,
-            type: "EMISSION",
-          },
-        },
+            type: "EMISSION"
+          }
+        }
       });
 
       expect(errors).toEqual([
         expect.objectContaining({
           extensions: {
-            code: "BAD_USER_INPUT",
-          },
-        }),
+            code: "BAD_USER_INPUT"
+          }
+        })
       ]);
     });
 
@@ -128,8 +128,8 @@ describe("Mutation.Bsda.sign", () => {
       const bsda = await bsdaFactory({
         opt: {
           emitterCompanySiret: emitter.company.siret,
-          transporterCompanySiret: transporter.company.siret,
-        },
+          transporterCompanySiret: transporter.company.siret
+        }
       });
 
       const { mutate } = makeClient(transporter.user);
@@ -142,9 +142,9 @@ describe("Mutation.Bsda.sign", () => {
           input: {
             author: emitter.user.name,
             type: "EMISSION",
-            securityCode: emitter.company.securityCode,
-          },
-        },
+            securityCode: emitter.company.securityCode
+          }
+        }
       });
 
       expect(data.signBsda.id).toBeTruthy();
@@ -156,8 +156,8 @@ describe("Mutation.Bsda.sign", () => {
       const bsda = await bsdaFactory({
         opt: {
           emitterCompanySiret: emitter.company.siret,
-          transporterCompanySiret: transporter.company.siret,
-        },
+          transporterCompanySiret: transporter.company.siret
+        }
       });
 
       const { mutate } = makeClient(transporter.user);
@@ -169,17 +169,17 @@ describe("Mutation.Bsda.sign", () => {
           id: bsda.id,
           input: {
             author: emitter.user.name,
-            type: "EMISSION",
-          },
-        },
+            type: "EMISSION"
+          }
+        }
       });
 
       expect(errors).toEqual([
         expect.objectContaining({
           extensions: expect.objectContaining({
-            code: ErrorCode.FORBIDDEN,
-          }),
-        }),
+            code: ErrorCode.FORBIDDEN
+          })
+        })
       ]);
     });
 
@@ -189,8 +189,8 @@ describe("Mutation.Bsda.sign", () => {
       const bsda = await bsdaFactory({
         opt: {
           emitterCompanySiret: emitter.company.siret,
-          transporterCompanySiret: transporter.company.siret,
-        },
+          transporterCompanySiret: transporter.company.siret
+        }
       });
 
       const { mutate } = makeClient(transporter.user);
@@ -203,15 +203,15 @@ describe("Mutation.Bsda.sign", () => {
           input: {
             author: emitter.user.name,
             type: "EMISSION",
-            securityCode: 1,
-          },
-        },
+            securityCode: 1
+          }
+        }
       });
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message: "Le code de signature est invalide.",
-        }),
+          message: "Le code de signature est invalide."
+        })
       ]);
     });
 
@@ -222,8 +222,8 @@ describe("Mutation.Bsda.sign", () => {
           emitterCompanySiret: company.siret,
           status: "SIGNED_BY_PRODUCER",
           emitterEmissionSignatureAuthor: "Emétteur",
-          emitterEmissionSignatureDate: new Date(),
-        },
+          emitterEmissionSignatureDate: new Date()
+        }
       });
 
       const { mutate } = makeClient(user);
@@ -235,15 +235,15 @@ describe("Mutation.Bsda.sign", () => {
           id: bsda.id,
           input: {
             author: user.name,
-            type: "EMISSION",
-          },
-        },
+            type: "EMISSION"
+          }
+        }
       });
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message: "Cette signature a déjà été apposée.",
-        }),
+          message: "Cette signature a déjà été apposée."
+        })
       ]);
     });
 
@@ -255,8 +255,8 @@ describe("Mutation.Bsda.sign", () => {
           emitterCompanySiret: emitter.company.siret,
           emitterEmissionSignatureDate: null,
           emitterEmissionSignatureAuthor: null,
-          transporterCompanySiret: transporter.company.siret,
-        },
+          transporterCompanySiret: transporter.company.siret
+        }
       });
 
       const { mutate } = makeClient(transporter.user);
@@ -268,17 +268,17 @@ describe("Mutation.Bsda.sign", () => {
           id: bsda.id,
           input: {
             author: transporter.user.name,
-            type: "EMISSION",
-          },
-        },
+            type: "EMISSION"
+          }
+        }
       });
 
       expect(errors).toEqual([
         expect.objectContaining({
           extensions: expect.objectContaining({
-            code: ErrorCode.FORBIDDEN,
-          }),
-        }),
+            code: ErrorCode.FORBIDDEN
+          })
+        })
       ]);
     });
   });
@@ -291,8 +291,8 @@ describe("Mutation.Bsda.sign", () => {
           status: "SIGNED_BY_PRODUCER",
           emitterEmissionSignatureAuthor: "Emétteur",
           emitterEmissionSignatureDate: new Date(),
-          workerCompanySiret: worker.company.siret,
-        },
+          workerCompanySiret: worker.company.siret
+        }
       });
 
       const { mutate } = makeClient(worker.user);
@@ -304,9 +304,9 @@ describe("Mutation.Bsda.sign", () => {
           id: bsda.id,
           input: {
             type: "WORK",
-            author: worker.user.name,
-          },
-        },
+            author: worker.user.name
+          }
+        }
       });
 
       expect(data.signBsda.id).toBeTruthy();
@@ -318,8 +318,8 @@ describe("Mutation.Bsda.sign", () => {
         opt: {
           status: "INITIAL",
           workerWorkHasEmitterPaperSignature: true,
-          workerCompanySiret: worker.company.siret,
-        },
+          workerCompanySiret: worker.company.siret
+        }
       });
 
       const { mutate } = makeClient(worker.user);
@@ -331,9 +331,9 @@ describe("Mutation.Bsda.sign", () => {
           id: bsda.id,
           input: {
             type: "WORK",
-            author: worker.user.name,
-          },
-        },
+            author: worker.user.name
+          }
+        }
       });
 
       expect(data.signBsda.id).toBeTruthy();
@@ -347,8 +347,8 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureAuthor: "Emétteur",
           emitterEmissionSignatureDate: new Date(),
           workerCompanySiret: worker.company.siret,
-          workerCompanyMail: null, // Missing worker company name
-        },
+          workerCompanyMail: null // Missing worker company name
+        }
       });
 
       const { mutate } = makeClient(worker.user);
@@ -360,17 +360,17 @@ describe("Mutation.Bsda.sign", () => {
           id: bsda.id,
           input: {
             type: "WORK",
-            author: worker.user.name,
-          },
-        },
+            author: worker.user.name
+          }
+        }
       });
 
       expect(errors).toEqual([
         expect.objectContaining({
           extensions: {
-            code: "BAD_USER_INPUT",
-          },
-        }),
+            code: "BAD_USER_INPUT"
+          }
+        })
       ]);
     });
   });
@@ -386,8 +386,8 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureDate: new Date(),
           workerWorkSignatureAuthor: "worker",
           workerWorkSignatureDate: new Date(),
-          transporterCompanySiret: transporter.company.siret,
-        },
+          transporterCompanySiret: transporter.company.siret
+        }
       });
 
       const { mutate } = makeClient(transporter.user);
@@ -399,9 +399,9 @@ describe("Mutation.Bsda.sign", () => {
           id: bsda.id,
           input: {
             type: "TRANSPORT",
-            author: transporter.user.name,
-          },
-        },
+            author: transporter.user.name
+          }
+        }
       });
 
       expect(data.signBsda.id).toBeTruthy();
@@ -420,8 +420,8 @@ describe("Mutation.Bsda.sign", () => {
           workerWorkSignatureAuthor: "worker",
           workerWorkSignatureDate: new Date(),
           transporterCompanySiret: transporter.company.siret,
-          transporterRecepisseNumber: null, // Missing recepisse
-        },
+          transporterRecepisseNumber: null // Missing recepisse
+        }
       });
 
       const { mutate } = makeClient(transporter.user);
@@ -433,17 +433,17 @@ describe("Mutation.Bsda.sign", () => {
           id: bsda.id,
           input: {
             type: "TRANSPORT",
-            author: transporter.user.name,
-          },
-        },
+            author: transporter.user.name
+          }
+        }
       });
 
       expect(errors).toEqual([
         expect.objectContaining({
           extensions: {
-            code: "BAD_USER_INPUT",
-          },
-        }),
+            code: "BAD_USER_INPUT"
+          }
+        })
       ]);
     });
 
@@ -459,8 +459,8 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureDate: new Date(),
           workerWorkSignatureAuthor: "worker",
           workerWorkSignatureDate: new Date(),
-          transporterCompanySiret: transporter.company.siret,
-        },
+          transporterCompanySiret: transporter.company.siret
+        }
       });
 
       const { mutate } = makeClient(transporter.user);
@@ -472,16 +472,16 @@ describe("Mutation.Bsda.sign", () => {
           id: bsda.id,
           input: {
             type: "TRANSPORT",
-            author: transporter.user.name,
-          },
-        },
+            author: transporter.user.name
+          }
+        }
       });
 
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "Vous ne pouvez pas apposer cette signature sur le bordereau.",
-        }),
+            "Vous ne pouvez pas apposer cette signature sur le bordereau."
+        })
       ]);
     });
   });
@@ -499,8 +499,8 @@ describe("Mutation.Bsda.sign", () => {
           workerWorkSignatureDate: new Date(),
           transporterTransportSignatureAuthor: "Transporter",
           transporterTransportSignatureDate: new Date(),
-          destinationCompanySiret: company.siret,
-        },
+          destinationCompanySiret: company.siret
+        }
       });
 
       const { mutate } = makeClient(user);
@@ -512,9 +512,9 @@ describe("Mutation.Bsda.sign", () => {
           id: bsda.id,
           input: {
             type: "OPERATION",
-            author: user.name,
-          },
-        },
+            author: user.name
+          }
+        }
       });
 
       expect(data.signBsda.id).toBeTruthy();
@@ -527,8 +527,8 @@ describe("Mutation.Bsda.sign", () => {
         opt: {
           status: "INITIAL",
           type: "COLLECTION_2710",
-          destinationCompanySiret: company.siret,
-        },
+          destinationCompanySiret: company.siret
+        }
       });
 
       const { mutate } = makeClient(user);
@@ -540,9 +540,9 @@ describe("Mutation.Bsda.sign", () => {
           id: bsda.id,
           input: {
             type: "OPERATION",
-            author: user.name,
-          },
-        },
+            author: user.name
+          }
+        }
       });
 
       expect(data.signBsda.id).toBeTruthy();
@@ -561,8 +561,8 @@ describe("Mutation.Bsda.sign", () => {
           transporterTransportSignatureAuthor: "Transporter",
           transporterTransportSignatureDate: new Date(),
           destinationCompanySiret: company.siret,
-          destinationOperationCode: null, // Missing operation code
-        },
+          destinationOperationCode: null // Missing operation code
+        }
       });
 
       const { mutate } = makeClient(user);
@@ -574,17 +574,17 @@ describe("Mutation.Bsda.sign", () => {
           id: bsda.id,
           input: {
             type: "OPERATION",
-            author: user.name,
-          },
-        },
+            author: user.name
+          }
+        }
       });
 
       expect(errors).toEqual([
         expect.objectContaining({
           extensions: {
-            code: "BAD_USER_INPUT",
-          },
-        }),
+            code: "BAD_USER_INPUT"
+          }
+        })
       ]);
     });
 
@@ -605,8 +605,8 @@ describe("Mutation.Bsda.sign", () => {
           transporterCompanySiret: transporter.siret,
           destinationCompanySiret: ttr1.siret,
           status: BsdaStatus.AWAITING_CHILD,
-          destinationOperationCode: "R 13",
-        },
+          destinationOperationCode: "R 13"
+        }
       });
 
       // bsda1 => bsda2
@@ -617,8 +617,8 @@ describe("Mutation.Bsda.sign", () => {
           destinationCompanySiret: ttr2.siret,
           destinationOperationCode: "R 13",
           status: BsdaStatus.AWAITING_CHILD,
-          forwarding: { connect: { id: bsda1.id } },
-        },
+          forwarding: { connect: { id: bsda1.id } }
+        }
       });
       // bsda1 => bsda2 => bsda3
       const bsda3 = await bsdaFactory({
@@ -628,8 +628,8 @@ describe("Mutation.Bsda.sign", () => {
           transporterCompanySiret: transporter.siret,
           destinationCompanySiret: destination.siret,
           destinationOperationCode: "D 10",
-          forwarding: { connect: { id: bsda2.id } },
-        },
+          forwarding: { connect: { id: bsda2.id } }
+        }
       });
 
       const { mutate } = makeClient(user);
@@ -641,20 +641,20 @@ describe("Mutation.Bsda.sign", () => {
           id: bsda3.id,
           input: {
             type: "OPERATION",
-            author: user.name,
-          },
-        },
+            author: user.name
+          }
+        }
       });
 
       expect(errors).toBeUndefined();
       expect(data.signBsda.id).toBeTruthy();
 
       const newBsda1 = await prisma.bsda.findUnique({
-        where: { id: bsda1.id },
+        where: { id: bsda1.id }
       });
       expect(newBsda1.status).toEqual(BsdaStatus.PROCESSED);
       const newBsda2 = await prisma.bsda.findUnique({
-        where: { id: bsda2.id },
+        where: { id: bsda2.id }
       });
       expect(newBsda2.status).toEqual(BsdaStatus.PROCESSED);
     });

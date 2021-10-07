@@ -14,12 +14,12 @@ import {
   BsvhuReception,
   BsvhuOperation,
   BsvhuNextDestination,
-  BsvhuTransport,
+  BsvhuTransport
 } from "../generated/graphql/types";
 import {
   Prisma,
   Bsvhu as PrismaVhuForm,
-  WasteAcceptationStatus,
+  WasteAcceptationStatus
 } from "@prisma/client";
 
 export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
@@ -37,25 +37,25 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         address: form.emitterCompanyAddress,
         contact: form.emitterCompanyContact,
         phone: form.emitterCompanyPhone,
-        mail: form.emitterCompanyMail,
+        mail: form.emitterCompanyMail
       }),
       emission: nullIfNoValues<BsvhuEmission>({
         signature: nullIfNoValues<Signature>({
           author: form.emitterEmissionSignatureAuthor,
-          date: form.emitterEmissionSignatureDate,
-        }),
-      }),
+          date: form.emitterEmissionSignatureDate
+        })
+      })
     }),
     packaging: form.packaging,
     wasteCode: form.wasteCode,
     identification: nullIfNoValues<BsvhuIdentification>({
       numbers: form.identificationNumbers,
-      type: form.identificationType,
+      type: form.identificationType
     }),
     quantity: form.quantity,
     weight: nullIfNoValues<BsvhuWeight>({
       value: form.weightValue,
-      isEstimate: form.weightIsEstimate,
+      isEstimate: form.weightIsEstimate
     }),
     destination: nullIfNoValues<BsvhuDestination>({
       type: form.destinationType,
@@ -66,7 +66,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         address: form.destinationCompanyAddress,
         contact: form.destinationCompanyContact,
         phone: form.destinationCompanyPhone,
-        mail: form.destinationCompanyMail,
+        mail: form.destinationCompanyMail
       }),
       plannedOperationCode: form.destinationPlannedOperationCode,
       reception: nullIfNoValues<BsvhuReception>({
@@ -74,10 +74,10 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         date: form.destinationReceptionDate,
         identification: nullIfNoValues<BsvhuIdentification>({
           numbers: form.destinationReceptionIdentificationNumbers,
-          type: form.destinationReceptionIdentificationType,
+          type: form.destinationReceptionIdentificationType
         }),
         weight: form.destinationReceptionWeight,
-        refusalReason: form.destinationReceptionRefusalReason,
+        refusalReason: form.destinationReceptionRefusalReason
       }),
       operation: nullIfNoValues<BsvhuOperation>({
         code: form.destinationOperationCode,
@@ -89,15 +89,15 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
             address: form.destinationOperationNextDestinationCompanyAddress,
             contact: form.destinationOperationNextDestinationCompanyContact,
             phone: form.destinationOperationNextDestinationCompanyPhone,
-            mail: form.destinationOperationNextDestinationCompanyMail,
-          }),
+            mail: form.destinationOperationNextDestinationCompanyMail
+          })
         }),
 
         signature: nullIfNoValues<Signature>({
           author: form.destinationOperationSignatureAuthor,
-          date: form.destinationOperationSignatureDate,
-        }),
-      }),
+          date: form.destinationOperationSignatureDate
+        })
+      })
     }),
     transporter: nullIfNoValues<BsvhuTransporter>({
       company: nullIfNoValues<FormCompany>({
@@ -107,22 +107,22 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         contact: form.transporterCompanyContact,
         phone: form.transporterCompanyPhone,
         mail: form.transporterCompanyMail,
-        vatNumber: form.transporterCompanyVatNumber,
+        vatNumber: form.transporterCompanyVatNumber
       }),
       recepisse: nullIfNoValues<BsvhuRecepisse>({
         number: form.transporterRecepisseNumber,
         department: form.transporterRecepisseDepartment,
-        validityLimit: form.transporterRecepisseValidityLimit,
+        validityLimit: form.transporterRecepisseValidityLimit
       }),
       transport: nullIfNoValues<BsvhuTransport>({
         signature: nullIfNoValues<Signature>({
           author: form.transporterTransportSignatureAuthor,
-          date: form.transporterTransportSignatureDate,
+          date: form.transporterTransportSignatureDate
         }),
-        takenOverAt: form.transporterTransportTakenOverAt,
-      }),
+        takenOverAt: form.transporterTransportTakenOverAt
+      })
     }),
-    metadata: null,
+    metadata: null
   };
 }
 
@@ -133,168 +133,172 @@ export function flattenVhuInput(
     ...flattenVhuEmitterInput(formInput),
     ...flattenVhuDestinationInput(formInput),
     ...flattenVhuTransporterInput(formInput),
-    packaging: chain(formInput, (f) => f.packaging),
-    wasteCode: chain(formInput, (f) => f.wasteCode),
-    quantity: chain(formInput, (f) => f.quantity),
+    packaging: chain(formInput, f => f.packaging),
+    wasteCode: chain(formInput, f => f.wasteCode),
+    quantity: chain(formInput, f => f.quantity),
     ...flattenVhuIdentificationInput(formInput),
-    ...flattenVhuWeightInput(formInput),
+    ...flattenVhuWeightInput(formInput)
   });
 }
 
 function flattenVhuEmitterInput({ emitter }: Pick<BsvhuInput, "emitter">) {
   return {
-    emitterAgrementNumber: chain(emitter, (e) => e.agrementNumber),
-    emitterCompanyName: chain(emitter, (e) => chain(e.company, (c) => c.name)),
-    emitterCompanySiret: chain(emitter, (e) =>
-      chain(e.company, (c) => c.siret)
+    emitterAgrementNumber: chain(emitter, e => e.agrementNumber),
+    emitterCompanyName: chain(emitter, e => chain(e.company, c => c.name)),
+    emitterCompanySiret: chain(emitter, e => chain(e.company, c => c.siret)),
+    emitterCompanyAddress: chain(emitter, e =>
+      chain(e.company, c => c.address)
     ),
-    emitterCompanyAddress: chain(emitter, (e) =>
-      chain(e.company, (c) => c.address)
+    emitterCompanyContact: chain(emitter, e =>
+      chain(e.company, c => c.contact)
     ),
-    emitterCompanyContact: chain(emitter, (e) =>
-      chain(e.company, (c) => c.contact)
-    ),
-    emitterCompanyPhone: chain(emitter, (e) =>
-      chain(e.company, (c) => c.phone)
-    ),
-    emitterCompanyMail: chain(emitter, (e) => chain(e.company, (c) => c.mail)),
+    emitterCompanyPhone: chain(emitter, e => chain(e.company, c => c.phone)),
+    emitterCompanyMail: chain(emitter, e => chain(e.company, c => c.mail))
   };
 }
 
 function flattenVhuDestinationInput({
-  destination,
+  destination
 }: Pick<BsvhuInput, "destination">) {
   return {
-    destinationType: chain(destination, (r) => r.type),
-    destinationAgrementNumber: chain(destination, (r) => r.agrementNumber),
-    destinationCompanyName: chain(destination, (r) =>
-      chain(r.company, (c) => c.name)
+    destinationType: chain(destination, r => r.type),
+    destinationAgrementNumber: chain(destination, r => r.agrementNumber),
+    destinationCompanyName: chain(destination, r =>
+      chain(r.company, c => c.name)
     ),
-    destinationCompanySiret: chain(destination, (r) =>
-      chain(r.company, (c) => c.siret)
+    destinationCompanySiret: chain(destination, r =>
+      chain(r.company, c => c.siret)
     ),
-    destinationCompanyAddress: chain(destination, (r) =>
-      chain(r.company, (c) => c.address)
+    destinationCompanyAddress: chain(destination, r =>
+      chain(r.company, c => c.address)
     ),
-    destinationCompanyContact: chain(destination, (r) =>
-      chain(r.company, (c) => c.contact)
+    destinationCompanyContact: chain(destination, r =>
+      chain(r.company, c => c.contact)
     ),
-    destinationCompanyPhone: chain(destination, (r) =>
-      chain(r.company, (c) => c.phone)
+    destinationCompanyPhone: chain(destination, r =>
+      chain(r.company, c => c.phone)
     ),
-    destinationCompanyMail: chain(destination, (r) =>
-      chain(r.company, (c) => c.mail)
+    destinationCompanyMail: chain(destination, r =>
+      chain(r.company, c => c.mail)
     ),
     destinationPlannedOperationCode: chain(
       destination,
-      (r) => r.plannedOperationCode
+      r => r.plannedOperationCode
     ),
-    destinationReceptionWeight: chain(destination, (d) =>
-      chain(d.reception, (r) => r.weight)
+    destinationReceptionQuantity: chain(destination, d =>
+      chain(d.reception, r => r.quantity)
     ),
-    destinationReceptionIdentificationNumbers: chain(destination, (d) =>
-      chain(d.reception, (r) => chain(r.identification, (i) => i.numbers))
+    destinationReceptionWeight: chain(destination, d =>
+      chain(d.reception, r => r.weight)
     ),
-    destinationReceptionIdentificationType: chain(destination, (d) =>
-      chain(d.reception, (r) => chain(r.identification, (i) => i.type))
+    destinationReceptionIdentificationNumbers: chain(destination, d =>
+      chain(d.reception, r => chain(r.identification, i => i.numbers))
     ),
-    destinationReceptionAcceptationStatus: chain(destination, (r) =>
-      chain(r.reception, (o) => o.acceptationStatus)
+    destinationReceptionIdentificationType: chain(destination, d =>
+      chain(d.reception, r => chain(r.identification, i => i.type))
+    ),
+    destinationReceptionAcceptationStatus: chain(destination, r =>
+      chain(r.reception, o => o.acceptationStatus)
     ) as WasteAcceptationStatus,
-    destinationReceptionRefusalReason: chain(destination, (r) =>
-      chain(r.reception, (o) => o.refusalReason)
+    destinationReceptionRefusalReason: chain(destination, r =>
+      chain(r.reception, o => o.refusalReason)
     ),
-    destinationReceptionDate: chain(destination, (d) =>
-      chain(d.reception, (r) => r.date)
+    destinationReceptionDate: chain(destination, d =>
+      chain(d.reception, r => r.date)
     ),
-    destinationOperationCode: chain(destination, (r) =>
-      chain(r.operation, (o) => o.code)
+    destinationOperationCode: chain(destination, r =>
+      chain(r.operation, o => o.code)
     ),
-    destinationOperationNextDestinationCompanyName: chain(destination, (d) =>
-      chain(d.operation, (o) =>
-        chain(o.nextDestination, (nd) => chain(nd.company, (c) => c.name))
+    destinationOperationNextDestinationCompanyName: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.name))
       )
     ),
-    destinationOperationDate: chain(destination, (d) =>
-      chain(d.operation, (o) => o.date)
+    destinationOperationDate: chain(destination, d =>
+      chain(d.operation, o => o.date)
     ),
-    destinationOperationNextDestinationCompanySiret: chain(destination, (d) =>
-      chain(d.operation, (o) =>
-        chain(o.nextDestination, (nd) => chain(nd.company, (c) => c.siret))
+    destinationOperationNextDestinationCompanySiret: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.siret))
       )
     ),
-    destinationOperationNextDestinationCompanyAddress: chain(destination, (d) =>
-      chain(d.operation, (o) =>
-        chain(o.nextDestination, (nd) => chain(nd.company, (c) => c.address))
+    destinationOperationNextDestinationCompanyAddress: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.address))
       )
     ),
-    destinationOperationNextDestinationCompanyContact: chain(destination, (d) =>
-      chain(d.operation, (o) =>
-        chain(o.nextDestination, (nd) => chain(nd.company, (c) => c.contact))
+    destinationOperationNextDestinationCompanyContact: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.contact))
       )
     ),
-    destinationOperationNextDestinationCompanyPhone: chain(destination, (d) =>
-      chain(d.operation, (o) =>
-        chain(o.nextDestination, (nd) => chain(nd.company, (c) => c.phone))
+    destinationOperationNextDestinationCompanyPhone: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.phone))
       )
     ),
-    destinationOperationNextDestinationCompanyMail: chain(destination, (d) =>
-      chain(d.operation, (o) =>
-        chain(o.nextDestination, (nd) => chain(nd.company, (c) => c.mail))
+    destinationOperationNextDestinationCompanyMail: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.mail))
       )
     ),
+    destinationOperationNextDestinationCompanyVatNumber: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.vatNumber))
+      )
+    )
   };
 }
 
 function flattenVhuTransporterInput({
-  transporter,
+  transporter
 }: Pick<BsvhuInput, "transporter">) {
   return {
-    transporterCompanyName: chain(transporter, (t) =>
-      chain(t.company, (c) => c.name)
+    transporterCompanyName: chain(transporter, t =>
+      chain(t.company, c => c.name)
     ),
-    transporterCompanySiret: chain(transporter, (t) =>
-      chain(t.company, (c) => c.siret)
+    transporterCompanySiret: chain(transporter, t =>
+      chain(t.company, c => c.siret)
     ),
-    transporterCompanyAddress: chain(transporter, (t) =>
-      chain(t.company, (c) => c.address)
+    transporterCompanyAddress: chain(transporter, t =>
+      chain(t.company, c => c.address)
     ),
-    transporterCompanyContact: chain(transporter, (t) =>
-      chain(t.company, (c) => c.contact)
+    transporterCompanyContact: chain(transporter, t =>
+      chain(t.company, c => c.contact)
     ),
-    transporterCompanyPhone: chain(transporter, (t) =>
-      chain(t.company, (c) => c.phone)
+    transporterCompanyPhone: chain(transporter, t =>
+      chain(t.company, c => c.phone)
     ),
-    transporterCompanyMail: chain(transporter, (t) =>
-      chain(t.company, (c) => c.mail)
+    transporterCompanyMail: chain(transporter, t =>
+      chain(t.company, c => c.mail)
     ),
-    transporterCompanyVatNumber: chain(transporter, (t) =>
-      chain(t.company, (c) => c.vatNumber)
+    transporterCompanyVatNumber: chain(transporter, t =>
+      chain(t.company, c => c.vatNumber)
     ),
-    transporterRecepisseNumber: chain(transporter, (t) =>
-      chain(t.recepisse, (r) => r.number)
+    transporterRecepisseNumber: chain(transporter, t =>
+      chain(t.recepisse, r => r.number)
     ),
-    transporterRecepisseDepartment: chain(transporter, (t) =>
-      chain(t.recepisse, (r) => r.department)
+    transporterRecepisseDepartment: chain(transporter, t =>
+      chain(t.recepisse, r => r.department)
     ),
-    transporterRecepisseValidityLimit: chain(transporter, (t) =>
-      chain(t.recepisse, (r) => r.validityLimit)
-    ),
+    transporterRecepisseValidityLimit: chain(transporter, t =>
+      chain(t.recepisse, r => r.validityLimit)
+    )
   };
 }
 
 function flattenVhuIdentificationInput({
-  identification,
+  identification
 }: Pick<BsvhuInput, "identification">) {
   return {
-    identificationNumbers: chain(identification, (i) => i.numbers),
-    identificationType: chain(identification, (i) => i.type),
+    identificationNumbers: chain(identification, i => i.numbers),
+    identificationType: chain(identification, i => i.type)
   };
 }
 
 function flattenVhuWeightInput({ weight }: Pick<BsvhuInput, "weight">) {
   return {
-    weightValue: chain(weight, (q) => q.value),
-    weightIsEstimate: chain(weight, (q) => q.isEstimate),
+    weightValue: chain(weight, q => q.value),
+    weightIsEstimate: chain(weight, q => q.isEstimate)
   };
 }

@@ -116,6 +116,8 @@ input BsvhuDestinationInput {
 input BsvhuReceptionInput {
   "Date de présentation sur site"
   date: DateTime
+  "Quantité de VHUs reçue"
+  quantity: Int
   "Poids réel reçu"
   weight: Float
   "Lot accepté oui/non"

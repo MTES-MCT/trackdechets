@@ -1,10 +1,10 @@
 import {
-  Prisma,
   Bsda,
-  WasteAcceptationStatus,
   BsdaStatus,
+  Prisma,
+  WasteAcceptationStatus
 } from "@prisma/client";
-import { UserInputError } from "apollo-server-errors";
+import { UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import { WASTES_CODES } from "../common/constants";
 import { FactorySchemaOf } from "../common/yup/configureYup";
@@ -16,12 +16,11 @@ import {
   MISSING_COMPANY_EMAIL,
   MISSING_COMPANY_NAME,
   MISSING_COMPANY_PHONE,
-  MISSING_COMPANY_SIRET,
+  MISSING_COMPANY_SIRET
 } from "../forms/validation";
 import {
   BsdaAcceptationStatus,
-  BsdaConsistence,
-  BsdaQuantityType,
+  BsdaConsistence
 } from "../generated/graphql/types";
 import prisma from "../prisma";
 
@@ -132,12 +131,12 @@ async function validatePreviousBsdas(
   }
 
   const previousBsdasWithDestination = previousBsdas.filter(
-    (previousBsda) => previousBsda.destinationCompanySiret
+    previousBsda => previousBsda.destinationCompanySiret
   );
   if (
     bsda.emitterCompanySiret &&
     previousBsdasWithDestination.some(
-      (previousBsda) =>
+      previousBsda =>
         previousBsda.destinationCompanySiret !== bsda.emitterCompanySiret
     )
   ) {
@@ -149,7 +148,7 @@ async function validatePreviousBsdas(
   const firstPreviousBsdaWithDestination = previousBsdasWithDestination[0];
   if (
     previousBsdasWithDestination.some(
-      (previousBsda) =>
+      previousBsda =>
         previousBsda.destinationCompanySiret !==
         firstPreviousBsdaWithDestination.destinationCompanySiret
     )
@@ -160,23 +159,23 @@ async function validatePreviousBsdas(
   }
 
   const fullpreviousBsdas = await prisma.bsda.findMany({
-    where: { id: { in: previousBsdas.map((bsda) => bsda.id) } },
+    where: { id: { in: previousBsdas.map(bsda => bsda.id) } },
     include: {
       forwardedIn: true,
-      groupedIn: true,
-    },
+      groupedIn: true
+    }
   });
 
   const errors = fullpreviousBsdas.reduce<string[]>((acc, previousBsda) => {
     if (previousBsda.status === BsdaStatus.PROCESSED) {
       return acc.concat([
-        `Le bordereau n°${previousBsda.id} a déjà reçu son traitement final.`,
+        `Le bordereau n°${previousBsda.id} a déjà reçu son traitement final.`
       ]);
     }
 
     if (previousBsda.status !== BsdaStatus.AWAITING_CHILD) {
       return acc.concat([
-        `Le bordereau n°${previousBsda.id} n'a pas toutes les signatures requises.`,
+        `Le bordereau n°${previousBsda.id} n'a pas toutes les signatures requises.`
       ]);
     }
 
@@ -185,17 +184,17 @@ async function validatePreviousBsdas(
     const nextBsdas = [forwardedIn, groupedIn].filter(Boolean);
     if (
       nextBsdas.length > 0 &&
-      !nextBsdas.map((bsda) => bsda.id).includes(bsda.id)
+      !nextBsdas.map(bsda => bsda.id).includes(bsda.id)
     ) {
       return acc.concat([
-        `Le bordereau n°${previousBsda.id} a déjà été réexpédié ou groupé.`,
+        `Le bordereau n°${previousBsda.id} a déjà été réexpédié ou groupé.`
       ]);
     }
 
     const allowedOperations = ["D 13", "D 15"];
     if (!allowedOperations.includes(previousBsda.destinationOperationCode)) {
       return acc.concat([
-        `Le bordereau n°${previousBsda.id} a déclaré un traitement qui ne permet pas de lui donner la suite voulue.`,
+        `Le bordereau n°${previousBsda.id} a déclaré un traitement qui ne permet pas de lui donner la suite voulue.`
       ]);
     }
 
@@ -207,9 +206,10 @@ async function validatePreviousBsdas(
   }
 }
 
-const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> = (
-  context
-) =>
+const emitterSchema: FactorySchemaOf<
+  BsdaValidationContext,
+  Emitter
+> = context =>
   yup.object({
     emitterIsPrivateIndividual: yup
       .boolean()
@@ -259,12 +259,10 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> = (
     emitterPickupSiteCity: yup.string().nullable(),
     emitterPickupSiteInfos: yup.string().nullable(),
     emitterPickupSiteName: yup.string().nullable(),
-    emitterPickupSitePostalCode: yup.string().nullable(),
+    emitterPickupSitePostalCode: yup.string().nullable()
   });
 
-const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = (
-  context
-) =>
+const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
   yup.object({
     workerCompanyName: yup
       .string()
@@ -304,12 +302,13 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = (
         context.emissionSignature && !context.isType2710,
         `Entreprise de travaux: ${MISSING_COMPANY_EMAIL}`
       ),
-    workerWorkHasEmitterPaperSignature: yup.boolean().nullable(),
+    workerWorkHasEmitterPaperSignature: yup.boolean().nullable()
   });
 
-const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> = (
-  context
-) =>
+const destinationSchema: FactorySchemaOf<
+  BsdaValidationContext,
+  Destination
+> = context =>
   yup.object({
     destinationCompanyName: yup
       .string()
@@ -378,16 +377,14 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> = (
         `Entreprise de destination: vous devez préciser la quantité`
       )
       .when("destinationReceptionAcceptationStatus", {
-        is: (value) => value === WasteAcceptationStatus.REFUSED,
-        then: (schema) =>
+        is: value => value === WasteAcceptationStatus.REFUSED,
+        then: schema =>
           schema.oneOf(
             [0],
             "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
           ),
-        otherwise: (schema) =>
-          schema.positive(
-            "Vous devez saisir une quantité reçue supérieure à 0"
-          ),
+        otherwise: schema =>
+          schema.positive("Vous devez saisir une quantité reçue supérieure à 0")
       }),
     destinationReceptionAcceptationStatus: yup
       .mixed<BsdaAcceptationStatus>()
@@ -420,12 +417,13 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> = (
       .requiredIf(
         context.operationSignature,
         `Entreprise de destination:vous devez préciser la date d'opétation`
-      ) as any,
+      ) as any
   });
 
-const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> = (
-  context
-) =>
+const transporterSchema: FactorySchemaOf<
+  BsdaValidationContext,
+  Transporter
+> = context =>
   yup.object({
     transporterRecepisseDepartment: yup
       .string()
@@ -498,13 +496,13 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> = (
         context.transportSignature,
         `Transporteur: ${MISSING_COMPANY_EMAIL}`
       ),
-    transporterCompanyVatNumber: yup.string().nullable(),
+    transporterCompanyVatNumber: yup.string().nullable()
   });
 
 const wasteDescriptionSchema: FactorySchemaOf<
   BsdaValidationContext,
   WasteDescription
-> = (context) =>
+> = context =>
   yup.object({
     wasteCode: yup
       .string()
@@ -539,5 +537,5 @@ const wasteDescriptionSchema: FactorySchemaOf<
       ),
     weightValue: yup
       .number()
-      .requiredIf(context.emissionSignature, `La quantité est obligatoire`),
+      .requiredIf(context.emissionSignature, `La quantité est obligatoire`)
   });

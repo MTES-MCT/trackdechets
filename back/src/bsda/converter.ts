@@ -19,7 +19,7 @@ import {
   BsdaWork,
   BsdaBroker,
   BsdaPickupSite,
-  BsdaWeight,
+  BsdaWeight
 } from "../generated/graphql/types";
 import { Prisma, Bsda as PrismaBsda } from "@prisma/client";
 
@@ -39,22 +39,22 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         address: form.emitterCompanyAddress,
         contact: form.emitterCompanyContact,
         phone: form.emitterCompanyPhone,
-        mail: form.emitterCompanyMail,
+        mail: form.emitterCompanyMail
       }),
       customInfo: form.emitterCustomInfo,
       emission: nullIfNoValues<BsdaEmission>({
         signature: nullIfNoValues<Signature>({
           author: form.emitterEmissionSignatureAuthor,
-          date: form.emitterEmissionSignatureDate,
-        }),
+          date: form.emitterEmissionSignatureDate
+        })
       }),
       pickupSite: nullIfNoValues<BsdaPickupSite>({
         address: form.emitterPickupSiteAddress,
         city: form.emitterPickupSiteCity,
         infos: form.emitterPickupSiteInfos,
         name: form.emitterPickupSiteName,
-        postalCode: form.emitterPickupSitePostalCode,
-      }),
+        postalCode: form.emitterPickupSitePostalCode
+      })
     }),
     packagings: form.packagings as BsdaPackaging[],
     waste: nullIfNoValues<BsdaWaste>({
@@ -64,11 +64,11 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
       materialName: form.wasteMaterialName,
       name: form.wasteName,
       sealNumbers: form.wasteSealNumbers,
-      adr: form.wasteAdr,
+      adr: form.wasteAdr
     }),
     weight: nullIfNoValues<BsdaWeight>({
       isEstimate: form.weightIsEstimate,
-      value: form.weightValue,
+      value: form.weightValue
     }),
     destination: nullIfNoValues<BsdaDestination>({
       company: nullIfNoValues<FormCompany>({
@@ -77,7 +77,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         address: form.destinationCompanyAddress,
         contact: form.destinationCompanyContact,
         phone: form.destinationCompanyPhone,
-        mail: form.destinationCompanyMail,
+        mail: form.destinationCompanyMail
       }),
       customInfo: form.destinationCustomInfo,
       cap: form.destinationCap,
@@ -86,16 +86,16 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         acceptationStatus: form.destinationReceptionAcceptationStatus,
         refusalReason: form.destinationReceptionRefusalReason,
         date: form.destinationReceptionDate,
-        weight: form.destinationReceptionWeight,
+        weight: form.destinationReceptionWeight
       }),
       operation: nullIfNoValues<BsdaOperation>({
         code: form.destinationOperationCode,
         date: form.destinationOperationDate,
         signature: nullIfNoValues<Signature>({
           author: form.destinationOperationSignatureAuthor,
-          date: form.destinationOperationSignatureDate,
-        }),
-      }),
+          date: form.destinationOperationSignatureDate
+        })
+      })
     }),
     worker: nullIfNoValues<BsdaWorker>({
       company: nullIfNoValues<FormCompany>({
@@ -104,15 +104,15 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         address: form.workerCompanyAddress,
         contact: form.workerCompanyContact,
         phone: form.workerCompanyPhone,
-        mail: form.workerCompanyMail,
+        mail: form.workerCompanyMail
       }),
       work: nullIfNoValues<BsdaWork>({
         hasEmitterPaperSignature: form.workerWorkHasEmitterPaperSignature,
         signature: nullIfNoValues<Signature>({
           author: form.workerWorkSignatureAuthor,
-          date: form.workerWorkSignatureDate,
-        }),
-      }),
+          date: form.workerWorkSignatureDate
+        })
+      })
     }),
     broker: nullIfNoValues<BsdaBroker>({
       company: nullIfNoValues<FormCompany>({
@@ -121,13 +121,13 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         address: form.brokerCompanyAddress,
         contact: form.brokerCompanyContact,
         phone: form.brokerCompanyPhone,
-        mail: form.brokerCompanyMail,
+        mail: form.brokerCompanyMail
       }),
       recepisse: nullIfNoValues<BsdaRecepisse>({
         department: form.brokerRecepisseDepartment,
         number: form.brokerRecepisseNumber,
-        validityLimit: form.brokerRecepisseValidityLimit,
-      }),
+        validityLimit: form.brokerRecepisseValidityLimit
+      })
     }),
     transporter: nullIfNoValues<BsdaTransporter>({
       company: nullIfNoValues<FormCompany>({
@@ -137,13 +137,13 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         contact: form.transporterCompanyContact,
         phone: form.transporterCompanyPhone,
         mail: form.transporterCompanyMail,
-        vatNumber: form.transporterCompanyVatNumber,
+        vatNumber: form.transporterCompanyVatNumber
       }),
       customInfo: form.transporterCustomInfo,
       recepisse: nullIfNoValues<BsdaRecepisse>({
         department: form.transporterRecepisseDepartment,
         number: form.transporterRecepisseNumber,
-        validityLimit: form.transporterRecepisseValidityLimit,
+        validityLimit: form.transporterRecepisseValidityLimit
       }),
       transport: nullIfNoValues<BsdaTransport>({
         mode: form.transporterTransportMode,
@@ -151,12 +151,12 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         takenOverAt: form.transporterTransportTakenOverAt,
         signature: nullIfNoValues<Signature>({
           author: form.transporterTransportSignatureAuthor,
-          date: form.transporterTransportSignatureDate,
-        }),
-      }),
+          date: form.transporterTransportSignatureDate
+        })
+      })
     }),
     grouping: [],
-    metadata: null,
+    metadata: null
   };
 }
 
@@ -164,262 +164,240 @@ export function flattenBsdaInput(
   formInput: BsdaInput
 ): Partial<Prisma.BsdaCreateInput> {
   return safeInput({
-    type: chain(formInput, (f) => f.type),
+    type: chain(formInput, f => f.type),
     ...flattenBsdaEmitterInput(formInput),
     ...flattenBsdaDestinationInput(formInput),
     ...flattenBsdaTransporterInput(formInput),
     ...flattenBsdaWorkerInput(formInput),
     ...flattenBsdaBrokerInput(formInput),
     ...flattenBsdaWasteInput(formInput),
-    packagings: chain(formInput, (f) => f.packagings),
-    ...flattenBsdaWeightInput(formInput),
+    packagings: chain(formInput, f => f.packagings),
+    ...flattenBsdaWeightInput(formInput)
   });
 }
 
 function flattenBsdaEmitterInput({ emitter }: Pick<BsdaInput, "emitter">) {
   return {
-    emitterIsPrivateIndividual: chain(emitter, (e) => e.isPrivateIndividual),
-    emitterCompanyName: chain(emitter, (e) => chain(e.company, (c) => c.name)),
-    emitterCompanySiret: chain(emitter, (e) =>
-      chain(e.company, (c) => c.siret)
+    emitterIsPrivateIndividual: chain(emitter, e => e.isPrivateIndividual),
+    emitterCompanyName: chain(emitter, e => chain(e.company, c => c.name)),
+    emitterCompanySiret: chain(emitter, e => chain(e.company, c => c.siret)),
+    emitterCompanyAddress: chain(emitter, e =>
+      chain(e.company, c => c.address)
     ),
-    emitterCompanyAddress: chain(emitter, (e) =>
-      chain(e.company, (c) => c.address)
+    emitterCompanyContact: chain(emitter, e =>
+      chain(e.company, c => c.contact)
     ),
-    emitterCompanyContact: chain(emitter, (e) =>
-      chain(e.company, (c) => c.contact)
+    emitterCompanyPhone: chain(emitter, e => chain(e.company, c => c.phone)),
+    emitterCompanyMail: chain(emitter, e => chain(e.company, c => c.mail)),
+    emitterCustomInfo: chain(emitter, e => e.customInfo),
+    emitterWorkSiteName: chain(emitter, e => chain(e.pickupSite, w => w.name)),
+    emitterWorkSiteAddress: chain(emitter, e =>
+      chain(e.pickupSite, w => w.address)
     ),
-    emitterCompanyPhone: chain(emitter, (e) =>
-      chain(e.company, (c) => c.phone)
+    emitterWorkSiteCity: chain(emitter, e => chain(e.pickupSite, w => w.city)),
+    emitterWorkSitePostalCode: chain(emitter, e =>
+      chain(e.pickupSite, w => w.postalCode)
     ),
-    emitterCompanyMail: chain(emitter, (e) => chain(e.company, (c) => c.mail)),
-    emitterCustomInfo: chain(emitter, (e) => e.customInfo),
-    emitterWorkSiteName: chain(emitter, (e) =>
-      chain(e.pickupSite, (w) => w.name)
-    ),
-    emitterWorkSiteAddress: chain(emitter, (e) =>
-      chain(e.pickupSite, (w) => w.address)
-    ),
-    emitterWorkSiteCity: chain(emitter, (e) =>
-      chain(e.pickupSite, (w) => w.city)
-    ),
-    emitterWorkSitePostalCode: chain(emitter, (e) =>
-      chain(e.pickupSite, (w) => w.postalCode)
-    ),
-    emitterWorkSiteInfos: chain(emitter, (e) =>
-      chain(e.pickupSite, (w) => w.infos)
-    ),
+    emitterWorkSiteInfos: chain(emitter, e => chain(e.pickupSite, w => w.infos))
   };
 }
 
 function flattenBsdaDestinationInput({
-  destination,
+  destination
 }: Pick<BsdaInput, "destination">) {
   return {
-    destinationCompanyName: chain(destination, (d) =>
-      chain(d.company, (c) => c.name)
+    destinationCompanyName: chain(destination, d =>
+      chain(d.company, c => c.name)
     ),
-    destinationCompanySiret: chain(destination, (d) =>
-      chain(d.company, (c) => c.siret)
+    destinationCompanySiret: chain(destination, d =>
+      chain(d.company, c => c.siret)
     ),
-    destinationCompanyAddress: chain(destination, (d) =>
-      chain(d.company, (c) => c.address)
+    destinationCompanyAddress: chain(destination, d =>
+      chain(d.company, c => c.address)
     ),
-    destinationCompanyContact: chain(destination, (d) =>
-      chain(d.company, (c) => c.contact)
+    destinationCompanyContact: chain(destination, d =>
+      chain(d.company, c => c.contact)
     ),
-    destinationCompanyPhone: chain(destination, (d) =>
-      chain(d.company, (c) => c.phone)
+    destinationCompanyPhone: chain(destination, d =>
+      chain(d.company, c => c.phone)
     ),
-    destinationCompanyMail: chain(destination, (d) =>
-      chain(d.company, (c) => c.mail)
+    destinationCompanyMail: chain(destination, d =>
+      chain(d.company, c => c.mail)
     ),
-    destinationCustomInfo: chain(destination, (d) => d.customInfo),
-    destinationCap: chain(destination, (d) => d.cap),
+    destinationCustomInfo: chain(destination, d => d.customInfo),
+    destinationCap: chain(destination, d => d.cap),
     destinationPlannedOperationCode: chain(
       destination,
-      (d) => d.plannedOperationCode
+      d => d.plannedOperationCode
     ),
 
-    destinationReceptionDate: chain(destination, (d) =>
-      chain(d.reception, (r) => r.date)
+    destinationReceptionDate: chain(destination, d =>
+      chain(d.reception, r => r.date)
     ),
-    destinationReceptionWeight: chain(destination, (d) =>
-      chain(d.reception, (r) => r.weight)
+    destinationReceptionWeight: chain(destination, d =>
+      chain(d.reception, r => r.weight)
     ),
-    destinationReceptionAcceptationStatus: chain(destination, (d) =>
-      chain(d.reception, (r) => r.acceptationStatus)
+    destinationReceptionAcceptationStatus: chain(destination, d =>
+      chain(d.reception, r => r.acceptationStatus)
     ),
-    destinationReceptionRefusalReason: chain(destination, (d) =>
-      chain(d.reception, (r) => r.refusalReason)
+    destinationReceptionRefusalReason: chain(destination, d =>
+      chain(d.reception, r => r.refusalReason)
     ),
 
-    destinationOperationCode: chain(destination, (d) =>
-      chain(d.operation, (o) => o.code)
+    destinationOperationCode: chain(destination, d =>
+      chain(d.operation, o => o.code)
     ),
-    destinationOperationDate: chain(destination, (d) =>
-      chain(d.operation, (o) => o.date)
+    destinationOperationDate: chain(destination, d =>
+      chain(d.operation, o => o.date)
     ),
-    destinationOperationNextDestinationCompanyName: chain(destination, (d) =>
-      chain(d.operation, (o) =>
-        chain(o.nextDestination, (nd) => chain(nd.company, (c) => c.name))
+    destinationOperationNextDestinationCompanyName: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.name))
       )
     ),
-    destinationOperationNextDestinationCompanySiret: chain(destination, (d) =>
-      chain(d.operation, (o) =>
-        chain(o.nextDestination, (nd) => chain(nd.company, (c) => c.siret))
+    destinationOperationNextDestinationCompanySiret: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.siret))
       )
     ),
-    destinationOperationNextDestinationCompanyVatNumber: chain(
-      destination,
-      (d) =>
-        chain(d.operation, (o) =>
-          chain(o.nextDestination, (nd) =>
-            chain(nd.company, (c) => c.vatNumber)
-          )
-        )
-    ),
-    destinationOperationNextDestinationCompanyAddress: chain(destination, (d) =>
-      chain(d.operation, (o) =>
-        chain(o.nextDestination, (nd) => chain(nd.company, (c) => c.address))
+    destinationOperationNextDestinationCompanyVatNumber: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.vatNumber))
       )
     ),
-    destinationOperationNextDestinationCompanyContact: chain(destination, (d) =>
-      chain(d.operation, (o) =>
-        chain(o.nextDestination, (nd) => chain(nd.company, (c) => c.contact))
+    destinationOperationNextDestinationCompanyAddress: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.address))
       )
     ),
-    destinationOperationNextDestinationCompanyPhone: chain(destination, (d) =>
-      chain(d.operation, (o) =>
-        chain(o.nextDestination, (nd) => chain(nd.company, (c) => c.phone))
+    destinationOperationNextDestinationCompanyContact: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.contact))
       )
     ),
-    destinationOperationNextDestinationCompanyMail: chain(destination, (d) =>
-      chain(d.operation, (o) =>
-        chain(o.nextDestination, (nd) => chain(nd.company, (c) => c.mail))
+    destinationOperationNextDestinationCompanyPhone: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.phone))
       )
     ),
-    destinationOperationNextDestinationCap: chain(destination, (d) =>
-      chain(d.operation, (o) => chain(o.nextDestination, (nd) => nd.cap))
+    destinationOperationNextDestinationCompanyMail: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.mail))
+      )
+    ),
+    destinationOperationNextDestinationCap: chain(destination, d =>
+      chain(d.operation, o => chain(o.nextDestination, nd => nd.cap))
     ),
     destinationOperationNextDestinationPlannedOperationCode: chain(
       destination,
-      (d) =>
-        chain(d.operation, (o) =>
-          chain(o.nextDestination, (nd) => nd.plannedOperationCode)
+      d =>
+        chain(d.operation, o =>
+          chain(o.nextDestination, nd => nd.plannedOperationCode)
         )
-    ),
+    )
   };
 }
 
 function flattenBsdaTransporterInput({
-  transporter,
+  transporter
 }: Pick<BsdaInput, "transporter">) {
   return {
-    transporterCompanyName: chain(transporter, (t) =>
-      chain(t.company, (c) => c.name)
+    transporterCompanyName: chain(transporter, t =>
+      chain(t.company, c => c.name)
     ),
-    transporterCompanySiret: chain(transporter, (t) =>
-      chain(t.company, (c) => c.siret)
+    transporterCompanySiret: chain(transporter, t =>
+      chain(t.company, c => c.siret)
     ),
-    transporterCompanyAddress: chain(transporter, (t) =>
-      chain(t.company, (c) => c.address)
+    transporterCompanyAddress: chain(transporter, t =>
+      chain(t.company, c => c.address)
     ),
-    transporterCompanyContact: chain(transporter, (t) =>
-      chain(t.company, (c) => c.contact)
+    transporterCompanyContact: chain(transporter, t =>
+      chain(t.company, c => c.contact)
     ),
-    transporterCompanyPhone: chain(transporter, (t) =>
-      chain(t.company, (c) => c.phone)
+    transporterCompanyPhone: chain(transporter, t =>
+      chain(t.company, c => c.phone)
     ),
-    transporterCompanyMail: chain(transporter, (t) =>
-      chain(t.company, (c) => c.mail)
+    transporterCompanyMail: chain(transporter, t =>
+      chain(t.company, c => c.mail)
     ),
-    transporterCompanyVatNumber: chain(transporter, (t) =>
-      chain(t.company, (c) => c.vatNumber)
+    transporterCompanyVatNumber: chain(transporter, t =>
+      chain(t.company, c => c.vatNumber)
     ),
-    transporterCustomInfo: chain(transporter, (t) => t.customInfo),
-    transporterRecepisseIsExempted: chain(transporter, (t) =>
-      chain(t.recepisse, (r) => r.isExempted)
+    transporterCustomInfo: chain(transporter, t => t.customInfo),
+    transporterRecepisseIsExempted: chain(transporter, t =>
+      chain(t.recepisse, r => r.isExempted)
     ),
-    transporterRecepisseNumber: chain(transporter, (t) =>
-      chain(t.recepisse, (r) => r.number)
+    transporterRecepisseNumber: chain(transporter, t =>
+      chain(t.recepisse, r => r.number)
     ),
-    transporterRecepisseDepartment: chain(transporter, (t) =>
-      chain(t.recepisse, (r) => r.department)
+    transporterRecepisseDepartment: chain(transporter, t =>
+      chain(t.recepisse, r => r.department)
     ),
-    transporterRecepisseValidityLimit: chain(transporter, (t) =>
-      chain(t.recepisse, (r) => r.validityLimit)
+    transporterRecepisseValidityLimit: chain(transporter, t =>
+      chain(t.recepisse, r => r.validityLimit)
     ),
-    transporterTransportMode: chain(transporter, (t) =>
-      chain(t.transport, (tr) => tr.mode)
+    transporterTransportMode: chain(transporter, t =>
+      chain(t.transport, tr => tr.mode)
     ),
-    transporterTransportPlates: chain(transporter, (t) =>
-      chain(t.transport, (tr) => tr.plates)
+    transporterTransportPlates: chain(transporter, t =>
+      chain(t.transport, tr => tr.plates)
     ),
-    transporterTransportTakenOverAt: chain(transporter, (t) =>
-      chain(t.transport, (tr) => tr.takenOverAt)
-    ),
+    transporterTransportTakenOverAt: chain(transporter, t =>
+      chain(t.transport, tr => tr.takenOverAt)
+    )
   };
 }
 
 function flattenBsdaWorkerInput({ worker }: Pick<BsdaInput, "worker">) {
   return {
-    workerCompanyName: chain(worker, (w) => chain(w.company, (c) => c.name)),
-    workerCompanySiret: chain(worker, (w) => chain(w.company, (c) => c.siret)),
-    workerCompanyAddress: chain(worker, (w) =>
-      chain(w.company, (c) => c.address)
-    ),
-    workerCompanyContact: chain(worker, (w) =>
-      chain(w.company, (c) => c.contact)
-    ),
-    workerCompanyPhone: chain(worker, (w) => chain(w.company, (c) => c.phone)),
-    workerCompanyMail: chain(worker, (w) => chain(w.company, (c) => c.mail)),
-    workerWorkHasEmitterPaperSignature: chain(worker, (w) =>
-      chain(w.work, (wo) => wo.hasEmitterPaperSignature)
-    ),
+    workerCompanyName: chain(worker, w => chain(w.company, c => c.name)),
+    workerCompanySiret: chain(worker, w => chain(w.company, c => c.siret)),
+    workerCompanyAddress: chain(worker, w => chain(w.company, c => c.address)),
+    workerCompanyContact: chain(worker, w => chain(w.company, c => c.contact)),
+    workerCompanyPhone: chain(worker, w => chain(w.company, c => c.phone)),
+    workerCompanyMail: chain(worker, w => chain(w.company, c => c.mail)),
+    workerWorkHasEmitterPaperSignature: chain(worker, w =>
+      chain(w.work, wo => wo.hasEmitterPaperSignature)
+    )
   };
 }
 
 function flattenBsdaBrokerInput({ broker }: Pick<BsdaInput, "broker">) {
   return {
-    brokerCompanyName: chain(broker, (b) => chain(b.company, (c) => c.name)),
-    brokerCompanySiret: chain(broker, (b) => chain(b.company, (c) => c.siret)),
-    brokerCompanyAddress: chain(broker, (b) =>
-      chain(b.company, (c) => c.address)
+    brokerCompanyName: chain(broker, b => chain(b.company, c => c.name)),
+    brokerCompanySiret: chain(broker, b => chain(b.company, c => c.siret)),
+    brokerCompanyAddress: chain(broker, b => chain(b.company, c => c.address)),
+    brokerCompanyContact: chain(broker, b => chain(b.company, c => c.contact)),
+    brokerCompanyPhone: chain(broker, b => chain(b.company, c => c.phone)),
+    brokerCompanyMail: chain(broker, b => chain(b.company, c => c.mail)),
+    brokerRecepisseNumber: chain(broker, b =>
+      chain(b.recepisse, r => r.number)
     ),
-    brokerCompanyContact: chain(broker, (b) =>
-      chain(b.company, (c) => c.contact)
+    brokerRecepisseDepartment: chain(broker, b =>
+      chain(b.recepisse, r => r.department)
     ),
-    brokerCompanyPhone: chain(broker, (b) => chain(b.company, (c) => c.phone)),
-    brokerCompanyMail: chain(broker, (b) => chain(b.company, (c) => c.mail)),
-    brokerRecepisseNumber: chain(broker, (b) =>
-      chain(b.recepisse, (r) => r.number)
-    ),
-    brokerRecepisseDepartment: chain(broker, (b) =>
-      chain(b.recepisse, (r) => r.department)
-    ),
-    brokerRecepisseValidityLimit: chain(broker, (b) =>
-      chain(b.recepisse, (r) => r.validityLimit)
-    ),
+    brokerRecepisseValidityLimit: chain(broker, b =>
+      chain(b.recepisse, r => r.validityLimit)
+    )
   };
 }
 
 function flattenBsdaWeightInput({ weight }: Pick<BsdaInput, "weight">) {
   return {
-    weightIsEstimate: chain(weight, (q) => q.isEstimate),
-    weightValue: chain(weight, (q) => q.value),
+    weightIsEstimate: chain(weight, q => q.isEstimate),
+    weightValue: chain(weight, q => q.value)
   };
 }
 
 function flattenBsdaWasteInput({ waste }: Pick<BsdaInput, "waste">) {
   return {
-    wasteCode: chain(waste, (w) => w.code),
-    wasteAdr: chain(waste, (w) => w.adr),
-    wasteName: chain(waste, (w) => w.name),
-    wasteFamilyCode: chain(waste, (w) => w.familyCode),
-    wasteMaterialName: chain(waste, (w) => w.materialName),
-    wasteConsistence: chain(waste, (w) => w.consistence),
-    wasteSealNumbers: chain(waste, (w) => w.sealNumbers),
+    wasteCode: chain(waste, w => w.code),
+    wasteAdr: chain(waste, w => w.adr),
+    wasteName: chain(waste, w => w.name),
+    wasteFamilyCode: chain(waste, w => w.familyCode),
+    wasteMaterialName: chain(waste, w => w.materialName),
+    wasteConsistence: chain(waste, w => w.consistence),
+    wasteSealNumbers: chain(waste, w => w.sealNumbers)
   };
 }
 
@@ -436,6 +414,6 @@ export function toInitialBsda(bsda: GraphqlBsda): GraphQLInitialBsda {
     waste: bsda.waste,
     weight: bsda.weight,
     destination: bsda.destination,
-    packagings: bsda.packagings,
+    packagings: bsda.packagings
   };
 }
