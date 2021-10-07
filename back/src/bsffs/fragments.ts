@@ -114,8 +114,10 @@ export const fullBsff = gql`
       reception {
         date
         weight
-        acceptationStatus
-        refusalReason
+        acceptation {
+          status
+          refusalReason
+        }
         signature {
           date
           author
