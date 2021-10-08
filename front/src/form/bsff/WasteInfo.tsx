@@ -29,12 +29,12 @@ export default function WasteInfo({ disabled }) {
           Nature du fluide
           <Field
             type="text"
-            name="waste.nature"
+            name="waste.description"
             disabled={disabled}
             className="td-input"
           />
         </label>
-        <RedErrorMessage name="waste.nature" />
+        <RedErrorMessage name="waste.description" />
       </div>
 
       <div className="form__row">

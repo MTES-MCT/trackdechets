@@ -34,7 +34,7 @@ export const FullBsffFragment = gql`
     }
     waste {
       code
-      nature
+      description
       adr
     }
     weight {

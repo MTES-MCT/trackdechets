@@ -176,7 +176,7 @@ type BsffWaste {
   "Code déchet."
   code: String!
   "Nature du fluide, laisser vide lorsqu'il est inconnu."
-  nature: String
+  description: String
   "Mention ADR."
   adr: String!
 }

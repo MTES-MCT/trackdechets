@@ -1,6 +1,9 @@
 
+
 -- AlterTable Bsff
 ALTER TABLE "Bsff"
+  DROP COLUMN "wasteDescription",
+  RENAME COLUMN "wasteNature" TO "wasteDescription",
   RENAME COLUMN "destinationReceptionKilos" TO "destinationReceptionWeight",
   RENAME COLUMN "destinationReceptionRefusal" TO "destinationReceptionRefusalReason",
   RENAME COLUMN "quantityIsEstimate" TO "weightIsEstimate",
@@ -10,7 +13,7 @@ ALTER TABLE "Bsff"
   ADD COLUMN     "emitterCustomInfo" TEXT,
   ADD COLUMN     "forwardingId" TEXT,
   ADD COLUMN     "repackagedInId" TEXT,
-  ADD COLUMN     "transporterCustomInfo" TEXT;
+  ADD COLUMN     "transporterCustomInfo" TEXT,
 
 -- AlterTable BsffFicheIntervention
 ALTER TABLE "default$default"."BsffFicheIntervention"

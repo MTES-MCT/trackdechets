@@ -835,7 +835,6 @@ model Bsff {
   packagings Json @default("[]")
 
   wasteCode        String?
-  wasteNature      String?
   wasteDescription String?
   wasteAdr         String?
 

@@ -29,7 +29,7 @@ const UPDATE_BSFF = `
       }
       waste {
         code
-        nature
+        description
         adr
       }
       weight {
@@ -290,7 +290,7 @@ describe("Mutation.updateBsff", () => {
     const input = {
       waste: {
         code: WASTE_CODES[0],
-        nature: "R10",
+        description: "R10",
         adr: "Mention ADR"
       },
       weight: {
@@ -327,7 +327,7 @@ describe("Mutation.updateBsff", () => {
     const input = {
       waste: {
         code: WASTE_CODES[0],
-        nature: "R10",
+        description: "R10",
         adr: "Mention ADR"
       },
       weight: {
@@ -350,7 +350,7 @@ describe("Mutation.updateBsff", () => {
       expect.objectContaining({
         waste: {
           code: bsff.wasteCode,
-          nature: bsff.wasteNature,
+          description: bsff.wasteDescription,
           adr: input.waste.adr
         },
         weight: {
