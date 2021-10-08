@@ -14,6 +14,7 @@ export default function SignatureCodeInput({
       value={value}
       {...props}
       type="password"
+      autoComplete="off"
       pattern="[0-9]*"
       inputMode="numeric"
     />
