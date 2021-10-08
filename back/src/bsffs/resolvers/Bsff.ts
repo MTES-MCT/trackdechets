@@ -41,7 +41,7 @@ export const Bsff: BsffResolvers = {
   groupedIn: async ({ id }) => {
     const groupingBsff = await prisma.bsff
       .findUnique({ where: { id } })
-      .repackagedIn();
+      .groupedIn();
     return groupingBsff ? unflattenBsff(groupingBsff) : null;
   },
   grouping: async ({ id }) => {
