@@ -25,7 +25,7 @@ export function BsffWasteSummary({ bsff }: BsffWasteSummaryProps) {
       <DataListItem>
         <DataListTerm>Nature du fluide</DataListTerm>
         <DataListDescription>
-          {bsff.waste?.nature || "inconnue"}
+          {bsff.waste?.description || "inconnue"}
         </DataListDescription>
       </DataListItem>
       <DataListItem>

@@ -30,7 +30,7 @@ export default {
   packagings: [],
   waste: {
     code: "14 06 01*",
-    nature: null,
+    description: null,
     adr: "UN 1078, Gaz frigorifique NSA (Gaz réfrigérant, NSA), 2.2 (C/E)",
   },
   weight: {

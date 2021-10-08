@@ -67,7 +67,7 @@ export const fullBsff = gql`
     }
     waste {
       code
-      nature
+      description
       adr
     }
     weight {

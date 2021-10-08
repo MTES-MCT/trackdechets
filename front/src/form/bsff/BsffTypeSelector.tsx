@@ -183,7 +183,7 @@ function PreviousBsffsPicker({
                   <TableCell>{bsff.id}</TableCell>
                   <TableCell>
                     {bsff.waste?.code} - Nature :{" "}
-                    {bsff.waste?.nature ?? "inconnue"}
+                    {bsff.waste?.description ?? "inconnue"}
                   </TableCell>
                   <TableCell>{bsff.emitter?.company?.name}</TableCell>
                   <TableCell>{bsff.transporter?.company?.name}</TableCell>

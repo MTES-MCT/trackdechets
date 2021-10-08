@@ -313,21 +313,19 @@ describe("Query.bsffs", () => {
             node: expect.objectContaining({
               id: bsff.id,
               grouping: [
-                expect.objectContaining(
-                  expect.objectContaining({
-                    id: previousBsff.id,
-                    ficheInterventions: [
-                      expect.objectContaining({
-                        detenteur: expect.objectContaining({
-                          company: expect.objectContaining({
-                            siret:
-                              previousBsffFicheIntervention.detenteurCompanySiret
-                          })
+                expect.objectContaining({
+                  id: previousBsff.id,
+                  ficheInterventions: [
+                    expect.objectContaining({
+                      detenteur: expect.objectContaining({
+                        company: expect.objectContaining({
+                          siret:
+                            previousBsffFicheIntervention.detenteurCompanySiret
                         })
                       })
-                    ]
-                  })
-                )
+                    })
+                  ]
+                })
               ]
             })
           })

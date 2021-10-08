@@ -65,7 +65,7 @@ export function BsffDetailContent({ form }: Props) {
               />
               <dt>Déchet</dt>
               <dd>
-                {form.waste?.code} {form.waste?.nature}
+                {form.waste?.code} {form.waste?.description}
               </dd>
             </div>
           </div>
@@ -180,7 +180,7 @@ export function BsffDetailContent({ form }: Props) {
               },
               waste: {
                 code: form.waste?.code,
-                nature: form.waste?.nature ?? undefined,
+                nature: form.waste?.description ?? undefined,
               },
             }}
           />
