@@ -14,7 +14,10 @@ export const signatureValidationSchema = (form: Bsdasri) =>
 export const emissionSignatureSecretCodeValidationSchema = yup.object({
   signature: yup.object({
     author: yup.string().nullable().required("Le nom du signataire est requis"),
-    securityCode: yup.number().required("Le code de signature est obligatoire"),
+    securityCode: yup
+      .string()
+      .required("Le code de signature est obligatoire")
+      .matches(/[0-9]{4}/, "Format invalide"),
   }),
 });
 
