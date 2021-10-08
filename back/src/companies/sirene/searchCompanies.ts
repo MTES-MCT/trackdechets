@@ -14,13 +14,13 @@ import { redundant } from "./redundancy";
  * because fuzzy search is way better in entreprise.data.gouv.fr
  */
 const decoratedSearchCompanies = redundant(
-  throttle(searchCompaniesDataGouv, {
-    cacheKey: DATA_GOUV_THROTTLE_KEY,
-    errorMessage: throttleErrorMessage("entreprise.data.gouv.fr")
-  }),
   throttle(searchCompaniesInsee, {
     cacheKey: INSEE_THROTTLE_KEY,
     errorMessage: throttleErrorMessage("INSEE")
+  }),
+  throttle(searchCompaniesDataGouv, {
+    cacheKey: DATA_GOUV_THROTTLE_KEY,
+    errorMessage: throttleErrorMessage("entreprise.data.gouv.fr")
   })
 );
 
