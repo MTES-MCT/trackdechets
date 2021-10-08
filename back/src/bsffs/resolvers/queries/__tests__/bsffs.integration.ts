@@ -313,8 +313,8 @@ describe("Query.bsffs", () => {
             node: expect.objectContaining({
               id: bsff.id,
               grouping: [
-                expect.objectContaining({
-                  bsff: expect.objectContaining({
+                expect.objectContaining(
+                  expect.objectContaining({
                     id: previousBsff.id,
                     ficheInterventions: [
                       expect.objectContaining({
@@ -327,7 +327,7 @@ describe("Query.bsffs", () => {
                       })
                     ]
                   })
-                })
+                )
               ]
             })
           })
