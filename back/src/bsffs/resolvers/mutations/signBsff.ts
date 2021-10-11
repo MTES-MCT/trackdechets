@@ -1,4 +1,4 @@
-import { BsffStatus, Bsff } from "@prisma/client";
+import { BsffStatus, Bsff, WasteAcceptationStatus } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -14,7 +14,7 @@ import {
   validateBeforeTransport
 } from "../../validation";
 import { unflattenBsff } from "../../converter";
-import { getBsffOrNotFound } from "../../database";
+import { getBsffHistory, getBsffOrNotFound } from "../../database";
 import { indexBsff } from "../../elastic";
 import { OPERATION } from "../../constants";
 
@@ -108,9 +108,11 @@ const signatures: Record<
 
     return prisma.bsff.update({
       data: {
-        status: existingBsff.destinationReceptionRefusal
-          ? BsffStatus.REFUSED
-          : BsffStatus.RECEIVED,
+        status:
+          existingBsff.destinationReceptionAcceptationStatus ===
+          WasteAcceptationStatus.ACCEPTED
+            ? BsffStatus.RECEIVED
+            : BsffStatus.REFUSED,
         destinationReceptionSignatureDate: signature.date,
         destinationReceptionSignatureAuthor: signature.author
       },
@@ -132,15 +134,23 @@ const signatures: Record<
         ? BsffStatus.INTERMEDIATELY_PROCESSED
         : BsffStatus.PROCESSED;
 
-    if (status === BsffStatus.PROCESSED) {
+    const previousBsffsIds = (await getBsffHistory(existingBsff)).map(
+      bsff => bsff.id
+    );
+
+    if (status === BsffStatus.PROCESSED && previousBsffsIds.length > 0) {
       await prisma.bsff.updateMany({
         data: {
           status: BsffStatus.PROCESSED
         },
         where: {
-          nextBsffId: existingBsff.id
+          id: { in: previousBsffsIds }
         }
       });
+      const updatedBsffs = await prisma.bsff.findMany({
+        where: { id: { in: previousBsffsIds } }
+      });
+      await Promise.all(updatedBsffs.map(bsff => indexBsff(bsff)));
     }
 
     return prisma.bsff.update({

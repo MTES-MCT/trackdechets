@@ -23,7 +23,7 @@ export default function Destination({ disabled }) {
         <label>Opération d’élimination / valorisation prévue (code D/R)</label>
         <Field
           as="select"
-          name="destination.plannedOperation.code"
+          name="destination.plannedOperationCode"
           className="td-select"
           disabled={disabled}
         >

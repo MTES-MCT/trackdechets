@@ -29,12 +29,12 @@ export default function WasteInfo({ disabled }) {
           Nature du fluide
           <Field
             type="text"
-            name="waste.nature"
+            name="waste.description"
             disabled={disabled}
             className="td-input"
           />
         </label>
-        <RedErrorMessage name="waste.nature" />
+        <RedErrorMessage name="waste.description" />
       </div>
 
       <div className="form__row">
@@ -61,7 +61,7 @@ export default function WasteInfo({ disabled }) {
           Poids total en kilos
           <Field
             component={NumberInput}
-            name="quantity.kilos"
+            name="weight.value"
             disabled={disabled}
             className="td-input"
           />
@@ -70,10 +70,10 @@ export default function WasteInfo({ disabled }) {
           type="checkbox"
           label="Il s'agit d'une estimation"
           component={FieldSwitch}
-          name="quantity.isEstimate"
+          name="weight.isEstimate"
           disabled={disabled}
         />
-        <RedErrorMessage name="quantity.kilos" />
+        <RedErrorMessage name="weight.value" />
       </div>
     </>
   );

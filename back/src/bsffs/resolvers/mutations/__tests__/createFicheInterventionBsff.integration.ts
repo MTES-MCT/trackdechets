@@ -18,7 +18,7 @@ const ADD_FICHE_INTERVENTION = `
 const variables: MutationCreateFicheInterventionBsffArgs = {
   input: {
     numero: "ABCDEFGHIJK",
-    kilos: 1,
+    weight: 1,
     detenteur: {
       company: {
         name: "Acme",

@@ -827,6 +827,7 @@ model Bsff {
   emitterCompanyContact String?
   emitterCompanyPhone   String?
   emitterCompanyMail    String?
+  emitterCustomInfo     String?
 
   emitterEmissionSignatureAuthor String?
   emitterEmissionSignatureDate   DateTime?
@@ -834,12 +835,11 @@ model Bsff {
   packagings Json @default("[]")
 
   wasteCode        String?
-  wasteNature      String?
   wasteDescription String?
   wasteAdr         String?
 
-  quantityKilos      Float?
-  quantityIsEstimate Boolean?
+  weightValue      Float?
+  weightIsEstimate Boolean?
 
   transporterCompanyName      String?
   transporterCompanySiret     String?
@@ -848,6 +848,8 @@ model Bsff {
   transporterCompanyContact   String?
   transporterCompanyPhone     String?
   transporterCompanyMail      String?
+
+  transporterCustomInfo String?
 
   transporterRecepisseNumber        String?
   transporterRecepisseDepartment    String?
@@ -864,9 +866,12 @@ model Bsff {
   destinationCompanyPhone   String?
   destinationCompanyMail    String?
 
-  destinationReceptionDate    DateTime?
-  destinationReceptionKilos   Float?
-  destinationReceptionRefusal String?
+  destinationCustomInfo String?
+
+  destinationReceptionDate              DateTime?
+  destinationReceptionWeight            Float?
+  destinationReceptionAcceptationStatus WasteAcceptationStatus?
+  destinationReceptionRefusalReason     String?
 
   destinationReceptionSignatureAuthor String?
   destinationReceptionSignatureDate   DateTime?
@@ -890,10 +895,25 @@ model Bsff {
 
   ficheInterventions BsffFicheIntervention[] @relation("FicheInterventionToBsff")
 
+  grouping    Bsff[]  @relation("Grouping")
+  groupedIn   Bsff?   @relation("Grouping", fields: [groupedInId], references: [id])
+  groupedInId String?
+
+
+  repackaging    Bsff[]  @relation("Repackaging")
+  repackagedIn   Bsff?   @relation("Repackaging", fields: [repackagedInId], references: [id])
+  repackagedInId String?
+
+  forwarding   Bsff?   @relation("Forwarding", fields: [forwardingId], references: [id])
+  forwardingId String?
+  forwardedIn  Bsff?   @relation("Forwarding")
+
+  // DEPRECATED relations, to be deleted after data migration
   previousBsffs Bsff[]  @relation("BsffToBsff")
   nextBsff      Bsff?   @relation("BsffToBsff", fields: [nextBsffId], references: [id])
   nextBsffId    String?
 }
+
 
 enum BsffType {
   TRACER_FLUIDE
@@ -918,7 +938,7 @@ model BsffFicheIntervention {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   numero     String
-  kilos      Float
+  weight     Float
   postalCode String
 
   detenteurCompanyName    String
@@ -989,6 +1009,7 @@ model Bsda {
   emitterWorkSiteInfos           String?
   emitterEmissionSignatureAuthor String?
   emitterEmissionSignatureDate   DateTime?
+
 
   wasteCode         String?
   wasteName         String?

@@ -2,12 +2,13 @@ import path from "path";
 import fs from "fs/promises";
 import mustache from "mustache";
 import { format } from "date-fns";
-import { Bsff, BsffType } from "@prisma/client";
+import { Bsff, BsffType, WasteAcceptationStatus } from "@prisma/client";
 import * as QRCode from "qrcode";
 import prisma from "../../prisma";
 import { BsffPackaging } from "../../generated/graphql/types";
 import { toPDF } from "../../common/pdf";
 import { OPERATION } from "../constants";
+import { getBsffHistory } from "../database";
 
 const assetsPath = path.join(__dirname, "assets");
 const templatePath = path.join(assetsPath, "index.html");
@@ -18,11 +19,7 @@ const cssPaths = [
 ];
 
 export async function generateBsffPdf(bsff: Bsff) {
-  const previousBsffs = await prisma.bsff.findMany({
-    where: {
-      nextBsffId: bsff.id
-    }
-  });
+  const previousBsffs = await getBsffHistory(bsff);
   const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
     where: {
       bsffId: bsff.id
@@ -81,13 +78,17 @@ export async function generateBsffPdf(bsff: Bsff) {
             `n°${packaging.numero}`
           ]
             .filter(Boolean)
-            .join(" ")} : ${packaging.kilos} kilo(s)`
+            .join(" ")} : ${packaging.weight} kilo(s)`
       )
       .join(", "),
     receptionAccepted:
-      !!bsff.destinationReceptionDate && !bsff.destinationReceptionRefusal,
+      !!bsff.destinationReceptionDate &&
+      bsff.destinationReceptionAcceptationStatus ===
+        WasteAcceptationStatus.ACCEPTED,
     recepetionRefused:
-      !!bsff.destinationReceptionDate && !!bsff.destinationReceptionRefusal,
+      !!bsff.destinationReceptionDate &&
+      bsff.destinationReceptionAcceptationStatus ===
+        WasteAcceptationStatus.REFUSED,
     ficheInterventions: [
       ...ficheInterventions,
 

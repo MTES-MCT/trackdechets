@@ -6,10 +6,12 @@ import {
   TransportMode,
   BsffFicheIntervention,
   BsffStatus,
-  BsffType
+  BsffType,
+  WasteAcceptationStatus
 } from "@prisma/client";
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { OPERATION, WASTE_CODES } from "./constants";
+import prisma from "../prisma";
 
 const bsffSchema: yup.SchemaOf<Pick<
   Bsff,
@@ -22,7 +24,7 @@ const bsffSchema: yup.SchemaOf<Pick<
   | "emitterCompanyMail"
   | "wasteCode"
   | "wasteAdr"
-  | "quantityKilos"
+  | "weightValue"
   | "destinationPlannedOperationCode"
 >> = yup.object({
   isDraft: yup.boolean().nullable(),
@@ -101,7 +103,7 @@ const bsffSchema: yup.SchemaOf<Pick<
       is: true,
       otherwise: schema => schema.required("La mention ADR est requise")
     }),
-  quantityKilos: yup
+  weightValue: yup
     .number()
     .nullable()
     .when("isDraft", {
@@ -173,7 +175,16 @@ async function validatePreviousBsffs(
     );
   }
 
-  const errors = previousBsffs.reduce<string[]>((acc, previousBsff) => {
+  const fullPreviousBsffs = await prisma.bsff.findMany({
+    where: { id: { in: previousBsffs.map(bsff => bsff.id) } },
+    include: {
+      forwardedIn: true,
+      repackagedIn: true,
+      groupedIn: true
+    }
+  });
+
+  const errors = fullPreviousBsffs.reduce<string[]>((acc, previousBsff) => {
     if (previousBsff.status === BsffStatus.PROCESSED) {
       return acc.concat([
         `Le bordereau n°${previousBsff.id} a déjà reçu son traitement final.`
@@ -186,9 +197,19 @@ async function validatePreviousBsffs(
       ]);
     }
 
-    if (previousBsff.nextBsffId && previousBsff.nextBsffId !== bsff.id) {
+    const { forwardedIn, repackagedIn, groupedIn } = previousBsff;
+    // nextBsffs of previous
+    const nextBsffs = [
+      ...(forwardedIn ? [forwardedIn] : []),
+      ...(repackagedIn ? [repackagedIn] : []),
+      ...(groupedIn ? [groupedIn] : [])
+    ];
+    if (
+      nextBsffs.length > 0 &&
+      !nextBsffs.map(bsff => bsff.id).includes(bsff.id)
+    ) {
       return acc.concat([
-        `Le bordereau n°${previousBsff.id} est déjà associé à un autre bordereau.`
+        `Le bordereau n°${previousBsff.id} a déjà été réexpédié, reconditionné ou groupé.`
       ]);
     }
 
@@ -305,7 +326,7 @@ const beforeTransportSchema: yup.SchemaOf<Pick<
           .string()
           .nullable()
           .required("Le numéro identifiant du contenant est requis"),
-        kilos: yup
+        weight: yup
           .number()
           .nullable()
           .required("Le poids du contenant est requis")
@@ -373,7 +394,7 @@ export function validateBeforeTransport(
   });
 }
 
-const beforeReceptionSchema: yup.SchemaOf<Pick<
+export const beforeReceptionSchema: yup.SchemaOf<Pick<
   Bsff,
   | "destinationCompanyName"
   | "destinationCompanySiret"
@@ -384,7 +405,7 @@ const beforeReceptionSchema: yup.SchemaOf<Pick<
   | "transporterTransportSignatureDate"
   | "destinationReceptionSignatureDate"
   | "destinationReceptionDate"
-  | "destinationReceptionKilos"
+  | "destinationReceptionWeight"
 >> = yup.object({
   destinationCompanyName: yup
     .string()
@@ -435,10 +456,41 @@ const beforeReceptionSchema: yup.SchemaOf<Pick<
     .date()
     .nullable()
     .required("La date de réception du déchet est requise") as any, // https://github.com/jquense/yup/issues/1302
-  destinationReceptionKilos: yup
+  destinationReceptionAcceptationStatus: yup
+    .mixed<WasteAcceptationStatus>()
+    .required()
+    .notOneOf(
+      [WasteAcceptationStatus.PARTIALLY_REFUSED],
+      "Le refus partiel n'est pas autorisé dans le cas d'un BSFF"
+    ),
+  destinationReceptionRefusalReason: yup
+    .string()
+    .when(
+      "destinationReceptionAcceptationStatus",
+      (acceptationStatus, schema) =>
+        acceptationStatus === WasteAcceptationStatus.REFUSED
+          ? schema.ensure().required("Vous devez saisir un motif de refus")
+          : schema
+              .ensure()
+              .max(
+                0,
+                "Le motif du refus ne doit pas être renseigné si le déchet est accepté"
+              )
+    ),
+  destinationReceptionWeight: yup
     .number()
     .nullable()
     .required("Le poids en kilos du déchet reçu est requis")
+    .when("destinationReceptionAcceptationStatus", {
+      is: value => value === WasteAcceptationStatus.REFUSED,
+      then: schema =>
+        schema.oneOf(
+          [0],
+          "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
+        ),
+      otherwise: schema =>
+        schema.positive("Vous devez saisir une quantité reçue supérieure à 0")
+    })
 });
 
 export function validateBeforeReception(
@@ -488,7 +540,7 @@ export function validateBeforeOperation(
 const ficheInterventionSchema: yup.SchemaOf<Pick<
   BsffFicheIntervention,
   | "numero"
-  | "kilos"
+  | "weight"
   | "postalCode"
   | "detenteurCompanyName"
   | "detenteurCompanySiret"
@@ -506,7 +558,7 @@ const ficheInterventionSchema: yup.SchemaOf<Pick<
   numero: yup
     .string()
     .required("Le numéro de la fiche d'intervention est requis"),
-  kilos: yup.number().required("Le poids en kilos est requis"),
+  weight: yup.number().required("Le poids en kilos est requis"),
   postalCode: yup
     .string()
     .required("Le code postal du lieu de l'intervention est requis"),

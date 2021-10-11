@@ -25,19 +25,19 @@ export function BsffWasteSummary({ bsff }: BsffWasteSummaryProps) {
       <DataListItem>
         <DataListTerm>Nature du fluide</DataListTerm>
         <DataListDescription>
-          {bsff.waste?.nature || "inconnue"}
+          {bsff.waste?.description || "inconnue"}
         </DataListDescription>
       </DataListItem>
       <DataListItem>
         <DataListTerm>Quantité de fluides</DataListTerm>
         <DataListDescription>
-          {bsff.destination?.reception?.kilos == null ? (
+          {bsff.destination?.reception?.weight == null ? (
             <>
-              {bsff.quantity?.kilos} kilo(s){" "}
-              {bsff.quantity?.isEstimate && <>(estimé(s))</>}
+              {bsff.weight?.value} kilo(s){" "}
+              {bsff.weight?.isEstimate && <>(estimé(s))</>}
             </>
           ) : (
-            <>{bsff.destination.reception.kilos} kilo(s)</>
+            <>{bsff.destination.reception.weight} kilo(s)</>
           )}
         </DataListDescription>
       </DataListItem>
@@ -47,7 +47,7 @@ export function BsffWasteSummary({ bsff }: BsffWasteSummaryProps) {
           {bsff.packagings
             .map(
               packaging =>
-                `${packaging.name} n°${packaging.numero} (${packaging.kilos} kilo(s))`
+                `${packaging.name} n°${packaging.numero} (${packaging.weight} kilo(s))`
             )
             .join(", ")}
         </DataListDescription>

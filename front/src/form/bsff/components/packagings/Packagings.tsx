@@ -73,7 +73,7 @@ export default function BsffPackagings({
                           <Field
                             component={NumberInput}
                             className="td-input"
-                            name={`${fieldName}.kilos`}
+                            name={`${fieldName}.weight`}
                             disabled={!canEdit}
                           />
                         </label>
@@ -92,7 +92,7 @@ export default function BsffPackagings({
                   </div>
                   <RedErrorMessage name={`${fieldName}.name`} />
                   <RedErrorMessage name={`${fieldName}.numero`} />
-                  <RedErrorMessage name={`${fieldName}.kilos`} />
+                  <RedErrorMessage name={`${fieldName}.weight`} />
                 </div>
               );
             })}
@@ -104,7 +104,7 @@ export default function BsffPackagings({
                   arrayHelpers.push({
                     name: "",
                     numero: "",
-                    kilos: 0,
+                    weight: 0,
                   })
                 }
               >

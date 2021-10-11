@@ -32,15 +32,16 @@ export function flattenBsffInput(
     emitterCompanyContact: bsffInput.emitter?.company.contact,
     emitterCompanyPhone: bsffInput.emitter?.company.phone,
     emitterCompanyMail: bsffInput.emitter?.company.mail,
+    emitterCustomInfo: bsffInput.emitter?.customInfo,
 
     packagings: bsffInput.packagings,
 
     wasteCode: bsffInput.waste?.code,
-    wasteNature: bsffInput.waste?.nature,
+    wasteDescription: bsffInput.waste?.description,
     wasteAdr: bsffInput.waste?.adr,
 
-    quantityKilos: bsffInput.quantity?.kilos,
-    quantityIsEstimate: bsffInput.quantity?.isEstimate,
+    weightValue: bsffInput.weight?.value,
+    weightIsEstimate: bsffInput.weight?.isEstimate,
 
     transporterCompanyName: bsffInput.transporter?.company.name,
     transporterCompanySiret: bsffInput.transporter?.company.siret,
@@ -49,6 +50,7 @@ export function flattenBsffInput(
     transporterCompanyContact: bsffInput.transporter?.company.contact,
     transporterCompanyPhone: bsffInput.transporter?.company.phone,
     transporterCompanyMail: bsffInput.transporter?.company.mail,
+    transporterCustomInfo: bsffInput.transporter?.customInfo,
 
     transporterRecepisseNumber: bsffInput.transporter?.recepisse?.number,
     transporterRecepisseDepartment:
@@ -64,13 +66,17 @@ export function flattenBsffInput(
     destinationCompanyContact: bsffInput.destination?.company?.contact,
     destinationCompanyPhone: bsffInput.destination?.company?.phone,
     destinationCompanyMail: bsffInput.destination?.company?.mail,
+    destinationCustomInfo: bsffInput.destination?.customInfo,
 
     destinationReceptionDate: bsffInput.destination?.reception?.date,
-    destinationReceptionKilos: bsffInput.destination?.reception?.kilos,
-    destinationReceptionRefusal: bsffInput.destination?.reception?.refusal,
+    destinationReceptionWeight: bsffInput.destination?.reception?.weight,
+    destinationReceptionAcceptationStatus:
+      bsffInput.destination?.reception?.acceptation?.status,
+    destinationReceptionRefusalReason:
+      bsffInput.destination?.reception?.acceptation?.refusalReason,
 
     destinationPlannedOperationCode:
-      bsffInput.destination?.plannedOperation?.code,
+      bsffInput.destination?.plannedOperationCode,
 
     destinationOperationCode: bsffInput.destination?.operation?.code,
 
@@ -96,6 +102,8 @@ export function flattenBsffInput(
 export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
   return {
     id: prismaBsff.id,
+    createdAt: prismaBsff.createdAt,
+    updatedAt: prismaBsff.updatedAt,
     isDraft: prismaBsff.isDraft,
     type: prismaBsff.type,
     status: prismaBsff.status,
@@ -108,6 +116,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
         phone: prismaBsff.emitterCompanyPhone,
         mail: prismaBsff.emitterCompanyMail
       }),
+      customInfo: prismaBsff.emitterCustomInfo,
       emission: nullIfNoValues<GraphQL.BsffEmission>({
         signature: nullIfNoValues<GraphQL.Signature>({
           author: prismaBsff.emitterEmissionSignatureAuthor,
@@ -118,12 +127,12 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
     packagings: prismaBsff.packagings as GraphQL.BsffPackaging[],
     waste: nullIfNoValues<GraphQL.BsffWaste>({
       code: prismaBsff.wasteCode,
-      nature: prismaBsff.wasteNature,
+      description: prismaBsff.wasteDescription,
       adr: prismaBsff.wasteAdr
     }),
-    quantity: nullIfNoValues<GraphQL.BsffQuantity>({
-      kilos: prismaBsff.quantityKilos,
-      isEstimate: prismaBsff.quantityIsEstimate
+    weight: nullIfNoValues<GraphQL.BsffWeight>({
+      value: prismaBsff.weightValue,
+      isEstimate: prismaBsff.weightIsEstimate
     }),
     transporter: nullIfNoValues<GraphQL.BsffTransporter>({
       company: nullIfNoValues<GraphQL.FormCompany>({
@@ -140,6 +149,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
         department: prismaBsff.transporterRecepisseDepartment,
         validityLimit: prismaBsff.transporterRecepisseValidityLimit
       }),
+      customInfo: prismaBsff.transporterCustomInfo,
       transport: nullIfNoValues<GraphQL.BsffTransport>({
         mode: prismaBsff.transporterTransportMode,
         signature: nullIfNoValues<GraphQL.Signature>({
@@ -157,10 +167,14 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
         phone: prismaBsff.destinationCompanyPhone,
         mail: prismaBsff.destinationCompanyMail
       }),
+      customInfo: prismaBsff.destinationCustomInfo,
       reception: nullIfNoValues<GraphQL.BsffReception>({
         date: prismaBsff.destinationReceptionDate,
-        kilos: prismaBsff.destinationReceptionKilos,
-        refusal: prismaBsff.destinationReceptionRefusal,
+        weight: prismaBsff.destinationReceptionWeight,
+        acceptation: nullIfNoValues<GraphQL.BsffAcceptation>({
+          status: prismaBsff.destinationReceptionAcceptationStatus,
+          refusalReason: prismaBsff.destinationReceptionRefusalReason
+        }),
         signature: nullIfNoValues<GraphQL.Signature>({
           author: prismaBsff.destinationReceptionSignatureAuthor,
           date: prismaBsff.destinationReceptionSignatureDate
@@ -187,15 +201,13 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
           date: prismaBsff.destinationOperationSignatureDate
         })
       }),
-      plannedOperation: nullIfNoValues<GraphQL.BsffPlannedOperation>({
-        code: prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode
-      }),
+      plannedOperationCode: prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode,
       cap: prismaBsff.destinationCap
     }),
+    // the following relations will be set in Bsff resolver
     ficheInterventions: [],
-    nextBsff: null,
-    nextBsffs: [],
-    previousBsffs: []
+    grouping: [],
+    repackaging: []
   };
 }
 
@@ -204,7 +216,7 @@ export function flattenFicheInterventionBsffInput(
 ): Prisma.Prisma.BsffFicheInterventionCreateInput {
   return {
     numero: ficheInterventionInput.numero,
-    kilos: ficheInterventionInput.kilos,
+    weight: ficheInterventionInput.weight,
     postalCode: ficheInterventionInput.postalCode,
 
     detenteurCompanyName: ficheInterventionInput.detenteur.company.name ?? "",
@@ -233,7 +245,7 @@ export function unflattenFicheInterventionBsff(
   return {
     id: prismaFicheIntervention.id,
     numero: prismaFicheIntervention.numero,
-    kilos: prismaFicheIntervention.kilos,
+    weight: prismaFicheIntervention.weight,
     postalCode: prismaFicheIntervention.postalCode,
     detenteur: {
       company: {
@@ -255,5 +267,24 @@ export function unflattenFicheInterventionBsff(
         mail: prismaFicheIntervention.operateurCompanyMail
       }
     }
+  };
+}
+
+/**
+ * Only returns fields that can be read from the child BSFF in
+ * case of a forwarding, repackaging or grouping
+ */
+export function toInitialBsff(bsff: GraphQL.Bsff): GraphQL.InitialBsff {
+  return {
+    id: bsff.id,
+    // emitter can only be read by someone who is contributor of the initial BSFF, this
+    // logic is implemented in the InitialBsff resolver
+    emitter: bsff.emitter,
+    waste: bsff.waste,
+    weight: bsff.weight,
+    destination: bsff.destination,
+    packagings: bsff.packagings,
+    // ficheInterventions will be returned in InitialBsff resolver
+    ficheInterventions: []
   };
 }
