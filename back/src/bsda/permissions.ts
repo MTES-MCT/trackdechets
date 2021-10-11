@@ -4,7 +4,7 @@ import { NotFormContributor } from "../forms/errors";
 import prisma from "../prisma";
 import { getFullUser } from "../users/database";
 
-export async function checkIsFormContributor(
+export async function checkIsBsdaContributor(
   user: User,
   form: Partial<
     Pick<
@@ -13,11 +13,12 @@ export async function checkIsFormContributor(
       | "destinationCompanySiret"
       | "transporterCompanySiret"
       | "workerCompanySiret"
+      | "brokerCompanySiret"
     >
   >,
   errorMsg: string
 ) {
-  const isContributor = await isFormContributor(user, form);
+  const isContributor = await isBsdaContributor(user, form);
 
   if (!isContributor) {
     throw new NotFormContributor(errorMsg);
@@ -26,7 +27,7 @@ export async function checkIsFormContributor(
   return true;
 }
 
-export async function isFormContributor(user: User, form: Partial<Bsda>) {
+export async function isBsdaContributor(user: User, form: Partial<Bsda>) {
   const fullUser = await getFullUser(user);
   const userSirets = fullUser.companies.map(c => c.siret);
 
@@ -34,7 +35,8 @@ export async function isFormContributor(user: User, form: Partial<Bsda>) {
     form.emitterCompanySiret,
     form.destinationCompanySiret,
     form.transporterCompanySiret,
-    form.workerCompanySiret
+    form.workerCompanySiret,
+    form.brokerCompanySiret
   ];
 
   const siretsInCommon = userSirets.filter(siret => formSirets.includes(siret));
@@ -43,7 +45,7 @@ export async function isFormContributor(user: User, form: Partial<Bsda>) {
 }
 
 export async function checkCanDeleteBsda(user: User, form: Bsda) {
-  await checkIsFormContributor(
+  await checkIsBsdaContributor(
     user,
     form,
     "Vous n'êtes pas autorisé à supprimer ce bordereau."

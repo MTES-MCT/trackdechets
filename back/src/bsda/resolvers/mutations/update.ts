@@ -8,7 +8,7 @@ import { checkKeysEditability } from "../../edition-rules";
 import { indexBsda } from "../../elastic";
 import {
   checkCanAssociateBsdas,
-  checkIsFormContributor
+  checkIsBsdaContributor
 } from "../../permissions";
 import { validateBsda } from "../../validation";
 
@@ -20,7 +20,7 @@ export default async function edit(
   const user = checkIsAuthenticated(context);
 
   const prismaForm = await getFormOrFormNotFound(id);
-  await checkIsFormContributor(
+  await checkIsBsdaContributor(
     user,
     prismaForm,
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
@@ -31,7 +31,7 @@ export default async function edit(
   const formUpdate = flattenBsdaInput(input);
 
   const resultingForm = { ...prismaForm, ...formUpdate };
-  await checkIsFormContributor(
+  await checkIsBsdaContributor(
     user,
     resultingForm,
     "Vous ne pouvez pas enlever votre établissement du bordereau"
