@@ -19,7 +19,7 @@ const deleteFormResolver: MutationResolvers["deleteForm"] = async (
 
   const deletedForm = await prisma.form.update({
     where: { id },
-    data: { isDeleted: true }
+    data: { isDeleted: true, appendix2Forms: { set: [] } }
   });
 
   // TODO: create a statusLog
