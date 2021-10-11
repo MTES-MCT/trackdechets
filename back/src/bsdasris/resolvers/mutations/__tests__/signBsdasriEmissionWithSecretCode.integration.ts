@@ -12,14 +12,13 @@ describe("Mutation.signBsdasri emission with secret code", () => {
   afterEach(resetDatabase);
 
   it("should deny emission signature if secret code is incorrect", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company } = await userWithCompanyFactory("MEMBER");
     const {
       user: transporter,
       company: transporterCompany
     } = await userWithCompanyFactory("MEMBER");
 
     let dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company),
         status: BsdasriStatus.INITIAL,
@@ -55,14 +54,13 @@ describe("Mutation.signBsdasri emission with secret code", () => {
   });
 
   it("should put emission signature on a dasri when correct code is provided", async () => {
-    const { user: emitter, company } = await userWithCompanyFactory("MEMBER");
+    const { company } = await userWithCompanyFactory("MEMBER");
     const {
       user: transporter,
       company: transporterCompany
     } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
-      ownerId: emitter.id,
       opt: {
         ...initialData(company),
         status: BsdasriStatus.INITIAL,
@@ -88,8 +86,10 @@ describe("Mutation.signBsdasri emission with secret code", () => {
       where: { id: dasri.id }
     });
     expect(readyTotakeOverDasri.status).toEqual("SIGNED_BY_PRODUCER");
-    expect(readyTotakeOverDasri.emissionSignatureAuthor).toEqual("Marcel");
-    expect(readyTotakeOverDasri.emissionSignatureDate).toBeTruthy();
+    expect(readyTotakeOverDasri.emitterEmissionSignatureAuthor).toEqual(
+      "Marcel"
+    );
+    expect(readyTotakeOverDasri.emitterEmissionSignatureDate).toBeTruthy();
     expect(readyTotakeOverDasri.emissionSignatoryId).toEqual(transporter.id);
     expect(readyTotakeOverDasri.isEmissionTakenOverWithSecretCode).toEqual(
       true

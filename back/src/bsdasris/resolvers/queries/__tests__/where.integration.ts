@@ -16,7 +16,7 @@ describe("Bsdasri where conversion", () => {
     const where: BsdasriWhere = {
       emitter: { company: { siret: "emitterSiret" } },
       transporter: { company: { siret: "transporterSiret" } },
-      recipient: { company: { siret: "recipientSiret" } }
+      destination: { company: { siret: "destinationSiret" } }
     };
 
     const dbFilter = buildDbFilter(where, [siret]);
@@ -24,17 +24,17 @@ describe("Bsdasri where conversion", () => {
       OR: [
         { emitterCompanySiret: { in: [siret] } },
         { transporterCompanySiret: { in: [siret] } },
-        { recipientCompanySiret: { in: [siret] } }
+        { destinationCompanySiret: { in: [siret] } }
       ],
       emitterCompanySiret: "emitterSiret",
       transporterCompanySiret: "transporterSiret",
-      recipientCompanySiret: "recipientSiret"
+      destinationCompanySiret: "destinationSiret"
     });
   });
 
   it("should convert filter on operations", () => {
     const where: BsdasriWhere = {
-      processingOperation: ["D9", "R1"]
+      destinationOperationCode: ["D9", "R1"]
     };
 
     const dbFilter = buildDbFilter(where, [siret]);
@@ -42,10 +42,10 @@ describe("Bsdasri where conversion", () => {
       OR: [
         { emitterCompanySiret: { in: [siret] } },
         { transporterCompanySiret: { in: [siret] } },
-        { recipientCompanySiret: { in: [siret] } }
+        { destinationCompanySiret: { in: [siret] } }
       ],
 
-      processingOperation: { in: ["D9", "R1"] }
+      destinationOperationCode: { in: ["D9", "R1"] }
     });
   });
 
@@ -60,7 +60,7 @@ describe("Bsdasri where conversion", () => {
       OR: [
         { emitterCompanySiret: { in: [siret] } },
         { transporterCompanySiret: { in: [siret] } },
-        { recipientCompanySiret: { in: [siret] } }
+        { destinationCompanySiret: { in: [siret] } }
       ],
       status: "PROCESSED",
       isDraft: true
@@ -77,10 +77,10 @@ describe("Bsdasri where conversion", () => {
       OR: [
         { emitterCompanySiret: { in: [siret] } },
         { transporterCompanySiret: { in: [siret] } },
-        { recipientCompanySiret: { in: [siret] } }
+        { destinationCompanySiret: { in: [siret] } }
       ],
-      regroupedBsdasris: { none: {} },
-      regroupedOnBsdasri: null
+      grouping: { none: {} },
+      groupingIn: null
     });
   });
   it("should convert complex filters to db filters", () => {
@@ -91,7 +91,7 @@ describe("Bsdasri where conversion", () => {
       ],
       _and: [
         { emitter: { company: { siret: "emitterSiret" } } },
-        { recipient: { company: { siret: "recipientSiret" } } }
+        { destination: { company: { siret: "destinationSiret" } } }
       ]
     };
 
@@ -101,7 +101,7 @@ describe("Bsdasri where conversion", () => {
       OR: [{ status: "RECEIVED" }, { status: "PROCESSED" }],
       AND: [
         { emitterCompanySiret: "emitterSiret" },
-        { recipientCompanySiret: "recipientSiret" }
+        { destinationCompanySiret: "destinationSiret" }
       ]
     });
   });
@@ -118,7 +118,7 @@ describe("Bsdasri where conversion", () => {
       OR: [
         { emitterCompanySiret: { in: [siret] } },
         { transporterCompanySiret: { in: [siret] } },
-        { recipientCompanySiret: { in: [siret] } }
+        { destinationCompanySiret: { in: [siret] } }
       ],
       createdAt: { gt: now, lt: now }
     });
@@ -134,7 +134,7 @@ describe("Bsdasri where conversion", () => {
       OR: [
         { emitterCompanySiret: { in: [siret] } },
         { transporterCompanySiret: { in: [siret] } },
-        { recipientCompanySiret: { in: [siret] } }
+        { destinationCompanySiret: { in: [siret] } }
       ],
       id: { in: ["x", "y", "z"] }
     });

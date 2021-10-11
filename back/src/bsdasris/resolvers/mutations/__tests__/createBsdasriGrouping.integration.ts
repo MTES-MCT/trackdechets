@@ -6,23 +6,18 @@ import { bsdasriFactory } from "../../../__tests__/factories";
 import { BsdasriStatus } from "@prisma/client";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
+import { gql } from "apollo-server-express";
+import { fullGroupingBsdasriFragment } from "../../../fragments";
 
-const CREATE_DASRI = `
-mutation DasriCreate($input: BsdasriCreateInput!) {
-  createBsdasri(input: $input)  {
-    id
-    isDraft
-    bsdasriType
-    status
-    emitter {
-      company {
-         siret
-        }
+const CREATE_DASRI = gql`
+  ${fullGroupingBsdasriFragment}
+  mutation DasriCreate($input: BsdasriCreateInput!) {
+    createBsdasri(input: $input) {
+      ...FullGroupingBsdasriFragment
     }
-    regroupedBsdasris 
   }
-}
 `;
+
 describe("Mutation.createDasri", () => {
   afterEach(async () => {
     await resetDatabase();
@@ -32,15 +27,19 @@ describe("Mutation.createDasri", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const toRegroup1 = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         status: BsdasriStatus.PROCESSED,
         emitterCompanySiret: "1234",
-        recipientCompanySiret: company.siret
+        destinationCompanySiret: company.siret
       }
     });
 
     const input = {
+      waste: {
+        adr: "xyz 33",
+        code: "18 01 03*"
+      },
+
       emitter: {
         company: {
           name: "hopital blanc",
@@ -49,14 +48,10 @@ describe("Mutation.createDasri", () => {
           phone: "06 18 76 02 00",
           mail: "emitter@test.fr",
           address: "avenue de la mer"
-        }
-      },
-      emission: {
-        wasteCode: "18 01 03*",
-        wasteDetails: {
-          quantity: { value: 23, type: "REAL" },
+        },
+        emission: {
+          weight: { value: 23, isEstimate: false },
 
-          onuCode: "xyz 33",
           packagingInfos: [
             {
               type: "BOITE_CARTON",
@@ -66,7 +61,8 @@ describe("Mutation.createDasri", () => {
           ]
         }
       },
-      regroupedBsdasris: [{ id: toRegroup1.id }]
+
+      grouping: [{ id: toRegroup1.id }]
     };
 
     const { mutate } = makeClient(user);
@@ -96,16 +92,19 @@ describe("Mutation.createDasri", () => {
     });
 
     const toRegroup1 = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         status: BsdasriStatus.PROCESSED,
         emitterCompanySiret: "1234",
-        recipientCompanySiret: company.siret,
-        processingOperation: "R1"
+        destinationCompanySiret: company.siret,
+        destinationOperationCode: "R1"
       }
     });
 
     const input = {
+      waste: {
+        adr: "xyz 33",
+        code: "18 01 03*"
+      },
       emitter: {
         company: {
           name: "hopital blanc",
@@ -114,14 +113,10 @@ describe("Mutation.createDasri", () => {
           phone: "06 18 76 02 00",
           mail: "emitter@test.fr",
           address: "avenue de la mer"
-        }
-      },
-      emission: {
-        wasteCode: "18 01 03*",
-        wasteDetails: {
-          quantity: { value: 23, type: "REAL" },
+        },
+        emission: {
+          weight: { value: 23, isEstimate: false },
 
-          onuCode: "xyz 33",
           packagingInfos: [
             {
               type: "BOITE_CARTON",
@@ -131,7 +126,8 @@ describe("Mutation.createDasri", () => {
           ]
         }
       },
-      regroupedBsdasris: [{ id: toRegroup1.id }]
+
+      grouping: [{ id: toRegroup1.id }]
     };
 
     const { mutate } = makeClient(user);
@@ -160,26 +156,28 @@ describe("Mutation.createDasri", () => {
     });
 
     const toRegroup1 = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         status: BsdasriStatus.PROCESSED,
         emitterCompanySiret: "1234",
-        recipientCompanySiret: company.siret,
-        processingOperation: "D12"
+        destinationCompanySiret: company.siret,
+        destinationOperationCode: "D12"
       }
     });
 
     const toRegroup2 = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         status: BsdasriStatus.PROCESSED,
         emitterCompanySiret: "1234",
-        recipientCompanySiret: company.siret,
-        processingOperation: "R12"
+        destinationCompanySiret: company.siret,
+        destinationOperationCode: "R12"
       }
     });
 
     const input = {
+      waste: {
+        adr: "xyz 33",
+        code: "18 01 03*"
+      },
       emitter: {
         company: {
           name: "hopital blanc",
@@ -188,14 +186,10 @@ describe("Mutation.createDasri", () => {
           phone: "06 18 76 02 00",
           mail: "emitter@test.fr",
           address: "avenue de la mer"
-        }
-      },
-      emission: {
-        wasteCode: "18 01 03*",
-        wasteDetails: {
-          quantity: { value: 23, type: "REAL" },
+        },
+        emission: {
+          weight: { value: 23, isEstimate: false },
 
-          onuCode: "xyz 33",
           packagingInfos: [
             {
               type: "BOITE_CARTON",
@@ -205,7 +199,8 @@ describe("Mutation.createDasri", () => {
           ]
         }
       },
-      regroupedBsdasris: [{ id: toRegroup1.id }, { id: toRegroup2.id }]
+
+      grouping: [{ id: toRegroup1.id }, { id: toRegroup2.id }]
     };
 
     const { mutate } = makeClient(user);
@@ -217,19 +212,19 @@ describe("Mutation.createDasri", () => {
         }
       }
     );
-    expect(data.createBsdasri.regroupedBsdasris).toEqual([
+    expect(data.createBsdasri.grouping.map(bsd => bsd.id)).toEqual([
       toRegroup1.id,
       toRegroup2.id
     ]);
-    expect(data.createBsdasri.bsdasriType).toEqual("GROUPING");
-    const regrouped1 = await prisma.bsdasri.findUnique({
+    expect(data.createBsdasri.type).toEqual("GROUPING");
+    const grouped1 = await prisma.bsdasri.findUnique({
       where: { id: toRegroup1.id }
     });
-    const regrouped2 = await prisma.bsdasri.findUnique({
+    const grouped2 = await prisma.bsdasri.findUnique({
       where: { id: toRegroup1.id }
     });
-    expect(regrouped1.regroupedOnBsdasriId).toEqual(data.createBsdasri.id);
+    expect(grouped1.groupingInId).toEqual(data.createBsdasri.id);
 
-    expect(regrouped2.regroupedOnBsdasriId).toEqual(data.createBsdasri.id);
+    expect(grouped2.groupingInId).toEqual(data.createBsdasri.id);
   });
 });

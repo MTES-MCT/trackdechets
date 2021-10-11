@@ -19,25 +19,24 @@ describe("Mutation.signBsdasri operation", () => {
   afterEach(resetDatabase);
 
   it("should deny operation signature on a dasri if operation code is invalid", async () => {
-    const {
-      user: emitter,
-      company: emitterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
     const {
       user: recipient,
-      company: recipientCompany
+      company: destinationCompany
     } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
-      ownerId: emitter.id,
       opt: {
         ...initialData(emitterCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(recipientCompany),
-        ...{ processingOperation: "XYZ", processedAt: new Date() },
+        ...readyToReceiveData(destinationCompany),
+        ...{
+          destinationOperationCode: "XYZ",
+          destinationOperationDate: new Date()
+        },
         status: BsdasriStatus.RECEIVED
       }
     });
@@ -64,29 +63,25 @@ describe("Mutation.signBsdasri operation", () => {
       where: { id: dasri.id }
     });
     expect(receivedDasri.status).toEqual("RECEIVED");
-    expect(receivedDasri.operationSignatureAuthor).toBeNull();
+    expect(receivedDasri.destinationOperationSignatureAuthor).toBeNull();
     expect(receivedDasri.operationSignatoryId).toBeNull();
   });
 
   it("should put operation signature on a dasri", async () => {
-    const {
-      user: emitter,
-      company: emitterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
     const {
       user: recipient,
-      company: recipientCompany
+      company: destinationCompany
     } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
-      ownerId: emitter.id,
       opt: {
         ...initialData(emitterCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(recipientCompany),
+        ...readyToReceiveData(destinationCompany),
         ...readyToProcessData,
         status: BsdasriStatus.RECEIVED
       }
@@ -104,33 +99,31 @@ describe("Mutation.signBsdasri operation", () => {
       where: { id: dasri.id }
     });
     expect(receivedDasri.status).toEqual("PROCESSED");
-    expect(receivedDasri.operationSignatureAuthor).toEqual("Martine");
+    expect(receivedDasri.destinationOperationSignatureAuthor).toEqual(
+      "Martine"
+    );
     expect(receivedDasri.operationSignatoryId).toEqual(recipient.id);
-    expect(receivedDasri.operationSignatureDate).toBeTruthy();
+    expect(receivedDasri.destinationOperationSignatureDate).toBeTruthy();
   });
 
   it("should deny operation signature if ops code is final and quantity is not provided", async () => {
-    const {
-      user: emitter,
-      company: emitterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
     const {
       user: recipient,
-      company: recipientCompany
+      company: destinationCompany
     } = await userWithCompanyFactory("MEMBER");
     const {
-      recipientWasteQuantity,
+      destinationReceptionWasteWeightValue,
       ...processDataWithoutQuantity
     } = readyToProcessData;
     const dasri = await bsdasriFactory({
-      ownerId: emitter.id,
       opt: {
         ...initialData(emitterCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(recipientCompany),
+        ...readyToReceiveData(destinationCompany),
         ...processDataWithoutQuantity,
         status: BsdasriStatus.RECEIVED
       }
@@ -146,7 +139,7 @@ describe("Mutation.signBsdasri operation", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "La quantité du déchet traité en kg est obligatoire si le code correspond à un traitement final",
+          "Le poids du déchet traité en kg est obligatoire si le code correspond à un traitement final",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -156,22 +149,19 @@ describe("Mutation.signBsdasri operation", () => {
       where: { id: dasri.id }
     });
     expect(receivedDasri.status).toEqual("RECEIVED");
-    expect(receivedDasri.operationSignatureAuthor).toEqual(null);
+    expect(receivedDasri.destinationOperationSignatureAuthor).toEqual(null);
 
-    expect(receivedDasri.operationSignatureDate).toBeFalsy();
+    expect(receivedDasri.destinationOperationSignatureDate).toBeFalsy();
   });
 
   it("should allow operation signature if ops code is not final and quantity is not provided", async () => {
-    const {
-      user: emitter,
-      company: emitterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
     const {
       user: recipient,
-      company: recipientCompany
+      company: destinationCompany
     } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
         set: [CompanyType.COLLECTOR]
@@ -179,13 +169,12 @@ describe("Mutation.signBsdasri operation", () => {
     });
 
     const dasri = await bsdasriFactory({
-      ownerId: emitter.id,
       opt: {
         ...initialData(emitterCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(recipientCompany),
+        ...readyToReceiveData(destinationCompany),
         ...readyToProcessData,
-        processingOperation: "D12",
+        destinationOperationCode: "D12",
         status: BsdasriStatus.RECEIVED
       }
     });
@@ -202,8 +191,10 @@ describe("Mutation.signBsdasri operation", () => {
       where: { id: dasri.id }
     });
     expect(receivedDasri.status).toEqual("PROCESSED");
-    expect(receivedDasri.operationSignatureAuthor).toEqual("Martine");
+    expect(receivedDasri.destinationOperationSignatureAuthor).toEqual(
+      "Martine"
+    );
     expect(receivedDasri.operationSignatoryId).toEqual(recipient.id);
-    expect(receivedDasri.operationSignatureDate).toBeTruthy();
+    expect(receivedDasri.destinationOperationSignatureDate).toBeTruthy();
   });
 });

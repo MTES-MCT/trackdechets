@@ -30,7 +30,7 @@ export default function Recipient({ status, stepName }) {
         })}
       >
         <CompanySelector
-          name="recipient.company"
+          name="destination.company"
           heading="Installation destinataire"
           disabled={receptionDisabled}
           optionalMail={true}
@@ -41,7 +41,7 @@ export default function Recipient({ status, stepName }) {
           Champ libre (optionnel)
           <Field
             component="textarea"
-            name="recipient.customInfo"
+            name="destination.customInfo"
             className="td-textarea"
             disabled={receptionDisabled}
           />
@@ -56,7 +56,7 @@ export default function Recipient({ status, stepName }) {
             })}
           >
             <Field
-              name="reception.wasteAcceptation"
+              name="destination.reception.wasteAcceptation"
               component={Acceptation}
               disabled={receptionDisabled}
             />
@@ -70,14 +70,14 @@ export default function Recipient({ status, stepName }) {
               Date de réception
               <div className="td-date-wrapper">
                 <Field
-                  name="reception.receivedAt"
+                  name="destination.reception.date"
                   component={DateInput}
                   className="td-input"
                   disabled={receptionDisabled}
                 />
               </div>
             </label>
-            <RedErrorMessage name="reception.receivedAt" />
+            <RedErrorMessage name="destination.reception.date" />
           </div>
           <div
             className={classNames("form__row", {
@@ -85,7 +85,7 @@ export default function Recipient({ status, stepName }) {
             })}
           >
             <Field
-              name="reception.wasteDetails.packagingInfos"
+              name="destination.reception.packagingInfos"
               component={Packagings}
               disabled={receptionDisabled}
             />
@@ -106,7 +106,7 @@ export default function Recipient({ status, stepName }) {
             <label>Opération réalisée</label>
             <Field
               as="select"
-              name="operation.processingOperation"
+              name="destination.operation.code"
               className="td-select"
             >
               <option value="">-----</option>
@@ -137,7 +137,7 @@ export default function Recipient({ status, stepName }) {
               Date de l'opération :
               <div className="td-date-wrapper">
                 <Field
-                  name="operation.processedAt"
+                  name="destination.operation.date"
                   component={DateInput}
                   className="td-input"
                 />
@@ -153,11 +153,11 @@ export default function Recipient({ status, stepName }) {
             })}
           >
             <label>
-              Quantité en kg :
+              Poids en kg :
               <Field
                 component={NumberInput}
-                name="operation.quantity.value"
-                className="td-input dasri__waste-details__quantity"
+                name="destination.operation.weight.value"
+                className="td-input dasri__waste-details__weight"
                 placeholder="En kg"
                 min="0"
                 step="0.1"
@@ -165,7 +165,7 @@ export default function Recipient({ status, stepName }) {
               <span className="tw-ml-2">kg</span>
             </label>
 
-            <RedErrorMessage name="operation.quantity.value" />
+            <RedErrorMessage name="destination.operation.weight.value" />
           </div>
         </>
       ) : (

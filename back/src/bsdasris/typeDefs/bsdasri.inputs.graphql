@@ -12,7 +12,7 @@ input BsdasriTransporterWhere {
   company: BsdasriCompanyWhere
   signature: BsdasriSignatureWhere
 }
-input BsdasriRecipientWhere {
+input BsdasriDestinationWhere {
   company: BsdasriCompanyWhere
   signature: BsdasriSignatureWhere
 }
@@ -35,8 +35,8 @@ input BsdasriWhere {
   updatedAt: DateFilter
   emitter: BsdasriEmitterWhere
   transporter: BsdasriTransporterWhere
-  recipient: BsdasriRecipientWhere
-  processingOperation: [processingOperationTypes!]
+  destination: BsdasriDestinationWhere
+  destinationOperationCode: [destinationOperationCodeTypes!]
   """
   (Optionnel) Filtre sur l'état de regroupement des bordereaux
   Si aucun filtre n'est passé, les bordereaux seront retournés sans filtrage supplémentaire
@@ -63,7 +63,7 @@ input BsdasriPackagingInfoInput {
   quantity: Int!
 }
 
-input WorkSiteInput {
+input PickupSiteInput {
   name: String
   address: String
   city: String
@@ -71,132 +71,130 @@ input WorkSiteInput {
   infos: String
 }
 
+input BsdasriWasteInput {
+  adr: String
+  code: String
+}
+input BsdasriEmissionInput {
+  weight: BsdasriWeightInput
+  packagingInfos: [BsdasriPackagingInfoInput!]
+}
 input BsdasriEmitterInput {
-  "Établissement émetteur"
-  type: BsdasriEmitterType
   company: CompanyInput
-  workSite: WorkSiteInput
+  pickupSite: PickupSiteInput
   "Champ libre émetteur"
   customInfo: String
   onBehalfOfEcoorganisme: Boolean
+  emission: BsdasriEmissionInput
 }
 
-input BsdasriQuantityInput {
+input BsdasriWeightInput {
   value: Float
-  type: QuantityType
+  isEstimate: Boolean
+}
+input BsdasriRealWeightInput {
+  value: Float!
 }
 
-input BsdasriWasteDetailEmissionInput {
-  quantity: BsdasriQuantityInput
-  packagingInfos: [BsdasriPackagingInfoInput!]
-  onuCode: String
-}
-
-input BsdasriWasteDetailTransportInput {
-  quantity: BsdasriQuantityInput
-  packagingInfos: [BsdasriPackagingInfoInput!]
-}
-input BsdasriRecipientWasteDetailInput {
-  volume: Int
-  packagingInfos: [BsdasriPackagingInfoInput!]
-}
 input BsdasriWasteAcceptationInput {
   status: WasteAcceptationStatusInput
   refusalReason: String
-  refusedQuantity: Float
+  refusedWeight: Float
 }
-input BsdasriEmissionInput {
-  wasteCode: String
-  wasteDetails: BsdasriWasteDetailEmissionInput
-  handedOverAt: DateTime
-}
+
 input BsdasriTransportInput {
-  wasteDetails: BsdasriWasteDetailTransportInput
+  weight: BsdasriWeightInput
+  packagingInfos: [BsdasriPackagingInfoInput!]
   takenOverAt: DateTime
   handedOverAt: DateTime
   wasteAcceptation: BsdasriWasteAcceptationInput
   mode: TransportMode
 }
 
+input BsdasriRecepisseInput {
+  number: String
+  department: String
+  validityLimit: DateTime
+}
+
 input BsdasriTransporterInput {
   "Établissement collecteur - transporteur"
   company: CompanyInput
 
-  "N° de récipissé"
-  receipt: String
-
-  "Département"
-  receiptDepartment: String
-
-  "Limite de validité du récipissé"
-  receiptValidityLimit: DateTime
+  "Récépissé transporteur"
+  recepisse: BsdasriRecepisseInput
 
   "Champ libre transporteur"
   customInfo: String
+
+  transport: BsdasriTransportInput
 }
 
-input BsdasriRecipientInput {
+input BsdasriDestinationInput {
   "Établissement émetteur"
   company: CompanyInput
 
   "Champ libre transporteur"
   customInfo: String
-}
 
-input BsdasriReceptionInput {
-  wasteDetails: BsdasriRecipientWasteDetailInput
-  receivedAt: DateTime
-  wasteAcceptation: BsdasriWasteAcceptationInput
-}
-
-input BsdasriOperationInput {
-  quantity: BsdasriQuantityInput
-  """
-  Code de traitement
-  Les codes R12 et D12 ne sont autorisé que si le destinataire est une installation TTR (tri transit regroupement).
-  """
-  processingOperation: String
-  processedAt: DateTime
-}
-
-input BsdasriInput {
-  emitter: BsdasriEmitterInput
-  emission: BsdasriEmissionInput
-  transporter: BsdasriTransporterInput
-  transport: BsdasriTransportInput
-  recipient: BsdasriRecipientInput
   reception: BsdasriReceptionInput
   operation: BsdasriOperationInput
 }
 
+input BsdasriReceptionInput {
+  volume: Int
+  packagingInfos: [BsdasriPackagingInfoInput!]
+  date: DateTime
+  wasteAcceptation: BsdasriWasteAcceptationInput
+}
+
+input BsdasriOperationInput {
+  weight: BsdasriRealWeightInput
+  """
+  Code de traitement
+  Les codes R12 et D12 ne sont autorisé que si le destinataire est une installation TTR (tri transit regroupement).
+  """
+  code: String
+  date: DateTime
+}
+
+input BsdasriInput {
+  waste: BsdasriWasteInput
+
+  emitter: BsdasriEmitterInput
+
+  transporter: BsdasriTransporterInput
+
+  destination: BsdasriDestinationInput
+}
+
 "Payload de regroupement"
-input RegroupedBsdasriInput {
+input GroupingBsdasriInput {
   "Identifiant unique du bordereau"
   id: ID
 }
 
 input BsdasriCreateInput {
-  emitter: BsdasriEmitterInput
-  emission: BsdasriEmissionInput
-  transporter: BsdasriTransporterInput
-  transport: BsdasriTransportInput
-  recipient: BsdasriRecipientInput
-  reception: BsdasriReceptionInput
-  operation: BsdasriOperationInput
+  waste: BsdasriWasteInput
 
-  regroupedBsdasris: [RegroupedBsdasriInput]
+  emitter: BsdasriEmitterInput
+
+  transporter: BsdasriTransporterInput
+
+  destination: BsdasriDestinationInput
+
+  grouping: [GroupingBsdasriInput]
 }
 
 input BsdasriUpdateInput {
-  emitter: BsdasriEmitterInput
-  emission: BsdasriEmissionInput
-  transporter: BsdasriTransporterInput
-  transport: BsdasriTransportInput
-  recipient: BsdasriRecipientInput
-  reception: BsdasriReceptionInput
-  operation: BsdasriOperationInput
+  waste: BsdasriWasteInput
 
-  regroupedBsdasris: [RegroupedBsdasriInput]
+  emitter: BsdasriEmitterInput
+
+  transporter: BsdasriTransporterInput
+  destination: BsdasriDestinationInput
+
+  grouping: [GroupingBsdasriInput]
 }
 
 input BsdasriSignatureInput {

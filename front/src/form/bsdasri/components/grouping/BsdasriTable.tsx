@@ -7,7 +7,7 @@ import {
   Query,
   QueryBsdasrisArgs,
   BsdasriStatus,
-  ProcessingOperationTypes,
+  DestinationOperationCodeTypes,
 } from "generated/graphql/types";
 import { formatDate } from "common/datetime";
 const GET_GROUPABLE_BSDASRIS = gql`
@@ -16,22 +16,22 @@ const GET_GROUPABLE_BSDASRIS = gql`
       edges {
         node {
           id
+          waste {
+            code
+          }
           emitter {
             company {
               name
             }
           }
-          emission {
-            wasteCode
-          }
-          reception {
-            receivedAt
-            wasteDetails {
+          destination {
+            reception {
+              date
               volume
             }
-          }
-          operation {
-            processingOperation
+            operation {
+              code
+            }
           }
         }
       }
@@ -56,13 +56,12 @@ export default function BsdasriTable({
       where: {
         _or: [{ groupable: true }, { id_in: regroupedInDB }],
 
-        processingOperation: [
-          ProcessingOperationTypes.D12,
-          ProcessingOperationTypes.R12,
+        destinationOperationCode: [
+          DestinationOperationCodeTypes.D12,
+          DestinationOperationCodeTypes.R12,
         ],
-
         status: BsdasriStatus.Processed,
-        recipient: {
+        destination: {
           company: { siret: values.emitter?.company?.siret as string },
         },
       },
@@ -124,14 +123,14 @@ export default function BsdasriTable({
             </td>
             <td>{edge.node.id}</td>
 
-            <td>{edge.node.emission?.wasteCode}</td>
+            <td>{edge.node.waste?.code}</td>
             <td>{edge.node.emitter?.company?.name}</td>
             <td>
-              {!!edge.node.reception?.receivedAt &&
-                formatDate(edge.node.reception?.receivedAt)}
+              {!!edge.node.destination?.reception?.date &&
+                formatDate(edge.node.destination?.reception?.date)}
             </td>
-            <td>{edge.node.reception?.wasteDetails?.volume}</td>
-            <td>{edge.node.operation?.processingOperation}</td>
+            <td>{edge.node.destination?.reception?.volume}</td>
+            <td>{edge.node.destination?.operation?.code}</td>
           </tr>
         ))}
       </tbody>

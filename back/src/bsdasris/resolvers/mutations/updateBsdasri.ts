@@ -1,13 +1,10 @@
-import {
-  expandBsdasriFromDb,
-  flattenBsdasriInput
-} from "../../dasri-converter";
+import { unflattenBsdasri, flattenBsdasriInput } from "../../converter";
 import { Bsdasri, BsdasriStatus } from "@prisma/client";
 import prisma from "../../../prisma";
 import {
   ResolversParentTypes,
   MutationUpdateBsdasriArgs,
-  RegroupedBsdasriInput
+  GroupingBsdasriInput
 } from "../../../generated/graphql/types";
 
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -21,27 +18,27 @@ import { indexBsdasri } from "../../elastic";
 
 type BsdasriField = keyof Bsdasri;
 const fieldsAllowedForUpdateOnceReceived: BsdasriField[] = [
-  "processingOperation",
-  "processedAt",
-  "recipientWasteQuantity"
+  "destinationOperationCode",
+  "destinationOperationDate",
+  "destinationReceptionWasteWeightValue"
 ];
 
 const fieldsAllowedForUpdateOnceSent: BsdasriField[] = fieldsAllowedForUpdateOnceReceived.concat(
   [
-    "recipientCompanyName",
-    "recipientCompanySiret",
-    "recipientCompanyAddress",
-    "recipientCompanyContact",
-    "recipientCompanyPhone",
-    "recipientCompanyMail",
-    "recipientWastePackagingsInfo",
-    "recipientWasteAcceptationStatus",
-    "recipientWasteRefusalReason",
-    "recipientWasteRefusedQuantity",
-    "recipientWasteVolume",
-    "receivedAt",
-    "handedOverToRecipientAt",
-    "recipientCustomInfo"
+    "destinationCompanyName",
+    "destinationCompanySiret",
+    "destinationCompanyAddress",
+    "destinationCompanyContact",
+    "destinationCompanyPhone",
+    "destinationCompanyMail",
+    "destinationCustomInfo",
+    "destinationWastePackagingsInfo",
+    "destinationReceptionAcceptationStatus",
+    "destinationReceptionWasteRefusalReason",
+    "destinationReceptionWasteRefusedWeightValue",
+    "destinationReceptionWasteVolume",
+    "destinationReceptionDate",
+    "handedOverToRecipientAt" // optional field to be filled by transporter once waste is received
   ]
 );
 
@@ -53,20 +50,20 @@ const fieldsAllowedForUpdateOnceSignedByEmitter: BsdasriField[] = fieldsAllowedF
     "transporterCompanyPhone",
     "transporterCompanyContact",
     "transporterCompanyMail",
-    "transporterReceipt",
-    "transporterReceiptDepartment",
-    "transporterReceiptValidityLimit",
-    "transporterWasteAcceptationStatus",
+    "transporterRecepisseNumber",
+    "transporterRecepisseDepartment",
+    "transporterRecepisseValidityLimit",
+    "transporterAcceptationStatus",
     "transporterWasteRefusalReason",
-    "transporterWasteRefusedQuantity",
+    "transporterWasteRefusedWeightValue",
     "transporterTakenOverAt",
     "transporterWastePackagingsInfo",
-    "transporterWasteQuantity",
-    "transporterWasteQuantityType",
+    "transporterWasteWeightValue",
+    "transporterWasteWeightIsEstimate",
     "transporterWasteVolume",
     "handedOverToRecipientAt",
     "transporterCustomInfo",
-    "transportMode"
+    "transporterTransportMode"
   ]
 );
 
@@ -81,32 +78,32 @@ const getFieldsAllorwedForUpdate = (bsdasri: Bsdasri) => {
 };
 
 const getRegroupedBsdasriArgs = (
-  inputRegroupedBsdasris: RegroupedBsdasriInput[] | null | undefined
+  inputRegroupedBsdasris: GroupingBsdasriInput[] | null | undefined
 ) => {
   if (inputRegroupedBsdasris === null || inputRegroupedBsdasris?.length === 0) {
-    return { regroupedBsdasris: { set: [] } };
+    return { grouping: { set: [] } };
   }
 
   const args = !!inputRegroupedBsdasris ? { set: inputRegroupedBsdasris } : {};
-  return { regroupedBsdasris: args };
+  return { grouping: args };
 };
 
-const getIsRegrouping = (dbRegroupedBsdasris, regroupedBsdasris) => {
+const getIsRegrouping = (dbGrouping, grouping) => {
   // new input does not provide info about regrouped dasris: use db value
-  if (regroupedBsdasris === undefined) {
+  if (grouping === undefined) {
     return {
-      isRegrouping: !!dbRegroupedBsdasris.length
+      isRegrouping: !!dbGrouping.length
     };
   }
   // else use provided input value
 
-  return { isRegrouping: !!regroupedBsdasris?.length };
+  return { isRegrouping: !!grouping?.length };
 };
 
 /**
  * Bsdasri update mutation
- * sets bsdasriType to `GROUPING` if a non empty array of regroupedBsdasris is provided
- * sets bsdasriType to `SIMPLE` if a null regroupedBsdasris field is provided
+ * sets type to `GROUPING` if a non empty array of grouping is provided
+ * sets type to `SIMPLE` if a null grouping field is provided
  */
 const dasriUpdateResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -117,12 +114,12 @@ const dasriUpdateResolver = async (
 
   const { id, input } = { ...args };
 
-  const { regroupedBsdasris: inputRegroupedBsdasris, ...dasriContent } = input;
+  const { grouping: inputGrouping, ...dasriContent } = input;
 
-  const {
-    regroupedBsdasris: dbRegroupedBsdasris,
-    ...dbBsdasri
-  } = await getBsdasriOrNotFound({ id, includeRegrouped: true });
+  const { grouping: dbGrouping, ...dbBsdasri } = await getBsdasriOrNotFound({
+    id,
+    includeRegrouped: true
+  });
 
   await checkIsBsdasriContributor(
     user,
@@ -138,10 +135,7 @@ const dasriUpdateResolver = async (
 
   const expectedBsdasri = { ...dbBsdasri, ...flattenedInput };
   // Validate form input
-  const isRegrouping = getIsRegrouping(
-    dbRegroupedBsdasris,
-    inputRegroupedBsdasris
-  );
+  const isRegrouping = getIsRegrouping(dbGrouping, inputGrouping);
 
   await validateBsdasri(expectedBsdasri, {
     ...isRegrouping
@@ -165,13 +159,13 @@ const dasriUpdateResolver = async (
     where: { id },
     data: {
       ...flattenedInput,
-      ...getRegroupedBsdasriArgs(inputRegroupedBsdasris),
-      bsdasriType: isRegrouping.isRegrouping ? "GROUPING" : "SIMPLE"
+      ...getRegroupedBsdasriArgs(inputGrouping),
+      type: isRegrouping.isRegrouping ? "GROUPING" : "SIMPLE"
     }
   });
 
-  const expandedDasri = expandBsdasriFromDb(updatedDasri);
-  await indexBsdasri(updatedDasri, context);
+  const expandedDasri = unflattenBsdasri(updatedDasri);
+  await indexBsdasri(updatedDasri);
   return expandedDasri;
 };
 

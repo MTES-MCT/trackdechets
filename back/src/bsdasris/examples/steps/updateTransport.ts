@@ -8,7 +8,7 @@ export function updateTransport(company: string): WorkflowStep {
     mutation: mutations.updateBsdasri,
     variables: ({ bsd }) => ({
       id: bsd.id,
-      input: { transport: fixtures.transportInput }
+      input: { transporter: { transport: fixtures.transportInput } }
     }),
     expected: { status: "SIGNED_BY_PRODUCER" },
     data: response => response.updateBsdasri,

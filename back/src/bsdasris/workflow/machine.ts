@@ -67,15 +67,14 @@ const machine = Machine<any, BsdasriEvent>(
           [
             WasteAcceptationStatus.ACCEPTED,
             WasteAcceptationStatus.PARTIALLY_REFUSED
-          ].includes(ctx?.transporterWasteAcceptationStatus)
+          ].includes(ctx?.transporterAcceptationStatus)
         );
       },
       refusedByTransporter: ctx => {
         //  totally refused
         return (
           emissionNotSigned(ctx) &&
-          ctx?.transporterWasteAcceptationStatus ===
-            WasteAcceptationStatus.REFUSED
+          ctx?.transporterAcceptationStatus === WasteAcceptationStatus.REFUSED
         );
       },
       acceptedByRecipient: ctx => {
@@ -85,14 +84,14 @@ const machine = Machine<any, BsdasriEvent>(
           [
             WasteAcceptationStatus.ACCEPTED,
             WasteAcceptationStatus.PARTIALLY_REFUSED
-          ].includes(ctx?.recipientWasteAcceptationStatus)
+          ].includes(ctx?.destinationReceptionAcceptationStatus)
         );
       },
       refusedByRecipient: ctx => {
         //  totally refused
         return (
           receptionNotSigned(ctx) &&
-          ctx?.recipientWasteAcceptationStatus ===
+          ctx?.destinationReceptionAcceptationStatus ===
             WasteAcceptationStatus.REFUSED
         );
       },

@@ -7,20 +7,18 @@ type BsdasriSignature {
 type BsdasriEmitter {
   "Établissement émetteur"
   company: FormCompany
-  "Site d'emport du déceht, si différent de celle de l'émetteur"
-  workSite: WorkSite
-  "Date de remise au tranporteur"
-  handOverToTransporterAt: DateTime
+  "Site d'emport du déchet, si différent de celle de l'émetteur"
+  pickupSite: PickupSite
   "Champ libre"
   customInfo: String
-  "Type d'émetteur"
-  type: BsdasriEmitterType
+
   "Agit pour le compte de l'éco organisme agréé"
   onBehalfOfEcoorganisme: Boolean!
+  emission: BsdasriEmission
 }
 
-"Destinataire du Bsdasri"
-type BsdasriRecipient {
+"Destination du Bsdasri"
+type BsdasriDestination {
   """
   Installation destinataire
   """
@@ -28,6 +26,17 @@ type BsdasriRecipient {
 
   "Champ libre"
   customInfo: String
+  reception: BsdasriReception
+  operation: BsdasriOperation
+}
+
+type BsdasriRecepisse {
+  "Numéro de récépissé"
+  number: String
+  "Département"
+  department: String
+  "Date limite de validité"
+  validityLimit: DateTime
 }
 
 """
@@ -37,17 +46,13 @@ type BsdasriTransporter {
   "Établissement de destination"
   company: FormCompany
 
-  "N° de récipissé"
-  receipt: String
-
-  "Département"
-  receiptDepartment: String
-
-  "Limite de validité du récipissé"
-  receiptValidityLimit: DateTime
+  "Récépissé"
+  recepisse: BsdasriRecepisse
 
   "Champ libre"
   customInfo: String
+
+  transport: BsdasriTransport
 }
 
 "Informations sur le conditionnement Bsdasri"
@@ -64,64 +69,42 @@ type BsdasriPackagingInfo {
   volume: Int!
 }
 
-type BsdasriQuantity {
-  "Quantité en kg"
-  value: Float
-  "Quantité réélle (pesée ou estimée)"
-  type: QuantityType
+"Informations sur un poids de déchet estimé ou pesé"
+type BsdasriWeight {
+  "Poids en kg, pesé ou estimé"
+  value: Float!
+  "Le poids est-il estimé (pesé si false)"
+  isEstimate: Boolean!
 }
-type BsdasriOperationQuantity {
-  "Quantité en kg"
-  value: Float
-}
-
-"Détail sur le déchet emis du Bsdasri"
-type BsdasriEmissionWasteDetails {
-  "Quantité émise"
-  quantity: BsdasriQuantity
-  "Volume en litres"
-  volume: Int
-  packagingInfos: [BsdasriPackagingInfo!]
-  onuCode: String
+"Informations sur un poids reçu (toujours pesé)"
+type BsdasriOperationWeight {
+  "Pois en kg (pesé)"
+  value: Float!
 }
 
-"Détail sur le déchet transporté"
-type BsdasriTransportWasteDetails {
-  "Quantité transportée"
-  quantity: BsdasriQuantity
-
-  volume: Int
-  packagingInfos: [BsdasriPackagingInfo!]
-}
-
-"Détail sur le déchet reçu du Bsdasri"
-type BsdasriReceptionWasteDetails {
-  volume: Int
-  packagingInfos: [BsdasriPackagingInfo!]
-}
-
-"Informations relatives au déchet émis"
-type BsdasriEmission {
-  wasteCode: String
-  wasteDetails: BsdasriEmissionWasteDetails
-  handedOverAt: DateTime
-  signature: BsdasriSignature
-  "Emporté sans signature PRED avec son autorisation prélalable"
-  isTakenOverWithoutEmitterSignature: Boolean
-  "Signature PRED avec code de sécurité"
-  isTakenOverWithSecretCode: Boolean
+"Informations relatives au déchet"
+type BsdasriWaste {
+  "Code adr"
+  adr: String!
+  "Code déchet"
+  code: String!
 }
 
 "Informations relatives à l'acceptation ou au refus du déchet (Bsdasri)"
 type BsdasriWasteAcceptation {
   status: String
   refusalReason: String
-  refusedQuantity: Float
+  refusedWeight: Float
 }
 
 "Informations relatives au transport du Bsdasri"
 type BsdasriTransport {
-  wasteDetails: BsdasriTransportWasteDetails
+  "Quantité transportée"
+  weight: BsdasriWeight
+  "Volume transporté"
+  volume: Int
+  "Conditionnement"
+  packagingInfos: [BsdasriPackagingInfo!]
   wasteAcceptation: BsdasriWasteAcceptation
   handedOverAt: DateTime
   takenOverAt: DateTime
@@ -129,46 +112,77 @@ type BsdasriTransport {
   mode: TransportMode!
 }
 
+"Informations relatives au déchet émis"
+type BsdasriEmission {
+  "Quantité émise"
+  weight: BsdasriWeight
+  "Volume en litres"
+  volume: Int
+  "Conditionnement"
+  packagingInfos: [BsdasriPackagingInfo!]
+  signature: BsdasriSignature
+  "Emporté sans signature PRED avec son autorisation prélalable"
+  isTakenOverWithoutEmitterSignature: Boolean
+  "Signature PRED avec code de sécurité"
+  isTakenOverWithSecretCode: Boolean
+}
+
 "Informations relatives à la réception du Bsdasri"
 type BsdasriReception {
-  wasteDetails: BsdasriReceptionWasteDetails
+  "Volume reçu"
+  volume: Int
+  "Conditionnement"
+  packagingInfos: [BsdasriPackagingInfo!]
   wasteAcceptation: BsdasriWasteAcceptation
-  receivedAt: DateTime
+  "Date de réception du déchet"
+  date: DateTime
   signature: BsdasriSignature
 }
 
 "Informations relatives au traitement du Bsdasri"
 type BsdasriOperation {
   "Quantité traitée"
-  quantity: BsdasriOperationQuantity
+  weight: BsdasriOperationWeight
   "Code de l'opération de traitement"
-  processingOperation: String
+  code: String
   "Date de l'opération de traitement"
-  processedAt: DateTime
+  date: DateTime
   signature: BsdasriSignature
 }
-
+"Bordereau Bsdasri regroupé"
+type InitialBsdasri {
+  "Identifiant du bordereau regroupé "
+  id: ID!
+  "Nombre de contenants reçus"
+  quantity: Int
+  "Volume associé"
+  volume: Int
+  "Poids de déchets (en kg) traités"
+  weight: Float
+  "Date de collecte initiale"
+  takenOverAt: DateTime
+  "Code postal du lieu de collecte"
+  postalCode: String
+}
 "Bordereau Bsdasri"
 type Bsdasri {
   id: ID!
   status: BsdasriStatus!
-  bsdasriType: BsdasriType!
+  type: BsdasriType!
   createdAt: DateTime
   updatedAt: DateTime
   isDraft: Boolean!
 
+  waste: BsdasriWaste
+
   emitter: BsdasriEmitter
-  emission: BsdasriEmission
 
   transporter: BsdasriTransporter
-  transport: BsdasriTransport
 
-  recipient: BsdasriRecipient
-  reception: BsdasriReception
-  operation: BsdasriOperation
+  destination: BsdasriDestination
 
   "Bordereaux regroupés"
-  regroupedBsdasris: [ID!]
+  grouping: [InitialBsdasri!]
 
   metadata: BsdasriMetadata!
 

@@ -21,7 +21,7 @@ const isPublishable = (form: Bsdasri) => {
   if (!form.isDraft) {
     return false;
   }
-  if (form.bsdasriType === "GROUPING" && !form.regroupedBsdasris?.length) {
+  if (form.type === "GROUPING" && !form.grouping?.length) {
     return false;
   }
   return true;
@@ -84,7 +84,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
             </ActionLink>
 
             {form?.allowDirectTakeOver &&
-            form.bsdasriType === "SIMPLE" && ( // grouping dasri can't be directly taken over
+            form.type === "SIMPLE" && ( // grouping dasri can't be directly taken over
                 <ActionLink
                   icon={<IconCheckCircle1 size="24px" />}
                   to={{
@@ -131,7 +131,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case BsdasriStatus.Sent: {
-      if (siret === form.recipient?.company?.siret && matchAct) {
+      if (siret === form.destination?.company?.siret && matchAct) {
         return (
           <ActionLink
             icon={<IconCheckCircle1 size="24px" />}
@@ -150,7 +150,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case BsdasriStatus.Received: {
-      if (siret === form.recipient?.company?.siret && matchAct) {
+      if (siret === form.destination?.company?.siret && matchAct) {
         return (
           <>
             <ActionLink
