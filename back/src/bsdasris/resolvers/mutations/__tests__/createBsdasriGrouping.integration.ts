@@ -212,7 +212,6 @@ describe("Mutation.createDasri", () => {
         }
       }
     );
-
     expect(data.createBsdasri.grouping.map(bsd => bsd.id)).toEqual([
       toRegroup1.id,
       toRegroup2.id

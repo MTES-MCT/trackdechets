@@ -12,7 +12,7 @@ export interface BsdElastic {
   emitter: string;
   recipient: string;
   waste: string;
-  transporterNumberPlate?: string;
+  transporterNumberPlate?: string[];
   transporterCustomInfo?: string;
   createdAt: number;
 

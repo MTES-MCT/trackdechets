@@ -735,6 +735,7 @@ model Bsdasri {
   transporterRecepisseValidityLimit           DateTime?
   transporterCustomInfo                       String? // free field
   // transport
+  transporterTransportPlates                  String[]
   transporterTransportMode                    TransportMode?          @default(ROAD)
   transporterAcceptationStatus                WasteAcceptationStatus?
   transporterWasteRefusalReason               String?

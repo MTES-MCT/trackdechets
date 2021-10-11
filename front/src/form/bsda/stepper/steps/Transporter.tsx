@@ -5,7 +5,7 @@ import { RedErrorMessage } from "common/components";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { Bsda } from "generated/graphql/types";
 import Tooltip from "common/components/Tooltip";
-import TagsInput from "form/bsvhu/components/tags-input/TagsInput";
+import TagsInput from "common/components/tags-input/TagsInput";
 import { transportModeLabels } from "dashboard/constants";
 
 export function Transporter({ disabled }) {

@@ -64,7 +64,6 @@ const getInitialState = (f?: Bsdasri | null) => ({
     customInfo: "",
     reception: {
       packagingInfos: [],
-
       wasteAcceptation: null,
       date: null,
     },

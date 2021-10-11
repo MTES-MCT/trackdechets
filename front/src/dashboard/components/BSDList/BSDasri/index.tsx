@@ -54,8 +54,12 @@ export const COLUMNS: Record<
     ),
   },
   transporterNumberPlate: {
-    accessor: () => null,
-    Cell: () => null,
+    accessor: dasri => dasri.transporter?.transport?.plates ?? [],
+    Cell: ({ value }) => (
+      <>
+        <span> {value.join(", ")}</span>
+      </>
+    ),
   },
   status: {
     accessor: dasri =>

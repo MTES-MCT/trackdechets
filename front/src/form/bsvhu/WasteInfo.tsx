@@ -4,7 +4,7 @@ import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useFormikContext } from "formik";
 import React, { useEffect } from "react";
-import TagsInput from "./components/tags-input/TagsInput";
+import TagsInput from "common/components/tags-input/TagsInput";
 import "./WasteInfo.scss";
 
 export default function WasteInfo({ disabled }) {

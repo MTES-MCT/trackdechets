@@ -67,6 +67,7 @@ export const fullBsdasriFragment = gql`
       company {
         ...CompanyFragment
       }
+
       recepisse {
         number
         department
@@ -75,7 +76,8 @@ export const fullBsdasriFragment = gql`
       transport {
         handedOverAt
         takenOverAt
-
+        mode
+        plates
         volume
         weight {
           value

@@ -109,6 +109,7 @@ input BsdasriTransportInput {
   handedOverAt: DateTime
   wasteAcceptation: BsdasriWasteAcceptationInput
   mode: TransportMode
+  plates: [String!]
 }
 
 input BsdasriRecepisseInput {

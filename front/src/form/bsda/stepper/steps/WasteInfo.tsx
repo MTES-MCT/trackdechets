@@ -4,7 +4,7 @@ import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import Packagings from "form/bsda/components/packagings/Packagings";
 import Tooltip from "common/components/Tooltip";
-import TagsInput from "form/bsvhu/components/tags-input/TagsInput";
+import TagsInput from "common/components/tags-input/TagsInput";
 import { BsdaConsistence } from "generated/graphql/types";
 
 export function WasteInfo({ disabled }) {

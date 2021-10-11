@@ -7,7 +7,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 # Next Release (~25/10)
 
 #### :rocket: Nouvelles fonctionnalités
-
+- Gestion des plaques d'immatriculation sur les bordereaux dasri [PR 1013](https://github.com/MTES-MCT/trackdechets/pull/1013
+)
 #### :boom: Breaking changes
 - Harmonisation et stabilisation de l'api des bordereaux dasri [PR 992](https://github.com/MTES-MCT/trackdechets/pull/992)
  

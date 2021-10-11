@@ -110,6 +110,8 @@ type BsdasriTransport {
   takenOverAt: DateTime
   signature: BsdasriSignature
   mode: TransportMode!
+  "Plaque(s) d'immatriculation"
+  plates: [String]
 }
 
 "Informations relatives au déchet émis"

@@ -10,7 +10,8 @@ import { getInitialWeightFn } from "./utils/initial-state";
 import { transportModeLabels } from "dashboard/constants";
 import { FillFieldsInfo, DisabledFieldsInfo } from "./utils/commons";
 import classNames from "classnames";
-
+import Tooltip from "common/components/Tooltip";
+import TagsInput from "common/components/tags-input/TagsInput";
 import WeightWidget from "./components/Weight";
 
 /**
@@ -163,6 +164,13 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
             </option>
           ))}
         </Field>
+      </div>
+      <div className="form__row">
+        <label>
+          Immatriculations
+          <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> pour valider chacun" />
+          <TagsInput name="transporter.transport.plates" disabled={disabled} />
+        </label>
       </div>
       <div
         className={classNames("form__row", {
