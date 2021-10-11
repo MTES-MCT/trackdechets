@@ -250,8 +250,11 @@ input AppendixFormInput {
 
   """
   N° de bordereau
+
+  Déprécié : L'id du bordereau doit être utilisé comme identifiant (paramètre id).
+  Le readableId permet de le récupérer via la query form.
   """
-  readableId: ID @deprecated(reason: "Utiliser le paramètre id")
+  readableId: ID
 }
 
 "Payload de liaison d'un BSD à un eco-organisme"
