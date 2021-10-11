@@ -21,8 +21,8 @@ export default {
     adr: "",
   },
   packagings: [],
-  quantity: {
-    type: QuantityType.Estimated,
+  weight: {
+    isEstimate: false,
     value: null,
   },
   worker: {

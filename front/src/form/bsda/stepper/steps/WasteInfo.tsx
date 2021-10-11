@@ -111,30 +111,24 @@ export function WasteInfo({ disabled }) {
           <Field
             disabled={disabled}
             component={NumberInput}
-            name="quantity.value"
+            name="weight.value"
             className="td-input td-input--small"
             min="0"
             step="0.001"
           />
         </label>
 
-        <fieldset className="tw-mt-3">
-          <legend>Cette quantité est</legend>
-          <Field
-            disabled={disabled}
-            name="quantity.type"
-            id="REAL"
-            label="Réelle"
-            component={RadioButton}
-          />
-          <Field
-            disabled={disabled}
-            name="quantity.type"
-            id="ESTIMATED"
-            label="Estimée"
-            component={RadioButton}
-          />
-        </fieldset>
+        <div className="form__row">
+          <label>
+            <Field
+              disabled={disabled}
+              type="checkbox"
+              name="weight.isEstimate"
+              className="td-checkbox"
+            />
+            Ce poids est estimé
+          </label>
+        </div>
       </div>
 
       <h4 className="form__section-heading">Numéros de scellés</h4>

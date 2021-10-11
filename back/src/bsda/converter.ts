@@ -19,7 +19,8 @@ import {
   BsdaWork,
   BsdaBroker,
   BsdaPickupSite,
-  BsdaWeight
+  BsdaWeight,
+  BsdaEcoOrganisme
 } from "../generated/graphql/types";
 import { Prisma, Bsda as PrismaBsda } from "@prisma/client";
 
@@ -55,6 +56,10 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         name: form.emitterPickupSiteName,
         postalCode: form.emitterPickupSitePostalCode
       })
+    }),
+    ecoOrganisme: nullIfNoValues<BsdaEcoOrganisme>({
+      name: form.ecoOrganismeName,
+      siret: form.ecoOrganismeSiret
     }),
     packagings: form.packagings as BsdaPackaging[],
     waste: nullIfNoValues<BsdaWaste>({
@@ -166,6 +171,7 @@ export function flattenBsdaInput(
   return safeInput({
     type: chain(formInput, f => f.type),
     ...flattenBsdaEmitterInput(formInput),
+    ...flattenBsdaEcoOrganismeInput(formInput),
     ...flattenBsdaDestinationInput(formInput),
     ...flattenBsdaTransporterInput(formInput),
     ...flattenBsdaWorkerInput(formInput),
@@ -199,6 +205,15 @@ function flattenBsdaEmitterInput({ emitter }: Pick<BsdaInput, "emitter">) {
       chain(e.pickupSite, w => w.postalCode)
     ),
     emitterWorkSiteInfos: chain(emitter, e => chain(e.pickupSite, w => w.infos))
+  };
+}
+
+function flattenBsdaEcoOrganismeInput({
+  ecoOrganisme
+}: Pick<BsdaInput, "ecoOrganisme">) {
+  return {
+    ecoOrganismeName: chain(ecoOrganisme, e => e.name),
+    ecoOrganismeSiret: chain(ecoOrganisme, e => e.siret)
   };
 }
 

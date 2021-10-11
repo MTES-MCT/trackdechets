@@ -30,6 +30,8 @@ type Bsda {
   "Maitre d'ouvrage ou détenteur du déchet"
   emitter: BsdaEmitter
 
+  ecoOrganisme: BsdaEcoOrganisme
+
   "Courtier"
   broker: BsdaBroker
 
@@ -109,6 +111,12 @@ type BsdaEmitter {
   pickupSite: BsdaPickupSite
   "Déclaration générale"
   emission: BsdaEmission
+}
+
+"Information sur l'éco-organisme responsable du BSDA"
+type BsdaEcoOrganisme {
+  name: String!
+  siret: String!
 }
 
 type BsdaPickupSite {

@@ -152,7 +152,7 @@ describe("Query.bsds.bsda base workflow", () => {
             weight: { isEstimate: true, value: 1.2 },
             destination: {
               cap: "A cap",
-              plannedOperationCode: "R 12",
+              plannedOperationCode: "D 13",
               company: {
                 siret: destination.company.siret,
                 name: "destination",
