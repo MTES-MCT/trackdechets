@@ -25,7 +25,7 @@ import {
   Packagings
 } from "../generated/graphql/types";
 import { isCollector, isWasteProcessor } from "../companies/validation";
-import { getFormOrFormNotFound } from "./database";
+import { getFinalDestinationSiret, getFormOrFormNotFound } from "./database";
 import { FormAlreadyInAppendix2 } from "./errors";
 // set yup default error messages
 configureYup();
@@ -1106,8 +1106,9 @@ export async function validateAppendix2Forms(
         );
       }
     }
+    const appendix2DestinationSiret = await getFinalDestinationSiret(appendix2);
 
-    if (form?.emitterCompanySiret !== appendix2.recipientCompanySiret) {
+    if (form?.emitterCompanySiret !== appendix2DestinationSiret) {
       throw new Error(
         `Le bordereau ${appendix2.id} n'est pas en possession du nouvel émetteur`
       );
