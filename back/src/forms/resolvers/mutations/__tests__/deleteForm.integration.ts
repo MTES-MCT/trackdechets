@@ -163,9 +163,14 @@ describe("Mutation.deleteForm", () => {
       ownerId: owner.id,
       opt: {
         emitterCompanySiret: ttr.siret,
-        status: "DRAFT",
+        status: "SEALED",
         appendix2Forms: { connect: [{ id: appendix2.id }] }
       }
+    });
+
+    await prisma.form.update({
+      where: { id: appendix2.id },
+      data: { status: "GROUPED" }
     });
 
     const { mutate } = makeClient(ttrUser);
@@ -186,5 +191,6 @@ describe("Mutation.deleteForm", () => {
       where: { id: appendix2.id }
     });
     expect(disconnectedAppendix2.appendix2RootFormId).toEqual(null);
+    expect(disconnectedAppendix2.status).toEqual("AWAITING_GROUP");
   });
 });
