@@ -60,6 +60,9 @@ input BsdaInput {
   "Maitre d'ouvrage ou détenteur du déchet"
   emitter: BsdaEmitterInput
 
+  "Eco-organisme"
+  ecoOrganisme: BsdaEcoOrganismeInput
+
   "Courtier"
   broker: BsdaBrokerInput
 
@@ -94,6 +97,11 @@ input BsdaEmitterInput {
   pickupSite: BsdaPickupSiteInput
   "Champ libre"
   customInfo: String
+}
+
+input BsdaEcoOrganismeInput {
+  name: String!
+  siret: String!
 }
 
 input BsdaPickupSiteInput {
