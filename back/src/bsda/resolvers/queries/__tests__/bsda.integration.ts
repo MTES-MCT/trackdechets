@@ -8,12 +8,12 @@ import { fullBsda } from "../../../fragments";
 import { bsdaFactory } from "../../../__tests__/factories";
 
 const GET_BSDA = gql`
-query GetBsda($id: ID!) {
-  bsda(id: $id) {
-    ...FullBsda
+  query GetBsda($id: ID!) {
+    bsda(id: $id) {
+      ...FullBsda
+    }
   }
-}
-${fullBsda}
+  ${fullBsda}
 `;
 
 describe("Query.Bsda", () => {
