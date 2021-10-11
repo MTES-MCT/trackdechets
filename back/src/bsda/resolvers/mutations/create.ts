@@ -10,7 +10,7 @@ import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb, flattenBsdaInput } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
 import { indexBsda } from "../../elastic";
-import { checkIsFormContributor } from "../../permissions";
+import { checkIsBsdaContributor } from "../../permissions";
 import { validateBsda } from "../../validation";
 
 type CreateBsda = {
@@ -31,7 +31,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
   const user = checkIsAuthenticated(context);
 
   const bsda = flattenBsdaInput(input);
-  await checkIsFormContributor(
+  await checkIsBsdaContributor(
     user,
     bsda,
     "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"

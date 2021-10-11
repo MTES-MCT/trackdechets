@@ -6,7 +6,7 @@ import prisma from "../../../prisma";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
 import { indexBsda } from "../../elastic";
-import { checkIsFormContributor } from "../../permissions";
+import { checkIsBsdaContributor } from "../../permissions";
 
 export default async function duplicate(
   _,
@@ -17,7 +17,7 @@ export default async function duplicate(
 
   const prismaForm = await getBsdaOrNotFound(id);
 
-  await checkIsFormContributor(
+  await checkIsBsdaContributor(
     user,
     prismaForm,
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"

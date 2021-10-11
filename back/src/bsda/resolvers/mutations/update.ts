@@ -7,7 +7,7 @@ import { expandBsdaFromDb, flattenBsdaInput } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
 import { checkKeysEditability } from "../../edition-rules";
 import { indexBsda } from "../../elastic";
-import { checkIsFormContributor } from "../../permissions";
+import { checkIsBsdaContributor } from "../../permissions";
 import { validateBsda } from "../../validation";
 
 export default async function edit(
@@ -18,7 +18,8 @@ export default async function edit(
   const user = checkIsAuthenticated(context);
 
   const existingBsda = await getBsdaOrNotFound(id);
-  await checkIsFormContributor(
+
+  await checkIsBsdaContributor(
     user,
     existingBsda,
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
@@ -29,7 +30,7 @@ export default async function edit(
   const data = flattenBsdaInput(input);
 
   const resultingForm = { ...existingBsda, ...data };
-  await checkIsFormContributor(
+  await checkIsBsdaContributor(
     user,
     resultingForm,
     "Vous ne pouvez pas enlever votre établissement du bordereau"

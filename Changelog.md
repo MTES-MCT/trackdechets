@@ -42,6 +42,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Correction d'un bug d'affichage dans la préparation d'un transfert multi-modal [PR 997](https://github.com/MTES-MCT/trackdechets/pull/997)
+- Correction d'un bug empêchant le courtier de créer un BSDA [PR 1008](https://github.com/MTES-MCT/trackdechets/pull/1008)
+
 #### :nail_care: Améliorations
 
 - Rafraichissement automatique de la liste des bordereaux dans l'UI Trackdéchets [PR 985](https://github.com/MTES-MCT/trackdechets/pull/985)
