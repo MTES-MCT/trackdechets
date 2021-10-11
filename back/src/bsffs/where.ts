@@ -1,18 +1,17 @@
+import { BsffWhere, BsffOperationCode } from "../generated/graphql/types";
 import { Prisma } from "@prisma/client";
 import { safeInput } from "../forms/form-converter";
-import { BsvhuWhere } from "../generated/graphql/types";
 import {
   toPrismaDateFilter,
+  toPrismaEnumFilter,
   toPrismaStringFilter,
   toPrismaNestedWhereInput,
-  toPrismaGenericWhereInput,
-  toPrismaEnumFilter
+  toPrismaGenericWhereInput
 } from "../common/where";
 
-function toPrismaBsvhuWhereInput(where: BsvhuWhere): Prisma.BsvhuWhereInput {
-  return safeInput<Prisma.BsvhuWhereInput>({
+function toPrismaBsffWhereInput(where: BsffWhere): Prisma.BsffWhereInput {
+  return safeInput<Prisma.BsffWhereInput>({
     ...toPrismaGenericWhereInput(where),
-    status: toPrismaEnumFilter(where.status),
     emitterCompanySiret: toPrismaStringFilter(where.emitter?.company?.siret),
     emitterEmissionSignatureDate: toPrismaDateFilter(
       where.emitter?.emission?.signature?.date
@@ -26,10 +25,10 @@ function toPrismaBsvhuWhereInput(where: BsvhuWhere): Prisma.BsvhuWhereInput {
     destinationCompanySiret: toPrismaStringFilter(
       where.destination?.company?.siret
     ),
-    destinationReceptionDate: toPrismaDateFilter(
-      where.destination?.reception?.date
+    destinationReceptionSignatureDate: toPrismaDateFilter(
+      where.destination?.reception?.signature.date
     ),
-    destinationOperationCode: toPrismaStringFilter(
+    destinationOperationCode: toPrismaEnumFilter<BsffOperationCode>(
       where.destination?.operation?.code
     ),
     destinationOperationSignatureDate: toPrismaDateFilter(
@@ -37,7 +36,6 @@ function toPrismaBsvhuWhereInput(where: BsvhuWhere): Prisma.BsvhuWhereInput {
     )
   });
 }
-
-export function toPrismaWhereInput(where: BsvhuWhere): Prisma.BsvhuWhereInput {
-  return toPrismaNestedWhereInput(where, toPrismaBsvhuWhereInput);
+export function toPrismaWhereInput(where: BsffWhere): Prisma.BsffWhereInput {
+  return toPrismaNestedWhereInput(where, toPrismaBsffWhereInput);
 }

@@ -118,7 +118,7 @@ describe("Query.bsdas", () => {
             where: {
               [role]: {
                 company: {
-                  siret: company.siret
+                  siret: { _eq: company.siret }
                 }
               }
             }

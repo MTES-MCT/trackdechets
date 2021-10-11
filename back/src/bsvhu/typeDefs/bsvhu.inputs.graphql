@@ -1,57 +1,73 @@
+"Filtres possibles pour la récupération de bordereaux."
 input BsvhuWhere {
-  "(Optionnel) Permet de récupérer uniquement les bordereaux en brouillon"
+  "Filtre sur l'ID"
+  id: IdFilter
+  "Filtre sur le statut de brouillon."
   isDraft: Boolean
-
-  """
-  (Optionnel) Filtre sur le statut des bordereaux
-  Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
-  Défaut à vide.
-  """
-  status: BsvhuStatus
-
+  "Filtre sur le statut"
+  status: BsvhuStatusFilter
+  "Filtre sur la date de création"
   createdAt: DateFilter
+  "Filtre sur la date de dernière modification"
   updatedAt: DateFilter
+  "Filtre sur le champ emitter."
   emitter: BsvhuEmitterWhere
+  "Filtre sur le champ transporter."
   transporter: BsvhuTransporterWhere
+  "Filtre sur le champ destination."
   destination: BsvhuDestinationWhere
+  "ET logique"
   _and: [BsvhuWhere!]
+  "OU logique"
   _or: [BsvhuWhere!]
-  _not: [BsvhuWhere!]
+  "NON logique"
+  _not: BsvhuWhere
 }
 
+"Filtre sur le statut"
+input BsvhuStatusFilter {
+  _eq: BsvhuStatus
+  _in: [BsvhuStatus!]
+}
+
+"Champs possible pour le filtre sur l'émetteur."
 input BsvhuEmitterWhere {
-  company: BsvhuCompanyWhere
+  company: CompanyWhere
   emission: BsvhuEmissionWhere
 }
 
+"Champs possibles pour le filtre sur l'émission"
 input BsvhuEmissionWhere {
-  signature: BsvhuSignatureWhere
+  signature: SignatureWhere
 }
 
+"Champs possible pour le filtre sur le transporteur."
 input BsvhuTransporterWhere {
-  company: BsvhuCompanyWhere
+  company: CompanyWhere
   transport: BsvhuTransportWhere
 }
 
+"Champs possible pour le filtre sur le transport."
 input BsvhuTransportWhere {
-  signature: BsvhuSignatureWhere
+  signature: SignatureWhere
 }
 
+"Champs possible pour le filtre sur la destination."
 input BsvhuDestinationWhere {
-  company: BsvhuCompanyWhere
+  company: CompanyWhere
+  reception: BsvhuReceptionWhere
   operation: BsvhuOperationWhere
 }
 
+"Champs possibles pour le filtre sur la réception"
+input BsvhuReceptionWhere {
+  date: DateFilter
+}
+
+"Champs possible pour le filtre sur l'opération."
 input BsvhuOperationWhere {
-  signature: BsvhuSignatureWhere
-}
-
-input BsvhuCompanyWhere {
-  siret: String!
-}
-
-input BsvhuSignatureWhere {
-  date: DateFilter!
+  signature: SignatureWhere
+  code: StringFilter
 }
 
 input BsvhuInput {
