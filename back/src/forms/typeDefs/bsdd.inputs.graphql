@@ -246,15 +246,12 @@ input FormInput {
 "Payload de création d'une annexe 2"
 input AppendixFormInput {
   "Identifiant unique du bordereau"
-  id: ID
+  id: ID!
 
   """
   N° de bordereau
-
-  Déprécié : L'id du bordereau doit être utilisé comme identifiant (paramètre id).
-  Le readableId permet de le récupérer via la query form.
   """
-  readableId: ID
+  readableId: ID @deprecated(reason: "Utiliser le paramètre id")
 }
 
 "Payload de liaison d'un BSD à un eco-organisme"
@@ -284,7 +281,7 @@ input DestinationInput {
 
   "Opération d'élimination / valorisation prévue (code D/R)"
   processingOperation: String
-  
+
   "Indique si c'est l'émetteur initial ou l'installation d'entreposage ou de reconditionnement qui a saisi les informations"
   isFilledByEmitter: Boolean
 }

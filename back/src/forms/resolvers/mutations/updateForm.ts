@@ -16,7 +16,11 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanUpdate, checkIsFormContributor } from "../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound, getFullForm } from "../../database";
-import { draftFormSchema, sealedFormSchema } from "../../validation";
+import {
+  draftFormSchema,
+  sealedFormSchema,
+  validateAppendix2Forms
+} from "../../validation";
 import { FormSirets } from "../../types";
 import { indexForm } from "../../elastic";
 import { EventType } from "../../workflow/types";
@@ -51,6 +55,10 @@ const updateFormResolver = async (
   await checkCanUpdate(user, existingForm);
 
   const form = flattenFormInput(formContent);
+
+  if (appendix2Forms) {
+    await validateAppendix2Forms(appendix2Forms, { ...existingForm, ...form });
+  }
 
   await handleFormsRemovedFromAppendix(existingForm, appendix2Forms);
 

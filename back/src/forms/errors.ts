@@ -91,9 +91,9 @@ export class HasSegmentToTakeOverError extends UserInputError {
 }
 
 export class FormAlreadyInAppendix2 extends UserInputError {
-  constructor() {
+  constructor(id: string) {
     super(
-      "Vous ne pouvez pas ajouter ce bordereau à l'annexe, il est déjà associé à une autre annexe 2."
+      `Le bordereau ${id} est déjà associé à un autre bordereau dans le cadre d'un regroupement avec annexe 2`
     );
   }
 }
