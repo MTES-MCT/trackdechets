@@ -22,7 +22,7 @@ import routes from "common/routes";
 import PasswordMeter from "common/components/PasswordMeter";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "./Invite.module.scss";
-import querystring from "querystring";
+import * as queryString from "query-string";
 const INVITATION = gql`
   query Invitation($hash: String!) {
     invitation(hash: $hash) {
@@ -113,6 +113,15 @@ function AlreadyAccepted({ invitation }: { invitation: Invitation }) {
   );
 }
 
+const decodeHash = hash => {
+  if (!hash) {
+    return "";
+  }
+  return Array.isArray(hash)
+    ? decodeURIComponent(hash[0])
+    : decodeURIComponent(hash);
+};
+
 /**
  * Signup to Trackdéchets with an invitation link
  */
@@ -121,12 +130,11 @@ export default function Invite() {
   const location = useLocation();
 
   // parse qs and get rid of extra parameters
-  const parsedQs = querystring.parse(location.search);
+  const parsedQs = queryString.parse(location.search);
+
   const { hash: qsHash } = parsedQs;
 
-  const hash = Array.isArray(qsHash)
-    ? decodeURIComponent(qsHash[0])
-    : decodeURIComponent(qsHash);
+  const hash = decodeHash(qsHash);
 
   const [passwordType, setPasswordType] = useState("password");
 
