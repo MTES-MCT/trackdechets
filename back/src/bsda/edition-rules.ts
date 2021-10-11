@@ -35,14 +35,15 @@ const editableFields = {
   },
   waste: ifAwaitingSignature("EMISSION"),
   packagings: ifAwaitingSignature("WORK"),
-  quantity: ifAwaitingSignature("WORK"),
+  weight: ifAwaitingSignature("WORK"),
   worker: {
     company: ifAwaitingSignature("EMISSION"),
     work: ifAwaitingSignature("WORK")
   },
   broker: ifAwaitingSignature("EMISSION"),
   transporter: ifAwaitingSignature("TRANSPORT"),
-  associations: ifAwaitingSignature("EMISSION")
+  grouping: ifAwaitingSignature("EMISSION"),
+  forwarding: ifAwaitingSignature("EMISSION")
 };
 
 function ifAwaitingSignature(signature: BsdaSignatureType) {

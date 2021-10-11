@@ -4,7 +4,7 @@ import { MutationPublishBsdaArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb } from "../../converter";
-import { getFormOrFormNotFound } from "../../database";
+import { getBsdaOrNotFound, getPreviousBsdas } from "../../database";
 import { indexBsda } from "../../elastic";
 import { checkIsFormContributor } from "../../permissions";
 import { validateBsda } from "../../validation";
@@ -16,20 +16,21 @@ export default async function create(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const prismaForm = await getFormOrFormNotFound(id);
+  const existingBsda = await getBsdaOrNotFound(id);
   await checkIsFormContributor(
     user,
-    prismaForm,
+    existingBsda,
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  if (!prismaForm.isDraft) {
+  if (!existingBsda.isDraft) {
     throw new ForbiddenError(
       "Impossible de publier un bordereau qui n'est pas un brouillon"
     );
   }
 
-  await validateBsda(prismaForm, { emissionSignature: true });
+  const previousBsdas = await getPreviousBsdas(existingBsda);
+  await validateBsda(existingBsda, previousBsdas, { emissionSignature: true });
 
   const updatedBsda = await prisma.bsda.update({
     where: { id },

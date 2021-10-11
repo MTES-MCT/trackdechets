@@ -1,31 +1,35 @@
 import { BsdaResolvers } from "../../generated/graphql/types";
 import prisma from "../../prisma";
+import { expandBsdaFromDb, toInitialBsda } from "../converter";
 
 export const Bsda: BsdaResolvers = {
-  associations: async parent => {
-    const bsdas = await prisma.bsda.findMany({
-      where: {
-        childBsdaId: parent.id
-      }
-    });
-
-    return bsdas.map(bsda => ({
-      id: bsda.id,
-      status: bsda.status,
-      cap: bsda.destinationCap,
-      wasteCode: bsda.wasteCode,
-      wasteDescription: [
-        bsda.wasteName,
-        bsda.wasteFamilyCode,
-        bsda.wasteMaterialName
-      ]
-        .filter(Boolean)
-        .join(" - "),
-      wasteSealNumbers: bsda.wasteSealNumbers,
-      wasteAdr: bsda.wasteAdr,
-      totalQuantity: bsda.destinationReceptionQuantityValue,
-      emissionDate: bsda.emitterEmissionSignatureDate
-    }));
+  forwardedIn: async ({ id }) => {
+    const forwardingBsda = await prisma.bsda
+      .findUnique({
+        where: { id }
+      })
+      .forwardedIn();
+    return forwardingBsda ? expandBsdaFromDb(forwardingBsda) : null;
+  },
+  forwarding: async ({ id }) => {
+    const forwardedBsda = await prisma.bsda
+      .findUnique({
+        where: { id }
+      })
+      .forwarding();
+    return forwardedBsda
+      ? toInitialBsda(expandBsdaFromDb(forwardedBsda))
+      : null;
+  },
+  grouping: async ({ id }) => {
+    const grouping = await prisma.bsda.findUnique({ where: { id } }).grouping();
+    return grouping.map(bsda => toInitialBsda(expandBsdaFromDb(bsda)));
+  },
+  groupedIn: async ({ id }) => {
+    const groupedIn = await prisma.bsda
+      .findUnique({ where: { id } })
+      .groupedIn();
+    return toInitialBsda(expandBsdaFromDb(groupedIn));
   },
   metadata: bsda => {
     return {

@@ -52,7 +52,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                 sealNumbers: ["1", "2"]
             }
             packagings: [{ quantity: 1, type: PALETTE_FILME }]
-            quantity: { type: ESTIMATED, value: 1.2 }
+            weight: { isEstimate: true, value: 1.2 }
             destination: {
                 cap: "A cap"
                 plannedOperationCode: "D 13"
@@ -81,10 +81,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
           destination: {
               reception: {
                   date: "2020-06-30"
-                  quantity: {
-                      type: REAL
-                      value: 1.1
-                  }
+                  weight: 1.1
                   acceptationStatus: ACCEPTED
               }
               operation: {
@@ -164,7 +161,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                   sealNumbers: ["1", "2"]
               }
               packagings: [{ quantity: 1, type: PALETTE_FILME }]
-              quantity: { type: ESTIMATED, value: 1.2 }
+              weight: { isEstimate: true, value: 1.2 }
               destination: {
                   cap: "A cap"
                   plannedOperationCode: "D 13"
@@ -245,10 +242,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
               destination: {
                   reception: {
                       date: "2020-06-30"
-                      quantity: {
-                          type: REAL
-                          value: 1.1
-                      }
+                      weight: 1.1
                       acceptationStatus: ACCEPTED
                   }
                   operation: {
@@ -343,8 +337,8 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                     quantity: 1
                     type: PALETTE_FILME
                 }]
-                quantity: { 
-                    type: ESTIMATED
+                weight: { 
+                    isEstimate: true
                     value: 1.2
                 }
                 destination: {
@@ -446,10 +440,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
               destination: {
                   reception: {
                       date: "2020-06-30"
-                      quantity: {
-                          type: REAL
-                          value: 1.1
-                      }
+                      weight: 1.1
                       acceptationStatus: ACCEPTED
                   }
                   operation: {

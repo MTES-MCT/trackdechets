@@ -1,7 +1,6 @@
-import { User, Bsda, BsdaStatus, BsdaType } from "@prisma/client";
-import { ForbiddenError, UserInputError } from "apollo-server-express";
+import { Bsda, BsdaStatus, User } from "@prisma/client";
+import { ForbiddenError } from "apollo-server-express";
 import { NotFormContributor } from "../forms/errors";
-import prisma from "../prisma";
 import { getFullUser } from "../users/database";
 
 export async function checkIsFormContributor(
@@ -56,30 +55,4 @@ export async function checkCanDeleteBsda(user: User, form: Bsda) {
   }
 
   return true;
-}
-
-export async function checkCanAssociateBsdas(ids: string[]) {
-  if (!ids || ids.length === 0) {
-    return;
-  }
-
-  const bsdas = await prisma.bsda.findMany({
-    where: {
-      id: {
-        in: ids
-      }
-    }
-  });
-
-  if (
-    bsdas.some(
-      bsda =>
-        ![BsdaType.GATHERING, BsdaType.RESHIPMENT].includes(bsda.type as any) ||
-        bsda.status !== "AWAITING_CHILD"
-    )
-  ) {
-    throw new UserInputError(
-      `Les bordereaux ne peuvent pas être associés à un bordereau enfant.`
-    );
-  }
 }

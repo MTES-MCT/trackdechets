@@ -38,8 +38,8 @@ mutation EditVhuForm($id: ID!, $input: BsvhuInput!) {
         number
       }
     }
-    quantity {
-      number
+    weight {
+      value
     }
   }
 }
@@ -83,9 +83,7 @@ describe("Mutation.Vhu.update", () => {
         variables: {
           id: form.id,
           input: {
-            quantity: {
-              number: 4
-            }
+            quantity: 4
           }
         }
       }
@@ -112,8 +110,8 @@ describe("Mutation.Vhu.update", () => {
 
     const { mutate } = makeClient(user);
     const input = {
-      quantity: {
-        number: 4
+      weight: {
+        value: 4
       }
     };
     const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
@@ -123,7 +121,7 @@ describe("Mutation.Vhu.update", () => {
       }
     );
 
-    expect(data.updateBsvhu.quantity.number).toBe(4);
+    expect(data.updateBsvhu.weight.value).toBe(4);
   });
 
   it("should allow emitter fields update before emitter signature", async () => {

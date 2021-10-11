@@ -3,7 +3,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationDeleteBsdaArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { expandBsdaFromDb } from "../../converter";
-import { getFormOrFormNotFound } from "../../database";
+import { getBsdaOrNotFound } from "../../database";
 import { checkCanDeleteBsda } from "../../permissions";
 import { GraphQLContext } from "../../../types";
 
@@ -14,7 +14,7 @@ export default async function deleteBsda(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const bsda = await getFormOrFormNotFound(id);
+  const bsda = await getBsdaOrNotFound(id);
   await checkCanDeleteBsda(user, bsda);
 
   const deletedBsda = await prisma.bsda.update({

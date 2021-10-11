@@ -1,10 +1,11 @@
-import { UserRole } from "@prisma/client";
+import { BsdaStatus, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import {
   Mutation,
   MutationSignBsdaArgs
 } from "../../../../generated/graphql/types";
+import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../__tests__/factories";
@@ -585,6 +586,77 @@ describe("Mutation.Bsda.sign", () => {
           }
         })
       ]);
+    });
+
+    it("should mark all BSDAs in the history as PROCESSED", async () => {
+      const { company: emitter } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { company: transporter } = await userWithCompanyFactory(
+        UserRole.ADMIN
+      );
+      const { user, company: destination } = await userWithCompanyFactory(
+        UserRole.ADMIN
+      );
+      const { company: ttr1 } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { company: ttr2 } = await userWithCompanyFactory(UserRole.ADMIN);
+
+      const bsda1 = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: emitter.siret,
+          transporterCompanySiret: transporter.siret,
+          destinationCompanySiret: ttr1.siret,
+          status: BsdaStatus.AWAITING_CHILD,
+          destinationOperationCode: "R 13"
+        }
+      });
+
+      // bsda1 => bsda2
+      const bsda2 = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: emitter.siret,
+          transporterCompanySiret: transporter.siret,
+          destinationCompanySiret: ttr2.siret,
+          destinationOperationCode: "R 13",
+          status: BsdaStatus.AWAITING_CHILD,
+          forwarding: { connect: { id: bsda1.id } }
+        }
+      });
+      // bsda1 => bsda2 => bsda3
+      const bsda3 = await bsdaFactory({
+        opt: {
+          status: BsdaStatus.SENT,
+          emitterCompanySiret: ttr2.siret,
+          transporterCompanySiret: transporter.siret,
+          destinationCompanySiret: destination.siret,
+          destinationOperationCode: "D 10",
+          forwarding: { connect: { id: bsda2.id } }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda3.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.signBsda.id).toBeTruthy();
+
+      const newBsda1 = await prisma.bsda.findUnique({
+        where: { id: bsda1.id }
+      });
+      expect(newBsda1.status).toEqual(BsdaStatus.PROCESSED);
+      const newBsda2 = await prisma.bsda.findUnique({
+        where: { id: bsda2.id }
+      });
+      expect(newBsda2.status).toEqual(BsdaStatus.PROCESSED);
     });
   });
 });
