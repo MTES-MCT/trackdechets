@@ -11,6 +11,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
 import { Mutation } from "../../../../generated/graphql/types";
+import { Status } from ".prisma/client";
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
@@ -572,19 +573,20 @@ describe("Mutation.createForm", () => {
   });
 
   it("should allow creating a form with an appendix 2", async () => {
-    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
 
     const appendix2 = await formFactory({
       ownerId: user.id,
       opt: {
-        status: "AWAITING_GROUP"
+        status: "AWAITING_GROUP",
+        recipientCompanySiret: ttr.siret
       }
     });
 
     const createFormInput = {
       emitter: {
         company: {
-          siret: company.siret
+          siret: ttr.siret
         }
       },
       appendix2Forms: [{ id: appendix2.id }]
@@ -638,11 +640,62 @@ describe("Mutation.createForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Vous ne pouvez pas ajouter ce bordereau à l'annexe, il est déjà associé à une autre annexe 2.",
+        message: `Le bordereau ${appendix2.id} est déjà associé à un autre bordereau dans le cadre d'un regroupement avec annexe 2`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
+      })
+    ]);
+  });
+
+  it("should disallow linking an appendix 2 form if the emitter of the regroupement form is not the recipient of the initial form", async () => {
+    const appendix2 = await formFactory({
+      ownerId: (await userFactory()).id,
+      opt: { status: Status.AWAITING_GROUP }
+    });
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: ttr.siret
+        }
+      },
+      appendix2Forms: [{ id: appendix2.id }]
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le bordereau ${appendix2.id} n'est pas en possession du nouvel émetteur`
+      })
+    ]);
+  });
+
+  it("should disallow linking an appendix2 form that is not awaiting groupement", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: { status: Status.SENT, recipientCompanySiret: ttr.siret }
+    });
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: ttr.siret
+        }
+      },
+      appendix2Forms: [{ id: appendix2.id }]
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le bordereau ${appendix2.id} n'est pas en attente de regroupement`
       })
     ]);
   });

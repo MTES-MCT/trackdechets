@@ -9,6 +9,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
+import { Status } from ".prisma/client";
 
 const UPDATE_FORM = `
   mutation UpdateForm($updateFormInput: UpdateFormInput!) {
@@ -713,21 +714,20 @@ describe("Mutation.updateForm", () => {
   );
 
   it("should update appendix2 status", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-    const originalRecipientCompany = await companyFactory();
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
 
     const appendixForm = await formFactory({
       ownerId: user.id,
       opt: {
         status: "GROUPED",
-        emitterCompanySiret: company.siret
+        recipientCompanySiret: ttr.siret
       }
     });
     const toBeAppendixForm = await formFactory({
       ownerId: user.id,
       opt: {
         status: "AWAITING_GROUP",
-        emitterCompanySiret: company.siret
+        recipientCompanySiret: ttr.siret
       }
     });
 
@@ -735,8 +735,7 @@ describe("Mutation.updateForm", () => {
       ownerId: user.id,
       opt: {
         status: "SEALED",
-        emitterCompanySiret: company.siret,
-        recipientCompanySiret: originalRecipientCompany.siret,
+        emitterCompanySiret: ttr.siret,
         appendix2Forms: { connect: { id: appendixForm.id } }
       }
     });
@@ -763,5 +762,41 @@ describe("Mutation.updateForm", () => {
       where: { id: toBeAppendixForm.id }
     });
     expect(newAppendix2Form.status).toBe("GROUPED");
+  });
+
+  it("should disallow linking an appendix 2 form if the emitter of the regroupement form is not the recipient of the initial form", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+    const initialAppendix2 = await formFactory({
+      ownerId: user.id,
+      opt: { status: Status.AWAITING_GROUP, recipientCompanySiret: ttr.siret }
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SEALED,
+        emitterCompanySiret: ttr.siret,
+        appendix2Forms: { connect: [{ id: initialAppendix2.id }] }
+      }
+    });
+
+    const wannaBeAppendix2 = await formFactory({
+      ownerId: (await userFactory()).id,
+      opt: { status: Status.AWAITING_GROUP }
+    });
+
+    const updateFormInput = {
+      id: form.id,
+      appendix2Forms: [{ id: wannaBeAppendix2.id }]
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le bordereau ${wannaBeAppendix2.id} n'est pas en possession du nouvel émetteur`
+      })
+    ]);
   });
 });

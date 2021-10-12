@@ -1101,7 +1101,7 @@ export async function validateAppendix2Forms(
       }
     } else {
       if (appendix2.status !== Status.AWAITING_GROUP) {
-        throw new Error(
+        throw new UserInputError(
           `Le bordereau ${appendix2.id} n'est pas en attente de regroupement`
         );
       }
@@ -1109,7 +1109,7 @@ export async function validateAppendix2Forms(
     const appendix2DestinationSiret = await getFinalDestinationSiret(appendix2);
 
     if (form?.emitterCompanySiret !== appendix2DestinationSiret) {
-      throw new Error(
+      throw new UserInputError(
         `Le bordereau ${appendix2.id} n'est pas en possession du nouvel émetteur`
       );
     }
