@@ -10,4 +10,7 @@ export type RoleRow = InferType<typeof r>;
 export interface CompanyInfo {
   name: string;
   codeNaf: string;
+  address: string;
+  latitude: number;
+  longitude: number;
 }

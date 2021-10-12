@@ -19,6 +19,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Amélioration de la query { me } pour éviter de reqêter inutilement la base sirene  [PR 1010](https://github.com/MTES-MCT/trackdechets/pull/1010)
+ 
 # [2021.10.1] 04/10/2021
 
 #### :rocket: Nouvelles fonctionnalités
