@@ -28,7 +28,7 @@ const deleteFormResolver: MutationResolvers["deleteForm"] = async (
   });
 
   if (appendix2Forms.length) {
-    // roll back status changes to
+    // roll back status changes to appendixes 2
     await prisma.form.updateMany({
       where: { id: { in: appendix2Forms.map(f => f.id) } },
       data: { status: Status.AWAITING_GROUP }
