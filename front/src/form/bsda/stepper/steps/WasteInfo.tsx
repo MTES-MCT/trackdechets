@@ -1,7 +1,6 @@
 import React from "react";
 import { Field } from "formik";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import Packagings from "form/bsda/components/packagings/Packagings";
 import Tooltip from "common/components/Tooltip";
 import TagsInput from "form/bsvhu/components/tags-input/TagsInput";

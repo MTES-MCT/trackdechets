@@ -1,15 +1,11 @@
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import {
-  BsdaConsistence,
-  QuantityType,
-  TransportMode,
-} from "generated/graphql/types";
+import { BsdaConsistence, TransportMode } from "generated/graphql/types";
 
 export default {
   emitter: {
     company: getInitialCompany(),
     isPrivateIndividual: false,
-    workSite: null,
+    pickupSite: null,
   },
   waste: {
     code: "",
