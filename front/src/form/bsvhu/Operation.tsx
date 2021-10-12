@@ -71,7 +71,7 @@ export default function Operation() {
           En tonnes
           <Field
             component={NumberInput}
-            name="destination.reception.quantity.tons"
+            name="destination.reception.weight"
             className="td-input td-input--small"
             placeholder="0"
             min="0"
@@ -79,7 +79,7 @@ export default function Operation() {
           />
         </label>
 
-        <RedErrorMessage name="destination.reception.quantity.tons" />
+        <RedErrorMessage name="destination.reception.weight" />
       </div>
 
       <h4 className="form__section-heading">Identification & Quantité</h4>
@@ -96,12 +96,12 @@ export default function Operation() {
           En nombre
           <Field
             component={NumberInput}
-            name="destination.reception.quantity.number"
+            name="destination.reception.quantity"
             className="td-input td-input--small"
           />
         </label>
 
-        <RedErrorMessage name="destination.reception.quantity.number" />
+        <RedErrorMessage name="destination.reception.quantity" />
       </div>
 
       <h4 className="form__section-heading">Opération</h4>
