@@ -58,6 +58,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "build:recette": "env-cmd -f .env.recette npm run build",
+    "build:preview": "env-cmd -f .env.preview npm run build",
     "build:sandbox": "env-cmd -f .env.sandbox npm run build",
     "build:production": "npm run build",
     "start": "npx serve -s build -l $PORT",
