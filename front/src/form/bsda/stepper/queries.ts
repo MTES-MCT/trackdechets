@@ -131,8 +131,8 @@ export const GET_BSDA = gql`
 `;
 
 export const GET_BSDAS = gql`
-  query Bsdas {
-    bsdas {
+  query Bsdas($where: BsdaWhere) {
+    bsdas(where: $where) {
       totalCount
       pageInfo {
         hasNextPage

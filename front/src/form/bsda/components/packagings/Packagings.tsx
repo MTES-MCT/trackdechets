@@ -11,6 +11,7 @@ export const PACKAGINGS_NAMES = {
   [BsdaPackagingType.DepotBag]: "Dépôt-bag",
   [BsdaPackagingType.PaletteFilme]: "Palette filmée",
   [BsdaPackagingType.SacRenforce]: "Sac renforcé",
+  [BsdaPackagingType.ConteneurBag]: "Conteneur-bag",
   [BsdaPackagingType.Other]: "Autre(s)",
 };
 

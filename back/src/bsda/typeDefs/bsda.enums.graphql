@@ -28,6 +28,7 @@ enum BsdaPackagingType {
   DEPOT_BAG
   SAC_RENFORCE
   BODY_BENNE
+  CONTENEUR_BAG
   OTHER
 }
 

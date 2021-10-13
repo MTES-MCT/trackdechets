@@ -1,7 +1,13 @@
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import { BsdaConsistence, TransportMode } from "generated/graphql/types";
+import {
+  BsdaConsistence,
+  BsdaType,
+  QuantityType,
+  TransportMode,
+} from "generated/graphql/types";
 
 export default {
+  type: BsdaType.OtherCollections,
   emitter: {
     company: getInitialCompany(),
     isPrivateIndividual: false,
@@ -54,4 +60,5 @@ export default {
       },
     },
   },
+  associations: [],
 };

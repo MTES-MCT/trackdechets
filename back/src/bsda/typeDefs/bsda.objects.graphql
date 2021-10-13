@@ -272,7 +272,7 @@ type BsdaBroker {
 }
 
 type BsdaMetadata {
-  errors: [BsdaError!]!
+  errors: [BsdaError!]
 }
 
 type BsdaError {

@@ -515,27 +515,23 @@ const wasteDescriptionSchema: FactorySchemaOf<
         "La description déchet est obligatoire"
       ),
     wasteFamilyCode: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature,
-        "Le code famille déchet est obligatoire"
-      ),
+      .string().nullable(),
     wasteMaterialName: yup.string().nullable(),
     wasteConsistence: yup
       .mixed<BsdaConsistence>()
-      .requiredIf(context.emissionSignature, `La consistence est obligatoire`),
+      .requiredIf(context.workSignature, `La consistence est obligatoire`),
     wasteSealNumbers: yup.array().ensure().of(yup.string()) as any,
     wasteAdr: yup
       .string()
-      .requiredIf(context.emissionSignature, "Le code ADR est obligatoire"),
+      .nullable(),
     packagings: yup.array(),
     weightIsEstimate: yup
       .boolean()
       .requiredIf(
-        context.emissionSignature,
+        context.workSignature,
         `Le type de quantité est obligatoire`
       ),
     weightValue: yup
       .number()
-      .requiredIf(context.emissionSignature, `La quantité est obligatoire`)
+      .requiredIf(context.workSignature, `La quantité est obligatoire`)
   });

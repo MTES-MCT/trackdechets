@@ -58,3 +58,27 @@ export async function checkCanDeleteBsda(user: User, form: Bsda) {
 
   return true;
 }
+
+export async function checkCanAssociateBsdas(ids: string[]) {
+  if (!ids || ids.length === 0) {
+    return;
+  }
+
+  const bsdas = await prisma.bsda.findMany({
+    where: {
+      id: {
+        in: ids
+      }
+    }
+  });
+
+  if (
+    bsdas.some(
+      bsda => bsda.status !== "AWAITING_CHILD"
+    )
+  ) {
+    throw new UserInputError(
+      `Les bordereaux ne peuvent pas être associés à un bordereau enfant.`
+    );
+  }
+}

@@ -2,12 +2,17 @@ import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
 import { GET_BSDS } from "common/queries";
 import routes from "common/routes";
+import { UPDATE_BSDA } from "form/bsda/stepper/queries";
+import { Transport } from "form/bsda/stepper/steps/Transport";
+import { getComputedState } from "form/common/stepper/GenericStepList";
 import { Field, Form, Formik } from "formik";
 import {
   BsdaSignatureType,
   Mutation,
   MutationSignBsdaArgs,
+  MutationUpdateBsdaArgs,
   SignatureTypeInput,
+  TransportMode,
 } from "generated/graphql/types";
 import React from "react";
 import { generatePath, Link } from "react-router-dom";
@@ -23,6 +28,10 @@ const validationSchema = yup.object({
 
 type Props = { siret: string; bsdaId: string };
 export function SignTransport({ siret, bsdaId }: Props) {
+  const [updateBsda] = useMutation<
+    Pick<Mutation, "updateBsda">,
+    MutationUpdateBsdaArgs
+  >(UPDATE_BSDA);
   const [signBsda, { loading }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs
@@ -59,13 +68,41 @@ export function SignTransport({ siret, bsdaId }: Props) {
           <Formik
             initialValues={{
               author: "",
+              ...getComputedState(
+                {
+                  transporter: {
+                    recepisse: {
+                      isExempted: false,
+                      number: "",
+                      department: "",
+                      validityLimit: null,
+                    },
+                    transport: {
+                      mode: TransportMode.Road,
+                      plates: [],
+                      takenOverAt: new Date().toISOString(),
+                    },
+                  },
+                },
+                bsda
+              ),
             }}
             validationSchema={validationSchema}
             onSubmit={async values => {
+              const { id, author, ...update } = values;
+              await updateBsda({
+                variables: {
+                  id: bsda.id,
+                  input: update,
+                },
+              });
               await signBsda({
                 variables: {
                   id: bsda.id,
-                  input: { ...values, type: BsdaSignatureType.Transport },
+                  input: {
+                    author,
+                    type: BsdaSignatureType.Transport,
+                  },
                 },
               });
               onClose();
@@ -73,6 +110,9 @@ export function SignTransport({ siret, bsdaId }: Props) {
           >
             {({ isSubmitting, handleReset }) => (
               <Form>
+                <div className="tw-mb-6">
+                  <Transport disabled={false} />
+                </div>
                 <p>
                   En qualité de <strong>transporteur du déchet</strong>,
                   j'atteste que les informations ci-dessus sont correctes. En
