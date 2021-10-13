@@ -7,24 +7,27 @@ const prisma = new PrismaClient({
   datasources: {
     db: { url: getDbUrl() }
   },
-  log: [
-    {
-      emit: "event",
-      level: "query"
-    },
-    {
-      emit: "stdout",
-      level: "error"
-    },
-    {
-      emit: "stdout",
-      level: "info"
-    },
-    {
-      emit: "stdout",
-      level: "warn"
-    }
-  ]
+  log:
+    process.env.NODE_ENV !== "test"
+      ? [
+          {
+            emit: "event",
+            level: "query"
+          },
+          {
+            emit: "stdout",
+            level: "error"
+          },
+          {
+            emit: "stdout",
+            level: "info"
+          },
+          {
+            emit: "stdout",
+            level: "warn"
+          }
+        ]
+      : []
 });
 
 prisma.$use(async (params, next) => {
