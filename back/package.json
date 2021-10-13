@@ -93,7 +93,6 @@
     "prisma": "^2.29.1",
     "qrcode": "^1.4.4",
     "rate-limit-redis": "^2.0.0",
-    "request": "^2.88.2",
     "sanitize-html": "^2.4.0",
     "winston": "^3.2.1",
     "winston-transport": "^4.3.0",
