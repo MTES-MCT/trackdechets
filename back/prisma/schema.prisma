@@ -646,6 +646,7 @@ model Bsvhu {
   transporterRecepisseDepartment      String?
   transporterRecepisseValidityLimit   DateTime?
   transporterTransportTakenOverAt     DateTime?
+  transporterTransportPlates          String[]
   transporterTransportSignatureAuthor String?
   transporterTransportSignatureDate   DateTime?
 
@@ -1087,7 +1088,7 @@ model Bsda {
   grouping    Bsda[]  @relation("BsdaGrouping")
 
   forwarding   Bsda?   @relation("BsdaForwarding", fields: [forwardingId], references: [id])
-  forwardingId String?
+  forwardingId String? @unique
   forwardedIn  Bsda?   @relation("BsdaForwarding")
 
   // DEPRECATED - remove after migration

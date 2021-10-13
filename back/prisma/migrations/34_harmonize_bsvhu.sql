@@ -8,3 +8,4 @@ ALTER TABLE "default$default"."Bsvhu" ADD COLUMN    "destinationOperationNextDes
 ALTER TABLE "default$default"."Bsvhu" ADD COLUMN    "emitterCustomInfo" TEXT;
 ALTER TABLE "default$default"."Bsvhu" ADD COLUMN    "destinationCustomInfo" TEXT;
 ALTER TABLE "default$default"."Bsvhu" ADD COLUMN    "transporterCustomInfo" TEXT;
+ALTER TABLE "default$default"."Bsvhu" ADD COLUMN    "transporterTransportPlates" TEXT[];
