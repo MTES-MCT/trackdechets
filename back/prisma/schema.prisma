@@ -1082,13 +1082,13 @@ model Bsda {
   workerWorkSignatureAuthor          String?
   workerWorkSignatureDate            DateTime?
 
-  groupedIn   Bsda?   @relation("Grouping", fields: [groupedInId], references: [id])
+  groupedIn   Bsda?   @relation("BsdaGrouping", fields: [groupedInId], references: [id])
   groupedInId String?
-  grouping    Bsda[]  @relation("Grouping")
+  grouping    Bsda[]  @relation("BsdaGrouping")
 
-  forwarding   Bsda?   @relation("Forwarding", fields: [forwardingId], references: [id])
+  forwarding   Bsda?   @relation("BsdaForwarding", fields: [forwardingId], references: [id])
   forwardingId String?
-  forwardedIn  Bsda?   @relation("Forwarding")
+  forwardedIn  Bsda?   @relation("BsdaForwarding")
 
   // DEPRECATED - remove after migration
   bsdas       Bsda[]  @relation("BsdasToBsda")
