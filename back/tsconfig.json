@@ -19,5 +19,6 @@
     "strictNullChecks": false,
     "strictPropertyInitialization": false
   },
-  "include": ["src/**/*", "prisma/**/*"]
+  "include": ["src/**/*", "prisma/**/*"],
+  "exclude": ["**/__tests__/*"]
 }
