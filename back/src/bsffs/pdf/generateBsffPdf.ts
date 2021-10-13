@@ -21,9 +21,7 @@ const cssPaths = [
 export async function generateBsffPdf(bsff: Bsff) {
   const previousBsffs = await getBsffHistory(bsff);
   const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
-    where: {
-      bsffId: bsff.id
-    }
+    where: { bsffs: { some: { id: { in: [bsff.id] } } } }
   });
 
   const bsffType = {

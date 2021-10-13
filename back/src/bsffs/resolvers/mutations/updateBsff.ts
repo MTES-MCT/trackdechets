@@ -123,7 +123,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     where:
       input.ficheInterventions?.length > 0
         ? { id: { in: input.ficheInterventions } }
-        : { bsffId: existingBsff.id }
+        : { bsffs: { some: { id: { in: [existingBsff.id] } } } }
   });
 
   await validateBsff(futureBsff, previousBsffs, ficheInterventions);

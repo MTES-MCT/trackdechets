@@ -20,7 +20,7 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
   const previousBsffs = await getPreviousBsffs(existingBsff);
 
   const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
-    where: { bsffId: existingBsff.id }
+    where: { bsffs: { some: { id: { in: [existingBsff.id] } } } }
   });
 
   await validateBsff(existingBsff, previousBsffs, ficheInterventions);

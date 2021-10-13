@@ -12,6 +12,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout du code de traitement R3 à la liste des traitements possibles pour le BSFF [PR 1037](https://github.com/MTES-MCT/trackdechets/pull/1037)
 - Ajout de la création d'application OAuth2 à l'interface [PR 1051](https://github.com/MTES-MCT/trackdechets/pull/1051)
 - Ajout de la suppression d'un établissement depuis l'interface [PR 1053](https://github.com/MTES-MCT/trackdechets/pull/1053)
+- Il est maintenant possible de lier une fiche d'intervention à plusieurs BSFFs [PR 1033](https://github.com/MTES-MCT/trackdechets/pull/1033)
 
 #### :boom: Breaking changes
 
