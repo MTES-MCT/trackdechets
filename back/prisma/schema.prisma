@@ -871,18 +871,18 @@ model Bsff {
 
   ficheInterventions BsffFicheIntervention[] @relation("FicheInterventionToBsff")
 
-  grouping    Bsff[]  @relation("Grouping")
-  groupedIn   Bsff?   @relation("Grouping", fields: [groupedInId], references: [id])
+  grouping    Bsff[]  @relation("BsffGrouping")
+  groupedIn   Bsff?   @relation("BsffGrouping", fields: [groupedInId], references: [id])
   groupedInId String?
 
 
-  repackaging    Bsff[]  @relation("Repackaging")
-  repackagedIn   Bsff?   @relation("Repackaging", fields: [repackagedInId], references: [id])
+  repackaging    Bsff[]  @relation("BsffRepackaging")
+  repackagedIn   Bsff?   @relation("BsffRepackaging", fields: [repackagedInId], references: [id])
   repackagedInId String?
 
-  forwarding   Bsff?   @relation("Forwarding", fields: [forwardingId], references: [id])
+  forwarding   Bsff?   @relation("BsffForwarding", fields: [forwardingId], references: [id])
   forwardingId String?
-  forwardedIn  Bsff?   @relation("Forwarding")
+  forwardedIn  Bsff?   @relation("BsffForwarding")
 
   // DEPRECATED relations, to be deleted after data migration
   previousBsffs Bsff[]  @relation("BsffToBsff")
