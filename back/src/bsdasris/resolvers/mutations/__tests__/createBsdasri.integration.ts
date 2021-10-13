@@ -12,7 +12,7 @@ import { gql } from "apollo-server-express";
 
 const CREATE_DASRI = gql`
   ${fullGroupingBsdasriFragment}
-  mutation DasriCreate($input: BsdasriCreateInput!) {
+  mutation DasriCreate($input: BsdasriInput!) {
     createBsdasri(input: $input) {
       ...FullGroupingBsdasriFragment
     }
@@ -156,6 +156,7 @@ describe("Mutation.createDasri", () => {
         }
       }
     );
+
     expect(data.createBsdasri.isDraft).toEqual(false);
     expect(data.createBsdasri.status).toEqual("INITIAL");
     expect(data.createBsdasri.type).toEqual("SIMPLE");

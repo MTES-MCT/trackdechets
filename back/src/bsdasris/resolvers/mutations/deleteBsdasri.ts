@@ -19,7 +19,7 @@ const deleteBsdasriResolver: MutationResolvers["deleteBsdasri"] = async (
 
   const { grouping, ...bsdasri } = await getBsdasriOrNotFound({
     id,
-    includeRegrouped: true
+    includeGrouped: true
   });
   // user must belong to the dasri, and status must be INITIAL
   // if this dasri is regrouped by an other, it should be in another status thus being not deletable
@@ -30,7 +30,7 @@ const deleteBsdasriResolver: MutationResolvers["deleteBsdasri"] = async (
     // let's set their fk to null
     await prisma.bsdasri.updateMany({
       where: { id: { in: grouping.map(dasri => dasri.id) } },
-      data: { groupingInId: null }
+      data: { groupedInId: null }
     });
   }
 

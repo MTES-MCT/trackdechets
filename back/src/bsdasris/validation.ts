@@ -521,7 +521,7 @@ export const operationSchema: FactorySchemaOf<
   Operation
 > = context => {
   // a grouping dasri should not have a grouping operation code (D12, R12)
-  const allowedOperations = context?.isRegrouping
+  const allowedOperations = context?.isGrouping
     ? DASRI_PROCESSING_OPERATIONS_CODES
     : DASRI_ALL_OPERATIONS_CODES;
 
@@ -585,7 +585,7 @@ export type BsdasriValidationContext = {
   transportSignature?: boolean;
   receptionSignature?: boolean;
   operationSignature?: boolean;
-  isRegrouping?: boolean;
+  isGrouping?: boolean;
 };
 export function validateBsdasri(
   dasri: Partial<Prisma.BsdasriCreateInput>,

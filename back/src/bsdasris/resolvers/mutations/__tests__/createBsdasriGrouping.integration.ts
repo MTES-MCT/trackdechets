@@ -11,7 +11,7 @@ import { fullGroupingBsdasriFragment } from "../../../fragments";
 
 const CREATE_DASRI = gql`
   ${fullGroupingBsdasriFragment}
-  mutation DasriCreate($input: BsdasriCreateInput!) {
+  mutation DasriCreate($input: BsdasriInput!) {
     createBsdasri(input: $input) {
       ...FullGroupingBsdasriFragment
     }
@@ -62,7 +62,7 @@ describe("Mutation.createDasri", () => {
         }
       },
 
-      grouping: [{ id: toRegroup1.id }]
+      grouping: [toRegroup1.id]
     };
 
     const { mutate } = makeClient(user);
@@ -127,7 +127,7 @@ describe("Mutation.createDasri", () => {
         }
       },
 
-      grouping: [{ id: toRegroup1.id }]
+      grouping: [toRegroup1.id]
     };
 
     const { mutate } = makeClient(user);
@@ -200,7 +200,7 @@ describe("Mutation.createDasri", () => {
         }
       },
 
-      grouping: [{ id: toRegroup1.id }, { id: toRegroup2.id }]
+      grouping: [toRegroup1.id, toRegroup2.id]
     };
 
     const { mutate } = makeClient(user);
@@ -212,6 +212,7 @@ describe("Mutation.createDasri", () => {
         }
       }
     );
+
     expect(data.createBsdasri.grouping.map(bsd => bsd.id)).toEqual([
       toRegroup1.id,
       toRegroup2.id
@@ -223,8 +224,8 @@ describe("Mutation.createDasri", () => {
     const grouped2 = await prisma.bsdasri.findUnique({
       where: { id: toRegroup1.id }
     });
-    expect(grouped1.groupingInId).toEqual(data.createBsdasri.id);
+    expect(grouped1.groupedInId).toEqual(data.createBsdasri.id);
 
-    expect(grouped2.groupingInId).toEqual(data.createBsdasri.id);
+    expect(grouped2.groupedInId).toEqual(data.createBsdasri.id);
   });
 });

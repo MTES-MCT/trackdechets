@@ -12,7 +12,7 @@ export const GET_BSDASRI = gql`
 `;
 
 export const CREATE_BSDASRI = gql`
-  mutation CreateDraftBsdasri($input: BsdasriCreateInput!) {
+  mutation CreateDraftBsdasri($input: BsdasriInput!) {
     createDraftBsdasri(input: $input) {
       id
     }
@@ -20,7 +20,7 @@ export const CREATE_BSDASRI = gql`
 `;
 
 export const UPDATE_BSDASRI = gql`
-  mutation UpdateBsdasri($input: BsdasriUpdateInput!, $id: ID!) {
+  mutation UpdateBsdasri($input: BsdasriInput!, $id: ID!) {
     updateBsdasri(input: $input, id: $id) {
       id
     }

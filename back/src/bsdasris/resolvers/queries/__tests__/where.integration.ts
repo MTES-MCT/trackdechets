@@ -80,7 +80,7 @@ describe("Bsdasri where conversion", () => {
         { destinationCompanySiret: { in: [siret] } }
       ],
       grouping: { none: {} },
-      groupingIn: null
+      groupedIn: null
     });
   });
   it("should convert complex filters to db filters", () => {

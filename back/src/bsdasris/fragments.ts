@@ -137,5 +137,8 @@ export const fullGroupingBsdasriFragment = gql`
     grouping {
       ...InitialBsdasriFragment
     }
+    groupedIn {
+      id
+    }
   }
 `;

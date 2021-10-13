@@ -35,6 +35,7 @@ export function unflattenBsdasri(bsdasri: Bsdasri): GqlBsdasri {
     id: bsdasri.id,
     isDraft: bsdasri.isDraft,
     type: bsdasri.type,
+
     waste: nullIfNoValues<BsdasriWaste>({
       code: bsdasri.wasteCode,
       adr: bsdasri.wasteAdr

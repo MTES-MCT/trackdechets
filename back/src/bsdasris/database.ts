@@ -8,10 +8,10 @@ import { UserInputError } from "apollo-server-express";
  */
 export async function getBsdasriOrNotFound({
   id,
-  includeRegrouped = false
+  includeGrouped = false
 }: {
   id: string;
-  includeRegrouped?: boolean;
+  includeGrouped?: boolean;
 }) {
   if (!id) {
     throw new UserInputError("You should specify an id");
@@ -19,7 +19,7 @@ export async function getBsdasriOrNotFound({
 
   const bsdasri = await prisma.bsdasri.findUnique({
     where: { id },
-    ...(includeRegrouped && {
+    ...(includeGrouped && {
       include: { grouping: { select: { id: true } } }
     })
   });

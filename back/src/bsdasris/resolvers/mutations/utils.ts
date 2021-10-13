@@ -2,14 +2,14 @@ import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-express";
 
 import { DASRI_GROUPING_OPERATIONS_CODES } from "../../../common/constants";
-export const checkDasrisAreGroupable = async (grouping, emitterSiret) => {
-  if (!grouping) {
+export const checkDasrisAreGroupable = async (groupingIds, emitterSiret) => {
+  if (!groupingIds) {
     return;
   }
-  if (!grouping.length) {
+  if (!groupingIds.length) {
     return;
   }
-  const groupingIds = grouping.map(dasri => dasri.id);
+
   // retrieve dasris:
   // whose id is in regroupedBsdasrisIds array
   // which are in PROCESSED status
@@ -22,13 +22,12 @@ export const checkDasrisAreGroupable = async (grouping, emitterSiret) => {
       id: { in: groupingIds },
       destinationOperationCode: { in: DASRI_GROUPING_OPERATIONS_CODES },
       status: "PROCESSED",
-      groupingIn: null,
+      groupedIn: null,
       grouping: { none: {} },
       destinationCompanySiret: emitterSiret
     },
     select: { id: true }
   });
-
   const foundIds = found.map(el => el.id);
   const diff = groupingIds.filter(el => !foundIds.includes(el));
 

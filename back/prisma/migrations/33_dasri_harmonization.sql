@@ -90,7 +90,7 @@ ALTER TABLE "default$default"."Bsdasri"
    RENAME COLUMN "emitterWorkSitePostalCode" TO "emitterPickupSitePostalCode";
 ALTER TABLE "default$default"."Bsdasri"
    RENAME COLUMN "emitterWorkSiteInfos" TO "emitterPickupSiteInfos";
- 
+
  ALTER TABLE "default$default"."Bsdasri"
    RENAME COLUMN "emitterWasteQuantity" TO "emitterWasteWeightValue";
 ALTER TABLE "default$default"."Bsdasri"
@@ -102,31 +102,30 @@ ALTER TABLE "default$default"."Bsdasri"
 ALTER TABLE "default$default"."Bsdasri"
    RENAME COLUMN "destinationReceptionWasteQuantity" TO "destinationReceptionWasteWeightValue";
 ALTER TABLE "default$default"."Bsdasri"
-  RENAME COLUMN "regroupedOnBsdasriId" TO "groupingInId";
-ALTER TABLE "default$default"."Bsdasri"  
+  RENAME COLUMN "regroupedOnBsdasriId" TO "groupedInId";
+ALTER TABLE "default$default"."Bsdasri"
    ADD "emitterWasteWeightIsEstimate" BOOLEAN,
    ADD "transporterWasteWeightIsEstimate" BOOLEAN;
- 
-UPDATE  "default$default"."Bsdasri" SET "emitterWasteWeightIsEstimate" = (CASE 
-   WHEN "emitterWasteQuantityType" = E'ESTIMATED' 
+
+UPDATE  "default$default"."Bsdasri" SET "emitterWasteWeightIsEstimate" = (CASE
+   WHEN "emitterWasteQuantityType" = E'ESTIMATED'
 then true
-   WHEN "emitterWasteQuantityType" = E'REAL' 
+   WHEN "emitterWasteQuantityType" = E'REAL'
 then false
 END
 );
 
-UPDATE  "default$default"."Bsdasri" SET "transporterWasteWeightIsEstimate" = (CASE 
-   WHEN "transporterWasteQuantityType" = E'ESTIMATED' 
+UPDATE  "default$default"."Bsdasri" SET "transporterWasteWeightIsEstimate" = (CASE
+   WHEN "transporterWasteQuantityType" = E'ESTIMATED'
 then true
-  WHEN "transporterWasteQuantityType" = E'REAL' 
+  WHEN "transporterWasteQuantityType" = E'REAL'
 then false
 END
-); 
+);
 
 ALTER TABLE "default$default"."Bsdasri"
 DROP COLUMN "emitterWasteQuantityType",
 DROP COLUMN "transporterWasteQuantityType";
 
 
- 
- 
+

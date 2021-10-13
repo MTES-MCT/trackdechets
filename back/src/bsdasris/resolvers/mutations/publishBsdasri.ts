@@ -18,7 +18,7 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
   const user = checkIsAuthenticated(context);
   const { grouping, ...bsdasri } = await getBsdasriOrNotFound({
     id,
-    includeRegrouped: true
+    includeGrouped: true
   });
   await checkIsBsdasriContributor(
     user,

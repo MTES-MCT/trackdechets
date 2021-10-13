@@ -184,6 +184,9 @@ type Bsdasri {
   "Bordereaux regroupés"
   grouping: [InitialBsdasri!]
 
+  "Regroupé dans le bordereau"
+  groupedIn: Bsdasri
+
   metadata: BsdasriMetadata!
 
   allowDirectTakeOver: Boolean

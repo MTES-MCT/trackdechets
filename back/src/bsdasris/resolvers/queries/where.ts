@@ -48,12 +48,12 @@ const getGroupableCondition = (groupable?: boolean) => {
   if (!!groupable) {
     return {
       grouping: { none: {} },
-      groupingIn: null
+      groupedIn: null
     };
   }
   if (groupable === false) {
     return {
-      OR: [{ grouping: { some: {} } }, { NOT: { groupingIn: null } }]
+      OR: [{ grouping: { some: {} } }, { NOT: { groupedIn: null } }]
     };
   }
   return {};

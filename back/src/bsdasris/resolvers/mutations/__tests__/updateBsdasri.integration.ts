@@ -8,7 +8,7 @@ import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
 
 const UPDATE_DASRI = `
-mutation UpdateDasri($id: ID!, $input: BsdasriUpdateInput!) {
+mutation UpdateDasri($id: ID!, $input: BsdasriInput!) {
   updateBsdasri(id: $id, input: $input) {
     id
     status

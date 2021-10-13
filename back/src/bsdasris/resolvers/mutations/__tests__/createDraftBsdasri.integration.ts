@@ -13,7 +13,7 @@ import { gql } from "apollo-server-express";
 
 const CREATE_DRAFT_DASRI = gql`
   ${fullBsdasriFragment}
-  mutation DasriCreate($input: BsdasriCreateInput!) {
+  mutation DasriCreate($input: BsdasriInput!) {
     createDraftBsdasri(input: $input) {
       ...FullBsdasriFragment
     }

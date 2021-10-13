@@ -3,8 +3,7 @@ import { Bsdasri, BsdasriStatus } from "@prisma/client";
 import prisma from "../../../prisma";
 import {
   ResolversParentTypes,
-  MutationUpdateBsdasriArgs,
-  GroupingBsdasriInput
+  MutationUpdateBsdasriArgs
 } from "../../../generated/graphql/types";
 
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -77,27 +76,33 @@ const getFieldsAllorwedForUpdate = (bsdasri: Bsdasri) => {
   return allowedFields[bsdasri.status];
 };
 
-const getRegroupedBsdasriArgs = (
-  inputRegroupedBsdasris: GroupingBsdasriInput[] | null | undefined
+const getGroupedBsdasriArgs = (
+  inputRegroupedBsdasris: string[] | null | undefined
 ) => {
-  if (inputRegroupedBsdasris === null || inputRegroupedBsdasris?.length === 0) {
+  if (inputRegroupedBsdasris === null) {
     return { grouping: { set: [] } };
   }
 
-  const args = !!inputRegroupedBsdasris ? { set: inputRegroupedBsdasris } : {};
+  const args = !!inputRegroupedBsdasris
+    ? {
+        set: inputRegroupedBsdasris.map(id => ({
+          id
+        }))
+      }
+    : {};
   return { grouping: args };
 };
 
-const getIsRegrouping = (dbGrouping, grouping) => {
+const getIsGrouping = (dbGrouping, grouping) => {
   // new input does not provide info about regrouped dasris: use db value
   if (grouping === undefined) {
     return {
-      isRegrouping: !!dbGrouping.length
+      isGrouping: !!dbGrouping.length
     };
   }
   // else use provided input value
 
-  return { isRegrouping: !!grouping?.length };
+  return { isGrouping: !!grouping?.length };
 };
 
 /**
@@ -118,7 +123,7 @@ const dasriUpdateResolver = async (
 
   const { grouping: dbGrouping, ...dbBsdasri } = await getBsdasriOrNotFound({
     id,
-    includeRegrouped: true
+    includeGrouped: true
   });
 
   await checkIsBsdasriContributor(
@@ -135,10 +140,10 @@ const dasriUpdateResolver = async (
 
   const expectedBsdasri = { ...dbBsdasri, ...flattenedInput };
   // Validate form input
-  const isRegrouping = getIsRegrouping(dbGrouping, inputGrouping);
+  const isGrouping = getIsGrouping(dbGrouping, inputGrouping);
 
   await validateBsdasri(expectedBsdasri, {
-    ...isRegrouping
+    ...isGrouping
   });
 
   const flattenedFields = Object.keys(flattenedInput);
@@ -159,8 +164,8 @@ const dasriUpdateResolver = async (
     where: { id },
     data: {
       ...flattenedInput,
-      ...getRegroupedBsdasriArgs(inputGrouping),
-      type: isRegrouping.isRegrouping ? "GROUPING" : "SIMPLE"
+      ...getGroupedBsdasriArgs(inputGrouping),
+      type: isGrouping.isGrouping ? "GROUPING" : "SIMPLE"
     }
   });
 

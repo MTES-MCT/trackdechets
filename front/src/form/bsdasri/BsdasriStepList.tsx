@@ -12,7 +12,7 @@ import {
   QueryBsdasriArgs,
   Query,
   Bsdasri,
-  BsdasriCreateInput,
+  BsdasriInput,
   BsdasriStatus,
 } from "generated/graphql/types";
 import omit from "object.omit";
@@ -30,10 +30,7 @@ interface Props {
 /**
  * Do not resend sections locked by relevant signatures
  */
-const removeSignedSections = (
-  input: BsdasriCreateInput,
-  status: BsdasriStatus
-) => {
+const removeSignedSections = (input: BsdasriInput, status: BsdasriStatus) => {
   const emitterKey = "emitter";
 
   const transporterKey = "transporter";
@@ -77,9 +74,7 @@ export default function BsdasriStepsList(props: Props) {
   };
   const mapRegrouped = dasri => ({
     ...dasri,
-    grouping: dasri?.grouping.map(r => ({
-      id: r,
-    })),
+    grouping: dasri?.grouping.map(d => d.id),
   });
 
   const formState = useMemo(
@@ -106,7 +101,8 @@ export default function BsdasriStepsList(props: Props) {
     MutationUpdateBsdasriArgs
   >(UPDATE_BSDASRI);
 
-  function saveForm(input: BsdasriCreateInput): Promise<any> {
+  function saveForm(input: BsdasriInput): Promise<any> {
+    console.log(input);
     return formState.id
       ? updateBsdasri({
           variables: {
@@ -127,7 +123,7 @@ export default function BsdasriStepsList(props: Props) {
       formQuery.data?.bsdasri?.type === "GROUPING"
     ) {
       if (!values?.grouping?.length) {
-        cogoToast.error("Vous devez sélectionner des bordereaux à regrouper", {
+        cogoToast.error("Vous devez sélectionner des bordereaux à grouper", {
           hideAfter: 7,
         });
         return;

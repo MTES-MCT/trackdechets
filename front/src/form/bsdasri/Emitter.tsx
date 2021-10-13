@@ -44,7 +44,7 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
   const { values } = useFormikContext<Bsdasri>();
   const { siret } = useParams<{ siret: string }>();
   const isUserCurrentEmitter = values?.emitter?.company?.siret === siret;
-
+  console.log(values);
   return (
     <>
       {emissionEmphasis && <FillFieldsInfo />}

@@ -27,7 +27,7 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import { bsdasriFactory } from "../../../../bsdasris/__tests__/factories";
 
 const CREATE_DRAFT_DASRI = `
-mutation CreateDraftDasri($input: BsdasriCreateInput!) {
+mutation CreateDraftDasri($input: BsdasriInput!) {
   createDraftBsdasri(input: $input)  {
     id
   }

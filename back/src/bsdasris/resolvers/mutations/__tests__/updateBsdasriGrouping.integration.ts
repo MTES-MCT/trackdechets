@@ -7,7 +7,7 @@ import { BsdasriStatus } from "@prisma/client";
 import { Mutation } from "../../../../generated/graphql/types";
 
 const UPDATE_DASRI = `
-mutation UpdateDasri($id: ID!, $input: BsdasriUpdateInput!) {
+mutation UpdateDasri($id: ID!, $input: BsdasriInput!) {
   updateBsdasri(id: $id, input: $input) {
     id
     status
@@ -23,7 +23,7 @@ mutation UpdateDasri($id: ID!, $input: BsdasriUpdateInput!) {
 describe("Mutation.updateBsdasri", () => {
   afterEach(resetDatabase);
 
-  it("should set dasri type to GROUPING when regrouping", async () => {
+  it("should set dasri type to GROUPING when grouping", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
         set: ["COLLECTOR"]
@@ -51,10 +51,11 @@ describe("Mutation.updateBsdasri", () => {
       {
         variables: {
           id: dasri.id,
-          input: { grouping: [{ id: toRegroup.id }] }
+          input: { grouping: [toRegroup.id] }
         }
       }
     );
+
     expect(data.updateBsdasri.grouping).toEqual([{ id: toRegroup.id }]);
     expect(data.updateBsdasri.type).toEqual("GROUPING");
   });

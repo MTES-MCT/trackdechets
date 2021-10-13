@@ -166,35 +166,8 @@ input BsdasriInput {
   transporter: BsdasriTransporterInput
 
   destination: BsdasriDestinationInput
-}
 
-"Payload de regroupement"
-input GroupingBsdasriInput {
-  "Identifiant unique du bordereau"
-  id: ID
-}
-
-input BsdasriCreateInput {
-  waste: BsdasriWasteInput
-
-  emitter: BsdasriEmitterInput
-
-  transporter: BsdasriTransporterInput
-
-  destination: BsdasriDestinationInput
-
-  grouping: [GroupingBsdasriInput]
-}
-
-input BsdasriUpdateInput {
-  waste: BsdasriWasteInput
-
-  emitter: BsdasriEmitterInput
-
-  transporter: BsdasriTransporterInput
-  destination: BsdasriDestinationInput
-
-  grouping: [GroupingBsdasriInput]
+  grouping: [ID!]
 }
 
 input BsdasriSignatureInput {

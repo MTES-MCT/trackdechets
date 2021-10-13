@@ -784,8 +784,8 @@ model Bsdasri {
   destinationOperationSignatureAuthor         String?
   // associations
   grouping                                    Bsdasri[]               @relation("BsdasriToBsdasri")
-  groupingIn                                  Bsdasri?                @relation("BsdasriToBsdasri", fields: [groupingInId], references: [id])
-  groupingInId                                String?
+  groupedIn                                   Bsdasri?                @relation("BsdasriToBsdasri", fields: [groupedInId], references: [id])
+  groupedInId                                 String?
 }
 
 // ----------------

@@ -18,7 +18,7 @@ import { indexBsdasri } from "../../elastic";
  */
 const createBsdasri = async (
   parent: ResolversParentTypes["Mutation"],
-  { input: input }: MutationCreateBsdasriArgs,
+  { input }: MutationCreateBsdasriArgs,
   context: GraphQLContext,
   isDraft: boolean
 ) => {
@@ -39,16 +39,18 @@ const createBsdasri = async (
   );
 
   const flattenedInput = flattenBsdasriInput(rest);
-  const isRegrouping = !!grouping && !!grouping.length;
 
-  if (isRegrouping) {
+  const isGrouping = !!grouping && !!grouping.length;
+
+  if (isGrouping) {
     await emitterIsAllowedToGroup(flattenedInput?.emitterCompanySiret);
     await checkDasrisAreGroupable(grouping, flattenedInput.emitterCompanySiret);
   }
+  const groupedBsdasris = isGrouping ? grouping.map(id => ({ id })) : [];
 
   const signatureContext = isDraft
-    ? { isRegrouping }
-    : { emissionSignature: true, isRegrouping };
+    ? { isGrouping }
+    : { emissionSignature: true, isGrouping };
 
   await validateBsdasri(flattenedInput, signatureContext);
 
@@ -56,8 +58,8 @@ const createBsdasri = async (
     data: {
       ...flattenedInput,
       id: getReadableId(ReadableIdPrefix.DASRI),
-      type: isRegrouping ? "GROUPING" : "SIMPLE",
-      grouping: { connect: grouping },
+      type: isGrouping ? "GROUPING" : "SIMPLE",
+      grouping: { connect: groupedBsdasris },
       isDraft: isDraft
     }
   });
