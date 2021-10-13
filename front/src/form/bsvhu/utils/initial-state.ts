@@ -14,10 +14,7 @@ export default {
       date: null,
       acceptationStatus: null,
       refusalReason: "",
-      quantity: {
-        number: null,
-        tons: null,
-      },
+      quantity: null,
       identification: {
         numbers: [],
       },
@@ -34,9 +31,10 @@ export default {
     numbers: [],
     type: "NUMERO_ORDRE_REGISTRE_POLICE",
   },
-  quantity: {
-    number: null,
-    tons: null,
+  quantity: null,
+  weight: {
+    value: null,
+    isEstimate: false,
   },
   transporter: {
     company: {

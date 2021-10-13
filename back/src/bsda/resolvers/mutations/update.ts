@@ -18,7 +18,6 @@ export default async function edit(
   const user = checkIsAuthenticated(context);
 
   const existingBsda = await getBsdaOrNotFound(id);
-
   await checkIsBsdaContributor(
     user,
     existingBsda,

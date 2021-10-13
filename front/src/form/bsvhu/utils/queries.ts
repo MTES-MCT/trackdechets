@@ -29,10 +29,8 @@ export const FullBsvhuFragment = gql`
       agrementNumber
       reception {
         date
-        quantity {
-          number
-          tons
-        }
+        quantity
+        weight
         acceptationStatus
         refusalReason
         identification {
@@ -60,9 +58,10 @@ export const FullBsvhuFragment = gql`
       numbers
       type
     }
-    quantity {
-      number
-      tons
+    quantity
+    weight {
+      value
+      isEstimate
     }
     transporter {
       company {
