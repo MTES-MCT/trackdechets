@@ -25,6 +25,9 @@ const UPDATE_BSDA = `
         company {
           name
         }
+        recepisse {
+          number
+        }
       }
       destination {
         company {
@@ -292,7 +295,7 @@ describe("Mutation.updateBsda", () => {
       }
     });
 
-    expect(data.updateBsda).toEqual(expect.objectContaining(input));
+    expect(data.updateBsda.transporter.recepisse).toEqual("Num recepisse");
   });
 
   it("should not update transporter if they signed already", async () => {
