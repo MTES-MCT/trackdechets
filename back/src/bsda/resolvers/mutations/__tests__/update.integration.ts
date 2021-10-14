@@ -277,8 +277,8 @@ describe("Mutation.updateBsda", () => {
 
     const input = {
       transporter: {
-        company: {
-          name: "Another name"
+        recepisse: {
+          number: "Num recepisse"
         }
       }
     };

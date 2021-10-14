@@ -40,7 +40,7 @@ const editableFields = {
     materialName: ifAwaitingSignature("WORK"),
     consistence: ifAwaitingSignature("WORK"),
     sealNumbers: ifAwaitingSignature("WORK"),
-    adr: ifAwaitingSignature("WORK"),
+    adr: ifAwaitingSignature("WORK")
   },
   packagings: ifAwaitingSignature("WORK"),
   weight: ifAwaitingSignature("WORK"),
@@ -52,7 +52,7 @@ const editableFields = {
   transporter: {
     company: ifAwaitingSignature("EMISSION"),
     recepisse: ifAwaitingSignature("TRANSPORT"),
-    transport: ifAwaitingSignature("TRANSPORT"),
+    transport: ifAwaitingSignature("TRANSPORT")
   },
   grouping: ifAwaitingSignature("EMISSION"),
   forwarding: ifAwaitingSignature("EMISSION")
