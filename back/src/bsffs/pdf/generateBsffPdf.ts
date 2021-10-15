@@ -36,6 +36,7 @@ export async function generateBsffPdf(bsff: Bsff) {
   };
   const bsffOperation = {
     isRecuperationR2: bsff.destinationOperationCode === OPERATION.R2.code,
+    isRecyclageR3: bsff.destinationOperationCode === OPERATION.R3.code,
     isIncinerationD10: bsff.destinationOperationCode === OPERATION.D10.code,
     isGroupementR12:
       bsff.destinationOperationCode === OPERATION.R12.code &&
