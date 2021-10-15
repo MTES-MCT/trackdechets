@@ -10,7 +10,7 @@ import { expandBsdaFromDb, flattenBsdaInput } from "../../converter";
 import { indexBsda } from "../../elastic";
 import {
   checkCanAssociateBsdas,
-  checkIsFormContributor
+  checkIsBsdaContributor
 } from "../../permissions";
 import { validateBsda } from "../../validation";
 
@@ -32,7 +32,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
   const user = checkIsAuthenticated(context);
 
   const form = flattenBsdaInput(input);
-  await checkIsFormContributor(
+  await checkIsBsdaContributor(
     user,
     form,
     "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"

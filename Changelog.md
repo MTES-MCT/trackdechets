@@ -16,6 +16,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - À la création d'une entreprise, le réglage "j'autorise l'emport direct de dasris" est proposé [PR 1006](https://github.com/MTES-MCT/trackdechets/pull/1006)
 - Ajout d'un message d'erreur lorsque l'on requête un établissement non diffusable [PR 1009](https://github.com/MTES-MCT/trackdechets/pull/1009)
 - Suppression de la bannière d'avertissement DASRI, amiante, FF [PR 1016](https://github.com/MTES-MCT/trackdechets/pull/1016)
+- Ajout de la possibilité de mettre à jour un BSDD à l'état `RESEALED` en appelant plusieurs fois la mutation `markAsResealed`. Cette fonctionnalité n'est disponible que par API. [PR 1014](https://github.com/MTES-MCT/trackdechets/pull/1014)
 #### :memo: Documentation
 
 #### :house: Interne
@@ -29,6 +30,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Correction d'un bug d'affichage dans la préparation d'un transfert multi-modal [PR 997](https://github.com/MTES-MCT/trackdechets/pull/997)
+- Correction d'un bug empêchant le courtier de créer un BSDA [PR 1008](https://github.com/MTES-MCT/trackdechets/pull/1008)
+
 #### :nail_care: Améliorations
 
 - Rafraichissement automatique de la liste des bordereaux dans l'UI Trackdéchets [PR 985](https://github.com/MTES-MCT/trackdechets/pull/985)
