@@ -180,7 +180,7 @@ export function BsffDetailContent({ form }: Props) {
               },
               waste: {
                 code: form.waste?.code,
-                nature: form.waste?.description ?? undefined,
+                description: form.waste?.description ?? undefined,
               },
             }}
           />

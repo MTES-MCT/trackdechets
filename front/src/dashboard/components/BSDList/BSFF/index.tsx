@@ -30,7 +30,7 @@ export const COLUMNS: Record<
   },
   waste: {
     accessor: bsff =>
-      [bsff.waste?.code, bsff.waste?.nature].filter(Boolean).join(" "),
+      [bsff.waste?.code, bsff.waste?.description].filter(Boolean).join(" "),
   },
   transporterCustomInfo: {
     accessor: () => null,
