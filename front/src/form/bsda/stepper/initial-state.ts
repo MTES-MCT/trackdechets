@@ -31,6 +31,7 @@ export default {
       hasEmitterPaperSignature: false,
     },
   },
+  broker: null,
   transporter: {
     company: {
       ...getInitialCompany(),
