@@ -64,7 +64,7 @@ type Form {
   sentBy: String
 
   "Statut d'acceptation du déchet (case 10)"
-  wasteAcceptationStatus: String
+  wasteAcceptationStatus: WasteAcceptationStatus
 
   "Raison du refus (case 10)"
   wasteRefusalReason: String

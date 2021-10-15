@@ -132,10 +132,9 @@ input BsdasriRealWeightInput {
   "Poids en kilogrammes"
   value: Float!
 }
-
 input BsdasriAcceptationInput {
   "Accepté, refusé ou refusé partiellement"
-  status: WasteAcceptationStatusInput
+  status: WasteAcceptationStatus
   "Raison en cas de refus ou refus partiel"
   refusalReason: String
   "Poids en kilogrammes de déchets refusé"
