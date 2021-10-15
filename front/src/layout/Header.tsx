@@ -60,12 +60,7 @@ function MobileSubNav({ currentSiret, onClick }) {
   );
 }
 
-const getMenuEntries = (
-  isAuthenticated,
-  isAdmin,
-  devEndpoint,
-  currentSiret
-) => {
+const getMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
   const common = [
     {
       caption: "Foire aux questions",
@@ -76,7 +71,7 @@ const getMenuEntries = (
     },
     {
       caption: "Développeurs",
-      href: devEndpoint,
+      href: "https://developers.trackdechets.beta.gouv.fr",
       onClick: () => trackEvent("navbar", "faq"),
 
       navlink: false,
@@ -179,7 +174,7 @@ export default withRouter(function Header({
   isAdmin,
   location,
 }: RouteComponentProps & HeaderProps) {
-  const { REACT_APP_API_ENDPOINT, REACT_APP_DEVELOPERS_ENDPOINT } = process.env;
+  const { REACT_APP_API_ENDPOINT } = process.env;
   const [menuHidden, toggleMenu] = useState(true);
 
   const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
@@ -199,12 +194,7 @@ export default withRouter(function Header({
 
   // Catching siret from url when not available from props (just after login)
   const currentSiret = matchDashboard?.params["siret"];
-  const menuEntries = getMenuEntries(
-    isAuthenticated,
-    isAdmin,
-    REACT_APP_DEVELOPERS_ENDPOINT,
-    currentSiret
-  );
+  const menuEntries = getMenuEntries(isAuthenticated, isAdmin, currentSiret);
 
   const mobileNav = () => {
     if (!isAuthenticated || !isMobile) {
