@@ -97,3 +97,13 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
       .flat()
   };
 }
+
+export async function getFinalDestinationSiret(form: Form) {
+  return form.temporaryStorageDetailId
+    ? (
+        await prisma.form
+          .findUnique({ where: { id: form.id } })
+          .temporaryStorageDetail()
+      )?.destinationCompanySiret
+    : form.recipientCompanySiret;
+}
