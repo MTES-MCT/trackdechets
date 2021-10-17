@@ -1,7 +1,7 @@
 import { convertUrls, getInstallation } from "../../companies/database";
 import { UserResolvers, CompanyPrivate } from "../../generated/graphql/types";
 import { getUserCompanies } from "../database";
-import { nafCodes } from "./naf";
+import { nafCodes } from "../../common/constants/NAF";
 
 const userResolvers: UserResolvers = {
   // Returns the list of companies a user belongs to
