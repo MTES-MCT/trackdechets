@@ -1,5 +1,6 @@
 import { CompanyRow, CompanyInfo } from "./types";
 import { searchCompany } from "../../companies/sirene/entreprise.data.gouv.fr/client";
+import geocode from "../../companies/geocode";
 import { CompanySearchResult } from "../../generated/graphql/types";
 
 /**
@@ -27,9 +28,15 @@ export function getCompanyThrottled(
 export async function sirenify(
   company: CompanyRow
 ): Promise<CompanyRow & CompanyInfo> {
-  const { naf: codeNaf, name } = await getCompanyThrottled(company.siret);
+  const { naf: codeNaf, name, address } = await getCompanyThrottled(
+    company.siret
+  );
+  const { latitude, longitude } = await geocode(address);
   return {
     ...company,
+    address,
+    latitude,
+    longitude,
     codeNaf,
     name
   };

@@ -147,7 +147,10 @@ export async function bulkCreate(opts: Opts): Promise<void> {
           contactEmail: company.contactEmail,
           contactPhone: company.contactPhone,
           website: company.website,
-          verificationCode: randomNumber(5).toString()
+          verificationCode: randomNumber(5).toString(),
+          address: company.address,
+          latitude: company.latitude,
+          longitude: company.longitude
         }
       });
     }
