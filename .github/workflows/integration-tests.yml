@@ -16,6 +16,5 @@ jobs:
       - uses: actions/checkout@v2
       - name: Run integration tests
         run: |
-          chmod +x ./run-chunk.sh
           chmod +x ./run.sh
-          ./run-chunk.sh ${{ matrix.chunk }} ${{ strategy.job-total }}
+          ./run.sh -c ${{ matrix.chunk }}-${{ strategy.job-total }}
