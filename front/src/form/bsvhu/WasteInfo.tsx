@@ -106,7 +106,7 @@ export default function WasteInfo({ disabled }) {
       <div className="tw-flex tw-space-x-8">
         <div className="form__row">
           <label>
-            En nombre
+            En nombre (correspond au nombre d'identifications saisies)
             <Field
               component={NumberInput}
               name="quantity"
@@ -120,7 +120,7 @@ export default function WasteInfo({ disabled }) {
 
         <div className="form__row">
           <label>
-            En tonnes (le cas échéant)
+            En tonnes
             <Field
               disabled={disabled}
               component={NumberInput}

@@ -65,6 +65,8 @@ type Identification = Pick<
   "identificationNumbers" | "identificationType"
 >;
 
+type Quantity = Pick<Bsvhu, "quantity">;
+
 type Weight = Pick<Bsvhu, "weightValue" | "weightIsEstimate">;
 type Packaging = Pick<Bsvhu, "packaging">;
 
@@ -84,6 +86,7 @@ export function validateBsvhu(
     .concat(packagingSchema(context))
     .concat(identificationSchema(context))
     .concat(weightSchema(context))
+    .concat(quantitySchema(context))
     .validate(form, { abortEarly: false });
 }
 
@@ -310,13 +313,26 @@ const identificationSchema: FactorySchemaOf<
       )
   });
 
+const quantitySchema: FactorySchemaOf<
+  VhuValidationContext,
+  Quantity
+> = context =>
+  yup.object({
+    quantity: yup
+      .number()
+      .requiredIf(
+        context.emissionSignature,
+        `Déchet: la quantité est obligatoire`
+      )
+  });
+
 const weightSchema: FactorySchemaOf<VhuValidationContext, Weight> = context =>
   yup.object({
     weightValue: yup
       .number()
       .requiredIf(
         context.emissionSignature,
-        `Déchet: la quantité est obligatoire`
+        `Déchet: le poids est obligatoire`
       ),
     weightIsEstimate: yup.boolean().nullable()
   });
