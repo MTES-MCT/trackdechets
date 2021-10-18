@@ -10,6 +10,11 @@ export ELASTIC_SEARCH_URL=http://elasticsearch:9200
 
 EXIT_CODE=0
 
+dockerexec() {
+    api_container_id=$(docker ps -qf "name=^/integration.td-api")
+    docker exec -e NODE_OPTIONS=--max_old_space_size=4096 -t $api_container_id $1
+}
+
 startcontainers(){
     echo "🚀 >> Starting containers..."
     docker-compose up --build -d
@@ -24,8 +29,7 @@ stopcontainers(){
 }
 
 runtest(){
-    api_container_id=$(docker ps -qf name=^/integration.td-api)
-    docker exec -e NODE_OPTIONS=--max_old_space_size=4096 -t $api_container_id npm run integration-tests $1
+    dockerexec "npm run integration-tests $1"
     EXIT_CODE=$?
 }
 
@@ -36,10 +40,9 @@ all(){
 }
 
 chunk() {
-    api_container_id=$(docker ps -qf "name=^/trackdechets.td-api")
     chunk_infos=($(echo "$1" | tr "-" "\n"))
     echo "🔢 >> Chunk index: ${chunk_infos[0]}/${chunk_infos[1]}"
-    tests_to_run=$(docker exec -t $api_container_id ./integration-tests/get-chunk.sh ${chunk_infos[0]} ${chunk_infos[1]})
+    tests_to_run=$(dockerexec "./integration-tests/get-chunk.sh ${chunk_infos[0]} ${chunk_infos[1]}")
     chunk_length=$(echo "$tests_to_run" | tr -cd '|' | wc -c)
     echo "📏 >> Chunk length $chunk_length"
 
