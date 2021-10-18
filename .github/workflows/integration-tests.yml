@@ -5,7 +5,7 @@ on: pull_request
 jobs:
   back:
     runs-on: ubuntu-latest
-    name: Integration tests (chunk ${{ matrix.chunk }})
+    name: Integration tests (chunk ${{ matrix.chunk }})/${{ strategy.job-total }}
     strategy:
       matrix:
         chunk: [1, 2, 3, 4]

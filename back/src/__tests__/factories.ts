@@ -258,7 +258,7 @@ export const tempStorageData: Prisma.TemporaryStorageDetailCreateInput = {
   destinationCap: "",
   destinationProcessingOperation: "R 1",
   wasteDetailsOnuCode: "",
-  wasteDetailsPackagingInfos: null,
+  wasteDetailsPackagingInfos: undefined,
   wasteDetailsQuantity: 1,
   wasteDetailsQuantityType: "ESTIMATED",
   transporterCompanyName: "Transporteur",
