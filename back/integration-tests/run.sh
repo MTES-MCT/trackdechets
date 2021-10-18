@@ -40,13 +40,14 @@ all(){
 }
 
 chunk() {
+    startcontainers
+    
     chunk_infos=($(echo "$1" | tr "-" "\n"))
     echo "🔢 >> Chunk index: ${chunk_infos[0]}/${chunk_infos[1]}"
     tests_to_run=$(dockerexec "./integration-tests/get-chunk.sh ${chunk_infos[0]} ${chunk_infos[1]}")
     chunk_length=$(echo "$tests_to_run" | tr -cd '|' | wc -c)
     echo "📏 >> Chunk length $chunk_length"
 
-    startcontainers
     runtest "(${tests_to_run::-1})"
     stopcontainers
 }
