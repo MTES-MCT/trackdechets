@@ -21,9 +21,8 @@ echo "3/4 - Create truncating function";
 docker cp ./db-deploy/truncate.sql $psql_container_id:/tmp
 docker exec -t $psql_container_id bash -c "psql -U test prisma -f /tmp/truncate.sql;"
 
-echo "4/4 - Create Elastic Search index and alias";
+echo "4/4 - Wait for Elastic Search";
 until docker exec -t $api_container_id bash -c "curl -XGET http://elasticsearch:9200 2> /dev/null"; do
   >&2 echo "⏳ Elastic Search is unavailable - sleeping"
   sleep 1
 done
-docker exec -t $api_container_id bash -c "npx ts-node src/scripts/bin/indexElasticSearch.ts -f"
