@@ -102,7 +102,6 @@ export default function BsdasriStepsList(props: Props) {
   >(UPDATE_BSDASRI);
 
   function saveForm(input: BsdasriInput): Promise<any> {
-    console.log(input);
     return formState.id
       ? updateBsdasri({
           variables: {

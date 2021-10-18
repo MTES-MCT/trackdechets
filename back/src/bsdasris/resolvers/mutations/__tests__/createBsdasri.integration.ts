@@ -485,13 +485,15 @@ describe("Mutation.createDasri validation scenarii", () => {
     };
 
     const { mutate } = makeClient(user);
-    const res = await mutate<Pick<Mutation, "createBsdasri">>(CREATE_DASRI, {
-      variables: {
-        input
+    const { data } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
       }
-    });
-    console.log(res);
-    const { data } = res;
+    );
+
     expect(data.createBsdasri.isDraft).toEqual(false);
     expect(data.createBsdasri.status).toEqual("INITIAL");
 

@@ -411,6 +411,7 @@ export const dasriFragment = gql`
       customInfo
       transport {
         mode
+        plates
         handedOverAt
         takenOverAt
 

@@ -48,7 +48,6 @@ export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
   );
 
   const hasEcoOrganisme = !!field.value;
-  console.log(field.value);
   function handleEcoOrganismeToggle() {
     if (hasEcoOrganisme) {
       setFieldValue(field.name, null, false);

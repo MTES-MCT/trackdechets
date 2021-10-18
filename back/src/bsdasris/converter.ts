@@ -92,7 +92,6 @@ export function unflattenBsdasri(bsdasri: Bsdasri): GqlBsdasri {
         contact: bsdasri.transporterCompanyContact
       }),
       customInfo: bsdasri.transporterCustomInfo,
-
       recepisse: nullIfNoValues({
         department: bsdasri.transporterRecepisseDepartment,
         number: bsdasri.transporterRecepisseNumber,
@@ -100,7 +99,7 @@ export function unflattenBsdasri(bsdasri: Bsdasri): GqlBsdasri {
       }),
       transport: nullIfNoValues<BsdasriTransport>({
         mode: bsdasri.transporterTransportMode,
-
+        plates: bsdasri.transporterTransportPlates,
         weight: nullIfNoValues<BsdasriWeight>({
           value: bsdasri.transporterWasteWeightValue,
           isEstimate: bsdasri.transporterWasteWeightIsEstimate
@@ -332,6 +331,9 @@ function flattenTransporterInput(input: {
     ),
 
     transporterCustomInfo: chain(input.transporter, e => e.customInfo),
+    transporterTransportPlates: chain(input.transporter, t =>
+      chain(t.transport, e => e.plates)
+    ),
     ...flattenTransportInput(input.transporter)
   });
 }

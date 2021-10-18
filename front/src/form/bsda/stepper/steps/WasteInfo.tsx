@@ -3,8 +3,9 @@ import { Field, useFormikContext } from "formik";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import Packagings from "form/bsda/components/packagings/Packagings";
 import Tooltip from "common/components/Tooltip";
-import TagsInput from "form/bsvhu/components/tags-input/TagsInput";
 import { Bsda, BsdaConsistence } from "generated/graphql/types";
+import TagsInput from "common/components/tags-input/TagsInput";
+
 
 export function WasteInfo({ disabled }) {
   return (
