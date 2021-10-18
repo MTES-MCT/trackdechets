@@ -290,7 +290,7 @@ function flattenEmissionInput(input: { emission?: BsdasriEmissionInput }) {
       chain(e.weight, q => q.isEstimate)
     ),
     emitterWasteVolume: computeTotalVolume(emitterWastePackagings),
-    emitterWastePackagings
+    emitterWastePackagings: emitterWastePackagings ?? []
   };
 }
 function flattenTransporterInput(input: {
@@ -367,7 +367,7 @@ function flattenTransportInput(input: { transport?: BsdasriTransportInput }) {
       chain(t.acceptation, w => w.refusalReason)
     ),
     transporterWasteVolume: computeTotalVolume(transporterWastePackagings),
-    transporterWastePackagings
+    transporterWastePackagings: transporterWastePackagings ?? []
   };
 }
 
@@ -421,7 +421,7 @@ function flattenReceptiontInput(input: { reception?: BsdasriReceptionInput }) {
     destinationReceptionWasteRefusalReason: chain(input.reception, t =>
       chain(t.acceptation, w => w.refusalReason)
     ),
-    destinationWastePackagings
+    destinationWastePackagings: destinationWastePackagings ?? []
   };
 }
 

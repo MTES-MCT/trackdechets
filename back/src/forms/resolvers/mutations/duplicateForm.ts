@@ -1,4 +1,10 @@
-import { Status, Form, TemporaryStorageDetail, User } from "@prisma/client";
+import {
+  Status,
+  Form,
+  TemporaryStorageDetail,
+  User,
+  Prisma
+} from "@prisma/client";
 import prisma from "../../../prisma";
 
 import { expandFormFromDb } from "../../form-converter";
@@ -88,16 +94,10 @@ function duplicateTemporaryStorageDetail(
     ...rest
   }: TemporaryStorageDetail
 ) {
-  return prisma.form.update({
-    where: {
-      id: form.id
-    },
+  return prisma.temporaryStorageDetail.create({
     data: {
-      temporaryStorageDetail: {
-        create: {
-          ...rest
-        }
-      }
+      ...rest,
+      Form: { connect: { id: form.id } }
     }
   });
 }

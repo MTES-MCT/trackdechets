@@ -763,6 +763,7 @@ function getProcessedPackagingInfos(wasteDetails: Partial<WasteDetailsInput>) {
     }));
   }
 
-  // otherwise return packagingInfos "as is". It can be null or undefined
-  return wasteDetails.packagingInfos;
+  // Otherwise return packagingInfos "as is".
+  // Always default to an empty array to avoid unhandled `null` for JSON fields in prisma
+  return wasteDetails.packagingInfos ?? [];
 }

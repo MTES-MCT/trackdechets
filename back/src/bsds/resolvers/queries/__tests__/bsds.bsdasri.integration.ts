@@ -762,7 +762,8 @@ describe("Query.bsds.dasris mutations", () => {
     `;
 
     const {
-      data: { duplicateBsdasri }
+      data: { duplicateBsdasri },
+      errors
     } = await mutate<
       Pick<Mutation, "duplicateBsdasri">,
       MutationDuplicateBsdasriArgs
@@ -771,6 +772,7 @@ describe("Query.bsds.dasris mutations", () => {
         id: dasri.id
       }
     });
+    console.log(errors)
 
     await indexBsdasri(dasri);
     await refreshElasticSearch();
