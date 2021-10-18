@@ -92,7 +92,7 @@ while getopts "hudp:r:c:" OPTION; do
         ;;
 
     c)  chunk $OPTARG
-        exit 1
+        exit $EXIT_CODE
         ;;
 
     *)
