@@ -117,10 +117,7 @@ export function chain<T, K>(o: T, getter: (o: T) => K): K | null | undefined {
   return getter(o);
 }
 
-export function undefinedOrDefault<I>(
-  value: I,
-  defaultValue: any
-): I {
+export function undefinedOrDefault<I>(value: I, defaultValue: I): I {
   if (value === null) {
     return defaultValue;
   }
