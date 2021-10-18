@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Integration tests (chunk ${{ matrix.chunk }}/${{ strategy.job-total }})
     strategy:
+      fail-fast: false
       matrix:
         chunk: [1, 2, 3, 4]
     defaults:

@@ -1,8 +1,4 @@
-import {
-  chain,
-  nullIfNoValues,
-  safeInput
-} from "../forms/form-converter";
+import { chain, nullIfNoValues, safeInput } from "../forms/form-converter";
 import {
   FormCompany,
   Signature,

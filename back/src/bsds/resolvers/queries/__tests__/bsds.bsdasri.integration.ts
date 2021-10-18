@@ -772,7 +772,7 @@ describe("Query.bsds.dasris mutations", () => {
         id: dasri.id
       }
     });
-    console.log(errors)
+    console.log(errors);
 
     await indexBsdasri(dasri);
     await refreshElasticSearch();

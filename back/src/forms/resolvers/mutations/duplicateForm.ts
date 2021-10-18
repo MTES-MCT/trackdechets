@@ -1,10 +1,4 @@
-import {
-  Status,
-  Form,
-  TemporaryStorageDetail,
-  User,
-  Prisma
-} from "@prisma/client";
+import { Status, Form, TemporaryStorageDetail, User } from "@prisma/client";
 import prisma from "../../../prisma";
 
 import { expandFormFromDb } from "../../form-converter";
