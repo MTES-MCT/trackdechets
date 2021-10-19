@@ -1,13 +1,16 @@
 @page {
   size: A4;
+  margin: 0.5rem;
 }
 
-@import url("./OpenSans-Regular.ttf");
+:root {
+  --color-black: #000000;
+  --spacing-gutter: 0.5rem;
+}
 
 html {
-  all: unset;
   font-size: 0.8em;
-  font-family: "Open Sans", sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 h1,
@@ -23,7 +26,7 @@ p {
 
 p {
   font-size: 0.9em;
-  margin: 1px 0;
+  margin: 0 0 var(--spacing-gutter) 0;
 }
 
 h1 {
@@ -45,6 +48,10 @@ input[type="radio"] {
 
 input[type="radio"]:checked::before {
   all: inherit;
+}
+
+.sheet {
+  break-after: page;
 }
 
 .centered {
@@ -75,15 +82,21 @@ input[type="radio"]:checked::before {
   margin-bottom: 15px;
 }
 
-.item {
-  border: 1px solid black;
-  padding: 2px 10px;
-}
-.parent {
+.grid-container {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  grid-column-gap: 0px;
-  grid-row-gap: 0px;
+  background-color: var(--color-black);
+  border: 1px solid var(--color-black);
+  grid-gap: 1px;
+}
+
+.table {
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.grid-item {
+  padding: 2px 10px;
+  background-color: white;
 }
 
 .frame-description {
