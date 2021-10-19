@@ -295,7 +295,7 @@ describe("Mutation.updateBsda", () => {
       }
     });
 
-    expect(data.updateBsda.transporter.recepisse).toEqual("Num recepisse");
+    expect(data.updateBsda.transporter.recepisse.number).toEqual("Num recepisse");
   });
 
   it("should not update transporter if they signed already", async () => {
