@@ -155,7 +155,6 @@ const dasriUpdateResolver = async (
     const diff = flattenedFields.filter(el => !allowedFields.includes(el));
 
     if (!!diff.length) {
-      console.log(diff, flattenedInput);
       const errMessage = `Des champs ont été verrouillés via signature et ne peuvent plus être modifiés: ${diff.join()}`;
       throw new ForbiddenError(errMessage);
     }
