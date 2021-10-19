@@ -29,7 +29,12 @@ import {
   BsdasriEcoOrganisme,
   BsdasriEcoOrganismeInput
 } from "../generated/graphql/types";
-import { chain, nullIfNoValues, safeInput, undefinedOrDefault } from "../forms/form-converter";
+import {
+  chain,
+  nullIfNoValues,
+  safeInput,
+  undefinedOrDefault
+} from "../forms/form-converter";
 import { Prisma, Bsdasri, BsdasriStatus } from "@prisma/client";
 
 export function unflattenBsdasri(bsdasri: Bsdasri): GqlBsdasri {
@@ -367,7 +372,10 @@ function flattenTransportInput(input: { transport?: BsdasriTransportInput }) {
       chain(t.acceptation, w => w.refusalReason)
     ),
     transporterWasteVolume: computeTotalVolume(transporterWastePackagings),
-    transporterWastePackagings: undefinedOrDefault(transporterWastePackagings, [])
+    transporterWastePackagings: undefinedOrDefault(
+      transporterWastePackagings,
+      []
+    )
   };
 }
 
@@ -421,7 +429,10 @@ function flattenReceptiontInput(input: { reception?: BsdasriReceptionInput }) {
     destinationReceptionWasteRefusalReason: chain(input.reception, t =>
       chain(t.acceptation, w => w.refusalReason)
     ),
-    destinationWastePackagings: undefinedOrDefault(destinationWastePackagings, [])
+    destinationWastePackagings: undefinedOrDefault(
+      destinationWastePackagings,
+      []
+    )
   };
 }
 
