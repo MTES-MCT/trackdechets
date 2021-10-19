@@ -1,11 +1,12 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { applyMask } from "../../../common/where";
 import { QueryBsvhusArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { expandVhuFormFromDb } from "../../converter";
 import { getConnectionsArgs } from "../../pagination";
-import { convertWhereToDbFilter } from "../../where";
+import { toPrismaWhereInput } from "../../where";
 
 export default async function bsvhus(
   _,
@@ -26,15 +27,20 @@ export default async function bsvhus(
   const userCompanies = await getUserCompanies(user.id);
   const userSirets = userCompanies.map(c => c.siret);
 
-  const where = {
-    ...convertWhereToDbFilter(whereArgs),
+  const mask = {
     OR: [
       { emitterCompanySiret: { in: userSirets } },
       { transporterCompanySiret: { in: userSirets } },
       { destinationCompanySiret: { in: userSirets } }
-    ],
+    ]
+  };
+
+  const prismaWhere = {
+    ...(whereArgs ? toPrismaWhereInput(whereArgs) : {}),
     isDeleted: false
   };
+
+  const where = applyMask(prismaWhere, mask);
 
   const totalCount = await prisma.bsvhu.count({ where });
   const queriedForms = await prisma.bsvhu.findMany({
