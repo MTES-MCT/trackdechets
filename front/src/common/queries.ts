@@ -104,7 +104,7 @@ export const GET_BSDS = gql`
             }
             waste {
               code
-              nature
+              description
             }
           }
           ... on Bsda {

@@ -47,15 +47,22 @@ input BsffInput {
   emitter: BsffEmitterInput
   packagings: [BsffPackagingInput!]
   waste: BsffWasteInput
-  quantity: BsffQuantityInput
+  weight: BsffWeightInput
   transporter: BsffTransporterInput
   destination: BsffDestinationInput
   ficheInterventions: [ID!]
-  previousBsffs: [ID!]
+  "Bordereau que celui-ci reéxpédie"
+  forwarding: ID
+  "Liste des bordereaux que celui-ci reconditionne"
+  repackaging: [ID!]
+  "Liste des bordereaux que celui-ci groupe"
+  grouping: [ID!]
 }
 
 input BsffEmitterInput {
   company: CompanyInput
+  "Champ libre"
+  customInfo: String
 }
 
 input BsffPackagingInput {
@@ -65,18 +72,19 @@ input BsffPackagingInput {
   volume: Float
   "Numéro du contenant."
   numero: String!
-  "Poids en kilos."
-  kilos: Float!
+  "Poids en kilogrammes"
+  weight: Float!
 }
 
 input BsffWasteInput {
   code: String!
-  nature: String
+  description: String
   adr: String!
 }
 
-input BsffQuantityInput {
-  kilos: Float!
+input BsffWeightInput {
+  "Poids en kilogrammes"
+  value: Float!
   isEstimate: Boolean!
 }
 
@@ -84,6 +92,8 @@ input BsffTransporterInput {
   company: CompanyInput
   recepisse: BsffTransporterRecepisseInput
   transport: BsffTransporterTransportInput
+  "Champ libre"
+  customInfo: String
 }
 input BsffTransporterRecepisseInput {
   number: String!
@@ -98,17 +108,24 @@ input BsffDestinationInput {
   company: CompanyInput
   cap: String
   reception: BsffDestinationReceptionInput
-  plannedOperation: BsffDestinationPlannedOperationInput
+  plannedOperationCode: BsffOperationCode
   operation: BsffDestinationOperationInput
-}
-input BsffDestinationReceptionInput {
-  date: DateTime!
-  kilos: Float!
-  refusal: String
+  "Champ libre"
+  customInfo: String
 }
 
-input BsffDestinationPlannedOperationInput {
-  code: BsffOperationCode!
+input BsffAcceptationInput {
+  "Accepté ou refusé"
+  status: BsffAcceptationStatus!
+  "En cas de refus, la raison"
+  refusalReason: String
+}
+
+input BsffDestinationReceptionInput {
+  date: DateTime!
+  "Poids en kilogrammes"
+  weight: Float!
+  acceptation: BsffAcceptationInput!
 }
 
 input BsffOperationNextDestinationInput {
@@ -122,7 +139,8 @@ input BsffDestinationOperationInput {
 
 input BsffFicheInterventionInput {
   numero: String!
-  kilos: Float!
+  "Poids en kilogrammes"
+  weight: Float!
   detenteur: BsffDetenteurInput!
   operateur: BsffOperateurInput!
   postalCode: String!

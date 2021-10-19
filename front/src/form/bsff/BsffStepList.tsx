@@ -13,6 +13,7 @@ import {
   Query,
   Bsff,
   BsffInput,
+  BsffType,
 } from "generated/graphql/types";
 import React, { ReactElement, useMemo } from "react";
 import { generatePath, useHistory, useParams } from "react-router-dom";
@@ -43,10 +44,19 @@ export default function BsffStepsList(props: Props) {
     }
   );
 
-  const formState = useMemo(
-    () => getComputedState(initialState, formQuery.data?.bsff),
-    [formQuery.data]
-  );
+  const formState = useMemo(() => {
+    function getCurrentState(bsff: Bsff) {
+      const { forwarding, repackaging, grouping } = bsff;
+      const previousBsffs = [
+        ...(forwarding ? [forwarding] : []),
+        ...repackaging,
+        ...grouping,
+      ];
+      return { ...formQuery.data?.bsff, previousBsffs };
+    }
+    const bsff = formQuery.data?.bsff;
+    return getComputedState(initialState, bsff ? getCurrentState(bsff) : null);
+  }, [formQuery.data]);
 
   const [createDraftBsff] = useMutation<
     Pick<Mutation, "createDraftBsff">,
@@ -72,12 +82,22 @@ export default function BsffStepsList(props: Props) {
     // and don't use the classic Formik mechanism
 
     const { id, ficheInterventions, previousBsffs, ...input } = values;
+
     saveForm({
       ...input,
       ficheInterventions: ficheInterventions.map(
         ficheIntervention => ficheIntervention.id
       ),
-      previousBsffs: previousBsffs.map(previousBsff => previousBsff.id),
+      forwarding:
+        input.type === BsffType.Reexpedition ? previousBsffs[0].id : null,
+      repackaging:
+        input.type === BsffType.Reconditionnement
+          ? previousBsffs.map(previousBsff => previousBsff.id)
+          : [],
+      grouping:
+        input.type === BsffType.Groupement
+          ? previousBsffs.map(previousBsff => previousBsff.id)
+          : [],
     })
       .then(_ => {
         const redirectTo = generatePath(routes.dashboard.bsds.drafts, {

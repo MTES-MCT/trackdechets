@@ -59,13 +59,13 @@ export function BsffDetailContent({ form }: Props) {
               label="Dernière action sur le BSD"
             /> */}
               <DetailRow
-                value={form.quantity?.kilos}
+                value={form.weight?.value}
                 label="Poids total"
                 units="kg"
               />
               <dt>Déchet</dt>
               <dd>
-                {form.waste?.code} {form.waste?.nature}
+                {form.waste?.code} {form.waste?.description}
               </dd>
             </div>
           </div>
@@ -180,7 +180,7 @@ export function BsffDetailContent({ form }: Props) {
               },
               waste: {
                 code: form.waste?.code,
-                nature: form.waste?.nature ?? undefined,
+                description: form.waste?.description ?? undefined,
               },
             }}
           />
@@ -221,17 +221,13 @@ function Emitter({ form }: { form: Bsff }) {
           value={(form.packagings ?? [])
             .map(
               packaging =>
-                `${packaging.name} ${packaging.numero} (${packaging.kilos}kg)`
+                `${packaging.name} ${packaging.numero} (${packaging.weight}kg)`
             )
             .join(", ")}
           label="Conditionnement"
         />
 
-        <DetailRow
-          value={form.quantity?.kilos}
-          label="Poids total"
-          units="kg"
-        />
+        <DetailRow value={form.weight?.value} label="Poids total" units="kg" />
       </div>
       <div className={styles.detailGrid}>
         <DateRow
@@ -289,7 +285,7 @@ function Destination({ form }: { form: Bsff }) {
       </div>
       <div className={styles.detailGrid}>
         <DetailRow
-          value={form.destination?.plannedOperation?.code}
+          value={form.destination?.plannedOperationCode}
           label="Opération prévue"
         />
       </div>
@@ -338,7 +334,7 @@ function FicheInterventions({ form }: { form: Bsff }) {
           />
           <DetailRow
             label="Quantité fluides en kilo(s)"
-            value={ficheIntervention.kilos}
+            value={ficheIntervention.weight}
           />
           <DetailRow
             label="Code postal lieu de collecte"

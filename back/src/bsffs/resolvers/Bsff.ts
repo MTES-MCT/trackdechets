@@ -1,62 +1,53 @@
 import prisma from "../../prisma";
 import { BsffResolvers } from "../../generated/graphql/types";
-import { unflattenBsff, unflattenFicheInterventionBsff } from "../converter";
-import { isBsffContributor } from "../permissions";
-import { getNextBsffs } from "../database";
+import { toInitialBsff, unflattenBsff } from "../converter";
+import { getFicheInterventions } from "../database";
 
 export const Bsff: BsffResolvers = {
   ficheInterventions: async ({ id }, _, context) => {
     const prismaBsff = await prisma.bsff.findUnique({
       where: { id }
     });
-    const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
-      where: {
-        bsffId: prismaBsff.id
-      }
-    });
-    const unflattenedFicheInterventions = ficheInterventions.map(
-      unflattenFicheInterventionBsff
-    );
-
-    // the user trying to read ficheInterventions might not be a contributor of the bsff
-    // for example they could be reading the ficheInterventions of a bsff they are grouping:
-    // bsffs { previousBsffs { ficheInterventions } }
-    // in this case, they are still allowed to read ficheInterventions but not all fields
-    try {
-      await isBsffContributor(context.user, prismaBsff);
-    } catch (err) {
-      unflattenedFicheInterventions.forEach(ficheIntervention => {
-        delete ficheIntervention.detenteur;
-        delete ficheIntervention.operateur;
-      });
-    }
-
-    return unflattenedFicheInterventions;
+    return getFicheInterventions({ bsff: prismaBsff, context });
   },
-  nextBsff: async ({ id }) => {
-    const prismaBsff = await prisma.bsff.findUnique({
-      where: { id }
-    });
-    const nextBsff = await prisma.bsff.findUnique({
-      where: { id: prismaBsff.nextBsffId }
-    });
-
-    return unflattenBsff(nextBsff);
+  forwardedIn: async ({ id }) => {
+    const forwardingBsff = await prisma.bsff
+      .findUnique({
+        where: { id }
+      })
+      .forwardedIn();
+    return forwardingBsff ? unflattenBsff(forwardingBsff) : null;
   },
-  nextBsffs: async ({ id }) => {
-    const prismaBsff = await prisma.bsff.findUnique({
-      where: { id }
-    });
-    const nextBsffs = await getNextBsffs(prismaBsff);
-
-    return nextBsffs.map(unflattenBsff);
+  forwarding: async ({ id }) => {
+    const forwardedBsff = await prisma.bsff
+      .findUnique({
+        where: { id }
+      })
+      .forwarding();
+    return forwardedBsff ? toInitialBsff(unflattenBsff(forwardedBsff)) : null;
   },
-  previousBsffs: async ({ id }) => {
-    const previousBsffs = await prisma.bsff.findMany({
-      where: {
-        nextBsffId: id
-      }
-    });
-    return previousBsffs.map(unflattenBsff);
+  repackagedIn: async ({ id }) => {
+    const repackagingBsff = await prisma.bsff
+      .findUnique({ where: { id } })
+      .repackagedIn();
+    return repackagingBsff ? unflattenBsff(repackagingBsff) : null;
+  },
+  repackaging: async ({ id }) => {
+    const repackagedBsffs = await prisma.bsff
+      .findUnique({ where: { id } })
+      .repackaging();
+    return repackagedBsffs.map(bsff => toInitialBsff(unflattenBsff(bsff)));
+  },
+  groupedIn: async ({ id }) => {
+    const groupingBsff = await prisma.bsff
+      .findUnique({ where: { id } })
+      .groupedIn();
+    return groupingBsff ? unflattenBsff(groupingBsff) : null;
+  },
+  grouping: async ({ id }) => {
+    const groupedBsffs = await prisma.bsff
+      .findUnique({ where: { id } })
+      .grouping();
+    return groupedBsffs.map(bsff => toInitialBsff(unflattenBsff(bsff)));
   }
 };

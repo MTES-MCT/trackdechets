@@ -25,18 +25,16 @@ export default {
   destination: {
     company: getInitialCompany(),
     cap: "",
-    plannedOperation: {
-      code: OPERATION.R2.code,
-    },
+    plannedOperationCode: OPERATION.R2.code,
   },
   packagings: [],
   waste: {
     code: "14 06 01*",
-    nature: null,
+    description: null,
     adr: "UN 1078, Gaz frigorifique NSA (Gaz réfrigérant, NSA), 2.2 (C/E)",
   },
-  quantity: {
-    kilos: 0,
+  weight: {
+    value: 0,
     isEstimate: false,
   },
   ficheInterventions: [],

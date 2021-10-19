@@ -63,17 +63,17 @@ describe("Mutation.createBsff", () => {
           waste: {
             code: WASTE_CODES[0],
             adr: "Mention ADR",
-            nature: "R410"
+            description: "R410"
           },
-          quantity: {
-            kilos: 1,
+          weight: {
+            value: 1,
             isEstimate: true
           },
           packagings: [
             {
               name: "BOUTEILLE",
               numero: "123",
-              kilos: 1
+              weight: 1
             }
           ]
         }

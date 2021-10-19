@@ -1,9 +1,10 @@
-import { UserRole } from "@prisma/client";
+import { UserRole, BsffStatus } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
   MutationSignBsffArgs
 } from "../../../../generated/graphql/types";
+import prisma from "../../../../prisma";
 import {
   UserWithCompany,
   userWithCompanyFactory
@@ -16,7 +17,9 @@ import {
   createBsffBeforeTransport,
   createBsffBeforeReception,
   createBsffAfterTransport,
-  createBsffBeforeOperation
+  createBsffBeforeOperation,
+  createBsffBeforeRefusal,
+  createBsffAfterOperation
 } from "../../../__tests__/factories";
 
 const SIGN = `
@@ -361,6 +364,32 @@ describe("Mutation.signBsff", () => {
       expect(data.signBsff.id).toBeTruthy();
     });
 
+    it("should allow destination to sign refusal", async () => {
+      const bsff = await createBsffBeforeRefusal({
+        emitter,
+        transporter,
+        destination
+      });
+
+      const { mutate } = makeClient(destination.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "signBsff">,
+        MutationSignBsffArgs
+      >(SIGN, {
+        variables: {
+          id: bsff.id,
+          type: "RECEPTION",
+          signature: {
+            date: new Date().toISOString() as any,
+            author: destination.user.name
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.signBsff.id).toBeTruthy();
+    });
+
     it("should disallow destination to sign reception when required data is missing", async () => {
       const bsff = await createBsffAfterTransport({
         emitter,
@@ -449,6 +478,68 @@ describe("Mutation.signBsff", () => {
 
       expect(errors).toBeUndefined();
       expect(data.signBsff.id).toBeTruthy();
+    });
+
+    it("should mark all BSFFs in the history as PROCESSED", async () => {
+      const ttr1 = await userWithCompanyFactory(UserRole.ADMIN);
+      const ttr2 = await userWithCompanyFactory(UserRole.ADMIN);
+
+      const bsff1 = await createBsffAfterOperation(
+        { emitter, transporter, destination: ttr1 },
+        {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED,
+          destinationOperationCode: OPERATION.R13.code
+        }
+      );
+
+      // bsff1 => bsff2
+      const bsff2 = await createBsffAfterOperation(
+        { emitter: ttr1, transporter, destination: ttr2 },
+        {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED,
+          destinationOperationCode: OPERATION.R13.code,
+          forwarding: { connect: { id: bsff1.id } }
+        }
+      );
+      // bsff1 => bsff2 => bsff3
+      const bsff3 = await createBsffBeforeOperation(
+        {
+          emitter: ttr2,
+          transporter,
+          destination
+        },
+        {
+          destinationOperationCode: OPERATION.D10.code,
+          forwarding: { connect: { id: bsff2.id } }
+        }
+      );
+
+      const { mutate } = makeClient(destination.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "signBsff">,
+        MutationSignBsffArgs
+      >(SIGN, {
+        variables: {
+          id: bsff3.id,
+          type: "OPERATION",
+          signature: {
+            date: new Date().toISOString() as any,
+            author: destination.user.name
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.signBsff.id).toBeTruthy();
+
+      const newBsff1 = await prisma.bsff.findUnique({
+        where: { id: bsff1.id }
+      });
+      expect(newBsff1.status).toEqual(BsffStatus.PROCESSED);
+      const newBsff2 = await prisma.bsff.findUnique({
+        where: { id: bsff2.id }
+      });
+      expect(newBsff2.status).toEqual(BsffStatus.PROCESSED);
     });
   });
 });

@@ -5,7 +5,7 @@ export const FicheInterventionFragment = gql`
   fragment FicheInterventionFragment on BsffFicheIntervention {
     id
     numero
-    kilos
+    weight
     postalCode
   }
 `;
@@ -30,15 +30,15 @@ export const FullBsffFragment = gql`
       name
       numero
       volume
-      kilos
+      weight
     }
     waste {
       code
-      nature
+      description
       adr
     }
-    quantity {
-      kilos
+    weight {
+      value
       isEstimate
     }
     transporter {
@@ -64,8 +64,11 @@ export const FullBsffFragment = gql`
       }
       reception {
         date
-        kilos
-        refusal
+        weight
+        acceptation {
+          status
+          refusalReason
+        }
         signature {
           author
           date
@@ -83,15 +86,28 @@ export const FullBsffFragment = gql`
           date
         }
       }
-      plannedOperation {
-        code
-      }
+      plannedOperationCode
       cap
     }
     ficheInterventions {
       ...FicheInterventionFragment
     }
-    previousBsffs {
+    grouping {
+      id
+    }
+    groupedIn {
+      id
+    }
+    repackaging {
+      id
+    }
+    repackagedIn {
+      id
+    }
+    forwarding {
+      id
+    }
+    forwardedIn {
       id
     }
   }
