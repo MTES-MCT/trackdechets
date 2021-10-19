@@ -28,7 +28,7 @@ enum BsdasriStatus {
 }
 
 "Type de packaging du déchet"
-enum BsdasriPackagings {
+enum BsdasriPackagingType {
   "Caisse en carton avec sac en plastique"
   BOITE_CARTON
 
@@ -48,16 +48,7 @@ enum BsdasriPackagings {
   AUTRE
 }
 
-"Type d'émetteur"
-enum BsdasriEmitterType {
-  "Producteur"
-  PRODUCER
-
-  "Installation de regroupement"
-  COLLECTOR
-}
-
-enum processingOperationTypes {
+enum destinationOperationCodeTypes {
   D9
   D10
   D12
@@ -78,7 +69,7 @@ enum BsdasriSignatureType {
   "Signature du traitement du déchet"
   OPERATION
 }
-enum BsdasriType{
+enum BsdasriType {
   "Bordereau dasri simple"
   SIMPLE
 

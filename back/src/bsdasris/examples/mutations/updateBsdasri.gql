@@ -1,4 +1,4 @@
-mutation UpdateBsdasri($id: ID!, $input: BsdasriUpdateInput!) {
+mutation UpdateBsdasri($id: ID!, $input: BsdasriInput!) {
   updateBsdasri(id: $id, input: $input) {
     id
     status

@@ -17,10 +17,7 @@ describe("Mutation.signBsdasri transport", () => {
   afterEach(resetDatabase);
 
   it("should put transport signature on an INITIAL dasri if allowed by emitter company", async () => {
-    const {
-      user: emitter,
-      company: emitterCompany
-    } = await userWithCompanyFactory("MEMBER", {
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER", {
       allowBsdasriTakeOverWithoutSignature: true // company allow takeover without signature
     });
 
@@ -30,7 +27,6 @@ describe("Mutation.signBsdasri transport", () => {
     } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
-      ownerId: emitter.id,
       opt: {
         ...initialData(emitterCompany),
         ...readyToTakeOverData(transporterCompany),
@@ -50,17 +46,16 @@ describe("Mutation.signBsdasri transport", () => {
       where: { id: dasri.id }
     });
     expect(readyTotakeOverDasri.status).toEqual("SENT");
-    expect(readyTotakeOverDasri.transportSignatureAuthor).toEqual("Jimmy");
-    expect(readyTotakeOverDasri.transportSignatureDate).toBeTruthy();
+    expect(readyTotakeOverDasri.transporterTransportSignatureAuthor).toEqual(
+      "Jimmy"
+    );
+    expect(readyTotakeOverDasri.transporterTransportSignatureDate).toBeTruthy();
     expect(readyTotakeOverDasri.transportSignatoryId).toEqual(transporter.id);
     expect(readyTotakeOverDasri.isEmissionDirectTakenOver).toEqual(true);
   });
 
   it("should forbid transport signature on an INITIAL grouping dasri", async () => {
-    const {
-      user: emitter,
-      company: emitterCompany
-    } = await userWithCompanyFactory("MEMBER", {
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER", {
       allowBsdasriTakeOverWithoutSignature: true // company allow takeover without signature
     });
 
@@ -70,12 +65,11 @@ describe("Mutation.signBsdasri transport", () => {
     } = await userWithCompanyFactory("MEMBER");
 
     const groupingDasri = await bsdasriFactory({
-      ownerId: emitter.id,
       opt: {
         ...initialData(emitterCompany),
         ...readyToTakeOverData(transporterCompany),
         status: BsdasriStatus.INITIAL,
-        bsdasriType: "GROUPING"
+        type: "GROUPING"
       }
     });
     const { mutate } = makeClient(transporter);
@@ -95,10 +89,7 @@ describe("Mutation.signBsdasri transport", () => {
     ]);
   });
   it("should not put transport signature on an INITIAL dasri if required field is missing", async () => {
-    const {
-      user: emitter,
-      company: emitterCompany
-    } = await userWithCompanyFactory("MEMBER", {
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER", {
       allowBsdasriTakeOverWithoutSignature: true // company allow takeover without signature
     });
 
@@ -109,11 +100,10 @@ describe("Mutation.signBsdasri transport", () => {
 
     // missing onu code
     const dasri = await bsdasriFactory({
-      ownerId: emitter.id,
       opt: {
         ...initialData(emitterCompany),
         ...readyToTakeOverData(transporterCompany),
-        wasteDetailsOnuCode: null,
+        wasteAdr: null,
         status: BsdasriStatus.INITIAL
       }
     });
@@ -133,10 +123,7 @@ describe("Mutation.signBsdasri transport", () => {
   });
 
   it("should not put transport signature on an INITIAL dasri if not allowed by emitter company", async () => {
-    const {
-      user: emitter,
-      company: emitterCompany
-    } = await userWithCompanyFactory("MEMBER"); // company forbid takeover without signature
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER"); // company forbid takeover without signature
 
     const {
       user: transporter,
@@ -144,7 +131,6 @@ describe("Mutation.signBsdasri transport", () => {
     } = await userWithCompanyFactory("MEMBER");
 
     let dasri = await bsdasriFactory({
-      ownerId: emitter.id,
       opt: {
         ...initialData(emitterCompany),
         ...readyToTakeOverData(transporterCompany),

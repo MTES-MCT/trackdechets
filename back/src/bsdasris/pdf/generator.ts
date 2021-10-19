@@ -20,8 +20,11 @@ export async function buildPdf(bsdasri: Bsdasri) {
   Handlebars.registerHelper("dateFmt", safeDateFmt);
   Handlebars.registerHelper("sumPackageQuantity", sumPackageQuantity);
   Handlebars.registerHelper("ifEquals", function (arg1, arg2, options) {
-    return arg1 == arg2 ? options.fn(this) : options.inverse(this);
+    // check strict equality for booleans, coerce for other types
+    const isEqual = typeof arg2 === "boolean" ? arg1 === arg2 : arg1 == arg2;
+    return isEqual ? options.fn(this) : options.inverse(this);
   });
+
   Handlebars.registerHelper("verboseTransportMode", function (transportMode) {
     if (!transportMode) {
       return "";
@@ -51,11 +54,11 @@ const safeDateFmt = (dt: Date) => {
   return format(dt, "dd/MM/yyyy");
 };
 
-const sumPackageQuantity = packagingInfos => {
-  if (!packagingInfos) {
+const sumPackageQuantity = packagings => {
+  if (!packagings) {
     return "";
   }
-  return packagingInfos
+  return packagings
     .map(info => info.quantity)
     .reduce((acc, val) => acc + val, 0);
 };

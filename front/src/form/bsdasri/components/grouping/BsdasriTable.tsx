@@ -7,7 +7,7 @@ import {
   Query,
   QueryBsdasrisArgs,
   BsdasriStatus,
-  ProcessingOperationTypes,
+  DestinationOperationCodeTypes,
 } from "generated/graphql/types";
 import { formatDate } from "common/datetime";
 const GET_GROUPABLE_BSDASRIS = gql`
@@ -16,22 +16,22 @@ const GET_GROUPABLE_BSDASRIS = gql`
       edges {
         node {
           id
+          waste {
+            code
+          }
           emitter {
             company {
               name
             }
           }
-          emission {
-            wasteCode
-          }
-          reception {
-            receivedAt
-            wasteDetails {
+          destination {
+            reception {
+              date
               volume
             }
-          }
-          operation {
-            processingOperation
+            operation {
+              code
+            }
           }
         }
       }
@@ -54,17 +54,21 @@ export default function BsdasriTable({
   >(GET_GROUPABLE_BSDASRIS, {
     variables: {
       where: {
-        _or: [{ groupable: true }, { id_in: regroupedInDB }],
+        _or: [{ groupable: true }, { id: { _in: regroupedInDB } }],
 
-        processingOperation: [
-          ProcessingOperationTypes.D12,
-          ProcessingOperationTypes.R12,
-        ],
-
-        status: BsdasriStatus.Processed,
-        recipient: {
-          company: { siret: values.emitter?.company?.siret as string },
+        destination: {
+          company: { siret: { _eq: values.emitter?.company?.siret as string } },
+          operation: {
+            code: {
+              _in: [
+                DestinationOperationCodeTypes.D12,
+                DestinationOperationCodeTypes.R12,
+              ],
+            },
+          },
         },
+
+        status: { _eq: BsdasriStatus.Processed },
       },
     },
   });
@@ -124,14 +128,14 @@ export default function BsdasriTable({
             </td>
             <td>{edge.node.id}</td>
 
-            <td>{edge.node.emission?.wasteCode}</td>
+            <td>{edge.node.waste?.code}</td>
             <td>{edge.node.emitter?.company?.name}</td>
             <td>
-              {!!edge.node.reception?.receivedAt &&
-                formatDate(edge.node.reception?.receivedAt)}
+              {!!edge.node.destination?.reception?.date &&
+                formatDate(edge.node.destination?.reception?.date)}
             </td>
-            <td>{edge.node.reception?.wasteDetails?.volume}</td>
-            <td>{edge.node.operation?.processingOperation}</td>
+            <td>{edge.node.destination?.reception?.volume}</td>
+            <td>{edge.node.destination?.operation?.code}</td>
           </tr>
         ))}
       </tbody>

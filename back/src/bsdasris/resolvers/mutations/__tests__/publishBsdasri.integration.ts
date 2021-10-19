@@ -17,9 +17,8 @@ describe("Mutation.publishBsdasri", () => {
   afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret
       }
@@ -48,7 +47,6 @@ describe("Mutation.publishBsdasri", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         isDraft: true,
         ...initialData(company)
@@ -74,7 +72,6 @@ describe("Mutation.publishBsdasri", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company)
       }
@@ -104,8 +101,6 @@ describe("Mutation.publishBsdasri", () => {
   it("should not publish a draft dasri if mandatory fields are not filled", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
-
       opt: {
         isDraft: true,
         ...initialData(company),

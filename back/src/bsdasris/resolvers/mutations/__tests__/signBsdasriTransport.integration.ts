@@ -16,17 +16,13 @@ describe("Mutation.signBsdasri transport", () => {
   afterEach(resetDatabase);
 
   it("should put transport signature on a SIGNED_BY_PRODUCER dasri", async () => {
-    const {
-      user: emitter,
-      company: emitterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const {
       user: transporter,
       company: transporterCompany
     } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
-      ownerId: emitter.id,
       opt: {
         ...initialData(emitterCompany),
         ...readyToTakeOverData(transporterCompany),
@@ -46,29 +42,27 @@ describe("Mutation.signBsdasri transport", () => {
       where: { id: dasri.id }
     });
     expect(readyTotakeOverDasri.status).toEqual("SENT");
-    expect(readyTotakeOverDasri.transportSignatureAuthor).toEqual("Jimmy");
-    expect(readyTotakeOverDasri.transportSignatureDate).toBeTruthy();
+    expect(readyTotakeOverDasri.transporterTransportSignatureAuthor).toEqual(
+      "Jimmy"
+    );
+    expect(readyTotakeOverDasri.transporterTransportSignatureDate).toBeTruthy();
     expect(readyTotakeOverDasri.transportSignatoryId).toEqual(transporter.id);
   });
 
   it("should mark a dasri as refused when transporter acceptation is refused", async () => {
-    const {
-      user: emitter,
-      company: emitterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const {
       user: transporter,
       company: transporterCompany
     } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
-      ownerId: emitter.id,
       opt: {
         ...initialData(emitterCompany),
         ...readyToTakeOverData(transporterCompany),
-        transporterWasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
+        transporterAcceptationStatus: WasteAcceptationStatus.REFUSED,
         transporterWasteRefusalReason: "J'en veux pas",
-        transporterWasteRefusedQuantity: 66,
+        transporterWasteRefusedWeightValue: 66,
         status: BsdasriStatus.SIGNED_BY_PRODUCER
       }
     });
@@ -85,8 +79,10 @@ describe("Mutation.signBsdasri transport", () => {
       where: { id: dasri.id }
     });
     expect(readyTotakeOverDasri.status).toEqual("REFUSED");
-    expect(readyTotakeOverDasri.transportSignatureAuthor).toEqual("Jimmy");
-    expect(readyTotakeOverDasri.transportSignatureDate).toBeTruthy();
+    expect(readyTotakeOverDasri.transporterTransportSignatureAuthor).toEqual(
+      "Jimmy"
+    );
+    expect(readyTotakeOverDasri.transporterTransportSignatureDate).toBeTruthy();
     expect(readyTotakeOverDasri.transportSignatoryId).toEqual(transporter.id);
   });
 });

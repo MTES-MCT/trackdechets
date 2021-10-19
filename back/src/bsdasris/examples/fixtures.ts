@@ -1,3 +1,10 @@
+const wasteInput = {
+  waste: {
+    code: "18 01 03*",
+
+    adr: "non soumis"
+  }
+};
 function emitterCompanyInput(siret: string) {
   return {
     siret,
@@ -11,21 +18,16 @@ function emitterCompanyInput(siret: string) {
 
 function emitterInput(siret: string) {
   return {
-    company: emitterCompanyInput(siret),
-    type: "PRODUCER"
+    company: emitterCompanyInput(siret)
   };
 }
 
 const emissionInput = {
-  wasteCode: "18 01 03*",
-  wasteDetails: {
-    quantity: {
-      value: 1,
-      type: "REAL"
-    },
-    onuCode: "non soumis",
-    packagingInfos: [{ type: "BOITE_CARTON", quantity: 1, volume: 1 }]
-  }
+  weight: {
+    value: 1,
+    isEstimate: false
+  },
+  packagings: [{ type: "BOITE_CARTON", quantity: 1, volume: 1 }]
 };
 
 function transporteurCompanyInput(siret: string) {
@@ -39,32 +41,32 @@ function transporteurCompanyInput(siret: string) {
   };
 }
 
-const receiptInput = {
-  receipt: "KIH-458-87",
-  receiptDepartment: "07",
-  receiptValidityLimit: "2022-01-01"
+const recepisseInput = {
+  number: "KIH-458-87",
+  department: "07",
+  validityLimit: "2022-01-01"
 };
 
 function transporterInput(siret: string) {
   return {
     company: transporteurCompanyInput(siret),
-    ...receiptInput
+    recepisse: recepisseInput
   };
 }
 
 const transportInput = {
-  wasteAcceptation: { status: "ACCEPTED" },
-  wasteDetails: {
-    quantity: {
-      value: 1,
-      type: "REAL"
-    },
-    packagingInfos: [{ type: "BOITE_CARTON", quantity: 1, volume: 1 }]
+  acceptation: { status: "ACCEPTED" },
+
+  weight: {
+    value: 1,
+    isEstimate: false
   },
+  packagings: [{ type: "BOITE_CARTON", quantity: 1, volume: 1 }],
+
   takenOverAt: "2022-04-27"
 };
 
-function recipientCompanyInput(siret: string) {
+function destinationCompanyInput(siret: string) {
   return {
     siret,
     name: "Traiteur Inc",
@@ -75,39 +77,39 @@ function recipientCompanyInput(siret: string) {
   };
 }
 
-function recipientInput(siret: string) {
+function destinationInput(siret: string) {
   return {
-    company: recipientCompanyInput(siret)
+    company: destinationCompanyInput(siret)
   };
 }
 
 const receptionInput = {
-  wasteAcceptation: { status: "ACCEPTED" },
-  wasteDetails: {
-    volume: 1,
-    packagingInfos: [{ type: "BOITE_CARTON", quantity: 1, volume: 1 }]
-  },
-  receivedAt: "2021-04-27"
+  acceptation: { status: "ACCEPTED" },
+
+  volume: 1,
+  packagings: [{ type: "BOITE_CARTON", quantity: 1, volume: 1 }],
+
+  date: "2021-04-27"
 };
 
 const operationInput = {
-  quantity: {
-    value: 1,
-    type: "REAL"
+  weight: {
+    value: 1
   },
-  processingOperation: "D10",
-  processedAt: "2020-04-28"
+  code: "D10",
+  date: "2020-04-28"
 };
 
 export default {
+  wasteInput,
   emitterCompanyInput,
   emitterInput,
   emissionInput,
   transporteurCompanyInput,
   transporterInput,
   transportInput,
-  recipientCompanyInput,
-  recipientInput,
+  destinationCompanyInput,
+  destinationInput,
   receptionInput,
   operationInput
 };

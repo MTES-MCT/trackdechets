@@ -1,6 +1,6 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsdasriOrNotFound } from "../../database";
-import { expandBsdasriFromDb } from "../../dasri-converter";
+import { unflattenBsdasri } from "../../converter";
 import { InvalidTransition } from "../../../forms/errors";
 
 import dasriTransition from "../../workflow/dasriTransition";
@@ -59,8 +59,8 @@ const basesign = async ({ id, input, context, securityCode = null }) => {
     { isEmissionDirectTakenOver, isEmissionTakenOverWithSecretCode }
   );
 
-  const expandedDasri = expandBsdasriFromDb(updatedDasri);
-  await indexBsdasri(updatedDasri, context);
+  const expandedDasri = unflattenBsdasri(updatedDasri);
+  await indexBsdasri(updatedDasri);
   return expandedDasri;
 };
 

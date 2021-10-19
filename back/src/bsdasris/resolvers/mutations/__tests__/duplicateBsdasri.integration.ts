@@ -17,9 +17,8 @@ describe("Mutation.duplicateBsdasri", () => {
   afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret
       }
@@ -45,13 +44,9 @@ describe("Mutation.duplicateBsdasri", () => {
   });
   it("should disallow users not belonging to the duplicated dasri", async () => {
     const { user } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: otherUser,
-      company: otherCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { company: otherCompany } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
-      ownerId: otherUser.id,
       opt: {
         ...initialData(otherCompany)
       }
@@ -82,7 +77,6 @@ describe("Mutation.duplicateBsdasri", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company)
       }
