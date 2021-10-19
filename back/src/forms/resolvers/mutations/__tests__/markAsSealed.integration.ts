@@ -455,6 +455,34 @@ describe("Mutation.markAsSealed", () => {
     expect(data.markAsSealed.status).toBe("SEALED");
   });
 
+  it("should be optional to provide packagings", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const recipientCompany = await destinationFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        wasteDetailsPackagingInfos: []
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "markAsSealed">>(
+      MARK_AS_SEALED,
+      {
+        variables: {
+          id: form.id
+        }
+      }
+    );
+
+    expect(data.markAsSealed.status).toBe("SEALED");
+  });
+
   it("should mark appendix2 forms as grouped", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destination = await destinationFactory();

@@ -456,6 +456,15 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
 
 export const wasteDetailsSchema = wasteDetailsSchemaFn(false);
 
+export const beforeSignedByTransporterSchema: yup.SchemaOf<Pick<
+  Form,
+  "wasteDetailsPackagingInfos"
+>> = yup.object({
+  wasteDetailsPackagingInfos: yup
+    .array()
+    .min(1, "Le nombre de contenants doit être supérieur à 0")
+});
+
 // 8 - Collecteur-transporteur
 const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> = isDraft =>
   yup.object({
