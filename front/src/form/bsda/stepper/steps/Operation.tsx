@@ -71,12 +71,12 @@ export default function Operation() {
           Quantité présentée
           <Field
             component={NumberInput}
-            name="destination.reception.quantity.value"
+            name="destination.reception.weight"
             className="td-input td-input--small"
           />
         </label>
 
-        <RedErrorMessage name="destination.reception.quantity.value" />
+        <RedErrorMessage name="destination.reception.weight" />
       </div>
 
       <h4 className="form__section-heading">Opération</h4>
@@ -102,14 +102,11 @@ export default function Operation() {
         >
           <option value="...">Sélectionnez une valeur...</option>
           <option value="D 5">
-            D 5 - Mise en décharge aménagée et autorisée en ISDD
+            D 5 - Mise en décharge aménagée et autorisée en ISDD ou ISDND
           </option>
-          <option value="D 5">
-            D 5 - Mise en décharge aménagée et autorisée en ISDND
+          <option value="D 9">
+            D 9 - Vitrification, traitement chimique ou prétraitement
           </option>
-          <option value="D 9">D 9 - Vitrification</option>
-          <option value="D 9">D 9 - Traitement chimique</option>
-          <option value="D 9">D 9 - Prétraitement</option>
           <option value="D 13">D 13 - Groupement de déchets</option>
           <option value="D 15">D 15 - Entreposage provisoire</option>
         </Field>
