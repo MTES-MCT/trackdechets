@@ -11,7 +11,7 @@ export default function WasteInfo({ disabled }) {
   const { values, setFieldValue } = useFormikContext<any>();
 
   useEffect(() => {
-    setFieldValue("quantity.number", values.identification.numbers.length);
+    setFieldValue("quantity", values.identification.numbers.length);
   }, [setFieldValue, values.identification.numbers]);
 
   return (
@@ -106,25 +106,25 @@ export default function WasteInfo({ disabled }) {
       <div className="tw-flex tw-space-x-8">
         <div className="form__row">
           <label>
-            En nombre
+            En nombre (correspond au nombre d'identifications saisies)
             <Field
               component={NumberInput}
-              name="quantity.number"
+              name="quantity"
               className="td-input waste-details__quantity"
               disabled
             />
           </label>
 
-          <RedErrorMessage name="quantity.number" />
+          <RedErrorMessage name="quantity" />
         </div>
 
         <div className="form__row">
           <label>
-            En tonnes (le cas échéant)
+            En tonnes
             <Field
               disabled={disabled}
               component={NumberInput}
-              name="quantity.tons"
+              name="weight.value"
               className="td-input waste-details__quantity"
               placeholder="0"
               min="0"
@@ -132,7 +132,7 @@ export default function WasteInfo({ disabled }) {
             />
           </label>
 
-          <RedErrorMessage name="quantity.tons" />
+          <RedErrorMessage name="weight.value" />
         </div>
       </div>
     </>

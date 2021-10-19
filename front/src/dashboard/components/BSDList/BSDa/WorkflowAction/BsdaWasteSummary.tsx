@@ -34,10 +34,10 @@ export function BsdaWasteSummary({ bsda }: Props) {
       <DataListItem>
         <DataListTerm>Poids</DataListTerm>
         <DataListDescription>
-          {bsda.destination?.reception?.quantity?.value == null ? (
-            <>{bsda.quantity?.value ?? 0} tonne(s)</>
+          {bsda.destination?.reception?.weight == null ? (
+            <>{bsda.weight?.value ?? 0} tonne(s)</>
           ) : (
-            <>{bsda.destination.reception.quantity?.value && <>(tonne(s))</>}</>
+            <>{bsda.destination.reception.weight && <>(tonne(s))</>}</>
           )}
         </DataListDescription>
       </DataListItem>

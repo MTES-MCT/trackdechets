@@ -6,7 +6,7 @@ import {
   Bsvhu as GraphqlVhuForm,
   BsvhuInput,
   BsvhuIdentification,
-  BsvhuQuantity,
+  BsvhuWeight,
   BsvhuRecepisse,
   BsvhuTransporter,
   BsvhuEmission,
@@ -52,9 +52,10 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
       numbers: form.identificationNumbers,
       type: form.identificationType
     }),
-    quantity: nullIfNoValues<BsvhuQuantity>({
-      number: form.quantityNumber,
-      tons: form.quantityTons
+    quantity: form.quantity,
+    weight: nullIfNoValues<BsvhuWeight>({
+      value: form.weightValue,
+      isEstimate: form.weightIsEstimate
     }),
     destination: nullIfNoValues<BsvhuDestination>({
       type: form.destinationType,
@@ -75,10 +76,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
           numbers: form.destinationReceptionIdentificationNumbers,
           type: form.destinationReceptionIdentificationType
         }),
-        quantity: nullIfNoValues<BsvhuQuantity>({
-          number: form.destinationReceptionQuantityNumber,
-          tons: form.destinationReceptionQuantityTons
-        }),
+        weight: form.destinationReceptionWeight,
         refusalReason: form.destinationReceptionRefusalReason
       }),
       operation: nullIfNoValues<BsvhuOperation>({
@@ -137,8 +135,9 @@ export function flattenVhuInput(
     ...flattenVhuTransporterInput(formInput),
     packaging: chain(formInput, f => f.packaging),
     wasteCode: chain(formInput, f => f.wasteCode),
+    quantity: chain(formInput, f => f.quantity),
     ...flattenVhuIdentificationInput(formInput),
-    ...flattenVhuQuantityInput(formInput)
+    ...flattenVhuWeightInput(formInput)
   });
 }
 
@@ -186,11 +185,11 @@ function flattenVhuDestinationInput({
       destination,
       r => r.plannedOperationCode
     ),
-    destinationReceptionQuantityNumber: chain(destination, d =>
-      chain(d.reception, r => chain(r.quantity, q => q.number))
+    destinationReceptionQuantity: chain(destination, d =>
+      chain(d.reception, r => r.quantity)
     ),
-    destinationReceptionQuantityTons: chain(destination, d =>
-      chain(d.reception, r => chain(r.quantity, q => q.tons))
+    destinationReceptionWeight: chain(destination, d =>
+      chain(d.reception, r => r.weight)
     ),
     destinationReceptionIdentificationNumbers: chain(destination, d =>
       chain(d.reception, r => chain(r.identification, i => i.numbers))
@@ -242,6 +241,11 @@ function flattenVhuDestinationInput({
       chain(d.operation, o =>
         chain(o.nextDestination, nd => chain(nd.company, c => c.mail))
       )
+    ),
+    destinationOperationNextDestinationCompanyVatNumber: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.vatNumber))
+      )
     )
   };
 }
@@ -292,9 +296,9 @@ function flattenVhuIdentificationInput({
   };
 }
 
-function flattenVhuQuantityInput({ quantity }: Pick<BsvhuInput, "quantity">) {
+function flattenVhuWeightInput({ weight }: Pick<BsvhuInput, "weight">) {
   return {
-    quantityNumber: chain(quantity, q => q.number),
-    quantityTons: chain(quantity, q => q.tons)
+    weightValue: chain(weight, q => q.value),
+    weightIsEstimate: chain(weight, q => q.isEstimate)
   };
 }

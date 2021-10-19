@@ -3,11 +3,11 @@ import {
   FormCompany,
   Signature,
   Bsda as GraphqlBsda,
+  InitialBsda as GraphQLInitialBsda,
   BsdaEmitter,
   BsdaEmission,
   BsdaPackaging,
   BsdaWaste,
-  BsdaQuantity,
   BsdaDestination,
   BsdaReception,
   BsdaOperation,
@@ -18,7 +18,9 @@ import {
   BsdaInput,
   BsdaWork,
   BsdaBroker,
-  BsdaWorkSite
+  BsdaPickupSite,
+  BsdaWeight,
+  BsdaEcoOrganisme
 } from "../generated/graphql/types";
 import { Prisma, Bsda as PrismaBsda } from "@prisma/client";
 
@@ -40,19 +42,24 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         phone: form.emitterCompanyPhone,
         mail: form.emitterCompanyMail
       }),
+      customInfo: form.emitterCustomInfo,
       emission: nullIfNoValues<BsdaEmission>({
         signature: nullIfNoValues<Signature>({
           author: form.emitterEmissionSignatureAuthor,
           date: form.emitterEmissionSignatureDate
         })
       }),
-      workSite: nullIfNoValues<BsdaWorkSite>({
-        address: form.emitterWorkSiteAddress,
-        city: form.emitterWorkSiteCity,
-        infos: form.emitterWorkSiteInfos,
-        name: form.emitterWorkSiteName,
-        postalCode: form.emitterWorkSitePostalCode
+      pickupSite: nullIfNoValues<BsdaPickupSite>({
+        address: form.emitterPickupSiteAddress,
+        city: form.emitterPickupSiteCity,
+        infos: form.emitterPickupSiteInfos,
+        name: form.emitterPickupSiteName,
+        postalCode: form.emitterPickupSitePostalCode
       })
+    }),
+    ecoOrganisme: nullIfNoValues<BsdaEcoOrganisme>({
+      name: form.ecoOrganismeName,
+      siret: form.ecoOrganismeSiret
     }),
     packagings: form.packagings as BsdaPackaging[],
     waste: nullIfNoValues<BsdaWaste>({
@@ -64,9 +71,9 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
       sealNumbers: form.wasteSealNumbers,
       adr: form.wasteAdr
     }),
-    quantity: nullIfNoValues<BsdaQuantity>({
-      type: form.quantityType,
-      value: form.quantityValue
+    weight: nullIfNoValues<BsdaWeight>({
+      isEstimate: form.weightIsEstimate,
+      value: form.weightValue
     }),
     destination: nullIfNoValues<BsdaDestination>({
       company: nullIfNoValues<FormCompany>({
@@ -77,16 +84,14 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         phone: form.destinationCompanyPhone,
         mail: form.destinationCompanyMail
       }),
+      customInfo: form.destinationCustomInfo,
       cap: form.destinationCap,
       plannedOperationCode: form.destinationPlannedOperationCode,
       reception: nullIfNoValues<BsdaReception>({
         acceptationStatus: form.destinationReceptionAcceptationStatus,
         refusalReason: form.destinationReceptionRefusalReason,
         date: form.destinationReceptionDate,
-        quantity: nullIfNoValues<BsdaQuantity>({
-          type: form.destinationReceptionQuantityType,
-          value: form.destinationReceptionQuantityValue
-        })
+        weight: form.destinationReceptionWeight
       }),
       operation: nullIfNoValues<BsdaOperation>({
         code: form.destinationOperationCode,
@@ -139,6 +144,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         mail: form.transporterCompanyMail,
         vatNumber: form.transporterCompanyVatNumber
       }),
+      customInfo: form.transporterCustomInfo,
       recepisse: nullIfNoValues<BsdaRecepisse>({
         department: form.transporterRecepisseDepartment,
         number: form.transporterRecepisseNumber,
@@ -154,6 +160,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         })
       })
     }),
+    grouping: [],
     metadata: null
   };
 }
@@ -164,13 +171,14 @@ export function flattenBsdaInput(
   return safeInput({
     type: chain(formInput, f => f.type),
     ...flattenBsdaEmitterInput(formInput),
+    ...flattenBsdaEcoOrganismeInput(formInput),
     ...flattenBsdaDestinationInput(formInput),
     ...flattenBsdaTransporterInput(formInput),
     ...flattenBsdaWorkerInput(formInput),
     ...flattenBsdaBrokerInput(formInput),
     ...flattenBsdaWasteInput(formInput),
     packagings: chain(formInput, f => f.packagings),
-    ...flattenBsdaQuantityInput(formInput)
+    ...flattenBsdaWeightInput(formInput)
   });
 }
 
@@ -187,15 +195,31 @@ function flattenBsdaEmitterInput({ emitter }: Pick<BsdaInput, "emitter">) {
     ),
     emitterCompanyPhone: chain(emitter, e => chain(e.company, c => c.phone)),
     emitterCompanyMail: chain(emitter, e => chain(e.company, c => c.mail)),
-    emitterWorkSiteName: chain(emitter, e => chain(e.workSite, w => w.name)),
-    emitterWorkSiteAddress: chain(emitter, e =>
-      chain(e.workSite, w => w.address)
+    emitterCustomInfo: chain(emitter, e => e.customInfo),
+    emitterPickupSiteName: chain(emitter, e =>
+      chain(e.pickupSite, w => w.name)
     ),
-    emitterWorkSiteCity: chain(emitter, e => chain(e.workSite, w => w.city)),
-    emitterWorkSitePostalCode: chain(emitter, e =>
-      chain(e.workSite, w => w.postalCode)
+    emitterPickupSiteAddress: chain(emitter, e =>
+      chain(e.pickupSite, w => w.address)
     ),
-    emitterWorkSiteInfos: chain(emitter, e => chain(e.workSite, w => w.infos))
+    emitterPickupSiteCity: chain(emitter, e =>
+      chain(e.pickupSite, w => w.city)
+    ),
+    emitterPickupSitePostalCode: chain(emitter, e =>
+      chain(e.pickupSite, w => w.postalCode)
+    ),
+    emitterPickupSiteInfos: chain(emitter, e =>
+      chain(e.pickupSite, w => w.infos)
+    )
+  };
+}
+
+function flattenBsdaEcoOrganismeInput({
+  ecoOrganisme
+}: Pick<BsdaInput, "ecoOrganisme">) {
+  return {
+    ecoOrganismeName: chain(ecoOrganisme, e => e.name),
+    ecoOrganismeSiret: chain(ecoOrganisme, e => e.siret)
   };
 }
 
@@ -221,6 +245,7 @@ function flattenBsdaDestinationInput({
     destinationCompanyMail: chain(destination, d =>
       chain(d.company, c => c.mail)
     ),
+    destinationCustomInfo: chain(destination, d => d.customInfo),
     destinationCap: chain(destination, d => d.cap),
     destinationPlannedOperationCode: chain(
       destination,
@@ -230,11 +255,8 @@ function flattenBsdaDestinationInput({
     destinationReceptionDate: chain(destination, d =>
       chain(d.reception, r => r.date)
     ),
-    destinationReceptionQuantityType: chain(destination, d =>
-      chain(d.reception, r => chain(r.quantity, q => q.type))
-    ),
-    destinationReceptionQuantityValue: chain(destination, d =>
-      chain(d.reception, r => chain(r.quantity, q => q.value))
+    destinationReceptionWeight: chain(destination, d =>
+      chain(d.reception, r => r.weight)
     ),
     destinationReceptionAcceptationStatus: chain(destination, d =>
       chain(d.reception, r => r.acceptationStatus)
@@ -322,6 +344,7 @@ function flattenBsdaTransporterInput({
     transporterCompanyVatNumber: chain(transporter, t =>
       chain(t.company, c => c.vatNumber)
     ),
+    transporterCustomInfo: chain(transporter, t => t.customInfo),
     transporterRecepisseIsExempted: chain(transporter, t =>
       chain(t.recepisse, r => r.isExempted)
     ),
@@ -380,10 +403,10 @@ function flattenBsdaBrokerInput({ broker }: Pick<BsdaInput, "broker">) {
   };
 }
 
-function flattenBsdaQuantityInput({ quantity }: Pick<BsdaInput, "quantity">) {
+function flattenBsdaWeightInput({ weight }: Pick<BsdaInput, "weight">) {
   return {
-    quantityType: chain(quantity, q => q.type),
-    quantityValue: chain(quantity, q => q.value)
+    weightIsEstimate: chain(weight, q => q.isEstimate),
+    weightValue: chain(weight, q => q.value)
   };
 }
 
@@ -396,5 +419,22 @@ function flattenBsdaWasteInput({ waste }: Pick<BsdaInput, "waste">) {
     wasteMaterialName: chain(waste, w => w.materialName),
     wasteConsistence: chain(waste, w => w.consistence),
     wasteSealNumbers: chain(waste, w => w.sealNumbers)
+  };
+}
+
+/**
+ * Only returns fields that can be read from the child BSDA in
+ * case of a forwarding or grouping
+ */
+export function toInitialBsda(bsda: GraphqlBsda): GraphQLInitialBsda {
+  return {
+    id: bsda.id,
+    // emitter can only be read by someone who is contributor of the initial BSda, this
+    // logic is implemented in the InitialBsda resolver
+    emitter: bsda.emitter,
+    waste: bsda.waste,
+    weight: bsda.weight,
+    destination: bsda.destination,
+    packagings: bsda.packagings
   };
 }

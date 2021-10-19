@@ -496,10 +496,8 @@ export const vhuFragment = gql`
       }
       reception {
         date
-        quantity {
-          number
-          tons
-        }
+        quantity
+        weight
         acceptationStatus
         refusalReason
       }
@@ -510,9 +508,10 @@ export const vhuFragment = gql`
     }
     wasteCode
     packaging
-    quantity {
-      number
-      tons
+    quantity
+    weight {
+      value
+      isEstimate
     }
   }
   ${companyFragment}

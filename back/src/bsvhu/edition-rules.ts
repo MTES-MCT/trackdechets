@@ -4,7 +4,7 @@ import {
   FormCompany,
   BsvhuInput,
   BsvhuIdentification,
-  BsvhuQuantity,
+  BsvhuWeight,
   BsvhuRecepisse
 } from "../generated/graphql/types";
 import { expandVhuFormFromDb } from "./converter";
@@ -85,7 +85,7 @@ const identificationKeys: Array<keyof BsvhuIdentification> = [
   "numbers",
   "type"
 ];
-const quantityKeys: Array<keyof BsvhuQuantity> = ["number", "tons"];
+const weightKeys: Array<keyof BsvhuWeight> = ["value", "isEstimate"];
 const recepisseKeys: Array<keyof BsvhuRecepisse> = [
   "number",
   "validityLimit",
@@ -119,10 +119,8 @@ const vhuFormRules: InternalRules<BsvhuInput, PrismaVhuForm> = {
     reception: {
       refusalReason: nullFieldRule("destinationOperationSignatureDate"),
       acceptationStatus: nullFieldRule("destinationOperationSignatureDate"),
-      quantity: globalNullFieldRule(
-        quantityKeys,
-        "destinationOperationSignatureDate"
-      ),
+      quantity: nullFieldRule("destinationOperationSignatureDate"),
+      weight: nullFieldRule("destinationOperationSignatureDate"),
       identification: globalNullFieldRule(
         identificationKeys,
         "destinationOperationSignatureDate"
@@ -151,7 +149,8 @@ const vhuFormRules: InternalRules<BsvhuInput, PrismaVhuForm> = {
     "emitterEmissionSignatureDate"
   ),
   wasteCode: nullFieldRule("emitterEmissionSignatureDate"),
-  quantity: globalNullFieldRule(quantityKeys, "emitterEmissionSignatureDate"),
+  quantity: nullFieldRule("emitterEmissionSignatureDate"),
+  weight: globalNullFieldRule(weightKeys, "emitterEmissionSignatureDate"),
   transporter: {
     company: globalNullFieldRule(
       companyKeys,

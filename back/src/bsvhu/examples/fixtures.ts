@@ -23,9 +23,10 @@ const wasteDetailsInput = {
     numbers: ["123", "456"],
     type: "NUMERO_ORDRE_REGISTRE_POLICE"
   },
-  quantity: {
-    number: 2,
-    tons: 1.3
+  quantity: 2,
+  weight: {
+    value: 1.3,
+    isEstimate: false
   }
 };
 
@@ -73,9 +74,7 @@ function broyeurInput(siret: string) {
 }
 
 const receptionInput = {
-  quantity: {
-    tons: 1.4
-  },
+  weight: 1.4,
   acceptationStatus: "ACCEPTED"
 };
 

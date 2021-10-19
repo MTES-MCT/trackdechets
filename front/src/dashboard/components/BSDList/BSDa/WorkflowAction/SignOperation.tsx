@@ -73,10 +73,7 @@ export function SignOperation({ siret, bsdaId }: Props) {
                       date: null,
                       acceptationStatus: "ACCEPTED",
                       refusalReason: "",
-                      quantity: {
-                        type: "REAL",
-                        value: null,
-                      },
+                      weight: null,
                     },
                     operation: {
                       date: null,

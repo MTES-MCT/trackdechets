@@ -40,10 +40,10 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
     { type: "PALETTE_FILME", quantity: 1 },
     { type: "BIG_BAG", quantity: 2 }
   ],
-  quantityType: "REAL",
-  quantityValue: 25.4,
+  weightIsEstimate: false,
+  weightValue: 25.4,
 
-  destinationPlannedOperationCode: "R 4",
+  destinationPlannedOperationCode: "D 5",
   destinationCompanyName: "I reveive waste INC",
   destinationCompanySiret: "13254678974589",
   destinationCompanyAddress: "14 boulevard Recipient, Recipient City",
@@ -63,11 +63,10 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   transporterRecepisseValidityLimit: "2019-11-27T00:00:00.000Z",
 
   destinationReceptionDate: "2019-11-27T00:00:00.000Z",
-  destinationReceptionQuantityType: "REAL",
-  destinationReceptionQuantityValue: 1.2,
+  destinationReceptionWeight: 1.2,
   destinationReceptionAcceptationStatus: "ACCEPTED",
   destinationReceptionRefusalReason: null,
-  destinationOperationCode: "D 10",
+  destinationOperationCode: "D 9",
   destinationOperationDate: "2019-11-27T00:00:00.000Z",
 
   workerCompanyName: "Entreprise de travaux",

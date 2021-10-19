@@ -1,16 +1,19 @@
 import { UserRole } from "@prisma/client";
+import { gql } from "apollo-server-express";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Query } from "../../../../generated/graphql/types";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { fullBsda } from "../../../fragments";
 import { bsdaFactory } from "../../../__tests__/factories";
 
-const GET_BSDA = `
-query GetBsda($id: ID!) {
-  bsda(id: $id) {
-    id
+const GET_BSDA = gql`
+  query GetBsda($id: ID!) {
+    bsda(id: $id) {
+      ...FullBsda
+    }
   }
-}
+  ${fullBsda}
 `;
 
 describe("Query.Bsda", () => {

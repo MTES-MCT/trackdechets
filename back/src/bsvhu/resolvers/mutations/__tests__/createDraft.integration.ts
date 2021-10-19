@@ -31,8 +31,8 @@ mutation CreateVhuForm($input: BsvhuInput!) {
         phone
       }
     }
-    quantity {
-      number
+    weight {
+      value
     }
   }
 }
