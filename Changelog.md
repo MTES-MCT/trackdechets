@@ -4,27 +4,15 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
+
 # Next Release (~25/10)
 
 #### :rocket: Nouvelles fonctionnalités
 
 #### :boom: Breaking changes
+
 - Harmonisation et stabilisation de l'api des bordereaux dasri [PR 992](https://github.com/MTES-MCT/trackdechets/pull/992)
- 
-#### :bug: Corrections de bugs
- 
-#### :nail_care: Améliorations
-
-#### :memo: Documentation
-
-#### :house: Interne
-
-# Next Release (~25/10)
-
-#### :rocket: Nouvelles fonctionnalités
-
-#### :boom: Breaking changes
-
+- Harmonisation et stabilisation de l'api des bordereaux BSFF [PR 991](https://github.com/MTES-MCT/trackdechets/pull/991)
 - Le champ `id` de l'input `AppendixFormInput` devient obligatoire [PR 1028](https://github.com/MTES-MCT/trackdechets/pull/1028)
 
 #### :bug: Corrections de bugs
@@ -43,7 +31,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Amélioration de la query { me } pour éviter de reqêter inutilement la base sirene  [PR 1010](https://github.com/MTES-MCT/trackdechets/pull/1010)
- 
+
 # [2021.10.1] 04/10/2021
 
 #### :rocket: Nouvelles fonctionnalités
