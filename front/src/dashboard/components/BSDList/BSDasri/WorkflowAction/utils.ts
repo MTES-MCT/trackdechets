@@ -17,7 +17,7 @@ export const emissionSignatureSecretCodeValidationSchema = yup.object({
     securityCode: yup
       .string()
       .required("Le code de signature est obligatoire")
-      .matches(/[0-9]{4}/, "Format invalide"),
+      .matches(/[1-9][0-9]{3}/, "Format invalide"),
   }),
 });
 

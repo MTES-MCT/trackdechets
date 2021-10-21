@@ -113,7 +113,7 @@ export function RouteBSDasrisSignEmissionSecretCode() {
               id: data.bsdasri.id,
               input: {
                 ...signature,
-                securityCode: parseInt(signature.securityCode),
+                securityCode: parseInt(signature.securityCode, 10),
               },
             },
           });

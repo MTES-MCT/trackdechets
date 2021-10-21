@@ -61,7 +61,7 @@ export function SignedByTransporterModal({
     securityCode: yup
       .string()
       .required("Le code de signature est obligatoire")
-      .matches(/[0-9]{4}/, "Format invalide"),
+      .matches(/[1-9][0-9]{3}/, "Format invalide"),
     sentBy: yup
       .string()
       .required("Le nom et prénom du contact est obligatoire"),
@@ -109,7 +109,7 @@ export function SignedByTransporterModal({
                 id: form.id,
                 signingInfo: {
                   ...values,
-                  securityCode: parseInt(values.securityCode),
+                  securityCode: parseInt(values.securityCode, 10),
                 },
               },
             })
