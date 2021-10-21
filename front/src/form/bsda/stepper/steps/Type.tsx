@@ -27,7 +27,7 @@ const OPTIONS = [
 ];
 
 export function Type({ disabled }: Props) {
-  const [{ value: type }] = useField<BsdaType>("type");
+  const [{ value: type }] = useField<BsdaType>(BsdaType.OtherCollections);
 
   return (
     <>
