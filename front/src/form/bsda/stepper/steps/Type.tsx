@@ -27,7 +27,7 @@ const OPTIONS = [
 ];
 
 export function Type({ disabled }: Props) {
-  const [{ value: type }] = useField<BsdaType>(BsdaType.OtherCollections);
+  const [{ value: type }] = useField<BsdaType>("type");
 
   return (
     <>
@@ -49,9 +49,11 @@ export function Type({ disabled }: Props) {
           />
         ))}
       </div>
-
-      {[BsdaType.Gathering, BsdaType.Reshipment].includes(type) && (
-        <BsdaPicker singleSelect={type === BsdaType.Reshipment} />
+      {BsdaType.Gathering === type && (
+        <BsdaPicker singleSelect={false} name="grouping" />
+      )}
+      {BsdaType.Reshipment === type && (
+        <BsdaPicker singleSelect={true} name="forwarding" />
       )}
     </>
   );

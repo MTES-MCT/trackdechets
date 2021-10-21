@@ -13,17 +13,17 @@ import { FieldArray, useField } from "formik";
 import { BsdaStatus, Query, QueryBsdasArgs } from "generated/graphql/types";
 import React from "react";
 
-type Props = { singleSelect: boolean };
-export function BsdaPicker({ singleSelect }: Props) {
+type Props = { singleSelect: boolean; name: string };
+export function BsdaPicker({ singleSelect, name }: Props) {
   const { data } = useQuery<Pick<Query, "bsdas">, QueryBsdasArgs>(GET_BSDAS, {
     variables: {
       where: {
-        status: BsdaStatus.AwaitingChild,
+        status: { _eq: BsdaStatus.AwaitingChild },
       },
     },
   });
 
-  const [{ value: associations }] = useField<string[]>("associations");
+  const [{ value: associations }] = useField<string[]>(name);
 
   if (data == null) {
     return <Loader />;
@@ -31,7 +31,7 @@ export function BsdaPicker({ singleSelect }: Props) {
 
   return (
     <FieldArray
-      name="associations"
+      name={name}
       render={({ push, remove, pop }) => (
         <Table isSelectable>
           <TableHead>

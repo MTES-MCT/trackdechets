@@ -2,6 +2,7 @@ import { User, Bsda, BsdaStatus } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { NotFormContributor } from "../forms/errors";
 import { getFullUser } from "../users/database";
+import prisma from "../prisma";
 
 export async function checkIsBsdaContributor(
   user: User,

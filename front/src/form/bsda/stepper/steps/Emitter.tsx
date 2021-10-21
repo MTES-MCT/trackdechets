@@ -89,7 +89,7 @@ export function Emitter({ disabled }) {
         designation="de l'entreprise"
         getInitialEmitterWorkSiteFn={getInitialEmitterPickupSite}
         disabled={disabled}
-        key={"pickupSite"}
+        modelKey="pickupSite"
       />
     </>
   );

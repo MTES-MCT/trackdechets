@@ -8,7 +8,6 @@ import { getComputedState } from "form/common/stepper/GenericStepList";
 import { Field, Form, Formik } from "formik";
 import {
   BsdaConsistence,
-  BsdaQuantityType,
   BsdaSignatureType,
   Mutation,
   MutationSignBsdaArgs,
@@ -73,9 +72,9 @@ export function SignWork({ siret, bsdaId }: Props) {
                     consistence: BsdaConsistence.Solide,
                     sealNumbers: [],
                   },
-                  quantity: {
+                  weight: {
                     value: null,
-                    type: BsdaQuantityType.Real,
+                    isEstimate: false,
                   },
                 },
                 bsda

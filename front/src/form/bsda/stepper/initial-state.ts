@@ -2,7 +2,6 @@ import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import {
   BsdaConsistence,
   BsdaType,
-  QuantityType,
   TransportMode,
 } from "generated/graphql/types";
 
@@ -60,5 +59,6 @@ export default {
       },
     },
   },
-  associations: [],
+  grouping: [],
+  forwarding: null,
 };

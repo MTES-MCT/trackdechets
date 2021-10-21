@@ -13,14 +13,14 @@ export default function WorkSite({
   designation,
   getInitialEmitterWorkSiteFn,
   disabled = false,
-  key = DEFAULT_KEY,
+  modelKey = DEFAULT_KEY,
 }: {
   switchLabel: string;
   headingTitle: string;
   designation: string;
   getInitialEmitterWorkSiteFn: () => any;
   disabled?: boolean;
-  key?: string;
+  modelKey?: string;
 }) {
   const { values, setFieldValue } = useFormikContext<Form>();
 
@@ -28,16 +28,20 @@ export default function WorkSite({
 
   function handleWorksiteToggle() {
     if (showWorkSite) {
-      setFieldValue(`emitter.${key}`, null, false);
+      setFieldValue(`emitter.${modelKey}`, null, false);
     } else {
-      setFieldValue(`emitter.${key}`, getInitialEmitterWorkSiteFn(), false);
+      setFieldValue(
+        `emitter.${modelKey}`,
+        getInitialEmitterWorkSiteFn(),
+        false
+      );
     }
   }
 
   function setAddress(details) {
-    setFieldValue(`emitter.${key}.address`, details.name);
-    setFieldValue(`emitter.${key}.city`, details.city);
-    setFieldValue(`emitter.${key}.postalCode`, details.postcode);
+    setFieldValue(`emitter.${modelKey}.address`, details.name);
+    setFieldValue(`emitter.${modelKey}.city`, details.city);
+    setFieldValue(`emitter.${modelKey}.postalCode`, details.postcode);
   }
 
   return (
@@ -59,7 +63,7 @@ export default function WorkSite({
               Nom {designation}
               <Field
                 type="text"
-                name={`emitter.${key}.name`}
+                name={`emitter.${modelKey}.name`}
                 placeholder="Intitulé"
                 className="td-input"
                 disabled={disabled}
@@ -85,7 +89,7 @@ export default function WorkSite({
                 component="textarea"
                 className="textarea-pickup-site td-textarea"
                 placeholder="Champ libre pour préciser..."
-                name={`emitter.${key}.infos`}
+                name={`emitter.${modelKey}.infos`}
                 disabled={disabled}
               />
             </label>

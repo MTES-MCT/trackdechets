@@ -524,10 +524,7 @@ const wasteDescriptionSchema: FactorySchemaOf<
     packagings: yup.array(),
     weightIsEstimate: yup
       .boolean()
-      .requiredIf(
-        context.workSignature,
-        `Le type de quantité est obligatoire`
-      ),
+      .requiredIf(context.workSignature, `Le type de quantité est obligatoire`),
     weightValue: yup
       .number()
       .requiredIf(context.workSignature, `La quantité est obligatoire`)
