@@ -12,7 +12,6 @@ import {
   Mutation,
   MutationSignBsdasriEmissionWithSecretCodeArgs,
   MutationUpdateBsdasriArgs,
-  BsdasriSignatureWithSecretCodeInput,
   BsdasriSignatureType,
 } from "generated/graphql/types";
 import { getComputedState } from "form/common/stepper/GenericStepList";
@@ -34,8 +33,7 @@ import {
   emissionSignatureSecretCodeValidationSchema,
   prefillWasteDetails,
 } from "./utils";
-
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";
 
 export function RouteBSDasrisSignEmissionSecretCode() {
   const history = useHistory();
@@ -94,11 +92,10 @@ export function RouteBSDasrisSignEmissionSecretCode() {
       <Formik
         initialValues={{
           ...prefillWasteDetails(getComputedState(getInitialState(), bsdasri)),
-
           signature: {
             author: "",
-            securityCode: "" as unknown,
-          } as BsdasriSignatureWithSecretCodeInput,
+            securityCode: "",
+          },
         }}
         validationSchema={emissionSignatureSecretCodeValidationSchema}
         onSubmit={async values => {
@@ -114,7 +111,10 @@ export function RouteBSDasrisSignEmissionSecretCode() {
           await signBsdasriEmissionWithSecretCode({
             variables: {
               id: data.bsdasri.id,
-              input: { ...signature },
+              input: {
+                ...signature,
+                securityCode: parseInt(signature.securityCode, 10),
+              },
             },
           });
 
@@ -139,13 +139,11 @@ export function RouteBSDasrisSignEmissionSecretCode() {
                 <Label htmlFor="id_securityCode">Code de signature </Label>
 
                 <Field
-                  component={NumberInput}
+                  component={SignatureCodeInput}
                   name="signature.securityCode"
                   id="id_securityCode"
-                  type="number"
                   className="field__block td-input"
                   required
-                  noSpin
                   style={{ width: "100px" }}
                 />
               </div>
