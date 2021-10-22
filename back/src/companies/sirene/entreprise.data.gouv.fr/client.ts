@@ -43,7 +43,7 @@ function searchResponseToCompany({
     addressCity: etablissement.libelle_commune,
     codeCommune: etablissement.code_commune,
     name: etablissement.unite_legale.denomination,
-    naf: etablissement.unite_legale.activite_principale,
+    naf: etablissement.activite_principale,
     libelleNaf: ""
   };
 
@@ -126,7 +126,8 @@ function fullTextSearchResponseToCompanies(
       addressCity: etablissement.libelle_commune,
       name: etablissement.nom_raison_sociale,
       naf: etablissement.activite_principale,
-      libelleNaf: etablissement.libelle_activite_principale
+      libelleNaf: etablissement.libelle_activite_principale,
+      etatAdministratif: "A"
     };
   });
 }
