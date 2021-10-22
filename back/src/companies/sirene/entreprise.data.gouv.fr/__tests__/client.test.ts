@@ -24,9 +24,9 @@ describe("searchCompany", () => {
           code_postal: "13001",
           code_commune: "13201",
           libelle_commune: "MARSEILLE",
+          activite_principale: "62.01Z",
           unite_legale: {
-            denomination: "CODE EN STOCK",
-            activite_principale: "62.01Z"
+            denomination: "CODE EN STOCK"
           }
         }
       }
@@ -62,12 +62,12 @@ describe("searchCompany", () => {
           code_commune: "13201",
           libelle_commune: "MARSEILLE",
           geo_adresse: "4 RUE DES ROSIERS 13001 Marseille",
+          activite_principale: "86.21Z",
           unite_legale: {
             denomination: null,
             prenom_1: "JOHN",
             nom: "SNOW",
-            categorie_juridique: "1000",
-            activite_principale: "86.21Z"
+            categorie_juridique: "1000"
           }
         }
       }
@@ -139,7 +139,8 @@ describe("searchCompanies", () => {
       addressCity: "MARSEILLE",
       name: "CODE EN STOCK",
       naf: "6201Z",
-      libelleNaf: "Programmation informatique"
+      libelleNaf: "Programmation informatique",
+      etatAdministratif: "A"
     };
     expect(companies[0]).toEqual(expected);
   });
@@ -160,7 +161,8 @@ describe("searchCompanies", () => {
             activite_principale: "1071C",
             libelle_activite_principale:
               "Boulangerie et boulangerie-pâtisserie",
-            geo_adresse: "18 Cours Joseph Thierry 13001 Marseille"
+            geo_adresse: "18 Cours Joseph Thierry 13001 Marseille",
+            etatAdministratif: "A"
           }
         ]
       }
@@ -230,7 +232,8 @@ describe("searchCompanies", () => {
       name: "BOULANGERIE",
       naf: "4724Z",
       libelleNaf:
-        "Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé"
+        "Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé",
+      etatAdministratif: "A"
     };
     expect(companies[0]).toEqual(expected);
     expect(
@@ -253,9 +256,9 @@ describe("searchCompanies", () => {
           code_postal: "13001",
           libelle_commune: "MARSEILLE",
           geo_adresse: "4 Boulevard Longchamp 13001 Marseille",
+          activite_principale: "62.01Z",
           unite_legale: {
-            denomination: "CODE EN STOCK",
-            activite_principale: "62.01Z"
+            denomination: "CODE EN STOCK"
           }
         }
       }
