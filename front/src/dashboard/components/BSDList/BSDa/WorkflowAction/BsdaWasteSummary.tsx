@@ -24,6 +24,10 @@ export function BsdaWasteSummary({ bsda }: Props) {
         <DataListDescription>{bsda.waste?.code}</DataListDescription>
       </DataListItem>
       <DataListItem>
+        <DataListTerm>Numéro de CAP</DataListTerm>
+        <DataListDescription>{bsda.destination?.cap}</DataListDescription>
+      </DataListItem>
+      <DataListItem>
         <DataListTerm>Description</DataListTerm>
         <DataListDescription>
           {[bsda.waste?.materialName, bsda.waste?.familyCode, bsda.waste?.name]

@@ -4,7 +4,7 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useFormikContext } from "formik";
-import { Bsvhu } from "generated/graphql/types";
+import { Bsvhu, BsvhuDestinationType } from "generated/graphql/types";
 import React from "react";
 import TagsInput from "./components/tags-input/TagsInput";
 
@@ -82,15 +82,21 @@ export default function Operation() {
         <RedErrorMessage name="destination.reception.weight" />
       </div>
 
-      <h4 className="form__section-heading">Identification & Quantité</h4>
-      <div className="form__row">
-        <label>
-          Identification des numeros entrant des lots ou des VHU (livre de
-          police)
-          <Tooltip msg="Saisissez les identifications une par une. Appuyez sur la touche <Entrée> pour valider chacune" />
-          <TagsInput name="destination.reception.identification.numbers" />
-        </label>
-      </div>
+      {values.destination?.type === BsvhuDestinationType.Demolisseur && (
+        <>
+          <h4 className="form__section-heading">Identification</h4>
+          <div className="form__row">
+            <label>
+              Identification des numeros entrant des lots ou des VHU (livre de
+              police)
+              <Tooltip msg="Saisissez les identifications une par une. Appuyez sur la touche <Entrée> pour valider chacune" />
+              <TagsInput name="destination.reception.identification.numbers" />
+            </label>
+          </div>
+        </>
+      )}
+
+      <h4 className="form__section-heading">Quantité</h4>
       <div className="form__row">
         <label>
           En nombre

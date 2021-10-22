@@ -28,7 +28,54 @@ export function Emitter({ disabled }) {
         </label>
       </div>
 
-      {!values.emitter?.isPrivateIndividual && (
+      {values.emitter?.isPrivateIndividual ? (
+        <>
+          <div className="form__row">
+            <label>
+              Nom et prénom
+              <Field
+                type="text"
+                name="emitter.company.contact"
+                className="td-input td-input"
+                disabled={disabled}
+              />
+            </label>
+          </div>
+          <div className="form__row">
+            <label>
+              Adresse
+              <Field
+                type="text"
+                name="emitter.company.address"
+                className="td-input td-input"
+                disabled={disabled}
+              />
+            </label>
+          </div>
+          <div className="form__row">
+            <label>
+              Téléphone
+              <Field
+                type="text"
+                name="emitter.company.phone"
+                className="td-input td-input--small"
+                disabled={disabled}
+              />
+            </label>
+          </div>
+          <div className="form__row">
+            <label>
+              Mail
+              <Field
+                type="text"
+                name="emitter.company.mail"
+                className="td-input td-input--medium"
+                disabled={disabled}
+              />
+            </label>
+          </div>
+        </>
+      ) : (
         <CompanySelector
           disabled={disabled}
           name="emitter.company"
@@ -42,7 +89,7 @@ export function Emitter({ disabled }) {
         designation="de l'entreprise"
         getInitialEmitterWorkSiteFn={getInitialEmitterPickupSite}
         disabled={disabled}
-        key={"pickupSite"}
+        modelKey="pickupSite"
       />
     </>
   );

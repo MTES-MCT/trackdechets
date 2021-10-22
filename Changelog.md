@@ -31,8 +31,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout d'un message d'erreur lorsque l'on requête un établissement non diffusable [PR 1009](https://github.com/MTES-MCT/trackdechets/pull/1009)
 - Suppression de la bannière d'avertissement DASRI, amiante, FF [PR 1016](https://github.com/MTES-MCT/trackdechets/pull/1016)
 - Ajout de la possibilité de mettre à jour un BSDD à l'état `RESEALED` en appelant plusieurs fois la mutation `markAsResealed`. Cette fonctionnalité n'est disponible que par API. [PR 1014](https://github.com/MTES-MCT/trackdechets/pull/1014)
-- Sécurisation des inputs de code de signature dans l'UI [PR 1019](https://github.com/MTES-MCT/trackdechets/pull/1019)
-
+- Multiples améliorations sur les formulaires de création et de signature VHU et amiante [PR 1036](https://github.com/MTES-MCT/trackdechets/pull/1036)
 #### :memo: Documentation
 
 #### :house: Interne
