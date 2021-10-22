@@ -2,16 +2,30 @@ import { Bsff, BsffStatus } from "@prisma/client";
 import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 import { GraphQLContext } from "../types";
+import { getRegisterFields } from "./register";
 
 function toBsdElastic(bsff: Bsff): BsdElastic {
   const bsd = {
+    type: "BSFF" as const,
     id: bsff.id,
     readableId: bsff.id,
-    type: "BSFF" as const,
-    emitter: bsff.emitterCompanyName ?? "",
-    recipient: bsff.destinationCompanyName ?? "",
-    waste: [bsff.wasteCode, bsff.wasteDescription].filter(Boolean).join(" "),
     createdAt: bsff.createdAt.getTime(),
+    emitterCompanyName: bsff.emitterCompanyName ?? "",
+    emitterCompanySiret: bsff.emitterCompanySiret ?? "",
+    transporterCompanyName: bsff.transporterCompanyName ?? "",
+    transporterCompanySiret: bsff.transporterCompanySiret ?? "",
+    transporterTakenOverAt:
+      bsff.transporterTransportTakenOverAt?.getTime() ??
+      bsff.transporterTransportSignatureDate?.getTime(),
+    destinationCompanyName: bsff.destinationCompanyName ?? "",
+    destinationCompanySiret: bsff.destinationCompanySiret ?? "",
+    destinationReceptionDate: bsff.destinationReceptionDate?.getTime(),
+    destinationReceptionWeight: bsff.destinationReceptionWeight,
+    destinationOperationCode: bsff.destinationOperationCode ?? "",
+    destinationOperationDate: bsff.destinationOperationSignatureDate?.getTime(),
+    wasteCode: bsff.wasteCode ?? "",
+    wasteDescription: bsff.wasteDescription ?? "",
+
     isDraftFor: [],
     isForActionFor: [],
     isFollowFor: [],
@@ -22,7 +36,8 @@ function toBsdElastic(bsff: Bsff): BsdElastic {
       bsff.emitterCompanySiret,
       bsff.transporterCompanySiret,
       bsff.destinationCompanySiret
-    ]
+    ],
+    ...getRegisterFields(bsff)
   };
 
   if (bsff.isDraft) {
@@ -92,7 +107,7 @@ export async function indexAllBsffs(
   idx: string,
   { skip = 0 }: { skip?: number } = {}
 ) {
-  const take = 1000;
+  const take = 500;
   const bsffs = await prisma.bsff.findMany({
     skip,
     take,

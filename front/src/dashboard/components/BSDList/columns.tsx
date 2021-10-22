@@ -32,11 +32,11 @@ export const COLUMNS_PARAMETERS_NAME = {
   },
   emitter: {
     filter: "emitter",
-    order: "emitter",
+    order: "emitterCompanyName",
   },
   recipient: {
     filter: "recipient",
-    order: "recipient",
+    order: "destinationCompanyName",
   },
   transporterNumberPlate: {
     filter: "transporterNumberPlate",
@@ -48,7 +48,7 @@ export const COLUMNS_PARAMETERS_NAME = {
   },
   waste: {
     filter: "waste",
-    order: "waste",
+    order: "wasteCode",
   },
 };
 

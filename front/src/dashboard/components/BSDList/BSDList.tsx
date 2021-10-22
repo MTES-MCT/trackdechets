@@ -72,6 +72,7 @@ export function BSDList({
     QueryBsdsArgs
   >(GET_BSDS, {
     variables: {
+      first: 10,
       where: defaultWhere,
     },
     fetchPolicy: "cache-and-network",

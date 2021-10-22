@@ -17,7 +17,7 @@ input BsdWhere {
 input OrderBy {
   type: OrderType
   readableId: OrderType
-  emitter: OrderType
-  recipient: OrderType
-  waste: OrderType
+  emitterCompanyName: OrderType
+  destinationCompanyName: OrderType
+  wasteCode: OrderType
 }

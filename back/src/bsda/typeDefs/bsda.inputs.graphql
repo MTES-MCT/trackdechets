@@ -103,7 +103,7 @@ input BsdaInput {
   waste: BsdaWasteInput
   "Conditionnement"
   packagings: [BsdaPackagingInput!]
-  "Quantité"
+  "Quantité en tonnes, réelle ou estimée"
   weight: BsdaWeightInput
 
   "Installation de destination"
@@ -197,7 +197,7 @@ input BsdaDestinationInput {
 input BsdaReceptionInput {
   "Date de présentation sur site"
   date: DateTime
-  "Quantité présentée"
+  "Quantité présentée en tonnes"
   weight: Float
   "Lot accepté, accepté partiellement ou refusé"
   acceptationStatus: WasteAcceptationStatus

@@ -86,6 +86,7 @@ input BsffInput {
   emitter: BsffEmitterInput
   packagings: [BsffPackagingInput!]
   waste: BsffWasteInput
+  "Quantité en kilogrammes"
   weight: BsffWeightInput
   transporter: BsffTransporterInput
   destination: BsffDestinationInput

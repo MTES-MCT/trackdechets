@@ -3,6 +3,7 @@ import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 import { FullForm } from "./types";
 import { GraphQLContext } from "../types";
+import { getRegisterFields } from "./register";
 
 function getWhere(
   form: FullForm
@@ -212,14 +213,11 @@ function getWhere(
 
 function getRecipient(form: FullForm) {
   return form.temporaryStorageDetail?.signedByTransporter
-    ? form.temporaryStorageDetail.destinationCompanyName
-    : form.recipientCompanyName;
-}
-
-function getWaste(form: FullForm) {
-  return [form.wasteDetailsCode, form.wasteDetailsName]
-    .filter(Boolean)
-    .join(" ");
+    ? {
+        name: form.temporaryStorageDetail.destinationCompanyName,
+        siret: form.temporaryStorageDetail.destinationCompanySiret
+      }
+    : { name: form.recipientCompanyName, siret: form.recipientCompanySiret };
 }
 
 /**
@@ -227,18 +225,30 @@ function getWaste(form: FullForm) {
  */
 function toBsdElastic(form: FullForm): BsdElastic {
   const where = getWhere(form);
+  const recipient = getRecipient(form);
   return {
+    type: "BSDD",
     id: form.id,
     readableId: form.readableId,
-    type: "BSDD",
-    emitter: form.emitterCompanyName ?? "",
-    recipient: getRecipient(form) ?? "",
+    createdAt: form.createdAt.getTime(),
+    emitterCompanyName: form.emitterCompanyName ?? "",
+    emitterCompanySiret: form.emitterCompanySiret ?? "",
+    transporterCompanyName: form.transporterCompanyName ?? "",
+    transporterCompanySiret: form.transporterCompanySiret ?? "",
+    transporterTakenOverAt: form.sentAt?.getTime(),
+    destinationCompanyName: recipient.name ?? "",
+    destinationCompanySiret: recipient.siret ?? "",
+    destinationReceptionDate: form.receivedAt?.getTime(),
+    destinationReceptionWeight: form.quantityReceived,
+    destinationOperationCode: form.processingOperationDone ?? "",
+    destinationOperationDate: form.processedAt?.getTime(),
+    wasteCode: form.wasteDetailsCode ?? "",
+    wasteDescription: form.wasteDetailsName,
     transporterNumberPlate: [form.transporterNumberPlate],
     transporterCustomInfo: form.transporterCustomInfo,
-    waste: getWaste(form),
-    createdAt: form.createdAt.getTime(),
     ...where,
-    sirets: Object.values(where).flat()
+    sirets: Object.values(where).flat(),
+    ...getRegisterFields(form)
   };
 }
 
@@ -249,7 +259,7 @@ export async function indexAllForms(
   idx: string,
   { skip = 0 }: { skip?: number } = {}
 ) {
-  const take = 1000;
+  const take = 500;
   const forms = await prisma.form.findMany({
     skip,
     take,

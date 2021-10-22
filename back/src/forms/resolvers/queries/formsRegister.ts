@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
 import * as yup from "yup";
@@ -6,23 +7,45 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import {
   QueryFormsRegisterArgs,
-  QueryResolvers
+  QueryResolvers,
+  QueryWastesDownloadLinkArgs
 } from "../../../generated/graphql/types";
 import { downloadFormsRegister } from "../../exports/handler";
 import { formsWhereInput } from "../../exports/where-inputs";
 import { DownloadHandler } from "../../../routers/downloadRouter";
+import { wastesDownloadHandler } from "../../../register/resolvers/queries/wastesDownloadLink";
+=======
+import { checkIsAuthenticated } from "../../../common/permissions";
+import { checkIsCompanyMember } from "../../../users/permissions";
+import {
+  FormsRegisterExportType,
+  QueryResolvers,
+  QueryWastesDownloadLinkArgs,
+  WasteRegisterType
+} from "../../../generated/graphql/types";
 
-const validationSchema = yup.object().shape({
-  startDate: yup.date().nullable(),
-  endDate: yup.date().nullable()
-});
+import { getWastesDownloadToken } from "../../../register/download";
+>>>>>>> 2bd96afb (Regsitre multi-bordereaux combinaison de commits)
 
-export const formsRegisterDownloadHandler: DownloadHandler<QueryFormsRegisterArgs> =
-  {
-    name: "formsRegister",
-    handler: downloadFormsRegister
-  };
+// compatibility between register v1 and register v2
+const exportTypeToRegisterType: Record<
+  FormsRegisterExportType,
+  WasteRegisterType
+> = {
+  OUTGOING: "OUTGOING",
+  INCOMING: "INCOMING",
+  TRANSPORTED: "TRANSPORTED",
+  TRADED: "MANAGED",
+  BROKERED: "MANAGED",
+  ALL: "ALL"
+};
 
+/**
+ * DEPRECATED
+ * Forms only register exports
+ * This resolver calls wastesDownloadLink resolver with bsdType=BSDD
+ * for compatibility
+ */
 const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
   parent,
   args,
@@ -30,33 +53,33 @@ const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  validationSchema.validateSync(args);
-
   for (const siret of args.sirets) {
     // check user is member of every provided sirets
     await checkIsCompanyMember({ id: user.id }, { siret: siret });
   }
 
-  const whereInput = formsWhereInput(
-    args.exportType,
-    args.sirets,
-    args.startDate ? new Date(args.startDate) : null,
-    args.endDate ? new Date(args.endDate) : null,
-    args.wasteCode
-  );
+  const wasteDownloadLinkArgs: QueryWastesDownloadLinkArgs = {
+    registerType: exportTypeToRegisterType[args.exportType],
+    fileType: args.exportFormat,
+    sirets: args.sirets,
+    where: {
+      bsdType: { _eq: "BSDD" },
+      ...(args.wasteCode ? { wasteCode: { _eq: args.wasteCode } } : {}),
+      ...(args.startDate || args.endDate
+        ? {
+            createdAt: {
+              ...(args.startDate ? { _gte: new Date(args.startDate) } : {}),
+              ...(args.endDate ? { _lte: new Date(args.endDate) } : {})
+            }
+          }
+        : {})
+    }
+  };
 
-  // check if register is empty
-  const isEmpty = !(await prisma.form.findFirst({ where: whereInput }));
-
-  if (isEmpty) {
-    throw new UserInputError(
-      "Aucune donnée à exporter sur la période sélectionnée"
-    );
-  }
-
+  // defer execution to new wastesDownloadHandler
   return getFileDownload({
-    handler: formsRegisterDownloadHandler.name,
-    params: args
+    handler: wastesDownloadHandler.name,
+    params: wasteDownloadLinkArgs
   });
 };
 

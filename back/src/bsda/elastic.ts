@@ -2,6 +2,7 @@ import { Bsda, BsdaStatus } from "@prisma/client";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 import prisma from "../prisma";
 import { GraphQLContext } from "../types";
+import { getRegisterFields } from "./register";
 
 // | state              | emitter          | worker           | transporter | destination      |
 // |--------------------|------------------|------------------|-------------|------------------|
@@ -111,25 +112,34 @@ function getWhere(
   return where;
 }
 
-function getWaste(bsda: Bsda) {
-  return [bsda.wasteName, bsda.wasteMaterialName, bsda.wasteCode]
-    .filter(Boolean)
-    .join(", ");
+function getWasteDescription(bsda: Bsda) {
+  return [bsda.wasteName, bsda.wasteMaterialName].filter(Boolean).join(", ");
 }
 
 function toBsdElastic(bsda: Bsda): BsdElastic {
   const where = getWhere(bsda);
 
   return {
+    type: "BSDA",
     id: bsda.id,
     readableId: bsda.id,
-    type: "BSDA",
-    emitter: bsda.emitterCompanyName ?? "",
-    recipient: bsda.destinationCompanyName ?? "",
-    waste: getWaste(bsda),
     createdAt: bsda.createdAt.getTime(),
+    emitterCompanyName: bsda.emitterCompanyName ?? "",
+    emitterCompanySiret: bsda.emitterCompanySiret ?? "",
+    transporterCompanyName: bsda.transporterCompanyName ?? "",
+    transporterCompanySiret: bsda.transporterCompanySiret ?? "",
+    transporterTakenOverAt: bsda.transporterTransportTakenOverAt?.getTime(),
+    destinationCompanyName: bsda.destinationCompanyName ?? "",
+    destinationCompanySiret: bsda.destinationCompanySiret ?? "",
+    destinationReceptionDate: bsda.destinationReceptionDate?.getTime(),
+    destinationReceptionWeight: bsda.destinationReceptionWeight,
+    destinationOperationCode: bsda.destinationOperationCode ?? "",
+    destinationOperationDate: bsda.destinationOperationDate?.getTime(),
+    wasteCode: bsda.wasteCode ?? "",
+    wasteDescription: getWasteDescription(bsda),
     ...where,
-    sirets: Object.values(where).flat()
+    sirets: Object.values(where).flat(),
+    ...getRegisterFields(bsda)
   };
 }
 
@@ -137,7 +147,7 @@ export async function indexAllBsdas(
   idx: string,
   { skip = 0 }: { skip?: number } = {}
 ) {
-  const take = 1000;
+  const take = 500;
   const bsdas = await prisma.bsda.findMany({
     skip,
     take,

@@ -13,7 +13,10 @@ import {
   BsdElastic,
   index,
   getKeywordFieldNameFromName,
-  getFieldNameFromKeyword
+  getFieldNameFromKeyword,
+  GetResponse,
+  SearchResponse,
+  toPrismaBsds
 } from "../../../common/elastic";
 import { Bsdasri } from "@prisma/client";
 import prisma from "../../../prisma";
@@ -23,22 +26,6 @@ import { expandVhuFormFromDb } from "../../../bsvhu/converter";
 import { expandBsdaFromDb } from "../../../bsda/converter";
 import { getUserCompanies } from "../../../users/database";
 import { unflattenBsff } from "../../../bsffs/converter";
-
-// complete Typescript example:
-// https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
-
-interface SearchResponse<T> {
-  hits: {
-    total: number;
-    hits: Array<{
-      _source: T;
-    }>;
-  };
-}
-
-interface GetResponse<T> {
-  _source: T;
-}
 
 async function buildQuery(
   { clue, where = {} }: QueryBsdsArgs,
@@ -70,8 +57,8 @@ async function buildQuery(
     });
 
   Object.entries({
-    emitter: where.emitter,
-    recipient: where.recipient,
+    emitterCompanyName: where.emitter,
+    destinationCompanyName: where.recipient,
     transporterCustomInfo: where.transporterCustomInfo
   })
     .filter(([_, value]) => value != null)
@@ -120,14 +107,14 @@ async function buildQuery(
           {
             match: {
               // match on waste code
-              "waste.ngram": {
+              "wasteCode.ngram": {
                 query: where.waste
               }
             }
           },
           {
             match: {
-              waste: {
+              wasteDescription: {
                 // match on waste description
                 query: where.waste,
                 fuzziness: "AUTO"
@@ -143,7 +130,12 @@ async function buildQuery(
     query.bool.must.push({
       multi_match: {
         query: clue,
-        fields: ["readableId", "emitter", "recipient", "waste"],
+        fields: [
+          "readableId",
+          "emitterCompanyName",
+          "destinationCompanyName",
+          "wasteDescription"
+        ],
         fuzziness: "AUTO"
       }
     });
@@ -270,62 +262,18 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   );
   const hits = body.hits.hits.slice(0, size);
 
-  const ids = hits.reduce<Record<BsdType, string[]>>(
-    (acc, { _source: { type, id } }) => ({
-      ...acc,
-      [type]: acc[type].concat([id])
-    }),
-    { BSDD: [], BSDASRI: [], BSVHU: [], BSDA: [], BSFF: [] }
+  const { bsdds, bsdasris, bsvhus, bsdas, bsffs } = await toPrismaBsds(
+    hits.map(hit => hit._source)
   );
-  const dasris = await prisma.bsdasri.findMany({
-    where: {
-      id: {
-        in: ids.BSDASRI
-      }
-    }
-  });
 
-  const expandedDasris = await buildDasris(dasris);
+  const expandedDasris = await buildDasris(bsdasris);
 
   const bsds: Record<BsdType, Bsd[]> = {
-    BSDD: (
-      await prisma.form.findMany({
-        where: {
-          id: {
-            in: ids.BSDD
-          }
-        }
-      })
-    ).map(expandFormFromDb),
+    BSDD: bsdds.map(expandFormFromDb),
     BSDASRI: expandedDasris,
-
-    BSVHU: (
-      await prisma.bsvhu.findMany({
-        where: {
-          id: {
-            in: ids.BSVHU
-          }
-        }
-      })
-    ).map(expandVhuFormFromDb),
-    BSDA: (
-      await prisma.bsda.findMany({
-        where: {
-          id: {
-            in: ids.BSDA
-          }
-        }
-      })
-    ).map(expandBsdaFromDb),
-    BSFF: (
-      await prisma.bsff.findMany({
-        where: {
-          id: {
-            in: ids.BSFF
-          }
-        }
-      })
-    ).map(unflattenBsff)
+    BSVHU: bsvhus.map(expandVhuFormFromDb),
+    BSDA: bsdas.map(expandBsdaFromDb),
+    BSFF: bsffs.map(unflattenBsff)
   };
   const edges = hits
     .reduce<Array<Bsd>>((acc, { _source: { type, id } }) => {

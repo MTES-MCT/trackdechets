@@ -98,6 +98,7 @@ type BsdasriWaste {
 type BsdasriWasteAcceptation {
   status: WasteAcceptationStatus
   refusalReason: String
+  "Poids refusé en kilogrammes"
   refusedWeight: Float
 }
 

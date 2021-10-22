@@ -8,7 +8,7 @@ import {
 import { json, urlencoded } from "body-parser";
 import redisStore from "connect-redis";
 import cors from "cors";
-import express from "express";
+import express, { static as serveStatic } from "express";
 import rateLimit from "express-rate-limit";
 import session from "express-session";
 import depthLimit from "graphql-depth-limit";
@@ -217,7 +217,7 @@ app.get("/exports", (_, res) =>
 
 app.use(
   "/graphiql",
-  express.static(path.join(__dirname, "common/plugins/graphiql/assets"))
+  serveStatic(path.join(__dirname, "common/plugins/graphiql/assets"))
 );
 
 // Apply passport auth middlewares to the graphQL endpoint

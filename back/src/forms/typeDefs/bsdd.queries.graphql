@@ -159,9 +159,8 @@ type Query {
   formPdf("ID d'un BSD" id: ID): FileDownload!
 
   """
-  Renvoie un token pour télécharger un csv du regsitre
-  Ce token doit être transmis à la route /download pour obtenir le fichier.
-  Il est valable 10 secondes
+  DEPRECATED - Renvoie un lien de téléchargement pour télécharger le registre BSDD
+  Le lien est valable 10 secondes
   """
   formsRegister(
     """
@@ -198,7 +197,7 @@ type Query {
     Défaut: csv
     """
     exportFormat: FormsRegisterExportFormat
-  ): FileDownload!
+  ): FileDownload! @deprecated(reason: "Utiliser wastesDownloadLink")
 
   """
   Renvoie les changements de statut des bordereaux de l'entreprise sélectionnée.
