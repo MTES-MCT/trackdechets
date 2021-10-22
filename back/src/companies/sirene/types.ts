@@ -23,6 +23,10 @@ export interface SearchResponseDataGouv {
   };
 }
 
+interface PeriodeEtablissementInsee {
+  etatAdministratifEtablissement: string;
+  activitePrincipaleEtablissement: string;
+}
 interface EtablissementInsee {
   siret: string;
   uniteLegale: {
@@ -43,6 +47,7 @@ interface EtablissementInsee {
     libelleCommuneEtablissement: string;
     codeCommuneEtablissement: string;
   };
+  periodesEtablissement: PeriodeEtablissementInsee[];
 }
 
 // Response from https://api.insee.fr/entreprises/siret/V3/siret/<VOTRE_SIRET>
