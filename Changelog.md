@@ -30,11 +30,13 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Suppression de la bannière d'avertissement DASRI, amiante, FF [PR 1016](https://github.com/MTES-MCT/trackdechets/pull/1016)
 - Ajout de la possibilité de mettre à jour un BSDD à l'état `RESEALED` en appelant plusieurs fois la mutation `markAsResealed`. Cette fonctionnalité n'est disponible que par API. [PR 1014](https://github.com/MTES-MCT/trackdechets/pull/1014)
 - Multiples améliorations sur les formulaires de création et de signature VHU et amiante [PR 1036](https://github.com/MTES-MCT/trackdechets/pull/1036)
+- Gestion des plaques d'immatriculation des dasris [PR 1041](https://github.com/MTES-MCT/trackdechets/pull/1041)
+
 #### :memo: Documentation
 
 #### :house: Interne
 
-- Amélioration de la query { me } pour éviter de reqêter inutilement la base sirene  [PR 1010](https://github.com/MTES-MCT/trackdechets/pull/1010)
+- Amélioration de la query { me } pour éviter de reqêter inutilement la base sirene [PR 1010](https://github.com/MTES-MCT/trackdechets/pull/1010)
 
 # [2021.10.1] 04/10/2021
 

@@ -8,9 +8,6 @@ function reducer(
   state: { selected: string[] },
   action: { type: string; payload: Bsdasri | Bsdasri[] }
 ) {
-  console.log(action.payload);
-  console.log(action.type);
-  console.log(state);
   switch (action.type) {
     case "select":
       const sp = action.payload as Bsdasri;
@@ -45,8 +42,6 @@ export default function BsdasriSelector({ name }) {
     values,
   ]);
 
-  console.log("name, values", name, values);
-  console.log("regroupedInDB", regroupedInDB);
   useEffect(() => {
     setFieldValue(
       name,

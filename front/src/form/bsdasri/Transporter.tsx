@@ -2,7 +2,7 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { Field, useFormikContext } from "formik";
-import { BsdasriStatus } from "generated/graphql/types";
+import { BsdasriStatus, Bsdasri } from "generated/graphql/types";
 import React from "react";
 import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 import Packagings from "./components/packagings/Packagings";
@@ -10,7 +10,8 @@ import { getInitialWeightFn } from "./utils/initial-state";
 import { transportModeLabels } from "dashboard/constants";
 import { FillFieldsInfo, DisabledFieldsInfo } from "./utils/commons";
 import classNames from "classnames";
-
+import Tooltip from "common/components/Tooltip";
+import TagsInput from "common/components/tags-input/TagsInput";
 import WeightWidget from "./components/Weight";
 
 /**
@@ -32,8 +33,7 @@ export default function Transporter({ status, stepName }) {
   return <BaseTransporter status={status} stepName={stepName} />;
 }
 function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
-  const { setFieldValue } = useFormikContext();
-
+  const { values, setFieldValue } = useFormikContext<Bsdasri>();
   // handedOverAt is editable even after dasri reception
   const showHandedOverAtField = [
     BsdasriStatus.Sent,
@@ -43,6 +43,16 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
   const disabled = [BsdasriStatus.Sent, BsdasriStatus.Received].includes(
     status
   );
+
+  const showTransportePlates = values?.transporter?.transport?.mode === "ROAD";
+
+  function handleTransportMode(e) {
+    setFieldValue("transporter.transport.mode", e.target.value, false);
+    if (e.target.value !== "ROAD") {
+      setFieldValue("transporter.transport.plates", [], false);
+    }
+  }
+
   const transportEmphasis = stepName === "transport";
   return (
     <>
@@ -156,6 +166,7 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
           id="id_mode"
           className="td-select"
           disabled={disabled}
+          onChange={e => handleTransportMode(e)}
         >
           {Object.entries(transportModeLabels).map(([k, v]) => (
             <option value={`${k}`} key={k}>
@@ -164,6 +175,18 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
           ))}
         </Field>
       </div>
+      {showTransportePlates && (
+        <div className="form__row">
+          <label>
+            Immatriculations
+            <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> pour valider chacun" />
+            <TagsInput
+              name="transporter.transport.plates"
+              disabled={disabled}
+            />
+          </label>
+        </div>
+      )}
       <div
         className={classNames("form__row", {
           "field-emphasis": transportEmphasis,

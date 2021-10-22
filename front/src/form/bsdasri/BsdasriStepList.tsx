@@ -31,16 +31,23 @@ interface Props {
  * Do not resend sections locked by relevant signatures
  */
 const removeSignedSections = (input: BsdasriInput, status: BsdasriStatus) => {
+  const wasteKey = "waste";
+  const ecoOrganismeKey = "ecoOrganisme";
   const emitterKey = "emitter";
-
   const transporterKey = "transporter";
   const destinationKey = "destination";
 
   const mapping = {
     INITIAL: [],
-    SIGNED_BY_PRODUCER: [emitterKey],
-    SENT: [emitterKey, transporterKey],
-    RECEIVED: [emitterKey, transporterKey, destinationKey],
+    SIGNED_BY_PRODUCER: [wasteKey, ecoOrganismeKey, emitterKey],
+    SENT: [wasteKey, ecoOrganismeKey, emitterKey, transporterKey],
+    RECEIVED: [
+      wasteKey,
+      ecoOrganismeKey,
+      emitterKey,
+      transporterKey,
+      destinationKey,
+    ],
   };
   return omit(input, mapping[status]);
 };
@@ -102,7 +109,6 @@ export default function BsdasriStepsList(props: Props) {
   >(UPDATE_BSDASRI);
 
   function saveForm(input: BsdasriInput): Promise<any> {
-    console.log(input);
     return formState.id
       ? updateBsdasri({
           variables: {

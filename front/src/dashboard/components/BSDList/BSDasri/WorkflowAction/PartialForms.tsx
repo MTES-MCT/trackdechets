@@ -215,6 +215,8 @@ export function OperationSignatureForm() {
 export const removeSections = (input, signatureType: SignatureType) => {
   const emitterKey = "emitter";
 
+  const wasteKey = "waste";
+  const ecoOrganismeKey = "ecoOrganisme";
   const transporterKey = "transporter";
   const destinationKey = "destination";
   const receptionKey = "reception";
@@ -222,7 +224,13 @@ export const removeSections = (input, signatureType: SignatureType) => {
   const companyKey = "company";
   const customInfoKey = "customInfo";
   const groupingBsdasrisKey = "grouping";
-  const common = [companyKey, customInfoKey, groupingBsdasrisKey];
+  const common = [
+    wasteKey,
+    companyKey,
+    ecoOrganismeKey,
+    customInfoKey,
+    groupingBsdasrisKey,
+  ];
   const mapping = {
     [BsdasriSignatureType.Emission]: [
       transporterKey,

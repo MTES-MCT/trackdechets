@@ -121,6 +121,7 @@ function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
     type: "BSDASRI",
     emitter: bsdasri.emitterCompanyName ?? "",
     recipient: bsdasri.destinationCompanyName ?? "",
+    transporterNumberPlate: bsdasri.transporterTransportPlates,
     waste: getWaste(bsdasri),
     createdAt: bsdasri.createdAt.getTime(),
     ...where,

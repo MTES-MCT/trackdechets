@@ -100,6 +100,8 @@ export const fullBsdasriFragment = gql`
           author
           date
         }
+        mode
+        plates
       }
     }
     destination {

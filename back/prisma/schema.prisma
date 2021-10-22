@@ -758,6 +758,7 @@ model Bsdasri {
   transportSignatoryId                        String?
   transporterTransportSignatureDate           DateTime?
   transporterTransportSignatureAuthor         String?
+  transporterTransportPlates                  String[]
   // destination
   destinationCompanyName                      String?
   destinationCompanySiret                     String?
