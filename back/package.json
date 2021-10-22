@@ -74,6 +74,7 @@
     "graphql-tools": "^6.0.14",
     "graylog2": "^0.2.1",
     "handlebars": "^4.7.7",
+    "helmet": "^4.6.0",
     "ioredis": "^4.17.3",
     "minimist": "^1.2.5",
     "mustache": "^4.2.0",

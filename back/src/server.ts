@@ -14,6 +14,7 @@ import rateLimit from "express-rate-limit";
 import session from "express-session";
 import depthLimit from "graphql-depth-limit";
 import { applyMiddleware } from "graphql-middleware";
+import helmet from "helmet";
 import passport from "passport";
 import RateLimitRedisStore from "rate-limit-redis";
 import prisma from "./prisma";
@@ -120,6 +121,26 @@ app.use(
       client: redisClient,
       expiry: RATE_LIMIT_WINDOW_SECONDS
     })
+  })
+);
+
+app.use(
+  helmet({
+    // Because of the GraphQL playground we have to override the default
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        baseUri: ["'self'"],
+        fontSrc: ["'self'", "https:", "data:"],
+        frameAncestors: ["'self'"],
+        imgSrc: ["'self'", "cdn.jsdelivr.net"],
+        objectSrc: ["'none'"],
+        scriptSrc: ["'unsafe-inline'", "cdn.jsdelivr.net"],
+        scriptSrcAttr: ["'none'"],
+        styleSrc: ["'self'", "https:", "cdn.jsdelivr.net", "'unsafe-inline'"],
+        ...(NODE_ENV === "production" && { upgradeInsecureRequests: [] })
+      }
+    }
   })
 );
 
