@@ -3,6 +3,7 @@ export interface SearchResponseDataGouv {
   etablissement: {
     siret: string;
     etat_administratif: string;
+    activite_principale: string;
     statut_diffusion: string;
     numero_voie: string;
     indice_repetition: string;
@@ -17,7 +18,6 @@ export interface SearchResponseDataGouv {
       denomination: string;
       prenom_1: string;
       nom: string;
-      activite_principale: string;
       categorie_juridique: string;
     };
   };
@@ -32,10 +32,8 @@ interface EtablissementInsee {
   uniteLegale: {
     denominationUniteLegale: string;
     categorieJuridiqueUniteLegale: string;
-    etatAdministratifUniteLegale: string;
     prenom1UniteLegale: string;
     nomUniteLegale: string;
-    activitePrincipaleUniteLegale: string;
   };
   adresseEtablissement: {
     numeroVoieEtablissement: string;
