@@ -6,7 +6,6 @@ import Tooltip from "common/components/Tooltip";
 import { Bsda, BsdaConsistence } from "generated/graphql/types";
 import TagsInput from "common/components/tags-input/TagsInput";
 
-
 export function WasteInfo({ disabled }) {
   return (
     <>

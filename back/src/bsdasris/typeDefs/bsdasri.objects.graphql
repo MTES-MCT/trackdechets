@@ -114,7 +114,7 @@ type BsdasriTransport {
   signature: BsdasriSignature
   mode: TransportMode!
   "Plaque(s) d'immatriculation"
-  plates: [String]
+  plates: [String!]
 }
 
 "Informations relatives au déchet émis"

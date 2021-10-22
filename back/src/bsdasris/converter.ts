@@ -344,7 +344,7 @@ function flattenTransportInput(input: { transport?: BsdasriTransportInput }) {
 
   const transporterWastePackagings = chain(input.transport, t => t.packagings);
   return {
-    transportMode: chain(input.transport, t => t.mode),
+    transporterTransportMode: chain(input.transport, t => t.mode),
     transporterTakenOverAt: chain(input.transport, t =>
       t.takenOverAt ? new Date(t.takenOverAt) : t.takenOverAt
     ),

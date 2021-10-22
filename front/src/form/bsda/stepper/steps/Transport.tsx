@@ -4,7 +4,7 @@ import { Bsda } from "generated/graphql/types";
 import { RedErrorMessage } from "common/components";
 import { transportModeLabels } from "dashboard/constants";
 import Tooltip from "common/components/Tooltip";
-import TagsInput from "form/bsvhu/components/tags-input/TagsInput";
+import TagsInput from "common/components/tags-input/TagsInput";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 
 type Props = { disabled: boolean };

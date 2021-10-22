@@ -46,11 +46,12 @@ const getInitialState = (f?: Bsdasri | null) => ({
       validityLimit: startOfYear(addYears(new Date(), 1)).toISOString(),
     },
     transport: {
+      mode: "ROAD",
       packagings: [],
       weight: !!f?.transporter?.transport?.weight
         ? getInitialWeightFn(f?.transporter?.transport?.weight)
         : null,
-
+      plates: null,
       takenOverAt: null,
       handedOverAt: null,
       acceptation: {
