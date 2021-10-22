@@ -129,15 +129,17 @@ app.use(
     // Because of the GraphQL playground we have to override the default
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ["'self'"],
+        defaultSrc: ["'none'"],
         baseUri: ["'self'"],
         fontSrc: ["'self'", "https:", "data:"],
         frameAncestors: ["'self'"],
         imgSrc: ["'self'", "cdn.jsdelivr.net"],
         objectSrc: ["'none'"],
-        scriptSrc: ["'unsafe-inline'", "cdn.jsdelivr.net"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "cdn.jsdelivr.net"],
         scriptSrcAttr: ["'none'"],
         styleSrc: ["'self'", "https:", "cdn.jsdelivr.net", "'unsafe-inline'"],
+        connectSrc: [process.env.API_HOST],
+        formAction: ["self"],
         ...(NODE_ENV === "production" && { upgradeInsecureRequests: [] })
       }
     }
