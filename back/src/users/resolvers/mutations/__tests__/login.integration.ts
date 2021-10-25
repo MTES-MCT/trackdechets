@@ -3,7 +3,11 @@ import makeClient from "../../../../__tests__/testClient";
 import prisma from "../../../../prisma";
 import { hashToken } from "../../../../utils";
 import { Mutation } from "../../../../generated/graphql/types";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+
 describe("{ mutation { login } }", () => {
+  afterEach(resetDatabase);
+
   it("should return a token", async () => {
     const user = await userFactory();
     const { mutate } = makeClient(user);
