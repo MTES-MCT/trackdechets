@@ -17,7 +17,7 @@ import {
   PackagingInfo,
   Packagings,
   Consistence,
-  WasteAcceptationStatusInput as WasteAcceptationStatus,
+  WasteAcceptationStatus,
   CompanyType,
 } from "generated/graphql/types";
 import graphlClient from "graphql-client";

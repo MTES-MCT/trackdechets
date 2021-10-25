@@ -8,7 +8,7 @@ import {
   RadioButton,
 } from "form/common/components/custom-inputs/RadioButton";
 import {
-  WasteAcceptationStatusInput as WasteAcceptationStatus,
+  WasteAcceptationStatus,
   FormStatus,
   Form as TdForm,
   QuantityType,

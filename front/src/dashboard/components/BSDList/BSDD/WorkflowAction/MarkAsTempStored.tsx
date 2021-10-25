@@ -3,7 +3,7 @@ import {
   Mutation,
   MutationMarkAsTempStoredArgs,
   QuantityType,
-  WasteAcceptationStatusInput,
+  WasteAcceptationStatus,
 } from "generated/graphql/types";
 import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
@@ -62,7 +62,7 @@ export default function MarkAsTempStored({ form }: WorkflowActionProps) {
                       quantityReceived: values.quantityReceived ?? 0,
                       wasteAcceptationStatus:
                         values.wasteAcceptationStatus ??
-                        WasteAcceptationStatusInput.Accepted,
+                        WasteAcceptationStatus.Accepted,
                     },
                   },
                 });
