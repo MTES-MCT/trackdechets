@@ -19,6 +19,12 @@ export function WorkflowAction(props: WorkflowActionProps) {
   }
   switch (form["bsdaStatus"]) {
     case BsdaStatus.Initial:
+      if (
+        form.emitter?.isPrivateIndividual &&
+        siret === form.worker?.company?.siret
+      ) {
+        return <SignWork {...props} bsdaId={form.id} />;
+      }
       if (siret !== form.emitter?.company?.siret) return null;
       return <SignEmission {...props} bsdaId={form.id} />;
 

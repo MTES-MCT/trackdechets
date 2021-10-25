@@ -524,6 +524,7 @@ export const bsdaFragment = gql`
     isDraft
     bsdaStatus: status
     emitter {
+      isPrivateIndividual
       company {
         name
         siret
