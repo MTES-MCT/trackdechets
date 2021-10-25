@@ -18,10 +18,7 @@ import {
   MISSING_COMPANY_PHONE,
   MISSING_COMPANY_SIRET
 } from "../forms/validation";
-import {
-  BsdaAcceptationStatus,
-  BsdaConsistence
-} from "../generated/graphql/types";
+import { BsdaConsistence } from "../generated/graphql/types";
 import prisma from "../prisma";
 
 const OPERATIONS = ["D 5", "D 9", "D 13", "D 15"];
@@ -394,7 +391,7 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
             )
         }),
       destinationReceptionAcceptationStatus: yup
-        .mixed<BsdaAcceptationStatus>()
+        .mixed<WasteAcceptationStatus>()
         .requiredIf(
           context.operationSignature,
           `Entreprise de destination: vous devez préciser le statut d'acceptation`
