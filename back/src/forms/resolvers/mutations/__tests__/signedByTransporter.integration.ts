@@ -53,9 +53,11 @@ describe("Mutation.signedByTransporter", () => {
           securityCode: emitterCompany.securityCode,
           sentBy: "Roger Lapince",
           signedByProducer: true,
-          packagings: (form.wasteDetailsPackagingInfos as {
-            type: string;
-          }[]).map(p => p.type),
+          packagings: (
+            form.wasteDetailsPackagingInfos as {
+              type: string;
+            }[]
+          ).map(p => p.type),
           quantity: form.wasteDetailsQuantity,
           onuCode: "Code ONU"
         }

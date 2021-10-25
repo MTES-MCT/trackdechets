@@ -135,13 +135,10 @@ describe("bulk create users and companies from csv files", () => {
     await bulkCreateIdempotent();
 
     await expectNumberOfRecords(2, 3, 4);
-    const {
-      firstAssociationDate,
-      updatedAt,
-      ...dbJohn
-    } = await prisma.user.findUnique({
-      where: { email: "john.snow@trackdechets.fr" }
-    });
+    const { firstAssociationDate, updatedAt, ...dbJohn } =
+      await prisma.user.findUnique({
+        where: { email: "john.snow@trackdechets.fr" }
+      });
 
     // john snow user should be untouched
     expect(dbJohn).toEqual(john);

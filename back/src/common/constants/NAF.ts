@@ -246,8 +246,7 @@ export const nafCodes: Record<string, string> = {
   "152": "Fabrication de chaussures",
   "1520": "Fabrication de chaussures",
   "1520Z": "Fabrication de chaussures",
-  "16":
-    "Activités de soutien à l'agriculture et traitement primaire des récoltes",
+  "16": "Activités de soutien à l'agriculture et traitement primaire des récoltes",
   "161": "Activités de soutien aux cultures",
   "1610": "Sciage et rabotage du bois",
   "1610A": "Sciage et rabotage du bois, hors imprégnation",
@@ -483,8 +482,7 @@ export const nafCodes: Record<string, string> = {
   "2453Z": "Fonderie de métaux légers",
   "2454": "Fonderie d'autres métaux non ferreux",
   "2454Z": "Fonderie d'autres métaux non ferreux",
-  "25":
-    "Fabrication de produits métalliques, à l’exception des machines et des équipements",
+  "25": "Fabrication de produits métalliques, à l’exception des machines et des équipements",
   "251": "Fabrication d'éléments en métal pour la construction",
   "2511": "Fabrication de structures métalliques et de parties de structures",
   "2511Z": "Fabrication de structures métalliques et de parties de structures",
@@ -767,8 +765,7 @@ export const nafCodes: Record<string, string> = {
     "Conception d'ensemble et assemblage sur site industriel d'équipements de contrôle des processus industriels",
   "3320D":
     "Installation d'équipements électriques, de matériels électroniques et optiques ou d'autres matériels",
-  "35":
-    "Production et distribution d'électricité, de gaz, de vapeur et d'air conditionné",
+  "35": "Production et distribution d'électricité, de gaz, de vapeur et d'air conditionné",
   "351": "Production, transport et distribution d'électricité",
   "3511": "Production d'électricité",
   "3511Z": "Production d'électricité",
@@ -1343,8 +1340,7 @@ export const nafCodes: Record<string, string> = {
   "5829A": "Édition de logiciels système et de réseau",
   "5829B": "Edition de logiciels outils de développement et de langages",
   "5829C": "Edition de logiciels applicatifs",
-  "59":
-    "Production de films cinématographiques, de vidéo et de programmes de télévision ; enregistrement sonore et édition musicale",
+  "59": "Production de films cinématographiques, de vidéo et de programmes de télévision ; enregistrement sonore et édition musicale",
   "591": "Activités cinématographiques, vidéo et de télévision",
   "5911":
     "Production de films cinématographiques, de vidéo et de programmes de télévision",
@@ -1409,8 +1405,7 @@ export const nafCodes: Record<string, string> = {
   "6391Z": "Activités des agences de presse",
   "6399": "Autres services d'information n.c.a.",
   "6399Z": "Autres services d'information n.c.a.",
-  "64":
-    "Activités des services financiers, hors assurance et caisses de retraite",
+  "64": "Activités des services financiers, hors assurance et caisses de retraite",
   "641": "Intermédiation monétaire",
   "6411": "Activités de banque centrale",
   "6411Z": "Activités de banque centrale",
@@ -1597,8 +1592,7 @@ export const nafCodes: Record<string, string> = {
   "783": "Autre mise à disposition de ressources humaines",
   "7830": "Autre mise à disposition de ressources humaines",
   "7830Z": "Autre mise à disposition de ressources humaines",
-  "79":
-    "Activités des agences de voyage, voyagistes, services de réservation et activités connexes",
+  "79": "Activités des agences de voyage, voyagistes, services de réservation et activités connexes",
   "791": "Activités des agences de voyage et voyagistes",
   "7911": "Activités des agences de voyage",
   "7911Z": "Activités des agences de voyage",
@@ -1634,8 +1628,7 @@ export const nafCodes: Record<string, string> = {
   "813": "Services d'aménagement paysager",
   "8130": "Services d'aménagement paysager",
   "8130Z": "Services d'aménagement paysager",
-  "82":
-    "Activités administratives et autres activités de soutien aux entreprises",
+  "82": "Activités administratives et autres activités de soutien aux entreprises",
   "821": "Activités administratives",
   "8211": "Services administratifs combinés de bureau",
   "8211Z": "Services administratifs combinés de bureau",
@@ -1881,8 +1874,7 @@ export const nafCodes: Record<string, string> = {
   "9700": "Activités des ménages en tant qu'employeurs de personnel domestique",
   "9700Z":
     "Activités des ménages en tant qu'employeurs de personnel domestique",
-  "98":
-    "Activités indifférenciées des ménages en tant que producteurs de biens et services pour usage propre",
+  "98": "Activités indifférenciées des ménages en tant que producteurs de biens et services pour usage propre",
   "981":
     "Activités indifférenciées des ménages en tant que producteurs de biens pour usage propre",
   "9810":

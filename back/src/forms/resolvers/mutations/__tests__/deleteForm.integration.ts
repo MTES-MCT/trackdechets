@@ -143,10 +143,8 @@ describe("Mutation.deleteForm", () => {
   );
 
   it("should disconnect appendix 2 forms", async () => {
-    const {
-      user: emitterUser,
-      company: emitter
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: emitterUser, company: emitter } =
+      await userWithCompanyFactory("MEMBER");
     const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
       "MEMBER"
     );

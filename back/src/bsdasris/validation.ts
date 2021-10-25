@@ -117,50 +117,48 @@ const INVALID_DASRI_WASTE_CODE =
 const INVALID_PROCESSING_OPERATION =
   "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée";
 
-export const emitterSchema: FactorySchemaOf<
-  BsdasriValidationContext,
-  Emitter
-> = context =>
-  yup.object({
-    emitterCompanyName: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature,
-        `Émetteur: ${MISSING_COMPANY_NAME}`
-      ),
-    emitterCompanySiret: yup
-      .string()
-      .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
-      .requiredIf(
-        context.emissionSignature,
-        `Émetteur: ${MISSING_COMPANY_SIRET}`
-      ),
-    emitterCompanyAddress: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature,
-        `Émetteur: ${MISSING_COMPANY_ADDRESS}`
-      ),
-    emitterCompanyContact: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature,
-        `Émetteur: ${MISSING_COMPANY_CONTACT}`
-      ),
-    emitterCompanyPhone: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature,
-        `Émetteur: ${MISSING_COMPANY_PHONE}`
-      ),
-    emitterCompanyMail: yup.string().email().ensure(),
+export const emitterSchema: FactorySchemaOf<BsdasriValidationContext, Emitter> =
+  context =>
+    yup.object({
+      emitterCompanyName: yup
+        .string()
+        .requiredIf(
+          context.emissionSignature,
+          `Émetteur: ${MISSING_COMPANY_NAME}`
+        ),
+      emitterCompanySiret: yup
+        .string()
+        .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
+        .requiredIf(
+          context.emissionSignature,
+          `Émetteur: ${MISSING_COMPANY_SIRET}`
+        ),
+      emitterCompanyAddress: yup
+        .string()
+        .requiredIf(
+          context.emissionSignature,
+          `Émetteur: ${MISSING_COMPANY_ADDRESS}`
+        ),
+      emitterCompanyContact: yup
+        .string()
+        .requiredIf(
+          context.emissionSignature,
+          `Émetteur: ${MISSING_COMPANY_CONTACT}`
+        ),
+      emitterCompanyPhone: yup
+        .string()
+        .requiredIf(
+          context.emissionSignature,
+          `Émetteur: ${MISSING_COMPANY_PHONE}`
+        ),
+      emitterCompanyMail: yup.string().email().ensure(),
 
-    emitterPickupSiteName: yup.string().nullable(),
-    emitterPickupSiteAddress: yup.string().nullable(),
-    emitterPickupSiteCity: yup.string().nullable(),
-    emitterPickupSitePostalCode: yup.string().nullable(),
-    emitterPickupSiteInfos: yup.string().nullable()
-  });
+      emitterPickupSiteName: yup.string().nullable(),
+      emitterPickupSiteAddress: yup.string().nullable(),
+      emitterPickupSiteCity: yup.string().nullable(),
+      emitterPickupSitePostalCode: yup.string().nullable(),
+      emitterPickupSiteInfos: yup.string().nullable()
+    });
 
 const packagingsTypes: BsdasriPackagingType[] = [
   "BOITE_CARTON",

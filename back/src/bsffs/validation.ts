@@ -13,20 +13,22 @@ import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { OPERATION, WASTE_CODES } from "./constants";
 import prisma from "../prisma";
 
-const bsffSchema: yup.SchemaOf<Pick<
-  Bsff,
-  | "isDraft"
-  | "emitterCompanyName"
-  | "emitterCompanySiret"
-  | "emitterCompanyAddress"
-  | "emitterCompanyContact"
-  | "emitterCompanyPhone"
-  | "emitterCompanyMail"
-  | "wasteCode"
-  | "wasteAdr"
-  | "weightValue"
-  | "destinationPlannedOperationCode"
->> = yup.object({
+const bsffSchema: yup.SchemaOf<
+  Pick<
+    Bsff,
+    | "isDraft"
+    | "emitterCompanyName"
+    | "emitterCompanySiret"
+    | "emitterCompanyAddress"
+    | "emitterCompanyContact"
+    | "emitterCompanyPhone"
+    | "emitterCompanyMail"
+    | "wasteCode"
+    | "wasteAdr"
+    | "weightValue"
+    | "destinationPlannedOperationCode"
+  >
+> = yup.object({
   isDraft: yup.boolean().nullable(),
   emitterCompanyName: yup
     .string()
@@ -271,10 +273,9 @@ async function validateFicheInterventions(
   }
 }
 
-const beforeEmissionSchema: yup.SchemaOf<Pick<
-  Bsff,
-  "isDraft" | "emitterEmissionSignatureDate"
->> = yup.object({
+const beforeEmissionSchema: yup.SchemaOf<
+  Pick<Bsff, "isDraft" | "emitterEmissionSignatureDate">
+> = yup.object({
   isDraft: yup
     .boolean()
     .oneOf(
@@ -299,19 +300,21 @@ export function validateBeforeEmission(
   });
 }
 
-const beforeTransportSchema: yup.SchemaOf<Pick<
-  Bsff,
-  | "packagings"
-  | "transporterCompanyName"
-  | "transporterCompanySiret"
-  | "transporterCompanyAddress"
-  | "transporterCompanyContact"
-  | "transporterCompanyPhone"
-  | "transporterCompanyMail"
-  | "emitterEmissionSignatureDate"
-  | "transporterTransportSignatureDate"
-  | "transporterTransportMode"
->> = yup.object({
+const beforeTransportSchema: yup.SchemaOf<
+  Pick<
+    Bsff,
+    | "packagings"
+    | "transporterCompanyName"
+    | "transporterCompanySiret"
+    | "transporterCompanyAddress"
+    | "transporterCompanyContact"
+    | "transporterCompanyPhone"
+    | "transporterCompanyMail"
+    | "emitterEmissionSignatureDate"
+    | "transporterTransportSignatureDate"
+    | "transporterTransportMode"
+  >
+> = yup.object({
   packagings: yup
     .array()
     .nullable()
@@ -394,19 +397,21 @@ export function validateBeforeTransport(
   });
 }
 
-export const beforeReceptionSchema: yup.SchemaOf<Pick<
-  Bsff,
-  | "destinationCompanyName"
-  | "destinationCompanySiret"
-  | "destinationCompanyAddress"
-  | "destinationCompanyContact"
-  | "destinationCompanyPhone"
-  | "destinationCompanyMail"
-  | "transporterTransportSignatureDate"
-  | "destinationReceptionSignatureDate"
-  | "destinationReceptionDate"
-  | "destinationReceptionWeight"
->> = yup.object({
+export const beforeReceptionSchema: yup.SchemaOf<
+  Pick<
+    Bsff,
+    | "destinationCompanyName"
+    | "destinationCompanySiret"
+    | "destinationCompanyAddress"
+    | "destinationCompanyContact"
+    | "destinationCompanyPhone"
+    | "destinationCompanyMail"
+    | "transporterTransportSignatureDate"
+    | "destinationReceptionSignatureDate"
+    | "destinationReceptionDate"
+    | "destinationReceptionWeight"
+  >
+> = yup.object({
   destinationCompanyName: yup
     .string()
     .nullable()
@@ -501,12 +506,14 @@ export function validateBeforeReception(
   });
 }
 
-const beforeOperationSchema: yup.SchemaOf<Pick<
-  Bsff,
-  | "destinationReceptionSignatureDate"
-  | "destinationOperationSignatureDate"
-  | "destinationOperationCode"
->> = yup.object({
+const beforeOperationSchema: yup.SchemaOf<
+  Pick<
+    Bsff,
+    | "destinationReceptionSignatureDate"
+    | "destinationOperationSignatureDate"
+    | "destinationOperationCode"
+  >
+> = yup.object({
   destinationReceptionSignatureDate: yup
     .date()
     .nullable()
@@ -537,24 +544,26 @@ export function validateBeforeOperation(
   });
 }
 
-const ficheInterventionSchema: yup.SchemaOf<Pick<
-  BsffFicheIntervention,
-  | "numero"
-  | "weight"
-  | "postalCode"
-  | "detenteurCompanyName"
-  | "detenteurCompanySiret"
-  | "detenteurCompanyAddress"
-  | "detenteurCompanyContact"
-  | "detenteurCompanyPhone"
-  | "detenteurCompanyMail"
-  | "operateurCompanyName"
-  | "operateurCompanySiret"
-  | "operateurCompanyAddress"
-  | "operateurCompanyContact"
-  | "operateurCompanyPhone"
-  | "operateurCompanyMail"
->> = yup.object({
+const ficheInterventionSchema: yup.SchemaOf<
+  Pick<
+    BsffFicheIntervention,
+    | "numero"
+    | "weight"
+    | "postalCode"
+    | "detenteurCompanyName"
+    | "detenteurCompanySiret"
+    | "detenteurCompanyAddress"
+    | "detenteurCompanyContact"
+    | "detenteurCompanyPhone"
+    | "detenteurCompanyMail"
+    | "operateurCompanyName"
+    | "operateurCompanySiret"
+    | "operateurCompanyAddress"
+    | "operateurCompanyContact"
+    | "operateurCompanyPhone"
+    | "operateurCompanyMail"
+  >
+> = yup.object({
   numero: yup
     .string()
     .required("Le numéro de la fiche d'intervention est requis"),

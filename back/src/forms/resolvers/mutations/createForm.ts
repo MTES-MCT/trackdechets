@@ -27,11 +27,8 @@ const createFormResolver = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const {
-    appendix2Forms,
-    temporaryStorageDetail,
-    ...formContent
-  } = createFormInput;
+  const { appendix2Forms, temporaryStorageDetail, ...formContent } =
+    createFormInput;
 
   const formSirets: FormSirets = {
     emitterCompanySiret: formContent.emitter?.company?.siret,

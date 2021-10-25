@@ -456,10 +456,9 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
 
 export const wasteDetailsSchema = wasteDetailsSchemaFn(false);
 
-export const beforeSignedByTransporterSchema: yup.SchemaOf<Pick<
-  Form,
-  "wasteDetailsPackagingInfos"
->> = yup.object({
+export const beforeSignedByTransporterSchema: yup.SchemaOf<
+  Pick<Form, "wasteDetailsPackagingInfos">
+> = yup.object({
   wasteDetailsPackagingInfos: yup
     .array()
     .min(1, "Le nombre de contenants doit être supérieur à 0")
@@ -729,27 +728,26 @@ const traceabilityBreakForbidden = yup.object({
 });
 
 // 11 - Réalisation de l’opération :
-const processedInfoSchemaFn: (
-  value: any
-) => yup.SchemaOf<ProcessedInfo> = value => {
-  const base = yup.object({
-    processedBy: yup
-      .string()
-      .ensure()
-      .required("Vous devez saisir un responsable de traitement."),
-    processedAt: yup.date().required(),
-    processingOperationDone: yup
-      .string()
-      .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION),
-    processingOperationDescription: yup.string().nullable()
-  });
+const processedInfoSchemaFn: (value: any) => yup.SchemaOf<ProcessedInfo> =
+  value => {
+    const base = yup.object({
+      processedBy: yup
+        .string()
+        .ensure()
+        .required("Vous devez saisir un responsable de traitement."),
+      processedAt: yup.date().required(),
+      processingOperationDone: yup
+        .string()
+        .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION),
+      processingOperationDescription: yup.string().nullable()
+    });
 
-  return PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-    value?.processingOperationDone
-  )
-    ? base.concat(withNextDestination).concat(traceabilityBreakAllowed)
-    : base.concat(withoutNextDestination).concat(traceabilityBreakForbidden);
-};
+    return PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
+      value?.processingOperationDone
+    )
+      ? base.concat(withNextDestination).concat(traceabilityBreakAllowed)
+      : base.concat(withoutNextDestination).concat(traceabilityBreakForbidden);
+  };
 
 export const processedInfoSchema = yup.lazy(processedInfoSchemaFn);
 
@@ -868,8 +866,8 @@ export const tempStorerAcceptedInfoSchema = yup.object().shape({
 });
 
 // 14 - Installation de destination prévue
-export const destinationAfterTempStorageSchema: yup.SchemaOf<DestinationAfterTempStorage> = yup.object(
-  {
+export const destinationAfterTempStorageSchema: yup.SchemaOf<DestinationAfterTempStorage> =
+  yup.object({
     destinationCap: yup.string().nullable(),
     destinationCompanyName: yup
       .string()
@@ -899,14 +897,13 @@ export const destinationAfterTempStorageSchema: yup.SchemaOf<DestinationAfterTem
     destinationProcessingOperation: yup
       .string()
       .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
-  }
-);
+  });
 
 // 15 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
 // 16 - Conditionnement
 // 17 - Quantité
-export const wasteRepackagingSchema: yup.SchemaOf<WasteRepackaging> = yup.object(
-  {
+export const wasteRepackagingSchema: yup.SchemaOf<WasteRepackaging> =
+  yup.object({
     wasteDetailsOnuCode: yup.string().nullable(),
     wasteDetailsOtherPackaging: yup.string().nullable(),
     wasteDetailsPackagings: yup.object().nullable(),
@@ -922,13 +919,11 @@ export const wasteRepackagingSchema: yup.SchemaOf<WasteRepackaging> = yup.object
       .nullable()
       .notRequired()
       .min(0, "La quantité doit être supérieure à 0")
-  }
-);
+  });
 
 // 18 - Collecteur-transporteur reconditionnement
-export const transporterAfterTempStorageSchema: yup.SchemaOf<TransporterAfterTempStorage> = transporterSchemaFn(
-  false
-);
+export const transporterAfterTempStorageSchema: yup.SchemaOf<TransporterAfterTempStorage> =
+  transporterSchemaFn(false);
 
 // *******************************************************************
 // COMPOSE VALIDATION SCHEMAS TO VALIDATE A FORM FOR A SPECIFIC STATUS

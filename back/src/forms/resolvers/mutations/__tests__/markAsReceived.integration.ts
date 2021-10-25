@@ -128,12 +128,8 @@ describe("Test Form reception", () => {
   });
 
   it("should not accept negative values", async () => {
-    const {
-      emitterCompany,
-      recipient,
-      recipientCompany,
-      form
-    } = await prepareDB();
+    const { emitterCompany, recipient, recipientCompany, form } =
+      await prepareDB();
     await prepareRedis({
       emitterCompany,
       recipientCompany
@@ -163,12 +159,8 @@ describe("Test Form reception", () => {
   });
 
   it("should not accept 0 value when form is accepted", async () => {
-    const {
-      emitterCompany,
-      recipient,
-      recipientCompany,
-      form
-    } = await prepareDB();
+    const { emitterCompany, recipient, recipientCompany, form } =
+      await prepareDB();
     await prepareRedis({
       emitterCompany,
       recipientCompany
@@ -198,12 +190,8 @@ describe("Test Form reception", () => {
   });
 
   it("should mark a sent form as refused", async () => {
-    const {
-      emitterCompany,
-      recipient,
-      recipientCompany,
-      form
-    } = await prepareDB();
+    const { emitterCompany, recipient, recipientCompany, form } =
+      await prepareDB();
     await prepareRedis({
       emitterCompany,
       recipientCompany
@@ -242,12 +230,8 @@ describe("Test Form reception", () => {
   });
 
   it("should not accept a non-zero quantity when waste is refused", async () => {
-    const {
-      emitterCompany,
-      recipient,
-      recipientCompany,
-      form
-    } = await prepareDB();
+    const { emitterCompany, recipient, recipientCompany, form } =
+      await prepareDB();
     await prepareRedis({
       emitterCompany,
       recipientCompany
@@ -285,12 +269,8 @@ describe("Test Form reception", () => {
   });
 
   it("should mark a sent form as partially refused", async () => {
-    const {
-      emitterCompany,
-      recipient,
-      recipientCompany,
-      form
-    } = await prepareDB();
+    const { emitterCompany, recipient, recipientCompany, form } =
+      await prepareDB();
     await prepareRedis({
       emitterCompany,
       recipientCompany
@@ -328,12 +308,8 @@ describe("Test Form reception", () => {
   });
 
   it("should not accept to edit a received form", async () => {
-    const {
-      emitter,
-      emitterCompany,
-      recipient,
-      recipientCompany
-    } = await prepareDB();
+    const { emitter, emitterCompany, recipient, recipientCompany } =
+      await prepareDB();
     await prepareRedis({
       emitterCompany,
       recipientCompany

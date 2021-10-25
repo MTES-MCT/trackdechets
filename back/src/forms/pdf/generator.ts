@@ -323,9 +323,10 @@ export const buildPdf = async (form: Form, user?: Express.User | null) => {
       });
     }
 
-    const [
-      copiedTempStoragePage
-    ] = await mainForm.copyPages(tempStorageDetailsPdf, [0]);
+    const [copiedTempStoragePage] = await mainForm.copyPages(
+      tempStorageDetailsPdf,
+      [0]
+    );
     mainForm.addPage(copiedTempStoragePage);
   }
 

@@ -16,14 +16,10 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
   }
 
   it("Déchet déposé en déchetterie (collecte en 2710-1)", async () => {
-    const {
-      user: producteurUser,
-      company: producteurCompany
-    } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: exutoireUser,
-      company: exutoireCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: producteurUser, company: producteurCompany } =
+      await userWithCompanyFactory("MEMBER");
+    const { user: exutoireUser, company: exutoireCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const producteurToken = await apiKey(producteurUser);
     const exutoireToken = await apiKey(exutoireUser);
@@ -108,18 +104,12 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
   });
 
   it("Déchet collecté chez un particulier, avec signature papier détenue par l'entreprise de travaux", async () => {
-    const {
-      user: workerUser,
-      company: workerCompany
-    } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: transporterUser,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: destinationUser,
-      company: destinationCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: workerUser, company: workerCompany } =
+      await userWithCompanyFactory("MEMBER");
+    const { user: transporterUser, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
+    const { user: destinationUser, company: destinationCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const workerToken = await apiKey(workerUser);
     const transporterToken = await apiKey(transporterUser);
@@ -273,22 +263,14 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
   });
 
   it("Déchet collecté chez un professionnel, curcuit complet", async () => {
-    const {
-      user: producteurUser,
-      company: producteurCompany
-    } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: workerUser,
-      company: workerCompany
-    } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: transporterUser,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: destinationUser,
-      company: destinationCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: producteurUser, company: producteurCompany } =
+      await userWithCompanyFactory("MEMBER");
+    const { user: workerUser, company: workerCompany } =
+      await userWithCompanyFactory("MEMBER");
+    const { user: transporterUser, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
+    const { user: destinationUser, company: destinationCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const producteurToken = await apiKey(producteurUser);
     const workerToken = await apiKey(workerUser);

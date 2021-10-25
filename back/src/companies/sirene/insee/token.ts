@@ -14,7 +14,7 @@ async function generateToken(): Promise<string> {
     "Content-Type": "application/x-www-form-urlencoded"
   };
 
-  const response = await axios.post<{access_token: string}>(
+  const response = await axios.post<{ access_token: string }>(
     SIRENE_API_TOKEN_URL,
     "grant_type=client_credentials",
     { headers }

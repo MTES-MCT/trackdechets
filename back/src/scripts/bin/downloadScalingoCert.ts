@@ -9,7 +9,7 @@ import axios from "axios";
       `SCALINGO_CERT is defined, downloading certificate to ${certPath}`
     );
 
-    const { data } = await axios.get(process.env.SCALINGO_CERT);
+    const { data } = await axios.get<string>(process.env.SCALINGO_CERT);
     fs.writeFileSync(certPath, data);
   } else {
     console.log(`SCALINGO_CERT is undefined, skipping certificate download`);

@@ -391,10 +391,8 @@ describe("Mutation markAsResealed", () => {
     process.env.VERIFY_COMPANY = "true";
     const makeClient = require("../../../../__tests__/testClient").default;
 
-    const {
-      user: owner,
-      company: emitterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: owner, company: emitterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const { user, company: collector } = await userWithCompanyFactory(
       "MEMBER",

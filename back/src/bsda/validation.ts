@@ -314,120 +314,120 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
     workerWorkHasEmitterPaperSignature: yup.boolean().nullable()
   });
 
-const destinationSchema: FactorySchemaOf<
-  BsdaValidationContext,
-  Destination
-> = context =>
-  yup.object({
-    destinationCompanyName: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature,
-        `Entreprise de destination: ${MISSING_COMPANY_NAME}`
-      ),
-    destinationCompanySiret: yup
-      .string()
-      .length(14, `Entreprise de destination: ${INVALID_SIRET_LENGTH}`)
-      .requiredIf(
-        context.emissionSignature,
-        `Entreprise de destination: ${MISSING_COMPANY_SIRET}`
-      ),
-    destinationCompanyAddress: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature,
-        `Entreprise de destination: ${MISSING_COMPANY_ADDRESS}`
-      ),
-    destinationCompanyContact: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature,
-        `Entreprise de destination: ${MISSING_COMPANY_CONTACT}`
-      ),
-    destinationCompanyPhone: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature,
-        `Entreprise de destination: ${MISSING_COMPANY_PHONE}`
-      ),
-    destinationCompanyMail: yup
-      .string()
-      .email()
-      .requiredIf(
-        context.emissionSignature,
-        `Entreprise de destination: ${MISSING_COMPANY_EMAIL}`
-      ),
-    destinationCap: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature,
-        `Entreprise de destination: CAP obligatoire`
-      ),
-    destinationPlannedOperationCode: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature,
-        `Entreprise de destination: vous devez préciser le code d'opétation prévu`
-      )
-      .oneOf(
-        [null, ...OPERATIONS],
-        "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
-      ),
-    destinationReceptionDate: yup
-      .date()
-      .requiredIf(
-        context.operationSignature,
-        `Entreprise de destination:vous devez préciser la date de réception`
-      ) as any,
-    destinationReceptionWeight: yup
-      .number()
-      .requiredIf(
-        context.operationSignature,
-        `Entreprise de destination: vous devez préciser la quantité`
-      )
-      .when("destinationReceptionAcceptationStatus", {
-        is: value => value === WasteAcceptationStatus.REFUSED,
-        then: schema =>
-          schema.oneOf(
-            [0],
-            "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
-          ),
-        otherwise: schema =>
-          schema.positive("Vous devez saisir une quantité reçue supérieure à 0")
-      }),
-    destinationReceptionAcceptationStatus: yup
-      .mixed<BsdaAcceptationStatus>()
-      .requiredIf(
-        context.operationSignature,
-        `Entreprise de destination: vous devez préciser le statut d'acceptation`
-      ),
-    destinationReceptionRefusalReason: yup
-      .string()
-      .when(
-        "destinationReceptionAcceptationStatus",
-        (acceptationStatus, schema) =>
-          acceptationStatus === WasteAcceptationStatus.REFUSED
-            ? schema.ensure().required("Vous devez saisir un motif de refus")
-            : schema
-                .ensure()
-                .max(
-                  0,
-                  "Le motif du refus ne doit pas être renseigné si le déchet est accepté"
-                )
-      ),
-    destinationOperationCode: yup
-      .string()
-      .requiredIf(
-        context.operationSignature,
-        `Entreprise de destination: vous devez préciser le code d'opétation réalisé`
-      ),
-    destinationOperationDate: yup
-      .date()
-      .requiredIf(
-        context.operationSignature,
-        `Entreprise de destination:vous devez préciser la date d'opétation`
-      ) as any
-  });
+const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
+  context =>
+    yup.object({
+      destinationCompanyName: yup
+        .string()
+        .requiredIf(
+          context.emissionSignature,
+          `Entreprise de destination: ${MISSING_COMPANY_NAME}`
+        ),
+      destinationCompanySiret: yup
+        .string()
+        .length(14, `Entreprise de destination: ${INVALID_SIRET_LENGTH}`)
+        .requiredIf(
+          context.emissionSignature,
+          `Entreprise de destination: ${MISSING_COMPANY_SIRET}`
+        ),
+      destinationCompanyAddress: yup
+        .string()
+        .requiredIf(
+          context.emissionSignature,
+          `Entreprise de destination: ${MISSING_COMPANY_ADDRESS}`
+        ),
+      destinationCompanyContact: yup
+        .string()
+        .requiredIf(
+          context.emissionSignature,
+          `Entreprise de destination: ${MISSING_COMPANY_CONTACT}`
+        ),
+      destinationCompanyPhone: yup
+        .string()
+        .requiredIf(
+          context.emissionSignature,
+          `Entreprise de destination: ${MISSING_COMPANY_PHONE}`
+        ),
+      destinationCompanyMail: yup
+        .string()
+        .email()
+        .requiredIf(
+          context.emissionSignature,
+          `Entreprise de destination: ${MISSING_COMPANY_EMAIL}`
+        ),
+      destinationCap: yup
+        .string()
+        .requiredIf(
+          context.emissionSignature,
+          `Entreprise de destination: CAP obligatoire`
+        ),
+      destinationPlannedOperationCode: yup
+        .string()
+        .requiredIf(
+          context.emissionSignature,
+          `Entreprise de destination: vous devez préciser le code d'opétation prévu`
+        )
+        .oneOf(
+          [null, ...OPERATIONS],
+          "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
+        ),
+      destinationReceptionDate: yup
+        .date()
+        .requiredIf(
+          context.operationSignature,
+          `Entreprise de destination:vous devez préciser la date de réception`
+        ) as any,
+      destinationReceptionWeight: yup
+        .number()
+        .requiredIf(
+          context.operationSignature,
+          `Entreprise de destination: vous devez préciser la quantité`
+        )
+        .when("destinationReceptionAcceptationStatus", {
+          is: value => value === WasteAcceptationStatus.REFUSED,
+          then: schema =>
+            schema.oneOf(
+              [0],
+              "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
+            ),
+          otherwise: schema =>
+            schema.positive(
+              "Vous devez saisir une quantité reçue supérieure à 0"
+            )
+        }),
+      destinationReceptionAcceptationStatus: yup
+        .mixed<BsdaAcceptationStatus>()
+        .requiredIf(
+          context.operationSignature,
+          `Entreprise de destination: vous devez préciser le statut d'acceptation`
+        ),
+      destinationReceptionRefusalReason: yup
+        .string()
+        .when(
+          "destinationReceptionAcceptationStatus",
+          (acceptationStatus, schema) =>
+            acceptationStatus === WasteAcceptationStatus.REFUSED
+              ? schema.ensure().required("Vous devez saisir un motif de refus")
+              : schema
+                  .ensure()
+                  .max(
+                    0,
+                    "Le motif du refus ne doit pas être renseigné si le déchet est accepté"
+                  )
+        ),
+      destinationOperationCode: yup
+        .string()
+        .requiredIf(
+          context.operationSignature,
+          `Entreprise de destination: vous devez préciser le code d'opétation réalisé`
+        ),
+      destinationOperationDate: yup
+        .date()
+        .requiredIf(
+          context.operationSignature,
+          `Entreprise de destination:vous devez préciser la date d'opétation`
+        ) as any
+    });
 
 const transporterSchema: FactorySchemaOf<
   BsdaValidationContext,

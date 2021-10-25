@@ -168,9 +168,7 @@ describe("searchCompanies", () => {
       }
     });
     await searchCompanies("le bar à pain");
-    expect(
-      axios.get as jest.Mock
-    ).toHaveBeenCalledWith(
+    expect(axios.get as jest.Mock).toHaveBeenCalledWith(
       "https://entreprise.data.gouv.fr/api/sirene/v1/full_text/le%20bar%20a%20pain",
       { params: {} }
     );
@@ -236,9 +234,7 @@ describe("searchCompanies", () => {
       etatAdministratif: "A"
     };
     expect(companies[0]).toEqual(expected);
-    expect(
-      axios.get
-    ).toHaveBeenCalledWith(
+    expect(axios.get).toHaveBeenCalledWith(
       "https://entreprise.data.gouv.fr/api/sirene/v1/full_text/boulangerie",
       { params: { departement: "07" } }
     );

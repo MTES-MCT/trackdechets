@@ -26,9 +26,8 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 
   await checkCanMarkAsProcessed(user, form);
 
-  const formUpdateInput: Prisma.FormUpdateInput = flattenProcessedFormInput(
-    processedInfo
-  );
+  const formUpdateInput: Prisma.FormUpdateInput =
+    flattenProcessedFormInput(processedInfo);
   await processedInfoSchema.validate(formUpdateInput);
 
   // set default value for processingOperationDescription
