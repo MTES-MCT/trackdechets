@@ -230,7 +230,7 @@ type BsffDestination {
 
 type BsffAcceptation {
   "Accepté ou refusé"
-  status: BsffAcceptationStatus!
+  status: WasteAcceptationStatus!
   "En cas de refus, la raison"
   refusalReason: String
 }

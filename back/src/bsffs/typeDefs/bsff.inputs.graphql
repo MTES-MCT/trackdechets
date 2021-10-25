@@ -155,7 +155,7 @@ input BsffDestinationInput {
 
 input BsffAcceptationInput {
   "Accepté ou refusé"
-  status: BsffAcceptationStatus!
+  status: WasteAcceptationStatus!
   "En cas de refus, la raison"
   refusalReason: String
 }

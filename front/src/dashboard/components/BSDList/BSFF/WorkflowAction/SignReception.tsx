@@ -4,7 +4,7 @@ import { Formik, Form, Field } from "formik";
 import * as yup from "yup";
 import {
   Bsff,
-  BsffAcceptationStatus,
+  WasteAcceptationStatus,
   BsffSignatureType,
   Mutation,
   MutationSignBsffArgs,
@@ -22,7 +22,7 @@ const validationSchema = yup.object({
   receptionDate: yup.date().required(),
   receptionWeight: yup.number().required(),
   receptionRefusalReason: yup.string().when("receptionAcceptationStatus", {
-    is: value => value === BsffAcceptationStatus.Refused,
+    is: value => value === WasteAcceptationStatus.Refused,
     then: schema =>
       schema
         .ensure()
@@ -62,7 +62,7 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
           bsff.destination?.reception?.weight ?? bsff.weight?.value ?? 0,
         receptionAcceptationStatus:
           bsff.destination?.reception?.acceptation?.status ??
-          BsffAcceptationStatus.Accepted,
+          WasteAcceptationStatus.Accepted,
         receptionRefusalReason:
           bsff.destination?.reception?.acceptation?.refusalReason ?? null,
         signatureAuthor: "",
@@ -136,20 +136,20 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
                   setValues({
                     ...values,
                     receptionAcceptationStatus: checked
-                      ? BsffAcceptationStatus.Refused
-                      : BsffAcceptationStatus.Accepted,
+                      ? WasteAcceptationStatus.Refused
+                      : WasteAcceptationStatus.Accepted,
                     receptionRefusalReason: checked ? "" : null,
                   })
                 }
                 checked={
                   values.receptionAcceptationStatus ===
-                  BsffAcceptationStatus.Refused
+                  WasteAcceptationStatus.Refused
                 }
               />
             </label>
           </div>
           {values.receptionAcceptationStatus ===
-            BsffAcceptationStatus.Refused && (
+            WasteAcceptationStatus.Refused && (
             <div className="form__row">
               <label>
                 <Field

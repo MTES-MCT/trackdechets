@@ -222,7 +222,7 @@ type TemporaryStorageDetail {
 type TemporaryStorer {
   quantityType: QuantityType
   quantityReceived: Float
-  wasteAcceptationStatus: String
+  wasteAcceptationStatus: WasteAcceptationStatus
   wasteRefusalReason: String
 
   receivedAt: DateTime
