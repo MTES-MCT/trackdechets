@@ -20,7 +20,7 @@ const UPDATE_FICHE_INTERVENTION = `
 const variables: Omit<MutationUpdateFicheInterventionBsffArgs, "id"> = {
   input: {
     numero: "ABCDEFGHIJK",
-    kilos: 2,
+    weight: 2,
     detenteur: {
       company: {
         name: "Acme",
@@ -61,7 +61,7 @@ describe("Mutation.updateFicheInterventionBsff", () => {
       data: {
         ...flattenFicheInterventionBsffInput({
           ...variables.input,
-          kilos: variables.input.kilos - 1
+          weight: variables.input.weight - 1
         })
       }
     });

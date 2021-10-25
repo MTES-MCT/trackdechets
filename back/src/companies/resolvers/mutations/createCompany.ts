@@ -40,7 +40,8 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     transporterReceiptId,
     traderReceiptId,
     vhuAgrementDemolisseurId,
-    vhuAgrementBroyeurId
+    vhuAgrementBroyeurId,
+    allowBsdasriTakeOverWithoutSignature
   } = companyInput;
   const ecoOrganismeAgreements =
     companyInput.ecoOrganismeAgreements?.map(a => a.href) || [];
@@ -95,7 +96,8 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     verificationCode: randomNumber(5).toString(),
     ecoOrganismeAgreements: {
       set: ecoOrganismeAgreements
-    }
+    },
+    allowBsdasriTakeOverWithoutSignature
   };
 
   if (!!transporterReceiptId) {

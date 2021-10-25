@@ -10,7 +10,7 @@ function toBsdElastic(bsff: Bsff): BsdElastic {
     type: "BSFF" as const,
     emitter: bsff.emitterCompanyName ?? "",
     recipient: bsff.destinationCompanyName ?? "",
-    waste: [bsff.wasteCode, bsff.wasteNature].filter(Boolean).join(" "),
+    waste: [bsff.wasteCode, bsff.wasteDescription].filter(Boolean).join(" "),
     createdAt: bsff.createdAt.getTime(),
     isDraftFor: [],
     isForActionFor: [],

@@ -41,8 +41,7 @@ type Destination = Pick<
   | "destinationCompanyPhone"
   | "destinationCompanyMail"
   | "destinationPlannedOperationCode"
-  | "destinationReceptionQuantityNumber"
-  | "destinationReceptionQuantityTons"
+  | "destinationReceptionWeight"
   | "destinationReceptionAcceptationStatus"
   | "destinationReceptionRefusalReason"
   | "destinationOperationCode"
@@ -66,7 +65,9 @@ type Identification = Pick<
   "identificationNumbers" | "identificationType"
 >;
 
-type Quantity = Pick<Bsvhu, "quantityNumber" | "quantityTons">;
+type Quantity = Pick<Bsvhu, "quantity">;
+
+type Weight = Pick<Bsvhu, "weightValue" | "weightIsEstimate">;
 type Packaging = Pick<Bsvhu, "packaging">;
 
 interface VhuValidationContext {
@@ -84,6 +85,7 @@ export function validateBsvhu(
     .concat(transporterSchema(context))
     .concat(packagingSchema(context))
     .concat(identificationSchema(context))
+    .concat(weightSchema(context))
     .concat(quantitySchema(context))
     .validate(form, { abortEarly: false });
 }
@@ -147,12 +149,11 @@ const destinationSchema: FactorySchemaOf<
         context.emissionSignature,
         `Destinataire: le type de destination est obligatoire`
       ),
-    destinationReceptionQuantityNumber: yup.number().nullable(),
-    destinationReceptionQuantityTons: yup
+    destinationReceptionWeight: yup
       .number()
       .requiredIf(
         context.operationSignature,
-        `Destinataire: la quantité reçue est obligatoire`
+        `Destinataire: le poids reçu est obligatoire`
       ),
     destinationReceptionRefusalReason: yup.string().nullable(),
     destinationAgrementNumber: yup
@@ -317,13 +318,23 @@ const quantitySchema: FactorySchemaOf<
   Quantity
 > = context =>
   yup.object({
-    quantityNumber: yup
+    quantity: yup
       .number()
       .requiredIf(
         context.emissionSignature,
         `Déchet: la quantité est obligatoire`
+      )
+  });
+
+const weightSchema: FactorySchemaOf<VhuValidationContext, Weight> = context =>
+  yup.object({
+    weightValue: yup
+      .number()
+      .requiredIf(
+        context.emissionSignature,
+        `Déchet: le poids est obligatoire`
       ),
-    quantityTons: yup.number().nullable()
+    weightIsEstimate: yup.boolean().nullable()
   });
 
 const packagingSchema: FactorySchemaOf<

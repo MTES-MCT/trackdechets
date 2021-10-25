@@ -1,63 +1,69 @@
 import { BsvhuStatus } from "@prisma/client";
 import { BsvhuWhere } from "../../generated/graphql/types";
-import { convertWhereToDbFilter } from "../where";
+import { toPrismaWhereInput } from "../where";
 
 describe("Bsvhu where builder", () => {
   it("should throw if filters are deeply nested in OR", () => {
     const where: BsvhuWhere = {
       _and: [{ _and: [{ isDraft: true }] }]
     };
-    expect(() => convertWhereToDbFilter(where)).toThrow();
+    expect(() => toPrismaWhereInput(where)).toThrow();
   });
 
   it("should throw if filters are deeply nested in AND", () => {
     const where: BsvhuWhere = {
       _or: [{ _and: [{ isDraft: true }] }]
     };
-    expect(() => convertWhereToDbFilter(where)).toThrow();
+    expect(() => toPrismaWhereInput(where)).toThrow();
   });
 
-  it("should convert basic filters to db filters", () => {
+  it("should convert string filters to db filters", () => {
     const where: BsvhuWhere = {
-      emitter: { company: { siret: "1234" } },
-      destination: { company: { siret: "1234" } },
-      transporter: { company: { siret: "1234" } }
+      emitter: { company: { siret: { _eq: "1234" } } },
+      destination: { company: { siret: { _eq: "1234" } } },
+      transporter: { company: { siret: { _eq: "1234" } } }
     };
 
-    const dbFilter = convertWhereToDbFilter(where);
+    const dbFilter = toPrismaWhereInput(where);
 
     expect(dbFilter).toEqual({
-      emitterCompanySiret: "1234",
-      destinationCompanySiret: "1234",
-      transporterCompanySiret: "1234"
+      emitterCompanySiret: { equals: "1234" },
+      destinationCompanySiret: { equals: "1234" },
+      transporterCompanySiret: { equals: "1234" }
     });
   });
 
   it("should convert complex filters to db filters", () => {
     const where: BsvhuWhere = {
-      emitter: { company: { siret: "1234" } },
+      emitter: { company: { siret: { _eq: "1234" } } },
       _or: [{ isDraft: true }],
-      _and: [{ status: BsvhuStatus.INITIAL }]
+      _and: [{ status: { _eq: BsvhuStatus.INITIAL } }]
     };
 
-    const dbFilter = convertWhereToDbFilter(where);
+    const dbFilter = toPrismaWhereInput(where);
 
     expect(dbFilter).toEqual({
-      emitterCompanySiret: "1234",
+      emitterCompanySiret: { equals: "1234" },
       OR: [{ isDraft: true }],
-      AND: [{ status: "INITIAL" }]
+      AND: [{ status: { equals: "INITIAL" } }]
     });
   });
 
   it("should support ORing the same field", () => {
     const where: BsvhuWhere = {
-      _or: [{ status: BsvhuStatus.PROCESSED }, { status: BsvhuStatus.INITIAL }]
+      _or: [
+        { status: { _eq: BsvhuStatus.PROCESSED } },
+        { status: { _eq: BsvhuStatus.INITIAL } }
+      ]
     };
 
-    const dbFilter = convertWhereToDbFilter(where);
+    const dbFilter = toPrismaWhereInput(where);
 
     expect(dbFilter).toEqual({
-      OR: [{ status: "PROCESSED" }, { status: "INITIAL" }]
+      OR: [
+        { status: { equals: "PROCESSED" } },
+        { status: { equals: "INITIAL" } }
+      ]
     });
   });
 
@@ -67,7 +73,7 @@ describe("Bsvhu where builder", () => {
       createdAt: { _gt: now }
     };
 
-    const dbFilter = convertWhereToDbFilter(where);
+    const dbFilter = toPrismaWhereInput(where);
 
     expect(dbFilter).toEqual({
       createdAt: { gt: now }
@@ -80,7 +86,7 @@ describe("Bsvhu where builder", () => {
       createdAt: { _gt: now, _lt: now }
     };
 
-    const dbFilter = convertWhereToDbFilter(where);
+    const dbFilter = toPrismaWhereInput(where);
 
     expect(dbFilter).toEqual({
       createdAt: { gt: now, lt: now }

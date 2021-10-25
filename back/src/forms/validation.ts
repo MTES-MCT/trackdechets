@@ -5,7 +5,8 @@ import {
   QuantityType,
   WasteAcceptationStatus,
   Prisma,
-  CompanyVerificationStatus
+  CompanyVerificationStatus,
+  Status
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
@@ -18,8 +19,14 @@ import {
   WASTES_CODES
 } from "../common/constants";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
-import { PackagingInfo, Packagings } from "../generated/graphql/types";
+import {
+  AppendixFormInput,
+  PackagingInfo,
+  Packagings
+} from "../generated/graphql/types";
 import { isCollector, isWasteProcessor } from "../companies/validation";
+import { getFinalDestinationSiret, getFormOrFormNotFound } from "./database";
+import { FormAlreadyInAppendix2 } from "./errors";
 // set yup default error messages
 configureYup();
 
@@ -448,6 +455,15 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
   });
 
 export const wasteDetailsSchema = wasteDetailsSchemaFn(false);
+
+export const beforeSignedByTransporterSchema: yup.SchemaOf<Pick<
+  Form,
+  "wasteDetailsPackagingInfos"
+>> = yup.object({
+  wasteDetailsPackagingInfos: yup
+    .array()
+    .min(1, "Le nombre de contenants doit être supérieur à 0")
+});
 
 // 8 - Collecteur-transporteur
 const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> = isDraft =>
@@ -1069,4 +1085,44 @@ export async function checkCompaniesType(form: Form) {
   }
 
   return true;
+}
+
+/**
+ * @param appendix2Forms bordereaux annexés
+ * @param form bordereau de regroupement existant
+ */
+export async function validateAppendix2Forms(
+  appendix2FormsInput: AppendixFormInput[],
+  form?: Partial<Pick<Form, "id" | "emitterCompanySiret">>
+) {
+  const appendix2Forms = await Promise.all(
+    appendix2FormsInput.map(({ id }) => getFormOrFormNotFound({ id }))
+  );
+
+  for (const appendix2 of appendix2Forms) {
+    if (appendix2.appendix2RootFormId) {
+      if (
+        !form?.id ||
+        (form?.id && appendix2.appendix2RootFormId !== form.id)
+      ) {
+        // the form has already been grouped into another one
+        throw new FormAlreadyInAppendix2(appendix2.id);
+      }
+    } else {
+      if (appendix2.status !== Status.AWAITING_GROUP) {
+        throw new UserInputError(
+          `Le bordereau ${appendix2.id} n'est pas en attente de regroupement`
+        );
+      }
+    }
+    const appendix2DestinationSiret = await getFinalDestinationSiret(appendix2);
+
+    if (form?.emitterCompanySiret !== appendix2DestinationSiret) {
+      throw new UserInputError(
+        `Le bordereau ${appendix2.id} n'est pas en possession du nouvel émetteur`
+      );
+    }
+  }
+
+  return appendix2Forms;
 }

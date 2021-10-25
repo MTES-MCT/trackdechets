@@ -3,8 +3,8 @@
 # Helper to restore a DB backup locally
 # -------------------------------------
 
-psql_container_id=$(docker ps -qf "name=trackdechets_postgres")
-api_container_id=$(docker ps -qf "name=trackdechets_td-api")
+psql_container_id=$(docker ps -qf name=^/trackdechets.postgres)
+api_container_id=$(docker ps -qf name=^/trackdechets.td-api)
 
 read -erp $'\e[1m? Do you wish to download the latest backup of your chosen database \e[m (Y/n) ' -e downloadBackup
 downloadBackup=${downloadBackup:-Y}

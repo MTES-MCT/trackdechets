@@ -481,4 +481,50 @@ describe("Mutation.signedByTransporter", () => {
       expect(resultingForm.sentAt).toEqual(sentAt);
     }
   );
+
+  it("should return an error if packagings is empty", async () => {
+    const { user, company: transporter } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const emitter = await companyFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        sentAt: null,
+        status: "SEALED",
+        wasteDetailsCode: "01 01 01",
+        emitterCompanySiret: emitter.siret,
+        transporterCompanySiret: transporter.siret,
+        wasteDetailsQuantity: 0,
+        wasteDetailsPackagingInfos: []
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "signedByTransporter">>(
+      SIGNED_BY_TRANSPORTER,
+      {
+        variables: {
+          id: form.id,
+          signingInfo: {
+            sentAt: "2018-12-11T00:00:00.000Z",
+            signedByTransporter: true,
+            securityCode: emitter.securityCode,
+            sentBy: "Roger Lapince",
+            signedByProducer: true,
+            quantity: 1
+          }
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Le nombre de contenants doit être supérieur à 0",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
 });

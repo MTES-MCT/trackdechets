@@ -3,8 +3,8 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { Field, FieldArray, FieldProps, useFormikContext } from "formik";
 import {
-  BsdasriPackagingInfo,
-  BsdasriPackagings as PackagingsEnum,
+  BsdasriPackaging,
+  BsdasriPackagingType,
 } from "generated/graphql/types";
 import {
   PACKAGINGS_NAMES,
@@ -19,7 +19,7 @@ export default function DasriPackagings({
   id,
   disabled,
   ...props
-}: FieldProps<BsdasriPackagingInfo[] | null> &
+}: FieldProps<BsdasriPackaging[] | null> &
   InputHTMLAttributes<HTMLInputElement>) {
   const { setFieldValue } = useFormikContext();
 
@@ -70,10 +70,12 @@ export default function DasriPackagings({
                               setFieldValue(fieldName, {
                                 type: event.target.value,
                                 other:
-                                  event.target.value === PackagingsEnum.Autre
+                                  event.target.value ===
+                                  BsdasriPackagingType.Autre
                                     ? p.other
                                     : "",
                                 quantity: p.quantity,
+                                volume: p.volume || 0,
                               });
                             }}
                           >
@@ -142,7 +144,7 @@ export default function DasriPackagings({
                 disabled={disabled}
                 onClick={() =>
                   arrayHelpers.push({
-                    type: PackagingsEnum.Autre,
+                    type: BsdasriPackagingType.Autre,
                     other: "",
                     quantity: 1,
                     volume: 0,

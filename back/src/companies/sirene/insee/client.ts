@@ -6,6 +6,8 @@ import {
 import { libelleFromCodeNaf, buildAddress } from "../utils";
 import { UserInputError } from "apollo-server-express";
 import { authorizedAxiosGet } from "./token";
+import { AnonymousCompanyError } from "../errors";
+import { format } from "date-fns";
 
 const SIRENE_API_BASE_URL = "https://api.insee.fr/entreprises/sirene/V3";
 
@@ -30,9 +32,13 @@ function searchResponseToCompany({
     etablissement.adresseEtablissement.libelleCommuneEtablissement
   ]);
 
+  const lastPeriod = etablissement.periodesEtablissement?.length
+    ? etablissement.periodesEtablissement[0]
+    : null;
+
   const company = {
     siret: etablissement.siret,
-    etatAdministratif: etablissement.uniteLegale.etatAdministratifUniteLegale,
+    etatAdministratif: lastPeriod?.etatAdministratifEtablissement,
     address: fullAddress,
     addressVoie,
     addressPostalCode:
@@ -40,7 +46,7 @@ function searchResponseToCompany({
     addressCity: etablissement.adresseEtablissement.libelleCommuneEtablissement,
     codeCommune: etablissement.adresseEtablissement.codeCommuneEtablissement,
     name: etablissement.uniteLegale.denominationUniteLegale,
-    naf: etablissement.uniteLegale.activitePrincipaleUniteLegale,
+    naf: lastPeriod?.activitePrincipaleEtablissement,
     libelleNaf: ""
   };
 
@@ -82,6 +88,10 @@ export function searchCompany(siret: string): Promise<CompanySearchResult> {
           invalidArgs: ["siret"]
         });
       }
+      if (error.response?.status === 403) {
+        throw new AnonymousCompanyError();
+      }
+
       throw error;
     });
 }
@@ -111,8 +121,10 @@ export function searchCompanies(
   // list of filters to pass as "q" arguments
   const filters = [];
 
+  const today = format(new Date(), "yyyy-MM-dd");
+
   // exclude closed companies
-  filters.push(`etatAdministratifUniteLegale:A`);
+  filters.push(`periode(etatAdministratifEtablissement:A)`);
 
   if (/[0-9]{14}/.test(clue)) {
     // clue is formatted like a SIRET
@@ -125,7 +137,10 @@ export function searchCompanies(
     filters.push(`codePostalEtablissement:${department}*`);
   }
 
-  const searchUrl = `${SIRENE_API_BASE_URL}/siret?q=${filters.join(" AND ")}`;
+  // the date parameter allows to apply the filter on current period
+  const q = `${filters.join(" AND ")} &date=${today}`;
+
+  const searchUrl = `${SIRENE_API_BASE_URL}/siret?q=${q}`;
 
   return authorizedAxiosGet<FullTextSearchResponseInsee>(searchUrl)
     .then(r => {

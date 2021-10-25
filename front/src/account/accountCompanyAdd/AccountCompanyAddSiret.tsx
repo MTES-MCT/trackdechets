@@ -56,7 +56,24 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
 
   return (
     <>
-      {error && <NotificationError apolloError={error} />}
+      {error && (
+        <NotificationError
+          apolloError={error}
+          message={error => {
+            if (
+              error.graphQLErrors.length &&
+              error.graphQLErrors[0].extensions?.code === "FORBIDDEN"
+            ) {
+              return (
+                "Nous n'avons pas pu récupérer les informations de cet établissement car il n'est pas diffusable. " +
+                "Veuillez nous contacter à l'adresse tech@trackdechets.beta.gouv.fr avec votre certificat d'inscription au répertoire des Entreprises et " +
+                "des Établissements (SIRENE) pour pouvoir procéder à la création de l'établissement"
+              );
+            }
+            return error.message;
+          }}
+        />
+      )}
       <Formik
         initialValues={{ siret: "" }}
         validate={values => {

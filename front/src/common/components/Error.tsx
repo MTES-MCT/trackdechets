@@ -5,6 +5,7 @@ import styles from "./Error.module.scss";
 type Props = {
   apolloError: ApolloError;
   className?: string;
+  message?: (err: ApolloError) => string;
 };
 
 export const isFunction = (obj: any): obj is Function =>
@@ -45,7 +46,7 @@ export function InlineError({ apolloError }: Props) {
   );
 }
 
-export function NotificationError({ apolloError, className }: Props) {
+export function NotificationError({ apolloError, className, message }: Props) {
   return (
     <ErrorProvider apolloError={apolloError}>
       {({ error, idx }) => (
@@ -55,7 +56,7 @@ export function NotificationError({ apolloError, className }: Props) {
             styles.lineBreak
           } ${className ?? ""}`}
         >
-          {error.message}
+          {message ? message(apolloError) : error.message}
         </div>
       )}
     </ErrorProvider>

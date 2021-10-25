@@ -233,7 +233,7 @@ function toBsdElastic(form: FullForm): BsdElastic {
     type: "BSDD",
     emitter: form.emitterCompanyName ?? "",
     recipient: getRecipient(form) ?? "",
-    transporterNumberPlate: form.transporterNumberPlate,
+    transporterNumberPlate: [form.transporterNumberPlate],
     transporterCustomInfo: form.transporterCustomInfo,
     waste: getWaste(form),
     createdAt: form.createdAt.getTime(),

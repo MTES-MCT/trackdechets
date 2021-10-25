@@ -70,16 +70,13 @@ export function SignOperation({ siret, bsdaId }: Props) {
                 {
                   destination: {
                     reception: {
-                      date: null,
+                      date: new Date().toISOString(),
                       acceptationStatus: "ACCEPTED",
                       refusalReason: "",
-                      quantity: {
-                        type: "REAL",
-                        value: null,
-                      },
+                      weight: null,
                     },
                     operation: {
-                      date: null,
+                      date: new Date().toISOString(),
                       code: "",
                       nextDestination: { company: getInitialCompany() },
                     },

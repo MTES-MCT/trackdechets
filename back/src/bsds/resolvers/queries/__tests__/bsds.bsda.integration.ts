@@ -149,10 +149,10 @@ describe("Query.bsds.bsda base workflow", () => {
               sealNumbers: ["1", "2"]
             },
             packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
-            quantity: { type: "ESTIMATED", value: 1.2 },
+            weight: { isEstimate: true, value: 1.2 },
             destination: {
               cap: "A cap",
-              plannedOperationCode: "R 12",
+              plannedOperationCode: "D 13",
               company: {
                 siret: destination.company.siret,
                 name: "destination",
@@ -164,7 +164,7 @@ describe("Query.bsds.bsda base workflow", () => {
               reception: {
                 acceptationStatus: "ACCEPTED",
                 date: new Date().toISOString() as any,
-                quantity: { type: "REAL", value: 1 }
+                weight: 1
               },
               operation: {
                 code: "D 13",

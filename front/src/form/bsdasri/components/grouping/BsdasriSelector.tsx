@@ -33,19 +33,19 @@ export default function BsdasriSelector({ name }) {
   const { values, setFieldValue } = useFormikContext<Bsdasri>();
 
   const [state, dispatch] = useReducer(reducer, {
-    selected: getIn(values, name).map(f => f.id),
+    selected: getIn(values, name), //.map(f => f.id),
   });
 
   // memoize stored regrouped dasris
-  const regroupedInDB = useMemo(
-    () => getIn(values, name).map(f => f.id) || [],
-    [name, values]
-  );
+  const regroupedInDB = useMemo(() => getIn(values, name) || [], [
+    name,
+    values,
+  ]);
 
   useEffect(() => {
     setFieldValue(
       name,
-      state.selected.map(s => ({ id: s }))
+      state.selected.map(s => s)
     );
   }, [state, name, setFieldValue]);
 

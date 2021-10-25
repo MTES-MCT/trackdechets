@@ -25,10 +25,8 @@ describe("searchCompany", () => {
           uniteLegale: {
             denominationUniteLegale: "CODE EN STOCK",
             categorieJuridiqueUniteLegale: "",
-            etatAdministratifUniteLegale: "A",
             prenom1UniteLegale: "",
-            nomUniteLegale: "",
-            activitePrincipaleUniteLegale: "62.01Z"
+            nomUniteLegale: ""
           },
           adresseEtablissement: {
             numeroVoieEtablissement: "4",
@@ -39,7 +37,13 @@ describe("searchCompany", () => {
             codePostalEtablissement: "13001",
             libelleCommuneEtablissement: "Marseille",
             codeCommuneEtablissement: "13201"
-          }
+          },
+          periodesEtablissement: [
+            {
+              etatAdministratifEtablissement: "A",
+              activitePrincipaleEtablissement: "62.01Z"
+            }
+          ]
         }
       }
     });
@@ -71,10 +75,8 @@ describe("searchCompany", () => {
           uniteLegale: {
             denominationUniteLegale: "",
             categorieJuridiqueUniteLegale: "1000",
-            etatAdministratifUniteLegale: "A",
             prenom1UniteLegale: "JOHN",
-            nomUniteLegale: "SNOW",
-            activitePrincipaleUniteLegale: "62.01Z"
+            nomUniteLegale: "SNOW"
           },
           adresseEtablissement: {
             numeroVoieEtablissement: "4",
@@ -83,7 +85,13 @@ describe("searchCompany", () => {
             codePostalEtablissement: "13001",
             libelleCommuneEtablissement: "Marseille",
             codeCommuneEtablissement: "13201"
-          }
+          },
+          periodesEtablissement: [
+            {
+              etatAdministratifEtablissement: "A",
+              activitePrincipaleEtablissement: "62.01Z"
+            }
+          ]
         }
       }
     });
@@ -135,10 +143,8 @@ describe("searchCompanies", () => {
             uniteLegale: {
               denominationUniteLegale: "CODE EN STOCK",
               categorieJuridiqueUniteLegale: "",
-              etatAdministratifUniteLegale: "A",
               prenom1UniteLegale: "",
-              nomUniteLegale: "",
-              activitePrincipaleUniteLegale: "62.01Z"
+              nomUniteLegale: ""
             },
             adresseEtablissement: {
               numeroVoieEtablissement: "4",
@@ -147,7 +153,13 @@ describe("searchCompanies", () => {
               codePostalEtablissement: "13001",
               libelleCommuneEtablissement: "Marseille",
               codeCommuneEtablissement: "13201"
-            }
+            },
+            periodesEtablissement: [
+              {
+                etatAdministratifEtablissement: "A",
+                activitePrincipaleEtablissement: "62.01Z"
+              }
+            ]
           }
         ]
       }
@@ -203,10 +215,8 @@ describe("searchCompanies", () => {
             uniteLegale: {
               denominationUniteLegale: "BOULANGERIE",
               categorieJuridiqueUniteLegale: "",
-              etatAdministratifUniteLegale: "A",
               prenom1UniteLegale: "",
-              nomUniteLegale: "",
-              activitePrincipaleUniteLegale: "4724Z"
+              nomUniteLegale: ""
             },
             adresseEtablissement: {
               numeroVoieEtablissement: "1",
@@ -215,7 +225,13 @@ describe("searchCompanies", () => {
               codePostalEtablissement: "07100",
               libelleCommuneEtablissement: "ANNONAY",
               codeCommuneEtablissement: "07110"
-            }
+            },
+            periodesEtablissement: [
+              {
+                etatAdministratifEtablissement: "A",
+                activitePrincipaleEtablissement: "4724Z"
+              }
+            ]
           }
         ]
       }

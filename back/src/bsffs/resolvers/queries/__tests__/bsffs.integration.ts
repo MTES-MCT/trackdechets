@@ -1,4 +1,5 @@
 import { Bsff, BsffFicheIntervention, UserRole } from "@prisma/client";
+import { gql } from "apollo-server-express";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import { Query, QueryBsffsArgs } from "../../../../generated/graphql/types";
@@ -10,34 +11,35 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { OPERATION } from "../../../constants";
+import { fullBsff } from "../../../fragments";
 import {
   createBsff,
   createBsffAfterOperation
 } from "../../../__tests__/factories";
 
-const GET_BSFFS = `
-  query GetBsffs($after: ID, $first: Int, $before: ID, $last: Int, $where: BsffWhere) {
-    bsffs(after: $after, first: $first, before: $before, last: $last, where: $where) {
+const GET_BSFFS = gql`
+  query GetBsffs(
+    $after: ID
+    $first: Int
+    $before: ID
+    $last: Int
+    $where: BsffWhere
+  ) {
+    bsffs(
+      after: $after
+      first: $first
+      before: $before
+      last: $last
+      where: $where
+    ) {
       edges {
         node {
-          id
-          ficheInterventions {
-            numero
-          }
-          previousBsffs {
-            id
-            ficheInterventions {
-              detenteur {
-                company {
-                  siret
-                }
-              }
-            }
-          }
+          ...FullBsff
         }
       }
     }
   }
+  ${fullBsff}
 `;
 
 describe("Query.bsffs", () => {
@@ -107,7 +109,7 @@ describe("Query.bsffs", () => {
             where: {
               [role]: {
                 company: {
-                  siret: userAndCompany.company.siret
+                  siret: { _eq: userAndCompany.company.siret }
                 }
               }
             }
@@ -146,7 +148,7 @@ describe("Query.bsffs", () => {
           create: [
             {
               numero: ficheInterventionNumero,
-              kilos: 2,
+              weight: 2,
               detenteurCompanyName: "Acme",
               detenteurCompanySiret: "1".repeat(14),
               detenteurCompanyAddress: "12 rue de la Tige, 69000",
@@ -174,9 +176,9 @@ describe("Query.bsffs", () => {
     expect(data.bsffs.edges[0].node).toEqual(
       expect.objectContaining({
         ficheInterventions: [
-          {
+          expect.objectContaining({
             numero: ficheInterventionNumero
-          }
+          })
         ]
       })
     );
@@ -205,7 +207,7 @@ describe("Query.bsffs", () => {
           where: {
             destination: {
               operation: {
-                code: "D10"
+                code: { _eq: "D10" }
               }
             }
           }
@@ -216,7 +218,7 @@ describe("Query.bsffs", () => {
     expect(data.bsffs.edges.length).toBe(1);
   });
 
-  describe("when listing the previous bsffs", () => {
+  describe("when listing the BSFFs that are grouped into this one", () => {
     let emitter: UserWithCompany;
     let transporter: UserWithCompany;
     let destination: UserWithCompany;
@@ -243,7 +245,7 @@ describe("Query.bsffs", () => {
             create: [
               {
                 numero: ficheInterventionNumero,
-                kilos: 2,
+                weight: 2,
                 postalCode: "69000",
                 detenteurCompanyName: "Acme",
                 detenteurCompanySiret: "1".repeat(14),
@@ -267,10 +269,10 @@ describe("Query.bsffs", () => {
       );
     });
 
-    it("should list the previous bsffs", async () => {
+    it("should list the grouping bsffs", async () => {
       const bsff = await createBsff(
         { emitter, transporter, destination },
-        { previousBsffs: { connect: [{ id: previousBsff.id }] } }
+        { grouping: { connect: [{ id: previousBsff.id }] } }
       );
 
       const { query } = makeClient(emitter.user);
@@ -283,7 +285,7 @@ describe("Query.bsffs", () => {
           expect.objectContaining({
             node: expect.objectContaining({
               id: bsff.id,
-              previousBsffs: [
+              grouping: [
                 expect.objectContaining({
                   id: previousBsff.id
                 })
@@ -297,7 +299,7 @@ describe("Query.bsffs", () => {
     it("should show the detenteur from the fiche d'interventions to companies on the bsff", async () => {
       const bsff = await createBsff(
         { emitter, transporter, destination },
-        { previousBsffs: { connect: [{ id: previousBsff.id }] } }
+        { grouping: { connect: [{ id: previousBsff.id }] } }
       );
 
       const { query } = makeClient(destination.user);
@@ -310,17 +312,17 @@ describe("Query.bsffs", () => {
           expect.objectContaining({
             node: expect.objectContaining({
               id: bsff.id,
-              previousBsffs: [
+              grouping: [
                 expect.objectContaining({
                   id: previousBsff.id,
                   ficheInterventions: [
                     expect.objectContaining({
-                      detenteur: {
-                        company: {
+                      detenteur: expect.objectContaining({
+                        company: expect.objectContaining({
                           siret:
                             previousBsffFicheIntervention.detenteurCompanySiret
-                        }
-                      }
+                        })
+                      })
                     })
                   ]
                 })
@@ -336,7 +338,7 @@ describe("Query.bsffs", () => {
 
       const bsff = await createBsff(
         { emitter: destination, transporter, destination: newDestination },
-        { previousBsffs: { connect: [{ id: previousBsff.id }] } }
+        { grouping: { connect: [{ id: previousBsff.id }] } }
       );
 
       const { query } = makeClient(newDestination.user);
@@ -349,7 +351,7 @@ describe("Query.bsffs", () => {
           expect.objectContaining({
             node: expect.objectContaining({
               id: bsff.id,
-              previousBsffs: [
+              grouping: [
                 expect.objectContaining({
                   id: previousBsff.id,
                   ficheInterventions: [
@@ -363,6 +365,49 @@ describe("Query.bsffs", () => {
           })
         ])
       );
+    });
+
+    it("should work with a nested _or filter", async () => {
+      const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsff1 = await createBsff(
+        { emitter },
+        {
+          destinationCompanySiret: "00000000000000"
+        }
+      );
+      const bsff2 = await createBsff(
+        { emitter },
+        {
+          destinationCompanySiret: "11111111111111"
+        }
+      );
+      await createBsff(
+        { emitter },
+        {
+          destinationCompanySiret: "22222222222222"
+        }
+      );
+
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+        GET_BSFFS,
+        {
+          variables: {
+            where: {
+              _or: [
+                {
+                  destination: { company: { siret: { _eq: "00000000000000" } } }
+                },
+                {
+                  destination: { company: { siret: { _eq: "11111111111111" } } }
+                }
+              ]
+            }
+          }
+        }
+      );
+      const bsffIds = data.bsffs.edges.map(({ node }) => node.id);
+      expect(bsffIds).toEqual([bsff2.id, bsff1.id]);
     });
   });
 });

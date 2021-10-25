@@ -1,9 +1,11 @@
 import { BsdasriResolvers } from "../../generated/graphql/types";
 
-import regroupedBsdasris from "./bsdasris/regroupedBsdasris";
+import grouping from "./bsdasris/grouping";
+import groupedIn from "./bsdasris/groupedIn";
 
 const bsdasriResolvers: BsdasriResolvers = {
-  regroupedBsdasris,
+  grouping,
+  groupedIn,
   metadata: bsdasri => {
     return {
       id: bsdasri.id

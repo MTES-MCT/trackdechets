@@ -3,15 +3,8 @@ import axios from "axios";
 import prisma from "../prisma";
 import { sendMail } from "../mailer/mailing";
 import { trim } from "../common/strings";
-import {
-  alertTypes,
-  createNotCompatibleRubriqueAlertCard,
-  createNotICPEAlertCard,
-  createSiretUnknownAlertCard
-} from "../common/trello";
 import { getCompanyAdminUsers } from "../companies/database";
 import { searchCompany } from "../companies/sirene";
-import { anomalies, verifyPrestataire } from "../companies/verif";
 import { buildPdfBase64 } from "../forms/pdf/generator";
 import Dreals from "./dreals";
 import { TDEventPayload } from "./emitter";
@@ -22,9 +15,6 @@ export async function formsEventCallback(payload: TDEventPayload<Form>) {
   await Promise.all([
     mailWhenFormIsDeclined(payload).catch(err =>
       console.error("Error on declined form subscription", err)
-    ),
-    verifiyPresta(payload).catch(err =>
-      console.error("Error on prestataire verification form subscription", err)
     )
   ]);
 }
@@ -110,40 +100,4 @@ export async function mailWhenFormIsDeclined(payload: TDEventPayload<Form>) {
     attachment: attachmentData
   });
   return sendMail(mail);
-}
-
-async function verifiyPresta(payload: TDEventPayload<Form>) {
-  if (payload.mutation === "CREATED") {
-    const bsd = payload.node;
-    const siret = bsd.recipientCompanySiret;
-    const wasteCode = bsd.wasteDetailsCode;
-
-    const [company, anomaly] = await verifyPrestataire(siret, wasteCode);
-
-    switch (anomaly) {
-      case anomalies.SIRET_UNKNOWN:
-        // Raise an internal alert => the siret was not recognized
-        const companyWithName = {
-          ...company,
-          name: bsd.recipientCompanyName
-        };
-        createSiretUnknownAlertCard(companyWithName, alertTypes.BSD_CREATION, {
-          bsd
-        });
-        break;
-      case anomalies.NOT_ICPE_27XX_35XX:
-        // Raise an internal alert => a producer is sending a waste
-        // to a company that is not ICPE
-        createNotICPEAlertCard(company, alertTypes.BSD_CREATION, { bsd });
-        break;
-      case anomalies.RUBRIQUES_INCOMPATIBLE:
-        // Raise an internal alert => a producer is sending a waste
-        // to a company that is not compatible with this type of waste
-        createNotCompatibleRubriqueAlertCard(
-          company,
-          alertTypes.BSD_CREATION,
-          bsd
-        );
-    }
-  }
 }

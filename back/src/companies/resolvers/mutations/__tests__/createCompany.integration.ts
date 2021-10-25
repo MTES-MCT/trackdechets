@@ -40,6 +40,7 @@ const CREATE_COMPANY = `
         validityLimit
         department
       }
+      allowBsdasriTakeOverWithoutSignature
     }
   }
 `;
@@ -70,7 +71,58 @@ describe("Mutation.createCompany", () => {
       siret: companyInput.siret,
       gerepId: companyInput.gerepId,
       name: companyInput.companyName,
-      companyTypes: companyInput.companyTypes
+      companyTypes: companyInput.companyTypes,
+      allowBsdasriTakeOverWithoutSignature: false // by default
+    });
+
+    const newCompanyExists =
+      (await prisma.company.findFirst({
+        where: {
+          siret: companyInput.siret
+        }
+      })) != null;
+    expect(newCompanyExists).toBe(true);
+
+    const newCompanyAssociationExists =
+      (await prisma.companyAssociation.findFirst({
+        where: { company: { siret: companyInput.siret }, user: { id: user.id } }
+      })) != null;
+    expect(newCompanyAssociationExists).toBe(true);
+
+    const refreshedUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
+
+    // association date is filled
+    expect(refreshedUser.firstAssociationDate).toBeTruthy();
+  });
+
+  it("should create company allowing dasri direct takeOver", async () => {
+    const user = await userFactory();
+
+    const companyInput = {
+      siret: "12345678912345",
+      gerepId: "1234",
+      companyName: "Acme",
+      companyTypes: ["PRODUCER"],
+      allowBsdasriTakeOverWithoutSignature: true
+    };
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
+      }
+    );
+
+    expect(data.createCompany).toMatchObject({
+      siret: companyInput.siret,
+      gerepId: companyInput.gerepId,
+      name: companyInput.companyName,
+      companyTypes: companyInput.companyTypes,
+      allowBsdasriTakeOverWithoutSignature: true
     });
 
     const newCompanyExists =

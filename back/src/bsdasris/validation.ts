@@ -1,4 +1,4 @@
-import { WasteAcceptationStatus, QuantityType, Prisma } from "@prisma/client";
+import { WasteAcceptationStatus, Prisma } from "@prisma/client";
 import { isCollector } from "../companies/validation";
 import * as yup from "yup";
 import {
@@ -10,7 +10,7 @@ import {
 import configureYup from "../common/yup/configureYup";
 import prisma from "../prisma";
 import {
-  BsdasriPackagings,
+  BsdasriPackagingType,
   BsdasriSignatureType
 } from "../generated/graphql/types";
 
@@ -28,11 +28,11 @@ export type FactorySchemaOf<Context, Type> = (
 
 type Emitter = Pick<
   Prisma.BsdasriCreateInput,
-  | "emitterWorkSiteName"
-  | "emitterWorkSiteAddress"
-  | "emitterWorkSiteCity"
-  | "emitterWorkSitePostalCode"
-  | "emitterWorkSiteInfos"
+  | "emitterPickupSiteName"
+  | "emitterPickupSiteAddress"
+  | "emitterPickupSiteCity"
+  | "emitterPickupSitePostalCode"
+  | "emitterPickupSiteInfos"
   | "emitterCompanyName"
   | "emitterCompanySiret"
   | "emitterCompanyAddress"
@@ -42,14 +42,16 @@ type Emitter = Pick<
 >;
 type Emission = Pick<
   Prisma.BsdasriCreateInput,
-  | "wasteDetailsCode"
-  | "wasteDetailsOnuCode"
-  | "emitterWasteQuantity"
-  | "emitterWasteQuantityType"
-  | "emitterWastePackagingsInfo"
-  | "handedOverToTransporterAt"
+  | "wasteCode"
+  | "wasteAdr"
+  | "emitterWasteWeightValue"
+  | "emitterWasteWeightIsEstimate"
+  | "emitterWastePackagings"
 >;
-
+type EcoOrganisme = Pick<
+  Prisma.BsdasriCreateInput,
+  "ecoOrganismeSiret" | "ecoOrganismeName"
+>;
 type Transporter = Pick<
   Prisma.BsdasriCreateInput,
   | "transporterCompanyName"
@@ -58,41 +60,43 @@ type Transporter = Pick<
   | "transporterCompanyContact"
   | "transporterCompanyPhone"
   | "transporterCompanyMail"
-  | "transporterReceipt"
-  | "transporterReceiptDepartment"
-  | "transporterReceiptValidityLimit"
+  | "transporterRecepisseNumber"
+  | "transporterRecepisseDepartment"
+  | "transporterRecepisseValidityLimit"
 >;
 type Transport = Pick<
   Prisma.BsdasriCreateInput,
-  | "transporterWasteAcceptationStatus"
+  | "transporterAcceptationStatus"
   | "transporterWasteRefusalReason"
-  | "transporterWasteRefusedQuantity"
+  | "transporterWasteRefusedWeightValue"
   | "transporterTakenOverAt"
-  | "transporterWastePackagingsInfo"
-  | "transporterWasteQuantity"
-  | "transporterWasteQuantityType"
+  | "transporterWastePackagings"
+  | "transporterWasteWeightValue"
+  | "transporterWasteWeightIsEstimate"
   | "handedOverToRecipientAt"
 >;
 type Recipient = Pick<
   Prisma.BsdasriCreateInput,
-  | "recipientCompanyName"
-  | "recipientCompanySiret"
-  | "recipientCompanyAddress"
-  | "recipientCompanyContact"
-  | "recipientCompanyPhone"
-  | "recipientCompanyMail"
+  | "destinationCompanyName"
+  | "destinationCompanySiret"
+  | "destinationCompanyAddress"
+  | "destinationCompanyContact"
+  | "destinationCompanyPhone"
+  | "destinationCompanyMail"
 >;
 type Reception = Pick<
   Prisma.BsdasriCreateInput,
-  | "recipientWastePackagingsInfo"
-  | "recipientWasteAcceptationStatus"
-  | "recipientWasteRefusalReason"
-  | "recipientWasteRefusedQuantity"
-  | "receivedAt"
+  | "destinationWastePackagings"
+  | "destinationReceptionAcceptationStatus"
+  | "destinationReceptionWasteRefusalReason"
+  | "destinationReceptionWasteRefusedWeightValue"
+  | "destinationReceptionDate"
 >;
 type Operation = Pick<
   Prisma.BsdasriCreateInput,
-  "processingOperation" | "processedAt" | "recipientWasteQuantity"
+  | "destinationOperationCode"
+  | "destinationOperationDate"
+  | "destinationReceptionWasteWeightValue"
 >;
 
 // *********************
@@ -150,15 +154,14 @@ export const emitterSchema: FactorySchemaOf<
       ),
     emitterCompanyMail: yup.string().email().ensure(),
 
-    emitterWorkSiteName: yup.string().nullable(),
-    emitterWorkSiteAddress: yup.string().nullable(),
-    emitterWorkSiteCity: yup.string().nullable(),
-    emitterWorkSitePostalCode: yup.string().nullable(),
-    emitterWorkSiteInfos: yup.string().nullable(),
-    emitterOnBehalfOfEcoorganisme: yup.boolean().notRequired().nullable()
+    emitterPickupSiteName: yup.string().nullable(),
+    emitterPickupSiteAddress: yup.string().nullable(),
+    emitterPickupSiteCity: yup.string().nullable(),
+    emitterPickupSitePostalCode: yup.string().nullable(),
+    emitterPickupSiteInfos: yup.string().nullable()
   });
 
-const packagingsTypes: BsdasriPackagings[] = [
+const packagingsTypes: BsdasriPackagingType[] = [
   "BOITE_CARTON",
   "FUT",
   "BOITE_PERFORANTS",
@@ -169,7 +172,7 @@ const packagingsTypes: BsdasriPackagings[] = [
 export const packagingInfo = _ =>
   yup.object({
     type: yup
-      .mixed<BsdasriPackagings>()
+      .mixed<BsdasriPackagingType>()
       .required("Le type de conditionnement doit être précisé.")
       .oneOf(packagingsTypes),
     other: yup
@@ -207,38 +210,41 @@ export const emissionSchema: FactorySchemaOf<
   Emission
 > = context =>
   yup.object({
-    wasteDetailsCode: yup
+    wasteCode: yup
       .string()
       .oneOf([...wasteCodes, "", null], INVALID_DASRI_WASTE_CODE)
       .requiredIf(context.emissionSignature, "Le code déchet est obligatoire"),
-    wasteDetailsOnuCode: yup
+    wasteAdr: yup
       .string()
       .ensure()
       .requiredIf(context.emissionSignature, `La mention ADR est obligatoire.`),
 
-    emitterWasteQuantity: yup
+    emitterWasteWeightValue: yup
       .number()
       .nullable()
       .test(
         "emission-quantity-required-if-type-is-provided",
-        "La quantité du déchet émis en kg est obligatoire si vous renseignez le type de quantité",
+        "Le poids de déchets émis en kg est obligatoire si vous renseignez le type de pesée",
         function (value) {
-          return !!this.parent.emitterWasteQuantityType ? !!value : true;
+          return !!this.parent.emitterWasteWeightIsEstimate ? !!value : true;
         }
       )
-      .min(0, "La quantité émise doit être supérieure à 0"),
+      .min(0.1, "Le poids de déchet émis doit être supérieur à 0"),
 
-    emitterWasteQuantityType: yup
-      .mixed<QuantityType>()
+    emitterWasteWeightIsEstimate: yup
+      .boolean()
+      .nullable()
       .test(
         "emission-quantity-type-required-if-quantity-is-provided",
-        "Le type de quantité (réelle ou estimée) émise doit être précisé si vous renseignez une quantité",
+        "Le type de pesée (réelle ou estimée) doit être précisé si vous renseignez un poids de déchets émis",
         function (value) {
-          return !!this.parent.emitterWasteQuantity ? !!value : true;
+          return !!this.parent.emitterWasteWeightValue
+            ? ![null, undefined].includes(value)
+            : true;
         }
       ),
 
-    emitterWastePackagingsInfo: yup
+    emitterWastePackagings: yup
       .array()
       .requiredIf(
         context.emissionSignature,
@@ -251,9 +257,31 @@ export const emissionSchema: FactorySchemaOf<
         function (value) {
           return !!context.emissionSignature ? !!value && !!value.length : true;
         }
-      ),
+      )
+  });
 
-    handedOverToTransporterAt: yup.date().nullable()
+export const ecoOrganismeSchema: FactorySchemaOf<
+  BsdasriValidationContext,
+  EcoOrganisme
+> = () =>
+  yup.object().shape({
+    ecoOrganismeSiret: yup
+      .string()
+      .notRequired()
+      .nullable()
+      .test(
+        "is-known-eco-organisme",
+        "L'éco-organisme avec le siret \"${value}\" n'est pas reconnu.",
+        ecoOrganismeSiret =>
+          ecoOrganismeSiret
+            ? prisma.ecoOrganisme
+                .findFirst({
+                  where: { siret: ecoOrganismeSiret }
+                })
+                .then(el => el != null)
+            : true
+      ),
+    ecoOrganismeName: yup.string().notRequired().nullable()
   });
 
 export const transporterSchema: FactorySchemaOf<
@@ -297,7 +325,7 @@ export const transporterSchema: FactorySchemaOf<
         `Transporteur: ${MISSING_COMPANY_PHONE}`
       ),
     transporterCompanyMail: yup.string().email().ensure(),
-    transporterReceipt: yup
+    transporterRecepisseNumber: yup
       .string()
       .ensure()
       .requiredIf(
@@ -305,7 +333,7 @@ export const transporterSchema: FactorySchemaOf<
         "Le numéro de récépissé est obligatoire"
       ),
 
-    transporterReceiptDepartment: yup
+    transporterRecepisseDepartment: yup
       .string()
       .ensure()
       .requiredIf(
@@ -313,7 +341,7 @@ export const transporterSchema: FactorySchemaOf<
         "Le département du transporteur est obligatoire"
       ),
 
-    transporterReceiptValidityLimit: yup
+    transporterRecepisseValidityLimit: yup
       .date()
       .requiredIf(
         context.transportSignature,
@@ -326,32 +354,32 @@ export const transportSchema: FactorySchemaOf<
   Transport
 > = context =>
   yup.object({
-    transporterWasteAcceptationStatus: yup
+    transporterAcceptationStatus: yup
       .mixed<WasteAcceptationStatus>()
       .requiredIf(
         context.transportSignature,
         "Vous devez préciser si le déchet est accepté"
       ),
 
-    transporterWasteRefusedQuantity: yup
+    transporterWasteRefusedWeightValue: yup
       .number()
-      .when("transporterWasteAcceptationStatus", (type, schema) =>
+      .when("transporterAcceptationStatus", (type, schema) =>
         ["REFUSED", "PARTIALLY_REFUSED"].includes(type)
           ? schema
-              .required("La quantité de déchets refusés doit être précisée.")
-              .min(0, "La quantité doit être supérieure à 0")
+              .required("Le poids de déchets refusés doit être précisé.")
+              .min(0, "Le poids doit être supérieur à 0")
           : schema
               .nullable()
               .notRequired()
               .test(
                 "is-empty",
-                "Le champ transporterWasteRefusedQuantity ne doit pas être renseigné si le déchet est accepté ",
+                "Le champ transporterWasteRefusedWeightValue ne doit pas être renseigné si le déchet est accepté ",
                 v => !v
               )
       ),
     transporterWasteRefusalReason: yup
       .string()
-      .when("transporterWasteAcceptationStatus", (type, schema) =>
+      .when("transporterAcceptationStatus", (type, schema) =>
         ["REFUSED", "PARTIALLY_REFUSED"].includes(type)
           ? schema.required("Vous devez saisir un motif de refus")
           : schema
@@ -363,28 +391,34 @@ export const transportSchema: FactorySchemaOf<
                 v => !v
               )
       ),
-    transporterWasteQuantity: yup
+    transporterWasteWeightValue: yup
       .number()
       .nullable()
       .test(
         "transport-quantity-required-if-type-is-provided",
-        "La quantité du déchet transporté en kg est obligatoire si vous renseignez le type de quantité",
+        "Le poids de déchets transportés en kg est obligatoire si vous renseignez le type de pesée",
         function (value) {
-          return !!this.parent.transporterWasteQuantityType ? !!value : true;
+          return !!this.parent.transporterWasteWeightIsEstimate
+            ? !!value
+            : true;
         }
       )
-      .min(0, "La quantité transportée doit être supérieure à 0"),
-    transporterWasteQuantityType: yup
-      .mixed<QuantityType>()
+      .min(0, "Le poids de déchets transportés doit être supérieur à 0"),
+
+    transporterWasteWeightIsEstimate: yup
+      .boolean()
+      .nullable()
       .test(
         "emission-quantity-type-required-if-quantity-is-provided",
-        "Le type de quantité (réelle ou estimée) transportée doit être précisé si vous renseignez une quantité",
+        "Le type de pesée (réelle ou estimée) doit être précisé si vous renseignez un poids de déchets transportés",
         function (value) {
-          return !!this.parent.transporterWasteQuantity ? !!value : true;
+          return !!this.parent.transporterWasteWeightValue
+            ? ![null, undefined].includes(value)
+            : true;
         }
       ),
 
-    transporterWastePackagingsInfo: yup
+    transporterWastePackagings: yup
       .array()
       .requiredIf(
         context.transportSignature,
@@ -415,13 +449,13 @@ export const recipientSchema: FactorySchemaOf<
   Recipient
 > = context =>
   yup.object().shape({
-    recipientCompanyName: yup
+    destinationCompanyName: yup
       .string()
       .requiredIf(
         context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_NAME}`
       ),
-    recipientCompanySiret: yup
+    destinationCompanySiret: yup
       .string()
       .length(14, `Destinataire: ${INVALID_SIRET_LENGTH}`)
 
@@ -429,28 +463,28 @@ export const recipientSchema: FactorySchemaOf<
         context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_SIRET}`
       ),
-    recipientCompanyAddress: yup
+    destinationCompanyAddress: yup
       .string()
 
       .requiredIf(
         context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_ADDRESS}`
       ),
-    recipientCompanyContact: yup
+    destinationCompanyContact: yup
       .string()
 
       .requiredIf(
         context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_CONTACT}`
       ),
-    recipientCompanyPhone: yup
+    destinationCompanyPhone: yup
       .string()
       .ensure()
       .requiredIf(
         context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_PHONE}`
       ),
-    recipientCompanyMail: yup.string().email().ensure()
+    destinationCompanyMail: yup.string().email().ensure()
   });
 
 export const receptionSchema: FactorySchemaOf<
@@ -458,21 +492,21 @@ export const receptionSchema: FactorySchemaOf<
   Reception
 > = context =>
   yup.object().shape({
-    recipientWasteAcceptationStatus: yup
+    destinationReceptionAcceptationStatus: yup
       .mixed<WasteAcceptationStatus>()
       .requiredIf(
         context.receptionSignature,
         "Vous devez préciser si le déchet est accepté"
       ),
-    recipientWasteRefusedQuantity: yup
+    destinationReceptionWasteRefusedWeightValue: yup
       .number()
       .nullable()
       .notRequired()
-      .min(0, "La quantité doit être supérieure à 0"),
+      .min(0, "Le poids doit être supérieur à 0"),
 
-    recipientWasteRefusalReason: yup
+    destinationReceptionWasteRefusalReason: yup
       .string()
-      .when("recipientWasteAcceptationStatus", (type, schema) =>
+      .when("destinationReceptionAcceptationStatus", (type, schema) =>
         ["REFUSED", "PARTIALLY_REFUSED"].includes(type)
           ? schema.required("Vous devez saisir un motif de refus")
           : schema
@@ -480,12 +514,12 @@ export const receptionSchema: FactorySchemaOf<
               .notRequired()
               .test(
                 "is-empty",
-                "Le champ recipientWasteAcceptationStatus ne doit pas être renseigné si le déchet est accepté ",
+                "Le champ destinationReceptionWasteRefusalReason ne doit pas être renseigné si le déchet est accepté ",
                 v => !v
               )
       ),
 
-    recipientWastePackagingsInfo: yup
+    destinationWastePackagings: yup
       .array()
       .requiredIf(
         context.receptionSignature,
@@ -501,7 +535,11 @@ export const receptionSchema: FactorySchemaOf<
         }
       )
       .of(packagingInfo(true)),
-    receivedAt: yup.date().nullable()
+    destinationReceptionDate: yup
+      .date()
+      .label("Date de réception")
+      .nullable()
+      .requiredIf(context.receptionSignature)
   });
 
 export const operationSchema: FactorySchemaOf<
@@ -509,31 +547,31 @@ export const operationSchema: FactorySchemaOf<
   Operation
 > = context => {
   // a grouping dasri should not have a grouping operation code (D12, R12)
-  const allowedOperations = context?.isRegrouping
+  const allowedOperations = context?.isGrouping
     ? DASRI_PROCESSING_OPERATIONS_CODES
     : DASRI_ALL_OPERATIONS_CODES;
 
   return yup.object({
-    recipientWasteQuantity: yup
+    destinationReceptionWasteWeightValue: yup
       .number()
       .test(
         "operation-quantity-required-if-final-processing-operation",
-        "La quantité du déchet traité en kg est obligatoire si le code correspond à un traitement final",
+        "Le poids du déchet traité en kg est obligatoire si le code correspond à un traitement final",
         function (value) {
           // We do not run this validator until processing signature because fields are not avilable in UI until then
           if (!context.operationSignature) {
             return true;
           }
           return DASRI_PROCESSING_OPERATIONS_CODES.includes(
-            this.parent.processingOperation
+            this.parent.destinationOperationCode
           )
             ? !!value
             : true;
         }
       )
       .nullable()
-      .min(0, "La quantité doit être supérieure à 0"),
-    processingOperation: yup
+      .min(0, "Le poids doit être supérieur à 0"),
+    destinationOperationCode: yup
       .string()
       .label("Opération d’élimination / valorisation")
       .oneOf([...allowedOperations, "", null], INVALID_PROCESSING_OPERATION)
@@ -542,25 +580,25 @@ export const operationSchema: FactorySchemaOf<
         "recipientIsCollectorForGroupingCodes",
         "Les codes R12 et D12 sont réservés aux installations de tri transit regroupement",
         async (value, ctx) => {
-          const recipientSiret = ctx.parent.recipientCompanySiret;
+          const recipientSiret = ctx.parent.destinationCompanySiret;
 
           if (
             DASRI_GROUPING_OPERATIONS_CODES.includes(value) &&
             !!recipientSiret
           ) {
-            const recipientCompany = await prisma.company.findUnique({
+            const destinationCompany = await prisma.company.findUnique({
               where: {
                 siret: recipientSiret
               }
             });
 
-            return isCollector(recipientCompany);
+            return isCollector(destinationCompany);
           }
           return true;
         }
       ),
 
-    processedAt: yup
+    destinationOperationDate: yup
       .date()
       .label("Date de traitement")
       .nullable()
@@ -573,7 +611,7 @@ export type BsdasriValidationContext = {
   transportSignature?: boolean;
   receptionSignature?: boolean;
   operationSignature?: boolean;
-  isRegrouping?: boolean;
+  isGrouping?: boolean;
 };
 export function validateBsdasri(
   dasri: Partial<Prisma.BsdasriCreateInput>,
@@ -586,6 +624,7 @@ export function validateBsdasri(
     .concat(recipientSchema(context))
     .concat(receptionSchema(context))
     .concat(operationSchema(context))
+    .concat(ecoOrganismeSchema(context))
     .validate(dasri, { abortEarly: false });
 }
 

@@ -45,8 +45,8 @@ const GET_BSVHUS = `
               number
             }
           }
-          quantity {
-            number
+          weight {
+            value
           }
         }
       }
@@ -113,7 +113,7 @@ describe("Query.Bsvhus", () => {
     const { query } = makeClient(user);
     const { data } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS, {
       variables: {
-        where: { destination: { company: { siret: company.siret } } }
+        where: { destination: { company: { siret: { _eq: company.siret } } } }
       }
     });
 

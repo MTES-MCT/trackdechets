@@ -5,6 +5,12 @@ type Bsff {
   """
   id: ID!
 
+  "Date de création"
+  createdAt: DateTime!
+
+  "Date de dernière modification"
+  updatedAt: DateTime!
+
   """
   Si ce BSFF est à l'état de brouillon ou pas.
 
@@ -42,9 +48,9 @@ type Bsff {
   waste: BsffWaste
 
   """
-  Quantité totale du déchet, il peut s'agir d'une estimation.
+  Quantité totale du déchet en kilogrammes, il peut s'agir d'une estimation.
   """
-  quantity: BsffQuantity
+  weight: BsffWeight
 
   """
   Transporteur du déchet, effectue l'enlèvement du déchet auprès de l'émetteur et l'emporte à la destination.
@@ -69,20 +75,77 @@ type Bsff {
   ficheInterventions: [BsffFicheIntervention!]!
 
   """
-  Bordereau qui a groupé, reconditionné ou réexpédié celui-ci.
+  Bordereau que celui-ci réexpédie
   """
-  nextBsff: Bsff
+  forwarding: InitialBsff
 
   """
-  Bordereaux qui ont successivement groupé, reconditionné ou réexpédié celui-ci.
-  Cette liste permet d'accéder à la traçabilité complète d'un bordereau.
+  Bordereau dans lequel celui-ci est réexpédié
   """
-  nextBsffs: [Bsff!]!
+  forwardedIn: Bsff
 
   """
-  Bordereaux que celui-ci groupe, reconditionne ou réexpédie.
+  Bordereaux que celui-ci reconditionne
   """
-  previousBsffs: [Bsff!]!
+  repackaging: [InitialBsff!]!
+
+  """
+  Bordereau dans lequel celui-ci est reconditionné
+  """
+  repackagedIn: Bsff
+
+  """
+  Bordereaux que celui-ci groupe
+  """
+  grouping: [InitialBsff!]!
+
+  """
+  Bordereau dans lequel celui-ci est groupé.
+  """
+  groupedIn: Bsff
+}
+
+"""
+Extrait d'un bordereau initial dans le cas d'une réexpedition, d'un reconditionnement ou d'un groupement
+"""
+type InitialBsff {
+  """
+  Identifiant unique assigné par Trackdéchets.
+  Il est à utiliser pour les échanges avec l'API.
+  """
+  id: ID!
+
+  """
+  Émetteur du déchet, qui n'est pas nécessairement le producteur.
+  Il s'agit par exemple de l'opérateur ayant collecté des fluides lors d'interventions,
+  ou alors d'une installation de collecte qui procède à la réexpédition pour traitement final.
+  """
+  emitter: BsffEmitter
+  """
+  Destination du déchet, qui peut le réceptionner pour traitement, groupement, reconditionnement ou réexpedition.
+  Un nouveau bordereau doit être créé si le déchet connaît un nouveau parcours, par exemple s'il quitte une installation de collecte pour un centre de traitement.
+
+  Pour plus de détails sur les différents types de bordereau, voir l'enum BsffType.
+  """
+  destination: BsffDestination
+  """
+  Détails du déchet.
+  """
+  waste: BsffWaste
+
+  """
+  Quantité totale du déchet en kilogrammes, il peut s'agir d'une estimation.
+  """
+  weight: BsffWeight
+  """
+  Liste des contenants utilisés pour le transport du déchet.
+  """
+  packagings: [BsffPackaging!]!
+  """
+  Liste des fiches d'intervention associés à ce bordereau.
+  Habituellement renseigné par un opérateur lors de son intervention.
+  """
+  ficheInterventions: [BsffFicheIntervention!]!
 }
 
 type BsffEmitter {
@@ -90,6 +153,8 @@ type BsffEmitter {
   company: FormCompany
   "Déclaration de l'émetteur lors de l'enlèvement par le transporteur."
   emission: BsffEmission
+  "Champ libre"
+  customInfo: String
 }
 type BsffEmission {
   "Signature de l'émetteur lors de l'enlèvement par le transporteur."
@@ -103,22 +168,22 @@ type BsffPackaging {
   volume: Float
   "Numéro du contenant."
   numero: String!
-  "Poids en kilos."
-  kilos: Float!
+  "Poids en kilogrammes."
+  weight: Float!
 }
 
 type BsffWaste {
   "Code déchet."
   code: String!
   "Nature du fluide, laisser vide lorsqu'il est inconnu."
-  nature: String
+  description: String
   "Mention ADR."
   adr: String!
 }
 
-type BsffQuantity {
-  "Poids total du déchet en kilos."
-  kilos: Float!
+type BsffWeight {
+  "Poids total du déchet en kilogrammes."
+  value: Float!
   "Si il s'agit d'une estimation ou d'un poids réel."
   isEstimate: Boolean!
 }
@@ -130,6 +195,8 @@ type BsffTransporter {
   recepisse: BsffTransporterRecepisse
   "Déclaration du transporteur lors de l'enlèvement auprès de l'émetteur."
   transport: BsffTransport
+  "Champ libre"
+  customInfo: String
 }
 type BsffTransporterRecepisse {
   "Numéro du récépissé."
@@ -154,17 +221,27 @@ type BsffDestination {
   "Déclaration de traitement du déchet."
   operation: BsffOperation
   "Opération de traitement prévu initialement."
-  plannedOperation: BsffPlannedOperation
+  plannedOperationCode: BsffOperationCode
   "Numéro CAP."
   cap: String
+  "Champ libre"
+  customInfo: String
 }
+
+type BsffAcceptation {
+  "Accepté ou refusé"
+  status: BsffAcceptationStatus!
+  "En cas de refus, la raison"
+  refusalReason: String
+}
+
 type BsffReception {
   "Date de réception du déchet."
   date: DateTime!
-  "Quantité totale du déchet, qu'elle soit réelle ou estimée."
-  kilos: Float!
-  "En cas de refus, le motif."
-  refusal: String
+  "Quantité totale du déchet en kilogrammes, qu'elle soit réelle ou estimée. Doit être à 0 dans le cas d'un refus"
+  weight: Float!
+  "Statut d'acceptation du déchet"
+  acceptation: BsffAcceptation
   "Signature de la destination lors de l'acceptation ou du refus du déchet."
   signature: Signature
 }
@@ -182,18 +259,14 @@ type BsffOperation {
   "Signature de la destination lors du traitement."
   signature: Signature
 }
-type BsffPlannedOperation {
-  "Code de l'opération de traitement prévu."
-  code: BsffOperationCode
-}
 
 type BsffFicheIntervention {
   "Identifiant unique de la fiche d'intervention."
   id: ID!
   "Numéro de la fiche d'intervention, habituellement renseigné par l'opérateur."
   numero: String!
-  "Poids total des fluides récupérés lors de cette intervention."
-  kilos: Float!
+  "Poids total en kilogrammes des fluides récupérés lors de cette intervention."
+  weight: Float!
   "Détenteur de l'équipement sur lequel est intervenu l'opérateur."
   detenteur: BsffDetenteur
   "Opérateur à l'origine de l'intervention."

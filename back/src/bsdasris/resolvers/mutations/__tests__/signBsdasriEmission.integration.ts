@@ -12,9 +12,8 @@ describe("Mutation.signBsdasri emission", () => {
   afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret
       }
@@ -40,7 +39,6 @@ describe("Mutation.signBsdasri emission", () => {
   it("a draft dasri should not be signed", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: {
         ...initialData(company),
         status: BsdasriStatus.INITIAL,
@@ -69,7 +67,6 @@ describe("Mutation.signBsdasri emission", () => {
   it("should put emission signature on a dasri", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
-      ownerId: user.id,
       opt: { ...initialData(company), status: BsdasriStatus.INITIAL }
     });
     const { mutate } = makeClient(user); // emitter
@@ -85,8 +82,10 @@ describe("Mutation.signBsdasri emission", () => {
       where: { id: dasri.id }
     });
     expect(signedByTransporterDasri.status).toEqual("SIGNED_BY_PRODUCER");
-    expect(signedByTransporterDasri.emissionSignatureAuthor).toEqual("Marcel");
-    expect(signedByTransporterDasri.emissionSignatureDate).toBeTruthy();
+    expect(signedByTransporterDasri.emitterEmissionSignatureAuthor).toEqual(
+      "Marcel"
+    );
+    expect(signedByTransporterDasri.emitterEmissionSignatureDate).toBeTruthy();
     expect(signedByTransporterDasri.emissionSignatoryId).toEqual(user.id);
   });
 });

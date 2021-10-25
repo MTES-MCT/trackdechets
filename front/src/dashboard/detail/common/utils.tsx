@@ -43,3 +43,16 @@ export const getVerboseQuantityType = (
 
   return quantityType === "REAL" ? "Réelle" : "Estimée";
 };
+
+export const getVerboseWeightType = (
+  isEstimate: Boolean | null | undefined | ""
+): string => {
+  if (isEstimate === true) {
+    return "Estimé";
+  }
+  if (isEstimate === false) {
+    return "Réél";
+  }
+
+  return "";
+};

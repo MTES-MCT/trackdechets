@@ -2,8 +2,8 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryBsdaArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb } from "../../converter";
-import { getFormOrFormNotFound } from "../../database";
-import { checkIsFormContributor } from "../../permissions";
+import { getBsdaOrNotFound } from "../../database";
+import { checkIsBsdaContributor } from "../../permissions";
 
 export default async function bsda(
   _,
@@ -12,8 +12,8 @@ export default async function bsda(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const form = await getFormOrFormNotFound(id);
-  await checkIsFormContributor(
+  const form = await getBsdaOrNotFound(id);
+  await checkIsBsdaContributor(
     user,
     form,
     "Vous n'êtes pas autorisé à accéder à ce bordereau"

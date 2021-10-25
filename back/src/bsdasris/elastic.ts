@@ -37,7 +37,7 @@ function getWhere(
 
   const formSirets: Record<string, string | null | undefined> = {
     emitterCompanySiret: bsdasri.emitterCompanySiret,
-    recipientCompanySiret: bsdasri.recipientCompanySiret,
+    destinationCompanySiret: bsdasri.destinationCompanySiret,
     transporterCompanySiret: bsdasri.transporterCompanySiret
   };
 
@@ -73,13 +73,13 @@ function getWhere(
     }
 
     case BsdasriStatus.SENT: {
-      setTab(siretsFilters, "recipientCompanySiret", "isForActionFor");
+      setTab(siretsFilters, "destinationCompanySiret", "isForActionFor");
       setTab(siretsFilters, "transporterCompanySiret", "isCollectedFor");
       break;
     }
 
     case BsdasriStatus.RECEIVED: {
-      setTab(siretsFilters, "recipientCompanySiret", "isForActionFor");
+      setTab(siretsFilters, "destinationCompanySiret", "isForActionFor");
       break;
     }
 
@@ -104,10 +104,7 @@ function getWhere(
 }
 
 function getWaste(bsdasri: Bsdasri) {
-  return [
-    bsdasri.wasteDetailsCode,
-    DASRI_WASTE_CODES_MAPPING[bsdasri.wasteDetailsCode]
-  ]
+  return [bsdasri.wasteCode, DASRI_WASTE_CODES_MAPPING[bsdasri.wasteCode]]
     .filter(Boolean)
     .join(" ");
 }
@@ -123,7 +120,8 @@ function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
     readableId: bsdasri.id,
     type: "BSDASRI",
     emitter: bsdasri.emitterCompanyName ?? "",
-    recipient: bsdasri.recipientCompanyName ?? "",
+    recipient: bsdasri.destinationCompanyName ?? "",
+    transporterNumberPlate: bsdasri.transporterTransportPlates,
     waste: getWaste(bsdasri),
     createdAt: bsdasri.createdAt.getTime(),
     ...where,

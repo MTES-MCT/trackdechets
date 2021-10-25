@@ -31,8 +31,8 @@ mutation CreateVhuForm($input: BsvhuInput!) {
         phone
       }
     }
-    quantity {
-      number
+    weight {
+      value
     }
   }
 }
@@ -111,9 +111,10 @@ describe("Mutation.Vhu.create", () => {
         numbers: ["123", "456"],
         type: "NUMERO_ORDRE_REGISTRE_POLICE"
       },
-      quantity: {
-        number: 2,
-        tons: 1.3
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
       },
       destination: {
         type: "BROYEUR",
@@ -166,9 +167,10 @@ describe("Mutation.Vhu.create", () => {
         numbers: ["123", "456"],
         type: "NUMERO_ORDRE_REGISTRE_POLICE"
       },
-      quantity: {
-        number: 2,
-        tons: 1.3
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
       },
       destination: {
         type: "BROYEUR",

@@ -1,53 +1,86 @@
+"Filtres possibles pour la récupération de bordereaux."
 input BsdaWhere {
+  "Filtre sur l'ID"
+  id: IdFilter
+  "Filtre sur le statut de brouillon."
   isDraft: Boolean
-  status: BsdaStatus
-
+  "Filtre sur le statut"
+  status: BsdaStatusFilter
+  "Filtre sur la date de création"
   createdAt: DateFilter
+  "Filtre sur la date de dernière modification"
   updatedAt: DateFilter
+  "Filtre sur le champ emitter."
   emitter: BsdaEmitterWhere
+  "Filtre sur le champ worker."
   worker: BsdaWorkerWhere
+  "Filtre sur le champ transporter."
   transporter: BsdaTransporterWhere
+  "Filtre sur le champ destination."
   destination: BsdaDestinationWhere
+  "ET logique"
   _and: [BsdaWhere!]
+  "OU logique"
   _or: [BsdaWhere!]
-  _not: [BsdaWhere!]
+  "NON logique"
+  _not: BsdaWhere
 }
 
+"Filtre sur le statut"
+input BsdaStatusFilter {
+  _eq: BsdaStatus
+  _in: [BsdaStatus!]
+}
+
+"Champs possible pour le filtre sur l'émetteur."
 input BsdaEmitterWhere {
-  company: BsdaCompanyWhere
+  company: CompanyWhere
   emission: BsdaEmissionWhere
 }
+
+"Champs possibles pour le filtre sur l'émission"
 input BsdaEmissionWhere {
-  signature: BsdaSignatureWhere
+  signature: SignatureWhere
 }
+
+"Champs possible pour le filtre sur le transporteur."
 input BsdaTransporterWhere {
-  company: BsdaCompanyWhere
+  company: CompanyWhere
   transport: BsdaTransportWhere
 }
+
+"Champs possible pour le filtre sur le transport."
 input BsdaTransportWhere {
-  signature: BsdaSignatureWhere
+  signature: SignatureWhere
 }
+
+"Champs possible pour le filtre sur la destination."
 input BsdaDestinationWhere {
-  company: BsdaCompanyWhere
+  company: CompanyWhere
+  reception: BsdaReceptionWhere
   operation: BsdaOperationWhere
 }
-input BsdaOperationWhere {
-  signature: BsdaSignatureWhere
+
+"Champs possibles pour le filtre sur la réception"
+input BsdaReceptionWhere {
+  date: DateFilter
 }
+
+"Champs possible pour le filtre sur l'opération."
+input BsdaOperationWhere {
+  code: StringFilter
+  signature: SignatureWhere
+}
+
+"Champs possible pour le filtre sur l'entreprise de travaux."
 input BsdaWorkerWhere {
-  company: BsdaCompanyWhere
+  company: CompanyWhere
   work: BsdaWorkWhere
 }
+
+"Champs possible pour le filtre sur les travaux."
 input BsdaWorkWhere {
-  signature: BsdaSignatureWhere
-}
-
-input BsdaCompanyWhere {
-  siret: String!
-}
-
-input BsdaSignatureWhere {
-  date: DateFilter!
+  signature: SignatureWhere
 }
 
 input BsdaInput {
@@ -60,6 +93,9 @@ input BsdaInput {
   "Maitre d'ouvrage ou détenteur du déchet"
   emitter: BsdaEmitterInput
 
+  "Eco-organisme"
+  ecoOrganisme: BsdaEcoOrganismeInput
+
   "Courtier"
   broker: BsdaBrokerInput
 
@@ -68,7 +104,7 @@ input BsdaInput {
   "Conditionnement"
   packagings: [BsdaPackagingInput!]
   "Quantité"
-  quantity: BsdaQuantityInput
+  weight: BsdaWeightInput
 
   "Installation de destination"
   destination: BsdaDestinationInput
@@ -78,8 +114,11 @@ input BsdaInput {
   "Entreprise de transport"
   transporter: BsdaTransporterInput
 
-  "Précédents bordereaux à associer à celui ci - cas du transit, entreposage provisoire ou groupement"
-  associations: [ID!]
+  "Bordereau que celui-ci reéxpédie"
+  forwarding: ID
+
+  "Liste des bordereaux que celui-ci groupe"
+  grouping: [ID!]
 }
 
 input BsdaEmitterInput {
@@ -88,10 +127,17 @@ input BsdaEmitterInput {
   "Établissement MOA/détenteur. Partiellement rempli si l'émetteur est en fait un particulier"
   company: CompanyInput
   "Informations chantier (si différente de l'adresse de l'entreprise)"
-  workSite: BsdaWorkSiteInput
+  pickupSite: BsdaPickupSiteInput
+  "Champ libre"
+  customInfo: String
 }
 
-input BsdaWorkSiteInput {
+input BsdaEcoOrganismeInput {
+  name: String!
+  siret: String!
+}
+
+input BsdaPickupSiteInput {
   name: String
   address: String
   city: String
@@ -126,9 +172,9 @@ input BsdaPackagingInput {
   quantity: Int!
 }
 
-input BsdaQuantityInput {
+input BsdaWeightInput {
   "Type de quantité (réelle ou estimé)"
-  type: BsdaQuantityType
+  isEstimate: Boolean
   "Quantité en tonne"
   value: Float
 }
@@ -144,13 +190,15 @@ input BsdaDestinationInput {
   reception: BsdaReceptionInput
   "Réalisation de l'opération (case 11)"
   operation: BsdaOperationInput
+  "Champ libre"
+  customInfo: String
 }
 
 input BsdaReceptionInput {
   "Date de présentation sur site"
   date: DateTime
   "Quantité présentée"
-  quantity: BsdaQuantityInput
+  weight: Float
   "Lot accepté, accepté partiellement ou refusé"
   acceptationStatus: BsdaAcceptationStatus
   "Motif de refus"
@@ -193,6 +241,8 @@ input BsdaWorkInput {
 input BsdaTransporterInput {
   "Entreprise de transport"
   company: CompanyInput
+  "Champ libre"
+  customInfo: String
   recepisse: BsdaRecepisseInput
   transport: BsdaTransportInput
 }

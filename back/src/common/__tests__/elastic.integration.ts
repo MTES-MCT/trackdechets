@@ -350,7 +350,7 @@ describe("transporterNumberPlate analyzer", () => {
       return {
         id,
         readableId: id,
-        transporterNumberPlate: plate,
+        transporterNumberPlate: [plate],
         ...defaultOpts
       };
     });
@@ -379,7 +379,7 @@ describe("transporterNumberPlate analyzer", () => {
     const hits = result.body.hits.hits;
 
     expect(hits).toHaveLength(1);
-    expect(hits[0]._source.transporterNumberPlate).toEqual(plates[0]);
+    expect(hits[0]._source.transporterNumberPlate).toEqual([plates[0]]);
   });
 
   test("lower case match", async () => {
@@ -400,7 +400,7 @@ describe("transporterNumberPlate analyzer", () => {
     const hits = result.body.hits.hits;
 
     expect(hits).toHaveLength(1);
-    expect(hits[0]._source.transporterNumberPlate).toEqual(plates[0]);
+    expect(hits[0]._source.transporterNumberPlate).toEqual([plates[0]]);
   });
 
   test("partial match ", async () => {
@@ -420,8 +420,10 @@ describe("transporterNumberPlate analyzer", () => {
     const hits = result.body.hits.hits;
 
     expect(hits).toHaveLength(2);
-    const expected = [plates[0], plates[1]];
-    expect(expected).toContain(hits[0]._source.transporterNumberPlate);
-    expect(expected).toContain(hits[1]._source.transporterNumberPlate);
+    const expected = new Set([plates[0], plates[1]]); // GT-* plates expected
+
+    expect(expected).toEqual(
+      new Set(hits.flatMap(h => h._source.transporterNumberPlate))
+    );
   });
 });

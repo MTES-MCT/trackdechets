@@ -2,16 +2,17 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { Field, useFormikContext } from "formik";
-import { BsdasriStatus } from "generated/graphql/types";
+import { BsdasriStatus, Bsdasri } from "generated/graphql/types";
 import React from "react";
 import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 import Packagings from "./components/packagings/Packagings";
-import { getInitialQuantityFn } from "./utils/initial-state";
+import { getInitialWeightFn } from "./utils/initial-state";
 import { transportModeLabels } from "dashboard/constants";
 import { FillFieldsInfo, DisabledFieldsInfo } from "./utils/commons";
 import classNames from "classnames";
-
-import QuantityWidget from "./components/Quantity";
+import Tooltip from "common/components/Tooltip";
+import TagsInput from "common/components/tags-input/TagsInput";
+import WeightWidget from "./components/Weight";
 
 /**
  *
@@ -32,8 +33,7 @@ export default function Transporter({ status, stepName }) {
   return <BaseTransporter status={status} stepName={stepName} />;
 }
 function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
-  const { setFieldValue } = useFormikContext();
-
+  const { values, setFieldValue } = useFormikContext<Bsdasri>();
   // handedOverAt is editable even after dasri reception
   const showHandedOverAtField = [
     BsdasriStatus.Sent,
@@ -43,6 +43,16 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
   const disabled = [BsdasriStatus.Sent, BsdasriStatus.Received].includes(
     status
   );
+
+  const showTransportePlates = values?.transporter?.transport?.mode === "ROAD";
+
+  function handleTransportMode(e) {
+    setFieldValue("transporter.transport.mode", e.target.value, false);
+    if (e.target.value !== "ROAD") {
+      setFieldValue("transporter.transport.plates", [], false);
+    }
+  }
+
   const transportEmphasis = stepName === "transport";
   return (
     <>
@@ -61,21 +71,21 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
           onCompanySelected={transporter => {
             if (transporter.transporterReceipt) {
               setFieldValue(
-                "transporter.receipt",
+                "transporter.recepisse.number",
                 transporter.transporterReceipt.receiptNumber
               );
               setFieldValue(
-                "transporter.receiptValidityLimit",
+                "transporter.recepisse.validityLimit",
                 transporter.transporterReceipt.validityLimit
               );
               setFieldValue(
-                "transporter.receiptDepartment",
+                "transporter.recepisse.department",
                 transporter.transporterReceipt.department
               );
             } else {
-              setFieldValue("transporter.receipt", "");
-              setFieldValue("transporter.receiptValidityLimit", null);
-              setFieldValue("transporter.receiptDepartment", "");
+              setFieldValue("transporter.recepisse.number", "");
+              setFieldValue("transporter.recepisse.validityLimit", null);
+              setFieldValue("transporter.recepisse.department", "");
             }
           }}
         />
@@ -101,13 +111,13 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
           Numéro de récépissé
           <Field
             type="text"
-            name="transporter.receipt"
+            name="transporter.recepisse.number"
             className="td-input"
             disabled={disabled}
           />
         </label>
 
-        <RedErrorMessage name="transporter.receipt" />
+        <RedErrorMessage name="transporter.recepisse.number" />
       </div>
       <div
         className={classNames("form__row", {
@@ -118,14 +128,14 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
           Département
           <Field
             type="text"
-            name="transporter.receiptDepartment"
+            name="transporter.recepisse.department"
             placeholder="Ex: 83"
             className="td-input td-department"
             disabled={disabled}
           />
         </label>
 
-        <RedErrorMessage name="transporter.receiptDepartment" />
+        <RedErrorMessage name="transporter.recepisse.department" />
       </div>
       <div
         className={classNames("form__row", {
@@ -137,14 +147,14 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
           <div className="td-date-wrapper">
             <Field
               component={DateInput}
-              name="transporter.receiptValidityLimit"
+              name="transporter.recepisse.validityLimit"
               className="td-input td-date"
               disabled={disabled}
             />
           </div>
         </label>
 
-        <RedErrorMessage name="transporter.receiptValidityLimit" />
+        <RedErrorMessage name="transporter.recepisse.validityLimit" />
       </div>
       <h4 className="form__section-heading">Transport du déchet</h4>
 
@@ -152,10 +162,11 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
         <label>Mode de transport</label>
         <Field
           as="select"
-          name="transport.mode"
+          name="transporter.transport.mode"
           id="id_mode"
           className="td-select"
           disabled={disabled}
+          onChange={e => handleTransportMode(e)}
         >
           {Object.entries(transportModeLabels).map(([k, v]) => (
             <option value={`${k}`} key={k}>
@@ -164,13 +175,25 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
           ))}
         </Field>
       </div>
+      {showTransportePlates && (
+        <div className="form__row">
+          <label>
+            Immatriculations
+            <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> pour valider chacun" />
+            <TagsInput
+              name="transporter.transport.plates"
+              disabled={disabled}
+            />
+          </label>
+        </div>
+      )}
       <div
         className={classNames("form__row", {
           "field-emphasis": transportEmphasis,
         })}
       >
         <Field
-          name="transport.wasteAcceptation"
+          name="transporter.transport.acceptation"
           component={Acceptation}
           disabled={disabled}
         />
@@ -184,7 +207,7 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
           Date de prise en charge
           <div className="td-date-wrapper">
             <Field
-              name="transport.takenOverAt"
+              name="transporter.transport.takenOverAt"
               component={DateInput}
               className="td-input"
               disabled={disabled}
@@ -198,18 +221,18 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
         })}
       >
         <Field
-          name="transport.wasteDetails.packagingInfos"
+          name="transporter.transport.packagings"
           component={Packagings}
           disabled={disabled}
         />
       </div>
       <h4 className="form__section-heading">Quantité transportée</h4>
 
-      <QuantityWidget
+      <WeightWidget
         disabled={disabled}
         switchLabel="Je souhaite ajouter une quantité"
-        dasriSection="transport"
-        getInitialQuantityFn={getInitialQuantityFn}
+        dasriPath="transporter.transport"
+        getInitialWeightFn={getInitialWeightFn}
       />
 
       {showHandedOverAtField ? (
@@ -222,7 +245,7 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
             Date de remise à l'installation destinataire (optionnel)
             <div className="td-date-wrapper">
               <Field
-                name="transport.handedOverAt"
+                name="transporter.transport.handedOverAt"
                 component={DateInput}
                 className="td-input"
               />

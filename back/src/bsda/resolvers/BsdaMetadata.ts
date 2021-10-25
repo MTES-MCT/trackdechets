@@ -3,14 +3,14 @@ import {
   BsdaMetadataResolvers,
   BsdaStatus
 } from "../../generated/graphql/types";
-import { getFormOrFormNotFound } from "../database";
+import { getBsdaOrNotFound } from "../database";
 import { validateBsda } from "../validation";
 
 export const Metadata: BsdaMetadataResolvers = {
   errors: async (
     metadata: BsdaMetadata & { id: string; status: BsdaStatus }
   ) => {
-    const prismaForm = await getFormOrFormNotFound(metadata.id);
+    const prismaForm = await getBsdaOrNotFound(metadata.id);
 
     const validationMatrix = [
       {
@@ -68,7 +68,7 @@ export const Metadata: BsdaMetadataResolvers = {
     );
     for (const { context, requiredFor } of filteredValidationMatrix) {
       try {
-        await validateBsda(prismaForm, context);
+        await validateBsda(prismaForm, [], context);
         return [];
       } catch (errors) {
         return errors.inner?.map(e => {

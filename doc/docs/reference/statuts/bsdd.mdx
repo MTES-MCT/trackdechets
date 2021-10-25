@@ -9,13 +9,17 @@ Au cours de son cycle de vie, un BSDD numérique peut passer par différents ét
 - `DRAFT` (brouillon): État initial à la création d'un BSD. Des champs obligatoires peuvent manquer.
 - `SEALED` (finalisé): BSD finalisé. Les données sont validées et un numéro de BSD `readableId` est affecté.
 - `SENT` (envoyé): BSD en transit vers l'installation de destination, d'entreposage ou de reconditionnement
-- `RECEIVED` (reçu): BSD reçu sur l'installation de destination, d'entreposage ou de reconditionnement
-- `ACCEPTED` (accepté): BSD accepté sur l'installation de destination, d'entreposage ou de reconditionnement
+- `RECEIVED` (reçu): BSD reçu sur l'installation de destination
+- `ACCEPTED` (accepté): BSD accepté sur l'installation de destination
 - `REFUSED` (refusé): Déchet refusé
 - `PROCESSED` (traité): BSD dont l'opération de traitement a été effectué
 - `NO_TRACEABILITY` (rupture de traçabilité): Rupture de traçabilité autorisée par arrêté préfectoral avec transfert de responsabilité.
 - `AWAITING_GROUP`: BSD en attente de regroupement (code de traitement D 13, D 14, D 15, R 12, R 13)
 - `GROUPED`: BSD qui a été ajouté à une annexe 2
+- `TEMP_STORED`: (reçu): BSD reçu sur l'installation d'entreposage provisoire ou de reconditionnement
+- `TEMP_STORED_ACCEPTED`: (accepté): BSD accepté sur l'installation d'entreposage provisoire ou de reconditionnement
+- `RESEALED`: (finalisé): BSD sur lequel les informations de l'entreposage provisoire ont été finalisées et validées
+- `RESENT`: (envoyé): BSD en transit vers l'installation de destination finale après un entreposage provisoire
 
 Chaque changement d'état s'effectue grâce à une mutation.
 
@@ -30,8 +34,10 @@ Chaque changement d'état s'effectue grâce à une mutation.
 | `markAsProcessed`          | <div><ul><li>`RECEIVED -> PROCESSED`</li><li>`RECEIVED -> NO_TRACEABILITY`</li><li>`RECEIVED -> AWAITING_GROUP`</li></ul></div> | [ProcessedFormInput](../api-reference/bsdd/inputObjects#processedforminput)                         | Uniquement le destinataire du BSD                                                                                                                                                       |
 | `markAsTempStored`         | <div><ul><li>`SENT -> TEMP_STORER_ACCEPTED`</li><li>`SENT -> TEMP_STORED`</li><li>`SENT -> REFUSED`</li></ul></div>             | [TempStoredFormInput](../api-reference/bsdd/inputObjects#tempstoredforminput)                       | Uniquement le site d'entreposage temporaire ou de reconditionnement                                                                                                                     |
 | `markAsTempStorerAccepted` | `TEMP_STORED -> TEMP_STORER_ACCEPTED`                                                                                           | [TempStorerAcceptedFormInput](../api-reference/bsdd/inputObjects#tempstoreracceptedforminput)       | Uniquement le site d'entreposage temporaire ou de reconditionnement                                                                                                                     |
-| `markAsResealed`           | `TEMP_STORED -> RESEALED`                                                                                                       | [ResealedFormInput](../api-reference/bsdd/inputObjects#resealedtoredforminput)                      | Uniquement le site d'entreposage temporaire ou de reconditionnement                                                                                                                     |
+| `markAsResealed`           | <div><ul><li>`TEMP_STORED -> RESEALED`</li><li>`RESEALED -> RESEALED`</li></ul></div>                                           | [ResealedFormInput](../api-reference/bsdd/inputObjects#resealedtoredforminput)                      | Uniquement le site d'entreposage temporaire ou de reconditionnement                                                                                                                     |
 | `importPaperForm`          | `SEALED -> PROCESSED`                                                                                                           | [ImportPaperFormInput](../api-reference/bsdd/inputObjects#importpaperforminput)                        | Uniquement l'entreprise de destination                                                                                                                                                  |
+
+
 
 Le diagramme ci dessous retrace le cycle de vie d'un BSD dans Trackdéchets:
 
@@ -60,6 +66,7 @@ C -->|markAsTempStored|N
 J -->|markAsTempStorerAccepted - avec refus|I
 J -->|markAsTempStorerAccepted|N(TEMP_STORER_ACCEPTED)
 N -->|markAsResealed| K(RESEALED)
+K -->|markAsResealed| K
 K -->|signedByTransporter| L(RESENT)
 L --> D
 `}/>

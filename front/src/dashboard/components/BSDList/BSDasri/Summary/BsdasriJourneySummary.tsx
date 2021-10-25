@@ -43,10 +43,10 @@ export function BsdasriJourneySummary({ bsdasri }: BsdasriJourneySummaryProps) {
       <JourneyStop variant={steps[status][2]}>
         <JourneyStopName>Destinataire</JourneyStopName>
         <JourneyStopDescription>
-          {bsdasri.recipient?.company?.name} (
-          {bsdasri.recipient?.company?.siret})
+          {bsdasri.destination?.company?.name} (
+          {bsdasri.destination?.company?.siret})
           <br />
-          {bsdasri.recipient?.company?.address}
+          {bsdasri.destination?.company?.address}
         </JourneyStopDescription>
       </JourneyStop>
     </Journey>

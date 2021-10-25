@@ -5,18 +5,22 @@ import { Form } from "generated/graphql/types";
 import React from "react";
 import WorkSiteAddress from "./WorkSiteAddress";
 
+const DEFAULT_KEY = "workSite";
+
 export default function WorkSite({
   switchLabel,
   headingTitle,
   designation,
   getInitialEmitterWorkSiteFn,
   disabled = false,
+  modelKey = DEFAULT_KEY,
 }: {
   switchLabel: string;
   headingTitle: string;
   designation: string;
   getInitialEmitterWorkSiteFn: () => any;
   disabled?: boolean;
+  modelKey?: string;
 }) {
   const { values, setFieldValue } = useFormikContext<Form>();
 
@@ -24,16 +28,20 @@ export default function WorkSite({
 
   function handleWorksiteToggle() {
     if (showWorkSite) {
-      setFieldValue("emitter.workSite", null, false);
+      setFieldValue(`emitter.${modelKey}`, null, false);
     } else {
-      setFieldValue("emitter.workSite", getInitialEmitterWorkSiteFn(), false);
+      setFieldValue(
+        `emitter.${modelKey}`,
+        getInitialEmitterWorkSiteFn(),
+        false
+      );
     }
   }
 
   function setAddress(details) {
-    setFieldValue(`emitter.workSite.address`, details.name);
-    setFieldValue(`emitter.workSite.city`, details.city);
-    setFieldValue(`emitter.workSite.postalCode`, details.postcode);
+    setFieldValue(`emitter.${modelKey}.address`, details.name);
+    setFieldValue(`emitter.${modelKey}.city`, details.city);
+    setFieldValue(`emitter.${modelKey}.postalCode`, details.postcode);
   }
 
   return (
@@ -55,7 +63,7 @@ export default function WorkSite({
               Nom {designation}
               <Field
                 type="text"
-                name="emitter.workSite.name"
+                name={`emitter.${modelKey}.name`}
                 placeholder="Intitulé"
                 className="td-input"
                 disabled={disabled}
@@ -81,7 +89,7 @@ export default function WorkSite({
                 component="textarea"
                 className="textarea-pickup-site td-textarea"
                 placeholder="Champ libre pour préciser..."
-                name="emitter.workSite.infos"
+                name={`emitter.${modelKey}.infos`}
                 disabled={disabled}
               />
             </label>

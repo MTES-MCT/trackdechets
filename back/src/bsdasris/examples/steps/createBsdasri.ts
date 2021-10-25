@@ -8,9 +8,12 @@ export function createBsdasri(company: string): WorkflowStep {
     mutation: mutations.createBsdasri,
     variables: ({ pred, transporteur, traiteur }) => ({
       input: {
-        emitter: fixtures.emitterInput(pred.siret),
-        emission: fixtures.emissionInput,
-        recipient: fixtures.recipientInput(traiteur.siret),
+        ...fixtures.wasteInput,
+        emitter: {
+          ...fixtures.emitterInput(pred.siret),
+          emission: fixtures.emissionInput
+        },
+        destination: fixtures.destinationInput(traiteur.siret),
         transporter: fixtures.transporterInput(transporteur.siret)
       }
     }),

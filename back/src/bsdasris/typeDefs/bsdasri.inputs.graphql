@@ -1,42 +1,59 @@
-input BsdasriCompanyWhere {
-  siret: String!
-}
-input BsdasriSignatureWhere {
-  date: DateFilter!
-}
 input BsdasriEmitterWhere {
-  company: BsdasriCompanyWhere
-  signature: BsdasriSignatureWhere
+  company: CompanyWhere
+  emission: BsdasriEmissionWhere
 }
+
+input BsdasriEmissionWhere {
+  signature: SignatureWhere
+}
+
 input BsdasriTransporterWhere {
-  company: BsdasriCompanyWhere
-  signature: BsdasriSignatureWhere
+  company: CompanyWhere
+  transport: BsdasriTransportWhere
 }
-input BsdasriRecipientWhere {
-  company: BsdasriCompanyWhere
-  signature: BsdasriSignatureWhere
+input BsdasriTransportWhere {
+  signature: SignatureWhere
+}
+
+input BsdasriDestinationWhere {
+  company: CompanyWhere
+  reception: BsdasriReceptionWhere
+  operation: BsdasriOperationWhere
+}
+
+input BsdasriReceptionWhere {
+  date: DateFilter
+  signature: SignatureWhere
+}
+
+input BsdasriOperationWhere {
+  code: StringFilter
+  date: DateFilter
+  signature: SignatureWhere
 }
 
 input BsdasriWhere {
   "(Optionnel) Permet de récupérer uniquement les bordereaux en brouillon"
   isDraft: Boolean
+
   """
   (Optionnel) Filtre sur le statut des bordereaux
   Si aucun filtre n'est passé, les bordereaux seront retournés quel que soit leur statut
   Défaut à vide.
   """
-  status: BsdasriStatus
+  status: BsdasriStatusFilter
+
   """
-  Expérimental : Filtre le résultat sur l'ID des bordereaux
+  Filtre le résultat sur l'ID des bordereaux
   """
-  id_in: [ID!]
+  id: IdFilter
 
   createdAt: DateFilter
   updatedAt: DateFilter
   emitter: BsdasriEmitterWhere
   transporter: BsdasriTransporterWhere
-  recipient: BsdasriRecipientWhere
-  processingOperation: [processingOperationTypes!]
+  destination: BsdasriDestinationWhere
+
   """
   (Optionnel) Filtre sur l'état de regroupement des bordereaux
   Si aucun filtre n'est passé, les bordereaux seront retournés sans filtrage supplémentaire
@@ -44,14 +61,21 @@ input BsdasriWhere {
   Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne regroupent d'autres bordereaux
   """
   groupable: Boolean
+
   _and: [BsdasriWhere!]
   _or: [BsdasriWhere!]
-  _not: [BsdasriWhere!]
+  _not: BsdasriWhere
 }
 
-input BsdasriPackagingInfoInput {
+"Filtre sur le statut"
+input BsdasriStatusFilter {
+  _eq: BsdasriStatus
+  _in: [BsdasriStatus!]
+}
+
+input BsdasriPackagingsInput {
   "Type de conditionnement"
-  type: BsdasriPackagings!
+  type: BsdasriPackagingType!
 
   "Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"
   other: String
@@ -63,7 +87,7 @@ input BsdasriPackagingInfoInput {
   quantity: Int!
 }
 
-input WorkSiteInput {
+input PickupSiteInput {
   name: String
   address: String
   city: String
@@ -71,132 +95,113 @@ input WorkSiteInput {
   infos: String
 }
 
-input BsdasriEmitterInput {
-  "Établissement émetteur"
-  type: BsdasriEmitterType
-  company: CompanyInput
-  workSite: WorkSiteInput
-  "Champ libre émetteur"
-  customInfo: String
-  onBehalfOfEcoorganisme: Boolean
-}
-
-input BsdasriQuantityInput {
-  value: Float
-  type: QuantityType
-}
-
-input BsdasriWasteDetailEmissionInput {
-  quantity: BsdasriQuantityInput
-  packagingInfos: [BsdasriPackagingInfoInput!]
-  onuCode: String
-}
-
-input BsdasriWasteDetailTransportInput {
-  quantity: BsdasriQuantityInput
-  packagingInfos: [BsdasriPackagingInfoInput!]
-}
-input BsdasriRecipientWasteDetailInput {
-  volume: Int
-  packagingInfos: [BsdasriPackagingInfoInput!]
-}
-input BsdasriWasteAcceptationInput {
-  status: WasteAcceptationStatusInput
-  refusalReason: String
-  refusedQuantity: Float
+input BsdasriWasteInput {
+  adr: String
+  code: String
 }
 input BsdasriEmissionInput {
-  wasteCode: String
-  wasteDetails: BsdasriWasteDetailEmissionInput
-  handedOverAt: DateTime
+  weight: BsdasriWeightInput
+  packagings: [BsdasriPackagingsInput!]
 }
+input BsdasriEmitterInput {
+  company: CompanyInput
+  pickupSite: PickupSiteInput
+  "Champ libre émetteur"
+  customInfo: String
+  emission: BsdasriEmissionInput
+}
+
+input BsdasriEcoOrganismeInput {
+  name: String!
+  """
+  SIRET composé de 14 caractères correspondant à un éco-organisme? Seul DASTRI est autorisé à ce jour.
+  """
+  siret: String!
+}
+
+input BsdasriWeightInput {
+  value: Float
+  isEstimate: Boolean
+}
+input BsdasriRealWeightInput {
+  value: Float!
+}
+
+input BsdasriAcceptationInput {
+  status: WasteAcceptationStatusInput
+  refusalReason: String
+  refusedWeight: Float
+}
+
 input BsdasriTransportInput {
-  wasteDetails: BsdasriWasteDetailTransportInput
+  weight: BsdasriWeightInput
+  packagings: [BsdasriPackagingsInput!]
   takenOverAt: DateTime
   handedOverAt: DateTime
-  wasteAcceptation: BsdasriWasteAcceptationInput
+  acceptation: BsdasriAcceptationInput
   mode: TransportMode
+  plates: [String!]
+}
+
+input BsdasriRecepisseInput {
+  number: String
+  department: String
+  validityLimit: DateTime
 }
 
 input BsdasriTransporterInput {
   "Établissement collecteur - transporteur"
   company: CompanyInput
 
-  "N° de récipissé"
-  receipt: String
-
-  "Département"
-  receiptDepartment: String
-
-  "Limite de validité du récipissé"
-  receiptValidityLimit: DateTime
+  "Récépissé transporteur"
+  recepisse: BsdasriRecepisseInput
 
   "Champ libre transporteur"
   customInfo: String
+
+  transport: BsdasriTransportInput
 }
 
-input BsdasriRecipientInput {
+input BsdasriDestinationInput {
   "Établissement émetteur"
   company: CompanyInput
 
   "Champ libre transporteur"
   customInfo: String
+
+  reception: BsdasriReceptionInput
+  operation: BsdasriOperationInput
 }
 
 input BsdasriReceptionInput {
-  wasteDetails: BsdasriRecipientWasteDetailInput
-  receivedAt: DateTime
-  wasteAcceptation: BsdasriWasteAcceptationInput
+  volume: Int
+  packagings: [BsdasriPackagingsInput!]
+  date: DateTime
+  acceptation: BsdasriAcceptationInput
 }
 
 input BsdasriOperationInput {
-  quantity: BsdasriQuantityInput
+  weight: BsdasriRealWeightInput
   """
   Code de traitement
   Les codes R12 et D12 ne sont autorisé que si le destinataire est une installation TTR (tri transit regroupement).
   """
-  processingOperation: String
-  processedAt: DateTime
+  code: String
+  date: DateTime
 }
 
 input BsdasriInput {
+  waste: BsdasriWasteInput
+
   emitter: BsdasriEmitterInput
-  emission: BsdasriEmissionInput
+
+  ecoOrganisme: BsdasriEcoOrganismeInput
+
   transporter: BsdasriTransporterInput
-  transport: BsdasriTransportInput
-  recipient: BsdasriRecipientInput
-  reception: BsdasriReceptionInput
-  operation: BsdasriOperationInput
-}
 
-"Payload de regroupement"
-input RegroupedBsdasriInput {
-  "Identifiant unique du bordereau"
-  id: ID
-}
+  destination: BsdasriDestinationInput
 
-input BsdasriCreateInput {
-  emitter: BsdasriEmitterInput
-  emission: BsdasriEmissionInput
-  transporter: BsdasriTransporterInput
-  transport: BsdasriTransportInput
-  recipient: BsdasriRecipientInput
-  reception: BsdasriReceptionInput
-  operation: BsdasriOperationInput
-
-  regroupedBsdasris: [RegroupedBsdasriInput]
-}
-
-input BsdasriUpdateInput {
-  emitter: BsdasriEmitterInput
-  emission: BsdasriEmissionInput
-  transporter: BsdasriTransporterInput
-  transport: BsdasriTransportInput
-  recipient: BsdasriRecipientInput
-  reception: BsdasriReceptionInput
-  operation: BsdasriOperationInput
-
-  regroupedBsdasris: [RegroupedBsdasriInput]
+  grouping: [ID!]
 }
 
 input BsdasriSignatureInput {

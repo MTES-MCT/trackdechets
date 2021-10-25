@@ -1,10 +1,10 @@
-import { User, Bsda, BsdaStatus, BsdaType } from "@prisma/client";
+import { User, Bsda, BsdaStatus } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { NotFormContributor } from "../forms/errors";
-import prisma from "../prisma";
 import { getFullUser } from "../users/database";
+import prisma from "../prisma";
 
-export async function checkIsFormContributor(
+export async function checkIsBsdaContributor(
   user: User,
   form: Partial<
     Pick<
@@ -13,11 +13,12 @@ export async function checkIsFormContributor(
       | "destinationCompanySiret"
       | "transporterCompanySiret"
       | "workerCompanySiret"
+      | "brokerCompanySiret"
     >
   >,
   errorMsg: string
 ) {
-  const isContributor = await isFormContributor(user, form);
+  const isContributor = await isBsdaContributor(user, form);
 
   if (!isContributor) {
     throw new NotFormContributor(errorMsg);
@@ -26,7 +27,7 @@ export async function checkIsFormContributor(
   return true;
 }
 
-export async function isFormContributor(user: User, form: Partial<Bsda>) {
+export async function isBsdaContributor(user: User, form: Partial<Bsda>) {
   const fullUser = await getFullUser(user);
   const userSirets = fullUser.companies.map(c => c.siret);
 
@@ -34,7 +35,8 @@ export async function isFormContributor(user: User, form: Partial<Bsda>) {
     form.emitterCompanySiret,
     form.destinationCompanySiret,
     form.transporterCompanySiret,
-    form.workerCompanySiret
+    form.workerCompanySiret,
+    form.brokerCompanySiret
   ];
 
   const siretsInCommon = userSirets.filter(siret => formSirets.includes(siret));
@@ -43,7 +45,7 @@ export async function isFormContributor(user: User, form: Partial<Bsda>) {
 }
 
 export async function checkCanDeleteBsda(user: User, form: Bsda) {
-  await checkIsFormContributor(
+  await checkIsBsdaContributor(
     user,
     form,
     "Vous n'êtes pas autorisé à supprimer ce bordereau."
@@ -71,13 +73,7 @@ export async function checkCanAssociateBsdas(ids: string[]) {
     }
   });
 
-  if (
-    bsdas.some(
-      bsda =>
-        ![BsdaType.GATHERING, BsdaType.RESHIPMENT].includes(bsda.type as any) ||
-        bsda.status !== "AWAITING_CHILD"
-    )
-  ) {
+  if (bsdas.some(bsda => bsda.status !== "AWAITING_CHILD")) {
     throw new UserInputError(
       `Les bordereaux ne peuvent pas être associés à un bordereau enfant.`
     );

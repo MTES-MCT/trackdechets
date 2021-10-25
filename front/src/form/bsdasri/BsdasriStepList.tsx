@@ -12,7 +12,7 @@ import {
   QueryBsdasriArgs,
   Query,
   Bsdasri,
-  BsdasriCreateInput,
+  BsdasriInput,
   BsdasriStatus,
 } from "generated/graphql/types";
 import omit from "object.omit";
@@ -30,28 +30,23 @@ interface Props {
 /**
  * Do not resend sections locked by relevant signatures
  */
-const removeSignedSections = (
-  input: BsdasriCreateInput,
-  status: BsdasriStatus
-) => {
+const removeSignedSections = (input: BsdasriInput, status: BsdasriStatus) => {
+  const wasteKey = "waste";
+  const ecoOrganismeKey = "ecoOrganisme";
   const emitterKey = "emitter";
-  const emissionKey = "emission";
-  const transportKey = "transport";
   const transporterKey = "transporter";
-  const recipientKey = "recipient";
-  const receptionKey = "reception";
+  const destinationKey = "destination";
 
   const mapping = {
     INITIAL: [],
-    SIGNED_BY_PRODUCER: [emitterKey, emissionKey],
-    SENT: [emitterKey, emissionKey, transportKey, transporterKey],
+    SIGNED_BY_PRODUCER: [wasteKey, ecoOrganismeKey, emitterKey],
+    SENT: [wasteKey, ecoOrganismeKey, emitterKey, transporterKey],
     RECEIVED: [
+      wasteKey,
+      ecoOrganismeKey,
       emitterKey,
-      emissionKey,
-      transportKey,
       transporterKey,
-      receptionKey,
-      recipientKey,
+      destinationKey,
     ],
   };
   return omit(input, mapping[status]);
@@ -73,21 +68,20 @@ export default function BsdasriStepsList(props: Props) {
 
   // prefill packaging info with previous dasri actor data
   const prefillWasteDetails = dasri => {
-    if (!dasri?.transport?.wasteDetails?.packagingInfos?.length) {
-      dasri.transport.wasteDetails.packagingInfos =
-        dasri?.emission?.wasteDetails?.packagingInfos;
+    if (!dasri?.transporter?.transport?.packagings?.length) {
+      dasri.transporter.transport.packagings =
+        dasri?.emitter?.emission?.packagings;
     }
-    if (!dasri?.reception?.wasteDetails?.packagingInfos?.length) {
-      dasri.reception.wasteDetails.packagingInfos =
-        dasri?.transport?.wasteDetails?.packagingInfos;
+
+    if (!dasri?.destination?.reception?.packagings?.length) {
+      dasri.destination.reception.packagings =
+        dasri?.transporter?.transport?.packagings;
     }
     return dasri;
   };
   const mapRegrouped = dasri => ({
     ...dasri,
-    regroupedBsdasris: dasri?.regroupedBsdasris.map(r => ({
-      id: r,
-    })),
+    grouping: dasri?.grouping.map(d => d.id),
   });
 
   const formState = useMemo(
@@ -114,7 +108,7 @@ export default function BsdasriStepsList(props: Props) {
     MutationUpdateBsdasriArgs
   >(UPDATE_BSDASRI);
 
-  function saveForm(input: BsdasriCreateInput): Promise<any> {
+  function saveForm(input: BsdasriInput): Promise<any> {
     return formState.id
       ? updateBsdasri({
           variables: {
@@ -132,10 +126,10 @@ export default function BsdasriStepsList(props: Props) {
 
     if (
       props.bsdasriFormType === "bsdasriRegroup" ||
-      formQuery.data?.bsdasri?.bsdasriType === "GROUPING"
+      formQuery.data?.bsdasri?.type === "GROUPING"
     ) {
-      if (!values?.regroupedBsdasris?.length) {
-        cogoToast.error("Vous devez sélectionner des bordereaux à regrouper", {
+      if (!values?.grouping?.length) {
+        cogoToast.error("Vous devez sélectionner des bordereaux à grouper", {
           hideAfter: 7,
         });
         return;

@@ -11,7 +11,7 @@ type Mutation {
   - emitter.company.mail
   - waste.code
   - waste.adr
-  - quantity.kilos
+  - weight.value
 
   Si vous souhaitez créer un BSFF sans ces informations, utilisez createDraftBsff.
   """

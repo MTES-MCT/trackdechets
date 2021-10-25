@@ -2,7 +2,7 @@ import React from "react";
 import { RedErrorMessage } from "common/components";
 import { BsdasriSignatureType } from "generated/graphql/types";
 import Packagings from "form/bsdasri/components/packagings/Packagings";
-import QuantityWidget from "form/bsdasri/components/Quantity";
+import WeightWidget from "form/bsdasri/components/Weight";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
@@ -11,49 +11,30 @@ import {
   SignatureType,
 } from "dashboard/components/BSDList/BSDasri/types";
 import { Field } from "formik";
-import omit from "object.omit";
-import { getInitialQuantityFn } from "./utils";
+import { omitDeep } from "common/omitDeep";
+import { getInitialWeightFn } from "form/bsdasri/utils/initial-state";
 
 export function ProducerSignatureForm() {
   return (
     <>
       <div className="form__row">
-        <Field
-          name="emission.wasteDetails.packagingInfos"
-          component={Packagings}
-        />
+        <Field name="emitter.emission.packagingInfos" component={Packagings} />
       </div>
       <h4 className="form__section-heading">Quantité remise</h4>
       <div className="form__row">
-        <QuantityWidget
-          switchLabel="Je souhaite ajouter une quantité"
-          dasriSection="emission"
-          getInitialQuantityFn={getInitialQuantityFn}
+        <WeightWidget
+          switchLabel="Je souhaite ajouter un poids"
+          dasriPath="emitter.emission"
+          getInitialWeightFn={getInitialWeightFn}
         />
       </div>
       <div className="form__row">
         <label>
           Code ADR
-          <Field
-            type="text"
-            name="emission.wasteDetails.onuCode"
-            className="td-input"
-          />
+          <Field type="text" name="waste.adr" className="td-input" />
         </label>
 
-        <RedErrorMessage name="emission.wasteDetails.onuCode" />
-      </div>
-      <div className="form__row">
-        <label>
-          Date de remise au collecteur transporteur
-          <div className="td-date-wrapper">
-            <Field
-              name="emission.handedOverAt"
-              component={DateInput}
-              className="td-input"
-            />
-          </div>{" "}
-        </label>
+        <RedErrorMessage name="waste.adr" />
       </div>
     </>
   );
@@ -64,23 +45,27 @@ export function TransportSignatureForm() {
       <div className="form__row">
         <label>
           Numéro de récépissé
-          <Field type="text" name="transporter.receipt" className="td-input" />
+          <Field
+            type="text"
+            name="transporter.recepisse.number"
+            className="td-input"
+          />
         </label>
 
-        <RedErrorMessage name="transporter.receipt" />
+        <RedErrorMessage name="transporter.recepisse.number" />
       </div>
       <div className="form__row">
         <label>
           Département
           <Field
             type="text"
-            name="transporter.receiptDepartment"
+            name="transporter.recepisse.department"
             placeholder="Ex: 83"
             className="td-input td-department"
           />
         </label>
 
-        <RedErrorMessage name="transporter.receiptDepartment" />
+        <RedErrorMessage name="transporter.recepisse.department" />
       </div>
       <div className="form__row">
         <label>
@@ -88,24 +73,27 @@ export function TransportSignatureForm() {
           <div className="td-date-wrapper">
             <Field
               component={DateInput}
-              name="transporter.receiptValidityLimit"
+              name="transporter.recepisse.validityLimit"
               className="td-input td-date"
             />
           </div>
         </label>
 
-        <RedErrorMessage name="transporter.receiptValidityLimit" />
+        <RedErrorMessage name="transporter.recepisse.validityLimit" />
       </div>
 
       <div className="form__row">
-        <Field name="transport.wasteAcceptation" component={Acceptation} />
+        <Field
+          name="transporter.transport.acceptation"
+          component={Acceptation}
+        />
       </div>
       <div className="form__row">
         <label>
           Date de prise en charge
           <div className="td-date-wrapper">
             <Field
-              name="transport.takenOverAt"
+              name="transporter.transport.takenOverAt"
               component={DateInput}
               className="td-input"
             />
@@ -114,16 +102,16 @@ export function TransportSignatureForm() {
       </div>
       <div className="form__row">
         <Field
-          name="transport.wasteDetails.packagingInfos"
+          name="transporter.transport.packagingInfos"
           component={Packagings}
         />
       </div>
       <h4 className="form__section-heading">Quantité transportée</h4>
 
-      <QuantityWidget
-        switchLabel="Je souhaite ajouter une quantité"
-        dasriSection="transport"
-        getInitialQuantityFn={getInitialQuantityFn}
+      <WeightWidget
+        switchLabel="Je souhaite ajouter un poids"
+        dasriPath="transporter.transport"
+        getInitialWeightFn={getInitialWeightFn}
       />
     </>
   );
@@ -133,24 +121,27 @@ export function ReceptionSignatureForm() {
   return (
     <>
       <div className="form__row">
-        <Field name="reception.wasteAcceptation" component={Acceptation} />
+        <Field
+          name="destination.reception.acceptation"
+          component={Acceptation}
+        />
       </div>
       <div className="form__row">
         <label>
           Date de réception
           <div className="td-date-wrapper">
             <Field
-              name="reception.receivedAt"
+              name="destination.reception.date"
               component={DateInput}
               className="td-input"
             />
           </div>
         </label>
-        <RedErrorMessage name="reception.receivedAt" />
+        <RedErrorMessage name="destination.reception.date" />
       </div>
       <div className="form__row">
         <Field
-          name="reception.wasteDetails.packagingInfos"
+          name="destination.reception.packagingInfos"
           component={Packagings}
         />
       </div>
@@ -164,7 +155,7 @@ export function OperationSignatureForm() {
         <label>Opération réalisée</label>
         <Field
           as="select"
-          name="operation.processingOperation"
+          name="destination.operation.code"
           className="td-select"
         >
           <option value="">-----</option>
@@ -191,7 +182,7 @@ export function OperationSignatureForm() {
           Date de traitement :
           <div className="td-date-wrapper">
             <Field
-              name="operation.processedAt"
+              name="destination.operation.date"
               component={DateInput}
               className="td-input"
             />
@@ -206,8 +197,8 @@ export function OperationSignatureForm() {
           Quantité en kg :
           <Field
             component={NumberInput}
-            name="operation.quantity.value"
-            className="td-input dasri__waste-details__quantity"
+            name="destination.operation.weight.value"
+            className="td-input dasri__waste-details__weight"
             placeholder="En kg"
             min="0"
             step="0.1"
@@ -215,7 +206,7 @@ export function OperationSignatureForm() {
           <span className="tw-ml-2">kg</span>
         </label>
 
-        <RedErrorMessage name="operation.quantity.value" />
+        <RedErrorMessage name="destination.operation.weight.value" />
       </div>
     </>
   );
@@ -223,56 +214,47 @@ export function OperationSignatureForm() {
 
 export const removeSections = (input, signatureType: SignatureType) => {
   const emitterKey = "emitter";
-  const emissionKey = "emission";
-  const transportKey = "transport";
+
+  const wasteKey = "waste";
+  const ecoOrganismeKey = "ecoOrganisme";
   const transporterKey = "transporter";
-  const recipientKey = "recipient";
+  const destinationKey = "destination";
   const receptionKey = "reception";
   const operationKey = "operation";
-  const regroupedBsdasrisKey = "regroupedBsdasris";
-
+  const companyKey = "company";
+  const customInfoKey = "customInfo";
+  const groupingBsdasrisKey = "grouping";
+  const common = [
+    wasteKey,
+    companyKey,
+    ecoOrganismeKey,
+    customInfoKey,
+    groupingBsdasrisKey,
+  ];
   const mapping = {
     [BsdasriSignatureType.Emission]: [
       transporterKey,
-      transportKey,
-      recipientKey,
-      receptionKey,
-      operationKey,
-      regroupedBsdasrisKey,
+      destinationKey,
+      ...common,
     ],
-    [BsdasriSignatureType.Transport]: [
-      emitterKey,
-      emissionKey,
-      recipientKey,
-      receptionKey,
-      operationKey,
-      regroupedBsdasrisKey,
-    ],
+    [BsdasriSignatureType.Transport]: [emitterKey, destinationKey, ...common],
     [ExtraSignatureType.DirectTakeover]: [
       emitterKey,
-      emissionKey,
-      recipientKey,
-      receptionKey,
-      operationKey,
-      regroupedBsdasrisKey,
+      destinationKey,
+      ...common,
     ],
     [BsdasriSignatureType.Reception]: [
       emitterKey,
-      emissionKey,
       transporterKey,
-      transportKey,
       operationKey,
-      regroupedBsdasrisKey,
+      ...common,
     ],
     [BsdasriSignatureType.Operation]: [
       emitterKey,
-      emissionKey,
       transporterKey,
-      transportKey,
-      recipientKey,
       receptionKey,
-      regroupedBsdasrisKey,
+      ...common,
     ],
   };
-  return omit(input, mapping[signatureType]);
+  return omitDeep(input, mapping[signatureType]);
 };

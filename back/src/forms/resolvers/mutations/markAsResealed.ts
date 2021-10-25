@@ -11,6 +11,7 @@ import { checkCanMarkAsResealed } from "../../permissions";
 import { checkCompaniesType, resealedFormSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
+import { Form, Status } from ".prisma/client";
 
 const markAsResealed: MutationResolvers["markAsResealed"] = async (
   parent,
@@ -51,10 +52,21 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     }
   };
 
-  const resealedForm = await transitionForm(user, form, {
-    type: EventType.MarkAsResealed,
-    formUpdateInput
-  });
+  let resealedForm: Form | null = null;
+
+  if (form.status === Status.RESEALED) {
+    // by pass xstate transition because markAsResealed is
+    // used to update an already resealed form
+    resealedForm = await prisma.form.update({
+      where: { id },
+      data: { temporaryStorageDetail: { update: updateInput } }
+    });
+  } else {
+    resealedForm = await transitionForm(user, form, {
+      type: EventType.MarkAsResealed,
+      formUpdateInput
+    });
+  }
 
   return expandFormFromDb(resealedForm);
 };

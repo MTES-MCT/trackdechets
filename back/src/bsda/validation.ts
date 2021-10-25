@@ -1,4 +1,10 @@
-import { Prisma, Bsda } from "@prisma/client";
+import {
+  Bsda,
+  BsdaStatus,
+  Prisma,
+  WasteAcceptationStatus
+} from "@prisma/client";
+import { UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import { WASTES_CODES } from "../common/constants";
 import { FactorySchemaOf } from "../common/yup/configureYup";
@@ -14,10 +20,11 @@ import {
 } from "../forms/validation";
 import {
   BsdaAcceptationStatus,
-  BsdaConsistence,
-  BsdaQuantityType
+  BsdaConsistence
 } from "../generated/graphql/types";
+import prisma from "../prisma";
 
+const OPERATIONS = ["D 5", "D 9", "D 13", "D 15"];
 type Emitter = Pick<
   Bsda,
   | "emitterIsPrivateIndividual"
@@ -27,11 +34,11 @@ type Emitter = Pick<
   | "emitterCompanyContact"
   | "emitterCompanyPhone"
   | "emitterCompanyMail"
-  | "emitterWorkSiteName"
-  | "emitterWorkSiteAddress"
-  | "emitterWorkSiteCity"
-  | "emitterWorkSitePostalCode"
-  | "emitterWorkSiteInfos"
+  | "emitterPickupSiteName"
+  | "emitterPickupSiteAddress"
+  | "emitterPickupSiteCity"
+  | "emitterPickupSitePostalCode"
+  | "emitterPickupSiteInfos"
 >;
 
 type Worker = Pick<
@@ -56,8 +63,7 @@ type Destination = Pick<
   | "destinationCap"
   | "destinationPlannedOperationCode"
   | "destinationReceptionDate"
-  | "destinationReceptionQuantityType"
-  | "destinationReceptionQuantityValue"
+  | "destinationReceptionWeight"
   | "destinationReceptionAcceptationStatus"
   | "destinationReceptionRefusalReason"
   | "destinationOperationCode"
@@ -88,8 +94,8 @@ type WasteDescription = Pick<
   | "wasteSealNumbers"
   | "wasteAdr"
   | "packagings"
-  | "quantityType"
-  | "quantityValue"
+  | "weightIsEstimate"
+  | "weightValue"
 >;
 
 interface BsdaValidationContext {
@@ -101,16 +107,103 @@ interface BsdaValidationContext {
   workSignature?: boolean;
 }
 
-export function validateBsda(
-  form: Partial<Prisma.BsdaCreateInput>,
+export async function validateBsda(
+  bsda: Partial<Prisma.BsdaCreateInput>,
+  previousBsdas: Bsda[],
   context: BsdaValidationContext
 ) {
-  return emitterSchema(context)
+  await emitterSchema(context)
     .concat(workerSchema(context))
     .concat(destinationSchema(context))
     .concat(transporterSchema(context))
     .concat(wasteDescriptionSchema(context))
-    .validate(form, { abortEarly: false });
+    .validate(bsda, { abortEarly: false });
+
+  await validatePreviousBsdas(bsda, previousBsdas);
+}
+
+async function validatePreviousBsdas(
+  bsda: Partial<Prisma.BsdaCreateInput>,
+  previousBsdas: Bsda[]
+) {
+  if (previousBsdas.length === 0) {
+    return;
+  }
+
+  const previousBsdasWithDestination = previousBsdas.filter(
+    previousBsda => previousBsda.destinationCompanySiret
+  );
+  if (
+    bsda.emitterCompanySiret &&
+    previousBsdasWithDestination.some(
+      previousBsda =>
+        previousBsda.destinationCompanySiret !== bsda.emitterCompanySiret
+    )
+  ) {
+    throw new UserInputError(
+      `Certains des bordereaux à associer ne sont pas en la possession du nouvel émetteur.`
+    );
+  }
+
+  const firstPreviousBsdaWithDestination = previousBsdasWithDestination[0];
+  if (
+    previousBsdasWithDestination.some(
+      previousBsda =>
+        previousBsda.destinationCompanySiret !==
+        firstPreviousBsdaWithDestination.destinationCompanySiret
+    )
+  ) {
+    throw new UserInputError(
+      `Certains des bordereaux à associer ne sont pas en possession du même établissement.`
+    );
+  }
+
+  const fullpreviousBsdas = await prisma.bsda.findMany({
+    where: { id: { in: previousBsdas.map(bsda => bsda.id) } },
+    include: {
+      forwardedIn: true,
+      groupedIn: true
+    }
+  });
+
+  const errors = fullpreviousBsdas.reduce<string[]>((acc, previousBsda) => {
+    if (previousBsda.status === BsdaStatus.PROCESSED) {
+      return acc.concat([
+        `Le bordereau n°${previousBsda.id} a déjà reçu son traitement final.`
+      ]);
+    }
+
+    if (previousBsda.status !== BsdaStatus.AWAITING_CHILD) {
+      return acc.concat([
+        `Le bordereau n°${previousBsda.id} n'a pas toutes les signatures requises.`
+      ]);
+    }
+
+    const { forwardedIn, groupedIn } = previousBsda;
+    // nextBsdas of previous
+    const nextBsdas = [forwardedIn, groupedIn].filter(Boolean);
+    if (
+      nextBsdas.length > 0 &&
+      !nextBsdas.map(bsda => bsda.id).includes(bsda.id)
+    ) {
+      return acc.concat([
+        `Le bordereau n°${previousBsda.id} a déjà été réexpédié ou groupé.`
+      ]);
+    }
+
+    const allowedOperations = ["D 13", "D 15"];
+    if (!allowedOperations.includes(previousBsda.destinationOperationCode)) {
+      return acc.concat([
+        `Le bordereau n°${previousBsda.id} a déclaré un traitement qui ne permet pas de lui donner la suite voulue.`
+      ]);
+    }
+
+    return acc;
+  }, []);
+
+  if (errors.length > 0) {
+    throw new UserInputError(errors.join("\n"));
+  }
 }
 
 const emitterSchema: FactorySchemaOf<
@@ -162,11 +255,11 @@ const emitterSchema: FactorySchemaOf<
         context.emissionSignature && !context.isPrivateIndividual,
         `Émetteur: ${MISSING_COMPANY_EMAIL}`
       ),
-    emitterWorkSiteAddress: yup.string().nullable(),
-    emitterWorkSiteCity: yup.string().nullable(),
-    emitterWorkSiteInfos: yup.string().nullable(),
-    emitterWorkSiteName: yup.string().nullable(),
-    emitterWorkSitePostalCode: yup.string().nullable()
+    emitterPickupSiteAddress: yup.string().nullable(),
+    emitterPickupSiteCity: yup.string().nullable(),
+    emitterPickupSiteInfos: yup.string().nullable(),
+    emitterPickupSiteName: yup.string().nullable(),
+    emitterPickupSitePostalCode: yup.string().nullable()
   });
 
 const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
@@ -266,6 +359,10 @@ const destinationSchema: FactorySchemaOf<
       .requiredIf(
         context.emissionSignature,
         `Entreprise de destination: vous devez préciser le code d'opétation prévu`
+      )
+      .oneOf(
+        [null, ...OPERATIONS],
+        "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
       ),
     destinationReceptionDate: yup
       .date()
@@ -273,25 +370,42 @@ const destinationSchema: FactorySchemaOf<
         context.operationSignature,
         `Entreprise de destination:vous devez préciser la date de réception`
       ) as any,
-    destinationReceptionQuantityType: yup
-      .mixed<BsdaQuantityType>()
-      .requiredIf(
-        context.operationSignature,
-        `Entreprise de destination: vous devez préciser le type de quantité`
-      ),
-    destinationReceptionQuantityValue: yup
+    destinationReceptionWeight: yup
       .number()
       .requiredIf(
         context.operationSignature,
         `Entreprise de destination: vous devez préciser la quantité`
-      ),
+      )
+      .when("destinationReceptionAcceptationStatus", {
+        is: value => value === WasteAcceptationStatus.REFUSED,
+        then: schema =>
+          schema.oneOf(
+            [0],
+            "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
+          ),
+        otherwise: schema =>
+          schema.positive("Vous devez saisir une quantité reçue supérieure à 0")
+      }),
     destinationReceptionAcceptationStatus: yup
       .mixed<BsdaAcceptationStatus>()
       .requiredIf(
         context.operationSignature,
         `Entreprise de destination: vous devez préciser le statut d'acceptation`
       ),
-    destinationReceptionRefusalReason: yup.string().nullable(),
+    destinationReceptionRefusalReason: yup
+      .string()
+      .when(
+        "destinationReceptionAcceptationStatus",
+        (acceptationStatus, schema) =>
+          acceptationStatus === WasteAcceptationStatus.REFUSED
+            ? schema.ensure().required("Vous devez saisir un motif de refus")
+            : schema
+                .ensure()
+                .max(
+                  0,
+                  "Le motif du refus ne doit pas être renseigné si le déchet est accepté"
+                )
+      ),
     destinationOperationCode: yup
       .string()
       .requiredIf(
@@ -400,28 +514,18 @@ const wasteDescriptionSchema: FactorySchemaOf<
         context.emissionSignature,
         "La description déchet est obligatoire"
       ),
-    wasteFamilyCode: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature,
-        "Le code famille déchet est obligatoire"
-      ),
+    wasteFamilyCode: yup.string().nullable(),
     wasteMaterialName: yup.string().nullable(),
     wasteConsistence: yup
       .mixed<BsdaConsistence>()
-      .requiredIf(context.emissionSignature, `La consistence est obligatoire`),
+      .requiredIf(context.workSignature, `La consistence est obligatoire`),
     wasteSealNumbers: yup.array().ensure().of(yup.string()) as any,
-    wasteAdr: yup
-      .string()
-      .requiredIf(context.emissionSignature, "Le code ADR est obligatoire"),
+    wasteAdr: yup.string().nullable(),
     packagings: yup.array(),
-    quantityType: yup
-      .mixed<BsdaQuantityType>()
-      .requiredIf(
-        context.emissionSignature,
-        `Le type de quantité est obligatoire`
-      ),
-    quantityValue: yup
+    weightIsEstimate: yup
+      .boolean()
+      .requiredIf(context.workSignature, `Le type de quantité est obligatoire`),
+    weightValue: yup
       .number()
-      .requiredIf(context.emissionSignature, `La quantité est obligatoire`)
+      .requiredIf(context.workSignature, `La quantité est obligatoire`)
   });

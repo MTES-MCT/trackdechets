@@ -70,3 +70,23 @@ export function mergeDefaults<T>(defaults: T, options: Record<string, any>): T {
     };
   }, defaults);
 }
+
+const traverse = ({ obj, paths, depth = 0 }) => {
+  const node = obj[paths[depth]];
+
+  if (depth === paths.length - 1) {
+    return node;
+  } else {
+    return traverse({ obj: node, paths, depth: depth + 1 });
+  }
+};
+
+/**
+ *   Retrieve an object node via its dotted path
+ *  eg: getNestedValue(form, "emitter.emission.waste.weight")
+ */
+export const getNestedNode = (obj: Object, path: String): any => {
+  const paths = path.split(".");
+
+  return traverse({ obj, paths });
+};

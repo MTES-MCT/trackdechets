@@ -1,7 +1,7 @@
 import React from "react";
 import { RedErrorMessage, Label } from "common/components";
 import Packagings from "form/bsdasri/components/packagings/Packagings";
-import QuantityWidget from "form/bsdasri/components/Quantity";
+import WeightWidget from "form/bsdasri/components/Weight";
 import { useParams, useHistory, generatePath } from "react-router-dom";
 import { BdasriSummary } from "dashboard/components/BSDList/BSDasri/Summary/BsdasriSummary";
 import Loader from "common/components/Loaders";
@@ -12,11 +12,12 @@ import {
   Mutation,
   MutationSignBsdasriEmissionWithSecretCodeArgs,
   MutationUpdateBsdasriArgs,
-  BsdasriSignatureWithSecretCodeInput,
   BsdasriSignatureType,
 } from "generated/graphql/types";
 import { getComputedState } from "form/common/stepper/GenericStepList";
-import getInitialState from "form/bsdasri/utils/initial-state";
+import getInitialState, {
+  getInitialWeightFn,
+} from "form/bsdasri/utils/initial-state";
 
 import { GET_DETAIL_DASRI } from "common/queries";
 import { InlineError, NotificationError } from "common/components/Error";
@@ -30,11 +31,9 @@ import {
 } from "form/bsdasri/utils/queries";
 import {
   emissionSignatureSecretCodeValidationSchema,
-  getInitialQuantityFn,
   prefillWasteDetails,
 } from "./utils";
-
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";
 
 export function RouteBSDasrisSignEmissionSecretCode() {
   const history = useHistory();
@@ -93,11 +92,10 @@ export function RouteBSDasrisSignEmissionSecretCode() {
       <Formik
         initialValues={{
           ...prefillWasteDetails(getComputedState(getInitialState(), bsdasri)),
-
           signature: {
             author: "",
-            securityCode: "" as unknown,
-          } as BsdasriSignatureWithSecretCodeInput,
+            securityCode: "",
+          },
         }}
         validationSchema={emissionSignatureSecretCodeValidationSchema}
         onSubmit={async values => {
@@ -106,16 +104,6 @@ export function RouteBSDasrisSignEmissionSecretCode() {
             variables: {
               id: id,
               input: {
-                // emission: {
-                //   wasteDetails: {
-                //     quantity: {
-                //       value: values.emission?.wasteDetails?.quantity?.value,
-                //       type: values.emission?.wasteDetails?.quantity?.type,
-                //     },
-                //     packagingInfos:
-                //       values.emission?.wasteDetails?.packagingInfos,
-                //   },
-                // },
                 ...removeSections(rest, BsdasriSignatureType.Emission),
               },
             },
@@ -123,7 +111,10 @@ export function RouteBSDasrisSignEmissionSecretCode() {
           await signBsdasriEmissionWithSecretCode({
             variables: {
               id: data.bsdasri.id,
-              input: { ...signature },
+              input: {
+                ...signature,
+                securityCode: parseInt(signature.securityCode, 10),
+              },
             },
           });
 
@@ -134,30 +125,25 @@ export function RouteBSDasrisSignEmissionSecretCode() {
           return (
             <Form>
               <div className="form__row">
-                <Field
-                  name="emission.wasteDetails.packagingInfos"
-                  component={Packagings}
-                />
+                <Field name="emission.packagingInfos" component={Packagings} />
               </div>
               <h4 className="form__section-heading">Quantité remise</h4>
               <div className="form__row">
-                <QuantityWidget
+                <WeightWidget
                   switchLabel="Je souhaite ajouter une quantité"
-                  dasriSection="emission"
-                  getInitialQuantityFn={getInitialQuantityFn}
+                  dasriPath="emitter.emission"
+                  getInitialWeightFn={getInitialWeightFn}
                 />
               </div>
               <div className="form__row">
                 <Label htmlFor="id_securityCode">Code de signature </Label>
 
                 <Field
-                  component={NumberInput}
+                  component={SignatureCodeInput}
                   name="signature.securityCode"
                   id="id_securityCode"
-                  type="number"
                   className="field__block td-input"
                   required
-                  noSpin
                   style={{ width: "100px" }}
                 />
               </div>

@@ -3,6 +3,8 @@ export interface SearchResponseDataGouv {
   etablissement: {
     siret: string;
     etat_administratif: string;
+    activite_principale: string;
+    statut_diffusion: string;
     numero_voie: string;
     indice_repetition: string;
     type_voie: string;
@@ -16,21 +18,22 @@ export interface SearchResponseDataGouv {
       denomination: string;
       prenom_1: string;
       nom: string;
-      activite_principale: string;
       categorie_juridique: string;
     };
   };
 }
 
+interface PeriodeEtablissementInsee {
+  etatAdministratifEtablissement: string;
+  activitePrincipaleEtablissement: string;
+}
 interface EtablissementInsee {
   siret: string;
   uniteLegale: {
     denominationUniteLegale: string;
     categorieJuridiqueUniteLegale: string;
-    etatAdministratifUniteLegale: string;
     prenom1UniteLegale: string;
     nomUniteLegale: string;
-    activitePrincipaleUniteLegale: string;
   };
   adresseEtablissement: {
     numeroVoieEtablissement: string;
@@ -42,6 +45,7 @@ interface EtablissementInsee {
     libelleCommuneEtablissement: string;
     codeCommuneEtablissement: string;
   };
+  periodesEtablissement: PeriodeEtablissementInsee[];
 }
 
 // Response from https://api.insee.fr/entreprises/siret/V3/siret/<VOTRE_SIRET>

@@ -6,7 +6,7 @@ import {
   MutationResolvers
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
-import { expandBsdasriFromDb } from "../../dasri-converter";
+import { unflattenBsdasri } from "../../converter";
 import { getBsdasriOrNotFound } from "../../database";
 import { checkIsBsdasriContributor } from "../../permissions";
 import { indexBsdasri } from "../../elastic";
@@ -37,8 +37,8 @@ const duplicateBsdasriResolver: MutationResolvers["duplicateBsdasri"] = async (
   );
 
   const newBsdasri = await duplicateBsdasri(user, bsdasri);
-  await indexBsdasri(newBsdasri, context);
-  return expandBsdasriFromDb(newBsdasri);
+  await indexBsdasri(newBsdasri);
+  return unflattenBsdasri(newBsdasri);
 };
 
 function duplicateBsdasri(
@@ -49,45 +49,44 @@ function duplicateBsdasri(
     updatedAt,
 
     emissionSignatoryId,
-    emissionSignatureDate,
-    emissionSignatureAuthor,
+    emitterEmissionSignatureDate,
+    emitterEmissionSignatureAuthor,
 
     isEmissionDirectTakenOver,
     isEmissionTakenOverWithSecretCode,
-    handedOverToTransporterAt,
 
-    transporterWasteAcceptationStatus,
+    transporterAcceptationStatus,
     transporterWasteRefusalReason,
-    transporterWasteRefusedQuantity,
+    transporterWasteRefusedWeightValue,
     transporterTakenOverAt,
-    transporterWastePackagingsInfo,
-    transporterWasteQuantity,
-    transporterWasteQuantityType,
+    transporterWastePackagings,
+    transporterWasteWeightValue,
+    transporterWasteWeightIsEstimate,
     transporterWasteVolume,
     handedOverToRecipientAt,
     transportSignatoryId,
-    transportSignatureDate,
-    transportSignatureAuthor,
+    transporterTransportSignatureDate,
+    transporterTransportSignatureAuthor,
 
-    recipientWastePackagingsInfo,
-    recipientWasteAcceptationStatus,
-    recipientWasteRefusalReason,
-    recipientWasteRefusedQuantity,
-    recipientWasteQuantity,
-    recipientWasteVolume,
-    receivedAt,
+    destinationWastePackagings,
+    destinationReceptionAcceptationStatus,
+    destinationReceptionWasteRefusalReason,
+    destinationReceptionWasteRefusedWeightValue,
+    destinationReceptionWasteWeightValue,
+    destinationReceptionWasteVolume,
+    destinationReceptionDate,
 
     receptionSignatoryId,
-    receptionSignatureDate,
-    receptionSignatureAuthor,
+    destinationReceptionSignatureDate,
+    destinationReceptionSignatureAuthor,
 
-    processedAt,
+    destinationOperationDate,
 
     operationSignatoryId,
-    operationSignatureDate,
-    operationSignatureAuthor,
-    regroupedOnBsdasriId,
-    ownerId,
+    destinationOperationSignatureDate,
+    destinationOperationSignatureAuthor,
+    groupedInId,
+
     ...fieldsToCopy
   }: Bsdasri
 ) {
@@ -96,8 +95,7 @@ function duplicateBsdasri(
       ...fieldsToCopy,
       id: getReadableId(ReadableIdPrefix.DASRI),
       status: BsdasriStatus.INITIAL,
-      isDraft: true,
-      owner: { connect: { id: user.id } }
+      isDraft: true
     }
   });
 }

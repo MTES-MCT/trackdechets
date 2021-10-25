@@ -132,17 +132,6 @@ type Mutation {
   """
   createCompany(companyInput: PrivateCompanyInput!): CompanyPrivate!
 
-  """
-  USAGE INTERNE
-  Récupère une URL signé pour l'upload d'un fichier
-  """
-  createUploadLink(
-    "nom du fichier"
-    fileName: String!
-    "type de fichier"
-    fileType: String!
-  ): UploadLink!
-
   "Verify a company manually"
   verifyCompanyByAdmin(
     input: VerifyCompanyByAdminInput!

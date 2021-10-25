@@ -41,7 +41,9 @@ type Bsvhu {
   "Identification des VHUs"
   identification: BsvhuIdentification
   "Quantité de VHUs"
-  quantity: BsvhuQuantity
+  quantity: Int
+  "Poids"
+  weight: BsvhuWeight
 
   "Destinataire du bordereau"
   destination: BsvhuDestination
@@ -104,8 +106,10 @@ type BsvhuDestination {
 type BsvhuReception {
   "Date de présentation sur site"
   date: DateTime
-  "Quantité réelle reçue"
-  quantity: BsvhuQuantity
+  "Quantité de VHUs reçue"
+  quantity: Int
+  "Poids réel reçu"
+  weight: Float
   "Lot accepté oui/non"
   acceptationStatus: BsvhuAcceptationStatus
   "Motif de refus"
@@ -133,7 +137,7 @@ type BsvhuIdentification {
   type: BsvhuIdentificationType
 }
 
-type BsvhuQuantity {
-  number: Int
-  tons: Float
+type BsvhuWeight {
+  value: Float
+  isEstimate: Boolean
 }

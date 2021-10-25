@@ -10,8 +10,8 @@ import {
 import { Label, RedErrorMessage } from "common/components";
 import { NotificationError } from "common/components/Error";
 import { PreviousButton } from "common/components/Buttons";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { CollectAddress } from "./CollectAddress";
+import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";
 
 interface SignatureEmitterProps {
   form: Form;
@@ -154,13 +154,11 @@ export function SignatureEmitter({
             : "de l'éco-organisme"}
         </Label>
         <Field
-          component={NumberInput}
+          component={SignatureCodeInput}
           name="securityCode"
           id="id_securityCode"
-          type="number"
           className="field__block td-input"
           required
-          noSpin
           style={{ width: "100px" }}
         />
       </div>

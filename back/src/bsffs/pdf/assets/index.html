@@ -113,7 +113,7 @@
             <p>
               <strong>{{ bsff.wasteCode }}</strong> : chlorofluorocarbones,
               HCFC, HFC<br />
-              Nom usuel : {{ bsff.wasteNature }}<br />
+              Nom usuel : {{ bsff.wasteDescription }}<br />
               Code UN / Mention ADR : {{ bsff.wasteAdr }}
             </p>
           </div>
@@ -121,12 +121,12 @@
             <p><strong>5. Quantité totale</strong></p>
             <p>
               <input type="checkbox"
-              {{#bsff.quantityIsEstimate}}{{/bsff.quantityIsEstimate}}{{^bsff.quantityIsEstimate}}checked{{/bsff.quantityIsEstimate}}
+              {{#bsff.weightIsEstimate}}{{/bsff.weightIsEstimate}}{{^bsff.weightIsEstimate}}checked{{/bsff.weightIsEstimate}}
               /> Réelle <input type="checkbox"
-              {{#bsff.quantityIsEstimate}}checked{{/bsff.quantityIsEstimate}}{{^bsff.quantityIsEstimate}}{{/bsff.quantityIsEstimate}}
+              {{#bsff.weightIsEstimate}}checked{{/bsff.weightIsEstimate}}{{^bsff.weightIsEstimate}}{{/bsff.weightIsEstimate}}
               /> Estimée
             </p>
-            <p>kilo(s) : {{ bsff.quantityKilos }}</p>
+            <p>kilo(s) : {{ bsff.weightValue }}</p>
           </div>
         </div>
 
@@ -216,7 +216,7 @@
               Date de présentation sur site : {{#formatDate}}{{
               bsff.destinationReceptionDate }}{{/formatDate}}<br />
               Quantité réelle présentée en kilo(s) : {{
-              bsff.destinationReceptionKilos }}<br />
+              bsff.destinationReceptionWeight }}<br />
               Lot accepté : <input type="checkbox"
               {{#receptionAccepted}}checked{{/receptionAccepted}} /> Oui <input
               type="checkbox" {{#receptionRefused}}checked{{/receptionRefused}}
@@ -340,7 +340,7 @@
         {{#ficheInterventions}}
         <div class="BoxRow">
           <div class="BoxCol"><p>{{ numero }}&nbsp;</p></div>
-          <div class="BoxCol"><p>{{ kilos }}&nbsp;</p></div>
+          <div class="BoxCol"><p>{{ weight }}&nbsp;</p></div>
           <div class="BoxCol"><p>{{ postalCode }}&nbsp;</p></div>
         </div>
         {{/ficheInterventions}}
@@ -378,7 +378,7 @@
         <div class="BoxRow">
           <div class="BoxCol"><p>{{ id }}&nbsp;</p></div>
           <div class="BoxCol"><p>{{ destinationCap }}&nbsp;</p></div>
-          <div class="BoxCol"><p>{{ quantityKilos }}&nbsp;</p></div>
+          <div class="BoxCol"><p>{{ destinationReceptionWeight }}&nbsp;</p></div>
         </div>
         {{/previousBsffs}}
       </div>

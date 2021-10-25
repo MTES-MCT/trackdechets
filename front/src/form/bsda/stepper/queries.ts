@@ -18,7 +18,7 @@ export const FullBsdaFragment = gql`
           date
         }
       }
-      workSite {
+      pickupSite {
         address
         city
         infos
@@ -34,10 +34,7 @@ export const FullBsdaFragment = gql`
       }
       reception {
         date
-        quantity {
-          value
-          type
-        }
+        weight
         acceptationStatus
         refusalReason
       }
@@ -69,9 +66,9 @@ export const FullBsdaFragment = gql`
       sealNumbers
       adr
     }
-    quantity {
+    weight {
       value
-      type
+      isEstimate
     }
     worker {
       company {
@@ -134,8 +131,8 @@ export const GET_BSDA = gql`
 `;
 
 export const GET_BSDAS = gql`
-  query Bsdas {
-    bsdas {
+  query Bsdas($where: BsdaWhere) {
+    bsdas(where: $where) {
       totalCount
       pageInfo {
         hasNextPage

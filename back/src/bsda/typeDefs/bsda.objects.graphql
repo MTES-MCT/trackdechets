@@ -30,6 +30,8 @@ type Bsda {
   "Maitre d'ouvrage ou détenteur du déchet"
   emitter: BsdaEmitter
 
+  ecoOrganisme: BsdaEcoOrganisme
+
   "Courtier"
   broker: BsdaBroker
 
@@ -37,8 +39,8 @@ type Bsda {
   waste: BsdaWaste
   "Conditionnement"
   packagings: [BsdaPackaging!]
-  "Quantité"
-  quantity: BsdaQuantity
+  "Poids"
+  weight: BsdaWeight
 
   "Installation de destination"
   destination: BsdaDestination
@@ -49,11 +51,53 @@ type Bsda {
   "Entreprise de transport"
   transporter: BsdaTransporter
 
-  "Précedents BSDA associés, constituant l'historique de traçabilité"
-  associations: [BsdaAssociation]
+  "Bordereau que celui-ci réexpédie"
+  forwarding: InitialBsda
+
+  "Bordereau dans lequel celui-ci est réexpédié"
+  forwardedIn: Bsda
+
+  "Bordereaux que celui-ci groupe"
+  grouping: [InitialBsda!]
+
+  """
+  Bordereaux dans lequel celui-ci est groupé
+  """
+  groupedIn: InitialBsda
 
   "Metadata associées au bordereau"
   metadata: BsdaMetadata!
+}
+
+type InitialBsda {
+  """
+  Identifiant unique assigné par Trackdéchets.
+  Il est à utiliser pour les échanges avec l'API.
+  """
+  id: ID!
+  """
+  Émetteur du déchet, qui n'est pas nécessairement le producteur.
+  """
+  emitter: BsdaEmitter
+  """
+  Destination du déchet, qui peut le réceptionner pour traitement, groupement ou réexpedition.
+  Un nouveau bordereau doit être créé si le déchet connaît un nouveau parcours, par exemple s'il quitte une installation de collecte pour un centre de traitement.
+
+  Pour plus de détails sur les différents types de bordereau, voir l'enum BsdaType.
+  """
+  destination: BsdaDestination
+  """
+  Détails du déchet.
+  """
+  waste: BsdaWaste
+  """
+  Quantité totale du déchet en kilogrammes, il peut s'agir d'une estimation.
+  """
+  weight: BsdaWeight
+  """
+  Liste des contenants utilisés pour le transport du déchet.
+  """
+  packagings: [BsdaPackaging!]!
 }
 
 type BsdaEmitter {
@@ -61,13 +105,21 @@ type BsdaEmitter {
   isPrivateIndividual: Boolean
   "Établissement MOA/détenteur. Partiellement rempli si l'émetteur est en fait un particulier"
   company: FormCompany
+  "Champ libre"
+  customInfo: String
   "Informations chantier (si différente de l'adresse de l'entreprise)"
-  workSite: BsdaWorkSite
+  pickupSite: BsdaPickupSite
   "Déclaration générale"
   emission: BsdaEmission
 }
 
-type BsdaWorkSite {
+"Information sur l'éco-organisme responsable du BSDA"
+type BsdaEcoOrganisme {
+  name: String!
+  siret: String!
+}
+
+type BsdaPickupSite {
   name: String
   address: String
   city: String
@@ -108,9 +160,9 @@ type BsdaPackaging {
   quantity: Int!
 }
 
-type BsdaQuantity {
+type BsdaWeight {
   "Type de quantité (réelle ou estimé)"
-  type: BsdaQuantityType
+  isEstimate: Boolean
   "Quantité en tonne"
   value: Float
 }
@@ -118,6 +170,8 @@ type BsdaQuantity {
 type BsdaDestination {
   "Établissement de destination"
   company: FormCompany
+  "Champ libre"
+  customInfo: String
   "N° de CAP (le cas échéant)"
   cap: String
   "Opération d'élimination / valorisation prévue (code D/R)"
@@ -133,8 +187,8 @@ type BsdaDestination {
 type BsdaReception {
   "Date de présentation sur site"
   date: DateTime
-  "Quantité présentée"
-  quantity: BsdaQuantity
+  "Poids présentée"
+  weight: Float
   "Lot accepté, accepté partiellement ou refusé"
   acceptationStatus: BsdaAcceptationStatus
   "Motif de refus"
@@ -181,6 +235,8 @@ type BsdaWork {
 type BsdaTransporter {
   "Coordonnées de l'entreprise de transport"
   company: FormCompany
+  "Champ libre"
+  customInfo: String
   "Récépissé transporteur"
   recepisse: BsdaRecepisse
   "Déclaration générale"
@@ -208,18 +264,6 @@ type BsdaRecepisse {
   validityLimit: DateTime
 }
 
-type BsdaAssociation {
-  id: ID!
-  status: BsdaStatus!
-  cap: String!
-  wasteCode: String!
-  wasteDescription: String!
-  wasteSealNumbers: [String!]
-  wasteAdr: String
-  totalQuantity: Float!
-  emissionDate: DateTime!
-}
-
 type BsdaBroker {
   "Coordonnées de l'entreprise courtier"
   company: FormCompany
@@ -228,7 +272,7 @@ type BsdaBroker {
 }
 
 type BsdaMetadata {
-  errors: [BsdaError!]!
+  errors: [BsdaError!]
 }
 
 type BsdaError {

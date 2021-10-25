@@ -14,7 +14,10 @@ const GET_BSDAS = `
       edges {
         node {
           id
-          associations {
+          grouping {
+            id
+          }
+          forwarding {
             id
           }
         }
@@ -118,7 +121,7 @@ describe("Query.bsdas", () => {
             where: {
               [role]: {
                 company: {
-                  siret: company.siret
+                  siret: { _eq: company.siret }
                 }
               }
             }
@@ -150,7 +153,13 @@ describe("Query.bsdas", () => {
   it("should list the associated bsdas", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
 
-    const associatedBsda = await bsdaFactory({
+    const groupedBsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        status: "AWAITING_CHILD"
+      }
+    });
+    const forwardedBsda = await bsdaFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
         status: "AWAITING_CHILD"
@@ -159,7 +168,8 @@ describe("Query.bsdas", () => {
     await bsdaFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        bsdas: { connect: [{ id: associatedBsda.id }] }
+        grouping: { connect: [{ id: groupedBsda.id }] },
+        forwarding: { connect: { id: forwardedBsda.id } }
       }
     });
 
@@ -168,10 +178,15 @@ describe("Query.bsdas", () => {
       GET_BSDAS
     );
 
-    expect(data.bsdas.edges[0].node.associations).toEqual([
+    expect(data.bsdas.edges[0].node.grouping).toEqual([
       expect.objectContaining({
-        id: associatedBsda.id
+        id: groupedBsda.id
       })
     ]);
+    expect(data.bsdas.edges[0].node.forwarding).toEqual(
+      expect.objectContaining({
+        id: forwardedBsda.id
+      })
+    );
   });
 });

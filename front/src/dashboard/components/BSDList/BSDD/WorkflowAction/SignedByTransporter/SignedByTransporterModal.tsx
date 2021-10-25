@@ -7,7 +7,6 @@ import {
   Mutation,
   MutationSignedByTransporterArgs,
   SignatureAuthor,
-  TransporterSignatureFormInput,
 } from "generated/graphql/types";
 import { Stepper, StepperItem, Modal, Loader } from "common/components";
 import steps from "./steps";
@@ -59,7 +58,10 @@ export function SignedByTransporterModal({
   const { Component } = steps[stepIndex];
 
   const validationSchema = yup.object({
-    securityCode: yup.number().required("Le code de signature est obligatoire"),
+    securityCode: yup
+      .string()
+      .required("Le code de signature est obligatoire")
+      .matches(/[1-9][0-9]{3}/, "Format invalide"),
     sentBy: yup
       .string()
       .required("Le nom et prénom du contact est obligatoire"),
@@ -89,29 +91,26 @@ export function SignedByTransporterModal({
 
       <div className="step-content">
         <Formik
-          initialValues={
-            {
-              sentAt: new Date().toISOString(),
-              sentBy: "",
-
-              // an input[type=number]'s empty value is a string
-              // but it's becoming a number when it's filled
-              securityCode: "" as unknown,
-
-              signedByTransporter: false,
-              signedByProducer: false,
-              signatureAuthor: SignatureAuthor.Emitter,
-              packagingInfos: form.stateSummary?.packagingInfos,
-              quantity: form.stateSummary?.quantity ?? "",
-              onuCode: form.stateSummary?.onuCode ?? "",
-            } as TransporterSignatureFormInput
-          }
+          initialValues={{
+            sentAt: new Date().toISOString(),
+            sentBy: "",
+            securityCode: "",
+            signedByTransporter: false,
+            signedByProducer: false,
+            signatureAuthor: SignatureAuthor.Emitter,
+            packagingInfos: form.stateSummary?.packagingInfos,
+            quantity: form.stateSummary?.quantity ?? 0,
+            onuCode: form.stateSummary?.onuCode ?? "",
+          }}
           validationSchema={validationSchema}
           onSubmit={values =>
             signedByTransporter({
               variables: {
                 id: form.id,
-                signingInfo: values,
+                signingInfo: {
+                  ...values,
+                  securityCode: parseInt(values.securityCode, 10),
+                },
               },
             })
           }

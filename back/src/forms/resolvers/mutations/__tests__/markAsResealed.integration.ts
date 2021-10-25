@@ -34,6 +34,8 @@ describe("Mutation markAsResealed", () => {
     process.env = OLD_ENV;
   });
 
+  afterAll(resetDatabase);
+
   test("the temp storer of the BSD can reseal it", async () => {
     const owner = await userFactory();
     const { user, company: collector } = await userWithCompanyFactory(
@@ -152,6 +154,52 @@ describe("Mutation markAsResealed", () => {
       where: { id: form.id }
     });
     expect(resealedForm.status).toEqual("RESEALED");
+  });
+
+  it("should allow updating an already RESEALED form", async () => {
+    const owner = await userFactory();
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const destination = await destinationFactory();
+    const transporter = await companyFactory();
+
+    const { mutate } = makeClient(user);
+
+    const form = await formWithTempStorageFactory({
+      ownerId: owner.id,
+      opt: {
+        status: Status.RESEALED,
+        recipientCompanySiret: collector.siret
+      },
+      tempStorageOpts: { destinationCompanySiret: destination.siret }
+    });
+
+    // change transporter
+    await mutate(MARK_AS_RESEALED, {
+      variables: {
+        id: form.id,
+        resealedInfos: {
+          transporter: {
+            company: {
+              siret: transporter.siret
+            }
+          }
+        }
+      }
+    });
+
+    const resealedForm = await prisma.form.findUnique({
+      where: { id: form.id },
+      include: { temporaryStorageDetail: true }
+    });
+    expect(resealedForm.status).toEqual("RESEALED");
+    expect(resealedForm.temporaryStorageDetail.transporterCompanySiret).toEqual(
+      transporter.siret
+    );
   });
 
   test("when resealedInfos contains repackaging data", async () => {

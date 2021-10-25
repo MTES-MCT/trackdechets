@@ -6,7 +6,7 @@ import {
   BsffFicheIntervention,
   BsffOperationCode,
   BsffPackagingInput,
-  BsffQuantityInput,
+  BsffWeightInput,
   BsffStatus,
   BsffType,
   CompanyInput,
@@ -108,14 +108,16 @@ function PreviousBsffsPicker({
     {
       variables: {
         where: {
-          status: BsffStatus.IntermediatelyProcessed,
+          status: { _eq: BsffStatus.IntermediatelyProcessed },
           destination: {
             operation: {
-              code_in,
+              code: { _in: code_in },
             },
           },
         },
       },
+      // make sure we have fresh data here
+      fetchPolicy: "cache-and-network",
     }
   );
   const [{ value: previousBsffs }] = useField<Bsff[]>("previousBsffs");
@@ -123,6 +125,13 @@ function PreviousBsffsPicker({
   if (data == null) {
     return <Loader />;
   }
+
+  // remove bsffs that have already been grouped, forwarded or repackaged
+  const pickableBsffs = data.bsffs.edges
+    .map(({ node: bsff }) => bsff)
+    .filter(bsff => {
+      return !bsff.groupedIn && !bsff.repackagedIn && !bsff.forwardedIn;
+    });
 
   return (
     <FieldArray
@@ -140,7 +149,7 @@ function PreviousBsffsPicker({
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.bsffs.edges.map(({ node: bsff }) => {
+            {pickableBsffs.map(bsff => {
               const previousBsffIndex = previousBsffs.findIndex(
                 previousBsff => previousBsff.id === bsff.id
               );
@@ -150,16 +159,15 @@ function PreviousBsffsPicker({
                 <TableRow
                   key={bsff.id}
                   onClick={() => {
-                    if (previousBsffs.length >= max) {
-                      window.alert(
-                        `Vous ne pouvez pas sélectionner plus de ${max} BSFFs avec ce type de BSFF.`
-                      );
-                      return;
-                    }
-
                     if (isSelected) {
                       remove(previousBsffIndex);
                     } else {
+                      if (previousBsffs.length >= max) {
+                        window.alert(
+                          `Vous ne pouvez pas sélectionner plus de ${max} BSFFs avec ce type de BSFF.`
+                        );
+                        return;
+                      }
                       push(bsff);
                     }
                   }}
@@ -175,7 +183,7 @@ function PreviousBsffsPicker({
                   <TableCell>{bsff.id}</TableCell>
                   <TableCell>
                     {bsff.waste?.code} - Nature :{" "}
-                    {bsff.waste?.nature ?? "inconnue"}
+                    {bsff.waste?.description ?? "inconnue"}
                   </TableCell>
                   <TableCell>{bsff.emitter?.company?.name}</TableCell>
                   <TableCell>{bsff.transporter?.company?.name}</TableCell>
@@ -198,9 +206,7 @@ export function BsffTypeSelector() {
   const [, , { setValue: setEmitterCompany }] = useField<CompanyInput>(
     "emitter.company"
   );
-  const [, , { setValue: setQuantity }] = useField<BsffQuantityInput>(
-    "quantity"
-  );
+  const [, , { setValue: setWeight }] = useField<BsffWeightInput>("weight");
   const [
     { value: ficheInterventions },
     ,
@@ -216,11 +222,11 @@ export function BsffTypeSelector() {
   // it should be fixed in formik v3: https://github.com/formium/formik/issues/2268
   const setters = React.useRef({
     setEmitterCompany,
-    setQuantity,
+    setWeight,
     setPackagings,
   });
   setters.current.setEmitterCompany = setEmitterCompany;
-  setters.current.setQuantity = setQuantity;
+  setters.current.setWeight = setWeight;
   setters.current.setPackagings = setPackagings;
 
   // When selecting the previous bsffs, prefill the fields with what we already know
@@ -243,27 +249,27 @@ export function BsffTypeSelector() {
     }
 
     if ([BsffType.Reexpedition, BsffType.Groupement].includes(type)) {
-      setters.current.setQuantity(
-        previousBsffs.reduce<BsffQuantityInput>(
+      setters.current.setWeight(
+        previousBsffs.reduce<BsffWeightInput>(
           (acc, previousBsff) => {
-            if (previousBsff.destination?.reception?.kilos) {
+            if (previousBsff.destination?.reception?.weight) {
               return {
                 ...acc,
-                kilos: acc.kilos + previousBsff.destination.reception.kilos,
+                value: acc.value + previousBsff.destination.reception.weight,
               };
             }
 
-            if (previousBsff.quantity) {
+            if (previousBsff.weight) {
               return {
                 ...acc,
-                ...previousBsff.quantity,
+                ...previousBsff.weight,
               };
             }
 
             return acc;
           },
           {
-            kilos: 0,
+            value: 0,
             isEstimate: false,
           }
         )

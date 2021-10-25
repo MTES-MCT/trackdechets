@@ -42,8 +42,9 @@ const getVhuFormdata = (): Prisma.BsvhuCreateInput => ({
   packaging: "UNITE" as BsvhuPackaging,
   identificationNumbers: ["1", "2", "3"],
   identificationType: "NUMERO_ORDRE_REGISTRE_POLICE" as BsvhuIdentificationType,
-  quantityNumber: 2,
-  quantityTons: 1.4,
+  quantity: 2,
+  weightValue: 1.4,
+  weightIsEstimate: true,
 
   transporterCompanyName: "Transport facile",
   transporterCompanySiret: "12345678974589",
@@ -55,8 +56,7 @@ const getVhuFormdata = (): Prisma.BsvhuCreateInput => ({
   transporterRecepisseDepartment: "83",
   transporterRecepisseValidityLimit: "2019-11-27T00:00:00.000Z",
 
-  destinationReceptionQuantityNumber: null,
-  destinationReceptionQuantityTons: null,
+  destinationReceptionWeight: null,
   destinationReceptionAcceptationStatus: null,
   destinationReceptionRefusalReason: null,
   destinationOperationCode: null

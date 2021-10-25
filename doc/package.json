@@ -5,8 +5,9 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "prebuild": "yarn build-workflow-plugin && yarn docs",
-    "prestart": "yarn build-workflow-plugin && yarn docs",
-    "start": "docusaurus start",
+    "predev": "yarn build-workflow-plugin && yarn docs",
+    "dev": "docusaurus start",
+    "start": "npx serve -s build -l $PORT",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",

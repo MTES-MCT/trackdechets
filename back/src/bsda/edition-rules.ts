@@ -33,16 +33,29 @@ const editableFields = {
     reception: ifAwaitingSignature("OPERATION"),
     operation: ifAwaitingSignature("OPERATION")
   },
-  waste: ifAwaitingSignature("EMISSION"),
+  waste: {
+    code: ifAwaitingSignature("EMISSION"),
+    name: ifAwaitingSignature("EMISSION"),
+    familyCode: ifAwaitingSignature("WORK"),
+    materialName: ifAwaitingSignature("WORK"),
+    consistence: ifAwaitingSignature("WORK"),
+    sealNumbers: ifAwaitingSignature("WORK"),
+    adr: ifAwaitingSignature("WORK")
+  },
   packagings: ifAwaitingSignature("WORK"),
-  quantity: ifAwaitingSignature("WORK"),
+  weight: ifAwaitingSignature("WORK"),
   worker: {
     company: ifAwaitingSignature("EMISSION"),
     work: ifAwaitingSignature("WORK")
   },
   broker: ifAwaitingSignature("EMISSION"),
-  transporter: ifAwaitingSignature("TRANSPORT"),
-  associations: ifAwaitingSignature("EMISSION")
+  transporter: {
+    company: ifAwaitingSignature("EMISSION"),
+    recepisse: ifAwaitingSignature("TRANSPORT"),
+    transport: ifAwaitingSignature("TRANSPORT")
+  },
+  grouping: ifAwaitingSignature("EMISSION"),
+  forwarding: ifAwaitingSignature("EMISSION")
 };
 
 function ifAwaitingSignature(signature: BsdaSignatureType) {

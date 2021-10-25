@@ -11,6 +11,7 @@ import {
   Worker,
   WasteInfo,
 } from "./stepper/steps";
+import { Type } from "./stepper/steps/Type";
 
 export default function FormContainer() {
   const { id } = useParams<{ id?: string }>();
@@ -32,6 +33,11 @@ export default function FormContainer() {
 
             return (
               <>
+                <StepContainer
+                  component={Type}
+                  title="Type de bordereau"
+                  disabled={emitterSigned}
+                />
                 <StepContainer
                   component={Emitter}
                   title="Émetteur"

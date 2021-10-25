@@ -106,10 +106,10 @@ describe("Mutation.Bsda.create", () => {
         sealNumbers: ["1", "2"]
       },
       packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
-      quantity: { type: "ESTIMATED", value: 1.2 },
+      weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "R 12",
+        plannedOperationCode: "D 9",
         company: {
           siret: "11111111111111",
           name: "destination",
@@ -171,10 +171,10 @@ describe("Mutation.Bsda.create", () => {
         sealNumbers: ["1", "2"]
       },
       packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
-      quantity: { type: "ESTIMATED", value: 1.2 },
+      weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "R 12",
+        plannedOperationCode: "D 9",
         company: {
           siret: "11111111111111",
           name: "destination",

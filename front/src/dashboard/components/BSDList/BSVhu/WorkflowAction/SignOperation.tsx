@@ -44,19 +44,17 @@ export function SignOperation({ siret, bsvhuId }: Props) {
               {
                 destination: {
                   reception: {
-                    date: null,
+                    date: new Date().toISOString(),
                     acceptationStatus: null,
                     refusalReason: "",
-                    quantity: {
-                      number: null,
-                      tons: null,
-                    },
+                    quantity: null,
+                    weight: null,
                     identification: {
                       numbers: [],
                     },
                   },
                   operation: {
-                    date: null,
+                    date: new Date().toISOString(),
                     code: "",
                     nextDestination: { company: getInitialCompany() },
                   },

@@ -76,6 +76,30 @@ describe("Mutation.Bsda.createDraft", () => {
     ]);
   });
 
+  it.each(["emitter", "transporter", "destination", "broker"])(
+    "should allow %p to create a BSDA",
+    async role => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<Pick<Mutation, "createDraftBsda">>(
+        CREATE_BSDA,
+        {
+          variables: {
+            input: {
+              [role]: {
+                company: {
+                  siret: company.siret
+                }
+              }
+            }
+          }
+        }
+      );
+      expect(errors).toBeUndefined();
+    }
+  );
+
   it("create a form with an emitter and a destination", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 

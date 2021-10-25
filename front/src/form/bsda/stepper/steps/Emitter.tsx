@@ -1,9 +1,8 @@
 import React from "react";
 import { Field, useFormikContext } from "formik";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import { Bsda } from "generated/graphql/types";
+import { Bsda, BsdaPickupSite } from "generated/graphql/types";
 import WorkSite from "form/common/components/work-site/WorkSite";
-import { getInitialEmitterWorkSite } from "form/bsdd/utils/initial-state";
 
 export function Emitter({ disabled }) {
   const { values } = useFormikContext<Bsda>();
@@ -29,7 +28,54 @@ export function Emitter({ disabled }) {
         </label>
       </div>
 
-      {!values.emitter?.isPrivateIndividual && (
+      {values.emitter?.isPrivateIndividual ? (
+        <>
+          <div className="form__row">
+            <label>
+              Nom et prénom
+              <Field
+                type="text"
+                name="emitter.company.contact"
+                className="td-input td-input"
+                disabled={disabled}
+              />
+            </label>
+          </div>
+          <div className="form__row">
+            <label>
+              Adresse
+              <Field
+                type="text"
+                name="emitter.company.address"
+                className="td-input td-input"
+                disabled={disabled}
+              />
+            </label>
+          </div>
+          <div className="form__row">
+            <label>
+              Téléphone
+              <Field
+                type="text"
+                name="emitter.company.phone"
+                className="td-input td-input--small"
+                disabled={disabled}
+              />
+            </label>
+          </div>
+          <div className="form__row">
+            <label>
+              Mail
+              <Field
+                type="text"
+                name="emitter.company.mail"
+                className="td-input td-input--medium"
+                disabled={disabled}
+              />
+            </label>
+          </div>
+        </>
+      ) : (
         <CompanySelector
           disabled={disabled}
           name="emitter.company"
@@ -41,9 +87,22 @@ export function Emitter({ disabled }) {
         switchLabel="Je souhaite ajouter une adresse de chantier ou de collecte"
         headingTitle="Adresse chantier"
         designation="de l'entreprise"
-        getInitialEmitterWorkSiteFn={getInitialEmitterWorkSite}
+        getInitialEmitterWorkSiteFn={getInitialEmitterPickupSite}
         disabled={disabled}
+        modelKey="pickupSite"
       />
     </>
   );
+}
+
+export function getInitialEmitterPickupSite(
+  pickupSite?: BsdaPickupSite | null
+) {
+  return {
+    name: pickupSite?.name ?? "",
+    address: pickupSite?.address ?? "",
+    city: pickupSite?.city ?? "",
+    postalCode: pickupSite?.postalCode ?? "",
+    infos: pickupSite?.infos ?? "",
+  };
 }

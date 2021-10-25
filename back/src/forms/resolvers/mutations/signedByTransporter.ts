@@ -11,7 +11,11 @@ import {
   checkCanSignedByTransporter,
   checkSecurityCode
 } from "../../permissions";
-import { signingInfoSchema, wasteDetailsSchema } from "../../validation";
+import {
+  beforeSignedByTransporterSchema,
+  signingInfoSchema,
+  wasteDetailsSchema
+} from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 
@@ -53,18 +57,21 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
     sentBy: infos.sentBy
   });
 
-  const wasteDetails = infos => ({
+  const wasteDetails = {
     wasteDetailsPackagingInfos:
       infos.packagingInfos ?? form.wasteDetailsPackagingInfos,
     wasteDetailsQuantity: infos.quantity ?? form.wasteDetailsQuantity,
     wasteDetailsOnuCode: infos.onuCode ?? form.wasteDetailsOnuCode
-  });
+  };
+
+  const futureForm = {
+    ...form,
+    ...wasteDetails
+  };
 
   // check waste details override is valid
-  await wasteDetailsSchema.validate({
-    ...form,
-    ...wasteDetails(infos)
-  });
+  await wasteDetailsSchema.validate(futureForm);
+  await beforeSignedByTransporterSchema.validate(futureForm);
 
   if (form.sentAt) {
     // BSD has already been sent, it must be a signature for frame 18
@@ -79,13 +86,13 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
     const hasWasteDetailsOverride = !!temporaryStorageDetail.wasteDetailsQuantity;
 
     const formUpdateInput = {
-      ...(!hasWasteDetailsOverride && wasteDetails(infos)),
+      ...(!hasWasteDetailsOverride && wasteDetails),
       temporaryStorageDetail: {
         update: {
           signedBy: infos.sentBy,
           signedAt: infos.sentAt,
           signedByTransporter: true,
-          ...(hasWasteDetailsOverride && wasteDetails(infos))
+          ...(hasWasteDetailsOverride && wasteDetails)
         }
       }
     };
@@ -113,7 +120,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] = as
     signedByTransporter: true,
     sentAt: infos.sentAt,
     sentBy: infos.sentBy,
-    ...wasteDetails(infos),
+    ...wasteDetails,
     currentTransporterSiret: form.transporterCompanySiret
   };
 

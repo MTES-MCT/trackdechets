@@ -5,19 +5,55 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2021.10.1] 04/10/2021
+# [2021.10.2] 25/10/2021
 
 #### :rocket: Nouvelles fonctionnalités
 
 #### :boom: Breaking changes
 
+- Harmonisation et stabilisation de l'api des bordereaux dasri [PR 992](https://github.com/MTES-MCT/trackdechets/pull/992)
+- Harmonisation et stabilisation de l'api des bordereaux BSFF [PR 991](https://github.com/MTES-MCT/trackdechets/pull/991)
+- Le champ `id` de l'input `AppendixFormInput` devient obligatoire [PR 1028](https://github.com/MTES-MCT/trackdechets/pull/1028)
+- Harmonisation du fonctionnement des filtres sur les queries bsdasris, bsdas, bsvhus and bsffs [PR 1005](https://github.com/MTES-MCT/trackdechets/pull/1005)
+
+#### :bug: Corrections de bugs
+
+- Correction de la validation des contenants lors de la signature transporteur sur le BSDD [PR 1012](https://github.com/MTES-MCT/trackdechets/pull/1012)
+- Correction de la recherche entreprise qui retournait des établissements fermés [PR 1046](https://github.com/MTES-MCT/trackdechets/pull/1046)
+- Correction du code APE renvoyé par `companyInfos` qui était celui du siège et non celui de l'établissement [PR 1046](https://github.com/MTES-MCT/trackdechets/pull/1046)
+- Correction d'un bug empêchant le courtier de créer un BSDA [PR 1008](https://github.com/MTES-MCT/trackdechets/pull/1008)
+#### :nail_care: Améliorations
+
+- Ajout d'un contrôle de cohérence centre émetteur vs destination initiale lors du regroupement de BSDD [PR 1028](https://github.com/MTES-MCT/trackdechets/pull/1028)
+- La suppression d'un BSDD de regroupement dissocie désormais les annexes 2 [PR 1028](https://github.com/MTES-MCT/trackdechets/pull/1028)
+- Correction d'un bug de l'interface qui ne reprenait pas les informations liées au courtier lors de la modification d'un BSDA [PR 1015](https://github.com/MTES-MCT/trackdechets/pull/1015)
+- À la création d'une entreprise, le réglage "j'autorise l'emport direct de dasris" est proposé [PR 1006](https://github.com/MTES-MCT/trackdechets/pull/1006)
+- Ajout d'un message d'erreur lorsque l'on requête un établissement non diffusable [PR 1009](https://github.com/MTES-MCT/trackdechets/pull/1009)
+- Suppression de la bannière d'avertissement DASRI, amiante, FF [PR 1016](https://github.com/MTES-MCT/trackdechets/pull/1016)
+- Ajout de la possibilité de mettre à jour un BSDD à l'état `RESEALED` en appelant plusieurs fois la mutation `markAsResealed`. Cette fonctionnalité n'est disponible que par API. [PR 1014](https://github.com/MTES-MCT/trackdechets/pull/1014)
+- Multiples améliorations sur les formulaires de création et de signature VHU et amiante [PR 1036](https://github.com/MTES-MCT/trackdechets/pull/1036)
+- Gestion des plaques d'immatriculation des dasris [PR 1041](https://github.com/MTES-MCT/trackdechets/pull/1041)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Amélioration de la query { me } pour éviter de reqêter inutilement la base sirene [PR 1010](https://github.com/MTES-MCT/trackdechets/pull/1010)
+
+# [2021.10.1] 04/10/2021
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :boom: Breaking changes
 #### :bug: Corrections de bugs
 
 - Correction d'un bug d'affichage dans la préparation d'un transfert multi-modal [PR 997](https://github.com/MTES-MCT/trackdechets/pull/997)
+
 #### :nail_care: Améliorations
 
 - Rafraichissement automatique de la liste des bordereaux dans l'UI Trackdéchets [PR 985](https://github.com/MTES-MCT/trackdechets/pull/985)
 - Ajout d'un filtre sur les champs "Plaque d'immatriculation" et "Champ libre" dans le tableau de bord transporteur [PR 998](https://github.com/MTES-MCT/trackdechets/pull/998)
+
 #### :memo: Documentation
 
 #### :house: Interne
@@ -27,6 +63,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - La signature du producteur dasri avec code secret est disponible dans l'UI [PR 987](https://github.com/MTES-MCT/trackdechets/pull/987)
+
 #### :boom: Breaking changes
 
 - La validation de la mutation `createBsff` a été renforcée, certains champs sont maintenant requis (cf la documentation pour plus de détails). Il est possible d'utiliser la mutation `createDraftBsff` pour conserver l'ancien comportement [PR 971](https://github.com/MTES-MCT/trackdechets/pull/971).
@@ -42,7 +79,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Sur l'interface Trackdéchets, les champs se pré-remplissent désormais lors d'un groupement, réexpédition ou reconditionnement d'un BSFF [PR 971](https://github.com/MTES-MCT/trackdechets/pull/971).
 - La validation du groupement, réexpédition et reconditionnement d'un BSFF a été renforcée [PR 971](https://github.com/MTES-MCT/trackdechets/pull/97
 - Améliorations des filtres sur les champs "Numéro de BSD" et "Déchet" dans le tableau de bord de l'interface Trackdéchets [PR 983](https://github.com/MTES-MCT/trackdechets/pull/983)
-
 
 #### :memo: Documentation
 

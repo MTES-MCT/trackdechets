@@ -24,7 +24,7 @@ stopcontainers(){
 }
 
 runtest(){
-    api_container_id=$(docker ps -qf "name=integration_td-api")
+    api_container_id=$(docker ps -qf name=^/integration.td-api)
     docker exec -e NODE_OPTIONS=--max_old_space_size=4096 -t $api_container_id npm run integration-tests $1
     EXIT_CODE=$?
 }

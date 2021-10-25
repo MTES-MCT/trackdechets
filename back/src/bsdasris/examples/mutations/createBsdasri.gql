@@ -1,4 +1,4 @@
-mutation CreateBsdasri($input: BsdasriCreateInput!) {
+mutation CreateBsdasri($input: BsdasriInput!) {
   createBsdasri(input: $input) {
     id
     status

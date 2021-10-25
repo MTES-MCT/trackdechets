@@ -141,4 +141,56 @@ describe("Mutation.deleteForm", () => {
       expect(deletedForm.isDeleted).toBe(true);
     }
   );
+
+  it("should disconnect appendix 2 forms", async () => {
+    const {
+      user: emitterUser,
+      company: emitter
+    } = await userWithCompanyFactory("MEMBER");
+    const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const owner = await userFactory();
+    const appendix2 = await formFactory({
+      ownerId: emitterUser.id,
+      opt: {
+        emitterCompanySiret: emitter.siret,
+        recipientCompanySiret: ttr.siret,
+        status: "AWAITING_GROUP"
+      }
+    });
+    const form = await formFactory({
+      ownerId: owner.id,
+      opt: {
+        emitterCompanySiret: ttr.siret,
+        status: "SEALED",
+        appendix2Forms: { connect: [{ id: appendix2.id }] }
+      }
+    });
+
+    await prisma.form.update({
+      where: { id: appendix2.id },
+      data: { status: "GROUPED" }
+    });
+
+    const { mutate } = makeClient(ttrUser);
+    const { data } = await mutate<Pick<Mutation, "deleteForm">>(DELETE_FORM, {
+      variables: { id: form.id }
+    });
+
+    expect(data.deleteForm.id).toBeTruthy();
+
+    const deletedForm = await prisma.form.findUnique({
+      where: { id: form.id },
+      include: { appendix2Forms: true }
+    });
+    expect(deletedForm.isDeleted).toBe(true);
+    expect(deletedForm.appendix2Forms).toEqual([]);
+
+    const disconnectedAppendix2 = await prisma.form.findUnique({
+      where: { id: appendix2.id }
+    });
+    expect(disconnectedAppendix2.appendix2RootFormId).toEqual(null);
+    expect(disconnectedAppendix2.status).toEqual("AWAITING_GROUP");
+  });
 });

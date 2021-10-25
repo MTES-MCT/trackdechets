@@ -2,11 +2,16 @@ import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
 import { GET_BSDS } from "common/queries";
 import routes from "common/routes";
+import { UPDATE_BSDA } from "form/bsda/stepper/queries";
+import { WasteInfoWorker } from "form/bsda/stepper/steps/WasteInfo";
+import { getComputedState } from "form/common/stepper/GenericStepList";
 import { Field, Form, Formik } from "formik";
 import {
+  BsdaConsistence,
   BsdaSignatureType,
   Mutation,
   MutationSignBsdaArgs,
+  MutationUpdateBsdaArgs,
   SignatureTypeInput,
 } from "generated/graphql/types";
 import React from "react";
@@ -23,6 +28,10 @@ const validationSchema = yup.object({
 
 type Props = { siret: string; bsdaId: string };
 export function SignWork({ siret, bsdaId }: Props) {
+  const [updateBsda] = useMutation<
+    Pick<Mutation, "updateBsda">,
+    MutationUpdateBsdaArgs
+  >(UPDATE_BSDA);
   const [signBsda, { loading }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs
@@ -54,13 +63,39 @@ export function SignWork({ siret, bsdaId }: Props) {
           <Formik
             initialValues={{
               author: "",
+              ...getComputedState(
+                {
+                  waste: {
+                    familyCode: "",
+                    materialName: "",
+                    adr: "",
+                    consistence: BsdaConsistence.Solide,
+                    sealNumbers: [],
+                  },
+                  weight: {
+                    value: null,
+                    isEstimate: false,
+                  },
+                },
+                bsda
+              ),
             }}
             validationSchema={validationSchema}
             onSubmit={async values => {
+              const { id, author, ...update } = values;
+              await updateBsda({
+                variables: {
+                  id: bsda.id,
+                  input: update,
+                },
+              });
               await signBsda({
                 variables: {
                   id: bsda.id,
-                  input: { ...values, type: BsdaSignatureType.Work },
+                  input: {
+                    author,
+                    type: BsdaSignatureType.Work,
+                  },
                 },
               });
               onClose();
@@ -68,6 +103,10 @@ export function SignWork({ siret, bsdaId }: Props) {
           >
             {({ isSubmitting, handleReset }) => (
               <Form>
+                <div className="tw-mb-6">
+                  <WasteInfoWorker disabled={false} />
+                </div>
+
                 <p>
                   En qualité <strong>d'entreprise de travaux</strong>, j'atteste
                   que les informations ci-dessus sont correctes. En signant ce

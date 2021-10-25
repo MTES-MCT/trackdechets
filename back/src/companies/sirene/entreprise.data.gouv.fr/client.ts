@@ -7,6 +7,7 @@ import {
   FullTextSearchResponseDataGouv,
   CompanySearchResult
 } from "../types";
+import { AnonymousCompanyError } from "../errors";
 
 const SIRENE_API_BASE_URL = "https://entreprise.data.gouv.fr/api/sirene";
 
@@ -42,7 +43,7 @@ function searchResponseToCompany({
     addressCity: etablissement.libelle_commune,
     codeCommune: etablissement.code_commune,
     name: etablissement.unite_legale.denomination,
-    naf: etablissement.unite_legale.activite_principale,
+    naf: etablissement.activite_principale,
     libelleNaf: ""
   };
 
@@ -72,8 +73,15 @@ function searchResponseToCompany({
  */
 export function searchCompany(siret: string): Promise<CompanySearchResult> {
   const searchUrl = `${SIRENE_API_BASE_URL}/v3/etablissements/${siret}`;
+
   return axios
     .get<SearchResponseDataGouv>(searchUrl)
+    .then(async r => {
+      if (r.data?.etablissement?.statut_diffusion === "N") {
+        throw new AnonymousCompanyError();
+      }
+      return r;
+    })
     .then(r => searchResponseToCompany(r.data))
     .catch((error: AxiosError) => {
       // The request was made and the server responded with a status code
@@ -118,7 +126,8 @@ function fullTextSearchResponseToCompanies(
       addressCity: etablissement.libelle_commune,
       name: etablissement.nom_raison_sociale,
       naf: etablissement.activite_principale,
-      libelleNaf: etablissement.libelle_activite_principale
+      libelleNaf: etablissement.libelle_activite_principale,
+      etatAdministratif: "A"
     };
   });
 }

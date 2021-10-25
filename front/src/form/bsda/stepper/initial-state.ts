@@ -1,15 +1,16 @@
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import {
   BsdaConsistence,
-  QuantityType,
+  BsdaType,
   TransportMode,
 } from "generated/graphql/types";
 
 export default {
+  type: BsdaType.OtherCollections,
   emitter: {
     company: getInitialCompany(),
     isPrivateIndividual: false,
-    workSite: null,
+    pickupSite: null,
   },
   waste: {
     code: "",
@@ -21,8 +22,8 @@ export default {
     adr: "",
   },
   packagings: [],
-  quantity: {
-    type: QuantityType.Estimated,
+  weight: {
+    isEstimate: false,
     value: null,
   },
   worker: {
@@ -31,6 +32,7 @@ export default {
       hasEmitterPaperSignature: false,
     },
   },
+  broker: null,
   transporter: {
     company: {
       ...getInitialCompany(),
@@ -57,4 +59,6 @@ export default {
       },
     },
   },
+  grouping: [],
+  forwarding: null,
 };

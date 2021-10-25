@@ -48,17 +48,6 @@ type CompanyFavorite {
   vhuAgrementBroyeur: VhuAgrement
 }
 
-"""
-Lien d'upload
-"""
-type UploadLink {
-  "URL signé permettant d'uploader un fichier"
-  signedUrl: String
-
-  "Clé permettant l'upload du fichier"
-  key: String
-}
-
 type CompanyForVerification {
   id: ID!
   siret: String!

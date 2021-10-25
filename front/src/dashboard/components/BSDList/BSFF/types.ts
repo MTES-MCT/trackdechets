@@ -24,6 +24,6 @@ export interface BsffFragment {
   };
   waste?: {
     code?: string;
-    nature?: string;
+    description?: string;
   };
 }

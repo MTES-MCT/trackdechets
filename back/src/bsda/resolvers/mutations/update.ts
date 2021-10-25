@@ -1,15 +1,13 @@
+import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationUpdateBsdaArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb, flattenBsdaInput } from "../../converter";
-import { getFormOrFormNotFound } from "../../database";
+import { getBsdaOrNotFound } from "../../database";
 import { checkKeysEditability } from "../../edition-rules";
 import { indexBsda } from "../../elastic";
-import {
-  checkCanAssociateBsdas,
-  checkIsFormContributor
-} from "../../permissions";
+import { checkIsBsdaContributor } from "../../permissions";
 import { validateBsda } from "../../validation";
 
 export default async function edit(
@@ -19,41 +17,68 @@ export default async function edit(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const prismaForm = await getFormOrFormNotFound(id);
-  await checkIsFormContributor(
+  const existingBsda = await getBsdaOrNotFound(id);
+  await checkIsBsdaContributor(
     user,
-    prismaForm,
+    existingBsda,
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  checkKeysEditability(input, prismaForm);
+  checkKeysEditability(input, existingBsda);
 
-  const formUpdate = flattenBsdaInput(input);
+  const data = flattenBsdaInput(input);
 
-  const resultingForm = { ...prismaForm, ...formUpdate };
-  await checkIsFormContributor(
+  const resultingForm = { ...existingBsda, ...data };
+  await checkIsBsdaContributor(
     user,
     resultingForm,
     "Vous ne pouvez pas enlever votre établissement du bordereau"
   );
 
-  await validateBsda(resultingForm, {
-    emissionSignature: prismaForm.emitterEmissionSignatureAuthor != null,
-    workSignature: prismaForm.workerWorkSignatureAuthor != null,
-    operationSignature: prismaForm.destinationOperationSignatureAuthor != null,
-    transportSignature: prismaForm.transporterTransportSignatureAuthor != null
-  });
+  const forwardedBsda = input.forwarding
+    ? await getBsdaOrNotFound(input.forwarding)
+    : existingBsda.forwardingId
+    ? await prisma.bsda.findUnique({ where: { id: existingBsda.forwardingId } })
+    : null;
 
-  await checkCanAssociateBsdas(input.associations);
-  const bsdas = input.associations
-    ? { set: input.associations.map(id => ({ id })) }
-    : undefined;
+  const groupedBsdas =
+    input.grouping?.length > 0
+      ? await prisma.bsda.findMany({
+          where: { id: { in: input.grouping } }
+        })
+      : await prisma.bsda
+          .findUnique({ where: { id: existingBsda.id } })
+          .grouping();
+
+  const isForwarding = Boolean(forwardedBsda);
+  const isGrouping = groupedBsdas.length > 0;
+
+  if ([isForwarding, isGrouping].filter(b => b).length > 1) {
+    throw new UserInputError(
+      "Les opérations d'entreposage provisoire et groupement ne sont pas compatibles entre elles"
+    );
+  }
+
+  const previousBsdas = [forwardedBsda, ...groupedBsdas].filter(Boolean);
+
+  await validateBsda(resultingForm, previousBsdas, {
+    emissionSignature: existingBsda.emitterEmissionSignatureAuthor != null,
+    workSignature: existingBsda.workerWorkSignatureAuthor != null,
+    operationSignature:
+      existingBsda.destinationOperationSignatureAuthor != null,
+    transportSignature: existingBsda.transporterTransportSignatureAuthor != null
+  });
 
   const updatedBsda = await prisma.bsda.update({
     where: { id },
     data: {
-      ...formUpdate,
-      bsdas
+      ...data,
+      ...(isGrouping && {
+        grouping: { set: input.grouping.map(id => ({ id })) }
+      }),
+      ...(isForwarding && {
+        forwarding: { connect: { id: input.forwarding } }
+      })
     }
   });
 

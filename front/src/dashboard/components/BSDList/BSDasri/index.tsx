@@ -25,7 +25,7 @@ export const COLUMNS: Record<
   }
 > = {
   type: {
-    accessor: dasri => dasri.bsdasriType,
+    accessor: dasri => dasri.type,
     Cell: ({ value }) => (
       <>
         <IconBSDasri style={{ fontSize: "24px" }} />
@@ -40,10 +40,10 @@ export const COLUMNS: Record<
     accessor: dasri => dasri.emitter?.company?.name ?? "",
   },
   recipient: {
-    accessor: dasri => dasri?.recipient?.company?.name ?? "",
+    accessor: dasri => dasri?.destination?.company?.name ?? "",
   },
   waste: {
-    accessor: dasri => dasri?.emission?.wasteCode,
+    accessor: dasri => dasri?.waste?.code,
   },
   transporterCustomInfo: {
     accessor: dasri => dasri.transporter?.customInfo ?? "",
@@ -54,8 +54,12 @@ export const COLUMNS: Record<
     ),
   },
   transporterNumberPlate: {
-    accessor: () => null,
-    Cell: () => null,
+    accessor: dasri => dasri.transporter?.transport?.plates ?? [],
+    Cell: ({ value }) => (
+      <>
+        <span> {value.join(", ")}</span>
+      </>
+    ),
   },
   status: {
     accessor: dasri =>
