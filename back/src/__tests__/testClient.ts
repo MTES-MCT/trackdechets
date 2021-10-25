@@ -1,5 +1,5 @@
 import { AuthType } from "@prisma/client";
-import { createTestClient } from "apollo-server-integration-testing";
+import { createTestClient } from "./apollo-integration-testing";
 import { server } from "../server";
 
 /**

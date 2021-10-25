@@ -285,7 +285,7 @@ export const client = new Client({
 function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
   return ctx?.user?.auth === AuthType.Session
     ? { refresh: "wait_for" }
-    : { refresh: "false" };
+    : { refresh: false };
 }
 
 /**

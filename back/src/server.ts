@@ -1,9 +1,9 @@
 import "./tracer";
 
+import { ApolloServerPluginLandingPageProductionDefault } from "apollo-server-core";
 import {
   ApolloError,
   ApolloServer,
-  makeExecutableSchema,
   UserInputError
 } from "apollo-server-express";
 import { json, urlencoded } from "body-parser";
@@ -13,7 +13,7 @@ import express from "express";
 import rateLimit from "express-rate-limit";
 import session from "express-session";
 import depthLimit from "graphql-depth-limit";
-import { applyMiddleware } from "graphql-middleware";
+import { makeExecutableSchema } from "@graphql-tools/schema";
 import helmet from "helmet";
 import passport from "passport";
 import RateLimitRedisStore from "rate-limit-redis";
@@ -53,15 +53,12 @@ const schema = makeExecutableSchema({
   resolvers
 });
 
-export const schemaWithMiddleware = applyMiddleware(schema);
-
 // GraphQL endpoint
 const graphQLPath = "/";
 
 export const server = new ApolloServer({
-  schema: schemaWithMiddleware,
+  schema,
   introspection: true, // used to enable the playground in production
-  playground: true, // used to enable the playground in production
   validationRules: [depthLimit(10)],
   context: async ctx => {
     return {
@@ -99,7 +96,10 @@ export const server = new ApolloServer({
 
     return err;
   },
-  plugins: [...(Sentry ? [sentryReporter] : [])]
+  plugins: [
+    ApolloServerPluginLandingPageProductionDefault({ footer: false }),
+    ...(Sentry ? [sentryReporter] : [])
+  ]
 });
 
 export const app = express();
@@ -133,11 +133,14 @@ app.use(
         baseUri: ["'self'"],
         fontSrc: ["'self'", "https:", "data:"],
         frameAncestors: ["'self'"],
-        imgSrc: ["'self'", "cdn.jsdelivr.net"],
+        imgSrc: ["'self'", "apollo-server-landing-page.cdn.apollographql.com"],
         objectSrc: ["'none'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "cdn.jsdelivr.net"],
+        scriptSrc: [
+          "'self'",
+          "apollo-server-landing-page.cdn.apollographql.com"
+        ],
         scriptSrcAttr: ["'none'"],
-        styleSrc: ["'self'", "https:", "cdn.jsdelivr.net", "'unsafe-inline'"],
+        styleSrc: ["'self'", "https:", "'unsafe-inline'"],
         connectSrc: [process.env.API_HOST],
         formAction: ["self"],
         ...(NODE_ENV === "production" && { upgradeInsecureRequests: [] })
@@ -227,27 +230,31 @@ app.use((req, res, next) => {
 // GraphQL sanitization middleware
 app.use(sanitizePathBodyMiddleware(graphQLPath));
 
-/**
- * Wire up ApolloServer to /
- * UI_BASE_URL is explicitly set in the origin list
- * to avoid "Credentials is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’"
- * See https://developer.mozilla.org/fr/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials
- */
-server.applyMiddleware({
-  app,
-  cors: {
-    origin: [UI_BASE_URL, "*"],
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-    credentials: true
-  },
-  path: graphQLPath
-});
-
 if (Sentry) {
   // The error handler must be before any other error middleware and after all controllers
   app.use(Sentry.Handlers.errorHandler());
 }
 
 app.use(errorHandler);
+
+export async function startApolloServer() {
+  await server.start();
+
+  /**
+   * Wire up ApolloServer to /
+   * UI_BASE_URL is explicitly set in the origin list
+   * to avoid "Credentials is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’"
+   * See https://developer.mozilla.org/fr/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials
+   */
+  server.applyMiddleware({
+    app,
+    cors: {
+      origin: [UI_BASE_URL, "*"],
+      methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+      preflightContinue: false,
+      optionsSuccessStatus: 204,
+      credentials: true
+    },
+    path: graphQLPath
+  });
+}

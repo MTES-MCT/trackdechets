@@ -1,5 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { createTestClient } from "apollo-server-integration-testing";
+import { createTestClient } from "../../../../__tests__/apollo-integration-testing";
 import { server } from "../../../../server";
 import prisma from "../../../../prisma";
 import { companyFactory } from "../../../../__tests__/factories";
