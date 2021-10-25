@@ -225,11 +225,13 @@ const emitterSchema: FactorySchemaOf<
       ),
     emitterCompanySiret: yup
       .string()
-      .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
-      .requiredIf(
-        context.emissionSignature && !context.isPrivateIndividual,
-        `Émetteur: ${MISSING_COMPANY_SIRET}`
-      ),
+      .when("emitterIsPrivateIndividual", {
+        is: false,
+        then: yup.string().length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`).requiredIf(
+          context.emissionSignature,
+          `Émetteur: ${MISSING_COMPANY_SIRET}`
+        ),
+      }),
     emitterCompanyAddress: yup
       .string()
       .requiredIf(

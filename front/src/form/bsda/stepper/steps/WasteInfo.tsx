@@ -116,7 +116,7 @@ export function WasteInfoWorker({ disabled }) {
     <>
       <div className="form__row">
         <label>
-          Code famille
+          Code famille (Optionnel)
           <Field
             disabled={disabled}
             type="text"
@@ -128,7 +128,7 @@ export function WasteInfoWorker({ disabled }) {
 
       <div className="form__row">
         <label>
-          Nom du matériau
+          Nom du matériau (Optionnel)
           <Field
             disabled={disabled}
             type="text"
@@ -140,7 +140,7 @@ export function WasteInfoWorker({ disabled }) {
 
       <div className="form__row">
         <label>
-          Mention au titre des règlements ADR/RID/ADN/IMDG (Optionnel):
+          Mention au titre des règlements ADR/RID/ADN/IMDG (Optionnel)
           <Field
             disabled={disabled}
             type="text"
