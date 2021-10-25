@@ -63,8 +63,7 @@ const fieldsAllowedForUpdateOnceSignedByEmitter: BsdasriField[] =
     "transporterCustomInfo",
     "transporterTransportMode",
     "transporterTransportPlates"
-  ]
-);
+  ]);
 
 const getFieldsAllorwedForUpdate = (bsdasri: Bsdasri) => {
   const allowedFields = {

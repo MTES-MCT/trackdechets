@@ -2,7 +2,7 @@ import { Server as HttpServer } from "http";
 import { Server as HttpsServer } from "https";
 import { redisClient } from "../src/common/redis";
 import prisma from "../src/prisma";
-import { app } from "../src/server";
+import { app, server } from "../src/server";
 import { client as elasticSearch, index } from "../src/common/elastic";
 
 let httpServerInstance: HttpServer | HttpsServer = null;
@@ -56,6 +56,10 @@ export function refreshElasticSearch() {
 export function resetCache() {
   return redisClient.flushdb();
 }
+
+beforeAll(async () => {
+  await server.start();
+});
 
 afterAll(async () => {
   jest.restoreAllMocks();
