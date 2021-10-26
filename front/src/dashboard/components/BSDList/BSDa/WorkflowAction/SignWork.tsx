@@ -76,7 +76,7 @@ export function SignWork({ siret, bsdaId }: Props) {
                     value: null,
                     isEstimate: false,
                   },
-                  packagings: []
+                  packagings: [],
                 },
                 bsda
               ),

@@ -218,8 +218,9 @@ const emitterSchema: FactorySchemaOf<
         `Émetteur: vous devez précisez si c'est un particulier ou un professionnel`
       ),
     emitterCompanyName: yup.string().when("emitterIsPrivateIndividual", {
-      is: false,
-      then: yup
+      is: true,
+      then: yup.string().nullable(true),
+      otherwise: yup
         .string()
         .requiredIf(
           context.emissionSignature,
@@ -227,8 +228,9 @@ const emitterSchema: FactorySchemaOf<
         )
     }),
     emitterCompanySiret: yup.string().when("emitterIsPrivateIndividual", {
-      is: false,
-      then: yup
+      is: true,
+      then: yup.string().nullable(true),
+      otherwise: yup
         .string()
         .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
         .requiredIf(
