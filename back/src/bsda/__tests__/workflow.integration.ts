@@ -212,7 +212,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
       .set("Authorization", `Bearer ${workerToken}`)
       .send({ query: workerSignatureQuery });
 
-    console.log(exutoireSignatureResponse.body.errors);
     expect(exutoireSignatureResponse.body.data.signBsda.status).toBe(
       "SIGNED_BY_WORKER"
     );
