@@ -13,10 +13,10 @@ export function redundant<F extends (...args: any[]) => any>(...fns: F[]) {
         const response = await fn(...args);
         return response;
       } catch (error) {
-        captureException(error);
-
         if (firstError == null) {
           firstError = error;
+        } else {
+          captureException(error);
         }
       }
     }
