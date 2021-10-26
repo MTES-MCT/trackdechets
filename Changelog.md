@@ -137,6 +137,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Amélioration du PDF du bordereau amiante [PR 1050](https://github.com/MTES-MCT/trackdechets/pull/1050)
+
 #### :memo: Documentation
 
 #### :house: Interne
