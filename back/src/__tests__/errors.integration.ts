@@ -165,7 +165,7 @@ describe("Error handling", () => {
     expect(error.message).toContain("Bang");
   });
 
-  test("GRAPHQL_VALIDATION_FAILED should be returned when mutations variables are invalid", async () => {
+  test("BAD_USER_INPUT should be returned when mutations variables are invalid", async () => {
     process.env.NODE_ENV = "production";
     const server = require("../server").server;
     // invalid variable `toto` instead of `input`
@@ -175,7 +175,7 @@ describe("Error handling", () => {
       variables
     });
     const error = errors[0];
-    expect(error.extensions.code).toEqual(ErrorCode.GRAPHQL_VALIDATION_FAILED);
+    expect(error.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
     expect(error.message).toEqual(
       'Variable "$input" of required type "String!" was not provided.'
     );

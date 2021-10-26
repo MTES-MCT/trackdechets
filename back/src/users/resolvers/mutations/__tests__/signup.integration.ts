@@ -1,5 +1,8 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { createTestClient } from "../../../../__tests__/apollo-integration-testing";
+import {
+  createTestClient,
+  TestQuery
+} from "../../../../__tests__/apollo-integration-testing";
 import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
 import * as mailsHelper from "../../../../mailer/mailing";
@@ -24,13 +27,17 @@ const SIGNUP = `
 `;
 
 describe("Mutation.signup", () => {
+  let mutate: TestQuery;
+  beforeAll(() => {
+    const testClient = createTestClient({
+      apolloServer: server
+    });
+    mutate = testClient.mutate;
+  });
+
   afterEach(async () => {
     await resetDatabase();
     sendMailSpy.mockClear();
-  });
-
-  const { mutate } = createTestClient({
-    apolloServer: server
   });
 
   it("should create user, activation hash and send email", async () => {

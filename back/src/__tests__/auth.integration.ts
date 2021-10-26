@@ -140,6 +140,8 @@ describe("POST /login", () => {
     jest.resetModules();
     const a = require("../server").app;
     const s = require("../server").sess;
+    const startApolloServer = require("../server").startApolloServer;
+    await startApolloServer();
     const r = supertest(a);
 
     const user = await userFactory();

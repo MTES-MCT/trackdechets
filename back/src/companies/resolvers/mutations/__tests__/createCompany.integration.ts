@@ -399,6 +399,8 @@ describe("Mutation.createCompany", () => {
 
     // get local versions of imports to reload env variables
     jest.resetModules();
+    const server = require("../../../../server").server;
+    await server.start();
     const makeClient = require("../../../../__tests__/testClient").default;
     const mailsHelper = require("../../../../mailer/mailing");
     const geocode = require("../../../geocode");
