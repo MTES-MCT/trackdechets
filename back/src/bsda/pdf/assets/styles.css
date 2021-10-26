@@ -99,6 +99,11 @@ input[type="radio"]:checked::before {
   background-color: white;
 }
 
+.qrcode svg {
+  height: 80px;
+  width: auto;
+}
+
 .frame-description {
   grid-area: 1 / 1 / 2 / 3;
 }

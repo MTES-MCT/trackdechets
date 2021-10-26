@@ -10,21 +10,20 @@ import { getBsdaHistory } from "../database";
 
 export async function buildPdf(bsda: Bsda) {
   const assetsPath = join(__dirname, "assets");
-  const templatePath = join(assetsPath, "bsda.html");
+  const templatePath = join(assetsPath, "index.html");
   const stampPath = join(assetsPath, "stamp.svg");
   const cssPaths = [
     join(assetsPath, "modern-normalize.css"),
-    join(assetsPath, "bsda.css")
+    join(assetsPath, "styles.css")
   ];
 
   const signatureStamp = await readFile(stampPath, "utf-8");
   const template = await readFile(templatePath, "utf-8");
 
   Handlebars.registerHelper("dateFmt", safeDateFmt);
+  Handlebars.registerHelper("eq", eq);
 
-  const qrcode = !bsda.isDraft
-    ? await QRCode.toString(bsda.id, { type: "svg" })
-    : "";
+  const qrcode = await QRCode.toString(bsda.id, { type: "svg" });
   const source = template.toString();
   const compiled = Handlebars.compile(source);
 
@@ -51,12 +50,13 @@ export async function buildPdf(bsda: Bsda) {
   });
 
   const files = {
-    "index.html": html,
-    ...cssPaths.reduce(async (cssKeys, cssPath) => {
-      cssKeys[basename(cssPath)] = await readFile(cssPath, "utf-8");
-      return cssKeys;
-    }, {})
+    "index.html": html
   };
+
+  for (const cssPath of cssPaths) {
+    const content = await readFile(cssPath, "utf-8");
+    files[basename(cssPath)] = content;
+  }
 
   return toPDF(files);
 }
@@ -67,3 +67,4 @@ const safeDateFmt = (dt: Date) => {
   }
   return format(dt, "dd/MM/yyyy");
 };
+const eq = (arg1: any, arg2: any) => arg1 == arg2;
