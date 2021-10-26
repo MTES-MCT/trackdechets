@@ -4,6 +4,19 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
+# Next release ~15/11
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :boom: Breaking changes
+
+- `Form.wasteAcceptationStatus` renvoie désormais un enum de type `WasteAcceptationStatus`
+
+#### :bug: Corrections de bugs
+
+
+#### :nail_care: Améliorations
+
 
 # [2021.11.1] 15/11/2021
 
