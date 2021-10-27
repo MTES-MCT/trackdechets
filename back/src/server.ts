@@ -1,6 +1,5 @@
 import "./tracer";
 
-import { ApolloServerPluginLandingPageProductionDefault } from "apollo-server-core";
 import {
   ApolloError,
   ApolloServer,
@@ -15,6 +14,7 @@ import session from "express-session";
 import depthLimit from "graphql-depth-limit";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import helmet from "helmet";
+import path from "path";
 import passport from "passport";
 import RateLimitRedisStore from "rate-limit-redis";
 import prisma from "./prisma";
@@ -33,6 +33,7 @@ import { userActivationHandler } from "./users/activation";
 import { getUIBaseURL } from "./utils";
 import sentryReporter from "./common/plugins/sentryReporter";
 import { initSentry } from "./common/sentry";
+import { graphiqlLandingPagePlugin } from "./common/plugins/graphiql";
 
 const {
   SESSION_SECRET,
@@ -96,10 +97,7 @@ export const server = new ApolloServer({
 
     return err;
   },
-  plugins: [
-    ApolloServerPluginLandingPageProductionDefault({ footer: false }),
-    ...(Sentry ? [sentryReporter] : [])
-  ]
+  plugins: [graphiqlLandingPagePlugin(), ...(Sentry ? [sentryReporter] : [])]
 });
 
 export const app = express();
@@ -133,14 +131,15 @@ app.use(
         baseUri: ["'self'"],
         fontSrc: ["'self'", "https:", "data:"],
         frameAncestors: ["'self'"],
-        imgSrc: ["'self'", "apollo-server-landing-page.cdn.apollographql.com"],
+        imgSrc: ["'self'"],
         objectSrc: ["'none'"],
-        scriptSrc: [
-          "'self'",
-          "apollo-server-landing-page.cdn.apollographql.com"
-        ],
+        scriptSrc: ["'self'"],
         scriptSrcAttr: ["'none'"],
-        styleSrc: ["'self'", "https:", "'unsafe-inline'"],
+        styleSrc: [
+          "'self'",
+          "https:",
+          "'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='"
+        ],
         connectSrc: [process.env.API_HOST],
         formAction: ["self"],
         ...(NODE_ENV === "production" && { upgradeInsecureRequests: [] })
@@ -213,6 +212,11 @@ app.get("/exports", (_, res) =>
   res
     .status(410)
     .send("Route dépréciée, utilisez la query GraphQL `formsRegister`")
+);
+
+app.use(
+  "/graphiql",
+  express.static(path.join(__dirname, "common/plugins/graphiql/assets"))
 );
 
 // Apply passport auth middlewares to the graphQL endpoint
