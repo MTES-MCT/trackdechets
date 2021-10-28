@@ -217,42 +217,50 @@ const emitterSchema: FactorySchemaOf<
         context.emissionSignature,
         `Émetteur: vous devez précisez si c'est un particulier ou un professionnel`
       ),
-    emitterCompanyName: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature && !context.isPrivateIndividual,
-        `Émetteur: ${MISSING_COMPANY_NAME}`
-      ),
-    emitterCompanySiret: yup
-      .string()
-      .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
-      .requiredIf(
-        context.emissionSignature && !context.isPrivateIndividual,
-        `Émetteur: ${MISSING_COMPANY_SIRET}`
-      ),
+    emitterCompanyName: yup.string().when("emitterIsPrivateIndividual", {
+      is: true,
+      then: yup.string().nullable(true),
+      otherwise: yup
+        .string()
+        .requiredIf(
+          context.emissionSignature,
+          `Émetteur: ${MISSING_COMPANY_NAME}`
+        )
+    }),
+    emitterCompanySiret: yup.string().when("emitterIsPrivateIndividual", {
+      is: true,
+      then: yup.string().nullable(true),
+      otherwise: yup
+        .string()
+        .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
+        .requiredIf(
+          context.emissionSignature,
+          `Émetteur: ${MISSING_COMPANY_SIRET}`
+        )
+    }),
     emitterCompanyAddress: yup
       .string()
       .requiredIf(
-        context.emissionSignature && !context.isPrivateIndividual,
+        context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_ADDRESS}`
       ),
     emitterCompanyContact: yup
       .string()
       .requiredIf(
-        context.emissionSignature && !context.isPrivateIndividual,
+        context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_CONTACT}`
       ),
     emitterCompanyPhone: yup
       .string()
       .requiredIf(
-        context.emissionSignature && !context.isPrivateIndividual,
+        context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_PHONE}`
       ),
     emitterCompanyMail: yup
       .string()
       .email()
       .requiredIf(
-        context.emissionSignature && !context.isPrivateIndividual,
+        context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_EMAIL}`
       ),
     emitterPickupSiteAddress: yup.string().nullable(),

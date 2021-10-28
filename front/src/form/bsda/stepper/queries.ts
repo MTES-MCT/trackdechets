@@ -9,6 +9,7 @@ export const FullBsdaFragment = gql`
     createdAt
     updatedAt
     emitter {
+      isPrivateIndividual
       company {
         ...CompanyFragment
       }

@@ -130,6 +130,12 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
               type: OTHER_COLLECTIONS
               emitter: {
                   isPrivateIndividual: true
+                  company: {
+                    address: "Rue du bsda"
+                    contact: "Un particulier"
+                    phone: "0101010101"
+                    mail: "particulier@mail.com"
+                  }
               }
               worker: {
                   company: {

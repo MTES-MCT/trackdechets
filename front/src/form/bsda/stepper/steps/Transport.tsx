@@ -92,7 +92,11 @@ export function Transport({ disabled }: Props) {
         <label>
           Immatriculations
           <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> pour valider chacun" />
-          <TagsInput name="transporter.transport.plates" disabled={disabled} />
+          <TagsInput
+            name="transporter.transport.plates"
+            disabled={disabled}
+            limit={2}
+          />
         </label>
       </div>
 
