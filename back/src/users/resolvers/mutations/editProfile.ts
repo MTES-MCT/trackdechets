@@ -1,4 +1,4 @@
-import { UserInputError } from "apollo-server-errors";
+import { UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
