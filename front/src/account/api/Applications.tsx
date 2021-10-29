@@ -155,11 +155,12 @@ function CreateApplicationModal({ onClose }: CreateApplicationModalProps) {
 export function Applications() {
   const { data } = useQuery<Pick<Query, "myApplications">>(MY_APPLICATIONS);
   const [isCreating, setIsCreating] = React.useState(false);
+  const myApplications = data?.myApplications ?? [];
 
   return (
     <div className={styles.Applications}>
       <h5 className="h5 tw-font-bold tw-mb-4">Applications OAuth2</h5>
-      {data?.myApplications.map(application => (
+      {myApplications.map(application => (
         <div key={application.id} className={styles.Application}>
           <div className={styles.ApplicationLogo}>
             <img src={application.logoUrl} alt="" width="100" height="100" />
@@ -183,6 +184,7 @@ export function Applications() {
         type="button"
         className="btn btn--primary"
         onClick={() => setIsCreating(true)}
+        disabled={myApplications.length > 0}
       >
         Créer une application
       </button>

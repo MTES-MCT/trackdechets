@@ -1,3 +1,4 @@
+import { UserInputError } from "apollo-server-express";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
@@ -12,6 +13,12 @@ const createFicheInterventionBsff: MutationResolvers["createApplication"] = asyn
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
+
+  if (user.applicationId) {
+    throw new UserInputError(
+      "Vous ne pouvez pas administrer plus d'une application."
+    );
+  }
 
   await ApplicationInputSchema.validate(input, { abortEarly: false });
 
