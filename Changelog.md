@@ -4,9 +4,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
+
 # Next release ~15/11
 
 #### :rocket: Nouvelles fonctionnalités
+
+- Ajout de l'édition de l'adresse email depuis l'interface [PR 1052](https://github.com/MTES-MCT/trackdechets/pull/1052)
 
 #### :boom: Breaking changes
 
@@ -17,10 +20,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
-
 #### :nail_care: Améliorations
 
--  Ajout d'index sur les champs siret des différents bordereaux [PR 1080](https://github.com/MTES-MCT/trackdechets/pull/1080)
+- Ajout d'index sur les champs siret des différents bordereaux [PR 1080](https://github.com/MTES-MCT/trackdechets/pull/1080)
 
 # [2021.11.1] 15/11/2021
 
