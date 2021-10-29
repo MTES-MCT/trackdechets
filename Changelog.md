@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout du code de traitement R3 à la liste des traitements possibles pour le BSFF [PR 1037](https://github.com/MTES-MCT/trackdechets/pull/1037)
+- Ajout de la création d'application OAuth2 à l'interface [PR 1051](https://github.com/MTES-MCT/trackdechets/pull/1051)
 
 #### :boom: Breaking changes
 
