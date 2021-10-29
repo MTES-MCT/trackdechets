@@ -518,3 +518,30 @@ type Stat {
   "Qantité sortante"
   outgoing: Float!
 }
+
+type BsddReview {
+  "Identifiant de la révison"
+  id: ID!
+
+  "Identifiant du bordereau concerné"
+  bsddId: ID!
+
+  "Identifiant de l'entreprise à l'origine de la demande de révision"
+  fromCompanyId: String!
+  "Entreprise à l'origine de la demande de révision"
+  fromCompany: FormCompany
+
+  "Identifiant de l'entreprise qui doit valider la révision"
+  toCompanyId: String!
+  "Entreprise qui doit valider la révision"
+  toCompany: FormCompany
+
+  "Contenu de la révision"
+  content: JSON!
+
+  "Indique si la révision a été acceptée ou pas"
+  isAccepted: Boolean
+
+  "Indique si la révision est archivée ou en attente d'une réponse"
+  isArchived: Boolean!
+}

@@ -336,3 +336,18 @@ export async function checkSecurityCode(siret: string, securityCode: number) {
   }
   return true;
 }
+
+export async function checkCanReview(user: User, form: Form) {
+  const fullUser = await getFullUser(user);
+  const canReview = [isFormEmitter, isFormRecipient].some(isFormRole =>
+    isFormRole(fullUser, form)
+  );
+
+  if (!canReview) {
+    throw new NotFormContributor(
+      "Vous n'êtes pas autorisé à réviser ce bordereau"
+    );
+  }
+
+  return true;
+}

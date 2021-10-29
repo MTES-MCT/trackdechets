@@ -660,3 +660,36 @@ input ImportPaperFormInput {
   "Informations liées au traitement du déchet (case 11)"
   processedInfo: ProcessedFormInput!
 }
+
+"Payload de révision d'un bordereau. Disponible sur une liste restrainte de champs."
+input BsddReviewFormInput {
+  "Détails du déchet (partiel)"
+  wasteDetails: BsddReviewWasteDetailsInput
+
+  "Négociant"
+  trader: TraderInput
+
+  "Courtier"
+  broker: BrokerInput
+
+  "Destination du déchet (partiel)"
+  recipient: BsddReviewRecipientInput
+
+  "Quantité reçue, en tonnes"
+  quantityReceived: Float
+}
+
+input BsddReviewWasteDetailsInput {
+  "Code CED"
+  code: String
+
+  "Code ONU. Obligatoire pour les déchets dangereux. Merci d'indiquer 'non soumis' si nécessaire."
+  onuCode: String
+
+  "Contient des Polluants Organiques Persistants (POP) oui / non"
+  pop: Boolean
+}
+
+input BsddReviewRecipientInput {
+  cap: String
+}

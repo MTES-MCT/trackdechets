@@ -182,6 +182,8 @@ model Company {
   CompanyAssociation                   CompanyAssociation[]
   MembershipRequest                    MembershipRequest[]
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
+  bsddReviewsFrom                      BsddReview[]              @relation("BsddReviewFromCompany")
+  bsddReviewsTo                        BsddReview[]              @relation("BsddReviewToCompany")
 }
 
 // Companies with restricted diffusion of SIRENE information (police, army, etc)
@@ -338,13 +340,31 @@ model Form {
   ownerId                            String
   owner                              User                    @relation(fields: [ownerId], references: [id])
   StatusLog                          StatusLog[]
-
+  bsddReviews                        BsddReview[]
 
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_FormTransporterCompanySiretIdx")
   @@index([traderCompanySiret], map: "_FormTraderCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_FormBrokerCompanySiretIdx")
+  
+}
+
+model BsddReview {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bsddId        String
+  bsdd          Form    @relation(fields: [bsddId], references: [id])
+  fromCompanyId String
+  fromCompany   Company @relation(name: "BsddReviewFromCompany", fields: [fromCompanyId], references: [id])
+  toCompanyId   String
+  toCompany     Company @relation(name: "BsddReviewToCompany", fields: [toCompanyId], references: [id])
+
+  content    Json
+  isAccepted Boolean?
+  isArchived Boolean  @default(false)
 }
 
 model Grant {

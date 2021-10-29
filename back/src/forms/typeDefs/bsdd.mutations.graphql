@@ -187,4 +187,18 @@ type Mutation {
     siret: String!
     nextSegmentInfo: NextSegmentInfoInput!
   ): TransportSegment
+
+  createBsddReview(
+    "Identifiant du bordereauà réviser"
+    bsddId: ID!
+    "Contenu de la révision"
+    input: BsddReviewFormInput!
+  ): BsddReview
+
+  settleBsddReview(
+    "Identifiant de la révision"
+    id: ID!
+    "Indique si la révision est acceptée ou non"
+    isAccepted: Boolean!
+  ): BsddReview
 }
