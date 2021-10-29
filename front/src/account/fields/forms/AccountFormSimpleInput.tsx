@@ -37,12 +37,16 @@ export default function AccountFormSimpleInput<Variables>({
   return (
     <Formik<Variables>
       initialValues={initialValues}
-      onSubmit={(values, { setFieldError, setSubmitting }) => {
+      onSubmit={async (values, { setFieldError, setSubmitting }) => {
         const variables = { ...values, ...mutationArgs };
-        update({ variables }).catch(() => {
-          setFieldError(name, "Erreur serveur");
-          setSubmitting(false);
-        });
+
+        try {
+          await update({ variables });
+        } catch (err) {
+          setFieldError(name, (err as Error).message);
+        }
+
+        setSubmitting(false);
       }}
       validateOnChange={false}
       validationSchema={yupSchema}

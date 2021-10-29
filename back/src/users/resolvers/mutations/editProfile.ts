@@ -1,31 +1,38 @@
+import { UserInputError } from "apollo-server-errors";
 import prisma from "../../../prisma";
-import {
-  MutationEditProfileArgs,
-  MutationResolvers
-} from "../../../generated/graphql/types";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { applyAuthStrategies, AuthType } from "../../../auth";
+import { sanitizeEmail } from "../../../utils";
 
-/**
- * Edit user profile
- * Each field can be edited separately so we need to handle
- * undefined values
- * @param userId
- * @param payload
- */
-export async function editProfileFn(
-  userId: string,
-  payload: MutationEditProfileArgs
-) {
-  const { name, phone, email } = payload;
+const editProfileResolver: MutationResolvers["editProfile"] = async (
+  parent,
+  { name, phone, email },
+  context
+) => {
+  applyAuthStrategies(context, [AuthType.Session]);
+  const user = checkIsAuthenticated(context);
 
   const data = {
-    ...(name !== undefined ? { name } : {}),
-    ...(phone !== undefined ? { phone } : {}),
-    ...(email !== undefined ? { email } : {})
+    ...(name ? { name } : {}),
+    ...(phone ? { phone } : {}),
+    ...(email ? { email: sanitizeEmail(email) } : {})
   };
+
+  if (data.email) {
+    const existingUser = await prisma.user.findUnique({
+      where: { email: data.email }
+    });
+
+    if (existingUser) {
+      throw new UserInputError(
+        `L'adresse email "${email}" est associée à un compte existant.`
+      );
+    }
+  }
+
   const updatedUser = await prisma.user.update({
-    where: { id: userId },
+    where: { id: user.id },
     data
   });
 
@@ -34,18 +41,6 @@ export async function editProfileFn(
     // companies are resolved through a separate resolver (User.companies)
     companies: []
   };
-}
-
-const editProfileResolver: MutationResolvers["editProfile"] = (
-  parent,
-  args,
-  context
-) => {
-  applyAuthStrategies(context, [AuthType.Session]);
-
-  const user = checkIsAuthenticated(context);
-
-  return editProfileFn(user.id, args);
 };
 
 export default editProfileResolver;

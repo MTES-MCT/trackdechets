@@ -1,7 +1,7 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import { filter } from "graphql-anywhere";
-import AccountFieldNotEditable from "./fields/AccountFieldNotEditable";
+import AccountFieldEmail from "./fields/AccountFieldEmail";
 import AccountFieldName from "./fields/AccountFieldName";
 import AccountFieldPhone from "./fields/AccountFieldPhone";
 import AccountFieldPassword from "./fields/AccountFieldPassword";
@@ -26,7 +26,7 @@ AccountInfo.fragments = {
 export default function AccountInfo({ me }: Props) {
   return (
     <>
-      <AccountFieldNotEditable name="email" label="Email" value={me.email} />
+      <AccountFieldEmail me={filter(AccountFieldEmail.fragments.me, me)} />
       <AccountFieldName me={filter(AccountFieldName.fragments.me, me)} />
       <AccountFieldPhone me={filter(AccountFieldPhone.fragments.me, me)} />
       <AccountFieldPassword />
