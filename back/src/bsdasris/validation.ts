@@ -74,6 +74,7 @@ type Transport = Pick<
   | "transporterWasteWeightValue"
   | "transporterWasteWeightIsEstimate"
   | "handedOverToRecipientAt"
+  | "transporterTransportPlates"
 >;
 type Recipient = Pick<
   Prisma.BsdasriCreateInput,
@@ -441,7 +442,12 @@ export const transportSchema: FactorySchemaOf<
         context.transportSignature,
         "Le date de prise en charge du déchet est obligatoire"
       ),
-    handedOverToRecipientAt: yup.date().nullable() // optional field
+    handedOverToRecipientAt: yup.date().nullable(), // optional field
+
+    transporterTransportPlates: yup
+      .array()
+      .of(yup.string())
+      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
   });
 
 export const recipientSchema: FactorySchemaOf<

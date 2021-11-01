@@ -438,6 +438,139 @@ describe("Mutation.createDasri validation scenarii", () => {
     ]);
   });
 
+  it("should allow up to 2 transporter plates", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporterCompany = await companyFactory();
+
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 03*" },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: company.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+
+      transporter: {
+        company: {
+          mail: "trans@test.fr",
+          name: "El transporter",
+          siret: transporterCompany.siret,
+          contact: "Jason Statham",
+          phone: "06 18 76 02 00",
+          address: "avenue de la mer"
+        },
+        transport: {
+          plates: ["AB-44-YU", "CF-43-TT"],
+          weight: { value: 22, isEstimate: false },
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    expect(data.createBsdasri.transporter.transport.plates.length).toEqual(2);
+  });
+
+  it("should fail creating the form if more than 2 plates are submitted", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporterCompany = await companyFactory();
+
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 03*" },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: company.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+
+      transporter: {
+        company: {
+          mail: "trans@test.fr",
+          name: "El transporter",
+          siret: transporterCompany.siret,
+          contact: "Jason Statham",
+          phone: "06 18 76 02 00",
+          address: "avenue de la mer"
+        },
+        transport: {
+          plates: ["AB-44-YU", "CF-43-TT", "BG-32-UU"], // 3 plates, only 2 allowed
+          weight: { value: 22, isEstimate: false },
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Un maximum de 2 plaques d'immatriculation est accepté",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
   it("create a dasri without transport quantity and type", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const transporterCompany = await companyFactory();

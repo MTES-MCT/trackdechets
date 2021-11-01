@@ -21,6 +21,11 @@ mutation CreateBsda($input: BsdaInput!) {
           siret
       }
     }
+    transporter {
+      transport {
+        plates
+      }
+    }
   }
 }
 `;
@@ -135,7 +140,153 @@ describe("Mutation.Bsda.create", () => {
       input.destination.company.siret
     );
   });
+  it("should allow creating the form if up to 2 plates are submitted", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
 
+    const input: BsdaInput = {
+      emitter: {
+        isPrivateIndividual: false,
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      worker: {
+        company: {
+          siret: "22222222222222",
+          name: "worker",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      waste: {
+        code: "16 01 06",
+        adr: "ADR",
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        name: "Amiante",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: "11111111111111",
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      transporter: {
+        company: {
+          siret: "11111111111112",
+          name: "The Transporter",
+          address: "Rue du bsda",
+          contact: "Un transporter",
+          phone: "0101010101",
+          mail: "transporter@mail.com"
+        },
+        transport: { plates: ["SD-99-TY", "GG-66-AR"] }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(data.createBsda.transporter.transport.plates.length).toBe(2);
+  });
+  it("should fail creating the form if more than 2 plates are submitted", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const input: BsdaInput = {
+      emitter: {
+        isPrivateIndividual: false,
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      worker: {
+        company: {
+          siret: "22222222222222",
+          name: "worker",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      waste: {
+        code: "16 01 06",
+        adr: "ADR",
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        name: "Amiante",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: "11111111111111",
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      transporter: {
+        company: {
+          siret: "11111111111112",
+          name: "The Transporter",
+          address: "Rue du bsda",
+          contact: "Un transporter",
+          phone: "0101010101",
+          mail: "transporter@mail.com"
+        },
+        transport: { plates: ["SD-99-TY", "GG-66-AR", "DD-44-TT"] }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Un maximum de 2 plaques d'immatriculation est accepté",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
   it("should fail creating the form if a required field like the waste code is missing", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
