@@ -1,3 +1,3 @@
 type Query {
-  myApplications: [Application!]!
+  myApplication: Application
 }

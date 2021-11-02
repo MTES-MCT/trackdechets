@@ -16,7 +16,7 @@ import {
   MutationCreateApplicationArgs,
   Query,
 } from "generated/graphql/types";
-import styles from "./Applications.module.scss";
+import styles from "./MyApplication.module.scss";
 
 const ApplicationFragment = gql`
   fragment ApplicationFragment on Application {
@@ -28,9 +28,9 @@ const ApplicationFragment = gql`
   }
 `;
 
-const MY_APPLICATIONS = gql`
-  query GetMyApplications {
-    myApplications {
+const MY_APPLICATION = gql`
+  query GetMyApplication {
+    myApplication {
       ...ApplicationFragment
     }
   }
@@ -72,7 +72,7 @@ function CreateApplicationModal({ onClose }: CreateApplicationModalProps) {
   const [createApplication, { loading }] = useMutation<
     Pick<Mutation, "createApplication">,
     MutationCreateApplicationArgs
-  >(CREATE_APPLICATION, { refetchQueries: [MY_APPLICATIONS] });
+  >(CREATE_APPLICATION, { refetchQueries: [MY_APPLICATION] });
 
   return (
     <Modal ariaLabel="Créer une application OAuth2" onClose={onClose} isOpen>
@@ -160,42 +160,47 @@ function CreateApplicationModal({ onClose }: CreateApplicationModalProps) {
   );
 }
 
-export function Applications() {
-  const { data } = useQuery<Pick<Query, "myApplications">>(MY_APPLICATIONS);
+export function MyApplication() {
+  const { data } = useQuery<Pick<Query, "myApplication">>(MY_APPLICATION);
   const [isCreating, setIsCreating] = React.useState(false);
-  const myApplications = data?.myApplications ?? [];
 
   return (
     <div className={styles.Applications}>
-      <h5 className="h5 tw-font-bold tw-mb-4">Applications OAuth2</h5>
-      {myApplications.map(application => (
-        <div key={application.id} className={styles.Application}>
+      <h5 className="h5 tw-font-bold tw-mb-4">Application OAuth2</h5>
+      {data?.myApplication && (
+        <div key={data.myApplication.id} className={styles.Application}>
           <div className={styles.ApplicationLogo}>
-            <img src={application.logoUrl} alt="" width="100" height="100" />
+            <img
+              src={data.myApplication.logoUrl}
+              alt=""
+              width="100"
+              height="100"
+            />
           </div>
           <div className={styles.ApplicationDetails}>
             <p>
-              <strong>{application.name}</strong>
+              <strong>{data.myApplication.name}</strong>
             </p>
-            <p>Client id : {application.id}</p>
-            <p>Client secret : {application.clientSecret}</p>
+            <p>Client id : {data.myApplication.id}</p>
+            <p>Client secret : {data.myApplication.clientSecret}</p>
             <p>URLs de redirection :</p>
             <List>
-              {application.redirectUris.map((redirectUri, index) => (
+              {data.myApplication.redirectUris.map((redirectUri, index) => (
                 <ListItem key={index}>{redirectUri}</ListItem>
               ))}
             </List>
           </div>
         </div>
-      ))}
-      <button
-        type="button"
-        className="btn btn--primary"
-        onClick={() => setIsCreating(true)}
-        disabled={myApplications.length > 0}
-      >
-        Créer une application
-      </button>
+      )}
+      {!data?.myApplication && (
+        <button
+          type="button"
+          className="btn btn--primary"
+          onClick={() => setIsCreating(true)}
+        >
+          Créer une application
+        </button>
+      )}
       {isCreating && (
         <CreateApplicationModal onClose={() => setIsCreating(false)} />
       )}
