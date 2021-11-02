@@ -1,4 +1,5 @@
 import { UserRole } from "@prisma/client";
+import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
   MutationDeleteCompanyArgs
@@ -16,6 +17,8 @@ const DELETE_COMPANY = `
 `;
 
 describe("deleteCompany", () => {
+  afterEach(resetDatabase);
+
   it("should delete a company", async () => {
     const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
     const { mutate } = makeClient(user);
