@@ -6,7 +6,7 @@ import prisma from "../../../prisma";
 import { getUid } from "../../../utils";
 import { ApplicationInputSchema } from "../../validation";
 
-const createFicheInterventionBsff: MutationResolvers["createApplication"] = async (
+const createApplicationResolver: MutationResolvers["createApplication"] = async (
   _,
   { input },
   context
@@ -39,4 +39,4 @@ const createFicheInterventionBsff: MutationResolvers["createApplication"] = asyn
   return application;
 };
 
-export default createFicheInterventionBsff;
+export default createApplicationResolver;
