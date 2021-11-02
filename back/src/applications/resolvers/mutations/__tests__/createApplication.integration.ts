@@ -1,3 +1,4 @@
+import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
   MutationCreateApplicationArgs
@@ -15,6 +16,8 @@ const CREATE_APPLICATION = `
 `;
 
 describe("createApplication", () => {
+  afterEach(resetDatabase);
+
   it("should create an application", async () => {
     const user = await userFactory();
     const { mutate } = makeClient(user);
