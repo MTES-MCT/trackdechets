@@ -40,7 +40,7 @@ const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"
   });
   if (existingAnonymousCompany) {
     throw new UserInputError(
-      `L'entreprise au SIRET "${input.siret}" est déjà connue de notre répertoire privée.`
+      `L'entreprise au SIRET "${input.siret}" est déjà connue de notre répertoire privé.`
     );
   }
 
