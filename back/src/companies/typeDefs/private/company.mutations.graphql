@@ -149,4 +149,6 @@ type Mutation {
   createTestCompany: String!
 
   deleteCompany(id: ID!): CompanyPrivate!
+
+  createAnonymousCompany(input: AnonymousCompanyInput!): AnonymousCompany!
 }
