@@ -45,8 +45,9 @@ export function CreateAnonymousCompany() {
         siret: "",
       }}
       validationSchema={AnonymousCompanyInputSchema}
-      onSubmit={async values => {
+      onSubmit={async (values, { resetForm }) => {
         await createAnonymousCompany({ variables: { input: values } });
+        resetForm();
         cogoToast.success(
           `L'entreprise au SIRET "${values.siret}" est maintenant connue de notre répertoire privé et peut être créée via l'interface.`,
           { hideAfter: 6 }
