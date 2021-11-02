@@ -49,7 +49,7 @@ export function CreateAnonymousCompany() {
         await createAnonymousCompany({ variables: { input: values } });
         cogoToast.success(
           `L'entreprise au SIRET "${values.siret}" est maintenant connue de notre répertoire privé et peut être créée via l'interface.`,
-          { hideAfter: 6000 }
+          { hideAfter: 6 }
         );
       }}
     >
