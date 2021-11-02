@@ -1,13 +1,20 @@
 import prisma from "../../../prisma";
 import * as yup from "yup";
 import { Prisma, Form } from "@prisma/client";
-import { WASTES_CODES } from "../../../common/constants";
+import {
+  PROCESSING_OPERATIONS_CODES,
+  WASTES_CODES
+} from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationCreateBsddReviewArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
 import { checkCanReview } from "../../permissions";
-import { INVALID_SIRET_LENGTH, INVALID_WASTE_CODE } from "../../validation";
+import {
+  INVALID_PROCESSING_OPERATION,
+  INVALID_SIRET_LENGTH,
+  INVALID_WASTE_CODE
+} from "../../validation";
 import { getUserCompanies } from "../../../users/database";
 import { flattenFormInput } from "../../form-converter";
 
@@ -17,9 +24,12 @@ const reviewSchema = yup
     wasteDetailsCode: yup
       .string()
       .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE),
-    wasteDetailsOnuCode: yup.string().nullable(),
     wasteDetailsPop: yup.boolean().nullable(),
     quantityReceived: yup.number().nullable(),
+    processingOperationDone: yup
+      .string()
+      .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
+      .nullable(),
     brokerCompanyName: yup.string().nullable(),
     brokerCompanySiret: yup
       .string()

@@ -235,4 +235,9 @@ type Query {
     "(Optionnel) ID d'un BSD en particulier"
     formId: ID
   ): formsLifeCycleData!
+
+  bsddReviews(
+    "SIRET d'un établissement dont je suis membre"
+    siret: String!
+  ): [BsddReview!]
 }

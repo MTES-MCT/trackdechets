@@ -677,14 +677,14 @@ input BsddReviewFormInput {
 
   "Quantité reçue, en tonnes"
   quantityReceived: Float
+
+  "Traitement réalisé (code D/R)"
+  processingOperationDone: String
 }
 
 input BsddReviewWasteDetailsInput {
   "Code CED"
   code: String
-
-  "Code ONU. Obligatoire pour les déchets dangereux. Merci d'indiquer 'non soumis' si nécessaire."
-  onuCode: String
 
   "Contient des Polluants Organiques Persistants (POP) oui / non"
   pop: Boolean
