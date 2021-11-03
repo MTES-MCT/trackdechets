@@ -366,7 +366,9 @@ model BsddReview {
 }
 
 model BsddReviewValidation {
-  id String @id @default(cuid())
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   bsddReviewId String
   bsddReview   BsddReview @relation(fields: [bsddReviewId], references: [id])
