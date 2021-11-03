@@ -36,16 +36,6 @@ export function Destination({ disabled }) {
         </label>
       </div>
 
-      {hasNextDestination && (
-        <>
-          <CompanySelector
-            disabled={disabled}
-            name="destination.operation.nextDestination.company"
-            heading="Exutoire final prévu"
-          />
-        </>
-      )}
-
       <div className="form__row">
         <label>
           N° CAP:
@@ -67,19 +57,67 @@ export function Destination({ disabled }) {
           disabled={disabled}
         >
           <option />
-          <option value="D 5">
-            D 5 - Mise en décharge aménagée et autorisée en ISDD
-          </option>
-          <option value="D 5">
-            D 5 - Mise en décharge aménagée et autorisée en ISDND
-          </option>
-          <option value="D 9">D 9 - Vitrification</option>
-          <option value="D 9">D 9 - Traitement chimique</option>
-          <option value="D 9">D 9 - Prétraitement</option>
-          <option value="D 13">D 13 - Groupement de déchets</option>
-          <option value="D 15">D 15 - Entreposage provisoire</option>
+          {values.destination?.operation?.nextDestination?.company?.siret ? (
+            <>
+              <option value="D 13">D 13 - Groupement de déchets</option>
+              <option value="D 15">D 15 - Entreposage provisoire</option>
+            </>
+          ) : (
+            <>
+              <option value="D 5">
+                D 5 - Mise en décharge aménagée et autorisée en ISDD ou ISDND
+              </option>
+              <option value="D 9">
+                D 9 - Vitrification, traitement chimique ou prétraitement
+              </option>
+            </>
+          )}
         </Field>
       </div>
+
+      {hasNextDestination && (
+        <>
+          <CompanySelector
+            disabled={disabled}
+            name="destination.operation.nextDestination.company"
+            heading="Exutoire final prévu"
+          />
+
+          <div className="form__row">
+            <label>
+              N° CAP:
+              <Field
+                disabled={disabled}
+                type="text"
+                name="destination.operation.nextDestination.cap"
+                className="td-input td-input--medium"
+              />
+            </label>
+          </div>
+
+          <div className="form__row">
+            <label>
+              Opération d’élimination / valorisation prévue (code D/R)
+            </label>
+            <Field
+              as="select"
+              name="destination.operation.nextDestination.plannedOperationCode"
+              className="td-select"
+              disabled={disabled}
+            >
+              <option />
+              <option value="D 5">
+                D 5 - Mise en décharge aménagée et autorisée en ISDD ou ISDND
+              </option>
+              <option value="D 9">
+                D 9 - Vitrification, traitement chimique ou prétraitement
+              </option>
+              <option value="D 13">D 13 - Groupement de déchets</option>
+              <option value="D 15">D 15 - Entreposage provisoire</option>
+            </Field>
+          </div>
+        </>
+      )}
     </>
   );
 }

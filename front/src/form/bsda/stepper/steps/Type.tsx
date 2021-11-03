@@ -1,7 +1,7 @@
 import { BsdaPicker } from "form/bsda/components/bsdaPicker/BsdaPicker";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useField } from "formik";
-import { BsdaType } from "generated/graphql/types";
+import { BsdaType, CompanyInput } from "generated/graphql/types";
 import React from "react";
 
 type Props = { disabled: boolean };
@@ -50,10 +50,10 @@ export function Type({ disabled }: Props) {
         ))}
       </div>
       {BsdaType.Gathering === type && (
-        <BsdaPicker singleSelect={false} name="grouping" />
+        <BsdaPicker singleSelect={false} name="grouping" code="D 13" />
       )}
       {BsdaType.Reshipment === type && (
-        <BsdaPicker singleSelect={true} name="forwarding" />
+        <BsdaPicker singleSelect={true} name="forwarding" code="D 15" />
       )}
     </>
   );

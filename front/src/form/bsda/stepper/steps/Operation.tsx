@@ -110,6 +110,7 @@ export default function Operation() {
           <option value="D 13">D 13 - Groupement de déchets</option>
           <option value="D 15">D 15 - Entreposage provisoire</option>
         </Field>
+        <p>Opération prévue: {values.destination?.plannedOperationCode}</p>
       </div>
     </>
   );

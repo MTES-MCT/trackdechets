@@ -69,7 +69,7 @@ export default async function sign(
     where: { id },
     data: {
       [signatureTypeInfos.dbAuthorKey]: input.author,
-      [signatureTypeInfos.dbDateKey]: new Date(input.date),
+      [signatureTypeInfos.dbDateKey]: new Date(input.date ?? Date.now()),
       isDraft: false, // If it was one, signing always "un-drafts" it,
       status: newStatus as BsvhuStatus
     }

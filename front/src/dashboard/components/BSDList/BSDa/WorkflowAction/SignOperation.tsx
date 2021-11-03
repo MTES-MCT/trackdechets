@@ -69,6 +69,7 @@ export function SignOperation({ siret, bsdaId }: Props) {
               ...getComputedState(
                 {
                   destination: {
+                    plannedOperationCode: bsda.plannedOperationCode,
                     reception: {
                       date: new Date().toISOString(),
                       acceptationStatus: "ACCEPTED",

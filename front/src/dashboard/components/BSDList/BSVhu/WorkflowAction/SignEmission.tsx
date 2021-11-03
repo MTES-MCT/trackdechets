@@ -28,7 +28,7 @@ export function SignEmission({ siret, bsvhuId }: Props) {
   >(SIGN_BSVHU, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   return (
-    <SignBsvhu title="Signer l'enlèvement" bsvhuId={bsvhuId}>
+    <SignBsvhu title="Signer" bsvhuId={bsvhuId}>
       {({ bsvhu, onClose }) =>
         bsvhu.metadata?.errors.some(
           error => error.requiredFor === SignatureTypeInput.Emission

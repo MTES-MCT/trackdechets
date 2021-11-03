@@ -47,6 +47,7 @@ function duplicateForm({
   destinationOperationSignatureAuthor,
   destinationOperationSignatureDate,
   destinationOperationDate,
+  wasteSealNumbers,
   ...rest
 }: Bsda) {
   return prisma.bsda.create({

@@ -7,6 +7,7 @@ import { UPDATE_VHU_FORM } from "form/bsvhu/utils/queries";
 import { getComputedState } from "form/common/stepper/GenericStepList";
 import { Field, Form, Formik } from "formik";
 import {
+  BsvhuDestinationType,
   Mutation,
   MutationSignBsvhuArgs,
   MutationUpdateBsvhuArgs,
@@ -29,7 +30,7 @@ export function SignOperation({ siret, bsvhuId }: Props) {
     Pick<Mutation, "updateBsvhu">,
     MutationUpdateBsvhuArgs
   >(UPDATE_VHU_FORM);
-  const [signBsvhu, { loading }] = useMutation<
+  const [signBsvhu, { loading, error }] = useMutation<
     Pick<Mutation, "signBsvhu">,
     MutationSignBsvhuArgs
   >(SIGN_BSVHU, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
@@ -43,6 +44,7 @@ export function SignOperation({ siret, bsvhuId }: Props) {
             ...getComputedState(
               {
                 destination: {
+                  type: bsvhu.destination.type,
                   reception: {
                     date: new Date().toISOString(),
                     acceptationStatus: null,
@@ -102,6 +104,8 @@ export function SignOperation({ siret, bsvhuId }: Props) {
                 </label>
                 <RedErrorMessage name="author" />
               </div>
+
+              {error && <div className="error-message">{error.message}</div>}
 
               <div className="form__actions">
                 <button

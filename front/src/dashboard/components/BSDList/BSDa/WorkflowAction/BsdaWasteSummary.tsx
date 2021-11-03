@@ -48,11 +48,9 @@ export function BsdaWasteSummary({ bsda }: Props) {
       <DataListItem>
         <DataListTerm>Conditionnement</DataListTerm>
         <DataListDescription>
-          {bsda.packagings?.map(p => (
-            <span key={`${p.quantity}-${p.type}`}>
-              {p.quantity} {PACKAGINGS_NAMES[p.type]}
-            </span>
-          ))}
+          {bsda.packagings
+            ?.map(p => `${p.quantity} ${PACKAGINGS_NAMES[p.type]}`)
+            .join(", ")}
         </DataListDescription>
       </DataListItem>
     </DataList>

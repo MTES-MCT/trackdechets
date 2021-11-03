@@ -10,7 +10,7 @@ type BsvhuEdge {
 }
 
 type BsvhuMetadata {
-  errors: [BsvhuError!]!
+  errors: [BsvhuError!]
 }
 
 type BsvhuError {
