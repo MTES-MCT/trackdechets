@@ -92,7 +92,7 @@ describe("createAnonymousCompany", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'entreprise au SIRET "${validInput.siret}" est déjà connue de notre répertoire privée.`
+        message: `L'entreprise au SIRET "${validInput.siret}" est déjà connue de notre répertoire privé.`
       })
     ]);
   });
