@@ -236,6 +236,7 @@ type Query {
     formId: ID
   ): formsLifeCycleData!
 
+  "Renvoie toutes les demandes de révisions en lien avec le SIRET passé en paramètre"
   bsddReviews(
     "SIRET d'un établissement dont je suis membre"
     siret: String!

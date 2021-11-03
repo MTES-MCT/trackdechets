@@ -526,22 +526,77 @@ type BsddReview {
   "Identifiant du bordereau concerné"
   bsddId: ID!
 
-  "Identifiant de l'entreprise à l'origine de la demande de révision"
-  fromCompanyId: String!
   "Entreprise à l'origine de la demande de révision"
-  fromCompany: FormCompany
+  requestedBy: FormCompany!
 
-  "Identifiant de l'entreprise qui doit valider la révision"
-  toCompanyId: String!
-  "Entreprise qui doit valider la révision"
-  toCompany: FormCompany
+  "Validations nécessaires à l'approbation de la révision"
+  validations: [BsddReviewValidation!]
 
   "Contenu de la révision"
-  content: JSON!
+  content: BsddReviewForm!
 
-  "Indique si la révision a été acceptée ou pas"
+  "Indique si la révision a été acceptée par l'ensemble des valideurs"
+  isAccepted: Boolean!
+
+  "Indique si la révision est archivée ou en attente d'une réponse d'un valideur"
+  isSettled: Boolean!
+}
+
+type BsddReviewValidation {
+  "Entreprise qui doit valider la révision"
+  company: FormCompany
+
+  "Indique si la révision a été acceptée ou pas par l'entreprise"
   isAccepted: Boolean
 
-  "Indique si la révision est archivée ou en attente d'une réponse"
-  isArchived: Boolean!
+  "Indique si la révision est archivée ou en attente d'une réponse par l'entreprise"
+  isSettled: Boolean!
+}
+
+"Payload de révision d'un bordereau. Disponible sur une liste restrainte de champs."
+type BsddReviewForm {
+  "Détails du déchet (édition partielle uniquement)"
+  wasteDetails: BsddReviewWasteDetails
+
+  "Négociant"
+  trader: Trader
+
+  "Courtier"
+  broker: Broker
+
+  "Destination du déchet (édition partielle uniquement)"
+  recipient: BsddReviewRecipient
+
+  "Quantité reçue, en tonnes"
+  quantityReceived: Float
+
+  "Traitement réalisé (code D/R)"
+  processingOperationDone: String
+
+  "Entreposage provisoire (édition partielle uniquement)"
+  temporaryStorageDetail: BsddReviewTemporaryStorageDetail
+}
+
+type BsddReviewWasteDetails {
+  "Code CED"
+  code: String
+
+  "Contient des Polluants Organiques Persistants (POP) oui / non"
+  pop: Boolean
+}
+
+type BsddReviewRecipient {
+  cap: String
+}
+
+type BsddReviewTemporaryStorageDetail {
+  destination: BsddReviewDestination
+}
+
+type BsddReviewDestination {
+  "N° de CAP"
+  cap: String
+
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  processingOperation: String
 }

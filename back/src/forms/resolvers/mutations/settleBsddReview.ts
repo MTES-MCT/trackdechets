@@ -4,7 +4,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationSettleBsddReviewArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
-import { getUserCompanies } from "../../../users/database";
+import { getFirstUserCompanyInList } from "../../../users/database";
 
 export default async function settleReview(
   _,
@@ -13,28 +13,51 @@ export default async function settleReview(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const review = await prisma.bsddReview.findUnique({ where: { id } });
+  const review = await prisma.bsddReview.findUnique({
+    where: { id },
+    include: { validations: true }
+  });
 
   if (!review) {
     throw new UserInputError("Révision introuvable.");
   }
-  const userCompanies = await getUserCompanies(user.id);
 
-  if (!userCompanies.find(company => company.id === review.toCompanyId)) {
+  const activeValidations = review.validations.filter(val => !val.isSettled);
+  const userCompany = await getFirstUserCompanyInList(
+    user.id,
+    activeValidations.map(val => val.companyId)
+  );
+
+  if (!userCompany) {
     throw new ForbiddenError("Vous n'êtes pas destinataire de cette révision.");
   }
 
+  const bsddReviewValidation = activeValidations.find(
+    val => val.companyId === userCompany.id
+  );
+
   if (isAccepted) {
+    const { temporaryStorageDetail, ...bsddReview } = review.content as Partial<
+      Prisma.FormUpdateInput
+    >;
     await prisma.form.update({
       where: { id: review.bsddId },
       data: {
-        ...(review.content as Partial<Prisma.FormUpdateInput>)
+        ...bsddReview,
+        ...(temporaryStorageDetail && {
+          temporaryStorageDetail: { update: { ...temporaryStorageDetail } }
+        })
       }
     });
   }
 
-  return prisma.bsddReview.update({
+  await prisma.bsddReviewValidation.update({
+    where: { id: bsddReviewValidation.id },
+    data: { isAccepted, isSettled: true }
+  });
+
+  return prisma.bsddReview.findFirst({
     where: { id },
-    data: { isAccepted, isArchived: true }
+    include: { validations: true }
   });
 }

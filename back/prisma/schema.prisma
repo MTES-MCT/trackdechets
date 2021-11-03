@@ -182,8 +182,8 @@ model Company {
   CompanyAssociation                   CompanyAssociation[]
   MembershipRequest                    MembershipRequest[]
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
-  bsddReviewsFrom                      BsddReview[]              @relation("BsddReviewFromCompany")
-  bsddReviewsTo                        BsddReview[]              @relation("BsddReviewToCompany")
+  bsddReviewRequests                   BsddReview[]
+  bsddReviewRequestValidations         BsddReviewValidation[]
 }
 
 // Companies with restricted diffusion of SIRENE information (police, army, etc)
@@ -357,14 +357,25 @@ model BsddReview {
 
   bsddId        String
   bsdd          Form    @relation(fields: [bsddId], references: [id])
-  fromCompanyId String
-  fromCompany   Company @relation(name: "BsddReviewFromCompany", fields: [fromCompanyId], references: [id])
-  toCompanyId   String
-  toCompany     Company @relation(name: "BsddReviewToCompany", fields: [toCompanyId], references: [id])
+  requestedById String
+  requestedBy   Company @relation(fields: [requestedById], references: [id])
 
-  content    Json
+  validations BsddReviewValidation[]
+
+  content Json
+}
+
+model BsddReviewValidation {
+  id String @id @default(cuid())
+
+  bsddReviewId String
+  bsddReview   BsddReview @relation(fields: [bsddReviewId], references: [id])
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
   isAccepted Boolean?
-  isArchived Boolean  @default(false)
+  isSettled  Boolean  @default(false)
 }
 
 model Grant {

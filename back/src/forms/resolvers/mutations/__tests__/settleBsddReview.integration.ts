@@ -15,9 +15,11 @@ const SETTLE_BSDD_REVIEW = `
     settleBsddReview(id: $id, isAccepted: $isAccepted) {
       id
       bsddId
-      content
+      content {
+        wasteDetails { code }
+      }
       isAccepted
-      isArchived
+      isSettled
     }
   }
 `;
@@ -54,9 +56,8 @@ describe("Mutation.settleBsddReview", () => {
     const review = await prisma.bsddReview.create({
       data: {
         bsddId: bsdd.id,
-        fromCompanyId: companyOfSomeoneElse.id,
-        toCompanyId: companyOfSomeoneElse.id,
-        content: ""
+        requestedById: companyOfSomeoneElse.id,
+        content: {}
       }
     });
 
@@ -72,7 +73,7 @@ describe("Mutation.settleBsddReview", () => {
     );
   });
 
-  it("should fail if fromCompany tries to approve its own review", async () => {
+  it("should fail if requester tries to approve its own review", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -87,9 +88,9 @@ describe("Mutation.settleBsddReview", () => {
     const review = await prisma.bsddReview.create({
       data: {
         bsddId: bsdd.id,
-        fromCompanyId: company.id,
-        toCompanyId: companyOfSomeoneElse.id,
-        content: ""
+        requestedById: company.id,
+        validations: { create: { companyId: companyOfSomeoneElse.id } },
+        content: {}
       }
     });
 
@@ -105,7 +106,7 @@ describe("Mutation.settleBsddReview", () => {
     );
   });
 
-  it("should work if toCompany approves the review", async () => {
+  it("should work if one of the validators approves the review", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -120,9 +121,9 @@ describe("Mutation.settleBsddReview", () => {
     const review = await prisma.bsddReview.create({
       data: {
         bsddId: bsdd.id,
-        fromCompanyId: companyOfSomeoneElse.id,
-        toCompanyId: company.id,
-        content: ""
+        requestedById: companyOfSomeoneElse.id,
+        validations: { create: { companyId: company.id } },
+        content: {}
       }
     });
 
@@ -137,10 +138,10 @@ describe("Mutation.settleBsddReview", () => {
     );
 
     expect(data.settleBsddReview.isAccepted).toBe(true);
-    expect(data.settleBsddReview.isArchived).toBe(true);
+    expect(data.settleBsddReview.isSettled).toBe(true);
   });
 
-  it("should work if toCompany refuses the review", async () => {
+  it("should work if only validator refuses the review", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -155,9 +156,9 @@ describe("Mutation.settleBsddReview", () => {
     const review = await prisma.bsddReview.create({
       data: {
         bsddId: bsdd.id,
-        fromCompanyId: companyOfSomeoneElse.id,
-        toCompanyId: company.id,
-        content: ""
+        requestedById: companyOfSomeoneElse.id,
+        validations: { create: { companyId: company.id } },
+        content: {}
       }
     });
 
@@ -172,7 +173,7 @@ describe("Mutation.settleBsddReview", () => {
     );
 
     expect(data.settleBsddReview.isAccepted).toBe(false);
-    expect(data.settleBsddReview.isArchived).toBe(true);
+    expect(data.settleBsddReview.isSettled).toBe(true);
   });
 
   it("should edit bsdd accordingly when accepted", async () => {
@@ -191,8 +192,8 @@ describe("Mutation.settleBsddReview", () => {
     const review = await prisma.bsddReview.create({
       data: {
         bsddId: bsdd.id,
-        fromCompanyId: companyOfSomeoneElse.id,
-        toCompanyId: company.id,
+        requestedById: companyOfSomeoneElse.id,
+        validations: { create: { companyId: company.id } },
         content: { wasteDetailsCode: "01 03 08" }
       }
     });
@@ -230,8 +231,8 @@ describe("Mutation.settleBsddReview", () => {
     const review = await prisma.bsddReview.create({
       data: {
         bsddId: bsdd.id,
-        fromCompanyId: companyOfSomeoneElse.id,
-        toCompanyId: company.id,
+        requestedById: companyOfSomeoneElse.id,
+        validations: { create: { companyId: company.id } },
         content: { wasteDetailsCode: "01 03 08" }
       }
     });

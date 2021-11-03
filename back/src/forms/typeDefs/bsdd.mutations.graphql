@@ -189,7 +189,7 @@ type Mutation {
   ): TransportSegment
 
   createBsddReview(
-    "Identifiant du bordereauà réviser"
+    "Identifiant du bordereau à réviser"
     bsddId: ID!
     "Contenu de la révision"
     input: BsddReviewFormInput!

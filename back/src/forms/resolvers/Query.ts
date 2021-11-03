@@ -6,6 +6,7 @@ import appendixForms from "./queries/appendixForms";
 import formsLifeCycle from "./queries/formsLifeCycle";
 import formsRegister from "./queries/formsRegister";
 import stats from "./queries/stats";
+import bsddReviews from "./queries/bsddReviews";
 
 const Query: QueryResolvers = {
   form,
@@ -14,7 +15,8 @@ const Query: QueryResolvers = {
   appendixForms,
   formsLifeCycle,
   formsRegister,
-  stats
+  stats,
+  bsddReviews: bsddReviews as any
 };
 
 export default Query;

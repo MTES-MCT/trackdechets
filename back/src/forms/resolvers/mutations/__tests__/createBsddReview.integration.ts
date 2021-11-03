@@ -1,4 +1,3 @@
-import { BsddReview } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -15,11 +14,21 @@ const CREATE_BSDD_REVIEW = `
     createBsddReview(bsddId: $bsddId, input: $input) {
       id
       bsddId
-      content
-      fromCompanyId
-      toCompanyId
+      content {
+        wasteDetails { code }
+      }
+      requestedBy {
+        siret
+      }
+      validations {
+        company {
+          siret
+        }
+        isAccepted
+        isSettled
+      }
       isAccepted
-      isArchived
+      isSettled
     }
   }
 `;
@@ -66,7 +75,7 @@ describe("Mutation.createBsddReview", () => {
     );
   });
 
-  it("should create a review and identify current user company on fromCompany", async () => {
+  it("should create a review and identifying current user as the requester", async () => {
     const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
@@ -89,9 +98,36 @@ describe("Mutation.createBsddReview", () => {
     );
 
     expect(data.createBsddReview.bsddId).toBe(bsdd.id);
-    expect(data.createBsddReview.fromCompanyId).toBe(company.id);
-    expect(data.createBsddReview.isArchived).toBe(false);
-    expect(data.createBsddReview.isAccepted).toBeNull();
+    expect(data.createBsddReview.requestedBy.siret).toBe(company.siret);
+  });
+
+  it("should create a review and a validation targetting the company not requesting the review", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsddReview">>(
+      CREATE_BSDD_REVIEW,
+      {
+        variables: {
+          bsddId: bsdd.id,
+          input: {}
+        }
+      }
+    );
+
+    expect(data.createBsddReview.bsddId).toBe(bsdd.id);
+    expect(data.createBsddReview.validations.length).toBe(1);
+    expect(data.createBsddReview.validations[0].company.siret).toBe(
+      recipientCompany.siret
+    );
   });
 
   it("should fail if unknown fields are provided", async () => {
@@ -157,7 +193,7 @@ describe("Mutation.createBsddReview", () => {
     });
 
     expect(data.createBsddReview.content).toEqual({
-      wasteDetailsCode: "01 03 08"
+      wasteDetails: { code: "01 03 08" }
     });
   });
 });

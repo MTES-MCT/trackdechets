@@ -1,6 +1,7 @@
+import { UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
 import * as yup from "yup";
-import { Prisma, Form } from "@prisma/client";
+import { Form } from "@prisma/client";
 import {
   PROCESSING_OPERATIONS_CODES,
   WASTES_CODES
@@ -16,9 +17,116 @@ import {
   INVALID_WASTE_CODE
 } from "../../validation";
 import { getUserCompanies } from "../../../users/database";
-import { flattenFormInput } from "../../form-converter";
+import {
+  flattenFormInput,
+  flattenTemporaryStorageDetailInput
+} from "../../form-converter";
 
-const reviewSchema = yup
+export default async function createReview(
+  _,
+  { bsddId, input }: MutationCreateBsddReviewArgs,
+  context: GraphQLContext
+) {
+  const user = checkIsAuthenticated(context);
+
+  const existingBsdd = await getFormOrFormNotFound({ id: bsddId });
+  await checkCanReview(user, existingBsdd);
+
+  const { temporaryStorageDetail, ...bsddReview } = input;
+  if (temporaryStorageDetail && existingBsdd.temporaryStorageDetailId == null) {
+    throw new UserInputError(
+      "Impossible de réviser l'entreposage provisoire, ce bordereau n'est pas concerné."
+    );
+  }
+  const bsddReviewContent = flattenFormInput(bsddReview);
+  await simpleReviewSchema.validate(bsddReviewContent);
+
+  const reviewContent: any = {
+    ...bsddReviewContent
+  };
+
+  if (temporaryStorageDetail) {
+    const temporaryStorageReviewContent = flattenTemporaryStorageDetailInput(
+      temporaryStorageDetail
+    );
+    await temporaryStorageDetailSchema.validate(temporaryStorageReviewContent);
+    reviewContent.temporaryStorageDetail = temporaryStorageReviewContent;
+  }
+
+  const requesterCompany = await getReviewRequesterCompany(
+    user.id,
+    existingBsdd
+  );
+  const allValidationCompanies = await getReviewValidationCompanies(
+    existingBsdd,
+    temporaryStorageDetail == null
+  );
+
+  return prisma.bsddReview.create({
+    data: {
+      bsdd: { connect: { id: existingBsdd.id } },
+      content: JSON.parse(JSON.stringify(reviewContent)),
+      requestedBy: { connect: { id: requesterCompany.id } },
+      validations: {
+        create: allValidationCompanies
+          .filter(company => company.id !== requesterCompany.id)
+          .map(company => ({ companyId: company.id }))
+      }
+    }
+  });
+}
+
+async function getReviewRequesterCompany(userId: string, bsdd: Form) {
+  const userCompanies = await getUserCompanies(userId);
+  const userCompanySirets = new Set(
+    userCompanies.map(company => company.siret)
+  );
+
+  if (userCompanySirets.has(bsdd.emitterCompanySiret))
+    return userCompanies.find(
+      company => company.siret === bsdd.emitterCompanySiret
+    );
+
+  if (userCompanySirets.has(bsdd.recipientCompanySiret))
+    return userCompanies.find(
+      company => company.siret === bsdd.recipientCompanySiret
+    );
+
+  throw new Error(
+    "Unknown user role on BSDD. He should not have been allowed to create a review."
+  );
+}
+
+async function getReviewValidationCompanies(
+  bsdd: Form,
+  isBsddOnlyReview: boolean
+) {
+  const simpleBsddValidators = [
+    bsdd.emitterCompanySiret,
+    bsdd.traderCompanySiret, // TODO ask for trader validation if there is one ?
+    bsdd.recipientCompanySiret
+  ].filter(Boolean);
+
+  if (isBsddOnlyReview) {
+    return prisma.company.findMany({
+      where: { siret: { in: simpleBsddValidators } }
+    });
+  }
+
+  const temporaryStorageDetail = await prisma.form
+    .findUnique({ where: { id: bsdd.id } })
+    .temporaryStorageDetail();
+  const bsddWithTemporaryStorageValidators = [
+    ...simpleBsddValidators,
+    temporaryStorageDetail.destinationCompanySiret
+  ];
+
+  return prisma.company.findMany({
+    where: { siret: { in: bsddWithTemporaryStorageValidators } }
+  });
+}
+
+const simpleReviewSchema = yup
   .object({
     recipientCap: yup.string().nullable(),
     wasteDetailsCode: yup
@@ -57,55 +165,15 @@ const reviewSchema = yup
     "Révision impossible, certains champs saisis ne sont pas modifiables"
   );
 
-export default async function createReview(
-  _,
-  { bsddId, input }: MutationCreateBsddReviewArgs,
-  context: GraphQLContext
-) {
-  const user = checkIsAuthenticated(context);
-
-  const existingBsdd = await getFormOrFormNotFound({ id: bsddId });
-  await checkCanReview(user, existingBsdd);
-
-  const revisionContent = flattenFormInput(input);
-  await reviewSchema.validate(revisionContent);
-
-  const { fromCompany, toCompany } = await getReviewActors(
-    user.id,
-    existingBsdd
+const temporaryStorageDetailSchema = yup
+  .object({
+    destinationCap: yup.string().nullable(),
+    destinationProcessingOperation: yup
+      .string()
+      .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
+      .nullable()
+  })
+  .noUnknown(
+    true,
+    "Révision impossible, certains champs saisis ne sont pas modifiables"
   );
-
-  return prisma.bsddReview.create({
-    data: {
-      bsdd: { connect: { id: existingBsdd.id } },
-      content: JSON.parse(JSON.stringify(revisionContent)),
-      fromCompany,
-      toCompany
-    }
-  });
-}
-
-async function getReviewActors(
-  userId: string,
-  bsdd: Form
-): Promise<Pick<Prisma.BsddReviewCreateInput, "fromCompany" | "toCompany">> {
-  const userCompanies = await getUserCompanies(userId);
-  const { emitterCompanySiret, recipientCompanySiret } = bsdd;
-
-  const isEmitter = userCompanies
-    .map(company => company.siret)
-    .includes(emitterCompanySiret);
-
-  return {
-    fromCompany: {
-      connect: {
-        siret: isEmitter ? emitterCompanySiret : recipientCompanySiret
-      }
-    },
-    toCompany: {
-      connect: {
-        siret: isEmitter ? recipientCompanySiret : emitterCompanySiret
-      }
-    }
-  };
-}

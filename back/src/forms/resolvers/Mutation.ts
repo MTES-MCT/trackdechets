@@ -45,8 +45,8 @@ const Mutation: MutationResolvers = {
   editSegment,
   markSegmentAsReadyToTakeOver,
   takeOverSegment,
-  createBsddReview,
-  settleBsddReview
+  createBsddReview: createBsddReview as any, // TODO better typing ?
+  settleBsddReview: settleBsddReview as any
 };
 
 export default Mutation;

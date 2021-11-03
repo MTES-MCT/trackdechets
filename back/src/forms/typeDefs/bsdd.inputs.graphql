@@ -663,7 +663,7 @@ input ImportPaperFormInput {
 
 "Payload de révision d'un bordereau. Disponible sur une liste restrainte de champs."
 input BsddReviewFormInput {
-  "Détails du déchet (partiel)"
+  "Détails du déchet (édition partielle uniquement)"
   wasteDetails: BsddReviewWasteDetailsInput
 
   "Négociant"
@@ -672,7 +672,7 @@ input BsddReviewFormInput {
   "Courtier"
   broker: BrokerInput
 
-  "Destination du déchet (partiel)"
+  "Destination du déchet (édition partielle uniquement)"
   recipient: BsddReviewRecipientInput
 
   "Quantité reçue, en tonnes"
@@ -680,6 +680,9 @@ input BsddReviewFormInput {
 
   "Traitement réalisé (code D/R)"
   processingOperationDone: String
+
+  "Entreposage provisoire (édition partielle uniquement)"
+  temporaryStorageDetail: BsddReviewTemporaryStorageDetailInput
 }
 
 input BsddReviewWasteDetailsInput {
@@ -692,4 +695,16 @@ input BsddReviewWasteDetailsInput {
 
 input BsddReviewRecipientInput {
   cap: String
+}
+
+input BsddReviewTemporaryStorageDetailInput {
+  destination: BsddReviewDestinationInput
+}
+
+input BsddReviewDestinationInput {
+  "N° de CAP"
+  cap: String
+
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  processingOperation: String
 }

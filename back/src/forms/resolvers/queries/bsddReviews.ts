@@ -16,8 +16,10 @@ export default async function bsddReviews(
 
   return prisma.bsddReview.findMany({
     where: {
-      OR: [{ toCompanyId: company.id }, { fromCompanyId: company.id }],
-      isArchived: false
+      OR: [
+        { requestedById: company.id },
+        { validations: { some: { companyId: company.id } } }
+      ]
     }
   });
 }
