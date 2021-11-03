@@ -82,6 +82,7 @@ type Transporter = Pick<
   | "transporterRecepisseNumber"
   | "transporterRecepisseDepartment"
   | "transporterRecepisseValidityLimit"
+  | "transporterTransportPlates"
 >;
 
 type WasteDescription = Pick<
@@ -504,7 +505,11 @@ const transporterSchema: FactorySchemaOf<
         context.transportSignature,
         `Transporteur: ${MISSING_COMPANY_EMAIL}`
       ),
-    transporterCompanyVatNumber: yup.string().nullable()
+    transporterCompanyVatNumber: yup.string().nullable(),
+    transporterTransportPlates: yup
+      .array()
+      .of(yup.string())
+      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
   });
 
 const wasteDescriptionSchema: FactorySchemaOf<

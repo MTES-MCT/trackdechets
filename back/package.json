@@ -97,7 +97,7 @@
     "winston-transport": "^4.3.0",
     "world-countries": "^4.0.0",
     "xstate": "^4.13.0",
-    "yup": "^0.32.8"
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@fast-csv/parse": "^4.3.0",

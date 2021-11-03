@@ -17,6 +17,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Le nombre maximum de plaques d'immatriculations est limité à 2 sur les bsdasri et bsda [PR 1054](https://github.com/MTES-MCT/trackdechets/pull/1054)
+
 #### :memo: Documentation
 
 #### :house: Interne
