@@ -1,7 +1,7 @@
 import { BsdaPicker } from "form/bsda/components/bsdaPicker/BsdaPicker";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useField } from "formik";
-import { BsdaType, CompanyInput } from "generated/graphql/types";
+import { BsdaType } from "generated/graphql/types";
 import React from "react";
 
 type Props = { disabled: boolean };

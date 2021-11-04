@@ -7,7 +7,6 @@ import { UPDATE_VHU_FORM } from "form/bsvhu/utils/queries";
 import { getComputedState } from "form/common/stepper/GenericStepList";
 import { Field, Form, Formik } from "formik";
 import {
-  BsvhuDestinationType,
   Mutation,
   MutationSignBsvhuArgs,
   MutationUpdateBsvhuArgs,

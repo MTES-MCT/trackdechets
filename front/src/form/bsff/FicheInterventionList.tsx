@@ -34,6 +34,7 @@ const companySchema: yup.SchemaOf<CompanyInput> = yup.object({
   phone: yup.string().required(),
   siret: yup.string().required(),
   vatNumber: yup.string().nullable(),
+  country: yup.string().nullable(),
 });
 const detenteurSchema: yup.SchemaOf<
   BsffFicheInterventionInput["detenteur"]
