@@ -18,6 +18,13 @@ const SETTLE_BSDD_REVIEW = `
       content {
         wasteDetails { code }
       }
+      validations {
+        company {
+          siret
+        }
+        isAccepted
+        isSettled
+      }
       isAccepted
       isSettled
     }
@@ -69,7 +76,7 @@ describe("Mutation.settleBsddReview", () => {
     });
 
     expect(errors[0].message).toBe(
-      "Vous n'êtes pas destinataire de cette révision."
+      "Vous n'êtes pas destinataire de cette révision, ou alors cette révision n'est plus approuvable."
     );
   });
 
@@ -102,11 +109,11 @@ describe("Mutation.settleBsddReview", () => {
     });
 
     expect(errors[0].message).toBe(
-      "Vous n'êtes pas destinataire de cette révision."
+      "Vous n'êtes pas destinataire de cette révision, ou alors cette révision n'est plus approuvable."
     );
   });
 
-  it("should work if one of the validators approves the review", async () => {
+  it("should work if the only validator approves the review", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -139,6 +146,122 @@ describe("Mutation.settleBsddReview", () => {
 
     expect(data.settleBsddReview.isAccepted).toBe(true);
     expect(data.settleBsddReview.isSettled).toBe(true);
+  });
+
+  it("should work if one of the validators approves the review, but not mark the review as accepted", async () => {
+    const { company: secondCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: thirdCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: secondCompany.siret }
+    });
+
+    const review = await prisma.bsddReview.create({
+      data: {
+        bsddId: bsdd.id,
+        requestedById: secondCompany.id,
+        validations: {
+          create: [{ companyId: company.id }, { companyId: thirdCompany.id }]
+        },
+        content: {}
+      }
+    });
+
+    const { data } = await mutate<Pick<Mutation, "settleBsddReview">>(
+      SETTLE_BSDD_REVIEW,
+      {
+        variables: {
+          id: review.id,
+          isAccepted: true
+        }
+      }
+    );
+
+    expect(data.settleBsddReview.isAccepted).toBe(false);
+    expect(data.settleBsddReview.isSettled).toBe(false);
+
+    expect(
+      data.settleBsddReview.validations.find(
+        val => val.company.siret === company.siret
+      ).isAccepted
+    ).toBe(true);
+    expect(
+      data.settleBsddReview.validations.find(
+        val => val.company.siret === company.siret
+      ).isSettled
+    ).toBe(true);
+
+    expect(
+      data.settleBsddReview.validations.find(
+        val => val.company.siret === thirdCompany.siret
+      ).isAccepted
+    ).toBeNull();
+    expect(
+      data.settleBsddReview.validations.find(
+        val => val.company.siret === thirdCompany.siret
+      ).isSettled
+    ).toBe(false);
+  });
+
+  it("should mark every validations as settled if one of the validators refused the review", async () => {
+    const { company: secondCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: thirdCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: secondCompany.siret }
+    });
+
+    const review = await prisma.bsddReview.create({
+      data: {
+        bsddId: bsdd.id,
+        requestedById: secondCompany.id,
+        validations: {
+          create: [{ companyId: company.id }, { companyId: thirdCompany.id }]
+        },
+        content: {}
+      }
+    });
+
+    const { data } = await mutate<Pick<Mutation, "settleBsddReview">>(
+      SETTLE_BSDD_REVIEW,
+      {
+        variables: {
+          id: review.id,
+          isAccepted: false
+        }
+      }
+    );
+
+    expect(data.settleBsddReview.isAccepted).toBe(false);
+    expect(data.settleBsddReview.isSettled).toBe(true);
+
+    expect(
+      data.settleBsddReview.validations.find(
+        val => val.company.siret === company.siret
+      ).isAccepted
+    ).toBe(false);
+    expect(
+      data.settleBsddReview.validations.find(
+        val => val.company.siret === company.siret
+      ).isSettled
+    ).toBe(true);
+
+    expect(
+      data.settleBsddReview.validations.find(
+        val => val.company.siret === thirdCompany.siret
+      ).isAccepted
+    ).toBeNull();
+    expect(
+      data.settleBsddReview.validations.find(
+        val => val.company.siret === thirdCompany.siret
+      ).isSettled
+    ).toBe(true);
   });
 
   it("should work if only validator refuses the review", async () => {
