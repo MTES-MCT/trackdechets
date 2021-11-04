@@ -1,6 +1,6 @@
 import prisma from "../../prisma";
 import { CompanyPrivateResolvers } from "../../generated/graphql/types";
-import { getCompanyUsers, getUserRole } from "../database";
+import { getCompanyUsers, getUserRole, getInstallation } from "../database";
 
 const companyPrivateResolvers: CompanyPrivateResolvers = {
   users: parent => {
@@ -34,6 +34,10 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
     return prisma.company
       .findUnique({ where: { siret: parent.siret } })
       .vhuAgrementDemolisseur();
+  },
+  installation: async parent => {
+    const installation = await getInstallation(parent.siret);
+    return installation;
   }
 };
 
