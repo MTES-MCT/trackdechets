@@ -39,6 +39,7 @@ const {
   SESSION_COOKIE_SECURE,
   SESSION_NAME,
   UI_HOST,
+  MAX_REQUESTS_PER_WINDOW = "1000",
   NODE_ENV
 } = process.env;
 
@@ -108,12 +109,13 @@ if (Sentry) {
 }
 
 const RATE_LIMIT_WINDOW_SECONDS = 60;
-const MAX_REQUESTS_PER_WINDOW = 1000;
+const maxrequestPerWindows = parseInt(MAX_REQUESTS_PER_WINDOW, 10);
+
 app.use(
   rateLimit({
-    message: `Quota de ${MAX_REQUESTS_PER_WINDOW} requêtes par minute excédée pour cette adresse IP, merci de réessayer plus tard.`,
+    message: `Quota de ${maxrequestPerWindows} requêtes par minute excédée pour cette adresse IP, merci de réessayer plus tard.`,
     windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
-    max: MAX_REQUESTS_PER_WINDOW,
+    max: maxrequestPerWindows,
     store: new RateLimitRedisStore({
       client: redisClient,
       expiry: RATE_LIMIT_WINDOW_SECONDS

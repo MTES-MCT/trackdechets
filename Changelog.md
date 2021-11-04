@@ -23,6 +23,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Rend le rate limit configurable [PR 1056](https://github.com/MTES-MCT/trackdechets/pull/1056)
+
 # [2021.10.2] 25/10/2021
 
 #### :rocket: Nouvelles fonctionnalités
