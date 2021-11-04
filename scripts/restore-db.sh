@@ -12,13 +12,21 @@ downloadBackup=${downloadBackup:-Y}
 if [ "$downloadBackup" != "${downloadBackup#[Yy]}" ]; then
     echo -e "\e[90m"
 
-    backupName="db_backup.custom"
+    backupName="db_backup.pgsql"
     backupPath="$(pwd)/$backupName"
+    backupTarName="db_backup.tar.gz"
+    backupTarPath="$(pwd)/$backupTarName"
 
-    node ./get-db-backup-link.js | xargs wget -O "$backupPath"
+    node ./get-db-backup-link.js | xargs wget -O "$backupTarPath"
+    tar xvf "$backupTarPath"
+    for name in *pgsql
+    do
+      mv $name $backupName
+    done
+    rm $backupTarName
     echo -e "\e[m"
 else
-    while read -erp $'\e[1m? Enter local backup path:\e[m ' backupPath; do
+    while read -erp $'\e[1m? Enter local backup path (pgsql file):\e[m ' backupPath; do
         if [ -f "$backupPath" ]; then
             break
         else
@@ -40,6 +48,7 @@ docker stop "$api_container_id"
 echo -e "\e[1m→ Recreating DB \e[36mprisma\e[m"
 docker exec -t "$psql_container_id" bash -c "psql -U $psqlUser -c \"DROP DATABASE IF EXISTS prisma;\"";
 docker exec -t "$psql_container_id" bash -c "psql -U $psqlUser -c \"CREATE DATABASE prisma;\"";
+docker exec -t "$psql_container_id" bash -c "psql -U $psqlUser -d prisma -c 'CREATE SCHEMA default\$default;'";
 
 echo -e "\e[1m→ Restoring dump"
 docker exec -t "$psql_container_id" bash -c "pg_restore -U $psqlUser -d prisma --clean /tmp/dump.sql 2>/dev/null";
