@@ -24,6 +24,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Rend le rate limit configurable [PR 1056](https://github.com/MTES-MCT/trackdechets/pull/1056)
+- Le champ installation de CompanyPrivate est dans son propre resolver [PR 1059](https://github.com/MTES-MCT/trackdechets/pull/1059)
 
 # [2021.10.2] 25/10/2021
 
