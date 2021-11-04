@@ -22,6 +22,9 @@ input CompanyInput {
 
   "Numéro de TVA intracommunautaire"
   vatNumber: String
+
+  "Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise"
+  country: String
 }
 
 "Filtre de date"

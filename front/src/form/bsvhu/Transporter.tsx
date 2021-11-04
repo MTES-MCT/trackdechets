@@ -48,7 +48,7 @@ export default function Transporter({ disabled }) {
           Numéro de TVA intracommunautaire
           <Field
             type="text"
-            name="transporter.tvaIntracommunautaire"
+            name="transporter.company.vatNumber"
             placeholder="Ex: DE 123456789"
             className="td-input"
             disabled={disabled}
