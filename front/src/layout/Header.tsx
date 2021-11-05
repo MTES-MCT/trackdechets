@@ -20,7 +20,7 @@ import { Query } from "generated/graphql/types";
 import { DashboardNav } from "dashboard/DashboardNavigation";
 
 import routes from "common/routes";
-import { MEDIA_QUERIES } from "common/config";
+import { DEVELOPERS_DOCUMENTATION_URL, MEDIA_QUERIES } from "common/config";
 import styles from "./Header.module.scss";
 import { useMedia } from "use-media";
 
@@ -71,7 +71,7 @@ const getMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
     },
     {
       caption: "Développeurs",
-      href: "https://developers.trackdechets.beta.gouv.fr",
+      href: DEVELOPERS_DOCUMENTATION_URL,
       onClick: () => trackEvent("navbar", "faq"),
 
       navlink: false,
