@@ -2,4 +2,5 @@ export const MEDIA_QUERIES = {
   handHeld: "900px",
 };
 
-export const tdContactEmail = "hello@trackdechets.beta.gouv.fr";
+export const CONTACT_EMAIL =
+  process.env.REACT_APP_CONTACT_EMAIL || "hello@trackdechets.beta.gouv.fr";
