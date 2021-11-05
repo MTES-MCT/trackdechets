@@ -1,13 +1,29 @@
-import React, { useState } from "react";
+import React from "react";
 import { Field, useFormikContext } from "formik";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { Bsda } from "generated/graphql/types";
+import { getInitialCompany } from "form/bsdd/utils/initial-state";
 
 export function Destination({ disabled }) {
-  const { values } = useFormikContext<Bsda>();
-  const [hasNextDestination, setHasNextDestination] = useState(
-    Boolean(values.destination?.operation?.nextDestination?.company?.siret)
+  const { values, setFieldValue } = useFormikContext<Bsda>();
+  const hasNextDestination = Boolean(
+    values.destination?.operation?.nextDestination
   );
+
+  function onNextDestinationToggle() {
+    console.log(hasNextDestination);
+    if (hasNextDestination) {
+      setFieldValue("destination.operation.nextDestination", null);
+    } else {
+      setFieldValue(
+        "destination.operation.nextDestination",
+        {
+          company: getInitialCompany(),
+        },
+        false
+      );
+    }
+  }
 
   return (
     <>
@@ -27,7 +43,7 @@ export function Destination({ disabled }) {
         <label>
           <input
             type="checkbox"
-            onChange={() => setHasNextDestination(!hasNextDestination)}
+            onChange={onNextDestinationToggle}
             disabled={disabled}
             checked={hasNextDestination}
             className="td-checkbox"
@@ -57,7 +73,7 @@ export function Destination({ disabled }) {
           disabled={disabled}
         >
           <option />
-          {values.destination?.operation?.nextDestination?.company?.siret ? (
+          {hasNextDestination ? (
             <>
               <option value="D 13">D 13 - Groupement de déchets</option>
               <option value="D 15">D 15 - Entreposage provisoire</option>

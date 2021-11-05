@@ -54,9 +54,7 @@ export default {
     plannedOperationCode: "",
     company: getInitialCompany(),
     operation: {
-      nextDestination: {
-        company: getInitialCompany(),
-      },
+      nextDestination: null,
     },
   },
   grouping: [],
