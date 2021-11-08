@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { tdContactEmail } from "common/config";
+import { CONTACT_EMAIL } from "common/config";
 import styles from "./SignupInfo.module.scss";
 import routes from "common/routes";
 
@@ -95,7 +95,7 @@ export default function SignupInfo() {
 
         <p className="body-text">
           Des questions, des interrogations ? N'hésitez pas à{" "}
-          <a href={`mailto:${tdContactEmail}`} className="link">
+          <a href={`mailto:${CONTACT_EMAIL}`} className="link">
             nous contacter
           </a>
           .
