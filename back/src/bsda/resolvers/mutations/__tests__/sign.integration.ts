@@ -641,7 +641,7 @@ describe("Mutation.Bsda.sign", () => {
           transporterCompanySiret: transporter.siret,
           destinationCompanySiret: ttr1.siret,
           status: BsdaStatus.AWAITING_CHILD,
-          destinationOperationCode: "D 13"
+          destinationOperationCode: "D 9"
         }
       });
 
@@ -651,7 +651,7 @@ describe("Mutation.Bsda.sign", () => {
           emitterCompanySiret: emitter.siret,
           transporterCompanySiret: transporter.siret,
           destinationCompanySiret: ttr2.siret,
-          destinationOperationCode: "D 13",
+          destinationOperationCode: "D 9",
           status: BsdaStatus.AWAITING_CHILD,
           forwarding: { connect: { id: bsda1.id } }
         }
