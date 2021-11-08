@@ -1,8 +1,8 @@
 import * as yup from "yup";
 import { ApplicationInput } from "../generated/graphql/types";
 
-export const ApplicationInputSchema: yup.SchemaOf<ApplicationInput> = yup.object(
-  {
+export const ApplicationInputSchema: yup.SchemaOf<ApplicationInput> =
+  yup.object({
     name: yup.string().required(),
     logoUrl: yup
       .string()
@@ -18,5 +18,4 @@ export const ApplicationInputSchema: yup.SchemaOf<ApplicationInput> = yup.object
       )
       .required()
       .min(1, "Vous devez préciser au moins une URL de redirection")
-  }
-);
+  });
