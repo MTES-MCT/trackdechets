@@ -352,7 +352,7 @@ describe("{ mutation { markAsSent } }", () => {
         });
       expect(markAsSent).rejects.toThrow(
         `{"errors":[{"message":"Variable \\"$sentInfo\\" got invalid value \\"${dateStr}\\" at \\"sentInfo.sentAt\\"; ` +
-          `Expected type DateTime. Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. ` +
+          `Expected type \\"DateTime\\". Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. ` +
           `Reçu ${dateStr}.","locations":[{"line":2,"column":33}],"extensions":{"code":"BAD_USER_INPUT"}}]}`
       );
     }

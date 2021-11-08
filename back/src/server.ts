@@ -3,7 +3,6 @@ import "./tracer";
 import {
   ApolloError,
   ApolloServer,
-  makeExecutableSchema,
   UserInputError
 } from "apollo-server-express";
 import { json, urlencoded } from "body-parser";
@@ -13,7 +12,9 @@ import express from "express";
 import rateLimit from "express-rate-limit";
 import session from "express-session";
 import depthLimit from "graphql-depth-limit";
-import { applyMiddleware } from "graphql-middleware";
+import { makeExecutableSchema } from "@graphql-tools/schema";
+import helmet from "helmet";
+import path from "path";
 import passport from "passport";
 import RateLimitRedisStore from "rate-limit-redis";
 import prisma from "./prisma";
@@ -32,6 +33,7 @@ import { userActivationHandler } from "./users/activation";
 import { getUIBaseURL } from "./utils";
 import sentryReporter from "./common/plugins/sentryReporter";
 import { initSentry } from "./common/sentry";
+import { graphiqlLandingPagePlugin } from "./common/plugins/graphiql";
 
 const {
   SESSION_SECRET,
@@ -52,15 +54,12 @@ const schema = makeExecutableSchema({
   resolvers
 });
 
-export const schemaWithMiddleware = applyMiddleware(schema);
-
 // GraphQL endpoint
 const graphQLPath = "/";
 
 export const server = new ApolloServer({
-  schema: schemaWithMiddleware,
+  schema,
   introspection: true, // used to enable the playground in production
-  playground: true, // used to enable the playground in production
   validationRules: [depthLimit(10)],
   context: async ctx => {
     return {
@@ -98,7 +97,7 @@ export const server = new ApolloServer({
 
     return err;
   },
-  plugins: [...(Sentry ? [sentryReporter] : [])]
+  plugins: [graphiqlLandingPagePlugin(), ...(Sentry ? [sentryReporter] : [])]
 });
 
 export const app = express();
@@ -120,6 +119,32 @@ app.use(
       client: redisClient,
       expiry: RATE_LIMIT_WINDOW_SECONDS
     })
+  })
+);
+
+app.use(
+  helmet({
+    // Because of the GraphQL playground we have to override the default
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'none'"],
+        baseUri: ["'self'"],
+        fontSrc: ["'self'", "https:", "data:"],
+        frameAncestors: ["'self'"],
+        imgSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        scriptSrc: ["'self'"],
+        scriptSrcAttr: ["'none'"],
+        styleSrc: [
+          "'self'",
+          "https:",
+          "'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='"
+        ],
+        connectSrc: [process.env.API_HOST],
+        formAction: ["self"],
+        ...(NODE_ENV === "production" && { upgradeInsecureRequests: [] })
+      }
+    }
   })
 );
 
@@ -189,6 +214,11 @@ app.get("/exports", (_, res) =>
     .send("Route dépréciée, utilisez la query GraphQL `formsRegister`")
 );
 
+app.use(
+  "/graphiql",
+  express.static(path.join(__dirname, "common/plugins/graphiql/assets"))
+);
+
 // Apply passport auth middlewares to the graphQL endpoint
 app.use(graphQLPath, passportBearerMiddleware, passportJwtMiddleware);
 
@@ -204,27 +234,31 @@ app.use((req, res, next) => {
 // GraphQL sanitization middleware
 app.use(sanitizePathBodyMiddleware(graphQLPath));
 
-/**
- * Wire up ApolloServer to /
- * UI_BASE_URL is explicitly set in the origin list
- * to avoid "Credentials is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’"
- * See https://developer.mozilla.org/fr/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials
- */
-server.applyMiddleware({
-  app,
-  cors: {
-    origin: [UI_BASE_URL, "*"],
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-    credentials: true
-  },
-  path: graphQLPath
-});
-
 if (Sentry) {
   // The error handler must be before any other error middleware and after all controllers
   app.use(Sentry.Handlers.errorHandler());
 }
 
 app.use(errorHandler);
+
+export async function startApolloServer() {
+  await server.start();
+
+  /**
+   * Wire up ApolloServer to /
+   * UI_BASE_URL is explicitly set in the origin list
+   * to avoid "Credentials is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’"
+   * See https://developer.mozilla.org/fr/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials
+   */
+  server.applyMiddleware({
+    app,
+    cors: {
+      origin: [UI_BASE_URL, "*"],
+      methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+      preflightContinue: false,
+      optionsSuccessStatus: 204,
+      credentials: true
+    },
+    path: graphQLPath
+  });
+}

@@ -32,13 +32,12 @@ const basesign = async ({ id, input, context, securityCode = null }) => {
     bsdasri
   });
 
-  const isEmissionTakenOverWithSecretCode = await checkEmitterAllowsSignatureWithSecretCode(
-    {
+  const isEmissionTakenOverWithSecretCode =
+    await checkEmitterAllowsSignatureWithSecretCode({
       signatureParams,
       bsdasri,
       securityCode
-    }
-  );
+    });
 
   const data = {
     [signatureParams.author]: input.author,

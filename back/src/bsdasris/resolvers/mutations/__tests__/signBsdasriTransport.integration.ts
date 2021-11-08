@@ -17,10 +17,8 @@ describe("Mutation.signBsdasri transport", () => {
 
   it("should put transport signature on a SIGNED_BY_PRODUCER dasri", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: transporter,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
       opt: {
@@ -51,10 +49,8 @@ describe("Mutation.signBsdasri transport", () => {
 
   it("should mark a dasri as refused when transporter acceptation is refused", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: transporter,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
       opt: {

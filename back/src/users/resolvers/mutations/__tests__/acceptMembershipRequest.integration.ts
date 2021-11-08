@@ -135,13 +135,12 @@ describe("mutation acceptMembershipRequest", () => {
       const members = data.acceptMembershipRequest.users.map(u => u.email);
       expect(members).toContain(user.email);
 
-      const acceptedMembershipRequest = await prisma.membershipRequest.findUnique(
-        {
+      const acceptedMembershipRequest =
+        await prisma.membershipRequest.findUnique({
           where: {
             id: membershipRequest.id
           }
-        }
-      );
+        });
 
       expect(acceptedMembershipRequest.status).toEqual("ACCEPTED");
       expect(acceptedMembershipRequest.statusUpdatedBy).toEqual(user.email);

@@ -205,11 +205,10 @@ export async function bulkCreate(opts: Opts): Promise<void> {
         } catch (err) {
           if (err instanceof UserInputError) {
             // association already exist, return it
-            const existingAssociations = await prisma.companyAssociation.findMany(
-              {
+            const existingAssociations =
+              await prisma.companyAssociation.findMany({
                 where: { company: { siret }, user: { id: user.id } }
-              }
-            );
+              });
             return existingAssociations[0];
           }
 

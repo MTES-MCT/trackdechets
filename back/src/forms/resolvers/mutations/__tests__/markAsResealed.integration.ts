@@ -389,12 +389,12 @@ describe("Mutation markAsResealed", () => {
   it("should throw an error if VERIFY_COMPANY=true and destination after temp storage is not verified", async () => {
     // patch process.env and reload server
     process.env.VERIFY_COMPANY = "true";
+    const server = require("../../../../server").server;
+    await server.start();
     const makeClient = require("../../../../__tests__/testClient").default;
 
-    const {
-      user: owner,
-      company: emitterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: owner, company: emitterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const { user, company: collector } = await userWithCompanyFactory(
       "MEMBER",

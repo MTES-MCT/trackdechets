@@ -384,14 +384,8 @@ export function flattenProcessedFormInput(
 export function flattenImportPaperFormInput(
   input: ImportPaperFormInput
 ): Partial<Prisma.FormCreateInput> {
-  const {
-    id,
-    customId,
-    signingInfo,
-    receivedInfo,
-    processedInfo,
-    ...rest
-  } = input;
+  const { id, customId, signingInfo, receivedInfo, processedInfo, ...rest } =
+    input;
 
   return safeInput({
     id,
@@ -660,7 +654,8 @@ export function expandTemporaryStorageFromDb(
       code: null,
       name: null,
       onuCode: temporaryStorageDetail.wasteDetailsOnuCode,
-      packagingInfos: temporaryStorageDetail.wasteDetailsPackagingInfos as PackagingInfo[],
+      packagingInfos:
+        temporaryStorageDetail.wasteDetailsPackagingInfos as PackagingInfo[],
       // DEPRECATED - To remove with old packaging fields
       ...getDeprecatedPackagingApiFields(
         temporaryStorageDetail.wasteDetailsPackagingInfos as PackagingInfo[]

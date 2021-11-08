@@ -27,23 +27,19 @@ describe("Appendix2Form", () => {
   afterAll(resetDatabase);
 
   it("should deny access to `emitter` field is user is not form contributor", async () => {
-    const {
-      user: emitterUser,
-      company: emitter
-    } = await userWithCompanyFactory(UserRole.MEMBER, {
-      companyTypes: { set: [CompanyType.PRODUCER] }
-    });
+    const { user: emitterUser, company: emitter } =
+      await userWithCompanyFactory(UserRole.MEMBER, {
+        companyTypes: { set: [CompanyType.PRODUCER] }
+      });
 
     const collector = await companyFactory({
       companyTypes: { set: [CompanyType.COLLECTOR] }
     });
 
-    const {
-      user: destinationUser,
-      company: destination
-    } = await userWithCompanyFactory(UserRole.MEMBER, {
-      companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
-    });
+    const { user: destinationUser, company: destination } =
+      await userWithCompanyFactory(UserRole.MEMBER, {
+        companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+      });
 
     const appendix2 = await formFactory({
       ownerId: emitterUser.id,

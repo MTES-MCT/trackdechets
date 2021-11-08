@@ -9,17 +9,14 @@ import { checkCanReadUpdateDeleteTraderReceipt } from "../../permissions";
  * Delete a trader receipt
  * @param id
  */
-const deleteTraderReceiptResolver: MutationResolvers["deleteTraderReceipt"] = async (
-  parent,
-  { input },
-  context
-) => {
-  applyAuthStrategies(context, [AuthType.Session]);
-  const user = checkIsAuthenticated(context);
-  const { id } = input;
-  const receipt = await getTraderReceiptOrNotFound({ id });
-  await checkCanReadUpdateDeleteTraderReceipt(user, receipt);
-  return prisma.traderReceipt.delete({ where: { id } });
-};
+const deleteTraderReceiptResolver: MutationResolvers["deleteTraderReceipt"] =
+  async (parent, { input }, context) => {
+    applyAuthStrategies(context, [AuthType.Session]);
+    const user = checkIsAuthenticated(context);
+    const { id } = input;
+    const receipt = await getTraderReceiptOrNotFound({ id });
+    await checkCanReadUpdateDeleteTraderReceipt(user, receipt);
+    return prisma.traderReceipt.delete({ where: { id } });
+  };
 
 export default deleteTraderReceiptResolver;

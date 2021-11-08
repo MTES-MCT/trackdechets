@@ -43,12 +43,8 @@ const updateFormResolver = async (
 
   const { updateFormInput } = validateArgs(args);
 
-  const {
-    id,
-    appendix2Forms,
-    temporaryStorageDetail,
-    ...formContent
-  } = updateFormInput;
+  const { id, appendix2Forms, temporaryStorageDetail, ...formContent } =
+    updateFormInput;
 
   const existingForm = await getFormOrFormNotFound({ id });
 

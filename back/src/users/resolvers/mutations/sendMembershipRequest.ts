@@ -14,75 +14,72 @@ import {
   membershipRequestConfirmation
 } from "../../../mailer/templates";
 
-const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] = async (
-  parent,
-  { siret },
-  context
-) => {
-  const user = checkIsAuthenticated(context);
+const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] =
+  async (parent, { siret }, context) => {
+    const user = checkIsAuthenticated(context);
 
-  const company = await getCompanyOrCompanyNotFound({ siret });
+    const company = await getCompanyOrCompanyNotFound({ siret });
 
-  // check user is not already member of company
-  const isMember = await isCompanyMember(user, company);
-  if (isMember) {
-    throw new UserInputError("Vous êtes déjà membre de cet établissement");
-  }
-
-  // check there is no existing membership request for this
-  // user and company
-  const alreadyRequested = await prisma.membershipRequest.findFirst({
-    where: {
-      user: { id: user.id },
-      company: { id: company.id }
+    // check user is not already member of company
+    const isMember = await isCompanyMember(user, company);
+    if (isMember) {
+      throw new UserInputError("Vous êtes déjà membre de cet établissement");
     }
-  });
-  if (alreadyRequested) {
-    throw new UserInputError(
-      "Une demande de rattachement a déjà été faite pour cet établissement"
-    );
-  }
 
-  const admins = await getCompanyAdminUsers(siret);
-  const emails = admins.map(a => a.email);
-
-  const membershipRequest = await prisma.membershipRequest.create({
-    data: {
-      user: { connect: { id: user.id } },
-      company: { connect: { id: company.id } },
-      sentTo: emails
-    }
-  });
-
-  // send membership request to all admins of the company
-  const recipients = admins.map(a => ({ email: a.email, name: a.name }));
-
-  await sendMail(
-    renderMail(membershipRequestMail, {
-      to: recipients,
-      variables: {
-        userEmail: user.email,
-        companyName: company.name,
-        companySiret: company.siret,
-        membershipRequestId: membershipRequest.id
+    // check there is no existing membership request for this
+    // user and company
+    const alreadyRequested = await prisma.membershipRequest.findFirst({
+      where: {
+        user: { id: user.id },
+        company: { id: company.id }
       }
-    })
-  );
+    });
+    if (alreadyRequested) {
+      throw new UserInputError(
+        "Une demande de rattachement a déjà été faite pour cet établissement"
+      );
+    }
 
-  // send membership request confirmation to requester
-  await sendMail(
-    renderMail(membershipRequestConfirmation, {
-      to: [{ email: user.email, name: user.name }],
-      variables: { companyName: company.name, companySiret: company.siret }
-    })
-  );
+    const admins = await getCompanyAdminUsers(siret);
+    const emails = admins.map(a => a.email);
 
-  return {
-    ...membershipRequest,
-    email: user.email,
-    siret: company.siret,
-    name: company.name
+    const membershipRequest = await prisma.membershipRequest.create({
+      data: {
+        user: { connect: { id: user.id } },
+        company: { connect: { id: company.id } },
+        sentTo: emails
+      }
+    });
+
+    // send membership request to all admins of the company
+    const recipients = admins.map(a => ({ email: a.email, name: a.name }));
+
+    await sendMail(
+      renderMail(membershipRequestMail, {
+        to: recipients,
+        variables: {
+          userEmail: user.email,
+          companyName: company.name,
+          companySiret: company.siret,
+          membershipRequestId: membershipRequest.id
+        }
+      })
+    );
+
+    // send membership request confirmation to requester
+    await sendMail(
+      renderMail(membershipRequestConfirmation, {
+        to: [{ email: user.email, name: user.name }],
+        variables: { companyName: company.name, companySiret: company.siret }
+      })
+    );
+
+    return {
+      ...membershipRequest,
+      email: user.email,
+      siret: company.siret,
+      name: company.name
+    };
   };
-};
 
 export default sendMembershipRequestResolver;

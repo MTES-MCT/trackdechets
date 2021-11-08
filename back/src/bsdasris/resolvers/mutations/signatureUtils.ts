@@ -15,32 +15,30 @@ type checkEmitterAllowsDirectTakeOverFn = ({
  * Checking this in mutation code needs less code than doing it in the state machine, hence this util.
  * A boolean is returned to be stored on Bsdasri model iot tell apart which dasris were taken over directly.
  */
-export const checkEmitterAllowsDirectTakeOver: checkEmitterAllowsDirectTakeOverFn = async ({
-  signatureParams,
-  bsdasri
-}) => {
-  if (
-    signatureParams.eventType === BsdasriEventType.SignTransport &&
-    bsdasri.status === BsdasriStatus.INITIAL
-  ) {
-    if (bsdasri.type !== BsdasriType.SIMPLE) {
-      throw new UserInputError(
-        "L'emport direct est interdit pour les bordereaux dasri de groupement"
-      );
-    }
+export const checkEmitterAllowsDirectTakeOver: checkEmitterAllowsDirectTakeOverFn =
+  async ({ signatureParams, bsdasri }) => {
+    if (
+      signatureParams.eventType === BsdasriEventType.SignTransport &&
+      bsdasri.status === BsdasriStatus.INITIAL
+    ) {
+      if (bsdasri.type !== BsdasriType.SIMPLE) {
+        throw new UserInputError(
+          "L'emport direct est interdit pour les bordereaux dasri de groupement"
+        );
+      }
 
-    const emitterCompany = await getCompanyOrCompanyNotFound({
-      siret: bsdasri.emitterCompanySiret
-    });
-    if (!emitterCompany.allowBsdasriTakeOverWithoutSignature) {
-      throw new UserInputError(
-        "Erreur, l'émetteur n'a pas autorisé l'emport par le transporteur sans l'avoir préalablement signé"
-      );
+      const emitterCompany = await getCompanyOrCompanyNotFound({
+        siret: bsdasri.emitterCompanySiret
+      });
+      if (!emitterCompany.allowBsdasriTakeOverWithoutSignature) {
+        throw new UserInputError(
+          "Erreur, l'émetteur n'a pas autorisé l'emport par le transporteur sans l'avoir préalablement signé"
+        );
+      }
+      return true;
     }
-    return true;
-  }
-  return false;
-};
+    return false;
+  };
 
 type checkEmitterAllowsSignatureWithCodeFn = ({
   signatureParams: BsdasriSignatureInfos,
@@ -54,31 +52,29 @@ type checkEmitterAllowsSignatureWithCodeFn = ({
  * provided code matches emitter's one.
  * A boolean is returned to be stored on Bsdasri model iot tell apart which dasris were taken over with secret code.
  */
-export const checkEmitterAllowsSignatureWithSecretCode: checkEmitterAllowsSignatureWithCodeFn = async ({
-  signatureParams,
-  bsdasri,
-  securityCode
-}) => {
-  if (!securityCode) {
-    return false;
-  }
-  if (
-    signatureParams.eventType !== BsdasriEventType.SignEmissionWithSecretCode ||
-    bsdasri.status !== BsdasriStatus.INITIAL
-  ) {
-    return false;
-  }
-  const emitterCompany = await getCompanyOrCompanyNotFound({
-    siret: bsdasri.emitterCompanySiret
-  });
+export const checkEmitterAllowsSignatureWithSecretCode: checkEmitterAllowsSignatureWithCodeFn =
+  async ({ signatureParams, bsdasri, securityCode }) => {
+    if (!securityCode) {
+      return false;
+    }
+    if (
+      signatureParams.eventType !==
+        BsdasriEventType.SignEmissionWithSecretCode ||
+      bsdasri.status !== BsdasriStatus.INITIAL
+    ) {
+      return false;
+    }
+    const emitterCompany = await getCompanyOrCompanyNotFound({
+      siret: bsdasri.emitterCompanySiret
+    });
 
-  if (!securityCode || securityCode !== emitterCompany.securityCode) {
-    throw new UserInputError(
-      "Erreur, le code de sécurité est manquant ou invalide"
-    );
-  }
-  return true;
-};
+    if (!securityCode || securityCode !== emitterCompany.securityCode) {
+      throw new UserInputError(
+        "Erreur, le code de sécurité est manquant ou invalide"
+      );
+    }
+    return true;
+  };
 
 // Secret code signature rely on a specific mutation, here we use a common util to sign each dasri step
 type InternalBsdasriSignatureType =

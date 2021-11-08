@@ -66,14 +66,10 @@ export const prepareRedis = async ({ emitterCompany, recipientCompany }) => {
 };
 
 export const prepareDB = async () => {
-  const {
-    user: emitter,
-    company: emitterCompany
-  } = await userWithCompanyFactory("ADMIN");
-  const {
-    user: recipient,
-    company: recipientCompany
-  } = await userWithCompanyFactory("ADMIN");
+  const { user: emitter, company: emitterCompany } =
+    await userWithCompanyFactory("ADMIN");
+  const { user: recipient, company: recipientCompany } =
+    await userWithCompanyFactory("ADMIN");
 
   const form = await formFactory({
     ownerId: emitter.id,

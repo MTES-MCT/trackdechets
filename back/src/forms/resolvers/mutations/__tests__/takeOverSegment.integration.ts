@@ -26,12 +26,10 @@ describe("{ mutation { takeOverSegment } }", () => {
       }
     );
 
-    const {
-      user: secondTransporter,
-      company: secondTransporterCompany
-    } = await userWithCompanyFactory("ADMIN", {
-      companyTypes: { set: ["TRANSPORTER"] }
-    });
+    const { user: secondTransporter, company: secondTransporterCompany } =
+      await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["TRANSPORTER"] }
+      });
 
     // create a form whose first transporter is another one
     const form = await formFactory({

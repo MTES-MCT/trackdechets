@@ -1,5 +1,4 @@
 import { ApolloServer, gql, UserInputError } from "apollo-server-express";
-import { createTestClient } from "apollo-server-testing";
 import { format } from "date-fns";
 import scalars from "..";
 
@@ -46,8 +45,6 @@ describe("DateTime", () => {
     resolvers
   });
 
-  const { query, mutate } = createTestClient(server);
-
   const FOO_QUERY = gql`
     query {
       foo {
@@ -65,7 +62,7 @@ describe("DateTime", () => {
   `;
 
   it("should format date to ISO string", async () => {
-    const { data } = await query({ query: FOO_QUERY });
+    const { data } = await server.executeOperation({ query: FOO_QUERY });
     expect(data.foo.bar).toEqual(bar.toISOString());
   });
 
@@ -80,8 +77,8 @@ describe("DateTime", () => {
       "yyyy-MM-dd'T'HH:mm:ss.SSSX"
     ]
   )("ISO 8601 format like %s should be parsed correctly", async f => {
-    await mutate({
-      mutation: CREATE_FOO,
+    await server.executeOperation({
+      query: CREATE_FOO,
       variables: {
         bar: format(bar, f)
       }
@@ -90,25 +87,25 @@ describe("DateTime", () => {
   });
 
   it("should fail validation when invalid date format", async () => {
-    const { errors } = await mutate({
-      mutation: CREATE_FOO,
+    const { errors } = await server.executeOperation({
+      query: CREATE_FOO,
       variables: { bar: "2020-33-02" }
     });
     expect(errors).toEqual([
       new UserInputError(
-        `Variable "$bar" got invalid value "2020-33-02"; Expected type DateTime. Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 2020-33-02.`
+        `Variable "$bar" got invalid value "2020-33-02"; Expected type "DateTime". Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 2020-33-02.`
       )
     ]);
   });
 
   it("should fail validation when invalid type", async () => {
-    const { errors } = await mutate({
-      mutation: CREATE_FOO,
+    const { errors } = await server.executeOperation({
+      query: CREATE_FOO,
       variables: { bar: 1 }
     });
     expect(errors).toEqual([
       new UserInputError(
-        `Variable "$bar" got invalid value 1; Expected type DateTime. Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 1.`
+        `Variable "$bar" got invalid value 1; Expected type "DateTime". Seul les chaînes de caractères au format ISO 8601 sont acceptées en tant que date. Reçu 1.`
       )
     ]);
   });

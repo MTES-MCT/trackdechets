@@ -7,9 +7,14 @@ interface GeoInfo {
   longitude: number | null;
 }
 
+type Feature = {
+  geometry?: { type: string; coordinates: number[] };
+  properties?: { score: number };
+};
+
 export default async function geocode(address: string): Promise<GeoInfo> {
   try {
-    const response = await axios.get(API_ADRESSE_URL, {
+    const response = await axios.get<{ features: Feature[] }>(API_ADRESSE_URL, {
       params: { q: address }
     });
     if (response.status === 200) {

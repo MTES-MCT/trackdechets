@@ -27,7 +27,7 @@ describe("sendInBlue backend", () => {
 
     expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
 
-    const args = mockedAxiosPost.mock.calls;
+    const args: any = mockedAxiosPost.mock.calls;
 
     // right service was called
 

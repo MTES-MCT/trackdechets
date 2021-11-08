@@ -35,7 +35,7 @@ describe("migrate packagings updater", () => {
     await updater.run();
 
     expect(updateFormMock).toHaveBeenCalledWith(
-      jasmine.objectContaining({
+      expect.objectContaining({
         data: { wasteDetailsPackagingInfos: [] }
       })
     );
@@ -55,7 +55,7 @@ describe("migrate packagings updater", () => {
     await updater.run();
 
     expect(updateFormMock).toHaveBeenCalledWith(
-      jasmine.objectContaining({
+      expect.objectContaining({
         data: {
           wasteDetailsPackagingInfos: [
             {
@@ -93,7 +93,7 @@ describe("migrate packagings updater", () => {
     await updater.run();
 
     expect(updateFormMock).toHaveBeenCalledWith(
-      jasmine.objectContaining({
+      expect.objectContaining({
         data: {
           wasteDetailsPackagingInfos: [
             {
@@ -126,7 +126,7 @@ describe("migrate packagings updater", () => {
     await updater.run();
 
     expect(updateFormMock).toHaveBeenCalledWith(
-      jasmine.objectContaining({
+      expect.objectContaining({
         data: {
           wasteDetailsPackagingInfos: [
             {
@@ -164,7 +164,7 @@ describe("migrate packagings updater", () => {
     await updater.run();
 
     expect(updateFormMock).toHaveBeenCalledWith(
-      jasmine.objectContaining({
+      expect.objectContaining({
         data: {
           wasteDetailsPackagingInfos: [
             {

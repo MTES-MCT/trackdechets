@@ -67,9 +67,8 @@ describe("formDiff", () => {
       temporaryStorageDetail: {
         transporter: {
           company: {
-            name:
-              formUpdateInput.temporaryStorageDetail.update
-                .transporterCompanyName
+            name: formUpdateInput.temporaryStorageDetail.update
+              .transporterCompanyName
           }
         }
       }

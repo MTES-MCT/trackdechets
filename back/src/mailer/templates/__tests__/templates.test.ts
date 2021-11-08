@@ -95,7 +95,7 @@ describe("templates", () => {
     expect(rendered.body).toContain(form.readableId);
     expect(rendered.body).toContain(form.wasteDetailsName);
     expect(rendered.body).toContain(form.wasteDetailsCode);
-    expect(rendered.body).toContain(form.wasteDetailsQuantity);
+    expect(rendered.body).toContain(form.wasteDetailsQuantity.toString());
     expect(rendered.body).toContain(form.wasteRefusalReason);
     expect(rendered.body).toContain(form.transporterCompanyName);
     expect(rendered.body).toContain(form.sentBy);
@@ -177,7 +177,7 @@ describe("templates", () => {
     expect(rendered.body).toContain(form.readableId);
     expect(rendered.body).toContain(form.wasteDetailsName);
     expect(rendered.body).toContain(form.wasteDetailsCode);
-    expect(rendered.body).toContain(form.wasteDetailsQuantity);
+    expect(rendered.body).toContain(form.wasteDetailsQuantity.toString());
     expect(rendered.body).toContain(form.wasteRefusalReason);
     expect(rendered.body).toContain(form.transporterCompanyName);
     expect(rendered.body).toContain(form.sentBy);

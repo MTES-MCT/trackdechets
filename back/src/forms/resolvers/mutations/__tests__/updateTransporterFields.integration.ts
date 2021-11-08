@@ -17,10 +17,8 @@ describe("Forms -> updateTransporterFields mutation", () => {
 
   it("should update transporter plate", async () => {
     const { user: emitter } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: transporter,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     let form = await formFactory({
       ownerId: emitter.id,
@@ -46,10 +44,8 @@ describe("Forms -> updateTransporterFields mutation", () => {
 
   it("should update transporter custom info", async () => {
     const { user: emitter } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: transporter,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     let form = await formFactory({
       ownerId: emitter.id,
@@ -75,10 +71,8 @@ describe("Forms -> updateTransporterFields mutation", () => {
 
   it("should not update not SEALED forms", async () => {
     const { user: emitter } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: transporter,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     let form = await formFactory({
       ownerId: emitter.id,

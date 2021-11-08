@@ -10,24 +10,21 @@ import { receiptSchema } from "../../validation";
  * Update a trader receipt
  * @param input
  */
-const updateTraderReceiptResolver: MutationResolvers["updateTraderReceipt"] = async (
-  parent,
-  args,
-  context
-) => {
-  applyAuthStrategies(context, [AuthType.Session]);
-  const user = checkIsAuthenticated(context);
-  const {
-    input: { id, ...data }
-  } = args;
-  const receipt = await getTraderReceiptOrNotFound({ id });
-  await receiptSchema.validate({ ...receipt, ...data });
-  await checkCanReadUpdateDeleteTraderReceipt(user, receipt);
-  const traderReceipt = await prisma.traderReceipt.update({
-    data,
-    where: { id: receipt.id }
-  });
-  return traderReceipt;
-};
+const updateTraderReceiptResolver: MutationResolvers["updateTraderReceipt"] =
+  async (parent, args, context) => {
+    applyAuthStrategies(context, [AuthType.Session]);
+    const user = checkIsAuthenticated(context);
+    const {
+      input: { id, ...data }
+    } = args;
+    const receipt = await getTraderReceiptOrNotFound({ id });
+    await receiptSchema.validate({ ...receipt, ...data });
+    await checkCanReadUpdateDeleteTraderReceipt(user, receipt);
+    const traderReceipt = await prisma.traderReceipt.update({
+      data,
+      where: { id: receipt.id }
+    });
+    return traderReceipt;
+  };
 
 export default updateTraderReceiptResolver;

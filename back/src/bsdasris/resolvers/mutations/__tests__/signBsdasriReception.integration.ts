@@ -23,10 +23,8 @@ describe("Mutation.signBsdasri reception", () => {
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
-    const {
-      user: recipient,
-      company: destinationCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: recipient, company: destinationCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
       opt: {
@@ -71,10 +69,8 @@ describe("Mutation.signBsdasri reception", () => {
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
-    const {
-      user: recipient,
-      company: destinationCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: recipient, company: destinationCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
       opt: {
@@ -114,10 +110,8 @@ describe("Mutation.signBsdasri reception", () => {
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
-    const {
-      user: recipient,
-      company: destinationCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: recipient, company: destinationCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
       opt: {

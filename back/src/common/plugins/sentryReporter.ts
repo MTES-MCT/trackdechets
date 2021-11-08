@@ -10,9 +10,9 @@ const knownErrors = [ApolloError, ValidationError];
  * https://www.apollographql.com/docs/apollo-server/integrations/plugins/
  */
 const sentryReporter: ApolloServerPlugin = {
-  requestDidStart(requestContext) {
+  async requestDidStart(requestContext) {
     return {
-      didEncounterErrors(errorContext) {
+      async didEncounterErrors(errorContext) {
         if (!errorContext.operation) {
           // If we couldn't parse the operation, don't do anything here
           return;

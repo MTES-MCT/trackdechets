@@ -1,6 +1,7 @@
 import { CompanyType } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
+import { TestQuery } from "../../../../__tests__/apollo-integration-testing";
 import { companyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import * as sirene from "../../../sirene";
@@ -8,12 +9,17 @@ import * as sirene from "../../../sirene";
 const searchCompanySpy = jest.spyOn(sirene, "searchCompany");
 
 describe("query { companyInfos(siret: <SIRET>) }", () => {
+  let query: TestQuery;
+  beforeAll(() => {
+    const testClient = makeClient();
+    query = testClient.query;
+  });
+  afterEach(resetDatabase);
+
   afterEach(async () => {
     await resetDatabase();
     searchCompanySpy.mockReset();
   });
-
-  const { query } = makeClient(null);
 
   test("Random company not registered in Trackdéchets", async () => {
     searchCompanySpy.mockResolvedValueOnce({

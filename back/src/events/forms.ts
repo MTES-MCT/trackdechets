@@ -59,7 +59,7 @@ export async function mailWhenFormIsDeclined(payload: TDEventPayload<Form>) {
     if (!!form[field]) {
       try {
         const company = await searchCompany(trim(form[field]));
-        const res = await axios.get(
+        const res = await axios.get<{ codeDepartement: string }>(
           `https://geo.api.gouv.fr/communes/${company.codeCommune}`
         );
         if (!!res.data.codeDepartement) {
