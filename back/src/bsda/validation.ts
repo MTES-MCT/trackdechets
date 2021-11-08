@@ -415,10 +415,17 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         ),
       destinationOperationCode: yup
         .string()
-        .requiredIf(
-          context.operationSignature,
-          `Entreprise de destination: vous devez préciser le code d'opétation réalisé`
-        ),
+        .oneOf(["D 5", "D 9","D 13","D 15", "", null])
+        .when("destinationReceptionAcceptationStatus", {
+          is: value => value === WasteAcceptationStatus.REFUSED,
+          then: schema =>
+            schema.sting().nullable(),
+          otherwise: schema =>
+            schema.requiredIf(
+              context.operationSignature,
+              `Entreprise de destination: vous devez préciser le code d'opétation réalisé`
+            )
+        }),
       destinationOperationDate: yup
         .date()
         .requiredIf(
