@@ -9,8 +9,8 @@ import { checkIsAdmin } from "../../../common/permissions";
 import prisma from "../../../prisma";
 import { nafCodes } from "../../../common/constants/NAF";
 
-const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> = yup.object(
-  {
+const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
+  yup.object({
     address: yup.string().required(),
     codeCommune: yup.string().required(),
     codeNaf: yup
@@ -22,36 +22,32 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> = yup.obj
       .required(),
     name: yup.string().required(),
     siret: yup.string().length(14).required()
-  }
-);
-
-const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"] = async (
-  parent,
-  { input },
-  context
-) => {
-  applyAuthStrategies(context, [AuthType.Session]);
-  checkIsAdmin(context);
-
-  await AnonymousCompanyInputSchema.validate(input);
-
-  const existingAnonymousCompany = await prisma.anonymousCompany.findUnique({
-    where: { siret: input.siret }
   });
-  if (existingAnonymousCompany) {
-    throw new UserInputError(
-      `L'entreprise au SIRET "${input.siret}" est déjà connue de notre répertoire privé.`
-    );
-  }
 
-  const anonymousCompany = await prisma.anonymousCompany.create({
-    data: {
-      ...input,
-      libelleNaf: nafCodes[input.codeNaf]
+const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"] =
+  async (parent, { input }, context) => {
+    applyAuthStrategies(context, [AuthType.Session]);
+    checkIsAdmin(context);
+
+    await AnonymousCompanyInputSchema.validate(input);
+
+    const existingAnonymousCompany = await prisma.anonymousCompany.findUnique({
+      where: { siret: input.siret }
+    });
+    if (existingAnonymousCompany) {
+      throw new UserInputError(
+        `L'entreprise au SIRET "${input.siret}" est déjà connue de notre répertoire privé.`
+      );
     }
-  });
 
-  return anonymousCompany;
-};
+    const anonymousCompany = await prisma.anonymousCompany.create({
+      data: {
+        ...input,
+        libelleNaf: nafCodes[input.codeNaf]
+      }
+    });
+
+    return anonymousCompany;
+  };
 
 export default createAnonymousCompanyResolver;
