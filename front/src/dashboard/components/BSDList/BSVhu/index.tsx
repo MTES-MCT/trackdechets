@@ -51,7 +51,6 @@ export const COLUMNS: Record<
     accessor: vhu =>
       vhu.isDraft ? "Brouillon" : vhuVerboseStatuses[vhu["bsvhuStatus"]], // unable to use dot notation because of conflicting status fields
   },
-
   workflow: {
     accessor: () => null,
     Cell: ({ row }) => {

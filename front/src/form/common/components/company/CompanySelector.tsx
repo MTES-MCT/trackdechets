@@ -155,10 +155,12 @@ export default function CompanySelector({
     return <InlineError apolloError={favoritesError} />;
   }
 
+  const isForeignCompany = field.value.siret == null;
+
   return (
     <div className="tw-my-6">
       {!!heading && <h4 className="form__section-heading">{heading}</h4>}
-      {field.value.siret != null && (
+      {!isForeignCompany && (
         <>
           <div className={styles.companySelectorSearchFields}>
             <div className={styles.companySelectorSearchGroup}>
@@ -228,7 +230,7 @@ export default function CompanySelector({
                 event.target.checked ? null : ""
               );
             }}
-            checked={field.value.siret == null}
+            checked={isForeignCompany}
             disabled={disabled}
           />
           L'entreprise est à l'étranger
@@ -236,7 +238,7 @@ export default function CompanySelector({
       )}
 
       <div className="form__row">
-        {field.value.siret == null && (
+        {isForeignCompany && (
           <>
             <label>
               Nom de l'entreprise

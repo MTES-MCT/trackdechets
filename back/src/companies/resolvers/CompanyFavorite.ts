@@ -14,6 +14,12 @@ const companyFavoriteResolvers: CompanyFavoriteResolvers = {
       .traderReceipt();
     return traderReceipt;
   },
+  brokerReceipt: async parent => {
+    const brokerReceipt = await prisma.company
+      .findUnique({ where: { siret: parent.siret } })
+      .brokerReceipt();
+    return brokerReceipt;
+  },
   vhuAgrementBroyeur: parent => {
     return prisma.company
       .findUnique({ where: { siret: parent.siret } })

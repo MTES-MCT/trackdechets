@@ -49,11 +49,7 @@ const editableFields = {
     work: ifAwaitingSignature("WORK")
   },
   broker: ifAwaitingSignature("EMISSION"),
-  transporter: {
-    company: ifAwaitingSignature("EMISSION"),
-    recepisse: ifAwaitingSignature("TRANSPORT"),
-    transport: ifAwaitingSignature("TRANSPORT")
-  },
+  transporter: ifAwaitingSignature("TRANSPORT"),
   grouping: ifAwaitingSignature("EMISSION"),
   forwarding: ifAwaitingSignature("EMISSION")
 };

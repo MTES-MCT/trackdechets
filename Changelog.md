@@ -142,6 +142,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Nombreuses améliorations et corrections de bugs sur les formulaires de création de bordereaux VHU et BSDA [PR 1058](https://github.com/MTES-MCT/trackdechets/pull/1058)
+
 #### :memo: Documentation
 
 #### :house: Interne

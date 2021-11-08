@@ -51,7 +51,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
             weight: { isEstimate: true, value: 1.2 }
             destination: {
                 cap: "A cap"
-                plannedOperationCode: "D 13"
+                plannedOperationCode: "D 9"
                 company: {
                     siret: "${exutoireCompany.siret}"
                     name: "destination"
@@ -81,7 +81,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                   acceptationStatus: ACCEPTED
               }
               operation: {
-                  code: "R 13"
+                  code: "D 9"
                   date: "2020-06-30"
               }
           }
@@ -160,7 +160,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
               weight: { isEstimate: true, value: 1.2 }
               destination: {
                   cap: "A cap"
-                  plannedOperationCode: "D 13"
+                  plannedOperationCode: "D 9"
                   company: {
                       siret: "${destinationCompany.siret}"
                       name: "destination"
@@ -242,7 +242,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                       acceptationStatus: ACCEPTED
                   }
                   operation: {
-                      code: "R 13"
+                      code: "D 9"
                       date: "2020-06-30"
                   }
               }
@@ -331,7 +331,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                 }
                 destination: {
                     cap: "A cap"
-                    plannedOperationCode: "D 13"
+                    plannedOperationCode: "D 9"
                     company: {
                         siret: "${destinationCompany.siret}",
                         name: "destination"
@@ -432,7 +432,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                       acceptationStatus: ACCEPTED
                   }
                   operation: {
-                      code: "R 13"
+                      code: "D 9"
                       date: "2020-06-30"
                   }
               }

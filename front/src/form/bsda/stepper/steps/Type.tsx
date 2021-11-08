@@ -50,10 +50,10 @@ export function Type({ disabled }: Props) {
         ))}
       </div>
       {BsdaType.Gathering === type && (
-        <BsdaPicker singleSelect={false} name="grouping" />
+        <BsdaPicker singleSelect={false} name="grouping" code="D 13" />
       )}
       {BsdaType.Reshipment === type && (
-        <BsdaPicker singleSelect={true} name="forwarding" />
+        <BsdaPicker singleSelect={true} name="forwarding" code="D 15" />
       )}
     </>
   );
