@@ -207,69 +207,67 @@ async function validatePreviousBsdas(
   }
 }
 
-const emitterSchema: FactorySchemaOf<
-  BsdaValidationContext,
-  Emitter
-> = context =>
-  yup.object({
-    emitterIsPrivateIndividual: yup
-      .boolean()
-      .requiredIf(
-        context.emissionSignature,
-        `Émetteur: vous devez précisez si c'est un particulier ou un professionnel`
-      ),
-    emitterCompanyName: yup.string().when("emitterIsPrivateIndividual", {
-      is: true,
-      then: yup.string().nullable(true),
-      otherwise: yup
+const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
+  context =>
+    yup.object({
+      emitterIsPrivateIndividual: yup
+        .boolean()
+        .requiredIf(
+          context.emissionSignature,
+          `Émetteur: vous devez précisez si c'est un particulier ou un professionnel`
+        ),
+      emitterCompanyName: yup.string().when("emitterIsPrivateIndividual", {
+        is: true,
+        then: yup.string().nullable(true),
+        otherwise: yup
+          .string()
+          .requiredIf(
+            context.emissionSignature,
+            `Émetteur: ${MISSING_COMPANY_NAME}`
+          )
+      }),
+      emitterCompanySiret: yup.string().when("emitterIsPrivateIndividual", {
+        is: true,
+        then: yup.string().nullable(true),
+        otherwise: yup
+          .string()
+          .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
+          .requiredIf(
+            context.emissionSignature,
+            `Émetteur: ${MISSING_COMPANY_SIRET}`
+          )
+      }),
+      emitterCompanyAddress: yup
         .string()
         .requiredIf(
           context.emissionSignature,
-          `Émetteur: ${MISSING_COMPANY_NAME}`
-        )
-    }),
-    emitterCompanySiret: yup.string().when("emitterIsPrivateIndividual", {
-      is: true,
-      then: yup.string().nullable(true),
-      otherwise: yup
+          `Émetteur: ${MISSING_COMPANY_ADDRESS}`
+        ),
+      emitterCompanyContact: yup
         .string()
-        .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
         .requiredIf(
           context.emissionSignature,
-          `Émetteur: ${MISSING_COMPANY_SIRET}`
-        )
-    }),
-    emitterCompanyAddress: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature,
-        `Émetteur: ${MISSING_COMPANY_ADDRESS}`
-      ),
-    emitterCompanyContact: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature,
-        `Émetteur: ${MISSING_COMPANY_CONTACT}`
-      ),
-    emitterCompanyPhone: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature,
-        `Émetteur: ${MISSING_COMPANY_PHONE}`
-      ),
-    emitterCompanyMail: yup
-      .string()
-      .email()
-      .requiredIf(
-        context.emissionSignature,
-        `Émetteur: ${MISSING_COMPANY_EMAIL}`
-      ),
-    emitterPickupSiteAddress: yup.string().nullable(),
-    emitterPickupSiteCity: yup.string().nullable(),
-    emitterPickupSiteInfos: yup.string().nullable(),
-    emitterPickupSiteName: yup.string().nullable(),
-    emitterPickupSitePostalCode: yup.string().nullable()
-  });
+          `Émetteur: ${MISSING_COMPANY_CONTACT}`
+        ),
+      emitterCompanyPhone: yup
+        .string()
+        .requiredIf(
+          context.emissionSignature,
+          `Émetteur: ${MISSING_COMPANY_PHONE}`
+        ),
+      emitterCompanyMail: yup
+        .string()
+        .email()
+        .requiredIf(
+          context.emissionSignature,
+          `Émetteur: ${MISSING_COMPANY_EMAIL}`
+        ),
+      emitterPickupSiteAddress: yup.string().nullable(),
+      emitterPickupSiteCity: yup.string().nullable(),
+      emitterPickupSiteInfos: yup.string().nullable(),
+      emitterPickupSiteName: yup.string().nullable(),
+      emitterPickupSitePostalCode: yup.string().nullable()
+    });
 
 const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
   yup.object({
@@ -429,88 +427,86 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         ) as any
     });
 
-const transporterSchema: FactorySchemaOf<
-  BsdaValidationContext,
-  Transporter
-> = context =>
-  yup.object({
-    transporterRecepisseDepartment: yup
-      .string()
-      .when("transporterTvaIntracommunautaire", (tva, schema) => {
-        if (tva == null) {
-          return schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: le département associé au récépissé est obligatoire`
-          );
-        }
-        return schema.nullable().notRequired();
-      }),
-    transporterRecepisseNumber: yup
-      .string()
-      .when("transporterTvaIntracommunautaire", (tva, schema) => {
-        if (tva == null) {
-          return schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: le numéro de récépissé est obligatoire`
-          );
-        }
-        return schema.nullable().notRequired();
-      }),
-    transporterRecepisseValidityLimit: yup
-      .date()
-      .requiredIf(
-        context.transportSignature,
-        `Transporteur: ${MISSING_COMPANY_NAME}`
-      ) as any,
-    transporterCompanyName: yup
-      .string()
-      .requiredIf(
-        context.transportSignature,
-        `Transporteur: ${MISSING_COMPANY_NAME}`
-      ),
-    transporterCompanySiret: yup
-      .string()
-      .length(14, `Transporteur: ${INVALID_SIRET_LENGTH}`)
-      .when("transporterTvaIntracommunautaire", (tva, schema) => {
-        if (tva == null) {
-          return schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: le numéro SIRET est obligatoire pour une entreprise française`
-          );
-        }
-        return schema.nullable().notRequired();
-      }),
-    transporterCompanyAddress: yup
-      .string()
-      .requiredIf(
-        context.transportSignature,
-        `Transporteur: ${MISSING_COMPANY_ADDRESS}`
-      ),
-    transporterCompanyContact: yup
-      .string()
-      .requiredIf(
-        context.transportSignature,
-        `Transporteur: ${MISSING_COMPANY_CONTACT}`
-      ),
-    transporterCompanyPhone: yup
-      .string()
-      .requiredIf(
-        context.transportSignature,
-        `Transporteur: ${MISSING_COMPANY_PHONE}`
-      ),
-    transporterCompanyMail: yup
-      .string()
-      .email()
-      .requiredIf(
-        context.transportSignature,
-        `Transporteur: ${MISSING_COMPANY_EMAIL}`
-      ),
-    transporterCompanyVatNumber: yup.string().nullable(),
-    transporterTransportPlates: yup
-      .array()
-      .of(yup.string())
-      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
-  });
+const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
+  context =>
+    yup.object({
+      transporterRecepisseDepartment: yup
+        .string()
+        .when("transporterTvaIntracommunautaire", (tva, schema) => {
+          if (tva == null) {
+            return schema.requiredIf(
+              context.transportSignature,
+              `Transporteur: le département associé au récépissé est obligatoire`
+            );
+          }
+          return schema.nullable().notRequired();
+        }),
+      transporterRecepisseNumber: yup
+        .string()
+        .when("transporterTvaIntracommunautaire", (tva, schema) => {
+          if (tva == null) {
+            return schema.requiredIf(
+              context.transportSignature,
+              `Transporteur: le numéro de récépissé est obligatoire`
+            );
+          }
+          return schema.nullable().notRequired();
+        }),
+      transporterRecepisseValidityLimit: yup
+        .date()
+        .requiredIf(
+          context.transportSignature,
+          `Transporteur: ${MISSING_COMPANY_NAME}`
+        ) as any,
+      transporterCompanyName: yup
+        .string()
+        .requiredIf(
+          context.transportSignature,
+          `Transporteur: ${MISSING_COMPANY_NAME}`
+        ),
+      transporterCompanySiret: yup
+        .string()
+        .length(14, `Transporteur: ${INVALID_SIRET_LENGTH}`)
+        .when("transporterTvaIntracommunautaire", (tva, schema) => {
+          if (tva == null) {
+            return schema.requiredIf(
+              context.transportSignature,
+              `Transporteur: le numéro SIRET est obligatoire pour une entreprise française`
+            );
+          }
+          return schema.nullable().notRequired();
+        }),
+      transporterCompanyAddress: yup
+        .string()
+        .requiredIf(
+          context.transportSignature,
+          `Transporteur: ${MISSING_COMPANY_ADDRESS}`
+        ),
+      transporterCompanyContact: yup
+        .string()
+        .requiredIf(
+          context.transportSignature,
+          `Transporteur: ${MISSING_COMPANY_CONTACT}`
+        ),
+      transporterCompanyPhone: yup
+        .string()
+        .requiredIf(
+          context.transportSignature,
+          `Transporteur: ${MISSING_COMPANY_PHONE}`
+        ),
+      transporterCompanyMail: yup
+        .string()
+        .email()
+        .requiredIf(
+          context.transportSignature,
+          `Transporteur: ${MISSING_COMPANY_EMAIL}`
+        ),
+      transporterCompanyVatNumber: yup.string().nullable(),
+      transporterTransportPlates: yup
+        .array()
+        .of(yup.string())
+        .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
+    });
 
 const wasteDescriptionSchema: FactorySchemaOf<
   BsdaValidationContext,
