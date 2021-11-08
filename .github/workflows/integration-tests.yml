@@ -1,4 +1,3 @@
-
 name: Integration tests
 
 on: pull_request
@@ -6,6 +5,11 @@ on: pull_request
 jobs:
   back:
     runs-on: ubuntu-latest
+    name: Integration tests (chunk ${{ matrix.chunk }}/${{ strategy.job-total }})
+    strategy:
+      fail-fast: false
+      matrix:
+        chunk: [1, 2, 3, 4]
     defaults:
       run:
         working-directory: back/integration-tests
@@ -14,4 +18,4 @@ jobs:
       - name: Run integration tests
         run: |
           chmod +x ./run.sh
-          ./run.sh
+          ./run.sh -c ${{ matrix.chunk }}-${{ strategy.job-total }}

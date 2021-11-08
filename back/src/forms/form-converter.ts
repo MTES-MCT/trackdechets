@@ -117,6 +117,14 @@ export function chain<T, K>(o: T, getter: (o: T) => K): K | null | undefined {
   return getter(o);
 }
 
+export function undefinedOrDefault<I>(value: I, defaultValue: I): I {
+  if (value === null) {
+    return defaultValue;
+  }
+
+  return value;
+}
+
 function flattenDestinationInput(input: {
   destination?: DestinationInput;
 }): Prisma.TemporaryStorageDetailCreateInput {
@@ -763,6 +771,7 @@ function getProcessedPackagingInfos(wasteDetails: Partial<WasteDetailsInput>) {
     }));
   }
 
-  // otherwise return packagingInfos "as is". It can be null or undefined
-  return wasteDetails.packagingInfos;
+  // Otherwise return packagingInfos "as is".
+  // Always default to an empty array to avoid unhandled `null` for JSON fields in prisma
+  return undefinedOrDefault(wasteDetails.packagingInfos, []);
 }

@@ -1,4 +1,9 @@
-import { chain, nullIfNoValues, safeInput } from "../forms/form-converter";
+import {
+  chain,
+  nullIfNoValues,
+  safeInput,
+  undefinedOrDefault
+} from "../forms/form-converter";
 import {
   FormCompany,
   Signature,
@@ -177,7 +182,10 @@ export function flattenBsdaInput(
     ...flattenBsdaWorkerInput(formInput),
     ...flattenBsdaBrokerInput(formInput),
     ...flattenBsdaWasteInput(formInput),
-    packagings: chain(formInput, f => f.packagings),
+    packagings: undefinedOrDefault(
+      chain(formInput, f => f.packagings),
+      []
+    ),
     ...flattenBsdaWeightInput(formInput)
   });
 }
