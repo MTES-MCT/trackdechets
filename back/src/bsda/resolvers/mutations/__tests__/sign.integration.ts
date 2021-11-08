@@ -663,7 +663,7 @@ describe("Mutation.Bsda.sign", () => {
           emitterCompanySiret: ttr2.siret,
           transporterCompanySiret: transporter.siret,
           destinationCompanySiret: destination.siret,
-          destinationOperationCode: "D 10",
+          destinationOperationCode: "D 9",
           forwarding: { connect: { id: bsda2.id } }
         }
       });
