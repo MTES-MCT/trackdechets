@@ -286,3 +286,11 @@ input VerifyCompanyByAdminInput {
 input SendVerificationCodeLetterInput {
   siret: String!
 }
+
+input AnonymousCompanyInput {
+  siret: String!
+  name: String!
+  codeNaf: String!
+  address: String!
+  codeCommune: String!
+}

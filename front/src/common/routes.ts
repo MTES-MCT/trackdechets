@@ -2,6 +2,7 @@ export default {
   admin: {
     index: "/admin",
     verification: "/admin/verification",
+    anonymousCompany: "/admin/anonymous-company",
   },
   login: "/login",
   invite: "/invite",

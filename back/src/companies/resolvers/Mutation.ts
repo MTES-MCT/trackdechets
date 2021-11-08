@@ -19,6 +19,7 @@ import verifyCompanyByAdmin from "./mutations/verifyCompanyByAdmin";
 import sendVerificationCodeLetter from "./mutations/sendVerificationCodeLetter";
 import createTestCompany from "./mutations/createTestCompany";
 import deleteCompany from "./mutations/deleteCompany";
+import createAnonymousCompany from "./mutations/createAnonymousCompany";
 
 const Mutation: MutationResolvers = {
   createCompany,
@@ -40,7 +41,8 @@ const Mutation: MutationResolvers = {
   verifyCompanyByAdmin,
   sendVerificationCodeLetter,
   createTestCompany,
-  deleteCompany
+  deleteCompany,
+  createAnonymousCompany
 };
 
 export default Mutation;

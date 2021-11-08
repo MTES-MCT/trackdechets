@@ -2,6 +2,7 @@ import SideMenu from "common/components/SideMenu";
 import routes from "common/routes";
 import React from "react";
 import { NavLink, Switch, Route, Redirect } from "react-router-dom";
+import { CreateAnonymousCompany } from "./anonymousCompany";
 import CompaniesVerification from "./verification/CompaniesVerification";
 
 /**
@@ -23,6 +24,15 @@ export default function Admin() {
                 Vérification
               </NavLink>
             </li>
+            <li className="tw-mb-1">
+              <NavLink
+                to={routes.admin.anonymousCompany}
+                className="sidebar__link"
+                activeClassName="sidebar__link--active"
+              >
+                Entreprise anonyme
+              </NavLink>
+            </li>
           </ul>
         </>
       </SideMenu>
@@ -30,6 +40,9 @@ export default function Admin() {
         <Switch>
           <Route exact path={routes.admin.verification}>
             <CompaniesVerification />
+          </Route>
+          <Route exact path={routes.admin.anonymousCompany}>
+            <CreateAnonymousCompany />
           </Route>
           <Redirect to={routes.admin.verification} />
         </Switch>
