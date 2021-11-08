@@ -81,7 +81,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                   acceptationStatus: ACCEPTED
               }
               operation: {
-                  code: "R 13"
+                  code: "D 13"
                   date: "2020-06-30"
               }
           }
@@ -242,7 +242,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                       acceptationStatus: ACCEPTED
                   }
                   operation: {
-                      code: "R 13"
+                      code: "D 13"
                       date: "2020-06-30"
                   }
               }
@@ -432,7 +432,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                       acceptationStatus: ACCEPTED
                   }
                   operation: {
-                      code: "R 13"
+                      code: "D 13"
                       date: "2020-06-30"
                   }
               }
