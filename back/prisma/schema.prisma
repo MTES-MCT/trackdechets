@@ -871,12 +871,9 @@ model Bsff {
 
   destinationCap String?
 
-  ficheInterventions BsffFicheIntervention[] @relation("FicheInterventionToBsff")
-
   grouping    Bsff[]  @relation("BsffGrouping")
   groupedIn   Bsff?   @relation("BsffGrouping", fields: [groupedInId], references: [id])
   groupedInId String?
-
 
   repackaging    Bsff[]  @relation("BsffRepackaging")
   repackagedIn   Bsff?   @relation("BsffRepackaging", fields: [repackagedInId], references: [id])
@@ -890,6 +887,8 @@ model Bsff {
   previousBsffs Bsff[]  @relation("BsffToBsff")
   nextBsff      Bsff?   @relation("BsffToBsff", fields: [nextBsffId], references: [id])
   nextBsffId    String?
+
+  ficheInterventions BsffFicheIntervention[]
 }
 
 enum BsffType {
@@ -932,7 +931,9 @@ model BsffFicheIntervention {
   operateurCompanyPhone   String
   operateurCompanyMail    String
 
-  Bsff   Bsff?   @relation("FicheInterventionToBsff", fields: [bsffId], references: [id])
+  bsffs Bsff[]
+
+  // The following property is not used anymore and should be removed in the next version
   bsffId String?
 }
 

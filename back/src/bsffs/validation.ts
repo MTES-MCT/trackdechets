@@ -254,23 +254,6 @@ async function validateFicheInterventions(
       `Le type de bordereau choisi ne permet pas d'associer plusieurs fiches d'intervention.`
     );
   }
-
-  const errors = ficheInterventions.reduce<string[]>(
-    (acc, ficheIntervention) => {
-      if (ficheIntervention.bsffId && ficheIntervention.bsffId !== bsff.id) {
-        return acc.concat([
-          `La fiche d'intervention n°${ficheIntervention.numero} est déjà associé à un BSFF.`
-        ]);
-      }
-
-      return acc;
-    },
-    []
-  );
-
-  if (errors.length > 0) {
-    throw new UserInputError(errors.join("\n"));
-  }
 }
 
 const beforeEmissionSchema: yup.SchemaOf<

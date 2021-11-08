@@ -266,7 +266,7 @@ describe("Query.bsffs", () => {
       );
       previousBsffFicheIntervention =
         await prisma.bsffFicheIntervention.findFirst({
-          where: { bsffId: previousBsff.id }
+          where: { bsffs: { some: { id: { in: [previousBsff.id] } } } }
         });
     });
 

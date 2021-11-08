@@ -3,11 +3,11 @@ import { Bsda } from "@prisma/client";
 import prisma from "../../src/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
 
-@registerUpdater("Harmonize bsda", "Harmonize bsda", true)
+@registerUpdater("Harmonize bsda", "Harmonize bsda", false)
 export class HarmonizeBsda implements Updater {
   async run() {
     const bsdas = await prisma.bsda.findMany({
-      include: { bsdas: true },
+      include: { bsdas: true }
     });
 
     for (const bsda of bsdas) {
@@ -34,14 +34,14 @@ function setAssociations(
   }
   if (bsda.type === BsdaType.GATHERING) {
     data.grouping = {
-      connect: bsda.bsdas.map(({ id }) => ({ id })),
+      connect: bsda.bsdas.map(({ id }) => ({ id }))
     };
   }
 
   data.bsdas = {
     disconnect: bsda.bsdas.map(({ id }) => ({
-      id,
-    })),
+      id
+    }))
   };
 
   return data;

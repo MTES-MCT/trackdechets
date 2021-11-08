@@ -14,13 +14,18 @@ import { OPERATION } from "../../../constants";
 import {
   createBsff,
   createBsffAfterEmission,
-  createBsffAfterOperation
+  createBsffAfterOperation,
+  createBsffBeforeEmission,
+  createFicheIntervention
 } from "../../../__tests__/factories";
 
 const CREATE_DRAFT_BSFF = `
   mutation CreateDraftBsff($input: BsffInput!) {
     createDraftBsff(input: $input) {
       id
+      ficheInterventions {
+        id
+      }
     }
   }
 `;
@@ -102,6 +107,52 @@ describe("Mutation.createDraftBsff", () => {
           "Vous ne pouvez pas éditer un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas."
       })
     ]);
+  });
+
+  it("should link a fiche intervention to several bsffs", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const detenteur = await userWithCompanyFactory(UserRole.ADMIN);
+    const ficheIntervention = await createFicheIntervention({
+      operateur: emitter,
+      detenteur
+    });
+
+    // Create a first bsff linked to this fiche intervention
+    await createBsffBeforeEmission(
+      { emitter },
+      {
+        ficheInterventions: {
+          connect: {
+            id: ficheIntervention.id
+          }
+        }
+      }
+    );
+
+    const { mutate } = makeClient(emitter.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createDraftBsff">,
+      MutationCreateDraftBsffArgs
+    >(CREATE_DRAFT_BSFF, {
+      variables: {
+        input: {
+          emitter: {
+            company: {
+              name: emitter.company.name,
+              siret: emitter.company.siret,
+              address: emitter.company.address,
+              contact: emitter.user.name,
+              mail: emitter.user.email
+            }
+          },
+          ficheInterventions: [ficheIntervention.id]
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.createDraftBsff.ficheInterventions).toHaveLength(1);
   });
 
   describe("when adding previous bsffs", () => {
