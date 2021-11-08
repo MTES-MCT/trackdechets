@@ -1,0 +1,7 @@
+type Application {
+  id: String!
+  name: String!
+  logoUrl: String!
+  redirectUris: [String!]!
+  clientSecret: String!
+}

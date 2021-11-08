@@ -9,6 +9,7 @@ import bsdsResolvers from "./bsds/resolvers";
 import dasriResolvers from "./bsdasris/resolvers";
 import bsffResolvers from "./bsffs/resolvers";
 import bsdaResolvers from "./bsda/resolvers";
+import applicationResolvers from "./applications/resolvers";
 
 // Merge GraphQL schema by merging types definitions and resolvers
 // from differents modules
@@ -22,7 +23,8 @@ const repositories = [
   "bsds",
   "bsdasris",
   "bsffs",
-  "bsda"
+  "bsda",
+  "applications"
 ];
 
 const typeDefsPath = repositories.map(
@@ -42,7 +44,8 @@ const resolvers = [
   bsdsResolvers,
   dasriResolvers,
   bsffResolvers,
-  bsdaResolvers
+  bsdaResolvers,
+  applicationResolvers
 ];
 
 export { typeDefs, resolvers };
