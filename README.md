@@ -45,6 +45,9 @@ l'API Trackdéchets fait appel à plusieurs services externes :
 
 L'applicatif et les bases de données sont hebergées en mode PaaS chez Scalingo.
 
+![Infra TD](https://user-images.githubusercontent.com/2269165/140944341-b6a4499b-738a-4762-bfa9-14d7a0bab377.png)
+
+
 ## Outillage
 
 - [Github Actions](https://github.com/features/actions) pour l'intégration continue et le déploiement
