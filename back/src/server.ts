@@ -124,6 +124,9 @@ app.use(
 
 app.use(
   helmet({
+    hsts: {
+      maxAge: 31536000
+    },
     // Because of the GraphQL playground we have to override the default
     contentSecurityPolicy: {
       directives: {
