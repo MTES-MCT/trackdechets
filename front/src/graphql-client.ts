@@ -43,6 +43,9 @@ export default new ApolloClient({
           },
         },
       },
+      CompanyMember: {
+        keyFields: ["id", "role"],
+      },
     },
   }),
   link: ApolloLink.from([cleanTypeNameLink, httpLink]),
