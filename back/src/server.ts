@@ -124,9 +124,7 @@ app.use(
 
 app.use(
   helmet({
-    hsts: {
-      maxAge: 31536000
-    },
+    hsts: false, // Auto injected by Scalingo
     // Because of the GraphQL playground we have to override the default
     contentSecurityPolicy: {
       directives: {
