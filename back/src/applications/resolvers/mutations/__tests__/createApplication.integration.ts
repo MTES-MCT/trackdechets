@@ -18,7 +18,7 @@ const CREATE_APPLICATION = `
 describe("createApplication", () => {
   afterEach(resetDatabase);
 
-  it("should create an application", async () => {
+  it.skip("should create an application", async () => {
     const user = await userFactory();
     const { mutate } = makeClient(user);
 
@@ -44,7 +44,7 @@ describe("createApplication", () => {
     });
   });
 
-  it("should prevent creating an application if user already has one", async () => {
+  it.skip("should prevent creating an application if user already has one", async () => {
     const user = await userFactory({
       application: {
         create: {
