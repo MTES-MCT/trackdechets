@@ -8,6 +8,10 @@ import { ApplicationInputSchema } from "../../validation";
 
 const createApplicationResolver: MutationResolvers["createApplication"] =
   async (_, { input }, context) => {
+    throw new UserInputError(
+      "La création d'une application n'est pas encore disponible."
+    );
+
     applyAuthStrategies(context, [AuthType.Session]);
     const user = checkIsAuthenticated(context);
 
