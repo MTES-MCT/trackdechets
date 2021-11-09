@@ -5,7 +5,7 @@
 <img height="100px" style="margin-right: 20px" src="./front/public/trackdechets.png" alt="logo"></img>
 <img height="100px" src="./front/public/marianne_mte.svg" alt="logo"></img>
 
-Dépôt de code de la startup d'état **Trackdéchets** incubée à la Fabrique Numérique du Ministère de la Transition Écologique et Solidaire.
+Dépôt de code du projet **Trackdéchets** incubée à la Fabrique Numérique du Ministère de la Transition Écologique.
 
 Ce `README` s'adresse aux intervenant·es techniques sur le projet. Pour plus d'infos en tant qu'utilisateur.ice du produit ou de l'API, vous pouvez consulter les liens suivants:
 
@@ -14,46 +14,66 @@ Ce `README` s'adresse aux intervenant·es techniques sur le projet. Pour plus d'
 - [Documentation technique de l'API](https://developers.trackdechets.beta.gouv.fr)
 - [Forum technique](https://forum.trackdechets.beta.gouv.fr)
 
+
+
 ## Architecture logicielle
 
-Le projet utilise `docker-compose` avec les différents services suivants:
+Le projet est constitué de trois briques logicielles principales :
 
-- `td-api` (`./back`) Serveur Express.js avec une API GraphQL (Node.js)
-- `td-ui` (`./front`) Single Page App pour la page d'accueil et le dashboard (React.js)
+| | back  | front | doc |
+|:---------------| :--------------- |:---------------| :-----|
+| Description | API Trackdéchets | Interface graphique (SPA)| Documentation technique |
+| Technologies | Node.js <br/> Typescript <br/> Express.js <br/> Apollo Server <br/> Prisma ORM <br/> PostgreSQL </br> Elasticsearch | React.js <br/> Typescript <br/> Apollo Client | Docusaurus |
 
-La config `nginx` pour chaque container exposé est créee de façon automatique grâce à [jwilder/nginx-proxy](https://github.com/nginx-proxy/nginx-proxy)
+## Dépôts de code connexes
 
-![stack](./stack.png)
+- [trackdechets-website](https://github.com/MTES-MCT/trackdechets-website) (site web statique https://trackdechets.beta.gouv.fr/)
+- [trackdechets-backups ](https://github.com/MTES-MCT/trackdechets-backups) (jobs cron permettant de réaliser des backups des bases de données sur une autre infra)
+- [trackdechets-metabase](https://github.com/MTES-MCT/trackdechets-metabase) (guide d'administration de metabase permettant de visualiser les données)
+- [trackdechets-etl](https://github.com/MTES-MCT/trackdechets-etl) (script d'import des données ICPE)
 
-## Environnements
+## Services externes
 
-Plusieurs environnements sont configurés via les différents fichiers compose.
-
-- **dev** pour le développement en local
-- **test** pour faire tourner les tests, en local ou sur CircleCI
-- **recette**: environnement de validation fonctionnelle, synchronisé avec la branche `dev`.
-- **sandbox**: environnement "bac à sable" pour les personnes souhaitant s'interfacer avec l'API Trackdéchets, synchronisé avec la branche `master`
-- **prod**: environnement de production, synchronisé avec la branche `master`
-
+l'API Trackdéchets fait appel à plusieurs services externes :
+- API SIRENE de l'INSEE.
+- API SIRENE etalab `entreprise.data.gouv.fr` (en redondance de l'API INSEE).
+- Sendinblue pour l'envoi d'e-mails transactionnels.
+- MySendingBox pour l'envoi de courrier papier.
+- Serveur Gotenberg (auto-hébergé) pour le rendu des PDFs
+- Serveur Metabase (auto-hebergé) pour les analytics
 ## Infrastructure
 
-Les différentes instances sont hébérgées chez OVH et Scaleway. Le détail est disponible dans la carte correspondante sur [Trello](https://trello.com/c/zZJskt5m)
+L'applicatif et les bases de données sont hebergées en mode PaaS chez Scalingo.
 
 ## Outillage
 
-- [CircleCI](https://circleci.com/) pour l'intégration continue et le déploiement
+- [Github Actions](https://github.com/features/actions) pour l'intégration continue et le déploiement
 - [Sentry](https://sentry.io) pour le reporting des erreurs
+- [Datadog](https://www.datadoghq.eu) pour le monitoring
 - [Graylog](https://www.graylog.org/) pour l'indexation des logs
 - [Metabase](https://www.metabase.com/) pour l'analyse et la visualisation des données Trackdéchets
 - [Matomo](https://fr.matomo.org/) pour l'analyse du traffic web
 - [Updown](https://updown.io/) pour la page de statuts et les alertes
 - [graphql-codegen](https://graphql-code-generator.com/) pour générer la référence de l'API et le typage Typescript à partir des fichiers de définition GraphQL.
 
+
+## Environnements
+
+Trois environnements sont déployés en parallèle :
+- Recette (usage interne pour les tests de l'équipe)
+  - back : https://api.trackdechets.fr
+  - front : https://recette.trackdechets.fr
+- Sandbox (environnement "bac à sable" pour les intégrateurs)
+  - back : https://api.sandbox.trackdechets.beta.gouv.fr
+  - front : https://sandbox.trackdechets.beta.gouv.fr
+- Production
+  - back : https://api.trackdechets.beta.gouv.fr
+  - front : https://app.trackdechets.beta.gouv.fr
 ## Monitoring
 
 Deux pages de monitoring sont accessibles:
-- [Statuts API GraphQL](https://status.trackdechets.beta.gouv.fr)
-- [Statuts service d'envoi d'email](https://updown.io/jgo1)
+- [Statut API GraphQL Production](https://status.trackdechets.beta.gouv.fr)
+- [Statut API GraphQL Sandbox](https://status.sandbox.trackdechets.beta.gouv.fr)
 
 ## Compatibilité navigateur
 
