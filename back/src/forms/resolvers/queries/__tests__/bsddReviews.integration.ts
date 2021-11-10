@@ -41,7 +41,8 @@ describe("Mutation.bsddReviews", () => {
         bsddId: bsdd1.id,
         requestedById: otherCompany.id,
         validations: { create: { companyId: company.id } },
-        content: {}
+        content: {},
+        comment: ""
       }
     });
     await prisma.bsddReview.create({
@@ -49,7 +50,8 @@ describe("Mutation.bsddReviews", () => {
         bsddId: bsdd2.id,
         requestedById: company.id,
         validations: { create: { companyId: otherCompany.id } },
-        content: {}
+        content: {},
+        comment: ""
       }
     });
 
@@ -65,7 +67,8 @@ describe("Mutation.bsddReviews", () => {
             isSettled: true
           }
         },
-        content: {}
+        content: {},
+        comment: ""
       }
     });
     await prisma.bsddReview.create({
@@ -79,7 +82,8 @@ describe("Mutation.bsddReviews", () => {
             isSettled: true
           }
         },
-        content: {}
+        content: {},
+        comment: ""
       }
     });
 
@@ -115,7 +119,8 @@ describe("Mutation.bsddReviews", () => {
             isSettled: true
           }
         },
-        content: {}
+        content: {},
+        comment: ""
       }
     });
     await prisma.bsddReview.create({
@@ -129,7 +134,8 @@ describe("Mutation.bsddReviews", () => {
             isSettled: false
           }
         },
-        content: {}
+        content: {},
+        comment: ""
       }
     });
 
@@ -171,7 +177,8 @@ describe("Mutation.bsddReviews", () => {
             isSettled: true
           }
         },
-        content: {}
+        content: {},
+        comment: ""
       }
     });
     await prisma.bsddReview.create({
@@ -185,7 +192,8 @@ describe("Mutation.bsddReviews", () => {
             isSettled: true
           }
         },
-        content: {}
+        content: {},
+        comment: ""
       }
     });
 

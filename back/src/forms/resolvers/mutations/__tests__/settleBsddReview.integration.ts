@@ -64,7 +64,8 @@ describe("Mutation.settleBsddReview", () => {
       data: {
         bsddId: bsdd.id,
         requestedById: companyOfSomeoneElse.id,
-        content: {}
+        content: {},
+        comment: ""
       }
     });
 
@@ -97,7 +98,8 @@ describe("Mutation.settleBsddReview", () => {
         bsddId: bsdd.id,
         requestedById: company.id,
         validations: { create: { companyId: companyOfSomeoneElse.id } },
-        content: {}
+        content: {},
+        comment: ""
       }
     });
 
@@ -130,7 +132,8 @@ describe("Mutation.settleBsddReview", () => {
         bsddId: bsdd.id,
         requestedById: companyOfSomeoneElse.id,
         validations: { create: { companyId: company.id } },
-        content: {}
+        content: {},
+        comment: ""
       }
     });
 
@@ -166,7 +169,8 @@ describe("Mutation.settleBsddReview", () => {
         validations: {
           create: [{ companyId: company.id }, { companyId: thirdCompany.id }]
         },
-        content: {}
+        content: {},
+        comment: ""
       }
     });
 
@@ -224,7 +228,8 @@ describe("Mutation.settleBsddReview", () => {
         validations: {
           create: [{ companyId: company.id }, { companyId: thirdCompany.id }]
         },
-        content: {}
+        content: {},
+        comment: ""
       }
     });
 
@@ -281,7 +286,8 @@ describe("Mutation.settleBsddReview", () => {
         bsddId: bsdd.id,
         requestedById: companyOfSomeoneElse.id,
         validations: { create: { companyId: company.id } },
-        content: {}
+        content: {},
+        comment: ""
       }
     });
 
@@ -317,7 +323,8 @@ describe("Mutation.settleBsddReview", () => {
         bsddId: bsdd.id,
         requestedById: companyOfSomeoneElse.id,
         validations: { create: { companyId: company.id } },
-        content: { wasteDetailsCode: "01 03 08" }
+        content: { wasteDetailsCode: "01 03 08" },
+        comment: ""
       }
     });
 
@@ -356,7 +363,8 @@ describe("Mutation.settleBsddReview", () => {
         bsddId: bsdd.id,
         requestedById: companyOfSomeoneElse.id,
         validations: { create: { companyId: company.id } },
-        content: { wasteDetailsCode: "01 03 08" }
+        content: { wasteDetailsCode: "01 03 08" },
+        comment: ""
       }
     });
 
