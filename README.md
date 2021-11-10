@@ -5,7 +5,7 @@
 <img height="100px" style="margin-right: 20px" src="./front/public/trackdechets.png" alt="logo"></img>
 <img height="100px" src="./front/public/marianne_mte.svg" alt="logo"></img>
 
-Dépôt de code du projet **Trackdéchets** incubée à la Fabrique Numérique du Ministère de la Transition Écologique.
+Dépôt de code du projet **Trackdéchets** incubé à la Fabrique Numérique du Ministère de la Transition Écologique.
 
 Ce `README` s'adresse aux intervenant·es techniques sur le projet. Pour plus d'infos en tant qu'utilisateur.ice du produit ou de l'API, vous pouvez consulter les liens suivants:
 
@@ -43,7 +43,7 @@ l'API Trackdéchets fait appel à plusieurs services externes :
 - Serveur Metabase (auto-hebergé) pour les analytics
 ## Infrastructure
 
-L'applicatif et les bases de données sont hebergées en mode PaaS chez Scalingo.
+L'applicatif et les bases de données sont hebergés en mode PaaS chez Scalingo.
 
 ![Infra TD](https://user-images.githubusercontent.com/2269165/140944341-b6a4499b-738a-4762-bfa9-14d7a0bab377.png)
 
@@ -55,7 +55,7 @@ L'applicatif et les bases de données sont hebergées en mode PaaS chez Scalingo
 - [Datadog](https://www.datadoghq.eu) pour le monitoring
 - [Graylog](https://www.graylog.org/) pour l'indexation des logs
 - [Metabase](https://www.metabase.com/) pour l'analyse et la visualisation des données Trackdéchets
-- [Matomo](https://fr.matomo.org/) pour l'analyse du traffic web
+- [Matomo](https://fr.matomo.org/) pour l'analyse du trafic web
 - [Updown](https://updown.io/) pour la page de statuts et les alertes
 - [graphql-codegen](https://graphql-code-generator.com/) pour générer la référence de l'API et le typage Typescript à partir des fichiers de définition GraphQL.
 
