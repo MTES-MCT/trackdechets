@@ -10,8 +10,8 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 
 const CREATE_BSDD_REVIEW = `
-  mutation CreateBsddReview($bsddId: ID!, $input: BsddReviewFormInput!) {
-    createBsddReview(bsddId: $bsddId, input: $input) {
+  mutation CreateBsddReview($bsddId: ID!, $input: BsddReviewFormInput!, $comment: String!) {
+    createBsddReview(bsddId: $bsddId, input: $input, comment: $comment) {
       id
       bsddId
       content {
