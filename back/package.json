@@ -36,6 +36,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "dependencies": {
     "@elastic/elasticsearch": "^7.15.0",
     "@fast-csv/format": "^4.3.0",
