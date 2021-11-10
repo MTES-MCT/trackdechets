@@ -26,12 +26,12 @@ export function flattenBsffInput(
   return safeInput({
     type: bsffInput.type,
 
-    emitterCompanyName: bsffInput.emitter?.company.name,
-    emitterCompanySiret: bsffInput.emitter?.company.siret,
-    emitterCompanyAddress: bsffInput.emitter?.company.address,
-    emitterCompanyContact: bsffInput.emitter?.company.contact,
-    emitterCompanyPhone: bsffInput.emitter?.company.phone,
-    emitterCompanyMail: bsffInput.emitter?.company.mail,
+    emitterCompanyName: bsffInput.emitter?.company?.name,
+    emitterCompanySiret: bsffInput.emitter?.company?.siret,
+    emitterCompanyAddress: bsffInput.emitter?.company?.address,
+    emitterCompanyContact: bsffInput.emitter?.company?.contact,
+    emitterCompanyPhone: bsffInput.emitter?.company?.phone,
+    emitterCompanyMail: bsffInput.emitter?.company?.mail,
     emitterCustomInfo: bsffInput.emitter?.customInfo,
 
     packagings: bsffInput.packagings,
@@ -43,13 +43,13 @@ export function flattenBsffInput(
     weightValue: bsffInput.weight?.value,
     weightIsEstimate: bsffInput.weight?.isEstimate,
 
-    transporterCompanyName: bsffInput.transporter?.company.name,
-    transporterCompanySiret: bsffInput.transporter?.company.siret,
-    transporterCompanyVatNumber: bsffInput.transporter?.company.vatNumber,
-    transporterCompanyAddress: bsffInput.transporter?.company.address,
-    transporterCompanyContact: bsffInput.transporter?.company.contact,
-    transporterCompanyPhone: bsffInput.transporter?.company.phone,
-    transporterCompanyMail: bsffInput.transporter?.company.mail,
+    transporterCompanyName: bsffInput.transporter?.company?.name,
+    transporterCompanySiret: bsffInput.transporter?.company?.siret,
+    transporterCompanyVatNumber: bsffInput.transporter?.company?.vatNumber,
+    transporterCompanyAddress: bsffInput.transporter?.company?.address,
+    transporterCompanyContact: bsffInput.transporter?.company?.contact,
+    transporterCompanyPhone: bsffInput.transporter?.company?.phone,
+    transporterCompanyMail: bsffInput.transporter?.company?.mail,
     transporterCustomInfo: bsffInput.transporter?.customInfo,
 
     transporterRecepisseNumber: bsffInput.transporter?.recepisse?.number,
@@ -59,6 +59,8 @@ export function flattenBsffInput(
       bsffInput.transporter?.recepisse?.validityLimit,
 
     transporterTransportMode: bsffInput.transporter?.transport?.mode,
+    transporterTransportTakenOverAt:
+      bsffInput.transporter?.transport?.takenOverAt,
 
     destinationCompanyName: bsffInput.destination?.company?.name,
     destinationCompanySiret: bsffInput.destination?.company?.siret,
@@ -81,19 +83,19 @@ export function flattenBsffInput(
     destinationOperationCode: bsffInput.destination?.operation?.code,
 
     destinationOperationNextDestinationCompanyName:
-      bsffInput.destination?.operation?.nextDestination?.company.name,
+      bsffInput.destination?.operation?.nextDestination?.company?.name,
     destinationOperationNextDestinationCompanySiret:
-      bsffInput.destination?.operation?.nextDestination?.company.siret,
+      bsffInput.destination?.operation?.nextDestination?.company?.siret,
     destinationOperationNextDestinationCompanyVatNumber:
-      bsffInput.destination?.operation?.nextDestination?.company.vatNumber,
+      bsffInput.destination?.operation?.nextDestination?.company?.vatNumber,
     destinationOperationNextDestinationCompanyAddress:
-      bsffInput.destination?.operation?.nextDestination?.company.address,
+      bsffInput.destination?.operation?.nextDestination?.company?.address,
     destinationOperationNextDestinationCompanyContact:
-      bsffInput.destination?.operation?.nextDestination?.company.contact,
+      bsffInput.destination?.operation?.nextDestination?.company?.contact,
     destinationOperationNextDestinationCompanyPhone:
-      bsffInput.destination?.operation?.nextDestination?.company.phone,
+      bsffInput.destination?.operation?.nextDestination?.company?.phone,
     destinationOperationNextDestinationCompanyMail:
-      bsffInput.destination?.operation?.nextDestination?.company.mail,
+      bsffInput.destination?.operation?.nextDestination?.company?.mail,
 
     destinationCap: bsffInput.destination?.cap
   });
@@ -152,6 +154,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
       customInfo: prismaBsff.transporterCustomInfo,
       transport: nullIfNoValues<GraphQL.BsffTransport>({
         mode: prismaBsff.transporterTransportMode,
+        takenOverAt: prismaBsff.transporterTransportTakenOverAt,
         signature: nullIfNoValues<GraphQL.Signature>({
           author: prismaBsff.transporterTransportSignatureAuthor,
           date: prismaBsff.transporterTransportSignatureDate
@@ -201,8 +204,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
           date: prismaBsff.destinationOperationSignatureDate
         })
       }),
-      plannedOperationCode:
-        prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode,
+      plannedOperationCode: prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode,
       cap: prismaBsff.destinationCap
     }),
     // the following relations will be set in Bsff resolver
