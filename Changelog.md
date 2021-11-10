@@ -32,6 +32,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :boom: Breaking changes
 
+- Ajout d'une date de prise en charge du déchet par le transporteur sur le `Bsff` [PR 1065](https://github.com/MTES-MCT/trackdechets/pull/1065)
+  - Ajout du champ `transporter.transport.takenOverAt` à l'objet `Bsff`
+  - Ajout du champ optionnel `takenOverAt` à l'input `BsffTransporterTransportInput`.
+  - Dans le cas où `takenOverAt` n'est pas renseigné, `bsff.transporter.transport.takenOverAt` renvoie la date de signature transport par défaut.
 #### :bug: Corrections de bugs
 
 - Correction d'une rare erreur d'affichage du rôle utilisateur sur la page "Mon compte -> Etablissements -> Membres" [PR 1061](https://github.com/MTES-MCT/trackdechets/pull/1061)
