@@ -57,9 +57,8 @@ async function updateReviewIfNecessary({ id, content, bsddId }: BsddReview) {
 
   const isReviewAccepted = validations.every(val => val.isAccepted);
   if (isReviewAccepted) {
-    const { temporaryStorageDetail, ...bsddReview } = content as Partial<
-      Prisma.FormUpdateInput
-    >;
+    const { temporaryStorageDetail, ...bsddReview } =
+      content as Partial<Prisma.FormUpdateInput>;
     await prisma.form.update({
       where: { id: bsddId },
       data: {

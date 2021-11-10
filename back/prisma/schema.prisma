@@ -363,6 +363,7 @@ model BsddReview {
   validations BsddReviewValidation[]
 
   content Json
+  comment String
 }
 
 model BsddReviewValidation {

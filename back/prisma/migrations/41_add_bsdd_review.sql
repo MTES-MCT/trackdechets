@@ -6,6 +6,7 @@ CREATE TABLE "default$default"."BsddReview" (
     "bsddId" TEXT NOT NULL,
     "requestedById" TEXT NOT NULL,
     "content" JSONB NOT NULL,
+    "comment" TEXT NOT NULL,
 
     PRIMARY KEY ("id")
 );

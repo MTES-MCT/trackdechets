@@ -24,7 +24,7 @@ import {
 
 export default async function createReview(
   _,
-  { bsddId, input }: MutationCreateBsddReviewArgs,
+  { bsddId, input, comment }: MutationCreateBsddReviewArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
@@ -71,7 +71,8 @@ export default async function createReview(
         create: allValidationCompanies
           .filter(company => company.id !== requesterCompany.id)
           .map(company => ({ companyId: company.id }))
-      }
+      },
+      comment
     }
   });
 }

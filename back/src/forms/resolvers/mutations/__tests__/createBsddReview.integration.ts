@@ -44,7 +44,8 @@ describe("Mutation.createBsddReview", () => {
     const { errors } = await mutate(CREATE_BSDD_REVIEW, {
       variables: {
         bsddId,
-        input: {}
+        input: {},
+        comment: ""
       }
     });
 
@@ -66,7 +67,8 @@ describe("Mutation.createBsddReview", () => {
     const { errors } = await mutate(CREATE_BSDD_REVIEW, {
       variables: {
         bsddId: bsdd.id,
-        input: {}
+        input: {},
+        comment: ""
       }
     });
 
@@ -92,7 +94,8 @@ describe("Mutation.createBsddReview", () => {
       {
         variables: {
           bsddId: bsdd.id,
-          input: {}
+          input: {},
+          comment: ""
         }
       }
     );
@@ -118,7 +121,8 @@ describe("Mutation.createBsddReview", () => {
       {
         variables: {
           bsddId: bsdd.id,
-          input: {}
+          input: {},
+          comment: ""
         }
       }
     );
@@ -139,7 +143,8 @@ describe("Mutation.createBsddReview", () => {
       await mutate(CREATE_BSDD_REVIEW, {
         variables: {
           bsddId: "",
-          input: { wasteDetails: { name: "I cannot change the name" } }
+          input: { wasteDetails: { name: "I cannot change the name" } },
+          comment: ""
         }
       });
     } catch (err) {
@@ -161,7 +166,8 @@ describe("Mutation.createBsddReview", () => {
     const { errors } = await mutate(CREATE_BSDD_REVIEW, {
       variables: {
         bsddId: bsdd.id,
-        input: { wasteDetails: { code: "Made up code" } }
+        input: { wasteDetails: { code: "Made up code" } },
+        comment: ""
       }
     });
 
@@ -188,7 +194,8 @@ describe("Mutation.createBsddReview", () => {
     >(CREATE_BSDD_REVIEW, {
       variables: {
         bsddId: bsdd.id,
-        input: { wasteDetails: { code: "01 03 08" } }
+        input: { wasteDetails: { code: "01 03 08" } },
+        comment: ""
       }
     });
 

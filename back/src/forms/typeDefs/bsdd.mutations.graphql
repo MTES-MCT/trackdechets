@@ -193,6 +193,8 @@ type Mutation {
     bsddId: ID!
     "Contenu de la révision"
     input: BsddReviewFormInput!
+    "Commentaire pour expliquer la demande de révision"
+    comment: String!
   ): BsddReview
 
   settleBsddReview(
