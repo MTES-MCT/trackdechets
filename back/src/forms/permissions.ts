@@ -351,3 +351,29 @@ export async function checkCanReview(user: User, form: Form) {
 
   return true;
 }
+
+export async function checkIsOneOfTheCompaniesMember(
+  userId: string,
+  companiesIds: string[]
+) {
+  const companyAssociation = await prisma.companyAssociation.findFirst({
+    where: {
+      userId: userId,
+      company: {
+        id: {
+          in: companiesIds
+        }
+      }
+    }
+  });
+
+  const isCompanyMember = companyAssociation != null;
+
+  if (isCompanyMember) {
+    return true;
+  }
+
+  throw new ForbiddenError(
+    "Vous n'êtes pas autorisé à consulter cette révision."
+  );
+}

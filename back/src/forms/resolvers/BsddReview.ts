@@ -31,6 +31,9 @@ const bsddReviewResolvers: BsddReviewResolvers = {
     return prisma.bsddReview
       .findUnique({ where: { id: parent.id } })
       .requestedBy();
+  },
+  bsdd: parent => {
+    return prisma.form.findUnique({ where: { id: parent.bsddId } });
   }
 };
 

@@ -526,6 +526,9 @@ type BsddReview {
   "Identifiant du bordereau concerné"
   bsddId: ID!
 
+  "Bordereau concerné"
+  bsdd: Form!
+
   "Entreprise à l'origine de la demande de révision"
   requestedBy: FormCompany!
 

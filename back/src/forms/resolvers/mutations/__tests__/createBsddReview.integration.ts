@@ -45,7 +45,7 @@ describe("Mutation.createBsddReview", () => {
       variables: {
         bsddId,
         input: {},
-        comment: ""
+        comment: "A comment"
       }
     });
 
@@ -68,7 +68,7 @@ describe("Mutation.createBsddReview", () => {
       variables: {
         bsddId: bsdd.id,
         input: {},
-        comment: ""
+        comment: "A comment"
       }
     });
 
@@ -95,7 +95,7 @@ describe("Mutation.createBsddReview", () => {
         variables: {
           bsddId: bsdd.id,
           input: {},
-          comment: ""
+          comment: "A comment"
         }
       }
     );
@@ -122,7 +122,7 @@ describe("Mutation.createBsddReview", () => {
         variables: {
           bsddId: bsdd.id,
           input: {},
-          comment: ""
+          comment: "A comment"
         }
       }
     );
@@ -144,7 +144,7 @@ describe("Mutation.createBsddReview", () => {
         variables: {
           bsddId: "",
           input: { wasteDetails: { name: "I cannot change the name" } },
-          comment: ""
+          comment: "A comment"
         }
       });
     } catch (err) {
@@ -167,7 +167,7 @@ describe("Mutation.createBsddReview", () => {
       variables: {
         bsddId: bsdd.id,
         input: { wasteDetails: { code: "Made up code" } },
-        comment: ""
+        comment: "A comment"
       }
     });
 
@@ -195,7 +195,7 @@ describe("Mutation.createBsddReview", () => {
       variables: {
         bsddId: bsdd.id,
         input: { wasteDetails: { code: "01 03 08" } },
-        comment: ""
+        comment: "A comment"
       }
     });
 

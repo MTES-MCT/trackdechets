@@ -241,4 +241,7 @@ type Query {
     "SIRET d'un établissement dont je suis membre"
     siret: String!
   ): [BsddReview!]
+
+  "Renvoie une demande de révision"
+  bsddReview("Identifiant de la demande" id: ID!): BsddReview!
 }
