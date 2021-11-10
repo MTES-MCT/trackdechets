@@ -1,0 +1,141 @@
+import React from "react";
+import {
+  Broker,
+  BsddRevisionRequest,
+  Mutation,
+  MutationSubmitBsddRevisionRequestApprovalArgs,
+  Trader,
+} from "generated/graphql/types";
+import { TdModalTrigger } from "common/components/Modal";
+import { ActionButton } from "common/components";
+import { IconCogApproved } from "common/components/Icons";
+import { RevisionField } from "./RevisionField";
+import { useMutation } from "@apollo/client";
+import { SUBMIT_BSDD_REVISION_REQUEST_APPROVAL } from "../query";
+
+type Props = {
+  review: BsddRevisionRequest;
+};
+
+export function BsddApproveRevision({ review }: Props) {
+  const [submitBsddRevisionRequestApproval, { loading }] = useMutation<
+    Pick<Mutation, "submitBsddRevisionRequestApproval">,
+    MutationSubmitBsddRevisionRequestApprovalArgs
+  >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL);
+
+  return (
+    <TdModalTrigger
+      ariaLabel="Acceptation d'une révision"
+      trigger={open => (
+        <ActionButton icon={<IconCogApproved size="24px" />} onClick={open}>
+          Acceptation d'une révision
+        </ActionButton>
+      )}
+      modalContent={close => (
+        <div>
+          <p className="tw-pb-6">
+            L'entreprise <strong>{review.author.name}</strong> propose les
+            révisions suivantes pour le bordereau{" "}
+            <strong>#{review.bsdd.readableId}</strong>
+          </p>
+
+          <div className="tw-flex tw-py-2">
+            <p className="tw-w-1/4 tw-font-bold">Commentaire</p>
+            <p className="tw-w-3/4">{review.bsdd.id}</p>
+          </div>
+
+          <RevisionField
+            label="code déchet"
+            bsddValue={review.bsdd.wasteDetails?.code}
+            reviewValue={review.content.wasteDetails?.code}
+          />
+
+          <RevisionField
+            label="POP"
+            bsddValue={review.bsdd.wasteDetails?.pop}
+            reviewValue={review.content.wasteDetails?.pop}
+          />
+
+          <RevisionField
+            label="CAP"
+            bsddValue={review.bsdd.recipient?.cap}
+            reviewValue={review.content.recipient?.cap}
+          />
+
+          <RevisionField
+            label="quantité reçue"
+            bsddValue={review.bsdd.quantityReceived}
+            reviewValue={review.content.quantityReceived}
+          />
+
+          <RevisionField
+            label="opération réalisée"
+            bsddValue={review.bsdd.processingOperationDone}
+            reviewValue={review.content.processingOperationDone}
+          />
+
+          <RevisionField
+            label="courtier"
+            bsddValue={review.bsdd.broker}
+            reviewValue={review.content.broker}
+            formatter={customFormatter}
+          />
+
+          <RevisionField
+            label="négociant"
+            bsddValue={review.bsdd.trader}
+            reviewValue={review.content.trader}
+            formatter={customFormatter}
+          />
+
+          <div className="form__actions">
+            <button
+              type="button"
+              className="btn btn--outline-primary"
+              onClick={async () => {
+                await submitBsddRevisionRequestApproval({
+                  variables: { id: review.id, isApproved: false },
+                });
+                close();
+              }}
+              disabled={loading}
+            >
+              Refuser
+            </button>
+
+            <button
+              type="submit"
+              className="btn btn--primary"
+              onClick={async () => {
+                await submitBsddRevisionRequestApproval({
+                  variables: { id: review.id, isApproved: true },
+                });
+                close();
+              }}
+              disabled={loading}
+            >
+              Accepter
+            </button>
+          </div>
+        </div>
+      )}
+    />
+  );
+}
+
+function customFormatter(entity: Trader | Broker | undefined): React.ReactNode {
+  if (!entity?.company?.name) return null;
+
+  return (
+    <>
+      <div>
+        {entity.company?.name} ({entity.company?.siret}) -{" "}
+        {entity.company?.address}
+      </div>
+      <div>
+        Récepissé: {entity.receipt} - Département: {entity.department} - Date
+        limite de validité: {entity.validityLimit}
+      </div>
+    </>
+  );
+}

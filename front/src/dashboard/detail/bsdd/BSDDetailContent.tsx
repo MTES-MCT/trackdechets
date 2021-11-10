@@ -599,6 +599,17 @@ export default function BSDDetailContent({
                 <IconPaperWrite size="24px" color="blueLight" />
                 <span>Modifier</span>
               </Link>
+
+              <Link
+                to={generatePath(routes.dashboard.bsdds.edit, {
+                  siret,
+                  id: form.id,
+                })}
+                className="btn btn--outline-primary"
+              >
+                <IconPaperWrite size="24px" color="blueLight" />
+                <span>Demander une révision</span>
+              </Link>
             </>
           )}
           <WorkflowAction siret={siret} form={form} />

@@ -77,7 +77,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                   Pdf
                 </MenuItem>
               )}
-              {[FormStatus.Draft, FormStatus.Sealed].includes(form.status) && (
+              {[FormStatus.Draft, FormStatus.Sealed].includes(form.status) ? (
                 <>
                   <MenuItem onSelect={() => setIsDeleting(true)}>
                     <IconTrash color="blueLight" size="24px" />
@@ -94,6 +94,20 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                     Modifier
                   </MenuLink>
                 </>
+              ) : (
+                <MenuLink
+                  as={Link}
+                  to={{
+                    pathname: generatePath(routes.dashboard.bsdds.review, {
+                      siret,
+                      id: form.id,
+                    }),
+                    state: { background: location },
+                  }}
+                >
+                  <IconPaperWrite size="24px" color="blueLight" />
+                  Révision
+                </MenuLink>
               )}
               <MenuItem onSelect={() => duplicateForm()}>
                 <IconDuplicateFile size="24px" color="blueLight" />
