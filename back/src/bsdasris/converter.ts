@@ -105,6 +105,7 @@ export function unflattenBsdasri(bsdasri: Bsdasri): GqlBsdasri {
       transport: nullIfNoValues<BsdasriTransport>({
         mode: bsdasri.transporterTransportMode,
         plates: bsdasri.transporterTransportPlates,
+
         weight: nullIfNoValues<BsdasriWeight>({
           value: bsdasri.transporterWasteWeightValue,
           isEstimate: bsdasri.transporterWasteWeightIsEstimate
@@ -164,7 +165,9 @@ export function unflattenBsdasri(bsdasri: Bsdasri): GqlBsdasri {
         })
       })
     }),
-
+    identificationNumbers: nullIfNoValues<string[]>(
+      bsdasri.identificationNumbers
+    ),
     createdAt: bsdasri.createdAt,
     updatedAt: bsdasri.updatedAt,
     status: bsdasri.status as BsdasriStatus,
@@ -451,10 +454,25 @@ function flattenOperationInput(input: { operation?: BsdasriOperationInput }) {
     )
   };
 }
+
+function flattenContainersInput(input: { identificationNumbers?: string[] }) {
+  if (!input?.identificationNumbers) {
+    return null;
+  }
+  return {
+    identificationNumbers: input.identificationNumbers
+  };
+}
+
 export function flattenBsdasriInput(
   formInput: Pick<
     BsdasriInput,
-    "waste" | "emitter" | "ecoOrganisme" | "transporter" | "destination"
+    | "waste"
+    | "emitter"
+    | "ecoOrganisme"
+    | "transporter"
+    | "destination"
+    | "identificationNumbers"
   >
 ): Partial<Prisma.BsdasriCreateInput> {
   return safeInput({
@@ -466,6 +484,8 @@ export function flattenBsdasriInput(
 
     ...flattenTransporterInput(formInput),
 
-    ...flattenDestinationInput(formInput)
+    ...flattenDestinationInput(formInput),
+
+    ...flattenContainersInput(formInput)
   });
 }

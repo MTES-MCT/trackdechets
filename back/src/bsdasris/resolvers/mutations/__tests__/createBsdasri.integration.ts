@@ -437,6 +437,71 @@ describe("Mutation.createDasri validation scenarii", () => {
       })
     ]);
   });
+  it("should allow containers numbers", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporterCompany = await companyFactory();
+
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 03*" },
+      identificationNumbers: ["GRV-XY12345", "GRV-VB45678"],
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: company.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+
+      transporter: {
+        company: {
+          mail: "trans@test.fr",
+          name: "El transporter",
+          siret: transporterCompany.siret,
+          contact: "Jason Statham",
+          phone: "06 18 76 02 00",
+          address: "avenue de la mer"
+        },
+        transport: {
+          weight: { value: 22, isEstimate: false },
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    expect(data.createBsdasri.identificationNumbers).toEqual([
+      "GRV-XY12345",
+      "GRV-VB45678"
+    ]);
+  });
 
   it("should allow up to 2 transporter plates", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");

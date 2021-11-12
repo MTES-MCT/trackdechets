@@ -250,7 +250,8 @@ describe("Mutation.updateBsdasri", () => {
         company: {
           mail: "recipient@test.test"
         }
-      }
+      },
+      identificationNumbers: ["abc", "def"]
     };
 
     await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
@@ -402,7 +403,8 @@ describe("Mutation.updateBsdasri", () => {
         company: {
           mail: "recipient@test.test"
         }
-      }
+      },
+      identificationNumbers: ["xyz", "bnh"]
     };
 
     await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {

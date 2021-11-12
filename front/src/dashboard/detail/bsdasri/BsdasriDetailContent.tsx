@@ -150,6 +150,14 @@ const Transporter = ({ form }: { form: Bsdasri }) => {
           label="Mode de transport"
         />
         <DetailRow
+          value={
+            transporter?.transport?.plates
+              ? transporter.transport.plates.join(", ")
+              : null
+          }
+          label="Immatriculation"
+        />
+        <DetailRow
           value={transporter?.transport?.weight?.value}
           label="Poids"
           units="kg"
@@ -389,6 +397,9 @@ export default function BsdasriDetailContent({
           </TabPanel>
         </div>
       </Tabs>
+      <DasriIdentificationNumbers
+        identificationNumbers={form?.identificationNumbers}
+      />
       <div className={styles.detailActions}>
         <button
           className="btn btn--outline-primary"
@@ -401,6 +412,15 @@ export default function BsdasriDetailContent({
     </div>
   );
 }
+
+const DasriIdentificationNumbers = ({ identificationNumbers }) =>
+  !!identificationNumbers ? (
+    <div className={styles.BsdasriIdentificationNumbersRow}>
+      <dt>Identifiants de containers:</dt>
+      <dd>{identificationNumbers ? identificationNumbers.join(" ,") : null}</dd>
+    </div>
+  ) : null;
+
 const Dasripackaging = ({
   packagings,
 }: {

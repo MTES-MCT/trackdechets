@@ -163,3 +163,14 @@
     background-color: $grey-lightest;
   }
 }
+
+.BsdasriIdentificationNumbersRow {
+  padding: 1rem;
+  border-top: 1px solid $grey;
+  display: flex;
+  dt {
+    color: $grey-dark;
+    font-weight: bold;
+    margin-right: 1rem;
+  }
+}

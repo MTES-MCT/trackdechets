@@ -7,7 +7,8 @@ import {
   toPrismaStringFilter,
   toPrismaNestedWhereInput,
   toPrismaGenericWhereInput,
-  toPrismaEnumFilter
+  toPrismaEnumFilter,
+  toPrismaStringNullableListFilter
 } from "../common/where";
 
 const toPrismaGroupableFilter = (groupable?: boolean) => {
@@ -62,6 +63,9 @@ function toPrismaBsdasriWhereInput(
     ),
     destinationOperationSignatureDate: toPrismaDateFilter(
       where?.destination?.operation?.signature?.date
+    ),
+    identificationNumbers: toPrismaStringNullableListFilter(
+      where?.identificationNumbers
     ),
     ...toPrismaGroupableFilter(where?.groupable)
   });

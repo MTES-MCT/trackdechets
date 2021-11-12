@@ -187,6 +187,7 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
           </label>
         </div>
       )}
+
       <div
         className={classNames("form__row", {
           "field-emphasis": transportEmphasis,
@@ -258,6 +259,13 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
           l'emport du déchet
         </p>
       )}
+      <div className="form__row">
+        <label>
+          Numéros de containers
+          <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> pour valider chacun" />
+          <TagsInput name="identificationNumbers" disabled={disabled} />
+        </label>
+      </div>
     </>
   );
 }
