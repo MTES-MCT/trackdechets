@@ -1,9 +1,7 @@
 type Query {
-  "EXPERIMENTAL - Ne pas utiliser dans un contexte de production"
   bsvhu(id: ID!): Bsvhu!
 
   """
-  EXPERIMENTAL - Ne pas utiliser dans un contexte de production
   Tous les arguments sont optionnels.
   Par défaut, retourne les 50 premiers bordereaux associés à entreprises dont vous êtes membres
   """
