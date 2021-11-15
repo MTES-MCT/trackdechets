@@ -79,6 +79,7 @@ type BsdasriWeight {
   "Le poids est-il estimé (pesé si false)"
   isEstimate: Boolean!
 }
+
 "Informations sur un poids reçu (toujours pesé)"
 type BsdasriOperationWeight {
   "Pois en kg (pesé)"
@@ -88,9 +89,9 @@ type BsdasriOperationWeight {
 "Informations relatives au déchet"
 type BsdasriWaste {
   "Code adr"
-  adr: String!
+  adr: String
   "Code déchet"
-  code: String!
+  code: String
 }
 
 "Informations relatives à l'acceptation ou au refus du déchet (Bsdasri)"

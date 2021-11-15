@@ -364,7 +364,47 @@ const wasteAcceptationFragment = gql`
     refusedWeight
   }
 `;
-export const dasriFragment = gql`
+
+export const dashboardDasriFragment = gql`
+  fragment DasriFragment on Bsdasri {
+    id
+    bsdasriStatus: status
+    type
+    isDraft
+    bsdasriWaste: waste {
+      code
+    }
+    emitter {
+      company {
+        ...CompanyFragment
+      }
+      emission {
+        isTakenOverWithoutEmitterSignature
+        isTakenOverWithSecretCode
+      }
+    }
+    transporter {
+      company {
+        ...CompanyFragment
+      }
+      customInfo
+      transport {
+        plates
+      }
+    }
+    destination {
+      company {
+        ...CompanyFragment
+      }
+    }
+    createdAt
+    updatedAt
+    allowDirectTakeOver
+  }
+  ${companyFragment}
+`;
+
+export const fullDasriFragment = gql`
   fragment DasriFragment on Bsdasri {
     id
     bsdasriStatus: status

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-import { dasriFragment } from "common/fragments";
+import { fullDasriFragment } from "common/fragments";
 
 export const GET_BSDASRI = gql`
   query Bsdasri($id: ID!) {
@@ -8,7 +8,7 @@ export const GET_BSDASRI = gql`
       ...DasriFragment
     }
   }
-  ${dasriFragment}
+  ${fullDasriFragment}
 `;
 
 export const CREATE_BSDASRI = gql`

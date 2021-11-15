@@ -34,6 +34,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Correction d'une rare erreur d'affichage du rôle utilisateur sur la page "Mon compte -> Etablissements -> Membres" [PR 1061](https://github.com/MTES-MCT/trackdechets/pull/1061)
+- Correction d'erreurs sur le bsdasri liées à l'harmmonisation et la gestion des plaques d'immatriculation [PR 1071](https://github.com/MTES-MCT/trackdechets/pull/1071)
 
 #### :nail_care: Améliorations
 

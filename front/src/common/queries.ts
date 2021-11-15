@@ -2,7 +2,8 @@ import { gql } from "@apollo/client";
 import {
   detailFormFragment,
   fullFormFragment,
-  dasriFragment,
+  fullDasriFragment,
+  dashboardDasriFragment,
   vhuFragment,
   bsdaFragment,
 } from "./fragments";
@@ -23,7 +24,7 @@ export const GET_DETAIL_DASRI = gql`
       ...DasriFragment
     }
   }
-  ${dasriFragment}
+  ${fullDasriFragment}
 `;
 
 export const GET_DETAIL_DASRI_WITH_METADATA = gql`
@@ -38,7 +39,7 @@ export const GET_DETAIL_DASRI_WITH_METADATA = gql`
       }
     }
   }
-  ${dasriFragment}
+  ${fullDasriFragment}
 `;
 
 export const GET_DASRI_METADATA = gql`
@@ -120,7 +121,7 @@ export const GET_BSDS = gql`
     }
   }
   ${fullFormFragment}
-  ${dasriFragment}
+  ${dashboardDasriFragment}
   ${vhuFragment}
   ${bsdaFragment}
 `;

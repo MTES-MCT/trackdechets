@@ -51,7 +51,7 @@ const getInitialState = (f?: Bsdasri | null) => ({
       weight: !!f?.transporter?.transport?.weight
         ? getInitialWeightFn(f?.transporter?.transport?.weight)
         : null,
-      plates: null,
+      plates: [],
       takenOverAt: null,
       handedOverAt: null,
       acceptation: {
