@@ -1,7 +1,11 @@
-import * as React from "react";
 import { gql, useMutation } from "@apollo/client";
-import { Formik, Form, Field } from "formik";
-import * as yup from "yup";
+import { Modal, RedErrorMessage } from "common/components";
+import { NotificationError } from "common/components/Error";
+import { IconClose } from "common/components/Icons";
+import { getInitialCompany } from "form/bsdd/utils/initial-state";
+import CompanySelector from "form/common/components/company/CompanySelector";
+import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import { Field, Form, Formik } from "formik";
 import {
   BsffFicheIntervention,
   BsffFicheInterventionInput,
@@ -9,12 +13,9 @@ import {
   Mutation,
   MutationCreateFicheInterventionBsffArgs,
 } from "generated/graphql/types";
-import { Modal, RedErrorMessage } from "common/components";
-import { IconClose } from "common/components/Icons";
-import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import CompanySelector from "form/common/components/company/CompanySelector";
-import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import { NotificationError } from "common/components/Error";
+import * as React from "react";
+import countries from "world-countries";
+import * as yup from "yup";
 import { FicheInterventionFragment } from "./utils/queries";
 
 const CREATE_BSFF_FICHE_INTERVENTION = gql`
@@ -34,6 +35,10 @@ const companySchema: yup.SchemaOf<CompanyInput> = yup.object({
   phone: yup.string().required(),
   siret: yup.string().required(),
   vatNumber: yup.string().nullable(),
+  country: yup
+    .string()
+    .oneOf([...countries.map(country => country.cca2), null])
+    .nullable(),
 });
 const detenteurSchema: yup.SchemaOf<
   BsffFicheInterventionInput["detenteur"]

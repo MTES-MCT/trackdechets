@@ -19,6 +19,11 @@ export const FAVORITES = gql`
         validityLimit
         department
       }
+      brokerReceipt {
+        receiptNumber
+        validityLimit
+        department
+      }
       vhuAgrementDemolisseur {
         agrementNumber
       }

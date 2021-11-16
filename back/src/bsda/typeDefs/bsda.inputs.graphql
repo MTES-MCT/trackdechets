@@ -200,7 +200,7 @@ input BsdaReceptionInput {
   "Quantité présentée"
   weight: Float
   "Lot accepté, accepté partiellement ou refusé"
-  acceptationStatus: BsdaAcceptationStatus
+  acceptationStatus: WasteAcceptationStatus
   "Motif de refus"
   refusalReason: String
 }
@@ -261,7 +261,7 @@ input BsdaRecepisseInput {
 input BsdaTransportInput {
   "Mode de transport"
   mode: TransportMode
-  "Plaque(s) d'immatriculation"
+  "Plaque(s) d'immatriculation - maximum 2"
   plates: [String!]
   "Date de prise en charge"
   takenOverAt: DateTime

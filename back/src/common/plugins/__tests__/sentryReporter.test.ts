@@ -17,42 +17,48 @@ const mockResolver = jest.fn();
 const mockFormatError = jest.fn();
 
 describe("graphqlErrorHandler", () => {
+  let request;
+
   afterEach(() => {
     jest.resetAllMocks();
   });
 
-  const app = express();
-  const typeDefs = gql`
-    type Query {
-      bim: String
-    }
-  `;
+  beforeAll(async () => {
+    const app = express();
+    const typeDefs = gql`
+      type Query {
+        bim: String
+      }
+    `;
 
-  const resolvers = {
-    Query: {
-      bim: mockResolver
-    }
-  };
+    const resolvers = {
+      Query: {
+        bim: mockResolver
+      }
+    };
 
-  const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    formatError: mockFormatError,
-    plugins: [sentryReporter]
+    const server = new ApolloServer({
+      typeDefs,
+      resolvers,
+      formatError: mockFormatError,
+      plugins: [sentryReporter]
+    });
+
+    await server.start();
+
+    server.applyMiddleware({
+      app,
+      cors: {
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
+        credentials: true
+      },
+      path: "/graphql"
+    });
+
+    request = supertest(app);
   });
-
-  server.applyMiddleware({
-    app,
-    cors: {
-      methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-      preflightContinue: false,
-      optionsSuccessStatus: 204,
-      credentials: true
-    },
-    path: "/graphql"
-  });
-
-  const request = supertest(app);
 
   it("should report unknown errors to sentry and attach sentryId to error", async () => {
     const sentryId = "sentry_id_1";

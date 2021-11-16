@@ -2,7 +2,11 @@
 
 * Emmanuel Flahaut - Intrapreneur
 * Claire Vigier - Coach
+* Maxime Teneur - Coach
 * Judith Lenglet - Business Developer
+* Fanny Marcon - Business Developer
+* Raphaël Yharrassarry - Designer
+* [Colin Maudry](https://github.com/ColinMaudry) - Ingénieur Données
 * [Orion Charlier](https://github.com/riron) - Développeur
 * [Benoît Guigal](https://github.com/benoitguigal) - Développeur
 * [Laurent Paoletti](https://github.com/providenz) - Développeur

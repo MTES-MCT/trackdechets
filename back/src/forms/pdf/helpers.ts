@@ -160,9 +160,8 @@ const getWasteDetailsConsistence = params => {
     return {};
   }
   return {
-    [`wasteDetailsConsistence${capitalize(
-      params.wasteDetailsConsistence
-    )}`]: true
+    [`wasteDetailsConsistence${capitalize(params.wasteDetailsConsistence)}`]:
+      true
   };
 };
 

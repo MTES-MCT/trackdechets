@@ -14,6 +14,12 @@ export const OPERATION: Record<
     description: "Récupération ou régénération des solvants",
     successors: []
   },
+  R3: {
+    code: "R3",
+    description:
+      "Recyclage ou récupération des substances organiques qui ne sont pas utilisées comme solvants (y compris les opérations de compostage et autres transformations biologiques)",
+    successors: []
+  },
   R12: {
     code: "R12",
     description:

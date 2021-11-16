@@ -22,15 +22,16 @@ export default function configureYup() {
     }
   });
 
-  yup.addMethod<yup.BaseSchema>(yup.mixed, "requiredIf", function requiredIf(
-    condition: boolean,
-    message?: string
-  ) {
-    if (condition) {
-      // nullable to treat null as a missing value, not a type error
-      return this.nullable().required(message);
-    }
+  yup.addMethod<yup.BaseSchema>(
+    yup.mixed,
+    "requiredIf",
+    function requiredIf(condition: boolean, message?: string) {
+      if (condition) {
+        // nullable to treat null as a missing value, not a type error
+        return this.nullable().required(message);
+      }
 
-    return this.nullable().notRequired();
-  });
+      return this.nullable().notRequired();
+    }
+  );
 }

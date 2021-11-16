@@ -1,4 +1,5 @@
 import React from "react";
+import { DEVELOPERS_DOCUMENTATION_URL } from "common/config";
 import AccountFieldApiKey from "./fields/AccountFieldApiKey";
 
 export default function AccountIntegrationApi() {
@@ -9,7 +10,7 @@ export default function AccountIntegrationApi() {
         informatique tierce (ERP, SaaS déchets, etc). Pour en savoir plus, nous
         vous invitons à consulter{" "}
         <a
-          href="https://developers.trackdechets.beta.gouv.fr/"
+          href={DEVELOPERS_DOCUMENTATION_URL}
           target="_blank"
           className="link"
           rel="noopener noreferrer"

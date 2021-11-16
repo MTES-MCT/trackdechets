@@ -21,9 +21,7 @@ const cssPaths = [
 export async function generateBsffPdf(bsff: Bsff) {
   const previousBsffs = await getBsffHistory(bsff);
   const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
-    where: {
-      bsffId: bsff.id
-    }
+    where: { bsffs: { some: { id: { in: [bsff.id] } } } }
   });
 
   const bsffType = {
@@ -36,6 +34,7 @@ export async function generateBsffPdf(bsff: Bsff) {
   };
   const bsffOperation = {
     isRecuperationR2: bsff.destinationOperationCode === OPERATION.R2.code,
+    isRecyclageR3: bsff.destinationOperationCode === OPERATION.R3.code,
     isIncinerationD10: bsff.destinationOperationCode === OPERATION.D10.code,
     isGroupementR12:
       bsff.destinationOperationCode === OPERATION.R12.code &&

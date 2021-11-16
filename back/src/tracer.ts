@@ -1,5 +1,7 @@
 import { tracer } from "dd-trace";
 
-tracer.init();
+if (process.env.NODE_ENV !== "test") {
+  tracer.init();
+}
 
 export { tracer };

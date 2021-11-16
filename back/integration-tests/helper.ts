@@ -56,10 +56,3 @@ export function refreshElasticSearch() {
 export function resetCache() {
   return redisClient.flushdb();
 }
-
-afterAll(async () => {
-  jest.restoreAllMocks();
-  await elasticSearch.close();
-  await redisClient.quit();
-  await prisma.$disconnect();
-});

@@ -170,6 +170,7 @@ export const PROCESSING_OPERATIONS_CODES: string[] = PROCESSING_OPERATIONS.map(
   operation => operation.code
 );
 
-export const PROCESSING_OPERATIONS_GROUPEMENT_CODES: string[] = PROCESSING_OPERATIONS.filter(
-  operation => operation.type === ProcessingOperationType.Groupement
-).map(operation => operation.code);
+export const PROCESSING_OPERATIONS_GROUPEMENT_CODES: string[] =
+  PROCESSING_OPERATIONS.filter(
+    operation => operation.type === ProcessingOperationType.Groupement
+  ).map(operation => operation.code);

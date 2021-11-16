@@ -15,7 +15,10 @@ export default function TagsInput(props) {
     const val = (e.target as HTMLInputElement).value;
     if (e.key === "Enter" && val) {
       e.preventDefault();
-      if (field.value?.find(tag => tag.toLowerCase() === val.toLowerCase())) {
+      if (
+        field.value?.find(tag => tag.toLowerCase() === val.toLowerCase()) ||
+        (props.limit && field.value?.length >= props.limit)
+      ) {
         return;
       }
       arrayHelpers.push(val);

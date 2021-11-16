@@ -21,10 +21,8 @@ describe("Mutation.signBsdasri transport", () => {
       allowBsdasriTakeOverWithoutSignature: true // company allow takeover without signature
     });
 
-    const {
-      user: transporter,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
       opt: {
@@ -59,10 +57,8 @@ describe("Mutation.signBsdasri transport", () => {
       allowBsdasriTakeOverWithoutSignature: true // company allow takeover without signature
     });
 
-    const {
-      user: transporter,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const groupingDasri = await bsdasriFactory({
       opt: {
@@ -93,10 +89,8 @@ describe("Mutation.signBsdasri transport", () => {
       allowBsdasriTakeOverWithoutSignature: true // company allow takeover without signature
     });
 
-    const {
-      user: transporter,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     // missing onu code
     const dasri = await bsdasriFactory({
@@ -125,10 +119,8 @@ describe("Mutation.signBsdasri transport", () => {
   it("should not put transport signature on an INITIAL dasri if not allowed by emitter company", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER"); // company forbid takeover without signature
 
-    const {
-      user: transporter,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     let dasri = await bsdasriFactory({
       opt: {

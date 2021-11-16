@@ -4,6 +4,51 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
+# Next release ~15/11
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :boom: Breaking changes
+
+- Harmonisation du statut d'acceptation du déchet [PR 1040](https://github.com/MTES-MCT/trackdechets/pull/1040)
+  - Remplacement de `BsdaAcceptationStatus`, `BsffAcceptationStatus` et `BsvhuAcceptationStatus` par `WasteAcceptationStatus`
+  - Remplacement de l'input `WasteAcceptationStatusInput` par l'enum `WasteAcceptationStatus`
+  - Les champs `Form.wasteAcceptationStatus`, `TemporaryStorer.wasteAcceptationStatus` et `BsdasriWasteAcceptation.status` ne sont plus du type `String` mais `WasteAcceptationStatus`
+
+#### :bug: Corrections de bugs
+
+
+#### :nail_care: Améliorations
+
+
+# [2021.11.1] 15/11/2021
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout du code de traitement R3 à la liste des traitements possibles pour le BSFF [PR 1037](https://github.com/MTES-MCT/trackdechets/pull/1037)
+- Ajout de la suppression d'un établissement depuis l'interface [PR 1053](https://github.com/MTES-MCT/trackdechets/pull/1053)
+- Il est maintenant possible de lier une fiche d'intervention à plusieurs BSFFs [PR 1033](https://github.com/MTES-MCT/trackdechets/pull/1033)
+
+#### :boom: Breaking changes
+
+#### :bug: Corrections de bugs
+
+- Correction d'une rare erreur d'affichage du rôle utilisateur sur la page "Mon compte -> Etablissements -> Membres" [PR 1061](https://github.com/MTES-MCT/trackdechets/pull/1061)
+- Correction d'erreurs sur le bsdasri liées à l'harmmonisation et la gestion des plaques d'immatriculation [PR 1071](https://github.com/MTES-MCT/trackdechets/pull/1071)
+
+#### :nail_care: Améliorations
+
+- Le nombre maximum de plaques d'immatriculations est limité à 2 sur les bsdasri et bsda [PR 1054](https://github.com/MTES-MCT/trackdechets/pull/1054)
+- Amélioration du PDF du bordereau amiante [PR 1050](https://github.com/MTES-MCT/trackdechets/pull/1050)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Rend le rate limit configurable [PR 1056](https://github.com/MTES-MCT/trackdechets/pull/1056)
+- Le champ installation de CompanyPrivate est dans son propre resolver [PR 1059](https://github.com/MTES-MCT/trackdechets/pull/1059)
+- Mise à jour de l'utilitaire de restauration [PR 1060](https://github.com/MTES-MCT/trackdechets/pull/1060)
+- Ajout de la création d'une entreprise anonyme via le panneau d'administration [PR 1057](https://github.com/MTES-MCT/trackdechets/pull/1057)
 
 # [2021.10.2] 25/10/2021
 
@@ -22,6 +67,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Correction de la recherche entreprise qui retournait des établissements fermés [PR 1046](https://github.com/MTES-MCT/trackdechets/pull/1046)
 - Correction du code APE renvoyé par `companyInfos` qui était celui du siège et non celui de l'établissement [PR 1046](https://github.com/MTES-MCT/trackdechets/pull/1046)
 - Correction d'un bug empêchant le courtier de créer un BSDA [PR 1008](https://github.com/MTES-MCT/trackdechets/pull/1008)
+
 #### :nail_care: Améliorations
 
 - Ajout d'un contrôle de cohérence centre émetteur vs destination initiale lors du regroupement de BSDD [PR 1028](https://github.com/MTES-MCT/trackdechets/pull/1028)
@@ -45,6 +91,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 #### :boom: Breaking changes
+
 #### :bug: Corrections de bugs
 
 - Correction d'un bug d'affichage dans la préparation d'un transfert multi-modal [PR 997](https://github.com/MTES-MCT/trackdechets/pull/997)
@@ -112,6 +159,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Correction de bugs de validation et de l'interface des bordereaux dasri [PR 960](https://github.com/MTES-MCT/trackdechets/pull/960)
 
 #### :nail_care: Améliorations
+
+- Nombreuses améliorations et corrections de bugs sur les formulaires de création de bordereaux VHU et BSDA [PR 1058](https://github.com/MTES-MCT/trackdechets/pull/1058)
 
 #### :memo: Documentation
 

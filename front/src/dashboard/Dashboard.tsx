@@ -36,6 +36,7 @@ import {
   RouteBsvhusView,
   RouteBsffsView,
   RouteBSDDsView,
+  RouteBSDasView,
 } from "./detail";
 import { RouteTransportToCollect, RouteTransportCollected } from "./transport";
 
@@ -137,6 +138,9 @@ export default function Dashboard() {
             </Route>
             <Route path={routes.dashboard.bsvhus.view}>
               <RouteBsvhusView />
+            </Route>
+            <Route path={routes.dashboard.bsdas.view}>
+              <RouteBSDasView />
             </Route>
             <Route path={routes.dashboard.bsffs.view}>
               <RouteBsffsView />
@@ -271,6 +275,17 @@ export default function Dashboard() {
                   wide={true}
                 >
                   <RouteBsvhusView />
+                </Modal>
+              </Route>
+              <Route path={routes.dashboard.bsdas.view}>
+                <Modal
+                  onClose={() => history.goBack()}
+                  ariaLabel="Aperçu du bordereau"
+                  isOpen
+                  padding={false}
+                  wide={true}
+                >
+                  <RouteBSDasView />
                 </Modal>
               </Route>
               <Route path={routes.dashboard.bsffs.view}>

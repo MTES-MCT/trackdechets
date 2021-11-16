@@ -7,6 +7,7 @@ import AccountCompanyInfo from "./AccountCompanyInfo";
 import AccountCompanySecurity from "./AccountCompanySecurity";
 import AccountCompanyMemberList from "./AccountCompanyMemberList";
 import AccountCompanyPage from "./AccountCompanyPage";
+import AccountCompanyAdvanced from "./AccountCompanyAdvanced";
 import styles from "./AccountCompany.module.scss";
 import { CompanyPrivate, UserRole } from "generated/graphql/types";
 
@@ -19,6 +20,7 @@ export enum Link {
   Signature = "Signature",
   Members = "Membres",
   CompanyPage = "Fiche Entreprise",
+  Advanced = "Avancé",
 }
 
 AccountCompany.fragments = {
@@ -69,6 +71,12 @@ export default function AccountCompany({ company }: Props) {
     />
   );
 
+  const advanced = (
+    <AccountCompanyAdvanced
+      company={filter(AccountCompanyAdvanced.fragments.company, company)}
+    />
+  );
+
   let activeContent: ReactNode = null;
 
   switch (activeLink) {
@@ -84,10 +92,13 @@ export default function AccountCompany({ company }: Props) {
     case Link.CompanyPage:
       activeContent = page;
       break;
+    case Link.Advanced:
+      activeContent = advanced;
+      break;
   }
 
   const links = isAdmin
-    ? [Link.Info, Link.Signature, Link.Members, Link.CompanyPage]
+    ? [Link.Info, Link.Signature, Link.Members, Link.CompanyPage, Link.Advanced]
     : [Link.Info, Link.Signature, Link.CompanyPage];
 
   return (

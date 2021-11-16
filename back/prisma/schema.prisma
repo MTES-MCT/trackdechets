@@ -264,10 +264,7 @@ model Form {
   transporterNumberPlate             String?
   wasteDetailsCode                   String?
   wasteDetailsOnuCode                String?
-  wasteDetailsPackagingInfos         Json?
-  wasteDetailsPackagings             Json?
-  wasteDetailsOtherPackaging         String?
-  wasteDetailsNumberOfPackages       Int?
+  wasteDetailsPackagingInfos         Json                    @default("[]")
   wasteDetailsQuantity               Float?
   wasteDetailsQuantityType           QuantityType?
   wasteDetailsPop                    Boolean                 @default(false)
@@ -439,10 +436,7 @@ model TemporaryStorageDetail {
   destinationCap                   String?
   destinationProcessingOperation   String?
   wasteDetailsOnuCode              String?
-  wasteDetailsPackagingInfos       Json?
-  wasteDetailsPackagings           Json?
-  wasteDetailsOtherPackaging       String?
-  wasteDetailsNumberOfPackages     Int?
+  wasteDetailsPackagingInfos       Json                    @default("[]")
   wasteDetailsQuantity             Float?
   wasteDetailsQuantityType         QuantityType?
   transporterCompanyName           String?
@@ -722,7 +716,7 @@ model Bsdasri {
   emitterWasteWeightValue                     Float? // kg
   emitterWasteWeightIsEstimate                Boolean?
   emitterWasteVolume                          Int? // liters
-  emitterWastePackagings                      Json?
+  emitterWastePackagings                      Json                    @default("[]")
   emissionSignatory                           User?                   @relation("BsdasriEmissionSignature", fields: [emissionSignatoryId], references: [id])
   emissionSignatoryId                         String?
   emitterEmissionSignatureDate                DateTime?
@@ -749,7 +743,7 @@ model Bsdasri {
   transporterWasteRefusalReason               String?
   transporterWasteRefusedWeightValue          Float? // kg
   transporterTakenOverAt                      DateTime?
-  transporterWastePackagings                  Json?
+  transporterWastePackagings                  Json                    @default("[]")
   transporterWasteWeightValue                 Float? // kg
   transporterWasteWeightIsEstimate            Boolean?
   transporterWasteVolume                      Int? // liters
@@ -768,7 +762,7 @@ model Bsdasri {
   destinationCompanyMail                      String?
   destinationCustomInfo                       String? // free field
   // reception
-  destinationWastePackagings                  Json?
+  destinationWastePackagings                  Json                    @default("[]")
   destinationReceptionAcceptationStatus       WasteAcceptationStatus?
   destinationReceptionWasteRefusalReason      String?
   destinationReceptionWasteRefusedWeightValue Float? // kg
@@ -877,27 +871,25 @@ model Bsff {
 
   destinationCap String?
 
-  ficheInterventions BsffFicheIntervention[] @relation("FicheInterventionToBsff")
-
   grouping    Bsff[]  @relation("BsffGrouping")
   groupedIn   Bsff?   @relation("BsffGrouping", fields: [groupedInId], references: [id])
   groupedInId String?
-
 
   repackaging    Bsff[]  @relation("BsffRepackaging")
   repackagedIn   Bsff?   @relation("BsffRepackaging", fields: [repackagedInId], references: [id])
   repackagedInId String?
 
   forwarding   Bsff?   @relation("BsffForwarding", fields: [forwardingId], references: [id])
-  forwardingId String?
+  forwardingId String? @unique
   forwardedIn  Bsff?   @relation("BsffForwarding")
 
   // DEPRECATED relations, to be deleted after data migration
   previousBsffs Bsff[]  @relation("BsffToBsff")
   nextBsff      Bsff?   @relation("BsffToBsff", fields: [nextBsffId], references: [id])
   nextBsffId    String?
-}
 
+  ficheInterventions BsffFicheIntervention[]
+}
 
 enum BsffType {
   TRACER_FLUIDE
@@ -939,7 +931,9 @@ model BsffFicheIntervention {
   operateurCompanyPhone   String
   operateurCompanyMail    String
 
-  Bsff   Bsff?   @relation("FicheInterventionToBsff", fields: [bsffId], references: [id])
+  bsffs Bsff[]
+
+  // The following property is not used anymore and should be removed in the next version
   bsffId String?
 }
 
@@ -1006,7 +1000,7 @@ model Bsda {
   wasteSealNumbers  String[]
   wasteAdr          String?
 
-  packagings       Json?
+  packagings       Json          @default("[]")
   // DEPRECATED - remove after migration
   quantityType     QuantityType?
   weightIsEstimate Boolean?

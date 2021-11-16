@@ -13,57 +13,54 @@ import { checkIsCompanyAdmin } from "../../permissions";
 import { membershipRequestRefused } from "../../../mailer/templates";
 import { renderMail } from "../../../mailer/templates/renderers";
 
-const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipRequest"] = async (
-  parent,
-  { id },
-  context
-) => {
-  applyAuthStrategies(context, [AuthType.Session]);
+const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipRequest"] =
+  async (parent, { id }, context) => {
+    applyAuthStrategies(context, [AuthType.Session]);
 
-  const user = checkIsAuthenticated(context);
+    const user = checkIsAuthenticated(context);
 
-  // throw error if membership request does not exist
-  const membershipRequest = await getMembershipRequestOrNotFoundError({ id });
+    // throw error if membership request does not exist
+    const membershipRequest = await getMembershipRequestOrNotFoundError({ id });
 
-  const company = await prisma.membershipRequest
-    .findUnique({ where: { id: membershipRequest.id } })
-    .company();
+    const company = await prisma.membershipRequest
+      .findUnique({ where: { id: membershipRequest.id } })
+      .company();
 
-  // check authenticated user is admin of the company
-  await checkIsCompanyAdmin(user, company);
+    // check authenticated user is admin of the company
+    await checkIsCompanyAdmin(user, company);
 
-  // throw error if membership request was already accepted
-  if (membershipRequest.status === "ACCEPTED") {
-    throw new MembershipRequestAlreadyAccepted();
-  }
-
-  // throw error if membership request was already refused
-  if (membershipRequest.status === "REFUSED") {
-    throw new MembershipRequestAlreadyRefused();
-  }
-
-  await prisma.membershipRequest.update({
-    where: { id },
-    data: {
-      status: "REFUSED",
-      statusUpdatedBy: user.email
+    // throw error if membership request was already accepted
+    if (membershipRequest.status === "ACCEPTED") {
+      throw new MembershipRequestAlreadyAccepted();
     }
-  });
 
-  // notify requester of refusal
-  const requester = await prisma.membershipRequest
-    .findUnique({ where: { id } })
-    .user();
-  const mail = renderMail(membershipRequestRefused, {
-    to: [{ email: requester.email, name: requester.name }],
-    variables: { companyName: company.name, companySiret: company.siret }
-  });
-  await sendMail(mail);
+    // throw error if membership request was already refused
+    if (membershipRequest.status === "REFUSED") {
+      throw new MembershipRequestAlreadyRefused();
+    }
 
-  const dbCompany = await prisma.company.findUnique({
-    where: { id: company.id }
-  });
-  return convertUrls(dbCompany);
-};
+    await prisma.membershipRequest.update({
+      where: { id },
+      data: {
+        status: "REFUSED",
+        statusUpdatedBy: user.email
+      }
+    });
+
+    // notify requester of refusal
+    const requester = await prisma.membershipRequest
+      .findUnique({ where: { id } })
+      .user();
+    const mail = renderMail(membershipRequestRefused, {
+      to: [{ email: requester.email, name: requester.name }],
+      variables: { companyName: company.name, companySiret: company.siret }
+    });
+    await sendMail(mail);
+
+    const dbCompany = await prisma.company.findUnique({
+      where: { id: company.id }
+    });
+    return convertUrls(dbCompany);
+  };
 
 export default refuseMembershipRequestResolver;

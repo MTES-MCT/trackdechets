@@ -72,16 +72,13 @@ export async function renewSecurityCodeFn(
   return convertUrls(updatedCompany);
 }
 
-const renewSecurityCodeResolver: MutationResolvers["renewSecurityCode"] = async (
-  parent,
-  { siret },
-  context
-) => {
-  applyAuthStrategies(context, [AuthType.Session]);
-  const user = checkIsAuthenticated(context);
-  const company = await getCompanyOrCompanyNotFound({ siret });
-  await checkIsCompanyAdmin(user, company);
-  return renewSecurityCodeFn(siret);
-};
+const renewSecurityCodeResolver: MutationResolvers["renewSecurityCode"] =
+  async (parent, { siret }, context) => {
+    applyAuthStrategies(context, [AuthType.Session]);
+    const user = checkIsAuthenticated(context);
+    const company = await getCompanyOrCompanyNotFound({ siret });
+    await checkIsCompanyAdmin(user, company);
+    return renewSecurityCodeFn(siret);
+  };
 
 export default renewSecurityCodeResolver;

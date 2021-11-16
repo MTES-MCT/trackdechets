@@ -117,6 +117,14 @@ export function chain<T, K>(o: T, getter: (o: T) => K): K | null | undefined {
   return getter(o);
 }
 
+export function undefinedOrDefault<I>(value: I, defaultValue: I): I {
+  if (value === null) {
+    return defaultValue;
+  }
+
+  return value;
+}
+
 function flattenDestinationInput(input: {
   destination?: DestinationInput;
 }): Prisma.TemporaryStorageDetailCreateInput {
@@ -384,14 +392,8 @@ export function flattenProcessedFormInput(
 export function flattenImportPaperFormInput(
   input: ImportPaperFormInput
 ): Partial<Prisma.FormCreateInput> {
-  const {
-    id,
-    customId,
-    signingInfo,
-    receivedInfo,
-    processedInfo,
-    ...rest
-  } = input;
+  const { id, customId, signingInfo, receivedInfo, processedInfo, ...rest } =
+    input;
 
   return safeInput({
     id,
@@ -660,7 +662,8 @@ export function expandTemporaryStorageFromDb(
       code: null,
       name: null,
       onuCode: temporaryStorageDetail.wasteDetailsOnuCode,
-      packagingInfos: temporaryStorageDetail.wasteDetailsPackagingInfos as PackagingInfo[],
+      packagingInfos:
+        temporaryStorageDetail.wasteDetailsPackagingInfos as PackagingInfo[],
       // DEPRECATED - To remove with old packaging fields
       ...getDeprecatedPackagingApiFields(
         temporaryStorageDetail.wasteDetailsPackagingInfos as PackagingInfo[]
@@ -768,6 +771,7 @@ function getProcessedPackagingInfos(wasteDetails: Partial<WasteDetailsInput>) {
     }));
   }
 
-  // otherwise return packagingInfos "as is". It can be null or undefined
-  return wasteDetails.packagingInfos;
+  // Otherwise return packagingInfos "as is".
+  // Always default to an empty array to avoid unhandled `null` for JSON fields in prisma
+  return undefinedOrDefault(wasteDetails.packagingInfos, []);
 }

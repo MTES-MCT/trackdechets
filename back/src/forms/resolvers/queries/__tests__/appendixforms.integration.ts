@@ -18,14 +18,10 @@ describe("Test appendixForms", () => {
     await resetDatabase();
   });
   it("should return appendixForms data", async () => {
-    const {
-      user: emitter,
-      company: emitterCompany
-    } = await userWithCompanyFactory("ADMIN");
-    const {
-      user: recipient,
-      company: recipientCompany
-    } = await userWithCompanyFactory("ADMIN");
+    const { user: emitter, company: emitterCompany } =
+      await userWithCompanyFactory("ADMIN");
+    const { user: recipient, company: recipientCompany } =
+      await userWithCompanyFactory("ADMIN");
 
     // This form is in AWAITING_GROUP and should be returned
     const form = await formFactory({
@@ -79,15 +75,11 @@ describe("Test appendixForms", () => {
   });
 
   it("should not return appendixForms data", async () => {
-    const {
-      user: emitter,
-      company: emitterCompany
-    } = await userWithCompanyFactory("ADMIN");
+    const { user: emitter, company: emitterCompany } =
+      await userWithCompanyFactory("ADMIN");
 
-    const {
-      user: recipient,
-      company: recipientCompany
-    } = await userWithCompanyFactory("ADMIN");
+    const { user: recipient, company: recipientCompany } =
+      await userWithCompanyFactory("ADMIN");
 
     await formFactory({
       ownerId: emitter.id,

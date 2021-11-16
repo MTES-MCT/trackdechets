@@ -71,3 +71,13 @@ type CompanyForVerificationConnection {
   totalCount: Int!
   companies: [CompanyForVerification!]!
 }
+
+type AnonymousCompany {
+  id: String!
+  address: String!
+  codeCommune: String!
+  codeNaf: String!
+  libelleNaf: String!
+  name: String!
+  siret: String!
+}

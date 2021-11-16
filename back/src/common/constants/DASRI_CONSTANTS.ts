@@ -54,13 +54,11 @@ export const DASRI_GROUPING_OPERATIONS = [
   }
 ];
 
-export const DASRI_GROUPING_OPERATIONS_CODES: string[] = DASRI_GROUPING_OPERATIONS.map(
-  operation => operation.code
-);
+export const DASRI_GROUPING_OPERATIONS_CODES: string[] =
+  DASRI_GROUPING_OPERATIONS.map(operation => operation.code);
 
-export const DASRI_PROCESSING_OPERATIONS_CODES: string[] = DASRI_PROCESSING_OPERATIONS.map(
-  operation => operation.code
-);
+export const DASRI_PROCESSING_OPERATIONS_CODES: string[] =
+  DASRI_PROCESSING_OPERATIONS.map(operation => operation.code);
 export const DASRI_ALL_OPERATIONS_CODES: string[] = [
   ...DASRI_PROCESSING_OPERATIONS_CODES,
   ...DASRI_GROUPING_OPERATIONS_CODES

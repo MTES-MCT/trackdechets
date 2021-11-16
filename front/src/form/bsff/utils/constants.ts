@@ -23,6 +23,12 @@ export const OPERATION: Record<
     description: "Récupération ou régénération des solvants",
     successors: [],
   },
+  [BsffOperationCode.R3]: {
+    code: BsffOperationCode.R3,
+    description:
+      "Recyclage ou récupération des substances organiques qui ne sont pas utilisées comme solvants (y compris les opérations de compostage et autres transformations biologiques)",
+    successors: [],
+  },
   [BsffOperationCode.R12]: {
     code: BsffOperationCode.R12,
     description:

@@ -264,9 +264,10 @@ describe("Query.bsffs", () => {
           }
         }
       );
-      previousBsffFicheIntervention = await prisma.bsffFicheIntervention.findFirst(
-        { where: { bsffId: previousBsff.id } }
-      );
+      previousBsffFicheIntervention =
+        await prisma.bsffFicheIntervention.findFirst({
+          where: { bsffs: { some: { id: { in: [previousBsff.id] } } } }
+        });
     });
 
     it("should list the grouping bsffs", async () => {

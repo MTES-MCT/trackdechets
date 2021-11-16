@@ -43,12 +43,6 @@ enum BsdaConsistence {
   OTHER
 }
 
-enum BsdaAcceptationStatus {
-  ACCEPTED
-  REFUSED
-  PARTIALLY_REFUSED
-}
-
 enum BsdaSignatureType {
   EMISSION
   WORK

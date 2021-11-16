@@ -13,10 +13,8 @@ describe("Mutation.signBsdasri emission with secret code", () => {
 
   it("should deny emission signature if secret code is incorrect", async () => {
     const { company } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: transporter,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     let dasri = await bsdasriFactory({
       opt: {
@@ -55,10 +53,8 @@ describe("Mutation.signBsdasri emission with secret code", () => {
 
   it("should put emission signature on a dasri when correct code is provided", async () => {
     const { company } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: transporter,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
       opt: {

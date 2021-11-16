@@ -56,7 +56,7 @@ export const machine = Machine<never, Event>(
             },
             {
               target: BsdaStatus.AWAITING_CHILD,
-              cond: "hasChildBsda"
+              cond: "isGroupingOrReshipmentOperation"
             },
             {
               target: BsdaStatus.PROCESSED
@@ -78,10 +78,8 @@ export const machine = Machine<never, Event>(
         event.bsda?.workerWorkHasEmitterPaperSignature,
       isCollectedBy2010: (_, event) =>
         event.bsda?.type === BsdaType.COLLECTION_2710,
-      hasChildBsda: (_, event) =>
-        [BsdaType.GATHERING, BsdaType.RESHIPMENT].includes(
-          event.bsda?.type as any
-        )
+      isGroupingOrReshipmentOperation: (_, event) =>
+        ["D 13", "D 15"].includes(event.bsda?.destinationOperationCode)
     }
   }
 );

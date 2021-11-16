@@ -51,15 +51,11 @@ describe("appendix2Forms resolver", () => {
   });
 
   it("should return appendix2 forms", async () => {
-    const {
-      user: emitter,
-      company: emitterCompany
-    } = await userWithCompanyFactory(UserRole.MEMBER);
+    const { user: emitter, company: emitterCompany } =
+      await userWithCompanyFactory(UserRole.MEMBER);
 
-    const {
-      user: collector,
-      company: collectorCompany
-    } = await userWithCompanyFactory(UserRole.MEMBER);
+    const { user: collector, company: collectorCompany } =
+      await userWithCompanyFactory(UserRole.MEMBER);
 
     const appendix2 = await formFactory({
       ownerId: emitter.id,

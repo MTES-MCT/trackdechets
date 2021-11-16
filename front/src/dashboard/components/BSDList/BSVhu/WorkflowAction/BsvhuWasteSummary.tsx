@@ -33,13 +33,13 @@ export function BsvhuWasteSummary({ bsvhu }: Props) {
         <DataListDescription>
           {bsvhu.destination?.reception?.quantity == null ? (
             <>
-              {bsvhu.quantity ?? 0} unité(s){" "}
-              {bsvhu.weight?.value && <>(tonne(s))</>}
+              {bsvhu.quantity ?? 0} unité(s) ({bsvhu.weight?.value || "?"}{" "}
+              tonne(s))
             </>
           ) : (
             <>
-              {bsvhu.destination.reception.quantity} unité(s){" "}
-              {bsvhu.destination.reception.weight && <>(tonne(s))</>}
+              {bsvhu.destination.reception.quantity} unité(s) (
+              {bsvhu.destination.reception.weight || "?"} tonne(s))
             </>
           )}
         </DataListDescription>

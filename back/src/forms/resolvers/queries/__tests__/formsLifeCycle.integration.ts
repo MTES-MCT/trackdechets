@@ -51,13 +51,8 @@ describe("Test formsLifeCycle query", () => {
     await resetDatabase();
   });
   it("should return statusLog data", async () => {
-    const {
-      emitter,
-      emitterCompany,
-      recipient,
-      recipientCompany,
-      form
-    } = await prepareDB();
+    const { emitter, emitterCompany, recipient, recipientCompany, form } =
+      await prepareDB();
 
     await prepareRedis({
       emitterCompany,
@@ -83,13 +78,8 @@ describe("Test formsLifeCycle query", () => {
   });
 
   it("should return not statusLog objects without null loggedAt", async () => {
-    const {
-      emitter,
-      emitterCompany,
-      recipient,
-      recipientCompany,
-      form
-    } = await prepareDB();
+    const { emitter, emitterCompany, recipient, recipientCompany, form } =
+      await prepareDB();
 
     await prepareRedis({
       emitterCompany,
@@ -113,13 +103,8 @@ describe("Test formsLifeCycle query", () => {
   });
 
   it("should return statusLog data after a given date", async () => {
-    const {
-      emitter,
-      emitterCompany,
-      recipient,
-      recipientCompany,
-      form
-    } = await prepareDB();
+    const { emitter, emitterCompany, recipient, recipientCompany, form } =
+      await prepareDB();
 
     await prepareRedis({
       emitterCompany,
@@ -157,13 +142,8 @@ describe("Test formsLifeCycle query", () => {
   });
 
   it("should return statusLog data before a given date", async () => {
-    const {
-      emitter,
-      emitterCompany,
-      recipient,
-      recipientCompany,
-      form
-    } = await prepareDB();
+    const { emitter, emitterCompany, recipient, recipientCompany, form } =
+      await prepareDB();
 
     await prepareRedis({
       emitterCompany,
@@ -201,13 +181,8 @@ describe("Test formsLifeCycle query", () => {
   });
 
   it("should return statusLog data filtered by formID", async () => {
-    const {
-      emitter,
-      emitterCompany,
-      recipient,
-      recipientCompany,
-      form
-    } = await prepareDB();
+    const { emitter, emitterCompany, recipient, recipientCompany, form } =
+      await prepareDB();
 
     const otherForm = await formFactory({
       ownerId: emitter.id,
@@ -249,13 +224,8 @@ describe("Test formsLifeCycle query", () => {
   });
 
   it("should return statusLog data filtered by siret", async () => {
-    const {
-      emitter,
-      emitterCompany,
-      recipient,
-      recipientCompany,
-      form
-    } = await prepareDB();
+    const { emitter, emitterCompany, recipient, recipientCompany, form } =
+      await prepareDB();
     await prepareRedis({
       emitterCompany,
       recipientCompany
@@ -310,13 +280,8 @@ describe("Test formsLifeCycle query", () => {
   });
 
   it("should not return statusLog data for deleted forms", async () => {
-    const {
-      emitter,
-      emitterCompany,
-      recipient,
-      recipientCompany,
-      form
-    } = await prepareDB();
+    const { emitter, emitterCompany, recipient, recipientCompany, form } =
+      await prepareDB();
 
     await prepareRedis({
       emitterCompany,
@@ -346,10 +311,8 @@ describe("Test formsLifeCycle query", () => {
   });
 
   it("should return statusLog data for which the current user is a trader on", async () => {
-    const {
-      user: trader,
-      company: tradingCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: trader, company: tradingCompany } =
+      await userWithCompanyFactory("MEMBER");
     const owner = await userFactory();
 
     const form = await formFactory({

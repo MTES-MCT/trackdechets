@@ -10,7 +10,7 @@ type BsvhuEdge {
 }
 
 type BsvhuMetadata {
-  errors: [BsvhuError!]!
+  errors: [BsvhuError!]
 }
 
 type BsvhuError {
@@ -111,7 +111,7 @@ type BsvhuReception {
   "Poids réel reçu"
   weight: Float
   "Lot accepté oui/non"
-  acceptationStatus: BsvhuAcceptationStatus
+  acceptationStatus: WasteAcceptationStatus
   "Motif de refus"
   refusalReason: String
   "Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)"

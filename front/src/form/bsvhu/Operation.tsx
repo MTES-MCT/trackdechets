@@ -64,11 +64,13 @@ export default function Operation() {
             </label>
           </div>
         ) : null}
+
+        <RedErrorMessage name="destination.reception.acceptationStatus" />
       </div>
 
       <div className="form__row">
         <label>
-          En tonnes
+          Poids accepté en tonnes
           <Field
             component={NumberInput}
             name="destination.reception.weight"
@@ -95,20 +97,6 @@ export default function Operation() {
           </div>
         </>
       )}
-
-      <h4 className="form__section-heading">Quantité</h4>
-      <div className="form__row">
-        <label>
-          En nombre
-          <Field
-            component={NumberInput}
-            name="destination.reception.quantity"
-            className="td-input td-input--small"
-          />
-        </label>
-
-        <RedErrorMessage name="destination.reception.quantity" />
-      </div>
 
       <h4 className="form__section-heading">Opération</h4>
       <div className="form__row">

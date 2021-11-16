@@ -23,10 +23,8 @@ describe("Mutation.signBsdasri operation", () => {
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
-    const {
-      user: recipient,
-      company: destinationCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: recipient, company: destinationCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
       opt: {
@@ -72,10 +70,8 @@ describe("Mutation.signBsdasri operation", () => {
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
-    const {
-      user: recipient,
-      company: destinationCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: recipient, company: destinationCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
       opt: {
@@ -111,10 +107,8 @@ describe("Mutation.signBsdasri operation", () => {
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
-    const {
-      user: recipient,
-      company: destinationCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: recipient, company: destinationCompany } =
+      await userWithCompanyFactory("MEMBER");
     const {
       destinationReceptionWasteWeightValue,
       ...processDataWithoutQuantity
@@ -159,14 +153,12 @@ describe("Mutation.signBsdasri operation", () => {
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
-    const {
-      user: recipient,
-      company: destinationCompany
-    } = await userWithCompanyFactory("MEMBER", {
-      companyTypes: {
-        set: [CompanyType.COLLECTOR]
-      }
-    });
+    const { user: recipient, company: destinationCompany } =
+      await userWithCompanyFactory("MEMBER", {
+        companyTypes: {
+          set: [CompanyType.COLLECTOR]
+        }
+      });
 
     const dasri = await bsdasriFactory({
       opt: {

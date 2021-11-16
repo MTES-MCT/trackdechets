@@ -10,18 +10,27 @@ import {
 } from "common/components";
 import { GET_BSDAS } from "form/bsda/stepper/queries";
 import { FieldArray, useField } from "formik";
-import { BsdaStatus, Query, QueryBsdasArgs } from "generated/graphql/types";
+import {
+  BsdaStatus,
+  CompanyInput,
+  Query,
+  QueryBsdasArgs,
+} from "generated/graphql/types";
 import React from "react";
 
-type Props = { singleSelect: boolean; name: string };
-export function BsdaPicker({ singleSelect, name }: Props) {
+type Props = { singleSelect: boolean; name: string; code: string };
+export function BsdaPicker({ singleSelect, name, code }: Props) {
   const { data } = useQuery<Pick<Query, "bsdas">, QueryBsdasArgs>(GET_BSDAS, {
     variables: {
       where: {
         status: { _eq: BsdaStatus.AwaitingChild },
+        destination: { operation: { code: { _eq: code } } },
       },
     },
   });
+  const [emitter, , { setValue: setEmitterCompany }] = useField<CompanyInput>(
+    "emitter.company"
+  );
 
   const [{ value: associations }] = useField<string[]>(name);
 
@@ -62,6 +71,11 @@ export function BsdaPicker({ singleSelect, name }: Props) {
 
                     if (singleSelect) pop();
                     push(bsda.id);
+
+                    if (!emitter && bsda.destination?.company) {
+                      const { country, ...company } = bsda.destination.company;
+                      setEmitterCompany(company);
+                    }
                   }}
                 >
                   <TableCell>

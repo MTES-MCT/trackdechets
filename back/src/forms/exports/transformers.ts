@@ -4,11 +4,8 @@ import { FormExpanded, FormFlattened } from "./types";
  * Flatten nested temporary storage detail object
  */
 export function flattenForm(formExpanded: FormExpanded): FormFlattened {
-  const {
-    recipientIsTempStorage,
-    temporaryStorageDetail,
-    ...rest
-  } = formExpanded;
+  const { recipientIsTempStorage, temporaryStorageDetail, ...rest } =
+    formExpanded;
 
   const form: FormFlattened = { ...rest };
 

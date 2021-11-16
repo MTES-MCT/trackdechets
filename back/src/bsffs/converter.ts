@@ -201,7 +201,8 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
           date: prismaBsff.destinationOperationSignatureDate
         })
       }),
-      plannedOperationCode: prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode,
+      plannedOperationCode:
+        prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode,
       cap: prismaBsff.destinationCap
     }),
     // the following relations will be set in Bsff resolver

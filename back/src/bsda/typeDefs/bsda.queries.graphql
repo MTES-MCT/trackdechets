@@ -1,8 +1,6 @@
 type Query {
-  "EXPERIMENTAL - Ne pas utiliser dans un contexte de production"
   bsda(id: ID!): Bsda!
 
-  "EXPERIMENTAL - Ne pas utiliser dans un contexte de production"
   bsdas(
     """
     (Optionnel) PAGINATION

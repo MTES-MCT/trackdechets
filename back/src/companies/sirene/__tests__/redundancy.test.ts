@@ -10,7 +10,7 @@ describe("redundant", () => {
   });
 
   it("should not call fallback function when the first function succeeds", async () => {
-    const fn = redundant<string>(fn1, fn2);
+    const fn = redundant(fn1, fn2);
 
     // test fn1 returns something
     fn1.mockResolvedValueOnce("bar");
@@ -28,7 +28,7 @@ describe("redundant", () => {
     fn1.mockRejectedValueOnce({ response: { status: 502 } });
     fn2.mockResolvedValueOnce("bar");
 
-    const fn = redundant<string>(fn1, fn2);
+    const fn = redundant(fn1, fn2);
     const response = await fn("foo");
     expect(response).toEqual("bar");
     // fn2 should have been called
@@ -37,7 +37,7 @@ describe("redundant", () => {
   });
 
   it("should call fallback function when the first function returns TOO_MANY_REQUESTS", async () => {
-    const fn = redundant<string>(fn1, fn2);
+    const fn = redundant(fn1, fn2);
 
     // test fn1 throw TooManyRequests
     fn1.mockRejectedValueOnce({
@@ -66,7 +66,7 @@ describe("redundant", () => {
       response: { status: 502, message: fn2BadGateway }
     });
 
-    const fn = redundant<string>(fn1, fn2);
+    const fn = redundant(fn1, fn2);
 
     try {
       await fn("foo");

@@ -11,6 +11,7 @@ input BsdasriTransporterWhere {
   company: CompanyWhere
   transport: BsdasriTransportWhere
 }
+
 input BsdasriTransportWhere {
   signature: SignatureWhere
 }
@@ -32,6 +33,7 @@ input BsdasriOperationWhere {
   signature: SignatureWhere
 }
 
+"Filtres possibles pour la récupération de bordereaux."
 input BsdasriWhere {
   "(Optionnel) Permet de récupérer uniquement les bordereaux en brouillon"
   isDraft: Boolean
@@ -99,6 +101,7 @@ input BsdasriWasteInput {
   adr: String
   code: String
 }
+
 input BsdasriEmissionInput {
   weight: BsdasriWeightInput
   packagings: [BsdasriPackagingsInput!]
@@ -120,16 +123,22 @@ input BsdasriEcoOrganismeInput {
 }
 
 input BsdasriWeightInput {
+  "Poids en kilogrammes"
   value: Float
+  "Le poids est il une estimation"
   isEstimate: Boolean
 }
+
 input BsdasriRealWeightInput {
+  "Poids en kilogrammes"
   value: Float!
 }
-
 input BsdasriAcceptationInput {
-  status: WasteAcceptationStatusInput
+  "Accepté, refusé ou refusé partiellement"
+  status: WasteAcceptationStatus
+  "Raison en cas de refus ou refus partiel"
   refusalReason: String
+  "Poids en kilogrammes de déchets refusé"
   refusedWeight: Float
 }
 
@@ -138,14 +147,19 @@ input BsdasriTransportInput {
   packagings: [BsdasriPackagingsInput!]
   takenOverAt: DateTime
   handedOverAt: DateTime
+  "Mode de transport"
   acceptation: BsdasriAcceptationInput
   mode: TransportMode
+  "Plaque(s) d'immatriculation - maximum 2"
   plates: [String!]
 }
 
 input BsdasriRecepisseInput {
+  "Numéro de récépissé"
   number: String
+  "Département"
   department: String
+  "Date limite de validité"
   validityLimit: DateTime
 }
 
@@ -201,15 +215,20 @@ input BsdasriInput {
 
   destination: BsdasriDestinationInput
 
+  "Liste des bordereaux que celui-ci groupe"
   grouping: [ID!]
 }
 
 input BsdasriSignatureInput {
+  "Type de signature apposée"
   type: BsdasriSignatureType!
+  "Nom et prénom du signataire"
   author: String!
 }
 
 input BsdasriSignatureWithSecretCodeInput {
+  "Nom et prénom du signataire"
   author: String!
+  "Code de sécurité de l'entreprise pour laquelle on signe. Permet de signer en tant que. Optionnel"
   securityCode: Int!
 }

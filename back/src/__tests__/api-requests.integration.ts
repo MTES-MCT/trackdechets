@@ -6,9 +6,7 @@ import { app } from "../server";
 const request = supertest(app);
 
 describe("Perform api requests", () => {
-  afterEach(async () => {
-    await resetDatabase();
-  });
+  afterEach(resetDatabase);
 
   test("query request with application/json header", async () => {
     const { user, accessToken } = await userWithAccessTokenFactory();

@@ -1,11 +1,22 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
+import { Mutation } from "../../../../generated/graphql/types";
+import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { vhuFormFactory } from "../../../__tests__/factories.vhu";
 
 const SIGN_VHU_FORM = `
 mutation SignVhuForm($id: ID!, $input: BsvhuSignatureInput!) {
   signBsvhu(id: $id, input: $input) {
       id
+      emitter {
+        emission {
+          signature {
+            author
+            date
+          }
+        }
+      }
   }
 }
 `;
@@ -30,5 +41,46 @@ describe("Mutation.Vhu.sign", () => {
         })
       })
     ]);
+  });
+
+  it("should set a default signature date if none is given", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const bsvhu = await vhuFormFactory({
+      opt: {
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
+      variables: {
+        id: bsvhu.id,
+        input: { type: "EMISSION", author: user.name }
+      }
+    });
+
+    expect(data.signBsvhu.emitter.emission.signature.author).toBe(user.name);
+    expect(data.signBsvhu.emitter.emission.signature.date).not.toBeNull();
+  });
+
+  it("should use the provided date for the signature if  given", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const bsvhu = await vhuFormFactory({
+      opt: {
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const date = new Date().toISOString();
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
+      variables: {
+        id: bsvhu.id,
+        input: { type: "EMISSION", author: user.name, date }
+      }
+    });
+
+    expect(data.signBsvhu.emitter.emission.signature.author).toBe(user.name);
+    expect(data.signBsvhu.emitter.emission.signature.date).toBe(date);
   });
 });

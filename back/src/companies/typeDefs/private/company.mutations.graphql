@@ -147,4 +147,8 @@ type Mutation {
   rattachement d'un établissement de test
   """
   createTestCompany: String!
+
+  deleteCompany(id: ID!): CompanyPrivate!
+
+  createAnonymousCompany(input: AnonymousCompanyInput!): AnonymousCompany!
 }

@@ -5,7 +5,7 @@ import { registerUpdater, Updater } from "./helper/helper";
 @registerUpdater(
   "Update bsff after harmonization",
   "Update bsff after harmonization",
-  true
+  false
 )
 export class UpdateBsff implements Updater {
   async run() {

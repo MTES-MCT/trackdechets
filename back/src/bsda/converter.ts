@@ -1,4 +1,9 @@
-import { chain, nullIfNoValues, safeInput } from "../forms/form-converter";
+import {
+  chain,
+  nullIfNoValues,
+  safeInput,
+  undefinedOrDefault
+} from "../forms/form-converter";
 import {
   FormCompany,
   Signature,
@@ -20,7 +25,8 @@ import {
   BsdaBroker,
   BsdaPickupSite,
   BsdaWeight,
-  BsdaEcoOrganisme
+  BsdaEcoOrganisme,
+  BsdaNextDestination
 } from "../generated/graphql/types";
 import { Prisma, Bsda as PrismaBsda } from "@prisma/client";
 
@@ -99,6 +105,19 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         signature: nullIfNoValues<Signature>({
           author: form.destinationOperationSignatureAuthor,
           date: form.destinationOperationSignatureDate
+        }),
+        nextDestination: nullIfNoValues<BsdaNextDestination>({
+          company: nullIfNoValues<FormCompany>({
+            name: form.destinationOperationNextDestinationCompanyName,
+            siret: form.destinationOperationNextDestinationCompanySiret,
+            address: form.destinationOperationNextDestinationCompanyAddress,
+            contact: form.destinationOperationNextDestinationCompanyContact,
+            phone: form.destinationOperationNextDestinationCompanyPhone,
+            mail: form.destinationOperationNextDestinationCompanyMail
+          }),
+          cap: form.destinationOperationNextDestinationCap,
+          plannedOperationCode:
+            form.destinationOperationNextDestinationPlannedOperationCode
         })
       })
     }),
@@ -177,7 +196,10 @@ export function flattenBsdaInput(
     ...flattenBsdaWorkerInput(formInput),
     ...flattenBsdaBrokerInput(formInput),
     ...flattenBsdaWasteInput(formInput),
-    packagings: chain(formInput, f => f.packagings),
+    packagings: undefinedOrDefault(
+      chain(formInput, f => f.packagings),
+      []
+    ),
     ...flattenBsdaWeightInput(formInput)
   });
 }

@@ -76,7 +76,7 @@ export default async function sign(
     where: { id },
     data: {
       [signatureTypeInfos.dbAuthorKey]: input.author,
-      [signatureTypeInfos.dbDateKey]: new Date(input.date),
+      [signatureTypeInfos.dbDateKey]: new Date(input.date ?? Date.now()),
       isDraft: false,
       status: newStatus as BsdaStatus
     }

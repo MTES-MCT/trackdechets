@@ -148,7 +148,9 @@ export function getComputedState(initialState, actualForm) {
     ) {
       prev[curKey] = getComputedState(initialValue, actualForm[curKey]);
     } else {
-      prev[curKey] = actualForm[curKey] ?? initialValue;
+      // Keep null values - only replace unedfined.
+      prev[curKey] =
+        actualForm[curKey] === undefined ? initialValue : actualForm[curKey];
     }
 
     return prev;

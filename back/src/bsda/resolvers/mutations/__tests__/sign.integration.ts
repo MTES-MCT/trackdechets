@@ -14,6 +14,7 @@ const SIGN_BSDA = `
 mutation SignBsda($id: ID!, $input: BsdaSignatureInput!) {
   signBsda(id: $id, input: $input) {
       id
+      status
   }
 }
 `;
@@ -520,6 +521,41 @@ describe("Mutation.Bsda.sign", () => {
       expect(data.signBsda.id).toBeTruthy();
     });
 
+    it("should mark as AWAITING_CHILD if operation code implies it", async () => {
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SENT",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "Worker",
+          workerWorkSignatureDate: new Date(),
+          transporterTransportSignatureAuthor: "Transporter",
+          transporterTransportSignatureDate: new Date(),
+          destinationCompanySiret: company.siret,
+          destinationOperationCode: "D 13"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
+          }
+        }
+      });
+
+      expect(data.signBsda.id).toBeTruthy();
+      expect(data.signBsda.status).toBe(BsdaStatus.AWAITING_CHILD);
+    });
+
     it("should allow destination to sign operation on intial bsda for déchetteries", async () => {
       const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
 
@@ -605,7 +641,7 @@ describe("Mutation.Bsda.sign", () => {
           transporterCompanySiret: transporter.siret,
           destinationCompanySiret: ttr1.siret,
           status: BsdaStatus.AWAITING_CHILD,
-          destinationOperationCode: "R 13"
+          destinationOperationCode: "D 9"
         }
       });
 
@@ -615,7 +651,7 @@ describe("Mutation.Bsda.sign", () => {
           emitterCompanySiret: emitter.siret,
           transporterCompanySiret: transporter.siret,
           destinationCompanySiret: ttr2.siret,
-          destinationOperationCode: "R 13",
+          destinationOperationCode: "D 9",
           status: BsdaStatus.AWAITING_CHILD,
           forwarding: { connect: { id: bsda1.id } }
         }
@@ -627,7 +663,7 @@ describe("Mutation.Bsda.sign", () => {
           emitterCompanySiret: ttr2.siret,
           transporterCompanySiret: transporter.siret,
           destinationCompanySiret: destination.siret,
-          destinationOperationCode: "D 10",
+          destinationOperationCode: "D 9",
           forwarding: { connect: { id: bsda2.id } }
         }
       });

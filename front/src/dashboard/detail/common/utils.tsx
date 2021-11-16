@@ -1,6 +1,6 @@
 import {
   Consistence,
-  WasteAcceptationStatusInput as WasteAcceptationStatus,
+  WasteAcceptationStatus,
   QuantityType,
 } from "generated/graphql/types";
 

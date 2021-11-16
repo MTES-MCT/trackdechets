@@ -36,6 +36,7 @@ enum BsffStatus {
 "Liste des codes de traitement possible."
 enum BsffOperationCode {
   R2
+  R3
   R12
   R13
   D10
@@ -54,14 +55,4 @@ enum BsffSignatureType {
   RECEPTION
   "Signature de la destination, lors du traitement."
   OPERATION
-}
-
-"Statut d'acceptation du déchet"
-enum BsffAcceptationStatus {
-  "Accepté"
-  ACCEPTED
-  "Refusé"
-  REFUSED
-  "Refus partiel"
-  PARTIALLY_REFUSED
 }

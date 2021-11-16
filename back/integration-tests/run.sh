@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 export NODE_ENV=test
 export API_HOST=api-td.local
@@ -9,6 +9,11 @@ export MSYS_NO_PATHCONV=1 # needed for windows
 export ELASTIC_SEARCH_URL=http://elasticsearch:9200
 
 EXIT_CODE=0
+
+dockerexec() {
+    api_container_id=$(docker ps -qf "name=^/integration.td-api")
+    docker exec -e NODE_OPTIONS=--max_old_space_size=4096 -t $api_container_id $1
+}
 
 startcontainers(){
     echo "🚀 >> Starting containers..."
@@ -24,8 +29,7 @@ stopcontainers(){
 }
 
 runtest(){
-    api_container_id=$(docker ps -qf name=^/integration.td-api)
-    docker exec -e NODE_OPTIONS=--max_old_space_size=4096 -t $api_container_id npm run integration-tests $1
+    dockerexec "npm run integration-tests $1"
     EXIT_CODE=$?
 }
 
@@ -35,7 +39,20 @@ all(){
     stopcontainers
 }
 
-help="$(basename "$0") [-h] [-u] [-d] [-r] [-p] -- trackdechets test runner
+chunk() {
+    startcontainers
+
+    mapfile -t chunk_infos < <(echo "$1" | tr "-" "\n")
+    echo "🔢 >> Chunk index: ${chunk_infos[0]}/${chunk_infos[1]}"
+    tests_to_run=$(dockerexec "./integration-tests/get-chunk.sh ${chunk_infos[0]} ${chunk_infos[1]}")
+    chunk_length=$(echo "$tests_to_run" | tr -cd '|' | wc -c)
+    echo "📏 >> Chunk length $chunk_length"
+
+    runtest "(${tests_to_run::-1})"
+    stopcontainers
+}
+
+help="$(basename "$0") [-h] [-u] [-d] [-r] [-p] [-c] -- trackdechets test runner
 
 where:
     -h show this help text
@@ -45,9 +62,12 @@ where:
         ./$(basename "$0") -r /docker-path/to/my/test
 
     -p spin up containers, run integration test(s) matching given path, down containers
-        ./$(basename "$0") -p /docker-path/to/my/test"
+        ./$(basename "$0") -p /docker-path/to/my/test
 
-while getopts "hudp:r:" OPTION; do
+    -c CI only. Run integration test(s) by chunk
+        ./$(basename "$0") \$CHUNK_SIZE \$NB_OF_CHUNKS"
+
+while getopts "hudp:r:c:" OPTION; do
     case $OPTION in
     h)
         echo "$help"
@@ -70,6 +90,11 @@ while getopts "hudp:r:" OPTION; do
         all $OPTARG
         exit 1
         ;;
+
+    c)  chunk $OPTARG
+        exit $EXIT_CODE
+        ;;
+
     *)
         echo -e "\e[31mIncorrect options provided\e[0m"
         exit 1

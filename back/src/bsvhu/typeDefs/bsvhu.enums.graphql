@@ -26,9 +26,3 @@ enum SignatureTypeInput {
   TRANSPORT
   OPERATION
 }
-
-enum BsvhuAcceptationStatus {
-  ACCEPTED
-  REFUSED
-  PARTIALLY_REFUSED
-}

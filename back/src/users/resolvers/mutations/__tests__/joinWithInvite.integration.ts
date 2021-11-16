@@ -1,5 +1,8 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { createTestClient } from "apollo-server-integration-testing";
+import {
+  createTestClient,
+  TestQuery
+} from "../../../../__tests__/apollo-integration-testing";
 import { server } from "../../../../server";
 import prisma from "../../../../prisma";
 import { companyFactory } from "../../../../__tests__/factories";
@@ -16,8 +19,12 @@ const JOIN_WITH_INVITE = `
 `;
 
 describe("joinWithInvite mutation", () => {
+  let mutate: TestQuery;
+  beforeAll(() => {
+    const testClient = makeClient();
+    mutate = testClient.mutate;
+  });
   afterEach(resetDatabase);
-  const { mutate } = makeClient();
 
   it("should raise exception if invitation does not exist", async () => {
     const { errors } = await mutate(JOIN_WITH_INVITE, {

@@ -59,16 +59,13 @@ export async function inviteUserToCompanyFn(
   return convertUrls(company);
 }
 
-const inviteUserToCompanyResolver: MutationResolvers["inviteUserToCompany"] = async (
-  parent,
-  args,
-  context
-) => {
-  applyAuthStrategies(context, [AuthType.Session]);
-  const user = checkIsAuthenticated(context);
-  const company = await getCompanyOrCompanyNotFound({ siret: args.siret });
-  await checkIsCompanyAdmin(user, company);
-  return inviteUserToCompanyFn(user, args);
-};
+const inviteUserToCompanyResolver: MutationResolvers["inviteUserToCompany"] =
+  async (parent, args, context) => {
+    applyAuthStrategies(context, [AuthType.Session]);
+    const user = checkIsAuthenticated(context);
+    const company = await getCompanyOrCompanyNotFound({ siret: args.siret });
+    await checkIsCompanyAdmin(user, company);
+    return inviteUserToCompanyFn(user, args);
+  };
 
 export default inviteUserToCompanyResolver;

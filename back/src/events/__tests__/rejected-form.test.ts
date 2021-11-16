@@ -35,7 +35,6 @@ const mockedForm = {
   recipientCap: "",
   emitterCompanyPhone: "06 12 45 56 78",
   emitterCompanyMail: "producer@example.com",
-  wasteDetailsOtherPackaging: "",
   receivedBy: "john",
   transporterCompanySiret: "12346084400013",
   processingOperationDescription: null,

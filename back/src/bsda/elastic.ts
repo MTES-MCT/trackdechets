@@ -42,7 +42,7 @@ function getWhere(
 
   const siretsFilters = new Map<string, keyof typeof where>(
     Object.entries(formSirets)
-      .filter(([_, siret]) => !!siret)
+      .filter(([_, siret]) => Boolean(siret))
       .map(([actor, _]) => [actor, "isFollowFor"])
   );
   type Mapping = Map<string, keyof typeof where>;

@@ -220,7 +220,7 @@ describe("Query.forms", () => {
       ownerId: user.id,
       opt: {
         recipientCompanySiret: company.siret,
-        wasteDetailsPackagingInfos: null
+        wasteDetailsPackagingInfos: []
       }
     });
 

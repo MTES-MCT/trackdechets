@@ -1,5 +1,6 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
+import { TestQuery } from "../../../../__tests__/apollo-integration-testing";
 import { companyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import * as sirene from "../../../sirene";
@@ -7,12 +8,17 @@ import * as sirene from "../../../sirene";
 const searchCompanySpy = jest.spyOn(sirene, "searchCompanies");
 
 describe("query { searchCompanies(clue, department) }", () => {
+  let query: TestQuery;
+  beforeAll(() => {
+    const client = makeClient(null);
+    query = client.query;
+  });
+
   afterEach(async () => {
     await resetDatabase();
     searchCompanySpy.mockReset();
   });
 
-  const { query } = makeClient(null);
   it("should return list of companies based on clue", async () => {
     searchCompanySpy.mockResolvedValueOnce([
       {

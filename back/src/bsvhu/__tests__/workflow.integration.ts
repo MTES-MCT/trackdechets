@@ -16,18 +16,12 @@ describe("Exemples de circuit du bordereau de suivi de véhicule hors d'usage", 
   }
 
   it("Acheminement d'un centre VHU vers un broyeur", async () => {
-    const {
-      user: producteurUser,
-      company: producteurCompany
-    } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: transporterUser,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
-    const {
-      user: broyeurUser,
-      company: broyeurCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: producteurUser, company: producteurCompany } =
+      await userWithCompanyFactory("MEMBER");
+    const { user: transporterUser, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
+    const { user: broyeurUser, company: broyeurCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const producteurToken = await apiKey(producteurUser);
     const transporteurToken = await apiKey(transporterUser);

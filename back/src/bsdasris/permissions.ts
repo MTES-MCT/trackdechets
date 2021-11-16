@@ -46,11 +46,9 @@ function isDasriTransporter(
 export async function isDasriContributor(user: User, dasri: BsdasriSirets) {
   const fullUser = await getFullUser(user);
 
-  return [
-    isDasriEmitter,
-    isDasriTransporter,
-    isDasriRecipient
-  ].some(isFormRole => isFormRole(fullUser, dasri));
+  return [isDasriEmitter, isDasriTransporter, isDasriRecipient].some(
+    isFormRole => isFormRole(fullUser, dasri)
+  );
 }
 
 export async function checkIsBsdasriContributor(

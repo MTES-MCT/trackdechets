@@ -167,7 +167,7 @@ describe("Query.bsds.bsda base workflow", () => {
                 weight: 1
               },
               operation: {
-                code: "D 13",
+                code: "D 9",
                 date: new Date().toISOString() as any
               }
             }
@@ -720,12 +720,131 @@ describe("Query.bsds.bsda base workflow", () => {
     });
   });
 
-  describe("when the bsda is refused", () => {
+  describe("when the bsda operation is signed by the destination (AWAITING_CHILD)", () => {
     beforeAll(async () => {
+      const { mutate } = makeClient(destination.user);
+
       await prisma.bsda.update({
         where: { id: bsdaId },
-        data: { status: "REFUSED" }
+        data: {
+          destinationOperationCode: "D 13",
+          status: "SENT",
+          destinationOperationSignatureDate: null,
+          destinationOperationSignatureAuthor: null
+        }
       });
+
+      await mutate<Pick<Mutation, "signBsda">, MutationSignBsdaArgs>(
+        SIGN_BSDA,
+        {
+          variables: {
+            id: bsdaId,
+            input: { type: "OPERATION", author: "Pierre Je Traite" }
+          }
+        }
+      );
+
+      await refreshElasticSearch();
+    });
+
+    it("processed bsda should be isFollowFor emitter", async () => {
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [emitter.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("processed bsda should be isFollowFor worker", async () => {
+      const { query } = makeClient(worker.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [worker.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("processed bsda should be isFollowFor transporter", async () => {
+      const { query } = makeClient(transporter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [transporter.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("processed bsda should be isFollowFor destination", async () => {
+      const { query } = makeClient(destination.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [destination.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+  });
+
+  describe("when the bsda is refused", () => {
+    beforeAll(async () => {
+      const { mutate } = makeClient(destination.user);
+
+      await prisma.bsda.update({
+        where: { id: bsdaId },
+        data: {
+          status: "SENT",
+          destinationReceptionWeight: 0,
+          destinationReceptionAcceptationStatus: "REFUSED",
+          destinationReceptionRefusalReason: "Ugly waste...",
+          destinationOperationSignatureDate: null,
+          destinationOperationSignatureAuthor: null
+        }
+      });
+
+      await mutate<Pick<Mutation, "signBsda">, MutationSignBsdaArgs>(
+        SIGN_BSDA,
+        {
+          variables: {
+            id: bsdaId,
+            input: { type: "OPERATION", author: "Pierre Je Traite" }
+          }
+        }
+      );
 
       await refreshElasticSearch();
     });
