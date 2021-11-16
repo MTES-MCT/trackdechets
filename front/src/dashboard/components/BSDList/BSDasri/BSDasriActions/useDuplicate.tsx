@@ -4,7 +4,7 @@ import {
   Mutation,
   MutationDuplicateBsdasriArgs,
 } from "generated/graphql/types";
-import { dasriFragment } from "common/fragments";
+import { fullDasriFragment } from "common/fragments";
 import { GET_BSDS } from "common/queries";
 
 const DUPLICATE_BSDASRI = gql`
@@ -13,7 +13,7 @@ const DUPLICATE_BSDASRI = gql`
       ...DasriFragment
     }
   }
-  ${dasriFragment}
+  ${fullDasriFragment}
 `;
 
 export function useBsdasriDuplicate(

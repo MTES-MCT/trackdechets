@@ -43,7 +43,7 @@ export const COLUMNS: Record<
     accessor: dasri => dasri?.destination?.company?.name ?? "",
   },
   waste: {
-    accessor: dasri => dasri?.waste?.code ?? "",
+    accessor: dasri => dasri["bsdasriWaste"]?.code ?? "",
   },
   transporterCustomInfo: {
     accessor: dasri => dasri.transporter?.customInfo ?? "",

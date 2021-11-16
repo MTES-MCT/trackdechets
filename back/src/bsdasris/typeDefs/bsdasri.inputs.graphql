@@ -101,6 +101,7 @@ input BsdasriWasteInput {
   adr: String
   code: String
 }
+
 input BsdasriEmissionInput {
   weight: BsdasriWeightInput
   packagings: [BsdasriPackagingsInput!]
