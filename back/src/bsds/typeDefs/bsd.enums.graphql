@@ -1,5 +1,5 @@
 "Statut d'acceptation d'un déchet"
-enum WasteAcceptationStatusInput {
+enum WasteAcceptationStatus {
   "Accepté en totalité"
   ACCEPTED
 

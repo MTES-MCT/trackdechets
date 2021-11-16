@@ -50,7 +50,7 @@ input SignatureFormInput {
 
 input AcceptedFormInput {
   "Statut d'acceptation du déchet (case 10)"
-  wasteAcceptationStatus: WasteAcceptationStatusInput!
+  wasteAcceptationStatus: WasteAcceptationStatus!
 
   "Raison du refus (case 10). Obligatoire en cas de refus de déchet"
   wasteRefusalReason: String
@@ -78,7 +78,7 @@ input ReceivedFormInput {
   receivedAt: DateTime!
 
   "Statut d'acceptation du déchet (case 10)"
-  wasteAcceptationStatus: WasteAcceptationStatusInput
+  wasteAcceptationStatus: WasteAcceptationStatus
 
   "Raison du refus (case 10). Obligatoire en cas de refus de déchet"
   wasteRefusalReason: String
@@ -510,7 +510,7 @@ input TempStorerAcceptedFormInput {
   signedBy: String!
 
   "Statut d'acceptation du déchet (case 13)"
-  wasteAcceptationStatus: WasteAcceptationStatusInput!
+  wasteAcceptationStatus: WasteAcceptationStatus!
 
   "Raison du refus (case 13). Obligatoire en cas de refus de déchet"
   wasteRefusalReason: String
@@ -528,7 +528,7 @@ input TempStorerAcceptedFormInput {
 
 input TempStoredFormInput {
   "Statut d'acceptation du déchet (case 13)"
-  wasteAcceptationStatus: WasteAcceptationStatusInput
+  wasteAcceptationStatus: WasteAcceptationStatus
 
   "Raison du refus (case 13). Obligatoire en cas de refus de déchet"
   wasteRefusalReason: String

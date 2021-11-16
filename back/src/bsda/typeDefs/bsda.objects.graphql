@@ -190,7 +190,7 @@ type BsdaReception {
   "Poids présentée"
   weight: Float
   "Lot accepté, accepté partiellement ou refusé"
-  acceptationStatus: BsdaAcceptationStatus
+  acceptationStatus: WasteAcceptationStatus
   "Motif de refus"
   refusalReason: String
   "Signature case 10"
