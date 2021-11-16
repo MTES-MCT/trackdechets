@@ -63,7 +63,7 @@ type Bsda {
   """
   Bordereaux dans lequel celui-ci est groupé
   """
-  groupedIn: InitialBsda
+  groupedIn: Bsda
 
   "Metadata associées au bordereau"
   metadata: BsdaMetadata!

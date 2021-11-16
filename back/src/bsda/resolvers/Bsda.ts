@@ -29,7 +29,7 @@ export const Bsda: BsdaResolvers = {
     const groupedIn = await prisma.bsda
       .findUnique({ where: { id } })
       .groupedIn();
-    return toInitialBsda(expandBsdaFromDb(groupedIn));
+    return groupedIn ? expandBsdaFromDb(groupedIn) : null;
   },
   metadata: bsda => {
     return {
