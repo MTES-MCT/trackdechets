@@ -4,23 +4,19 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
-# Next release ~15/11
+
+# Next release ~06/12
 
 #### :rocket: Nouvelles fonctionnalités
 
 #### :boom: Breaking changes
 
-- Harmonisation du statut d'acceptation du déchet [PR 1040](https://github.com/MTES-MCT/trackdechets/pull/1040)
-  - Remplacement de `BsdaAcceptationStatus`, `BsffAcceptationStatus` et `BsvhuAcceptationStatus` par `WasteAcceptationStatus`
-  - Remplacement de l'input `WasteAcceptationStatusInput` par l'enum `WasteAcceptationStatus`
-  - Les champs `Form.wasteAcceptationStatus`, `TemporaryStorer.wasteAcceptationStatus` et `BsdasriWasteAcceptation.status` ne sont plus du type `String` mais `WasteAcceptationStatus`
-
 #### :bug: Corrections de bugs
-
 
 #### :nail_care: Améliorations
 
 -  Ajout d'index sur les champs siret des différents bordereaux [PR 1080](https://github.com/MTES-MCT/trackdechets/pull/1080)
+- Ajout d'exemples pour le profil producteur lors de la création d'un établissement, et modification des liens du header [PR 1078](https://github.com/MTES-MCT/trackdechets/pull/1078)
 
 # [2021.11.1] 15/11/2021
 
@@ -31,6 +27,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Il est maintenant possible de lier une fiche d'intervention à plusieurs BSFFs [PR 1033](https://github.com/MTES-MCT/trackdechets/pull/1033)
 
 #### :boom: Breaking changes
+
+- Harmonisation du statut d'acceptation du déchet [PR 1040](https://github.com/MTES-MCT/trackdechets/pull/1040)
+  - Remplacement de `BsdaAcceptationStatus`, `BsffAcceptationStatus` et `BsvhuAcceptationStatus` par `WasteAcceptationStatus`
+  - Remplacement de l'input `WasteAcceptationStatusInput` par l'enum `WasteAcceptationStatus`
+  - Les champs `Form.wasteAcceptationStatus`, `TemporaryStorer.wasteAcceptationStatus` et `BsdasriWasteAcceptation.status` ne sont plus du type `String` mais `WasteAcceptationStatus`
 
 #### :bug: Corrections de bugs
 
