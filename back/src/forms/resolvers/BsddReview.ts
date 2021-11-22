@@ -1,3 +1,4 @@
+import { AcceptationStatus } from ".prisma/client";
 import { BsddReviewResolvers } from "../../generated/graphql/types";
 import prisma from "../../prisma";
 import { expandFormFromDb } from "../form-converter";
@@ -10,19 +11,18 @@ const bsddReviewResolvers: BsddReviewResolvers = {
     });
     return review.validations;
   },
-  isAccepted: async parent => {
+  status: async parent => {
     const validations = await prisma.bsddReview
       .findUnique({ where: { id: parent.id } })
       .validations();
 
-    return validations.every(val => val.isAccepted);
-  },
-  isSettled: async parent => {
-    const validations = await prisma.bsddReview
-      .findUnique({ where: { id: parent.id } })
-      .validations();
-
-    return validations.every(val => val.isSettled);
+    if (validations.every(val => val.status === AcceptationStatus.ACCEPTED)) {
+      return AcceptationStatus.ACCEPTED;
+    }
+    if (validations.every(val => val.status === AcceptationStatus.REFUSED)) {
+      return AcceptationStatus.REFUSED;
+    }
+    return AcceptationStatus.PENDING;
   },
   content: parent => {
     return expandFormFromDb(parent.content as any) as any;

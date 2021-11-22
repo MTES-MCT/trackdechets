@@ -1,4 +1,4 @@
-import { BsddReview, Prisma } from "@prisma/client";
+import { AcceptationStatus, BsddReview, Prisma } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationSettleBsddReviewArgs } from "../../../generated/graphql/types";
@@ -22,7 +22,17 @@ export default async function settleReview(
     throw new UserInputError("Révision introuvable.");
   }
 
-  const activeValidations = review.validations.filter(val => !val.isSettled);
+  if (
+    review.validations.some(val => val.status === AcceptationStatus.PENDING)
+  ) {
+    throw new ForbiddenError(
+      "Cette révision n'est plus approuvable, au moins un acteur la refusée."
+    );
+  }
+
+  const activeValidations = review.validations.filter(
+    val => val.status === AcceptationStatus.PENDING
+  );
   const userCompany = await getFirstUserCompanyInList(
     user.id,
     activeValidations.map(val => val.companyId)
@@ -39,7 +49,11 @@ export default async function settleReview(
   );
   await prisma.bsddReviewValidation.update({
     where: { id: bsddReviewValidation.id },
-    data: { isAccepted, isSettled: true }
+    data: {
+      status: isAccepted
+        ? AcceptationStatus.ACCEPTED
+        : AcceptationStatus.REFUSED
+    }
   });
 
   await updateReviewIfNecessary(review);
@@ -55,29 +69,22 @@ async function updateReviewIfNecessary({ id, content, bsddId }: BsddReview) {
     .findUnique({ where: { id: id } })
     .validations();
 
-  const isReviewAccepted = validations.every(val => val.isAccepted);
-  if (isReviewAccepted) {
-    const { temporaryStorageDetail, ...bsddReview } =
-      content as Partial<Prisma.FormUpdateInput>;
-    await prisma.form.update({
-      where: { id: bsddId },
-      data: {
-        ...bsddReview,
-        ...(temporaryStorageDetail && {
-          temporaryStorageDetail: { update: { ...temporaryStorageDetail } }
-        })
-      }
-    });
-
+  const isReviewAccepted = validations.every(
+    val => val.status === AcceptationStatus.ACCEPTED
+  );
+  if (!isReviewAccepted) {
     return;
   }
 
-  const isReviewRefused = validations.some(val => val.isAccepted === false);
-  // If one review is refused, mark every other validations as settled
-  if (isReviewRefused) {
-    await prisma.bsddReviewValidation.updateMany({
-      where: { bsddReviewId: id },
-      data: { isSettled: true }
-    });
-  }
+  const { temporaryStorageDetail, ...bsddReview } =
+    content as Partial<Prisma.FormUpdateInput>;
+  await prisma.form.update({
+    where: { id: bsddId },
+    data: {
+      ...bsddReview,
+      ...(temporaryStorageDetail && {
+        temporaryStorageDetail: { update: { ...temporaryStorageDetail } }
+      })
+    }
+  });
 }

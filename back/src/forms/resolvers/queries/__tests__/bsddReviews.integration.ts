@@ -12,8 +12,7 @@ const BSDD_REVIEWS = `
     bsddReviews(siret: $siret) {
       id
       bsddId
-      isAccepted
-      isSettled
+      status
     }
   }
 `;
@@ -63,8 +62,7 @@ describe("Mutation.bsddReviews", () => {
         validations: {
           create: {
             companyId: otherCompany.id,
-            isAccepted: true,
-            isSettled: true
+            status: "ACCEPTED"
           }
         },
         content: {},
@@ -78,8 +76,7 @@ describe("Mutation.bsddReviews", () => {
         validations: {
           create: {
             companyId: otherCompany.id,
-            isAccepted: false,
-            isSettled: true
+            status: "REFUSED"
           }
         },
         content: {},
@@ -115,8 +112,7 @@ describe("Mutation.bsddReviews", () => {
         validations: {
           create: {
             companyId: otherCompany.id,
-            isAccepted: true,
-            isSettled: true
+            status: "ACCEPTED"
           }
         },
         content: {},
@@ -130,8 +126,7 @@ describe("Mutation.bsddReviews", () => {
         validations: {
           create: {
             companyId: otherCompany.id,
-            isAccepted: false,
-            isSettled: false
+            status: "PENDING"
           }
         },
         content: {},
@@ -144,11 +139,8 @@ describe("Mutation.bsddReviews", () => {
     });
 
     expect(
-      data.bsddReviews.find(review => review.bsddId === bsdd1.id).isSettled
-    ).toBe(true);
-    expect(
-      data.bsddReviews.find(review => review.bsddId === bsdd2.id).isSettled
-    ).toBe(false);
+      data.bsddReviews.find(review => review.bsddId === bsdd1.id).status
+    ).toBe("REFUSED");
   });
 
   it("should mark accepted reviews as so", async () => {
@@ -173,8 +165,7 @@ describe("Mutation.bsddReviews", () => {
         validations: {
           create: {
             companyId: otherCompany.id,
-            isAccepted: true,
-            isSettled: true
+            status: "ACCEPTED"
           }
         },
         content: {},
@@ -188,8 +179,7 @@ describe("Mutation.bsddReviews", () => {
         validations: {
           create: {
             companyId: otherCompany.id,
-            isAccepted: false,
-            isSettled: true
+            status: "REFUSED"
           }
         },
         content: {},
@@ -202,10 +192,7 @@ describe("Mutation.bsddReviews", () => {
     });
 
     expect(
-      data.bsddReviews.find(review => review.bsddId === bsdd1.id).isAccepted
-    ).toBe(true);
-    expect(
-      data.bsddReviews.find(review => review.bsddId === bsdd2.id).isAccepted
-    ).toBe(false);
+      data.bsddReviews.find(review => review.bsddId === bsdd1.id).status
+    ).toBe("ACCEPTED");
   });
 });

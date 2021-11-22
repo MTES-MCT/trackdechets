@@ -538,22 +538,16 @@ type BsddReview {
   "Contenu de la révision"
   content: BsddReviewForm!
 
-  "Indique si la révision a été acceptée par l'ensemble des valideurs"
-  isAccepted: Boolean!
-
-  "Indique si la révision est archivée ou en attente d'une réponse d'un valideur"
-  isSettled: Boolean!
+  "Statut d'acceptation de la révision"
+  status: AcceptationStatus!
 }
 
 type BsddReviewValidation {
   "Entreprise qui doit valider la révision"
   company: FormCompany
 
-  "Indique si la révision a été acceptée ou pas par l'entreprise"
-  isAccepted: Boolean
-
-  "Indique si la révision est archivée ou en attente d'une réponse par l'entreprise"
-  isSettled: Boolean!
+  "Statut d'acceptation de la validation"
+  status: AcceptationStatus!
 }
 
 "Payload de révision d'un bordereau. Disponible sur une liste restrainte de champs."

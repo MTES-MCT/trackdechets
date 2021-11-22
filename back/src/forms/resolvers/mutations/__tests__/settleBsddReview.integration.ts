@@ -22,11 +22,9 @@ const SETTLE_BSDD_REVIEW = `
         company {
           siret
         }
-        isAccepted
-        isSettled
+        status
       }
-      isAccepted
-      isSettled
+      status
     }
   }
 `;
@@ -147,8 +145,7 @@ describe("Mutation.settleBsddReview", () => {
       }
     );
 
-    expect(data.settleBsddReview.isAccepted).toBe(true);
-    expect(data.settleBsddReview.isSettled).toBe(true);
+    expect(data.settleBsddReview.status).toBe("ACCEPTED");
   });
 
   it("should work if one of the validators approves the review, but not mark the review as accepted", async () => {
@@ -184,30 +181,19 @@ describe("Mutation.settleBsddReview", () => {
       }
     );
 
-    expect(data.settleBsddReview.isAccepted).toBe(false);
-    expect(data.settleBsddReview.isSettled).toBe(false);
+    expect(data.settleBsddReview.status).toBe("PENDING");
 
     expect(
       data.settleBsddReview.validations.find(
         val => val.company.siret === company.siret
-      ).isAccepted
-    ).toBe(true);
-    expect(
-      data.settleBsddReview.validations.find(
-        val => val.company.siret === company.siret
-      ).isSettled
-    ).toBe(true);
+      ).status
+    ).toBe("ACCEPTED");
 
     expect(
       data.settleBsddReview.validations.find(
         val => val.company.siret === thirdCompany.siret
-      ).isAccepted
-    ).toBeNull();
-    expect(
-      data.settleBsddReview.validations.find(
-        val => val.company.siret === thirdCompany.siret
-      ).isSettled
-    ).toBe(false);
+      ).status
+    ).toBe("PENDING");
   });
 
   it("should mark every validations as settled if one of the validators refused the review", async () => {
@@ -243,30 +229,19 @@ describe("Mutation.settleBsddReview", () => {
       }
     );
 
-    expect(data.settleBsddReview.isAccepted).toBe(false);
-    expect(data.settleBsddReview.isSettled).toBe(true);
+    expect(data.settleBsddReview.status).toBe("REFUSED");
 
     expect(
       data.settleBsddReview.validations.find(
         val => val.company.siret === company.siret
-      ).isAccepted
-    ).toBe(false);
-    expect(
-      data.settleBsddReview.validations.find(
-        val => val.company.siret === company.siret
-      ).isSettled
-    ).toBe(true);
+      ).status
+    ).toBe("REFUSED");
 
     expect(
       data.settleBsddReview.validations.find(
         val => val.company.siret === thirdCompany.siret
-      ).isAccepted
-    ).toBeNull();
-    expect(
-      data.settleBsddReview.validations.find(
-        val => val.company.siret === thirdCompany.siret
-      ).isSettled
-    ).toBe(true);
+      ).status
+    ).toBe("PENDING");
   });
 
   it("should work if only validator refuses the review", async () => {
@@ -301,8 +276,7 @@ describe("Mutation.settleBsddReview", () => {
       }
     );
 
-    expect(data.settleBsddReview.isAccepted).toBe(false);
-    expect(data.settleBsddReview.isSettled).toBe(true);
+    expect(data.settleBsddReview.status).toBe("REFUSED");
   });
 
   it("should edit bsdd accordingly when accepted", async () => {

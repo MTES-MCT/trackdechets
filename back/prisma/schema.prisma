@@ -366,6 +366,12 @@ model BsddReview {
   comment String
 }
 
+enum AcceptationStatus {
+  PENDING
+  ACCEPTED
+  REFUSED
+}
+
 model BsddReviewValidation {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -377,8 +383,7 @@ model BsddReviewValidation {
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
-  isAccepted Boolean?
-  isSettled  Boolean  @default(false)
+  status AcceptationStatus @default(PENDING)
 }
 
 model Grant {

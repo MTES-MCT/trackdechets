@@ -178,3 +178,12 @@ enum SignatureAuthor {
   "L'auteur de la signature est l'éco-organisme figurant sur le BSD"
   ECO_ORGANISME
 }
+
+enum AcceptationStatus {
+  "En attente de validation"
+  PENDING
+  "Accepté"
+  ACCEPTED
+  "Refusé"
+  REFUSED
+}

@@ -24,11 +24,9 @@ const CREATE_BSDD_REVIEW = `
         company {
           siret
         }
-        isAccepted
-        isSettled
+        status
       }
-      isAccepted
-      isSettled
+      status
     }
   }
 `;

@@ -11,6 +11,9 @@ CREATE TABLE "default$default"."BsddReview" (
     PRIMARY KEY ("id")
 );
 
+-- CreateEnum
+CREATE TYPE "default$default"."AcceptationStatus" AS ENUM ('PENDING', 'ACCEPTED', 'REFUSED');
+
 -- CreateTable
 CREATE TABLE "default$default"."BsddReviewValidation" (
     "id" TEXT NOT NULL,
@@ -18,8 +21,7 @@ CREATE TABLE "default$default"."BsddReviewValidation" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "bsddReviewId" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
-    "isAccepted" BOOLEAN,
-    "isSettled" BOOLEAN NOT NULL DEFAULT false,
+    "status" "default$default"."AcceptationStatus" DEFAULT E'PENDING',
 
     PRIMARY KEY ("id")
 );
