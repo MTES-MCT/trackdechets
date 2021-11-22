@@ -397,6 +397,9 @@ export const dashboardDasriFragment = gql`
         ...CompanyFragment
       }
     }
+    grouping {
+      id
+    }
     createdAt
     updatedAt
     allowDirectTakeOver
