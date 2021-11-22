@@ -7,7 +7,7 @@ import {
   MutationResolvers
 } from "../../../generated/graphql/types";
 import { getUserCompanies } from "../../../users/database";
-import { getFormOrFormNotFound } from "../../database";
+import { getFormOrFormNotFound, getFullForm } from "../../database";
 import {
   expandFormFromDb,
   flattenImportPaperFormInput
@@ -17,6 +17,7 @@ import getReadableId from "../../readableId";
 import { processedFormSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
+import { indexForm } from "../../elastic";
 
 /**
  * Update an existing form with data imported from a paper form
@@ -64,11 +65,10 @@ async function updateForm(user: User, form: Form, input: ImportPaperFormInput) {
     signedByTransporter: true
   };
 
-  const updatedForm = await transitionForm(user, form, {
+  return transitionForm(user, form, {
     type: EventType.ImportPaperForm,
     formUpdateInput
   });
-  return expandFormFromDb(updatedForm);
 }
 
 /**
@@ -100,8 +100,21 @@ async function createForm(user: User, input: ImportPaperFormInput) {
     signedByTransporter: true
   };
 
-  const form = await prisma.form.create({ data: formCreateInput });
-  return expandFormFromDb(form);
+  return prisma.form.create({ data: formCreateInput });
+}
+
+async function createOrUpdateForm(
+  user: User,
+  id: string,
+  formInput: ImportPaperFormInput
+) {
+  if (id) {
+    const form = await getFormOrFormNotFound({ id });
+    await checkCanImportForm(user, form);
+    return updateForm(user, form, formInput);
+  }
+
+  return createForm(user, formInput);
 }
 
 const importPaperFormResolver: MutationResolvers["importPaperForm"] = async (
@@ -119,13 +132,12 @@ const importPaperFormResolver: MutationResolvers["importPaperForm"] = async (
       : rest.wasteDetails
   };
 
-  if (id) {
-    const form = await getFormOrFormNotFound({ id });
-    await checkCanImportForm(user, form);
-    return updateForm(user, form, formInput);
-  }
+  const form = await createOrUpdateForm(user, id, formInput);
 
-  return createForm(user, formInput);
+  const fullForm = await getFullForm(form);
+  await indexForm(fullForm, context);
+
+  return expandFormFromDb(form);
 };
 
 export default importPaperFormResolver;
