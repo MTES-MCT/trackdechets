@@ -23,7 +23,7 @@ export default async function settleReview(
   }
 
   if (
-    review.validations.some(val => val.status === AcceptationStatus.PENDING)
+    review.validations.some(val => val.status === AcceptationStatus.REFUSED)
   ) {
     throw new ForbiddenError(
       "Cette révision n'est plus approuvable, au moins un acteur la refusée."

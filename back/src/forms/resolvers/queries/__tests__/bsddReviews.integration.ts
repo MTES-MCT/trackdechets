@@ -140,7 +140,10 @@ describe("Mutation.bsddReviews", () => {
 
     expect(
       data.bsddReviews.find(review => review.bsddId === bsdd1.id).status
-    ).toBe("REFUSED");
+    ).toBe("ACCEPTED");
+    expect(
+      data.bsddReviews.find(review => review.bsddId === bsdd2.id).status
+    ).toBe("PENDING");
   });
 
   it("should mark accepted reviews as so", async () => {

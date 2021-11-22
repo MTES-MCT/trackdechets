@@ -196,7 +196,7 @@ describe("Mutation.settleBsddReview", () => {
     ).toBe("PENDING");
   });
 
-  it("should mark every validations as settled if one of the validators refused the review", async () => {
+  it("should mark the review as refused if one of the validators refused the review", async () => {
     const { company: secondCompany } = await userWithCompanyFactory("ADMIN");
     const { company: thirdCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
@@ -229,19 +229,12 @@ describe("Mutation.settleBsddReview", () => {
       }
     );
 
-    expect(data.settleBsddReview.status).toBe("REFUSED");
-
     expect(
       data.settleBsddReview.validations.find(
         val => val.company.siret === company.siret
       ).status
     ).toBe("REFUSED");
-
-    expect(
-      data.settleBsddReview.validations.find(
-        val => val.company.siret === thirdCompany.siret
-      ).status
-    ).toBe("PENDING");
+    expect(data.settleBsddReview.status).toBe("REFUSED");
   });
 
   it("should work if only validator refuses the review", async () => {

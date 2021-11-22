@@ -130,6 +130,7 @@ describe("Mutation.createBsddReview", () => {
     expect(data.createBsddReview.validations[0].company.siret).toBe(
       recipientCompany.siret
     );
+    expect(data.createBsddReview.validations[0].status).toBe("PENDING");
   });
 
   it("should fail if unknown fields are provided", async () => {
@@ -148,7 +149,7 @@ describe("Mutation.createBsddReview", () => {
     } catch (err) {
       expect(err.message).toContain('{"code":"BAD_USER_INPUT"}');
       expect(err.message).toContain(
-        'Field \\"name\\" is not defined by type BsddReviewWasteDetailsInput.'
+        'Field \\"name\\" is not defined by type \\"BsddReviewWasteDetailsInput\\".'
       );
     }
   });

@@ -19,7 +19,7 @@ const bsddReviewResolvers: BsddReviewResolvers = {
     if (validations.every(val => val.status === AcceptationStatus.ACCEPTED)) {
       return AcceptationStatus.ACCEPTED;
     }
-    if (validations.every(val => val.status === AcceptationStatus.REFUSED)) {
+    if (validations.some(val => val.status === AcceptationStatus.REFUSED)) {
       return AcceptationStatus.REFUSED;
     }
     return AcceptationStatus.PENDING;
