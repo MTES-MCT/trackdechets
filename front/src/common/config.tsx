@@ -3,7 +3,7 @@ export const MEDIA_QUERIES = {
 };
 
 export const CONTACT_EMAIL =
-  process.env.REACT_APP_CONTACT_EMAIL || "hello@trackdechets.beta.gouv.fr";
+  process.env.REACT_APP_CONTACT_EMAIL || "info@trackdechets.beta.gouv.fr";
 
 export const DEVELOPERS_DOCUMENTATION_URL =
   process.env.REACT_APP_DEVELOPERS_DOCUMENTATION_URL ||
