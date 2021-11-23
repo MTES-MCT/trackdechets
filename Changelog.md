@@ -20,6 +20,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+-  Ajout d'index sur les champs siret des différents bordereaux [PR 1080](https://github.com/MTES-MCT/trackdechets/pull/1080)
 
 # [2021.11.1] 15/11/2021
 

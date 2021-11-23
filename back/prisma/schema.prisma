@@ -338,6 +338,13 @@ model Form {
   ownerId                            String
   owner                              User                    @relation(fields: [ownerId], references: [id])
   StatusLog                          StatusLog[]
+
+
+  @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
+  @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
+  @@index([transporterCompanySiret], map: "_FormTransporterCompanySiretIdx")
+  @@index([traderCompanySiret], map: "_FormTraderCompanySiretIdx")
+  @@index([brokerCompanySiret], map: "_FormBrokerCompanySiretIdx")
 }
 
 model Grant {
@@ -368,10 +375,10 @@ model Installation {
   gerepNumeroSiret  String?
   sireneNumeroSiret String?
 
-  @@index([gerepNumeroSiret], name: "installation_gerepnumerosiret")
-  @@index([irepNumeroSiret], name: "installation_irepnumerosiret")
-  @@index([s3icNumeroSiret], name: "installation_s3icnumerosiret")
-  @@index([sireneNumeroSiret], name: "installation_sirenenumerosiret")
+  @@index([gerepNumeroSiret], map: "installation_gerepnumerosiret")
+  @@index([irepNumeroSiret], map: "installation_irepnumerosiret")
+  @@index([s3icNumeroSiret], map: "installation_s3icnumerosiret")
+  @@index([sireneNumeroSiret], map: "installation_sirenenumerosiret")
 }
 
 model MembershipRequest {
@@ -401,7 +408,7 @@ model Rubrique {
   category         String?
   wasteType        WasteType?
 
-  @@index([codeS3ic], name: "rubrique_codes3ic")
+  @@index([codeS3ic], map: "rubrique_codes3ic")
 }
 
 model StatusLog {
@@ -455,6 +462,9 @@ model TemporaryStorageDetail {
   signedBy                         String?
   signedAt                         DateTime?
   Form                             Form[]
+
+  @@index([destinationCompanySiret], map: "_TemporaryStorageDetailDestinationCompanyIdx")
+  @@index([transporterCompanySiret], map: "_TemporaryStorageDetailTransporterCompanySiretIdx")
 }
 
 model TraderReceipt {
@@ -512,6 +522,9 @@ model TransportSegment {
   updatedAt                       DateTime       @updatedAt
   formId                          String
   form                            Form           @relation(fields: [formId], references: [id])
+
+
+  @@index([transporterCompanySiret], map: "_TransportSegmentTransporterCompanySiretIdx")
 }
 
 model User {
@@ -663,6 +676,10 @@ model Bsvhu {
   destinationOperationNextDestinationCompanyVatNumber String?
   destinationOperationSignatureAuthor                 String?
   destinationOperationSignatureDate                   DateTime?
+
+  @@index([emitterCompanySiret], map: "_BvhuEmitterCompanySirettIdx")
+  @@index([destinationCompanySiret], map: "_BsvhuDestinationCompanySiretIdx")
+  @@index([transporterCompanySiret], map: "_BsvhuTransporterCompanySiretIdx")
 }
 
 // ----------------
@@ -784,6 +801,10 @@ model Bsdasri {
   grouping                                    Bsdasri[]               @relation("BsdasriToBsdasri")
   groupedIn                                   Bsdasri?                @relation("BsdasriToBsdasri", fields: [groupedInId], references: [id])
   groupedInId                                 String?
+
+  @@index([emitterCompanySiret], map: "_BsdasriEmitterCompanySiretIdx")
+  @@index([transporterCompanySiret], map: "_BsdasriTransporterCompanySiretIdx")
+  @@index([destinationCompanySiret], map: "_BsdasriDestinationCompanySiretIdx")
 }
 
 // ----------------
@@ -889,6 +910,11 @@ model Bsff {
   nextBsffId    String?
 
   ficheInterventions BsffFicheIntervention[]
+
+
+  @@index([emitterCompanySiret], map: "_BsffEmitterCompanySiretIdx")
+  @@index([transporterCompanySiret], map: "_BsffTransporterCompanySiretIdx")
+  @@index([destinationCompanySiret], map: "_BsffDestinationCompanySiretIdx")
 }
 
 enum BsffType {
@@ -935,6 +961,9 @@ model BsffFicheIntervention {
 
   // The following property is not used anymore and should be removed in the next version
   bsffId String?
+
+  @@index([detenteurCompanySiret], map: "_BsffFicheInterventionDetenteurCompanySiretIdx")
+  @@index([operateurCompanySiret], map: "_BsffFicheInterventionOperateurCompanySiretIdx")
 }
 
 // ----------------
@@ -1090,4 +1119,10 @@ model Bsda {
   bsdas       Bsda[]  @relation("BsdasToBsda")
   childBsda   Bsda?   @relation("BsdasToBsda", fields: [childBsdaId], references: [id])
   childBsdaId String?
+
+  @@index([emitterCompanySiret], map: "_BsdaEmitterCompanySiretIdx")
+  @@index([brokerCompanySiret], map: "_BsdaBrokerCompanySiretIdx")
+  @@index([destinationCompanySiret], map: "_BsdaDestinationCompanySiretIdx")
+  @@index([transporterCompanySiret], map: "_BsdaTransporterCompanySiretIdx")
+  @@index([workerCompanySiret], map: "_BsdaWorkerCompanySiretIdx")
 }
