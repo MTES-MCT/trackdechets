@@ -443,7 +443,9 @@ describe("Mutation.createDasri validation scenarii", () => {
 
     const input = {
       waste: { adr: "xyz 33", code: "18 01 03*" },
-      identificationNumbers: ["GRV-XY12345", "GRV-VB45678"],
+      identification: {
+        numbers: ["GRV-XY12345", "GRV-VB45678"]
+      },
       emitter: {
         company: {
           name: "hopital blanc",
@@ -497,7 +499,7 @@ describe("Mutation.createDasri validation scenarii", () => {
         }
       }
     );
-    expect(data.createBsdasri.identificationNumbers).toEqual([
+    expect(data.createBsdasri.identification.numbers).toEqual([
       "GRV-XY12345",
       "GRV-VB45678"
     ]);

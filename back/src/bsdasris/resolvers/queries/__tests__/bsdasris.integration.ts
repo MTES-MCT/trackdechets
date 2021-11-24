@@ -232,7 +232,7 @@ describe("Query.Bsdasris", () => {
     const { data } = await query<Pick<Query, "bsdasris">>(GET_BSDASRIS, {
       variables: {
         where: {
-          identificationNumbers: { _in: ["ABC123"] }
+          identification: { numbers: { _in: ["ABC123"] } }
         }
       }
     });
@@ -245,7 +245,7 @@ describe("Query.Bsdasris", () => {
     const { data: data2 } = await query<Pick<Query, "bsdasris">>(GET_BSDASRIS, {
       variables: {
         where: {
-          identificationNumbers: { _in: ["XY456", "VBN654"] }
+          identification: { numbers: { _in: ["XY456", "VBN654"] } }
         }
       }
     });

@@ -263,7 +263,7 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
         <label>
           Numéros de containers
           <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> pour valider chacun" />
-          <TagsInput name="identificationNumbers" disabled={disabled} />
+          <TagsInput name="identification.numbers" disabled={disabled} />
         </label>
       </div>
     </>

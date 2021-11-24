@@ -27,7 +27,9 @@ import {
   BsdasriWasteInput,
   BsdasriWaste,
   BsdasriEcoOrganisme,
-  BsdasriEcoOrganismeInput
+  BsdasriEcoOrganismeInput,
+  BsdasriIdentification,
+  BsdasriIdentificationInput
 } from "../generated/graphql/types";
 import {
   chain,
@@ -165,9 +167,9 @@ export function unflattenBsdasri(bsdasri: Bsdasri): GqlBsdasri {
         })
       })
     }),
-    identificationNumbers: nullIfNoValues<string[]>(
-      bsdasri.identificationNumbers
-    ),
+    identification: nullIfNoValues<BsdasriIdentification>({
+      numbers: bsdasri.identificationNumbers
+    }),
     createdAt: bsdasri.createdAt,
     updatedAt: bsdasri.updatedAt,
     status: bsdasri.status as BsdasriStatus,
@@ -455,12 +457,14 @@ function flattenOperationInput(input: { operation?: BsdasriOperationInput }) {
   };
 }
 
-function flattenContainersInput(input: { identificationNumbers?: string[] }) {
-  if (!input?.identificationNumbers) {
+function flattenContainersInput(input: {
+  identification?: BsdasriIdentificationInput;
+}) {
+  if (!input?.identification?.numbers) {
     return null;
   }
   return {
-    identificationNumbers: input.identificationNumbers
+    identificationNumbers: input.identification.numbers
   };
 }
 
@@ -472,7 +476,7 @@ export function flattenBsdasriInput(
     | "ecoOrganisme"
     | "transporter"
     | "destination"
-    | "identificationNumbers"
+    | "identification"
   >
 ): Partial<Prisma.BsdasriCreateInput> {
   return safeInput({

@@ -65,7 +65,7 @@ function toPrismaBsdasriWhereInput(
       where?.destination?.operation?.signature?.date
     ),
     identificationNumbers: toPrismaStringNullableListFilter(
-      where?.identificationNumbers
+      where?.identification?.numbers
     ),
     ...toPrismaGroupableFilter(where?.groupable)
   });

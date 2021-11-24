@@ -398,7 +398,7 @@ export default function BsdasriDetailContent({
         </div>
       </Tabs>
       <DasriIdentificationNumbers
-        identificationNumbers={form?.identificationNumbers}
+        identificationNumbers={form?.identification?.numbers}
       />
       <div className={styles.detailActions}>
         <button
@@ -417,7 +417,7 @@ const DasriIdentificationNumbers = ({ identificationNumbers }) =>
   !!identificationNumbers ? (
     <div className={styles.BsdasriIdentificationNumbersRow}>
       <dt>Identifiants de containers:</dt>
-      <dd>{identificationNumbers ? identificationNumbers.join(" ,") : null}</dd>
+      <dd>{identificationNumbers ? identificationNumbers.join(", ") : null}</dd>
     </div>
   ) : null;
 

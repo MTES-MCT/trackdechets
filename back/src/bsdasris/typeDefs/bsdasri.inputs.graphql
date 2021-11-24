@@ -55,7 +55,7 @@ input BsdasriWhere {
   emitter: BsdasriEmitterWhere
   transporter: BsdasriTransporterWhere
   destination: BsdasriDestinationWhere
-  identificationNumbers: BsdasriContainersNumbersFilter
+  identification: BsdasriContainersNumbersWhere
 
   """
   (Optionnel) Filtre sur l'état de regroupement des bordereaux
@@ -74,6 +74,11 @@ input BsdasriWhere {
 input BsdasriStatusFilter {
   _eq: BsdasriStatus
   _in: [BsdasriStatus!]
+}
+
+
+input BsdasriContainersNumbersWhere{
+  numbers: BsdasriContainersNumbersFilter
 }
 
 """
@@ -213,6 +218,12 @@ input BsdasriOperationInput {
   date: DateTime
 }
 
+input BsdasriIdentificationInput {
+  "Numéros d'identification des conteneurs concernés"
+  numbers: [String!]
+ 
+}
+
 input BsdasriInput {
   waste: BsdasriWasteInput
 
@@ -228,7 +239,8 @@ input BsdasriInput {
   Optionel: liste d'identifiants des conteneurs concernés. Modifiable par tous les acteurs du bsd, ce champ mis
   à disposition des utilisateur permet de retrouver aisément des Bsdasris grâce à un identifiant de conteneur (cf. query bsdasris) 
   """
-  identificationNumbers: [String!]
+  
+  identification: BsdasriIdentificationInput
 
   "Liste des bordereaux que celui-ci groupe"
   grouping: [ID!]

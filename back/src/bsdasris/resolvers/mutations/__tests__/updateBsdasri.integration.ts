@@ -251,7 +251,9 @@ describe("Mutation.updateBsdasri", () => {
           mail: "recipient@test.test"
         }
       },
-      identificationNumbers: ["abc", "def"]
+      identification: {
+        numbers: ["abc", "def"]
+      }
     };
 
     await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
@@ -404,7 +406,9 @@ describe("Mutation.updateBsdasri", () => {
           mail: "recipient@test.test"
         }
       },
-      identificationNumbers: ["xyz", "bnh"]
+      identification: {
+        numbers: ["xyz", "bnh"]
+      }
     };
 
     await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
