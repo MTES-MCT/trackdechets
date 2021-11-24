@@ -6,7 +6,7 @@ import StateSummary from "./StateSummary";
 import FormCompany from "./FormCompany";
 import Appendix2Form from "./Appendix2Form";
 import Bsd from "./Bsd";
-import BsddReview from "./BsddReview";
+import BsddRevisionRequest from "./BsddRevisionRequest";
 
 export default {
   Query,
@@ -17,5 +17,5 @@ export default {
   FormCompany,
   Appendix2Form,
   Bsd,
-  BsddReview
+  BsddRevisionRequest
 };

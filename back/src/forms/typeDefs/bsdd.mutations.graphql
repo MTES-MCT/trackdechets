@@ -188,19 +188,19 @@ type Mutation {
     nextSegmentInfo: NextSegmentInfoInput!
   ): TransportSegment
 
-  createBsddReview(
+  createBsddRevisionRequest(
     "Identifiant du bordereau à réviser"
     bsddId: ID!
     "Contenu de la révision"
-    input: BsddReviewFormInput!
+    input: BsddRevisionRequestFormInput!
     "Commentaire pour expliquer la demande de révision"
     comment: String!
-  ): BsddReview
+  ): BsddRevisionRequest
 
-  settleBsddReview(
+  settleBsddRevisionRequest(
     "Identifiant de la révision"
     id: ID!
     "Indique si la révision est acceptée ou non"
     isAccepted: Boolean!
-  ): BsddReview
+  ): BsddRevisionRequest
 }

@@ -7,9 +7,9 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
-const BSDD_REVIEWS = `
-  query BsddReviews($siret: String!) {
-    bsddReviews(siret: $siret) {
+const BSDD_REVISION_REQUESTS = `
+  query BsddRevisionRequests($siret: String!) {
+    bsddRevisionRequests(siret: $siret) {
       id
       bsddId
       status
@@ -17,10 +17,10 @@ const BSDD_REVIEWS = `
   }
 `;
 
-describe("Mutation.bsddReviews", () => {
+describe("Mutation.bsddRevisionRequests", () => {
   afterEach(() => resetDatabase());
 
-  it("should list unarchived review from and to company", async () => {
+  it("should list unarchived revisionRequest from and to company", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const { company: otherCompany } = await userWithCompanyFactory("ADMIN");
     const { query } = makeClient(user);
@@ -35,7 +35,7 @@ describe("Mutation.bsddReviews", () => {
     });
 
     // 2 unsettled
-    await prisma.bsddReview.create({
+    await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd1.id,
         requestedById: otherCompany.id,
@@ -44,7 +44,7 @@ describe("Mutation.bsddReviews", () => {
         comment: ""
       }
     });
-    await prisma.bsddReview.create({
+    await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd2.id,
         requestedById: company.id,
@@ -54,8 +54,8 @@ describe("Mutation.bsddReviews", () => {
       }
     });
 
-    // 2 settled reviews
-    await prisma.bsddReview.create({
+    // 2 settled revisionRequests
+    await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd2.id,
         requestedById: company.id,
@@ -69,7 +69,7 @@ describe("Mutation.bsddReviews", () => {
         comment: ""
       }
     });
-    await prisma.bsddReview.create({
+    await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd2.id,
         requestedById: company.id,
@@ -84,13 +84,13 @@ describe("Mutation.bsddReviews", () => {
       }
     });
 
-    const { data } = await query<Pick<Query, "bsddReviews">>(BSDD_REVIEWS, {
+    const { data } = await query<Pick<Query, "bsddRevisionRequests">>(BSDD_REVISION_REQUESTS, {
       variables: { siret: company.siret }
     });
-    expect(data.bsddReviews.length).toBe(4);
+    expect(data.bsddRevisionRequests.length).toBe(4);
   });
 
-  it("should mark settled reviews as so", async () => {
+  it("should mark settled revisionRequests as so", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const { company: otherCompany } = await userWithCompanyFactory("ADMIN");
     const { query } = makeClient(user);
@@ -104,8 +104,8 @@ describe("Mutation.bsddReviews", () => {
       opt: { recipientCompanySiret: company.siret }
     });
 
-    // 1 settled review and 1 unsettled
-    await prisma.bsddReview.create({
+    // 1 settled revisionRequest and 1 unsettled
+    await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd1.id,
         requestedById: company.id,
@@ -119,7 +119,7 @@ describe("Mutation.bsddReviews", () => {
         comment: ""
       }
     });
-    await prisma.bsddReview.create({
+    await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd2.id,
         requestedById: company.id,
@@ -134,19 +134,19 @@ describe("Mutation.bsddReviews", () => {
       }
     });
 
-    const { data } = await query<Pick<Query, "bsddReviews">>(BSDD_REVIEWS, {
+    const { data } = await query<Pick<Query, "bsddRevisionRequests">>(BSDD_REVISION_REQUESTS, {
       variables: { siret: company.siret }
     });
 
     expect(
-      data.bsddReviews.find(review => review.bsddId === bsdd1.id).status
+      data.bsddRevisionRequests.find(revisionRequest => revisionRequest.bsddId === bsdd1.id).status
     ).toBe("ACCEPTED");
     expect(
-      data.bsddReviews.find(review => review.bsddId === bsdd2.id).status
+      data.bsddRevisionRequests.find(revisionRequest => revisionRequest.bsddId === bsdd2.id).status
     ).toBe("PENDING");
   });
 
-  it("should mark accepted reviews as so", async () => {
+  it("should mark accepted revisionRequests as so", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const { company: otherCompany } = await userWithCompanyFactory("ADMIN");
     const { query } = makeClient(user);
@@ -160,8 +160,8 @@ describe("Mutation.bsddReviews", () => {
       opt: { recipientCompanySiret: company.siret }
     });
 
-    // 1 approved review and one refused
-    await prisma.bsddReview.create({
+    // 1 approved revisionRequest and one refused
+    await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd1.id,
         requestedById: company.id,
@@ -175,7 +175,7 @@ describe("Mutation.bsddReviews", () => {
         comment: ""
       }
     });
-    await prisma.bsddReview.create({
+    await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd2.id,
         requestedById: company.id,
@@ -190,12 +190,12 @@ describe("Mutation.bsddReviews", () => {
       }
     });
 
-    const { data } = await query<Pick<Query, "bsddReviews">>(BSDD_REVIEWS, {
+    const { data } = await query<Pick<Query, "bsddRevisionRequests">>(BSDD_REVISION_REQUESTS, {
       variables: { siret: company.siret }
     });
 
     expect(
-      data.bsddReviews.find(review => review.bsddId === bsdd1.id).status
+      data.bsddRevisionRequests.find(revisionRequest => revisionRequest.bsddId === bsdd1.id).status
     ).toBe("ACCEPTED");
   });
 });

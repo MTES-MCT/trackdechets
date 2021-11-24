@@ -1,7 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
-  MutationSettleBsddReviewArgs
+  MutationSettleBsddRevisionRequestArgs
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
@@ -10,9 +10,9 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
-const SETTLE_BSDD_REVIEW = `
-  mutation SettleBsddReview($id: ID!, $isAccepted: Boolean!) {
-    settleBsddReview(id: $id, isAccepted: $isAccepted) {
+const SETTLE_BSDD_REVISION_REQUEST = `
+  mutation SettleBsddRevisionRequest($id: ID!, $isAccepted: Boolean!) {
+    settleBsddRevisionRequest(id: $id, isAccepted: $isAccepted) {
       id
       bsddId
       content {
@@ -29,16 +29,16 @@ const SETTLE_BSDD_REVIEW = `
   }
 `;
 
-describe("Mutation.settleBsddReview", () => {
+describe("Mutation.settleBsddRevisionRequest", () => {
   afterEach(() => resetDatabase());
 
-  it("should fail if review doesnt exist", async () => {
+  it("should fail if revisionRequest doesnt exist", async () => {
     const { user } = await userWithCompanyFactory("ADMIN");
     const { mutate } = makeClient(user);
 
-    const { errors } = await mutate(SETTLE_BSDD_REVIEW, {
+    const { errors } = await mutate(SETTLE_BSDD_REVISION_REQUEST, {
       variables: {
-        id: "inexistant review",
+        id: "inexistant revisionRequest",
         isAccepted: true
       }
     });
@@ -46,7 +46,7 @@ describe("Mutation.settleBsddReview", () => {
     expect(errors[0].message).toBe("Révision introuvable.");
   });
 
-  it("should fail if user is not allowed on review", async () => {
+  it("should fail if user is not allowed on revisionRequest", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -58,7 +58,7 @@ describe("Mutation.settleBsddReview", () => {
       opt: { emitterCompanySiret: companyOfSomeoneElse.siret }
     });
 
-    const review = await prisma.bsddReview.create({
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
         requestedById: companyOfSomeoneElse.id,
@@ -67,9 +67,9 @@ describe("Mutation.settleBsddReview", () => {
       }
     });
 
-    const { errors } = await mutate(SETTLE_BSDD_REVIEW, {
+    const { errors } = await mutate(SETTLE_BSDD_REVISION_REQUEST, {
       variables: {
-        id: review.id,
+        id: revisionRequest.id,
         isAccepted: true
       }
     });
@@ -79,7 +79,7 @@ describe("Mutation.settleBsddReview", () => {
     );
   });
 
-  it("should fail if requester tries to approve its own review", async () => {
+  it("should fail if requester tries to approve its own revisionRequest", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -91,7 +91,7 @@ describe("Mutation.settleBsddReview", () => {
       opt: { emitterCompanySiret: company.siret }
     });
 
-    const review = await prisma.bsddReview.create({
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
         requestedById: company.id,
@@ -101,9 +101,9 @@ describe("Mutation.settleBsddReview", () => {
       }
     });
 
-    const { errors } = await mutate(SETTLE_BSDD_REVIEW, {
+    const { errors } = await mutate(SETTLE_BSDD_REVISION_REQUEST, {
       variables: {
-        id: review.id,
+        id: revisionRequest.id,
         isAccepted: true
       }
     });
@@ -113,7 +113,7 @@ describe("Mutation.settleBsddReview", () => {
     );
   });
 
-  it("should work if the only validator approves the review", async () => {
+  it("should work if the only validator approves the revisionRequest", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -125,7 +125,7 @@ describe("Mutation.settleBsddReview", () => {
       opt: { emitterCompanySiret: companyOfSomeoneElse.siret }
     });
 
-    const review = await prisma.bsddReview.create({
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
         requestedById: companyOfSomeoneElse.id,
@@ -135,20 +135,20 @@ describe("Mutation.settleBsddReview", () => {
       }
     });
 
-    const { data } = await mutate<Pick<Mutation, "settleBsddReview">>(
-      SETTLE_BSDD_REVIEW,
+    const { data } = await mutate<Pick<Mutation, "settleBsddRevisionRequest">>(
+      SETTLE_BSDD_REVISION_REQUEST,
       {
         variables: {
-          id: review.id,
+          id: revisionRequest.id,
           isAccepted: true
         }
       }
     );
 
-    expect(data.settleBsddReview.status).toBe("ACCEPTED");
+    expect(data.settleBsddRevisionRequest.status).toBe("ACCEPTED");
   });
 
-  it("should work if one of the validators approves the review, but not mark the review as accepted", async () => {
+  it("should work if one of the validators approves the revisionRequest, but not mark the revisionRequest as accepted", async () => {
     const { company: secondCompany } = await userWithCompanyFactory("ADMIN");
     const { company: thirdCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
@@ -159,7 +159,7 @@ describe("Mutation.settleBsddReview", () => {
       opt: { emitterCompanySiret: secondCompany.siret }
     });
 
-    const review = await prisma.bsddReview.create({
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
         requestedById: secondCompany.id,
@@ -171,32 +171,32 @@ describe("Mutation.settleBsddReview", () => {
       }
     });
 
-    const { data } = await mutate<Pick<Mutation, "settleBsddReview">>(
-      SETTLE_BSDD_REVIEW,
+    const { data } = await mutate<Pick<Mutation, "settleBsddRevisionRequest">>(
+      SETTLE_BSDD_REVISION_REQUEST,
       {
         variables: {
-          id: review.id,
+          id: revisionRequest.id,
           isAccepted: true
         }
       }
     );
 
-    expect(data.settleBsddReview.status).toBe("PENDING");
+    expect(data.settleBsddRevisionRequest.status).toBe("PENDING");
 
     expect(
-      data.settleBsddReview.validations.find(
+      data.settleBsddRevisionRequest.validations.find(
         val => val.company.siret === company.siret
       ).status
     ).toBe("ACCEPTED");
 
     expect(
-      data.settleBsddReview.validations.find(
+      data.settleBsddRevisionRequest.validations.find(
         val => val.company.siret === thirdCompany.siret
       ).status
     ).toBe("PENDING");
   });
 
-  it("should mark the review as refused if one of the validators refused the review", async () => {
+  it("should mark the revisionRequest as refused if one of the validators refused the revisionRequest", async () => {
     const { company: secondCompany } = await userWithCompanyFactory("ADMIN");
     const { company: thirdCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
@@ -207,7 +207,7 @@ describe("Mutation.settleBsddReview", () => {
       opt: { emitterCompanySiret: secondCompany.siret }
     });
 
-    const review = await prisma.bsddReview.create({
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
         requestedById: secondCompany.id,
@@ -219,25 +219,25 @@ describe("Mutation.settleBsddReview", () => {
       }
     });
 
-    const { data } = await mutate<Pick<Mutation, "settleBsddReview">>(
-      SETTLE_BSDD_REVIEW,
+    const { data } = await mutate<Pick<Mutation, "settleBsddRevisionRequest">>(
+      SETTLE_BSDD_REVISION_REQUEST,
       {
         variables: {
-          id: review.id,
+          id: revisionRequest.id,
           isAccepted: false
         }
       }
     );
 
     expect(
-      data.settleBsddReview.validations.find(
+      data.settleBsddRevisionRequest.validations.find(
         val => val.company.siret === company.siret
       ).status
     ).toBe("REFUSED");
-    expect(data.settleBsddReview.status).toBe("REFUSED");
+    expect(data.settleBsddRevisionRequest.status).toBe("REFUSED");
   });
 
-  it("should work if only validator refuses the review", async () => {
+  it("should work if only validator refuses the revisionRequest", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -249,7 +249,7 @@ describe("Mutation.settleBsddReview", () => {
       opt: { emitterCompanySiret: companyOfSomeoneElse.siret }
     });
 
-    const review = await prisma.bsddReview.create({
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
         requestedById: companyOfSomeoneElse.id,
@@ -259,17 +259,17 @@ describe("Mutation.settleBsddReview", () => {
       }
     });
 
-    const { data } = await mutate<Pick<Mutation, "settleBsddReview">>(
-      SETTLE_BSDD_REVIEW,
+    const { data } = await mutate<Pick<Mutation, "settleBsddRevisionRequest">>(
+      SETTLE_BSDD_REVISION_REQUEST,
       {
         variables: {
-          id: review.id,
+          id: revisionRequest.id,
           isAccepted: false
         }
       }
     );
 
-    expect(data.settleBsddReview.status).toBe("REFUSED");
+    expect(data.settleBsddRevisionRequest.status).toBe("REFUSED");
   });
 
   it("should edit bsdd accordingly when accepted", async () => {
@@ -285,7 +285,7 @@ describe("Mutation.settleBsddReview", () => {
     });
 
     expect(bsdd.wasteDetailsCode).not.toBe("01 03 08");
-    const review = await prisma.bsddReview.create({
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
         requestedById: companyOfSomeoneElse.id,
@@ -296,11 +296,11 @@ describe("Mutation.settleBsddReview", () => {
     });
 
     await mutate<
-      Pick<Mutation, "settleBsddReview">,
-      MutationSettleBsddReviewArgs
-    >(SETTLE_BSDD_REVIEW, {
+      Pick<Mutation, "settleBsddRevisionRequest">,
+      MutationSettleBsddRevisionRequestArgs
+    >(SETTLE_BSDD_REVISION_REQUEST, {
       variables: {
-        id: review.id,
+        id: revisionRequest.id,
         isAccepted: true
       }
     });
@@ -325,7 +325,7 @@ describe("Mutation.settleBsddReview", () => {
     });
 
     expect(bsdd.wasteDetailsCode).not.toBe("01 03 08");
-    const review = await prisma.bsddReview.create({
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
         requestedById: companyOfSomeoneElse.id,
@@ -336,11 +336,11 @@ describe("Mutation.settleBsddReview", () => {
     });
 
     await mutate<
-      Pick<Mutation, "settleBsddReview">,
-      MutationSettleBsddReviewArgs
-    >(SETTLE_BSDD_REVIEW, {
+      Pick<Mutation, "settleBsddRevisionRequest">,
+      MutationSettleBsddRevisionRequestArgs
+    >(SETTLE_BSDD_REVISION_REQUEST, {
       variables: {
-        id: review.id,
+        id: revisionRequest.id,
         isAccepted: false
       }
     });

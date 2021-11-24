@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "default$default"."BsddReview" (
+CREATE TABLE "default$default"."BsddRevisionRequest" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -12,28 +12,28 @@ CREATE TABLE "default$default"."BsddReview" (
 );
 
 -- CreateEnum
-CREATE TYPE "default$default"."AcceptationStatus" AS ENUM ('PENDING', 'ACCEPTED', 'REFUSED');
+CREATE TYPE "default$default"."RevisionRequestAcceptationStatus" AS ENUM ('PENDING', 'ACCEPTED', 'REFUSED');
 
 -- CreateTable
-CREATE TABLE "default$default"."BsddReviewValidation" (
+CREATE TABLE "default$default"."BsddRevisionRequestValidation" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "bsddReviewId" TEXT NOT NULL,
+    "revisionRequestId" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
-    "status" "default$default"."AcceptationStatus" DEFAULT E'PENDING',
+    "status" "default$default"."RevisionRequestAcceptationStatus" DEFAULT E'PENDING',
 
     PRIMARY KEY ("id")
 );
 
 -- AddForeignKey
-ALTER TABLE "default$default"."BsddReview" ADD FOREIGN KEY ("requestedById") REFERENCES "default$default"."Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "default$default"."BsddRevisionRequest" ADD FOREIGN KEY ("requestedById") REFERENCES "default$default"."Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "default$default"."BsddReview" ADD FOREIGN KEY ("bsddId") REFERENCES "default$default"."Form"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "default$default"."BsddRevisionRequest" ADD FOREIGN KEY ("bsddId") REFERENCES "default$default"."Form"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "default$default"."BsddReviewValidation" ADD FOREIGN KEY ("bsddReviewId") REFERENCES "default$default"."BsddReview"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "default$default"."BsddRevisionRequestValidation" ADD FOREIGN KEY ("bsddRevisionRequestId") REFERENCES "default$default"."BsddRevisionRequest"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "default$default"."BsddReviewValidation" ADD FOREIGN KEY ("companyId") REFERENCES "default$default"."Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "default$default"."BsddRevisionRequestValidation" ADD FOREIGN KEY ("companyId") REFERENCES "default$default"."Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;

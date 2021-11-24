@@ -1,20 +1,20 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import { QueryBsddReviewsArgs } from "../../../generated/graphql/types";
+import { QueryBsddRevisionRequestsArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
 
-export default async function bsddReviews(
+export default async function bsddRevisionRequests(
   _,
-  { siret }: QueryBsddReviewsArgs,
+  { siret }: QueryBsddRevisionRequestsArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ siret });
   await checkIsCompanyMember({ id: user.id }, { siret });
 
-  return prisma.bsddReview.findMany({
+  return prisma.bsddRevisionRequest.findMany({
     where: {
       OR: [
         { requestedById: company.id },

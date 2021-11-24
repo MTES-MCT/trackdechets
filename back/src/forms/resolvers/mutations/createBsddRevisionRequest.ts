@@ -1,16 +1,16 @@
-import { UserInputError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
 import * as yup from "yup";
-import { Form } from "@prisma/client";
+import { Form, RevisionRequestAcceptationStatus } from "@prisma/client";
 import {
   PROCESSING_OPERATIONS_CODES,
   WASTES_CODES
 } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationCreateBsddReviewArgs } from "../../../generated/graphql/types";
+import { MutationCreateBsddRevisionRequestArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
-import { checkCanReview } from "../../permissions";
+import { checkCanRequestRevision } from "../../permissions";
 import {
   INVALID_PROCESSING_OPERATION,
   INVALID_SIRET_LENGTH,
@@ -24,25 +24,42 @@ import {
 
 export default async function createReview(
   _,
-  { bsddId, input, comment }: MutationCreateBsddReviewArgs,
+  { bsddId, input, comment }: MutationCreateBsddRevisionRequestArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
 
   const existingBsdd = await getFormOrFormNotFound({ id: bsddId });
-  await checkCanReview(user, existingBsdd);
+  await checkCanRequestRevision(user, existingBsdd);
 
-  const { temporaryStorageDetail, ...bsddReview } = input;
+  const unsettledExistingRevisionRequest =
+    await prisma.bsddRevisionRequest.findFirst({
+      where: {
+        bsddId,
+        validations: {
+          none: { status: RevisionRequestAcceptationStatus.REFUSED },
+          some: { status: RevisionRequestAcceptationStatus.PENDING }
+        }
+      }
+    });
+
+  if (unsettledExistingRevisionRequest) {
+    throw new ForbiddenError(
+      "Impossible de créer une révision sur ce bordereau. Une autre révision est déjà en attente de validation."
+    );
+  }
+
+  const { temporaryStorageDetail, ...bsddRevisionRequest } = input;
   if (temporaryStorageDetail && existingBsdd.temporaryStorageDetailId == null) {
     throw new UserInputError(
       "Impossible de réviser l'entreposage provisoire, ce bordereau n'est pas concerné."
     );
   }
-  const bsddReviewContent = flattenFormInput(bsddReview);
-  await simpleReviewSchema.validate(bsddReviewContent);
+  const bsddRevisionRequestContent = flattenFormInput(bsddRevisionRequest);
+  await simpleReviewSchema.validate(bsddRevisionRequestContent);
 
   const reviewContent: any = {
-    ...bsddReviewContent
+    ...bsddRevisionRequestContent
   };
 
   if (temporaryStorageDetail) {
@@ -62,7 +79,7 @@ export default async function createReview(
     temporaryStorageDetail == null
   );
 
-  return prisma.bsddReview.create({
+  return prisma.bsddRevisionRequest.create({
     data: {
       bsdd: { connect: { id: existingBsdd.id } },
       content: JSON.parse(JSON.stringify(reviewContent)),

@@ -519,7 +519,7 @@ type Stat {
   outgoing: Float!
 }
 
-type BsddReview {
+type BsddRevisionRequest {
   "Identifiant de la révison"
   id: ID!
 
@@ -533,16 +533,16 @@ type BsddReview {
   requestedBy: FormCompany!
 
   "Validations nécessaires à l'approbation de la révision"
-  validations: [BsddReviewValidation!]
+  validations: [BsddRevisionRequestValidation!]
 
   "Contenu de la révision"
-  content: BsddReviewForm!
+  content: BsddRevisionRequestForm!
 
   "Statut d'acceptation de la révision"
   status: AcceptationStatus!
 }
 
-type BsddReviewValidation {
+type BsddRevisionRequestValidation {
   "Entreprise qui doit valider la révision"
   company: FormCompany
 
@@ -551,9 +551,9 @@ type BsddReviewValidation {
 }
 
 "Payload de révision d'un bordereau. Disponible sur une liste restrainte de champs."
-type BsddReviewForm {
+type BsddRevisionRequestForm {
   "Détails du déchet (édition partielle uniquement)"
-  wasteDetails: BsddReviewWasteDetails
+  wasteDetails: BsddRevisionRequestWasteDetails
 
   "Négociant"
   trader: Trader
@@ -562,7 +562,7 @@ type BsddReviewForm {
   broker: Broker
 
   "Destination du déchet (édition partielle uniquement)"
-  recipient: BsddReviewRecipient
+  recipient: BsddRevisionRequestRecipient
 
   "Quantité reçue, en tonnes"
   quantityReceived: Float
@@ -571,10 +571,10 @@ type BsddReviewForm {
   processingOperationDone: String
 
   "Entreposage provisoire (édition partielle uniquement)"
-  temporaryStorageDetail: BsddReviewTemporaryStorageDetail
+  temporaryStorageDetail: BsddRevisionRequestTemporaryStorageDetail
 }
 
-type BsddReviewWasteDetails {
+type BsddRevisionRequestWasteDetails {
   "Code CED"
   code: String
 
@@ -582,15 +582,15 @@ type BsddReviewWasteDetails {
   pop: Boolean
 }
 
-type BsddReviewRecipient {
+type BsddRevisionRequestRecipient {
   cap: String
 }
 
-type BsddReviewTemporaryStorageDetail {
-  destination: BsddReviewDestination
+type BsddRevisionRequestTemporaryStorageDetail {
+  destination: BsddRevisionRequestDestination
 }
 
-type BsddReviewDestination {
+type BsddRevisionRequestDestination {
   "N° de CAP"
   cap: String
 

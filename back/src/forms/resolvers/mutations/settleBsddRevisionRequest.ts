@@ -1,37 +1,39 @@
-import { AcceptationStatus, BsddReview, Prisma } from "@prisma/client";
+import { RevisionRequestAcceptationStatus, BsddRevisionRequest, Prisma } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationSettleBsddReviewArgs } from "../../../generated/graphql/types";
+import { MutationSettleBsddRevisionRequestArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getFirstUserCompanyInList } from "../../../users/database";
 
-export default async function settleReview(
+export default async function settleRevisionRequest(
   _,
-  { id, isAccepted }: MutationSettleBsddReviewArgs,
+  { id, isAccepted }: MutationSettleBsddRevisionRequestArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
 
-  const review = await prisma.bsddReview.findUnique({
+  const revisionRequest = await prisma.bsddRevisionRequest.findUnique({
     where: { id },
     include: { validations: true }
   });
 
-  if (!review) {
+  if (!revisionRequest) {
     throw new UserInputError("Révision introuvable.");
   }
 
   if (
-    review.validations.some(val => val.status === AcceptationStatus.REFUSED)
+    revisionRequest.validations.some(
+      val => val.status === RevisionRequestAcceptationStatus.REFUSED
+    )
   ) {
     throw new ForbiddenError(
       "Cette révision n'est plus approuvable, au moins un acteur la refusée."
     );
   }
 
-  const activeValidations = review.validations.filter(
-    val => val.status === AcceptationStatus.PENDING
+  const activeValidations = revisionRequest.validations.filter(
+    val => val.status === RevisionRequestAcceptationStatus.PENDING
   );
   const userCompany = await getFirstUserCompanyInList(
     user.id,
@@ -44,44 +46,48 @@ export default async function settleReview(
     );
   }
 
-  const bsddReviewValidation = activeValidations.find(
+  const bsddRevisionRequestValidation = activeValidations.find(
     val => val.companyId === userCompany.id
   );
-  await prisma.bsddReviewValidation.update({
-    where: { id: bsddReviewValidation.id },
+  await prisma.bsddRevisionRequestValidation.update({
+    where: { id: bsddRevisionRequestValidation.id },
     data: {
       status: isAccepted
-        ? AcceptationStatus.ACCEPTED
-        : AcceptationStatus.REFUSED
+        ? RevisionRequestAcceptationStatus.ACCEPTED
+        : RevisionRequestAcceptationStatus.REFUSED
     }
   });
 
-  await updateReviewIfNecessary(review);
+  await updateFormIfNecessary(revisionRequest);
 
-  return prisma.bsddReview.findFirst({
+  return prisma.bsddRevisionRequest.findFirst({
     where: { id },
     include: { validations: true }
   });
 }
 
-async function updateReviewIfNecessary({ id, content, bsddId }: BsddReview) {
-  const validations = await prisma.bsddReview
+async function updateFormIfNecessary({
+  id,
+  content,
+  bsddId
+}: BsddRevisionRequest) {
+  const validations = await prisma.bsddRevisionRequest
     .findUnique({ where: { id: id } })
     .validations();
 
   const isReviewAccepted = validations.every(
-    val => val.status === AcceptationStatus.ACCEPTED
+    val => val.status === RevisionRequestAcceptationStatus.ACCEPTED
   );
   if (!isReviewAccepted) {
     return;
   }
 
-  const { temporaryStorageDetail, ...bsddReview } =
+  const { temporaryStorageDetail, ...bsddRevisionRequest } =
     content as Partial<Prisma.FormUpdateInput>;
   await prisma.form.update({
     where: { id: bsddId },
     data: {
-      ...bsddReview,
+      ...bsddRevisionRequest,
       ...(temporaryStorageDetail && {
         temporaryStorageDetail: { update: { ...temporaryStorageDetail } }
       })

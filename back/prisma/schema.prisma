@@ -147,13 +147,13 @@ model Application {
 }
 
 model Company {
-  id                                   String                    @id @default(cuid())
-  siret                                String                    @unique
-  updatedAt                            DateTime                  @updatedAt
-  createdAt                            DateTime                  @default(now())
+  id                                   String                          @id @default(cuid())
+  siret                                String                          @unique
+  updatedAt                            DateTime                        @updatedAt
+  createdAt                            DateTime                        @default(now())
   securityCode                         Int
   verificationCode                     String
-  verificationStatus                   CompanyVerificationStatus @default(TO_BE_VERIFIED)
+  verificationStatus                   CompanyVerificationStatus       @default(TO_BE_VERIFIED)
   verificationMode                     CompanyVerificationMode?
   verificationComment                  String?
   verifiedAt                           DateTime?
@@ -170,20 +170,20 @@ model Company {
   ecoOrganismeAgreements               String[]
   companyTypes                         CompanyType[]
   traderReceiptId                      String?
-  traderReceipt                        TraderReceipt?            @relation(fields: [traderReceiptId], references: [id])
+  traderReceipt                        TraderReceipt?                  @relation(fields: [traderReceiptId], references: [id])
   brokerReceiptId                      String?
-  brokerReceipt                        BrokerReceipt?            @relation(fields: [brokerReceiptId], references: [id])
+  brokerReceipt                        BrokerReceipt?                  @relation(fields: [brokerReceiptId], references: [id])
   transporterReceiptId                 String?
-  transporterReceipt                   TransporterReceipt?       @relation(fields: [transporterReceiptId], references: [id])
+  transporterReceipt                   TransporterReceipt?             @relation(fields: [transporterReceiptId], references: [id])
   vhuAgrementDemolisseurId             String?
-  vhuAgrementDemolisseur               VhuAgrement?              @relation(name: "VhuAgrementDemolisseur_Company", fields: [vhuAgrementDemolisseurId], references: [id])
+  vhuAgrementDemolisseur               VhuAgrement?                    @relation(name: "VhuAgrementDemolisseur_Company", fields: [vhuAgrementDemolisseurId], references: [id])
   vhuAgrementBroyeurId                 String?
-  vhuAgrementBroyeur                   VhuAgrement?              @relation(name: "VhuAgrementBroyeur_Company", fields: [vhuAgrementBroyeurId], references: [id])
+  vhuAgrementBroyeur                   VhuAgrement?                    @relation(name: "VhuAgrementBroyeur_Company", fields: [vhuAgrementBroyeurId], references: [id])
   CompanyAssociation                   CompanyAssociation[]
   MembershipRequest                    MembershipRequest[]
-  allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
-  bsddReviewRequests                   BsddReview[]
-  bsddReviewRequestValidations         BsddReviewValidation[]
+  allowBsdasriTakeOverWithoutSignature Boolean                         @default(false)
+  bsddRevisionRequests                 BsddRevisionRequest[]
+  bsddRevisionRequestValidations       BsddRevisionRequestValidation[]
 }
 
 // Companies with restricted diffusion of SIRENE information (police, army, etc)
@@ -340,17 +340,16 @@ model Form {
   ownerId                            String
   owner                              User                    @relation(fields: [ownerId], references: [id])
   StatusLog                          StatusLog[]
-  bsddReviews                        BsddReview[]
+  bsddRevisionRequests               BsddRevisionRequest[]
 
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_FormTransporterCompanySiretIdx")
   @@index([traderCompanySiret], map: "_FormTraderCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_FormBrokerCompanySiretIdx")
-  
 }
 
-model BsddReview {
+model BsddRevisionRequest {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -360,30 +359,30 @@ model BsddReview {
   requestedById String
   requestedBy   Company @relation(fields: [requestedById], references: [id])
 
-  validations BsddReviewValidation[]
+  validations BsddRevisionRequestValidation[]
 
   content Json
   comment String
 }
 
-enum AcceptationStatus {
+enum RevisionRequestAcceptationStatus {
   PENDING
   ACCEPTED
   REFUSED
 }
 
-model BsddReviewValidation {
+model BsddRevisionRequestValidation {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  bsddReviewId String
-  bsddReview   BsddReview @relation(fields: [bsddReviewId], references: [id])
+  revisionRequestId String
+  revisionRequest   BsddRevisionRequest @relation(fields: [revisionRequestId], references: [id])
 
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
-  status AcceptationStatus @default(PENDING)
+  status RevisionRequestAcceptationStatus @default(PENDING)
 }
 
 model Grant {
