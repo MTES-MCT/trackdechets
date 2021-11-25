@@ -94,6 +94,7 @@ module.exports = {
         "reference/authentification",
         "reference/permissions",
         "reference/identifiants",
+        "reference/validation",
         "reference/errors",
         "reference/notifications",
         "reference/limitations",
