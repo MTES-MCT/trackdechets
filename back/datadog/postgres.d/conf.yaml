@@ -1,0 +1,8 @@
+init_config:
+instances:
+  - dbm: true
+    host: %%env_DD_DATABASE_HOST%%
+    port: %%env_DD_DATABASE_PORT%%
+    username: %%env_DD_DATABASE_USER%%
+    password: %%env_DD_DATABASE_PWD%%
+    dbname: %%env_DD_DATABASE_DB%%
