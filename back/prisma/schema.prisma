@@ -363,6 +363,8 @@ model BsddRevisionRequest {
 
   content Json
   comment String
+
+  isSettled Boolean @default(false)
 }
 
 enum RevisionRequestAcceptationStatus {

@@ -7,6 +7,7 @@ CREATE TABLE "default$default"."BsddRevisionRequest" (
     "requestedById" TEXT NOT NULL,
     "content" JSONB NOT NULL,
     "comment" TEXT NOT NULL,
+    "isSettled" BOOLEAN NOT NULL DEFAULT false,
 
     PRIMARY KEY ("id")
 );

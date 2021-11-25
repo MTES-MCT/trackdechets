@@ -32,18 +32,14 @@ export default async function createReview(
   const existingBsdd = await getFormOrFormNotFound({ id: bsddId });
   await checkCanRequestRevision(user, existingBsdd);
 
-  const unsettledExistingRevisionRequest =
-    await prisma.bsddRevisionRequest.findFirst({
-      where: {
-        bsddId,
-        validations: {
-          none: { status: RevisionRequestAcceptationStatus.REFUSED },
-          some: { status: RevisionRequestAcceptationStatus.PENDING }
-        }
-      }
-    });
+  const unsettledRevisionRequest = await prisma.bsddRevisionRequest.count({
+    where: {
+      bsddId,
+      isSettled: false
+    }
+  });
 
-  if (unsettledExistingRevisionRequest) {
+  if (unsettledRevisionRequest > 0) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau. Une autre révision est déjà en attente de validation."
     );

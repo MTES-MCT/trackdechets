@@ -1,4 +1,8 @@
-import { RevisionRequestAcceptationStatus, BsddRevisionRequest, Prisma } from "@prisma/client";
+import {
+  RevisionRequestAcceptationStatus,
+  BsddRevisionRequest,
+  Prisma
+} from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationSettleBsddRevisionRequestArgs } from "../../../generated/graphql/types";
@@ -28,7 +32,7 @@ export default async function settleRevisionRequest(
     )
   ) {
     throw new ForbiddenError(
-      "Cette révision n'est plus approuvable, au moins un acteur la refusée."
+      "Cette révision n'est plus approuvable, au moins un acteur l'a refusée."
     );
   }
 
@@ -42,7 +46,7 @@ export default async function settleRevisionRequest(
 
   if (!userCompany) {
     throw new ForbiddenError(
-      "Vous n'êtes pas destinataire de cette révision, ou alors cette révision n'est plus approuvable."
+      "Vous n'êtes pas destinataire de cette révision, ou alors cette révision a déjà été approuvée."
     );
   }
 
@@ -58,7 +62,15 @@ export default async function settleRevisionRequest(
     }
   });
 
-  await updateFormIfNecessary(revisionRequest);
+  // We just settled the last active validation ? Then the whole revision is settled
+  const isRevisionSettled = activeValidations.length === 1;
+  if (isRevisionSettled) {
+    await updateFormIfRevisionIsAccepted(revisionRequest, isAccepted);
+    await prisma.bsddRevisionRequest.update({
+      where: { id },
+      data: { isSettled: true }
+    });
+  }
 
   return prisma.bsddRevisionRequest.findFirst({
     where: { id },
@@ -66,19 +78,11 @@ export default async function settleRevisionRequest(
   });
 }
 
-async function updateFormIfNecessary({
-  id,
-  content,
-  bsddId
-}: BsddRevisionRequest) {
-  const validations = await prisma.bsddRevisionRequest
-    .findUnique({ where: { id: id } })
-    .validations();
-
-  const isReviewAccepted = validations.every(
-    val => val.status === RevisionRequestAcceptationStatus.ACCEPTED
-  );
-  if (!isReviewAccepted) {
+async function updateFormIfRevisionIsAccepted(
+  { content, bsddId }: BsddRevisionRequest,
+  isAccepted: boolean
+) {
+  if (!isAccepted) {
     return;
   }
 
