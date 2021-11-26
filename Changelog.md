@@ -4,19 +4,19 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
-# Next release ~15/11
+# Next release ~6/12
 
 #### :rocket: Nouvelles fonctionnalités
 
 #### :boom: Breaking changes
 
-- Harmonisation du statut d'acceptation du déchet [PR 1040](https://github.com/MTES-MCT/trackdechets/pull/1040)
-  - Remplacement de `BsdaAcceptationStatus`, `BsffAcceptationStatus` et `BsvhuAcceptationStatus` par `WasteAcceptationStatus`
-  - Remplacement de l'input `WasteAcceptationStatusInput` par l'enum `WasteAcceptationStatus`
-  - Les champs `Form.wasteAcceptationStatus`, `TemporaryStorer.wasteAcceptationStatus` et `BsdasriWasteAcceptation.status` ne sont plus du type `String` mais `WasteAcceptationStatus`
-
+- Ajout d'une date de prise en charge du déchet par le transporteur sur le `Bsff` [PR 1065](https://github.com/MTES-MCT/trackdechets/pull/1065)
+  - Ajout du champ `transporter.transport.takenOverAt` à l'objet `Bsff`
+  - Ajout du champ optionnel `takenOverAt` à l'input `BsffTransporterTransportInput`.
+  - Dans le cas où `takenOverAt` n'est pas renseigné, `bsff.transporter.transport.takenOverAt` renvoie la date de signature transport par défaut.
 #### :bug: Corrections de bugs
 
+- Correction d'un bug empêchant la mise à jour partielle de champs imbriqués via la mutation `updateBsff` [PR 1065](https://github.com/MTES-MCT/trackdechets/pull/1065)
 
 #### :nail_care: Améliorations
 
@@ -32,10 +32,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :boom: Breaking changes
 
-- Ajout d'une date de prise en charge du déchet par le transporteur sur le `Bsff` [PR 1065](https://github.com/MTES-MCT/trackdechets/pull/1065)
-  - Ajout du champ `transporter.transport.takenOverAt` à l'objet `Bsff`
-  - Ajout du champ optionnel `takenOverAt` à l'input `BsffTransporterTransportInput`.
-  - Dans le cas où `takenOverAt` n'est pas renseigné, `bsff.transporter.transport.takenOverAt` renvoie la date de signature transport par défaut.
+- Harmonisation du statut d'acceptation du déchet [PR 1040](https://github.com/MTES-MCT/trackdechets/pull/1040)
+  - Remplacement de `BsdaAcceptationStatus`, `BsffAcceptationStatus` et `BsvhuAcceptationStatus` par `WasteAcceptationStatus`
+  - Remplacement de l'input `WasteAcceptationStatusInput` par l'enum `WasteAcceptationStatus`
+  - Les champs `Form.wasteAcceptationStatus`, `TemporaryStorer.wasteAcceptationStatus` et `BsdasriWasteAcceptation.status` ne sont plus du type `String` mais `WasteAcceptationStatus`
 #### :bug: Corrections de bugs
 
 - Correction d'une rare erreur d'affichage du rôle utilisateur sur la page "Mon compte -> Etablissements -> Membres" [PR 1061](https://github.com/MTES-MCT/trackdechets/pull/1061)
