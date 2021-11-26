@@ -8,7 +8,7 @@
     "dev": "npm run watch:node",
     "watch:node": "npx nodemon -r dotenv/config --watch src --exec \"ts-eager\" src/index.ts",
     "start": "node dist/src/index.js",
-    "update": "node prisma/scripts/index.js",
+    "update": "node dist/prisma/scripts/index.js",
     "update:dev": "ts-node prisma/scripts/index.ts",
     "migrate": "node dist/prisma/migrate.js",
     "migrate:dev": "ts-node -r dotenv/config prisma/migrate.ts",
