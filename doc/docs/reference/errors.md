@@ -21,7 +21,7 @@ Dans le cas où une erreur a lieu avant ou pendant l'exécution d'une requête G
 ```
 Voir [GraphQL Response Format](https://spec.graphql.org/June2018/#sec-Response-Format) pour plus d'information sur le formattage des erreurs GraphQL.
 
-Le champs `code` permet au client de l'API d'être informé du type d'erreur renvoyé et d'effectuer une action adéquate. Le code de statut HTTP sera en revanche toujours 200
+Le champs `code` permet au client de l'API d'être informé du type d'erreur renvoyé et d'effectuer une action adéquate.
 
 ## Liste des codes erreur GraphQL
 
