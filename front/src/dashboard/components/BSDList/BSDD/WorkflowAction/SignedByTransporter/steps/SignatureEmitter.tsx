@@ -56,7 +56,8 @@ export function SignatureEmitter({
       <h3>Déchets</h3>
       <div className="form__row">
         <strong>Bordereau numéro :</strong>
-        {form.readableId}
+        <span>{form.readableId}</span>
+        {form.customId && <span> {form.customId}</span>}
       </div>
       <div className="form__row">
         <strong>Appellation du déchet :</strong>

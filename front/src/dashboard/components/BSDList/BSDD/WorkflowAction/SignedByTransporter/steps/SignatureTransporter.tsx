@@ -34,6 +34,7 @@ export function SignatureTransporter({
       <div className="form__row">
         <strong>Bordereau</strong>
         <span> {form.readableId}</span>
+        {form.customId && <span> {form.customId}</span>}
       </div>
       <div className="form__row">
         <strong id="collect-address-trs">Lieu de collecte</strong>
