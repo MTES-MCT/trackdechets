@@ -179,11 +179,24 @@ enum SignatureAuthor {
   ECO_ORGANISME
 }
 
-enum AcceptationStatus {
+"Statut d'une demande de révision"
+enum RevisionRequestStatus {
   "En attente de validation"
   PENDING
-  "Accepté"
+  "Acceptée"
   ACCEPTED
-  "Refusé"
+  "Refusée"
+  REFUSED
+}
+
+"Statut d'une demande d'approbation sur une révision"
+enum RevisionRequestApprovalStatus {
+  "En attente de validation"
+  PENDING
+  "Annulée - quand un des approbateurs refuse la révision, toutes les approbations en attente sont annulées et la révision est refusée"
+  CANCELED
+  "Acceptée"
+  ACCEPTED
+  "Refusée"
   REFUSED
 }

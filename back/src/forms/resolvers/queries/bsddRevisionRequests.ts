@@ -5,21 +5,62 @@ import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
 
+const MIN_SIZE = 0;
+const MAX_SIZE = 50;
+
 export default async function bsddRevisionRequests(
   _,
-  { siret }: QueryBsddRevisionRequestsArgs,
+  {
+    siret,
+    after,
+    first = MAX_SIZE,
+    where: inputWhere = {}
+  }: QueryBsddRevisionRequestsArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ siret });
   await checkIsCompanyMember({ id: user.id }, { siret });
 
-  return prisma.bsddRevisionRequest.findMany({
-    where: {
-      OR: [
-        { requestedById: company.id },
-        { validations: { some: { companyId: company.id } } }
-      ]
-    }
+  const pageSize = Math.max(Math.min(first, MAX_SIZE), MIN_SIZE);
+
+  const { status } = inputWhere;
+  const where = {
+    OR: [
+      { authorId: company.id },
+      { approvals: { some: { approverSiret: company.siret } } }
+    ],
+    ...(status && { status })
+  };
+
+  const revisionRequestsCount = await prisma.bsddRevisionRequest.count({
+    where
   });
+  const revisionRequests = await prisma.bsddRevisionRequest.findMany({
+    take: pageSize + 1,
+    ...(after && { cursor: { id: after } }),
+    orderBy: { createdAt: "desc" },
+    where
+  });
+
+  const edges = revisionRequests
+    .map(revision => ({
+      node: revision,
+      cursor: revision.id
+    }))
+    .slice(0, pageSize);
+
+  const pageInfo = {
+    startCursor: edges[0]?.cursor || null,
+    endCursor: edges[edges.length - 1]?.cursor || null,
+
+    hasNextPage: revisionRequests.length > pageSize,
+    hasPreviousPage: false
+  };
+
+  return {
+    edges,
+    pageInfo,
+    totalCount: revisionRequestsCount
+  };
 }

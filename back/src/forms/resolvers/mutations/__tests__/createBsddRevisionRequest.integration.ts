@@ -10,20 +10,20 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 
 const CREATE_BSDD_REVISION_REQUEST = `
-  mutation CreateBsddRevisionRequest($bsddId: ID!, $input: BsddRevisionRequestFormInput!, $comment: String!) {
-    createBsddRevisionRequest(bsddId: $bsddId, input: $input, comment: $comment) {
+  mutation CreateBsddRevisionRequest($bsddId: ID!, $content: BsddRevisionRequestContentInput!, $comment: String!) {
+    createBsddRevisionRequest(bsddId: $bsddId, content: $content, comment: $comment) {
       id
-      bsddId
+      bsdd {
+        id
+      }
       content {
         wasteDetails { code }
       }
-      requestedBy {
+      author {
         siret
       }
-      validations {
-        company {
-          siret
-        }
+      approvals {
+        approverSiret
         status
       }
       status
@@ -42,7 +42,7 @@ describe("Mutation.createBsddRevisionRequest", () => {
     const { errors } = await mutate(CREATE_BSDD_REVISION_REQUEST, {
       variables: {
         bsddId,
-        input: {},
+        content: {},
         comment: "A comment"
       }
     });
@@ -65,7 +65,7 @@ describe("Mutation.createBsddRevisionRequest", () => {
     const { errors } = await mutate(CREATE_BSDD_REVISION_REQUEST, {
       variables: {
         bsddId: bsdd.id,
-        input: {},
+        content: {},
         comment: "A comment"
       }
     });
@@ -92,19 +92,17 @@ describe("Mutation.createBsddRevisionRequest", () => {
       {
         variables: {
           bsddId: bsdd.id,
-          input: {},
+          content: {},
           comment: "A comment"
         }
       }
     );
 
-    expect(data.createBsddRevisionRequest.bsddId).toBe(bsdd.id);
-    expect(data.createBsddRevisionRequest.requestedBy.siret).toBe(
-      company.siret
-    );
+    expect(data.createBsddRevisionRequest.bsdd.id).toBe(bsdd.id);
+    expect(data.createBsddRevisionRequest.author.siret).toBe(company.siret);
   });
 
-  it("should create a revisionRequest and a validation targetting the company not requesting the revisionRequest", async () => {
+  it("should create a revisionRequest and an approval targetting the company not requesting the revisionRequest", async () => {
     const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
@@ -121,20 +119,18 @@ describe("Mutation.createBsddRevisionRequest", () => {
       {
         variables: {
           bsddId: bsdd.id,
-          input: {},
+          content: {},
           comment: "A comment"
         }
       }
     );
 
-    expect(data.createBsddRevisionRequest.bsddId).toBe(bsdd.id);
-    expect(data.createBsddRevisionRequest.validations.length).toBe(1);
-    expect(data.createBsddRevisionRequest.validations[0].company.siret).toBe(
+    expect(data.createBsddRevisionRequest.bsdd.id).toBe(bsdd.id);
+    expect(data.createBsddRevisionRequest.approvals.length).toBe(1);
+    expect(data.createBsddRevisionRequest.approvals[0].approverSiret).toBe(
       recipientCompany.siret
     );
-    expect(data.createBsddRevisionRequest.validations[0].status).toBe(
-      "PENDING"
-    );
+    expect(data.createBsddRevisionRequest.approvals[0].status).toBe("PENDING");
   });
 
   it("should fail if unknown fields are provided", async () => {
@@ -146,7 +142,7 @@ describe("Mutation.createBsddRevisionRequest", () => {
       await mutate(CREATE_BSDD_REVISION_REQUEST, {
         variables: {
           bsddId: "",
-          input: { wasteDetails: { name: "I cannot change the name" } },
+          content: { wasteDetails: { name: "I cannot change the name" } },
           comment: "A comment"
         }
       });
@@ -169,7 +165,7 @@ describe("Mutation.createBsddRevisionRequest", () => {
     const { errors } = await mutate(CREATE_BSDD_REVISION_REQUEST, {
       variables: {
         bsddId: bsdd.id,
-        input: { wasteDetails: { code: "Made up code" } },
+        content: { wasteDetails: { code: "Made up code" } },
         comment: "A comment"
       }
     });
@@ -197,7 +193,7 @@ describe("Mutation.createBsddRevisionRequest", () => {
     >(CREATE_BSDD_REVISION_REQUEST, {
       variables: {
         bsddId: bsdd.id,
-        input: { wasteDetails: { code: "01 03 08" } },
+        content: { wasteDetails: { code: "01 03 08" } },
         comment: "A comment"
       }
     });

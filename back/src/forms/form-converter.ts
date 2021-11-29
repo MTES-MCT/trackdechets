@@ -368,7 +368,7 @@ export function flattenFormInput(
     | "broker"
     | "ecoOrganisme"
   >
-): Partial<Prisma.FormCreateInput> {
+): Partial<Omit<Prisma.FormCreateInput, "temporaryStorageDetail">> {
   return safeInput({
     customId: formInput.customId,
     ...flattenEmitterInput(formInput),

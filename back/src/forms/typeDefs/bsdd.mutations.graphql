@@ -188,19 +188,38 @@ type Mutation {
     nextSegmentInfo: NextSegmentInfoInput!
   ): TransportSegment
 
+  """
+  Crée une demande de révision sur un BSDD existant
+  """
   createBsddRevisionRequest(
     "Identifiant du bordereau à réviser"
     bsddId: ID!
     "Contenu de la révision"
-    input: BsddRevisionRequestFormInput!
+    content: BsddRevisionRequestContentInput!
     "Commentaire pour expliquer la demande de révision"
     comment: String!
   ): BsddRevisionRequest
 
-  settleBsddRevisionRequest(
-    "Identifiant de la révision"
+  """
+  Annule une demande de révision de BSDD.
+  Peut être fait uniquement par l'auteur de la révision, si celle-ci n'a pas encore été acceptée
+  """
+  cancelBsddRevisionRequest(
+    "Identifiant de la demande de révision"
+    id: ID!
+  ): Boolean
+
+  """
+  Répond à une demande d'approbation d'une révision.
+  En cas de refus, la révision associée est automatiquement refusée et les autres validations supprimées.
+  En cas d'acceptation, si c'était la dernière approbation attendue, la révision associée est automatiquement approuvée et appliquée sur le BSDD.
+  """
+  submitBsddRevisionRequestApproval(
+    "Identifiant de la validation"
     id: ID!
     "Indique si la révision est acceptée ou non"
-    isAccepted: Boolean!
+    isApproved: Boolean!
+    "Commentaire facultatif"
+    comment: String
   ): BsddRevisionRequest
 }

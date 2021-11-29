@@ -24,18 +24,6 @@ export async function getUserCompanies(userId: string): Promise<Company[]> {
   );
 }
 
-export async function getFirstUserCompanyInList(
-  userId: string,
-  companyIds: string[]
-): Promise<Company> {
-  const association = await prisma.companyAssociation.findFirst({
-    where: { companyId: { in: companyIds }, userId },
-    include: { company: true }
-  });
-
-  return association?.company;
-}
-
 /**
  * Returns a user with linked objects
  * @param user

@@ -10,9 +10,20 @@ import makeClient from "../../../../__tests__/testClient";
 const BSDD_REVISION_REQUESTS = `
   query BsddRevisionRequests($siret: String!) {
     bsddRevisionRequests(siret: $siret) {
-      id
-      bsddId
-      status
+      totalCount
+      pageInfo {
+        hasNextPage
+        startCursor
+      }
+      edges {
+        node {
+          id
+          bsdd {
+            id
+          }
+          status
+        }
+      }
     }
   }
 `;
@@ -20,7 +31,7 @@ const BSDD_REVISION_REQUESTS = `
 describe("Mutation.bsddRevisionRequests", () => {
   afterEach(() => resetDatabase());
 
-  it("should list unarchived revisionRequest from and to company", async () => {
+  it("should list every revisionRequest from and to company", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const { company: otherCompany } = await userWithCompanyFactory("ADMIN");
     const { query } = makeClient(user);
@@ -38,8 +49,8 @@ describe("Mutation.bsddRevisionRequests", () => {
     await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd1.id,
-        requestedById: otherCompany.id,
-        validations: { create: { companyId: company.id } },
+        authorId: otherCompany.id,
+        approvals: { create: { approverSiret: company.siret } },
         content: {},
         comment: ""
       }
@@ -47,8 +58,8 @@ describe("Mutation.bsddRevisionRequests", () => {
     await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd2.id,
-        requestedById: company.id,
-        validations: { create: { companyId: otherCompany.id } },
+        authorId: company.id,
+        approvals: { create: { approverSiret: otherCompany.siret } },
         content: {},
         comment: ""
       }
@@ -58,10 +69,10 @@ describe("Mutation.bsddRevisionRequests", () => {
     await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd2.id,
-        requestedById: company.id,
-        validations: {
+        authorId: company.id,
+        approvals: {
           create: {
-            companyId: otherCompany.id,
+            approverSiret: otherCompany.siret,
             status: "ACCEPTED"
           }
         },
@@ -72,10 +83,10 @@ describe("Mutation.bsddRevisionRequests", () => {
     await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd2.id,
-        requestedById: company.id,
-        validations: {
+        authorId: company.id,
+        approvals: {
           create: {
-            companyId: otherCompany.id,
+            approverSiret: otherCompany.siret,
             status: "REFUSED"
           }
         },
@@ -84,118 +95,31 @@ describe("Mutation.bsddRevisionRequests", () => {
       }
     });
 
-    const { data } = await query<Pick<Query, "bsddRevisionRequests">>(BSDD_REVISION_REQUESTS, {
-      variables: { siret: company.siret }
-    });
-    expect(data.bsddRevisionRequests.length).toBe(4);
+    const { data } = await query<Pick<Query, "bsddRevisionRequests">>(
+      BSDD_REVISION_REQUESTS,
+      {
+        variables: { siret: company.siret }
+      }
+    );
+
+    expect(data.bsddRevisionRequests.totalCount).toBe(4);
+    expect(data.bsddRevisionRequests.pageInfo.hasNextPage).toBe(false);
   });
 
-  it("should mark settled revisionRequests as so", async () => {
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const { company: otherCompany } = await userWithCompanyFactory("ADMIN");
+  it("should fail if requesting a siret current user is not part of", async () => {
+    const { user } = await userWithCompanyFactory("ADMIN");
+    const { company } = await userWithCompanyFactory("ADMIN");
     const { query } = makeClient(user);
 
-    const bsdd1 = await formFactory({
-      ownerId: user.id,
-      opt: { emitterCompanySiret: company.siret }
-    });
-    const bsdd2 = await formFactory({
-      ownerId: user.id,
-      opt: { recipientCompanySiret: company.siret }
-    });
-
-    // 1 settled revisionRequest and 1 unsettled
-    await prisma.bsddRevisionRequest.create({
-      data: {
-        bsddId: bsdd1.id,
-        requestedById: company.id,
-        validations: {
-          create: {
-            companyId: otherCompany.id,
-            status: "ACCEPTED"
-          }
-        },
-        content: {},
-        comment: ""
+    const { errors } = await query<Pick<Query, "bsddRevisionRequests">>(
+      BSDD_REVISION_REQUESTS,
+      {
+        variables: { siret: company.siret }
       }
-    });
-    await prisma.bsddRevisionRequest.create({
-      data: {
-        bsddId: bsdd2.id,
-        requestedById: company.id,
-        validations: {
-          create: {
-            companyId: otherCompany.id,
-            status: "PENDING"
-          }
-        },
-        content: {},
-        comment: ""
-      }
-    });
+    );
 
-    const { data } = await query<Pick<Query, "bsddRevisionRequests">>(BSDD_REVISION_REQUESTS, {
-      variables: { siret: company.siret }
-    });
-
-    expect(
-      data.bsddRevisionRequests.find(revisionRequest => revisionRequest.bsddId === bsdd1.id).status
-    ).toBe("ACCEPTED");
-    expect(
-      data.bsddRevisionRequests.find(revisionRequest => revisionRequest.bsddId === bsdd2.id).status
-    ).toBe("PENDING");
-  });
-
-  it("should mark accepted revisionRequests as so", async () => {
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const { company: otherCompany } = await userWithCompanyFactory("ADMIN");
-    const { query } = makeClient(user);
-
-    const bsdd1 = await formFactory({
-      ownerId: user.id,
-      opt: { emitterCompanySiret: company.siret }
-    });
-    const bsdd2 = await formFactory({
-      ownerId: user.id,
-      opt: { recipientCompanySiret: company.siret }
-    });
-
-    // 1 approved revisionRequest and one refused
-    await prisma.bsddRevisionRequest.create({
-      data: {
-        bsddId: bsdd1.id,
-        requestedById: company.id,
-        validations: {
-          create: {
-            companyId: otherCompany.id,
-            status: "ACCEPTED"
-          }
-        },
-        content: {},
-        comment: ""
-      }
-    });
-    await prisma.bsddRevisionRequest.create({
-      data: {
-        bsddId: bsdd2.id,
-        requestedById: company.id,
-        validations: {
-          create: {
-            companyId: otherCompany.id,
-            status: "REFUSED"
-          }
-        },
-        content: {},
-        comment: ""
-      }
-    });
-
-    const { data } = await query<Pick<Query, "bsddRevisionRequests">>(BSDD_REVISION_REQUESTS, {
-      variables: { siret: company.siret }
-    });
-
-    expect(
-      data.bsddRevisionRequests.find(revisionRequest => revisionRequest.bsddId === bsdd1.id).status
-    ).toBe("ACCEPTED");
+    expect(errors[0].message).toBe(
+      `Vous n'êtes pas membre de l'entreprise portant le siret "${company.siret}".`
+    );
   });
 });

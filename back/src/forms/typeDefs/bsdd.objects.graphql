@@ -519,39 +519,47 @@ type Stat {
   outgoing: Float!
 }
 
+"Demande de révision BSDD"
 type BsddRevisionRequest {
-  "Identifiant de la révison"
+  "Identifiant de la demande de révison"
   id: ID!
-
-  "Identifiant du bordereau concerné"
-  bsddId: ID!
 
   "Bordereau concerné"
   bsdd: Form!
 
-  "Entreprise à l'origine de la demande de révision"
-  requestedBy: FormCompany!
+  "Date de création de la demande"
+  createdAt: DateTime
 
-  "Validations nécessaires à l'approbation de la révision"
-  validations: [BsddRevisionRequestValidation!]
+  "Entreprise à l'origine de la demande de révision"
+  author: FormCompany!
+
+  "Liste des approbations apposées sur la révision"
+  approvals: [BsddRevisionRequestApproval!]
 
   "Contenu de la révision"
-  content: BsddRevisionRequestForm!
+  content: BsddRevisionRequestContent!
+
+  "Commentaire explicatif, saisi par l'auteur de la demande de révision"
+  comment: String!
 
   "Statut d'acceptation de la révision"
-  status: AcceptationStatus!
+  status: RevisionRequestStatus!
 }
 
-type BsddRevisionRequestValidation {
-  "Entreprise qui doit valider la révision"
-  company: FormCompany
+"Approbation d'une demande de révision"
+type BsddRevisionRequestApproval {
+  "Siret de l'entreprise responsable de cette approbation"
+  approverSiret: String!
 
-  "Statut d'acceptation de la validation"
-  status: AcceptationStatus!
+  "Commentaire explicatif, saisi par l'approbateur"
+  comment: String
+
+  "Statut d'acceptation de l'approbation"
+  status: RevisionRequestApprovalStatus!
 }
 
-"Payload de révision d'un bordereau. Disponible sur une liste restrainte de champs."
-type BsddRevisionRequestForm {
+"Payload de révision d'un bordereau. Disponible sur une liste restreinte de champs."
+type BsddRevisionRequestContent {
   "Détails du déchet (édition partielle uniquement)"
   wasteDetails: BsddRevisionRequestWasteDetails
 
@@ -596,4 +604,15 @@ type BsddRevisionRequestDestination {
 
   "Opération d'élimination / valorisation prévue (code D/R)"
   processingOperation: String
+}
+
+type BsddRevisionRequestConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [BsddRevisionRequestEdge!]!
+}
+
+type BsddRevisionRequestEdge {
+  cursor: String!
+  node: BsddRevisionRequest!
 }

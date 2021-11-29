@@ -21,7 +21,8 @@ import takeOverSegment from "./mutations/takeOverSegment";
 import markSegmentAsReadyToTakeOver from "./mutations/markSegmentAsReadyToTakeOver";
 import importPaperForm from "./mutations/importPaperForm";
 import createBsddRevisionRequest from "./mutations/createBsddRevisionRequest";
-import settleBsddRevisionRequest from "./mutations/settleBsddRevisionRequest";
+import submitBsddRevisionRequestApproval from "./mutations/submitBsddRevisionRequestApproval";
+import cancelBsddRevisionRequest from "./mutations/cancelBsddRevisionRequest";
 
 const Mutation: MutationResolvers = {
   createForm,
@@ -46,7 +47,8 @@ const Mutation: MutationResolvers = {
   markSegmentAsReadyToTakeOver,
   takeOverSegment,
   createBsddRevisionRequest: createBsddRevisionRequest as any, // TODO better typing ?
-  settleBsddRevisionRequest: settleBsddRevisionRequest as any
+  cancelBsddRevisionRequest,
+  submitBsddRevisionRequestApproval: submitBsddRevisionRequestApproval as any
 };
 
 export default Mutation;

@@ -1,47 +1,38 @@
-import { RevisionRequestAcceptationStatus } from "@prisma/client";
+import { Form, TemporaryStorageDetail } from "@prisma/client";
 import { BsddRevisionRequestResolvers } from "../../generated/graphql/types";
 import prisma from "../../prisma";
-import { expandFormFromDb } from "../form-converter";
+import {
+  expandFormFromDb,
+  expandTemporaryStorageFromDb
+} from "../form-converter";
 
 const bsddRevisionRequestResolvers: BsddRevisionRequestResolvers = {
-  validations: async parent => {
-    const review = await prisma.bsddRevisionRequest.findUnique({
-      where: { id: parent.id },
-      include: { validations: { include: { company: true } } }
+  approvals: async parent => {
+    return prisma.bsddRevisionRequestApproval.findMany({
+      where: { revisionRequestId: parent.id }
     });
-    return review.validations;
-  },
-  status: async parent => {
-    const validations = await prisma.bsddRevisionRequest
-      .findUnique({ where: { id: parent.id } })
-      .validations();
-
-    if (
-      validations.every(
-        val => val.status === RevisionRequestAcceptationStatus.ACCEPTED
-      )
-    ) {
-      return RevisionRequestAcceptationStatus.ACCEPTED;
-    }
-    if (
-      validations.some(
-        val => val.status === RevisionRequestAcceptationStatus.REFUSED
-      )
-    ) {
-      return RevisionRequestAcceptationStatus.REFUSED;
-    }
-    return RevisionRequestAcceptationStatus.PENDING;
   },
   content: parent => {
-    return expandFormFromDb(parent.content as any) as any;
+    const { temporaryStorageDetail, ...bsdd } = parent.content;
+
+    return {
+      ...expandFormFromDb(bsdd as Form),
+      ...(temporaryStorageDetail && {
+        temporaryStorageDetail: expandTemporaryStorageFromDb(
+          temporaryStorageDetail as TemporaryStorageDetail
+        )
+      })
+    } as any; // Typing as any because of differences in __typename props;
   },
-  requestedBy: parent => {
+  author: parent => {
     return prisma.bsddRevisionRequest
       .findUnique({ where: { id: parent.id } })
-      .requestedBy();
+      .author();
   },
   bsdd: parent => {
-    return prisma.form.findUnique({ where: { id: parent.bsddId } });
+    return prisma.bsddRevisionRequest
+      .findUnique({ where: { id: parent.id } })
+      .bsdd();
   }
 };
 

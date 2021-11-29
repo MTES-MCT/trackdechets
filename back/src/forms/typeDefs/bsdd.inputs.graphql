@@ -662,7 +662,7 @@ input ImportPaperFormInput {
 }
 
 "Payload de révision d'un bordereau. Disponible sur une liste restrainte de champs."
-input BsddRevisionRequestFormInput {
+input BsddRevisionRequestContentInput {
   "Détails du déchet (édition partielle uniquement)"
   wasteDetails: BsddRevisionRequestWasteDetailsInput
 
@@ -707,4 +707,8 @@ input BsddRevisionRequestDestinationInput {
 
   "Opération d'élimination / valorisation prévue (code D/R)"
   processingOperation: String
+}
+
+input BsddRevisionRequestWhere {
+  status: RevisionRequestStatus
 }

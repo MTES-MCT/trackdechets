@@ -1,96 +1,98 @@
+import {
+  Form,
+  Prisma,
+  RevisionRequestStatus,
+  Status,
+  User
+} from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import prisma from "../../../prisma";
 import * as yup from "yup";
-import { Form, RevisionRequestAcceptationStatus } from "@prisma/client";
 import {
   PROCESSING_OPERATIONS_CODES,
   WASTES_CODES
 } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationCreateBsddRevisionRequestArgs } from "../../../generated/graphql/types";
+import {
+  BsddRevisionRequestContentInput,
+  MutationCreateBsddRevisionRequestArgs
+} from "../../../generated/graphql/types";
+import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
+import { getUserCompanies } from "../../../users/database";
 import { getFormOrFormNotFound } from "../../database";
+import {
+  flattenFormInput,
+  flattenTemporaryStorageDetailInput
+} from "../../form-converter";
 import { checkCanRequestRevision } from "../../permissions";
 import {
   INVALID_PROCESSING_OPERATION,
   INVALID_SIRET_LENGTH,
   INVALID_WASTE_CODE
 } from "../../validation";
-import { getUserCompanies } from "../../../users/database";
-import {
-  flattenFormInput,
-  flattenTemporaryStorageDetailInput
-} from "../../form-converter";
 
-export default async function createReview(
+export type RevisionRequestContent = Pick<
+  Prisma.FormCreateInput,
+  | "recipientCap"
+  | "wasteDetailsCode"
+  | "wasteDetailsPop"
+  | "quantityReceived"
+  | "processingOperationDone"
+  | "brokerCompanyName"
+  | "brokerCompanySiret"
+  | "brokerCompanyAddress"
+  | "brokerCompanyContact"
+  | "brokerCompanyPhone"
+  | "brokerCompanyMail"
+  | "brokerReceipt"
+  | "brokerDepartment"
+  | "brokerValidityLimit"
+  | "traderCompanyAddress"
+  | "traderCompanyContact"
+  | "traderCompanyPhone"
+  | "traderCompanyMail"
+  | "traderReceipt"
+  | "traderDepartment"
+  | "traderValidityLimit"
+> & {
+  temporaryStorageDetail?: Pick<
+    Prisma.TemporaryStorageDetailCreateInput,
+    "destinationCap" | "destinationProcessingOperation"
+  >;
+};
+
+export default async function createBsddRevisionRequest(
   _,
-  { bsddId, input, comment }: MutationCreateBsddRevisionRequestArgs,
+  { bsddId, content, comment }: MutationCreateBsddRevisionRequestArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
-
   const existingBsdd = await getFormOrFormNotFound({ id: bsddId });
-  await checkCanRequestRevision(user, existingBsdd);
+  await checkIfUserCanRequestRevisionOnBsdd(user, existingBsdd);
 
-  const unsettledRevisionRequest = await prisma.bsddRevisionRequest.count({
-    where: {
-      bsddId,
-      isSettled: false
-    }
-  });
+  const flatContent = await getFlatContent(content, existingBsdd);
 
-  if (unsettledRevisionRequest > 0) {
-    throw new ForbiddenError(
-      "Impossible de créer une révision sur ce bordereau. Une autre révision est déjà en attente de validation."
-    );
-  }
-
-  const { temporaryStorageDetail, ...bsddRevisionRequest } = input;
-  if (temporaryStorageDetail && existingBsdd.temporaryStorageDetailId == null) {
-    throw new UserInputError(
-      "Impossible de réviser l'entreposage provisoire, ce bordereau n'est pas concerné."
-    );
-  }
-  const bsddRevisionRequestContent = flattenFormInput(bsddRevisionRequest);
-  await simpleReviewSchema.validate(bsddRevisionRequestContent);
-
-  const reviewContent: any = {
-    ...bsddRevisionRequestContent
-  };
-
-  if (temporaryStorageDetail) {
-    const temporaryStorageReviewContent = flattenTemporaryStorageDetailInput(
-      temporaryStorageDetail
-    );
-    await temporaryStorageDetailSchema.validate(temporaryStorageReviewContent);
-    reviewContent.temporaryStorageDetail = temporaryStorageReviewContent;
-  }
-
-  const requesterCompany = await getReviewRequesterCompany(
-    user.id,
-    existingBsdd
-  );
-  const allValidationCompanies = await getReviewValidationCompanies(
+  const author = await getAuthorCompany(user.id, existingBsdd);
+  const approversSirets = await getApproversSirets(
     existingBsdd,
-    temporaryStorageDetail == null
+    flatContent,
+    author.siret
   );
 
   return prisma.bsddRevisionRequest.create({
     data: {
       bsdd: { connect: { id: existingBsdd.id } },
-      content: JSON.parse(JSON.stringify(reviewContent)),
-      requestedBy: { connect: { id: requesterCompany.id } },
-      validations: {
-        create: allValidationCompanies
-          .filter(company => company.id !== requesterCompany.id)
-          .map(company => ({ companyId: company.id }))
+      content: JSON.parse(JSON.stringify(flatContent)),
+      author: { connect: { id: author.id } },
+      approvals: {
+        create: approversSirets.map(approverSiret => ({ approverSiret }))
       },
       comment
     }
   });
 }
 
-async function getReviewRequesterCompany(userId: string, bsdd: Form) {
+async function getAuthorCompany(userId: string, bsdd: Form) {
   const userCompanies = await getUserCompanies(userId);
   const userCompanySirets = new Set(
     userCompanies.map(company => company.siret)
@@ -111,36 +113,85 @@ async function getReviewRequesterCompany(userId: string, bsdd: Form) {
   );
 }
 
-async function getReviewValidationCompanies(
-  bsdd: Form,
-  isBsddOnlyReview: boolean
-) {
-  const simpleBsddValidators = [
-    bsdd.emitterCompanySiret,
-    bsdd.traderCompanySiret, // TODO ask for trader validation if there is one ?
-    bsdd.recipientCompanySiret
-  ].filter(Boolean);
+async function checkIfUserCanRequestRevisionOnBsdd(
+  user: User,
+  bsdd: Form
+): Promise<void> {
+  await checkCanRequestRevision(user, bsdd);
 
-  if (isBsddOnlyReview) {
-    return prisma.company.findMany({
-      where: { siret: { in: simpleBsddValidators } }
-    });
+  if (Status.DRAFT === bsdd.status || Status.SEALED === bsdd.status) {
+    throw new ForbiddenError(
+      "Impossible de créer une révision sur ce bordereau. Vous pouvez le modifier directement, aucune signature bloquante n'a encore été apposée."
+    );
   }
 
-  const temporaryStorageDetail = await prisma.form
-    .findUnique({ where: { id: bsdd.id } })
-    .temporaryStorageDetail();
-  const bsddWithTemporaryStorageValidators = [
-    ...simpleBsddValidators,
-    temporaryStorageDetail.destinationCompanySiret
-  ];
-
-  return prisma.company.findMany({
-    where: { siret: { in: bsddWithTemporaryStorageValidators } }
-  });
+  const unsettledRevisionRequestsOnBsdd =
+    await prisma.bsddRevisionRequest.count({
+      where: {
+        bsddId: bsdd.id,
+        status: RevisionRequestStatus.PENDING
+      }
+    });
+  if (unsettledRevisionRequestsOnBsdd > 0) {
+    throw new ForbiddenError(
+      "Impossible de créer une révision sur ce bordereau. Une autre révision est déjà en attente de validation."
+    );
+  }
 }
 
-const simpleReviewSchema = yup
+async function getFlatContent(
+  content: BsddRevisionRequestContentInput,
+  bsdd: Form
+): Promise<RevisionRequestContent> {
+  const { temporaryStorageDetail, ...bsddInput } = content;
+  if (temporaryStorageDetail && bsdd.temporaryStorageDetailId == null) {
+    throw new UserInputError(
+      "Impossible de réviser l'entreposage provisoire, ce bordereau n'est pas concerné."
+    );
+  }
+  const revisionRequestContent: RevisionRequestContent =
+    flattenFormInput(bsddInput);
+  await bsddRevisionRequestSchema.validate(revisionRequestContent);
+
+  if (temporaryStorageDetail) {
+    const temporaryStorageReviewContent = flattenTemporaryStorageDetailInput(
+      temporaryStorageDetail
+    );
+    await temporaryStorageRevisionRequestSchema.validate(
+      temporaryStorageReviewContent
+    );
+    revisionRequestContent.temporaryStorageDetail =
+      temporaryStorageReviewContent;
+  }
+
+  return revisionRequestContent;
+}
+
+async function getApproversSirets(
+  bsdd: Form,
+  content: RevisionRequestContent,
+  revisionAuthorSiret: string
+) {
+  const approvers = [
+    bsdd.emitterCompanySiret,
+    bsdd.traderCompanySiret,
+    bsdd.recipientCompanySiret
+  ];
+
+  if (content.temporaryStorageDetail) {
+    const temporaryStorageDetail = await prisma.form
+      .findUnique({ where: { id: bsdd.id } })
+      .temporaryStorageDetail();
+
+    approvers.push(temporaryStorageDetail.destinationCompanySiret);
+  }
+
+  return approvers
+    .filter(Boolean)
+    .filter(siret => siret !== revisionAuthorSiret);
+}
+
+const bsddRevisionRequestSchema = yup
   .object({
     recipientCap: yup.string().nullable(),
     wasteDetailsCode: yup
@@ -179,7 +230,7 @@ const simpleReviewSchema = yup
     "Révision impossible, certains champs saisis ne sont pas modifiables"
   );
 
-const temporaryStorageDetailSchema = yup
+const temporaryStorageRevisionRequestSchema = yup
   .object({
     destinationCap: yup.string().nullable(),
     destinationProcessingOperation: yup
@@ -189,5 +240,5 @@ const temporaryStorageDetailSchema = yup
   })
   .noUnknown(
     true,
-    "Révision impossible, certains champs saisis ne sont pas modifiables"
+    "Révision impossible, certains champs saisis pour l'entreposage provisioire ne sont pas modifiables"
   );
