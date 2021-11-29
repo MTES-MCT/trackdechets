@@ -91,7 +91,7 @@ export function Transport({ disabled }: Props) {
       <div className="form__row">
         <label>
           Immatriculations
-          <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> pour valider chacun" />
+          <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
           <TagsInput
             name="transporter.transport.plates"
             disabled={disabled}

@@ -201,7 +201,7 @@ export function WasteInfoWorker({ disabled }) {
       <div className="form__row">
         <label>
           Numéros de scellés
-          <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> pour valider chacun" />
+          <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
           <TagsInput name="waste.sealNumbers" disabled={disabled} />
         </label>
       </div>
