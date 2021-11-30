@@ -3,9 +3,9 @@ import {
   BsddRevisionRequest,
   Prisma,
   RevisionRequestStatus,
-  BsddRevisionRequestApproval
+  BsddRevisionRequestApproval,
+  User
 } from "@prisma/client";
-import { User } from "@sentry/types";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationSubmitBsddRevisionRequestApprovalArgs } from "../../../generated/graphql/types";
