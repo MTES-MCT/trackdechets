@@ -19,7 +19,7 @@ CREATE TABLE "default$default"."BsddRevisionRequest" (
 CREATE TYPE "default$default"."RevisionRequestApprovalStatus" AS ENUM ('PENDING', 'ACCEPTED', 'REFUSED', 'CANCELED');
 
 -- CreateTable
-CREATE TABLE "default$default"."BsddRevisionRequestValidation" (
+CREATE TABLE "default$default"."BsddRevisionRequestApproval" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -38,4 +38,4 @@ ALTER TABLE "default$default"."BsddRevisionRequest" ADD FOREIGN KEY ("authorId")
 ALTER TABLE "default$default"."BsddRevisionRequest" ADD FOREIGN KEY ("bsddId") REFERENCES "default$default"."Form"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "default$default"."BsddRevisionRequestValidation" ADD FOREIGN KEY ("bsddRevisionRequestId") REFERENCES "default$default"."BsddRevisionRequest"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "default$default"."BsddRevisionRequestApproval" ADD FOREIGN KEY ("revisionRequestId") REFERENCES "default$default"."BsddRevisionRequest"("id") ON DELETE CASCADE ON UPDATE CASCADE;
