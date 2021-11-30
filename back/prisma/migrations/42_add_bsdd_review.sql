@@ -26,7 +26,7 @@ CREATE TABLE "default$default"."BsddRevisionRequestApproval" (
     "revisionRequestId" TEXT NOT NULL,
     "approverSiret" TEXT NOT NULL,
     "status" "default$default"."RevisionRequestApprovalStatus" DEFAULT E'PENDING',
-    "comment" TEXT NOT NULL,
+    "comment" TEXT,
 
     PRIMARY KEY ("id")
 );
