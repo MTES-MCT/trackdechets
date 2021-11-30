@@ -4,6 +4,7 @@ import {
   BsddRevisionRequest,
   Mutation,
   MutationSubmitBsddRevisionRequestApprovalArgs,
+  RevisionRequestStatus,
   Trader,
 } from "generated/graphql/types";
 import { TdModalTrigger } from "common/components/Modal";
@@ -12,23 +13,33 @@ import { IconCogApproved } from "common/components/Icons";
 import { RevisionField } from "./RevisionField";
 import { useMutation } from "@apollo/client";
 import { SUBMIT_BSDD_REVISION_REQUEST_APPROVAL } from "../query";
+import { useParams } from "react-router-dom";
 
 type Props = {
   review: BsddRevisionRequest;
 };
 
 export function BsddApproveRevision({ review }: Props) {
+  const { siret } = useParams<{ siret: string }>();
+
   const [submitBsddRevisionRequestApproval, { loading }] = useMutation<
     Pick<Mutation, "submitBsddRevisionRequestApproval">,
     MutationSubmitBsddRevisionRequestApprovalArgs
   >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL);
+
+  if (
+    siret === review.author.siret ||
+    review.status !== RevisionRequestStatus.Pending
+  ) {
+    return null;
+  }
 
   return (
     <TdModalTrigger
       ariaLabel="Acceptation d'une révision"
       trigger={open => (
         <ActionButton icon={<IconCogApproved size="24px" />} onClick={open}>
-          Acceptation d'une révision
+          Approbation
         </ActionButton>
       )}
       modalContent={close => (
@@ -41,7 +52,7 @@ export function BsddApproveRevision({ review }: Props) {
 
           <div className="tw-flex tw-py-2">
             <p className="tw-w-1/4 tw-font-bold">Commentaire</p>
-            <p className="tw-w-3/4">{review.bsdd.id}</p>
+            <p className="tw-w-3/4">{review.comment}</p>
           </div>
 
           <RevisionField

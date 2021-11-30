@@ -15,14 +15,25 @@ type Props = {
   revisions: BsddRevisionRequest[];
 };
 
+const STATUS_LABELS = {
+  PENDING: "En attente de validation",
+  APPROVED: "Approuvée",
+  REFUSED: "Refusée",
+  CANCELLED: "Annulée",
+};
+
 const COLUMNS = [
   {
-    Header: "ID",
+    Header: "Bordereau",
     accessor: "bsdd.readableId",
   },
   {
     Header: "Demandeur",
-    accessor: "requestedBy.siret",
+    accessor: row => `${row.author.name} (${row.author.siret})`,
+  },
+  {
+    Header: "Statut",
+    accessor: row => STATUS_LABELS[row.status],
   },
   {
     Header: "Actions",

@@ -49,6 +49,7 @@ const reviewFragment = gql`
       }
     }
     status
+    comment
   }
   ${companyFragment}
 `;
@@ -86,7 +87,7 @@ export const CREATE_BSDD_REVISION_REQUEST = gql`
 `;
 
 export const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = gql`
-  mutation SubmitBsddRevisionRequestApproval($is: ID!, $isApproved: Boolean!) {
+  mutation SubmitBsddRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
     submitBsddRevisionRequestApproval(id: $id, isApproved: $isApproved) {
       id
     }
