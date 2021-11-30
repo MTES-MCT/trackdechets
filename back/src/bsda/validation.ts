@@ -459,7 +459,7 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
         .date()
         .requiredIf(
           context.transportSignature,
-          `Transporteur: ${MISSING_COMPANY_NAME}`
+          `Transporteur: la date limite de validité du récépissé est obligatoire`
         ) as any,
       transporterCompanyName: yup
         .string()

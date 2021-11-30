@@ -20,7 +20,97 @@ type Mutation {
   publishBsda(id: ID!): Bsda
 
   """
-  Signe un Bsda
+  Signe un Bsda.
+
+  **Champs requis pour `EMISSION` :**
+
+  ```
+  emitter {
+    isPrivateIndividual
+    company {
+      siret
+      name
+      address
+      contact
+      mail
+      phone
+    }
+  }
+  waste {
+    code
+    name
+  }
+  destination {
+    company {
+      siret
+      name
+      address
+      contact
+      mail
+      phone
+    }
+    cap
+    plannedOperationCode
+  }
+  worker {
+    company {
+      siret
+      name
+      address
+      contact
+      mail
+      phone
+    }
+  }
+  ```
+
+  **Champs requis pour `WORK` :**
+
+  ```
+  waste {
+    consistence
+  }
+  weight {
+    value
+    isEstimate
+  }
+  ```
+
+  **Champs requis pour `TRANSPORT` :**
+
+  ```
+  transporter {
+    company {
+      siret
+      name
+      address
+      contact
+      mail
+      phone
+    }
+    recepisse {
+      number
+      department
+      validityLimit
+    }
+  }
+  ```
+
+  **Champs requis pour `OPERATION` :**
+
+  ```
+  destination {
+    reception {
+      date
+      weight
+      acceptationStatus
+    }
+    operation {
+      code
+      date
+    }
+  }
+  ```
   """
   signBsda(id: ID!, input: BsdaSignatureInput!): Bsda
 
