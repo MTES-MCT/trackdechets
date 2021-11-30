@@ -6,6 +6,7 @@ import {
 } from "@prisma/client";
 import {
   Form as GraphQLForm,
+  Appendix2Form as GraphQLAppendix2Form,
   TemporaryStorageDetail as GraphQLTemporaryStorageDetail,
   TransportSegment as GraphQLTransportSegment,
   Emitter,
@@ -40,6 +41,7 @@ import {
   ReceivedFormInput,
   NextSegmentInfoInput
 } from "../generated/graphql/types";
+import { extractPostalCode } from "../utils";
 
 export function flattenObjectForDb(
   input,
@@ -625,6 +627,30 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
     }),
     currentTransporterSiret: form.currentTransporterSiret,
     nextTransporterSiret: form.nextTransporterSiret
+  };
+}
+
+export function expandAppendix2FormFromDb(
+  prismaForm: PrismaForm
+): GraphQLAppendix2Form {
+  const {
+    id,
+    readableId,
+    wasteDetails,
+    emitter,
+    signedAt,
+    quantityReceived,
+    processingOperationDone
+  } = expandFormFromDb(prismaForm);
+  return {
+    id,
+    readableId,
+    wasteDetails,
+    emitter,
+    emitterPostalCode: extractPostalCode(emitter?.company?.address),
+    signedAt,
+    quantityReceived,
+    processingOperationDone
   };
 }
 

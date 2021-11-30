@@ -160,8 +160,8 @@ const insee2: CompanySearchResult = {
 };
 
 // Mock pdf generator
-jest.mock("../../forms/pdf/generator", () => ({
-  buildPdfBase64: jest.fn(() => "base64xyz")
+jest.mock("../../forms/pdf", () => ({
+  generateBsddPdfToBase64: jest.fn(() => "base64xyz")
 }));
 
 // Mock a utils function that hits th db

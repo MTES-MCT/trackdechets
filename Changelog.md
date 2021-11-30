@@ -8,13 +8,21 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 # Next release ~27/12
 
 #### :rocket: Nouvelles fonctionnalités
+
 #### :bug: Corrections de bugs
 
 #### :boom: Breaking changes
+
 #### :nail_care: Améliorations
+
+- Remplacement du CERFA BSDD par un récépissé reprenant l'ensemble des évolutions Trackdéchets [PR 1096](https://github.com/MTES-MCT/trackdechets/pull/1096)
+
 #### :memo: Documentation
+
 #### :house: Interne
+
 - Initialisation explicite des gestionnaires de téléchargement de fichier [PR 1092](https://github.com/MTES-MCT/trackdechets/pull/1092)
+
 # Next release ~06/12
 
 #### :rocket: Nouvelles fonctionnalités
@@ -42,6 +50,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Correction d'un bug empêchant la signature de l'entreprise de travaux sur le BSDA quand l'émetteur est un particulier [PR 1091](https://github.com/MTES-MCT/trackdechets/pull/1091)
 
 #### :boom: Breaking changes
+
 - Ajout d'une date de prise en charge du déchet par le transporteur sur le `Bsff` [PR 1065](https://github.com/MTES-MCT/trackdechets/pull/1065)
   - Ajout du champ `transporter.transport.takenOverAt` à l'objet `Bsff`
   - Ajout du champ optionnel `takenOverAt` à l'input `BsffTransporterTransportInput`.
