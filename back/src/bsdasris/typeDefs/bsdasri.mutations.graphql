@@ -10,10 +10,7 @@ type Mutation {
   """
   Crée un nouveau dasri
   """
-  createBsdasri(
-    "Payload de création d'un dasri"
-    input: BsdasriInput!
-  ): Bsdasri!
+  createBsdasri("Payload de création d'un dasri" input: BsdasriInput!): Bsdasri!
 
   """
   Met à jour un dasri existant.
@@ -32,13 +29,107 @@ type Mutation {
   publishBsdasri("ID d'un Bsdasri" id: ID!): Bsdasri
 
   """
-  Appose une signature sur un Bsdasri, verrouille les cadres correspondant
+  Appose une signature sur un Bsdasri, verrouille les cadres correspondant.
 
-  Une signature ne peut être apposée que par un membre de l'entreprise figurant sur le cadre concerné
-  Ex: la signature TRANSPORT ne peut être apposée que par un membre de l'entreprise de transport
+  Une signature ne peut être apposée que par un membre de l'entreprise figurant sur le cadre concerné.
+  Ex: la signature TRANSPORT ne peut être apposée que par un membre de l'entreprise de transport.
 
   Pour signer l'emission avec un compte transporteur (cas de la signature sur device transporteur),
-  utiliser la mutation signBsdasriEmissionWithSecretCode
+  utiliser la mutation signBsdasriEmissionWithSecretCode.
+
+  **Champs requis pour `EMISSION` :**
+
+  ```
+  emitter {
+    company {
+      name
+      siret
+      address
+      contact
+      phone
+    }
+    emission {
+      packagings {
+        type
+        volume
+        quantity
+      }
+    }
+  }
+  waste {
+    code
+    adr
+  }
+  ```
+
+  **Champs requis pour `TRANSPORT` :**
+
+  ```
+  transporter {
+    company {
+      name
+      siret
+      address
+      contact
+      phone
+    }
+    transport {
+      acceptation {
+        status
+      }
+      packagings {
+        type
+        volume
+        quantity
+      }
+      takenOverAt
+    }
+    recepisse {
+      number
+      department
+      validityLimit
+    }
+  }
+  ```
+
+  **Champs requis pour `RECEPTION` :**
+
+  ```
+  destination {
+    company {
+      name
+      siret
+      address
+      contact
+      phone
+    }
+    reception {
+      acceptation {
+        status
+      }
+      packagings {
+        type
+        volume
+        quantity
+      }
+      date
+    }
+  }
+  ```
+
+  **Champs requis pour `OPERATION` :**
+
+  ```
+  destination {
+    operation {
+      weight {
+        value
+      }
+      code
+      date
+    }
+  }
+  ```
   """
   signBsdasri(id: ID!, input: BsdasriSignatureInput!): Bsdasri
 
