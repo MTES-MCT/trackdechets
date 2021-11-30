@@ -20,7 +20,78 @@ type Mutation {
   publishBsvhu(id: ID!): Bsvhu
 
   """
-  Signe un BSVHU
+  Signe un BSVHU.
+
+  **Champs requis pour `EMISSION` :**
+
+  ```
+  emitter {
+    company {
+      siret
+      name
+      address
+      contact
+      mail
+      phone
+    }
+    agrementNumber
+  }
+  quantity
+  weight {
+    value
+  }
+  identification {
+    type
+  }
+  packaging
+  destination {
+    type
+    plannedOperationCode
+    company {
+      siret
+      name
+      address
+      contact
+      mail
+      phone
+    }
+  }
+  ```
+
+  **Champs requis pour `TRANSPORT` :**
+
+  ```
+  transporter {
+    company {
+      siret
+      name
+      address
+      contact
+      mail
+      phone
+    }
+    recepisse {
+      number
+      department
+      validityLimit
+    }
+  }
+  ```
+
+  **Champs requis pour `OPERATION` :**
+
+  ```
+  destination {
+    reception {
+      weight
+      acceptationStatus
+    }
+    operation {
+      code
+    }
+    agrementNumber
+  }
+  ```
   """
   signBsvhu(id: ID!, input: BsvhuSignatureInput!): Bsvhu
 
