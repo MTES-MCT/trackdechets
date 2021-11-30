@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { companyFragment } from "common/fragments";
 
 const reviewFragment = gql`
-  fragment BsddRevisionRequestWithoutFormFragment on BsddRevisionRequest {
+  fragment BsddRevisionRequestFragment on BsddRevisionRequest {
     id
     bsdd {
       id
@@ -58,7 +58,7 @@ export const GET_BSDD_REVISION_REQUESTS = gql`
     bsddRevisionRequests(siret: $siret) {
       edges {
         node {
-          ...BsddRevisionRequestWithoutFormFragment
+          ...BsddRevisionRequestFragment
           bsdd {
             readableId
           }
@@ -72,12 +72,12 @@ export const GET_BSDD_REVISION_REQUESTS = gql`
 export const CREATE_BSDD_REVISION_REQUEST = gql`
   mutation CreateBsddRevisionRequest(
     $bsddId: ID!
-    $input: BsddRevisionRequestFormInput!
+    $content: BsddRevisionRequestContentInput!
     $comment: String!
   ) {
     createBsddRevisionRequest(
       bsddId: $bsddId
-      input: $input
+      content: $content
       comment: $comment
     ) {
       id
@@ -86,8 +86,8 @@ export const CREATE_BSDD_REVISION_REQUEST = gql`
 `;
 
 export const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = gql`
-  mutation SubmitBsddRevisionRequestApproval($is: ID!, $isAccepted: Boolean!) {
-    submitBsddRevisionRequestApproval(id: $id, isAccepted: $isAccepted) {
+  mutation SubmitBsddRevisionRequestApproval($is: ID!, $isApproved: Boolean!) {
+    submitBsddRevisionRequestApproval(id: $id, isApproved: $isApproved) {
       id
     }
   }
