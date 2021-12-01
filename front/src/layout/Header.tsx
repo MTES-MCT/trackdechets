@@ -63,25 +63,25 @@ function MobileSubNav({ currentSiret, onClick }) {
 const getMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
   const common = [
     {
-      caption: "Foire aux questions",
-      href: "https://faq.trackdechets.fr/",
-      onClick: () => trackEvent("navbar", "faq"),
-
+      caption: "Ressources",
+      href: "https://trackdechets.beta.gouv.fr/resources",
+      onClick: () => trackEvent("navbar", "resources"),
       navlink: null,
+      target: "_blank",
     },
     {
       caption: "Développeurs",
       href: DEVELOPERS_DOCUMENTATION_URL,
-      onClick: () => trackEvent("navbar", "faq"),
-
+      onClick: () => trackEvent("navbar", "dev_doc"),
       navlink: false,
+      target: "_blank",
     },
     {
-      caption: "Partenaires",
-      href: "https://trackdechets.beta.gouv.fr/partners",
-      onClick: () => trackEvent("navbar", "partners"),
-
+      caption: "Site de test",
+      href: "https://sandbox.trackdechets.beta.gouv.fr/",
+      onClick: () => trackEvent("navbar", "sandbox"),
       navlink: false,
+      target: "_blank",
     },
   ];
 
@@ -149,6 +149,7 @@ const MenuLink = ({ entry, mobileCallback }) => {
           className={styles.headerNavLink}
           href={entry.href}
           onClick={entry.onClick}
+          target={entry.target ?? "_self"}
         >
           {content}
         </a>
