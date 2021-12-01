@@ -858,6 +858,7 @@ model Bsff {
   transporterRecepisseValidityLimit DateTime?
 
   transporterTransportMode            TransportMode?
+  transporterTransportTakenOverAt     DateTime?
   transporterTransportSignatureAuthor String?
   transporterTransportSignatureDate   DateTime?
 

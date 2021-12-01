@@ -192,8 +192,10 @@
               </span>
               Date limite de validité : {{#formatDate}}{{
               bsff.transporterRecepisseValidityLimit }}{{/formatDate}}<br />
-              Date de prise en charge : {{#formatDate}}{{
-              bsff.transporterTransportSignatureDate }}{{/formatDate}} <br />
+              Date de prise en charge :
+              {{#bsff.transporterTransportTakenOverAt}}{{#formatDate}}{{bsff.transporterTransportTakenOverAt}}{{/formatDate}}{{/bsff.transporterTransportTakenOverAt}}
+              {{^bsff.transporterTransportTakenOverAt}}{{#formatDate}}{{bsff.transporterTransportSignatureDate}}{{/formatDate}}{{/bsff.transporterTransportTakenOverAt}}
+              <br />
               Mode de transport : Route<br />
             </p>
             <p>

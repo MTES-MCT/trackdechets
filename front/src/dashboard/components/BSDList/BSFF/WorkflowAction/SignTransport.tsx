@@ -7,10 +7,12 @@ import {
   BsffSignatureType,
   Mutation,
   MutationSignBsffArgs,
+  MutationUpdateBsffArgs,
+  TransportMode,
 } from "generated/graphql/types";
 import { RedErrorMessage } from "common/components";
 import { NotificationError } from "common/components/Error";
-import { SIGN_BSFF } from "form/bsff/utils/queries";
+import { SIGN_BSFF, UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
 import { GET_BSDS } from "common/queries";
 
@@ -27,6 +29,11 @@ interface SignTransportFormProps {
 }
 
 function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
+  const [updateBsff, updateBsffResult] = useMutation<
+    Pick<Mutation, "updateBsff">,
+    MutationUpdateBsffArgs
+  >(UPDATE_BSFF_FORM);
+
   const [signBsff, signBsffResult] = useMutation<
     Pick<Mutation, "signBsff">,
     MutationSignBsffArgs
@@ -39,6 +46,19 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
       }}
       validationSchema={validationSchema}
       onSubmit={async values => {
+        await updateBsff({
+          variables: {
+            id: bsff.id,
+            input: {
+              transporter: {
+                transport: {
+                  takenOverAt: new Date().toISOString(),
+                  mode: bsff.transporter?.transport?.mode ?? TransportMode.Road,
+                },
+              },
+            },
+          },
+        });
         await signBsff({
           variables: {
             id: bsff.id,
@@ -89,7 +109,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
               disabled={signBsffResult.loading}
             >
               <span>
-                {signBsffResult.loading
+                {updateBsffResult.loading || signBsffResult.loading
                   ? "Signature en cours..."
                   : "Signer l'enlèvement"}
               </span>

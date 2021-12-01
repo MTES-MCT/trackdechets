@@ -207,6 +207,8 @@ type BsffTransporterRecepisse {
   validityLimit: DateTime!
 }
 type BsffTransport {
+  "Date de prise en charge"
+  takenOverAt: DateTime
   "Mode de transport utilisé."
   mode: TransportMode!
   "Signature du transporteur lors de l'enlèvement auprès de l'émetteur."

@@ -140,6 +140,8 @@ input BsffTransporterRecepisseInput {
   validityLimit: DateTime!
 }
 input BsffTransporterTransportInput {
+  "Date de prise en charge"
+  takenOverAt: DateTime
   mode: TransportMode!
 }
 

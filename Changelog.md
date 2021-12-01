@@ -11,16 +11,25 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Gestion des numéros d'identification des containers des Dasris [PR 1087](https://github.com/MTES-MCT/trackdechets/pull/1087)
 
-#### :boom: Breaking changes
-
 #### :bug: Corrections de bugs
 
 - Indexation Elasticsearch des bordereaux indexés via la mutation `importPaperForm` [PR 1081](https://github.com/MTES-MCT/trackdechets/pull/1081)
+- Correction d'un bug empêchant la mise à jour partielle de champs imbriqués via la mutation `updateBsff` [PR 1065](https://github.com/MTES-MCT/trackdechets/pull/1065)
+
+#### :boom: Breaking changes
+- Ajout d'une date de prise en charge du déchet par le transporteur sur le `Bsff` [PR 1065](https://github.com/MTES-MCT/trackdechets/pull/1065)
+  - Ajout du champ `transporter.transport.takenOverAt` à l'objet `Bsff`
+  - Ajout du champ optionnel `takenOverAt` à l'input `BsffTransporterTransportInput`.
+  - Dans le cas où `takenOverAt` n'est pas renseigné, `bsff.transporter.transport.takenOverAt` renvoie la date de signature transport par défaut.
 
 #### :nail_care: Améliorations
 
 - Ajout d'index sur les champs siret des différents bordereaux [PR 1080](https://github.com/MTES-MCT/trackdechets/pull/1080)
 - Ajout d'exemples pour le profil producteur lors de la création d'un établissement, et modification des liens du header [PR 1078](https://github.com/MTES-MCT/trackdechets/pull/1078)
+
+#### :memo: Documentation
+
+#### :house: Interne
 
 # [2021.11.1] 15/11/2021
 
