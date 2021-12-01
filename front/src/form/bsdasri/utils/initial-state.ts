@@ -23,6 +23,7 @@ const getInitialState = (f?: Bsdasri | null) => ({
     code: "18 01 03*",
     adr: "",
   },
+  identification: { numbers: null },
   ecoOrganisme: null,
   emitter: {
     company: getInitialCompany(),

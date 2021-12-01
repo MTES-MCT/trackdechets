@@ -189,6 +189,12 @@ type Bsdasri {
 
   destination: BsdasriDestination
 
+  """
+  Liste des identifiants des conteneurs concernés. Modifiable par tous les acteurs du bsd, ce champ mis
+  à disposition des utilisateur permet de retrouver aisément des Bsdasris grâce à un identifiant de conteneur 
+  """
+  identification: BsdasriIdentification
+
   "Bordereaux regroupés"
   grouping: [InitialBsdasri!]
 
@@ -198,6 +204,10 @@ type Bsdasri {
   metadata: BsdasriMetadata!
 
   allowDirectTakeOver: Boolean
+}
+
+type BsdasriIdentification {
+  numbers: [String!]
 }
 
 type BsdasriError {

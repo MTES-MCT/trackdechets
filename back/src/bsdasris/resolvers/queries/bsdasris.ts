@@ -37,7 +37,6 @@ export default async function dasris(_, args, context: GraphQLContext) {
   };
 
   const prismaWhere = {
-    // ...filters,
     ...(whereArgs ? toPrismaWhereInput(whereArgs) : {}),
     isDeleted: false
   };
@@ -47,7 +46,6 @@ export default async function dasris(_, args, context: GraphQLContext) {
   const queried = await prisma.bsdasri.findMany({
     ...connectionsArgs,
     orderBy: { createdAt: "desc" },
-
     where
   });
   const totalCount = await prisma.bsdasri.count({ where });

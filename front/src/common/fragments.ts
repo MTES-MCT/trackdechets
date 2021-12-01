@@ -410,6 +410,9 @@ export const fullDasriFragment = gql`
     bsdasriStatus: status
     type
     isDraft
+    identification {
+      numbers
+    }
     waste {
       adr
       code

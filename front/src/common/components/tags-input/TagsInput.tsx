@@ -13,7 +13,7 @@ export default function TagsInput(props) {
     e.stopPropagation();
 
     const val = (e.target as HTMLInputElement).value;
-    if (e.key === "Enter" && val) {
+    if (["Enter", "Tab"].includes(e.key) && val) {
       e.preventDefault();
       if (
         field.value?.find(tag => tag.toLowerCase() === val.toLowerCase()) ||

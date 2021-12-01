@@ -9,6 +9,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Gestion des numéros d'identification des containers des Dasris [PR 1087](https://github.com/MTES-MCT/trackdechets/pull/1087)
+
 #### :boom: Breaking changes
 
 #### :bug: Corrections de bugs

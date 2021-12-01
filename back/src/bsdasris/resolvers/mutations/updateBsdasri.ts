@@ -37,6 +37,7 @@ const fieldsAllowedForUpdateOnceSent: BsdasriField[] =
     "destinationReceptionWasteRefusedWeightValue",
     "destinationReceptionWasteVolume",
     "destinationReceptionDate",
+    "identificationNumbers",
     "handedOverToRecipientAt" // optional field to be filled by transporter once waste is received
   ]);
 
