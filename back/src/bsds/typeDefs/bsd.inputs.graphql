@@ -58,3 +58,8 @@ input CompanyWhere {
 input SignatureWhere {
   date: DateFilter
 }
+
+"Filtre générique sur une liste de chaînes telle que des identifiants"
+input StringNullableListFilter {
+  _in: [String!]
+}

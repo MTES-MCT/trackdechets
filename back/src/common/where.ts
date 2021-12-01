@@ -5,7 +5,7 @@ import {
   DateFilter,
   StringFilter,
   IdFilter,
-  BsdasriContainersNumbersFilter
+  StringNullableListFilter
 } from "../generated/graphql/types";
 
 type EnumFilter<E> = {
@@ -141,7 +141,7 @@ export function toPrismaStringFilter(
 
 /** Converter */
 export function toPrismaStringNullableListFilter(
-  stringFilter: BsdasriContainersNumbersFilter | undefined
+  stringFilter: StringNullableListFilter | undefined
 ): Prisma.StringNullableListFilter {
   if (!stringFilter) {
     return undefined;

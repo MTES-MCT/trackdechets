@@ -76,17 +76,12 @@ input BsdasriStatusFilter {
   _in: [BsdasriStatus!]
 }
 
-
-input BsdasriContainersNumbersWhere{
-  numbers: BsdasriContainersNumbersFilter
-}
-
 """
 Filtre sur les numéros de containers. Renvoie les Bsdasris dont au moins un des identifiants de containers `identificationNumbers`
 est présent dans la liste passée en paramètre
 """
-input BsdasriContainersNumbersFilter {
-  _in: [String!]
+input BsdasriContainersNumbersWhere {
+  numbers: StringNullableListFilter
 }
 
 input BsdasriPackagingsInput {
@@ -221,7 +216,6 @@ input BsdasriOperationInput {
 input BsdasriIdentificationInput {
   "Numéros d'identification des conteneurs concernés"
   numbers: [String!]
- 
 }
 
 input BsdasriInput {
@@ -237,9 +231,8 @@ input BsdasriInput {
 
   """
   Optionel: liste d'identifiants des conteneurs concernés. Modifiable par tous les acteurs du bsd, ce champ mis
-  à disposition des utilisateur permet de retrouver aisément des Bsdasris grâce à un identifiant de conteneur (cf. query bsdasris) 
+  à disposition des utilisateur permet de retrouver aisément des Bsdasris grâce à un identifiant de conteneur (cf. query bsdasris)
   """
-  
   identification: BsdasriIdentificationInput
 
   "Liste des bordereaux que celui-ci groupe"
