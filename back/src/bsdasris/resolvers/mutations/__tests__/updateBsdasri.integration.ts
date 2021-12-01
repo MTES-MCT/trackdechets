@@ -250,6 +250,9 @@ describe("Mutation.updateBsdasri", () => {
         company: {
           mail: "recipient@test.test"
         }
+      },
+      identification: {
+        numbers: ["abc", "def"]
       }
     };
 
@@ -402,6 +405,9 @@ describe("Mutation.updateBsdasri", () => {
         company: {
           mail: "recipient@test.test"
         }
+      },
+      identification: {
+        numbers: ["xyz", "bnh"]
       }
     };
 

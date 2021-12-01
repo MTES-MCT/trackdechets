@@ -4,23 +4,32 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
-# Next release ~6/12
+
+# Next release ~06/12
 
 #### :rocket: Nouvelles fonctionnalités
 
-#### :boom: Breaking changes
+- Gestion des numéros d'identification des containers des Dasris [PR 1087](https://github.com/MTES-MCT/trackdechets/pull/1087)
 
+#### :bug: Corrections de bugs
+
+- Indexation Elasticsearch des bordereaux indexés via la mutation `importPaperForm` [PR 1081](https://github.com/MTES-MCT/trackdechets/pull/1081)
+- Correction d'un bug empêchant la mise à jour partielle de champs imbriqués via la mutation `updateBsff` [PR 1065](https://github.com/MTES-MCT/trackdechets/pull/1065)
+
+#### :boom: Breaking changes
 - Ajout d'une date de prise en charge du déchet par le transporteur sur le `Bsff` [PR 1065](https://github.com/MTES-MCT/trackdechets/pull/1065)
   - Ajout du champ `transporter.transport.takenOverAt` à l'objet `Bsff`
   - Ajout du champ optionnel `takenOverAt` à l'input `BsffTransporterTransportInput`.
   - Dans le cas où `takenOverAt` n'est pas renseigné, `bsff.transporter.transport.takenOverAt` renvoie la date de signature transport par défaut.
-#### :bug: Corrections de bugs
-
-- Correction d'un bug empêchant la mise à jour partielle de champs imbriqués via la mutation `updateBsff` [PR 1065](https://github.com/MTES-MCT/trackdechets/pull/1065)
 
 #### :nail_care: Améliorations
 
--  Ajout d'index sur les champs siret des différents bordereaux [PR 1080](https://github.com/MTES-MCT/trackdechets/pull/1080)
+- Ajout d'index sur les champs siret des différents bordereaux [PR 1080](https://github.com/MTES-MCT/trackdechets/pull/1080)
+- Ajout d'exemples pour le profil producteur lors de la création d'un établissement, et modification des liens du header [PR 1078](https://github.com/MTES-MCT/trackdechets/pull/1078)
+
+#### :memo: Documentation
+
+#### :house: Interne
 
 # [2021.11.1] 15/11/2021
 
@@ -36,6 +45,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
   - Remplacement de `BsdaAcceptationStatus`, `BsffAcceptationStatus` et `BsvhuAcceptationStatus` par `WasteAcceptationStatus`
   - Remplacement de l'input `WasteAcceptationStatusInput` par l'enum `WasteAcceptationStatus`
   - Les champs `Form.wasteAcceptationStatus`, `TemporaryStorer.wasteAcceptationStatus` et `BsdasriWasteAcceptation.status` ne sont plus du type `String` mais `WasteAcceptationStatus`
+
 #### :bug: Corrections de bugs
 
 - Correction d'une rare erreur d'affichage du rôle utilisateur sur la page "Mon compte -> Etablissements -> Membres" [PR 1061](https://github.com/MTES-MCT/trackdechets/pull/1061)

@@ -1,7 +1,12 @@
 import { Prisma } from ".prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { safeInput } from "../forms/form-converter";
-import { DateFilter, StringFilter, IdFilter } from "../generated/graphql/types";
+import {
+  DateFilter,
+  StringFilter,
+  IdFilter,
+  StringNullableListFilter
+} from "../generated/graphql/types";
 
 type EnumFilter<E> = {
   _in?: E[];
@@ -131,6 +136,19 @@ export function toPrismaStringFilter(
     equals: stringFilter._eq,
     in: stringFilter._in,
     contains: stringFilter._contains
+  });
+}
+
+/** Converter */
+export function toPrismaStringNullableListFilter(
+  stringFilter: StringNullableListFilter | undefined
+): Prisma.StringNullableListFilter {
+  if (!stringFilter) {
+    return undefined;
+  }
+
+  return safeInput<Prisma.StringNullableListFilter>({
+    hasSome: stringFilter._in
   });
 }
 

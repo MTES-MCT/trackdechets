@@ -86,6 +86,7 @@ function duplicateBsdasri(
     destinationOperationSignatureDate,
     destinationOperationSignatureAuthor,
     groupedInId,
+    identificationNumbers,
 
     ...fieldsToCopy
   }: Bsdasri

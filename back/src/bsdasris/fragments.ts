@@ -32,6 +32,9 @@ export const fullBsdasriFragment = gql`
     type
     createdAt
     updatedAt
+    identification {
+      numbers
+    }
     ecoOrganisme {
       name
       siret

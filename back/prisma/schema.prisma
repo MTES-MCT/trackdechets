@@ -707,69 +707,72 @@ enum BsdasriType {
 }
 
 model Bsdasri {
-  id                                          String                  @unique
-  type                                        BsdasriType             @default(SIMPLE)
-  status                                      BsdasriStatus           @default(INITIAL)
-  createdAt                                   DateTime                @default(now())
-  updatedAt                                   DateTime                @updatedAt
-  isDeleted                                   Boolean?                @default(false)
-  isDraft                                     Boolean?                @default(false)
+  id                                  String                  @unique
+  type                                BsdasriType             @default(SIMPLE)
+  status                              BsdasriStatus           @default(INITIAL)
+  createdAt                           DateTime                @default(now())
+  updatedAt                           DateTime                @updatedAt
+  isDeleted                           Boolean?                @default(false)
+  isDraft                             Boolean?                @default(false)
+  identificationNumbers               String[]
+  // waste
+  wasteCode                           String?
+  wasteAdr                            String?
   // emitter
-  emitterCompanyName                          String?
-  emitterCompanySiret                         String?
-  emitterCompanyAddress                       String?
-  emitterCompanyContact                       String?
-  emitterCompanyPhone                         String?
-  emitterCompanyMail                          String?
-  emitterPickupSiteName                       String?
-  emitterPickupSiteAddress                    String?
-  emitterPickupSiteCity                       String?
-  emitterPickupSitePostalCode                 String?
-  emitterPickupSiteInfos                      String?
-  emitterCustomInfo                           String? // free field
+  emitterCompanyName                  String?
+  emitterCompanySiret                 String?
+  emitterCompanyAddress               String?
+  emitterCompanyContact               String?
+  emitterCompanyPhone                 String?
+  emitterCompanyMail                  String?
+  emitterPickupSiteName               String?
+  emitterPickupSiteAddress            String?
+  emitterPickupSiteCity               String?
+  emitterPickupSitePostalCode         String?
+  emitterPickupSiteInfos              String?
+  emitterCustomInfo                   String? // free field
   // emission
-  wasteCode                                   String?
-  wasteAdr                                    String?
-  emitterWasteWeightValue                     Float? // kg
-  emitterWasteWeightIsEstimate                Boolean?
-  emitterWasteVolume                          Int? // liters
-  emitterWastePackagings                      Json                    @default("[]")
-  emissionSignatory                           User?                   @relation("BsdasriEmissionSignature", fields: [emissionSignatoryId], references: [id])
-  emissionSignatoryId                         String?
-  emitterEmissionSignatureDate                DateTime?
-  emitterEmissionSignatureAuthor              String?
-  isEmissionDirectTakenOver                   Boolean                 @default(false)
-  isEmissionTakenOverWithSecretCode           Boolean                 @default(false)
+  emitterWasteWeightValue             Float? // kg
+  emitterWasteWeightIsEstimate        Boolean?
+  emitterWasteVolume                  Int? // liters
+  emitterWastePackagings              Json                    @default("[]")
+  emissionSignatory                   User?                   @relation("BsdasriEmissionSignature", fields: [emissionSignatoryId], references: [id])
+  emissionSignatoryId                 String?
+  emitterEmissionSignatureDate        DateTime?
+  emitterEmissionSignatureAuthor      String?
+  isEmissionDirectTakenOver           Boolean                 @default(false)
+  isEmissionTakenOverWithSecretCode   Boolean                 @default(false)
   // Ecoorganisme
-  ecoOrganismeName                            String?
-  ecoOrganismeSiret                           String?
+  ecoOrganismeName                    String?
+  ecoOrganismeSiret                   String?
   // transporter
-  transporterCompanyName                      String?
-  transporterCompanySiret                     String?
-  transporterCompanyAddress                   String?
-  transporterCompanyPhone                     String?
-  transporterCompanyContact                   String?
-  transporterCompanyMail                      String?
-  transporterRecepisseNumber                  String?
-  transporterRecepisseDepartment              String?
-  transporterRecepisseValidityLimit           DateTime?
-  transporterCustomInfo                       String? // free field
+  transporterCompanyName              String?
+  transporterCompanySiret             String?
+  transporterCompanyAddress           String?
+  transporterCompanyPhone             String?
+  transporterCompanyContact           String?
+  transporterCompanyMail              String?
+  transporterRecepisseNumber          String?
+  transporterRecepisseDepartment      String?
+  transporterRecepisseValidityLimit   DateTime?
+  transporterCustomInfo               String? // free field
   // transport
-  transporterTransportMode                    TransportMode?          @default(ROAD)
-  transporterAcceptationStatus                WasteAcceptationStatus?
-  transporterWasteRefusalReason               String?
-  transporterWasteRefusedWeightValue          Float? // kg
-  transporterTakenOverAt                      DateTime?
-  transporterWastePackagings                  Json                    @default("[]")
-  transporterWasteWeightValue                 Float? // kg
-  transporterWasteWeightIsEstimate            Boolean?
-  transporterWasteVolume                      Int? // liters
-  handedOverToRecipientAt                     DateTime?
-  transportSignatory                          User?                   @relation("BsdasriTransportSignature", fields: [transportSignatoryId], references: [id])
-  transportSignatoryId                        String?
-  transporterTransportSignatureDate           DateTime?
-  transporterTransportSignatureAuthor         String?
-  transporterTransportPlates                  String[]
+  transporterTransportMode            TransportMode?          @default(ROAD)
+  transporterAcceptationStatus        WasteAcceptationStatus?
+  transporterWasteRefusalReason       String?
+  transporterWasteRefusedWeightValue  Float? // kg
+  transporterTakenOverAt              DateTime?
+  transporterWastePackagings          Json                    @default("[]")
+  transporterWasteWeightValue         Float? // kg
+  transporterWasteWeightIsEstimate    Boolean?
+  transporterWasteVolume              Int? // liters
+  handedOverToRecipientAt             DateTime?
+  transportSignatory                  User?                   @relation("BsdasriTransportSignature", fields: [transportSignatoryId], references: [id])
+  transportSignatoryId                String?
+  transporterTransportSignatureDate   DateTime?
+  transporterTransportSignatureAuthor String?
+  transporterTransportPlates          String[]
+
   // destination
   destinationCompanyName                      String?
   destinationCompanySiret                     String?
