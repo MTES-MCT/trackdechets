@@ -13,9 +13,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Indexation Elasticsearch des bordereaux indexés via la mutation `importPaperForm` [PR 1081](https://github.com/MTES-MCT/trackdechets/pull/1081)
+
 #### :nail_care: Améliorations
 
--  Ajout d'index sur les champs siret des différents bordereaux [PR 1080](https://github.com/MTES-MCT/trackdechets/pull/1080)
+- Ajout d'index sur les champs siret des différents bordereaux [PR 1080](https://github.com/MTES-MCT/trackdechets/pull/1080)
 - Ajout d'exemples pour le profil producteur lors de la création d'un établissement, et modification des liens du header [PR 1078](https://github.com/MTES-MCT/trackdechets/pull/1078)
 
 # [2021.11.1] 15/11/2021
