@@ -1,11 +1,18 @@
-import { QueryResolvers } from "../../../generated/graphql/types";
-import { getFileDownloadToken } from "../../../common/file-download";
-import downloadPdf from "../../pdf/downloadPdf";
+import {
+  QueryFormPdfArgs,
+  QueryResolvers
+} from "../../../generated/graphql/types";
+import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
 import { checkCanRead } from "../../permissions";
+import downloadPdf from "../../pdf/downloadPdf";
+import { DownloadHandler } from "../../../routers/downloadRouter";
 
-const TYPE = "form_pdf";
+export const formPdfDownloadHandler: DownloadHandler<QueryFormPdfArgs> = {
+  name: "formPdf",
+  handler: downloadPdf
+};
 
 const formPdfResolver: QueryResolvers["formPdf"] = async (
   parent,
@@ -19,7 +26,10 @@ const formPdfResolver: QueryResolvers["formPdf"] = async (
 
   await checkCanRead(user, form);
 
-  return getFileDownloadToken({ type: TYPE, params: { id } }, downloadPdf);
+  return getFileDownload({
+    handler: formPdfDownloadHandler.name,
+    params: { id }
+  });
 };
 
 export default formPdfResolver;

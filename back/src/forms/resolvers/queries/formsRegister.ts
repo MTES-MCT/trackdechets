@@ -1,19 +1,27 @@
 import { UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
 import * as yup from "yup";
-import { getFileDownloadToken } from "../../../common/file-download";
+import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkIsCompanyMember } from "../../../users/permissions";
-import { QueryResolvers } from "../../../generated/graphql/types";
+import {
+  QueryFormsRegisterArgs,
+  QueryResolvers
+} from "../../../generated/graphql/types";
 import { downloadFormsRegister } from "../../exports/handler";
 import { formsWhereInput } from "../../exports/where-inputs";
-
-const TYPE = "forms_register";
+import { DownloadHandler } from "../../../routers/downloadRouter";
 
 const validationSchema = yup.object().shape({
   startDate: yup.date().nullable(),
   endDate: yup.date().nullable()
 });
+
+export const formsRegisterDownloadHandler: DownloadHandler<QueryFormsRegisterArgs> =
+  {
+    name: "formsRegister",
+    handler: downloadFormsRegister
+  };
 
 const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
   parent,
@@ -46,10 +54,10 @@ const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
     );
   }
 
-  return getFileDownloadToken(
-    { type: TYPE, params: args },
-    downloadFormsRegister
-  );
+  return getFileDownload({
+    handler: formsRegisterDownloadHandler.name,
+    params: args
+  });
 };
 
 export default formsRegisterResolver;

@@ -20,7 +20,7 @@ import RateLimitRedisStore from "rate-limit-redis";
 import prisma from "./prisma";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 import { ErrorCode } from "./common/errors";
-import { downloadFileHandler } from "./common/file-download";
+import { downloadRouter } from "./routers/downloadRouter";
 import errorHandler from "./common/middlewares/errorHandler";
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
@@ -207,7 +207,7 @@ app.use(oauth2Router);
 
 app.get("/ping", (_, res) => res.send("Pong!"));
 app.get("/userActivation", userActivationHandler);
-app.get("/download", downloadFileHandler);
+app.get("/download", downloadRouter);
 
 app.get("/exports", (_, res) =>
   res

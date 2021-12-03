@@ -1,4 +1,4 @@
-import { downloadFileHandler, getFileDownloadToken } from "../file-download";
+import { downloadFileHandler, getFileDownload } from "../fileDownload";
 
 const res: any = {};
 res.status = jest.fn().mockReturnValue(res);
@@ -16,13 +16,13 @@ describe("File download token", () => {
   const handler = () => null;
 
   it("should set token in cache", async () => {
-    await getFileDownloadToken({ type: "A_TYPE", params: null }, handler);
+    await getFileDownload({ type: "A_TYPE", params: null }, handler);
 
     expect(setInCacheMock).toHaveBeenCalled();
   });
 
   it("should return token and link", async () => {
-    const response = await getFileDownloadToken(
+    const response = await getFileDownload(
       { type: "A_TYPE", params: null },
       handler
     );
@@ -32,11 +32,11 @@ describe("File download token", () => {
   });
 
   it("should return different tokens every time", async () => {
-    const res1 = await getFileDownloadToken(
+    const res1 = await getFileDownload(
       { type: "A_TYPE", params: null },
       handler
     );
-    const res2 = await getFileDownloadToken(
+    const res2 = await getFileDownload(
       { type: "A_TYPE", params: null },
       handler
     );
@@ -69,10 +69,7 @@ describe("File download handler", () => {
       JSON.stringify({ type: "EXISTS", params: null })
     );
     const fileDownloader = jest.fn();
-    await getFileDownloadToken(
-      { type: "EXISTS", params: null },
-      fileDownloader
-    );
+    await getFileDownload({ type: "EXISTS", params: null }, fileDownloader);
 
     await downloadFileHandler({ query: { token: "TOKEN" } } as any, res);
 
