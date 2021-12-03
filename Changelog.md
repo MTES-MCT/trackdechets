@@ -15,6 +15,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Indexation Elasticsearch des bordereaux indexés via la mutation `importPaperForm` [PR 1081](https://github.com/MTES-MCT/trackdechets/pull/1081)
 - Correction d'un bug empêchant la mise à jour partielle de champs imbriqués via la mutation `updateBsff` [PR 1065](https://github.com/MTES-MCT/trackdechets/pull/1065)
+- Correction d'un bug empêchant la signature de l'entreprise de travaux sur le BSDA quand l'émetteur est un particulier [PR 1091](https://github.com/MTES-MCT/trackdechets/pull/1091)
 
 #### :boom: Breaking changes
 - Ajout d'une date de prise en charge du déchet par le transporteur sur le `Bsff` [PR 1065](https://github.com/MTES-MCT/trackdechets/pull/1065)
