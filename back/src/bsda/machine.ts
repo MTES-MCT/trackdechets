@@ -25,7 +25,7 @@ export const machine = Machine<never, Event>(
           },
           WORK: {
             target: BsdaStatus.SIGNED_BY_WORKER,
-            cond: "workerHasEmitterPaperSignature"
+            cond: "canSkipEmissionSignature"
           },
           OPERATION: {
             target: BsdaStatus.PROCESSED,
@@ -74,8 +74,9 @@ export const machine = Machine<never, Event>(
       isBsdaRefused: (_, event) =>
         event.bsda?.destinationReceptionAcceptationStatus ===
         BsdaStatus.REFUSED,
-      workerHasEmitterPaperSignature: (_, event) =>
-        event.bsda?.workerWorkHasEmitterPaperSignature,
+      canSkipEmissionSignature: (_, event) =>
+        event.bsda?.workerWorkHasEmitterPaperSignature ||
+        event.bsda?.emitterIsPrivateIndividual,
       isCollectedBy2010: (_, event) =>
         event.bsda?.type === BsdaType.COLLECTION_2710,
       isGroupingOrReshipmentOperation: (_, event) =>
