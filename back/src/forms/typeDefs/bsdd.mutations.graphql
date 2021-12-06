@@ -36,9 +36,9 @@ type Mutation {
   Les champs suivants sont obligatoires pour pouvoir finaliser un bordereau et
   doivent avoir été renseignés au préalable
   ```
-  emitter: {
+  emitter {
     type
-    company: {
+    company {
       siret
       name
       address
@@ -47,10 +47,10 @@ type Mutation {
       mail
     }
   }
-  recipient: {
+  recipient {
     processingOperation
     cap // requis pour les déchets dangereux uniquement
-    company: {
+    company {
       siret
       name
       address
@@ -59,8 +59,8 @@ type Mutation {
       mail
     }
   }
-  transporter: {
-    company: {
+  transporter {
+    company {
       siret
       name
       address
@@ -68,17 +68,14 @@ type Mutation {
       mail
       phone
     }
-    isExemptedOfReceipt
-    receipt
+    receipt // non requis si isExemptedOfReceipt=true
     department // non requis si isExemptedOfReceipt=true
     validityLimit // peut-être omis si isExemptedOfReceipt=true
-    numberPlate // peut-être omis si isExemptedOfReceipt=true
   }
-  wasteDetails: {
+  wasteDetails {
     code
     onuCode // requis pour les déchets dangereux uniquement
-    name
-    packagings {
+    packagingInfos {
       type
       other // requis si type=OTHER
       quantity

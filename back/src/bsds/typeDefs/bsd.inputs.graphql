@@ -42,7 +42,7 @@ input IdFilter {
   _in: [ID!]
 }
 
-"Filtre pour les champs textuelles"
+"Filtre pour les champs textuels"
 input StringFilter {
   _eq: String
   _in: [String!]
@@ -57,4 +57,9 @@ input CompanyWhere {
 "Filtre pour les signatures"
 input SignatureWhere {
   date: DateFilter
+}
+
+"Filtre générique sur une liste de chaînes telle que des identifiants"
+input StringNullableListFilter {
+  _in: [String!]
 }

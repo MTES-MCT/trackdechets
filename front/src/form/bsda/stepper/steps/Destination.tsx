@@ -11,7 +11,6 @@ export function Destination({ disabled }) {
   );
 
   function onNextDestinationToggle() {
-    console.log(hasNextDestination);
     if (hasNextDestination) {
       setFieldValue("destination.operation.nextDestination", null);
     } else {

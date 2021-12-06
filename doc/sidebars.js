@@ -77,7 +77,14 @@ module.exports = {
     {
       Référence: [
         {
-          "Référence API ": [...apiReference, "reference/changelog"],
+          "Référence API ": [
+            ...apiReference,
+            {
+              type: "link",
+              label: "Changelog",
+              href: "https://github.com/MTES-MCT/trackdechets/blob/master/Changelog.md",
+            },
+          ],
         },
         {
           Statuts: ["reference/statuts/bsdd", "reference/statuts/bsdasri"],
@@ -87,6 +94,7 @@ module.exports = {
         "reference/authentification",
         "reference/permissions",
         "reference/identifiants",
+        "reference/validation",
         "reference/errors",
         "reference/notifications",
         "reference/limitations",

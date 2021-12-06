@@ -46,9 +46,12 @@ export default function AccountCompanyAdvanced({
       value
       renderForm={() => (
         <>
-          <div className="notification warning">
-            En supprimant cet établissement vous ne pourrez plus accéder au
-            suivi des bordereaux qui le concerne.
+          <div className="notification notification--warning">
+            En supprimant cet établissement, vous supprimez les accès de tous
+            les administrateurs et collaborateurs et vous ne pourrez plus
+            accéder ni au suivi des bordereaux, ni au registre.
+            <br />
+            Pour retirer les droits d'un membre, allez sur l'onglet « Membres ».
             <br />
             <br />
             Êtes-vous sûr de vouloir le supprimer ?

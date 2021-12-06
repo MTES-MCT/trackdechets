@@ -7,6 +7,8 @@ export const COMPANY_TYPES = [
   {
     value: CompanyType.Producer,
     label: "Producteur de déchets",
+    helpText:
+      "Exemple: garage, médecin / infirmier libéral, opérateur de fluides frigorigènes",
   },
   {
     value: CompanyType.Collector,

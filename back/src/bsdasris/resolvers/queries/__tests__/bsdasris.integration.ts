@@ -202,4 +202,57 @@ describe("Query.Bsdasris", () => {
     expect(ids).toContain(dasri2.id);
     expect(ids).toContain(dasri3.id);
   });
+
+  it("should retrieve dasris by identificationNumbers", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const dasri1 = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        identificationNumbers: ["ABC123", "XY456"]
+      }
+    });
+    const dasri2 = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        identificationNumbers: ["VBN654", "MLK987"]
+      }
+    });
+
+    const dasri3 = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        identificationNumbers: ["BVC321", "ABC123"]
+      }
+    });
+
+    const { query } = makeClient(user);
+
+    // retrieve dasris by container id number
+    const { data } = await query<Pick<Query, "bsdasris">>(GET_BSDASRIS, {
+      variables: {
+        where: {
+          identification: { numbers: { _in: ["ABC123"] } }
+        }
+      }
+    });
+    let ids = data.bsdasris.edges.map(edge => edge.node.id);
+
+    expect(ids.length).toEqual(2);
+    expect(ids).toContain(dasri1.id);
+    expect(ids).toContain(dasri3.id);
+
+    const { data: data2 } = await query<Pick<Query, "bsdasris">>(GET_BSDASRIS, {
+      variables: {
+        where: {
+          identification: { numbers: { _in: ["XY456", "VBN654"] } }
+        }
+      }
+    });
+    ids = data2.bsdasris.edges.map(edge => edge.node.id);
+
+    expect(ids.length).toEqual(2);
+    expect(ids).toContain(dasri1.id);
+    expect(ids).toContain(dasri2.id);
+  });
 });

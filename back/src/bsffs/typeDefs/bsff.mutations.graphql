@@ -3,15 +3,26 @@ type Mutation {
   Mutation permettant de créer un nouveau bordereau de suivi de fluides frigorigènes.
 
   Ces champs sont requis :
-  - emitter.company.name
-  - emitter.company.siret
-  - emitter.company.address
-  - emitter.company.contact
-  - emitter.company.phone
-  - emitter.company.mail
-  - waste.code
-  - waste.adr
-  - weight.value
+
+  ```
+  emitter {
+    company {
+      name
+      siret
+      address
+      contact
+      phone
+      mail
+    }
+  }
+  waste {
+    code
+    adr
+  }
+  weight {
+    value
+  }
+  ```
 
   Si vous souhaitez créer un BSFF sans ces informations, utilisez createDraftBsff.
   """
@@ -41,6 +52,83 @@ type Mutation {
 
   """
   Mutation permettant d'apposer une signature sur le bordereau.
+
+  **Champs requis pour `EMISSION` :**
+
+  ```
+  emitter {
+    company {
+      name
+      siret
+      address
+      contact
+      phone
+      mail
+    }
+  }
+  waste {
+    code
+    adr
+  }
+  weight {
+    value
+  }
+  ```
+
+  **Champs requis pour `TRANSPORT` :**
+
+  ```
+  transporter {
+    company {
+      name
+      siret
+      address
+      contact
+      phone
+      mail
+    }
+    transport {
+      mode
+    }
+  }
+  packagings {
+    name
+    numero
+    weight
+  }
+  ```
+
+  **Champs requis pour `RECEPTION` :**
+
+  ```
+  destination {
+    company {
+      name
+      siret
+      address
+      contact
+      phone
+      mail
+    }
+    reception {
+      date
+      weight
+      acceptation {
+        status
+      }
+    }
+  }
+  ```
+
+  **Champs requis pour `OPERATION` :**
+
+  ```
+  destination {
+    operation {
+      code
+    }
+  }
+  ```
   """
   signBsff(
     "Identifiant du BSFF à signer."

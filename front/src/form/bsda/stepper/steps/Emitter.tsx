@@ -35,7 +35,7 @@ export function Emitter({ disabled }) {
               Nom et prénom
               <Field
                 type="text"
-                name="emitter.company.contact"
+                name="emitter.company.name"
                 className="td-input td-input"
                 disabled={disabled}
               />
