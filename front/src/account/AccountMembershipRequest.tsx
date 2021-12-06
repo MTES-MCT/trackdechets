@@ -28,6 +28,7 @@ const ACCEPT_MEMBERSHIP_REQUEST = gql`
       id
       users {
         id
+        role
       }
     }
   }
@@ -39,6 +40,7 @@ const REFUSE_MEMBERSHIP_REQUEST = gql`
       id
       users {
         id
+        role
       }
     }
   }

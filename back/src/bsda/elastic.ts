@@ -37,7 +37,8 @@ function getWhere(
     emitterCompanySiret: bsda.emitterCompanySiret,
     workerCompanySiret: bsda.workerCompanySiret,
     destinationCompanySiret: bsda.destinationCompanySiret,
-    transporterCompanySiret: bsda.transporterCompanySiret
+    transporterCompanySiret: bsda.transporterCompanySiret,
+    brokerCompanySiret: bsda.brokerCompanySiret
   };
 
   const siretsFilters = new Map<string, keyof typeof where>(

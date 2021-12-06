@@ -31,7 +31,8 @@ const editableFields = {
     cap: ifAwaitingSignature("EMISSION"),
     plannedOperationCode: ifAwaitingSignature("EMISSION"),
     reception: ifAwaitingSignature("OPERATION"),
-    operation: ifAwaitingSignature("OPERATION")
+    operation: ifAwaitingSignature("OPERATION"),
+    customInfo: ifAwaitingSignature("OPERATION")
   },
   waste: {
     code: ifAwaitingSignature("EMISSION"),
@@ -50,6 +51,7 @@ const editableFields = {
   },
   broker: ifAwaitingSignature("EMISSION"),
   transporter: ifAwaitingSignature("TRANSPORT"),
+  ecoOrganisme: ifAwaitingSignature("TRANSPORT"),
   grouping: ifAwaitingSignature("EMISSION"),
   forwarding: ifAwaitingSignature("EMISSION")
 };
