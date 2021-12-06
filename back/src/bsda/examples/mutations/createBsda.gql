@@ -1,0 +1,6 @@
+mutation Createbsda($input: BsdaInput!) {
+  createBsda(input: $input) {
+    id
+    status
+  }
+}

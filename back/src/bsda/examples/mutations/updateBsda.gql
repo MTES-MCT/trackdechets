@@ -1,0 +1,6 @@
+mutation Updatebsda($input: BsdaInput!) {
+  updateBsda(input: $input) {
+    id
+    status
+  }
+}

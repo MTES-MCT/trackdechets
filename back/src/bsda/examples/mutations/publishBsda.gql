@@ -1,0 +1,6 @@
+mutation PublishBsda($id: ID!) {
+  publishBsda(id: $id) {
+    id
+    status
+  }
+}
