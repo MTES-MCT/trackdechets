@@ -58,7 +58,7 @@ export function objectDiff(o1, o2) {
         [key]: o2[key]
       };
     }
-    if (o1[key] === o2[key]) return diff;
+    if (o1[key] === o2[key] || !(key in o1)) return diff;
     return {
       ...diff,
       [key]: o2[key]

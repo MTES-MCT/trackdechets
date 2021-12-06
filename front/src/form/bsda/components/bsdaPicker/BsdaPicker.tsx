@@ -27,79 +27,105 @@ export function BsdaPicker({ singleSelect, name, code }: Props) {
         destination: { operation: { code: { _eq: code } } },
       },
     },
+    fetchPolicy: "network-only",
   });
   const [emitter, , { setValue: setEmitterCompany }] = useField<CompanyInput>(
     "emitter.company"
   );
 
-  const [{ value: associations }] = useField<string[]>(name);
+  const [{ value: forwarding }, , { setValue }] = useField<string>(name);
+  const [{ value: grouping }] = useField<string[]>(name);
+
+  const isSingleValue = name === "forwarding";
 
   if (data == null) {
     return <Loader />;
+  }
+
+  if (data.bsdas.edges.length === 0) {
+    return <div className="notification">Aucun BSDA disponible à associer</div>;
+  }
+
+  if (isSingleValue) {
+    return (
+      <PickerTable
+        onClick={bsda => setValue(bsda.id)}
+        isSelected={bsda => forwarding === bsda.id}
+        bsdas={data.bsdas}
+      />
+    );
   }
 
   return (
     <FieldArray
       name={name}
       render={({ push, remove, pop }) => (
-        <Table isSelectable>
-          <TableHead>
-            <TableRow>
-              <TableHeaderCell />
-              <TableHeaderCell>Numéro</TableHeaderCell>
-              <TableHeaderCell>Déchet</TableHeaderCell>
-              <TableHeaderCell>Émetteur</TableHeaderCell>
-              <TableHeaderCell>Transporteur</TableHeaderCell>
-              <TableHeaderCell>Destinataire</TableHeaderCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.bsdas.edges.map(({ node: bsda }) => {
-              const previousBsdaIndex = associations.findIndex(
-                id => id === bsda.id
-              );
-              const isSelected = previousBsdaIndex >= 0;
+        <PickerTable
+          onClick={bsda => {
+            const previousBsdaIndex = grouping.findIndex(id => id === bsda.id);
+            const isSelected = previousBsdaIndex >= 0;
+            if (singleSelect) {
+              setValue(bsda.id);
+              return;
+            }
 
-              return (
-                <TableRow
-                  key={bsda.id}
-                  onClick={() => {
-                    if (isSelected) {
-                      remove(previousBsdaIndex);
-                      return;
-                    }
+            if (isSelected) {
+              remove(previousBsdaIndex);
+              return;
+            }
 
-                    if (singleSelect) pop();
-                    push(bsda.id);
+            if (singleSelect) pop();
+            push(bsda.id);
 
-                    if (!emitter && bsda.destination?.company) {
-                      const { country, ...company } = bsda.destination.company;
-                      setEmitterCompany(company);
-                    }
-                  }}
-                >
-                  <TableCell>
-                    <input
-                      type="checkbox"
-                      className="td-input"
-                      checked={isSelected}
-                      readOnly
-                    />
-                  </TableCell>
-                  <TableCell>{bsda.id}</TableCell>
-                  <TableCell>
-                    {bsda.waste?.code} -{" "}
-                    {bsda.waste?.materialName ?? "inconnue"}
-                  </TableCell>
-                  <TableCell>{bsda.emitter?.company?.name}</TableCell>
-                  <TableCell>{bsda.transporter?.company?.name}</TableCell>
-                  <TableCell>{bsda.destination?.company?.name}</TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+            if (!emitter && bsda.destination?.company) {
+              const { country, ...company } = bsda.destination.company;
+              setEmitterCompany(company);
+            }
+          }}
+          isSelected={bsda => grouping.findIndex(id => id === bsda.id) >= 0}
+          bsdas={data.bsdas}
+        />
       )}
     />
+  );
+}
+
+function PickerTable({ bsdas, onClick, isSelected }) {
+  return (
+    <Table isSelectable>
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell />
+          <TableHeaderCell>Numéro</TableHeaderCell>
+          <TableHeaderCell>Déchet</TableHeaderCell>
+          <TableHeaderCell>Émetteur</TableHeaderCell>
+          <TableHeaderCell>Transporteur</TableHeaderCell>
+          <TableHeaderCell>Destinataire</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {bsdas.edges.map(({ node: bsda }) => {
+          return (
+            <TableRow key={bsda.id} onClick={() => onClick(bsda)}>
+              <TableCell>
+                <input
+                  type="checkbox"
+                  className="td-input"
+                  checked={isSelected(bsda)}
+                  readOnly
+                />
+              </TableCell>
+              <TableCell>{bsda.id}</TableCell>
+              <TableCell>
+                {bsda.waste?.code} - {bsda.waste?.materialName ?? "inconnue"}
+              </TableCell>
+              <TableCell>{bsda.emitter?.company?.name}</TableCell>
+              <TableCell>{bsda.transporter?.company?.name}</TableCell>
+              <TableCell>{bsda.destination?.company?.name}</TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
   );
 }
