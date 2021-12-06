@@ -1,15 +1,7 @@
 import { setInCache, SetOptions } from "./redis";
-import {
-  DownloadHandlerType,
-  DownloadHandlerParams
-} from "../routers/downloadRouter";
-import { randomNumber, getAPIBaseURL } from "../utils";
+import { FileDownloadPayload } from "../routers/downloadRouter";
+import { getAPIBaseURL, getUid } from "../utils";
 import { FileDownload } from "../generated/graphql/types";
-
-type FileDownloadParams = {
-  handler: DownloadHandlerType;
-  params: DownloadHandlerParams;
-};
 
 /**
  * GraphQL FileDownload resolver
@@ -22,8 +14,8 @@ type FileDownloadParams = {
 export async function getFileDownload({
   handler,
   params
-}: FileDownloadParams): Promise<FileDownload> {
-  const token = `${handler}-${new Date().getTime()}-${randomNumber(4)}`;
+}: FileDownloadPayload): Promise<FileDownload> {
+  const token = getUid(10);
 
   const options: SetOptions = {};
 
