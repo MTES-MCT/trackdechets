@@ -73,10 +73,10 @@ export default async function edit(
     where: { id },
     data: {
       ...data,
-      ...(isGrouping && {
+      ...(input.grouping?.length > 0 && {
         grouping: { set: input.grouping.map(id => ({ id })) }
       }),
-      ...(isForwarding && {
+      ...(input.forwarding && {
         forwarding: { connect: { id: input.forwarding } }
       })
     }
