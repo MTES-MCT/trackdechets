@@ -2,6 +2,8 @@
  * Fixtures used as building blocks of mutations inputs
  */
 
+import { TransportMode, WasteAcceptationStatus } from "@prisma/client";
+
 function emitterCompanyInput(siret: string) {
   return {
     siret,
@@ -28,18 +30,32 @@ function emitterInput(siret: string) {
   };
 }
 
+function privateIndividualEmitterInput() {
+  return {
+    isPrivateIndividual: true,
+    company: {
+      name: "Henri Dupont",
+      address: "5 rue du producteur",
+      contact: "Henri Dupont",
+      phone: "01 00 00 00 00",
+      mail: "henri.dupont@dechets.org"
+    },
+    pickupSite: pickupSiteInput
+  };
+}
+
 function packagingsInput() {
   return [
     {
       type: "BIG_BAG",
-      quantity: 2.1
+      quantity: 2
     }
   ];
 }
 
 function wasteInput() {
   return {
-    code: "Un code",
+    code: "16 01 11*",
     consistence: "SOLIDE",
     familyCode: "Code famille",
     materialName: "Nom du matériau",
@@ -116,9 +132,43 @@ function workerCompanyInput(siret: string) {
   };
 }
 
+function emitterSignatureUpdateInput() {
+  return {};
+}
+function workerSignatureUpdateInput() {
+  return {};
+}
+function transporterSignatureUpdateInput() {
+  return {
+    transporter: {
+      transport: {
+        mode: TransportMode.ROAD,
+        plates: ["abc21cde"],
+        takenOverAt: new Date().toISOString() as any
+      }
+    }
+  };
+}
+function destinationSignatureUpdateInput() {
+  return {
+    destination: {
+      reception: {
+        acceptationStatus: WasteAcceptationStatus.ACCEPTED,
+        date: new Date().toISOString() as any,
+        weight: 2.1
+      },
+      operation: {
+        code: "D 5",
+        date: new Date().toISOString() as any
+      }
+    }
+  };
+}
+
 export default {
   emitterCompanyInput,
   emitterInput,
+  privateIndividualEmitterInput,
   transporterCompanyInput,
   transporterInput,
   traiteurCompanyInput,
@@ -127,5 +177,9 @@ export default {
   wasteInput,
   weightInput,
   workerInput,
-  pickupSiteInput
+  pickupSiteInput,
+  emitterSignatureUpdateInput,
+  workerSignatureUpdateInput,
+  transporterSignatureUpdateInput,
+  destinationSignatureUpdateInput
 };
