@@ -1,4 +1,4 @@
-import axios from "axios";
+import * as queue from "../../../../queue/producer";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   userWithCompanyFactory,
@@ -19,11 +19,13 @@ const INVITE_USER_TO_COMPANY = `
   }
 `;
 
-// Intercept mail calls
-const mockedAxiosPost = jest.spyOn(axios, "post");
-mockedAxiosPost.mockResolvedValue({} as any);
+// Intercept mail job creation
+const mockedAddToMailQueue = jest
+  .spyOn(queue, "addToMailQueue")
+  .mockImplementation(jest.fn());
+
 beforeEach(() => {
-  mockedAxiosPost.mockClear();
+  mockedAddToMailQueue.mockClear();
 });
 
 describe("mutation inviteUserToCompany", () => {
@@ -83,24 +85,29 @@ describe("mutation inviteUserToCompany", () => {
     // Check email was sent
     const hashValue = hashes[0].hash;
 
-    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
+    // Check that the job was added to the queue
+    expect(mockedAddToMailQueue as jest.Mock<any>).toHaveBeenCalledTimes(1);
 
-    const postArgs: any = mockedAxiosPost.mock.calls[0];
+    const addJobArgs: any = mockedAddToMailQueue.mock.calls[0];
 
-    // to right endpoint
-    expect(postArgs[0]).toEqual("http://mailservice/smtp/email");
-
-    // to right person
-    expect(postArgs[1].to[0].email).toEqual(invitedUserEmail);
-    // With right text
-    expect(postArgs[1].subject).toContain(
-      "Vous avez été invité à rejoindre Trackdéchets"
+    // the right payload
+    expect(addJobArgs[0]).toMatchObject({
+      subject: "Vous avez été invité à rejoindre Trackdéchets",
+      templateId: 9,
+      to: [{ email: "newuser@example.test", name: "newuser@example.test" }],
+      vars: {
+        API_URL: "http://api.trackdechets.local",
+        UI_URL: "http://trackdechets.local",
+        companyName: "company_2",
+        hash: encodeURIComponent(hashValue)
+      }
+    });
+    expect(addJobArgs[0].body).toContain(
+      `vous a invité à rejoindre Trackdéchets.`
     );
-
-    expect(postArgs[1].params.body).toContain(
-      "vous a invité à rejoindre Trackdéchets"
-    );
-    // Dnd right hash value
-    expect(postArgs[1].params.body).toContain(encodeURIComponent(hashValue));
+    expect(addJobArgs[0].body).toContain(`<a
+    href=\"http://trackdechets.local/invite?hash=${encodeURIComponent(
+      hashValue
+    )}\">`);
   });
 });

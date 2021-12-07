@@ -3,3 +3,5 @@
 .idea
 *.pgsql
 logs/
+.data
+docker-compose.override.yml

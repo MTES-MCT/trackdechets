@@ -35,6 +35,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Initialisation explicite des gestionnaires de téléchargement de fichier [PR 1092](https://github.com/MTES-MCT/trackdechets/pull/1092)
+- Envoi des emails dans une file d'attente de taches asynchrone [PR 1097](https://github.com/MTES-MCT/trackdechets/pull/1097/)
 
 # [2021.12.1] 06/12/2021
 

@@ -1,5 +1,5 @@
 import prisma from "../prisma";
-import { sendMail } from "../mailer/mailing";
+import { sendMailSync } from "../mailer/mailing";
 import { Company, CompanyAssociation, User } from "@prisma/client";
 import * as COMPANY_TYPES from "../common/constants/COMPANY_TYPES";
 import {
@@ -9,7 +9,7 @@ import {
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
 /**
- * Compute a past date relative to now
+ * Compute a past date relative to baseDate
  *
  * @param baseDate Date
  * @param daysAgo Integer
@@ -58,7 +58,7 @@ export const sendFirstOnboardingEmail = async () => {
       const payload = renderMail(onboardingFirstStep, {
         to: [{ name: recipient.name, email: recipient.email }]
       });
-      return sendMail(payload);
+      return sendMailSync(payload);
     })
   );
   await prisma.$disconnect();
@@ -107,7 +107,7 @@ export const sendSecondOnboardingEmail = async () => {
       const payload = renderMail(mailTemplate, {
         to: [{ email: recipient.email, name: recipient.name }]
       });
-      return sendMail(payload);
+      return sendMailSync(payload);
     })
   );
   await prisma.$disconnect();
