@@ -75,6 +75,8 @@ export default {
     index: "/account",
     info: "/account/info",
     companies: "/account/companies",
+    applications: "/account/applications",
     api: "/account/api",
+    oauth2: "account/oauth2",
   },
 };
