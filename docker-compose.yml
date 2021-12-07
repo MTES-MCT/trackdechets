@@ -35,6 +35,9 @@ services:
       NODE_ENV: dev
     ports:
       - "4000:$API_PORT"
+    depends_on:
+      - redis
+      - postgres
 
   td-ui:
     stdin_open: true

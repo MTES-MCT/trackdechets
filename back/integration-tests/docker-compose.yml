@@ -50,3 +50,4 @@ services:
       SENDER_NAME: "Wastetracker corp."
       POST_BACKEND: console
       ELASTIC_SEARCH_URL: $ELASTIC_SEARCH_URL
+      QUEUE_NAME_SENDMAIL: td-integration-tests-queue

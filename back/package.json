@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "predev": "npm run generate",
-    "dev": "npm run watch:node",
+    "dev": "npm run watch:all",
+    "watch:all": "concurrently -k -p \"[{name}]\" -n \"Api,Queue\" -c \"yellow.bold,cyan.bold\" \"npm run watch:node\" \"npm run watch:queue\"",
     "watch:node": "npx nodemon -r dotenv/config --watch src --exec \"ts-eager\" src/index.ts -e ts,tsx",
     "start": "node dist/src/index.js",
     "update": "node dist/prisma/scripts/index.js",
@@ -28,7 +29,9 @@
     "bulk-create-account": "node dist/src/users/bulk-creation/index.js",
     "bulk-create-account:dev": "ts-node src/users/bulk-creation/index.ts",
     "index-elastic-search": "node dist/src/scripts/bin/indexElasticSearch.js",
-    "index-elastic-search:dev": "ts-node -r dotenv/config ./src/scripts/bin/indexElasticSearch.ts"
+    "index-elastic-search:dev": "ts-node -r dotenv/config ./src/scripts/bin/indexElasticSearch.ts",
+    "watch:queue": "npx nodemon -r dotenv/config --watch src --exec \"ts-eager\" --inspect=0.0.0.0:9230 src/queue/consumer.ts -e ts,tsx",
+    "queue": "node dist/src/queue/consumer.js"
   },
   "engines": {
     "node": "^14"
@@ -56,6 +59,7 @@
     "axios": "^0.23.0",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
+    "bull": "^4.1.4",
     "camel-case": "^4.1.1",
     "concat-stream": "^2.0.0",
     "connect-redis": "^6.0.0",
@@ -112,6 +116,7 @@
     "@graphql-codegen/typescript-resolvers": "^2.3.2",
     "@types/bcrypt": "^3.0.0",
     "@types/body-parser": "^1.17.1",
+    "@types/bull": "^3.15.7",
     "@types/concat-stream": "^1.6.1",
     "@types/connect-redis": "^0.0.14",
     "@types/cors": "^2.8.6",
@@ -141,6 +146,7 @@
     "@types/supertest": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "^5.1.0",
     "@typescript-eslint/parser": "^5.1.0",
+    "concurrently": "^6.4.0",
     "copyfiles": "^2.2.0",
     "dotenv": "^10.0.0",
     "eslint": "^8.1.0",
