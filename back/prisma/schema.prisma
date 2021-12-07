@@ -141,7 +141,8 @@ model Application {
   name         String
   logoUrl      String?
   redirectUris String[]
-  admins       User[]
+  admin        User?         @relation(fields: [adminId], references: [id])
+  adminId      String?
   AccessToken  AccessToken[]
   Grant        Grant[]
 }
@@ -630,7 +631,7 @@ model User {
   // compte de service avec des droits étendus
   isRegistreNational   Boolean?             @default(false)
   applicationId        String?
-  application          Application?         @relation(fields: [applicationId], references: [id])
+  applications         Application[]
   companyAssociations  CompanyAssociation[]
   AccessToken          AccessToken[]
   Form                 Form[]
