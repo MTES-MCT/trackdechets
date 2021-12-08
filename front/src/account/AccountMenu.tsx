@@ -24,7 +24,7 @@ export const AccountMenuContent = ({
       </li>
       <li className="tw-mb-1">
         <NavLink
-          to={routes.account.companies}
+          to={routes.account.companies.list}
           className="sidebar__link"
           activeClassName="sidebar__link--active"
           onClick={() => !!mobileCallback && mobileCallback()}

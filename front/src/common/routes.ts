@@ -74,7 +74,10 @@ export default {
   account: {
     index: "/account",
     info: "/account/info",
-    companies: "/account/companies",
+    companies: {
+      create: "/account/companies/new",
+      list: "/account/companies",
+    },
     applications: "/account/applications",
     api: "/account/api",
     oauth2: {

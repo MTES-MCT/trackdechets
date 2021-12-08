@@ -12,37 +12,15 @@ import {
   Query,
 } from "generated/graphql/types";
 import styles from "./AccountOauth2AppCreateUpdate.module.scss";
-import { ApplicationFragment, APPLICATIONS } from "./AccountOauth2AppList";
 import { useHistory } from "react-router";
 import routes from "common/routes";
 import { NotificationError } from "common/components/Error";
-
-const APPLICATION = gql`
-  query Application($id: ID!) {
-    application(id: $id) {
-      ...ApplicationFragment
-    }
-  }
-  ${ApplicationFragment}
-`;
-
-const CREATE_APPLICATION = gql`
-  mutation CreateApplication($input: ApplicationInput!) {
-    createApplication(input: $input) {
-      ...ApplicationFragment
-    }
-  }
-  ${ApplicationFragment}
-`;
-
-const UPDATE_APPLICATION = gql`
-  mutation UpdateApplication($id: ID!, $input: ApplicationInput!) {
-    updateApplication(id: $id, input: $input) {
-      ...ApplicationFragment
-    }
-  }
-  ${ApplicationFragment}
-`;
+import {
+  APPLICATION,
+  APPLICATIONS,
+  CREATE_APPLICATION,
+  UPDATE_APPLICATION,
+} from "./queries";
 
 const ApplicationInputSchema: yup.SchemaOf<ApplicationInput> = yup.object({
   name: yup.string().required(),
@@ -203,7 +181,12 @@ export default function AccountOauth2AppCreateUpdate({
               </div>
             </div>
             <div className="td-modal-actions">
-              <button className="btn btn--outline-primary">Annuler</button>
+              <button
+                className="btn btn--outline-primary"
+                onClick={() => history.goBack()}
+              >
+                Annuler
+              </button>
               <button
                 type="submit"
                 className="btn btn--primary"

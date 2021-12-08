@@ -96,14 +96,14 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
             />
             <Route
               exact
-              path={`${match.path}/companies`}
+              path={routes.account.companies.list}
               render={() => (
                 <AccountContentWrapper
                   title="Établissements"
                   button={
                     <a
                       className="btn btn--primary"
-                      href={`${match.path}/companies/new`}
+                      href={routes.account.companies.create}
                     >
                       Créer un établissement
                     </a>
@@ -113,12 +113,12 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
                 </AccountContentWrapper>
               )}
             />
-            <Route path={`${match.path}/companies/new`}>
+            <Route path={routes.account.companies.create}>
               <AccountContentWrapper title="Créer un établissement">
                 <AccountCompanyAdd />
               </AccountContentWrapper>
             </Route>
-            <Redirect to={`${match.path}/info`} />
+            <Redirect to={routes.account.info} />
           </Switch>
         </div>
       </div>
