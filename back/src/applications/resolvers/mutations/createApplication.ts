@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server-express";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
@@ -11,12 +10,6 @@ const createApplicationResolver: MutationResolvers["createApplication"] =
     applyAuthStrategies(context, [AuthType.Session]);
     const user = checkIsAuthenticated(context);
 
-    if (user.applicationId) {
-      throw new UserInputError(
-        "Vous ne pouvez pas administrer plus d'une application."
-      );
-    }
-
     await ApplicationInputSchema.validate(input, { abortEarly: false });
 
     const application = await prisma.application.create({
@@ -24,7 +17,7 @@ const createApplicationResolver: MutationResolvers["createApplication"] =
         name: input.name,
         logoUrl: input.logoUrl,
         redirectUris: input.redirectUris,
-        admins: {
+        admin: {
           connect: {
             id: user.id
           }

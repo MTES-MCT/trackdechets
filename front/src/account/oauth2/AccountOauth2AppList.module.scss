@@ -1,13 +1,12 @@
 @import "src/scss/Constants.scss";
 
 .Applications {
-  padding-top: 1rem;
-  border-top: 1px solid $grey-lighter;
+  margin-top: 1rem;
 }
 
 .Application {
   display: flex;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 .ApplicationLogo {
   width: 100px;
@@ -24,13 +23,4 @@
 }
 .ApplicationDetails {
   flex: 1;
-}
-
-.InputGroup {
-  display: flex;
-  margin-bottom: 1rem;
-
-  & > *:not(:last-child) {
-    margin-right: 0.5rem;
-  }
 }

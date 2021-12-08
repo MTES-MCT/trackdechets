@@ -34,7 +34,7 @@ export const AccountMenuContent = ({
       </li>
       <li className="tw-mb-1">
         <NavLink
-          to={routes.account.oauth2}
+          to={routes.account.applications}
           className="sidebar__link"
           activeClassName="sidebar__link--active"
           onClick={() => !!mobileCallback && mobileCallback()}
@@ -52,17 +52,17 @@ export const AccountMenuContent = ({
           activeClassName="sidebar__link--active"
           onClick={() => !!mobileCallback && mobileCallback()}
         >
-          Jeton d'accès
+          Jetons d'accès
         </NavLink>
       </li>
       <li>
         <NavLink
-          to={routes.account.oauth2}
+          to={routes.account.oauth2.list}
           className="sidebar__link"
           activeClassName="sidebar__link--active"
           onClick={() => !!mobileCallback && mobileCallback()}
         >
-          Applications OAuth
+          Applications OAuth2
         </NavLink>
       </li>
     </ul>

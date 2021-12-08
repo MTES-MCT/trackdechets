@@ -1,7 +1,6 @@
 import React from "react";
 import { DEVELOPERS_DOCUMENTATION_URL } from "common/config";
 import AccountFieldApiKey from "./fields/AccountFieldApiKey";
-import { MyApplication } from "./api";
 
 export default function AccountIntegrationApi() {
   return (
@@ -20,7 +19,6 @@ export default function AccountIntegrationApi() {
         </a>
       </div>
       <AccountFieldApiKey />
-      <MyApplication />
     </>
   );
 }

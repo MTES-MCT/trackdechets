@@ -77,6 +77,10 @@ export default {
     companies: "/account/companies",
     applications: "/account/applications",
     api: "/account/api",
-    oauth2: "account/oauth2",
+    oauth2: {
+      create: "/account/oauth2/create",
+      edit: "/account/oauth2/edit/:id",
+      list: "/account/oauth2/list",
+    },
   },
 };
