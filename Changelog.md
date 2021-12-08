@@ -5,6 +5,16 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# Next release ~27/12
+
+#### :rocket: Nouvelles fonctionnalités
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+#### :nail_care: Améliorations
+#### :memo: Documentation
+#### :house: Interne
+- Initialisation explicite des gestionnaires de téléchargement de fichier [PR 1092](https://github.com/MTES-MCT/trackdechets/pull/1092)
 # Next release ~06/12
 
 #### :rocket: Nouvelles fonctionnalités
