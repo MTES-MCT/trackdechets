@@ -33,6 +33,7 @@ const columns: Column[] = [
   { field: "id", label: "N° de bordereau" },
   { field: "bsdType", label: "Type de bordereau" },
   { field: "customId", label: "Identifiant secondaire" },
+  { field: "status", label: "Statut du bordereau" },
   { field: "wasteDescription", label: "Dénomination usuelle" },
   { field: "wasteCode", label: "Code du déchet" },
   { field: "pop", label: "POP", format: formatBoolean },
@@ -58,6 +59,9 @@ const columns: Column[] = [
   { field: "emitterCompanyAddress", label: "Expéditeur adresse" },
   { field: "emitterPickupsiteAddress", label: "Adresse de prise en charge" },
   { field: "emitterCompanyMail", label: "Expéditeur contact" },
+  { field: "workerCompanyName", label: "Entreprise de travaux raison sociale" },
+  { field: "workerCompanySiret", label: "Entreprise de travaux SIRET" },
+  { field: "workerCompanyAddress", label: "Entreprise de travaux adresse" },
   // Gestion du déchets
   { field: "ecoOrganismeName", label: "Éco-organisme raison sociale" },
   { field: "ecoOrganismeSiren", label: "Éco-organisme SIREN" },

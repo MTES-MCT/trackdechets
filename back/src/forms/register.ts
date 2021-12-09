@@ -113,6 +113,7 @@ export function toIncomingWaste(
     transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
     destinationOperationCode: bsdd.destinationOperationCode,
     bsdType: "BSDD",
+    status: bsdd.status,
     customId: bsdd.customId,
     destinationCustomInfo: null,
     destinationCap: null,
@@ -122,7 +123,10 @@ export function toIncomingWaste(
     emitterCompanyMail: bsdd.emitterCompanyMail,
     transporterCompanyMail: bsdd.transporterCompanyMail,
     transporterRecepisseIsExempted: false,
-    wasteAdr: bsdd.wasteAdr
+    wasteAdr: bsdd.wasteAdr,
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null
   };
 }
 
@@ -209,6 +213,7 @@ export function toOutgoingWaste(
     wasteDescription: bsdd.wasteDescription,
     weight: bsdd.weightValue,
     bsdType: "BSDD",
+    status: bsdd.status,
     customId: bsdd.customId,
     emitterCustomInfo: null,
     destinationCap: bsdd.destinationCap,
@@ -218,7 +223,10 @@ export function toOutgoingWaste(
     transporterCompanyMail: bsdd.transporterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
-    wasteAdr: bsdd.wasteAdr
+    wasteAdr: bsdd.wasteAdr,
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null
   };
 }
 
@@ -304,6 +312,7 @@ export function toTransportedWaste(
     destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationCompanyAddress: bsdd.destinationCompanyAddress,
     bsdType: "BSDD",
+    status: bsdd.status,
     customId: bsdd.customId,
     transporterCustomInfo: bsdd.transporterCustomInfo,
     destinationCap: bsdd.destinationCap,
@@ -311,7 +320,10 @@ export function toTransportedWaste(
     destinationReceptionAcceptationStatus:
       bsdd.destinationReceptionAcceptationStatus,
     emitterCompanyMail: bsdd.emitterCompanyMail,
-    destinationCompanyMail: bsdd.destinationCompanyMail
+    destinationCompanyMail: bsdd.destinationCompanyMail,
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null
   };
 }
 
@@ -393,6 +405,7 @@ export function toManagedWaste(
     wasteCode: bsdd.wasteCode,
     wasteDescription: bsdd.wasteDescription,
     bsdType: "BSDD",
+    status: bsdd.status,
     customId: bsdd.customId,
     destinationCap: bsdd.destinationCap,
     destinationOperationNoTraceability: null,
@@ -402,7 +415,10 @@ export function toManagedWaste(
     transporterCompanyMail: bsdd.transporterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
-    wasteAdr: bsdd.wasteAdr
+    wasteAdr: bsdd.wasteAdr,
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null
   };
 }
 
@@ -480,6 +496,7 @@ export function toAllWaste(
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
     bsdType: "BSDD",
+    status: bsdd.status,
     customId: bsdd.customId,
     destinationCap: bsdd.destinationCap,
     destinationOperationNoTraceability: bsdd.destinationOperationNoTraceability,
@@ -488,7 +505,10 @@ export function toAllWaste(
     emitterCompanyMail: bsdd.emitterCompanyMail,
     transporterCompanyMail: bsdd.transporterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail,
-    transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted
+    transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null
   };
 }
 

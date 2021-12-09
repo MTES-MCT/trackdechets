@@ -78,6 +78,7 @@ export function toIncomingWaste(bsvhu: Bsvhu): IncomingWaste {
     transporterRecepisseNumber: bsvhu.transporterRecepisseNumber,
     destinationOperationCode: bsvhu.destinationOperationCode,
     bsdType: "BSVHU",
+    status: bsvhu.status,
     customId: null,
     destinationCustomInfo: bsvhu.destinationCustomInfo,
     destinationCap: null,
@@ -87,7 +88,10 @@ export function toIncomingWaste(bsvhu: Bsvhu): IncomingWaste {
     emitterCompanyMail: bsvhu.emitterCompanyMail,
     transporterCompanyMail: bsvhu.transporterCompanyMail,
     transporterRecepisseIsExempted: false,
-    wasteAdr: null
+    wasteAdr: null,
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null
   };
 }
 
@@ -132,6 +136,7 @@ export function toOutgoingWaste(bsvhu: Bsvhu): OutgoingWaste {
     wasteDescription: getWasteDescription(bsvhu.wasteCode),
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
     bsdType: "BSVHU",
+    status: bsvhu.status,
     customId: null,
     emitterCustomInfo: bsvhu.emitterCustomInfo,
     destinationCap: null,
@@ -141,7 +146,10 @@ export function toOutgoingWaste(bsvhu: Bsvhu): OutgoingWaste {
     transporterCompanyMail: bsvhu.transporterCompanyMail,
     destinationCompanyMail: bsvhu.destinationCompanyMail,
     transporterRecepisseIsExempted: null,
-    wasteAdr: null
+    wasteAdr: null,
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null
   };
 }
 
@@ -185,6 +193,7 @@ export function toTransportedWaste(bsvhu: Bsvhu): TransportedWaste {
     destinationCompanySiret: bsvhu.destinationCompanySiret,
     destinationCompanyAddress: bsvhu.destinationCompanyAddress,
     bsdType: "BSVHU",
+    status: bsvhu.status,
     customId: null,
     transporterCustomInfo: bsvhu.transporterCustomInfo,
     destinationCap: null,
@@ -192,8 +201,7 @@ export function toTransportedWaste(bsvhu: Bsvhu): TransportedWaste {
     destinationReceptionAcceptationStatus:
       bsvhu.destinationReceptionAcceptationStatus,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
-    destinationCompanyMail: bsvhu.destinationCompanyMail,
-    wasteAdr: null
+    destinationCompanyMail: bsvhu.destinationCompanyMail
   };
 }
 
@@ -240,6 +248,7 @@ export function toManagedWaste(bsvhu: Bsvhu): ManagedWaste {
     wasteCode: bsvhu.wasteCode,
     wasteDescription: getWasteDescription(bsvhu.wasteCode),
     bsdType: "BSVHU",
+    status: bsvhu.status,
     customId: null,
     destinationCap: null,
     destinationOperationNoTraceability: null,
@@ -249,7 +258,10 @@ export function toManagedWaste(bsvhu: Bsvhu): ManagedWaste {
     transporterCompanyMail: bsvhu.transporterCompanyMail,
     destinationCompanyMail: bsvhu.destinationCompanyMail,
     transporterRecepisseIsExempted: null,
-    wasteAdr: null
+    wasteAdr: null,
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null
   };
 }
 
@@ -303,6 +315,7 @@ export function toAllWaste(bsvhu: Bsvhu): AllWaste {
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     bsdType: "BSVHU",
+    status: bsvhu.status,
     customId: null,
     destinationCap: null,
     destinationOperationNoTraceability: false,
@@ -311,6 +324,9 @@ export function toAllWaste(bsvhu: Bsvhu): AllWaste {
     emitterCompanyMail: bsvhu.emitterCompanyMail,
     transporterCompanyMail: bsvhu.transporterCompanyMail,
     destinationCompanyMail: bsvhu.destinationCompanyMail,
-    transporterRecepisseIsExempted: null
+    transporterRecepisseIsExempted: null,
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null
   };
 }

@@ -110,7 +110,10 @@ export function toIncomingWaste(
     emitterCompanyMail: bsff.emitterCompanyMail,
     transporterCompanyMail: bsff.transporterCompanyMail,
     transporterRecepisseIsExempted: false,
-    wasteAdr: bsff.wasteAdr
+    wasteAdr: bsff.wasteAdr,
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null
   };
 }
 
@@ -179,6 +182,7 @@ export function toOutgoingWaste(
     wasteDescription: bsff.wasteDescription,
     weight: bsff.weightValue ? bsff.weightValue / 1000 : bsff.weightValue,
     bsdType: "BSFF",
+    status: bsff.status,
     customId: null,
     emitterCustomInfo: bsff.emitterCustomInfo,
     destinationCap: bsff.destinationCap,
@@ -188,7 +192,10 @@ export function toOutgoingWaste(
     transporterCompanyMail: bsff.transporterCompanyMail,
     destinationCompanyMail: bsff.destinationCompanyMail,
     transporterRecepisseIsExempted: null,
-    wasteAdr: bsff.wasteAdr
+    wasteAdr: bsff.wasteAdr,
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null
   };
 }
 
@@ -256,6 +263,7 @@ export function toTransportedWaste(
     destinationCompanySiret: bsff.destinationCompanySiret,
     destinationCompanyAddress: bsff.destinationCompanyAddress,
     bsdType: "BSFF",
+    status: bsff.status,
     customId: null,
     transporterCustomInfo: bsff.transporterCustomInfo,
     destinationCap: bsff.destinationCap,
@@ -263,7 +271,10 @@ export function toTransportedWaste(
     destinationReceptionAcceptationStatus:
       bsff.destinationReceptionAcceptationStatus,
     emitterCompanyMail: bsff.emitterCompanyMail,
-    destinationCompanyMail: bsff.destinationCompanyMail
+    destinationCompanyMail: bsff.destinationCompanyMail,
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null
   };
 }
 
@@ -332,6 +343,7 @@ export function toManagedWaste(
     wasteCode: bsff.wasteCode,
     wasteDescription: bsff.wasteDescription,
     bsdType: "BSFF",
+    status: bsff.status,
     customId: null,
     destinationCap: bsff.destinationCap,
     destinationOperationNoTraceability: null,
@@ -341,7 +353,10 @@ export function toManagedWaste(
     transporterCompanyMail: bsff.transporterCompanyMail,
     destinationCompanyMail: bsff.destinationCompanyMail,
     transporterRecepisseIsExempted: null,
-    wasteAdr: bsff.wasteAdr
+    wasteAdr: bsff.wasteAdr,
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null
   };
 }
 
@@ -418,6 +433,7 @@ export function toAllWaste(
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     bsdType: "BSFF",
+    status: bsff.status,
     customId: null,
     destinationCap: bsff.destinationCap,
     destinationOperationNoTraceability: false,
@@ -426,6 +442,9 @@ export function toAllWaste(
     emitterCompanyMail: bsff.emitterCompanyMail,
     transporterCompanyMail: bsff.transporterCompanyMail,
     destinationCompanyMail: bsff.destinationCompanyMail,
-    transporterRecepisseIsExempted: null
+    transporterRecepisseIsExempted: null,
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null
   };
 }

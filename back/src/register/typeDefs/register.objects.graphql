@@ -104,6 +104,9 @@ type IncomingWaste {
   "Extra - Type de bordereau"
   bsdType: BsdType
 
+  "Extra - Statut du bordereau"
+  status: String
+
   "Extra - Identifiant secondaire du bordereau (BSDD uniquement)"
   customId: String
 
@@ -135,6 +138,13 @@ type IncomingWaste {
   transport maritime de marchandises dangereuses
   """
   wasteAdr: String
+
+  "Extra - La raison sociale de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyName: String
+  "Extra - Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
+  workerCompanySiret: String
+  "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyAddress: String
 }
 
 type IncomingWasteEdge {
@@ -258,6 +268,9 @@ type OutgoingWaste {
   "Extra - Type de bordereau"
   bsdType: BsdType
 
+  "Extra - Statut du bordereau"
+  status: String
+
   "Extra - Identifiant secondaire du bordereau (BSDD uniquement)"
   customId: String
 
@@ -289,6 +302,13 @@ type OutgoingWaste {
   transport maritime de marchandises dangereuses
   """
   wasteAdr: String
+
+  "Extra - La raison sociale de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyName: String
+  "Extra - Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
+  workerCompanySiret: String
+  "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyAddress: String
 }
 
 type OutgoingWasteEdge {
@@ -413,6 +433,9 @@ type TransportedWaste {
   "Extra - Type de bordereau"
   bsdType: BsdType
 
+  "Extra - Statut du bordereau"
+  status: String
+
   "Extra - Identifiant secondaire du bordereau (BSDD uniquement)"
   customId: String
 
@@ -433,6 +456,13 @@ type TransportedWaste {
 
   "Extra - Adresse email de contact de l'installation de destination"
   destinationCompanyMail: String
+
+  "Extra - La raison sociale de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyName: String
+  "Extra - Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
+  workerCompanySiret: String
+  "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyAddress: String
 }
 
 type TransportedWasteEdge {
@@ -551,6 +581,9 @@ type ManagedWaste {
   "Extra - Type de bordereau"
   bsdType: BsdType
 
+  "Extra - Statut du bordereau"
+  status: String
+
   "Extra - Identifiant secondaire du bordereau (BSDD uniquement)"
   customId: String
 
@@ -582,6 +615,13 @@ type ManagedWaste {
   transport maritime de marchandises dangereuses
   """
   wasteAdr: String
+
+  "Extra - La raison sociale de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyName: String
+  "Extra - Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
+  workerCompanySiret: String
+  "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyAddress: String
 }
 
 type ManagedWasteEdge {
@@ -724,6 +764,9 @@ type AllWaste {
   "Extra - Type de bordereau"
   bsdType: BsdType
 
+  "Extra - Statut du bordereau"
+  status: String
+
   "Extra - Identifiant secondaire du bordereau (BSDD uniquement)"
   customId: String
 
@@ -747,6 +790,13 @@ type AllWaste {
 
   "Extra - Exemption de récépissé transporteur"
   transporterRecepisseIsExempted: Boolean
+
+  "Extra - La raison sociale de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyName: String
+  "Extra - Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
+  workerCompanySiret: String
+  "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyAddress: String
 }
 
 type AllWasteEdge {
