@@ -3,7 +3,7 @@ import { List, ListItem } from "common/components";
 import styles from "./AccountOauth2App.module.scss";
 import { generatePath, useHistory } from "react-router";
 import routes from "common/routes";
-import { Application } from "generated/graphql/types";
+import { Application, ApplicationGoal } from "generated/graphql/types";
 import AccountOauth2AppDelete from "./AccountOauth2AppDelete";
 
 type AccountOauth2AppProps = {
@@ -21,11 +21,22 @@ export default function AccountOauth2App({
     <div className="panel" key={application.id}>
       <div className={styles.Application}>
         <div className={styles.ApplicationLogo}>
-          <img src={application.logoUrl} alt="" width="100" height="100" />
+          <img
+            src={application.logoUrl || ""}
+            alt="Logo Application"
+            width="100"
+            height="100"
+          />
         </div>
         <div className={styles.ApplicationDetails}>
           <p>
             <strong>{application.name}</strong>
+          </p>
+          <p>
+            But de l'application :{" "}
+            {application.goal === ApplicationGoal.Personnal
+              ? "Pour vous-même ou pour votre entreprise"
+              : "Pour le compte de clients"}
           </p>
           <p>Client id : {application.id}</p>
           <p>Client secret : {application.clientSecret}</p>

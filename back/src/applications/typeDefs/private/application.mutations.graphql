@@ -1,5 +1,5 @@
 type Mutation {
-  createApplication(input: ApplicationInput!): Application!
-  updateApplication(id: ID!, input: ApplicationInput!): Application!
+  createApplication(input: CreateApplicationInput!): Application!
+  updateApplication(id: ID!, input: UpdateApplicationInput!): Application!
   deleteApplication(id: ID!): Application!
 }

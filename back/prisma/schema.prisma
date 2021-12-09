@@ -120,6 +120,13 @@ enum AuthType {
   JWT
 }
 
+enum ApplicationGoal {
+  // Application pour un usage personnel ou au sein de sa propre entreprise
+  PERSONNAL
+  // Application pour des clients (ex: SaaS métier)
+  CLIENTS
+}
+
 model AccessToken {
   id            String       @id @default(cuid())
   createdAt     DateTime     @default(now())
@@ -134,14 +141,15 @@ model AccessToken {
 }
 
 model Application {
-  id           String        @id @default(cuid())
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id           String          @id @default(cuid())
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
   clientSecret String
   name         String
+  goal         ApplicationGoal?
   logoUrl      String?
   redirectUris String[]
-  admin        User?         @relation(fields: [adminId], references: [id])
+  admin        User?           @relation(fields: [adminId], references: [id])
   adminId      String?
   AccessToken  AccessToken[]
   Grant        Grant[]

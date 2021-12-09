@@ -8,6 +8,7 @@ export const ApplicationInputSchema: yup.SchemaOf<ApplicationInput> =
       .string()
       .matches(/^https?:\/\//i, "URL invalide")
       .required(),
+    goal: yup.string().required(),
     redirectUris: yup
       .array()
       .of(

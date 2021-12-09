@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Modal } from "common/components";
 import { Application } from "generated/graphql/types";
-import gql from "graphql-tag";
 import { useMutation } from "@apollo/client";
 import { APPLICATIONS, DELETE_APPLICATION } from "./queries";
 import { NotificationError } from "common/components/Error";

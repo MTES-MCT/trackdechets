@@ -16,6 +16,7 @@ const createApplicationResolver: MutationResolvers["createApplication"] =
       data: {
         name: input.name,
         logoUrl: input.logoUrl,
+        goal: input.goal,
         redirectUris: input.redirectUris,
         admin: {
           connect: {

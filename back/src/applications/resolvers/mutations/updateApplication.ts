@@ -21,7 +21,10 @@ const updateApplicationResolver: MutationResolvers["updateApplication"] =
       );
     }
 
-    await ApplicationInputSchema.validate(input, { abortEarly: false });
+    await ApplicationInputSchema.validate(
+      { ...existingApplication, ...input },
+      { abortEarly: false }
+    );
 
     const updatedApplication = await prisma.application.update({
       where: { id: existingApplication.id },

@@ -1,11 +1,12 @@
 import React from "react";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { Formik, Form, Field, FieldArray } from "formik";
 import * as yup from "yup";
 import { Label, Loader, RedErrorMessage } from "common/components";
 import { IconTrash } from "common/components/Icons";
 import {
-  ApplicationInput,
+  ApplicationGoal,
+  CreateApplicationInput,
   Mutation,
   MutationCreateApplicationArgs,
   MutationUpdateApplicationArgs,
@@ -15,6 +16,7 @@ import styles from "./AccountOauth2AppCreateUpdate.module.scss";
 import { useHistory } from "react-router";
 import routes from "common/routes";
 import { NotificationError } from "common/components/Error";
+import Tooltip from "common/components/Tooltip";
 import {
   APPLICATION,
   APPLICATIONS,
@@ -22,23 +24,26 @@ import {
   UPDATE_APPLICATION,
 } from "./queries";
 
-const ApplicationInputSchema: yup.SchemaOf<ApplicationInput> = yup.object({
-  name: yup.string().required(),
-  logoUrl: yup
-    .string()
-    .matches(/^https?:\/\//i, "URL invalide")
-    .required(),
-  redirectUris: yup
-    .array()
-    .of(
-      yup
-        .string()
-        .matches(/^https?:\/\//i, "URL invalide")
-        .required("L'URL ne peut pas être vide")
-    )
-    .required()
-    .min(1, "Vous devez préciser au moins une URL de redirection"),
-});
+const ApplicationInputSchema: yup.SchemaOf<CreateApplicationInput> = yup.object(
+  {
+    name: yup.string().required(),
+    logoUrl: yup
+      .string()
+      .matches(/^https?:\/\//i, "URL invalide")
+      .required(),
+    goal: yup.mixed<ApplicationGoal>().required(),
+    redirectUris: yup
+      .array()
+      .of(
+        yup
+          .string()
+          .matches(/^https?:\/\//i, "URL invalide")
+          .required("L'URL ne peut pas être vide")
+      )
+      .required()
+      .min(1, "Vous devez préciser au moins une URL de redirection"),
+  }
+);
 
 type AccountOauth2AppCreateUpdateProps = {
   id?: string;
@@ -74,16 +79,10 @@ export default function AccountOauth2AppCreateUpdate({
   const history = useHistory();
 
   const initialValues = {
-    name: "",
-    logoUrl: "",
-    redirectUris: [],
-    ...(data?.application
-      ? {
-          name: data.application.name,
-          logoUrl: data.application.logoUrl,
-          redirectUris: data.application.redirectUris,
-        }
-      : {}),
+    name: data?.application?.name ?? "",
+    logoUrl: data?.application?.logoUrl ?? "",
+    goal: data?.application?.goal ?? ApplicationGoal.Personnal,
+    redirectUris: data?.application?.redirectUris ?? [],
   };
 
   if (getApplicationLoading) {
@@ -98,7 +97,14 @@ export default function AccountOauth2AppCreateUpdate({
         onSubmit={async values => {
           if (data?.application?.id) {
             await updateApplication({
-              variables: { id: data.application.id, input: values },
+              variables: {
+                id: data.application.id,
+                input: {
+                  name: values.name,
+                  redirectUris: values.redirectUris,
+                  logoUrl: values.logoUrl,
+                },
+              },
             });
           } else {
             await createApplication({ variables: { input: values } });
@@ -119,6 +125,55 @@ export default function AccountOauth2AppCreateUpdate({
                 <RedErrorMessage name="name" />
               </div>
             </div>
+            {!data?.application?.id && (
+              <div className={styles.field}>
+                <Label id="goal-radio-group" className={`${styles.bold}`}>
+                  But de l'application
+                  <Tooltip
+                    msg="Le but principal de cette app est d’accéder aux données de la
+                  plate-forme Trackdéchets et de les utiliser au nom de :"
+                  />
+                </Label>
+                <div className={styles.field__value}>
+                  <div role="group" aria-labelledby="goal-radio-group">
+                    <label className="tw-block">
+                      <Field
+                        type="radio"
+                        name="goal"
+                        value={ApplicationGoal.Personnal}
+                        className="td-radio"
+                      />
+                      Vous-même ou votre propre entreprise
+                    </label>
+                    <label className="tw-block">
+                      <Field
+                        type="radio"
+                        name="goal"
+                        value={ApplicationGoal.Clients}
+                        className="td-radio"
+                      />
+                      Clients{" "}
+                      <Tooltip
+                        msg="Par exemple un développeur d'une solution logicielle SaaS permettant de
+                    gérer les expéditions de déchets pour le compte de producteurs"
+                      />
+                    </label>
+                  </div>
+                  <RedErrorMessage name="goal" />
+                  {values.goal === ApplicationGoal.Clients && (
+                    <div className="notification tw-mt-2">
+                      Si vous développez une app qui accède et utilise des
+                      données de la plate-forme Trackdechets pour le compte de
+                      clients, vous êtes soumis à la Section X des{" "}
+                      <a href="https://trackdechets.beta.gouv.fr/cgu">
+                        conditions générales de la plate-forme.
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className={styles.field}>
               <Label className={`${styles.bold}`}>URL du logo</Label>
               <div className={styles.field__value}>

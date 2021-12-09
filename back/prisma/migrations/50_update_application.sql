@@ -17,8 +17,6 @@ FROM
 WHERE
   "default$default"."User"."applicationId" = "default$default"."Application"."id";
 
-
-
 -- AlterTable
 ALTER TABLE
   "default$default"."User" DROP COLUMN "applicationId";
@@ -28,3 +26,6 @@ ALTER TABLE
   "default$default"."Application"
 ADD
   CONSTRAINT "Application_adminId_fkey" FOREIGN KEY ("adminId") REFERENCES "default$default"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+CREATE TYPE "default$default"."ApplicationGoal" AS ENUM ('PERSONNAL', 'CLIENTS');
+ALTER TABLE "default$default"."Application" ADD COLUMN "goal" SET DATA TYPE "default$default"."ApplicationGoal";

@@ -5,6 +5,7 @@ const ApplicationFragment = gql`
     id
     name
     logoUrl
+    goal
     redirectUris
     clientSecret
   }
@@ -29,7 +30,7 @@ export const APPLICATION = gql`
 `;
 
 export const CREATE_APPLICATION = gql`
-  mutation CreateApplication($input: ApplicationInput!) {
+  mutation CreateApplication($input: CreateApplicationInput!) {
     createApplication(input: $input) {
       ...ApplicationFragment
     }
@@ -38,7 +39,7 @@ export const CREATE_APPLICATION = gql`
 `;
 
 export const UPDATE_APPLICATION = gql`
-  mutation UpdateApplication($id: ID!, $input: ApplicationInput!) {
+  mutation UpdateApplication($id: ID!, $input: UpdateApplicationInput!) {
     updateApplication(id: $id, input: $input) {
       ...ApplicationFragment
     }
