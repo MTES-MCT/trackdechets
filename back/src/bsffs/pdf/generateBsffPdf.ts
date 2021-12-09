@@ -6,17 +6,13 @@ import { Bsff, BsffType, WasteAcceptationStatus } from "@prisma/client";
 import * as QRCode from "qrcode";
 import prisma from "../../prisma";
 import { BsffPackaging } from "../../generated/graphql/types";
-import { toPDF } from "../../common/pdf";
 import { OPERATION } from "../constants";
 import { getBsffHistory } from "../database";
+import { generatePdf } from "../../common/pdf";
 
 const assetsPath = path.join(__dirname, "assets");
 const templatePath = path.join(assetsPath, "index.html");
 const signaturePath = path.join(assetsPath, "signature.svg");
-const cssPaths = [
-  path.join(assetsPath, "modern-normalize.css"),
-  path.join(assetsPath, "styles.css")
-];
 
 export async function generateBsffPdf(bsff: Bsff) {
   const previousBsffs = await getBsffHistory(bsff);
@@ -107,12 +103,6 @@ export async function generateBsffPdf(bsff: Bsff) {
       return dateStr ? format(new Date(dateStr), "dd/MM/yyyy") : "__/__/____";
     }
   });
-  const files = { "index.html": html };
 
-  for (const cssPath of cssPaths) {
-    const content = await fs.readFile(cssPath, "utf-8");
-    files[path.basename(cssPath)] = content;
-  }
-
-  return toPDF(files);
+  return generatePdf(html);
 }

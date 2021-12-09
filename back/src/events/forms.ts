@@ -5,11 +5,11 @@ import { sendMail } from "../mailer/mailing";
 import { trim } from "../common/strings";
 import { getCompanyAdminUsers } from "../companies/database";
 import { searchCompany } from "../companies/sirene";
-import { buildPdfBase64 } from "../forms/pdf/generator";
 import Dreals from "./dreals";
 import { TDEventPayload } from "./emitter";
 import { renderMail } from "../mailer/templates/renderers";
 import { formNotAccepted, formPartiallyRefused } from "../mailer/templates";
+import { generateBsddPdfToBase64 } from "../forms/pdf";
 
 export async function formsEventCallback(payload: TDEventPayload<Form>) {
   await Promise.all([
@@ -40,7 +40,7 @@ export async function mailWhenFormIsDeclined(payload: TDEventPayload<Form>) {
   const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
   const attachmentData = {
-    file: await buildPdfBase64(form),
+    file: await generateBsddPdfToBase64(form),
     name: `${form.readableId}.pdf`
   };
 

@@ -17,7 +17,8 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": false,
     "strictNullChecks": false,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "jsx": "react"
   },
   "include": ["src/**/*", "prisma/**/*"]
 }

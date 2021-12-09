@@ -33,6 +33,21 @@ h2 {
   text-decoration: underline;
 }
 
+table {
+  font: inherit;
+  text-align: left;
+  border-collapse: collapse;
+  width: 100%;
+}
+th {
+  font-weight: bold;
+}
+th,
+td {
+  padding: var(--spacing-gutter);
+  border: 1px solid var(--color-black);
+}
+
 .TextAlignCenter {
   text-align: center;
 }
@@ -50,13 +65,12 @@ h2 {
   break-after: page;
 }
 
-.Box {
-  border-bottom: 1px solid var(--color-black);
-}
 .BoxRow {
   border: 1px solid var(--color-black);
   border-right: 0;
-  border-bottom: 0;
+  margin-bottom: -1px;
+  page-break-inside: avoid;
+  page-break-after: auto;
 }
 .BoxCol {
   position: relative;
