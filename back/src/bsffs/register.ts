@@ -109,7 +109,8 @@ export function toIncomingWaste(
       bsff.destinationReceptionAcceptationStatus,
     emitterCompanyMail: bsff.emitterCompanyMail,
     transporterCompanyMail: bsff.transporterCompanyMail,
-    transporterRecepisseIsExempted: false
+    transporterRecepisseIsExempted: false,
+    wasteAdr: bsff.wasteAdr
   };
 }
 
@@ -186,7 +187,8 @@ export function toOutgoingWaste(
       bsff.destinationReceptionAcceptationStatus,
     transporterCompanyMail: bsff.transporterCompanyMail,
     destinationCompanyMail: bsff.destinationCompanyMail,
-    transporterRecepisseIsExempted: null
+    transporterRecepisseIsExempted: null,
+    wasteAdr: bsff.wasteAdr
   };
 }
 
@@ -338,7 +340,8 @@ export function toManagedWaste(
     emitterCompanyMail: bsff.emitterCompanyMail,
     transporterCompanyMail: bsff.transporterCompanyMail,
     destinationCompanyMail: bsff.destinationCompanyMail,
-    transporterRecepisseIsExempted: null
+    transporterRecepisseIsExempted: null,
+    wasteAdr: bsff.wasteAdr
   };
 }
 

@@ -107,7 +107,8 @@ export function toIncomingWaste(
       bsda.destinationReceptionAcceptationStatus,
     emitterCompanyMail: bsda.emitterCompanyMail,
     transporterCompanyMail: bsda.transporterCompanyMail,
-    transporterRecepisseIsExempted: bsda.transporterRecepisseIsExempted
+    transporterRecepisseIsExempted: bsda.transporterRecepisseIsExempted,
+    wasteAdr: bsda.wasteAdr
   };
 }
 
@@ -178,7 +179,8 @@ export function toOutgoingWaste(
       bsda.destinationReceptionAcceptationStatus,
     transporterCompanyMail: bsda.transporterCompanyMail,
     destinationCompanyMail: bsda.destinationCompanyMail,
-    transporterRecepisseIsExempted: bsda.transporterRecepisseIsExempted
+    transporterRecepisseIsExempted: bsda.transporterRecepisseIsExempted,
+    wasteAdr: bsda.wasteAdr
   };
 }
 
@@ -315,7 +317,8 @@ export function toManagedWaste(
     emitterCompanyMail: bsda.emitterCompanyMail,
     transporterCompanyMail: bsda.transporterCompanyMail,
     destinationCompanyMail: bsda.destinationCompanyMail,
-    transporterRecepisseIsExempted: bsda.transporterRecepisseIsExempted
+    transporterRecepisseIsExempted: bsda.transporterRecepisseIsExempted,
+    wasteAdr: bsda.wasteAdr
   };
 }
 

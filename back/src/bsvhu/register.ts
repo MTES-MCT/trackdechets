@@ -86,7 +86,8 @@ export function toIncomingWaste(bsvhu: Bsvhu): IncomingWaste {
       bsvhu.destinationReceptionAcceptationStatus,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
     transporterCompanyMail: bsvhu.transporterCompanyMail,
-    transporterRecepisseIsExempted: false
+    transporterRecepisseIsExempted: false,
+    wasteAdr: null
   };
 }
 
@@ -139,7 +140,8 @@ export function toOutgoingWaste(bsvhu: Bsvhu): OutgoingWaste {
       bsvhu.destinationReceptionAcceptationStatus,
     transporterCompanyMail: bsvhu.transporterCompanyMail,
     destinationCompanyMail: bsvhu.destinationCompanyMail,
-    transporterRecepisseIsExempted: null
+    transporterRecepisseIsExempted: null,
+    wasteAdr: null
   };
 }
 
@@ -190,7 +192,8 @@ export function toTransportedWaste(bsvhu: Bsvhu): TransportedWaste {
     destinationReceptionAcceptationStatus:
       bsvhu.destinationReceptionAcceptationStatus,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
-    destinationCompanyMail: bsvhu.destinationCompanyMail
+    destinationCompanyMail: bsvhu.destinationCompanyMail,
+    wasteAdr: null
   };
 }
 
@@ -245,7 +248,8 @@ export function toManagedWaste(bsvhu: Bsvhu): ManagedWaste {
     emitterCompanyMail: bsvhu.emitterCompanyMail,
     transporterCompanyMail: bsvhu.transporterCompanyMail,
     destinationCompanyMail: bsvhu.destinationCompanyMail,
-    transporterRecepisseIsExempted: null
+    transporterRecepisseIsExempted: null,
+    wasteAdr: null
   };
 }
 

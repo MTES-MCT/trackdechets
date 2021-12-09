@@ -127,6 +127,14 @@ type IncomingWaste {
 
   "Extra - Exemption de récépissé transporteur"
   transporterRecepisseIsExempted: Boolean
+
+  """
+  Extra - Dans le cas de déchets dangereux, selon le cas, le code transport lié aux réglementations internationales
+  relatives au transport international des marchandises dangereuses par route, au transport international
+  ferroviaire des marchandises dangereuses, au transport de matières dangereuses sur le Rhin, ou au
+  transport maritime de marchandises dangereuses
+  """
+  wasteAdr: String
 }
 
 type IncomingWasteEdge {
@@ -273,6 +281,14 @@ type OutgoingWaste {
 
   "Extra - Exemption de récépissé transporteur"
   transporterRecepisseIsExempted: Boolean
+
+  """
+  Extra - Dans le cas de déchets dangereux, selon le cas, le code transport lié aux réglementations internationales
+  relatives au transport international des marchandises dangereuses par route, au transport international
+  ferroviaire des marchandises dangereuses, au transport de matières dangereuses sur le Rhin, ou au
+  transport maritime de marchandises dangereuses
+  """
+  wasteAdr: String
 }
 
 type OutgoingWasteEdge {
@@ -558,6 +574,14 @@ type ManagedWaste {
 
   "Extra - Exemption de récépissé transporteur"
   transporterRecepisseIsExempted: Boolean
+
+  """
+  Extra - Dans le cas de déchets dangereux, selon le cas, le code transport lié aux réglementations internationales
+  relatives au transport international des marchandises dangereuses par route, au transport international
+  ferroviaire des marchandises dangereuses, au transport de matières dangereuses sur le Rhin, ou au
+  transport maritime de marchandises dangereuses
+  """
+  wasteAdr: String
 }
 
 type ManagedWasteEdge {
