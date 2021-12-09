@@ -66,7 +66,7 @@ function traderFormFactory(ownerId: string, siret: string) {
   });
 }
 
-describe("query { wastesDownloadLink }", () => {
+describe("query { wastesXls }", () => {
   afterEach(resetDatabase);
 
   it("should throw exception if register is empty", async () => {

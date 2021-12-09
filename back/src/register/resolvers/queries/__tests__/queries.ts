@@ -174,7 +174,6 @@ export const WASTES_CSV = gql`
   query WastesCsv(
     $registerType: WasteRegisterType!
     $sirets: [String!]!
-    $fileType: WasteRegisterFileType!
     $where: WasteRegisterWhere
   ) {
     wastesCsv(registerType: $registerType, sirets: $sirets, where: $where) {

@@ -7,7 +7,8 @@ import {
   QueryWastesXlsArgs,
   WasteRegisterType
 } from "../../../generated/graphql/types";
-import { getFileDownload } from "../../../common/fileDownload";
+import { wastesCsvResolverFn } from "../../../register/resolvers/queries/wastesCsv";
+import { wastesXlsResolverFn } from "../../../register/resolvers/queries/wastesXls";
 
 // compatibility between register v1 and register v2
 const exportTypeToRegisterType: Record<
@@ -57,10 +58,10 @@ const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
     }
   };
 
-  return getFileDownload({
-    handler: args.exportFormat === "CSV" ? "wastesCsv" : "wastesXls",
-    params: wasteArgs
-  });
+  // delegate resolution to wastesCsv and wastesXls with bsdType == BSDD
+  return args.exportFormat === "CSV"
+    ? wastesCsvResolverFn(wasteArgs, context)
+    : wastesXlsResolverFn(wasteArgs, context);
 };
 
 export default formsRegisterResolver;
