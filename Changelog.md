@@ -7,9 +7,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # Next release ~27/12
 #### :rocket: Nouvelles fonctionnalités
-<<<<<<< HEAD
 
-=======
 - Gestion de l'export du registre pour tous les types de déchets en accord avec l'arrêté du 31 mai 2021 fixant le contenu du registre. Cet export est disponible :
   - soit en téléchargeant un fichier CSV ou XLSX via la `query` `wastesDownloadLink`
   - soit en paginant les données directement via les `queries` :
@@ -17,18 +15,13 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
     - `outgoingWastes` : registre déchets sortants
     - `transportedWastes` : registre déchets collectés
     - `managedWastes` : registre déchets gérés
->>>>>>> b1ff831c (Regsitre multi-bordereaux combinaison de commits)
 #### :bug: Corrections de bugs
 #### :boom: Breaking changes
-<<<<<<< HEAD
 
-=======
 - Dépréciation de la query `formsRegister` au profit de la query `wastesDownloadLink`.
->>>>>>> b1ff831c (Regsitre multi-bordereaux combinaison de commits)
 #### :nail_care: Améliorations
 
 - Remplacement du CERFA BSDD par un récépissé reprenant l'ensemble des évolutions Trackdéchets [PR 1096](https://github.com/MTES-MCT/trackdechets/pull/1096)
-
 #### :memo: Documentation
 
 #### :house: Interne
