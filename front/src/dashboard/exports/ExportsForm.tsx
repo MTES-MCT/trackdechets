@@ -39,19 +39,25 @@ ExportsForm.fragments = {
   `,
 };
 
-export const WASTES_DOWNLOAD_LINK = gql`
-  query WastesDownloadLink(
+export const WASTES_CSV = gql`
+  query WastesCsv(
     $registerType: WasteRegisterType!
     $sirets: [String!]!
-    $fileType: WasteRegisterFileType!
     $where: WasteRegisterWhere
   ) {
-    wastesDownloadLink(
-      registerType: $registerType
-      sirets: $sirets
-      fileType: $fileType
-      where: $where
-    ) {
+    wastesCsv(registerType: $registerType, sirets: $sirets, where: $where) {
+      downloadLink
+    }
+  }
+`;
+
+export const WASTES_XLS = gql`
+  query WastesXls(
+    $registerType: WasteRegisterType!
+    $sirets: [String!]!
+    $where: WasteRegisterWhere
+  ) {
+    wastesXls(registerType: $registerType, sirets: $sirets, where: $where) {
       downloadLink
     }
   }
@@ -126,9 +132,17 @@ export default function ExportsForm({ companies }: IProps) {
     exportFormat: "CSV",
   };
 
-  const [downloadFile, { data, error, loading }] = useLazyQuery<
-    Pick<Query, "wastesDownloadLink">
-  >(WASTES_DOWNLOAD_LINK, {
+  const [
+    wastesCsv,
+    { data: wastesCsvData, error: wastesCsvError, loading: wastesCsvLoading },
+  ] = useLazyQuery<Pick<Query, "wastesCsv">>(WASTES_CSV, {
+    fetchPolicy: "network-only",
+  });
+
+  const [
+    wastesXls,
+    { data: wastesXlsData, error: wastesXlsError, loading: wastesXlsLoading },
+  ] = useLazyQuery<Pick<Query, "wastesXls">>(WASTES_XLS, {
     fetchPolicy: "network-only",
   });
 
@@ -143,13 +157,12 @@ export default function ExportsForm({ companies }: IProps) {
       exportFormat,
     } = values;
 
-    console.log(values);
+    const downloadFile = exportFormat === "CSV" ? wastesCsv : wastesXls;
 
     downloadFile({
       variables: {
         sirets: companies.map(c => c.siret),
         registerType: exportType,
-        fileType: exportFormat,
         where: {
           createdAt: {
             _gte: startDate,
@@ -177,6 +190,8 @@ export default function ExportsForm({ companies }: IProps) {
   };
 
   useEffect(() => {
+    const data = wastesCsvData || wastesXlsData;
+
     if (!data) {
       return;
     }
@@ -185,7 +200,7 @@ export default function ExportsForm({ companies }: IProps) {
     if (data[key].downloadLink) {
       window.open(data[key].downloadLink, "_blank");
     }
-  }, [data]);
+  }, [wastesCsvData, wastesXlsData]);
 
   return (
     <Formik<Values>
@@ -202,6 +217,9 @@ export default function ExportsForm({ companies }: IProps) {
         if (!exportTypes.includes(values.exportType)) {
           setFieldValue("exportType", exportTypes[0]);
         }
+
+        const error = wastesCsvError || wastesXlsError;
+        const loading = wastesCsvLoading || wastesXlsLoading;
 
         return (
           <Form className={styles.exportForm}>
