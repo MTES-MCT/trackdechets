@@ -1,24 +1,33 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
 import testWorkflow from "../../../__tests__/testWorkflow";
-import acheminementDirectWorkflow from "../workflows/acheminementDirect";
-import acheminementDirectParticulierWorkflow from "../workflows/acheminementDirectParticulier";
+import collecteChantierWorkflow from "../workflows/collecteChantier";
+import collecteChantierParticulierWorkflow from "../workflows/collecteChantierParticulier";
+import groupementWorkflow from "../workflows/groupement";
 
 describe("Exemples de circuit du bordereau de suivi amiante", () => {
   afterEach(resetDatabase);
 
   test(
-    acheminementDirectWorkflow.title,
+    collecteChantierWorkflow.title,
     async () => {
-      await testWorkflow(acheminementDirectWorkflow);
+      await testWorkflow(collecteChantierWorkflow);
     },
     10000
   );
 
   test(
-    acheminementDirectParticulierWorkflow.title,
+    collecteChantierParticulierWorkflow.title,
     async () => {
-      await testWorkflow(acheminementDirectParticulierWorkflow);
+      await testWorkflow(collecteChantierParticulierWorkflow);
     },
     10000
+  );
+
+  test(
+    groupementWorkflow.title,
+    async () => {
+      await testWorkflow(groupementWorkflow);
+    },
+    20000
   );
 });

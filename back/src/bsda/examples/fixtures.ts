@@ -135,9 +135,11 @@ function workerCompanyInput(siret: string) {
 function emitterSignatureUpdateInput() {
   return {};
 }
+
 function workerSignatureUpdateInput() {
   return {};
 }
+
 function transporterSignatureUpdateInput() {
   return {
     transporter: {
@@ -149,6 +151,7 @@ function transporterSignatureUpdateInput() {
     }
   };
 }
+
 function destinationSignatureUpdateInput() {
   return {
     destination: {
@@ -165,14 +168,45 @@ function destinationSignatureUpdateInput() {
   };
 }
 
+function transporterToGroupInput(siret: string) {
+  return {
+    company: transporterCompanyInput(siret),
+    recepisse: recepisseInput,
+    transport: {
+      mode: TransportMode.ROAD,
+      plates: ["abc21cde"],
+      takenOverAt: new Date().toISOString() as any
+    }
+  };
+}
+
+function destinationToGroupInput(siret: string) {
+  return {
+    company: traiteurCompanyInput(siret),
+    plannedOperationCode: "D 13",
+    cap: "CAP",
+    reception: {
+      acceptationStatus: WasteAcceptationStatus.ACCEPTED,
+      date: new Date().toISOString() as any,
+      weight: 2.1
+    },
+    operation: {
+      code: "D 13",
+      date: new Date().toISOString() as any
+    }
+  };
+}
+
 export default {
   emitterCompanyInput,
   emitterInput,
   privateIndividualEmitterInput,
   transporterCompanyInput,
   transporterInput,
+  transporterToGroupInput,
   traiteurCompanyInput,
   destinationInput,
+  destinationToGroupInput,
   packagingsInput,
   wasteInput,
   weightInput,
@@ -181,5 +215,5 @@ export default {
   emitterSignatureUpdateInput,
   workerSignatureUpdateInput,
   transporterSignatureUpdateInput,
-  destinationSignatureUpdateInput
+  destinationSignatureUpdateInput,
 };

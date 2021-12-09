@@ -9,9 +9,16 @@ const expectedStatus = {
   OPERATION: "PROCESSED"
 };
 
+const expectedStatusWhenGrouping = {
+    EMISSION: "SIGNED_BY_PRODUCER",
+    WORK: "SIGNED_BY_WORKER",
+    TRANSPORT: "SENT",
+    OPERATION: "AWAITING_CHILD"
+  };
+
 export function signBsda(
   company: string,
-  type: BsdaSignatureType
+  type: BsdaSignatureType,
 ): WorkflowStep {
   return {
     description: `L'entreprise ${company} appose une signature "${type}" sur le BSDA.`,
@@ -29,3 +36,24 @@ export function signBsda(
     setContext: (ctx, data) => ({ ...ctx, bsda: data })
   };
 }
+
+export function signBsdaToGroup(
+    company: string,
+    type: BsdaSignatureType,
+  ): WorkflowStep {
+    return {
+      description: `L'entreprise ${company} appose une signature "${type}" sur le BSDA.`,
+      mutation: mutations.signBsda,
+      variables: ctx => ({
+        id: ctx.bsda.id,
+        input: {
+          author: `Jean Dupont`,
+          type
+        }
+      }),
+      expected: { status: expectedStatusWhenGrouping[type] },
+      data: response => response.signBsda,
+      company,
+      setContext: (ctx, data) => ({ ...ctx, bsda: data })
+    };
+  }

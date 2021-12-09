@@ -37,6 +37,10 @@ export const machine = Machine<never, Event>(
         on: {
           WORK: {
             target: BsdaStatus.SIGNED_BY_WORKER
+          },
+          TRANSPORT: {
+            target: BsdaStatus.SENT,
+            cond: "isGroupingOrForwardingBsda"
           }
         }
       },
@@ -80,7 +84,10 @@ export const machine = Machine<never, Event>(
       isCollectedBy2010: (_, event) =>
         event.bsda?.type === BsdaType.COLLECTION_2710,
       isGroupingOrReshipmentOperation: (_, event) =>
-        ["D 13", "D 15"].includes(event.bsda?.destinationOperationCode)
+        ["D 13", "D 15"].includes(event.bsda?.destinationOperationCode),
+      isGroupingOrForwardingBsda: (_, event) =>
+        event.bsda?.type === BsdaType.GATHERING ||
+        event.bsda?.type === BsdaType.RESHIPMENT
     }
   }
 );
