@@ -12,6 +12,7 @@ import {
 function toPrismaBsffWhereInput(where: BsffWhere): Prisma.BsffWhereInput {
   return safeInput<Prisma.BsffWhereInput>({
     ...toPrismaGenericWhereInput(where),
+    status: toPrismaEnumFilter(where.status),
     emitterCompanySiret: toPrismaStringFilter(where.emitter?.company?.siret),
     emitterEmissionSignatureDate: toPrismaDateFilter(
       where.emitter?.emission?.signature?.date
