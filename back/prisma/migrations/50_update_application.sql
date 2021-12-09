@@ -28,4 +28,4 @@ ADD
   CONSTRAINT "Application_adminId_fkey" FOREIGN KEY ("adminId") REFERENCES "default$default"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 CREATE TYPE "default$default"."ApplicationGoal" AS ENUM ('PERSONNAL', 'CLIENTS');
-ALTER TABLE "default$default"."Application" ADD COLUMN "goal" SET DATA TYPE "default$default"."ApplicationGoal";
+ALTER TABLE "default$default"."Application" ADD COLUMN "goal" "default$default"."ApplicationGoal";
