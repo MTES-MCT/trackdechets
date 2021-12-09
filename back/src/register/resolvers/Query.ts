@@ -4,7 +4,8 @@ import outgoingWastes from "./queries/outgoingWastes";
 import transportedWastes from "./queries/transportedWastes";
 import managedWastes from "./queries/managedWastes";
 import allWastes from "./queries/allWastes";
-import wastesDownloadLink from "./queries/wastesDownloadLink";
+import wastesCsv from "./queries/wastesCsv";
+import wastesXls from "./queries/wastesXls";
 
 export const Query: QueryResolvers = {
   incomingWastes,
@@ -12,5 +13,6 @@ export const Query: QueryResolvers = {
   transportedWastes,
   managedWastes,
   allWastes,
-  wastesDownloadLink
+  wastesCsv,
+  wastesXls
 };

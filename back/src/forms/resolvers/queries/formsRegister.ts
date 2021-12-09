@@ -1,33 +1,13 @@
-<<<<<<< HEAD
-import { UserInputError } from "apollo-server-express";
-import prisma from "../../../prisma";
-import * as yup from "yup";
-import { getFileDownload } from "../../../common/fileDownload";
-import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkIsCompanyMember } from "../../../users/permissions";
-import {
-  QueryFormsRegisterArgs,
-  QueryResolvers,
-  QueryWastesCsvArgs,
-  QueryWastesDownloadLinkArgs,
-  QueryWastesXlsArgs
-} from "../../../generated/graphql/types";
-import { downloadFormsRegister } from "../../exports/handler";
-import { formsWhereInput } from "../../exports/where-inputs";
-import { DownloadHandler } from "../../../routers/downloadRouter";
-import { wastesDownloadHandler } from "../../../register/resolvers/queries/wastesDownloadLink";
-=======
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import {
   FormsRegisterExportType,
   QueryResolvers,
-  QueryWastesDownloadLinkArgs,
+  QueryWastesCsvArgs,
+  QueryWastesXlsArgs,
   WasteRegisterType
 } from "../../../generated/graphql/types";
-
-import { getWastesDownloadToken } from "../../../register/download";
->>>>>>> 2bd96afb (Regsitre multi-bordereaux combinaison de commits)
+import { getFileDownload } from "../../../common/fileDownload";
 
 // compatibility between register v1 and register v2
 const exportTypeToRegisterType: Record<
@@ -78,10 +58,9 @@ const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
   };
 
   return getFileDownload({
-    handler: args.exportFormat === "CSV" ? "wastesCsv": "wastesXls",
+    handler: args.exportFormat === "CSV" ? "wastesCsv" : "wastesXls",
     params: wasteArgs
   });
-
 };
 
 export default formsRegisterResolver;
