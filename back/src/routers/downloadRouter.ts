@@ -5,7 +5,8 @@ import { bsffPdfDownloadHandler } from "../bsffs/resolvers/queries/bsffPdf";
 import { bsvhuPdfDownloadHandler } from "../bsvhu/resolvers/queries/bsvhuPdf";
 import { redisClient } from "../common/redis";
 import { formPdfDownloadHandler } from "../forms/resolvers/queries/formPdf";
-import { formsRegisterDownloadHandler } from "../forms/resolvers/queries/formsRegister";
+import { wastesCsvDownloadHandler } from "../register/resolvers/queries/wastesCsv";
+import { wastesXlsDownloadHandler } from "../register/resolvers/queries/wastesXls";
 import {
   Query,
   QueryBsdaPdfArgs,
@@ -14,9 +15,9 @@ import {
   QueryBsvhuPdfArgs,
   QueryFormPdfArgs,
   QueryFormsRegisterArgs,
-  QueryWastesDownloadLinkArgs
+  QueryWastesCsvArgs,
+  QueryWastesXlsArgs
 } from "../generated/graphql/types";
-import { wastesDownloadHandler } from "../register/resolvers/queries/wastesDownloadLink";
 
 // List all GraphQL resolvers that register a download handler
 // These values are used as serialization key in Redis
@@ -27,8 +28,8 @@ type DownloadHandlerName = keyof Pick<
   | "bsdasriPdf"
   | "bsffPdf"
   | "bsvhuPdf"
-  | "formsRegister"
-  | "wastesDownloadLink"
+  | "wastesCsv"
+  | "wastesXls"
 >;
 
 // List all different params that can be passed to a download handler
@@ -39,7 +40,8 @@ type DownloadHandlerParams =
   | QueryBsffPdfArgs
   | QueryBsvhuPdfArgs
   | QueryFormsRegisterArgs
-  | QueryWastesDownloadLinkArgs;
+  | QueryWastesCsvArgs
+  | QueryWastesXlsArgs;
 
 type DownloadHandlerFn<P extends DownloadHandlerParams> = (
   req: Request,
@@ -69,8 +71,8 @@ const downloadHandlers: DownloadHandlers = [
   bsdasriPdfDownloadHandler,
   bsffPdfDownloadHandler,
   bsvhuPdfDownloadHandler,
-  formsRegisterDownloadHandler,
-  wastesDownloadHandler
+  wastesCsvDownloadHandler,
+  wastesXlsDownloadHandler
 ].reduce((acc, { name, handler }) => {
   return { ...acc, [name]: handler };
 }, {} as DownloadHandlers);

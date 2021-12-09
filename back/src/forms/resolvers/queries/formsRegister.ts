@@ -8,7 +8,9 @@ import { checkIsCompanyMember } from "../../../users/permissions";
 import {
   QueryFormsRegisterArgs,
   QueryResolvers,
-  QueryWastesDownloadLinkArgs
+  QueryWastesCsvArgs,
+  QueryWastesDownloadLinkArgs,
+  QueryWastesXlsArgs
 } from "../../../generated/graphql/types";
 import { downloadFormsRegister } from "../../exports/handler";
 import { formsWhereInput } from "../../exports/where-inputs";
@@ -43,7 +45,7 @@ const exportTypeToRegisterType: Record<
 /**
  * DEPRECATED
  * Forms only register exports
- * This resolver calls wastesDownloadLink resolver with bsdType=BSDD
+ * This resolver calls wastesXls or wastesCsv resolver with bsdType=BSDD
  * for compatibility
  */
 const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
@@ -58,9 +60,8 @@ const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
     await checkIsCompanyMember({ id: user.id }, { siret: siret });
   }
 
-  const wasteDownloadLinkArgs: QueryWastesDownloadLinkArgs = {
+  const wasteArgs: QueryWastesXlsArgs | QueryWastesCsvArgs = {
     registerType: exportTypeToRegisterType[args.exportType],
-    fileType: args.exportFormat,
     sirets: args.sirets,
     where: {
       bsdType: { _eq: "BSDD" },
@@ -76,11 +77,11 @@ const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
     }
   };
 
-  // defer execution to new wastesDownloadHandler
   return getFileDownload({
-    handler: wastesDownloadHandler.name,
-    params: wasteDownloadLinkArgs
+    handler: args.exportFormat === "CSV" ? "wastesCsv": "wastesXls",
+    params: wasteArgs
   });
+
 };
 
 export default formsRegisterResolver;

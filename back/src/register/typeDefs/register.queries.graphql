@@ -100,14 +100,22 @@ type Query {
     last: Int
   ): AllWasteConnection!
 
-  "Renvoie un lien permettant de télécharger un registre au format CSV ou XLSX"
-  wastesDownloadLink(
+  "Renvoie un lien permettant de télécharger un registre au format CSV"
+  wastesCsv(
     "Type de registre de déchets"
     registerType: WasteRegisterType!
     "Liste d'établissements à inclure dans le registre de déchets"
     sirets: [String!]!
-    "Format du fichier à télécharger"
-    fileType: WasteRegisterFileType!
+    "Filtres additionnels sur les dates d'expédition / réception, le code déchet, l'opération de traitement, etc "
+    where: WasteRegisterWhere
+  ): FileDownload!
+
+  "Renvoie un lien permettant de télécharger un registre au format Excel"
+  wastesXls(
+    "Type de registre de déchets"
+    registerType: WasteRegisterType!
+    "Liste d'établissements à inclure dans le registre de déchets"
+    sirets: [String!]!
     "Filtres additionnels sur les dates d'expédition / réception, le code déchet, l'opération de traitement, etc "
     where: WasteRegisterWhere
   ): FileDownload!

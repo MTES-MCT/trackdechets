@@ -1,6 +1,4 @@
 import { parseString } from "@fast-csv/parse";
-import * as Excel from "exceljs";
-import fs, { createWriteStream } from "fs";
 import {
   refreshElasticSearch,
   resetDatabase
@@ -15,7 +13,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Query } from "../../../../generated/graphql/types";
-import { WASTES_DOWNLOAD_LINK } from "./queries";
+import { WASTES_CSV } from "./queries";
 import { indexForm } from "../../../../forms/elastic";
 import { getFullForm } from "../../../../forms/database";
 
@@ -73,16 +71,12 @@ describe("query { wastesDownloadLink }", () => {
   it("should throw exception if register is empty", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { query } = makeClient(user);
-    const { errors } = await query<Pick<Query, "wastesDownloadLink">>(
-      WASTES_DOWNLOAD_LINK,
-      {
-        variables: {
-          registerType: "INCOMING",
-          sirets: [company.siret],
-          fileType: "CSV"
-        }
+    const { errors } = await query<Pick<Query, "wastesCsv">>(WASTES_CSV, {
+      variables: {
+        registerType: "INCOMING",
+        sirets: [company.siret]
       }
-    );
+    });
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual(
       "Aucune donnée à exporter sur la période sélectionnée"
@@ -93,16 +87,12 @@ describe("query { wastesDownloadLink }", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const otherCompany = await companyFactory();
     const { query } = makeClient(user);
-    const { errors } = await query<Pick<Query, "wastesDownloadLink">>(
-      WASTES_DOWNLOAD_LINK,
-      {
-        variables: {
-          registerType: "INCOMING",
-          sirets: [company.siret, otherCompany.siret],
-          fileType: "CSV"
-        }
+    const { errors } = await query<Pick<Query, "wastesCsv">>(WASTES_CSV, {
+      variables: {
+        registerType: "INCOMING",
+        sirets: [company.siret, otherCompany.siret]
       }
-    );
+    });
     expect(errors).toHaveLength(1);
     expect(errors[0].extensions.code).toEqual(ErrorCode.FORBIDDEN);
   });
@@ -126,24 +116,20 @@ describe("query { wastesDownloadLink }", () => {
       await indexForm(await getFullForm(form));
       await refreshElasticSearch();
       const { query } = makeClient(user);
-      const { data } = await query<Pick<Query, "wastesDownloadLink">>(
-        WASTES_DOWNLOAD_LINK,
-        {
-          variables: {
-            registerType,
-            sirets: [company.siret],
-            fileType: "CSV"
-          }
+      const { data } = await query<Pick<Query, "wastesCsv">>(WASTES_CSV, {
+        variables: {
+          registerType,
+          sirets: [company.siret]
         }
-      );
-      expect(data.wastesDownloadLink.token).not.toBeUndefined();
-      expect(data.wastesDownloadLink.token).not.toBeNull();
+      });
+      expect(data.wastesCsv.token).not.toBeUndefined();
+      expect(data.wastesCsv.token).not.toBeNull();
 
       const request = supertest(app);
 
       const res = await request
         .get("/download")
-        .query({ token: data.wastesDownloadLink.token });
+        .query({ token: data.wastesCsv.token });
 
       expect(res.status).toBe(200);
 
@@ -157,66 +143,5 @@ describe("query { wastesDownloadLink }", () => {
           expect(row["N° de bordereau"]).toEqual(form.readableId);
         });
     }
-  );
-
-  // Test XLXS export for different register types
-  it.each(["INCOMING", "OUTGOING", "TRANSPORTED"])(
-    "should download XLXS %p register",
-    async registerType => {
-      const { user, company } = await userWithCompanyFactory("MEMBER");
-      const customFormFactory =
-        registerType === "OUTGOING"
-          ? emitterFormFactory
-          : registerType === "INCOMING"
-          ? recipientFormFactory
-          : registerType === "TRANSPORTED"
-          ? transporterFormFactory
-          : registerType === "TRADED"
-          ? traderFormFactory
-          : emitterFormFactory;
-      const form = await customFormFactory(user.id, company.siret);
-      await indexForm(await getFullForm(form));
-      await refreshElasticSearch();
-      const { query } = makeClient(user);
-      const { data } = await query<Pick<Query, "wastesDownloadLink">>(
-        WASTES_DOWNLOAD_LINK,
-        {
-          variables: {
-            registerType,
-            sirets: [company.siret],
-            fileType: "XLSX"
-          }
-        }
-      );
-      expect(data.wastesDownloadLink.token).not.toBeUndefined();
-      expect(data.wastesDownloadLink.token).not.toBeNull();
-
-      const request = supertest(app);
-      const req = request
-        .get("/download")
-        .query({ token: data.wastesDownloadLink.token });
-
-      const tmpFolder = fs.mkdtempSync("/");
-      const filename = `${tmpFolder}/registre.xlsx`;
-      const writeStream = createWriteStream(filename);
-
-      req.pipe(writeStream);
-
-      await new Promise<void>(resolve => {
-        req.on("end", async () => {
-          resolve();
-        });
-      });
-
-      const workbook = new Excel.Workbook();
-      await workbook.xlsx.readFile(filename);
-      const worksheet = workbook.getWorksheet("registre");
-      expect(worksheet.rowCount).toBe(2);
-      const row1 = worksheet.getRow(1);
-      const row2 = worksheet.getRow(2);
-      expect(row1.getCell(1).value).toEqual("N° de bordereau");
-      expect(row2.getCell(1).value).toEqual(form.readableId);
-    },
-    30000
   );
 });
