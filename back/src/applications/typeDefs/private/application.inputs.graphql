@@ -8,5 +8,6 @@ input CreateApplicationInput {
 input UpdateApplicationInput {
   name: String
   logoUrl: String
+  goal: ApplicationGoal
   redirectUris: [String!]
 }

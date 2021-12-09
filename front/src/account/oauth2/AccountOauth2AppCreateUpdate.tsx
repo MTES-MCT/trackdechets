@@ -99,11 +99,7 @@ export default function AccountOauth2AppCreateUpdate({
             await updateApplication({
               variables: {
                 id: data.application.id,
-                input: {
-                  name: values.name,
-                  redirectUris: values.redirectUris,
-                  logoUrl: values.logoUrl,
-                },
+                input: values,
               },
             });
           } else {
@@ -125,7 +121,7 @@ export default function AccountOauth2AppCreateUpdate({
                 <RedErrorMessage name="name" />
               </div>
             </div>
-            {!data?.application?.id && (
+            {(!data?.application?.id || !data?.application?.goal) && (
               <div className={styles.field}>
                 <Label id="goal-radio-group" className={`${styles.bold}`}>
                   But de l'application

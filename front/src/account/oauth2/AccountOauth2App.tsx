@@ -36,7 +36,9 @@ export default function AccountOauth2App({
             But de l'application :{" "}
             {application.goal === ApplicationGoal.Personnal
               ? "Pour vous-même ou pour votre entreprise"
-              : "Pour le compte de clients"}
+              : application.goal === ApplicationGoal.Clients
+              ? "Pour le compte de clients"
+              : "Non défini. Veuillez mettre à jour cette information à partir du bouton Modifier"}
           </p>
           <p>Client id : {application.id}</p>
           <p>Client secret : {application.clientSecret}</p>
