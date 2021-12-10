@@ -1,7 +1,6 @@
 import {
   RevisionRequestApprovalStatus as Status,
   BsddRevisionRequest,
-  Prisma,
   RevisionRequestStatus,
   BsddRevisionRequestApproval,
   User

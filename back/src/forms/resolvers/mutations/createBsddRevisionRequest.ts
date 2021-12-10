@@ -20,11 +20,7 @@ import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { getFormOrFormNotFound } from "../../database";
-import {
-  flattenBsddRevisionRequestInput,
-  flattenFormInput,
-  flattenTemporaryStorageDetailInput
-} from "../../form-converter";
+import { flattenBsddRevisionRequestInput } from "../../form-converter";
 import { checkCanRequestRevision } from "../../permissions";
 import {
   INVALID_PROCESSING_OPERATION,
