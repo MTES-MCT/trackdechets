@@ -31,6 +31,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Ajout du courtier à la liste des acteurs pouvant lister ses bsdas [PR 1103](https://github.com/MTES-MCT/trackdechets/pull/1103)
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
