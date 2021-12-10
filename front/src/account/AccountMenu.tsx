@@ -34,20 +34,20 @@ export const AccountMenuContent = ({
       </li>
       <li className="tw-mb-1">
         <NavLink
-          to={routes.account.applications}
+          to={routes.account.authorizedApplications}
           className="sidebar__link"
           activeClassName="sidebar__link--active"
           onClick={() => !!mobileCallback && mobileCallback()}
         >
-          Applications
+          Applications autorisées
         </NavLink>
       </li>
     </ul>
-    <h5 className={styles.title}>Paramètres développeurs</h5>
+    <h5 className={styles.title}>Développeurs</h5>
     <ul>
       <li>
         <NavLink
-          to={routes.account.api}
+          to={routes.account.tokens}
           className="sidebar__link"
           activeClassName="sidebar__link--active"
           onClick={() => !!mobileCallback && mobileCallback()}
@@ -62,7 +62,7 @@ export const AccountMenuContent = ({
           activeClassName="sidebar__link--active"
           onClick={() => !!mobileCallback && mobileCallback()}
         >
-          Applications OAuth2
+          Mes Applications
         </NavLink>
       </li>
     </ul>

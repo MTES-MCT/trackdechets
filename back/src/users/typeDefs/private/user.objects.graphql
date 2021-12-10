@@ -37,5 +37,5 @@ type AuthorizedApplication {
   "Date de dernière connexion"
   lastConnection: DateTime
   "Email de l'administrateur"
-  owner: String
+  admin: String
 }

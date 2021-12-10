@@ -10,7 +10,10 @@ type AccountOauth2AppDeleteProps = {
   onClose: () => void;
 };
 
-export default function AccountOauth2AppDelete({ application, onClose }) {
+export default function AccountOauth2AppDelete({
+  application,
+  onClose,
+}: AccountOauth2AppDeleteProps) {
   const [
     deleteApplication,
     { loading, error },

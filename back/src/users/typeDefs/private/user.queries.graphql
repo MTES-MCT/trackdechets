@@ -16,5 +16,5 @@ type Query {
   USAGE INTERNE
   Liste toutes les applications tierces ayant accès à mon compte
   """
-  authorizedApplications(id: ID!): [AuthorizedApplication!]!
+  authorizedApplications: [AuthorizedApplication!]!
 }

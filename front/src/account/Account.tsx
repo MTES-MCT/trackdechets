@@ -20,6 +20,7 @@ import AccountOauth2AppList from "./oauth2/AccountOauth2AppList";
 import AccountOAuth2AppCreateUpdate from "./oauth2/AccountOauth2AppCreateUpdate";
 import { Query } from "generated/graphql/types";
 import routes from "common/routes";
+import AccountAuthorizedAppList from "./apps/AccountAuthorizedAppList";
 
 export const GET_ME = gql`
   {
@@ -52,9 +53,17 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
               )}
             />
             <Route
-              path={routes.account.api}
+              path={routes.account.authorizedApplications}
               render={() => (
-                <AccountContentWrapper title="Intégration API">
+                <AccountContentWrapper title="Applications tierces autorisées">
+                  <AccountAuthorizedAppList />
+                </AccountContentWrapper>
+              )}
+            />
+            <Route
+              path={routes.account.tokens}
+              render={() => (
+                <AccountContentWrapper title="Mes jetons d'accès personnels">
                   <AccountIntegrationApi />
                 </AccountContentWrapper>
               )}
