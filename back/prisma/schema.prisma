@@ -211,6 +211,9 @@ model CompanyAssociation {
   company   Company  @relation(fields: [companyId], references: [id])
   userId    String
   user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "_CompanyAssociationUserIdIdx")
+  @@index([companyId], map: "_CompanyAssociationCompanyIdIdx")
 }
 
 model Declaration {
@@ -345,6 +348,8 @@ model Form {
   @@index([transporterCompanySiret], map: "_FormTransporterCompanySiretIdx")
   @@index([traderCompanySiret], map: "_FormTraderCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_FormBrokerCompanySiretIdx")
+  @@index([status], map: "_FormStatusIdx")
+  @@index([appendix2RootFormId], map: "_FormAppendix2RootFormIdIdx")
 }
 
 model Grant {
@@ -392,6 +397,9 @@ model MembershipRequest {
   company         Company                 @relation(fields: [companyId], references: [id])
   userId          String
   user            User                    @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "_MembershipRequestUserIdIdx")
+  @@index([companyId], map: "_MembershipRequestCompanyIdIdx")
 }
 
 model Rubrique {
@@ -421,6 +429,9 @@ model StatusLog {
   userId        String
   user          User      @relation(fields: [userId], references: [id])
   authType      AuthType
+
+  @@index([userId], map: "_StatusLogUserIdIdx")
+  @@index([formId], map: "_StatusLogFormIdIdx")
 }
 
 model TemporaryStorageDetail {
@@ -564,6 +575,9 @@ model UserAccountHash {
   createdAt    DateTime  @default(now())
   role         UserRole
   acceptedAt   DateTime?
+
+  @@index([email], map: "_UserAccountHashEmailIdx")
+  @@index([companySiret], map: "_UserAccountHashCompanySiretIdx")
 }
 
 model UserActivationHash {
@@ -573,6 +587,8 @@ model UserActivationHash {
   createdAt DateTime @default(now())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "_UserActivationHashUserIdIdx")
 }
 
 // ----------------
