@@ -24,8 +24,9 @@ const revokeAuthorizedApplicationResolver: MutationResolvers["revokeAuthorizedAp
       );
     }
 
-    await prisma.accessToken.deleteMany({
-      where: { userId: user.id, applicationId: id }
+    await prisma.accessToken.updateMany({
+      where: { userId: user.id, applicationId: id },
+      data: { isRevoked: true }
     });
 
     const lastConnection = accessTokens

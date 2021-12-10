@@ -24,7 +24,6 @@ type Invitation {
 }
 
 """
-USAGE INTERNE
 Application tierce ayant accès à mon compte via le protocole OAuth2
 """
 type AuthorizedApplication {

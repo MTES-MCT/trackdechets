@@ -11,7 +11,11 @@ const authorizedApplicationsResolver: QueryResolvers["authorizedApplications"] =
     applyAuthStrategies(context, [AuthType.Session]);
     const user = checkIsAuthenticated(context);
     const accessTokens = await prisma.accessToken.findMany({
-      where: { userId: user.id, applicationId: { not: null } },
+      where: {
+        userId: user.id,
+        applicationId: { not: null },
+        isRevoked: false
+      },
       include: { application: { include: { admin: true } } }
     });
     const authorizedApplications = accessTokens.map(token => {
@@ -25,10 +29,9 @@ const authorizedApplicationsResolver: QueryResolvers["authorizedApplications"] =
       };
     });
 
-    // oauth2 protocol should prevent issuing several tokens for the
-    // the same user and application but this is not enforced at
-    // database level so we make sure the items are unique and compute
-    // most recent `lastConnection` value
+    // It is possible that the same app retrieved several tokens from the
+    // same user, so we have to make sure the items are unique and to compute the most
+    // recent `lastConnection` value
     const authorizedApplicationsById = authorizedApplications.reduce(
       (acc, application) => {
         if (acc[application.id]) {
