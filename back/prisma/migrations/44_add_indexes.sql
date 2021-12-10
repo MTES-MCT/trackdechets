@@ -26,3 +26,19 @@ CREATE INDEX IF NOT EXISTS "_UserActivationHashUserIdIdx" ON "default$default"."
 
 CREATE INDEX IF NOT EXISTS "_FormStatusIdx" ON "default$default"."Form"("status");
 CREATE INDEX IF NOT EXISTS "_FormAppendix2RootFormIdIdx" ON "default$default"."Form"("appendix2RootFormId");
+
+-- Bsvhu
+
+CREATE INDEX IF NOT EXISTS "_BsvhuStatusIdx" ON "default$default"."Bsvhu"("status");
+
+-- Bsda
+
+CREATE INDEX IF NOT EXISTS "_BsdaStatusIdx" ON "default$default"."Bsda"("status");
+
+-- Bsff
+
+CREATE INDEX IF NOT EXISTS "_BsffStatusIdx" ON "default$default"."Bsff"("status");
+
+-- Bsdasri
+
+CREATE INDEX IF NOT EXISTS "_BsdasriStatusIdx" ON "default$default"."Bsdasri"("status");

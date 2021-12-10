@@ -696,6 +696,7 @@ model Bsvhu {
   @@index([emitterCompanySiret], map: "_BvhuEmitterCompanySirettIdx")
   @@index([destinationCompanySiret], map: "_BsvhuDestinationCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsvhuTransporterCompanySiretIdx")
+  @@index([status], map: "_BsvhuStatusIdx")
 }
 
 // ----------------
@@ -824,6 +825,7 @@ model Bsdasri {
   @@index([emitterCompanySiret], map: "_BsdasriEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsdasriTransporterCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsdasriDestinationCompanySiretIdx")
+  @@index([status], map: "_BsdasriStatusIdx")
 }
 
 // ----------------
@@ -935,6 +937,7 @@ model Bsff {
   @@index([emitterCompanySiret], map: "_BsffEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsffTransporterCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsffDestinationCompanySiretIdx")
+  @@index([status], map: "_BsffStatusIdx")
 }
 
 enum BsffType {
@@ -1145,4 +1148,5 @@ model Bsda {
   @@index([destinationCompanySiret], map: "_BsdaDestinationCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsdaTransporterCompanySiretIdx")
   @@index([workerCompanySiret], map: "_BsdaWorkerCompanySiretIdx")
+  @@index([status], map: "_BsdaStatusIdx")
 }
