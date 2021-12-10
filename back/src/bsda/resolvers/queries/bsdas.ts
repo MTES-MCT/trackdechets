@@ -29,7 +29,9 @@ export default async function bsdas(
   const userSirets = userCompanies.map(c => c.siret);
 
   const mask = {
-    OR: BSDA_CONTRIBUTORS_FIELDS.map(field => ({ [field]: { in: userSirets } }))
+    OR: Object.values(BSDA_CONTRIBUTORS_FIELDS).map(field => ({
+      [field]: { in: userSirets }
+    }))
   };
 
   const prismaWhere = {

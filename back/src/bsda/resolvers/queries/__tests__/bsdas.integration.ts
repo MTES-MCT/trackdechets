@@ -88,15 +88,35 @@ describe("Query.bsdas", () => {
     expect(data.bsdas.edges.length).toBe(2);
   });
 
-  it.each(BSDA_CONTRIBUTORS_FIELDS)(
+  it("should list all of user's bsdas", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const fields = Object.values(BSDA_CONTRIBUTORS_FIELDS);
+    for (const field of fields) {
+      await bsdaFactory({
+        opt: {
+          [field]: company.siret
+        }
+      });
+    }
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsdas">, QueryBsdasArgs>(
+      GET_BSDAS
+    );
+
+    expect(data.bsdas.edges.length).toBe(fields.length);
+  });
+
+  it.each(Object.keys(BSDA_CONTRIBUTORS_FIELDS))(
     "should filter bsdas where user appears as %s",
-    async field => {
+    async role => {
       const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
 
-      for (const otherField of BSDA_CONTRIBUTORS_FIELDS) {
+      for (const field of Object.values(BSDA_CONTRIBUTORS_FIELDS)) {
         await bsdaFactory({
           opt: {
-            [otherField]: company.siret
+            [field]: company.siret
           }
         });
       }
@@ -107,7 +127,7 @@ describe("Query.bsdas", () => {
         {
           variables: {
             where: {
-              [field]: {
+              [role]: {
                 company: {
                   siret: { _eq: company.siret }
                 }

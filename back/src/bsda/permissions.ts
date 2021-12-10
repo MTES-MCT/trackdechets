@@ -13,13 +13,14 @@ type BsdaContributors = Pick<
   | "brokerCompanySiret"
 >;
 
-export const BSDA_CONTRIBUTORS_FIELDS: Array<keyof BsdaContributors> = [
-  "emitterCompanySiret",
-  "destinationCompanySiret",
-  "transporterCompanySiret",
-  "workerCompanySiret",
-  "brokerCompanySiret"
-];
+export const BSDA_CONTRIBUTORS_FIELDS: Record<string, keyof BsdaContributors> =
+  {
+    emitter: "emitterCompanySiret",
+    destination: "destinationCompanySiret",
+    transporter: "transporterCompanySiret",
+    worker: "workerCompanySiret",
+    broker: "brokerCompanySiret"
+  };
 
 export async function checkIsBsdaContributor(
   user: User,
@@ -39,7 +40,9 @@ export async function isBsdaContributor(user: User, form: Partial<Bsda>) {
   const fullUser = await getFullUser(user);
   const userSirets = fullUser.companies.map(c => c.siret);
 
-  const formSirets = BSDA_CONTRIBUTORS_FIELDS.map(field => form[field]);
+  const formSirets = Object.values(BSDA_CONTRIBUTORS_FIELDS).map(
+    field => form[field]
+  );
 
   const siretsInCommon = userSirets.filter(siret => formSirets.includes(siret));
 
