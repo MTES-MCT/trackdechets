@@ -119,16 +119,61 @@ async function reverberateChangeOnAssociatedObjects(
       data: { status: RevisionRequestStatus.ACCEPTED }
     });
 
-    const { temporaryStorageDetail, ...bsddRevisionRequest } =
-      revisionRequest.content as Partial<Prisma.FormUpdateInput>;
+    const [bsddUpdate, temporaryStorageUpdate] =
+      getUpdateFromBsddRevisionRequest(revisionRequest);
+
     await prisma.form.update({
       where: { id: revisionRequest.bsddId },
       data: {
-        ...bsddRevisionRequest,
-        ...(temporaryStorageDetail && {
-          temporaryStorageDetail: { update: { ...temporaryStorageDetail } }
+        ...bsddUpdate,
+        ...(temporaryStorageUpdate && {
+          temporaryStorageDetail: { update: { ...temporaryStorageUpdate } }
         })
       }
     });
   }
+}
+
+function getUpdateFromBsddRevisionRequest(
+  revisionRequest: BsddRevisionRequest
+) {
+  const bsddUpdate = {
+    recipientCap: revisionRequest.recipientCap,
+    wasteDetailsCode: revisionRequest.wasteDetailsCode,
+    wasteDetailsPop: revisionRequest.wasteDetailsPop,
+    quantityReceived: revisionRequest.quantityReceived,
+    processingOperationDone: revisionRequest.processingOperationDone,
+    brokerCompanyName: revisionRequest.brokerCompanyName,
+    brokerCompanySiret: revisionRequest.brokerCompanySiret,
+    brokerCompanyAddress: revisionRequest.brokerCompanyAddress,
+    brokerCompanyContact: revisionRequest.brokerCompanyContact,
+    brokerCompanyPhone: revisionRequest.brokerCompanyPhone,
+    brokerCompanyMail: revisionRequest.brokerCompanyMail,
+    brokerReceipt: revisionRequest.brokerReceipt,
+    brokerDepartment: revisionRequest.brokerDepartment,
+    brokerValidityLimit: revisionRequest.brokerValidityLimit,
+    traderCompanyAddress: revisionRequest.traderCompanyAddress,
+    traderCompanyContact: revisionRequest.traderCompanyContact,
+    traderCompanyPhone: revisionRequest.traderCompanyPhone,
+    traderCompanyMail: revisionRequest.traderCompanyMail,
+    traderReceipt: revisionRequest.traderReceipt,
+    traderDepartment: revisionRequest.traderDepartment,
+    traderValidityLimit: revisionRequest.traderValidityLimit
+  };
+
+  const temporaryStorageUpdate = {
+    destinationCap: revisionRequest.temporaryStorageDestinationCap,
+    destinationProcessingOperation:
+      revisionRequest.temporaryStorageDestinationProcessingOperation
+  };
+
+  function removeEmpty(obj) {
+    const cleanedObject = Object.fromEntries(
+      Object.entries(obj).filter(([_, v]) => v != null)
+    );
+
+    return Object.keys(cleanedObject).length === 0 ? null : cleanedObject;
+  }
+
+  return [removeEmpty(bsddUpdate), removeEmpty(temporaryStorageUpdate)];
 }

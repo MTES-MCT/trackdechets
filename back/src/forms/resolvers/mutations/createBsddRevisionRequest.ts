@@ -21,6 +21,7 @@ import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { getFormOrFormNotFound } from "../../database";
 import {
+  flattenBsddRevisionRequestInput,
   flattenFormInput,
   flattenTemporaryStorageDetailInput
 } from "../../form-converter";
@@ -32,7 +33,7 @@ import {
 } from "../../validation";
 
 export type RevisionRequestContent = Pick<
-  Prisma.FormCreateInput,
+  Prisma.BsddRevisionRequestCreateInput,
   | "recipientCap"
   | "wasteDetailsCode"
   | "wasteDetailsPop"
@@ -54,12 +55,9 @@ export type RevisionRequestContent = Pick<
   | "traderReceipt"
   | "traderDepartment"
   | "traderValidityLimit"
-> & {
-  temporaryStorageDetail?: Pick<
-    Prisma.TemporaryStorageDetailCreateInput,
-    "destinationCap" | "destinationProcessingOperation"
-  >;
-};
+  | "temporaryStorageDestinationCap"
+  | "temporaryStorageDestinationProcessingOperation"
+>;
 
 export default async function createBsddRevisionRequest(
   _,
@@ -82,7 +80,7 @@ export default async function createBsddRevisionRequest(
   return prisma.bsddRevisionRequest.create({
     data: {
       bsdd: { connect: { id: existingBsdd.id } },
-      content: JSON.parse(JSON.stringify(flatContent)),
+      ...flatContent,
       author: { connect: { id: author.id } },
       approvals: {
         create: approversSirets.map(approverSiret => ({ approverSiret }))
@@ -147,28 +145,20 @@ async function getFlatContent(
   content: BsddRevisionRequestContentInput,
   bsdd: Form
 ): Promise<RevisionRequestContent> {
-  const { temporaryStorageDetail, ...bsddInput } = content;
-  if (temporaryStorageDetail && bsdd.temporaryStorageDetailId == null) {
+  const flatContent = flattenBsddRevisionRequestInput(content);
+
+  if (
+    bsdd.temporaryStorageDetailId == null &&
+    hasTemporaryStorageUpdate(flatContent)
+  ) {
     throw new UserInputError(
       "Impossible de réviser l'entreposage provisoire, ce bordereau n'est pas concerné."
     );
   }
-  const revisionRequestContent: RevisionRequestContent =
-    flattenFormInput(bsddInput);
-  await bsddRevisionRequestSchema.validate(revisionRequestContent);
 
-  if (temporaryStorageDetail) {
-    const temporaryStorageReviewContent = flattenTemporaryStorageDetailInput(
-      temporaryStorageDetail
-    );
-    await temporaryStorageRevisionRequestSchema.validate(
-      temporaryStorageReviewContent
-    );
-    revisionRequestContent.temporaryStorageDetail =
-      temporaryStorageReviewContent;
-  }
+  await bsddRevisionRequestSchema.validate(flatContent);
 
-  return revisionRequestContent;
+  return flatContent;
 }
 
 async function getApproversSirets(
@@ -182,7 +172,7 @@ async function getApproversSirets(
     bsdd.recipientCompanySiret
   ];
 
-  if (content.temporaryStorageDetail) {
+  if (hasTemporaryStorageUpdate(content)) {
     const temporaryStorageDetail = await prisma.form
       .findUnique({ where: { id: bsdd.id } })
       .temporaryStorageDetail();
@@ -193,6 +183,13 @@ async function getApproversSirets(
   return approvers
     .filter(Boolean)
     .filter(siret => siret !== revisionAuthorSiret);
+}
+
+function hasTemporaryStorageUpdate(content: RevisionRequestContent): boolean {
+  return (
+    content.temporaryStorageDestinationCap != null ||
+    content.temporaryStorageDestinationProcessingOperation != null
+  );
 }
 
 const bsddRevisionRequestSchema = yup
@@ -227,22 +224,14 @@ const bsddRevisionRequestSchema = yup
     traderCompanyMail: yup.string().email().nullable(),
     traderReceipt: yup.string().nullable(),
     traderDepartment: yup.string().nullable(),
-    traderValidityLimit: yup.date().nullable()
-  })
-  .noUnknown(
-    true,
-    "Révision impossible, certains champs saisis ne sont pas modifiables"
-  );
-
-const temporaryStorageRevisionRequestSchema = yup
-  .object({
-    destinationCap: yup.string().nullable(),
-    destinationProcessingOperation: yup
+    traderValidityLimit: yup.date().nullable(),
+    temporaryStorageDestinationCap: yup.string().nullable(),
+    temporaryStorageDestinationProcessingOperation: yup
       .string()
       .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
       .nullable()
   })
   .noUnknown(
     true,
-    "Révision impossible, certains champs saisis pour l'entreposage provisioire ne sont pas modifiables"
+    "Révision impossible, certains champs saisis ne sont pas modifiables"
   );

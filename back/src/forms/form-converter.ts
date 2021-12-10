@@ -2,7 +2,8 @@ import {
   Form as PrismaForm,
   TemporaryStorageDetail as PrismaTemporaryStorageDetail,
   TransportSegment as PrismaTransportSegment,
-  Prisma
+  Prisma,
+  BsddRevisionRequest
 } from "@prisma/client";
 import {
   Form as GraphQLForm,
@@ -39,7 +40,12 @@ import {
   TransporterSignatureFormInput,
   SignatureFormInput,
   ReceivedFormInput,
-  NextSegmentInfoInput
+  NextSegmentInfoInput,
+  BsddRevisionRequestContentInput,
+  BsddRevisionRequestContent,
+  BsddRevisionRequestWasteDetails,
+  BsddRevisionRequestTemporaryStorageDetail,
+  BsddRevisionRequestDestination
 } from "../generated/graphql/types";
 import { extractPostalCode } from "../utils";
 
@@ -354,6 +360,35 @@ function flattenNextDestinationInput(input: {
       chain(nd.company, c => c.phone)
     )
   };
+}
+
+export function flattenBsddRevisionRequestInput(
+  reviewContent: BsddRevisionRequestContentInput
+) {
+  return safeInput({
+    recipientCap: chain(reviewContent, c => chain(c.recipient, r => r.cap)),
+    wasteDetailsCode: chain(reviewContent, c =>
+      chain(c.wasteDetails, w => w.code)
+    ),
+    wasteDetailsPop: chain(reviewContent, c =>
+      chain(c.wasteDetails, w => w.pop)
+    ),
+    quantityReceived: chain(reviewContent, c => c.quantityReceived),
+    processingOperationDone: chain(
+      reviewContent,
+      c => c.processingOperationDone
+    ),
+    ...flattenTraderInput(reviewContent),
+    ...flattenBrokerInput(reviewContent),
+    temporaryStorageDestinationCap: chain(reviewContent, c =>
+      chain(c.temporaryStorageDetail, t => chain(t.destination, d => d.cap))
+    ),
+    temporaryStorageDestinationProcessingOperation: chain(reviewContent, c =>
+      chain(c.temporaryStorageDetail, t =>
+        chain(t.destination, d => d.processingOperation)
+      )
+    )
+  });
 }
 
 export function flattenFormInput(
@@ -747,6 +782,51 @@ export function expandTransportSegmentFromDb(
     takenOverBy: segment.takenOverBy,
     readyToTakeOver: segment.readyToTakeOver,
     segmentNumber: segment.segmentNumber
+  };
+}
+
+export function expandBsddRevisionRequestContent(
+  bsddRevisionRequest: BsddRevisionRequest
+): BsddRevisionRequestContent {
+  return {
+    wasteDetails: nullIfNoValues<BsddRevisionRequestWasteDetails>({
+      code: bsddRevisionRequest.wasteDetailsCode,
+      pop: bsddRevisionRequest.wasteDetailsPop
+    }),
+    trader: nullIfNoValues<Trader>({
+      company: nullIfNoValues<FormCompany>({
+        address: bsddRevisionRequest.traderCompanyAddress,
+        contact: bsddRevisionRequest.traderCompanyContact,
+        phone: bsddRevisionRequest.traderCompanyPhone,
+        mail: bsddRevisionRequest.traderCompanyMail
+      }),
+      receipt: bsddRevisionRequest.traderReceipt,
+      department: bsddRevisionRequest.traderDepartment,
+      validityLimit: bsddRevisionRequest.traderValidityLimit
+    }),
+    broker: nullIfNoValues<Broker>({
+      company: nullIfNoValues<FormCompany>({
+        name: bsddRevisionRequest.brokerCompanyName,
+        siret: bsddRevisionRequest.brokerCompanySiret,
+        address: bsddRevisionRequest.brokerCompanyAddress,
+        contact: bsddRevisionRequest.brokerCompanyContact,
+        phone: bsddRevisionRequest.brokerCompanyPhone,
+        mail: bsddRevisionRequest.brokerCompanyMail
+      }),
+      receipt: bsddRevisionRequest.brokerReceipt,
+      department: bsddRevisionRequest.brokerDepartment,
+      validityLimit: bsddRevisionRequest.brokerValidityLimit
+    }),
+    quantityReceived: bsddRevisionRequest.quantityReceived,
+    processingOperationDone: bsddRevisionRequest.processingOperationDone,
+    temporaryStorageDetail:
+      nullIfNoValues<BsddRevisionRequestTemporaryStorageDetail>({
+        destination: nullIfNoValues<BsddRevisionRequestDestination>({
+          cap: bsddRevisionRequest.temporaryStorageDestinationCap,
+          processingOperation:
+            bsddRevisionRequest.temporaryStorageDestinationProcessingOperation
+        })
+      })
   };
 }
 

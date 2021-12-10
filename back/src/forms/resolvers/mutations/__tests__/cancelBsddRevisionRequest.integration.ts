@@ -48,7 +48,6 @@ describe("Mutation.cancelBsddRevisionRequest", () => {
       data: {
         bsddId: bsdd.id,
         authorId: company.id,
-        content: {},
         comment: ""
       }
     });
@@ -78,7 +77,6 @@ describe("Mutation.cancelBsddRevisionRequest", () => {
       data: {
         bsddId: bsdd.id,
         authorId: company.id,
-        content: {},
         comment: "",
         status: RevisionRequestStatus.ACCEPTED
       }
@@ -109,7 +107,6 @@ describe("Mutation.cancelBsddRevisionRequest", () => {
       data: {
         bsddId: bsdd.id,
         authorId: company.id,
-        content: {},
         comment: ""
       }
     });

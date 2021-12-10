@@ -62,7 +62,6 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
       data: {
         bsddId: bsdd.id,
         authorId: companyOfSomeoneElse.id,
-        content: {},
         comment: ""
       }
     });
@@ -96,7 +95,6 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
         bsddId: bsdd.id,
         authorId: company.id,
         approvals: { create: { approverSiret: companyOfSomeoneElse.siret } },
-        content: {},
         comment: ""
       }
     });
@@ -130,7 +128,6 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
         bsddId: bsdd.id,
         authorId: companyOfSomeoneElse.id,
         approvals: { create: { approverSiret: company.siret } },
-        content: {},
         comment: ""
       }
     });
@@ -168,7 +165,6 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
             { approverSiret: thirdCompany.siret }
           ]
         },
-        content: {},
         comment: ""
       }
     });
@@ -218,7 +214,6 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
             { approverSiret: thirdCompany.siret }
           ]
         },
-        content: {},
         comment: ""
       }
     });
@@ -257,7 +252,6 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
         bsddId: bsdd.id,
         authorId: companyOfSomeoneElse.id,
         approvals: { create: { approverSiret: company.siret } },
-        content: {},
         comment: ""
       }
     });
@@ -292,7 +286,7 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
         bsddId: bsdd.id,
         authorId: companyOfSomeoneElse.id,
         approvals: { create: { approverSiret: company.siret } },
-        content: { wasteDetailsCode: "01 03 08" },
+        wasteDetailsCode: "01 03 08",
         comment: ""
       }
     });
@@ -332,7 +326,7 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
         bsddId: bsdd.id,
         authorId: companyOfSomeoneElse.id,
         approvals: { create: { approverSiret: company.siret } },
-        content: { wasteDetailsCode: "01 03 08" },
+        wasteDetailsCode: "01 03 08",
         comment: ""
       }
     });

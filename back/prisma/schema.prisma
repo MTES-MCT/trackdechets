@@ -366,7 +366,30 @@ model BsddRevisionRequest {
 
   approvals BsddRevisionRequestApproval[]
 
-  content Json
+  recipientCap                                   String?
+  wasteDetailsCode                               String?
+  wasteDetailsPop                                Boolean?
+  quantityReceived                               Float?
+  processingOperationDone                        String?
+  brokerCompanyName                              String?
+  brokerCompanySiret                             String?
+  brokerCompanyAddress                           String?
+  brokerCompanyContact                           String?
+  brokerCompanyPhone                             String?
+  brokerCompanyMail                              String?
+  brokerReceipt                                  String?
+  brokerDepartment                               String?
+  brokerValidityLimit                            DateTime?
+  traderCompanyAddress                           String?
+  traderCompanyContact                           String?
+  traderCompanyPhone                             String?
+  traderCompanyMail                              String?
+  traderReceipt                                  String?
+  traderDepartment                               String?
+  traderValidityLimit                            DateTime?
+  temporaryStorageDestinationCap                 String?
+  temporaryStorageDestinationProcessingOperation String?
+
   comment String
 
   status RevisionRequestStatus @default(PENDING)

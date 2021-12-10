@@ -51,7 +51,6 @@ describe("Mutation.bsddRevisionRequests", () => {
         bsddId: bsdd1.id,
         authorId: otherCompany.id,
         approvals: { create: { approverSiret: company.siret } },
-        content: {},
         comment: ""
       }
     });
@@ -60,7 +59,6 @@ describe("Mutation.bsddRevisionRequests", () => {
         bsddId: bsdd2.id,
         authorId: company.id,
         approvals: { create: { approverSiret: otherCompany.siret } },
-        content: {},
         comment: ""
       }
     });
@@ -76,7 +74,6 @@ describe("Mutation.bsddRevisionRequests", () => {
             status: "ACCEPTED"
           }
         },
-        content: {},
         comment: ""
       }
     });
@@ -90,7 +87,6 @@ describe("Mutation.bsddRevisionRequests", () => {
             status: "REFUSED"
           }
         },
-        content: {},
         comment: ""
       }
     });
