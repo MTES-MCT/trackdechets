@@ -11,4 +11,10 @@ type Query {
   par son hash
   """
   invitation(hash: String!): Invitation
+
+  """
+  USAGE INTERNE
+  Liste toutes les applications tierces ayant accès à mon compte
+  """
+  authorizedApplications(id: ID!): [AuthorizedApplication!]!
 }

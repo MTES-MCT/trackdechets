@@ -22,3 +22,20 @@ type Invitation {
   "Date when the invitation was accepted and the user joined"
   acceptedAt: DateTime
 }
+
+"""
+USAGE INTERNE
+Application tierce ayant accès à mon compte via le protocole OAuth2
+"""
+type AuthorizedApplication {
+  "Identifiant de l'application"
+  id: ID!
+  "Nom de l'application"
+  name: String!
+  "Logo de l'application"
+  logoUrl: String
+  "Date de dernière connexion"
+  lastConnection: DateTime
+  "Email de l'administrateur"
+  owner: String
+}

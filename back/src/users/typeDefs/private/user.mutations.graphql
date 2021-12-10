@@ -75,4 +75,10 @@ type Mutation {
   Refuse une demande de rattachement à un un établissement
   """
   refuseMembershipRequest(id: ID!): CompanyPrivate!
+
+  """
+  USAGE INTERNE
+  Révoque l'accès à une application tierce
+  """
+  revokeAuthorizedApplication(id: ID!): AuthorizedApplication
 }
