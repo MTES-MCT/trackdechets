@@ -11,9 +11,9 @@ const ApplicationFragment = gql`
   }
 `;
 
-export const APPLICATIONS = gql`
-  query GetApplications {
-    applications {
+export const MY_APPLICATIONS = gql`
+  query MyApplications {
+    myApplications {
       ...ApplicationFragment
     }
   }

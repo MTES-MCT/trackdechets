@@ -19,7 +19,7 @@ import { NotificationError } from "common/components/Error";
 import Tooltip from "common/components/Tooltip";
 import {
   APPLICATION,
-  APPLICATIONS,
+  MY_APPLICATIONS,
   CREATE_APPLICATION,
   UPDATE_APPLICATION,
 } from "./queries";
@@ -66,7 +66,7 @@ export default function AccountOauth2AppCreateUpdate({
   ] = useMutation<
     Pick<Mutation, "createApplication">,
     MutationCreateApplicationArgs
-  >(CREATE_APPLICATION, { refetchQueries: [APPLICATIONS] });
+  >(CREATE_APPLICATION, { refetchQueries: [MY_APPLICATIONS] });
 
   const [
     updateApplication,

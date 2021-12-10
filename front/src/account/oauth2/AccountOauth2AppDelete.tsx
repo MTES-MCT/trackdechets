@@ -2,7 +2,7 @@ import * as React from "react";
 import { Modal } from "common/components";
 import { Application } from "generated/graphql/types";
 import { useMutation } from "@apollo/client";
-import { APPLICATIONS, DELETE_APPLICATION } from "./queries";
+import { MY_APPLICATIONS, DELETE_APPLICATION } from "./queries";
 import { NotificationError } from "common/components/Error";
 
 type AccountOauth2AppDeleteProps = {
@@ -14,7 +14,7 @@ export default function AccountOauth2AppDelete({ application, onClose }) {
   const [
     deleteApplication,
     { loading, error },
-  ] = useMutation(DELETE_APPLICATION, { refetchQueries: [APPLICATIONS] });
+  ] = useMutation(DELETE_APPLICATION, { refetchQueries: [MY_APPLICATIONS] });
 
   return (
     <Modal ariaLabel="Supprimer une application" onClose={onClose} isOpen>

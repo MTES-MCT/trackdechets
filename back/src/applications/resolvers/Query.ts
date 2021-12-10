@@ -1,8 +1,8 @@
 import { QueryResolvers } from "../../generated/graphql/types";
-import applications from "./queries/applications";
+import myApplications from "./queries/myApplications";
 import application from "./queries/application";
 
 export const Query: QueryResolvers = {
-  applications,
+  myApplications,
   application
 };

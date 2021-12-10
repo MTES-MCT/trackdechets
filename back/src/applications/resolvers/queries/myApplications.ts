@@ -2,7 +2,7 @@ import { QueryResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import prisma from "../../../prisma";
 
-const applications: QueryResolvers["applications"] = async (
+const myApplications: QueryResolvers["myApplications"] = async (
   _,
   args,
   context
@@ -11,4 +11,4 @@ const applications: QueryResolvers["applications"] = async (
   return prisma.user.findFirst({ where: { id: user.id } }).applications();
 };
 
-export default applications;
+export default myApplications;
