@@ -6,7 +6,7 @@ import {
   OutgoingWaste,
   TransportedWaste
 } from "../generated/graphql/types";
-import { Waste } from "./types";
+import { GenericWaste } from "./types";
 
 type Column = {
   field: keyof (IncomingWaste &
@@ -143,7 +143,7 @@ const columns: Column[] = [
   }
 ];
 
-export function formatRow(waste: Waste, useLabelAsKey = false) {
+export function formatRow(waste: GenericWaste, useLabelAsKey = false) {
   return columns.reduce((acc, column) => {
     if (column.field in waste) {
       const key = useLabelAsKey ? column.label : column.field;
@@ -161,7 +161,7 @@ export function formatRow(waste: Waste, useLabelAsKey = false) {
 /**
  * GET XLSX headers based of the first row
  */
-export function getXlsxHeaders(waste: Waste): Partial<Excel.Column>[] {
+export function getXlsxHeaders(waste: GenericWaste): Partial<Excel.Column>[] {
   return columns.reduce<Partial<Excel.Column>[]>((acc, column) => {
     if (column.field in waste) {
       return [

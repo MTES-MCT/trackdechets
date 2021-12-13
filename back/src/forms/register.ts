@@ -7,6 +7,7 @@ import {
   OutgoingWaste,
   TransportedWaste
 } from "../generated/graphql/types";
+import { GenericWaste } from "../register/types";
 import { extractPostalCode } from "../utils";
 import { formToBsdd } from "./compat";
 import { Bsdd, FullForm } from "./types";
@@ -63,6 +64,29 @@ export function getRegisterFields(
   return registerFields;
 }
 
+function toGenericWaste(bsdd: Bsdd): GenericWaste {
+  return {
+    wasteDescription: bsdd.wasteDescription,
+    wasteCode: bsdd.wasteCode,
+    pop: bsdd.pop,
+    id: bsdd.id,
+    ecoOrganismeName: bsdd.ecoOrganismeName,
+    ecoOrganismeSiren: bsdd.ecoOrganismeSiret?.slice(0, 9),
+    bsdType: "BSDD",
+    status: bsdd.status,
+    customId: bsdd.customId,
+    destinationCap: bsdd.destinationCap,
+    destinationOperationNoTraceability: bsdd.destinationOperationNoTraceability,
+    destinationReceptionAcceptationStatus:
+      bsdd.destinationReceptionAcceptationStatus,
+    transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
+    wasteAdr: bsdd.wasteAdr,
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null
+  };
+}
+
 export function toIncomingWaste(
   bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
 ): IncomingWaste {
@@ -88,20 +112,17 @@ export function toIncomingWaste(
       .filter(s => !!s);
   }
 
+  const { __typename, ...genericWaste } = toGenericWaste(bsdd);
+
   return {
+    ...genericWaste,
     destinationReceptionDate: bsdd.destinationReceptionDate,
-    wasteDescription: bsdd.wasteDescription,
-    wasteCode: bsdd.wasteCode,
-    pop: bsdd.pop,
-    id: bsdd.id,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterPickupsiteAddress: bsdd.emitterPickupSiteAddress,
     ...initialEmitter,
-    ecoOrganismeName: bsdd.ecoOrganismeName,
-    ecoOrganismeSiren: bsdd.ecoOrganismeSiret?.slice(0, 9),
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
@@ -112,21 +133,9 @@ export function toIncomingWaste(
     transporterCompanySiret: bsdd.transporterCompanySiret,
     transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
     destinationOperationCode: bsdd.destinationOperationCode,
-    bsdType: "BSDD",
-    status: bsdd.status,
-    customId: bsdd.customId,
     destinationCustomInfo: null,
-    destinationCap: null,
-    destinationOperationNoTraceability: bsdd.destinationOperationNoTraceability,
-    destinationReceptionAcceptationStatus:
-      bsdd.destinationReceptionAcceptationStatus,
     emitterCompanyMail: bsdd.emitterCompanyMail,
-    transporterCompanyMail: bsdd.transporterCompanyMail,
-    transporterRecepisseIsExempted: false,
-    wasteAdr: bsdd.wasteAdr,
-    workerCompanyName: null,
-    workerCompanySiret: null,
-    workerCompanyAddress: null
+    transporterCompanyMail: bsdd.transporterCompanyMail
   };
 }
 
@@ -185,7 +194,10 @@ export function toOutgoingWaste(
       .filter(s => !!s);
   }
 
+  const { __typename, ...genericWaste } = toGenericWaste(bsdd);
+
   return {
+    ...genericWaste,
     brokerCompanyName: bsdd.brokerCompanyName,
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
@@ -194,13 +206,9 @@ export function toOutgoingWaste(
     destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
-    ecoOrganismeName: bsdd.ecoOrganismeName,
-    ecoOrganismeSiren: bsdd.ecoOrganismeSiret?.slice(0, 9),
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterPickupsiteAddress: bsdd.emitterPickupSiteAddress,
     ...initialEmitter,
-    id: bsdd.id,
-    pop: bsdd.pop,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
@@ -209,24 +217,10 @@ export function toOutgoingWaste(
     transporterCompanySiret: bsdd.transporterCompanySiret,
     transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
     transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
-    wasteCode: bsdd.wasteCode,
-    wasteDescription: bsdd.wasteDescription,
     weight: bsdd.weightValue,
-    bsdType: "BSDD",
-    status: bsdd.status,
-    customId: bsdd.customId,
     emitterCustomInfo: null,
-    destinationCap: bsdd.destinationCap,
-    destinationOperationNoTraceability: bsdd.destinationOperationNoTraceability,
-    destinationReceptionAcceptationStatus:
-      bsdd.destinationReceptionAcceptationStatus,
     transporterCompanyMail: bsdd.transporterCompanyMail,
-    destinationCompanyMail: bsdd.destinationCompanyMail,
-    transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
-    wasteAdr: bsdd.wasteAdr,
-    workerCompanyName: null,
-    workerCompanySiret: null,
-    workerCompanyAddress: null
+    destinationCompanyMail: bsdd.destinationCompanyMail
   };
 }
 
@@ -285,23 +279,19 @@ export function toTransportedWaste(
       .filter(s => !!s);
   }
 
+  const { __typename, ...genericWaste } = toGenericWaste(bsdd);
+
   return {
+    ...genericWaste,
     transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
     destinationReceptionDate: bsdd.destinationReceptionDate,
-    wasteDescription: bsdd.wasteDescription,
-    wasteCode: bsdd.wasteCode,
-    pop: false,
-    id: bsdd.id,
     weight: bsdd.weightValue,
     transporterNumberPlates: bsdd.transporterNumberPlates,
-    wasteAdr: bsdd.wasteAdr,
     ...initialEmitter,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
     emitterPickupsiteAddress: bsdd.emitterPickupSiteAddress,
-    ecoOrganismeName: bsdd.ecoOrganismeName,
-    ecoOrganismeSiren: bsdd.ecoOrganismeSiret?.slice(0, 9),
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
@@ -311,19 +301,9 @@ export function toTransportedWaste(
     destinationCompanyName: bsdd.destinationCompanyName,
     destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationCompanyAddress: bsdd.destinationCompanyAddress,
-    bsdType: "BSDD",
-    status: bsdd.status,
-    customId: bsdd.customId,
     transporterCustomInfo: bsdd.transporterCustomInfo,
-    destinationCap: bsdd.destinationCap,
-    destinationOperationNoTraceability: bsdd.destinationOperationNoTraceability,
-    destinationReceptionAcceptationStatus:
-      bsdd.destinationReceptionAcceptationStatus,
     emitterCompanyMail: bsdd.emitterCompanyMail,
-    destinationCompanyMail: bsdd.destinationCompanyMail,
-    workerCompanyName: null,
-    workerCompanySiret: null,
-    workerCompanyAddress: null
+    destinationCompanyMail: bsdd.destinationCompanyMail
   };
 }
 
@@ -382,43 +362,28 @@ export function toManagedWaste(
       .filter(s => !!s);
   }
 
+  const { __typename, ...genericWaste } = toGenericWaste(bsdd);
+
   return {
+    ...genericWaste,
     destinationCompanyAddress: bsdd.destinationCompanyAddress,
     destinationCompanyName: bsdd.destinationCompanyName,
     destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
-    ecoOrganismeName: bsdd.ecoOrganismeName,
-    ecoOrganismeSiren: bsdd.ecoOrganismeSiret?.slice(0, 9),
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
     emitterPickupsiteAddress: bsdd.emitterPickupSiteAddress,
     ...initialEmitter,
-    id: bsdd.id,
-    pop: bsdd.pop,
     transporterCompanyAddress: bsdd.transporterCompanyAddress,
     transporterCompanyName: bsdd.transporterCompanyName,
     transporterCompanySiret: bsdd.transporterCompanySiret,
     transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
-    wasteCode: bsdd.wasteCode,
-    wasteDescription: bsdd.wasteDescription,
-    bsdType: "BSDD",
-    status: bsdd.status,
-    customId: bsdd.customId,
-    destinationCap: bsdd.destinationCap,
-    destinationOperationNoTraceability: null,
-    destinationReceptionAcceptationStatus:
-      bsdd.destinationReceptionAcceptationStatus,
     emitterCompanyMail: bsdd.emitterCompanyMail,
     transporterCompanyMail: bsdd.transporterCompanyMail,
-    destinationCompanyMail: bsdd.destinationCompanyMail,
-    transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
-    wasteAdr: bsdd.wasteAdr,
-    workerCompanyName: null,
-    workerCompanySiret: null,
-    workerCompanyAddress: null
+    destinationCompanyMail: bsdd.destinationCompanyMail
   };
 }
 
@@ -462,7 +427,10 @@ export function toAllWaste(
       .filter(s => !!s);
   }
 
+  const { __typename, ...genericWaste } = toGenericWaste(bsdd);
+
   return {
+    ...genericWaste,
     brokerCompanyName: bsdd.brokerCompanyName,
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
@@ -473,42 +441,24 @@ export function toAllWaste(
     destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
-    ecoOrganismeName: bsdd.ecoOrganismeName,
-    ecoOrganismeSiren: bsdd.ecoOrganismeSiret?.slice(0, 9),
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
     emitterPickupsiteAddress: bsdd.emitterPickupSiteAddress,
     ...initialEmitter,
-    id: bsdd.id,
-    pop: bsdd.pop,
     transporterCompanyAddress: bsdd.transporterCompanyAddress,
     transporterCompanyName: bsdd.transporterCompanyName,
     transporterCompanySiret: bsdd.transporterCompanySiret,
     transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
-    wasteAdr: bsdd.wasteAdr,
-    wasteCode: bsdd.wasteCode,
-    wasteDescription: bsdd.wasteDescription,
     weight: bsdd.weightValue,
     managedEndDate: null,
     managedStartDate: null,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
-    bsdType: "BSDD",
-    status: bsdd.status,
-    customId: bsdd.customId,
-    destinationCap: bsdd.destinationCap,
-    destinationOperationNoTraceability: bsdd.destinationOperationNoTraceability,
-    destinationReceptionAcceptationStatus:
-      bsdd.destinationReceptionAcceptationStatus,
     emitterCompanyMail: bsdd.emitterCompanyMail,
     transporterCompanyMail: bsdd.transporterCompanyMail,
-    destinationCompanyMail: bsdd.destinationCompanyMail,
-    transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
-    workerCompanyName: null,
-    workerCompanySiret: null,
-    workerCompanyAddress: null
+    destinationCompanyMail: bsdd.destinationCompanyMail
   };
 }
 

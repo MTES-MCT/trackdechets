@@ -4,7 +4,7 @@ import {
   WasteRegisterWhere
 } from "../generated/graphql/types";
 import { formatRow } from "./columns";
-import { Waste } from "./types";
+import { GenericWaste } from "./types";
 import getWasteConnection from "./wastes";
 
 export interface WasteReaderOptions extends ReadableOptions {
@@ -67,7 +67,7 @@ export function wastesReader({
 /**
  * Format rows as data flow
  */
-export function wasteFormatter<WasteType extends Waste>(
+export function wasteFormatter<WasteType extends GenericWaste>(
   opts = { useLabelAsKey: false }
 ) {
   return new Transform({

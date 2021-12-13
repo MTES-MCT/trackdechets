@@ -34,7 +34,7 @@ import {
   toAllWastes as formToAllWastes
 } from "../forms/register";
 
-import { Waste } from "./types";
+import { GenericWaste } from "./types";
 import { PrismaBsdMap } from "../common/elastic";
 import { WasteRegisterType } from "../generated/graphql/types";
 
@@ -94,7 +94,7 @@ type WasteMap<WasteType> = {
   BSFF: WasteType[];
 };
 
-export function toWastes<WasteType extends Waste>(
+export function toWastes<WasteType extends GenericWaste>(
   registerType: WasteRegisterType,
   sirets: string[],
   bsds: PrismaBsdMap

@@ -3,7 +3,12 @@ import { WasteRegisterType } from "../generated/graphql/types";
 import { toWastes } from "./converters";
 import { searchBsds } from "./elastic";
 import { getElasticPaginationArgs } from "./pagination";
-import { QueryWastesArgs, Waste, WasteConnection, WasteEdge } from "./types";
+import {
+  QueryWastesArgs,
+  GenericWaste,
+  WasteConnection,
+  WasteEdge
+} from "./types";
 
 /**
  * Perform the actual data fetching and return a waste connection
@@ -17,7 +22,7 @@ import { QueryWastesArgs, Waste, WasteConnection, WasteEdge } from "./types";
  * IncomingWaste, OutgoingWaste, TransportedWaste, etc
  * @returns
  */
-async function getWasteConnection<WasteType extends Waste>(
+async function getWasteConnection<WasteType extends GenericWaste>(
   registerType: WasteRegisterType,
   args: QueryWastesArgs
 ): Promise<WasteConnection<WasteType>> {

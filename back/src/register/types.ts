@@ -7,7 +7,8 @@ import {
   QueryIncomingWastesArgs,
   QueryManagedWastesArgs,
   QueryOutgoingWastesArgs,
-  QueryTransportedWastesArgs
+  QueryTransportedWastesArgs,
+  AllWaste
 } from "../generated/graphql/types";
 import {
   Bsda,
@@ -19,11 +20,12 @@ import {
 } from ".prisma/client";
 import { integer } from "@elastic/elasticsearch/api/types";
 
-export type Waste =
+export type GenericWaste =
   | IncomingWaste
   | OutgoingWaste
   | TransportedWaste
-  | ManagedWaste;
+  | ManagedWaste
+  | AllWaste;
 
 export type PaginationArgs = {
   first: number;
@@ -38,12 +40,12 @@ export type QueryWastesArgs =
   | QueryManagedWastesArgs
   | QueryTransportedWastesArgs;
 
-export type WasteEdge<WasteType extends Waste> = {
+export type WasteEdge<WasteType extends GenericWaste> = {
   cursor: string;
   node: WasteType;
 };
 
-export type WasteConnection<WasteType extends Waste> = {
+export type WasteConnection<WasteType extends GenericWaste> = {
   totalCount: integer;
   pageInfo: PageInfo;
   edges: WasteEdge<WasteType>[];

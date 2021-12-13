@@ -280,7 +280,7 @@ export const index = {
   // Changing the value of index is a way to "bump" the model
   // Doing so will cause all BSDs to be reindexed in Elastic Search
   // when running the appropriate script
-  index: "bsds_0.2.11",
+  index: "bsds_0.2.0",
 
   // The next major version of Elastic Search doesn't use "type" anymore
   // so while it's required for the current version, we are not using it too much

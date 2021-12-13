@@ -7,6 +7,7 @@ import {
   OutgoingWaste,
   TransportedWaste
 } from "../generated/graphql/types";
+import { GenericWaste } from "../register/types";
 import { extractPostalCode } from "../utils";
 import { getWasteDescription } from "./utils";
 
@@ -38,6 +39,29 @@ export function getRegisterFields(
   return registerFields;
 }
 
+function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
+  return {
+    wasteDescription: getWasteDescription(bsdasri.wasteCode),
+    wasteCode: bsdasri.wasteCode,
+    pop: false,
+    id: bsdasri.id,
+    ecoOrganismeName: bsdasri.ecoOrganismeName,
+    ecoOrganismeSiren: bsdasri.ecoOrganismeSiret?.slice(0, 9),
+    bsdType: "BSDASRI",
+    status: bsdasri.status,
+    customId: null,
+    destinationCap: null,
+    destinationOperationNoTraceability: false,
+    destinationReceptionAcceptationStatus:
+      bsdasri.destinationReceptionAcceptationStatus,
+    transporterRecepisseIsExempted: false,
+    wasteAdr: bsdasri.wasteAdr,
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null
+  };
+}
+
 export function toIncomingWaste(
   bsdasri: Bsdasri & { grouping: Bsdasri[] }
 ): IncomingWaste {
@@ -60,12 +84,11 @@ export function toIncomingWaste(
       .filter(s => !!s);
   }
 
+  const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
+
   return {
+    ...genericWaste,
     destinationReceptionDate: bsdasri.destinationReceptionDate,
-    wasteDescription: getWasteDescription(bsdasri.wasteCode),
-    wasteCode: bsdasri.wasteCode,
-    pop: false,
-    id: bsdasri.id,
     destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
       ? bsdasri.destinationReceptionWasteWeightValue / 1000
       : bsdasri.destinationReceptionWasteWeightValue,
@@ -74,8 +97,6 @@ export function toIncomingWaste(
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterPickupsiteAddress: null,
     ...initialEmitter,
-    ecoOrganismeName: bsdasri.ecoOrganismeName,
-    ecoOrganismeSiren: bsdasri.ecoOrganismeSiret?.slice(0, 9),
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -86,21 +107,9 @@ export function toIncomingWaste(
     transporterCompanySiret: bsdasri.transporterCompanySiret,
     transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
     destinationOperationCode: bsdasri.destinationOperationCode,
-    bsdType: "BSDASRI",
-    status: bsdasri.status,
-    customId: null,
     destinationCustomInfo: bsdasri.destinationCustomInfo,
-    destinationCap: null,
-    destinationOperationNoTraceability: false,
-    destinationReceptionAcceptationStatus:
-      bsdasri.destinationReceptionAcceptationStatus,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
-    transporterCompanyMail: bsdasri.transporterCompanyMail,
-    transporterRecepisseIsExempted: false,
-    wasteAdr: bsdasri.wasteAdr,
-    workerCompanyName: null,
-    workerCompanySiret: null,
-    workerCompanyAddress: null
+    transporterCompanyMail: bsdasri.transporterCompanyMail
   };
 }
 
@@ -126,7 +135,10 @@ export function toOutgoingWaste(
       .filter(s => !!s);
   }
 
+  const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
+
   return {
+    ...genericWaste,
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
@@ -135,13 +147,9 @@ export function toOutgoingWaste(
     destinationCompanySiret: bsdasri.destinationCompanySiret,
     destinationPlannedOperationCode: bsdasri.destinationOperationCode,
     destinationPlannedOperationMode: null,
-    ecoOrganismeName: bsdasri.ecoOrganismeName,
-    ecoOrganismeSiren: bsdasri.ecoOrganismeSiret?.slice(0, 9),
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterPickupsiteAddress: bsdasri.emitterPickupSiteAddress,
     ...initialEmitter,
-    id: bsdasri.id,
-    pop: false,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -150,26 +158,12 @@ export function toOutgoingWaste(
     transporterCompanySiret: bsdasri.transporterCompanySiret,
     transporterTakenOverAt: bsdasri.transporterTakenOverAt,
     transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
-    wasteCode: bsdasri.wasteCode,
-    wasteDescription: getWasteDescription(bsdasri.wasteCode),
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue / 1000
       : bsdasri.emitterWasteWeightValue,
-    bsdType: "BSDASRI",
-    status: bsdasri.status,
-    customId: null,
     emitterCustomInfo: bsdasri.emitterCustomInfo,
-    destinationCap: null,
-    destinationOperationNoTraceability: false,
-    destinationReceptionAcceptationStatus:
-      bsdasri.destinationReceptionAcceptationStatus,
     transporterCompanyMail: bsdasri.transporterCompanyMail,
-    destinationCompanyMail: bsdasri.destinationCompanyMail,
-    transporterRecepisseIsExempted: null,
-    wasteAdr: bsdasri.wasteAdr,
-    workerCompanyName: null,
-    workerCompanySiret: null,
-    workerCompanyAddress: null
+    destinationCompanyMail: bsdasri.destinationCompanyMail
   };
 }
 
@@ -195,25 +189,21 @@ export function toTransportedWaste(
       .filter(s => !!s);
   }
 
+  const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
+
   return {
+    ...genericWaste,
     transporterTakenOverAt: bsdasri.transporterTakenOverAt,
     destinationReceptionDate: bsdasri.destinationReceptionDate,
-    wasteDescription: getWasteDescription(bsdasri.wasteCode),
-    wasteCode: bsdasri.wasteCode,
-    pop: false,
-    id: bsdasri.id,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue / 1000
       : bsdasri.emitterWasteWeightValue,
     transporterNumberPlates: bsdasri.transporterTransportPlates,
-    wasteAdr: bsdasri.wasteAdr,
     ...initialEmitter,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
     emitterPickupsiteAddress: bsdasri.emitterPickupSiteAddress,
-    ecoOrganismeName: bsdasri.ecoOrganismeName,
-    ecoOrganismeSiren: bsdasri.ecoOrganismeSiret?.slice(0, 9),
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -223,19 +213,9 @@ export function toTransportedWaste(
     destinationCompanyName: bsdasri.destinationCompanyName,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
     destinationCompanyAddress: bsdasri.destinationCompanyAddress,
-    bsdType: "BSDASRI",
-    status: bsdasri.status,
-    customId: null,
     transporterCustomInfo: bsdasri.transporterCustomInfo,
-    destinationCap: null,
-    destinationOperationNoTraceability: null,
-    destinationReceptionAcceptationStatus:
-      bsdasri.destinationReceptionAcceptationStatus,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
-    destinationCompanyMail: bsdasri.destinationCompanyMail,
-    workerCompanyName: null,
-    workerCompanySiret: null,
-    workerCompanyAddress: null
+    destinationCompanyMail: bsdasri.destinationCompanyMail
   };
 }
 
@@ -265,7 +245,10 @@ export function toManagedWaste(
       .filter(s => !!s);
   }
 
+  const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
+
   return {
+    ...genericWaste,
     destinationCompanyAddress: bsdasri.destinationCompanyAddress,
     destinationCompanyName: bsdasri.destinationCompanyName,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
@@ -274,36 +257,18 @@ export function toManagedWaste(
     destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
       ? bsdasri.destinationReceptionWasteWeightValue / 1000
       : bsdasri.destinationReceptionWasteWeightValue,
-    ecoOrganismeName: bsdasri.ecoOrganismeName,
-    ecoOrganismeSiren: bsdasri.ecoOrganismeSiret?.slice(0, 9),
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
     emitterPickupsiteAddress: bsdasri.emitterPickupSiteAddress,
     ...initialEmitter,
-    id: bsdasri.id,
-    pop: false,
     transporterCompanyAddress: bsdasri.transporterCompanyAddress,
     transporterCompanyName: bsdasri.transporterCompanyName,
     transporterCompanySiret: bsdasri.transporterCompanySiret,
     transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
-    wasteCode: bsdasri.wasteCode,
-    wasteDescription: getWasteDescription(bsdasri.wasteCode),
-    wasteAdr: bsdasri.wasteAdr,
-    bsdType: "BSDASRI",
-    status: bsdasri.status,
-    customId: null,
-    destinationCap: null,
-    destinationOperationNoTraceability: false,
-    destinationReceptionAcceptationStatus:
-      bsdasri.destinationReceptionAcceptationStatus,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
     transporterCompanyMail: bsdasri.transporterCompanyMail,
-    destinationCompanyMail: bsdasri.destinationCompanyMail,
-    transporterRecepisseIsExempted: null,
-    workerCompanyName: null,
-    workerCompanySiret: null,
-    workerCompanyAddress: null
+    destinationCompanyMail: bsdasri.destinationCompanyMail
   };
 }
 
@@ -329,7 +294,10 @@ export function toAllWaste(
       .filter(s => !!s);
   }
 
+  const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
+
   return {
+    ...genericWaste,
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
@@ -342,22 +310,15 @@ export function toAllWaste(
     destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
       ? bsdasri.destinationReceptionWasteWeightValue / 1000
       : bsdasri.destinationReceptionWasteWeightValue,
-    ecoOrganismeName: bsdasri.ecoOrganismeName,
-    ecoOrganismeSiren: bsdasri.ecoOrganismeSiret?.slice(0, 9),
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
     emitterPickupsiteAddress: bsdasri.emitterPickupSiteAddress,
     ...initialEmitter,
-    id: bsdasri.id,
-    pop: false,
     transporterCompanyAddress: bsdasri.transporterCompanyAddress,
     transporterCompanyName: bsdasri.transporterCompanyName,
     transporterCompanySiret: bsdasri.transporterCompanySiret,
     transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
-    wasteAdr: bsdasri.wasteAdr,
-    wasteCode: bsdasri.wasteCode,
-    wasteDescription: getWasteDescription(bsdasri.wasteCode),
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue / 1000
       : bsdasri.emitterWasteWeightValue,
@@ -366,19 +327,8 @@ export function toAllWaste(
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
-    bsdType: "BSDASRI",
-    status: bsdasri.status,
-    customId: null,
-    destinationCap: null,
-    destinationOperationNoTraceability: false,
-    destinationReceptionAcceptationStatus:
-      bsdasri.destinationReceptionAcceptationStatus,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
     transporterCompanyMail: bsdasri.transporterCompanyMail,
-    destinationCompanyMail: bsdasri.destinationCompanyMail,
-    transporterRecepisseIsExempted: null,
-    workerCompanyName: null,
-    workerCompanySiret: null,
-    workerCompanyAddress: null
+    destinationCompanyMail: bsdasri.destinationCompanyMail
   };
 }

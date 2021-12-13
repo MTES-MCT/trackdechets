@@ -258,7 +258,7 @@ export default function ExportsForm({ companies }: IProps) {
                 >
                   Gestion
                 </option>
-                {/* <option value={FormsRegisterExportType.All}>Exhaustif</option> */}
+                <option value={WasteRegisterType.All}>Exhaustif</option>
               </Field>
               <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
                 Date de début
