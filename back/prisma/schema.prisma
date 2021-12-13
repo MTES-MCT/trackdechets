@@ -535,6 +535,7 @@ model TransportSegment {
   form                            Form           @relation(fields: [formId], references: [id])
 
 
+  @@index([formId], map: "_TransportSegmentFormIdIdx")
   @@index([transporterCompanySiret], map: "_TransportSegmentTransporterCompanySiretIdx")
 }
 

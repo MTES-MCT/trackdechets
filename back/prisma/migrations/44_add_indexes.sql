@@ -42,3 +42,7 @@ CREATE INDEX IF NOT EXISTS "_BsffStatusIdx" ON "default$default"."Bsff"("status"
 -- Bsdasri
 
 CREATE INDEX IF NOT EXISTS "_BsdasriStatusIdx" ON "default$default"."Bsdasri"("status");
+
+-- TransportSegment
+
+CREATE INDEX IF NOT EXISTS "_TransportSegmentFormIdIdx" ON "default$default"."TransportSegment"("formId");
