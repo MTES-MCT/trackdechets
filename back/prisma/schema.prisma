@@ -540,7 +540,7 @@ model User {
   isActive             Boolean?             @default(false)
   isAdmin              Boolean?             @default(false)
   // compte de service avec des droits étendus
-  isService            Boolean?             @default(false)
+  isRegistreNational   Boolean?             @default(false)
   applicationId        String?
   application          Application?         @relation(fields: [applicationId], references: [id])
   companyAssociations  CompanyAssociation[]

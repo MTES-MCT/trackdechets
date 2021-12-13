@@ -203,7 +203,7 @@ describe("Outgoing wastes registry", () => {
   });
 
   it("should allow user to request any siret if authenticated from a service account", async () => {
-    const user = await userFactory({ isService: true });
+    const user = await userFactory({ isRegistreNational: true });
     const { query } = makeClient(user);
     const { data } = await query<Pick<Query, "outgoingWastes">>(
       OUTGOING_WASTES,

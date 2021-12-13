@@ -11,7 +11,7 @@ const transportedWastesResolver: QueryResolvers["transportedWastes"] = async (
   const user = checkIsAuthenticated(context);
 
   // bypass authorization if the user authenticated from a service account
-  if (!user.isService) {
+  if (!user.isRegistreNational) {
     for (const siret of args.sirets) {
       await checkIsCompanyMember({ id: user.id }, { siret });
     }
