@@ -1,5 +1,6 @@
 import { Bsdasri } from ".prisma/client";
 import { BsdElastic } from "../common/elastic";
+import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
   IncomingWaste,
@@ -27,12 +28,15 @@ export function getRegisterFields(
     isManagedWasteFor: []
   };
 
-  if (bsdasri.transporterTakenOverAt) {
+  if (
+    bsdasri.emitterEmissionSignatureDate &&
+    bsdasri.transporterTransportSignatureDate
+  ) {
     registerFields.isOutgoingWasteFor.push(bsdasri.emitterCompanySiret);
     registerFields.isTransportedWasteFor.push(bsdasri.transporterCompanySiret);
   }
 
-  if (bsdasri.destinationReceptionDate) {
+  if (bsdasri.destinationReceptionSignatureDate) {
     registerFields.isIncomingWasteFor.push(bsdasri.destinationCompanySiret);
   }
 
@@ -95,7 +99,12 @@ export function toIncomingWaste(
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
-    emitterPickupsiteAddress: null,
+    emitterPickupsiteAddress: buildAddress([
+      bsdasri.emitterPickupSiteName,
+      bsdasri.emitterPickupSiteAddress,
+      bsdasri.emitterPickupSitePostalCode,
+      bsdasri.emitterPickupSiteCity
+    ]),
     ...initialEmitter,
     traderCompanyName: null,
     traderCompanySiret: null,
@@ -148,7 +157,12 @@ export function toOutgoingWaste(
     destinationPlannedOperationCode: bsdasri.destinationOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
-    emitterPickupsiteAddress: bsdasri.emitterPickupSiteAddress,
+    emitterPickupsiteAddress: buildAddress([
+      bsdasri.emitterPickupSiteName,
+      bsdasri.emitterPickupSiteAddress,
+      bsdasri.emitterPickupSitePostalCode,
+      bsdasri.emitterPickupSiteCity
+    ]),
     ...initialEmitter,
     traderCompanyName: null,
     traderCompanySiret: null,
@@ -203,7 +217,12 @@ export function toTransportedWaste(
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
-    emitterPickupsiteAddress: bsdasri.emitterPickupSiteAddress,
+    emitterPickupsiteAddress: buildAddress([
+      bsdasri.emitterPickupSiteName,
+      bsdasri.emitterPickupSiteAddress,
+      bsdasri.emitterPickupSitePostalCode,
+      bsdasri.emitterPickupSiteCity
+    ]),
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -260,7 +279,12 @@ export function toManagedWaste(
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
-    emitterPickupsiteAddress: bsdasri.emitterPickupSiteAddress,
+    emitterPickupsiteAddress: buildAddress([
+      bsdasri.emitterPickupSiteName,
+      bsdasri.emitterPickupSiteAddress,
+      bsdasri.emitterPickupSitePostalCode,
+      bsdasri.emitterPickupSiteCity
+    ]),
     ...initialEmitter,
     transporterCompanyAddress: bsdasri.transporterCompanyAddress,
     transporterCompanyName: bsdasri.transporterCompanyName,
@@ -313,7 +337,12 @@ export function toAllWaste(
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
-    emitterPickupsiteAddress: bsdasri.emitterPickupSiteAddress,
+    emitterPickupsiteAddress: buildAddress([
+      bsdasri.emitterPickupSiteName,
+      bsdasri.emitterPickupSiteAddress,
+      bsdasri.emitterPickupSitePostalCode,
+      bsdasri.emitterPickupSiteCity
+    ]),
     ...initialEmitter,
     transporterCompanyAddress: bsdasri.transporterCompanyAddress,
     transporterCompanyName: bsdasri.transporterCompanyName,

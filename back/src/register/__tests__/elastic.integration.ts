@@ -209,7 +209,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsda = await bsdaFactory({
       opt: {
         destinationCompanySiret: destination.company.siret,
-        destinationReceptionDate: new Date()
+        destinationReceptionDate: new Date(),
+        destinationOperationSignatureDate: new Date()
       }
     });
     await indexBsda(bsda);
@@ -221,7 +222,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsda = await bsdaFactory({
       opt: {
         destinationCompanySiret: destination.company.siret,
-        destinationReceptionDate: null
+        destinationReceptionDate: null,
+        destinationOperationSignatureDate: null
       }
     });
     await indexBsda(bsda);
@@ -233,7 +235,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsdasri = await bsdasriFactory({
       opt: {
         destinationCompanySiret: destination.company.siret,
-        destinationReceptionDate: new Date()
+        destinationReceptionDate: new Date(),
+        destinationReceptionSignatureDate: new Date()
       }
     });
     await indexBsdasri(bsdasri);
@@ -245,7 +248,7 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsdasri = await bsdasriFactory({
       opt: {
         destinationCompanySiret: destination.company.siret,
-        destinationReceptionDate: null
+        destinationReceptionSignatureDate: null
       }
     });
     await indexBsdasri(bsdasri);
@@ -257,7 +260,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsvhu = await vhuFormFactory({
       opt: {
         destinationCompanySiret: destination.company.siret,
-        destinationReceptionDate: new Date()
+        destinationReceptionDate: new Date(),
+        destinationOperationSignatureDate: new Date()
       }
     });
     await indexBsvhu(bsvhu);
@@ -269,7 +273,7 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsvhu = await vhuFormFactory({
       opt: {
         destinationCompanySiret: destination.company.siret,
-        destinationReceptionDate: null
+        destinationOperationSignatureDate: null
       }
     });
     await indexBsvhu(bsvhu);
@@ -353,7 +357,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsda = await bsdaFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterTransportTakenOverAt: new Date()
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
       }
     });
     await indexBsda(bsda);
@@ -365,7 +370,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsda = await bsdaFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterTransportTakenOverAt: null
+        emitterEmissionSignatureDate: null,
+        transporterTransportSignatureDate: null
       }
     });
     await indexBsda(bsda);
@@ -377,7 +383,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsda = await bsdaFactory({
       opt: {
         workerCompanySiret: worker.company.siret,
-        transporterTransportTakenOverAt: new Date()
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
       }
     });
     await indexBsda(bsda);
@@ -389,7 +396,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsda = await bsdaFactory({
       opt: {
         workerCompanySiret: worker.company.siret,
-        transporterTransportTakenOverAt: null
+        emitterEmissionSignatureDate: null,
+        transporterTransportSignatureDate: null
       }
     });
     await indexBsda(bsda);
@@ -401,7 +409,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsdasri = await bsdasriFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterTakenOverAt: new Date()
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
       }
     });
     await indexBsdasri(bsdasri);
@@ -413,7 +422,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsdasri = await bsdasriFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterTakenOverAt: null
+        emitterEmissionSignatureDate: null,
+        transporterTransportSignatureDate: null
       }
     });
     await indexBsdasri(bsdasri);
@@ -425,7 +435,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsvhu = await vhuFormFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterTransportTakenOverAt: new Date()
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
       }
     });
     await indexBsvhu(bsvhu);
@@ -437,7 +448,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsvhu = await vhuFormFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterTransportTakenOverAt: null
+        emitterEmissionSignatureDate: null,
+        transporterTransportSignatureDate: null
       }
     });
     await indexBsvhu(bsvhu);
@@ -521,7 +533,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsda = await bsdaFactory({
       opt: {
         transporterCompanySiret: transporter.company.siret,
-        transporterTransportTakenOverAt: new Date()
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
       }
     });
     await indexBsda(bsda);
@@ -533,7 +546,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsda = await bsdaFactory({
       opt: {
         transporterCompanySiret: transporter.company.siret,
-        transporterTransportTakenOverAt: null
+        emitterEmissionSignatureDate: null,
+        transporterTransportSignatureDate: null
       }
     });
     await indexBsda(bsda);
@@ -545,7 +559,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsdasri = await bsdasriFactory({
       opt: {
         transporterCompanySiret: transporter.company.siret,
-        transporterTakenOverAt: new Date()
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
       }
     });
     await indexBsdasri(bsdasri);
@@ -557,7 +572,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsdasri = await bsdasriFactory({
       opt: {
         transporterCompanySiret: transporter.company.siret,
-        transporterTakenOverAt: null
+        emitterEmissionSignatureDate: null,
+        transporterTransportSignatureDate: null
       }
     });
     await indexBsdasri(bsdasri);
@@ -569,7 +585,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsvhu = await vhuFormFactory({
       opt: {
         transporterCompanySiret: transporter.company.siret,
-        transporterTransportTakenOverAt: new Date()
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
       }
     });
     await indexBsvhu(bsvhu);
@@ -581,7 +598,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsvhu = await vhuFormFactory({
       opt: {
         transporterCompanySiret: transporter.company.siret,
-        transporterTransportTakenOverAt: null
+        emitterEmissionSignatureDate: null,
+        transporterTransportSignatureDate: null
       }
     });
     await indexBsvhu(bsvhu);
@@ -669,7 +687,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsda = await bsdaFactory({
       opt: {
         brokerCompanySiret: broker.company.siret,
-        transporterTransportTakenOverAt: new Date()
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
       }
     });
     await indexBsda(bsda);
@@ -681,7 +700,8 @@ describe("Retrieval of bsds in ES based on waste register type", () => {
     const bsda = await bsdaFactory({
       opt: {
         brokerCompanySiret: broker.company.siret,
-        transporterTransportTakenOverAt: null
+        emitterEmissionSignatureDate: null,
+        transporterTransportSignatureDate: null
       }
     });
     await indexBsda(bsda);

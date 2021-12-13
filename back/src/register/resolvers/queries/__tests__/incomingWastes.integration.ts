@@ -97,8 +97,11 @@ describe("Incoming wastes register", () => {
         status: BsdaStatus.PROCESSED,
         createdAt: new Date("2021-05-01"),
         destinationReceptionWeight: 500,
+        emitterEmissionSignatureDate: new Date("2021-05-01"),
+        transporterTransportSignatureDate: new Date("2021-05-01"),
         transporterTransportTakenOverAt: new Date("2021-05-01"),
         destinationReceptionDate: new Date("2021-05-01"),
+        destinationOperationSignatureDate: new Date("2021-05-01"),
         destinationOperationDate: new Date("2021-05-01"),
         destinationOperationCode: "D 5"
       }
@@ -112,8 +115,11 @@ describe("Incoming wastes register", () => {
         status: BsdasriState.Processed,
         createdAt: new Date("2021-06-01"),
         destinationReceptionWasteWeightValue: 10,
+        emitterEmissionSignatureDate: new Date("2021-06-01"),
         transporterTakenOverAt: new Date("2021-06-01"),
+        transporterTransportSignatureDate: new Date("2021-06-01"),
         destinationReceptionDate: new Date("2021-06-01"),
+        destinationReceptionSignatureDate: new Date("2021-06-01"),
         destinationOperationDate: new Date("2021-06-01"),
         destinationOperationCode: "R 13"
       }
@@ -127,8 +133,11 @@ describe("Incoming wastes register", () => {
         status: BsvhuStatus.PROCESSED,
         createdAt: new Date("2021-07-01"),
         destinationReceptionWeight: 3000,
+        emitterEmissionSignatureDate: new Date("2021-07-01"),
+        transporterTransportSignatureDate: new Date("2021-07-01"),
         transporterTransportTakenOverAt: new Date("2021-07-01"),
         destinationReceptionDate: new Date("2021-07-01"),
+        destinationOperationSignatureDate: new Date("2021-07-01"),
         destinationOperationDate: new Date("2021-07-01"),
         destinationOperationCode: "R 8"
       }
@@ -143,9 +152,11 @@ describe("Incoming wastes register", () => {
         wasteCode: "14 06 01*",
         destinationReceptionWeight: 200,
         createdAt: new Date("2021-08-01"),
-        transporterTransportTakenOverAt: new Date("2021-08-02"),
-        destinationReceptionDate: new Date("2021-08-03"),
-        destinationOperationSignatureDate: new Date("2021-08-04"),
+        emitterEmissionSignatureDate: new Date("2021-08-01"),
+        transporterTransportSignatureDate: new Date("2021-08-01"),
+        transporterTransportTakenOverAt: new Date("2021-08-01"),
+        destinationReceptionDate: new Date("2021-08-01"),
+        destinationOperationSignatureDate: new Date("2021-08-01"),
         destinationOperationCode: "R 2"
       }
     );

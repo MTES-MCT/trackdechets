@@ -26,7 +26,10 @@ export function getRegisterFields(
     isManagedWasteFor: []
   };
 
-  if (bsda.transporterTransportTakenOverAt) {
+  if (
+    bsda.emitterEmissionSignatureDate &&
+    bsda.transporterTransportSignatureDate
+  ) {
     registerFields.isOutgoingWasteFor.push(bsda.emitterCompanySiret);
     if (bsda.workerCompanySiret) {
       registerFields.isOutgoingWasteFor.push(bsda.workerCompanySiret);
@@ -35,7 +38,8 @@ export function getRegisterFields(
     registerFields.isManagedWasteFor.push(bsda.brokerCompanySiret);
   }
 
-  if (bsda.destinationReceptionDate) {
+  // There is no signature at reception on the BSDA so we use the operation signature
+  if (bsda.destinationOperationSignatureDate) {
     registerFields.isIncomingWasteFor.push(bsda.destinationCompanySiret);
   }
 

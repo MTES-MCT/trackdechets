@@ -26,12 +26,15 @@ export function getRegisterFields(
     isManagedWasteFor: []
   };
 
-  if (bsvhu.transporterTransportTakenOverAt) {
+  if (
+    bsvhu.emitterEmissionSignatureDate &&
+    bsvhu.transporterTransportSignatureDate
+  ) {
     registerFields.isOutgoingWasteFor.push(bsvhu.emitterCompanySiret);
     registerFields.isTransportedWasteFor.push(bsvhu.transporterCompanySiret);
   }
 
-  if (bsvhu.destinationReceptionDate) {
+  if (bsvhu.destinationOperationSignatureDate) {
     registerFields.isIncomingWasteFor.push(bsvhu.destinationCompanySiret);
   }
 
