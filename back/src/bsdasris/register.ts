@@ -8,7 +8,7 @@ import {
   TransportedWaste
 } from "../generated/graphql/types";
 import { extractPostalCode } from "../utils";
-import { getWasteDescription } from "./utills";
+import { getWasteDescription } from "./utils";
 
 export function getRegisterFields(
   bsdasri: Bsdasri

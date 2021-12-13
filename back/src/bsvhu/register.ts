@@ -1,5 +1,4 @@
 import { Bsvhu } from ".prisma/client";
-import { getWasteDescription } from "../bsdasris/utills";
 import { BsdElastic } from "../common/elastic";
 import {
   AllWaste,
@@ -8,6 +7,7 @@ import {
   OutgoingWaste,
   TransportedWaste
 } from "../generated/graphql/types";
+import { getWasteDescription } from "./utils";
 
 export function getRegisterFields(
   bsvhu: Bsvhu
