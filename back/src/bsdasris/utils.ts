@@ -1,7 +1,5 @@
+import { DASRI_WASTE_CODES_MAPPING } from "../common/constants";
+
 export function getWasteDescription(wasteCode: string) {
-  return wasteCode === "18 01 02*"
-    ? "DASRI origine animale"
-    : wasteCode === "18 01 02*"
-    ? "DASRI d'origine humaine"
-    : "";
+  return DASRI_WASTE_CODES_MAPPING[wasteCode] ?? "";
 }
