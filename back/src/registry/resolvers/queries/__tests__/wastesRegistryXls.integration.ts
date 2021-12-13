@@ -14,7 +14,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Query } from "../../../../generated/graphql/types";
-import { WASTES_XLS } from "./queries";
+import { WASTES_REGISTRY_XLS } from "./queries";
 import { indexForm } from "../../../../forms/elastic";
 import { getFullForm } from "../../../../forms/database";
 
@@ -66,18 +66,21 @@ function traderFormFactory(ownerId: string, siret: string) {
   });
 }
 
-describe("query { wastesXls }", () => {
+describe("query { wastesRegistryXls }", () => {
   afterEach(resetDatabase);
 
   it("should throw exception if registry is empty", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { query } = makeClient(user);
-    const { errors } = await query<Pick<Query, "wastesXls">>(WASTES_XLS, {
-      variables: {
-        registryType: "INCOMING",
-        sirets: [company.siret]
+    const { errors } = await query<Pick<Query, "wastesRegistryXls">>(
+      WASTES_REGISTRY_XLS,
+      {
+        variables: {
+          registryType: "INCOMING",
+          sirets: [company.siret]
+        }
       }
-    });
+    );
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual(
       "Aucune donnée à exporter sur la période sélectionnée"
@@ -88,12 +91,15 @@ describe("query { wastesXls }", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const otherCompany = await companyFactory();
     const { query } = makeClient(user);
-    const { errors } = await query<Pick<Query, "wastesXls">>(WASTES_XLS, {
-      variables: {
-        registryType: "INCOMING",
-        sirets: [company.siret, otherCompany.siret]
+    const { errors } = await query<Pick<Query, "wastesRegistryXls">>(
+      WASTES_REGISTRY_XLS,
+      {
+        variables: {
+          registryType: "INCOMING",
+          sirets: [company.siret, otherCompany.siret]
+        }
       }
-    });
+    );
     expect(errors).toHaveLength(1);
     expect(errors[0].extensions.code).toEqual(ErrorCode.FORBIDDEN);
   });
@@ -117,19 +123,22 @@ describe("query { wastesXls }", () => {
       await indexForm(await getFullForm(form));
       await refreshElasticSearch();
       const { query } = makeClient(user);
-      const { data } = await query<Pick<Query, "wastesXls">>(WASTES_XLS, {
-        variables: {
-          registryType,
-          sirets: [company.siret]
+      const { data } = await query<Pick<Query, "wastesRegistryXls">>(
+        WASTES_REGISTRY_XLS,
+        {
+          variables: {
+            registryType,
+            sirets: [company.siret]
+          }
         }
-      });
-      expect(data.wastesXls.token).not.toBeUndefined();
-      expect(data.wastesXls.token).not.toBeNull();
+      );
+      expect(data.wastesRegistryXls.token).not.toBeUndefined();
+      expect(data.wastesRegistryXls.token).not.toBeNull();
 
       const request = supertest(app);
       const req = request
         .get("/download")
-        .query({ token: data.wastesXls.token });
+        .query({ token: data.wastesRegistryXls.token });
 
       const tmpFolder = fs.mkdtempSync("/");
       const filename = `${tmpFolder}/registre.xlsx`;

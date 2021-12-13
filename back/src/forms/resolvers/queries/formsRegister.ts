@@ -3,12 +3,12 @@ import { checkIsCompanyMember } from "../../../users/permissions";
 import {
   FormsRegisterExportType,
   QueryResolvers,
-  QueryWastesCsvArgs,
-  QueryWastesXlsArgs,
+  QueryWastesRegistryCsvArgs,
+  QueryWastesRegistryXlsArgs,
   WasteRegistryType
 } from "../../../generated/graphql/types";
-import { wastesCsvResolverFn } from "../../../registry/resolvers/queries/wastesCsv";
-import { wastesXlsResolverFn } from "../../../registry/resolvers/queries/wastesXls";
+import { wastesRegistryCsvResolverFn } from "../../../registry/resolvers/queries/wastesRegistryCsv";
+import { wastesXlsResolverFn } from "../../../registry/resolvers/queries/wastesRegistryXls";
 
 // compatibility between register v1 and register v2
 const exportTypeToRegisterType: Record<
@@ -41,7 +41,9 @@ const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
     await checkIsCompanyMember({ id: user.id }, { siret: siret });
   }
 
-  const wasteArgs: QueryWastesXlsArgs | QueryWastesCsvArgs = {
+  const wasteRegistryArgs:
+    | QueryWastesRegistryCsvArgs
+    | QueryWastesRegistryXlsArgs = {
     registryType: exportTypeToRegisterType[args.exportType],
     sirets: args.sirets,
     where: {
@@ -60,8 +62,8 @@ const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
 
   // delegate resolution to wastesCsv and wastesXls with bsdType == BSDD
   return args.exportFormat === "CSV"
-    ? wastesCsvResolverFn(wasteArgs, context)
-    : wastesXlsResolverFn(wasteArgs, context);
+    ? wastesRegistryCsvResolverFn(wasteRegistryArgs, context)
+    : wastesXlsResolverFn(wasteRegistryArgs, context);
 };
 
 export default formsRegisterResolver;

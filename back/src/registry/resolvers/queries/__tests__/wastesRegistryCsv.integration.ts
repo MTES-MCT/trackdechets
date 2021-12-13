@@ -13,7 +13,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Query } from "../../../../generated/graphql/types";
-import { WASTES_CSV } from "./queries";
+import { WASTES_REGISTRY_CSV } from "./queries";
 import { indexForm } from "../../../../forms/elastic";
 import { getFullForm } from "../../../../forms/database";
 
@@ -65,18 +65,21 @@ function traderFormFactory(ownerId: string, siret: string) {
   });
 }
 
-describe("query { wastesCsv }", () => {
+describe("query { wastesRegistryCsv }", () => {
   afterEach(resetDatabase);
 
   it("should throw exception if registry is empty", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { query } = makeClient(user);
-    const { errors } = await query<Pick<Query, "wastesCsv">>(WASTES_CSV, {
-      variables: {
-        registryType: "INCOMING",
-        sirets: [company.siret]
+    const { errors } = await query<Pick<Query, "wastesRegistryCsv">>(
+      WASTES_REGISTRY_CSV,
+      {
+        variables: {
+          registryType: "INCOMING",
+          sirets: [company.siret]
+        }
       }
-    });
+    );
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual(
       "Aucune donnée à exporter sur la période sélectionnée"
@@ -87,12 +90,15 @@ describe("query { wastesCsv }", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const otherCompany = await companyFactory();
     const { query } = makeClient(user);
-    const { errors } = await query<Pick<Query, "wastesCsv">>(WASTES_CSV, {
-      variables: {
-        registryType: "INCOMING",
-        sirets: [company.siret, otherCompany.siret]
+    const { errors } = await query<Pick<Query, "wastesRegistryCsv">>(
+      WASTES_REGISTRY_CSV,
+      {
+        variables: {
+          registryType: "INCOMING",
+          sirets: [company.siret, otherCompany.siret]
+        }
       }
-    });
+    );
     expect(errors).toHaveLength(1);
     expect(errors[0].extensions.code).toEqual(ErrorCode.FORBIDDEN);
   });
@@ -116,20 +122,23 @@ describe("query { wastesCsv }", () => {
       await indexForm(await getFullForm(form));
       await refreshElasticSearch();
       const { query } = makeClient(user);
-      const { data } = await query<Pick<Query, "wastesCsv">>(WASTES_CSV, {
-        variables: {
-          registryType,
-          sirets: [company.siret]
+      const { data } = await query<Pick<Query, "wastesRegistryCsv">>(
+        WASTES_REGISTRY_CSV,
+        {
+          variables: {
+            registryType,
+            sirets: [company.siret]
+          }
         }
-      });
-      expect(data.wastesCsv.token).not.toBeUndefined();
-      expect(data.wastesCsv.token).not.toBeNull();
+      );
+      expect(data.wastesRegistryCsv.token).not.toBeUndefined();
+      expect(data.wastesRegistryCsv.token).not.toBeNull();
 
       const request = supertest(app);
 
       const res = await request
         .get("/download")
-        .query({ token: data.wastesCsv.token });
+        .query({ token: data.wastesRegistryCsv.token });
 
       expect(res.status).toBe(200);
 

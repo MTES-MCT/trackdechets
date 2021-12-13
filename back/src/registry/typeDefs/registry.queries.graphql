@@ -101,7 +101,7 @@ type Query {
   ): AllWasteConnection!
 
   "Renvoie un lien permettant de télécharger un registre au format CSV"
-  wastesCsv(
+  wastesRegistryCsv(
     "Type de registre de déchets"
     registryType: WasteRegistryType!
     "Liste d'établissements à inclure dans le registre de déchets"
@@ -111,7 +111,7 @@ type Query {
   ): FileDownload!
 
   "Renvoie un lien permettant de télécharger un registre au format Excel"
-  wastesXls(
+  wastesRegistryXls(
     "Type de registre de déchets"
     registryType: WasteRegistryType!
     "Liste d'établissements à inclure dans le registre de déchets"

@@ -170,26 +170,34 @@ export const ALL_WASTES = gql`
   }
 `;
 
-export const WASTES_CSV = gql`
-  query WastesCsv(
+export const WASTES_REGISTRY_CSV = gql`
+  query WastesRegistryCsv(
     $registryType: WasteRegistryType!
     $sirets: [String!]!
     $where: WasteRegistryWhere
   ) {
-    wastesCsv(registryType: $registryType, sirets: $sirets, where: $where) {
+    wastesRegistryCsv(
+      registryType: $registryType
+      sirets: $sirets
+      where: $where
+    ) {
       token
       downloadLink
     }
   }
 `;
 
-export const WASTES_XLS = gql`
-  query WastesXls(
+export const WASTES_REGISTRY_XLS = gql`
+  query WastesRegistryXls(
     $registryType: WasteRegistryType!
     $sirets: [String!]!
     $where: WasteRegistryWhere
   ) {
-    wastesXls(registryType: $registryType, sirets: $sirets, where: $where) {
+    wastesRegistryXls(
+      registryType: $registryType
+      sirets: $sirets
+      where: $where
+    ) {
       token
       downloadLink
     }

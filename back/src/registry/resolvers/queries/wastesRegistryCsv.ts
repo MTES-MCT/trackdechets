@@ -1,7 +1,7 @@
 import {
   FileDownload,
   QueryResolvers,
-  QueryWastesCsvArgs
+  QueryWastesRegistryCsvArgs
 } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkIsCompanyMember } from "../../../users/permissions";
@@ -14,27 +14,28 @@ import { searchBsds } from "../../elastic";
 import { UserInputError } from "apollo-server-core";
 import { GraphQLContext } from "../../../types";
 
-export const wastesCsvDownloadHandler: DownloadHandler<QueryWastesCsvArgs> = {
-  name: "wastesCsv",
-  handler: (_, res, args) => {
-    const reader = wastesReader({
-      registryType: args.registryType,
-      sirets: args.sirets,
-      where: args.where,
-      chunk: 100
-    });
-    const filename = getRegistryFileName(args.registryType, args.sirets);
-    res.set("Content-disposition", `attachment; filename=${filename}.csv`);
-    res.set("Content-Type", "text/csv");
-    res.set("Transfer-Encoding", "chunked");
-    const csvStream = format({ headers: true, delimiter: ";" });
-    const transformer = wasteFormatter({ useLabelAsKey: true });
-    reader.pipe(transformer).pipe(csvStream).pipe(res);
-  }
-};
+export const wastesRegistryCsvDownloadHandler: DownloadHandler<QueryWastesRegistryCsvArgs> =
+  {
+    name: "wastesRegistryCsv",
+    handler: (_, res, args) => {
+      const reader = wastesReader({
+        registryType: args.registryType,
+        sirets: args.sirets,
+        where: args.where,
+        chunk: 100
+      });
+      const filename = getRegistryFileName(args.registryType, args.sirets);
+      res.set("Content-disposition", `attachment; filename=${filename}.csv`);
+      res.set("Content-Type", "text/csv");
+      res.set("Transfer-Encoding", "chunked");
+      const csvStream = format({ headers: true, delimiter: ";" });
+      const transformer = wasteFormatter({ useLabelAsKey: true });
+      reader.pipe(transformer).pipe(csvStream).pipe(res);
+    }
+  };
 
-export async function wastesCsvResolverFn(
-  args: QueryWastesCsvArgs,
+export async function wastesRegistryCsvResolverFn(
+  args: QueryWastesRegistryCsvArgs,
   context: GraphQLContext
 ): Promise<FileDownload> {
   const user = checkIsAuthenticated(context);
@@ -51,17 +52,17 @@ export async function wastesCsvResolverFn(
     );
   }
   return getFileDownload({
-    handler: wastesCsvDownloadHandler.name,
+    handler: wastesRegistryCsvDownloadHandler.name,
     params: args
   });
 }
 
-const wastesCsvResolver: QueryResolvers["wastesCsv"] = async (
+const wastesCsvResolver: QueryResolvers["wastesRegistryCsv"] = async (
   _,
   args,
   context
 ) => {
-  return wastesCsvResolverFn(args, context);
+  return wastesRegistryCsvResolverFn(args, context);
 };
 
 export default wastesCsvResolver;
