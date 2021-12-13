@@ -11,7 +11,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
-- Correctif de l'affichag du type de quantité dans l'UI du BSDD [PR 1102](https://github.com/MTES-MCT/trackdechets/pull/1102)
+- Correctif de l'affichage du type de quantité dans l'UI du BSDD [PR 1102](https://github.com/MTES-MCT/trackdechets/pull/1102)
 
 #### :boom: Breaking changes
 
