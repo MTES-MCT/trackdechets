@@ -91,6 +91,8 @@ describe("Managed wastes register", () => {
         status: BsdaStatus.PROCESSED,
         createdAt: new Date("2021-05-01"),
         destinationReceptionWeight: 500,
+        emitterEmissionSignatureDate: new Date("2021-05-01"),
+        transporterTransportSignatureDate: new Date("2021-05-01"),
         transporterTransportTakenOverAt: new Date("2021-05-01"),
         destinationReceptionDate: new Date("2021-05-01"),
         destinationOperationDate: new Date("2021-05-01"),

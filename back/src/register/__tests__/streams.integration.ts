@@ -69,7 +69,8 @@ describe("wastesReader", () => {
           bsdaFactory({
             opt: {
               destinationCompanySiret: destination.company.siret,
-              destinationReceptionDate: new Date()
+              destinationReceptionDate: new Date(),
+              destinationOperationSignatureDate: new Date()
             }
           })
         )
@@ -85,7 +86,8 @@ describe("wastesReader", () => {
           bsdasriFactory({
             opt: {
               destinationCompanySiret: destination.company.siret,
-              destinationReceptionDate: new Date()
+              destinationReceptionDate: new Date(),
+              destinationReceptionSignatureDate: new Date()
             }
           })
         )
@@ -101,7 +103,8 @@ describe("wastesReader", () => {
           vhuFormFactory({
             opt: {
               destinationCompanySiret: destination.company.siret,
-              destinationReceptionDate: new Date()
+              destinationReceptionDate: new Date(),
+              destinationOperationSignatureDate: new Date()
             }
           })
         )
@@ -118,7 +121,8 @@ describe("wastesReader", () => {
             { emitter, transporter, destination },
             {
               destinationCompanySiret: destination.company.siret,
-              destinationReceptionDate: new Date()
+              destinationReceptionDate: new Date(),
+              destinationReceptionSignatureDate: new Date()
             }
           )
         )

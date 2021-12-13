@@ -1,10 +1,15 @@
+import { format } from "date-fns";
 import { WasteRegisterType } from "../generated/graphql/types";
 
 export function getRegisterFileName(
   registerType: WasteRegisterType,
   sirets: string[]
 ) {
-  const components = ["TD-Registre", formatRegisterType(registerType)];
+  const components = [
+    "TD-Registre",
+    format(new Date(), "yyyyMMdd"),
+    formatRegisterType(registerType)
+  ];
 
   if (sirets.length === 1) {
     components.push(sirets[0]);
