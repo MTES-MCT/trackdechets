@@ -3,7 +3,7 @@ import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 import { FullForm } from "./types";
 import { GraphQLContext } from "../types";
-import { getRegisterFields } from "./register";
+import { getRegistryFields } from "./registry";
 
 function getWhere(
   form: FullForm
@@ -248,7 +248,7 @@ function toBsdElastic(form: FullForm): BsdElastic {
     transporterCustomInfo: form.transporterCustomInfo,
     ...where,
     sirets: Object.values(where).flat(),
-    ...getRegisterFields(form)
+    ...getRegistryFields(form)
   };
 }
 

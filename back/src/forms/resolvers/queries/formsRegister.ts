@@ -5,15 +5,15 @@ import {
   QueryResolvers,
   QueryWastesCsvArgs,
   QueryWastesXlsArgs,
-  WasteRegisterType
+  WasteRegistryType
 } from "../../../generated/graphql/types";
-import { wastesCsvResolverFn } from "../../../register/resolvers/queries/wastesCsv";
-import { wastesXlsResolverFn } from "../../../register/resolvers/queries/wastesXls";
+import { wastesCsvResolverFn } from "../../../registry/resolvers/queries/wastesCsv";
+import { wastesXlsResolverFn } from "../../../registry/resolvers/queries/wastesXls";
 
 // compatibility between register v1 and register v2
 const exportTypeToRegisterType: Record<
   FormsRegisterExportType,
-  WasteRegisterType
+  WasteRegistryType
 > = {
   OUTGOING: "OUTGOING",
   INCOMING: "INCOMING",
@@ -42,7 +42,7 @@ const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
   }
 
   const wasteArgs: QueryWastesXlsArgs | QueryWastesCsvArgs = {
-    registerType: exportTypeToRegisterType[args.exportType],
+    registryType: exportTypeToRegisterType[args.exportType],
     sirets: args.sirets,
     where: {
       bsdType: { _eq: "BSDD" },

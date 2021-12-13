@@ -4,7 +4,7 @@ import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 
 import { DASRI_WASTE_CODES_MAPPING } from "../common/constants/DASRI_CONSTANTS";
 import { GraphQLContext } from "../types";
-import { getRegisterFields } from "./register";
+import { getRegistryFields } from "./registry";
 
 // | state              | emitter | transporter | recipient |
 // |--------------------|---------|-------------|-----------|
@@ -131,7 +131,7 @@ function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
     createdAt: bsdasri.createdAt.getTime(),
     ...where,
     sirets: Object.values(where).flat(),
-    ...getRegisterFields(bsdasri)
+    ...getRegistryFields(bsdasri)
   };
 }
 

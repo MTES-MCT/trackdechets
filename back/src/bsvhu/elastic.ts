@@ -2,7 +2,7 @@ import { BsvhuStatus, Bsvhu } from "@prisma/client";
 import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 import { GraphQLContext } from "../types";
-import { getRegisterFields } from "./register";
+import { getRegistryFields } from "./registry";
 
 // | state              | emitter | transporter | destination |
 // |--------------------|---------|-------------|-------------|
@@ -123,7 +123,7 @@ function toBsdElastic(bsvhu: Bsvhu): BsdElastic {
     wasteDescription: "",
     ...where,
     sirets: Object.values(where).flat(),
-    ...getRegisterFields(bsvhu)
+    ...getRegistryFields(bsvhu)
   };
 }
 

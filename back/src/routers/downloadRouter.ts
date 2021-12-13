@@ -5,8 +5,8 @@ import { bsffPdfDownloadHandler } from "../bsffs/resolvers/queries/bsffPdf";
 import { bsvhuPdfDownloadHandler } from "../bsvhu/resolvers/queries/bsvhuPdf";
 import { redisClient } from "../common/redis";
 import { formPdfDownloadHandler } from "../forms/resolvers/queries/formPdf";
-import { wastesCsvDownloadHandler } from "../register/resolvers/queries/wastesCsv";
-import { wastesXlsDownloadHandler } from "../register/resolvers/queries/wastesXls";
+import { wastesCsvDownloadHandler } from "../registry/resolvers/queries/wastesCsv";
+import { wastesXlsDownloadHandler } from "../registry/resolvers/queries/wastesXls";
 import {
   Query,
   QueryBsdaPdfArgs,

@@ -2,7 +2,7 @@ import { Bsff, BsffStatus } from "@prisma/client";
 import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 import { GraphQLContext } from "../types";
-import { getRegisterFields } from "./register";
+import { getRegistryFields } from "./registry";
 
 function toBsdElastic(bsff: Bsff): BsdElastic {
   const bsd = {
@@ -37,7 +37,7 @@ function toBsdElastic(bsff: Bsff): BsdElastic {
       bsff.transporterCompanySiret,
       bsff.destinationCompanySiret
     ],
-    ...getRegisterFields(bsff)
+    ...getRegistryFields(bsff)
   };
 
   if (bsff.isDraft) {
