@@ -4,7 +4,6 @@ import { redisClient } from "../src/common/redis";
 import prisma from "../src/prisma";
 import { app } from "../src/server";
 import { client as elasticSearch, index } from "../src/common/elastic";
-import { Prisma } from "@prisma/client";
 
 let httpServerInstance: HttpServer | HttpsServer = null;
 
