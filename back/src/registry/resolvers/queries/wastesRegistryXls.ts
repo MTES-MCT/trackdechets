@@ -53,7 +53,7 @@ export const wastesRegistryXlsDownloadHandler: DownloadHandler<QueryWastesRegist
     }
   };
 
-export async function wastesXlsResolverFn(
+export async function wastesRegistryXlsResolverFn(
   args: QueryWastesRegistryXlsArgs,
   context: GraphQLContext
 ): Promise<FileDownload> {
@@ -82,7 +82,7 @@ const wastesXlsResolver: QueryResolvers["wastesRegistryXls"] = async (
   args,
   context
 ) => {
-  return wastesXlsResolverFn(args, context);
+  return wastesRegistryXlsResolverFn(args, context);
 };
 
 export default wastesXlsResolver;

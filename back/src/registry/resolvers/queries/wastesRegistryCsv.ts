@@ -57,7 +57,7 @@ export async function wastesRegistryCsvResolverFn(
   });
 }
 
-const wastesCsvResolver: QueryResolvers["wastesRegistryCsv"] = async (
+const wastesRegistryCsvResolver: QueryResolvers["wastesRegistryCsv"] = async (
   _,
   args,
   context
@@ -65,4 +65,4 @@ const wastesCsvResolver: QueryResolvers["wastesRegistryCsv"] = async (
   return wastesRegistryCsvResolverFn(args, context);
 };
 
-export default wastesCsvResolver;
+export default wastesRegistryCsvResolver;
