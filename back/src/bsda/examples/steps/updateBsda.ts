@@ -13,7 +13,7 @@ export function updateBsda(
       id: ctx.bsda.id,
       input: getInput(ctx)
     }),
-    expected: { },
+    expected: {},
     data: response => response.updateBsda,
     company,
     setContext: (ctx, data) => ({ ...ctx, bsda: data })

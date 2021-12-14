@@ -215,5 +215,5 @@ export default {
   emitterSignatureUpdateInput,
   workerSignatureUpdateInput,
   transporterSignatureUpdateInput,
-  destinationSignatureUpdateInput,
+  destinationSignatureUpdateInput
 };
