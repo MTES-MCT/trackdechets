@@ -21,7 +21,7 @@ export function BsddRevisionRequestList() {
 
   if (loading) return <Loader />;
 
-  if (!data?.bsddRevisionRequests) {
+  if (!data?.bsddRevisionRequests?.edges?.length) {
     return <div>Vous n'avez aucune révision en attente.</div>;
   }
 

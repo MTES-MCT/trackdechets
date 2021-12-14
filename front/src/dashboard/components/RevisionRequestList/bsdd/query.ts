@@ -71,16 +71,8 @@ export const GET_BSDD_REVISION_REQUESTS = gql`
 `;
 
 export const CREATE_BSDD_REVISION_REQUEST = gql`
-  mutation CreateBsddRevisionRequest(
-    $bsddId: ID!
-    $content: BsddRevisionRequestContentInput!
-    $comment: String!
-  ) {
-    createBsddRevisionRequest(
-      bsddId: $bsddId
-      content: $content
-      comment: $comment
-    ) {
+  mutation CreateBsddRevisionRequest($input: CreateBsddRevisionRequestInput!) {
+    createBsddRevisionRequest(input: $input) {
       id
     }
   }

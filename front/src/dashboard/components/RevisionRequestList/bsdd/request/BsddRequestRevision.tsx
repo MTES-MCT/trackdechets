@@ -78,9 +78,11 @@ export function BsddRequestRevision({ bsdd }: Props) {
 
           await createBsddRevisionRequest({
             variables: {
-              bsddId: bsdd.id,
-              content: cleanedContent,
-              comment,
+              input: {
+                bsddId: bsdd.id,
+                content: cleanedContent,
+                comment,
+              },
             },
           });
           history.goBack();
