@@ -17,7 +17,7 @@ type Props = {
 
 const STATUS_LABELS = {
   PENDING: "En attente de validation",
-  APPROVED: "Approuvée",
+  ACCEPTED: "Approuvée",
   REFUSED: "Refusée",
   CANCELLED: "Annulée",
 };
