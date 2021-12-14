@@ -10,7 +10,11 @@ until PGPASSWORD="no_pass" docker exec -t $psql_container_id bash -c "psql -U \"
   sleep 1
 done
 
-echo "Wait for Elastic Search";
+echo "1/2 - Drop and Create prisma DB";
+docker exec -t $psql_container_id bash -c "psql -U test -c \"DROP DATABASE IF EXISTS prisma;\"";
+docker exec -t $psql_container_id bash -c "psql -U test -c \"CREATE DATABASE prisma;\"";
+
+echo "2/2 - Wait for Elastic Search";
 until docker exec -t $api_container_id bash -c "curl -XGET http://elasticsearch:9200 2> /dev/null"; do
   >&2 echo "⏳ Elastic Search is unavailable - sleeping"
   sleep 1
