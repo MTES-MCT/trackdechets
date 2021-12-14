@@ -192,12 +192,7 @@ type Mutation {
   Crée une demande de révision sur un BSDD existant
   """
   createBsddRevisionRequest(
-    "Identifiant du bordereau à réviser"
-    bsddId: ID!
-    "Contenu de la révision"
-    content: BsddRevisionRequestContentInput!
-    "Commentaire pour expliquer la demande de révision"
-    comment: String!
+    input: CreateBsddRevisionRequestInput!
   ): BsddRevisionRequest
 
   """

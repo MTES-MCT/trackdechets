@@ -244,9 +244,23 @@ type Query {
     siret: String!
     "(Optionnel) Filtres"
     where: BsddRevisionRequestWhere
-    "(Optionnel) PAGINATION - obtenir les éléments qui viennent après le curseur passé en paramètre"
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `first` de paginer "en avant"
+    (des révisions les plus récentes aux révisions les plus ancienness)
+    Curseur après lequel les révisions doivent être retournées
+    Attend un identifiant (propriété `id`) de révision
+    Défaut à vide, pour retourner les révisions les plus récentes
+    La révision précisée dans le curseur ne fait pas partie du résultat
+    """
     after: String
-    "(Optionnel) PAGINATION - nombre d'éléments à obtenir"
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `after` de paginer "en avant"
+    (des révisions les plus récentes aux révisions les plus anciennes)
+    Nombre de révisions retournées après le `after`
+    Défaut à 50
+    """
     first: Int
   ): BsddRevisionRequestConnection!
 }

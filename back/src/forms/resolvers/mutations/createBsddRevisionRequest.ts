@@ -57,9 +57,11 @@ export type RevisionRequestContent = Pick<
 
 export default async function createBsddRevisionRequest(
   _,
-  { bsddId, content, comment }: MutationCreateBsddRevisionRequestArgs,
+  { input }: MutationCreateBsddRevisionRequestArgs,
   context: GraphQLContext
 ) {
+  const { bsddId, content, comment } = input;
+
   const user = checkIsAuthenticated(context);
   const existingBsdd = await getFormOrFormNotFound({ id: bsddId });
   await checkIfUserCanRequestRevisionOnBsdd(user, existingBsdd);
@@ -100,6 +102,15 @@ async function getAuthorCompany(userId: string, bsdd: Form) {
   if (userCompanySirets.has(bsdd.recipientCompanySiret))
     return userCompanies.find(
       company => company.siret === bsdd.recipientCompanySiret
+    );
+
+  const temporaryStorageDetail = await prisma.form
+    .findUnique({ where: { id: bsdd.id } })
+    .temporaryStorageDetail();
+  if (userCompanySirets.has(temporaryStorageDetail.destinationCompanySiret))
+    return userCompanies.find(
+      company =>
+        company.siret === temporaryStorageDetail.destinationCompanySiret
     );
 
   throw new Error(

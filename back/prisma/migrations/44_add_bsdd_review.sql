@@ -11,29 +11,29 @@ CREATE TABLE "default$default"."BsddRevisionRequest" (
     "comment" TEXT NOT NULL,
     "status" "default$default"."RevisionRequestStatus" DEFAULT E'PENDING',
 
-    "recipientCap" TEXT
-    "wasteDetailsCode" TEXT
-    "wasteDetailsPop" BOOLEAN
-    "quantityReceived" FLOAT
-    "processingOperationDone" TEXT
-    "brokerCompanyName" TEXT
-    "brokerCompanySiret" TEXT
-    "brokerCompanyAddress" TEXT
-    "brokerCompanyContact" TEXT
-    "brokerCompanyPhone" TEXT
-    "brokerCompanyMail" TEXT
-    "brokerReceipt" TEXT
-    "brokerDepartment" TEXT
-    "brokerValidityLimit" TIMESTAMP(3)
-    "traderCompanyAddress" TEXT
-    "traderCompanyContact" TEXT
-    "traderCompanyPhone" TEXT
-    "traderCompanyMail" TEXT
-    "traderReceipt" TEXT
-    "traderDepartment" TEXT
-    "traderValidityLimit" TIMESTAMP(3)
-    "temporaryStorageDestinationCap" TEXT
-    "temporaryStorageDestinationProcessingOperation" TEXT
+    "recipientCap" TEXT,
+    "wasteDetailsCode" TEXT,
+    "wasteDetailsPop" BOOLEAN,
+    "quantityReceived" FLOAT,
+    "processingOperationDone" TEXT,
+    "brokerCompanyName" TEXT,
+    "brokerCompanySiret" TEXT,
+    "brokerCompanyAddress" TEXT,
+    "brokerCompanyContact" TEXT,
+    "brokerCompanyPhone" TEXT,
+    "brokerCompanyMail" TEXT,
+    "brokerReceipt" TEXT,
+    "brokerDepartment" TEXT,
+    "brokerValidityLimit" TIMESTAMP(3),
+    "traderCompanyAddress" TEXT,
+    "traderCompanyContact" TEXT,
+    "traderCompanyPhone" TEXT,
+    "traderCompanyMail" TEXT,
+    "traderReceipt" TEXT,
+    "traderDepartment" TEXT,
+    "traderValidityLimit" TIMESTAMP(3),
+    "temporaryStorageDestinationCap" TEXT,
+    "temporaryStorageDestinationProcessingOperation" TEXT,
 
     PRIMARY KEY ("id")
 );

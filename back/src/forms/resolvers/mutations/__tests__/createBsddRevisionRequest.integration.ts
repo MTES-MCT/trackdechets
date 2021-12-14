@@ -10,8 +10,8 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 
 const CREATE_BSDD_REVISION_REQUEST = `
-  mutation CreateBsddRevisionRequest($bsddId: ID!, $content: BsddRevisionRequestContentInput!, $comment: String!) {
-    createBsddRevisionRequest(bsddId: $bsddId, content: $content, comment: $comment) {
+  mutation CreateBsddRevisionRequest($input: CreateBsddRevisionRequestInput!) {
+    createBsddRevisionRequest(input: $input) {
       id
       bsdd {
         id
@@ -41,9 +41,11 @@ describe("Mutation.createBsddRevisionRequest", () => {
     const bsddId = "123";
     const { errors } = await mutate(CREATE_BSDD_REVISION_REQUEST, {
       variables: {
-        bsddId,
-        content: {},
-        comment: "A comment"
+        input: {
+          bsddId,
+          content: {},
+          comment: "A comment"
+        }
       }
     });
 
@@ -64,9 +66,7 @@ describe("Mutation.createBsddRevisionRequest", () => {
     const { mutate } = makeClient(user);
     const { errors } = await mutate(CREATE_BSDD_REVISION_REQUEST, {
       variables: {
-        bsddId: bsdd.id,
-        content: {},
-        comment: "A comment"
+        input: { bsddId: bsdd.id, content: {}, comment: "A comment" }
       }
     });
 
@@ -91,9 +91,7 @@ describe("Mutation.createBsddRevisionRequest", () => {
       CREATE_BSDD_REVISION_REQUEST,
       {
         variables: {
-          bsddId: bsdd.id,
-          content: {},
-          comment: "A comment"
+          input: { bsddId: bsdd.id, content: {}, comment: "A comment" }
         }
       }
     );
@@ -118,9 +116,7 @@ describe("Mutation.createBsddRevisionRequest", () => {
       CREATE_BSDD_REVISION_REQUEST,
       {
         variables: {
-          bsddId: bsdd.id,
-          content: {},
-          comment: "A comment"
+          input: { bsddId: bsdd.id, content: {}, comment: "A comment" }
         }
       }
     );
@@ -141,9 +137,11 @@ describe("Mutation.createBsddRevisionRequest", () => {
     try {
       await mutate(CREATE_BSDD_REVISION_REQUEST, {
         variables: {
-          bsddId: "",
-          content: { wasteDetails: { name: "I cannot change the name" } },
-          comment: "A comment"
+          input: {
+            bsddId: "",
+            content: { wasteDetails: { name: "I cannot change the name" } },
+            comment: "A comment"
+          }
         }
       });
     } catch (err) {
@@ -164,9 +162,11 @@ describe("Mutation.createBsddRevisionRequest", () => {
     const { mutate } = makeClient(user);
     const { errors } = await mutate(CREATE_BSDD_REVISION_REQUEST, {
       variables: {
-        bsddId: bsdd.id,
-        content: { wasteDetails: { code: "Made up code" } },
-        comment: "A comment"
+        input: {
+          bsddId: bsdd.id,
+          content: { wasteDetails: { code: "Made up code" } },
+          comment: "A comment"
+        }
       }
     });
 
@@ -192,9 +192,11 @@ describe("Mutation.createBsddRevisionRequest", () => {
       MutationCreateBsddRevisionRequestArgs
     >(CREATE_BSDD_REVISION_REQUEST, {
       variables: {
-        bsddId: bsdd.id,
-        content: { wasteDetails: { code: "01 03 08" } },
-        comment: "A comment"
+        input: {
+          bsddId: bsdd.id,
+          content: { wasteDetails: { code: "01 03 08" } },
+          comment: "A comment"
+        }
       }
     });
 

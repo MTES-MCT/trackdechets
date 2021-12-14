@@ -661,7 +661,17 @@ input ImportPaperFormInput {
   processedInfo: ProcessedFormInput!
 }
 
-"Payload de révision d'un bordereau. Disponible sur une liste restrainte de champs."
+"Payload de révision d'un bordereau."
+input CreateBsddRevisionRequestInput {
+  "Identifiant du bordereau à réviser"
+    bsddId: ID!
+    "Contenu de la révision"
+    content: BsddRevisionRequestContentInput!
+    "Commentaire pour expliquer la demande de révision"
+    comment: String!
+}
+
+"Payload du contenu de la révision d'un bordereau. Disponible sur une liste restreinte de champs."
 input BsddRevisionRequestContentInput {
   "Détails du déchet (édition partielle uniquement)"
   wasteDetails: BsddRevisionRequestWasteDetailsInput

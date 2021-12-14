@@ -534,7 +534,7 @@ type BsddRevisionRequest {
   author: FormCompany!
 
   "Liste des approbations apposées sur la révision"
-  approvals: [BsddRevisionRequestApproval!]
+  approvals: [BsddRevisionRequestApproval!]!
 
   "Contenu de la révision"
   content: BsddRevisionRequestContent!
