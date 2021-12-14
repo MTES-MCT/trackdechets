@@ -1,11 +1,13 @@
 import { Mail, Contact } from "../types";
+import * as Sentry from "@sentry/node";
 import * as mailjet from "node-mailjet";
 
 const {
   MJ_APIKEY_PUBLIC,
   MJ_APIKEY_PRIVATE,
   SENDER_EMAIL_ADDRESS,
-  SENDER_NAME
+  SENDER_NAME,
+  SENTRY_DSN
 } = process.env;
 
 const mj = mailjet.connect(MJ_APIKEY_PUBLIC, MJ_APIKEY_PRIVATE);
@@ -54,8 +56,16 @@ const mailjetBackend = {
       })
 
       .catch(err => {
-        console.log(err);
-        throw err;
+        if (!!SENTRY_DSN) {
+          Sentry.captureException(err, {
+            tags: {
+              Mailer: "Mailjet",
+              Recipients: mail.to.map(el => el.email).join(" ")
+            }
+          });
+        } else {
+          console.log(err);
+        }
       });
   },
   addContact: function (contact: Contact) {

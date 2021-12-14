@@ -1,8 +1,14 @@
 import { Mail, Contact } from "../types";
 import axios from "axios";
+import * as Sentry from "@sentry/node";
 
-const { SIB_APIKEY, SENDER_EMAIL_ADDRESS, SENDER_NAME, SIB_BASE_URL } =
-  process.env;
+const {
+  SIB_APIKEY,
+  SENDER_EMAIL_ADDRESS,
+  SENDER_NAME,
+  SENTRY_DSN,
+  SIB_BASE_URL
+} = process.env;
 
 const SIB_SMTP_URL = `${SIB_BASE_URL}/smtp/email`;
 const SIB_CONTACT_URL = `${SIB_BASE_URL}/contacts`;
@@ -51,8 +57,16 @@ const sendInBlueBackend = {
         }
       })
       .catch(err => {
-        console.log(err);
-        throw err;
+        if (!!SENTRY_DSN) {
+          Sentry.captureException(err, {
+            tags: {
+              Mailer: "SendInBlue",
+              Recipients: mail.to.map(el => el.email).join(" ")
+            }
+          });
+        } else {
+          console.log(err);
+        }
       });
   },
   addContact: function (contact: Contact) {
