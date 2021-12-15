@@ -238,7 +238,12 @@ function toBsdElastic(form: FullForm): BsdElastic {
     transporterTakenOverAt: form.sentAt?.getTime(),
     destinationCompanyName: recipient.name ?? "",
     destinationCompanySiret: recipient.siret ?? "",
-    destinationReceptionDate: form.receivedAt?.getTime(),
+    destinationReceptionDate:
+      form.receivedAt?.getTime() ??
+      // a single v1 BSDD increment both TTR incoming wastes registry
+      // and final destination incoming wastes registry. Add this line
+      // to prevent sorting on null value when paginating TTR registry
+      form.temporaryStorageDetail?.tempStorerReceivedAt?.getTime(),
     destinationReceptionWeight: form.quantityReceived,
     destinationOperationCode: form.processingOperationDone ?? "",
     destinationOperationDate: form.processedAt?.getTime(),
