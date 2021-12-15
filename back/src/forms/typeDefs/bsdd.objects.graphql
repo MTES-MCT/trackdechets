@@ -520,7 +520,7 @@ type Stat {
 }
 
 "Demande de révision BSDD"
-type BsddRevisionRequest {
+type FormRevisionRequest {
   "Identifiant de la demande de révison"
   id: ID!
 
@@ -534,10 +534,10 @@ type BsddRevisionRequest {
   authoringCompany: FormCompany!
 
   "Liste des approbations apposées sur la révision"
-  approvals: [BsddRevisionRequestApproval!]!
+  approvals: [FormRevisionRequestApproval!]!
 
   "Contenu de la révision"
-  content: BsddRevisionRequestContent!
+  content: FormRevisionRequestContent!
 
   "Commentaire explicatif, saisi par l'auteur de la demande de révision"
   comment: String!
@@ -547,7 +547,7 @@ type BsddRevisionRequest {
 }
 
 "Approbation d'une demande de révision"
-type BsddRevisionRequestApproval {
+type FormRevisionRequestApproval {
   "Siret de l'entreprise responsable de cette approbation"
   approverSiret: String!
 
@@ -559,9 +559,9 @@ type BsddRevisionRequestApproval {
 }
 
 "Payload de révision d'un bordereau. Disponible sur une liste restreinte de champs."
-type BsddRevisionRequestContent {
+type FormRevisionRequestContent {
   "Détails du déchet (édition partielle uniquement)"
-  wasteDetails: BsddRevisionRequestWasteDetails
+  wasteDetails: FormRevisionRequestWasteDetails
 
   "Négociant"
   trader: Trader
@@ -570,7 +570,7 @@ type BsddRevisionRequestContent {
   broker: Broker
 
   "Destination du déchet (édition partielle uniquement)"
-  recipient: BsddRevisionRequestRecipient
+  recipient: FormRevisionRequestRecipient
 
   "Quantité reçue, en tonnes"
   quantityReceived: Float
@@ -579,10 +579,10 @@ type BsddRevisionRequestContent {
   processingOperationDone: String
 
   "Entreposage provisoire (édition partielle uniquement)"
-  temporaryStorageDetail: BsddRevisionRequestTemporaryStorageDetail
+  temporaryStorageDetail: FormRevisionRequestTemporaryStorageDetail
 }
 
-type BsddRevisionRequestWasteDetails {
+type FormRevisionRequestWasteDetails {
   "Code CED"
   code: String
 
@@ -590,15 +590,15 @@ type BsddRevisionRequestWasteDetails {
   pop: Boolean
 }
 
-type BsddRevisionRequestRecipient {
+type FormRevisionRequestRecipient {
   cap: String
 }
 
-type BsddRevisionRequestTemporaryStorageDetail {
-  destination: BsddRevisionRequestDestination
+type FormRevisionRequestTemporaryStorageDetail {
+  destination: FormRevisionRequestDestination
 }
 
-type BsddRevisionRequestDestination {
+type FormRevisionRequestDestination {
   "N° de CAP"
   cap: String
 
@@ -606,13 +606,13 @@ type BsddRevisionRequestDestination {
   processingOperation: String
 }
 
-type BsddRevisionRequestConnection {
+type FormRevisionRequestConnection {
   totalCount: Int!
   pageInfo: PageInfo!
-  edges: [BsddRevisionRequestEdge!]!
+  edges: [FormRevisionRequestEdge!]!
 }
 
-type BsddRevisionRequestEdge {
+type FormRevisionRequestEdge {
   cursor: String!
-  node: BsddRevisionRequest!
+  node: FormRevisionRequest!
 }

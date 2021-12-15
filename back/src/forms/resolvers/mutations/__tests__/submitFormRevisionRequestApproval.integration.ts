@@ -1,7 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
-  MutationSubmitBsddRevisionRequestApprovalArgs
+  MutationSubmitFormRevisionRequestApprovalArgs
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
@@ -11,8 +11,8 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 
 const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = `
-  mutation SubmitBsddRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
-    submitBsddRevisionRequestApproval(id: $id, isApproved: $isApproved) {
+  mutation SubmitFormRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
+    submitFormRevisionRequestApproval(id: $id, isApproved: $isApproved) {
       id
       bsdd {
         id
@@ -29,7 +29,7 @@ const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = `
   }
 `;
 
-describe("Mutation.submitBsddRevisionRequestApproval", () => {
+describe("Mutation.submitFormRevisionRequestApproval", () => {
   afterEach(() => resetDatabase());
 
   it("should fail if revisionRequest doesnt exist", async () => {
@@ -133,7 +133,7 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
     });
 
     const { data } = await mutate<
-      Pick<Mutation, "submitBsddRevisionRequestApproval">
+      Pick<Mutation, "submitFormRevisionRequestApproval">
     >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
       variables: {
         id: revisionRequest.id,
@@ -141,7 +141,7 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
       }
     });
 
-    expect(data.submitBsddRevisionRequestApproval.status).toBe("ACCEPTED");
+    expect(data.submitFormRevisionRequestApproval.status).toBe("ACCEPTED");
   });
 
   it("should work if one of the approvers approves the revisionRequest, but not mark the revisionRequest as accepted", async () => {
@@ -170,7 +170,7 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
     });
 
     const { data } = await mutate<
-      Pick<Mutation, "submitBsddRevisionRequestApproval">
+      Pick<Mutation, "submitFormRevisionRequestApproval">
     >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
       variables: {
         id: revisionRequest.id,
@@ -178,16 +178,16 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
       }
     });
 
-    expect(data.submitBsddRevisionRequestApproval.status).toBe("PENDING");
+    expect(data.submitFormRevisionRequestApproval.status).toBe("PENDING");
 
     expect(
-      data.submitBsddRevisionRequestApproval.approvals.find(
+      data.submitFormRevisionRequestApproval.approvals.find(
         val => val.approverSiret === company.siret
       ).status
     ).toBe("ACCEPTED");
 
     expect(
-      data.submitBsddRevisionRequestApproval.approvals.find(
+      data.submitFormRevisionRequestApproval.approvals.find(
         val => val.approverSiret === thirdCompany.siret
       ).status
     ).toBe("PENDING");
@@ -219,7 +219,7 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
     });
 
     const { data } = await mutate<
-      Pick<Mutation, "submitBsddRevisionRequestApproval">
+      Pick<Mutation, "submitFormRevisionRequestApproval">
     >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
       variables: {
         id: revisionRequest.id,
@@ -228,11 +228,11 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
     });
 
     expect(
-      data.submitBsddRevisionRequestApproval.approvals.find(
+      data.submitFormRevisionRequestApproval.approvals.find(
         val => val.approverSiret === company.siret
       ).status
     ).toBe("REFUSED");
-    expect(data.submitBsddRevisionRequestApproval.status).toBe("REFUSED");
+    expect(data.submitFormRevisionRequestApproval.status).toBe("REFUSED");
   });
 
   it("should work if only validator refuses the revisionRequest", async () => {
@@ -257,7 +257,7 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
     });
 
     const { data } = await mutate<
-      Pick<Mutation, "submitBsddRevisionRequestApproval">
+      Pick<Mutation, "submitFormRevisionRequestApproval">
     >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
       variables: {
         id: revisionRequest.id,
@@ -265,7 +265,7 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
       }
     });
 
-    expect(data.submitBsddRevisionRequestApproval.status).toBe("REFUSED");
+    expect(data.submitFormRevisionRequestApproval.status).toBe("REFUSED");
   });
 
   it("should edit bsdd accordingly when accepted", async () => {
@@ -292,8 +292,8 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
     });
 
     await mutate<
-      Pick<Mutation, "submitBsddRevisionRequestApproval">,
-      MutationSubmitBsddRevisionRequestApprovalArgs
+      Pick<Mutation, "submitFormRevisionRequestApproval">,
+      MutationSubmitFormRevisionRequestApprovalArgs
     >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
       variables: {
         id: revisionRequest.id,
@@ -332,8 +332,8 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
     });
 
     await mutate<
-      Pick<Mutation, "submitBsddRevisionRequestApproval">,
-      MutationSubmitBsddRevisionRequestApprovalArgs
+      Pick<Mutation, "submitFormRevisionRequestApproval">,
+      MutationSubmitFormRevisionRequestApprovalArgs
     >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
       variables: {
         id: revisionRequest.id,

@@ -7,9 +7,9 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
-const BSDD_REVISION_REQUESTS = `
-  query BsddRevisionRequests($siret: String!) {
-    bsddRevisionRequests(siret: $siret) {
+const FORM_REVISION_REQUESTS = `
+  query FormRevisionRequests($siret: String!) {
+    formRevisionRequests(siret: $siret) {
       totalCount
       pageInfo {
         hasNextPage
@@ -28,7 +28,7 @@ const BSDD_REVISION_REQUESTS = `
   }
 `;
 
-describe("Mutation.bsddRevisionRequests", () => {
+describe("Mutation.formRevisionRequests", () => {
   afterEach(() => resetDatabase());
 
   it("should list every revisionRequest from and to company", async () => {
@@ -91,15 +91,15 @@ describe("Mutation.bsddRevisionRequests", () => {
       }
     });
 
-    const { data } = await query<Pick<Query, "bsddRevisionRequests">>(
-      BSDD_REVISION_REQUESTS,
+    const { data } = await query<Pick<Query, "formRevisionRequests">>(
+      FORM_REVISION_REQUESTS,
       {
         variables: { siret: company.siret }
       }
     );
 
-    expect(data.bsddRevisionRequests.totalCount).toBe(4);
-    expect(data.bsddRevisionRequests.pageInfo.hasNextPage).toBe(false);
+    expect(data.formRevisionRequests.totalCount).toBe(4);
+    expect(data.formRevisionRequests.pageInfo.hasNextPage).toBe(false);
   });
 
   it("should fail if requesting a siret current user is not part of", async () => {
@@ -107,8 +107,8 @@ describe("Mutation.bsddRevisionRequests", () => {
     const { company } = await userWithCompanyFactory("ADMIN");
     const { query } = makeClient(user);
 
-    const { errors } = await query<Pick<Query, "bsddRevisionRequests">>(
-      BSDD_REVISION_REQUESTS,
+    const { errors } = await query<Pick<Query, "formRevisionRequests">>(
+      FORM_REVISION_REQUESTS,
       {
         variables: { siret: company.siret }
       }

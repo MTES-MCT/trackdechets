@@ -239,11 +239,11 @@ type Query {
   """
   Renvoie les demandes de révisions BSDD associées à un SIRET (demandes soumises et approbations requises)
   """
-  bsddRevisionRequests(
+  formRevisionRequests(
     "SIRET d'un établissement dont je suis membre"
     siret: String!
     "(Optionnel) Filtres"
-    where: BsddRevisionRequestWhere
+    where: FormRevisionRequestWhere
     """
     (Optionnel) PAGINATION
     Permet en conjonction avec `first` de paginer "en avant"
@@ -262,5 +262,5 @@ type Query {
     Défaut à 50
     """
     first: Int
-  ): BsddRevisionRequestConnection!
+  ): FormRevisionRequestConnection!
 }

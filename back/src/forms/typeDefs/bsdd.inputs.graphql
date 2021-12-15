@@ -662,19 +662,19 @@ input ImportPaperFormInput {
 }
 
 "Payload de révision d'un bordereau."
-input CreateBsddRevisionRequestInput {
+input CreateFormRevisionRequestInput {
   "Identifiant du bordereau à réviser"
     bsddId: ID!
     "Contenu de la révision"
-    content: BsddRevisionRequestContentInput!
+    content: FormRevisionRequestContentInput!
     "Commentaire pour expliquer la demande de révision"
     comment: String!
 }
 
 "Payload du contenu de la révision d'un bordereau. Disponible sur une liste restreinte de champs."
-input BsddRevisionRequestContentInput {
+input FormRevisionRequestContentInput {
   "Détails du déchet (édition partielle uniquement)"
-  wasteDetails: BsddRevisionRequestWasteDetailsInput
+  wasteDetails: FormRevisionRequestWasteDetailsInput
 
   "Négociant"
   trader: TraderInput
@@ -683,7 +683,7 @@ input BsddRevisionRequestContentInput {
   broker: BrokerInput
 
   "Destination du déchet (édition partielle uniquement)"
-  recipient: BsddRevisionRequestRecipientInput
+  recipient: FormRevisionRequestRecipientInput
 
   "Quantité reçue, en tonnes"
   quantityReceived: Float
@@ -692,10 +692,10 @@ input BsddRevisionRequestContentInput {
   processingOperationDone: String
 
   "Entreposage provisoire (édition partielle uniquement)"
-  temporaryStorageDetail: BsddRevisionRequestTemporaryStorageDetailInput
+  temporaryStorageDetail: FormRevisionRequestTemporaryStorageDetailInput
 }
 
-input BsddRevisionRequestWasteDetailsInput {
+input FormRevisionRequestWasteDetailsInput {
   "Code CED"
   code: String
 
@@ -703,15 +703,15 @@ input BsddRevisionRequestWasteDetailsInput {
   pop: Boolean
 }
 
-input BsddRevisionRequestRecipientInput {
+input FormRevisionRequestRecipientInput {
   cap: String
 }
 
-input BsddRevisionRequestTemporaryStorageDetailInput {
-  destination: BsddRevisionRequestDestinationInput
+input FormRevisionRequestTemporaryStorageDetailInput {
+  destination: FormRevisionRequestDestinationInput
 }
 
-input BsddRevisionRequestDestinationInput {
+input FormRevisionRequestDestinationInput {
   "N° de CAP"
   cap: String
 
@@ -719,6 +719,6 @@ input BsddRevisionRequestDestinationInput {
   processingOperation: String
 }
 
-input BsddRevisionRequestWhere {
+input FormRevisionRequestWhere {
   status: RevisionRequestStatus
 }

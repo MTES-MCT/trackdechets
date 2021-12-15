@@ -191,15 +191,15 @@ type Mutation {
   """
   Crée une demande de révision sur un BSDD existant
   """
-  createBsddRevisionRequest(
-    input: CreateBsddRevisionRequestInput!
-  ): BsddRevisionRequest
+  createFormRevisionRequest(
+    input: CreateFormRevisionRequestInput!
+  ): FormRevisionRequest
 
   """
   Annule une demande de révision de BSDD.
   Peut être fait uniquement par l'auteur de la révision, si celle-ci n'a pas encore été acceptée
   """
-  cancelBsddRevisionRequest(
+  cancelFormRevisionRequest(
     "Identifiant de la demande de révision"
     id: ID!
   ): Boolean
@@ -209,12 +209,12 @@ type Mutation {
   En cas de refus, la révision associée est automatiquement refusée et les autres validations supprimées.
   En cas d'acceptation, si c'était la dernière approbation attendue, la révision associée est automatiquement approuvée et appliquée sur le BSDD.
   """
-  submitBsddRevisionRequestApproval(
+  submitFormRevisionRequestApproval(
     "Identifiant de la validation"
     id: ID!
     "Indique si la révision est acceptée ou non"
     isApproved: Boolean!
     "Commentaire facultatif"
     comment: String
-  ): BsddRevisionRequest
+  ): FormRevisionRequest
 }

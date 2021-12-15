@@ -1,14 +1,14 @@
 import { RevisionRequestStatus } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-core";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationCancelBsddRevisionRequestArgs } from "../../../generated/graphql/types";
+import { MutationCancelFormRevisionRequestArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 
-export default async function cancelBsddRevisionRequest(
+export default async function cancelFormRevisionRequest(
   _,
-  { id }: MutationCancelBsddRevisionRequestArgs,
+  { id }: MutationCancelFormRevisionRequestArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);

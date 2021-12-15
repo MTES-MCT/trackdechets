@@ -2,7 +2,7 @@ import { RevisionRequestStatus } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
-  MutationCancelBsddRevisionRequestArgs
+  MutationCancelFormRevisionRequestArgs
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
@@ -11,13 +11,13 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
-const CANCEL_BSDD_REVISION_REQUEST = `
-  mutation CancelBsddRevisionRequest($id: ID!) {
-    cancelBsddRevisionRequest(id: $id)
+const CANCEL_FORM_REVISION_REQUEST = `
+  mutation CancelFormRevisionRequest($id: ID!) {
+    cancelFormRevisionRequest(id: $id)
   }
 `;
 
-describe("Mutation.cancelBsddRevisionRequest", () => {
+describe("Mutation.cancelFormRevisionRequest", () => {
   afterEach(() => resetDatabase());
 
   it("should fail if revision doesnt exist", async () => {
@@ -25,9 +25,9 @@ describe("Mutation.cancelBsddRevisionRequest", () => {
     const { mutate } = makeClient(user);
 
     const { errors } = await mutate<
-      Pick<Mutation, "cancelBsddRevisionRequest">,
-      MutationCancelBsddRevisionRequestArgs
-    >(CANCEL_BSDD_REVISION_REQUEST, {
+      Pick<Mutation, "cancelFormRevisionRequest">,
+      MutationCancelFormRevisionRequestArgs
+    >(CANCEL_FORM_REVISION_REQUEST, {
       variables: { id: "i dont exist" }
     });
 
@@ -53,9 +53,9 @@ describe("Mutation.cancelBsddRevisionRequest", () => {
     });
 
     const { errors } = await mutate<
-      Pick<Mutation, "cancelBsddRevisionRequest">,
-      MutationCancelBsddRevisionRequestArgs
-    >(CANCEL_BSDD_REVISION_REQUEST, {
+      Pick<Mutation, "cancelFormRevisionRequest">,
+      MutationCancelFormRevisionRequestArgs
+    >(CANCEL_FORM_REVISION_REQUEST, {
       variables: { id: revisionRequest.id }
     });
 
@@ -83,9 +83,9 @@ describe("Mutation.cancelBsddRevisionRequest", () => {
     });
 
     const { errors } = await mutate<
-      Pick<Mutation, "cancelBsddRevisionRequest">,
-      MutationCancelBsddRevisionRequestArgs
-    >(CANCEL_BSDD_REVISION_REQUEST, {
+      Pick<Mutation, "cancelFormRevisionRequest">,
+      MutationCancelFormRevisionRequestArgs
+    >(CANCEL_FORM_REVISION_REQUEST, {
       variables: { id: revisionRequest.id }
     });
 
@@ -117,9 +117,9 @@ describe("Mutation.cancelBsddRevisionRequest", () => {
     expect(revisionsCountBefore).toBe(1);
 
     await mutate<
-      Pick<Mutation, "cancelBsddRevisionRequest">,
-      MutationCancelBsddRevisionRequestArgs
-    >(CANCEL_BSDD_REVISION_REQUEST, {
+      Pick<Mutation, "cancelFormRevisionRequest">,
+      MutationCancelFormRevisionRequestArgs
+    >(CANCEL_FORM_REVISION_REQUEST, {
       variables: { id: revisionRequest.id }
     });
 

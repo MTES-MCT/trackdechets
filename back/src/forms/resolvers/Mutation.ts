@@ -20,9 +20,9 @@ import editSegment from "./mutations/editSegment";
 import takeOverSegment from "./mutations/takeOverSegment";
 import markSegmentAsReadyToTakeOver from "./mutations/markSegmentAsReadyToTakeOver";
 import importPaperForm from "./mutations/importPaperForm";
-import createBsddRevisionRequest from "./mutations/createBsddRevisionRequest";
-import submitBsddRevisionRequestApproval from "./mutations/submitBsddRevisionRequestApproval";
-import cancelBsddRevisionRequest from "./mutations/cancelBsddRevisionRequest";
+import createFormRevisionRequest from "./mutations/createFormRevisionRequest";
+import submitFormRevisionRequestApproval from "./mutations/submitFormRevisionRequestApproval";
+import cancelFormRevisionRequest from "./mutations/cancelFormRevisionRequest";
 
 const Mutation: MutationResolvers = {
   createForm,
@@ -46,9 +46,9 @@ const Mutation: MutationResolvers = {
   editSegment,
   markSegmentAsReadyToTakeOver,
   takeOverSegment,
-  createBsddRevisionRequest: createBsddRevisionRequest as any, // TODO better typing ?
-  cancelBsddRevisionRequest,
-  submitBsddRevisionRequestApproval: submitBsddRevisionRequestApproval as any
+  createFormRevisionRequest: createFormRevisionRequest as any, // TODO better typing ?
+  cancelFormRevisionRequest,
+  submitFormRevisionRequestApproval: submitFormRevisionRequestApproval as any
 };
 
 export default Mutation;

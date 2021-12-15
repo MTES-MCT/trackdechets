@@ -7,18 +7,18 @@ import {
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationSubmitBsddRevisionRequestApprovalArgs } from "../../../generated/graphql/types";
+import { MutationSubmitFormRevisionRequestApprovalArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 
-type BsddRevisionRequestWithApprovals = BsddRevisionRequest & {
+type FormRevisionRequestWithApprovals = BsddRevisionRequest & {
   approvals: BsddRevisionRequestApproval[];
 };
 
-export default async function submitBsddRevisionRequestApproval(
+export default async function submitFormRevisionRequestApproval(
   _,
-  { id, isApproved, comment }: MutationSubmitBsddRevisionRequestApprovalArgs,
+  { id, isApproved, comment }: MutationSubmitFormRevisionRequestApprovalArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
@@ -63,7 +63,7 @@ export default async function submitBsddRevisionRequestApproval(
 
 async function getCurrentApproverSiret(
   user: User,
-  revisionRequest: BsddRevisionRequestWithApprovals
+  revisionRequest: FormRevisionRequestWithApprovals
 ) {
   const remainingApproverSirets = revisionRequest.approvals
     .filter(approval => approval.status === Status.PENDING)
@@ -84,7 +84,7 @@ async function getCurrentApproverSiret(
 }
 
 async function reverberateChangeOnAssociatedObjects(
-  revisionRequest: BsddRevisionRequestWithApprovals,
+  revisionRequest: FormRevisionRequestWithApprovals,
   updatedApproval: BsddRevisionRequestApproval
 ) {
   // We have a refusal:
@@ -119,7 +119,7 @@ async function reverberateChangeOnAssociatedObjects(
     });
 
     const [bsddUpdate, temporaryStorageUpdate] =
-      getUpdateFromBsddRevisionRequest(revisionRequest);
+      getUpdateFromFormRevisionRequest(revisionRequest);
 
     await prisma.form.update({
       where: { id: revisionRequest.bsddId },
@@ -133,7 +133,7 @@ async function reverberateChangeOnAssociatedObjects(
   }
 }
 
-function getUpdateFromBsddRevisionRequest(
+function getUpdateFromFormRevisionRequest(
   revisionRequest: BsddRevisionRequest
 ) {
   const bsddUpdate = {

@@ -41,11 +41,11 @@ import {
   SignatureFormInput,
   ReceivedFormInput,
   NextSegmentInfoInput,
-  BsddRevisionRequestContentInput,
-  BsddRevisionRequestContent,
-  BsddRevisionRequestWasteDetails,
-  BsddRevisionRequestTemporaryStorageDetail,
-  BsddRevisionRequestDestination
+  FormRevisionRequestContentInput,
+  FormRevisionRequestContent,
+  FormRevisionRequestWasteDetails,
+  FormRevisionRequestTemporaryStorageDetail,
+  FormRevisionRequestDestination
 } from "../generated/graphql/types";
 import { extractPostalCode } from "../utils";
 
@@ -363,7 +363,7 @@ function flattenNextDestinationInput(input: {
 }
 
 export function flattenBsddRevisionRequestInput(
-  reviewContent: BsddRevisionRequestContentInput
+  reviewContent: FormRevisionRequestContentInput
 ) {
   return safeInput({
     recipientCap: chain(reviewContent, c => chain(c.recipient, r => r.cap)),
@@ -787,9 +787,9 @@ export function expandTransportSegmentFromDb(
 
 export function expandBsddRevisionRequestContent(
   bsddRevisionRequest: BsddRevisionRequest
-): BsddRevisionRequestContent {
+): FormRevisionRequestContent {
   return {
-    wasteDetails: nullIfNoValues<BsddRevisionRequestWasteDetails>({
+    wasteDetails: nullIfNoValues<FormRevisionRequestWasteDetails>({
       code: bsddRevisionRequest.wasteDetailsCode,
       pop: bsddRevisionRequest.wasteDetailsPop
     }),
@@ -820,8 +820,8 @@ export function expandBsddRevisionRequestContent(
     quantityReceived: bsddRevisionRequest.quantityReceived,
     processingOperationDone: bsddRevisionRequest.processingOperationDone,
     temporaryStorageDetail:
-      nullIfNoValues<BsddRevisionRequestTemporaryStorageDetail>({
-        destination: nullIfNoValues<BsddRevisionRequestDestination>({
+      nullIfNoValues<FormRevisionRequestTemporaryStorageDetail>({
+        destination: nullIfNoValues<FormRevisionRequestDestination>({
           cap: bsddRevisionRequest.temporaryStorageDestinationCap,
           processingOperation:
             bsddRevisionRequest.temporaryStorageDestinationProcessingOperation

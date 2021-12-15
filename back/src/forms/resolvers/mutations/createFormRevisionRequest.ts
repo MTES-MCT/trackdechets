@@ -13,8 +13,8 @@ import {
 } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
-  BsddRevisionRequestContentInput,
-  MutationCreateBsddRevisionRequestArgs
+  FormRevisionRequestContentInput,
+  MutationCreateFormRevisionRequestArgs
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
@@ -55,9 +55,9 @@ export type RevisionRequestContent = Pick<
   | "temporaryStorageDestinationProcessingOperation"
 >;
 
-export default async function createBsddRevisionRequest(
+export default async function createFormRevisionRequest(
   _,
-  { input }: MutationCreateBsddRevisionRequestArgs,
+  { input }: MutationCreateFormRevisionRequestArgs,
   context: GraphQLContext
 ) {
   const { bsddId, content, comment } = input;
@@ -154,7 +154,7 @@ async function checkIfUserCanRequestRevisionOnBsdd(
 }
 
 async function getFlatContent(
-  content: BsddRevisionRequestContentInput,
+  content: FormRevisionRequestContentInput,
   bsdd: Form
 ): Promise<RevisionRequestContent> {
   const flatContent = flattenBsddRevisionRequestInput(content);

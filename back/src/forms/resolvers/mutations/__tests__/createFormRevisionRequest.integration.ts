@@ -1,7 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
-  MutationCreateBsddRevisionRequestArgs
+  MutationCreateFormRevisionRequestArgs
 } from "../../../../generated/graphql/types";
 import {
   formFactory,
@@ -9,9 +9,9 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
-const CREATE_BSDD_REVISION_REQUEST = `
-  mutation CreateBsddRevisionRequest($input: CreateBsddRevisionRequestInput!) {
-    createBsddRevisionRequest(input: $input) {
+const CREATE_FORM_REVISION_REQUEST = `
+  mutation CreateFormRevisionRequest($input: CreateFormRevisionRequestInput!) {
+    createFormRevisionRequest(input: $input) {
       id
       bsdd {
         id
@@ -31,7 +31,7 @@ const CREATE_BSDD_REVISION_REQUEST = `
   }
 `;
 
-describe("Mutation.createBsddRevisionRequest", () => {
+describe("Mutation.createFormRevisionRequest", () => {
   afterEach(() => resetDatabase());
 
   it("should fail if bsdd doesnt exist", async () => {
@@ -39,7 +39,7 @@ describe("Mutation.createBsddRevisionRequest", () => {
     const { mutate } = makeClient(user);
 
     const bsddId = "123";
-    const { errors } = await mutate(CREATE_BSDD_REVISION_REQUEST, {
+    const { errors } = await mutate(CREATE_FORM_REVISION_REQUEST, {
       variables: {
         input: {
           bsddId,
@@ -64,7 +64,7 @@ describe("Mutation.createBsddRevisionRequest", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_BSDD_REVISION_REQUEST, {
+    const { errors } = await mutate(CREATE_FORM_REVISION_REQUEST, {
       variables: {
         input: { bsddId: bsdd.id, content: {}, comment: "A comment" }
       }
@@ -87,8 +87,8 @@ describe("Mutation.createBsddRevisionRequest", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "createBsddRevisionRequest">>(
-      CREATE_BSDD_REVISION_REQUEST,
+    const { data } = await mutate<Pick<Mutation, "createFormRevisionRequest">>(
+      CREATE_FORM_REVISION_REQUEST,
       {
         variables: {
           input: { bsddId: bsdd.id, content: {}, comment: "A comment" }
@@ -96,8 +96,8 @@ describe("Mutation.createBsddRevisionRequest", () => {
       }
     );
 
-    expect(data.createBsddRevisionRequest.bsdd.id).toBe(bsdd.id);
-    expect(data.createBsddRevisionRequest.authoringCompany.siret).toBe(company.siret);
+    expect(data.createFormRevisionRequest.bsdd.id).toBe(bsdd.id);
+    expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(company.siret);
   });
 
   it("should create a revisionRequest and an approval targetting the company not requesting the revisionRequest", async () => {
@@ -112,8 +112,8 @@ describe("Mutation.createBsddRevisionRequest", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "createBsddRevisionRequest">>(
-      CREATE_BSDD_REVISION_REQUEST,
+    const { data } = await mutate<Pick<Mutation, "createFormRevisionRequest">>(
+      CREATE_FORM_REVISION_REQUEST,
       {
         variables: {
           input: { bsddId: bsdd.id, content: {}, comment: "A comment" }
@@ -121,12 +121,12 @@ describe("Mutation.createBsddRevisionRequest", () => {
       }
     );
 
-    expect(data.createBsddRevisionRequest.bsdd.id).toBe(bsdd.id);
-    expect(data.createBsddRevisionRequest.approvals.length).toBe(1);
-    expect(data.createBsddRevisionRequest.approvals[0].approverSiret).toBe(
+    expect(data.createFormRevisionRequest.bsdd.id).toBe(bsdd.id);
+    expect(data.createFormRevisionRequest.approvals.length).toBe(1);
+    expect(data.createFormRevisionRequest.approvals[0].approverSiret).toBe(
       recipientCompany.siret
     );
-    expect(data.createBsddRevisionRequest.approvals[0].status).toBe("PENDING");
+    expect(data.createFormRevisionRequest.approvals[0].status).toBe("PENDING");
   });
 
   it("should fail if unknown fields are provided", async () => {
@@ -135,7 +135,7 @@ describe("Mutation.createBsddRevisionRequest", () => {
     const { mutate } = makeClient(user);
     expect.assertions(2);
     try {
-      await mutate(CREATE_BSDD_REVISION_REQUEST, {
+      await mutate(CREATE_FORM_REVISION_REQUEST, {
         variables: {
           input: {
             bsddId: "",
@@ -147,7 +147,7 @@ describe("Mutation.createBsddRevisionRequest", () => {
     } catch (err) {
       expect(err.message).toContain('{"code":"BAD_USER_INPUT"}');
       expect(err.message).toContain(
-        'Field \\"name\\" is not defined by type \\"BsddRevisionRequestWasteDetailsInput\\".'
+        'Field \\"name\\" is not defined by type \\"FormRevisionRequestWasteDetailsInput\\".'
       );
     }
   });
@@ -160,7 +160,7 @@ describe("Mutation.createBsddRevisionRequest", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_BSDD_REVISION_REQUEST, {
+    const { errors } = await mutate(CREATE_FORM_REVISION_REQUEST, {
       variables: {
         input: {
           bsddId: bsdd.id,
@@ -188,9 +188,9 @@ describe("Mutation.createBsddRevisionRequest", () => {
 
     const { mutate } = makeClient(user);
     const { data } = await mutate<
-      Pick<Mutation, "createBsddRevisionRequest">,
-      MutationCreateBsddRevisionRequestArgs
-    >(CREATE_BSDD_REVISION_REQUEST, {
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
       variables: {
         input: {
           bsddId: bsdd.id,
@@ -200,7 +200,7 @@ describe("Mutation.createBsddRevisionRequest", () => {
       }
     });
 
-    expect(data.createBsddRevisionRequest.content).toEqual({
+    expect(data.createFormRevisionRequest.content).toEqual({
       wasteDetails: { code: "01 03 08" }
     });
   });

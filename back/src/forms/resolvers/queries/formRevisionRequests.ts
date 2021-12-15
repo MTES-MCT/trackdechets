@@ -1,6 +1,6 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import { QueryBsddRevisionRequestsArgs } from "../../../generated/graphql/types";
+import { QueryFormRevisionRequestsArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
@@ -8,14 +8,14 @@ import { checkIsCompanyMember } from "../../../users/permissions";
 const MIN_SIZE = 0;
 const MAX_SIZE = 50;
 
-export default async function bsddRevisionRequests(
+export default async function formRevisionRequests(
   _,
   {
     siret,
     after,
     first = MAX_SIZE,
     where: inputWhere = {}
-  }: QueryBsddRevisionRequestsArgs,
+  }: QueryFormRevisionRequestsArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);

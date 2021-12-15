@@ -1,8 +1,8 @@
-import { BsddRevisionRequestResolvers } from "../../generated/graphql/types";
+import { FormRevisionRequestResolvers } from "../../generated/graphql/types";
 import prisma from "../../prisma";
 import { expandBsddRevisionRequestContent } from "../form-converter";
 
-const bsddRevisionRequestResolvers: BsddRevisionRequestResolvers = {
+const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
   approvals: async parent => {
     return prisma.bsddRevisionRequestApproval.findMany({
       where: { revisionRequestId: parent.id }
@@ -23,4 +23,4 @@ const bsddRevisionRequestResolvers: BsddRevisionRequestResolvers = {
   }
 };
 
-export default bsddRevisionRequestResolvers;
+export default formRevisionRequestResolvers;
