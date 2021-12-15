@@ -28,7 +28,11 @@ export default async function cancelFormRevisionRequest(
 
   const userCompanies = await getUserCompanies(user.id);
 
-  if (!userCompanies.find(company => company.id === revisionRequest.authoringCompanyId)) {
+  if (
+    !userCompanies.find(
+      company => company.id === revisionRequest.authoringCompanyId
+    )
+  ) {
     throw new ForbiddenError("Vous n'êtes pas l'auteur de cette révision.");
   }
 

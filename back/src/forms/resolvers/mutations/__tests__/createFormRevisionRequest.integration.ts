@@ -91,13 +91,19 @@ describe("Mutation.createFormRevisionRequest", () => {
       CREATE_FORM_REVISION_REQUEST,
       {
         variables: {
-          input: { bsddId: bsdd.id, content: {}, comment: "A comment" }
+          input: {
+            bsddId: bsdd.id,
+            content: { wasteDetails: { code: "01 03 08" } },
+            comment: "A comment"
+          }
         }
       }
     );
 
     expect(data.createFormRevisionRequest.bsdd.id).toBe(bsdd.id);
-    expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(company.siret);
+    expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+      company.siret
+    );
   });
 
   it("should create a revisionRequest and an approval targetting the company not requesting the revisionRequest", async () => {
@@ -116,7 +122,11 @@ describe("Mutation.createFormRevisionRequest", () => {
       CREATE_FORM_REVISION_REQUEST,
       {
         variables: {
-          input: { bsddId: bsdd.id, content: {}, comment: "A comment" }
+          input: {
+            bsddId: bsdd.id,
+            content: { wasteDetails: { code: "01 03 08" } },
+            comment: "A comment"
+          }
         }
       }
     );
