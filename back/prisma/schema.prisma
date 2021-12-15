@@ -182,6 +182,7 @@ model Company {
   CompanyAssociation                   CompanyAssociation[]
   MembershipRequest                    MembershipRequest[]
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
+  bsddRevisionRequests                 BsddRevisionRequest[]
 }
 
 // Companies with restricted diffusion of SIRENE information (police, army, etc)
@@ -341,7 +342,7 @@ model Form {
   ownerId                            String
   owner                              User                    @relation(fields: [ownerId], references: [id])
   StatusLog                          StatusLog[]
-
+  bsddRevisionRequests               BsddRevisionRequest[]
 
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
@@ -350,6 +351,79 @@ model Form {
   @@index([brokerCompanySiret], map: "_FormBrokerCompanySiretIdx")
   @@index([status], map: "_FormStatusIdx")
   @@index([appendix2RootFormId], map: "_FormAppendix2RootFormIdIdx")
+}
+
+enum RevisionRequestStatus {
+  PENDING
+  ACCEPTED
+  REFUSED
+}
+
+model BsddRevisionRequest {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bsddId             String
+  bsdd               Form    @relation(fields: [bsddId], references: [id])
+  authoringCompanyId String
+  authoringCompany   Company @relation(fields: [authoringCompanyId], references: [id])
+
+  approvals BsddRevisionRequestApproval[]
+
+  recipientCap                                   String?
+  wasteDetailsCode                               String?
+  wasteDetailsPop                                Boolean?
+  quantityReceived                               Float?
+  processingOperationDone                        String?
+  brokerCompanyName                              String?
+  brokerCompanySiret                             String?
+  brokerCompanyAddress                           String?
+  brokerCompanyContact                           String?
+  brokerCompanyPhone                             String?
+  brokerCompanyMail                              String?
+  brokerReceipt                                  String?
+  brokerDepartment                               String?
+  brokerValidityLimit                            DateTime?
+  traderCompanyAddress                           String?
+  traderCompanyContact                           String?
+  traderCompanyPhone                             String?
+  traderCompanyMail                              String?
+  traderReceipt                                  String?
+  traderDepartment                               String?
+  traderValidityLimit                            DateTime?
+  temporaryStorageDestinationCap                 String?
+  temporaryStorageDestinationProcessingOperation String?
+
+  comment String
+
+  status RevisionRequestStatus @default(PENDING)
+
+  @@index([authoringCompanyId], map: "_BsddRevisionRequestAuthoringCompanyIdIdx")
+  @@index([bsddId], map: "_BsddRevisionRequestBsddIdIdx")
+}
+
+enum RevisionRequestApprovalStatus {
+  PENDING
+  ACCEPTED
+  REFUSED
+  CANCELED
+}
+
+model BsddRevisionRequestApproval {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  revisionRequestId String
+  revisionRequest   BsddRevisionRequest @relation(fields: [revisionRequestId], references: [id])
+  approverSiret     String
+
+  status  RevisionRequestApprovalStatus @default(PENDING)
+  comment String?
+
+  @@index([revisionRequestId], map: "_BsddRevisionRequestApprovalRevisionRequestIdIdx")
+  @@index([approverSiret], map: "_BsddRevisionRequestApprovalApproverSiretIdx")
 }
 
 model Grant {

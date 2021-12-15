@@ -26,11 +26,13 @@ export default {
       act: "/dashboard/:siret/bsds/act",
       follow: "/dashboard/:siret/bsds/follow",
       history: "/dashboard/:siret/bsds/history",
+      reviews: "/dashboard/:siret/bsds/review",
     },
     bsdds: {
       create: "/dashboard/:siret/bsdds/create",
       edit: "/dashboard/:siret/bsdds/edit/:id",
       view: "/dashboard/:siret/bsdds/view/:id",
+      review: "/dashboard/:siret/bsdds/review/:id",
     },
     bsdasris: {
       view: "/dashboard/:siret/bsdasris/view/:id",

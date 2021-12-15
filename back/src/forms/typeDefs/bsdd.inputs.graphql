@@ -660,3 +660,65 @@ input ImportPaperFormInput {
   "Informations liées au traitement du déchet (case 11)"
   processedInfo: ProcessedFormInput!
 }
+
+"Payload de révision d'un bordereau."
+input CreateFormRevisionRequestInput {
+  "Identifiant du bordereau à réviser"
+    bsddId: ID!
+    "Contenu de la révision"
+    content: FormRevisionRequestContentInput!
+    "Commentaire pour expliquer la demande de révision"
+    comment: String!
+}
+
+"Payload du contenu de la révision d'un bordereau. Disponible sur une liste restreinte de champs."
+input FormRevisionRequestContentInput {
+  "Détails du déchet (édition partielle uniquement)"
+  wasteDetails: FormRevisionRequestWasteDetailsInput
+
+  "Négociant"
+  trader: TraderInput
+
+  "Courtier"
+  broker: BrokerInput
+
+  "Destination du déchet (édition partielle uniquement)"
+  recipient: FormRevisionRequestRecipientInput
+
+  "Quantité reçue, en tonnes"
+  quantityReceived: Float
+
+  "Traitement réalisé (code D/R)"
+  processingOperationDone: String
+
+  "Entreposage provisoire (édition partielle uniquement)"
+  temporaryStorageDetail: FormRevisionRequestTemporaryStorageDetailInput
+}
+
+input FormRevisionRequestWasteDetailsInput {
+  "Code CED"
+  code: String
+
+  "Contient des Polluants Organiques Persistants (POP) oui / non"
+  pop: Boolean
+}
+
+input FormRevisionRequestRecipientInput {
+  cap: String
+}
+
+input FormRevisionRequestTemporaryStorageDetailInput {
+  destination: FormRevisionRequestDestinationInput
+}
+
+input FormRevisionRequestDestinationInput {
+  "N° de CAP"
+  cap: String
+
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  processingOperation: String
+}
+
+input FormRevisionRequestWhere {
+  status: RevisionRequestStatus
+}

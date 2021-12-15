@@ -90,3 +90,22 @@ export const getNestedNode = (obj: Object, path: String): any => {
 
   return traverse({ obj, paths });
 };
+
+/**
+ * Clean an object from null, undefined, empty string and empty objects values
+ * @param obj Input object
+ * @returns A cleaned object
+ */
+export function removeEmptyKeys<T>(obj: Object): Partial<T> | undefined {
+  const newObject = Object.entries(obj)
+    .filter(([, value]) => Boolean(value))
+    .reduce((cleanedObj, [key]) => {
+      const value =
+        typeof obj[key] === "object" ? removeEmptyKeys(obj[key]) : obj[key];
+
+      if (value) cleanedObj[key] = value;
+      return cleanedObj;
+    }, {});
+
+  return Object.keys(newObject).length !== 0 ? newObject : undefined;
+}

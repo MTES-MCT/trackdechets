@@ -73,6 +73,15 @@ export default function DashboardMenu({ me, handleCompanyChange }: IProps) {
                   Archives
                 </NavLink>
               </li>
+              <li>
+                <NavLink
+                  to={generatePath(routes.dashboard.bsds.reviews, { siret })}
+                  className="sidebar__link sidebar__link--indented"
+                  activeClassName="sidebar__link--active"
+                >
+                  Révisions
+                </NavLink>
+              </li>
             </ul>
 
             {company.companyTypes.includes(CompanyType.Transporter) && (

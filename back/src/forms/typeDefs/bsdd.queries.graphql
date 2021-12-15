@@ -234,4 +234,32 @@ type Query {
     "(Optionnel) ID d'un BSD en particulier"
     formId: ID
   ): formsLifeCycleData!
+
+  """
+  Renvoie les demandes de révisions BSDD associées à un SIRET (demandes soumises et approbations requises)
+  """
+  formRevisionRequests(
+    "SIRET d'un établissement dont je suis membre"
+    siret: String!
+    "(Optionnel) Filtres"
+    where: FormRevisionRequestWhere
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `first` de paginer "en avant"
+    (des révisions les plus récentes aux révisions les plus ancienness)
+    Curseur après lequel les révisions doivent être retournées
+    Attend un identifiant (propriété `id`) de révision
+    Défaut à vide, pour retourner les révisions les plus récentes
+    La révision précisée dans le curseur ne fait pas partie du résultat
+    """
+    after: String
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `after` de paginer "en avant"
+    (des révisions les plus récentes aux révisions les plus anciennes)
+    Nombre de révisions retournées après le `after`
+    Défaut à 50
+    """
+    first: Int
+  ): FormRevisionRequestConnection!
 }
