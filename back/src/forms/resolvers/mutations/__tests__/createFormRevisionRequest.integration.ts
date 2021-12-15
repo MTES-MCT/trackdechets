@@ -97,7 +97,9 @@ describe("Mutation.createFormRevisionRequest", () => {
     );
 
     expect(data.createFormRevisionRequest.bsdd.id).toBe(bsdd.id);
-    expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(company.siret);
+    expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+      company.siret
+    );
   });
 
   it("should create a revisionRequest and an approval targetting the company not requesting the revisionRequest", async () => {

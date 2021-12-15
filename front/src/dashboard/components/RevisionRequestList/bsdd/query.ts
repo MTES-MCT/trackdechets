@@ -2,10 +2,41 @@ import { gql } from "@apollo/client";
 import { companyFragment } from "common/fragments";
 
 const reviewFragment = gql`
-  fragment BsddRevisionRequestFragment on BsddRevisionRequest {
+  fragment FormRevisionRequestFragment on FormRevisionRequest {
     id
     bsdd {
       id
+      wasteDetails {
+        code
+        pop
+      }
+      trader {
+        company {
+          ...CompanyFragment
+        }
+        receipt
+        department
+        validityLimit
+      }
+      broker {
+        company {
+          ...CompanyFragment
+        }
+        receipt
+        department
+        validityLimit
+      }
+      recipient {
+        cap
+      }
+      quantityReceived
+      processingOperationDone
+      temporaryStorageDetail {
+        destination {
+          cap
+          processingOperation
+        }
+      }
     }
     authoringCompany {
       siret
@@ -36,21 +67,15 @@ const reviewFragment = gql`
         department
         validityLimit
       }
-      destination {
+      recipient {
         cap
-        reception {
-          weight
-        }
-        operation {
-          code
-        }
       }
+      quantityReceived
+      processingOperationDone
       temporaryStorageDetail {
         destination {
           cap
-          operation {
-            code
-          }
+          processingOperation
         }
       }
     }
@@ -60,12 +85,12 @@ const reviewFragment = gql`
   ${companyFragment}
 `;
 
-export const GET_BSDD_REVISION_REQUESTS = gql`
-  query BsddRevisionRequests($siret: String!) {
-    bsddRevisionRequests(siret: $siret) {
+export const GET_FORM_REVISION_REQUESTS = gql`
+  query FormRevisionRequests($siret: String!) {
+    formRevisionRequests(siret: $siret) {
       edges {
         node {
-          ...BsddRevisionRequestFragment
+          ...FormRevisionRequestFragment
           bsdd {
             readableId
           }
@@ -76,18 +101,25 @@ export const GET_BSDD_REVISION_REQUESTS = gql`
   ${reviewFragment}
 `;
 
-export const CREATE_BSDD_REVISION_REQUEST = gql`
-  mutation CreateBsddRevisionRequest($input: CreateBsddRevisionRequestInput!) {
-    createBsddRevisionRequest(input: $input) {
+export const CREATE_FORM_REVISION_REQUEST = gql`
+  mutation CreateFormRevisionRequest($input: CreateFormRevisionRequestInput!) {
+    createFormRevisionRequest(input: $input) {
       id
     }
   }
 `;
 
-export const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = gql`
-  mutation SubmitBsddRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
-    submitBsddRevisionRequestApproval(id: $id, isApproved: $isApproved) {
+export const CANCEL_FORM_REVISION_REQUEST = gql`
+  mutation CancelFormRevisionRequest($id: ID!) {
+    cancelFormRevisionRequest(id: $id)
+  }
+`;
+
+export const SUBMIT_FORM_REVISION_REQUEST_APPROVAL = gql`
+  mutation SubmitFormRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
+    submitFormRevisionRequestApproval(id: $id, isApproved: $isApproved) {
       id
+      status
     }
   }
 `;

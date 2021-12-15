@@ -1,5 +1,5 @@
 import React from "react";
-import { BsddRevisionRequest } from "generated/graphql/types";
+import { FormRevisionRequest } from "generated/graphql/types";
 import { useTable, useFilters, useSortBy } from "react-table";
 import {
   Table,
@@ -9,10 +9,10 @@ import {
   TableRow,
   TableCell,
 } from "common/components";
-import { BsddApproveRevision } from "./approve";
+import { BsddRevisionAction } from "./approve/BsddRevisionAction";
 
 type Props = {
-  revisions: BsddRevisionRequest[];
+  revisions: FormRevisionRequest[];
 };
 
 const STATUS_LABELS = {
@@ -39,7 +39,7 @@ const COLUMNS = [
   {
     Header: "Actions",
     accessor: () => null,
-    Cell: ({ row }) => <BsddApproveRevision review={row.original} />,
+    Cell: ({ row }) => <BsddRevisionAction review={row.original} />,
   },
 ];
 

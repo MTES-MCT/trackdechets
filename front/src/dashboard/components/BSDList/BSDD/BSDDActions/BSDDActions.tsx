@@ -77,7 +77,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                   Pdf
                 </MenuItem>
               )}
-              {[FormStatus.Draft, FormStatus.Sealed].includes(form.status) ? (
+              {[FormStatus.Draft, FormStatus.Sealed].includes(form.status) && (
                 <>
                   <MenuItem onSelect={() => setIsDeleting(true)}>
                     <IconTrash color="blueLight" size="24px" />
@@ -94,7 +94,12 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                     Modifier
                   </MenuLink>
                 </>
-              ) : (
+              )}
+              {![
+                FormStatus.Draft,
+                FormStatus.Sealed,
+                FormStatus.Refused,
+              ].includes(form.status) && (
                 <MenuLink
                   as={Link}
                   to={{

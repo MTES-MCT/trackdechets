@@ -45,7 +45,8 @@ import {
   FormRevisionRequestContent,
   FormRevisionRequestWasteDetails,
   FormRevisionRequestTemporaryStorageDetail,
-  FormRevisionRequestDestination
+  FormRevisionRequestDestination,
+  FormRevisionRequestRecipient
 } from "../generated/graphql/types";
 import { extractPostalCode } from "../utils";
 
@@ -816,6 +817,9 @@ export function expandBsddRevisionRequestContent(
       receipt: bsddRevisionRequest.brokerReceipt,
       department: bsddRevisionRequest.brokerDepartment,
       validityLimit: bsddRevisionRequest.brokerValidityLimit
+    }),
+    recipient: nullIfNoValues<FormRevisionRequestRecipient>({
+      cap: bsddRevisionRequest.recipientCap
     }),
     quantityReceived: bsddRevisionRequest.quantityReceived,
     processingOperationDone: bsddRevisionRequest.processingOperationDone,

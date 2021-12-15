@@ -1,18 +1,28 @@
 import React, { useState } from "react";
 import TdSwitch from "common/components/Switch";
+import { useField } from "formik";
 
 type Props = {
   title: string;
   children: React.ReactNode;
+  name: string;
+  defaultValue: any;
   value: string | number | React.ReactNode;
 };
 
-export function ReviewableField({ value, title, children }: Props) {
+export function ReviewableField({
+  value,
+  title,
+  name,
+  defaultValue,
+  children,
+}: Props) {
   const [isEditing, setIsEditing] = useState(false);
+  const [, , { setValue }] = useField(name);
 
   function handleIsEditingChange() {
     if (isEditing) {
-      // TODO clear value
+      setValue(defaultValue);
     }
     setIsEditing(!isEditing);
   }

@@ -124,10 +124,7 @@ async function checkIfUserCanRequestRevisionOnBsdd(
 ): Promise<void> {
   await checkCanRequestRevision(user, bsdd);
 
-  if (
-    Status.DRAFT === bsdd.status ||
-    Status.SEALED === bsdd.status
-  ) {
+  if (Status.DRAFT === bsdd.status || Status.SEALED === bsdd.status) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau. Vous pouvez le modifier directement, aucune signature bloquante n'a encore été apposée."
     );
@@ -158,6 +155,12 @@ async function getFlatContent(
   bsdd: Form
 ): Promise<RevisionRequestContent> {
   const flatContent = flattenBsddRevisionRequestInput(content);
+  
+  if (Object.keys(flatContent).length === 0) {
+    throw new UserInputError(
+      "Impossible créer une révision sans modifications."
+    );
+  }
 
   if (
     bsdd.temporaryStorageDetailId == null &&

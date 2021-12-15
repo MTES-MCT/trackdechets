@@ -14,13 +14,13 @@ import { Field, Form, Formik } from "formik";
 import {
   Form as Bsdd,
   Mutation,
-  MutationCreateBsddRevisionRequestArgs,
+  MutationCreateFormRevisionRequestArgs,
 } from "generated/graphql/types";
 import React from "react";
 import { useHistory } from "react-router";
 import * as yup from "yup";
 import { removeEmptyKeys } from "../../../../../common/helper";
-import { CREATE_BSDD_REVISION_REQUEST } from "../query";
+import { CREATE_FORM_REVISION_REQUEST } from "../query";
 import styles from "./BsddRequestRevision.module.scss";
 import { ReviewableField } from "./ReviewableField";
 
@@ -58,10 +58,10 @@ const validationSchema = yup.object({
 
 export function BsddRequestRevision({ bsdd }: Props) {
   const history = useHistory();
-  const [createBsddRevisionRequest, { loading }] = useMutation<
-    Pick<Mutation, "createBsddRevisionRequest">,
-    MutationCreateBsddRevisionRequestArgs
-  >(CREATE_BSDD_REVISION_REQUEST);
+  const [createFormRevisionRequest, { loading, error }] = useMutation<
+    Pick<Mutation, "createFormRevisionRequest">,
+    MutationCreateFormRevisionRequestArgs
+  >(CREATE_FORM_REVISION_REQUEST);
 
   return (
     <div className={styles.container}>
@@ -74,13 +74,12 @@ export function BsddRequestRevision({ bsdd }: Props) {
         validationSchema={validationSchema}
         onSubmit={async ({ content, comment }) => {
           const cleanedContent = removeEmptyKeys(content);
-          if (!cleanedContent) return;
 
-          await createBsddRevisionRequest({
+          await createFormRevisionRequest({
             variables: {
               input: {
                 bsddId: bsdd.id,
-                content: cleanedContent,
+                content: cleanedContent ?? {},
                 comment,
               },
             },
@@ -91,7 +90,12 @@ export function BsddRequestRevision({ bsdd }: Props) {
         {({ setFieldValue }) => (
           <Form>
             <div className={styles.fields}>
-              <ReviewableField title="CAP" value={bsdd.recipient?.cap}>
+              <ReviewableField
+                title="CAP"
+                value={bsdd.recipient?.cap}
+                name="content.recipient.cap"
+                defaultValue={initialReview.recipient.cap}
+              >
                 <Field
                   name="content.recipient.cap"
                   className="td-input td-input--medium"
@@ -101,6 +105,8 @@ export function BsddRequestRevision({ bsdd }: Props) {
               <ReviewableField
                 title="Code déchet"
                 value={bsdd.wasteDetails?.code}
+                name="content.wasteDetails.code"
+                defaultValue={initialReview.wasteDetails.code}
               >
                 <WasteCode
                   name="content.wasteDetails.code"
@@ -111,6 +117,8 @@ export function BsddRequestRevision({ bsdd }: Props) {
               <ReviewableField
                 title="Présence de polluants organiques persistants"
                 value={Boolean(bsdd.wasteDetails?.pop) ? "Oui" : "Non"}
+                name="content.wasteDetails.pop"
+                defaultValue={initialReview.wasteDetails.pop}
               >
                 <Field
                   type="checkbox"
@@ -123,6 +131,8 @@ export function BsddRequestRevision({ bsdd }: Props) {
               <ReviewableField
                 title="Quantité traitée"
                 value={bsdd.quantityReceived}
+                name="content.quantityReceived"
+                defaultValue={initialReview.quantityReceived}
               >
                 <Field
                   name="content.quantityReceived"
@@ -134,6 +144,8 @@ export function BsddRequestRevision({ bsdd }: Props) {
               <ReviewableField
                 title="Code de l'opération D/R"
                 value={bsdd.processingOperationDone}
+                name="content.processingOperationDone"
+                defaultValue={initialReview.processingOperationDone}
               >
                 <Field
                   component={ProcessingOperation}
@@ -150,6 +162,8 @@ export function BsddRequestRevision({ bsdd }: Props) {
                     "Aucun"
                   )
                 }
+                name="content.broker"
+                defaultValue={initialReview.broker}
               >
                 <>
                   <CompanySelector
@@ -230,6 +244,8 @@ export function BsddRequestRevision({ bsdd }: Props) {
                     "Aucun"
                   )
                 }
+                name="content.trader"
+                defaultValue={initialReview.trader}
               >
                 <>
                   <CompanySelector
@@ -307,6 +323,12 @@ export function BsddRequestRevision({ bsdd }: Props) {
                 <RedErrorMessage name="comment" />
               </div>
             </div>
+
+            {error && (
+              <div className="notification notification--warning">
+                {error.message}
+              </div>
+            )}
 
             <div className={styles.actions}>
               <button
