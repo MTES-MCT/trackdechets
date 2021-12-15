@@ -26,12 +26,6 @@ const sentryReporter: ApolloServerPlugin = {
             continue;
           }
 
-          // Workaround issue https://github.com/apollographql/apollo-server/issues/5704
-          // Related with Typescript issue https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
-          if (typeof error.extensions?.code === "string") {
-            continue;
-          }
-
           const scope = new Sentry.Scope();
           // Annotate whether failing operation was query/mutation/subscription
           scope.setTag("kind", errorContext.operation.operation);
