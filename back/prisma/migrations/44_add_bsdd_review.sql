@@ -62,3 +62,11 @@ ALTER TABLE "default$default"."BsddRevisionRequest" ADD FOREIGN KEY ("bsddId") R
 
 -- AddForeignKey
 ALTER TABLE "default$default"."BsddRevisionRequestApproval" ADD FOREIGN KEY ("revisionRequestId") REFERENCES "default$default"."BsddRevisionRequest"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Indexes
+
+CREATE INDEX IF NOT EXISTS "_BsddRevisionRequestAuthoringCompanyIdIdx" ON "default$default"."BsddRevisionRequest"("authoringCompanyId");
+CREATE INDEX IF NOT EXISTS "_BsddRevisionRequestBsddIdIdx" ON "default$default"."BsddRevisionRequest"("bsddId");
+
+CREATE INDEX IF NOT EXISTS "_BsddRevisionRequestApprovalRevisionRequestIdIdx" ON "default$default"."BsddRevisionRequestApproval"("revisionRequestId");
+CREATE INDEX IF NOT EXISTS "_BsddRevisionRequestApprovalApproverSiretIdx" ON "default$default"."BsddRevisionRequestApproval"("approverSiret");

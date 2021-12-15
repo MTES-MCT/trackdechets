@@ -11,10 +11,10 @@ const bsddRevisionRequestResolvers: BsddRevisionRequestResolvers = {
   content: parent => {
     return expandBsddRevisionRequestContent(parent as any);
   },
-  author: parent => {
+  authoringCompany: parent => {
     return prisma.bsddRevisionRequest
       .findUnique({ where: { id: parent.id } })
-      .author();
+      .authoringCompany();
   },
   bsdd: parent => {
     return prisma.bsddRevisionRequest

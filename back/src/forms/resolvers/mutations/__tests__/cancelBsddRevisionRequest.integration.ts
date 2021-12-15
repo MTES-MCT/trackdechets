@@ -47,7 +47,7 @@ describe("Mutation.cancelBsddRevisionRequest", () => {
     const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
-        authorId: company.id,
+        authoringCompanyId: company.id,
         comment: ""
       }
     });
@@ -76,7 +76,7 @@ describe("Mutation.cancelBsddRevisionRequest", () => {
     const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
-        authorId: company.id,
+        authoringCompanyId: company.id,
         comment: "",
         status: RevisionRequestStatus.ACCEPTED
       }
@@ -106,13 +106,13 @@ describe("Mutation.cancelBsddRevisionRequest", () => {
     const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
-        authorId: company.id,
+        authoringCompanyId: company.id,
         comment: ""
       }
     });
 
     const revisionsCountBefore = await prisma.bsddRevisionRequest.count({
-      where: { authorId: company.id }
+      where: { authoringCompanyId: company.id }
     });
     expect(revisionsCountBefore).toBe(1);
 
@@ -124,7 +124,7 @@ describe("Mutation.cancelBsddRevisionRequest", () => {
     });
 
     const revisionsCountAfter = await prisma.bsddRevisionRequest.count({
-      where: { authorId: company.id }
+      where: { authoringCompanyId: company.id }
     });
     expect(revisionsCountAfter).toBe(0);
   });

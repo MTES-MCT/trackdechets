@@ -27,7 +27,7 @@ export default async function bsddRevisionRequests(
   const { status } = inputWhere;
   const where = {
     OR: [
-      { authorId: company.id },
+      { authoringCompanyId: company.id },
       { approvals: { some: { approverSiret: company.siret } } }
     ],
     ...(status && { status })

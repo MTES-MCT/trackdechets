@@ -531,7 +531,7 @@ type BsddRevisionRequest {
   createdAt: DateTime
 
   "Entreprise à l'origine de la demande de révision"
-  author: FormCompany!
+  authoringCompany: FormCompany!
 
   "Liste des approbations apposées sur la révision"
   approvals: [BsddRevisionRequestApproval!]!

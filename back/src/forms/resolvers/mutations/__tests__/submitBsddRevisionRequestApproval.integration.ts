@@ -61,7 +61,7 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
     const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
-        authorId: companyOfSomeoneElse.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
         comment: ""
       }
     });
@@ -93,7 +93,7 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
     const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
-        authorId: company.id,
+        authoringCompanyId: company.id,
         approvals: { create: { approverSiret: companyOfSomeoneElse.siret } },
         comment: ""
       }
@@ -126,7 +126,7 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
     const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
-        authorId: companyOfSomeoneElse.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
         approvals: { create: { approverSiret: company.siret } },
         comment: ""
       }
@@ -158,7 +158,7 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
     const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
-        authorId: secondCompany.id,
+        authoringCompanyId: secondCompany.id,
         approvals: {
           create: [
             { approverSiret: company.siret },
@@ -207,7 +207,7 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
     const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
-        authorId: secondCompany.id,
+        authoringCompanyId: secondCompany.id,
         approvals: {
           create: [
             { approverSiret: company.siret },
@@ -250,7 +250,7 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
     const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
-        authorId: companyOfSomeoneElse.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
         approvals: { create: { approverSiret: company.siret } },
         comment: ""
       }
@@ -284,7 +284,7 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
     const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
-        authorId: companyOfSomeoneElse.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
         approvals: { create: { approverSiret: company.siret } },
         wasteDetailsCode: "01 03 08",
         comment: ""
@@ -324,7 +324,7 @@ describe("Mutation.submitBsddRevisionRequestApproval", () => {
     const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd.id,
-        authorId: companyOfSomeoneElse.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
         approvals: { create: { approverSiret: company.siret } },
         wasteDetailsCode: "01 03 08",
         comment: ""

@@ -19,7 +19,7 @@ const CREATE_BSDD_REVISION_REQUEST = `
       content {
         wasteDetails { code }
       }
-      author {
+      authoringCompany {
         siret
       }
       approvals {
@@ -97,7 +97,7 @@ describe("Mutation.createBsddRevisionRequest", () => {
     );
 
     expect(data.createBsddRevisionRequest.bsdd.id).toBe(bsdd.id);
-    expect(data.createBsddRevisionRequest.author.siret).toBe(company.siret);
+    expect(data.createBsddRevisionRequest.authoringCompany.siret).toBe(company.siret);
   });
 
   it("should create a revisionRequest and an approval targetting the company not requesting the revisionRequest", async () => {

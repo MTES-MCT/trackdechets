@@ -68,18 +68,18 @@ export default async function createBsddRevisionRequest(
 
   const flatContent = await getFlatContent(content, existingBsdd);
 
-  const author = await getAuthorCompany(user.id, existingBsdd);
+  const authoringCompany = await getAuthoringCompany(user.id, existingBsdd);
   const approversSirets = await getApproversSirets(
     existingBsdd,
     flatContent,
-    author.siret
+    authoringCompany.siret
   );
 
   return prisma.bsddRevisionRequest.create({
     data: {
       bsdd: { connect: { id: existingBsdd.id } },
       ...flatContent,
-      author: { connect: { id: author.id } },
+      authoringCompany: { connect: { id: authoringCompany.id } },
       approvals: {
         create: approversSirets.map(approverSiret => ({ approverSiret }))
       },
@@ -88,7 +88,7 @@ export default async function createBsddRevisionRequest(
   });
 }
 
-async function getAuthorCompany(userId: string, bsdd: Form) {
+async function getAuthoringCompany(userId: string, bsdd: Form) {
   const userCompanies = await getUserCompanies(userId);
   const userCompanySirets = new Set(
     userCompanies.map(company => company.siret)
@@ -126,11 +126,16 @@ async function checkIfUserCanRequestRevisionOnBsdd(
 
   if (
     Status.DRAFT === bsdd.status ||
-    Status.SEALED === bsdd.status ||
-    Status.REFUSED === bsdd.status
+    Status.SEALED === bsdd.status
   ) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau. Vous pouvez le modifier directement, aucune signature bloquante n'a encore été apposée."
+    );
+  }
+
+  if (Status.REFUSED === bsdd.status || bsdd.isDeleted) {
+    throw new ForbiddenError(
+      "Impossible de créer une révision sur ce bordereau, il a été refusé ou supprimé."
     );
   }
 

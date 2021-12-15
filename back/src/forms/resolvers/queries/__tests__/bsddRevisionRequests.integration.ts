@@ -49,7 +49,7 @@ describe("Mutation.bsddRevisionRequests", () => {
     await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd1.id,
-        authorId: otherCompany.id,
+        authoringCompanyId: otherCompany.id,
         approvals: { create: { approverSiret: company.siret } },
         comment: ""
       }
@@ -57,7 +57,7 @@ describe("Mutation.bsddRevisionRequests", () => {
     await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd2.id,
-        authorId: company.id,
+        authoringCompanyId: company.id,
         approvals: { create: { approverSiret: otherCompany.siret } },
         comment: ""
       }
@@ -67,7 +67,7 @@ describe("Mutation.bsddRevisionRequests", () => {
     await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd2.id,
-        authorId: company.id,
+        authoringCompanyId: company.id,
         approvals: {
           create: {
             approverSiret: otherCompany.siret,
@@ -80,7 +80,7 @@ describe("Mutation.bsddRevisionRequests", () => {
     await prisma.bsddRevisionRequest.create({
       data: {
         bsddId: bsdd2.id,
-        authorId: company.id,
+        authoringCompanyId: company.id,
         approvals: {
           create: {
             approverSiret: otherCompany.siret,

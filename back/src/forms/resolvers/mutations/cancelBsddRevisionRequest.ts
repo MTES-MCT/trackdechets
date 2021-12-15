@@ -28,7 +28,7 @@ export default async function cancelBsddRevisionRequest(
 
   const userCompanies = await getUserCompanies(user.id);
 
-  if (!userCompanies.find(company => company.id === revisionRequest.authorId)) {
+  if (!userCompanies.find(company => company.id === revisionRequest.authoringCompanyId)) {
     throw new ForbiddenError("Vous n'êtes pas l'auteur de cette révision.");
   }
 

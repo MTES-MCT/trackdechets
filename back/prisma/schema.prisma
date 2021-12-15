@@ -359,10 +359,10 @@ model BsddRevisionRequest {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  bsddId   String
-  bsdd     Form    @relation(fields: [bsddId], references: [id])
-  authorId String
-  author   Company @relation(fields: [authorId], references: [id])
+  bsddId             String
+  bsdd               Form    @relation(fields: [bsddId], references: [id])
+  authoringCompanyId String
+  authoringCompany   Company @relation(fields: [authoringCompanyId], references: [id])
 
   approvals BsddRevisionRequestApproval[]
 
@@ -393,6 +393,9 @@ model BsddRevisionRequest {
   comment String
 
   status RevisionRequestStatus @default(PENDING)
+
+  @@index([authoringCompanyId], map: "_BsddRevisionRequestAuthoringCompanyIdIdx")
+  @@index([bsddId], map: "_BsddRevisionRequestBsddIdIdx")
 }
 
 enum RevisionRequestApprovalStatus {
@@ -413,6 +416,9 @@ model BsddRevisionRequestApproval {
 
   status  RevisionRequestApprovalStatus @default(PENDING)
   comment String?
+
+  @@index([revisionRequestId], map: "_BsddRevisionRequestApprovalRevisionRequestIdIdx")
+  @@index([approverSiret], map: "_BsddRevisionRequestApprovalApproverSiretIdx")
 }
 
 model Grant {
