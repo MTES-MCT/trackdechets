@@ -91,7 +91,11 @@ describe("Mutation.createFormRevisionRequest", () => {
       CREATE_FORM_REVISION_REQUEST,
       {
         variables: {
-          input: { bsddId: bsdd.id, content: {}, comment: "A comment" }
+          input: {
+            bsddId: bsdd.id,
+            content: { wasteDetails: { code: "01 03 08" } },
+            comment: "A comment"
+          }
         }
       }
     );
@@ -118,7 +122,11 @@ describe("Mutation.createFormRevisionRequest", () => {
       CREATE_FORM_REVISION_REQUEST,
       {
         variables: {
-          input: { bsddId: bsdd.id, content: {}, comment: "A comment" }
+          input: {
+            bsddId: bsdd.id,
+            content: { wasteDetails: { code: "01 03 08" } },
+            comment: "A comment"
+          }
         }
       }
     );
