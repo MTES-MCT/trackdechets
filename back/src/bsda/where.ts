@@ -38,7 +38,8 @@ function toPrismaBsdaWhereInput(where: BsdaWhere): Prisma.BsdaWhereInput {
     ),
     destinationOperationSignatureDate: toPrismaDateFilter(
       where.destination?.operation?.signature?.date
-    )
+    ),
+    brokerCompanySiret: toPrismaStringFilter(where.broker?.company?.siret)
   });
 }
 

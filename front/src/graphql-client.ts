@@ -4,7 +4,7 @@ import {
   ApolloLink,
   createHttpLink,
 } from "@apollo/client";
-
+import { onError } from "@apollo/client/link/error";
 /**
  * Automatically erase `__typename` from variables
  * This enable devs to use objects fetched from the server
@@ -20,6 +20,22 @@ const cleanTypeNameLink = new ApolloLink((operation, forward) => {
     );
   }
   return forward(operation);
+});
+
+/**
+ * Handles any GraphQL errors or network error that occurred
+ */
+const errorLink = onError(({ response, graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    for (let err of graphQLErrors) {
+      if (err.extensions?.code === "UNAUTHENTICATED") {
+        // when AuthenticationError thrown
+        // modify the response context to ignore the error
+        // cf. https://www.apollographql.com/docs/react/data/error-handling/#ignoring-errors
+        response!.errors = undefined;
+      }
+    }
+  }
 });
 
 const httpLink = createHttpLink({
@@ -48,6 +64,6 @@ export default new ApolloClient({
       },
     },
   }),
-  link: ApolloLink.from([cleanTypeNameLink, httpLink]),
+  link: ApolloLink.from([errorLink, cleanTypeNameLink, httpLink]),
   name: "trackdechets-front",
 });

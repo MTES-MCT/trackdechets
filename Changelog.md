@@ -16,6 +16,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
     - `transportedWastes` : registre déchets collectés
     - `managedWastes` : registre déchets gérés
 #### :bug: Corrections de bugs
+
+- Correctif de l'affichage du type de quantité dans l'UI du BSDD [PR 1102](https://github.com/MTES-MCT/trackdechets/pull/1102)
+
 #### :boom: Breaking changes
 
 - Dépréciation de la query `formsRegister` au profit de la query `wastesDownloadLink`.
@@ -33,6 +36,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 #### :bug: Corrections de bugs
+
+- Ajout du courtier à la liste des acteurs pouvant lister ses bsdas [PR 1103](https://github.com/MTES-MCT/trackdechets/pull/1103)
 
 #### :boom: Breaking changes
 

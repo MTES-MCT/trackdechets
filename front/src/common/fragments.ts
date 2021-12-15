@@ -50,6 +50,7 @@ export const wasteDetailsFragment = gql`
       quantity
     }
     quantity
+    quantityType
     consistence
     pop
   }
