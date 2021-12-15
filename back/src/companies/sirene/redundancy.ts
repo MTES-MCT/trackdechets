@@ -1,5 +1,4 @@
 import type { AsyncReturnType } from "type-fest";
-import { captureException } from "@sentry/node";
 
 /**
  * Loop over the functions until one of them returns a result
@@ -15,8 +14,6 @@ export function redundant<F extends (...args: any[]) => any>(...fns: F[]) {
       } catch (error) {
         if (firstError == null) {
           firstError = error;
-        } else {
-          captureException(error);
         }
       }
     }
