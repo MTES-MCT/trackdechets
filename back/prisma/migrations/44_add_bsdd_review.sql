@@ -7,7 +7,7 @@ CREATE TABLE "default$default"."BsddRevisionRequest" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "bsddId" TEXT NOT NULL,
-    "authorId" TEXT NOT NULL,
+    "authoringCompanyId" TEXT NOT NULL,
     "comment" TEXT NOT NULL,
     "status" "default$default"."RevisionRequestStatus" DEFAULT E'PENDING',
 
@@ -55,7 +55,7 @@ CREATE TABLE "default$default"."BsddRevisionRequestApproval" (
 );
 
 -- AddForeignKey
-ALTER TABLE "default$default"."BsddRevisionRequest" ADD FOREIGN KEY ("authorId") REFERENCES "default$default"."Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "default$default"."BsddRevisionRequest" ADD FOREIGN KEY ("authoringCompanyId") REFERENCES "default$default"."Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "default$default"."BsddRevisionRequest" ADD FOREIGN KEY ("bsddId") REFERENCES "default$default"."Form"("id") ON DELETE CASCADE ON UPDATE CASCADE;
