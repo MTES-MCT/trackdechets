@@ -155,8 +155,8 @@ module.exports = {
     [
       "docusaurus-graphql-plugin",
       {
-        id: "registre",
-        schema: "../back/src/{scalars,common,register}/typeDefs/*.graphql",
+        id: "registry",
+        schema: "../back/src/{scalars,common,registry}/typeDefs/*.graphql",
         routeBasePath: "/reference/api-reference/registre",
       },
     ],
