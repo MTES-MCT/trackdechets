@@ -1,0 +1,18 @@
+"""
+URL de téléchargement accompagné d'un token
+permettant de valider le téléchargement.
+"""
+type FileDownload {
+  "Token ayant une durée de validité de 10s"
+  token: String
+
+  "Lien de téléchargement"
+  downloadLink: String
+}
+
+type PageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}

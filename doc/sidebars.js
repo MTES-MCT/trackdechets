@@ -24,6 +24,7 @@ const referenceDefs = [
   { id: "bsff", label: "Fluides Frigorigènes" },
   { id: "bsda", label: "Amiante" },
   { id: "user-company", label: "Utilisateurs et Établissements" },
+  { id: "registre", label: "Registre" },
 ];
 
 const apiReference = referenceDefs.map(({ id, label }) => ({

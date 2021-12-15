@@ -1,0 +1,30 @@
+"Filtre de date"
+input DateFilter {
+  _gte: DateTime
+  _gt: DateTime
+  _lte: DateTime
+  _lt: DateTime
+  _eq: DateTime
+}
+
+"Filtre pour les valeurs numériques"
+input NumericFilter {
+  _gte: Float
+  _gt: Float
+  _lte: Float
+  _lt: Float
+  _eq: Float
+}
+
+"Filtre pour les identifiants"
+input IdFilter {
+  _eq: ID
+  _in: [ID!]
+}
+
+"Filtre pour les champs textuelles"
+input StringFilter {
+  _eq: String
+  _in: [String!]
+  _contains: String
+}

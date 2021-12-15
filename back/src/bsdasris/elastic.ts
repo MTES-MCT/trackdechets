@@ -4,6 +4,7 @@ import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 
 import { DASRI_WASTE_CODES_MAPPING } from "../common/constants/DASRI_CONSTANTS";
 import { GraphQLContext } from "../types";
+import { getRegistryFields } from "./registry";
 
 // | state              | emitter | transporter | recipient |
 // |--------------------|---------|-------------|-----------|
@@ -103,12 +104,6 @@ function getWhere(
   return where;
 }
 
-function getWaste(bsdasri: Bsdasri) {
-  return [bsdasri.wasteCode, DASRI_WASTE_CODES_MAPPING[bsdasri.wasteCode]]
-    .filter(Boolean)
-    .join(" ");
-}
-
 /**
  * Convert a dasri from the bsdasri table to Elastic Search's BSD model.
  */
@@ -119,13 +114,24 @@ function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
     id: bsdasri.id,
     readableId: bsdasri.id,
     type: "BSDASRI",
-    emitter: bsdasri.emitterCompanyName ?? "",
-    recipient: bsdasri.destinationCompanyName ?? "",
+    emitterCompanyName: bsdasri.emitterCompanyName ?? "",
+    emitterCompanySiret: bsdasri.emitterCompanySiret ?? "",
+    transporterCompanyName: bsdasri.transporterCompanyName ?? "",
+    transporterCompanySiret: bsdasri.transporterCompanySiret ?? "",
+    transporterTakenOverAt: bsdasri.transporterTakenOverAt?.getTime(),
+    destinationCompanyName: bsdasri.destinationCompanyName ?? "",
+    destinationCompanySiret: bsdasri.destinationCompanySiret ?? "",
+    destinationReceptionDate: bsdasri.destinationReceptionDate?.getTime(),
+    destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue,
+    destinationOperationCode: bsdasri.destinationOperationCode ?? "",
+    destinationOperationDate: bsdasri.destinationOperationDate?.getTime(),
+    wasteCode: bsdasri.wasteCode ?? "",
+    wasteDescription: DASRI_WASTE_CODES_MAPPING[bsdasri.wasteCode],
     transporterNumberPlate: bsdasri.transporterTransportPlates,
-    waste: getWaste(bsdasri),
     createdAt: bsdasri.createdAt.getTime(),
     ...where,
-    sirets: Object.values(where).flat()
+    sirets: Object.values(where).flat(),
+    ...getRegistryFields(bsdasri)
   };
 }
 
@@ -136,7 +142,7 @@ export async function indexAllBsdasris(
   idx: string,
   { skip = 0 }: { skip?: number } = {}
 ) {
-  const take = 1000;
+  const take = 500;
   const bsdasris = await prisma.bsdasri.findMany({
     skip,
     take,

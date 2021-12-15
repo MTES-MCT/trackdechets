@@ -539,6 +539,8 @@ model User {
   firstAssociationDate DateTime? // when was this user first associated to any company ? - emailing purpose
   isActive             Boolean?             @default(false)
   isAdmin              Boolean?             @default(false)
+  // compte de service avec des droits étendus
+  isRegistreNational   Boolean?             @default(false)
   applicationId        String?
   application          Application?         @relation(fields: [applicationId], references: [id])
   companyAssociations  CompanyAssociation[]

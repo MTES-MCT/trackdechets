@@ -54,7 +54,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
     }),
     quantity: form.quantity,
     weight: nullIfNoValues<BsvhuWeight>({
-      value: form.weightValue,
+      value: form.weightValue ? form.weightValue / 1000 : form.weightValue,
       isEstimate: form.weightIsEstimate
     }),
     destination: nullIfNoValues<BsvhuDestination>({
@@ -76,7 +76,9 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
           numbers: form.destinationReceptionIdentificationNumbers,
           type: form.destinationReceptionIdentificationType
         }),
-        weight: form.destinationReceptionWeight,
+        weight: form.destinationReceptionWeight
+          ? form.destinationReceptionWeight / 1000
+          : form.destinationReceptionWeight,
         refusalReason: form.destinationReceptionRefusalReason
       }),
       operation: nullIfNoValues<BsvhuOperation>({
@@ -189,7 +191,7 @@ function flattenVhuDestinationInput({
       chain(d.reception, r => r.quantity)
     ),
     destinationReceptionWeight: chain(destination, d =>
-      chain(d.reception, r => r.weight)
+      chain(d.reception, r => r.weight * 1000)
     ),
     destinationReceptionIdentificationNumbers: chain(destination, d =>
       chain(d.reception, r => chain(r.identification, i => i.numbers))
@@ -298,7 +300,7 @@ function flattenVhuIdentificationInput({
 
 function flattenVhuWeightInput({ weight }: Pick<BsvhuInput, "weight">) {
   return {
-    weightValue: chain(weight, q => q.value),
+    weightValue: chain(weight, q => q.value * 1000),
     weightIsEstimate: chain(weight, q => q.isEstimate)
   };
 }

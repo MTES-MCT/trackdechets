@@ -2,6 +2,7 @@ import { BsvhuStatus, Bsvhu } from "@prisma/client";
 import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 import { GraphQLContext } from "../types";
+import { getRegistryFields } from "./registry";
 
 // | state              | emitter | transporter | destination |
 // |--------------------|---------|-------------|-------------|
@@ -96,10 +97,6 @@ function getWhere(
   return where;
 }
 
-function getWaste(bsvhu: Bsvhu) {
-  return [bsvhu.wasteCode].filter(Boolean).join(" ");
-}
-
 /**
  * Convert a dasri from the bsvhu table to Elastic Search's BSD model.
  */
@@ -107,15 +104,26 @@ function toBsdElastic(bsvhu: Bsvhu): BsdElastic {
   const where = getWhere(bsvhu);
 
   return {
+    type: "BSVHU",
     id: bsvhu.id,
     readableId: bsvhu.id,
-    type: "BSVHU",
-    emitter: bsvhu.emitterCompanyName ?? "",
-    recipient: bsvhu.destinationCompanyName ?? "",
-    waste: getWaste(bsvhu),
     createdAt: bsvhu.createdAt.getTime(),
+    emitterCompanyName: bsvhu.emitterCompanyName ?? "",
+    emitterCompanySiret: bsvhu.emitterCompanySiret ?? "",
+    transporterCompanyName: bsvhu.transporterCompanyName ?? "",
+    transporterCompanySiret: bsvhu.transporterCompanySiret ?? "",
+    transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt?.getTime(),
+    destinationCompanyName: bsvhu.destinationCompanyName ?? "",
+    destinationCompanySiret: bsvhu.destinationCompanySiret ?? "",
+    destinationReceptionDate: bsvhu.destinationReceptionDate?.getTime(),
+    destinationReceptionWeight: bsvhu.destinationReceptionWeight,
+    destinationOperationCode: bsvhu.destinationOperationCode ?? "",
+    destinationOperationDate: bsvhu.destinationOperationDate?.getTime(),
+    wasteCode: bsvhu.wasteCode ?? "",
+    wasteDescription: "",
     ...where,
-    sirets: Object.values(where).flat()
+    sirets: Object.values(where).flat(),
+    ...getRegistryFields(bsvhu)
   };
 }
 
@@ -126,7 +134,7 @@ export async function indexAllBsvhus(
   idx: string,
   { skip = 0 }: { skip?: number } = {}
 ) {
-  const take = 1000;
+  const take = 500;
   const bsvhus = await prisma.bsvhu.findMany({
     skip,
     take,

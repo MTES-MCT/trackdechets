@@ -39,7 +39,7 @@ type Bsda {
   waste: BsdaWaste
   "Conditionnement"
   packagings: [BsdaPackaging!]
-  "Poids"
+  "Quantité en tonnes"
   weight: BsdaWeight
 
   "Installation de destination"
@@ -91,7 +91,7 @@ type InitialBsda {
   """
   waste: BsdaWaste
   """
-  Quantité totale du déchet en kilogrammes, il peut s'agir d'une estimation.
+  Quantité totale du déchet en tonnes, il peut s'agir d'une estimation.
   """
   weight: BsdaWeight
   """
@@ -161,7 +161,7 @@ type BsdaPackaging {
 }
 
 type BsdaWeight {
-  "Type de quantité (réelle ou estimé)"
+  "Type de quantité (réelle ou estimée)"
   isEstimate: Boolean
   "Quantité en tonne"
   value: Float
