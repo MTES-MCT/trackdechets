@@ -155,10 +155,10 @@ async function getFlatContent(
   bsdd: Form
 ): Promise<RevisionRequestContent> {
   const flatContent = flattenBsddRevisionRequestInput(content);
-  
+
   if (Object.keys(flatContent).length === 0) {
     throw new UserInputError(
-      "Impossible créer une révision sans modifications."
+      "Impossible de créer une révision sans modifications."
     );
   }
 
