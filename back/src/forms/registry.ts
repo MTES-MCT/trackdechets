@@ -153,15 +153,18 @@ export function toIncomingWastes(
     // BSDDs, one from the emitter to the TTR and one from the TTR to the final destination
     const incomingWastes: IncomingWaste[] = [];
 
-    if (sirets.includes(bsdd.destinationCompanySiret)) {
-      // add a record only if TTR is present in the sirets
-      incomingWastes.push(toIncomingWaste(bsdd));
-    }
     if (sirets.includes(bsdd.forwarding.destinationCompanySiret)) {
-      // add a record only if final destination is present in the sirets
+      // add a record only if TTR is present in the sirets
       incomingWastes.push(
         toIncomingWaste({ ...bsdd.forwarding, forwarding: null })
       );
+    }
+    if (
+      bsdd.destinationReceptionSignatureDate &&
+      sirets.includes(bsdd.destinationCompanySiret)
+    ) {
+      // add a record only if final destination is present in the sirets
+      incomingWastes.push(toIncomingWaste(bsdd));
     }
     return incomingWastes;
   }
@@ -238,15 +241,18 @@ export function toOutgoingWastes(
     // BSDDs, one from the emitter to the TTR and one from the TTR to the final destination
     const outgoingWastes: OutgoingWaste[] = [];
 
-    if (sirets.includes(bsdd.emitterCompanySiret)) {
-      // add a record only if emitter is present in the sirets
-      outgoingWastes.push(toOutgoingWaste(bsdd));
-    }
     if (sirets.includes(bsdd.forwarding.emitterCompanySiret)) {
-      // add a record only if TTR is present in the sirets
+      // add a record only if initial emitter is present in the sirets
       outgoingWastes.push(
         toOutgoingWaste({ ...bsdd.forwarding, forwarding: null })
       );
+    }
+    if (
+      bsdd.transporterTransportSignatureDate &&
+      sirets.includes(bsdd.emitterCompanySiret)
+    ) {
+      // add a record only if TTR is present in the sirets
+      outgoingWastes.push(toOutgoingWaste(bsdd));
     }
     return outgoingWastes;
   }
@@ -316,20 +322,24 @@ export function toTransportedWastes(
   const bsdd = formToBsdd(form);
 
   if (bsdd.forwarding) {
-    // In case of temporary storage, a form can be flagged as outgoing waste
-    // either for the emitter or for the TTR. Here we compute two "virtual"
-    // BSDDs, one from the emitter to the TTR and one from the TTR to the final destination
+    // In case of temporary storage, a form can be flagged as trasnported waste
+    // either for the first trasnporter or for the transporter after temp storage.
+    // Here we compute two "virtual" BSDDs, one from the emitter to the TTR and
+    // one from the TTR to the final destination
     const transportedWastes: TransportedWaste[] = [];
 
-    if (sirets.includes(bsdd.transporterCompanySiret)) {
-      // add a record only if initial transporter is present in the sirets
-      transportedWastes.push(toTransportedWaste(bsdd));
-    }
     if (sirets.includes(bsdd.forwarding.transporterCompanySiret)) {
-      // add a record only if second transporter is present in the sirets
+      // add a record only if first transporter is present in the sirets
       transportedWastes.push(
         toTransportedWaste({ ...bsdd.forwarding, forwarding: null })
       );
+    }
+    if (
+      bsdd.transporterTransportSignatureDate &&
+      sirets.includes(bsdd.transporterCompanySiret)
+    ) {
+      // add a record only if second transporter is present in the sirets
+      transportedWastes.push(toTransportedWaste(bsdd));
     }
     return transportedWastes;
   }

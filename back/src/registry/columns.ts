@@ -31,6 +31,16 @@ const formatArray = (arr: any[]) => (Array.isArray(arr) ? arr.join(",") : "");
 const columns: Column[] = [
   // Dénomination, nature et quantité :
   { field: "id", label: "N° de bordereau" },
+  {
+    field: "transporterTakenOverAt",
+    label: "Date d'enlèvement",
+    format: formatDate
+  },
+  {
+    field: "destinationReceptionDate",
+    label: "Date de réception",
+    format: formatDate
+  },
   { field: "bsdType", label: "Type de bordereau" },
   { field: "customId", label: "Identifiant secondaire" },
   { field: "status", label: "Statut du bordereau" },
@@ -98,11 +108,7 @@ const columns: Column[] = [
     format: formatArray
   },
   { field: "transporterCompanyMail", label: "Transporteur contact" },
-  {
-    field: "transporterTakenOverAt",
-    label: "Date d'enlèvement",
-    format: formatDate
-  },
+
   { field: "wasteAdr", label: "ADR" },
   // Destination du déchet
   {
@@ -113,11 +119,6 @@ const columns: Column[] = [
   { field: "destinationCompanyName", label: "Destination raison sociale" },
   { field: "destinationCompanySiret", label: "Destination SIRET" },
   { field: "destinationCompanyAddress", label: "Destination adresse" },
-  {
-    field: "destinationReceptionDate",
-    label: "Date de réception",
-    format: formatDate
-  },
   {
     field: "destinationReceptionAcceptationStatus",
     label: "Statut d'acceptation du déchet"
