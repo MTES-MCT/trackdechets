@@ -6,6 +6,7 @@ import {
   companyAssociatedToExistingUserFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { BSDA_CONTRIBUTORS_FIELDS } from "../../../permissions";
 import { bsdaFactory } from "../../../__tests__/factories";
 
 const GET_BSDAS = `
@@ -87,31 +88,38 @@ describe("Query.bsdas", () => {
     expect(data.bsdas.edges.length).toBe(2);
   });
 
-  it.each(["emitter", "worker", "transporter", "destination"])(
+  it("should list all of user's bsdas", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const fields = Object.values(BSDA_CONTRIBUTORS_FIELDS);
+    for (const field of fields) {
+      await bsdaFactory({
+        opt: {
+          [field]: company.siret
+        }
+      });
+    }
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsdas">, QueryBsdasArgs>(
+      GET_BSDAS
+    );
+
+    expect(data.bsdas.edges.length).toBe(fields.length);
+  });
+
+  it.each(Object.keys(BSDA_CONTRIBUTORS_FIELDS))(
     "should filter bsdas where user appears as %s",
     async role => {
       const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
 
-      await bsdaFactory({
-        opt: {
-          emitterCompanySiret: company.siret
-        }
-      });
-      await bsdaFactory({
-        opt: {
-          workerCompanySiret: company.siret
-        }
-      });
-      await bsdaFactory({
-        opt: {
-          transporterCompanySiret: company.siret
-        }
-      });
-      await bsdaFactory({
-        opt: {
-          destinationCompanySiret: company.siret
-        }
-      });
+      for (const field of Object.values(BSDA_CONTRIBUTORS_FIELDS)) {
+        await bsdaFactory({
+          opt: {
+            [field]: company.siret
+          }
+        });
+      }
 
       const { query } = makeClient(user);
       const { data } = await query<Pick<Query, "bsdas">, QueryBsdasArgs>(
