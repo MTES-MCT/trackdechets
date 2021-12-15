@@ -24,11 +24,14 @@ export function RevisionField({
   if (!formattedReviewValue) return null;
 
   return (
-    <div className="tw-flex tw-flex-wrap tw-py-2 tw-border-t-2">
-      <p className="tw-w-1/4 tw-font-bold">Ancien {label} :</p>
-      <p className="tw-w-3/4">{formattedBsddValue ?? "Aucune valeur"}</p>
-      <p className="tw-w-1/4 tw-font-bold">Nouveau {label} :</p>
-      <p className="tw-w-3/4">{formattedReviewValue}</p>
+    <div className="tw-py-2 tw-border-t-2">
+      <h3 className="tw-font-bold">{label}</h3>
+      <div className="tw-flex tw-flex-wrap">
+        <p className="tw-w-1/4 tw-italic">Ancienne valeur</p>
+        <p className="tw-w-3/4">{formattedBsddValue ?? "Aucune valeur"}</p>
+        <p className="tw-w-1/4 tw-italic">Nouvelle valeur</p>
+        <p className="tw-w-3/4">{formattedReviewValue}</p>
+      </div>
     </div>
   );
 }

@@ -103,7 +103,7 @@ export function removeEmptyKeys<T>(obj: Object): Partial<T> | undefined {
       const value =
         typeof obj[key] === "object" ? removeEmptyKeys(obj[key]) : obj[key];
 
-      if (value) cleanedObj[key] = obj[key];
+      if (value) cleanedObj[key] = value;
       return cleanedObj;
     }, {});
 

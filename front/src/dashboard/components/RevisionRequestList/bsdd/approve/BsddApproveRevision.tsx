@@ -28,7 +28,7 @@ export function BsddApproveRevision({ review }: Props) {
   >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL);
 
   if (
-    siret === review.author.siret ||
+    siret === review.authoringCompany.siret ||
     review.status !== RevisionRequestStatus.Pending
   ) {
     return null;
@@ -45,8 +45,8 @@ export function BsddApproveRevision({ review }: Props) {
       modalContent={close => (
         <div>
           <p className="tw-pb-6">
-            L'entreprise <strong>{review.author.name}</strong> propose les
-            révisions suivantes pour le bordereau{" "}
+            L'entreprise <strong>{review.authoringCompany.name}</strong> propose
+            les révisions suivantes pour le bordereau{" "}
             <strong>#{review.bsdd.readableId}</strong>
           </p>
 
@@ -56,7 +56,7 @@ export function BsddApproveRevision({ review }: Props) {
           </div>
 
           <RevisionField
-            label="code déchet"
+            label="Code déchet"
             bsddValue={review.bsdd.wasteDetails?.code}
             reviewValue={review.content.wasteDetails?.code}
           />
@@ -65,6 +65,7 @@ export function BsddApproveRevision({ review }: Props) {
             label="POP"
             bsddValue={review.bsdd.wasteDetails?.pop}
             reviewValue={review.content.wasteDetails?.pop}
+            formatter={booleanFormatter}
           />
 
           <RevisionField
@@ -74,29 +75,29 @@ export function BsddApproveRevision({ review }: Props) {
           />
 
           <RevisionField
-            label="quantité reçue"
+            label="Poids reçu"
             bsddValue={review.bsdd.quantityReceived}
             reviewValue={review.content.quantityReceived}
           />
 
           <RevisionField
-            label="opération réalisée"
+            label="Opération réalisée"
             bsddValue={review.bsdd.processingOperationDone}
             reviewValue={review.content.processingOperationDone}
           />
 
           <RevisionField
-            label="courtier"
+            label="Courtier"
             bsddValue={review.bsdd.broker}
             reviewValue={review.content.broker}
-            formatter={customFormatter}
+            formatter={traderAndBrokerFormatter}
           />
 
           <RevisionField
-            label="négociant"
+            label="Négociant"
             bsddValue={review.bsdd.trader}
             reviewValue={review.content.trader}
-            formatter={customFormatter}
+            formatter={traderAndBrokerFormatter}
           />
 
           <div className="form__actions">
@@ -134,7 +135,9 @@ export function BsddApproveRevision({ review }: Props) {
   );
 }
 
-function customFormatter(entity: Trader | Broker | undefined): React.ReactNode {
+function traderAndBrokerFormatter(
+  entity: Trader | Broker | undefined
+): React.ReactNode {
   if (!entity?.company?.name) return null;
 
   return (
@@ -149,4 +152,10 @@ function customFormatter(entity: Trader | Broker | undefined): React.ReactNode {
       </div>
     </>
   );
+}
+
+function booleanFormatter(entity: boolean | undefined): React.ReactNode {
+  if (!entity) return null;
+
+  return entity ? "Oui" : "Non";
 }

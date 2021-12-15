@@ -7,7 +7,7 @@ const reviewFragment = gql`
     bsdd {
       id
     }
-    author {
+    authoringCompany {
       siret
       name
     }
@@ -36,15 +36,21 @@ const reviewFragment = gql`
         department
         validityLimit
       }
-      recipient {
+      destination {
         cap
+        reception {
+          weight
+        }
+        operation {
+          code
+        }
       }
-      quantityReceived
-      processingOperationDone
       temporaryStorageDetail {
         destination {
           cap
-          processingOperation
+          operation {
+            code
+          }
         }
       }
     }
