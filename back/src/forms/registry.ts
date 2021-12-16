@@ -116,6 +116,9 @@ export function toIncomingWaste(
 
   return {
     ...genericWaste,
+    destinationCompanyName: bsdd.destinationCompanyName,
+    destinationCompanySiret: bsdd.destinationCompanySiret,
+    destinationCompanyAddress: bsdd.destinationCompanyAddress,
     destinationReceptionDate: bsdd.destinationReceptionDate,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
     emitterCompanyName: bsdd.emitterCompanyName,
@@ -209,6 +212,8 @@ export function toOutgoingWaste(
     destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
+    emitterCompanyName: bsdd.emitterCompanyName,
+    emitterCompanySiret: bsdd.emitterCompanySiret,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterPickupsiteAddress: bsdd.emitterPickupSiteAddress,
     ...initialEmitter,
@@ -292,6 +297,9 @@ export function toTransportedWaste(
     transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
     destinationReceptionDate: bsdd.destinationReceptionDate,
     weight: bsdd.weightValue,
+    transporterCompanyName: bsdd.transporterCompanyName,
+    transporterCompanySiret: bsdd.transporterCompanySiret,
+    transporterCompanyAddress: bsdd.transporterCompanyAddress,
     transporterNumberPlates: bsdd.transporterNumberPlates,
     ...initialEmitter,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
@@ -376,6 +384,12 @@ export function toManagedWaste(
 
   return {
     ...genericWaste,
+    managedStartDate: null,
+    managedEndDate: null,
+    traderCompanyName: bsdd.traderCompanyName,
+    traderCompanySiret: bsdd.traderCompanySiret,
+    brokerCompanyName: null,
+    brokerCompanySiret: null,
     destinationCompanyAddress: bsdd.destinationCompanyAddress,
     destinationCompanyName: bsdd.destinationCompanyName,
     destinationCompanySiret: bsdd.destinationCompanySiret,
@@ -441,6 +455,9 @@ export function toAllWaste(
 
   return {
     ...genericWaste,
+    createdAt: bsdd.createdAt,
+    transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
+    destinationReceptionDate: bsdd.destinationReceptionDate,
     brokerCompanyName: bsdd.brokerCompanyName,
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,

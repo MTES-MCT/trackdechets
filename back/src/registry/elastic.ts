@@ -49,6 +49,7 @@ export async function searchBsds(
   where: WasteRegistryWhere,
   { size, sort, search_after }: ElasticPaginationArgs
 ): Promise<SearchHitsMetadata<BsdElastic>> {
+  const sortKey = Object.keys(sort[0])[0];
   const query = buildQuery(registryType, sirets, where);
 
   const { body } = await client.search({
@@ -59,7 +60,15 @@ export async function searchBsds(
         // Take one more result to know if there's a next page
         // it's removed from the actual results though
         1,
-      query,
+      query: {
+        bool: {
+          ...query.bool,
+          // make sure ordering is consistent by filtering out possible null value on sort key
+          must: {
+            exists: { field: sortKey }
+          }
+        }
+      },
       sort,
       search_after
     }
