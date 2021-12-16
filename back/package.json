@@ -87,6 +87,7 @@
     "minimist": "^1.2.5",
     "mustache": "^4.2.0",
     "node-mailjet": "^3.3.1",
+    "node-stream-zip": "^1.15.0",
     "oauth2orize": "^1.11.0",
     "object.omit": "^3.0.0",
     "passport": "^0.5.0",
