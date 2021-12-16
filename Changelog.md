@@ -25,6 +25,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Remplacement du CERFA BSDD par un récépissé reprenant l'ensemble des évolutions Trackdéchets [PR 1096](https://github.com/MTES-MCT/trackdechets/pull/1096)
+- Ajout d'exemples de workflows pour la création de bordereaux amiante [PR 1098](https://github.com/MTES-MCT/trackdechets/pull/1098)
+
 #### :memo: Documentation
 
 #### :house: Interne
