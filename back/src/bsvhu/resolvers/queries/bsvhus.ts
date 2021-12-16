@@ -1,3 +1,4 @@
+import { getPrismaPaginationArgs } from "../../../common/pagination";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { applyMask } from "../../../common/where";
 import { QueryBsvhusArgs } from "../../../generated/graphql/types";
@@ -5,24 +6,22 @@ import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { expandVhuFormFromDb } from "../../converter";
-import { getConnectionsArgs } from "../../pagination";
 import { toPrismaWhereInput } from "../../where";
 
 export default async function bsvhus(
   _,
-  { where: whereArgs, ...paginationArgs }: QueryBsvhusArgs,
+  { where: whereArgs, ...connectionArgs }: QueryBsvhusArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
 
   const defaultPaginateBy = 50;
-  const itemsPerPage =
-    paginationArgs.first ?? paginationArgs.last ?? defaultPaginateBy;
-  const connectionsArgs = await getConnectionsArgs({
-    ...paginationArgs,
+  const paginationArgs = getPrismaPaginationArgs({
+    ...connectionArgs,
     defaultPaginateBy,
     maxPaginateBy: 500
   });
+  const itemsPerPage = Math.abs(paginationArgs.take) - 1;
 
   const userCompanies = await getUserCompanies(user.id);
   const userSirets = userCompanies.map(c => c.siret);
@@ -44,7 +43,7 @@ export default async function bsvhus(
 
   const totalCount = await prisma.bsvhu.count({ where });
   const queriedForms = await prisma.bsvhu.findMany({
-    ...connectionsArgs,
+    ...paginationArgs,
     orderBy: { createdAt: "desc" },
     where
   });
@@ -58,10 +57,10 @@ export default async function bsvhus(
     pageInfo: {
       startCursor: edges[0]?.cursor,
       endCursor: edges[edges.length - 1]?.cursor,
-      hasNextPage: paginationArgs.after
+      hasNextPage: connectionArgs.after
         ? queriedForms.length > itemsPerPage
         : false,
-      hasPreviousPage: paginationArgs.before
+      hasPreviousPage: connectionArgs.before
         ? queriedForms.length > itemsPerPage
         : false
     }

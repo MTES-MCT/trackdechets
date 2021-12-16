@@ -3,27 +3,28 @@ import { QueryBsdasArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
-import { getConnectionsArgs } from "../../pagination";
 import { expandBsdaFromDb } from "../../converter";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { BSDA_CONTRIBUTORS_FIELDS } from "../../permissions";
+import { getPrismaPaginationArgs } from "../../../common/pagination";
 
 export default async function bsdas(
   _,
-  { where: whereArgs, ...paginationArgs }: QueryBsdasArgs,
+  { where: whereArgs, ...connectionArgs }: QueryBsdasArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
 
   const defaultPaginateBy = 50;
-  const itemsPerPage =
-    paginationArgs.first ?? paginationArgs.last ?? defaultPaginateBy;
-  const connectionsArgs = await getConnectionsArgs({
-    ...paginationArgs,
+
+  const paginationArgs = getPrismaPaginationArgs({
+    ...connectionArgs,
     defaultPaginateBy,
     maxPaginateBy: 500
   });
+
+  const itemsPerPage = Math.abs(paginationArgs.take) - 1;
 
   const userCompanies = await getUserCompanies(user.id);
   const userSirets = userCompanies.map(c => c.siret);
@@ -43,7 +44,7 @@ export default async function bsdas(
 
   const totalCount = await prisma.bsda.count({ where });
   const queriedForms = await prisma.bsda.findMany({
-    ...connectionsArgs,
+    ...paginationArgs,
     orderBy: { createdAt: "desc" },
     where
   });
@@ -57,10 +58,10 @@ export default async function bsdas(
     pageInfo: {
       startCursor: edges[0]?.cursor,
       endCursor: edges[edges.length - 1]?.cursor,
-      hasNextPage: paginationArgs.after
+      hasNextPage: connectionArgs.after
         ? queriedForms.length > itemsPerPage
         : false,
-      hasPreviousPage: paginationArgs.before
+      hasPreviousPage: connectionArgs.before
         ? queriedForms.length > itemsPerPage
         : false
     }

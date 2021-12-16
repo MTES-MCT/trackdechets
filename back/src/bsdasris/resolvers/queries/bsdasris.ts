@@ -1,29 +1,28 @@
 import { unflattenBsdasri } from "../../converter";
-
 import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
-
-import { getCursorConnectionsArgs } from "../../cursorPagination";
-
 import { GraphQLContext } from "../../../types";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { getUserCompanies } from "../../../users/database";
-
-const defaultPaginateBy = 50;
+import { getPrismaPaginationArgs } from "../../../common/pagination";
 
 export default async function dasris(_, args, context: GraphQLContext) {
   const user = checkIsAuthenticated(context);
 
-  const { where: whereArgs, ...paginationArgs } = args;
+  const { where: whereArgs, ...connectionsArgs } = args;
 
-  const itemsPerPage =
-    paginationArgs.first ?? paginationArgs.last ?? defaultPaginateBy;
-  const { requiredItems, ...connectionsArgs } = await getCursorConnectionsArgs({
-    ...paginationArgs,
-    defaultPaginateBy: itemsPerPage,
+  const paginationArgs = getPrismaPaginationArgs({
+    ...connectionsArgs,
+    defaultPaginateBy: 50,
     maxPaginateBy: 500
   });
+
+  const itemsPerPage = Math.abs(paginationArgs.take) - 1;
+
+  const requiredItems = Math.abs(
+    args.first || args.last || args.defaultPaginateBy
+  );
 
   const userCompanies = await getUserCompanies(user.id);
   const userSirets = userCompanies.map(c => c.siret);
@@ -44,23 +43,23 @@ export default async function dasris(_, args, context: GraphQLContext) {
   const where = applyMask(prismaWhere, mask);
 
   const queried = await prisma.bsdasri.findMany({
-    ...connectionsArgs,
+    ...paginationArgs,
     orderBy: { createdAt: "desc" },
     where
   });
   const totalCount = await prisma.bsdasri.count({ where });
   const queriedCount = queried.length;
 
-  const expanded = queried.map(f => unflattenBsdasri(f));
+  const expanded = queried.slice(0, itemsPerPage).map(f => unflattenBsdasri(f));
   const pageInfo = {
     startCursor: expanded[0]?.id || "",
     endCursor: expanded[queriedCount - 1]?.id || "",
     hasNextPage:
-      paginationArgs.after | paginationArgs.first
+      connectionsArgs.after | connectionsArgs.first
         ? queriedCount > requiredItems
         : false,
     hasPreviousPage:
-      paginationArgs.before | paginationArgs.last
+      connectionsArgs.before | connectionsArgs.last
         ? queriedCount > requiredItems
         : false
   };

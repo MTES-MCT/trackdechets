@@ -9,6 +9,7 @@ import { checkIsCompanyMember } from "../../../users/permissions";
 import { getFormsRightFilter } from "../../database";
 import { expandFormFromDb } from "../../form-converter";
 import { getConnectionsArgs } from "../../pagination";
+import { getPrismaPaginationArgs } from "../../../common/pagination";
 
 const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
   const user = checkIsAuthenticated(context);
@@ -38,16 +39,21 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
     company = userCompanies[0];
   }
 
-  // validate pagination arguments (skip, first, last, cursorAfter, cursorBefore)
-  // and convert them to prisma connections args: (skip, first, last, after, before)
-  const connectionsArgs = getConnectionsArgs({
-    ...rest,
+  const connectionArgs = {
+    first: rest.first,
+    after: rest.cursorAfter,
+    last: rest.last,
+    before: rest.cursorBefore
+  };
+
+  const paginationArgs = getPrismaPaginationArgs({
+    ...connectionArgs,
     defaultPaginateBy: 50,
     maxPaginateBy: 500
   });
 
   const queriedForms = await prisma.form.findMany({
-    ...connectionsArgs,
+    ...paginationArgs,
     orderBy: { createdAt: "desc" },
     where: {
       ...(rest.updatedAfter && {
@@ -67,7 +73,9 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
     }
   });
 
-  return queriedForms.map(f => expandFormFromDb(f));
+  return queriedForms
+    .slice(0, Math.abs(paginationArgs.take) - 1)
+    .map(f => expandFormFromDb(f));
 };
 
 function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {

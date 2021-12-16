@@ -2,10 +2,10 @@ import prisma from "../../../prisma";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { unflattenBsff } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getConnectionsArgs } from "../../pagination";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { getUserCompanies } from "../../../users/database";
+import { getPrismaPaginationArgs } from "../../../common/pagination";
 
 const bsffs: QueryResolvers["bsffs"] = async (_, args, context) => {
   const user = checkIsAuthenticated(context);
@@ -29,7 +29,7 @@ const bsffs: QueryResolvers["bsffs"] = async (_, args, context) => {
   const where = applyMask(prismaWhere, mask);
 
   const totalCount = await prisma.bsff.count({ where });
-  const paginationArgs = await getConnectionsArgs({
+  const paginationArgs = getPrismaPaginationArgs({
     after: args.after,
     first: args.first,
     before: args.before,
