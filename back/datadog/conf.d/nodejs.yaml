@@ -2,7 +2,7 @@ init_config:
 instances:
 logs:
   - type: file
-    path: "/logs/app.log"
+    path: "/app/logs/app.log"
     service: nodejs
     source: nodejs
     sourcecategory: sourcecode
