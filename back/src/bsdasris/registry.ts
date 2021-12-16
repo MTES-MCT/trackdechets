@@ -92,6 +92,9 @@ export function toIncomingWaste(
 
   return {
     ...genericWaste,
+    destinationCompanyName: bsdasri.destinationCompanyName,
+    destinationCompanySiret: bsdasri.destinationCompanySiret,
+    destinationCompanyAddress: bsdasri.destinationCompanyAddress,
     destinationReceptionDate: bsdasri.destinationReceptionDate,
     destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
       ? bsdasri.destinationReceptionWasteWeightValue / 1000
@@ -156,6 +159,8 @@ export function toOutgoingWaste(
     destinationCompanySiret: bsdasri.destinationCompanySiret,
     destinationPlannedOperationCode: bsdasri.destinationOperationCode,
     destinationPlannedOperationMode: null,
+    emitterCompanyName: bsdasri.emitterCompanyName,
+    emitterCompanySiret: bsdasri.emitterCompanySiret,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterPickupsiteAddress: buildAddress([
       bsdasri.emitterPickupSiteName,
@@ -212,6 +217,9 @@ export function toTransportedWaste(
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue / 1000
       : bsdasri.emitterWasteWeightValue,
+    transporterCompanyName: bsdasri.transporterCompanyName,
+    transporterCompanySiret: bsdasri.transporterCompanySiret,
+    transporterCompanyAddress: bsdasri.transporterCompanyAddress,
     transporterNumberPlates: bsdasri.transporterTransportPlates,
     ...initialEmitter,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
@@ -268,6 +276,12 @@ export function toManagedWaste(
 
   return {
     ...genericWaste,
+    managedStartDate: null,
+    managedEndDate: null,
+    traderCompanyName: null,
+    traderCompanySiret: null,
+    brokerCompanyName: null,
+    brokerCompanySiret: null,
     destinationCompanyAddress: bsdasri.destinationCompanyAddress,
     destinationCompanyName: bsdasri.destinationCompanyName,
     destinationCompanySiret: bsdasri.destinationCompanySiret,

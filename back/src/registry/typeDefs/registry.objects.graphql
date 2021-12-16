@@ -94,6 +94,13 @@ type IncomingWaste {
   # d) Concernant l'opération de traitement effectuée par l'établissement :
   #########################################################################
 
+  "La raison sociale de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyName: String
+  "Le N°SIRET de l'établissement vers lequel le déchet est expédié"
+  destinationCompanySiret: String
+  "L'adresse de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyAddress: String
+
   "Le code du traitement qui va être opéré dans l'établissement selon les annexes I et II de la directive 2008/98/CE relative aux déchets"
   destinationOperationCode: String
 
@@ -192,6 +199,11 @@ type OutgoingWaste {
   #####################################
   # c) Concernant l'origine du déchet :
   #####################################
+
+  "La raison sociale de l'établissement expéditeur des déchets"
+  emitterCompanyName: String
+  "Le numéro SIRET de l'établissement expéditeur des déchets"
+  emitterCompanySiret: String
 
   "L'adresse de l'établissement"
   emitterCompanyAddress: String
@@ -358,6 +370,13 @@ type TransportedWaste {
   # c) Concernant le transport du déchet :
   ########################################
 
+  "La raison sociale du transporteur"
+  transporterCompanyName: String
+  "Le N°SIRET du transporteur"
+  transporterCompanySiret: String
+  "L'adresse du transporteur"
+  transporterCompanyAddress: String
+
   "Le numéro d'immatriculation du ou des véhicules transportant le déchet"
   transporterNumberPlates: [String!]
   """
@@ -492,8 +511,17 @@ type ManagedWaste {
   id: ID
 
   ################################################
-  # a) Concernant les dates de gestion du déchet :
+  # a) Concernant la gestion du déchet :
   ################################################
+
+  "La raison sociale du négociant si le déchet est géré par un courtier"
+  traderCompanyName: String
+  "Le N°SIRET du négociant si le déchet est géré par un négociant"
+  traderCompanySiret: String
+  "La raison sociale du courtier si le déchet est géré par un courtier"
+  brokerCompanyName: String
+  "Le N°SIRET du courtier si le déchet est géré par un courtier"
+  brokerCompanySiret: String
 
   "NON IMPLÉMENTÉ. La date d'acquisition du déchet par le négociant, ou la date de début de gestion du déchet par le courtier"
   managedStartDate: DateTime

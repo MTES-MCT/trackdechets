@@ -105,6 +105,9 @@ export function toIncomingWaste(
 
   return {
     ...genericWaste,
+    destinationCompanyName: bsff.destinationCompanyName,
+    destinationCompanySiret: bsff.destinationCompanySiret,
+    destinationCompanyAddress: bsff.destinationCompanyAddress,
     destinationReceptionDate: bsff.destinationReceptionDate,
     destinationReceptionWeight: bsff.destinationReceptionWeight
       ? bsff.destinationReceptionWeight / 1000
@@ -178,6 +181,8 @@ export function toOutgoingWaste(
     destinationCompanySiret: bsff.destinationCompanySiret,
     destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
+    emitterCompanyName: bsff.emitterCompanyName,
+    emitterCompanySiret: bsff.emitterCompanySiret,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterPickupsiteAddress: null,
     ...initialEmitter,
@@ -240,6 +245,9 @@ export function toTransportedWaste(
     transporterTakenOverAt: bsff.transporterTransportSignatureDate,
     destinationReceptionDate: bsff.destinationReceptionDate,
     weight: bsff.weightValue ? bsff.weightValue / 1000 : bsff.weightValue,
+    transporterCompanyName: bsff.transporterCompanyName,
+    transporterCompanySiret: bsff.transporterCompanySiret,
+    transporterCompanyAddress: bsff.transporterCompanyAddress,
     transporterNumberPlates: null,
     ...initialEmitter,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
@@ -305,6 +313,12 @@ export function toManagedWaste(
 
   return {
     ...genericWaste,
+    managedStartDate: null,
+    managedEndDate: null,
+    traderCompanyName: null,
+    traderCompanySiret: null,
+    brokerCompanyName: null,
+    brokerCompanySiret: null,
     destinationCompanyAddress: bsff.destinationCompanyAddress,
     destinationCompanyName: bsff.destinationCompanyName,
     destinationCompanySiret: bsff.destinationCompanySiret,

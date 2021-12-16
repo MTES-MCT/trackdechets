@@ -82,6 +82,9 @@ export function toIncomingWaste(bsvhu: Bsvhu): IncomingWaste {
 
   return {
     ...genericWaste,
+    destinationCompanyName: bsvhu.destinationCompanyName,
+    destinationCompanySiret: bsvhu.destinationCompanySiret,
+    destinationCompanyAddress: bsvhu.destinationCompanyAddress,
     destinationReceptionDate: bsvhu.destinationReceptionDate,
     destinationReceptionWeight: bsvhu.destinationReceptionWeight
       ? bsvhu.destinationReceptionWeight / 1000
@@ -133,6 +136,8 @@ export function toOutgoingWaste(bsvhu: Bsvhu): OutgoingWaste {
     destinationCompanySiret: bsvhu.destinationCompanySiret,
     destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
+    emitterCompanyName: bsvhu.emitterCompanyName,
+    emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
     emitterPickupsiteAddress: null,
     ...initialEmitter,
@@ -171,6 +176,9 @@ export function toTransportedWaste(bsvhu: Bsvhu): TransportedWaste {
     transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
     destinationReceptionDate: bsvhu.destinationReceptionDate,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
+    transporterCompanyName: bsvhu.transporterCompanyName,
+    transporterCompanySiret: bsvhu.transporterCompanySiret,
+    transporterCompanyAddress: bsvhu.transporterCompanyAddress,
     transporterNumberPlates: bsvhu.transporterTransportPlates,
     ...initialEmitter,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
@@ -214,6 +222,12 @@ export function toManagedWaste(bsvhu: Bsvhu): ManagedWaste {
 
   return {
     ...genericWaste,
+    managedStartDate: null,
+    managedEndDate: null,
+    traderCompanyName: null,
+    traderCompanySiret: null,
+    brokerCompanyName: null,
+    brokerCompanySiret: null,
     destinationCompanyAddress: bsvhu.destinationCompanyAddress,
     destinationCompanyName: bsvhu.destinationCompanyName,
     destinationCompanySiret: bsvhu.destinationCompanySiret,

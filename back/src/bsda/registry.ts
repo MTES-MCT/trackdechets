@@ -104,6 +104,9 @@ export function toIncomingWaste(
 
   return {
     ...genericWaste,
+    destinationCompanyName: bsda.destinationCompanyName,
+    destinationCompanySiret: bsda.destinationCompanySiret,
+    destinationCompanyAddress: bsda.destinationCompanyAddress,
     destinationReceptionDate: bsda.destinationReceptionDate,
     destinationReceptionWeight: bsda.destinationReceptionWeight
       ? bsda.destinationReceptionWeight / 1000
@@ -172,6 +175,8 @@ export function toOutgoingWaste(
     destinationCompanySiret: bsda.destinationCompanySiret,
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
+    emitterCompanyName: bsda.emitterCompanyName,
+    emitterCompanySiret: bsda.emitterCompanySiret,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterPickupsiteAddress: bsda.emitterPickupSiteAddress,
     ...initialEmitter,
@@ -228,6 +233,9 @@ export function toTransportedWaste(
     transporterTakenOverAt: bsda.transporterTransportTakenOverAt,
     destinationReceptionDate: bsda.destinationReceptionDate,
     weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
+    transporterCompanyName: bsda.transporterCompanyName,
+    transporterCompanySiret: bsda.transporterCompanySiret,
+    transporterCompanyAddress: bsda.transporterCompanyAddress,
     transporterNumberPlates: bsda.transporterTransportPlates,
     ...initialEmitter,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
@@ -284,6 +292,12 @@ export function toManagedWaste(
 
   return {
     ...genericWaste,
+    managedStartDate: null,
+    managedEndDate: null,
+    traderCompanyName: null,
+    traderCompanySiret: null,
+    brokerCompanyName: bsda.brokerCompanyName,
+    brokerCompanySiret: bsda.brokerCompanySiret,
     destinationCompanyAddress: bsda.destinationCompanyAddress,
     destinationCompanyName: bsda.destinationCompanyName,
     destinationCompanySiret: bsda.destinationCompanySiret,
