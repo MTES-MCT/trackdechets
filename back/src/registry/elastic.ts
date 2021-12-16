@@ -13,7 +13,6 @@ import { toElasticFilter } from "./where";
 export function buildQuery(
   registryType: WasteRegistryType,
   sirets: string[],
-  sortKey: string,
   where: WasteRegistryWhere
 ): QueryDslQueryContainer {
   const elasticKey: { [key in WasteRegistryType]: keyof BsdElastic } = {
@@ -26,10 +25,6 @@ export function buildQuery(
 
   return {
     bool: {
-      // make sure ordering is consistent by filtering out possible null value on sort key
-      must: {
-        exists: { field: sortKey }
-      },
       filter: [
         {
           terms: {
@@ -55,7 +50,7 @@ export async function searchBsds(
   { size, sort, search_after }: ElasticPaginationArgs
 ): Promise<SearchHitsMetadata<BsdElastic>> {
   const sortKey = Object.keys(sort[0])[0];
-  const query = buildQuery(registryType, sirets, sortKey, where);
+  const query = buildQuery(registryType, sirets, where);
 
   const { body } = await client.search({
     index: index.alias,
@@ -65,7 +60,15 @@ export async function searchBsds(
         // Take one more result to know if there's a next page
         // it's removed from the actual results though
         1,
-      query,
+      query: {
+        bool: {
+          ...query.bool,
+          // make sure ordering is consistent by filtering out possible null value on sort key
+          must: {
+            exists: { field: sortKey }
+          }
+        }
+      },
       sort,
       search_after
     }
