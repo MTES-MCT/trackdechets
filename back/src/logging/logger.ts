@@ -7,7 +7,7 @@ const logger = createLogger({
   format: format.combine(
     format.errors({ stack: true }),
     format.metadata(),
-    format.simple()
+    format.json()
   ),
   transports: [new transports.File({ filename: LOG_PATH })]
 });
