@@ -441,6 +441,9 @@ export function toAllWaste(
 
   return {
     ...genericWaste,
+    createdAt: bsdd.createdAt,
+    transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
+    destinationReceptionDate: bsdd.destinationReceptionDate,
     brokerCompanyName: bsdd.brokerCompanyName,
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,

@@ -32,8 +32,13 @@ const columns: Column[] = [
   // Dénomination, nature et quantité :
   { field: "id", label: "N° de bordereau" },
   {
+    field: "createdAt",
+    label: "Date de création du bordereau",
+    format: formatDate
+  },
+  {
     field: "transporterTakenOverAt",
-    label: "Date d'enlèvement",
+    label: "Date d'expédition",
     format: formatDate
   },
   {

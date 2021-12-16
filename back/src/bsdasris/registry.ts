@@ -322,6 +322,9 @@ export function toAllWaste(
 
   return {
     ...genericWaste,
+    createdAt: bsdasri.createdAt,
+    transporterTakenOverAt: bsdasri.transporterTakenOverAt,
+    destinationReceptionDate: bsdasri.destinationReceptionDate,
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,

@@ -369,6 +369,9 @@ export function toAllWaste(
 
   return {
     ...genericWaste,
+    createdAt: bsff.createdAt,
+    transporterTakenOverAt: bsff.transporterTransportTakenOverAt,
+    destinationReceptionDate: bsff.destinationReceptionDate,
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,

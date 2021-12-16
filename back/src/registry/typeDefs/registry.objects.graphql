@@ -649,8 +649,20 @@ type AllWaste {
   """
   id: ID
 
+  "Date de création du bordereau"
+  createdAt: DateTime
+
   ################################################
-  # a) Concernant les dates de gestion du déchet :
+  # Concernant les dates de transit du déchet :
+  ################################################
+
+  "La date d'enlèvement du déchet"
+  transporterTakenOverAt: DateTime
+  "La date de déchargement du déchet"
+  destinationReceptionDate: DateTime
+
+  ################################################
+  # Concernant les dates de gestion du déchet :
   ################################################
 
   "NON IMPLÉMENTÉ. La date d'acquisition du déchet par le négociant, ou la date de début de gestion du déchet par le courtier"
@@ -659,7 +671,7 @@ type AllWaste {
   managedEndDate: DateTime
 
   #####################################################
-  # b) Concernant la dénomination, nature et quantité :
+  # Concernant la dénomination, nature et quantité :
   #####################################################
 
   "Dénomination usuelle du déchet"
@@ -676,7 +688,7 @@ type AllWaste {
   pop: Boolean
 
   #################################################################
-  # c) Concernant l'origine, la gestion et le transport du déchet :
+  # Concernant l'origine, la gestion et le transport du déchet :
   #################################################################
 
   """
