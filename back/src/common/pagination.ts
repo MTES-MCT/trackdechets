@@ -58,7 +58,7 @@ export async function getConnection<T extends { id: string }, N>(
     cursor
   });
 
-  const edges = records.slice(0, take).map(r => ({
+  const edges = records.slice(0, Math.abs(take)).map(r => ({
     node: args.formatNode(r),
     cursor: r.id
   }));

@@ -30,7 +30,7 @@ type User {
 
   "DEPRECATED - Liste des établissements dont l'utilisateur est membre. "
   companies: [CompanyPrivate!]!
-    @deprecated(reason: "Utiliser la query avec pagination myCompanies")
+    @deprecated(reason: "Utiliser la query avec pagination `myCompanies`")
 }
 
 """

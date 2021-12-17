@@ -3,10 +3,7 @@ import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { getFormsRightFilter } from "../../database";
-import {
-  getConnection,
-  getPrismaPaginationArgs
-} from "../../../common/pagination";
+import { getConnection } from "../../../common/pagination";
 
 const PAGINATE_BY = 100;
 
@@ -53,11 +50,11 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
 
   const formsFilter = getFormsRightFilter(selectedCompany.siret);
 
-  const gqlPaginationArgs = getPrismaPaginationArgs({
+  const gqlPaginationArgs = {
     after: cursorAfter,
     before: cursorBefore,
     defaultPaginateBy: PAGINATE_BY
-  });
+  };
 
   const where = {
     loggedAt: {
