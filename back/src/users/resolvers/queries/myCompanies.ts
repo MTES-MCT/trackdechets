@@ -34,7 +34,14 @@ const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
       prisma.company.findMany({
         where: { id: { in: companyIds } },
         ...prismaPaginationArgs,
-        orderBy: { createdAt: "desc" }
+        orderBy: [
+          {
+            givenName: "asc"
+          },
+          {
+            createdAt: "asc"
+          }
+        ]
       }),
     formatNode: (company: Company) => {
       const companyPrivate: CompanyPrivate = convertUrls(company);

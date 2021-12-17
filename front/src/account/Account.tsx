@@ -71,12 +71,7 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
                     </a>
                   }
                 >
-                  <AccountCompanyList
-                    companies={filter(
-                      AccountCompanyList.fragments.company,
-                      data.me.companies
-                    )}
-                  />
+                  <AccountCompanyList />
                 </AccountContentWrapper>
               )}
             />

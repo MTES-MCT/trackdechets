@@ -5,6 +5,7 @@ import {
   createHttpLink,
 } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
+import { relayStylePagination } from "@apollo/client/utilities";
 
 /**
  * Automatically erase `__typename` from variables
@@ -47,6 +48,12 @@ const httpLink = createHttpLink({
 export default new ApolloClient({
   cache: new InMemoryCache({
     typePolicies: {
+      Query: {
+        fields: {
+          // https://www.apollographql.com/docs/react/pagination/cursor-based/#relay-style-cursor-pagination
+          myCompanies: relayStylePagination(),
+        },
+      },
       Form: {
         fields: {
           transporter: {
