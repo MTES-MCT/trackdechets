@@ -6,8 +6,13 @@ import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { getUserCompanies } from "../../../users/database";
 import { getConnection } from "../../../common/pagination";
+import { QueryResolvers } from "../../../generated/graphql/types";
 
-export default async function dasris(_, args, context: GraphQLContext) {
+const bsdasrisResolver: QueryResolvers["bsdasris"] = async (
+  _,
+  args,
+  context: GraphQLContext
+) => {
   const user = checkIsAuthenticated(context);
 
   const { where: whereArgs, ...gqlPaginationArgs } = args;
@@ -43,4 +48,6 @@ export default async function dasris(_, args, context: GraphQLContext) {
     formatNode: unflattenBsdasri,
     ...gqlPaginationArgs
   });
-}
+};
+
+export default bsdasrisResolver;

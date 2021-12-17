@@ -19,7 +19,7 @@ export const bsdasriPdfDownloadHandler: DownloadHandler<QueryBsdasriPdfArgs> = {
   }
 };
 
-const bsdasriPdfResolver: QueryResolvers["formPdf"] = async (
+const bsdasriPdfResolver: QueryResolvers["bsdasriPdf"] = async (
   _,
   { id }: QueryBsdasriPdfArgs,
   context

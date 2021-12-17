@@ -6,7 +6,6 @@ import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { getUserCompanies } from "../../../users/database";
 import { getConnection } from "../../../common/pagination";
-import { Prisma } from "@prisma/client";
 
 const bsffs: QueryResolvers["bsffs"] = async (
   _,

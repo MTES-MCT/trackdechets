@@ -8,7 +8,6 @@ import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { BSDA_CONTRIBUTORS_FIELDS } from "../../permissions";
 import { getConnection } from "../../../common/pagination";
-import { Prisma } from "@prisma/client";
 
 export default async function bsdas(
   _,

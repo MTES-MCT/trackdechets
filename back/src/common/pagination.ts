@@ -110,7 +110,10 @@ export async function getConnection<T extends { id: string }, N>(
  * - https://relay.dev/graphql/connections.htm#sec-Backward-pagination-arguments
  */
 export function getPrismaPaginationArgs(
-  args: GraphqlPaginationArgs & { defaultPaginateBy?: number }
+  args: GraphqlPaginationArgs & {
+    defaultPaginateBy?: number;
+    maxPaginateBy?: number;
+  }
 ): PrismaPaginationArgs {
   validateGqlPaginationArgs(args);
 

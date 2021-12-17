@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import { getConnection } from "../../../common/pagination";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { applyMask } from "../../../common/where";
