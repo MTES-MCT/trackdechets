@@ -1,17 +1,81 @@
 import { UserInputError } from "apollo-server-core";
 import * as yup from "yup";
+import { PageInfo } from "../generated/graphql/types";
 
-export type PaginationArgs = {
+const DEFAULT_PAGINATE_BY = 50;
+const MAX_PAGINATE_BY = 500;
+
+export type GraphqlPaginationArgs = {
   skip?: number;
   first?: number;
   after?: string;
   last?: number;
   before?: string;
-  // default value for `first` and `last` if omitted
-  defaultPaginateBy?: number;
-  // max value for `first` and `last`
-  maxPaginateBy?: number;
 };
+
+// https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination
+export type PrismaPaginationArgs = {
+  skip?: number;
+  take?: number;
+  cursor?: { id: string };
+};
+
+type PrismaGetConnectionArgs<T extends { id: string }, N> = {
+  totalCount: number;
+  findMany: (args: PrismaPaginationArgs) => Promise<T[]>;
+  // a function used to convert prisma resource to connection node type
+  formatNode: (r: T) => N;
+} & GraphqlPaginationArgs;
+
+type GraphqlConnection<N> = {
+  totalCount: number;
+  pageInfo: PageInfo;
+  edges: { cursor: string; node: N }[];
+};
+
+export async function getConnection<T extends { id: string }, N>(
+  args: PrismaGetConnectionArgs<T, N>
+): Promise<GraphqlConnection<N>> {
+  const gqlPaginationArgs = {
+    first: args.first,
+    after: args.after,
+    last: args.last,
+    before: args.before,
+    skip: args.skip
+  };
+
+  // validate graphql pagination args
+  validateGqlPaginationArgs(gqlPaginationArgs);
+
+  // convert to prisma pagination args
+  const { skip, take, cursor } = getPrismaPaginationArgs(gqlPaginationArgs);
+
+  // retrieves page of records
+  const records = await args.findMany({
+    skip,
+    // take one extra records to know if there is a next page
+    take: take > 0 ? take + 1 : take - 1,
+    cursor
+  });
+
+  const edges = records.slice(0, take).map(r => ({
+    node: args.formatNode(r),
+    cursor: r.id
+  }));
+
+  const hasOtherPage = records.length > edges.length;
+
+  return {
+    totalCount: args.totalCount,
+    edges,
+    pageInfo: {
+      startCursor: edges[0]?.cursor,
+      endCursor: edges[edges.length - 1]?.cursor,
+      hasNextPage: take > 0 ? hasOtherPage : !!args.before,
+      hasPreviousPage: take < 0 ? hasOtherPage : !!args.after
+    }
+  };
+}
 
 /**
  * Validate and convert GraphQL pagination args (first, last, after, before)
@@ -45,15 +109,17 @@ export type PaginationArgs = {
  * - https://graphql.org/learn/pagination/
  * - https://relay.dev/graphql/connections.htm#sec-Backward-pagination-arguments
  */
-export function getPrismaPaginationArgs(args: PaginationArgs) {
-  validatePaginationArgs(args);
+export function getPrismaPaginationArgs(
+  args: GraphqlPaginationArgs & { defaultPaginateBy?: number }
+): PrismaPaginationArgs {
+  validateGqlPaginationArgs(args);
 
   const { before, after } = args;
   let first = args.first;
   let last = args.last;
 
   if (!first && !last) {
-    const paginateBy = args.defaultPaginateBy ?? 50;
+    const paginateBy = args.defaultPaginateBy ?? DEFAULT_PAGINATE_BY;
 
     if (args.before) {
       last = paginateBy;
@@ -64,21 +130,21 @@ export function getPrismaPaginationArgs(args: PaginationArgs) {
 
   return {
     ...(args.skip ? { skip: args.skip } : {}),
-    ...(first ? { take: first + 1 } : {}),
+    ...(first ? { take: first } : {}),
     ...(after ? { cursor: { id: after }, skip: 1 } : {}),
-    ...(last ? { take: -last - 1 } : {}),
+    ...(last ? { take: -last } : {}),
     ...(before ? { cursor: { id: before }, skip: 1 } : {})
   };
 }
 
-export function validatePaginationArgs({
+export function validateGqlPaginationArgs({
   skip,
   first,
   after,
   last,
   before,
-  maxPaginateBy = 500
-}: PaginationArgs) {
+  maxPaginateBy = MAX_PAGINATE_BY
+}: GraphqlPaginationArgs & { maxPaginateBy?: number }) {
   // validate number formats
   getValidationSchema(maxPaginateBy).validateSync({ first, last });
 

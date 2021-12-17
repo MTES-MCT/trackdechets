@@ -1,4 +1,5 @@
-import { getPrismaPaginationArgs } from "../../../common/pagination";
+import { Prisma } from "@prisma/client";
+import { getConnection } from "../../../common/pagination";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { applyMask } from "../../../common/where";
 import { QueryBsvhusArgs } from "../../../generated/graphql/types";
@@ -10,18 +11,10 @@ import { toPrismaWhereInput } from "../../where";
 
 export default async function bsvhus(
   _,
-  { where: whereArgs, ...connectionArgs }: QueryBsvhusArgs,
+  { where: whereArgs, ...gqlPaginationArgs }: QueryBsvhusArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
-
-  const defaultPaginateBy = 50;
-  const paginationArgs = getPrismaPaginationArgs({
-    ...connectionArgs,
-    defaultPaginateBy,
-    maxPaginateBy: 500
-  });
-  const itemsPerPage = Math.abs(paginationArgs.take) - 1;
 
   const userCompanies = await getUserCompanies(user.id);
   const userSirets = userCompanies.map(c => c.siret);
@@ -42,27 +35,16 @@ export default async function bsvhus(
   const where = applyMask(prismaWhere, mask);
 
   const totalCount = await prisma.bsvhu.count({ where });
-  const queriedForms = await prisma.bsvhu.findMany({
-    ...paginationArgs,
-    orderBy: { createdAt: "desc" },
-    where
-  });
 
-  const edges = queriedForms
-    .slice(0, itemsPerPage)
-    .map(f => ({ cursor: f.id, node: expandVhuFormFromDb(f) }));
-  return {
+  return getConnection({
     totalCount,
-    edges,
-    pageInfo: {
-      startCursor: edges[0]?.cursor,
-      endCursor: edges[edges.length - 1]?.cursor,
-      hasNextPage: connectionArgs.after
-        ? queriedForms.length > itemsPerPage
-        : false,
-      hasPreviousPage: connectionArgs.before
-        ? queriedForms.length > itemsPerPage
-        : false
-    }
-  };
+    findMany: prismaPaginationArgs =>
+      prisma.bsvhu.findMany({
+        where,
+        ...prismaPaginationArgs,
+        orderBy: { createdAt: "desc" }
+      }),
+    formatNode: expandVhuFormFromDb,
+    ...gqlPaginationArgs
+  });
 }

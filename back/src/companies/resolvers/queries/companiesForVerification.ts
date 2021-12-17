@@ -11,7 +11,7 @@ const companiesForVerificationResolver: QueryResolvers["companiesForVerification
     const paginationArgs = getPrismaPaginationArgs({
       first,
       last,
-      skip: skip && skip > 0 ? skip : null
+      skip
     });
 
     applyAuthStrategies(context, [AuthType.Session]);

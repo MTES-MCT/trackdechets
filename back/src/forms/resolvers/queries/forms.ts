@@ -38,18 +38,14 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
     company = userCompanies[0];
   }
 
-  const connectionArgs = {
+  const gqlPaginationArgs = {
     first: rest.first,
     after: rest.cursorAfter,
     last: rest.last,
     before: rest.cursorBefore
   };
 
-  const paginationArgs = getPrismaPaginationArgs({
-    ...connectionArgs,
-    defaultPaginateBy: 50,
-    maxPaginateBy: 500
-  });
+  const paginationArgs = getPrismaPaginationArgs(gqlPaginationArgs);
 
   const queriedForms = await prisma.form.findMany({
     ...paginationArgs,
@@ -72,9 +68,7 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
     }
   });
 
-  return queriedForms
-    .slice(0, Math.abs(paginationArgs.take) - 1)
-    .map(f => expandFormFromDb(f));
+  return queriedForms.map(f => expandFormFromDb(f));
 };
 
 function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
