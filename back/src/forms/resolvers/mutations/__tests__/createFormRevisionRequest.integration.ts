@@ -38,11 +38,14 @@ describe("Mutation.createFormRevisionRequest", () => {
     const { user } = await userWithCompanyFactory("ADMIN");
     const { mutate } = makeClient(user);
 
-    const bsddId = "123";
-    const { errors } = await mutate(CREATE_FORM_REVISION_REQUEST, {
+    const formId = "123";
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
       variables: {
         input: {
-          bsddId,
+          formId,
           content: {},
           comment: "A comment"
         }
@@ -50,7 +53,7 @@ describe("Mutation.createFormRevisionRequest", () => {
     });
 
     expect(errors[0].message).toBe(
-      `Le bordereau avec l'identifiant "${bsddId}" n'existe pas.`
+      `Le bordereau avec l'identifiant "${formId}" n'existe pas.`
     );
   });
 
@@ -64,9 +67,12 @@ describe("Mutation.createFormRevisionRequest", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_FORM_REVISION_REQUEST, {
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
       variables: {
-        input: { bsddId: bsdd.id, content: {}, comment: "A comment" }
+        input: { formId: bsdd.id, content: {}, comment: "A comment" }
       }
     });
 
@@ -87,18 +93,18 @@ describe("Mutation.createFormRevisionRequest", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "createFormRevisionRequest">>(
-      CREATE_FORM_REVISION_REQUEST,
-      {
-        variables: {
-          input: {
-            bsddId: bsdd.id,
-            content: { wasteDetails: { code: "01 03 08" } },
-            comment: "A comment"
-          }
+    const { data } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { wasteDetails: { code: "01 03 08" } },
+          comment: "A comment"
         }
       }
-    );
+    });
 
     expect(data.createFormRevisionRequest.bsdd.id).toBe(bsdd.id);
     expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
@@ -118,18 +124,18 @@ describe("Mutation.createFormRevisionRequest", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "createFormRevisionRequest">>(
-      CREATE_FORM_REVISION_REQUEST,
-      {
-        variables: {
-          input: {
-            bsddId: bsdd.id,
-            content: { wasteDetails: { code: "01 03 08" } },
-            comment: "A comment"
-          }
+    const { data } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { wasteDetails: { code: "01 03 08" } },
+          comment: "A comment"
         }
       }
-    );
+    });
 
     expect(data.createFormRevisionRequest.bsdd.id).toBe(bsdd.id);
     expect(data.createFormRevisionRequest.approvals.length).toBe(1);
@@ -170,10 +176,13 @@ describe("Mutation.createFormRevisionRequest", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(CREATE_FORM_REVISION_REQUEST, {
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
       variables: {
         input: {
-          bsddId: bsdd.id,
+          formId: bsdd.id,
           content: { wasteDetails: { code: "Made up code" } },
           comment: "A comment"
         }
@@ -203,7 +212,7 @@ describe("Mutation.createFormRevisionRequest", () => {
     >(CREATE_FORM_REVISION_REQUEST, {
       variables: {
         input: {
-          bsddId: bsdd.id,
+          formId: bsdd.id,
           content: { wasteDetails: { code: "01 03 08" } },
           comment: "A comment"
         }

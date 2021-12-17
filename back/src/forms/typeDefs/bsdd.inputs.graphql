@@ -664,11 +664,11 @@ input ImportPaperFormInput {
 "Payload de révision d'un bordereau."
 input CreateFormRevisionRequestInput {
   "Identifiant du bordereau à réviser"
-    bsddId: ID!
-    "Contenu de la révision"
-    content: FormRevisionRequestContentInput!
-    "Commentaire pour expliquer la demande de révision"
-    comment: String!
+  formId: ID!
+  "Contenu de la révision"
+  content: FormRevisionRequestContentInput!
+  "Commentaire pour expliquer la demande de révision"
+  comment: String!
 }
 
 "Payload du contenu de la révision d'un bordereau. Disponible sur une liste restreinte de champs."
