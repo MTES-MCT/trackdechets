@@ -8,7 +8,6 @@ import { getUserCompanies } from "../../../users/database";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { getFormsRightFilter } from "../../database";
 import { expandFormFromDb } from "../../form-converter";
-import { getConnectionsArgs } from "../../pagination";
 import { getPrismaPaginationArgs } from "../../../common/pagination";
 
 const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {

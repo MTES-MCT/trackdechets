@@ -1,9 +1,9 @@
 import { QueryResolvers } from "../../../generated/graphql/types";
 
 const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
-  parent,
-  args,
-  context
+  _parent,
+  _args,
+  _context
 ) => {
   //const me = checkIsAuthenticated(context);
 

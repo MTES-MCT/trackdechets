@@ -1,24 +1,24 @@
-import { getConnectionsArgs } from "../pagination";
+import { getPrismaPaginationArgs } from "../pagination";
 
-describe("getConnectionArgs", () => {
+describe("getPrismaPaginationArgs", () => {
   it("should default to forward pagination if no arguments is provided", () => {
-    const args = getConnectionsArgs({ defaultPaginateBy: 100 });
+    const args = getPrismaPaginationArgs({ defaultPaginateBy: 100 });
     expect(args).toEqual({ take: 100 });
   });
   it("should default to forward pagination if only `skip` is provided", () => {
-    const args = getConnectionsArgs({ defaultPaginateBy: 100, skip: 2 });
+    const args = getPrismaPaginationArgs({ defaultPaginateBy: 100, skip: 2 });
     expect(args).toEqual({ take: 100, skip: 2 });
   });
   it("should set default value to `first` if cursorAfter is provided", () => {
-    const args = getConnectionsArgs({
-      cursorAfter: "after",
+    const args = getPrismaPaginationArgs({
+      after: "after",
       defaultPaginateBy: 100
     });
     expect(args).toEqual({ take: 100, skip: 1, cursor: { id: "after" } });
   });
   it("should set default value to `last` if cursorBefore is provided", () => {
-    const args = getConnectionsArgs({
-      cursorBefore: "before",
+    const args = getPrismaPaginationArgs({
+      before: "before",
       defaultPaginateBy: 100
     });
     expect(args).toEqual({ take: -100, skip: 1, cursor: { id: "before" } });
@@ -27,7 +27,7 @@ describe("getConnectionArgs", () => {
     "should throw a validation error if %p is not an integer",
     p => {
       const shouldThrow = () =>
-        getConnectionsArgs({
+        getPrismaPaginationArgs({
           [p]: 1.2
         });
       expect(shouldThrow).toThrow(`\`${p}\` doit être un entier`);
@@ -37,7 +37,7 @@ describe("getConnectionArgs", () => {
     "should throw a validation error if %p is not positive",
     p => {
       const shouldThrow = () =>
-        getConnectionsArgs({
+        getPrismaPaginationArgs({
           [p]: -1
         });
       expect(shouldThrow).toThrow(`\`${p}\` doit être positif`);
@@ -47,7 +47,7 @@ describe("getConnectionArgs", () => {
     "should throw a validation error if %p is higher than max value allowed",
     p => {
       const shouldThrow = () =>
-        getConnectionsArgs({
+        getPrismaPaginationArgs({
           [p]: 11,
           maxPaginateBy: 10
         });
@@ -55,7 +55,7 @@ describe("getConnectionArgs", () => {
     }
   );
   it("should throw an error when passing both `first` and `last`", () => {
-    const shouldThrow = () => getConnectionsArgs({ first: 10, last: 10 });
+    const shouldThrow = () => getPrismaPaginationArgs({ first: 10, last: 10 });
     expect(shouldThrow).toThrow(
       "L'utilisation simultanée de `first` et `last` n'est pas supportée"
     );
@@ -63,21 +63,21 @@ describe("getConnectionArgs", () => {
 
   it("should throw an error when passing both `cursorAfter` and `cursorBefore`", () => {
     const shouldThrow = () =>
-      getConnectionsArgs({ cursorAfter: "after", cursorBefore: "before" });
+      getPrismaPaginationArgs({ after: "after", before: "before" });
     expect(shouldThrow).toThrow(
       "L'utilisation simultanée de `cursorAfter` et `cursorBefore` n'est pas supportée"
     );
   });
   it("should throw error when passing `first` with `cursorBefore`", () => {
     const shouldThrow = () =>
-      getConnectionsArgs({ first: 10, cursorBefore: "before" });
+      getPrismaPaginationArgs({ first: 10, before: "before" });
     expect(shouldThrow).toThrow(
       "`first` ne peut pas être utilisé en conjonction avec `cursorBefore`"
     );
   });
   it("should throw error when passing `last` with `cursorAfter`", () => {
     const shouldThrow = () =>
-      getConnectionsArgs({ last: 10, cursorAfter: "after" });
+      getPrismaPaginationArgs({ last: 10, after: "after" });
     expect(shouldThrow).toThrow(
       "`last` ne peut pas être utilisé en conjonction avec `cursorAfter`"
     );
@@ -86,7 +86,7 @@ describe("getConnectionArgs", () => {
     "should throw a validation error if skip is used in conjunction with %p",
     p => {
       const shouldThrow = () =>
-        getConnectionsArgs({
+        getPrismaPaginationArgs({
           [p]: 10,
           skip: 10
         });
