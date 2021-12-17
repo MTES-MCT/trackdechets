@@ -46,6 +46,11 @@ const columns: Column[] = [
     label: "Date de réception",
     format: formatDate
   },
+  {
+    field: "destinationOperationDate",
+    label: "Date de réalisation de l'opération",
+    format: formatDate
+  },
   { field: "bsdType", label: "Type de bordereau" },
   { field: "customId", label: "Identifiant secondaire" },
   { field: "status", label: "Statut du bordereau" },

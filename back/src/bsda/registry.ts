@@ -61,6 +61,7 @@ function toGenericWaste(bsda: Bsda): GenericWaste {
     destinationOperationNoTraceability: false,
     destinationReceptionAcceptationStatus:
       bsda.destinationReceptionAcceptationStatus,
+    destinationOperationDate: bsda.destinationOperationDate,
     transporterRecepisseIsExempted: bsda.transporterRecepisseIsExempted,
     wasteAdr: bsda.wasteAdr,
     workerCompanyName: bsda.workerCompanyName,

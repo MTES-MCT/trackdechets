@@ -56,6 +56,7 @@ function toGenericWaste(bsff: Bsff): GenericWaste {
     destinationOperationNoTraceability: false,
     destinationReceptionAcceptationStatus:
       bsff.destinationReceptionAcceptationStatus,
+    destinationOperationDate: bsff.destinationOperationSignatureDate,
     transporterRecepisseIsExempted: false,
     wasteAdr: bsff.wasteAdr,
     workerCompanyName: null,
