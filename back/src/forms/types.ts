@@ -124,6 +124,7 @@ export type Bsdd = {
   destinationOperationNextDestinationCompanyPhone: string | null;
   destinationOperationNextDestinationCompanyMail: string | null;
   destinationOperationSignatureAuthor: string | null;
+  destinationOperationDate: Date | null;
   destinationOperationSignatureDate: Date | null;
   destinationCap: string | null;
 };

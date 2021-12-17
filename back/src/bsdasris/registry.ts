@@ -58,6 +58,7 @@ function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
     destinationOperationNoTraceability: false,
     destinationReceptionAcceptationStatus:
       bsdasri.destinationReceptionAcceptationStatus,
+    destinationOperationDate: bsdasri.destinationOperationDate,
     transporterRecepisseIsExempted: false,
     wasteAdr: bsdasri.wasteAdr,
     workerCompanyName: null,

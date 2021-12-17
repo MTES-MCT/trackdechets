@@ -96,6 +96,7 @@ export function simpleFormToBsdd(form: Form): Bsdd {
     destinationPlannedOperationCode: form.recipientProcessingOperation,
     destinationOperationCode: form.processingOperationDone,
     destinationOperationSignatureAuthor: form.processedBy,
+    destinationOperationDate: form.processedAt,
     destinationOperationSignatureDate: form.processedAt,
     destinationCap: form.recipientCap,
     destinationOperationNoTraceability: form.noTraceability,
@@ -138,6 +139,7 @@ export function formWithTempStorageToBsdd(
     destinationOperationCode: form.recipientProcessingOperation,
     destinationOperationSignatureAuthor: form.receivedBy,
     destinationOperationSignatureDate: form.receivedAt,
+    destinationOperationDate: form.receivedAt,
     destinationOperationNoTraceability: false,
     destinationOperationNextDestinationCompanyName: null,
     destinationOperationNextDestinationCompanySiret: null,
@@ -236,6 +238,7 @@ export function formWithTempStorageToBsdd(
     destinationOperationCode: form.processingOperationDone,
     destinationOperationSignatureAuthor: form.processedBy,
     destinationOperationSignatureDate: form.processedAt,
+    destinationOperationDate: form.processedAt,
     destinationOperationNoTraceability: form.noTraceability,
     destinationCap: form.recipientCap,
     destinationOperationNextDestinationCompanyName:
