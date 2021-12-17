@@ -42,7 +42,8 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
     first: rest.first,
     after: rest.cursorAfter,
     last: rest.last,
-    before: rest.cursorBefore
+    before: rest.cursorBefore,
+    skip: rest.skip
   };
 
   const paginationArgs = getPrismaPaginationArgs(gqlPaginationArgs);

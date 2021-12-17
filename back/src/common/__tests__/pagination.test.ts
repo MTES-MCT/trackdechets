@@ -65,24 +65,24 @@ describe("getPrismaPaginationArgs", () => {
     const shouldThrow = () =>
       getPrismaPaginationArgs({ after: "after", before: "before" });
     expect(shouldThrow).toThrow(
-      "L'utilisation simultanée de `cursorAfter` et `cursorBefore` n'est pas supportée"
+      "L'utilisation simultanée de `after` et `before` n'est pas supportée"
     );
   });
   it("should throw error when passing `first` with `cursorBefore`", () => {
     const shouldThrow = () =>
       getPrismaPaginationArgs({ first: 10, before: "before" });
     expect(shouldThrow).toThrow(
-      "`first` ne peut pas être utilisé en conjonction avec `cursorBefore`"
+      "`first` ne peut pas être utilisé en conjonction avec `before`"
     );
   });
   it("should throw error when passing `last` with `cursorAfter`", () => {
     const shouldThrow = () =>
       getPrismaPaginationArgs({ last: 10, after: "after" });
     expect(shouldThrow).toThrow(
-      "`last` ne peut pas être utilisé en conjonction avec `cursorAfter`"
+      "`last` ne peut pas être utilisé en conjonction avec `after`"
     );
   });
-  it.each(["cursorAfter", "cursorBefore"])(
+  it.each(["after", "before"])(
     "should throw a validation error if skip is used in conjunction with %p",
     p => {
       const shouldThrow = () =>
@@ -91,7 +91,7 @@ describe("getPrismaPaginationArgs", () => {
           skip: 10
         });
       expect(shouldThrow).toThrow(
-        "`skip` (pagination par offset) ne peut pas être utilisé en conjonction avec `cursorAfter` ou `cursorBefore` (pagination par curseur)"
+        "`skip` (pagination par offset) ne peut pas être utilisé en conjonction avec `after` ou `before` (pagination par curseur)"
       );
     }
   );

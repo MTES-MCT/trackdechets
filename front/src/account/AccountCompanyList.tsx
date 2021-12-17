@@ -1,25 +1,37 @@
 import React from "react";
-import { gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { filter } from "graphql-anywhere";
 import AccountCompany from "./AccountCompany";
 import { useRouteMatch, Link } from "react-router-dom";
-import { CompanyPrivate } from "generated/graphql/types";
+import { Query } from "generated/graphql/types";
+import { Loader } from "common/components";
+import { NotificationError } from "common/components/Error";
 
-type Props = {
-  companies: CompanyPrivate[] | null | undefined;
-};
-
-AccountCompanyList.fragments = {
-  company: gql`
-    fragment AccountCompaniesFragment on CompanyPrivate {
+export const MY_COMPANIES = gql`
+  query MyCompanies($first: Int, $after: string) {
+    myCompanies(first: $first, after: $after) {
       ...AccountCompanyFragment
     }
-    ${AccountCompany.fragments.company}
-  `,
-};
+  }
+  ${AccountCompany.fragments.company}
+`;
 
-export default function AccountCompanyList({ companies }: Props) {
+export default function AccountCompanyList() {
   const { url } = useRouteMatch();
+
+  const { data, loading, error, fetchMore } = useQuery<
+    Pick<Query, "myCompanies">
+  >(MY_COMPANIES);
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  {
+    error && <NotificationError apolloError={error} />;
+  }
+
+  const companies = data?.myCompanies?.edges.map(({ node }) => node);
 
   return (
     <>

@@ -22,13 +22,9 @@ export const GET_ME = gql`
   {
     me {
       ...AccountInfoFragment
-      companies {
-        ...AccountCompaniesFragment
-      }
     }
   }
   ${AccountInfo.fragments.me}
-  ${AccountCompanyList.fragments.company}
 `;
 
 export default withRouter(function Account({ match }: RouteComponentProps) {
