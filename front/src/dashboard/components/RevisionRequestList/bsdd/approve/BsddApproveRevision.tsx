@@ -5,7 +5,6 @@ import {
   FormRevisionRequest,
   Mutation,
   MutationSubmitFormRevisionRequestApprovalArgs,
-  RevisionRequestStatus,
   Trader,
 } from "generated/graphql/types";
 import { TdModalTrigger } from "common/components/Modal";
@@ -14,7 +13,6 @@ import { IconCogApproved } from "common/components/Icons";
 import { RevisionField } from "./RevisionField";
 import { useMutation } from "@apollo/client";
 import { SUBMIT_FORM_REVISION_REQUEST_APPROVAL } from "../query";
-import { useParams } from "react-router-dom";
 import { Field, Form, Formik } from "formik";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 
