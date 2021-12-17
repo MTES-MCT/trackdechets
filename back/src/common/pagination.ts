@@ -53,7 +53,7 @@ export async function getConnection<T extends { id: string }, N>(
   // retrieves page of records
   const records = await args.findMany({
     skip,
-    // take one extra records to know if there is a next page
+    // take one extra record to know if there is a next page
     take: take > 0 ? take + 1 : take - 1,
     cursor
   });

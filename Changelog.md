@@ -5,8 +5,23 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
- 
-# [2021.12.2] 27/12/2021
+
+# [2022.01.1] ~10/01/2022
+
+#### :rocket: Nouvelles fonctionnalités
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+- Pagination des établissements dans Mon Compte > Établissements. [PR 1113](https://github.com/MTES-MCT/trackdechets/pull/1113)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Refactoring du code qui gère la pagination. [PR 1113](https://github.com/MTES-MCT/trackdechets/pull/1113)
+ # [2021.12.2] 27/12/2021
 
 #### :rocket: Nouvelles fonctionnalités
 
@@ -25,6 +40,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :boom: Breaking changes
 
 - Dépréciation de la query `formsRegister` au profit de la query `wastesDownloadLink`.
+- Dépréciation du champ `me { companies }` au profit de la query `myCompanies` (paginée). [PR 1113](https://github.com/MTES-MCT/trackdechets/pull/1113)
 #### :nail_care: Améliorations
 
 - Remplacement du CERFA BSDD par un récépissé reprenant l'ensemble des évolutions Trackdéchets [PR 1096](https://github.com/MTES-MCT/trackdechets/pull/1096)

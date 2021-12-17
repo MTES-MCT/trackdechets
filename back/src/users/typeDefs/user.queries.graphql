@@ -2,6 +2,10 @@ type Query {
   "Renvoie les informations sur l'utilisateur authentifié"
   me: User!
 
+  """
+  Liste paginée des établissements de l'utilisateur authentifié triée par ordre alphabétique
+  du nom usuel et par défaut par date de création de l'établissement
+  """
   myCompanies(
     "Pagination croissante avec first et after"
     first: Int
