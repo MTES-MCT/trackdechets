@@ -2,6 +2,9 @@ import prisma from "../../prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory } from "../../__tests__/factories";
 import { getCompanyInvitedUsers } from "../database";
+import { createUserDataLoaders } from "../../users/dataloders";
+
+const dataloaders = createUserDataLoaders();
 
 describe("getInvitedUsers", () => {
   afterAll(resetDatabase);
@@ -17,7 +20,10 @@ describe("getInvitedUsers", () => {
         acceptedAt: new Date()
       }
     });
-    const invitedUsers = await getCompanyInvitedUsers(company.siret);
+    const invitedUsers = await getCompanyInvitedUsers(
+      company.siret,
+      dataloaders.activeUserAccountHashesBySiret
+    );
     expect(invitedUsers).toEqual([]);
   });
 
@@ -31,7 +37,10 @@ describe("getInvitedUsers", () => {
         role: "MEMBER"
       }
     });
-    const invitedUsers = await getCompanyInvitedUsers(company.siret);
+    const invitedUsers = await getCompanyInvitedUsers(
+      company.siret,
+      dataloaders.activeUserAccountHashesBySiret
+    );
     expect(invitedUsers).toHaveLength(1);
     expect(invitedUsers[0]).toMatchObject({
       email: invitation.email,

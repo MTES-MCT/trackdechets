@@ -47,7 +47,6 @@ prisma.$on("query", e => {
   span?.setTag("prisma.query", e.query);
   span?.setTag("prisma.params", e.params);
   span?.setTag("prisma.duration", e.duration);
-  console.log("query", e.query, e.duration);
 });
 
 function getDbUrl() {
