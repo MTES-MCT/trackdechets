@@ -41,10 +41,9 @@ const workflow: Workflow = {
   chart: `
     graph LR
     AO(NO STATE) -->|createForm| A
-    A(INITIAL) -->|signBsda| B(SIGNED_BY_PRODUCER)
-    B -->|signBsda| C(SIGNED_BY_WORKER)
-    C --> |signBsda| D(SENT)
-    D --> |signBsda| E(PROCESSED)
+    A(INITIAL) -->|signBsda| B(SIGNED_BY_WORKER)
+    B -->|signBsda| C(SENT)
+    C --> |signBsda| D(PROCESSED)
     `
 };
 
