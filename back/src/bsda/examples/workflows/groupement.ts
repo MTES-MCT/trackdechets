@@ -47,7 +47,9 @@ const workflow: Workflow = {
     transporteur: { siret: "SIRET_TRANSPORTEUR" },
     traiteur: { siret: "SIRET_TRAITEUR_1" },
     traiteur2: { siret: "SIRET_TRAITEUR_2" },
-    bsda: { id: "ID_BSD" }
+    bsda: { id: "ID_BSD" },
+    bsda_1: { id: "ID_BSD_GROUPE_1" },
+    bsda_2: { id: "ID_BSD_GROUPE_2" }
   },
   chart: `
     graph LR
