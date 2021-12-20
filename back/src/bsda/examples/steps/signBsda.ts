@@ -1,5 +1,4 @@
 import { WorkflowStep } from "../../../common/workflow";
-import { BsdaSignatureType } from "../../../generated/graphql/types";
 import mutations from "../mutations";
 
 const expectedStatus = {
@@ -15,6 +14,8 @@ const expectedStatusWhenGrouping = {
   TRANSPORT: "SENT",
   OPERATION: "AWAITING_CHILD"
 };
+
+type BsdaSignatureType = "EMISSION" | "OPERATION" | "TRANSPORT" | "WORK";
 
 export function signBsda(
   company: string,

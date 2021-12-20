@@ -1,4 +1,3 @@
-import { BsdaType } from "@prisma/client";
 import { WorkflowStep } from "../../../common/workflow";
 import fixtures from "../fixtures";
 import mutations from "../mutations";
@@ -35,7 +34,7 @@ export function createBsda2ToGroup(company: string): WorkflowStep {
     mutation: mutations.createBsda,
     variables: ({ producteur, worker, transporteur, traiteur }) => ({
       input: {
-        type: BsdaType.OTHER_COLLECTIONS,
+        type: "OTHER_COLLECTIONS",
         emitter: fixtures.emitterInput(producteur.siret),
         worker: fixtures.workerInput(worker.siret),
         destination: fixtures.destinationToGroupInput(traiteur.siret),

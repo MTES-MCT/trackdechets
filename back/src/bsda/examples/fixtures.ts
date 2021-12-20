@@ -2,8 +2,6 @@
  * Fixtures used as building blocks of mutations inputs
  */
 
-import { TransportMode, WasteAcceptationStatus } from "@prisma/client";
-
 function emitterCompanyInput(siret: string) {
   return {
     siret,
@@ -144,7 +142,7 @@ function transporterSignatureUpdateInput() {
   return {
     transporter: {
       transport: {
-        mode: TransportMode.ROAD,
+        mode: "ROAD",
         plates: ["abc21cde"],
         takenOverAt: new Date().toISOString() as any
       }
@@ -156,7 +154,7 @@ function destinationSignatureUpdateInput() {
   return {
     destination: {
       reception: {
-        acceptationStatus: WasteAcceptationStatus.ACCEPTED,
+        acceptationStatus: "ACCEPTED",
         date: new Date().toISOString() as any,
         weight: 2.1
       },
@@ -173,7 +171,7 @@ function transporterToGroupInput(siret: string) {
     company: transporterCompanyInput(siret),
     recepisse: recepisseInput,
     transport: {
-      mode: TransportMode.ROAD,
+      mode: "ROAD",
       plates: ["abc21cde"],
       takenOverAt: new Date().toISOString() as any
     }
@@ -186,7 +184,7 @@ function destinationToGroupInput(siret: string) {
     plannedOperationCode: "D 13",
     cap: "CAP",
     reception: {
-      acceptationStatus: WasteAcceptationStatus.ACCEPTED,
+      acceptationStatus: "ACCEPTED",
       date: new Date().toISOString() as any,
       weight: 2.1
     },
