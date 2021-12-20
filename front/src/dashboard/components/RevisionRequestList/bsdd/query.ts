@@ -4,7 +4,7 @@ import { companyFragment } from "common/fragments";
 const reviewFragment = gql`
   fragment FormRevisionRequestFragment on FormRevisionRequest {
     id
-    bsdd {
+    form {
       id
       wasteDetails {
         code

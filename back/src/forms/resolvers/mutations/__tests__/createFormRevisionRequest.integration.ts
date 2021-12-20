@@ -13,7 +13,7 @@ const CREATE_FORM_REVISION_REQUEST = `
   mutation CreateFormRevisionRequest($input: CreateFormRevisionRequestInput!) {
     createFormRevisionRequest(input: $input) {
       id
-      bsdd {
+      form {
         id
       }
       content {
@@ -106,7 +106,7 @@ describe("Mutation.createFormRevisionRequest", () => {
       }
     });
 
-    expect(data.createFormRevisionRequest.bsdd.id).toBe(bsdd.id);
+    expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
     expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
       company.siret
     );
@@ -137,7 +137,7 @@ describe("Mutation.createFormRevisionRequest", () => {
       }
     });
 
-    expect(data.createFormRevisionRequest.bsdd.id).toBe(bsdd.id);
+    expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
     expect(data.createFormRevisionRequest.approvals.length).toBe(1);
     expect(data.createFormRevisionRequest.approvals[0].approverSiret).toBe(
       recipientCompany.siret

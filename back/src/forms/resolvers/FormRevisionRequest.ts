@@ -16,7 +16,7 @@ const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
       .findUnique({ where: { id: parent.id } })
       .authoringCompany();
   },
-  bsdd: parent => {
+  form: parent => {
     return prisma.bsddRevisionRequest
       .findUnique({ where: { id: parent.id } })
       .bsdd();

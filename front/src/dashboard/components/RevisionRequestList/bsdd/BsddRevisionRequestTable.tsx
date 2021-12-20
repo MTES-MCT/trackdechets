@@ -25,7 +25,7 @@ const STATUS_LABELS = {
 const COLUMNS = [
   {
     Header: "Bordereau",
-    accessor: "bsdd.readableId",
+    accessor: "form.readableId",
   },
   {
     Header: "Demandeur",
