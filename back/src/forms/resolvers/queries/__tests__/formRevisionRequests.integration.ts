@@ -18,7 +18,7 @@ const FORM_REVISION_REQUESTS = `
       edges {
         node {
           id
-          bsdd {
+          form {
             id
           }
           status
