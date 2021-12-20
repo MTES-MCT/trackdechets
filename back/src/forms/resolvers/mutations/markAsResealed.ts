@@ -11,7 +11,7 @@ import { checkCanMarkAsResealed } from "../../permissions";
 import { checkCompaniesType, resealedFormSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
-import { Form, Status } from ".prisma/client";
+import { Form, Status } from "@prisma/client";
 
 const markAsResealed: MutationResolvers["markAsResealed"] = async (
   parent,

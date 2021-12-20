@@ -1,4 +1,4 @@
-import { Form, TemporaryStorageDetail } from ".prisma/client";
+import { Form, TemporaryStorageDetail } from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
 import {
   AllWaste,

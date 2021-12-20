@@ -3,7 +3,7 @@
  */
 
 import prisma from "../prisma";
-import { User, Prisma, Company } from "@prisma/client";
+import { User, Prisma, Company, UserAccountHash } from "@prisma/client";
 import {
   CompanyNotFound,
   TraderReceiptNotFound,
@@ -13,6 +13,7 @@ import {
 } from "./errors";
 import { CompanyMember } from "../generated/graphql/types";
 import { UserInputError } from "apollo-server-express";
+import DataLoader from "dataloader";
 
 /**
  * Retrieves a company by siret or or throw a CompanyNotFound error
@@ -44,7 +45,7 @@ export async function getCompanyOrCompanyNotFound({
  */
 export function getInstallation(siret: string) {
   return prisma.installation
-    .findMany({
+    .findFirst({
       where: {
         OR: [
           { s3icNumeroSiret: siret },
@@ -92,9 +93,10 @@ export function getDeclarations(codeS3ic: string) {
  * @param siret
  */
 export async function getUserRole(userId: string, siret: string) {
-  const associations = await prisma.companyAssociation.findMany({
-    where: { user: { id: userId }, company: { siret } }
-  });
+  const associations = await prisma.company
+    .findUnique({ where: { siret: siret } })
+    .companyAssociations({ where: { userId } });
+
   if (associations.length > 0) {
     return associations[0].role;
   }
@@ -121,9 +123,15 @@ export async function isCompanyMember(user: User, company: Company) {
  * Concat active company users and invited company users
  * @param siret
  */
-export async function getCompanyUsers(siret: string): Promise<CompanyMember[]> {
+export async function getCompanyUsers(
+  siret: string,
+  userAccountHashDataloader: DataLoader<string, UserAccountHash[], string>
+): Promise<CompanyMember[]> {
   const activeUsers = await getCompanyActiveUsers(siret);
-  const invitedUsers = await getCompanyInvitedUsers(siret);
+  const invitedUsers = await getCompanyInvitedUsers(
+    siret,
+    userAccountHashDataloader
+  );
 
   return [...activeUsers, ...invitedUsers];
 }
@@ -133,8 +141,9 @@ export async function getCompanyUsers(siret: string): Promise<CompanyMember[]> {
  * @param siret
  */
 export function getCompanyActiveUsers(siret: string): Promise<CompanyMember[]> {
-  return prisma.companyAssociation
-    .findMany({ where: { company: { siret } }, include: { user: true } })
+  return prisma.company
+    .findUnique({ where: { siret: siret } })
+    .companyAssociations({ include: { user: true } })
     .then(associations =>
       associations.map(a => {
         return {
@@ -152,11 +161,10 @@ export function getCompanyActiveUsers(siret: string): Promise<CompanyMember[]> {
  * @param siret
  */
 export async function getCompanyInvitedUsers(
-  siret: string
+  siret: string,
+  dataloader: DataLoader<string, UserAccountHash[], string>
 ): Promise<CompanyMember[]> {
-  const hashes = await prisma.userAccountHash.findMany({
-    where: { companySiret: siret, acceptedAt: null }
-  });
+  const hashes = await dataloader.load(siret);
   return hashes.map(h => {
     return {
       id: h.id,

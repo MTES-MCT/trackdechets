@@ -1,4 +1,4 @@
-import { Bsff } from ".prisma/client";
+import { Bsff } from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
 import {
   AllWaste,

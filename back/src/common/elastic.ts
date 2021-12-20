@@ -5,14 +5,7 @@ import { BsdType } from "../generated/graphql/types";
 import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
 import prisma from "../prisma";
-import {
-  Bsda,
-  Bsdasri,
-  Bsff,
-  Bsvhu,
-  Form,
-  TemporaryStorageDetail
-} from ".prisma/client";
+import { Bsda, Bsdasri, Bsff, Bsvhu, Form } from "@prisma/client";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -438,14 +431,11 @@ function groupByBsdType(
 }
 
 export type PrismaBsdMap = {
-  bsdds: (Form & {
-    temporaryStorageDetail: TemporaryStorageDetail;
-    appendix2Forms: Form[];
-  })[];
-  bsdasris: (Bsdasri & { grouping: Bsdasri[] })[];
+  bsdds: Form[];
+  bsdasris: Bsdasri[];
   bsvhus: Bsvhu[];
-  bsdas: (Bsda & { forwarding: Bsda; grouping: Bsda[] })[];
-  bsffs: (Bsff & { forwarding: Bsff; repackaging: Bsff[]; grouping: Bsff[] })[];
+  bsdas: Bsda[];
+  bsffs: Bsff[];
 };
 
 /**
@@ -455,41 +445,48 @@ export async function toPrismaBsds(
   bsdsElastic: BsdElastic[]
 ): Promise<PrismaBsdMap> {
   const { BSDD, BSDASRI, BSVHU, BSDA, BSFF } = groupByBsdType(bsdsElastic);
-  return {
-    bsdds: await prisma.form.findMany({
+  const prismaBsdsPromises: [
+    Promise<Form[]>,
+    Promise<Bsdasri[]>,
+    Promise<Bsvhu[]>,
+    Promise<Bsda[]>,
+    Promise<Bsff[]>
+  ] = [
+    prisma.form.findMany({
       where: {
         id: {
           in: BSDD.map(bsdd => bsdd.id)
         }
-      },
-      include: { temporaryStorageDetail: true, appendix2Forms: true }
+      }
     }),
-    bsdasris: await prisma.bsdasri.findMany({
-      where: { id: { in: BSDASRI.map(bsdasri => bsdasri.id) } },
-      include: { grouping: true }
+    prisma.bsdasri.findMany({
+      where: { id: { in: BSDASRI.map(bsdasri => bsdasri.id) } }
     }),
-    bsvhus: await prisma.bsvhu.findMany({
+    prisma.bsvhu.findMany({
       where: {
         id: {
           in: BSVHU.map(bsvhu => bsvhu.id)
         }
       }
     }),
-    bsdas: await prisma.bsda.findMany({
+    prisma.bsda.findMany({
       where: {
         id: {
           in: BSDA.map(bsda => bsda.id)
         }
-      },
-      include: { forwarding: true, grouping: true }
+      }
     }),
-    bsffs: await prisma.bsff.findMany({
+    prisma.bsff.findMany({
       where: {
         id: {
           in: BSFF.map(bsff => bsff.id)
         }
-      },
-      include: { forwarding: true, repackaging: true, grouping: true }
+      }
     })
-  };
+  ];
+
+  const [bsdds, bsdasris, bsvhus, bsdas, bsffs] = await Promise.all(
+    prismaBsdsPromises
+  );
+  return { bsdds, bsdasris, bsvhus, bsdas, bsffs };
 }
