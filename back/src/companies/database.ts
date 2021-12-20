@@ -162,9 +162,9 @@ export function getCompanyActiveUsers(siret: string): Promise<CompanyMember[]> {
  */
 export async function getCompanyInvitedUsers(
   siret: string,
-  dataloader: DataLoader<string, UserAccountHash[], string>
+  userAccountHashDataloader: DataLoader<string, UserAccountHash[], string>
 ): Promise<CompanyMember[]> {
-  const hashes = await dataloader.load(siret);
+  const hashes = await userAccountHashDataloader.load(siret);
   return hashes.map(h => {
     return {
       id: h.id,
