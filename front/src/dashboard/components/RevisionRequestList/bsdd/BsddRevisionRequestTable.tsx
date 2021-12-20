@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { FormRevisionRequest } from "generated/graphql/types";
 import { useTable, useFilters, useSortBy } from "react-table";
 import {
@@ -44,7 +44,7 @@ const COLUMNS = [
 ];
 
 export function BsddRevisionRequestTable({ revisions }: Props) {
-  const columns: any = React.useMemo(() => COLUMNS, []);
+  const columns: any = useMemo(() => COLUMNS, []);
 
   const {
     getTableProps,
