@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { FormRevisionRequest } from "generated/graphql/types";
 import { useTable, useFilters, useSortBy } from "react-table";
 import {
@@ -25,7 +25,7 @@ const STATUS_LABELS = {
 const COLUMNS = [
   {
     Header: "Bordereau",
-    accessor: "bsdd.readableId",
+    accessor: "form.readableId",
   },
   {
     Header: "Demandeur",
@@ -44,7 +44,7 @@ const COLUMNS = [
 ];
 
 export function BsddRevisionRequestTable({ revisions }: Props) {
-  const columns: any = React.useMemo(() => COLUMNS, []);
+  const columns: any = useMemo(() => COLUMNS, []);
 
   const {
     getTableProps,

@@ -14,7 +14,7 @@ const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = `
   mutation SubmitFormRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
     submitFormRevisionRequestApproval(id: $id, isApproved: $isApproved) {
       id
-      bsdd {
+      form {
         id
       }
       content {

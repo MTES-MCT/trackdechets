@@ -5,7 +5,6 @@ import {
   FormRevisionRequest,
   Mutation,
   MutationSubmitFormRevisionRequestApprovalArgs,
-  RevisionRequestStatus,
   Trader,
 } from "generated/graphql/types";
 import { TdModalTrigger } from "common/components/Modal";
@@ -14,7 +13,6 @@ import { IconCogApproved } from "common/components/Icons";
 import { RevisionField } from "./RevisionField";
 import { useMutation } from "@apollo/client";
 import { SUBMIT_FORM_REVISION_REQUEST_APPROVAL } from "../query";
-import { useParams } from "react-router-dom";
 import { Field, Form, Formik } from "formik";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 
@@ -107,7 +105,7 @@ export function DisplayRevision({ review }: Props) {
       <p className="tw-pb-6">
         L'entreprise <strong>{review.authoringCompany.name}</strong> a proposé
         les révisions suivantes pour le bordereau{" "}
-        <strong>#{review.bsdd.readableId}</strong>
+        <strong>#{review.form.readableId}</strong>
       </p>
 
       <div className="tw-flex tw-py-2">
@@ -117,45 +115,45 @@ export function DisplayRevision({ review }: Props) {
 
       <RevisionField
         label="Code déchet"
-        bsddValue={review.bsdd.wasteDetails?.code}
+        bsddValue={review.form.wasteDetails?.code}
         reviewValue={review.content.wasteDetails?.code}
       />
 
       <RevisionField
         label="POP"
-        bsddValue={review.bsdd.wasteDetails?.pop}
+        bsddValue={review.form.wasteDetails?.pop}
         reviewValue={review.content.wasteDetails?.pop}
         formatter={booleanFormatter}
       />
 
       <RevisionField
         label="CAP"
-        bsddValue={review.bsdd.recipient?.cap}
+        bsddValue={review.form.recipient?.cap}
         reviewValue={review.content.recipient?.cap}
       />
 
       <RevisionField
         label="Poids reçu"
-        bsddValue={review.bsdd.quantityReceived}
+        bsddValue={review.form.quantityReceived}
         reviewValue={review.content.quantityReceived}
       />
 
       <RevisionField
         label="Opération réalisée"
-        bsddValue={review.bsdd.processingOperationDone}
+        bsddValue={review.form.processingOperationDone}
         reviewValue={review.content.processingOperationDone}
       />
 
       <RevisionField
         label="Courtier"
-        bsddValue={review.bsdd.broker}
+        bsddValue={review.form.broker}
         reviewValue={review.content.broker}
         formatter={traderAndBrokerFormatter}
       />
 
       <RevisionField
         label="Négociant"
-        bsddValue={review.bsdd.trader}
+        bsddValue={review.form.trader}
         reviewValue={review.content.trader}
         formatter={traderAndBrokerFormatter}
       />

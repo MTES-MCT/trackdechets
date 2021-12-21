@@ -526,7 +526,7 @@ type FormRevisionRequest {
   id: ID!
 
   "Bordereau concerné"
-  bsdd: Form!
+  form: Form!
 
   "Date de création de la demande"
   createdAt: DateTime

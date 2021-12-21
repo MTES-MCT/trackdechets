@@ -78,7 +78,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
           await createFormRevisionRequest({
             variables: {
               input: {
-                bsddId: bsdd.id,
+                formId: bsdd.id,
                 content: cleanedContent ?? {},
                 comment,
               },

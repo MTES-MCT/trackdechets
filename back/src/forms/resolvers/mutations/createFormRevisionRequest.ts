@@ -60,10 +60,10 @@ export default async function createFormRevisionRequest(
   { input }: MutationCreateFormRevisionRequestArgs,
   context: GraphQLContext
 ) {
-  const { bsddId, content, comment } = input;
+  const { formId, content, comment } = input;
 
   const user = checkIsAuthenticated(context);
-  const existingBsdd = await getFormOrFormNotFound({ id: bsddId });
+  const existingBsdd = await getFormOrFormNotFound({ id: formId });
   await checkIfUserCanRequestRevisionOnBsdd(user, existingBsdd);
 
   const flatContent = await getFlatContent(content, existingBsdd);
