@@ -1,6 +1,7 @@
 import {
   Bsda,
   BsdaStatus,
+  BsdaType,
   Prisma,
   WasteAcceptationStatus
 } from "@prisma/client";
@@ -268,44 +269,96 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
 
 const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
   yup.object({
-    workerCompanyName: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature && !context.isType2710,
-        `Entreprise de travaux: ${MISSING_COMPANY_NAME}`
-      ),
+    workerCompanyName: yup.string().when("type", {
+      is: value =>
+        [
+          BsdaType.RESHIPMENT,
+          BsdaType.GATHERING,
+          BsdaType.COLLECTION_2710
+        ].includes(value),
+      then: schema => schema.nullable(),
+      otherwise: schema =>
+        schema.requiredIf(
+          context.emissionSignature,
+          `Entreprise de travaux: ${MISSING_COMPANY_NAME}`
+        )
+    }),
     workerCompanySiret: yup
       .string()
       .length(14, `Entreprise de travaux: ${INVALID_SIRET_LENGTH}`)
-      .requiredIf(
-        context.emissionSignature && !context.isType2710,
-        `Entreprise de travaux: ${MISSING_COMPANY_SIRET}`
-      ),
-    workerCompanyAddress: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature && !context.isType2710,
-        `Entreprise de travaux: ${MISSING_COMPANY_ADDRESS}`
-      ),
-    workerCompanyContact: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature && !context.isType2710,
-        `Entreprise de travaux: ${MISSING_COMPANY_CONTACT}`
-      ),
-    workerCompanyPhone: yup
-      .string()
-      .requiredIf(
-        context.emissionSignature && !context.isType2710,
-        `Entreprise de travaux: ${MISSING_COMPANY_PHONE}`
-      ),
+      .when("type", {
+        is: value =>
+          [
+            BsdaType.RESHIPMENT,
+            BsdaType.GATHERING,
+            BsdaType.COLLECTION_2710
+          ].includes(value),
+        then: schema => schema.nullable(),
+        otherwise: schema =>
+          schema.requiredIf(
+            context.emissionSignature,
+            `Entreprise de travaux: ${MISSING_COMPANY_SIRET}`
+          )
+      }),
+    workerCompanyAddress: yup.string().when("type", {
+      is: value =>
+        [
+          BsdaType.RESHIPMENT,
+          BsdaType.GATHERING,
+          BsdaType.COLLECTION_2710
+        ].includes(value),
+      then: schema => schema.nullable(),
+      otherwise: schema =>
+        schema.requiredIf(
+          context.emissionSignature,
+          `Entreprise de travaux: ${MISSING_COMPANY_ADDRESS}`
+        )
+    }),
+    workerCompanyContact: yup.string().when("type", {
+      is: value =>
+        [
+          BsdaType.RESHIPMENT,
+          BsdaType.GATHERING,
+          BsdaType.COLLECTION_2710
+        ].includes(value),
+      then: schema => schema.nullable(),
+      otherwise: schema =>
+        schema.requiredIf(
+          context.emissionSignature,
+          `Entreprise de travaux: ${MISSING_COMPANY_CONTACT}`
+        )
+    }),
+    workerCompanyPhone: yup.string().when("type", {
+      is: value =>
+        [
+          BsdaType.RESHIPMENT,
+          BsdaType.GATHERING,
+          BsdaType.COLLECTION_2710
+        ].includes(value),
+      then: schema => schema.nullable(),
+      otherwise: schema =>
+        schema.requiredIf(
+          context.emissionSignature,
+          `Entreprise de travaux: ${MISSING_COMPANY_PHONE}`
+        )
+    }),
     workerCompanyMail: yup
       .string()
       .email()
-      .requiredIf(
-        context.emissionSignature && !context.isType2710,
-        `Entreprise de travaux: ${MISSING_COMPANY_EMAIL}`
-      ),
+      .when("type", {
+        is: value =>
+          [
+            BsdaType.RESHIPMENT,
+            BsdaType.GATHERING,
+            BsdaType.COLLECTION_2710
+          ].includes(value),
+        then: schema => schema.nullable(),
+        otherwise: schema =>
+          schema.requiredIf(
+            context.emissionSignature,
+            `Entreprise de travaux: ${MISSING_COMPANY_EMAIL}`
+          )
+      }),
     workerWorkHasEmitterPaperSignature: yup.boolean().nullable()
   });
 

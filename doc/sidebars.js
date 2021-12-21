@@ -60,6 +60,11 @@ module.exports = {
               ],
               BSVHU: ["tutoriels/examples/bsvhu/vhu-vers-broyeur"],
               BSFF: ["tutoriels/examples/bsff/collecte-petites-quantites"],
+              BSDA: [
+                "tutoriels/examples/bsda/collecte-chantier",
+                "tutoriels/examples/bsda/collecte-chantier-particulier",
+                "tutoriels/examples/bsda/groupement",
+              ],
             },
           ],
         },
