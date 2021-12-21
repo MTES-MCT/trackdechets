@@ -156,8 +156,6 @@ input BsdaPickupSiteInput {
 input BsdaWasteInput {
   "Rubrique Déchet"
   code: String
-  "Dénomination usuelle"
-  name: String
   "Code famille"
   familyCode: String
   "Nom du matériau"

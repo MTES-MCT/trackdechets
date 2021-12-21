@@ -1,8 +1,8 @@
 import { BsdaPicker } from "form/bsda/components/bsdaPicker/BsdaPicker";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useField } from "formik";
-import { BsdaType } from "generated/graphql/types";
-import React from "react";
+import { Bsda, BsdaType } from "generated/graphql/types";
+import React, { useEffect } from "react";
 
 type Props = { disabled: boolean };
 
@@ -28,6 +28,13 @@ const OPTIONS = [
 
 export function Type({ disabled }: Props) {
   const [{ value: type }] = useField<BsdaType>("type");
+  const [, , { setValue: setGroupingValue }] = useField("grouping");
+  const [, , { setValue: setForwardingValue }] = useField("forwarding");
+
+  useEffect(() => {
+    setGroupingValue([]);
+    setForwardingValue(null);
+  }, [type]);
 
   return (
     <>

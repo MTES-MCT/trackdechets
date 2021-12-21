@@ -86,7 +86,6 @@ type Transporter = Pick<
 type WasteDescription = Pick<
   Bsda,
   | "wasteCode"
-  | "wasteName"
   | "wasteFamilyCode"
   | "wasteMaterialName"
   | "wasteConsistence"
@@ -421,6 +420,7 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         ),
       destinationReceptionDate: yup
         .date()
+        .max(new Date())
         .requiredIf(
           context.operationSignature,
           `Entreprise de destination:vous devez préciser la date de réception`
@@ -477,6 +477,7 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         }),
       destinationOperationDate: yup
         .date()
+        .max(new Date())
         .requiredIf(
           context.operationSignature,
           `Entreprise de destination:vous devez préciser la date d'opétation`
@@ -573,14 +574,13 @@ const wasteDescriptionSchema: FactorySchemaOf<
       .string()
       .requiredIf(context.emissionSignature, "Le code déchet est obligatoire")
       .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE),
-    wasteName: yup
+    wasteFamilyCode: yup.string().nullable(),
+    wasteMaterialName: yup
       .string()
       .requiredIf(
         context.emissionSignature,
         "La description déchet est obligatoire"
       ),
-    wasteFamilyCode: yup.string().nullable(),
-    wasteMaterialName: yup.string().nullable(),
     wasteConsistence: yup
       .mixed<BsdaConsistence>()
       .requiredIf(context.workSignature, `La consistence est obligatoire`),

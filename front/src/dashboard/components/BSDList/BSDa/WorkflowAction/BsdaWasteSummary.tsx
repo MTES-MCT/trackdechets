@@ -30,7 +30,7 @@ export function BsdaWasteSummary({ bsda }: Props) {
       <DataListItem>
         <DataListTerm>Description</DataListTerm>
         <DataListDescription>
-          {[bsda.waste?.materialName, bsda.waste?.familyCode, bsda.waste?.name]
+          {[bsda.waste?.materialName, bsda.waste?.familyCode]
             .filter(Boolean)
             .join(" / ")}
         </DataListDescription>

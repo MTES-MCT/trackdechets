@@ -73,7 +73,6 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
       consistence: form.wasteConsistence,
       familyCode: form.wasteFamilyCode,
       materialName: form.wasteMaterialName,
-      name: form.wasteName,
       sealNumbers: form.wasteSealNumbers,
       adr: form.wasteAdr
     }),
@@ -438,7 +437,6 @@ function flattenBsdaWasteInput({ waste }: Pick<BsdaInput, "waste">) {
   return {
     wasteCode: chain(waste, w => w.code),
     wasteAdr: chain(waste, w => w.adr),
-    wasteName: chain(waste, w => w.name),
     wasteFamilyCode: chain(waste, w => w.familyCode),
     wasteMaterialName: chain(waste, w => w.materialName),
     wasteConsistence: chain(waste, w => w.consistence),

@@ -97,6 +97,7 @@ input[type="radio"]:checked::before {
 .grid-item {
   padding: 2px 10px;
   background-color: white;
+  border: 1px solid black; /* bg color for some reason doesnt work. Fallback to border */
 }
 
 .qrcode svg {

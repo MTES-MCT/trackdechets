@@ -14,7 +14,6 @@ export default {
   },
   waste: {
     code: "",
-    name: "",
     familyCode: "",
     materialName: "",
     consistence: BsdaConsistence.Solide,

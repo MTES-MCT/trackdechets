@@ -19,7 +19,7 @@ export function BsdaJourneySummary({ bsda }: Props) {
       >
         <JourneyStopName>Émetteur</JourneyStopName>
         <JourneyStopDescription>
-          {bsda.emitter?.company?.name} ({bsda.emitter?.company?.siret})<br />
+          {bsda.emitter?.company?.name} ({bsda.emitter?.company?.siret ?? 'particulier'})<br />
           {bsda.emitter?.company?.address}
         </JourneyStopDescription>
       </JourneyStop>

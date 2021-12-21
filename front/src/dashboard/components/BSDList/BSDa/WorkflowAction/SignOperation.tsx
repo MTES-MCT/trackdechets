@@ -28,7 +28,7 @@ const validationSchema = yup.object({
 
 type Props = { siret: string; bsdaId: string };
 export function SignOperation({ siret, bsdaId }: Props) {
-  const [updateBsda] = useMutation<
+  const [updateBsda, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsda">,
     MutationUpdateBsdaArgs
   >(UPDATE_BSDA);
@@ -82,6 +82,9 @@ export function SignOperation({ siret, bsdaId }: Props) {
                       nextDestination: { company: getInitialCompany() },
                     },
                   },
+                  weight: {
+                    value: null,
+                  },
                 },
                 bsda
               ),
@@ -132,6 +135,12 @@ export function SignOperation({ siret, bsdaId }: Props) {
                   </label>
                   <RedErrorMessage name="author" />
                 </div>
+
+                {updateError && (
+                  <div className="notification notification--error">
+                    {updateError.message}
+                  </div>
+                )}
 
                 <div className="form__actions">
                   <button

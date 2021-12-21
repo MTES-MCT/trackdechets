@@ -8,6 +8,7 @@ export const FullBsdaFragment = gql`
     status
     createdAt
     updatedAt
+    type
     emitter {
       isPrivateIndividual
       company {
@@ -60,7 +61,6 @@ export const FullBsdaFragment = gql`
     }
     waste {
       code
-      name
       familyCode
       materialName
       consistence

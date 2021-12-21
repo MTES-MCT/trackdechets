@@ -92,18 +92,6 @@ export function WasteInfo({ disabled }) {
         </Field>
       </div>
 
-      <div className="form__row">
-        <label>
-          Dénomination du déchet
-          <Field
-            disabled={disabled}
-            type="text"
-            name="waste.name"
-            className="td-input td-input--medium"
-          />
-        </label>
-      </div>
-
       <WasteInfoWorker disabled={disabled} />
     </>
   );
@@ -128,7 +116,7 @@ export function WasteInfoWorker({ disabled }) {
 
       <div className="form__row">
         <label>
-          Nom du matériau (Optionnel)
+          Nom du matériau
           <Field
             disabled={disabled}
             type="text"
