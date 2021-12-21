@@ -55,9 +55,8 @@ export function getInstallation(siret: string) {
         ]
       }
     })
-    .then(installations => {
-      // return first installation if several match
-      return installations ? installations[0] : null;
+    .then(installation => {
+      return installation ?? null;
     });
 }
 
