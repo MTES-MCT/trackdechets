@@ -1,11 +1,24 @@
 import React from "react";
 import { Field, useFormikContext } from "formik";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import { Bsda, BsdaPickupSite } from "generated/graphql/types";
+import { Bsda, BsdaType, BsdaPickupSite } from "generated/graphql/types";
 import WorkSite from "form/common/components/work-site/WorkSite";
 
 export function Emitter({ disabled }) {
   const { values } = useFormikContext<Bsda>();
+
+  const isGroupement = values?.type === BsdaType.Gathering;
+  const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
+
+  if (isGroupement || isEntreposageProvisoire) {
+    return (
+      <div className="notification">
+        Vous effectuez un groupement ou entreposage provisoire. L'entreprise
+        émettrice est obligatoirement la vôtre: {values.emitter?.company?.name}{" "}
+        - {values.emitter?.company?.siret}
+      </div>
+    );
+  }
 
   return (
     <>

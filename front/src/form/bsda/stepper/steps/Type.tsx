@@ -31,8 +31,12 @@ export function Type({ disabled }: Props) {
   const [{ value: type }] = useField<BsdaType>("type");
 
   useEffect(() => {
-    setFieldValue("grouping", []);
-    setFieldValue("forwarding", null);
+    if (type !== BsdaType.Gathering) {
+      setFieldValue("grouping", []);
+    }
+    if (type !== BsdaType.Reshipment) {
+      setFieldValue("forwarding", null);
+    }
   }, [type, setFieldValue]);
 
   return (

@@ -3,10 +3,22 @@ import { Field, useFormikContext } from "formik";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import Packagings from "form/bsda/components/packagings/Packagings";
 import Tooltip from "common/components/Tooltip";
-import { Bsda, BsdaConsistence } from "generated/graphql/types";
+import { Bsda, BsdaConsistence, BsdaType } from "generated/graphql/types";
 import TagsInput from "common/components/tags-input/TagsInput";
 
 export function WasteInfo({ disabled }) {
+  const { values } = useFormikContext<Bsda>();
+  const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
+
+  if (isEntreposageProvisoire) {
+    return (
+      <div className="notification">
+        Vous effectuez un entreposage provisoire. Les informations sur le déchet
+        ont été automatiquement reportées et ne sont pas modifiables.
+      </div>
+    );
+  }
+
   return (
     <>
       {disabled && (

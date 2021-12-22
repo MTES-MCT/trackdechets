@@ -133,7 +133,7 @@ export function BsdaPicker({ name, code }: Props) {
 
   return (
     <FieldArray
-      name={name}
+      name="grouping"
       render={({ push, remove }) => (
         <PickerTable
           onClick={bsda => {

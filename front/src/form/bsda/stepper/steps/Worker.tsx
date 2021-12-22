@@ -1,7 +1,7 @@
 import React from "react";
 import { Field, useFormikContext } from "formik";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import { Bsda } from "generated/graphql/types";
+import { Bsda, BsdaType } from "generated/graphql/types";
 import { RedErrorMessage } from "common/components";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
@@ -27,6 +27,18 @@ export function Worker({ disabled }) {
         false
       );
     }
+  }
+
+  const isGroupement = values?.type === BsdaType.Gathering;
+  const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
+
+  if (isGroupement || isEntreposageProvisoire) {
+    return (
+      <div className="notification">
+        Vous effectuez un groupement ou entreposage provisoire. Il n'y a pas
+        d'entreprise de travaux à saisir.
+      </div>
+    );
   }
 
   return (
