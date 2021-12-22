@@ -27,6 +27,8 @@ interface Props {
   initialStep?: number;
   bsdasriFormType?: string;
 }
+type removableKey = keyof Bsdasri;
+
 /**
  * Do not resend sections locked by relevant signatures
  */
@@ -36,8 +38,9 @@ const removeSignedSections = (input: BsdasriInput, status: BsdasriStatus) => {
   const emitterKey = "emitter";
   const transporterKey = "transporter";
   const destinationKey = "destination";
+  const identificationKey = "identification";
 
-  const mapping = {
+  const mapping: Partial<Record<BsdasriStatus, removableKey[]>> = {
     INITIAL: [],
     SIGNED_BY_PRODUCER: [wasteKey, ecoOrganismeKey, emitterKey],
     SENT: [wasteKey, ecoOrganismeKey, emitterKey, transporterKey],
@@ -47,6 +50,7 @@ const removeSignedSections = (input: BsdasriInput, status: BsdasriStatus) => {
       emitterKey,
       transporterKey,
       destinationKey,
+      identificationKey,
     ],
   };
   return omit(input, mapping[status]);
