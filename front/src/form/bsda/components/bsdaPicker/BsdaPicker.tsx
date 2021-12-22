@@ -50,7 +50,10 @@ export function BsdaPicker({ name, code }: Props) {
     const forwardedBsda = data.bsdas.edges.find(
       edge => edge.node.id === forwarding
     )?.node;
-    setFieldValue("weight.value", forwardedBsda?.destination?.reception?.weight ?? 0);
+    setFieldValue(
+      "weight.value",
+      forwardedBsda?.destination?.reception?.weight ?? 0
+    );
     setFieldValue(
       "waste.sealNumbers",
       forwardedBsda?.waste?.sealNumbers ?? initialState.waste.sealNumbers
