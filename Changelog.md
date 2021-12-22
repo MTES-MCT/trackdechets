@@ -18,6 +18,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Correctif de l'affichage du type de quantité dans l'UI du BSDD [PR 1102](https://github.com/MTES-MCT/trackdechets/pull/1102)
+- Correctif de la signature du traitement du Bsdasri dans l'UI [PR 1119](https://github.com/MTES-MCT/trackdechets/pull/1102)
 
 #### :boom: Breaking changes
 
@@ -33,7 +34,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Initialisation explicite des gestionnaires de téléchargement de fichier [PR 1092](https://github.com/MTES-MCT/trackdechets/pull/1092)
 
-# Next release ~06/12
+# [2021.12.1] 06/12/2021
 
 #### :rocket: Nouvelles fonctionnalités
 
