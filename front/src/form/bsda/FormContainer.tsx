@@ -12,6 +12,7 @@ import {
   WasteInfo,
 } from "./stepper/steps";
 import { Type } from "./stepper/steps/Type";
+import { BsdaType } from "generated/graphql/types";
 
 export default function FormContainer() {
   const { id } = useParams<{ id?: string }>();
@@ -30,6 +31,8 @@ export default function FormContainer() {
             const workerSigned = bsda?.worker?.work?.signature?.author != null;
             const transporterSigned =
               bsda?.transporter?.transport?.signature?.author != null;
+            const isGroupement = bsda?.type === BsdaType.Gathering;
+            const isEntreposageProvisoire = bsda?.type === BsdaType.Reshipment;
 
             return (
               <>
@@ -41,18 +44,22 @@ export default function FormContainer() {
                 <StepContainer
                   component={Emitter}
                   title="Émetteur"
-                  disabled={emitterSigned}
+                  disabled={
+                    emitterSigned || isGroupement || isEntreposageProvisoire
+                  }
                 />
                 <StepContainer
                   component={WasteInfo}
                   title="Détail du déchet"
-                  disabled={emitterSigned}
+                  disabled={emitterSigned || isEntreposageProvisoire}
                 />
-                <StepContainer
-                  component={Worker}
-                  title="Entreprise de travaux"
-                  disabled={workerSigned}
-                />
+                {!isGroupement && !isEntreposageProvisoire && (
+                  <StepContainer
+                    component={Worker}
+                    title="Entreprise de travaux"
+                    disabled={workerSigned}
+                  />
+                )}
                 <StepContainer
                   component={Transporter}
                   title="Transporteur"

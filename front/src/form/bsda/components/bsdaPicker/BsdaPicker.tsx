@@ -9,34 +9,104 @@ import {
   TableRow,
 } from "common/components";
 import { GET_BSDAS } from "form/bsda/stepper/queries";
-import { FieldArray, useField } from "formik";
+import { FieldArray, useFormikContext } from "formik";
 import {
+  BsdaInput,
+  BsdaPackaging,
   BsdaStatus,
-  CompanyInput,
   Query,
   QueryBsdasArgs,
 } from "generated/graphql/types";
-import React from "react";
+import React, { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import initialState from "../../stepper/initial-state";
 
-type Props = { singleSelect: boolean; name: string; code: string };
-export function BsdaPicker({ singleSelect, name, code }: Props) {
+type Props = { name: string; code: string };
+
+export function BsdaPicker({ name, code }: Props) {
+  const { siret } = useParams<{ siret: string }>();
   const { data } = useQuery<Pick<Query, "bsdas">, QueryBsdasArgs>(GET_BSDAS, {
     variables: {
       where: {
         status: { _eq: BsdaStatus.AwaitingChild },
-        destination: { operation: { code: { _eq: code } } },
+        destination: {
+          operation: { code: { _eq: code } },
+          company: { siret: { _eq: siret } },
+        },
       },
     },
     fetchPolicy: "network-only",
   });
-  const [emitter, , { setValue: setEmitterCompany }] = useField<CompanyInput>(
-    "emitter.company"
-  );
+  const {
+    values: { forwarding, grouping },
+    setFieldValue,
+  } = useFormikContext<BsdaInput>();
 
-  const [{ value: forwarding }, , { setValue }] = useField<string>(name);
-  const [{ value: grouping }] = useField<string[]>(name);
+  const isForwardingPicker = name === "forwarding";
 
-  const isSingleValue = name === "forwarding";
+  // `forwarding` change effect
+  useEffect(() => {
+    if (!data) return;
+    const forwardedBsda = data.bsdas.edges.find(
+      edge => edge.node.id === forwarding
+    )?.node;
+    setFieldValue("weight.value", forwardedBsda?.destination?.reception?.weight ?? 0);
+    setFieldValue(
+      "waste.sealNumbers",
+      forwardedBsda?.waste?.sealNumbers ?? initialState.waste.sealNumbers
+    );
+    setFieldValue(
+      "waste.materialName",
+      forwardedBsda?.waste?.materialName ?? initialState.waste.materialName
+    );
+    setFieldValue(
+      "waste.code",
+      forwardedBsda?.waste?.code ?? initialState.waste.code
+    );
+    setFieldValue(
+      "packagings",
+      forwardedBsda?.packagings ?? initialState.packagings
+    );
+
+    const { country, ...company } =
+      forwardedBsda?.destination?.company ?? initialState.destination.company;
+    setFieldValue("emitter.company", company);
+  }, [forwarding, data, setFieldValue]);
+
+  // `grouping` change effect
+  useEffect(() => {
+    if (!data) return;
+    const groupedBsdas = data.bsdas.edges
+      .filter(edge => grouping?.includes(edge.node.id))
+      .map(edge => edge.node);
+
+    setFieldValue(
+      "weight.value",
+      groupedBsdas?.reduce(
+        (prev, cur) => prev + (cur.destination?.reception?.weight ?? 0),
+        0
+      ) ?? 0
+    );
+    setFieldValue(
+      "waste.sealNumbers",
+      groupedBsdas?.reduce(
+        (prev, cur) => prev.concat(cur.waste?.sealNumbers ?? []),
+        [] as string[]
+      ) ?? initialState.waste.sealNumbers
+    );
+    setFieldValue(
+      "packagings",
+      groupedBsdas?.reduce(
+        (prev, cur) => prev.concat(cur.packagings ?? []),
+        [] as BsdaPackaging[]
+      ) ?? initialState.packagings
+    );
+
+    const { country, ...company } =
+      groupedBsdas?.[0]?.destination?.company ??
+      initialState.destination.company;
+    setFieldValue("emitter.company", company);
+  }, [grouping, data, setFieldValue]);
 
   if (data == null) {
     return <Loader />;
@@ -46,10 +116,12 @@ export function BsdaPicker({ singleSelect, name, code }: Props) {
     return <div className="notification">Aucun BSDA disponible à associer</div>;
   }
 
-  if (isSingleValue) {
+  if (isForwardingPicker) {
     return (
       <PickerTable
-        onClick={bsda => setValue(bsda.id)}
+        onClick={bsda => {
+          setFieldValue("forwarding", bsda.id);
+        }}
         isSelected={bsda => forwarding === bsda.id}
         bsdas={data.bsdas}
       />
@@ -59,30 +131,19 @@ export function BsdaPicker({ singleSelect, name, code }: Props) {
   return (
     <FieldArray
       name={name}
-      render={({ push, remove, pop }) => (
+      render={({ push, remove }) => (
         <PickerTable
           onClick={bsda => {
-            const previousBsdaIndex = grouping.findIndex(id => id === bsda.id);
-            const isSelected = previousBsdaIndex >= 0;
-            if (singleSelect) {
-              setValue(bsda.id);
-              return;
-            }
+            const clickedBsdaIndex = grouping!.findIndex(id => id === bsda.id);
+            const isSelected = clickedBsdaIndex >= 0;
 
             if (isSelected) {
-              remove(previousBsdaIndex);
+              remove(clickedBsdaIndex);
               return;
             }
-
-            if (singleSelect) pop();
             push(bsda.id);
-
-            if (!emitter && bsda.destination?.company) {
-              const { country, ...company } = bsda.destination.company;
-              setEmitterCompany(company);
-            }
           }}
-          isSelected={bsda => grouping.findIndex(id => id === bsda.id) >= 0}
+          isSelected={bsda => grouping!.findIndex(id => id === bsda.id) >= 0}
           bsdas={data.bsdas}
         />
       )}

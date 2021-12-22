@@ -28,7 +28,6 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   emitterIsPrivateIndividual: false,
 
   wasteCode: "16 01 06",
-  wasteName: "Matériaux construction contenant de l’amiante",
   wasteFamilyCode: "6",
   wasteMaterialName:
     "Amiante lié : Amiante ciment, lié à des matériaux inertes",
