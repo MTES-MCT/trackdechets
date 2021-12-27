@@ -39,7 +39,7 @@ import {
   RouteBSDasView,
 } from "./detail";
 import { RouteTransportToCollect, RouteTransportCollected } from "./transport";
-import { RouteBsdsReview } from "./bsds/review";
+// import { RouteBsdsReview } from "./bsds/review";
 import { RouteBsddRequestRevision } from "./components/RevisionRequestList/bsdd/request/RouteBsddRequestRevision";
 
 export const GET_ME = gql`
@@ -162,9 +162,9 @@ export default function Dashboard() {
             <Route path={routes.dashboard.bsds.history}>
               <RouteBsdsHistory />
             </Route>
-            <Route path={routes.dashboard.bsds.reviews}>
+            {/* <Route path={routes.dashboard.bsds.reviews}>
               <RouteBsdsReview />
-            </Route>
+            </Route> */}
             <Route path={routes.dashboard.transport.toCollect}>
               <RouteTransportToCollect />
             </Route>

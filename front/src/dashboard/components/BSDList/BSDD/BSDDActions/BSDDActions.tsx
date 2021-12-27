@@ -95,7 +95,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                   </MenuLink>
                 </>
               )}
-              {![
+              {/* {![
                 FormStatus.Draft,
                 FormStatus.Sealed,
                 FormStatus.Refused,
@@ -113,7 +113,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                   <IconPaperWrite size="24px" color="blueLight" />
                   Révision
                 </MenuLink>
-              )}
+              )} */}
               <MenuItem onSelect={() => duplicateForm()}>
                 <IconDuplicateFile size="24px" color="blueLight" />
                 Dupliquer

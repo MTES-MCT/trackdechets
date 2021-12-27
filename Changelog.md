@@ -5,7 +5,7 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# Next release ~27/12
+# [2021.12.2] 27/12/2021
 #### :rocket: Nouvelles fonctionnalités
 
 - Gestion de l'export du registre pour tous les types de déchets en accord avec l'arrêté du 31 mai 2021 fixant le contenu du registre. Cet export est disponible :
