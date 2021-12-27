@@ -33,7 +33,7 @@
     "clsx": "^1.1.1",
     "docusaurus-graphql-plugin": "^0.6.1",
     "file-loader": "^6.2.0",
-    "mermaid": "^8.10.2",
+    "mermaid": "^8.11.0",
     "raw-loader": "^4.0.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
