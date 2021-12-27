@@ -9,6 +9,7 @@ import bsdsResolvers from "./bsds/resolvers";
 import dasriResolvers from "./bsdasris/resolvers";
 import bsffResolvers from "./bsffs/resolvers";
 import bsdaResolvers from "./bsda/resolvers";
+import registerResolvers from "./registry/resolvers";
 import applicationResolvers from "./applications/resolvers";
 
 // Merge GraphQL schema by merging types definitions and resolvers
@@ -24,6 +25,7 @@ const repositories = [
   "bsdasris",
   "bsffs",
   "bsda",
+  "registry",
   "applications"
 ];
 
@@ -45,6 +47,7 @@ const resolvers = [
   dasriResolvers,
   bsffResolvers,
   bsdaResolvers,
+  registerResolvers,
   applicationResolvers
 ];
 

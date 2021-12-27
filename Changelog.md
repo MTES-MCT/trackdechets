@@ -5,11 +5,44 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# Next release ~27/12
+ 
+# [2021.12.2] 27/12/2021
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Gestion de l'export du registre pour tous les types de déchets en accord avec l'arrêté du 31 mai 2021 fixant le contenu du registre. Cet export est disponible :
+  - soit en téléchargeant un fichier CSV ou XLSX via la `query` `wastesDownloadLink`
+  - soit en paginant les données directement via les `queries` :
+    - `incomingWastes` : registre déchets entrants
+    - `outgoingWastes` : registre déchets sortants
+    - `transportedWastes` : registre déchets collectés
+    - `managedWastes` : registre déchets gérés
+#### :bug: Corrections de bugs
+
+- Correctif de l'affichage du type de quantité dans l'UI du BSDD [PR 1102](https://github.com/MTES-MCT/trackdechets/pull/1102)
+- Correctif de la signature du traitement du Bsdasri dans l'UI [PR 1119](https://github.com/MTES-MCT/trackdechets/pull/1102)
+
+#### :boom: Breaking changes
+
+- Dépréciation de la query `formsRegister` au profit de la query `wastesDownloadLink`.
+#### :nail_care: Améliorations
+
+- Remplacement du CERFA BSDD par un récépissé reprenant l'ensemble des évolutions Trackdéchets [PR 1096](https://github.com/MTES-MCT/trackdechets/pull/1096)
+- Ajout d'exemples de workflows pour la création de bordereaux amiante [PR 1098](https://github.com/MTES-MCT/trackdechets/pull/1098)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Initialisation explicite des gestionnaires de téléchargement de fichier [PR 1092](https://github.com/MTES-MCT/trackdechets/pull/1092)
+
+# [2021.12.1] 06/12/2021
 
 #### :rocket: Nouvelles fonctionnalités
 
 #### :bug: Corrections de bugs
+
+- Ajout du courtier à la liste des acteurs pouvant lister ses bsdas [PR 1103](https://github.com/MTES-MCT/trackdechets/pull/1103)
 
 #### :boom: Breaking changes
 
@@ -32,6 +65,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Correction d'un bug empêchant la signature de l'entreprise de travaux sur le BSDA quand l'émetteur est un particulier [PR 1091](https://github.com/MTES-MCT/trackdechets/pull/1091)
 
 #### :boom: Breaking changes
+
 - Ajout d'une date de prise en charge du déchet par le transporteur sur le `Bsff` [PR 1065](https://github.com/MTES-MCT/trackdechets/pull/1065)
   - Ajout du champ `transporter.transport.takenOverAt` à l'objet `Bsff`
   - Ajout du champ optionnel `takenOverAt` à l'input `BsffTransporterTransportInput`.
@@ -53,6 +87,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout du code de traitement R3 à la liste des traitements possibles pour le BSFF [PR 1037](https://github.com/MTES-MCT/trackdechets/pull/1037)
 - Ajout de la suppression d'un établissement depuis l'interface [PR 1053](https://github.com/MTES-MCT/trackdechets/pull/1053)
 - Il est maintenant possible de lier une fiche d'intervention à plusieurs BSFFs [PR 1033](https://github.com/MTES-MCT/trackdechets/pull/1033)
+- Ajout de la demande de révision d'un bordereau (API seulement). Rend possible la modification de certains champs du bordereau après la fin de son cycle de vie [PR 1055](https://github.com/MTES-MCT/trackdechets/pull/1055)
 
 #### :boom: Breaking changes
 

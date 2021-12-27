@@ -4,18 +4,27 @@ import { NotFormContributor } from "../forms/errors";
 import { getFullUser } from "../users/database";
 import prisma from "../prisma";
 
+type BsdaContributors = Pick<
+  Bsda,
+  | "emitterCompanySiret"
+  | "destinationCompanySiret"
+  | "transporterCompanySiret"
+  | "workerCompanySiret"
+  | "brokerCompanySiret"
+>;
+
+export const BSDA_CONTRIBUTORS_FIELDS: Record<string, keyof BsdaContributors> =
+  {
+    emitter: "emitterCompanySiret",
+    destination: "destinationCompanySiret",
+    transporter: "transporterCompanySiret",
+    worker: "workerCompanySiret",
+    broker: "brokerCompanySiret"
+  };
+
 export async function checkIsBsdaContributor(
   user: User,
-  form: Partial<
-    Pick<
-      Bsda,
-      | "emitterCompanySiret"
-      | "destinationCompanySiret"
-      | "transporterCompanySiret"
-      | "workerCompanySiret"
-      | "brokerCompanySiret"
-    >
-  >,
+  form: Partial<BsdaContributors>,
   errorMsg: string
 ) {
   const isContributor = await isBsdaContributor(user, form);
@@ -31,13 +40,9 @@ export async function isBsdaContributor(user: User, form: Partial<Bsda>) {
   const fullUser = await getFullUser(user);
   const userSirets = fullUser.companies.map(c => c.siret);
 
-  const formSirets = [
-    form.emitterCompanySiret,
-    form.destinationCompanySiret,
-    form.transporterCompanySiret,
-    form.workerCompanySiret,
-    form.brokerCompanySiret
-  ];
+  const formSirets = Object.values(BSDA_CONTRIBUTORS_FIELDS).map(
+    field => form[field]
+  );
 
   const siretsInCommon = userSirets.filter(siret => formSirets.includes(siret));
 

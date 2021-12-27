@@ -18,6 +18,8 @@ input BsdaWhere {
   transporter: BsdaTransporterWhere
   "Filtre sur le champ destination."
   destination: BsdaDestinationWhere
+  "Filtre sur le champ broker."
+  broker: BsdaBrokerWhere
   "ET logique"
   _and: [BsdaWhere!]
   "OU logique"
@@ -59,6 +61,11 @@ input BsdaDestinationWhere {
   company: CompanyWhere
   reception: BsdaReceptionWhere
   operation: BsdaOperationWhere
+}
+
+"Champs possible pour le filtre sur le courtier."
+input BsdaBrokerWhere {
+  company: CompanyWhere
 }
 
 "Champs possibles pour le filtre sur la réception"
@@ -103,7 +110,7 @@ input BsdaInput {
   waste: BsdaWasteInput
   "Conditionnement"
   packagings: [BsdaPackagingInput!]
-  "Quantité"
+  "Quantité en tonnes, réelle ou estimée"
   weight: BsdaWeightInput
 
   "Installation de destination"
@@ -197,7 +204,7 @@ input BsdaDestinationInput {
 input BsdaReceptionInput {
   "Date de présentation sur site"
   date: DateTime
-  "Quantité présentée"
+  "Quantité présentée en tonnes"
   weight: Float
   "Lot accepté, accepté partiellement ou refusé"
   acceptationStatus: WasteAcceptationStatus

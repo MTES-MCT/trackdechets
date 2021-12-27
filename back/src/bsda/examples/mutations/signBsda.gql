@@ -1,0 +1,6 @@
+mutation SignBsda($id: ID!, $input: BsdaSignatureInput!) {
+  signBsda(id: $id, input: $input) {
+    id
+    status
+  }
+}

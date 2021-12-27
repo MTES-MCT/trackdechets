@@ -95,6 +95,25 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                   </MenuLink>
                 </>
               )}
+              {/* {![
+                FormStatus.Draft,
+                FormStatus.Sealed,
+                FormStatus.Refused,
+              ].includes(form.status) && (
+                <MenuLink
+                  as={Link}
+                  to={{
+                    pathname: generatePath(routes.dashboard.bsdds.review, {
+                      siret,
+                      id: form.id,
+                    }),
+                    state: { background: location },
+                  }}
+                >
+                  <IconPaperWrite size="24px" color="blueLight" />
+                  Révision
+                </MenuLink>
+              )} */}
               <MenuItem onSelect={() => duplicateForm()}>
                 <IconDuplicateFile size="24px" color="blueLight" />
                 Dupliquer

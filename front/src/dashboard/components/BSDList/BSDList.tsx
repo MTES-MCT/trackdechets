@@ -61,6 +61,9 @@ interface BSDListProps {
   defaultWhere: BsdWhere;
 }
 
+// Number of bsds per page
+const FIRST = 10;
+
 export function BSDList({
   siret,
   columns = DEFAULT_COLUMNS,
@@ -72,6 +75,7 @@ export function BSDList({
     QueryBsdsArgs
   >(GET_BSDS, {
     variables: {
+      first: FIRST,
       where: defaultWhere,
     },
     fetchPolicy: "cache-and-network",
@@ -85,6 +89,7 @@ export function BSDList({
     GET_BSDS,
     {
       variables: {
+        first: FIRST,
         where: defaultWhere,
       },
       // read from the cache only to avoid duplicate requests

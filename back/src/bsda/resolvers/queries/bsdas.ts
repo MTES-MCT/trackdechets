@@ -3,10 +3,11 @@ import { QueryBsdasArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
-import { getConnectionsArgs } from "../../../bsvhu/pagination";
+import { getConnectionsArgs } from "../../pagination";
 import { expandBsdaFromDb } from "../../converter";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
+import { BSDA_CONTRIBUTORS_FIELDS } from "../../permissions";
 
 export default async function bsdas(
   _,
@@ -28,12 +29,9 @@ export default async function bsdas(
   const userSirets = userCompanies.map(c => c.siret);
 
   const mask = {
-    OR: [
-      { emitterCompanySiret: { in: userSirets } },
-      { workerCompanySiret: { in: userSirets } },
-      { transporterCompanySiret: { in: userSirets } },
-      { destinationCompanySiret: { in: userSirets } }
-    ]
+    OR: Object.values(BSDA_CONTRIBUTORS_FIELDS).map(field => ({
+      [field]: { in: userSirets }
+    }))
   };
 
   const prismaWhere = {

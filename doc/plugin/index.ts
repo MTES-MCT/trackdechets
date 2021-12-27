@@ -3,6 +3,7 @@ import bsdWorkflows from "../../back/src/forms/examples/workflows";
 import bsdasriWorkflows from "../../back/src/bsdasris/examples/workflows";
 import bsvhuWorkflows from "../../back/src/bsvhu/examples/workflows";
 import bsffWorkflows from "../../back/src/bsffs/examples/workflows";
+import bsdaWorkflows from "../../back/src/bsda/examples/workflows";
 import { Workflow } from "../../back/src/common/workflow";
 
 // parse workflow definition files
@@ -45,6 +46,13 @@ export default function plugin(): Plugin<any> {
           collectePetitesQuantites: parseWorkflow(
             bsffWorkflows.collectePetitesQuantites
           ),
+        },
+        bsda: {
+          collecteChantier: parseWorkflow(bsdaWorkflows.collecteChantier),
+          collecteChantierParticulier: parseWorkflow(
+            bsdaWorkflows.collecteChantierParticulier
+          ),
+          groupement: parseWorkflow(bsdaWorkflows.groupement),
         },
       };
     },

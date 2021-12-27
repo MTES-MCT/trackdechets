@@ -37,7 +37,7 @@ export function RouteBsdsHistory() {
               Il n'y a aucun bordereau en archive
             </BlankslateTitle>
             <BlankslateDescription>
-              Des bordereaux apparaissent dans cet onglet lorsqu'ils terminé
+              Des bordereaux apparaissent dans cet onglet lorsqu'ils ont terminé
               leur cycle de vie. Ils sont alors disponible en lecture seule pour
               consultation.
             </BlankslateDescription>

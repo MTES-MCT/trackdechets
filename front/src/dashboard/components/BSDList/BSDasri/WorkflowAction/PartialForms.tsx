@@ -224,6 +224,7 @@ export const removeSections = (input, signatureType: SignatureType) => {
   const companyKey = "company";
   const customInfoKey = "customInfo";
   const groupingBsdasrisKey = "grouping";
+  const identificationKey = "identification";
   const common = [
     wasteKey,
     companyKey,
@@ -253,6 +254,7 @@ export const removeSections = (input, signatureType: SignatureType) => {
       emitterKey,
       transporterKey,
       receptionKey,
+      identificationKey,
       ...common,
     ],
   };

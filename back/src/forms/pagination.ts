@@ -1,5 +1,4 @@
-import { UserInputError } from "apollo-server-express";
-import * as yup from "yup";
+import { validatePaginationArgs } from "../common/pagination";
 
 type PaginationArgs = {
   skip?: number;
@@ -12,13 +11,6 @@ type PaginationArgs = {
   // max value for `first` and `last`
   maxPaginateBy?: number;
 };
-
-const positiveInteger = yup
-  .number()
-  .nullable(true)
-  .notRequired()
-  .integer("`${path}` doit être un entier")
-  .positive("`${path}` doit être positif"); // strictly positive (n > 0)
 
 /**
  * Validate and convert GraphQL pagination args (skip, first, last, cursorAfter, cursorBefore)
@@ -58,51 +50,14 @@ const positiveInteger = yup
 export function getConnectionsArgs(args: PaginationArgs) {
   const maxPaginateBy = args.maxPaginateBy ?? 1000;
 
-  const validationSchema = yup.object().shape({
-    first: positiveInteger.max(
-      maxPaginateBy,
-      `\`first\` doit être inférieur à ${maxPaginateBy}`
-    ),
-    last: positiveInteger.max(
-      maxPaginateBy,
-      `\`last\` doit être inférieur à ${maxPaginateBy}`
-    ),
-    skip: positiveInteger,
-    defaultPaginateBy: positiveInteger
+  validatePaginationArgs({
+    skip: args.skip,
+    first: args.first,
+    after: args.cursorAfter,
+    last: args.last,
+    before: args.cursorBefore,
+    maxPaginateBy
   });
-
-  // validate number formats
-  validationSchema.validateSync(args);
-
-  if (args.first & args.last) {
-    throw new UserInputError(
-      "L'utilisation simultanée de `first` et `last` n'est pas supportée"
-    );
-  }
-
-  if (args.cursorAfter && args.cursorBefore) {
-    throw new UserInputError(
-      "L'utilisation simultanée de `cursorAfter` et `cursorBefore` n'est pas supportée"
-    );
-  }
-
-  if (args.first && args.cursorBefore) {
-    throw new UserInputError(
-      "`first` ne peut pas être utilisé en conjonction avec `cursorBefore`"
-    );
-  }
-
-  if (args.last && args.cursorAfter) {
-    throw new UserInputError(
-      "`last` ne peut pas être utilisé en conjonction avec `cursorAfter`"
-    );
-  }
-
-  if ((args.skip && args.cursorAfter) || (args.skip && args.cursorBefore)) {
-    throw new UserInputError(
-      "`skip` (pagination par offset) ne peut pas être utilisé en conjonction avec `cursorAfter` ou `cursorBefore` (pagination par curseur)"
-    );
-  }
 
   let first = args.first;
   let last = args.last;

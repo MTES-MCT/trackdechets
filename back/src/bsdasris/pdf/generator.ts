@@ -4,8 +4,7 @@ import path from "path";
 import * as QRCode from "qrcode";
 import { format } from "date-fns";
 import Handlebars from "handlebars";
-import { toPDF } from "../../common/pdf";
-import { transportModeLabels } from "../../common/pdf/helpers";
+import { TRANSPORT_MODE_LABELS, toPDF } from "../../common/pdf";
 
 export async function buildPdf(bsdasri: Bsdasri) {
   const dasristamp = await fs.readFile(
@@ -29,7 +28,7 @@ export async function buildPdf(bsdasri: Bsdasri) {
     if (!transportMode) {
       return "";
     }
-    return transportModeLabels[transportMode];
+    return TRANSPORT_MODE_LABELS[transportMode];
   });
 
   const qrcode = !bsdasri.isDraft

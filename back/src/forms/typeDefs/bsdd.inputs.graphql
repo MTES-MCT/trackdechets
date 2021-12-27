@@ -62,7 +62,7 @@ input AcceptedFormInput {
   signedBy: String!
 
   """
-  Quantité réelle présentée (case 10).
+  Quantité réelle présentée en tonnes (case 10).
    Doit être supérieure à 0 lorsque le déchet est accepté.
    Doit être égale à 0 lorsque le déchet est refusé.
   """
@@ -87,7 +87,7 @@ input ReceivedFormInput {
   signedAt: DateTime
 
   """
-  Quantité réelle présentée (case 10).
+  Quantité réelle présentée en tonnes (case 10).
    Doit être supérieure à 0 lorsque le déchet est accepté.
    Doit être égale à 0 lorsque le déchet est refusé.
   """
@@ -516,7 +516,7 @@ input TempStorerAcceptedFormInput {
   wasteRefusalReason: String
 
   """
-  Quantité réelle présentée (case 13)
+  Quantité réelle présentée en tonnes (case 13)
    Doit être supérieure à 0 lorsque le déchet est accepté.
    Doit être égale à 0 lorsque le déchet est refusé.
   """
@@ -543,7 +543,7 @@ input TempStoredFormInput {
   signedAt: DateTime
 
   """
-  Quantité réelle présentée (case 13)
+  Quantité réelle présentée en tonnes (case 13)
    Doit être supérieure à 0 lorsque le déchet est accepté.
    Doit être égale à 0 lorsque le déchet est refusé.
   """
@@ -659,4 +659,66 @@ input ImportPaperFormInput {
 
   "Informations liées au traitement du déchet (case 11)"
   processedInfo: ProcessedFormInput!
+}
+
+"Payload de révision d'un bordereau."
+input CreateFormRevisionRequestInput {
+  "Identifiant du bordereau à réviser"
+  formId: ID!
+  "Contenu de la révision"
+  content: FormRevisionRequestContentInput!
+  "Commentaire pour expliquer la demande de révision"
+  comment: String!
+}
+
+"Payload du contenu de la révision d'un bordereau. Disponible sur une liste restreinte de champs."
+input FormRevisionRequestContentInput {
+  "Détails du déchet (édition partielle uniquement)"
+  wasteDetails: FormRevisionRequestWasteDetailsInput
+
+  "Négociant"
+  trader: TraderInput
+
+  "Courtier"
+  broker: BrokerInput
+
+  "Destination du déchet (édition partielle uniquement)"
+  recipient: FormRevisionRequestRecipientInput
+
+  "Quantité reçue, en tonnes"
+  quantityReceived: Float
+
+  "Traitement réalisé (code D/R)"
+  processingOperationDone: String
+
+  "Entreposage provisoire (édition partielle uniquement)"
+  temporaryStorageDetail: FormRevisionRequestTemporaryStorageDetailInput
+}
+
+input FormRevisionRequestWasteDetailsInput {
+  "Code CED"
+  code: String
+
+  "Contient des Polluants Organiques Persistants (POP) oui / non"
+  pop: Boolean
+}
+
+input FormRevisionRequestRecipientInput {
+  cap: String
+}
+
+input FormRevisionRequestTemporaryStorageDetailInput {
+  destination: FormRevisionRequestDestinationInput
+}
+
+input FormRevisionRequestDestinationInput {
+  "N° de CAP"
+  cap: String
+
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  processingOperation: String
+}
+
+input FormRevisionRequestWhere {
+  status: RevisionRequestStatus
 }

@@ -78,7 +78,7 @@ type Form {
   "Date à laquelle le déchet a été accepté ou refusé (case 10)"
   signedAt: DateTime
 
-  "Quantité réelle présentée (case 10)"
+  "Quantité réelle présentée en tonnes (case 10)"
   quantityReceived: Float
 
   "Traitement réalisé (code D/R)"
@@ -145,7 +145,7 @@ type Appendix2Form {
   signedAt: DateTime
   """
   Quantité reçue par l’installation réalisant une transformation ou un traitement aboutissant à des déchets
-  dont la provenance reste identifiable
+  dont la provenance reste identifiable (en tonnes)
   """
   quantityReceived: Float
   """
@@ -165,7 +165,7 @@ En fonction du statut du bordereau, différentes informations sont à lire pour 
 Cet objet `StateSummary` vise à simplifier ces questions. Il renverra toujours la valeur pour un instant T donné.
 """
 type StateSummary {
-  "Quantité la plus à jour"
+  "Quantité la plus à jour (en tonnes)"
   quantity: Float
 
   "DEPRECATED Packaging le plus à jour"
@@ -221,6 +221,7 @@ type TemporaryStorageDetail {
 
 type TemporaryStorer {
   quantityType: QuantityType
+  "Quantité reçue en tonnes"
   quantityReceived: Float
   wasteAcceptationStatus: WasteAcceptationStatus
   wasteRefusalReason: String
@@ -512,9 +513,107 @@ type Stat {
   "Code déchet"
   wasteCode: String!
 
-  "Quantité entrante"
+  "Quantité entrante en tonnes"
   incoming: Float!
 
   "Qantité sortante"
   outgoing: Float!
+}
+
+"Demande de révision BSDD"
+type FormRevisionRequest {
+  "Identifiant de la demande de révison"
+  id: ID!
+
+  "Bordereau concerné"
+  form: Form!
+
+  "Date de création de la demande"
+  createdAt: DateTime
+
+  "Entreprise à l'origine de la demande de révision"
+  authoringCompany: FormCompany!
+
+  "Liste des approbations apposées sur la révision"
+  approvals: [FormRevisionRequestApproval!]!
+
+  "Contenu de la révision"
+  content: FormRevisionRequestContent!
+
+  "Commentaire explicatif, saisi par l'auteur de la demande de révision"
+  comment: String!
+
+  "Statut d'acceptation de la révision"
+  status: RevisionRequestStatus!
+}
+
+"Approbation d'une demande de révision"
+type FormRevisionRequestApproval {
+  "Siret de l'entreprise responsable de cette approbation"
+  approverSiret: String!
+
+  "Commentaire explicatif, saisi par l'approbateur"
+  comment: String
+
+  "Statut d'acceptation de l'approbation"
+  status: RevisionRequestApprovalStatus!
+}
+
+"Payload de révision d'un bordereau. Disponible sur une liste restreinte de champs."
+type FormRevisionRequestContent {
+  "Détails du déchet (édition partielle uniquement)"
+  wasteDetails: FormRevisionRequestWasteDetails
+
+  "Négociant"
+  trader: Trader
+
+  "Courtier"
+  broker: Broker
+
+  "Destination du déchet (édition partielle uniquement)"
+  recipient: FormRevisionRequestRecipient
+
+  "Quantité reçue, en tonnes"
+  quantityReceived: Float
+
+  "Traitement réalisé (code D/R)"
+  processingOperationDone: String
+
+  "Entreposage provisoire (édition partielle uniquement)"
+  temporaryStorageDetail: FormRevisionRequestTemporaryStorageDetail
+}
+
+type FormRevisionRequestWasteDetails {
+  "Code CED"
+  code: String
+
+  "Contient des Polluants Organiques Persistants (POP) oui / non"
+  pop: Boolean
+}
+
+type FormRevisionRequestRecipient {
+  cap: String
+}
+
+type FormRevisionRequestTemporaryStorageDetail {
+  destination: FormRevisionRequestDestination
+}
+
+type FormRevisionRequestDestination {
+  "N° de CAP"
+  cap: String
+
+  "Opération d'élimination / valorisation prévue (code D/R)"
+  processingOperation: String
+}
+
+type FormRevisionRequestConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [FormRevisionRequestEdge!]!
+}
+
+type FormRevisionRequestEdge {
+  cursor: String!
+  node: FormRevisionRequest!
 }

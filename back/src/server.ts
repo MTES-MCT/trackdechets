@@ -8,7 +8,7 @@ import {
 import { json, urlencoded } from "body-parser";
 import redisStore from "connect-redis";
 import cors from "cors";
-import express from "express";
+import express, { static as serveStatic } from "express";
 import rateLimit from "express-rate-limit";
 import session from "express-session";
 import depthLimit from "graphql-depth-limit";
@@ -20,7 +20,7 @@ import RateLimitRedisStore from "rate-limit-redis";
 import prisma from "./prisma";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 import { ErrorCode } from "./common/errors";
-import { downloadFileHandler } from "./common/file-download";
+import { downloadRouter } from "./routers/downloadRouter";
 import errorHandler from "./common/middlewares/errorHandler";
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
@@ -207,7 +207,7 @@ app.use(oauth2Router);
 
 app.get("/ping", (_, res) => res.send("Pong!"));
 app.get("/userActivation", userActivationHandler);
-app.get("/download", downloadFileHandler);
+app.get("/download", downloadRouter);
 
 app.get("/exports", (_, res) =>
   res
@@ -217,7 +217,7 @@ app.get("/exports", (_, res) =>
 
 app.use(
   "/graphiql",
-  express.static(path.join(__dirname, "common/plugins/graphiql/assets"))
+  serveStatic(path.join(__dirname, "common/plugins/graphiql/assets"))
 );
 
 // Apply passport auth middlewares to the graphQL endpoint

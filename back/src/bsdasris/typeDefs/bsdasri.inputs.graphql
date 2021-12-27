@@ -112,6 +112,7 @@ input BsdasriWasteInput {
 }
 
 input BsdasriEmissionInput {
+  "Quantité en kilogrammes"
   weight: BsdasriWeightInput
   packagings: [BsdasriPackagingsInput!]
 }
@@ -152,6 +153,7 @@ input BsdasriAcceptationInput {
 }
 
 input BsdasriTransportInput {
+  "Poids"
   weight: BsdasriWeightInput
   packagings: [BsdasriPackagingsInput!]
   takenOverAt: DateTime

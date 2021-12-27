@@ -20,6 +20,9 @@ import editSegment from "./mutations/editSegment";
 import takeOverSegment from "./mutations/takeOverSegment";
 import markSegmentAsReadyToTakeOver from "./mutations/markSegmentAsReadyToTakeOver";
 import importPaperForm from "./mutations/importPaperForm";
+import createFormRevisionRequest from "./mutations/createFormRevisionRequest";
+import submitFormRevisionRequestApproval from "./mutations/submitFormRevisionRequestApproval";
+import cancelFormRevisionRequest from "./mutations/cancelFormRevisionRequest";
 
 const Mutation: MutationResolvers = {
   createForm,
@@ -42,7 +45,10 @@ const Mutation: MutationResolvers = {
   prepareSegment,
   editSegment,
   markSegmentAsReadyToTakeOver,
-  takeOverSegment
+  takeOverSegment,
+  createFormRevisionRequest: createFormRevisionRequest as any, // TODO better typing ?
+  cancelFormRevisionRequest,
+  submitFormRevisionRequestApproval: submitFormRevisionRequestApproval as any
 };
 
 export default Mutation;

@@ -2,7 +2,7 @@ import prisma from "../../../prisma";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { unflattenBsff } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getConnectionsArgs } from "../../../bsvhu/pagination";
+import { getConnectionsArgs } from "../../pagination";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { getUserCompanies } from "../../../users/database";

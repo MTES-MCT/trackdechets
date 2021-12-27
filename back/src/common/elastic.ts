@@ -4,17 +4,49 @@ import { Client, RequestParams } from "@elastic/elasticsearch";
 import { BsdType } from "../generated/graphql/types";
 import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
+import prisma from "../prisma";
+import {
+  Bsda,
+  Bsdasri,
+  Bsff,
+  Bsvhu,
+  Form,
+  TemporaryStorageDetail
+} from ".prisma/client";
 
+// complete Typescript example:
+// https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
+export interface SearchResponse<T> {
+  hits: {
+    total: number;
+    hits: Array<{
+      _source: T;
+    }>;
+  };
+}
+export interface GetResponse<T> {
+  _source: T;
+}
 export interface BsdElastic {
-  id: string;
-  readableId: string;
   type: BsdType;
-  emitter: string;
-  recipient: string;
-  waste: string;
+  id: string;
+  createdAt: number;
+  readableId: string;
+  emitterCompanyName: string;
+  emitterCompanySiret: string;
+  transporterCompanyName: string;
+  transporterCompanySiret: string;
+  transporterTakenOverAt: number;
+  wasteCode: string;
+  wasteDescription: string;
   transporterNumberPlate?: string[];
   transporterCustomInfo?: string;
-  createdAt: number;
+  destinationCompanyName: string;
+  destinationCompanySiret: string;
+  destinationReceptionDate: number;
+  destinationReceptionWeight: number;
+  destinationOperationCode: string;
+  destinationOperationDate: number;
 
   isDraftFor: string[];
   isForActionFor: string[];
@@ -23,6 +55,11 @@ export interface BsdElastic {
   isToCollectFor: string[];
   isCollectedFor: string[];
   sirets: string[];
+
+  isIncomingWasteFor: string[];
+  isOutgoingWasteFor: string[];
+  isTransportedWasteFor: string[];
+  isManagedWasteFor: string[];
 }
 
 // Custom analyzers for readableId and waste fields
@@ -40,10 +77,6 @@ const settings = {
       readableId_search: {
         tokenizer: "readableId_char_group",
         filter: ["lowercase"]
-      },
-      waste_text: {
-        tokenizer: "letter", // remove waste code from index
-        filter: ["lowercase", "asciifolding", "stemmer"]
       },
       // 01 01 01* => ["01", "01 ", "1 ", .. "01 01 01*"]
       waste_ngram: {
@@ -115,7 +148,7 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   type: {
     type: "keyword"
   },
-  emitter: {
+  emitterCompanyName: {
     type: "text",
     fields: {
       keyword: {
@@ -123,7 +156,10 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
       }
     }
   },
-  recipient: {
+  emitterCompanySiret: {
+    type: "keyword"
+  },
+  transporterCompanyName: {
     type: "text",
     fields: {
       keyword: {
@@ -131,17 +167,50 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
       }
     }
   },
-  waste: {
+  transporterCompanySiret: {
+    type: "keyword"
+  },
+  transporterTakenOverAt: {
+    type: "date"
+  },
+  destinationCompanyName: {
     type: "text",
-    analyzer: "waste_text",
     fields: {
       keyword: {
         type: "keyword"
-      },
+      }
+    }
+  },
+  destinationReceptionDate: {
+    type: "date"
+  },
+  destinationReceptionWeight: {
+    type: "float"
+  },
+  destinationOperationCode: {
+    type: "keyword"
+  },
+  destinationOperationDate: {
+    type: "date"
+  },
+  destinationCompanySiret: {
+    type: "keyword"
+  },
+  wasteCode: {
+    type: "keyword",
+    fields: {
       ngram: {
         type: "text",
         analyzer: "waste_ngram",
         search_analyzer: "waste_ngram_search"
+      }
+    }
+  },
+  wasteDescription: {
+    type: "text",
+    fields: {
+      keyword: {
+        type: "keyword"
       }
     }
   },
@@ -186,6 +255,22 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   },
   sirets: {
     type: "keyword"
+  },
+  // établissement pour lesquelles ce BSD doit apparaitre sur le registre de déchets entrants
+  isIncomingWasteFor: {
+    type: "keyword"
+  },
+  // établissements pour lesquelles ce BSD doit apparaitre sur le registre de déchets sortants
+  isOutgoingWasteFor: {
+    type: "keyword"
+  },
+  // établissements pour lesquelles ce BSD doit apparaitre sur le registre de déchets transportés
+  isTransportedWasteFor: {
+    type: "keyword"
+  },
+  // établissements pour lesquelles ce BSD doit apparaitre sur le registre de déchets gérés
+  isManagedWasteFor: {
+    type: "keyword"
   }
 };
 
@@ -195,7 +280,7 @@ export const index = {
   // Changing the value of index is a way to "bump" the model
   // Doing so will cause all BSDs to be reindexed in Elastic Search
   // when running the appropriate script
-  index: "bsds_0.1.3",
+  index: "bsds_0.2.0",
 
   // The next major version of Elastic Search doesn't use "type" anymore
   // so while it's required for the current version, we are not using it too much
@@ -335,4 +420,76 @@ export function deleteBsd<T extends { id: string }>(
     },
     { ignore: [404] }
   );
+}
+
+/**
+ * Group BsdElastic by BSD type
+ */
+function groupByBsdType(
+  bsdsELastic: BsdElastic[]
+): Record<BsdType, BsdElastic[]> {
+  return bsdsELastic.reduce<Record<BsdType, BsdElastic[]>>(
+    (acc, bsdElastic) => ({
+      ...acc,
+      [bsdElastic.type]: [...acc[bsdElastic.type], bsdElastic]
+    }),
+    { BSDD: [], BSDASRI: [], BSVHU: [], BSDA: [], BSFF: [] }
+  );
+}
+
+export type PrismaBsdMap = {
+  bsdds: (Form & {
+    temporaryStorageDetail: TemporaryStorageDetail;
+    appendix2Forms: Form[];
+  })[];
+  bsdasris: (Bsdasri & { grouping: Bsdasri[] })[];
+  bsvhus: Bsvhu[];
+  bsdas: (Bsda & { forwarding: Bsda; grouping: Bsda[] })[];
+  bsffs: (Bsff & { forwarding: Bsff; repackaging: Bsff[]; grouping: Bsff[] })[];
+};
+
+/**
+ * Convert a list of BsdElastic to a mapping of prisma Bsds
+ */
+export async function toPrismaBsds(
+  bsdsElastic: BsdElastic[]
+): Promise<PrismaBsdMap> {
+  const { BSDD, BSDASRI, BSVHU, BSDA, BSFF } = groupByBsdType(bsdsElastic);
+  return {
+    bsdds: await prisma.form.findMany({
+      where: {
+        id: {
+          in: BSDD.map(bsdd => bsdd.id)
+        }
+      },
+      include: { temporaryStorageDetail: true, appendix2Forms: true }
+    }),
+    bsdasris: await prisma.bsdasri.findMany({
+      where: { id: { in: BSDASRI.map(bsdasri => bsdasri.id) } },
+      include: { grouping: true }
+    }),
+    bsvhus: await prisma.bsvhu.findMany({
+      where: {
+        id: {
+          in: BSVHU.map(bsvhu => bsvhu.id)
+        }
+      }
+    }),
+    bsdas: await prisma.bsda.findMany({
+      where: {
+        id: {
+          in: BSDA.map(bsda => bsda.id)
+        }
+      },
+      include: { forwarding: true, grouping: true }
+    }),
+    bsffs: await prisma.bsff.findMany({
+      where: {
+        id: {
+          in: BSFF.map(bsff => bsff.id)
+        }
+      },
+      include: { forwarding: true, repackaging: true, grouping: true }
+    })
+  };
 }

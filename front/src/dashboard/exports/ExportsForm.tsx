@@ -4,8 +4,9 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 import styles from "./ExportsForms.module.scss";
 import {
   CompanyPrivate,
-  FormsRegisterExportType,
   CompanyType,
+  Query,
+  WasteRegistryType,
 } from "generated/graphql/types";
 import WasteTreeModal from "search/WasteTreeModal";
 import { wasteCodeValidator } from "form/bsdd/components/waste-code/waste-code.validator";
@@ -19,7 +20,7 @@ interface IProps {
 }
 
 type Values = {
-  exportType: FormsRegisterExportType;
+  exportType: WasteRegistryType;
   startDate: string;
   endDate: string;
   companies: CompanyPrivate[];
@@ -38,22 +39,32 @@ ExportsForm.fragments = {
   `,
 };
 
-const FORMS_REGISTER = gql`
-  query FormsRegister(
+export const WASTES_REGISTRY_CSV = gql`
+  query WastesRegistryCsv(
+    $registryType: WasteRegistryType!
     $sirets: [String!]!
-    $exportType: FormsRegisterExportType
-    $startDate: DateTime
-    $endDate: DateTime
-    $wasteCode: String
-    $exportFormat: FormsRegisterExportFormat
+    $where: WasteRegistryWhere
   ) {
-    formsRegister(
+    wastesRegistryCsv(
+      registryType: $registryType
       sirets: $sirets
-      exportType: $exportType
-      startDate: $startDate
-      endDate: $endDate
-      wasteCode: $wasteCode
-      exportFormat: $exportFormat
+      where: $where
+    ) {
+      downloadLink
+    }
+  }
+`;
+
+export const WASTES_REGISTRY_XLS = gql`
+  query WastesRegistryXls(
+    $registryType: WasteRegistryType!
+    $sirets: [String!]!
+    $where: WasteRegistryWhere
+  ) {
+    wastesRegistryXls(
+      registryType: $registryType
+      sirets: $sirets
+      where: $where
     ) {
       downloadLink
     }
@@ -73,7 +84,7 @@ function getPossibleExportTypes(companies: CompanyPrivate[]) {
     return acc;
   }, [] as CompanyType[]);
 
-  const exportTypes: FormsRegisterExportType[] = [];
+  const exportTypes: WasteRegistryType[] = [];
 
   if (
     companyTypes.filter(t =>
@@ -84,7 +95,7 @@ function getPossibleExportTypes(companies: CompanyPrivate[]) {
       ].includes(t)
     ).length > 0
   ) {
-    exportTypes.push(FormsRegisterExportType.Outgoing);
+    exportTypes.push(WasteRegistryType.Outgoing);
   }
 
   if (
@@ -96,22 +107,21 @@ function getPossibleExportTypes(companies: CompanyPrivate[]) {
       ].includes(t)
     ).length > 0
   ) {
-    exportTypes.push(FormsRegisterExportType.Incoming);
+    exportTypes.push(WasteRegistryType.Incoming);
   }
 
   if (companyTypes.includes(CompanyType.Transporter)) {
-    exportTypes.push(FormsRegisterExportType.Transported);
+    exportTypes.push(WasteRegistryType.Transported);
   }
 
-  if (companyTypes.includes(CompanyType.Trader)) {
-    exportTypes.push(FormsRegisterExportType.Traded);
+  if (
+    companyTypes.includes(CompanyType.Trader) ||
+    companyTypes.includes(CompanyType.Broker)
+  ) {
+    exportTypes.push(WasteRegistryType.Managed);
   }
 
-  if (companyTypes.includes(CompanyType.Broker)) {
-    exportTypes.push(FormsRegisterExportType.Brokered);
-  }
-
-  exportTypes.push(FormsRegisterExportType.All);
+  exportTypes.push(WasteRegistryType.All);
 
   return exportTypes;
 }
@@ -122,7 +132,7 @@ export default function ExportsForm({ companies }: IProps) {
   const now = new Date();
 
   const initialValues: Values = {
-    exportType: FormsRegisterExportType.Outgoing,
+    exportType: WasteRegistryType.Outgoing,
     startDate: new Date(now.getFullYear(), 0, 1).toISOString(),
     endDate: now.toISOString(),
     companies,
@@ -130,12 +140,19 @@ export default function ExportsForm({ companies }: IProps) {
     exportFormat: "CSV",
   };
 
-  const [downloadFile, { data, error, loading }] = useLazyQuery(
-    FORMS_REGISTER,
-    {
-      fetchPolicy: "network-only",
-    }
-  );
+  const [
+    wastesRegistryCsv,
+    { data: wastesCsvData, error: wastesCsvError, loading: wastesCsvLoading },
+  ] = useLazyQuery<Pick<Query, "wastesRegistryCsv">>(WASTES_REGISTRY_CSV, {
+    fetchPolicy: "network-only",
+  });
+
+  const [
+    wastesRegistryXls,
+    { data: wastesXlsData, error: wastesXlsError, loading: wastesXlsLoading },
+  ] = useLazyQuery<Pick<Query, "wastesRegistryXls">>(WASTES_REGISTRY_XLS, {
+    fetchPolicy: "network-only",
+  });
 
   // Formik onSubmit callback
   const onSubmit = (values: Values) => {
@@ -148,14 +165,20 @@ export default function ExportsForm({ companies }: IProps) {
       exportFormat,
     } = values;
 
+    const downloadFile =
+      exportFormat === "CSV" ? wastesRegistryCsv : wastesRegistryXls;
+
     downloadFile({
       variables: {
         sirets: companies.map(c => c.siret),
-        exportType,
-        startDate: startDate,
-        endDate: endDate,
-        wasteCode,
-        exportFormat,
+        registryType: exportType,
+        where: {
+          createdAt: {
+            _gte: startDate,
+            _lte: endDate,
+          },
+          ...(wasteCode ? { wasteCode: { _eq: wasteCode } } : {}),
+        },
       },
     });
   };
@@ -176,6 +199,8 @@ export default function ExportsForm({ companies }: IProps) {
   };
 
   useEffect(() => {
+    const data = wastesCsvData || wastesXlsData;
+
     if (!data) {
       return;
     }
@@ -184,7 +209,7 @@ export default function ExportsForm({ companies }: IProps) {
     if (data[key].downloadLink) {
       window.open(data[key].downloadLink, "_blank");
     }
-  }, [data]);
+  }, [wastesCsvData, wastesXlsData]);
 
   return (
     <Formik<Values>
@@ -202,6 +227,9 @@ export default function ExportsForm({ companies }: IProps) {
           setFieldValue("exportType", exportTypes[0]);
         }
 
+        const error = wastesCsvError || wastesXlsError;
+        const loading = wastesCsvLoading || wastesXlsLoading;
+
         return (
           <Form className={styles.exportForm}>
             <div className="tw-grid tw-justify-center tw-grid-cols-3 tw-gap-6">
@@ -214,46 +242,32 @@ export default function ExportsForm({ companies }: IProps) {
                 as="select"
               >
                 <option
-                  value={FormsRegisterExportType.Outgoing}
-                  disabled={
-                    !exportTypes.includes(FormsRegisterExportType.Outgoing)
-                  }
+                  value={WasteRegistryType.Outgoing}
+                  disabled={!exportTypes.includes(WasteRegistryType.Outgoing)}
                 >
                   Déchets sortants
                 </option>
                 <option
-                  value={FormsRegisterExportType.Incoming}
-                  disabled={
-                    !exportTypes.includes(FormsRegisterExportType.Incoming)
-                  }
+                  value={WasteRegistryType.Incoming}
+                  disabled={!exportTypes.includes(WasteRegistryType.Incoming)}
                 >
                   Déchets entrants
                 </option>
                 <option
-                  value={FormsRegisterExportType.Transported}
+                  value={WasteRegistryType.Transported}
                   disabled={
-                    !exportTypes.includes(FormsRegisterExportType.Transported)
+                    !exportTypes.includes(WasteRegistryType.Transported)
                   }
                 >
                   Transporteur
                 </option>
                 <option
-                  value={FormsRegisterExportType.Traded}
-                  disabled={
-                    !exportTypes.includes(FormsRegisterExportType.Traded)
-                  }
+                  value={WasteRegistryType.Managed}
+                  disabled={!exportTypes.includes(WasteRegistryType.Managed)}
                 >
-                  Négociant
+                  Gestion
                 </option>
-                <option
-                  value={FormsRegisterExportType.Brokered}
-                  disabled={
-                    !exportTypes.includes(FormsRegisterExportType.Brokered)
-                  }
-                >
-                  Courtier
-                </option>
-                <option value={FormsRegisterExportType.All}>Exhaustif</option>
+                <option value={WasteRegistryType.All}>Exhaustif</option>
               </Field>
               <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
                 Date de début

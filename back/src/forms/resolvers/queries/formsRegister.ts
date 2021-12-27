@@ -1,20 +1,34 @@
-import { UserInputError } from "apollo-server-express";
-import prisma from "../../../prisma";
-import * as yup from "yup";
-import { getFileDownloadToken } from "../../../common/file-download";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkIsCompanyMember } from "../../../users/permissions";
-import { QueryResolvers } from "../../../generated/graphql/types";
-import { downloadFormsRegister } from "../../exports/handler";
-import { formsWhereInput } from "../../exports/where-inputs";
+import {
+  FormsRegisterExportType,
+  QueryResolvers,
+  QueryWastesRegistryCsvArgs,
+  QueryWastesRegistryXlsArgs,
+  WasteRegistryType
+} from "../../../generated/graphql/types";
+import { wastesRegistryCsvResolverFn } from "../../../registry/resolvers/queries/wastesRegistryCsv";
+import { wastesRegistryXlsResolverFn } from "../../../registry/resolvers/queries/wastesRegistryXls";
 
-const TYPE = "forms_register";
+// compatibility between register v1 and register v2
+const exportTypeToRegisterType: Record<
+  FormsRegisterExportType,
+  WasteRegistryType
+> = {
+  OUTGOING: "OUTGOING",
+  INCOMING: "INCOMING",
+  TRANSPORTED: "TRANSPORTED",
+  TRADED: "MANAGED",
+  BROKERED: "MANAGED",
+  ALL: "ALL"
+};
 
-const validationSchema = yup.object().shape({
-  startDate: yup.date().nullable(),
-  endDate: yup.date().nullable()
-});
-
+/**
+ * DEPRECATED
+ * Forms only register exports
+ * This resolver calls wastesXls or wastesCsv resolver with bsdType=BSDD
+ * for compatibility
+ */
 const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
   parent,
   args,
@@ -22,34 +36,34 @@ const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  validationSchema.validateSync(args);
-
   for (const siret of args.sirets) {
     // check user is member of every provided sirets
     await checkIsCompanyMember({ id: user.id }, { siret: siret });
   }
 
-  const whereInput = formsWhereInput(
-    args.exportType,
-    args.sirets,
-    args.startDate ? new Date(args.startDate) : null,
-    args.endDate ? new Date(args.endDate) : null,
-    args.wasteCode
-  );
+  const wasteRegistryArgs:
+    | QueryWastesRegistryCsvArgs
+    | QueryWastesRegistryXlsArgs = {
+    registryType: exportTypeToRegisterType[args.exportType],
+    sirets: args.sirets,
+    where: {
+      bsdType: { _eq: "BSDD" },
+      ...(args.wasteCode ? { wasteCode: { _eq: args.wasteCode } } : {}),
+      ...(args.startDate || args.endDate
+        ? {
+            createdAt: {
+              ...(args.startDate ? { _gte: new Date(args.startDate) } : {}),
+              ...(args.endDate ? { _lte: new Date(args.endDate) } : {})
+            }
+          }
+        : {})
+    }
+  };
 
-  // check if register is empty
-  const isEmpty = !(await prisma.form.findFirst({ where: whereInput }));
-
-  if (isEmpty) {
-    throw new UserInputError(
-      "Aucune donnée à exporter sur la période sélectionnée"
-    );
-  }
-
-  return getFileDownloadToken(
-    { type: TYPE, params: args },
-    downloadFormsRegister
-  );
+  // delegate resolution to wastesCsv and wastesXls with bsdType == BSDD
+  return args.exportFormat === "CSV"
+    ? wastesRegistryCsvResolverFn(wasteRegistryArgs, context)
+    : wastesRegistryXlsResolverFn(wasteRegistryArgs, context);
 };
 
 export default formsRegisterResolver;

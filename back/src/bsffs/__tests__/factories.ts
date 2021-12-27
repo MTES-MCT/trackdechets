@@ -111,6 +111,7 @@ export function createBsffAfterTransport(
     status: BsffStatus.SENT,
     transporterTransportSignatureAuthor: args.transporter.user.name,
     transporterTransportSignatureDate: new Date().toISOString(),
+    transporterTransportTakenOverAt: new Date().toISOString(),
     ...initialData
   });
 }
@@ -151,6 +152,7 @@ export function createBsffAfterReception(
         ? BsffStatus.RECEIVED
         : BsffStatus.REFUSED,
     destinationReceptionSignatureAuthor: args.destination.user.name,
+    destinationReceptionDate: new Date().toISOString(),
     destinationReceptionSignatureDate: new Date().toISOString(),
     ...initialData
   });

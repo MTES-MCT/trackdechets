@@ -24,6 +24,7 @@ const referenceDefs = [
   { id: "bsff", label: "Fluides Frigorigènes" },
   { id: "bsda", label: "Amiante" },
   { id: "user-company", label: "Utilisateurs et Établissements" },
+  { id: "registre", label: "Registre" },
 ];
 
 const apiReference = referenceDefs.map(({ id, label }) => ({
@@ -59,6 +60,11 @@ module.exports = {
               ],
               BSVHU: ["tutoriels/examples/bsvhu/vhu-vers-broyeur"],
               BSFF: ["tutoriels/examples/bsff/collecte-petites-quantites"],
+              BSDA: [
+                "tutoriels/examples/bsda/collecte-chantier",
+                "tutoriels/examples/bsda/collecte-chantier-particulier",
+                "tutoriels/examples/bsda/groupement",
+              ],
             },
           ],
         },

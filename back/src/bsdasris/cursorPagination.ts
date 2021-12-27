@@ -1,16 +1,4 @@
-import { UserInputError } from "apollo-server-express";
-import * as yup from "yup";
-
-type CursorPaginationArgs = {
-  first?: number;
-  after?: string;
-  last?: number;
-  before?: string;
-  // default value for `first` and `last` if omitted
-  defaultPaginateBy?: number;
-  // max value for `first` and `last`
-  maxPaginateBy?: number;
-};
+import { PaginationArgs, validatePaginationArgs } from "../common/pagination";
 
 /**
  * Validate and convert GraphQL pagination args (first, last, cursorAfter, cursorBefore)
@@ -52,33 +40,8 @@ export async function getCursorConnectionsArgs({
   before,
   defaultPaginateBy = 50,
   maxPaginateBy = 500
-}: CursorPaginationArgs) {
-  // validate number formats
-  await getValidationSchema(maxPaginateBy).validate({ first, last });
-
-  if (first && last) {
-    throw new UserInputError(
-      "L'utilisation simultanée de `first` et `last` n'est pas supportée"
-    );
-  }
-
-  if (after && before) {
-    throw new UserInputError(
-      "L'utilisation simultanée de `after` et `before` n'est pas supportée"
-    );
-  }
-
-  if (first && before) {
-    throw new UserInputError(
-      "`first` ne peut pas être utilisé en conjonction avec `before`"
-    );
-  }
-
-  if (last && after) {
-    throw new UserInputError(
-      "`last` ne peut pas être utilisé en conjonction avec `after`"
-    );
-  }
+}: PaginationArgs) {
+  validatePaginationArgs({ first, after, last, before, maxPaginateBy });
 
   return {
     take: before ? -(defaultPaginateBy + 1) : defaultPaginateBy + 1,
@@ -89,22 +52,3 @@ export async function getCursorConnectionsArgs({
     requiredItems: Math.abs(first || last || defaultPaginateBy)
   };
 }
-
-const positiveInteger = yup
-  .number()
-  .nullable(true)
-  .notRequired()
-  .integer("`${path}` doit être un entier")
-  .positive("`${path}` doit être positif");
-
-const getValidationSchema = (maxPaginateBy: number) =>
-  yup.object().shape({
-    first: positiveInteger.max(
-      maxPaginateBy,
-      `\`first\` doit être inférieur à ${maxPaginateBy}`
-    ),
-    last: positiveInteger.max(
-      maxPaginateBy,
-      `\`last\` doit être inférieur à ${maxPaginateBy}`
-    )
-  });

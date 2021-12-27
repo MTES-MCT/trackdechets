@@ -116,7 +116,7 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "bsdd",
-        schema: "../back/src/{scalars,bsds,forms}/typeDefs/*.graphql",
+        schema: "../back/src/{scalars,common,bsds,forms}/typeDefs/*.graphql",
         routeBasePath: "/reference/api-reference/bsdd",
       },
     ],
@@ -124,7 +124,7 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "bsdasri",
-        schema: "../back/src/{scalars,bsds,bsdasris}/typeDefs/*.graphql",
+        schema: "../back/src/{scalars,common,bsds,bsdasris}/typeDefs/*.graphql",
         routeBasePath: "/reference/api-reference/bsdasri",
       },
     ],
@@ -132,7 +132,7 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "bsff",
-        schema: "../back/src/{scalars,bsds,bsffs}/typeDefs/*.graphql",
+        schema: "../back/src/{scalars,common,bsds,bsffs}/typeDefs/*.graphql",
         routeBasePath: "/reference/api-reference/bsff",
       },
     ],
@@ -140,7 +140,7 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "bsda",
-        schema: "../back/src/{scalars,bsds,bsda}/typeDefs/*.graphql",
+        schema: "../back/src/{scalars,common,bsds,bsda}/typeDefs/*.graphql",
         routeBasePath: "/reference/api-reference/bsda",
       },
     ],
@@ -148,8 +148,16 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "bsvhu",
-        schema: "../back/src/{scalars,bsds,bsvhu}/typeDefs/*.graphql",
+        schema: "../back/src/{scalars,common,bsds,bsvhu}/typeDefs/*.graphql",
         routeBasePath: "/reference/api-reference/bsvhu",
+      },
+    ],
+    [
+      "docusaurus-graphql-plugin",
+      {
+        id: "registry",
+        schema: "../back/src/{scalars,common,registry}/typeDefs/*.graphql",
+        routeBasePath: "/reference/api-reference/registre",
       },
     ],
     // plugin used to make workflows examples available with `usePluginData`

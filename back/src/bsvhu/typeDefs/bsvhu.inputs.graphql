@@ -82,7 +82,7 @@ input BsvhuInput {
   identification: BsvhuIdentificationInput
   "Quantité de VHUs"
   quantity: Int
-  "Poids des VHUs"
+  "Poids des VHUs en tonnes"
   weight: BsvhuWeightInput
 
   "Détails sur la destination"
@@ -134,7 +134,7 @@ input BsvhuReceptionInput {
   date: DateTime
   "Quantité de VHUs reçue"
   quantity: Int
-  "Poids réel reçu"
+  "Poids réel reçu en tonnes"
   weight: Float
   "Lot accepté oui/non"
   acceptationStatus: WasteAcceptationStatus

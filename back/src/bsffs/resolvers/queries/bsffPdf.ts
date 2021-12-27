@@ -1,37 +1,33 @@
-import { Request, Response } from "express";
-import { QueryResolvers } from "../../../generated/graphql/types";
 import {
-  getFileDownloadToken,
-  registerFileDownloader
-} from "../../../common/file-download";
+  QueryBsffPdfArgs,
+  QueryResolvers
+} from "../../../generated/graphql/types";
+import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound } from "../../database";
 import { isBsffContributor } from "../../permissions";
 import { createPDFResponse } from "../../../common/pdf";
 import { generateBsffPdf } from "../../pdf";
+import { DownloadHandler } from "../../../routers/downloadRouter";
 
-const TYPE = "bsff_pdf";
-
-// TODO: it would be better to declare the handlers directly in the download route
-registerFileDownloader(TYPE, sendBsffPdf);
-
-async function sendBsffPdf(
-  req: Request,
-  res: Response,
-  { id }: { id: string }
-) {
-  const bsff = await getBsffOrNotFound({ id });
-  const readableStream = await generateBsffPdf(bsff);
-
-  readableStream.pipe(createPDFResponse(res, bsff.id));
-}
+export const bsffPdfDownloadHandler: DownloadHandler<QueryBsffPdfArgs> = {
+  name: "bsffPdf",
+  handler: async (_, res, { id }) => {
+    const bsff = await getBsffOrNotFound({ id });
+    const readableStream = await generateBsffPdf(bsff);
+    readableStream.pipe(createPDFResponse(res, bsff.id));
+  }
+};
 
 const bsffPdf: QueryResolvers["bsffPdf"] = async (_, { id }, context) => {
   const user = checkIsAuthenticated(context);
   const bsff = await getBsffOrNotFound({ id });
   await isBsffContributor(user, bsff);
 
-  return getFileDownloadToken({ type: TYPE, params: { id } }, sendBsffPdf);
+  return getFileDownload({
+    handler: bsffPdfDownloadHandler.name,
+    params: { id }
+  });
 };
 
 export default bsffPdf;

@@ -10,18 +10,11 @@ until PGPASSWORD="no_pass" docker exec -t $psql_container_id bash -c "psql -U \"
   sleep 1
 done
 
-echo "1/4 - Create prisma DB";
+echo "1/2 - Drop and Create prisma DB";
 docker exec -t $psql_container_id bash -c "psql -U test -c \"DROP DATABASE IF EXISTS prisma;\"";
 docker exec -t $psql_container_id bash -c "psql -U test -c \"CREATE DATABASE prisma;\"";
 
-echo "2/4 - Restore DB model";
-docker exec -t $api_container_id bash -c "npx prisma db push"
-
-echo "3/4 - Create truncating function";
-docker cp ./db-deploy/truncate.sql $psql_container_id:/tmp
-docker exec -t $psql_container_id bash -c "psql -U test prisma -f /tmp/truncate.sql;"
-
-echo "4/4 - Wait for Elastic Search";
+echo "2/2 - Wait for Elastic Search";
 until docker exec -t $api_container_id bash -c "curl -XGET http://elasticsearch:9200 2> /dev/null"; do
   >&2 echo "⏳ Elastic Search is unavailable - sleeping"
   sleep 1

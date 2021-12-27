@@ -79,7 +79,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
     }),
     weight: nullIfNoValues<BsdaWeight>({
       isEstimate: form.weightIsEstimate,
-      value: form.weightValue
+      value: form.weightValue ? form.weightValue / 1000 : form.weightValue
     }),
     destination: nullIfNoValues<BsdaDestination>({
       company: nullIfNoValues<FormCompany>({
@@ -98,6 +98,8 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         refusalReason: form.destinationReceptionRefusalReason,
         date: form.destinationReceptionDate,
         weight: form.destinationReceptionWeight
+          ? form.destinationReceptionWeight / 1000
+          : form.destinationReceptionWeight
       }),
       operation: nullIfNoValues<BsdaOperation>({
         code: form.destinationOperationCode,
@@ -278,7 +280,7 @@ function flattenBsdaDestinationInput({
       chain(d.reception, r => r.date)
     ),
     destinationReceptionWeight: chain(destination, d =>
-      chain(d.reception, r => r.weight)
+      chain(d.reception, r => r.weight * 1000)
     ),
     destinationReceptionAcceptationStatus: chain(destination, d =>
       chain(d.reception, r => r.acceptationStatus)
@@ -428,7 +430,7 @@ function flattenBsdaBrokerInput({ broker }: Pick<BsdaInput, "broker">) {
 function flattenBsdaWeightInput({ weight }: Pick<BsdaInput, "weight">) {
   return {
     weightIsEstimate: chain(weight, q => q.isEstimate),
-    weightValue: chain(weight, q => q.value)
+    weightValue: chain(weight, q => q.value * 1000)
   };
 }
 
