@@ -5,6 +5,7 @@ import {
   createHttpLink,
 } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
+
 /**
  * Automatically erase `__typename` from variables
  * This enable devs to use objects fetched from the server
