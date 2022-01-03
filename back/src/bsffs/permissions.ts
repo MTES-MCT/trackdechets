@@ -1,7 +1,8 @@
 import { User, Bsff, BsffFicheIntervention } from "@prisma/client";
 import { ForbiddenError } from "apollo-server-express";
-import prisma from "../prisma";
+
 import { checkIsCompanyMember } from "../users/permissions";
+import { getUserSirets } from "../common/cache";
 
 export async function isBsffContributor(
   user: User,
@@ -14,20 +15,17 @@ export async function isBsffContributor(
     >
   >
 ) {
-  const count = await prisma.companyAssociation.count({
-    where: {
-      userId: user.id,
-      company: {
-        siret: {
-          in: [
-            bsff.emitterCompanySiret,
-            bsff.transporterCompanySiret,
-            bsff.destinationCompanySiret
-          ].filter(Boolean)
-        }
-      }
-    }
-  });
+  const userSirets = await getUserSirets(user.id);
+
+  const bsffSirets = [
+    bsff.emitterCompanySiret,
+    bsff.transporterCompanySiret,
+    bsff.destinationCompanySiret
+  ].filter(Boolean);
+
+  const siretsInCommon = userSirets.filter(siret => bsffSirets.includes(siret));
+
+  const count = siretsInCommon.length;
 
   if (count <= 0) {
     throw new ForbiddenError(

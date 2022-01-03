@@ -4,7 +4,8 @@ import { applyMask } from "../../../common/where";
 import { QueryBsvhusArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
-import { getUserCompanies } from "../../../users/database";
+import { getUserSirets } from "../../../common/cache";
+
 import { expandVhuFormFromDb } from "../../converter";
 import { toPrismaWhereInput } from "../../where";
 
@@ -15,8 +16,7 @@ export default async function bsvhus(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const userCompanies = await getUserCompanies(user.id);
-  const userSirets = userCompanies.map(c => c.siret);
+  const userSirets = getUserSirets(user.id);
 
   const mask = {
     OR: [

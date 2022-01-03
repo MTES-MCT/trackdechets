@@ -24,7 +24,9 @@ import { expandFormFromDb } from "../../../forms/form-converter";
 import { unflattenBsdasri } from "../../../bsdasris/converter";
 import { expandVhuFormFromDb } from "../../../bsvhu/converter";
 import { expandBsdaFromDb } from "../../../bsda/converter";
-import { getUserCompanies } from "../../../users/database";
+
+import { getUserSirets } from "../../../common/cache";
+
 import { unflattenBsff } from "../../../bsffs/converter";
 
 async function buildQuery(
@@ -142,8 +144,7 @@ async function buildQuery(
   }
 
   // Limit the scope of what the user can see to their companies
-  const companies = await getUserCompanies(user.id);
-  const sirets = companies.map(({ siret }) => siret);
+  const sirets = await getUserSirets(user.id);
   query.bool.filter.push({
     terms: {
       sirets

@@ -4,8 +4,8 @@ import { unflattenBsff } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
-import { getUserCompanies } from "../../../users/database";
 import { getConnection } from "../../../common/pagination";
+import { getUserSirets } from "../../../common/cache";
 
 const bsffs: QueryResolvers["bsffs"] = async (
   _,
@@ -14,8 +14,7 @@ const bsffs: QueryResolvers["bsffs"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const companies = await getUserCompanies(user.id);
-  const sirets = companies.map(company => company.siret);
+  const sirets = await getUserSirets(user.id);
 
   const mask = {
     OR: [

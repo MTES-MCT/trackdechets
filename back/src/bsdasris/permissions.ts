@@ -1,6 +1,6 @@
-import { Company, User, Bsdasri, BsdasriStatus } from "@prisma/client";
+import { User, Bsdasri, BsdasriStatus } from "@prisma/client";
 
-import { getFullUser } from "../users/database";
+import { getUserSirets } from "../common/cache";
 
 import { BsdasriSirets } from "./types";
 
@@ -13,42 +13,16 @@ export class InvalidPublicationAttempt extends UserInputError {
   }
 }
 
-function isDasriEmitter(user: { companies: Company[] }, dasri: BsdasriSirets) {
-  if (!dasri.emitterCompanySiret) {
-    return false;
-  }
-  const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(dasri.emitterCompanySiret);
-}
-
-function isDasriRecipient(
-  user: { companies: Company[] },
-  dasri: BsdasriSirets
-) {
-  if (!dasri.destinationCompanySiret) {
-    return false;
-  }
-  const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(dasri.destinationCompanySiret);
-}
-
-function isDasriTransporter(
-  user: { companies: Company[] },
-  dasri: BsdasriSirets
-) {
-  if (!dasri.transporterCompanySiret) {
-    return false;
-  }
-  const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(dasri.transporterCompanySiret);
-}
-
 export async function isDasriContributor(user: User, dasri: BsdasriSirets) {
-  const fullUser = await getFullUser(user);
+  const userSirets = await getUserSirets(user.id);
+  const formSirets = [
+    dasri.emitterCompanySiret,
+    dasri.transporterCompanySiret,
+    dasri.destinationCompanySiret
+  ].filter(Boolean);
 
-  return [isDasriEmitter, isDasriTransporter, isDasriRecipient].some(
-    isFormRole => isFormRole(fullUser, dasri)
-  );
+  const siretsInCommon = userSirets.filter(siret => formSirets.includes(siret));
+  return !!siretsInCommon.length;
 }
 
 export async function checkIsBsdasriContributor(
@@ -65,7 +39,6 @@ export async function checkIsBsdasriContributor(
   return true;
 }
 export async function checkIsBsdasriPublishable(
-  user: User,
   dasri: Bsdasri,
   grouping?: string[]
 ) {

@@ -2,7 +2,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryBsdasArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
-import { getUserCompanies } from "../../../users/database";
+import { getUserSirets } from "../../../common/cache";
 import { expandBsdaFromDb } from "../../converter";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
@@ -16,8 +16,7 @@ export default async function bsdas(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const userCompanies = await getUserCompanies(user.id);
-  const userSirets = userCompanies.map(c => c.siret);
+  const userSirets = getUserSirets(user.id);
 
   const mask = {
     OR: Object.values(BSDA_CONTRIBUTORS_FIELDS).map(field => ({
