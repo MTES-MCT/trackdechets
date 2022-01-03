@@ -7,6 +7,7 @@ import {
 } from "../../../../__tests__/factories";
 import { Query } from "../../../../generated/graphql/types";
 import { associateUserToCompany } from "../../../database";
+import { resetDatabase } from "../../../../../integration-tests/helper";
 
 const MY_COMPANIES = gql`
   query MyCompanies($first: Int, $after: ID, $last: Int, $before: ID) {
@@ -31,6 +32,8 @@ const MY_COMPANIES = gql`
 `;
 
 describe("query { myCompanies }", () => {
+  afterAll(resetDatabase);
+
   it("should deny access to unauthenticated users", async () => {
     const { query } = makeClient();
     const { errors } = await query(MY_COMPANIES);
@@ -96,16 +99,12 @@ describe("query { myCompanies }", () => {
     ]);
   });
 
-  it.only("should paginate backward with last and before", async () => {
+  it("should paginate backward with last and before", async () => {
     const user = await userFactory();
     const company1 = await companyFactory({ givenName: "A" });
-    console.log("company1", company1.id);
     const company2 = await companyFactory({ givenName: "B" });
-    console.log("company2", company2.id);
     const company3 = await companyFactory({ givenName: "C" });
-    console.log("company3", company3.id);
     const company4 = await companyFactory(); // record without given name should be last
-    console.log("company4", company4.id);
 
     for (const company of [company1, company2, company3, company4]) {
       await associateUserToCompany(user.id, company.siret, "MEMBER");
@@ -117,8 +116,6 @@ describe("query { myCompanies }", () => {
         variables: { last: 3 }
       }
     );
-
-    console.log("page1", JSON.stringify(page1));
 
     expect(page1.myCompanies.totalCount).toEqual(4);
     expect(page1.myCompanies.pageInfo.hasPreviousPage).toEqual(true);
@@ -136,6 +133,7 @@ describe("query { myCompanies }", () => {
         variables: { last: 3, before: page1.myCompanies.pageInfo.startCursor }
       }
     );
+
     expect(page2.myCompanies.totalCount).toEqual(4);
     expect(page2.myCompanies.pageInfo.hasPreviousPage).toEqual(false);
     expect(page2.myCompanies.pageInfo.hasNextPage).toEqual(true);

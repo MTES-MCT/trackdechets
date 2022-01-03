@@ -58,12 +58,18 @@ export async function getConnection<T extends { id: string }, N>(
     cursor
   });
 
-  const edges = records.slice(0, Math.abs(take)).map(r => ({
+  const hasOtherPage = records.length > Math.abs(take);
+
+  const slice = hasOtherPage
+    ? take > 0
+      ? records.slice(0, take)
+      : records.slice(1)
+    : records;
+
+  const edges = slice.map(r => ({
     node: args.formatNode(r),
     cursor: r.id
   }));
-
-  const hasOtherPage = records.length > edges.length;
 
   return {
     totalCount: args.totalCount,
