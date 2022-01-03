@@ -1,12 +1,13 @@
 import { redisClient, generateKey } from "./redis";
 import { getUserCompanies } from "../users/database";
 
-const cacheKey = (userId: string): string => generateKey("userSirets", userId);
+export const cacheKey = (userId: string): string =>
+  generateKey("userSirets", userId);
 
 const MINUTES = 60;
 
 export async function deleteCachedUserSirets(userId: string): Promise<void> {
-  const key = cacheKey(userId);
+  const key = cacheKey(userId); // non-existent keys are ignored
   await redisClient.unlink(key);
 }
 

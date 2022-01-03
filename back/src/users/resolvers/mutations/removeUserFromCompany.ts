@@ -25,7 +25,7 @@ const removeUserFromCompanyResolver: MutationResolvers["removeUserFromCompany"] 
     });
 
     // clear cache
-    await deleteCachedUserSirets(userId);
+    await deleteCachedUserSirets("userId");
 
     const dbCompany = await prisma.company.findUnique({ where: { siret } });
 
