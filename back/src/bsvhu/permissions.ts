@@ -1,6 +1,6 @@
 import { User, Bsvhu, BsvhuStatus } from "@prisma/client";
 import { NotFormContributor } from "../forms/errors";
-import { getUserSirets } from "../common/cache";
+import { getCachedUserSirets } from "../common/cache";
 
 import { ForbiddenError } from "apollo-server-express";
 export async function checkIsFormContributor(
@@ -25,7 +25,7 @@ export async function checkIsFormContributor(
 }
 
 export async function isFormContributor(user: User, form: Partial<Bsvhu>) {
-  const userSirets = await getUserSirets(user.id);
+  const userSirets = await getCachedUserSirets(user.id);
 
   const formSirets = [
     form.emitterCompanySiret,

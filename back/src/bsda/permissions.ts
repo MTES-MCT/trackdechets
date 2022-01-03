@@ -1,7 +1,7 @@
 import { User, Bsda, BsdaStatus } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { NotFormContributor } from "../forms/errors";
-import { getUserSirets } from "../common/cache";
+import { getCachedUserSirets } from "../common/cache";
 
 import prisma from "../prisma";
 
@@ -38,7 +38,7 @@ export async function checkIsBsdaContributor(
 }
 
 export async function isBsdaContributor(user: User, form: Partial<Bsda>) {
-  const userSirets = await getUserSirets(user.id);
+  const userSirets = await getCachedUserSirets(user.id);
 
   const formSirets = Object.values(BSDA_CONTRIBUTORS_FIELDS).map(
     field => form[field]

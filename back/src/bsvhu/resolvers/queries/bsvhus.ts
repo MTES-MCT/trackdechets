@@ -4,7 +4,7 @@ import { applyMask } from "../../../common/where";
 import { QueryBsvhusArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
-import { getUserSirets } from "../../../common/cache";
+import { getCachedUserSirets } from "../../../common/cache";
 
 import { expandVhuFormFromDb } from "../../converter";
 import { toPrismaWhereInput } from "../../where";
@@ -16,7 +16,17 @@ export default async function bsvhus(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const userSirets = getUserSirets(user.id);
+  
+  const defaultPaginateBy = 50;
+  const itemsPerPage =
+    paginationArgs.first ?? paginationArgs.last ?? defaultPaginateBy;
+  const connectionsArgs = await getConnectionsArgs({
+    ...paginationArgs,
+    defaultPaginateBy,
+    maxPaginateBy: 500
+  });
+
+  const userSirets = await getCachedUserSirets(user.id);
 
   const mask = {
     OR: [

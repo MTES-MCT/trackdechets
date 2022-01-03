@@ -1,24 +1,29 @@
-import { redisClient } from "./redis";
+import { redisClient, generateKey } from "./redis";
 import { getUserCompanies } from "../users/database";
 
-const cacheKey = (userId: string): string => `user-${userId}`;
+const cacheKey = (userId: string): string => generateKey("userSirets", userId);
 
 const MINUTES = 60;
-export async function setUserSirets(
+
+export async function deleteCachedUserSirets(userId: string): Promise<void> {
+  const key = cacheKey(userId);
+  await redisClient.unlink(key);
+}
+
+export async function setCachedUserSirets(
   userId: string,
   sirets: string[]
 ): Promise<void> {
-  // await redisClient.sadd(cacheKey(userId), sirets);
-  // await redisClient.expire(cacheKey(userId), 10 * MINUTES);
+  const key = cacheKey(userId);
   await redisClient
     .pipeline()
-    .sadd(cacheKey(userId), sirets)
-    .expire(cacheKey(userId), 10 * MINUTES)
+    .sadd(key, sirets)
+    .expire(key, 10 * MINUTES)
     .exec();
 }
 
-export async function getUserSirets(userId: string): Promise<string[]> {
-  const key = `user_${userId}`;
+export async function getCachedUserSirets(userId: string): Promise<string[]> {
+  const key = cacheKey(userId);
   const exists = await redisClient.exists(key);
   if (!!exists) {
     return redisClient.smembers(key);
@@ -27,6 +32,6 @@ export async function getUserSirets(userId: string): Promise<string[]> {
   const companies = await getUserCompanies(userId);
   const sirets = companies.map(c => c.siret);
 
-  await setUserSirets(userId, sirets);
+  await setCachedUserSirets(userId, sirets);
   return sirets;
 }

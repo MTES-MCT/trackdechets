@@ -10,6 +10,7 @@ import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail, hashToken } from "../utils";
+import { deleteCachedUserSirets } from "../common/cache";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma.user
@@ -113,6 +114,10 @@ export async function associateUserToCompany(userId, siret, role) {
     where: { id: userId, firstAssociationDate: null },
     data: { firstAssociationDate: new Date() }
   });
+
+  // clear cache
+  await deleteCachedUserSirets(userId);
+
   return association;
 }
 
@@ -193,6 +198,9 @@ export async function acceptNewUserCompanyInvitations(user: User) {
       data: { firstAssociationDate: new Date() }
     });
   }
+
+  // clear cache
+  await deleteCachedUserSirets(user.id);
 
   return prisma.userAccountHash.updateMany({
     where: {

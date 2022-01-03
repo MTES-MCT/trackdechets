@@ -1,6 +1,6 @@
 import { User, Bsdasri, BsdasriStatus } from "@prisma/client";
 
-import { getUserSirets } from "../common/cache";
+import { getCachedUserSirets } from "../common/cache";
 
 import { BsdasriSirets } from "./types";
 
@@ -14,7 +14,7 @@ export class InvalidPublicationAttempt extends UserInputError {
 }
 
 export async function isDasriContributor(user: User, dasri: BsdasriSirets) {
-  const userSirets = await getUserSirets(user.id);
+  const userSirets = await getCachedUserSirets(user.id);
   const formSirets = [
     dasri.emitterCompanySiret,
     dasri.transporterCompanySiret,

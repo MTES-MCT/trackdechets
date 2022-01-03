@@ -5,7 +5,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { getConnection } from "../../../common/pagination";
-import { getUserSirets } from "../../../common/cache";
+import { getCachedUserSirets } from "../../../common/cache";
 
 const bsffs: QueryResolvers["bsffs"] = async (
   _,
@@ -14,7 +14,7 @@ const bsffs: QueryResolvers["bsffs"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const sirets = await getUserSirets(user.id);
+  const sirets = await getCachedUserSirets(user.id);
 
   const mask = {
     OR: [

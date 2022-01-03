@@ -6,7 +6,7 @@ import {
   ImportPaperFormInput,
   MutationResolvers
 } from "../../../generated/graphql/types";
-import { getUserSirets } from "../../../common/cache";
+import { getCachedUserSirets } from "../../../common/cache";
 import { getFormOrFormNotFound, getFullForm } from "../../database";
 import {
   expandFormFromDb,
@@ -83,7 +83,7 @@ async function createForm(user: User, input: ImportPaperFormInput) {
   });
 
   // check user belongs to destination company
-  const userSirets = await getUserSirets(user.id);
+  const userSirets = await getCachedUserSirets(user.id);
   if (!userSirets.includes(flattenedFormInput.recipientCompanySiret)) {
     throw new UserInputError(
       "Vous devez apparaitre en tant que destinataire du bordereau (case 2) pour pouvoir importer ce bordereau"
