@@ -13,6 +13,7 @@ import { getUid, sanitizeEmail, hashToken } from "../utils";
 import { deleteCachedUserSirets } from "../common/cache";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
+  // hint: See getCachedUserSirets function to leverage redis
   const companyAssociations = await prisma.user
     .findUnique({ where: { id: userId } })
     .companyAssociations();

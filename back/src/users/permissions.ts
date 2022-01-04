@@ -1,7 +1,7 @@
 import { User, Company } from "@prisma/client";
-import prisma from "../prisma";
 import { getCompanyAdminUsers } from "../companies/database";
 import { NotCompanyAdmin, NotCompanyMember } from "../common/errors";
+import { getCachedUserSirets } from "../common/cache";
 
 export async function checkIsCompanyAdmin(user: User, company: Company) {
   const admins = await getCompanyAdminUsers(company.siret);
@@ -15,16 +15,9 @@ export async function checkIsCompanyMember(
   { id }: { id: string },
   { siret }: { siret: string }
 ) {
-  const companyAssociation = await prisma.companyAssociation.findFirst({
-    where: {
-      userId: id,
-      company: {
-        siret
-      }
-    }
-  });
+  const userSirets = await getCachedUserSirets(id);
 
-  const isCompanyMember = companyAssociation != null;
+  const isCompanyMember = userSirets.includes(siret);
 
   if (isCompanyMember) {
     return true;
