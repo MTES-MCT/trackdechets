@@ -10,7 +10,7 @@ import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail, hashToken } from "../utils";
-import { deleteCachedUserSirets } from "../common/cache";
+import { deleteCachedUserSirets } from "../common/redis/users";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   // hint: See getCachedUserSirets function to leverage redis

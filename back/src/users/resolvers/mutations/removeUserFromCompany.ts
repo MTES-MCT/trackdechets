@@ -8,7 +8,7 @@ import {
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getCompanyAssociationOrNotFound } from "../../database";
 import { checkIsCompanyAdmin } from "../../permissions";
-import { deleteCachedUserSirets } from "../../../common/cache";
+import { deleteCachedUserSirets } from "../../../common/redis/users";
 
 const removeUserFromCompanyResolver: MutationResolvers["removeUserFromCompany"] =
   async (parent, { userId, siret }, context) => {

@@ -1,6 +1,6 @@
 import { User, Bsvhu, BsvhuStatus } from "@prisma/client";
 import { NotFormContributor } from "../forms/errors";
-import { getCachedUserSirets } from "../common/cache";
+import { getCachedUserSirets } from "../common/redis/users";
 
 import { ForbiddenError } from "apollo-server-express";
 export async function checkIsFormContributor(

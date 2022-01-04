@@ -11,7 +11,7 @@ import {
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
-import { getCachedUserSirets } from "../../../common/cache";
+import { getCachedUserSirets } from "../../../common/redis/users";
 
 import {
   expandTransportSegmentFromDb,

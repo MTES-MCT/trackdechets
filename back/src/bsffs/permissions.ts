@@ -2,7 +2,7 @@ import { User, Bsff, BsffFicheIntervention } from "@prisma/client";
 import { ForbiddenError } from "apollo-server-express";
 
 import { checkIsCompanyMember } from "../users/permissions";
-import { getCachedUserSirets } from "../common/cache";
+import { getCachedUserSirets } from "../common/redis/users";
 
 export async function isBsffContributor(
   user: User,

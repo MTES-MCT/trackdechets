@@ -6,7 +6,7 @@ import {
   ImportPaperFormInput,
   MutationResolvers
 } from "../../../generated/graphql/types";
-import { getCachedUserSirets } from "../../../common/cache";
+import { getCachedUserSirets } from "../../../common/redis/users";
 import { getFormOrFormNotFound, getFullForm } from "../../database";
 import {
   expandFormFromDb,

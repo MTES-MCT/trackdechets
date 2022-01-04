@@ -1,28 +1,43 @@
 import { redisClient, generateKey } from "./redis";
-import { getUserCompanies } from "../users/database";
+import { getUserCompanies } from "../../users/database";
 
 export const cacheKey = (userId: string): string =>
   generateKey("userSirets", userId);
 
-const MINUTES = 60;
+const CACHED_SIRET_EXPIRATION = 10 * 60; // 10 minutes
 
+/**
+ * Delete the cached sirets for a given user
+ * @param userId
+ */
 export async function deleteCachedUserSirets(userId: string): Promise<void> {
   const key = cacheKey(userId); // non-existent keys are ignored
   await redisClient.unlink(key);
 }
 
+/**
+ *
+ * @param userId Store sirets in a redis SET
+ * @param sirets
+ */
 export async function setCachedUserSirets(
   userId: string,
   sirets: string[]
 ): Promise<void> {
   const key = cacheKey(userId);
+
   await redisClient
     .pipeline()
     .sadd(key, sirets)
-    .expire(key, 10 * MINUTES)
+    .expire(key, CACHED_SIRET_EXPIRATION)
     .exec();
 }
 
+/**
+ *
+ * @param userId Retrieve cached sirets if found in redis, or query the db and cache them
+ * @returns array of sirets
+ */
 export async function getCachedUserSirets(userId: string): Promise<string[]> {
   const key = cacheKey(userId);
   const exists = await redisClient.exists(key);

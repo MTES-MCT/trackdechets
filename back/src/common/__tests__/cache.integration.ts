@@ -9,7 +9,7 @@ import {
   getCachedUserSirets,
   cacheKey,
   deleteCachedUserSirets
-} from "../../common/cache";
+} from "../../common/redis/users";
 import { redisClient } from "../redis";
 
 describe("Test Caching", () => {

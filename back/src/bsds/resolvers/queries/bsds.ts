@@ -25,7 +25,7 @@ import { unflattenBsdasri } from "../../../bsdasris/converter";
 import { expandVhuFormFromDb } from "../../../bsvhu/converter";
 import { expandBsdaFromDb } from "../../../bsda/converter";
 
-import { getCachedUserSirets } from "../../../common/cache";
+import { getCachedUserSirets } from "../../../common/redis/users";
 
 import { unflattenBsff } from "../../../bsffs/converter";
 

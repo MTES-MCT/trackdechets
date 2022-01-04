@@ -33,7 +33,7 @@ jest.mock("../../../../mailer/mailing", () => ({
   sendMail: () => null
 }));
 
-jest.mock("../../../../common/cache", () => ({
+jest.mock("../../../../common/redis/users", () => ({
   deleteCachedUserSirets: () => jest.fn(() => Promise.resolve())
 }));
 

@@ -5,7 +5,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { convertUrls, getCompanyActiveUsers } from "../../database";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import { deleteCachedUserSirets } from "../../../common/cache";
+import { deleteCachedUserSirets } from "../../../common/redis/users";
 
 const deleteCompanyResolver: MutationResolvers["deleteCompany"] = async (
   _,

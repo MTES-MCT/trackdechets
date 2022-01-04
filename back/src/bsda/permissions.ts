@@ -1,7 +1,7 @@
 import { User, Bsda, BsdaStatus } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { NotFormContributor } from "../forms/errors";
-import { getCachedUserSirets } from "../common/cache";
+import { getCachedUserSirets } from "../common/redis/users";
 
 import prisma from "../prisma";
 

@@ -1,7 +1,7 @@
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { unflattenBsff } from "../../converter";
-import { getCachedUserSirets } from "../../../common/cache";
+import { getCachedUserSirets } from "../../../common/redis/users";
 import { getBsffOrNotFound } from "../../database";
 
 const bsff: QueryResolvers["bsff"] = async (_, { id }, context) => {

@@ -4,7 +4,7 @@ import { applyMask } from "../../../common/where";
 import { QueryBsvhusArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
-import { getCachedUserSirets } from "../../../common/cache";
+import { getCachedUserSirets } from "../../../common/redis/users";
 
 import { expandVhuFormFromDb } from "../../converter";
 import { toPrismaWhereInput } from "../../where";

@@ -1,6 +1,6 @@
 import { User, Bsdasri, BsdasriStatus } from "@prisma/client";
 
-import { getCachedUserSirets } from "../common/cache";
+import { getCachedUserSirets } from "../common/redis/users";
 
 import { BsdasriSirets } from "./types";
 

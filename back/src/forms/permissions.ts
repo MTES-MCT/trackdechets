@@ -3,7 +3,7 @@ import { ForbiddenError } from "apollo-server-express";
 import prisma from "../prisma";
 import { FormSirets } from "./types";
 
-import { getCachedUserSirets } from "../common/cache";
+import { getCachedUserSirets } from "../common/redis/users";
 
 import { getFullForm } from "./database";
 import { InvaliSecurityCode, NotFormContributor } from "./errors";

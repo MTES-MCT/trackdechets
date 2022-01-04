@@ -11,7 +11,7 @@ import geocode from "../../geocode";
 import * as COMPANY_TYPES from "../../../common/constants/COMPANY_TYPES";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../mailer/templates";
-import { deleteCachedUserSirets } from "../../../common/cache";
+import { deleteCachedUserSirets } from "../../../common/redis/users";
 
 /**
  * Create a new company and associate it to a user
