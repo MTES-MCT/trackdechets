@@ -108,7 +108,8 @@ module.exports = {
       "docusaurus-graphql-plugin",
       {
         id: "user-company",
-        schema: "../back/src/{scalars,users,companies}/typeDefs/*.graphql",
+        schema:
+          "../back/src/{scalars,common,users,companies}/typeDefs/*.graphql",
         routeBasePath: "/reference/api-reference/user-company",
       },
     ],

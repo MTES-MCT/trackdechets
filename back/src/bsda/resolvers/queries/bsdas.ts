@@ -3,27 +3,18 @@ import { QueryBsdasArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
-import { getConnectionsArgs } from "../../pagination";
 import { expandBsdaFromDb } from "../../converter";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { BSDA_CONTRIBUTORS_FIELDS } from "../../permissions";
+import { getConnection } from "../../../common/pagination";
 
 export default async function bsdas(
   _,
-  { where: whereArgs, ...paginationArgs }: QueryBsdasArgs,
+  { where: whereArgs, ...gqlPaginationArgs }: QueryBsdasArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
-
-  const defaultPaginateBy = 50;
-  const itemsPerPage =
-    paginationArgs.first ?? paginationArgs.last ?? defaultPaginateBy;
-  const connectionsArgs = await getConnectionsArgs({
-    ...paginationArgs,
-    defaultPaginateBy,
-    maxPaginateBy: 500
-  });
 
   const userCompanies = await getUserCompanies(user.id);
   const userSirets = userCompanies.map(c => c.siret);
@@ -42,27 +33,16 @@ export default async function bsdas(
   const where = applyMask(prismaWhere, mask);
 
   const totalCount = await prisma.bsda.count({ where });
-  const queriedForms = await prisma.bsda.findMany({
-    ...connectionsArgs,
-    orderBy: { createdAt: "desc" },
-    where
-  });
 
-  const edges = queriedForms
-    .slice(0, itemsPerPage)
-    .map(f => ({ cursor: f.id, node: expandBsdaFromDb(f) }));
-  return {
+  return getConnection({
     totalCount,
-    edges,
-    pageInfo: {
-      startCursor: edges[0]?.cursor,
-      endCursor: edges[edges.length - 1]?.cursor,
-      hasNextPage: paginationArgs.after
-        ? queriedForms.length > itemsPerPage
-        : false,
-      hasPreviousPage: paginationArgs.before
-        ? queriedForms.length > itemsPerPage
-        : false
-    }
-  };
+    findMany: prismaPaginationArgs =>
+      prisma.bsda.findMany({
+        where,
+        ...prismaPaginationArgs,
+        orderBy: { createdAt: "desc" }
+      }),
+    formatNode: expandBsdaFromDb,
+    ...gqlPaginationArgs
+  });
 }

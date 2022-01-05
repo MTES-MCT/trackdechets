@@ -2,12 +2,16 @@ import prisma from "../../../prisma";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { unflattenBsff } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getConnectionsArgs } from "../../pagination";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { getUserCompanies } from "../../../users/database";
+import { getConnection } from "../../../common/pagination";
 
-const bsffs: QueryResolvers["bsffs"] = async (_, args, context) => {
+const bsffs: QueryResolvers["bsffs"] = async (
+  _,
+  { where: whereArgs, ...gqlPaginationArgs },
+  context
+) => {
   const user = checkIsAuthenticated(context);
 
   const companies = await getUserCompanies(user.id);
@@ -22,36 +26,25 @@ const bsffs: QueryResolvers["bsffs"] = async (_, args, context) => {
   };
 
   const prismaWhere = {
-    ...(args.where ? toPrismaWhereInput(args.where) : {}),
+    ...(whereArgs ? toPrismaWhereInput(whereArgs) : {}),
     isDeleted: false
   };
 
   const where = applyMask(prismaWhere, mask);
 
   const totalCount = await prisma.bsff.count({ where });
-  const paginationArgs = await getConnectionsArgs({
-    after: args.after,
-    first: args.first,
-    before: args.before,
-    last: args.last
-  });
-  const bsffs = await prisma.bsff.findMany({
-    ...paginationArgs,
-    where,
-    orderBy: { updatedAt: "desc" }
-  });
 
-  return {
-    edges: bsffs.map(bsff => ({
-      node: unflattenBsff(bsff),
-      cursor: bsff.id
-    })),
+  return getConnection({
     totalCount,
-    pageInfo: {
-      hasNextPage: false,
-      hasPreviousPage: false
-    }
-  };
+    findMany: prismaPaginationArgs =>
+      prisma.bsff.findMany({
+        where,
+        ...prismaPaginationArgs,
+        orderBy: { createdAt: "desc" }
+      }),
+    formatNode: unflattenBsff,
+    ...gqlPaginationArgs
+  });
 };
 
 export default bsffs;

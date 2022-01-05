@@ -1,7 +1,10 @@
 import { ApiResponse } from "@elastic/elasticsearch";
 import { GetResponse } from "@elastic/elasticsearch/api/types";
 import { BsdElastic, client, index } from "../common/elastic";
-import { PaginationArgs, validatePaginationArgs } from "../common/pagination";
+import {
+  GraphqlPaginationArgs,
+  validateGqlPaginationArgs
+} from "../common/pagination";
 import { OrderType, WasteRegistryType } from "../generated/graphql/types";
 
 function buildSort(
@@ -47,17 +50,15 @@ async function buildSearchAfter(
 }
 
 export async function getElasticPaginationArgs({
-  defaultPaginateBy = 50,
-  maxPaginateBy = 100,
   registryType,
   ...args
-}: PaginationArgs & { registryType: WasteRegistryType }) {
-  validatePaginationArgs({
+}: GraphqlPaginationArgs & { registryType: WasteRegistryType }) {
+  validateGqlPaginationArgs({
     first: args.first,
     after: args.after,
     last: args.last,
     before: args.before,
-    maxPaginateBy
+    maxPaginateBy: 100
   });
 
   let first = args.first;
@@ -65,9 +66,9 @@ export async function getElasticPaginationArgs({
 
   if (!first && !last) {
     if (args.before) {
-      last = defaultPaginateBy;
+      last = 50;
     } else {
-      first = defaultPaginateBy;
+      first = 50;
     }
   }
 

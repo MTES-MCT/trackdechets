@@ -3,7 +3,7 @@ import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { getFormsRightFilter } from "../../database";
-import { getConnectionsArgs } from "../../pagination";
+import { getConnection } from "../../../common/pagination";
 
 const PAGINATE_BY = 100;
 
@@ -50,11 +50,11 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
 
   const formsFilter = getFormsRightFilter(selectedCompany.siret);
 
-  const connectionArgs = getConnectionsArgs({
-    cursorAfter,
-    cursorBefore,
+  const gqlPaginationArgs = {
+    after: cursorAfter,
+    before: cursorBefore,
     defaultPaginateBy: PAGINATE_BY
-  });
+  };
 
   const where = {
     loggedAt: {
@@ -65,36 +65,28 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
     form: { ...formsFilter, isDeleted: false, id: formId }
   };
 
-  const count = await prisma.statusLog.count({ where });
-  const statusLogs = await prisma.statusLog.findMany({
-    orderBy: { loggedAt: "desc" },
-    ...connectionArgs,
-    take: parseInt(`${cursorBefore ? "-" : "+"}${PAGINATE_BY}`, 10),
-    ...(cursorAfter && { cursor: { id: cursorAfter } }),
-    ...(cursorBefore && { cursor: { id: cursorBefore } }),
-    where,
-    include: {
-      form: { select: { id: true, readableId: true } },
-      user: { select: { id: true, email: true } }
-    }
+  const totalCount = await prisma.statusLog.count({ where });
+
+  const { pageInfo, edges } = await getConnection({
+    totalCount,
+    findMany: prismaPaginationArgs =>
+      prisma.statusLog.findMany({
+        where,
+        ...prismaPaginationArgs,
+        orderBy: { loggedAt: "desc" },
+        include: {
+          form: { select: { id: true, readableId: true } },
+          user: { select: { id: true, email: true } }
+        }
+      }),
+    formatNode: statusLog => statusLog,
+    ...gqlPaginationArgs
   });
 
-  const startCursor = statusLogs.length > 0 ? statusLogs[0].id : undefined;
-  const endCursor =
-    statusLogs.length > 0 ? statusLogs[statusLogs.length - 1].id : undefined;
-
-  const hasNextPage = true; // TODO-PRISMA
-  const hasPreviousPage = true; // TODO-PRISMA
-
   return {
-    statusLogs,
-    pageInfo: {
-      startCursor,
-      endCursor,
-      hasNextPage,
-      hasPreviousPage
-    },
-    count
+    statusLogs: edges.map(({ node }) => node),
+    count: totalCount,
+    pageInfo
   };
 };
 
