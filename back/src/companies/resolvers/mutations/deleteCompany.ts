@@ -25,6 +25,7 @@ const deleteCompanyResolver: MutationResolvers["deleteCompany"] = async (
   }
 
   await prisma.companyAssociation.deleteMany({ where: { companyId: id } });
+  await prisma.membershipRequest.deleteMany({ where: { companyId: id } });
   await prisma.company.delete({ where: { id } });
 
   return convertUrls(companyAssocation.company);
