@@ -42,15 +42,13 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   });
 
   // check for stale transport segments and delete them
-  const transportSegments = await prisma.form
+  // quick fix https://trackdechets.zammad.com/#ticket/zoom/1696
+  const staleSegments = await prisma.form
     .findUnique({ where: { id: form.id } })
-    .transportSegments();
-  if (transportSegments.length > 0) {
-    const staleSegments = transportSegments
-      .filter(f => !f.takenOverAt)
-      .map(s => s.id);
+    .transportSegments({ where: { takenOverAt: null } });
+  if (staleSegments.length > 0) {
     await prisma.transportSegment.deleteMany({
-      where: { id: { in: staleSegments } }
+      where: { id: { in: staleSegments.map(s => s.id) } }
     });
   }
 
