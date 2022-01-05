@@ -13,6 +13,10 @@ import {
   acceptNewUserCompanyInvitations
 } from "../database";
 import templateIds from "../../mailer/templates/provider/templateIds";
+import {
+  CompanyVerificationMode,
+  CompanyVerificationStatus
+} from "@prisma/client";
 
 function printHelp() {
   console.log(`
@@ -138,6 +142,10 @@ export async function bulkCreate(opts: Opts): Promise<void> {
       await prisma.company.create({
         data: {
           siret: company.siret,
+          verificationStatus: CompanyVerificationStatus.VERIFIED,
+          verificationMode: CompanyVerificationMode.MANUAL,
+          verifiedAt: new Date(),
+          verificationComment: "Import en masse",
           codeNaf: company.codeNaf,
           gerepId: company.gerepId,
           name: company.name,
