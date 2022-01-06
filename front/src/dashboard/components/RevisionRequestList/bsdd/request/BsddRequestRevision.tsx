@@ -18,6 +18,7 @@ import {
 } from "generated/graphql/types";
 import React from "react";
 import { useHistory } from "react-router";
+import { useParams } from "react-router-dom";
 import * as yup from "yup";
 import { removeEmptyKeys } from "../../../../../common/helper";
 import { CREATE_FORM_REVISION_REQUEST } from "../query";
@@ -57,6 +58,7 @@ const validationSchema = yup.object({
 });
 
 export function BsddRequestRevision({ bsdd }: Props) {
+  const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
   const [createFormRevisionRequest, { loading, error }] = useMutation<
     Pick<Mutation, "createFormRevisionRequest">,
@@ -81,6 +83,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                 formId: bsdd.id,
                 content: cleanedContent ?? {},
                 comment,
+                authoringCompanySiret: siret,
               },
             },
           });
