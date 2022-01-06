@@ -87,7 +87,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
           history.goBack();
         }}
       >
-        {({ setFieldValue }) => (
+        {({ setFieldValue, values }) => (
           <Form>
             <div className={styles.fields}>
               <ReviewableField
@@ -125,7 +125,8 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   component={FieldSwitch}
                   name="content.wasteDetails.pop"
                   label=""
-                />
+                />{" "}
+                {Boolean(values.content.wasteDetails.pop) ? "Oui" : "Non"}
               </ReviewableField>
 
               <ReviewableField

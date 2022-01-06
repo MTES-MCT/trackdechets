@@ -60,7 +60,7 @@ export default async function createFormRevisionRequest(
   { input }: MutationCreateFormRevisionRequestArgs,
   context: GraphQLContext
 ) {
-  const { formId, content, comment } = input;
+  const { formId, content, comment, authoringCompanySiret } = input;
 
   const user = checkIsAuthenticated(context);
   const existingBsdd = await getFormOrFormNotFound({ id: formId });
@@ -68,7 +68,11 @@ export default async function createFormRevisionRequest(
 
   const flatContent = await getFlatContent(content, existingBsdd);
 
-  const authoringCompany = await getAuthoringCompany(user.id, existingBsdd);
+  const authoringCompany = await getAuthoringCompany(
+    user.id,
+    existingBsdd,
+    authoringCompanySiret
+  );
   const approversSirets = await getApproversSirets(
     existingBsdd,
     flatContent,
@@ -88,34 +92,38 @@ export default async function createFormRevisionRequest(
   });
 }
 
-async function getAuthoringCompany(userId: string, bsdd: Form) {
-  const userCompanies = await getUserCompanies(userId);
-  const userCompanySirets = new Set(
-    userCompanies.map(company => company.siret)
-  );
-
-  if (userCompanySirets.has(bsdd.emitterCompanySiret))
-    return userCompanies.find(
-      company => company.siret === bsdd.emitterCompanySiret
-    );
-
-  if (userCompanySirets.has(bsdd.recipientCompanySiret))
-    return userCompanies.find(
-      company => company.siret === bsdd.recipientCompanySiret
-    );
-
+async function getAuthoringCompany(
+  userId: string,
+  bsdd: Form,
+  authoringCompanySiret: string
+) {
   const temporaryStorageDetail = await prisma.form
     .findUnique({ where: { id: bsdd.id } })
     .temporaryStorageDetail();
-  if (userCompanySirets.has(temporaryStorageDetail.destinationCompanySiret))
-    return userCompanies.find(
-      company =>
-        company.siret === temporaryStorageDetail.destinationCompanySiret
+  if (
+    ![
+      bsdd.emitterCompanySiret,
+      bsdd.recipientCompanySiret,
+      temporaryStorageDetail.destinationCompanySiret
+    ].includes(authoringCompanySiret)
+  ) {
+    throw new UserInputError(
+      `Le SIRET "${authoringCompanySiret}" ne peut pas être auteur de la révision.`
     );
+  }
 
-  throw new Error(
-    "Unknown user role on BSDD. He should not have been allowed to create a review."
+  const userCompanies = await getUserCompanies(userId);
+  const authoringCompany = userCompanies.find(
+    company => company.siret === authoringCompanySiret
   );
+
+  if (!authoringCompany) {
+    throw new UserInputError(
+      `Vous n'avez pas les droits suffisants pour déclarer le SIRET "${authoringCompanySiret}" comme auteur de la révision.`
+    );
+  }
+
+  return authoringCompany;
 }
 
 async function checkIfUserCanRequestRevisionOnBsdd(
@@ -179,7 +187,7 @@ async function getFlatContent(
 async function getApproversSirets(
   bsdd: Form,
   content: RevisionRequestContent,
-  revisionAuthorSiret: string
+  authoringCompanySiret: string
 ) {
   const approvers = [
     bsdd.emitterCompanySiret,
@@ -197,7 +205,7 @@ async function getApproversSirets(
 
   return approvers
     .filter(Boolean)
-    .filter(siret => siret !== revisionAuthorSiret);
+    .filter(siret => siret !== authoringCompanySiret);
 }
 
 function hasTemporaryStorageUpdate(content: RevisionRequestContent): boolean {
