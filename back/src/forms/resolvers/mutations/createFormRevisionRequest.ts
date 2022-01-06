@@ -104,7 +104,7 @@ async function getAuthoringCompany(
     ![
       bsdd.emitterCompanySiret,
       bsdd.recipientCompanySiret,
-      temporaryStorageDetail.destinationCompanySiret
+      temporaryStorageDetail?.destinationCompanySiret
     ].includes(authoringCompanySiret)
   ) {
     throw new UserInputError(
