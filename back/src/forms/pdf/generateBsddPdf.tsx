@@ -657,7 +657,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             <p>
               Date de présentation :{" "}
               {formatDate(
-                form.temporaryStorageDetail?.temporaryStorer.receivedAt
+                form.temporaryStorageDetail?.temporaryStorer?.receivedAt
               )}
             </p>
             <AcceptationFields
