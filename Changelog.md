@@ -12,6 +12,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 - Correction d'un bug affectant la création de BSVHU. [PR 1130](https://github.com/MTES-MCT/trackdechets/pull/1130)
 
+- Suppression de tous les objets liés à un établissement avant l'appel à `prisma.company.delete` [PR 1127](https://github.com/MTES-MCT/trackdechets/pull/1127)
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
