@@ -16,6 +16,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 - Pagination des établissements dans Mon Compte > Établissements. [PR 1113](https://github.com/MTES-MCT/trackdechets/pull/1113)
 - Possibilité pour le destinataire d'un BSDD de valider une réception même si un segment multi-modal a été crée par erreur [PR 1128](https://github.com/MTES-MCT/trackdechets/pull/1128)
+- Affichage du courtier sur l'aperçu des bordereaux amiante. [PR 1135](https://github.com/MTES-MCT/trackdechets/pull/1135)
 #### :memo: Documentation
 
 #### :house: Interne
