@@ -1,8 +1,7 @@
 import {
   userWithCompanyFactory,
   formFactory,
-  userFactory,
-  transportSegmentFactory
+  userFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
