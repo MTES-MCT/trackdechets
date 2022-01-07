@@ -16,7 +16,7 @@ import {
   flattenTransportSegmentInput
 } from "../../form-converter";
 import { indexForm } from "../../elastic";
-import { getFormOrFormNotFound, getFullForm } from "../../database";
+import { getFullForm } from "../../database";
 
 const SEGMENT_NOT_FOUND = "Le segment de transport n'a pas été trouvé";
 const FORM_NOT_FOUND_OR_NOT_ALLOWED =
