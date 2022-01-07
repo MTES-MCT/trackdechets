@@ -280,7 +280,7 @@ function flattenBsdaDestinationInput({
       chain(d.reception, r => r.date)
     ),
     destinationReceptionWeight: chain(destination, d =>
-      chain(d.reception, r => r.weight * 1000)
+      chain(d.reception, r => (r.weight ? r.weight * 1000 : r.weight))
     ),
     destinationReceptionAcceptationStatus: chain(destination, d =>
       chain(d.reception, r => r.acceptationStatus)
@@ -430,7 +430,7 @@ function flattenBsdaBrokerInput({ broker }: Pick<BsdaInput, "broker">) {
 function flattenBsdaWeightInput({ weight }: Pick<BsdaInput, "weight">) {
   return {
     weightIsEstimate: chain(weight, q => q.isEstimate),
-    weightValue: chain(weight, q => q.value * 1000)
+    weightValue: chain(weight, q => (q.value ? q.value * 1000 : q.value))
   };
 }
 
