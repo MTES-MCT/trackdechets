@@ -653,7 +653,14 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               </strong>
             </p>
             <p>Quantité présentée :</p>
-            <QuantityFields {...form.temporaryStorageDetail?.temporaryStorer} />
+            <QuantityFields
+              quantity={
+                form.temporaryStorageDetail?.temporaryStorer?.quantityReceived
+              }
+              quantityType={
+                form.temporaryStorageDetail?.temporaryStorer?.quantityType
+              }
+            />
             <p>
               Date de présentation :{" "}
               {formatDate(
