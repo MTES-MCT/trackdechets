@@ -157,10 +157,9 @@ describe("joinWithInvite mutation", () => {
     const companies = await getUserCompanies(user.id);
 
     expect(companies.length).toEqual(2);
-    expect(companies.map(c => c.siret)).toEqual([
-      company1.siret,
-      company2.siret
-    ]);
+    expect(companies.map(c => c.siret).sort()).toEqual(
+      [company1.siret, company2.siret].sort()
+    );
   });
 
   it("should return an error if name is empty or password less than 8 characters", async () => {
