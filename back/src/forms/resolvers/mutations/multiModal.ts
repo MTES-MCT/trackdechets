@@ -15,6 +15,8 @@ import {
   expandTransportSegmentFromDb,
   flattenTransportSegmentInput
 } from "../../form-converter";
+import { indexForm } from "../../elastic";
+import { getFullForm } from "../../database";
 
 const SEGMENT_NOT_FOUND = "Le segment de transport n'a pas été trouvé";
 const FORM_NOT_FOUND_OR_NOT_ALLOWED =
@@ -108,6 +110,7 @@ export async function prepareSegment(
     throw new ForbiddenError("Le siret est obligatoire");
   }
   // get form and segments
+
   const form = await getForm(id);
   if (!form) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
@@ -176,6 +179,9 @@ export async function prepareSegment(
     }
   });
 
+  const fullForm = await getFullForm(form);
+  await indexForm(fullForm);
+
   return expandTransportSegmentFromDb(segment);
 }
 
@@ -215,10 +221,25 @@ export async function markSegmentAsReadyToTakeOver(
     throw new ForbiddenError(SEGMENT_ALREADY_SEALED);
   }
 
+  const segmentErrors: string[] = await segmentSchema
+    .validate(currentSegment, { abortEarly: false })
+    .catch(err => err.errors);
+
+  if (!!segmentErrors.length) {
+    throw new UserInputError(
+      `Erreur, impossible de finaliser la préparation du transfert multi-modal car des champs sont manquants ou mal renseignés. \nErreur(s): ${segmentErrors.join(
+        "\n"
+      )}`
+    );
+  }
+
   const updatedSegment = await prisma.transportSegment.update({
     where: { id },
     data: { readyToTakeOver: true }
   });
+
+  const fullForm = await getFullForm(form);
+  await indexForm(fullForm);
 
   return expandTransportSegmentFromDb(updatedSegment);
 }
@@ -292,13 +313,16 @@ export async function takeOverSegment(
     data: takeOverInfo
   });
 
-  await prisma.form.update({
+  const updatedForm = await prisma.form.update({
     where: { id: currentSegment.form.id },
     data: {
       currentTransporterSiret: currentSegment.transporterCompanySiret,
       nextTransporterSiret: ""
     }
   });
+
+  const fullForm = await getFullForm(updatedForm);
+  await indexForm(fullForm);
 
   return expandTransportSegmentFromDb(updatedSegment);
 }
