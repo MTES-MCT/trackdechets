@@ -221,6 +221,18 @@ export async function markSegmentAsReadyToTakeOver(
     throw new ForbiddenError(SEGMENT_ALREADY_SEALED);
   }
 
+  const segmentErrors: string[] = await segmentSchema
+    .validate(currentSegment, { abortEarly: false })
+    .catch(err => err.errors);
+
+  if (!!segmentErrors.length) {
+    throw new UserInputError(
+      `Erreur, impossible de finaliser la préparation du transfert multi-modal car des champs sont manquants ou mal renseignés. \nErreur(s): ${segmentErrors.join(
+        "\n"
+      )}`
+    );
+  }
+
   const updatedSegment = await prisma.transportSegment.update({
     where: { id },
     data: { readyToTakeOver: true }
