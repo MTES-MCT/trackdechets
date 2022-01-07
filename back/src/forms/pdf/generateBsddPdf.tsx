@@ -171,7 +171,9 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
             <td>
               {packagingInfos.reduce(
                 (total, packaging) =>
-                  packaging.type === packagingType.value ? total + 1 : total,
+                  packaging.type === packagingType.value
+                    ? total + (packaging.quantity ?? 0)
+                    : total,
                 0
               ) ||
                 // leave the box empty if it's 0
@@ -183,7 +185,9 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
         <tr>
           <td>
             <strong>
-              {packagingInfos.length ||
+              {packagingInfos.reduce((total, packaging) => {
+                return total + (packaging.quantity ?? 0);
+              }, 0) ||
                 // leave the box empty if it's 0
                 null}
             </strong>
