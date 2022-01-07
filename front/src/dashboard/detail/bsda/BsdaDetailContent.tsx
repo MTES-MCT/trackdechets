@@ -215,7 +215,10 @@ const Broker = ({ broker }) => (
       <div className={styles.detailGrid}>
         <DetailRow value={broker.recepisse?.number} label="Récépissé" />
         <DetailRow value={broker.recepisse?.department} label="Départment" />
-        <DateRow value={broker.recepisse?.validityLimit} label="Date de validité" />
+        <DateRow
+          value={broker.recepisse?.validityLimit}
+          label="Date de validité"
+        />
       </div>
     </div>
   </>
