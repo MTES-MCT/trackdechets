@@ -6,3 +6,6 @@ instances:
     username: "%%env_DD_DATABASE_USER%%"
     password: "%%env_DD_DATABASE_PWD%%"
     dbname: "%%env_DD_DATABASE_DB%%"
+    tags:
+    - service.name:postgres
+    - env:%%env_DD_ENV%%
