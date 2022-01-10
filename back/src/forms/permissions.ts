@@ -1,97 +1,101 @@
-import { Company, Form, User } from "@prisma/client";
+import { Form, User } from "@prisma/client";
 import { ForbiddenError } from "apollo-server-express";
 import prisma from "../prisma";
 import { FormSirets } from "./types";
-import { getFullUser } from "../users/database";
+
+import { getCachedUserSirets } from "../common/redis/users";
+
 import { getFullForm } from "./database";
 import { InvaliSecurityCode, NotFormContributor } from "./errors";
 
-function isFormEmitter(user: { companies: Company[] }, form: FormSirets) {
+function isFormEmitter(userSirets: string[], form: FormSirets) {
   if (!form.emitterCompanySiret) {
     return false;
   }
-  const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(form.emitterCompanySiret);
+
+  return userSirets.includes(form.emitterCompanySiret);
 }
 
-function isFormRecipient(user: { companies: Company[] }, form: FormSirets) {
+function isFormRecipient(userSirets: string[], form: FormSirets) {
   if (!form.recipientCompanySiret) {
     return false;
   }
-  const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(form.recipientCompanySiret);
+
+  return userSirets.includes(form.recipientCompanySiret);
 }
 
-function isFormTransporter(user: { companies: Company[] }, form: FormSirets) {
+function isFormTransporter(userSirets: string[], form: FormSirets) {
   if (!form.transporterCompanySiret) {
     return false;
   }
-  const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(form.transporterCompanySiret);
+
+  return userSirets.includes(form.transporterCompanySiret);
 }
 
-function isFormTrader(user: { companies: Company[] }, form: FormSirets) {
+function isFormTrader(userSirets: string[], form: FormSirets) {
   if (!form.traderCompanySiret) {
     return false;
   }
-  const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(form.traderCompanySiret);
+
+  return userSirets.includes(form.traderCompanySiret);
 }
 
-function isFormBroker(user: { companies: Company[] }, form: FormSirets) {
+function isFormBroker(userSirets: string[], form: FormSirets) {
   if (!form.brokerCompanySiret) {
     return false;
   }
-  const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(form.brokerCompanySiret);
+
+  return userSirets.includes(form.brokerCompanySiret);
 }
 
-function isFormEcoOrganisme(user: { companies: Company[] }, form: FormSirets) {
+function isFormEcoOrganisme(userSirets: string[], form: FormSirets) {
   if (!form.ecoOrganismeSiret) {
     return false;
   }
-  const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(form.ecoOrganismeSiret);
+
+  return userSirets.includes(form.ecoOrganismeSiret);
 }
 
 function isFormDestinationAfterTempStorage(
-  user: { companies: Company[] },
+  userSirets: string[],
   form: FormSirets
 ) {
   if (!form.temporaryStorageDetail) {
     return false;
   }
-  const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(form.temporaryStorageDetail.destinationCompanySiret);
+
+  return userSirets.includes(
+    form.temporaryStorageDetail.destinationCompanySiret
+  );
 }
 
 function isFormTransporterAfterTempStorage(
-  user: { companies: Company[] },
+  userSirets: string[],
   form: FormSirets
 ) {
   if (!form.temporaryStorageDetail) {
     return false;
   }
-  const sirets = user.companies.map(c => c.siret);
-  return sirets.includes(form.temporaryStorageDetail.transporterCompanySiret);
+
+  return userSirets.includes(
+    form.temporaryStorageDetail.transporterCompanySiret
+  );
 }
 
-function isFormMultiModalTransporter(
-  user: { companies: Company[] },
-  form: FormSirets
-) {
+function isFormMultiModalTransporter(userSirets: string[], form: FormSirets) {
   if (!form.transportSegments) {
     return false;
   }
-  const sirets = user.companies.map(c => c.siret);
+
   const transportSegmentSirets = form.transportSegments.map(
     segment => segment.transporterCompanySiret
   );
-  return transportSegmentSirets.some(s => sirets.includes(s));
+  return transportSegmentSirets.some(s => userSirets.includes(s));
 }
 
 export async function isFormContributor(user: User, form: FormSirets) {
-  const fullUser = await getFullUser(user);
+  const userSirets = await getCachedUserSirets(user.id);
+
   return [
     isFormEmitter,
     isFormRecipient,
@@ -102,7 +106,7 @@ export async function isFormContributor(user: User, form: FormSirets) {
     isFormTransporterAfterTempStorage,
     isFormDestinationAfterTempStorage,
     isFormMultiModalTransporter
-  ].some(isFormRole => isFormRole(fullUser, form));
+  ].some(isFormRole => isFormRole(userSirets, form));
 }
 
 /**
@@ -171,9 +175,8 @@ export async function checkCanDelete(user: User, form: Form) {
 }
 
 export async function checkCanUpdateTransporterFields(user: User, form: Form) {
-  const fullUser = await getFullUser(user);
-
-  if (!isFormTransporter(fullUser, form)) {
+  const userSirets = await getCachedUserSirets(user.id);
+  if (!isFormTransporter(userSirets, form)) {
     throw new ForbiddenError("Vous n'êtes pas transporteur de ce bordereau.");
   }
 }
@@ -187,11 +190,12 @@ export async function checkCanMarkAsSealed(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsSent(user: User, form: Form) {
-  const fullUser = await getFullUser(user);
+  const userSirets = await getCachedUserSirets(user.id);
+
   const fullForm = await getFullForm(form);
 
   const isAuthorized = [isFormRecipient, isFormEmitter].some(isFormRole =>
-    isFormRole(fullUser, fullForm)
+    isFormRole(userSirets, fullForm)
   );
   if (!isAuthorized) {
     throw new ForbiddenError(
@@ -202,12 +206,12 @@ export async function checkCanMarkAsSent(user: User, form: Form) {
 }
 
 export async function checkCanSignedByTransporter(user: User, form: Form) {
-  const fullUser = await getFullUser(user);
+  const userSirets = await getCachedUserSirets(user.id);
   const fullForm = await getFullForm(form);
   const isAuthorized = [
     isFormTransporter,
     isFormTransporterAfterTempStorage
-  ].some(isFormRole => isFormRole(fullUser, fullForm));
+  ].some(isFormRole => isFormRole(userSirets, fullForm));
 
   if (!isAuthorized) {
     throw new ForbiddenError(
@@ -218,12 +222,12 @@ export async function checkCanSignedByTransporter(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsReceived(user: User, form: Form) {
-  const fullUser = await getFullUser(user);
+  const userSirets = await getCachedUserSirets(user.id);
   const fullForm = await getFullForm(form);
   const isAuthorized = [
     isFormRecipient,
     isFormDestinationAfterTempStorage
-  ].some(isFormRole => isFormRole(fullUser, fullForm));
+  ].some(isFormRole => isFormRole(userSirets, fullForm));
 
   if (!isAuthorized) {
     throw new ForbiddenError(
@@ -234,12 +238,12 @@ export async function checkCanMarkAsReceived(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsAccepted(user: User, form: Form) {
-  const fullUser = await getFullUser(user);
+  const userSirets = await getCachedUserSirets(user.id);
   const fullForm = await getFullForm(form);
   const isAuthorized = [
     isFormRecipient,
     isFormDestinationAfterTempStorage
-  ].some(isFormRole => isFormRole(fullUser, fullForm));
+  ].some(isFormRole => isFormRole(userSirets, fullForm));
   if (!isAuthorized) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à marquer ce bordereau comme accepté"
@@ -249,12 +253,12 @@ export async function checkCanMarkAsAccepted(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsProcessed(user: User, form: Form) {
-  const fullUser = await getFullUser(user);
+  const userSirets = await getCachedUserSirets(user.id);
   const fullForm = await getFullForm(form);
   const isAuthorized = [
     isFormRecipient,
     isFormDestinationAfterTempStorage
-  ].some(isFormRole => isFormRole(fullUser, fullForm));
+  ].some(isFormRole => isFormRole(userSirets, fullForm));
   if (!isAuthorized) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à marquer ce bordereau comme traité"
@@ -264,10 +268,10 @@ export async function checkCanMarkAsProcessed(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsTempStored(user: User, form: Form) {
-  const fullUser = await getFullUser(user);
+  const userSirets = await getCachedUserSirets(user.id);
   const fullForm = await getFullForm(form);
 
-  const isAuthorized = isFormRecipient(fullUser, fullForm);
+  const isAuthorized = isFormRecipient(userSirets, fullForm);
   if (!isAuthorized) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à marquer ce bordereau comme entreposé provisoirement"
@@ -277,10 +281,10 @@ export async function checkCanMarkAsTempStored(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsTempStorerAccepted(user: User, form: Form) {
-  const fullUser = await getFullUser(user);
+  const userSirets = await getCachedUserSirets(user.id);
   const fullForm = await getFullForm(form);
 
-  const isAuthorized = isFormRecipient(fullUser, fullForm);
+  const isAuthorized = isFormRecipient(userSirets, fullForm);
   if (!isAuthorized) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à marquer ce bordereau comme entreposé provisoirement"
@@ -290,10 +294,10 @@ export async function checkCanMarkAsTempStorerAccepted(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsResealed(user: User, form: Form) {
-  const fullUser = await getFullUser(user);
+  const userSirets = await getCachedUserSirets(user.id);
   const fullForm = await getFullForm(form);
 
-  const isAuthorized = isFormRecipient(fullUser, fullForm);
+  const isAuthorized = isFormRecipient(userSirets, fullForm);
   if (!isAuthorized) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à sceller ce bordereau après entreposage provisoire"
@@ -303,10 +307,10 @@ export async function checkCanMarkAsResealed(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsResent(user: User, form: Form) {
-  const fullUser = await getFullUser(user);
+  const userSirets = await getCachedUserSirets(user.id);
   const fullForm = await getFullForm(form);
 
-  const isAuthorized = isFormRecipient(fullUser, fullForm);
+  const isAuthorized = isFormRecipient(userSirets, fullForm);
   if (!isAuthorized) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à marquer ce borderau comme envoyé après entreposage provisoire"
@@ -317,8 +321,8 @@ export async function checkCanMarkAsResent(user: User, form: Form) {
 
 // only recipient of the form can import data from paper
 export async function checkCanImportForm(user: User, form: Form) {
-  const fullUser = await getFullUser(user);
-  const isAuthorized = isFormRecipient(fullUser, form);
+  const userSirets = await getCachedUserSirets(user.id);
+  const isAuthorized = isFormRecipient(userSirets, form);
   if (!isAuthorized) {
     throw new ForbiddenError(
       "Vous devez apparaitre en tant que destinataire du bordereau (case 2) pour pouvoir mettre à jour ce bordereau"
@@ -338,12 +342,12 @@ export async function checkSecurityCode(siret: string, securityCode: number) {
 }
 
 export async function checkCanRequestRevision(user: User, form: Form) {
-  const fullUser = await getFullUser(user);
+  const userSirets = await getCachedUserSirets(user.id);
   const canRequestRevision = [
     isFormEmitter,
     isFormRecipient,
     isFormDestinationAfterTempStorage
-  ].some(isFormRole => isFormRole(fullUser, form));
+  ].some(isFormRole => isFormRole(userSirets, form));
 
   if (!canRequestRevision) {
     throw new NotFormContributor(

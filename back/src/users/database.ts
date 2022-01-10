@@ -10,8 +10,10 @@ import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail, hashToken } from "../utils";
+import { deleteCachedUserSirets } from "../common/redis/users";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
+  // hint: See getCachedUserSirets function to leverage redis
   const companyAssociations = await prisma.user
     .findUnique({ where: { id: userId } })
     .companyAssociations();
@@ -113,6 +115,10 @@ export async function associateUserToCompany(userId, siret, role) {
     where: { id: userId, firstAssociationDate: null },
     data: { firstAssociationDate: new Date() }
   });
+
+  // clear cache
+  await deleteCachedUserSirets(userId);
+
   return association;
 }
 
@@ -193,6 +199,9 @@ export async function acceptNewUserCompanyInvitations(user: User) {
       data: { firstAssociationDate: new Date() }
     });
   }
+
+  // clear cache
+  await deleteCachedUserSirets(user.id);
 
   return prisma.userAccountHash.updateMany({
     where: {

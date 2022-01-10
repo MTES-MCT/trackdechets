@@ -1,7 +1,8 @@
 import { User, Bsff, BsffFicheIntervention } from "@prisma/client";
 import { ForbiddenError } from "apollo-server-express";
-import prisma from "../prisma";
+
 import { checkIsCompanyMember } from "../users/permissions";
+import { getCachedUserSirets } from "../common/redis/users";
 
 export async function isBsffContributor(
   user: User,
@@ -14,22 +15,17 @@ export async function isBsffContributor(
     >
   >
 ) {
-  const count = await prisma.companyAssociation.count({
-    where: {
-      userId: user.id,
-      company: {
-        siret: {
-          in: [
-            bsff.emitterCompanySiret,
-            bsff.transporterCompanySiret,
-            bsff.destinationCompanySiret
-          ].filter(Boolean)
-        }
-      }
-    }
-  });
+  const userSirets = await getCachedUserSirets(user.id);
 
-  if (count <= 0) {
+  const bsffSirets = [
+    bsff.emitterCompanySiret,
+    bsff.transporterCompanySiret,
+    bsff.destinationCompanySiret
+  ].filter(Boolean);
+
+  const hasCommonSirets = userSirets.some(siret => bsffSirets.includes(siret));
+
+  if (!hasCommonSirets) {
     throw new ForbiddenError(
       "Vous ne pouvez pas éditer un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas."
     );

@@ -11,6 +11,7 @@ import geocode from "../../geocode";
 import * as COMPANY_TYPES from "../../../common/constants/COMPANY_TYPES";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../mailer/templates";
+import { deleteCachedUserSirets } from "../../../common/redis/users";
 
 /**
  * Create a new company and associate it to a user
@@ -132,7 +133,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       role: "ADMIN"
     }
   });
-
+  await deleteCachedUserSirets(user.id);
   const company = await companyAssociationPromise.company();
 
   // fill firstAssociationDate field if null (no need to update it if user was previously already associated)

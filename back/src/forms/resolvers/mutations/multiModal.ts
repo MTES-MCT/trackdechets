@@ -11,6 +11,8 @@ import {
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
+import { getCachedUserSirets } from "../../../common/redis/users";
+
 import {
   expandTransportSegmentFromDb,
   flattenTransportSegmentInput
@@ -98,9 +100,7 @@ export async function prepareSegment(
 ): Promise<TransportSegment> {
   const user = checkIsAuthenticated(context);
 
-  const userCompanies = await getUserCompanies(user.id);
-  const currentUserSirets = userCompanies.map(c => c.siret);
-
+  const currentUserSirets = await getCachedUserSirets(user.id);
   if (!currentUserSirets.includes(siret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
@@ -283,8 +283,7 @@ export async function takeOverSegment(
     throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
 
-  const userCompanies = await getUserCompanies(user.id);
-  const userSirets = userCompanies.map(c => c.siret);
+  const userSirets = await getCachedUserSirets(user.id);
 
   //   user must be the nextTransporter
   const nexTransporterIsFilled = !!form.nextTransporterSiret;
@@ -359,8 +358,9 @@ export async function editSegment(
   const nextSegmentPayload = flattenTransportSegmentInput(nextSegmentInfo);
 
   // check user owns siret
-  const userCompanies = await getUserCompanies(user.id);
-  const userSirets = userCompanies.map(c => c.siret);
+
+  const userSirets = await getCachedUserSirets(user.id);
+
   if (!userSirets.includes(userSiret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }

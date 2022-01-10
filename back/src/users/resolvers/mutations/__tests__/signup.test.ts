@@ -1,5 +1,6 @@
 import { signupFn as signup } from "../signup";
 import prisma from "../../../../prisma";
+
 const userInfos = {
   id: "new_user",
   name: "an user",
@@ -30,6 +31,10 @@ jest.mock("../../../../prisma", () => ({
 
 jest.mock("../../../../mailer/mailing", () => ({
   sendMail: () => null
+}));
+
+jest.mock("../../../../common/redis/users", () => ({
+  deleteCachedUserSirets: () => jest.fn(() => Promise.resolve())
 }));
 
 describe("signup", () => {
