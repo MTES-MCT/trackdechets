@@ -246,47 +246,6 @@ describe("Mutation.createCompany", () => {
     expect(errors[0].extensions.code).toBe(ErrorCode.BAD_USER_INPUT);
   });
 
-  it("should alert when a user creates too many companies", async () => {
-    const user = await userFactory();
-    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-
-    async function createCompany(siret: string) {
-      await mutate(CREATE_COMPANY, {
-        variables: {
-          companyInput: {
-            siret,
-            gerepId: "1234",
-            companyTypes: ["PRODUCER"]
-          }
-        }
-      });
-    }
-
-    // 1 company
-    await createCompany("12345678912345");
-    expect(sendMailSpy).not.toBeCalled();
-
-    // 2 companies
-    await createCompany("23456789123456");
-    expect(sendMailSpy).not.toBeCalled();
-
-    // 3 companies
-    await createCompany("34567891234567");
-    expect(sendMailSpy).not.toBeCalled();
-
-    // 4 companies
-    await createCompany("45678912345678");
-    expect(sendMailSpy).not.toBeCalled();
-
-    // 5 companies
-    await createCompany("56789123456789");
-    expect(sendMailSpy).not.toBeCalled();
-
-    // 6 companies => should warn
-    await createCompany("67891234567890");
-    expect(sendMailSpy).toBeCalled();
-  });
-
   it("should return an error when creating an unknown eco-organisme", async () => {
     const user = await userFactory();
 

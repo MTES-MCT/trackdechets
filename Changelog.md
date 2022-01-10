@@ -5,8 +5,33 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
- 
-# [2021.12.2] 27/12/2021
+
+# [2022.01.1] 10/01/2022
+
+#### :rocket: Nouvelles fonctionnalités
+#### :bug: Corrections de bugs
+- Correction d'un bug affectant la création de BSVHU. [PR 1130](https://github.com/MTES-MCT/trackdechets/pull/1130)
+- Suppression de tous les objets liés à un établissement avant l'appel à `prisma.company.delete` [PR 1127](https://github.com/MTES-MCT/trackdechets/pull/1127)
+- Correction d'un problème d'indexation lors des différentes étapes de préparation et prise en charge d'un segment multi-modal [PR 1127](https://github.com/MTES-MCT/trackdechets/pull/1127)
+- Validation d'un segment multi-modal lors de l'appel à la mutation `markAsReadyToTakeOver` [PR 1127](https://github.com/MTES-MCT/trackdechets/pull/1127)
+
+#### :boom: Breaking changes
+- Dépréciation du champ `me { companies }` au profit de la query `myCompanies` (paginée). [PR 1113](https://github.com/MTES-MCT/trackdechets/pull/1113)
+#### :nail_care: Améliorations
+- Pagination des établissements dans Mon Compte > Établissements. [PR 1113](https://github.com/MTES-MCT/trackdechets/pull/1113)
+- Possibilité pour le destinataire d'un BSDD de valider une réception même si un segment multi-modal a été crée par erreur [PR 1128](https://github.com/MTES-MCT/trackdechets/pull/1128)
+- Affichage du courtier sur l'aperçu et le PDF des bordereaux amiante. [PR 1135](https://github.com/MTES-MCT/trackdechets/pull/1135)
+- Mise en cache des sirets utilisateurs pour améliorer les performances des requêtes [PR 1123](https://github.com/MTES-MCT/trackdechets/pull/1123)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Refactoring du code qui gère la pagination. [PR 1113](https://github.com/MTES-MCT/trackdechets/pull/1113)
+- Retrait de l'envoi d'emails alertant d'un grand nombre d'établissements créés [PR 1123](https://github.com/MTES-MCT/trackdechets/pull/1123)
+- Envoi des emails dans une file d'attente de taches asynchrone [PR 1097](https://github.com/MTES-MCT/trackdechets/pull/1097/)
+
+ # [2021.12.2] 27/12/2021
 
 #### :rocket: Nouvelles fonctionnalités
 
@@ -35,6 +60,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Initialisation explicite des gestionnaires de téléchargement de fichier [PR 1092](https://github.com/MTES-MCT/trackdechets/pull/1092)
+
 
 # [2021.12.1] 06/12/2021
 

@@ -35,7 +35,7 @@ describe("Mutation.createFormRevisionRequest", () => {
   afterEach(() => resetDatabase());
 
   it("should fail if bsdd doesnt exist", async () => {
-    const { user } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
     const { mutate } = makeClient(user);
 
     const formId = "123";
@@ -47,7 +47,8 @@ describe("Mutation.createFormRevisionRequest", () => {
         input: {
           formId,
           content: {},
-          comment: "A comment"
+          comment: "A comment",
+          authoringCompanySiret: company.siret
         }
       }
     });
@@ -59,7 +60,7 @@ describe("Mutation.createFormRevisionRequest", () => {
 
   it("should fail if current user is neither emitter or recipient of the bsdd", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
-    const { user } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
 
     const bsdd = await formFactory({
       ownerId: user.id,
@@ -72,7 +73,12 @@ describe("Mutation.createFormRevisionRequest", () => {
       MutationCreateFormRevisionRequestArgs
     >(CREATE_FORM_REVISION_REQUEST, {
       variables: {
-        input: { formId: bsdd.id, content: {}, comment: "A comment" }
+        input: {
+          formId: bsdd.id,
+          content: {},
+          comment: "A comment",
+          authoringCompanySiret: company.siret
+        }
       }
     });
 
@@ -101,7 +107,8 @@ describe("Mutation.createFormRevisionRequest", () => {
         input: {
           formId: bsdd.id,
           content: { wasteDetails: { code: "01 03 08" } },
-          comment: "A comment"
+          comment: "A comment",
+          authoringCompanySiret: company.siret
         }
       }
     });
@@ -132,7 +139,8 @@ describe("Mutation.createFormRevisionRequest", () => {
         input: {
           formId: bsdd.id,
           content: { wasteDetails: { code: "01 03 08" } },
-          comment: "A comment"
+          comment: "A comment",
+          authoringCompanySiret: company.siret
         }
       }
     });
@@ -184,7 +192,8 @@ describe("Mutation.createFormRevisionRequest", () => {
         input: {
           formId: bsdd.id,
           content: { wasteDetails: { code: "Made up code" } },
-          comment: "A comment"
+          comment: "A comment",
+          authoringCompanySiret: company.siret
         }
       }
     });
@@ -214,7 +223,8 @@ describe("Mutation.createFormRevisionRequest", () => {
         input: {
           formId: bsdd.id,
           content: { wasteDetails: { code: "01 03 08" } },
-          comment: "A comment"
+          comment: "A comment",
+          authoringCompanySiret: company.siret
         }
       }
     });

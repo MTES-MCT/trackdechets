@@ -1,2 +1,3 @@
 web: node dist/src/index.js
 clock: node dist/src/cron.js
+queue: node dist/src/queue/consumer.js

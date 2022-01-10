@@ -3,6 +3,21 @@ type Query {
   me: User!
 
   """
+  Liste paginée des établissements de l'utilisateur authentifié triée par ordre alphabétique
+  du nom usuel et par défaut par date de création de l'établissement
+  """
+  myCompanies(
+    "Pagination croissante avec first et after"
+    first: Int
+    "Pagination croissante avec first et after"
+    after: ID
+    "Pagination décroissante avec last et before"
+    last: Int
+    "Pagination décroissante avec last et before"
+    before: ID
+  ): CompanyPrivateConnection
+
+  """
   Récupère une demande de rattachement effectuée par l'utilisateur courant
   à partir de l'identifiant de cette demande ou du SIRET de l'établissement
   auquel l'utilisateur a demandé à être rattaché. L'un ou l'autre des

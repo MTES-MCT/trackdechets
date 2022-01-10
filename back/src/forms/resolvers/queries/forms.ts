@@ -8,7 +8,7 @@ import { getUserCompanies } from "../../../users/database";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { getFormsRightFilter } from "../../database";
 import { expandFormFromDb } from "../../form-converter";
-import { getConnectionsArgs } from "../../pagination";
+import { getPrismaPaginationArgs } from "../../../common/pagination";
 
 const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
   const user = checkIsAuthenticated(context);
@@ -38,16 +38,18 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
     company = userCompanies[0];
   }
 
-  // validate pagination arguments (skip, first, last, cursorAfter, cursorBefore)
-  // and convert them to prisma connections args: (skip, first, last, after, before)
-  const connectionsArgs = getConnectionsArgs({
-    ...rest,
-    defaultPaginateBy: 50,
-    maxPaginateBy: 500
-  });
+  const gqlPaginationArgs = {
+    first: rest.first,
+    after: rest.cursorAfter,
+    last: rest.last,
+    before: rest.cursorBefore,
+    skip: rest.skip
+  };
+
+  const paginationArgs = getPrismaPaginationArgs(gqlPaginationArgs);
 
   const queriedForms = await prisma.form.findMany({
-    ...connectionsArgs,
+    ...paginationArgs,
     orderBy: { createdAt: "desc" },
     where: {
       ...(rest.updatedAfter && {

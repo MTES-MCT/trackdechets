@@ -90,6 +90,17 @@ type CompanyPrivate {
   allowBsdasriTakeOverWithoutSignature: Boolean!
 }
 
+type CompanyPrivateEdge {
+  cursor: String!
+  node: CompanyPrivate!
+}
+
+type CompanyPrivateConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [CompanyPrivateEdge!]!
+}
+
 "Information sur un établissement accessible publiquement"
 type CompanyPublic {
   "Email de contact"

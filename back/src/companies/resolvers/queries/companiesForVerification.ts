@@ -1,17 +1,17 @@
 import { CompanyType, Prisma } from "@prisma/client";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
-import { getConnectionsArgs } from "../../../forms/pagination";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import * as COMPANY_TYPES from "../../../common/constants/COMPANY_TYPES";
+import { getPrismaPaginationArgs } from "../../../common/pagination";
 
 const companiesForVerificationResolver: QueryResolvers["companiesForVerification"] =
   async (parent, { first, last, skip, where }, context) => {
-    const connectionArgs = getConnectionsArgs({
+    const paginationArgs = getPrismaPaginationArgs({
       first,
       last,
-      skip: skip && skip > 0 ? skip : null
+      skip
     });
 
     applyAuthStrategies(context, [AuthType.Session]);
@@ -25,7 +25,7 @@ const companiesForVerificationResolver: QueryResolvers["companiesForVerification
     const totalCount = await prisma.company.count({ where: whereInput });
 
     const companies = await prisma.company.findMany({
-      ...connectionArgs,
+      ...paginationArgs,
       where: whereInput,
       orderBy: {
         createdAt: Prisma.SortOrder.desc

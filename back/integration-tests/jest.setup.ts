@@ -4,7 +4,7 @@ import { startApolloServer } from "../src/server";
 import { client as elasticSearch } from "../src/common/elastic";
 
 beforeAll(async () => {
-    await startApolloServer();
+  await startApolloServer();
 });
 
 afterAll(async () => {

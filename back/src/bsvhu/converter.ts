@@ -191,7 +191,7 @@ function flattenVhuDestinationInput({
       chain(d.reception, r => r.quantity)
     ),
     destinationReceptionWeight: chain(destination, d =>
-      chain(d.reception, r => r.weight * 1000)
+      chain(d.reception, r => (r.weight ? r.weight * 1000 : r.weight))
     ),
     destinationReceptionIdentificationNumbers: chain(destination, d =>
       chain(d.reception, r => chain(r.identification, i => i.numbers))
@@ -300,7 +300,7 @@ function flattenVhuIdentificationInput({
 
 function flattenVhuWeightInput({ weight }: Pick<BsvhuInput, "weight">) {
   return {
-    weightValue: chain(weight, q => q.value * 1000),
+    weightValue: chain(weight, q => (q.value ? q.value * 1000 : q.value)),
     weightIsEstimate: chain(weight, q => q.isEstimate)
   };
 }

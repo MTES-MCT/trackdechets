@@ -11,10 +11,14 @@ import {
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
+import { getCachedUserSirets } from "../../../common/redis/users";
+
 import {
   expandTransportSegmentFromDb,
   flattenTransportSegmentInput
 } from "../../form-converter";
+import { indexForm } from "../../elastic";
+import { getFullForm } from "../../database";
 
 const SEGMENT_NOT_FOUND = "Le segment de transport n'a pas été trouvé";
 const FORM_NOT_FOUND_OR_NOT_ALLOWED =
@@ -96,9 +100,7 @@ export async function prepareSegment(
 ): Promise<TransportSegment> {
   const user = checkIsAuthenticated(context);
 
-  const userCompanies = await getUserCompanies(user.id);
-  const currentUserSirets = userCompanies.map(c => c.siret);
-
+  const currentUserSirets = await getCachedUserSirets(user.id);
   if (!currentUserSirets.includes(siret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
@@ -108,6 +110,7 @@ export async function prepareSegment(
     throw new ForbiddenError("Le siret est obligatoire");
   }
   // get form and segments
+
   const form = await getForm(id);
   if (!form) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
@@ -176,6 +179,9 @@ export async function prepareSegment(
     }
   });
 
+  const fullForm = await getFullForm(form);
+  await indexForm(fullForm);
+
   return expandTransportSegmentFromDb(segment);
 }
 
@@ -215,10 +221,25 @@ export async function markSegmentAsReadyToTakeOver(
     throw new ForbiddenError(SEGMENT_ALREADY_SEALED);
   }
 
+  const segmentErrors: string[] = await segmentSchema
+    .validate(currentSegment, { abortEarly: false })
+    .catch(err => err.errors);
+
+  if (!!segmentErrors.length) {
+    throw new UserInputError(
+      `Erreur, impossible de finaliser la préparation du transfert multi-modal car des champs sont manquants ou mal renseignés. \nErreur(s): ${segmentErrors.join(
+        "\n"
+      )}`
+    );
+  }
+
   const updatedSegment = await prisma.transportSegment.update({
     where: { id },
     data: { readyToTakeOver: true }
   });
+
+  const fullForm = await getFullForm(form);
+  await indexForm(fullForm);
 
   return expandTransportSegmentFromDb(updatedSegment);
 }
@@ -262,8 +283,7 @@ export async function takeOverSegment(
     throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
 
-  const userCompanies = await getUserCompanies(user.id);
-  const userSirets = userCompanies.map(c => c.siret);
+  const userSirets = await getCachedUserSirets(user.id);
 
   //   user must be the nextTransporter
   const nexTransporterIsFilled = !!form.nextTransporterSiret;
@@ -292,13 +312,16 @@ export async function takeOverSegment(
     data: takeOverInfo
   });
 
-  await prisma.form.update({
+  const updatedForm = await prisma.form.update({
     where: { id: currentSegment.form.id },
     data: {
       currentTransporterSiret: currentSegment.transporterCompanySiret,
       nextTransporterSiret: ""
     }
   });
+
+  const fullForm = await getFullForm(updatedForm);
+  await indexForm(fullForm);
 
   return expandTransportSegmentFromDb(updatedSegment);
 }
@@ -335,8 +358,9 @@ export async function editSegment(
   const nextSegmentPayload = flattenTransportSegmentInput(nextSegmentInfo);
 
   // check user owns siret
-  const userCompanies = await getUserCompanies(user.id);
-  const userSirets = userCompanies.map(c => c.siret);
+
+  const userSirets = await getCachedUserSirets(user.id);
+
   if (!userSirets.includes(userSiret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }

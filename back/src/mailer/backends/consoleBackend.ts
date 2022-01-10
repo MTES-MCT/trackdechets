@@ -11,13 +11,15 @@ const consoleBackend = {
     console.log(payload);
     console.log("\n");
   },
-  sendMail: function (mail: Mail) {
+  // keep the async function to match the other mail backends
+  sendMail: async function (mail: Mail): Promise<void> {
     if (!mail.templateId) {
       console.log(
         "\nTemplateId not provided, will use default provider template id\n"
       );
     }
     this.log(mail);
+    return Promise.resolve();
   },
   addContact: function (contact: Contact) {
     this.log(contact);

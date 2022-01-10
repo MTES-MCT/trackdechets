@@ -38,7 +38,7 @@ export type SetOptions = {
   EX?: number; // EX seconds -- Set the specified expire time, in seconds.
   PX?: number; // PX milliseconds -- Set the specified expire time, in milliseconds.
   NX?: boolean; // NX -- Only set the key if it does not already exist.
-  XX?: boolean; // XX -- Only set the key if it already exist.
+  XX?: boolean; // XX -- Only set the key if it already exists.
 };
 
 export async function cachedGet<T>(

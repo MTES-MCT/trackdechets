@@ -28,8 +28,9 @@ type User {
   "Numéro de téléphone de l'utilisateur"
   phone: String
 
-  "Liste des établissements dont l'utilisateur est membre"
+  "DEPRECATED - Liste des établissements dont l'utilisateur est membre. "
   companies: [CompanyPrivate!]!
+    @deprecated(reason: "Utiliser la query avec pagination `myCompanies`")
 }
 
 """
