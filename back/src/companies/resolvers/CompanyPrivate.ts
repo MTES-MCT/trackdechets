@@ -4,10 +4,7 @@ import { getCompanyUsers, getUserRole } from "../database";
 
 const companyPrivateResolvers: CompanyPrivateResolvers = {
   users: (parent, _, context) => {
-    return getCompanyUsers(
-      parent.siret,
-      context.dataloaders
-    );
+    return getCompanyUsers(parent.siret, context.dataloaders);
   },
   userRole: (parent, _, context) => {
     const userId = context.user.id;

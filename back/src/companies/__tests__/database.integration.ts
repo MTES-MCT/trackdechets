@@ -3,8 +3,9 @@ import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory } from "../../__tests__/factories";
 import { getCompanyInvitedUsers } from "../database";
 import { createUserDataLoaders } from "../../users/dataloders";
+import { AppDataloaders } from "../../types";
 
-const dataloaders = createUserDataLoaders();
+const dataloaders = createUserDataLoaders() as AppDataloaders;
 
 describe("getInvitedUsers", () => {
   afterAll(resetDatabase);
@@ -22,7 +23,7 @@ describe("getInvitedUsers", () => {
     });
     const invitedUsers = await getCompanyInvitedUsers(
       company.siret,
-      dataloaders.activeUserAccountHashesBySiret
+      dataloaders
     );
     expect(invitedUsers).toEqual([]);
   });
@@ -39,7 +40,7 @@ describe("getInvitedUsers", () => {
     });
     const invitedUsers = await getCompanyInvitedUsers(
       company.siret,
-      dataloaders.activeUserAccountHashesBySiret
+      dataloaders
     );
     expect(invitedUsers).toHaveLength(1);
     expect(invitedUsers[0]).toMatchObject({

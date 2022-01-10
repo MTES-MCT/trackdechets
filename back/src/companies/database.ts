@@ -3,7 +3,7 @@
  */
 
 import prisma from "../prisma";
-import { User, Prisma, Company, UserAccountHash } from "@prisma/client";
+import { User, Prisma, Company } from "@prisma/client";
 import {
   CompanyNotFound,
   TraderReceiptNotFound,
@@ -13,7 +13,6 @@ import {
 } from "./errors";
 import { CompanyMember } from "../generated/graphql/types";
 import { UserInputError } from "apollo-server-express";
-import DataLoader from "dataloader";
 import { AppDataloaders } from "../types";
 
 /**
