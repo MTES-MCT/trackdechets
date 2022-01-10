@@ -120,7 +120,7 @@ export function DisplayRevision({ review }: Props) {
       />
 
       <RevisionField
-        label="POP"
+        label="Présence de polluants organiques persistants"
         bsddValue={review.form.wasteDetails?.pop}
         reviewValue={review.content.wasteDetails?.pop}
         formatter={booleanFormatter}
@@ -181,7 +181,7 @@ function traderAndBrokerFormatter(
 }
 
 function booleanFormatter(entity: boolean | undefined): React.ReactNode {
-  if (!entity) return null;
+  if (entity == null) return null;
 
   return entity ? "Oui" : "Non";
 }

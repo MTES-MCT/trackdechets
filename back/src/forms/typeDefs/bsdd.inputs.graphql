@@ -665,6 +665,8 @@ input ImportPaperFormInput {
 input CreateFormRevisionRequestInput {
   "Identifiant du bordereau à réviser"
   formId: ID!
+  "Numéro SIRET du demandeur"
+  authoringCompanySiret: String!
   "Contenu de la révision"
   content: FormRevisionRequestContentInput!
   "Commentaire pour expliquer la demande de révision"
