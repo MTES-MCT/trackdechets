@@ -91,7 +91,7 @@ export const GET_FORM_REVISION_REQUESTS = gql`
       edges {
         node {
           ...FormRevisionRequestFragment
-          bsdd {
+          form {
             readableId
           }
         }

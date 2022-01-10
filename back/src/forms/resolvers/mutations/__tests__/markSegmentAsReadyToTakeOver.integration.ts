@@ -1,8 +1,7 @@
 import {
   userWithCompanyFactory,
   formFactory,
-  userFactory,
-  transportSegmentFactory
+  userFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
@@ -37,10 +36,20 @@ describe("{ mutation { markSegmentAsReadyToTakeOver} }", () => {
       }
     });
     // there is already one segment
-    const segment = await transportSegmentFactory({
-      formId: form.id,
-      segmentPayload: { transporterCompanySiret: "98765" }
+    const segment = await prisma.transportSegment.create({
+      data: {
+        form: { connect: { id: form.id } },
+        transporterCompanySiret: "98765",
+        mode: "ROAD",
+        transporterCompanyAddress: "40 Boulevard Voltaire 13001 Marseille",
+        transporterCompanyPhone: "01 00 00 00 00",
+        transporterCompanyMail: "john.snow@trackdechets.fr",
+        transporterReceipt: "receipt",
+        transporterDepartment: "13",
+        transporterCompanyContact: "John Snow"
+      }
     });
+
     const { mutate } = makeClient(firstTransporter);
     await mutate(
       `mutation  {

@@ -26,7 +26,6 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
     "Vous ne pouvez publier ce bordereau si vous ne figurez pas dessus"
   );
   await checkIsBsdasriPublishable(
-    user,
     bsdasri,
     grouping.map(el => el.id)
   );

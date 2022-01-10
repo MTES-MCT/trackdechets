@@ -17,7 +17,7 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 import { transportModeLabels } from "dashboard/constants";
 import { WorkflowActionProps } from "./WorkflowAction";
 import TdSwitch from "common/components/Switch";
-import { GET_BSDS } from "common/queries";
+import { GET_BSDS, GET_DETAIL_FORM } from "common/queries";
 import { Loader } from "common/components";
 
 const PREPARE_SEGMENT = gql`
@@ -39,7 +39,7 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
     Pick<Mutation, "prepareSegment">,
     MutationPrepareSegmentArgs
   >(PREPARE_SEGMENT, {
-    refetchQueries: [GET_BSDS],
+    refetchQueries: [GET_BSDS, GET_DETAIL_FORM],
     awaitRefetchQueries: true,
     onCompleted: () => {
       setIsOpen(false);
@@ -76,7 +76,7 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
         icon={<IconBusTransfer size="24px" />}
         onClick={() => setIsOpen(true)}
       >
-        Préparer le transfert
+        Préparer le transfert à un autre transporteur (multimodal)
       </ActionButton>
       {isOpen && (
         <TdModal

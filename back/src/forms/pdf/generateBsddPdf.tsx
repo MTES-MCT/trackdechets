@@ -171,7 +171,9 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
             <td>
               {packagingInfos.reduce(
                 (total, packaging) =>
-                  packaging.type === packagingType.value ? total + 1 : total,
+                  packaging.type === packagingType.value
+                    ? total + (packaging.quantity ?? 0)
+                    : total,
                 0
               ) ||
                 // leave the box empty if it's 0
@@ -183,7 +185,9 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
         <tr>
           <td>
             <strong>
-              {packagingInfos.length ||
+              {packagingInfos.reduce((total, packaging) => {
+                return total + (packaging.quantity ?? 0);
+              }, 0) ||
                 // leave the box empty if it's 0
                 null}
             </strong>
@@ -649,11 +653,18 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               </strong>
             </p>
             <p>Quantité présentée :</p>
-            <QuantityFields {...form.temporaryStorageDetail?.temporaryStorer} />
+            <QuantityFields
+              quantity={
+                form.temporaryStorageDetail?.temporaryStorer?.quantityReceived
+              }
+              quantityType={
+                form.temporaryStorageDetail?.temporaryStorer?.quantityType
+              }
+            />
             <p>
               Date de présentation :{" "}
               {formatDate(
-                form.temporaryStorageDetail?.temporaryStorer.receivedAt
+                form.temporaryStorageDetail?.temporaryStorer?.receivedAt
               )}
             </p>
             <AcceptationFields
