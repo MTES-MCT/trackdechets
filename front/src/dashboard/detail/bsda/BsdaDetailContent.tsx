@@ -3,6 +3,7 @@ import {
   IconDuplicateFile,
   IconRenewableEnergyEarth,
   IconWarehouseDelivery,
+  IconWarehousePackage,
   IconWaterDam,
 } from "common/components/Icons";
 import routes from "common/routes";
@@ -189,6 +190,40 @@ const Recipient = ({ form }: { form: Bsda }) => {
   );
 };
 
+const Broker = ({ broker }) => (
+  <>
+    <div className={styles.detailColumns}>
+      <div className={styles.detailGrid}>
+        <dt>Courtier</dt>
+        <dd>{broker.company?.name}</dd>
+
+        <dt>Siret</dt>
+        <dd>{broker.company?.siret}</dd>
+
+        <dt>Adresse</dt>
+        <dd>{broker.company?.address}</dd>
+
+        <dt>Tél</dt>
+        <dd>{broker.company?.phone}</dd>
+
+        <dt>Mél</dt>
+        <dd>{broker.company?.mail}</dd>
+
+        <dt>Contact</dt>
+        <dd>{broker.company?.contact}</dd>
+      </div>
+      <div className={styles.detailGrid}>
+        <DetailRow value={broker.recepisse?.number} label="Récépissé" />
+        <DetailRow value={broker.recepisse?.department} label="Départment" />
+        <DateRow
+          value={broker.recepisse?.validityLimit}
+          label="Date de validité"
+        />
+      </div>
+    </div>
+  </>
+);
+
 export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
@@ -279,6 +314,13 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             </span>
           </Tab>
 
+          {!!form?.broker?.company?.name && (
+            <Tab className={styles.detailTab}>
+              <IconWarehousePackage size="25px" />
+              <span className={styles.detailTabCaption}>Courtier</span>
+            </Tab>
+          )}
+
           <Tab className={styles.detailTab}>
             <IconWarehouseDelivery size="25px" />
             <span className={styles.detailTabCaption}>
@@ -302,6 +344,13 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
           <TabPanel className={styles.detailTabPanel}>
             <Worker form={form} />
           </TabPanel>
+
+          {/* Broker tab panel */}
+          {!!form?.broker?.company?.name && (
+            <TabPanel className={styles.detailTabPanel}>
+              <Broker broker={form.broker} />
+            </TabPanel>
+          )}
 
           {/* Transporter tab panel */}
           <TabPanel className={styles.detailTabPanel}>
