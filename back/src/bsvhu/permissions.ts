@@ -33,9 +33,7 @@ export async function isFormContributor(user: User, form: Partial<Bsvhu>) {
     form.transporterCompanySiret
   ];
 
-  const siretsInCommon = userSirets.filter(siret => formSirets.includes(siret));
-
-  return siretsInCommon.length;
+  return userSirets.some(siret => formSirets.includes(siret));
 }
 
 export async function checkCanDeleteBsdvhu(user: User, form: Bsvhu) {

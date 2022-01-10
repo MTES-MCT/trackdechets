@@ -21,8 +21,7 @@ export async function isDasriContributor(user: User, dasri: BsdasriSirets) {
     dasri.destinationCompanySiret
   ].filter(Boolean);
 
-  const siretsInCommon = userSirets.filter(siret => formSirets.includes(siret));
-  return !!siretsInCommon.length;
+  return userSirets.some(siret => formSirets.includes(siret));
 }
 
 export async function checkIsBsdasriContributor(

@@ -44,9 +44,7 @@ export async function isBsdaContributor(user: User, form: Partial<Bsda>) {
     field => form[field]
   );
 
-  const siretsInCommon = userSirets.filter(siret => formSirets.includes(siret));
-
-  return siretsInCommon.length;
+  return userSirets.some(siret => formSirets.includes(siret));
 }
 
 export async function checkCanDeleteBsda(user: User, form: Bsda) {

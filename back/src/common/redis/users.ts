@@ -16,8 +16,8 @@ export async function deleteCachedUserSirets(userId: string): Promise<void> {
 }
 
 /**
- *
- * @param userId Store sirets in a redis SET
+ * Store sirets in a redis SET
+ * @param userId
  * @param sirets
  */
 export async function setCachedUserSirets(
@@ -34,8 +34,8 @@ export async function setCachedUserSirets(
 }
 
 /**
- *
- * @param userId Retrieve cached sirets if found in redis, or query the db and cache them
+ * Retrieve cached sirets if found in redis, or query the db and cache them
+ * @param userId
  * @returns array of sirets
  */
 export async function getCachedUserSirets(userId: string): Promise<string[]> {

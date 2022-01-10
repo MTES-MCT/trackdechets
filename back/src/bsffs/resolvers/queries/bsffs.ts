@@ -5,7 +5,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { getConnection } from "../../../common/pagination";
-import { getCachedUserSirets } from "../../../common/redis/users"
+import { getCachedUserSirets } from "../../../common/redis/users";
 
 const bsffs: QueryResolvers["bsffs"] = async (
   _,

@@ -23,11 +23,9 @@ export async function isBsffContributor(
     bsff.destinationCompanySiret
   ].filter(Boolean);
 
-  const siretsInCommon = userSirets.filter(siret => bsffSirets.includes(siret));
+  const hasCommonSirets = userSirets.some(siret => bsffSirets.includes(siret));
 
-  const count = siretsInCommon.length;
-
-  if (count <= 0) {
+  if (!hasCommonSirets) {
     throw new ForbiddenError(
       "Vous ne pouvez pas éditer un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas."
     );
