@@ -16,7 +16,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Validation d'un segment multi-modal lors de l'appel à la mutation `markAsReadyToTakeOver` [PR 1127](https://github.com/MTES-MCT/trackdechets/pull/1127)
 
 #### :boom: Breaking changes
-
+- Dépréciation du champ `me { companies }` au profit de la query `myCompanies` (paginée). [PR 1113](https://github.com/MTES-MCT/trackdechets/pull/1113)
 #### :nail_care: Améliorations
 - Pagination des établissements dans Mon Compte > Établissements. [PR 1113](https://github.com/MTES-MCT/trackdechets/pull/1113)
 - Possibilité pour le destinataire d'un BSDD de valider une réception même si un segment multi-modal a été crée par erreur [PR 1128](https://github.com/MTES-MCT/trackdechets/pull/1128)
@@ -29,6 +29,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Refactoring du code qui gère la pagination. [PR 1113](https://github.com/MTES-MCT/trackdechets/pull/1113)
 - Retrait de l'envoi d'emails alertant d'un grand nombre d'établissements créés [PR 1123](https://github.com/MTES-MCT/trackdechets/pull/1123)
+- Envoi des emails dans une file d'attente de taches asynchrone [PR 1097](https://github.com/MTES-MCT/trackdechets/pull/1097/)
 
  # [2021.12.2] 27/12/2021
 
@@ -49,7 +50,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :boom: Breaking changes
 
 - Dépréciation de la query `formsRegister` au profit de la query `wastesDownloadLink`.
-- Dépréciation du champ `me { companies }` au profit de la query `myCompanies` (paginée). [PR 1113](https://github.com/MTES-MCT/trackdechets/pull/1113)
 #### :nail_care: Améliorations
 
 - Remplacement du CERFA BSDD par un récépissé reprenant l'ensemble des évolutions Trackdéchets [PR 1096](https://github.com/MTES-MCT/trackdechets/pull/1096)
@@ -60,7 +60,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Initialisation explicite des gestionnaires de téléchargement de fichier [PR 1092](https://github.com/MTES-MCT/trackdechets/pull/1092)
-- Envoi des emails dans une file d'attente de taches asynchrone [PR 1097](https://github.com/MTES-MCT/trackdechets/pull/1097/)
+
 
 # [2021.12.1] 06/12/2021
 
