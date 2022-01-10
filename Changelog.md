@@ -6,7 +6,7 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
 
-# [2022.01.1] ~10/01/2022
+# [2022.01.1] 10/01/2022
 
 #### :rocket: Nouvelles fonctionnalités
 #### :bug: Corrections de bugs
