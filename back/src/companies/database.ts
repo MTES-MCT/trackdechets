@@ -14,6 +14,7 @@ import {
 import { CompanyMember } from "../generated/graphql/types";
 import { UserInputError } from "apollo-server-express";
 import DataLoader from "dataloader";
+import { AppDataloaders } from "../types";
 
 /**
  * Retrieves a company by siret or or throw a CompanyNotFound error
@@ -93,7 +94,7 @@ export function getDeclarations(codeS3ic: string) {
  */
 export async function getUserRole(userId: string, siret: string) {
   const associations = await prisma.company
-    .findUnique({ where: { siret: siret } })
+    .findUnique({ where: { siret } })
     .companyAssociations({ where: { userId } });
 
   if (associations.length > 0) {
@@ -124,13 +125,10 @@ export async function isCompanyMember(user: User, company: Company) {
  */
 export async function getCompanyUsers(
   siret: string,
-  userAccountHashDataloader: DataLoader<string, UserAccountHash[], string>
+  dataloaders: AppDataloaders
 ): Promise<CompanyMember[]> {
   const activeUsers = await getCompanyActiveUsers(siret);
-  const invitedUsers = await getCompanyInvitedUsers(
-    siret,
-    userAccountHashDataloader
-  );
+  const invitedUsers = await getCompanyInvitedUsers(siret, dataloaders);
 
   return [...activeUsers, ...invitedUsers];
 }
@@ -161,9 +159,9 @@ export function getCompanyActiveUsers(siret: string): Promise<CompanyMember[]> {
  */
 export async function getCompanyInvitedUsers(
   siret: string,
-  userAccountHashDataloader: DataLoader<string, UserAccountHash[], string>
+  dataloaders: AppDataloaders
 ): Promise<CompanyMember[]> {
-  const hashes = await userAccountHashDataloader.load(siret);
+  const hashes = await dataloaders.activeUserAccountHashesBySiret.load(siret);
   return hashes.map(h => {
     return {
       id: h.id,

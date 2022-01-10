@@ -6,7 +6,7 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
   users: (parent, _, context) => {
     return getCompanyUsers(
       parent.siret,
-      context.dataloaders.activeUserAccountHashesBySiret
+      context.dataloaders
     );
   },
   userRole: (parent, _, context) => {
