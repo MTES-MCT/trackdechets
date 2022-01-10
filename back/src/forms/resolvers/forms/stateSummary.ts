@@ -123,9 +123,11 @@ export async function getStateSummary(form: Form) {
     .temporaryStorageDetail();
 
   const packagingInfos =
-    (temporaryStorageDetail?.wasteDetailsPackagingInfos as PackagingInfo[]) ??
-    form.wasteDetails?.packagingInfos ??
-    [];
+    temporaryStorageDetail?.wasteDetailsPackagingInfos &&
+    (temporaryStorageDetail?.wasteDetailsPackagingInfos as PackagingInfo[])
+      .length > 0
+      ? (temporaryStorageDetail?.wasteDetailsPackagingInfos as PackagingInfo[])
+      : form.wasteDetails?.packagingInfos ?? [];
 
   return {
     quantity: getQuantity(form, temporaryStorageDetail),

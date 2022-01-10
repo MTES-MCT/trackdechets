@@ -107,12 +107,7 @@ const TempStorage = ({ form }) => {
             label="Code Onu"
           />
 
-          <PackagingRow
-            packagingInfos={
-              temporaryStorageDetail?.wasteDetails?.packagingInfos ||
-              form.wasteDetails?.packagingInfos
-            }
-          />
+          <PackagingRow packagingInfos={form.stateSummary?.packagingInfos} />
           <DetailRow
             value={temporaryStorageDetail?.temporaryStorer?.quantityReceived}
             label="Quantité reçue"
@@ -380,10 +375,7 @@ export default function BSDDetailContent({
               <dt>Quantité</dt>
               <dd>{form.stateSummary?.quantity ?? "?"} tonnes</dd>
               <PackagingRow
-                packagingInfos={
-                  form.temporaryStorageDetail?.wasteDetails?.packagingInfos ||
-                  form.wasteDetails?.packagingInfos
-                }
+                packagingInfos={form.stateSummary?.packagingInfos}
               />
               <dt>Consistance</dt>{" "}
               <dd>{getVerboseConsistence(form.wasteDetails?.consistence)}</dd>
