@@ -1,4 +1,4 @@
-import { Company, Prisma, User } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { convertUrls } from "../../database";
 import prisma from "../../../prisma";
@@ -11,7 +11,6 @@ import geocode from "../../geocode";
 import * as COMPANY_TYPES from "../../../common/constants/COMPANY_TYPES";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../mailer/templates";
-import templateIds from "../../../mailer/templates/provider/templateIds";
 
 /**
  * Create a new company and associate it to a user
@@ -156,37 +155,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     }
   }
 
-  await warnIfUserCreatesTooManyCompanies(user, company);
-
   return convertUrls(company);
 };
-
-const NB_OF_COMPANIES_BEFORE_ALERT = 5;
-
-export async function warnIfUserCreatesTooManyCompanies(
-  user: User,
-  company: Company
-) {
-  const userCompaniesNumber = await prisma.companyAssociation.count({
-    where: { user: { id: user.id } }
-  });
-
-  if (userCompaniesNumber > NB_OF_COMPANIES_BEFORE_ALERT) {
-    return sendMail({
-      body: `L'utilisateur ${user.name} (${user.id}) vient de créer sa ${userCompaniesNumber}ème entreprise: ${company.name} - ${company.siret}. A surveiller !`,
-      subject:
-        "Alerte: Grand mombre de compagnies créées par un même utilisateur",
-      to: [
-        {
-          email: "alerts@trackdechets.beta.gouv.fr ",
-          name: "Equipe Trackdéchets"
-        }
-      ],
-      templateId: templateIds.LAYOUT
-    });
-  }
-
-  return Promise.resolve();
-}
 
 export default createCompanyResolver;

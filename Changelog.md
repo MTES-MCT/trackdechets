@@ -25,6 +25,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Refactoring du code qui gère la pagination. [PR 1113](https://github.com/MTES-MCT/trackdechets/pull/1113)
+- Retrait de l'envoi d'emails alertant d'un grand nombre d'établissements créés [PR 1123](https://github.com/MTES-MCT/trackdechets/pull/1123)
+
  # [2021.12.2] 27/12/2021
 
 #### :rocket: Nouvelles fonctionnalités
