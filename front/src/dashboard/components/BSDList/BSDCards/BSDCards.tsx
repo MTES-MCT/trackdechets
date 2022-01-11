@@ -98,4 +98,5 @@ const getViewRoute = (bsdTypename: BsdTypename): string =>
     Bsdasri: routes.dashboard.bsdasris.view,
     Bsff: routes.dashboard.bsffs.view,
     Bsvhu: routes.dashboard.bsvhus.view,
+    Bsda: routes.dashboard.bsdas.view,
   }[bsdTypename]);
