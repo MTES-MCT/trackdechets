@@ -33,6 +33,13 @@ export function WasteInfo({ disabled }) {
         <label>Code déchet</label>
         <Field as="select" name="waste.code" className="td-select">
           <option />
+          <option value="06 07 01*">
+            06 07 01* - Déchets contenant de l'amiante provenant de
+            l'électrolyse
+          </option>
+          <option value="06 13 04*">
+            06 13 04* - Déchets provenant de la transformation de l'amiante
+          </option>
           <option value="08 01 17*">
             08 01 17* - déchets provenant du décapage de peintures ou vernis
             contenant des solvants organiques ou autres substances dangereuses
@@ -76,6 +83,17 @@ export function WasteInfo({ disabled }) {
           </option>
           <option value="17 03 01*">
             17 03 01* - mélanges bitumineux contenant du goudron
+          </option>
+          <option value="17 04 09*">
+            17 04 09* - Déchets métalliques contaminés par des substances
+            dangereuses
+          </option>
+          <option value="17 04 10*">
+            17 04 10* - Câbles contenant des hydrocarbures, du goudron ou
+            d'autres substances dangereuses
+          </option>
+          <option value="17 05 03*">
+            17 05 03* - Terres et cailloux contenant des substances dangereuses
           </option>
           <option value="17 05 05*">
             17 05 05* - boues de dragage contenant des substances dangereuses
