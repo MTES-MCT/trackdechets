@@ -18,6 +18,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- La recherche d'établissements par n°SIRET ne retourne plus d'établissement fermé [PR 1140](https://github.com/MTES-MCT/trackdechets/pull/1140)
+
 #### :memo: Documentation
 
 #### :house: Interne

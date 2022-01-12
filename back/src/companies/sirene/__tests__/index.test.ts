@@ -37,9 +37,6 @@ describe("searchCompanies", () => {
       etatAdministratif: "A"
     };
     searchCompanyMock.mockResolvedValue(company);
-    const searchCompanies = makeSearchCompanies({
-      searchCompany: searchCompanyMock
-    });
     const companies = await searchCompanies("11111111111111");
     expect(searchCompanyMock).toHaveBeenCalledWith("11111111111111");
     expect(companies[0]).toEqual(company);
@@ -57,9 +54,6 @@ describe("searchCompanies", () => {
       addressCity: "Marseille",
       addressPostalCode: "13001",
       etatAdministratif: "F"
-    });
-    const searchCompanies = makeSearchCompanies({
-      searchCompany: searchCompanyMock
     });
     const companies = await searchCompanies("11111111111111");
     expect(searchCompanyMock).toHaveBeenCalledWith("11111111111111");
