@@ -156,6 +156,8 @@ input BsdaPickupSiteInput {
 input BsdaWasteInput {
   "Rubrique Déchet"
   code: String
+  "DEPRECATED - Dénomination usuelle"
+  name: String @deprecated(reason: "Utiliser materialName")
   "Code famille"
   familyCode: String
   "Nom du matériau"

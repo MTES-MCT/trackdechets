@@ -438,7 +438,11 @@ function flattenBsdaWasteInput({ waste }: Pick<BsdaInput, "waste">) {
     wasteCode: chain(waste, w => w.code),
     wasteAdr: chain(waste, w => w.adr),
     wasteFamilyCode: chain(waste, w => w.familyCode),
-    wasteMaterialName: chain(waste, w => w.materialName),
+    // TODO: name is deprecated, but still supported as an input for now.
+    // As `name` was previously mandatory, and `materialName` optional, to avoid breaking integrations we fallback to `name` for now.
+    // Remove the `?? ...` part when `name` is removed from the input.
+    wasteMaterialName:
+      chain(waste, w => w.materialName) ?? chain(waste, w => w.name),
     wasteConsistence: chain(waste, w => w.consistence),
     wasteSealNumbers: chain(waste, w => w.sealNumbers)
   };
