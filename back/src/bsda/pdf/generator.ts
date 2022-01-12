@@ -22,6 +22,7 @@ export async function buildPdf(bsda: Bsda) {
 
   Handlebars.registerHelper("dateFmt", safeDateFmt);
   Handlebars.registerHelper("eq", eq);
+  Handlebars.registerHelper("divide", divide);
 
   const qrcode = await QRCode.toString(bsda.id, { type: "svg" });
   const source = template.toString();
@@ -68,3 +69,10 @@ const safeDateFmt = (dt: Date) => {
   return format(dt, "dd/MM/yyyy");
 };
 const eq = (arg1: any, arg2: any) => arg1 == arg2;
+
+const divide = (n: number, by: number) => {
+  if (n) {
+    return n / by;
+  }
+  return n;
+};
