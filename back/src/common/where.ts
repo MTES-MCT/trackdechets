@@ -125,7 +125,7 @@ export function toPrismaIdFilter(idFilter: IdFilter | undefined) {
   });
 }
 
-export function toPrismaRelationIdFilter<T>(idFilter: IdFilter | undefined) {
+export function toPrismaRelationIdFilter(idFilter: IdFilter | undefined) {
   if (!idFilter) {
     return undefined;
   }
