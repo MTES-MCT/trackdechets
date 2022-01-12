@@ -10,17 +10,17 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
     const userId = context.user.id;
     return getUserRole(userId, parent.siret);
   },
-  transporterReceipt: async parent => {
+  transporterReceipt: parent => {
     return prisma.company
       .findUnique({ where: { siret: parent.siret } })
       .transporterReceipt();
   },
-  traderReceipt: async parent => {
+  traderReceipt: parent => {
     return prisma.company
       .findUnique({ where: { siret: parent.siret } })
       .traderReceipt();
   },
-  brokerReceipt: async parent => {
+  brokerReceipt: parent => {
     return prisma.company
       .findUnique({ where: { siret: parent.siret } })
       .brokerReceipt();
@@ -35,7 +35,7 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
       .findUnique({ where: { siret: parent.siret } })
       .vhuAgrementDemolisseur();
   },
-  installation: async (parent, _, context) => {
+  installation: (parent, _, context) => {
     return context.dataloaders.installations.load(parent.siret);
   }
 };
