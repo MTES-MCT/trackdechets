@@ -70,6 +70,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
     packagings: form.packagings as BsdaPackaging[],
     waste: nullIfNoValues<BsdaWaste>({
       code: form.wasteCode,
+      name: form.wasteMaterialName, // TODO To remove - keeps support for `name` for now
       consistence: form.wasteConsistence,
       familyCode: form.wasteFamilyCode,
       materialName: form.wasteMaterialName,
