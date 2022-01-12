@@ -33,7 +33,7 @@ import { getUIBaseURL } from "./utils";
 import sentryReporter from "./common/plugins/sentryReporter";
 import { initSentry } from "./common/sentry";
 import { graphiqlLandingPagePlugin } from "./common/plugins/graphiql";
-import { createUserDataLoaders } from "./users/dataloders";
+import { createUserDataLoaders } from "./users/dataloaders";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
 
 const {

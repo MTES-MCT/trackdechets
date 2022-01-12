@@ -2,7 +2,7 @@ import prisma from "../../prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory } from "../../__tests__/factories";
 import { getCompanyInvitedUsers } from "../database";
-import { createUserDataLoaders } from "../../users/dataloders";
+import { createUserDataLoaders } from "../../users/dataloaders";
 import { AppDataloaders } from "../../types";
 
 const dataloaders = createUserDataLoaders() as AppDataloaders;

@@ -1,6 +1,6 @@
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
-import { createUserDataLoaders } from "./users/dataloders";
+import { createUserDataLoaders } from "./users/dataloaders";
 
 export type AppDataloaders = ReturnType<typeof createUserDataLoaders> &
   ReturnType<typeof createCompanyDataLoaders>;
