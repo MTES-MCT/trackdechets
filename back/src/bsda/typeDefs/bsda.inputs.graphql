@@ -20,6 +20,10 @@ input BsdaWhere {
   destination: BsdaDestinationWhere
   "Filtre sur le champ broker."
   broker: BsdaBrokerWhere
+  "Filtre sur le champ groupedIn."
+  groupedIn: IdFilter
+  "Filtre sur le champ forwardedIn."
+  forwardedIn: IdFilter
   "ET logique"
   _and: [BsdaWhere!]
   "OU logique"

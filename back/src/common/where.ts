@@ -125,6 +125,23 @@ export function toPrismaIdFilter(idFilter: IdFilter | undefined) {
   });
 }
 
+export function toPrismaRelationIdFilter<T>(idFilter: IdFilter | undefined) {
+  if (!idFilter) {
+    return undefined;
+  }
+
+  if (idFilter._eq === null) {
+    return { is: null };
+  }
+
+  return {
+    id: safeInput<Prisma.StringFilter>({
+      equals: idFilter._eq,
+      in: idFilter._in
+    })
+  };
+}
+
 export function toPrismaStringFilter(
   stringFilter: StringFilter | undefined
 ): Prisma.StringFilter {

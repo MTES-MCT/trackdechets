@@ -29,6 +29,8 @@ export function BsdaPicker({ name, code }: Props) {
     variables: {
       where: {
         status: { _eq: BsdaStatus.AwaitingChild },
+        groupedIn: { _eq: null },
+        forwardedIn: { _eq: null },
         destination: {
           operation: { code: { _eq: code } },
           company: { siret: { _eq: siret } },
