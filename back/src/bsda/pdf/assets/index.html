@@ -111,7 +111,7 @@
               </p>
 
               <p>
-                Quantité en tonnes : {{bsda.weightValue}} <input type="checkbox"
+                Quantité en tonnes : {{divide bsda.weightValue 1000}} <input type="checkbox"
                 {{#if bsda.weightIsEstimate}}checked{{/if}} /> Réelle <input
                 type="checkbox" {{#unless
                 bsda.weightIsEstimate}}checked{{/unless}} /> Estimée
@@ -262,7 +262,7 @@
             bsda.destinationReceptionDate}}
           </p>
           <p>
-            Quantité réelle présentée : {{bsda.destinationReceptionWeight}}
+            Quantité réelle présentée : {{divide bsda.destinationReceptionWeight 1000}}
             tonne(s)
           </p>
           <p>
