@@ -168,15 +168,17 @@ export default function ExportsForm({ companies }: IProps) {
     const downloadFile =
       exportFormat === "CSV" ? wastesRegistryCsv : wastesRegistryXls;
 
+    const dateFilter =
+      exportType === WasteRegistryType.Incoming
+        ? { destinationReceptionDate: { _gte: startDate, _lte: endDate } }
+        : { transporterTakenOverAt: { _gte: startDate, _lte: endDate } };
+
     downloadFile({
       variables: {
         sirets: companies.map(c => c.siret),
         registryType: exportType,
         where: {
-          createdAt: {
-            _gte: startDate,
-            _lte: endDate,
-          },
+          ...dateFilter,
           ...(wasteCode ? { wasteCode: { _eq: wasteCode } } : {}),
         },
       },
@@ -270,7 +272,11 @@ export default function ExportsForm({ companies }: IProps) {
                 <option value={WasteRegistryType.All}>Exhaustif</option>
               </Field>
               <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
-                Date de début
+                Début de la période (
+                {values.exportType === WasteRegistryType.Incoming
+                  ? "date de réception"
+                  : "date d'expédition"}
+                )
               </label>
               <div className="tw-col-span-2 tw-max-w-md">
                 <Field
@@ -280,7 +286,11 @@ export default function ExportsForm({ companies }: IProps) {
                 />
               </div>
               <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
-                Date de fin
+                Fin de la période (
+                {values.exportType === WasteRegistryType.Incoming
+                  ? "date de réception"
+                  : "date d'expédition"}
+                )
               </label>
 
               <div className="tw-col-span-2 tw-max-w-md">
