@@ -6,6 +6,7 @@ const reviewFragment = gql`
     id
     form {
       id
+      readableId
       wasteDetails {
         code
         pop
@@ -91,9 +92,6 @@ export const GET_FORM_REVISION_REQUESTS = gql`
       edges {
         node {
           ...FormRevisionRequestFragment
-          form {
-            readableId
-          }
         }
       }
     }
