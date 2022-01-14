@@ -29,7 +29,7 @@ services:
     ports:
       - 3000:3000
     env_file:
-      - .env
+      - .cypress-tests-env
 
   postgres:
     image: circleci/postgres:12-alpine-ram
