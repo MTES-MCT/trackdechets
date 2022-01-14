@@ -28,6 +28,7 @@ jobs:
         uses: actions/checkout@v2
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
+      # options docs : https://github.com/cypress-io/github-action/blob/master/action.yml
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
@@ -37,3 +38,4 @@ jobs:
           # wait for the URL to respond
           # using the default parameter
           wait-on: 'http://127.0.0.1:3000'
+          headless: true

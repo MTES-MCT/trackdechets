@@ -2,12 +2,9 @@ version: "3"
 services:
   td-api:
     image: td-api
-    build:
-      context: ../../back
-      dockerfile: Dockerfile.dev
-    command: tail -f /dev/null
+    build: DockerfileApi.dev
     volumes:
-      - ../src:/usr/src/app/src
+      - ../../back:/usr/src/app
     env_file:
       - .cypress-tests-env
     ports:
@@ -25,8 +22,8 @@ services:
     expose:
       - "3000"
     volumes:
-      - ./front:/usr/src/front
-      - ./back/src:/usr/src/back/src
+      - ..:/usr/src/front
+      - ../../back/src:/usr/src/back/src
     ports:
       - 3000:3000
     env_file:
