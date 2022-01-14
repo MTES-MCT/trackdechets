@@ -19,12 +19,10 @@ jobs:
         run: |
           chmod +x ./run.sh
           ./run.sh -c ${{ matrix.chunk }}-${{ strategy.job-total }}
+
   front:
     runs-on: ubuntu-20.04
     name: Cypress Integration tests
-    defaults:
-      run:
-        working-directory: front
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -33,6 +31,7 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
+          install: false
           working-directory: front/cypress
           start: docker-compose up -d
           # wait for the URL to respond

@@ -46,7 +46,6 @@ services:
 
   redis:
     image: redis:5.0-alpine
-    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     sysctls:
       - net.core.somaxconn=511
     ports:
@@ -55,7 +54,6 @@ services:
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.8.0
-    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - discovery.type=single-node
