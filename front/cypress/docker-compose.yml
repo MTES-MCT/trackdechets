@@ -15,6 +15,7 @@ services:
     depends_on:
       - redis
       - postgres
+      - elasticsearch
 
   td-ui:
     stdin_open: true
@@ -30,6 +31,8 @@ services:
       - 3000:3000
     env_file:
       - .cypress-tests-env
+    depends_on:
+      - td-api
 
   postgres:
     image: circleci/postgres:12-alpine-ram
@@ -38,19 +41,15 @@ services:
       POSTGRES_USER: trackdechets
       POSTGRES_PASSWORD: password
     ports:
-      - "5432:5432"
+      - 5432:5432
     shm_size: "512m"
-    depends_on:
-      - elasticsearch
-      - redis
-
 
   redis:
     image: redis:5.0-alpine
     sysctls:
       - net.core.somaxconn=511
     ports:
-      - "6379:6379"
+      - 6379:6379
 
 
   elasticsearch:
@@ -62,15 +61,5 @@ services:
       memlock:
         soft: -1
         hard: -1
-    volumes:
-      - elasticsearch:/usr/share/elasticsearch/data
     ports:
-      - "9200:9200"
-    deploy:
-      placement:
-        constraints:
-          - "node.labels.elasticsearch == true"
-
-volumes:
-  postgres:
-  elasticsearch:
+      - 9200:9200
