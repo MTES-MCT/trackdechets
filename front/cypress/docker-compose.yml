@@ -1,0 +1,77 @@
+services:
+  td-api:
+    image: td-api
+    build:
+      context: ../../back
+      dockerfile: Dockerfile.dev
+    command: tail -f /dev/null
+    volumes:
+      - ../src:/usr/src/app/src
+    env_file:
+      - .env
+    ports:
+      - "4000:$API_PORT"
+    depends_on:
+      - redis
+      - postgres
+
+  td-ui:
+    stdin_open: true
+    image: node:14.15.4
+    working_dir: /usr/src/front
+    command: sh -c "npm install && npm run dev"
+    expose:
+      - "3000"
+    volumes:
+      - ./front:/usr/src/front
+      - ./back/src:/usr/src/back/src
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+
+  postgres:
+    image: circleci/postgres:12-alpine-ram
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: trackdechets
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    shm_size: "512m"
+    depends_on:
+      - elasticsearch
+      - redis
+
+
+  redis:
+    image: redis:5.0-alpine
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    sysctls:
+      - net.core.somaxconn=511
+    ports:
+      - "6379:6379"
+
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.0
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.elasticsearch == true"
+
+volumes:
+  postgres:
+  elasticsearch:

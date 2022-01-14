@@ -15,6 +15,7 @@
     "cleave.js": "^1.6.0",
     "cogo-toast": "^4.1.3",
     "constant-case": "^3.0.3",
+    "cypress": "^9.2.1",
     "date-fns": "^2.16.1",
     "env-cmd": "^10.0.1",
     "formik": "2.2.5",
@@ -62,7 +63,9 @@
     "eject": "react-scripts eject",
     "supportedBrowsers": "echo \"// eslint-disable-next-line\nmodule.exports = $(browserslist-useragent-regexp --allowHigherVersions);\" > src/supportedBrowsers.js",
     "lint": "eslint --ext .ts,.tsx ./src",
-    "lint:fix": "eslint --fix --ext .ts,.tsx ./src"
+    "lint:fix": "eslint --fix --ext .ts,.tsx ./src",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "engines": {
     "node": "^14"

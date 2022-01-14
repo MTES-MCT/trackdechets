@@ -19,3 +19,22 @@ jobs:
         run: |
           chmod +x ./run.sh
           ./run.sh -c ${{ matrix.chunk }}-${{ strategy.job-total }}
+  front:
+    runs-on: ubuntu-20.04
+    name: Cypress Integration tests
+    defaults:
+      run:
+        working-directory: front
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      # Install NPM dependencies, cache them correctly
+      # and run all Cypress tests
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          working-directory: front/cypress
+          start: docker-compose up -d
+          # wait for the URL to respond
+          # using the default parameter
+          wait-on: 'http://127.0.0.1:3000'
