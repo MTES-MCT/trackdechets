@@ -1,3 +1,4 @@
+version: "3"
 services:
   td-api:
     image: td-api
@@ -10,7 +11,7 @@ services:
     env_file:
       - .env
     ports:
-      - "4000:$API_PORT"
+      - 4000:4000
     depends_on:
       - redis
       - postgres
@@ -26,7 +27,7 @@ services:
       - ./front:/usr/src/front
       - ./back/src:/usr/src/back/src
     ports:
-      - "3000:3000"
+      - 3000:3000
     env_file:
       - .env
 
