@@ -60,8 +60,7 @@ async function buildQuery(
 
   Object.entries({
     emitterCompanyName: where.emitter,
-    destinationCompanyName: where.recipient,
-    transporterCustomInfo: where.transporterCustomInfo
+    destinationCompanyName: where.recipient
   })
     .filter(([_, value]) => value != null)
     .forEach(([key, value]) => {
@@ -74,6 +73,17 @@ async function buildQuery(
         }
       });
     });
+
+  if (where.transporterCustomInfo) {
+    query.bool.must.push({
+      match: {
+        transporterCustomInfo: {
+          query: where.transporterCustomInfo,
+          fuzziness: 0
+        }
+      }
+    });
+  }
 
   if (where.readableId) {
     query.bool.must.push({
