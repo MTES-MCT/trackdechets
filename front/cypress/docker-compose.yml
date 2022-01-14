@@ -9,7 +9,7 @@ services:
     volumes:
       - ../src:/usr/src/app/src
     env_file:
-      - .env
+      - .cypress-tests-env
     ports:
       - 4000:4000
     depends_on:
