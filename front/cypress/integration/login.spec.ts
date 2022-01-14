@@ -34,3 +34,6 @@ describe("login app", () => {
     cy.get(".todo-list li").last().should("have.text", "Walk the dog");
   });
 });
+
+// Just avoid compiler error asking for option --isolatedModules
+export {};

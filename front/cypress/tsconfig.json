@@ -4,7 +4,8 @@
     "noEmit": true,
     // be explicit about types included
     // to avoid clashing with Jest types
-    "types": ["cypress"]
+    "types": ["cypress"],
+    "skipLibCheck": true, // Fix type conflict with cypress https://github.com/cypress-io/cypress/issues/1087
   },
   "include": [
     "../node_modules/cypress",
