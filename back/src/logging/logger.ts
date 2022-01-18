@@ -16,8 +16,8 @@ const logger = createLogger({
 
 // If we're not in production then log to the `console` with the format:
 // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
-//
-if (process.env.NODE_ENV === "dev") {
+// avoid using missing console.log() function in CI https://jestjs.io/docs/environment-variables
+if (process.env.NODE_ENV === "dev" && !process.env.JEST_WORKER_ID) {
   logger.add(
     new transports.Console({
       format: format.simple()
