@@ -11,7 +11,10 @@ const logger = createLogger({
     format.metadata(),
     format.json()
   ),
-  transports: [new transports.File({ filename: LOG_PATH })]
+  transports:
+    process.env.NODE_ENV !== "dev" || process.env.JEST_WORKER_ID
+      ? [new transports.File({ filename: LOG_PATH })]
+      : [new transports.Console({ format: format.simple() })]
 });
 
 export default logger;

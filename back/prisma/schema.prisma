@@ -649,6 +649,7 @@ model User {
   MembershipRequest    MembershipRequest[]
   StatusLog            StatusLog[]
   UserActivationHash   UserActivationHash[]
+  UserResetPasswordHash   UserResetPasswordHash[]
 
   bsdasriEmissionSignatures  Bsdasri[] @relation("BsdasriEmissionSignature")
   bsdasriTransportSignatures Bsdasri[] @relation("BsdasriTransportSignature")
@@ -679,6 +680,17 @@ model UserActivationHash {
   user      User     @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "_UserActivationHashUserIdIdx")
+}
+
+model UserResetPasswordHash {
+  id          String   @id @default(cuid())
+  hash        String   @unique
+  hashExpires DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "UserResetPasswordHashIdIdx")
 }
 
 // ----------------
