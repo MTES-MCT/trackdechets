@@ -4,6 +4,7 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
+# [2022.01.2] 31/01/2022
 
 # [2022.01.2] 31/01/2022
 
@@ -19,6 +20,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - La recherche d'établissements par n°SIRET ne retourne plus d'établissement fermé [PR 1140](https://github.com/MTES-MCT/trackdechets/pull/1140)
+- Retrait du lien de création de bsdd apparaissant sur le dashboard brouillon vide #1150 [PR 1150](https://github.com/MTES-MCT/trackdechets/pull/1150)
 
 #### :memo: Documentation
 
