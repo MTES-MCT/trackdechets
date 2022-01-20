@@ -104,6 +104,7 @@ export default function AcceptedInfo({
                   component={InlineRadioButton}
                 />
               </fieldset>
+              <RedErrorMessage name="wasteAcceptationStatus" />
             </div>
           </div>
           <div className="form__row">
