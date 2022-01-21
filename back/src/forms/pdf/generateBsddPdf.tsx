@@ -35,6 +35,7 @@ import {
 } from "../form-converter";
 import { getFullForm } from "../database";
 import prisma from "../../prisma";
+import { buildAddress } from "../../companies/sirene/utils";
 
 type ReceiptFieldsProps = Partial<
   Pick<GraphQLForm["transporter"], "department" | "receipt" | "validityLimit">
@@ -345,7 +346,13 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             <p>
               Nom/raison sociale : {form.emitter?.workSite?.name}
               <br />
-              Adresse : {form.emitter?.workSite?.address}
+              Adresse :{" "}
+              {form.emitter?.workSite &&
+                buildAddress([
+                  form.emitter?.workSite?.address,
+                  form.emitter?.workSite?.postalCode,
+                  form.emitter?.workSite?.city
+                ])}
               <br />
               Info libre : {form.emitter?.workSite?.infos}
             </p>
