@@ -9,7 +9,7 @@ L'[arrêté du 31 mai 2021](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT00004
 Les `queries` permettant d'exporter les données registre sont les suivantes :
 - [`incomingWastes`](../reference/api-reference/registre/queries#incomingwastes) : registre de déchets entrants
 - [`outgoingWastes`](../reference/api-reference/registre/queries#outgoingwastes) : registre de déchets sortants
-- [`transporteWastes](../reference/api-reference/registre/queries#transportedwastes): registre de déchets transportés
+- [`transporteWastes`](../reference/api-reference/registre/queries#transportedwastes): registre de déchets transportés
 - [`managedWastes`](../reference/api-reference/registre/queries#managedwastes) : registre de déchets gérés (courtage ou négoce)
 - [`allWastes`](../reference/api-reference/registre/queries#allwastes) : registre permettant d'exporter toutes les données de bordereaux pour un ou plusieurs établissements
 
