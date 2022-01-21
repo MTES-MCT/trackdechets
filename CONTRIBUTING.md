@@ -1,21 +1,25 @@
 # Contribuer à Trackdéchets
 
-- [Mise en route](#mise-en-route)
-  - [Pré-requis](#pré-requis)
-  - [Installation](#installation)
-  - [Conventions](#conventions)
-- [Tests unitaires](#tests-unitaires)
-- [Tests d'intégration](#tests-dintégration)
-- [Créer une PR](#créer-une-pr)
-- [Déploiement](#déploiement)
-- [Migrations](#migrations)
-- [Guides](#guides)
-  - [Mettre à jour le changelog](#mettre-à-jour-le-changelog)
-  - [Mettre à jour la documentation](#mettre-à-jour-la-documentation)
-  - [Utiliser un backup de base de donnée](#utiliser-un-backup-de-base-de-donnée)
-  - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
-  - [Nourrir la base de donnée avec des données par défaut](#nourrir-la-base-de-donnée-avec-des-données-par-défaut)
-  - [Ajouter une nouvelle icône](#ajouter-une-nouvelle-icône)
+- [Contribuer à Trackdéchets](#contribuer-à-trackdéchets)
+  - [Mise en route](#mise-en-route)
+    - [Pré-requis](#pré-requis)
+    - [Installation](#installation)
+    - [Installation alternative sans docker](#installation-alternative-sans-docker)
+    - [Conventions](#conventions)
+  - [Tests unitaires](#tests-unitaires)
+  - [Tests d'intégration](#tests-dintégration)
+  - [Créer une PR](#créer-une-pr)
+  - [Déploiement](#déploiement)
+  - [Migrations](#migrations)
+  - [Guides](#guides)
+    - [Mettre à jour le changelog](#mettre-à-jour-le-changelog)
+    - [Mettre à jour la documentation](#mettre-à-jour-la-documentation)
+    - [Utiliser un backup de base de donnée](#utiliser-un-backup-de-base-de-donnée)
+      - [Procédure automatique avec Docker](#procédure-automatique-avec-docker)
+      - [Procédure manuelle](#procédure-manuelle)
+    - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
+    - [Nourrir la base de donnée avec des données par défaut](#nourrir-la-base-de-donnée-avec-des-données-par-défaut)
+    - [Ajouter une nouvelle icône](#ajouter-une-nouvelle-icône)
 
 ## Mise en route
 
@@ -23,6 +27,7 @@
 
 1. Installer Node.js
 2. Installer Docker et Docker Compose
+3. Installer Yarn pkg manager v3 en suivant les [instructions officielles pour node < 16](https://yarnpkg.com/getting-started/install)
 
 ### Installation
 
@@ -77,7 +82,7 @@
 
    ```bash
    docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
-   npm run index-elastic-search:dev
+   yarn index-elastic-search:dev
    ```
 
 7. Accéder aux différents services.
@@ -102,24 +107,24 @@ ln -s /path/to/trackdechets/.env /path/to/trackdechets/back/.env
 
 ```bash
 cd back
-npm install
-npm run dev
+yarn
+yarn dev
 ```
 
 4. Démarrer l'UI
 
 ```bash
 cd front
-npm install
-npm start
+yarn
+yarn start
 ```
 
 5. (Optionnel) Démarrer la documentation
 
 ```
 cd doc/website
-npm install
-npm start
+yarn
+yarn start
 ```
 
 ### Conventions
@@ -146,13 +151,13 @@ Il est également possible de faire tourner les tests unitaires sur l'environnem
 2. Faire tourner les tests back
    ```bash
    docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
-   npm run test # run all the tests
+   yarn test # run all the tests
    npx jest path src/path/to/my-function.test.ts # run only one test
    ```
 3. Faire tourner les tests front
    ```bash
    docker exec -it $(docker ps -aqf "name=td-ui") sh
-   npm run test # run tests in watch mode
+   yarn test # run tests in watch mode
    ```
 
 ## Tests d'intégration
@@ -196,7 +201,7 @@ Chaque update de la branche `dev` déclenche un déploiement sur l'environnement
 7. Si possible faire tourner les migrations sur une copie de la base de prod en local.
 8. S'assurer que les nouvelles variables d'environnement (Cf `.env.model`) ont bien été ajoutée sur sandbox et prod
 9. Merger la PR et suivre l'avancement du déploiement sur le CI
-10. Se connecter à l'instance de prod et faire tourner le script `npm run update` dans le container `td-api`. Faire de même sur l'instance sandbox.
+10. Se connecter à l'instance de prod et faire tourner le script `yarn update` dans le container `td-api`. Faire de même sur l'instance sandbox.
 
 ## Migrations
 
@@ -207,7 +212,7 @@ A noter que une fois que ces migrations ont été jouées, le contenu des fichie
 Pour les migrations scriptées, c'est dans `back/prisma/scripts`. Les migrations doivent prendre la forme d'une classe, implémentant `Updater` et décorée par `registerUpdater`.
 Attention, contrairement aux scripts SQL ces migrations ne sont pas jouées une seules fois. Il faut donc s'assurer qu'elles sont idempotentes, ou les désactiver après chaque mise en production.
 
-Toutes ces migrations sont jouées avec la commande `npm run update:dev`. (sans le suffixe `:dev` en production)
+Toutes ces migrations sont jouées avec la commande `yarn update:dev`. (sans le suffixe `:dev` en production)
 
 ## Guides
 

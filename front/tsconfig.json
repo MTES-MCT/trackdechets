@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "composite": true /* Enable project compilation, compulsory to use typescript references */,
     "target": "es5",
     "allowJs": true,
     "skipLibCheck": false,
@@ -22,7 +23,7 @@
       "esnext.asynciterable"
     ],
     "baseUrl": "./src",
- 
+
   },
   "include": [
     "src/**/*"

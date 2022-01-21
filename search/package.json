@@ -1,0 +1,47 @@
+{
+  "name": "@trackdechets/search",
+  "version": "1.0.0",
+  "description": "Search library and scripts for open data like INSEE's SIRET and SIRENE",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "build": "tsc",
+    "start": "yarn index",
+    "index": "yarn index:sirene && yarn index:siret",
+    "index:dev": "export NODE_ENV=dev && docker-compose up -d elasticsearch && yarn index:sirene && yarn index:siret",
+    "preindex:sirene": "yarn build",
+    "preindex:siret": "yarn build",
+    "index:sirene": "node dist/commands/indexInseeSirene.js",
+    "index:siret": "node dist/commands/indexInseeSiret.js"
+  },
+  "engines": {
+    "node": "^14",
+    "npm": "^6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MTES-MCT/trackdechets.git"
+  },
+  "keywords": [
+    "data",
+    "indexation",
+    "search",
+    "elasticsearch",
+    "typescript"
+  ],
+  "author": "Trackdéchets <tech@trackdechets.beta.gouv.fr>",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/MTES-MCT/trackdechets/issues"
+  },
+  "homepage": "https://github.com/MTES-MCT/trackdechets#readme",
+  "devDependencies": {
+    "jest": "^27.4.7",
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^7.16.0",
+    "@trackdechets/common": "*",
+    "node-stream-zip": "^1.15.0"
+  }
+}

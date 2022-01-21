@@ -1,0 +1,40 @@
+{
+  "name": "@trackdechets/common",
+  "version": "1.0.0",
+  "description": "Common libs for Trackdechets",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "build": "tsc"
+  },
+  "engines": {
+    "node": "^14",
+    "npm": "^6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MTES-MCT/trackdechets.git"
+  },
+  "keywords": [
+    "typescript"
+  ],
+  "author": "Trackdechets <tech@trackdechets.beta.gouv.fr>",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/MTES-MCT/trackdechets/issues"
+  },
+  "homepage": "https://github.com/MTES-MCT/trackdechets#readme",
+  "devDependencies": {
+    "jest": "^27.4.7",
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^7.16.0",
+    "@sentry/integrations": "^6.16.1",
+    "@sentry/node": "^6.16.1",
+    "app-root-path": "^3.0.0",
+    "dd-trace": "^1.6.0",
+    "winston": "^3.2.1",
+    "winston-transport": "^4.3.0"
+  }
+}

@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import logger from "../../logging/logger";
+import type { Request, Response, NextFunction } from "express";
+import { logger } from "@trackdechets/common";
 
 const { NODE_ENV } = process.env;
 

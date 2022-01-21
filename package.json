@@ -1,0 +1,25 @@
+{
+  "name": "trackdechets",
+  "packageManager": "yarn@3.1.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MTES-MCT/trackdechets.git"
+  },
+  "author": "Trackdéchets <tech@trackdechets.beta.gouv.fr>",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/MTES-MCT/trackdechets/issues"
+  },
+  "homepage": "https://github.com/MTES-MCT/trackdechets#readme",
+  "scripts": {
+    "up": "docker-compose up"
+  },
+  "workspaces": {
+    "packages": [
+      "common",
+      "back",
+      "front",
+      "search"
+    ]
+  }
+}

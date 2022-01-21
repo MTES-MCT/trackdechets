@@ -29,7 +29,7 @@ stopcontainers(){
 }
 
 runtest(){
-    dockerexec "npm run integration-tests $1"
+    dockerexec "yarn integration-tests $1"
     EXIT_CODE=$?
 }
 

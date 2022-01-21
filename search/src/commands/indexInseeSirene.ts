@@ -1,10 +1,10 @@
-import logger from "../logging/logger";
+import logger from "../common/logger";
 import { initSentry } from "../common/sentry";
 import {
   downloadAndIndex,
   unzipAndIndex,
   sireneIndexConfig
-} from "./elasticSearch.helpers";
+} from "../indexation/elasticSearch.helpers";
 
 const Sentry = initSentry();
 /**

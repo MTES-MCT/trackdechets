@@ -1,6 +1,5 @@
-import fs from "fs";
-import path from "path";
-import { Client, RequestParams } from "@elastic/elasticsearch";
+import { RequestParams } from "@elastic/elasticsearch";
+import { elasticSearchClient } from "@trackdechets/common";
 import { BsdType } from "../generated/graphql/types";
 import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
@@ -354,14 +353,6 @@ export function getFieldNameFromKeyword(
   return fieldName as keyof BsdElastic;
 }
 
-const certPath = path.join(__dirname, "es.cert");
-export const client = new Client({
-  node: process.env.ELASTIC_SEARCH_URL,
-  ssl: fs.existsSync(certPath)
-    ? { ca: fs.readFileSync(certPath, "utf-8") }
-    : undefined
-});
-
 /**
  * Set refresh parameter to `wait_for` when user is logged in from UI
  * It allows to refresh the BSD list in real time after a create, update or delete operation from UI
@@ -377,7 +368,7 @@ function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
  * Create/update a document in Elastic Search.
  */
 export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
-  return client.index({
+  return elasticSearchClient.index({
     index: index.alias,
     type: index.type,
     id: bsd.id,
@@ -390,7 +381,7 @@ export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
  * Bulk create/update a list of documents in Elastic Search.
  */
 export function indexBsds(idx: string, bsds: BsdElastic[]) {
-  return client.bulk({
+  return elasticSearchClient.bulk({
     body: bsds.flatMap(bsd => [
       {
         index: {
@@ -411,7 +402,7 @@ export function deleteBsd<T extends { id: string }>(
   { id }: T,
   ctx?: GraphQLContext
 ) {
-  return client.delete(
+  return elasticSearchClient.delete(
     {
       index: index.alias,
       type: index.type,

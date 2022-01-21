@@ -1,5 +1,5 @@
 import axios from "axios";
-import {  resetDatabase } from "../../../../integration-tests/helper";
+import { resetDatabase } from "../../../../integration-tests/helper";
 import prisma from "../../../prisma";
 import { companyFactory } from "../../../__tests__/factories";
 import { setCompanyName } from "../set-company-name";
@@ -7,8 +7,7 @@ import { setCompanyName } from "../set-company-name";
 jest.mock("axios");
 
 // Skip this test in a normal test run because it targets a function
-// that should be run only once in "npm run update"
-
+// that should be run only once in "yarn update"
 
 describe.skip("setCompanyName", () => {
   afterAll(async () => {

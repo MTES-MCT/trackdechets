@@ -21,15 +21,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
       - name: Install dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile
       - name: Generate files
-        run: npm run generate
+        run: yarn generate
       - name: Run linter
-        run: npm run lint
+        run: yarn lint
       - name: Run typecheck
-        run: npm run types
+        run: yarn types
       - name: Run tests
-        run: npm test
+        run: yarn test
 
   back:
     runs-on: ubuntu-latest
@@ -49,17 +49,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
       - name: Install dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile
       - name: Generate files
-        run: npm run generate
+        run: yarn generate
       - name: Run linter
-        run: npm run lint
+        run: yarn lint
       - name: Run typecheck
-        run: npm run types
+        run: yarn types
       - name: Check migrations
-        run: npm run check:migrations
+        run: yarn check:migrations
       - name: Run tests
-        run: npm test -- --forceExit
+        run: yarn test -- --forceExit
         env:
           JWT_SECRET: "xxx"
           EMAIL_BACKEND: "console"

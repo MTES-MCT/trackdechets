@@ -3,19 +3,26 @@ import https from "https";
 import path from "path";
 import { Writable } from "stream";
 import StreamZip from "node-stream-zip";
-import logger from "../logging/logger";
-import { client } from "../common/elastic";
+import { logger, elasticSearchClient } from "@trackdechets/common";
 import {
   ElasticBulkIndexError,
   ElasticBulkNonFlatPayload,
   ElasticBulkPayloadDocument,
   ElasticBulkPrepayload,
-  IndexProcessConfig
+  IndexProcessConfig,
 } from "./types";
 import { ApiResponse } from "@elastic/elasticsearch";
+import {
+  BulkOperationContainer,
+  BulkOperationType,
+  BulkResponse,
+  BulkResponseItem,
+} from "@elastic/elasticsearch/api/types";
+
+var pjson = require("../../package.json");
 
 // Max size of documents to index at once, also depends on ES JVM memory available
-const CHUNK_SIZE = 10_000;
+const CHUNK_SIZE: number = parseInt(process.env.INDEX_CHUNK_SIZE, 10) || 10_000;
 
 // ES Mapping docs: https://www.elastic.co/guide/en/elasticsearch/reference/6.8/mapping.html
 export const standardMapping = {
@@ -28,12 +35,12 @@ export const standardMapping = {
           mapping: {
             type: "date",
             // docs : https://www.elastic.co/guide/en/elasticsearch/reference/6.8/ignore-malformed.html
-            ignore_malformed: true
-          }
-        }
-      }
-    ]
-  }
+            ignore_malformed: true,
+          },
+        },
+      },
+    ],
+  },
 };
 
 export const sireneIndexConfig: IndexProcessConfig = {
@@ -43,12 +50,14 @@ export const sireneIndexConfig: IndexProcessConfig = {
   // zip target filename
   zipFileName: "StockUniteLegale_utf8.zip",
   idKey: "siren",
-  mappings: standardMapping
+  mappings: standardMapping,
 };
 
 const INDEX_ALIAS_NAME_SEPARATOR = "-";
 export const getIndexVersionName = (indexConfig: IndexProcessConfig) =>
-  `${indexConfig.alias}${INDEX_ALIAS_NAME_SEPARATOR}${Date.now()}`;
+  `${indexConfig.alias}${INDEX_ALIAS_NAME_SEPARATOR}${
+    pjson.version
+  }${INDEX_ALIAS_NAME_SEPARATOR}${Date.now()}`;
 
 /**
  * Create a new index with timestamp appended to the alias name
@@ -59,12 +68,12 @@ export const createIndexRelease = async (
 ): Promise<string> => {
   const indexName = getIndexVersionName(indexConfig);
   const { mappings, settings } = indexConfig;
-  await client.indices.create({
+  await elasticSearchClient.indices.create({
     index: indexName,
     body: {
       ...(mappings && { mappings }),
-      ...(settings && { settings })
-    }
+      ...(settings && { settings }),
+    },
   });
   logger.info(`Created a new index ${indexName}`);
   return indexName;
@@ -77,40 +86,43 @@ export const cleanOldIndexes = async (
   indexAlias: string,
   indexName: string
 ) => {
-  const aliases = await client.cat.aliases({
+  const aliases = await elasticSearchClient.cat.aliases({
     name: indexAlias,
-    format: "json"
+    format: "json",
   });
-  const bindedIndexes = aliases.body.map(info => info.index);
+  const bindedIndexes = aliases.body.map((info: { index: any }) => info.index);
   logger.info(
     `Pointing the index alias ${indexAlias} to the index ${indexName}`
   );
-  await client.indices.putAlias({
+  await elasticSearchClient.indices.putAlias({
     index: indexName,
-    name: indexAlias
+    name: indexAlias,
   });
-  logger.info(
-    `Removing alias pointers to older indices ${bindedIndexes.join(", ")}.`
-  );
-  // Delete old alias pointers
-  await client.indices.deleteAlias({
-    index: bindedIndexes,
-    name: indexAlias
-  });
+  if (bindedIndexes.length) {
+    logger.info(
+      `Removing alias pointers to older indices ${bindedIndexes.join(", ")}.`
+    );
+    await elasticSearchClient.indices.deleteAlias({
+      index: bindedIndexes,
+      name: indexAlias,
+    });
+  }
   // Delete old indices completely
-  const indices = await client.cat.indices({
-    index: `${indexAlias}${INDEX_ALIAS_NAME_SEPARATOR}*`,
-    format: "json"
+  const indices = await elasticSearchClient.cat.indices({
+    index: `${indexAlias}${INDEX_ALIAS_NAME_SEPARATOR}${pjson.version}${INDEX_ALIAS_NAME_SEPARATOR}*`,
+    format: "json",
   });
   const oldIndexes = indices.body
-    .map(info => info.index)
+    .map((info: { index: any }) => info.index)
     // Filter out the last indexName
-    // TODO later : keep alse the previous index in order to roll-back
-    .filter(name => name !== indexName);
-  logger.info(
-    `Removing ${oldIndexes.length} old index(es) (${oldIndexes.join(", ")})`
-  );
-  await client.indices.delete({ index: oldIndexes.join(",") });
+    // TODO feature : also keep the previous index in order to roll-back
+    .filter((name: string) => name !== indexName);
+  if (oldIndexes.length) {
+    logger.info(
+      `Removing ${oldIndexes.length} old index(es) (${oldIndexes.join(", ")})`
+    );
+    await elasticSearchClient.indices.delete({ index: oldIndexes.join(",") });
+  }
 };
 
 /**
@@ -122,23 +134,23 @@ export const bulkIndex = async (
   indexConfig: IndexProcessConfig
 ) => {
   // Promise returning function chunks
-  const request = async bodyChunk => {
-    const requestBulkIndex = body => {
+  const request = async (bodyChunk: ElasticBulkNonFlatPayload) => {
+    const requestBulkIndex = (body: (BulkOperationContainer | unknown)[]) => {
       if (!body || !body.length) {
         // nothing to index
-        return Promise.resolve(null);
+        return;
       }
-      return client.bulk({
+      return elasticSearchClient.bulk({
         body,
         // lighten the response
-        _source_excludes: ["items.index._*", "took"]
+        _source_excludes: ["items.index._*", "took"],
       });
     };
-    logger.info(`Bulk index ${bodyChunk.length} documents`);
+    logger.info(`Indexing ${bodyChunk.length} documents in bulk`);
     // append new data to the body before indexation
     if (typeof indexConfig.dataFormatterFn === "function") {
       const formattedChunk = await indexConfig.dataFormatterFn(bodyChunk, {
-        sireneIndexConfig
+        sireneIndexConfig,
       });
       return requestBulkIndex(formattedChunk.flat());
     }
@@ -146,25 +158,33 @@ export const bulkIndex = async (
   };
 
   const logBulkIndexErrors = (
-    bulkResponse: ApiResponse,
+    bulkResponse: BulkResponse,
     slice: [ElasticBulkPrepayload, ElasticBulkPayloadDocument][]
   ) => {
-    if (bulkResponse?.body?.errors) {
-      bulkResponse.body.items.forEach((action, k: number) => {
-        const [operation] = Object.keys(action);
-        if (action[operation].error) {
-          const elasticBulkIndexError: ElasticBulkIndexError = {
-            // If the status is 429 it means that you can retry the document,
-            // otherwise it's very likely a mapping error, and you should fix the document content
-            status: action[operation].status,
-            error: action[operation].error,
-            bulkBody: slice[k]
-          };
-          logger.error(`Error in bulkIndex operation`, {
-            elasticBulkIndexError
-          });
+    if (bulkResponse.errors) {
+      bulkResponse.items.forEach(
+        (
+          action: Partial<Record<BulkOperationType, BulkResponseItem>>,
+          k: number
+        ) => {
+          const operations: string[] = Object.keys(action);
+          for (const operation of operations) {
+            const opType = operation as BulkOperationType;
+            if (action[opType].error) {
+              const elasticBulkIndexError: ElasticBulkIndexError = {
+                // If the status is 429 it means that you can retry the document,
+                // otherwise it's very likely a mapping error, and you should fix the document content
+                status: action[opType].status,
+                error: action[opType].error,
+                bulkBody: slice[k],
+              };
+              logger.error(`Error in bulkIndex operation`, {
+                elasticBulkIndexError,
+              });
+            }
+          }
         }
-      });
+      );
     }
   };
 
@@ -172,7 +192,7 @@ export const bulkIndex = async (
   if (CHUNK_SIZE > body.length) {
     const bulkResponse = await request(body);
     // Collect error data
-    logBulkIndexErrors(bulkResponse, body);
+    logBulkIndexErrors(bulkResponse.body as BulkResponse, body);
     return;
   }
 
@@ -182,7 +202,7 @@ export const bulkIndex = async (
     const slice = body.slice(i, end);
     const bulkResponse = await request(slice);
     // Collect error data
-    logBulkIndexErrors(bulkResponse, slice);
+    logBulkIndexErrors(bulkResponse.body as BulkResponse, slice);
   }
 };
 
@@ -217,7 +237,7 @@ export const getWritableParserAndIndexer = (
         })
         .map(line => {
           const values = line.split(",");
-          const doc = {};
+          const doc: Record<string, any> = {};
           // build the document to index
           for (let i = 0; i < headers.length; i++) {
             doc[headers[i]] = values[i];
@@ -316,7 +336,7 @@ export const downloadAndIndex = async (
         res.on("end", () => {
           try {
             resolve(unzipAndIndex(zipPath, indexConfig));
-          } catch (e) {
+          } catch (e: any) {
             reject(e.message);
           }
         });

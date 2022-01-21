@@ -2,32 +2,21 @@
   "compilerOptions": {
     "composite": true /* Enable project compilation, compulsory to use typescript references */,
     "experimentalDecorators": true,
-    "lib": ["ES2020", "esnext.asynciterable"],
-    "outDir": "dist",
     "moduleResolution": "node",
-    "module": "CommonJS",
-    "target": "es6",
+		"module": "CommonJS",
+		"lib": ["es2020", "esnext.asynciterable"],
+    "outDir": "./dist",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-
-    "strict": false,
-    "noImplicitThis": false,
+    "strict": true,
+    "noImplicitThis": true,
     "noImplicitAny": false,
     "strictBindCallApply": true,
     "strictFunctionTypes": false,
     "strictNullChecks": false,
     "strictPropertyInitialization": false,
-    "jsx": "react"
   },
-  "include": ["src/**/*", "prisma/**/*"],
-  "references": [
-    {
-      "path": "../common"
-    },
-    {
-      "path": "../search"
-    }
-  ]
+  "include": ["src/**/*"]
 }

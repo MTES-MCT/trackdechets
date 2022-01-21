@@ -1,6 +1,6 @@
 FROM node:14.15.4
 WORKDIR /usr/src/app
 COPY package*.json ./
-RUN npm install --quiet
+RUN yarn --quiet
 COPY . .
-CMD [ "npm", "run", "dev" ]
+CMD [ "yarn", "dev" ]

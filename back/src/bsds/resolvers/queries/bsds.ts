@@ -9,7 +9,6 @@ import {
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
-  client,
   BsdElastic,
   index,
   getKeywordFieldNameFromName,
@@ -185,7 +184,7 @@ async function buildSearchAfter(
 
   const {
     body: { _source: bsd }
-  }: ApiResponse<GetResponse<BsdElastic>> = await client.get({
+  }: ApiResponse<GetResponse<BsdElastic>> = await elasticSearchClient.get({
     id: args.after,
     index: index.alias,
     type: index.type
@@ -246,8 +245,8 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   const sort = buildSort(args);
   const search_after = await buildSearchAfter(args, sort);
 
-  const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
-    {
+  const { body }: ApiResponse<SearchResponse<BsdElastic>> =
+    await elasticSearchClient.search({
       index: index.alias,
       body: {
         size:
@@ -259,8 +258,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
         sort,
         search_after
       }
-    }
-  );
+    });
   const hits = body.hits.hits.slice(0, size);
 
   const { bsdds, bsdasris, bsvhus, bsdas, bsffs } = await toPrismaBsds(

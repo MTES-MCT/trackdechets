@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import logger from "../../logging/logger";
+import { logger } from "@trackdechets/common";
 
 /**
  * Logging middleware

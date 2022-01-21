@@ -20,7 +20,7 @@ import {
 
 function printHelp() {
   console.log(`
-  Usage npm run bulk-create-account [options]
+  Usage yarn bulk-create-account [options]
   Bulk load a list of companies and users to Trackdéchets
   Two csv files are required
   * etablissements.csv

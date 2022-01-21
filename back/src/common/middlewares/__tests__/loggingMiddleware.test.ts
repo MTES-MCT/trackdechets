@@ -2,7 +2,7 @@ import { json } from "body-parser";
 import express from "express";
 import supertest from "supertest";
 import Transport from "winston-transport";
-import logger from "../../../logging/logger";
+import { logger } from "@trackdechets/common";
 import loggingMiddleware from "../loggingMiddleware";
 
 const logMock = jest.fn();

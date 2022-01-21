@@ -1,12 +1,15 @@
 import { client } from "../common/elastic";
 import { initSentry } from "../common/sentry";
-import logger from "../logging/logger";
-import { ElasticBulkNonFlatPayload, IndexProcessConfig } from "./types";
+import logger from "../common/logger";
+import {
+  ElasticBulkNonFlatPayload,
+  IndexProcessConfig
+} from "../indexation/types";
 import {
   downloadAndIndex,
   standardMapping,
   unzipAndIndex
-} from "./elasticSearch.helpers";
+} from "../indexation/elasticSearch.helpers";
 
 const Sentry = initSentry();
 
