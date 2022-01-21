@@ -150,6 +150,17 @@ type PackagingInfosTableProps = {
   packagingInfos: PackagingInfo[];
 };
 
+export function getOtherPackagingLabel(packagingInfos: PackagingInfo[]) {
+  const otherPackagings = packagingInfos.filter(p => p.type === "AUTRE");
+  const otherPackagingsSummary =
+    otherPackagings.length === 0
+      ? "à préciser"
+      : otherPackagings
+          .map(({ quantity, other }) => `${quantity} ${other ?? "?"}`)
+          .join(", ");
+  return `Autre (${otherPackagingsSummary})`;
+}
+
 function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
   return (
     <table>
@@ -165,7 +176,7 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
           { label: "Citerne", value: "CITERNE" },
           { label: "GRV", value: "GRV" },
           { label: "Fûts", value: "FUT" },
-          { label: "Autre (à préciser)", value: "AUTRE" }
+          { label: getOtherPackagingLabel(packagingInfos), value: "AUTRE" }
         ].map((packagingType, index) => (
           <tr key={index}>
             <td>
@@ -179,6 +190,7 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
                 // leave the box empty if it's 0
                 null}
             </td>
+
             <td>{packagingType.label}</td>
           </tr>
         ))}
