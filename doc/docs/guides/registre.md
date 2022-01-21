@@ -95,7 +95,7 @@ Les résultats sont paginés. Pour récupérer tous les déchets :
 - obtenir une première page avec `first=50`.
 - si `pageInfo { hasNextPage }` est `true`, refaire une requête avec `first=50` et `after=<cursor>` où `cursor` est égal à `pageInfo { endCursor }` de la requête précédente.
 - continuer ainsi tant que `pageInfo { hasNextPage }` est `true`.
-- `pageInfo { totalCount }` vous donne le nombre total de déchets à récupérer à tout moment.
+- `totalCount` vous donne le nombre total de déchets à récupérer à tout moment.
 
 
 ## Export CSV ou Excel
