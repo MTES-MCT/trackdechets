@@ -63,6 +63,7 @@ export const transporterFragment = gql`
     department
     validityLimit
     numberPlate
+    customInfo
     company {
       ...CompanyFragment
     }
