@@ -27,6 +27,7 @@ import { expandBsdaFromDb } from "../../../bsda/converter";
 import { getCachedUserSirets } from "../../../common/redis/users";
 
 import { unflattenBsff } from "../../../bsffs/converter";
+import { elasticSearchClient } from "@trackdechets/common";
 
 async function buildQuery(
   { clue, where = {} }: QueryBsdsArgs,

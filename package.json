@@ -12,7 +12,8 @@
   },
   "homepage": "https://github.com/MTES-MCT/trackdechets#readme",
   "scripts": {
-    "up": "docker-compose up"
+    "up": "docker-compose up",
+    "build": "yarn workspaces foreach run build"
   },
   "workspaces": {
     "packages": [

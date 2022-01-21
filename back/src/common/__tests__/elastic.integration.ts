@@ -1,10 +1,11 @@
+import { elasticSearchClient as client } from "@trackdechets/common";
 import {
   refreshElasticSearch,
   resetDatabase
 } from "../../../integration-tests/helper";
 import getReadableId from "../../forms/readableId";
 import { BsdType } from "../../generated/graphql/types";
-import { BsdElastic, client, index, indexBsds } from "../elastic";
+import { BsdElastic, index, indexBsds } from "../elastic";
 
 const defaultOpts: BsdElastic = {
   id: "id",

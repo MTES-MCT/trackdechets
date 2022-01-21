@@ -1,4 +1,5 @@
 import { Company, Status, User, UserRole } from ".prisma/client";
+import { elasticSearchClient as client } from "@trackdechets/common";
 import {
   refreshElasticSearch,
   resetDatabase
@@ -17,7 +18,7 @@ import {
 } from "../../bsffs/__tests__/factories";
 import { indexBsvhu } from "../../bsvhu/elastic";
 import { vhuFormFactory } from "../../bsvhu/__tests__/factories.vhu";
-import { client, index } from "../../common/elastic";
+import { index } from "../../common/elastic";
 import { getFullForm } from "../../forms/database";
 import { indexForm } from "../../forms/elastic";
 import { WasteRegistryType } from "../../generated/graphql/types";

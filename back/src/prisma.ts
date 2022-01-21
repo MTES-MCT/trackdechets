@@ -1,7 +1,7 @@
 import { URL } from "url";
 import { unescape } from "querystring";
 import { PrismaClient } from "@prisma/client";
-import { tracer } from "./tracer";
+import { tracer } from "@trackdechets/common";
 
 const prisma = new PrismaClient({
   datasources: {

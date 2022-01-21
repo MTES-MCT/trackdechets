@@ -2,7 +2,8 @@ import {
   QueryDslQueryContainer,
   SearchHitsMetadata
 } from "@elastic/elasticsearch/api/types";
-import { BsdElastic, client, index } from "../common/elastic";
+import { elasticSearchClient as client } from "@trackdechets/common";
+import { BsdElastic, index } from "../common/elastic";
 import {
   OrderType,
   WasteRegistryType,
