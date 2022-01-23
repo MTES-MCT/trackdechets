@@ -8,6 +8,7 @@ import { BsdElastic, client, index, indexBsds } from "../elastic";
 
 const defaultOpts: BsdElastic = {
   id: "id",
+  isDraft: false,
   readableId: "readableId",
   type: "BSDD" as BsdType,
   emitterCompanyName: "emitter name",

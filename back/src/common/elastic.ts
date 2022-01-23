@@ -1,7 +1,12 @@
 import fs from "fs";
 import path from "path";
 import { Client, RequestParams } from "@elastic/elasticsearch";
-import { BsdType } from "../generated/graphql/types";
+import {
+  BsdType,
+  CommonBsdStatus,
+  BsdasriType,
+  BsdaType
+} from "../generated/graphql/types";
 import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
 import prisma from "../prisma";
@@ -27,9 +32,52 @@ export interface SearchResponse<T> {
 export interface GetResponse<T> {
   _source: T;
 }
+
+interface BsdasriElastic {
+  type: BsdasriType;
+  groupingCount: number;
+}
+
+interface BsdaElastic {
+  type: BsdaType;
+  emitterIsPrivateIndividual: boolean;
+  workerCompanySiret?: string;
+  workerCompanyName?: string;
+  wasteMaterialName?: string;
+  transporterCustomInfo?: string;
+}
+
+interface BsddLastSegmentInfo {
+  id: string;
+  takenOver: boolean;
+  readyToTakeOver: boolean;
+  previousTransporterCompanySiret: string;
+}
+
+interface BsddTemporaryStorageInfo {
+  recipientIsTempStorage: boolean;
+  transporterCompanySiret: string;
+  destinationCompanySiret: string;
+}
+
+interface BsddStateSummary {
+  transporterCustomInfo?: string;
+  transporterNumberPlate?: string;
+  recipientName: string;
+}
+interface BsddElastic {
+  currentTransporterSiret?: string;
+  nextTransporterSiret?: string;
+  lastSegment?: BsddLastSegmentInfo;
+  temporaryStorage?: BsddTemporaryStorageInfo;
+  stateSummary?: BsddStateSummary;
+}
+
 export interface BsdElastic {
   type: BsdType;
   id: string;
+  isDraft: boolean;
+  status?: CommonBsdStatus;
   createdAt: number;
   readableId: string;
   emitterCompanyName: string;
@@ -60,6 +108,10 @@ export interface BsdElastic {
   isOutgoingWasteFor: string[];
   isTransportedWasteFor: string[];
   isManagedWasteFor: string[];
+
+  bsda?: BsdaElastic;
+  bsdasri?: BsdasriElastic;
+  bsdd?: BsddElastic;
 }
 
 // Custom analyzers for readableId and waste fields
@@ -127,7 +179,11 @@ const settings = {
   }
 };
 
-const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
+type IndexableBsdElastic = Omit<
+  BsdElastic,
+  "status" | "isDraft" | "bsda" | "bsdasri" | "bsdd" | "bsff" | "bsvhu"
+>;
+const properties: Record<keyof IndexableBsdElastic, Record<string, unknown>> = {
   // "keyword" is used for exact matches
   // "text" for fuzzy matches
   // but it's not possible to sort on "text" fields
@@ -135,6 +191,7 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   id: {
     type: "keyword"
   },
+
   readableId: {
     type: "text",
     analyzer: "readableId",
@@ -148,6 +205,7 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   type: {
     type: "keyword"
   },
+
   emitterCompanyName: {
     type: "text",
     fields: {
@@ -295,7 +353,7 @@ export const index = {
  * Returns the keyword field matching the given fieldName.
  *
  * e.g passing "readableId" returns "readableId.keyword",
- *     because "redableId" is a "text" with a sub field "readableId.keyword" which is a keyword.
+ *     because "readableId" is a "text" with a sub field "readableId.keyword" which is a keyword.
  *
  * e.g passing "id" returns "id", because it's already a keyword.
  *
@@ -303,7 +361,7 @@ export const index = {
  * For example when sorting, where it's not possible to sort on text fields.
  */
 export function getKeywordFieldNameFromName(
-  fieldName: keyof BsdElastic
+  fieldName: keyof IndexableBsdElastic
 ): string {
   const property = index.mappings.properties[fieldName];
 
