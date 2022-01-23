@@ -84,7 +84,7 @@ export const FullBsvhuFragment = gql`
   ${companyFragment}
 `;
 
-export const GET_VHU_FORM = gql`
+export const GET_BSVHU = gql`
   query Bsvhu($id: ID!) {
     bsvhu(id: $id) {
       ...FullBsvhu
