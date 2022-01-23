@@ -3,9 +3,11 @@ import {
   Mutation,
   QuantityType,
   MutationMarkAsTempStorerAcceptedArgs,
+  Query,
+  QueryFormArgs,
 } from "generated/graphql/types";
 import { WorkflowActionProps } from "./WorkflowAction";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useLazyQuery } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
 import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton, Loader } from "common/components";
@@ -13,6 +15,7 @@ import { IconWarehouseStorage } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 import AcceptedInfo from "./AcceptedInfo";
 import { GET_BSDS } from "common/queries";
+import { GET_FORM } from "form/bsdd/utils/queries";
 
 const MARK_TEMP_STORER_ACCEPTED = gql`
   mutation MarkAsTempStorerAccepted(
@@ -29,10 +32,17 @@ const MARK_TEMP_STORER_ACCEPTED = gql`
   ${statusChangeFragment}
 `;
 
-export default function MarkAsTempStorerAccepted({
-  form,
-  siret,
-}: WorkflowActionProps) {
+export default function MarkAsTempStorerAccepted({ bsd }: WorkflowActionProps) {
+  const [
+    getBsdd,
+    { error: bsddGetError, data, loading: bsddGetLoading },
+  ] = useLazyQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
+    variables: {
+      id: bsd.id,
+      readableId: null,
+    },
+    fetchPolicy: "network-only",
+  });
   const [markAsTempStorerAccepted, { loading, error }] = useMutation<
     Pick<Mutation, "markAsTempStorerAccepted">,
     MutationMarkAsTempStorerAcceptedArgs
@@ -49,36 +59,57 @@ export default function MarkAsTempStorerAccepted({
       trigger={open => (
         <ActionButton
           icon={<IconWarehouseStorage size="24px" />}
-          onClick={open}
+          onClick={() => {
+            getBsdd();
+            open();
+          }}
         >
           {actionLabel}
         </ActionButton>
       )}
-      modalContent={close => (
-        <div>
-          <AcceptedInfo
-            form={form}
-            close={close}
-            onSubmit={values =>
-              markAsTempStorerAccepted({
-                variables: {
-                  id: form.id,
-                  tempStorerAcceptedInfo: {
-                    ...values,
-                    quantityReceived: values.quantityReceived ?? 0,
-                    quantityType: values.quantityType ?? QuantityType.Real,
-                  },
-                },
-              })
-            }
-          />
+      modalContent={close => {
+        if (!!bsddGetLoading) {
+          return <Loader />;
+        }
+        if (!!bsddGetError) {
+          return (
+            <NotificationError
+              className="action-error"
+              apolloError={bsddGetError}
+            />
+          );
+        }
+        if (!!data?.form) {
+          return (
+            <div>
+              <AcceptedInfo
+                form={data?.form}
+                close={close}
+                onSubmit={values =>
+                  markAsTempStorerAccepted({
+                    variables: {
+                      id: bsd.id,
+                      tempStorerAcceptedInfo: {
+                        ...values,
+                        quantityReceived: values.quantityReceived ?? 0,
+                        quantityType: values.quantityType ?? QuantityType.Real,
+                      },
+                    },
+                  })
+                }
+              />
 
-          {error && (
-            <NotificationError className="action-error" apolloError={error} />
-          )}
-          {loading && <Loader />}
-        </div>
-      )}
+              {error && (
+                <NotificationError
+                  className="action-error"
+                  apolloError={error}
+                />
+              )}
+              {loading && <Loader />}
+            </div>
+          );
+        }
+      }}
     />
   );
 }

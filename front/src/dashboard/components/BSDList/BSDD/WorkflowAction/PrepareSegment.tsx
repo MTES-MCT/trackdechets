@@ -16,6 +16,7 @@ import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { transportModeLabels } from "dashboard/constants";
 import { WorkflowActionProps } from "./WorkflowAction";
+
 import TdSwitch from "common/components/Switch";
 import { GET_BSDS, GET_DETAIL_FORM } from "common/queries";
 import { Loader } from "common/components";
@@ -33,7 +34,7 @@ const PREPARE_SEGMENT = gql`
   ${segmentFragment}
 `;
 
-export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
+export default function PrepareSegment({ bsd, siret }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [prepareSegment, { loading, error }] = useMutation<
     Pick<Mutation, "prepareSegment">,
@@ -93,7 +94,7 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
               // prevent empty strings to be sent for validityLimit
               prepareSegment({
                 variables: {
-                  id: form.id,
+                  id: bsd.id,
                   siret,
                   nextSegmentInfo: {
                     transporter: {

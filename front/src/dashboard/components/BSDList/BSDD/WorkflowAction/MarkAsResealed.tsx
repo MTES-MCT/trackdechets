@@ -6,18 +6,26 @@ import CompanySelector from "form/common/components/company/CompanySelector";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import Packagings from "form/bsdd/components/packagings/Packagings";
-import { FormStatus, Mutation, WasteDetails } from "generated/graphql/types";
+import {
+  FormStatus,
+  Mutation,
+  WasteDetails,
+  Query,
+  QueryFormArgs,
+} from "generated/graphql/types";
+
 import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton, Loader } from "common/components";
 import { IconPaperWrite } from "common/components/Icons";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useLazyQuery } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
 import { NotificationError } from "common/components/Error";
 import cogoToast from "cogo-toast";
 import Transporter from "form/bsdd/Transporter";
 import { GET_BSDS } from "common/queries";
+import { GET_FORM } from "form/bsdd/utils/queries";
 
 const MARK_RESEALED = gql`
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {
@@ -28,21 +36,22 @@ const MARK_RESEALED = gql`
   ${statusChangeFragment}
 `;
 
-export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
+const MarkAsResealedForm = ({ queryResult }) => {
+  const { error, data, loading } = queryResult;
+
   const initialValues = mergeDefaults(
     emptyState,
-    form.temporaryStorageDetail || {}
+    data?.form.temporaryStorageDetail || {}
   );
   const [isRefurbished, setIsRefurbished] = useState(
-    !!form.temporaryStorageDetail?.wasteDetails?.quantity
+    !!data?.form.temporaryStorageDetail?.wasteDetails?.quantity
   );
-
   function onChangeRefurbished(values, setFieldValue: (field, value) => void) {
     const willBeRefurbished = !isRefurbished;
     setIsRefurbished(willBeRefurbished);
 
     if (willBeRefurbished) {
-      const { wasteDetails } = form;
+      const { wasteDetails } = data?.form;
 
       if (wasteDetails == null) {
         return;
@@ -75,10 +84,10 @@ export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
       });
     }
   }
-
-  const [markAsResealed, { error, loading }] = useMutation<
-    Pick<Mutation, "markAsResealed">
-  >(MARK_RESEALED, {
+  const [
+    markAsResealed,
+    { error: mutationError, loading: mutationLoading },
+  ] = useMutation<Pick<Mutation, "markAsResealed">>(MARK_RESEALED, {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: data => {
@@ -93,161 +102,190 @@ export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
     },
   });
 
+  if (!!loading) {
+    return <Loader />;
+  }
+  if (!!error) {
+    return <NotificationError className="action-error" apolloError={error} />;
+  }
+  return (
+    <>
+      <Formik
+        initialValues={initialValues}
+        onSubmit={values =>
+          markAsResealed({
+            variables: { id: data?.form.id, resealedInfos: values },
+          })
+        }
+      >
+        {({ values, setFieldValue }) => (
+          <Form>
+            <h5 className="form__section-heading">
+              Installation de destination prévue
+            </h5>
+
+            <div className="form__row form__row--inline">
+              <Field
+                name="destination.isFilledByEmitter"
+                type="checkbox"
+                id="isFilledByEmitter"
+                className="td-checkbox"
+              />
+              <label htmlFor="isFilledByEmitter">
+                Je suis l'émetteur du bordereau
+              </label>
+            </div>
+
+            <CompanySelector name="destination.company" />
+
+            <div className="form__row">
+              <label>
+                Numéro de CAP (le cas échéant)
+                <Field
+                  type="text"
+                  name="destination.cap"
+                  className="td-input"
+                />
+              </label>
+            </div>
+
+            <div className="form__row">
+              <Field
+                component={ProcessingOperationSelect}
+                name="destination.processingOperation"
+              />
+            </div>
+
+            <div className="form__row form__row--inline">
+              <input
+                type="checkbox"
+                checked={isRefurbished}
+                id="id_isRefurbished"
+                className="td-checkbox"
+                onChange={() => onChangeRefurbished(values, setFieldValue)}
+              />
+              <label htmlFor="id_isRefurbished">
+                Les déchets ont subi un reconditionnement, je dois saisir les
+                détails
+              </label>
+            </div>
+
+            {isRefurbished && (
+              <>
+                <h5 className="form__section-heading">Détails du déchet</h5>
+
+                <h4>Conditionnement</h4>
+
+                <Field
+                  name="wasteDetails.packagingInfos"
+                  component={Packagings}
+                />
+
+                <h4>Quantité en tonnes</h4>
+                <div className="form__row">
+                  <Field
+                    component={NumberInput}
+                    name="wasteDetails.quantity"
+                    className="td-input"
+                    placeholder="En tonnes"
+                    min="0"
+                    step="0.001"
+                  />
+
+                  <RedErrorMessage name="wasteDetails.quantity" />
+
+                  <fieldset>
+                    <legend>Cette quantité est</legend>
+                    <Field
+                      name="wasteDetails.quantityType"
+                      id="REAL"
+                      label="Réelle"
+                      component={RadioButton}
+                    />
+                    <Field
+                      name="wasteDetails.quantityType"
+                      id="ESTIMATED"
+                      label="Estimée"
+                      component={RadioButton}
+                    />
+                  </fieldset>
+
+                  <RedErrorMessage name="wasteDetails.quantityType" />
+                </div>
+                <div className="form__row">
+                  <label>
+                    Mentions au titre des règlements ADR, RID, ADNR, IMDG (le
+                    cas échéant)
+                    <Field
+                      type="text"
+                      name="wasteDetails.onuCode"
+                      className="td-input"
+                    />
+                  </label>
+                </div>
+              </>
+            )}
+
+            <h5 className="form__section-heading">
+              Collecteur-transporteur après entreposage ou reconditionnement
+            </h5>
+
+            <Transporter />
+
+            <div className="form__actions">
+              <button
+                type="button"
+                className="btn btn--outline-primary"
+                onClick={() => 1}
+              >
+                Annuler
+              </button>
+              <button type="submit" className="btn btn--primary">
+                Je valide
+              </button>
+            </div>
+          </Form>
+        )}
+      </Formik>
+      {mutationError && (
+        <NotificationError className="action-error" apolloError={error} />
+      )}
+      {mutationLoading && <Loader />}
+    </>
+  );
+};
+
+export default function MarkAsResealed({ bsd }: WorkflowActionProps) {
+  const [getBsdd, bsddQueryResult] = useLazyQuery<
+    Pick<Query, "form">,
+    QueryFormArgs
+  >(GET_FORM, {
+    variables: {
+      id: bsd.id,
+      readableId: null,
+    },
+    fetchPolicy: "network-only",
+  });
+
   const actionLabel = "Compléter le BSD suite";
 
   return (
     <TdModalTrigger
       ariaLabel={actionLabel}
       trigger={open => (
-        <ActionButton icon={<IconPaperWrite size="24px" />} onClick={open}>
+        <ActionButton
+          icon={<IconPaperWrite size="24px" />}
+          onClick={() => {
+            getBsdd();
+            open();
+          }}
+        >
           {actionLabel}
         </ActionButton>
       )}
-      modalContent={close => (
-        <div>
-          <Formik
-            initialValues={initialValues}
-            onSubmit={values =>
-              markAsResealed({
-                variables: { id: form.id, resealedInfos: values },
-              })
-            }
-          >
-            {({ values, setFieldValue }) => (
-              <Form>
-                <h5 className="form__section-heading">
-                  Installation de destination prévue
-                </h5>
-
-                <div className="form__row form__row--inline">
-                  <Field
-                    name="destination.isFilledByEmitter"
-                    type="checkbox"
-                    id="isFilledByEmitter"
-                    className="td-checkbox"
-                  />
-                  <label htmlFor="isFilledByEmitter">
-                    Je suis l'émetteur du bordereau
-                  </label>
-                </div>
-
-                <CompanySelector name="destination.company" />
-
-                <div className="form__row">
-                  <label>
-                    Numéro de CAP (le cas échéant)
-                    <Field
-                      type="text"
-                      name="destination.cap"
-                      className="td-input"
-                    />
-                  </label>
-                </div>
-
-                <div className="form__row">
-                  <Field
-                    component={ProcessingOperationSelect}
-                    name="destination.processingOperation"
-                  />
-                </div>
-
-                <div className="form__row form__row--inline">
-                  <input
-                    type="checkbox"
-                    checked={isRefurbished}
-                    id="id_isRefurbished"
-                    className="td-checkbox"
-                    onChange={() => onChangeRefurbished(values, setFieldValue)}
-                  />
-                  <label htmlFor="id_isRefurbished">
-                    Les déchets ont subi un reconditionnement, je dois saisir
-                    les détails
-                  </label>
-                </div>
-
-                {isRefurbished && (
-                  <>
-                    <h5 className="form__section-heading">Détails du déchet</h5>
-
-                    <h4>Conditionnement</h4>
-
-                    <Field
-                      name="wasteDetails.packagingInfos"
-                      component={Packagings}
-                    />
-
-                    <h4>Quantité en tonnes</h4>
-                    <div className="form__row">
-                      <Field
-                        component={NumberInput}
-                        name="wasteDetails.quantity"
-                        className="td-input"
-                        placeholder="En tonnes"
-                        min="0"
-                        step="0.001"
-                      />
-
-                      <RedErrorMessage name="wasteDetails.quantity" />
-
-                      <fieldset>
-                        <legend>Cette quantité est</legend>
-                        <Field
-                          name="wasteDetails.quantityType"
-                          id="REAL"
-                          label="Réelle"
-                          component={RadioButton}
-                        />
-                        <Field
-                          name="wasteDetails.quantityType"
-                          id="ESTIMATED"
-                          label="Estimée"
-                          component={RadioButton}
-                        />
-                      </fieldset>
-
-                      <RedErrorMessage name="wasteDetails.quantityType" />
-                    </div>
-                    <div className="form__row">
-                      <label>
-                        Mentions au titre des règlements ADR, RID, ADNR, IMDG
-                        (le cas échéant)
-                        <Field
-                          type="text"
-                          name="wasteDetails.onuCode"
-                          className="td-input"
-                        />
-                      </label>
-                    </div>
-                  </>
-                )}
-
-                <h5 className="form__section-heading">
-                  Collecteur-transporteur après entreposage ou reconditionnement
-                </h5>
-
-                <Transporter />
-
-                <div className="form__actions">
-                  <button
-                    type="button"
-                    className="btn btn--outline-primary"
-                    onClick={close}
-                  >
-                    Annuler
-                  </button>
-                  <button type="submit" className="btn btn--primary">
-                    Je valide
-                  </button>
-                </div>
-              </Form>
-            )}
-          </Formik>
-          {error && (
-            <NotificationError className="action-error" apolloError={error} />
-          )}
-          {loading && <Loader />}
-        </div>
-      )}
+      modalContent={close => {
+        return <MarkAsResealedForm queryResult={bsddQueryResult} />;
+      }}
     />
   );
 }

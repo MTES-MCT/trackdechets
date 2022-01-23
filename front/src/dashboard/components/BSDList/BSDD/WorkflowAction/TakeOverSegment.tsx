@@ -20,7 +20,7 @@ const TAKE_OVER_SEGMENT = gql`
   }
 `;
 
-export default function TakeOverSegment({ form }: WorkflowActionProps) {
+export default function TakeOverSegment({ bsd }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [takeOverSegment, { loading, error }] = useMutation<
     Pick<Mutation, "takeOverSegment">,
@@ -35,8 +35,12 @@ export default function TakeOverSegment({ form }: WorkflowActionProps) {
       });
     },
   });
-  const transportSegments = form.transportSegments!;
-  const segment = transportSegments[transportSegments.length - 1];
+
+  if (!bsd.bsdd?.lastSegment?.id) {
+    return null;
+  }
+
+  const segment = bsd.bsdd.lastSegment;
 
   const initialValues = {
     takenOverBy: "",
@@ -63,7 +67,7 @@ export default function TakeOverSegment({ form }: WorkflowActionProps) {
             onSubmit={values => {
               const variables = {
                 takeOverInfo: { ...values },
-                id: segment.id,
+                id: segment.id!,
               };
 
               takeOverSegment({ variables }).catch(() => {});

@@ -1,116 +1,127 @@
 import React from "react";
-import { Form, FormStatus } from "generated/graphql/types";
+import { CommonBsd, CommonBsdStatus } from "generated/graphql/types";
 import MarkAsSealed from "./MarkAsSealed";
-import MarkAsReceived from "./MarkAsReceived";
+
 import MarkAsAccepted from "./MarkAsAccepted";
 import MarkAsProcessed from "./MarkAsProcessed";
 import MarkAsTempStored from "./MarkAsTempStored";
 import MarkAsResealed from "./MarkAsResealed";
 import MarkAsTempStorerAccepted from "./MarkAsTempStorerAccepted";
-import SignedByTransporter from "./SignedByTransporter";
+import { SignedByTransporter } from "./SignedByTransporter/SignedByTransporter";
 import PrepareSegment from "./PrepareSegment";
 import MarkSegmentAsReadyToTakeOver from "./MarkSegmentAsReadyToTakeOver";
 import TakeOverSegment from "./TakeOverSegment";
-
+import { useRouteMatch } from "react-router-dom";
+import routes from "common/routes";
+import MarkAsReceived from "dashboard/components/BSDList/BSDD/WorkflowAction/MarkAsReceived";
 export interface WorkflowActionProps {
-  form: Form;
+  bsd: CommonBsd;
   siret: string;
+  usedInTab?: boolean;
 }
 
 export function WorkflowAction(props: WorkflowActionProps) {
-  const { form, siret } = props;
+  const { bsd, siret, usedInTab = false } = props;
 
-  const isTempStorage = form.recipient?.isTempStorage;
+  // prevent action button to appear in wrong tabs when siret plays several roles on the bsd
+  const isActTabRoute = !!useRouteMatch(routes.dashboard.bsds.act);
+  const isToCollectTabRoute = !!useRouteMatch(
+    routes.dashboard.transport.toCollect
+  );
+  const isActTab = usedInTab ? isActTabRoute : true;
+  const isToCollectTab = usedInTab ? isToCollectTabRoute : true;
 
-  switch (form.status) {
-    case FormStatus.Draft:
+  const isTempStorage = bsd?.bsdd?.temporaryStorage?.recipientIsTempStorage;
+  switch (bsd.status) {
+    case CommonBsdStatus.Draft:
       return <MarkAsSealed {...props} />;
-    case FormStatus.Sealed: {
-      if (siret === form.transporter?.company?.siret) {
+    case CommonBsdStatus.Sealed: {
+      if (siret === bsd.transporter?.company?.siret && isToCollectTab) {
         return <SignedByTransporter {...props} />;
       }
       return null;
     }
-    case FormStatus.Sent: {
-      if (siret === form.recipient?.company?.siret) {
+    case CommonBsdStatus.Sent: {
+      if (siret === bsd.destination?.company?.siret && isActTab) {
         if (isTempStorage) {
           return <MarkAsTempStored {...props} />;
         }
         return <MarkAsReceived {...props} />;
       }
 
-      const transportSegments = form.transportSegments ?? [];
-      const lastSegment = transportSegments[transportSegments.length - 1];
-
-      if (form.currentTransporterSiret === siret) {
+      if (bsd.bsdd?.currentTransporterSiret === siret) {
         if (
           // there are no segments yet, current transporter can create one
-          lastSegment == null ||
+          !bsd.bsdd?.lastSegment ||
           // the last segment was taken over and current user is the current transporter
           // which means there are no pending transfers so they can create a new segment
-          lastSegment.takenOverAt
+          bsd.bsdd?.lastSegment.takenOver
         ) {
           return <PrepareSegment {...props} />;
         }
 
         if (
           // the last segment is still a draft
-          !lastSegment.readyToTakeOver &&
+          !bsd.bsdd?.lastSegment.readyToTakeOver &&
           // that was created by the current user
-          lastSegment.previousTransporterCompanySiret === siret
+          bsd.bsdd?.lastSegment?.previousTransporterCompanySiret === siret
         ) {
           return <MarkSegmentAsReadyToTakeOver {...props} />;
         }
       }
 
-      if (form.nextTransporterSiret === siret && lastSegment.readyToTakeOver) {
+      if (
+        bsd.bsdd?.nextTransporterSiret === siret &&
+        bsd.bsdd?.lastSegment?.readyToTakeOver
+      ) {
         return <TakeOverSegment {...props} />;
       }
 
       return null;
     }
-    case FormStatus.TempStored: {
-      if (siret === form.recipient?.company?.siret) {
+    case CommonBsdStatus.TempStored: {
+      if (siret === bsd.destination?.company?.siret) {
         return <MarkAsTempStorerAccepted {...props} />;
       }
       return null;
     }
-    case FormStatus.TempStorerAccepted: {
-      if (siret === form.recipient?.company?.siret) {
+    case CommonBsdStatus.TempStorerAccepted: {
+      if (siret === bsd.destination?.company?.siret) {
         return <MarkAsResealed {...props} />;
       }
       return null;
     }
-    case FormStatus.Resealed: {
-      if (siret === form.temporaryStorageDetail?.transporter?.company?.siret) {
+    case CommonBsdStatus.Resealed: {
+      if (siret === bsd?.bsdd?.temporaryStorage?.transporterCompanySiret) {
         return <SignedByTransporter {...props} />;
       }
       return null;
     }
-    case FormStatus.Resent: {
-      if (siret === form.temporaryStorageDetail?.destination?.company?.siret) {
+    case CommonBsdStatus.Resent: {
+      if (siret === bsd?.bsdd?.temporaryStorage?.destinationCompanySiret) {
         return <MarkAsReceived {...props} />;
       }
       return null;
     }
-    case FormStatus.Received: {
+    case CommonBsdStatus.Received: {
       if (
         (isTempStorage &&
-          siret === form.temporaryStorageDetail?.destination?.company?.siret) ||
-        (!isTempStorage && siret === form.recipient?.company?.siret)
+          siret === bsd?.bsdd?.temporaryStorage?.destinationCompanySiret) ||
+        (!isTempStorage && siret === bsd.destination?.company?.siret)
       ) {
         return <MarkAsAccepted {...props} />;
       }
       return null;
     }
-    case FormStatus.Accepted: {
+    case CommonBsdStatus.Accepted: {
       if (
         (isTempStorage &&
-          siret === form.temporaryStorageDetail?.destination?.company?.siret) ||
-        (!isTempStorage && siret === form.recipient?.company?.siret)
+          siret === bsd?.bsdd?.temporaryStorage?.destinationCompanySiret) ||
+        (!isTempStorage && siret === bsd.destination?.company?.siret)
       ) {
         return <MarkAsProcessed {...props} />;
       }
+
       return null;
     }
     default:

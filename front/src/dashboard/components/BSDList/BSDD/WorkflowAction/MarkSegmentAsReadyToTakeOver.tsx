@@ -25,8 +25,7 @@ const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
 `;
 
 export default function MarkSegmentAsReadyToTakeOver({
-  form,
-  siret,
+  bsd,
 }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [markSegmentAsReadyToTakeOver, { loading, error }] = useMutation<
@@ -44,10 +43,11 @@ export default function MarkSegmentAsReadyToTakeOver({
     },
   });
 
-  const segments = form.transportSegments!;
-  // it's not possible to create a new segment if the last one
-  // was not taken over. so the segment to take over is always the last
-  const segment = segments[segments.length - 1];
+  if (!bsd.bsdd?.lastSegment?.id) {
+    return null;
+  }
+
+  const lastSegment = bsd.bsdd.lastSegment;
 
   return (
     <>
@@ -55,7 +55,7 @@ export default function MarkSegmentAsReadyToTakeOver({
         icon={<IconPaperWrite size="24px" />}
         onClick={() => setIsOpen(true)}
       >
-        Finaliser pour transférer
+        Finaliser pour transférer (Multimodal)
       </ActionButton>
       {isOpen && (
         <TdModal
@@ -67,14 +67,16 @@ export default function MarkSegmentAsReadyToTakeOver({
             initialValues={{}}
             onSubmit={() => {
               const variables = {
-                id: segment.id,
+                id: lastSegment.id!,
               };
               markSegmentAsReadyToTakeOver({ variables }).catch(() => {});
             }}
           >
             {() => (
               <FormikForm>
-                <h3 className="h3 tw-mb-4">Préparer un transfert multimodal</h3>
+                <h3 className="h3 tw-mb-4">
+                  Finaliser un transfert multimodal
+                </h3>
 
                 <p>
                   Cette action aura pour effet de finaliser le segment suivant,

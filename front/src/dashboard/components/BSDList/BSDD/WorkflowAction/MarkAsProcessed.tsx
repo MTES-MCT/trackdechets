@@ -11,16 +11,21 @@ import {
   FormStatus,
   Mutation,
   MutationMarkAsProcessedArgs,
+  Query,
+  QueryFormArgs,
 } from "generated/graphql/types";
-import { gql, useMutation } from "@apollo/client";
-import { statusChangeFragment } from "common/fragments";
 import { WorkflowActionProps } from "./WorkflowAction";
+
+import { gql, useMutation, useLazyQuery } from "@apollo/client";
+import { statusChangeFragment } from "common/fragments";
+
 import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton, Loader } from "common/components";
 import { IconCogApproved } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 import cogoToast from "cogo-toast";
 import { GET_BSDS } from "common/queries";
+import { GET_FORM } from "form/bsdd/utils/queries";
 
 const MARK_AS_PROCESSED = gql`
   mutation MarkAsProcessed($id: ID!, $processedInfo: ProcessedFormInput!) {
@@ -177,7 +182,18 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   );
 }
 
-export default function MarkAsProcessed({ form, siret }: WorkflowActionProps) {
+export default function MarkAsProcessed({ bsd }: WorkflowActionProps) {
+  const [
+    getBsdd,
+    { error: bsddGetError, data, loading: bsddGetLoading },
+  ] = useLazyQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
+    variables: {
+      id: bsd.id,
+      readableId: null,
+    },
+    fetchPolicy: "network-only",
+  });
+
   const [markAsProcessed, { loading, error }] = useMutation<
     Pick<Mutation, "markAsProcessed">,
     MutationMarkAsProcessedArgs
@@ -202,35 +218,59 @@ export default function MarkAsProcessed({ form, siret }: WorkflowActionProps) {
     <TdModalTrigger
       ariaLabel={actionLabel}
       trigger={open => (
-        <ActionButton icon={<IconCogApproved size="24px" />} onClick={open}>
+        <ActionButton
+          icon={<IconCogApproved size="24px" />}
+          onClick={() => {
+            getBsdd();
+            open();
+          }}
+        >
           {actionLabel}
         </ActionButton>
       )}
-      modalContent={close => (
-        <div>
-          <Formik
-            initialValues={{
-              processingOperationDone: "",
-              processingOperationDescription: "",
-              processedBy: "",
-              processedAt: new Date().toISOString(),
-              nextDestination: null,
-              noTraceability: null,
-            }}
-            onSubmit={values =>
-              markAsProcessed({
-                variables: { id: form.id, processedInfo: values },
-              })
-            }
-          >
-            <ProcessedInfo form={form} close={close} />
-          </Formik>
-          {error && (
-            <NotificationError className="action-error" apolloError={error} />
-          )}
-          {loading && <Loader />}
-        </div>
-      )}
+      modalContent={close => {
+        if (!!bsddGetLoading) {
+          return <Loader />;
+        }
+        if (!!bsddGetError) {
+          return (
+            <NotificationError
+              className="action-error"
+              apolloError={bsddGetError}
+            />
+          );
+        }
+        if (!!data?.form) {
+          return (
+            <div>
+              <Formik
+                initialValues={{
+                  processingOperationDone: "",
+                  processingOperationDescription: "",
+                  processedBy: "",
+                  processedAt: new Date().toISOString(),
+                  nextDestination: null,
+                  noTraceability: null,
+                }}
+                onSubmit={values => {
+                  markAsProcessed({
+                    variables: { id: data.form.id, processedInfo: values },
+                  });
+                }}
+              >
+                <ProcessedInfo form={data.form} close={close} />
+              </Formik>
+              {error && (
+                <NotificationError
+                  className="action-error"
+                  apolloError={error}
+                />
+              )}
+              {loading && <Loader />}
+            </div>
+          );
+        }
+      }}
     />
   );
 }

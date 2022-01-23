@@ -24,12 +24,12 @@ const MARK_AS_SEALED = gql`
   ${statusChangeFragment}
 `;
 
-export default function MarkAsSealed({ form, siret }: WorkflowActionProps) {
+export default function MarkAsSealed({ bsd }: WorkflowActionProps) {
   const [markAsSealed, { loading, error }] = useMutation<
     Pick<Mutation, "markAsSealed">,
     MutationMarkAsSealedArgs
   >(MARK_AS_SEALED, {
-    variables: { id: form.id },
+    variables: { id: bsd.id },
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onCompleted: data => {

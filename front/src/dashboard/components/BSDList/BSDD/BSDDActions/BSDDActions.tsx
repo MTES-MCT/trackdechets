@@ -19,7 +19,7 @@ import {
   IconTrash,
   IconView,
 } from "common/components/Icons";
-import { Form, FormStatus } from "generated/graphql/types";
+import { CommonBsd, CommonBsdStatus } from "generated/graphql/types";
 import { DeleteModal } from "./DeleteModal";
 import { useDuplicate } from "./useDuplicate";
 import { useDownloadPdf } from "./useDownloadPdf";
@@ -27,15 +27,15 @@ import styles from "../../BSDActions.module.scss";
 import { Loader } from "common/components";
 
 interface BSDDActionsProps {
-  form: Form;
+  bsd: CommonBsd;
 }
 
-export const BSDDActions = ({ form }: BSDDActionsProps) => {
+export const BSDDActions = ({ bsd }: BSDDActionsProps) => {
   const { siret } = useParams<{ siret: string }>();
   const location = useLocation();
-  const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
+  const [downloadPdf] = useDownloadPdf({ variables: { id: bsd.id } });
   const [duplicateForm, { loading: isDuplicating }] = useDuplicate({
-    variables: { id: form.id },
+    variables: { id: bsd.id },
   });
   const [isDeleting, setIsDeleting] = React.useState(false);
 
@@ -63,7 +63,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                 to={{
                   pathname: generatePath(routes.dashboard.bsdds.view, {
                     siret,
-                    id: form.id,
+                    id: bsd.id,
                   }),
                   state: { background: location },
                 }}
@@ -71,13 +71,15 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
-              {form.status !== FormStatus.Draft && (
+              {bsd.status !== CommonBsdStatus.Draft && (
                 <MenuItem onSelect={() => downloadPdf()}>
                   <IconPdf size="24px" color="blueLight" />
                   Pdf
                 </MenuItem>
               )}
-              {[FormStatus.Draft, FormStatus.Sealed].includes(form.status) && (
+              {[CommonBsdStatus.Draft, CommonBsdStatus.Sealed].includes(
+                bsd.status
+              ) && (
                 <>
                   <MenuItem onSelect={() => setIsDeleting(true)}>
                     <IconTrash color="blueLight" size="24px" />
@@ -87,7 +89,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                     as={Link}
                     to={generatePath(routes.dashboard.bsdds.edit, {
                       siret,
-                      id: form.id,
+                      id: bsd.id,
                     })}
                   >
                     <IconPaperWrite size="24px" color="blueLight" />
@@ -96,16 +98,16 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                 </>
               )}
               {![
-                FormStatus.Draft,
-                FormStatus.Sealed,
-                FormStatus.Refused,
-              ].includes(form.status) && (
+                CommonBsdStatus.Draft,
+                CommonBsdStatus.Sealed,
+                CommonBsdStatus.Refused,
+              ].includes(bsd.status) && (
                 <MenuLink
                   as={Link}
                   to={{
                     pathname: generatePath(routes.dashboard.bsdds.review, {
                       siret,
-                      id: form.id,
+                      id: bsd.id,
                     }),
                     state: { background: location },
                   }}
@@ -126,7 +128,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
         <DeleteModal
           isOpen
           onClose={() => setIsDeleting(false)}
-          formId={form.id}
+          formId={bsd.id}
         />
       )}
       {isDuplicating && <Loader />}
