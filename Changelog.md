@@ -30,6 +30,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Amélioration des requêtes dashboard [PR 1158](https://github.com/MTES-MCT/trackdechets/pull/1158)
+
 # [2022.01.1] 10/01/2022
 
 #### :rocket: Nouvelles fonctionnalités
