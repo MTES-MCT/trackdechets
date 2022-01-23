@@ -35,7 +35,7 @@ export default function FormContainer({
           bsdasriFormType={bsdasriFormType}
         >
           {bsdasri => {
-            const state = !!bsdasri ? bsdasri["bsdasriStatus"] : "";
+            const state = !!bsdasri ? bsdasri.status : "";
             // Use a tweaked emitter component when creating or updating a grouping bsdasri
             const emitterComponent =
               bsdasriFormType === "bsdasriRegroup" ||
