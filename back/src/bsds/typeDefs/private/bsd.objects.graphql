@@ -1,12 +1,99 @@
-type BsdConnection {
-  totalCount: Int!
-  pageInfo: PageInfo!
-  edges: [BsdEdge!]!
-}
+# type BsdConnection {
+#   totalCount: Int!
+#   pageInfo: PageInfo!
+#   edges: [BsdEdge!]!
+# }
 
-type BsdEdge {
-  cursor: String!
-  node: Bsd!
-}
+# type BsdEdge {
+#   cursor: String!
+#   node: Bsd!
+# }
 
 union Bsd = Form | Bsdasri | Bsvhu | Bsda | Bsff
+
+type CommonBsdConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [CommonBsdEdge!]!
+}
+
+type CommonBsdEdge {
+  cursor: String!
+  node: CommonBsd!
+}
+
+type CommonBsdWaste {
+  code: String
+  description: String
+}
+
+type CommonBsdCompany {
+  name: String!
+  siret: String!
+}
+
+type CommonBsdActor {
+  company: CommonBsdCompany!
+}
+
+type CommonBsdTransporter {
+  company: CommonBsdCompany!
+  numberPlate: [String]!
+  customInfo: String
+}
+
+type CommonBsda {
+  type: BsdaType!
+  worker: CommonBsdActor
+  emitterIsPrivateIndividual: Boolean!
+  wasteMaterialName: String
+}
+
+type CommonBsdasri {
+  type: BsdasriType!
+  groupingCount: Int!
+  emitterAllowDirectTakeOver: Boolean!
+}
+type CommonBsff {
+  type: String
+}
+type CommonBsddLastSegmentInfo {
+  id: ID
+  takenOver: Boolean!
+  readyToTakeOver: Boolean!
+  previousTransporterCompanySiret: String
+}
+type CommonBsddTemporaryStorageInfo {
+  recipientIsTempStorage: Boolean!
+  transporterCompanySiret: String
+  destinationCompanySiret: String
+}
+type CommonBsddStateSummaryInfo {
+  transporterCustomInfo: String
+  transporterNumberPlate: String
+  recipientName: String
+}
+type CommonBsdd {
+  currentTransporterSiret: String
+  nextTransporterSiret: String
+  lastSegment: CommonBsddLastSegmentInfo
+  temporaryStorage: CommonBsddTemporaryStorageInfo
+  stateSummary: CommonBsddStateSummaryInfo
+}
+type CommonBsvhu {
+  type: String
+}
+type CommonBsd {
+  id: ID!
+  isDraft: Boolean!
+  status: CommonBsdStatus!
+  readableId: String!
+  type: CommonBsdType!
+  emitter: CommonBsdActor
+  transporter: CommonBsdTransporter
+  destination: CommonBsdActor
+  waste: CommonBsdWaste
+  bsda: CommonBsda
+  bsdasri: CommonBsdasri
+  bsdd: CommonBsdd
+}
