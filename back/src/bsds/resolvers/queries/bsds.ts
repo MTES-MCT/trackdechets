@@ -1,9 +1,7 @@
 import { ApiResponse } from "@elastic/elasticsearch";
 import {
   QueryResolvers,
-  Bsd,
   QueryBsdsArgs,
-  BsdType,
   OrderType
 } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
@@ -15,19 +13,15 @@ import {
   getKeywordFieldNameFromName,
   getFieldNameFromKeyword,
   GetResponse,
-  SearchResponse,
-  toPrismaBsds
+  SearchResponse
 } from "../../../common/elastic";
-import { Bsdasri } from "@prisma/client";
+import { BsdConverterContext } from "../../types";
+
 import prisma from "../../../prisma";
-import { expandFormFromDb } from "../../../forms/form-converter";
-import { unflattenBsdasri } from "../../../bsdasris/converter";
-import { expandVhuFormFromDb } from "../../../bsvhu/converter";
-import { expandBsdaFromDb } from "../../../bsda/converter";
 
 import { getCachedUserSirets } from "../../../common/redis/users";
 
-import { unflattenBsff } from "../../../bsffs/converter";
+import { elasticToBsd } from "../../converter";
 
 async function buildQuery(
   { clue, where = {} }: QueryBsdsArgs,
@@ -210,24 +204,18 @@ async function buildSearchAfter(
   );
 }
 
-/**
- * This function takes an array of dasris and, expand them and add `allowDirectTakeOver` boolean field by
- * requesting emittercompany to know wether direct takeover is allowed
- */
-async function buildDasris(dasris: Bsdasri[]) {
-  // build a list of emitter siret from dasris, non-INITIAL bsds are ignored
-  const emitterSirets = dasris
-    .filter(bsd => !!bsd.emitterCompanySiret && bsd.status === "INITIAL")
-    .map(bsd => bsd.emitterCompanySiret);
-
-  // deduplicate sirets
-  const uniqueSirets = Array.from(new Set(emitterSirets));
-
-  // build an array of sirets allwoing direct takeover
-  const allows = (
+// Extra converter context required to populate some results with non indexable values
+// For now it only provides wich dasri emitter sirets allow direct take over
+async function getConverterContext(
+  bsdasriEmitterSirets: string[]
+): Promise<BsdConverterContext> {
+  if (!bsdasriEmitterSirets?.length) {
+    return { bsdasri: { siretsAllowingDirectDasriTakeover: [] } };
+  }
+  const siretsAllowingDirectDasriTakeover = (
     await prisma.company.findMany({
       where: {
-        siret: { in: uniqueSirets },
+        siret: { in: bsdasriEmitterSirets },
         allowBsdasriTakeOverWithoutSignature: true
       },
       select: {
@@ -236,11 +224,7 @@ async function buildDasris(dasris: Bsdasri[]) {
     })
   ).map(comp => comp.siret);
 
-  // expand dasris and insert `allowDirectTakeOver`
-  return dasris.map(bsd => ({
-    ...unflattenBsdasri(bsd),
-    allowDirectTakeOver: allows.includes(bsd.emitterCompanySiret)
-  }));
+  return { bsdasri: { siretsAllowingDirectDasriTakeover } };
 }
 
 const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
@@ -271,37 +255,23 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
       }
     }
   );
+
   const hits = body.hits.hits.slice(0, size);
 
-  const { bsdds, bsdasris, bsvhus, bsdas, bsffs } = await toPrismaBsds(
-    hits.map(hit => hit._source)
+  const bsdasriEmitterSirets: string[] = Array.from(
+    new Set(
+      hits
+        .filter(hit => hit._source.type === "BSDASRI")
+        .map(hit => hit._source.emitterCompanySiret)
+    )
   );
 
-  const expandedDasris = await buildDasris(bsdasris);
+  const converterContext = await getConverterContext(bsdasriEmitterSirets);
 
-  const bsds: Record<BsdType, Bsd[]> = {
-    BSDD: bsdds.map(expandFormFromDb),
-    BSDASRI: expandedDasris,
-    BSVHU: bsvhus.map(expandVhuFormFromDb),
-    BSDA: bsdas.map(expandBsdaFromDb),
-    BSFF: bsffs.map(unflattenBsff)
-  };
-  const edges = hits
-    .reduce<Array<Bsd>>((acc, { _source: { type, id } }) => {
-      const bsd = bsds[type].find(bsd => bsd.id === id);
-
-      if (bsd) {
-        // filter out null values in case Elastic Search
-        // is desynchronized with the actual database
-        return acc.concat(bsd);
-      }
-
-      return acc;
-    }, [])
-    .map(node => ({
-      cursor: node.id,
-      node
-    }));
+  const edges = hits.map(node => ({
+    cursor: node._source.id,
+    node: elasticToBsd(node, converterContext)
+  }));
 
   const pageInfo = {
     // startCursor and endCursor are null if the list is empty
