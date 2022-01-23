@@ -19,7 +19,8 @@ import {
   IconDuplicateFile,
   IconTrash,
 } from "common/components/Icons";
-import { Bsda, BsdaStatus } from "generated/graphql/types";
+import { CommonBsd, CommonBsdStatus } from "generated/graphql/types";
+
 import { DeleteBsdaModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";
 import { useDuplicate } from "./useDuplicate";
@@ -28,18 +29,18 @@ import styles from "../../BSDActions.module.scss";
 import { Loader } from "common/components";
 
 interface BSdaActionsProps {
-  form: Bsda;
+  bsd: CommonBsd;
 }
 
-export const BSDaActions = ({ form }: BSdaActionsProps) => {
+export const BSDaActions = ({ bsd }: BSdaActionsProps) => {
   const { siret } = useParams<{ siret: string }>();
   const location = useLocation();
 
   const [duplicateBsda, { loading }] = useDuplicate({
-    variables: { id: form.id },
+    variables: { id: bsd.id },
   });
   const [isDeleting, setIsDeleting] = React.useState(false);
-  const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
+  const [downloadPdf] = useDownloadPdf({ variables: { id: bsd.id } });
 
   return (
     <>
@@ -65,7 +66,7 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
                 to={{
                   pathname: generatePath(routes.dashboard.bsdas.view, {
                     siret,
-                    id: form.id,
+                    id: bsd.id,
                   }),
                   state: { background: location },
                 }}
@@ -73,23 +74,23 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
-              {!form.isDraft && (
+              {!bsd.isDraft && (
                 <MenuItem onSelect={() => downloadPdf()}>
                   <IconPdf size="24px" color="blueLight" />
                   Pdf
                 </MenuItem>
               )}
               {![
-                BsdaStatus.Processed,
-                BsdaStatus.Refused,
-                BsdaStatus.AwaitingChild,
-              ].includes(form["bsdaStatus"]) && (
+                CommonBsdStatus.Processed,
+                CommonBsdStatus.Refused,
+                CommonBsdStatus.AwaitingChild,
+              ].includes(bsd.status) && (
                 <>
                   <MenuLink
                     as={Link}
                     to={generatePath(routes.dashboard.bsdas.edit, {
                       siret,
-                      id: form.id,
+                      id: bsd.id,
                     })}
                   >
                     <IconPaperWrite size="24px" color="blueLight" />
@@ -101,7 +102,7 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
                 <IconDuplicateFile size="24px" color="blueLight" />
                 Dupliquer
               </MenuItem>
-              {form["bsdaStatus"] === BsdaStatus.Initial && (
+              {bsd.status === CommonBsdStatus.Initial && (
                 <MenuItem onSelect={() => setIsDeleting(true)}>
                   <IconTrash color="blueLight" size="24px" />
                   Supprimer
@@ -116,7 +117,7 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
         <DeleteBsdaModal
           isOpen
           onClose={() => setIsDeleting(false)}
-          formId={form.id}
+          formId={bsd.id}
         />
       )}
     </>

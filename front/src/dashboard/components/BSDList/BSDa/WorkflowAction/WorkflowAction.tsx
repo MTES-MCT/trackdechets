@@ -1,5 +1,8 @@
 import React from "react";
-import { Bsda, BsdaStatus } from "generated/graphql/types";
+import { CommonBsd, CommonBsdStatus } from "generated/graphql/types";
+import { useRouteMatch } from "react-router-dom";
+import routes from "common/routes";
+
 import PublishBsda from "./PublishBsda";
 import { SignEmission } from "./SignEmission";
 import { SignWork } from "./SignWork";
@@ -7,38 +10,45 @@ import { SignTransport } from "./SignTransport";
 import { SignOperation } from "./SignOperation";
 
 export interface WorkflowActionProps {
-  form: Bsda;
+  bsd: CommonBsd;
   siret: string;
 }
 
 export function WorkflowAction(props: WorkflowActionProps) {
-  const { form, siret } = props;
+  const { bsd, siret } = props;
+  // prevent action button to appear in wrong tabs when siret plays several roles on the bsd
 
-  if (form.isDraft) {
+  const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
+  const isToCollectTab = !!useRouteMatch(routes.dashboard.transport.toCollect);
+  if (bsd.isDraft) {
     return <PublishBsda {...props} />;
   }
-  switch (form["bsdaStatus"]) {
-    case BsdaStatus.Initial:
+
+  switch (bsd.status) {
+    case CommonBsdStatus.Initial:
       if (
-        form.emitter?.isPrivateIndividual &&
-        siret === form.worker?.company?.siret
+        (bsd.bsda?.emitterIsPrivateIndividual &&
+          siret === bsd.bsda?.worker?.company?.siret) ||
+        isActTab
       ) {
-        return <SignWork {...props} bsdaId={form.id} />;
+        return <SignWork {...{ siret }} bsdId={bsd.id} />;
       }
-      if (siret !== form.emitter?.company?.siret) return null;
-      return <SignEmission {...props} bsdaId={form.id} />;
 
-    case BsdaStatus.SignedByProducer:
-      if (siret !== form.worker?.company?.siret) return null;
-      return <SignWork {...props} bsdaId={form.id} />;
+      if (siret !== bsd.emitter?.company?.siret || isActTab) return null;
+      return <SignEmission {...{ siret }} bsdId={bsd.id} />;
 
-    case BsdaStatus.SignedByWorker:
-      if (siret !== form.transporter?.company?.siret) return null;
-      return <SignTransport {...props} bsdaId={form.id} />;
+    case CommonBsdStatus.SignedByProducer:
+      if (siret !== bsd.bsda?.worker?.company?.siret || isActTab) return null;
+      return <SignWork {...{ siret }} bsdId={bsd.id} />;
 
-    case BsdaStatus.Sent:
-      if (siret !== form.destination?.company?.siret) return null;
-      return <SignOperation {...props} bsdaId={form.id} />;
+    case CommonBsdStatus.SignedByWorker:
+      if (siret !== bsd.transporter?.company?.siret || !isToCollectTab)
+        return null;
+      return <SignTransport {...{ siret }} bsdId={bsd.id} />;
+
+    case CommonBsdStatus.Sent:
+      if (siret !== bsd.destination?.company?.siret || isActTab) return null;
+      return <SignOperation {...props} bsdId={bsd.id} />;
 
     default:
       return null;

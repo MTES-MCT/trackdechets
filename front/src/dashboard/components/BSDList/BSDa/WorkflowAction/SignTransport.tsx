@@ -23,11 +23,11 @@ const validationSchema = yup.object({
   author: yup
     .string()
     .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+    .min(1, "Le nom et prénom de l'auteur de la signature sont requis"),
 });
 
-type Props = { siret: string; bsdaId: string };
-export function SignTransport({ siret, bsdaId }: Props) {
+type Props = { siret: string; bsdId: string };
+export function SignTransport({ siret, bsdId }: Props) {
   const [updateBsda, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsda">,
     MutationUpdateBsdaArgs
@@ -38,7 +38,7 @@ export function SignTransport({ siret, bsdaId }: Props) {
   >(SIGN_BSDA, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   return (
-    <SignBsda title="Signer l'enlèvement" bsdaId={bsdaId}>
+    <SignBsda title="Signer l'enlèvement" bsdaId={bsdId}>
       {({ bsda, onClose }) =>
         bsda.metadata?.errors.some(
           error => error.requiredFor === SignatureTypeInput.Transport
