@@ -19,7 +19,7 @@ import {
   IconDuplicateFile,
   IconTrash,
 } from "common/components/Icons";
-import { Bsvhu, BsvhuStatus } from "generated/graphql/types";
+import { CommonBsd, CommonBsdStatus } from "generated/graphql/types";
 import { DeleteBsvhuModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";
 import { useDuplicate } from "./useDuplicate";
@@ -27,19 +27,19 @@ import { useDuplicate } from "./useDuplicate";
 import styles from "../../BSDActions.module.scss";
 import { Loader } from "common/components";
 
-interface BSVhuActionsProps {
-  form: Bsvhu;
+interface BVhuActionsProps {
+  bsd: CommonBsd;
 }
 
-export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
+export const BSVhuActions = ({ bsd }: BVhuActionsProps) => {
   const { siret } = useParams<{ siret: string }>();
   const location = useLocation();
 
   const [duplicateBsvhu, { loading: isDuplicating }] = useDuplicate({
-    variables: { id: form.id },
+    variables: { id: bsd.id },
   });
   const [isDeleting, setIsDeleting] = React.useState(false);
-  const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
+  const [downloadPdf] = useDownloadPdf({ variables: { id: bsd.id } });
 
   return (
     <>
@@ -65,7 +65,7 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
                 to={{
                   pathname: generatePath(routes.dashboard.bsvhus.view, {
                     siret,
-                    id: form.id,
+                    id: bsd.id,
                   }),
                   state: { background: location },
                 }}
@@ -73,21 +73,21 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
-              {!form.isDraft && (
+              {!bsd.isDraft && (
                 <MenuItem onSelect={() => downloadPdf()}>
                   <IconPdf size="24px" color="blueLight" />
                   Pdf
                 </MenuItem>
               )}
-              {![BsvhuStatus.Processed, BsvhuStatus.Refused].includes(
-                form["bsvhuStatus"]
+              {![CommonBsdStatus.Processed, CommonBsdStatus.Refused].includes(
+                bsd.status
               ) && (
                 <>
                   <MenuLink
                     as={Link}
                     to={generatePath(routes.dashboard.bsvhus.edit, {
                       siret,
-                      id: form.id,
+                      id: bsd.id,
                     })}
                   >
                     <IconPaperWrite size="24px" color="blueLight" />
@@ -99,7 +99,7 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
                 <IconDuplicateFile size="24px" color="blueLight" />
                 Dupliquer
               </MenuItem>
-              {form["bsvhuStatus"] === BsvhuStatus.Initial && (
+              {bsd.status === CommonBsdStatus.Initial && (
                 <MenuItem onSelect={() => setIsDeleting(true)}>
                   <IconTrash color="blueLight" size="24px" />
                   Supprimer
@@ -113,7 +113,7 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
         <DeleteBsvhuModal
           isOpen
           onClose={() => setIsDeleting(false)}
-          formId={form.id}
+          formId={bsd.id}
         />
       )}
       {isDuplicating && <Loader />}

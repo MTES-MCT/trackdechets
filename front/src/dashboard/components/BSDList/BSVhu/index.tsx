@@ -1,26 +1,21 @@
 import * as React from "react";
 import { CellProps, CellValue } from "react-table";
 import { IconBSVhu } from "common/components/Icons";
-import { Bsvhu, BsvhuStatus } from "generated/graphql/types";
+
 import { BSVhuActions } from "./BSVhuActions/BSVhuActions";
 import { useParams } from "react-router-dom";
 import { ActionButtonContext } from "common/components/ActionButton";
-import { WorkflowAction } from "./WorkflowAction";
+import { WorkflowAction } from "./WorkflowAction/WorkflowAction";
+import { CommonBsd } from "generated/graphql/types";
 
-const vhuVerboseStatuses: Record<BsvhuStatus, string> = {
-  INITIAL: "Initial",
-  SIGNED_BY_PRODUCER: "Signé par le producteur",
-  SENT: "En cours d'acheminement",
-  PROCESSED: "Traité",
-  REFUSED: "Refusé",
-};
+import { verboseBsdStatuses } from "../../../constants";
 
 // Basic implementation
 export const COLUMNS: Record<
   string,
   {
-    accessor: (form: Bsvhu) => CellValue;
-    Cell?: React.ComponentType<CellProps<Bsvhu>>;
+    accessor: (form: CommonBsd) => CellValue;
+    Cell?: React.ComponentType<CellProps<CommonBsd>>;
   }
 > = {
   type: {
@@ -37,7 +32,7 @@ export const COLUMNS: Record<
     accessor: vhu => vhu?.destination?.company?.name ?? "",
   },
   waste: {
-    accessor: vhu => vhu?.wasteCode,
+    accessor: vhu => vhu?.waste?.code ?? "",
   },
   transporterCustomInfo: {
     accessor: () => null,
@@ -49,7 +44,7 @@ export const COLUMNS: Record<
   },
   status: {
     accessor: vhu =>
-      vhu.isDraft ? "Brouillon" : vhuVerboseStatuses[vhu["bsvhuStatus"]], // unable to use dot notation because of conflicting status fields
+      vhu.isDraft ? "Brouillon" : verboseBsdStatuses[vhu.status],
   },
   workflow: {
     accessor: () => null,
@@ -57,13 +52,13 @@ export const COLUMNS: Record<
       const { siret } = useParams<{ siret: string }>();
       return (
         <ActionButtonContext.Provider value={{ size: "small" }}>
-          <WorkflowAction siret={siret} form={row.original} />
+          <WorkflowAction siret={siret} bsd={row.original} />
         </ActionButtonContext.Provider>
       );
     },
   },
   actions: {
     accessor: () => null,
-    Cell: ({ row }) => <BSVhuActions form={row.original} />,
+    Cell: ({ row }) => <BSVhuActions bsd={row.original} />,
   },
 };

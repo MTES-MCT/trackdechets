@@ -2,11 +2,17 @@ import { useMutation, gql } from "@apollo/client";
 import { useFormik } from "formik";
 import React, { useState } from "react";
 
-import { Form as FormModel } from "generated/graphql/types";
+import {
+  CommonBsd,
+  CommonBsdStatus,
+  Mutation,
+  MutationUpdateTransporterFieldsArgs,
+} from "generated/graphql/types";
 import { NotificationError } from "common/components/Error";
 import { capitalize } from "common/helper";
 import { IconPaperWrite } from "common/components/Icons";
 import TdModal from "common/components/Modal";
+import { GET_BSDS } from "common/queries";
 
 const UPDATE_PLATE = gql`
   mutation updateTransporterFields(
@@ -20,52 +26,48 @@ const UPDATE_PLATE = gql`
       transporterCustomInfo: $transporterCustomInfo
     ) {
       id
-      transporter {
-        numberPlate
-        customInfo
-      }
-      # query stateSummary to update the cache
-      stateSummary {
-        transporterCustomInfo
-        transporterNumberPlate
-      }
     }
   }
 `;
 
 type Props = {
-  form: FormModel;
+  bsd: CommonBsd;
   fieldName: string;
   verboseFieldName: string;
+  initialValue: string;
 };
 
 export default function TransporterInfoEdit({
-  form,
+  bsd,
   fieldName,
   verboseFieldName,
+  initialValue,
 }: Props) {
   const mutationFieldName = `transporter${capitalize(fieldName)}`;
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const [updateTransporterPlate, { error }] = useMutation(UPDATE_PLATE, {
+  const [updateTransporterPlate, { error }] = useMutation<
+    Pick<Mutation, "updateTransporterFields">,
+    MutationUpdateTransporterFieldsArgs
+  >(UPDATE_PLATE, {
+    refetchQueries: [GET_BSDS],
+    awaitRefetchQueries: true,
     onCompleted: () => setIsOpen(false),
   });
 
   const formik = useFormik({
     initialValues: {
-      [fieldName]: form.stateSummary
-        ? form.stateSummary[mutationFieldName]
-        : null,
+      [fieldName]: initialValue,
     },
     onSubmit: values => {
       updateTransporterPlate({
-        variables: { id: form.id, [mutationFieldName]: values[fieldName] },
+        variables: { id: bsd.id, [mutationFieldName]: values[fieldName] },
       });
     },
   });
 
-  if (form.status !== "SEALED") {
+  if (bsd.status !== CommonBsdStatus.Sealed) {
     return null;
   }
   return (

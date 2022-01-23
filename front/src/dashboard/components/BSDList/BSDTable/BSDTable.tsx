@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useTable, useFilters, useSortBy } from "react-table";
-import { Bsd, OrderType, QueryBsdsArgs } from "generated/graphql/types";
+import { OrderType, CommonBsd, QueryBsdsArgs } from "generated/graphql/types";
 import {
   Table,
   TableHead,
@@ -13,7 +13,7 @@ import {
 import { Column, COLUMNS_PARAMETERS_NAME, createColumn } from "../columns";
 
 interface BSDTableProps {
-  bsds: Bsd[];
+  bsds: CommonBsd[];
   columns: Column[];
   refetch: (variables: QueryBsdsArgs) => void;
 }
@@ -45,7 +45,7 @@ export function BSDTable({ bsds, refetch, ...props }: BSDTableProps) {
     rows,
     prepareRow,
     state: { filters, sortBy },
-  } = useTable(
+  } = useTable<CommonBsd>(
     {
       columns,
       data: bsds,

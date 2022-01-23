@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { Loader, Modal } from "common/components";
-import { GET_VHU_FORM } from "form/bsvhu/utils/queries";
+import { GET_BSVHU } from "form/bsvhu/utils/queries";
 import { Query, QueryBsvhuArgs } from "generated/graphql/types";
 import React from "react";
 import { BsvhuSummary } from "./BsvhuSummary";
@@ -13,14 +13,11 @@ type Props = {
 };
 
 export function SignBsvhuModal({ title, bsvhuId, children, onClose }: Props) {
-  const { data } = useQuery<Pick<Query, "bsvhu">, QueryBsvhuArgs>(
-    GET_VHU_FORM,
-    {
-      variables: {
-        id: bsvhuId,
-      },
-    }
-  );
+  const { data } = useQuery<Pick<Query, "bsvhu">, QueryBsvhuArgs>(GET_BSVHU, {
+    variables: {
+      id: bsvhuId,
+    },
+  });
 
   if (data == null) {
     return <Loader />;

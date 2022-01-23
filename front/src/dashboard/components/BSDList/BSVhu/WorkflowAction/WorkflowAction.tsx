@@ -1,33 +1,38 @@
 import React from "react";
-import { Bsvhu, BsvhuStatus } from "generated/graphql/types";
+import { CommonBsd, CommonBsdStatus } from "generated/graphql/types";
 import PublishBsvhu from "./PublishBsvhu";
 import { SignEmission } from "./SignEmission";
 import { SignTransport } from "./SignTransport";
 import { SignOperation } from "./SignOperation";
+import { useRouteMatch } from "react-router-dom";
+import routes from "common/routes";
 
 export interface WorkflowActionProps {
-  form: Bsvhu;
+  bsd: CommonBsd;
   siret: string;
 }
 
 export function WorkflowAction(props: WorkflowActionProps) {
-  const { form, siret } = props;
-
-  if (form.isDraft) {
+  const { bsd, siret } = props;
+  // prevent action button to appear in wrong tabs when siret plays several roles on the bsd
+  const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
+  const isToCollectTab = !!useRouteMatch(routes.dashboard.transport.toCollect);
+  if (bsd.isDraft) {
     return <PublishBsvhu {...props} />;
   }
-  switch (form["bsvhuStatus"]) {
-    case BsvhuStatus.Initial:
-      if (siret !== form.emitter?.company?.siret) return null;
-      return <SignEmission {...props} bsvhuId={form.id} />;
+  switch (bsd.status) {
+    case CommonBsdStatus.Initial:
+      if (siret !== bsd.emitter?.company?.siret || !isActTab) return null;
+      return <SignEmission {...props} bsvhuId={bsd.id} />;
 
-    case BsvhuStatus.SignedByProducer:
-      if (siret !== form.transporter?.company?.siret) return null;
-      return <SignTransport {...props} bsvhuId={form.id} />;
+    case CommonBsdStatus.SignedByProducer:
+      if (siret !== bsd.transporter?.company?.siret || !isToCollectTab)
+        return null;
+      return <SignTransport {...props} bsvhuId={bsd.id} />;
 
-    case BsvhuStatus.Sent:
-      if (siret !== form.destination?.company?.siret) return null;
-      return <SignOperation {...props} bsvhuId={form.id} />;
+    case CommonBsdStatus.Sent:
+      if (siret !== bsd.destination?.company?.siret || !isActTab) return null;
+      return <SignOperation {...props} bsvhuId={bsd.id} />;
 
     default:
       return null;
