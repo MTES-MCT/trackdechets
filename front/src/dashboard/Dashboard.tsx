@@ -31,6 +31,7 @@ import {
 } from "./bsds";
 import { RouteBSDasrisSignEmissionSecretCode } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasriSecretCode";
 import { RouteSignBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
+import { RoutePublishBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RoutepublishBsdasri";
 import {
   RouteBSDasrisView,
   RouteBsvhusView,
@@ -38,8 +39,8 @@ import {
   RouteBSDDsView,
   RouteBSDasView,
 } from "./detail";
-import { RouteTransportToCollect, RouteTransportCollected } from "./transport";
 import { RouteBsdsReview } from "./bsds/review";
+import { RouteTransportToCollect, RouteTransportCollected } from "./transport";
 import { RouteBsddRequestRevision } from "./components/RevisionRequestList/bsdd/request/RouteBsddRequestRevision";
 
 export const GET_ME = gql`
@@ -69,6 +70,7 @@ export default function Dashboard() {
       siret,
     }),
   };
+
   const actionDashboard = {
     pathname: generatePath(routes.dashboard.bsds.act, {
       siret,
@@ -153,15 +155,19 @@ export default function Dashboard() {
             <Route path={routes.dashboard.bsds.drafts}>
               <RouteBsdsDrafts />
             </Route>
+
             <Route path={routes.dashboard.bsds.act}>
               <RouteBsdsAct />
             </Route>
+
             <Route path={routes.dashboard.bsds.follow}>
               <RouteBsdsFollow />
             </Route>
+
             <Route path={routes.dashboard.bsds.history}>
               <RouteBsdsHistory />
             </Route>
+
             <Route path={routes.dashboard.bsds.reviews}>
               <RouteBsdsReview />
             </Route>
@@ -171,6 +177,7 @@ export default function Dashboard() {
             <Route path={routes.dashboard.transport.collected}>
               <RouteTransportCollected />
             </Route>
+
             <Route path={routes.dashboard.exports}>
               <Exports
                 companies={filter(Exports.fragments.company, companies)}
@@ -199,6 +206,7 @@ export default function Dashboard() {
                   <RouteBSDDsView />
                 </Modal>
               </Route>
+
               <Route path={routes.dashboard.bsdds.review}>
                 <Modal
                   onClose={() => history.goBack()}
@@ -208,6 +216,27 @@ export default function Dashboard() {
                   wide={true}
                 >
                   <RouteBsddRequestRevision />
+                </Modal>
+              </Route>
+
+              <Route path={routes.dashboard.bsdasris.view}>
+                <Modal
+                  onClose={() => history.goBack()}
+                  ariaLabel="Aperçu du bordereau"
+                  isOpen
+                  padding={false}
+                  wide={true}
+                >
+                  <RouteBSDasrisView />
+                </Modal>
+              </Route>
+              <Route path={routes.dashboard.bsdasris.sign.publish}>
+                <Modal
+                  onClose={() => history.goBack()}
+                  ariaLabel="Publier un dasri"
+                  isOpen
+                >
+                  <RoutePublishBsdasri />
                 </Modal>
               </Route>
               <Route path={routes.dashboard.bsdasris.sign.emissionSecretCode}>
@@ -274,17 +303,7 @@ export default function Dashboard() {
                   />
                 </Modal>
               </Route>
-              <Route path={routes.dashboard.bsdasris.view}>
-                <Modal
-                  onClose={() => history.goBack()}
-                  ariaLabel="Aperçu du bordereau"
-                  isOpen
-                  padding={false}
-                  wide={true}
-                >
-                  <RouteBSDasrisView />
-                </Modal>
-              </Route>
+
               <Route path={routes.dashboard.bsvhus.view}>
                 <Modal
                   onClose={() => history.goBack()}
