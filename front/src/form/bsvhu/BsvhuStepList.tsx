@@ -17,11 +17,7 @@ import {
 import React, { ReactElement, useMemo } from "react";
 import { generatePath, useHistory, useParams } from "react-router-dom";
 import initialState from "./utils/initial-state";
-import {
-  CREATE_VHU_FORM,
-  UPDATE_VHU_FORM,
-  GET_VHU_FORM,
-} from "./utils/queries";
+import { CREATE_VHU_FORM, UPDATE_VHU_FORM, GET_BSVHU } from "./utils/queries";
 
 interface Props {
   children: (vhuForm: Bsvhu | undefined) => ReactElement;
@@ -32,16 +28,13 @@ export default function BsvhuStepsList(props: Props) {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
 
-  const formQuery = useQuery<Pick<Query, "bsvhu">, QueryBsvhuArgs>(
-    GET_VHU_FORM,
-    {
-      variables: {
-        id: props.formId!,
-      },
-      skip: !props.formId,
-      fetchPolicy: "network-only",
-    }
-  );
+  const formQuery = useQuery<Pick<Query, "bsvhu">, QueryBsvhuArgs>(GET_BSVHU, {
+    variables: {
+      id: props.formId!,
+    },
+    skip: !props.formId,
+    fetchPolicy: "network-only",
+  });
 
   const formState = useMemo(
     () => getComputedState(initialState, formQuery.data?.bsvhu),

@@ -99,8 +99,8 @@ export default function BsdasriStepsList(props: Props) {
     [formQuery.data]
   );
   const status = formState.id
-    ? formQuery?.data?.bsdasri?.["bsdasriStatus"]
-    : "INITIAL";
+    ? formQuery?.data?.bsdasri?.status ?? BsdasriStatus.Initial
+    : BsdasriStatus.Initial;
 
   const [createBsdasri] = useMutation<
     Pick<Mutation, "createBsdasri">,
