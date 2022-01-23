@@ -8,7 +8,8 @@ import {
   BlankslateTitle,
   BlankslateDescription,
 } from "common/components";
-import { BSDList } from "../../components/BSDList";
+import { BSDList } from "../../components/BSDList/BSDList";
+
 import illustration from "./assets/blankslateFollow.svg";
 
 export function RouteBsdsFollow() {
