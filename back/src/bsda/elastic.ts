@@ -122,6 +122,8 @@ function toBsdElastic(bsda: Bsda): BsdElastic {
   return {
     type: "BSDA",
     id: bsda.id,
+    isDraft: bsda.isDraft,
+    status: bsda.status,
     readableId: bsda.id,
     createdAt: bsda.createdAt.getTime(),
     emitterCompanyName: bsda.emitterCompanyName ?? "",
@@ -129,6 +131,7 @@ function toBsdElastic(bsda: Bsda): BsdElastic {
     transporterCompanyName: bsda.transporterCompanyName ?? "",
     transporterCompanySiret: bsda.transporterCompanySiret ?? "",
     transporterTakenOverAt: bsda.transporterTransportTakenOverAt?.getTime(),
+    transporterCustomInfo: bsda.transporterCustomInfo ?? "",
     destinationCompanyName: bsda.destinationCompanyName ?? "",
     destinationCompanySiret: bsda.destinationCompanySiret ?? "",
     destinationReceptionDate: bsda.destinationReceptionDate?.getTime(),
@@ -137,6 +140,13 @@ function toBsdElastic(bsda: Bsda): BsdElastic {
     destinationOperationDate: bsda.destinationOperationDate?.getTime(),
     wasteCode: bsda.wasteCode ?? "",
     wasteDescription: getWasteDescription(bsda),
+    bsda: {
+      type: bsda.type,
+      emitterIsPrivateIndividual: bsda.emitterIsPrivateIndividual,
+      workerCompanySiret: bsda.workerCompanySiret ?? null,
+      workerCompanyName: bsda.workerCompanyName ?? "",
+      wasteMaterialName: bsda.wasteMaterialName ?? ""
+    },
     ...where,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsda)
