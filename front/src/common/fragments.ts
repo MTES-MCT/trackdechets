@@ -373,52 +373,10 @@ const wasteAcceptationFragment = gql`
   }
 `;
 
-export const dashboardDasriFragment = gql`
-  fragment DasriFragment on Bsdasri {
-    id
-    bsdasriStatus: status
-    type
-    isDraft
-    bsdasriWaste: waste {
-      code
-    }
-    emitter {
-      company {
-        ...CompanyFragment
-      }
-      emission {
-        isTakenOverWithoutEmitterSignature
-        isTakenOverWithSecretCode
-      }
-    }
-    transporter {
-      company {
-        ...CompanyFragment
-      }
-      customInfo
-      transport {
-        plates
-      }
-    }
-    destination {
-      company {
-        ...CompanyFragment
-      }
-    }
-    grouping {
-      id
-    }
-    createdAt
-    updatedAt
-    allowDirectTakeOver
-  }
-  ${companyFragment}
-`;
-
 export const fullDasriFragment = gql`
   fragment DasriFragment on Bsdasri {
     id
-    bsdasriStatus: status
+    status
     type
     isDraft
     identification {

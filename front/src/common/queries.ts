@@ -1,12 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  detailFormFragment,
-  fullFormFragment,
-  fullDasriFragment,
-  dashboardDasriFragment,
-  vhuFragment,
-  bsdaFragment,
-} from "./fragments";
+import { detailFormFragment, fullDasriFragment } from "./fragments";
 
 // full fledged bsd to display in detailled views
 export const GET_DETAIL_FORM = gql`
@@ -56,7 +49,7 @@ export const GET_DASRI_METADATA = gql`
 `;
 
 export const GET_BSDS = gql`
-  query GetBsds(
+  query GetFastBsds(
     $after: String
     $first: Int
     $clue: String
@@ -72,47 +65,73 @@ export const GET_BSDS = gql`
     ) {
       edges {
         node {
-          ... on Form {
-            ...FullForm
+          id
+          readableId
+          status
+          isDraft
+          type
+          emitter {
+            company {
+              name
+              siret
+            }
           }
-          ... on Bsdasri {
-            ...DasriFragment
+          destination {
+            company {
+              name
+              siret
+            }
           }
-          ... on Bsvhu {
-            ...VhuFragment
+          waste {
+            code
+            description
           }
-          ... on Bsff {
-            id
-            isDraft
-            bsffStatus: status
-            bsffEmitter: emitter {
+          transporter {
+            company {
+              name
+              siret
+            }
+            numberPlate
+            customInfo
+          }
+          bsda {
+            type
+            wasteMaterialName
+            worker {
               company {
-                siret
                 name
+                siret
               }
             }
-            bsffTransporter: transporter {
-              company {
-                siret
-                name
-              }
-            }
-            bsffDestination: destination {
-              company {
-                siret
-                name
-              }
-            }
-            waste {
-              code
-              description
-            }
           }
-          ... on Bsda {
-            ...BsdaFragment
+          bsdasri {
+            type
+            groupingCount
+            emitterAllowDirectTakeOver
+          }
+          bsdd {
+            currentTransporterSiret
+            nextTransporterSiret
+            lastSegment {
+              id
+              takenOver
+              readyToTakeOver
+              previousTransporterCompanySiret
+            }
+            temporaryStorage {
+              recipientIsTempStorage
+              transporterCompanySiret
+              destinationCompanySiret
+            }
+            stateSummary {
+              transporterCustomInfo
+              transporterNumberPlate
+              recipientName
+            }
           }
         }
       }
+
       pageInfo {
         endCursor
         hasNextPage
@@ -120,8 +139,4 @@ export const GET_BSDS = gql`
       totalCount
     }
   }
-  ${fullFormFragment}
-  ${dashboardDasriFragment}
-  ${vhuFragment}
-  ${bsdaFragment}
 `;
