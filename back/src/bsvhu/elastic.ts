@@ -106,6 +106,8 @@ function toBsdElastic(bsvhu: Bsvhu): BsdElastic {
   return {
     type: "BSVHU",
     id: bsvhu.id,
+    status: bsvhu.status,
+    isDraft: bsvhu.isDraft,
     readableId: bsvhu.id,
     createdAt: bsvhu.createdAt.getTime(),
     emitterCompanyName: bsvhu.emitterCompanyName ?? "",
