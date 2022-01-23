@@ -18,7 +18,7 @@ export function BsdasriWasteSummary({ bsdasri }: BsdasriWasteSummaryProps) {
     SENT: "transport",
     RECEIVED: "reception",
     PROCESSED: "reception",
-  }[bsdasri["bsdasriStatus"]];
+  }[bsdasri.status];
 
   return (
     <DataList>

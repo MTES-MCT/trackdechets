@@ -21,22 +21,22 @@ import {
   IconDuplicateFile,
   IconPdf,
 } from "common/components/Icons";
-import { Bsdasri, BsdasriStatus } from "generated/graphql/types";
+import { CommonBsd, CommonBsdStatus } from "generated/graphql/types";
 import { useDownloadPdf } from "./useDownloadPdf";
 import styles from "../../BSDActions.module.scss";
 
 interface BSDAsriActionsProps {
-  form: Bsdasri;
+  bsd: CommonBsd;
 }
 
-export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
+export const BSDAsriActions = ({ bsd }: BSDAsriActionsProps) => {
   const { siret } = useParams<{ siret: string }>();
   const location = useLocation();
   const [duplicateBsdasri] = useBsdasriDuplicate({
-    variables: { id: form.id },
+    variables: { id: bsd.id },
   });
   const [isDeleting, setIsDeleting] = React.useState(false);
-  const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
+  const [downloadPdf] = useDownloadPdf({ variables: { id: bsd.id } });
 
   return (
     <>
@@ -62,7 +62,7 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
                 to={{
                   pathname: generatePath(routes.dashboard.bsdasris.view, {
                     siret,
-                    id: form.id,
+                    id: bsd.id,
                   }),
                   state: { background: location },
                 }}
@@ -70,27 +70,27 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
-              {form["bsdasriStatus"] === BsdasriStatus.Initial && (
+              {bsd.status === CommonBsdStatus.Initial && (
                 <MenuItem onSelect={() => setIsDeleting(true)}>
                   <IconTrash color="blueLight" size="24px" />
                   Supprimer
                 </MenuItem>
               )}
-              {!form.isDraft && (
+              {!bsd.isDraft && (
                 <MenuItem onSelect={() => downloadPdf()}>
                   <IconPdf size="24px" color="blueLight" />
                   Pdf
                 </MenuItem>
               )}
-              {![BsdasriStatus.Processed, BsdasriStatus.Refused].includes(
-                form["bsdasriStatus"]
+              {![CommonBsdStatus.Processed, CommonBsdStatus.Refused].includes(
+                bsd.status
               ) && (
                 <>
                   <MenuLink
                     as={Link}
                     to={generatePath(routes.dashboard.bsdasris.edit, {
                       siret,
-                      id: form.id,
+                      id: bsd.id,
                     })}
                   >
                     <IconPaperWrite size="24px" color="blueLight" />
@@ -110,7 +110,7 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
         <DeleteBsdasriModal
           isOpen
           onClose={() => setIsDeleting(false)}
-          formId={form.id}
+          formId={bsd.id}
         />
       )}
     </>

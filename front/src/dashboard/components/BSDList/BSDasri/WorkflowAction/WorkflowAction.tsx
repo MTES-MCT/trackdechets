@@ -1,69 +1,80 @@
 import React from "react";
 
-import PublishBsdasri from "./PublishBsdasri";
-
 import { ActionLink } from "common/components";
 import { generatePath, useLocation, useRouteMatch } from "react-router-dom";
 
 import "@reach/menu-button/styles.css";
-import { IconCheckCircle1 } from "common/components/Icons";
+import { IconCheckCircle1, IconPaperWrite } from "common/components/Icons";
 
 import routes from "common/routes";
 
-import { Bsdasri, BsdasriStatus } from "generated/graphql/types";
+import {
+  CommonBsd,
+  CommonBsdStatus,
+  BsdasriType,
+} from "generated/graphql/types";
 
 export interface WorkflowActionProps {
-  form: Bsdasri;
+  bsd: CommonBsd;
   siret: string;
 }
 
-const isPublishable = (form: Bsdasri) => {
-  if (!form.isDraft) {
+const isPublishable = (bsd: CommonBsd) => {
+  if (!bsd.isDraft) {
     return false;
   }
-  if (form.type === "GROUPING" && !form.grouping?.length) {
+
+  if (bsd?.bsdasri?.type === "GROUPING" && !bsd.bsdasri?.groupingCount) {
     return false;
   }
   return true;
 };
 export function WorkflowAction(props: WorkflowActionProps) {
-  const { form, siret } = props;
+  const { bsd, siret } = props;
   const location = useLocation();
-  const matchAct = !!useRouteMatch(routes.dashboard.bsds.act);
-  const matchToCollect = !!useRouteMatch(routes.dashboard.transport.toCollect);
+  const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
+  const isToCollectTab = !!useRouteMatch(routes.dashboard.transport.toCollect);
 
-  if (isPublishable(form)) {
-    return <PublishBsdasri {...props} />;
+  if (isPublishable(bsd)) {
+    return (
+      <ActionLink
+        icon={<IconPaperWrite size="24px" />}
+        to={{
+          pathname: generatePath(routes.dashboard.bsdasris.sign.publish, {
+            siret,
+            id: bsd.id,
+          }),
+          state: { background: location },
+        }}
+      >
+        Publier le bordereau
+      </ActionLink>
+    );
   }
-  switch (form["bsdasriStatus"]) {
-    case BsdasriStatus.Initial: {
-      if (form.isDraft) {
+  switch (bsd.status) {
+    case CommonBsdStatus.Initial: {
+      if (bsd.isDraft) {
         return null;
       }
 
-      if (siret === form.emitter?.company?.siret && matchAct) {
+      if (siret === bsd.emitter?.company?.siret && isActTab) {
         return (
-          <>
-            <ActionLink
-              icon={<IconCheckCircle1 size="24px" />}
-              to={{
-                pathname: generatePath(
-                  routes.dashboard.bsdasris.sign.emission,
-                  {
-                    siret,
-                    id: form.id,
-                  }
-                ),
-                state: { background: location },
-              }}
-            >
-              Signature producteur
-            </ActionLink>
-          </>
+          <ActionLink
+            icon={<IconCheckCircle1 size="24px" />}
+            to={{
+              pathname: generatePath(routes.dashboard.bsdasris.sign.emission, {
+                siret,
+                id: bsd.id,
+              }),
+              state: { background: location },
+            }}
+          >
+            Signature producteur
+          </ActionLink>
         );
       }
 
-      if (siret === form.transporter?.company?.siret && matchToCollect) {
+      if (siret === bsd.transporter?.company?.siret && isToCollectTab) {
         return (
           <>
             <ActionLink
@@ -74,7 +85,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
                   routes.dashboard.bsdasris.sign.emissionSecretCode,
                   {
                     siret,
-                    id: form.id,
+                    id: bsd.id,
                   }
                 ),
                 state: { background: location },
@@ -83,16 +94,17 @@ export function WorkflowAction(props: WorkflowActionProps) {
               Signature producteur (code secret)
             </ActionLink>
 
-            {form?.allowDirectTakeOver &&
-            form.type === "SIMPLE" && ( // grouping dasri can't be directly taken over
+            {bsd?.bsdasri?.emitterAllowDirectTakeOver &&
+            bsd?.bsdasri?.type === BsdasriType.Simple && ( // grouping dasri can't be directly taken over
                 <ActionLink
+                  extraClassName="tw-mt-2"
                   icon={<IconCheckCircle1 size="24px" />}
                   to={{
                     pathname: generatePath(
                       routes.dashboard.bsdasris.sign.directTakeover,
                       {
                         siret,
-                        id: form.id,
+                        id: bsd.id,
                       }
                     ),
                     state: { background: location },
@@ -106,8 +118,8 @@ export function WorkflowAction(props: WorkflowActionProps) {
       }
       return null;
     }
-    case BsdasriStatus.SignedByProducer: {
-      if (siret === form.transporter?.company?.siret && matchToCollect) {
+    case CommonBsdStatus.SignedByProducer: {
+      if (siret === bsd.transporter?.company?.siret && isToCollectTab) {
         return (
           <>
             <ActionLink
@@ -117,7 +129,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
                   routes.dashboard.bsdasris.sign.transporter,
                   {
                     siret,
-                    id: form.id,
+                    id: bsd.id,
                   }
                 ),
                 state: { background: location },
@@ -128,17 +140,19 @@ export function WorkflowAction(props: WorkflowActionProps) {
           </>
         );
       }
+
+      // AJOUTER LES SIRETS SUR LES BSDsss
       return null;
     }
-    case BsdasriStatus.Sent: {
-      if (siret === form.destination?.company?.siret && matchAct) {
+    case CommonBsdStatus.Sent: {
+      if (siret === bsd.destination?.company?.siret && isActTab) {
         return (
           <ActionLink
             icon={<IconCheckCircle1 size="24px" />}
             to={{
               pathname: generatePath(routes.dashboard.bsdasris.sign.reception, {
                 siret,
-                id: form.id,
+                id: bsd.id,
               }),
               state: { background: location },
             }}
@@ -149,8 +163,8 @@ export function WorkflowAction(props: WorkflowActionProps) {
       }
       return null;
     }
-    case BsdasriStatus.Received: {
-      if (siret === form.destination?.company?.siret && matchAct) {
+    case CommonBsdStatus.Received: {
+      if (siret === bsd.destination?.company?.siret && isActTab) {
         return (
           <>
             <ActionLink
@@ -160,7 +174,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
                   routes.dashboard.bsdasris.sign.operation,
                   {
                     siret,
-                    id: form.id,
+                    id: bsd.id,
                   }
                 ),
                 state: { background: location },

@@ -1,52 +1,47 @@
 import * as React from "react";
 
-import { Bsdasri, BsdasriStatus } from "generated/graphql/types";
+import { CommonBsd } from "generated/graphql/types";
 import { ActionButtonContext } from "common/components/ActionButton";
+import { verboseBsdStatuses } from "dashboard/constants";
 import { useParams } from "react-router";
 
 import { IconBSDasri } from "common/components/Icons";
 import { CellProps, CellValue } from "react-table";
-import { BSDAsriActions } from "dashboard/components/BSDList/BSDasri/BSDasriActions/BSDasriActions";
+
 import { WorkflowAction } from "./WorkflowAction";
-const dasriVerboseStatuses: Record<BsdasriStatus, string> = {
-  INITIAL: "Initial",
-  SIGNED_BY_PRODUCER: "Signé par le producteur",
-  SENT: "Envoyé",
-  RECEIVED: "Reçu",
-  PROCESSED: "Traité",
-  REFUSED: "Refusé",
-};
-// Basic implementation
+import { BSDAsriActions } from "dashboard/components/BSDList/BSDasri/BSDasriActions/BSDasriActions";
+
 export const COLUMNS: Record<
   string,
   {
-    accessor: (form: Bsdasri) => CellValue;
-    Cell?: React.ComponentType<CellProps<Bsdasri>>;
+    accessor: (form: CommonBsd) => CellValue;
+    Cell?: React.ComponentType<CellProps<CommonBsd>>;
   }
 > = {
   type: {
-    accessor: dasri => dasri.type,
+    accessor: bsd => bsd?.bsdasri?.type,
     Cell: ({ value }) => (
       <>
         <IconBSDasri style={{ fontSize: "24px" }} />
+
         {value === "GROUPING" && <span>Grp</span>}
       </>
     ),
   },
   readableId: {
-    accessor: dasri => dasri.id,
+    accessor: bsd => bsd.id,
   },
   emitter: {
-    accessor: dasri => dasri.emitter?.company?.name ?? "",
+    accessor: bsd => bsd.emitter?.company?.name ?? "",
   },
   recipient: {
-    accessor: dasri => dasri?.destination?.company?.name ?? "",
+    accessor: bsd => bsd?.destination?.company?.name ?? "",
   },
   waste: {
-    accessor: dasri => dasri["bsdasriWaste"]?.code ?? "",
+    accessor: bsd => bsd?.waste?.code ?? "",
   },
   transporterCustomInfo: {
-    accessor: dasri => dasri.transporter?.customInfo ?? "",
+    accessor: bsd => bsd?.transporter?.customInfo ?? "",
     Cell: ({ value }) => (
       <>
         <span style={{ marginRight: "0.5rem" }}>{value}</span>
@@ -54,7 +49,7 @@ export const COLUMNS: Record<
     ),
   },
   transporterNumberPlate: {
-    accessor: dasri => dasri.transporter?.transport?.plates ?? [],
+    accessor: bsd => bsd?.transporter?.numberPlate ?? [],
     Cell: ({ value }) => (
       <>
         <span> {value.join(", ")}</span>
@@ -62,10 +57,8 @@ export const COLUMNS: Record<
     ),
   },
   status: {
-    accessor: dasri =>
-      dasri.isDraft
-        ? "Brouillon"
-        : dasriVerboseStatuses[dasri["bsdasriStatus"]], // unable to use dot notation because of conflicting status fields
+    accessor: bsd =>
+      bsd.isDraft ? "Brouillon" : verboseBsdStatuses[bsd.status],
   },
 
   workflow: {
@@ -74,13 +67,13 @@ export const COLUMNS: Record<
       const { siret } = useParams<{ siret: string }>();
       return (
         <ActionButtonContext.Provider value={{ size: "small" }}>
-          <WorkflowAction siret={siret} form={row.original} />
+          <WorkflowAction siret={siret} bsd={row.original} />
         </ActionButtonContext.Provider>
       );
     },
   },
   actions: {
     accessor: () => null,
-    Cell: ({ row }) => <BSDAsriActions form={row.original} />,
+    Cell: ({ row }) => <BSDAsriActions bsd={row.original} />,
   },
 };

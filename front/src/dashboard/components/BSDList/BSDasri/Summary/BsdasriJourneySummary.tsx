@@ -19,7 +19,7 @@ export function BsdasriJourneySummary({ bsdasri }: BsdasriJourneySummaryProps) {
     RECEIVED: ["complete", "complete", "active"],
     PROCESSED: ["complete", "complete", "complete"],
   };
-  const status = bsdasri["bsdasriStatus"];
+  const status = bsdasri.status;
 
   return (
     <Journey>
