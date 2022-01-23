@@ -2,8 +2,10 @@ import { Status } from "@prisma/client";
 import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 import { FullForm } from "./types";
+
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
+import { getElasticStateSummary } from "./resolvers/forms/stateSummary";
 
 function getWhere(
   form: FullForm
@@ -220,15 +222,45 @@ function getRecipient(form: FullForm) {
     : { name: form.recipientCompanyName, siret: form.recipientCompanySiret };
 }
 
+const getTemporaryStorageInfo = (form: FullForm) => {
+  const { temporaryStorageDetail } = form;
+
+  return {
+    recipientIsTempStorage: form.recipientIsTempStorage,
+    transporterCompanySiret:
+      temporaryStorageDetail?.transporterCompanySiret ?? null,
+    destinationCompanySiret:
+      temporaryStorageDetail?.destinationCompanySiret ?? null
+  };
+};
+const getLastSegmentInfo = (form: FullForm) => {
+  if (!form.transportSegments?.length) {
+    return null;
+  }
+
+  const lastSegment = form.transportSegments[form.transportSegments.length - 1];
+
+  return {
+    id: lastSegment.id,
+    takenOver: !!lastSegment.takenOverAt,
+    readyToTakeOver: lastSegment.readyToTakeOver,
+    previousTransporterCompanySiret: lastSegment.previousTransporterCompanySiret
+  };
+};
+
 /**
  * Convert a BSD from the forms table to Elastic Search's BSD model.
  */
 function toBsdElastic(form: FullForm): BsdElastic {
+  const stateSummary = getElasticStateSummary(form);
+
   const where = getWhere(form);
   const recipient = getRecipient(form);
   return {
     type: "BSDD",
     id: form.id,
+    status: form.status,
+    isDraft: form.status === Status.DRAFT,
     readableId: form.readableId,
     createdAt: form.createdAt.getTime(),
     emitterCompanyName: form.emitterCompanyName ?? "",
@@ -251,6 +283,13 @@ function toBsdElastic(form: FullForm): BsdElastic {
     wasteDescription: form.wasteDetailsName,
     transporterNumberPlate: [form.transporterNumberPlate],
     transporterCustomInfo: form.transporterCustomInfo,
+    bsdd: {
+      currentTransporterSiret: form.currentTransporterSiret,
+      nextTransporterSiret: form.nextTransporterSiret,
+      lastSegment: getLastSegmentInfo(form),
+      temporaryStorage: getTemporaryStorageInfo(form),
+      stateSummary
+    },
     ...where,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(form)

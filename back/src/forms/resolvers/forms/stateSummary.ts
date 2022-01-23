@@ -5,7 +5,7 @@ import {
   FormResolvers,
   PackagingInfo
 } from "../../../generated/graphql/types";
-
+import { FullForm } from "../../types";
 function getTransporter(
   form: Form,
   temporaryStorageDetail: TemporaryStorageDetail
@@ -147,6 +147,18 @@ export async function getStateSummary(form: Form) {
     lastActionOn: getLastActionOn(form, temporaryStorageDetail)
   };
 }
+
+export const getElasticStateSummary = (form: FullForm) => {
+  return {
+    transporterNumberPlate:
+      form?.temporaryStorageDetail?.transporterNumberPlate ??
+      form?.transporterNumberPlate,
+    transporterCustomInfo:
+      form.temporaryStorageDetail?.transporterNumberPlate ??
+      form?.transporterCustomInfo,
+    recipientName: form?.temporaryStorageDetail?.destinationCompanyName
+  };
+};
 
 const stateSummaryResolver: FormResolvers["stateSummary"] = form => {
   return getStateSummary(form);
