@@ -486,7 +486,7 @@ export const fullDasriFragment = gql`
 export const vhuFragment = gql`
   fragment VhuFragment on Bsvhu {
     id
-    bsvhuStatus: status
+    status
     isDraft
     emitter {
       agrementNumber
@@ -534,7 +534,7 @@ export const bsdaFragment = gql`
   fragment BsdaFragment on Bsda {
     id
     isDraft
-    bsdaStatus: status
+    status
     emitter {
       isPrivateIndividual
       company {
