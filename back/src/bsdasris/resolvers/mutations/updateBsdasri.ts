@@ -22,8 +22,8 @@ const fieldsAllowedForUpdateOnceReceived: BsdasriField[] = [
   "destinationReceptionWasteWeightValue"
 ];
 
-const fieldsAllowedForUpdateOnceSent: BsdasriField[] = fieldsAllowedForUpdateOnceReceived.concat(
-  [
+const fieldsAllowedForUpdateOnceSent: BsdasriField[] =
+  fieldsAllowedForUpdateOnceReceived.concat([
     "destinationCompanyName",
     "destinationCompanySiret",
     "destinationCompanyAddress",
@@ -39,11 +39,10 @@ const fieldsAllowedForUpdateOnceSent: BsdasriField[] = fieldsAllowedForUpdateOnc
     "destinationReceptionDate",
     "identificationNumbers",
     "handedOverToRecipientAt" // optional field to be filled by transporter once waste is received
-  ]
-);
+  ]);
 
-const fieldsAllowedForUpdateOnceSignedByEmitter: BsdasriField[] = fieldsAllowedForUpdateOnceSent.concat(
-  [
+const fieldsAllowedForUpdateOnceSignedByEmitter: BsdasriField[] =
+  fieldsAllowedForUpdateOnceSent.concat([
     "transporterCompanyName",
     "transporterCompanySiret",
     "transporterCompanyAddress",
@@ -65,12 +64,12 @@ const fieldsAllowedForUpdateOnceSignedByEmitter: BsdasriField[] = fieldsAllowedF
     "transporterCustomInfo",
     "transporterTransportMode",
     "transporterTransportPlates"
-  ]
-);
+  ]);
 
 const getFieldsAllorwedForUpdate = (bsdasri: Bsdasri) => {
   const allowedFields = {
-    [BsdasriStatus.SIGNED_BY_PRODUCER]: fieldsAllowedForUpdateOnceSignedByEmitter,
+    [BsdasriStatus.SIGNED_BY_PRODUCER]:
+      fieldsAllowedForUpdateOnceSignedByEmitter,
     [BsdasriStatus.SENT]: fieldsAllowedForUpdateOnceSent,
     [BsdasriStatus.RECEIVED]: fieldsAllowedForUpdateOnceReceived,
     [BsdasriStatus.PROCESSED]: []
