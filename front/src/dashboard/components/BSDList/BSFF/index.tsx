@@ -2,17 +2,19 @@ import * as React from "react";
 import { CellProps, CellValue } from "react-table";
 import { IconBSFF } from "common/components/Icons";
 import { BsffActions } from "./BsffActions/BsffActions";
-import { BsffFragment } from "./types";
+
 import { ActionButtonContext } from "common/components/ActionButton";
-import { WorkflowAction } from "./WorkflowAction";
+import { WorkflowAction } from "./WorkflowAction/WorkflowAction";
 import { useParams } from "react-router-dom";
-import { bsffVerboseStatuses } from "form/bsff/utils/constants";
+
+import { CommonBsd } from "generated/graphql/types";
+import { verboseBsdStatuses } from "../../../constants";
 
 export const COLUMNS: Record<
   string,
   {
-    accessor: (bsff: BsffFragment) => CellValue;
-    Cell?: React.ComponentType<CellProps<BsffFragment>>;
+    accessor: (bsff: CommonBsd) => CellValue;
+    Cell?: React.ComponentType<CellProps<CommonBsd>>;
   }
 > = {
   type: {
@@ -23,10 +25,10 @@ export const COLUMNS: Record<
     accessor: bsff => bsff.id,
   },
   emitter: {
-    accessor: bsff => bsff.bsffEmitter?.company?.name ?? "",
+    accessor: bsff => bsff.emitter?.company?.name ?? "",
   },
   recipient: {
-    accessor: bsff => bsff.bsffDestination?.company?.name ?? "",
+    accessor: bsff => bsff.destination?.company?.name ?? "",
   },
   waste: {
     accessor: bsff =>
@@ -42,7 +44,7 @@ export const COLUMNS: Record<
   },
   status: {
     accessor: bsff =>
-      bsff.isDraft ? "Brouillon" : bsffVerboseStatuses[bsff.bsffStatus],
+      bsff.isDraft ? "Brouillon" : verboseBsdStatuses[bsff.status],
   },
   workflow: {
     accessor: () => null,
@@ -50,14 +52,14 @@ export const COLUMNS: Record<
       const { siret } = useParams<{ siret: string }>();
       return (
         <ActionButtonContext.Provider value={{ size: "small" }}>
-          <WorkflowAction siret={siret} form={row.original} />
+          <WorkflowAction siret={siret} bsd={row.original} />
         </ActionButtonContext.Provider>
       );
     },
   },
   actions: {
     accessor: () => null,
-    Cell: ({ row }) => <BsffActions form={row.original} />,
+    Cell: ({ row }) => <BsffActions bsd={row.original} />,
   },
 };
 

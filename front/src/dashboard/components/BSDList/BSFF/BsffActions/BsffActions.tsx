@@ -18,23 +18,23 @@ import {
   IconPdf,
   IconTrash,
 } from "common/components/Icons";
-import { BsffStatus } from "generated/graphql/types";
-import { BsffFragment } from "../types";
+import { CommonBsd, CommonBsdStatus } from "generated/graphql/types";
+
 import { DeleteBsffModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";
 
 import styles from "../../BSDActions.module.scss";
 
 interface BsffActionsProps {
-  form: BsffFragment;
+  bsd: CommonBsd;
 }
 
-export const BsffActions = ({ form }: BsffActionsProps) => {
+export const BsffActions = ({ bsd }: BsffActionsProps) => {
   const { siret } = useParams<{ siret: string }>();
   const location = useLocation();
 
   const [isDeleting, setIsDeleting] = React.useState(false);
-  const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
+  const [downloadPdf] = useDownloadPdf({ variables: { id: bsd.id } });
 
   return (
     <>
@@ -60,7 +60,7 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
                 to={{
                   pathname: generatePath(routes.dashboard.bsffs.view, {
                     siret,
-                    id: form.id,
+                    id: bsd.id,
                   }),
                   state: { background: location },
                 }}
@@ -72,15 +72,15 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
                 <IconPdf size="24px" color="blueLight" />
                 Pdf
               </MenuItem>
-              {![BsffStatus.Processed, BsffStatus.Refused].includes(
-                form.bsffStatus
+              {![CommonBsdStatus.Processed, CommonBsdStatus.Refused].includes(
+                bsd.status
               ) && (
                 <>
                   <MenuLink
                     as={Link}
                     to={generatePath(routes.dashboard.bsffs.edit, {
                       siret,
-                      id: form.id,
+                      id: bsd.id,
                     })}
                   >
                     <IconPaperWrite size="24px" color="blueLight" />
@@ -88,7 +88,7 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
                   </MenuLink>
                 </>
               )}
-              {form.bsffStatus === BsffStatus.Initial && (
+              {bsd.status === CommonBsdStatus.Initial && (
                 <MenuItem onSelect={() => setIsDeleting(true)}>
                   <IconTrash color="blueLight" size="24px" />
                   Supprimer
@@ -102,7 +102,7 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
         <DeleteBsffModal
           isOpen
           onClose={() => setIsDeleting(false)}
-          formId={form.id}
+          formId={bsd.id}
         />
       )}
     </>
