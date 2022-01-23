@@ -19,6 +19,7 @@ import {
 import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { GET_BSDS } from "./queries";
 
 const CREATE_DRAFT_BSDA = `
 mutation CreateDraftBsda($input: BsdaInput!) {
@@ -45,19 +46,6 @@ mutation SignBsda($id: ID!, $input: BsdaSignatureInput
   }
 }
 `;
-const GET_BSDS = `
-  query GetBsds($where: BsdWhere) {
-    bsds(where: $where) {
-      edges {
-        node {
-          ... on Bsda {
-            id
-          }
-        }
-      }
-    }
-  }
-`;
 
 describe("Query.bsds.bsda base workflow", () => {
   let emitter: { user: User; company: Company };
@@ -65,6 +53,7 @@ describe("Query.bsds.bsda base workflow", () => {
   let transporter: { user: User; company: Company };
   let destination: { user: User; company: Company };
   let bsdaId: string;
+  let indexedBsda;
 
   beforeAll(async () => {
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
@@ -174,6 +163,37 @@ describe("Query.bsds.bsda base workflow", () => {
         }
       });
       bsdaId = data.createDraftBsda.id;
+      indexedBsda = {
+        bsda: {
+          type: "OTHER_COLLECTIONS",
+          worker: {
+            company: { name: "worker", siret: worker.company.siret }
+          }
+        },
+        bsdasri: null,
+        bsdd: null,
+        destination: {
+          company: { name: "destination", siret: destination.company.siret }
+        },
+        emitter: {
+          company: { name: "The crusher", siret: emitter.company.siret }
+        },
+        id: bsdaId,
+        isDraft: true,
+        readableId: bsdaId,
+        status: "INITIAL",
+        transporter: {
+          company: {
+            name: "transporter",
+            siret: transporter.company.siret
+          },
+          customInfo: "",
+          numberPlate: []
+        },
+        type: "BSDA",
+        waste: { code: "16 01 06", description: "Amiante, A material" }
+      };
+
       await refreshElasticSearch();
     });
 
@@ -214,7 +234,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
     it("draft bsda should be isDraftFor worker", async () => {
@@ -231,7 +253,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
     it("draft bsda should be isDraftFor transporter", async () => {
@@ -248,7 +272,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
     it("draft bsda should be isDraftFor destination", async () => {
@@ -265,7 +291,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
   });
@@ -282,7 +310,7 @@ describe("Query.bsds.bsda base workflow", () => {
           }
         }
       );
-
+      indexedBsda.isDraft = false;
       await refreshElasticSearch();
     });
 
@@ -300,7 +328,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -318,7 +348,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -336,7 +368,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -354,7 +388,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
   });
@@ -372,6 +408,7 @@ describe("Query.bsds.bsda base workflow", () => {
           }
         }
       );
+      indexedBsda.status = "SIGNED_BY_PRODUCER";
 
       await refreshElasticSearch();
     });
@@ -390,7 +427,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -408,7 +447,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -426,7 +467,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -444,7 +487,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
   });
@@ -462,6 +507,7 @@ describe("Query.bsds.bsda base workflow", () => {
           }
         }
       );
+      indexedBsda.status = "SIGNED_BY_WORKER";
 
       await refreshElasticSearch();
     });
@@ -480,7 +526,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -498,7 +546,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -516,7 +566,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -534,7 +586,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
   });
@@ -552,6 +606,7 @@ describe("Query.bsds.bsda base workflow", () => {
           }
         }
       );
+      indexedBsda.status = "SENT";
 
       await refreshElasticSearch();
     });
@@ -570,7 +625,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -588,7 +645,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -606,7 +665,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -624,7 +685,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
   });
@@ -643,6 +706,8 @@ describe("Query.bsds.bsda base workflow", () => {
         }
       );
 
+      indexedBsda.status = "PROCESSED";
+
       await refreshElasticSearch();
     });
 
@@ -660,7 +725,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -678,7 +745,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -696,7 +765,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -714,7 +785,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
   });
@@ -743,6 +816,8 @@ describe("Query.bsds.bsda base workflow", () => {
         }
       );
 
+      indexedBsda.status = "AWAITING_CHILD";
+
       await refreshElasticSearch();
     });
 
@@ -760,7 +835,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -778,7 +855,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -796,7 +875,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -814,7 +895,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
   });
@@ -844,6 +927,7 @@ describe("Query.bsds.bsda base workflow", () => {
           }
         }
       );
+      indexedBsda.status = "REFUSED";
 
       await refreshElasticSearch();
     });
@@ -862,7 +946,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -880,7 +966,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -898,7 +986,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
 
@@ -916,7 +1006,9 @@ describe("Query.bsds.bsda base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
+        {
+          node: indexedBsda
+        }
       ]);
     });
   });
@@ -945,9 +1037,8 @@ describe("Query.bsds.bsdas mutations", () => {
     let res = await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {});
 
     // created bsda is indexed
-    expect(res.data.bsds.edges).toEqual([
-      expect.objectContaining({ node: { id: bsda.id } })
-    ]);
+    const ids = res.data.bsds.edges.map(edge => edge.node.id);
+    expect(ids).toEqual([bsda.id]);
 
     // then we delete it
     const { mutate } = makeClient(emitter.user);
@@ -1023,12 +1114,9 @@ describe("Query.bsds.bsdas mutations", () => {
     );
 
     // duplicated bsda is indexed
-    expect(data.bsds.edges.length).toEqual(2); // initial + duplicated bsda
-    expect(data.bsds.edges).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ node: { id: bsda.id } }),
-        expect.objectContaining({ node: { id: duplicateBsda.id } })
-      ])
-    );
+
+    const ids = data.bsds.edges.map(edge => edge.node.id);
+    expect(ids.length).toEqual(2); // initial + duplicated bsda
+    expect(ids).toEqual(expect.arrayContaining([bsda.id, duplicateBsda.id]));
   });
 });

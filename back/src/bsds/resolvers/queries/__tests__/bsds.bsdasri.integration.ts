@@ -25,7 +25,7 @@ import { ErrorCode } from "../../../../common/errors";
 import { indexBsdasri } from "../../../../bsdasris/elastic";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import { bsdasriFactory } from "../../../../bsdasris/__tests__/factories";
-
+import { GET_BSDS } from "./queries";
 const CREATE_DRAFT_DASRI = `
 mutation CreateDraftDasri($input: BsdasriInput!) {
   createDraftBsdasri(input: $input)  {
@@ -51,25 +51,13 @@ mutation SignDasri($id: ID!, $input: BsdasriSignatureInput
   }
 }
 `;
-const GET_BSDS = `
-  query GetBsds($where: BsdWhere) {
-    bsds(where: $where) {
-      edges {
-        node {
-          ... on Bsdasri {
-            id
-          }
-        }
-      }
-    }
-  }
-`;
 
 describe("Query.bsds.dasris base workflow", () => {
   let emitter: { user: User; company: Company };
   let transporter: { user: User; company: Company };
   let destination: { user: User; company: Company };
   let dasriId: string;
+  let indexedBsd;
 
   beforeAll(async () => {
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
@@ -177,6 +165,45 @@ describe("Query.bsds.dasris base workflow", () => {
         }
       });
       dasriId = id;
+      indexedBsd = {
+        bsda: null,
+        bsdasri: {
+          emitterAllowDirectTakeOver: false,
+          groupingCount: 0,
+          type: "SIMPLE"
+        },
+        bsdd: null,
+        destination: {
+          company: {
+            name: "JEANNE COLLECTEUR",
+            siret: destination.company.siret
+          }
+        },
+        emitter: {
+          company: {
+            name: "hopital blanc",
+            siret: emitter.company.siret
+          }
+        },
+        id: dasriId,
+        isDraft: true,
+        readableId: dasriId,
+        status: "INITIAL",
+        transporter: {
+          company: {
+            name: "JM TRANSPORT",
+            siret: transporter.company.siret
+          },
+          customInfo: null,
+          numberPlate: []
+        },
+        type: "BSDASRI",
+        waste: {
+          code: "18 01 03*",
+          description: "DASRI d'origine humaine"
+        }
+      };
+
       await refreshElasticSearch();
     });
 
@@ -217,7 +244,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
     it("draft dasri should be isDraftFor transporter", async () => {
@@ -234,7 +263,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
     it("draft dasri should be isDraftFor destination", async () => {
@@ -251,7 +282,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
   });
@@ -268,7 +301,7 @@ describe("Query.bsds.dasris base workflow", () => {
           id: dasriId
         }
       });
-
+      indexedBsd.isDraft = false;
       await refreshElasticSearch();
     });
 
@@ -286,7 +319,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
 
@@ -304,7 +339,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
 
@@ -322,7 +359,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
   });
@@ -340,7 +379,7 @@ describe("Query.bsds.dasris base workflow", () => {
           }
         }
       );
-
+      indexedBsd.status = "SIGNED_BY_PRODUCER";
       await refreshElasticSearch();
     });
 
@@ -358,7 +397,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
 
@@ -376,7 +417,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
 
@@ -394,7 +437,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
   });
@@ -412,6 +457,7 @@ describe("Query.bsds.dasris base workflow", () => {
           }
         }
       );
+      indexedBsd.status = "SENT";
 
       await refreshElasticSearch();
     });
@@ -430,7 +476,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
 
@@ -448,7 +496,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
 
@@ -466,7 +516,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
   });
@@ -484,6 +536,7 @@ describe("Query.bsds.dasris base workflow", () => {
           }
         }
       );
+      indexedBsd.status = "RECEIVED";
 
       await refreshElasticSearch();
     });
@@ -502,7 +555,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
 
@@ -520,7 +575,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
 
@@ -538,7 +595,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
   });
@@ -556,6 +615,7 @@ describe("Query.bsds.dasris base workflow", () => {
           }
         }
       );
+      indexedBsd.status = "PROCESSED";
 
       await refreshElasticSearch();
     });
@@ -574,7 +634,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
 
@@ -592,7 +654,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
 
@@ -610,7 +674,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
   });
@@ -622,6 +688,8 @@ describe("Query.bsds.dasris base workflow", () => {
         data: { status: "REFUSED" }
       });
       await indexBsdasri(refusedDasri);
+      indexedBsd.status = "REFUSED";
+
       await refreshElasticSearch();
     });
 
@@ -639,7 +707,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
 
@@ -657,7 +727,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
 
@@ -675,7 +747,9 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        {
+          node: indexedBsd
+        }
       ]);
     });
   });
@@ -704,9 +778,8 @@ describe("Query.bsds.dasris mutations", () => {
     let res = await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {});
 
     // created dasri is indexed
-    expect(res.data.bsds.edges).toEqual([
-      expect.objectContaining({ node: { id: dasri.id } })
-    ]);
+    const ids = res.data.bsds.edges.map(edge => edge.node.id);
+    expect(ids).toEqual([dasri.id]);
 
     // let's delete this dasri
     const { mutate } = makeClient(emitter.user);
@@ -782,12 +855,10 @@ describe("Query.bsds.dasris mutations", () => {
     );
 
     // duplicated dasri is indexed
-    expect(data.bsds.edges.length).toEqual(2); // initial + duplicated dasri
-    expect(data.bsds.edges).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ node: { id: dasri.id } }),
-        expect.objectContaining({ node: { id: duplicateBsdasri.id } })
-      ])
+    const ids = data.bsds.edges.map(edge => edge.node.id);
+    expect(ids.length).toEqual(2); // initial + duplicated bsda
+    expect(ids).toEqual(
+      expect.arrayContaining([dasri.id, duplicateBsdasri.id])
     );
   });
 });

@@ -25,20 +25,8 @@ import { ErrorCode } from "../../../../common/errors";
 import { indexBsvhu } from "../../../../bsvhu/elastic";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import { vhuFormFactory } from "../../../../bsvhu/__tests__/factories.vhu";
+import { GET_BSDS } from "./queries";
 
-const GET_BSDS = `
-  query GetBsds($where: BsdWhere) {
-    bsds(where: $where) {
-      edges {
-        node {
-          ... on Bsvhu {
-            id
-          }
-        }
-      }
-    }
-  }
-`;
 const CREATE_DRAFT_VHU = `
 mutation CreateDraftVhu($input: BsvhuInput!) {
   createDraftBsvhu(input: $input) {
@@ -70,6 +58,7 @@ describe("Query.bsds.vhus base workflow", () => {
   let transporter: { user: User; company: Company };
   let destination: { user: User; company: Company };
   let vhuId: string;
+  let indexedVhu;
 
   beforeAll(async () => {
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
@@ -159,6 +148,41 @@ describe("Query.bsds.vhus base workflow", () => {
         }
       });
       vhuId = id;
+      indexedVhu = {
+        bsda: null,
+        bsdasri: null,
+        bsdd: null,
+        destination: {
+          company: {
+            name: "destination",
+            siret: destination.company.siret
+          }
+        },
+        emitter: {
+          company: {
+            name: "The crusher",
+            siret: emitter.company.siret
+          }
+        },
+        id: vhuId,
+        isDraft: true,
+        readableId: vhuId,
+        status: "INITIAL",
+        transporter: {
+          company: {
+            name: "The transporter",
+            siret: transporter.company.siret
+          },
+          customInfo: null,
+          numberPlate: []
+        },
+        type: "BSVHU",
+        waste: {
+          code: "16 01 06",
+          description: ""
+        }
+      };
+
       await refreshElasticSearch();
     });
 
@@ -195,7 +219,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
     it("draft vhu should be isDraftFor transporter", async () => {
@@ -212,7 +238,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
     it("draft vhu should be isDraftFor destination", async () => {
@@ -229,7 +257,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
   });
@@ -246,7 +276,7 @@ describe("Query.bsds.vhus base workflow", () => {
           }
         }
       );
-
+      indexedVhu.isDraft = false;
       await refreshElasticSearch();
     });
 
@@ -264,7 +294,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
 
@@ -282,7 +314,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
 
@@ -300,7 +334,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
   });
@@ -318,7 +354,7 @@ describe("Query.bsds.vhus base workflow", () => {
           }
         }
       );
-
+      indexedVhu.status = "SIGNED_BY_PRODUCER";
       await refreshElasticSearch();
     });
 
@@ -336,7 +372,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
 
@@ -354,7 +392,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
 
@@ -372,7 +412,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
   });
@@ -390,7 +432,7 @@ describe("Query.bsds.vhus base workflow", () => {
           }
         }
       );
-
+      indexedVhu.status = "SENT";
       await refreshElasticSearch();
     });
 
@@ -408,7 +450,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
 
@@ -426,7 +470,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
 
@@ -444,7 +490,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
   });
@@ -473,7 +521,7 @@ describe("Query.bsds.vhus base workflow", () => {
           }
         }
       );
-
+      indexedVhu.status = "PROCESSED";
       await refreshElasticSearch();
     });
 
@@ -491,7 +539,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
 
@@ -509,7 +559,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
 
@@ -527,7 +579,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
   });
@@ -539,6 +593,7 @@ describe("Query.bsds.vhus base workflow", () => {
         data: { status: "REFUSED" }
       });
       await indexBsvhu(refusedVhu);
+      indexedVhu.status = "REFUSED";
       await refreshElasticSearch();
     });
 
@@ -556,7 +611,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
 
@@ -574,7 +631,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
 
@@ -592,7 +651,9 @@ describe("Query.bsds.vhus base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
+        {
+          node: indexedVhu
+        }
       ]);
     });
   });
@@ -601,7 +662,7 @@ describe("Query.bsds.vhus base workflow", () => {
 describe("Query.bsds.vhus mutations", () => {
   afterAll(resetDatabase);
 
-  it("deleted vhu should be removed from es index", async () => {
+  it("deleted vhu should be removed from ES index", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
         set: ["PRODUCER"]
@@ -621,9 +682,8 @@ describe("Query.bsds.vhus mutations", () => {
     let res = await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {});
 
     // created vhu is indexed
-    expect(res.data.bsds.edges).toEqual([
-      expect.objectContaining({ node: { id: vhu.id } })
-    ]);
+    const ids = res.data.bsds.edges.map(edge => edge.node.id);
+    expect(ids).toEqual([vhu.id]);
 
     // let's delete this vhu
     const { mutate } = makeClient(emitter.user);
@@ -699,12 +759,8 @@ describe("Query.bsds.vhus mutations", () => {
     );
 
     // duplicated vhu is indexed
-    expect(data.bsds.edges.length).toEqual(2); // initial + duplicated vhu
-    expect(data.bsds.edges).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ node: { id: vhu.id } }),
-        expect.objectContaining({ node: { id: duplicateBsvhu.id } })
-      ])
-    );
+    const ids = data.bsds.edges.map(edge => edge.node.id);
+    expect(ids.length).toEqual(2); // initial + duplicated bsda
+    expect(ids).toEqual(expect.arrayContaining([vhu.id, duplicateBsvhu.id]));
   });
 });

@@ -19,26 +19,15 @@ import {
   userWithCompanyFactory,
   formFactory
 } from "../../../../__tests__/factories";
-
+import { GET_BSDS } from "./queries";
 import { indexForm } from "../../../../forms/elastic";
 import { getFullForm } from "../../../../forms/database";
-const GET_BSDS = `
-  query GetBsds($where: BsdWhere) {
-    bsds(where: $where) {
-      edges {
-        node {
-          ... on Form {
-            id
-          }
-        }
-      }
-    }
-  }
-`;
+
 const CREATE_FORM = `
 mutation CreateForm($createFormInput: CreateFormInput!) {
   createForm(createFormInput: $createFormInput) {
     id
+    readableId
   }
 }
 `;
@@ -48,6 +37,8 @@ describe("Query.bsds workflow", () => {
   let transporter: { user: User; company: Company };
   let recipient: { user: User; company: Company };
   let formId: string;
+  let formReadableId: string;
+  let indexedBsdd;
 
   beforeAll(async () => {
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
@@ -74,7 +65,7 @@ describe("Query.bsds workflow", () => {
 
       const {
         data: {
-          createForm: { id }
+          createForm: { id, readableId }
         }
       } = await mutate<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
         CREATE_FORM,
@@ -134,6 +125,51 @@ describe("Query.bsds workflow", () => {
         }
       );
       formId = id;
+      formReadableId = readableId;
+      indexedBsdd = {
+        bsda: null,
+        bsdasri: null,
+        bsdd: {
+          currentTransporterSiret: null,
+          lastSegment: null,
+          nextTransporterSiret: null,
+          temporaryStorage: {
+            destinationCompanySiret: null,
+            recipientIsTempStorage: false,
+            transporterCompanySiret: null
+          }
+        },
+        destination: {
+          company: {
+            name: "JEANNE COLLECTEUR",
+            siret: recipient.company.siret
+          }
+        },
+        emitter: {
+          company: {
+            name: "MARIE PRODUCTEUR",
+            siret: emitter.company.siret
+          }
+        },
+        id: formId,
+        isDraft: true,
+        readableId: formReadableId,
+        status: "DRAFT",
+        transporter: {
+          company: {
+            name: "JM TRANSPORT",
+            siret: transporter.company.siret
+          },
+          customInfo: null,
+          numberPlate: [null]
+        },
+        type: "BSDD",
+        waste: {
+          code: "01 01 01",
+          description: "Stylos bille"
+        }
+      };
+
       await refreshElasticSearch();
     });
 
@@ -151,7 +187,9 @@ describe("Query.bsds workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: formId } })
+        {
+          node: indexedBsdd
+        }
       ]);
     });
   });
@@ -174,6 +212,8 @@ describe("Query.bsds workflow", () => {
           }
         }
       );
+      indexedBsdd.status = "SEALED";
+      indexedBsdd.isDraft = false;
       await refreshElasticSearch();
     });
 
@@ -191,7 +231,9 @@ describe("Query.bsds workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: formId } })
+        {
+          node: indexedBsdd
+        }
       ]);
     });
 
@@ -209,7 +251,9 @@ describe("Query.bsds workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: formId } })
+        {
+          node: indexedBsdd
+        }
       ]);
     });
   });
@@ -240,6 +284,8 @@ describe("Query.bsds workflow", () => {
           }
         }
       });
+      indexedBsdd.status = "SENT";
+      indexedBsdd.bsdd.currentTransporterSiret = transporter.company.siret;
       await refreshElasticSearch();
     });
 
@@ -257,7 +303,9 @@ describe("Query.bsds workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: formId } })
+        {
+          node: indexedBsdd
+        }
       ]);
     });
 
@@ -275,7 +323,9 @@ describe("Query.bsds workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: formId } })
+        {
+          node: indexedBsdd
+        }
       ]);
     });
   });
@@ -305,8 +355,10 @@ describe("Query.bsds workflow", () => {
           }
         }
       });
-      await refreshElasticSearch();
+      indexedBsdd.status = "ACCEPTED";
+      indexedBsdd.bsdd.currentTransporterSiret = "";
 
+      await refreshElasticSearch();
       expect(errors).toBeUndefined();
     });
 
@@ -322,9 +374,10 @@ describe("Query.bsds workflow", () => {
           }
         }
       );
-
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: formId } })
+        {
+          node: indexedBsdd
+        }
       ]);
     });
   });
@@ -352,6 +405,8 @@ describe("Query.bsds workflow", () => {
           }
         }
       });
+      indexedBsdd.status = "PROCESSED";
+
       await refreshElasticSearch();
 
       expect(errors).toBeUndefined();
@@ -369,9 +424,10 @@ describe("Query.bsds workflow", () => {
           }
         }
       );
-
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: formId } })
+        {
+          node: indexedBsdd
+        }
       ]);
     });
 
@@ -389,7 +445,9 @@ describe("Query.bsds workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: formId } })
+        {
+          node: indexedBsdd
+        }
       ]);
     });
 
@@ -407,7 +465,9 @@ describe("Query.bsds workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: formId } })
+        {
+          node: indexedBsdd
+        }
       ]);
     });
   });
@@ -464,9 +524,9 @@ describe("Query.bsds edge cases", () => {
       }
     );
 
-    expect(res.data.bsds.edges).toEqual([
-      expect.objectContaining({ node: { id: form.id } })
-    ]);
+    let ids = res.data.bsds.edges.map(edge => edge.node.id);
+
+    expect(ids).toEqual([form.id]);
 
     const { query: recipientQuery } = makeClient(recipientAndTransporter.user);
     // form shows when we request `isForActionFor`
@@ -477,9 +537,8 @@ describe("Query.bsds edge cases", () => {
         }
       }
     });
+    ids = res.data.bsds.edges.map(edge => edge.node.id);
 
-    expect(res.data.bsds.edges).toEqual([
-      expect.objectContaining({ node: { id: form.id } })
-    ]);
+    expect(ids).toEqual([form.id]);
   });
 });
