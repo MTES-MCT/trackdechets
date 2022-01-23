@@ -101,7 +101,7 @@ export function flattenBsffInput(
   });
 }
 
-export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
+export function expandBsffFromDb(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
   return {
     id: prismaBsff.id,
     createdAt: prismaBsff.createdAt,

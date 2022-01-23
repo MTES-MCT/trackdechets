@@ -5,7 +5,7 @@ import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound } from "../../database";
-import { flattenBsffInput, unflattenBsff } from "../../converter";
+import { flattenBsffInput, expandBsffFromDb } from "../../converter";
 import { isBsffContributor } from "../../permissions";
 import { validateBsff } from "../../validation";
 import { indexBsff } from "../../elastic";
@@ -168,7 +168,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   await indexBsff(updatedBsff, context);
 
-  return unflattenBsff(updatedBsff);
+  return expandBsffFromDb(updatedBsff);
 };
 
 export default updateBsff;

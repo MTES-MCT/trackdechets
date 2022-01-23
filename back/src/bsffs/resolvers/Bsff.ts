@@ -1,6 +1,6 @@
 import prisma from "../../prisma";
 import { BsffResolvers } from "../../generated/graphql/types";
-import { toInitialBsff, unflattenBsff } from "../converter";
+import { toInitialBsff, expandBsffFromDb } from "../converter";
 import { getFicheInterventions } from "../database";
 
 export const Bsff: BsffResolvers = {
@@ -16,7 +16,7 @@ export const Bsff: BsffResolvers = {
         where: { id }
       })
       .forwardedIn();
-    return forwardingBsff ? unflattenBsff(forwardingBsff) : null;
+    return forwardingBsff ? expandBsffFromDb(forwardingBsff) : null;
   },
   forwarding: async ({ id }) => {
     const forwardedBsff = await prisma.bsff
@@ -24,30 +24,32 @@ export const Bsff: BsffResolvers = {
         where: { id }
       })
       .forwarding();
-    return forwardedBsff ? toInitialBsff(unflattenBsff(forwardedBsff)) : null;
+    return forwardedBsff
+      ? toInitialBsff(expandBsffFromDb(forwardedBsff))
+      : null;
   },
   repackagedIn: async ({ id }) => {
     const repackagingBsff = await prisma.bsff
       .findUnique({ where: { id } })
       .repackagedIn();
-    return repackagingBsff ? unflattenBsff(repackagingBsff) : null;
+    return repackagingBsff ? expandBsffFromDb(repackagingBsff) : null;
   },
   repackaging: async ({ id }) => {
     const repackagedBsffs = await prisma.bsff
       .findUnique({ where: { id } })
       .repackaging();
-    return repackagedBsffs.map(bsff => toInitialBsff(unflattenBsff(bsff)));
+    return repackagedBsffs.map(bsff => toInitialBsff(expandBsffFromDb(bsff)));
   },
   groupedIn: async ({ id }) => {
     const groupingBsff = await prisma.bsff
       .findUnique({ where: { id } })
       .groupedIn();
-    return groupingBsff ? unflattenBsff(groupingBsff) : null;
+    return groupingBsff ? expandBsffFromDb(groupingBsff) : null;
   },
   grouping: async ({ id }) => {
     const groupedBsffs = await prisma.bsff
       .findUnique({ where: { id } })
       .grouping();
-    return groupedBsffs.map(bsff => toInitialBsff(unflattenBsff(bsff)));
+    return groupedBsffs.map(bsff => toInitialBsff(expandBsffFromDb(bsff)));
   }
 };

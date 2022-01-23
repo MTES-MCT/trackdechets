@@ -8,6 +8,8 @@ function toBsdElastic(bsff: Bsff): BsdElastic {
   const bsd = {
     type: "BSFF" as const,
     id: bsff.id,
+    isDraft: bsff.isDraft,
+    status: bsff.status,
     readableId: bsff.id,
     createdAt: bsff.createdAt.getTime(),
     emitterCompanyName: bsff.emitterCompanyName ?? "",

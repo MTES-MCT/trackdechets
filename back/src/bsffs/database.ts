@@ -11,7 +11,7 @@ import { BsffFicheIntervention, BsffInput } from "../generated/graphql/types";
 import getReadableId, { ReadableIdPrefix } from "../forms/readableId";
 import {
   flattenBsffInput,
-  unflattenBsff,
+  expandBsffFromDb,
   unflattenFicheInterventionBsff
 } from "./converter";
 import { isBsffContributor } from "./permissions";
@@ -192,7 +192,7 @@ export async function createBsff(
 
   await indexBsff(bsff, { user } as GraphQLContext);
 
-  return unflattenBsff(bsff);
+  return expandBsffFromDb(bsff);
 }
 
 /**

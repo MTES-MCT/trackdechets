@@ -1,6 +1,6 @@
 import prisma from "../../../prisma";
 import { QueryResolvers } from "../../../generated/graphql/types";
-import { unflattenBsff } from "../../converter";
+import { expandBsffFromDb } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
@@ -41,7 +41,7 @@ const bsffs: QueryResolvers["bsffs"] = async (
         ...prismaPaginationArgs,
         orderBy: { createdAt: "desc" }
       }),
-    formatNode: unflattenBsff,
+    formatNode: expandBsffFromDb,
     ...gqlPaginationArgs
   });
 };

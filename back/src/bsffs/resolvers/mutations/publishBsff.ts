@@ -3,7 +3,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound, getPreviousBsffs } from "../../database";
 import { isBsffContributor } from "../../permissions";
 import prisma from "../../../prisma";
-import { unflattenBsff } from "../../converter";
+import { expandBsffFromDb } from "../../converter";
 import { indexBsff } from "../../elastic";
 import { validateBsff } from "../../validation";
 
@@ -36,7 +36,7 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
 
   await indexBsff(updatedBsff, context);
 
-  return unflattenBsff(updatedBsff);
+  return expandBsffFromDb(updatedBsff);
 };
 
 export default publishBsffResolver;
