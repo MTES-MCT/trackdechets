@@ -52,12 +52,6 @@ const Company = ({ company, label }: CompanyProps) => (
   </>
 );
 
-type SlipDetailContentProps = {
-  form: Bsdasri;
-  children?: React.ReactNode;
-  refetch?: () => void;
-};
-
 const Emitter = ({ form }: { form: Bsdasri }) => {
   const { emitter } = form;
   return (
@@ -289,11 +283,10 @@ const Recipient = ({ form }: { form: Bsdasri }) => {
   );
 };
 
-export default function BsdasriDetailContent({
-  form,
-  children = null,
-  refetch,
-}: SlipDetailContentProps) {
+type Props = {
+  form: Bsdasri;
+};
+export default function BsdasriDetailContent({ form }: Props) {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
 
@@ -313,7 +306,7 @@ export default function BsdasriDetailContent({
         <h4 className={styles.detailTitle}>
           <IconBSDasri className="tw-mr-2" />
           <span className={styles.detailStatus}>
-            [{form.isDraft ? "Brouillon" : statusLabels[form["bsdasriStatus"]]}]
+            [{form.isDraft ? "Brouillon" : statusLabels[form.status]}]
           </span>
           {!form.isDraft && <span>{form.id}</span>}
           {!!form?.grouping?.length && <span>Bordereau de groupement</span>}

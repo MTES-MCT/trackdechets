@@ -11,6 +11,8 @@ import {
   Form,
   FormCompany,
   FormStatus,
+  CommonBsdStatus,
+  CommonBsdType,
 } from "generated/graphql/types";
 import { statusLabels } from "../../constants";
 import {
@@ -26,7 +28,7 @@ import {
   IconBSDD,
 } from "common/components/Icons";
 import routes from "common/routes";
-
+import { WorkflowAction } from "dashboard/components/BSDList";
 import {
   getVerboseConsistence,
   getVerboseAcceptationStatus,
@@ -42,9 +44,10 @@ import {
   YesNoRow,
   PackagingRow,
 } from "dashboard/detail/common/Components";
-import { WorkflowAction } from "dashboard/components/BSDList";
+
 import EditSegment from "./EditSegment";
 import { Loader } from "common/components";
+import { isCommonBsdStatus } from "dashboard/detail/utils";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -593,7 +596,49 @@ export default function BSDDetailContent({
               </Link>
             </>
           )}
-          <WorkflowAction siret={siret} form={form} />
+          <WorkflowAction
+            usedInTab={false}
+            siret={siret}
+            bsd={{
+              type: CommonBsdType.Bsff,
+              id: form.id,
+              readableId: form.readableId,
+              isDraft: isCommonBsdStatus(form.status)
+                ? form.status === CommonBsdStatus.Draft
+                : false,
+
+              status: isCommonBsdStatus(form.status)
+                ? form.status
+                : CommonBsdStatus.Draft,
+              destination: {
+                company: {
+                  siret: form.recipient?.company?.siret ?? "",
+                  name: form.recipient?.company?.name ?? "",
+                },
+              },
+              emitter: {
+                company: {
+                  siret: form.emitter?.company?.siret ?? "",
+                  name: form.emitter?.company?.name ?? "",
+                },
+              },
+              transporter: {
+                company: {
+                  siret: form.transporter?.company?.siret ?? "",
+                  name: form.transporter?.company?.name ?? "",
+                },
+                numberPlate: !!form.transporter?.numberPlate
+                  ? [form.transporter?.numberPlate]
+                  : [],
+                customInfo: "",
+              },
+              waste: {
+                code: form.wasteDetails?.code,
+                description: form.wasteDetails?.name ?? undefined,
+              },
+            }}
+          />
+
           {children}
         </div>
       </div>

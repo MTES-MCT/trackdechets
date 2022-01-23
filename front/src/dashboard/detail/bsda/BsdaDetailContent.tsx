@@ -244,7 +244,7 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
         <h4 className={styles.detailTitle}>
           <IconBSDa className="tw-mr-2" />
           <span className={styles.detailStatus}>
-            [{form.isDraft ? "Brouillon" : statusLabels[form["bsdaStatus"]]}]
+            [{form.isDraft ? "Brouillon" : statusLabels[form.status]}]
           </span>
           {!form.isDraft && <span>{form.id}</span>}
           {!!form?.grouping?.length && <span>Bordereau de groupement</span>}

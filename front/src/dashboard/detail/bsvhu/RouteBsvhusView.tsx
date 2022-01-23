@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/client";
 
 import { Query, QueryBsvhuArgs } from "generated/graphql/types";
 import Loader from "common/components/Loaders";
-import { GET_VHU_FORM } from "form/bsvhu/utils/queries";
+import { GET_BSVHU } from "form/bsvhu/utils/queries";
 import { InlineError } from "common/components/Error";
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
 
@@ -15,7 +15,7 @@ export function RouteBsvhusView() {
   const { error, data, loading } = useQuery<
     Pick<Query, "bsvhu">,
     QueryBsvhuArgs
-  >(GET_VHU_FORM, {
+  >(GET_BSVHU, {
     variables: {
       id: formId,
     },

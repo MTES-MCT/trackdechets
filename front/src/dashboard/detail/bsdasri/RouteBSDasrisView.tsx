@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { GET_DETAIL_DASRI } from "common/queries";
 import { InlineError } from "common/components/Error";
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
+
 export function RouteBSDasrisView() {
   const { id: formId } = useParams<{ id: string }>();
   const { error, data, loading } = useQuery<

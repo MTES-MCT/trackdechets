@@ -7,7 +7,13 @@ import {
   IconWarehouseDelivery,
   IconWaterDam,
 } from "common/components/Icons";
-import { Bsff, BsffStatus, FormCompany } from "generated/graphql/types";
+import {
+  Bsff,
+  BsffStatus,
+  FormCompany,
+  CommonBsdStatus,
+  CommonBsdType,
+} from "generated/graphql/types";
 import React, { useState } from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -21,6 +27,7 @@ import routes from "common/routes";
 import { WorkflowAction } from "dashboard/components/BSDList/BSFF/WorkflowAction";
 import { DeleteBsffModal } from "dashboard/components/BSDList/BSFF/BsffActions/DeleteModal";
 import { useDownloadPdf } from "dashboard/components/BSDList/BSFF/BsffActions/useDownloadPdf";
+import { isCommonBsdStatus } from "dashboard/detail/utils";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -154,29 +161,36 @@ export function BsffDetailContent({ form }: Props) {
               </Link>
             </>
           )}
+
           <WorkflowAction
+            usedInTab={false}
             siret={siret}
-            form={{
-              ...form,
+            bsd={{
+              type: CommonBsdType.Bsff,
               id: form.id,
-              bsffStatus: form.status,
-              bsffDestination: {
+              readableId: form.id,
+              isDraft: form.isDraft,
+              status: isCommonBsdStatus(form.status)
+                ? form.status
+                : CommonBsdStatus.Initial,
+              destination: {
                 company: {
-                  siret: form.destination?.company?.siret ?? undefined,
-                  name: form.destination?.company?.name ?? undefined,
+                  siret: form.destination?.company?.siret ?? "",
+                  name: form.destination?.company?.name ?? "",
                 },
               },
-              bsffEmitter: {
+              emitter: {
                 company: {
-                  siret: form.emitter?.company?.siret ?? undefined,
-                  name: form.emitter?.company?.name ?? undefined,
+                  siret: form.emitter?.company?.siret ?? "",
+                  name: form.emitter?.company?.name ?? "",
                 },
               },
-              bsffTransporter: {
+              transporter: {
                 company: {
-                  siret: form.transporter?.company?.siret ?? undefined,
-                  name: form.transporter?.company?.name ?? undefined,
+                  siret: form.transporter?.company?.siret ?? "",
+                  name: form.transporter?.company?.name ?? "",
                 },
+                numberPlate: [],
               },
               waste: {
                 code: form.waste?.code,
