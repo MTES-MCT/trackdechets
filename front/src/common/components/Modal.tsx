@@ -66,7 +66,10 @@ export function TdModalTrigger({
   const [isOpen, setIsOpen] = useState(false);
 
   const open = () => setIsOpen(true);
-  const close = () => setIsOpen(false);
+  const close = () => {
+    console.log("close");
+    return setIsOpen(false);
+  };
   return (
     <div>
       {trigger(open)}

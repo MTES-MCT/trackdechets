@@ -42,16 +42,27 @@ interface ActionLinkProps extends HTMLAttributes<HTMLLinkElement> {
   icon: ReactNode;
   children: ReactNode;
   to: any;
+  extraClassName?: String;
 }
-export function ActionLink({ icon, children, to }: ActionLinkProps) {
+export function ActionLink({
+  icon,
+  children,
+  to,
+  extraClassName,
+}: ActionLinkProps) {
   const { size } = useContext(ActionButtonContext);
 
   return (
     <Link
       to={to}
-      className={classNames("btn btn--primary", styles.ActionButton, {
-        [styles.ActionButtonSmall]: size === "small",
-      })}
+      className={classNames(
+        "btn btn--primary",
+        styles.ActionButton,
+        {
+          [styles.ActionButtonSmall]: size === "small",
+        },
+        extraClassName
+      )}
     >
       <span className={styles.ActionButtonIcon}>{icon}</span>
       <span className={styles.ActionButtonContent}>{children}</span>
