@@ -1,19 +1,20 @@
 import * as React from "react";
 import { useParams } from "react-router";
-import { Form } from "generated/graphql/types";
+import { CommonBsd } from "generated/graphql/types";
 import { CellProps, CellValue } from "react-table";
 import { ActionButtonContext } from "common/components/ActionButton";
+
 import { BSDDActions } from "dashboard/components/BSDList/BSDD/BSDDActions/BSDDActions";
 import { IconBSDD } from "common/components/Icons";
 import { statusLabels } from "../../../constants";
 import TransporterInfoEdit from "../TransporterInfoEdit";
-import { WorkflowAction } from "./WorkflowAction";
+import { WorkflowAction } from "./WorkflowAction/WorkflowAction";
 
 export const COLUMNS: Record<
   string,
   {
-    accessor: (form: Form) => CellValue;
-    Cell?: React.ComponentType<CellProps<Form>>;
+    accessor: (form: CommonBsd) => CellValue;
+    Cell?: React.ComponentType<CellProps<CommonBsd>>;
   }
 > = {
   type: {
@@ -27,36 +28,40 @@ export const COLUMNS: Record<
     accessor: form => form.emitter?.company?.name ?? "",
   },
   recipient: {
-    accessor: form => form.stateSummary?.recipient?.name ?? "",
+    accessor: form =>
+      form.destination?.company?.name ??
+      form?.bsdd?.stateSummary?.recipientName,
   },
+
   waste: {
     accessor: form =>
-      [form.wasteDetails?.code, form.wasteDetails?.name]
-        .filter(Boolean)
-        .join(" "),
+      [form.waste?.code, form.waste?.description].filter(Boolean).join(" "),
   },
   transporterCustomInfo: {
-    accessor: form => form.stateSummary?.transporterCustomInfo ?? "",
+    accessor: form => form?.bsdd?.stateSummary?.transporterCustomInfo ?? "",
     Cell: ({ value, row }) => (
       <>
         <span style={{ marginRight: "0.5rem" }}>{value}</span>
+
         <TransporterInfoEdit
           fieldName="customInfo"
           verboseFieldName="champ libre"
-          form={row.original}
+          bsd={row.original}
+          initialValue={value}
         />
       </>
     ),
   },
   transporterNumberPlate: {
-    accessor: form => form.stateSummary?.transporterNumberPlate ?? "",
+    accessor: form => form?.bsdd?.stateSummary?.transporterNumberPlate ?? "",
     Cell: ({ value, row }) => (
       <>
         <span style={{ marginRight: "0.5rem" }}>{value}</span>
         <TransporterInfoEdit
           fieldName="numberPlate"
           verboseFieldName="plaque d'immatriculation"
-          form={row.original}
+          bsd={row.original}
+          initialValue={value}
         />
       </>
     ),
@@ -70,13 +75,13 @@ export const COLUMNS: Record<
       const { siret } = useParams<{ siret: string }>();
       return (
         <ActionButtonContext.Provider value={{ size: "small" }}>
-          <WorkflowAction siret={siret} form={row.original} />
+          <WorkflowAction siret={siret} bsd={row.original} />
         </ActionButtonContext.Provider>
       );
     },
   },
   actions: {
     accessor: () => null,
-    Cell: ({ row }) => <BSDDActions form={row.original} />,
+    Cell: ({ row }) => <BSDDActions bsd={row.original} />,
   },
 };

@@ -1,21 +1,19 @@
 import * as React from "react";
 import { Link, generatePath, useLocation, useParams } from "react-router-dom";
 import { CellProps } from "react-table";
-import { Bsd } from "generated/graphql/types";
+import { CommonBsd, CommonBsdType } from "generated/graphql/types";
 import routes from "common/routes";
 import { IconView } from "common/components/Icons";
-import { WorkflowAction } from "../BSDD/WorkflowAction";
+import { WorkflowAction } from "../BSDD/WorkflowAction/WorkflowAction";
 import { WorkflowAction as BsdasriWorkflowAction } from "../BSDasri/WorkflowAction";
 import { WorkflowAction as BsffWorkflowAction } from "../BSFF/WorkflowAction";
 import { WorkflowAction as BsvhuWorkflowAction } from "../BSVhu/WorkflowAction";
 import { WorkflowAction as BsdaWorkflowAction } from "../BSDa/WorkflowAction";
-import { Column } from "../columns";
+import { Column } from "../columns"; 
 import styles from "./BSDCards.module.scss";
-import { BsdTypename } from "dashboard/constants";
-import { BsffFragment } from "../BSFF";
 
 interface BSDCardsProps {
-  bsds: Bsd[];
+  bsds: CommonBsd[];
   columns: Column[];
 }
 
@@ -25,12 +23,14 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
 
   return (
     <div className={styles.BSDCards}>
-      {bsds.map(form => (
-        <div key={form.id} className={styles.BSDCard}>
+      {bsds.map(bsd => (
+        <div key={bsd.id} className={styles.BSDCard}>
           <ul className={styles.BSDCardList}>
             {columns.map(column => {
-              const Cell = column.Cell as React.ComponentType<CellProps<Bsd>>;
-
+              const Cell = column.Cell as React.ComponentType<
+                CellProps<CommonBsd>
+              >;
+              console.log(bsd.type);
               return (
                 <li key={column.id} className={styles.BSDCardListItem}>
                   <div className={styles.BSDCardListItemLabel}>
@@ -38,13 +38,13 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
                   </div>
                   <div className={styles.BSDCardListItemValue}>
                     <Cell
-                      value={column.accessor!(form, 0, {
+                      value={column.accessor!(bsd, 0, {
                         data: bsds,
                         depth: 0,
                         subRows: [],
                       })}
                       // @ts-ignore
-                      row={{ original: form }}
+                      row={{ original: bsd }}
                     />
                   </div>
                 </li>
@@ -52,12 +52,12 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
             })}
           </ul>
           <div className={styles.BSDCardActions}>
-            {!!form.__typename && (
+            {!!bsd.type && (
               <Link
                 to={{
-                  pathname: generatePath(getViewRoute(form.__typename), {
+                  pathname: generatePath(getViewRoute(bsd.type), {
                     siret,
-                    id: form.id,
+                    id: bsd.id,
                   }),
                   state: { background: location },
                 }}
@@ -67,20 +67,17 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
                 Aperçu
               </Link>
             )}
-            {form.__typename === "Form" ? (
-              <WorkflowAction siret={siret} form={form} />
+            {bsd.type === CommonBsdType.Bsdd ? (
+              <WorkflowAction siret={siret} bsd={bsd} />
             ) : null}
-            {form.__typename === "Bsdasri" ? (
-              <BsdasriWorkflowAction siret={siret} form={form} />
+            {bsd.type === CommonBsdType.Bsdasri ? (
+              <BsdasriWorkflowAction siret={siret} bsd={bsd} />
             ) : null}
-            {form.__typename === "Bsff" ? (
-              <BsffWorkflowAction
-                siret={siret}
-                form={(form as unknown) as BsffFragment}
-              />
+            {bsd.type === CommonBsdType.Bsff ? (
+              <BsffWorkflowAction siret={siret} bsd={bsd} />
             ) : null}
-            {form.__typename === "Bsvhu" ? (
-              <BsvhuWorkflowAction siret={siret} form={form} />
+            {bsd.type === CommonBsdType.Bsvhu ? (
+              <BsvhuWorkflowAction siret={siret} bsd={bsd} />
             ) : null}
             {form.__typename === "Bsda" ? (
               <BsdaWorkflowAction siret={siret} form={form} />
@@ -92,11 +89,11 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
   );
 }
 
-const getViewRoute = (bsdTypename: BsdTypename): string =>
+const getViewRoute = (bsdTypename: CommonBsdType): string =>
   ({
-    Form: routes.dashboard.bsdds.view,
-    Bsdasri: routes.dashboard.bsdasris.view,
-    Bsff: routes.dashboard.bsffs.view,
-    Bsvhu: routes.dashboard.bsvhus.view,
-    Bsda: routes.dashboard.bsdas.view,
+    [CommonBsdType.Bsdd]: routes.dashboard.bsdds.view,
+    [CommonBsdType.Bsdasri]: routes.dashboard.bsdasris.view,
+    [CommonBsdType.Bsff]: routes.dashboard.bsffs.view,
+    [CommonBsdType.Bsvhu]: routes.dashboard.bsvhus.view,
+    [CommonBsdType.Bsda]: routes.dashboard.bsdas.view,
   }[bsdTypename]);

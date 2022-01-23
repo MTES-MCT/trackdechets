@@ -12,19 +12,19 @@ import { GET_BSDS } from "common/queries";
 import { BsdWhere, Query, QueryBsdsArgs } from "generated/graphql/types";
 import * as React from "react";
 import { useMedia } from "use-media";
-import { BSDCards } from "./BSDCards";
 import styles from "./BSDList.module.scss";
-import { BSDTable } from "./BSDTable";
-import { Column, COLUMNS } from "./columns";
+import { BSDTable } from "./BSDTable/BSDTable";
+import { BSDCards } from "./BSDCards/BSDCards";
+import { Column, BSD_COLUMNS } from "./columns";
 import { NewBSDDropdown } from "./NewBSDDropdown";
 
 const DEFAULT_COLUMNS = [
-  COLUMNS.type,
-  COLUMNS.readableId,
-  COLUMNS.emitter,
-  COLUMNS.recipient,
-  COLUMNS.waste,
-  COLUMNS.status,
+  BSD_COLUMNS.type,
+  BSD_COLUMNS.readableId,
+  BSD_COLUMNS.emitter,
+  BSD_COLUMNS.recipient,
+  BSD_COLUMNS.waste,
+  BSD_COLUMNS.status,
 ];
 
 const LAYOUT_LOCAL_STORAGE_KEY = "td-display-type";
@@ -96,7 +96,7 @@ export function BSDList({
       fetchPolicy: "cache-only",
     }
   );
-  const showBlankslate = cachedData?.bsds.totalCount === 0;
+  const showBlankslate = cachedData?.bsds?.totalCount === 0;
 
   const refetchWithDefaultWhere = React.useCallback(
     ({ where, ...args }) =>
