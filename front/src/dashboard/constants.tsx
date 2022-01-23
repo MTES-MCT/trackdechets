@@ -1,3 +1,5 @@
+import { CommonBsdStatus } from "generated/graphql/types";
+
 export const statusLabels: { [key: string]: string } = {
   DRAFT: "Brouillon",
   SEALED: "En attente de collecte par le transporteur",
@@ -29,3 +31,39 @@ export const transportModeLabels: { [key: string]: string } = {
 };
 
 export type BsdTypename = "Form" | "Bsdasri" | "Bsvhu" | "Bsda" | "Bsff";
+
+export const verboseBsdStatuses: Record<CommonBsdStatus, string> = {
+  INITIAL: "Initial",
+  SIGNED_BY_PRODUCER: "Signé par le producteur",
+  SENT: "Envoyé",
+  RECEIVED: "Reçu",
+  PROCESSED: "Traité",
+  REFUSED: "Refusé",
+
+  SIGNED_BY_WORKER: "Signé par l'entreprise de travaux",
+
+  SIGNED_BY_EMITTER: "Signé par l'émetteur",
+
+  INTERMEDIATELY_PROCESSED: "Envoyé",
+  AWAITING_CHILD: "En attente d'un BSD suite",
+  DRAFT: "Envoyé",
+
+  SEALED: "En attente de collecte par le transporteur",
+
+  ACCEPTED: "Envoyé",
+
+  AWAITING_GROUP: "Traité, en attente de regroupement",
+
+  GROUPED: "Annexé à un bordereau de regroupement",
+
+  NO_TRACEABILITY: "Regroupé, avec autorisation de rupture de traçabilité",
+
+  TEMP_STORED: "Arrivé à l'entreposage provisoire, en attente d'acceptation",
+
+  TEMP_STORER_ACCEPTED: "Entreposé temporairement ou en reconditionnement",
+
+  RESEALED:
+    "En attente de collecte par le transporteur après entreposage provisoire",
+
+  RESENT: "En attente de réception pour traitement",
+};
