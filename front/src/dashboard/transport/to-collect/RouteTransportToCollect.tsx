@@ -8,18 +8,19 @@ import {
   Breadcrumb,
   BreadcrumbItem,
 } from "common/components";
-import { BSDList, COLUMNS } from "../../components/BSDList";
+import { BSDList } from "../../components/BSDList/BSDList";
+import { BSD_COLUMNS } from "../../components/BSDList/columns";
 import illustration from "./assets/blankslateToCollect.svg";
 
 const TO_COLLECT_COLUMNS = [
-  COLUMNS.type,
-  COLUMNS.readableId,
-  COLUMNS.emitter,
-  COLUMNS.recipient,
-  COLUMNS.waste,
-  COLUMNS.transporterCustomInfo,
-  COLUMNS.transporterNumberPlate,
-  COLUMNS.status,
+  BSD_COLUMNS.type,
+  BSD_COLUMNS.readableId,
+  BSD_COLUMNS.emitter,
+  BSD_COLUMNS.recipient,
+  BSD_COLUMNS.waste,
+  BSD_COLUMNS.transporterCustomInfo,
+  BSD_COLUMNS.transporterNumberPlate,
+  BSD_COLUMNS.status,
 ];
 
 export function RouteTransportToCollect() {
