@@ -1,4 +1,4 @@
-import { unflattenBsdasri } from "../../converter";
+import { expandBsdasriFromDb } from "../../converter";
 import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { GraphQLContext } from "../../../types";
@@ -44,7 +44,7 @@ const bsdasrisResolver: QueryResolvers["bsdasris"] = async (
         ...prismaPaginationArgs,
         orderBy: { createdAt: "desc" }
       }),
-    formatNode: unflattenBsdasri,
+    formatNode: expandBsdasriFromDb,
     ...gqlPaginationArgs
   });
 };

@@ -1,4 +1,4 @@
-import { unflattenBsdasri, flattenBsdasriInput } from "../../converter";
+import { expandBsdasriFromDb, flattenBsdasriInput } from "../../converter";
 import { Bsdasri, BsdasriStatus } from "@prisma/client";
 import prisma from "../../../prisma";
 import {
@@ -22,8 +22,8 @@ const fieldsAllowedForUpdateOnceReceived: BsdasriField[] = [
   "destinationReceptionWasteWeightValue"
 ];
 
-const fieldsAllowedForUpdateOnceSent: BsdasriField[] =
-  fieldsAllowedForUpdateOnceReceived.concat([
+const fieldsAllowedForUpdateOnceSent: BsdasriField[] = fieldsAllowedForUpdateOnceReceived.concat(
+  [
     "destinationCompanyName",
     "destinationCompanySiret",
     "destinationCompanyAddress",
@@ -39,10 +39,11 @@ const fieldsAllowedForUpdateOnceSent: BsdasriField[] =
     "destinationReceptionDate",
     "identificationNumbers",
     "handedOverToRecipientAt" // optional field to be filled by transporter once waste is received
-  ]);
+  ]
+);
 
-const fieldsAllowedForUpdateOnceSignedByEmitter: BsdasriField[] =
-  fieldsAllowedForUpdateOnceSent.concat([
+const fieldsAllowedForUpdateOnceSignedByEmitter: BsdasriField[] = fieldsAllowedForUpdateOnceSent.concat(
+  [
     "transporterCompanyName",
     "transporterCompanySiret",
     "transporterCompanyAddress",
@@ -64,12 +65,12 @@ const fieldsAllowedForUpdateOnceSignedByEmitter: BsdasriField[] =
     "transporterCustomInfo",
     "transporterTransportMode",
     "transporterTransportPlates"
-  ]);
+  ]
+);
 
 const getFieldsAllorwedForUpdate = (bsdasri: Bsdasri) => {
   const allowedFields = {
-    [BsdasriStatus.SIGNED_BY_PRODUCER]:
-      fieldsAllowedForUpdateOnceSignedByEmitter,
+    [BsdasriStatus.SIGNED_BY_PRODUCER]: fieldsAllowedForUpdateOnceSignedByEmitter,
     [BsdasriStatus.SENT]: fieldsAllowedForUpdateOnceSent,
     [BsdasriStatus.RECEIVED]: fieldsAllowedForUpdateOnceReceived,
     [BsdasriStatus.PROCESSED]: []
@@ -167,12 +168,14 @@ const dasriUpdateResolver = async (
       ...flattenedInput,
       ...getGroupedBsdasriArgs(inputGrouping),
       type: isGrouping.isGrouping ? "GROUPING" : "SIMPLE"
+    },
+    include: {
+      _count: { select: { grouping: true } }
     }
   });
 
-  const expandedDasri = unflattenBsdasri(updatedDasri);
   await indexBsdasri(updatedDasri);
-  return expandedDasri;
+  return expandBsdasriFromDb(updatedDasri);
 };
 
 export default dasriUpdateResolver;

@@ -6,7 +6,7 @@ import {
   MutationResolvers
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
-import { unflattenBsdasri } from "../../converter";
+import { expandBsdasriFromDb } from "../../converter";
 import { getBsdasriOrNotFound } from "../../database";
 import { checkIsBsdasriContributor } from "../../permissions";
 import { indexBsdasri } from "../../elastic";
@@ -37,8 +37,8 @@ const duplicateBsdasriResolver: MutationResolvers["duplicateBsdasri"] = async (
   );
 
   const newBsdasri = await duplicateBsdasri(user, bsdasri);
-  await indexBsdasri(newBsdasri);
-  return unflattenBsdasri(newBsdasri);
+  await indexBsdasri({ ...newBsdasri, _count: { grouping: 0 } }); // duplicated dasris can't be initially grouping other bsds
+  return expandBsdasriFromDb(newBsdasri);
 };
 
 function duplicateBsdasri(

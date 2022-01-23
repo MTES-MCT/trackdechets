@@ -39,7 +39,7 @@ import {
 } from "../forms/form-converter";
 import { Prisma, Bsdasri, BsdasriStatus } from "@prisma/client";
 
-export function unflattenBsdasri(bsdasri: Bsdasri): GqlBsdasri {
+export function expandBsdasriFromDb(bsdasri: Bsdasri): GqlBsdasri {
   return {
     id: bsdasri.id,
     isDraft: bsdasri.isDraft,

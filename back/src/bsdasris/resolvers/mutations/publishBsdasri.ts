@@ -1,7 +1,7 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getBsdasriOrNotFound } from "../../database";
-import { unflattenBsdasri } from "../../converter";
+import { expandBsdasriFromDb } from "../../converter";
 import { validateBsdasri } from "../../validation";
 import {
   checkIsBsdasriContributor,
@@ -36,7 +36,7 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
     where: { id: bsdasri.id },
     data: { isDraft: false }
   });
-  const expandedDasri = unflattenBsdasri(publishedBsdasri);
+  const expandedDasri = expandBsdasriFromDb(publishedBsdasri);
   await indexBsdasri(publishedBsdasri);
   return expandedDasri;
 };

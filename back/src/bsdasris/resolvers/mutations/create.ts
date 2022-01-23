@@ -4,7 +4,7 @@ import {
   ResolversParentTypes
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
-import { unflattenBsdasri, flattenBsdasriInput } from "../../converter";
+import { expandBsdasriFromDb, flattenBsdasriInput } from "../../converter";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { validateBsdasri } from "../../validation";
@@ -60,12 +60,15 @@ const createBsdasri = async (
       type: isGrouping ? "GROUPING" : "SIMPLE",
       grouping: { connect: groupedBsdasris },
       isDraft: isDraft
+    },
+    include: {
+      _count: { select: { grouping: true } }
     }
   });
 
   await indexBsdasri(newDasri, context);
 
-  return unflattenBsdasri(newDasri);
+  return expandBsdasriFromDb(newDasri);
 };
 
 export default createBsdasri;

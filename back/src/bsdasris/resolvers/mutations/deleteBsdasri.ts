@@ -3,7 +3,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import * as elastic from "../../../common/elastic";
 import { getBsdasriOrNotFound } from "../../database";
-import { unflattenBsdasri } from "../../converter";
+import { expandBsdasriFromDb } from "../../converter";
 import { checkCanDeleteBsdasri } from "../../permissions";
 
 /**
@@ -41,7 +41,7 @@ const deleteBsdasriResolver: MutationResolvers["deleteBsdasri"] = async (
 
   await elastic.deleteBsd(deletedBsdasri, context);
 
-  return unflattenBsdasri(deletedBsdasri);
+  return expandBsdasriFromDb(deletedBsdasri);
 };
 
 export default deleteBsdasriResolver;

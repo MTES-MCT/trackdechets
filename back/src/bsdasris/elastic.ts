@@ -104,16 +104,24 @@ function getWhere(
   return where;
 }
 
+// Pass grouping info to avoid fetching related objects
+type BsdasriAnnotations = {
+  _count?: { grouping: number };
+};
+
+type AnnotatedBsdasri = Bsdasri & BsdasriAnnotations;
 /**
  * Convert a dasri from the bsdasri table to Elastic Search's BSD model.
  */
-function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
+function toBsdElastic(bsdasri: AnnotatedBsdasri): BsdElastic {
   const where = getWhere(bsdasri);
 
   return {
     id: bsdasri.id,
     readableId: bsdasri.id,
     type: "BSDASRI",
+    isDraft: bsdasri.isDraft,
+    status: bsdasri.status,
     emitterCompanyName: bsdasri.emitterCompanyName ?? "",
     emitterCompanySiret: bsdasri.emitterCompanySiret ?? "",
     transporterCompanyName: bsdasri.transporterCompanyName ?? "",
@@ -129,6 +137,10 @@ function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
     wasteDescription: DASRI_WASTE_CODES_MAPPING[bsdasri.wasteCode],
     transporterNumberPlate: bsdasri.transporterTransportPlates,
     createdAt: bsdasri.createdAt.getTime(),
+    bsdasri: {
+      type: bsdasri.type,
+      groupingCount: bsdasri?._count?.grouping ?? 0
+    },
     ...where,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsdasri)
@@ -148,6 +160,9 @@ export async function indexAllBsdasris(
     take,
     where: {
       isDeleted: false
+    },
+    include: {
+      _count: { select: { grouping: true } }
     }
   });
 
@@ -168,6 +183,6 @@ export async function indexAllBsdasris(
   return indexAllBsdasris(idx, { skip: skip + take });
 }
 
-export function indexBsdasri(bsdasri: Bsdasri, ctx?: GraphQLContext) {
+export function indexBsdasri(bsdasri: AnnotatedBsdasri, ctx?: GraphQLContext) {
   return indexBsd(toBsdElastic(bsdasri), ctx);
 }
