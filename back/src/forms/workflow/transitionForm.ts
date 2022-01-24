@@ -8,6 +8,7 @@ import { eventEmitter, TDEvent } from "../../events/emitter";
 import { indexForm } from "../elastic";
 import { getFullForm } from "../database";
 import { GraphQLContext } from "../../types";
+import { persistBsddEvent } from "../../activity-events/bsdd";
 
 /**
  * Transition a form from initial state (ex: DRAFT) to next state (ex: SEALED)
@@ -77,6 +78,20 @@ export default async function transitionForm(
       loggedAt: new Date(),
       updatedFields
     }
+  });
+  await persistBsddEvent({
+    streamId: form.id,
+    actorId: user.id,
+    type: "BsddUpdated",
+    data: { content: formUpdateInput },
+    metadata: { authType: user.auth }
+  });
+  await persistBsddEvent({
+    streamId: form.id,
+    actorId: user.id,
+    type: "BsddSigned",
+    data: { status: nextStatus },
+    metadata: { authType: user.auth }
   });
 
   const fullForm = await getFullForm(updatedForm);

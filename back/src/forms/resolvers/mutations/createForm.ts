@@ -1,5 +1,6 @@
 import { Prisma, Status } from "@prisma/client";
 import { isDangerous } from "../../../common/constants";
+import { persistBsddEvent } from "../../../activity-events/bsdd";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { eventEmitter, TDEvent } from "../../../events/emitter";
 import {
@@ -113,6 +114,13 @@ const createFormResolver = async (
       authType: user.auth,
       loggedAt: new Date()
     }
+  });
+  await persistBsddEvent({
+    streamId: newForm.id,
+    actorId: context.user!.id,
+    type: "BsddCreated",
+    data: { content: formCreateInput },
+    metadata: { authType: user.auth }
   });
 
   const fullForm = await getFullForm(newForm);

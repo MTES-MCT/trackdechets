@@ -36,6 +36,13 @@ const deleteFormResolver: MutationResolvers["deleteForm"] = async (
   }
 
   // TODO: create a statusLog
+  await persistBsddEvent({
+    streamId: id,
+    actorId: user.id,
+    type: "BsddDeleted",
+    data: {},
+    metadata: { authType: user.auth }
+  });
 
   await elastic.deleteBsd(deletedForm, context);
 

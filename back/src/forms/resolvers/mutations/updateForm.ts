@@ -25,6 +25,7 @@ import { FormSirets } from "../../types";
 import { indexForm } from "../../elastic";
 import { EventType } from "../../workflow/types";
 import transitionForm from "../../workflow/transitionForm";
+import { persistBsddEvent } from "../../../activity-events/bsdd";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -155,6 +156,13 @@ const updateFormResolver = async (
   // We create a statusLog when creating a form
   // but not when it is updated between its creation and seal
   // so the form might have changed in-between without a proper statusLog
+  await persistBsddEvent({
+    streamId: updatedForm.id,
+    actorId: context.user!.id,
+    type: "BsddUpdated",
+    data: { content: formUpdateInput },
+    metadata: { authType: user.auth }
+  });
 
   const fullForm = await getFullForm(updatedForm);
   await indexForm(fullForm, context);

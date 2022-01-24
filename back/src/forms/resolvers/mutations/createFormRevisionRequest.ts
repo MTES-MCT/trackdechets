@@ -8,6 +8,7 @@ import {
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
+import { persistBsddRevisionRequestEvent } from "../../../activity-events/bsdd";
 import {
   PROCESSING_OPERATIONS_CODES,
   WASTES_CODES
@@ -91,7 +92,7 @@ export default async function createFormRevisionRequest(
     authoringCompany.siret
   );
 
-  return prisma.bsddRevisionRequest.create({
+  const bsddRevisionRequest = await prisma.bsddRevisionRequest.create({
     data: {
       bsdd: { connect: { id: existingBsdd.id } },
       ...flatContent,
@@ -102,6 +103,15 @@ export default async function createFormRevisionRequest(
       comment
     }
   });
+
+  await persistBsddRevisionRequestEvent({
+    actorId: user.id,
+    streamId: bsddRevisionRequest.id,
+    type: "BsddRevisionRequestCreated",
+    data: { content: flatContent, authoringSiret: authoringCompanySiret }
+  });
+
+  return bsddRevisionRequest;
 }
 
 async function getAuthoringCompany(

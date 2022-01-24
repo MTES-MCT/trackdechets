@@ -6,6 +6,7 @@ import {
   User
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
+import { persistBsddEvent } from "../../../activity-events/bsdd";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationSubmitFormRevisionRequestApprovalArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
@@ -54,7 +55,11 @@ export default async function submitFormRevisionRequestApproval(
     }
   });
 
-  await reverberateChangeOnAssociatedObjects(revisionRequest, updatedApproval);
+  await reverberateChangeOnAssociatedObjects(
+    revisionRequest,
+    updatedApproval,
+    user
+  );
 
   return prisma.bsddRevisionRequest.findFirst({
     where: { id }
@@ -85,7 +90,8 @@ async function getCurrentApproverSiret(
 
 async function reverberateChangeOnAssociatedObjects(
   revisionRequest: FormRevisionRequestWithApprovals,
-  updatedApproval: BsddRevisionRequestApproval
+  updatedApproval: BsddRevisionRequestApproval,
+  user: User
 ) {
   // We have a refusal:
   // - mark revision as refused
@@ -129,6 +135,14 @@ async function reverberateChangeOnAssociatedObjects(
           temporaryStorageDetail: { update: { ...temporaryStorageUpdate } }
         })
       }
+    });
+
+    await persistBsddEvent({
+      streamId: revisionRequest.bsddId,
+      actorId: user.id,
+      type: "BsddRevisionRequestApplied",
+      data: { content: bsddUpdate, revisionRequestId: revisionRequest.id },
+      metadata: {}
     });
   }
 }

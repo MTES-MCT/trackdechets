@@ -9,14 +9,15 @@ import { getFormOrFormNotFound, getFullForm } from "../../database";
 import { checkCanDuplicate } from "../../permissions";
 import { eventEmitter, TDEvent } from "../../../events/emitter";
 import { indexForm } from "../../elastic";
+import { persistBsddEvent } from "../../../activity-events/bsdd";
 
 /**
- * Duplicate a form by stripping the properties that should not be copied.
+ * Get the input to duplicate a form by stripping the properties that should not be copied.
  *
  * @param {User} user user that should own the duplicated form
  * @param {Form} form the form to duplicate
  */
-async function duplicateForm(
+function getDuplicateFormInput(
   user: User,
   {
     id,
@@ -52,14 +53,12 @@ async function duplicateForm(
     ...rest
   }: Form
 ) {
-  return prisma.form.create({
-    data: {
-      ...rest,
-      readableId: getReadableId(),
-      status: "DRAFT",
-      owner: { connect: { id: user.id } }
-    }
-  });
+  return {
+    ...rest,
+    readableId: getReadableId(),
+    status: "DRAFT" as Status,
+    owner: { connect: { id: user.id } }
+  };
 }
 
 /**
@@ -114,7 +113,10 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
 
   await checkCanDuplicate(user, existingForm);
 
-  const newForm = await duplicateForm(user, existingForm);
+  const newFormInput = getDuplicateFormInput(user, existingForm);
+  const newForm = await prisma.form.create({
+    data: newFormInput
+  });
 
   const temporaryStorageDetail = await prisma.form
     .findUnique({ where: { id: existingForm.id } })
@@ -141,6 +143,13 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
       updatedFields: {},
       loggedAt: new Date()
     }
+  });
+  await persistBsddEvent({
+    streamId: newForm.id,
+    actorId: context.user!.id,
+    type: "BsddCreated",
+    data: { content: newFormInput },
+    metadata: { authType: user.auth }
   });
 
   const fullForm = await getFullForm(newForm);
