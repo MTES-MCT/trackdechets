@@ -10,7 +10,7 @@ const {
   SENTRY_DSN
 } = process.env;
 
-const mj = mailjet.connect(MJ_APIKEY_PUBLIC ?? null, MJ_APIKEY_PRIVATE ?? null);
+const mj = mailjet.connect(MJ_APIKEY_PUBLIC, MJ_APIKEY_PRIVATE);
 
 const mailjetBackend = {
   backendName: "Mailjet",
