@@ -1,4 +1,4 @@
-import { Form, Prisma, Status } from "@prisma/client";
+import { Prisma, Status } from "@prisma/client";
 import { ActivityEvent } from "..";
 import { RevisionRequestContent } from "../../forms/resolvers/mutations/createFormRevisionRequest";
 
@@ -32,7 +32,7 @@ export type BsddSigned = ActivityEvent<
     status: Status;
   }
 >;
-export type BsddDeleted = ActivityEvent<"BsddDeleted", {}>;
+export type BsddDeleted = ActivityEvent<"BsddDeleted", Record<string, never>>;
 export type BsddRevisionRequestApplied = ActivityEvent<
   "BsddRevisionRequestApplied",
   {

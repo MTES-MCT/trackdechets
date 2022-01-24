@@ -651,7 +651,6 @@ model User {
   StatusLog             StatusLog[]
   UserActivationHash    UserActivationHash[]
   UserResetPasswordHash UserResetPasswordHash[]
-  events                Event[]
 
   bsdasriEmissionSignatures  Bsdasri[] @relation("BsdasriEmissionSignature")
   bsdasriTransportSignatures Bsdasri[] @relation("BsdasriTransportSignature")
@@ -1256,13 +1255,12 @@ model Bsda {
 
 model Event {
   id         String   @id @default(cuid())
-  occurredAt DateTime
+  occurredAt DateTime @default(now())
 
   streamId String
   type     String
   data     Json
-  metadata Json
+  metadata Json?
 
   actorId String
-  actor   User   @relation(fields: [actorId], references: [id])
 }

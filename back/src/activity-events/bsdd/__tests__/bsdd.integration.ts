@@ -1,6 +1,5 @@
 import { BsddRevisionRequestApplied, getBsddFromActivityEvents } from "..";
 import { resetDatabase } from "../../../../integration-tests/helper";
-import { getNewValidForm } from "../../../forms/resolvers/mutations/__mocks__/data";
 import {
   Mutation,
   MutationSubmitFormRevisionRequestApprovalArgs
@@ -65,11 +64,6 @@ describe("ActivityEvent.Bsdd", () => {
       }
     );
     const { mutate } = makeClient(user);
-
-    const { id, readableId, isImportedFromPaper, status, ...validForm } =
-      getNewValidForm();
-    validForm.emitter.company.siret = company.siret;
-    validForm.emitter.company.name = company.name;
 
     // Create form
     const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
@@ -255,5 +249,60 @@ describe("ActivityEvent.Bsdd", () => {
     const eventData = eventsAfterBsddApplied[0]
       .data as BsddRevisionRequestApplied["data"];
     expect(eventData.content.wasteDetailsCode).toBe("01 03 08");
+  });
+
+  it("should enable getting a bsdd at a certain moment in time", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const { mutate } = makeClient(user);
+
+    // Create form
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            type: "PRODUCER",
+            company: {
+              name: company.name,
+              siret: company.siret,
+              address: company.address,
+              contact: "Emetteur",
+              phone: "01",
+              mail: "e@e.fr"
+            }
+          },
+          wasteDetails: {
+            code: "01 03 04*"
+          }
+        }
+      }
+    });
+
+    const formId = data.createForm.id;
+
+    const now = new Date();
+
+    // Update form
+    await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: formId,
+          wasteDetails: {
+            code: "01 01 01"
+          }
+        }
+      }
+    });
+
+    // We should now be able to get the bsdd at different stages
+    const formAfterUpdate = await prisma.form.findUnique({
+      where: { id: formId }
+    });
+    const formFromEventsAfterCreate = await getBsddFromActivityEvents(
+      formId,
+      now
+    );
+    expect(formFromEventsAfterCreate.wasteDetailsCode).toBe("01 03 04*");
+    expect(formAfterUpdate.wasteDetailsCode).toBe("01 01 01");
   });
 });
