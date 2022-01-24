@@ -71,7 +71,7 @@
 
    ```bash
    docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
-   npx prisma db push --preview-feature
+   yarn prisma db push --preview-feature
    ```
 
 6. Initialiser l'index Elastic Search.
@@ -152,7 +152,7 @@ Il est également possible de faire tourner les tests unitaires sur l'environnem
    ```bash
    docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
    yarn test # run all the tests
-   npx jest path src/path/to/my-function.test.ts # run only one test
+   yarn jest path src/path/to/my-function.test.ts # run only one test
    ```
 3. Faire tourner les tests front
    ```bash
@@ -288,8 +288,8 @@ Pour palier à ce problème, il est possible de nourrir la base de donnée Prism
 2. Démarrer les containers `postgres` et `td-api`
 3. (Optionnel) Reset de la base de données
    3.1 Dans le container `postgres `: `psql -U trackdechets -d prisma -c "DROP SCHEMA \"default\$default\" CASCADE;"` pour supprimer les données existantes
-   3.2 Dans le container `td-api`: `npx prisma db push --preview-feature` pour recréer les tables
-4. Dans le container `td-api`: `npx prisma db seed --preview-feature` pour nourrir la base de données.
+   3.2 Dans le container `td-api`: `yarn prisma db push --preview-feature` pour recréer les tables
+4. Dans le container `td-api`: `yarn prisma db seed --preview-feature` pour nourrir la base de données.
 
 ### Ajouter une nouvelle icône
 

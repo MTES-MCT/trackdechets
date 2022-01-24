@@ -2,7 +2,11 @@
   "compilerOptions": {
     "composite": true /* Enable project compilation, compulsory to use typescript references */,
     "experimentalDecorators": true,
-    "lib": ["ES2020", "esnext.asynciterable"],
+    "lib": [
+      "dom",
+      "es2020",
+      "esnext.asynciterable"
+    ],
     "outDir": "dist",
     "moduleResolution": "node",
     "module": "CommonJS",
@@ -21,7 +25,7 @@
     "strictPropertyInitialization": false,
     "jsx": "react"
   },
-  "include": ["src/**/*", "prisma/**/*"],
+  "include": ["src/**/*", "prisma/**/*", "integration-tests/*"],
   "references": [
     {
       "path": "../common"

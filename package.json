@@ -20,7 +20,8 @@
       "common",
       "back",
       "front",
-      "search"
+      "search",
+      "doc"
     ]
   }
 }

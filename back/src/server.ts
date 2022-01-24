@@ -1,4 +1,4 @@
-import "./tracer";
+import "@trackdechets/common/src/tracer";
 
 import {
   ApolloError,

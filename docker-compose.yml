@@ -19,16 +19,18 @@ services:
       - "6379:6379"
 
   td-api:
-    image: td-api
+    image: node:14.15.4
+    command: sh -c "yarn && yarn generate && yarn dev"
+    working_dir: /usr/src/back
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
-    build:
-      context: ./back
-      dockerfile: Dockerfile.dev
     volumes:
-      - ./back/src:/usr/src/app/src
-      - ./doc/docs:/usr/src/doc/docs
-      - ./front/src/generated:/usr/src/front/src/generated
-      - ./back/prisma:/usr/src/app/prisma
+      - ./back:/usr/src/back
+      - ./package.json:/usr/src/package.json
+      - ./yarn.lock:/usr/src/yarn.lock
+      - ./.yarn:/usr/src/.yarn
+      - ./.yarnrc.yml:/usr/src/.yarnrc.yml
+      - ./common:/usr/src/common
+      - ./search:/usr/src/search
     env_file:
       - .env
     environment:
@@ -49,6 +51,8 @@ services:
       - "3000"
     volumes:
       - ./front:/usr/src/front
+      - ./common:/usr/src/common
+      - ./search:/usr/src/search
       - ./back/src:/usr/src/back/src
     ports:
       - "3000:3000"

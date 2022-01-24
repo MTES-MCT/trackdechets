@@ -1,4 +1,4 @@
-import { Bsdasri } from ".prisma/client";
+import { Bsdasri } from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import {

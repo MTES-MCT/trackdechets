@@ -11,7 +11,7 @@ import {
   Bsvhu,
   Form,
   TemporaryStorageDetail
-} from ".prisma/client";
+} from "@prisma/client";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html

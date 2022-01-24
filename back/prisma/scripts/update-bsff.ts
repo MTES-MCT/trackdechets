@@ -1,4 +1,4 @@
-import { BsffType, Prisma, WasteAcceptationStatus } from ".prisma/client";
+import { BsffType, Prisma, WasteAcceptationStatus } from "@prisma/client";
 import prisma from "../../src/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
 

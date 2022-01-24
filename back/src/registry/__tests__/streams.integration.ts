@@ -1,6 +1,6 @@
 import { wastesReader } from "../streams";
 import { formFactory, userWithCompanyFactory } from "../../__tests__/factories";
-import { Company, User, UserRole } from ".prisma/client";
+import { Company, User, UserRole } from "@prisma/client";
 import {
   refreshElasticSearch,
   resetDatabase

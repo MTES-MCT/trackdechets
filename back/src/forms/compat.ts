@@ -3,7 +3,7 @@ import {
   QuantityType,
   Status,
   TemporaryStorageDetail
-} from ".prisma/client";
+} from "@prisma/client";
 import { Bsdd } from "./types";
 
 /**

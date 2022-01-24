@@ -1,4 +1,4 @@
-import { BsdaType, Prisma } from ".prisma/client";
+import { BsdaType, Prisma } from "@prisma/client";
 import { Bsda } from "@prisma/client";
 import prisma from "../../src/prisma";
 import { registerUpdater, Updater } from "./helper/helper";

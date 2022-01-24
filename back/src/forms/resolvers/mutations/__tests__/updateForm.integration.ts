@@ -9,7 +9,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
-import { Status } from ".prisma/client";
+import { Status } from "@prisma/client";
 
 const UPDATE_FORM = `
   mutation UpdateForm($updateFormInput: UpdateFormInput!) {

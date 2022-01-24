@@ -27,13 +27,17 @@ services:
           - "node.labels.elasticsearch == true"
 
   td-api:
-    image: td-api
-    build:
-      context: ../
-      dockerfile: Dockerfile.dev
-    command: tail -f /dev/null
+    image: node:14.15.4
+    command: sh -c "yarn && yarn generate && yarn dev"
+    working_dir: /usr/src/back
     volumes:
-      - ../src:/usr/src/app/src
+      - ./back:/usr/src/back
+      - ./package.json:/usr/src/package.json
+      - ./yarn.lock:/usr/src/yarn.lock
+      - ./.yarn:/usr/src/.yarn
+      - ./.yarnrc.yml:/usr/src/.yarnrc.yml
+      - ./common:/usr/src/common
+      - ./search:/usr/src/search
     env_file:
       - .integration-tests-env
     environment:

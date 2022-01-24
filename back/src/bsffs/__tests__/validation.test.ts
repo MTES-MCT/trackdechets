@@ -1,4 +1,4 @@
-import { WasteAcceptationStatus } from ".prisma/client";
+import { WasteAcceptationStatus } from "@prisma/client";
 import { beforeReceptionSchema } from "../validation";
 
 const destination = {

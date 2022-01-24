@@ -5,10 +5,10 @@ if [ $# -ne 2 ] ; then
     exit 1
 fi
 
-NB_OF_TESTS=$(npx jest --config ./integration-tests/jest.config.js --listTests | wc -l)
+NB_OF_TESTS=$(yarn jest --config ./integration-tests/jest.config.js --listTests | wc -l)
 CHUNK_SIZE=$(((NB_OF_TESTS + $2 - 1) / $2))
 
 TEST_START_INDEX=$((CHUNK_SIZE * $1))
-TEST_FILES=$(npx jest --config ./integration-tests/jest.config.js --listTests | head -n $TEST_START_INDEX | tail -n $CHUNK_SIZE)
+TEST_FILES=$(yarn jest --config ./integration-tests/jest.config.js --listTests | head -n $TEST_START_INDEX | tail -n $CHUNK_SIZE)
 
 echo "$TEST_FILES" | tr '\n' '|' | sed "s|$PWD||g"

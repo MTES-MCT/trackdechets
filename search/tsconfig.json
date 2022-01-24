@@ -1,22 +1,31 @@
 {
+  /* Visit https://aka.ms/tsconfig.json to read more about this file */
   "compilerOptions": {
     "composite": true /* Enable project compilation, compulsory to use typescript references */,
-    "experimentalDecorators": true,
+    "target": "es2020" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */,
     "moduleResolution": "node",
 		"module": "CommonJS",
-		"lib": ["es2020", "esnext.asynciterable"],
+    "lib": [
+      "dom",
+      "es2020",
+      "esnext.asynciterable"
+    ],
     "outDir": "./dist",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "strict": true,
+    "resolveJsonModule": true            /* Parse in strict mode and emit "use strict" for each source file. */,
+    "skipLibCheck": true /* Skip type checking of declaration files. */,
+    /* Strict Type-Checking Options */
+    "strict": true /* Enable all strict type-checking options. */,
     "noImplicitThis": true,
     "noImplicitAny": false,
     "strictBindCallApply": true,
     "strictFunctionTypes": false,
     "strictNullChecks": false,
     "strictPropertyInitialization": false,
+    /* Experimental Options */
+    "experimentalDecorators": true /* Enables experimental support for ES7 decorators. */,
+    "emitDecoratorMetadata": true /* Enables experimental support for emitting type metadata for decorators. */
   },
   "include": ["src/**/*"],
   "references": [
