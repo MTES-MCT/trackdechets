@@ -35,8 +35,10 @@ jobs:
         working-directory: back
     steps:
       - uses: actions/checkout@v2
+      - name: install corepack
+        run: npm i -g corepack
       - name: Update yarn
-        run: yarn set version berry
+        run: yarn set version stable
       - name: Setup Node
         uses: actions/setup-node@v2.5.1
         with:
