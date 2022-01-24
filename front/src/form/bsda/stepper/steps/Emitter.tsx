@@ -99,7 +99,7 @@ export function Emitter({ disabled }) {
       <WorkSite
         switchLabel="Je souhaite ajouter une adresse de chantier ou de collecte"
         headingTitle="Adresse chantier"
-        designation="du chantier"
+        designation="du chantier ou lieu de collecte"
         getInitialEmitterWorkSiteFn={getInitialEmitterPickupSite}
         disabled={disabled}
         modelKey="pickupSite"
