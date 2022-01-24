@@ -13,7 +13,7 @@ const logger = createLogger({
     format.json()
   ),
   transports: [
-    process.env.NODE_ENV !== "dev"
+    process.env.API_LOGS_CONSOLE
       ? new transports.File({ filename: LOG_PATH })
       : new transports.Console({
           format: format.simple(),
