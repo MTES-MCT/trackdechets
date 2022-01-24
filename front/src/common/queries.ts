@@ -49,7 +49,7 @@ export const GET_DASRI_METADATA = gql`
 `;
 
 export const GET_BSDS = gql`
-  query GetFastBsds(
+  query GetBsds(
     $after: String
     $first: Int
     $clue: String

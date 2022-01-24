@@ -67,7 +67,6 @@ export function TdModalTrigger({
 
   const open = () => setIsOpen(true);
   const close = () => {
-    console.log("close");
     return setIsOpen(false);
   };
   return (

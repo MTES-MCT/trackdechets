@@ -148,6 +148,11 @@ export async function getStateSummary(form: Form) {
   };
 }
 
+/**
+ *
+ * Extract relevant state summary to be indexed in ES for UI rendering
+ * Kept here to be colocated with other state summary utils
+ */
 export const getElasticStateSummary = (form: FullForm) => {
   return {
     transporterNumberPlate:

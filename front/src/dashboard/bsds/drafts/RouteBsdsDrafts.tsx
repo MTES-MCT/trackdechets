@@ -9,7 +9,7 @@ import {
   BlankslateTitle,
   BlankslateDescription,
 } from "common/components";
-import { BSDList } from "../../components/BSDList/BSDList";
+import { BSDList } from "../../components/BSDList";
 import illustration from "./assets/blankslateDrafts.svg";
 
 export function RouteBsdsDrafts() {

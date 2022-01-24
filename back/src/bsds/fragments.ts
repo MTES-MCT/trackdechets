@@ -34,7 +34,6 @@ export const fullBsdFragment = gql`
     }
     bsda {
       type
-
       worker {
         company {
           siret
@@ -42,7 +41,6 @@ export const fullBsdFragment = gql`
         }
       }
     }
-
     bsdasri {
       type
       groupingCount
@@ -65,9 +63,3 @@ export const fullBsdFragment = gql`
     }
   }
 `;
-// export const fullBsdFragment = gql`
-//   fragment FullBsdFragment on CommonBsd {
-//     id
-
-//   }
-// `;

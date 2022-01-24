@@ -4,7 +4,7 @@ import { CellProps } from "react-table";
 import { CommonBsd, CommonBsdType } from "generated/graphql/types";
 import routes from "common/routes";
 import { IconView } from "common/components/Icons";
-import { WorkflowAction } from "../BSDD/WorkflowAction/WorkflowAction";
+import { WorkflowAction } from "../BSDD/WorkflowAction";
 import { WorkflowAction as BsdasriWorkflowAction } from "../BSDasri/WorkflowAction";
 import { WorkflowAction as BsffWorkflowAction } from "../BSFF/WorkflowAction";
 import { WorkflowAction as BsvhuWorkflowAction } from "../BSVhu/WorkflowAction";
@@ -30,7 +30,6 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
               const Cell = column.Cell as React.ComponentType<
                 CellProps<CommonBsd>
               >;
-              console.log(bsd.type);
               return (
                 <li key={column.id} className={styles.BSDCardListItem}>
                   <div className={styles.BSDCardListItemLabel}>

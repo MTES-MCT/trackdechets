@@ -11,6 +11,9 @@ import {
 import { BsdConverterContext, BsdasriConverterContext } from "./types";
 import { BsdElastic } from "../common/elastic";
 
+/**
+ * Extract relevant data from BsdElastic to fill CommonBsdd bsdd section
+ */
 type elasticToBsdd = (node: BsdElastic) => CommonBsdd;
 const elasticToBsdd = node => {
   if (node._source.type !== "BSDD") {
@@ -60,6 +63,9 @@ const elasticToBsdd = node => {
   };
 };
 
+/**
+ * Extract relevant data from BsdElastic to fill CommonBsdd bsdasri section
+ */
 type elasticToBsdasri = (
   node: BsdElastic,
   bsdasriSiretsAllowingDirectTakeover: string[]
@@ -102,6 +108,9 @@ const elasticToBsda = node => {
   };
 };
 
+/**
+ * Convert BsdElastic to CommonBsdd iot be returned by bsds query
+ */
 type ElasticToBsdFn = (
   node,
   converterContext: BsdConverterContext

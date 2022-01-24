@@ -1,14 +1,3 @@
-# type BsdConnection {
-#   totalCount: Int!
-#   pageInfo: PageInfo!
-#   edges: [BsdEdge!]!
-# }
-
-# type BsdEdge {
-#   cursor: String!
-#   node: Bsd!
-# }
-
 union Bsd = Form | Bsdasri | Bsvhu | Bsda | Bsff
 
 type CommonBsdConnection {

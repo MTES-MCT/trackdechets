@@ -27,8 +27,6 @@ enum BsdasriStatus {
   REFUSED
 }
 
-
-
 "Type de packaging du déchet"
 enum BsdasriPackagingType {
   "Caisse en carton avec sac en plastique"
