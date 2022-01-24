@@ -1,60 +1,56 @@
 import TdSwitch from "common/components/Switch";
 
 import { Field, useFormikContext } from "formik";
-import { Form } from "generated/graphql/types";
+import { Bsdasri } from "generated/graphql/types";
 import React from "react";
-import WorkSiteAddress from "./WorkSiteAddress";
+import PickupSiteAddress from "./PickupSiteAddress";
 
-const DEFAULT_KEY = "workSite";
-
-export default function WorkSite({
+export default function PickupSite({
   switchLabel,
   headingTitle,
   designation,
-  getInitialEmitterWorkSiteFn,
+  getInitialEmitterPickupSiteFn,
   disabled = false,
-  modelKey = DEFAULT_KEY,
 }: {
   switchLabel: string;
   headingTitle: string;
   designation: string;
-  getInitialEmitterWorkSiteFn: () => any;
+  getInitialEmitterPickupSiteFn: () => any;
   disabled?: boolean;
-  modelKey?: string;
 }) {
-  const { values, setFieldValue } = useFormikContext<Form>();
+  const { values, setFieldValue } = useFormikContext<Bsdasri>();
 
-  const showWorkSite = !!values.emitter?.[modelKey];
+  const showPickupSite = !!values.emitter?.pickupSite;
 
   function handleWorksiteToggle() {
-    if (showWorkSite) {
-      setFieldValue(`emitter.${modelKey}`, null, false);
+    if (showPickupSite) {
+      setFieldValue("emitter.pickupSite", null, false);
     } else {
       setFieldValue(
-        `emitter.${modelKey}`,
-        getInitialEmitterWorkSiteFn(),
+        "emitter.pickupSite",
+        getInitialEmitterPickupSiteFn(),
         false
       );
     }
   }
 
   function setAddress(details) {
-    setFieldValue(`emitter.${modelKey}.address`, details.name);
-    setFieldValue(`emitter.${modelKey}.city`, details.city);
-    setFieldValue(`emitter.${modelKey}.postalCode`, details.postcode);
+    setFieldValue(`emitter.pickupSite.address`, details.name);
+    setFieldValue(`emitter.pickupSite.city`, details.city);
+    setFieldValue(`emitter.pickupSite.postalCode`, details.postcode);
   }
 
   return (
     <div className="form__row">
       {!disabled && (
         <TdSwitch
-          checked={showWorkSite}
+          checked={showPickupSite}
           onChange={handleWorksiteToggle}
           label={switchLabel}
         />
       )}
 
-      {showWorkSite && values.emitter?.[modelKey] && (
+      {showPickupSite && values.emitter?.pickupSite && (
         <>
           <h4 className="form__section-heading">{headingTitle}</h4>
 
@@ -63,7 +59,7 @@ export default function WorkSite({
               Nom {designation}
               <Field
                 type="text"
-                name={`emitter.${modelKey}.name`}
+                name="emitter.pickupSite.name"
                 placeholder="Intitulé"
                 className="td-input"
                 disabled={disabled}
@@ -72,10 +68,10 @@ export default function WorkSite({
           </div>
 
           <div className="form__row">
-            <WorkSiteAddress
-              adress={values.emitter?.[modelKey]?.address}
-              city={values.emitter?.[modelKey]?.city}
-              postalCode={values.emitter?.[modelKey]?.postalCode}
+            <PickupSiteAddress
+              adress={values.emitter?.pickupSite?.address}
+              city={values.emitter?.pickupSite?.city}
+              postalCode={values.emitter?.pickupSite?.postalCode}
               onAddressSelection={details => setAddress(details)}
               designation={designation}
               disabled={disabled}
@@ -89,7 +85,8 @@ export default function WorkSite({
                 component="textarea"
                 className="textarea-pickup-site td-textarea"
                 placeholder="Champ libre pour préciser..."
-                name={`emitter.${modelKey}.infos`}
+                name="emitter.pickupSite.infos"
+                value={values.emitter?.pickupSite?.infos || ""}
                 disabled={disabled}
               />
             </label>

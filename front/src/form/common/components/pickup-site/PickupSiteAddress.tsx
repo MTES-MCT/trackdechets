@@ -1,7 +1,7 @@
 import React, { useEffect, useReducer } from "react";
 
 import SearchInput from "common/components/SearchInput";
-import styles from "./WorkSiteAddress.module.scss";
+import styles from "./PickupSiteAddress.module.scss";
 function init({ adress, city, postalCode }) {
   const selectedAdress = [adress, postalCode, city].filter(Boolean).join(" ");
   return {
@@ -26,7 +26,7 @@ function reducer(state, action) {
   }
 }
 
-export default function WorkSiteAddress({
+export default function PickupSiteAddress({
   adress,
   city,
   postalCode,
@@ -83,7 +83,7 @@ export default function WorkSiteAddress({
 
       {state.searchResults.map(feature => (
         <div
-          className={styles.worksiteSearchResult}
+          className={styles.pickupSiteSearchResult}
           key={feature.properties.id}
           onClick={_ => selectAddress(feature)}
         >

@@ -9,7 +9,7 @@ import {
   getInitialEmitterPickupSiteFn,
   getInitialWeightFn,
 } from "./utils/initial-state";
-import WorkSite from "form/common/components/work-site/WorkSite";
+import PickupSite from "form/common/components/pickup-site/PickupSite";
 import BsdasriEcoOrganismes from "./components/eco-organismes/EcoOrganismes";
 import WeightWidget from "./components/Weight";
 
@@ -80,13 +80,12 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
         />
       </div>
 
-      <WorkSite
+      <PickupSite
         disabled={disabled}
         switchLabel="Je souhaite ajouter une adresse de collecte ou d'enlèvement"
         headingTitle="Adresse d'enlèvement"
         designation="du site d'enlèvement"
-        getInitialEmitterWorkSiteFn={getInitialEmitterPickupSiteFn}
-        modelKey="pickupSite"
+        getInitialEmitterPickupSiteFn={getInitialEmitterPickupSiteFn}
       />
 
       <BsdasriEcoOrganismes name="ecoOrganisme" />
