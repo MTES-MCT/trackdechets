@@ -39,6 +39,7 @@ export default function WorkSite({
   }
 
   function setAddress(details) {
+    // `address` is passed as `name` because of adresse api return fields
     setFieldValue(`emitter.${modelKey}.address`, details.name);
     setFieldValue(`emitter.${modelKey}.city`, details.city);
     setFieldValue(`emitter.${modelKey}.postalCode`, details.postcode);
@@ -73,7 +74,7 @@ export default function WorkSite({
 
           <div className="form__row">
             <WorkSiteAddress
-              adress={values.emitter?.[modelKey]?.address}
+              address={values.emitter?.[modelKey]?.address}
               city={values.emitter?.[modelKey]?.city}
               postalCode={values.emitter?.[modelKey]?.postalCode}
               onAddressSelection={details => setAddress(details)}
