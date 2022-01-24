@@ -1,11 +1,17 @@
-import consoleBackend from "./backends/consoleBackend";
-import mailjetBackend from "./backends/mailjetBackend";
-import sendInBlueBackend from "./backends/sendInBlueBackend";
-
+/**
+ * Dynamically import the configured mail backend
+ * Avoid the need to export the environment vars for all backends
+ */
 const backends = {
-  console: consoleBackend,
-  mailjet: mailjetBackend,
-  sendinblue: sendInBlueBackend
+  ...(process.env.EMAIL_BACKEND === "console" && {
+    console: require("./backends/consoleBackend")
+  }),
+  ...(process.env.EMAIL_BACKEND === "mailjet" && {
+    mailjet: require("./backends/mailjetBackend")
+  }),
+  ...(process.env.EMAIL_BACKEND === "sendinblue" && {
+    sendinblue: require("./backends/sendInBlueBackend")
+  })
 };
 
 export const backend = backends[process.env.EMAIL_BACKEND];

@@ -18,6 +18,8 @@ jobs:
         working-directory: doc
     steps:
       - uses: actions/checkout@v2
+      - name: Update yarn
+        run: yarn set version berry
       - name: Setup Node
         uses: actions/setup-node@v2.5.1
         with:
