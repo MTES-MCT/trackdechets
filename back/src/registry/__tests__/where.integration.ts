@@ -3,6 +3,7 @@ import {
   refreshElasticSearch,
   resetDatabase
 } from "../../../integration-tests/helper";
+import { elasticSearchClient as client } from "@trackdechets/common";
 import { indexBsda } from "../../bsda/elastic";
 import { bsdaFactory } from "../../bsda/__tests__/factories";
 import { indexBsdasri } from "../../bsdasris/elastic";
@@ -11,7 +12,7 @@ import { indexBsff } from "../../bsffs/elastic";
 import { createBsff } from "../../bsffs/__tests__/factories";
 import { indexBsvhu } from "../../bsvhu/elastic";
 import { vhuFormFactory } from "../../bsvhu/__tests__/factories.vhu";
-import { BsdElastic, client, index } from "../../common/elastic";
+import { BsdElastic, index } from "../../common/elastic";
 import { getFullForm } from "../../forms/database";
 import { indexForm } from "../../forms/elastic";
 import { BsdType, WasteRegistryWhere } from "../../generated/graphql/types";

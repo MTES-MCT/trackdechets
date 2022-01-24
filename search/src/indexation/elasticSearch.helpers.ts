@@ -11,12 +11,10 @@ import {
   ElasticBulkPrepayload,
   IndexProcessConfig,
 } from "./types";
-import { ApiResponse } from "@elastic/elasticsearch";
 import {
   BulkOperationContainer,
   BulkOperationType,
   BulkResponse,
-  BulkResponseItem,
 } from "@elastic/elasticsearch/api/types";
 
 var pjson = require("../../package.json");

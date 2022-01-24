@@ -1,4 +1,5 @@
-import { client, index } from "../../common/elastic";
+import { elasticSearchClient as client } from "@trackdechets/common";
+import { index } from "../../common/elastic";
 import { indexAllBsdasris } from "../../bsdasris/elastic";
 import { indexAllForms } from "../../forms/elastic";
 import { indexAllBsvhus } from "../../bsvhu/elastic";

@@ -3,7 +3,8 @@ import { Server as HttpsServer } from "https";
 import { redisClient } from "../src/common/redis";
 import prisma from "../src/prisma";
 import { app } from "../src/server";
-import { client as elasticSearch, index } from "../src/common/elastic";
+import { elasticSearchClient } from "@trackdechets/common";
+import { index } from "../src/common/elastic";
 
 let httpServerInstance: HttpServer | HttpsServer = null;
 
@@ -57,7 +58,7 @@ export async function resetDatabase() {
   jest.setTimeout(10000);
 
   await refreshElasticSearch();
-  await elasticSearch.deleteByQuery({
+  await elasticSearchClient.deleteByQuery({
     index: index.alias,
     body: {
       query: {
@@ -70,7 +71,7 @@ export async function resetDatabase() {
 }
 
 export function refreshElasticSearch() {
-  return elasticSearch.indices.refresh({
+  return elasticSearchClient.indices.refresh({
     index: index.alias
   });
 }

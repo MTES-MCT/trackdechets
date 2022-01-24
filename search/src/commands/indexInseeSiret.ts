@@ -1,14 +1,12 @@
-import { client } from "../common/elastic";
-import { initSentry } from "../common/sentry";
-import logger from "../common/logger";
+import { logger, elasticSearchClient, initSentry } from "@trackdechets/common";
 import {
   ElasticBulkNonFlatPayload,
-  IndexProcessConfig
+  IndexProcessConfig,
 } from "../indexation/types";
 import {
   downloadAndIndex,
   standardMapping,
-  unzipAndIndex
+  unzipAndIndex,
 } from "../indexation/elasticSearch.helpers";
 
 const Sentry = initSentry();
@@ -22,11 +20,11 @@ const multiGet = (
   body: ElasticBulkNonFlatPayload,
   sireneIndexConfig: IndexProcessConfig
 ) =>
-  client.mget({
+  elasticSearchClient.mget({
     index: sireneIndexConfig.alias,
     body: {
-      ids: body.map(doc => doc[1].siren)
-    }
+      ids: body.map((doc) => doc[1].siren),
+    },
   });
 
 /**
@@ -41,8 +39,8 @@ const siretWithUniteLegaleFormatter = async (
     body[i][0],
     {
       ...body[i][1],
-      ...sirenDoc._source
-    }
+      ...sirenDoc._source,
+    },
   ]);
 };
 
@@ -62,7 +60,7 @@ const siretIndexConfig: IndexProcessConfig = {
   idKey: "siren",
   // append StockUniteLegale by JOINING ON "siren"
   dataFormatterFn: siretWithUniteLegaleFormatter,
-  mappings: standardMapping
+  mappings: standardMapping,
 };
 
 /**

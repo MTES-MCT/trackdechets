@@ -1,7 +1,7 @@
 import { redisClient } from "../src/common/redis";
 import prisma from "../src/prisma";
 import { startApolloServer } from "../src/server";
-import { client as elasticSearch } from "../src/common/elastic";
+import { elasticSearchClient } from "@trackdechets/common";
 
 beforeAll(async () => {
   await startApolloServer();
@@ -9,7 +9,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   jest.restoreAllMocks();
-  await elasticSearch.close();
+  await elasticSearchClient.close();
   await redisClient.quit();
   await prisma.$disconnect();
 });

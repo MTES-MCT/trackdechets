@@ -16,7 +16,7 @@ jobs:
           node-version: "14.x"
           cache: "yarn"
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
       - name: Generate files
         run: yarn generate
       - name: Run linter
@@ -39,7 +39,7 @@ jobs:
           node-version: "14.x"
           cache: "yarn"
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
       - name: Generate files
         run: yarn generate
       - name: Run linter
@@ -74,5 +74,5 @@ jobs:
           cache: "yarn"
       - name: Test Build
         run: |
-          yarn install --frozen-lockfile
+          yarn install --immutable
           yarn build
