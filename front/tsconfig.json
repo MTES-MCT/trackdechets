@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "composite": true /* Enable project compilation, compulsory to use typescript references */,
+    "composite": true,
     "target": "es5",
     "allowJs": true,
     "skipLibCheck": false,
@@ -16,14 +16,14 @@
     "noEmit": true,
     "noImplicitAny": false,
     "strictNullChecks": true,
-    "jsx": "preserve",
+    "jsx": "react",
     "lib": [
       "dom",
       "es6",
       "esnext.asynciterable"
     ],
     "baseUrl": "./src",
-
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "src/**/*"
