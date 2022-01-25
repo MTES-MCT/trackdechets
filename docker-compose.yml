@@ -19,8 +19,11 @@ services:
       - "6379:6379"
 
   td-api:
-    image: node:14.15.4
-    command: sh -c "yarn && yarn generate && yarn dev"
+    image: td-api
+    build:
+      dockerfile: Dockerfile.dev
+      context: .
+    command: sh -c "yarn generate && yarn dev"
     working_dir: /usr/src/back
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     volumes:
@@ -43,10 +46,13 @@ services:
 
   td-ui:
     stdin_open: true
-    image: node:14.15.4
+    image: td-ui
+    build:
+      dockerfile: Dockerfile.dev
+      context: .
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     working_dir: /usr/src/front
-    command: sh -c "yarn && yarn dev"
+    command: sh -c "yarn dev"
     expose:
       - "3000"
     volumes:
