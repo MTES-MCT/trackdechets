@@ -48,7 +48,7 @@ export function getRegistryFields(
 
 function toGenericWaste(bsda: Bsda): GenericWaste {
   return {
-    wasteDescription: bsda.wasteName,
+    wasteDescription: bsda.wasteMaterialName,
     wasteCode: bsda.wasteCode,
     pop: false,
     id: bsda.id,

@@ -79,9 +79,11 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
                   Pdf
                 </MenuItem>
               )}
-              {![BsdaStatus.Processed, BsdaStatus.Refused].includes(
-                form["bsdaStatus"]
-              ) && (
+              {![
+                BsdaStatus.Processed,
+                BsdaStatus.Refused,
+                BsdaStatus.AwaitingChild,
+              ].includes(form["bsdaStatus"]) && (
                 <>
                   <MenuLink
                     as={Link}

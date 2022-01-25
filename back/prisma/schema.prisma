@@ -1123,7 +1123,6 @@ model Bsda {
   ecoOrganismeSiret String?
 
   wasteCode         String?
-  wasteName         String?
   wasteFamilyCode   String?
   wasteMaterialName String?
   wasteConsistence  BsdaConsistence?

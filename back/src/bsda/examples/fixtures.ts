@@ -57,7 +57,6 @@ function wasteInput() {
     consistence: "SOLIDE",
     familyCode: "Code famille",
     materialName: "Nom du matériau",
-    name: "Nom",
     sealNumbers: ["1", "2", "3"],
     adr: "ADR"
   };

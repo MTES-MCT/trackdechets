@@ -113,7 +113,7 @@ function getWhere(
 }
 
 function getWasteDescription(bsda: Bsda) {
-  return [bsda.wasteName, bsda.wasteMaterialName].filter(Boolean).join(", ");
+  return [bsda.wasteCode, bsda.wasteMaterialName].filter(Boolean).join(", ");
 }
 
 function toBsdElastic(bsda: Bsda): BsdElastic {

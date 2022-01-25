@@ -39,7 +39,6 @@ export const fullBsda = gql`
     }
     waste {
       code
-      name
       familyCode
       materialName
       consistence

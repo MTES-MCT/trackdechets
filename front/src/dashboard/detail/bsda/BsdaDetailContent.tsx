@@ -268,8 +268,7 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             <dd>{form.waste?.code}</dd>
             <dt>Description du déchet</dt>
             <dd>
-              {form.waste?.name} {form.waste?.materialName}{" "}
-              {form.waste?.familyCode}
+              {form.waste?.materialName} {form.waste?.familyCode}
             </dd>
           </div>
 

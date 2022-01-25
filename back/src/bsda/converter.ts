@@ -70,10 +70,10 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
     packagings: form.packagings as BsdaPackaging[],
     waste: nullIfNoValues<BsdaWaste>({
       code: form.wasteCode,
+      name: form.wasteMaterialName, // TODO To remove - keeps support for `name` for now
       consistence: form.wasteConsistence,
       familyCode: form.wasteFamilyCode,
       materialName: form.wasteMaterialName,
-      name: form.wasteName,
       sealNumbers: form.wasteSealNumbers,
       adr: form.wasteAdr
     }),
@@ -438,9 +438,12 @@ function flattenBsdaWasteInput({ waste }: Pick<BsdaInput, "waste">) {
   return {
     wasteCode: chain(waste, w => w.code),
     wasteAdr: chain(waste, w => w.adr),
-    wasteName: chain(waste, w => w.name),
     wasteFamilyCode: chain(waste, w => w.familyCode),
-    wasteMaterialName: chain(waste, w => w.materialName),
+    // TODO: name is deprecated, but still supported as an input for now.
+    // As `name` was previously mandatory, and `materialName` optional, to avoid breaking integrations we fallback to `name` for now.
+    // Remove the `?? ...` part when `name` is removed from the input.
+    wasteMaterialName:
+      chain(waste, w => w.materialName) ?? chain(waste, w => w.name),
     wasteConsistence: chain(waste, w => w.consistence),
     wasteSealNumbers: chain(waste, w => w.sealNumbers)
   };

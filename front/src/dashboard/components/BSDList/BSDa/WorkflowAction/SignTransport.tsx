@@ -28,7 +28,7 @@ const validationSchema = yup.object({
 
 type Props = { siret: string; bsdaId: string };
 export function SignTransport({ siret, bsdaId }: Props) {
-  const [updateBsda] = useMutation<
+  const [updateBsda, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsda">,
     MutationUpdateBsdaArgs
   >(UPDATE_BSDA);
@@ -113,7 +113,18 @@ export function SignTransport({ siret, bsdaId }: Props) {
                 <div className="tw-mb-6">
                   <Transport disabled={false} />
                 </div>
-                <p>
+                <div className="form__row">
+                  <label>
+                    ADR:
+                    <input
+                      type="text"
+                      className="td-input"
+                      disabled
+                      value={bsda.waste?.adr}
+                    />
+                  </label>
+                </div>
+                <p className="tw-pt-2">
                   En qualité de <strong>transporteur du déchet</strong>,
                   j'atteste que les informations ci-dessus sont correctes. En
                   signant ce document, je déclare prendre en charge le déchet.
@@ -131,6 +142,12 @@ export function SignTransport({ siret, bsdaId }: Props) {
                   </label>
                   <RedErrorMessage name="author" />
                 </div>
+
+                {updateError && (
+                  <div className="notification notification--error">
+                    {updateError.message}
+                  </div>
+                )}
 
                 <div className="form__actions">
                   <button

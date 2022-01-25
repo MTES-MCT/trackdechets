@@ -36,18 +36,17 @@ export async function buildPdf(bsda: Bsda) {
     packagings: (bsda.packagings as BsdaPackaging[])
       .map(
         packaging =>
-          `${packaging.quantity ?? 0}} x ${packaging.type} ${packaging.other}`
+          `${packaging.quantity ?? 0}x${packaging.type} ${
+            packaging.other ?? ""
+          }`
       )
       .join(" / "),
     nbOfPackagings: (bsda.packagings as BsdaPackaging[]).reduce(
       (prev, cur) => prev + cur.quantity,
       0
     ),
-    previousBsdas: [
-      ...previousBsdas,
-      // Show a minimum of 5 rows
-      ...Array.from({ length: 5 - previousBsdas.length }).fill({})
-    ]
+    sealedNumbers: bsda.wasteSealNumbers.join(", "),
+    previousBsdas: [...previousBsdas]
   });
 
   const files = {

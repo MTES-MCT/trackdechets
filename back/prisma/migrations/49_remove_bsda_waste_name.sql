@@ -1,0 +1,1 @@
+ALTER TABLE "default$default"."Bsda" DROP COLUMN "wasteName";

@@ -23,7 +23,7 @@ const validationSchema = yup.object({
 
 type Props = { siret: string; bsdaId: string };
 export function SignEmission({ siret, bsdaId }: Props) {
-  const [signBsda, { loading }] = useMutation<
+  const [signBsda, { loading, error }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs
   >(SIGN_BSDA, {
@@ -94,6 +94,12 @@ export function SignEmission({ siret, bsdaId }: Props) {
                   </label>
                   <RedErrorMessage name="author" />
                 </div>
+
+                {error && (
+                  <div className="notification notification--error">
+                    {error.message}
+                  </div>
+                )}
 
                 <div className="form__actions">
                   <button
