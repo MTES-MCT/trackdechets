@@ -26,6 +26,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - La recherche d'établissements par n°SIRET ne retourne plus d'établissement fermé [PR 1140](https://github.com/MTES-MCT/trackdechets/pull/1140)
 - Retrait du lien de création de bsdd apparaissant sur le dashboard brouillon vide #1150 [PR 1150](https://github.com/MTES-MCT/trackdechets/pull/1150)
+- La recherche sur `customInfo` dans le tableau de bord transporteur se fait de façon exacte et non plus floue [PR 1144](https://github.com/MTES-MCT/trackdechets/pull/1144)
 
 #### :memo: Documentation
 
