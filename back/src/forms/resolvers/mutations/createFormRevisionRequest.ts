@@ -222,7 +222,7 @@ const bsddRevisionRequestSchema = yup
       .string()
       .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE),
     wasteDetailsPop: yup.boolean().nullable(),
-    quantityReceived: yup.number().nullable(),
+    quantityReceived: yup.number().min(0).nullable(),
     processingOperationDone: yup
       .string()
       .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
