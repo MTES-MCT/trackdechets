@@ -30,7 +30,7 @@ services:
     image: td-api
     build:
       dockerfile: Dockerfile.dev
-      context: ../..
+      context: ../../
     command: sh -c "yarn generate && yarn dev"
     working_dir: /usr/src/back
     volumes:
