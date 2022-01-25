@@ -1,13 +1,18 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useReducer, useState } from "react";
+import TdSwitch from "common/components/Switch";
 
 import SearchInput from "common/components/SearchInput";
 import styles from "./WorkSiteAddress.module.scss";
-function init({ adress, city, postalCode }) {
-  const selectedAdress = [adress, postalCode, city].filter(Boolean).join(" ");
+
+function init({ address, city, postalCode }) {
+  const selectedAdress = [address, postalCode, city].filter(Boolean).join(" ");
   return {
     selectedAdress,
     searchInput: selectedAdress,
     searchResults: [],
+    address,
+    postalCode,
+    city,
   };
 }
 
@@ -17,6 +22,11 @@ function reducer(state, action) {
       return { ...state, searchInput: action.payload };
     case "search_done":
       return { ...state, searchResults: action.payload };
+    case "set_fields":
+      return {
+        ...state,
+        ...action.payload,
+      };
     case "select_address":
       return {
         ...state,
@@ -27,7 +37,7 @@ function reducer(state, action) {
 }
 
 export default function WorkSiteAddress({
-  adress,
+  address,
   city,
   postalCode,
   onAddressSelection,
@@ -36,9 +46,11 @@ export default function WorkSiteAddress({
 }) {
   const [state, dispatch] = useReducer(
     reducer,
-    { adress, city, postalCode },
+    { address, city, postalCode },
     init
   );
+
+  const [showAdressFields, setShowAdressFields] = useState(false);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -65,6 +77,21 @@ export default function WorkSiteAddress({
       payload: feature.properties.label,
     });
   }
+  function setManualAddress(payload) {
+    const { city, address, postalCode } = payload;
+
+    dispatch({
+      type: "set_fields",
+      payload: { city, address, postalCode },
+    });
+
+    // beware postCode/postalCode & name/address (former fields returned by address api)
+    onAddressSelection({
+      city: city,
+      name: address,
+      postcode: postalCode,
+    });
+  }
 
   return (
     <div className="form__row">
@@ -78,9 +105,71 @@ export default function WorkSiteAddress({
           dispatch({ type: "search_input", payload: e.target.value })
         }
         value={state.searchInput}
-        disabled={disabled}
+        disabled={disabled || showAdressFields}
+      />
+      <TdSwitch
+        checked={showAdressFields}
+        onChange={e => {
+          setShowAdressFields(e);
+        }}
+        label={"Je veux entrer l'adresse manuellement"}
       />
 
+      {showAdressFields && (
+        <div>
+          <div>
+            <label htmlFor="IdAddressStreet">
+              {" "}
+              N° et libellé de voie ou lieu-dit
+            </label>
+            <input
+              type="text"
+              id="IdAddressStreet"
+              className="td-input"
+              defaultValue={address}
+              onChange={e =>
+                setManualAddress({
+                  city: state.city,
+                  postalCode: state.postalCode,
+                  address: e.target.value,
+                })
+              }
+            />
+          </div>
+          <div>
+            <label htmlFor="IdAddressCity">Ville</label>
+            <input
+              id="IdAddressCity"
+              type="text"
+              className="td-input"
+              defaultValue={city}
+              onChange={e =>
+                setManualAddress({
+                  address: state.address,
+                  postalCode: state.postalCode,
+                  city: e.target.value,
+                })
+              }
+            />
+          </div>
+          <div>
+            <label htmlFor="IdAddressPostalCode">Code postal</label>
+            <input
+              id="IdAddressPostalCode"
+              type="text"
+              className="td-input"
+              defaultValue={postalCode}
+              onChange={e =>
+                setManualAddress({
+                  address: state.address,
+                  city: state.city,
+                  postalCode: e.target.value,
+                })
+              }
+            />
+          </div>
+        </div>
+      )}
       {state.searchResults.map(feature => (
         <div
           className={styles.worksiteSearchResult}

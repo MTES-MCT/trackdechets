@@ -6,8 +6,6 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 # [2022.01.2] 31/01/2022
 
-# [2022.01.2] 31/01/2022
-
 #### :rocket: Nouvelles fonctionnalités
 
 #### :bug: Corrections de bugs
@@ -19,14 +17,14 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
   - affichage de l'adresse chantier complète.
   - case exemption de récépissé.
 
-
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
 
 - La recherche d'établissements par n°SIRET ne retourne plus d'établissement fermé [PR 1140](https://github.com/MTES-MCT/trackdechets/pull/1140)
-- Retrait du lien de création de bsdd apparaissant sur le dashboard brouillon vide #1150 [PR 1150](https://github.com/MTES-MCT/trackdechets/pull/1150)
+- Retrait du lien de création de bsdd apparaissant sur le dashboard brouillon vide [PR 1150](https://github.com/MTES-MCT/trackdechets/pull/1150)
 - La recherche sur `customInfo` dans le tableau de bord transporteur se fait de façon exacte et non plus floue [PR 1144](https://github.com/MTES-MCT/trackdechets/pull/1144)
+- Les champs adresse enlèvement ou chantier sont remplissables même si les adresses ne sont pas trouvées [PR 1159](https://github.com/MTES-MCT/trackdechets/pull/1159)
 
 #### :memo: Documentation
 
