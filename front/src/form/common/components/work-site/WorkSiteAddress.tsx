@@ -118,9 +118,13 @@ export default function WorkSiteAddress({
       {showAdressFields && (
         <div>
           <div>
-            <label htmlFor="">Adresse</label>
+            <label htmlFor="IdAddressStreet">
+              {" "}
+              N° et libellé de voie ou lieu-dit
+            </label>
             <input
               type="text"
+              id="IdAddressStreet"
               className="td-input"
               defaultValue={address}
               onChange={e =>
@@ -133,8 +137,9 @@ export default function WorkSiteAddress({
             />
           </div>
           <div>
-            <label htmlFor="">Ville</label>
+            <label htmlFor="IdAddressCity">Ville</label>
             <input
+              id="IdAddressCity"
               type="text"
               className="td-input"
               defaultValue={city}
@@ -148,8 +153,9 @@ export default function WorkSiteAddress({
             />
           </div>
           <div>
-            <label htmlFor="">Code postal</label>
+            <label htmlFor="IdAddressPostalCode">Code postal</label>
             <input
+              id="IdAddressPostalCode"
               type="text"
               className="td-input"
               defaultValue={postalCode}
