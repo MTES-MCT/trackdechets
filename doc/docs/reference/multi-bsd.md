@@ -2,11 +2,6 @@
 title: Différences entre les bordereaux
 ---
 
-:::caution
-L'API pour les bordereaux DASRI, amiante, VHU et Fluides Frigorigènes est encore en mode expérimental
-:::caution
-
-
 Le mode opératoire de l'API pour les bordereaux DASRI, amiante, VHU et Fluides Frigorigènes diffère sensiblement de celui pour le BSDD.
 
 le champ `id` stocke un champ lisible (équivalent du `readableId` du bsdd). Il n'y a donc pas de champ `readableId`.
