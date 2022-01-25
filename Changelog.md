@@ -13,6 +13,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Affichage d'un message d'erreur lorsque le statut d'acceptation d'un déchet dangereux n'est pas précisé lors de la signature de l'acceptation [PR 1152](https://github.com/MTES-MCT/trackdechets/pull/1152)
 - Affichage d'un message d'erreur lorsque la validation du traitement d'un déchet dangereux n'aboutit pas lors de la signature du traitement [PR 1152](https://github.com/MTES-MCT/trackdechets/pull/1152)
+- Corrections récépissé PDF [PR 1153](https://github.com/MTES-MCT/trackdechets/pull/1153) :
+  - ajout du détail des contenants pour le packaging "Autre".
+  - affichage de l'adresse chantier complète.
+  - case exemption de récépissé.
+
 
 #### :boom: Breaking changes
 
