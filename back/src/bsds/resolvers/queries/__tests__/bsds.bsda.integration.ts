@@ -191,7 +191,7 @@ describe("Query.bsds.bsda base workflow", () => {
           numberPlate: []
         },
         type: "BSDA",
-        waste: { code: "16 01 06", description: "Amiante, A material" }
+        waste: { code: "16 01 06", description: "16 01 06, A material" }
       };
 
       await refreshElasticSearch();

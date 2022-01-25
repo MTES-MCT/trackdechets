@@ -26,7 +26,7 @@ export const COLUMNS: Record<
   emitter: {
     accessor: bsd =>
       `${bsd.emitter?.company?.name ?? ""} ${
-        bsd.emitter?.isPrivateIndividual ? "(particulier)" : ""
+        bsd.bsda?.emitterIsPrivateIndividual ? "(particulier)" : ""
       }`,
   },
   recipient: {
@@ -34,7 +34,7 @@ export const COLUMNS: Record<
   },
   waste: {
     accessor: bsd =>
-      [bsd?.waste?.code, bsd?.waste?.materialName]
+      [bsd?.waste?.code, bsd?.bsda?.wasteMaterialName]
         .filter(Boolean)
         .join(" - "),
   },

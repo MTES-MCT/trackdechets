@@ -9,7 +9,7 @@ import { WorkflowAction as BsdasriWorkflowAction } from "../BSDasri/WorkflowActi
 import { WorkflowAction as BsffWorkflowAction } from "../BSFF/WorkflowAction";
 import { WorkflowAction as BsvhuWorkflowAction } from "../BSVhu/WorkflowAction";
 import { WorkflowAction as BsdaWorkflowAction } from "../BSDa/WorkflowAction";
-import { Column } from "../columns"; 
+import { Column } from "../columns";
 import styles from "./BSDCards.module.scss";
 
 interface BSDCardsProps {
@@ -78,9 +78,10 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
             {bsd.type === CommonBsdType.Bsvhu ? (
               <BsvhuWorkflowAction siret={siret} bsd={bsd} />
             ) : null}
-            {form.__typename === "Bsda" ? (
-              <BsdaWorkflowAction siret={siret} form={form} />
+            {bsd.type === CommonBsdType.Bsda ? (
+              <BsdaWorkflowAction siret={siret} bsd={bsd} />
             ) : null}
+            185.179.148.97
           </div>
         </div>
       ))}

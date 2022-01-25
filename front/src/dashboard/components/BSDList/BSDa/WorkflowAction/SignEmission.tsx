@@ -23,7 +23,7 @@ const validationSchema = yup.object({
 
 type Props = { siret: string; bsdId: string };
 export function SignEmission({ siret, bsdId }: Props) {
-  const [signBsda, { loading , error}] = useMutation<
+  const [signBsda, { loading, error }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs
   >(SIGN_BSDA, {
