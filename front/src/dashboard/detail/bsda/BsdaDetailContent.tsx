@@ -140,7 +140,7 @@ const Recipient = ({ form }: { form: Bsda }) => {
         <DetailRow
           value={destination?.reception?.weight}
           label="Poids reçu"
-          units="kg"
+          units="tonne(s)"
         />
       </div>
       <div className={styles.detailGrid}>

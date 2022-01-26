@@ -46,7 +46,7 @@ export default function FormContainer() {
                 <StepContainer
                   component={WasteInfo}
                   title="Détail du déchet"
-                  disabled={emitterSigned}
+                  disabled={workerSigned}
                 />
                 <StepContainer
                   component={Worker}

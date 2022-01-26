@@ -8,6 +8,16 @@ import { toPDF } from "../../common/pdf";
 import { BsdaPackaging } from "../../generated/graphql/types";
 import { getBsdaHistory } from "../database";
 
+const PACKAGINGS_NAMES = {
+  ["BIG_BAG"]: "Big-bag / GRV",
+  ["BODY_BENNE"]: "Benne",
+  ["DEPOT_BAG"]: "Dépôt-bag",
+  ["PALETTE_FILME"]: "Palette filmée",
+  ["SAC_RENFORCE"]: "Sac renforcé",
+  ["CONTENEUR_BAG"]: "Conteneur-bag",
+  ["OTHER"]: "Autre(s)"
+};
+
 export async function buildPdf(bsda: Bsda) {
   const assetsPath = join(__dirname, "assets");
   const templatePath = join(assetsPath, "index.html");
@@ -36,7 +46,7 @@ export async function buildPdf(bsda: Bsda) {
     packagings: (bsda.packagings as BsdaPackaging[])
       .map(
         packaging =>
-          `${packaging.quantity ?? 0}x${packaging.type} ${
+          `${packaging.quantity ?? 0}x${PACKAGINGS_NAMES[packaging.type]} ${
             packaging.other ?? ""
           }`
       )
