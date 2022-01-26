@@ -15,7 +15,7 @@ const bsdaVerboseStatuses: Record<BsdaStatus, string> = {
   SENT: "Envoyé",
   PROCESSED: "Traité",
   REFUSED: "Refusé",
-  AWAITING_CHILD: "En attente d'un BSD suite",
+  AWAITING_CHILD: "En attente d'un BSDA suite",
 };
 
 // Basic implementation

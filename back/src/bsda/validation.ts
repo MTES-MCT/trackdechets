@@ -284,7 +284,6 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
     }),
     workerCompanySiret: yup
       .string()
-      .length(14, `Entreprise de travaux: ${INVALID_SIRET_LENGTH}`)
       .when("type", {
         is: value =>
           [
@@ -294,10 +293,12 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           ].includes(value),
         then: schema => schema.nullable(),
         otherwise: schema =>
-          schema.requiredIf(
-            context.emissionSignature,
-            `Entreprise de travaux: ${MISSING_COMPANY_SIRET}`
-          )
+          schema
+            .length(14, `Entreprise de travaux: ${INVALID_SIRET_LENGTH}`)
+            .requiredIf(
+              context.emissionSignature,
+              `Entreprise de travaux: ${MISSING_COMPANY_SIRET}`
+            )
       }),
     workerCompanyAddress: yup.string().when("type", {
       is: value =>
