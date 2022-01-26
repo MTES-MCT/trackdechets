@@ -2,6 +2,9 @@ import { searchCompanies as searchCompaniesInsee } from "./insee/client";
 import { searchCompanies as searchCompaniesDataGouv } from "./entreprise.data.gouv.fr/client";
 import { backoffIfTooManyRequests, throttle } from "./ratelimit";
 import { redundant } from "./redundancy";
+import { setInMaintenanceIf } from "./maintenance";
+
+const { INSEE_MAINTENACE } = process.env;
 
 /**
  * Apply throttle and redundant decorator to searchCompanies functions
@@ -9,9 +12,12 @@ import { redundant } from "./redundancy";
  * because fuzzy search is way better in entreprise.data.gouv.fr
  */
 const decoratedSearchCompanies = redundant(
-  backoffIfTooManyRequests(searchCompaniesInsee, {
-    service: "insee"
-  }),
+  setInMaintenanceIf(
+    backoffIfTooManyRequests(searchCompaniesInsee, {
+      service: "insee"
+    }),
+    INSEE_MAINTENACE === "true"
+  ),
   throttle(searchCompaniesDataGouv, {
     service: "data_gouv",
     requestsPerSeconds: 8

@@ -3,6 +3,9 @@ import { searchCompany as searchCompanyDataGouv } from "./entreprise.data.gouv.f
 import { backoffIfTooManyRequests, throttle } from "./ratelimit";
 import { redundant } from "./redundancy";
 import { cache } from "./cache";
+import { setInMaintenanceIf } from "./maintenance";
+
+const { INSEE_MAINTENANCE } = process.env;
 
 /**
  * Apply throttle, redundant and cache decorators to searchCompany functions
@@ -10,9 +13,12 @@ import { cache } from "./cache";
  */
 const decoratedSearchCompany = cache(
   redundant(
-    backoffIfTooManyRequests(searchCompanyInsee, {
-      service: "insee"
-    }),
+    setInMaintenanceIf(
+      backoffIfTooManyRequests(searchCompanyInsee, {
+        service: "insee"
+      }),
+      INSEE_MAINTENANCE === "true"
+    ),
     throttle(searchCompanyDataGouv, {
       service: "data_gouv",
       requestsPerSeconds: 8
