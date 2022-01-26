@@ -1,4 +1,4 @@
-import { Bsda } from ".prisma/client";
+import { Bsda } from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
 import {
   AllWaste,

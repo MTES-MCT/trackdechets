@@ -1,4 +1,4 @@
-import { Company, Status, User, UserRole } from ".prisma/client";
+import { Company, Status, User, UserRole } from "@prisma/client";
 import {
   refreshElasticSearch,
   resetDatabase

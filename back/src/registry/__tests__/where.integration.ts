@@ -1,4 +1,4 @@
-import { Bsda, Bsdasri, Bsff, Bsvhu, Form } from ".prisma/client";
+import { Bsda, Bsdasri, Bsff, Bsvhu, Form } from "@prisma/client";
 import {
   refreshElasticSearch,
   resetDatabase

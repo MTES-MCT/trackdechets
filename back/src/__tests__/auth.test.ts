@@ -94,7 +94,8 @@ describe("applyAuthStrategies", () => {
     const context: GraphQLContext = {
       user: { ...(user as User), auth: AuthType.Session },
       req: null,
-      res: null
+      res: null,
+      dataloaders: null
     };
     applyAuthStrategies(context, [AuthType.Session]);
     expect(context.user).not.toBeNull();
@@ -111,7 +112,8 @@ describe("applyAuthStrategies", () => {
     const context: GraphQLContext = {
       user: { ...(user as User), auth: AuthType.Bearer },
       req: null,
-      res: null
+      res: null,
+      dataloaders: null
     };
     applyAuthStrategies(context, [AuthType.Session]);
     expect(context.user).toBeNull();

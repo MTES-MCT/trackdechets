@@ -11,7 +11,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
 import { Mutation } from "../../../../generated/graphql/types";
-import { Status } from ".prisma/client";
+import { Status } from "@prisma/client";
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {

@@ -41,7 +41,7 @@ prisma.$use(async (params, next) => {
   return tracer.trace("prisma.query", { tags }, () => next(params));
 });
 
-prisma.$on("query" as any, async (e: any) => {
+prisma.$on("query", e => {
   const span = tracer.scope().active();
 
   span?.setTag("prisma.query", e.query);

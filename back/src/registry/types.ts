@@ -17,7 +17,7 @@ import {
   Bsvhu,
   Form,
   TemporaryStorageDetail
-} from ".prisma/client";
+} from "@prisma/client";
 import { integer } from "@elastic/elasticsearch/api/types";
 
 export type GenericWaste =

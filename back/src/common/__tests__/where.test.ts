@@ -1,4 +1,4 @@
-import { Prisma } from ".prisma/client";
+import { Prisma } from "@prisma/client";
 import { safeInput } from "../../forms/form-converter";
 import { BsffWhere } from "../../generated/graphql/types";
 import {
