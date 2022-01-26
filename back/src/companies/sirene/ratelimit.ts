@@ -56,10 +56,8 @@ export function throttle<T>(
 ) {
   const throttled = async (...args) => {
     const now = Date.now();
-    console.log(now);
     const secondsSinceEpoch = Math.round(now / 1000);
     const cacheKey = `${service}_throttle_${secondsSinceEpoch}`;
-    console.log(cacheKey);
     const responses = await redisClient
       .multi()
       .incr(cacheKey)

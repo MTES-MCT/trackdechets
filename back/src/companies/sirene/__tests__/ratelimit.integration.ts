@@ -75,10 +75,6 @@ describe("throttle decorator", () => {
     const fn = jest.fn().mockResolvedValue({ status: 200 });
     const throttled = throttle(fn, { service: "insee", requestsPerSeconds: 2 });
     // 2 requests per seconds are allowed, let's make 3
-    const requests = [];
-    for (let i = 0; i < 3; i++) {
-      requests.push(() => throttled());
-    }
     await expect(throttled()).resolves.toEqual({ status: 200 });
     await expect(throttled()).resolves.toEqual({ status: 200 });
     await expect(throttled()).rejects.toThrow(
