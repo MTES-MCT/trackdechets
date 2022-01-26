@@ -1,11 +1,6 @@
 import { searchCompany as searchCompanyInsee } from "./insee/client";
 import { searchCompany as searchCompanyDataGouv } from "./entreprise.data.gouv.fr/client";
-import {
-  throttle,
-  throttleErrorMessage,
-  INSEE_THROTTLE_KEY,
-  DATA_GOUV_THROTTLE_KEY
-} from "./ratelimit";
+import { backoffIfTooManyRequests, throttle } from "./ratelimit";
 import { redundant } from "./redundancy";
 import { cache } from "./cache";
 
@@ -15,18 +10,15 @@ import { cache } from "./cache";
  */
 const decoratedSearchCompany = cache(
   redundant(
-    throttle(searchCompanyInsee, {
-      cacheKey: INSEE_THROTTLE_KEY,
-      errorMessage: throttleErrorMessage("INSEE")
+    backoffIfTooManyRequests(searchCompanyInsee, {
+      service: "insee"
     }),
     throttle(searchCompanyDataGouv, {
-      cacheKey: DATA_GOUV_THROTTLE_KEY,
-      errorMessage: throttleErrorMessage("entreprise.data.gouv.fr")
+      service: "data_gouv",
+      requestsPerSeconds: 8
     })
   )
 );
-
-//export default decoratedSearchCompany
 
 export default function searchCompany(siret: string) {
   return decoratedSearchCompany(siret);
