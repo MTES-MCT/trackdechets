@@ -32,7 +32,7 @@ type Props = {
 const initialReview = {
   wasteDetails: {
     code: "",
-    pop: false,
+    pop: "",
   },
   trader: getInitialTrader(),
   broker: getInitialBroker(),

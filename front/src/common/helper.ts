@@ -97,13 +97,17 @@ export const getNestedNode = (obj: Object, path: String): any => {
  * @returns A cleaned object
  */
 export function removeEmptyKeys<T>(obj: Object): Partial<T> | undefined {
+  function isValid(value) {
+    return value !== null && value !== undefined && value !== "";
+  }
+
   const newObject = Object.entries(obj)
-    .filter(([, value]) => Boolean(value))
+    .filter(([, value]) => isValid(value))
     .reduce((cleanedObj, [key]) => {
       const value =
         typeof obj[key] === "object" ? removeEmptyKeys(obj[key]) : obj[key];
 
-      if (value) cleanedObj[key] = value;
+      if (isValid(value)) cleanedObj[key] = value;
       return cleanedObj;
     }, {});
 
