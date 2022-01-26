@@ -21,8 +21,7 @@ const searchCompaniesDataGouvThrottled = throttle(searchCompaniesDataGouv, {
 // order of priority.
 const searchCompaniesProviders = [
   ...(INSEE_MAINTENANCE === "true" ? [] : [searchCompaniesInseeThrottled]),
-  searchCompaniesDataGouvThrottled,
-  searchCompaniesInseeThrottled
+  searchCompaniesDataGouvThrottled
 ];
 
 /**
