@@ -7,12 +7,13 @@ import React, { InputHTMLAttributes } from "react";
 import "./Packagings.scss";
 
 export const PACKAGINGS_NAMES = {
-  [BsdaPackagingType.BigBag]: "Big-bag",
+  [BsdaPackagingType.BigBag]: "Big-bag / GRV",
   [BsdaPackagingType.DepotBag]: "Dépôt-bag",
   [BsdaPackagingType.PaletteFilme]: "Palette filmée",
   [BsdaPackagingType.SacRenforce]: "Sac renforcé",
   [BsdaPackagingType.ConteneurBag]: "Conteneur-bag",
   [BsdaPackagingType.Other]: "Autre(s)",
+  [BsdaPackagingType.BodyBenne]: "Benne",
 };
 
 export default function Packagings({

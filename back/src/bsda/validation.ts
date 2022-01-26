@@ -213,16 +213,12 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
           context.emissionSignature,
           `Émetteur: vous devez précisez si c'est un particulier ou un professionnel`
         ),
-      emitterCompanyName: yup.string().when("emitterIsPrivateIndividual", {
-        is: true,
-        then: yup.string().nullable(true),
-        otherwise: yup
-          .string()
-          .requiredIf(
-            context.emissionSignature,
-            `Émetteur: ${MISSING_COMPANY_NAME}`
-          )
-      }),
+      emitterCompanyName: yup
+        .string()
+        .requiredIf(
+          context.emissionSignature,
+          `Émetteur: ${MISSING_COMPANY_NAME}`
+        ),
       emitterCompanySiret: yup.string().when("emitterIsPrivateIndividual", {
         is: true,
         then: yup.string().nullable(true),
@@ -240,12 +236,16 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
           context.emissionSignature,
           `Émetteur: ${MISSING_COMPANY_ADDRESS}`
         ),
-      emitterCompanyContact: yup
-        .string()
-        .requiredIf(
-          context.emissionSignature,
-          `Émetteur: ${MISSING_COMPANY_CONTACT}`
-        ),
+      emitterCompanyContact: yup.string().when("emitterIsPrivateIndividual", {
+        is: true,
+        then: yup.string().nullable(true),
+        otherwise: yup
+          .string()
+          .requiredIf(
+            context.emissionSignature,
+            `Émetteur: ${MISSING_COMPANY_CONTACT}`
+          )
+      }),
       emitterCompanyPhone: yup
         .string()
         .requiredIf(
