@@ -4,7 +4,7 @@ import { backoffIfTooManyRequests, throttle } from "./ratelimit";
 import { redundant } from "./redundancy";
 import { setInMaintenanceIf } from "./maintenance";
 
-const { INSEE_MAINTENACE } = process.env;
+const { INSEE_MAINTENANCE } = process.env;
 
 /**
  * Apply throttle and redundant decorator to searchCompanies functions
@@ -16,7 +16,7 @@ const decoratedSearchCompanies = redundant(
     backoffIfTooManyRequests(searchCompaniesInsee, {
       service: "insee"
     }),
-    INSEE_MAINTENACE === "true"
+    INSEE_MAINTENANCE === "true"
   ),
   throttle(searchCompaniesDataGouv, {
     service: "data_gouv",
