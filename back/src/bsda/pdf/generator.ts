@@ -18,8 +18,6 @@ const PACKAGINGS_NAMES = {
   ["OTHER"]: "Autre(s)"
 };
 
-("BODY_BENNE");
-
 export async function buildPdf(bsda: Bsda) {
   const assetsPath = join(__dirname, "assets");
   const templatePath = join(assetsPath, "index.html");
