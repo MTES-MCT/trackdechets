@@ -110,7 +110,6 @@ const Transporter = ({ form }: { form: Bsda }) => {
           value={transporter?.transport?.takenOverAt}
           label="Emporté le"
         />
-
         <DateRow
           value={transporter?.transport?.signature?.date}
           label="Signé le"
@@ -122,6 +121,10 @@ const Transporter = ({ form }: { form: Bsda }) => {
         <DetailRow
           value={transporter?.customInfo}
           label="Informations tranporteur"
+        />
+        <DateRow
+          value={transporter?.transport?.plates?.join(", ")}
+          label="Immatriculations"
         />
       </div>
     </>

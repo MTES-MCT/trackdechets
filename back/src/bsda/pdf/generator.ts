@@ -9,13 +9,20 @@ import { BsdaPackaging } from "../../generated/graphql/types";
 import { getBsdaHistory } from "../database";
 
 const PACKAGINGS_NAMES = {
-  ["BIG_BAG"]: "Big-bag / GRV",
-  ["BODY_BENNE"]: "Benne",
-  ["DEPOT_BAG"]: "Dépôt-bag",
-  ["PALETTE_FILME"]: "Palette filmée",
-  ["SAC_RENFORCE"]: "Sac renforcé",
-  ["CONTENEUR_BAG"]: "Conteneur-bag",
-  ["OTHER"]: "Autre(s)"
+  BIG_BAG: "Big-bag / GRV",
+  BODY_BENNE: "Benne",
+  DEPOT_BAG: "Dépôt-bag",
+  PALETTE_FILME: "Palette filmée",
+  SAC_RENFORCE: "Sac renforcé",
+  CONTENEUR_BAG: "Conteneur-bag",
+  OTHER: "Autre(s)"
+};
+
+export const TRANSPORT_MODES = {
+  ROAD: "Route",
+  AIR: "Voie aérienne",
+  RAIL: "Voie ferrée",
+  RIVER: "Voie fluviale"
 };
 
 export async function buildPdf(bsda: Bsda) {
@@ -56,6 +63,7 @@ export async function buildPdf(bsda: Bsda) {
       0
     ),
     sealedNumbers: bsda.wasteSealNumbers.join(", "),
+    transportMode: TRANSPORT_MODES[bsda.transporterTransportMode],
     previousBsdas: [...previousBsdas]
   });
 

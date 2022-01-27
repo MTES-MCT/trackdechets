@@ -24,22 +24,24 @@ export function BsdaJourneySummary({ bsda }: Props) {
           {bsda.emitter?.company?.address}
         </JourneyStopDescription>
       </JourneyStop>
-      <JourneyStop
-        variant={
-          bsda.worker?.work?.signature
-            ? "complete"
-            : bsda.emitter?.emission?.signature
-            ? "active"
-            : "incomplete"
-        }
-      >
-        <JourneyStopName>Entreprise de travaux</JourneyStopName>
-        <JourneyStopDescription>
-          {bsda.worker?.company?.name} ({bsda.worker?.company?.siret})
-          <br />
-          {bsda.worker?.company?.address}
-        </JourneyStopDescription>
-      </JourneyStop>
+      {bsda.worker?.company?.name && (
+        <JourneyStop
+          variant={
+            bsda.worker?.work?.signature
+              ? "complete"
+              : bsda.emitter?.emission?.signature
+              ? "active"
+              : "incomplete"
+          }
+        >
+          <JourneyStopName>Entreprise de travaux</JourneyStopName>
+          <JourneyStopDescription>
+            {bsda.worker?.company?.name} ({bsda.worker?.company?.siret})
+            <br />
+            {bsda.worker?.company?.address}
+          </JourneyStopDescription>
+        </JourneyStop>
+      )}
       <JourneyStop
         variant={
           bsda.transporter?.transport?.signature
