@@ -6,7 +6,7 @@ function throttleErrorMessage(apiType: string) {
 }
 
 type BackoffDecoratorOpts = {
-  service: "insee" | "data_gouv";
+  service: "insee" | "data_gouv" | "social_gouv";
   expiry?: number;
 };
 
@@ -47,7 +47,7 @@ type ThrottleDecoratorArgs = {
 };
 
 /**
- * Throttle request made to sirene API before hitting 429
+ * Throttle requests made to API before hitting 429
  * https://redis.io/commands/INCR
  */
 export function throttle<T>(

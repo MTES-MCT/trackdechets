@@ -13,7 +13,6 @@ const SOCIAL_GOUV_API_BASE_URL =
 
 /**
  * Build a company object from a search response
- * @param data etablissement response object
  */
 function searchResponseToCompany(
   response: SearchResponseSocialGouv
@@ -36,7 +35,6 @@ function searchResponseToCompany(
 
 /**
  * Search a company by SIRET
- * @param siret
  */
 export function searchCompany(siret: string): Promise<CompanySearchResult> {
   const searchUrl = `${SOCIAL_GOUV_API_BASE_URL}/api/v1/etablissement/${siret}`;
@@ -58,8 +56,7 @@ export function searchCompany(siret: string): Promise<CompanySearchResult> {
 }
 
 /**
- * Build a list of company objects from a full text search response
- * @param data etablissement response object
+ * Build a list of company objects from a full text search responset
  */
 function fullTextSearchResponseToCompanies(
   r: FullTextSearchResponseSocialGouv

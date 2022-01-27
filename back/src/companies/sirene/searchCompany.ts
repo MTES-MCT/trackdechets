@@ -24,7 +24,7 @@ const searchCompanySocialGouvThrottled = throttle(searchCompanySocialGouv, {
   requestsPerSeconds: 50
 });
 
-// list differents implementations of searchCompany by
+// list different implementations of searchCompany by
 // order of priority.
 const searchCompanyProviders = [
   ...(INSEE_MAINTENANCE === "true" ? [] : [searchCompanyInseeThrottled]),
