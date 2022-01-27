@@ -42,7 +42,7 @@ export function backoffIfTooManyRequests<T>(
 }
 
 type ThrottleDecoratorArgs = {
-  service: "insee" | "data_gouv";
+  service: "insee" | "data_gouv" | "social_gouv";
   requestsPerSeconds?: number;
 };
 
