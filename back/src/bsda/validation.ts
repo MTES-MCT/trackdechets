@@ -282,24 +282,22 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           `Entreprise de travaux: ${MISSING_COMPANY_NAME}`
         )
     }),
-    workerCompanySiret: yup
-      .string()
-      .when("type", {
-        is: value =>
-          [
-            BsdaType.RESHIPMENT,
-            BsdaType.GATHERING,
-            BsdaType.COLLECTION_2710
-          ].includes(value),
-        then: schema => schema.nullable(),
-        otherwise: schema =>
-          schema
-            .length(14, `Entreprise de travaux: ${INVALID_SIRET_LENGTH}`)
-            .requiredIf(
-              context.emissionSignature,
-              `Entreprise de travaux: ${MISSING_COMPANY_SIRET}`
-            )
-      }),
+    workerCompanySiret: yup.string().when("type", {
+      is: value =>
+        [
+          BsdaType.RESHIPMENT,
+          BsdaType.GATHERING,
+          BsdaType.COLLECTION_2710
+        ].includes(value),
+      then: schema => schema.nullable(),
+      otherwise: schema =>
+        schema
+          .length(14, `Entreprise de travaux: ${INVALID_SIRET_LENGTH}`)
+          .requiredIf(
+            context.emissionSignature,
+            `Entreprise de travaux: ${MISSING_COMPANY_SIRET}`
+          )
+    }),
     workerCompanyAddress: yup.string().when("type", {
       is: value =>
         [
