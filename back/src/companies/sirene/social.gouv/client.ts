@@ -1,5 +1,4 @@
 import axios, { AxiosError } from "axios";
-import { URL } from "url";
 import { UserInputError } from "apollo-server-express";
 import { removeDiacritics } from "../utils";
 import {
