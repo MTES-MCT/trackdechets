@@ -227,7 +227,8 @@
               <p>Tel : {{bsda.transporterCompanyPhone}}</p>
               <p>Mail : {{bsda.transporterCompanyMail}}</p>
               <p>
-                Nom de la personne à contacter : {{bsda.transporterCompanyContact}}
+                Nom de la personne à contacter :
+                {{bsda.transporterCompanyContact}}
               </p>
             </div>
 
@@ -238,7 +239,7 @@
                 Date limite de validité : {{dateFmt
                 bsda.transporterRecepisseValidityLimit}}
               </p>
-              <p>Mode de transport : {{bsda.transporterTransportMode}}</p>
+              <p>Mode de transport : {{transportMode}}</p>
               <p>
                 Immatriculation(s) : {{#each
                 bsda.transporterTransportPlates}}<span>{{this}}</span>{{/each}}
@@ -262,8 +263,8 @@
             bsda.destinationReceptionDate}}
           </p>
           <p>
-            Quantité réelle présentée : {{divide bsda.destinationReceptionWeight 1000}}
-            tonne(s)
+            Quantité réelle présentée : {{divide bsda.destinationReceptionWeight
+            1000}} tonne(s)
           </p>
           <p>
             Lot accepté : <input type="checkbox" {{#if (eq
@@ -291,6 +292,13 @@
             Date de réalisation : {{dateFmt
             bsda.destinationOperationSignatureDate}}
           </p>
+          <p>
+            Destination finale :
+            {{bsda.destinationOperationNextDestinationCompanyName}}
+            {{bsda.destinationOperationNextDestinationCompanySiret}} /
+            {{bsda.destinationOperationNextDestinationCompanyAddress}}
+          </p>
+          <p>Code final prévu : {{bsda.destinationOperationNextDestinationPlannedOperationCode}}</p>
         </div>
       </div>
     </section>

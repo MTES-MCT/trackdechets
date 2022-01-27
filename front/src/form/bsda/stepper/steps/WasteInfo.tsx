@@ -215,7 +215,10 @@ export function WasteInfoWorker({ disabled }) {
         </div>
       </div>
 
-      <h4 className="form__section-heading">Numéros de scellés</h4>
+      <h4 className="form__section-heading">
+        Numéros de scellés{" "}
+        <Tooltip msg="Ils peuvent être remplis au moment de la signature. Vous n'êtes pas obligé de les compléter à la création du bordereau." />
+      </h4>
       <div className="form__row">
         <label>
           Numéros de scellés

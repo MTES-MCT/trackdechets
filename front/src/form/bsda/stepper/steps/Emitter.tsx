@@ -10,16 +10,6 @@ export function Emitter({ disabled }) {
   const isGroupement = values?.type === BsdaType.Gathering;
   const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
 
-  if (isGroupement || isEntreposageProvisoire) {
-    return (
-      <div className="notification">
-        Vous effectuez un groupement ou entreposage provisoire. L'entreprise
-        émettrice est obligatoirement la vôtre: {values.emitter?.company?.name}{" "}
-        - {values.emitter?.company?.siret}
-      </div>
-    );
-  }
-
   return (
     <>
       {disabled && (
@@ -29,19 +19,29 @@ export function Emitter({ disabled }) {
         </div>
       )}
 
-      <div className="form__row">
-        <label>
-          <Field
-            disabled={disabled}
-            type="checkbox"
-            name="emitter.isPrivateIndividual"
-            className="td-checkbox"
-          />
-          Le MO ou le détenteur est un particulier
-        </label>
-      </div>
+      {isGroupement || isEntreposageProvisoire ? (
+        <div className="notification">
+          Vous effectuez un groupement ou entreposage provisoire. L'entreprise
+          émettrice est obligatoirement la vôtre:{" "}
+          {values.emitter?.company?.name} - {values.emitter?.company?.siret}
+        </div>
+      ) : (
+        <div className="form__row">
+          <label>
+            <Field
+              disabled={disabled}
+              type="checkbox"
+              name="emitter.isPrivateIndividual"
+              className="td-checkbox"
+            />
+            Le MO ou le détenteur est un particulier
+          </label>
+        </div>
+      )}
 
-      {values.emitter?.isPrivateIndividual ? (
+      {values.emitter?.isPrivateIndividual ||
+      isGroupement ||
+      isEntreposageProvisoire ? (
         <>
           <div className="form__row">
             <label>
