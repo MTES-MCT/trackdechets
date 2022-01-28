@@ -44,6 +44,8 @@ export type RevisionRequestContent = Pick<
   | "brokerReceipt"
   | "brokerDepartment"
   | "brokerValidityLimit"
+  | "traderCompanyName"
+  | "traderCompanySiret"
   | "traderCompanyAddress"
   | "traderCompanyContact"
   | "traderCompanyPhone"
