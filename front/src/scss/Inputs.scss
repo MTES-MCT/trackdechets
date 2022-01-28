@@ -158,3 +158,8 @@ select:-moz-focusring {
   background-position: right 0.7em top 50%, 0 0;
   background-size: 0.65em auto, 100%;
 }
+.td-input-text-security {
+  font-family: "text-security-disc";
+  /* Use -webkit-text-security if the browser supports it */
+  -webkit-text-security: disc;
+}

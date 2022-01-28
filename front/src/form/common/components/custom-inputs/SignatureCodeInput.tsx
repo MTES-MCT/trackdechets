@@ -13,10 +13,10 @@ export default function SignatureCodeInput({
       {...field}
       value={value}
       {...props}
-      type="password"
-      autoComplete="off"
+      type="text"
       pattern="[0-9]*"
       inputMode="numeric"
+      className="td-input-text-security td-input"
     />
   );
 }
