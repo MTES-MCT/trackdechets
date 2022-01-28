@@ -26,3 +26,11 @@ export const REVOKE_ACCESS_TOKEN = gql`
     }
   }
 `;
+
+export const REVOKE_ALL_ACCESS_TOKENS = gql`
+  mutation RevokeAllAccessTokens {
+    revokeAllAccessTokens {
+      id
+    }
+  }
+`;

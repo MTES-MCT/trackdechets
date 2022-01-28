@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { DEVELOPERS_DOCUMENTATION_URL } from "common/config";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { NewAccessToken, Query } from "generated/graphql/types";
 import { Loader } from "common/components";
 import { NotificationError } from "common/components/Error";
@@ -8,9 +8,11 @@ import AccountAccessToken from "./AccountAccessToken";
 import { ACCESS_TOKENS } from "./queries";
 import AccountAccessTokenCreate from "./AccountAccessTokenCreate";
 import AccountNewAccessToken from "./AccountNewAccessToken";
+import AccountAccessTokenRevokeAll from "./AccountAccessTokenRevokeAll";
 
 export default function AccountAccessTokenList() {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isRevokingAll, setIsRevokingAll] = useState(false);
   const [newAccessToken, setNewAccessToken] = useState<NewAccessToken | null>(
     null
   );
@@ -21,14 +23,24 @@ export default function AccountAccessTokenList() {
         <h5 className="h5 tw-font-bold tw-mb-4">
           Mes jetons d'accès personnels
         </h5>
-        <button
-          className="btn btn--primary"
-          onClick={() => {
-            setIsGenerating(true);
-          }}
-        >
-          Générer un nouveau jeton d'accès
-        </button>
+        <div>
+          <button
+            className="btn btn--primary tw-mr-2"
+            onClick={() => {
+              setIsGenerating(true);
+            }}
+          >
+            Générer un nouveau jeton d'accès
+          </button>
+          <button
+            className="btn btn--danger"
+            onClick={() => {
+              setIsRevokingAll(true);
+            }}
+          >
+            Révoquer tous les jetons d'accès
+          </button>
+        </div>
       </div>
       <AccountAccessTokenListContent
         newAccessToken={newAccessToken}
@@ -40,6 +52,12 @@ export default function AccountAccessTokenList() {
             setNewAccessToken(newToken);
             setIsGenerating(false);
           }}
+        />
+      )}
+      {isRevokingAll && (
+        <AccountAccessTokenRevokeAll
+          onClose={() => setIsRevokingAll(false)}
+          onRevokeAll={() => setNewAccessToken(null)}
         />
       )}
     </div>
@@ -84,11 +102,16 @@ function AccountAccessTokenListContent({
             onDelete={() => onNewAccessTokenDelete()}
           />
         )}
+
         <div>
           {data.accessTokens.map(accessToken => (
             <AccountAccessToken accessToken={accessToken} />
           ))}
         </div>
+        {data.accessTokens.length === 0 && !newAccessToken && (
+          <div>Aucun jeton d'accès</div>
+        )}
+        <div></div>
       </div>
     );
   }

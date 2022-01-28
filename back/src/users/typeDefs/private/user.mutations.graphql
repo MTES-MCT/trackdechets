@@ -93,4 +93,10 @@ type Mutation {
   Révoque un jeton d'accès personnel
   """
   revokeAccessToken(id: ID!): AccessToken!
+
+  """
+  USAGE INTERNE
+  Révoque l'ensemble des jetons d'accès personnels
+  """
+  revokeAllAccessTokens: [AccessToken!]!
 }

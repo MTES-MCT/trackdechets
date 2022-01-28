@@ -16,6 +16,7 @@ import refuseMembershipRequest from "./mutations/refuseMembershipRequest";
 import revokeAuthorizedApplication from "./mutations/revokeAuthorizedApplication";
 import revokeAccessToken from "./mutations/revokeAccessToken";
 import createAccessToken from "./mutations/createAccessToken";
+import revokeAllAccessTokens from "./mutations/revokeAllAccessTokens";
 
 const Mutation: MutationResolvers = {
   signup,
@@ -34,7 +35,8 @@ const Mutation: MutationResolvers = {
   resendActivationEmail,
   revokeAuthorizedApplication,
   revokeAccessToken,
-  createAccessToken
+  createAccessToken,
+  revokeAllAccessTokens
 };
 
 export default Mutation;
