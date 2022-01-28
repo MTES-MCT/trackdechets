@@ -44,6 +44,8 @@ export type RevisionRequestContent = Pick<
   | "brokerReceipt"
   | "brokerDepartment"
   | "brokerValidityLimit"
+  | "traderCompanyName"
+  | "traderCompanySiret"
   | "traderCompanyAddress"
   | "traderCompanyContact"
   | "traderCompanyPhone"
@@ -232,7 +234,7 @@ const bsddRevisionRequestSchema = yup
       .string()
       .nullable()
       .matches(/^$|^\d{14}$/, {
-        message: `Transporteur: ${INVALID_SIRET_LENGTH}`
+        message: `Courtier: ${INVALID_SIRET_LENGTH}`
       }),
     brokerCompanyAddress: yup.string().nullable(),
     brokerCompanyContact: yup.string().nullable(),
@@ -241,6 +243,13 @@ const bsddRevisionRequestSchema = yup
     brokerReceipt: yup.string().nullable(),
     brokerDepartment: yup.string().nullable(),
     brokerValidityLimit: yup.date().nullable(),
+    traderCompanyName: yup.string().nullable(),
+    traderCompanySiret: yup
+      .string()
+      .nullable()
+      .matches(/^$|^\d{14}$/, {
+        message: `Négociant: ${INVALID_SIRET_LENGTH}`
+      }),
     traderCompanyAddress: yup.string().nullable(),
     traderCompanyContact: yup.string().nullable(),
     traderCompanyPhone: yup.string().nullable(),

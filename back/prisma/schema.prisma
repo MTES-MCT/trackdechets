@@ -385,6 +385,7 @@ model BsddRevisionRequest {
   brokerReceipt                                  String?
   brokerDepartment                               String?
   brokerValidityLimit                            DateTime?
+  traderCompanyName                              String?
   traderCompanySiret                             String?
   traderCompanyAddress                           String?
   traderCompanyContact                           String?
