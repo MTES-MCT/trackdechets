@@ -5,12 +5,15 @@ import { generatePassword, hashPassword } from "../../utils";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { resetPassword } from "../../../mailer/templates";
 import { UserInputError } from "apollo-server-express";
+import { sanitizeEmail } from "../../../utils";
 
 const resetPasswordResolver: MutationResolvers["resetPassword"] = async (
   parent,
   { email }
 ) => {
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await prisma.user.findUnique({
+    where: { email: sanitizeEmail(email) }
+  });
   if (!user) {
     throw new UserInputError(`Cet email n'existe pas sur notre plateforme.`);
   }
