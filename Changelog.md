@@ -21,6 +21,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :boom: Breaking changes
 
 - Dépréciation du champ `waste { name }` sur le BSDA au profit champ `waste { materialName }`, aussi bien en lecture qu'en écriture. [PR 1118](https://github.com/MTES-MCT/trackdechets/pull/1118)
+  - Ce changement n'aura pas d'impact pour cette release mais le champ déprécié disparaîtra avec la prochaine. Il est donc important de faire la migration dès que possible.
 
 #### :nail_care: Améliorations
 
@@ -28,6 +29,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Retrait du lien de création de bsdd apparaissant sur le dashboard brouillon vide [PR 1150](https://github.com/MTES-MCT/trackdechets/pull/1150)
 - La recherche sur `customInfo` dans le tableau de bord transporteur se fait de façon exacte et non plus floue [PR 1144](https://github.com/MTES-MCT/trackdechets/pull/1144)
 - Les champs adresse enlèvement ou chantier sont remplissables même si les adresses ne sont pas trouvées [PR 1159](https://github.com/MTES-MCT/trackdechets/pull/1159)
+- Nombreuses améliorations apportées au BSDA autour du lexique utilisé, de la génération du récépissé PDF et affichage [PR 1118](https://github.com/MTES-MCT/trackdechets/pull/1118)
 
 #### :memo: Documentation
 
