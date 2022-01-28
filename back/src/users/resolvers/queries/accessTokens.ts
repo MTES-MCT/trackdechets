@@ -11,9 +11,10 @@ const accessTokensResolver: QueryResolvers["accessTokens"] = async (
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
   const accessTokens = await prisma.accessToken.findMany({
-    where: { userId: user.id, isRevoked: false }
+    where: { userId: user.id, isRevoked: false, applicationId: null }
   });
   return accessTokens.map(token => ({
+    id: token.id,
     description: token.description,
     lastUsed: token.lastUsed,
     tokenPreview: `${token.token.slice(0, 5)}*************`

@@ -12,7 +12,7 @@ import {
 import Loader from "common/components/Loaders";
 import { InlineError } from "common/components/Error";
 import AccountInfo from "./AccountInfo";
-import AccountIntegrationApi from "./AccountIntegrationApi";
+import AccountAccessTokenList from "./accessTokens/AccountAccessTokenList";
 import AccountCompanyList from "./AccountCompanyList";
 import AccountContentWrapper from "./AccountContentWrapper";
 import AccountCompanyAdd from "./AccountCompanyAdd";
@@ -64,7 +64,7 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
               path={routes.account.tokens}
               render={() => (
                 <AccountContentWrapper title="Mes jetons d'accès personnels">
-                  <AccountIntegrationApi />
+                  <AccountAccessTokenList />
                 </AccountContentWrapper>
               )}
             />

@@ -43,6 +43,7 @@ type AuthorizedApplication {
 Personnal access token
 """
 type AccessToken {
+  id: ID!
   "Permet de décrire l'utilité de ce token"
   description: String
   "Date de dernière utilisation du token"

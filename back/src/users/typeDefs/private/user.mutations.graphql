@@ -80,5 +80,11 @@ type Mutation {
   USAGE INTERNE
   Révoque l'accès à une application tierce
   """
-  revokeAuthorizedApplication(id: ID!): AuthorizedApplication
+  revokeAuthorizedApplication(id: ID!): AuthorizedApplication!
+
+  """
+  USAGE INTERNE
+  Révoque un jeton d'accès personnel
+  """
+  revokeAccessToken(id: ID!): AccessToken!
 }
