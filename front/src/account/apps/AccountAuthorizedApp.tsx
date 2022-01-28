@@ -1,7 +1,6 @@
 import { formatDate } from "common/datetime";
 import { AuthorizedApplication } from "generated/graphql/types";
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
 import styles from "./AccountAuthorizedApp.module.scss";
 import AccountAuthorizedAppRevoke from "./AccountAuthorizedAppRevoke";
 

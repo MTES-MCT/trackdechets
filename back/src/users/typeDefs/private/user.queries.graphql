@@ -17,4 +17,10 @@ type Query {
   Liste toutes les applications tierces ayant accès à mon compte
   """
   authorizedApplications: [AuthorizedApplication!]!
+
+  """
+  USAGE INTERNE
+  Liste tous les tokens peronnels générés
+  """
+  accessTokens: [AccessToken!]!
 }

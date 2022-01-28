@@ -38,3 +38,15 @@ type AuthorizedApplication {
   "Email de l'administrateur"
   admin: String
 }
+
+"""
+Personnal access token
+"""
+type AccessToken {
+  "Permet de décrire l'utilité de ce token"
+  description: String
+  "Date de dernière utilisation du token"
+  lastUsed: DateTime
+  "Affiche les 5 premiers caractères du token"
+  tokenPreview: String
+}

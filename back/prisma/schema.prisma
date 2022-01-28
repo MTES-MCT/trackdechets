@@ -132,6 +132,7 @@ model AccessToken {
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   token         String       @unique
+  description   String?
   isRevoked     Boolean      @default(false)
   lastUsed      DateTime?
   applicationId String?

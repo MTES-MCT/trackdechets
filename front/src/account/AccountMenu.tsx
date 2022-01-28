@@ -52,7 +52,7 @@ export const AccountMenuContent = ({
           activeClassName="sidebar__link--active"
           onClick={() => !!mobileCallback && mobileCallback()}
         >
-          Jetons d'accès
+          Jetons d'accès API
         </NavLink>
       </li>
       <li>
