@@ -48,6 +48,15 @@ type AccessToken {
   description: String
   "Date de dernière utilisation du token"
   lastUsed: DateTime
-  "Affiche les 5 premiers caractères du token"
-  tokenPreview: String
+}
+
+"""
+Personnal access token
+"""
+type NewAccessToken {
+  id: ID!
+  "Token en clair"
+  token: String!
+  "Permet de décrire l'utilité de ce token"
+  description: String!
 }

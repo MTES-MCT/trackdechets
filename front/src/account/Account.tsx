@@ -61,12 +61,8 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
               )}
             />
             <Route
-              path={routes.account.tokens}
-              render={() => (
-                <AccountContentWrapper title="Mes jetons d'accès personnels">
-                  <AccountAccessTokenList />
-                </AccountContentWrapper>
-              )}
+              path={routes.account.tokens.list}
+              render={() => <AccountAccessTokenList />}
             />
             <Route
               exact

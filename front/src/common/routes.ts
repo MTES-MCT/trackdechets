@@ -79,7 +79,7 @@ export default {
       list: "/account/companies",
     },
     authorizedApplications: "/account/applications",
-    tokens: "/account/tokens",
+    tokens: { list: "/account/tokens/list" },
     oauth2: {
       create: "/account/oauth2/create",
       edit: "/account/oauth2/edit/:id",

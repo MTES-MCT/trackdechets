@@ -47,7 +47,7 @@ export const AccountMenuContent = ({
     <ul>
       <li>
         <NavLink
-          to={routes.account.tokens}
+          to={routes.account.tokens.list}
           className="sidebar__link"
           activeClassName="sidebar__link--active"
           onClick={() => !!mobileCallback && mobileCallback()}

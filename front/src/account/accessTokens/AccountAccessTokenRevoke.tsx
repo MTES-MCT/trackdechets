@@ -1,24 +1,31 @@
 import * as React from "react";
 import { Modal } from "common/components";
-import { AccessToken } from "generated/graphql/types";
+import { AccessToken, NewAccessToken } from "generated/graphql/types";
 import { useMutation } from "@apollo/client";
 import { ACCESS_TOKENS, REVOKE_ACCESS_TOKEN } from "./queries";
 import { NotificationError } from "common/components/Error";
 
-type AccountOauth2AppDeleteProps = {
-  accessToken: AccessToken;
+type AccountAccessTokenRevokeProps = {
+  accessToken: AccessToken | NewAccessToken;
   onClose: () => void;
+  onDelete?: () => void;
 };
 
 export default function AccountAccessTokenRevoke({
   accessToken,
   onClose,
-}: AccountOauth2AppDeleteProps) {
+  onDelete,
+}: AccountAccessTokenRevokeProps) {
   const [revokeAccessToken, { loading, error }] = useMutation(
     REVOKE_ACCESS_TOKEN,
     {
       refetchQueries: [ACCESS_TOKENS],
-      onCompleted: onClose,
+      onCompleted: () => {
+        if (onDelete) {
+          onDelete();
+        }
+        onClose();
+      },
     }
   );
 

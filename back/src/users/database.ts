@@ -141,18 +141,24 @@ export async function getCompanyAssociationOrNotFound(
   return companyAssociations[0];
 }
 
-export async function createAccessToken(user: User) {
+type CreateAccessTokenArgs = { user: User; description?: string };
+
+export async function createAccessToken({
+  user,
+  description
+}: CreateAccessTokenArgs) {
   const clearToken = getUid(40);
 
-  await prisma.accessToken.create({
+  const accessToken = await prisma.accessToken.create({
     data: {
       user: {
         connect: { id: user.id }
       },
+      ...(description ? { description } : {}),
       token: hashToken(clearToken)
     }
   });
-  return { clearToken };
+  return { ...accessToken, token: clearToken };
 }
 
 export async function userExists(unsafeEmail: string) {

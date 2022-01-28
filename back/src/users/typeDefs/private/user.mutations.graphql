@@ -84,6 +84,12 @@ type Mutation {
 
   """
   USAGE INTERNE
+  Crée un jeton d'accès personnel
+  """
+  createAccessToken(input: CreateAccessTokenInput!): NewAccessToken!
+
+  """
+  USAGE INTERNE
   Révoque un jeton d'accès personnel
   """
   revokeAccessToken(id: ID!): AccessToken!

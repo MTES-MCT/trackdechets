@@ -1,12 +1,20 @@
 import { gql } from "@apollo/client";
 
+export const CREATE_ACCESS_TOKEN = gql`
+  mutation CreateAccessToken($input: CreateAccessTokenInput!) {
+    createAccessToken(input: $input) {
+      id
+      token
+    }
+  }
+`;
+
 export const ACCESS_TOKENS = gql`
   {
     accessTokens {
       id
       description
       lastUsed
-      tokenPreview
     }
   }
 `;

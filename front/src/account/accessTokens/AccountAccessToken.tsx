@@ -1,13 +1,8 @@
-import {
-  AccessToken,
-  Mutation,
-  MutationRevokeAccessTokenArgs,
-} from "generated/graphql/types";
+import { AccessToken } from "generated/graphql/types";
 import React, { useState } from "react";
 import { format } from "date-fns";
-import { gql, useMutation } from "@apollo/client";
-import { REVOKE_ACCESS_TOKEN } from "./queries";
 import AccountAccessTokenRevoke from "./AccountAccessTokenRevoke";
+import styles from "./AccountAccessToken.module.scss";
 
 type AccountAccessTokenProps = {
   accessToken: AccessToken;
@@ -19,11 +14,13 @@ export default function AccountAccessToken({
   const [isRevoking, setIsRevoking] = useState(false);
 
   return (
-    <div className="panel tw-flex tw-justify-between">
+    <div className={styles.token}>
       <div>
-        <div>{accessToken.tokenPreview}</div>
-        <div>{accessToken.description}</div>
         <div>
+          <span>*********************</span>
+          {accessToken.description && <span> - {accessToken.description}</span>}
+        </div>
+        <div className={styles.lastUsed}>
           {accessToken.lastUsed
             ? `Utilisé pour la dernière fois le ${format(
                 new Date(accessToken.lastUsed),
