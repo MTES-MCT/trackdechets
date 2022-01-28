@@ -26,13 +26,11 @@ function searchResponseToCompany({
     etablissement.complement_adresse
   ]);
 
-  const fullAddress = etablissement.geo_adresse
-    ? etablissement.geo_adresse
-    : buildAddress([
-        addressVoie,
-        etablissement.code_postal,
-        etablissement.libelle_commune
-      ]);
+  const fullAddress = buildAddress([
+    addressVoie,
+    etablissement.code_postal,
+    etablissement.libelle_commune
+  ]);
 
   const company = {
     siret: etablissement.siret,
