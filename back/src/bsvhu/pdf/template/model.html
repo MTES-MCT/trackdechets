@@ -98,11 +98,21 @@
           <h2>3. Le VHU sont conditionnés</h2>
           <div class="flex justify-center">
             <div>
-              <input type="radio" id="unites" name="emetteur" disabled />
+              <input
+                type="radio"
+                id="unites"
+                name="emetteur"
+                disabled
+                defaultChecked="${ form.packaging === 'UNITE' }" />
               <label htmlFor="unites">Unités</label>
             </div>
             <div>
-              <input type="radio" id="lots" name="emetteur" disabled />
+              <input
+                type="radio"
+                id="lots"
+                name="emetteur"
+                disabled
+                defaultChecked="${ form.packaging === 'LOT' }" />
               <label htmlFor="lots">Lots</label>
             </div>
           </div>
@@ -111,14 +121,24 @@
           <h2>4. Code déchet correspondant</h2>
           <div class="flex flex-column">
             <div>
-              <input type="radio" id="16 01 06" name="emetteur" disabled />
+              <input
+                type="radio"
+                id="16 01 06"
+                name="emetteur"
+                disabled
+                defaultChecked="${ form.wasteCode === '16 01 06' } />
               <label htmlFor="16 01 06">
                 <strong>16 01 06</strong> (Véhicules hors d’usage ne contenant
                 ni liquides ni autres composants dangereux)
               </label>
             </div>
             <div>
-              <input type="radio" id="16 01 04*" name="emetteur" disabled />
+              <input
+                type="radio"
+                id="16 01 04*"
+                name="emetteur"
+                disabled
+                defaultChecked="${ form.wasteCode === '16 01 04*' } />
               <label htmlFor="16 01 04*">
                 <strong>16 01 04*</strong> (véhicules hors d’usage non dépollué
                 par un centre agréé)
