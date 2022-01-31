@@ -1,6 +1,5 @@
-import express from "express";
+import express, { json } from "express";
 import supertest from "supertest";
-import { json } from "body-parser";
 
 const originalConsole = global.console;
 global.console = { error: jest.fn() } as any;
