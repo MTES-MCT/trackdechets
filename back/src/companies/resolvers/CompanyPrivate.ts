@@ -1,27 +1,27 @@
 import prisma from "../../prisma";
 import { CompanyPrivateResolvers } from "../../generated/graphql/types";
-import { getCompanyUsers, getUserRole, getInstallation } from "../database";
+import { getCompanyUsers, getUserRole } from "../database";
 
 const companyPrivateResolvers: CompanyPrivateResolvers = {
-  users: parent => {
-    return getCompanyUsers(parent.siret);
+  users: (parent, _, context) => {
+    return getCompanyUsers(parent.siret, context.dataloaders);
   },
   userRole: (parent, _, context) => {
     const userId = context.user.id;
     return getUserRole(userId, parent.siret);
   },
-  transporterReceipt: async parent => {
-    return await prisma.company
+  transporterReceipt: parent => {
+    return prisma.company
       .findUnique({ where: { siret: parent.siret } })
       .transporterReceipt();
   },
-  traderReceipt: async parent => {
-    return await prisma.company
+  traderReceipt: parent => {
+    return prisma.company
       .findUnique({ where: { siret: parent.siret } })
       .traderReceipt();
   },
-  brokerReceipt: async parent => {
-    return await prisma.company
+  brokerReceipt: parent => {
+    return prisma.company
       .findUnique({ where: { siret: parent.siret } })
       .brokerReceipt();
   },
@@ -35,9 +35,8 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
       .findUnique({ where: { siret: parent.siret } })
       .vhuAgrementDemolisseur();
   },
-  installation: async parent => {
-    const installation = await getInstallation(parent.siret);
-    return installation;
+  installation: (parent, _, context) => {
+    return context.dataloaders.installations.load(parent.siret);
   }
 };
 

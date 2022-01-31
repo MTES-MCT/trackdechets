@@ -44,7 +44,7 @@ export default function BsdaStepsList(props: Props) {
     [formQuery.data]
   );
 
-  const [createdaForm, { loading: creating }] = useMutation<
+  const [createBsda, { loading: creating }] = useMutation<
     Pick<Mutation, "createBsda">,
     MutationCreateBsdaArgs
   >(CREATE_BSDA, {
@@ -52,7 +52,7 @@ export default function BsdaStepsList(props: Props) {
     awaitRefetchQueries: true,
   });
 
-  const [updatedaForm, { loading: updating }] = useMutation<
+  const [updateBsda, { loading: updating }] = useMutation<
     Pick<Mutation, "updateBsda">,
     MutationUpdateBsdaArgs
   >(UPDATE_BSDA, {
@@ -62,10 +62,10 @@ export default function BsdaStepsList(props: Props) {
 
   function saveForm(input: BsdaInput): Promise<any> {
     return formState.id
-      ? updatedaForm({
+      ? updateBsda({
           variables: { id: formState.id, input },
         })
-      : createdaForm({ variables: { input } });
+      : createBsda({ variables: { input } });
   }
 
   function onSubmit(e, values) {

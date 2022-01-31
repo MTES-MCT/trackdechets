@@ -217,11 +217,11 @@ export default function MarkAsProcessed({ form, siret }: WorkflowActionProps) {
               nextDestination: null,
               noTraceability: null,
             }}
-            onSubmit={values => {
+            onSubmit={values =>
               markAsProcessed({
                 variables: { id: form.id, processedInfo: values },
-              });
-            }}
+              })
+            }
           >
             <ProcessedInfo form={form} close={close} />
           </Formik>

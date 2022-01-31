@@ -86,7 +86,7 @@ export default function Emitter() {
       <WorkSite
         switchLabel="Je souhaite ajouter une adresse de chantier ou de collecte"
         headingTitle="Adresse chantier"
-        designation="de l'entreprise"
+        designation="du chantier ou lieu de collecte"
         getInitialEmitterWorkSiteFn={getInitialEmitterWorkSite}
       />
     </>

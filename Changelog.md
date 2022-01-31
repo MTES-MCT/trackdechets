@@ -5,19 +5,53 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.01.2] 31/01/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+- Affichage d'un message d'erreur lorsque le statut d'acceptation d'un déchet dangereux n'est pas précisé lors de la signature de l'acceptation [PR 1152](https://github.com/MTES-MCT/trackdechets/pull/1152)
+- Affichage d'un message d'erreur lorsque la validation du traitement d'un déchet dangereux n'aboutit pas lors de la signature du traitement [PR 1152](https://github.com/MTES-MCT/trackdechets/pull/1152)
+- Corrections récépissé PDF [PR 1153](https://github.com/MTES-MCT/trackdechets/pull/1153) :
+  - ajout du détail des contenants pour le packaging "Autre".
+  - affichage de l'adresse chantier complète.
+  - case exemption de récépissé.
+
+#### :boom: Breaking changes
+
+- Dépréciation du champ `waste { name }` sur le BSDA au profit champ `waste { materialName }`, aussi bien en lecture qu'en écriture. [PR 1118](https://github.com/MTES-MCT/trackdechets/pull/1118)
+  - Ce changement n'aura pas d'impact pour cette release mais le champ déprécié disparaîtra avec la prochaine. Il est donc important de faire la migration dès que possible.
+
+#### :nail_care: Améliorations
+
+- La recherche d'établissements par n°SIRET ne retourne plus d'établissement fermé [PR 1140](https://github.com/MTES-MCT/trackdechets/pull/1140)
+- Retrait du lien de création de bsdd apparaissant sur le dashboard brouillon vide [PR 1150](https://github.com/MTES-MCT/trackdechets/pull/1150)
+- La recherche sur `customInfo` dans le tableau de bord transporteur se fait de façon exacte et non plus floue [PR 1144](https://github.com/MTES-MCT/trackdechets/pull/1144)
+- Les champs adresse enlèvement ou chantier sont remplissables même si les adresses ne sont pas trouvées [PR 1159](https://github.com/MTES-MCT/trackdechets/pull/1159)
+- Nombreuses améliorations apportées au BSDA autour du lexique utilisé, de la génération du récépissé PDF et affichage [PR 1118](https://github.com/MTES-MCT/trackdechets/pull/1118)
+
+#### :memo: Documentation
+
+#### :house: Interne
 
 # [2022.01.1] 10/01/2022
 
 #### :rocket: Nouvelles fonctionnalités
+
 #### :bug: Corrections de bugs
+
 - Correction d'un bug affectant la création de BSVHU. [PR 1130](https://github.com/MTES-MCT/trackdechets/pull/1130)
 - Suppression de tous les objets liés à un établissement avant l'appel à `prisma.company.delete` [PR 1127](https://github.com/MTES-MCT/trackdechets/pull/1127)
 - Correction d'un problème d'indexation lors des différentes étapes de préparation et prise en charge d'un segment multi-modal [PR 1127](https://github.com/MTES-MCT/trackdechets/pull/1127)
 - Validation d'un segment multi-modal lors de l'appel à la mutation `markAsReadyToTakeOver` [PR 1127](https://github.com/MTES-MCT/trackdechets/pull/1127)
 
 #### :boom: Breaking changes
+
 - Dépréciation du champ `me { companies }` au profit de la query `myCompanies` (paginée). [PR 1113](https://github.com/MTES-MCT/trackdechets/pull/1113)
+
 #### :nail_care: Améliorations
+
 - Pagination des établissements dans Mon Compte > Établissements. [PR 1113](https://github.com/MTES-MCT/trackdechets/pull/1113)
 - Possibilité pour le destinataire d'un BSDD de valider une réception même si un segment multi-modal a été crée par erreur [PR 1128](https://github.com/MTES-MCT/trackdechets/pull/1128)
 - Affichage du courtier sur l'aperçu et le PDF des bordereaux amiante. [PR 1135](https://github.com/MTES-MCT/trackdechets/pull/1135)
@@ -31,7 +65,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Retrait de l'envoi d'emails alertant d'un grand nombre d'établissements créés [PR 1123](https://github.com/MTES-MCT/trackdechets/pull/1123)
 - Envoi des emails dans une file d'attente de taches asynchrone [PR 1097](https://github.com/MTES-MCT/trackdechets/pull/1097/)
 
- # [2021.12.2] 27/12/2021
+# [2021.12.2] 27/12/2021
 
 #### :rocket: Nouvelles fonctionnalités
 
@@ -42,6 +76,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
     - `outgoingWastes` : registre déchets sortants
     - `transportedWastes` : registre déchets collectés
     - `managedWastes` : registre déchets gérés
+
 #### :bug: Corrections de bugs
 
 - Correctif de l'affichage du type de quantité dans l'UI du BSDD [PR 1102](https://github.com/MTES-MCT/trackdechets/pull/1102)
@@ -50,6 +85,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :boom: Breaking changes
 
 - Dépréciation de la query `formsRegister` au profit de la query `wastesDownloadLink`.
+
 #### :nail_care: Améliorations
 
 - Remplacement du CERFA BSDD par un récépissé reprenant l'ensemble des évolutions Trackdéchets [PR 1096](https://github.com/MTES-MCT/trackdechets/pull/1096)
@@ -60,7 +96,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Initialisation explicite des gestionnaires de téléchargement de fichier [PR 1092](https://github.com/MTES-MCT/trackdechets/pull/1092)
-
 
 # [2021.12.1] 06/12/2021
 

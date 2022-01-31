@@ -17,7 +17,6 @@ import helmet from "helmet";
 import path from "path";
 import passport from "passport";
 import RateLimitRedisStore from "rate-limit-redis";
-import prisma from "./prisma";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 import { ErrorCode } from "./common/errors";
 import { downloadRouter } from "./routers/downloadRouter";
@@ -34,6 +33,8 @@ import { getUIBaseURL } from "./utils";
 import sentryReporter from "./common/plugins/sentryReporter";
 import { initSentry } from "./common/sentry";
 import { graphiqlLandingPagePlugin } from "./common/plugins/graphiql";
+import { createUserDataLoaders } from "./users/dataloaders";
+import { createCompanyDataLoaders } from "./companies/dataloaders";
 
 const {
   SESSION_SECRET,
@@ -66,7 +67,7 @@ export const server = new ApolloServer({
       ...ctx,
       // req.user is made available by passport
       user: ctx.req?.user ?? null,
-      prisma
+      dataloaders: { ...createUserDataLoaders(), ...createCompanyDataLoaders() }
     };
   },
   formatError: err => {

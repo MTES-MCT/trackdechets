@@ -5,7 +5,7 @@ import * as elastic from "../../../common/elastic";
 import { getFormOrFormNotFound } from "../../database";
 import { expandFormFromDb } from "../../form-converter";
 import { checkCanDelete } from "../../permissions";
-import { Status } from ".prisma/client";
+import { Status } from "@prisma/client";
 
 const deleteFormResolver: MutationResolvers["deleteForm"] = async (
   parent,

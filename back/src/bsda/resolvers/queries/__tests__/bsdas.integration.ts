@@ -197,4 +197,56 @@ describe("Query.bsdas", () => {
       })
     );
   });
+
+  it("should enable excluding bsdas that are already grouped or forwarded", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const groupedBsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        status: "AWAITING_CHILD"
+      }
+    });
+    const forwardedBsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        status: "AWAITING_CHILD"
+      }
+    });
+    await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        grouping: { connect: [{ id: groupedBsda.id }] },
+        forwarding: { connect: { id: forwardedBsda.id } }
+      }
+    });
+
+    const { query } = makeClient(emitter.user);
+    const { data: dataWithoutNullFilter } = await query<
+      Pick<Query, "bsdas">,
+      QueryBsdasArgs
+    >(GET_BSDAS, {
+      variables: {
+        where: {
+          status: { _eq: "AWAITING_CHILD" }
+        }
+      }
+    });
+    expect(dataWithoutNullFilter.bsdas.edges.length).toBe(2);
+
+    const { data } = await query<Pick<Query, "bsdas">, QueryBsdasArgs>(
+      GET_BSDAS,
+      {
+        variables: {
+          where: {
+            groupedIn: { _eq: null },
+            forwardedIn: { _eq: null },
+            status: { _eq: "AWAITING_CHILD" }
+          }
+        }
+      }
+    );
+
+    expect(data.bsdas.edges.length).toBe(0);
+  });
 });

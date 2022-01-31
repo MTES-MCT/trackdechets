@@ -61,9 +61,9 @@ export async function getFicheInterventions({
   bsff: Bsff;
   context: GraphQLContext;
 }): Promise<BsffFicheIntervention[]> {
-  const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
-    where: { bsffs: { some: { id: { in: [bsff.id] } } } }
-  });
+  const ficheInterventions = await prisma.bsff
+    .findUnique({ where: { id: bsff.id } })
+    .ficheInterventions();
 
   const unflattenedFicheInterventions = ficheInterventions.map(
     unflattenFicheInterventionBsff

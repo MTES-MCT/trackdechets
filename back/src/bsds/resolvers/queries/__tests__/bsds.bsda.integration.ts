@@ -145,7 +145,6 @@ describe("Query.bsds.bsda base workflow", () => {
               consistence: "SOLIDE",
               familyCode: "Code famille",
               materialName: "A material",
-              name: "Amiante",
               sealNumbers: ["1", "2"]
             },
             packagings: [{ quantity: 1, type: "PALETTE_FILME" }],

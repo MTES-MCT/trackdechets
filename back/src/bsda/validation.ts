@@ -86,7 +86,6 @@ type Transporter = Pick<
 type WasteDescription = Pick<
   Bsda,
   | "wasteCode"
-  | "wasteName"
   | "wasteFamilyCode"
   | "wasteMaterialName"
   | "wasteConsistence"
@@ -214,16 +213,12 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
           context.emissionSignature,
           `Émetteur: vous devez précisez si c'est un particulier ou un professionnel`
         ),
-      emitterCompanyName: yup.string().when("emitterIsPrivateIndividual", {
-        is: true,
-        then: yup.string().nullable(true),
-        otherwise: yup
-          .string()
-          .requiredIf(
-            context.emissionSignature,
-            `Émetteur: ${MISSING_COMPANY_NAME}`
-          )
-      }),
+      emitterCompanyName: yup
+        .string()
+        .requiredIf(
+          context.emissionSignature,
+          `Émetteur: ${MISSING_COMPANY_NAME}`
+        ),
       emitterCompanySiret: yup.string().when("emitterIsPrivateIndividual", {
         is: true,
         then: yup.string().nullable(true),
@@ -241,12 +236,16 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
           context.emissionSignature,
           `Émetteur: ${MISSING_COMPANY_ADDRESS}`
         ),
-      emitterCompanyContact: yup
-        .string()
-        .requiredIf(
-          context.emissionSignature,
-          `Émetteur: ${MISSING_COMPANY_CONTACT}`
-        ),
+      emitterCompanyContact: yup.string().when("emitterIsPrivateIndividual", {
+        is: true,
+        then: yup.string().nullable(true),
+        otherwise: yup
+          .string()
+          .requiredIf(
+            context.emissionSignature,
+            `Émetteur: ${MISSING_COMPANY_CONTACT}`
+          )
+      }),
       emitterCompanyPhone: yup
         .string()
         .requiredIf(
@@ -283,23 +282,22 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           `Entreprise de travaux: ${MISSING_COMPANY_NAME}`
         )
     }),
-    workerCompanySiret: yup
-      .string()
-      .length(14, `Entreprise de travaux: ${INVALID_SIRET_LENGTH}`)
-      .when("type", {
-        is: value =>
-          [
-            BsdaType.RESHIPMENT,
-            BsdaType.GATHERING,
-            BsdaType.COLLECTION_2710
-          ].includes(value),
-        then: schema => schema.nullable(),
-        otherwise: schema =>
-          schema.requiredIf(
+    workerCompanySiret: yup.string().when("type", {
+      is: value =>
+        [
+          BsdaType.RESHIPMENT,
+          BsdaType.GATHERING,
+          BsdaType.COLLECTION_2710
+        ].includes(value),
+      then: schema => schema.nullable(),
+      otherwise: schema =>
+        schema
+          .length(14, `Entreprise de travaux: ${INVALID_SIRET_LENGTH}`)
+          .requiredIf(
             context.emissionSignature,
             `Entreprise de travaux: ${MISSING_COMPANY_SIRET}`
           )
-      }),
+    }),
     workerCompanyAddress: yup.string().when("type", {
       is: value =>
         [
@@ -421,6 +419,7 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         ),
       destinationReceptionDate: yup
         .date()
+        .max(new Date())
         .requiredIf(
           context.operationSignature,
           `Entreprise de destination:vous devez préciser la date de réception`
@@ -477,6 +476,7 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         }),
       destinationOperationDate: yup
         .date()
+        .max(new Date())
         .requiredIf(
           context.operationSignature,
           `Entreprise de destination:vous devez préciser la date d'opétation`
@@ -573,14 +573,13 @@ const wasteDescriptionSchema: FactorySchemaOf<
       .string()
       .requiredIf(context.emissionSignature, "Le code déchet est obligatoire")
       .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE),
-    wasteName: yup
+    wasteFamilyCode: yup.string().nullable(),
+    wasteMaterialName: yup
       .string()
       .requiredIf(
         context.emissionSignature,
         "La description déchet est obligatoire"
       ),
-    wasteFamilyCode: yup.string().nullable(),
-    wasteMaterialName: yup.string().nullable(),
     wasteConsistence: yup
       .mixed<BsdaConsistence>()
       .requiredIf(context.workSignature, `La consistence est obligatoire`),

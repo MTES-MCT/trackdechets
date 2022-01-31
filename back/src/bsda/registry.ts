@@ -1,4 +1,4 @@
-import { Bsda } from ".prisma/client";
+import { Bsda } from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
 import {
   AllWaste,
@@ -48,7 +48,7 @@ export function getRegistryFields(
 
 function toGenericWaste(bsda: Bsda): GenericWaste {
   return {
-    wasteDescription: bsda.wasteName,
+    wasteDescription: bsda.wasteMaterialName,
     wasteCode: bsda.wasteCode,
     pop: false,
     id: bsda.id,

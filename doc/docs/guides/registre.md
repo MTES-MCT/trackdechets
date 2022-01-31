@@ -9,7 +9,7 @@ L'[arrêté du 31 mai 2021](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT00004
 Les `queries` permettant d'exporter les données registre sont les suivantes :
 - [`incomingWastes`](../reference/api-reference/registre/queries#incomingwastes) : registre de déchets entrants
 - [`outgoingWastes`](../reference/api-reference/registre/queries#outgoingwastes) : registre de déchets sortants
-- [`transporteWastes](../reference/api-reference/registre/queries#transportedwastes): registre de déchets transportés
+- [`transporteWastes`](../reference/api-reference/registre/queries#transportedwastes): registre de déchets transportés
 - [`managedWastes`](../reference/api-reference/registre/queries#managedwastes) : registre de déchets gérés (courtage ou négoce)
 - [`allWastes`](../reference/api-reference/registre/queries#allwastes) : registre permettant d'exporter toutes les données de bordereaux pour un ou plusieurs établissements
 
@@ -95,7 +95,7 @@ Les résultats sont paginés. Pour récupérer tous les déchets :
 - obtenir une première page avec `first=50`.
 - si `pageInfo { hasNextPage }` est `true`, refaire une requête avec `first=50` et `after=<cursor>` où `cursor` est égal à `pageInfo { endCursor }` de la requête précédente.
 - continuer ainsi tant que `pageInfo { hasNextPage }` est `true`.
-- `pageInfo { totalCount }` vous donne le nombre total de déchets à récupérer à tout moment.
+- `totalCount` vous donne le nombre total de déchets à récupérer à tout moment.
 
 
 ## Export CSV ou Excel

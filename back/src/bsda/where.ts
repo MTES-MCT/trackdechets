@@ -6,7 +6,9 @@ import {
   toPrismaStringFilter,
   toPrismaNestedWhereInput,
   toPrismaGenericWhereInput,
-  toPrismaEnumFilter
+  toPrismaEnumFilter,
+  toPrismaIdFilter,
+  toPrismaRelationIdFilter
 } from "../common/where";
 
 function toPrismaBsdaWhereInput(where: BsdaWhere): Prisma.BsdaWhereInput {
@@ -39,7 +41,12 @@ function toPrismaBsdaWhereInput(where: BsdaWhere): Prisma.BsdaWhereInput {
     destinationOperationSignatureDate: toPrismaDateFilter(
       where.destination?.operation?.signature?.date
     ),
-    brokerCompanySiret: toPrismaStringFilter(where.broker?.company?.siret)
+    brokerCompanySiret: toPrismaStringFilter(where.broker?.company?.siret),
+    groupedInId: toPrismaIdFilter(where.groupedIn),
+    forwardedIn: toPrismaRelationIdFilter(where.forwardedIn) as Prisma.XOR<
+      Prisma.BsdaRelationFilter,
+      Prisma.BsdaWhereInput
+    >
   });
 }
 

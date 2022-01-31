@@ -1,11 +1,14 @@
 import React from "react";
 import { Field, useFormikContext } from "formik";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import { Bsda, BsdaPickupSite } from "generated/graphql/types";
+import { Bsda, BsdaType, BsdaPickupSite } from "generated/graphql/types";
 import WorkSite from "form/common/components/work-site/WorkSite";
 
 export function Emitter({ disabled }) {
   const { values } = useFormikContext<Bsda>();
+
+  const isGroupement = values?.type === BsdaType.Gathering;
+  const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
 
   return (
     <>
@@ -16,19 +19,29 @@ export function Emitter({ disabled }) {
         </div>
       )}
 
-      <div className="form__row">
-        <label>
-          <Field
-            disabled={disabled}
-            type="checkbox"
-            name="emitter.isPrivateIndividual"
-            className="td-checkbox"
-          />
-          Le MO ou le détenteur est un particulier
-        </label>
-      </div>
+      {isGroupement || isEntreposageProvisoire ? (
+        <div className="notification">
+          Vous effectuez un groupement ou entreposage provisoire. L'entreprise
+          émettrice est obligatoirement la vôtre:{" "}
+          {values.emitter?.company?.name} - {values.emitter?.company?.siret}
+        </div>
+      ) : (
+        <div className="form__row">
+          <label>
+            <Field
+              disabled={disabled}
+              type="checkbox"
+              name="emitter.isPrivateIndividual"
+              className="td-checkbox"
+            />
+            Le MO ou le détenteur est un particulier
+          </label>
+        </div>
+      )}
 
-      {values.emitter?.isPrivateIndividual ? (
+      {values.emitter?.isPrivateIndividual ||
+      isGroupement ||
+      isEntreposageProvisoire ? (
         <>
           <div className="form__row">
             <label>
@@ -86,7 +99,7 @@ export function Emitter({ disabled }) {
       <WorkSite
         switchLabel="Je souhaite ajouter une adresse de chantier ou de collecte"
         headingTitle="Adresse chantier"
-        designation="du chantier"
+        designation="du chantier ou lieu de collecte"
         getInitialEmitterWorkSiteFn={getInitialEmitterPickupSite}
         disabled={disabled}
         modelKey="pickupSite"

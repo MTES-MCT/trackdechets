@@ -1,16 +1,16 @@
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { searchCompanies } from "../../sirene/";
-import { getInstallation } from "../../database";
 
 const searchCompaniesResolver: QueryResolvers["searchCompanies"] = async (
-  parent,
-  { clue, department }
+  _,
+  { clue, department },
+  context
 ) => {
   const companies = await searchCompanies(clue, department);
   return companies.map(async company => {
     return {
       ...company,
-      installation: await getInstallation(company.siret)
+      installation: await context.dataloaders.installations.load(company.siret)
     };
   });
 };

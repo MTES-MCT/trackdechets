@@ -88,3 +88,30 @@ export interface CompanySearchResult {
   addressCity: string;
   addressPostalCode: string;
 }
+
+// Response from https://search-recherche-entreprises.fabrique.social.gouv.fr/api/v1/etablissement/<VOTRE_SIRET>
+export interface SearchResponseSocialGouv {
+  siret: string;
+  activitePrincipale: string;
+  categorieJuridiqueUniteLegale: string;
+  etatAdministratifEtablissement: string;
+  address: string;
+  codeCommuneEtablissement: string;
+  label: string;
+}
+
+export interface MatchingEtablissementSocialGouv {
+  siret: string;
+  address: string;
+}
+
+export interface MatchingEntrepriseSocialGouv {
+  activitePrincipale: string;
+  label: string;
+  categorieJuridiqueUniteLegale: string;
+  allMatchingEtablissements: MatchingEtablissementSocialGouv[];
+}
+// Response from https://search-recherche-entreprises.fabrique.social.gouv.fr/api/v1/search?query=<QUERY>
+export interface FullTextSearchResponseSocialGouv {
+  entreprises: MatchingEntrepriseSocialGouv[];
+}

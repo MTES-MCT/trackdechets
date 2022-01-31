@@ -179,7 +179,7 @@ model Company {
   vhuAgrementDemolisseur               VhuAgrement?              @relation(name: "VhuAgrementDemolisseur_Company", fields: [vhuAgrementDemolisseurId], references: [id])
   vhuAgrementBroyeurId                 String?
   vhuAgrementBroyeur                   VhuAgrement?              @relation(name: "VhuAgrementBroyeur_Company", fields: [vhuAgrementBroyeurId], references: [id])
-  CompanyAssociation                   CompanyAssociation[]
+  companyAssociations                  CompanyAssociation[]
   MembershipRequest                    MembershipRequest[]
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
   bsddRevisionRequests                 BsddRevisionRequest[]
@@ -385,6 +385,7 @@ model BsddRevisionRequest {
   brokerReceipt                                  String?
   brokerDepartment                               String?
   brokerValidityLimit                            DateTime?
+  traderCompanyName                              String?
   traderCompanySiret                             String?
   traderCompanyAddress                           String?
   traderCompanyContact                           String?
@@ -1123,7 +1124,6 @@ model Bsda {
   ecoOrganismeSiret String?
 
   wasteCode         String?
-  wasteName         String?
   wasteFamilyCode   String?
   wasteMaterialName String?
   wasteConsistence  BsdaConsistence?

@@ -28,9 +28,9 @@
         <div class="grid-item frame-type">
           <p>
             J’édite un BSDA pour : <input type="checkbox" {{#if (eq bsda.type
-            "COLLECTION_2710")}}checked{{/if}} /> la collecte amiante sur un
+            "OTHER_COLLECTIONS")}}checked{{/if}} /> la collecte amiante sur un
             chantier <input type="checkbox" {{#if (eq bsda.type
-            "OTHER_COLLECTIONS")}}checked{{/if}} /> la collecte en déchèterie
+            "COLLECTION_2710")}}checked{{/if}} /> la collecte en déchèterie
             relevant de la rubrique 2710-1 <input type="checkbox" {{#if (eq
             bsda.type "GATHERING")}}checked{{/if}} /> le groupement de déchets
             en transit sur un site relevant de la rubrique 2718 (ou 2710-1)
@@ -69,8 +69,12 @@
               <p>Nom du responsable : {{bsda.emitterCompanyContact}}</p>
 
               <h4>Informations chantier</h4>
-              <p>Code chantier :</p>
-              <p>Adresse chantier:</p>
+              <p>Info chantier : {{bsda.emitterPickupSiteInfos}}</p>
+              <p>
+                Adresse chantier : {{bsda.emitterPickupSiteName}}
+                {{bsda.emitterPickupSiteAddress}} {{bsda.emitterPickupSiteCity}}
+                {{bsda.emitterPickupSitePostalCode}}
+              </p>
             </div>
           </div>
         </div>
@@ -78,7 +82,6 @@
         <div class="grid-item frame-waste-codes">
           <h2>2. Déchets</h2>
           <p>Code déchet : {{bsda.wasteCode}}</p>
-          <p>Dénomination : {{bsda.wasteName}}</p>
           <p>Code famille : {{bsda.wasteFamilyCode}}</p>
           <p>Nom du matériau : {{bsda.wasteMaterialName}}</p>
         </div>
@@ -110,17 +113,16 @@
                 "OTHER")}}checked{{/if}} /> Autre
               </p>
 
+              <p>Quantité en tonnes : {{divide bsda.weightValue 1000}}</p>
               <p>
-                Quantité en tonnes : {{divide bsda.weightValue 1000}} <input type="checkbox"
-                {{#if bsda.weightIsEstimate}}checked{{/if}} /> Réelle <input
+                <input type="checkbox" {{#if
+                bsda.weightIsEstimate}}checked{{/if}} /> Estimée <input
                 type="checkbox" {{#unless
-                bsda.weightIsEstimate}}checked{{/unless}} /> Estimée
+                bsda.weightIsEstimate}}checked{{/unless}} /> Réelle
               </p>
             </div>
             <div>
-              <p>
-                Détail conditionnements/nombre : {{packagings}}
-              </p>
+              <p>Détail conditionnements/nombre : {{packagings}}</p>
               <p>Total conditionnements : {{nbOfPackagings}}</p>
             </div>
           </div>
@@ -136,7 +138,7 @@
 
         <div class="grid-item frame-waste-sealed">
           <h2>2.2 Numéros de scellés</h2>
-          <p>{{#each bsda.wasteSealNumbers}}<span>{{this}}</span>{{/each}}</p>
+          <p>{{sealedNumbers}}</p>
         </div>
 
         <div class="grid-item frame-trader">
@@ -189,9 +191,7 @@
           <p>Adresse : {{bsda.workerCompanyAddress}}</p>
           <p>Tel : {{bsda.workerCompanyPhone}}</p>
           <p>Mail : {{bsda.workerCompanyMail}}</p>
-          <p>
-            Nom de la personne à contacter : {{bsda.workerCompanyContact}}
-          </p>
+          <p>Nom de la personne à contacter : {{bsda.workerCompanyContact}}</p>
         </div>
 
         <div class="grid-item frame-worker-consent">
@@ -218,7 +218,7 @@
         </div>
 
         <div class="grid-item frame-transporter">
-          <h2>6. Transporteur 1</h2>
+          <h2>6. Transporteur</h2>
           <div class="flex">
             <div class="grow">
               <p>N° SIRET : {{bsda.transporterCompanySiret}}</p>
@@ -227,18 +227,19 @@
               <p>Tel : {{bsda.transporterCompanyPhone}}</p>
               <p>Mail : {{bsda.transporterCompanyMail}}</p>
               <p>
-                Nom de la personne à contacter : {{bsda.transporterCompanyMail}}
+                Nom de la personne à contacter :
+                {{bsda.transporterCompanyContact}}
               </p>
             </div>
 
             <div class="grow">
               <p>Récépissé n°: {{bsda.transporterRecepisseNumber}}</p>
-              <p>Département : {{bsda.transporterRecepisseDepartmen}}</p>
+              <p>Département : {{bsda.transporterRecepisseDepartment}}</p>
               <p>
                 Date limite de validité : {{dateFmt
                 bsda.transporterRecepisseValidityLimit}}
               </p>
-              <p>Mode de transport : {{bsda.transporterTransportMode}}</p>
+              <p>Mode de transport : {{transportMode}}</p>
               <p>
                 Immatriculation(s) : {{#each
                 bsda.transporterTransportPlates}}<span>{{this}}</span>{{/each}}
@@ -249,7 +250,7 @@
               </p>
               <p>
                 {{#if
-                bsda.transporterSignatureAuthor}}{{{signatureStamp}}}{{/if}}
+                bsda.transporterTransportSignatureAuthor}}{{{signatureStamp}}}{{/if}}
               </p>
             </div>
           </div>
@@ -262,8 +263,8 @@
             bsda.destinationReceptionDate}}
           </p>
           <p>
-            Quantité réelle présentée : {{divide bsda.destinationReceptionWeight 1000}}
-            tonne(s)
+            Quantité réelle présentée : {{divide bsda.destinationReceptionWeight
+            1000}} tonne(s)
           </p>
           <p>
             Lot accepté : <input type="checkbox" {{#if (eq
@@ -281,8 +282,8 @@
         </div>
 
         <div class="grid-item frame-destination-operation">
-          <h2>8. Réalisation de l'opétation</h2>
-          <p>Opération :</p>
+          <h2>8. Réalisation de l'opération</h2>
+          <p>Opération : {{bsda.destinationOperationCode}}</p>
           <p>
             {{#if
             bsda.destinationOperationSignatureAuthor}}{{{signatureStamp}}}{{/if}}
@@ -291,13 +292,18 @@
             Date de réalisation : {{dateFmt
             bsda.destinationOperationSignatureDate}}
           </p>
+          <p>
+            Destination finale :
+            {{bsda.destinationOperationNextDestinationCompanyName}}
+            {{bsda.destinationOperationNextDestinationCompanySiret}} /
+            {{bsda.destinationOperationNextDestinationCompanyAddress}}
+          </p>
+          <p>Code final prévu : {{bsda.destinationOperationNextDestinationPlannedOperationCode}}</p>
         </div>
       </div>
     </section>
     <section class="sheet">
-      <h1 class="centered">
-        Traçabilité associée au BSD n°{{ bsda.id }}
-      </h1>
+      <h1 class="centered">Traçabilité associée au BSD n°{{ bsda.id }}</h1>
 
       <br /><br />
 
@@ -330,19 +336,17 @@
         </div>
         <div class="grid-item">{{this.destinationCap}}</div>
         <div class="grid-item">{{this.destinationReceptionWeight}}</div>
-        <div class="grid-item">{{this.transporterTransportTakenOverAt}}</div>
+        <div class="grid-item">
+          {{dateFmt this.transporterTransportTakenOverAt}}
+        </div>
         {{/each}}
       </div>
 
       <div>
         <p>Niveau :</p>
         <ul>
-          <li>
-            1 -> BSDA initial (producteur responsable)
-          </li>
-          <li>
-            2 -> groupement de BSDA / transit
-          </li>
+          <li>1 -> BSDA initial (producteur responsable)</li>
+          <li>2 -> groupement de BSDA / transit</li>
         </ul>
       </div>
     </section>

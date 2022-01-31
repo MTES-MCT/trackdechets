@@ -15,7 +15,7 @@ const bsdaVerboseStatuses: Record<BsdaStatus, string> = {
   SENT: "Envoyé",
   PROCESSED: "Traité",
   REFUSED: "Refusé",
-  AWAITING_CHILD: "En attente d'un BSD suite",
+  AWAITING_CHILD: "En attente d'un BSDA suite",
 };
 
 // Basic implementation
@@ -34,13 +34,19 @@ export const COLUMNS: Record<
     accessor: bsda => bsda.id,
   },
   emitter: {
-    accessor: bsda => bsda.emitter?.company?.name ?? "",
+    accessor: bsda =>
+      `${bsda.emitter?.company?.name ?? ""} ${
+        bsda.emitter?.isPrivateIndividual ? "(particulier)" : ""
+      }`,
   },
   recipient: {
     accessor: bsda => bsda?.destination?.company?.name ?? "",
   },
   waste: {
-    accessor: bsda => bsda?.waste?.materialName ?? "",
+    accessor: bsda =>
+      [bsda?.waste?.code, bsda?.waste?.materialName]
+        .filter(Boolean)
+        .join(" - "),
   },
   transporterCustomInfo: {
     accessor: bsda => "", // bsda.transporter?.customInfo

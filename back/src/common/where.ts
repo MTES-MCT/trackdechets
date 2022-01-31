@@ -1,4 +1,4 @@
-import { Prisma } from ".prisma/client";
+import { Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { safeInput } from "../forms/form-converter";
 import {
@@ -123,6 +123,23 @@ export function toPrismaIdFilter(idFilter: IdFilter | undefined) {
     equals: idFilter._eq,
     in: idFilter._in
   });
+}
+
+export function toPrismaRelationIdFilter(idFilter: IdFilter | undefined) {
+  if (!idFilter) {
+    return undefined;
+  }
+
+  if (idFilter._eq === null) {
+    return { is: null };
+  }
+
+  return {
+    id: safeInput<Prisma.StringFilter>({
+      equals: idFilter._eq,
+      in: idFilter._in
+    })
+  };
 }
 
 export function toPrismaStringFilter(

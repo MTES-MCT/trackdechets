@@ -7,9 +7,9 @@ import {
 
 const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
   approvals: async parent => {
-    return prisma.bsddRevisionRequestApproval.findMany({
-      where: { revisionRequestId: parent.id }
-    });
+    return prisma.bsddRevisionRequest
+      .findUnique({ where: { id: parent.id } })
+      .approvals();
   },
   content: parent => {
     return expandBsddRevisionRequestContent(parent as any);

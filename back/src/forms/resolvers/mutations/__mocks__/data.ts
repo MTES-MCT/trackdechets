@@ -230,6 +230,7 @@ export function getContext(): GraphQLContext {
       updatedAt: new Date()
     } as User,
     req: null as any,
-    res: null as any
+    res: null as any,
+    dataloaders: null
   };
 }

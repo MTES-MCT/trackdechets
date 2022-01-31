@@ -44,7 +44,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                 consistence: SOLIDE
                 familyCode: "Code famille"
                 materialName: "A material"
-                name: "Amiante"
                 sealNumbers: ["1", "2"]
             }
             packagings: [{ quantity: 1, type: PALETTE_FILME }]
@@ -122,7 +121,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                   isPrivateIndividual: true
                   company: {
                     address: "Rue du bsda"
-                    contact: "Un particulier"
+                    name: "Un particulier"
                     phone: "0101010101"
                     mail: "particulier@mail.com"
                   }
@@ -153,7 +152,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                   consistence: SOLIDE
                   familyCode: "Code famille"
                   materialName: "A material"
-                  name: "Amiante"
                   sealNumbers: ["1", "2"]
               }
               packagings: [{ quantity: 1, type: PALETTE_FILME }]
@@ -318,7 +316,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                     consistence: SOLIDE
                     familyCode: "Code famille"
                     materialName: "A material"
-                    name: "Amiante"
                     sealNumbers: ["1", "2"]
                 }
                 packagings: [{

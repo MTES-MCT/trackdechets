@@ -110,7 +110,6 @@ const Transporter = ({ form }: { form: Bsda }) => {
           value={transporter?.transport?.takenOverAt}
           label="Emporté le"
         />
-
         <DateRow
           value={transporter?.transport?.signature?.date}
           label="Signé le"
@@ -122,6 +121,10 @@ const Transporter = ({ form }: { form: Bsda }) => {
         <DetailRow
           value={transporter?.customInfo}
           label="Informations tranporteur"
+        />
+        <DateRow
+          value={transporter?.transport?.plates?.join(", ")}
+          label="Immatriculations"
         />
       </div>
     </>
@@ -140,7 +143,7 @@ const Recipient = ({ form }: { form: Bsda }) => {
         <DetailRow
           value={destination?.reception?.weight}
           label="Poids reçu"
-          units="kg"
+          units="tonne(s)"
         />
       </div>
       <div className={styles.detailGrid}>
@@ -268,8 +271,7 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             <dd>{form.waste?.code}</dd>
             <dt>Description du déchet</dt>
             <dd>
-              {form.waste?.name} {form.waste?.materialName}{" "}
-              {form.waste?.familyCode}
+              {form.waste?.materialName} {form.waste?.familyCode}
             </dd>
           </div>
 

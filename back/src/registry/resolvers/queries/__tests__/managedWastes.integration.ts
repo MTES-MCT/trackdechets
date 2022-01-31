@@ -6,7 +6,7 @@ import {
   Status,
   User,
   UserRole
-} from ".prisma/client";
+} from "@prisma/client";
 import {
   refreshElasticSearch,
   resetDatabase

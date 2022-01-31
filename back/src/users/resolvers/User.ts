@@ -9,16 +9,14 @@ const userResolvers: UserResolvers = {
   // to make up an instance of CompanyPrivate
   companies: async parent => {
     const companies = await getUserCompanies(parent.id);
-    return Promise.all(
-      companies.map(async company => {
-        const companyPrivate: CompanyPrivate = convertUrls(company);
+    return companies.map(async company => {
+      const companyPrivate: CompanyPrivate = convertUrls(company);
 
-        const { codeNaf: naf, address } = company;
-        const libelleNaf = naf in nafCodes ? nafCodes[naf] : "";
+      const { codeNaf: naf, address } = company;
+      const libelleNaf = naf in nafCodes ? nafCodes[naf] : "";
 
-        return { ...companyPrivate, naf, libelleNaf, address };
-      })
-    );
+      return { ...companyPrivate, naf, libelleNaf, address };
+    });
   }
 };
 

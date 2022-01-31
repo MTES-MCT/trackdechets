@@ -69,7 +69,7 @@ export default function Operation() {
 
           <div className="form__row">
             <label>
-              Quantité présentée
+              Quantité présentée en tonnes
               <Field
                 component={NumberInput}
                 name="destination.reception.weight"
@@ -79,6 +79,9 @@ export default function Operation() {
 
             <RedErrorMessage name="destination.reception.weight" />
           </div>
+          <p className="tw-text-sm">
+            <em>Quantité prévue: {values.weight?.value} tonnes</em>
+          </p>
 
           <h4 className="form__section-heading">Opération</h4>
           <div className="form__row">

@@ -32,14 +32,23 @@ export async function searchCompany(
   }
 }
 
-export function searchCompanies(
-  clue: string,
-  department?: string
-): Promise<CompanySearchResult[]> {
-  if (/[0-9]{14}/.test(clue)) {
-    // clue is formatted like a SIRET
-    // use search by siret instead of full text
-    return searchCompany(clue).then(c => [c]);
-  }
-  return decoratedSearchCompanies(clue, department);
+interface SearchCompaniesDeps {
+  searchCompany: (siret: string) => Promise<CompanySearchResult>;
 }
+
+export const makeSearchCompanies =
+  ({ searchCompany }: SearchCompaniesDeps) =>
+  (clue: string, department?: string) => {
+    if (/[0-9]{14}/.test(clue)) {
+      // clue is formatted like a SIRET
+      // use search by siret instead of full text
+      return searchCompany(clue)
+        .then(c => [c].filter(c => c.etatAdministratif === "A"))
+        .catch(_ => []);
+    }
+    return decoratedSearchCompanies(clue, department);
+  };
+
+// use dependency injection here to easily mock `searchCompany`
+// in index.test.ts
+export const searchCompanies = makeSearchCompanies({ searchCompany });

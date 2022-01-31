@@ -35,6 +35,7 @@ import {
 } from "../form-converter";
 import { getFullForm } from "../database";
 import prisma from "../../prisma";
+import { buildAddress } from "../../companies/sirene/utils";
 
 type ReceiptFieldsProps = Partial<
   Pick<GraphQLForm["transporter"], "department" | "receipt" | "validityLimit">
@@ -150,6 +151,17 @@ type PackagingInfosTableProps = {
   packagingInfos: PackagingInfo[];
 };
 
+export function getOtherPackagingLabel(packagingInfos: PackagingInfo[]) {
+  const otherPackagings = packagingInfos.filter(p => p.type === "AUTRE");
+  const otherPackagingsSummary =
+    otherPackagings.length === 0
+      ? "à préciser"
+      : otherPackagings
+          .map(({ quantity, other }) => `${quantity} ${other ?? "?"}`)
+          .join(", ");
+  return `Autre (${otherPackagingsSummary})`;
+}
+
 function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
   return (
     <table>
@@ -165,7 +177,7 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
           { label: "Citerne", value: "CITERNE" },
           { label: "GRV", value: "GRV" },
           { label: "Fûts", value: "FUT" },
-          { label: "Autre (à préciser)", value: "AUTRE" }
+          { label: getOtherPackagingLabel(packagingInfos), value: "AUTRE" }
         ].map((packagingType, index) => (
           <tr key={index}>
             <td>
@@ -179,6 +191,7 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
                 // leave the box empty if it's 0
                 null}
             </td>
+
             <td>{packagingType.label}</td>
           </tr>
         ))}
@@ -219,8 +232,13 @@ function TransporterFormCompanyFields({
       </div>
       <div className="Col">
         <p>
-          <input type="checkbox" readOnly /> Je déclare être exempté de
-          récépissé au titre de l’article R.541-50 du code de l’environnement
+          <input
+            type="checkbox"
+            checked={transporter?.isExemptedOfReceipt}
+            readOnly
+          />{" "}
+          Je déclare être exempté de récépissé au titre de l’article R.541-50 du
+          code de l’environnement
         </p>
         <ReceiptFields {...(transporter ?? {})} />
         <p>
@@ -333,7 +351,13 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             <p>
               Nom/raison sociale : {form.emitter?.workSite?.name}
               <br />
-              Adresse : {form.emitter?.workSite?.address}
+              Adresse :{" "}
+              {form.emitter?.workSite &&
+                buildAddress([
+                  form.emitter?.workSite?.address,
+                  form.emitter?.workSite?.postalCode,
+                  form.emitter?.workSite?.city
+                ])}
               <br />
               Info libre : {form.emitter?.workSite?.infos}
             </p>

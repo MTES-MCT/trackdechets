@@ -8,6 +8,23 @@ import { toPDF } from "../../common/pdf";
 import { BsdaPackaging } from "../../generated/graphql/types";
 import { getBsdaHistory } from "../database";
 
+const PACKAGINGS_NAMES = {
+  BIG_BAG: "Big-bag / GRV",
+  BODY_BENNE: "Benne",
+  DEPOT_BAG: "Dépôt-bag",
+  PALETTE_FILME: "Palette filmée",
+  SAC_RENFORCE: "Sac renforcé",
+  CONTENEUR_BAG: "Conteneur-bag",
+  OTHER: "Autre(s)"
+};
+
+export const TRANSPORT_MODES = {
+  ROAD: "Route",
+  AIR: "Voie aérienne",
+  RAIL: "Voie ferrée",
+  RIVER: "Voie fluviale"
+};
+
 export async function buildPdf(bsda: Bsda) {
   const assetsPath = join(__dirname, "assets");
   const templatePath = join(assetsPath, "index.html");
@@ -36,18 +53,18 @@ export async function buildPdf(bsda: Bsda) {
     packagings: (bsda.packagings as BsdaPackaging[])
       .map(
         packaging =>
-          `${packaging.quantity ?? 0}} x ${packaging.type} ${packaging.other}`
+          `${packaging.quantity ?? 0}x${PACKAGINGS_NAMES[packaging.type]} ${
+            packaging.other ?? ""
+          }`
       )
       .join(" / "),
     nbOfPackagings: (bsda.packagings as BsdaPackaging[]).reduce(
       (prev, cur) => prev + cur.quantity,
       0
     ),
-    previousBsdas: [
-      ...previousBsdas,
-      // Show a minimum of 5 rows
-      ...Array.from({ length: 5 - previousBsdas.length }).fill({})
-    ]
+    sealedNumbers: bsda.wasteSealNumbers.join(", "),
+    transportMode: TRANSPORT_MODES[bsda.transporterTransportMode],
+    previousBsdas: [...previousBsdas]
   });
 
   const files = {
