@@ -158,11 +158,13 @@ export default function AccountOauth2AppCreateUpdate({
                   <RedErrorMessage name="goal" />
                   {values.goal === ApplicationGoal.Clients && (
                     <div className="notification tw-mt-2">
-                      Si vous développez une app qui accède et utilise des
-                      données de la plate-forme Trackdechets pour le compte de
-                      clients, vous êtes soumis à la Section X des{" "}
-                      <a href="https://trackdechets.beta.gouv.fr/cgu">
-                        conditions générales de la plate-forme.
+                      Si vous développez une application pour le compte de
+                      clients, vous êtes soumis à la Section 5.2.2 des{" "}
+                      <a
+                        className="tw-underline"
+                        href="https://trackdechets.beta.gouv.fr/cgu"
+                      >
+                        conditions générales d'utilisation.
                       </a>
                     </div>
                   )}
