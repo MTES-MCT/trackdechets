@@ -1,15 +1,18 @@
-import { Status, Form, TemporaryStorageDetail, User } from "@prisma/client";
-import prisma from "../../../prisma";
-
-import { expandFormFromDb } from "../../form-converter";
-import getReadableId from "../../readableId";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import {
+  Form,
+  Prisma,
+  Status,
+  TemporaryStorageDetail,
+  User
+} from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getFormOrFormNotFound, getFullForm } from "../../database";
-import { checkCanDuplicate } from "../../permissions";
 import { eventEmitter, TDEvent } from "../../../events/emitter";
-import { indexForm } from "../../elastic";
-import { persistBsddEvent } from "../../../activity-events/bsdd";
+import { MutationResolvers } from "../../../generated/graphql/types";
+import { getFormOrFormNotFound } from "../../database";
+import { expandFormFromDb } from "../../form-converter";
+import { checkCanDuplicate } from "../../permissions";
+import getReadableId from "../../readableId";
+import { getFormRepository } from "../../repository";
 
 /**
  * Get the input to duplicate a form by stripping the properties that should not be copied.
@@ -52,7 +55,7 @@ function getDuplicateFormInput(
 
     ...rest
   }: Form
-) {
+): Prisma.FormCreateInput {
   return {
     ...rest,
     readableId: getReadableId(),
@@ -68,31 +71,23 @@ function getDuplicateFormInput(
  * @param {Form} form the form to which the duplicated temporary storage detail should be linked to
  * @param {TemporaryStorageDetail} temporaryStorageDetail the temporary storage detail to duplicate
  */
-function duplicateTemporaryStorageDetail(
-  form: Form,
-  {
-    id,
-    tempStorerQuantityType,
-    tempStorerQuantityReceived,
-    tempStorerWasteAcceptationStatus,
-    tempStorerWasteRefusalReason,
-    tempStorerReceivedAt,
-    tempStorerReceivedBy,
-    tempStorerSignedAt,
-    transporterNumberPlate,
-    signedByTransporter,
-    signedBy,
-    signedAt,
+function getDuplicateTemporaryStorageDetail({
+  id,
+  tempStorerQuantityType,
+  tempStorerQuantityReceived,
+  tempStorerWasteAcceptationStatus,
+  tempStorerWasteRefusalReason,
+  tempStorerReceivedAt,
+  tempStorerReceivedBy,
+  tempStorerSignedAt,
+  transporterNumberPlate,
+  signedByTransporter,
+  signedBy,
+  signedAt,
 
-    ...rest
-  }: TemporaryStorageDetail
-) {
-  return prisma.temporaryStorageDetail.create({
-    data: {
-      ...rest,
-      Form: { connect: { id: form.id } }
-    }
-  });
+  ...rest
+}: TemporaryStorageDetail) {
+  return rest;
 }
 
 /**
@@ -113,18 +108,22 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
 
   await checkCanDuplicate(user, existingForm);
 
+  const formRepository = getFormRepository(user);
+
   const newFormInput = getDuplicateFormInput(user, existingForm);
-  const newForm = await prisma.form.create({
-    data: newFormInput
-  });
 
-  const temporaryStorageDetail = await prisma.form
-    .findUnique({ where: { id: existingForm.id } })
-    .temporaryStorageDetail();
-
-  if (temporaryStorageDetail) {
-    await duplicateTemporaryStorageDetail(newForm, temporaryStorageDetail);
+  const fullForm = await formRepository.getFullFormById(existingForm.id);
+  if (fullForm.temporaryStorageDetail) {
+    const temporaryStorageDetailCreateInput =
+      getDuplicateTemporaryStorageDetail(fullForm.temporaryStorageDetail);
+    newFormInput.temporaryStorageDetail = {
+      create: temporaryStorageDetailCreateInput
+    };
   }
+
+  const newForm = await formRepository.create(newFormInput, {
+    duplicate: { id: existingForm.id }
+  });
 
   eventEmitter.emit(TDEvent.CreateForm, {
     previousNode: null,
@@ -132,28 +131,6 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
     updatedFields: {},
     mutation: "CREATED"
   });
-
-  // create statuslog when form is created
-  await prisma.statusLog.create({
-    data: {
-      form: { connect: { id: newForm.id } },
-      user: { connect: { id: user.id } },
-      status: newForm.status as Status,
-      authType: user.auth,
-      updatedFields: {},
-      loggedAt: new Date()
-    }
-  });
-  await persistBsddEvent({
-    streamId: newForm.id,
-    actorId: context.user!.id,
-    type: "BsddCreated",
-    data: { content: newFormInput },
-    metadata: { authType: user.auth }
-  });
-
-  const fullForm = await getFullForm(newForm);
-  await indexForm(fullForm, context);
 
   return expandFormFromDb(newForm);
 };

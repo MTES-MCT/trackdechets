@@ -1,5 +1,4 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import prisma from "../../../prisma";
 import * as Yup from "yup";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -17,8 +16,9 @@ import {
   expandTransportSegmentFromDb,
   flattenTransportSegmentInput
 } from "../../form-converter";
-import { indexForm } from "../../elastic";
-import { getFullForm } from "../../database";
+import { Prisma } from "@prisma/client";
+import { getFormRepository } from "../../repository";
+import prisma from "../../../prisma";
 
 const SEGMENT_NOT_FOUND = "Le segment de transport n'a pas été trouvé";
 const FORM_NOT_FOUND_OR_NOT_ALLOWED =
@@ -72,23 +72,17 @@ const takeOverInfoSchema = Yup.object<any>().shape({
   takenOverBy: Yup.string().required("Le nom du responsable est obligatoire")
 });
 
-const getForm = async formId => {
-  const form = await prisma.form.findUnique({
-    where: { id: formId },
+const formWithOwnerIdAndTransportSegments = Prisma.validator<Prisma.FormArgs>()(
+  {
     include: {
-      owner: {
-        select: {
-          id: true
-        }
-      },
-      transportSegments: {
-        select: { mode: true }
-      }
+      owner: { select: { id: true } },
+      transportSegments: { select: { mode: true } }
     }
-  });
-
-  return form;
-};
+  }
+);
+type MultiModalForm = Prisma.FormGetPayload<
+  typeof formWithOwnerIdAndTransportSegments
+>;
 
 /**
  *
@@ -109,9 +103,12 @@ export async function prepareSegment(
   if (!nextSegmentPayload.transporterCompanySiret) {
     throw new ForbiddenError("Le siret est obligatoire");
   }
+  const formRepository = getFormRepository(user);
   // get form and segments
-
-  const form = await getForm(id);
+  const form = (await formRepository.getByIdentifier(
+    { id },
+    formWithOwnerIdAndTransportSegments
+  )) as MultiModalForm;
   if (!form) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
@@ -164,23 +161,27 @@ export async function prepareSegment(
     throw new UserInputError("Le siret est obligatoire");
   }
 
-  const segment = await prisma.transportSegment.create({
-    data: {
-      ...nextSegmentPayload,
-      formId: id,
-      previousTransporterCompanySiret: siret,
-      segmentNumber: transportSegments.length + 1 // additional segments begin at index 1
-    }
-  });
-  await prisma.form.update({
-    where: { id },
-    data: {
-      nextTransporterSiret: nextSegmentPayload.transporterCompanySiret
-    }
-  });
+  const segmentInput = {
+    ...nextSegmentPayload,
+    previousTransporterCompanySiret: siret,
+    segmentNumber: transportSegments.length + 1 // additional segments begin at index 1
+  };
+  await formRepository.update(
+    { id },
+    {
+      nextTransporterSiret: nextSegmentPayload.transporterCompanySiret,
+      transportSegments: {
+        create: {
+          ...segmentInput
+        }
+      }
+    },
+    { prepareSegment: true }
+  );
 
-  const fullForm = await getFullForm(form);
-  await indexForm(fullForm);
+  const segment = await prisma.transportSegment.findFirst({
+    where: { segmentNumber: transportSegments.length + 1 }
+  });
 
   return expandTransportSegmentFromDb(segment);
 }
@@ -205,7 +206,11 @@ export async function markSegmentAsReadyToTakeOver(
   if (!currentSegment) {
     throw new ForbiddenError(SEGMENT_NOT_FOUND);
   }
-  const form = await getForm(currentSegment.form.id);
+  const formRepository = getFormRepository(user);
+  const form = await formRepository.getByIdentifier(
+    { id: currentSegment.form.id },
+    formWithOwnerIdAndTransportSegments
+  );
 
   if (form.status !== "SENT") {
     throw new ForbiddenError(FORM_MUST_BE_SENT);
@@ -233,15 +238,19 @@ export async function markSegmentAsReadyToTakeOver(
     );
   }
 
-  const updatedSegment = await prisma.transportSegment.update({
-    where: { id },
-    data: { readyToTakeOver: true }
+  await formRepository.update(
+    { id: currentSegment.form.id },
+    {
+      transportSegments: {
+        update: { where: { id }, data: { readyToTakeOver: true } }
+      }
+    }
+  );
+
+  return expandTransportSegmentFromDb({
+    ...currentSegment,
+    readyToTakeOver: true
   });
-
-  const fullForm = await getFullForm(form);
-  await indexForm(fullForm);
-
-  return expandTransportSegmentFromDb(updatedSegment);
 }
 
 // when a waste is taken over
@@ -278,7 +287,11 @@ export async function takeOverSegment(
     throw new ForbiddenError(SEGMENT_NOT_FOUND);
   }
 
-  const form = await getForm(currentSegment.form.id);
+  const formRepository = getFormRepository(user);
+  const form = await formRepository.getByIdentifier(
+    { id: currentSegment.form.id },
+    formWithOwnerIdAndTransportSegments
+  );
   if (form.status !== "SENT") {
     throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
@@ -307,23 +320,23 @@ export async function takeOverSegment(
       )}`
     );
   }
-  const updatedSegment = await prisma.transportSegment.update({
-    where: { id },
-    data: takeOverInfo
-  });
 
-  const updatedForm = await prisma.form.update({
-    where: { id: currentSegment.form.id },
-    data: {
+  await formRepository.update(
+    { id: currentSegment.form.id },
+    {
       currentTransporterSiret: currentSegment.transporterCompanySiret,
-      nextTransporterSiret: ""
-    }
-  });
+      nextTransporterSiret: "",
+      transportSegments: {
+        update: {
+          where: { id },
+          data: takeOverInfo
+        }
+      }
+    },
+    { takeOverSegment: true }
+  );
 
-  const fullForm = await getFullForm(updatedForm);
-  await indexForm(fullForm, context);
-
-  return expandTransportSegmentFromDb(updatedSegment);
+  return expandTransportSegmentFromDb({ ...currentSegment, ...takeOverInfo });
 }
 
 /**
@@ -365,7 +378,11 @@ export async function editSegment(
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
 
-  const form = await getForm(currentSegment.form.id);
+  const formRepository = getFormRepository(user);
+  const form = (await formRepository.getByIdentifier(
+    { id: currentSegment.form.id },
+    formWithOwnerIdAndTransportSegments
+  )) as MultiModalForm;
 
   const userIsOwner = user.id === form.owner.id;
   const userIsCurrentTransporter = userSiret === form.currentTransporterSiret;
@@ -421,15 +438,21 @@ export async function editSegment(
     throw new ForbiddenError("Le siret ne peut pas être modifié");
   }
 
-  const updatedSegment = await prisma.transportSegment.update({
-    where: { id },
-    data: nextSegmentPayload
+  await formRepository.update(
+    { id: currentSegment.form.id },
+    {
+      nextTransporterSiret: nextSegmentPayload.transporterCompanySiret,
+      transportSegments: {
+        update: {
+          where: { id },
+          data: nextSegmentPayload
+        }
+      }
+    },
+    { editSegment: true }
+  );
+  return expandTransportSegmentFromDb({
+    ...currentSegment,
+    ...nextSegmentPayload
   });
-  await prisma.form.update({
-    where: { id: currentSegment.form.id },
-    data: {
-      nextTransporterSiret: nextSegmentPayload.transporterCompanySiret
-    }
-  });
-  return expandTransportSegmentFromDb(updatedSegment);
 }

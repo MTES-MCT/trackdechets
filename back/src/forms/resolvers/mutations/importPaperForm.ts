@@ -1,23 +1,22 @@
-import { Form, Prisma, User } from "@prisma/client";
+import { Form, Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
-import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { getCachedUserSirets } from "../../../common/redis/users";
 import {
   ImportPaperFormInput,
   MutationResolvers
 } from "../../../generated/graphql/types";
-import { getCachedUserSirets } from "../../../common/redis/users";
-import { getFormOrFormNotFound, getFullForm } from "../../database";
+import { getFormOrFormNotFound } from "../../database";
 import {
   expandFormFromDb,
   flattenImportPaperFormInput
 } from "../../form-converter";
 import { checkCanImportForm } from "../../permissions";
 import getReadableId from "../../readableId";
+import { getFormRepository } from "../../repository";
 import { processedFormSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
-import { indexForm } from "../../elastic";
 import { isDangerous } from "../../../common/constants";
 
 /**
@@ -25,7 +24,11 @@ import { isDangerous } from "../../../common/constants";
  * Only SEALED form can be updated and marked as processed
  * which is reflected in the state machine
  */
-async function updateForm(user: User, form: Form, input: ImportPaperFormInput) {
+async function updateForm(
+  form: Form,
+  input: ImportPaperFormInput,
+  user: Express.User
+) {
   // fail fast on form.status (before state machine validation) to ensure
   // we apply validation on a sealed form
   if (form.status !== "SEALED") {
@@ -84,7 +87,7 @@ async function updateForm(user: User, form: Form, input: ImportPaperFormInput) {
  * Create a form from scratch based on imported data
  * A customId corresponding to paper form number should be provided
  */
-async function createForm(user: User, input: ImportPaperFormInput) {
+async function createForm(input: ImportPaperFormInput, user: Express.User) {
   const flattenedFormInput = flattenImportPaperFormInput(input);
 
   await processedFormSchema.validate(flattenedFormInput, {
@@ -108,21 +111,22 @@ async function createForm(user: User, input: ImportPaperFormInput) {
     signedByTransporter: true
   };
 
-  return prisma.form.create({ data: formCreateInput });
+  const formRepository = getFormRepository(user);
+  return formRepository.create(formCreateInput, { isPaperForm: true });
 }
 
 async function createOrUpdateForm(
-  user: User,
   id: string,
-  formInput: ImportPaperFormInput
+  formInput: ImportPaperFormInput,
+  user: Express.User
 ) {
   if (id) {
     const form = await getFormOrFormNotFound({ id });
     await checkCanImportForm(user, form);
-    return updateForm(user, form, formInput);
+    return updateForm(form, formInput, user);
   }
 
-  return createForm(user, formInput);
+  return createForm(formInput, user);
 }
 
 const importPaperFormResolver: MutationResolvers["importPaperForm"] = async (
@@ -130,7 +134,7 @@ const importPaperFormResolver: MutationResolvers["importPaperForm"] = async (
   { input: { id, ...rest } },
   context
 ) => {
-  const user = checkIsAuthenticated(context);
+  checkIsAuthenticated(context);
 
   // add defaults values where needed/possible
   const formInput: ImportPaperFormInput = {
@@ -140,10 +144,7 @@ const importPaperFormResolver: MutationResolvers["importPaperForm"] = async (
       : rest.wasteDetails
   };
 
-  const form = await createOrUpdateForm(user, id, formInput);
-
-  const fullForm = await getFullForm(form);
-  await indexForm(fullForm, context);
+  const form = await createOrUpdateForm(id, formInput, context.user);
 
   return expandFormFromDb(form);
 };

@@ -1,4 +1,3 @@
-import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
@@ -7,6 +6,7 @@ import { checkCanMarkAsSent } from "../../permissions";
 import { checkCanBeSealed, signingInfoSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
+import { getFormRepository } from "../../repository";
 
 const markAsSentResolver: MutationResolvers["markAsSent"] = async (
   parent,
@@ -42,9 +42,9 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
   });
 
   // mark appendix2Forms as GROUPED
-  const appendix2Forms = await prisma.form
-    .findUnique({ where: { id: form.id } })
-    .appendix2Forms({ where: { status: "AWAITING_GROUP" } });
+  const appendix2Forms = await getFormRepository(user).getAppendix2FormsById(
+    form.id
+  );
 
   if (appendix2Forms.length > 0) {
     const promises = appendix2Forms.map(appendix => {

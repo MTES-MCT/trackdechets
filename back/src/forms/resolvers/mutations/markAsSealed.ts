@@ -1,4 +1,3 @@
-import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
@@ -11,6 +10,8 @@ import { sendMail } from "../../../mailer/mailing";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { contentAwaitsGuest } from "../../../mailer/templates";
 import { Form, Status } from "@prisma/client";
+import { FormRepository, getFormRepository } from "../../repository";
+import prisma from "../../../prisma";
 
 const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   parent,
@@ -30,10 +31,10 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
     type: EventType.MarkAsSealed
   });
 
+  const formRepository = getFormRepository(user);
+
   // mark appendix2Forms as GROUPED
-  const appendix2Forms = await prisma.form
-    .findUnique({ where: { id: form.id } })
-    .appendix2Forms();
+  const appendix2Forms = await formRepository.getAppendix2FormsById(form.id);
   if (appendix2Forms.length > 0) {
     const promises = appendix2Forms.map(appendix => {
       return transitionForm(user, appendix, {
@@ -50,20 +51,21 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
     })) > 0;
 
   if (!emitterCompanyExists) {
-    await mailToNonExistentEmitter(sealedForm);
+    await mailToNonExistentEmitter(sealedForm, formRepository);
   }
 
   return expandFormFromDb(sealedForm);
 };
 
-async function mailToNonExistentEmitter(form: Form) {
+async function mailToNonExistentEmitter(
+  form: Form,
+  formRepository: FormRepository
+) {
   // check contact email has not been mentionned already
   const contactAlreadyMentionned =
-    (await prisma.form.count({
-      where: {
-        emitterCompanyMail: form.emitterCompanyMail,
-        status: { not: Status.DRAFT }
-      }
+    (await formRepository.count({
+      emitterCompanyMail: form.emitterCompanyMail,
+      status: { not: Status.DRAFT }
     })) > 1;
   if (!contactAlreadyMentionned) {
     await sendMail(

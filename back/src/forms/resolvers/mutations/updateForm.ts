@@ -1,31 +1,33 @@
-import {
-  flattenFormInput,
-  flattenTemporaryStorageDetailInput,
-  expandFormFromDb
-} from "../../form-converter";
 import { Form, Prisma, Status } from "@prisma/client";
-import prisma from "../../../prisma";
+import { WASTES_CODES } from "../../../common/constants";
+import { checkIsAuthenticated } from "../../../common/permissions";
 import {
-  ResolversParentTypes,
+  AppendixFormInput,
   MutationUpdateFormArgs,
-  AppendixFormInput
+  ResolversParentTypes
 } from "../../../generated/graphql/types";
 import { MissingTempStorageFlag, InvalidWasteCode } from "../../errors";
 import { isDangerous, WASTES_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanUpdate, checkIsFormContributor } from "../../permissions";
 import { GraphQLContext } from "../../../types";
-import { getFormOrFormNotFound, getFullForm } from "../../database";
+import { getFormOrFormNotFound } from "../../database";
+import { InvalidWasteCode, MissingTempStorageFlag } from "../../errors";
+import {
+  expandFormFromDb,
+  flattenFormInput,
+  flattenTemporaryStorageDetailInput
+} from "../../form-converter";
+import { checkCanUpdate, checkIsFormContributor } from "../../permissions";
+import { FormRepository, getFormRepository } from "../../repository";
+import { FormSirets } from "../../types";
 import {
   draftFormSchema,
   sealedFormSchema,
   validateAppendix2Forms
 } from "../../validation";
-import { FormSirets } from "../../types";
-import { indexForm } from "../../elastic";
-import { EventType } from "../../workflow/types";
 import transitionForm from "../../workflow/transitionForm";
-import { persistBsddEvent } from "../../../activity-events/bsdd";
+import { EventType } from "../../workflow/types";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -56,6 +58,7 @@ const updateFormResolver = async (
   }
 
   const existingForm = await getFormOrFormNotFound({ id });
+  const formRepository = getFormRepository(user);
 
   await checkCanUpdate(user, existingForm);
 
@@ -84,9 +87,8 @@ const updateFormResolver = async (
       formContent.recipient?.isTempStorage !== false) ||
     formContent.recipient?.isTempStorage === true;
 
-  const existingTemporaryStorageDetail = await prisma.form
-    .findUnique({ where: { id } })
-    .temporaryStorageDetail();
+  const { temporaryStorageDetail: existingTemporaryStorageDetail } =
+    await formRepository.getFullFormById(id);
 
   // make sure user will still be form contributor after update
   const nextFormSirets: FormSirets = {
@@ -145,27 +147,9 @@ const updateFormResolver = async (
     }
   }
 
-  const updatedForm = await prisma.form.update({
-    where: { id },
-    data: formUpdateInput
-  });
+  const updatedForm = await formRepository.update({ id }, formUpdateInput);
 
-  await handleFormsAddedToAppendix(updatedForm, user);
-
-  // TODO: create statusLog?
-  // We create a statusLog when creating a form
-  // but not when it is updated between its creation and seal
-  // so the form might have changed in-between without a proper statusLog
-  await persistBsddEvent({
-    streamId: updatedForm.id,
-    actorId: context.user!.id,
-    type: "BsddUpdated",
-    data: { content: formUpdateInput },
-    metadata: { authType: user.auth }
-  });
-
-  const fullForm = await getFullForm(updatedForm);
-  await indexForm(fullForm, context);
+  await handleFormsAddedToAppendix(updatedForm, user, formRepository);
 
   return expandFormFromDb(updatedForm);
 };
@@ -174,7 +158,8 @@ export default updateFormResolver;
 
 async function handleFormsRemovedFromAppendix(
   existingForm: Form,
-  appendix2Forms: AppendixFormInput[]
+  appendix2Forms: AppendixFormInput[],
+  formRepository: FormRepository
 ) {
   if (existingForm.status !== Status.SEALED) {
     return;
@@ -182,9 +167,10 @@ async function handleFormsRemovedFromAppendix(
 
   // When the form is sealed & has an appendix 2
   // form no longer in the appendix must be set back to AWAITING_GROUP
-  const previousAppendix2Forms = await prisma.form
-    .findUnique({ where: { id: existingForm.id } })
-    .appendix2Forms();
+  const previousAppendix2Forms = await formRepository.getAppendix2FormsById(
+    existingForm.id
+  );
+
   if (previousAppendix2Forms.length === 0) {
     return;
   }
@@ -194,28 +180,27 @@ async function handleFormsRemovedFromAppendix(
   const appendix2ToUngroup = previousAppendix2Forms.filter(
     groupedAppendix => !nextAppendix2Ids.includes(groupedAppendix.id)
   );
-  await prisma.form.updateMany({
-    where: {
-      id: { in: appendix2ToUngroup.map(form => form.id) }
-    },
-    data: {
+  await formRepository.updateMany(
+    appendix2ToUngroup.map(form => form.id),
+    {
       status: Status.AWAITING_GROUP
     }
-  });
+  );
 }
 
 async function handleFormsAddedToAppendix(
   updatedForm: Form,
-  user: Express.User
+  user: Express.User,
+  formRepository: FormRepository
 ) {
   if (updatedForm.status !== Status.SEALED) {
     return;
   }
 
   // Mark potential additions to the appendix 2 as Grouped if the form is already sealed
-  const appendix2Forms = await prisma.form
-    .findUnique({ where: { id: updatedForm.id } })
-    .appendix2Forms();
+  const appendix2Forms = await formRepository.getAppendix2FormsById(
+    updatedForm.id
+  );
   const promises = appendix2Forms
     .filter(form => form.status !== Status.GROUPED)
     .map(appendix => {

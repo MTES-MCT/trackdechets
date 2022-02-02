@@ -8,7 +8,6 @@ import {
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
-import { persistBsddRevisionRequestEvent } from "../../../activity-events/bsdd";
 import {
   PROCESSING_OPERATIONS_CODES,
   WASTES_CODES
@@ -18,12 +17,12 @@ import {
   FormRevisionRequestContentInput,
   MutationCreateFormRevisionRequestArgs
 } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { getFormOrFormNotFound } from "../../database";
 import { flattenBsddRevisionRequestInput } from "../../form-converter";
 import { checkCanRequestRevision } from "../../permissions";
+import { getFormRepository } from "../../repository";
 import {
   INVALID_PROCESSING_OPERATION,
   INVALID_SIRET_LENGTH,
@@ -82,46 +81,40 @@ export default async function createFormRevisionRequest(
   const flatContent = await getFlatContent(content, existingBsdd);
 
   const authoringCompany = await getAuthoringCompany(
-    user.id,
+    user,
     existingBsdd,
     authoringCompanySiret
   );
   const approversSirets = await getApproversSirets(
     existingBsdd,
     flatContent,
-    authoringCompany.siret
+    authoringCompany.siret,
+    context.user
   );
 
-  const bsddRevisionRequest = await prisma.bsddRevisionRequest.create({
-    data: {
-      bsdd: { connect: { id: existingBsdd.id } },
-      ...flatContent,
-      authoringCompany: { connect: { id: authoringCompany.id } },
-      approvals: {
-        create: approversSirets.map(approverSiret => ({ approverSiret }))
-      },
-      comment
-    }
-  });
-
-  await persistBsddRevisionRequestEvent({
-    actorId: user.id,
-    streamId: bsddRevisionRequest.id,
-    type: "BsddRevisionRequestCreated",
-    data: { content: flatContent, authoringSiret: authoringCompanySiret }
+  const formRepository = getFormRepository(user);
+  const bsddRevisionRequest = await formRepository.createRevisionRequest({
+    bsdd: { connect: { id: existingBsdd.id } },
+    ...flatContent,
+    authoringCompany: { connect: { id: authoringCompany.id } },
+    approvals: {
+      create: approversSirets.map(approverSiret => ({ approverSiret }))
+    },
+    comment
   });
 
   return bsddRevisionRequest;
 }
 
 async function getAuthoringCompany(
-  userId: string,
+  user: Express.User,
   bsdd: Form,
   authoringCompanySiret: string
 ) {
-  const temporaryStorageDetail = await prisma.form
-    .findUnique({ where: { id: bsdd.id } })
-    .temporaryStorageDetail();
+  const { temporaryStorageDetail } = await getFormRepository(
+    user
+  ).getFullFormById(bsdd.id);
+
   if (
     ![
       bsdd.emitterCompanySiret,
@@ -134,7 +127,7 @@ async function getAuthoringCompany(
     );
   }
 
-  const userCompanies = await getUserCompanies(userId);
+  const userCompanies = await getUserCompanies(user.id);
   const authoringCompany = userCompanies.find(
     company => company.siret === authoringCompanySiret
   );
@@ -166,14 +159,12 @@ async function checkIfUserCanRequestRevisionOnBsdd(
     );
   }
 
-  const unsettledRevisionRequestsOnBsdd =
-    await prisma.bsddRevisionRequest.count({
-      where: {
-        bsddId: bsdd.id,
-        status: RevisionRequestStatus.PENDING
-      }
-    });
-
+  const unsettledRevisionRequestsOnBsdd = await getFormRepository(
+    user
+  ).countRevisionRequests({
+    bsddId: bsdd.id,
+    status: RevisionRequestStatus.PENDING
+  });
   if (unsettledRevisionRequestsOnBsdd > 0) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau. Une autre révision est déjà en attente de validation."
@@ -210,7 +201,8 @@ async function getFlatContent(
 async function getApproversSirets(
   bsdd: Form,
   content: RevisionRequestContent,
-  authoringCompanySiret: string
+  authoringCompanySiret: string,
+  user: Express.User
 ) {
   const approvers = [
     bsdd.emitterCompanySiret,
@@ -219,9 +211,9 @@ async function getApproversSirets(
   ];
 
   if (hasTemporaryStorageUpdate(content)) {
-    const temporaryStorageDetail = await prisma.form
-      .findUnique({ where: { id: bsdd.id } })
-      .temporaryStorageDetail();
+    const { temporaryStorageDetail } = await getFormRepository(
+      user
+    ).getFullFormById(bsdd.id);
 
     approvers.push(temporaryStorageDetail.destinationCompanySiret);
   }
