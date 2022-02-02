@@ -25,6 +25,10 @@ const deleteApplicationResolver: MutationResolvers["deleteApplication"] =
       data: { isRevoked: true }
     });
 
+    await prisma.grant.deleteMany({
+      where: { applicationId: existingApplication.id }
+    });
+
     await prisma.application.delete({
       where: { id: existingApplication.id }
     });

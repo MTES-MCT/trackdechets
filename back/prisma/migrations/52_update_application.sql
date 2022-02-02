@@ -8,6 +8,9 @@ ALTER TABLE
 ADD
   COLUMN "adminId" TEXT;
 
+-- I doubled checked on prod and staging : there is no application with several admins
+-- If an application is created before MEP with several admins, only the first
+-- one will be picked
 UPDATE
   "default$default"."Application"
 SET

@@ -14,7 +14,7 @@ export default function AccountOAuth2AppList() {
     return <Loader />;
   }
 
-  if (data) {
+  if (data && data.myApplications.length > 0) {
     return (
       <div className="tw-mt-4">
         {data.myApplications.map(application => (
@@ -24,5 +24,5 @@ export default function AccountOAuth2AppList() {
     );
   }
 
-  return null;
+  return <div>Aucune application</div>;
 }
