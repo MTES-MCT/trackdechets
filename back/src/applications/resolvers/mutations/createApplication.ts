@@ -3,14 +3,14 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { getUid } from "../../../utils";
-import { ApplicationInputSchema } from "../../validation";
+import { applicationSchema } from "../../validation";
 
 const createApplicationResolver: MutationResolvers["createApplication"] =
   async (_, { input }, context) => {
     applyAuthStrategies(context, [AuthType.Session]);
     const user = checkIsAuthenticated(context);
 
-    await ApplicationInputSchema.validate(input, { abortEarly: false });
+    await applicationSchema.validate(input, { abortEarly: false });
 
     const application = await prisma.application.create({
       data: {
@@ -18,11 +18,7 @@ const createApplicationResolver: MutationResolvers["createApplication"] =
         logoUrl: input.logoUrl,
         goal: input.goal,
         redirectUris: input.redirectUris,
-        admin: {
-          connect: {
-            id: user.id
-          }
-        },
+        adminId: user.id,
         clientSecret: getUid(40)
       }
     });

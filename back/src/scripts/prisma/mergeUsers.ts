@@ -132,36 +132,9 @@ async function transferUserAccessTokens(user: User, heir: User) {
   }
 }
 
-async function transferUserApplications(user: User, heir: User) {
-  const applications = await prisma.application.findMany({
-    where: {
-      admins: {
-        some: { id: user.id }
-      }
-    }
+function transferUserApplications(user: User, heir: User) {
+  return prisma.application.updateMany({
+    where: { adminId: user.id },
+    data: { adminId: heir.id }
   });
-
-  for (const application of applications) {
-    const [{ admins }] = await prisma.application.findMany({
-      where: {
-        id: application.id
-      },
-      include: { admins: { select: { id: true } } }
-    });
-
-    if (admins.find(admin => admin.id === heir.id) == null) {
-      await prisma.application.update({
-        data: {
-          admins: {
-            connect: {
-              id: heir.id
-            }
-          }
-        },
-        where: {
-          id: application.id
-        }
-      });
-    }
-  }
 }

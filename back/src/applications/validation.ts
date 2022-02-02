@@ -1,7 +1,7 @@
 import * as yup from "yup";
 import { CreateApplicationInput } from "../generated/graphql/types";
 
-export const ApplicationInputSchema: yup.SchemaOf<CreateApplicationInput> =
+export const applicationSchema: yup.SchemaOf<CreateApplicationInput> =
   yup.object({
     name: yup.string().required(),
     logoUrl: yup

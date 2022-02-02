@@ -4,7 +4,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { getApplicationOrApplicationNotFound } from "../../database";
-import { ApplicationInputSchema } from "../../validation";
+import { applicationSchema } from "../../validation";
 
 const updateApplicationResolver: MutationResolvers["updateApplication"] =
   async (_, { id, input }, context) => {
@@ -21,7 +21,7 @@ const updateApplicationResolver: MutationResolvers["updateApplication"] =
       );
     }
 
-    await ApplicationInputSchema.validate(
+    await applicationSchema.validate(
       { ...existingApplication, ...input },
       { abortEarly: false }
     );
