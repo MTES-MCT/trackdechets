@@ -29,4 +29,11 @@ export const transportModeLabels: { [key: string]: string } = {
   SEA: "Voie maritime",
 };
 
+export function getTransportModeLabel(mode: string | null | undefined) {
+  if (!mode) {
+    return "";
+  }
+  return transportModeLabels[mode];
+}
+
 export type BsdTypename = "Form" | "Bsdasri" | "Bsvhu" | "Bsda" | "Bsff";

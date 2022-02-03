@@ -12,7 +12,7 @@ import {
   FormCompany,
   FormStatus,
 } from "generated/graphql/types";
-import { statusLabels } from "../../constants";
+import { getTransportModeLabel, statusLabels } from "../../constants";
 import {
   IconWarehouseDelivery,
   IconWarehouseStorage,
@@ -526,6 +526,10 @@ export default function BSDDetailContent({
                   label="Signé par le transporteur"
                 />
                 <DateRow value={form.sentAt} label="Date de prise en charge" />
+                <DetailRow
+                  value={getTransportModeLabel(form.transporter?.mode)}
+                  label="Mode de transport"
+                />
               </div>
             </TabPanel>
             {/* Multimodal transporters tab panels */}
