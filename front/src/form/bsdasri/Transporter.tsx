@@ -7,7 +7,6 @@ import React from "react";
 import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 import Packagings from "./components/packagings/Packagings";
 import { getInitialWeightFn } from "./utils/initial-state";
-import { transportModeLabels } from "dashboard/constants";
 import { FillFieldsInfo, DisabledFieldsInfo } from "./utils/commons";
 import classNames from "classnames";
 import Tooltip from "common/components/Tooltip";
