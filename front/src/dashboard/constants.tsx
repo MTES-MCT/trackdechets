@@ -26,6 +26,7 @@ export const transportModeLabels: { [key: string]: string } = {
   AIR: "Voie aérienne",
   RAIL: "Voie ferrée",
   RIVER: "Voie fluviale",
+  SEA: "Voie maritime",
 };
 
 export type BsdTypename = "Form" | "Bsdasri" | "Bsvhu" | "Bsda" | "Bsff";

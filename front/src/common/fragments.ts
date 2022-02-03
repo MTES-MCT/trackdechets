@@ -64,6 +64,7 @@ export const transporterFragment = gql`
     validityLimit
     numberPlate
     customInfo
+    mode
     company {
       ...CompanyFragment
     }

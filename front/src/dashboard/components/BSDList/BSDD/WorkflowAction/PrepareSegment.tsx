@@ -14,11 +14,11 @@ import { NotificationError } from "common/components/Error";
 import { IconBusTransfer } from "common/components/Icons";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
-import { transportModeLabels } from "dashboard/constants";
 import { WorkflowActionProps } from "./WorkflowAction";
 import TdSwitch from "common/components/Switch";
 import { GET_BSDS, GET_DETAIL_FORM } from "common/queries";
 import { Loader } from "common/components";
+import TransportModeSelect from "common/components/TransportModeSelect";
 
 const PREPARE_SEGMENT = gql`
   mutation prepareSegment(
@@ -113,17 +113,10 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
                 <h4 className="form__section-heading">Transporteur</h4>
                 <label htmlFor="id_mode">Mode de transport</label>
                 <Field
-                  as="select"
-                  name="mode"
                   id="id_mode"
-                  className="td-select"
-                >
-                  {Object.entries(transportModeLabels).map(([k, v]) => (
-                    <option value={`${k}`} key={k}>
-                      {v}
-                    </option>
-                  ))}
-                </Field>
+                  name="mode"
+                  component={TransportModeSelect}
+                ></Field>
                 <h4 className="form__section-heading">Siret</h4>
                 <CompanySelector
                   name="transporter.company"

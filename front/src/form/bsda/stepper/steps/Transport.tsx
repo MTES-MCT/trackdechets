@@ -2,10 +2,10 @@ import React from "react";
 import { Field, useFormikContext } from "formik";
 import { Bsda } from "generated/graphql/types";
 import { RedErrorMessage } from "common/components";
-import { transportModeLabels } from "dashboard/constants";
 import Tooltip from "common/components/Tooltip";
 import TagsInput from "common/components/tags-input/TagsInput";
 import DateInput from "form/common/components/custom-inputs/DateInput";
+import TransportModeSelect from "common/components/TransportModeSelect";
 
 type Props = { disabled: boolean };
 export function Transport({ disabled }: Props) {
@@ -73,18 +73,11 @@ export function Transport({ disabled }: Props) {
         <label>
           Mode de transport:
           <Field
-            as="select"
-            name="transporter.transport.mode"
             id="id_mode"
-            className="td-select td-input--small"
+            name="transporter.transport.mode"
+            component={TransportModeSelect}
             disabled={disabled}
-          >
-            {Object.entries(transportModeLabels).map(([k, v]) => (
-              <option value={`${k}`} key={k}>
-                {v}
-              </option>
-            ))}
-          </Field>
+          ></Field>
         </label>
       </div>
 

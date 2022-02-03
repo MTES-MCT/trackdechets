@@ -13,6 +13,7 @@ import classNames from "classnames";
 import Tooltip from "common/components/Tooltip";
 import TagsInput from "common/components/tags-input/TagsInput";
 import WeightWidget from "./components/Weight";
+import TransportModeSelect from "common/components/TransportModeSelect";
 
 /**
  *
@@ -161,19 +162,12 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
       <div className="form__row">
         <label>Mode de transport</label>
         <Field
-          as="select"
-          name="transporter.transport.mode"
           id="id_mode"
-          className="td-select"
+          name="transporter.transport.mode"
+          component={TransportModeSelect}
           disabled={disabled}
           onChange={e => handleTransportMode(e)}
-        >
-          {Object.entries(transportModeLabels).map(([k, v]) => (
-            <option value={`${k}`} key={k}>
-              {v}
-            </option>
-          ))}
-        </Field>
+        ></Field>
       </div>
       {showTransportePlates && (
         <div className="form__row">
