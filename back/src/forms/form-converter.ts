@@ -207,7 +207,8 @@ function flattenTransporterInput(input: { transporter?: TransporterInput }) {
     transporterDepartment: chain(input.transporter, t => t.department),
     transporterValidityLimit: chain(input.transporter, t => t.validityLimit),
     transporterNumberPlate: chain(input.transporter, t => t.numberPlate),
-    transporterCustomInfo: chain(input.transporter, t => t.customInfo)
+    transporterCustomInfo: chain(input.transporter, t => t.customInfo),
+    transporterTransportMode: chain(input.transporter, t => t.mode)
   };
 }
 
@@ -586,7 +587,8 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       department: form.transporterDepartment,
       validityLimit: form.transporterValidityLimit,
       numberPlate: form.transporterNumberPlate,
-      customInfo: form.transporterCustomInfo
+      customInfo: form.transporterCustomInfo,
+      mode: form.transporterTransportMode
     }),
     wasteDetails: nullIfNoValues<WasteDetails>({
       code: form.wasteDetailsCode,
@@ -749,7 +751,8 @@ export function expandTemporaryStorageFromDb(
       department: temporaryStorageDetail.transporterDepartment,
       validityLimit: temporaryStorageDetail.transporterValidityLimit,
       numberPlate: temporaryStorageDetail.transporterNumberPlate,
-      customInfo: null
+      customInfo: null,
+      mode: temporaryStorageDetail.transporterTransportMode
     }),
     signedBy: temporaryStorageDetail.signedBy,
     signedAt: temporaryStorageDetail.signedAt
