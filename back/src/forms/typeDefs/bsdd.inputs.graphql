@@ -386,7 +386,7 @@ input TransporterInput {
   "Information libre, destinée aux transporteurs"
   customInfo: String
 
-  "Mode de transport"
+  "Mode de transport. 'Route' par défaut"
   mode: TransportMode
 }
 
