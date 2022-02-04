@@ -387,7 +387,7 @@ type WasteDetails {
   pop: Boolean
 
   "Caractère dangereux du déchet au sens de l’article R541-8 du code de l’environnement"
-  isDangeroux: Boolean
+  isDangerous: Boolean
 }
 
 "Négociant (case 7)"

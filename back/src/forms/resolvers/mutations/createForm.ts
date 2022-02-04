@@ -1,4 +1,5 @@
 import { Prisma, Status } from "@prisma/client";
+import { isDangerous } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { eventEmitter, TDEvent } from "../../../events/emitter";
 import {
@@ -30,6 +31,13 @@ const createFormResolver = async (
   const { appendix2Forms, temporaryStorageDetail, ...formContent } =
     createFormInput;
 
+  if (
+    formContent.wasteDetails?.code &&
+    isDangerous(formContent.wasteDetails?.code)
+  ) {
+    formContent.wasteDetails.isDangerous = true;
+  }
+
   const formSirets: FormSirets = {
     emitterCompanySiret: formContent.emitter?.company?.siret,
     recipientCompanySiret: formContent.recipient?.company?.siret,
@@ -58,7 +66,6 @@ const createFormResolver = async (
   }
 
   const formCreateInput: Prisma.FormCreateInput = {
-    ...form,
     readableId: getReadableId(),
     owner: { connect: { id: user.id } },
     appendix2Forms: appendix2Forms ? { connect: appendix2Forms } : undefined

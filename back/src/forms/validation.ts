@@ -443,7 +443,12 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
       .requiredIf(!isDraft, "La consistance du déchet doit être précisée"),
     wasteDetailsPop: yup
       .boolean()
-      .requiredIf(!isDraft, "La présence (ou non) de POP doit être précisée")
+      .requiredIf(!isDraft, "La présence (ou non) de POP doit être précisée"),
+    wasteDetailsIsDangerous: yup.string().when("wasteDetailsCode", {
+      is: (wasteCode: string) => isDangerous(wasteCode || ""),
+      then: () => yup.boolean().isTrue(),
+      otherwise: () => yup.boolean()
+    })
   });
 
 export const wasteDetailsSchema = wasteDetailsSchemaFn(false);

@@ -11,7 +11,7 @@ import {
   AppendixFormInput
 } from "../../../generated/graphql/types";
 import { MissingTempStorageFlag, InvalidWasteCode } from "../../errors";
-import { WASTES_CODES } from "../../../common/constants";
+import { isDangerous, WASTES_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanUpdate, checkIsFormContributor } from "../../permissions";
 import { GraphQLContext } from "../../../types";
@@ -45,6 +45,13 @@ const updateFormResolver = async (
 
   const { id, appendix2Forms, temporaryStorageDetail, ...formContent } =
     updateFormInput;
+
+  if (
+    formContent.wasteDetails?.code &&
+    isDangerous(formContent.wasteDetails?.code)
+  ) {
+    formContent.wasteDetails.isDangerous = true;
+  }
 
   const existingForm = await getFormOrFormNotFound({ id });
 
