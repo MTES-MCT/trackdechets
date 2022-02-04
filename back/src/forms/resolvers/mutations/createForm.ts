@@ -33,7 +33,8 @@ const createFormResolver = async (
 
   if (
     formContent.wasteDetails?.code &&
-    isDangerous(formContent.wasteDetails?.code)
+    isDangerous(formContent.wasteDetails?.code) &&
+    formContent.wasteDetails.isDangerous === undefined
   ) {
     formContent.wasteDetails.isDangerous = true;
   }
@@ -66,6 +67,7 @@ const createFormResolver = async (
   }
 
   const formCreateInput: Prisma.FormCreateInput = {
+    ...form,
     readableId: getReadableId(),
     owner: { connect: { id: user.id } },
     appendix2Forms: appendix2Forms ? { connect: appendix2Forms } : undefined

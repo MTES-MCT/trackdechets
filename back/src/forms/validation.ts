@@ -446,7 +446,12 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
       .requiredIf(!isDraft, "La présence (ou non) de POP doit être précisée"),
     wasteDetailsIsDangerous: yup.string().when("wasteDetailsCode", {
       is: (wasteCode: string) => isDangerous(wasteCode || ""),
-      then: () => yup.boolean().isTrue(),
+      then: () =>
+        yup
+          .boolean()
+          .isTrue(
+            `Un déchet avec un code comportant un astérisque est forcément dangereux`
+          ),
       otherwise: () => yup.boolean()
     })
   });

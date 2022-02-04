@@ -34,7 +34,11 @@ async function updateForm(user: User, form: Form, input: ImportPaperFormInput) {
     );
   }
 
-  if (input.wasteDetails?.code && isDangerous(input.wasteDetails?.code)) {
+  if (
+    input.wasteDetails?.code &&
+    isDangerous(input.wasteDetails?.code) &&
+    input.wasteDetails?.isDangerous === undefined
+  ) {
     input.wasteDetails.isDangerous = true;
   }
 

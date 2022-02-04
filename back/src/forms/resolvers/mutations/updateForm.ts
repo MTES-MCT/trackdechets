@@ -48,7 +48,8 @@ const updateFormResolver = async (
 
   if (
     formContent.wasteDetails?.code &&
-    isDangerous(formContent.wasteDetails?.code)
+    isDangerous(formContent.wasteDetails?.code) &&
+    formContent.wasteDetails.isDangerous === undefined
   ) {
     formContent.wasteDetails.isDangerous = true;
   }

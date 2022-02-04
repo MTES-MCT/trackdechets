@@ -10,7 +10,10 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
-import { Mutation } from "../../../../generated/graphql/types";
+import {
+  Mutation,
+  MutationCreateFormArgs
+} from "../../../../generated/graphql/types";
 import { Status } from "@prisma/client";
 
 const CREATE_FORM = `
@@ -77,6 +80,7 @@ const CREATE_FORM = `
           other
           quantity
         }
+        isDangerous
       }
       appendix2Forms {
         id
@@ -696,6 +700,68 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message: `Le bordereau ${appendix2.id} n'est pas en attente de regroupement`
+      })
+    ]);
+  });
+
+  it("should set isDangerous to `true` when specifying a waste code ending with *", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          wasteDetails: { code: "20 01 27*" }
+        }
+      }
+    });
+    expect(data.createForm.wasteDetails.isDangerous).toEqual(true);
+  });
+
+  it("should set isDangerous to `false` when specifying a waste code without *", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          wasteDetails: { code: "20 03 01" }
+        }
+      }
+    });
+    expect(data.createForm.wasteDetails.isDangerous).toEqual(false);
+  });
+
+  it("should throw an exception if trying to set `isDangerous=false` with a code containing *", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          wasteDetails: { code: "20 01 27*", isDangerous: false }
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Un déchet avec un code comportant un astérisque est forcément dangereux"
       })
     ]);
   });
