@@ -588,7 +588,9 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       validityLimit: form.transporterValidityLimit,
       numberPlate: form.transporterNumberPlate,
       customInfo: form.transporterCustomInfo,
-      mode: form.transporterTransportMode
+      // transportMode has default value in DB but we do not want to return anything
+      // if the transporter siret is not defined
+      mode: form.transporterCompanySiret ? form.transporterTransportMode : null
     }),
     wasteDetails: nullIfNoValues<WasteDetails>({
       code: form.wasteDetailsCode,
@@ -752,7 +754,11 @@ export function expandTemporaryStorageFromDb(
       validityLimit: temporaryStorageDetail.transporterValidityLimit,
       numberPlate: temporaryStorageDetail.transporterNumberPlate,
       customInfo: null,
-      mode: temporaryStorageDetail.transporterTransportMode
+      // transportMode has default value in DB but we do not want to return anything
+      // if the transporter siret is not defined
+      mode: temporaryStorageDetail.transporterCompanySiret
+        ? temporaryStorageDetail.transporterTransportMode
+        : null
     }),
     signedBy: temporaryStorageDetail.signedBy,
     signedAt: temporaryStorageDetail.signedAt
