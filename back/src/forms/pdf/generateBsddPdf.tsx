@@ -241,11 +241,7 @@ function TransporterFormCompanyFields({
         <ReceiptFields {...(transporter ?? {})} />
         <p>
           Mode de transport :{" "}
-          {
-            TRANSPORT_MODE_LABELS[
-              transporter ? transporter.mode ?? TransportMode.ROAD : null
-            ]
-          }
+          {transporter?.mode ? TRANSPORT_MODE_LABELS[transporter.mode] : null}
           <br />
           Immatriculation(s) : {transporter?.numberPlate}
           <br />
