@@ -486,6 +486,15 @@ input WasteDetailsInput {
 
   "Contient des Polluants Organiques Persistants (POP) oui / non"
   pop: Boolean
+
+  """
+  https://www.ecologie.gouv.fr/dechets-dangereux
+  Permet de préciser le caractère dangereux (au sens de l’article R541-8 du code de l’environnement)
+  d'un déchet dont le code ne contient pas d'astérisque. Par défaut si cette valeur est omise,
+  on considère dangereux un déchet dont le code comporte un astérique et non dangereux un déchet
+  dont le code ne comporte pas d'astérisque.
+  """
+  isDangerous: Boolean
 }
 
 """
