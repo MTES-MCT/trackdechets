@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "UserResetPasswordHash" (
+CREATE TABLE "default$default"."UserResetPasswordHash" (
     "id" TEXT NOT NULL,
     "hash" TEXT NOT NULL,
     "hashExpires" TIMESTAMP(3) NOT NULL,
@@ -10,10 +10,10 @@ CREATE TABLE "UserResetPasswordHash" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "UserResetPasswordHash_hash_key" ON "UserResetPasswordHash"("hash");
+CREATE UNIQUE INDEX "UserResetPasswordHash_hash_key" ON "default$default"."UserResetPasswordHash"("hash");
 
 -- CreateIndex
-CREATE INDEX "UserResetPasswordHashIdIdx" ON "UserResetPasswordHash"("userId");
+CREATE INDEX "UserResetPasswordHashIdIdx" ON "default$default"."UserResetPasswordHash"("userId");
 
 -- AddForeignKey
-ALTER TABLE "UserResetPasswordHash" ADD CONSTRAINT "UserResetPasswordHash_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "default$default"."UserResetPasswordHash" ADD CONSTRAINT "UserResetPasswordHash_userId_fkey" FOREIGN KEY ("userId") REFERENCES "default$default"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
