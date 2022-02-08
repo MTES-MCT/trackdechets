@@ -81,14 +81,14 @@ export default async function transitionForm(
   });
   await persistBsddEvent({
     streamId: form.id,
-    actorId: user.id,
+    actor: user.id,
     type: "BsddUpdated",
     data: { content: formUpdateInput },
     metadata: { authType: user.auth }
   });
   await persistBsddEvent({
     streamId: form.id,
-    actorId: user.id,
+    actor: user.id,
     type: "BsddSigned",
     data: { status: nextStatus },
     metadata: { authType: user.auth }

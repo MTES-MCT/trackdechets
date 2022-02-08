@@ -66,7 +66,7 @@ export function buildFormRevisionRequestRepository(
         await transaction.event.create({
           data: {
             streamId: revisionRequest.id,
-            actorId: user.id,
+            actor: user.id,
             type: "BsddRevisionRequestCancelled",
             data: {},
             metadata: { ...logMetadata, authType: user.auth }
@@ -92,7 +92,7 @@ export function buildFormRevisionRequestRepository(
         await transaction.event.create({
           data: {
             streamId: revisionRequest.id,
-            actorId: user.id,
+            actor: user.id,
             type: "BsddRevisionRequestCreated",
             data: { content: data } as Prisma.InputJsonObject,
             metadata: { ...logMetadata, authType: user.auth }
@@ -144,7 +144,7 @@ export function buildFormRevisionRequestRepository(
       await transaction.event.create({
         data: {
           streamId: revisionRequestApproval.revisionRequestId,
-          actorId: user.id,
+          actor: user.id,
           type: "BsddRevisionRequestRefused",
           data: {
             content: {
@@ -208,7 +208,7 @@ export function buildFormRevisionRequestRepository(
       await transaction.event.create({
         data: {
           streamId: updatedApproval.revisionRequestId,
-          actorId: user.id,
+          actor: user.id,
           type: "BsddRevisionRequestRefused",
           data: {
             content: {
@@ -222,7 +222,7 @@ export function buildFormRevisionRequestRepository(
       await transaction.event.create({
         data: {
           streamId: revisionRequest.bsddId,
-          actorId: user.id,
+          actor: user.id,
           type: "BsddRevisionRequestApplied",
           data: {
             content: bsddUpdate,

@@ -9,7 +9,7 @@ describe("ActivityEvent.Bsdd", () => {
     const bsddId = "TD-TEST-0001";
 
     const bsddCreated: BsddCreated = {
-      actorId: userId,
+      actor: userId,
       streamId: bsddId,
       type: "BsddCreated",
       data: {
@@ -22,7 +22,7 @@ describe("ActivityEvent.Bsdd", () => {
     };
 
     const bsddUpdated: BsddUpdated = {
-      actorId: userId,
+      actor: userId,
       streamId: bsddId,
       type: "BsddUpdated",
       data: {
@@ -31,7 +31,7 @@ describe("ActivityEvent.Bsdd", () => {
     };
 
     const bsddSigned: BsddSigned = {
-      actorId: userId,
+      actor: userId,
       streamId: bsddId,
       type: "BsddSigned",
       data: {

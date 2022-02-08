@@ -8,14 +8,14 @@ export async function getStream(
 ): Promise<ActivityEvent[]> {
   const where = {
     streamId,
-    ...(until && { occurredAt: { lte: until } })
+    ...(until && { createdAt: { lte: until } })
   };
 
   const events = await prisma.event.findMany({ where });
 
   return events?.map(event => ({
     type: event.type,
-    actorId: event.actorId,
+    actor: event.actor,
     streamId: event.streamId,
     data: event.data as Record<string, unknown>,
     metadata: event.metadata as Record<string, unknown>
@@ -26,7 +26,7 @@ export function persistEvent(event: ActivityEvent): Promise<Event> {
   return prisma.event.create({
     data: {
       streamId: event.streamId,
-      actorId: event.actorId,
+      actor: event.actor,
       type: event.type,
       data: event.data as Prisma.InputJsonObject,
       metadata: (event.metadata as Prisma.InputJsonObject) ?? Prisma.DbNull

@@ -4,7 +4,7 @@ export type ActivityEvent<
   EventMetadata extends Record<string, unknown> = Record<string, unknown>
 > = Readonly<{
   type: Readonly<EventType>;
-  actorId: Readonly<string>;
+  actor: Readonly<string>;
   streamId: Readonly<string>;
   data: Readonly<EventData>;
   metadata?: Readonly<EventMetadata>;

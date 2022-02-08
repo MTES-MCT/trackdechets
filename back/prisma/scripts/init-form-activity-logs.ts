@@ -23,10 +23,10 @@ export class LoadAnonymousCompaniesUpdater implements Updater {
 
         await prisma.event.createMany({
           data: chunkForms.map(form => ({
-            occurredAt: new Date("2018-01-01T00:00:00"), // A date that for sure is before any existing Form
+            createdAt: new Date("2018-01-01T00:00:00"), // A date that for sure is before any existing Form
             streamId: form.id,
             type: "BsddCreated",
-            actorId: "script",
+            actor: "script",
             data: {
               content: JSON.parse(JSON.stringify(form))
             },

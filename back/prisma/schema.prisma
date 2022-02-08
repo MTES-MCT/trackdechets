@@ -1256,12 +1256,12 @@ model Bsda {
 
 model Event {
   id         String   @id @default(cuid())
-  occurredAt DateTime @default(now())
+  createdAt  DateTime @default(now())
 
   streamId String
   type     String
   data     Json
   metadata Json?
 
-  actorId String
+  actor String
 }

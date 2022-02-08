@@ -89,7 +89,7 @@ export function buildFormRepository(
       await transaction.event.create({
         data: {
           streamId: form.id,
-          actorId: user.id,
+          actor: user.id,
           type: "BsddCreated",
           data: { content: data } as Prisma.InputJsonObject,
           metadata: { ...logMetadata, authType: user.auth }
@@ -119,7 +119,7 @@ export function buildFormRepository(
       await transaction.event.create({
         data: {
           streamId: form.id,
-          actorId: user.id,
+          actor: user.id,
           type: "BsddUpdated",
           data: { content: data } as Prisma.InputJsonObject,
           metadata: { ...logMetadata, authType: user.auth }
@@ -150,7 +150,7 @@ export function buildFormRepository(
         await transaction.event.create({
           data: {
             streamId: id,
-            actorId: user.id,
+            actor: user.id,
             type: "BsddUpdated",
             data: { content: data } as Prisma.InputJsonObject,
             metadata: { ...logMetadata, authType: user.auth }
@@ -184,7 +184,7 @@ export function buildFormRepository(
       await transaction.event.create({
         data: {
           streamId: form.id,
-          actorId: user.id,
+          actor: user.id,
           type: "BsddDeleted",
           data: {},
           metadata: { ...logMetadata, authType: user.auth }
