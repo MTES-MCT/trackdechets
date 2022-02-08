@@ -8,7 +8,7 @@ export const COMPANY_TYPES = [
     value: CompanyType.Producer,
     label: "Producteur de déchets",
     helpText:
-      "Exemple: garage, médecin / infirmier libéral, opérateur de fluides frigorigènes",
+      "Tous les établissements produisant des déchets et producteurs subséquents. Exemples: Ateliers de réparation véhicules, laboratoires, ateliers de traitement de surfaces, détenteurs d'équipements contenant des fluides frigorigènes et les opérateurs, producteurs de DASRI (hôpitaux, EHPAD, médecin, infirmier(e), tatoueurs, dentiste, etc.), maitre ouvrage amiante, etc. Les ménages sont exclus de la traçabilité.",
   },
   {
     value: CompanyType.Collector,
