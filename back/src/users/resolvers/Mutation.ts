@@ -17,12 +17,14 @@ import revokeAuthorizedApplication from "./mutations/revokeAuthorizedApplication
 import revokeAccessToken from "./mutations/revokeAccessToken";
 import createAccessToken from "./mutations/createAccessToken";
 import revokeAllAccessTokens from "./mutations/revokeAllAccessTokens";
+import updatePassword from "./mutations/updatePassword";
 
 const Mutation: MutationResolvers = {
   signup,
   login,
   changePassword,
   resetPassword,
+  updatePassword,
   editProfile,
   inviteUserToCompany,
   deleteInvitation,

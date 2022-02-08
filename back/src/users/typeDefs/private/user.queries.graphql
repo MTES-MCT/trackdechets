@@ -23,4 +23,11 @@ type Query {
   Liste tous les tokens peronnels générés
   """
   accessTokens: [AccessToken!]!
+
+  """
+  USAGE INTERNE
+  Vérifie la validité d'un lien de changement de mot de passe
+  par son hash
+  """
+  resetPassword(hash: String!): Boolean!
 }

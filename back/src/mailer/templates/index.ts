@@ -57,8 +57,7 @@ export const onboardingProfessionalSecondStep: MailTemplate = {
 };
 
 export const resetPassword: MailTemplate<{
-  hash: string;
-  hashExpires: Date;
+  resetHash: string;
 }> = {
   subject: "Ré-initialisation du mot de passe",
   body: mustacheRenderer("reinitialisation-mot-de-passe.html"),

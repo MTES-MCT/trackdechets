@@ -33,15 +33,8 @@ import { getUIBaseURL } from "./utils";
 import sentryReporter from "./common/plugins/sentryReporter";
 import { initSentry } from "./common/sentry";
 import { graphiqlLandingPagePlugin } from "./common/plugins/graphiql";
-<<<<<<< HEAD
 import { createUserDataLoaders } from "./users/dataloaders";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
-=======
-import {
-  userResetPasswordGet,
-  userResetPasswordPost
-} from "./users/resetPassword";
->>>>>>> reset password by link
 
 const {
   SESSION_SECRET,
@@ -215,8 +208,6 @@ app.use(oauth2Router);
 
 app.get("/ping", (_, res) => res.send("Pong!"));
 app.get("/userActivation", userActivationHandler);
-app.get("/resetPassword", userResetPasswordGet);
-app.post("/resetPassword", userResetPasswordPost);
 app.get("/download", downloadRouter);
 
 app.get("/exports", (_, res) =>

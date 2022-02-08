@@ -14,6 +14,7 @@ export default {
   },
   resendActivationEmail: "/resend-activation-email",
   resetPassword: "/reset-password",
+  resetPasswordForm: "/reset-password-confirm",
   company: "/company/:siret",
   wasteTree: "/wasteTree",
   dashboard: {

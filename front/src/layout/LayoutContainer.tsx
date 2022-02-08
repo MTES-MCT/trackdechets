@@ -33,6 +33,7 @@ const WasteSelector = lazy(() => import("login/WasteSelector"));
 
 const Invite = lazy(() => import("login/Invite"));
 const ResetPassword = lazy(() => import("login/ResetPassword"));
+const ResetPasswordForm = lazy(() => import("login/ResetPasswordForm"));
 const Login = lazy(() => import("login/Login"));
 const Signup = lazy(() => import("login/Signup"));
 const Dialog = lazy(() => import("oauth2/Dialog"));
@@ -126,6 +127,10 @@ export default withRouter(function LayoutContainer({ history }) {
 
               <Route exact path={routes.resetPassword}>
                 <ResetPassword />
+              </Route>
+
+              <Route exact path={routes.resetPasswordForm}>
+                <ResetPasswordForm />
               </Route>
 
               <Route exact path={routes.resendActivationEmail}>

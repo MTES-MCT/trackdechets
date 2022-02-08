@@ -23,6 +23,8 @@ import PasswordMeter from "common/components/PasswordMeter";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "./Invite.module.scss";
 import * as queryString from "query-string";
+import { decodeHash } from "common/helper";
+
 const INVITATION = gql`
   query Invitation($hash: String!) {
     invitation(hash: $hash) {
@@ -112,15 +114,6 @@ function AlreadyAccepted({ invitation }: { invitation: Invitation }) {
     </div>
   );
 }
-
-const decodeHash = hash => {
-  if (!hash) {
-    return "";
-  }
-  return Array.isArray(hash)
-    ? decodeURIComponent(hash[0])
-    : decodeURIComponent(hash);
-};
 
 /**
  * Signup to Trackdéchets with an invitation link
