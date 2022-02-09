@@ -60,12 +60,12 @@ describe("templates", () => {
   });
 
   test("resetPassword", () => {
-    const hash = "secret";
+    const resetHash = "secret";
     const rendered = renderMail(resetPassword, {
-      variables: { hash, hashExpires: new Date() },
+      variables: { resetHash },
       to
     });
-    expect(rendered.body).toContain(hash);
+    expect(rendered.body).toContain(resetHash);
   });
 
   test("formNotAccepted", () => {
