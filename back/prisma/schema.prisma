@@ -639,7 +639,6 @@ model User {
   isAdmin              Boolean?             @default(false)
   // compte de service avec des droits étendus
   isRegistreNational   Boolean?             @default(false)
-  applicationId        String?
   applications         Application[]
   companyAssociations  CompanyAssociation[]
   AccessToken          AccessToken[]
