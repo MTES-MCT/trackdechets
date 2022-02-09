@@ -9,7 +9,6 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import * as Sentry from "@sentry/browser";
 import "@reach/tooltip/styles.css";
-import "text-security/text-security-disc.css";
 
 if (process.env.REACT_APP_SENTRY_DSN) {
   Sentry.init({
