@@ -1,5 +1,6 @@
 import React, { InputHTMLAttributes } from "react";
 import { FieldProps } from "formik";
+import "text-security/text-security-disc.css";
 
 type NumberInputProps = FieldProps & InputHTMLAttributes<HTMLInputElement>;
 export default function SignatureCodeInput({
