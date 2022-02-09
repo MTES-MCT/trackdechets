@@ -42,22 +42,25 @@ export function BsdaJourneySummary({ bsda }: Props) {
           </JourneyStopDescription>
         </JourneyStop>
       )}
-      <JourneyStop
-        variant={
-          bsda.transporter?.transport?.signature
-            ? "complete"
-            : bsda.worker?.work?.signature
-            ? "active"
-            : "incomplete"
-        }
-      >
-        <JourneyStopName>Transporteur</JourneyStopName>
-        <JourneyStopDescription>
-          {bsda.transporter?.company?.name} ({bsda.transporter?.company?.siret})
-          <br />
-          {bsda.transporter?.company?.address}
-        </JourneyStopDescription>
-      </JourneyStop>
+      {bsda.transporter?.company?.name && (
+        <JourneyStop
+          variant={
+            bsda.transporter?.transport?.signature
+              ? "complete"
+              : bsda.worker?.work?.signature
+              ? "active"
+              : "incomplete"
+          }
+        >
+          <JourneyStopName>Transporteur</JourneyStopName>
+          <JourneyStopDescription>
+            {bsda.transporter?.company?.name} (
+            {bsda.transporter?.company?.siret})
+            <br />
+            {bsda.transporter?.company?.address}
+          </JourneyStopDescription>
+        </JourneyStop>
+      )}
       <JourneyStop
         variant={
           bsda.destination?.operation?.signature

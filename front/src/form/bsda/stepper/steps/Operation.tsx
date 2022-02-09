@@ -105,11 +105,18 @@ export default function Operation() {
               className="td-select"
             >
               <option value="...">Sélectionnez une valeur...</option>
+              <option value="R 5">
+                R 5 - Recyclage ou récupération d’autres matières inorganiques.
+              </option>
               <option value="D 5">
                 D 5 - Mise en décharge aménagée et autorisée en ISDD ou ISDND
               </option>
               <option value="D 9">
                 D 9 - Vitrification, traitement chimique ou prétraitement
+              </option>
+              <option value="R 12">
+                R 12 - Echange de déchets en vue de les soumettre à l'une des
+                opération R1 à R11
               </option>
               <option value="D 13">D 13 - Groupement de déchets</option>
               <option value="D 15">D 15 - Entreposage provisoire</option>

@@ -29,7 +29,7 @@ export const machine = Machine<never, Event>(
           },
           OPERATION: {
             target: BsdaStatus.PROCESSED,
-            cond: "isCollectedBy2010"
+            cond: "isCollectedBy2710"
           }
         }
       },
@@ -81,7 +81,7 @@ export const machine = Machine<never, Event>(
       canSkipEmissionSignature: (_, event) =>
         event.bsda?.workerWorkHasEmitterPaperSignature ||
         event.bsda?.emitterIsPrivateIndividual,
-      isCollectedBy2010: (_, event) =>
+      isCollectedBy2710: (_, event) =>
         event.bsda?.type === BsdaType.COLLECTION_2710,
       isGroupingOrReshipmentOperation: (_, event) =>
         ["D 13", "D 15"].includes(event.bsda?.destinationOperationCode),

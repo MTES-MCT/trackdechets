@@ -25,12 +25,19 @@ export function WorkflowAction(props: WorkflowActionProps) {
       ) {
         return <SignWork {...props} bsdaId={form.id} />;
       }
+      if (
+        form["bsdaType"] === "COLLECTION_2710" &&
+        siret === form.destination?.company?.siret
+      ) {
+        return <SignOperation {...props} bsdaId={form.id} />;
+      }
       if (siret !== form.emitter?.company?.siret) return null;
       return <SignEmission {...props} bsdaId={form.id} />;
 
     case BsdaStatus.SignedByProducer:
       if (
-        (form.type === "GATHERING" || form.type === "RESHIPMENT") &&
+        (form["bsdaType"] === "GATHERING" ||
+          form["bsdaType"] === "RESHIPMENT") &&
         siret === form.worker?.company?.siret
       ) {
         return <SignTransport {...props} bsdaId={form.id} />;
