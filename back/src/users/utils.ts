@@ -6,7 +6,7 @@ import { base32Encode } from "../utils";
 const saltRound = 10;
 const minimalPasswordLength = 8; // check frontend when update
 
-export function isPasswordLongEnouh(password: string): boolean {
+export function isPasswordLongEnough(password: string): boolean {
   return password.length >= minimalPasswordLength;
 }
 
