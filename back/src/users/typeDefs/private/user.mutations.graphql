@@ -75,4 +75,28 @@ type Mutation {
   Refuse une demande de rattachement à un un établissement
   """
   refuseMembershipRequest(id: ID!): CompanyPrivate!
+
+  """
+  USAGE INTERNE
+  Révoque l'accès à une application tierce
+  """
+  revokeAuthorizedApplication(id: ID!): AuthorizedApplication!
+
+  """
+  USAGE INTERNE
+  Crée un jeton d'accès personnel
+  """
+  createAccessToken(input: CreateAccessTokenInput!): NewAccessToken!
+
+  """
+  USAGE INTERNE
+  Révoque un jeton d'accès personnel
+  """
+  revokeAccessToken(id: ID!): AccessToken!
+
+  """
+  USAGE INTERNE
+  Révoque l'ensemble des jetons d'accès personnels
+  """
+  revokeAllAccessTokens: [AccessToken!]!
 }

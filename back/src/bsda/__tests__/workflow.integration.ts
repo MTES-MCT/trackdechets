@@ -11,8 +11,8 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
   afterEach(resetDatabase);
 
   async function apiKey(user: User) {
-    const { clearToken } = await createAccessToken(user);
-    return clearToken;
+    const { token } = await createAccessToken({ user });
+    return token;
   }
 
   it("Déchet déposé en déchetterie (collecte en 2710-1)", async () => {
@@ -322,7 +322,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                     quantity: 1
                     type: PALETTE_FILME
                 }]
-                weight: { 
+                weight: {
                     isEstimate: true
                     value: 1.2
                 }

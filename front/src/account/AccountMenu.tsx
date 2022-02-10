@@ -10,7 +10,7 @@ export const AccountMenuContent = ({
   mobileCallback?: () => void;
 }) => (
   <>
-    <h5 className={styles.title}>Mon Compte</h5>
+    <h5 className={styles.title}>Paramètres du compte</h5>
     <ul>
       <li className="tw-mb-1">
         <NavLink
@@ -24,7 +24,7 @@ export const AccountMenuContent = ({
       </li>
       <li className="tw-mb-1">
         <NavLink
-          to={routes.account.companies}
+          to={routes.account.companies.list}
           className="sidebar__link"
           activeClassName="sidebar__link--active"
           onClick={() => !!mobileCallback && mobileCallback()}
@@ -32,14 +32,37 @@ export const AccountMenuContent = ({
           Établissements
         </NavLink>
       </li>
-      <li>
+      <li className="tw-mb-1">
         <NavLink
-          to={routes.account.api}
+          to={routes.account.authorizedApplications}
           className="sidebar__link"
           activeClassName="sidebar__link--active"
           onClick={() => !!mobileCallback && mobileCallback()}
         >
-          Intégration API
+          Applications autorisées
+        </NavLink>
+      </li>
+    </ul>
+    <h5 className={styles.title}>Développeurs</h5>
+    <ul>
+      <li>
+        <NavLink
+          to={routes.account.tokens.list}
+          className="sidebar__link"
+          activeClassName="sidebar__link--active"
+          onClick={() => !!mobileCallback && mobileCallback()}
+        >
+          Jetons d'accès API
+        </NavLink>
+      </li>
+      <li>
+        <NavLink
+          to={routes.account.oauth2.list}
+          className="sidebar__link"
+          activeClassName="sidebar__link--active"
+          onClick={() => !!mobileCallback && mobileCallback()}
+        >
+          Mes Applications
         </NavLink>
       </li>
     </ul>

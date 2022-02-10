@@ -1,0 +1,1 @@
+ALTER TABLE "default$default"."AccessToken" ADD COLUMN "description" TEXT;

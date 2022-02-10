@@ -1,7 +1,8 @@
 type Application {
   id: String!
   name: String!
-  logoUrl: String!
+  goal: ApplicationGoal
+  logoUrl: String
   redirectUris: [String!]!
   clientSecret: String!
 }

@@ -350,7 +350,7 @@ export const applicationFactory = async () => {
 
   const application = await prisma.application.create({
     data: {
-      admins: { connect: { id: admin.id } },
+      admin: { connect: { id: admin.id } },
       clientSecret: `Secret_${applicationIndex}`,
       name: `Application_${applicationIndex}`,
       redirectUris: ["https://acme.inc/authorize"]

@@ -9,7 +9,6 @@ import {
 } from "../../../__tests__/factories";
 import deleteUser from "../deleteUser";
 
-
 describe("deleteUser", () => {
   afterEach(() => resetDatabase());
 
@@ -191,19 +190,13 @@ describe("deleteUser", () => {
     expect(grants.length).toBe(0);
   });
 
-  it("should return an error if user is the only admin of an application", async () => {
+  it("should return an error if user is admin of an application", async () => {
     const user = await userFactory();
     const application = await prisma.application.create({
       data: {
         name: "",
         clientSecret: "",
-        admins: {
-          connect: [
-            {
-              id: user.id
-            }
-          ]
-        }
+        adminId: user.id
       }
     });
 
@@ -215,37 +208,5 @@ describe("deleteUser", () => {
         `Impossible de supprimer cet utilisateur car il est le seul administrateur de l'application ${application.id}.`
       );
     }
-  });
-
-  it("should remove user from their applications if there are other admins", async () => {
-    const user = await userFactory();
-    const otherUser = await userFactory();
-    await prisma.application.create({
-      data: {
-        name: "",
-        clientSecret: "",
-        admins: {
-          connect: [
-            {
-              id: user.id
-            },
-            {
-              id: otherUser.id
-            }
-          ]
-        }
-      }
-    });
-
-    await deleteUser(user);
-
-    const applications = await prisma.application.findMany({
-      where: {
-        admins: {
-          some: { id: user.id }
-        }
-      }
-    });
-    expect(applications.length).toBe(0);
   });
 });

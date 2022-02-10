@@ -13,6 +13,10 @@ import removeUserFromCompany from "./mutations/removeUserFromCompany";
 import sendMembershipRequest from "./mutations/sendMembershipRequest";
 import acceptMembershipRequest from "./mutations/acceptMembershipRequest";
 import refuseMembershipRequest from "./mutations/refuseMembershipRequest";
+import revokeAuthorizedApplication from "./mutations/revokeAuthorizedApplication";
+import revokeAccessToken from "./mutations/revokeAccessToken";
+import createAccessToken from "./mutations/createAccessToken";
+import revokeAllAccessTokens from "./mutations/revokeAllAccessTokens";
 
 const Mutation: MutationResolvers = {
   signup,
@@ -28,7 +32,11 @@ const Mutation: MutationResolvers = {
   sendMembershipRequest,
   acceptMembershipRequest,
   refuseMembershipRequest,
-  resendActivationEmail
+  resendActivationEmail,
+  revokeAuthorizedApplication,
+  revokeAccessToken,
+  createAccessToken,
+  revokeAllAccessTokens
 };
 
 export default Mutation;

@@ -26,6 +26,15 @@
       background-color: $blue-light;
     }
   }
+
+  &--danger {
+    background-color: $red-dark;
+    color: $white;
+    &:hover {
+      background-color: $red;
+    }
+  }
+
   &--outline {
     background-color: $white;
 

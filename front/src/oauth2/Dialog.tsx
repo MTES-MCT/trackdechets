@@ -38,13 +38,20 @@ export default function Dialog() {
         <img src="/trackdechets.png" alt="trackdechets" width="100px" />
       </div>
       <h4 className="text-center">Autoriser {client.name}</h4>
-      <div className="panel">
-        <p className="text-center">{user.name}</p>
+      <div className="panel tw-mt-2">
         <p className="text-center">
-          {client.name} souhaite accéder à votre compte Trackdéchets
+          {user.name}, l'application {client.name} souhaite accéder à votre
+          compte Trackdéchets.
+        </p>
+        <p className="text-center notification success tw-mt-2">
+          L'application aura accès à tous les établissements dont vous faites
+          partie et sera en mesure de créer et signer des bordereaux de suivi de
+          déchets à votre place. Vous pourrez révoquer cet accès à tout moment
+          depuis Mon Compte {">"} Paramètres du compte {">"} Applications
+          autorisées
         </p>
         <div className={styles.hr} />
-        <form action={authorizeDecisionUrl} method="post">
+        <form className="tw-mt-5" action={authorizeDecisionUrl} method="post">
           <input
             name="transaction_id"
             type="hidden"
@@ -58,7 +65,7 @@ export default function Dialog() {
               id="allow"
             ></input>
             <input
-              className="button warning"
+              className="btn btn--outline-primary"
               type="submit"
               value="Refuser"
               name="cancel"

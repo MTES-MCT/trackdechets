@@ -4,13 +4,17 @@ import apiKey from "./queries/apiKey";
 import invitation from "./queries/invitation";
 import membershipRequest from "./queries/membershipRequest";
 import myCompanies from "./queries/myCompanies";
+import authorizedApplications from "./queries/authorizedApplications";
+import accessTokens from "./queries/accessTokens";
 
 const Query: QueryResolvers = {
   me,
   apiKey,
   invitation,
   membershipRequest,
-  myCompanies
+  myCompanies,
+  authorizedApplications,
+  accessTokens
 };
 
 export default Query;
