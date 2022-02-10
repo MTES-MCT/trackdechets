@@ -1,3 +1,5 @@
+import { TransportMode } from "generated/graphql/types";
+
 export const statusLabels: { [key: string]: string } = {
   DRAFT: "Brouillon",
   SEALED: "En attente de collecte par le transporteur",
@@ -21,12 +23,12 @@ export const statusLabels: { [key: string]: string } = {
 
 export const ITEMS_PER_PAGE = 50;
 
-export const transportModeLabels: { [key: string]: string } = {
-  ROAD: "Route",
-  AIR: "Voie aérienne",
-  RAIL: "Voie ferrée",
-  RIVER: "Voie fluviale",
-  SEA: "Voie maritime",
+export const transportModeLabels: Record<TransportMode, string> = {
+  [TransportMode.Road]: "Route",
+  [TransportMode.Air]: "Voie aérienne",
+  [TransportMode.Rail]: "Voie ferrée",
+  [TransportMode.River]: "Voie fluviale",
+  [TransportMode.Sea]: "Voie maritime",
 };
 
 export function getTransportModeLabel(mode: string | null | undefined) {
