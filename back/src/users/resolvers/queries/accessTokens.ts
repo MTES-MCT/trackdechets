@@ -16,8 +16,7 @@ const accessTokensResolver: QueryResolvers["accessTokens"] = async (
   return accessTokens.map(token => ({
     id: token.id,
     description: token.description,
-    lastUsed: token.lastUsed,
-    tokenPreview: `${token.token.slice(0, 5)}*************`
+    lastUsed: token.lastUsed
   }));
 };
 
