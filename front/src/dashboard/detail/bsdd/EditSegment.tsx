@@ -15,7 +15,7 @@ import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
-import TransportModeSelect from "common/components/TransportModeSelect";
+import { FieldTransportModeSelect } from "common/components";
 
 const EDIT_SEGMENT = gql`
   mutation editSegment(
@@ -87,7 +87,7 @@ export default function EditSegment({ siret, segment }: Props) {
                 <Field
                   id="id_mode"
                   name="mode"
-                  component={TransportModeSelect}
+                  component={FieldTransportModeSelect}
                 ></Field>
                 <h4 className="form__section-heading">Transporteur</h4>
 

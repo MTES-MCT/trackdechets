@@ -1,6 +1,6 @@
 import RedErrorMessage from "common/components/RedErrorMessage";
 import TdSwitch from "common/components/Switch";
-import TransportModeSelect from "common/components/TransportModeSelect";
+import { FieldTransportModeSelect } from "common/components";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { Field, useFormikContext } from "formik";
@@ -47,7 +47,7 @@ export default function Transporter() {
         <Field
           id="bsdd-transporter-mode"
           name="transporter.mode"
-          component={TransportModeSelect}
+          component={FieldTransportModeSelect}
         ></Field>
       </div>
 

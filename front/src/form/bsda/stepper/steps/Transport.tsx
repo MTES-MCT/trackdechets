@@ -1,11 +1,10 @@
 import React from "react";
 import { Field, useFormikContext } from "formik";
 import { Bsda } from "generated/graphql/types";
-import { RedErrorMessage } from "common/components";
+import { RedErrorMessage, FieldTransportModeSelect } from "common/components";
 import Tooltip from "common/components/Tooltip";
 import TagsInput from "common/components/tags-input/TagsInput";
 import DateInput from "form/common/components/custom-inputs/DateInput";
-import TransportModeSelect from "common/components/TransportModeSelect";
 
 type Props = { disabled: boolean };
 export function Transport({ disabled }: Props) {
@@ -75,7 +74,7 @@ export function Transport({ disabled }: Props) {
           <Field
             id="id_mode"
             name="transporter.transport.mode"
-            component={TransportModeSelect}
+            component={FieldTransportModeSelect}
             disabled={disabled}
           ></Field>
         </label>

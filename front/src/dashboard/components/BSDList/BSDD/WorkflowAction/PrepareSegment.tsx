@@ -17,8 +17,7 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 import { WorkflowActionProps } from "./WorkflowAction";
 import TdSwitch from "common/components/Switch";
 import { GET_BSDS, GET_DETAIL_FORM } from "common/queries";
-import { Loader } from "common/components";
-import TransportModeSelect from "common/components/TransportModeSelect";
+import { Loader, FieldTransportModeSelect } from "common/components";
 
 const PREPARE_SEGMENT = gql`
   mutation prepareSegment(
@@ -115,7 +114,7 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
                 <Field
                   id="id_mode"
                   name="mode"
-                  component={TransportModeSelect}
+                  component={FieldTransportModeSelect}
                 ></Field>
                 <h4 className="form__section-heading">Siret</h4>
                 <CompanySelector

@@ -12,7 +12,7 @@ import classNames from "classnames";
 import Tooltip from "common/components/Tooltip";
 import TagsInput from "common/components/tags-input/TagsInput";
 import WeightWidget from "./components/Weight";
-import TransportModeSelect from "common/components/TransportModeSelect";
+import { FieldTransportModeSelect } from "common/components";
 
 /**
  *
@@ -163,7 +163,7 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
         <Field
           id="id_mode"
           name="transporter.transport.mode"
-          component={TransportModeSelect}
+          component={FieldTransportModeSelect}
           disabled={disabled}
           onChange={e => handleTransportMode(e)}
         ></Field>
