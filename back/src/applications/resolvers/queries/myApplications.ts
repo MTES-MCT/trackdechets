@@ -10,7 +10,7 @@ const myApplications: QueryResolvers["myApplications"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-  return prisma.user.findFirst({ where: { id: user.id } }).applications();
+  return prisma.user.findUnique({ where: { id: user.id } }).applications();
 };
 
 export default myApplications;
