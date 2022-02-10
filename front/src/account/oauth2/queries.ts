@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 
 const ApplicationFragment = gql`
   fragment ApplicationFragment on Application {
