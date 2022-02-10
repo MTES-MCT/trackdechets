@@ -8,6 +8,7 @@ import {
   RouteComponentProps,
   Redirect,
   Switch,
+  Link,
 } from "react-router-dom";
 import Loader from "common/components/Loaders";
 import { InlineError } from "common/components/Error";
@@ -71,12 +72,12 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
                 <AccountContentWrapper
                   title="Mes applications OAuth2"
                   button={
-                    <a
+                    <Link
                       className="btn btn--primary"
-                      href={routes.account.oauth2.create}
+                      to={routes.account.oauth2.create}
                     >
                       Créer une application OAuth2
-                    </a>
+                    </Link>
                   }
                 >
                   <AccountOauth2AppList />
@@ -106,12 +107,12 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
                 <AccountContentWrapper
                   title="Établissements"
                   button={
-                    <a
+                    <Link
                       className="btn btn--primary"
-                      href={routes.account.companies.create}
+                      to={routes.account.companies.create}
                     >
                       Créer un établissement
-                    </a>
+                    </Link>
                   }
                 >
                   <AccountCompanyList />

@@ -163,6 +163,8 @@ export default function AccountOauth2AppCreateUpdate({
                       <a
                         className="tw-underline"
                         href="https://trackdechets.beta.gouv.fr/cgu"
+                        target="_blank"
+                        rel="noopener noreferrer"
                       >
                         conditions générales d'utilisation.
                       </a>
