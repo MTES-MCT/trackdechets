@@ -24,3 +24,4 @@ export * from "./Blankslate";
 export * from "./Table";
 export * from "./Journey";
 export * from "./DataList";
+export * from "./TransportModeSelect";

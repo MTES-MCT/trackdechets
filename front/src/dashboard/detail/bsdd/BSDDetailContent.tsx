@@ -12,7 +12,7 @@ import {
   FormCompany,
   FormStatus,
 } from "generated/graphql/types";
-import { statusLabels } from "../../constants";
+import { getTransportModeLabel, statusLabels } from "../../constants";
 import {
   IconWarehouseDelivery,
   IconWarehouseStorage,
@@ -76,6 +76,10 @@ const TransportSegmentDetail = ({ segment, siret }: SegmentProps) => {
 
         <DateRow value={segment?.takenOverAt} label="Pris en charge le" />
         <DetailRow value={segment?.takenOverBy} label="Pris en charge par" />
+        <DetailRow
+          value={getTransportModeLabel(segment?.mode)}
+          label="Mode de transport"
+        />
       </div>
       {!segment.readyToTakeOver &&
         [
@@ -88,6 +92,7 @@ const TransportSegmentDetail = ({ segment, siret }: SegmentProps) => {
 
 const TempStorage = ({ form }) => {
   const { temporaryStorageDetail } = form;
+
   return (
     <>
       <div className={styles.detailColumns}>
@@ -178,6 +183,12 @@ const TempStorage = ({ form }) => {
             <DateRow
               value={temporaryStorageDetail?.transporter?.validityLimit}
               label="Date de validité"
+            />
+            <DetailRow
+              value={getTransportModeLabel(
+                temporaryStorageDetail?.transporter?.mode
+              )}
+              label="Mode de transport"
             />
           </div>
         </div>
@@ -526,6 +537,10 @@ export default function BSDDetailContent({
                   label="Signé par le transporteur"
                 />
                 <DateRow value={form.sentAt} label="Date de prise en charge" />
+                <DetailRow
+                  value={getTransportModeLabel(form.transporter?.mode)}
+                  label="Mode de transport"
+                />
               </div>
             </TabPanel>
             {/* Multimodal transporters tab panels */}

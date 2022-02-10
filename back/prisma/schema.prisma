@@ -276,6 +276,7 @@ model Form {
   transporterDepartment              String?
   transporterValidityLimit           DateTime?
   transporterNumberPlate             String?
+  transporterTransportMode           TransportMode?          @default(ROAD)
   wasteDetailsCode                   String?
   wasteDetailsOnuCode                String?
   wasteDetailsPackagingInfos         Json                    @default("[]")
@@ -555,6 +556,7 @@ model TemporaryStorageDetail {
   transporterValidityLimit         DateTime?
   transporterNumberPlate           String?
   transporterCustomInfo            String?
+  transporterTransportMode         TransportMode?          @default(ROAD)
   signedByTransporter              Boolean?
   signedBy                         String?
   signedAt                         DateTime?

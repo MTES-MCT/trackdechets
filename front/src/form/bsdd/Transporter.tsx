@@ -1,5 +1,6 @@
 import RedErrorMessage from "common/components/RedErrorMessage";
 import TdSwitch from "common/components/Switch";
+import { FieldTransportModeSelect } from "common/components";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { Field, useFormikContext } from "formik";
@@ -40,6 +41,11 @@ export default function Transporter() {
           }
         }}
       />
+
+      <label>
+        Mode de transport
+        <Field name="transporter.mode" component={FieldTransportModeSelect} />
+      </label>
 
       <h4 className="form__section-heading">Autorisations</h4>
       <div className="form__row">

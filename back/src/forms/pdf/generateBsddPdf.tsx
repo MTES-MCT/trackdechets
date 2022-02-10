@@ -216,13 +216,11 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
 
 type TransporterFormCompanyFieldsProps = {
   transporter?: Transporter;
-  transportMode?: TransportMode;
   sentAt?: Date;
 };
 
 function TransporterFormCompanyFields({
   transporter,
-  transportMode = TransportMode.ROAD,
   sentAt
 }: TransporterFormCompanyFieldsProps) {
   return (
@@ -242,7 +240,8 @@ function TransporterFormCompanyFields({
         </p>
         <ReceiptFields {...(transporter ?? {})} />
         <p>
-          Mode de transport : {TRANSPORT_MODE_LABELS[transportMode]}
+          Mode de transport :{" "}
+          {transporter?.mode ? TRANSPORT_MODE_LABELS[transporter.mode] : null}
           <br />
           Immatriculation(s) : {transporter?.numberPlate}
           <br />
@@ -813,8 +812,10 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                   <strong>18. Collecteur-Transporteur</strong>
                 </p>
                 <TransporterFormCompanyFields
-                  transporter={transportSegment?.transporter}
-                  transportMode={transportSegment?.mode}
+                  transporter={{
+                    ...transportSegment?.transporter,
+                    mode: transportSegment?.mode
+                  }}
                   sentAt={transportSegment?.takenOverAt}
                 />
               </div>
