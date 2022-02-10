@@ -42,14 +42,10 @@ export default function Transporter() {
         }}
       />
 
-      <label htmlFor="id_mode">Mode de transport</label>
-      <div>
-        <Field
-          id="bsdd-transporter-mode"
-          name="transporter.mode"
-          component={FieldTransportModeSelect}
-        ></Field>
-      </div>
+      <label>
+        Mode de transport
+        <Field name="transporter.mode" component={FieldTransportModeSelect} />
+      </label>
 
       <h4 className="form__section-heading">Autorisations</h4>
       <div className="form__row">
