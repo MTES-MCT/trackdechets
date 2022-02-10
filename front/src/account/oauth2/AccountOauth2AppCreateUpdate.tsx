@@ -124,7 +124,7 @@ export default function AccountOauth2AppCreateUpdate({
             {(!data?.application?.id || !data?.application?.goal) && (
               <div className={styles.field}>
                 <Label id="goal-radio-group" className={`${styles.bold}`}>
-                  But de l'application
+                  Cette application gère les données de :
                   <Tooltip
                     msg="Le but principal de cette app est d’accéder aux données de la
                   plate-forme Trackdéchets et de les utiliser au nom de :"
@@ -139,7 +139,7 @@ export default function AccountOauth2AppCreateUpdate({
                         value={ApplicationGoal.Personnal}
                         className="td-radio"
                       />
-                      Vous-même ou votre propre entreprise
+                      Votre propre entreprise
                     </label>
                     <label className="tw-block">
                       <Field
@@ -148,7 +148,7 @@ export default function AccountOauth2AppCreateUpdate({
                         value={ApplicationGoal.Clients}
                         className="td-radio"
                       />
-                      Clients{" "}
+                      Vos clients{" "}
                       <Tooltip
                         msg="Par exemple un développeur d'une solution logicielle SaaS permettant de
                     gérer les expéditions de déchets pour le compte de producteurs"

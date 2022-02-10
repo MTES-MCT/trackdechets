@@ -33,11 +33,11 @@ export default function AccountOauth2App({
             <strong>{application.name}</strong>
           </p>
           <p>
-            But de l'application :{" "}
+            Cette application gère les données de :{" "}
             {application.goal === ApplicationGoal.Personnal
-              ? "Pour vous-même ou pour votre entreprise"
+              ? "Votre propre entreprise"
               : application.goal === ApplicationGoal.Clients
-              ? "Pour le compte de clients"
+              ? "Vos clients"
               : "Non défini. Veuillez mettre à jour cette information à partir du bouton Modifier"}
           </p>
           <p>Client id : {application.id}</p>
