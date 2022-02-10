@@ -16,10 +16,10 @@ export default function AccountAuthorizedAppList() {
   }
 
   if (data) {
-    console.log(data.authorizedApplications);
     if (data.authorizedApplications.length === 0) {
       return <div>Vous n'avez donné accès à aucune application</div>;
     }
+
     return (
       <div>
         <div>

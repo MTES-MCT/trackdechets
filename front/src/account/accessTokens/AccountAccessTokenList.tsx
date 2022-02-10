@@ -4,6 +4,7 @@ import { useQuery } from "@apollo/client";
 import { NewAccessToken, Query } from "generated/graphql/types";
 import { Loader } from "common/components";
 import { NotificationError } from "common/components/Error";
+import AccountContentWrapper from "account/AccountContentWrapper";
 import AccountAccessToken from "./AccountAccessToken";
 import { ACCESS_TOKENS } from "./queries";
 import AccountAccessTokenCreate from "./AccountAccessTokenCreate";
@@ -18,20 +19,19 @@ export default function AccountAccessTokenList() {
   );
 
   return (
-    <div className="tw-px-1 tw-py-2">
-      <div className="tw-flex tw-justify-between tw-flex-start">
-        <h5 className="h5 tw-font-bold tw-mb-4">
-          Mes jetons d'accès personnels
-        </h5>
-        <div>
+    <AccountContentWrapper
+      title="Mes jetons d'accès personnels"
+      button={
+        <div className="tw-flex">
           <button
-            className="btn btn--primary tw-mr-2"
+            className="btn btn--primary"
             onClick={() => {
               setIsGenerating(true);
             }}
           >
             Générer un nouveau jeton d'accès
           </button>
+          <div className="tw-pr-2" />
           <button
             className="btn btn--danger"
             onClick={() => {
@@ -41,7 +41,8 @@ export default function AccountAccessTokenList() {
             Révoquer tous les jetons d'accès
           </button>
         </div>
-      </div>
+      }
+    >
       <AccountAccessTokenListContent
         newAccessToken={newAccessToken}
         onNewAccessTokenDelete={() => setNewAccessToken(null)}
@@ -60,7 +61,7 @@ export default function AccountAccessTokenList() {
           onRevokeAll={() => setNewAccessToken(null)}
         />
       )}
-    </div>
+    </AccountContentWrapper>
   );
 }
 
@@ -87,13 +88,19 @@ function AccountAccessTokenListContent({
 
   if (data) {
     return (
-      <div>
-        <div className="tw-mb-5">
+      <div className="tw-mb-4">
+        <div className="tw-mb-4">
           Jeton d'accès personnels que vous pouvez utiliser pour vous
           authentifier à{" "}
-          <a className="tw-underline" href={DEVELOPERS_DOCUMENTATION_URL}>
+          <a
+            href={DEVELOPERS_DOCUMENTATION_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="tw-underline"
+          >
             l'API Trackdéchets
           </a>
+          .
         </div>
 
         {newAccessToken && (
@@ -103,15 +110,13 @@ function AccountAccessTokenListContent({
           />
         )}
 
-        <div>
-          {data.accessTokens.map(accessToken => (
-            <AccountAccessToken accessToken={accessToken} />
-          ))}
-        </div>
+        {data.accessTokens.map(accessToken => (
+          <AccountAccessToken key={accessToken.id} accessToken={accessToken} />
+        ))}
+
         {data.accessTokens.length === 0 && !newAccessToken && (
-          <div>Aucun jeton d'accès</div>
+          <div>Vous n'avez aucun jeton d'accès.</div>
         )}
-        <div></div>
       </div>
     );
   }

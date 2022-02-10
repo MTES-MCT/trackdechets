@@ -18,7 +18,7 @@ export default function AccountOAuth2AppList() {
     return (
       <div className="tw-mt-4">
         {data.myApplications.map(application => (
-          <AccountOauth2App application={application} />
+          <AccountOauth2App key={application.id} application={application} />
         ))}
       </div>
     );
