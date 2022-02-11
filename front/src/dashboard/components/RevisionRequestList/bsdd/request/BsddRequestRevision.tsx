@@ -340,6 +340,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                 onClick={() => {
                   history.goBack();
                 }}
+                type="button"
               >
                 Annuler
               </button>
