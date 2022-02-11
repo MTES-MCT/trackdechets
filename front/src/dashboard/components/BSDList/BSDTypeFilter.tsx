@@ -13,7 +13,7 @@ import {
   IconBSDasri,
   IconBSVhu,
   IconBSFF,
-  IconBSDa
+  IconBSDa,
 } from "common/components/Icons";
 import styles from "./BSDTypeFilter.module.scss";
 

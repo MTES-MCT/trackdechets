@@ -104,7 +104,7 @@ export function BsdaPicker({ name, code }: Props) {
       groupedBsdas?.reduce((prev, cur) => {
         for (const packaging of cur.packagings ?? []) {
           const found = prev.find(
-            pp => pp.type === packaging.type && pp.other == packaging.other
+            pp => pp.type === packaging.type && pp.other === packaging.other
           );
           if (found) {
             found.quantity += packaging.quantity;
