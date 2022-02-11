@@ -66,7 +66,23 @@ export default function AccountOauth2AppCreateUpdate({
   ] = useMutation<
     Pick<Mutation, "createApplication">,
     MutationCreateApplicationArgs
-  >(CREATE_APPLICATION, { refetchQueries: [MY_APPLICATIONS] });
+  >(CREATE_APPLICATION, {
+    refetchQueries: [MY_APPLICATIONS],
+    update: cache => {
+      // If there are no components currently observing the MY_APPLICATIONS query,
+      // refetchQueries will not trigger a refetch.
+      // We need to delete the cache to trigger a refetch the next time it's queried.
+      // https://github.com/apollographql/apollo-client/issues/7878
+      // https://github.com/apollographql/apollo-client/issues/7060
+      cache.modify({
+        fields: {
+          myApplications(_, { DELETE }) {
+            return DELETE;
+          },
+        },
+      });
+    },
+  });
 
   const [
     updateApplication,
