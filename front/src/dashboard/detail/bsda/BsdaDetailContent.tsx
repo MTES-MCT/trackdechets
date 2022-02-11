@@ -46,8 +46,18 @@ const Emitter = ({ form }: { form: Bsda }) => {
     <div className={styles.detailColumns}>
       <div className={styles.detailGrid}>
         <Company label="Émetteur" company={emitter?.company} />
-        <DetailRow value={emitter?.pickupSite?.name} label="Adresse collecte" />
-        <DetailRow value={emitter?.pickupSite?.name} label="Informations" />
+        <DetailRow
+          value={emitter?.pickupSite?.name}
+          label="Nom du chantier/collecte"
+        />
+        <DetailRow
+          value={emitter?.pickupSite?.address}
+          label="Adresse chantier/collecte"
+        />
+        <DetailRow
+          value={emitter?.pickupSite?.infos}
+          label="Informations complémentaires"
+        />
         {!!emitter?.pickupSite?.address && (
           <>
             <dt>Adresse</dt>
