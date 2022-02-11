@@ -205,6 +205,26 @@ export async function checkCanMarkAsSent(user: User, form: Form) {
   return true;
 }
 
+export async function checkCanSignFor(
+  siret: string,
+  user: User,
+  securityCode?: number
+) {
+  const userSirets = await getCachedUserSirets(user.id);
+
+  if (userSirets.includes(siret)) {
+    return true;
+  }
+
+  if (securityCode) {
+    return checkSecurityCode(siret, securityCode);
+  }
+
+  throw new ForbiddenError(
+    "Vous n'êtes pas autorisé à signer ce bordereau pour cet acteur"
+  );
+}
+
 export async function checkCanSignedByTransporter(user: User, form: Form) {
   const userSirets = await getCachedUserSirets(user.id);
   const fullForm = await getFullForm(form);

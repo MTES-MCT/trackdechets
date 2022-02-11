@@ -54,14 +54,30 @@ type Form {
   "Statut du BSD (brouillon, envoyé, reçu, traité, etc)"
   status: FormStatus!
 
+  "Date à laquelle l'émetteur a signé l'enlèvement initial."
+  emittedAt: DateTime
+
+  "Nom de la personne qui a signé l'enlèvement initial pour l'émetteur."
+  emittedBy: String
+
+  "Indique si l'enlèvement a été signé par l'éco-organisme en charge du déchet ou pas."
+  emittedByEcoOrganisme: Boolean
+
+  "Date à laquelle le transporteur a signé l'enlèvement initial."
+  takenOverAt: DateTime
+
+  "Nom de la personne qui a signé l'enlèvement initial pour le transporteur."
+  takenOverBy: String
+
   "Si oui ou non le BSD a été signé par un transporteur"
   signedByTransporter: Boolean
+    @deprecated(reason: "Ce champ est redondant avec status et takenOverAt")
 
   "Date de l'envoi du déchet par l'émetteur (case 9)"
-  sentAt: DateTime
+  sentAt: DateTime @deprecated(reason: "Remplacé par takenOverAt")
 
   "Nom de la personne responsable de l'envoi du déchet (case 9)"
-  sentBy: String
+  sentBy: String @deprecated(reason: "Remplacé par emittedBy")
 
   "Statut d'acceptation du déchet (case 10)"
   wasteAcceptationStatus: WasteAcceptationStatus
@@ -220,10 +236,23 @@ type TemporaryStorageDetail {
   "Transporteur du déchet (case 18)"
   transporter: Transporter
 
+  "Date à laquelle l'entreposage provisoire a signé l'enlèvement."
+  emittedAt: DateTime
+
+  "Nom de la personne qui a signé l'enlèvement pour l'entreposage provisoire."
+  emittedBy: String
+
+  "Date à laquelle le transporteur a signé l'enlèvement."
+  takenOverAt: DateTime
+
+  "Nom de la personne qui a signé l'enlèvement pour le transporteur."
+  takenOverBy: String
+
   "Nom du signataire du BSD suite  (case 19)"
-  signedBy: String
+  signedBy: String @deprecated(reason: "Remplacé par emittedBy")
+
   "Date de signature du BSD suite (case 19)"
-  signedAt: DateTime
+  signedAt: DateTime @deprecated(reason: "Remplacé par takenOverAt")
 }
 
 type TemporaryStorer {

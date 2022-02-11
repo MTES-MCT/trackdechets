@@ -113,15 +113,22 @@ const wasteDetailsInput = {
   consistence: "LIQUID"
 };
 
-function signingInfoInput(securityCode: number) {
+function signEmissionFormInput() {
   return {
-    sentAt: "2020-04-03T14:48:00",
-    sentBy: "Isabelle Guichard",
-    onuCode: "non soumis",
     quantity: 1,
-    signedByTransporter: true,
-    signedByProducer: true,
-    securityCode
+    onuCode: "non soumis",
+    packagingInfos: [],
+    transporterNumberPlate: "AA-123456-BB",
+    emittedAt: "2020-04-03T14:48:00",
+    emittedBy: "Isabelle Guichard",
+    emittedByEcoOrganisme: false
+  };
+}
+
+function signTransportFormInput() {
+  return {
+    takenOverAt: "2020-04-03T14:48:00",
+    takenOverBy: "Isabelle Guichard"
   };
 }
 
@@ -182,7 +189,8 @@ export default {
   wasteDetailsInput,
   workSiteInput,
   receiptInput,
-  signingInfoInput,
+  signEmissionFormInput,
+  signTransportFormInput,
   receivedInfoInput,
   processedInfoInput,
   tempStoredInfosInput,

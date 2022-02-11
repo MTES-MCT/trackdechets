@@ -19,6 +19,7 @@ export const statusLabels: { [key: string]: string } = {
   INITIAL: "Initial",
   SIGNED_BY_PRODUCER: "Signé par le producteur",
   SIGNED_BY_EMITTER: "Signé par l'émetteur",
+  SIGNED_BY_TEMP_STORER: "Signé par l'entreposage provisoire",
 };
 
 export const ITEMS_PER_PAGE = 50;

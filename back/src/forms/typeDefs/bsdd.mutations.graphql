@@ -125,6 +125,32 @@ type Mutation {
   ): Form
 
   """
+  Permet de signer pour le détenteur du déchet afin de le transférer au transporteur.
+  Par exemple lors de l'enlèvement initial ou après un entreposage provisoire.
+  """
+  signEmissionForm(
+    "ID du BSDD"
+    id: ID!
+    "Informations liées à la signature du détenteur"
+    input: SignEmissionFormInput!
+    "Code de signature du détenteur, permettant de signer en son nom sans être authentifié"
+    securityCode: Int
+  ): Form!
+
+  """
+  Permet de signer pour le transporteur afin de valider l'enlèvement.
+  Par exemple lors de l'enlèvement initial ou après un entreposage provisoire.
+  """
+  signTransportForm(
+    "ID du BSDD"
+    id: ID!
+    "Informations liées à la signature du transporteur"
+    input: SignTransportFormInput!
+    "Code de signature du transporteur, permettant de signer en son nom sans être authentifié"
+    securityCode: Int
+  ): Form!
+
+  """
   Permet de transférer le déchet à un transporteur lors de la collecte initiale (signatures en case 8 et 9)
   ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
   Cette mutation doit être appelée avec le token du collecteur-transporteur.
@@ -140,7 +166,7 @@ type Mutation {
     id: ID!
     "Informations liées aux signatures transporteur et émetteur (case 8 et 9)"
     signingInfo: TransporterSignatureFormInput!
-  ): Form
+  ): Form @deprecated(reason: "Remplacé par signEmission et signTransport")
 
   "Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement"
   markAsTempStored(id: ID!, tempStoredInfos: TempStoredFormInput!): Form

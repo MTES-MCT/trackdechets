@@ -7,7 +7,8 @@ import MarkAsProcessed from "./MarkAsProcessed";
 import MarkAsTempStored from "./MarkAsTempStored";
 import MarkAsResealed from "./MarkAsResealed";
 import MarkAsTempStorerAccepted from "./MarkAsTempStorerAccepted";
-import SignedByTransporter from "./SignedByTransporter";
+import SignEmissionForm from "./SignEmissionForm";
+import SignTransportForm from "./SignTransportForm";
 import PrepareSegment from "./PrepareSegment";
 import MarkSegmentAsReadyToTakeOver from "./MarkSegmentAsReadyToTakeOver";
 import TakeOverSegment from "./TakeOverSegment";
@@ -26,8 +27,25 @@ export function WorkflowAction(props: WorkflowActionProps) {
     case FormStatus.Draft:
       return <MarkAsSealed {...props} />;
     case FormStatus.Sealed: {
-      if (siret === form.transporter?.company?.siret) {
-        return <SignedByTransporter {...props} />;
+      if (
+        [
+          form.emitter?.company?.siret,
+          form.ecoOrganisme?.siret,
+          form.transporter?.company?.siret,
+        ].includes(siret)
+      ) {
+        return <SignEmissionForm {...props} />;
+      }
+      return null;
+    }
+    case FormStatus.SignedByProducer: {
+      if (
+        [
+          form.emitter?.company?.siret,
+          form.transporter?.company?.siret,
+        ].includes(siret)
+      ) {
+        return <SignTransportForm {...props} />;
       }
       return null;
     }
@@ -82,8 +100,24 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.Resealed: {
-      if (siret === form.temporaryStorageDetail?.transporter?.company?.siret) {
-        return <SignedByTransporter {...props} />;
+      if (
+        [
+          form.recipient?.company?.siret,
+          form.temporaryStorageDetail?.transporter?.company?.siret,
+        ].includes(siret)
+      ) {
+        return <SignEmissionForm {...props} />;
+      }
+      return null;
+    }
+    case FormStatus.SignedByTempStorer: {
+      if (
+        [
+          form.emitter?.company?.siret,
+          form.transporter?.company?.siret,
+        ].includes(siret)
+      ) {
+        return <SignTransportForm {...props} />;
       }
       return null;
     }

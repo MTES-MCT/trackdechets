@@ -1,9 +1,0 @@
-mutation SignedByTransporter(
-  $id: ID!
-  $signingInfo: TransporterSignatureFormInput!
-) {
-  signedByTransporter(id: $id, signingInfo: $signingInfo) {
-    id
-    status
-  }
-}

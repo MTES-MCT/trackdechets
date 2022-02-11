@@ -7,6 +7,37 @@ input SentFormInput {
   sentBy: String!
 }
 
+input SignEmissionFormInput {
+  "Conditionnements"
+  packagingInfos: [PackagingInfoInput!]
+
+  "Quantité en tonnes"
+  quantity: Float!
+
+  "Code ONU"
+  onuCode: String
+
+  "Numéro de la plaque d'immatriculation transporteur"
+  transporterNumberPlate: String
+
+  "Date de signature de l'émetteur"
+  emittedAt: DateTime!
+
+  "Nom de la personne signant pour l'émetteur"
+  emittedBy: String!
+
+  "Si c'est l'éco-organisme qui a signé ou pas"
+  emittedByEcoOrganisme: Boolean
+}
+
+input SignTransportFormInput {
+  "Date de signature du transporteur"
+  takenOverAt: DateTime!
+
+  "Nom de la personne signant pour le transporteur"
+  takenOverBy: String!
+}
+
 "Payload de signature d'un BSD par un transporteur"
 input TransporterSignatureFormInput {
   "Date de l'envoi du déchet par l'émetteur (case 9)"

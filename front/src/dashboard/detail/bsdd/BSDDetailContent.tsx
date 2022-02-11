@@ -575,10 +575,10 @@ export default function BSDDetailContent({
                     )}
                     label="Quantité"
                   />
-                  <DateRow value={form.sentAt} label="Envoyé le" />
-                  <DetailRow value={form.sentBy} label="Envoyé par" />
+                  <DateRow value={form.takenOverAt} label="Envoyé le" />
+                  <DetailRow value={form.emittedBy} label="Envoyé par" />
                   <YesNoRow
-                    value={!!form.sentAt}
+                    value={!!form.emittedAt}
                     label="Signature producteur"
                   />
                 </div>
@@ -629,7 +629,10 @@ export default function BSDDetailContent({
                   value={form.signedByTransporter}
                   label="Signé par le transporteur"
                 />
-                <DateRow value={form.sentAt} label="Date de prise en charge" />
+                <DateRow
+                  value={form.takenOverAt}
+                  label="Date de prise en charge"
+                />
                 <DetailRow
                   value={getTransportModeLabel(form.transporter?.mode)}
                   label="Mode de transport"

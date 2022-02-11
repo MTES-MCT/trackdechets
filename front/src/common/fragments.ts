@@ -126,6 +126,10 @@ const brokerFragment = gql`
 
 export const temporaryStorageDetailFragment = gql`
   fragment TemporaryStorageDetailFragment on TemporaryStorageDetail {
+    emittedAt
+    emittedAt
+    takenOverAt
+    takenOverBy
     temporaryStorer {
       quantityType
       quantityReceived
@@ -222,6 +226,11 @@ const mutableFieldsFragment = gql`
     id
     customId
     sentAt
+    emittedAt
+    emittedBy
+    emittedByEcoOrganisme
+    takenOverAt
+    takenOverBy
     emitter {
       ...EmitterFragment
     }
