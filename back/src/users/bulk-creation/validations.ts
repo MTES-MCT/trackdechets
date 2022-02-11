@@ -3,6 +3,7 @@ import * as yup from "yup";
 import prisma from "../../prisma";
 import { getCompanyThrottled } from "./sirene";
 import { CompanyRow } from "./types";
+import { opts } from ".";
 
 /**
  * Validation schema for company
@@ -17,7 +18,7 @@ export const companyValidationSchema = yup.object({
       "Siret ${value} was not found in SIRENE database",
       async value => {
         try {
-          await getCompanyThrottled(value);
+          await getCompanyThrottled(value, opts);
           return true;
         } catch (err) {
           return false;
