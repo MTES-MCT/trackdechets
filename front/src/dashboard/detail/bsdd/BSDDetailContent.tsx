@@ -45,6 +45,7 @@ import {
 import { WorkflowAction } from "dashboard/components/BSDList";
 import EditSegment from "./EditSegment";
 import { Loader } from "common/components";
+import { isDangerous } from "generated/constants";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -383,7 +384,7 @@ export default function BSDDetailContent({
               <dt>Code déchet</dt>
               <dd>
                 {form.wasteDetails?.code}
-                {form.wasteDetails?.code?.indexOf("*") === -1 &&
+                {isDangerous(form.wasteDetails?.code ?? "") &&
                   form.wasteDetails?.isDangerous &&
                   " (dangereux)"}
               </dd>

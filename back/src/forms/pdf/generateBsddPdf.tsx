@@ -5,7 +5,6 @@ import {
   Consistence,
   QuantityType,
   WasteAcceptationStatus,
-  TransportMode,
   EmitterType
 } from "@prisma/client";
 import * as QRCode from "qrcode";

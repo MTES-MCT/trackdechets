@@ -22,14 +22,11 @@ export default connect<{}, Values>(function WasteInfo(props) {
   if (!values.wasteDetails.packagings) {
     values.wasteDetails.packagings = [];
   }
-
-  const hasAsterisk = values.wasteDetails.code.indexOf("*") > -1;
-
   React.useEffect(() => {
-    if (hasAsterisk) {
+    if (isDangerous(values.wasteDetails.code)) {
       setFieldValue("wasteDetails.isDangerous", true);
     }
-  }, [hasAsterisk, setFieldValue]);
+  }, [values.wasteDetails.code, setFieldValue]);
 
   return (
     <>
@@ -60,7 +57,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
           type="checkbox"
           component={FieldSwitch}
           name="wasteDetails.isDangerous"
-          disabled={hasAsterisk}
+          disabled={isDangerous(values.wasteDetails.code)}
           label={
             <span>
               Le déchet est{" "}

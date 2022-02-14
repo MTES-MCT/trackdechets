@@ -26,7 +26,6 @@ function formatWasteCode(wasteCode: string) {
 export function WasteCodeSelect({ field, form }: FieldProps) {
   const [openModal, setOpenModal] = useState(false);
 
-  const isDangerous = field.value.indexOf("*") > -1;
   const waste = WASTES.find(waste => waste.code === field.value);
 
   return (
