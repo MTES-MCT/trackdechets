@@ -175,6 +175,7 @@ const formdata = {
   traderCompanyContact: "",
   brokerCompanyContact: "",
   wasteDetailsCode: "05 01 04*",
+  wasteDetailsIsDangerous: true,
   processedBy: null,
   recipientCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
   transporterDepartment: "86",
