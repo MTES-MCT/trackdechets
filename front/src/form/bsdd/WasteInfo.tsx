@@ -17,7 +17,7 @@ type Values = {
   emitter: { company: { siret: string }; type: string };
 };
 export default connect<{}, Values>(function WasteInfo(props) {
-  const { values, errors, setFieldValue } = props.formik;
+  const { values, setFieldValue } = props.formik;
 
   if (!values.wasteDetails.packagings) {
     values.wasteDetails.packagings = [];

@@ -384,7 +384,7 @@ export default function BSDDetailContent({
               <dt>Code déchet</dt>
               <dd>
                 {form.wasteDetails?.code}
-                {isDangerous(form.wasteDetails?.code ?? "") &&
+                {!isDangerous(form.wasteDetails?.code ?? "") &&
                   form.wasteDetails?.isDangerous &&
                   " (dangereux)"}
               </dd>
