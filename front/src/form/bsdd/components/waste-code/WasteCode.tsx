@@ -1,26 +1,34 @@
-import { useField, useFormikContext } from "formik";
-import React, { useEffect, useState } from "react";
+import { FieldProps } from "formik";
+import React, { useState, ChangeEvent } from "react";
 import { WASTES } from "generated/constants";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import WasteTreeModal from "search/WasteTreeModal";
-import formatWasteCodeEffect from "./format-waste-code.effect";
 import styles from "./WasteCode.module.scss";
 
-export function WasteCode(props) {
-  const [field, meta] = useField(props);
-  const { setFieldValue } = useFormikContext();
+function formatWasteCode(wasteCode: string) {
+  if (!wasteCode) {
+    return wasteCode;
+  }
+  const trimmed = wasteCode.trim();
+  const stringLength = trimmed.length;
+  if (
+    [3, 6].indexOf(stringLength) > -1 &&
+    wasteCode[stringLength - 1] !== " "
+  ) {
+    return `${wasteCode.substr(0, stringLength - 1)} ${wasteCode.substr(
+      stringLength - 1,
+      1
+    )}`;
+  }
+  return trimmed;
+}
 
-  const [wasteCode, setWasteCode] = useState(field.value);
-
-  useEffect(() => {
-    setFieldValue(field.name, wasteCode);
-    formatWasteCodeEffect(wasteCode, setWasteCode);
-  }, [wasteCode, field.name, setFieldValue]);
-
-  const wasteCodeDetail = WASTES.find(waste => waste.code === wasteCode);
-  const isDangerous = wasteCode.indexOf("*") > -1;
-
+export function WasteCodeSelect({ field, form }: FieldProps) {
   const [openModal, setOpenModal] = useState(false);
+
+  const isDangerous = field.value.indexOf("*") > -1;
+  const waste = WASTES.find(waste => waste.code === field.value);
+
   return (
     <div>
       <div className={styles.textQuote}>
@@ -31,7 +39,9 @@ export function WasteCode(props) {
             <WasteTreeModal
               open={openModal}
               onClose={() => setOpenModal(false)}
-              onSelect={codes => setWasteCode(codes[0])}
+              onSelect={codes => {
+                form.setFieldValue(field.name, codes[0]);
+              }}
             />
           </li>
           <li>Pour les codes déchets dangereux n'oubliez pas l'astérisque</li>
@@ -42,14 +52,13 @@ export function WasteCode(props) {
         Code déchet
         <div className={styles.wasteCodeWidgets}>
           <input
+            {...field}
             type="text"
-            name={field.name}
-            value={wasteCode}
-            className={`td-input ${styles.wasteCodeInput} ${
-              meta.touched && meta.error && styles.inputError
-            }`}
-            onBlur={field.onBlur}
-            onChange={e => setWasteCode(e.target.value)}
+            className={`td-input ${styles.wasteCodeInput}`}
+            onChange={e => {
+              e.target.value = formatWasteCode(e.target.value);
+              field.onChange(e);
+            }}
           />
           <button
             type="button"
@@ -63,11 +72,10 @@ export function WasteCode(props) {
 
       <RedErrorMessage name={field.name} />
 
-      {wasteCodeDetail && (
+      {field.value && (
         <div className="notification success tw-mt-2">
-          Vous avez sélectionné le code déchet{" "}
-          <strong>{isDangerous ? "dangereux" : "non dangereux"}</strong>{" "}
-          suivant: <em>{wasteCodeDetail.description}</em>
+          Vous avez sélectionné le code déchet suivant:{" "}
+          <em>{waste?.description}</em>
         </div>
       )}
     </div>

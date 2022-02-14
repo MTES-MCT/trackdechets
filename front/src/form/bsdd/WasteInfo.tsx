@@ -9,7 +9,7 @@ import React from "react";
 import AppendixInfo from "./components/appendix/AppendixInfo";
 import FormsSelector from "./components/appendix/FormsSelector";
 import Packagings from "./components/packagings/Packagings";
-import { WasteCode, wasteCodeValidator } from "./components/waste-code";
+import { WasteCodeSelect, wasteCodeValidator } from "./components/waste-code";
 import "./WasteInfo.scss";
 
 type Values = {
@@ -17,17 +17,29 @@ type Values = {
   emitter: { company: { siret: string }; type: string };
 };
 export default connect<{}, Values>(function WasteInfo(props) {
-  const values = props.formik.values;
+  const { values, errors, setFieldValue } = props.formik;
 
   if (!values.wasteDetails.packagings) {
     values.wasteDetails.packagings = [];
   }
 
+  const hasAsterisk = values.wasteDetails.code.indexOf("*") > -1;
+
+  React.useEffect(() => {
+    if (hasAsterisk) {
+      setFieldValue("wasteDetails.isDangerous", true);
+    }
+  }, [hasAsterisk, setFieldValue]);
+
   return (
     <>
       <h4 className="form__section-heading">Description du déchet</h4>
       <div className="form__row">
-        <WasteCode name="wasteDetails.code" validate={wasteCodeValidator} />
+        <Field
+          name="wasteDetails.code"
+          component={WasteCodeSelect}
+          validate={wasteCodeValidator}
+        />
       </div>
 
       <div className="form__row">
@@ -47,20 +59,52 @@ export default connect<{}, Values>(function WasteInfo(props) {
         <Field
           type="checkbox"
           component={FieldSwitch}
-          name="wasteDetails.pop"
-          label="Le déchet contient des polluants organiques persistants"
+          name="wasteDetails.isDangerous"
+          disabled={hasAsterisk}
+          label={
+            <span>
+              Le déchet est{" "}
+              <a
+                className="tw-underline"
+                href="https://www.ecologie.gouv.fr/dechets-dangereux"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                dangereux
+              </a>
+            </span>
+          }
         />
-        <a
-          className="link tw-ml-2"
-          href="https://www.ecologique-solidaire.gouv.fr/polluants-organiques-persistants-pop"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <div className="tw-ml-1">
+          <Tooltip msg="Certains déchets avec un code sans astérisque peuvent, selon les cas, être dangereux ou non dangereux." />
+        </div>
+      </div>
+
+      <div className="form__row" style={{ flexDirection: "row" }}>
+        <Field
+          type="checkbox"
+          component={FieldSwitch}
+          name="wasteDetails.pop"
+          label={
+            <span>
+              Le déchet contient des{" "}
+              <a
+                className="tw-underline"
+                href="https://www.ecologique-solidaire.gouv.fr/polluants-organiques-persistants-pop"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                polluants organiques persistants
+              </a>
+            </span>
+          }
+        />
+        <div className="tw-ml-1">
           <Tooltip
             msg="Le terme POP recouvre un ensemble de substances organiques qui
         possèdent 4 propriétés : persistantes, bioaccumulables, toxiques et mobiles."
           />
-        </a>
+        </div>
       </div>
 
       {values.emitter.type === "APPENDIX1" && <AppendixInfo />}
