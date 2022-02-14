@@ -417,11 +417,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               Déchet dangereux :{" "}
               <input
                 type="checkbox"
-                checked={
-                  form.wasteDetails?.code
-                    ? isDangerous(form.wasteDetails?.code)
-                    : false
-                }
+                checked={form.wasteDetails?.isDangerous}
                 readOnly
               />{" "}
               oui{" "}
