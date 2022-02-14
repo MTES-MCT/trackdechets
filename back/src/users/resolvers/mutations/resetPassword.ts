@@ -1,44 +1,53 @@
-import crypto from "crypto";
-import { promisify } from "util";
-import prisma from "../../../prisma";
-import { sendMail } from "../../../mailer/mailing";
-import { MutationResolvers } from "../../../generated/graphql/types";
-
-import { renderMail } from "../../../mailer/templates/renderers";
-import { resetPassword } from "../../../mailer/templates";
 import { UserInputError } from "apollo-server-express";
-import { sanitizeEmail } from "../../../utils";
 
+import prisma from "../../../prisma";
+
+import {
+  MutationResetPasswordArgs,
+  MutationResolvers
+} from "../../../generated/graphql/types";
+import { hashPassword, isPasswordLongEnough } from "../../utils";
+
+/**
+ * Update user password in a password reset workflow
+ *
+ * query the reset hash
+ * check it is not expired
+ * check password is long enough
+ * update user password
+ * delete userResetPasswordHash
+ * throw UserInputError if any step fails
+ */
 const resetPasswordResolver: MutationResolvers["resetPassword"] = async (
   parent,
-  { email }
+  { newPassword, hash }: MutationResetPasswordArgs
 ) => {
-  const user = await prisma.user.findUnique({
-    where: { email: sanitizeEmail(email) }
+  const now = new Date();
+  const resetHash = await prisma.userResetPasswordHash.findUnique({
+    where: { hash }
   });
-  if (!user) {
-    throw new UserInputError(`Cet email n'existe pas sur notre plateforme.`);
+
+  if (!resetHash || resetHash.hashExpires < now) {
+    throw new UserInputError("Lien invalide ou trop ancien.");
   }
-  const resetHash = (await promisify(crypto.randomBytes)(20)).toString("hex");
-  const expirationDelta = 3600 * 1000; // one hour
-  const hashExpires = new Date(Date.now() + expirationDelta);
-
-  await prisma.userResetPasswordHash.create({
-    data: {
-      hash: resetHash,
-      hashExpires,
-      user: { connect: { id: user.id } }
-    }
+  const trimmedPassword = newPassword.trim();
+  if (!isPasswordLongEnough(trimmedPassword)) {
+    throw new UserInputError("Mot de passe trop court.");
+  }
+  const user = await prisma.user.findUnique({
+    where: { id: resetHash.userId }
   });
 
-  const mail = renderMail(resetPassword, {
-    to: [{ email: user.email, name: user.name }],
-    variables: {
-      resetHash
-    }
-  });
+  const hashedPassword = await hashPassword(trimmedPassword);
 
-  await sendMail(mail);
+  await prisma.user.update({
+    where: { id: user.id },
+
+    data: { password: hashedPassword }
+  });
+  await prisma.userResetPasswordHash.delete({
+    where: { hash }
+  });
   return true;
 };
 

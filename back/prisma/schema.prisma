@@ -685,12 +685,12 @@ model UserActivationHash {
 model UserResetPasswordHash {
   id          String   @id @default(cuid())
   hash        String   @unique
-  hashExpires DateTime @updatedAt
+  hashExpires DateTime
   createdAt   DateTime @default(now())
   userId      String
   user        User     @relation(fields: [userId], references: [id])
 
-  @@index([userId], map: "UserResetPasswordHashIdIdx")
+  @@index([userId], map: "_UserResetPasswordHashIdIdx")
 }
 
 // ----------------

@@ -21,13 +21,13 @@ type Mutation {
   USAGE INTERNE
   Envoie un email pour la réinitialisation du mot de passe
   """
-  resetPassword(email: String!): Boolean!
+  createPasswordResetRequest(email: String!): Boolean!
 
   """
   USAGE INTERNE
-  Envoie un email pour la réinitialisation du mot de passe
+  Met à jour le mot de passe de l'utilisateur correspondant au hash
   """
-  updatePassword(newPassword: String!, hash: String!): Boolean!
+  resetPassword(newPassword: String!, hash: String!): Boolean!
 
   """
   USAGE INTERNE

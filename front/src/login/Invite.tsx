@@ -21,7 +21,6 @@ import { NotificationError } from "common/components/Error";
 import routes from "common/routes";
 import PasswordMeter from "common/components/PasswordMeter";
 import RedErrorMessage from "common/components/RedErrorMessage";
-import styles from "./Invite.module.scss";
 import * as queryString from "query-string";
 import { decodeHash } from "common/helper";
 
@@ -250,7 +249,7 @@ export default function Invite() {
                             </i>
                           </div>
                           <span
-                            className={styles.showPassword}
+                            className="showPassword"
                             onClick={() =>
                               setPasswordType(
                                 passwordType === "password"

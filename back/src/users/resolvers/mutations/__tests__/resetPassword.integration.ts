@@ -3,11 +3,11 @@ import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
-
 import { compare } from "bcrypt";
-const UPDATE_PASSWORD = `
-  mutation UpdatePassword($newPassword: String! ,$hash: String! ){
-    updatePassword(newPassword:$newPassword, hash: $hash )
+
+const RESET_PASSWORD = `
+  mutation ResetPassword($newPassword: String! ,$hash: String! ){
+    resetPassword(newPassword:$newPassword, hash: $hash )
   }
 `;
 
@@ -28,14 +28,14 @@ describe("mutation resetPassword", () => {
 
     const { mutate } = makeClient();
 
-    const { data } = await mutate<Pick<Mutation, "updatePassword">>(
-      UPDATE_PASSWORD,
+    const { data } = await mutate<Pick<Mutation, "resetPassword">>(
+      RESET_PASSWORD,
       {
         variables: { hash: "abcdef", newPassword }
       }
     );
     // gql response
-    expect(data.updatePassword).toEqual(true);
+    expect(data.resetPassword).toEqual(true);
 
     // hash deleted
     const resetHashExists = await prisma.userResetPasswordHash.count({
@@ -66,8 +66,8 @@ describe("mutation resetPassword", () => {
     const oldPasswordHash = user.password;
     const { mutate } = makeClient();
 
-    const { errors } = await mutate<Pick<Mutation, "updatePassword">>(
-      UPDATE_PASSWORD,
+    const { errors } = await mutate<Pick<Mutation, "resetPassword">>(
+      RESET_PASSWORD,
       {
         variables: { hash: "qsdfgh", newPassword }
       }
@@ -108,8 +108,8 @@ describe("mutation resetPassword", () => {
     const oldPasswordHash = user.password;
     const { mutate } = makeClient();
 
-    const { errors } = await mutate<Pick<Mutation, "updatePassword">>(
-      UPDATE_PASSWORD,
+    const { errors } = await mutate<Pick<Mutation, "resetPassword">>(
+      RESET_PASSWORD,
       {
         variables: { hash: "nbvcxw", newPassword }
       }
@@ -150,8 +150,8 @@ describe("mutation resetPassword", () => {
     const oldPasswordHash = user.password;
     const { mutate } = makeClient();
 
-    const { errors } = await mutate<Pick<Mutation, "updatePassword">>(
-      UPDATE_PASSWORD,
+    const { errors } = await mutate<Pick<Mutation, "resetPassword">>(
+      RESET_PASSWORD,
       {
         variables: { hash: "fghjkl", newPassword }
       }

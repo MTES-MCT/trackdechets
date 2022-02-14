@@ -56,7 +56,7 @@ export const onboardingProfessionalSecondStep: MailTemplate = {
   templateId: templateIds.PROFESSIONAL_SECOND_ONBOARDING
 };
 
-export const resetPassword: MailTemplate<{
+export const createPasswordResetRequest: MailTemplate<{
   resetHash: string;
 }> = {
   subject: "Ré-initialisation du mot de passe",

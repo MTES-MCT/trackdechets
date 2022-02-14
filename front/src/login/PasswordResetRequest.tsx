@@ -1,19 +1,22 @@
 import { useMutation, gql } from "@apollo/client";
 import React, { useState } from "react";
 import { NotificationError } from "../common/components/Error";
-import { Mutation, MutationResetPasswordArgs } from "generated/graphql/types";
+import {
+  Mutation,
+  MutationCreatePasswordResetRequestArgs,
+} from "generated/graphql/types";
 
 const RESET_PASSWORD = gql`
-  mutation ResetPassword($email: String!) {
-    resetPassword(email: $email)
+  mutation CreatePasswordResetRequest($email: String!) {
+    createPasswordResetRequest(email: $email)
   }
 `;
-export default function ResetPassword() {
+export default function PasswordResetRequest() {
   const [email, setEmail] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  const [resetPassword, { error }] = useMutation<
-    Pick<Mutation, "resetPassword">,
-    MutationResetPasswordArgs
+  const [createPasswordResetReques, { error }] = useMutation<
+    Pick<Mutation, "createPasswordResetRequest">,
+    MutationCreatePasswordResetRequestArgs
   >(RESET_PASSWORD);
   return (
     <section className="section section--white">
@@ -21,7 +24,7 @@ export default function ResetPassword() {
         <form
           onSubmit={e => {
             e.preventDefault();
-            resetPassword({ variables: { email } }).then(_ =>
+            createPasswordResetReques({ variables: { email } }).then(_ =>
               setShowSuccess(true)
             );
             setShowSuccess(false);

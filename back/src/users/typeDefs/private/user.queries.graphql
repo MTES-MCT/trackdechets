@@ -26,8 +26,7 @@ type Query {
 
   """
   USAGE INTERNE
-  Vérifie la validité d'un lien de changement de mot de passe
-  par son hash
+  Vérifie la validité d'un lien de changement de mot de passe par son hash
   """
-  resetPassword(hash: String!): Boolean!
+  passwordResetRequest(hash: String!): ID
 }

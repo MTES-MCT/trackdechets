@@ -4,20 +4,20 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
 import * as mailsHelper from "../../../../mailer/mailing";
-import { resetPassword } from "../../../../mailer/templates";
+import { createPasswordResetRequest } from "../../../../mailer/templates";
 import { renderMail } from "../../../../mailer/templates/renderers";
 
 // Mails spy
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
 
-const RESET_PASSWORD = `
-  mutation ResetPassword($email: String! ){
-    resetPassword(email: $email )
+const CREATE_PASSWORD_RESET_REQUEST = `
+  mutation CreatePasswordResetRequest($email: String! ){
+    createPasswordResetRequest(email: $email )
   }
 `;
 
-describe("mutation resetPassword", () => {
+describe("mutation createPasswordResetRequest", () => {
   afterAll(resetDatabase);
   afterEach(sendMailSpy.mockClear);
 
@@ -25,13 +25,13 @@ describe("mutation resetPassword", () => {
     const user = await userFactory();
     const { mutate } = makeClient();
 
-    const { data } = await mutate<Pick<Mutation, "resetPassword">>(
-      RESET_PASSWORD,
+    const { data } = await mutate<Pick<Mutation, "createPasswordResetRequest">>(
+      CREATE_PASSWORD_RESET_REQUEST,
       {
         variables: { email: user.email }
       }
     );
-    expect(data.resetPassword).toEqual(true);
+    expect(data.createPasswordResetRequest).toEqual(true);
 
     const resetHash = await prisma.userResetPasswordHash.findFirst({
       where: { userId: user.id }
@@ -44,7 +44,7 @@ describe("mutation resetPassword", () => {
 
     expect(sendMailSpy).toHaveBeenNthCalledWith(
       1,
-      renderMail(resetPassword, {
+      renderMail(createPasswordResetRequest, {
         to: [{ email: user.email, name: user.name }],
         variables: {
           resetHash: resetHash.hash

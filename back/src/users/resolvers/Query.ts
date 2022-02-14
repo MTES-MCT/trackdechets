@@ -6,7 +6,7 @@ import membershipRequest from "./queries/membershipRequest";
 import myCompanies from "./queries/myCompanies";
 import authorizedApplications from "./queries/authorizedApplications";
 import accessTokens from "./queries/accessTokens";
-import resetPassword from "./queries/resetPassword";
+import passwordResetRequest from "./queries/passwordResetRequest";
 
 const Query: QueryResolvers = {
   me,
@@ -16,7 +16,7 @@ const Query: QueryResolvers = {
   myCompanies,
   authorizedApplications,
   accessTokens,
-  resetPassword
+  passwordResetRequest
 };
 
 export default Query;

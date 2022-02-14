@@ -13,7 +13,7 @@ CREATE TABLE "default$default"."UserResetPasswordHash" (
 CREATE UNIQUE INDEX "UserResetPasswordHash_hash_key" ON "default$default"."UserResetPasswordHash"("hash");
 
 -- CreateIndex
-CREATE INDEX "UserResetPasswordHashIdIdx" ON "default$default"."UserResetPasswordHash"("userId");
+CREATE INDEX "_UserResetPasswordHashIdIdx" ON "default$default"."UserResetPasswordHash"("userId");
 
 -- AddForeignKey
 ALTER TABLE "default$default"."UserResetPasswordHash" ADD CONSTRAINT "UserResetPasswordHash_userId_fkey" FOREIGN KEY ("userId") REFERENCES "default$default"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

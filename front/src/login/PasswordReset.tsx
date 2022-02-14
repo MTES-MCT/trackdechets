@@ -6,7 +6,7 @@ import { useLocation, Link } from "react-router-dom";
 import { decodeHash } from "common/helper";
 import {
   Mutation,
-  MutationUpdatePasswordArgs,
+  MutationResetPasswordArgs,
   Query,
 } from "../generated/graphql/types";
 import Loader from "common/components/Loaders";
@@ -17,19 +17,19 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import { IconLock1, IconView } from "common/components/Icons";
 import routes from "common/routes";
 
+const PASSWORD_RESET_REQUEST = gql`
+  query PasswordResetRequest($hash: String!) {
+    passwordResetRequest(hash: $hash)
+  }
+`;
+
 const RESET_PASSWORD = gql`
-  query ResetPassword($hash: String!) {
-    resetPassword(hash: $hash)
+  mutation ResetPassword($hash: String!, $newPassword: String!) {
+    resetPassword(hash: $hash, newPassword: $newPassword)
   }
 `;
 
-const UPDATE_PASSWORD = gql`
-  mutation UpdatePassword($hash: String!, $newPassword: String!) {
-    updatePassword(hash: $hash, newPassword: $newPassword)
-  }
-`;
-
-export default function ResetPasswordForm() {
+export default function PasswordReset() {
   const [passwordType, setPasswordType] = useState("password");
 
   // parse qs and get rid of extra parameters
@@ -39,17 +39,17 @@ export default function ResetPasswordForm() {
 
   // CHECK RESET LINK QUERY
   const { loading, error: queryError, data: queryData } = useQuery<
-    Pick<Query, "resetPassword">
-  >(RESET_PASSWORD, {
+    Pick<Query, "passwordResetRequest">
+  >(PASSWORD_RESET_REQUEST, {
     variables: { hash },
   });
 
   // UPDATE PASSWORD MUTATION
   const [
-    updatePassword,
+    resetPassword,
     { error: mutationError, data: mutationData },
-  ] = useMutation<Pick<Mutation, "updatePassword">, MutationUpdatePasswordArgs>(
-    UPDATE_PASSWORD
+  ] = useMutation<Pick<Mutation, "resetPassword">, MutationResetPasswordArgs>(
+    RESET_PASSWORD
   );
 
   if (loading) {
@@ -59,7 +59,7 @@ export default function ResetPasswordForm() {
   if (queryError) {
     return <NotificationError apolloError={queryError} />;
   }
-  if (!queryData?.resetPassword) {
+  if (!queryData?.passwordResetRequest) {
     return (
       <section className="section section-white">
         <div className="container-narrow">
@@ -77,7 +77,7 @@ export default function ResetPasswordForm() {
     );
   }
   if (mutationData) {
-    return <PasswordChangedConfirmation />;
+    return <PasswordChangedSuccess />;
   }
 
   return (
@@ -93,7 +93,7 @@ export default function ResetPasswordForm() {
       })}
       onSubmit={(values, { setSubmitting }) => {
         const { password } = values;
-        updatePassword({ variables: { newPassword: password, hash } }).then(_ =>
+        resetPassword({ variables: { newPassword: password, hash } }).then(_ =>
           setSubmitting(false)
         );
       }}
@@ -104,7 +104,7 @@ export default function ResetPasswordForm() {
             <Form>
               <h1 className="h1 tw-my-4">Changement de mot de passe</h1>
               <p className="body-text">
-                Veuiller entrer votre nouveau mot de apsse pour le mettre à
+                Veuiller entrer votre nouveau mot de passe pour le mettre à
                 jour.
               </p>
               <div>
@@ -129,7 +129,7 @@ export default function ResetPasswordForm() {
                             </i>
                           </div>
                           <span
-                            // className={styles.showPassword}
+                            className="showPassword"
                             onClick={() =>
                               setPasswordType(
                                 passwordType === "password"
@@ -166,25 +166,23 @@ export default function ResetPasswordForm() {
   );
 }
 
-function PasswordChangedConfirmation() {
-  return (
-    <div className="container-narrow">
-      <section className="section section-white">
-        <h2 className="h2 tw-my-4">Mot de passe mis à jour</h2>
-        <p className="body-text">
-          Votre mot de passe a été mis à jour avec succès.
-        </p>
+const PasswordChangedSuccess = () => (
+  <div className="container-narrow">
+    <section className="section section-white">
+      <h2 className="h2 tw-my-4">Mot de passe mis à jour</h2>
+      <p className="body-text">
+        Votre mot de passe a été mis à jour avec succès.
+      </p>
 
-        <p className="body-text">
-          Connectez-vous à votre compte pour accéder à votre tableau de bord et
-          accéder aux bordereaux de ces établissements.
-        </p>
-        <div className="form__actions">
-          <Link to={routes.login} className="btn btn--primary">
-            Se connecter
-          </Link>
-        </div>
-      </section>
-    </div>
-  );
-}
+      <p className="body-text">
+        Connectez-vous à votre compte pour accéder à votre tableau de bord et
+        accéder aux bordereaux de ces établissements.
+      </p>
+      <div className="form__actions">
+        <Link to={routes.login} className="btn btn--primary">
+          Se connecter
+        </Link>
+      </div>
+    </section>
+  </div>
+);

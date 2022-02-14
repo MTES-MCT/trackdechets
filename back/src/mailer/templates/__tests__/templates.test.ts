@@ -3,7 +3,7 @@ import {
   onSignup,
   inviteUserToJoin,
   notifyUserOfInvite,
-  resetPassword,
+  createPasswordResetRequest,
   formNotAccepted,
   formPartiallyRefused,
   membershipRequestConfirmation,
@@ -59,9 +59,9 @@ describe("templates", () => {
     expect(rendered.body).toContain(companyName);
   });
 
-  test("resetPassword", () => {
+  test("createPasswordResetRequest", () => {
     const resetHash = "secret";
-    const rendered = renderMail(resetPassword, {
+    const rendered = renderMail(createPasswordResetRequest, {
       variables: { resetHash },
       to
     });
