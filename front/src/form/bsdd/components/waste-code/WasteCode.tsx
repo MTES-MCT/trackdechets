@@ -1,5 +1,5 @@
 import { FieldProps } from "formik";
-import React, { useState, ChangeEvent } from "react";
+import React, { useState } from "react";
 import { WASTES } from "generated/constants";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import WasteTreeModal from "search/WasteTreeModal";

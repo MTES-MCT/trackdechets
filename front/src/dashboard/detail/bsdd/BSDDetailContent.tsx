@@ -381,7 +381,12 @@ export default function BSDDetailContent({
                 label="Dernière action sur le BSD"
               />
               <dt>Code déchet</dt>
-              <dd>{form.wasteDetails?.code}</dd>
+              <dd>
+                {form.wasteDetails?.code}
+                {form.wasteDetails?.code?.indexOf("*") === -1 &&
+                  form.wasteDetails?.isDangerous &&
+                  " (dangereux)"}
+              </dd>
               <DetailRow value={form.wasteDetails?.name} label="Nom usuel" />
               <dt>Quantité</dt>
               <dd>{form.stateSummary?.quantity ?? "?"} tonnes</dd>
