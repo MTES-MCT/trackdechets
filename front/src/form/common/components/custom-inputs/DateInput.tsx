@@ -29,7 +29,10 @@ export default function DateInput({
       dateFormat="dd/MM/yyyy"
       selected={value ? parseDate(value) : null}
       onChange={(value: Date | null) => {
-        setFieldValue(field.name, value?.toISOString() ?? null);
+        const utcDate = value
+          ? new Date(value.getTime() - value.getTimezoneOffset() * 60000)
+          : null;
+        setFieldValue(field.name, utcDate?.toISOString() ?? null);
       }}
     />
   );
