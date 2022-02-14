@@ -44,9 +44,9 @@ const authorizedApplicationsResolver: QueryResolvers["authorizedApplications"] =
             [application.id]: {
               id: application.id,
               name: application.name,
-              admin: application.admin.email,
+              admin: application.admin?.email,
               logoUrl: application.logoUrl,
-              lastConnection: accessToken.lastUsed
+              lastConnection: new Date(accessToken.lastUsed)
             }
           };
         }

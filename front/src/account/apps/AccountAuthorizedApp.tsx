@@ -33,7 +33,9 @@ export default function AccountAuthorizedApp({
             ) : (
               <span>Jamais utilisé</span>
             )}{" "}
-            - <span>Administré par {authorizedApplication.admin}</span>
+            {authorizedApplication.admin && (
+              <span> - Administré par {authorizedApplication.admin}</span>
+            )}
           </div>
         </div>
         <button className="btn btn--danger" onClick={() => setIsDeleting(true)}>
