@@ -371,7 +371,7 @@ function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
  */
 export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
   return client.index({
-    index: index.alias,
+    index: index.index,
     type: index.type,
     id: bsd.id,
     body: bsd,
