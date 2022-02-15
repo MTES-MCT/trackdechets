@@ -113,3 +113,12 @@ export function removeEmptyKeys<T>(obj: Object): Partial<T> | undefined {
 
   return Object.keys(newObject).length !== 0 ? newObject : undefined;
 }
+
+export const decodeHash = (hash: string | string[] | null): string => {
+  if (!hash) {
+    return "";
+  }
+  return Array.isArray(hash)
+    ? decodeURIComponent(hash[0])
+    : decodeURIComponent(hash);
+};

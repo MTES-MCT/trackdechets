@@ -13,7 +13,6 @@ import { NotificationError } from "common/components/Error";
 import PasswordMeter from "common/components/PasswordMeter";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import { SIGNUP } from "./mutations";
-import styles from "./Signup.module.scss";
 import { Wizard } from "./Wizard";
 import { Mutation, MutationSignupArgs } from "generated/graphql/types";
 import routes from "common/routes";
@@ -162,7 +161,7 @@ export default function Signup() {
                           </i>
                         </div>
                         <span
-                          className={styles.showPassword}
+                          className="showPassword"
                           onClick={() =>
                             setPasswordType(
                               passwordType === "password" ? "text" : "password"
