@@ -765,4 +765,23 @@ describe("Mutation.createForm", () => {
       })
     ]);
   });
+
+  it("should be possible to set `isDangerous=true` with a code not containing *", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          wasteDetails: { code: "20 03 01", isDangerous: true }
+        }
+      }
+    });
+    expect(data.createForm.wasteDetails.isDangerous).toBe(true);
+  });
 });

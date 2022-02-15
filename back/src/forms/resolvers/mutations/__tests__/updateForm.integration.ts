@@ -18,6 +18,7 @@ const UPDATE_FORM = `
       wasteDetails {
         name
         code
+        isDangerous
       }
       recipient {
         company {
@@ -831,5 +832,30 @@ describe("Mutation.updateForm", () => {
           "Un déchet avec un code comportant un astérisque est forcément dangereux"
       })
     ]);
+  });
+
+  it("should be possible to set isDangerous=true with a waste code without *", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        wasteDetailsCode: "20 03 01",
+        wasteDetailsIsDangerous: false
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      wasteDetails: {
+        isDangerous: true
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    expect(data.updateForm.wasteDetails.isDangerous).toBe(true);
   });
 });
