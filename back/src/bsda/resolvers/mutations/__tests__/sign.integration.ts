@@ -694,5 +694,37 @@ describe("Mutation.Bsda.sign", () => {
       });
       expect(newBsda2.status).toEqual(BsdaStatus.PROCESSED);
     });
+
+    it("should throw an error when the emitter tries to sign a COLLECTION_2710 bsda", async () => {
+      const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          status: "INITIAL",
+          type: "COLLECTION_2710"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            author: user.name,
+            type: "EMISSION"
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Ce type de bordereau ne peut être signé qu'à la réception par la déchetterie."
+        })
+      ]);
+    });
   });
 });

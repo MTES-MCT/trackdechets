@@ -319,12 +319,14 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             <span className={styles.detailTabCaption}>Producteur</span>
           </Tab>
 
-          <Tab className={styles.detailTab}>
-            <IconWaterDam size="25px" />
-            <span className={styles.detailTabCaption}>
-              Entreprise de travaux
-            </span>
-          </Tab>
+          {!!form?.worker?.company?.name && (
+            <Tab className={styles.detailTab}>
+              <IconWaterDam size="25px" />
+              <span className={styles.detailTabCaption}>
+                Entreprise de travaux
+              </span>
+            </Tab>
+          )}
 
           {!!form?.broker?.company?.name && (
             <Tab className={styles.detailTab}>
@@ -333,12 +335,14 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             </Tab>
           )}
 
-          <Tab className={styles.detailTab}>
-            <IconWarehouseDelivery size="25px" />
-            <span className={styles.detailTabCaption}>
-              <span> Transporteur</span>
-            </span>
-          </Tab>
+          {!!form?.transporter?.company?.name && (
+            <Tab className={styles.detailTab}>
+              <IconWarehouseDelivery size="25px" />
+              <span className={styles.detailTabCaption}>
+                <span> Transporteur</span>
+              </span>
+            </Tab>
+          )}
 
           <Tab className={styles.detailTab}>
             <IconRenewableEnergyEarth size="25px" />
@@ -353,9 +357,11 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
           </TabPanel>
 
           {/* Worker tab panel */}
-          <TabPanel className={styles.detailTabPanel}>
-            <Worker form={form} />
-          </TabPanel>
+          {!!form?.worker?.company?.name && (
+            <TabPanel className={styles.detailTabPanel}>
+              <Worker form={form} />
+            </TabPanel>
+          )}
 
           {/* Broker tab panel */}
           {!!form?.broker?.company?.name && (
@@ -365,9 +371,11 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
           )}
 
           {/* Transporter tab panel */}
-          <TabPanel className={styles.detailTabPanel}>
-            <Transporter form={form} />
-          </TabPanel>
+          {!!form?.transporter?.company?.name && (
+            <TabPanel className={styles.detailTabPanel}>
+              <Transporter form={form} />
+            </TabPanel>
+          )}
 
           {/* Recipient  tab panel */}
           <TabPanel className={styles.detailTabPanel}>
