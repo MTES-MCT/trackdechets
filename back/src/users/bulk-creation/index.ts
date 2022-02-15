@@ -27,11 +27,25 @@ function printHelp() {
   * roles.csv
   See validations.ts for the format of each file
   Options:
-  -- --help                       Print help
-  -- --validateOnly               Only perform validation csv files
-  -- --csvDir=/path/to/csv/dir    Specify custom csv directory
+  -- --help                         Print help
+  -- --validateOnly                 Only perform validation csv files
+  -- --sireneProvider=providerName  Choose provider name (directory name under src/companies/sirene/*)
+  -- --csvDir=/path/to/csv/dir      Specify custom csv directory
   `);
 }
+
+export interface Opts {
+  validateOnly: boolean;
+  csvDir: string;
+  console?: any;
+  sireneProvider: "entreprise.data.gouv.fr" | "insee" | "social.gouv";
+}
+
+export const opts: Opts = {
+  validateOnly: false,
+  csvDir: `${__dirname}/../../../csv`,
+  sireneProvider: "entreprise.data.gouv.fr"
+};
 
 async function run(argv = process.argv.slice(2)): Promise<void> {
   const args = parseArgs(argv);
@@ -39,11 +53,6 @@ async function run(argv = process.argv.slice(2)): Promise<void> {
   if (args.help) {
     printHelp();
   }
-
-  const opts = {
-    validateOnly: false,
-    csvDir: `${__dirname}/../../../csv`
-  };
 
   if (args.validateOnly) {
     opts.validateOnly = args.validateOnly;
@@ -54,13 +63,11 @@ async function run(argv = process.argv.slice(2)): Promise<void> {
     opts.csvDir = args.csvDir;
   }
 
-  await bulkCreate(opts);
-}
+  if (args.sireneProvider) {
+    opts.sireneProvider = args.sireneProvider;
+  }
 
-interface Opts {
-  validateOnly: boolean;
-  csvDir: string;
-  console?: any;
+  await bulkCreate(opts);
 }
 
 export async function bulkCreate(opts: Opts): Promise<void> {
@@ -123,7 +130,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
   for (const c of companies) {
     try {
       console.info(`Add sirene info for company ${c.siret}`);
-      const sirenified = await sirenify(c);
+      const sirenified = await sirenify(c, opts);
       sirenifiedCompanies.push(sirenified);
     } catch (err) {
       console.error(err);

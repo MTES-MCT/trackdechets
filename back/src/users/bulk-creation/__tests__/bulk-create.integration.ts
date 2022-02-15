@@ -2,7 +2,7 @@ import { resetDatabase } from "../../../../integration-tests/helper";
 import prisma from "../../../prisma";
 import * as mailsHelper from "../../../mailer/mailing";
 import { companyFactory, userFactory } from "../../../__tests__/factories";
-import { bulkCreate } from "../index";
+import { bulkCreate, Opts } from "../index";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -50,7 +50,7 @@ describe("bulk create users and companies from csv files", () => {
   // bulkCreate is called twice in all tests to verify
   // the idempotency of the function
 
-  const opts = {
+  const opts: Opts = {
     validateOnly: false,
     csvDir: `${__dirname}/csv`,
     console: {
@@ -58,7 +58,8 @@ describe("bulk create users and companies from csv files", () => {
       info: jest.fn(),
       error: jest.fn(),
       log: global.console.log
-    }
+    },
+    sireneProvider: "entreprise.data.gouv.fr"
   };
 
   async function bulkCreateIdempotent() {
