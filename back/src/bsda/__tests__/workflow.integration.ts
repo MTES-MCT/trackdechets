@@ -16,8 +16,9 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
   }
 
   it("Déchet déposé en déchetterie (collecte en 2710-1)", async () => {
-    const { company: producteurCompany } =
-      await userWithCompanyFactory("MEMBER");
+    const { company: producteurCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
     const { user: exutoireUser, company: exutoireCompany } =
       await userWithCompanyFactory("MEMBER", {
         companyTypes: {
