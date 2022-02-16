@@ -49,7 +49,7 @@ const DECHETTERIE_OPTIONS = [
 ];
 
 export function Type({ disabled }: Props) {
-  const { setFieldValue, values } = useFormikContext<Bsda>();
+  const { setFieldValue } = useFormikContext<Bsda>();
   const [{ value: type }] = useField<BsdaType>("type");
   const { siret } = useParams<{ siret: string }>();
 
@@ -69,14 +69,11 @@ export function Type({ disabled }: Props) {
       setFieldValue("forwarding", null);
     }
     if (type === BsdaType.Collection_2710) {
-      setFieldValue("destination.company", {
-        ...values.destination?.company,
-        address: data?.companyInfos.address,
-        siret: data?.companyInfos.siret,
-        name: data?.companyInfos.name,
-      });
+      setFieldValue("destination.company.siret", data?.companyInfos.siret);
+      setFieldValue("destination.company.address", data?.companyInfos.address);
+      setFieldValue("destination.company.name", data?.companyInfos.name);
     }
-  }, [type, setFieldValue]);
+  }, [type, setFieldValue, data]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <InlineError apolloError={error} />;
