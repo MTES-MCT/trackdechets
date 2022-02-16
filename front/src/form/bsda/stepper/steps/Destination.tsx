@@ -52,17 +52,19 @@ export function Destination({ disabled }) {
         </label>
       </div>
 
-      <div className="form__row">
-        <label>
-          N° CAP:
-          <Field
-            disabled={disabled}
-            type="text"
-            name="destination.cap"
-            className="td-input td-input--medium"
-          />
-        </label>
-      </div>
+      {!isDechetterie && (
+        <div className="form__row">
+          <label>
+            N° CAP:
+            <Field
+              disabled={disabled}
+              type="text"
+              name="destination.cap"
+              className="td-input td-input--medium"
+            />
+          </label>
+        </div>
+      )}
 
       <div className="form__row">
         <label>Opération d’élimination / valorisation prévue (code D/R)</label>
