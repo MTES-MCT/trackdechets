@@ -7,6 +7,7 @@ import {
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
+import { getUserCompanies } from "../../../users/database";
 import { expandBsdaFromDb, flattenBsdaInput } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
 import { indexBsda } from "../../elastic";
@@ -43,6 +44,19 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
   if ([isForwarding, isGrouping].filter(b => b).length > 1) {
     throw new UserInputError(
       "Les opérations d'entreposage provisoire et groupement ne sont pas compatibles entre elles"
+    );
+  }
+
+  const companies = await getUserCompanies(user.id);
+  const destinationCompany = companies.find(
+    company => company.siret === input.destination?.company?.siret
+  );
+  if (
+    bsda.type === "COLLECTION_2710" &&
+    !destinationCompany?.companyTypes.includes("WASTE_CENTER")
+  ) {
+    throw new UserInputError(
+      "Seules les déchetteries peuvent créer un bordereau de ce type, et elles doivent impérativement être identifiées comme destinataire du déchet."
     );
   }
 
