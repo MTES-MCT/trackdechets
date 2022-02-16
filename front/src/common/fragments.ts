@@ -576,6 +576,7 @@ export const vhuFragment = gql`
 export const bsdaFragment = gql`
   fragment BsdaFragment on Bsda {
     id
+    bsdaType: type
     isDraft
     bsdaStatus: status
     emitter {

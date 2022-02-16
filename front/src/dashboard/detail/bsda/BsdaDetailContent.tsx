@@ -46,8 +46,18 @@ const Emitter = ({ form }: { form: Bsda }) => {
     <div className={styles.detailColumns}>
       <div className={styles.detailGrid}>
         <Company label="Émetteur" company={emitter?.company} />
-        <DetailRow value={emitter?.pickupSite?.name} label="Adresse collecte" />
-        <DetailRow value={emitter?.pickupSite?.name} label="Informations" />
+        <DetailRow
+          value={emitter?.pickupSite?.name}
+          label="Nom du chantier/collecte"
+        />
+        <DetailRow
+          value={emitter?.pickupSite?.address}
+          label="Adresse chantier/collecte"
+        />
+        <DetailRow
+          value={emitter?.pickupSite?.infos}
+          label="Informations complémentaires"
+        />
         {!!emitter?.pickupSite?.address && (
           <>
             <dt>Adresse</dt>
@@ -309,12 +319,14 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             <span className={styles.detailTabCaption}>Producteur</span>
           </Tab>
 
-          <Tab className={styles.detailTab}>
-            <IconWaterDam size="25px" />
-            <span className={styles.detailTabCaption}>
-              Entreprise de travaux
-            </span>
-          </Tab>
+          {!!form?.worker?.company?.name && (
+            <Tab className={styles.detailTab}>
+              <IconWaterDam size="25px" />
+              <span className={styles.detailTabCaption}>
+                Entreprise de travaux
+              </span>
+            </Tab>
+          )}
 
           {!!form?.broker?.company?.name && (
             <Tab className={styles.detailTab}>
@@ -323,12 +335,14 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             </Tab>
           )}
 
-          <Tab className={styles.detailTab}>
-            <IconWarehouseDelivery size="25px" />
-            <span className={styles.detailTabCaption}>
-              <span> Transporteur</span>
-            </span>
-          </Tab>
+          {!!form?.transporter?.company?.name && (
+            <Tab className={styles.detailTab}>
+              <IconWarehouseDelivery size="25px" />
+              <span className={styles.detailTabCaption}>
+                <span> Transporteur</span>
+              </span>
+            </Tab>
+          )}
 
           <Tab className={styles.detailTab}>
             <IconRenewableEnergyEarth size="25px" />
@@ -343,9 +357,11 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
           </TabPanel>
 
           {/* Worker tab panel */}
-          <TabPanel className={styles.detailTabPanel}>
-            <Worker form={form} />
-          </TabPanel>
+          {!!form?.worker?.company?.name && (
+            <TabPanel className={styles.detailTabPanel}>
+              <Worker form={form} />
+            </TabPanel>
+          )}
 
           {/* Broker tab panel */}
           {!!form?.broker?.company?.name && (
@@ -355,9 +371,11 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
           )}
 
           {/* Transporter tab panel */}
-          <TabPanel className={styles.detailTabPanel}>
-            <Transporter form={form} />
-          </TabPanel>
+          {!!form?.transporter?.company?.name && (
+            <TabPanel className={styles.detailTabPanel}>
+              <Transporter form={form} />
+            </TabPanel>
+          )}
 
           {/* Recipient  tab panel */}
           <TabPanel className={styles.detailTabPanel}>

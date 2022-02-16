@@ -101,10 +101,19 @@ export function BsdaPicker({ name, code }: Props) {
     );
     setFieldValue(
       "packagings",
-      groupedBsdas?.reduce(
-        (prev, cur) => prev.concat(cur.packagings ?? []),
-        [] as BsdaPackaging[]
-      ) ?? initialState.packagings
+      groupedBsdas?.reduce((prev, cur) => {
+        for (const packaging of cur.packagings ?? []) {
+          const found = prev.find(
+            pp => pp.type === packaging.type && pp.other === packaging.other
+          );
+          if (found) {
+            found.quantity += packaging.quantity;
+          } else {
+            prev.push(packaging);
+          }
+        }
+        return prev;
+      }, [] as BsdaPackaging[]) ?? initialState.packagings
     );
 
     const { country, ...company } =

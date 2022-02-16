@@ -16,12 +16,16 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
   }
 
   it("Déchet déposé en déchetterie (collecte en 2710-1)", async () => {
-    const { user: producteurUser, company: producteurCompany } =
-      await userWithCompanyFactory("MEMBER");
+    const { company: producteurCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
     const { user: exutoireUser, company: exutoireCompany } =
-      await userWithCompanyFactory("MEMBER");
+      await userWithCompanyFactory("MEMBER", {
+        companyTypes: {
+          set: ["WASTE_CENTER"]
+        }
+      });
 
-    const producteurToken = await apiKey(producteurUser);
     const exutoireToken = await apiKey(exutoireUser);
 
     const createBsdaMutation = `mutation {
@@ -64,7 +68,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
 
     const createBsdaResponse = await request
       .post("/")
-      .set("Authorization", `Bearer ${producteurToken}`)
+      .set("Authorization", `Bearer ${exutoireToken}`)
       .send({ query: createBsdaMutation });
     const id: string = createBsdaResponse.body.data.createBsda.id;
     expect(createBsdaResponse.body.data.createBsda.status).toBe("INITIAL");

@@ -1,11 +1,22 @@
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { useFormikContext } from "formik";
-import { Bsda } from "generated/graphql/types";
+import { Bsda, BsdaType } from "generated/graphql/types";
 import React from "react";
 import { Transport } from "./Transport";
 
 export function Transporter({ disabled }) {
-  const { setFieldValue } = useFormikContext<Bsda>();
+  const { values, setFieldValue } = useFormikContext<Bsda>();
+
+  const isDechetterie = values?.type === BsdaType.Collection_2710;
+
+  if (isDechetterie) {
+    return (
+      <div className="notification">
+        Vous effectuez une collecte en déchetterie. Il n'y a pas de transporteur
+        à saisir.
+      </div>
+    );
+  }
 
   return (
     <>

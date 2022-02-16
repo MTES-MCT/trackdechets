@@ -13,6 +13,7 @@ import {
   IconBSDasri,
   IconBSVhu,
   IconBSFF,
+  IconBSDa,
 } from "common/components/Icons";
 import styles from "./BSDTypeFilter.module.scss";
 
@@ -36,6 +37,11 @@ const OPTIONS = [
     value: BsdType.Bsff,
     Icon: IconBSFF,
     label: "BSFFs",
+  },
+  {
+    value: BsdType.Bsda,
+    Icon: IconBSDa,
+    label: "BSDAs",
   },
 ];
 

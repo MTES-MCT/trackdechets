@@ -7,8 +7,10 @@ import WorkSite from "form/common/components/work-site/WorkSite";
 export function Emitter({ disabled }) {
   const { values } = useFormikContext<Bsda>();
 
-  const isGroupement = values?.type === BsdaType.Gathering;
-  const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
+  const isValidBsdaSuite =
+    [BsdaType.Gathering, BsdaType.Reshipment].includes(
+      values?.type as BsdaType
+    ) && values.emitter?.company?.siret;
 
   return (
     <>
@@ -19,7 +21,7 @@ export function Emitter({ disabled }) {
         </div>
       )}
 
-      {isGroupement || isEntreposageProvisoire ? (
+      {isValidBsdaSuite ? (
         <div className="notification">
           Vous effectuez un groupement ou entreposage provisoire. L'entreprise
           émettrice est obligatoirement la vôtre:{" "}
@@ -39,9 +41,7 @@ export function Emitter({ disabled }) {
         </div>
       )}
 
-      {values.emitter?.isPrivateIndividual ||
-      isGroupement ||
-      isEntreposageProvisoire ? (
+      {values.emitter?.isPrivateIndividual || isValidBsdaSuite ? (
         <>
           <div className="form__row">
             <label>

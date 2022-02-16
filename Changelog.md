@@ -13,6 +13,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout d'une section dans "Mon Compte" permettant de révoquer l'accès donné à des applications tierces [PR 1174](https://github.com/MTES-MCT/trackdechets/pull/1174)
 - Ajout d'une section dans "Mon Compte" permettant de révoquer les tokens personnels générés [PR 1174](https://github.com/MTES-MCT/trackdechets/pull/1174)
 - Ajout du mode de transport pour le premier transporteur et le transporteur après entreposage provisoire [PR 1176](https://github.com/MTES-MCT/trackdechets/pull/1176)
+- Prise en compte du workflow déchetterie pour le bordereau amiante [PR 1180](https://github.com/MTES-MCT/trackdechets/pull/1180)
 
 #### :bug: Corrections de bugs
 

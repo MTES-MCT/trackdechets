@@ -208,6 +208,7 @@ describe("Mutation.Bsda.create", () => {
 
     expect(data.createBsda.transporter.transport.plates.length).toBe(2);
   });
+
   it("should fail creating the form if more than 2 plates are submitted", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -284,6 +285,7 @@ describe("Mutation.Bsda.create", () => {
       })
     ]);
   });
+
   it("should fail creating the form if a required field like the waste code is missing", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -341,5 +343,163 @@ describe("Mutation.Bsda.create", () => {
     });
 
     expect(errors[0].message).toBe("Le code déchet est obligatoire");
+  });
+
+  it("should disallow creating the bsda with type COLLECTION_2710 if destination is not set", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const input: BsdaInput = {
+      type: "COLLECTION_2710",
+      emitter: {
+        isPrivateIndividual: false,
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      waste: {
+        code: "16 01 06",
+        adr: "ADR",
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 }
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Seules les déchetteries peuvent créer un bordereau de ce type, et elles doivent impérativement être identifiées comme destinataire du déchet.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should disallow creating the bsda with type COLLECTION_2710 if destination is not a waste center", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: ["WASTEPROCESSOR"] }
+    });
+
+    const input: BsdaInput = {
+      type: "COLLECTION_2710",
+      emitter: {
+        isPrivateIndividual: true,
+        company: {
+          siret: "Jean DUPONT",
+          name: "Jean DUPONT",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      waste: {
+        code: "16 01 06",
+        adr: "ADR",
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: company.siret,
+          name: company.name,
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Seules les déchetteries peuvent créer un bordereau de ce type, et elles doivent impérativement être identifiées comme destinataire du déchet.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should allow creating the bsda with type COLLECTION_2710 if destination is a waste center", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: ["WASTE_CENTER"] }
+    });
+
+    const input: BsdaInput = {
+      type: "COLLECTION_2710",
+      emitter: {
+        isPrivateIndividual: true,
+        company: {
+          siret: "Jean DUPONT",
+          name: "Jean DUPONT",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      waste: {
+        code: "16 01 06",
+        adr: "ADR",
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: company.siret,
+          name: company.name,
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(data.createBsda.id).toBeDefined();
   });
 });

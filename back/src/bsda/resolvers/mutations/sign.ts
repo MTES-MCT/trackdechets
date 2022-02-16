@@ -1,17 +1,19 @@
-import { Bsda, BsdaStatus } from "@prisma/client";
+import { Bsda, BsdaStatus, BsdaType } from "@prisma/client";
+import { UserInputError } from "apollo-server-express";
+import {
+  AlreadySignedError,
+  InvalidSignatureError
+} from "../../../bsvhu/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkSecurityCode } from "../../../forms/permissions";
 import {
+  BsdaSignatureInput,
   BsdaSignatureType,
   MutationSignBsdaArgs
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
-import {
-  AlreadySignedError,
-  InvalidSignatureError
-} from "../../../bsvhu/errors";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaHistory, getBsdaOrNotFound } from "../../database";
 import { indexBsda } from "../../elastic";
@@ -32,43 +34,44 @@ export default async function sign(
   const user = checkIsAuthenticated(context);
 
   const signatureTypeInfos = signatureTypeMapping[input.type];
-  const prismaForm = await getBsdaOrNotFound(id);
+  const bsda = await getBsdaOrNotFound(id);
 
   // To sign a form for a company, you must either:
   // - be part of that company
   // - provide the company security code
   await checkAuthorization(
     { currentUserId: user.id, securityCode: input.securityCode },
-    signatureTypeInfos.getAuthorizedSiret(prismaForm)
+    signatureTypeInfos.getAuthorizedSiret(bsda)
   );
 
   // Cannot re-sign a form
-  if (prismaForm[signatureTypeInfos.dbDateKey] != null) {
+  if (bsda[signatureTypeInfos.dbDateKey] != null) {
     throw new AlreadySignedError();
   }
 
+  checkBsdaTypeSpecificRules(bsda, input);
+
   // Check that all necessary fields are filled
-  await validateBsda(prismaForm, [], {
-    isPrivateIndividual: prismaForm.emitterIsPrivateIndividual,
+  await validateBsda(bsda, [], {
+    isPrivateIndividual: bsda.emitterIsPrivateIndividual,
     emissionSignature:
-      prismaForm.emitterEmissionSignatureDate != null ||
-      input.type === "EMISSION",
+      bsda.emitterEmissionSignatureDate != null || input.type === "EMISSION",
     workSignature:
-      prismaForm.workerWorkSignatureDate != null || input.type === "WORK",
+      bsda.workerWorkSignatureDate != null || input.type === "WORK",
     transportSignature:
-      prismaForm.transporterTransportSignatureDate != null ||
+      bsda.transporterTransportSignatureDate != null ||
       input.type === "TRANSPORT",
     operationSignature:
-      prismaForm.destinationOperationSignatureDate != null ||
+      bsda.destinationOperationSignatureDate != null ||
       input.type === "OPERATION"
   });
 
-  const { value: newStatus } = machine.transition(prismaForm.status, {
+  const { value: newStatus } = machine.transition(bsda.status, {
     type: input.type,
-    bsda: prismaForm
+    bsda: bsda
   });
 
-  if (newStatus === prismaForm.status) {
+  if (newStatus === bsda.status) {
     throw new InvalidSignatureError();
   }
 
@@ -139,4 +142,21 @@ function checkAuthorization(
     { id: requestInfo.currentUserId },
     { siret: signingCompanySiret }
   );
+}
+
+function checkBsdaTypeSpecificRules(bsda: Bsda, input: BsdaSignatureInput) {
+  if (bsda.type === BsdaType.COLLECTION_2710 && input.type !== "OPERATION") {
+    throw new UserInputError(
+      "Ce type de bordereau ne peut être signé qu'à la réception par la déchetterie."
+    );
+  }
+
+  if (
+    (bsda.type === BsdaType.RESHIPMENT || bsda.type === BsdaType.GATHERING) &&
+    input.type === "WORK"
+  ) {
+    throw new UserInputError(
+      "Ce type de bordereau ne peut pas être signé par une entreprise de travaux."
+    );
+  }
 }
