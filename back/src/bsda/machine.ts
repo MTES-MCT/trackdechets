@@ -14,7 +14,7 @@ type Event = {
   bsda: Bsda;
 };
 
-export const machine = createMachine<{}, Event>(
+export const machine = createMachine<Record<string, never>, Event>(
   {
     id: "bsda-workflow",
     initial: BsdaStatus.INITIAL,
