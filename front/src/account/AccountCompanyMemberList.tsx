@@ -9,7 +9,7 @@ import {
 } from "generated/graphql/types";
 import * as COMPANY_TYPES from "generated/constants/COMPANY_TYPES";
 
-const { REACT_APP_VERIFY_COMPANY } = process.env;
+const { VITE_VERIFY_COMPANY } = import.meta.env;
 
 type Props = { company: CompanyPrivate };
 
@@ -40,7 +40,7 @@ export default function AccountCompanyMemberList({ company }: Props) {
 
   return (
     <>
-      {REACT_APP_VERIFY_COMPANY !== "true" ||
+      {VITE_VERIFY_COMPANY !== "true" ||
       !isProfessional ||
       (isProfessional && isVerified) ? (
         <AccountFormCompanyInviteNewUser

@@ -8,6 +8,7 @@ describe("<AccountField />", () => {
     const {
       container,
       getByLabelText,
+      getAllByLabelText,
       getByText,
       getByRole,
       queryByRole,
@@ -24,10 +25,10 @@ describe("<AccountField />", () => {
 
     expect(container.querySelector("div")).toHaveClass(styles.field);
 
-    // it should container label
-    expect(getByLabelText("Nom utilisateur")).toBeInTheDocument();
+    // it should contain label
+    expect(getByText("Nom utilisateur")).toBeInTheDocument();
 
-    // it should container tooltip trigger
+    // it should contain tooltip trigger
     expect(getByRole("button")).toBeInTheDocument();
 
     // it should contain field value
@@ -53,7 +54,7 @@ describe("<AccountField />", () => {
         label="Nom utilisateur"
         value="John Snow"
         renderForm={toggleEdition => (
-          <form onSubmit={() => toggleEdition()}>
+          <form name="a form" onSubmit={() => toggleEdition()}>
             <button type="submit" data-test-id="submit-button" />
           </form>
         )}

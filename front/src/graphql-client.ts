@@ -41,7 +41,7 @@ const errorLink = onError(({ response, graphQLErrors, networkError }) => {
 });
 
 const httpLink = createHttpLink({
-  uri: process.env.REACT_APP_API_ENDPOINT,
+  uri: import.meta.env.VITE_API_ENDPOINT as string,
   credentials: "include",
 });
 

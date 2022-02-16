@@ -103,7 +103,7 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
                     setFieldValue("siret", e.target.value);
                   }}
                 />
-                {process.env.REACT_APP_ALLOW_TEST_COMPANY === "true" && (
+                {import.meta.env.VITE_ALLOW_TEST_COMPANY === "true" && (
                   <button
                     className={`tw-block tw-mt-1 tw-underline ${styles.smaller}`}
                     type="button"

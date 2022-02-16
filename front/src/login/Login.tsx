@@ -31,7 +31,7 @@ export default withRouter(function Login(
     }
   >
 ) {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  const { VITE_API_ENDPOINT } = import.meta.env;
 
   const queries = queryString.parse(routeProps.location.search);
 
@@ -52,7 +52,7 @@ export default withRouter(function Login(
     <section className="section section--white">
       <div className="container-narrow">
         <form
-          action={`${REACT_APP_API_ENDPOINT}/login`}
+          action={`${VITE_API_ENDPOINT}/login`}
           method="post"
           name="login"
         >

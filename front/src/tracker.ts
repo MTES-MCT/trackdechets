@@ -6,23 +6,23 @@ declare global {
 }
 // Piwik/Matomo tracker
 window._paq = window._paq || [];
-window._paq.push(["setDomains", ["*." + process.env.REACT_APP_HOSTNAME]]);
+window._paq.push(["setDomains", ["*." + import.meta.env.VITE_HOSTNAME]]);
 window._paq.push(["setDoNotTrack", true]);
 window._paq.push(["trackPageView"]);
 window._paq.push(["enableLinkTracking"]);
 
 if (
-  process.env.NODE_ENV === "production" &&
-  process.env.REACT_APP_MATOMO_TRACKER_SITE_ID &&
-  process.env.REACT_APP_MATOMO_TRACKER_URL
+  import.meta.env.NODE_ENV === "production" &&
+  import.meta.env.VITE_MATOMO_TRACKER_SITE_ID &&
+  import.meta.env.VITE_MATOMO_TRACKER_URL
 ) {
   loadTracker();
 }
 
 function loadTracker() {
-  var u = process.env.REACT_APP_MATOMO_TRACKER_URL;
+  var u = import.meta.env.VITE_MATOMO_TRACKER_URL;
   window._paq.push(["setTrackerUrl", u + "piwik.php"]);
-  window._paq.push(["setSiteId", process.env.REACT_APP_MATOMO_TRACKER_SITE_ID]);
+  window._paq.push(["setSiteId", import.meta.env.VITE_MATOMO_TRACKER_SITE_ID]);
   var d = document;
   var g = d.createElement("script");
   var s = d.getElementsByTagName("script")[0];
@@ -38,8 +38,8 @@ function loadTracker() {
 export function getTracker() {
   if (typeof Piwik !== "undefined") {
     const tracker = Piwik.getAsyncTracker(
-      `${process.env.REACT_APP_MATOMO_TRACKER_URL}piwik.php`,
-      process.env.REACT_APP_MATOMO_TRACKER_SITE_ID
+      `${import.meta.env.VITE_MATOMO_TRACKER_URL}piwik.php`,
+      import.meta.env.VITE_MATOMO_TRACKER_SITE_ID
     );
     return tracker;
   }

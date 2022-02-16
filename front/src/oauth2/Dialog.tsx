@@ -5,11 +5,11 @@ import styles from "./Dialog.module.scss";
 import { useOAuth2, AuthorizePayload } from "./use-oauth2";
 
 export default function Dialog() {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  const { VITE_API_ENDPOINT } = import.meta.env;
 
   const { loading, error, authorizePayload } = useOAuth2();
 
-  const authorizeDecisionUrl = `${REACT_APP_API_ENDPOINT}/oauth2/authorize/decision`;
+  const authorizeDecisionUrl = `${VITE_API_ENDPOINT}/oauth2/authorize/decision`;
 
   if (loading) {
     return <Loader />;
