@@ -19,7 +19,7 @@ const createPasswordResetRequestResolver: MutationResolvers["createPasswordReset
     }
     const resetHash = (await promisify(crypto.randomBytes)(20)).toString("hex");
 
-    const hashExpires = addHours(new Date(), 1);
+    const hashExpires = addHours(new Date(), 4);
 
     await prisma.userResetPasswordHash.create({
       data: {

@@ -6,6 +6,7 @@ import { Mutation } from "../../../../generated/graphql/types";
 import * as mailsHelper from "../../../../mailer/mailing";
 import { createPasswordResetRequest } from "../../../../mailer/templates";
 import { renderMail } from "../../../../mailer/templates/renderers";
+import { addMinutes } from "date-fns";
 
 // Mails spy
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -37,10 +38,8 @@ describe("mutation createPasswordResetRequest", () => {
       where: { userId: user.id }
     });
 
-    // expires delta is one hour, let's check with a slightly smaller value
-    expect(resetHash.hashExpires > new Date(Date.now() + 1000 * 3550)).toEqual(
-      true
-    );
+    // expires delta is 4 hour, let's check with a slightly smaller value (3H59)
+    expect(resetHash.hashExpires > addMinutes(Date.now(), 239)).toEqual(true);
 
     expect(sendMailSpy).toHaveBeenNthCalledWith(
       1,

@@ -104,7 +104,7 @@ export default function PasswordReset() {
             <Form>
               <h1 className="h1 tw-my-4">Changement de mot de passe</h1>
               <p className="body-text">
-                Veuiller entrer votre nouveau mot de passe pour le mettre à
+                Veuillez entrer votre nouveau mot de passe pour le mettre à
                 jour.
               </p>
               <div>
@@ -155,7 +155,7 @@ export default function PasswordReset() {
                   type="submit"
                   disabled={isSubmitting}
                 >
-                  Je mets à jour mon mot de passe
+                  Mettre à jour mon mot de passe
                 </button>
               </div>
             </Form>

@@ -4,6 +4,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
 import { compare } from "bcrypt";
+import { addHours } from "date-fns";
 
 const RESET_PASSWORD = `
   mutation ResetPassword($newPassword: String! ,$hash: String! ){
@@ -21,7 +22,7 @@ describe("mutation resetPassword", () => {
     await prisma.userResetPasswordHash.create({
       data: {
         hash: "abcdef",
-        hashExpires: new Date(Date.now() + 3600 * 60),
+        hashExpires: addHours(Date.now(), 4),
         user: { connect: { id: user.id } }
       }
     });
@@ -59,7 +60,7 @@ describe("mutation resetPassword", () => {
     await prisma.userResetPasswordHash.create({
       data: {
         hash: "xyzer",
-        hashExpires: new Date(Date.now() + 3600 * 60),
+        hashExpires: addHours(Date.now(), 4),
         user: { connect: { id: user.id } }
       }
     });
@@ -72,8 +73,8 @@ describe("mutation resetPassword", () => {
         variables: { hash: "qsdfgh", newPassword }
       }
     );
-    // gql response
 
+    // gql response
     expect(errors).toEqual([
       expect.objectContaining({
         message: `Lien invalide ou trop ancien.`
@@ -101,7 +102,7 @@ describe("mutation resetPassword", () => {
     await prisma.userResetPasswordHash.create({
       data: {
         hash: "nbvcxw",
-        hashExpires: new Date(Date.now() - 1),
+        hashExpires: addHours(Date.now(), -1),
         user: { connect: { id: user.id } }
       }
     });
@@ -143,7 +144,7 @@ describe("mutation resetPassword", () => {
     await prisma.userResetPasswordHash.create({
       data: {
         hash: "fghjkl",
-        hashExpires: new Date(Date.now() + 3600 * 1000),
+        hashExpires: addHours(Date.now(), 4),
         user: { connect: { id: user.id } }
       }
     });

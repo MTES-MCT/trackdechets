@@ -34,7 +34,7 @@ export default function PasswordResetRequest() {
           <h1 className="h1">Réinitialisation de votre mot de passe</h1>
           <p className="tw-my-2">
             Afin de réinitialiser votre mot de passe, merci de saisir votre
-            email. Un lien vous sera transmis à cette adresse email..
+            email. Un lien vous sera transmis à cette adresse email.
           </p>
           <div className="form__row tw-my-2">
             <label>
