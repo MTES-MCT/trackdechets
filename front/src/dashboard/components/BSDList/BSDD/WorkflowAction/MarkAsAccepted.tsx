@@ -26,6 +26,9 @@ export default function MarkAsAccepted({ form }: WorkflowActionProps) {
   >(MARK_AS_ACCEPTED, {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
+    onError: () => {
+      // The error is handled in the UI
+    },
   });
 
   const actionLabel = "Valider l'acceptation";

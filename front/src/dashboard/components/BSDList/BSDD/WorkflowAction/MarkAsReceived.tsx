@@ -26,6 +26,9 @@ export default function MarkAsReceived({ form }: WorkflowActionProps) {
   >(MARK_AS_RECEIVED, {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
+    onError: () => {
+      // The error is handled in the UI
+    },
   });
 
   const actionLabel = "Valider la réception";

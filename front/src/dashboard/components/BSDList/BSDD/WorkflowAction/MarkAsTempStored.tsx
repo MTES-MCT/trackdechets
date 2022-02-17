@@ -31,6 +31,9 @@ export default function MarkAsTempStored({ form }: WorkflowActionProps) {
   >(MARK_AS_TEMP_STORED, {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
+    onError: () => {
+      // The error is handled in the UI
+    },
   });
 
   const actionLabel = "Valider l'entreposage provisoire";

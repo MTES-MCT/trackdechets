@@ -19,13 +19,18 @@ export default function ResetPassword() {
     <section className="section section--white">
       <div className="container">
         <form
-          onSubmit={e => {
+          onSubmit={async e => {
             e.preventDefault();
-            resetPassword({ variables: { email } }).then(_ =>
-              setShowSuccess(true)
-            );
+
             setShowSuccess(false);
             setEmail("");
+
+            try {
+              await resetPassword({ variables: { email } });
+              setShowSuccess(true);
+            } catch (err) {
+              // The error is handled in the UI
+            }
           }}
         >
           <h1 className="h1">Réinitialisation de votre mot de passe</h1>

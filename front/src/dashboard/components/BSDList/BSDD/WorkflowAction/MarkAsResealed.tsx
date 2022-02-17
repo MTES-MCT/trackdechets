@@ -91,6 +91,9 @@ export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
         );
       }
     },
+    onError: () => {
+      // The error is handled in the UI
+    },
   });
 
   const actionLabel = "Compléter le BSD suite";

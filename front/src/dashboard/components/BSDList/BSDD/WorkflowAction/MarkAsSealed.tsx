@@ -41,6 +41,9 @@ export default function MarkAsSealed({ form, siret }: WorkflowActionProps) {
           );
       }
     },
+    onError: () => {
+      // The error is handled in the UI
+    },
   });
 
   const actionLabel = "Valider le bordereau";
