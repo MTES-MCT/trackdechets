@@ -21,7 +21,11 @@ const sentryReporter: ApolloServerPlugin = {
         for (const error of errorContext.errors) {
           // don't do anything with errors we expect.
           if (
-            knownErrors.some(expectedError => error instanceof expectedError)
+            knownErrors.some(
+              expectedError =>
+                error instanceof expectedError ||
+                error.originalError instanceof expectedError
+            )
           ) {
             continue;
           }
