@@ -1,6 +1,7 @@
 import { Bsda, BsdaType, BsdaStatus } from "@prisma/client";
-import { Machine } from "xstate";
+import { createMachine } from "xstate";
 import { BsdaSignatureType } from "../generated/graphql/types";
+import { PARTIAL_OPERATIONS } from "./validation";
 
 export enum EventType {
   ProducerSignature,
@@ -13,7 +14,7 @@ type Event = {
   bsda: Bsda;
 };
 
-export const machine = Machine<never, Event>(
+export const machine = createMachine<Record<string, never>, Event>(
   {
     id: "bsda-workflow",
     initial: BsdaStatus.INITIAL,
@@ -27,10 +28,16 @@ export const machine = Machine<never, Event>(
             target: BsdaStatus.SIGNED_BY_WORKER,
             cond: "canSkipEmissionSignature"
           },
-          OPERATION: {
-            target: BsdaStatus.PROCESSED,
-            cond: "isCollectedBy2710"
-          }
+          OPERATION: [
+            {
+              target: BsdaStatus.AWAITING_CHILD,
+              cond: "isCollectedBy2710AndGroupingOrReshipmentOperation"
+            },
+            {
+              target: BsdaStatus.PROCESSED,
+              cond: "isCollectedBy2710"
+            }
+          ]
         }
       },
       [BsdaStatus.SIGNED_BY_PRODUCER]: {
@@ -83,8 +90,11 @@ export const machine = Machine<never, Event>(
         event.bsda?.emitterIsPrivateIndividual,
       isCollectedBy2710: (_, event) =>
         event.bsda?.type === BsdaType.COLLECTION_2710,
+      isCollectedBy2710AndGroupingOrReshipmentOperation: (_, event) =>
+        event.bsda?.type === BsdaType.COLLECTION_2710 &&
+        PARTIAL_OPERATIONS.includes(event.bsda?.destinationOperationCode),
       isGroupingOrReshipmentOperation: (_, event) =>
-        ["D 13", "D 15"].includes(event.bsda?.destinationOperationCode),
+        PARTIAL_OPERATIONS.includes(event.bsda?.destinationOperationCode),
       isGroupingOrForwardingBsda: (_, event) =>
         event.bsda?.type === BsdaType.GATHERING ||
         event.bsda?.type === BsdaType.RESHIPMENT
