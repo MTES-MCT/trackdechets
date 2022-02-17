@@ -1,14 +1,15 @@
-import { client } from "../common/elastic";
-import { initSentry } from "../common/sentry";
-import logger from "../logging/logger";
-import { ElasticBulkNonFlatPayload, IndexProcessConfig } from "./types";
+import { elasticSearchClient as client } from "..";
+import { logger } from "..";
+import {
+  ElasticBulkNonFlatPayload,
+  IndexProcessConfig
+} from "../indexation/types";
 import {
   downloadAndIndex,
+  INDEX_ALIAS_NAME_SEPARATOR,
   standardMapping,
   unzipAndIndex
-} from "./elasticSearch.helpers";
-
-const Sentry = initSentry();
+} from "../indexation/elasticSearch.helpers";
 
 process.on("exit", function () {
   console.log(`Command indexInseeSirene.ts finished`);
@@ -51,7 +52,13 @@ const siretUrl =
   "https://files.data.gouv.fr/insee-sirene/StockEtablissement_utf8.zip";
 
 const siretIndexConfig: IndexProcessConfig = {
-  alias: `stocketablissement_utf8-${process.env.NODE_ENV}`,
+  alias: `stocketablissement_utf8${INDEX_ALIAS_NAME_SEPARATOR}${
+    process.env.NODE_ENV ? process.env.NODE_ENV : "dev"
+  }${
+    process.env.INDEX_ALIAS_NAME_SUFFIX
+      ? process.env.INDEX_ALIAS_NAME_SUFFIX
+      : ""
+  }`,
   // to match the filename inside zip
   csvFileName: "StockEtablissement_utf8.csv",
   // zip target filename
@@ -67,14 +74,10 @@ const siretIndexConfig: IndexProcessConfig = {
  */
 (async function main() {
   logger.info("Starting indexation of StockEtablissements");
-  try {
-    if (process.env.INSEE_SIRET_ZIP_PATH) {
-      await unzipAndIndex(process.env.INSEE_SIRET_ZIP_PATH, siretIndexConfig);
-    } else {
-      await downloadAndIndex(siretUrl, siretIndexConfig);
-    }
-    logger.info(`Command indexInseeSiret.ts finished`);
-  } catch (exc) {
-    Sentry.captureException(exc);
+  if (process.env.INSEE_SIRET_ZIP_PATH) {
+    await unzipAndIndex(process.env.INSEE_SIRET_ZIP_PATH, siretIndexConfig);
+  } else {
+    await downloadAndIndex(siretUrl, siretIndexConfig);
   }
+  logger.info(`Command indexInseeSiret.ts finished`);
 })();

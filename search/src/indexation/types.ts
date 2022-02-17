@@ -28,7 +28,7 @@ export type ElasticBulkPrepayload = {
     _id: string;
     _index: string;
     // Next major ES version won't need _type anymore
-    _type: "_doc";
+    _type?: "_doc";
   };
 };
 
