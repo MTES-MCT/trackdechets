@@ -194,6 +194,9 @@ export default function MarkAsProcessed({ form, siret }: WorkflowActionProps) {
         );
       }
     },
+    onError: () => {
+      // The error is handled in the UI
+    },
   });
 
   const actionLabel = "Valider le traitement";

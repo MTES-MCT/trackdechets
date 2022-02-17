@@ -47,6 +47,9 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
         hideAfter: 5,
       });
     },
+    onError: () => {
+      // The error is handled in the UI
+    },
   });
 
   const initialValues = {

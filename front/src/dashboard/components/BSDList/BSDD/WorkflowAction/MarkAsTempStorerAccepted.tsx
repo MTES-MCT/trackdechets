@@ -39,6 +39,9 @@ export default function MarkAsTempStorerAccepted({
   >(MARK_TEMP_STORER_ACCEPTED, {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
+    onError: () => {
+      // The error is handled in the UI
+    },
   });
 
   const actionLabel = "Valider l'acceptation de l'entreposage provisoire";

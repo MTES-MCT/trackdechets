@@ -34,6 +34,9 @@ export default function TakeOverSegment({ form }: WorkflowActionProps) {
         hideAfter: 5,
       });
     },
+    onError: () => {
+      // The error is handled in the UI
+    },
   });
   const transportSegments = form.transportSegments!;
   const segment = transportSegments[transportSegments.length - 1];
@@ -66,7 +69,7 @@ export default function TakeOverSegment({ form }: WorkflowActionProps) {
                 id: segment.id,
               };
 
-              takeOverSegment({ variables }).catch(() => {});
+              takeOverSegment({ variables });
             }}
           >
             {({ values }) => (
