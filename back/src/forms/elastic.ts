@@ -90,14 +90,13 @@ function getWhere(
     }
     case Status.SENT: {
       appendToSirets(siretsFilters, "recipientCompanySiret", "isForActionFor");
-      appendToSirets(
-        siretsFilters,
-        "transporterCompanySiret",
-        "isCollectedFor"
-      );
+
+      // whether or not this BSD has been handed over by transporter n°1
+      let hasBeenHandedOver = false;
 
       form.transportSegments.forEach(segment => {
         if (segment.readyToTakeOver) {
+          hasBeenHandedOver = hasBeenHandedOver || !!segment.takenOverAt;
           appendToSirets(
             siretsFilters,
             segment.id,
@@ -105,6 +104,14 @@ function getWhere(
           );
         }
       });
+
+      if (!hasBeenHandedOver) {
+        appendToSirets(
+          siretsFilters,
+          "transporterCompanySiret",
+          "isCollectedFor"
+        );
+      }
 
       break;
     }
@@ -152,44 +159,10 @@ function getWhere(
         "isForActionFor"
       );
 
-      appendToSirets(
-        siretsFilters,
-        "temporaryStorageDetailTransporterCompanySiret",
-        "isCollectedFor"
-      );
-
-      appendToSirets(
-        siretsFilters,
-        "transporterCompanySiret",
-        "isCollectedFor"
-      );
-
-      form.transportSegments.forEach(segment => {
-        appendToSirets(siretsFilters, segment.id, "isCollectedFor");
-      });
-
       break;
     }
     case Status.AWAITING_GROUP:
-    case Status.GROUPED: {
-      appendToSirets(
-        siretsFilters,
-        "temporaryStorageDetailTransporterCompanySiret",
-        "isCollectedFor"
-      );
-
-      appendToSirets(
-        siretsFilters,
-        "transporterCompanySiret",
-        "isCollectedFor"
-      );
-
-      form.transportSegments.forEach(segment => {
-        appendToSirets(siretsFilters, segment.id, "isCollectedFor");
-      });
-
-      break;
-    }
+    case Status.GROUPED:
     case Status.REFUSED:
     case Status.PROCESSED:
     case Status.NO_TRACEABILITY: {
