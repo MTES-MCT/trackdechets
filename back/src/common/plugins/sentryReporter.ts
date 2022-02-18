@@ -19,10 +19,14 @@ const sentryReporter: ApolloServerPlugin = {
         }
 
         for (const error of errorContext.errors) {
-          const err = error.originalError || error;
-
           // don't do anything with errors we expect.
-          if (knownErrors.some(expectedError => err instanceof expectedError)) {
+          if (
+            knownErrors.some(
+              expectedError =>
+                error instanceof expectedError ||
+                error.originalError instanceof expectedError
+            )
+          ) {
             continue;
           }
 
@@ -58,7 +62,9 @@ const sentryReporter: ApolloServerPlugin = {
           // kinda of a hack but seems to be the only way to pass
           // info down to formatError. See also
           // https://github.com/apollographql/apollo-server/issues/4010
-          (err as any).sentryId = sentryId;
+          if (error.originalError) {
+            (error.originalError as any).sentryId = sentryId;
+          }
         }
       }
     };

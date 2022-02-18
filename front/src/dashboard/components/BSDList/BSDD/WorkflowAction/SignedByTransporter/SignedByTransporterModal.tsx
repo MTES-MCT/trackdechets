@@ -53,6 +53,9 @@ export function SignedByTransporterModal({
       });
       onClose();
     },
+    onError: () => {
+      // The error is handled in the UI
+    },
   });
 
   const { Component } = steps[stepIndex];

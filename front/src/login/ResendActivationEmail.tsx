@@ -22,11 +22,17 @@ export default function ResendActivationEmail() {
     <section className="section section--white">
       <div className="container">
         <form
-          onSubmit={e => {
+          onSubmit={async e => {
             e.preventDefault();
-            resendActivationEmail({ variables: { email } })
-              .then(_ => setShowSuccess(true))
-              .catch(_ => setShowSuccess(false));
+
+            setShowSuccess(false);
+
+            try {
+              await resendActivationEmail({ variables: { email } });
+              setShowSuccess(true);
+            } catch (err) {
+              // The error is handled in the UI
+            }
           }}
         >
           <h1 className="h1">Renvoyer l'email d'activation</h1>

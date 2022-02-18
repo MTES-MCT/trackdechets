@@ -42,6 +42,9 @@ export default function MarkSegmentAsReadyToTakeOver({
         { hideAfter: 5 }
       );
     },
+    onError: () => {
+      // The error is handled in the UI
+    },
   });
 
   const segments = form.transportSegments!;

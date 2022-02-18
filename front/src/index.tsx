@@ -17,6 +17,10 @@ if (process.env.REACT_APP_SENTRY_DSN) {
     ignoreErrors: [
       "NetworkError when attempting to fetch resource.",
       "Non-Error promise rejection captured with value: Object Not Found Matching Id:2",
+
+      // The following is caused by cache mismatches,
+      // possibly because of the ServiceWorker
+      "Unexpected token '<'",
     ],
   });
 }

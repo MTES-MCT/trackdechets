@@ -22,13 +22,17 @@ export default function PasswordResetRequest() {
     <section className="section section--white">
       <div className="container">
         <form
-          onSubmit={e => {
+          onSubmit={async e => {
             e.preventDefault();
-            createPasswordResetReques({ variables: { email } }).then(_ =>
-              setShowSuccess(true)
-            );
             setShowSuccess(false);
             setEmail("");
+
+            try {
+              await createPasswordResetReques({ variables: { email } });
+              setShowSuccess(true);
+            } catch (err) {
+              // The error is handled in the UI
+            }
           }}
         >
           <h1 className="h1">Réinitialisation de votre mot de passe</h1>
