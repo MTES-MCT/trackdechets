@@ -15,6 +15,13 @@ mutation SignBsda($id: ID!, $input: BsdaSignatureInput!) {
   signBsda(id: $id, input: $input) {
       id
       status
+      emitter {
+        emission {
+          signature {
+            date
+          }
+        }
+      }
   }
 }
 `;
@@ -726,5 +733,32 @@ describe("Mutation.Bsda.sign", () => {
         })
       ]);
     });
+  });
+});
+
+describe("Date integrity", () => {
+  it("should preserve timezone info in signature date", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "signBsda">>(SIGN_BSDA, {
+      variables: {
+        id: bsda.id,
+        input: {
+          author: user.name,
+          type: "EMISSION",
+          date: "2021-01-01T00:00:00.000Z"
+        }
+      }
+    });
+
+    expect(data.signBsda.emitter.emission.signature.date).toEqual(
+      "2021-01-01T00:00:00.000Z"
+    );
   });
 });
