@@ -7,7 +7,7 @@
     "predev": "npm run generate",
     "dev": "npm run watch:all",
     "watch:all": "concurrently -k -p \"[{name}]\" -n \"Api,Queue\" -c \"yellow.bold,cyan.bold\" \"npm run watch:node\" \"npm run watch:queue\"",
-    "watch:node": "nodemon -r dotenv/config --watch src --exec \"ts-eager\" src/index.ts -e ts,tsx",
+    "watch:node": "nodemon -r dotenv/config --watch src --exec ts-eager --inspect=0.0.0.0:9229 src/index.ts -e ts,tsx",
     "start": "node dist/src/index.js",
     "update": "node dist/prisma/scripts/index.js",
     "update:dev": "ts-node prisma/scripts/index.ts",
@@ -30,7 +30,7 @@
     "bulk-create-account:dev": "ts-node src/users/bulk-creation/index.ts",
     "index-elastic-search": "node dist/src/scripts/bin/indexElasticSearch.js",
     "index-elastic-search:dev": "ts-node -r dotenv/config ./src/scripts/bin/indexElasticSearch.ts",
-    "watch:queue": "nodemon -r dotenv/config --watch src --exec \"ts-eager\" --inspect=0.0.0.0:9230 src/queue/consumer.ts -e ts,tsx",
+    "watch:queue": "nodemon -r dotenv/config --watch src --exec ts-eager --inspect=0.0.0.0:9230 src/queue/consumer.ts -e ts,tsx",
     "queue": "node dist/src/queue/consumer.js"
   },
   "engines": {

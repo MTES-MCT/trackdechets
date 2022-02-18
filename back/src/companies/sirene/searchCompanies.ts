@@ -1,6 +1,7 @@
 import { searchCompanies as searchCompaniesInsee } from "./insee/client";
 import { searchCompanies as searchCompaniesDataGouv } from "./entreprise.data.gouv.fr/client";
 import { searchCompanies as searchCompaniesSocialGouv } from "./social.gouv/client";
+import { searchCompanies as searchCompaniesTD } from "./trackdechets/client";
 import { backoffIfTooManyRequests, throttle } from "./ratelimit";
 import { redundant } from "./redundancy";
 
@@ -26,6 +27,7 @@ const searchCompaniesSocialGouvThrottled = throttle(searchCompaniesSocialGouv, {
 // list different implementations of searchCompanies by
 // order of priority.
 const searchCompaniesProviders = [
+  searchCompaniesTD,
   ...(INSEE_MAINTENANCE === "true" ? [] : [searchCompaniesInseeThrottled]),
   searchCompaniesDataGouvThrottled,
   searchCompaniesSocialGouvThrottled

@@ -9,6 +9,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Ajout d'un client primaire nommé trackdechets dans `companies/sirene` base sur notre propre index ElasticSearch des données Sirene INSEE.
+
 #### :bug: Corrections de bugs
 
 #### :boom: Breaking changes
