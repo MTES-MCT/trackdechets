@@ -1,4 +1,4 @@
-import { UserInputError } from "apollo-server-core";
+import { UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import { PageInfo } from "../generated/graphql/types";
 

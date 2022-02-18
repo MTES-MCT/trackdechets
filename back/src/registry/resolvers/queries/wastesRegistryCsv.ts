@@ -11,7 +11,7 @@ import { getRegistryFileName } from "../../filename";
 import { format } from "@fast-csv/format";
 import { wasteFormatter, wastesReader } from "../../streams";
 import { searchBsds } from "../../elastic";
-import { UserInputError } from "apollo-server-core";
+import { UserInputError } from "apollo-server-express";
 import { GraphQLContext } from "../../../types";
 
 export const wastesRegistryCsvDownloadHandler: DownloadHandler<QueryWastesRegistryCsvArgs> =

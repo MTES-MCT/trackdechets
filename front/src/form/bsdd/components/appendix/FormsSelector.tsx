@@ -9,36 +9,37 @@ function round(value: number) {
   return Math.round(value * 100) / 100;
 }
 
-function reducer(
-  state: { selected: string[]; quantity: number },
-  action: { type: string; payload: Form | Form[] }
-) {
+type State = { selected: string[]; quantity: number };
+
+type Action =
+  | { type: "select"; payload: Form }
+  | { type: "unselect"; payload: Form }
+  | { type: "selectAll"; payload: Form[] };
+
+function reducer(state: State, action: Action) {
   switch (action.type) {
     case "select":
-      const sp = action.payload as Form;
+      const sp = action.payload;
       return {
         selected: [sp.id, ...state.selected],
         quantity: round(state.quantity + (sp.quantityReceived || 0)),
       };
     case "unselect":
-      const usp = action.payload as Form;
+      const usp = action.payload;
       return {
         selected: state.selected.filter(v => v !== usp.id),
         quantity: round(state.quantity - (usp.quantityReceived || 0)),
       };
     case "selectAll":
-      const sap = action.payload as Form[];
+      const sap = action.payload;
       return {
-        selected: sap.map((v: Form) => v.id),
+        selected: sap.map(v => v.id),
         quantity: round(
-          sap.reduce(
-            (prev: number, cur: Form) => (prev += cur.quantityReceived || 0),
-            0
-          )
+          sap.reduce((prev, cur) => (prev += cur.quantityReceived || 0), 0)
         ),
       };
     default:
-      throw new Error();
+      throw new Error("Unknown action type");
   }
 }
 

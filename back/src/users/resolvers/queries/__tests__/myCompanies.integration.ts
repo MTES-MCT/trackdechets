@@ -1,4 +1,4 @@
-import { gql } from "apollo-server-core";
+import { gql } from "apollo-server-express";
 import makeClient from "../../../../__tests__/testClient";
 import {
   companyFactory,

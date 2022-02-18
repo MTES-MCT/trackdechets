@@ -12,7 +12,7 @@ import * as Excel from "exceljs";
 import { wasteFormatter, wastesReader } from "../../streams";
 import { getXlsxHeaders } from "../../columns";
 import { searchBsds } from "../../elastic";
-import { UserInputError } from "apollo-server-core";
+import { UserInputError } from "apollo-server-express";
 import { GraphQLContext } from "../../../types";
 
 export const wastesRegistryXlsDownloadHandler: DownloadHandler<QueryWastesRegistryXlsArgs> =

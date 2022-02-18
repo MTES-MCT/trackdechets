@@ -16,7 +16,12 @@ const SEND_MEMBERSHIP_REQUEST = gql`
  */
 export default function AccountCompanyAddInvitationRequest({ siret }) {
   const [sendMembershipRequest, { data, error, loading }] = useMutation(
-    SEND_MEMBERSHIP_REQUEST
+    SEND_MEMBERSHIP_REQUEST,
+    {
+      onError: () => {
+        // The error is handled in the UI
+      },
+    }
   );
 
   if (data) {
