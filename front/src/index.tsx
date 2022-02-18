@@ -15,12 +15,19 @@ if (process.env.REACT_APP_SENTRY_DSN) {
     dsn: process.env.REACT_APP_SENTRY_DSN,
     environment: process.env.REACT_APP_SENTRY_ENVIRONMENT,
     ignoreErrors: [
+      // The user is having issues with their internet connection
       "NetworkError when attempting to fetch resource.",
-      "Non-Error promise rejection captured with value: Object Not Found Matching Id:2",
 
-      // The following is caused by cache mismatches,
-      // possibly because of the ServiceWorker
+      // An error is thrown without a message
+      // https://github.com/getsentry/sentry-javascript/issues/3440
+      "Non-Error promise rejection captured with value: Object Not Found Matching Id:",
+
+      // There's a cache mismatch, possibly because of the ServiceWorker
       "Unexpected token '<'",
+
+      // Happens after a new release, when trying to load files that don't exist anymore
+      // https://rollbar.com/blog/javascript-chunk-load-error
+      /Loading chunk [0-9]+ failed/,
     ],
   });
 }
