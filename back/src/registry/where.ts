@@ -1,5 +1,5 @@
 import { QueryDslQueryContainer } from "@elastic/elasticsearch/api/types";
-import { UserInputError } from "apollo-server-core";
+import { UserInputError } from "apollo-server-express";
 import { BsdElastic } from "../common/elastic";
 import {
   BsdTypeFilter,

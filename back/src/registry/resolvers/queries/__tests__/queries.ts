@@ -1,4 +1,4 @@
-import { gql } from "apollo-server-core";
+import { gql } from "apollo-server-express";
 
 export const INCOMING_WASTES = gql`
   query IncomingWastes(
