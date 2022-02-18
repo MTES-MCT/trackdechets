@@ -123,11 +123,7 @@ export default function BsdasriStepsList(props: Props) {
       : createBsdasri({ variables: { input: input } });
   }
 
-  function onSubmit(e, values) {
-    e.preventDefault();
-    // As we want to be able to save draft, we skip validation on submit
-    // and don't use the classic Formik mechanism
-
+  function onSubmit(values) {
     if (
       props.bsdasriFormType === "bsdasriRegroup" ||
       formQuery.data?.bsdasri?.type === "GROUPING"
