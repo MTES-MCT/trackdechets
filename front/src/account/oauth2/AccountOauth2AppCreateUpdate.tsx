@@ -107,6 +107,19 @@ export default function AccountOauth2AppCreateUpdate({
 
   return (
     <div className="panel">
+      <div className="notification success">
+        En créant une application tierce vous pouvez proposer aux utilisateurs
+        de Trackdéchets d'utiliser votre application afin d'enrichir leur
+        utilisation de Trackdéchets. Afin que les utilisateurs puissent
+        autoriser votre application à utiliser leur données Trackdéchets, nous
+        utilisons le protocole OAuth2. Plus d'informations sur{" "}
+        <a
+          className="tw-underline"
+          href="https://developers.trackdechets.beta.gouv.fr/guides/oauth2"
+        >
+          https://developers.trackdechets.beta.gouv.fr/guides/oauth2
+        </a>
+      </div>
       <Formik
         initialValues={initialValues}
         validationSchema={ApplicationInputSchema}
@@ -191,7 +204,10 @@ export default function AccountOauth2AppCreateUpdate({
             )}
 
             <div className={styles.field}>
-              <Label className={`${styles.bold}`}>URL du logo</Label>
+              <Label className={`${styles.bold}`}>
+                URL du logo
+                <Tooltip msg="Ce logo apparaitra sur la page de dialogue permettant à l'utilisateur de donner accès à votre application" />
+              </Label>
               <div className={styles.field__value}>
                 <Field
                   type="url"
@@ -204,7 +220,10 @@ export default function AccountOauth2AppCreateUpdate({
             </div>
 
             <div className={styles.field}>
-              <Label className={`${styles.bold}`}>URLs de redirection</Label>
+              <Label className={`${styles.bold}`}>
+                URLs de redirection
+                <Tooltip msg="Liste d'URLs autorisées sur lesquels l'utilisateur pourra être redirigé après avoir donné accès à votre application" />
+              </Label>
               <div className={styles.field__value}>
                 <FieldArray name="redirectUris">
                   {({ push, remove }) => (

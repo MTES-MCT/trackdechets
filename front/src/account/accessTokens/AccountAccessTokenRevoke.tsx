@@ -30,8 +30,8 @@ export default function AccountAccessTokenRevoke({
   );
 
   return (
-    <Modal ariaLabel="Supprimer un jeton d'accès" onClose={onClose} isOpen>
-      <div>Êtes vous certain.e de vouloir supprimer ce jeton d'accès ? </div>
+    <Modal ariaLabel="Révoquer un jeton d'accès" onClose={onClose} isOpen>
+      <div>Êtes vous certain.e de vouloir révoquer ce jeton d'accès ? </div>
       <div>
         Tous les scripts et applications susceptibles d'utiliser ce jeton
         d'accès ne pourront plus accéder à l'API Trackdéchets
@@ -48,8 +48,8 @@ export default function AccountAccessTokenRevoke({
           disabled={loading}
         >
           {loading
-            ? "Suppression..."
-            : "J'ai compris, supprimer ce jeton d'accès"}
+            ? "Révocation..."
+            : "J'ai compris, révoquer ce jeton d'accès"}
         </button>
       </div>
       {error && <NotificationError apolloError={error} />}

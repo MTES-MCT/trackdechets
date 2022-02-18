@@ -3,6 +3,7 @@ import SideMenu from "../common/components/SideMenu";
 import { NavLink } from "react-router-dom";
 import styles from "./AccountMenu.module.scss";
 import routes from "common/routes";
+import Tooltip from "common/components/Tooltip";
 
 export const AccountMenuContent = ({
   mobileCallback,
@@ -32,18 +33,12 @@ export const AccountMenuContent = ({
           Établissements
         </NavLink>
       </li>
-      <li className="tw-mb-1">
-        <NavLink
-          to={routes.account.authorizedApplications}
-          className="sidebar__link"
-          activeClassName="sidebar__link--active"
-          onClick={() => !!mobileCallback && mobileCallback()}
-        >
-          Applications autorisées
-        </NavLink>
-      </li>
     </ul>
-    <h5 className={styles.title}>Développeurs</h5>
+    <h5 className={styles.title}>
+      Intégration API
+      <Tooltip msg="L'API Trackdéchets permet de se connecter à un compte Trackdéchets à partir de systèmes informatiques tierces" />
+    </h5>
+
     <ul>
       <li>
         <NavLink
@@ -55,6 +50,16 @@ export const AccountMenuContent = ({
           Jetons d'accès API
         </NavLink>
       </li>
+      <li className="tw-mb-1">
+        <NavLink
+          to={routes.account.authorizedApplications}
+          className="sidebar__link"
+          activeClassName="sidebar__link--active"
+          onClick={() => !!mobileCallback && mobileCallback()}
+        >
+          Applications autorisées
+        </NavLink>
+      </li>
       <li>
         <NavLink
           to={routes.account.oauth2.list}
@@ -62,7 +67,7 @@ export const AccountMenuContent = ({
           activeClassName="sidebar__link--active"
           onClick={() => !!mobileCallback && mobileCallback()}
         >
-          Mes Applications
+          Mes applications
         </NavLink>
       </li>
     </ul>

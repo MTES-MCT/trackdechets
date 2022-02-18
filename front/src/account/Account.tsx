@@ -70,13 +70,13 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
               path={routes.account.oauth2.list}
               render={() => (
                 <AccountContentWrapper
-                  title="Mes applications OAuth2"
+                  title="Mes applications tierces"
                   button={
                     <Link
                       className="btn btn--primary"
                       to={routes.account.oauth2.create}
                     >
-                      Créer une application OAuth2
+                      Créer une application tierce
                     </Link>
                   }
                 >
@@ -87,7 +87,7 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
             <Route
               path={routes.account.oauth2.create}
               render={() => (
-                <AccountContentWrapper title="Créer une application OAuth2">
+                <AccountContentWrapper title="Créer une application tierce sur la plateforme Trackdéchets">
                   <AccountOAuth2AppCreateUpdate />
                 </AccountContentWrapper>
               )}

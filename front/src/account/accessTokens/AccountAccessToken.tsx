@@ -35,7 +35,7 @@ export default function AccountAccessToken({
           setIsRevoking(true);
         }}
       >
-        Supprimer
+        Révoquer
       </button>
       {isRevoking && (
         <AccountAccessTokenRevoke
