@@ -79,7 +79,15 @@ function getWhere(
       break;
 
     case BsdaStatus.SIGNED_BY_PRODUCER:
-      setTab(siretsFilters, "workerCompanySiret", "isForActionFor");
+      if (bsda.type === "OTHER_COLLECTIONS") {
+        setTab(siretsFilters, "workerCompanySiret", "isForActionFor");
+      } else {
+        // Bsda types GATHERING and RESHIPMENT do not expect worker signature,
+        // so they're ready to take over an must appear on transporter dashboard
+        // (COLLECTION_2710 is directly PROCESSED and never SIGNED_BY_PRODUCER)
+        setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
+      }
+
       break;
 
     case BsdaStatus.SIGNED_BY_WORKER:
