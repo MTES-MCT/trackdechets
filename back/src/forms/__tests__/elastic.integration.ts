@@ -10,7 +10,7 @@ import {
 import { getFullForm } from "../database";
 import { getSiretsByTab } from "../elastic";
 
-describe("getTabs", () => {
+describe("getSiretsByTab", () => {
   afterEach(resetDatabase);
 
   test("status DRAFT", async () => {
