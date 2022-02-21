@@ -90,7 +90,7 @@ function AccountAccessTokenListContent({
     return (
       <div className="tw-mb-4">
         <div className="tw-mb-4">
-          Jeton d'accès personnels que vous pouvez utiliser pour vous
+          Jetons d'accès personnels que vous pouvez utiliser pour vous
           authentifier à{" "}
           <a
             href={DEVELOPERS_DOCUMENTATION_URL}

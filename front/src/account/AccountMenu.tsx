@@ -36,7 +36,7 @@ export const AccountMenuContent = ({
     </ul>
     <h5 className={styles.title}>
       Intégration API
-      <Tooltip msg="L'API Trackdéchets permet de se connecter à un compte Trackdéchets à partir de systèmes informatiques tierces" />
+      <Tooltip msg="L'API Trackdéchets permet de se connecter à un compte Trackdéchets à partir de systèmes informatiques tiers" />
     </h5>
 
     <ul>
