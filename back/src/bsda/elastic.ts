@@ -79,7 +79,14 @@ function getWhere(
       break;
 
     case BsdaStatus.SIGNED_BY_PRODUCER:
-      setTab(siretsFilters, "workerCompanySiret", "isForActionFor");
+      if (bsda.type === "OTHER_COLLECTIONS") {
+        setTab(siretsFilters, "workerCompanySiret", "isForActionFor");
+      } else {
+        // Bsda types other than do OTHER_COLLECTIONS not expect worker signature,
+        //so they're ready to take over an must appear on transporter dashboard
+        setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
+      }
+
       break;
 
     case BsdaStatus.SIGNED_BY_WORKER:
