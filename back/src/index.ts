@@ -17,4 +17,7 @@ async function start() {
   process.on("SIGINT", shutdown);
 }
 
+if (process.env.TZ !== "Europe/Paris") {
+  throw new Error("Please set the `TZ` env variable to `Europe/Paris`");
+}
 start();
