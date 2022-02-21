@@ -80,6 +80,7 @@ function toGenericWaste(bsdd: Bsdd): GenericWaste {
     destinationReceptionAcceptationStatus:
       bsdd.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsdd.destinationOperationDate,
+    destinationReceptionWeight: bsdd.destinationReceptionWeight,
     transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
     wasteAdr: bsdd.wasteAdr,
     workerCompanyName: null,
@@ -396,7 +397,6 @@ export function toManagedWaste(
     destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
-    destinationReceptionWeight: bsdd.destinationReceptionWeight,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
@@ -468,7 +468,6 @@ export function toAllWaste(
     destinationOperationCode: bsdd.destinationOperationCode,
     destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
-    destinationReceptionWeight: bsdd.destinationReceptionWeight,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
