@@ -33,7 +33,7 @@ export default function GenericStepList({
 }: Props) {
   const history = useHistory();
 
-  const steps = React.Children.toArray(children);
+  const steps = Children.toArray(children);
   const totalSteps = steps.length;
   const [currentStep, setCurrentStep] = useState(
     initialStep <= totalSteps ? initialStep : 0
