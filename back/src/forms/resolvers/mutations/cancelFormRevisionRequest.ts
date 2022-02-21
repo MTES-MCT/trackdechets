@@ -1,5 +1,5 @@
 import { RevisionRequestStatus } from "@prisma/client";
-import { ForbiddenError, UserInputError } from "apollo-server-core";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationCancelFormRevisionRequestArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";

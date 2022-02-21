@@ -4,28 +4,32 @@ import React, { useEffect, useReducer, useMemo } from "react";
 import { Bsdasri } from "generated/graphql/types";
 import BsdasriTable from "./BsdasriTable";
 
-function reducer(
-  state: { selected: string[] },
-  action: { type: string; payload: Bsdasri | Bsdasri[] }
-) {
+type State = { selected: string[] };
+
+type Action =
+  | { type: "select"; payload: Bsdasri }
+  | { type: "unselect"; payload: Bsdasri }
+  | { type: "selectAll"; payload: Bsdasri[] };
+
+function reducer(state: State, action: Action) {
   switch (action.type) {
     case "select":
-      const sp = action.payload as Bsdasri;
+      const sp = action.payload;
       return {
         selected: [sp.id, ...state.selected],
       };
     case "unselect":
-      const usp = action.payload as Bsdasri;
+      const usp = action.payload;
       return {
         selected: state.selected.filter(v => v !== usp.id),
       };
     case "selectAll":
-      const sap = action.payload as Bsdasri[];
+      const sap = action.payload;
       return {
-        selected: sap.map((v: Bsdasri) => v.id),
+        selected: sap.map(v => v.id),
       };
     default:
-      throw new Error();
+      throw new Error("Unknown action type");
   }
 }
 
