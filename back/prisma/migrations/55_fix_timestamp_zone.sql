@@ -112,18 +112,18 @@ ALTER TABLE "default$default"."Company" ALTER "verifiedAt" TYPE timestamptz USIN
 
 ALTER TABLE "default$default"."Form" ALTER "createdAt" TYPE timestamptz USING "createdAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Form" ALTER "updatedAt" TYPE timestamptz USING "updatedAt" AT TIME ZONE 'UTC';
-ALTER TABLE "default$default"."Form" ALTER "transporterValidityLimit" TYPE date USING "transporterValidityLimit";
-ALTER TABLE "default$default"."Form" ALTER "sentAt" TYPE date USING "sentAt";
-ALTER TABLE "default$default"."Form" ALTER "receivedAt" TYPE date USING "receivedAt";
-ALTER TABLE "default$default"."Form" ALTER "processedAt" TYPE date USING "processedAt";
-ALTER TABLE "default$default"."Form" ALTER "traderValidityLimit" TYPE date USING "traderValidityLimit";
-ALTER TABLE "default$default"."Form" ALTER "brokerValidityLimit" TYPE date USING "brokerValidityLimit";
+ALTER TABLE "default$default"."Form" ALTER "transporterValidityLimit" TYPE timestamptz USING "transporterValidityLimit" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."Form" ALTER "sentAt" TYPE timestamptz USING "sentAt" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."Form" ALTER "receivedAt" TYPE timestamptz USING "receivedAt" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."Form" ALTER "processedAt" TYPE timestamptz USING "processedAt" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."Form" ALTER "traderValidityLimit" TYPE timestamptz USING "traderValidityLimit" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."Form" ALTER "brokerValidityLimit" TYPE timestamptz USING "brokerValidityLimit" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Form" ALTER "signedAt" TYPE timestamptz USING "signedAt" AT TIME ZONE 'UTC';
 
 ALTER TABLE "default$default"."BsddRevisionRequest" ALTER "createdAt" TYPE timestamptz USING "createdAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."BsddRevisionRequest" ALTER "updatedAt" TYPE timestamptz USING "updatedAt" AT TIME ZONE 'UTC';
-ALTER TABLE "default$default"."BsddRevisionRequest" ALTER "traderValidityLimit" TYPE date USING "traderValidityLimit";
-ALTER TABLE "default$default"."BsddRevisionRequest" ALTER "brokerValidityLimit" TYPE date USING "brokerValidityLimit";
+ALTER TABLE "default$default"."BsddRevisionRequest" ALTER "traderValidityLimit" TYPE timestamptz USING "traderValidityLimit" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."BsddRevisionRequest" ALTER "brokerValidityLimit" TYPE timestamptz USING "brokerValidityLimit" AT TIME ZONE 'UTC';
 
 ALTER TABLE "default$default"."BsddRevisionRequestApproval" ALTER "createdAt" TYPE timestamptz USING "createdAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."BsddRevisionRequestApproval" ALTER "updatedAt" TYPE timestamptz USING "updatedAt" AT TIME ZONE 'UTC';
@@ -136,19 +136,19 @@ ALTER TABLE "default$default"."MembershipRequest" ALTER "updatedAt" TYPE timesta
 
 ALTER TABLE "default$default"."StatusLog" ALTER "loggedAt" TYPE timestamptz USING "loggedAt" AT TIME ZONE 'UTC';
 
-ALTER TABLE "default$default"."TemporaryStorageDetail" ALTER "tempStorerReceivedAt" TYPE date USING "tempStorerReceivedAt";
+ALTER TABLE "default$default"."TemporaryStorageDetail" ALTER "tempStorerReceivedAt" TYPE timestamptz USING "tempStorerReceivedAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."TemporaryStorageDetail" ALTER "tempStorerSignedAt" TYPE timestamptz USING "tempStorerSignedAt" AT TIME ZONE 'UTC';
-ALTER TABLE "default$default"."TemporaryStorageDetail" ALTER "transporterValidityLimit" TYPE date USING "transporterValidityLimit";
+ALTER TABLE "default$default"."TemporaryStorageDetail" ALTER "transporterValidityLimit" TYPE timestamptz USING "transporterValidityLimit" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."TemporaryStorageDetail" ALTER "signedAt" TYPE timestamptz USING "signedAt" AT TIME ZONE 'UTC';
 
-ALTER TABLE "default$default"."TraderReceipt" ALTER "validityLimit" TYPE date USING "validityLimit";
+ALTER TABLE "default$default"."TraderReceipt" ALTER "validityLimit" TYPE timestamptz USING "validityLimit" AT TIME ZONE 'UTC';
 
-ALTER TABLE "default$default"."BrokerReceipt" ALTER "validityLimit" TYPE date USING "validityLimit";
+ALTER TABLE "default$default"."BrokerReceipt" ALTER "validityLimit" TYPE timestamptz USING "validityLimit" AT TIME ZONE 'UTC';
 
-ALTER TABLE "default$default"."TransporterReceipt" ALTER "validityLimit" TYPE date USING "validityLimit";
+ALTER TABLE "default$default"."TransporterReceipt" ALTER "validityLimit" TYPE timestamptz USING "validityLimit" AT TIME ZONE 'UTC';
 
-ALTER TABLE "default$default"."TransportSegment" ALTER "transporterValidityLimit" TYPE date USING "transporterValidityLimit";
-ALTER TABLE "default$default"."TransportSegment" ALTER "takenOverAt" TYPE date USING "takenOverAt";
+ALTER TABLE "default$default"."TransportSegment" ALTER "transporterValidityLimit" TYPE timestamptz USING "transporterValidityLimit" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."TransportSegment" ALTER "takenOverAt" TYPE timestamptz USING "takenOverAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."TransportSegment" ALTER "createdAt" TYPE timestamptz USING "createdAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."TransportSegment" ALTER "updatedAt" TYPE timestamptz USING "updatedAt" AT TIME ZONE 'UTC';
 
@@ -164,35 +164,38 @@ ALTER TABLE "default$default"."UserAccountHash" ALTER "acceptedAt" TYPE timestam
 ALTER TABLE "default$default"."UserActivationHash" ALTER "createdAt" TYPE timestamptz USING "createdAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."UserActivationHash" ALTER "updatedAt" TYPE timestamptz USING "updatedAt" AT TIME ZONE 'UTC';
 
+ALTER TABLE "default$default"."UserResetPasswordHash" ALTER "createdAt" TYPE timestamptz USING "createdAt" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."UserResetPasswordHash" ALTER "hashExpires" TYPE timestamptz USING "hashExpires" AT TIME ZONE 'UTC';
+
 ALTER TABLE "default$default"."Bsvhu" ALTER "createdAt" TYPE timestamptz USING "createdAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsvhu" ALTER "updatedAt" TYPE timestamptz USING "updatedAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsvhu" ALTER "emitterEmissionSignatureDate" TYPE timestamptz USING "emitterEmissionSignatureDate" AT TIME ZONE 'UTC';
-ALTER TABLE "default$default"."Bsvhu" ALTER "transporterRecepisseValidityLimit" TYPE date USING "transporterRecepisseValidityLimit";
-ALTER TABLE "default$default"."Bsvhu" ALTER "transporterTransportTakenOverAt" TYPE date USING "transporterTransportTakenOverAt";
+ALTER TABLE "default$default"."Bsvhu" ALTER "transporterRecepisseValidityLimit" TYPE timestamptz USING "transporterRecepisseValidityLimit" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."Bsvhu" ALTER "transporterTransportTakenOverAt" TYPE timestamptz USING "transporterTransportTakenOverAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsvhu" ALTER "transporterTransportSignatureDate" TYPE timestamptz USING "transporterTransportSignatureDate" AT TIME ZONE 'UTC';
-ALTER TABLE "default$default"."Bsvhu" ALTER "destinationReceptionDate" TYPE date USING "destinationReceptionDate";
-ALTER TABLE "default$default"."Bsvhu" ALTER "destinationOperationDate" TYPE date USING "destinationOperationDate";
+ALTER TABLE "default$default"."Bsvhu" ALTER "destinationReceptionDate" TYPE timestamptz USING "destinationReceptionDate" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."Bsvhu" ALTER "destinationOperationDate" TYPE timestamptz USING "destinationOperationDate" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsvhu" ALTER "destinationOperationSignatureDate" TYPE timestamptz USING "destinationOperationSignatureDate" AT TIME ZONE 'UTC';
 
 ALTER TABLE "default$default"."Bsdasri" ALTER "createdAt" TYPE timestamptz USING "createdAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsdasri" ALTER "updatedAt" TYPE timestamptz USING "updatedAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsdasri" ALTER "emitterEmissionSignatureDate" TYPE timestamptz USING "emitterEmissionSignatureDate" AT TIME ZONE 'UTC';
-ALTER TABLE "default$default"."Bsdasri" ALTER "transporterRecepisseValidityLimit" TYPE date USING "transporterRecepisseValidityLimit";
-ALTER TABLE "default$default"."Bsdasri" ALTER "transporterTakenOverAt" TYPE date USING "transporterTakenOverAt";
-ALTER TABLE "default$default"."Bsdasri" ALTER "handedOverToRecipientAt" TYPE date USING "handedOverToRecipientAt";
+ALTER TABLE "default$default"."Bsdasri" ALTER "transporterRecepisseValidityLimit" TYPE timestamptz USING "transporterRecepisseValidityLimit" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."Bsdasri" ALTER "transporterTakenOverAt" TYPE timestamptz USING "transporterTakenOverAt" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."Bsdasri" ALTER "handedOverToRecipientAt" TYPE timestamptz USING "handedOverToRecipientAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsdasri" ALTER "transporterTransportSignatureDate" TYPE timestamptz USING "transporterTransportSignatureDate" AT TIME ZONE 'UTC';
-ALTER TABLE "default$default"."Bsdasri" ALTER "destinationReceptionDate" TYPE date USING "destinationReceptionDate";
-ALTER TABLE "default$default"."Bsdasri" ALTER "destinationOperationDate" TYPE date USING "destinationOperationDate";
+ALTER TABLE "default$default"."Bsdasri" ALTER "destinationReceptionDate" TYPE timestamptz USING "destinationReceptionDate" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."Bsdasri" ALTER "destinationOperationDate" TYPE timestamptz USING "destinationOperationDate" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsdasri" ALTER "destinationReceptionSignatureDate" TYPE timestamptz USING "destinationReceptionSignatureDate" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsdasri" ALTER "destinationOperationSignatureDate" TYPE timestamptz USING "destinationOperationSignatureDate" AT TIME ZONE 'UTC';
 
 ALTER TABLE "default$default"."Bsff" ALTER "createdAt" TYPE timestamptz USING "createdAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsff" ALTER "updatedAt" TYPE timestamptz USING "updatedAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsff" ALTER "emitterEmissionSignatureDate" TYPE timestamptz USING "emitterEmissionSignatureDate" AT TIME ZONE 'UTC';
-ALTER TABLE "default$default"."Bsff" ALTER "transporterRecepisseValidityLimit" TYPE date USING "transporterRecepisseValidityLimit";
-ALTER TABLE "default$default"."Bsff" ALTER "transporterTransportTakenOverAt" TYPE date USING "transporterTransportTakenOverAt";
+ALTER TABLE "default$default"."Bsff" ALTER "transporterRecepisseValidityLimit" TYPE timestamptz USING "transporterRecepisseValidityLimit" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."Bsff" ALTER "transporterTransportTakenOverAt" TYPE timestamptz USING "transporterTransportTakenOverAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsff" ALTER "transporterTransportSignatureDate" TYPE timestamptz USING "transporterTransportSignatureDate" AT TIME ZONE 'UTC';
-ALTER TABLE "default$default"."Bsff" ALTER "destinationReceptionDate" TYPE date USING "destinationReceptionDate";
+ALTER TABLE "default$default"."Bsff" ALTER "destinationReceptionDate" TYPE timestamptz USING "destinationReceptionDate" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsff" ALTER "destinationReceptionSignatureDate" TYPE timestamptz USING "destinationReceptionSignatureDate" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsff" ALTER "destinationOperationSignatureDate" TYPE timestamptz USING "destinationOperationSignatureDate" AT TIME ZONE 'UTC';
 
@@ -202,11 +205,11 @@ ALTER TABLE "default$default"."BsffFicheIntervention" ALTER "updatedAt" TYPE tim
 ALTER TABLE "default$default"."Bsda" ALTER "createdAt" TYPE timestamptz USING "createdAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsda" ALTER "updatedAt" TYPE timestamptz USING "updatedAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsda" ALTER "emitterEmissionSignatureDate" TYPE timestamptz USING "emitterEmissionSignatureDate" AT TIME ZONE 'UTC';
-ALTER TABLE "default$default"."Bsda" ALTER "brokerRecepisseValidityLimit" TYPE date USING "brokerRecepisseValidityLimit";
-ALTER TABLE "default$default"."Bsda" ALTER "destinationReceptionDate" TYPE date USING "destinationReceptionDate";
-ALTER TABLE "default$default"."Bsda" ALTER "destinationOperationDate" TYPE date USING "destinationOperationDate";
+ALTER TABLE "default$default"."Bsda" ALTER "brokerRecepisseValidityLimit" TYPE timestamptz USING "brokerRecepisseValidityLimit" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."Bsda" ALTER "destinationReceptionDate" TYPE timestamptz USING "destinationReceptionDate" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."Bsda" ALTER "destinationOperationDate" TYPE timestamptz USING "destinationOperationDate" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsda" ALTER "destinationOperationSignatureDate" TYPE timestamptz USING "destinationOperationSignatureDate" AT TIME ZONE 'UTC';
-ALTER TABLE "default$default"."Bsda" ALTER "transporterRecepisseValidityLimit" TYPE date USING "transporterRecepisseValidityLimit";
-ALTER TABLE "default$default"."Bsda" ALTER "transporterTransportTakenOverAt" TYPE date USING "transporterTransportTakenOverAt";
+ALTER TABLE "default$default"."Bsda" ALTER "transporterRecepisseValidityLimit" TYPE timestamptz USING "transporterRecepisseValidityLimit" AT TIME ZONE 'UTC';
+ALTER TABLE "default$default"."Bsda" ALTER "transporterTransportTakenOverAt" TYPE timestamptz USING "transporterTransportTakenOverAt" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsda" ALTER "transporterTransportSignatureDate" TYPE timestamptz USING "transporterTransportSignatureDate" AT TIME ZONE 'UTC';
 ALTER TABLE "default$default"."Bsda" ALTER "workerWorkSignatureDate" TYPE timestamptz USING "workerWorkSignatureDate" AT TIME ZONE 'UTC';
