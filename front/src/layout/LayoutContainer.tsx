@@ -32,7 +32,8 @@ const SignupInfo = lazy(() => import("login/SignupInfos"));
 const WasteSelector = lazy(() => import("login/WasteSelector"));
 
 const Invite = lazy(() => import("login/Invite"));
-const ResetPassword = lazy(() => import("login/ResetPassword"));
+const PasswordResetRequest = lazy(() => import("login/PasswordResetRequest"));
+const PasswordReset = lazy(() => import("login/PasswordReset"));
 const Login = lazy(() => import("login/Login"));
 const Signup = lazy(() => import("login/Signup"));
 const Dialog = lazy(() => import("oauth2/Dialog"));
@@ -124,8 +125,12 @@ export default withRouter(function LayoutContainer({ history }) {
                 <SignupInfo />
               </Route>
 
-              <Route exact path={routes.resetPassword}>
-                <ResetPassword />
+              <Route exact path={routes.passwordResetRequest}>
+                <PasswordResetRequest />
+              </Route>
+
+              <Route exact path={routes.passwordReset}>
+                <PasswordReset />
               </Route>
 
               <Route exact path={routes.resendActivationEmail}>
@@ -273,7 +278,7 @@ export default withRouter(function LayoutContainer({ history }) {
                       ? generatePath(routes.dashboard.index, {
                           siret: data.me.companies[0].siret,
                         })
-                      : routes.account.companies
+                      : routes.account.companies.list
                     : routes.login
                 }
               />

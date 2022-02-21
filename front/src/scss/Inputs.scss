@@ -29,7 +29,7 @@ input[type="radio"] {
   width: 1.25em;
   border-radius: 50%;
   display: inline-block;
-
+  cursor: pointer;
   appearance: none;
   padding: 0;
 }
@@ -157,4 +157,19 @@ select:-moz-focusring {
   background-repeat: no-repeat, repeat;
   background-position: right 0.7em top 50%, 0 0;
   background-size: 0.65em auto, 100%;
+}
+.td-input-text-security {
+  font-family: "text-security-disc";
+  /* Use -webkit-text-security if the browser supports it */
+  -webkit-text-security: disc;
+}
+
+.showPassword {
+  color: #006be6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  > span {
+    margin-left: 0.25rem;
+  }
 }

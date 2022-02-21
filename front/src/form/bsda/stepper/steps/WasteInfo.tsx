@@ -129,6 +129,7 @@ export function WasteInfo({ disabled }) {
 
 export function WasteInfoWorker({ disabled }) {
   const { values } = useFormikContext<Bsda>();
+  const isDechetterie = values?.type === "COLLECTION_2710";
 
   return (
     <>
@@ -215,22 +216,28 @@ export function WasteInfoWorker({ disabled }) {
         </div>
       </div>
 
-      <h4 className="form__section-heading">
-        Numéros de scellés{" "}
-        <Tooltip msg="Ils peuvent être remplis au moment de la signature. Vous n'êtes pas obligé de les compléter à la création du bordereau." />
-      </h4>
-      <div className="form__row">
-        <label>
-          Numéros de scellés
-          <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
-          <TagsInput name="waste.sealNumbers" disabled={disabled} />
-        </label>
-      </div>
-      <p>
-        Vous avez saisi {values.waste?.sealNumbers?.length ?? 0} scellé(s) et{" "}
-        {values.packagings?.reduce((prev, cur) => prev + cur.quantity, 0) ?? 0}{" "}
-        conditionnement(s).
-      </p>
+      {!isDechetterie && (
+        <>
+          <h4 className="form__section-heading">
+            Numéros de scellés{" "}
+            <Tooltip msg="Ils peuvent être remplis au moment de la signature. Vous n'êtes pas obligé de les compléter à la création du bordereau." />
+          </h4>
+          <div className="form__row">
+            <label>
+              Numéros de scellés
+              <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
+              <TagsInput name="waste.sealNumbers" disabled={disabled} />
+            </label>
+          </div>
+          <p>
+            Vous avez saisi {values.waste?.sealNumbers?.length ?? 0} scellé(s)
+            et{" "}
+            {values.packagings?.reduce((prev, cur) => prev + cur.quantity, 0) ??
+              0}{" "}
+            conditionnement(s).
+          </p>
+        </>
+      )}
     </>
   );
 }

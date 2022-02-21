@@ -5,10 +5,9 @@ import {
   ApolloServer,
   UserInputError
 } from "apollo-server-express";
-import { json, urlencoded } from "body-parser";
 import redisStore from "connect-redis";
 import cors from "cors";
-import express, { static as serveStatic } from "express";
+import express, { static as serveStatic, json, urlencoded } from "express";
 import rateLimit from "express-rate-limit";
 import session from "express-session";
 import depthLimit from "graphql-depth-limit";

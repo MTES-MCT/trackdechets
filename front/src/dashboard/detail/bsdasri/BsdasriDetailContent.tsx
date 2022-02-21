@@ -1,7 +1,7 @@
 import React from "react";
 import { useBsdasriDuplicate } from "dashboard/components/BSDList/BSDasri/BSDasriActions/useDuplicate";
 import { generatePath, useHistory, useParams } from "react-router-dom";
-import { transportModeLabels, statusLabels } from "dashboard/constants";
+import { statusLabels, getTransportModeLabel } from "dashboard/constants";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import {
   Bsdasri,
@@ -142,11 +142,7 @@ const Transporter = ({ form }: { form: Bsdasri }) => {
       </div>
       <div className={styles.detailGrid}>
         <DetailRow
-          value={
-            transporter?.transport?.mode
-              ? transportModeLabels[transporter?.transport?.mode]
-              : null
-          }
+          value={getTransportModeLabel(transporter?.transport?.mode)}
           label="Mode de transport"
         />
         <DetailRow

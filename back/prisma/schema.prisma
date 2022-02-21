@@ -120,11 +120,19 @@ enum AuthType {
   JWT
 }
 
+enum ApplicationGoal {
+  // Application pour un usage personnel ou au sein de sa propre entreprise
+  PERSONNAL
+  // Application pour des clients (ex: SaaS métier)
+  CLIENTS
+}
+
 model AccessToken {
   id            String       @id @default(cuid())
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   token         String       @unique
+  description   String?
   isRevoked     Boolean      @default(false)
   lastUsed      DateTime?
   applicationId String?
@@ -134,14 +142,16 @@ model AccessToken {
 }
 
 model Application {
-  id           String        @id @default(cuid())
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id           String          @id @default(cuid())
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
   clientSecret String
   name         String
+  goal         ApplicationGoal?
   logoUrl      String?
   redirectUris String[]
-  admins       User[]
+  admin        User?           @relation(fields: [adminId], references: [id])
+  adminId      String?
   AccessToken  AccessToken[]
   Grant        Grant[]
 }
@@ -266,6 +276,7 @@ model Form {
   transporterDepartment              String?
   transporterValidityLimit           DateTime?
   transporterNumberPlate             String?
+  transporterTransportMode           TransportMode?          @default(ROAD)
   wasteDetailsCode                   String?
   wasteDetailsOnuCode                String?
   wasteDetailsPackagingInfos         Json                    @default("[]")
@@ -545,6 +556,7 @@ model TemporaryStorageDetail {
   transporterValidityLimit         DateTime?
   transporterNumberPlate           String?
   transporterCustomInfo            String?
+  transporterTransportMode         TransportMode?          @default(ROAD)
   signedByTransporter              Boolean?
   signedBy                         String?
   signedAt                         DateTime?
@@ -629,8 +641,7 @@ model User {
   isAdmin              Boolean?             @default(false)
   // compte de service avec des droits étendus
   isRegistreNational   Boolean?             @default(false)
-  applicationId        String?
-  application          Application?         @relation(fields: [applicationId], references: [id])
+  applications         Application[]
   companyAssociations  CompanyAssociation[]
   AccessToken          AccessToken[]
   Form                 Form[]
@@ -638,6 +649,7 @@ model User {
   MembershipRequest    MembershipRequest[]
   StatusLog            StatusLog[]
   UserActivationHash   UserActivationHash[]
+  UserResetPasswordHash   UserResetPasswordHash[]
 
   bsdasriEmissionSignatures  Bsdasri[] @relation("BsdasriEmissionSignature")
   bsdasriTransportSignatures Bsdasri[] @relation("BsdasriTransportSignature")
@@ -668,6 +680,17 @@ model UserActivationHash {
   user      User     @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "_UserActivationHashUserIdIdx")
+}
+
+model UserResetPasswordHash {
+  id          String   @id @default(cuid())
+  hash        String   @unique
+  hashExpires DateTime
+  createdAt   DateTime @default(now())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "_UserResetPasswordHashIdIdx")
 }
 
 // ----------------

@@ -14,7 +14,6 @@ export default async function deleteUser(user: User) {
   }
 
   await deleteUserCompanyAssociations(user);
-  await removeUserFromApplications(user);
   await deleteUserActivationHashes(user);
   await deleteUserAccessTokens(user);
   await deleteUserGrants(user);
@@ -113,54 +112,16 @@ async function checkApplications(user: User): Promise<string[]> {
   const errors = [];
   const applications = await prisma.application.findMany({
     where: {
-      admins: {
-        some: {
-          id: user.id
-        }
-      }
+      adminId: user.id
     }
   });
   for (const application of applications) {
-    const { admins } = await prisma.application.findUnique({
-      where: { id: application.id },
-      include: { admins: { select: { id: true } } }
-    });
-
-    const otherAdmins = admins.filter(admin => admin.id !== user.id);
-    if (otherAdmins.length <= 0) {
-      errors.push(
-        `Impossible de supprimer cet utilisateur car il est le seul administrateur de l'application ${application.id}.`
-      );
-    }
+    errors.push(
+      `Impossible de supprimer cet utilisateur car il est le seul administrateur de l'application ${application.id}.`
+    );
   }
 
   return errors;
-}
-
-async function removeUserFromApplications(user: User) {
-  const applications = await prisma.application.findMany({
-    where: {
-      admins: {
-        some: { id: user.id }
-      }
-    }
-  });
-  for (const application of applications) {
-    await prisma.application.update({
-      data: {
-        admins: {
-          disconnect: [
-            {
-              id: user.id
-            }
-          ]
-        }
-      },
-      where: {
-        id: application.id
-      }
-    });
-  }
 }
 
 async function deleteUserActivationHashes(user: User) {

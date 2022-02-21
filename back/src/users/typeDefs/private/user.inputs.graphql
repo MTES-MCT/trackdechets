@@ -11,3 +11,8 @@ input SignupInput {
   "Numéro de téléphone de l'utilisateur"
   phone: String
 }
+
+input CreateAccessTokenInput {
+  "Note personnelle pour se souvenir à quoi ce token va servir"
+  description: String!
+}

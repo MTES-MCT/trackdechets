@@ -2,7 +2,13 @@ import { hash } from "bcrypt";
 import crypto from "crypto";
 import * as yup from "yup";
 import { base32Encode } from "../utils";
+
 const saltRound = 10;
+const minimalPasswordLength = 8; // update frontend validation if this value is edited
+
+export function isPasswordLongEnough(password: string): boolean {
+  return password.length >= minimalPasswordLength;
+}
 
 export function hashPassword(password: string) {
   return hash(password, saltRound);

@@ -1,3 +1,4 @@
 type Query {
-  myApplication: Application
+  myApplications: [Application!]!
+  application(id: ID!): Application
 }

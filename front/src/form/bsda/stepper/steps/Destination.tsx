@@ -9,6 +9,7 @@ export function Destination({ disabled }) {
   const hasNextDestination = Boolean(
     values.destination?.operation?.nextDestination
   );
+  const isDechetterie = values.type === "COLLECTION_2710";
 
   function onNextDestinationToggle() {
     if (hasNextDestination) {
@@ -51,17 +52,19 @@ export function Destination({ disabled }) {
         </label>
       </div>
 
-      <div className="form__row">
-        <label>
-          N° CAP:
-          <Field
-            disabled={disabled}
-            type="text"
-            name="destination.cap"
-            className="td-input td-input--medium"
-          />
-        </label>
-      </div>
+      {!isDechetterie && (
+        <div className="form__row">
+          <label>
+            N° CAP:
+            <Field
+              disabled={disabled}
+              type="text"
+              name="destination.cap"
+              className="td-input td-input--medium"
+            />
+          </label>
+        </div>
+      )}
 
       <div className="form__row">
         <label>Opération d’élimination / valorisation prévue (code D/R)</label>
@@ -72,13 +75,20 @@ export function Destination({ disabled }) {
           disabled={disabled}
         >
           <option />
-          {hasNextDestination ? (
+          {hasNextDestination || isDechetterie ? (
             <>
+              <option value="R 12">
+                R 12 - Echange de déchets en vue de les soumettre à l'une des
+                opération R1 à R11
+              </option>
               <option value="D 13">D 13 - Groupement de déchets</option>
               <option value="D 15">D 15 - Entreposage provisoire</option>
             </>
           ) : (
             <>
+              <option value="R 5">
+                R 5 - Recyclage ou récupération d’autres matières inorganiques.
+              </option>
               <option value="D 5">
                 D 5 - Mise en décharge aménagée et autorisée en ISDD ou ISDND
               </option>
@@ -121,11 +131,18 @@ export function Destination({ disabled }) {
               disabled={disabled}
             >
               <option />
+              <option value="R 5">
+                R 5 - Recyclage ou récupération d’autres matières inorganiques.
+              </option>
               <option value="D 5">
                 D 5 - Mise en décharge aménagée et autorisée en ISDD ou ISDND
               </option>
               <option value="D 9">
                 D 9 - Vitrification, traitement chimique ou prétraitement
+              </option>
+              <option value="R 12">
+                R 12 - Echange de déchets en vue de les soumettre à l'une des
+                opération R1 à R11
               </option>
               <option value="D 13">D 13 - Groupement de déchets</option>
               <option value="D 15">D 15 - Entreposage provisoire</option>

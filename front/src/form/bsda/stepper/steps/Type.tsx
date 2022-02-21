@@ -1,19 +1,35 @@
+import { gql, useQuery } from "@apollo/client";
+import { InlineError } from "common/components/Error";
 import { BsdaPicker } from "form/bsda/components/bsdaPicker/BsdaPicker";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useField, useFormikContext } from "formik";
-import { Bsda, BsdaType } from "generated/graphql/types";
+import {
+  Bsda,
+  BsdaType,
+  CompanyType,
+  Query,
+  QueryCompanyInfosArgs,
+} from "generated/graphql/types";
 import React, { useEffect } from "react";
+import { useParams } from "react-router-dom";
 
 type Props = { disabled: boolean };
 
-const OPTIONS = [
+const COMPANY_INFOS = gql`
+  query CompanyInfos($siret: String!) {
+    companyInfos(siret: $siret) {
+      siret
+      name
+      address
+      companyTypes
+    }
+  }
+`;
+
+const COMMON_OPTIONS = [
   {
     title: "la collecte amiante sur un chantier",
     value: BsdaType.OtherCollections,
-  },
-  {
-    title: "la collecte en déchèterie relevant de la rubrique 2710-1",
-    value: BsdaType.Collection_2710,
   },
   {
     title:
@@ -25,10 +41,25 @@ const OPTIONS = [
     value: BsdaType.Reshipment,
   },
 ];
+const DECHETTERIE_OPTIONS = [
+  {
+    title: "la collecte en déchèterie relevant de la rubrique 2710-1",
+    value: BsdaType.Collection_2710,
+  },
+];
 
 export function Type({ disabled }: Props) {
   const { setFieldValue } = useFormikContext<Bsda>();
   const [{ value: type }] = useField<BsdaType>("type");
+  const { siret } = useParams<{ siret: string }>();
+
+  const { data, loading, error } = useQuery<
+    Pick<Query, "companyInfos">,
+    QueryCompanyInfosArgs
+  >(COMPANY_INFOS, {
+    variables: { siret },
+    fetchPolicy: "no-cache",
+  });
 
   useEffect(() => {
     if (type !== BsdaType.Gathering) {
@@ -37,7 +68,21 @@ export function Type({ disabled }: Props) {
     if (type !== BsdaType.Reshipment) {
       setFieldValue("forwarding", null);
     }
-  }, [type, setFieldValue]);
+    if (type === BsdaType.Collection_2710) {
+      setFieldValue("destination.company.siret", data?.companyInfos.siret);
+      setFieldValue("destination.company.address", data?.companyInfos.address);
+      setFieldValue("destination.company.name", data?.companyInfos.name);
+    }
+  }, [type, setFieldValue, data]);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <InlineError apolloError={error} />;
+
+  const typeOptions = data?.companyInfos.companyTypes.includes(
+    "WASTE_CENTER" as CompanyType
+  )
+    ? [...COMMON_OPTIONS, ...DECHETTERIE_OPTIONS]
+    : COMMON_OPTIONS;
 
   return (
     <>
@@ -48,7 +93,7 @@ export function Type({ disabled }: Props) {
       </div>
 
       <div className="form__row">
-        {OPTIONS.map(option => (
+        {typeOptions.map(option => (
           <Field
             key={option.value}
             disabled={disabled}

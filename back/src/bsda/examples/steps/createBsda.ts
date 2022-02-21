@@ -50,3 +50,26 @@ export function createPrivateIndividualBsda(company: string): WorkflowStep {
     setContext: (ctx, data) => ({ ...ctx, bsda: data })
   };
 }
+
+export function create2710Bsda(company: string): WorkflowStep {
+  return {
+    description: `Les informations du BSDA sont remplies. Cette action est effectuée
+    par la déchetterie. À ce stade il est toujours possible
+    d'effectuer des modifications grâce à la mutation updateBsda.`,
+    mutation: mutations.createBsda,
+    variables: ({ producteur, traiteur }) => ({
+      input: {
+        type: "COLLECTION_2710",
+        emitter: fixtures.emitterInput(producteur.siret),
+        destination: fixtures.destinationInput(traiteur.siret),
+        waste: fixtures.wasteInput(),
+        packagings: fixtures.packagingsInput(),
+        weight: fixtures.weightInput()
+      }
+    }),
+    expected: { status: "INITIAL" },
+    data: response => response.createBsda,
+    company,
+    setContext: (ctx, data) => ({ ...ctx, bsda: data })
+  };
+}

@@ -13,7 +13,8 @@ export default {
     activation: "/signup/activation",
   },
   resendActivationEmail: "/resend-activation-email",
-  resetPassword: "/reset-password",
+  passwordResetRequest: "/password-reset-request",
+  passwordReset: "/password-reset",
   company: "/company/:siret",
   wasteTree: "/wasteTree",
   dashboard: {
@@ -74,7 +75,16 @@ export default {
   account: {
     index: "/account",
     info: "/account/info",
-    companies: "/account/companies",
-    api: "/account/api",
+    companies: {
+      create: "/account/companies/new",
+      list: "/account/companies",
+    },
+    authorizedApplications: "/account/applications",
+    tokens: { list: "/account/tokens/list" },
+    oauth2: {
+      create: "/account/oauth2/create",
+      edit: "/account/oauth2/edit/:id",
+      list: "/account/oauth2/list",
+    },
   },
 };

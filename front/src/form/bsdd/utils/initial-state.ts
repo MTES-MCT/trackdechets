@@ -128,6 +128,7 @@ export function getInitialState(f?: Form | null): FormInput {
       numberPlate: f?.transporter?.numberPlate ?? "",
       customInfo: f?.transporter?.customInfo ?? null,
       company: getInitialCompany(f?.transporter?.company),
+      mode: f?.transporter?.mode,
     },
     trader: f?.trader
       ? {

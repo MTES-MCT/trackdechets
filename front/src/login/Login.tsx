@@ -116,7 +116,7 @@ export default withRouter(function Login(
           </p>
           <p className="tw-my-5">
             Vous avez perdu votre mot de passe ?{" "}
-            <Link to={routes.resetPassword} className="link">
+            <Link to={routes.passwordResetRequest} className="link">
               Réinitialisez le
             </Link>
           </p>

@@ -1,5 +1,4 @@
-import { json } from "body-parser";
-import express from "express";
+import express, { json } from "express";
 import supertest from "supertest";
 import Transport from "winston-transport";
 import logger from "../../../logging/logger";

@@ -22,3 +22,41 @@ type Invitation {
   "Date when the invitation was accepted and the user joined"
   acceptedAt: DateTime
 }
+
+"""
+Application tierce ayant accès à mon compte via le protocole OAuth2
+"""
+type AuthorizedApplication {
+  "Identifiant de l'application"
+  id: ID!
+  "Nom de l'application"
+  name: String!
+  "Logo de l'application"
+  logoUrl: String
+  "Date de dernière connexion"
+  lastConnection: DateTime
+  "Email de l'administrateur"
+  admin: String
+}
+
+"""
+Personnal access token
+"""
+type AccessToken {
+  id: ID!
+  "Permet de décrire l'utilité de ce token"
+  description: String
+  "Date de dernière utilisation du token"
+  lastUsed: DateTime
+}
+
+"""
+Personnal access token
+"""
+type NewAccessToken {
+  id: ID!
+  "Token en clair"
+  token: String!
+  "Permet de décrire l'utilité de ce token"
+  description: String!
+}

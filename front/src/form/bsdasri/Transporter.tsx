@@ -7,12 +7,12 @@ import React from "react";
 import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 import Packagings from "./components/packagings/Packagings";
 import { getInitialWeightFn } from "./utils/initial-state";
-import { transportModeLabels } from "dashboard/constants";
 import { FillFieldsInfo, DisabledFieldsInfo } from "./utils/commons";
 import classNames from "classnames";
 import Tooltip from "common/components/Tooltip";
 import TagsInput from "common/components/tags-input/TagsInput";
 import WeightWidget from "./components/Weight";
+import { FieldTransportModeSelect } from "common/components";
 
 /**
  *
@@ -161,19 +161,12 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
       <div className="form__row">
         <label>Mode de transport</label>
         <Field
-          as="select"
-          name="transporter.transport.mode"
           id="id_mode"
-          className="td-select"
+          name="transporter.transport.mode"
+          component={FieldTransportModeSelect}
           disabled={disabled}
           onChange={e => handleTransportMode(e)}
-        >
-          {Object.entries(transportModeLabels).map(([k, v]) => (
-            <option value={`${k}`} key={k}>
-              {v}
-            </option>
-          ))}
-        </Field>
+        ></Field>
       </div>
       {showTransportePlates && (
         <div className="form__row">

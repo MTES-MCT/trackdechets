@@ -15,7 +15,7 @@ import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
-import { transportModeLabels } from "../../constants";
+import { FieldTransportModeSelect } from "common/components";
 
 const EDIT_SEGMENT = gql`
   mutation editSegment(
@@ -85,17 +85,10 @@ export default function EditSegment({ siret, segment }: Props) {
                 <h3>Modifier un transfert multimodal</h3>
                 <label htmlFor="id_mode">Mode de transport</label>
                 <Field
-                  as="select"
-                  name="mode"
                   id="id_mode"
-                  className="td-select"
-                >
-                  {Object.entries(transportModeLabels).map(([k, v]) => (
-                    <option value={`${k}`} key={k}>
-                      {v}
-                    </option>
-                  ))}
-                </Field>
+                  name="mode"
+                  component={FieldTransportModeSelect}
+                ></Field>
                 <h4 className="form__section-heading">Transporteur</h4>
 
                 {!segment.readyToTakeOver ? (

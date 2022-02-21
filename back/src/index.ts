@@ -9,9 +9,10 @@ async function start() {
   app.listen(port, () => console.info(`Server is running on port ${port}`));
   initSubscriptions();
 
-  const shutdown = async () => {
-    await closeMailQueue();
-  };
+  function shutdown() {
+    return closeMailQueue().finally(process.exit());
+  }
+
   process.on("SIGTERM", shutdown);
   process.on("SIGINT", shutdown);
 }

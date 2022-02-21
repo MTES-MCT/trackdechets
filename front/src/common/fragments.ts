@@ -64,6 +64,7 @@ export const transporterFragment = gql`
     validityLimit
     numberPlate
     customInfo
+    mode
     company {
       ...CompanyFragment
     }
@@ -575,6 +576,7 @@ export const vhuFragment = gql`
 export const bsdaFragment = gql`
   fragment BsdaFragment on Bsda {
     id
+    bsdaType: type
     isDraft
     bsdaStatus: status
     emitter {

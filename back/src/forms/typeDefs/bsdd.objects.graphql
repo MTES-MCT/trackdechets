@@ -306,6 +306,9 @@ type Transporter {
 
   "Information libre, destinée aux transporteurs"
   customInfo: String
+
+  "Mode de transport"
+  mode: TransportMode
 }
 
 "Destination ultérieure prévue (case 12)"

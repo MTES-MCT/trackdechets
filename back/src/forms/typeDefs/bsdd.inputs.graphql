@@ -385,6 +385,9 @@ input TransporterInput {
 
   "Information libre, destinée aux transporteurs"
   customInfo: String
+
+  "Mode de transport. 'Route' par défaut"
+  mode: TransportMode
 }
 
 "Payload lié au négociant"

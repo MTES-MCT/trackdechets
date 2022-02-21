@@ -1,4 +1,4 @@
-import {  resetDatabase } from "../../../../integration-tests/helper";
+import { resetDatabase } from "../../../../integration-tests/helper";
 import prisma from "../../../prisma";
 import {
   formFactory,
@@ -9,7 +9,6 @@ import {
 } from "../../../__tests__/factories";
 import mergeUsers from "../mergeUsers";
 import { hashToken } from "../../../utils";
-
 
 describe("mergeUsers", () => {
   afterEach(() => resetDatabase());
@@ -111,13 +110,7 @@ describe("mergeUsers", () => {
       data: {
         name: "",
         clientSecret: "",
-        admins: {
-          connect: [
-            {
-              id: user.id
-            }
-          ]
-        }
+        adminId: user.id
       }
     });
 
@@ -127,10 +120,8 @@ describe("mergeUsers", () => {
       where: {
         id: application.id
       },
-      include: { admins: { select: { id: true } } }
+      include: { admin: { select: { id: true } } }
     });
-    expect(
-      updatedApplication.admins.find(admin => admin.id === heir.id)
-    ).not.toBe(null);
+    expect(updatedApplication.admin.id).toEqual(heir.id);
   });
 });

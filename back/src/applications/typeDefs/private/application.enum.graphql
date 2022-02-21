@@ -1,0 +1,6 @@
+enum ApplicationGoal {
+  "Application pour un usage personnel ou au sein de sa propre entreprise"
+  PERSONNAL
+  "Application pour des clients (ex: SaaS métier)"
+  CLIENTS
+}

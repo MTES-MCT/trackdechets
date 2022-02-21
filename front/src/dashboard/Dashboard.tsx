@@ -91,7 +91,7 @@ export default function Dashboard() {
             ? generatePath(routes.dashboard.bsds.drafts, {
                 siret: companies[0].siret,
               })
-            : routes.account.companies
+            : routes.account.companies.list
         }
       />
     );

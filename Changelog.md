@@ -5,6 +5,44 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.03.1] ~14/03/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+# [2022.02.1] 21/02/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout d'une section dans "Mon Compte" permettant de créer, modifier et supprimer une application OAuth2 [PR 1174](https://github.com/MTES-MCT/trackdechets/pull/1174)
+- Ajout d'une section dans "Mon Compte" permettant de révoquer l'accès donné à des applications tierces [PR 1174](https://github.com/MTES-MCT/trackdechets/pull/1174)
+- Ajout d'une section dans "Mon Compte" permettant de révoquer les tokens personnels générés [PR 1174](https://github.com/MTES-MCT/trackdechets/pull/1174)
+- Ajout du mode de transport pour le premier transporteur et le transporteur après entreposage provisoire [PR 1176](https://github.com/MTES-MCT/trackdechets/pull/1176)
+- Prise en compte du workflow déchetterie pour le bordereau amiante [PR 1180](https://github.com/MTES-MCT/trackdechets/pull/1180)
+
+#### :bug: Corrections de bugs
+
+- Correction de l'indexation des Bsda. [PR 1216](https://github.com/MTES-MCT/trackdechets/pull/1216)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Amélioration du processus de réinitialisation de mot de passe. [PR 1151](https://github.com/MTES-MCT/trackdechets/pull/1151)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2022.01.2] 31/01/2022
 
 #### :rocket: Nouvelles fonctionnalités

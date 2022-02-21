@@ -11,17 +11,21 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
   afterEach(resetDatabase);
 
   async function apiKey(user: User) {
-    const { clearToken } = await createAccessToken(user);
-    return clearToken;
+    const { token } = await createAccessToken({ user });
+    return token;
   }
 
   it("Déchet déposé en déchetterie (collecte en 2710-1)", async () => {
-    const { user: producteurUser, company: producteurCompany } =
-      await userWithCompanyFactory("MEMBER");
+    const { company: producteurCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
     const { user: exutoireUser, company: exutoireCompany } =
-      await userWithCompanyFactory("MEMBER");
+      await userWithCompanyFactory("MEMBER", {
+        companyTypes: {
+          set: ["WASTE_CENTER"]
+        }
+      });
 
-    const producteurToken = await apiKey(producteurUser);
     const exutoireToken = await apiKey(exutoireUser);
 
     const createBsdaMutation = `mutation {
@@ -64,7 +68,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
 
     const createBsdaResponse = await request
       .post("/")
-      .set("Authorization", `Bearer ${producteurToken}`)
+      .set("Authorization", `Bearer ${exutoireToken}`)
       .send({ query: createBsdaMutation });
     const id: string = createBsdaResponse.body.data.createBsda.id;
     expect(createBsdaResponse.body.data.createBsda.status).toBe("INITIAL");
@@ -322,7 +326,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                     quantity: 1
                     type: PALETTE_FILME
                 }]
-                weight: { 
+                weight: {
                     isEstimate: true
                     value: 1.2
                 }

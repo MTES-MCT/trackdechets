@@ -31,12 +31,13 @@ export function Worker({ disabled }) {
 
   const isGroupement = values?.type === BsdaType.Gathering;
   const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
+  const isDechetterie = values?.type === BsdaType.Collection_2710;
 
-  if (isGroupement || isEntreposageProvisoire) {
+  if (isGroupement || isEntreposageProvisoire || isDechetterie) {
     return (
       <div className="notification">
-        Vous effectuez un groupement ou entreposage provisoire. Il n'y a pas
-        d'entreprise de travaux à saisir.
+        Vous effectuez un groupement, un entreposage provisoire ou une collecte
+        en déchetterie. Il n'y a pas d'entreprise de travaux à saisir.
       </div>
     );
   }

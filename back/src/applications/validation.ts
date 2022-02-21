@@ -1,13 +1,14 @@
 import * as yup from "yup";
-import { ApplicationInput } from "../generated/graphql/types";
+import { CreateApplicationInput } from "../generated/graphql/types";
 
-export const ApplicationInputSchema: yup.SchemaOf<ApplicationInput> =
+export const applicationSchema: yup.SchemaOf<CreateApplicationInput> =
   yup.object({
     name: yup.string().required(),
     logoUrl: yup
       .string()
       .matches(/^https?:\/\//i, "URL invalide")
       .required(),
+    goal: yup.mixed().required(),
     redirectUris: yup
       .array()
       .of(

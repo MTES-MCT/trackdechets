@@ -3,12 +3,7 @@ title: Créer une application OAuth2
 ---
 
 :::note
-Avant de pouvoir implémenter le procotole OAuth2, vous aurez besoin d'une application sur la plateforme Trackdéchets. Pour ce faire, merci de nous envoyer un email à l'adresse tech@trackdechets.beta.gouv.fr en spécifiant l'environnement concerné, (production ou ["bac à sable"](../reference/environments/environments)) ainsi que les informations suivantes:
-
-- Email associé à un compte Trackdéchets existant
-- Nom de l'application
-- Logo de l’application au format png, jpeg ou svg
-- Une liste d’urls de redirection valides
+Avant de pouvoir implémenter le procotole OAuth2, vous aurez besoin d'une application sur la plateforme Trackdéchets. Vous pouvez créer une application depuis votre compte Trackdéchets dans la section Mon Compte > Développeurs > Mes Applications.
 :::
 
 Le [protocole OAuth2](https://tools.ietf.org/html/rfc6749) permet à des logiciels tiers type SaaS déchets ("client") d'accéder à l'API Trackdéchets ("ressource server") pour le compte d'utilisateurs ("ressource owner") sans exposer le mot de passe de celui-ci.

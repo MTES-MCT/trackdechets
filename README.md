@@ -31,21 +31,22 @@ Le projet est constitué de trois briques logicielles principales :
 - [trackdechets-backups ](https://github.com/MTES-MCT/trackdechets-backups) (jobs cron permettant de réaliser des backups des bases de données sur une autre infra)
 - [trackdechets-metabase](https://github.com/MTES-MCT/trackdechets-metabase) (guide d'administration de metabase permettant de visualiser les données)
 - [trackdechets-etl](https://github.com/MTES-MCT/trackdechets-etl) (script d'import des données ICPE)
+- [trackdechets-search](https://github.com/MTES-MCT/trackdechets-search) (moteur de recherche d'établissements)
 
 ## Services externes
 
 l'API Trackdéchets fait appel à plusieurs services externes :
-- API SIRENE de l'INSEE.
-- API SIRENE etalab `entreprise.data.gouv.fr` (en redondance de l'API INSEE).
 - Sendinblue pour l'envoi d'e-mails transactionnels.
 - MySendingBox pour l'envoi de courrier papier.
 - Serveur Gotenberg (auto-hébergé) pour le rendu des PDFs
 - Serveur Metabase (auto-hebergé) pour les analytics
+- Serveur Dash (auto-hebergé) pour les stats publiques
+
 ## Infrastructure
 
 L'applicatif et les bases de données sont hebergés en mode PaaS chez Scalingo.
 
-![Infra TD](https://user-images.githubusercontent.com/2269165/140944341-b6a4499b-738a-4762-bfa9-14d7a0bab377.png)
+![Infra TD](https://user-images.githubusercontent.com/2269165/154451580-e601abb4-40a2-41a6-9727-ff9b446a3594.png)
 
 
 ## Outillage
@@ -53,7 +54,6 @@ L'applicatif et les bases de données sont hebergés en mode PaaS chez Scalingo.
 - [Github Actions](https://github.com/features/actions) pour l'intégration continue et le déploiement
 - [Sentry](https://sentry.io) pour le reporting des erreurs
 - [Datadog](https://www.datadoghq.eu) pour le monitoring
-- [Graylog](https://www.graylog.org/) pour l'indexation des logs
 - [Metabase](https://www.metabase.com/) pour l'analyse et la visualisation des données Trackdéchets
 - [Matomo](https://fr.matomo.org/) pour l'analyse du trafic web
 - [Updown](https://updown.io/) pour la page de statuts et les alertes

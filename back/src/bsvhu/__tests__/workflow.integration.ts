@@ -11,8 +11,8 @@ describe("Exemples de circuit du bordereau de suivi de véhicule hors d'usage", 
   afterEach(resetDatabase);
 
   async function apiKey(user: User) {
-    const { clearToken } = await createAccessToken(user);
-    return clearToken;
+    const { token } = await createAccessToken({ user });
+    return token;
   }
 
   it("Acheminement d'un centre VHU vers un broyeur", async () => {

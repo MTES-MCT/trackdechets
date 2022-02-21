@@ -1,7 +1,10 @@
 import { useMutation, gql } from "@apollo/client";
 import React, { useState } from "react";
 import { NotificationError } from "../common/components/Error";
-import { Mutation, MutationResetPasswordArgs } from "generated/graphql/types";
+import {
+  Mutation,
+  MutationResendActivationEmailArgs,
+} from "generated/graphql/types";
 
 const RESEND_ACTIVATION_EMAIL = gql`
   mutation ResendActivationEmail($email: String!) {
@@ -13,7 +16,7 @@ export default function ResendActivationEmail() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [resendActivationEmail, { error }] = useMutation<
     Pick<Mutation, "resendActivationEmail">,
-    MutationResetPasswordArgs
+    MutationResendActivationEmailArgs
   >(RESEND_ACTIVATION_EMAIL);
   return (
     <section className="section section--white">

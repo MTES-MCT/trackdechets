@@ -6,6 +6,11 @@ import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
 import prisma from "../prisma";
 import { Bsda, Bsdasri, Bsff, Bsvhu, Form } from "@prisma/client";
+import { indexAllForms } from "../forms/elastic";
+import { indexAllBsdasris } from "../bsdasris/elastic";
+import { indexAllBsvhus } from "../bsvhu/elastic";
+import { indexAllBsdas } from "../bsda/elastic";
+import { indexAllBsffs } from "../bsffs/elastic";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -267,7 +272,17 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   }
 };
 
-export const index = {
+export type BsdIndex = {
+  index: string;
+  alias: string;
+  type: string;
+  settings: object;
+  mappings: {
+    properties: typeof properties;
+  };
+};
+
+export const index: BsdIndex = {
   alias: "bsds",
 
   // Changing the value of index is a way to "bump" the model
@@ -371,7 +386,7 @@ function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
  */
 export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
   return client.index({
-    index: index.alias,
+    index: index.index,
     type: index.type,
     id: bsd.id,
     body: bsd,
@@ -489,4 +504,12 @@ export async function toPrismaBsds(
     prismaBsdsPromises
   );
   return { bsdds, bsdasris, bsvhus, bsdas, bsffs };
+}
+
+export async function indexAllBsds(index: string) {
+  await indexAllForms(index);
+  await indexAllBsdasris(index);
+  await indexAllBsvhus(index);
+  await indexAllBsdas(index);
+  await indexAllBsffs(index);
 }
