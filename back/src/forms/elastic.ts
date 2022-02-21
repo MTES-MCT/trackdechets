@@ -5,7 +5,7 @@ import { FullForm } from "./types";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 
-function getWhere(
+export function getTabs(
   form: FullForm
 ): Pick<
   BsdElastic,
@@ -118,16 +118,6 @@ function getWhere(
     case Status.TEMP_STORED:
     case Status.TEMP_STORER_ACCEPTED: {
       appendToSirets(siretsFilters, "recipientCompanySiret", "isForActionFor");
-      appendToSirets(
-        siretsFilters,
-        "transporterCompanySiret",
-        "isCollectedFor"
-      );
-
-      form.transportSegments.forEach(segment => {
-        appendToSirets(siretsFilters, segment.id, "isCollectedFor");
-      });
-
       break;
     }
     case Status.RESEALED: {
@@ -137,18 +127,14 @@ function getWhere(
         "isToCollectFor"
       );
 
-      appendToSirets(
-        siretsFilters,
-        "transporterCompanySiret",
-        "isCollectedFor"
-      );
-      form.transportSegments.forEach(segment => {
-        appendToSirets(siretsFilters, segment.id, "isCollectedFor");
-      });
-
       break;
     }
     case Status.RESENT:
+      appendToSirets(
+        siretsFilters,
+        "temporaryStorageDetailTransporterCompanySiret",
+        "isCollectedFor"
+      );
     case Status.RECEIVED:
     case Status.ACCEPTED: {
       appendToSirets(
@@ -197,7 +183,7 @@ function getRecipient(form: FullForm) {
  * Convert a BSD from the forms table to Elastic Search's BSD model.
  */
 function toBsdElastic(form: FullForm): BsdElastic {
-  const where = getWhere(form);
+  const where = getTabs(form);
   const recipient = getRecipient(form);
   return {
     type: "BSDD",

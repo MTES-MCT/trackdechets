@@ -3,8 +3,7 @@ import { TransportMode } from "generated/graphql/types";
 export const statusLabels: { [key: string]: string } = {
   DRAFT: "Brouillon",
   SEALED: "En attente de collecte par le transporteur",
-  SENT:
-    "En attente de réception ou de prise en charge par un autre transporteur (multimodal)",
+  SENT: "En attente de réception",
   RECEIVED: "Reçu, en attente d'acceptation ou de refus",
   ACCEPTED: "Accepté, en attente de traitement",
   PROCESSED: "Traité",
