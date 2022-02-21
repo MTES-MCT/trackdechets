@@ -82,8 +82,9 @@ function getWhere(
       if (bsda.type === "OTHER_COLLECTIONS") {
         setTab(siretsFilters, "workerCompanySiret", "isForActionFor");
       } else {
-        // Bsda types other than do OTHER_COLLECTIONS not expect worker signature,
-        //so they're ready to take over an must appear on transporter dashboard
+        // Bsda types GATHERING and RESHIPMENT do not expect worker signature,
+        // so they're ready to take over an must appear on transporter dashboard
+        // (COLLECTION_2710 is directly PROCESSED and never SIGNED_BY_PRODUCER)
         setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
       }
 
