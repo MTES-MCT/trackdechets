@@ -5,7 +5,11 @@ import { FullForm } from "./types";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 
-export function getTabs(
+/**
+ * Computes which SIRET should appear on which tab in the frontend
+ * (Brouillon, Pour Action, Suivi, Archives, À collecter, Collecté)
+ */
+export function getSiretsByTab(
   form: FullForm
 ): Pick<
   BsdElastic,
@@ -19,12 +23,15 @@ export function getTabs(
   // we build a mapping where each key has to be unique.
   // Same siret can be used by different actors on the same form, so we can't use them as keys.
   // Instead we rely on field names and segments ids
-  const segments = form.transportSegments
-    .filter(segment => !!segment.transporterCompanySiret)
-    .map(segment => ({
-      [`${segment.id}`]: segment.transporterCompanySiret
-    }))
-    .reduce((el, acc) => ({ ...acc, ...el }), {});
+  const multimodalTransportersBySegmentId = form.transportSegments.reduce(
+    (acc, segment) => {
+      if (!!segment.transporterCompanySiret) {
+        return { ...acc, [`${segment.id}`]: segment.transporterCompanySiret };
+      }
+      return acc;
+    },
+    {}
+  );
 
   const formSirets = {
     emitterCompanySiret: form.emitterCompanySiret,
@@ -37,10 +44,10 @@ export function getTabs(
     brokerCompanySiret: form.brokerCompanySiret,
     ecoOrganismeSiret: form.ecoOrganismeSiret,
     transporterCompanySiret: form.transporterCompanySiret,
-    ...segments
+    ...multimodalTransportersBySegmentId
   };
 
-  const where = {
+  const siretsByTab = {
     isDraftFor: [],
     isForActionFor: [],
     isFollowFor: [],
@@ -49,47 +56,35 @@ export function getTabs(
     isCollectedFor: []
   };
 
-  type Mapping = Map<string, keyof typeof where>;
-  /**
-   * Set where clause to a given mapping
-   */
-  const appendToSirets = (
-    map: Mapping,
-    key: string,
-    newValue: keyof typeof where
-  ) => {
-    if (!map.has(key)) {
-      return;
-    }
-
-    map.set(key, newValue);
-  };
-
   // build a mapping to store which actor will see this form appear on a given UI tab
   // eg: 'transporterCompanySiret' : 'isCollectedFor'
-  const siretsFilters = new Map<string, keyof typeof where>(
+  const fieldTabs = new Map<string, keyof typeof siretsByTab>(
     Object.entries(formSirets)
       .filter(item => !!item[1])
       .map(item => [item[0], "isFollowFor"])
   );
+
+  function setFieldTab(field: string, tab: keyof typeof siretsByTab) {
+    if (!fieldTabs.has(field)) {
+      return;
+    }
+    fieldTabs.set(field, tab);
+  }
+
   switch (form.status) {
     case Status.DRAFT: {
-      for (const fieldName of siretsFilters.keys()) {
-        appendToSirets(siretsFilters, fieldName, "isDraftFor");
+      for (const fieldName of fieldTabs.keys()) {
+        setFieldTab(fieldName, "isDraftFor");
       }
       break;
     }
     case Status.SEALED: {
-      appendToSirets(
-        siretsFilters,
-        "transporterCompanySiret",
-        "isToCollectFor"
-      );
+      setFieldTab("transporterCompanySiret", "isToCollectFor");
 
       break;
     }
     case Status.SENT: {
-      appendToSirets(siretsFilters, "recipientCompanySiret", "isForActionFor");
+      setFieldTab("recipientCompanySiret", "isForActionFor");
 
       // whether or not this BSD has been handed over by transporter n°1
       let hasBeenHandedOver = false;
@@ -97,8 +92,7 @@ export function getTabs(
       form.transportSegments.forEach(segment => {
         if (segment.readyToTakeOver) {
           hasBeenHandedOver = hasBeenHandedOver || !!segment.takenOverAt;
-          appendToSirets(
-            siretsFilters,
+          setFieldTab(
             segment.id,
             segment.takenOverAt ? "isCollectedFor" : "isToCollectFor"
           );
@@ -106,23 +100,18 @@ export function getTabs(
       });
 
       if (!hasBeenHandedOver) {
-        appendToSirets(
-          siretsFilters,
-          "transporterCompanySiret",
-          "isCollectedFor"
-        );
+        setFieldTab("transporterCompanySiret", "isCollectedFor");
       }
 
       break;
     }
     case Status.TEMP_STORED:
     case Status.TEMP_STORER_ACCEPTED: {
-      appendToSirets(siretsFilters, "recipientCompanySiret", "isForActionFor");
+      setFieldTab("recipientCompanySiret", "isForActionFor");
       break;
     }
     case Status.RESEALED: {
-      appendToSirets(
-        siretsFilters,
+      setFieldTab(
         "temporaryStorageDetailTransporterCompanySiret",
         "isToCollectFor"
       );
@@ -130,15 +119,13 @@ export function getTabs(
       break;
     }
     case Status.RESENT:
-      appendToSirets(
-        siretsFilters,
+      setFieldTab(
         "temporaryStorageDetailTransporterCompanySiret",
         "isCollectedFor"
       );
     case Status.RECEIVED:
     case Status.ACCEPTED: {
-      appendToSirets(
-        siretsFilters,
+      setFieldTab(
         form.recipientIsTempStorage
           ? "temporaryStorageDetailDestinationCompanySiret"
           : "recipientCompanySiret",
@@ -152,8 +139,8 @@ export function getTabs(
     case Status.REFUSED:
     case Status.PROCESSED:
     case Status.NO_TRACEABILITY: {
-      for (const siret of siretsFilters.keys()) {
-        appendToSirets(siretsFilters, siret, "isArchivedFor");
+      for (const siret of fieldTabs.keys()) {
+        setFieldTab(siret, "isArchivedFor");
       }
       break;
     }
@@ -161,13 +148,13 @@ export function getTabs(
       break;
   }
 
-  for (const [fieldName, filter] of siretsFilters.entries()) {
-    if (fieldName) {
-      where[filter].push(formSirets[fieldName]);
+  for (const [field, tab] of fieldTabs.entries()) {
+    if (field) {
+      siretsByTab[tab].push(formSirets[field]);
     }
   }
 
-  return where;
+  return siretsByTab;
 }
 
 function getRecipient(form: FullForm) {
@@ -183,7 +170,7 @@ function getRecipient(form: FullForm) {
  * Convert a BSD from the forms table to Elastic Search's BSD model.
  */
 function toBsdElastic(form: FullForm): BsdElastic {
-  const where = getTabs(form);
+  const siretsByTab = getSiretsByTab(form);
   const recipient = getRecipient(form);
   return {
     type: "BSDD",
@@ -210,8 +197,8 @@ function toBsdElastic(form: FullForm): BsdElastic {
     wasteDescription: form.wasteDetailsName,
     transporterNumberPlate: [form.transporterNumberPlate],
     transporterCustomInfo: form.transporterCustomInfo,
-    ...where,
-    sirets: Object.values(where).flat(),
+    ...siretsByTab,
+    sirets: Object.values(siretsByTab).flat(),
     ...getRegistryFields(form)
   };
 }

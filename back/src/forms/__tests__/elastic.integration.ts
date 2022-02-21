@@ -8,7 +8,7 @@ import {
   userFactory
 } from "../../__tests__/factories";
 import { getFullForm } from "../database";
-import { getTabs } from "../elastic";
+import { getSiretsByTab } from "../elastic";
 
 describe("getTabs", () => {
   afterEach(resetDatabase);
@@ -20,7 +20,7 @@ describe("getTabs", () => {
       opt: { status: Status.DRAFT }
     });
     const fullForm = await getFullForm(form);
-    const { isDraftFor } = getTabs(fullForm);
+    const { isDraftFor } = getSiretsByTab(fullForm);
     expect(isDraftFor).toContain(form.emitterCompanySiret);
     expect(isDraftFor).toContain(form.recipientCompanySiret);
     expect(isDraftFor).toContain(form.transporterCompanySiret);
@@ -33,7 +33,7 @@ describe("getTabs", () => {
       opt: { status: Status.SEALED }
     });
     const fullForm = await getFullForm(form);
-    const { isFollowFor, isToCollectFor } = getTabs(fullForm);
+    const { isFollowFor, isToCollectFor } = getSiretsByTab(fullForm);
     expect(isFollowFor).toContain(form.emitterCompanySiret);
     expect(isFollowFor).toContain(form.recipientCompanySiret);
     expect(isToCollectFor).toContain(form.transporterCompanySiret);
@@ -46,7 +46,8 @@ describe("getTabs", () => {
       opt: { status: Status.SENT }
     });
     const fullForm = await getFullForm(form);
-    const { isFollowFor, isCollectedFor, isForActionFor } = getTabs(fullForm);
+    const { isFollowFor, isCollectedFor, isForActionFor } =
+      getSiretsByTab(fullForm);
     expect(isFollowFor).toContain(form.emitterCompanySiret);
     expect(isForActionFor).toContain(form.recipientCompanySiret);
     expect(isCollectedFor).toContain(form.transporterCompanySiret);
@@ -76,7 +77,7 @@ describe("getTabs", () => {
     });
 
     let fullForm = await getFullForm(form);
-    let tabs = getTabs(fullForm);
+    let tabs = getSiretsByTab(fullForm);
     let isFollowFor = tabs.isFollowFor;
     let isCollectedFor = tabs.isCollectedFor;
     let isToCollectFor = tabs.isToCollectFor;
@@ -93,7 +94,7 @@ describe("getTabs", () => {
       data: { readyToTakeOver: true }
     });
     fullForm = await getFullForm(form);
-    tabs = getTabs(fullForm);
+    tabs = getSiretsByTab(fullForm);
     isFollowFor = tabs.isFollowFor;
     isCollectedFor = tabs.isCollectedFor;
     isToCollectFor = tabs.isToCollectFor;
@@ -111,7 +112,7 @@ describe("getTabs", () => {
       data: { takenOverAt: new Date() }
     });
     fullForm = await getFullForm(form);
-    tabs = getTabs(fullForm);
+    tabs = getSiretsByTab(fullForm);
     isFollowFor = tabs.isFollowFor;
     isCollectedFor = tabs.isCollectedFor;
     isToCollectFor = tabs.isToCollectFor;
@@ -129,7 +130,8 @@ describe("getTabs", () => {
       opt: { status: Status.SENT }
     });
     const fullForm = await getFullForm(form);
-    const { isFollowFor, isCollectedFor, isForActionFor } = getTabs(fullForm);
+    const { isFollowFor, isCollectedFor, isForActionFor } =
+      getSiretsByTab(fullForm);
     expect(isFollowFor).toContain(form.emitterCompanySiret);
     expect(isFollowFor).toContain(
       fullForm.temporaryStorageDetail.transporterCompanySiret
@@ -149,7 +151,7 @@ describe("getTabs", () => {
       opt: { status: Status.RECEIVED }
     });
     const fullForm = await getFullForm(form);
-    const { isFollowFor, isForActionFor } = getTabs(fullForm);
+    const { isFollowFor, isForActionFor } = getSiretsByTab(fullForm);
     expect(isFollowFor).toContain(form.emitterCompanySiret);
     expect(isFollowFor).toContain(form.transporterCompanySiret);
     expect(isForActionFor).toContain(form.recipientCompanySiret);
@@ -162,7 +164,7 @@ describe("getTabs", () => {
       opt: { status: Status.ACCEPTED }
     });
     const fullForm = await getFullForm(form);
-    const { isFollowFor, isForActionFor } = getTabs(fullForm);
+    const { isFollowFor, isForActionFor } = getSiretsByTab(fullForm);
     expect(isFollowFor).toContain(form.emitterCompanySiret);
     expect(isFollowFor).toContain(form.transporterCompanySiret);
     expect(isForActionFor).toContain(form.recipientCompanySiret);
@@ -175,7 +177,7 @@ describe("getTabs", () => {
       opt: { status: Status.TEMP_STORED }
     });
     const fullForm = await getFullForm(form);
-    const { isFollowFor, isForActionFor } = getTabs(fullForm);
+    const { isFollowFor, isForActionFor } = getSiretsByTab(fullForm);
     expect(isFollowFor).toContain(form.emitterCompanySiret);
     expect(isFollowFor).toContain(form.transporterCompanySiret);
     expect(isForActionFor).toContain(form.recipientCompanySiret);
@@ -188,7 +190,7 @@ describe("getTabs", () => {
       ownerId: user.id
     });
     const fullForm = await getFullForm(form);
-    const { isFollowFor, isToCollectFor } = getTabs(fullForm);
+    const { isFollowFor, isToCollectFor } = getSiretsByTab(fullForm);
     expect(isFollowFor).toContain(form.emitterCompanySiret);
     expect(isFollowFor).toContain(form.transporterCompanySiret);
     expect(isFollowFor).toContain(form.recipientCompanySiret);
@@ -207,7 +209,8 @@ describe("getTabs", () => {
       ownerId: user.id
     });
     const fullForm = await getFullForm(form);
-    const { isFollowFor, isForActionFor, isCollectedFor } = getTabs(fullForm);
+    const { isFollowFor, isForActionFor, isCollectedFor } =
+      getSiretsByTab(fullForm);
     expect(isFollowFor).toContain(form.emitterCompanySiret);
     expect(isFollowFor).toContain(form.transporterCompanySiret);
     expect(isFollowFor).toContain(form.recipientCompanySiret);
