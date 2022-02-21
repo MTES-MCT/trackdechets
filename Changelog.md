@@ -31,6 +31,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Correction de l'indexation des Bsda. [PR 1216](https://github.com/MTES-MCT/trackdechets/pull/1216)
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
