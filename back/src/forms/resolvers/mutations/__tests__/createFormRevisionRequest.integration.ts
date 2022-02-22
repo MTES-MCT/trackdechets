@@ -119,6 +119,59 @@ describe("Mutation.createFormRevisionRequest", () => {
     );
   });
 
+  it("should create a revisionRequest and identifying current user as the requester (temporary storage) ", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: "1234",
+        recipientCompanySiret: "5678",
+        temporaryStorageDetail: {
+          create: {
+            tempStorerQuantityType: "REAL",
+            tempStorerQuantityReceived: 2.4,
+            tempStorerWasteAcceptationStatus: "ACCEPTED",
+            tempStorerReceivedAt: "2022-03-20T00:00:00.000Z",
+            tempStorerReceivedBy: "John Doe",
+            tempStorerSignedAt: "2022-03-20T00:00:00.000Z",
+            destinationIsFilledByEmitter: false,
+            destinationCompanyName: company.name,
+            destinationCompanySiret: company.siret,
+            destinationCap: "",
+            destinationProcessingOperation: "R 6",
+            transporterCompanyName: "9876",
+            transporterCompanySiret: "Transporter",
+            transporterIsExemptedOfReceipt: false,
+            transporterReceipt: "Dabcd",
+            transporterDepartment: "10",
+            transporterValidityLimit: "2054-11-20T00:00:00.000Z",
+            transporterNumberPlate: ""
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { wasteDetails: { code: "01 03 08" } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret
+        }
+      }
+    });
+
+    expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+    expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+      company.siret
+    );
+  });
+
   it("should create a revisionRequest and an approval targetting the company not requesting the revisionRequest", async () => {
     const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
