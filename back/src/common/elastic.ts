@@ -5,7 +5,7 @@ import { BsdType } from "../generated/graphql/types";
 import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
 import prisma from "../prisma";
-import { Bsda, Bsdasri, Bsff, Bsvhu, Form } from "@prisma/client";
+import { Bsda, Bsdasri, Bsff, Bsvhu, Form, Prisma } from "@prisma/client";
 import { indexAllForms } from "../forms/elastic";
 import { indexAllBsdasris } from "../bsdasris/elastic";
 import { indexAllBsvhus } from "../bsvhu/elastic";
@@ -453,11 +453,19 @@ export type PrismaBsdMap = {
   bsffs: Bsff[];
 };
 
+type PrismaBsdsInclude = {
+  BSDD?: Prisma.FormInclude;
+  BSDASRI?: Prisma.BsdasriInclude;
+  BSDA?: Prisma.BsdaInclude;
+  BSFF?: Prisma.BsffInclude;
+};
+
 /**
  * Convert a list of BsdElastic to a mapping of prisma Bsds
  */
 export async function toPrismaBsds(
-  bsdsElastic: BsdElastic[]
+  bsdsElastic: BsdElastic[],
+  include: PrismaBsdsInclude = {}
 ): Promise<PrismaBsdMap> {
   const { BSDD, BSDASRI, BSVHU, BSDA, BSFF } = groupByBsdType(bsdsElastic);
   const prismaBsdsPromises: [
@@ -472,10 +480,12 @@ export async function toPrismaBsds(
         id: {
           in: BSDD.map(bsdd => bsdd.id)
         }
-      }
+      },
+      ...(include.BSDD ? { include: include.BSDD } : {})
     }),
     prisma.bsdasri.findMany({
-      where: { id: { in: BSDASRI.map(bsdasri => bsdasri.id) } }
+      where: { id: { in: BSDASRI.map(bsdasri => bsdasri.id) } },
+      ...(include.BSDASRI ? { include: include.BSDASRI } : {})
     }),
     prisma.bsvhu.findMany({
       where: {
@@ -488,14 +498,16 @@ export async function toPrismaBsds(
       where: {
         id: {
           in: BSDA.map(bsda => bsda.id)
-        }
+        },
+        ...(include.BSDA ? { include: include.BSDA } : {})
       }
     }),
     prisma.bsff.findMany({
       where: {
         id: {
           in: BSFF.map(bsff => bsff.id)
-        }
+        },
+        ...(include.BSFF ? { include: include.BSFF } : {})
       }
     })
   ];
