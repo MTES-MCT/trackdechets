@@ -101,6 +101,7 @@ export function toWastes<WasteType extends GenericWaste>(
 ): WasteMap<WasteType> {
   const converter = bsdsToWastes[registryType];
   const { bsdds, bsdas, bsdasris, bsvhus, bsffs } = bsds;
+
   return {
     BSDD: bsdds.map(bsd => converter.BSDD(bsd, sirets)).flat(),
     BSDASRI: bsdasris.map(converter.BSDASRI),

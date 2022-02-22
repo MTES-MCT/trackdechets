@@ -95,7 +95,7 @@ export function toIncomingWaste(
     ].filter(s => !!s);
   }
 
-  if (bsda.grouping) {
+  if (bsda.grouping?.length > 0) {
     initialEmitter.initialEmitterPostalCodes = bsda.grouping
       .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
       .filter(s => !!s);
@@ -158,7 +158,7 @@ export function toOutgoingWaste(
       bsda.forwarding.emitterCompanySiret;
   }
 
-  if (bsda.grouping) {
+  if (bsda.grouping?.length > 0) {
     initialEmitter.initialEmitterPostalCodes = bsda.grouping
       .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
       .filter(s => !!s);
@@ -221,7 +221,7 @@ export function toTransportedWaste(
     ].filter(s => !!s);
   }
 
-  if (bsda.grouping) {
+  if (bsda.grouping?.length > 0) {
     initialEmitter.initialEmitterPostalCodes = bsda.grouping
       .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
       .filter(s => !!s);
@@ -283,7 +283,7 @@ export function toManagedWaste(
     ].filter(s => !!s);
   }
 
-  if (bsda.grouping) {
+  if (bsda.grouping?.length > 0) {
     initialEmitter.initialEmitterPostalCodes = bsda.grouping
       .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
       .filter(s => !!s);
@@ -347,7 +347,7 @@ export function toAllWaste(
     ].filter(s => !!s);
   }
 
-  if (bsda.grouping) {
+  if (bsda.grouping?.length > 0) {
     initialEmitter.initialEmitterPostalCodes = bsda.grouping
       .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
       .filter(s => !!s);

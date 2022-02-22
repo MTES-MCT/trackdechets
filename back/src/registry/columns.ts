@@ -66,7 +66,7 @@ const columns: Column[] = [
   { field: "initialEmitterCompanySiret", label: "Producteur initial SIRET" },
   {
     field: "initialEmitterPostalCodes",
-    label: "Code postaux collecte",
+    label: "Producteurs initiaux code postaux",
     format: formatArray
   },
   {
