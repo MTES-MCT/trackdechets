@@ -498,17 +498,17 @@ export async function toPrismaBsds(
       where: {
         id: {
           in: BSDA.map(bsda => bsda.id)
-        },
-        ...(include.BSDA ? { include: include.BSDA } : {})
-      }
+        }
+      },
+      ...(include.BSDA ? { include: include.BSDA } : {})
     }),
     prisma.bsff.findMany({
       where: {
         id: {
           in: BSFF.map(bsff => bsff.id)
-        },
-        ...(include.BSFF ? { include: include.BSFF } : {})
-      }
+        }
+      },
+      ...(include.BSFF ? { include: include.BSFF } : {})
     })
   ];
 
