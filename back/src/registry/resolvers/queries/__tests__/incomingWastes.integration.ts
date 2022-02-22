@@ -28,7 +28,9 @@ import { getFullForm } from "../../../../forms/database";
 import { indexForm } from "../../../../forms/elastic";
 import { Query } from "../../../../generated/graphql/types";
 import {
+  companyFactory,
   formFactory,
+  formWithTempStorageFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -315,5 +317,47 @@ describe("Incoming wastes registry", () => {
     expect(page3.incomingWastes.totalCount).toEqual(5);
     expect(page3.incomingWastes.pageInfo.startCursor).toEqual(bsd1.id);
     expect(page3.incomingWastes.pageInfo.hasPreviousPage).toEqual(false);
+  });
+
+  it("should hide initial emitter info and returns only postal codes", async () => {
+    const { company: destination, user: userDestination } =
+      await userWithCompanyFactory(UserRole.MEMBER);
+    const { company: emitter, user: userEmitter } =
+      await userWithCompanyFactory(UserRole.MEMBER, {
+        address: "8 rue des Lilas, 07100 Annonay"
+      });
+    const ttr = await companyFactory();
+    const form = await formWithTempStorageFactory({
+      ownerId: userEmitter.id,
+      opt: {
+        emitterCompanySiret: emitter.siret,
+        emitterCompanyAddress: emitter.address,
+        recipientCompanySiret: ttr.siret,
+        status: Status.PROCESSED,
+        receivedAt: new Date(),
+        processedAt: new Date()
+      },
+      tempStorageOpts: {
+        destinationCompanySiret: destination.siret,
+        tempStorerReceivedAt: new Date()
+      }
+    });
+    await indexForm(await getFullForm(form));
+    await refreshElasticSearch();
+    const { query } = makeClient(userDestination);
+    const { data } = await query<Pick<Query, "incomingWastes">>(
+      INCOMING_WASTES,
+      {
+        variables: {
+          sirets: [destination.siret]
+        }
+      }
+    );
+    expect(data.incomingWastes.edges).toHaveLength(1);
+    const incomingWaste = data.incomingWastes.edges.map(e => e.node)[0];
+    expect(incomingWaste.emitterCompanySiret).toEqual(ttr.siret);
+    expect(incomingWaste.initialEmitterCompanySiret).toBeNull();
+    expect(incomingWaste.initialEmitterCompanyName).toBeNull();
+    expect(incomingWaste.initialEmitterPostalCodes).toEqual(["07100"]);
   });
 });

@@ -71,7 +71,7 @@ describe("formatRow", () => {
       POP: "O",
       "Producteur initial raison sociale": "initial emitter company name",
       "Producteur initial SIRET": "initial emitter company siret",
-      "Code postaux collecte": "13001,13002",
+      "Producteurs initiaux code postaux": "13001,13002",
       "Producteur initial adresse": "initial emitter address",
       "Expéditeur raison sociale": "emitter name",
       "Expéditeur SIRET": "emitter siret",
