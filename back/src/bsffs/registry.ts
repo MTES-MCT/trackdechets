@@ -90,13 +90,13 @@ export function toIncomingWaste(
     ].filter(s => !!s);
   }
 
-  if (bsff.repackaging) {
+  if (bsff.repackaging?.length > 0) {
     initialEmitter.initialEmitterPostalCodes = bsff.repackaging
       .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
       .filter(s => !!s);
   }
 
-  if (bsff.grouping) {
+  if (bsff.grouping?.length > 0) {
     initialEmitter.initialEmitterPostalCodes = bsff.grouping
       .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
       .filter(s => !!s);
@@ -159,13 +159,13 @@ export function toOutgoingWaste(
       bsff.forwarding.emitterCompanySiret;
   }
 
-  if (bsff.repackaging) {
+  if (bsff.repackaging?.length > 0) {
     initialEmitter.initialEmitterPostalCodes = bsff.repackaging
       .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
       .filter(s => !!s);
   }
 
-  if (bsff.grouping) {
+  if (bsff.grouping?.length > 0) {
     initialEmitter.initialEmitterPostalCodes = bsff.grouping
       .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
       .filter(s => !!s);
@@ -227,13 +227,13 @@ export function toTransportedWaste(
     ].filter(s => !!s);
   }
 
-  if (bsff.repackaging) {
+  if (bsff.repackaging?.length > 0) {
     initialEmitter.initialEmitterPostalCodes = bsff.repackaging
       .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
       .filter(s => !!s);
   }
 
-  if (bsff.grouping) {
+  if (bsff.grouping?.length > 0) {
     initialEmitter.initialEmitterPostalCodes = bsff.grouping
       .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
       .filter(s => !!s);
@@ -298,13 +298,13 @@ export function toManagedWaste(
       bsff.forwarding.emitterCompanySiret;
   }
 
-  if (bsff.repackaging) {
+  if (bsff.repackaging?.length > 0) {
     initialEmitter.initialEmitterPostalCodes = bsff.repackaging
       .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
       .filter(s => !!s);
   }
 
-  if (bsff.grouping) {
+  if (bsff.grouping?.length > 0) {
     initialEmitter.initialEmitterPostalCodes = bsff.grouping
       .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
       .filter(s => !!s);
@@ -368,13 +368,13 @@ export function toAllWaste(
     ].filter(s => !!s);
   }
 
-  if (bsff.repackaging) {
+  if (bsff.repackaging?.length > 0) {
     initialEmitter.initialEmitterPostalCodes = bsff.repackaging
       .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
       .filter(s => !!s);
   }
 
-  if (bsff.grouping) {
+  if (bsff.grouping?.length > 0) {
     initialEmitter.initialEmitterPostalCodes = bsff.grouping
       .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
       .filter(s => !!s);

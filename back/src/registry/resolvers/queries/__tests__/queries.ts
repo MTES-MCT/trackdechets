@@ -28,6 +28,11 @@ export const INCOMING_WASTES = gql`
         cursor
         node {
           id
+          initialEmitterCompanySiret
+          initialEmitterCompanyName
+          initialEmitterCompanyAddress
+          initialEmitterPostalCodes
+          emitterCompanySiret
         }
       }
     }
