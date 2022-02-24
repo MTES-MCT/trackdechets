@@ -24,6 +24,13 @@ export default function Emitter() {
     setLockEmitterType(false);
   }, [values.ecoOrganisme, setFieldValue]);
 
+  // make sure appendix2 forms is empty when emitter type is not APPENDIX2
+  useEffect(() => {
+    if (values.emitter?.type !== "APPENDIX2" && values.appendix2Forms?.length) {
+      setFieldValue("appendix2Forms", []);
+    }
+  }, [values.emitter, values.appendix2Forms, setFieldValue]);
+
   return (
     <>
       <div className="form__row">
