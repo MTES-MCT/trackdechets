@@ -68,25 +68,60 @@ export default function Appendix2MultiSelect() {
     },
   });
 
-  const appendix2Candidates = data?.appendixForms ?? [];
-
-  // Computes sum of quantities of appendix2
-  const totalQuantity = useMemo(() => {
-    const forms = appendix2Candidates.filter(f =>
+  const appendix2Candidates = useMemo(() => data?.appendixForms ?? [], [data]);
+  const appendix2Selected = useMemo(() => {
+    return appendix2Candidates.filter(f =>
       values.appendix2Forms.includes(f.id)
     );
-    return forms.reduce((q, f) => {
+  }, [appendix2Candidates, values.appendix2Forms]);
+
+  useEffect(() => {
+    // Computes sum of quantities of appendix2
+    const totalQuantity = appendix2Selected.reduce((q, f) => {
       if (!f.wasteDetails?.quantity) {
         return q;
       }
       return q + f.wasteDetails?.quantity;
     }, 0);
-  }, [values.appendix2Forms, appendix2Candidates]);
+
+    // Computes the sum of packagingsInfos of appendix2
+    const totalPackagings = (() => {
+      const quantityByType = appendix2Selected.reduce((acc1, form) => {
+        if (!form.wasteDetails?.packagingInfos) {
+          return acc1;
+        }
+        return form.wasteDetails.packagingInfos.reduce(
+          (acc2, packagingInfo) => {
+            if (!acc2[packagingInfo.type]) {
+              return {
+                ...acc2,
+                [packagingInfo.type]: packagingInfo.quantity,
+              };
+            }
+            return {
+              ...acc2,
+              [packagingInfo.type]:
+                packagingInfo.quantity + acc2[packagingInfo.type],
+            };
+          },
+          acc1
+        );
+      }, {});
+      return Object.keys(quantityByType).map(type => ({
+        type,
+        other: "",
+        quantity: quantityByType[type],
+      }));
+    })();
+
+    setFieldValue("wasteDetails.quantity", totalQuantity || null);
+    setFieldValue("wasteDetails.packagingInfos", totalPackagings);
+  }, [appendix2Selected, setFieldValue]);
 
   // set default value for the quantity of the groupement BSD
-  useEffect(() => {
-    setFieldValue("wasteDetails.quantity", totalQuantity || null);
-  }, [totalQuantity, setFieldValue]);
+  // useEffect(() => {}, [totalQuantity, setFieldValue]);
+
+  // useEffect(() => {}, [totalPackagings, setFieldValue]);
 
   if (loading) return <p>Chargement...</p>;
   if (error) return <InlineError apolloError={error} />;
@@ -161,9 +196,7 @@ export default function Appendix2MultiSelect() {
           ))}
           {appendix2Candidates.length === 0 && (
             <tr>
-              <td key="sdqsdsq" colSpan={100}>
-                Aucun bordereau éligible au regroupement
-              </td>
+              <td colSpan={100}>Aucun bordereau éligible au regroupement</td>
             </tr>
           )}
         </tbody>
