@@ -196,7 +196,10 @@ export default function Appendix2MultiSelect() {
           ))}
           {appendix2Candidates.length === 0 && (
             <tr>
-              <td colSpan={100}>Aucun bordereau éligible au regroupement</td>
+              <td colSpan={100}>
+                Aucun bordereau éligible au regroupement. Vérifiez que vous avez
+                bien sélectionné le bon émetteur
+              </td>
             </tr>
           )}
         </tbody>

@@ -7,6 +7,7 @@ import EcoOrganismes from "./components/eco-organismes/EcoOrganismes";
 import WorkSite from "form/common/components/work-site/WorkSite";
 import { getInitialEmitterWorkSite } from "form/bsdd/utils/initial-state";
 import "./Emitter.scss";
+import MyCompanySelector from "form/common/components/company/MyCompanySelector";
 
 export default function Emitter() {
   const { values, setFieldValue } = useFormikContext<Form>();
@@ -88,7 +89,17 @@ export default function Emitter() {
         </fieldset>
       </div>
 
-      <CompanySelector name="emitter.company" heading="Entreprise émettrice" />
+      {values.emitter?.type === "APPENDIX2" ? (
+        <div className="tw-my-6">
+          <h4 className="form__section-heading">Entreprise émettrice</h4>
+          <MyCompanySelector fieldName="emitter.company" />
+        </div>
+      ) : (
+        <CompanySelector
+          name="emitter.company"
+          heading="Entreprise émettrice"
+        />
+      )}
 
       <WorkSite
         switchLabel="Je souhaite ajouter une adresse de chantier ou de collecte"
