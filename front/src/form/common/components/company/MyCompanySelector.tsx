@@ -17,6 +17,7 @@ export const GET_ME = gql`
         siret
         contactEmail
         contactPhone
+        address
       }
     }
   }
@@ -48,15 +49,21 @@ export default function MyCompanySelector({ fieldName }) {
             const selectedCompany = data.me.companies.filter(
               c => c.siret === e.target.value
             )?.[0];
-            setFieldValue(`${fieldName}.name`, selectedCompany.name);
-            setFieldValue(
-              `${fieldName}.mail`,
-              selectedCompany.contactEmail ?? ""
-            );
-            setFieldValue(
-              `${fieldName}.phone`,
-              selectedCompany.contactPhone ?? ""
-            );
+            if (selectedCompany) {
+              setFieldValue(`${fieldName}.name`, selectedCompany.name ?? "");
+              setFieldValue(
+                `${fieldName}.mail`,
+                selectedCompany.contactEmail ?? ""
+              );
+              setFieldValue(
+                `${fieldName}.phone`,
+                selectedCompany.contactPhone ?? ""
+              );
+              setFieldValue(
+                `${fieldName}.address`,
+                selectedCompany.address ?? ""
+              );
+            }
           }}
           value={field.value.siret}
         >
@@ -74,7 +81,7 @@ export default function MyCompanySelector({ fieldName }) {
             Personne à contacter
             <Field
               type="text"
-              name={`${fieldName.name}.contact`}
+              name={`${fieldName}.contact`}
               placeholder="NOM Prénom"
               className="td-input"
             />
