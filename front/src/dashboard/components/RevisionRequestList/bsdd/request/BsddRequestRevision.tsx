@@ -1,7 +1,10 @@
 import { useMutation } from "@apollo/client";
 import classNames from "classnames";
 import { FieldSwitch, RedErrorMessage } from "common/components";
-import { WasteCode, wasteCodeValidator } from "form/bsdd/components/waste-code";
+import {
+  WasteCodeSelect,
+  wasteCodeValidator,
+} from "form/bsdd/components/waste-code";
 import {
   getInitialBroker,
   getInitialTrader,
@@ -111,8 +114,9 @@ export function BsddRequestRevision({ bsdd }: Props) {
                 name="content.wasteDetails.code"
                 defaultValue={initialReview.wasteDetails.code}
               >
-                <WasteCode
+                <Field
                   name="content.wasteDetails.code"
+                  component={WasteCodeSelect}
                   validate={wasteCodeValidator}
                 />
               </ReviewableField>
