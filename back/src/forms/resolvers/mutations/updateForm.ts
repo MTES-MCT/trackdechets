@@ -54,9 +54,8 @@ const updateFormResolver = async (
 
   if (appendix2Forms) {
     await validateAppendix2Forms(appendix2Forms, { ...existingForm, ...form });
+    await handleFormsRemovedFromAppendix(existingForm, appendix2Forms);
   }
-
-  await handleFormsRemovedFromAppendix(existingForm, appendix2Forms);
 
   // Construct form update payload
   const formUpdateInput: Prisma.FormUpdateInput = {
@@ -175,6 +174,7 @@ async function handleFormsRemovedFromAppendix(
   }
 
   const nextAppendix2Ids = appendix2Forms.map(form => form.id);
+
   const appendix2ToUngroup = previousAppendix2Forms.filter(
     groupedAppendix => !nextAppendix2Ids.includes(groupedAppendix.id)
   );
