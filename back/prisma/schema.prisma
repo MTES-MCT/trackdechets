@@ -127,6 +127,17 @@ enum ApplicationGoal {
   CLIENTS
 }
 
+enum OrgRegistry {
+  SIRENE
+  TVAINTRACOMM
+  RNA
+  FULLNAME
+  FOREIGNID
+  OMI
+  RNC
+  PNTTD
+}
+
 model AccessToken {
   id            String       @id @default(cuid())
   createdAt     DateTime     @default(now()) @db.Timestamptz(6)
@@ -159,6 +170,8 @@ model Application {
 model Company {
   id                                   String                    @id @default(cuid())
   siret                                String                    @unique
+  orgId                                String                    @unique
+  orgRegistry                          OrgRegistry
   updatedAt                            DateTime                  @updatedAt @db.Timestamptz(6)
   createdAt                            DateTime                  @default(now()) @db.Timestamptz(6)
   securityCode                         Int
@@ -193,6 +206,13 @@ model Company {
   MembershipRequest                    MembershipRequest[]
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
   bsddRevisionRequests                 BsddRevisionRequest[]
+}
+
+model OrganisationRegistry {
+  id          String      @id @default(cuid())
+  orgRegistry OrgRegistry @unique
+  label       String
+  description String?
 }
 
 // Companies with restricted diffusion of SIRENE information (police, army, etc)
