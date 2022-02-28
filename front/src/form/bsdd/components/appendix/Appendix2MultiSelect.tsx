@@ -5,6 +5,7 @@ import useDebounce from "common/hooks/use-debounce";
 import { FieldArray, useFormikContext } from "formik";
 import { Form, Query, QueryAppendixFormsArgs } from "generated/graphql/types";
 import React, { useEffect, useMemo, useState } from "react";
+import formatWasteCodeEffect from "../waste-code/format-waste-code.effect";
 
 const APPENDIX2_FORMS = gql`
   query AppendixForms($siret: String!, $wasteCode: String) {
@@ -71,6 +72,10 @@ export default function Appendix2MultiSelect() {
   ]);
 
   useEffect(() => {
+    formatWasteCodeEffect(wasteCodeFilter, setWasteCodeFilter);
+  }, [wasteCodeFilter]);
+
+  useEffect(() => {
     // avoid overwriting values on first render when updating a BSDD
     if (!values.id || hasChanged) {
       // Computes sum of quantities of appendix2
@@ -115,9 +120,6 @@ export default function Appendix2MultiSelect() {
       setFieldValue("wasteDetails.packagingInfos", totalPackagings);
     }
   }, [appendix2Selected, values.id, hasChanged, setFieldValue]);
-
-  if (loading) return <p>Chargement...</p>;
-  if (error) return <InlineError apolloError={error} />;
 
   function onSelectAll() {
     if (values?.appendix2Forms?.length) {
@@ -209,11 +211,13 @@ export default function Appendix2MultiSelect() {
             <tr>
               <td colSpan={100}>
                 Aucun bordereau éligible au regroupement. Vérifiez que vous avez
-                bien sélectionné le bon émetteur
+                bien sélectionné le bon émetteur.
               </td>
             </tr>
           )}
         </tbody>
+        {error && <InlineError apolloError={error} />}
+        {loading && <div>Chargement</div>}
       </table>
     </>
   );
