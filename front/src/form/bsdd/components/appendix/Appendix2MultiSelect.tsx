@@ -2,12 +2,8 @@ import { gql, useQuery } from "@apollo/client";
 import { InlineError } from "common/components/Error";
 import { formatDate } from "common/datetime";
 import useDebounce from "common/hooks/use-debounce";
-import { Field, useFormikContext } from "formik";
-import {
-  CreateFormInput,
-  Query,
-  QueryAppendixFormsArgs,
-} from "generated/graphql/types";
+import { FieldArray, useFormikContext } from "formik";
+import { Form, Query, QueryAppendixFormsArgs } from "generated/graphql/types";
 import React, { useEffect, useMemo, useState } from "react";
 
 const APPENDIX2_FORMS = gql`
@@ -30,7 +26,7 @@ const APPENDIX2_FORMS = gql`
           quantity
         }
       }
-      receivedAt
+      signedAt
       quantityReceived
       processingOperationDone
     }
@@ -40,9 +36,9 @@ const APPENDIX2_FORMS = gql`
 export default function Appendix2MultiSelect() {
   const [wasteCodeFilter, setWasteCodeFilter] = useState("");
   const debouncedWasteCodeFilter = useDebounce(wasteCodeFilter, 500);
-  const { values, setFieldValue } = useFormikContext<
-    Pick<CreateFormInput, "emitter"> & { appendix2Forms: string[] }
-  >();
+  const { values, setFieldValue, getFieldMeta } = useFormikContext<Form>();
+  const meta = getFieldMeta<Form[]>("appendix2Forms");
+  const [hasChanged, setHasChanged] = useState(false);
 
   const { loading, error, data } = useQuery<
     Pick<Query, "appendixForms">,
@@ -56,72 +52,69 @@ export default function Appendix2MultiSelect() {
     },
     skip: !values.emitter?.company?.siret,
     fetchPolicy: "network-only",
-    onCompleted: data => {
-      if (values.appendix2Forms?.length > 0) {
-        setFieldValue(
-          "appendix2Forms",
-          values.appendix2Forms.filter(id =>
-            data.appendixForms.map(f => f.id).includes(id)
-          )
-        );
-      }
-    },
   });
 
-  const appendix2Candidates = useMemo(() => data?.appendixForms ?? [], [data]);
-  const appendix2Selected = useMemo(() => {
-    return appendix2Candidates.filter(f =>
-      values.appendix2Forms.includes(f.id)
-    );
-  }, [appendix2Candidates, values.appendix2Forms]);
+  // because { query { appendix2Forms } } does not return forms that
+  // have already been appended to a BSDD, we need to keep track of
+  // initial value of form.appendix2Forms when updating a BSDD
+  const appendix2Candidates = useMemo(() => {
+    const appendix2Forms = data?.appendixForms ?? [];
+    return [...(meta.initialValue ?? []), ...appendix2Forms].filter(f => {
+      return wasteCodeFilter?.length
+        ? f.wasteDetails?.code === wasteCodeFilter
+        : true;
+    });
+  }, [data, meta.initialValue, wasteCodeFilter]);
+
+  const appendix2Selected = useMemo(() => values.appendix2Forms ?? [], [
+    values.appendix2Forms,
+  ]);
 
   useEffect(() => {
-    // Computes sum of quantities of appendix2
-    const totalQuantity = appendix2Selected.reduce((q, f) => {
-      if (!f.wasteDetails?.quantity) {
-        return q;
-      }
-      return q + f.wasteDetails?.quantity;
-    }, 0);
-
-    // Computes the sum of packagingsInfos of appendix2
-    const totalPackagings = (() => {
-      const quantityByType = appendix2Selected.reduce((acc1, form) => {
-        if (!form.wasteDetails?.packagingInfos) {
-          return acc1;
+    // avoid overwriting values on first render when updating a BSDD
+    if (!values.id || hasChanged) {
+      // Computes sum of quantities of appendix2
+      const totalQuantity = appendix2Selected.reduce((q, f) => {
+        if (!f.wasteDetails?.quantity) {
+          return q;
         }
-        return form.wasteDetails.packagingInfos.reduce(
-          (acc2, packagingInfo) => {
-            if (!acc2[packagingInfo.type]) {
+        return q + f.wasteDetails?.quantity;
+      }, 0);
+
+      // Computes the sum of packagingsInfos of appendix2
+      const totalPackagings = (() => {
+        const quantityByType = appendix2Selected.reduce((acc1, form) => {
+          if (!form.wasteDetails?.packagingInfos) {
+            return acc1;
+          }
+          return form.wasteDetails.packagingInfos.reduce(
+            (acc2, packagingInfo) => {
+              if (!acc2[packagingInfo.type]) {
+                return {
+                  ...acc2,
+                  [packagingInfo.type]: packagingInfo.quantity,
+                };
+              }
               return {
                 ...acc2,
-                [packagingInfo.type]: packagingInfo.quantity,
+                [packagingInfo.type]:
+                  packagingInfo.quantity + acc2[packagingInfo.type],
               };
-            }
-            return {
-              ...acc2,
-              [packagingInfo.type]:
-                packagingInfo.quantity + acc2[packagingInfo.type],
-            };
-          },
-          acc1
-        );
-      }, {});
-      return Object.keys(quantityByType).map(type => ({
-        type,
-        other: "",
-        quantity: quantityByType[type],
-      }));
-    })();
+            },
+            acc1
+          );
+        }, {});
+        return Object.keys(quantityByType).map(type => ({
+          type,
+          other: "",
+          quantity: quantityByType[type],
+        }));
+      })();
 
-    setFieldValue("wasteDetails.quantity", totalQuantity || null);
-    setFieldValue("wasteDetails.packagingInfos", totalPackagings);
-  }, [appendix2Selected, setFieldValue]);
-
-  // set default value for the quantity of the groupement BSD
-  // useEffect(() => {}, [totalQuantity, setFieldValue]);
-
-  // useEffect(() => {}, [totalPackagings, setFieldValue]);
+      setFieldValue("wasteDetails.quantity", totalQuantity);
+      setFieldValue("wasteDetails.packagingInfos", totalPackagings);
+    }
+  }, [appendix2Selected, values.id, hasChanged, setFieldValue]);
 
   if (loading) return <p>Chargement...</p>;
   if (error) return <InlineError apolloError={error} />;
@@ -130,10 +123,7 @@ export default function Appendix2MultiSelect() {
     if (values?.appendix2Forms?.length) {
       setFieldValue("appendix2Forms", []);
     } else {
-      setFieldValue(
-        "appendix2Forms",
-        appendix2Candidates.map(f => f.id)
-      );
+      setFieldValue("appendix2Forms", appendix2Candidates);
     }
   }
 
@@ -148,7 +138,7 @@ export default function Appendix2MultiSelect() {
                   type="checkbox"
                   className="td-checkbox"
                   checked={
-                    values.appendix2Forms?.length === appendix2Candidates.length
+                    appendix2Selected.length === appendix2Candidates.length
                   }
                   onChange={onSelectAll}
                 />
@@ -174,26 +164,47 @@ export default function Appendix2MultiSelect() {
           </tr>
         </thead>
         <tbody>
-          {appendix2Candidates.map(form => (
-            <tr key={form.id} className="td-table__tr">
-              <td>
-                <Field
-                  type="checkbox"
-                  className="td-checkbox"
-                  name="appendix2Forms"
-                  value={form.id}
-                />
-              </td>
-              <td>{form.readableId}</td>
-              <td>
-                {form.wasteDetails?.code} - {form.wasteDetails?.name}
-              </td>
-              <td>{form.emitter?.company?.name}</td>
-              <td>{formatDate(form.receivedAt!)}</td>
-              <td>{form.quantityReceived} tonnes</td>
-              <td>{form.processingOperationDone}</td>
-            </tr>
-          ))}
+          <FieldArray
+            name="appendix2Forms"
+            render={({ push, remove }) => (
+              <>
+                {appendix2Candidates.map((form, index) => (
+                  <tr key={form.id} className="td-table__tr">
+                    <td>
+                      <input
+                        type="checkbox"
+                        className="td-checkbox"
+                        name={`appendix2Forms[${index}].id`}
+                        value={form.id}
+                        checked={appendix2Selected
+                          .map(f => f.id)
+                          .includes(form.id)}
+                        onChange={e => {
+                          setHasChanged(true);
+                          if (e.target.checked) {
+                            push(form);
+                          } else {
+                            const idx = appendix2Selected
+                              .map(f => f.id)
+                              .indexOf(form.id);
+                            remove(idx);
+                          }
+                        }}
+                      />
+                    </td>
+                    <td>{form.readableId}</td>
+                    <td>
+                      {form.wasteDetails?.code} - {form.wasteDetails?.name}
+                    </td>
+                    <td>{form.emitter?.company?.name}</td>
+                    <td>{formatDate(form.signedAt!)}</td>
+                    <td>{form.quantityReceived} tonnes</td>
+                    <td>{form.processingOperationDone}</td>
+                  </tr>
+                ))}
+              </>
+            )}
+          />
           {appendix2Candidates.length === 0 && (
             <tr>
               <td colSpan={100}>

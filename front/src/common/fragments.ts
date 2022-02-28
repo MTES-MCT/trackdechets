@@ -242,6 +242,23 @@ const mutableFieldsFragment = gql`
     appendix2Forms {
       id
       readableId
+      wasteDetails {
+        code
+        name
+        quantity
+        packagingInfos {
+          type
+          other
+          quantity
+        }
+      }
+      emitter {
+        company {
+          name
+        }
+      }
+      signedAt
+      processingOperationDone
     }
     ecoOrganisme {
       name

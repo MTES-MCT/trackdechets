@@ -80,7 +80,9 @@ export default function StepsList(props: Props) {
         : { temporaryStorageDetail: null }),
       // discard ecoOrganisme if not selected
       ...(ecoOrganisme?.siret ? { ecoOrganisme } : { ecoOrganisme: null }),
-      appendix2Forms: appendix2Forms.map(id => ({ id })),
+      ...(appendix2Forms?.length
+        ? { appendix2Forms: appendix2Forms.map(f => ({ id: f.id })) }
+        : {}),
     };
 
     saveForm(formInput)
@@ -99,10 +101,7 @@ export default function StepsList(props: Props) {
         formId={props.formId}
         formQuery={formQuery}
         onSubmit={onSubmit}
-        initialValues={{
-          ...formState,
-          appendix2Forms: formState.appendix2Forms?.map(f => f.id),
-        }}
+        initialValues={formState}
         validationSchema={formSchema}
       />
       {(creating || updating) && <Loader />}
