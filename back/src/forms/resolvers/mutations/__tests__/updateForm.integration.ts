@@ -764,6 +764,40 @@ describe("Mutation.updateForm", () => {
     expect(newAppendix2Form.status).toBe("GROUPED");
   });
 
+  it("should be possible to update data on a form containing appendix 2", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
+    const appendixForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        recipientCompanySiret: ttr.siret
+      }
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: ttr.siret,
+        appendix2Forms: { connect: { id: appendixForm.id } }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          wasteDetails: {
+            code: "01 03 04*"
+          }
+        }
+      }
+    });
+    expect(data.updateForm.wasteDetails.code).toEqual("01 03 04*");
+  });
+
   it("should disallow linking an appendix 2 form if the emitter of the regroupement form is not the recipient of the initial form", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
     const initialAppendix2 = await formFactory({
