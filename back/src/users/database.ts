@@ -15,7 +15,6 @@ import { deleteCachedUserSirets } from "../common/redis/users";
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   // hint: See getCachedUserSirets function to leverage redis
   const companyAssociations = await prisma.companyAssociation.findMany({
-    distinct: ["companyId"],
     where: { userId },
     include: { company: true }
   });
