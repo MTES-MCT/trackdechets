@@ -8,6 +8,7 @@ import WorkSite from "form/common/components/work-site/WorkSite";
 import { getInitialEmitterWorkSite } from "form/bsdd/utils/initial-state";
 import "./Emitter.scss";
 import MyCompanySelector from "form/common/components/company/MyCompanySelector";
+import { emitterTypeLabels } from "dashboard/constants";
 
 export default function Emitter() {
   const { values, setFieldValue } = useFormikContext<Form>();
@@ -60,21 +61,21 @@ export default function Emitter() {
           <Field
             name="emitter.type"
             id="PRODUCER"
-            label="Producteur du déchet"
+            label={emitterTypeLabels["PRODUCER"]}
             component={RadioButton}
             disabled={lockEmitterType}
           />
           <Field
             name="emitter.type"
             id="OTHER"
-            label="Autre détenteur"
+            label={emitterTypeLabels["OTHER"]}
             component={RadioButton}
             disabled={lockEmitterType}
           />
           <Field
             name="emitter.type"
             id="APPENDIX2"
-            label="Personne ayant transformé ou réalisé un traitement dont la provenance reste identifiable"
+            label={emitterTypeLabels["APPENDIX2"]}
             component={RadioButton}
             disabled={lockEmitterType}
           />
@@ -82,7 +83,7 @@ export default function Emitter() {
           <Field
             name="emitter.type"
             id="APPENDIX1"
-            label="Collecteur de petites quantités de déchets relevant d’une même rubrique"
+            label={emitterTypeLabels["APPENDIX1"]}
             component={RadioButton}
             disabled={lockEmitterType}
           />

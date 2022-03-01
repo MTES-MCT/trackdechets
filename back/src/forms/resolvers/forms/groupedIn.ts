@@ -8,7 +8,10 @@ const groupedInResolver: FormResolvers["groupedIn"] = async form => {
       where: { id: form.id }
     })
     .appendix2RootForm();
-  return expandFormFromDb(groupedIn);
+  if (groupedIn) {
+    return expandFormFromDb(groupedIn);
+  }
+  return null;
 };
 
 export default groupedInResolver;

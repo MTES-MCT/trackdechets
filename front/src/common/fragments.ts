@@ -329,6 +329,20 @@ export const detailFormFragment = gql`
       siret
       name
     }
+    groupedIn {
+      readableId
+    }
+    appendix2Forms {
+      readableId
+      wasteDetails {
+        code
+        name
+        quantity
+      }
+      quantityReceived
+      signedAt
+      emitterPostalCode
+    }
   }
   ${transporterFormFragment}
 `;

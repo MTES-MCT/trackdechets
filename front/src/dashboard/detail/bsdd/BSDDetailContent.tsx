@@ -11,8 +11,14 @@ import {
   Form,
   FormCompany,
   FormStatus,
+  Appendix2Form,
+  EmitterType,
 } from "generated/graphql/types";
-import { getTransportModeLabel, statusLabels } from "../../constants";
+import {
+  emitterTypeLabels,
+  getTransportModeLabel,
+  statusLabels,
+} from "../../constants";
 import {
   IconWarehouseDelivery,
   IconWarehouseStorage,
@@ -46,6 +52,7 @@ import { WorkflowAction } from "dashboard/components/BSDList";
 import EditSegment from "./EditSegment";
 import { Loader } from "common/components";
 import { isDangerous } from "generated/constants";
+import { format } from "date-fns";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -322,8 +329,64 @@ const Recipient = ({
         />
         <DateRow value={form.processedAt} label="Traitement effectué le" />
         <DetailRow value={form.processedBy} label="Traitement effectué par" />
+        <DetailRow value={form.processedBy} label="Traitement effectué par" />
+        {form.groupedIn && (
+          <DetailRow
+            value={form.groupedIn.readableId}
+            label={`Annexé au bordereau n°`}
+          />
+        )}
       </div>
     </>
+  );
+};
+
+const Appendix2 = ({
+  appendix2Forms,
+}: {
+  appendix2Forms: Appendix2Form[] | null | undefined;
+}) => {
+  if (!appendix2Forms?.length) {
+    return <div>Aucun bordereau annexé</div>;
+  }
+  return (
+    <table className="td-table">
+      <thead>
+        <tr className="td-table__head-tr">
+          <th>N° Bordereau</th>
+          <th>Code déchet</th>
+          <th>Dénomination usuelle</th>
+          <th>Pesée (tonne)</th>
+          <th>Réelle / estimée</th>
+          <th>Date de réception</th>
+          <th>Code postal lieu de collecte</th>
+        </tr>
+      </thead>
+      <tbody>
+        {appendix2Forms.map((appendix2Form, index) => (
+          <tr key={index}>
+            <td>{appendix2Form?.readableId}</td>
+            <td>{appendix2Form?.wasteDetails?.code}</td>
+            <td>{appendix2Form?.wasteDetails?.name}</td>
+            <td>
+              {appendix2Form?.quantityReceived ??
+                appendix2Form?.wasteDetails?.quantity}
+            </td>
+            <td>
+              {appendix2Form?.quantityReceived
+                ? "R"
+                : appendix2Form?.wasteDetails?.quantityType?.charAt(0)}
+            </td>
+            <td>
+              {appendix2Form?.signedAt
+                ? format(new Date(appendix2Form?.signedAt), "dd/MM/yyyy")
+                : ""}
+            </td>
+            <td>{appendix2Form?.emitterPostalCode}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 };
 
@@ -349,6 +412,7 @@ export default function BSDDetailContent({
 
   const isMultiModal: boolean = !!form?.transportSegments?.length;
   const hasTempStorage: boolean = !!form?.temporaryStorageDetail;
+  const isRegroupement: boolean = form?.emitter?.type === EmitterType.Appendix2;
 
   return (
     <>
@@ -413,9 +477,20 @@ export default function BSDDetailContent({
         <Tabs selectedTabClassName={styles.detailTabSelected}>
           {/* Tabs menu */}
           <TabList className={styles.detailTabs}>
+            {isRegroupement && (
+              <Tab className={styles.detailTab}>
+                <div className="tw-flex tw-space-x-2">
+                  <IconWaterDam size="18px" />
+                  <IconWaterDam size="18px" />
+                  <IconWaterDam size="18px" />
+                </div>
+                <span className={styles.detailTabCaption}>Annexes 2</span>
+              </Tab>
+            )}
+
             <Tab className={styles.detailTab}>
               <IconWaterDam size="25px" />
-              <span className={styles.detailTabCaption}>Producteur</span>
+              <span className={styles.detailTabCaption}>Émetteur</span>
             </Tab>
             {!!form?.trader?.company?.name && (
               <Tab className={styles.detailTab}>
@@ -458,12 +533,25 @@ export default function BSDDetailContent({
           </TabList>
           {/* Tabs content */}
           <div className={styles.detailTabPanels}>
+            {/* Appendix2 tab panel */}
+            {isRegroupement && (
+              <TabPanel className={styles.detailTabPanel}>
+                <Appendix2 appendix2Forms={form.appendix2Forms} />
+              </TabPanel>
+            )}
             {/* Emitter tab panel */}
             <TabPanel className={styles.detailTabPanel}>
               <div className={styles.detailColumns}>
                 <div className={styles.detailGrid}>
+                  <DetailRow
+                    label="Type d'émetteur"
+                    value={
+                      form.emitter?.type
+                        ? emitterTypeLabels[form.emitter?.type]
+                        : ""
+                    }
+                  />
                   <Company label="Émetteur" company={form.emitter?.company} />
-
                   <DetailRow
                     value={form.emitter?.workSite?.name}
                     label="Chantier"
