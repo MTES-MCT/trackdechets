@@ -216,9 +216,9 @@ export default function Appendix2MultiSelect() {
             </tr>
           )}
         </tbody>
-        {error && <InlineError apolloError={error} />}
-        {loading && <div>Chargement</div>}
       </table>
+      {error && <InlineError apolloError={error} />}
+      {loading && <div>Chargement</div>}
     </>
   );
 }

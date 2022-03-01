@@ -63,6 +63,11 @@ export default function MyCompanySelector({ fieldName }) {
                 `${fieldName}.address`,
                 selectedCompany.address ?? ""
               );
+            } else {
+              setFieldValue(`${fieldName}.name`, "");
+              setFieldValue(`${fieldName}.mail`, "");
+              setFieldValue(`${fieldName}.phone`, "");
+              setFieldValue(`${fieldName}.address`, "");
             }
           }}
           value={field.value.siret}
