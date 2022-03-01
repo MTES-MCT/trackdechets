@@ -38,8 +38,8 @@ export function RouteBsdsHistory() {
             </BlankslateTitle>
             <BlankslateDescription>
               Des bordereaux apparaissent dans cet onglet lorsqu'ils ont terminé
-              leur cycle de vie. Ils sont alors disponible en lecture seule pour
-              consultation.
+              leur cycle de vie. Ils sont alors disponibles en lecture seule
+              pour consultation.
             </BlankslateDescription>
           </Blankslate>
         }
