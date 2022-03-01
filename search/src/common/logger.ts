@@ -12,7 +12,8 @@ if (process.env.NODE_ENV !== "dev") {
  */
 
 // Avoid using undefined console.log() in jest context
-const LOG_TO_CONSOLE = process.env.FORCE_LOGGER_CONSOLE && !process.env.JEST_WORKER_ID;
+const LOG_TO_CONSOLE =
+  process.env.FORCE_LOGGER_CONSOLE && process.env.JEST_WORKER_ID === undefined;
 
 // Docs https://docs.datadoghq.com/fr/logs/log_collection/nodejs/?tab=winston30
 const logger = createLogger({
@@ -24,7 +25,7 @@ const logger = createLogger({
     format.json()
   ),
   transports: [
-    LOG_TO_CONSOLE
+    !LOG_TO_CONSOLE
       ? new transports.File({ filename: LOG_PATH })
       : new transports.Console({
           // Simple `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
@@ -33,7 +34,7 @@ const logger = createLogger({
   ],
   // capture exceptions, also for datadog to report it
   exceptionHandlers: [
-    LOG_TO_CONSOLE
+    !LOG_TO_CONSOLE
       ? new transports.File({ filename: LOG_PATH })
       : new transports.Console({
           format: format.simple()
