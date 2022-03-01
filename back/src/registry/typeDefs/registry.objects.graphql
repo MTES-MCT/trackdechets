@@ -535,12 +535,6 @@ type TransportedWaste {
   "Extra - Exemption de récépissé transporteur"
   transporterRecepisseIsExempted: Boolean
 
-  "Extra - Exemption de récépissé transporteur n°2"
-  transporter2RecepisseIsExempted: Boolean
-
-  "Extra - Exemption de récépissé transporteur n°3"
-  transporter3RecepisseIsExempted: Boolean
-
   "Extra - N° de CAP (Certificat d'acceptation préalable)"
   destinationCap: String
 

@@ -1,4 +1,4 @@
-import { Form, TemporaryStorageDetail } from "@prisma/client";
+import { Form, TemporaryStorageDetail, TransportSegment } from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
 import {
   AllWaste,
@@ -58,6 +58,16 @@ export function getRegistryFields(
     }
     if (form.brokerCompanySiret) {
       registryFields.isManagedWasteFor.push(form.brokerCompanySiret);
+    }
+  }
+
+  if (form.transportSegments?.length) {
+    for (const transportSegment of form.transportSegments) {
+      if (transportSegment.takenOverAt) {
+        registryFields.isTransportedWasteFor.push(
+          transportSegment.transporterCompanySiret
+        );
+      }
     }
   }
 
@@ -137,17 +147,25 @@ export function toIncomingWaste(
     transporterCompanyName: bsdd.transporterCompanyName,
     transporterCompanySiret: bsdd.transporterCompanySiret,
     transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
+    transporterCompanyMail: bsdd.transporterCompanyMail,
     destinationOperationCode: bsdd.destinationOperationCode,
     destinationCustomInfo: null,
     emitterCompanyMail: bsdd.emitterCompanyMail,
-    transporterCompanyMail: bsdd.transporterCompanyMail
+    transporter2CompanyName: bsdd.transporter2CompanyName,
+    transporter2CompanySiret: bsdd.transporter2CompanySiret,
+    transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber,
+    transporter2CompanyMail: bsdd.transporter2CompanyMail,
+    transporter3CompanyName: bsdd.transporter3CompanyName,
+    transporter3CompanySiret: bsdd.transporter3CompanySiret,
+    transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber,
+    transporter3CompanyMail: bsdd.transporter3CompanyMail
   };
 }
 
 export function toIncomingWastes(
   form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
     appendix2Forms: Form[];
-  },
+  } & { transportSegments: TransportSegment[] },
   sirets: string[]
 ): IncomingWaste[] {
   const bsdd = formToBsdd(form);
@@ -227,17 +245,27 @@ export function toOutgoingWaste(
     transporterCompanySiret: bsdd.transporterCompanySiret,
     transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
     transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
+    transporterCompanyMail: bsdd.transporterCompanyMail,
     weight: bsdd.weightValue,
     emitterCustomInfo: null,
-    transporterCompanyMail: bsdd.transporterCompanyMail,
-    destinationCompanyMail: bsdd.destinationCompanyMail
+    destinationCompanyMail: bsdd.destinationCompanyMail,
+    transporter2CompanyAddress: bsdd.traderCompanyAddress,
+    transporter2CompanyName: bsdd.transporter2CompanyName,
+    transporter2CompanySiret: bsdd.transporter2CompanySiret,
+    transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber,
+    transporter2CompanyMail: bsdd.transporter2CompanyMail,
+    transporter3CompanyAddress: bsdd.traderCompanyAddress,
+    transporter3CompanyName: bsdd.transporter2CompanyName,
+    transporter3CompanySiret: bsdd.transporter2CompanySiret,
+    transporter3RecepisseNumber: bsdd.transporter2RecepisseNumber,
+    transporter3CompanyMail: bsdd.transporter2CompanyMail
   };
 }
 
 export function toOutgoingWastes(
   form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
     appendix2Forms: Form[];
-  },
+  } & { transportSegments: TransportSegment[] },
   sirets: string[]
 ): OutgoingWaste[] {
   const bsdd = formToBsdd(form);
@@ -326,7 +354,7 @@ export function toTransportedWaste(
 export function toTransportedWastes(
   form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
     appendix2Forms: Form[];
-  },
+  } & { transportSegments: TransportSegment[] },
   sirets: string[]
 ): TransportedWaste[] {
   const bsdd = formToBsdd(form);
@@ -408,14 +436,22 @@ export function toManagedWaste(
     transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
     emitterCompanyMail: bsdd.emitterCompanyMail,
     transporterCompanyMail: bsdd.transporterCompanyMail,
-    destinationCompanyMail: bsdd.destinationCompanyMail
+    destinationCompanyMail: bsdd.destinationCompanyMail,
+    transporter2CompanyAddress: bsdd.transporter2CompanyAddress,
+    transporter2CompanyName: bsdd.transporter2CompanyName,
+    transporter2CompanySiret: bsdd.transporter2CompanySiret,
+    transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber,
+    transporter3CompanyAddress: bsdd.transporter3CompanyAddress,
+    transporter3CompanyName: bsdd.transporter3CompanyName,
+    transporter3CompanySiret: bsdd.transporter3CompanySiret,
+    transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber
   };
 }
 
 export function toManagedWastes(
   form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
     appendix2Forms: Form[];
-  }
+  } & { transportSegments: TransportSegment[] }
 ): ManagedWaste[] {
   const bsdd = formToBsdd(form);
   if (bsdd.forwarding) {
@@ -477,6 +513,7 @@ export function toAllWaste(
     transporterCompanyName: bsdd.transporterCompanyName,
     transporterCompanySiret: bsdd.transporterCompanySiret,
     transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
+    transporterCompanyMail: bsdd.transporterCompanyMail,
     weight: bsdd.weightValue,
     managedEndDate: null,
     managedStartDate: null,
@@ -484,15 +521,24 @@ export function toAllWaste(
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
     emitterCompanyMail: bsdd.emitterCompanyMail,
-    transporterCompanyMail: bsdd.transporterCompanyMail,
-    destinationCompanyMail: bsdd.destinationCompanyMail
+    destinationCompanyMail: bsdd.destinationCompanyMail,
+    transporter2CompanyAddress: bsdd.transporter2CompanyAddress,
+    transporter2CompanyName: bsdd.transporter2CompanyName,
+    transporter2CompanySiret: bsdd.transporter2CompanySiret,
+    transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber,
+    transporter2CompanyMail: bsdd.transporter2CompanyMail,
+    transporter3CompanyAddress: bsdd.transporter3CompanyAddress,
+    transporter3CompanyName: bsdd.transporter3CompanyName,
+    transporter3CompanySiret: bsdd.transporter3CompanySiret,
+    transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber,
+    transporter3CompanyMail: bsdd.transporter3CompanyMail
   };
 }
 
 export function toAllWastes(
   form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
     appendix2Forms: Form[];
-  },
+  } & { transportSegments: TransportSegment[] },
   sirets: string[]
 ): AllWaste[] {
   const bsdd = formToBsdd(form);
