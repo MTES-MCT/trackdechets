@@ -53,6 +53,7 @@ export const wasteDetailsFragment = gql`
     quantityType
     consistence
     pop
+    isDangerous
   }
 `;
 

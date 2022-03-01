@@ -18,6 +18,7 @@ import { processedFormSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { indexForm } from "../../elastic";
+import { isDangerous } from "../../../common/constants";
 
 /**
  * Update an existing form with data imported from a paper form
@@ -31,6 +32,14 @@ async function updateForm(user: User, form: Form, input: ImportPaperFormInput) {
     throw new UserInputError(
       `Seul un BSD à l'état "scellé" (SEALED) peut être mis à jour à partir d'un BSD papier`
     );
+  }
+
+  if (
+    input.wasteDetails?.code &&
+    isDangerous(input.wasteDetails?.code) &&
+    input.wasteDetails?.isDangerous === undefined
+  ) {
+    input.wasteDetails.isDangerous = true;
   }
 
   const flattenedFormInput = flattenImportPaperFormInput(input);

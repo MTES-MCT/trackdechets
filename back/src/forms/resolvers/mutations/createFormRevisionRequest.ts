@@ -3,7 +3,8 @@ import {
   Prisma,
   RevisionRequestStatus,
   Status,
-  User
+  User,
+  TemporaryStorageDetail
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
@@ -66,7 +67,16 @@ export default async function createFormRevisionRequest(
 
   const user = checkIsAuthenticated(context);
   const existingBsdd = await getFormOrFormNotFound({ id: formId });
-  await checkIfUserCanRequestRevisionOnBsdd(user, existingBsdd);
+
+  const temporaryStorageDetail = await prisma.form
+    .findUnique({ where: { id: formId } })
+    .temporaryStorageDetail();
+
+  await checkIfUserCanRequestRevisionOnBsdd(
+    user,
+    existingBsdd,
+    temporaryStorageDetail
+  );
 
   const flatContent = await getFlatContent(content, existingBsdd);
 
@@ -130,10 +140,10 @@ async function getAuthoringCompany(
 
 async function checkIfUserCanRequestRevisionOnBsdd(
   user: User,
-  bsdd: Form
+  bsdd: Form,
+  temporaryStorageDetail?: TemporaryStorageDetail
 ): Promise<void> {
-  await checkCanRequestRevision(user, bsdd);
-
+  await checkCanRequestRevision(user, bsdd, temporaryStorageDetail);
   if (Status.DRAFT === bsdd.status || Status.SEALED === bsdd.status) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau. Vous pouvez le modifier directement, aucune signature bloquante n'a encore été apposée."
@@ -153,6 +163,7 @@ async function checkIfUserCanRequestRevisionOnBsdd(
         status: RevisionRequestStatus.PENDING
       }
     });
+
   if (unsettledRevisionRequestsOnBsdd > 0) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau. Une autre révision est déjà en attente de validation."

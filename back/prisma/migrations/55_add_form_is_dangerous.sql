@@ -1,0 +1,2 @@
+ALTER TABLE "default$default"."Form" ADD COLUMN "wasteDetailsIsDangerous" bool NOT NULL DEFAULT 'false';
+UPDATE "default$default"."Form" SET "wasteDetailsIsDangerous" = 'true' WHERE "wasteDetailsCode" LIKE '%*';

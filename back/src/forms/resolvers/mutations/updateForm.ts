@@ -11,7 +11,7 @@ import {
   AppendixFormInput
 } from "../../../generated/graphql/types";
 import { MissingTempStorageFlag, InvalidWasteCode } from "../../errors";
-import { WASTES_CODES } from "../../../common/constants";
+import { isDangerous, WASTES_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanUpdate, checkIsFormContributor } from "../../permissions";
 import { GraphQLContext } from "../../../types";
@@ -46,6 +46,14 @@ const updateFormResolver = async (
   const { id, appendix2Forms, temporaryStorageDetail, ...formContent } =
     updateFormInput;
 
+  if (
+    formContent.wasteDetails?.code &&
+    isDangerous(formContent.wasteDetails?.code) &&
+    formContent.wasteDetails.isDangerous === undefined
+  ) {
+    formContent.wasteDetails.isDangerous = true;
+  }
+
   const existingForm = await getFormOrFormNotFound({ id });
 
   await checkCanUpdate(user, existingForm);
@@ -54,9 +62,8 @@ const updateFormResolver = async (
 
   if (appendix2Forms) {
     await validateAppendix2Forms(appendix2Forms, { ...existingForm, ...form });
+    await handleFormsRemovedFromAppendix(existingForm, appendix2Forms);
   }
-
-  await handleFormsRemovedFromAppendix(existingForm, appendix2Forms);
 
   // Construct form update payload
   const formUpdateInput: Prisma.FormUpdateInput = {
@@ -175,6 +182,7 @@ async function handleFormsRemovedFromAppendix(
   }
 
   const nextAppendix2Ids = appendix2Forms.map(form => form.id);
+
   const appendix2ToUngroup = previousAppendix2Forms.filter(
     groupedAppendix => !nextAppendix2Ids.includes(groupedAppendix.id)
   );

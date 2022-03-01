@@ -283,6 +283,7 @@ model Form {
   wasteDetailsQuantity               Float?
   wasteDetailsQuantityType           QuantityType?
   wasteDetailsPop                    Boolean                 @default(false)
+  wasteDetailsIsDangerous            Boolean                 @default(false)
   readableId                         String                  @unique
   status                             Status                  @default(DRAFT)
   sentAt                             DateTime?

@@ -8,7 +8,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Mutation } from "../../../../generated/graphql/types";
+import { Mutation, UpdateFormInput } from "../../../../generated/graphql/types";
 import { Status } from "@prisma/client";
 
 const UPDATE_FORM = `
@@ -18,6 +18,7 @@ const UPDATE_FORM = `
       wasteDetails {
         name
         code
+        isDangerous
       }
       recipient {
         company {
@@ -764,6 +765,40 @@ describe("Mutation.updateForm", () => {
     expect(newAppendix2Form.status).toBe("GROUPED");
   });
 
+  it("should be possible to update data on a form containing appendix 2", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
+    const appendixForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        recipientCompanySiret: ttr.siret
+      }
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: ttr.siret,
+        appendix2Forms: { connect: { id: appendixForm.id } }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          wasteDetails: {
+            code: "01 03 04*"
+          }
+        }
+      }
+    });
+    expect(data.updateForm.wasteDetails.code).toEqual("01 03 04*");
+  });
+
   it("should disallow linking an appendix 2 form if the emitter of the regroupement form is not the recipient of the initial form", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
     const initialAppendix2 = await formFactory({
@@ -798,5 +833,63 @@ describe("Mutation.updateForm", () => {
         message: `Le bordereau ${wannaBeAppendix2.id} n'est pas en possession du nouvel émetteur`
       })
     ]);
+  });
+
+  it("should not be possible to set isDangerous=false with a waste code containing an *", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        wasteDetailsCode: "20 01 27*",
+        wasteDetailsIsDangerous: true
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      // try to set isDangerous to false
+      wasteDetails: {
+        isDangerous: false
+      }
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toMatchObject([
+      expect.objectContaining({
+        extensions: { code: ErrorCode.BAD_USER_INPUT },
+        message:
+          "Un déchet avec un code comportant un astérisque est forcément dangereux"
+      })
+    ]);
+  });
+
+  it("should be possible to set isDangerous=true with a waste code without *", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        wasteDetailsCode: "20 03 01",
+        wasteDetailsIsDangerous: false
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      wasteDetails: {
+        isDangerous: true
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    expect(data.updateForm.wasteDetails.isDangerous).toBe(true);
   });
 });

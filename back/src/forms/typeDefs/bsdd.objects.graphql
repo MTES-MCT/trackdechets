@@ -385,6 +385,9 @@ type WasteDetails {
 
   "Contient des Polluants Organiques Persistants (POP) oui / non"
   pop: Boolean
+
+  "Caractère dangereux du déchet au sens de l’article R541-8 du code de l’environnement"
+  isDangerous: Boolean
 }
 
 "Négociant (case 7)"

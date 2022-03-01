@@ -1,4 +1,4 @@
-import { Form, User } from "@prisma/client";
+import { Form, User, TemporaryStorageDetail } from "@prisma/client";
 import { ForbiddenError } from "apollo-server-express";
 import prisma from "../prisma";
 import { FormSirets } from "./types";
@@ -341,13 +341,20 @@ export async function checkSecurityCode(siret: string, securityCode: number) {
   return true;
 }
 
-export async function checkCanRequestRevision(user: User, form: Form) {
+export async function checkCanRequestRevision(
+  user: User,
+  form: Form,
+  temporaryStorageDetail?: TemporaryStorageDetail
+) {
   const userSirets = await getCachedUserSirets(user.id);
+
   const canRequestRevision = [
     isFormEmitter,
     isFormRecipient,
     isFormDestinationAfterTempStorage
-  ].some(isFormRole => isFormRole(userSirets, form));
+  ].some(isFormRole =>
+    isFormRole(userSirets, { ...form, temporaryStorageDetail })
+  );
 
   if (!canRequestRevision) {
     throw new NotFormContributor(
