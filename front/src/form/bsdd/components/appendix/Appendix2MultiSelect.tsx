@@ -122,7 +122,7 @@ export default function Appendix2MultiSelect() {
   }, [appendix2Selected, values.id, hasChanged, setFieldValue]);
 
   function onSelectAll() {
-    if (values?.appendix2Forms?.length) {
+    if (appendix2Selected.length === appendix2Candidates.length) {
       setFieldValue("appendix2Forms", []);
     } else {
       setFieldValue("appendix2Forms", appendix2Candidates);
