@@ -9,7 +9,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
-- Ajout d'un client primaire nommé trackdechets dans `companies/sirene` base sur notre propre index ElasticSearch des données Sirene INSEE.
+- Ajout d'un client primaire nommé trackdechets dans `companies/sirene` basé sur notre propre index  ElasticSearch des données Sirene INSEE [PR 1214](https://github.com/MTES-MCT/trackdechets/pull/1214)
 
 #### :bug: Corrections de bugs
 

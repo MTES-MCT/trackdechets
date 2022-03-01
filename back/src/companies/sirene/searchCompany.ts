@@ -6,8 +6,6 @@ import { backoffIfTooManyRequests, throttle } from "./ratelimit";
 import { redundant } from "./redundancy";
 import { cache } from "./cache";
 
-const { INSEE_MAINTENANCE } = process.env;
-
 const searchCompanyInseeThrottled = backoffIfTooManyRequests(
   searchCompanyInsee,
   {
@@ -29,7 +27,7 @@ const searchCompanySocialGouvThrottled = throttle(searchCompanySocialGouv, {
 // order of priority.
 const searchCompanyProviders = [
   searchCompanyTD,
-  ...(INSEE_MAINTENANCE === "true" ? [] : [searchCompanyInseeThrottled]),
+  searchCompanyInseeThrottled,
   searchCompanyDataGouvThrottled,
   searchCompanySocialGouvThrottled
 ];

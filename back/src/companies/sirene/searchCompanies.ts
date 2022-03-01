@@ -5,8 +5,6 @@ import { searchCompanies as searchCompaniesTD } from "./trackdechets/client";
 import { backoffIfTooManyRequests, throttle } from "./ratelimit";
 import { redundant } from "./redundancy";
 
-const { INSEE_MAINTENANCE } = process.env;
-
 const searchCompaniesInseeThrottled = backoffIfTooManyRequests(
   searchCompaniesInsee,
   {
@@ -28,7 +26,7 @@ const searchCompaniesSocialGouvThrottled = throttle(searchCompaniesSocialGouv, {
 // order of priority.
 const searchCompaniesProviders = [
   searchCompaniesTD,
-  ...(INSEE_MAINTENANCE === "true" ? [] : [searchCompaniesInseeThrottled]),
+  searchCompaniesInseeThrottled,
   searchCompaniesDataGouvThrottled,
   searchCompaniesSocialGouvThrottled
 ];

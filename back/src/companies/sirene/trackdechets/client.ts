@@ -140,14 +140,14 @@ export const searchCompanies = (
     }
   ];
 
-  if (department && department.length === 2) {
+  if (department?.length >= 2 && department?.length <= 3) {
     // this might a french department code
     must.push({
       wildcard: { codePostalEtablissement: `${department}*` }
     });
   }
 
-  if (department && department.length === 5) {
+  if (department?.length === 5) {
     // this might be a french postal code
     must.push({
       term: { codePostalEtablissement: department }
@@ -177,7 +177,6 @@ export const searchCompanies = (
       if (r.warnings) {
         logger.warn(r.warnings);
       }
-      logger.info(`Request took : ${r.body.took}ms`);
       return fullTextSearchResponseToCompanies(r.body.hits.hits);
     })
     .catch(error => {
