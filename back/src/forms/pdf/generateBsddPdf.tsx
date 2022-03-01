@@ -874,9 +874,16 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                       <td>{appendix2Form?.readableId}</td>
                       <td>{appendix2Form?.wasteDetails?.code}</td>
                       <td>{appendix2Form?.wasteDetails?.name}</td>
-                      <td>{appendix2Form?.wasteDetails?.quantity}</td>
                       <td>
-                        {appendix2Form?.wasteDetails?.quantityType?.charAt(0)}
+                        {appendix2Form?.quantityReceived ??
+                          appendix2Form?.wasteDetails?.quantity}
+                      </td>
+                      <td>
+                        {appendix2Form?.quantityReceived
+                          ? "R"
+                          : appendix2Form?.wasteDetails?.quantityType?.charAt(
+                              0
+                            )}
                       </td>
                       <td>{formatDate(appendix2Form?.signedAt)}</td>
                       <td>{appendix2Form?.emitterPostalCode}</td>
