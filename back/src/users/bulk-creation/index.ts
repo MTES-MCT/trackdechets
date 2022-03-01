@@ -38,13 +38,12 @@ export interface Opts {
   validateOnly: boolean;
   csvDir: string;
   console?: any;
-  sireneProvider: "entreprise.data.gouv.fr" | "insee" | "social.gouv";
+  sireneProvider?: "entreprise.data.gouv.fr" | "insee" | "social.gouv";
 }
 
 export const opts: Opts = {
   validateOnly: false,
-  csvDir: `${__dirname}/../../../csv`,
-  sireneProvider: "entreprise.data.gouv.fr"
+  csvDir: `${__dirname}/../../../csv`
 };
 
 async function run(argv = process.argv.slice(2)): Promise<void> {
