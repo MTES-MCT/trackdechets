@@ -38,6 +38,14 @@ export function getRegistryFields(
       registryFields.isTransportedWasteFor.push(
         temporaryStorage.transporterCompanySiret
       );
+
+      if (form.transportSegments?.length) {
+        for (const transportSegment of form.transportSegments) {
+          registryFields.isTransportedWasteFor.push(
+            transportSegment.transporterCompanySiret
+          );
+        }
+      }
     }
     if (form.receivedAt) {
       registryFields.isIncomingWasteFor.push(
@@ -48,6 +56,14 @@ export function getRegistryFields(
     if (form.receivedAt) {
       registryFields.isIncomingWasteFor.push(form.recipientCompanySiret);
       registryFields.isTransportedWasteFor.push(form.transporterCompanySiret);
+
+      if (form.transportSegments?.length) {
+        for (const transportSegment of form.transportSegments) {
+          registryFields.isTransportedWasteFor.push(
+            transportSegment.transporterCompanySiret
+          );
+        }
+      }
     }
   }
   if (form.sentAt) {
@@ -58,16 +74,6 @@ export function getRegistryFields(
     }
     if (form.brokerCompanySiret) {
       registryFields.isManagedWasteFor.push(form.brokerCompanySiret);
-    }
-  }
-
-  if (form.transportSegments?.length) {
-    for (const transportSegment of form.transportSegments) {
-      if (transportSegment.takenOverAt) {
-        registryFields.isTransportedWasteFor.push(
-          transportSegment.transporterCompanySiret
-        );
-      }
     }
   }
 
@@ -331,6 +337,14 @@ export function toTransportedWaste(
     transporterCompanySiret: bsdd.transporterCompanySiret,
     transporterCompanyAddress: bsdd.transporterCompanyAddress,
     transporterNumberPlates: bsdd.transporterNumberPlates,
+    transporter2CompanyName: bsdd.transporter2CompanyName,
+    transporter2CompanySiret: bsdd.transporter2CompanySiret,
+    transporter2CompanyAddress: bsdd.transporter2CompanyAddress,
+    transporter2NumberPlates: bsdd.transporter2NumberPlates,
+    transporter3CompanyName: bsdd.transporter3CompanyName,
+    transporter3CompanySiret: bsdd.transporter3CompanySiret,
+    transporter3CompanyAddress: bsdd.transporter3CompanyAddress,
+    transporter3NumberPlates: bsdd.transporter3NumberPlates,
     ...initialEmitter,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
@@ -360,8 +374,8 @@ export function toTransportedWastes(
   const bsdd = formToBsdd(form);
 
   if (bsdd.forwarding) {
-    // In case of temporary storage, a form can be flagged as trasnported waste
-    // either for the first trasnporter or for the transporter after temp storage.
+    // In case of temporary storage, a form can be flagged as transported waste
+    // either for the first transporter or for the transporter after temp storage.
     // Here we compute two "virtual" BSDDs, one from the emitter to the TTR and
     // one from the TTR to the final destination
     const transportedWastes: TransportedWaste[] = [];

@@ -445,9 +445,27 @@ type TransportedWaste {
   transporterCompanySiret: String
   "L'adresse du transporteur"
   transporterCompanyAddress: String
-
   "Le numéro d'immatriculation du ou des véhicules transportant le déchet"
   transporterNumberPlates: [String!]
+
+  "La raison sociale du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyName: String
+  "Le N°SIRET du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanySiret: String
+  "L'adresse du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyAddress: String
+  "Le numéro d'immatriculation du ou des véhicules du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2NumberPlates: [String!]
+
+  "La raison sociale du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyName: String
+  "Le N°SIRET du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanySiret: String
+  "L'adresse du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyAddress: String
+  "Le numéro d'immatriculation du ou des véhicules du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3NumberPlates: [String!]
+
   """
   Dans le cas de déchets dangereux, selon le cas, le code transport lié aux réglementations internationales
   relatives au transport international des marchandises dangereuses par route, au transport international
