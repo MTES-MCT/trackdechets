@@ -3,9 +3,9 @@ import { URL } from "url";
 import { UserInputError } from "apollo-server-express";
 import { libelleFromCodeNaf, buildAddress, removeDiacritics } from "../utils";
 import {
+  SireneSearchResult,
   SearchResponseDataGouv,
-  FullTextSearchResponseDataGouv,
-  CompanySearchResult
+  FullTextSearchResponseDataGouv
 } from "../types";
 import { AnonymousCompanyError } from "../errors";
 
@@ -17,7 +17,7 @@ const SIRENE_API_BASE_URL = "https://entreprise.data.gouv.fr/api/sirene";
  */
 function searchResponseToCompany({
   etablissement
-}: SearchResponseDataGouv): CompanySearchResult {
+}: SearchResponseDataGouv): SireneSearchResult {
   const addressVoie = buildAddress([
     etablissement.numero_voie,
     etablissement.indice_repetition,
@@ -69,7 +69,7 @@ function searchResponseToCompany({
  * Search a company by SIRET
  * @param siret
  */
-export function searchCompany(siret: string): Promise<CompanySearchResult> {
+export function searchCompany(siret: string): Promise<SireneSearchResult> {
   const searchUrl = `${SIRENE_API_BASE_URL}/v3/etablissements/${siret}`;
 
   return axios
@@ -100,7 +100,7 @@ export function searchCompany(siret: string): Promise<CompanySearchResult> {
  */
 function fullTextSearchResponseToCompanies(
   r: FullTextSearchResponseDataGouv
-): CompanySearchResult[] {
+): SireneSearchResult[] {
   return r.etablissement.map(etablissement => {
     const addressVoie = buildAddress([
       etablissement.numero_voie,
@@ -145,7 +145,7 @@ function fullTextSearchResponseToCompanies(
 export function searchCompanies(
   clue: string,
   department?: string
-): Promise<CompanySearchResult[]> {
+): Promise<SireneSearchResult[]> {
   if (/[0-9]{14}/.test(clue)) {
     // clue is formatted like a SIRET
     // use search by siret instead of full text

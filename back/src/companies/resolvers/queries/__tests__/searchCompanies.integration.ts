@@ -3,7 +3,7 @@ import prisma from "../../../../prisma";
 import { TestQuery } from "../../../../__tests__/apollo-integration-testing";
 import { companyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import * as sirene from "../../../sirene";
+import * as sirene from "../../../search";
 
 const searchCompanySpy = jest.spyOn(sirene, "searchCompanies");
 

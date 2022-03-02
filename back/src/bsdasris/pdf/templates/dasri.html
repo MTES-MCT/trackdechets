@@ -26,7 +26,7 @@
           <p style="font-size: 0.7em">Arrêté du 29 mai 2009</p>
         </div>
         <div class="item qr-code centered">
-         {{{ qrcode }}} 
+         {{{ qrcode }}}
         </div>
 
         <!-- Row 2 -->
@@ -53,7 +53,7 @@
           <p><strong>N° SIRET : </strong>{{bsdasri.emitterCompanySiret}}</p>
           <p><strong>NOM Société : </strong>{{bsdasri.emitterCompanyName}}</p>
           <p>
-            <strong>Adresse postale : </strong>{{bsdasri.emitterCompanyAddress}} 
+            <strong>Adresse postale : </strong>{{bsdasri.emitterCompanyAddress}}
           </p>
 
 
@@ -63,30 +63,30 @@
           <p>
           <strong>Adresse email : </strong>{{bsdasri.emitterCompanyMail}}
           </p>
-          <p>      
-          <strong>Téléphone : </strong>{{bsdasri.emitterCompanyPhone}} 
+          <p>
+          <strong>Téléphone : </strong>{{bsdasri.emitterCompanyPhone}}
           </p>
-             
+
 
           <p><strong>Adresse collecte :</strong>
             {{bsdasri.emitterPickupSiteName}} {{bsdasri.emitterPickupSsiteAddress}} {{bsdasri.emitterPickupSitePostalCode}}  {{bsdasri.emitterPickupSiteCity}}</p>
           <p><strong>Nom et signature de la PRED : </strong>{{bsdasri.emitterEmissionSignatureAuthor}}</p>
           <p>{{#if bsdasri.emitterEmissionSignatureAuthor}}{{{dasristamp}}}{{/if}}</p>
           <p><strong>Date de remise au collecteur transporteur :</strong>
-         {{dateFmt bsdasri.transporterTakenOverAt}} 
+         {{dateFmt bsdasri.transporterTakenOverAt}}
           </p>
         </div>
 
         <div class="item emission-wastecode">
           <h2>Code nomenclature déchets</h2>
           <p>
-            <input type="checkbox" {{#ifEquals bsdasri.wasteCode "18 01 03*"}}checked{{/ifEquals}} /> 18 01 03*: DASRI origine humaine 
-          </p> 
-          
+            <input type="checkbox" {{#ifEquals bsdasri.wasteCode "18 01 03*"}}checked{{/ifEquals}} /> 18 01 03*: DASRI origine humaine
+          </p>
+
           <p><input type="checkbox" {{#ifEquals bsdasri.wasteCode "18 01 02*"}}checked{{/ifEquals}}/> 18 01 02*: DASRI origine animale</p>
-        
-     
-        </div> 
+
+
+        </div>
         <div class="item emission-onucode">
           <p><strong>Code ADR : </strong> {{bsdasri.wasteAdr}}  </p>
         </div>
@@ -125,6 +125,7 @@
           <h2 class="underlined">Collecteur / Transporteur</h2>
 
           <p><strong>N° SIRET : </strong>{{bsdasri.transporterCompanySiret}}</p>
+          <p><strong>N° TVA : </strong>{{bsdasri.transporterCompanyVatNumber}}</p>
           <p><strong>NOM Société : </strong>{{bsdasri.transporterCompanyName}}</p>
           <p><strong>Adresse postale :</strong>{{bsdasri.transporterCompanyAddress}}</p>
 
@@ -141,7 +142,7 @@
         </div>
         <div class="item transport">
           <p>
-            <strong>Lot accepté :</strong> 
+            <strong>Lot accepté :</strong>
             <input type="checkbox" {{#ifEquals bsdasri.transporterAcceptationStatus "ACCEPTED"}}checked{{/ifEquals}}/> Oui
             <input type="checkbox" {{#ifEquals bsdasri.transporterAcceptationStatus "REFUSED"}}checked{{/ifEquals}}/> Non
             <input type="checkbox" {{#ifEquals bsdasri.transporterAcceptationStatus "PARTIALLY_REFUSED"}}checked{{/ifEquals}}/> Partiellement
@@ -163,13 +164,13 @@
               </tr>
             </thead>
             <tbody>
-        
+
           {{#each bsdasri.transporterWastePackagings}}
             <td>{{this.quantity}}</td>
             <td>{{this.type}}</td>
             <td>{{this.volume}}</td>
           {{/each}}
-              
+
             </tbody>
           </table>
           <p style="display: flex">
@@ -202,7 +203,7 @@
         </div>
         <div class="item reception">
           <p>
-            <strong>Lot accepté :</strong> 
+            <strong>Lot accepté :</strong>
             <input type="checkbox" {{#ifEquals bsdasri.destinationReceptionAcceptationStatus "ACCEPTED"}}checked{{/ifEquals}}/> Oui
             <input type="checkbox" {{#ifEquals bsdasri.destinationReceptionAcceptationStatus "REFUSED"}}checked{{/ifEquals}}/> Non
             <input type="checkbox" {{#ifEquals bsdasri.destinationReceptionAcceptationStatus "PARTIALLY_REFUSED"}}checked{{/ifEquals}}/> Partiellement
@@ -223,8 +224,8 @@
               </tr>
             </thead>
             <tbody>
-           
-         
+
+
           {{#each bsdasri.destinationWastePackagings}}
             <td>{{this.quantity}}</td>
             <td>{{this.type}}</td>
@@ -234,15 +235,15 @@
           </table>
 
           <p style="display: flex">
-            <span style="flex: 50%"><strong>Nbre de contenants : </strong> 
-              {{sumPackageQuantity bsdasri.destinationWastePackagings}} 
+            <span style="flex: 50%"><strong>Nbre de contenants : </strong>
+              {{sumPackageQuantity bsdasri.destinationWastePackagings}}
               </span
             ><span style="flex: 50%"> <strong>Volume total :</strong>{{bsdasri.destinationReceptionWasteVolume}}</span>
           </p>
           <p style="display: flex">
             <span style="flex: 50%"><strong>Quantité remise :</strong>{{bsdasri.destinationReceptionWasteWeightValue}}</span
-            > 
- 
+            >
+
           </p>
         </div>
         <div class="item operation-signature">
@@ -267,7 +268,7 @@
           </p>
           <p><input type="checkbox" {{#ifEquals  bsdasri.destinationOperationCode "R12"}}checked{{/ifEquals}} /> Regroupement avant R1 (R12)</p>
           <p><strong>Date de l'opération:</strong>
-            {{dateFmt bsdasri.destinationOperationDate}}</p> 
+            {{dateFmt bsdasri.destinationOperationDate}}</p>
         </div>
       </div>
     </section>

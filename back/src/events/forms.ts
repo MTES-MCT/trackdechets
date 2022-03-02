@@ -4,7 +4,7 @@ import prisma from "../prisma";
 import { sendMail } from "../mailer/mailing";
 import { trim } from "../common/strings";
 import { getCompanyAdminUsers } from "../companies/database";
-import { searchCompany } from "../companies/sirene";
+import { searchCompany } from "../companies/search";
 import Dreals from "./dreals";
 import { TDEventPayload } from "./emitter";
 import { renderMail } from "../mailer/templates/renderers";

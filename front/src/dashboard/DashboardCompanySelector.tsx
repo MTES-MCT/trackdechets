@@ -29,7 +29,7 @@ export default function DashboardCompanySelector({
     >
       {sortedCompanies.map(c => (
         <option key={c.siret} value={c.siret}>
-          {c.givenName || c.name} ({c.siret})
+          {c.givenName || c.name} ({c.siret ?? c.vatNumber})
         </option>
       ))}
     </select>

@@ -4,11 +4,16 @@ import { Field, Form, Formik } from "formik";
 import cogoToast from "cogo-toast";
 import { COMPANY_INFOS } from "form/common/components/company/query";
 import RedErrorMessage from "common/components/RedErrorMessage";
-import AutoFormattingSiret from "common/components/AutoFormattingSiret";
+import AutoFormattingCompanyInfosInput from "common/components/AutoFormattingCompanyInfosInput";
 import { NotificationError } from "common/components/Error";
 import styles from "../AccountCompanyAdd.module.scss";
 import { Mutation, Query } from "generated/graphql/types";
 import Tooltip from "common/components/Tooltip";
+import {
+  isFRVat,
+  isSiret,
+  isVat,
+} from "generated/constants/companySearchHelpers";
 
 type IProps = {
   onCompanyInfos: (companyInfos) => void;
@@ -30,6 +35,7 @@ const CREATE_TEST_COMPANY = gql`
  */
 export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
   const [isRegistered, setIsRegistered] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
 
   const [searchCompany, { loading, error }] = useLazyQuery<
     Pick<Query, "companyInfos">
@@ -43,6 +49,7 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
           );
         } else {
           setIsRegistered(companyInfos?.isRegistered ?? false);
+          setIsDisabled(!companyInfos?.isRegistered);
           onCompanyInfos(companyInfos);
         }
       }
@@ -77,31 +84,47 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
       <Formik
         initialValues={{ siret: "" }}
         validate={values => {
-          const trimedSiret = values.siret.replace(/\s/g, "");
-          if (trimedSiret.length !== 14) {
-            return { siret: "Le SIRET doit faire 14 caractères" };
+          const isValidSiret = isSiret(values.siret);
+          const isValidVat = isVat(values.siret);
+          if (!isValidSiret && !/^[a-zA-Z]{2}/.test(values.siret)) {
+            return {
+              siret: "Vous devez entrer un SIRET de 14 chiffres",
+            };
+          } else if (!isValidVat && !/^[0-9]{14}$/.test(values.siret)) {
+            return {
+              siret:
+                "Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter à l'adresse hello@trackdechets.beta.gouv.fr avec un justifictif légal du pays d'origine.",
+            };
+          } else if (isValidVat && isFRVat(values.siret)) {
+            return {
+              siret:
+                "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et non son numéro de TVA",
+            };
           }
         }}
         onSubmit={values => {
           // reset company infos
           onCompanyInfos(null);
           searchCompany({
-            variables: { siret: values.siret.replace(/\s/g, "") },
+            variables: { siret: values.siret },
           });
         }}
       >
         {({ setFieldValue }) => (
           <Form className={styles.companyAddForm}>
             <div className={styles.field}>
-              <label className={`text-right ${styles.bold}`}>SIRET</label>
+              <label className={`text-right ${styles.bold}`}>
+                SIRET ou numéro TVA pour un transporteur de l'UE
+              </label>
               <div className={styles.field__value}>
                 <Field
                   name="siret"
-                  component={AutoFormattingSiret}
+                  component={AutoFormattingCompanyInfosInput}
                   onChange={e => {
                     setIsRegistered(false);
                     setFieldValue("siret", e.target.value);
                   }}
+                  disabled={isDisabled}
                 />
                 {import.meta.env.VITE_ALLOW_TEST_COMPANY === "true" && (
                   <button

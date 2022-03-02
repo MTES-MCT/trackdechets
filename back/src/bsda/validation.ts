@@ -8,6 +8,11 @@ import {
 import { UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import { WASTES_CODES } from "../common/constants";
+import {
+  isVat,
+  isSiret,
+  isFRVat
+} from "../common/constants/companySearchHelpers";
 import { FactorySchemaOf } from "../common/yup/configureYup";
 import {
   INVALID_SIRET_LENGTH,
@@ -18,7 +23,7 @@ import {
   MISSING_COMPANY_NAME,
   MISSING_COMPANY_PHONE,
   MISSING_COMPANY_SIRET
-} from "../forms/validation";
+} from "../forms/errors";
 import { BsdaConsistence } from "../generated/graphql/types";
 import prisma from "../prisma";
 
@@ -533,8 +538,8 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
         is: BsdaType.COLLECTION_2710,
         then: schema => schema.nullable(),
         otherwise: schema =>
-          schema.when("transporterTvaIntracommunautaire", (tva, schema) => {
-            if (tva == null) {
+          schema.when("transporterCompanyVatNumber", (tva, schema) => {
+            if (!tva) {
               return schema.requiredIf(
                 context.transportSignature,
                 `Transporteur: le département associé au récépissé est obligatoire`
@@ -547,8 +552,8 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
         is: BsdaType.COLLECTION_2710,
         then: schema => schema.nullable(),
         otherwise: schema =>
-          schema.when("transporterTvaIntracommunautaire", (tva, schema) => {
-            if (tva == null) {
+          schema.when("transporterCompanyVatNumber", (tva, schema) => {
+            if (!tva) {
               return schema.requiredIf(
                 context.transportSignature,
                 `Transporteur: le numéro de récépissé est obligatoire`
@@ -581,28 +586,38 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
             `Transporteur: ${MISSING_COMPANY_NAME}`
           )
       }),
-      transporterCompanySiret: yup.string().when("type", {
-        is: BsdaType.COLLECTION_2710,
-        then: schema =>
-          schema
-            .nullable()
-            .max(
-              0,
-              "Impossible de saisir le SIRET d'un transporteur pour ce type de bordereau"
-            ),
-        otherwise: schema =>
-          schema
-            .length(14, `Transporteur: ${INVALID_SIRET_LENGTH}`)
-            .when("transporterTvaIntracommunautaire", (tva, schema) => {
-              if (tva == null) {
-                return schema.requiredIf(
-                  context.transportSignature,
-                  `Transporteur: le numéro SIRET est obligatoire pour une entreprise française`
+      transporterCompanySiret: yup
+        .string()
+        .ensure()
+        .when("type", {
+          is: BsdaType.COLLECTION_2710,
+          then: schema =>
+            schema
+              .nullable()
+              .max(
+                0,
+                "Impossible de saisir le SIRET d'un transporteur pour ce type de bordereau"
+              ),
+          otherwise: schema =>
+            schema.when("transporterCompanyVatNumber", (tva, schema) => {
+              if (!tva && context.transportSignature) {
+                return schema.test(
+                  "is-siret",
+                  "${path} n'est pas un numéro de SIRET valide",
+                  value => isSiret(value)
                 );
               }
               return schema.nullable().notRequired();
             })
-      }),
+        }),
+      transporterCompanyVatNumber: yup
+        .string()
+        .ensure()
+        .test(
+          "is-vat",
+          "${path} n'est pas un numéro de TVA intracommunautaire valide",
+          value => !value || (isVat(value) && !isFRVat(value))
+        ),
       transporterCompanyAddress: yup.string().when("type", {
         is: BsdaType.COLLECTION_2710,
         then: schema => schema.nullable(),
@@ -642,7 +657,6 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
               `Transporteur: ${MISSING_COMPANY_EMAIL}`
             )
         }),
-      transporterCompanyVatNumber: yup.string().nullable(),
       transporterTransportPlates: yup
         .array()
         .of(yup.string())

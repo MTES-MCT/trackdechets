@@ -13,6 +13,12 @@ import {
   BsdasriPackagingType,
   BsdasriSignatureType
 } from "../generated/graphql/types";
+import {
+  isVat,
+  isSiret,
+  isFRVat
+} from "../common/constants/companySearchHelpers";
+import { MISSING_COMPANY_SIRET } from "../forms/errors";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
 // set yup default error messages
@@ -56,6 +62,7 @@ type Transporter = Pick<
   Prisma.BsdasriCreateInput,
   | "transporterCompanyName"
   | "transporterCompanySiret"
+  | "transporterCompanyVatNumber"
   | "transporterCompanyAddress"
   | "transporterCompanyContact"
   | "transporterCompanyPhone"
@@ -105,7 +112,6 @@ type Operation = Pick<
 // *********************
 
 const MISSING_COMPANY_NAME = "Le nom de l'entreprise est obligatoire";
-const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
 const MISSING_COMPANY_ADDRESS = "L'adresse de l'entreprise est obligatoire";
 const MISSING_COMPANY_CONTACT = "Le contact dans l'entreprise est obligatoire";
 const MISSING_COMPANY_PHONE = "Le téléphone de l'entreprise est obligatoire";
@@ -297,10 +303,24 @@ export const transporterSchema: FactorySchemaOf<
       ),
     transporterCompanySiret: yup
       .string()
-      .length(14, `Transporteur: ${INVALID_SIRET_LENGTH}`)
-      .requiredIf(
-        context.transportSignature,
-        `Transporteur: ${MISSING_COMPANY_SIRET}`
+      .ensure()
+      .when("transporterCompanyVatNumber", (tva, schema) => {
+        if (!tva && context.transportSignature) {
+          return schema.test(
+            "is-siret",
+            "${path} n'est pas un numéro de SIRET valide",
+            value => isSiret(value)
+          );
+        }
+        return schema.nullable().notRequired();
+      }),
+    transporterCompanyVatNumber: yup
+      .string()
+      .ensure()
+      .test(
+        "is-vat",
+        "${path} n'est pas un numéro de TVA intracommunautaire valide",
+        value => !value || (isVat(value) && !isFRVat(value))
       ),
     transporterCompanyAddress: yup
       .string()

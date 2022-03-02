@@ -11,6 +11,7 @@ export const companyFragment = gql`
   fragment CompanyFragment on FormCompany {
     name
     siret
+    vatNumber
     address
     contact
     country

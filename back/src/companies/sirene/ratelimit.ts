@@ -42,12 +42,25 @@ export function backoffIfTooManyRequests<T>(
 }
 
 type ThrottleDecoratorArgs = {
-  service: "insee" | "data_gouv" | "social_gouv";
+  service: "insee" | "data_gouv" | "social_gouv" | "vies";
   requestsPerSeconds?: number;
 };
 
+export function backoffIfTestEnvs<T>(fn: (...args) => Promise<T>) {
+  const backoff = async (...args) => {
+    if (process.env.NODE_ENV === "test") {
+      // do not call the APIs when running tests
+      return Promise.resolve(null);
+    } else {
+      return fn(...args);
+    }
+  };
+  return backoff;
+}
+
 /**
  * Throttle requests made to API before hitting 429
+ * Avoid requesting API in test
  * https://redis.io/commands/INCR
  */
 export function throttle<T>(

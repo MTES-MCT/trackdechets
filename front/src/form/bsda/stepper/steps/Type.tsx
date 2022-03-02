@@ -84,7 +84,7 @@ export function Type({ disabled }: Props) {
   if (loading) return <p>Loading...</p>;
   if (error) return <InlineError apolloError={error} />;
 
-  const typeOptions = data?.companyInfos.companyTypes.includes(
+  const typeOptions = data?.companyInfos.companyTypes?.includes(
     "WASTE_CENTER" as CompanyType
   )
     ? [...COMMON_OPTIONS, ...DECHETTERIE_OPTIONS]

@@ -89,3 +89,30 @@ export class FormAlreadyInAppendix2 extends UserInputError {
     );
   }
 }
+
+// *********************
+// COMMON VALIDATION ERROR MESSAGES
+// *********************
+
+export const MISSING_COMPANY_NAME = "Le nom de l'entreprise est obligatoire";
+export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
+export const MISSING_COMPANY_VAT =
+  "Le numéro de TVA de l'entreprise est obligatoire";
+export const MISSING_COMPANY_ADDRESS =
+  "L'adresse de l'entreprise est obligatoire";
+export const MISSING_COMPANY_CONTACT =
+  "Le contact dans l'entreprise est obligatoire";
+export const MISSING_COMPANY_PHONE =
+  "Le téléphone de l'entreprise est obligatoire";
+export const MISSING_COMPANY_EMAIL = "L'email de l'entreprise est obligatoire";
+
+export const INVALID_SIRET_LENGTH =
+  "Le SIRET doit faire 14 caractères numériques";
+
+export const INVALID_PROCESSING_OPERATION =
+  "Cette opération d’élimination / valorisation n'existe pas.";
+
+export const INVALID_WASTE_CODE =
+  "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement.";
+
+export const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseignée ne permet pas de destination ultérieure`;

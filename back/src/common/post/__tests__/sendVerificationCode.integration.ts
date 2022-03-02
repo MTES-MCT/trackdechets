@@ -27,10 +27,10 @@ describe("send verificationEmail", () => {
 
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
-    // mock sirene and axios
-    const sirene = require("../../../companies/sirene");
+    // mock search and axios
+    const search = require("../../../companies/search");
     const axios = require("axios");
-    const searchCompanySpy = jest.spyOn(sirene, "searchCompany");
+    const searchCompanySpy = jest.spyOn(search, "searchCompany");
     const axiosSpy = jest.spyOn(axios, "post");
     searchCompanySpy.mockResolvedValue(sireneInfoMock);
     axiosSpy.mockImplementation(() => Promise.resolve({}));

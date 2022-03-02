@@ -1,14 +1,21 @@
 import React from "react";
 import Cleave from "cleave.js/react";
-import styles from "./AutoFormattingSiret.module.scss";
+import styles from "./AutoFormattingCompanyInfosInput.module.scss";
 
 /**
  * Cleave component to format typed sirets on the fly (eg. 333 330 581 00012)
  */
-export default function AutoFormattingSiret({ field, form, ...props }) {
+export default function AutoFormattingCompanyInfosInput({
+  field,
+  form,
+  ...props
+}) {
   return (
     <Cleave
-      options={{ blocks: [3, 3, 3, 5] }}
+      options={{
+        uppercase: true,
+        stripLeadingZeroes: false,
+      }}
       {...field}
       {...props}
       onInit={owner => {
@@ -17,7 +24,7 @@ export default function AutoFormattingSiret({ field, form, ...props }) {
         // https://github.com/nosir/cleave.js/issues/601#issuecomment-902747682
         (owner as any).lastInputValue = "";
       }}
-      className={`td-input ${styles.autoformattingSiret}`}
+      className={`td-input ${styles.autoformattingCompanyInfosInput}`}
     />
   );
 }

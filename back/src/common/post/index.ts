@@ -4,7 +4,7 @@ import path from "path";
 import { format } from "date-fns";
 import consoleBackend from "./backends/console";
 import { Company, UserRole } from "@prisma/client";
-import { searchCompany } from "../../companies/sirene/";
+import { searchCompany } from "../../companies/search";
 import prisma from "../../prisma";
 
 const backend =

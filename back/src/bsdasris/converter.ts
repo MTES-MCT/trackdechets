@@ -93,6 +93,7 @@ export function unflattenBsdasri(bsdasri: Bsdasri): GqlBsdasri {
       company: nullIfNoValues<FormCompany>({
         name: bsdasri.transporterCompanyName,
         siret: bsdasri.transporterCompanySiret,
+        vatNumber: bsdasri.transporterCompanyVatNumber,
         address: bsdasri.transporterCompanyAddress,
         phone: bsdasri.transporterCompanyPhone,
         mail: bsdasri.transporterCompanyMail,
@@ -325,7 +326,9 @@ function flattenTransporterInput(input: {
     transporterCompanyMail: chain(input.transporter, t =>
       chain(t.company, c => c.mail)
     ),
-
+    transporterCompanyVatNumber: chain(input.transporter, t =>
+      chain(t.company, c => c.vatNumber)
+    ),
     transporterRecepisseNumber: chain(input.transporter, t =>
       chain(t.recepisse, recep => recep.number)
     ),

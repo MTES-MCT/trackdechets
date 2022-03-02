@@ -18,13 +18,15 @@ import {
   Mutation,
   MutationCreateCompanyArgs,
   CompanyType as _CompanyType,
-  CompanyPublic,
+  CompanySearchResult,
+  PrivateCompanyInput,
 } from "generated/graphql/types";
 import Tooltip from "common/components/Tooltip";
 import AccountCompanyAddVhuAgrement from "./accountCompanyAdd/AccountCompanyAddVhuAgrement";
 import { InlineRadioButton } from "form/common/components/custom-inputs/RadioButton";
 import classNames from "classnames";
 import { MY_COMPANIES } from "./AccountCompanyList";
+import { isSiret, isVat } from "generated/constants/companySearchHelpers";
 const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
     createCompany(companyInput: $companyInput) {
@@ -32,6 +34,7 @@ const CREATE_COMPANY = gql`
       name
       givenName
       siret
+      vatNumber
       companyTypes
     }
   }
@@ -71,6 +74,7 @@ const CREATE_VHU_AGREMENT = gql`
 
 interface Values extends FormikValues {
   siret: string;
+  vatNumber: string;
   companyName: string;
   givenName: string;
   address: string;
@@ -98,7 +102,9 @@ export default function AccountCompanyAdd() {
   const history = useHistory();
 
   // STATE
-  const [companyInfos, setCompanyInfos] = useState<CompanyPublic | null>(null);
+  const [companyInfos, setCompanyInfos] = useState<CompanySearchResult | null>(
+    null
+  );
 
   // const [willManageDasris, setWillManageDasris] = useState(false);
 
@@ -153,6 +159,10 @@ export default function AccountCompanyAdd() {
     return companyTypes.includes(_CompanyType.WasteVehicles);
   }
 
+  function isForcedTransporter(companyInfos: CompanySearchResult) {
+    return !!companyInfos.vatNumber && !companyInfos.siret;
+  }
+
   /**
    * Form submission callback
    * @param values form values
@@ -176,9 +186,14 @@ export default function AccountCompanyAdd() {
       vhuAgrementBroyeurNumber,
       vhuAgrementBroyeurDepartment,
       allowBsdasriTakeOverWithoutSignature,
-      ...companyInput
+      ...companyValues
     } = values;
 
+    const { siret, vatNumber, ...formInput } = companyValues;
+    const companyInput: PrivateCompanyInput = {
+      orgId: !!siret ? siret : vatNumber,
+      ...formInput,
+    };
     let transporterReceiptId: string | null = null;
 
     // create transporter receipt if any
@@ -309,7 +324,7 @@ export default function AccountCompanyAdd() {
     });
   }
 
-  function getCompanyTypes(companyInfos: CompanyPublic) {
+  function initCompanyTypes(companyInfos: CompanySearchResult) {
     if (companyInfos?.installation?.rubriques) {
       const categories = companyInfos.installation.rubriques
         .filter(r => !!r.category)
@@ -318,6 +333,8 @@ export default function AccountCompanyAdd() {
         return self.indexOf(value) === index;
       });
       return companyTypes;
+    } else if (isForcedTransporter(companyInfos)) {
+      return [_CompanyType.Transporter];
     }
     return [];
   }
@@ -337,10 +354,11 @@ export default function AccountCompanyAdd() {
         <Formik<Values>
           initialValues={{
             siret: companyInfos?.siret ?? "",
+            vatNumber: companyInfos?.vatNumber ?? "",
             companyName: companyInfos?.name ?? "",
             givenName: "",
             address: companyInfos?.address ?? "",
-            companyTypes: getCompanyTypes(companyInfos),
+            companyTypes: initCompanyTypes(companyInfos),
             gerepId: companyInfos?.installation?.codeS3ic ?? "",
             codeNaf: companyInfos?.naf ?? "",
             isAllowed: false,
@@ -399,9 +417,11 @@ export default function AccountCompanyAdd() {
                 isAllowed:
                   "Vous devez certifier être autorisé à créer ce compte pour votre entreprise",
               }),
-              ...(values.siret.replace(/\s/g, "").length !== 14 && {
-                siret: "Le SIRET doit faire 14 caractères",
-              }),
+              ...(!isSiret(values.siret) &&
+                !isVat(values.vatNumber) && {
+                  siret:
+                    "Le SIRET ou le numéro de TVA intracommunautaire doit être valides.",
+                }),
               ...(anyTransporterReceipField &&
                 isTransporter_ &&
                 !values.transporterReceiptNumber && {
@@ -527,8 +547,16 @@ export default function AccountCompanyAdd() {
               <div className={styles.field}>
                 <label className={`text-right ${styles.bold}`}>Profil</label>
                 <div className={styles.field__value}>
-                  <Field name="companyTypes" component={CompanyType} />
-
+                  {isForcedTransporter(companyInfos) ? (
+                    <Field
+                      name="companyTypes"
+                      value={[_CompanyType.Transporter]}
+                      component={CompanyType}
+                      disabled={true}
+                    />
+                  ) : (
+                    <Field name="companyTypes" component={CompanyType} />
+                  )}
                   <RedErrorMessage name="companyTypes" />
                 </div>
               </div>
@@ -551,102 +579,106 @@ export default function AccountCompanyAdd() {
 
               {isVhu(values.companyTypes) && <AccountCompanyAddVhuAgrement />}
 
-              <div className={styles.field}>
-                <label className={`text-right ${styles.bold}`}>
-                  Identifiant GEREP (optionnel){" "}
-                  <Tooltip msg="Toute installation de traitement classée et reconnue par l’état (ICPE) et toute entreprise produisant plus de 2 tonnes de déchets et/ou 2000 tonnes de déchets non dangereux est tenue de réaliser annuellement une déclaration d’émissions polluantes et de déchets en ligne. Elle peut le faire via l’application ministérielle web GEREP. Pour ce faire, elle dispose d’un identifiant GEREP." />
-                </label>
-                <div className={styles.field__value}>
-                  <Field
-                    type="text"
-                    name="gerepId"
-                    className={`td-input ${styles.textField}`}
-                  />
-                </div>
-              </div>
+              {!isForcedTransporter(companyInfos) && (
+                <>
+                  <div className={styles.field}>
+                    <label className={`text-right ${styles.bold}`}>
+                      Identifiant GEREP (optionnel){" "}
+                      <Tooltip msg="Toute installation de traitement classée et reconnue par l’état (ICPE) et toute entreprise produisant plus de 2 tonnes de déchets et/ou 2000 tonnes de déchets non dangereux est tenue de réaliser annuellement une déclaration d’émissions polluantes et de déchets en ligne. Elle peut le faire via l’application ministérielle web GEREP. Pour ce faire, elle dispose d’un identifiant GEREP." />
+                    </label>
+                    <div className={styles.field__value}>
+                      <Field
+                        type="text"
+                        name="gerepId"
+                        className={`td-input ${styles.textField}`}
+                      />
+                    </div>
+                  </div>
 
-              <div className={classNames(styles.field)}>
-                <div>
-                  <label className="tw-flex tw-items-center">
-                    <Field
-                      type="checkbox"
-                      name="willManageDasris"
-                      className="td-checkbox"
-                      onChange={() => {
-                        setFieldValue(
-                          "allowBsdasriTakeOverWithoutSignature",
-                          null
-                        );
-                        setFieldValue(
-                          "willManageDasris",
-                          !values.willManageDasris
-                        );
-                      }}
-                    />
-                    Cet établissement est susceptible de produire des DASRI
-                    (déchets d'activité de soins à risques infectieux)
-                  </label>
-                  {values.willManageDasris && (
-                    <>
-                      <div className="form__row">
-                        <fieldset className="tw-flex tw-items-center">
-                          <legend className="tw-font-semibold tw-mb-3">
-                            J'autorise l'emport direct de Dasri
-                          </legend>
-                          <Field
-                            name="allowBsdasriTakeOverWithoutSignature"
-                            checked={
-                              values.allowBsdasriTakeOverWithoutSignature ===
-                              true
-                            }
-                            id="Oui"
-                            label="Oui"
-                            component={InlineRadioButton}
-                            onChange={() =>
-                              setFieldValue(
-                                "allowBsdasriTakeOverWithoutSignature",
-                                true
-                              )
-                            }
-                          />
-                          <Field
-                            name="allowBsdasriTakeOverWithoutSignature"
-                            checked={
-                              values.allowBsdasriTakeOverWithoutSignature ===
-                              false
-                            }
-                            id="Non"
-                            label="Non"
-                            component={InlineRadioButton}
-                            onChange={() =>
-                              setFieldValue(
-                                "allowBsdasriTakeOverWithoutSignature",
-                                false
-                              )
-                            }
-                          />
-                        </fieldset>
-                        <RedErrorMessage name="allowBsdasriTakeOverWithoutSignature" />
-                        <div className="notification tw-mt-2">
-                          <p className="tw-italic">
-                            En cochant "oui", j'atteste avoir signé une
-                            convention avec un collecteur pour mes DASRI et
-                            j'accepte que ce collecteur les prenne en charge
-                            sans ma signature (lors de la collecte) si je ne
-                            suis pas disponible. Dans ce cas, je suis informé
-                            que je pourrai suivre les bordereaux sur
-                            Trackdéchets et disposer de leur archivage sur la
-                            plateforme.
-                          </p>
-                          <p className="tw-italic">
-                            Je pourrai modifier ce choix ultérieurement.
-                          </p>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
+                  <div className={classNames(styles.field)}>
+                    <div>
+                      <label className="tw-flex tw-items-center">
+                        <Field
+                          type="checkbox"
+                          name="willManageDasris"
+                          className="td-checkbox"
+                          onChange={() => {
+                            setFieldValue(
+                              "allowBsdasriTakeOverWithoutSignature",
+                              null
+                            );
+                            setFieldValue(
+                              "willManageDasris",
+                              !values.willManageDasris
+                            );
+                          }}
+                        />
+                        Cet établissement est susceptible de produire des DASRI
+                        (déchets d'activité de soins à risques infectieux)
+                      </label>
+                      {values.willManageDasris && (
+                        <>
+                          <div className="form__row">
+                            <fieldset className="tw-flex tw-items-center">
+                              <legend className="tw-font-semibold tw-mb-3">
+                                J'autorise l'emport direct de Dasri
+                              </legend>
+                              <Field
+                                name="allowBsdasriTakeOverWithoutSignature"
+                                checked={
+                                  values.allowBsdasriTakeOverWithoutSignature ===
+                                  true
+                                }
+                                id="Oui"
+                                label="Oui"
+                                component={InlineRadioButton}
+                                onChange={() =>
+                                  setFieldValue(
+                                    "allowBsdasriTakeOverWithoutSignature",
+                                    true
+                                  )
+                                }
+                              />
+                              <Field
+                                name="allowBsdasriTakeOverWithoutSignature"
+                                checked={
+                                  values.allowBsdasriTakeOverWithoutSignature ===
+                                  false
+                                }
+                                id="Non"
+                                label="Non"
+                                component={InlineRadioButton}
+                                onChange={() =>
+                                  setFieldValue(
+                                    "allowBsdasriTakeOverWithoutSignature",
+                                    false
+                                  )
+                                }
+                              />
+                            </fieldset>
+                            <RedErrorMessage name="allowBsdasriTakeOverWithoutSignature" />
+                            <div className="notification tw-mt-2">
+                              <p className="tw-italic">
+                                En cochant "oui", j'atteste avoir signé une
+                                convention avec un collecteur pour mes DASRI et
+                                j'accepte que ce collecteur les prenne en charge
+                                sans ma signature (lors de la collecte) si je ne
+                                suis pas disponible. Dans ce cas, je suis
+                                informé que je pourrai suivre les bordereaux sur
+                                Trackdéchets et disposer de leur archivage sur
+                                la plateforme.
+                              </p>
+                              <p className="tw-italic">
+                                Je pourrai modifier ce choix ultérieurement.
+                              </p>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
               <hr />
               <div className={styles.field}>
                 <div>

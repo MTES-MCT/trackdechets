@@ -27,7 +27,7 @@ import {
   INVALID_PROCESSING_OPERATION,
   INVALID_SIRET_LENGTH,
   INVALID_WASTE_CODE
-} from "../../validation";
+} from "../../errors";
 
 export type RevisionRequestContent = Pick<
   Prisma.BsddRevisionRequestCreateInput,

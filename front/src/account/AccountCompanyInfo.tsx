@@ -15,6 +15,7 @@ import AccountFieldCompanyVerificationStatus from "./fields/AccountFieldCompanyV
 import AccountFieldCompanyVhuAgrementBroyeur from "./fields/AccountFieldCompanyVhuAgrementBroyeur";
 import AccountFieldCompanyVhuAgrementDemolisseur from "./fields/AccountFieldCompanyVhuAgrementDemolisseur";
 import * as COMPANY_TYPES from "generated/constants/COMPANY_TYPES";
+import { isSiret, isVat } from "generated/constants/companySearchHelpers";
 
 type Props = { company: CompanyPrivate };
 
@@ -23,6 +24,7 @@ AccountCompanyInfo.fragments = {
     fragment AccountCompanyInfoFragment on CompanyPrivate {
       id
       siret
+      vatNumber
       address
       naf
       libelleNaf
@@ -62,11 +64,20 @@ export default function AccountCompanyInfo({ company }: Props) {
 
   return (
     <>
-      <AccountFieldNotEditable
-        name="siret"
-        label="Numéro SIRET"
-        value={company.siret}
-      />
+      {isSiret(company.siret) && (
+        <AccountFieldNotEditable
+          name="siret"
+          label="Numéro SIRET"
+          value={company.siret}
+        />
+      )}
+      {isVat(company.vatNumber!) && (
+        <AccountFieldNotEditable
+          name="siret"
+          label="Numéro de TVA intra-communautaire"
+          value={company.vatNumber}
+        />
+      )}
       <AccountFieldNotEditable
         name="naf"
         label="Code NAF"

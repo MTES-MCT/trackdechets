@@ -195,7 +195,7 @@ describe("Mutation.Vhu.update", () => {
     const { mutate } = makeClient(user);
     const input = {
       transporter: {
-        company: { vatNumber: "DE 123456789" }
+        company: { vatNumber: "NL004983269B01" }
       }
     };
     const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
@@ -205,6 +205,8 @@ describe("Mutation.Vhu.update", () => {
       }
     );
 
-    expect(data.updateBsvhu.transporter.company.vatNumber).toBe("DE 123456789");
+    expect(data.updateBsvhu.transporter.company.vatNumber).toBe(
+      "NL004983269B01"
+    );
   });
 });

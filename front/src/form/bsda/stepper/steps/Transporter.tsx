@@ -3,6 +3,7 @@ import { useFormikContext } from "formik";
 import { Bsda, BsdaType } from "generated/graphql/types";
 import React from "react";
 import { Transport } from "./Transport";
+import initialState from "../initial-state";
 
 export function Transporter({ disabled }) {
   const { values, setFieldValue } = useFormikContext<Bsda>();
@@ -32,6 +33,7 @@ export function Transporter({ disabled }) {
         name="transporter.company"
         heading="Entreprise de transport"
         allowForeignCompanies={true}
+        registeredOnlyCompanies={true}
         onCompanySelected={transporter => {
           if (transporter.transporterReceipt) {
             setFieldValue(
@@ -48,7 +50,10 @@ export function Transporter({ disabled }) {
             );
           } else {
             setFieldValue("transporter.recepisse.number", "");
-            setFieldValue("transporter.recepisse.validityLimit", null);
+            setFieldValue(
+              "transporter.recepisse.validityLimit",
+              initialState.transporter.recepisse.validityLimit
+            );
             setFieldValue("transporter.recepisse.department", "");
           }
         }}

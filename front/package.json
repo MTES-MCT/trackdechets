@@ -21,6 +21,7 @@
     "formik": "2.2.5",
     "graphql": "^16.0.2",
     "graphql-anywhere": "^4.2.7",
+    "jsvat": "^2.5.3",
     "jwt-decode": "^2.2.0",
     "local-storage": "^2.0.0",
     "mapbox-gl": "^1.11.1",
