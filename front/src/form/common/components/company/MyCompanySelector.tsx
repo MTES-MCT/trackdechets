@@ -2,9 +2,14 @@ import { gql, useQuery } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
 import { InlineError } from "common/components/Error";
 import { Field, useField, useFormikContext } from "formik";
-import { CreateFormInput, Query } from "generated/graphql/types";
+import {
+  CompanyPrivate,
+  CreateFormInput,
+  Query,
+} from "generated/graphql/types";
 import styles from "./CompanySelector.module.scss";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
+import { getInitialCompany } from "form/bsdd/utils/initial-state";
 
 export const GET_ME = gql`
   {
@@ -29,6 +34,24 @@ export default function MyCompanySelector({ fieldName }) {
   const { setFieldValue } = useFormikContext<CreateFormInput>();
   const [field] = useField({ name: fieldName });
 
+  const onCompanySelect = useCallback(
+    (company: CompanyPrivate) => {
+      setFieldValue(`${fieldName}.siret`, company.siret ?? "");
+      setFieldValue(`${fieldName}.name`, company.name ?? "");
+      setFieldValue(`${fieldName}.mail`, company.contactEmail ?? "");
+      setFieldValue(`${fieldName}.phone`, company.contactPhone ?? "");
+      setFieldValue(`${fieldName}.address`, company.address ?? "");
+    },
+    [fieldName, setFieldValue]
+  );
+
+  useEffect(() => {
+    if (data?.me.companies?.length === 1) {
+      setFieldValue(`${fieldName}.siret`, data?.me.companies[0].siret);
+      onCompanySelect(data?.me.companies[0]);
+    }
+  }, [data, setFieldValue, fieldName, onCompanySelect]);
+
   if (loading) {
     return <div>Chargement...</div>;
   }
@@ -40,37 +63,19 @@ export default function MyCompanySelector({ fieldName }) {
   if (data) {
     return (
       <>
-        <Field
+        <select
           className="td-select td-input--medium"
-          as="select"
-          name={`${fieldName}.siret`}
+          value={field.value?.siret}
           onChange={e => {
-            field.onChange(e);
             const selectedCompany = data.me.companies.filter(
               c => c.siret === e.target.value
             )?.[0];
             if (selectedCompany) {
-              setFieldValue(`${fieldName}.name`, selectedCompany.name ?? "");
-              setFieldValue(
-                `${fieldName}.mail`,
-                selectedCompany.contactEmail ?? ""
-              );
-              setFieldValue(
-                `${fieldName}.phone`,
-                selectedCompany.contactPhone ?? ""
-              );
-              setFieldValue(
-                `${fieldName}.address`,
-                selectedCompany.address ?? ""
-              );
+              onCompanySelect(selectedCompany);
             } else {
-              setFieldValue(`${fieldName}.name`, "");
-              setFieldValue(`${fieldName}.mail`, "");
-              setFieldValue(`${fieldName}.phone`, "");
-              setFieldValue(`${fieldName}.address`, "");
+              setFieldValue(fieldName, getInitialCompany());
             }
           }}
-          value={field.value.siret}
         >
           <option value="" label="Sélectionner un de vos établissements" />
           {data.me.companies.map(c => (
@@ -80,7 +85,7 @@ export default function MyCompanySelector({ fieldName }) {
               label={`${c.givenName ?? c.name ?? ""} - ${c.siret}`}
             ></option>
           ))}
-        </Field>
+        </select>
         <div className="form__row">
           <label>
             Personne à contacter
