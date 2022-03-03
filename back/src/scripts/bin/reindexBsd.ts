@@ -5,9 +5,25 @@ import { indexBsff } from "../../bsffs/elastic";
 import { indexBsvhu } from "../../bsvhu/elastic";
 import { indexForm } from "../../forms/elastic";
 import { getFullForm } from "../../forms/database";
-import { deleteBsd } from "../../common/elastic";
+import { deleteBsd, client, index } from "../../common/elastic";
 
-(async function() {
+async function findBsd(id) {
+  return client.search({
+    index: index.alias,
+    body: {
+      query: {
+        match: {
+          readableId: {
+            query: id,
+            operator: "and"
+          }
+        }
+      }
+    }
+  });
+}
+
+(async function () {
   const bsdId: string = process.argv[2];
   if (!bsdId) {
     console.log(
@@ -21,7 +37,9 @@ import { deleteBsd } from "../../common/elastic";
     return;
   }
   if (bsdId.startsWith("BSDA-")) {
-    const bsda = await prisma.bsda.findUnique({ where: { id: bsdId } });
+    const bsda = await prisma.bsda.findFirst({
+      where: { id: bsdId, isDeleted: false }
+    });
     if (!!bsda) {
       await indexBsda(bsda);
     } else {
@@ -31,8 +49,10 @@ import { deleteBsd } from "../../common/elastic";
   }
 
   if (bsdId.startsWith("DASRI-")) {
-    const bsdasri = await prisma.bsdasri.findUnique({ where: { id: bsdId } });
-    console.log(bsdasri);
+    const bsdasri = await prisma.bsdasri.findFirst({
+      where: { id: bsdId, isDeleted: false }
+    });
+
     if (!!bsdasri) {
       await indexBsdasri(bsdasri);
     } else {
@@ -42,8 +62,10 @@ import { deleteBsd } from "../../common/elastic";
   }
 
   if (bsdId.startsWith("FF-")) {
-    const bsff = await prisma.bsff.findUnique({ where: { id: bsdId } });
-    console.log(bsff);
+    const bsff = await prisma.bsff.findFirst({
+      where: { id: bsdId, isDeleted: false }
+    });
+
     if (!!bsff) {
       await indexBsff(bsff);
     } else {
@@ -53,8 +75,10 @@ import { deleteBsd } from "../../common/elastic";
   }
 
   if (bsdId.startsWith("VHU-")) {
-    const bsvhu = await prisma.bsvhu.findUnique({ where: { id: bsdId } });
-    console.log(bsvhu);
+    const bsvhu = await prisma.bsvhu.findFirst({
+      where: { id: bsdId, isDeleted: false }
+    });
+
     if (!!bsvhu) {
       await indexBsvhu(bsvhu);
     } else {
@@ -64,14 +88,19 @@ import { deleteBsd } from "../../common/elastic";
   }
 
   if (bsdId.startsWith("BSD-") || bsdId.startsWith("TD-")) {
-    const bsdd = await prisma.form.findUnique({
-      where: { readableId: bsdId }
+    const bsdd = await prisma.form.findFirst({
+      where: { readableId: bsdId, isDeleted: false }
     });
     if (!!bsdd) {
       const fullBsdd = await getFullForm(bsdd);
       await indexForm(fullBsdd);
     } else {
-      await deleteBsd({ id: bsdId });
+      // bsd was not found in db, let's find it in ES and get its db ID
+      const res = await findBsd(bsdId);
+      const indexedId = res?.body?.hits?.hits[0]?._id;
+      if (!!indexedId) {
+        await deleteBsd({ id: indexedId });
+      }
     }
     return;
   }
