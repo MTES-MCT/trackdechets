@@ -4,14 +4,14 @@ import { InlineError } from "common/components/Error";
 import { Formik, setNestedObjectValues } from "formik";
 import React, {
   Children,
-  createElement,
   ReactElement,
   useEffect,
   useRef,
   useState,
 } from "react";
-import { IStepContainerProps, Step } from "./Step";
+import { useHistory } from "react-router-dom";
 import "./GenericStepList.scss";
+import { IStepContainerProps } from "./Step";
 
 interface Props {
   children: ReactElement<IStepContainerProps>[];
@@ -20,7 +20,7 @@ interface Props {
   validationSchema: any;
   initialStep?: number;
   formQuery: QueryResult<any, any>;
-  onSubmit: (e, values) => void;
+  onSubmit: (values) => void;
 }
 export default function GenericStepList({
   children,
@@ -31,14 +31,17 @@ export default function GenericStepList({
   validationSchema,
   initialStep = 0,
 }: Props) {
-  const totalSteps = children.length - 1;
+  const history = useHistory();
+
+  const steps = Children.toArray(children);
+  const totalSteps = steps.length;
   const [currentStep, setCurrentStep] = useState(
     initialStep <= totalSteps ? initialStep : 0
   );
+  const step = steps[currentStep];
+  const isLastStep = currentStep === totalSteps - 1;
 
   const { loading, error } = formQuery;
-
-  useEffect(() => window.scrollTo(0, 0), [currentStep]);
 
   // When we edit a draft we want to automatically display on error on init
   const formikForm: any = useRef();
@@ -57,21 +60,26 @@ export default function GenericStepList({
     };
   });
 
-  const childrenComponents = Children.map(children, (child, index) => {
-    return createElement(
-      Step,
-      {
-        isActive: index === currentStep,
-        displayPrevious: currentStep > 0,
-        displayNext: currentStep < totalSteps,
-        displaySubmit: currentStep === totalSteps,
-        goToPreviousStep: () => setCurrentStep(currentStep - 1),
-        goToNextStep: () => setCurrentStep(currentStep + 1),
-        formId: formId,
-      },
-      child
-    );
-  });
+  function handleSubmit(
+    event: React.FormEvent<HTMLFormElement>,
+    values: unknown
+  ) {
+    event.preventDefault();
+
+    if (isLastStep) {
+      onSubmit(values);
+    } else {
+      setCurrentStep(currentStep + 1);
+    }
+  }
+
+  function previous() {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    } else {
+      history.goBack();
+    }
+  }
 
   if (loading) return <p>Chargement...</p>;
   if (error) return <InlineError apolloError={error} />;
@@ -98,25 +106,26 @@ export default function GenericStepList({
           innerRef={formikForm}
           initialValues={initialValues}
           validationSchema={validationSchema}
-          onSubmit={() => Promise.resolve()}
+          onSubmit={() => Promise.resolve()} // To skip formik validation upon submit (=allow drafts) we use a custom submit handler
         >
-          {({ values }) => {
-            return (
-              <form onSubmit={e => onSubmit(e, values)}>
-                <div
-                  onKeyPress={e => {
-                    // Disable submit on Enter key press
-                    // We prevent it from bubbling further
-                    if (e.key === "Enter") {
-                      e.stopPropagation();
-                    }
-                  }}
+          {({ values }) => (
+            <form onSubmit={e => handleSubmit(e, values)}>
+              {step}
+              <div className="step-buttons form__actions">
+                <button
+                  className="btn btn--outline-primary"
+                  type="button"
+                  onClick={() => previous()}
                 >
-                  {childrenComponents}
-                </div>
-              </form>
-            );
-          }}
+                  {currentStep === 0 ? "Annuler" : "Précédent"}
+                </button>
+
+                <button className="btn btn--primary" type="submit">
+                  {!isLastStep ? "Suivant" : formId ? "Créer" : "Enregistrer"}
+                </button>
+              </div>
+            </form>
+          )}
         </Formik>
       </div>
     </div>

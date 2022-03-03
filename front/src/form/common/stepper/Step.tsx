@@ -1,6 +1,4 @@
-import React, { ReactNode, createElement } from "react";
-import { Link } from "react-router-dom";
-import { NextButton, PreviousButton } from "common/components/Buttons";
+import { createElement, ReactNode } from "react";
 import "./Step.scss";
 
 interface IStepProps {
@@ -34,57 +32,6 @@ export function StepContainer(props: IStepContainerProps) {
     : null;
 }
 
-export function Step(props: IStepProps) {
-  if (props.isActive === false) return null;
-  const submitCaption = props.formId ? "Enregistrer" : "Créer";
-  const cancelLink = props.formId ? "/bsds/drafts" : "x";
-  return (
-    <>
-      {props.children}
-      <div className="step-buttons form__actions">
-        <Previous
-          isActive={props.displayPrevious}
-          goToPreviousStep={() => props.goToPreviousStep()}
-        />
-
-        <Cancel link={cancelLink} />
-
-        <Next
-          isActive={props.displayNext}
-          goToNextStep={() => props.goToNextStep()}
-        />
-        <Submit isActive={props.displaySubmit} caption={submitCaption} />
-      </div>
-    </>
-  );
-}
-
-function Next(props: { isActive: boolean; goToNextStep: Function }) {
-  if (props.isActive === false) return null;
-
-  return <NextButton onClick={props.goToNextStep} />;
-}
-
-function Previous(props: { isActive: boolean; goToPreviousStep: Function }) {
-  if (props.isActive === false) return null;
-
-  return <PreviousButton onClick={props.goToPreviousStep} />;
-}
-
-function Submit(props: { isActive: boolean; caption: string }) {
-  if (props.isActive === false) return null;
-
-  return (
-    <button className="btn btn--primary" type="submit">
-      {props.caption ? props.caption : "Enregistrer"}
-    </button>
-  );
-}
-
-function Cancel(props: { link: string }) {
-  return (
-    <Link to={props.link}>
-      <button className="btn btn--outline-primary">Annuler</button>
-    </Link>
-  );
+export function Step({ children }) {
+  return children;
 }

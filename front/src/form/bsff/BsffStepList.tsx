@@ -76,11 +76,7 @@ export default function BsffStepsList(props: Props) {
       : createDraftBsff({ variables: { input } });
   }
 
-  function onSubmit(e, values) {
-    e.preventDefault();
-    // As we want to be able to save draft, we skip validation on submit
-    // and don't use the classic Formik mechanism
-
+  function onSubmit(values) {
     const { id, ficheInterventions, previousBsffs, ...input } = values;
 
     saveForm({
