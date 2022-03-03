@@ -5,7 +5,7 @@ import {
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsdasriOrNotFound } from "../../database";
-import { isDasriContributor } from "../../permissions";
+import { checkCanReadBsdasri } from "../../permissions";
 import { buildPdf } from "../../pdf/generator";
 import { createPDFResponse } from "../../../common/pdf";
 import { DownloadHandler } from "../../../routers/downloadRouter";
@@ -27,7 +27,7 @@ const bsdasriPdfResolver: QueryResolvers["bsdasriPdf"] = async (
   const user = checkIsAuthenticated(context);
   const dasri = await getBsdasriOrNotFound({ id });
 
-  await isDasriContributor(user, dasri);
+  await checkCanReadBsdasri(user, dasri);
 
   return getFileDownload({
     handler: bsdasriPdfDownloadHandler.name,
