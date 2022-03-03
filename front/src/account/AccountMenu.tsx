@@ -5,11 +5,7 @@ import styles from "./AccountMenu.module.scss";
 import routes from "common/routes";
 import Tooltip from "common/components/Tooltip";
 
-export const AccountMenuContent = ({
-  mobileCallback,
-}: {
-  mobileCallback?: () => void;
-}) => (
+export const AccountMenuContent = () => (
   <>
     <h5 className={styles.title}>Paramètres du compte</h5>
     <ul>
@@ -18,7 +14,6 @@ export const AccountMenuContent = ({
           to={routes.account.info}
           className="sidebar__link  "
           activeClassName="sidebar__link--active"
-          onClick={() => !!mobileCallback && mobileCallback()}
         >
           Informations générales
         </NavLink>
@@ -28,7 +23,6 @@ export const AccountMenuContent = ({
           to={routes.account.companies.list}
           className="sidebar__link"
           activeClassName="sidebar__link--active"
-          onClick={() => !!mobileCallback && mobileCallback()}
         >
           Établissements
         </NavLink>
@@ -45,7 +39,6 @@ export const AccountMenuContent = ({
           to={routes.account.tokens.list}
           className="sidebar__link"
           activeClassName="sidebar__link--active"
-          onClick={() => !!mobileCallback && mobileCallback()}
         >
           Jetons d'accès API
         </NavLink>
@@ -55,7 +48,6 @@ export const AccountMenuContent = ({
           to={routes.account.authorizedApplications}
           className="sidebar__link"
           activeClassName="sidebar__link--active"
-          onClick={() => !!mobileCallback && mobileCallback()}
         >
           Applications autorisées
         </NavLink>
@@ -65,7 +57,6 @@ export const AccountMenuContent = ({
           to={routes.account.oauth2.list}
           className="sidebar__link"
           activeClassName="sidebar__link--active"
-          onClick={() => !!mobileCallback && mobileCallback()}
         >
           Mes applications
         </NavLink>
