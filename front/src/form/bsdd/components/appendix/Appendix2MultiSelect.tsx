@@ -1,11 +1,9 @@
 import { gql, useQuery } from "@apollo/client";
 import { InlineError } from "common/components/Error";
 import { formatDate } from "common/datetime";
-import useDebounce from "common/hooks/use-debounce";
 import { FieldArray, useFormikContext } from "formik";
 import { Form, Query, QueryAppendixFormsArgs } from "generated/graphql/types";
 import React, { useEffect, useMemo, useState } from "react";
-import formatWasteCodeEffect from "../waste-code/format-waste-code.effect";
 
 const APPENDIX2_FORMS = gql`
   query AppendixForms($siret: String!, $wasteCode: String) {
