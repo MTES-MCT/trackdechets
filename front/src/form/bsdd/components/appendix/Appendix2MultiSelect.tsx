@@ -36,7 +36,6 @@ const APPENDIX2_FORMS = gql`
 
 export default function Appendix2MultiSelect() {
   const [wasteCodeFilter, setWasteCodeFilter] = useState("");
-  const debouncedWasteCodeFilter = useDebounce(wasteCodeFilter, 500);
   const { values, setFieldValue, getFieldMeta } = useFormikContext<Form>();
   const meta = getFieldMeta<Form[]>("appendix2Forms");
   const [hasChanged, setHasChanged] = useState(false);
@@ -46,9 +45,6 @@ export default function Appendix2MultiSelect() {
     QueryAppendixFormsArgs
   >(APPENDIX2_FORMS, {
     variables: {
-      ...(debouncedWasteCodeFilter && debouncedWasteCodeFilter !== ""
-        ? { wasteCode: debouncedWasteCodeFilter }
-        : {}),
       siret: values.emitter?.company?.siret ?? "",
     },
     skip: !values.emitter?.company?.siret,
@@ -62,7 +58,7 @@ export default function Appendix2MultiSelect() {
     const appendix2Forms = data?.appendixForms ?? [];
     return [...(meta.initialValue ?? []), ...appendix2Forms].filter(f => {
       return wasteCodeFilter?.length
-        ? f.wasteDetails?.code === wasteCodeFilter
+        ? f.wasteDetails?.code?.includes(wasteCodeFilter)
         : true;
     });
   }, [data, meta.initialValue, wasteCodeFilter]);
@@ -70,10 +66,6 @@ export default function Appendix2MultiSelect() {
   const appendix2Selected = useMemo(() => values.appendix2Forms ?? [], [
     values.appendix2Forms,
   ]);
-
-  useEffect(() => {
-    formatWasteCodeEffect(wasteCodeFilter, setWasteCodeFilter);
-  }, [wasteCodeFilter]);
 
   useEffect(() => {
     // avoid overwriting values on first render when updating a BSDD
