@@ -257,7 +257,7 @@ export function toOutgoingWaste(
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
-    transporterCompanyAddress: bsdd.traderCompanyAddress,
+    transporterCompanyAddress: bsdd.transporterCompanyAddress,
     transporterCompanyName: bsdd.transporterCompanyName,
     transporterCompanySiret: bsdd.transporterCompanySiret,
     transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
@@ -266,16 +266,16 @@ export function toOutgoingWaste(
     weight: bsdd.weightValue,
     emitterCustomInfo: null,
     destinationCompanyMail: bsdd.destinationCompanyMail,
-    transporter2CompanyAddress: bsdd.traderCompanyAddress,
+    transporter2CompanyAddress: bsdd.transporter2CompanyAddress,
     transporter2CompanyName: bsdd.transporter2CompanyName,
     transporter2CompanySiret: bsdd.transporter2CompanySiret,
     transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber,
     transporter2CompanyMail: bsdd.transporter2CompanyMail,
-    transporter3CompanyAddress: bsdd.traderCompanyAddress,
-    transporter3CompanyName: bsdd.transporter2CompanyName,
-    transporter3CompanySiret: bsdd.transporter2CompanySiret,
-    transporter3RecepisseNumber: bsdd.transporter2RecepisseNumber,
-    transporter3CompanyMail: bsdd.transporter2CompanyMail
+    transporter3CompanyAddress: bsdd.transporter3CompanyAddress,
+    transporter3CompanyName: bsdd.transporter3CompanyName,
+    transporter3CompanySiret: bsdd.transporter3CompanySiret,
+    transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber,
+    transporter3CompanyMail: bsdd.transporter3CompanyMail
   };
 }
 
@@ -396,8 +396,12 @@ export function toTransportedWastes(
     // one from the TTR to the final destination
     const transportedWastes: TransportedWaste[] = [];
 
-    if (sirets.includes(bsdd.forwarding.transporterCompanySiret)) {
-      // add a record only if first transporter is present in the sirets
+    if (
+      sirets.includes(bsdd.forwarding.transporterCompanySiret) ||
+      sirets.includes(bsdd.forwarding.transporter2CompanySiret) ||
+      sirets.includes(bsdd.forwarding.transporter3CompanySiret)
+    ) {
+      // add a record only if one of the initial transporters is present in the sirets
       transportedWastes.push(
         toTransportedWaste({ ...bsdd.forwarding, forwarding: null })
       );

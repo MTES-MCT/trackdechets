@@ -103,9 +103,9 @@ const columns: Column[] = [
     field: "transporterCustomInfo",
     label: "Champ libre transporteur"
   },
-  { field: "transporterCompanyAddress", label: "Transporteur adresse" },
   { field: "transporterCompanyName", label: "Transporteur raison sociale" },
   { field: "transporterCompanySiret", label: "Transporteur SIRET" },
+  { field: "transporterCompanyAddress", label: "Transporteur adresse" },
   {
     field: "transporterRecepisseIsExempted",
     label: "Transporteur exemption de récépissé",
@@ -152,11 +152,11 @@ const columns: Column[] = [
     label: "Rupture de traçabilité autorisée",
     format: formatBoolean
   },
-  { field: "transporter2CompanyAddress", label: "Transporteur n°2 adresse" },
   {
     field: "transporter2CompanyName",
     label: "Transporteur n°2 raison sociale"
   },
+  { field: "transporter2CompanyAddress", label: "Transporteur n°2 adresse" },
   { field: "transporter2CompanySiret", label: "Transporteur n°2 SIRET" },
   {
     field: "transporter2RecepisseIsExempted",
@@ -170,12 +170,12 @@ const columns: Column[] = [
     format: formatArray
   },
   { field: "transporter2CompanyMail", label: "Transporteur n°2 contact" },
-  { field: "transporter3CompanyAddress", label: "Transporteur n°3 adresse" },
   {
     field: "transporter3CompanyName",
     label: "Transporteur n°3 raison sociale"
   },
   { field: "transporter3CompanySiret", label: "Transporteur n°3 SIRET" },
+  { field: "transporter3CompanyAddress", label: "Transporteur n°3 adresse" },
   {
     field: "transporter3RecepisseIsExempted",
     label: "Transporteur n°3 exemption de récépissé",

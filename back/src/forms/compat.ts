@@ -115,7 +115,7 @@ export function simpleFormToBsdd(
     transporter3CustomInfo: null,
     transporter3RecepisseIsExempted:
       transporter3?.transporterIsExemptedOfReceipt,
-    transporter3RecepisseNumber: transporter2?.transporterReceipt,
+    transporter3RecepisseNumber: transporter3?.transporterReceipt,
     transporter3RecepisseDepartment: transporter3?.transporterDepartment,
     transporter3RecepisseValidityLimit: transporter3?.transporterValidityLimit,
     transporter3TransportMode: transporter3?.mode,
