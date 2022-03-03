@@ -18,6 +18,10 @@ async function start() {
 }
 
 if (process.env.TZ !== "Europe/Paris") {
-  throw new Error("Please set the `TZ` env variable to `Europe/Paris`");
+  console.warn(
+    "Please explicitly set the `TZ` env variable to `Europe/Paris`."
+  );
+  process.env.TZ = "Europe/Paris";
 }
+
 start();

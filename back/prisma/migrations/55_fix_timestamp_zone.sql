@@ -1,7 +1,5 @@
 -- Fix hours & date globaly
--- There is two kind of modifications here
--- + Convert timestamp to timestampz for fields where we expect a datetime
--- + Convert timestamp to date for fields where we only care about the date. 
+-- => Convert timestamp to timestampz
 --     Before converting, we must fix the timezone padding caused by our front ent sending X-1/X/X 23:00 instead of X/X/X 00:00 (when at +1)
 --     So we add 2h to every timestamp where the time is 22:00, and 1h to those where it's 23:00.
 --     This way, when striping the time and keeping only the date we will have the right value.
