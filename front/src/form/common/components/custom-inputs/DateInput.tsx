@@ -1,11 +1,12 @@
-import React from "react";
-import { FieldProps } from "formik";
 import { parseDate } from "common/datetime";
+import { format } from "date-fns";
 import fr from "date-fns/locale/fr";
+import { FieldProps } from "formik";
+import React from "react";
 import DatePicker, {
-  setDefaultLocale,
-  registerLocale,
   ReactDatePickerProps,
+  registerLocale,
+  setDefaultLocale,
 } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./DateInput.module.scss";
@@ -29,7 +30,7 @@ export default function DateInput({
       dateFormat="dd/MM/yyyy"
       selected={value ? parseDate(value) : null}
       onChange={(value: Date | null) => {
-        setFieldValue(field.name, value?.toISOString() ?? null);
+        setFieldValue(field.name, value ? format(value, "yyyy-MM-dd") : null);
       }}
     />
   );
