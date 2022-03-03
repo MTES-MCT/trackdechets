@@ -109,6 +109,19 @@ export async function bulkCreate(opts: Opts): Promise<void> {
     }
   }
 
+  // Roles tab might contain duplicate pairs (siret/email)
+  // As companyAssociation creations occur in a promise.all(), race conditons can happen and lead to duplicate associations creations
+  const duplicates = roles
+    .map(o => `${o.siret}_${o.email}`)
+    .filter((item, index, strArr) => strArr.indexOf(item) != index);
+
+  if (duplicates.length) {
+    isValid = false;
+    console.log(
+      "The roles tab contains duplicate roles, a given user can't have multiple roles on the same siret"
+    );
+  }
+
   if (isValid) {
     console.info("Validation successful");
   }
