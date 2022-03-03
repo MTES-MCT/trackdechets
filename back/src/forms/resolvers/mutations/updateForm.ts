@@ -1,30 +1,13 @@
 import { Form, Prisma, Status } from "@prisma/client";
-import {
-  WASTES_CODES,
-  isDangerous,
-  WASTES_CODES
-} from "../../../common/constants";
-import {
-  checkIsAuthenticated,
-  checkIsAuthenticated
-} from "../../../common/permissions";
+import { isDangerous, WASTES_CODES } from "../../../common/constants";
+import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   AppendixFormInput,
   MutationUpdateFormArgs,
   ResolversParentTypes
 } from "../../../generated/graphql/types";
-import {
-  MissingTempStorageFlag,
-  InvalidWasteCode,
-  InvalidWasteCode,
-  MissingTempStorageFlag
-} from "../../errors";
-import {
-  checkCanUpdate,
-  checkIsFormContributor,
-  checkCanUpdate,
-  checkIsFormContributor
-} from "../../permissions";
+import { InvalidWasteCode, MissingTempStorageFlag } from "../../errors";
+import { checkCanUpdate, checkIsFormContributor } from "../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
 import {
@@ -79,7 +62,11 @@ const updateFormResolver = async (
 
   if (appendix2Forms) {
     await validateAppendix2Forms(appendix2Forms, { ...existingForm, ...form });
-    await handleFormsRemovedFromAppendix(existingForm, appendix2Forms);
+    await handleFormsRemovedFromAppendix(
+      existingForm,
+      appendix2Forms,
+      formRepository
+    );
   }
 
   // Construct form update payload

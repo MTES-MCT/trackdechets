@@ -68,9 +68,10 @@ export default async function createFormRevisionRequest(
   const user = checkIsAuthenticated(context);
   const existingBsdd = await getFormOrFormNotFound({ id: formId });
 
-  const temporaryStorageDetail = await prisma.form
-    .findUnique({ where: { id: formId } })
-    .temporaryStorageDetail();
+  const formRepository = getFormRepository(user);
+  const { temporaryStorageDetail } = await formRepository.findFullFormById(
+    formId
+  );
 
   await checkIfUserCanRequestRevisionOnBsdd(
     user,
@@ -92,7 +93,6 @@ export default async function createFormRevisionRequest(
     context.user
   );
 
-  const formRepository = getFormRepository(user);
   const bsddRevisionRequest = await formRepository.createRevisionRequest({
     bsdd: { connect: { id: existingBsdd.id } },
     ...flatContent,
