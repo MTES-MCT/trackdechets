@@ -15,6 +15,8 @@ import { Bsdd } from "./types";
 export function simpleFormToBsdd(
   form: Form & { transportSegments?: TransportSegment[] }
 ): Bsdd {
+  const [transporter2, transporter3] = form.transportSegments ?? [];
+
   return {
     id: form.readableId,
     customId: form.customId,
@@ -83,59 +85,45 @@ export function simpleFormToBsdd(
     transporterNumberPlates: form.transporterNumberPlate
       ? [form.transporterNumberPlate]
       : [],
-    transporter2CompanyName: form.transportSegments?.[0].transporterCompanyName,
-    transporter2CompanySiret:
-      form.transportSegments?.[0].transporterCompanySiret,
+    transporter2CompanyName: transporter2?.transporterCompanyName,
+    transporter2CompanySiret: transporter2?.transporterCompanySiret,
     transporter2CompanyVatNumber: null,
-    transporter2CompanyAddress:
-      form.transportSegments?.[0].transporterCompanyAddress,
-    transporter2CompanyContact:
-      form.transportSegments?.[0].transporterCompanyContact,
-    transporter2CompanyPhone:
-      form.transportSegments?.[0].transporterCompanyPhone,
-    transporter2CompanyMail: form.transportSegments?.[0].transporterCompanyMail,
+    transporter2CompanyAddress: transporter2?.transporterCompanyAddress,
+    transporter2CompanyContact: transporter2?.transporterCompanyContact,
+    transporter2CompanyPhone: transporter2?.transporterCompanyPhone,
+    transporter2CompanyMail: transporter2?.transporterCompanyMail,
     transporter2CustomInfo: null,
     transporter2RecepisseIsExempted:
-      form.transportSegments?.[0].transporterIsExemptedOfReceipt,
-    transporter2RecepisseNumber: form.transportSegments?.[0].transporterReceipt,
-    transporter2RecepisseDepartment:
-      form.transportSegments?.[0].transporterDepartment,
-    transporter2RecepisseValidityLimit:
-      form.transportSegments?.[0].transporterValidityLimit,
-    transporter2TransportMode: form.transportSegments?.[0].mode,
-    transporter2TransportTakenOverAt: form.transportSegments?.[0].takenOverAt,
-    transporter2TransportSignatureAuthor:
-      form.transportSegments?.[0].takenOverBy,
-    transporter2TransportSignatureDate: form.transportSegments?.[0].takenOverAt,
-    transporter2NumberPlates: form.transportSegments?.[0].transporterNumberPlate
-      ? [form.transportSegments?.[0].transporterNumberPlate]
+      transporter2?.transporterIsExemptedOfReceipt,
+    transporter2RecepisseNumber: transporter2?.transporterReceipt,
+    transporter2RecepisseDepartment: transporter2?.transporterDepartment,
+    transporter2RecepisseValidityLimit: transporter2?.transporterValidityLimit,
+    transporter2TransportMode: transporter2?.mode,
+    transporter2TransportTakenOverAt: transporter2?.takenOverAt,
+    transporter2TransportSignatureAuthor: transporter2?.takenOverBy,
+    transporter2TransportSignatureDate: transporter2?.takenOverAt,
+    transporter2NumberPlates: transporter2?.transporterNumberPlate
+      ? [transporter2.transporterNumberPlate]
       : [],
-    transporter3CompanyName: form.transportSegments?.[1].transporterCompanyName,
-    transporter3CompanySiret:
-      form.transportSegments?.[1].transporterCompanySiret,
+    transporter3CompanyName: transporter3?.transporterCompanyName,
+    transporter3CompanySiret: transporter3?.transporterCompanySiret,
     transporter3CompanyVatNumber: null,
-    transporter3CompanyAddress:
-      form.transportSegments?.[1].transporterCompanyAddress,
-    transporter3CompanyContact:
-      form.transportSegments?.[1].transporterCompanyContact,
-    transporter3CompanyPhone:
-      form.transportSegments?.[1].transporterCompanyPhone,
-    transporter3CompanyMail: form.transportSegments?.[1].transporterCompanyMail,
+    transporter3CompanyAddress: transporter3?.transporterCompanyAddress,
+    transporter3CompanyContact: transporter3?.transporterCompanyContact,
+    transporter3CompanyPhone: transporter3?.transporterCompanyPhone,
+    transporter3CompanyMail: transporter3?.transporterCompanyMail,
     transporter3CustomInfo: null,
     transporter3RecepisseIsExempted:
-      form.transportSegments?.[1].transporterIsExemptedOfReceipt,
-    transporter3RecepisseNumber: form.transportSegments?.[0].transporterReceipt,
-    transporter3RecepisseDepartment:
-      form.transportSegments?.[1].transporterDepartment,
-    transporter3RecepisseValidityLimit:
-      form.transportSegments?.[1].transporterValidityLimit,
-    transporter3TransportMode: form.transportSegments?.[1].mode,
-    transporter3TransportTakenOverAt: form.transportSegments?.[1].takenOverAt,
-    transporter3TransportSignatureAuthor:
-      form.transportSegments?.[1].takenOverBy,
-    transporter3TransportSignatureDate: form.transportSegments?.[1].takenOverAt,
-    transporter3NumberPlates: form.transportSegments?.[1].transporterNumberPlate
-      ? [form.transportSegments?.[1].transporterNumberPlate]
+      transporter3?.transporterIsExemptedOfReceipt,
+    transporter3RecepisseNumber: transporter2?.transporterReceipt,
+    transporter3RecepisseDepartment: transporter3?.transporterDepartment,
+    transporter3RecepisseValidityLimit: transporter3?.transporterValidityLimit,
+    transporter3TransportMode: transporter3?.mode,
+    transporter3TransportTakenOverAt: transporter3?.takenOverAt,
+    transporter3TransportSignatureAuthor: transporter3?.takenOverBy,
+    transporter3TransportSignatureDate: transporter3?.takenOverAt,
+    transporter3NumberPlates: transporter3?.transporterNumberPlate
+      ? [transporter3.transporterNumberPlate]
       : [],
     destinationCompanyName: form.recipientCompanyName,
     destinationCompanySiret: form.recipientCompanySiret,
