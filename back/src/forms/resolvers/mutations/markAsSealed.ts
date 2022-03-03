@@ -34,7 +34,7 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   const formRepository = getFormRepository(user);
 
   // mark appendix2Forms as GROUPED
-  const appendix2Forms = await formRepository.getAppendix2FormsById(form.id);
+  const appendix2Forms = await formRepository.findAppendix2FormsById(form.id);
   if (appendix2Forms.length > 0) {
     const promises = appendix2Forms.map(appendix => {
       return transitionForm(user, appendix, {

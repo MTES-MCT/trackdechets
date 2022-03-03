@@ -24,7 +24,7 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   if (form.recipientIsTempStorage === true) {
     // this form can be mark as received only if it has been
     // taken over by the transporter after temp storage
-    const { temporaryStorageDetail } = await formRepository.getFullFormById(
+    const { temporaryStorageDetail } = await formRepository.findFullFormById(
       form.id
     );
 

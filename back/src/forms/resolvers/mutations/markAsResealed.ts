@@ -25,7 +25,7 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
   const form = await getFormOrFormNotFound({ id });
   const formRepository = getFormRepository(user);
 
-  const { temporaryStorageDetail } = await formRepository.getFullFormById(
+  const { temporaryStorageDetail } = await formRepository.findFullFormById(
     form.id
   );
 

@@ -24,7 +24,7 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
   const formRepository = getFormRepository(user);
 
   if (form.status === "TEMP_STORER_ACCEPTED") {
-    const { temporaryStorageDetail } = await formRepository.getFullFormById(
+    const { temporaryStorageDetail } = await formRepository.findFullFormById(
       form.id
     );
 

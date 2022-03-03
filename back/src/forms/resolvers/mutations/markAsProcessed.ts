@@ -53,7 +53,7 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   });
 
   // mark appendix2Forms as PROCESSED
-  const appendix2Forms = await getFormRepository(user).getAppendix2FormsById(
+  const appendix2Forms = await getFormRepository(user).findAppendix2FormsById(
     form.id
   );
 

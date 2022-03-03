@@ -112,7 +112,7 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
 
   const newFormInput = getDuplicateFormInput(user, existingForm);
 
-  const fullForm = await formRepository.getFullFormById(existingForm.id);
+  const fullForm = await formRepository.findFullFormById(existingForm.id);
   if (fullForm.temporaryStorageDetail) {
     const temporaryStorageDetailCreateInput =
       getDuplicateTemporaryStorageDetail(fullForm.temporaryStorageDetail);

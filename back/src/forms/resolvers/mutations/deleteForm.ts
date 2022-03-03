@@ -18,8 +18,8 @@ const deleteFormResolver: MutationResolvers["deleteForm"] = async (
   await checkCanDelete(user, form);
 
   const formRepository = getFormRepository(user);
-  const appendix2Forms = await formRepository.getAppendix2FormsById(id);
-  const deletedForm = await formRepository.remove({ id });
+  const appendix2Forms = await formRepository.findAppendix2FormsById(id);
+  const deletedForm = await formRepository.delete({ id });
 
   if (appendix2Forms.length) {
     // roll back status changes to appendixes 2

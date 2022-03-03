@@ -113,7 +113,7 @@ async function getAuthoringCompany(
 ) {
   const { temporaryStorageDetail } = await getFormRepository(
     user
-  ).getFullFormById(bsdd.id);
+  ).findFullFormById(bsdd.id);
 
   if (
     ![
@@ -213,7 +213,7 @@ async function getApproversSirets(
   if (hasTemporaryStorageUpdate(content)) {
     const { temporaryStorageDetail } = await getFormRepository(
       user
-    ).getFullFormById(bsdd.id);
+    ).findFullFormById(bsdd.id);
 
     approvers.push(temporaryStorageDetail.destinationCompanySiret);
   }

@@ -1,24 +1,37 @@
 import { Form, Prisma, Status } from "@prisma/client";
-import { WASTES_CODES } from "../../../common/constants";
-import { checkIsAuthenticated } from "../../../common/permissions";
+import {
+  WASTES_CODES,
+  isDangerous,
+  WASTES_CODES
+} from "../../../common/constants";
+import {
+  checkIsAuthenticated,
+  checkIsAuthenticated
+} from "../../../common/permissions";
 import {
   AppendixFormInput,
   MutationUpdateFormArgs,
   ResolversParentTypes
 } from "../../../generated/graphql/types";
-import { MissingTempStorageFlag, InvalidWasteCode } from "../../errors";
-import { isDangerous, WASTES_CODES } from "../../../common/constants";
-import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkCanUpdate, checkIsFormContributor } from "../../permissions";
+import {
+  MissingTempStorageFlag,
+  InvalidWasteCode,
+  InvalidWasteCode,
+  MissingTempStorageFlag
+} from "../../errors";
+import {
+  checkCanUpdate,
+  checkIsFormContributor,
+  checkCanUpdate,
+  checkIsFormContributor
+} from "../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
-import { InvalidWasteCode, MissingTempStorageFlag } from "../../errors";
 import {
   expandFormFromDb,
   flattenFormInput,
   flattenTemporaryStorageDetailInput
 } from "../../form-converter";
-import { checkCanUpdate, checkIsFormContributor } from "../../permissions";
 import { FormRepository, getFormRepository } from "../../repository";
 import { FormSirets } from "../../types";
 import {
@@ -88,7 +101,7 @@ const updateFormResolver = async (
     formContent.recipient?.isTempStorage === true;
 
   const { temporaryStorageDetail: existingTemporaryStorageDetail } =
-    await formRepository.getFullFormById(id);
+    await formRepository.findFullFormById(id);
 
   // make sure user will still be form contributor after update
   const nextFormSirets: FormSirets = {
@@ -167,7 +180,7 @@ async function handleFormsRemovedFromAppendix(
 
   // When the form is sealed & has an appendix 2
   // form no longer in the appendix must be set back to AWAITING_GROUP
-  const previousAppendix2Forms = await formRepository.getAppendix2FormsById(
+  const previousAppendix2Forms = await formRepository.findAppendix2FormsById(
     existingForm.id
   );
 
@@ -198,7 +211,7 @@ async function handleFormsAddedToAppendix(
   }
 
   // Mark potential additions to the appendix 2 as Grouped if the form is already sealed
-  const appendix2Forms = await formRepository.getAppendix2FormsById(
+  const appendix2Forms = await formRepository.findAppendix2FormsById(
     updatedForm.id
   );
   const promises = appendix2Forms

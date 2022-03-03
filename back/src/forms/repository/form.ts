@@ -15,12 +15,12 @@ const formWithLinkedObjects = Prisma.validator<Prisma.FormArgs>()({
 type FullForm = Prisma.FormGetPayload<typeof formWithLinkedObjects>;
 
 export type FormActions = {
-  getByIdentifier(
+  findUnique(
     where: Prisma.FormWhereUniqueInput,
     options?: Omit<Prisma.FormFindUniqueArgs, "where">
   ): Promise<Form>;
-  getFullFormById(id: string): Promise<FullForm>;
-  getAppendix2FormsById(id: string): Promise<Form[]>;
+  findFullFormById(id: string): Promise<FullForm>;
+  findAppendix2FormsById(id: string): Promise<Form[]>;
   create(
     data: Prisma.FormCreateInput,
     logMetadata?: LogMetadata
@@ -35,7 +35,7 @@ export type FormActions = {
     data: Prisma.FormUpdateInput,
     logMetadata?: LogMetadata
   ): Promise<Prisma.BatchPayload>;
-  remove(
+  delete(
     where: Prisma.FormWhereUniqueInput,
     logMetadata?: LogMetadata
   ): Promise<Form>;
@@ -49,7 +49,7 @@ export function buildFormRepository(
   dbClient: PrismaClient,
   user: Express.User
 ): FormActions {
-  function getByIdentifier(
+  function findUnique(
     where: Prisma.FormWhereUniqueInput,
     options?: Omit<Prisma.FormFindUniqueArgs, "where">
   ): Promise<Form> {
@@ -57,14 +57,14 @@ export function buildFormRepository(
     return dbClient.form.findUnique(input);
   }
 
-  async function getFullFormById(id: string): Promise<FullForm> {
+  async function findFullFormById(id: string): Promise<FullForm> {
     return dbClient.form.findUnique({
       where: { id },
       ...formWithLinkedObjects
     });
   }
 
-  async function getAppendix2FormsById(id: string): Promise<Form[]> {
+  async function findAppendix2FormsById(id: string): Promise<Form[]> {
     return dbClient.form.findUnique({ where: { id } }).appendix2Forms();
   }
 
@@ -99,7 +99,7 @@ export function buildFormRepository(
       return form;
     });
 
-    const fullForm = await getFullFormById(newForm.id);
+    const fullForm = await findFullFormById(newForm.id);
     await indexForm(fullForm, { user } as GraphQLContext);
 
     return newForm;
@@ -129,7 +129,7 @@ export function buildFormRepository(
       return form;
     });
 
-    const fullForm = await getFullFormById(updatedForm.id);
+    const fullForm = await findFullFormById(updatedForm.id);
     await indexForm(fullForm, { user } as GraphQLContext);
 
     return updatedForm;
@@ -163,7 +163,7 @@ export function buildFormRepository(
 
     await Promise.all(
       ids.map(async id => {
-        const form = await getFullFormById(id);
+        const form = await findFullFormById(id);
         indexForm(form, { user } as GraphQLContext);
       })
     );
@@ -171,7 +171,7 @@ export function buildFormRepository(
     return result;
   }
 
-  async function remove(
+  async function deleteForm(
     where: Prisma.FormWhereUniqueInput,
     logMetadata?: LogMetadata
   ): Promise<Form> {
@@ -210,13 +210,13 @@ export function buildFormRepository(
   }
 
   return {
-    getByIdentifier,
-    getFullFormById,
-    getAppendix2FormsById,
+    findUnique,
+    findFullFormById,
+    findAppendix2FormsById,
     create,
     update,
     updateMany,
-    remove,
+    delete: deleteForm,
     createTemporaryStorage,
     count
   };

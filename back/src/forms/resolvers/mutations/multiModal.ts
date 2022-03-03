@@ -105,7 +105,7 @@ export async function prepareSegment(
   }
   const formRepository = getFormRepository(user);
   // get form and segments
-  const form = (await formRepository.getByIdentifier(
+  const form = (await formRepository.findUnique(
     { id },
     formWithOwnerIdAndTransportSegments
   )) as MultiModalForm;
@@ -207,7 +207,7 @@ export async function markSegmentAsReadyToTakeOver(
     throw new ForbiddenError(SEGMENT_NOT_FOUND);
   }
   const formRepository = getFormRepository(user);
-  const form = await formRepository.getByIdentifier(
+  const form = await formRepository.findUnique(
     { id: currentSegment.form.id },
     formWithOwnerIdAndTransportSegments
   );
@@ -288,7 +288,7 @@ export async function takeOverSegment(
   }
 
   const formRepository = getFormRepository(user);
-  const form = await formRepository.getByIdentifier(
+  const form = await formRepository.findUnique(
     { id: currentSegment.form.id },
     formWithOwnerIdAndTransportSegments
   );
@@ -379,7 +379,7 @@ export async function editSegment(
   }
 
   const formRepository = getFormRepository(user);
-  const form = (await formRepository.getByIdentifier(
+  const form = (await formRepository.findUnique(
     { id: currentSegment.form.id },
     formWithOwnerIdAndTransportSegments
   )) as MultiModalForm;

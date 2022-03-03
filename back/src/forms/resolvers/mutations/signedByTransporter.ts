@@ -78,7 +78,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
 
       const { temporaryStorageDetail } = await getFormRepository(
         user
-      ).getFullFormById(id);
+      ).findFullFormById(id);
 
       const hasWasteDetailsOverride =
         !!temporaryStorageDetail.wasteDetailsQuantity;

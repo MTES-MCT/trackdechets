@@ -42,7 +42,7 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
   });
 
   // mark appendix2Forms as GROUPED
-  const appendix2Forms = await getFormRepository(user).getAppendix2FormsById(
+  const appendix2Forms = await getFormRepository(user).findAppendix2FormsById(
     form.id
   );
 

@@ -239,7 +239,7 @@ export function buildFormRevisionRequestRepository(
       const fullForm = await buildFormRepository(
         dbClient,
         user
-      ).getFullFormById(updatedFormId);
+      ).findFullFormById(updatedFormId);
       await indexForm(fullForm, { user } as GraphQLContext);
     }
   }
