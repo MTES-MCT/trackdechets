@@ -208,9 +208,10 @@ model Company {
   bsddRevisionRequests                 BsddRevisionRequest[]
 }
 
+// Table remplie manuellement (pas d'applicatif pour éditer prévu)
+// Permet de labeliser et décrire les types d'identifiants utilisés dans Companu.orgId
 model OrganisationRegistry {
-  id          String      @id @default(cuid())
-  orgRegistry OrgRegistry @unique
+  orgRegistry OrgRegistry @id
   label       String
   description String?
 }
