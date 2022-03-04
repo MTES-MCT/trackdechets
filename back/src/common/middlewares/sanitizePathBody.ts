@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import xss from "xss";
+import xss, { IFilterXSSOptions } from "xss";
 
-const xssOptions = { stripIgnoreTag: true };
+const xssOptions: IFilterXSSOptions = {
+  stripIgnoreTag: true,
+  escapeHtml: s => s
+};
 
 /**
  * Remove XSS from GraphQL responses
