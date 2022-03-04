@@ -1,21 +1,25 @@
 # Contribuer à Trackdéchets
 
-- [Mise en route](#mise-en-route)
-  - [Pré-requis](#pré-requis)
-  - [Installation](#installation)
-  - [Conventions](#conventions)
-- [Tests unitaires](#tests-unitaires)
-- [Tests d'intégration](#tests-dintégration)
-- [Créer une PR](#créer-une-pr)
-- [Déploiement](#déploiement)
-- [Migrations](#migrations)
-- [Guides](#guides)
-  - [Mettre à jour le changelog](#mettre-à-jour-le-changelog)
-  - [Mettre à jour la documentation](#mettre-à-jour-la-documentation)
-  - [Utiliser un backup de base de donnée](#utiliser-un-backup-de-base-de-donnée)
-  - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
-  - [Nourrir la base de donnée avec des données par défaut](#nourrir-la-base-de-donnée-avec-des-données-par-défaut)
-  - [Ajouter une nouvelle icône](#ajouter-une-nouvelle-icône)
+- [Contribuer à Trackdéchets](#contribuer-à-trackdéchets)
+  - [Mise en route](#mise-en-route)
+    - [Pré-requis](#pré-requis)
+    - [Installation](#installation)
+    - [Installation alternative sans docker](#installation-alternative-sans-docker)
+    - [Conventions](#conventions)
+  - [Tests unitaires](#tests-unitaires)
+  - [Tests d'intégration](#tests-dintégration)
+  - [Créer une PR](#créer-une-pr)
+  - [Déploiement](#déploiement)
+  - [Migrations](#migrations)
+  - [Guides](#guides)
+    - [Mettre à jour le changelog](#mettre-à-jour-le-changelog)
+    - [Mettre à jour la documentation](#mettre-à-jour-la-documentation)
+    - [Utiliser un backup de base de donnée](#utiliser-un-backup-de-base-de-donnée)
+      - [Procédure automatique avec Docker](#procédure-automatique-avec-docker)
+      - [Procédure manuelle](#procédure-manuelle)
+    - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
+    - [Nourrir la base de donnée avec des données par défaut](#nourrir-la-base-de-donnée-avec-des-données-par-défaut)
+    - [Ajouter une nouvelle icône](#ajouter-une-nouvelle-icône)
 
 ## Mise en route
 
@@ -184,7 +188,7 @@ Note : l'équipe n'a pas de conventions strictes concernant le nom des branches 
 
 ## Déploiement
 
-Le déploiement est géré par CircleCI à l'aide du fichier [./circle/config.yml](.circleci/config.yml).
+Le déploiement est géré par Scalingo.
 Chaque update de la branche `dev` déclenche un déploiement sur l'environnement de recette. Chaque update de la branche `master` déclenche un déploiement sur les environnements sandbox et prod. Le déroulement dans le détails d'une mise en production est le suivant:
 
 1. Balayer la colonne Trello "Recette Métier" pour vérifier que l'étiquette "OK PASSAGE EN PROD" a bien été ajouté sur toutes les cartes.
