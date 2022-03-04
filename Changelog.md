@@ -13,10 +13,13 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Correction de l'adresse chantier incomplète dans le registre [PR 1238](https://github.com/MTES-MCT/trackdechets/pull/1238)
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
 
+- Gestion du multi-modal dans l'export du registre [PR 1238](https://github.com/MTES-MCT/trackdechets/pull/1238)
+- Ajout du poids à l'arrivée dans l'export du registre [PR 1238](https://github.com/MTES-MCT/trackdechets/pull/1238)
 #### :memo: Documentation
 
 #### :house: Interne
