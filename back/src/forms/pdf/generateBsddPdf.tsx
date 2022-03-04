@@ -379,7 +379,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             <p>
               <strong>
                 2. Installation de destination ou d’entreposage ou de
-                reconditionnement prévu
+                reconditionnement prévue
               </strong>
             </p>
             <p>
@@ -585,7 +585,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               </strong>
             </p>
             <p>
-              Quantité réelle présentées : {form.quantityReceived} tonne(s)
+              Quantité réelle présentée : {form.quantityReceived} tonne(s)
               <br />
               Date de présentation : {formatDate(form.receivedAt)}
             </p>
