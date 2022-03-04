@@ -31,7 +31,6 @@ Le projet est constitué de trois briques logicielles principales :
 - [trackdechets-backups ](https://github.com/MTES-MCT/trackdechets-backups) (jobs cron permettant de réaliser des backups des bases de données sur une autre infra)
 - [trackdechets-metabase](https://github.com/MTES-MCT/trackdechets-metabase) (guide d'administration de metabase permettant de visualiser les données)
 - [trackdechets-etl](https://github.com/MTES-MCT/trackdechets-etl) (script d'import des données ICPE)
-- [trackdechets-search](https://github.com/MTES-MCT/trackdechets-search) (moteur de recherche d'établissements)
 
 ## Services externes
 
