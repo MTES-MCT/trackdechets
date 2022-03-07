@@ -22,7 +22,6 @@ import { downloadRouter } from "./routers/downloadRouter";
 import errorHandler from "./common/middlewares/errorHandler";
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
-import sanitizePathBodyMiddleware from "./common/middlewares/sanitizePathBody";
 import { redisClient } from "./common/redis";
 import { authRouter } from "./routers/auth-router";
 import { oauth2Router } from "./routers/oauth2-router";
@@ -231,9 +230,6 @@ app.use((req, res, next) => {
   }
   next();
 });
-
-// GraphQL sanitization middleware
-app.use(sanitizePathBodyMiddleware(graphQLPath));
 
 if (Sentry) {
   // The error handler must be before any other error middleware and after all controllers
