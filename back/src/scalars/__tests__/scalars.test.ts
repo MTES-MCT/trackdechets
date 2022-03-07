@@ -118,7 +118,7 @@ describe("String", () => {
     scalar String
 
     type Foo {
-      bar: String!
+      bar: String
     }
 
     type Query {
@@ -173,6 +173,18 @@ describe("String", () => {
     resolveFooMock.mockReturnValue({ bar: "bar" });
     const { data } = await server.executeOperation({ query: FOO_QUERY });
     expect(data.foo.bar).toEqual("bar");
+  });
+
+  it("should not modify a null value", async () => {
+    resolveFooMock.mockReturnValue({ bar: null });
+    const { data } = await server.executeOperation({ query: FOO_QUERY });
+    expect(data.foo.bar).toEqual(null);
+  });
+
+  it("should not modify an empty string", async () => {
+    resolveFooMock.mockReturnValue({ bar: "" });
+    const { data } = await server.executeOperation({ query: FOO_QUERY });
+    expect(data.foo.bar).toEqual("");
   });
 
   it("should remove <script> tag", async () => {
