@@ -46,7 +46,11 @@ async function getWasteConnection<WasteType extends GenericWaste>(
   const bsds = await toPrismaBsds(
     searchHits.hits.map(hit => hit._source),
     {
-      BSDD: { temporaryStorageDetail: true, appendix2Forms: true },
+      BSDD: {
+        temporaryStorageDetail: true,
+        appendix2Forms: true,
+        transportSegments: true
+      },
       BSDA: { grouping: true, forwarding: true },
       BSDASRI: { grouping: true },
       BSFF: { grouping: true, forwarding: true, repackaging: true }
