@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -636,8 +637,8 @@ model User {
   phone                 String?
   createdAt             DateTime                @default(now()) @db.Timestamptz(6)
   updatedAt             DateTime                @updatedAt @db.Timestamptz(6)
-  activatedAt           DateTime? // when was this user activated ? - emailing purpose @db.Timestamptz(6)
-  firstAssociationDate  DateTime? // when was this user first associated to any company ? - emailing purpose @db.Timestamptz(6)
+  activatedAt           DateTime?               @db.Timestamptz(6) // when was this user activated ? - emailing purpose @db.Timestamptz(6)
+  firstAssociationDate  DateTime?               @db.Timestamptz(6) // when was this user first associated to any company ? - emailing purpose @db.Timestamptz(6)
   isActive              Boolean?                @default(false)
   isAdmin               Boolean?                @default(false)
   // compte de service avec des droits étendus
@@ -1251,4 +1252,16 @@ model Bsda {
   @@index([transporterCompanySiret], map: "_BsdaTransporterCompanySiretIdx")
   @@index([workerCompanySiret], map: "_BsdaWorkerCompanySiretIdx")
   @@index([status], map: "_BsdaStatusIdx")
+}
+
+model Event {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+
+  streamId String
+  type     String
+  data     Json
+  metadata Json?
+
+  actor String
 }

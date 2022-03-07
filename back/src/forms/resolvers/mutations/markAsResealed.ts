@@ -1,5 +1,4 @@
 import { UserInputError } from "apollo-server-express";
-import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
@@ -12,6 +11,7 @@ import { checkCompaniesType, resealedFormSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { Form, Status } from "@prisma/client";
+import { getFormRepository } from "../../repository";
 
 const markAsResealed: MutationResolvers["markAsResealed"] = async (
   parent,
@@ -23,10 +23,11 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
   const { id, resealedInfos } = args;
 
   const form = await getFormOrFormNotFound({ id });
+  const formRepository = getFormRepository(user);
 
-  const temporaryStorageDetail = await prisma.form
-    .findUnique({ where: { id: form.id } })
-    .temporaryStorageDetail();
+  const { temporaryStorageDetail } = await formRepository.findFullFormById(
+    form.id
+  );
 
   if (temporaryStorageDetail === null) {
     throw new UserInputError(
@@ -57,10 +58,10 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
   if (form.status === Status.RESEALED) {
     // by pass xstate transition because markAsResealed is
     // used to update an already resealed form
-    resealedForm = await prisma.form.update({
-      where: { id },
-      data: { temporaryStorageDetail: { update: updateInput } }
-    });
+    resealedForm = await formRepository.update(
+      { id },
+      { temporaryStorageDetail: { update: updateInput } }
+    );
   } else {
     resealedForm = await transitionForm(user, form, {
       type: EventType.MarkAsResealed,

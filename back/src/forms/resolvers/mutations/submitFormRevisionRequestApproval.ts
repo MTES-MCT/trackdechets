@@ -1,20 +1,23 @@
 import {
+  Prisma,
   RevisionRequestApprovalStatus as Status,
-  BsddRevisionRequest,
   RevisionRequestStatus,
-  BsddRevisionRequestApproval,
   User
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationSubmitFormRevisionRequestApprovalArgs } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
+import { getFormRepository } from "../../repository";
 
-type FormRevisionRequestWithApprovals = BsddRevisionRequest & {
-  approvals: BsddRevisionRequestApproval[];
-};
+const formRevisionRequestWithApprovals =
+  Prisma.validator<Prisma.BsddRevisionRequestArgs>()({
+    include: { approvals: true }
+  });
+type BsddRevisionRequestWithApprovals = Prisma.BsddRevisionRequestGetPayload<
+  typeof formRevisionRequestWithApprovals
+>;
 
 export default async function submitFormRevisionRequestApproval(
   _,
@@ -22,11 +25,12 @@ export default async function submitFormRevisionRequestApproval(
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
+  const formRepository = getFormRepository(user);
 
-  const revisionRequest = await prisma.bsddRevisionRequest.findUnique({
-    where: { id },
-    include: { approvals: true }
-  });
+  const revisionRequest = (await formRepository.getRevisionRequestById(
+    id,
+    formRevisionRequestWithApprovals
+  )) as BsddRevisionRequestWithApprovals;
 
   if (!revisionRequest) {
     throw new UserInputError("Révision introuvable.");
@@ -46,24 +50,22 @@ export default async function submitFormRevisionRequestApproval(
     approval => approval.approverSiret === currentApproverSiret
   );
 
-  const updatedApproval = await prisma.bsddRevisionRequestApproval.update({
-    where: { id: approval.id },
-    data: {
-      status: isApproved ? Status.ACCEPTED : Status.REFUSED,
+  if (isApproved) {
+    await formRepository.acceptRevisionRequestApproval(approval.id, {
       comment
-    }
-  });
+    });
+  } else {
+    await formRepository.refuseRevisionRequestApproval(approval.id, {
+      comment
+    });
+  }
 
-  await reverberateChangeOnAssociatedObjects(revisionRequest, updatedApproval);
-
-  return prisma.bsddRevisionRequest.findFirst({
-    where: { id }
-  });
+  return formRepository.getRevisionRequestById(id);
 }
 
 async function getCurrentApproverSiret(
   user: User,
-  revisionRequest: FormRevisionRequestWithApprovals
+  revisionRequest: BsddRevisionRequestWithApprovals
 ) {
   const remainingApproverSirets = revisionRequest.approvals
     .filter(approval => approval.status === Status.PENDING)
@@ -81,98 +83,4 @@ async function getCurrentApproverSiret(
   }
 
   return approvingCompaniesCandidates[0].siret;
-}
-
-async function reverberateChangeOnAssociatedObjects(
-  revisionRequest: FormRevisionRequestWithApprovals,
-  updatedApproval: BsddRevisionRequestApproval
-) {
-  // We have a refusal:
-  // - mark revision as refused
-  // - mark every awaiting approval as skipped
-  if (updatedApproval.status === Status.REFUSED) {
-    await prisma.bsddRevisionRequest.update({
-      where: { id: revisionRequest.id },
-      data: { status: RevisionRequestStatus.REFUSED }
-    });
-    await prisma.bsddRevisionRequestApproval.updateMany({
-      where: {
-        revisionRequestId: revisionRequest.id,
-        status: Status.PENDING
-      },
-      data: { status: Status.CANCELED }
-    });
-    return;
-  }
-
-  // We have an approval. If it was the last approval:
-  // - mark the revision as approved
-  // - apply the revision to the BSDD
-  const updatedApprovals = revisionRequest.approvals.map(approval => {
-    if (approval.id === updatedApproval.id) return updatedApproval;
-    return approval;
-  });
-  if (updatedApprovals.every(approval => approval.status === Status.ACCEPTED)) {
-    await prisma.bsddRevisionRequest.update({
-      where: { id: revisionRequest.id },
-      data: { status: RevisionRequestStatus.ACCEPTED }
-    });
-
-    const [bsddUpdate, temporaryStorageUpdate] =
-      getUpdateFromFormRevisionRequest(revisionRequest);
-
-    await prisma.form.update({
-      where: { id: revisionRequest.bsddId },
-      data: {
-        ...bsddUpdate,
-        ...(temporaryStorageUpdate && {
-          temporaryStorageDetail: { update: { ...temporaryStorageUpdate } }
-        })
-      }
-    });
-  }
-}
-
-function getUpdateFromFormRevisionRequest(
-  revisionRequest: BsddRevisionRequest
-) {
-  const bsddUpdate = {
-    recipientCap: revisionRequest.recipientCap,
-    wasteDetailsCode: revisionRequest.wasteDetailsCode,
-    wasteDetailsPop: revisionRequest.wasteDetailsPop,
-    quantityReceived: revisionRequest.quantityReceived,
-    processingOperationDone: revisionRequest.processingOperationDone,
-    brokerCompanyName: revisionRequest.brokerCompanyName,
-    brokerCompanySiret: revisionRequest.brokerCompanySiret,
-    brokerCompanyAddress: revisionRequest.brokerCompanyAddress,
-    brokerCompanyContact: revisionRequest.brokerCompanyContact,
-    brokerCompanyPhone: revisionRequest.brokerCompanyPhone,
-    brokerCompanyMail: revisionRequest.brokerCompanyMail,
-    brokerReceipt: revisionRequest.brokerReceipt,
-    brokerDepartment: revisionRequest.brokerDepartment,
-    brokerValidityLimit: revisionRequest.brokerValidityLimit,
-    traderCompanyAddress: revisionRequest.traderCompanyAddress,
-    traderCompanyContact: revisionRequest.traderCompanyContact,
-    traderCompanyPhone: revisionRequest.traderCompanyPhone,
-    traderCompanyMail: revisionRequest.traderCompanyMail,
-    traderReceipt: revisionRequest.traderReceipt,
-    traderDepartment: revisionRequest.traderDepartment,
-    traderValidityLimit: revisionRequest.traderValidityLimit
-  };
-
-  const temporaryStorageUpdate = {
-    destinationCap: revisionRequest.temporaryStorageDestinationCap,
-    destinationProcessingOperation:
-      revisionRequest.temporaryStorageDestinationProcessingOperation
-  };
-
-  function removeEmpty(obj) {
-    const cleanedObject = Object.fromEntries(
-      Object.entries(obj).filter(([_, v]) => v != null)
-    );
-
-    return Object.keys(cleanedObject).length === 0 ? null : cleanedObject;
-  }
-
-  return [removeEmpty(bsddUpdate), removeEmpty(temporaryStorageUpdate)];
 }

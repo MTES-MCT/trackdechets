@@ -1,11 +1,10 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getFormOrFormNotFound, getFullForm } from "../../database";
+import { getFormOrFormNotFound } from "../../database";
 import { ForbiddenError } from "apollo-server-express";
 import { checkCanUpdateTransporterFields } from "../../permissions";
-import prisma from "../../../prisma";
 import { expandFormFromDb } from "../../form-converter";
-import { indexForm } from "../../elastic";
+import { getFormRepository } from "../../repository";
 
 const updateTransporterFieldsResolver: MutationResolvers["updateTransporterFields"] =
   async (
@@ -25,13 +24,10 @@ const updateTransporterFieldsResolver: MutationResolvers["updateTransporterField
 
     await checkCanUpdateTransporterFields(user, form);
 
-    const updatedForm = await prisma.form.update({
-      where: { id },
-      data: { transporterNumberPlate, transporterCustomInfo }
-    });
-
-    const fullForm = await getFullForm(updatedForm);
-    await indexForm(fullForm, context);
+    const updatedForm = await getFormRepository(user).update(
+      { id },
+      { transporterNumberPlate, transporterCustomInfo }
+    );
 
     return expandFormFromDb(updatedForm);
   };

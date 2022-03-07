@@ -1,4 +1,8 @@
-import { FormRevisionRequestResolvers } from "../../generated/graphql/types";
+import { getBsddFromActivityEvents } from "../../activity-events/bsdd";
+import {
+  FormRevisionRequest,
+  FormRevisionRequestResolvers
+} from "../../generated/graphql/types";
 import prisma from "../../prisma";
 import {
   expandBsddRevisionRequestContent,
@@ -19,11 +23,15 @@ const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
       .findUnique({ where: { id: parent.id } })
       .authoringCompany();
   },
-  form: async parent => {
-    const bsdd = await prisma.bsddRevisionRequest
+  form: async (parent: FormRevisionRequest & { bsddId: string }) => {
+    const fullBsdd = await prisma.bsddRevisionRequest
       .findUnique({ where: { id: parent.id } })
       .bsdd();
-    return expandFormFromDb(bsdd);
+    const bsdd = await getBsddFromActivityEvents(
+      parent.bsddId,
+      parent.createdAt
+    );
+    return expandFormFromDb({ ...fullBsdd, ...bsdd });
   }
 };
 

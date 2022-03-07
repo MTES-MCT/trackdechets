@@ -3,11 +3,11 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
 import { expandFormFromDb, flattenResentFormInput } from "../../form-converter";
 import transitionForm from "../../workflow/transitionForm";
-import prisma from "../../../prisma";
 import { checkCanMarkAsResent } from "../../permissions";
 import { UserInputError } from "apollo-server-express";
 import { resealedFormSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
+import { getFormRepository } from "../../repository";
 
 const markAsResentResolver: MutationResolvers["markAsResent"] = async (
   parent,
@@ -21,11 +21,12 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
   const form = await getFormOrFormNotFound({ id });
 
   await checkCanMarkAsResent(user, form);
+  const formRepository = getFormRepository(user);
 
   if (form.status === "TEMP_STORER_ACCEPTED") {
-    const temporaryStorageDetail = await prisma.form
-      .findUnique({ where: { id: form.id } })
-      .temporaryStorageDetail();
+    const { temporaryStorageDetail } = await formRepository.findFullFormById(
+      form.id
+    );
 
     if (temporaryStorageDetail === null) {
       throw new UserInputError(
