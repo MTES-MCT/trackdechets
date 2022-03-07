@@ -25,6 +25,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Ajout d'une commande de réindexation unitaire d'un bsd 
+- Ajout d'une section dans "Mon Compte" permettant de créer, modifier et supprimer une application OAuth2 [PR 1244](https://github.com/MTES-MCT/trackdechets/pull/1244)
+
 # [2022.02.1] 21/02/2022
 
 #### :rocket: Nouvelles fonctionnalités
