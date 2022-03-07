@@ -180,4 +180,145 @@ describe("sanitizePathBodyMiddleware", () => {
     expect(body.is).toEqual(true);
     expect(body.bad.nested).toEqual("bar");
   });
+
+  it("should not mess up with json data", async () => {
+    setupTestApp();
+    const data = {
+      __typename: "Form",
+      id: "cl0cb9kwe0180tayuyu2ogctz",
+      customId: "",
+      sentAt: null,
+      emitter: {
+        type: "PRODUCER",
+        workSite: null,
+        company: {
+          name: "CENTRE AUTO BOLLIER",
+          siret: "79763653700012",
+          address: "106 RUE ANDRE BOLLIER 69007 LYON 7EME",
+          contact: "PRODUCTEUR Benoit",
+          country: "FR",
+          phone: "06 06 06 06 06",
+          mail: "hello+producteur@benoitguigal.fr",
+          __typename: "FormCompany"
+        },
+        __typename: "Emitter"
+      },
+      recipient: {
+        cap: "cap",
+        processingOperation: "R 1",
+        isTempStorage: false,
+        company: {
+          name: "TREDI",
+          siret: "33818576200162",
+          address: "ALL DES PINS ZI DE LA PLAINE DE L'AIN 01150 SAINT-VULBAS",
+          contact: "Benoit Guigal",
+          country: "FR",
+          phone: "0667789588",
+          mail: "benoit.guigal@protonmail.com",
+          __typename: "FormCompany"
+        },
+        __typename: "Recipient"
+      },
+      transporter: {
+        isExemptedOfReceipt: false,
+        receipt: "0101010101",
+        department: "69",
+        validityLimit: "2023-12-31T23:00:00.000Z",
+        numberPlate: "",
+        customInfo: null,
+        mode: "ROAD",
+        company: {
+          name: "SAS HEXATRANS",
+          siret: "33902484600034",
+          address: "BD DES NATIONS 69780 MIONS",
+          contact: "Benoit Guigal",
+          country: "FR",
+          phone: "0667789588",
+          mail: "benoit.guigal@protonmail.com",
+          __typename: "FormCompany"
+        },
+        __typename: "Transporter"
+      },
+      trader: null,
+      broker: null,
+      wasteDetails: {
+        code: "03 01 01",
+        name: "écorces",
+        onuCode: "adr",
+        packagingInfos: [
+          {
+            type: "AUTRE",
+            other: "Bonbonne (>5L - <100L)",
+            quantity: 1,
+            __typename: "PackagingInfo"
+          }
+        ],
+        quantity: 1,
+        quantityType: "ESTIMATED",
+        consistence: "SOLID",
+        pop: false,
+        __typename: "WasteDetails"
+      },
+      appendix2Forms: [],
+      ecoOrganisme: null,
+      temporaryStorageDetail: null,
+      currentTransporterSiret: null,
+      nextTransporterSiret: null,
+      transportSegments: [],
+      readableId: "BSD-20220304-9FZTZXEGX",
+      createdAt: "2022-03-04T11:06:02.894Z",
+      status: "DRAFT",
+      stateSummary: {
+        packagingInfos: [
+          {
+            type: "AUTRE",
+            other: "Bonbonne (>5L - <100L)",
+            quantity: 1,
+            __typename: "PackagingInfo"
+          }
+        ],
+        onuCode: "adr",
+        quantity: 1,
+        transporterNumberPlate: "",
+        transporterCustomInfo: null,
+        transporter: {
+          name: "SAS HEXATRANS",
+          siret: "33902484600034",
+          address: "BD DES NATIONS 69780 MIONS",
+          contact: "Benoit Guigal",
+          country: "FR",
+          phone: "0667789588",
+          mail: "benoit.guigal@protonmail.com",
+          __typename: "FormCompany"
+        },
+        recipient: {
+          name: "TREDI",
+          siret: "33818576200162",
+          address: "ALL DES PINS ZI DE LA PLAINE DE L'AIN 01150 SAINT-VULBAS",
+          contact: "Benoit Guigal",
+          country: "FR",
+          phone: "0667789588",
+          mail: "benoit.guigal@protonmail.com",
+          __typename: "FormCompany"
+        },
+        emitter: {
+          name: "CENTRE AUTO BOLLIER",
+          siret: "79763653700012",
+          address: "106 RUE ANDRE BOLLIER 69007 LYON 7EME",
+          contact: "PRODUCTEUR Benoit",
+          country: "FR",
+          phone: "06 06 06 06 06",
+          mail: "hello+producteur@benoitguigal.fr",
+          __typename: "FormCompany"
+        },
+        lastActionOn: "2022-03-04T11:06:02.894Z",
+        __typename: "StateSummary"
+      }
+    };
+    app.get(graphQLPath, (req, res) => res.json(data));
+    request = supertest(app);
+    const { body } = await request.get(graphQLPath);
+    // received "StateSummary"
+    expect(body.wasteDetails.__typename).toEqual("WasteDetails");
+  });
 });
