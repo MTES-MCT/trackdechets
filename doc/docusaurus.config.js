@@ -7,7 +7,7 @@ module.exports = {
   url: "https://developers.trackdechets.beta.gouv.fr",
   baseUrl: "/",
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "warn",
+  onBrokenMarkdownLinks: "throw",
   favicon: "img/trackdechets.png",
   organizationName: "MTES-MCT",
   projectName: "trackdechets",
