@@ -9,15 +9,29 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Ajout d'un client primaire nommé trackdechets dans `companies/sirene` basé sur notre propre index  ElasticSearch des données Sirene INSEE [PR 1214](https://github.com/MTES-MCT/trackdechets/pull/1214)
+- Ajout du caractère dangereux pour des déchets dont le code ne comporte pas d'astérisque [PR 1177](https://github.com/MTES-MCT/trackdechets/pull/1177)
 #### :bug: Corrections de bugs
 
+- Correction de l'adresse chantier incomplète dans le registre [PR 1238](https://github.com/MTES-MCT/trackdechets/pull/1238)
+- Correction de l'indexation des filtres d'onglet du tableau de bord [PR 1215](https://github.com/MTES-MCT/trackdechets/pull/1215)
+- Correction d'un bug de corruption de la structure du payload renvoyé par l'API en présence des caractères spéciaux "<" et ">" [PR 1250](https://github.com/MTES-MCT/trackdechets/pull/1250)
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
 
+- Gestion du multi-modal dans l'export du registre [PR 1238](https://github.com/MTES-MCT/trackdechets/pull/1238)
+- Ajout du poids à l'arrivée dans l'export du registre [PR 1238](https://github.com/MTES-MCT/trackdechets/pull/1238)
+- Ajout de la possibilité de visualiser les bordereaux annexés à un bordereau de regroupement. [PR 1227](https://github.com/MTES-MCT/trackdechets/pull/1227)
+- Ajout de la possibilité de visualiser le bordereau de regroupement d'un bordereau annexé. Par API, la lecture de cette information se fait avec le champ `Form.groupedIn`. [PR 1227](https://github.com/MTES-MCT/trackdechets/pull/1227)
+- Calcul automatique du conditionnemnt lors de l'ajout d'annexes 2. [PR 1227](https://github.com/MTES-MCT/trackdechets/pull/1227)
+
 #### :memo: Documentation
 
 #### :house: Interne
+
+- Ajout d'une commande de réindexation unitaire d'un bsd
+- Ajout d'une section dans "Mon Compte" permettant de créer, modifier et supprimer une application OAuth2 [PR 1244](https://github.com/MTES-MCT/trackdechets/pull/1244)
 
 # [2022.02.1] 21/02/2022
 

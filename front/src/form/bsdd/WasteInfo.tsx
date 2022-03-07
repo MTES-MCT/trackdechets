@@ -6,10 +6,10 @@ import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { connect, Field } from "formik";
 import { isDangerous } from "generated/constants";
 import React from "react";
+import Appendix2MultiSelect from "./components/appendix/Appendix2MultiSelect";
 import AppendixInfo from "./components/appendix/AppendixInfo";
-import FormsSelector from "./components/appendix/FormsSelector";
 import Packagings from "./components/packagings/Packagings";
-import { WasteCode, wasteCodeValidator } from "./components/waste-code";
+import { WasteCodeSelect, wasteCodeValidator } from "./components/waste-code";
 import "./WasteInfo.scss";
 
 type Values = {
@@ -17,17 +17,26 @@ type Values = {
   emitter: { company: { siret: string }; type: string };
 };
 export default connect<{}, Values>(function WasteInfo(props) {
-  const values = props.formik.values;
+  const { values, setFieldValue } = props.formik;
 
   if (!values.wasteDetails.packagings) {
     values.wasteDetails.packagings = [];
   }
+  React.useEffect(() => {
+    if (isDangerous(values.wasteDetails.code)) {
+      setFieldValue("wasteDetails.isDangerous", true);
+    }
+  }, [values.wasteDetails.code, setFieldValue]);
 
   return (
     <>
       <h4 className="form__section-heading">Description du déchet</h4>
       <div className="form__row">
-        <WasteCode name="wasteDetails.code" validate={wasteCodeValidator} />
+        <Field
+          name="wasteDetails.code"
+          component={WasteCodeSelect}
+          validate={wasteCodeValidator}
+        />
       </div>
 
       <div className="form__row">
@@ -47,26 +56,70 @@ export default connect<{}, Values>(function WasteInfo(props) {
         <Field
           type="checkbox"
           component={FieldSwitch}
-          name="wasteDetails.pop"
-          label="Le déchet contient des polluants organiques persistants"
+          name="wasteDetails.isDangerous"
+          disabled={isDangerous(values.wasteDetails.code)}
+          label={
+            <span>
+              Le déchet est{" "}
+              <a
+                className="tw-underline"
+                href="https://www.ecologie.gouv.fr/dechets-dangereux"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                dangereux
+              </a>
+            </span>
+          }
         />
-        <a
-          className="link tw-ml-2"
-          href="https://www.ecologique-solidaire.gouv.fr/polluants-organiques-persistants-pop"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <div className="tw-ml-1">
+          <Tooltip msg="Certains déchets avec un code sans astérisque peuvent, selon les cas, être dangereux ou non dangereux." />
+        </div>
+      </div>
+
+      <div className="form__row" style={{ flexDirection: "row" }}>
+        <Field
+          type="checkbox"
+          component={FieldSwitch}
+          name="wasteDetails.pop"
+          label={
+            <span>
+              Le déchet contient des{" "}
+              <a
+                className="tw-underline"
+                href="https://www.ecologique-solidaire.gouv.fr/polluants-organiques-persistants-pop"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                polluants organiques persistants
+              </a>
+            </span>
+          }
+        />
+        <div className="tw-ml-1">
           <Tooltip
             msg="Le terme POP recouvre un ensemble de substances organiques qui
         possèdent 4 propriétés : persistantes, bioaccumulables, toxiques et mobiles."
           />
-        </a>
+        </div>
       </div>
 
       {values.emitter.type === "APPENDIX1" && <AppendixInfo />}
 
       {values.emitter.type === "APPENDIX2" && (
-        <FormsSelector name="appendix2Forms" />
+        <>
+          <h4 className="form__section-heading">Annexe 2</h4>
+          <p className="tw-my-2">
+            Vous êtes en train de créer un bordereau de regroupement. Veuillez
+            sélectionner ci-dessous les bordereaux à regrouper.
+          </p>
+          <p className="tw-my-2">
+            Tous les bordereaux présentés ci-dessous correspondent à des
+            bordereaux pour lesquels vous avez effectué une opération de
+            traitement de type D 13, D 14, D 15 ou R 13.
+          </p>
+          <Appendix2MultiSelect />
+        </>
       )}
 
       <h4 className="form__section-heading">Conditionnement</h4>

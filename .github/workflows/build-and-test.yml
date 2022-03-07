@@ -70,6 +70,10 @@ jobs:
           PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID: "9"
           SECURITY_CODE_RENEWAL_TEMPLATE_ID: "6"
           DATABASE_URL: "postgresql://user:password@postgres:5432/db"
+          TD_COMPANY_ELASTICSEARCH_INDEX: "stocketablissement-production"
+          TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
+          TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
+
 
   doc:
     runs-on: ubuntu-latest

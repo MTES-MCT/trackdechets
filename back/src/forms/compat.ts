@@ -2,7 +2,8 @@ import {
   Form,
   QuantityType,
   Status,
-  TemporaryStorageDetail
+  TemporaryStorageDetail,
+  TransportSegment
 } from "@prisma/client";
 import { Bsdd } from "./types";
 
@@ -11,7 +12,11 @@ import { Bsdd } from "./types";
  * @param form
  * @returns
  */
-export function simpleFormToBsdd(form: Form): Bsdd {
+export function simpleFormToBsdd(
+  form: Form & { transportSegments?: TransportSegment[] }
+): Bsdd {
+  const [transporter2, transporter3] = form.transportSegments ?? [];
+
   return {
     id: form.readableId,
     customId: form.customId,
@@ -73,12 +78,52 @@ export function simpleFormToBsdd(form: Form): Bsdd {
     transporterRecepisseNumber: form.transporterReceipt,
     transporterRecepisseDepartment: form.transporterDepartment,
     transporterRecepisseValidityLimit: form.transporterValidityLimit,
-    transporterTransportMode: null,
+    transporterTransportMode: form.transporterTransportMode,
     transporterTransportTakenOverAt: form.sentAt,
     transporterTransportSignatureAuthor: null,
     transporterTransportSignatureDate: form.sentAt,
     transporterNumberPlates: form.transporterNumberPlate
       ? [form.transporterNumberPlate]
+      : [],
+    transporter2CompanyName: transporter2?.transporterCompanyName,
+    transporter2CompanySiret: transporter2?.transporterCompanySiret,
+    transporter2CompanyVatNumber: null,
+    transporter2CompanyAddress: transporter2?.transporterCompanyAddress,
+    transporter2CompanyContact: transporter2?.transporterCompanyContact,
+    transporter2CompanyPhone: transporter2?.transporterCompanyPhone,
+    transporter2CompanyMail: transporter2?.transporterCompanyMail,
+    transporter2CustomInfo: null,
+    transporter2RecepisseIsExempted:
+      transporter2?.transporterIsExemptedOfReceipt,
+    transporter2RecepisseNumber: transporter2?.transporterReceipt,
+    transporter2RecepisseDepartment: transporter2?.transporterDepartment,
+    transporter2RecepisseValidityLimit: transporter2?.transporterValidityLimit,
+    transporter2TransportMode: transporter2?.mode,
+    transporter2TransportTakenOverAt: transporter2?.takenOverAt,
+    transporter2TransportSignatureAuthor: transporter2?.takenOverBy,
+    transporter2TransportSignatureDate: transporter2?.takenOverAt,
+    transporter2NumberPlates: transporter2?.transporterNumberPlate
+      ? [transporter2.transporterNumberPlate]
+      : [],
+    transporter3CompanyName: transporter3?.transporterCompanyName,
+    transporter3CompanySiret: transporter3?.transporterCompanySiret,
+    transporter3CompanyVatNumber: null,
+    transporter3CompanyAddress: transporter3?.transporterCompanyAddress,
+    transporter3CompanyContact: transporter3?.transporterCompanyContact,
+    transporter3CompanyPhone: transporter3?.transporterCompanyPhone,
+    transporter3CompanyMail: transporter3?.transporterCompanyMail,
+    transporter3CustomInfo: null,
+    transporter3RecepisseIsExempted:
+      transporter3?.transporterIsExemptedOfReceipt,
+    transporter3RecepisseNumber: transporter3?.transporterReceipt,
+    transporter3RecepisseDepartment: transporter3?.transporterDepartment,
+    transporter3RecepisseValidityLimit: transporter3?.transporterValidityLimit,
+    transporter3TransportMode: transporter3?.mode,
+    transporter3TransportTakenOverAt: transporter3?.takenOverAt,
+    transporter3TransportSignatureAuthor: transporter3?.takenOverBy,
+    transporter3TransportSignatureDate: transporter3?.takenOverAt,
+    transporter3NumberPlates: transporter3?.transporterNumberPlate
+      ? [transporter3.transporterNumberPlate]
       : [],
     destinationCompanyName: form.recipientCompanyName,
     destinationCompanySiret: form.recipientCompanySiret,
@@ -122,7 +167,7 @@ export function simpleFormToBsdd(form: Form): Bsdd {
 export function formWithTempStorageToBsdd(
   form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
     appendix2Forms: Form[];
-  }
+  } & { transportSegments: TransportSegment[] }
 ): Bsdd & { forwarding: Bsdd & { grouping: Bsdd[] } } {
   const temporaryStorage = form.temporaryStorageDetail;
   const initial: Bsdd = {
@@ -268,7 +313,7 @@ export function formWithTempStorageToBsdd(
 export function formToBsdd(
   form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
     appendix2Forms: Form[];
-  }
+  } & { transportSegments: TransportSegment[] }
 ): Bsdd & { grouping: Bsdd[] } & { forwarding: Bsdd & { grouping: Bsdd[] } } {
   let grouping: Bsdd[] = [];
 

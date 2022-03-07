@@ -57,6 +57,9 @@ function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
     destinationReceptionAcceptationStatus:
       bsvhu.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsvhu.destinationOperationDate,
+    destinationReceptionWeight: bsvhu.destinationReceptionWeight
+      ? bsvhu.destinationReceptionWeight / 1000
+      : bsvhu.destinationReceptionWeight,
     transporterRecepisseIsExempted: false,
     wasteAdr: null,
     workerCompanyName: null,
@@ -87,9 +90,6 @@ export function toIncomingWaste(bsvhu: Bsvhu): IncomingWaste {
     destinationCompanySiret: bsvhu.destinationCompanySiret,
     destinationCompanyAddress: bsvhu.destinationCompanyAddress,
     destinationReceptionDate: bsvhu.destinationReceptionDate,
-    destinationReceptionWeight: bsvhu.destinationReceptionWeight
-      ? bsvhu.destinationReceptionWeight / 1000
-      : bsvhu.destinationReceptionWeight,
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
@@ -234,9 +234,6 @@ export function toManagedWaste(bsvhu: Bsvhu): ManagedWaste {
     destinationCompanySiret: bsvhu.destinationCompanySiret,
     destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
-    destinationReceptionWeight: bsvhu.destinationReceptionWeight
-      ? bsvhu.destinationReceptionWeight / 1000
-      : bsvhu.destinationReceptionWeight,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
@@ -282,9 +279,6 @@ export function toAllWaste(bsvhu: Bsvhu): AllWaste {
     destinationOperationCode: bsvhu.destinationOperationCode,
     destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
-    destinationReceptionWeight: bsvhu.destinationReceptionWeight
-      ? bsvhu.destinationReceptionWeight / 1000
-      : bsvhu.destinationReceptionWeight,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,

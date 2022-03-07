@@ -48,7 +48,7 @@ export default function AccountCompanyList() {
         {companies && companies.length > 0 ? (
           <>
             <div className="tw-mb-3">
-              Vous faites partie de {data.myCompanies?.totalCount}{" "}
+              Vous êtes membre de {data.myCompanies?.totalCount}{" "}
               {(data.myCompanies?.totalCount ?? 0) > 1
                 ? "établissements"
                 : "établissement"}

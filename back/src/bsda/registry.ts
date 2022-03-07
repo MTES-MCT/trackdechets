@@ -62,6 +62,9 @@ function toGenericWaste(bsda: Bsda): GenericWaste {
     destinationReceptionAcceptationStatus:
       bsda.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsda.destinationOperationDate,
+    destinationReceptionWeight: bsda.destinationReceptionWeight
+      ? bsda.destinationReceptionWeight / 1000
+      : bsda.destinationReceptionWeight,
     transporterRecepisseIsExempted: bsda.transporterRecepisseIsExempted,
     wasteAdr: bsda.wasteAdr,
     workerCompanyName: bsda.workerCompanyName,
@@ -109,9 +112,6 @@ export function toIncomingWaste(
     destinationCompanySiret: bsda.destinationCompanySiret,
     destinationCompanyAddress: bsda.destinationCompanyAddress,
     destinationReceptionDate: bsda.destinationReceptionDate,
-    destinationReceptionWeight: bsda.destinationReceptionWeight
-      ? bsda.destinationReceptionWeight / 1000
-      : bsda.destinationReceptionWeight,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
@@ -304,9 +304,6 @@ export function toManagedWaste(
     destinationCompanySiret: bsda.destinationCompanySiret,
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
-    destinationReceptionWeight: bsda.destinationReceptionWeight
-      ? bsda.destinationReceptionWeight / 1000
-      : bsda.destinationReceptionWeight,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
@@ -369,9 +366,6 @@ export function toAllWaste(
     destinationOperationCode: bsda.destinationOperationCode,
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
-    destinationReceptionWeight: bsda.destinationReceptionWeight
-      ? bsda.destinationReceptionWeight / 1000
-      : bsda.destinationReceptionWeight,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,

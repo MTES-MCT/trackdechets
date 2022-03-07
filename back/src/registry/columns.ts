@@ -103,9 +103,9 @@ const columns: Column[] = [
     field: "transporterCustomInfo",
     label: "Champ libre transporteur"
   },
-  { field: "transporterCompanyAddress", label: "Transporteur adresse" },
   { field: "transporterCompanyName", label: "Transporteur raison sociale" },
   { field: "transporterCompanySiret", label: "Transporteur SIRET" },
+  { field: "transporterCompanyAddress", label: "Transporteur adresse" },
   {
     field: "transporterRecepisseIsExempted",
     label: "Transporteur exemption de récépissé",
@@ -151,7 +151,43 @@ const columns: Column[] = [
     field: "destinationOperationNoTraceability",
     label: "Rupture de traçabilité autorisée",
     format: formatBoolean
-  }
+  },
+  {
+    field: "transporter2CompanyName",
+    label: "Transporteur n°2 raison sociale"
+  },
+  { field: "transporter2CompanyAddress", label: "Transporteur n°2 adresse" },
+  { field: "transporter2CompanySiret", label: "Transporteur n°2 SIRET" },
+  {
+    field: "transporter2RecepisseIsExempted",
+    label: "Transporteur n°2 exemption de récépissé",
+    format: formatBoolean
+  },
+  { field: "transporter2RecepisseNumber", label: "Transporteur n°2 récépissé" },
+  {
+    field: "transporter2NumberPlates",
+    label: "Transporteur n°2 immatriculation",
+    format: formatArray
+  },
+  { field: "transporter2CompanyMail", label: "Transporteur n°2 contact" },
+  {
+    field: "transporter3CompanyName",
+    label: "Transporteur n°3 raison sociale"
+  },
+  { field: "transporter3CompanySiret", label: "Transporteur n°3 SIRET" },
+  { field: "transporter3CompanyAddress", label: "Transporteur n°3 adresse" },
+  {
+    field: "transporter3RecepisseIsExempted",
+    label: "Transporteur n°3 exemption de récépissé",
+    format: formatBoolean
+  },
+  { field: "transporter3RecepisseNumber", label: "Transporteur n°3 récépissé" },
+  {
+    field: "transporter3NumberPlates",
+    label: "Transporteur n°3 immatriculation",
+    format: formatArray
+  },
+  { field: "transporter3CompanyMail", label: "Transporteur n°3 contact" }
 ];
 
 export function formatRow(waste: GenericWaste, useLabelAsKey = false) {

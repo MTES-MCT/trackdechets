@@ -321,7 +321,7 @@ export async function takeOverSegment(
   });
 
   const fullForm = await getFullForm(updatedForm);
-  await indexForm(fullForm);
+  await indexForm(fullForm, context);
 
   return expandTransportSegmentFromDb(updatedSegment);
 }
