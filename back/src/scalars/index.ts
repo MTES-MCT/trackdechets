@@ -1,7 +1,9 @@
 import { URLResolver } from "graphql-scalars";
 import DateTimeResolver from "./DateTimeResolver";
+import StringResolver from "./StringResolver";
 
 export default {
   URL: URLResolver,
-  DateTime: DateTimeResolver
+  DateTime: DateTimeResolver,
+  String: StringResolver
 };
