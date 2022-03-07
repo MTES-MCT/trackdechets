@@ -9,7 +9,7 @@ describe("formatRow", () => {
       brokerRecepisseNumber: "broker_recepisse",
       destinationOperationCode: "R10",
       destinationReceptionDate: new Date("2021-01-01"),
-      destinationReceptionWeight: 1,
+      destinationReceptionWeight: 1.2,
       ecoOrganismeName: null,
       ecoOrganismeSiren: null,
       emitterCompanyAddress: "emitter address",
@@ -61,7 +61,7 @@ describe("formatRow", () => {
       transporterRecepisseNumber: "transporter recepisse",
       destinationOperationCode: "R10",
       destinationReceptionDate: "2021-01-01",
-      destinationReceptionWeight: "1.000"
+      destinationReceptionWeight: 1.2
     });
     const formattedWithLabels = formatRow(waste, true);
     expect(formattedWithLabels).toEqual({
@@ -91,7 +91,7 @@ describe("formatRow", () => {
       "Transporteur récépissé": "transporter recepisse",
       "Code de traitement réalisée": "R10",
       "Date de réception": "2021-01-01",
-      "Quantité de déchet entrant (t)": "1.000"
+      "Quantité de déchet entrant (t)": 1.2
     });
     expect(Object.keys(formattedWithLabels).length).toEqual(
       Object.keys(waste).length
