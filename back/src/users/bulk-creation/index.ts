@@ -38,13 +38,12 @@ export interface Opts {
   validateOnly: boolean;
   csvDir: string;
   console?: any;
-  sireneProvider: "entreprise.data.gouv.fr" | "insee" | "social.gouv";
+  sireneProvider?: "entreprise.data.gouv.fr" | "insee" | "social.gouv";
 }
 
 export const opts: Opts = {
   validateOnly: false,
-  csvDir: `${__dirname}/../../../csv`,
-  sireneProvider: "entreprise.data.gouv.fr"
+  csvDir: `${__dirname}/../../../csv`
 };
 
 async function run(argv = process.argv.slice(2)): Promise<void> {
@@ -108,6 +107,19 @@ export async function bulkCreate(opts: Opts): Promise<void> {
       isValid = false;
       console.error(err);
     }
+  }
+
+  // Roles tab might contain duplicate pairs (siret/email)
+  // As companyAssociation creations occur in a promise.all(), race conditons can happen and lead to duplicate associations creations
+  const duplicates = roles
+    .map(o => `${o.siret}_${o.email}`)
+    .filter((item, index, strArr) => strArr.indexOf(item) != index);
+
+  if (duplicates.length) {
+    isValid = false;
+    console.log(
+      "The roles tab contains duplicate roles, a given user can't have multiple roles on the same siret"
+    );
   }
 
   if (isValid) {

@@ -111,7 +111,13 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
           >
             {({ values, setFieldValue }) => (
               <FormikForm>
-                <h3>Préparer un transfert multimodal</h3>
+                <h3 className="h3">Préparer un transfert multimodal</h3>
+                <div className="notification success tw-mt-3">
+                  À compléter uniquement en cas de transport multimodal. En cas
+                  de transport simple, vous n'avez rien à faire, c'est à
+                  l'installation de destination ou d'entreposage provisoire de
+                  valider la réception.
+                </div>
                 <h4 className="form__section-heading">Transporteur</h4>
                 <label htmlFor="id_mode">Mode de transport</label>
                 <Field

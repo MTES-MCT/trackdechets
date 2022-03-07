@@ -80,7 +80,49 @@ Deux pages de monitoring sont accessibles:
 
 ## Compatibilité navigateur
 
-Le support des navigateurs est configuré dans le fichier [`./front/.browserslistrc`](./front/.browserslistrc). La liste des navigateurs correspondant à cette config est [la suivante](https://browserl.ist/?q=%3E+0.1%25%2C+not+dead%2C+not+op_mini+all%2C+ie+11)
+Le support des navigateurs est configuré dans le fichier [`./front/.browserslistrc`](./front/.browserslistrc). La liste des navigateurs correspondant à cette config est disponible avec la commande suivante: `npx browserslist ">0.1% not dead not op_mini all ie 11"`
+À l'heure de la mise à jour de ce README.md, la liste est la suivante :
+
+```
+and_chr 98
+and_ff 96
+and_qq 10.4
+and_uc 12.12
+android 4.4.3-4.4.4
+chrome 98
+chrome 97
+chrome 96
+chrome 94
+chrome 93
+chrome 91
+chrome 87
+chrome 83
+chrome 79
+edge 98
+edge 97
+firefox 97
+firefox 96
+ie 11
+ios_saf 15.2-15.3
+ios_saf 15.0-15.1
+ios_saf 14.5-14.8
+ios_saf 14.0-14.4
+ios_saf 13.4-13.7
+ios_saf 12.2-12.5
+ios_saf 6.0-6.1
+opera 83
+opera 82
+safari 15.2-15.3
+safari 15.1
+safari 15
+safari 14.1
+safari 14
+safari 13.1
+samsung 16.0
+samsung 15.0
+samsung 14.0
+samsung 13.0
+```
 
 ## Contribuer
 

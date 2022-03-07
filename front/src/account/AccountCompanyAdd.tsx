@@ -576,7 +576,8 @@ export default function AccountCompanyAdd() {
 
               <div className={styles.field}>
                 <label className={`text-right ${styles.bold}`}>
-                  Identifiant GEREP (optionnel)
+                  Identifiant GEREP (optionnel){" "}
+                  <Tooltip msg="Toute installation de traitement classée et reconnue par l’état (ICPE) et toute entreprise produisant plus de 2 tonnes de déchets et/ou 2000 tonnes de déchets non dangereux est tenue de réaliser annuellement une déclaration d’émissions polluantes et de déchets en ligne. Elle peut le faire via l’application ministérielle web GEREP. Pour ce faire, elle dispose d’un identifiant GEREP." />
                 </label>
                 <div className={styles.field__value}>
                   <Field
@@ -584,16 +585,6 @@ export default function AccountCompanyAdd() {
                     name="gerepId"
                     className={`td-input ${styles.textField}`}
                   />
-                  <div className={styles.smaller}>
-                    Gestion Electronique du Registre des Emissions Polluantes.{" "}
-                    <a
-                      href="https://faq.trackdechets.fr/la-gestion-des-dechets-dangereux#quest-ce-quun-identifiant-gerep"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Plus d'informations sur la FAQ
-                    </a>
-                  </div>
                 </div>
               </div>
 

@@ -65,7 +65,9 @@ export function SignatureEmitter({
       </div>
       <div className="form__row">
         <strong>Conditionnement :</strong>
-        {values.packagingInfos?.map(p => `${p.quantity} ${p.type}`).join(", ")}
+        {values.packagingInfos
+          ?.map(p => `${p.quantity} ${p.type}${p.quantity > 1 ? "(s)" : ""}`)
+          .join(", ")}
       </div>
       <div className="form__row">
         <strong>Poids total :</strong>

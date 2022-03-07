@@ -48,7 +48,7 @@ export const standardMapping = {
 export const INDEX_ALIAS_NAME_SEPARATOR = "-";
 
 export const sireneIndexConfig: IndexProcessConfig = {
-  alias: `stockunitelegale_utf8${INDEX_ALIAS_NAME_SEPARATOR}${
+  alias: `stockunitelegale${INDEX_ALIAS_NAME_SEPARATOR}${
     process.env.NODE_ENV ? process.env.NODE_ENV : "dev"
   }${
     process.env.INDEX_ALIAS_NAME_SUFFIX
@@ -201,7 +201,9 @@ export const bulkIndex = async (
   if (CHUNK_SIZE > body.length) {
     const bulkResponse = await request(body);
     // Collect error data
-    logBulkIndexErrors(bulkResponse.body, body);
+    if (bulkResponse) {
+      logBulkIndexErrors(bulkResponse.body, body);
+    }
     return;
   }
 
@@ -211,7 +213,9 @@ export const bulkIndex = async (
     const slice = body.slice(i, end);
     const bulkResponse = await request(slice);
     // Collect error data
-    logBulkIndexErrors(bulkResponse.body, slice);
+    if (bulkResponse) {
+      logBulkIndexErrors(bulkResponse.body, body);
+    }
   }
 };
 
@@ -230,8 +234,8 @@ export const getWritableParserAndIndexer = (
       const bufferChunk = chunks.map(({ chunk }) => chunk);
       const csvLines: string[] = bufferChunk.toString().split("\n");
       // get columns names in the csv header
-      // pre-suppose that the first column === indexConfig.idKey (eg. "siren" or "siret")
-      if (csvLines[0].startsWith(indexConfig.idKey) && !headers) {
+      // pre-suppose that the first column === "siren" for both files
+      if (csvLines[0].startsWith("siren") && !headers) {
         headers = csvLines[0].split(",");
         csvLines.shift();
       }
@@ -251,20 +255,27 @@ export const getWritableParserAndIndexer = (
           for (let i = 0; i < headers.length; i++) {
             doc[headers[i]] = values[i];
           }
-          return [
-            {
-              index: {
-                _id: doc[indexConfig.idKey],
-                _index: indexName
-                // Next major ES version won't need _type anymore
-                //_type: "_doc"
-              }
-            },
-            doc
-          ];
+          // skip lines without "idKey" column
+          return doc[indexConfig.idKey] !== undefined &&
+            /[0-9]+/.test(doc[indexConfig.idKey])
+            ? [
+                {
+                  index: {
+                    _id: doc[indexConfig.idKey],
+                    _index: indexName,
+                    // Next major ES version won't need _type anymore
+                    _type: "_doc"
+                  }
+                },
+                doc
+              ]
+            : null;
         });
 
-      bulkIndex(body, indexConfig)
+      bulkIndex(
+        body.filter(line => line !== null),
+        indexConfig
+      )
         .then(() => next())
         .catch(err => next(err));
     }

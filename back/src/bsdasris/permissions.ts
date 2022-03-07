@@ -13,7 +13,11 @@ export class InvalidPublicationAttempt extends UserInputError {
   }
 }
 
-export async function isDasriContributor(user: User, dasri: BsdasriSirets) {
+// Don't call directly in resolver to handle permissions
+export async function isDasriContributorHelper(
+  user: User,
+  dasri: BsdasriSirets
+) {
   const userSirets = await getCachedUserSirets(user.id);
   const formSirets = [
     dasri.emitterCompanySiret,
@@ -29,7 +33,7 @@ export async function checkIsBsdasriContributor(
   dasri: BsdasriSirets,
   errorMsg: string
 ) {
-  const isContributor = await isDasriContributor(user, dasri);
+  const isContributor = await isDasriContributorHelper(user, dasri);
 
   if (!isContributor) {
     throw new NotFormContributor(errorMsg);

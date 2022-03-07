@@ -64,7 +64,7 @@ export default function StepsList(props: Props) {
       ? generatePath(routes.dashboard.bsds.follow, { siret })
       : generatePath(routes.dashboard.bsds.drafts, { siret });
 
-  function onSubmit(e, values) {
+  function onSubmit(values) {
     const { temporaryStorageDetail, ecoOrganisme, ...rest } = values;
 
     const formInput = {
@@ -76,10 +76,6 @@ export default function StepsList(props: Props) {
       // discard ecoOrganisme if not selected
       ...(ecoOrganisme?.siret ? { ecoOrganisme } : { ecoOrganisme: null }),
     };
-
-    e.preventDefault();
-    // As we want to be able to save draft, we skip validation on submit
-    // and don't use the classic Formik mechanism
 
     saveForm(formInput)
       .then(_ => history.push(redirectTo))

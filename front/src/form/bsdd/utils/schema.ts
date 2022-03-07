@@ -110,7 +110,7 @@ const packagingInfo: SchemaOf<Omit<
     ),
   quantity: number()
     .required(
-      "Le nombre de colis associé au conditionnement doit être précisé."
+      "Le nombre de colis associés au conditionnement doit être précisé."
     )
     .integer()
     .min(1, "Le nombre de colis doit être supérieur à 0.")
@@ -118,7 +118,7 @@ const packagingInfo: SchemaOf<Omit<
       ["CITERNE", "BENNE"].includes(type)
         ? schema.max(
             2,
-            "Le nombre de benne ou de citerne ne peut être supérieur à 2."
+            "Le nombre de benne(s) ou de citerne(s) ne peut être supérieur à 2."
           )
         : schema
     ),
