@@ -11,7 +11,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ajout d'un client primaire nommé trackdechets dans `companies/sirene` basé sur notre propre index  ElasticSearch des données Sirene INSEE [PR 1214](https://github.com/MTES-MCT/trackdechets/pull/1214)
 - Ajout du caractère dangereux pour des déchets dont le code ne comporte pas d'astérisque [PR 1177](https://github.com/MTES-MCT/trackdechets/pull/1177)
-
 #### :bug: Corrections de bugs
 
 - Correction de l'indexation des filtres d'onglet du tableau de bord [PR 1215](https://github.com/MTES-MCT/trackdechets/pull/1215)
@@ -19,6 +18,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Ajout de la possibilité de visualiser les bordereaux annexés à un bordereau de regroupement. [PR 1227](https://github.com/MTES-MCT/trackdechets/pull/1227)
+- Ajout de la possibilité de visualiser le bordereau de regroupement d'un bordereau annexé. Par API, la lecture de cette information se fait avec le champ `Form.groupedIn`. [PR 1227](https://github.com/MTES-MCT/trackdechets/pull/1227)
+- Calcul automatique du conditionnemnt lors de l'ajout d'annexes 2. [PR 1227](https://github.com/MTES-MCT/trackdechets/pull/1227)
 #### :memo: Documentation
 
 #### :house: Interne
