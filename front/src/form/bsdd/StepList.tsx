@@ -65,7 +65,12 @@ export default function StepsList(props: Props) {
       : generatePath(routes.dashboard.bsds.drafts, { siret });
 
   function onSubmit(values) {
-    const { temporaryStorageDetail, ecoOrganisme, ...rest } = values;
+    const {
+      temporaryStorageDetail,
+      ecoOrganisme,
+      appendix2Forms,
+      ...rest
+    } = values;
 
     const formInput = {
       ...rest,
@@ -75,6 +80,9 @@ export default function StepsList(props: Props) {
         : { temporaryStorageDetail: null }),
       // discard ecoOrganisme if not selected
       ...(ecoOrganisme?.siret ? { ecoOrganisme } : { ecoOrganisme: null }),
+      ...(appendix2Forms?.length
+        ? { appendix2Forms: appendix2Forms.map(f => ({ id: f.id })) }
+        : {}),
     };
 
     saveForm(formInput)

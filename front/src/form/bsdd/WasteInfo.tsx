@@ -6,8 +6,8 @@ import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { connect, Field } from "formik";
 import { isDangerous } from "generated/constants";
 import React from "react";
+import Appendix2MultiSelect from "./components/appendix/Appendix2MultiSelect";
 import AppendixInfo from "./components/appendix/AppendixInfo";
-import FormsSelector from "./components/appendix/FormsSelector";
 import Packagings from "./components/packagings/Packagings";
 import { WasteCodeSelect, wasteCodeValidator } from "./components/waste-code";
 import "./WasteInfo.scss";
@@ -107,7 +107,19 @@ export default connect<{}, Values>(function WasteInfo(props) {
       {values.emitter.type === "APPENDIX1" && <AppendixInfo />}
 
       {values.emitter.type === "APPENDIX2" && (
-        <FormsSelector name="appendix2Forms" />
+        <>
+          <h4 className="form__section-heading">Annexe 2</h4>
+          <p className="tw-my-2">
+            Vous êtes en train de créer un bordereau de regroupement. Veuillez
+            sélectionner ci-dessous les bordereaux à regrouper.
+          </p>
+          <p className="tw-my-2">
+            Tous les bordereaux présentés ci-dessous correspondent à des
+            bordereaux pour lesquels vous avez effectué une opération de
+            traitement de type D 13, D 14, D 15 ou R 13.
+          </p>
+          <Appendix2MultiSelect />
+        </>
       )}
 
       <h4 className="form__section-heading">Conditionnement</h4>

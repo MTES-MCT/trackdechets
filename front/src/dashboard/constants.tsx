@@ -1,4 +1,4 @@
-import { TransportMode } from "generated/graphql/types";
+import { EmitterType, TransportMode } from "generated/graphql/types";
 
 export const statusLabels: { [key: string]: string } = {
   DRAFT: "Brouillon",
@@ -39,3 +39,12 @@ export function getTransportModeLabel(mode: string | null | undefined) {
 }
 
 export type BsdTypename = "Form" | "Bsdasri" | "Bsvhu" | "Bsda" | "Bsff";
+
+export const emitterTypeLabels = {
+  [EmitterType.Producer]: "Producteur du déchet",
+  [EmitterType.Other]: "Autre détenteur",
+  [EmitterType.Appendix2]:
+    "Personne ayant transformé ou réalisé un traitement dont la provenance reste identifiable",
+  [EmitterType.Appendix1]:
+    "Collecteur de petites quantités de déchets relevant d’une même rubrique",
+};

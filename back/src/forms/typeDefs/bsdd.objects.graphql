@@ -99,8 +99,11 @@ type Form {
   "Destination ultérieure prévue (case 12)"
   nextDestination: NextDestination
 
-  "Annexe 2"
+  "Bordereaux que celui-ci regroupe (Annexe 2)"
   appendix2Forms: [Appendix2Form!]
+
+  "Bordereau dans lequel celui-ci est regroupé (Annexe 2)"
+  groupedIn: Form
 
   ecoOrganisme: FormEcoOrganisme
 

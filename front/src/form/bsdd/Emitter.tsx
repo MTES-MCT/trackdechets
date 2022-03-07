@@ -2,11 +2,16 @@ import CompanySelector from "form/common/components/company/CompanySelector";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useFormikContext } from "formik";
 import { Form } from "generated/graphql/types";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import EcoOrganismes from "./components/eco-organismes/EcoOrganismes";
 import WorkSite from "form/common/components/work-site/WorkSite";
-import { getInitialEmitterWorkSite } from "form/bsdd/utils/initial-state";
+import {
+  getInitialCompany,
+  getInitialEmitterWorkSite,
+} from "form/bsdd/utils/initial-state";
 import "./Emitter.scss";
+import MyCompanySelector from "form/common/components/company/MyCompanySelector";
+import { emitterTypeLabels } from "dashboard/constants";
 
 export default function Emitter() {
   const { values, setFieldValue } = useFormikContext<Form>();
@@ -23,6 +28,19 @@ export default function Emitter() {
     }
     setLockEmitterType(false);
   }, [values.ecoOrganisme, setFieldValue]);
+
+  const emitterType = useMemo(() => values.emitter?.type, [values.emitter]);
+
+  useEffect(() => {
+    // make sure appendix2 forms is empty when emitter type is not APPENDIX2
+    if (emitterType !== "APPENDIX2" && values.appendix2Forms?.length) {
+      setFieldValue("appendix2Forms", []);
+    }
+    // make sure to remove favorite company when emitter type is set to APPENDIX2
+    if (emitterType === "APPENDIX2") {
+      setFieldValue("emitter.company", getInitialCompany());
+    }
+  }, [emitterType, values.appendix2Forms, setFieldValue]);
 
   return (
     <>
@@ -52,21 +70,21 @@ export default function Emitter() {
           <Field
             name="emitter.type"
             id="PRODUCER"
-            label="Producteur du déchet"
+            label={emitterTypeLabels["PRODUCER"]}
             component={RadioButton}
             disabled={lockEmitterType}
           />
           <Field
             name="emitter.type"
             id="OTHER"
-            label="Autre détenteur"
+            label={emitterTypeLabels["OTHER"]}
             component={RadioButton}
             disabled={lockEmitterType}
           />
           <Field
             name="emitter.type"
             id="APPENDIX2"
-            label="Personne ayant transformé ou réalisé un traitement dont la provenance reste identifiable"
+            label={emitterTypeLabels["APPENDIX2"]}
             component={RadioButton}
             disabled={lockEmitterType}
           />
@@ -74,14 +92,24 @@ export default function Emitter() {
           <Field
             name="emitter.type"
             id="APPENDIX1"
-            label="Collecteur de petites quantités de déchets relevant d’une même rubrique"
+            label={emitterTypeLabels["APPENDIX1"]}
             component={RadioButton}
             disabled={lockEmitterType}
           />
         </fieldset>
       </div>
 
-      <CompanySelector name="emitter.company" heading="Entreprise émettrice" />
+      {values.emitter?.type === "APPENDIX2" ? (
+        <div className="tw-my-6">
+          <h4 className="form__section-heading">Entreprise émettrice</h4>
+          <MyCompanySelector fieldName="emitter.company" />
+        </div>
+      ) : (
+        <CompanySelector
+          name="emitter.company"
+          heading="Entreprise émettrice"
+        />
+      )}
 
       <WorkSite
         switchLabel="Je souhaite ajouter une adresse de chantier ou de collecte"
