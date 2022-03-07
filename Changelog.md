@@ -15,7 +15,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Correction de l'adresse chantier incomplète dans le registre [PR 1238](https://github.com/MTES-MCT/trackdechets/pull/1238)
 - Correction de l'indexation des filtres d'onglet du tableau de bord [PR 1215](https://github.com/MTES-MCT/trackdechets/pull/1215)
-
+- Correction d'un bug de corruption de la structure du payload renvoyé par l'API en présence des caractères spéciaux "<" et ">" [PR 1250](https://github.com/MTES-MCT/trackdechets/pull/1250)
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
@@ -30,7 +30,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
-- Ajout d'une commande de réindexation unitaire d'un bsd 
+- Ajout d'une commande de réindexation unitaire d'un bsd
 - Ajout d'une section dans "Mon Compte" permettant de créer, modifier et supprimer une application OAuth2 [PR 1244](https://github.com/MTES-MCT/trackdechets/pull/1244)
 
 # [2022.02.1] 21/02/2022
