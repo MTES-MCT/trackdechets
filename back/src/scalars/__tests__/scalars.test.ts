@@ -116,15 +116,12 @@ describe("String", () => {
 
   const typeDefs = gql`
     scalar String
-
     type Foo {
       bar: String
     }
-
     type Query {
       foo: Foo
     }
-
     type Mutation {
       createFoo(bar: String!): Foo
     }
