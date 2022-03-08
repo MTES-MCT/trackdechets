@@ -37,7 +37,7 @@ describe("graphqlBatchLimiterMiddleware", () => {
       .post(graphQLPath)
       .set("Content-Type", "application/json")
       .send(body);
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(400);
     expect(response.text).toContain(
       "Batching is limited to 5 operations per request."
     );

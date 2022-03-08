@@ -45,4 +45,30 @@ describe("Perform api requests", () => {
     expect(body.data.me.email).toEqual("yes");
     expect(body.data.me.isAdmin).toEqual(false);
   });
+
+  it("should allow batch operations", async () => {
+    const { user, accessToken } = await userWithAccessTokenFactory();
+
+    const res = await request
+      .post("/")
+      .type("application/json")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send([{ query: "{ me { email }}" }]);
+
+    expect(res.body[0].data.me.email).toEqual(user.email);
+  });
+
+  it("should limit the number of possible batch operations", async () => {
+    const { user, accessToken } = await userWithAccessTokenFactory();
+
+    const res = await request
+      .post("/")
+      .type("application/json")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send([...Array(10)].map(_ => ({ query: "{ me { email }}" })));
+
+    expect(res.body.error).toEqual(
+      "Batching is limited to 5 operations per request."
+    );
+  });
 });
