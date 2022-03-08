@@ -81,10 +81,11 @@ export default function Dashboard() {
   }
 
   const companies = data.me.companies;
+  const currentCompany = companies.find(company => company.siret === siret);
 
   // if the user is not part of the company whose siret is in the url
   // redirect them to their first company or account if they're not part of any company
-  if (!companies.find(company => company.siret === siret)) {
+  if (currentCompany == null) {
     return (
       <Redirect
         to={
@@ -103,7 +104,10 @@ export default function Dashboard() {
       <OnboardingSlideshow />
       <div id="dashboard" className="dashboard">
         <SideMenu>
-          <DashboardTabs siret={siret} me={data.me} />
+          <DashboardTabs
+            currentCompany={currentCompany}
+            companies={companies}
+          />
         </SideMenu>
 
         <div className="dashboard-content">
