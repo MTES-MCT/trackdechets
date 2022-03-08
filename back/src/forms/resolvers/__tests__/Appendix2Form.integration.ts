@@ -1,5 +1,5 @@
 import { CompanyType, Status, UserRole } from "@prisma/client";
-import { gql } from "apollo-server-express";
+import { Query } from "../../../generated/graphql/types";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   companyFactory,
@@ -8,7 +8,7 @@ import {
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 
-const FORM = gql`
+const FORM = `
   query Form($id: ID!) {
     form(id: $id) {
       appendix2Forms {
@@ -20,8 +20,7 @@ const FORM = gql`
         }
       }
     }
-  }
-`;
+  }`;
 
 describe("Appendix2Form", () => {
   afterAll(resetDatabase);
@@ -60,14 +59,11 @@ describe("Appendix2Form", () => {
 
     // destination cannot access appendix2.emitter
     const { query } = makeClient(destinationUser);
-    const { errors } = await query(FORM, {
-      variables: { id: regroupement.id }
+    const { data } = await query<Pick<Query, "form">>(FORM, {
+      variables: {
+        id: regroupement.id
+      }
     });
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message:
-          "Vous ne pouvez pas accéder au champ `emitter` de cette annexe 2 car votre SIRET apparait uniquement sur le bordereau de regroupement"
-      })
-    ]);
+    expect(data.form.appendix2Forms[0]).toMatchObject({ emitter: null });
   });
 });
