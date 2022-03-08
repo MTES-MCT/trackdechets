@@ -21,27 +21,27 @@ const OPTIONS = [
   {
     value: BsdType.Bsdd,
     Icon: IconBSDD,
-    label: "Déchets dangereux",
+    label: "Déchets Dangereux",
   },
   {
     value: BsdType.Bsdasri,
     Icon: IconBSDasri,
-    label: "DASRIs",
+    label: "Déchets d'Activités de Soins à Risque Infectieux",
   },
   {
     value: BsdType.Bsvhu,
     Icon: IconBSVhu,
-    label: "VHUs",
+    label: "Véhicules Hors d'Usage",
   },
   {
     value: BsdType.Bsff,
     Icon: IconBSFF,
-    label: "BSFFs",
+    label: "Déchets de Fluides Frigorigènes",
   },
   {
     value: BsdType.Bsda,
     Icon: IconBSDa,
-    label: "BSDAs",
+    label: "Déchets d'Amiante",
   },
 ];
 

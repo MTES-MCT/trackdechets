@@ -8,6 +8,7 @@ import { EventType } from "../../workflow/types";
 import { expandFormFromDb } from "../../form-converter";
 import { TemporaryStorageCannotReceive } from "../../errors";
 import prisma from "../../../prisma";
+import { getFormRepository } from "../../repository";
 
 const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   parent,
@@ -18,13 +19,14 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   const { id, receivedInfo } = args;
   const form = await getFormOrFormNotFound({ id });
   await checkCanMarkAsReceived(user, form);
+  const formRepository = getFormRepository(user);
 
   if (form.recipientIsTempStorage === true) {
     // this form can be mark as received only if it has been
     // taken over by the transporter after temp storage
-    const temporaryStorageDetail = await prisma.form
-      .findUnique({ where: { id: form.id } })
-      .temporaryStorageDetail();
+    const { temporaryStorageDetail } = await formRepository.findFullFormById(
+      form.id
+    );
 
     if (!temporaryStorageDetail?.signedAt) {
       throw new TemporaryStorageCannotReceive();

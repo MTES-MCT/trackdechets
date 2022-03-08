@@ -32,8 +32,8 @@ export INSEE_SIRENE_ZIP_PATH=~/Téléchargements/StockUniteLegale_utf8.zip
 npm run index:dev
 ```
 
-Au final, vous disposez de l'index "stocketablissement_utf8-dev" où les données d'unité légale de l'index Siren (`http://localhost:9201/stockunitelegale_utf8-dev/_search`) ont été dupliquées:
-`http://localhost:9201/stocketablissement_utf8-dev/_search`
+Au final, vous disposez de l'index "stocketablissement-dev" où les données d'unité légale de l'index Siren (`http://localhost:9201/stockunitelegale-dev/_search`) ont été dupliquées:
+`http://localhost:9201/stocketablissement-dev/_search`
 
 Ces index sont des alias et les commandes se chargent de faire un roulement des index à la fin du processus pour ne pas couper le service de l'index en cours de mise à jour.
 

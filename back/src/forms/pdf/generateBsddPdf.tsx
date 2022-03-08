@@ -5,7 +5,6 @@ import {
   Consistence,
   QuantityType,
   WasteAcceptationStatus,
-  TransportMode,
   EmitterType
 } from "@prisma/client";
 import * as QRCode from "qrcode";
@@ -380,7 +379,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             <p>
               <strong>
                 2. Installation de destination ou d’entreposage ou de
-                reconditionnement prévu
+                reconditionnement prévue
               </strong>
             </p>
             <p>
@@ -417,11 +416,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               Déchet dangereux :{" "}
               <input
                 type="checkbox"
-                checked={
-                  form.wasteDetails?.code
-                    ? isDangerous(form.wasteDetails?.code)
-                    : false
-                }
+                checked={form.wasteDetails?.isDangerous}
                 readOnly
               />{" "}
               oui{" "}
@@ -590,7 +585,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               </strong>
             </p>
             <p>
-              Quantité réelle présentées : {form.quantityReceived} tonne(s)
+              Quantité réelle présentée : {form.quantityReceived} tonne(s)
               <br />
               Date de présentation : {formatDate(form.receivedAt)}
             </p>
@@ -879,9 +874,16 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                       <td>{appendix2Form?.readableId}</td>
                       <td>{appendix2Form?.wasteDetails?.code}</td>
                       <td>{appendix2Form?.wasteDetails?.name}</td>
-                      <td>{appendix2Form?.wasteDetails?.quantity}</td>
                       <td>
-                        {appendix2Form?.wasteDetails?.quantityType?.charAt(0)}
+                        {appendix2Form?.quantityReceived ??
+                          appendix2Form?.wasteDetails?.quantity}
+                      </td>
+                      <td>
+                        {appendix2Form?.quantityReceived
+                          ? "R"
+                          : appendix2Form?.wasteDetails?.quantityType?.charAt(
+                              0
+                            )}
                       </td>
                       <td>{formatDate(appendix2Form?.signedAt)}</td>
                       <td>{appendix2Form?.emitterPostalCode}</td>

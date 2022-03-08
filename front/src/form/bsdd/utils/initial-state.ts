@@ -155,6 +155,7 @@ export function getInitialState(f?: Form | null): FormInput {
       quantityType: f?.wasteDetails?.quantityType ?? QuantityType.Estimated,
       consistence: f?.wasteDetails?.consistence ?? Consistence.Solid,
       pop: f?.wasteDetails?.pop ?? false,
+      isDangerous: f?.wasteDetails?.isDangerous ?? false,
       packagings: null, // deprecated
       otherPackaging: null, // deprecated
       numberOfPackages: null, // deprecated

@@ -66,11 +66,7 @@ export default function BsvhuStepsList(props: Props) {
       : createVhuForm({ variables: { input } });
   }
 
-  function onSubmit(e, values) {
-    e.preventDefault();
-    // As we want to be able to save draft, we skip validation on submit
-    // and don't use the classic Formik mechanism
-
+  function onSubmit(values) {
     const { id, ...input } = values;
     saveForm(input)
       .then(_ => {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   NavLink,
   Link,
@@ -17,12 +17,12 @@ import { useQuery, gql } from "@apollo/client";
 import Loader from "common/components/Loaders";
 import { InlineError } from "common/components/Error";
 import { Query } from "generated/graphql/types";
-import { DashboardNav } from "dashboard/DashboardNavigation";
 
 import routes from "common/routes";
 import { DEVELOPERS_DOCUMENTATION_URL, MEDIA_QUERIES } from "common/config";
 import styles from "./Header.module.scss";
 import { useMedia } from "use-media";
+import { DashboardTabs } from "dashboard/DashboardTabs";
 
 export const GET_ME = gql`
   {
@@ -44,20 +44,13 @@ export const GET_ME = gql`
  * Navigation subset to be included in the moble slidning panel nav
  * Contains main navigation items from the desktop top level nav (Dashboard, Account etc.)
  */
-function MobileSubNav({ currentSiret, onClick }) {
-  const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME, {});
+function MobileSubNav({ currentSiret }) {
+  const { error, data } = useQuery<Pick<Query, "me">>(GET_ME, {});
 
-  if (loading) return <Loader />;
   if (error) return <InlineError apolloError={error} />;
-  return (
-    <DashboardNav
-      currentSiret={currentSiret}
-      onClick={onClick}
-      loading={loading}
-      error={error}
-      data={data}
-    />
-  );
+  if (data?.me == null) return <Loader />;
+
+  return <DashboardTabs siret={currentSiret} me={data.me} />;
 }
 
 const getMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
@@ -174,12 +167,23 @@ export default withRouter(function Header({
   isAuthenticated,
   isAdmin,
   location,
+  history,
 }: RouteComponentProps & HeaderProps) {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [menuHidden, toggleMenu] = useState(true);
 
   const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
-  const closeMobileMenu = () => isMobile && toggleMenu(true);
+  const closeMobileMenu = React.useCallback(
+    () => isMobile && toggleMenu(true),
+    [isMobile, toggleMenu]
+  );
+
+  useEffect(() => {
+    return history.listen(() => {
+      closeMobileMenu();
+    });
+  }, [history, closeMobileMenu]);
+
   const matchAccount = matchPath(location.pathname, {
     path: routes.account.index,
     exact: false,
@@ -202,12 +206,9 @@ export default withRouter(function Header({
       return null;
     }
     return !!matchAccount ? (
-      <AccountMenuContent mobileCallback={() => closeMobileMenu()} />
+      <AccountMenuContent />
     ) : (
-      <MobileSubNav
-        currentSiret={currentSiret}
-        onClick={() => closeMobileMenu()}
-      />
+      <MobileSubNav currentSiret={currentSiret} />
     );
   };
 

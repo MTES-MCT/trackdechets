@@ -1,11 +1,10 @@
-import prisma from "../../../prisma";
+import { Status } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import * as elastic from "../../../common/elastic";
 import { getFormOrFormNotFound } from "../../database";
 import { expandFormFromDb } from "../../form-converter";
 import { checkCanDelete } from "../../permissions";
-import { Status } from "@prisma/client";
+import { getFormRepository } from "../../repository";
 
 const deleteFormResolver: MutationResolvers["deleteForm"] = async (
   parent,
@@ -18,26 +17,17 @@ const deleteFormResolver: MutationResolvers["deleteForm"] = async (
 
   await checkCanDelete(user, form);
 
-  const appendix2Forms = await prisma.form.findMany({
-    where: { appendix2RootFormId: form.id }
-  });
-
-  const deletedForm = await prisma.form.update({
-    where: { id },
-    data: { isDeleted: true, appendix2Forms: { set: [] } }
-  });
+  const formRepository = getFormRepository(user);
+  const appendix2Forms = await formRepository.findAppendix2FormsById(id);
+  const deletedForm = await formRepository.delete({ id });
 
   if (appendix2Forms.length) {
     // roll back status changes to appendixes 2
-    await prisma.form.updateMany({
-      where: { id: { in: appendix2Forms.map(f => f.id) } },
-      data: { status: Status.AWAITING_GROUP }
-    });
+    await formRepository.updateMany(
+      appendix2Forms.map(f => f.id),
+      { status: Status.AWAITING_GROUP }
+    );
   }
-
-  // TODO: create a statusLog
-
-  await elastic.deleteBsd(deletedForm, context);
 
   return expandFormFromDb(deletedForm);
 };

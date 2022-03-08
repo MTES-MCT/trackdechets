@@ -16,7 +16,6 @@ import routes from "common/routes";
 import { Modal } from "common/components";
 import Loader from "../common/components/Loaders";
 import "./Dashboard.scss";
-import DashboardMenu from "./DashboardMenu";
 import Exports from "./exports/Exports";
 import { OnboardingSlideshow } from "./components/OnboardingSlideshow";
 import { ExtraSignatureType } from "dashboard/components/BSDList/BSDasri/types";
@@ -41,6 +40,8 @@ import {
 import { RouteTransportToCollect, RouteTransportCollected } from "./transport";
 import { RouteBsdsReview } from "./bsds/review";
 import { RouteBsddRequestRevision } from "./components/RevisionRequestList/bsdd/request/RouteBsddRequestRevision";
+import { DashboardTabs } from "./DashboardTabs";
+import SideMenu from "common/components/SideMenu";
 
 export const GET_ME = gql`
   {
@@ -101,16 +102,9 @@ export default function Dashboard() {
     <>
       <OnboardingSlideshow />
       <div id="dashboard" className="dashboard">
-        <DashboardMenu
-          me={data.me}
-          handleCompanyChange={siret =>
-            history.push(
-              generatePath(routes.dashboard.bsds.drafts, {
-                siret,
-              })
-            )
-          }
-        />
+        <SideMenu>
+          <DashboardTabs siret={siret} me={data.me} />
+        </SideMenu>
 
         <div className="dashboard-content">
           <Switch location={backgroundLocation ?? location}>

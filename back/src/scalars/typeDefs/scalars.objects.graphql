@@ -6,6 +6,10 @@ formattées selon le standard ISO 8601. Exemples:
 - "yyyy-MM-ddTHH:mm:ssX" (eg. 2020-11-23T13:34:55Z)
 - "yyyy-MM-dd'T'HH:mm:ss.SSS" (eg. 2020-11-23T13:34:55.987)
 - "yyyy-MM-dd'T'HH:mm:ss.SSSX" (eg. 2020-11-23T13:34:55.987Z)
+
+Si aucune information de timezone n'est renseignée,
+c'est le fuseau horaire de Paris qui sera automatiquement utilisé (CET ou CEST).
+Eg. 2020-11-23T00:00:00 sera interprété comme 2020-11-22T23:00:00Z (CET) ou 2020-11-22T22:00:00Z (CEST).
 """
 scalar DateTime
 

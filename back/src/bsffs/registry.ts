@@ -57,6 +57,9 @@ function toGenericWaste(bsff: Bsff): GenericWaste {
     destinationReceptionAcceptationStatus:
       bsff.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsff.destinationOperationSignatureDate,
+    destinationReceptionWeight: bsff.destinationReceptionWeight
+      ? bsff.destinationReceptionWeight / 1000
+      : bsff.destinationReceptionWeight,
     transporterRecepisseIsExempted: false,
     wasteAdr: bsff.wasteAdr,
     workerCompanyName: null,
@@ -110,9 +113,6 @@ export function toIncomingWaste(
     destinationCompanySiret: bsff.destinationCompanySiret,
     destinationCompanyAddress: bsff.destinationCompanyAddress,
     destinationReceptionDate: bsff.destinationReceptionDate,
-    destinationReceptionWeight: bsff.destinationReceptionWeight
-      ? bsff.destinationReceptionWeight / 1000
-      : bsff.destinationReceptionWeight,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
@@ -325,9 +325,6 @@ export function toManagedWaste(
     destinationCompanySiret: bsff.destinationCompanySiret,
     destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
-    destinationReceptionWeight: bsff.destinationReceptionWeight
-      ? bsff.destinationReceptionWeight / 1000
-      : bsff.destinationReceptionWeight,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
@@ -396,9 +393,6 @@ export function toAllWaste(
     destinationOperationCode: bsff.destinationOperationCode,
     destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
-    destinationReceptionWeight: bsff.destinationReceptionWeight
-      ? bsff.destinationReceptionWeight / 1000
-      : bsff.destinationReceptionWeight,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,

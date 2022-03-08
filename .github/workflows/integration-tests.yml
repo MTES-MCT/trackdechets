@@ -16,6 +16,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run integration tests
+        env:
+          TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
+          TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
+
         run: |
           chmod +x ./run.sh
           ./run.sh -c ${{ matrix.chunk }}-${{ strategy.job-total }}

@@ -7,7 +7,7 @@ title: Introduction à GraphQL
 
 Dans le standard REST, la méthode de requête HTTP (`GET`, `POST`, `PUT`, `DELETE`) détermine le type d'opération. Dans le standard GraphQL, un contenu de requête JSON est passé que ce soit pour une `query` ou une `mutation`, la méthode de requête est donc toujours `POST`. La seule exception est la requête d'introspection qui est un simple `GET` sur le point de terminaison GraphQL.
 
-Toutes les requêtes se font sur un point de terminaison unique à la [racine de l'API](../reference/environments/environments)
+Toutes les requêtes se font sur un point de terminaison unique à la [racine de l'API](../reference/environments/environments.mdx)
 
 Pour faire une requête GraphQL en utilisant cURL, vous devez faire un `POST` avec un corps JSON. Le corps de la requête doit contenir une chaine de caractères appelée `query`.
 

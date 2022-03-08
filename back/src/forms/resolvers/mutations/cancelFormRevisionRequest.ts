@@ -2,9 +2,9 @@ import { RevisionRequestStatus } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationCancelFormRevisionRequestArgs } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
+import { getFormRepository } from "../../repository";
 
 export default async function cancelFormRevisionRequest(
   _,
@@ -12,9 +12,9 @@ export default async function cancelFormRevisionRequest(
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
-  const revisionRequest = await prisma.bsddRevisionRequest.findUnique({
-    where: { id }
-  });
+  const formRepository = await getFormRepository(user);
+
+  const revisionRequest = await formRepository.getRevisionRequestById(id);
 
   if (!revisionRequest) {
     throw new UserInputError("Révision introuvable.");
@@ -36,6 +36,6 @@ export default async function cancelFormRevisionRequest(
     throw new ForbiddenError("Vous n'êtes pas l'auteur de cette révision.");
   }
 
-  await prisma.bsddRevisionRequest.delete({ where: { id } });
+  await formRepository.cancelRevisionRequest({ id });
   return true;
 }

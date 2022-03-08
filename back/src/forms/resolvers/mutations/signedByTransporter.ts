@@ -1,5 +1,4 @@
 import { UserInputError } from "apollo-server-express";
-import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
@@ -18,6 +17,7 @@ import {
 } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
+import { getFormRepository } from "../../repository";
 
 const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
   async (parent, args, context) => {
@@ -76,9 +76,9 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       // check security code is temp storer's
       await checkSecurityCode(form.recipientCompanySiret, securityCode);
 
-      const temporaryStorageDetail = await prisma.form
-        .findUnique({ where: { id } })
-        .temporaryStorageDetail();
+      const { temporaryStorageDetail } = await getFormRepository(
+        user
+      ).findFullFormById(id);
 
       const hasWasteDetailsOverride =
         !!temporaryStorageDetail.wasteDetailsQuantity;

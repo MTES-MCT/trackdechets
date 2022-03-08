@@ -59,6 +59,9 @@ function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
     destinationReceptionAcceptationStatus:
       bsdasri.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsdasri.destinationOperationDate,
+    destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
+      ? bsdasri.destinationReceptionWasteWeightValue / 1000
+      : bsdasri.destinationReceptionWasteWeightValue,
     transporterRecepisseIsExempted: false,
     wasteAdr: bsdasri.wasteAdr,
     workerCompanyName: null,
@@ -97,9 +100,6 @@ export function toIncomingWaste(
     destinationCompanySiret: bsdasri.destinationCompanySiret,
     destinationCompanyAddress: bsdasri.destinationCompanyAddress,
     destinationReceptionDate: bsdasri.destinationReceptionDate,
-    destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
-      ? bsdasri.destinationReceptionWasteWeightValue / 1000
-      : bsdasri.destinationReceptionWasteWeightValue,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
@@ -288,9 +288,6 @@ export function toManagedWaste(
     destinationCompanySiret: bsdasri.destinationCompanySiret,
     destinationPlannedOperationCode: bsdasri.destinationOperationCode,
     destinationPlannedOperationMode: null,
-    destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
-      ? bsdasri.destinationReceptionWasteWeightValue / 1000
-      : bsdasri.destinationReceptionWasteWeightValue,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
@@ -349,9 +346,6 @@ export function toAllWaste(
     destinationOperationCode: bsdasri.destinationOperationCode,
     destinationPlannedOperationCode: bsdasri.destinationOperationCode,
     destinationPlannedOperationMode: null,
-    destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
-      ? bsdasri.destinationReceptionWasteWeightValue / 1000
-      : bsdasri.destinationReceptionWasteWeightValue,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,

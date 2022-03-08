@@ -1,11 +1,10 @@
 import { searchCompany as searchCompanyInsee } from "./insee/client";
 import { searchCompany as searchCompanyDataGouv } from "./entreprise.data.gouv.fr/client";
 import { searchCompany as searchCompanySocialGouv } from "./social.gouv/client";
+import { searchCompany as searchCompanyTD } from "./trackdechets/client";
 import { backoffIfTooManyRequests, throttle } from "./ratelimit";
 import { redundant } from "./redundancy";
 import { cache } from "./cache";
-
-const { INSEE_MAINTENANCE } = process.env;
 
 const searchCompanyInseeThrottled = backoffIfTooManyRequests(
   searchCompanyInsee,
@@ -27,9 +26,10 @@ const searchCompanySocialGouvThrottled = throttle(searchCompanySocialGouv, {
 // list different implementations of searchCompany by
 // order of priority.
 const searchCompanyProviders = [
-  ...(INSEE_MAINTENANCE === "true" ? [] : [searchCompanyInseeThrottled]),
-  searchCompanySocialGouvThrottled,
-  searchCompanyDataGouvThrottled
+  searchCompanyTD,
+  searchCompanyInseeThrottled,
+  searchCompanyDataGouvThrottled,
+  searchCompanySocialGouvThrottled
 ];
 
 /**

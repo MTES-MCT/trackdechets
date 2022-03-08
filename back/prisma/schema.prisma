@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -129,12 +130,12 @@ enum ApplicationGoal {
 
 model AccessToken {
   id            String       @id @default(cuid())
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  createdAt     DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime     @updatedAt @db.Timestamptz(6)
   token         String       @unique
   description   String?
   isRevoked     Boolean      @default(false)
-  lastUsed      DateTime?
+  lastUsed      DateTime?    @db.Timestamptz(6)
   applicationId String?
   application   Application? @relation(fields: [applicationId], references: [id])
   userId        String
@@ -142,15 +143,15 @@ model AccessToken {
 }
 
 model Application {
-  id           String          @id @default(cuid())
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  id           String           @id @default(cuid())
+  createdAt    DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime         @updatedAt @db.Timestamptz(6)
   clientSecret String
   name         String
   goal         ApplicationGoal?
   logoUrl      String?
   redirectUris String[]
-  admin        User?           @relation(fields: [adminId], references: [id])
+  admin        User?            @relation(fields: [adminId], references: [id])
   adminId      String?
   AccessToken  AccessToken[]
   Grant        Grant[]
@@ -159,14 +160,14 @@ model Application {
 model Company {
   id                                   String                    @id @default(cuid())
   siret                                String                    @unique
-  updatedAt                            DateTime                  @updatedAt
-  createdAt                            DateTime                  @default(now())
+  updatedAt                            DateTime                  @updatedAt @db.Timestamptz(6)
+  createdAt                            DateTime                  @default(now()) @db.Timestamptz(6)
   securityCode                         Int
   verificationCode                     String
   verificationStatus                   CompanyVerificationStatus @default(TO_BE_VERIFIED)
   verificationMode                     CompanyVerificationMode?
   verificationComment                  String?
-  verifiedAt                           DateTime?
+  verifiedAt                           DateTime?                 @db.Timestamptz(6)
   name                                 String?
   address                              String?
   longitude                            Float?
@@ -248,8 +249,8 @@ model EcoOrganisme {
 
 model Form {
   id                                 String                  @id @default(cuid())
-  createdAt                          DateTime                @default(now())
-  updatedAt                          DateTime                @updatedAt
+  createdAt                          DateTime                @default(now()) @db.Timestamptz(6)
+  updatedAt                          DateTime                @updatedAt @db.Timestamptz(6)
   emitterType                        EmitterType?
   emitterPickupSite                  String?
   emitterCompanyName                 String?
@@ -274,7 +275,7 @@ model Form {
   transporterCompanyMail             String?
   transporterReceipt                 String?
   transporterDepartment              String?
-  transporterValidityLimit           DateTime?
+  transporterValidityLimit           DateTime?               @db.Timestamptz(6)
   transporterNumberPlate             String?
   transporterTransportMode           TransportMode?          @default(ROAD)
   wasteDetailsCode                   String?
@@ -283,12 +284,13 @@ model Form {
   wasteDetailsQuantity               Float?
   wasteDetailsQuantityType           QuantityType?
   wasteDetailsPop                    Boolean                 @default(false)
+  wasteDetailsIsDangerous            Boolean                 @default(false)
   readableId                         String                  @unique
   status                             Status                  @default(DRAFT)
-  sentAt                             DateTime?
+  sentAt                             DateTime?               @db.Timestamptz(6)
   sentBy                             String?
   isAccepted                         Boolean?                @default(false)
-  receivedAt                         DateTime?
+  receivedAt                         DateTime?               @db.Timestamptz(6)
   quantityReceived                   Float?
   processingOperationDone            String?
   wasteDetailsName                   String?
@@ -296,7 +298,7 @@ model Form {
   receivedBy                         String?
   wasteDetailsConsistence            Consistence?
   processedBy                        String?
-  processedAt                        DateTime?
+  processedAt                        DateTime?               @db.Timestamptz(6)
   nextDestinationProcessingOperation String?
   traderCompanyName                  String?
   traderCompanySiret                 String?
@@ -306,7 +308,7 @@ model Form {
   traderCompanyMail                  String?
   traderReceipt                      String?
   traderDepartment                   String?
-  traderValidityLimit                DateTime?
+  traderValidityLimit                DateTime?               @db.Timestamptz(6)
   brokerCompanyName                  String?
   brokerCompanySiret                 String?
   brokerCompanyAddress               String?
@@ -315,7 +317,7 @@ model Form {
   brokerCompanyMail                  String?
   brokerReceipt                      String?
   brokerDepartment                   String?
-  brokerValidityLimit                DateTime?
+  brokerValidityLimit                DateTime?               @db.Timestamptz(6)
   processingOperationDescription     String?
   noTraceability                     Boolean?
   signedByTransporter                Boolean?
@@ -336,7 +338,7 @@ model Form {
   emitterWorkSiteInfos               String?
   transporterCustomInfo              String?
   recipientIsTempStorage             Boolean?                @default(false)
-  signedAt                           DateTime?
+  signedAt                           DateTime?               @db.Timestamptz(6)
   currentTransporterSiret            String?
   nextTransporterSiret               String?
   nextDestinationCompanyCountry      String?
@@ -372,8 +374,8 @@ enum RevisionRequestStatus {
 
 model BsddRevisionRequest {
   id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   bsddId             String
   bsdd               Form    @relation(fields: [bsddId], references: [id])
@@ -395,7 +397,7 @@ model BsddRevisionRequest {
   brokerCompanyMail                              String?
   brokerReceipt                                  String?
   brokerDepartment                               String?
-  brokerValidityLimit                            DateTime?
+  brokerValidityLimit                            DateTime? @db.Timestamptz(6)
   traderCompanyName                              String?
   traderCompanySiret                             String?
   traderCompanyAddress                           String?
@@ -404,7 +406,7 @@ model BsddRevisionRequest {
   traderCompanyMail                              String?
   traderReceipt                                  String?
   traderDepartment                               String?
-  traderValidityLimit                            DateTime?
+  traderValidityLimit                            DateTime? @db.Timestamptz(6)
   temporaryStorageDestinationCap                 String?
   temporaryStorageDestinationProcessingOperation String?
 
@@ -425,8 +427,8 @@ enum RevisionRequestApprovalStatus {
 
 model BsddRevisionRequestApproval {
   id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   revisionRequestId String
   revisionRequest   BsddRevisionRequest @relation(fields: [revisionRequestId], references: [id])
@@ -441,8 +443,8 @@ model BsddRevisionRequestApproval {
 
 model Grant {
   id            String      @id @default(cuid())
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  createdAt     DateTime    @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime    @updatedAt @db.Timestamptz(6)
   code          String      @unique
   expires       Int
   redirectUri   String
@@ -475,8 +477,8 @@ model Installation {
 
 model MembershipRequest {
   id              String                  @id @default(cuid())
-  createdAt       DateTime                @default(now())
-  updatedAt       DateTime                @updatedAt
+  createdAt       DateTime                @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime                @updatedAt @db.Timestamptz(6)
   status          MembershipRequestStatus @default(PENDING)
   statusUpdatedBy String?
   sentTo          String[]
@@ -509,7 +511,7 @@ model Rubrique {
 model StatusLog {
   id            String    @id @default(cuid())
   status        Status
-  loggedAt      DateTime?
+  loggedAt      DateTime? @db.Timestamptz(6)
   updatedFields Json
   formId        String
   form          Form      @relation(fields: [formId], references: [id])
@@ -527,9 +529,9 @@ model TemporaryStorageDetail {
   tempStorerQuantityReceived       Float?
   tempStorerWasteAcceptationStatus WasteAcceptationStatus?
   tempStorerWasteRefusalReason     String?
-  tempStorerReceivedAt             DateTime?
+  tempStorerReceivedAt             DateTime?               @db.Timestamptz(6)
   tempStorerReceivedBy             String?
-  tempStorerSignedAt               DateTime?
+  tempStorerSignedAt               DateTime?               @db.Timestamptz(6)
   tempStorerSignedBy               String?
   destinationIsFilledByEmitter     Boolean?                @default(true)
   destinationCompanyName           String?
@@ -553,13 +555,13 @@ model TemporaryStorageDetail {
   transporterIsExemptedOfReceipt   Boolean?
   transporterReceipt               String?
   transporterDepartment            String?
-  transporterValidityLimit         DateTime?
+  transporterValidityLimit         DateTime?               @db.Timestamptz(6)
   transporterNumberPlate           String?
   transporterCustomInfo            String?
   transporterTransportMode         TransportMode?          @default(ROAD)
   signedByTransporter              Boolean?
   signedBy                         String?
-  signedAt                         DateTime?
+  signedAt                         DateTime?               @db.Timestamptz(6)
   Form                             Form[]
 
   @@index([destinationCompanySiret], map: "_TemporaryStorageDetailDestinationCompanyIdx")
@@ -569,7 +571,7 @@ model TemporaryStorageDetail {
 model TraderReceipt {
   id            String    @id @default(cuid())
   receiptNumber String
-  validityLimit DateTime
+  validityLimit DateTime  @db.Timestamptz(6)
   department    String
   Company       Company[]
 }
@@ -577,7 +579,7 @@ model TraderReceipt {
 model BrokerReceipt {
   id            String    @id @default(cuid())
   receiptNumber String
-  validityLimit DateTime
+  validityLimit DateTime  @db.Timestamptz(6)
   department    String
   Company       Company[]
 }
@@ -585,7 +587,7 @@ model BrokerReceipt {
 model TransporterReceipt {
   id            String    @id @default(cuid())
   receiptNumber String
-  validityLimit DateTime
+  validityLimit DateTime  @db.Timestamptz(6)
   department    String
   Company       Company[]
 }
@@ -610,15 +612,15 @@ model TransportSegment {
   transporterIsExemptedOfReceipt  Boolean?
   transporterReceipt              String?
   transporterDepartment           String?
-  transporterValidityLimit        DateTime?
+  transporterValidityLimit        DateTime?      @db.Timestamptz(6)
   transporterNumberPlate          String?
   mode                            TransportMode?
   readyToTakeOver                 Boolean?       @default(false)
   previousTransporterCompanySiret String?
-  takenOverAt                     DateTime?
+  takenOverAt                     DateTime?      @db.Timestamptz(6)
   takenOverBy                     String?
-  createdAt                       DateTime       @default(now())
-  updatedAt                       DateTime       @updatedAt
+  createdAt                       DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt                       DateTime       @updatedAt @db.Timestamptz(6)
   formId                          String
   form                            Form           @relation(fields: [formId], references: [id])
 
@@ -628,28 +630,28 @@ model TransportSegment {
 }
 
 model User {
-  id                   String               @id @default(cuid())
-  email                String               @unique
-  password             String
-  name                 String?
-  phone                String?
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @updatedAt
-  activatedAt          DateTime? // when was this user activated ? - emailing purpose
-  firstAssociationDate DateTime? // when was this user first associated to any company ? - emailing purpose
-  isActive             Boolean?             @default(false)
-  isAdmin              Boolean?             @default(false)
+  id                    String                  @id @default(cuid())
+  email                 String                  @unique
+  password              String
+  name                  String?
+  phone                 String?
+  createdAt             DateTime                @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime                @updatedAt @db.Timestamptz(6)
+  activatedAt           DateTime?               @db.Timestamptz(6) // when was this user activated ? - emailing purpose @db.Timestamptz(6)
+  firstAssociationDate  DateTime?               @db.Timestamptz(6) // when was this user first associated to any company ? - emailing purpose @db.Timestamptz(6)
+  isActive              Boolean?                @default(false)
+  isAdmin               Boolean?                @default(false)
   // compte de service avec des droits étendus
-  isRegistreNational   Boolean?             @default(false)
-  applications         Application[]
-  companyAssociations  CompanyAssociation[]
-  AccessToken          AccessToken[]
-  Form                 Form[]
-  Grant                Grant[]
-  MembershipRequest    MembershipRequest[]
-  StatusLog            StatusLog[]
-  UserActivationHash   UserActivationHash[]
-  UserResetPasswordHash   UserResetPasswordHash[]
+  isRegistreNational    Boolean?                @default(false)
+  applications          Application[]
+  companyAssociations   CompanyAssociation[]
+  AccessToken           AccessToken[]
+  Form                  Form[]
+  Grant                 Grant[]
+  MembershipRequest     MembershipRequest[]
+  StatusLog             StatusLog[]
+  UserActivationHash    UserActivationHash[]
+  UserResetPasswordHash UserResetPasswordHash[]
 
   bsdasriEmissionSignatures  Bsdasri[] @relation("BsdasriEmissionSignature")
   bsdasriTransportSignatures Bsdasri[] @relation("BsdasriTransportSignature")
@@ -662,10 +664,10 @@ model UserAccountHash {
   email        String
   companySiret String
   hash         String    @unique
-  updatedAt    DateTime  @updatedAt
-  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @db.Timestamptz(6)
   role         UserRole
-  acceptedAt   DateTime?
+  acceptedAt   DateTime? @db.Timestamptz(6)
 
   @@index([email], map: "_UserAccountHashEmailIdx")
   @@index([companySiret], map: "_UserAccountHashCompanySiretIdx")
@@ -674,8 +676,8 @@ model UserAccountHash {
 model UserActivationHash {
   id        String   @id @default(cuid())
   hash      String   @unique
-  updatedAt DateTime @updatedAt
-  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
   userId    String
   user      User     @relation(fields: [userId], references: [id])
 
@@ -685,8 +687,8 @@ model UserActivationHash {
 model UserResetPasswordHash {
   id          String   @id @default(cuid())
   hash        String   @unique
-  hashExpires DateTime
-  createdAt   DateTime @default(now())
+  hashExpires DateTime @db.Timestamptz(6)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
   userId      String
   user        User     @relation(fields: [userId], references: [id])
 
@@ -721,8 +723,8 @@ enum BsvhuRecipientType {
 
 model Bsvhu {
   id        String   @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
   isDraft   Boolean  @default(false)
   isDeleted Boolean  @default(false)
 
@@ -757,7 +759,7 @@ model Bsvhu {
   weightIsEstimate      Boolean?
 
   emitterEmissionSignatureAuthor String?
-  emitterEmissionSignatureDate   DateTime?
+  emitterEmissionSignatureDate   DateTime? @db.Timestamptz(6)
 
   transporterCompanyName              String?
   transporterCompanySiret             String?
@@ -769,11 +771,11 @@ model Bsvhu {
   transporterCustomInfo               String?
   transporterRecepisseNumber          String?
   transporterRecepisseDepartment      String?
-  transporterRecepisseValidityLimit   DateTime?
-  transporterTransportTakenOverAt     DateTime?
+  transporterRecepisseValidityLimit   DateTime? @db.Timestamptz(6)
+  transporterTransportTakenOverAt     DateTime? @db.Timestamptz(6)
   transporterTransportPlates          String[]
   transporterTransportSignatureAuthor String?
-  transporterTransportSignatureDate   DateTime?
+  transporterTransportSignatureDate   DateTime? @db.Timestamptz(6)
 
   destinationReceptionQuantity              Int?
   destinationReceptionWeight                Float?
@@ -781,9 +783,9 @@ model Bsvhu {
   destinationReceptionRefusalReason         String?
   destinationReceptionIdentificationNumbers String[]
   destinationReceptionIdentificationType    BsvhuIdentificationType?
-  destinationReceptionDate                  DateTime?
+  destinationReceptionDate                  DateTime?                @db.Timestamptz(6)
 
-  destinationOperationDate                            DateTime?
+  destinationOperationDate                            DateTime? @db.Timestamptz(6)
   destinationOperationCode                            String?
   destinationOperationNextDestinationCompanyName      String?
   destinationOperationNextDestinationCompanySiret     String?
@@ -793,7 +795,7 @@ model Bsvhu {
   destinationOperationNextDestinationCompanyMail      String?
   destinationOperationNextDestinationCompanyVatNumber String?
   destinationOperationSignatureAuthor                 String?
-  destinationOperationSignatureDate                   DateTime?
+  destinationOperationSignatureDate                   DateTime? @db.Timestamptz(6)
 
   @@index([emitterCompanySiret], map: "_BvhuEmitterCompanySirettIdx")
   @@index([destinationCompanySiret], map: "_BsvhuDestinationCompanySiretIdx")
@@ -829,8 +831,8 @@ model Bsdasri {
   id                                  String                  @unique
   type                                BsdasriType             @default(SIMPLE)
   status                              BsdasriStatus           @default(INITIAL)
-  createdAt                           DateTime                @default(now())
-  updatedAt                           DateTime                @updatedAt
+  createdAt                           DateTime                @default(now()) @db.Timestamptz(6)
+  updatedAt                           DateTime                @updatedAt @db.Timestamptz(6)
   isDeleted                           Boolean?                @default(false)
   isDraft                             Boolean?                @default(false)
   identificationNumbers               String[]
@@ -857,7 +859,7 @@ model Bsdasri {
   emitterWastePackagings              Json                    @default("[]")
   emissionSignatory                   User?                   @relation("BsdasriEmissionSignature", fields: [emissionSignatoryId], references: [id])
   emissionSignatoryId                 String?
-  emitterEmissionSignatureDate        DateTime?
+  emitterEmissionSignatureDate        DateTime?               @db.Timestamptz(6)
   emitterEmissionSignatureAuthor      String?
   isEmissionDirectTakenOver           Boolean                 @default(false)
   isEmissionTakenOverWithSecretCode   Boolean                 @default(false)
@@ -873,22 +875,22 @@ model Bsdasri {
   transporterCompanyMail              String?
   transporterRecepisseNumber          String?
   transporterRecepisseDepartment      String?
-  transporterRecepisseValidityLimit   DateTime?
+  transporterRecepisseValidityLimit   DateTime?               @db.Timestamptz(6)
   transporterCustomInfo               String? // free field
   // transport
   transporterTransportMode            TransportMode?          @default(ROAD)
   transporterAcceptationStatus        WasteAcceptationStatus?
   transporterWasteRefusalReason       String?
   transporterWasteRefusedWeightValue  Float? // kg
-  transporterTakenOverAt              DateTime?
+  transporterTakenOverAt              DateTime?               @db.Timestamptz(6)
   transporterWastePackagings          Json                    @default("[]")
   transporterWasteWeightValue         Float? // kg
   transporterWasteWeightIsEstimate    Boolean?
   transporterWasteVolume              Int? // liters
-  handedOverToRecipientAt             DateTime?
+  handedOverToRecipientAt             DateTime?               @db.Timestamptz(6)
   transportSignatory                  User?                   @relation("BsdasriTransportSignature", fields: [transportSignatoryId], references: [id])
   transportSignatoryId                String?
-  transporterTransportSignatureDate   DateTime?
+  transporterTransportSignatureDate   DateTime?               @db.Timestamptz(6)
   transporterTransportSignatureAuthor String?
   transporterTransportPlates          String[]
 
@@ -907,17 +909,17 @@ model Bsdasri {
   destinationReceptionWasteRefusedWeightValue Float? // kg
   destinationReceptionWasteWeightValue        Float? // kg
   destinationReceptionWasteVolume             Int? // liters
-  destinationReceptionDate                    DateTime? // accepted or refused date
+  destinationReceptionDate                    DateTime? // accepted or refused date @db.Timestamptz(6)
   // processing
   destinationOperationCode                    String?
-  destinationOperationDate                    DateTime?
+  destinationOperationDate                    DateTime?               @db.Timestamptz(6)
   receptionSignatory                          User?                   @relation("BsdasriReceptionSignature", fields: [receptionSignatoryId], references: [id])
   receptionSignatoryId                        String?
-  destinationReceptionSignatureDate           DateTime?
+  destinationReceptionSignatureDate           DateTime?               @db.Timestamptz(6)
   destinationReceptionSignatureAuthor         String?
   operationSignatory                          User?                   @relation("BsdasriOperationSignature", fields: [operationSignatoryId], references: [id])
   operationSignatoryId                        String?
-  destinationOperationSignatureDate           DateTime?
+  destinationOperationSignatureDate           DateTime?               @db.Timestamptz(6)
   destinationOperationSignatureAuthor         String?
   // associations
   grouping                                    Bsdasri[]               @relation("BsdasriToBsdasri")
@@ -936,8 +938,8 @@ model Bsdasri {
 
 model Bsff {
   id        String     @id
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime   @updatedAt @db.Timestamptz(6)
   isDeleted Boolean    @default(false)
   isDraft   Boolean    @default(false)
   type      BsffType   @default(TRACER_FLUIDE)
@@ -952,7 +954,7 @@ model Bsff {
   emitterCustomInfo     String?
 
   emitterEmissionSignatureAuthor String?
-  emitterEmissionSignatureDate   DateTime?
+  emitterEmissionSignatureDate   DateTime? @db.Timestamptz(6)
 
   packagings Json @default("[]")
 
@@ -975,12 +977,12 @@ model Bsff {
 
   transporterRecepisseNumber        String?
   transporterRecepisseDepartment    String?
-  transporterRecepisseValidityLimit DateTime?
+  transporterRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
   transporterTransportMode            TransportMode?
-  transporterTransportTakenOverAt     DateTime?
+  transporterTransportTakenOverAt     DateTime?      @db.Timestamptz(6)
   transporterTransportSignatureAuthor String?
-  transporterTransportSignatureDate   DateTime?
+  transporterTransportSignatureDate   DateTime?      @db.Timestamptz(6)
 
   destinationCompanyName    String?
   destinationCompanySiret   String?
@@ -991,13 +993,13 @@ model Bsff {
 
   destinationCustomInfo String?
 
-  destinationReceptionDate              DateTime?
+  destinationReceptionDate              DateTime?               @db.Timestamptz(6)
   destinationReceptionWeight            Float?
   destinationReceptionAcceptationStatus WasteAcceptationStatus?
   destinationReceptionRefusalReason     String?
 
   destinationReceptionSignatureAuthor String?
-  destinationReceptionSignatureDate   DateTime?
+  destinationReceptionSignatureDate   DateTime? @db.Timestamptz(6)
 
   destinationPlannedOperationCode String?
 
@@ -1012,7 +1014,7 @@ model Bsff {
   destinationOperationNextDestinationCompanyMail      String?
 
   destinationOperationSignatureAuthor String?
-  destinationOperationSignatureDate   DateTime?
+  destinationOperationSignatureDate   DateTime? @db.Timestamptz(6)
 
   destinationCap String?
 
@@ -1062,8 +1064,8 @@ enum BsffStatus {
 
 model BsffFicheIntervention {
   id         String   @id @default(cuid())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(6)
   numero     String
   weight     Float
   postalCode String
@@ -1119,8 +1121,8 @@ enum BsdaConsistence {
 
 model Bsda {
   id        String   @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
   isDraft   Boolean  @default(false)
   isDeleted Boolean  @default(false)
 
@@ -1141,7 +1143,7 @@ model Bsda {
   emitterPickupSitePostalCode    String?
   emitterPickupSiteInfos         String?
   emitterEmissionSignatureAuthor String?
-  emitterEmissionSignatureDate   DateTime?
+  emitterEmissionSignatureDate   DateTime? @db.Timestamptz(6)
 
   ecoOrganismeName  String?
   ecoOrganismeSiret String?
@@ -1167,7 +1169,7 @@ model Bsda {
   brokerCompanyMail            String?
   brokerRecepisseNumber        String?
   brokerRecepisseDepartment    String?
-  brokerRecepisseValidityLimit DateTime?
+  brokerRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
   destinationCompanyName          String?
   destinationCompanySiret         String?
@@ -1179,15 +1181,15 @@ model Bsda {
   destinationPlannedOperationCode String?
   destinationCustomInfo           String?
 
-  destinationReceptionDate              DateTime?
+  destinationReceptionDate              DateTime?               @db.Timestamptz(6)
   destinationReceptionWeight            Float?
   destinationReceptionAcceptationStatus WasteAcceptationStatus?
   destinationReceptionRefusalReason     String?
 
   destinationOperationCode            String?
-  destinationOperationDate            DateTime?
+  destinationOperationDate            DateTime? @db.Timestamptz(6)
   destinationOperationSignatureAuthor String?
-  destinationOperationSignatureDate   DateTime?
+  destinationOperationSignatureDate   DateTime? @db.Timestamptz(6)
 
   destinationOperationNextDestinationCompanySiret         String?
   destinationOperationNextDestinationCompanyVatNumber     String?
@@ -1212,13 +1214,13 @@ model Bsda {
   transporterRecepisseIsExempted    Boolean?
   transporterRecepisseNumber        String?
   transporterRecepisseDepartment    String?
-  transporterRecepisseValidityLimit DateTime?
+  transporterRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
   transporterTransportMode            TransportMode?
   transporterTransportPlates          String[]
-  transporterTransportTakenOverAt     DateTime?
+  transporterTransportTakenOverAt     DateTime?      @db.Timestamptz(6)
   transporterTransportSignatureAuthor String?
-  transporterTransportSignatureDate   DateTime?
+  transporterTransportSignatureDate   DateTime?      @db.Timestamptz(6)
 
   workerCompanyName    String?
   workerCompanySiret   String?
@@ -1229,7 +1231,7 @@ model Bsda {
 
   workerWorkHasEmitterPaperSignature Boolean?
   workerWorkSignatureAuthor          String?
-  workerWorkSignatureDate            DateTime?
+  workerWorkSignatureDate            DateTime? @db.Timestamptz(6)
 
   groupedIn   Bsda?   @relation("BsdaGrouping", fields: [groupedInId], references: [id])
   groupedInId String?
@@ -1250,4 +1252,16 @@ model Bsda {
   @@index([transporterCompanySiret], map: "_BsdaTransporterCompanySiretIdx")
   @@index([workerCompanySiret], map: "_BsdaWorkerCompanySiretIdx")
   @@index([status], map: "_BsdaStatusIdx")
+}
+
+model Event {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+
+  streamId String
+  type     String
+  data     Json
+  metadata Json?
+
+  actor String
 }

@@ -1,14 +1,12 @@
-import { Prisma, Status } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { isDangerous } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { eventEmitter, TDEvent } from "../../../events/emitter";
 import {
   MutationCreateFormArgs,
   ResolversParentTypes
 } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
-import { getFullForm } from "../../database";
-import { indexForm } from "../../elastic";
 import { MissingTempStorageFlag } from "../../errors";
 import {
   expandFormFromDb,
@@ -17,8 +15,9 @@ import {
 } from "../../form-converter";
 import { checkIsFormContributor } from "../../permissions";
 import getReadableId from "../../readableId";
+import { getFormRepository } from "../../repository";
 import { FormSirets } from "../../types";
-import { validateAppendix2Forms, draftFormSchema } from "../../validation";
+import { draftFormSchema, validateAppendix2Forms } from "../../validation";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -29,6 +28,14 @@ const createFormResolver = async (
 
   const { appendix2Forms, temporaryStorageDetail, ...formContent } =
     createFormInput;
+
+  if (
+    formContent.wasteDetails?.code &&
+    isDangerous(formContent.wasteDetails?.code) &&
+    formContent.wasteDetails.isDangerous === undefined
+  ) {
+    formContent.wasteDetails.isDangerous = true;
+  }
 
   const formSirets: FormSirets = {
     emitterCompanySiret: formContent.emitter?.company?.siret,
@@ -85,7 +92,8 @@ const createFormResolver = async (
     }
   }
 
-  const newForm = await prisma.form.create({ data: formCreateInput });
+  const formRepository = getFormRepository(user);
+  const newForm = await formRepository.create(formCreateInput);
 
   eventEmitter.emit(TDEvent.CreateForm, {
     previousNode: null,
@@ -93,21 +101,6 @@ const createFormResolver = async (
     updatedFields: {},
     mutation: "CREATED"
   });
-
-  // create statuslog when and only when form is created
-  await prisma.statusLog.create({
-    data: {
-      form: { connect: { id: newForm.id } },
-      user: { connect: { id: context.user!.id } },
-      status: newForm.status as Status,
-      updatedFields: {},
-      authType: user.auth,
-      loggedAt: new Date()
-    }
-  });
-
-  const fullForm = await getFullForm(newForm);
-  await indexForm(fullForm, context);
 
   return expandFormFromDb(newForm);
 };

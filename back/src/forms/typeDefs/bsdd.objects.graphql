@@ -99,8 +99,11 @@ type Form {
   "Destination ultérieure prévue (case 12)"
   nextDestination: NextDestination
 
-  "Annexe 2"
+  "Bordereaux que celui-ci regroupe (Annexe 2)"
   appendix2Forms: [Appendix2Form!]
+
+  "Bordereau dans lequel celui-ci est regroupé (Annexe 2)"
+  groupedIn: Form
 
   ecoOrganisme: FormEcoOrganisme
 
@@ -385,6 +388,9 @@ type WasteDetails {
 
   "Contient des Polluants Organiques Persistants (POP) oui / non"
   pop: Boolean
+
+  "Caractère dangereux du déchet au sens de l’article R541-8 du code de l’environnement"
+  isDangerous: Boolean
 }
 
 "Négociant (case 7)"
@@ -528,7 +534,7 @@ type FormRevisionRequest {
   "Identifiant de la demande de révison"
   id: ID!
 
-  "Bordereau concerné"
+  "Aperçu du bordereau concerné au moment de la création de la demande de révision. Il ne reflète pas le bordereau actuel."
   form: Form!
 
   "Date de création de la demande"
