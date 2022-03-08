@@ -1,26 +1,27 @@
 import React from "react";
 import { generatePath, NavLink, useHistory } from "react-router-dom";
-import { CompanyType, User } from "generated/graphql/types";
+import { CompanyPrivate, CompanyType } from "generated/graphql/types";
 import DashboardCompanySelector from "./DashboardCompanySelector";
 import routes from "common/routes";
 import "./DashboardTabs.scss";
 
 interface DashboardTabsProps {
-  me: User;
-  siret: string;
+  currentCompany: CompanyPrivate;
+  companies: CompanyPrivate[];
 }
 
-export function DashboardTabs({ me, siret }: DashboardTabsProps) {
+export function DashboardTabs({
+  currentCompany,
+  companies,
+}: DashboardTabsProps) {
   const history = useHistory();
-  const companies = me.companies || [];
-  const currentCompany = companies.find(company => company.siret === siret)!;
 
   return (
     <>
       {companies.length > 1 ? (
         <div className="company-select">
           <DashboardCompanySelector
-            siret={siret}
+            siret={currentCompany.siret!}
             companies={companies}
             handleCompanyChange={siret =>
               history.push(
@@ -40,7 +41,9 @@ export function DashboardTabs({ me, siret }: DashboardTabsProps) {
         <ul>
           <li>
             <NavLink
-              to={generatePath(routes.dashboard.bsds.drafts, { siret })}
+              to={generatePath(routes.dashboard.bsds.drafts, {
+                siret: currentCompany.siret,
+              })}
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
             >
@@ -50,7 +53,9 @@ export function DashboardTabs({ me, siret }: DashboardTabsProps) {
 
           <li>
             <NavLink
-              to={generatePath(routes.dashboard.bsds.act, { siret })}
+              to={generatePath(routes.dashboard.bsds.act, {
+                siret: currentCompany.siret,
+              })}
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
             >
@@ -60,7 +65,9 @@ export function DashboardTabs({ me, siret }: DashboardTabsProps) {
 
           <li>
             <NavLink
-              to={generatePath(routes.dashboard.bsds.follow, { siret })}
+              to={generatePath(routes.dashboard.bsds.follow, {
+                siret: currentCompany.siret,
+              })}
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
             >
@@ -69,7 +76,9 @@ export function DashboardTabs({ me, siret }: DashboardTabsProps) {
           </li>
           <li>
             <NavLink
-              to={generatePath(routes.dashboard.bsds.history, { siret })}
+              to={generatePath(routes.dashboard.bsds.history, {
+                siret: currentCompany.siret,
+              })}
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
             >
@@ -78,7 +87,9 @@ export function DashboardTabs({ me, siret }: DashboardTabsProps) {
           </li>
           <li>
             <NavLink
-              to={generatePath(routes.dashboard.bsds.reviews, { siret })}
+              to={generatePath(routes.dashboard.bsds.reviews, {
+                siret: currentCompany.siret,
+              })}
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
             >
@@ -94,7 +105,7 @@ export function DashboardTabs({ me, siret }: DashboardTabsProps) {
               <li>
                 <NavLink
                   to={generatePath(routes.dashboard.transport.toCollect, {
-                    siret,
+                    siret: currentCompany.siret,
                   })}
                   className="sidebar__link sidebar__link--indented"
                   activeClassName="sidebar__link--active"
@@ -105,7 +116,7 @@ export function DashboardTabs({ me, siret }: DashboardTabsProps) {
               <li>
                 <NavLink
                   to={generatePath(routes.dashboard.transport.collected, {
-                    siret,
+                    siret: currentCompany.siret,
                   })}
                   className="sidebar__link sidebar__link--indented"
                   activeClassName="sidebar__link--active"
@@ -120,7 +131,9 @@ export function DashboardTabs({ me, siret }: DashboardTabsProps) {
         <ul>
           <li>
             <NavLink
-              to={generatePath(routes.dashboard.exports, { siret })}
+              to={generatePath(routes.dashboard.exports, {
+                siret: currentCompany.siret,
+              })}
               className="sidebar__link sidebar__link--chapter"
               activeClassName="sidebar__link--active"
             >
@@ -130,7 +143,9 @@ export function DashboardTabs({ me, siret }: DashboardTabsProps) {
 
           <li>
             <NavLink
-              to={generatePath(routes.dashboard.stats, { siret })}
+              to={generatePath(routes.dashboard.stats, {
+                siret: currentCompany.siret,
+              })}
               className="sidebar__link sidebar__link--chapter"
               activeClassName="sidebar__link--active"
             >
