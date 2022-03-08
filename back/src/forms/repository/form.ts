@@ -2,6 +2,7 @@ import {
   Form,
   Prisma,
   PrismaClient,
+  Status,
   TemporaryStorageDetail
 } from "@prisma/client";
 import { LogMetadata } from "./index";
@@ -180,6 +181,16 @@ export function buildFormRepository(
         where,
         data: { isDeleted: true, appendix2Forms: { set: [] } }
       });
+
+      const appendix2Forms = await findAppendix2FormsById(form.id);
+
+      if (appendix2Forms.length) {
+        // roll back status changes to appendixes 2
+        await updateMany(
+          appendix2Forms.map(f => f.id),
+          { status: Status.AWAITING_GROUP }
+        );
+      }
 
       await transaction.event.create({
         data: {
