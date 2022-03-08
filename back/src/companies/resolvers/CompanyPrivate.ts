@@ -3,7 +3,13 @@ import { CompanyPrivateResolvers } from "../../generated/graphql/types";
 import { getCompanyUsers, getUserRole } from "../database";
 
 const companyPrivateResolvers: CompanyPrivateResolvers = {
-  users: (parent, _, context) => {
+  users: async (parent, _, context) => {
+    const userId = context.user.id;
+    const userRole = await getUserRole(userId, parent.siret);
+    if (userRole !== "ADMIN") {
+      return [];
+    }
+
     return getCompanyUsers(parent.siret, context.dataloaders);
   },
   userRole: (parent, _, context) => {
