@@ -59,7 +59,7 @@ describe("Perform api requests", () => {
   });
 
   it("should limit the number of possible batch operations", async () => {
-    const { user, accessToken } = await userWithAccessTokenFactory();
+    const { accessToken } = await userWithAccessTokenFactory();
 
     const res = await request
       .post("/")

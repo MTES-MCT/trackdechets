@@ -11,11 +11,9 @@ export function graphqlBatchLimiterMiddleware(graphQLPath: string) {
       Array.isArray(body) &&
       body.length > MAX_OPERATIONS_PER_REQUEST
     ) {
-      return res
-        .status(400)
-        .send({
-          error: `Batching is limited to ${MAX_OPERATIONS_PER_REQUEST} operations per request.`
-        });
+      return res.status(400).send({
+        error: `Batching is limited to ${MAX_OPERATIONS_PER_REQUEST} operations per request.`
+      });
     }
 
     next();

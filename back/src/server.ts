@@ -35,7 +35,6 @@ import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
 
-
 const {
   SESSION_SECRET,
   SESSION_COOKIE_HOST,
@@ -163,7 +162,7 @@ app.use(graphqlBodyParser);
 
 // logging middleware
 app.use(loggingMiddleware(graphQLPath));
-app.use(graphqlBatchLimiterMiddleware(graphQLPath))
+app.use(graphqlBatchLimiterMiddleware(graphQLPath));
 
 /**
  * Set the following headers for cross-domain cookie
