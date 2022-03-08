@@ -1,5 +1,4 @@
 import { Prisma } from "@prisma/client";
-import prisma from "../../../prisma";
 import { PROCESSING_OPERATIONS } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
@@ -12,6 +11,7 @@ import { checkCanMarkAsProcessed } from "../../permissions";
 import { processedInfoSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
+import { getFormRepository } from "../../repository";
 
 const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   parent,
@@ -53,9 +53,10 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   });
 
   // mark appendix2Forms as PROCESSED
-  const appendix2Forms = await prisma.form
-    .findUnique({ where: { id: form.id } })
-    .appendix2Forms();
+  const appendix2Forms = await getFormRepository(user).findAppendix2FormsById(
+    form.id
+  );
+
   if (appendix2Forms.length > 0) {
     const promises = appendix2Forms.map(appendix => {
       return transitionForm(user, appendix, {
