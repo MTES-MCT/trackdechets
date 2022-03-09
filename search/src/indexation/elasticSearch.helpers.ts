@@ -9,8 +9,6 @@ import { elasticSearchClient as client } from "..";
 import {
   ElasticBulkIndexError,
   ElasticBulkNonFlatPayload,
-  ElasticBulkPayloadDocument,
-  ElasticBulkPrepayload,
   IndexProcessConfig
 } from "./types";
 
@@ -20,6 +18,7 @@ import {
   BulkResponse,
   BulkResponseItem
 } from "@elastic/elasticsearch/api/types";
+import { ApiResponse } from "@elastic/elasticsearch";
 
 var pjson = require("../../package.json");
 
@@ -47,6 +46,9 @@ export const standardMapping = {
 
 export const INDEX_ALIAS_NAME_SEPARATOR = "-";
 
+/**
+ * stockunitelegale-* indexation config
+ */
 export const sireneIndexConfig: IndexProcessConfig = {
   alias: `stockunitelegale${INDEX_ALIAS_NAME_SEPARATOR}${
     process.env.NODE_ENV ? process.env.NODE_ENV : "dev"
@@ -63,6 +65,9 @@ export const sireneIndexConfig: IndexProcessConfig = {
   mappings: standardMapping
 };
 
+/**
+ * Common index name formatter
+ */
 export const getIndexVersionName = (indexConfig: IndexProcessConfig) =>
   `${indexConfig.alias}${INDEX_ALIAS_NAME_SEPARATOR}${
     pjson.version
@@ -141,20 +146,31 @@ export const cleanOldIndexes = async (
  */
 export const bulkIndex = async (
   body: ElasticBulkNonFlatPayload,
-  indexConfig: IndexProcessConfig
+  indexConfig: IndexProcessConfig,
+  indexName: string
 ) => {
-  // Promise returning function chunks
+  /**
+   * Chunk and loop on bulkIndex
+   */
   const request = async (bodyChunk: ElasticBulkNonFlatPayload) => {
-    const requestBulkIndex = (body: (BulkOperationContainer | unknown)[]) => {
+    /**
+     * Calls client.bulk
+     */
+    const requestBulkIndex = async (body: BulkOperationContainer[]) => {
       if (!body || !body.length) {
+        logger.warn(`request to bulkIndex an empty body, return`);
         // nothing to index
         return Promise.resolve(null);
       }
-      return client.bulk({
+      const bulkResponse: ApiResponse<BulkResponse> = await client.bulk({
         body,
         // lighten the response
         _source_excludes: ["items.index._*", "took"]
       });
+      // Log error data and continue
+      if (bulkResponse) {
+        await logBulkErrorsAndRetry(bulkResponse.body, body);
+      }
     };
     logger.info(`Indexing ${bodyChunk.length} documents in bulk`);
     // append new data to the body before indexation
@@ -167,43 +183,51 @@ export const bulkIndex = async (
     return requestBulkIndex(bodyChunk.flat());
   };
 
-  const logBulkIndexErrors = (
+  /**
+   * Log bulkIndex errors and retries in some cases
+   */
+  const logBulkErrorsAndRetry = async (
     bulkResponse: BulkResponse,
-    slice: [ElasticBulkPrepayload, ElasticBulkPayloadDocument][]
+    body: BulkOperationContainer[]
   ) => {
     if (bulkResponse.errors) {
-      bulkResponse.items.forEach(
-        (
-          action: Partial<Record<BulkOperationType, BulkResponseItem>>,
-          k: number
-        ) => {
-          const operations: string[] = Object.keys(action);
-          for (const operation of operations) {
-            const opType = operation as BulkOperationType;
-            if (action[opType].error) {
-              const elasticBulkIndexError: ElasticBulkIndexError = {
-                // If the status is 429 it means that you can retry the document,
-                // otherwise it's very likely a mapping error, and you should fix the document content
-                status: action[opType].status,
-                error: action[opType].error,
-              };
-              logger.error(`Error in bulkIndex operation`, {
-                elasticBulkIndexError
+      for (let i = 0; i < bulkResponse.items.length; i++) {
+        const action = bulkResponse.items[i];
+        const operations: string[] = Object.keys(action);
+        for (const operation of operations) {
+          const opType = operation as BulkOperationType;
+          if (action[opType].error) {
+            // If the status is 429 it means that we can retry the document
+            if (action[opType].status) {
+              logger.info(
+                `Retrying index operation for doc ${body[i * 2].index._id}`
+              );
+              await client.index({
+                index: indexName,
+                id: body[i * 2].index._id as string,
+                body: body[i * 2 + 1],
+                type: "_doc",
+                refresh: false
               });
             }
+            const elasticBulkIndexError: ElasticBulkIndexError = {
+              // otherwise it's very likely a mapping error, and you should fix the document content
+              status: action[opType].status,
+              error: action[opType].error,
+              body: body[i * 2 + 1]
+            };
+            logger.error(`Error in bulkIndex operation`, {
+              elasticBulkIndexError
+            });
           }
         }
-      );
+      }
     }
   };
 
   // immediat return the chunk larger than the data streamed
   if (CHUNK_SIZE > body.length) {
-    const bulkResponse = await request(body);
-    // Collect error data
-    if (bulkResponse) {
-      logBulkIndexErrors(bulkResponse.body, body);
-    }
+    await request(body);
     return;
   }
 
@@ -211,11 +235,7 @@ export const bulkIndex = async (
   for (let i = 0; i < body.length; i += CHUNK_SIZE) {
     const end = i + CHUNK_SIZE;
     const slice = body.slice(i, end);
-    const bulkResponse = await request(slice);
-    // Collect error data
-    if (bulkResponse) {
-      logBulkIndexErrors(bulkResponse.body, body);
-    }
+    await request(slice);
   }
 };
 
@@ -274,7 +294,8 @@ export const getWritableParserAndIndexer = (
 
       bulkIndex(
         body.filter(line => line !== null),
-        indexConfig
+        indexConfig,
+        indexName
       )
         .then(() => next())
         .catch(err => next(err));
@@ -304,6 +325,32 @@ export const unzipAndIndex = async (
   });
   stm.on("error", err => {
     throw err;
+  });
+};
+
+/**
+ * Stream CSV file
+ */
+export const streamCsvAndIndex = async (
+  csvPath: string,
+  indexConfig: IndexProcessConfig
+) => {
+  var readStream = fs.createReadStream(csvPath);
+  const indexName = await createIndexRelease(indexConfig);
+
+  readStream.on("open", function () {
+    let headers: string[];
+    const writable = getWritableParserAndIndexer(
+      indexConfig,
+      headers,
+      indexName
+    );
+    readStream.pipe(writable);
+  });
+
+  // This catches any errors that happen while creating the readable stream (usually invalid names)
+  readStream.on("error", function (err) {
+    logger.error(err);
   });
 };
 

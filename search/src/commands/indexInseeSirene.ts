@@ -3,7 +3,8 @@ import { logger } from "../common/logger";
 import {
   downloadAndIndex,
   unzipAndIndex,
-  sireneIndexConfig
+  sireneIndexConfig,
+  streamCsvAndIndex
 } from "../indexation/elasticSearch.helpers";
 
 /**
@@ -26,6 +27,11 @@ process.on("exit", function () {
   logger.info("Starting indexation of StockUniteLegale");
   if (process.env.INSEE_SIRENE_ZIP_PATH) {
     await unzipAndIndex(process.env.INSEE_SIRENE_ZIP_PATH, sireneIndexConfig);
+  } else if (process.env.INSEE_SIRENE_CSV_PATH) {
+    await streamCsvAndIndex(
+      process.env.INSEE_SIRENE_CSV_PATH,
+      sireneIndexConfig
+    );
   } else {
     await downloadAndIndex(sireneUrl, sireneIndexConfig);
   }
