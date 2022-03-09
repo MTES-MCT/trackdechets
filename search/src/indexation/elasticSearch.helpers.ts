@@ -172,7 +172,9 @@ export const bulkIndex = async (
         await logBulkErrorsAndRetry(bulkResponse.body, body);
       }
     };
-    logger.info(`Indexing ${bodyChunk.length} documents in bulk`);
+    logger.info(
+      `Indexing ${bodyChunk.length} documents in bulk to index ${indexName}`
+    );
     // append new data to the body before indexation
     if (typeof indexConfig.dataFormatterFn === "function") {
       const formattedChunk = await indexConfig.dataFormatterFn(bodyChunk, {
@@ -199,8 +201,10 @@ export const bulkIndex = async (
           if (action[opType].error) {
             // If the status is 429 it means that we can retry the document
             if (action[opType].status === 429) {
-              logger.info(
-                `Retrying index operation for doc ${body[k * 2].index._id}`
+              logger.warn(
+                `Retrying index operation for doc ${
+                  body[k * 2].index._id
+                } in index ${indexName}`
               );
               try {
                 await client.index({
@@ -214,7 +218,7 @@ export const bulkIndex = async (
                 logger.error(
                   `Error retrying index operation for doc ${
                     body[k * 2].index._id
-                  }`,
+                  } in index ${indexName}`,
                   err
                 );
               }
