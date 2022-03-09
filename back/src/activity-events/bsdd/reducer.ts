@@ -68,6 +68,8 @@ function dateConverter(
       update,
       "brokerValidityLimit"
     ),
+    emittedAt: getDateField(currentState, update, "emittedAt"),
+    takenOverAt: getDateField(currentState, update, "takenOverAt"),
     sentAt: getDateField(currentState, update, "sentAt"),
     receivedAt: getDateField(currentState, update, "receivedAt"),
     processedAt: getDateField(currentState, update, "processedAt"),
