@@ -11,6 +11,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
 import { Status } from "@prisma/client";
 import { Mutation } from "../../../../generated/graphql/types";
+import { getFullForm } from "../../../../forms/database";
 
 jest.mock("axios", () => ({
   default: {
@@ -71,29 +72,30 @@ describe("Mutation.signedByTransporter", () => {
   });
 
   it("should mark a form as signed", async () => {
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const emitterCompany = await companyFactory();
+    const transporter = await userWithCompanyFactory("ADMIN");
+    const emitter = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
-      ownerId: user.id,
+      ownerId: transporter.user.id,
       opt: {
         sentAt: null,
         status: "SEALED",
-        emitterCompanyName: emitterCompany.name,
-        emitterCompanySiret: emitterCompany.siret,
-        transporterCompanyName: company.name,
-        transporterCompanySiret: company.siret
+        emitterCompanyName: emitter.company.name,
+        emitterCompanySiret: emitter.company.siret,
+        transporterCompanyName: transporter.company.name,
+        transporterCompanySiret: transporter.company.siret
       }
     });
+    const sentAt = new Date("2018-12-11T00:00:00.000Z");
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(transporter.user);
     await mutate<Pick<Mutation, "signedByTransporter">>(SIGNED_BY_TRANSPORTER, {
       variables: {
         id: form.id,
         signingInfo: {
-          sentAt: "2018-12-11T00:00:00.000Z",
+          sentAt: sentAt.toISOString(),
           signedByTransporter: true,
-          securityCode: emitterCompany.securityCode,
-          sentBy: "Roger Lapince",
+          securityCode: emitter.company.securityCode,
+          sentBy: emitter.user.name,
           signedByProducer: true,
           packagingInfos: form.wasteDetailsPackagingInfos,
           quantity: form.wasteDetailsQuantity,
@@ -105,7 +107,20 @@ describe("Mutation.signedByTransporter", () => {
     const resultingForm = await prisma.form.findUnique({
       where: { id: form.id }
     });
-    expect(resultingForm.status).toBe("SENT");
+    expect(resultingForm).toEqual(
+      expect.objectContaining({
+        status: "SENT",
+        signedByTransporter: true,
+        sentAt: sentAt,
+        sentBy: emitter.user.name,
+
+        emittedAt: sentAt,
+        emittedBy: emitter.user.name,
+        emittedByEcoOrganisme: false,
+        takenOverAt: sentAt,
+        takenOverBy: transporter.user.name
+      })
+    );
   });
 
   it("should return an error if onuCode is provided empty for a dangerous waste", async () => {
@@ -352,41 +367,43 @@ describe("Mutation.signedByTransporter", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "signedByTransporter">>(
-      SIGNED_BY_TRANSPORTER,
-      {
-        variables: {
-          id: form.id,
-          signingInfo: {
-            sentAt: "2018-12-11T00:00:00.000Z",
-            signedByTransporter: true,
-            securityCode: ecoOrganisme.securityCode,
-            signatureAuthor: "ECO_ORGANISME",
-            sentBy: "Roger Lapince",
-            signedByProducer: true,
-            packagingInfos: form.wasteDetailsPackagingInfos,
-            quantity: form.wasteDetailsQuantity
-          }
+    await mutate<Pick<Mutation, "signedByTransporter">>(SIGNED_BY_TRANSPORTER, {
+      variables: {
+        id: form.id,
+        signingInfo: {
+          sentAt: "2018-12-11T00:00:00.000Z",
+          signedByTransporter: true,
+          securityCode: ecoOrganisme.securityCode,
+          signatureAuthor: "ECO_ORGANISME",
+          sentBy: "Roger Lapince",
+          signedByProducer: true,
+          packagingInfos: form.wasteDetailsPackagingInfos,
+          quantity: form.wasteDetailsQuantity
         }
       }
-    );
-
-    expect(data.signedByTransporter).toMatchObject({
-      id: form.id,
-      status: "SENT"
     });
+
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
+    expect(resultingForm).toEqual(
+      expect.objectContaining({
+        status: "SENT",
+        emittedByEcoOrganisme: true
+      })
+    );
   });
 
   it("should mark a form with temporary storage as signed (frame 18)", async () => {
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const receivingCompany = await companyFactory();
-    const destinationCompany = await companyFactory();
+    const transporter = await userWithCompanyFactory("ADMIN");
+    const temporaryStorage = await userWithCompanyFactory("ADMIN");
+    const finalRecipient = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
-      ownerId: user.id,
+      ownerId: transporter.user.id,
       opt: {
         status: "RESEALED",
-        recipientCompanyName: receivingCompany.name,
-        recipientCompanySiret: receivingCompany.siret,
+        recipientCompanyName: temporaryStorage.company.name,
+        recipientCompanySiret: temporaryStorage.company.siret,
         sentAt: "2019-11-20T00:00:00.000Z",
         temporaryStorageDetail: {
           create: {
@@ -394,15 +411,15 @@ describe("Mutation.signedByTransporter", () => {
             tempStorerQuantityReceived: 2.4,
             tempStorerWasteAcceptationStatus: "ACCEPTED",
             tempStorerReceivedAt: "2019-11-20T00:00:00.000Z",
-            tempStorerReceivedBy: "John Doe",
+            tempStorerReceivedBy: temporaryStorage.user.name,
             tempStorerSignedAt: "2019-11-20T00:00:00.000Z",
             destinationIsFilledByEmitter: false,
-            destinationCompanyName: destinationCompany.name,
-            destinationCompanySiret: destinationCompany.siret,
+            destinationCompanyName: finalRecipient.company.name,
+            destinationCompanySiret: finalRecipient.company.siret,
             destinationCap: "",
             destinationProcessingOperation: "R 6",
-            transporterCompanyName: company.name,
-            transporterCompanySiret: company.siret,
+            transporterCompanyName: transporter.company.name,
+            transporterCompanySiret: transporter.company.siret,
             transporterIsExemptedOfReceipt: false,
             transporterReceipt: "Damned! That receipt looks good",
             transporterDepartment: "10",
@@ -412,16 +429,17 @@ describe("Mutation.signedByTransporter", () => {
         }
       }
     });
+    const resentAt = new Date("2018-12-11T00:00:00.000Z");
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(transporter.user);
     await mutate<Pick<Mutation, "signedByTransporter">>(SIGNED_BY_TRANSPORTER, {
       variables: {
         id: form.id,
         signingInfo: {
-          sentAt: "2018-12-11T00:00:00.000Z",
+          sentAt: resentAt.toISOString(),
           signedByTransporter: true,
-          securityCode: receivingCompany.securityCode,
-          sentBy: "Roger Lapince",
+          securityCode: temporaryStorage.company.securityCode,
+          sentBy: temporaryStorage.user.name,
           signedByProducer: true,
           packagingInfos: form.wasteDetailsPackagingInfos,
           quantity: form.wasteDetailsQuantity,
@@ -433,7 +451,21 @@ describe("Mutation.signedByTransporter", () => {
     const resultingForm = await prisma.form.findUnique({
       where: { id: form.id }
     });
-    expect(resultingForm.status).toBe("RESENT");
+    const resultingFullForm = await getFullForm(resultingForm);
+    expect(resultingFullForm).toEqual(
+      expect.objectContaining({
+        status: "RESENT",
+        temporaryStorageDetail: expect.objectContaining({
+          signedAt: resentAt,
+          signedBy: temporaryStorage.user.name,
+
+          emittedAt: resentAt,
+          emittedBy: temporaryStorage.user.name,
+          takenOverAt: resentAt,
+          takenOverBy: transporter.user.name
+        })
+      })
+    );
   });
 
   test.each(allowedFormats)(
