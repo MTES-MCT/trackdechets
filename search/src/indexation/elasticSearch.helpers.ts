@@ -285,20 +285,22 @@ export const getWritableParserAndIndexer = (
             doc[headers[i]] = values[i];
           }
           // skip lines without "idKey" column
-          return doc[indexConfig.idKey] !== undefined &&
-            /[0-9]+/.test(doc[indexConfig.idKey])
-            ? [
-                {
-                  index: {
-                    _id: doc[indexConfig.idKey],
-                    _index: indexName,
-                    // Next major ES version won't need _type anymore
-                    _type: "_doc"
-                  }
-                },
-                doc
-              ]
-            : null;
+          if (doc[indexConfig.idKey] === undefined) {
+            logger.error(`skipping malformed csv line: [${line}]`, doc);
+            return null;
+          } else {
+            return [
+              {
+                index: {
+                  _id: doc[indexConfig.idKey],
+                  _index: indexName,
+                  // Next major ES version won't need _type anymore
+                  _type: "_doc"
+                }
+              },
+              doc
+            ];
+          }
         });
 
       bulkIndex(
