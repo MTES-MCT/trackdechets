@@ -4,7 +4,7 @@ instances:
 
 logs:
   - type: file
-    path: /var/log/trackdechets/trackdechets-search.log
+    path: /app/logs/trackdechets-search.log
     service: trackdechets-search
     source: nodejs
     sourcecategory: sourcecode
