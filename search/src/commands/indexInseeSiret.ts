@@ -1,5 +1,6 @@
-import { elasticSearchClient as client } from "..";
+import "../common/tracer"; // tracer.init() doit précéder l'importation des modules instrumentés.
 import { logger } from "..";
+import { elasticSearchClient as client } from "..";
 import {
   ElasticBulkNonFlatPayload,
   IndexProcessConfig

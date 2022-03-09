@@ -1,3 +1,4 @@
+import "../common/tracer"; // tracer.init() doit précéder l'importation des modules instrumentés.
 import { logger } from "../common/logger";
 import {
   downloadAndIndex,

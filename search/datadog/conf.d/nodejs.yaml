@@ -1,5 +1,7 @@
 init_config:
+
 instances:
+
 logs:
   - type: file
     path: /var/log/trackdechets/trackdechets-search.log
