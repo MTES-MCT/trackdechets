@@ -50,7 +50,18 @@ function MobileSubNav({ currentSiret }) {
   if (error) return <InlineError apolloError={error} />;
   if (data?.me == null) return <Loader />;
 
-  return <DashboardTabs siret={currentSiret} me={data.me} />;
+  const companies = data.me.companies;
+  const currentCompany = companies.find(
+    company => company.siret === currentSiret
+  );
+
+  if (currentCompany == null) {
+    return null;
+  }
+
+  return (
+    <DashboardTabs currentCompany={currentCompany} companies={companies} />
+  );
 }
 
 const getMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
