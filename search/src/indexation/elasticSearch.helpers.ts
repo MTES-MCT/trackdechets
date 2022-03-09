@@ -191,30 +191,39 @@ export const bulkIndex = async (
     body: BulkOperationContainer[]
   ) => {
     if (bulkResponse.errors) {
-      for (let i = 0; i < bulkResponse.items.length; i++) {
-        const action = bulkResponse.items[i];
+      for (let k = 0; k < bulkResponse.items.length; k++) {
+        const action = bulkResponse.items[k];
         const operations: string[] = Object.keys(action);
         for (const operation of operations) {
           const opType = operation as BulkOperationType;
           if (action[opType].error) {
             // If the status is 429 it means that we can retry the document
-            if (action[opType].status) {
+            if (action[opType].status === 429) {
               logger.info(
-                `Retrying index operation for doc ${body[i * 2].index._id}`
+                `Retrying index operation for doc ${body[k * 2].index._id}`
               );
-              await client.index({
-                index: indexName,
-                id: body[i * 2].index._id as string,
-                body: body[i * 2 + 1],
-                type: "_doc",
-                refresh: false
-              });
+              try {
+                await client.index({
+                  index: indexName,
+                  id: body[k * 2].index._id as string,
+                  body: body[k * 2 + 1],
+                  type: "_doc",
+                  refresh: false
+                });
+              } catch (err) {
+                logger.error(
+                  `Error retrying index operation for doc ${
+                    body[k * 2].index._id
+                  }`,
+                  err
+                );
+              }
             }
+            // otherwise it's very likely a mapping error, and you should fix the document content
             const elasticBulkIndexError: ElasticBulkIndexError = {
-              // otherwise it's very likely a mapping error, and you should fix the document content
               status: action[opType].status,
               error: action[opType].error,
-              body: body[i * 2 + 1]
+              body: body[k * 2 + 1]
             };
             logger.error(`Error in bulkIndex operation`, {
               elasticBulkIndexError
@@ -325,32 +334,6 @@ export const unzipAndIndex = async (
   });
   stm.on("error", err => {
     throw err;
-  });
-};
-
-/**
- * Stream CSV file
- */
-export const streamCsvAndIndex = async (
-  csvPath: string,
-  indexConfig: IndexProcessConfig
-) => {
-  var readStream = fs.createReadStream(csvPath);
-  const indexName = await createIndexRelease(indexConfig);
-
-  readStream.on("open", function () {
-    let headers: string[];
-    const writable = getWritableParserAndIndexer(
-      indexConfig,
-      headers,
-      indexName
-    );
-    readStream.pipe(writable);
-  });
-
-  // This catches any errors that happen while creating the readable stream (usually invalid names)
-  readStream.on("error", function (err) {
-    logger.error(err);
   });
 };
 

@@ -9,7 +9,6 @@ import {
   downloadAndIndex,
   INDEX_ALIAS_NAME_SEPARATOR,
   standardMapping,
-  streamCsvAndIndex,
   unzipAndIndex
 } from "../indexation/elasticSearch.helpers";
 
@@ -146,8 +145,6 @@ const siretIndexConfig: IndexProcessConfig = {
   logger.info("Starting indexation of StockEtablissements");
   if (process.env.INSEE_SIRET_ZIP_PATH) {
     await unzipAndIndex(process.env.INSEE_SIRET_ZIP_PATH, siretIndexConfig);
-  } else if (process.env.INSEE_SIRET_CSV_PATH) {
-    await streamCsvAndIndex(process.env.INSEE_SIRET_CSV_PATH, siretIndexConfig);
   } else {
     await downloadAndIndex(siretUrl, siretIndexConfig);
   }
