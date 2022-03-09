@@ -215,12 +215,14 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
 
 type TransporterFormCompanyFieldsProps = {
   transporter?: Transporter;
-  sentAt?: Date;
+  takenOverAt?: Date;
+  takenOverBy?: string;
 };
 
 function TransporterFormCompanyFields({
   transporter,
-  sentAt
+  takenOverAt,
+  takenOverBy
 }: TransporterFormCompanyFieldsProps) {
   return (
     <div className="Row">
@@ -244,11 +246,11 @@ function TransporterFormCompanyFields({
           <br />
           Immatriculation(s) : {transporter?.numberPlate}
           <br />
-          Date de prise en charge : {formatDate(sentAt)}
+          Date de prise en charge : {formatDate(takenOverAt)}
           <br />
-          Nom et signature :
+          Nom et signature : {takenOverBy}
         </p>
-        {sentAt && <SignatureStamp />}
+        {takenOverAt && <SignatureStamp />}
       </div>
     </div>
   );
@@ -556,12 +558,12 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             </p>
             <p>
               <span className="Row">
-                <span className="Col">Nom : {form.sentBy}</span>
-                <span className="Col">Date : {formatDate(form.sentAt)}</span>
+                <span className="Col">Nom : {form.emittedBy}</span>
+                <span className="Col">Date : {formatDate(form.emittedAt)}</span>
                 <span className="Col">Signature :</span>
               </span>
             </p>
-            {form.sentAt && <SignatureStamp />}
+            {form.emittedAt && <SignatureStamp />}
           </div>
         </div>
 
@@ -747,7 +749,8 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             </p>
             <TransporterFormCompanyFields
               transporter={form.temporaryStorageDetail?.transporter}
-              sentAt={form.temporaryStorageDetail?.signedAt}
+              takenOverAt={form.temporaryStorageDetail?.takenOverAt}
+              takenOverBy={form.temporaryStorageDetail?.takenOverBy}
             />
           </div>
         </div>
@@ -807,7 +810,8 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                     ...transportSegment?.transporter,
                     mode: transportSegment?.mode
                   }}
-                  sentAt={transportSegment?.takenOverAt}
+                  takenOverAt={transportSegment?.takenOverAt}
+                  takenOverBy={transportSegment?.takenOverBy}
                 />
               </div>
             </div>
