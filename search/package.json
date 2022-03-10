@@ -1,7 +1,7 @@
 {
   "name": "trackdechets-search",
-  "version": "1.0.1",
-  "description": "Search index for entities on Trackdéchets",
+  "version": "1.1.0",
+  "description": "Search index for organisations on Trackdéchets",
   "main": "src/index.ts",
   "scripts": {
     "test": "jest --passWithNoTests",
@@ -43,6 +43,7 @@
     "@elastic/elasticsearch": "^7.17.0",
     "app-root-path": "^3.0.0",
     "dd-trace": "^1.6.0",
+    "fast-csv": "^4.3.6",
     "node-stream-zip": "^1.15.0",
     "winston": "^3.4.0"
   }

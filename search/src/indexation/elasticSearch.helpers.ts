@@ -2,7 +2,15 @@ import fs from "fs";
 import { rm } from "fs/promises";
 import https from "https";
 import path from "path";
-import { Writable } from "stream";
+import stream, { Writable } from "stream";
+import util from "util";
+import {
+  BulkOperationContainer,
+  BulkOperationType,
+  BulkResponse
+} from "@elastic/elasticsearch/api/types";
+import { ApiResponse } from "@elastic/elasticsearch";
+import { parse } from "fast-csv";
 import StreamZip from "node-stream-zip";
 import { logger } from "..";
 import { elasticSearchClient as client } from "..";
@@ -12,14 +20,7 @@ import {
   IndexProcessConfig
 } from "./types";
 
-import {
-  BulkOperationContainer,
-  BulkOperationType,
-  BulkResponse,
-  BulkResponseItem
-} from "@elastic/elasticsearch/api/types";
-import { ApiResponse } from "@elastic/elasticsearch";
-
+const pipeline = util.promisify(stream.pipeline);
 var pjson = require("../../package.json");
 
 // Max size of documents to index at once, also depends on ES JVM memory available
@@ -292,55 +293,42 @@ export const bulkIndex = async (
  */
 export const getWritableParserAndIndexer = (
   indexConfig: IndexProcessConfig,
-  headers: string[],
   indexName: string
 ) =>
   new Writable({
     // seems a reasonanle data size to go with CHUNK_SIZE = 10000
-    highWaterMark: 8_192_000,
-    writev: (chunks, next) => {
-      const bufferChunk = chunks.map(({ chunk }) => chunk);
-      const csvLines: string[] = bufferChunk.toString().split("\n");
-      const body: ElasticBulkNonFlatPayload = csvLines
-        .filter((line: string, index: number) => {
-          // exclude invalid like ones not starting with a SIREN numbers string
-          const values = line.split(",");
-          if (values && values.length) {
-            return true;
-          } else {
-            logger.error(
-              `error csv parsing malformed line ${
-                index + 1
-              }: [${line}] => parsed into [${values.toString()}]`
-            );
-            return false;
-          }
-        })
-        .map(line => {
-          const values = line.split(",");
-          const doc: Record<string, any> = {};
-          // build the document to index
-          for (let i = 0; i < headers.length; i++) {
-            doc[headers[i]] = values[i];
-          }
-          // skip lines without "idKey" column because we cannot miss the _id in ES
-          if (doc[indexConfig.idKey] === undefined) {
-            logger.error(`skipping malformed csv line missing _id key ${indexConfig.idKey}: [${line}]`, doc);
-            return null;
-          } else {
-            return [
-              {
-                index: {
-                  _id: doc[indexConfig.idKey],
-                  _index: indexName,
-                  // Next major ES version won't need _type anymore
-                  _type: "_doc"
-                }
-              },
-              doc
-            ];
-          }
-        });
+    highWaterMark: 100_000,
+    objectMode: true,
+    writev: (csvLines, next) => {
+      const body: ElasticBulkNonFlatPayload = csvLines.map((chunk, i) => {
+        const doc = chunk.chunk;
+        // skip lines without "idKey" column because we cannot miss the _id in ES
+        if (
+          doc[indexConfig.idKey] === undefined ||
+          !doc[indexConfig.idKey].length
+        ) {
+          logger.error(
+            `skipping malformed csv line ${i} missing _id key ${indexConfig.idKey}`,
+            doc
+          );
+          return null;
+        } else if (doc[indexConfig.idKey] === indexConfig.idKey) {
+          // first line
+          return null;
+        } else {
+          return [
+            {
+              index: {
+                _id: doc[indexConfig.idKey],
+                _index: indexName,
+                // Next major ES version won't need _type anymore
+                _type: "_doc"
+              }
+            },
+            doc
+          ];
+        }
+      });
 
       bulkIndex(
         body.filter(line => line !== null),
@@ -357,25 +345,39 @@ export const getWritableParserAndIndexer = (
  */
 export const unzipAndIndex = async (
   zipPath: string,
+  destination: string,
   indexConfig: IndexProcessConfig
 ) => {
   const indexName = await createIndexRelease(indexConfig);
   const zip = new StreamZip.async({ file: zipPath });
-  const stm = await zip.stream(indexConfig.csvFileName);
+  const csvPath = path.join(destination, indexConfig.csvFileName);
+  await zip.extract(indexConfig.csvFileName, csvPath);
+  await zip.close();
   const headers = indexConfig.headers;
-  const writable = getWritableParserAndIndexer(indexConfig, headers, indexName);
-  stm.pipe(writable);
-  stm.on("end", async () => {
-    zip.close();
-    // roll-over index alias
-    await cleanOldIndexes(indexConfig.alias, indexName);
-    logger.info(
-      `Finished indexing ${indexName} with alias ${indexConfig.alias}`
-    );
-  });
-  stm.on("error", err => {
-    throw err;
-  });
+  const writableStream = getWritableParserAndIndexer(indexConfig, indexName);
+  await pipeline(
+    fs.createReadStream(csvPath),
+    parse({ headers, ignoreEmpty: true })
+      .on("error", error => {
+        throw error;
+      })
+      .on("end", async (rowCount: number) => {
+        logger.info(`Finished parsing ${rowCount} CSV rows`);
+        // roll-over index alias
+        await cleanOldIndexes(indexConfig.alias, indexName);
+        logger.info(
+          `Finished indexing ${indexName} with alias ${indexConfig.alias}`
+        );
+        await rm(zipPath, { force: true });
+        await rm(csvPath, { force: true });
+      }),
+    writableStream
+  );
+  // roll-over index alias
+  await cleanOldIndexes(indexConfig.alias, indexName);
+  logger.info(`Finished indexing ${indexName} with alias ${indexConfig.alias}`);
+  await rm(zipPath, { force: true });
+  await rm(csvPath, { force: true });
 };
 
 /**
@@ -424,8 +426,11 @@ export const downloadAndIndex = async (
           file.close();
           logger.info(`Finished downloading the INSEE archive to ${zipPath}`);
           try {
-            const result = await unzipAndIndex(zipPath, indexConfig);
-            await rm(zipPath, { force: true });
+            const result = await unzipAndIndex(
+              zipPath,
+              destination,
+              indexConfig
+            );
             resolve(result);
           } catch (e: any) {
             reject(e.message);
