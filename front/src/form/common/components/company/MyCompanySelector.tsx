@@ -93,13 +93,18 @@ export default function MyCompanySelector({ fieldName, onSelect }) {
           }}
         >
           <option value="" label="Sélectionner un de vos établissements" />
-          {companies.map(c => (
-            <option
-              key={c.siret}
-              value={c.siret}
-              label={`${c.givenName ?? c.name ?? ""} - ${c.siret}`}
-            ></option>
-          ))}
+          {companies.map(c => {
+            const name =
+              c.givenName && c.givenName !== "" ? c.givenName : c.name;
+
+            return (
+              <option
+                key={c.siret}
+                value={c.siret}
+                label={`${name} - ${c.siret}`}
+              ></option>
+            );
+          })}
         </select>
         <div className="form__row">
           <label>
