@@ -14,11 +14,15 @@ mutation CreateBsda($input: BsdaInput!) {
     destination {
       company {
           siret
+          orgId
+          orgRegistry
       }
     }
     emitter {
       company {
           siret
+          orgId
+          orgRegistry
       }
     }
     transporter {
@@ -138,6 +142,10 @@ describe("Mutation.Bsda.create", () => {
     expect(data.createBsda.destination.company.siret).toBe(
       input.destination.company.siret
     );
+    expect(data.createBsda.destination.company.orgId).toBe(
+      input.destination.company.siret
+    );
+    expect(data.createBsda.destination.company.orgRegistry).toBe("SIRENE");
   });
   it("should allow creating the form if up to 2 plates are submitted", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -207,6 +215,8 @@ describe("Mutation.Bsda.create", () => {
     });
 
     expect(data.createBsda.transporter.transport.plates.length).toBe(2);
+    expect(data.createBsda.transporter.company.orgId).toEqual("11111111111112");
+    expect(data.createBsda.transporter.company.orgRegistry).toEqual("SIRENE");
   });
 
   it("should fail creating the form if more than 2 plates are submitted", async () => {

@@ -60,9 +60,12 @@ export const companyFactory = async (
 ) => {
   const opts = companyOpts || {};
   const companyIndex = (await prisma.company.count()) + 1;
+  const siret = siretify(companyIndex);
   return prisma.company.create({
     data: {
-      siret: siretify(companyIndex),
+      siret,
+      orgId: siret,
+      orgRegistry: "SIRENE",
       companyTypes: {
         set: ["PRODUCER" as CompanyType]
       },

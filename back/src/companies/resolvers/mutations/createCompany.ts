@@ -84,6 +84,8 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   const companyCreateInput: Prisma.CompanyCreateInput = {
     siret,
+    orgId: siret,
+    orgRegistry: "SIRENE",
     codeNaf,
     gerepId,
     name,
