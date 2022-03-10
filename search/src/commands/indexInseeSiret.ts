@@ -135,7 +135,57 @@ const siretIndexConfig: IndexProcessConfig = {
         }
       }
     }
-  }
+  },
+  headers: [
+    "siren",
+    "nic",
+    "siret",
+    "statutDiffusionEtablissement",
+    "dateCreationEtablissement",
+    "trancheEffectifsEtablissement",
+    "anneeEffectifsEtablissement",
+    "activitePrincipaleRegistreMetiersEtablissement",
+    "dateDernierTraitementEtablissement",
+    "etablissementSiege",
+    "nombrePeriodesEtablissement",
+    "complementAdresseEtablissement",
+    "numeroVoieEtablissement",
+    "indiceRepetitionEtablissement",
+    "typeVoieEtablissement",
+    "libelleVoieEtablissement",
+    "codePostalEtablissement",
+    "libelleCommuneEtablissement",
+    "libelleCommuneEtrangerEtablissement",
+    "distributionSpecialeEtablissement",
+    "codeCommuneEtablissement",
+    "codeCedexEtablissement",
+    "libelleCedexEtablissement",
+    "codePaysEtrangerEtablissement",
+    "libellePaysEtrangerEtablissement",
+    "complementAdresse2Etablissement",
+    "numeroVoie2Etablissement",
+    "indiceRepetition2Etablissement",
+    "typeVoie2Etablissement",
+    "libelleVoie2Etablissement",
+    "codePostal2Etablissement",
+    "libelleCommune2Etablissement",
+    "libelleCommuneEtranger2Etablissement",
+    "distributionSpeciale2Etablissement",
+    "codeCommune2Etablissement",
+    "codeCedex2Etablissement",
+    "libelleCedex2Etablissement",
+    "codePaysEtranger2Etablissement",
+    "libellePaysEtranger2Etablissement",
+    "dateDebut",
+    "etatAdministratifEtablissement",
+    "enseigne1Etablissement",
+    "enseigne2Etablissement",
+    "enseigne3Etablissement",
+    "denominationUsuelleEtablissement",
+    "activitePrincipaleEtablissement",
+    "nomenclatureActivitePrincipaleEtablissement",
+    "caractereEmployeurEtablissement"
+  ]
 };
 
 /**

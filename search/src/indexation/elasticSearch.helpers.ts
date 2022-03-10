@@ -327,7 +327,7 @@ export const unzipAndIndex = async (
   const indexName = await createIndexRelease(indexConfig);
   const zip = new StreamZip.async({ file: zipPath });
   const stm = await zip.stream(indexConfig.csvFileName);
-  let headers: string[];
+  const headers = indexConfig.headers;
   const writable = getWritableParserAndIndexer(indexConfig, headers, indexName);
   stm.pipe(writable);
   stm.on("end", async () => {

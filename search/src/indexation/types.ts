@@ -2,6 +2,7 @@
  * Indexing process configuration
  */
 export interface IndexProcessConfig {
+  headers: string[];
   alias: string;
   csvFileName: string;
   idKey: string;
