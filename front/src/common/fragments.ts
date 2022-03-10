@@ -257,6 +257,11 @@ const mutableFieldsFragment = gql`
           name
         }
       }
+      recipient {
+        company {
+          siret
+        }
+      }
       signedAt
       processingOperationDone
     }

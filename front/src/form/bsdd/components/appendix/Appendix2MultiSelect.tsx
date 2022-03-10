@@ -54,12 +54,15 @@ export default function Appendix2MultiSelect() {
   // initial value of form.appendix2Forms when updating a BSDD
   const appendix2Candidates = useMemo(() => {
     const appendix2Forms = data?.appendixForms ?? [];
-    return [...(meta.initialValue ?? []), ...appendix2Forms].filter(f => {
+    const initialValue = (meta.initialValue ?? []).filter(f => {
+      return f.recipient?.company?.siret === values.emitter?.company?.siret;
+    });
+    return [...initialValue, ...appendix2Forms].filter(f => {
       return wasteCodeFilter?.length
         ? f.wasteDetails?.code?.includes(wasteCodeFilter)
         : true;
     });
-  }, [data, meta.initialValue, wasteCodeFilter]);
+  }, [data, meta.initialValue, wasteCodeFilter, values.emitter]);
 
   const appendix2Selected = useMemo(() => values.appendix2Forms ?? [], [
     values.appendix2Forms,
@@ -117,6 +120,10 @@ export default function Appendix2MultiSelect() {
     } else {
       setFieldValue("appendix2Forms", appendix2Candidates);
     }
+  }
+
+  if (loading) {
+    return <div>Chargement</div>;
   }
 
   return (
@@ -208,7 +215,6 @@ export default function Appendix2MultiSelect() {
         </tbody>
       </table>
       {error && <InlineError apolloError={error} />}
-      {loading && <div>Chargement</div>}
     </>
   );
 }

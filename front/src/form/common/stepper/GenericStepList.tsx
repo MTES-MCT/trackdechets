@@ -121,7 +121,7 @@ export default function GenericStepList({
                 </button>
 
                 <button className="btn btn--primary" type="submit">
-                  {!isLastStep ? "Suivant" : formId ? "Créer" : "Enregistrer"}
+                  {!isLastStep ? "Suivant" : formId ? "Enregistrer" : "Créer"}
                 </button>
               </div>
             </form>
