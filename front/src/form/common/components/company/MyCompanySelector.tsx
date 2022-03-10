@@ -8,8 +8,9 @@ import {
   Query,
 } from "generated/graphql/types";
 import styles from "./CompanySelector.module.scss";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
+import { sortCompaniesByName } from "common/helper";
 
 export const GET_ME = gql`
   {
@@ -28,11 +29,18 @@ export const GET_ME = gql`
   }
 `;
 
-export default function MyCompanySelector({ fieldName }) {
-  const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME);
-
+export default function MyCompanySelector({ fieldName, onSelect }) {
   const { setFieldValue } = useFormikContext<CreateFormInput>();
   const [field] = useField({ name: fieldName });
+
+  const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME, {
+    onCompleted: data => {
+      // check user is member of selected company or reset emitter company
+      if (!data.me.companies.map(c => c.siret).includes(field.value.siret)) {
+        setFieldValue(fieldName, getInitialCompany());
+      }
+    },
+  });
 
   const onCompanySelect = useCallback(
     (company: CompanyPrivate) => {
@@ -41,16 +49,23 @@ export default function MyCompanySelector({ fieldName }) {
       setFieldValue(`${fieldName}.mail`, company.contactEmail ?? "");
       setFieldValue(`${fieldName}.phone`, company.contactPhone ?? "");
       setFieldValue(`${fieldName}.address`, company.address ?? "");
+      if (onSelect) {
+        onSelect();
+      }
     },
-    [fieldName, setFieldValue]
+    [fieldName, setFieldValue, onSelect]
   );
 
+  const companies = useMemo(() => {
+    return sortCompaniesByName(data?.me.companies ?? []);
+  }, [data]);
+
   useEffect(() => {
-    if (data?.me.companies?.length === 1) {
-      setFieldValue(`${fieldName}.siret`, data?.me.companies[0].siret);
-      onCompanySelect(data?.me.companies[0]);
+    if (companies.length === 1) {
+      setFieldValue(`${fieldName}.siret`, companies[0].siret);
+      onCompanySelect(companies[0]);
     }
-  }, [data, setFieldValue, fieldName, onCompanySelect]);
+  }, [companies, setFieldValue, fieldName, onCompanySelect]);
 
   if (loading) {
     return <div>Chargement...</div>;
@@ -67,7 +82,7 @@ export default function MyCompanySelector({ fieldName }) {
           className="td-select td-input--medium"
           value={field.value?.siret}
           onChange={e => {
-            const selectedCompany = data.me.companies.filter(
+            const selectedCompany = companies.filter(
               c => c.siret === e.target.value
             )?.[0];
             if (selectedCompany) {
@@ -78,7 +93,7 @@ export default function MyCompanySelector({ fieldName }) {
           }}
         >
           <option value="" label="Sélectionner un de vos établissements" />
-          {data.me.companies.map(c => (
+          {companies.map(c => (
             <option
               key={c.siret}
               value={c.siret}

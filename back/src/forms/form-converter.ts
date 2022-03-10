@@ -680,6 +680,7 @@ export function expandAppendix2FormFromDb(
     readableId,
     wasteDetails,
     emitter,
+    recipient,
     signedAt,
     quantityReceived,
     processingOperationDone
@@ -691,6 +692,7 @@ export function expandAppendix2FormFromDb(
     emitter,
     emitterPostalCode: extractPostalCode(emitter?.company?.address),
     signedAt,
+    recipient,
     quantityReceived,
     processingOperationDone
   };

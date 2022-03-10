@@ -122,3 +122,11 @@ export const decodeHash = (hash: string | string[] | null): string => {
     ? decodeURIComponent(hash[0])
     : decodeURIComponent(hash);
 };
+
+export const sortCompaniesByName = values => {
+  return [...values].sort((a, b) => {
+    const aName = a.givenName || a.name || "";
+    const bName = b.givenName || b.name || "";
+    return aName.localeCompare(bName);
+  });
+};
