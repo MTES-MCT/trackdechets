@@ -117,7 +117,6 @@ function signEmissionFormInput() {
   return {
     quantity: 1,
     onuCode: "non soumis",
-    packagingInfos: [],
     transporterNumberPlate: "AA-123456-BB",
     emittedAt: "2020-04-03T14:48:00",
     emittedBy: "Isabelle Guichard",

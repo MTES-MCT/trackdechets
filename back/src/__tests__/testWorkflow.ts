@@ -17,11 +17,14 @@ async function testWorkflow(workflow) {
   // run the steps one by one
   for (const step of workflow.steps) {
     const { mutate } = makeClient(context[step.company].user);
-    const { data: response } = await mutate(step.mutation, {
+    const { errors, data: response } = await mutate(step.mutation, {
       variables: step.variables(context)
     });
+    expect(errors).toBeUndefined();
+
     const data = step.data(response);
     expect(data).toEqual(expect.objectContaining(step.expected));
+
     if (step.setContext) {
       context = step.setContext(context, data);
     }
