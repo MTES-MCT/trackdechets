@@ -5,14 +5,7 @@ import styles from "../AccountField.module.scss";
 
 describe("<AccountField />", () => {
   it("should render label, value, tooltip and modifier", () => {
-    const {
-      container,
-      getByLabelText,
-      getAllByLabelText,
-      getByText,
-      getByRole,
-      queryByRole,
-    } = render(
+    const { container, getByText, getByRole, queryByRole } = render(
       <AccountField
         name="username"
         label="Nom utilisateur"

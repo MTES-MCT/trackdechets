@@ -51,11 +51,7 @@ export default withRouter(function Login(
   return (
     <section className="section section--white">
       <div className="container-narrow">
-        <form
-          action={`${VITE_API_ENDPOINT}/login`}
-          method="post"
-          name="login"
-        >
+        <form action={`${VITE_API_ENDPOINT}/login`} method="post" name="login">
           <h1 className="h1 tw-mb-6">Connexion</h1>
           <div className="form__row">
             <label>
