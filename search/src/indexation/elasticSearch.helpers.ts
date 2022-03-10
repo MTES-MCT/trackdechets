@@ -62,7 +62,42 @@ export const sireneIndexConfig: IndexProcessConfig = {
   // zip target filename
   zipFileName: "StockUniteLegale_utf8.zip",
   idKey: "siren",
-  mappings: standardMapping
+  mappings: standardMapping,
+  headers: [
+    "siren",
+    "statutDiffusionUniteLegale",
+    "unitePurgeeUniteLegale",
+    "dateCreationUniteLegale",
+    "sigleUniteLegale",
+    "sexeUniteLegale",
+    "prenom1UniteLegale",
+    "prenom2UniteLegale",
+    "prenom3UniteLegale",
+    "prenom4UniteLegale",
+    "prenomUsuelUniteLegale",
+    "pseudonymeUniteLegale",
+    "identifiantAssociationUniteLegale",
+    "trancheEffectifsUniteLegale",
+    "anneeEffectifsUniteLegale",
+    "dateDernierTraitementUniteLegale",
+    "nombrePeriodesUniteLegale",
+    "categorieEntreprise",
+    "anneeCategorieEntreprise",
+    "dateDebut",
+    "etatAdministratifUniteLegale",
+    "nomUniteLegale",
+    "nomUsageUniteLegale",
+    "denominationUniteLegale",
+    "denominationUsuelle1UniteLegale",
+    "denominationUsuelle2UniteLegale",
+    "denominationUsuelle3UniteLegale",
+    "categorieJuridiqueUniteLegale",
+    "activitePrincipaleUniteLegale",
+    "nomenclatureActivitePrincipaleUniteLegale",
+    "nicSiegeUniteLegale",
+    "economieSocialeSolidaireUniteLegale",
+    "caractereEmployeurUniteLegale"
+  ]
 };
 
 /**
@@ -266,20 +301,20 @@ export const getWritableParserAndIndexer = (
     writev: (chunks, next) => {
       const bufferChunk = chunks.map(({ chunk }) => chunk);
       const csvLines: string[] = bufferChunk.toString().split("\n");
-      // get columns names in the csv header
-      // pre-suppose that the first column === "siren" for both files
-      if (csvLines[0].startsWith("siren") && !headers) {
-        headers = csvLines[0].split(",");
-        csvLines.shift();
-      }
-
       const body: ElasticBulkNonFlatPayload = csvLines
-        .filter(line => {
+        .filter((line: string, index: number) => {
           // exclude invalid like ones not starting with a SIREN numbers string
           const values = line.split(",");
-          return (
-            values && values.length && values[0] && /^\d+$/.test(values[0])
-          );
+          if (values && values.length) {
+            return true;
+          } else {
+            logger.error(
+              `error csv parsing malformed line ${
+                index + 1
+              }: [${line}] => parsed into [${values.toString()}]`
+            );
+            return false;
+          }
         })
         .map(line => {
           const values = line.split(",");
@@ -288,9 +323,9 @@ export const getWritableParserAndIndexer = (
           for (let i = 0; i < headers.length; i++) {
             doc[headers[i]] = values[i];
           }
-          // skip lines without "idKey" column
+          // skip lines without "idKey" column because we cannot miss the _id in ES
           if (doc[indexConfig.idKey] === undefined) {
-            logger.error(`skipping malformed csv line: [${line}]`, doc);
+            logger.error(`skipping malformed csv line missing _id key ${indexConfig.idKey}: [${line}]`, doc);
             return null;
           } else {
             return [
