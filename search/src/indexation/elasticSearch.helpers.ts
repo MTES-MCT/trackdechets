@@ -194,7 +194,6 @@ export const bulkIndex = async (
      */
     const requestBulkIndex = async (body: BulkOperationContainer[]) => {
       if (!body || !body.length) {
-        logger.warn(`request to bulkIndex an empty body, return`);
         // nothing to index
         return Promise.resolve(null);
       }
@@ -208,9 +207,11 @@ export const bulkIndex = async (
         await logBulkErrorsAndRetry(bulkResponse.body, body);
       }
     };
-    logger.info(
-      `Indexing ${bodyChunk.length} documents in bulk to index ${indexName}`
-    );
+    if (bodyChunk.length) {
+      logger.info(
+        `Indexing ${bodyChunk.length} documents in bulk to index ${indexName}`
+      );
+    }
     // append new data to the body before indexation
     if (typeof indexConfig.dataFormatterFn === "function") {
       const formattedChunk = await indexConfig.dataFormatterFn(bodyChunk, {
