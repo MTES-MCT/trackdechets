@@ -3,7 +3,6 @@ import {
   QueryDslQueryContainer
 } from "@elastic/elasticsearch/api/types";
 import { TransportRequestOptions } from "@elastic/elasticsearch/lib/Transport";
-import { UserInputError } from "apollo-server-express";
 import logger from "../../../logging/logger";
 import { libelleFromCodeNaf, buildAddress, removeDiacritics } from "../utils";
 import { CompanySearchResult } from "../types";
@@ -19,6 +18,8 @@ import client from "./esClient";
 import { ResponseError } from "@elastic/elasticsearch/lib/errors";
 
 const index = process.env.TD_COMPANY_ELASTICSEARCH_INDEX;
+
+export class CompanyNotFound extends Error {}
 
 /**
  * Build a company object from a search response
@@ -95,17 +96,15 @@ export const searchCompany = (siret: string): Promise<CompanySearchResult> =>
       if (error instanceof AnonymousCompanyError) {
         throw error;
       }
-      // 404 "no results found"
+      // 404 veut peut-être dire non-diffusible, donc on se repose sur `redundancy` pour effectuer un requête sur les api publiques.
       if (error instanceof ResponseError && error.meta.statusCode === 404) {
-        throw new UserInputError(ProviderErrors.SiretNotFound, {
-          invalidArgs: ["siret"]
-        });
+        throw new CompanyNotFound(ProviderErrors.SiretNotFound);
       }
       logger.error(
         `${ProviderErrors.ServerError}: ${error.name}, ${error.message}, \n`,
         { stacktrace: error.stack }
       );
-      throw new Error(`${ProviderErrors.ServerError}`);
+      throw new Error(ProviderErrors.ServerError);
     });
 
 /**
@@ -181,6 +180,6 @@ export const searchCompanies = (
     })
     .catch(error => {
       logger.error(`${ProviderErrors.ServerError}\n`, error);
-      throw new Error(`${ProviderErrors.ServerError}`);
+      throw new Error(ProviderErrors.ServerError);
     });
 };

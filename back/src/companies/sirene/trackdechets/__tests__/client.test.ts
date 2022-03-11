@@ -1,4 +1,4 @@
-import { searchCompany, searchCompanies } from "../client";
+import { searchCompany, searchCompanies, CompanyNotFound } from "../client";
 import { ErrorCode } from "../../../../common/errors";
 import client from "../esClient";
 import { ResponseError } from "@elastic/elasticsearch/lib/errors";
@@ -48,6 +48,7 @@ describe("searchCompany", () => {
     expect(company).toEqual(expected);
   });
 
+  // FIXME this case may not even exist in INSEE public data
   it("should raise AnonymousCompanyError if non-diffusible", async () => {
     (client.get as jest.Mock).mockResolvedValueOnce({
       body: {
@@ -90,18 +91,13 @@ describe("searchCompany", () => {
     expect(company.name).toEqual("JOHN SNOW");
   });
 
-  it("should raise BAD_USER_INPUT if error 404 (siret not found)", async () => {
+  it("should raise CompanyNotFound if error 404 (siret not found)", async () => {
     (client.get as jest.Mock).mockRejectedValueOnce(
       new ResponseError({
         statusCode: 404
       } as unknown as ApiResponse)
     );
-    expect.assertions(1);
-    try {
-      await searchCompany("xxxxxxxxxxxxxx");
-    } catch (e) {
-      expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
-    }
+    expect(searchCompany("xxxxxxxxxxxxxx")).rejects.toThrow(CompanyNotFound);
   });
 
   it(`should escalate other types of errors
