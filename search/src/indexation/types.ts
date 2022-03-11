@@ -2,6 +2,7 @@
  * Indexing process configuration
  */
 export interface IndexProcessConfig {
+  headers: string[];
   alias: string;
   csvFileName: string;
   idKey: string;
@@ -20,10 +21,10 @@ export interface IndexProcessConfig {
 export interface ElasticBulkIndexError {
   status: number;
   error: any;
-  bulkBody?: Array<Record<string, any>>;
+  body: Record<string, any>;
 }
 
-export type ElasticBulkPrepayload = {
+type ElasticBulkPrepayload = {
   index: {
     _id: string;
     _index: string;
@@ -32,7 +33,7 @@ export type ElasticBulkPrepayload = {
   };
 };
 
-export type ElasticBulkPayloadDocument = Record<string, any>;
+type ElasticBulkPayloadDocument = Record<string, any>;
 
 /**
  * Preprocessing Bulk payload

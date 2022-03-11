@@ -1,11 +1,8 @@
 import appRoot from "app-root-path";
 import { createLogger, format, transports } from "winston";
 
-let LOG_PATH = `${appRoot}/logs/trackdechets-search.log`;
-
-if (process.env.NODE_ENV !== "dev") {
-  LOG_PATH = "/var/log/trackdechets/trackdechets-search.log";
-}
+let LOG_PATH =
+  process.env.LOG_PATH ?? `${appRoot}/logs/trackdechets-search.log`;
 
 /**
  * Set process.env.FORCE_LOGGER_CONSOLE to switch to Console instead of log file
