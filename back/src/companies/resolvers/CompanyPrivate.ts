@@ -7,7 +7,13 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
     const userId = context.user.id;
     const userRole = await getUserRole(userId, parent.siret);
     if (userRole !== "ADMIN") {
-      return [];
+      return [
+        {
+          ...context.user,
+          role: userRole,
+          isPendingInvitation: false
+        }
+      ];
     }
 
     return getCompanyUsers(parent.siret, context.dataloaders);
