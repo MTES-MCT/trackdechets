@@ -348,7 +348,7 @@ export const unzipAndIndex = async (
   zipPath: string,
   destination: string,
   indexConfig: IndexProcessConfig
-) => {
+): Promise<string> => {
   const indexName = await createIndexRelease(indexConfig);
   const zip = new StreamZip.async({ file: zipPath });
   const csvPath = path.join(destination, indexConfig.csvFileName);
@@ -364,21 +364,13 @@ export const unzipAndIndex = async (
       })
       .on("end", async (rowCount: number) => {
         logger.info(`Finished parsing ${rowCount} CSV rows`);
-        // roll-over index alias
-        await cleanOldIndexes(indexConfig.alias, indexName);
-        logger.info(
-          `Finished indexing ${indexName} with alias ${indexConfig.alias}`
-        );
-        await rm(zipPath, { force: true });
-        await rm(csvPath, { force: true });
       }),
     writableStream
   );
   // roll-over index alias
   await cleanOldIndexes(indexConfig.alias, indexName);
   logger.info(`Finished indexing ${indexName} with alias ${indexConfig.alias}`);
-  await rm(zipPath, { force: true });
-  await rm(csvPath, { force: true });
+  return csvPath;
 };
 
 /**
@@ -427,12 +419,14 @@ export const downloadAndIndex = async (
           file.close();
           logger.info(`Finished downloading the INSEE archive to ${zipPath}`);
           try {
-            const result = await unzipAndIndex(
+            const csvPath = await unzipAndIndex(
               zipPath,
               destination,
               indexConfig
             );
-            resolve(result);
+            await rm(zipPath, { force: true });
+            await rm(csvPath, { force: true });
+            resolve(true);
           } catch (e: any) {
             reject(e.message);
           }
