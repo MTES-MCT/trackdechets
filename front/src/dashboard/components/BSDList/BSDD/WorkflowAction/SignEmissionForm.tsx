@@ -31,6 +31,7 @@ const SIGN_EMISSION_FORM = gql`
 `;
 
 interface SignEmissionFormModalProps {
+  title: string;
   siret: string;
   form: Form;
   onClose: () => void;
@@ -47,6 +48,16 @@ const validationSchema = yup.object({
     .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
 });
 
+enum EmitterType {
+  Emitter = "Emitter",
+  EcoOrganisme = "EcoOrganisme",
+}
+
+const EMITTER_TYPE_LABEL: Record<EmitterType, string> = {
+  [EmitterType.Emitter]: "émetteur du déchet",
+  [EmitterType.EcoOrganisme]: "éco-organisme",
+};
+
 function SignEmissionFormModal({
   siret,
   form,
@@ -56,9 +67,10 @@ function SignEmissionFormModal({
     Pick<Mutation, "signEmissionForm">,
     MutationSignEmissionFormArgs
   >(SIGN_EMISSION_FORM);
+
   return (
-    <Modal onClose={onClose} ariaLabel="Signer l'enlèvement" isOpen>
-      <h2 className="td-modal-title">Signer l'enlèvement</h2>
+    <Modal onClose={onClose} ariaLabel="Signer pour l'émetteur" isOpen>
+      <h2 className="td-modal-title">Signer pour l'émetteur</h2>
 
       <Formik
         initialValues={{
@@ -68,7 +80,7 @@ function SignEmissionFormModal({
           transporterNumberPlate:
             form.stateSummary?.transporterNumberPlate ?? "",
           emittedBy: "",
-          emittedByType: "emitter",
+          emittedByType: EmitterType.Emitter,
           securityCode: "",
         }}
         validationSchema={validationSchema}
@@ -85,7 +97,7 @@ function SignEmissionFormModal({
                   emittedAt: new Date().toISOString(),
                   emittedBy: values.emittedBy,
                   emittedByEcoOrganisme:
-                    values.emittedByType === "ecoOrganisme",
+                    values.emittedByType === EmitterType.EcoOrganisme,
                 },
                 securityCode: values.securityCode
                   ? Number(values.securityCode)
@@ -98,20 +110,18 @@ function SignEmissionFormModal({
       >
         {({ values }) => {
           let signatureAuthorSiret: string | null | undefined = undefined;
-          let signatureAuthorType =
-            values.emittedByType === "emitter"
-              ? "détenteur du déchet"
-              : "éco-organisme";
 
           if (form.status === FormStatus.Resealed) {
             signatureAuthorSiret = form.recipient?.company?.siret;
           } else {
-            if (values.emittedByType === "ecoOrganisme") {
+            if (values.emittedByType === EmitterType.EcoOrganisme) {
               signatureAuthorSiret = form.ecoOrganisme?.siret;
             } else {
               signatureAuthorSiret = form.emitter?.company?.siret;
             }
           }
+
+          const emitterLabel = EMITTER_TYPE_LABEL[values.emittedByType];
 
           return (
             <FormikForm>
@@ -119,35 +129,26 @@ function SignEmissionFormModal({
               <FormJourneySummary form={form} />
               {form.status === FormStatus.Sealed && form.ecoOrganisme && (
                 <>
-                  <div className="form__row">
-                    <label>
-                      <Field
-                        type="radio"
-                        name="emittedByType"
-                        value="emitter"
-                        className="td-radio"
-                      />
-                      Signer en tant que <strong>détenteur du déchet</strong>
-                    </label>
-                  </div>
-                  <div className="form__row">
-                    <label>
-                      <Field
-                        type="radio"
-                        name="emittedByType"
-                        value="ecoOrganisme"
-                        className="td-radio"
-                      />
-                      Signer en tant que <strong>éco-organisme</strong>
-                    </label>
-                  </div>
+                  {Object.entries(EMITTER_TYPE_LABEL).map(([value, label]) => (
+                    <div key={value} className="form__row">
+                      <label>
+                        <Field
+                          type="radio"
+                          name="emittedByType"
+                          value={value}
+                          className="td-radio"
+                        />
+                        Signer en tant que <strong>{label}</strong>
+                      </label>
+                    </div>
+                  ))}
                 </>
               )}
 
               <p className="tw-mt-4">
-                En qualité de <strong>{signatureAuthorType}</strong>, j'atteste
-                que les informations ci-dessus sont correctes. En signant ce
-                document, je déclare prendre en charge le déchet.
+                En qualité d'<strong>{emitterLabel}</strong>, j'atteste que les
+                informations ci-dessus sont correctes. En signant ce document,
+                je déclare prendre en charge le déchet.
               </p>
 
               <div className="form__row">
@@ -165,7 +166,7 @@ function SignEmissionFormModal({
               {siret !== signatureAuthorSiret && (
                 <div className="form__row">
                   <label>
-                    Code de signature
+                    Code de signature de l'{emitterLabel}
                     <Field
                       component={SignatureCodeInput}
                       className="td-input"
@@ -193,7 +194,9 @@ function SignEmissionFormModal({
                   disabled={loading}
                 >
                   <span>
-                    {loading ? "Signature en cours..." : "Signer l'enlèvement"}
+                    {loading
+                      ? "Signature en cours..."
+                      : "Signer pour l'émetteur"}
                   </span>
                 </button>
               </div>
@@ -207,6 +210,13 @@ function SignEmissionFormModal({
 
 export default function SignEmissionForm({ siret, form }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const currentUserIsEmitter = [
+    form.emitter?.company?.siret,
+    form.ecoOrganisme?.siret,
+  ].includes(siret);
+  const title = currentUserIsEmitter
+    ? "Signer pour l'émetteur"
+    : "Faire signer l'émetteur";
 
   return (
     <>
@@ -214,10 +224,11 @@ export default function SignEmissionForm({ siret, form }: WorkflowActionProps) {
         icon={<IconShipmentSignSmartphone size="24px" />}
         onClick={() => setIsOpen(true)}
       >
-        Signer l'enlèvement
+        {title}
       </ActionButton>
       {isOpen && (
         <SignEmissionFormModal
+          title={title}
           siret={siret}
           form={form}
           onClose={() => setIsOpen(false)}

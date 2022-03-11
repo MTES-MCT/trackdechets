@@ -56,8 +56,8 @@ function SignTransportFormModal({
     MutationSignTransportFormArgs
   >(SIGN_TRANSPORT_FORM);
   return (
-    <Modal onClose={onClose} ariaLabel="Signer l'enlèvement" isOpen>
-      <h2 className="td-modal-title">Signer l'enlèvement</h2>
+    <Modal onClose={onClose} ariaLabel="Signer pour le transporteur" isOpen>
+      <h2 className="td-modal-title">Signer pour le transporteur</h2>
 
       <Formik
         initialValues={{
@@ -109,7 +109,7 @@ function SignTransportFormModal({
             {siret !== form.transporter?.company?.siret && (
               <div className="form__row">
                 <label>
-                  Code de signature
+                  Code de signature du transporteur
                   <Field
                     component={SignatureCodeInput}
                     className="td-input"
@@ -137,7 +137,9 @@ function SignTransportFormModal({
                 disabled={loading}
               >
                 <span>
-                  {loading ? "Signature en cours..." : "Signer l'enlèvement"}
+                  {loading
+                    ? "Signature en cours..."
+                    : "Signer pour le transporteur"}
                 </span>
               </button>
             </div>
@@ -160,7 +162,7 @@ export default function SignTransportForm({
         icon={<IconShipmentSignSmartphone size="24px" />}
         onClick={() => setIsOpen(true)}
       >
-        Signer l'enlèvement
+        Signer pour le transporteur
       </ActionButton>
       {isOpen && (
         <SignTransportFormModal
