@@ -1,14 +1,14 @@
 {
   "name": "trackdechets-search",
-  "version": "1.0.1",
-  "description": "Search index for entities on Trackdéchets",
+  "version": "1.1.0",
+  "description": "Search index for organisations on Trackdéchets",
   "main": "src/index.ts",
   "scripts": {
     "test": "jest --passWithNoTests",
     "scalingo-postbuild": "npm run build && npm prune --production",
     "build": "tsc",
     "watch": "tsc -w",
-    "start": "npm run index",
+    "start": "npm run build",
     "index": "npm run index:sirene && npm run index:siret",
     "index:dev": "export NODE_ENV=dev && docker-compose up -d elasticsearch && npm run build && npm run index:sirene && npm run index:siret",
     "index:sirene": "node dist/commands/indexInseeSirene.js",
@@ -43,6 +43,7 @@
     "@elastic/elasticsearch": "^7.17.0",
     "app-root-path": "^3.0.0",
     "dd-trace": "^1.6.0",
+    "fast-csv": "^4.3.6",
     "node-stream-zip": "^1.15.0",
     "winston": "^3.4.0"
   }

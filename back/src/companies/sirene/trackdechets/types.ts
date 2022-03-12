@@ -118,6 +118,6 @@ export interface SearchHit {
  * Public API error code names
  */
 export enum ProviderErrors {
-  SiretNotFound = "Aucun établissement trouvé avec ce SIRET",
+  SiretNotFound = "Nous n'avons pas trouvé ce SIRET dans notre base de données, cherchons sur l'Api publique Sirene de l'INSEE",
   ServerError = "Erreur inconnue"
 }

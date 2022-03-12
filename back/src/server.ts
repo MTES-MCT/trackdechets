@@ -1,5 +1,6 @@
 import "./tracer";
 
+import { makeExecutableSchema } from "@graphql-tools/schema";
 import {
   ApolloError,
   ApolloServer,
@@ -7,32 +8,32 @@ import {
 } from "apollo-server-express";
 import redisStore from "connect-redis";
 import cors from "cors";
-import express, { static as serveStatic, json, urlencoded } from "express";
+import express, { json, static as serveStatic, urlencoded } from "express";
 import rateLimit from "express-rate-limit";
 import session from "express-session";
 import depthLimit from "graphql-depth-limit";
-import { makeExecutableSchema } from "@graphql-tools/schema";
 import helmet from "helmet";
-import path from "path";
 import passport from "passport";
+import path from "path";
 import RateLimitRedisStore from "rate-limit-redis";
 import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
 import { ErrorCode } from "./common/errors";
-import { downloadRouter } from "./routers/downloadRouter";
 import errorHandler from "./common/middlewares/errorHandler";
+import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
-import { redisClient } from "./common/redis";
-import { authRouter } from "./routers/auth-router";
-import { oauth2Router } from "./routers/oauth2-router";
-import { typeDefs, resolvers } from "./schema";
-import { userActivationHandler } from "./users/activation";
-import { getUIBaseURL } from "./utils";
-import sentryReporter from "./common/plugins/sentryReporter";
-import { initSentry } from "./common/sentry";
 import { graphiqlLandingPagePlugin } from "./common/plugins/graphiql";
-import { createUserDataLoaders } from "./users/dataloaders";
+import sentryReporter from "./common/plugins/sentryReporter";
+import { redisClient } from "./common/redis";
+import { initSentry } from "./common/sentry";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
+import { authRouter } from "./routers/auth-router";
+import { downloadRouter } from "./routers/downloadRouter";
+import { oauth2Router } from "./routers/oauth2-router";
+import { resolvers, typeDefs } from "./schema";
+import { userActivationHandler } from "./users/activation";
+import { createUserDataLoaders } from "./users/dataloaders";
+import { getUIBaseURL } from "./utils";
 
 const {
   SESSION_SECRET,
@@ -161,6 +162,7 @@ app.use(graphqlBodyParser);
 
 // logging middleware
 app.use(loggingMiddleware(graphQLPath));
+app.use(graphqlBatchLimiterMiddleware(graphQLPath));
 
 /**
  * Set the following headers for cross-domain cookie

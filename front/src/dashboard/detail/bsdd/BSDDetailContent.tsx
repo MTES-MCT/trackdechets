@@ -329,7 +329,6 @@ const Recipient = ({
         />
         <DateRow value={form.processedAt} label="Traitement effectué le" />
         <DetailRow value={form.processedBy} label="Traitement effectué par" />
-        <DetailRow value={form.processedBy} label="Traitement effectué par" />
         {form.groupedIn && (
           <DetailRow
             value={form.groupedIn.readableId}

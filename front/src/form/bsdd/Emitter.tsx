@@ -1,14 +1,11 @@
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
-import { Field, useFormikContext } from "formik";
+import { Field, useField, useFormikContext } from "formik";
 import { Form } from "generated/graphql/types";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import EcoOrganismes from "./components/eco-organismes/EcoOrganismes";
 import WorkSite from "form/common/components/work-site/WorkSite";
-import {
-  getInitialCompany,
-  getInitialEmitterWorkSite,
-} from "form/bsdd/utils/initial-state";
+import { getInitialEmitterWorkSite } from "form/bsdd/utils/initial-state";
 import "./Emitter.scss";
 import MyCompanySelector from "form/common/components/company/MyCompanySelector";
 import { emitterTypeLabels } from "dashboard/constants";
@@ -29,18 +26,16 @@ export default function Emitter() {
     setLockEmitterType(false);
   }, [values.ecoOrganisme, setFieldValue]);
 
-  const emitterType = useMemo(() => values.emitter?.type, [values.emitter]);
+  const [emitterTypeField] = useField("emitter.type");
 
-  useEffect(() => {
-    // make sure appendix2 forms is empty when emitter type is not APPENDIX2
-    if (emitterType !== "APPENDIX2" && values.appendix2Forms?.length) {
+  function onChangeEmitterType(e) {
+    const previousEmitterType = values.emitter?.type;
+    emitterTypeField.onChange(e);
+    if (previousEmitterType === "APPENDIX2" && values.appendix2Forms?.length) {
+      // make sure to empty appendix2 forms when de-selecting APPENDIX2
       setFieldValue("appendix2Forms", []);
     }
-    // make sure to remove favorite company when emitter type is set to APPENDIX2
-    if (emitterType === "APPENDIX2") {
-      setFieldValue("emitter.company", getInitialCompany());
-    }
-  }, [emitterType, values.appendix2Forms, setFieldValue]);
+  }
 
   return (
     <>
@@ -72,6 +67,7 @@ export default function Emitter() {
             id="PRODUCER"
             label={emitterTypeLabels["PRODUCER"]}
             component={RadioButton}
+            onChange={onChangeEmitterType}
             disabled={lockEmitterType}
           />
           <Field
@@ -79,6 +75,7 @@ export default function Emitter() {
             id="OTHER"
             label={emitterTypeLabels["OTHER"]}
             component={RadioButton}
+            onChange={onChangeEmitterType}
             disabled={lockEmitterType}
           />
           <Field
@@ -86,6 +83,7 @@ export default function Emitter() {
             id="APPENDIX2"
             label={emitterTypeLabels["APPENDIX2"]}
             component={RadioButton}
+            onChange={onChangeEmitterType}
             disabled={lockEmitterType}
           />
 
@@ -94,6 +92,7 @@ export default function Emitter() {
             id="APPENDIX1"
             label={emitterTypeLabels["APPENDIX1"]}
             component={RadioButton}
+            onChange={onChangeEmitterType}
             disabled={lockEmitterType}
           />
         </fieldset>
@@ -102,7 +101,16 @@ export default function Emitter() {
       {values.emitter?.type === "APPENDIX2" ? (
         <div className="tw-my-6">
           <h4 className="form__section-heading">Entreprise émettrice</h4>
-          <MyCompanySelector fieldName="emitter.company" />
+          <MyCompanySelector
+            fieldName="emitter.company"
+            onSelect={() => {
+              if (values.appendix2Forms?.length) {
+                // make sure to empty appendix2 forms because new emitter may
+                // not be recipient of the select appendix 2 forms
+                setFieldValue("appendix2Forms", []);
+              }
+            }}
+          />
         </div>
       ) : (
         <CompanySelector

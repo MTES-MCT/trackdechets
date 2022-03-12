@@ -17,12 +17,11 @@ export async function editProfileFn(
   userId: string,
   payload: MutationEditProfileArgs
 ) {
-  const { name, phone, email } = payload;
+  const { name, phone } = payload;
 
   const data = {
     ...(name !== undefined ? { name } : {}),
-    ...(phone !== undefined ? { phone } : {}),
-    ...(email !== undefined ? { email } : {})
+    ...(phone !== undefined ? { phone } : {})
   };
   const updatedUser = await prisma.user.update({
     where: { id: userId },

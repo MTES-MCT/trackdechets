@@ -142,6 +142,10 @@ type Appendix2Form {
   """
   emitterPostalCode: String
   """
+  Destinataire du bordereau initial
+  """
+  recipient: Recipient
+  """
   Date d’acceptation du lot initial par l’installation réalisant une transformation ou un traitement aboutissant à des déchets
   dont la provenance reste identifiable. C'est la date qui figure au cadre 10 du bordereau initial.
   """

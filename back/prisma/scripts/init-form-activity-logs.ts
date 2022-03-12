@@ -13,13 +13,35 @@ export class LoadAnonymousCompaniesUpdater implements Updater {
     try {
       console.info("✨ Starting script to init Form activity logs...");
 
-      const forms = await prisma.form.findMany();
+      const firstBsddCreatedEvent = await prisma.event.findFirst({
+        orderBy: { createdAt: "asc" },
+        where: { type: "BsddCreated" }
+      });
+
+      const start = firstBsddCreatedEvent
+        ? new Date(firstBsddCreatedEvent.createdAt.getTime() - 500) // Event obj is created after the form. We take a 0.5s margin
+        : new Date();
+
+      const where = {
+        createdAt: {
+          lt: start
+        }
+      };
+      const formsCount = await prisma.form.count({ where });
       console.info(
-        `🔢 There are ${forms.length} forms to process. Chunk size is ${CHUNK_SIZE}`
+        `🔢 There are ${formsCount} forms to process. Chunk size is ${CHUNK_SIZE}`
       );
 
-      for (let i = 0; i < forms.length; i += CHUNK_SIZE) {
-        const chunkForms = forms.slice(i, i + CHUNK_SIZE);
+      let cursor = null;
+      for (let i = 0; i < formsCount; i += CHUNK_SIZE) {
+        const chunkForms = await prisma.form.findMany({
+          where,
+          orderBy: { id: "asc" },
+          take: CHUNK_SIZE,
+          ...(cursor ? { skip: 1, cursor: { id: cursor } } : {})
+        });
+
+        cursor = chunkForms[chunkForms.length - 1].id;
 
         await prisma.event.createMany({
           data: chunkForms.map(form => ({
