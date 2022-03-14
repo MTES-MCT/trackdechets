@@ -1,6 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { InlineError } from "common/components/Error";
 import { BsdaPicker } from "form/bsda/components/bsdaPicker/BsdaPicker";
+import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useField, useFormikContext } from "formik";
 import {
@@ -64,14 +65,18 @@ export function Type({ disabled }: Props) {
   useEffect(() => {
     if (type !== BsdaType.Gathering) {
       setFieldValue("grouping", []);
+      setFieldValue("worker.company", getInitialCompany());
     }
     if (type !== BsdaType.Reshipment) {
       setFieldValue("forwarding", null);
+      setFieldValue("worker.company", getInitialCompany());
     }
     if (type === BsdaType.Collection_2710) {
       setFieldValue("destination.company.siret", data?.companyInfos.siret);
       setFieldValue("destination.company.address", data?.companyInfos.address);
       setFieldValue("destination.company.name", data?.companyInfos.name);
+      setFieldValue("worker.company", getInitialCompany());
+      setFieldValue("transporter.company", getInitialCompany());
     }
   }, [type, setFieldValue, data]);
 

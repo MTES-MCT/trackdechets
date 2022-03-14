@@ -275,7 +275,13 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           BsdaType.GATHERING,
           BsdaType.COLLECTION_2710
         ].includes(value),
-      then: schema => schema.nullable(),
+      then: schema =>
+        schema
+          .nullable()
+          .max(
+            0,
+            "Impossible de saisir le nom d'une entreprise de travaux pour ce type de bordereau"
+          ),
       otherwise: schema =>
         schema.requiredIf(
           context.emissionSignature,
@@ -289,7 +295,13 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           BsdaType.GATHERING,
           BsdaType.COLLECTION_2710
         ].includes(value),
-      then: schema => schema.nullable(),
+      then: schema =>
+        schema
+          .nullable()
+          .max(
+            0,
+            "Impossible de saisir le SIRET d'une entreprise de travaux pour ce type de bordereau"
+          ),
       otherwise: schema =>
         schema
           .length(14, `Entreprise de travaux: ${INVALID_SIRET_LENGTH}`)
@@ -480,6 +492,11 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
       destinationOperationDate: yup
         .date()
         .max(new Date())
+        .when("destinationReceptionDate", (destinationReceptionDate, schema) =>
+          destinationReceptionDate
+            ? schema.min(destinationReceptionDate)
+            : schema
+        )
         .requiredIf(
           context.operationSignature,
           `Entreprise de destination:vous devez préciser la date d'opétation`
@@ -528,7 +545,13 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
       }),
       transporterCompanyName: yup.string().when("type", {
         is: BsdaType.COLLECTION_2710,
-        then: schema => schema.nullable(),
+        then: schema =>
+          schema
+            .nullable()
+            .max(
+              0,
+              "Impossible de saisir un transporteur pour ce type de bordereau"
+            ),
         otherwise: schema =>
           schema.requiredIf(
             context.transportSignature,
@@ -537,7 +560,13 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
       }),
       transporterCompanySiret: yup.string().when("type", {
         is: BsdaType.COLLECTION_2710,
-        then: schema => schema.nullable(),
+        then: schema =>
+          schema
+            .nullable()
+            .max(
+              0,
+              "Impossible de saisir le SIRET d'un transporteur pour ce type de bordereau"
+            ),
         otherwise: schema =>
           schema
             .length(14, `Transporteur: ${INVALID_SIRET_LENGTH}`)

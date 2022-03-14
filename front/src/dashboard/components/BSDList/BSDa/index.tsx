@@ -7,6 +7,7 @@ import { BSDaActions } from "./BSDaActions/BSDaActions";
 import { useParams } from "react-router-dom";
 import { ActionButtonContext } from "common/components/ActionButton";
 import { WorkflowAction } from "./WorkflowAction/WorkflowAction";
+import { TransporterInfoEdit } from "./WorkflowAction/TransporterInfoEdit";
 
 const bsdaVerboseStatuses: Record<BsdaStatus, string> = {
   INITIAL: "Initial",
@@ -49,16 +50,22 @@ export const COLUMNS: Record<
         .join(" - "),
   },
   transporterCustomInfo: {
-    accessor: bsda => "", // bsda.transporter?.customInfo
-    Cell: ({ value }) => (
+    accessor: bsda => bsda.transporter?.customInfo,
+    Cell: ({ value, row }) => (
       <>
         <span style={{ marginRight: "0.5rem" }}>{value}</span>
+        <TransporterInfoEdit bsda={row.original} />
       </>
     ),
   },
   transporterNumberPlate: {
-    accessor: () => null,
-    Cell: () => null,
+    accessor: bsda => bsda.transporter?.transport?.plates ?? [],
+    Cell: ({ value, row }) => (
+      <>
+        <span> {value.join(", ")}</span>
+        <TransporterInfoEdit bsda={row.original} />
+      </>
+    ),
   },
   status: {
     accessor: bsda =>
