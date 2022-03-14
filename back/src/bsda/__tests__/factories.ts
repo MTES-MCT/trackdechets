@@ -34,6 +34,7 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   wasteConsistence: BsdaConsistence.SOLIDE,
   wasteSealNumbers: ["1", "2", "3"],
   wasteAdr: "Mention ADR",
+  wastePop: false,
 
   packagings: [
     { type: "PALETTE_FILME", quantity: 1 },

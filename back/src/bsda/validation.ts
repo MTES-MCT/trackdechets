@@ -92,6 +92,7 @@ type WasteDescription = Pick<
   | "wasteConsistence"
   | "wasteSealNumbers"
   | "wasteAdr"
+  | "wastePop"
   | "packagings"
   | "weightIsEstimate"
   | "weightValue"
@@ -647,6 +648,7 @@ const wasteDescriptionSchema: FactorySchemaOf<
       .requiredIf(context.workSignature, `La consistence est obligatoire`),
     wasteSealNumbers: yup.array().ensure().of(yup.string()) as any,
     wasteAdr: yup.string().nullable(),
+    wastePop: yup.boolean().nullable(),
     packagings: yup.array(),
     weightIsEstimate: yup
       .boolean()

@@ -66,6 +66,7 @@ export const FullBsdaFragment = gql`
       consistence
       sealNumbers
       adr
+      pop
     }
     weight {
       value

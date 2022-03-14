@@ -5,6 +5,7 @@ import Packagings from "form/bsda/components/packagings/Packagings";
 import Tooltip from "common/components/Tooltip";
 import { Bsda, BsdaConsistence, BsdaType } from "generated/graphql/types";
 import TagsInput from "common/components/tags-input/TagsInput";
+import { FieldSwitch } from "common/components";
 
 export function WasteInfo({ disabled }) {
   const { values } = useFormikContext<Bsda>();
@@ -167,6 +168,33 @@ export function WasteInfoWorker({ disabled }) {
             className="td-input"
           />
         </label>
+      </div>
+
+      <div className="form__row" style={{ flexDirection: "row" }}>
+        <Field
+          type="checkbox"
+          component={FieldSwitch}
+          name="waste.pop"
+          label={
+            <span>
+              Le déchet contient des{" "}
+              <a
+                className="tw-underline"
+                href="https://www.ecologique-solidaire.gouv.fr/polluants-organiques-persistants-pop"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                polluants organiques persistants
+              </a>
+            </span>
+          }
+        />
+        <div className="tw-ml-1">
+          <Tooltip
+            msg="Le terme POP recouvre un ensemble de substances organiques qui
+        possèdent 4 propriétés : persistantes, bioaccumulables, toxiques et mobiles."
+          />
+        </div>
       </div>
 
       <h4 className="form__section-heading">Conditionnement</h4>
