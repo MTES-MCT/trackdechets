@@ -8,7 +8,7 @@ import {
   Query,
 } from "generated/graphql/types";
 import styles from "./CompanySelector.module.scss";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import { sortCompaniesByName } from "common/helper";
 
@@ -36,14 +36,24 @@ export default function MyCompanySelector({ fieldName, onSelect }) {
   const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME, {
     onCompleted: data => {
       // check user is member of selected company or reset emitter company
-      if (!data.me.companies.map(c => c.siret).includes(field.value.siret)) {
-        setFieldValue(fieldName, getInitialCompany());
+      const companies = data.me.companies;
+      if (!companies.map(c => c.siret).includes(field.value.siret)) {
+        if (companies.length === 1) {
+          onCompanySelect(companies[0]);
+        } else {
+          onCompanySelect(getInitialCompany());
+        }
       }
     },
   });
 
   const onCompanySelect = useCallback(
-    (company: CompanyPrivate) => {
+    (
+      company: Pick<
+        CompanyPrivate,
+        "siret" | "name" | "contactEmail" | "contactPhone" | "address"
+      >
+    ) => {
       setFieldValue(`${fieldName}.siret`, company.siret ?? "");
       setFieldValue(`${fieldName}.name`, company.name ?? "");
       setFieldValue(`${fieldName}.mail`, company.contactEmail ?? "");
@@ -59,13 +69,6 @@ export default function MyCompanySelector({ fieldName, onSelect }) {
   const companies = useMemo(() => {
     return sortCompaniesByName(data?.me.companies ?? []);
   }, [data]);
-
-  useEffect(() => {
-    if (companies.length === 1) {
-      setFieldValue(`${fieldName}.siret`, companies[0].siret);
-      onCompanySelect(companies[0]);
-    }
-  }, [companies, setFieldValue, fieldName, onCompanySelect]);
 
   if (loading) {
     return <div>Chargement...</div>;
