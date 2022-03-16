@@ -32,11 +32,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
     - `Form.emittedByEcoOrganisme` : indique si c'est l'éco-organisme qui a signé ou pas.
     - `Form.takenOverAt`, `Form.takenOverBy`, `TemporaryStorageDetail.takenOverAt`, `TemporaryStorageDetail.takenOverBy` : date et nom de la personne signant pour le transporteur initial ou après entreposage provisoire.
   - Dépréciation des champs :
-    - `Form.sentAt` : remplacé par `Form.takenOverAt`, qui peut différer de `Form.emittedAt`.
-    - `Form.sentBy` : remplacé par `Form.emittedBy`.
-    - `TemporaryStorageDetail.signedAt` : remplacé par `Form.takenOverAt`, qui peut différer de `Form.emittedAt`.
-    - `TemporaryStorageDetail.signedBy` : remplacé par `Form.takenOverBy`.
-  - Déprécation de la mutation `signedByTransporter`. Elle permet toujours de faire passer un bordereau du statut `SEALED` à `SENT` et de `RESEALED` à `RESENT` tout en remplissant les nouveaux champs. En revanche, elle ne permet pas de gérer le statut `SIGNED_BY_PRODUCER` et `SIGNED_BY_TEMP_STORER`.
+    - `Form.sentAt` : remplacé par `Form.takenOverAt`, qui peut différer de `Form.emittedAt`. Durant sa période de dépréciation le champ continue d'être remplit par la bonne valeur (`Form.takenOverAt`).
+    - `Form.sentBy` : remplacé par `Form.emittedBy`. Durant sa période de dépréciation le champ continue d'être remplit par la bonne valeur (`Form.emittedBy`).
+    - `TemporaryStorageDetail.signedAt` : remplacé par `TemporaryStorageDetail.takenOverAt`, qui peut différer de `TemporaryStorageDetail.emittedAt`. Durant sa période de dépréciation le champ continue d'être remplit par la bonne valeur (`TemporaryStorageDetail.takenOverAt`).
+    - `TemporaryStorageDetail.signedBy` : remplacé par `TemporaryStorageDetail.takenOverBy`. Durant sa période de dépréciation le champ continue d'être remplit par la bonne valeur (`TemporaryStorageDetail.takenOverBy`).
+  - Déprécation de la mutation `signedByTransporter`, remplacée par `signEmissionForm` et `signTransportForm` pour faire en deux temps ce qui se faisait avant en un temps. Elle permet toujours de faire passer un bordereau du statut `SEALED` à `SENT` et de `RESEALED` à `RESENT` tout en remplissant les nouveaux champs. En revanche, elle ne permet pas de gérer le statut `SIGNED_BY_PRODUCER` et `SIGNED_BY_TEMP_STORER`.
 
 #### :nail_care: Améliorations
 
