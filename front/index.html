@@ -2,7 +2,7 @@
 <html lang="fr">
   <head>
     <meta charset="utf-8" />
-    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="shortcut icon" href="/favicon.ico" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
@@ -20,16 +20,7 @@
       manifest.json provides metadata used when your web app is added to the
       homescreen on Android. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
-
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
+    <link rel="manifest" href="/manifest.json" />
     <title>Trackdéchets | La tracabilité des déchets en toute sécurité</title>
   </head>
   <body>
@@ -42,21 +33,10 @@
     </noscript>
     <div id="root"></div>
 
-    <!-- CRISP -->
-    <script type="text/javascript">
-      var environment = "%NODE_ENV%";
-      if (environment === "production") {
-        // CRISP
-        window.$crisp = ["safe", true];
-        window.CRISP_WEBSITE_ID = "11231caa-e6f1-436b-addc-eec1e0ddf040";
-        (function () {
-          d = document;
-          s = d.createElement("script");
-          s.src = "https://client.crisp.chat/l.js";
-          s.async = 1;
-          d.getElementsByTagName("head")[0].appendChild(s);
-        })();
-      }
+    <script>
+      window.global = window;
+      var exports = {};
     </script>
+    <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>

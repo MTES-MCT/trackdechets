@@ -5,7 +5,7 @@ interface AuthProps {
   isAuthenticated: boolean;
   isAdmin: boolean;
 }
-const { REACT_APP_WARNING_MESSAGE } = process.env;
+const { VITE_WARNING_MESSAGE } = import.meta.env;
 
 /**
  * Layout with common elements to all routes
@@ -17,7 +17,7 @@ export default function Layout({
 }: AuthProps & { children: ReactNode }) {
   return (
     <>
-      {!!REACT_APP_WARNING_MESSAGE && (
+      {!!VITE_WARNING_MESSAGE && (
         <div
           style={{
             backgroundColor: "#f8d7da",
@@ -27,7 +27,7 @@ export default function Layout({
           }}
           className="tw-text-center"
         >
-          {REACT_APP_WARNING_MESSAGE}
+          {VITE_WARNING_MESSAGE}
         </div>
       )}
       <Header isAuthenticated={isAuthenticated} isAdmin={isAdmin} />

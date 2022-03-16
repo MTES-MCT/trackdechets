@@ -1,17 +1,6 @@
 import { createElement, ReactNode } from "react";
 import "./Step.scss";
 
-interface IStepProps {
-  isActive: boolean;
-  displayPrevious: boolean;
-  displayNext: boolean;
-  displaySubmit: boolean;
-  children?: ReactNode;
-  goToNextStep: Function;
-  goToPreviousStep: Function;
-  formId?: string;
-}
-
 export interface IStepContainerProps {
   component?: any;
   children?: JSX.Element;
