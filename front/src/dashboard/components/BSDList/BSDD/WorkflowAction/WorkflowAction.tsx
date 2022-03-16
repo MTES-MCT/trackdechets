@@ -39,12 +39,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.SignedByProducer: {
-      if (
-        [
-          form.emitter?.company?.siret,
-          form.transporter?.company?.siret,
-        ].includes(siret)
-      ) {
+      if ([form.transporter?.company?.siret].includes(siret)) {
         return <SignTransportForm {...props} />;
       }
       return null;
