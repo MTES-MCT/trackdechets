@@ -6,6 +6,11 @@ updates:
     allow:
       - dependency-type: "production"
   - package-ecosystem: "npm"
+    directory: "/search"
+    open-pull-requests-limit: 0
+    allow:
+      - dependency-type: "production"
+  - package-ecosystem: "npm"
     directory: "/front"
     open-pull-requests-limit: 0
     allow:
