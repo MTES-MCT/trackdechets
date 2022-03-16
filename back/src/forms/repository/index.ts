@@ -55,10 +55,10 @@ export function getFormRepository(user: Express.User): FormRepository {
       prisma.$transaction(prisma =>
         buildCreateRevisionRequest({ prisma, user })(...args)
       ),
-    acceptRevisionRequestApproval: buildAcceptRevisionRequestApproval({
-      prisma,
-      user
-    }),
+    acceptRevisionRequestApproval: (...args) =>
+      prisma.$transaction(prisma =>
+        buildAcceptRevisionRequestApproval({ prisma, user })(...args)
+      ),
     refuseRevisionRequestApproval: (...args) =>
       prisma.$transaction(prisma =>
         buildRefuseRevisionRequestApproval({ prisma, user })(...args)
