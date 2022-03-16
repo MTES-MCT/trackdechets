@@ -2,7 +2,7 @@ import { EmitterType, TransportMode } from "generated/graphql/types";
 
 export const statusLabels: { [key: string]: string } = {
   DRAFT: "Brouillon",
-  SEALED: "En attente de collecte par le transporteur",
+  SEALED: "En attente de signature par l'émetteur",
   SENT: "En attente de réception",
   RECEIVED: "Reçu, en attente d'acceptation ou de refus",
   ACCEPTED: "Accepté, en attente de traitement",
@@ -15,11 +15,11 @@ export const statusLabels: { [key: string]: string } = {
   TEMP_STORER_ACCEPTED: "Entreposé temporairement ou en reconditionnement",
   RESENT: "En attente de réception pour traitement",
   RESEALED:
-    "En attente de collecte par le transporteur après entreposage provisoire",
+    "En attente de signature par l'installation d'entreposage provisoire",
   INITIAL: "Initial",
-  SIGNED_BY_PRODUCER: "Signé par le producteur",
+  SIGNED_BY_PRODUCER: "Signé par l'émetteur",
   SIGNED_BY_EMITTER: "Signé par l'émetteur",
-  SIGNED_BY_TEMP_STORER: "Signé par l'entreposage provisoire",
+  SIGNED_BY_TEMP_STORER: "Signé par l'installation d'entreposage provisoire",
 };
 
 export const ITEMS_PER_PAGE = 50;

@@ -148,7 +148,7 @@ function SignEmissionFormModal({
               <p className="tw-mt-4">
                 En qualité d'<strong>{emitterLabel}</strong>, j'atteste que les
                 informations ci-dessus sont correctes. En signant ce document,
-                je déclare prendre en charge le déchet.
+                je déclare transférer le déchet.
               </p>
 
               <div className="form__row">
