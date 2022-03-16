@@ -5,6 +5,18 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.04.1] ~04/04/2022
+
+#### :rocket: Nouvelles fonctionnalités
+#### :bug: Corrections de bugs
+#### :boom: Breaking changes
+#### :nail_care: Améliorations
+#### :memo: Documentation
+
+- Mise à jour de la documentation : Tutoriels > Démarrage Rapide > Obtenir un jeton d'accès [PR 1277](https://github.com/MTES-MCT/trackdechets/pull/1277)
+- Mise à jour de la référence du champ `Dasri.allowDirectTakeOver` [PR 1277](https://github.com/MTES-MCT/trackdechets/pull/1277)
+
+#### :house: Interne
 # [2022.03.1] ~14/03/2022
 
 #### :rocket: Nouvelles fonctionnalités
