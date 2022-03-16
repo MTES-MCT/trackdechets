@@ -93,7 +93,6 @@ const createFormResolver = async (
   }
 
   const formRepository = getFormRepository(user);
-  formRepository.findUnique({ id: "" });
   const newForm = await formRepository.create(formCreateInput);
 
   eventEmitter.emit(TDEvent.CreateForm, {

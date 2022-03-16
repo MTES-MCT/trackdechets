@@ -1,5 +1,5 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import { CountFormFn } from "./form/count";
+import { CountFormsFn } from "./form/count";
 import { CreateFormFn } from "./form/create";
 import { CreateTemporaryStorageFn } from "./form/createTemporaryStorage";
 import { DeleteFormFn } from "./form/delete";
@@ -49,7 +49,7 @@ export type FormActions = {
   updateMany: UpdateManyFormFn;
   delete: DeleteFormFn;
   createTemporaryStorage: CreateTemporaryStorageFn;
-  count: CountFormFn;
+  count: CountFormsFn;
 };
 
 export type FormRevisionRequestActions = {
