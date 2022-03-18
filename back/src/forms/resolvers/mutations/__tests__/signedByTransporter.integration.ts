@@ -165,6 +165,7 @@ describe("Mutation.signedByTransporter", () => {
         sentAt: null,
         status: "SEALED",
         wasteDetailsCode: "01 01 01",
+        wasteDetailsIsDangerous: false,
         emitterCompanySiret: emitter.siret,
         transporterCompanySiret: transporter.siret
       }
