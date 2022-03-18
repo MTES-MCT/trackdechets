@@ -1,5 +1,6 @@
 import { Bsda } from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
+import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
   IncomingWaste,
@@ -116,7 +117,12 @@ export function toIncomingWaste(
     emitterCompanySiret: bsda.emitterCompanySiret,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     ...initialEmitter,
-    emitterPickupsiteAddress: null,
+    emitterPickupsiteAddress: buildAddress([
+      bsda.emitterPickupSiteName,
+      bsda.emitterPickupSiteAddress,
+      bsda.emitterPickupSitePostalCode,
+      bsda.emitterPickupSiteCity
+    ]),
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -179,7 +185,12 @@ export function toOutgoingWaste(
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
-    emitterPickupsiteAddress: bsda.emitterPickupSiteAddress,
+    emitterPickupsiteAddress: buildAddress([
+      bsda.emitterPickupSiteName,
+      bsda.emitterPickupSiteAddress,
+      bsda.emitterPickupSitePostalCode,
+      bsda.emitterPickupSiteCity
+    ]),
     ...initialEmitter,
     traderCompanyName: null,
     traderCompanySiret: null,
@@ -242,7 +253,12 @@ export function toTransportedWaste(
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
-    emitterPickupsiteAddress: bsda.emitterPickupSiteAddress,
+    emitterPickupsiteAddress: buildAddress([
+      bsda.emitterPickupSiteName,
+      bsda.emitterPickupSiteAddress,
+      bsda.emitterPickupSitePostalCode,
+      bsda.emitterPickupSiteCity
+    ]),
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -307,7 +323,12 @@ export function toManagedWaste(
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
-    emitterPickupsiteAddress: bsda.emitterPickupSiteAddress,
+    emitterPickupsiteAddress: buildAddress([
+      bsda.emitterPickupSiteName,
+      bsda.emitterPickupSiteAddress,
+      bsda.emitterPickupSitePostalCode,
+      bsda.emitterPickupSiteCity
+    ]),
     ...initialEmitter,
     transporterCompanyAddress: bsda.transporterCompanyAddress,
     transporterCompanyName: bsda.transporterCompanyName,
@@ -369,7 +390,12 @@ export function toAllWaste(
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
-    emitterPickupsiteAddress: bsda.emitterPickupSiteAddress,
+    emitterPickupsiteAddress: buildAddress([
+      bsda.emitterPickupSiteName,
+      bsda.emitterPickupSiteAddress,
+      bsda.emitterPickupSitePostalCode,
+      bsda.emitterPickupSiteCity
+    ]),
     ...initialEmitter,
     transporterCompanyAddress: bsda.transporterCompanyAddress,
     transporterCompanyName: bsda.transporterCompanyName,
