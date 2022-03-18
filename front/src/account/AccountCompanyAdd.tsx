@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
-import { generatePath, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import routes from "common/routes";
 import { GET_ME } from "../dashboard/Dashboard";
 import { NotificationError } from "../common/components/Error";
@@ -17,7 +17,6 @@ import styles from "./AccountCompanyAdd.module.scss";
 import {
   Mutation,
   MutationCreateCompanyArgs,
-  Query,
   CompanyType as _CompanyType,
   CompanyPublic,
 } from "generated/graphql/types";
