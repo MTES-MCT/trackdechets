@@ -295,12 +295,7 @@ const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
         "Le champ CAP est obligatoire pour les déchets dangereux",
         (value, testContext) => {
           const rootValue = testContext.parent;
-
-          if (
-            !isDraft &&
-            isDangerous(rootValue?.wasteDetailsCode ?? "") &&
-            !value
-          ) {
+          if (!isDraft && rootValue?.wasteDetailsIsDangerous && !value) {
             return false;
           }
           return true;
@@ -391,8 +386,9 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
       .string()
       .requiredIf(!isDraft, "Le code déchet est obligatoire")
       .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE),
-    wasteDetailsOnuCode: yup.string().when("wasteDetailsCode", {
-      is: (wasteCode: string) => isDangerous(wasteCode || ""),
+    wasteDetailsOnuCode: yup.string().when("wasteDetailsIsDangerous", {
+      is: (wasteDetailsIsDangerous: boolean) =>
+        wasteDetailsIsDangerous === true,
       then: () =>
         yup
           .string()
