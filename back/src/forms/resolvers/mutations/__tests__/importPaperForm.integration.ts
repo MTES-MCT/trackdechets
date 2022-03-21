@@ -342,7 +342,7 @@ describe("mutation / importPaperForm", () => {
         }
       );
 
-      expect(data.importPaperForm.status).toEqual("AWAITING_GROUP");
+      expect(data.importPaperForm.status).toEqual(Status.NO_TRACEABILITY);
       expect(data.importPaperForm.isImportedFromPaper).toEqual(true);
     });
   });

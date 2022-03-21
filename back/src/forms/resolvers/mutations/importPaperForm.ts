@@ -105,15 +105,20 @@ async function createForm(input: ImportPaperFormInput, user: Express.User) {
     );
   }
 
+  const noTraceability = input.processedInfo?.noTraceability === true;
   const awaitingGroup = PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-    input.processedInfo.processingOperationDone
+    input.processedInfo?.processingOperationDone
   );
 
   const formCreateInput: Prisma.FormCreateInput = {
     ...flattenedFormInput,
     readableId: getReadableId(),
     owner: { connect: { id: user.id } },
-    status: awaitingGroup ? Status.AWAITING_GROUP : Status.PROCESSED,
+    status: noTraceability
+      ? Status.NO_TRACEABILITY
+      : awaitingGroup
+      ? Status.AWAITING_GROUP
+      : Status.PROCESSED,
     isImportedFromPaper: true,
     signedByTransporter: true
   };
