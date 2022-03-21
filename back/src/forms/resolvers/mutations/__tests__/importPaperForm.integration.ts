@@ -1,4 +1,12 @@
-import { Form, Prisma, Status } from "@prisma/client";
+import {
+  Consistence,
+  EmitterType,
+  Form,
+  Prisma,
+  QuantityType,
+  Status,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { format } from "date-fns";
 import prisma from "../../../../prisma";
 import {
@@ -9,7 +17,11 @@ import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { allowedFormats } from "../../../../common/dates";
-import { Mutation } from "../../../../generated/graphql/types";
+import {
+  ImportPaperFormInput,
+  Mutation,
+  Packagings
+} from "../../../../generated/graphql/types";
 
 const IMPORT_PAPER_FORM = `
   mutation ImportPaperForm($input: ImportPaperFormInput!){
@@ -24,11 +36,11 @@ describe("mutation / importPaperForm", () => {
   describe("import a BSD from scratch", () => {
     afterEach(resetDatabase);
 
-    function getImportPaperFormInput() {
+    function getImportPaperFormInput(): ImportPaperFormInput {
       const input = {
         customId: "customId",
         emitter: {
-          type: "PRODUCER",
+          type: EmitterType.PRODUCER,
           company: {
             siret: "98767567182671",
             name: "Émetteur",
@@ -64,24 +76,24 @@ describe("mutation / importPaperForm", () => {
         wasteDetails: {
           code: "01 03 04*",
           quantity: 1.0,
-          quantityType: "ESTIMATED",
-          packagingInfos: [{ type: "BENNE", quantity: 1 }],
+          quantityType: QuantityType.REAL,
+          packagingInfos: [{ type: "BENNE" as Packagings, quantity: 1 }],
           onuCode: "ONU",
-          consistence: "SOLID"
+          consistence: Consistence.SOLID
         },
         signingInfo: {
-          sentAt: "2019-12-20T00:00:00.000Z",
+          sentAt: "2019-12-20T00:00:00.000Z" as any,
           sentBy: "Mr Producer"
         },
         receivedInfo: {
-          receivedAt: "2019-12-21T00:00:00.000Z",
-          signedAt: "2019-12-20T00:00:00.000Z",
+          receivedAt: "2019-12-21T00:00:00.000Z" as any,
+          signedAt: "2019-12-20T00:00:00.000Z" as any,
           receivedBy: "Mr Destination",
-          wasteAcceptationStatus: "ACCEPTED",
+          wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
           quantityReceived: 1.0
         },
         processedInfo: {
-          processedAt: "2019-12-22T00:00:00.000Z",
+          processedAt: "2019-12-22T00:00:00.000Z" as any,
           processedBy: "Mr Recipient",
           processingOperationDone: "R 1",
           processingOperationDescription: "Traitement final"
@@ -245,10 +257,10 @@ describe("mutation / importPaperForm", () => {
 
         const input = getImportPaperFormInput();
         input.recipient.company.siret = company.siret;
-        input.signingInfo.sentAt = format(sentAt, f);
-        input.receivedInfo.receivedAt = format(receivedAt, f);
-        input.receivedInfo.signedAt = format(signedAt, f);
-        input.processedInfo.processedAt = format(processedAt, f);
+        input.signingInfo.sentAt = format(sentAt, f) as any;
+        input.receivedInfo.receivedAt = format(receivedAt, f) as any;
+        input.receivedInfo.signedAt = format(signedAt, f) as any;
+        input.processedInfo.processedAt = format(processedAt, f) as any;
 
         const { data } = await mutate<Pick<Mutation, "importPaperForm">>(
           IMPORT_PAPER_FORM,
@@ -270,6 +282,69 @@ describe("mutation / importPaperForm", () => {
         expect(form.processedAt).toEqual(processedAt);
       }
     );
+
+    it("should set status to AWAITING_GROUP in case of groupement code", async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const { mutate } = makeClient(user);
+
+      const input = getImportPaperFormInput();
+      input.recipient.company.siret = company.siret;
+      input.processedInfo.processingOperationDone = "D 13";
+      input.processedInfo.nextDestination = {
+        company: {
+          siret: "11111111111111",
+          name: "Incinérateur",
+          contact: "John Snow",
+          mail: "contact@incinerateur.fr",
+          phone: "00 00 00 00 00",
+          address: "40 rue des lilas 07100 Annonay"
+        },
+        processingOperation: "R 1"
+      };
+
+      const { data } = await mutate<Pick<Mutation, "importPaperForm">>(
+        IMPORT_PAPER_FORM,
+        {
+          variables: { input }
+        }
+      );
+
+      expect(data.importPaperForm.status).toEqual("AWAITING_GROUP");
+      expect(data.importPaperForm.isImportedFromPaper).toEqual(true);
+    });
+
+    it("should set status to NO_TREACEABILITY in case of no traceability", async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const { mutate } = makeClient(user);
+
+      const input = getImportPaperFormInput();
+      input.recipient.company.siret = company.siret;
+      input.processedInfo.noTraceability = true;
+      input.processedInfo.processingOperationDone = "R 13";
+      input.processedInfo.nextDestination = {
+        company: {
+          siret: "11111111111111",
+          name: "Incinérateur",
+          contact: "John Snow",
+          mail: "contact@incinerateur.fr",
+          phone: "00 00 00 00 00",
+          address: "40 rue des lilas 07100 Annonay"
+        },
+        processingOperation: "R 1"
+      };
+
+      const { data } = await mutate<Pick<Mutation, "importPaperForm">>(
+        IMPORT_PAPER_FORM,
+        {
+          variables: { input }
+        }
+      );
+
+      expect(data.importPaperForm.status).toEqual("AWAITING_GROUP");
+      expect(data.importPaperForm.isImportedFromPaper).toEqual(true);
+    });
   });
 
   describe("update an existing BSD with imported data", () => {
@@ -309,19 +384,19 @@ describe("mutation / importPaperForm", () => {
       wasteDetailsOnuCode: "ONU"
     };
 
-    const importedData = {
+    const importedData: ImportPaperFormInput = {
       signingInfo: {
-        sentAt: "2019-12-20T00:00:00.000Z",
+        sentAt: "2019-12-20T00:00:00.000Z" as any,
         sentBy: "Mr Producer"
       },
       receivedInfo: {
-        receivedAt: "2019-12-21T00:00:00.000Z",
+        receivedAt: "2019-12-21T00:00:00.000Z" as any,
         receivedBy: "Mr Destination",
         wasteAcceptationStatus: "ACCEPTED",
         quantityReceived: 1.0
       },
       processedInfo: {
-        processedAt: "2019-12-22T00:00:00.000Z",
+        processedAt: "2019-12-22T00:00:00.000Z" as any,
         processedBy: "Mr Recipient",
         processingOperationDone: "R 1",
         processingOperationDescription: "Traitement final"
@@ -613,6 +688,106 @@ describe("mutation / importPaperForm", () => {
       expect(errors[0].message).toEqual(
         "Vous ne pouvez pas mettre à jour les numéros SIRET des établissements présents sur le BSD"
       );
+    });
+
+    it("should set status to AWAITING_GROUP in case of groupement code", async () => {
+      const owner = await userFactory();
+
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const formCreateInput: Prisma.FormCreateInput = {
+        ...baseData,
+        readableId: getReadableId(),
+        owner: {
+          connect: { id: owner.id }
+        },
+        status: "SEALED",
+        recipientCompanySiret: company.siret // user is recipient
+      };
+
+      // create a form with a sealed status
+      const form = await prisma.form.create({ data: formCreateInput });
+
+      const { mutate } = makeClient(user);
+
+      const data = { ...importedData };
+      data.processedInfo.processingOperationDone = "D 13";
+      data.processedInfo.nextDestination = {
+        company: {
+          siret: "11111111111111",
+          name: "Incinérateur",
+          contact: "John Snow",
+          mail: "contact@incinerateur.fr",
+          phone: "00 00 00 00 00",
+          address: "40 rue des lilas 07100 Annonay",
+          country: "FR"
+        },
+        processingOperation: "R 1"
+      };
+
+      await mutate<Pick<Mutation, "importPaperForm">>(IMPORT_PAPER_FORM, {
+        variables: {
+          input: {
+            id: form.id, // update mode
+            ...data
+          }
+        }
+      });
+
+      const updatedForm = await prisma.form.findUnique({
+        where: { id: form.id }
+      });
+      expect(updatedForm.status).toEqual(Status.AWAITING_GROUP);
+    });
+
+    it("should set status to NO_TRACEABILITY in case of no traceability", async () => {
+      const owner = await userFactory();
+
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const formCreateInput: Prisma.FormCreateInput = {
+        ...baseData,
+        readableId: getReadableId(),
+        owner: {
+          connect: { id: owner.id }
+        },
+        status: "SEALED",
+        recipientCompanySiret: company.siret // user is recipient
+      };
+
+      // create a form with a sealed status
+      const form = await prisma.form.create({ data: formCreateInput });
+
+      const { mutate } = makeClient(user);
+
+      const data = { ...importedData };
+      data.processedInfo.noTraceability = true;
+      data.processedInfo.nextDestination = {
+        company: {
+          siret: "11111111111111",
+          name: "Incinérateur",
+          contact: "John Snow",
+          mail: "contact@incinerateur.fr",
+          phone: "00 00 00 00 00",
+          address: "40 rue des lilas 07100 Annonay",
+          country: "FR"
+        },
+        processingOperation: "R 1"
+      };
+
+      await mutate<Pick<Mutation, "importPaperForm">>(IMPORT_PAPER_FORM, {
+        variables: {
+          input: {
+            id: form.id, // update mode
+            ...data
+          }
+        }
+      });
+
+      const updatedForm = await prisma.form.findUnique({
+        where: { id: form.id }
+      });
+      expect(updatedForm.status).toEqual(Status.NO_TRACEABILITY);
     });
   });
 });

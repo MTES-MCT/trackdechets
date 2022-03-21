@@ -1,4 +1,4 @@
-import { Form, Prisma } from "@prisma/client";
+import { Form, Prisma, Status } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCachedUserSirets } from "../../../common/redis/users";
@@ -17,7 +17,10 @@ import { getFormRepository } from "../../repository";
 import { processedFormSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
-import { isDangerous } from "../../../common/constants";
+import {
+  isDangerous,
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES
+} from "../../../common/constants";
 
 /**
  * Update an existing form with data imported from a paper form
@@ -102,11 +105,15 @@ async function createForm(input: ImportPaperFormInput, user: Express.User) {
     );
   }
 
+  const awaitingGroup = PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
+    input.processedInfo.processingOperationDone
+  );
+
   const formCreateInput: Prisma.FormCreateInput = {
     ...flattenedFormInput,
     readableId: getReadableId(),
     owner: { connect: { id: user.id } },
-    status: "PROCESSED",
+    status: awaitingGroup ? Status.AWAITING_GROUP : Status.PROCESSED,
     isImportedFromPaper: true,
     signedByTransporter: true
   };
