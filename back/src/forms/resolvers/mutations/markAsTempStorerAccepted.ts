@@ -47,9 +47,8 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
     });
 
     if (
-      form.emitterType === EmitterType.APPENDIX2 &&
       tempStorerAcceptedInfo.wasteAcceptationStatus ===
-        WasteAcceptationStatus.REFUSED
+      WasteAcceptationStatus.REFUSED
     ) {
       await formRepository.removeAppendix2(id);
     }

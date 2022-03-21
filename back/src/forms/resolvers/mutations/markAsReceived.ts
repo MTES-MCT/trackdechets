@@ -55,10 +55,7 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
     });
   }
 
-  if (
-    form.emitterType === EmitterType.APPENDIX2 &&
-    receivedInfo.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED
-  ) {
+  if (receivedInfo.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED) {
     await formRepository.removeAppendix2(id);
   }
 

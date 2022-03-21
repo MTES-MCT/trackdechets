@@ -160,6 +160,7 @@ describe("Mutation.deleteForm", () => {
     const form = await formFactory({
       ownerId: owner.id,
       opt: {
+        emitterType: "APPENDIX2",
         emitterCompanySiret: ttr.siret,
         status: "SEALED",
         appendix2Forms: { connect: [{ id: appendix2.id }] }
