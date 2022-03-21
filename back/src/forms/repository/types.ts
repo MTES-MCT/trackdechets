@@ -6,6 +6,7 @@ import { DeleteFormFn } from "./form/delete";
 import { FindAppendix2FormsByIdFn } from "./form/findAppendix2FormsById";
 import { FindFullFormByIdFn } from "./form/findFullFormById";
 import { FindUniqueFormFn } from "./form/findUnique";
+import { RemoveAppendix2Fn } from "./form/removeAppendix2";
 import { UpdateFormFn } from "./form/update";
 import { UpdateManyFormFn } from "./form/updateMany";
 import { AcceptRevisionRequestApprovalFn } from "./formRevisionRequest/acceptRevisionRequestApproval";
@@ -50,6 +51,7 @@ export type FormActions = {
   delete: DeleteFormFn;
   createTemporaryStorage: CreateTemporaryStorageFn;
   count: CountFormsFn;
+  removeAppendix2: RemoveAppendix2Fn;
 };
 
 export type FormRevisionRequestActions = {

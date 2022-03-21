@@ -2,13 +2,23 @@ import { format } from "date-fns";
 import {
   userWithCompanyFactory,
   formFactory,
-  companyFactory
+  companyFactory,
+  formWithTempStorageFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { allowedFormats } from "../../../../common/dates";
-import { Status, WasteAcceptationStatus } from "@prisma/client";
+import {
+  CompanyType,
+  Status,
+  UserRole,
+  WasteAcceptationStatus
+} from "@prisma/client";
+import {
+  Mutation,
+  MutationMarkAsTempStorerAcceptedArgs
+} from "../../../../generated/graphql/types";
 
 const MARK_AS_TEMP_STORER_ACCEPTED = `
     mutation MarkAsTempStorerAccepted($id: ID!, $tempStorerAcceptedInfo: TempStorerAcceptedFormInput!){
@@ -20,7 +30,7 @@ const MARK_AS_TEMP_STORER_ACCEPTED = `
   `;
 
 describe("{ mutation { markAsTempStorerAccepted } }", () => {
-  afterAll(() => resetDatabase());
+  afterEach(() => resetDatabase());
 
   test("it fails when form is not TEMP_STORED", async () => {
     const { user, company: tempStorerCompany } = await userWithCompanyFactory(
@@ -217,5 +227,84 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
 
     expect(formAfterMutation.status).toEqual(Status.TEMP_STORER_ACCEPTED);
     expect(tempStorage.tempStorerSignedAt).toEqual(signedAt);
+  });
+
+  it("should unlink appendix 2 in case of refusal", async () => {
+    const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
+      UserRole.MEMBER,
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const { user: destinationUser, company: destination } =
+      await userWithCompanyFactory(UserRole.MEMBER, {
+        companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+      });
+
+    const form1 = await formFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        status: "GROUPED",
+        processingOperationDone: "R 13",
+        recipientCompanySiret: ttr.siret
+      }
+    });
+
+    const form2 = await formFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        status: "GROUPED",
+        processingOperationDone: "R 13",
+        recipientCompanySiret: ttr.siret
+      }
+    });
+
+    const groupementForm = await formWithTempStorageFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        emitterType: "APPENDIX2",
+        emitterCompanySiret: ttr.siret,
+        status: Status.TEMP_STORED,
+        receivedBy: "Bill",
+        recipientCompanySiret: destination.siret,
+        receivedAt: new Date("2019-01-17"),
+        appendix2Forms: { connect: [{ id: form1.id }, { id: form2.id }] }
+      }
+    });
+
+    const { mutate } = makeClient(destinationUser);
+
+    await mutate<
+      Pick<Mutation, "markAsReceived">,
+      MutationMarkAsTempStorerAcceptedArgs
+    >(MARK_AS_TEMP_STORER_ACCEPTED, {
+      variables: {
+        id: groupementForm.id,
+        tempStorerAcceptedInfo: {
+          wasteAcceptationStatus: "REFUSED",
+          wasteRefusalReason: "Parce que",
+          signedAt: "2019-01-18" as any,
+          signedBy: "John",
+          quantityType: "REAL",
+          quantityReceived: 0
+        }
+      }
+    });
+
+    const updatedForm1 = await prisma.form.findUnique({
+      where: { id: form1.id }
+    });
+    const updatedForm2 = await prisma.form.findUnique({
+      where: { id: form2.id }
+    });
+    expect(updatedForm1.status).toEqual("AWAITING_GROUP");
+    expect(updatedForm2.status).toEqual("AWAITING_GROUP");
+
+    const appendix2Forms = await prisma.form
+      .findUnique({
+        where: { id: groupementForm.id }
+      })
+      .appendix2Forms();
+    expect(appendix2Forms).toEqual([]);
   });
 });

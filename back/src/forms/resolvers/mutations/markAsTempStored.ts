@@ -7,6 +7,8 @@ import { tempStoredInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
 import { expandFormFromDb } from "../../form-converter";
 import { DestinationCannotTempStore } from "../../errors";
+import { EmitterType, WasteAcceptationStatus } from "@prisma/client";
+import { getFormRepository } from "../../repository";
 
 const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
   parent,
@@ -14,6 +16,7 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
+  const formRepository = getFormRepository(user);
   const { id, tempStoredInfos } = args;
   const form = await getFormOrFormNotFound({ id });
 
@@ -45,6 +48,13 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
     type: EventType.MarkAsTempStored,
     formUpdateInput
   });
+
+  if (
+    form.emitterType === EmitterType.APPENDIX2 &&
+    tempStoredInfos.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED
+  ) {
+    await formRepository.removeAppendix2(id);
+  }
 
   return expandFormFromDb(tempStoredForm);
 };
