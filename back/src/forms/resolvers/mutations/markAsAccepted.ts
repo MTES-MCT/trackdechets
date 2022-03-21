@@ -1,4 +1,4 @@
-import { EmitterType, WasteAcceptationStatus } from "@prisma/client";
+import { WasteAcceptationStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";

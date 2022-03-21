@@ -7,7 +7,7 @@ import { tempStoredInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
 import { expandFormFromDb } from "../../form-converter";
 import { DestinationCannotTempStore } from "../../errors";
-import { EmitterType, WasteAcceptationStatus } from "@prisma/client";
+import { WasteAcceptationStatus } from "@prisma/client";
 import { getFormRepository } from "../../repository";
 
 const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (

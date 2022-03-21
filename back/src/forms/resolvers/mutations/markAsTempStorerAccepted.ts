@@ -6,7 +6,7 @@ import { checkCanMarkAsTempStorerAccepted } from "../../permissions";
 import { tempStorerAcceptedInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
 import { expandFormFromDb } from "../../form-converter";
-import { EmitterType, WasteAcceptationStatus } from "@prisma/client";
+import { WasteAcceptationStatus } from "@prisma/client";
 import { getFormRepository } from "../../repository";
 
 const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccepted"] =
