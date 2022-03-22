@@ -138,6 +138,12 @@ type Query {
     Défaut à vide.
     """
     wasteCode: String
+
+    """
+    (Optionnel) CustomId pour affiner la recherche
+    Défaut à vide.
+    """
+    customId: String
   ): [Form!]!
 
   "Renvoie des statistiques sur le volume de déchets entrant et sortant"

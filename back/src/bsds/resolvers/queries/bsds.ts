@@ -87,13 +87,21 @@ async function buildQuery(
 
   if (where.readableId) {
     query.bool.must.push({
-      match: {
-        readableId: {
-          query: where.readableId,
-          // we need `and` operator here because the different components of
-          // the readableId (prefix, date and random chars) emit different tokens
-          operator: "and"
-        }
+      bool: {
+        // behaves like an OR
+        should: [
+          {
+            match: {
+              readableId: {
+                query: where.readableId,
+                // we need `and` operator here because the different components of
+                // the readableId (prefix, date and random chars) emit different tokens
+                operator: "and"
+              }
+            }
+          },
+          { term: { customId: where.readableId } }
+        ]
       }
     });
   }

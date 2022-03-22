@@ -56,7 +56,8 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
         updatedAt: { gte: new Date(rest.updatedAfter) }
       }),
       ...(rest.sentAfter && { sentAt: { gte: new Date(rest.sentAfter) } }),
-      wasteDetailsCode: rest.wasteCode,
+      ...(rest.wasteCode && { wasteDetailsCode: rest.wasteCode }),
+      ...(rest.customId && { customId: rest.customId }),
       ...(status?.length && { status: { in: status } }),
       AND: [
         getFormsRightFilter(company.siret, roles),
