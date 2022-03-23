@@ -149,7 +149,25 @@ export async function checkCanUpdate(user: User, form: Form) {
     await getFullForm(form),
     "Vous n'êtes pas autorisé à modifier ce bordereau"
   );
-  if (!["DRAFT", "SEALED"].includes(form.status)) {
+
+  if (form.status === "SIGNED_BY_PRODUCER") {
+    const userSirets = await getCachedUserSirets(user.id);
+
+    if (
+      form.emittedByEcoOrganisme &&
+      !userSirets.includes(form.ecoOrganismeSiret)
+    ) {
+      throw new ForbiddenError(
+        "L'éco-organisme a signé ce bordereau, il est le seul à pouvoir le mettre à jour."
+      );
+    }
+
+    if (!userSirets.includes(form.emitterCompanySiret)) {
+      throw new ForbiddenError(
+        "Le producteur a signé ce bordereau, il est le seul à pouvoir le mettre à jour."
+      );
+    }
+  } else if (!["DRAFT", "SEALED"].includes(form.status)) {
     throw new ForbiddenError(
       "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être modifiés"
     );
@@ -165,7 +183,24 @@ export async function checkCanDelete(user: User, form: Form) {
     "Vous n'êtes pas autorisé à supprimer ce bordereau"
   );
 
-  if (!["DRAFT", "SEALED"].includes(form.status)) {
+  if (form.status === "SIGNED_BY_PRODUCER") {
+    const userSirets = await getCachedUserSirets(user.id);
+
+    if (
+      form.emittedByEcoOrganisme &&
+      !userSirets.includes(form.ecoOrganismeSiret)
+    ) {
+      throw new ForbiddenError(
+        "L'éco-organisme a signé ce bordereau, il est le seul à pouvoir le supprimer."
+      );
+    }
+
+    if (!userSirets.includes(form.emitterCompanySiret)) {
+      throw new ForbiddenError(
+        "Le producteur a signé ce bordereau, il est le seul à pouvoir le supprimer."
+      );
+    }
+  } else if (!["DRAFT", "SEALED"].includes(form.status)) {
     throw new ForbiddenError(
       "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés"
     );

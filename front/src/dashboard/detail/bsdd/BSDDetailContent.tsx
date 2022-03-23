@@ -682,7 +682,11 @@ export default function BSDDetailContent({
             <IconDuplicateFile size="24px" color="blueLight" />
             <span>Dupliquer</span>
           </button>
-          {[FormStatus.Draft, FormStatus.Sealed].includes(form.status) && (
+          {[
+            FormStatus.Draft,
+            FormStatus.Sealed,
+            FormStatus.SignedByProducer,
+          ].includes(form.status) && (
             <>
               <button
                 className="btn btn--outline-primary"
