@@ -1,6 +1,6 @@
 "Payload de signature d'un BSD"
 input SentFormInput {
-  "Date de l'envoi du déchet par l'émetteur (case 9)"
+  "Date de l'envoi du déchet par l'émetteur et de prise en charge du déchet par le transporteur"
   sentAt: DateTime!
 
   "Nom de la personne responsable de l'envoi du déchet (case 9)"
@@ -40,7 +40,7 @@ input SignTransportFormInput {
 
 "Payload de signature d'un BSD par un transporteur"
 input TransporterSignatureFormInput {
-  "Date de l'envoi du déchet par l'émetteur (case 9)"
+  "Date de l'envoi du déchet par l'émetteur et de prise en charge du déchet par le transporteur"
   sentAt: DateTime!
 
   "Si oui ou non le BSD a été signé par un transporteur"
@@ -73,7 +73,7 @@ input TransporterSignatureFormInput {
 
 "Payload simplifié de signature d'un BSD par un transporteur"
 input SignatureFormInput {
-  "Date de l'envoi du déchet par l'émetteur (case 9)"
+  "Date de l'envoi du déchet par l'émetteur et de prise en charge du déchet par le transporteur"
   sentAt: DateTime!
   "Nom de la personne responsable de l'envoi du déchet (case 9)"
   sentBy: String!

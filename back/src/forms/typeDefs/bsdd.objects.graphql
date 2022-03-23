@@ -73,7 +73,7 @@ type Form {
   signedByTransporter: Boolean
     @deprecated(reason: "Ce champ est redondant avec status et takenOverAt")
 
-  "Date de l'envoi du déchet par l'émetteur (case 9)"
+  "Date de l'envoi du déchet par l'émetteur et de prise en charge du déchet par le transporteur"
   sentAt: DateTime @deprecated(reason: "Remplacé par takenOverAt")
 
   "Nom de la personne responsable de l'envoi du déchet (case 9)"
