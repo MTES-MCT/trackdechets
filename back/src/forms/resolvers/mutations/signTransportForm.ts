@@ -32,6 +32,9 @@ const signatures: Partial<
     const formUpdateInput = {
       takenOverAt: args.input.takenOverAt,
       takenOverBy: args.input.takenOverBy,
+      transporterNumberPlate:
+        args.input.transporterNumberPlate ??
+        existingForm.transporterNumberPlate,
 
       currentTransporterSiret: existingForm.transporterCompanySiret,
 
@@ -63,6 +66,9 @@ const signatures: Partial<
         update: {
           takenOverAt: args.input.takenOverAt,
           takenOverBy: args.input.takenOverBy,
+          transporterNumberPlate:
+            args.input.transporterNumberPlate ??
+            existingFullForm.temporaryStorageDetail.transporterNumberPlate,
 
           // The following fields are deprecated
           // but we need to fill them until we remove them completely

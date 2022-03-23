@@ -53,12 +53,8 @@ enum EmitterType {
   EcoOrganisme = "EcoOrganisme",
 }
 
-const EMITTER_TYPE_LABEL: Record<EmitterType, string> = {
-  [EmitterType.Emitter]: "émetteur du déchet",
-  [EmitterType.EcoOrganisme]: "éco-organisme",
-};
-
 function SignEmissionFormModal({
+  title,
   siret,
   form,
   onClose,
@@ -69,8 +65,8 @@ function SignEmissionFormModal({
   >(SIGN_EMISSION_FORM);
 
   return (
-    <Modal onClose={onClose} ariaLabel="Signer pour l'émetteur" isOpen>
-      <h2 className="td-modal-title">Signer pour l'émetteur</h2>
+    <Modal onClose={onClose} ariaLabel={title} isOpen>
+      <h2 className="td-modal-title">{title}</h2>
 
       <Formik
         initialValues={{
@@ -121,12 +117,20 @@ function SignEmissionFormModal({
             }
           }
 
+          const EMITTER_TYPE_LABEL: Record<EmitterType, string> = {
+            [EmitterType.Emitter]:
+              form.status === FormStatus.Sealed
+                ? "émetteur du déchet"
+                : "entreposage provisoire",
+            [EmitterType.EcoOrganisme]: "éco-organisme",
+          };
           const emitterLabel = EMITTER_TYPE_LABEL[values.emittedByType];
 
           return (
             <FormikForm>
               <FormWasteEmissionSummary form={form} />
               <FormJourneySummary form={form} />
+
               {form.status === FormStatus.Sealed && form.ecoOrganisme && (
                 <>
                   {Object.entries(EMITTER_TYPE_LABEL).map(([value, label]) => (
@@ -193,11 +197,7 @@ function SignEmissionFormModal({
                   className="btn btn--primary"
                   disabled={loading}
                 >
-                  <span>
-                    {loading
-                      ? "Signature en cours..."
-                      : "Signer pour l'émetteur"}
-                  </span>
+                  <span>{loading ? "Signature en cours..." : title}</span>
                 </button>
               </div>
             </FormikForm>
@@ -214,9 +214,11 @@ export default function SignEmissionForm({ siret, form }: WorkflowActionProps) {
     form.emitter?.company?.siret,
     form.ecoOrganisme?.siret,
   ].includes(siret);
+  const emitterLabel =
+    form.status === FormStatus.Sealed ? "émetteur" : "entreposage provisoire";
   const title = currentUserIsEmitter
-    ? "Signer pour l'émetteur"
-    : "Faire signer l'émetteur";
+    ? `Signer en tant que ${emitterLabel}`
+    : `Faire signer l'${emitterLabel}`;
 
   return (
     <>

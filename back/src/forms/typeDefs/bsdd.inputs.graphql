@@ -36,6 +36,9 @@ input SignTransportFormInput {
 
   "Nom de la personne signant pour le transporteur"
   takenOverBy: String!
+
+  "Numéro de la plaque d'immatriculation transporteur"
+  transporterNumberPlate: String
 }
 
 "Payload de signature d'un BSD par un transporteur"

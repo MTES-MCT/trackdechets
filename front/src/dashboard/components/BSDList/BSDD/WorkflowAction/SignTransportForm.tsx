@@ -30,6 +30,7 @@ const SIGN_TRANSPORT_FORM = gql`
 `;
 
 interface SignTransportFormModalProps {
+  title: string;
   siret: string;
   form: Form;
   onClose: () => void;
@@ -47,6 +48,7 @@ const validationSchema = yup.object({
 });
 
 function SignTransportFormModal({
+  title,
   siret,
   form,
   onClose,
@@ -56,13 +58,15 @@ function SignTransportFormModal({
     MutationSignTransportFormArgs
   >(SIGN_TRANSPORT_FORM);
   return (
-    <Modal onClose={onClose} ariaLabel="Signer pour le transporteur" isOpen>
-      <h2 className="td-modal-title">Signer pour le transporteur</h2>
+    <Modal onClose={onClose} ariaLabel={title} isOpen>
+      <h2 className="td-modal-title">{title}</h2>
 
       <Formik
         initialValues={{
           takenOverBy: "",
           securityCode: "",
+          transporterNumberPlate:
+            form.stateSummary?.transporterNumberPlate ?? "",
         }}
         validationSchema={validationSchema}
         onSubmit={async values => {
@@ -73,6 +77,7 @@ function SignTransportFormModal({
                 input: {
                   takenOverAt: new Date().toISOString(),
                   takenOverBy: values.takenOverBy,
+                  transporterNumberPlate: values.transporterNumberPlate,
                 },
                 securityCode: values.securityCode
                   ? Number(values.securityCode)
@@ -136,11 +141,7 @@ function SignTransportFormModal({
                 className="btn btn--primary"
                 disabled={loading}
               >
-                <span>
-                  {loading
-                    ? "Signature en cours..."
-                    : "Signer pour le transporteur"}
-                </span>
+                <span>{loading ? "Signature en cours..." : title}</span>
               </button>
             </div>
           </FormikForm>
@@ -155,6 +156,7 @@ export default function SignTransportForm({
   form,
 }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const title = "Signer en tant que transporteur";
 
   return (
     <>
@@ -162,10 +164,11 @@ export default function SignTransportForm({
         icon={<IconShipmentSignSmartphone size="24px" />}
         onClick={() => setIsOpen(true)}
       >
-        Signer pour le transporteur
+        {title}
       </ActionButton>
       {isOpen && (
         <SignTransportFormModal
+          title={title}
           siret={siret}
           form={form}
           onClose={() => setIsOpen(false)}
