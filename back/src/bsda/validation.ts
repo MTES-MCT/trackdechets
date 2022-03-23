@@ -427,7 +427,7 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         .string()
         .requiredIf(
           context.emissionSignature,
-          `Entreprise de destination: vous devez préciser le code d'opétation prévu`
+          `Entreprise de destination: vous devez préciser le code d'opération prévu`
         )
         .oneOf(
           [null, ...OPERATIONS],
@@ -487,21 +487,29 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
           otherwise: schema =>
             schema.requiredIf(
               context.operationSignature,
-              `Entreprise de destination: vous devez préciser le code d'opétation réalisé`
+              `Entreprise de destination: vous devez préciser le code d'opération réalisé`
             )
         }),
       destinationOperationDate: yup
         .date()
-        .max(new Date())
-        .when("destinationReceptionDate", (destinationReceptionDate, schema) =>
-          destinationReceptionDate
-            ? schema.min(destinationReceptionDate)
-            : schema
-        )
-        .requiredIf(
-          context.operationSignature,
-          `Entreprise de destination:vous devez préciser la date d'opétation`
-        ) as any
+        .when("destinationReceptionAcceptationStatus", {
+          is: value => value === WasteAcceptationStatus.REFUSED,
+          then: schema => schema.nullable(),
+          otherwise: schema =>
+            schema
+              .max(new Date())
+              .when(
+                "destinationReceptionDate",
+                (destinationReceptionDate, schema) =>
+                  destinationReceptionDate
+                    ? schema.min(destinationReceptionDate)
+                    : schema
+              )
+              .requiredIf(
+                context.operationSignature,
+                `Entreprise de destination: vous devez préciser la date d'opération`
+              ) as any
+        })
     });
 
 const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
