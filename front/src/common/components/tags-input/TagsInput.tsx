@@ -32,6 +32,27 @@ export default function TagsInput(props) {
     }
   }
 
+  function onBlur(
+    e: React.FocusEvent<HTMLInputElement>,
+    arrayHelpers: FieldArrayRenderProps
+  ) {
+    const val = (e.target as HTMLInputElement).value;
+    if (val) {
+      e.preventDefault();
+      if (
+        field.value?.find(tag => tag.toLowerCase() === val.toLowerCase()) ||
+        (props.limit && field.value?.length >= props.limit)
+      ) {
+        return;
+      }
+      arrayHelpers.push(val);
+
+      if (inputContainer.current) {
+        inputContainer.current.value = "";
+      }
+    }
+  }
+
   return (
     <FieldArray
       name={field.name}
@@ -53,6 +74,7 @@ export default function TagsInput(props) {
               <input
                 type="text"
                 onKeyDown={e => onInputKeyDown(e, arrayHelpers)}
+                onBlur={e => onBlur(e, arrayHelpers)}
                 ref={inputContainer}
                 disabled={props.disabled}
               />

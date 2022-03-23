@@ -2,6 +2,7 @@ import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
 import { GET_BSDS } from "common/queries";
 import routes from "common/routes";
+import { format } from "date-fns";
 import { UPDATE_BSDA } from "form/bsda/stepper/queries";
 import Operation from "form/bsda/stepper/steps/Operation";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
@@ -32,7 +33,7 @@ export function SignOperation({ siret, bsdaId }: Props) {
     Pick<Mutation, "updateBsda">,
     MutationUpdateBsdaArgs
   >(UPDATE_BSDA);
-  const [signBsda, { loading }] = useMutation<
+  const [signBsda, { loading, error: signatureError }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs
   >(SIGN_BSDA, {
@@ -71,13 +72,13 @@ export function SignOperation({ siret, bsdaId }: Props) {
                   destination: {
                     plannedOperationCode: bsda.plannedOperationCode,
                     reception: {
-                      date: new Date().toISOString(),
+                      date: format(new Date(), "yyyy-MM-dd"),
                       acceptationStatus: "ACCEPTED",
                       refusalReason: "",
                       weight: null,
                     },
                     operation: {
-                      date: new Date().toISOString(),
+                      date: format(new Date(), "yyyy-MM-dd"),
                       code: "",
                       nextDestination: { company: getInitialCompany() },
                     },
@@ -139,6 +140,11 @@ export function SignOperation({ siret, bsdaId }: Props) {
                 {updateError && (
                   <div className="notification notification--error">
                     {updateError.message}
+                  </div>
+                )}
+                {signatureError && (
+                  <div className="notification notification--error">
+                    {signatureError.message}
                   </div>
                 )}
 

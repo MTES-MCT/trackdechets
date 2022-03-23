@@ -222,7 +222,7 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
         ),
       emitterCompanySiret: yup.string().when("emitterIsPrivateIndividual", {
         is: true,
-        then: yup.string().nullable(true),
+        then: yup.string().oneOf([null, ""]).nullable(true),
         otherwise: yup
           .string()
           .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
@@ -239,7 +239,7 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
         ),
       emitterCompanyContact: yup.string().when("emitterIsPrivateIndividual", {
         is: true,
-        then: yup.string().nullable(true),
+        then: yup.string().oneOf([null, ""]).nullable(true),
         otherwise: yup
           .string()
           .requiredIf(
@@ -442,21 +442,22 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         ) as any,
       destinationReceptionWeight: yup
         .number()
-        .requiredIf(
-          context.operationSignature,
-          `Entreprise de destination: vous devez préciser la quantité`
-        )
         .when("destinationReceptionAcceptationStatus", {
           is: value => value === WasteAcceptationStatus.REFUSED,
           then: schema =>
-            schema.oneOf(
-              [0],
-              "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
-            ),
+            schema
+              .oneOf(
+                [0, null],
+                "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
+              )
+              .nullable(),
           otherwise: schema =>
-            schema.positive(
-              "Vous devez saisir une quantité reçue supérieure à 0"
-            )
+            schema
+              .positive("Vous devez saisir une quantité reçue supérieure à 0")
+              .requiredIf(
+                context.operationSignature,
+                `Entreprise de destination: vous devez préciser la quantité`
+              )
         }),
       destinationReceptionAcceptationStatus: yup
         .mixed<WasteAcceptationStatus>()
@@ -480,15 +481,16 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         ),
       destinationOperationCode: yup
         .string()
-        .oneOf([null, ...OPERATIONS])
         .when("destinationReceptionAcceptationStatus", {
           is: value => value === WasteAcceptationStatus.REFUSED,
-          then: schema => schema.nullable(),
+          then: schema => schema.oneOf([null, ""]).nullable(),
           otherwise: schema =>
-            schema.requiredIf(
-              context.operationSignature,
-              `Entreprise de destination: vous devez préciser le code d'opération réalisé`
-            )
+            schema
+              .oneOf([null, ...OPERATIONS])
+              .requiredIf(
+                context.operationSignature,
+                `Entreprise de destination: vous devez préciser le code d'opération réalisé`
+              )
         }),
       destinationOperationDate: yup
         .date()

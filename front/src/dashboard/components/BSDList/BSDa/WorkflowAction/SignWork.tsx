@@ -28,11 +28,11 @@ const validationSchema = yup.object({
 
 type Props = { siret: string; bsdaId: string };
 export function SignWork({ siret, bsdaId }: Props) {
-  const [updateBsda] = useMutation<
+  const [updateBsda, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsda">,
     MutationUpdateBsdaArgs
   >(UPDATE_BSDA);
-  const [signBsda, { loading }] = useMutation<
+  const [signBsda, { loading, error: signatureError }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs
   >(SIGN_BSDA, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
@@ -126,6 +126,17 @@ export function SignWork({ siret, bsdaId }: Props) {
                   </label>
                   <RedErrorMessage name="author" />
                 </div>
+
+                {updateError && (
+                  <div className="notification notification--error">
+                    {updateError.message}
+                  </div>
+                )}
+                {signatureError && (
+                  <div className="notification notification--error">
+                    {signatureError.message}
+                  </div>
+                )}
 
                 <div className="form__actions">
                   <button
