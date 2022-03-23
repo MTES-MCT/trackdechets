@@ -210,12 +210,16 @@ function SignEmissionFormModal({
 
 export default function SignEmissionForm({ siret, form }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = React.useState(false);
-  const currentUserIsEmitter = [
-    form.emitter?.company?.siret,
-    form.ecoOrganisme?.siret,
-  ].includes(siret);
-  const emitterLabel =
-    form.status === FormStatus.Sealed ? "émetteur" : "entreposage provisoire";
+
+  let emitterSirets = [form.emitter?.company?.siret, form.ecoOrganisme?.siret];
+  let emitterLabel = "émetteur";
+
+  if (FormStatus.Resealed) {
+    emitterSirets = [form.recipient?.company?.siret];
+    emitterLabel = "entreposage provisoire";
+  }
+
+  const currentUserIsEmitter = emitterSirets.includes(siret);
   const title = currentUserIsEmitter
     ? `Signer en tant que ${emitterLabel}`
     : `Faire signer l'${emitterLabel}`;
