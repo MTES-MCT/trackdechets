@@ -648,5 +648,11 @@ export const bsdaFragment = gql`
     waste {
       materialName
     }
+    forwardedIn {
+      id
+    }
+    groupedIn {
+      id
+    }
   }
 `;

@@ -68,8 +68,17 @@ export const COLUMNS: Record<
     ),
   },
   status: {
-    accessor: bsda =>
-      bsda.isDraft ? "Brouillon" : bsdaVerboseStatuses[bsda["bsdaStatus"]], // unable to use dot notation because of conflicting status fields
+    accessor: bsda => {
+      if (bsda.isDraft) return "Brouillon";
+      const status = bsda["bsdaStatus"];
+
+      if (
+        status === BsdaStatus.AwaitingChild &&
+        (bsda.forwardedIn || bsda.groupedIn)
+      )
+        return "Annexé à un bordereau suite.";
+      return bsdaVerboseStatuses[status];
+    },
   },
   workflow: {
     accessor: () => null,
