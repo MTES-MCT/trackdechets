@@ -119,6 +119,12 @@ export const FullBsdaFragment = gql`
         requiredFor
       }
     }
+    grouping {
+      id
+    }
+    forwardedIn {
+      id
+    }
   }
   ${companyFragment}
 `;

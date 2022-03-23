@@ -52,6 +52,7 @@ const DECHETTERIE_OPTIONS = [
 export function Type({ disabled }: Props) {
   const { setFieldValue } = useFormikContext<Bsda>();
   const [{ value: type }] = useField<BsdaType>("type");
+  const [{ value: id }] = useField<string>("id");
   const { siret } = useParams<{ siret: string }>();
 
   const { data, loading, error } = useQuery<
@@ -111,10 +112,10 @@ export function Type({ disabled }: Props) {
       </div>
       <div className="tw-mt-4">
         {BsdaType.Gathering === type && (
-          <BsdaPicker name="grouping" code="D 13" />
+          <BsdaPicker name="grouping" code="D 13" bsdaId={id} />
         )}
         {BsdaType.Reshipment === type && (
-          <BsdaPicker name="forwarding" code="D 15" />
+          <BsdaPicker name="forwarding" code="D 15" bsdaId={id} />
         )}
       </div>
     </>
