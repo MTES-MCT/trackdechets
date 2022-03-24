@@ -12,8 +12,7 @@ export const PACKAGINGS_NAMES = {
   [BsdaPackagingType.PaletteFilme]: "Palette filmée",
   [BsdaPackagingType.SacRenforce]: "Sac renforcé",
   [BsdaPackagingType.ConteneurBag]: "Conteneur-bag",
-  [BsdaPackagingType.Other]: "Autre(s)",
-  [BsdaPackagingType.BodyBenne]: "Benne",
+  [BsdaPackagingType.Other]: "Autre(s)"
 };
 
 export default function Packagings({
