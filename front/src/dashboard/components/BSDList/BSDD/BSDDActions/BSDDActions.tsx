@@ -39,6 +39,16 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
   });
   const [isDeleting, setIsDeleting] = React.useState(false);
 
+  let canDeleteAndUpdate = [FormStatus.Draft, FormStatus.Sealed].includes(
+    form.status
+  );
+  if (form.status === FormStatus.SignedByProducer) {
+    const signedBySiret = form.emittedByEcoOrganisme
+      ? form.ecoOrganisme?.siret
+      : form.emitter?.company?.siret;
+    canDeleteAndUpdate = siret === signedBySiret;
+  }
+
   return (
     <>
       <Menu>
@@ -77,11 +87,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                   Pdf
                 </MenuItem>
               )}
-              {[
-                FormStatus.Draft,
-                FormStatus.Sealed,
-                FormStatus.SignedByProducer,
-              ].includes(form.status) && (
+              {canDeleteAndUpdate && (
                 <>
                   <MenuItem onSelect={() => setIsDeleting(true)}>
                     <IconTrash color="blueLight" size="24px" />
