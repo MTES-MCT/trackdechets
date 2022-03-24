@@ -20,8 +20,6 @@ import { indexBsdasri } from "../../elastic";
 import { getCachedUserSirets } from "../../../common/redis/users";
 
 import {
-  emitterIsAllowedToGroup,
-  checkDasrisAreGroupable,
   checkDasrisAreEligibleForSynthesis,
   emitterBelongsToUserSirets
 } from "./utils";

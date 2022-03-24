@@ -23,36 +23,8 @@ const toPrismaGroupableFilter = (groupable?: boolean) => {
       type: BsdasriType.SIMPLE
     };
   }
+
   // not groupable dasris should either group, be grouped, synthesize, be synthesized or should not be SIMPLE
-
-  if (groupable === false) {
-    return {
-      OR: [
-        { grouping: { some: {} } },
-        { groupedInId: { not: null } },
-        { synthesizing: { some: {} } },
-        { synthesizedInId: { not: null } },
-        { type: { not: BsdasriType.SIMPLE } }
-      ]
-    };
-  }
-  return {};
-};
-
-const toPrismaSynthesizableFilter = (groupable?: boolean) => {
-  // synthesizable dasris should not: group, be grouped, synthesize or be synthesized, and should be SIMPLE
-
-  if (!!groupable) {
-    return {
-      grouping: { none: {} },
-      groupedInId: null,
-      synthesizing: { none: {} },
-      synthesizedInId: null,
-      type: BsdasriType.SIMPLE
-    };
-  }
-  // not groupable dasris should either group, be grouped, synthesize, be synthesized or should not be SIMPLE
-
   if (groupable === false) {
     return {
       OR: [
