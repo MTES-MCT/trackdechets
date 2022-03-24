@@ -1,4 +1,4 @@
-import { WasteAcceptationStatus, Prisma } from "@prisma/client";
+import { WasteAcceptationStatus, Prisma, BsdasriType } from "@prisma/client";
 import { isCollector } from "../companies/validation";
 import * as yup from "yup";
 import {
@@ -24,6 +24,7 @@ import {
 } from "../forms/errors";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
+
 // set yup default error messages
 configureYup();
 
@@ -125,6 +126,29 @@ const INVALID_DASRI_WASTE_CODE =
   "Ce code déchet n'est pas autorisé pour les DASRI";
 const INVALID_PROCESSING_OPERATION =
   "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée";
+
+/**
+ * Emitter and tranporter must be the same company
+ *
+ */
+export const synthesisSchema = () =>
+  yup.object({
+    emitterCompanySiret: yup
+      .string()
+      .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
+      .required("Siret emetteur requis"),
+    transporterCompanySiret: yup
+      .string()
+      .length(14, `Transporteur: ${INVALID_SIRET_LENGTH}`)
+      .required("Siret trs Requis")
+      .test(
+        "emitter-must-be-transporter-for-dasri-synthesis",
+        "Pour un dasri de synthèse, les sirets du producteur est transporteur doivent être identiques",
+        function (value) {
+          return this.parent.emitterCompanySiret === value;
+        }
+      )
+  });
 
 export const emitterSchema: FactorySchemaOf<BsdasriValidationContext, Emitter> =
   context =>
@@ -388,38 +412,54 @@ export const transportSchema: FactorySchemaOf<
       .requiredIf(
         context.transportSignature,
         "Vous devez préciser si le déchet est accepté"
+      )
+      .test(
+        "synthesis-trs-acceptation",
+        "Un dasri de synthèse ne peut pas être refusé ou partiellement accepté par le transporteur.",
+        function (value) {
+          return this.parent.type === BsdasriType.SYNTHESIS
+            ? value === WasteAcceptationStatus.ACCEPTED || !value
+            : true;
+        }
       ),
 
-    transporterWasteRefusedWeightValue: yup
-      .number()
-      .when("transporterAcceptationStatus", (type, schema) =>
-        ["REFUSED", "PARTIALLY_REFUSED"].includes(type)
-          ? schema
-              .required("Le poids de déchets refusés doit être précisé.")
-              .min(0, "Le poids doit être supérieur à 0")
-          : schema
-              .nullable()
-              .notRequired()
-              .test(
-                "is-empty",
-                "Le champ transporterWasteRefusedWeightValue ne doit pas être renseigné si le déchet est accepté ",
-                v => !v
-              )
-      ),
-    transporterWasteRefusalReason: yup
-      .string()
-      .when("transporterAcceptationStatus", (type, schema) =>
-        ["REFUSED", "PARTIALLY_REFUSED"].includes(type)
-          ? schema.required("Vous devez saisir un motif de refus")
-          : schema
-              .nullable()
-              .notRequired()
-              .test(
-                "is-empty",
-                "Le champ transporterWasteRefusalReason ne doit pas être renseigné si le déchet est accepté ",
-                v => !v
-              )
-      ),
+    transporterWasteRefusedWeightValue: yup.number().when("type", {
+      is: BsdasriType.SYNTHESIS,
+      then: schema => schema.nullable().notRequired(), // Synthesis dasri can't be refused
+      otherwise: schema =>
+        schema.when("transporterAcceptationStatus", (type, schema) =>
+          ["REFUSED", "PARTIALLY_REFUSED"].includes(type)
+            ? schema
+                .required("Le poids de déchets refusés doit être précisé.")
+                .min(0, "Le poids doit être supérieur à 0")
+            : schema
+                .nullable()
+                .notRequired()
+                .test(
+                  "is-empty",
+                  "Le champ transporterWasteRefusedWeightValue ne doit pas être renseigné si le déchet est accepté ",
+                  v => !v
+                )
+        )
+    }),
+    transporterWasteRefusalReason: yup.string().when("type", {
+      is: BsdasriType.SYNTHESIS,
+      then: schema => schema.nullable().notRequired(), // Synthesis dasri can't be refused
+      otherwise: schema =>
+        schema.when("transporterAcceptationStatus", (type, schema) =>
+          ["REFUSED", "PARTIALLY_REFUSED"].includes(type)
+            ? schema.required("Vous devez saisir un motif de refus")
+            : schema
+                .nullable()
+                .notRequired()
+                .test(
+                  "is-empty",
+                  "Le champ transporterWasteRefusalReason ne doit pas être renseigné si le déchet est accepté ",
+                  v => !v
+                )
+        )
+    }),
+
     transporterWasteWeightValue: yup
       .number()
       .nullable()
@@ -531,6 +571,15 @@ export const receptionSchema: FactorySchemaOf<
       .requiredIf(
         context.receptionSignature,
         "Vous devez préciser si le déchet est accepté"
+      )
+      .test(
+        "synthesis-trs-acceptation",
+        "Un dasri de synthèse ne peut pas être refusé ou partiellement accepté par le destinataire.",
+        function (value) {
+          return this.parent.type === BsdasriType.SYNTHESIS
+            ? value === WasteAcceptationStatus.ACCEPTED || !value
+            : true;
+        }
       ),
     destinationReceptionWasteRefusedWeightValue: yup
       .number()
@@ -538,21 +587,23 @@ export const receptionSchema: FactorySchemaOf<
       .notRequired()
       .min(0, "Le poids doit être supérieur à 0"),
 
-    destinationReceptionWasteRefusalReason: yup
-      .string()
-      .when("destinationReceptionAcceptationStatus", (type, schema) =>
-        ["REFUSED", "PARTIALLY_REFUSED"].includes(type)
-          ? schema.required("Vous devez saisir un motif de refus")
-          : schema
-              .nullable()
-              .notRequired()
-              .test(
-                "is-empty",
-                "Le champ destinationReceptionWasteRefusalReason ne doit pas être renseigné si le déchet est accepté ",
-                v => !v
-              )
-      ),
-
+    destinationReceptionWasteRefusalReason: yup.string().when("type", {
+      is: BsdasriType.SYNTHESIS,
+      then: schema => schema.nullable().notRequired(), // Synthesis dasri can't be refused
+      otherwise: schema =>
+        schema.when("destinationReceptionAcceptationStatus", (type, schema) =>
+          ["REFUSED", "PARTIALLY_REFUSED"].includes(type)
+            ? schema.required("Vous devez saisir un motif de refus")
+            : schema
+                .nullable()
+                .notRequired()
+                .test(
+                  "is-empty",
+                  "Le champ destinationReceptionWasteRefusalReason ne doit pas être renseigné si le déchet est accepté ",
+                  v => !v
+                )
+        )
+    }),
     destinationWastePackagings: yup
       .array()
       .requiredIf(
@@ -646,20 +697,27 @@ export type BsdasriValidationContext = {
   receptionSignature?: boolean;
   operationSignature?: boolean;
   isGrouping?: boolean;
+  isSynthesizing?: boolean;
 };
 export function validateBsdasri(
   dasri: Partial<Prisma.BsdasriCreateInput>,
   context: BsdasriValidationContext
 ) {
-  return emitterSchema(context)
+  let schema = emitterSchema(context)
     .concat(emissionSchema(context))
     .concat(transporterSchema(context))
     .concat(transportSchema(context))
     .concat(recipientSchema(context))
     .concat(receptionSchema(context))
     .concat(operationSchema(context))
-    .concat(ecoOrganismeSchema(context))
-    .validate(dasri, { abortEarly: false });
+    .concat(ecoOrganismeSchema(context));
+
+  // synthesis specific rules
+  if (!!context.isSynthesizing) {
+    schema = schema.concat(synthesisSchema());
+  }
+
+  return schema.validate(dasri, { abortEarly: false });
 }
 
 /**

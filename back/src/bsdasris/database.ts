@@ -1,5 +1,5 @@
 import prisma from "../prisma";
-
+import { FullDbBsdasri } from "./types";
 import { BsdasriNotFound } from "./errors";
 import { UserInputError } from "apollo-server-express";
 
@@ -8,21 +8,28 @@ import { UserInputError } from "apollo-server-express";
  */
 export async function getBsdasriOrNotFound({
   id,
-  includeGrouped = false
+  includeGrouped = false,
+  includeSynthesized = false
 }: {
   id: string;
   includeGrouped?: boolean;
-}) {
+  includeSynthesized?: boolean;
+}): Promise<FullDbBsdasri> {
   if (!id) {
     throw new UserInputError("You should specify an id");
   }
 
+  const include = includeGrouped || includeSynthesized;
   const bsdasri = await prisma.bsdasri.findUnique({
     where: { id },
-    ...(includeGrouped && {
-      include: { grouping: { select: { id: true } } }
+    ...(include && {
+      include: {
+        grouping: { select: { id: true } },
+        synthesizing: { select: { id: true } }
+      }
     })
   });
+  // ...((includeGrouped || includeSynthesized) ? i: {}) //fix me
 
   if (bsdasri == null || bsdasri.isDeleted == true) {
     throw new BsdasriNotFound(id.toString());

@@ -60,8 +60,12 @@ input BsdasriWhere {
   """
   (Optionnel) Filtre sur l'état de regroupement des bordereaux
   Si aucun filtre n'est passé, les bordereaux seront retournés sans filtrage supplémentaire
-  Si groupable: true, les bordereaux retournés ne sont pas déjà regroupés et ne regroupent pas d'autres bordereaux
-  Si groupable: false, les bordereaux retournés ne sont déjà regroupés ou ne regroupent d'autres bordereaux
+  Si groupable: true, les bordereaux retournés:
+    - ne regroupent pas d'autres bordereaux (groupement ou synthèse)
+    - ne sont pas associés à un bordereau de synthèse ou de groupement
+  Si groupable: false les bordereaux retournés: 
+    - sont déjà associés à un bordereau de synthèse ou de groupement 
+    - ou regroupent d'autres bordereaux (groupement ou synthèse)
   """
   groupable: Boolean
 
@@ -232,13 +236,16 @@ input BsdasriInput {
   destination: BsdasriDestinationInput
 
   """
-  Optionel: liste d'identifiants des conteneurs concernés. Modifiable par tous les acteurs du bsd, ce champ mis
+  Optionnel: liste d'identifiants des conteneurs concernés. Modifiable par tous les acteurs du bsd, ce champ mis
   à disposition des utilisateur permet de retrouver aisément des Bsdasris grâce à un identifiant de conteneur (cf. query bsdasris)
   """
   identification: BsdasriIdentificationInput
 
-  "Liste des bordereaux que celui-ci groupe"
+  "Liste des bordereaux que celui-ci groupe dans un bordereau de groupement"
   grouping: [ID!]
+
+  "Liste des bordereaux que celui-ci groupe dans un bordereau de synthèse"
+  synthesizing: [ID!]
 }
 
 input BsdasriSignatureInput {

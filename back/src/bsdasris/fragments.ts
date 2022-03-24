@@ -153,5 +153,11 @@ export const fullGroupingBsdasriFragment = gql`
     groupedIn {
       id
     }
+    synthesizing {
+      ...InitialBsdasriFragment
+    }
+    synthesizedIn {
+      id
+    }
   }
 `;

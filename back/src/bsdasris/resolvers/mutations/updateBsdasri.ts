@@ -1,5 +1,5 @@
-import { unflattenBsdasri, flattenBsdasriInput } from "../../converter";
-import { Bsdasri, BsdasriStatus } from "@prisma/client";
+import { expandBsdasriFromDB, flattenBsdasriInput } from "../../converter";
+import { Bsdasri, BsdasriStatus, BsdasriType } from "@prisma/client";
 import prisma from "../../../prisma";
 import {
   ResolversParentTypes,
@@ -7,13 +7,24 @@ import {
 } from "../../../generated/graphql/types";
 
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkIsBsdasriContributor } from "../../permissions";
+import {
+  checkIsBsdasriContributor,
+  checkCanEditBsdasri
+} from "../../permissions";
 
 import { GraphQLContext } from "../../../types";
 import { getBsdasriOrNotFound } from "../../database";
 import { validateBsdasri } from "../../validation";
-import { ForbiddenError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { indexBsdasri } from "../../elastic";
+import { getCachedUserSirets } from "../../../common/redis/users";
+
+import {
+  emitterIsAllowedToGroup,
+  checkDasrisAreGroupable,
+  checkDasrisAreEligibleForSynthesis,
+  emitterBelongsToUserSirets
+} from "./utils";
 
 type BsdasriField = keyof Bsdasri;
 const fieldsAllowedForUpdateOnceReceived: BsdasriField[] = [
@@ -95,16 +106,52 @@ const getGroupedBsdasriArgs = (
   return { grouping: args };
 };
 
+const getSynthesizedBsdasriArgs = (
+  inputSynthesizedBsdasris: string[] | null | undefined
+) => {
+  if (inputSynthesizedBsdasris === null) {
+    return { synthesizing: { set: [] } };
+  }
+
+  const args = !!inputSynthesizedBsdasris
+    ? {
+        set: inputSynthesizedBsdasris.map(id => ({
+          id
+        }))
+      }
+    : {};
+  return { synthesizing: args };
+};
+
 const getIsGrouping = (dbGrouping, grouping) => {
   // new input does not provide info about regrouped dasris: use db value
   if (grouping === undefined) {
-    return {
-      isGrouping: !!dbGrouping.length
-    };
+    return !!dbGrouping.length;
   }
   // else use provided input value
 
-  return { isGrouping: !!grouping?.length };
+  return !!grouping?.length;
+};
+
+const getIsSynthesizing = (dbSynthesizing, synthesizing) => {
+  // new input does not provide info about regrouped dasris: use db value
+
+  if (synthesizing === undefined) {
+    return !!dbSynthesizing.length;
+  }
+  // else use provided input value
+
+  return !!synthesizing?.length;
+};
+
+const getType = (isGrouping: boolean, isSynthesizing: boolean): BsdasriType => {
+  if (isGrouping) {
+    return BsdasriType.GROUPING;
+  }
+  if (isSynthesizing) {
+    return BsdasriType.SYNTHESIS;
+  }
+  return BsdasriType.SIMPLE;
 };
 
 /**
@@ -114,23 +161,35 @@ const getIsGrouping = (dbGrouping, grouping) => {
  */
 const dasriUpdateResolver = async (
   parent: ResolversParentTypes["Mutation"],
-  args: MutationUpdateBsdasriArgs,
+  { id, input }: MutationUpdateBsdasriArgs,
   context: GraphQLContext
 ) => {
   const user = checkIsAuthenticated(context);
+  const userSirets = await getCachedUserSirets(user.id);
 
-  const { id, input } = { ...args };
+  const { grouping: inputGrouping, synthesizing: inputSynthesizing } = input;
 
-  const { grouping: inputGrouping, ...dasriContent } = input;
+  const {
+    grouping: dbGrouping,
+    synthesizing: dbSynthesizing,
 
-  const { grouping: dbGrouping, ...dbBsdasri } = await getBsdasriOrNotFound({
+    ...dbBsdasri
+  } = await getBsdasriOrNotFound({
     id,
-    includeGrouped: true
+    includeGrouped: true,
+    includeSynthesized: true
   });
+
+  checkCanEditBsdasri(dbBsdasri);
+  const formSirets = {
+    emitterCompanySiret: dbBsdasri?.emitterCompanySiret,
+    destinationCompanySiret: dbBsdasri?.destinationCompanySiret,
+    transporterCompanySiret: dbBsdasri?.transporterCompanySiret
+  };
 
   await checkIsBsdasriContributor(
     user,
-    dbBsdasri,
+    formSirets,
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparaît pas"
   );
 
@@ -138,14 +197,49 @@ const dasriUpdateResolver = async (
     throw new ForbiddenError("Ce bordereau n'est plus modifiable");
   }
 
-  const flattenedInput = flattenBsdasriInput(dasriContent);
+  const flattenedInput = flattenBsdasriInput(input);
 
   const expectedBsdasri = { ...dbBsdasri, ...flattenedInput };
+
   // Validate form input
+
   const isGrouping = getIsGrouping(dbGrouping, inputGrouping);
+  const isSynthesizing = getIsSynthesizing(dbSynthesizing, inputSynthesizing);
+
+  if (isGrouping && isSynthesizing) {
+    throw new UserInputError(
+      "Un bordereau dasri ne peut pas à la fois être un bsd de synthèse et de groupement"
+    );
+  }
+
+  if (inputGrouping !== undefined || inputSynthesizing !== undefined) {
+    if (dbBsdasri.status !== BsdasriStatus.INITIAL) {
+      throw new UserInputError(
+        "Les bordereaux associés à ce bsd ne sont plus modifiables"
+      );
+    }
+  }
+
+  if (isSynthesizing && flattenedInput.emitterCompanySiret !== undefined) {
+    await emitterBelongsToUserSirets(
+      flattenedInput.emitterCompanySiret,
+      userSirets
+    );
+  }
+  if (isSynthesizing && !!inputSynthesizing?.length) {
+    // filter dasris already associated to current dasri
+    const newBsdToAssociate = inputSynthesizing.filter(
+      el => !dbSynthesizing.map(el => el.id).includes(el)
+    );
+    await checkDasrisAreEligibleForSynthesis(
+      newBsdToAssociate,
+      flattenedInput.emitterCompanySiret
+    );
+  }
 
   await validateBsdasri(expectedBsdasri, {
-    ...isGrouping
+    isGrouping,
+    isSynthesizing
   });
 
   const flattenedFields = Object.keys(flattenedInput);
@@ -167,11 +261,12 @@ const dasriUpdateResolver = async (
     data: {
       ...flattenedInput,
       ...getGroupedBsdasriArgs(inputGrouping),
-      type: isGrouping.isGrouping ? "GROUPING" : "SIMPLE"
+      ...getSynthesizedBsdasriArgs(inputSynthesizing),
+      type: getType(isGrouping, isSynthesizing)
     }
   });
 
-  const expandedDasri = unflattenBsdasri(updatedDasri);
+  const expandedDasri = expandBsdasriFromDB(updatedDasri);
   await indexBsdasri(updatedDasri);
   return expandedDasri;
 };

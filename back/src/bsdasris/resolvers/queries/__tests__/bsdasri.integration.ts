@@ -11,6 +11,7 @@ import {
 import { Query } from "../../../../generated/graphql/types";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { gql } from "apollo-server-express";
+import { BsdasriType } from "@prisma/client";
 
 const GET_BSDASRI = gql`
   ${fullGroupingBsdasriFragment}
@@ -104,7 +105,7 @@ describe("Query.Bsdasri", () => {
     const dasri = await bsdasriFactory({
       opt: {
         ...initialData(company),
-
+        type: BsdasriType.GROUPING,
         grouping: { connect: [{ id: toRegroup.id }] }
       }
     });

@@ -81,8 +81,7 @@ describe("Bsdasri where conversion", () => {
     const prismaWhere = toPrismaWhereInput(where);
     expect(prismaWhere).toEqual({
       grouping: { none: {} },
-      type: "SIMPLE",
-      groupedInId: null
+      type: "SIMPLE"
     });
   });
 
@@ -97,6 +96,8 @@ describe("Bsdasri where conversion", () => {
       OR: [
         { grouping: { some: {} } },
         { groupedInId: { not: null } },
+        { synthesizing: { some: {} } },
+        { synthesizedInId: { not: null } },
         { type: { not: "SIMPLE" } }
       ]
     });

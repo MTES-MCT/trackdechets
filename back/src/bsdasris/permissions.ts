@@ -64,7 +64,6 @@ export async function checkCanReadBsdasri(user: User, bsdasri: Bsdasri) {
     "Vous n'êtes pas autorisé à accéder à ce bordereau"
   );
 }
-
 export async function checkCanDeleteBsdasri(user: User, bsdasri: Bsdasri) {
   await checkIsBsdasriContributor(
     user,
@@ -78,5 +77,13 @@ export async function checkCanDeleteBsdasri(user: User, bsdasri: Bsdasri) {
     );
   }
 
+  return true;
+}
+
+export function checkCanEditBsdasri(bsdasri: Bsdasri) {
+  if (!!bsdasri.synthesizedInId)
+    throw new ForbiddenError(
+      "Ce bordereau est regroupé dans un bordereau de synthèse, il n'est pas modifiable, aucune signature ne peut y être apposée "
+    );
   return true;
 }

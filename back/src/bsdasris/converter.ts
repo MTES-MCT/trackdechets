@@ -39,7 +39,7 @@ import {
 } from "../forms/form-converter";
 import { Prisma, Bsdasri, BsdasriStatus } from "@prisma/client";
 
-export function unflattenBsdasri(bsdasri: Bsdasri): GqlBsdasri {
+export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
   return {
     id: bsdasri.id,
     isDraft: bsdasri.isDraft,
@@ -210,6 +210,23 @@ export const unflattenGroupingDasri = (dasri: Bsdasri): InitialBsdasri => ({
     dasri?.emitterPickupSitePostalCode ??
     extractPostalCode(dasri?.emitterCompanyAddress)
 });
+
+export const unflattenSynthesizingDasri = (dasri: Bsdasri): InitialBsdasri => ({
+  id: dasri.id,
+
+  quantity: countWasteQuantity(dasri.emitterWastePackagings),
+
+  volume: dasri.emitterWasteVolume ?? 0,
+
+  weight: dasri?.emitterWasteWeightValue ?? 0,
+
+  takenOverAt: dasri.transporterTakenOverAt,
+
+  postalCode:
+    dasri?.emitterPickupSitePostalCode ??
+    extractPostalCode(dasri?.emitterCompanyAddress)
+});
+
 type computeTotalVolumeFn = (packagings: BsdasriPackagingsInput[]) => number;
 /**
  * Compute total volume according to packaging infos details
@@ -480,6 +497,8 @@ export function flattenBsdasriInput(
     | "transporter"
     | "destination"
     | "identification"
+    | "grouping"
+    | "synthesizing"
   >
 ): Partial<Prisma.BsdasriCreateInput> {
   return safeInput({

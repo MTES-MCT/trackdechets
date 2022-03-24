@@ -86,7 +86,8 @@ describe("Mutation.updateBsdasri", () => {
         }
       }
     );
-    expect(data.updateBsdasri.grouping).toEqual([]);
+
     expect(data.updateBsdasri.type).toEqual("SIMPLE");
+    expect(data.updateBsdasri.grouping).toEqual([]);
   });
 });

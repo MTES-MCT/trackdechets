@@ -21,10 +21,15 @@ export const checkEmitterAllowsDirectTakeOver: checkEmitterAllowsDirectTakeOverF
       signatureParams.eventType === BsdasriEventType.SignTransport &&
       bsdasri.status === BsdasriStatus.INITIAL
     ) {
-      if (bsdasri.type !== BsdasriType.SIMPLE) {
+      if (bsdasri.type == BsdasriType.GROUPING) {
         throw new UserInputError(
           "L'emport direct est interdit pour les bordereaux dasri de groupement"
         );
+      }
+
+      // Synthesis Bsdasri are created by the transporter, so  direct `SignTransport` is allowed
+      if (bsdasri.type == BsdasriType.SYNTHESIS) {
+        return true;
       }
 
       const emitterCompany = await getCompanyOrCompanyNotFound({

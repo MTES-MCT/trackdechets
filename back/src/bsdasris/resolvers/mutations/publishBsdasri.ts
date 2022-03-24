@@ -1,11 +1,12 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getBsdasriOrNotFound } from "../../database";
-import { unflattenBsdasri } from "../../converter";
+import { expandBsdasriFromDB } from "../../converter";
 import { validateBsdasri } from "../../validation";
 import {
   checkIsBsdasriContributor,
-  checkIsBsdasriPublishable
+  checkIsBsdasriPublishable,
+  checkCanEditBsdasri
 } from "../../permissions";
 import prisma from "../../../prisma";
 import { indexBsdasri } from "../../elastic";
@@ -16,10 +17,14 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
-  const { grouping, ...bsdasri } = await getBsdasriOrNotFound({
+
+  const { grouping, synthesizing, ...bsdasri } = await getBsdasriOrNotFound({
     id,
     includeGrouped: true
   });
+
+  checkCanEditBsdasri(bsdasri);
+
   await checkIsBsdasriContributor(
     user,
     bsdasri,
@@ -31,12 +36,14 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
   );
 
   await validateBsdasri(bsdasri, { emissionSignature: true });
+
   // publish  dasri
   const publishedBsdasri = await prisma.bsdasri.update({
     where: { id: bsdasri.id },
     data: { isDraft: false }
   });
-  const expandedDasri = unflattenBsdasri(publishedBsdasri);
+
+  const expandedDasri = expandBsdasriFromDB(publishedBsdasri);
   await indexBsdasri(publishedBsdasri);
   return expandedDasri;
 };
