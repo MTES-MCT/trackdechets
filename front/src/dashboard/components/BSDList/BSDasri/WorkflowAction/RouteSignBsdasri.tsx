@@ -27,8 +27,9 @@ import { getComputedState } from "form/common/stepper/GenericStepList";
 import getInitialState from "form/bsdasri/utils/initial-state";
 import { signatureValidationSchema, prefillWasteDetails } from "./utils";
 import {
-  ProducerSignatureForm,
+  EmitterSignatureForm,
   TransportSignatureForm,
+  SynthesisTransportSignatureForm,
   ReceptionSignatureForm,
   OperationSignatureForm,
   removeSections,
@@ -37,10 +38,12 @@ import {
 import { BdasriSummary } from "dashboard/components/BSDList/BSDasri/Summary/BsdasriSummary";
 
 const forms = {
-  [BsdasriSignatureType.Emission]: ProducerSignatureForm,
+  [BsdasriSignatureType.Emission]: EmitterSignatureForm,
 
   [BsdasriSignatureType.Transport]: TransportSignatureForm,
   [ExtraSignatureType.DirectTakeover]: TransportSignatureForm,
+  [ExtraSignatureType.SynthesisEmission]: EmitterSignatureForm,
+  [ExtraSignatureType.SynthesisTransporter]: SynthesisTransportSignatureForm,
 
   [BsdasriSignatureType.Reception]: ReceptionSignatureForm,
   [BsdasriSignatureType.Operation]: OperationSignatureForm,
@@ -63,6 +66,12 @@ const settings: {
     validationText:
       "En signant, je confirme la remise du déchet au transporteur. La signature est horodatée.",
   },
+  [ExtraSignatureType.SynthesisEmission]: {
+    label: "Signature bordereau de synthèse",
+    signatureType: BsdasriSignatureType.Emission,
+    validationText:
+      "En signant, je valide l'emport du bsd de synthèse et des bordereaux associés. Les bordereaux associés ne sont plus modifiables.",
+  },
 
   [BsdasriSignatureType.Transport]: {
     label: "Signature transporteur",
@@ -76,6 +85,11 @@ const settings: {
     validationText: `L'émetteur de bordereau a autorisé son emport direct, en tant que
     transporteur vous pouvez donc emporter le déchet concerné.
     En signant, je confirme l'emport du déchet. La signature est horodatée.`,
+  },
+  [ExtraSignatureType.SynthesisTransporter]: {
+    label: "Bordereau de synthèse",
+    signatureType: BsdasriSignatureType.Transport,
+    validationText: `lorem ipsum`,
   },
   [BsdasriSignatureType.Reception]: {
     label: "Signature reception",
@@ -99,6 +113,7 @@ export function RouteSignBsdasri({
 }) {
   const { id: formId, siret } = useParams<{ id: string; siret: string }>();
   const history = useHistory();
+
   const { error, data, loading } = useQuery<
     Pick<Query, "bsdasri">,
     QueryBsdasriArgs
@@ -106,7 +121,6 @@ export function RouteSignBsdasri({
     variables: {
       id: formId,
     },
-
     fetchPolicy: "network-only",
   });
   const [updateBsdasri, { error: updateError }] = useMutation<
@@ -152,6 +166,7 @@ export function RouteSignBsdasri({
         validationSchema={() => signatureValidationSchema(bsdasri)}
         onSubmit={async values => {
           const { id, signature, ...rest } = values;
+
           await updateBsdasri({
             variables: {
               id: id,

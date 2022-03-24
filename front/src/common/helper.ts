@@ -87,8 +87,11 @@ const traverse = ({ obj, paths, depth = 0 }) => {
  */
 export const getNestedNode = (obj: Object, path: String): any => {
   const paths = path.split(".");
-
-  return traverse({ obj, paths });
+  try {
+    return traverse({ obj, paths });
+  } catch (e) {
+    return null;
+  }
 };
 
 /**

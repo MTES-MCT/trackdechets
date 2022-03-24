@@ -2,7 +2,7 @@ import { getIn, useFormikContext } from "formik";
 import React, { useEffect, useReducer } from "react";
 
 import { Bsdasri } from "generated/graphql/types";
-import BsdasriTable from "./BsdasriTable";
+import BsdasriTableSynthesis from "./BsdasriTableSynthesis";
 
 type State = { selected: string[] };
 
@@ -20,6 +20,7 @@ function reducer(state: State, action: Action) {
       };
     case "unselect":
       const usp = action.payload;
+
       return {
         selected: state.selected.filter(v => v !== usp.id),
       };
@@ -33,7 +34,7 @@ function reducer(state: State, action: Action) {
   }
 }
 
-export default function BsdasriSelector({ name }) {
+export default function BsdasriSelectorForSynthesis({ name }) {
   const { values, setFieldValue } = useFormikContext<Bsdasri>();
 
   const [state, dispatch] = useReducer(reducer, {
@@ -65,18 +66,17 @@ export default function BsdasriSelector({ name }) {
 
   return (
     <>
-      <h4 className="form__section-heading">Groupement de Dasris</h4>
+      <h4 className="form__section-heading">Dasri de synthèse</h4>
       <p className="tw-my-2">
-        Vous êtes en train de créer un bordereau de groupement. Veuillez
-        sélectionner ci-dessous les bordereaux à grouper.
+        Vous êtes en train de créer un bordereau de synthèse. Veuillez
+        sélectionner ci-dessous les bordereaux à associer.
       </p>
       <p className="tw-my-2">
         Tous les bordereaux présentés ci-dessous correspondent à des bordereaux
-        dasris pour lesquels vous avez effectué une opération de traitement de
-        type R 12 ou D 12.
+        dasris que vous avez pris en charge
       </p>
 
-      <BsdasriTable
+      <BsdasriTableSynthesis
         selectedItems={state.selected}
         onToggle={onToggle}
         regroupedInDB={regroupedInDB}

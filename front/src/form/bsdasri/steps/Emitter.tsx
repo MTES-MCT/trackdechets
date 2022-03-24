@@ -3,54 +3,47 @@ import CompanySelector from "form/common/components/company/CompanySelector";
 import { Field, useFormikContext } from "formik";
 import React from "react";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
-import Packagings from "./components/packagings/Packagings";
+import Packagings from "../components/packagings/Packagings";
 import "./Bsdasri.scss";
 import {
   getInitialEmitterPickupSiteFn,
   getInitialWeightFn,
-} from "./utils/initial-state";
+} from "../utils/initial-state";
 import WorkSite from "form/common/components/work-site/WorkSite";
-import BsdasriEcoOrganismes from "./components/eco-organismes/EcoOrganismes";
-import WeightWidget from "./components/Weight";
+import BsdasriEcoOrganismes from "../components/eco-organismes/EcoOrganismes";
+import WeightWidget from "../components/Weight";
 
-import { FillFieldsInfo, DisabledFieldsInfo } from "./utils/commons";
+import { FillFieldsInfo, DisabledFieldsInfo } from "../utils/commons";
 import classNames from "classnames";
 
-import { BsdasriStatus, Bsdasri } from "generated/graphql/types";
+import { BsdasriStatus, Bsdasri, BsdasriType } from "generated/graphql/types";
 import BsdasriSelector from "form/bsdasri/components/grouping/BsdasriSelector";
+import BsdasriSelectorForSynthesis from "form/bsdasri/components/grouping/BsdasriSelectorForSynthesis";
 import { useParams } from "react-router-dom";
 
-/**
- *
- * Emitter component with widget to group dasris
- */
-export function RegroupingEmitter({ status, stepName }) {
-  return (
-    <BaseEmitter status={status} isRegrouping={true} stepName={stepName} />
-  );
-}
-export default function Emitter({ status, stepName }) {
-  return <BaseEmitter status={status} stepName={stepName} />;
-}
-
-export function BaseEmitter({ status, stepName, isRegrouping = false }) {
-  const disabled = [
-    BsdasriStatus.SignedByProducer,
-    BsdasriStatus.Sent,
-    BsdasriStatus.Received,
-  ].includes(status);
-
-  const emissionEmphasis = stepName === "emission";
+export default function Emitter({ status, stepName, disabled = false }) {
+  const editionDisabled =
+    disabled ||
+    [
+      BsdasriStatus.SignedByProducer,
+      BsdasriStatus.Sent,
+      BsdasriStatus.Received,
+    ].includes(status);
   const { values } = useFormikContext<Bsdasri>();
+  const isRegrouping = values.type === BsdasriType.Grouping;
+  const isSynthesizing = values.type === BsdasriType.Synthesis;
+  const emissionEmphasis = stepName === "emission";
 
   const { siret } = useParams<{ siret: string }>();
   const isUserCurrentEmitter = values?.emitter?.company?.siret === siret;
   return (
     <>
       {emissionEmphasis && <FillFieldsInfo />}
-      {disabled && <DisabledFieldsInfo />}
-
-      {isRegrouping ? (
+      {editionDisabled && <DisabledFieldsInfo />}
+      {values.type === BsdasriType.Simple && (
+        <h3 className="form__section-heading">Bordereau de suivi DASRI</h3>
+      )}
+      {isRegrouping && (
         <>
           <h3 className="form__section-heading">
             Bordereau de groupement DASRI
@@ -63,8 +56,18 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
             </p>
           )}
         </>
-      ) : (
-        <h3 className="form__section-heading">Bordereau de suivi DASRI</h3>
+      )}
+      {isSynthesizing && (
+        <>
+          <h3 className="form__section-heading">Bordereau de synthèse DASRI</h3>
+
+          {values?.emitter?.company?.siret && !isUserCurrentEmitter && (
+            <p className="notification notification--error">
+              Pour préparer un bordereau de regroupement, vous devez y figurer
+              comme producteur
+            </p>
+          )}
+        </>
       )}
 
       <div
@@ -73,7 +76,7 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
         })}
       >
         <CompanySelector
-          disabled={disabled}
+          disabled={editionDisabled}
           name="emitter.company"
           heading="Personne responsable de l'élimination des déchets"
           optionalMail={true}
@@ -81,7 +84,7 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
       </div>
 
       <WorkSite
-        disabled={disabled}
+        disabled={editionDisabled}
         switchLabel="Je souhaite ajouter une adresse de collecte ou d'enlèvement"
         headingTitle="Adresse d'enlèvement"
         designation="du site d'enlèvement"
@@ -105,19 +108,22 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
             id="18 01 03*"
             label="18 01 03* DASRI d'origine humaine"
             component={RadioButton}
-            disabled={disabled}
+            disabled={editionDisabled}
           />
           <Field
             name="waste.code"
             id="18 01 02*"
             label="18 01 02* DASRI d'origine animale"
             component={RadioButton}
-            disabled={disabled}
+            disabled={editionDisabled}
           />
         </fieldset>
       </div>
       {isRegrouping && isUserCurrentEmitter && (
         <BsdasriSelector name="grouping" />
+      )}
+      {isSynthesizing && isUserCurrentEmitter && (
+        <BsdasriSelectorForSynthesis name="synthesizing" />
       )}
       <h4 className="form__section-heading">Conditionnement</h4>
       <div
@@ -128,7 +134,7 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
         <Field
           name="emitter.emission.packagings"
           component={Packagings}
-          disabled={disabled}
+          disabled={editionDisabled}
         />
       </div>
       <h4 className="form__section-heading">Quantité remise</h4>
@@ -138,7 +144,7 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
         })}
       >
         <WeightWidget
-          disabled={disabled}
+          disabled={editionDisabled}
           switchLabel="Je souhaite ajouter un poids"
           dasriPath="emitter.emission"
           getInitialWeightFn={getInitialWeightFn}
@@ -152,7 +158,7 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
         <label>
           Code ADR
           <Field
-            disabled={disabled}
+            disabled={editionDisabled}
             type="text"
             name="waste.adr"
             className="td-input"
@@ -166,7 +172,7 @@ export function BaseEmitter({ status, stepName, isRegrouping = false }) {
         <label>
           Champ libre (optionnel)
           <Field
-            disabled={disabled}
+            disabled={editionDisabled}
             component="textarea"
             name="emitter.customInfo"
             className="td-textarea"

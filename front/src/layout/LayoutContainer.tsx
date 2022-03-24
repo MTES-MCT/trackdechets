@@ -221,13 +221,7 @@ export default withRouter(function LayoutContainer({ history }) {
               >
                 <BsdasriFormContainer />
               </PrivateRoute>
-              <PrivateRoute
-                path={routes.dashboard.bsdasris.createGroup}
-                isAuthenticated={isAuthenticated}
-                exact
-              >
-                <BsdasriFormContainer bsdasriFormType="bsdasriRegroup" />
-              </PrivateRoute>
+
               <PrivateRoute
                 path={routes.dashboard.bsdasris.edit}
                 isAuthenticated={isAuthenticated}
