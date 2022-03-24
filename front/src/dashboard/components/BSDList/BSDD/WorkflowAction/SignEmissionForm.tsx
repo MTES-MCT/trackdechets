@@ -214,7 +214,7 @@ export default function SignEmissionForm({ siret, form }: WorkflowActionProps) {
   let emitterSirets = [form.emitter?.company?.siret, form.ecoOrganisme?.siret];
   let emitterLabel = "émetteur";
 
-  if (FormStatus.Resealed) {
+  if (form.status === FormStatus.Resealed) {
     emitterSirets = [form.recipient?.company?.siret];
     emitterLabel = "entreposage provisoire";
   }
