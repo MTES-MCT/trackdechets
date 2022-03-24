@@ -54,8 +54,7 @@ const cascadeOnSynthesized = async ({ dasri }) => {
       where: { synthesizedInId: dasri.id }
     });
     for (const updatedDasri of updatedDasris) {
-      const expandedDasri = expandBsdasriFromDB(updatedDasri);
-      await indexBsdasri(expandedDasri);
+      await indexBsdasri(updatedDasri);
     }
   }
 
