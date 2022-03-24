@@ -830,6 +830,7 @@ describe("Query.bsds.bsda base workflow", () => {
           destinationReceptionWeight: 0,
           destinationReceptionAcceptationStatus: "REFUSED",
           destinationReceptionRefusalReason: "Ugly waste...",
+          destinationOperationCode: "",
           destinationOperationSignatureDate: null,
           destinationOperationSignatureAuthor: null
         }

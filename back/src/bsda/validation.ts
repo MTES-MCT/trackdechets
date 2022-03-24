@@ -239,7 +239,13 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
         ),
       emitterCompanyContact: yup.string().when("emitterIsPrivateIndividual", {
         is: true,
-        then: yup.string().oneOf([null, ""]).nullable(true),
+        then: yup
+          .string()
+          .oneOf(
+            [null, ""],
+            "Le champ contact ne doit pas avoir de valeur dans le cas d'un particulier"
+          )
+          .nullable(true),
         otherwise: yup
           .string()
           .requiredIf(
@@ -483,7 +489,13 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         .string()
         .when("destinationReceptionAcceptationStatus", {
           is: value => value === WasteAcceptationStatus.REFUSED,
-          then: schema => schema.oneOf([null, ""]).nullable(),
+          then: schema =>
+            schema
+              .oneOf(
+                [null, ""],
+                "Le code d'opétation ne doit pas être renseigné lorsque le déchet est refusé"
+              )
+              .nullable(),
           otherwise: schema =>
             schema
               .oneOf([null, ...OPERATIONS])
