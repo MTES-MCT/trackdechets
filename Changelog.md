@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout de filtres sur la query `bsdas`. Il est désormais possible de filtrer par `customInfo` pour le transporteur, émetteur et destinataire. Et de filtrer par plaque d'immatriculation [PR 1330](https://github.com/MTES-MCT/trackdechets/pull/1330)
+- Gestion des dasri de synthèse [PR 1287](https://github.com/MTES-MCT/trackdechets/pull/1287)
 
 #### :bug: Corrections de bugs
 
@@ -34,7 +35,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
   - extension de CompanySelector.tsx pour valider un numéro TVA et remplir les infos Company (le nom et l'adresse) automatiquement.
   - extension d' AccountCompanyAdd.tsx pour supporter un numéro TVA et remplir les infos Company (le nom et l'adresse) automatiquement.
   - Refacto `companyInfos` pour déplacer toute la logique dans `company/search.ts` et capable de chercher à la fois par SIRET et par TVA.
-  - Ajout de la possibilité de filtrer sur le champ `customId` (recherche exacte) sur le tableau de bord et dans la query `forms` [PR 1284](https://github.com/MTES-MCT/trackdechets/pull/1284)
+  - Gestion des dasri de synthèse [PR 1287](https://github.com/MTES-MCT/trackdechets/pull/1287)
+
 
 #### :bug: Corrections de bugs
 
