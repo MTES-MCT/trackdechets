@@ -406,7 +406,6 @@ describe("Mutation.Bsda.create", () => {
       emitter: {
         isPrivateIndividual: true,
         company: {
-          siret: "Jean DUPONT",
           name: "Jean DUPONT",
           address: "Rue de la carcasse",
           contact: "Centre amiante",
@@ -467,7 +466,6 @@ describe("Mutation.Bsda.create", () => {
       emitter: {
         isPrivateIndividual: true,
         company: {
-          siret: "Jean DUPONT",
           name: "Jean DUPONT",
           address: "Rue de la carcasse",
           contact: "Centre amiante",
