@@ -12,22 +12,12 @@ export default function TagsInput(props) {
   ) {
     e.stopPropagation();
 
-    const val = (e.target as HTMLInputElement).value;
-    if (["Enter", "Tab"].includes(e.key) && val) {
+    const value = (e.target as HTMLInputElement).value;
+    if (["Enter", "Tab"].includes(e.key)) {
       e.preventDefault();
-      if (
-        field.value?.find(tag => tag.toLowerCase() === val.toLowerCase()) ||
-        (props.limit && field.value?.length >= props.limit)
-      ) {
-        return;
-      }
-      arrayHelpers.push(val);
-
-      if (inputContainer.current) {
-        inputContainer.current.value = "";
-      }
+      addTag(value, arrayHelpers);
     }
-    if (e.key === "Backspace" && !val && field.value) {
+    if (e.key === "Backspace" && !value && field.value) {
       arrayHelpers.remove(field.value.length - 1);
     }
   }
@@ -36,20 +26,22 @@ export default function TagsInput(props) {
     e: React.FocusEvent<HTMLInputElement>,
     arrayHelpers: FieldArrayRenderProps
   ) {
-    const val = (e.target as HTMLInputElement).value;
-    if (val) {
-      e.preventDefault();
-      if (
-        field.value?.find(tag => tag.toLowerCase() === val.toLowerCase()) ||
-        (props.limit && field.value?.length >= props.limit)
-      ) {
-        return;
-      }
-      arrayHelpers.push(val);
+    const value = (e.target as HTMLInputElement).value;
+    addTag(value, arrayHelpers);
+  }
 
-      if (inputContainer.current) {
-        inputContainer.current.value = "";
-      }
+  function addTag(value: string, arrayHelpers: FieldArrayRenderProps) {
+    if (
+      !value ||
+      field.value?.find(tag => tag.toLowerCase() === value.toLowerCase()) ||
+      (props.limit && field.value?.length >= props.limit)
+    ) {
+      return;
+    }
+    arrayHelpers.push(value);
+
+    if (inputContainer.current) {
+      inputContainer.current.value = "";
     }
   }
 
