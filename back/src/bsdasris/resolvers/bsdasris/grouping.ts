@@ -1,7 +1,7 @@
 import { BsdasriResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { BsdasriType } from "@prisma/client";
-import { unflattenGroupingDasri } from "../../converter";
+import { expandGroupingDasri } from "../../converter";
 
 const grouping: BsdasriResolvers["grouping"] = async bsdasri => {
   if (bsdasri.type !== BsdasriType.GROUPING) {
@@ -12,7 +12,7 @@ const grouping: BsdasriResolvers["grouping"] = async bsdasri => {
     .findUnique({ where: { id: bsdasri.id } })
     .grouping();
 
-  return grouping.map(bsdasri => unflattenGroupingDasri(bsdasri));
+  return grouping.map(bsdasri => expandGroupingDasri(bsdasri));
 };
 
 export default grouping;

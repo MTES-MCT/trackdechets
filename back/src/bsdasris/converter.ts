@@ -195,7 +195,7 @@ const countWasteQuantity = packagingsInfo => {
   return packagingsInfo.map(p => p.quantity).reduce((acc, p) => p + acc, 0);
 };
 
-export const unflattenGroupingDasri = (dasri: Bsdasri): InitialBsdasri => ({
+export const expandGroupingDasri = (dasri: Bsdasri): InitialBsdasri => ({
   id: dasri.id,
 
   quantity: countWasteQuantity(dasri.destinationWastePackagings),
@@ -211,7 +211,7 @@ export const unflattenGroupingDasri = (dasri: Bsdasri): InitialBsdasri => ({
     extractPostalCode(dasri?.emitterCompanyAddress)
 });
 
-export const unflattenSynthesizingDasri = (dasri: Bsdasri): InitialBsdasri => ({
+export const expandSynthesizingDasri = (dasri: Bsdasri): InitialBsdasri => ({
   id: dasri.id,
 
   quantity: countWasteQuantity(dasri.emitterWastePackagings),

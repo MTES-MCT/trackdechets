@@ -17,7 +17,7 @@ import {
 import { indexBsdasri } from "../../elastic";
 
 /**
- * When synthesized dasri is received or processed, associated dasri are updated
+ * When synthesized dasri is received or processed, associated dasris are updated
  *
  */
 const cascadeOnSynthesized = async ({ dasri }) => {
@@ -83,7 +83,7 @@ const cascadeOnSynthesized = async ({ dasri }) => {
 
 const basesign = async ({ id, input, context, securityCode = null }) => {
   const user = checkIsAuthenticated(context);
-  const bsdasri = await getBsdasriOrNotFound({ id, includeSynthesized: true });
+  const bsdasri = await getBsdasriOrNotFound({ id, includeAssociated: true });
 
   checkCanEditBsdasri(bsdasri);
 

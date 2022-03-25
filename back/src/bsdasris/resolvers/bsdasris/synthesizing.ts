@@ -1,7 +1,7 @@
 import { BsdasriResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { BsdasriType } from "@prisma/client";
-import { unflattenSynthesizingDasri } from "../../converter";
+import { expandSynthesizingDasri } from "../../converter";
 
 const synthesizing: BsdasriResolvers["synthesizing"] = async bsdasri => {
   if (bsdasri.type !== BsdasriType.SYNTHESIS) {
@@ -12,7 +12,7 @@ const synthesizing: BsdasriResolvers["synthesizing"] = async bsdasri => {
     .findUnique({ where: { id: bsdasri.id } })
     .synthesizing();
 
-  return synthesizing.map(bsdasri => unflattenSynthesizingDasri(bsdasri));
+  return synthesizing.map(bsdasri => expandSynthesizingDasri(bsdasri));
 };
 
 export default synthesizing;

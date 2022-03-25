@@ -19,11 +19,11 @@ const deleteBsdasriResolver: MutationResolvers["deleteBsdasri"] = async (
 
   const { grouping, synthesizing, ...bsdasri } = await getBsdasriOrNotFound({
     id,
-    includeGrouped: true
+    includeAssociated: true
   });
   // user must belong to the dasri, and status must be INITIAL
   // if this dasri is regrouped by an other, it should be in another status thus being not deletable
-  // grouped Basdasri are RECEIVED and synthesized Bsdasri are SENT so they can't be deleted
+  // grouped Bsdasri are RECEIVED and synthesized Bsdasri are SENT so they can't be deleted
 
   await checkCanDeleteBsdasri(user, bsdasri);
   // are any dasris grouped on the dasri we want to mark as deleted ?

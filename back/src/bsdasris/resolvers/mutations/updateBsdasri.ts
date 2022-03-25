@@ -174,8 +174,7 @@ const dasriUpdateResolver = async (
     ...dbBsdasri
   } = await getBsdasriOrNotFound({
     id,
-    includeGrouped: true,
-    includeSynthesized: true
+    includeAssociated: true
   });
 
   checkCanEditBsdasri(dbBsdasri);

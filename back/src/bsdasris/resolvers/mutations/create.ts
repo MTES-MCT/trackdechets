@@ -120,7 +120,6 @@ const createBsdasri = async (
     data: {
       ...flattenedInput,
       id: getReadableId(ReadableIdPrefix.DASRI),
-      // status: isSynthesizing ? BsdasriStatus.SENT : BsdasriStatus.INITIAL, // fix me
       type: bsdasriType,
       grouping: { connect: groupedBsdasris },
       synthesizing: { connect: synthesizedBsdasris },

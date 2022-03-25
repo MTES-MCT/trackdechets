@@ -20,7 +20,7 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
 
   const { grouping, synthesizing, ...bsdasri } = await getBsdasriOrNotFound({
     id,
-    includeGrouped: true
+    includeAssociated: true
   });
 
   checkCanEditBsdasri(bsdasri);

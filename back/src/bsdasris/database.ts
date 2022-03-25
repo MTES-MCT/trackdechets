@@ -8,28 +8,24 @@ import { UserInputError } from "apollo-server-express";
  */
 export async function getBsdasriOrNotFound({
   id,
-  includeGrouped = false,
-  includeSynthesized = false
+  includeAssociated = false
 }: {
   id: string;
-  includeGrouped?: boolean;
-  includeSynthesized?: boolean;
+  includeAssociated?: boolean;
 }): Promise<FullDbBsdasri> {
   if (!id) {
     throw new UserInputError("You should specify an id");
   }
 
-  const include = includeGrouped || includeSynthesized;
   const bsdasri = await prisma.bsdasri.findUnique({
     where: { id },
-    ...(include && {
+    ...(includeAssociated && {
       include: {
         grouping: { select: { id: true } },
         synthesizing: { select: { id: true } }
       }
     })
   });
-  // ...((includeGrouped || includeSynthesized) ? i: {}) //fix me
 
   if (bsdasri == null || bsdasri.isDeleted == true) {
     throw new BsdasriNotFound(id.toString());
