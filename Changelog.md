@@ -34,10 +34,14 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+<<<<<<< HEAD
 - Permettre au producteur initial de télécharger le PDF du BSDD de regroupement depuis le détail du BSDD initial [PR 1306](https://github.com/MTES-MCT/trackdechets/pull/1306)
 - Ajout de filtres sur la query `bsdas`. Il est désormais possible de filtrer par `customInfo` pour le transporteur, émetteur et destinataire. Et de filtrer par plaque d'immatriculation [PR 1330](https://github.com/MTES-MCT/trackdechets/pull/1330)
 - Gestion des dasri de synthèse [PR 1287](https://github.com/MTES-MCT/trackdechets/pull/1287)
 - Destination ultérieure optionnelle en cas de rupture de traçabilité [PR 1302](https://github.com/MTES-MCT/trackdechets/pull/1302)
+=======
+- Gestion des dasri de synthèse [PR 1287](https://github.com/MTES-MCT/trackdechets/pull/1287)
+>>>>>>> Bump changelog
 
 #### :bug: Corrections de bugs
 
