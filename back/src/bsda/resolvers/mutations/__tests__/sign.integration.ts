@@ -563,7 +563,11 @@ describe("Mutation.Bsda.sign", () => {
         opt: {
           status: "INITIAL",
           type: "COLLECTION_2710",
-          destinationCompanySiret: company.siret
+          destinationCompanySiret: company.siret,
+          transporterCompanyName: null,
+          transporterCompanySiret: null,
+          workerCompanyName: null,
+          workerCompanySiret: null
         }
       });
 
@@ -701,7 +705,11 @@ describe("Mutation.Bsda.sign", () => {
         opt: {
           emitterCompanySiret: company.siret,
           status: "INITIAL",
-          type: "COLLECTION_2710"
+          type: "COLLECTION_2710",
+          transporterCompanyName: null,
+          transporterCompanySiret: null,
+          workerCompanyName: null,
+          workerCompanySiret: null
         }
       });
 

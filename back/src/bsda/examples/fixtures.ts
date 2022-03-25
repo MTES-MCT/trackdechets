@@ -34,7 +34,6 @@ function privateIndividualEmitterInput() {
     company: {
       name: "Henri Dupont",
       address: "5 rue du producteur",
-      contact: "Henri Dupont",
       phone: "01 00 00 00 00",
       mail: "henri.dupont@dechets.org"
     },

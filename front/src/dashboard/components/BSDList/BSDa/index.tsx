@@ -7,6 +7,7 @@ import { BSDaActions } from "./BSDaActions/BSDaActions";
 import { useParams } from "react-router-dom";
 import { ActionButtonContext } from "common/components/ActionButton";
 import { WorkflowAction } from "./WorkflowAction/WorkflowAction";
+import { TransporterInfoEdit } from "./WorkflowAction/TransporterInfoEdit";
 
 const bsdaVerboseStatuses: Record<BsdaStatus, string> = {
   INITIAL: "Initial",
@@ -49,20 +50,35 @@ export const COLUMNS: Record<
         .join(" - "),
   },
   transporterCustomInfo: {
-    accessor: bsda => "", // bsda.transporter?.customInfo
-    Cell: ({ value }) => (
+    accessor: bsda => bsda.transporter?.customInfo,
+    Cell: ({ value, row }) => (
       <>
         <span style={{ marginRight: "0.5rem" }}>{value}</span>
+        <TransporterInfoEdit bsda={row.original} />
       </>
     ),
   },
   transporterNumberPlate: {
-    accessor: () => null,
-    Cell: () => null,
+    accessor: bsda => bsda.transporter?.transport?.plates ?? [],
+    Cell: ({ value, row }) => (
+      <>
+        <span> {value.join(", ")}</span>
+        <TransporterInfoEdit bsda={row.original} />
+      </>
+    ),
   },
   status: {
-    accessor: bsda =>
-      bsda.isDraft ? "Brouillon" : bsdaVerboseStatuses[bsda["bsdaStatus"]], // unable to use dot notation because of conflicting status fields
+    accessor: bsda => {
+      if (bsda.isDraft) return "Brouillon";
+      const status = bsda["bsdaStatus"];
+
+      if (
+        status === BsdaStatus.AwaitingChild &&
+        (bsda.forwardedIn || bsda.groupedIn)
+      )
+        return "Annexé à un bordereau suite.";
+      return bsdaVerboseStatuses[status];
+    },
   },
   workflow: {
     accessor: () => null,

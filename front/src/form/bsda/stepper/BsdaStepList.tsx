@@ -39,10 +39,18 @@ export default function BsdaStepsList(props: Props) {
     fetchPolicy: "network-only",
   });
 
-  const formState = useMemo(
-    () => getComputedState(initialState, formQuery.data?.bsda),
-    [formQuery.data]
-  );
+  const formState = useMemo(() => {
+    const computedState = getComputedState(initialState, formQuery.data?.bsda);
+    if (formQuery.data?.bsda?.grouping) {
+      computedState.grouping = formQuery.data?.bsda.grouping.map(
+        bsda => bsda.id
+      );
+    }
+    if (formQuery.data?.bsda?.forwarding) {
+      computedState.forwarding = formQuery.data?.bsda.forwarding.id;
+    }
+    return computedState;
+  }, [formQuery.data]);
 
   const [createBsda, { loading: creating }] = useMutation<
     Pick<Mutation, "createBsda">,

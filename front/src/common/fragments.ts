@@ -640,9 +640,19 @@ export const bsdaFragment = gql`
         name
         siret
       }
+      customInfo
+      transport {
+        plates
+      }
     }
     waste {
       materialName
+    }
+    forwardedIn {
+      id
+    }
+    groupedIn {
+      id
     }
   }
 `;

@@ -22,6 +22,14 @@ export default async function deleteBsda(
     data: { isDeleted: true }
   });
 
+  await prisma.bsda.updateMany({
+    where: { OR: [{ forwardedIn: { id } }, { groupedInId: id }] },
+    data: {
+      groupedInId: null,
+      forwardingId: { set: null }
+    }
+  });
+
   await deleteBsd(deletedBsda, context);
 
   return expandBsdaFromDb(deletedBsda);

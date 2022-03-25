@@ -28,6 +28,7 @@ export default function DateInput({
       {...rest}
       {...props}
       dateFormat="dd/MM/yyyy"
+      autoComplete="off"
       selected={value ? parseDate(value) : null}
       onChange={(value: Date | null) => {
         setFieldValue(field.name, value ? format(value, "yyyy-MM-dd") : null);

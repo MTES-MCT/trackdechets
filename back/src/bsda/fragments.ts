@@ -44,6 +44,7 @@ export const fullBsda = gql`
       consistence
       sealNumbers
       adr
+      pop
     }
     packagings {
       other

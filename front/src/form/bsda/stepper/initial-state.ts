@@ -19,6 +19,7 @@ export default {
     consistence: BsdaConsistence.Solide,
     sealNumbers: [],
     adr: "",
+    pop: false,
   },
   packagings: [],
   weight: {
