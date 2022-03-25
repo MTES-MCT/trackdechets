@@ -222,7 +222,13 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
         ),
       emitterCompanySiret: yup.string().when("emitterIsPrivateIndividual", {
         is: true,
-        then: yup.string().oneOf([null, ""]).nullable(true),
+        then: yup
+          .string()
+          .oneOf(
+            [null, ""],
+            "Émetteur: Le champ SIRET ne doit pas avoir de valeur dans le cas d'un particulier"
+          )
+          .nullable(true),
         otherwise: yup
           .string()
           .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
@@ -239,13 +245,7 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
         ),
       emitterCompanyContact: yup.string().when("emitterIsPrivateIndividual", {
         is: true,
-        then: yup
-          .string()
-          .oneOf(
-            [null, ""],
-            "Le champ contact ne doit pas avoir de valeur dans le cas d'un particulier"
-          )
-          .nullable(true),
+        then: yup.string().nullable(true),
         otherwise: yup
           .string()
           .requiredIf(
