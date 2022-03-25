@@ -7,8 +7,8 @@ import { registerUpdater, Updater } from "./helper/helper";
   true
 )
 export class DecodeAmpersandsInCompanyNames implements Updater {
-  run() {
-    console.info("Starting script to delete orphan companies...");
-    return decodeAmpersandsInCompanyNames();
+  async run() {
+    console.info("Starting script to decode ampersands in company names...");
+    await decodeAmpersandsInCompanyNames();
   }
 }

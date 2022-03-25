@@ -7,8 +7,8 @@ import { registerUpdater, Updater } from "./helper/helper";
   true
 )
 export class RemoveOrphanCompanies implements Updater {
-  run() {
+  async run() {
     console.info("Starting script to delete orphan companies...");
-    return deleteOrphanCompanies();
+    await deleteOrphanCompanies();
   }
 }
