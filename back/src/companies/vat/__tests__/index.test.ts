@@ -26,7 +26,7 @@ describe("searchVat client", () => {
     } catch (e) {
       expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
       expect(e.message).toBe(
-        "Le numéro de TVA intracommunautaire ne commence pas par un code pays européen valide"
+        "Le code pays du numéro de TVA intracommunautaire n'est pas valide, veuillez utiliser un code pays ISO à 2 lettres"
       );
     }
     // lower case
@@ -35,7 +35,7 @@ describe("searchVat client", () => {
     } catch (e) {
       expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
       expect(e.message).toBe(
-        "Le numéro de TVA intracommunautaire ne commence pas par un code pays européen valide"
+        "Le code pays du numéro de TVA intracommunautaire n'est pas valide, veuillez utiliser un code pays ISO à 2 lettres"
       );
     }
   });

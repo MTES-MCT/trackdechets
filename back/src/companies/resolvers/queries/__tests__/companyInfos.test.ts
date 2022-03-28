@@ -65,7 +65,7 @@ describe("companyInfos with SIRET", () => {
       website: "http://benoitguigal.fr",
       isRegistered: true,
       ecoOrganismeAgreements: [],
-      companyTypes: undefined,
+      companyTypes: [],
       installation: {
         codeS3ic: "0055.14316"
       }
@@ -135,7 +135,7 @@ describe("companyInfos search with a VAT number", () => {
       website: "http://benoitguigal.fr",
       isRegistered: true,
       ecoOrganismeAgreements: [],
-      companyTypes: undefined,
+      companyTypes: [],
       installation: undefined
     });
   });
