@@ -20,6 +20,8 @@ export default function Transporter() {
       <h4 className="form__section-heading">Transporteur</h4>
       <CompanySelector
         name="transporter.company"
+        allowForeignCompanies={true}
+        registeredOnlyCompanies={true}
         onCompanySelected={transporter => {
           if (transporter.transporterReceipt) {
             setFieldValue(

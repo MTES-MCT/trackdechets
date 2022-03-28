@@ -4,9 +4,10 @@ import prisma from "../../../../prisma";
 import { TestQuery } from "../../../../__tests__/apollo-integration-testing";
 import { companyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import * as sirene from "../../../sirene";
+import { AnonymousCompanyError } from "../../../sirene/errors";
+import * as searchCompany from "../../../sirene/searchCompany";
 
-const searchCompanySpy = jest.spyOn(sirene, "searchCompany");
+const searchSirene = jest.spyOn(searchCompany, "default");
 
 describe("query { companyInfos(siret: <SIRET>) }", () => {
   let query: TestQuery;
@@ -14,15 +15,14 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
     const testClient = makeClient();
     query = testClient.query;
   });
-  afterEach(resetDatabase);
 
   afterEach(async () => {
     await resetDatabase();
-    searchCompanySpy.mockReset();
+    searchSirene.mockReset();
   });
 
-  test("Random company not registered in Trackdéchets", async () => {
-    searchCompanySpy.mockResolvedValueOnce({
+  it("Random company not registered in Trackdéchets", async () => {
+    searchSirene.mockResolvedValueOnce({
       siret: "85001946400013",
       etatAdministratif: "A",
       name: "CODE EN STOCK",
@@ -72,8 +72,8 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
     });
   });
 
-  test("ICPE registered in Trackdéchets", async () => {
-    searchCompanySpy.mockResolvedValueOnce({
+  it("ICPE registered in Trackdéchets", async () => {
+    searchSirene.mockResolvedValueOnce({
       siret: "85001946400013",
       etatAdministratif: "A",
       name: "CODE EN STOCK",
@@ -142,8 +142,8 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
     });
   });
 
-  test("Transporter company with transporter receipt", async () => {
-    searchCompanySpy.mockResolvedValueOnce({
+  it("Transporter company with transporter receipt", async () => {
+    searchSirene.mockResolvedValueOnce({
       siret: "85001946400013",
       etatAdministratif: "A",
       name: "CODE EN STOCK",
@@ -186,8 +186,8 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
     expect(response.data.companyInfos.transporterReceipt).toEqual(receipt);
   });
 
-  test("Trader company with trader receipt", async () => {
-    searchCompanySpy.mockResolvedValueOnce({
+  it("Trader company with trader receipt", async () => {
+    searchSirene.mockResolvedValueOnce({
       siret: "85001946400013",
       etatAdministratif: "A",
       name: "CODE EN STOCK",
@@ -230,8 +230,8 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
     expect(response.data.companyInfos.traderReceipt).toEqual(receipt);
   });
 
-  test("Company with direct dasri takeover allowance", async () => {
-    searchCompanySpy.mockResolvedValueOnce({
+  it("Company with direct dasri takeover allowance", async () => {
+    searchSirene.mockResolvedValueOnce({
       siret: "85001946400013",
       etatAdministratif: "A",
       name: "CODE EN STOCK",
@@ -258,20 +258,23 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       query {
         companyInfos(siret: "85001946400013") {
           allowBsdasriTakeOverWithoutSignature
+          isRegistered
         }
       }`;
     const response = await query<any>(gqlquery);
     expect(
       response.data.companyInfos.allowBsdasriTakeOverWithoutSignature
     ).toEqual(true);
+    expect(response.data.companyInfos.isRegistered).toEqual(true);
   });
 
-  test.skip("Closed company", async () => {
-    // This test is skipped because it make a real call to SIRENE API
-    // It can be used to check our code is working well on closed companies
-    // (etatAdministratif = "F")
-    // Cf https://trello.com/c/6MtzqQk8
-    searchCompanySpy.mockRestore();
+  it("Closed company in INSEE public data", async () => {
+    searchSirene.mockResolvedValueOnce({
+      siret: "41268783200011",
+      etatAdministratif: "F",
+      name: "OPTIQUE LES AIX",
+      address: "49 Rue de la République 18220 Les Aix-d'Angillon"
+    });
     const gqlquery = `
     query {
       companyInfos(siret: "41268783200011") {
@@ -297,22 +300,19 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       etatAdministratif: "F",
       name: "OPTIQUE LES AIX",
       address: "49 Rue de la République 18220 Les Aix-d'Angillon",
-      naf: "52.4T",
-      libelleNaf: "",
       isRegistered: false,
       contactEmail: null,
       contactPhone: null,
-      website: null,
-      installation: null
+      installation: null,
+      naf: null,
+      libelleNaf: null,
+      website: null
     };
     expect(company).toEqual(expected);
   });
 
-  test.skip("Hidden company", async () => {
-    // This test is skipped because it make a real call to SIRENE API
-    // It can be used to check our code is working well on hidden companies
-    // Cf https://trello.com/c/6MtzqQk8
-    searchCompanySpy.mockRestore();
+  it("Hidden company in INSEE public data", async () => {
+    searchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
     const gqlquery = `
       query {
         companyInfos(siret: "43317467900046") {
@@ -331,21 +331,13 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
           }
         }
       }`;
-    const response = await query<any>(gqlquery);
-    const company = response.data.companyInfos;
-    const expected = {
-      siret: "43317467900046",
-      etatAdministratif: null,
-      name: null,
-      address: "",
-      naf: null,
-      libelleNaf: "",
-      isRegistered: false,
-      contactEmail: null,
-      contactPhone: null,
-      website: null,
-      installation: null
-    };
-    expect(company).toEqual(expected);
+    const { errors } = await query<any>(gqlquery);
+    expect(errors[0]).toMatchObject({
+      extensions: {
+        code: "FORBIDDEN"
+      },
+      message:
+        "Les informations de cet établissement ne sont pas disponibles car son propriétaire a choisi de ne pas les rendre publiques lors de son enregistrement au Répertoire des Entreprises et des Établissements (SIRENE)"
+    });
   });
 });

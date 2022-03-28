@@ -25,6 +25,7 @@ export default function Transporter({ disabled }) {
         name="transporter.company"
         heading="Entreprise de transport"
         allowForeignCompanies={true}
+        registeredOnlyCompanies={true}
         onCompanySelected={transporter => {
           if (transporter.transporterReceipt) {
             setFieldValue(
@@ -41,7 +42,10 @@ export default function Transporter({ disabled }) {
             );
           } else {
             setFieldValue("transporter.recepisse.number", "");
-            setFieldValue("transporter.recepisse.validityLimit", null);
+            setFieldValue(
+              "transporter.recepisse.validityLimit",
+              initialState.transporter.recepisse.validityLimit
+            );
             setFieldValue("transporter.recepisse.department", "");
           }
         }}

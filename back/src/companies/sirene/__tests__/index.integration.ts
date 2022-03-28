@@ -1,7 +1,7 @@
 import { UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
 import * as searchCompanyDecorated from "../searchCompany";
-import { searchCompany } from "../index";
+import { searchCompany } from "../../search";
 import { resetDatabase } from "../../../../integration-tests/helper";
 
 const searchCompanySpy = jest.spyOn(searchCompanyDecorated, "default");

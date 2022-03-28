@@ -160,6 +160,7 @@ model Application {
 model Company {
   id                                   String                    @id @default(cuid())
   siret                                String                    @unique
+  vatNumber                            String?                   @unique
   updatedAt                            DateTime                  @updatedAt @db.Timestamptz(6)
   createdAt                            DateTime                  @default(now()) @db.Timestamptz(6)
   securityCode                         Int
@@ -196,7 +197,7 @@ model Company {
   bsddRevisionRequests                 BsddRevisionRequest[]
 }
 
-// Companies with restricted diffusion of SIRENE information (police, army, etc)
+// Companies with restricted diffusion of SIRENE or VAT information (police, army, etc)
 
 // "Certaines entreprises demandent à ne pas figurer sur les listes de diffusion publique
 // en vertu de l'article A123-96 du code du commerce. On parle d‘entreprise non diffusable.
@@ -207,8 +208,9 @@ model Company {
 // Cette table permet également de stocker de "faux établissements" pouvant être visés lors
 // du rattachement d'établissements de test sur l'environnement sandbox
 model AnonymousCompany {
-  id          String @id @default(cuid())
-  siret       String @unique
+  id          String  @id @default(cuid())
+  siret       String  @unique
+  vatNumber   String? @unique
   name        String
   address     String
   codeNaf     String
@@ -273,6 +275,7 @@ model Form {
   transporterCompanyContact          String?
   transporterCompanyPhone            String?
   transporterCompanyMail             String?
+  transporterCompanyVatNumber        String?
   transporterReceipt                 String?
   transporterDepartment              String?
   transporterValidityLimit           DateTime?               @db.Timestamptz(6)
@@ -869,6 +872,7 @@ model Bsdasri {
   // transporter
   transporterCompanyName              String?
   transporterCompanySiret             String?
+  transporterCompanyVatNumber         String?
   transporterCompanyAddress           String?
   transporterCompanyPhone             String?
   transporterCompanyContact           String?

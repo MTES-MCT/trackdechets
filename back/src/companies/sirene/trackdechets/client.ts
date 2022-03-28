@@ -5,8 +5,8 @@ import {
 import { TransportRequestOptions } from "@elastic/elasticsearch/lib/Transport";
 import logger from "../../../logging/logger";
 import { libelleFromCodeNaf, buildAddress, removeDiacritics } from "../utils";
-import { CompanySearchResult } from "../types";
 import { AnonymousCompanyError } from "../errors";
+import { SireneSearchResult } from "../types";
 import {
   SearchHit,
   SearchOptions,
@@ -27,7 +27,7 @@ export class CompanyNotFound extends Error {}
  */
 const searchResponseToCompany = (
   etablissement: SearchStockEtablissement
-): CompanySearchResult => {
+): SireneSearchResult => {
   const addressVoie = buildAddress([
     etablissement.numeroVoieEtablissement,
     etablissement.indiceRepetitionEtablissement,
@@ -77,7 +77,7 @@ const searchResponseToCompany = (
  * Search a company by SIRET
  * @param siret
  */
-export const searchCompany = (siret: string): Promise<CompanySearchResult> =>
+export const searchCompany = (siret: string): Promise<SireneSearchResult> =>
   client
     .get<GetResponse<SearchStockEtablissement>>({
       id: siret,
@@ -112,7 +112,7 @@ export const searchCompany = (siret: string): Promise<CompanySearchResult> =>
  */
 const fullTextSearchResponseToCompanies = (
   r: SearchHit[]
-): CompanySearchResult[] =>
+): SireneSearchResult[] =>
   r.map(({ _source }) => searchResponseToCompany(_source));
 
 /**
@@ -123,7 +123,7 @@ export const searchCompanies = (
   department?: string,
   options?: Partial<SearchOptions>,
   requestOptions?: Partial<TransportRequestOptions>
-): Promise<CompanySearchResult[]> => {
+): Promise<SireneSearchResult[]> => {
   const qs = removeDiacritics(clue);
   // Multi-match query docs https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html
   const must: QueryDslQueryContainer[] = [

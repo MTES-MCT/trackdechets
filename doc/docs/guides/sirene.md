@@ -1,8 +1,8 @@
 ---
-title: Rechercher un établissement partenaire par son n° SIRET
+title: Rechercher un établissement partenaire par son n° SIRET pour les entreprises françaises ou par son n°TVA intracommunautaire pour les entreprises européennes.
 ---
 
-Nous exposons une query `companyInfos` qui interroge la base SIRENE (via [l'API de l'INSEE](https://api.insee.fr/catalogue/)), la base des installations classées pour la protection de l'environnement (ICPE) et la base Trackdéchets pour obtenir des informations sur un établissement à partir de son numéro SIRET.
+Nous exposons une query `companyInfos` qui interroge la base SIRENE (via [les données ouvertes de l'INSEE](https://files.data.gouv.fr/insee-sirene/)), ou la base VIES (via [le service la commission européenne](https://ec.europa.eu/taxation_customs/vies/)) la base des installations classées pour la protection de l'environnement (ICPE) et la base Trackdéchets pour obtenir des informations sur un établissement à partir de son numéro SIRET.
 
 La query renvoie un objet de type [`CompanyPublic`](../reference/api-reference/user-company/objects#companypublic) et permet notamment de savoir si un établissement est inscrit sur Trackdéchets grâce au champ `isRegistered`. Voir le détail de la query dans la [référence de l'API](../reference/api-reference/user-company/queries#companyinfos).
 

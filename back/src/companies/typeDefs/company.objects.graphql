@@ -39,6 +39,9 @@ type CompanyPrivate {
   "SIRET de l'établissement"
   siret: String!
 
+  "Numéro de TVA de l'établissement"
+  vatNumber: String
+
   "Adresse de l'établissement"
   address: String
 
@@ -101,24 +104,20 @@ type CompanyPrivateConnection {
   edges: [CompanyPrivateEdge!]!
 }
 
-"Information sur un établissement accessible publiquement"
+"Information sur un établissement accessible publiquement en recherche"
 type CompanyPublic {
-  "Email de contact"
-  contactEmail: String
-
-  "Numéro de téléphone de contact"
-  contactPhone: String
-
-  "Site web"
-  website: String
-
   "SIRET de l'établissement"
   siret: String
-
+  "TVA de l'établissement"
+  vatNumber: String
+  "Code pays de l'établissement"
+  codePaysEtrangerEtablissement: String
   "État administratif de l'établissement. A = Actif, F = Fermé"
   etatAdministratif: String
   "Adresse de l'établissement"
   address: String
+  "Code commune de l'établissement"
+  codeCommune: String
   "Nom de l'établissement"
   name: String
   "Code NAF"
@@ -131,17 +130,30 @@ type CompanyPublic {
   """
   installation: Installation
 
+  "Email de contact"
+  contactEmail: String
+  "Numéro de téléphone de contact"
+  contactPhone: String
+  "Site web"
+  website: String
   """
   Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
   """
   isRegistered: Boolean
-
   """
   Profil de l'établissement sur Trackdéchets
   ayant pour valeur un tableau vide quand l'établissement
   n'est pas inscrit sur la plateforme `isRegistered=false`
   """
   companyTypes: [CompanyType!]!
+
+  """
+  Liste des agréments de l'éco-organisme
+  """
+  ecoOrganismeAgreements: [URL!]!
+
+  "L'entreprise autorise l'enlèvement d'un Dasri sans sa signature"
+  allowBsdasriTakeOverWithoutSignature: Boolean
 
   """
   Récépissé transporteur associé à cet établissement (le cas échéant)
@@ -167,21 +179,16 @@ type CompanyPublic {
   Agrément VHU broyeur (le cas échéant, pour les profils VHU)
   """
   vhuAgrementBroyeur: VhuAgrement
-
-  """
-  Liste des agréments de l'éco-organisme
-  """
-  ecoOrganismeAgreements: [URL!]!
-
-  "L'entreprise autorise l'enlèvement d'un Dasri sans sa signature"
-  allowBsdasriTakeOverWithoutSignature: Boolean
 }
 
-"Information sur un établissement accessible publiquement en recherche"
+"Information sur un établissement accessible publiquement en recherche floue"
 type CompanySearchResult {
   "SIRET de l'établissement"
   siret: String
-
+  "TVA de l'établissement"
+  vatNumber: String
+  "Code pays de l'établissement"
+  codePaysEtrangerEtablissement: String
   "État administratif de l'établissement. A = Actif, F = Fermé"
   etatAdministratif: String
   "Adresse de l'établissement"
@@ -199,6 +206,31 @@ type CompanySearchResult {
   associé à cet établissement
   """
   installation: Installation
+
+  "Email de contact"
+  contactEmail: String
+  "Numéro de téléphone de contact"
+  contactPhone: String
+  "Site web"
+  website: String
+  """
+  Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
+  """
+  isRegistered: Boolean
+  """
+  Profil de l'établissement sur Trackdéchets
+  ayant pour valeur un tableau vide quand l'établissement
+  n'est pas inscrit sur la plateforme `isRegistered=false`
+  """
+  companyTypes: [CompanyType!]
+
+  """
+  Liste des agréments de l'éco-organisme
+  """
+  ecoOrganismeAgreements: [URL!]
+
+  "L'entreprise autorise l'enlèvement d'un Dasri sans sa signature"
+  allowBsdasriTakeOverWithoutSignature: Boolean
 
   """
   Récépissé transporteur associé à cet établissement (le cas échéant)

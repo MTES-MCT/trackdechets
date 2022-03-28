@@ -10,6 +10,9 @@ type CompanyFavorite {
   "SIRET de l'établissement"
   siret: String
 
+  "TVA intracommunautaire de l'établissement"
+  vatNumber: String
+
   "Adresse de l'établissement"
   address: String
 
@@ -51,6 +54,7 @@ type CompanyFavorite {
 type CompanyForVerification {
   id: ID!
   siret: String!
+  vatNumber: String
   name: String!
   companyTypes: [CompanyType!]!
   createdAt: DateTime!
@@ -80,4 +84,5 @@ type AnonymousCompany {
   libelleNaf: String!
   name: String!
   siret: String!
+  vatNumber: String
 }

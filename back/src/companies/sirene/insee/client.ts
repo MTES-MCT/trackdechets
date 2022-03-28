@@ -1,7 +1,7 @@
 import {
   SearchResponseInsee,
-  CompanySearchResult,
-  FullTextSearchResponseInsee
+  FullTextSearchResponseInsee,
+  SireneSearchResult
 } from "../types";
 import { libelleFromCodeNaf, buildAddress } from "../utils";
 import { UserInputError } from "apollo-server-express";
@@ -17,7 +17,7 @@ const SIRENE_API_BASE_URL = "https://api.insee.fr/entreprises/sirene/V3";
  */
 function searchResponseToCompany({
   etablissement
-}: SearchResponseInsee): CompanySearchResult {
+}: SearchResponseInsee): SireneSearchResult {
   const addressVoie = buildAddress([
     etablissement.adresseEtablissement.numeroVoieEtablissement,
     etablissement.adresseEtablissement.indiceRepetitionEtablissement,
@@ -74,7 +74,7 @@ function searchResponseToCompany({
  * Search a company by SIRET
  * @param siret
  */
-export function searchCompany(siret: string): Promise<CompanySearchResult> {
+export function searchCompany(siret: string): Promise<SireneSearchResult> {
   const searchUrl = `${SIRENE_API_BASE_URL}/siret/${siret}`;
 
   return authorizedAxiosGet<SearchResponseInsee>(searchUrl)
@@ -102,7 +102,7 @@ export function searchCompany(siret: string): Promise<CompanySearchResult> {
  */
 function fullTextSearchResponseToCompanies(
   r: FullTextSearchResponseInsee
-): CompanySearchResult[] {
+): SireneSearchResult[] {
   return r.etablissements.map(etablissement =>
     searchResponseToCompany({ etablissement })
   );
@@ -117,7 +117,7 @@ function fullTextSearchResponseToCompanies(
 export function searchCompanies(
   clue: string,
   department?: string
-): Promise<CompanySearchResult[]> {
+): Promise<SireneSearchResult[]> {
   // list of filters to pass as "q" arguments
   const filters = [];
 

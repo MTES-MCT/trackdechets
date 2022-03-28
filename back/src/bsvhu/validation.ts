@@ -14,10 +14,15 @@ import {
   MISSING_COMPANY_NAME,
   MISSING_COMPANY_PHONE,
   MISSING_COMPANY_SIRET
-} from "../forms/validation";
+} from "../forms/errors";
 import * as yup from "yup";
 import { FactorySchemaOf } from "../common/yup/configureYup";
 import { BsvhuDestinationType } from "../generated/graphql/types";
+import {
+  isVat,
+  isSiret,
+  isFRVat
+} from "../common/constants/companySearchHelpers";
 
 type Emitter = Pick<
   Bsvhu,
@@ -58,6 +63,7 @@ type Transporter = Pick<
   | "transporterRecepisseNumber"
   | "transporterRecepisseDepartment"
   | "transporterRecepisseValidityLimit"
+  | "transporterCompanyVatNumber"
 >;
 
 type Identification = Pick<
@@ -224,8 +230,8 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
     yup.object({
       transporterRecepisseDepartment: yup
         .string()
-        .when("transporterTvaIntracommunautaire", (tva, schema) => {
-          if (tva == null) {
+        .when("transporterCompanyVatNumber", (tva, schema) => {
+          if (!tva) {
             return schema.requiredIf(
               context.transportSignature,
               `Transporteur: le département associé au récépissé est obligatoire`
@@ -235,8 +241,8 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
         }),
       transporterRecepisseNumber: yup
         .string()
-        .when("transporterTvaIntracommunautaire", (tva, schema) => {
-          if (tva == null) {
+        .when("transporterCompanyVatNumber", (tva, schema) => {
+          if (!tva) {
             return schema.requiredIf(
               context.transportSignature,
               `Transporteur: le numéro de récépissé est obligatoire`
@@ -258,16 +264,25 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
         ),
       transporterCompanySiret: yup
         .string()
-        .length(14, `Transporteur: ${INVALID_SIRET_LENGTH}`)
-        .when("transporterTvaIntracommunautaire", (tva, schema) => {
-          if (tva == null) {
-            return schema.requiredIf(
-              context.transportSignature,
-              `Transporteur: le numéro SIRET est obligatoire pour une entreprise française`
+        .ensure()
+        .when("transporterCompanyVatNumber", (tva, schema) => {
+          if (!tva && context.transportSignature) {
+            return schema.test(
+              "is-siret",
+              "${path} n'est pas un numéro de SIRET valide",
+              value => isSiret(value)
             );
           }
           return schema.nullable().notRequired();
         }),
+      transporterCompanyVatNumber: yup
+        .string()
+        .ensure()
+        .test(
+          "is-vat",
+          "${path} n'est pas un numéro de TVA intracommunautaire valide",
+          value => !value || (isVat(value) && !isFRVat(value))
+        ),
       transporterCompanyAddress: yup
         .string()
         .requiredIf(

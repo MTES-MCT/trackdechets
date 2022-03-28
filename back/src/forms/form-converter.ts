@@ -200,6 +200,9 @@ function flattenTransporterInput(input: { transporter?: TransporterInput }) {
     transporterCompanyMail: chain(input.transporter, t =>
       chain(t.company, c => c.mail)
     ),
+    transporterCompanyVatNumber: chain(input.transporter, t =>
+      chain(t.company, c => c.vatNumber)
+    ),
     transporterIsExemptedOfReceipt: chain(
       input.transporter,
       t => t.isExemptedOfReceipt
@@ -578,6 +581,7 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       company: nullIfNoValues<FormCompany>({
         name: form.transporterCompanyName,
         siret: form.transporterCompanySiret,
+        vatNumber: form.transporterCompanyVatNumber,
         address: form.transporterCompanyAddress,
         contact: form.transporterCompanyContact,
         phone: form.transporterCompanyPhone,

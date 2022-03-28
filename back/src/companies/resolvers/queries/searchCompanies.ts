@@ -1,5 +1,5 @@
 import { QueryResolvers } from "../../../generated/graphql/types";
-import { searchCompanies } from "../../sirene/";
+import { searchCompanies } from "../../search";
 
 const searchCompaniesResolver: QueryResolvers["searchCompanies"] = async (
   _,

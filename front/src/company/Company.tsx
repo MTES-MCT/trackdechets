@@ -14,6 +14,7 @@ const COMPANY_INFOS = gql`
   query CompanyInfos($siret: String!) {
     companyInfos(siret: $siret) {
       siret
+      vatNumber
       name
       address
       naf
@@ -89,8 +90,14 @@ export default function CompanyInfo() {
   if (data) {
     const company = data.companyInfos;
 
-    if (!company.siret) {
-      return <p>Entreprise inconnue</p>;
+    if (!company || (!company.siret && !company.vatNumber)) {
+      return (
+        <div className="section">
+          <div className="container">
+            <p>Entreprise inconnue</p>
+          </div>
+        </div>
+      );
     }
 
     return (
@@ -98,7 +105,7 @@ export default function CompanyInfo() {
         <div className="container">
           <CompanyHeader
             name={company.name}
-            siret={company.siret}
+            siret={company.siret || company.vatNumber}
             naf={company.naf}
             libelleNaf={company.libelleNaf}
           />

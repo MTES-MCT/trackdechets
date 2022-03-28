@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 import { UserInputError } from "apollo-server-express";
 import { removeDiacritics } from "../utils";
 import {
-  CompanySearchResult,
+  SireneSearchResult,
   SearchResponseSocialGouv,
   FullTextSearchResponseSocialGouv,
   MatchingEtablissementSocialGouv
@@ -16,7 +16,7 @@ const SOCIAL_GOUV_API_BASE_URL =
  */
 function searchResponseToCompany(
   response: SearchResponseSocialGouv
-): CompanySearchResult {
+): SireneSearchResult {
   const company = {
     siret: response.siret,
     etatAdministratif: response.etatAdministratifEtablissement,
@@ -36,7 +36,7 @@ function searchResponseToCompany(
 /**
  * Search a company by SIRET
  */
-export function searchCompany(siret: string): Promise<CompanySearchResult> {
+export function searchCompany(siret: string): Promise<SireneSearchResult> {
   const searchUrl = `${SOCIAL_GOUV_API_BASE_URL}/api/v1/etablissement/${siret}`;
 
   return axios
@@ -60,7 +60,7 @@ export function searchCompany(siret: string): Promise<CompanySearchResult> {
  */
 function fullTextSearchResponseToCompanies(
   r: FullTextSearchResponseSocialGouv
-): CompanySearchResult[] {
+): SireneSearchResult[] {
   const matchingEtablissements: (MatchingEtablissementSocialGouv & {
     name: string;
   })[] = [];
@@ -91,7 +91,7 @@ function fullTextSearchResponseToCompanies(
 export function searchCompanies(
   clue: string,
   department?: string
-): Promise<CompanySearchResult[]> {
+): Promise<SireneSearchResult[]> {
   if (/[0-9]{14}/.test(clue)) {
     // clue is formatted like a SIRET
     // use search by siret instead of full text

@@ -24,27 +24,27 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
   },
   transporterReceipt: parent => {
     return prisma.company
-      .findUnique({ where: { siret: parent.siret } })
+      .findUnique({ where: { id: parent.id } })
       .transporterReceipt();
   },
   traderReceipt: parent => {
     return prisma.company
-      .findUnique({ where: { siret: parent.siret } })
+      .findUnique({ where: { id: parent.id } })
       .traderReceipt();
   },
   brokerReceipt: parent => {
     return prisma.company
-      .findUnique({ where: { siret: parent.siret } })
+      .findUnique({ where: { id: parent.id } })
       .brokerReceipt();
   },
   vhuAgrementBroyeur: parent => {
     return prisma.company
-      .findUnique({ where: { siret: parent.siret } })
+      .findUnique({ where: { id: parent.id } })
       .vhuAgrementBroyeur();
   },
   vhuAgrementDemolisseur: parent => {
     return prisma.company
-      .findUnique({ where: { siret: parent.siret } })
+      .findUnique({ where: { id: parent.id } })
       .vhuAgrementDemolisseur();
   },
   installation: (parent, _, context) => {

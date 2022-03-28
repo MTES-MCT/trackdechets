@@ -85,6 +85,7 @@ export default function CompanyTypeField({
                   className="td-checkbox"
                   value={companyType.value}
                   checked={value.includes(companyType.value)}
+                  disabled={props.disabled}
                   onChange={e => {
                     if (e.target.checked) {
                       arrayHelpers.push(companyType.value);

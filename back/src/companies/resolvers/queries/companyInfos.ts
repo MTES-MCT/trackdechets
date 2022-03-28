@@ -1,72 +1,50 @@
 import { UserInputError } from "apollo-server-express";
-import prisma from "../../../prisma";
 import {
   CompanyPublic,
   QueryResolvers
 } from "../../../generated/graphql/types";
-import { convertUrls, getInstallation } from "../../database";
-import { searchCompany } from "../../sirene";
+import { searchCompany } from "../../search";
+
 /**
  * This function is used to return public company
- * information for a specific siret. It merge info
- * from Sirene database, S3ic database and TD without
+ * information for a specific siret or VAT number. It merge info
+ * from Sirene or VIES vat database, S3ic database and TD without
  * exposing private TD info like securityCode, users, etc
  *
- * @param siret
+ * @param siretOrVat
  */
-export async function getCompanyInfos(siret: string): Promise<CompanyPublic> {
-  // retrieve cached info from SIRENE database
-  const sireneCompanyInfo = await searchCompany(siret);
-
-  // sireneCompanyInfo default to { siret: '', ...} if the siret is
-  // not recognized. Handle this edge case by throwing a NOT_FOUND
-  // exception
-  if (!sireneCompanyInfo || !sireneCompanyInfo.siret) {
-    throw new UserInputError("Ce siret n'existe pas", {
-      invalidArgs: ["siret"]
-    });
+export async function getCompanyInfos(
+  siretOrVat: string
+): Promise<CompanyPublic> {
+  if (siretOrVat === undefined || !siretOrVat.length) {
+    throw new UserInputError(
+      "Paramètre absent. Un numéro SIRET ou de TVA intracommunautaire valide est requis",
+      {
+        invalidArgs: ["clue"]
+      }
+    );
   }
-
-  // retrieves trackdechets public CompanyInfo
-  // it might be null if the company is not registered in TD
-  const trackdechetsCompanyInfo = await prisma.company.findUnique({
-    where: { siret },
-    select: {
-      companyTypes: true,
-      contactEmail: true,
-      contactPhone: true,
-      website: true,
-      ecoOrganismeAgreements: true,
-      allowBsdasriTakeOverWithoutSignature: true
-    }
-  });
-
-  const isRegistered = !!trackdechetsCompanyInfo;
-
-  const companyIcpeInfo = {
-    installation: await getInstallation(siret)
+  const searchResult = await searchCompany(siretOrVat);
+  return {
+    ...searchResult,
+    ecoOrganismeAgreements: searchResult.ecoOrganismeAgreements ?? [],
+    companyTypes: searchResult.companyTypes ?? []
   };
-
-  const company = {
-    isRegistered,
-    ecoOrganismeAgreements: [],
-
-    ...companyIcpeInfo,
-    ...sireneCompanyInfo,
-    ...convertUrls({
-      ...trackdechetsCompanyInfo,
-      companyTypes: isRegistered ? trackdechetsCompanyInfo.companyTypes : []
-    })
-  };
-
-  return company;
 }
 
 const companyInfosResolvers: QueryResolvers["companyInfos"] = (
   parent,
   args
 ) => {
-  return getCompanyInfos(args.siret);
+  if (args.siret === undefined && args.clue === undefined) {
+    throw new UserInputError(
+      "Paramètre siret et clue absents. Un numéro SIRET ou de TVA intracommunautaire valide est requis",
+      {
+        invalidArgs: ["clue", "siret"]
+      }
+    );
+  }
+  return getCompanyInfos(!!args.siret ? args.siret : args.clue);
 };
 
 export default companyInfosResolvers;

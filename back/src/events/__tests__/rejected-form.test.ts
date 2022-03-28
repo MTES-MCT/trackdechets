@@ -1,11 +1,11 @@
 import { Form } from "@prisma/client";
 import axios from "axios";
-import * as sirene from "../../companies/sirene";
-import { CompanySearchResult } from "../../companies/sirene/types";
+import * as search from "../../companies/search";
 import { TDEventPayload } from "../emitter";
 import { mailWhenFormIsDeclined } from "../forms";
 import * as mailing from "../../mailer/mailing";
 import templateIds from "../../mailer/templates/provider/templateIds";
+import { CompanySearchResult } from "../../companies/types";
 
 // This form will be refused,
 const mockedForm = {
@@ -135,7 +135,7 @@ const formPayload = (wasteAcceptationStatus): TDEventPayload<Form> => ({
   } as Form
 });
 
-// entreprise.data.gouv responses, giving 66 and 77 departements for companies involved in the form
+// search SIRENE responses, giving 66 and 77 departements for companies involved in the form
 const insee1: CompanySearchResult = {
   siret: "12346084400013",
   name: "Dechet Factory SA",
@@ -145,7 +145,8 @@ const insee1: CompanySearchResult = {
   addressVoie: "01 Rue Marie Curie",
   addressPostalCode: "66480",
   addressCity: "Laville",
-  codeCommune: "66001"
+  codeCommune: "66001",
+  isRegistered: true
 };
 const insee2: CompanySearchResult = {
   siret: "12346085500055",
@@ -156,7 +157,8 @@ const insee2: CompanySearchResult = {
   addressVoie: "rue de la Paix",
   addressPostalCode: "77760",
   addressCity: "Une ville",
-  codeCommune: "77001"
+  codeCommune: "77001",
+  isRegistered: true
 };
 
 // Mock pdf generator
@@ -175,7 +177,7 @@ jest.mock("../../prisma", () => ({
 }));
 
 // spies on searchCompany to capture calls to entreprise.data.gouv.fr
-const searchCompanySpy = jest.spyOn(sirene, "searchCompany");
+const searchCompanySpy = jest.spyOn(search, "searchCompany");
 // spies on axios get to capture calls to geo.api.gouv.fr
 const mockedAxiosGet = jest.spyOn(axios, "get");
 // spies on axios post to capture calls to mail helpers

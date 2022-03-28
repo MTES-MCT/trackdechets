@@ -1,3 +1,10 @@
+import { CompanySearchResult } from "../types";
+
+export type SireneSearchResult = Omit<
+  CompanySearchResult,
+  "id" | "isRegistered"
+>;
+
 // Response from https://api.entreprise.data.gouv.fr/api/sirene/v3/etablissements/<VOTRE_SIRET>
 export interface SearchResponseDataGouv {
   etablissement: {
@@ -73,20 +80,6 @@ export interface FullTextSearchResponseDataGouv {
 // Response from https://api.insee.fr/entreprises/siret/V3/siret/
 export interface FullTextSearchResponseInsee {
   etablissements: EtablissementInsee[];
-}
-
-// return type for functions searchCompany and searchCompanies
-export interface CompanySearchResult {
-  siret: string;
-  etatAdministratif?: string;
-  address: string;
-  codeCommune?: string;
-  name: string;
-  naf: string;
-  libelleNaf: string;
-  addressVoie: string;
-  addressCity: string;
-  addressPostalCode: string;
 }
 
 // Response from https://search-recherche-entreprises.fabrique.social.gouv.fr/api/v1/etablissement/<VOTRE_SIRET>

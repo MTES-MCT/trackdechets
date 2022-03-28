@@ -8,13 +8,31 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 # [2022.04.1] ~04/04/2022
 
 #### :rocket: Nouvelles fonctionnalités
+
+- [Possibilité de rattacher à son compte des établissements hors-france par recherche à partir de leur numéro de TVA. Type d'établissements hors-France forcé à Transporteur. Amélioration de l'édition des bordereaux pour chercher par numéro de TVA les transporteurs inscrits sur Trackdéchets](https://github.com/MTES-MCT/trackdechets/pull/1240)
+  - Migrations pour ajouter `Company.vatNumber` et index et ajouter dans les borderaux où manquait encore un `transporterCompanyVatNumber`
+  - Ajout d'un client de recherche et validation de coordonnées sur numéro de TVA intra-communautaire (service http://ec.europa.eu/taxation_customs/vies/)
+  - ajout de `transporterCompanyVatNumber` dans les différents PDF
+  - ajout de la colonne `vatNumber` dans AnonymousCompany et mutations pour permettre d'ajouter quand même des établissements manuellement si le numéro de TVA n'est pas trouvé par le service VIES;
+  - extension de CompanySelector.tsx pour valider un numéro TVA et remplir les infos Company (le nom et l'adresse) automatiquement.
+  - extension d' AccountCompanyAdd.tsx pour supporter un numéro TVA et remplir les infos Company (le nom et l'adresse) automatiquement.
+  - Refacto `companyInfos` pour déplacer toute la logique dans `company/search.ts` et capable de chercher à la fois par SIRET et par TVA.
+
 #### :bug: Corrections de bugs
+
+- fix CSS du stepper pour éviter le chevauchement du texte en responsive dans Stepper.module.scss.
+
 #### :boom: Breaking changes
 #### :nail_care: Améliorations
 - Nombreuses améliorations sur le BSDA (plus de champs dans l'aperçu, meilleure validation des données, corrections de bugs sur le groupement, amélioration de wordings...) [PR 1271](https://github.com/MTES-MCT/trackdechets/pull/1271)
+- Passage au client ElasticSearch TD interne pour le script add-address-lat-long.ts
+
 #### :memo: Documentation
 - Mise à jour de la documentation : Tutoriels > Démarrage Rapide > Obtenir un jeton d'accès [PR 1277](https://github.com/MTES-MCT/trackdechets/pull/1277)
 - Mise à jour de la référence du champ `Dasri.allowDirectTakeOver` [PR 1277](https://github.com/MTES-MCT/trackdechets/pull/1277)
+- Ajout de badges de tests sur le README.md et correction lien search
+- Mis à jour fonctionnement de recherche Sirene
+
 #### :house: Interne
 - Refactoring de `formRepository` [PR 1276](https://github.com/MTES-MCT/trackdechets/pull/1276)
 
@@ -590,7 +608,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :boom: Breaking changes
 
 - Seuls les établissements inscrits sur Trackdéchets en tant qu'installation de traitement ou de tri, transit, regoupement peuvent être visés en case 2 ou 14 [PR 784](https://github.com/MTES-MCT/trackdechets/pull/784)
-- Suppression du champ `companyTypes` du type `CompanySearchResult` retourné par la query `searchCompanies`. Ce champ avait été ajouté par erreur et renvoyait tout le temps `null` [PR 784](https://github.com/MTES-MCT/trackdechets/pull/784)
 - Validation exhaustive des champs pour les brouillons. Il était jusqu'à présent possible de saisir des valeurs invalides tant qu'un BSD était en brouillon. Les mêmes règles de validation que pour les bordereaux scéllés sont désormais appliquées [PR 764](https://github.com/MTES-MCT/trackdechets/pull/764)
 
 #### :bug: Corrections de bugs

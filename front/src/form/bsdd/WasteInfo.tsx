@@ -5,7 +5,7 @@ import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { connect, Field } from "formik";
 import { isDangerous } from "generated/constants";
-import React from "react";
+import React, { useEffect } from "react";
 import Appendix2MultiSelect from "./components/appendix/Appendix2MultiSelect";
 import AppendixInfo from "./components/appendix/AppendixInfo";
 import Packagings from "./components/packagings/Packagings";
@@ -22,7 +22,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
   if (!values.wasteDetails.packagings) {
     values.wasteDetails.packagings = [];
   }
-  React.useEffect(() => {
+  useEffect(() => {
     if (isDangerous(values.wasteDetails.code)) {
       setFieldValue("wasteDetails.isDangerous", true);
     }

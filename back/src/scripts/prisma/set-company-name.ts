@@ -1,5 +1,5 @@
 import prisma from "../../prisma";
-import { searchCompany } from "../../companies/sirene";
+import { searchCompany } from "../../companies/search";
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));

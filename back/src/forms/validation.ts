@@ -26,7 +26,24 @@ import {
 } from "../generated/graphql/types";
 import { isCollector, isWasteProcessor } from "../companies/validation";
 import { getFinalDestinationSiret, getFormOrFormNotFound } from "./database";
-import { FormAlreadyInAppendix2 } from "./errors";
+import {
+  FormAlreadyInAppendix2,
+  MISSING_COMPANY_NAME,
+  MISSING_COMPANY_SIRET,
+  INVALID_SIRET_LENGTH,
+  MISSING_COMPANY_ADDRESS,
+  MISSING_COMPANY_CONTACT,
+  MISSING_COMPANY_PHONE,
+  MISSING_COMPANY_EMAIL,
+  INVALID_WASTE_CODE,
+  INVALID_PROCESSING_OPERATION,
+  EXTRANEOUS_NEXT_DESTINATION
+} from "./errors";
+import {
+  isVat,
+  isSiret,
+  isFRVat
+} from "../common/constants/companySearchHelpers";
 // set yup default error messages
 configureYup();
 
@@ -92,6 +109,7 @@ type Transporter = Pick<
   | "transporterValidityLimit"
   | "transporterNumberPlate"
   | "transporterCustomInfo"
+  | "transporterCompanyVatNumber"
 >;
 
 type ReceivedInfo = Pick<
@@ -182,31 +200,6 @@ type WasteRepackaging = Pick<
   | "wasteDetailsQuantity"
   | "wasteDetailsQuantityType"
 >;
-
-// *********************
-// COMMON ERROR MESSAGES
-// *********************
-
-export const MISSING_COMPANY_NAME = "Le nom de l'entreprise est obligatoire";
-export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
-export const MISSING_COMPANY_ADDRESS =
-  "L'adresse de l'entreprise est obligatoire";
-export const MISSING_COMPANY_CONTACT =
-  "Le contact dans l'entreprise est obligatoire";
-export const MISSING_COMPANY_PHONE =
-  "Le téléphone de l'entreprise est obligatoire";
-export const MISSING_COMPANY_EMAIL = "L'email de l'entreprise est obligatoire";
-
-export const INVALID_SIRET_LENGTH =
-  "Le SIRET doit faire 14 caractères numériques";
-
-export const INVALID_PROCESSING_OPERATION =
-  "Cette opération d’élimination / valorisation n'existe pas.";
-
-export const INVALID_WASTE_CODE =
-  "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement.";
-
-export const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseignée ne permet pas de destination ultérieure`;
 
 // *************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 1
@@ -474,10 +467,24 @@ const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> = isDraft =>
     transporterCompanySiret: yup
       .string()
       .ensure()
-      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_SIRET}`)
-      .matches(/^$|^\d{14}$/, {
-        message: `Transporteur: ${INVALID_SIRET_LENGTH}`
+      .when("transporterCompanyVatNumber", (tva, schema) => {
+        if (!tva && !isDraft) {
+          return schema.test(
+            "is-siret",
+            "${path} n'est pas un numéro de SIRET valide",
+            value => isSiret(value)
+          );
+        }
+        return schema.nullable().notRequired();
       }),
+    transporterCompanyVatNumber: yup
+      .string()
+      .ensure()
+      .test(
+        "is-vat",
+        "${path} n'est pas un numéro de TVA intracommunautaire valide",
+        value => !value || (isVat(value) && !isFRVat(value))
+      ),
     transporterCompanyAddress: yup
       .string()
       .ensure()
