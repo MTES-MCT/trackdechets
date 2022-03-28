@@ -373,6 +373,7 @@ describe("Mutation.markAsSealed", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
         wasteDetailsCode: "01 01 01",
+        wasteDetailsIsDangerous: false,
         wasteDetailsOnuCode: null
       }
     });
@@ -438,6 +439,7 @@ describe("Mutation.markAsSealed", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
         wasteDetailsCode: "01 01 01",
+        wasteDetailsIsDangerous: false,
         recipientCap: null
       }
     });
