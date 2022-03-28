@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
-import { generatePath, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import routes from "common/routes";
 import { GET_ME } from "../dashboard/Dashboard";
 import { NotificationError } from "../common/components/Error";
@@ -17,7 +17,6 @@ import styles from "./AccountCompanyAdd.module.scss";
 import {
   Mutation,
   MutationCreateCompanyArgs,
-  Query,
   CompanyType as _CompanyType,
   CompanyPublic,
 } from "generated/graphql/types";
@@ -25,6 +24,7 @@ import Tooltip from "common/components/Tooltip";
 import AccountCompanyAddVhuAgrement from "./accountCompanyAdd/AccountCompanyAddVhuAgrement";
 import { InlineRadioButton } from "form/common/components/custom-inputs/RadioButton";
 import classNames from "classnames";
+import { MY_COMPANIES } from "./AccountCompanyList";
 const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
     createCompany(companyInput: $companyInput) {
@@ -107,27 +107,10 @@ export default function AccountCompanyAdd() {
     Pick<Mutation, "createCompany">,
     MutationCreateCompanyArgs
   >(CREATE_COMPANY, {
-    update(cache, { data }) {
-      if (data) {
-        const createCompany = data.createCompany;
-        const getMeQuery = cache.readQuery<Pick<Query, "me">>({
-          query: GET_ME,
-        });
-        if (getMeQuery == null) {
-          return;
-        }
-        const { me } = getMeQuery;
-
-        cache.writeQuery({
-          query: GET_ME,
-          data: {
-            me: {
-              ...me,
-              companies: [...me.companies, createCompany],
-            },
-          },
-        });
-      }
+    refetchQueries: [GET_ME, { query: MY_COMPANIES, variables: { first: 10 } }],
+    awaitRefetchQueries: true,
+    onCompleted: () => {
+      history.push(routes.account.companies.list);
     },
   });
 
@@ -307,7 +290,7 @@ export default function AccountCompanyAdd() {
       }
     }
 
-    await createCompany({
+    return createCompany({
       variables: {
         companyInput: {
           ...companyInput,
@@ -324,12 +307,6 @@ export default function AccountCompanyAdd() {
         },
       },
     });
-
-    history.push(
-      generatePath(routes.dashboard.bsds.drafts, {
-        siret: companyInput.siret,
-      })
-    );
   }
 
   function getCompanyTypes(companyInfos: CompanyPublic) {
