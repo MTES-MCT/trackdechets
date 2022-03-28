@@ -1,4 +1,3 @@
-import { Status } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
@@ -18,16 +17,8 @@ const deleteFormResolver: MutationResolvers["deleteForm"] = async (
   await checkCanDelete(user, form);
 
   const formRepository = getFormRepository(user);
-  const appendix2Forms = await formRepository.findAppendix2FormsById(id);
-  const deletedForm = await formRepository.delete({ id });
 
-  if (appendix2Forms.length) {
-    // roll back status changes to appendixes 2
-    await formRepository.updateMany(
-      appendix2Forms.map(f => f.id),
-      { status: Status.AWAITING_GROUP }
-    );
-  }
+  const deletedForm = await formRepository.delete({ id });
 
   return expandFormFromDb(deletedForm);
 };

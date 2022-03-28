@@ -6,10 +6,13 @@ import { checkCanMarkAsTempStorerAccepted } from "../../permissions";
 import { tempStorerAcceptedInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
 import { expandFormFromDb } from "../../form-converter";
+import { WasteAcceptationStatus } from "@prisma/client";
+import { getFormRepository } from "../../repository";
 
 const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccepted"] =
   async (_, args, context) => {
     const user = checkIsAuthenticated(context);
+    const formRepository = getFormRepository(user);
     const { id, tempStorerAcceptedInfo } = args;
     const form = await getFormOrFormNotFound({ id });
 
@@ -42,6 +45,13 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
       type: EventType.MarkAsTempStorerAccepted,
       formUpdateInput
     });
+
+    if (
+      tempStorerAcceptedInfo.wasteAcceptationStatus ===
+      WasteAcceptationStatus.REFUSED
+    ) {
+      await formRepository.removeAppendix2(id);
+    }
 
     return expandFormFromDb(tempStoredForm);
   };

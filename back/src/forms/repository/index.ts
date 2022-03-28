@@ -6,6 +6,7 @@ import buildDeleteForm from "./form/delete";
 import buildFindAppendix2FormsById from "./form/findAppendix2FormsById";
 import buildFindFullFormById from "./form/findFullFormById";
 import buildFindUniqueForm from "./form/findUnique";
+import buildRemoveAppendix2 from "./form/removeAppendix2";
 import buildUpdateForm from "./form/update";
 import buildUpdateManyForms from "./form/updateMany";
 import buildAcceptRevisionRequestApproval from "./formRevisionRequest/acceptRevisionRequestApproval";
@@ -39,6 +40,10 @@ export function getFormRepository(user: Express.User): FormRepository {
     createTemporaryStorage: (...args) =>
       prisma.$transaction(prisma =>
         buildCreateTemporaryStorage({ prisma, user })(...args)
+      ),
+    removeAppendix2: (...args) =>
+      prisma.$transaction(prisma =>
+        buildRemoveAppendix2({ prisma, user })(...args)
       )
   };
 

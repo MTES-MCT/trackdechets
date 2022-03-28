@@ -7,6 +7,10 @@ import {
 import { format } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { allowedFormats } from "../../../../common/dates";
+import {
+  Mutation,
+  MutationMarkAsAcceptedArgs
+} from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
   formFactory,
@@ -343,4 +347,82 @@ describe("Test Form reception", () => {
       expect(acceptedForm.signedAt).toEqual(signedAt);
     }
   );
+
+  it("should unlink appendix 2 in case of refusal", async () => {
+    const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
+      UserRole.MEMBER,
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const { user: destinationUser, company: destination } =
+      await userWithCompanyFactory(UserRole.MEMBER, {
+        companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+      });
+
+    const form1 = await formFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        status: "GROUPED",
+        processingOperationDone: "R 13",
+        recipientCompanySiret: ttr.siret
+      }
+    });
+
+    const form2 = await formFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        status: "GROUPED",
+        processingOperationDone: "R 13",
+        recipientCompanySiret: ttr.siret
+      }
+    });
+
+    const groupementForm = await formFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        emitterType: "APPENDIX2",
+        emitterCompanySiret: ttr.siret,
+        status: Status.RECEIVED,
+        receivedBy: "Bill",
+        recipientCompanySiret: destination.siret,
+        receivedAt: new Date("2019-01-17"),
+        appendix2Forms: { connect: [{ id: form1.id }, { id: form2.id }] }
+      }
+    });
+
+    const { mutate } = makeClient(destinationUser);
+
+    await mutate<Pick<Mutation, "markAsAccepted">, MutationMarkAsAcceptedArgs>(
+      MARK_AS_ACCEPTED,
+      {
+        variables: {
+          id: groupementForm.id,
+          acceptedInfo: {
+            wasteAcceptationStatus: "REFUSED",
+            wasteRefusalReason: "Parce que",
+            signedAt: "2019-01-18" as any,
+            signedBy: "John",
+            quantityReceived: 0
+          }
+        }
+      }
+    );
+
+    const updatedForm1 = await prisma.form.findUnique({
+      where: { id: form1.id }
+    });
+    const updatedForm2 = await prisma.form.findUnique({
+      where: { id: form2.id }
+    });
+    expect(updatedForm1.status).toEqual("AWAITING_GROUP");
+    expect(updatedForm2.status).toEqual("AWAITING_GROUP");
+
+    const appendix2Forms = await prisma.form
+      .findUnique({
+        where: { id: groupementForm.id }
+      })
+      .appendix2Forms();
+    expect(appendix2Forms).toEqual([]);
+  });
 });
