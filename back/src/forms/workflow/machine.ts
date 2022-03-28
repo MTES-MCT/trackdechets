@@ -25,7 +25,14 @@ const machine = Machine<any, Event>(
               target: FormState.Sent
             }
           ],
-          [EventType.ImportPaperForm]: [{ target: FormState.Processed }]
+          [EventType.ImportPaperForm]: [
+            {
+              target: FormState.NoTraceability,
+              cond: "isExemptOfTraceability"
+            },
+            { target: FormState.AwaitingGroup, cond: "awaitsGroup" },
+            { target: FormState.Processed }
+          ]
         }
       },
       [FormState.Sent]: {
