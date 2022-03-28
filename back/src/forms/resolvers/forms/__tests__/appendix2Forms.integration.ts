@@ -97,4 +97,42 @@ describe("appendix2Forms resolver", () => {
       }
     ]);
   });
+
+  it("should use pickup site postal code when available", async () => {
+    const { user: emitter, company: emitterCompany } =
+      await userWithCompanyFactory(UserRole.MEMBER);
+
+    const { user: collector, company: collectorCompany } =
+      await userWithCompanyFactory(UserRole.MEMBER);
+
+    const appendix2 = await formFactory({
+      ownerId: emitter.id,
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        emitterCompanyAddress: "40 boulevard Voltaire 13001 Marseille",
+        emitterWorkSiteName: "Adresse de collecte",
+        emitterWorkSiteAddress: "Rue du chantier",
+        emitterWorkSiteCity: "Annonay",
+        emitterWorkSitePostalCode: "07100",
+        recipientCompanySiret: collectorCompany.siret
+      }
+    });
+    const regroupementForm = await formFactory({
+      ownerId: collector.id,
+      opt: {
+        emitterCompanySiret: collectorCompany.siret,
+        appendix2Forms: { connect: { id: appendix2.id } }
+      }
+    });
+
+    const { query } = makeClient(collector);
+    const { data } = await query<Pick<Query, "form">>(FORM, {
+      variables: { id: regroupementForm.id }
+    });
+    expect(data.form.appendix2Forms).toEqual([
+      expect.objectContaining({
+        emitterPostalCode: "07100"
+      })
+    ]);
+  });
 });

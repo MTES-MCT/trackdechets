@@ -685,12 +685,17 @@ export function expandAppendix2FormFromDb(
     quantityReceived,
     processingOperationDone
   } = expandFormFromDb(prismaForm);
+
+  const hasPickupSite = emitter?.workSite?.postalCode?.length > 0;
+
   return {
     id,
     readableId,
     wasteDetails,
     emitter,
-    emitterPostalCode: extractPostalCode(emitter?.company?.address),
+    emitterPostalCode: hasPickupSite
+      ? emitter?.workSite?.postalCode
+      : extractPostalCode(emitter?.company?.address),
     signedAt,
     recipient,
     quantityReceived,
