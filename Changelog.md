@@ -21,6 +21,13 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - fix CSS du stepper pour éviter le chevauchement du texte en responsive dans Stepper.module.scss.
+- Correction du refraichissement de l'interface après une création ou une suppression d'établissement [PR 1278](https://github.com/MTES-MCT/trackdechets/pull/1278)
+- Correction de l'affichage du caractère dangereux Oui/Non sur le PDF [PR 1280](https://github.com/MTES-MCT/trackdechets/pull/1280)
+- Correction de l'adresse de collecte incomplète pour le BSDA dans le registre [PR 1281](https://github.com/MTES-MCT/trackdechets/pull/1281)
+- Correction des statuts `AWAITING_GROUP` et `NO_TRACEABILITY` en cas d'import d'un BSDD papier via la mutation `importPaperForm` [PR 1283](https://github.com/MTES-MCT/trackdechets/pull/1283)
+- Affichage de l'adresse de collecte/chantier sur le détail d'une annexe 2 lorsque celle-ci est présente [PR 1286](https://github.com/MTES-MCT/trackdechets/pull/1286)
+- Détachement des annexes 2 en cas de refus [PR 1282](https://github.com/MTES-MCT/trackdechets/pull/1282)
+
 
 #### :boom: Breaking changes
 #### :nail_care: Améliorations
@@ -32,6 +39,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Mise à jour de la référence du champ `Dasri.allowDirectTakeOver` [PR 1277](https://github.com/MTES-MCT/trackdechets/pull/1277)
 - Ajout de badges de tests sur le README.md et correction lien search
 - Mis à jour fonctionnement de recherche Sirene
+- Ajout d'un embed de la vidéo #14 "Introduction de Trackdéchets par API" au tutoriel de démarrage rapide [PR 1285](https://github.com/MTES-MCT/trackdechets/pull/1285)
 
 #### :house: Interne
 - Refactoring de `formRepository` [PR 1276](https://github.com/MTES-MCT/trackdechets/pull/1276)
