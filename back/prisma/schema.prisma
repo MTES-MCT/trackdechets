@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["interactiveTransactions"]
 }
 
@@ -1154,6 +1154,7 @@ model Bsda {
   wasteConsistence  BsdaConsistence?
   wasteSealNumbers  String[]
   wasteAdr          String?
+  wastePop          Boolean          @default(value: false)
 
   packagings       Json          @default("[]")
   // DEPRECATED - remove after migration
@@ -1255,8 +1256,8 @@ model Bsda {
 }
 
 model Event {
-  id         String   @id @default(cuid())
-  createdAt  DateTime @default(now())
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
 
   streamId String
   type     String

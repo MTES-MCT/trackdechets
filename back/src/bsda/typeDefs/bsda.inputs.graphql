@@ -172,6 +172,8 @@ input BsdaWasteInput {
   sealNumbers: [String!]
   "Mention ADR"
   adr: String
+  "Contient des Polluants Organiques Persistants (POP) oui / non"
+  pop: Boolean
 }
 
 input BsdaPackagingInput {

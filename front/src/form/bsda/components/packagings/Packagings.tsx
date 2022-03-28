@@ -13,7 +13,6 @@ export const PACKAGINGS_NAMES = {
   [BsdaPackagingType.SacRenforce]: "Sac renforcé",
   [BsdaPackagingType.ConteneurBag]: "Conteneur-bag",
   [BsdaPackagingType.Other]: "Autre(s)",
-  [BsdaPackagingType.BodyBenne]: "Benne",
 };
 
 export default function Packagings({

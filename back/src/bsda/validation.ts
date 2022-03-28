@@ -92,6 +92,7 @@ type WasteDescription = Pick<
   | "wasteConsistence"
   | "wasteSealNumbers"
   | "wasteAdr"
+  | "wastePop"
   | "packagings"
   | "weightIsEstimate"
   | "weightValue"
@@ -221,7 +222,13 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
         ),
       emitterCompanySiret: yup.string().when("emitterIsPrivateIndividual", {
         is: true,
-        then: yup.string().nullable(true),
+        then: yup
+          .string()
+          .oneOf(
+            [null, ""],
+            "Émetteur: Le champ SIRET ne doit pas avoir de valeur dans le cas d'un particulier"
+          )
+          .nullable(true),
         otherwise: yup
           .string()
           .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
@@ -275,7 +282,13 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           BsdaType.GATHERING,
           BsdaType.COLLECTION_2710
         ].includes(value),
-      then: schema => schema.nullable(),
+      then: schema =>
+        schema
+          .nullable()
+          .max(
+            0,
+            "Impossible de saisir le nom d'une entreprise de travaux pour ce type de bordereau"
+          ),
       otherwise: schema =>
         schema.requiredIf(
           context.emissionSignature,
@@ -289,7 +302,13 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           BsdaType.GATHERING,
           BsdaType.COLLECTION_2710
         ].includes(value),
-      then: schema => schema.nullable(),
+      then: schema =>
+        schema
+          .nullable()
+          .max(
+            0,
+            "Impossible de saisir le SIRET d'une entreprise de travaux pour ce type de bordereau"
+          ),
       otherwise: schema =>
         schema
           .length(14, `Entreprise de travaux: ${INVALID_SIRET_LENGTH}`)
@@ -414,7 +433,7 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         .string()
         .requiredIf(
           context.emissionSignature,
-          `Entreprise de destination: vous devez préciser le code d'opétation prévu`
+          `Entreprise de destination: vous devez préciser le code d'opération prévu`
         )
         .oneOf(
           [null, ...OPERATIONS],
@@ -429,21 +448,22 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         ) as any,
       destinationReceptionWeight: yup
         .number()
-        .requiredIf(
-          context.operationSignature,
-          `Entreprise de destination: vous devez préciser la quantité`
-        )
         .when("destinationReceptionAcceptationStatus", {
           is: value => value === WasteAcceptationStatus.REFUSED,
           then: schema =>
-            schema.oneOf(
-              [0],
-              "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
-            ),
+            schema
+              .oneOf(
+                [0, null],
+                "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
+              )
+              .nullable(),
           otherwise: schema =>
-            schema.positive(
-              "Vous devez saisir une quantité reçue supérieure à 0"
-            )
+            schema
+              .positive("Vous devez saisir une quantité reçue supérieure à 0")
+              .requiredIf(
+                context.operationSignature,
+                `Entreprise de destination: vous devez préciser la quantité`
+              )
         }),
       destinationReceptionAcceptationStatus: yup
         .mixed<WasteAcceptationStatus>()
@@ -467,23 +487,43 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         ),
       destinationOperationCode: yup
         .string()
-        .oneOf([null, ...OPERATIONS])
+        .when("destinationReceptionAcceptationStatus", {
+          is: value => value === WasteAcceptationStatus.REFUSED,
+          then: schema =>
+            schema
+              .oneOf(
+                [null, ""],
+                "Le code d'opétation ne doit pas être renseigné lorsque le déchet est refusé"
+              )
+              .nullable(),
+          otherwise: schema =>
+            schema
+              .oneOf([null, ...OPERATIONS])
+              .requiredIf(
+                context.operationSignature,
+                `Entreprise de destination: vous devez préciser le code d'opération réalisé`
+              )
+        }),
+      destinationOperationDate: yup
+        .date()
         .when("destinationReceptionAcceptationStatus", {
           is: value => value === WasteAcceptationStatus.REFUSED,
           then: schema => schema.nullable(),
           otherwise: schema =>
-            schema.requiredIf(
-              context.operationSignature,
-              `Entreprise de destination: vous devez préciser le code d'opétation réalisé`
-            )
-        }),
-      destinationOperationDate: yup
-        .date()
-        .max(new Date())
-        .requiredIf(
-          context.operationSignature,
-          `Entreprise de destination:vous devez préciser la date d'opétation`
-        ) as any
+            schema
+              .max(new Date())
+              .when(
+                "destinationReceptionDate",
+                (destinationReceptionDate, schema) =>
+                  destinationReceptionDate
+                    ? schema.min(destinationReceptionDate)
+                    : schema
+              )
+              .requiredIf(
+                context.operationSignature,
+                `Entreprise de destination: vous devez préciser la date d'opération`
+              ) as any
+        })
     });
 
 const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
@@ -528,7 +568,13 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
       }),
       transporterCompanyName: yup.string().when("type", {
         is: BsdaType.COLLECTION_2710,
-        then: schema => schema.nullable(),
+        then: schema =>
+          schema
+            .nullable()
+            .max(
+              0,
+              "Impossible de saisir un transporteur pour ce type de bordereau"
+            ),
         otherwise: schema =>
           schema.requiredIf(
             context.transportSignature,
@@ -537,7 +583,13 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
       }),
       transporterCompanySiret: yup.string().when("type", {
         is: BsdaType.COLLECTION_2710,
-        then: schema => schema.nullable(),
+        then: schema =>
+          schema
+            .nullable()
+            .max(
+              0,
+              "Impossible de saisir le SIRET d'un transporteur pour ce type de bordereau"
+            ),
         otherwise: schema =>
           schema
             .length(14, `Transporteur: ${INVALID_SIRET_LENGTH}`)
@@ -618,6 +670,7 @@ const wasteDescriptionSchema: FactorySchemaOf<
       .requiredIf(context.workSignature, `La consistence est obligatoire`),
     wasteSealNumbers: yup.array().ensure().of(yup.string()) as any,
     wasteAdr: yup.string().nullable(),
+    wastePop: yup.boolean().nullable(),
     packagings: yup.array(),
     weightIsEstimate: yup
       .boolean()

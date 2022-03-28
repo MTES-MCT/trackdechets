@@ -1,6 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { InlineError } from "common/components/Error";
 import { BsdaPicker } from "form/bsda/components/bsdaPicker/BsdaPicker";
+import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useField, useFormikContext } from "formik";
 import {
@@ -51,6 +52,7 @@ const DECHETTERIE_OPTIONS = [
 export function Type({ disabled }: Props) {
   const { setFieldValue } = useFormikContext<Bsda>();
   const [{ value: type }] = useField<BsdaType>("type");
+  const [{ value: id }] = useField<string>("id");
   const { siret } = useParams<{ siret: string }>();
 
   const { data, loading, error } = useQuery<
@@ -64,14 +66,18 @@ export function Type({ disabled }: Props) {
   useEffect(() => {
     if (type !== BsdaType.Gathering) {
       setFieldValue("grouping", []);
+      setFieldValue("worker.company", getInitialCompany());
     }
     if (type !== BsdaType.Reshipment) {
       setFieldValue("forwarding", null);
+      setFieldValue("worker.company", getInitialCompany());
     }
     if (type === BsdaType.Collection_2710) {
       setFieldValue("destination.company.siret", data?.companyInfos.siret);
       setFieldValue("destination.company.address", data?.companyInfos.address);
       setFieldValue("destination.company.name", data?.companyInfos.name);
+      setFieldValue("worker.company", getInitialCompany());
+      setFieldValue("transporter.company", getInitialCompany());
     }
   }, [type, setFieldValue, data]);
 
@@ -106,10 +112,10 @@ export function Type({ disabled }: Props) {
       </div>
       <div className="tw-mt-4">
         {BsdaType.Gathering === type && (
-          <BsdaPicker name="grouping" code="D 13" />
+          <BsdaPicker name="grouping" code="D 13" bsdaId={id} />
         )}
         {BsdaType.Reshipment === type && (
-          <BsdaPicker name="forwarding" code="D 15" />
+          <BsdaPicker name="forwarding" code="D 15" bsdaId={id} />
         )}
       </div>
     </>

@@ -35,10 +35,16 @@ function duplicateForm({
   updatedAt,
   emitterEmissionSignatureAuthor,
   emitterEmissionSignatureDate,
+  emitterCustomInfo,
+  workerWorkHasEmitterPaperSignature,
   workerWorkSignatureAuthor,
   workerWorkSignatureDate,
+  transporterTransportPlates,
+  transporterCustomInfo,
+  transporterTransportTakenOverAt,
   transporterTransportSignatureAuthor,
   transporterTransportSignatureDate,
+  destinationCustomInfo,
   destinationReceptionWeight,
   destinationReceptionDate,
   destinationReceptionAcceptationStatus,
@@ -48,6 +54,8 @@ function duplicateForm({
   destinationOperationSignatureDate,
   destinationOperationDate,
   wasteSealNumbers,
+  forwardingId,
+  groupedInId,
   ...rest
 }: Bsda) {
   return prisma.bsda.create({

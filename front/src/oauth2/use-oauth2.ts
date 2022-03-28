@@ -24,11 +24,11 @@ export function useOAuth2() {
     setAuthorizePayload,
   ] = useState<AuthorizePayload | null>(null);
 
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  const { VITE_API_ENDPOINT } = import.meta.env;
 
   const location = useLocation();
 
-  const authorizeUrl = `${REACT_APP_API_ENDPOINT}/oauth2/authorize${location.search}`;
+  const authorizeUrl = `${VITE_API_ENDPOINT}/oauth2/authorize${location.search}`;
 
   const fallbackError = "Une erreur est survenue";
 

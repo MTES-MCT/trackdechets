@@ -104,6 +104,7 @@ describe("Mutation.Bsda.create", () => {
       waste: {
         code: "16 01 06",
         adr: "ADR",
+        pop: true,
         consistence: "SOLIDE",
         familyCode: "Code famille",
         materialName: "A material",
@@ -167,6 +168,7 @@ describe("Mutation.Bsda.create", () => {
       waste: {
         code: "16 01 06",
         adr: "ADR",
+        pop: true,
         consistence: "SOLIDE",
         familyCode: "Code famille",
         materialName: "A material",
@@ -237,6 +239,7 @@ describe("Mutation.Bsda.create", () => {
       waste: {
         code: "16 01 06",
         adr: "ADR",
+        pop: true,
         consistence: "SOLIDE",
         familyCode: "Code famille",
         materialName: "A material",
@@ -317,7 +320,8 @@ describe("Mutation.Bsda.create", () => {
         consistence: "SOLIDE",
         familyCode: "Code famille",
         materialName: "A material",
-        sealNumbers: ["1", "2"]
+        sealNumbers: ["1", "2"],
+        pop: true
       },
       packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
       weight: { isEstimate: true, value: 1.2 },
@@ -364,6 +368,7 @@ describe("Mutation.Bsda.create", () => {
       waste: {
         code: "16 01 06",
         adr: "ADR",
+        pop: true,
         consistence: "SOLIDE",
         familyCode: "Code famille",
         materialName: "A material",
@@ -401,7 +406,6 @@ describe("Mutation.Bsda.create", () => {
       emitter: {
         isPrivateIndividual: true,
         company: {
-          siret: "Jean DUPONT",
           name: "Jean DUPONT",
           address: "Rue de la carcasse",
           contact: "Centre amiante",
@@ -412,6 +416,7 @@ describe("Mutation.Bsda.create", () => {
       waste: {
         code: "16 01 06",
         adr: "ADR",
+        pop: true,
         consistence: "SOLIDE",
         familyCode: "Code famille",
         materialName: "A material",
@@ -461,7 +466,6 @@ describe("Mutation.Bsda.create", () => {
       emitter: {
         isPrivateIndividual: true,
         company: {
-          siret: "Jean DUPONT",
           name: "Jean DUPONT",
           address: "Rue de la carcasse",
           contact: "Centre amiante",
@@ -472,6 +476,7 @@ describe("Mutation.Bsda.create", () => {
       waste: {
         code: "16 01 06",
         adr: "ADR",
+        pop: true,
         consistence: "SOLIDE",
         familyCode: "Code famille",
         materialName: "A material",

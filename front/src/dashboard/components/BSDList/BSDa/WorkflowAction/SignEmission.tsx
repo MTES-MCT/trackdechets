@@ -32,7 +32,7 @@ export function SignEmission({ siret, bsdaId }: Props) {
   });
 
   return (
-    <SignBsda title="Signer l'enlèvement" bsdaId={bsdaId}>
+    <SignBsda title="Signer" bsdaId={bsdaId}>
       {({ bsda, onClose }) =>
         bsda.metadata?.errors.some(
           error => error.requiredFor === SignatureTypeInput.Emission
@@ -118,7 +118,7 @@ export function SignEmission({ siret, bsdaId }: Props) {
                     className="btn btn--primary"
                     disabled={isSubmitting}
                   >
-                    {loading ? "Signature en cours..." : "Signer l'enlèvement"}
+                    {loading ? "Signature en cours..." : "Signer"}
                   </button>
                 </div>
               </Form>

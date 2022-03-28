@@ -41,7 +41,8 @@ const editableFields = {
     materialName: ifAwaitingSignature("WORK"),
     consistence: ifAwaitingSignature("WORK"),
     sealNumbers: ifAwaitingSignature("WORK"),
-    adr: ifAwaitingSignature("WORK")
+    adr: ifAwaitingSignature("WORK"),
+    pop: ifAwaitingSignature("WORK")
   },
   packagings: ifAwaitingSignature("WORK"),
   weight: ifAwaitingSignature("WORK"),
