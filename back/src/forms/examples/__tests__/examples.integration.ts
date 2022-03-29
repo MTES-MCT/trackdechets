@@ -21,7 +21,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     async () => {
       await testWorkflow(entreposageProvisoireWorkflow);
     },
-    10000
+    20000
   );
 
   test(
