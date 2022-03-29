@@ -43,6 +43,9 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     form.status
   );
   if (form.status === FormStatus.SignedByProducer) {
+    // if the bsd is only signed by the emitter, they can still update/delete it
+    // so if it's signed by the emitter, they can do it but not the eco organisme
+    // if it's signed by the eco organisme, they can do it but not the emitter
     const signedBySiret = form.emittedByEcoOrganisme
       ? form.ecoOrganisme?.siret
       : form.emitter?.company?.siret;
