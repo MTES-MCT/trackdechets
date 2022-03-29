@@ -1,0 +1,10 @@
+mutation SignTransportForm(
+  $id: ID!
+  $input: SignTransportFormInput!
+  $securityCode: Int
+) {
+  signTransportForm(id: $id, input: $input, securityCode: $securityCode) {
+    id
+    status
+  }
+}

@@ -76,6 +76,7 @@ enum Consistence {
 enum Status {
   DRAFT
   SEALED
+  SIGNED_BY_PRODUCER
   SENT
   RECEIVED
   ACCEPTED
@@ -89,6 +90,7 @@ enum Status {
   TEMP_STORED
   TEMP_STORER_ACCEPTED
   RESEALED
+  SIGNED_BY_TEMP_STORER
   RESENT
 }
 
@@ -290,6 +292,11 @@ model Form {
   wasteDetailsIsDangerous            Boolean                 @default(false)
   readableId                         String                  @unique
   status                             Status                  @default(DRAFT)
+  emittedBy                          String?
+  emittedAt                          DateTime?               @db.Timestamptz(6)
+  emittedByEcoOrganisme              Boolean?
+  takenOverBy                        String?
+  takenOverAt                        DateTime?               @db.Timestamptz(6)
   sentAt                             DateTime?               @db.Timestamptz(6)
   sentBy                             String?
   isAccepted                         Boolean?                @default(false)
@@ -562,6 +569,10 @@ model TemporaryStorageDetail {
   transporterNumberPlate           String?
   transporterCustomInfo            String?
   transporterTransportMode         TransportMode?          @default(ROAD)
+  emittedBy                        String?
+  emittedAt                        DateTime?               @db.Timestamptz(6)
+  takenOverBy                      String?
+  takenOverAt                      DateTime?               @db.Timestamptz(6)
   signedByTransporter              Boolean?
   signedBy                         String?
   signedAt                         DateTime?               @db.Timestamptz(6)

@@ -20,33 +20,53 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
-- fix CSS du stepper pour éviter le chevauchement du texte en responsive dans Stepper.module.scss.
-
 #### :boom: Breaking changes
+
+- Flexibilisation de la signature producteur / transporteur et installation d'entreposage provisoire / transporteur [PR 1214](https://github.com/MTES-MCT/trackdechets/pull/1186)
+  - Ajout du statut `SIGNED_BY_PRODUCER` qui arrive après `SEALED` et avant `SENT`.
+  - Ajout du statut `SIGNED_BY_TEMP_STORER` qui arrive après `RESEALED` et avant `RESENT`.
+  - Ajout de la mutation `signEmissionForm` qui permet de passer du statut `SEALED` à `SIGNED_BY_PRODUCER` ainsi que de `RESEALED` à `SIGNED_BY_TEMP_STORER`. Il est possible d'utiliser le code de signature d'un acteur pour signer en son nom sans qu'il soit authentifié.
+  - Ajout de la mutation `signTransportForm` qui permet de passer du statut `SIGNED_BY_PRODUCER` à `SENT` ainsi que de `SIGNED_BY_TEMP_STORER` à `RESENT`. Il est possible d'utiliser le code de signature pour signer au nom du transporteur sans qu'il soit authentifié.
+  - Ajout des champs :
+    - `Form.emittedAt`, `Form.emittedBy`, `TemporaryStorageDetail.emittedAt`, `TemporaryStorageDetail.emittedBy` : date et nom de la personne signant pour le producteur, éco-organisme ou installation d'entreposage provisoire.
+    - `Form.emittedByEcoOrganisme` : indique si c'est l'éco-organisme qui a signé ou pas.
+    - `Form.takenOverAt`, `Form.takenOverBy`, `TemporaryStorageDetail.takenOverAt`, `TemporaryStorageDetail.takenOverBy` : date et nom de la personne signant pour le transporteur initial ou après entreposage provisoire.
+  - Dépréciation des champs :
+    - `Form.sentAt` : remplacé par `Form.takenOverAt`, qui peut différer de `Form.emittedAt`. Durant sa période de dépréciation le champ continue d'être remplit par la bonne valeur (`Form.takenOverAt`).
+    - `Form.sentBy` : remplacé par `Form.emittedBy`. Durant sa période de dépréciation le champ continue d'être remplit par la bonne valeur (`Form.emittedBy`).
+    - `TemporaryStorageDetail.signedAt` : remplacé par `TemporaryStorageDetail.takenOverAt`, qui peut différer de `TemporaryStorageDetail.emittedAt`. Durant sa période de dépréciation le champ continue d'être remplit par la bonne valeur (`TemporaryStorageDetail.takenOverAt`).
+    - `TemporaryStorageDetail.signedBy` : remplacé par `TemporaryStorageDetail.takenOverBy`. Durant sa période de dépréciation le champ continue d'être remplit par la bonne valeur (`TemporaryStorageDetail.takenOverBy`).
+  - Déprécation de la mutation `signedByTransporter`, remplacée par `signEmissionForm` et `signTransportForm` pour faire en deux temps ce qui se faisait avant en un temps. Elle permet toujours de faire passer un bordereau du statut `SEALED` à `SENT` et de `RESEALED` à `RESENT` tout en remplissant les nouveaux champs. En revanche, elle ne permet pas de gérer le statut `SIGNED_BY_PRODUCER` et `SIGNED_BY_TEMP_STORER`.
+
 #### :nail_care: Améliorations
+
 - Nombreuses améliorations sur le BSDA (plus de champs dans l'aperçu, meilleure validation des données, corrections de bugs sur le groupement, amélioration de wordings...) [PR 1271](https://github.com/MTES-MCT/trackdechets/pull/1271)
 - Passage au client ElasticSearch TD interne pour le script add-address-lat-long.ts
 
 #### :memo: Documentation
+
 - Mise à jour de la documentation : Tutoriels > Démarrage Rapide > Obtenir un jeton d'accès [PR 1277](https://github.com/MTES-MCT/trackdechets/pull/1277)
 - Mise à jour de la référence du champ `Dasri.allowDirectTakeOver` [PR 1277](https://github.com/MTES-MCT/trackdechets/pull/1277)
 - Ajout de badges de tests sur le README.md et correction lien search
 - Mis à jour fonctionnement de recherche Sirene
 
 #### :house: Interne
+
 - Refactoring de `formRepository` [PR 1276](https://github.com/MTES-MCT/trackdechets/pull/1276)
 
 # [2022.03.1] ~14/03/2022
 
 #### :rocket: Nouvelles fonctionnalités
 
-- Ajout d'un client primaire nommé trackdechets dans `companies/sirene` basé sur notre propre index  ElasticSearch des données Sirene INSEE [PR 1214](https://github.com/MTES-MCT/trackdechets/pull/1214)
+- Ajout d'un client primaire nommé trackdechets dans `companies/sirene` basé sur notre propre index ElasticSearch des données Sirene INSEE [PR 1214](https://github.com/MTES-MCT/trackdechets/pull/1214)
 - Ajout du caractère dangereux pour des déchets dont le code ne comporte pas d'astérisque [PR 1177](https://github.com/MTES-MCT/trackdechets/pull/1177)
+
 #### :bug: Corrections de bugs
 
 - Correction de l'adresse chantier incomplète dans le registre [PR 1238](https://github.com/MTES-MCT/trackdechets/pull/1238)
 - Correction de l'indexation des filtres d'onglet du tableau de bord [PR 1215](https://github.com/MTES-MCT/trackdechets/pull/1215)
 - Correction d'un bug de corruption de la structure du payload renvoyé par l'API en présence des caractères spéciaux "<" et ">" [PR 1250](https://github.com/MTES-MCT/trackdechets/pull/1250)
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations

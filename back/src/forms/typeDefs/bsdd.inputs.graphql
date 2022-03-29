@@ -1,15 +1,49 @@
 "Payload de signature d'un BSD"
 input SentFormInput {
-  "Date de l'envoi du déchet par l'émetteur (case 9)"
+  "Date de l'envoi du déchet par l'émetteur et de prise en charge du déchet par le transporteur"
   sentAt: DateTime!
 
   "Nom de la personne responsable de l'envoi du déchet (case 9)"
   sentBy: String!
 }
 
+input SignEmissionFormInput {
+  "Conditionnements"
+  packagingInfos: [PackagingInfoInput!]
+
+  "Quantité en tonnes"
+  quantity: Float!
+
+  "Code ONU"
+  onuCode: String
+
+  "Numéro de la plaque d'immatriculation transporteur"
+  transporterNumberPlate: String
+
+  "Date de signature de l'émetteur"
+  emittedAt: DateTime!
+
+  "Nom de la personne signant pour l'émetteur"
+  emittedBy: String!
+
+  "Si c'est l'éco-organisme qui a signé ou pas"
+  emittedByEcoOrganisme: Boolean
+}
+
+input SignTransportFormInput {
+  "Date de signature du transporteur"
+  takenOverAt: DateTime!
+
+  "Nom de la personne signant pour le transporteur"
+  takenOverBy: String!
+
+  "Numéro de la plaque d'immatriculation transporteur"
+  transporterNumberPlate: String
+}
+
 "Payload de signature d'un BSD par un transporteur"
 input TransporterSignatureFormInput {
-  "Date de l'envoi du déchet par l'émetteur (case 9)"
+  "Date de l'envoi du déchet par l'émetteur et de prise en charge du déchet par le transporteur"
   sentAt: DateTime!
 
   "Si oui ou non le BSD a été signé par un transporteur"
@@ -42,7 +76,7 @@ input TransporterSignatureFormInput {
 
 "Payload simplifié de signature d'un BSD par un transporteur"
 input SignatureFormInput {
-  "Date de l'envoi du déchet par l'émetteur (case 9)"
+  "Date de l'envoi du déchet par l'émetteur et de prise en charge du déchet par le transporteur"
   sentAt: DateTime!
   "Nom de la personne responsable de l'envoi du déchet (case 9)"
   sentBy: String!

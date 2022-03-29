@@ -104,8 +104,9 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
           ))}
         </Field>
         <div>
-          Code de traitement initialement prévu par le producteur:{" "}
-          {form.recipient?.processingOperation}
+          Code de traitement prévu :{" "}
+          {form.temporaryStorageDetail?.destination?.processingOperation ??
+            form.recipient?.processingOperation}
         </div>
       </div>
       <div className="form__row">

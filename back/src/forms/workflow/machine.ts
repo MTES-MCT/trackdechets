@@ -1,7 +1,7 @@
-import { WasteAcceptationStatus } from "@prisma/client";
+import { Status, WasteAcceptationStatus } from "@prisma/client";
 import { Machine } from "xstate";
 import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "../../common/constants";
-import { Event, EventType, FormState } from "./types";
+import { Event, EventType } from "./types";
 
 /**
  * Workflow state machine
@@ -9,157 +9,185 @@ import { Event, EventType, FormState } from "./types";
 const machine = Machine<any, Event>(
   {
     id: "form-workflow-machine",
-    initial: FormState.Draft,
+    initial: Status.DRAFT,
     states: {
-      [FormState.Draft]: {
+      [Status.DRAFT]: {
         on: {
-          [EventType.MarkAsSealed]: [{ target: FormState.Sealed }],
-          [EventType.MarkAsSent]: [{ target: FormState.Sent }]
+          [EventType.MarkAsSealed]: [{ target: Status.SEALED }],
+          [EventType.MarkAsSent]: [{ target: Status.SENT }]
         }
       },
-      [FormState.Sealed]: {
+      [Status.SEALED]: {
         on: {
-          [EventType.MarkAsSent]: [{ target: FormState.Sent }],
+          [EventType.MarkAsSent]: [{ target: Status.SENT }],
           [EventType.SignedByTransporter]: [
             {
-              target: FormState.Sent
+              target: Status.SENT
             }
           ],
           [EventType.ImportPaperForm]: [
             {
-              target: FormState.NoTraceability,
+              target: Status.NO_TRACEABILITY,
               cond: "isExemptOfTraceability"
             },
-            { target: FormState.AwaitingGroup, cond: "awaitsGroup" },
-            { target: FormState.Processed }
+            { target: Status.AWAITING_GROUP, cond: "awaitsGroup" },
+            { target: Status.PROCESSED }
+          ],
+          [EventType.SignedByProducer]: [
+            {
+              target: Status.SIGNED_BY_PRODUCER
+            }
           ]
         }
       },
-      [FormState.Sent]: {
+      [Status.SIGNED_BY_PRODUCER]: {
+        on: {
+          [EventType.SignedByTransporter]: [
+            {
+              target: Status.SENT
+            }
+          ]
+        }
+      },
+      [Status.SENT]: {
         on: {
           [EventType.MarkAsTempStored]: [
             {
-              target: FormState.Refused,
+              target: Status.REFUSED,
               cond: "isFormRefusedByTempStorage"
             },
             {
-              target: FormState.TempStorerAccepted,
+              target: Status.TEMP_STORER_ACCEPTED,
               cond: "isFormAcceptedByTempStorage"
             },
             {
-              target: FormState.TempStored
+              target: Status.TEMP_STORED
             }
           ],
           [EventType.MarkAsReceived]: [
             {
-              target: FormState.Refused,
+              target: Status.REFUSED,
               cond: "isFormRefused"
             },
             {
-              target: FormState.Accepted,
+              target: Status.ACCEPTED,
               cond: "isFormAccepted"
             },
             {
-              target: FormState.Received
+              target: Status.RECEIVED
             }
           ]
         }
       },
-      [FormState.Refused]: { type: "final" },
-      [FormState.Received]: {
+      [Status.REFUSED]: { type: "final" },
+      [Status.RECEIVED]: {
         on: {
           [EventType.MarkAsAccepted]: [
             {
-              target: FormState.Refused,
+              target: Status.REFUSED,
               cond: "isFormRefused"
             },
             {
-              target: FormState.Accepted
+              target: Status.ACCEPTED
             }
           ]
         }
       },
-      [FormState.Accepted]: {
+      [Status.ACCEPTED]: {
         on: {
           [EventType.MarkAsProcessed]: [
             {
-              target: FormState.NoTraceability,
+              target: Status.NO_TRACEABILITY,
               cond: "isExemptOfTraceability"
             },
             {
-              target: FormState.AwaitingGroup,
+              target: Status.AWAITING_GROUP,
               cond: "awaitsGroup"
             },
             {
-              target: FormState.Processed
+              target: Status.PROCESSED
             }
           ]
         }
       },
-      [FormState.Processed]: { type: "final" },
-      [FormState.NoTraceability]: { type: "final" },
-      [FormState.AwaitingGroup]: {
+      [Status.PROCESSED]: { type: "final" },
+      [Status.NO_TRACEABILITY]: { type: "final" },
+      [Status.AWAITING_GROUP]: {
         on: {
-          [EventType.MarkAsGrouped]: { target: FormState.Grouped }
+          [EventType.MarkAsGrouped]: { target: Status.GROUPED }
         }
       },
-      [FormState.Grouped]: {
-        on: { [EventType.MarkAsProcessed]: { target: FormState.Processed } }
+      [Status.GROUPED]: {
+        on: { [EventType.MarkAsProcessed]: { target: Status.PROCESSED } }
       },
-      [FormState.TempStored]: {
+      [Status.TEMP_STORED]: {
         on: {
           [EventType.MarkAsTempStorerAccepted]: [
             {
-              target: FormState.Refused,
+              target: Status.REFUSED,
               cond: "isFormRefusedByTempStorage"
             },
             {
-              target: FormState.TempStorerAccepted
+              target: Status.TEMP_STORER_ACCEPTED
             }
           ]
         }
       },
-      [FormState.TempStorerAccepted]: {
+      [Status.TEMP_STORER_ACCEPTED]: {
         on: {
           [EventType.MarkAsResealed]: [
             {
-              target: FormState.Resealed
+              target: Status.RESEALED
             }
           ],
           [EventType.MarkAsResent]: [
             {
-              target: FormState.Resent
+              target: Status.RESENT
             }
           ]
         }
       },
-      [FormState.Resealed]: {
+      [Status.RESEALED]: {
         on: {
           [EventType.MarkAsResent]: [
             {
-              target: FormState.Resent
+              target: Status.RESENT
             }
           ],
           [EventType.SignedByTransporter]: [
             {
-              target: FormState.Resent
+              target: Status.RESENT
+            }
+          ],
+          [EventType.SignedByTempStorer]: [
+            {
+              target: Status.SIGNED_BY_TEMP_STORER
             }
           ]
         }
       },
-      [FormState.Resent]: {
+      [Status.SIGNED_BY_TEMP_STORER]: {
+        on: {
+          [EventType.MarkAsResent]: [
+            {
+              target: Status.RESENT
+            }
+          ]
+        }
+      },
+      [Status.RESENT]: {
         on: {
           [EventType.MarkAsReceived]: [
             {
-              target: FormState.Refused,
+              target: Status.REFUSED,
               cond: "isFormRefused"
             },
             {
-              target: FormState.Accepted,
+              target: Status.ACCEPTED,
               cond: "isFormAccepted"
             },
             {
-              target: FormState.Received
+              target: Status.RECEIVED
             }
           ]
         }

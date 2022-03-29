@@ -645,6 +645,11 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
     createdAt: form.createdAt,
     updatedAt: form.updatedAt,
     status: form.status as FormStatus,
+    emittedAt: form.emittedAt,
+    emittedBy: form.emittedBy,
+    emittedByEcoOrganisme: form.emittedByEcoOrganisme,
+    takenOverAt: form.takenOverAt,
+    takenOverBy: form.takenOverBy,
     signedByTransporter: form.signedByTransporter,
     sentAt: form.sentAt,
     sentBy: form.sentBy,
@@ -773,6 +778,10 @@ export function expandTemporaryStorageFromDb(
         ? temporaryStorageDetail.transporterTransportMode
         : null
     }),
+    emittedAt: temporaryStorageDetail.emittedAt,
+    emittedBy: temporaryStorageDetail.emittedBy,
+    takenOverBy: temporaryStorageDetail.takenOverBy,
+    takenOverAt: temporaryStorageDetail.takenOverAt,
     signedBy: temporaryStorageDetail.signedBy,
     signedAt: temporaryStorageDetail.signedAt
   };
