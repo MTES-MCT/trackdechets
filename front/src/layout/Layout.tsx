@@ -24,21 +24,32 @@ export default function Layout({
   isAdmin,
 }: AuthProps & { children: ReactNode }) {
   const { data } = useQuery<Pick<Query, "warningMessage">>(GET_WARNING_MESSAGE);
-  const messages = [VITE_WARNING_MESSAGE, data?.warningMessage].filter(
-    Boolean
-  ) as string[];
 
   return (
     <>
-      {messages.map((message, index) => (
+      {VITE_WARNING_MESSAGE && (
         <div
-          key={index}
           className="notification notification--error tw-text-center"
           style={{ borderRadius: 0, border: 0, margin: 0 }}
         >
-          {message}
+          {VITE_WARNING_MESSAGE}
         </div>
-      ))}
+      )}
+      {data?.warningMessage && (
+        <div
+          className="notification notification--error tw-text-center"
+          style={{
+            borderRadius: 0,
+            border: 0,
+            margin: 0,
+            backgroundColor: "red",
+            color: "white",
+            fontWeight: "bold",
+          }}
+        >
+          {data.warningMessage}
+        </div>
+      )}
       <Header isAuthenticated={isAuthenticated} isAdmin={isAdmin} />
       {children}
     </>
