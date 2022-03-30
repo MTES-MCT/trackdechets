@@ -33,20 +33,6 @@ export default function MyCompanySelector({ fieldName, onSelect }) {
   const { setFieldValue } = useFormikContext<CreateFormInput>();
   const [field] = useField({ name: fieldName });
 
-  const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME, {
-    onCompleted: data => {
-      // check user is member of selected company or reset emitter company
-      const companies = data.me.companies;
-      if (!companies.map(c => c.siret).includes(field.value.siret)) {
-        if (companies.length === 1) {
-          onCompanySelect(companies[0]);
-        } else {
-          onCompanySelect(getInitialCompany());
-        }
-      }
-    },
-  });
-
   const onCompanySelect = useCallback(
     (
       company: Pick<
@@ -65,6 +51,20 @@ export default function MyCompanySelector({ fieldName, onSelect }) {
     },
     [fieldName, setFieldValue, onSelect]
   );
+
+  const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME, {
+    onCompleted: data => {
+      // check user is member of selected company or reset emitter company
+      const companies = data.me.companies;
+      if (!companies.map(c => c.siret).includes(field.value.siret)) {
+        if (companies.length === 1) {
+          onCompanySelect(companies[0]);
+        } else {
+          onCompanySelect(getInitialCompany());
+        }
+      }
+    },
+  });
 
   const companies = useMemo(() => {
     return sortCompaniesByName(data?.me.companies ?? []);
