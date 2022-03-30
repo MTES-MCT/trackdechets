@@ -2,7 +2,7 @@ import { UserInputError } from "apollo-server-express";
 import { createClientAsync, Client, IOptions } from "soap";
 import { checkVAT } from "jsvat";
 import { CompanyVatSearchResult, ViesResult } from "./types";
-import { countries } from "../../../common/constants/companySearchHelpers"
+import { countries } from "../../../common/constants/companySearchHelpers";
 import logger from "../../../logging/logger";
 
 const viesUrl =
