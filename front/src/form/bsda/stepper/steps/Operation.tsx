@@ -4,10 +4,22 @@ import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useFormikContext } from "formik";
 import { Bsda } from "generated/graphql/types";
-import React from "react";
+import React, { useEffect } from "react";
 
 export default function Operation() {
-  const { values } = useFormikContext<Bsda>();
+  const { values, setFieldValue } = useFormikContext<Bsda>();
+
+  useEffect(() => {
+    const acceptationStatus = values.destination?.reception?.acceptationStatus;
+    if (acceptationStatus === "REFUSED") {
+      setFieldValue("destination.reception.weight", 0);
+      setFieldValue("destination.operation.code", "");
+      setFieldValue("destination.operation.date", null);
+    }
+    if (acceptationStatus === "ACCEPTED") {
+      setFieldValue("destination.reception.refusalReason", "");
+    }
+  }, [values.destination?.reception?.acceptationStatus, setFieldValue]);
 
   return (
     <>
