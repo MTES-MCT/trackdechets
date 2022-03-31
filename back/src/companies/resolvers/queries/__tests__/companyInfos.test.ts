@@ -32,7 +32,9 @@ describe("companyInfos with SIRET", () => {
   });
 
   it("should throw NOT_FOUND error if the siret is not in sirene database", async () => {
-    searchCompanyMock.mockResolvedValueOnce({ siret: "" });
+    searchCompanyMock.mockRejectedValueOnce(
+      new UserInputError("Siret not found")
+    );
     expect.assertions(1);
     try {
       await getCompanyInfos("85001946400014");
