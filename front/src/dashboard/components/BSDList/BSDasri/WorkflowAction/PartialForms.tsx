@@ -100,100 +100,7 @@ export function TransportSignatureForm() {
     </>
   );
 }
-// export function TransportSignatureForm_() {
-//   const { values, setFieldValue } = useFormikContext<Bsdasri>();
-//   const AcceptationComponent =
-//     values.type === BsdasriType.Synthesis ? AcceptOnlyField : Acceptation;
 
-//   function handleTransportMode(e) {
-//     setFieldValue("transporter.transport.mode", e.target.value, false);
-//     if (e.target.value !== "ROAD") {
-//       setFieldValue("transporter.transport.plates", [], false);
-//     }
-//   }
-//   return (
-//     <>
-//       <div className="form__row">
-//         <label>
-//           Numéro de récépissé
-//           <Field
-//             type="text"
-//             name="transporter.recepisse.number"
-//             className="td-input"
-//           />
-//         </label>
-
-//         <RedErrorMessage name="transporter.recepisse.number" />
-//       </div>
-//       <div className="form__row">
-//         <label>
-//           Département
-//           <Field
-//             type="text"
-//             name="transporter.recepisse.department"
-//             placeholder="Ex: 83"
-//             className="td-input td-department"
-//           />
-//         </label>
-
-//         <RedErrorMessage name="transporter.recepisse.department" />
-//       </div>
-//       <div className="form__row">
-//         <label>
-//           Limite de validité
-//           <div className="td-date-wrapper">
-//             <Field
-//               component={DateInput}
-//               name="transporter.recepisse.validityLimit"
-//               className="td-input td-date"
-//             />
-//           </div>
-//         </label>
-
-//         <RedErrorMessage name="transporter.recepisse.validityLimit" />
-//       </div>
-//       <h4 className="form__section-heading">Transport du déchet</h4>
-
-//       <div className="form__row">
-//         <label>Mode de transport</label>
-//         <Field
-//           id="id_mode"
-//           name="transporter.transport.mode"
-//           component={FieldTransportModeSelect}
-//           onChange={e => handleTransportMode(e)}
-//         ></Field>
-//       </div>
-//       <div className="form__row">
-//         <Field
-//           name="transporter.transport.acceptation"
-//           component={AcceptationComponent}
-//         />
-//       </div>
-//       <div className="form__row">
-//         <label>
-//           Date de prise en charge
-//           <div className="td-date-wrapper">
-//             <Field
-//               name="transporter.transport.takenOverAt"
-//               component={DateInput}
-//               className="td-input"
-//             />
-//           </div>
-//         </label>
-//       </div>
-//       <div className="form__row">
-//         <Field name="transporter.transport.packagings" component={Packagings} />
-//       </div>
-//       <h4 className="form__section-heading">Quantité transportée</h4>
-
-//       <WeightWidget
-//         switchLabel="Je souhaite ajouter un poids"
-//         dasriPath="transporter.transport"
-//         getInitialWeightFn={getInitialWeightFn}
-//       />
-//     </>
-//   );
-// }
 export function SynthesisTransportSignatureForm() {
   return (
     <>
@@ -240,7 +147,7 @@ export function SynthesisTransportSignatureForm() {
       <div className="form__row">
         <Field
           name="transporter.transport.acceptation"
-          component={Acceptation}
+          component={AcceptOnlyField}
         />
       </div>
       <div className="form__row">
@@ -427,8 +334,9 @@ export const removeSections = (input, signatureType: SignatureType) => {
       destinationKey,
       ...common,
     ],
-    [ExtraSignatureType.SynthesisEmission]: [
-      transporterKey,
+
+    [ExtraSignatureType.SynthesisTakeOver]: [
+      emitterKey,
       destinationKey,
       ...common,
     ],

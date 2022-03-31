@@ -228,14 +228,14 @@ export default function Dashboard() {
                   />
                 </Modal>
               </Route>
-              <Route path={routes.dashboard.bsdasris.sign.synthesisEmission}>
+              <Route path={routes.dashboard.bsdasris.sign.synthesisTakeover}>
                 <Modal
                   onClose={() => history.push(toCollectDashboard)}
                   ariaLabel="Bordereau de synthèse: Transporteur"
                   isOpen
                 >
                   <RouteSignBsdasri
-                    UIsignatureType={ExtraSignatureType.SynthesisEmission}
+                    UIsignatureType={ExtraSignatureType.SynthesisTakeOver}
                   />
                 </Modal>
               </Route>

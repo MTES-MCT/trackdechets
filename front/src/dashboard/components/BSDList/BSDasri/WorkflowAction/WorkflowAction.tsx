@@ -118,7 +118,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
                 icon={<IconCheckCircle1 size="24px" />}
                 to={{
                   pathname: generatePath(
-                    routes.dashboard.bsdasris.sign.synthesisEmission,
+                    routes.dashboard.bsdasris.sign.synthesisTakeover,
                     {
                       siret,
                       id: form.id,
@@ -127,7 +127,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
                   state: { background: location },
                 }}
               >
-                Signature 1/2 (Synthèse)
+                Signature transporteur (Synthèse)
               </ActionLink>
             )}
           </>
@@ -158,25 +158,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
           </ActionLink>
         );
       }
-      if (isSynthesis) {
-        return (
-          <ActionLink
-            icon={<IconCheckCircle1 size="24px" />}
-            to={{
-              pathname: generatePath(
-                routes.dashboard.bsdasris.sign.transporter,
-                {
-                  siret,
-                  id: form.id,
-                }
-              ),
-              state: { background: location },
-            }}
-          >
-            Signature 2/2 (Synthèse)
-          </ActionLink>
-        );
-      }
+
       return null;
     }
     case BsdasriStatus.Sent: {

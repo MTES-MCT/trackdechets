@@ -75,7 +75,7 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
                 "transporter.recepisse.validityLimit",
                 initialState().transporter.recepisse.validityLimit
               );
-            
+
               setFieldValue("transporter.recepisse.department", "");
             }
           }}

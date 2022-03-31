@@ -43,8 +43,7 @@ export default {
       sign: {
         publish: "/dashboard/:siret/bsdasris/publish/:id",
         directTakeover: "/dashboard/:siret/bsdasris/direct-takeover/:id",
-        synthesisEmission: "/dashboard/:siret/bsdasris/synthesis-emission/:id",
-        // synthesisTransport: "/dashboard/:siret/bsdasris/synthesis-transport/:id",
+        synthesisTakeover: "/dashboard/:siret/bsdasris/synthesis-takeover/:id",
         emission: "/dashboard/:siret/bsdasris/emission/:id",
         emissionSecretCode:
           "/dashboard/:siret/bsdasris/sign-emitter-secret/:id",

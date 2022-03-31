@@ -11,11 +11,14 @@ type checkEmitterAllowsDirectTakeOverFn = ({
   bsdasri: Bsdasri
 }) => Promise<boolean>;
 /**
- * Dasri can be taken over by transporter without signature if emitter explicitly allows this in company preferences
+ * Dasri can be taken over by transporter directly if:
+ * - without emitter signature if emitter explicitly allows this in company preferences
+ * - always for synthesis dasri, where emitter ans transporter are the same company
+ *
  * Checking this in mutation code needs less code than doing it in the state machine, hence this util.
  * A boolean is returned to be stored on Bsdasri model iot tell apart which dasris were taken over directly.
  */
-export const checkEmitterAllowsDirectTakeOver: checkEmitterAllowsDirectTakeOverFn =
+export const checkDirectakeOverIsAllowed: checkEmitterAllowsDirectTakeOverFn =
   async ({ signatureParams, bsdasri }) => {
     if (
       signatureParams.eventType === BsdasriEventType.SignTransport &&

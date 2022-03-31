@@ -22,6 +22,49 @@ import { SIGN_DASRI } from "./signUtils";
 describe("Mutation.signBsdasri on synthesis bsd", () => {
   afterEach(resetDatabase);
 
+  it("should deny emitter signature on an INITIAL synthesis dasri", async () => {
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
+
+    // this dasri will be grouped by the synthesis dasris
+    const synthesizeBsdasri = await bsdasriFactory({
+      opt: {
+        ...initialData(emitterCompany),
+        ...readyToTakeOverData(transporterCompany),
+        status: BsdasriStatus.SENT
+      }
+    });
+
+    // synthesis dasris
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(transporterCompany),
+        ...readyToTakeOverData(transporterCompany),
+        status: BsdasriStatus.INITIAL,
+        type: BsdasriType.SYNTHESIS,
+
+        synthesizing: { connect: [{ id: synthesizeBsdasri.id }] }
+      }
+    });
+    const { mutate } = makeClient(transporter); // transporter
+
+    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
+      variables: {
+        id: dasri.id,
+        input: { type: "EMISSION", author: "Jimmy" }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Un dasri de synthèse INITIAL attend une signature transporteur, la signature producteur n'est pas acceptée.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
   it("should put transport signature on an INITIAL synthesis dasri and cascade on associated bsds", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { user: transporter, company: transporterCompany } =

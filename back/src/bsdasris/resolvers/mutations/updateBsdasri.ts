@@ -54,6 +54,7 @@ const fieldsAllowedForUpdateOnceSignedByEmitter: BsdasriField[] =
   fieldsAllowedForUpdateOnceSent.concat([
     "transporterCompanyName",
     "transporterCompanySiret",
+    "transporterCompanyVatNumber",
     "transporterCompanyAddress",
     "transporterCompanyPhone",
     "transporterCompanyContact",

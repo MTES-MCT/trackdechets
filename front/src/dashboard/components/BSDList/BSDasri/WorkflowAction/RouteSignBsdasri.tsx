@@ -42,8 +42,8 @@ const forms = {
 
   [BsdasriSignatureType.Transport]: TransportSignatureForm,
   [ExtraSignatureType.DirectTakeover]: TransportSignatureForm,
-  [ExtraSignatureType.SynthesisEmission]: EmitterSignatureForm,
-  [ExtraSignatureType.SynthesisTransporter]: SynthesisTransportSignatureForm,
+  // [ExtraSignatureType.SynthesisEmission]: EmitterSignatureForm,
+  [ExtraSignatureType.SynthesisTakeOver]: SynthesisTransportSignatureForm,
 
   [BsdasriSignatureType.Reception]: ReceptionSignatureForm,
   [BsdasriSignatureType.Operation]: OperationSignatureForm,
@@ -66,9 +66,9 @@ const settings: {
     validationText:
       "En signant, je confirme la remise du déchet au transporteur. La signature est horodatée.",
   },
-  [ExtraSignatureType.SynthesisEmission]: {
+  [ExtraSignatureType.SynthesisTakeOver]: {
     label: "Signature bordereau de synthèse",
-    signatureType: BsdasriSignatureType.Emission,
+    signatureType: BsdasriSignatureType.Transport,
     validationText:
       "En signant, je valide l'emport du bsd de synthèse et des bordereaux associés. Les bordereaux associés ne sont plus modifiables.",
   },
@@ -86,11 +86,7 @@ const settings: {
     transporteur vous pouvez donc emporter le déchet concerné.
     En signant, je confirme l'emport du déchet. La signature est horodatée.`,
   },
-  [ExtraSignatureType.SynthesisTransporter]: {
-    label: "Bordereau de synthèse",
-    signatureType: BsdasriSignatureType.Transport,
-    validationText: `lorem ipsum`,
-  },
+
   [BsdasriSignatureType.Reception]: {
     label: "Signature reception",
     signatureType: BsdasriSignatureType.Reception,
@@ -113,7 +109,7 @@ export function RouteSignBsdasri({
 }) {
   const { id: formId, siret } = useParams<{ id: string; siret: string }>();
   const history = useHistory();
-
+  console.log(UIsignatureType);
   const { error, data, loading } = useQuery<
     Pick<Query, "bsdasri">,
     QueryBsdasriArgs
