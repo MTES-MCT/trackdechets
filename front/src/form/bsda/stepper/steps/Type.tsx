@@ -66,10 +66,11 @@ export function Type({ disabled }: Props) {
   useEffect(() => {
     if (type !== BsdaType.Gathering) {
       setFieldValue("grouping", []);
-      setFieldValue("worker.company", getInitialCompany());
     }
     if (type !== BsdaType.Reshipment) {
       setFieldValue("forwarding", null);
+    }
+    if ([BsdaType.Reshipment, BsdaType.Gathering].includes(type)) {
       setFieldValue("worker.company", getInitialCompany());
     }
     if (type === BsdaType.Collection_2710) {
