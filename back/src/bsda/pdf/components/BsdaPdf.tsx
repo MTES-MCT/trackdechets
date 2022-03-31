@@ -11,7 +11,6 @@ import { WasteDetails } from "./WasteDetails";
 
 const PACKAGINGS_NAMES = {
   BIG_BAG: "Big-bag / GRV",
-  BODY_BENNE: "Benne",
   DEPOT_BAG: "Dépôt-bag",
   PALETTE_FILME: "Palette filmée",
   SAC_RENFORCE: "Sac renforcé",
