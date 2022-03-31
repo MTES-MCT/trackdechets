@@ -13,5 +13,5 @@ Pour donner plus de flexibilité et limiter les mutations, les principes suivant
 - create crée un bordereau dans l'état `INITIAL`, `isDraft=false`
 - publish passe le bordereau de `isDraft=true` à `isDraft=false`
 - la mutation update permet de mettre à jour le bordereau pendant son cycle de vie
-- la mutation sign (EMISSION, TRANSPORT, RECPTION, OPERATION) appose une signature sur le cadre correspondant et verrouille les champs correspondants
+- la mutation sign (EMISSION, TRANSPORT, RECEPTION, OPERATION) appose une signature sur le cadre correspondant et verrouille les champs correspondants
 - une fois qu'une signature est apposée, les champs du cadre correspondant ne sont plus modifiables
