@@ -16,7 +16,6 @@ export default function (graphQLPath: string) {
       ip: req.ip,
       http_params: req.params,
       http_query: req.query,
-      http_status: res.statusCode,
       request_timing: "start",
       request_id: getUid(16)
     };
@@ -44,6 +43,7 @@ export default function (graphQLPath: string) {
 
       const metadataWithReponse = {
         ...requestMetadata,
+        http_status: res.statusCode,
         request_timing: "end",
         execution_time_num: end.getTime() - start.getTime(), // in millis
         response_body: Buffer.isBuffer(responseBody) ? null : responseBody
