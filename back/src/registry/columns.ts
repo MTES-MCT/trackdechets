@@ -15,7 +15,9 @@ type Column = {
     ManagedWaste &
     AllWaste);
   label: string;
-  format?: (v: string | boolean | number | Date | string[]) => string;
+  format?: (
+    v: string | boolean | number | Date | string[]
+  ) => string | number | null;
 };
 
 const formatDate = (d: Date | null) => d?.toISOString().slice(0, 10) ?? "";
@@ -25,7 +27,7 @@ const formatBoolean = (b: boolean | null) => {
   }
   return b ? "O" : "N";
 };
-const formatNumber = (n: number) => n?.toFixed(3) ?? "";
+const formatNumber = (n: number) => (!!n ? parseFloat(n.toFixed(3)) : null); // return as a number to allow xls cells formulas
 const formatArray = (arr: any[]) => (Array.isArray(arr) ? arr.join(",") : "");
 
 const columns: Column[] = [
