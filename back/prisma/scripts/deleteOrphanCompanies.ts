@@ -2,7 +2,7 @@ import deleteOrphanCompanies from "../../src/scripts/prisma/deleteOrphanCompanie
 import { registerUpdater, Updater } from "./helper/helper";
 
 @registerUpdater(
-  "Remove oprhan companies",
+  "Remove orphan companies",
   "Remove orphan companies without any member",
   true
 )
