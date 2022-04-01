@@ -27,6 +27,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Correction des statuts `AWAITING_GROUP` et `NO_TRACEABILITY` en cas d'import d'un BSDD papier via la mutation `importPaperForm` [PR 1283](https://github.com/MTES-MCT/trackdechets/pull/1283)
 - Affichage de l'adresse de collecte/chantier sur le détail d'une annexe 2 lorsque celle-ci est présente [PR 1286](https://github.com/MTES-MCT/trackdechets/pull/1286)
 - Détachement des annexes 2 en cas de refus [PR 1282](https://github.com/MTES-MCT/trackdechets/pull/1282)
+- Ajout d'un script de suppression des établissements orphelins et décodage des noms d'établissements contenant la chaîne de caractère \&amp; [PR 1288](https://github.com/MTES-MCT/trackdechets/pull/1288)
 
 #### :boom: Breaking changes
 

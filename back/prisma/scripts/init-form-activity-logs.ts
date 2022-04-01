@@ -6,7 +6,7 @@ const CHUNK_SIZE = 100;
 @registerUpdater(
   "Init Form activity logs",
   "Create a `BsddCreated` event for every existing Form. It acts as a starting point in time.",
-  true
+  false
 )
 export class LoadAnonymousCompaniesUpdater implements Updater {
   async run() {
