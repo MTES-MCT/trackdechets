@@ -113,10 +113,10 @@ export function Type({ disabled }: Props) {
       </div>
       <div className="tw-mt-4">
         {BsdaType.Gathering === type && (
-          <BsdaPicker name="grouping" code="D 13" bsdaId={id} />
+          <BsdaPicker name="grouping" bsdaId={id} />
         )}
         {BsdaType.Reshipment === type && (
-          <BsdaPicker name="forwarding" code="D 15" bsdaId={id} />
+          <BsdaPicker name="forwarding" bsdaId={id} />
         )}
       </div>
     </>

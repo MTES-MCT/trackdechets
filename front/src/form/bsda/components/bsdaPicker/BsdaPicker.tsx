@@ -22,10 +22,13 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import initialState from "../../stepper/initial-state";
 
-type Props = { name: string; code: string; bsdaId: string };
+type Props = { name: string; bsdaId: string };
 
-export function BsdaPicker({ name, code, bsdaId }: Props) {
+export function BsdaPicker({ name, bsdaId }: Props) {
   const { siret } = useParams<{ siret: string }>();
+
+  const codeFilter =
+    name === "grouping" ? { _in: ["D 13", "R 12"] } : { _eq: "D 15" };
   const { data } = useQuery<Pick<Query, "bsdas">, QueryBsdasArgs>(GET_BSDAS, {
     variables: {
       where: {
@@ -33,7 +36,7 @@ export function BsdaPicker({ name, code, bsdaId }: Props) {
         _or: [{ groupedIn: { _eq: null } }, { groupedIn: { _eq: bsdaId } }],
         forwardedIn: { _eq: null },
         destination: {
-          operation: { code: { _eq: code } },
+          operation: { code: codeFilter },
           company: { siret: { _eq: siret } },
         },
       },
