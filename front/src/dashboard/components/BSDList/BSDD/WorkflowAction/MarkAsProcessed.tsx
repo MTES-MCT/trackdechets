@@ -121,31 +121,35 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
         </label>
       </div>
       {isGroupement && (
-        <div className="form__row form__row--inline">
-          <Field
-            type="checkbox"
-            name="noTraceability"
-            id="id_noTraceability"
-            className="td-checkbox"
-          />
+        <>
+          <div className="form__row form__row--inline">
+            <Field
+              type="checkbox"
+              name="noTraceability"
+              id="id_noTraceability"
+              className="td-checkbox"
+            />
 
-          <label htmlFor="id_noTraceability">
-            {" "}
-            Rupture de traçabilité autorisée par arrêté préfectoral pour ce
-            déchet - la responsabilité du producteur du déchet est transférée
-          </label>
-        </div>
+            <label htmlFor="id_noTraceability">
+              {" "}
+              Rupture de traçabilité autorisée par arrêté préfectoral pour ce
+              déchet - la responsabilité du producteur du déchet est transférée
+            </label>
+          </div>
+          {noTraceability && (
+            <div className="notification">
+              La destination ultérieure prévue est optionnelle si les déchets
+              sont envoyés vers des destinations différentes et que vous n'êtes
+              pas en mesure de déterminer l'exutoire final à ce stade. Le code
+              de traitement final prévu reste obligatoire.
+            </div>
+          )}
+        </>
       )}
 
       {nextDestination && (
         <div className="form__row">
-          <h4>Destination ultérieure prévue</h4>
-          <CompanySelector
-            name="nextDestination.company"
-            allowForeignCompanies={true}
-            displayVatSearch={false}
-          />
-
+          <h4 className="h4">Destination ultérieure prévue</h4>
           <div className="form__row">
             <label>Opération d’élimination / valorisation (code D/R)</label>
             <Field
@@ -162,6 +166,12 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
               ))}
             </Field>
           </div>
+          <CompanySelector
+            name="nextDestination.company"
+            allowForeignCompanies={true}
+            displayVatSearch={false}
+            skipFavorite={true}
+          />
         </div>
       )}
       <div className="form__actions">

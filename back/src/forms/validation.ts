@@ -651,10 +651,7 @@ const withNextDestination = (required: boolean) =>
   yup.object().shape({
     nextDestinationProcessingOperation: yup
       .string()
-      .requiredIf(
-        required,
-        `Destination ultérieure : ${MISSING_PROCESSING_OPERATION}`
-      )
+      .required(`Destination ultérieure : ${MISSING_PROCESSING_OPERATION}`)
       .oneOf(
         PROCESSING_OPERATIONS_CODES,
         `Destination ultérieure : ${INVALID_PROCESSING_OPERATION}`

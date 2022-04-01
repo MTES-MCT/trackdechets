@@ -628,14 +628,48 @@ describe("processedInfoSchema", () => {
     }
   });
 
-  test("nextDestination is optional when processing operation is groupement and noTraceability is true", () => {
+  test("nextDestination company info is optional when noTraceability is true", () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
-      processingOperationDone: "D 13",
+      processingOperationDone: "R 12",
       processingOperationDescription: "Regroupement",
+      nextDestinationProcessingOperation: "R 1",
       noTraceability: true
     };
     expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+  });
+
+  test("nextDestination fields can be empty when noTraceability is true", () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "R 12",
+      processingOperationDescription: "Regroupement",
+      noTraceability: true,
+      nextDestinationProcessingOperation: "R 1",
+      nextDestinationCompanyName: "",
+      nextDestinationCompanySiret: "",
+      nextDestinationCompanyAddress: "",
+      nextDestinationCompanyContact: "",
+      nextDestinationCompanyPhone: "",
+      nextDestinationCompanyMail: ""
+    };
+    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+  });
+
+  test("nextDestination processingOperation is required when noTraceability is true", async () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "R 12",
+      processingOperationDescription: "Regroupement",
+      noTraceability: true
+    };
+    const validateFn = () => processedInfoSchema.validate(processedInfo);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Destination ultérieure : L'opération de traitement est obligatoire"
+    );
   });
 });

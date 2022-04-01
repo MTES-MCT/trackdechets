@@ -39,6 +39,7 @@ interface CompanySelectorProps {
   heading?: string;
   disabled?: boolean;
   optionalMail?: boolean;
+  skipFavorite?: boolean;
 }
 
 export default function CompanySelector({
@@ -50,6 +51,7 @@ export default function CompanySelector({
   heading,
   disabled,
   optionalMail = false,
+  skipFavorite = false,
 }: CompanySelectorProps) {
   // STATE
   const [isRegistered, setIsRegistered] = useState(true);
@@ -82,7 +84,7 @@ export default function CompanySelector({
       type: favoriteType,
     },
     // Skip this query if the name's prefix is not a known favorite
-    skip: !Object.values(FavoriteType).includes(favoriteType),
+    skip: !Object.values(FavoriteType).includes(favoriteType) || skipFavorite,
   });
 
   const [searchCompany, { loading, error }] = useLazyQuery<
