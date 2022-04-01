@@ -18,7 +18,7 @@ import {
   Query,
   QueryBsdasArgs,
 } from "generated/graphql/types";
-import React, { useEffect } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
 import initialState from "../../stepper/initial-state";
 
