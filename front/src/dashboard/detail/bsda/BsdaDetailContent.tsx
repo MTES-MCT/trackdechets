@@ -355,6 +355,9 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
 
             <dt>Scellés</dt>
             <dd>{form?.waste?.sealNumbers?.join(", ")}</dd>
+
+            <dt>Présence de POP</dt>
+            <dd>{form?.waste?.pop ? "Oui" : "Non"}</dd>
           </div>
 
           <div className={styles.detailGrid}>
