@@ -507,7 +507,10 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
               .nullable(),
           otherwise: schema =>
             schema
-              .oneOf([null, ...OPERATIONS])
+              .oneOf(
+                [null, ...OPERATIONS],
+                "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
+              )
               .requiredIf(
                 context.operationSignature,
                 `Entreprise de destination: vous devez préciser le code d'opération réalisé`
