@@ -15,7 +15,8 @@ jest.mock("../../../vat", () => ({
 
 const companyMock = jest.fn();
 jest.mock("../../../../prisma", () => ({
-  company: { findUnique: jest.fn((...args) => companyMock(...args)) }
+  company: { findUnique: jest.fn((...args) => companyMock(...args)) },
+  anonymousCompany: { findUnique: jest.fn(() => null) }
 }));
 
 const installationMock = jest.fn();
@@ -39,6 +40,7 @@ describe("companyInfos with SIRET", () => {
     try {
       await getCompanyInfos("85001946400014");
     } catch (e) {
+      console.log(e);
       expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
     }
   });
