@@ -100,7 +100,7 @@
     "passport-oauth2-client-password": "^0.1.2",
     "pg": "^8.5.1",
     "postgres-migrations": "^5.1.0",
-    "prisma": "^3.2.1",
+    "prisma": "dev",
     "qrcode": "^1.4.4",
     "rate-limit-redis": "^2.1.0",
     "react": "^17.0.2",
