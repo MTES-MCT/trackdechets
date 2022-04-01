@@ -36,8 +36,8 @@ export function DeleteModal({
       cogoToast.success("Bordereau supprimé", { hideAfter: 5 });
       !!onClose && onClose();
     },
-    onError: () =>
-      cogoToast.error("Le bordereau n'a pas pu être supprimé", {
+    onError: error =>
+      cogoToast.error(error.message, {
         hideAfter: 5,
       }),
   });

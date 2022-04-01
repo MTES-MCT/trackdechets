@@ -9,3 +9,9 @@ export type GraphQLContext = ExpressContext & {
   user: Express.User | null;
   dataloaders: AppDataloaders;
 };
+
+declare module "express-session" {
+  interface SessionData {
+    warningMessage?: string;
+  }
+}

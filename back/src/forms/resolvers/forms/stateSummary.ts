@@ -139,7 +139,7 @@ export async function getStateSummary(form: Form) {
       temporaryStorageDetail?.transporterNumberPlate ??
       form.transporter?.numberPlate,
     transporterCustomInfo:
-      temporaryStorageDetail?.transporterNumberPlate ??
+      temporaryStorageDetail?.transporterCustomInfo ??
       form.transporter?.customInfo,
     transporter: getTransporter(form, temporaryStorageDetail),
     recipient: getRecipient(form, temporaryStorageDetail),

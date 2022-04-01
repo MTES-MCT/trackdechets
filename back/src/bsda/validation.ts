@@ -481,7 +481,10 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         .when(
           "destinationReceptionAcceptationStatus",
           (acceptationStatus, schema) =>
-            acceptationStatus === WasteAcceptationStatus.REFUSED
+            [
+              WasteAcceptationStatus.REFUSED,
+              WasteAcceptationStatus.PARTIALLY_REFUSED
+            ].includes(acceptationStatus)
               ? schema.ensure().required("Vous devez saisir un motif de refus")
               : schema
                   .ensure()

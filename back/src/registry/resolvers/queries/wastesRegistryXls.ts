@@ -43,6 +43,7 @@ export const wastesRegistryXlsDownloadHandler: DownloadHandler<QueryWastesRegist
           // write headers if not present
           worksheet.columns = getXlsxHeaders(waste);
         }
+
         worksheet.addRow(waste, "n").commit();
       });
 

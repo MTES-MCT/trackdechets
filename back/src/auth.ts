@@ -62,6 +62,8 @@ export const getLoginError = (username: string) => ({
   }
 });
 
+export const ADMIN_IS_PERSONIFYING = "ADMIN_IS_PERSONIFYING";
+
 passport.use(
   new LocalStrategy(
     { usernameField: "email", passReqToCallback: true },
@@ -75,18 +77,25 @@ passport.use(
           ...getLoginError(username).UNKNOWN_USER
         });
       }
+
       if (!user.isActive) {
         return done(null, false, {
           ...getLoginError(username).NOT_ACTIVATED
         });
       }
+
       const passwordValid = await compare(password, user.password);
-      if (!passwordValid && !req.user?.isAdmin) {
-        return done(null, false, {
-          ...getLoginError(username).INVALID_PASSWORD
-        });
+      if (passwordValid) {
+        return done(null, user);
       }
-      return done(null, user);
+
+      if (req.user?.isAdmin) {
+        return done(null, user, { message: ADMIN_IS_PERSONIFYING });
+      }
+
+      return done(null, false, {
+        ...getLoginError(username).INVALID_PASSWORD
+      });
     }
   )
 );

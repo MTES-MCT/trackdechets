@@ -29,4 +29,11 @@ type Query {
   Vérifie la validité d'un lien de changement de mot de passe par son hash
   """
   passwordResetRequest(hash: String!): ID
+
+  """
+  USAGE INTERNE
+  Message d'avertissement à afficher à l'utilisateur.
+  Par exemple lorsqu'un administrateur personnifie un compte utilisateur.
+  """
+  warningMessage: String
 }

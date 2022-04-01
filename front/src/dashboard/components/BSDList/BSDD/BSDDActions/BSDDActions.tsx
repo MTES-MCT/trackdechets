@@ -39,6 +39,19 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
   });
   const [isDeleting, setIsDeleting] = React.useState(false);
 
+  let canDeleteAndUpdate = [FormStatus.Draft, FormStatus.Sealed].includes(
+    form.status
+  );
+  if (form.status === FormStatus.SignedByProducer) {
+    // if the bsd is only signed by the emitter, they can still update/delete it
+    // so if it's signed by the emitter, they can do it but not the eco organisme
+    // if it's signed by the eco organisme, they can do it but not the emitter
+    const signedBySiret = form.emittedByEcoOrganisme
+      ? form.ecoOrganisme?.siret
+      : form.emitter?.company?.siret;
+    canDeleteAndUpdate = siret === signedBySiret;
+  }
+
   return (
     <>
       <Menu>
@@ -77,7 +90,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                   Pdf
                 </MenuItem>
               )}
-              {[FormStatus.Draft, FormStatus.Sealed].includes(form.status) && (
+              {canDeleteAndUpdate && (
                 <>
                   <MenuItem onSelect={() => setIsDeleting(true)}>
                     <IconTrash color="blueLight" size="24px" />

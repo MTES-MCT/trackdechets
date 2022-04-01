@@ -177,14 +177,14 @@ describe("Query.bsds workflow", () => {
       await refreshElasticSearch();
     });
 
-    it("should list the emitter's follow bsds", async () => {
+    it("should list the emitter's for action bsds", async () => {
       const { query } = makeClient(transporter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
         {
           variables: {
             where: {
-              isFollowFor: [emitter.company.siret]
+              isForActionFor: [emitter.company.siret]
             }
           }
         }

@@ -1,0 +1,10 @@
+mutation SignEmissionForm(
+  $id: ID!
+  $input: SignEmissionFormInput!
+  $securityCode: Int
+) {
+  signEmissionForm(id: $id, input: $input, securityCode: $securityCode) {
+    id
+    status
+  }
+}

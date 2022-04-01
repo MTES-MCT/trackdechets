@@ -33,6 +33,8 @@ interface CompanySelectorProps {
   name: string;
   onCompanySelected?: (company: CompanyFavorite) => void;
   allowForeignCompanies?: boolean;
+  // whether to display a vat searchbar when allowForeignCompanies==true
+  displayVatSearch?: boolean;
   registeredOnlyCompanies?: boolean;
   heading?: string;
   disabled?: boolean;
@@ -43,6 +45,7 @@ export default function CompanySelector({
   name,
   onCompanySelected,
   allowForeignCompanies,
+  displayVatSearch = true,
   registeredOnlyCompanies = false,
   heading,
   disabled,
@@ -318,69 +321,72 @@ export default function CompanySelector({
         <div className="form__row">
           {isForeignCompany && (
             <>
-              <Formik
-                initialValues={{ siret: "" }}
-                validate={values => {
-                  const isValidSiret = isSiret(values.siret);
-                  const isValidVat = isVat(values.siret);
-                  if (isValidSiret) {
-                    return {
-                      siret:
-                        "Vous devez entrer un numéro de TVA intra-communautaire hors-France",
-                    };
-                  } else if (isValidVat && isFRVat(values.siret)) {
-                    return {
-                      siret:
-                        "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et non son numéro de TVA",
-                    };
-                  } else if (!isValidVat) {
-                    return {
-                      siret:
-                        "Vous devez entrer un numéro TVA intra-communautaire valide",
-                    };
-                  }
-                }}
-                onSubmit={values => {
-                  // reset company infos
-                  setCompanyInfos(null);
-                  searchCompany({
-                    variables: { siret: values.siret },
-                  });
-                }}
-              >
-                {({ setFieldValue }) => (
-                  <Form className={styles.companyForeignSelectorForm}>
-                    <div className={styles.field}>
-                      <label className={`text-right ${styles.bold}`}>
-                        Numéro TVA pour un transporteur de l'UE hors-France
-                      </label>
-                      <div className={styles.field__value}>
-                        <Field
-                          name="siret"
-                          component={AutoFormattingCompanyInfosInput}
-                          onChange={e => {
-                            setFieldValue("siret", e.target.value);
-                          }}
-                          disabled={isDisabled}
-                        />
-                        {!isRegistered && (
-                          <p className="error-message">
-                            Cet établissement n'est pas inscrit sur Trackdéchets
-                          </p>
-                        )}
-                        <RedErrorMessage name="siret" />
-                        <button
-                          disabled={loading}
-                          className="btn btn--primary tw-mt-2 tw-ml-1"
-                          type="submit"
-                        >
-                          {loading ? "Chargement..." : "Chercher"}
-                        </button>
+              {displayVatSearch && (
+                <Formik
+                  initialValues={{ siret: "" }}
+                  validate={values => {
+                    const isValidSiret = isSiret(values.siret);
+                    const isValidVat = isVat(values.siret);
+                    if (isValidSiret) {
+                      return {
+                        siret:
+                          "Vous devez entrer un numéro de TVA intra-communautaire hors-France",
+                      };
+                    } else if (isValidVat && isFRVat(values.siret)) {
+                      return {
+                        siret:
+                          "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et non son numéro de TVA",
+                      };
+                    } else if (!isValidVat) {
+                      return {
+                        siret:
+                          "Vous devez entrer un numéro TVA intra-communautaire valide",
+                      };
+                    }
+                  }}
+                  onSubmit={values => {
+                    // reset company infos
+                    setCompanyInfos(null);
+                    searchCompany({
+                      variables: { siret: values.siret },
+                    });
+                  }}
+                >
+                  {({ setFieldValue }) => (
+                    <Form className={styles.companyForeignSelectorForm}>
+                      <div className={styles.field}>
+                        <label className={`text-right ${styles.bold}`}>
+                          Numéro TVA pour un transporteur de l'UE hors-France
+                        </label>
+                        <div className={styles.field__value}>
+                          <Field
+                            name="siret"
+                            component={AutoFormattingCompanyInfosInput}
+                            onChange={e => {
+                              setFieldValue("siret", e.target.value);
+                            }}
+                            disabled={isDisabled}
+                          />
+                          {!isRegistered && (
+                            <p className="error-message">
+                              Cet établissement n'est pas inscrit sur
+                              Trackdéchets
+                            </p>
+                          )}
+                          <RedErrorMessage name="siret" />
+                          <button
+                            disabled={loading}
+                            className="btn btn--primary tw-mt-2 tw-ml-1"
+                            type="submit"
+                          >
+                            {loading ? "Chargement..." : "Chercher"}
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  </Form>
-                )}
-              </Formik>
+                    </Form>
+                  )}
+                </Formik>
+              )}
               <label>
                 Nom de l'entreprise
                 <Field

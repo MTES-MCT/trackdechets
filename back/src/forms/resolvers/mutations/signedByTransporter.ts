@@ -87,9 +87,19 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
         ...(!hasWasteDetailsOverride && wasteDetails),
         temporaryStorageDetail: {
           update: {
+            // The following fields are deprecated but what this mutation used to fill
+            // so we need to continue doing so until the mutation is completely removed
             signedBy: infos.sentBy,
             signedAt: infos.sentAt,
             signedByTransporter: true,
+
+            // The following fields are the new ones that we need to support
+            emittedAt: infos.sentAt,
+            emittedBy: infos.sentBy,
+            takenOverAt: infos.sentAt,
+            // We don't have this information so we're doing our best:
+            takenOverBy: user.name,
+
             ...(hasWasteDetailsOverride && wasteDetails)
           }
         }
@@ -118,9 +128,21 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
     }
 
     const formUpdateInput = {
+      // The following fields are deprecated but what this mutation used to fill
+      // so we need to continue doing so until the mutation is completely removed
       signedByTransporter: true,
       sentAt: infos.sentAt,
       sentBy: infos.sentBy,
+
+      // The following fields are the new ones that we need to support
+      emittedAt: infos.sentAt,
+      emittedBy: infos.sentBy,
+      emittedByEcoOrganisme:
+        args.signingInfo.signatureAuthor === "ECO_ORGANISME",
+      takenOverAt: infos.sentAt,
+      // We don't have this information so we're doing our best:
+      takenOverBy: user.name,
+
       ...wasteDetails,
       currentTransporterSiret: form.transporterCompanySiret
     };
