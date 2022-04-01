@@ -360,8 +360,8 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
           <div className={styles.detailGrid}>
             {Boolean(form?.grouping?.length) && (
               <>
-                <dt>Bordereau groupés:</dt>
-                <dd> {form?.grouping?.join(", ")}</dd>
+                <dt>Bordereaux groupés:</dt>
+                <dd> {form?.grouping?.map(g => g.id).join(", ")}</dd>
               </>
             )}
           </div>
