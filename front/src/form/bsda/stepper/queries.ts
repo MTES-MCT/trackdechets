@@ -51,6 +51,8 @@ export const FullBsdaFragment = gql`
           company {
             ...CompanyFragment
           }
+          cap
+          plannedOperationCode
         }
       }
     }
