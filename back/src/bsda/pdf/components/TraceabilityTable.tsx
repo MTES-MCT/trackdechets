@@ -12,8 +12,8 @@ export function TraceabilityTable({ previousBsdas }: Props) {
           <th>Niveau</th>
           <th>Code déchet</th>
           <th>Dénomination</th>
-          <th>CAP</th>
-          <th>Quantité de déchets (en T)</th>
+          <th>CAP (exutoire)</th>
+          <th>Quantité (en T)</th>
           <th>Date de collecte</th>
         </tr>
       </thead>
@@ -24,7 +24,10 @@ export function TraceabilityTable({ previousBsdas }: Props) {
             <td>{bsda?.type === "OTHER_COLLECTIONS" ? 1 : 2}</td>
             <td>{bsda?.waste?.code}</td>
             <td>{bsda?.waste?.materialName}</td>
-            <td>{bsda?.destination?.cap}</td>
+            <td>
+              {bsda?.destination?.operation?.nextDestination?.cap ??
+                bsda?.destination?.cap}
+            </td>
             <td>{bsda?.destination?.reception?.weight}</td>
             <td>{formatDate(bsda?.transporter?.transport?.takenOverAt)}</td>
           </tr>

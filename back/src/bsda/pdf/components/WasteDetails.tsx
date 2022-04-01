@@ -22,15 +22,11 @@ export function WasteDetails({ waste, packagings, weight }: Props) {
       <p>
         Consistance : {waste?.consistence ? CONSISTANCE[waste.consistence] : ""}
         <br />
-        Total conditionnements : {packagings?.length ?? 0}
-        <br />
         Quantité en tonnes : {weight?.value}{" "}
-        <input type="checkbox" checked={weight.isEstimate} readOnly /> Réelle
+        <input type="checkbox" checked={!weight.isEstimate} readOnly /> Réelle
         <br />
-        <input type="checkbox" checked={!weight.isEstimate} readOnly /> Estimée
-        
+        <input type="checkbox" checked={weight.isEstimate} readOnly /> Estimée
       </p>
-      <p>Détail Conditionnement/nombre : {}</p>
     </>
   );
 }

@@ -1,5 +1,9 @@
 import React from "react";
-import { Document, formatDate } from "../../../common/pdf";
+import {
+  Document,
+  formatDate,
+  TRANSPORT_MODE_LABELS
+} from "../../../common/pdf";
 import { Bsda } from "../../../generated/graphql/types";
 import { CompanyContact, CompanyDescription } from "./Company";
 import { PickupSite } from "./PickupSite";
@@ -135,6 +139,14 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
           </div>
           <div className="BoxCol">
             <p>
+              Total type de conditionnements : {bsda?.packagings?.length ?? 0}
+              <br />
+              Total colis :{" "}
+              {bsda?.packagings?.reduce((cur, p) => cur + p.quantity, 0)}
+              <br />
+              Détail Conditionnement/nombre :
+            </p>
+            <p>
               {bsda?.packagings
                 ?.map(
                   p =>
@@ -198,6 +210,8 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
                   bsda?.destination?.operation?.nextDestination
                     ?.plannedOperationCode
                 }
+                {" - "}
+                CAP : {bsda?.destination?.operation?.nextDestination?.cap}
               </p>
             </div>
           </div>
@@ -254,7 +268,10 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
               <Recepisse recepisse={bsda?.transporter?.recepisse} />
             )}
             <br />
-            Mode de transport : {bsda?.transporter?.transport?.mode}
+            Mode de transport :{" "}
+            {bsda?.transporter?.transport?.mode
+              ? TRANSPORT_MODE_LABELS[bsda?.transporter?.transport?.mode]
+              : ""}
             <br />
             Immatriculations: {bsda?.transporter?.transport?.plates?.join(", ")}
             <br />
@@ -304,9 +321,6 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
               <br />
               Quantité réelle acceptée : {bsda?.destination?.reception?.weight}
               <br />
-              Quantité refusée (le cas échéant) :{" "}
-              {bsda?.destination?.reception?.weight}
-              <br />
               Motif de refus (le cas échéant) :{" "}
               {bsda?.destination?.reception?.refusalReason}
             </p>
@@ -339,6 +353,7 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
               readOnly
             />{" "}
             groupement de déchets (rassemblement de déchets d’amiante)
+            {"  "}
             <input
               type="checkbox"
               checked={bsda.type === "RESHIPMENT"}
