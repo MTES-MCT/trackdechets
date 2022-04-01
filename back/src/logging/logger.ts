@@ -8,7 +8,6 @@ const logger = createLogger({
   exitOnError: false,
   format: format.combine(
     format.errors({ stack: true }),
-    format.metadata({ fillExcept: ["level", "message", "dd"] }), // `dd` enable connecting logs & traces
     format.json()
   ),
   transports: [new transports.File({ filename: LOG_PATH })]
