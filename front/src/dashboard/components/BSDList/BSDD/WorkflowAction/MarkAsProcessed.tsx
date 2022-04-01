@@ -60,6 +60,16 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
       if (noTraceability == null) {
         setFieldValue("noTraceability", false);
       }
+      if (noTraceability === true && nextDestination?.company?.siret?.length) {
+        setFieldValue("nextDestination.company", {
+          siret: "",
+          name: "",
+          address: "",
+          contact: "",
+          mail: "",
+          phone: "",
+        });
+      }
     } else {
       setFieldValue("nextDestination", null);
       setFieldValue("noTraceability", null);
@@ -170,7 +180,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
             name="nextDestination.company"
             allowForeignCompanies={true}
             displayVatSearch={false}
-            skipFavorite={true}
+            skipFavorite={noTraceability === true}
           />
         </div>
       )}
