@@ -47,9 +47,7 @@ export function BsdaPicker({ name, code, bsdaId }: Props) {
 
   const isForwardingPicker = name === "forwarding";
 
-  function onGroupingChange(bsdas: Bsda[]) {
-    const groupedBsdas = bsdas.filter(bsda => grouping?.includes(bsda.id));
-
+  function onGroupingChange(groupedBsdas: Bsda[]) {
     setFieldValue(
       "weight.value",
       groupedBsdas?.reduce(
@@ -138,10 +136,16 @@ export function BsdaPicker({ name, code, bsdaId }: Props) {
 
             if (isSelected) {
               remove(clickedBsdaIndex);
-              return;
+              onGroupingChange(
+                bsdas.filter(b => grouping?.includes(b.id) && b.id !== bsda.id)
+              );
+            } else {
+              push(bsda.id);
+              onGroupingChange([
+                ...bsdas.filter(b => grouping?.includes(b.id)),
+                bsda,
+              ]);
             }
-            push(bsda.id);
-            onGroupingChange(bsdas);
           }}
           isSelected={bsda => grouping!.findIndex(id => id === bsda.id) >= 0}
           bsdas={bsdas}
