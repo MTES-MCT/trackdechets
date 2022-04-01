@@ -15,7 +15,8 @@ jest.mock("../../../vat", () => ({
 
 const companyMock = jest.fn();
 jest.mock("../../../../prisma", () => ({
-  company: { findUnique: jest.fn((...args) => companyMock(...args)) }
+  company: { findUnique: jest.fn((...args) => companyMock(...args)) },
+  anonymousCompany: { findUnique: jest.fn(() => null) }
 }));
 
 const installationMock = jest.fn();
@@ -32,7 +33,9 @@ describe("companyInfos with SIRET", () => {
   });
 
   it("should throw NOT_FOUND error if the siret is not in sirene database", async () => {
-    searchCompanyMock.mockResolvedValueOnce({ siret: "" });
+    searchCompanyMock.mockRejectedValueOnce(
+      new UserInputError("Siret not found")
+    );
     expect.assertions(1);
     try {
       await getCompanyInfos("85001946400014");

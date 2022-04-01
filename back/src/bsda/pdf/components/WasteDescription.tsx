@@ -16,6 +16,8 @@ export function WasteDescription({ waste }: Props) {
         Code famille : {waste?.familyCode}
         <br />
         Nom du matériau : {waste?.materialName}
+        <br />
+        Présence de POP : {waste?.pop ? "Oui" : "Non"}
       </p>
     </>
   );

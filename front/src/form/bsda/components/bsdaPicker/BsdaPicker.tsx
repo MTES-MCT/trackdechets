@@ -18,14 +18,17 @@ import {
   Query,
   QueryBsdasArgs,
 } from "generated/graphql/types";
-import React, { useEffect } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
 import initialState from "../../stepper/initial-state";
 
-type Props = { name: string; code: string; bsdaId: string };
+type Props = { name: string; bsdaId: string };
 
-export function BsdaPicker({ name, code, bsdaId }: Props) {
+export function BsdaPicker({ name, bsdaId }: Props) {
   const { siret } = useParams<{ siret: string }>();
+
+  const codeFilter =
+    name === "grouping" ? { _in: ["D 13", "R 12"] } : { _eq: "D 15" };
   const { data } = useQuery<Pick<Query, "bsdas">, QueryBsdasArgs>(GET_BSDAS, {
     variables: {
       where: {
@@ -33,7 +36,7 @@ export function BsdaPicker({ name, code, bsdaId }: Props) {
         _or: [{ groupedIn: { _eq: null } }, { groupedIn: { _eq: bsdaId } }],
         forwardedIn: { _eq: null },
         destination: {
-          operation: { code: { _eq: code } },
+          operation: { code: codeFilter },
           company: { siret: { _eq: siret } },
         },
       },
@@ -47,9 +50,7 @@ export function BsdaPicker({ name, code, bsdaId }: Props) {
 
   const isForwardingPicker = name === "forwarding";
 
-  function onGroupingChange(bsdas: Bsda[]) {
-    const groupedBsdas = bsdas.filter(bsda => grouping?.includes(bsda.id));
-
+  function onGroupingChange(groupedBsdas: Bsda[]) {
     setFieldValue(
       "weight.value",
       groupedBsdas?.reduce(
@@ -138,10 +139,16 @@ export function BsdaPicker({ name, code, bsdaId }: Props) {
 
             if (isSelected) {
               remove(clickedBsdaIndex);
-              return;
+              onGroupingChange(
+                bsdas.filter(b => grouping?.includes(b.id) && b.id !== bsda.id)
+              );
+            } else {
+              push(bsda.id);
+              onGroupingChange([
+                ...bsdas.filter(b => grouping?.includes(b.id)),
+                bsda,
+              ]);
             }
-            push(bsda.id);
-            onGroupingChange(bsdas);
           }}
           isSelected={bsda => grouping!.findIndex(id => id === bsda.id) >= 0}
           bsdas={bsdas}

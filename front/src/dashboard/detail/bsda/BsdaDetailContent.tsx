@@ -355,13 +355,16 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
 
             <dt>Scellés</dt>
             <dd>{form?.waste?.sealNumbers?.join(", ")}</dd>
+
+            <dt>Présence de POP</dt>
+            <dd>{form?.waste?.pop ? "Oui" : "Non"}</dd>
           </div>
 
           <div className={styles.detailGrid}>
             {Boolean(form?.grouping?.length) && (
               <>
-                <dt>Bordereau groupés:</dt>
-                <dd> {form?.grouping?.join(", ")}</dd>
+                <dt>Bordereaux groupés:</dt>
+                <dd> {form?.grouping?.map(g => g.id).join(", ")}</dd>
               </>
             )}
           </div>

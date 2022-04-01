@@ -19,14 +19,13 @@ export default async function deleteBsda(
 
   const deletedBsda = await prisma.bsda.update({
     where: { id },
-    data: { isDeleted: true }
+    data: { isDeleted: true, forwardingId: null }
   });
 
   await prisma.bsda.updateMany({
-    where: { OR: [{ forwardedIn: { id } }, { groupedInId: id }] },
+    where: { groupedInId: id },
     data: {
-      groupedInId: null,
-      forwardingId: { set: null }
+      groupedInId: null
     }
   });
 

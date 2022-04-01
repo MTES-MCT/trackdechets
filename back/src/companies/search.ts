@@ -4,12 +4,14 @@ import decoratedSearchCompanies from "./sirene/searchCompanies";
 import { UserInputError } from "apollo-server-express";
 import { CompanySearchResult } from "./types";
 import { searchVat } from "./vat";
-import { convertUrls, getInstallation } from "./database";
+import { convertUrls } from "./database";
 import {
   isSiret,
   isVat,
   isFRVat
 } from "../common/constants/companySearchHelpers";
+import { SireneSearchResult } from "./sirene/types";
+import { CompanyVatSearchResult } from "./vat/vies/types";
 
 const SIRET_OR_VAT_ERROR =
   "Il est obligatoire de rechercher soit avec un SIRET de 14 caractères soit avec un numéro de TVA intracommunautaire valide";
@@ -27,62 +29,14 @@ export async function searchCompany(
       invalidArgs: ["clue"]
     });
   }
-  // Pre-validate VAT without querying searchVat(VIES)
-  const isValidVat = isVat(cleanClue);
-  const isValidSiret = isSiret(cleanClue);
 
-  if (!isValidSiret && !isValidVat) {
-    throw new UserInputError(SIRET_OR_VAT_ERROR, {
-      invalidArgs: ["clue"]
-    });
-  }
+  const companyInfo = await getCompanyInfo(cleanClue);
 
-  let companyInfo: Partial<CompanySearchResult> = {};
-  if (isValidSiret) {
-    try {
-      companyInfo = {
-        ...companyInfo,
-        ...(await decoratedSearchCompany(cleanClue))
-      };
-    } catch (err) {
-      // The SIRET was not found in public data
-      // Try searching the companies with restricted access
-      const anonymousCompany = await prisma.anonymousCompany.findUnique({
-        where: { siret: clue }
-      });
-      if (anonymousCompany) {
-        return {
-          ...anonymousCompany,
-          etatAdministratif: "A",
-          naf: anonymousCompany.codeNaf,
-          addressVoie: "",
-          addressCity: "",
-          addressPostalCode: "",
-          isRegistered: true
-        };
-      }
-      throw err;
-    }
-  } else if (isValidVat) {
-    if (isFRVat(cleanClue)) {
-      throw new UserInputError(
-        "Une entreprise française doit être identifiée par son SIRET et pas par sa TVA intracommunautaire",
-        {
-          invalidArgs: ["clue"]
-        }
-      );
-    }
-    // retrieve info from VIES API or throws an error
-    companyInfo = {
-      ...companyInfo,
-      ...(await searchVat(cleanClue))
-    };
-  }
   // retrieves trackdechets public CompanyInfo
   // it might be null if the company is not registered in TD
   const where = {
-    ...(isValidSiret && { where: { siret: cleanClue } }),
-    ...(isValidVat && { where: { vatNumber: cleanClue } })
+    ...(isSiret(cleanClue) && { where: { siret: cleanClue } }),
+    ...(isVat(cleanClue) && { where: { vatNumber: cleanClue } })
   };
   const trackdechetsCompanyInfo = await prisma.company.findUnique({
     ...where,
@@ -99,38 +53,14 @@ export async function searchCompany(
     }
   });
 
-  const isRegistered = !!trackdechetsCompanyInfo;
-  const companyIcpeInfo = {
-    installation: await getInstallation(cleanClue)
-  };
-
-  if (!companyInfo.siret && isValidSiret) {
-    throw new UserInputError("Cet établissement n'existe pas", {
-      invalidArgs: ["clue"]
-    });
-  }
-
-  if (!companyInfo.vatNumber && isValidVat) {
-    throw new UserInputError(
-      "Ce numéro de TVA intracommunautaire n'existe pas. Veuillez nous contacter à l'adresse hello@trackdechets.beta.gouv.fr avec un justificatif légal du pays d'origine.",
-      {
-        invalidArgs: ["clue"]
-      }
-    );
-  }
-
   return {
     // ensure compatibility with CompanyPublic
     ecoOrganismeAgreements: [],
-    ...companyIcpeInfo,
+    isRegistered: trackdechetsCompanyInfo != null,
+    companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
     ...companyInfo,
-    ...convertUrls({
-      ...trackdechetsCompanyInfo,
-      // ensure compatibility with CompanyPublic
-      companyTypes: isRegistered ? trackdechetsCompanyInfo.companyTypes : []
-    }),
-    isRegistered
-  } as CompanySearchResult;
+    ...convertUrls(trackdechetsCompanyInfo)
+  };
 }
 
 interface SearchCompaniesDeps {
@@ -156,3 +86,47 @@ export const makeSearchCompanies =
 // use dependency injection here to easily mock `searchCompany`
 // in index.test.ts
 export const searchCompanies = makeSearchCompanies({ searchCompany });
+
+function getCompanyInfo(
+  clue: string
+): Promise<SireneSearchResult | CompanyVatSearchResult> {
+  if (isSiret(clue)) return getSiretCompanyInfo(clue);
+  if (isVat(clue)) return getVatCompanyInfo(clue);
+
+  throw new UserInputError(SIRET_OR_VAT_ERROR, {
+    invalidArgs: ["clue"]
+  });
+}
+
+async function getSiretCompanyInfo(siret: string): Promise<SireneSearchResult> {
+  try {
+    return await decoratedSearchCompany(siret);
+  } catch (err) {
+    // The SIRET was not found in public data
+    // Try searching the companies with restricted access
+    const anonymousCompany = await prisma.anonymousCompany.findUnique({
+      where: { siret }
+    });
+    if (anonymousCompany) {
+      return {
+        ...anonymousCompany,
+        etatAdministratif: "A",
+        naf: anonymousCompany.codeNaf
+      };
+    }
+    throw err;
+  }
+}
+
+function getVatCompanyInfo(vatNumber: string): Promise<CompanyVatSearchResult> {
+  if (isFRVat(vatNumber)) {
+    throw new UserInputError(
+      "Une entreprise française doit être identifiée par son SIRET et pas par sa TVA intracommunautaire",
+      {
+        invalidArgs: ["clue"]
+      }
+    );
+  }
+
+  return searchVat(vatNumber);
+}

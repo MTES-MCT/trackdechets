@@ -3,6 +3,7 @@ import {
   CompanyPublic,
   QueryResolvers
 } from "../../../generated/graphql/types";
+import { getInstallation } from "../../database";
 import { searchCompany } from "../../search";
 
 /**
@@ -28,7 +29,7 @@ export async function getCompanyInfos(
   return {
     ...searchResult,
     ecoOrganismeAgreements: searchResult.ecoOrganismeAgreements ?? [],
-    companyTypes: searchResult.companyTypes ?? []
+    installation: await getInstallation(siretOrVat)
   };
 }
 

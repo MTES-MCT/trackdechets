@@ -72,6 +72,7 @@ type Destination = Pick<
   | "destinationReceptionRefusalReason"
   | "destinationOperationCode"
   | "destinationOperationDate"
+  | "destinationOperationNextDestinationCap"
 >;
 
 type Transporter = Pick<
@@ -506,7 +507,10 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
               .nullable(),
           otherwise: schema =>
             schema
-              .oneOf([null, ...OPERATIONS])
+              .oneOf(
+                [null, ...OPERATIONS],
+                "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
+              )
               .requiredIf(
                 context.operationSignature,
                 `Entreprise de destination: vous devez préciser le code d'opération réalisé`
@@ -519,18 +523,35 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
           then: schema => schema.nullable(),
           otherwise: schema =>
             schema
-              .max(new Date())
+              .max(
+                new Date(),
+                "La date d'opération doit être antérieure au moment présent"
+              )
               .when(
                 "destinationReceptionDate",
                 (destinationReceptionDate, schema) =>
                   destinationReceptionDate
-                    ? schema.min(destinationReceptionDate)
+                    ? schema.min(
+                        destinationReceptionDate,
+                        "La date d'opération doit être postérieure à la date de réception"
+                      )
                     : schema
               )
               .requiredIf(
                 context.operationSignature,
                 `Entreprise de destination: vous devez préciser la date d'opération`
               ) as any
+        }),
+      destinationOperationNextDestinationCap: yup
+        .string()
+        .when("destinationOperationNextDestinationCompanySiret", {
+          is: value => Boolean(value),
+          then: schema =>
+            schema.requiredIf(
+              context.emissionSignature,
+              `Entreprise de destination ultérieure prévue: CAP obligatoire`
+            ),
+          otherwise: schema => schema.nullable()
         })
     });
 

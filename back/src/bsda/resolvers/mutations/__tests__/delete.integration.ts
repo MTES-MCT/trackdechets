@@ -4,6 +4,7 @@ import {
   Mutation,
   MutationDeleteBsdaArgs
 } from "../../../../generated/graphql/types";
+import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../__tests__/factories";
@@ -151,5 +152,38 @@ describe("Mutation.deleteBsda", () => {
         message: `Seuls les bordereaux en brouillon ou n'ayant pas encore été signés peuvent être supprimés`
       })
     ]);
+  });
+
+  it("should remove forwardedIn link to deleted BSDA", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const forwardedBsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: company.siret
+      }
+    });
+    const forwardingBsda = await bsdaFactory({
+      opt: {
+        forwarding: { connect: { id: forwardedBsda.id } },
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "deleteBsda">,
+      MutationDeleteBsdaArgs
+    >(DELETE_BSDA, {
+      variables: {
+        id: forwardingBsda.id
+      }
+    });
+
+    expect(data.deleteBsda.id).toBeTruthy();
+
+    const updatedForwarded = await prisma.bsda.findUnique({
+      where: { id: forwardedBsda.id },
+      include: { forwarding: true }
+    });
+    expect(updatedForwarded.forwarding).toBe(null);
   });
 });

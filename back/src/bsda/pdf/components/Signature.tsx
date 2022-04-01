@@ -10,7 +10,7 @@ export function Signature({ signature }: Props) {
     <>
       <p>
         Je soussigné {signature?.author} certifie que les renseignements portés
-        dans les cades ci-dessus sont exacts et de bonne foi.
+        dans les cadres ci-dessus sont exacts et de bonne foi.
       </p>
       <p>
         <span className="Row">
