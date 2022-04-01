@@ -192,6 +192,7 @@ function toBsdElastic(form: FullForm): BsdElastic {
     type: "BSDD",
     id: form.id,
     readableId: form.readableId,
+    customId: form.customId,
     createdAt: form.createdAt.getTime(),
     emitterCompanyName: form.emitterCompanyName ?? "",
     emitterCompanySiret: form.emitterCompanySiret ?? "",

@@ -9,6 +9,7 @@ function toBsdElastic(bsff: Bsff): BsdElastic {
     type: "BSFF" as const,
     id: bsff.id,
     readableId: bsff.id,
+    customId: "",
     createdAt: bsff.createdAt.getTime(),
     emitterCompanyName: bsff.emitterCompanyName ?? "",
     emitterCompanySiret: bsff.emitterCompanySiret ?? "",

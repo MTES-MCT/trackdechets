@@ -21,7 +21,12 @@ export const COLUMNS: Record<
     Cell: () => <IconBSDD style={{ fontSize: "24px" }} />,
   },
   readableId: {
-    accessor: form => form.readableId,
+    accessor: form => {
+      if (form.customId && form.customId.length) {
+        return `${form.readableId} | ${form.customId}`;
+      }
+      return form.readableId;
+    },
   },
   emitter: {
     accessor: form => form.emitter?.company?.name ?? "",
