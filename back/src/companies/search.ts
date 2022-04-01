@@ -98,15 +98,9 @@ function getCompanyInfo(
   });
 }
 
-function isSireneSearchResult(
-  companyInfo: SireneSearchResult | CompanyVatSearchResult
-): companyInfo is SireneSearchResult {
-  return (companyInfo as SireneSearchResult).siret !== undefined;
-}
-
 async function getSiretCompanyInfo(siret: string): Promise<SireneSearchResult> {
   try {
-    return decoratedSearchCompany(siret);
+    return await decoratedSearchCompany(siret);
   } catch (err) {
     // The SIRET was not found in public data
     // Try searching the companies with restricted access
