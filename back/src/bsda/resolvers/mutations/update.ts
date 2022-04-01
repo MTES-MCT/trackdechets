@@ -24,8 +24,6 @@ export default async function edit(
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  checkKeysEditability(input, existingBsda);
-
   const data = flattenBsdaInput(input);
 
   const resultingForm = { ...existingBsda, ...data };
@@ -59,8 +57,9 @@ export default async function edit(
     );
   }
 
-  const previousBsdas = [forwardedBsda, ...groupedBsdas].filter(Boolean);
+  checkKeysEditability(input, { ...existingBsda, grouping: groupedBsdas });
 
+  const previousBsdas = [forwardedBsda, ...groupedBsdas].filter(Boolean);
   await validateBsda(resultingForm, previousBsdas, {
     emissionSignature: existingBsda.emitterEmissionSignatureAuthor != null,
     workSignature: existingBsda.workerWorkSignatureAuthor != null,
