@@ -86,11 +86,13 @@ export default function BsdaStepsList(props: Props) {
         history.push(redirectTo);
       })
       .catch(err => {
-        err.graphQLErrors.length &&
+        if (err.graphQLErrors?.length) {
           err.graphQLErrors.map(err =>
             cogoToast.error(err.message, { hideAfter: 7 })
           );
-        err.message && cogoToast.error(err.message, { hideAfter: 7 });
+        } else if (err.message) {
+          cogoToast.error(err.message, { hideAfter: 7 });
+        }
       });
   }
 
