@@ -40,7 +40,6 @@ describe("companyInfos with SIRET", () => {
     try {
       await getCompanyInfos("85001946400014");
     } catch (e) {
-      console.log(e);
       expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
     }
   });

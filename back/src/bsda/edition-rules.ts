@@ -76,7 +76,7 @@ function getDiffInput(updates: BsdaInput, currentForm: BsdaWithGrouping) {
   return objectDiff(
     {
       ...prismaForm,
-      grouping: currentForm.grouping.map(g => g.id)
+      grouping: currentForm.grouping?.map(g => g.id)
     },
     updates
   );
