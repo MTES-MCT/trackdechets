@@ -38,7 +38,8 @@ import {
   INVALID_WASTE_CODE,
   INVALID_PROCESSING_OPERATION,
   EXTRANEOUS_NEXT_DESTINATION,
-  MISSING_COMPANY_SIRET_OR_VAT
+  MISSING_COMPANY_SIRET_OR_VAT,
+  MISSING_PROCESSING_OPERATION
 } from "./errors";
 import {
   isVat,
@@ -646,52 +647,69 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
     )
 });
 
-const withNextDestination = yup.object().shape({
-  nextDestinationProcessingOperation: yup
-    .string()
-    .oneOf(
-      PROCESSING_OPERATIONS_CODES,
-      `Destination ultérieure: ${INVALID_PROCESSING_OPERATION}`
+const withNextDestination = (required: boolean) =>
+  yup.object().shape({
+    nextDestinationProcessingOperation: yup
+      .string()
+      .requiredIf(
+        required,
+        `Destination ultérieure : ${MISSING_PROCESSING_OPERATION}`
+      )
+      .oneOf(
+        PROCESSING_OPERATIONS_CODES,
+        `Destination ultérieure : ${INVALID_PROCESSING_OPERATION}`
+      ),
+    nextDestinationCompanyName: yup
+      .string()
+      .ensure()
+      .requiredIf(required, `Destination ultérieure : ${MISSING_COMPANY_NAME}`),
+    nextDestinationCompanySiret: yup
+      .string()
+      .when("nextDestinationCompanyCountry", (country, schema) => {
+        return (country == null || country === "FR") && required
+          ? schema
+              .ensure()
+              .required(
+                `Destination ultérieure prévue : ${MISSING_COMPANY_SIRET}`
+              )
+              .length(
+                14,
+                `Destination ultérieure prévue : ${INVALID_SIRET_LENGTH}`
+              )
+          : schema.notRequired().nullable();
+      }),
+    nextDestinationCompanyAddress: yup
+      .string()
+      .ensure()
+      .requiredIf(
+        required,
+        `Destination ultérieure : ${MISSING_COMPANY_ADDRESS}`
+      ),
+    nextDestinationCompanyCountry: yup.string().oneOf(
+      countries.map(country => country.cca2),
+      "Destination ultérieure : le code ISO 3166-1 alpha-2 du pays de l'entreprise n'est pas reconnu"
     ),
-  nextDestinationCompanyName: yup
-    .string()
-    .ensure()
-    .required(`Destination ultérieure: ${MISSING_COMPANY_NAME}`),
-  nextDestinationCompanySiret: yup
-    .string()
-    .when("nextDestinationCompanyCountry", (country, schema) => {
-      return country == null || country === "FR"
-        ? schema
-            .ensure()
-            .required(`Destination ultérieure prévue: ${MISSING_COMPANY_SIRET}`)
-            .length(
-              14,
-              `Destination ultérieure prévue: ${INVALID_SIRET_LENGTH}`
-            )
-        : schema.notRequired().nullable();
-    }),
-  nextDestinationCompanyAddress: yup
-    .string()
-    .ensure()
-    .required(`Destination ultérieure: ${MISSING_COMPANY_ADDRESS}`),
-  nextDestinationCompanyCountry: yup.string().oneOf(
-    countries.map(country => country.cca2),
-    "Destination ultérieure: le code ISO 3166-1 alpha-2 du pays de l'entreprise n'est pas reconnu"
-  ),
-  nextDestinationCompanyContact: yup
-    .string()
-    .ensure()
-    .required(`Destination ultérieure: ${MISSING_COMPANY_CONTACT}`),
-  nextDestinationCompanyPhone: yup
-    .string()
-    .ensure()
-    .required(`Destination ultérieure: ${MISSING_COMPANY_PHONE}`),
-  nextDestinationCompanyMail: yup
-    .string()
-    .email()
-    .ensure()
-    .required(`Destination ultérieure: ${MISSING_COMPANY_EMAIL}`)
-});
+    nextDestinationCompanyContact: yup
+      .string()
+      .ensure()
+      .requiredIf(
+        required,
+        `Destination ultérieure : ${MISSING_COMPANY_CONTACT}`
+      ),
+    nextDestinationCompanyPhone: yup
+      .string()
+      .ensure()
+      .requiredIf(
+        required,
+        `Destination ultérieure : ${MISSING_COMPANY_PHONE}`
+      ),
+    nextDestinationCompanyMail: yup
+      .string()
+      .email()
+      .ensure()
+      .requiredIf(required, `Destination ultérieure : ${MISSING_COMPANY_EMAIL}`)
+  });
+
 const withoutNextDestination = yup.object().shape({
   nextDestinationProcessingOperation: yup
     .string()
@@ -756,11 +774,24 @@ const processedInfoSchemaFn: (value: any) => yup.SchemaOf<ProcessedInfo> =
       processingOperationDescription: yup.string().nullable()
     });
 
-    return PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-      value?.processingOperationDone
-    )
-      ? base.concat(withNextDestination).concat(traceabilityBreakAllowed)
-      : base.concat(withoutNextDestination).concat(traceabilityBreakForbidden);
+    if (
+      PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
+        value?.processingOperationDone
+      )
+    ) {
+      if (value?.noTraceability === true) {
+        return base
+          .concat(withNextDestination(false))
+          .concat(traceabilityBreakAllowed);
+      }
+      return base
+        .concat(withNextDestination(true))
+        .concat(traceabilityBreakAllowed);
+    } else {
+      return base
+        .concat(withoutNextDestination)
+        .concat(traceabilityBreakForbidden);
+    }
   };
 
 export const processedInfoSchema = yup.lazy(processedInfoSchemaFn);
