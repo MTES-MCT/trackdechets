@@ -5,7 +5,7 @@ import { Bsda, BsdaType, BsdaPickupSite } from "generated/graphql/types";
 import WorkSite from "form/common/components/work-site/WorkSite";
 
 export function Emitter({ disabled }) {
-  const { values } = useFormikContext<Bsda>();
+  const { values, handleChange, setFieldValue } = useFormikContext<Bsda>();
 
   const isValidBsdaSuite =
     [BsdaType.Gathering, BsdaType.Reshipment].includes(
@@ -35,6 +35,10 @@ export function Emitter({ disabled }) {
               type="checkbox"
               name="emitter.isPrivateIndividual"
               className="td-checkbox"
+              onChange={e => {
+                handleChange(e);
+                setFieldValue("emitter.company.siret", null);
+              }}
             />
             Le MO ou le détenteur est un particulier
           </label>
