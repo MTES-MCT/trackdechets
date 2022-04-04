@@ -1,0 +1,8 @@
+init_config:
+instances:
+logs:
+  - type: file
+    path: /app/logs/app.log
+    service: nodejs
+    source: nodejs
+    sourcecategory: sourcecode

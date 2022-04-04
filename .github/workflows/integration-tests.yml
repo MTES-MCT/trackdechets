@@ -10,16 +10,20 @@ jobs:
       fail-fast: false
       matrix:
         chunk: [1, 2, 3, 4]
-    defaults:
-      run:
-        working-directory: back/integration-tests
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.10
+      - run: npm ci
+      - run: npx nx run-many --target=generate --all
       - name: Run integration tests
         env:
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
           TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
+          NODE_OPTIONS: "--max-old-space-size=4096"
 
         run: |
+          cd packages/back/integration-tests
           chmod +x ./run.sh
           ./run.sh -c ${{ matrix.chunk }}-${{ strategy.job-total }}

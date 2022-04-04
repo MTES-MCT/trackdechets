@@ -1,0 +1,29 @@
+import { expandBsdasriFromDB } from "../../converter";
+
+import { MissingIdOrReadableId } from "../../../forms/errors";
+import { QueryResolvers } from "@trackdechets/codegen/src/back.gen";
+import { checkIsAuthenticated } from "../../../common/permissions";
+import { getBsdasriOrNotFound } from "../../database";
+import { checkCanReadBsdasri } from "../../permissions";
+
+function validateArgs(args: any) {
+  if (args.id == null) {
+    throw new MissingIdOrReadableId();
+  }
+
+  return args;
+}
+
+const bsdasriResolver: QueryResolvers["bsdasri"] = async (_, args, context) => {
+  // check query level permissions
+  const user = checkIsAuthenticated(context);
+
+  const validArgs = validateArgs(args);
+
+  const bsdasri = await getBsdasriOrNotFound(validArgs);
+
+  await checkCanReadBsdasri(user, bsdasri);
+  return expandBsdasriFromDB(bsdasri);
+};
+
+export default bsdasriResolver;

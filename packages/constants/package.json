@@ -1,0 +1,25 @@
+{
+  "name": "@trackdechets/constants",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsc",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "jsvat": "^2.5.3"
+  },
+  "author": "",
+  "license": "ISC",
+  "nx": {
+    "targets": {
+      "build": {
+        "outputs": [
+          "packages/constants/.cache",
+          "packages/constants/dist"
+        ]
+      }
+    }
+  }
+}

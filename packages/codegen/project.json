@@ -1,0 +1,6 @@
+{
+  "root": "packages/codegen/",
+  "sourceRoot": "packages/codegen/src",
+  "projectType": "library",
+  "implicitDependencies": ["!back"]
+}

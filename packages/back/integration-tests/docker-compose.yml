@@ -1,0 +1,33 @@
+version: "3"
+services:
+  postgres:
+    image: postgres:13.3-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: no_pass
+
+  redis:
+    image: redis:5.0-alpine
+    restart: always
+    sysctls:
+      - net.core.somaxconn=511
+    ports:
+      - "6380:6379"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.0
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    deploy:
+      placement:
+        constraints:
+          - "node.labels.elasticsearch == true"
+    ports:
+      - "9201:9200"

@@ -1,5 +1,3 @@
-
-
 # Workflow de déploiement
 # Le front et le back ne sont pas inclut dans ce fichier car leur déploiement
 # se fait automatiquement via l'intégration Scalingo <> Github
@@ -47,7 +45,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          node-version: '14.x'
+          node-version: "14.x"
 
       - name: Get yarn cache
         id: yarn-cache

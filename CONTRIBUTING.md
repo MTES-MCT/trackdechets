@@ -25,7 +25,7 @@
 
 ### Pré-requis
 
-1. Installer Node.js
+1. Installer Node.js, ou [Volta](https://volta.sh/)
 2. Installer Docker et Docker Compose
 
 ### Installation
@@ -39,7 +39,7 @@
 2. Configurer les variables d'environnements :
 
    1. Renommer le ficher `.env.model` en `.env` et le compléter en demandant les infos à un développeur de l'équipe
-   2. Créer un fichier `.env` dans `front/` en s'inspirant du fichier `.env.recette`
+   2. Créer un fichier `.env` dans `packages/front/` en s'inspirant du fichier `.env.model`
 
 3. Mapper les différentes URLs sur localhost dans votre fichier `host`
 
@@ -58,39 +58,46 @@
 4. Démarrer les containers
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx elasticsearch kibana
+   docker-compose up -d
    ```
 
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
 
-5. Synchroniser la base de données avec le schéma prisma.
+5. Démarrer les applications
 
-   Les modèles de données sont définis dans les fichiers `back/prisma/schema.prisma`.
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+6. Synchroniser la base de données avec le schéma prisma.
+
+   Les modèles de données sont définis dans les fichiers `packages/back/prisma/schema.prisma`.
    Afin de synchroniser les tables PostgreSQL, il faut lancer une déploiement prisma
 
    ```bash
-   docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
+   cd packages/back
    npx prisma db push --preview-feature
    ```
 
-6. Initialiser l'index Elastic Search.
+7. Initialiser l'index Elastic Search.
 
    Les données sont indexées dans une base de donnée Elastic Search pour la recherche.
    Il est nécessaire de créer l'index et l'alias afin de commencer à indexer des documents.
    À noter que ce script peut aussi être utiliser pour indexer tous les documents en base de donnée.
 
    ```bash
-   docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
+   cd packages/back
    npm run index-elastic-search:dev
    ```
 
-7. Accéder aux différents services.
+8. Accéder aux différents services.
 
    C'est prêt ! Rendez-vous sur l'URL `UI_HOST` configurée dans votre fichier `.env` (par ex: `http://trackdechets.local`) pour commencer à utiliser l'application ou sur `API_HOST` (par ex `http://api.trackdechets.local`) pour accéder au playground GraphQL.
 
 ### Installation alternative sans docker
 
-Vous pouvez également faire tourner l'ensemble des services sans docker. Veillez à utiliser la même version de Node.js que celle spécifiée dans les images Docker. Vous pouvez utiliser [NVM](https://github.com/nvm-sh/nvm) pour changer facilement de version de Node.
+Vous pouvez également faire tourner l'ensemble des services sans docker. Veillez à utiliser la même version de Node.js que celle spécifiée dans les images Docker. Vous pouvez utiliser [NVM](https://github.com/nvm-sh/nvm) pour changer facilement de version de Node, ou si vous utilisez [Volta](https://volta.sh/) la bonne version sera automatiquement utilsée.
 
 1. Démarrer `postgres`, `redis`, et `nginx` sur votre machine hôte. Pour la configuration `nginx` vous pouvez vous inspirer du fichier `nginx/templates/default.conf.template`.
 
@@ -105,8 +112,8 @@ ln -s /path/to/trackdechets/.env /path/to/trackdechets/back/.env
 3. Démarrer l'API
 
 ```bash
-cd back
 npm install
+cd back
 npm run dev
 ```
 
@@ -191,7 +198,6 @@ Note : l'équipe n'a pas de conventions strictes concernant le nom des branches 
 Le déploiement est géré par Scalingo à l'aide des fichiers de configuration `Procfile` et `.buildpacks` placés dans le front et l'api.
 Chaque update de la branche `dev` déclenche un déploiement sur l'environnement de recette. Chaque update de la branche `master` déclenche un déploiement sur les environnements sandbox et prod. Le déroulement dans le détails d'une mise en production est le suivant:
 
-
 1. Faire le cahier de recette pour vérifier qu'il n'y a pas eu de régression sur les fonctionnalités critiques de l'application (login, signup, rattachement établissement, invitation collaborateur, création BSD)
 2. Balayer le tableau [Favro "Recette du xx/xx/xx"](https://favro.com/organization/ab14a4f0460a99a9d64d4945/02f1ec52bd91efc0adb3c38b) pour vérifier que l'étiquette "Recette OK --> EN PROD" a bien été ajoutée sur toutes les cartes.
 3. Mettre à jour le [Changelog.md](./Changelog.md) avec un nouveau numéro de version (versionnage calendaire)
@@ -200,9 +206,8 @@ Chaque update de la branche `dev` déclenche un déploiement sur l'environnement
 6. Faire une relecture des différents changements apportés aux modèles de données et scripts de migration.
 7. Si possible faire tourner les migrations sur une copie de la base de prod en local.
 8. S'assurer que les nouvelles variables d'environnement (Cf `.env.model`) ont bien été ajoutée sur Scalingo dans les environnements sandbox et prod respectivement pour les applications `front` et `api`
-9.  Merger la PR et suivre l'avancement de la CI github.
+9. Merger la PR et suivre l'avancement de la CI github.
 10. Suivre l'avancement du déploiement sur Scalingo respectivement pour le front, l'api et la doc.
-
 
 ## Migrations
 

@@ -3,66 +3,30 @@ name: Build & Test
 on: pull_request
 
 jobs:
-  front:
+  main:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: front
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup Node
-        uses: actions/setup-node@v2.1.2
+      - uses: actions/checkout@v3
         with:
-          node-version: "14.x"
-      - uses: actions/cache@v2
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Install dependencies
-        run: npm ci
-      - name: Generate files
-        run: npm run generate
-      - name: Run linter
-        run: npm run lint
-      - name: Run typecheck
-        run: npm run types
-      - name: Run tests
-        run: npm test
+          node-version: 16.10
+      - uses: nrwl/nx-set-shas@v2
+        with:
+          main-branch-name: "master"
+      - run: npm ci
+      - run: npx nx run-many --target=generate --all
 
-  back:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: back
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup Node
-        uses: actions/setup-node@v2.1.2
-        with:
-          node-version: "14.x"
-      - uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Install dependencies
-        run: npm ci
-      - name: Generate files
-        run: npm run generate
-      - name: Run linter
-        run: npm run lint
-      - name: Run typecheck
-        run: npm run types
-      - name: Check migrations
-        run: npm run check:migrations
-      - name: Run tests
-        run: npm test -- --forceExit
+      - run: npx nx workspace-lint
+      - run: npx nx format:check
+      - run: npx nx affected --target=lint --parallel=3
+      - run: npx nx affected --target=test --parallel=3 --ci --code-coverage
         env:
           JWT_SECRET: "xxx"
           EMAIL_BACKEND: "console"
+          MJ_APIKEY_PUBLIC: "*********"
+          MJ_APIKEY_PRIVATE: "*********"
           SIB_BASE_URL: "http://mailservice"
           MAIN_TEMPLATE_ID: "9"
           ONBOARDING_TEMPLATE_ID: "8"
@@ -73,19 +37,6 @@ jobs:
           TD_COMPANY_ELASTICSEARCH_INDEX: "stocketablissement-production"
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
           TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
-
-
-  doc:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: doc
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: "14.x"
-      - name: Test Build
-        run: |
-          yarn install --frozen-lockfile
-          yarn build
+      - run: npx nx affected --target=build
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"

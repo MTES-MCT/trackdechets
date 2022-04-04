@@ -1,0 +1,26 @@
+{
+  "name": "root",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "nx run-many --target=dev --projects=front,back",
+    "build": "nx run-many --target=build --all",
+    "build:front": "nx build @trackdechets/front",
+    "build:back": "nx build @trackdechets/back",
+    "nx": "nx"
+  },
+  "devDependencies": {
+    "@nrwl/nx-cloud": "latest",
+    "@nrwl/workspace": "latest",
+    "nx": "14.0.3",
+    "prettier": "^2.0.5"
+  },
+  "engines": {
+    "node": "^16"
+  },
+  "volta": {
+    "node": "16.10.0"
+  }
+}

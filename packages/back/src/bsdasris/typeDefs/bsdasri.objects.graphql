@@ -1,0 +1,243 @@
+type BsdasriSignature {
+  date: DateTime
+  author: String
+}
+
+"Information sur l'éco-organisme responsable du dasri"
+type BsdasriEcoOrganisme {
+  name: String!
+  siret: String!
+  "Indique si l'enlèvement a été signé par l'éco-organisme en charge du déchet."
+  emittedByEcoOrganisme: Boolean
+}
+
+"Émetteur du Bsdasri, Personne responsable de l'émimination des déchets (PRED)"
+type BsdasriEmitter {
+  "Établissement émetteur"
+  company: FormCompany
+  "Site d'emport du déchet, si différent de celle de l'émetteur"
+  pickupSite: PickupSite
+  "Champ libre"
+  customInfo: String
+  emission: BsdasriEmission
+}
+
+"Destination du Bsdasri"
+type BsdasriDestination {
+  """
+  Installation destinataire
+  """
+  company: FormCompany
+
+  "Champ libre"
+  customInfo: String
+  reception: BsdasriReception
+  operation: BsdasriOperation
+}
+
+type BsdasriRecepisse {
+  "Numéro de récépissé"
+  number: String
+  "Département"
+  department: String
+  "Date limite de validité"
+  validityLimit: DateTime
+}
+
+"""
+Collecteur transporteur
+"""
+type BsdasriTransporter {
+  "Établissement transporteur"
+  company: FormCompany
+
+  "Récépissé"
+  recepisse: BsdasriRecepisse
+
+  "Champ libre"
+  customInfo: String
+
+  transport: BsdasriTransport
+}
+
+"Informations sur le conditionnement Bsdasri"
+type BsdasriPackaging {
+  "Type de conditionnement"
+  type: BsdasriPackagingType!
+
+  "Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"
+  other: String
+
+  "Nombre de colis associés à ce conditionnement"
+  quantity: Int!
+
+  volume: Int!
+}
+
+"Informations sur un poids de déchet estimé ou pesé"
+type BsdasriWeight {
+  "Poids en kg, pesé ou estimé"
+  value: Float!
+  "Le poids est-il estimé (pesé si false)"
+  isEstimate: Boolean!
+}
+
+"Informations sur un poids reçu (toujours pesé)"
+type BsdasriOperationWeight {
+  "Pois en kg (pesé)"
+  value: Float!
+}
+
+"Informations relatives au déchet"
+type BsdasriWaste {
+  "Code adr"
+  adr: String
+  "Code déchet"
+  code: String
+}
+
+"Informations relatives à l'acceptation ou au refus du déchet (Bsdasri)"
+type BsdasriWasteAcceptation {
+  status: WasteAcceptationStatus
+  refusalReason: String
+  "Poids refusé en kilogrammes"
+  refusedWeight: Float
+}
+
+"Informations relatives au transport du Bsdasri"
+type BsdasriTransport {
+  "Quantité transportée"
+  weight: BsdasriWeight
+  "Volume transporté"
+  volume: Int
+  "Conditionnement"
+  packagings: [BsdasriPackaging!]
+  acceptation: BsdasriWasteAcceptation
+  handedOverAt: DateTime
+  takenOverAt: DateTime
+  signature: BsdasriSignature
+  mode: TransportMode!
+  "Plaque(s) d'immatriculation"
+  plates: [String!]
+}
+
+"Informations relatives au déchet émis"
+type BsdasriEmission {
+  "Quantité émise"
+  weight: BsdasriWeight
+  "Volume en litres"
+  volume: Int
+  "Conditionnement"
+  packagings: [BsdasriPackaging!]
+  signature: BsdasriSignature
+  "Emporté sans signature PRED avec son autorisation prélalable"
+  isTakenOverWithoutEmitterSignature: Boolean
+  "Signature émetteur avec code de sécurité: PRED ou éco-organisme si ecoOrganisme.emittedByEcoOrganisme vaut true"
+  isTakenOverWithSecretCode: Boolean
+}
+
+"Informations relatives à la réception du Bsdasri"
+type BsdasriReception {
+  "Volume reçu"
+  volume: Int
+  "Conditionnement"
+  packagings: [BsdasriPackaging!]
+  acceptation: BsdasriWasteAcceptation
+  "Date de réception du déchet"
+  date: DateTime
+  signature: BsdasriSignature
+}
+
+"Informations relatives au traitement du Bsdasri"
+type BsdasriOperation {
+  "Quantité traitée"
+  weight: BsdasriOperationWeight
+  "Code de l'opération de traitement"
+  code: String
+  "Date de l'opération de traitement"
+  date: DateTime
+  signature: BsdasriSignature
+}
+"Bordereau Bsdasri regroupé"
+type InitialBsdasri {
+  "Identifiant du bordereau regroupé "
+  id: ID!
+  "Nombre de contenants reçus"
+  quantity: Int
+  "Volume reçu dans le cas d'un groupement, émis dans le cas d'une synthèse"
+  volume: Int
+  "Poids de déchets (en kg) traités dans le cas d'un groupement, émis (si renseigné) dans le cas d'une synthèse"
+  weight: Float
+  "Date de collecte initiale"
+  takenOverAt: DateTime
+  "Code postal du lieu de collecte"
+  postalCode: String
+}
+"Bordereau Bsdasri"
+type Bsdasri {
+  id: ID!
+  status: BsdasriStatus!
+  type: BsdasriType!
+  createdAt: DateTime
+  updatedAt: DateTime
+  isDraft: Boolean!
+
+  waste: BsdasriWaste
+
+  emitter: BsdasriEmitter
+
+  ecoOrganisme: BsdasriEcoOrganisme
+
+  transporter: BsdasriTransporter
+
+  destination: BsdasriDestination
+
+  """
+  Liste des identifiants des conteneurs concernés. Modifiable par tous les acteurs du bsd, ce champ mis
+  à disposition des utilisateurs permet de retrouver aisément des Bsdasris grâce à un identifiant de conteneur
+  """
+  identification: BsdasriIdentification
+
+  "Bordereaux groupés par une opération de groupement"
+  grouping: [InitialBsdasri!]
+
+  "Groupé dans le bordereau par une opération de groupement"
+  groupedIn: Bsdasri
+
+  "Bordereaux regroupés par une opération de synthèse"
+  synthesizing: [InitialBsdasri!]
+
+  "Groupé dans le bordereau par une opération de synthèse"
+  synthesizedIn: Bsdasri
+
+  metadata: BsdasriMetadata!
+
+  "DEPRECATED - renvoie null"
+  allowDirectTakeOver: Boolean
+    @deprecated(
+      reason: "utiliser le champ `allowBsdasriTakeOverWithoutSignature` dans la réponse de la query `companyInfos` en passant le SIRET de l'émetteur en paramètre"
+    )
+}
+
+type BsdasriIdentification {
+  numbers: [String!]
+}
+
+type BsdasriError {
+  message: String!
+  path: String!
+  requiredFor: [BsdasriSignatureType!]!
+}
+type BsdasriMetadata {
+  errors: [BsdasriError]!
+}
+
+type BsdasriConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [BsdasriEdge!]!
+}
+type BsdasriEdge {
+  cursor: String!
+  node: Bsdasri!
+}
