@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { ReactNode, useMemo } from "react";
 import { formatDate } from "common/datetime";
 import { PackagingInfo } from "generated/graphql/types";
 import { getPackagingInfosSummary } from "form/bsdd/utils/packagings";
@@ -8,7 +8,7 @@ export const DetailRow = ({
   label,
   units = null,
 }: {
-  value: string | number | undefined | null;
+  value: string | number | ReactNode | undefined | null;
   label: string;
   units?: string | undefined | null;
 }) => {

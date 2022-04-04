@@ -7,6 +7,7 @@ import { getCachedUserSirets } from "../common/redis/users";
 
 import { getFullForm } from "./database";
 import { InvaliSecurityCode, NotFormContributor } from "./errors";
+import { getFormRepository } from "./repository";
 
 function isFormEmitter(userSirets: string[], form: FormSirets) {
   if (!form.emitterCompanySiret) {
@@ -109,6 +110,16 @@ export async function isFormContributor(user: User, form: FormSirets) {
   ].some(isFormRole => isFormRole(userSirets, form));
 }
 
+async function isFormInitialEmitter(user: User, form: Form) {
+  const { findAppendix2FormsById } = getFormRepository(user);
+  const appendix2Forms = await findAppendix2FormsById(form.id);
+  const userSirets = await getCachedUserSirets(user.id);
+  return appendix2Forms.reduce(
+    (acc, f) => acc || isFormEmitter(userSirets, f),
+    false
+  );
+}
+
 /**
  * Check that at least one of user's company is present somewhere in the form
  * or throw a ForbiddenError
@@ -128,9 +139,19 @@ export async function checkIsFormContributor(
 }
 
 export async function checkCanRead(user: User, form: Form) {
-  return checkIsFormContributor(
-    user,
-    await getFullForm(form),
+  const fullForm = await getFullForm(form);
+  const isContributor = await isFormContributor(user, fullForm);
+  if (isContributor) {
+    return true;
+  }
+  if (form.emitterType === "APPENDIX2") {
+    const isInitialEmitter = await isFormInitialEmitter(user, form);
+    if (isInitialEmitter) {
+      return true;
+    }
+  }
+
+  throw new NotFormContributor(
     "Vous n'êtes pas autorisé à accéder à ce bordereau"
   );
 }
