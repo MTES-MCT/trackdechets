@@ -71,23 +71,19 @@ const Emitter = ({ form }: { form: Bsda }) => {
           value={emitter?.pickupSite?.name}
           label="Nom du chantier/collecte"
         />
-        <DetailRow
-          value={emitter?.pickupSite?.address}
-          label="Adresse chantier/collecte"
-        />
-        <DetailRow
-          value={emitter?.pickupSite?.infos}
-          label="Informations complémentaires"
-        />
         {!!emitter?.pickupSite?.address && (
           <>
-            <dt>Adresse</dt>
+            <dt>Adresse chantier/collecte</dt>
             <dd>
               {emitter?.pickupSite?.address} {emitter?.pickupSite?.postalCode}{" "}
               {emitter?.pickupSite?.city}
             </dd>
           </>
         )}
+        <DetailRow
+          value={emitter?.pickupSite?.infos}
+          label="Informations complémentaires"
+        />
       </div>
       <div className={styles.detailGrid}>
         <DetailRow value={emitter?.customInfo} label="Champ libre émetteur" />
