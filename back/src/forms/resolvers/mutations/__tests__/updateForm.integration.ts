@@ -8,8 +8,12 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Mutation, UpdateFormInput } from "../../../../generated/graphql/types";
-import { Status } from "@prisma/client";
+import {
+  Mutation,
+  MutationUpdateFormArgs,
+  UpdateFormInput
+} from "../../../../generated/graphql/types";
+import { EmitterType, Status } from "@prisma/client";
 
 const UPDATE_FORM = `
   mutation UpdateForm($updateFormInput: UpdateFormInput!) {
@@ -41,6 +45,9 @@ const UPDATE_FORM = `
       }
       ecoOrganisme {
         siret
+      }
+      appendix2Forms {
+        id
       }
     }
   }
@@ -735,6 +742,7 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
+        emitterType: EmitterType.APPENDIX2,
         status: "SEALED",
         emitterCompanySiret: ttr.siret,
         appendix2Forms: { connect: { id: appendixForm.id } }
@@ -781,6 +789,7 @@ describe("Mutation.updateForm", () => {
       opt: {
         status: "SEALED",
         emitterCompanySiret: ttr.siret,
+        emitterType: EmitterType.APPENDIX2,
         appendix2Forms: { connect: { id: appendixForm.id } }
       }
     });
@@ -811,6 +820,7 @@ describe("Mutation.updateForm", () => {
       opt: {
         status: Status.SEALED,
         emitterCompanySiret: ttr.siret,
+        emitterType: EmitterType.APPENDIX2,
         appendix2Forms: { connect: [{ id: initialAppendix2.id }] }
       }
     });
@@ -833,6 +843,172 @@ describe("Mutation.updateForm", () => {
         message: `Le bordereau ${wannaBeAppendix2.id} n'est pas en possession du nouvel émetteur`
       })
     ]);
+  });
+
+  it("should not be possible to change emitter.type when existing appendix2Forms is not empty", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
+    const appendixForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        recipientCompanySiret: ttr.siret
+      }
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: ttr.siret,
+        emitterType: EmitterType.APPENDIX2,
+        appendix2Forms: { connect: { id: appendixForm.id } }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          emitter: { type: EmitterType.PRODUCER }
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+      })
+    ]);
+  });
+
+  it("should not be possible to add appendix2Forms to an existing form which emitter.type is not APPENDIX2", async () => {
+    const { user, company: producer } = await userWithCompanyFactory("MEMBER");
+
+    const appendixForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "AWAITING_GROUP",
+        recipientCompanySiret: producer.siret
+      }
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: producer.siret,
+        emitterType: EmitterType.PRODUCER
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          appendix2Forms: [{ id: appendixForm.id }]
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+      })
+    ]);
+  });
+
+  it("should be possible to change both emitter.type and set appendix2Forms to []", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
+    const appendixForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        recipientCompanySiret: ttr.siret
+      }
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: ttr.siret,
+        emitterType: EmitterType.APPENDIX2,
+        appendix2Forms: { connect: { id: appendixForm.id } }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          emitter: { type: EmitterType.PRODUCER },
+          appendix2Forms: []
+        }
+      }
+    });
+    expect(data.updateForm.appendix2Forms).toEqual([]);
+  });
+
+  it("should be possible to re-associate same appendix2", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
+    const appendixForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "AWAITING_GROUP",
+        recipientCompanySiret: ttr.siret
+      }
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: ttr.siret,
+        emitterType: EmitterType.APPENDIX2
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          appendix2Forms: [{ id: appendixForm.id }]
+        }
+      }
+    });
+    expect(data.updateForm.appendix2Forms).toHaveLength(1);
+
+    const { data: data2 } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          appendix2Forms: [{ id: appendixForm.id }]
+        }
+      }
+    });
+    expect(data2.updateForm.appendix2Forms).toHaveLength(1);
   });
 
   it("should not be possible to set isDangerous=false with a waste code containing an *", async () => {
