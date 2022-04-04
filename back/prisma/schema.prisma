@@ -362,6 +362,7 @@ model Form {
   appendix2Forms                     Form[]                  @relation("FormToForm")
   appendix2RootFormId                String?
   appendix2RootForm                  Form?                   @relation("FormToForm", fields: [appendix2RootFormId], references: [id])
+  intermediaries                     Intermediary[]
   ownerId                            String
   owner                              User                    @relation(fields: [ownerId], references: [id])
   StatusLog                          StatusLog[]
@@ -642,6 +643,22 @@ model TransportSegment {
 
   @@index([formId], map: "_TransportSegmentFormIdIdx")
   @@index([transporterCompanySiret], map: "_TransportSegmentTransporterCompanySiretIdx")
+}
+
+// Entreprise jouant le rôle d'intermédiaire sur un bordereau
+model Intermediary {
+  id        String  @id @default(cuid())
+  siret     String
+  vatNumber String?
+  name      String
+  address   String
+  contact   String
+  phone     String
+  mail      String
+  form      Form?   @relation(fields: [formId], references: [id])
+  formId    String?
+
+  @@index([formId], map: "_IntermediaryFormIdIdx")
 }
 
 model User {
