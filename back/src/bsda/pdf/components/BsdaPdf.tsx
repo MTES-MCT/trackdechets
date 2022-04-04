@@ -352,7 +352,7 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
               checked={bsda.type === "GATHERING"}
               readOnly
             />{" "}
-            groupement de déchets (rassemblement de déchets d’amiante)
+            groupement de déchets (synthèse des bsda liés)
             {"  "}
             <input
               type="checkbox"

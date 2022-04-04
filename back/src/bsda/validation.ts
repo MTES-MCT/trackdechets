@@ -442,7 +442,7 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
           `Entreprise de destination: vous devez préciser le code d'opération prévu`
         )
         .oneOf(
-          [null, ...OPERATIONS],
+          [null, "", ...OPERATIONS],
           "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
         ),
       destinationReceptionDate: yup
@@ -508,7 +508,7 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
           otherwise: schema =>
             schema
               .oneOf(
-                [null, ...OPERATIONS],
+                [null, "", ...OPERATIONS],
                 "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
               )
               .requiredIf(
