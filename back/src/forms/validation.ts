@@ -21,6 +21,7 @@ import {
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
   AppendixFormInput,
+  CompanyInput,
   PackagingInfo,
   Packagings
 } from "../generated/graphql/types";
@@ -45,6 +46,7 @@ import {
   isSiret,
   isFRVat
 } from "../common/constants/companySearchHelpers";
+import { searchCompany } from "../companies/search";
 // set yup default error messages
 configureYup();
 
@@ -1151,4 +1153,24 @@ export async function validateAppendix2Forms(
   }
 
   return appendix2Forms;
+}
+
+export async function validateCompanyInput(
+  company: CompanyInput
+): Promise<CompanyInput> {
+  // TODO apply validation on companyInput to check SIRET end VAT formats
+  const validCompany = await searchCompany(company.siret ?? company.vatNumber);
+  return {
+    ...company,
+    // overwite name and address with official data
+    ...(validCompany
+      ? { address: validCompany.address, name: validCompany.name }
+      : {})
+  };
+}
+
+export function validateCompanyInputs(
+  companies: CompanyInput[]
+): Promise<CompanyInput[]> {
+  return Promise.all(companies.map(validateCompanyInput));
 }
