@@ -4,9 +4,11 @@ import {
   sealedFormSchema,
   ecoOrganismeSchema,
   receivedInfoSchema,
-  processedInfoSchema
+  processedInfoSchema,
+  transporterSchemaFn
 } from "../validation";
 import { ReceivedFormInput } from "../../generated/graphql/types";
+import { transporterSchema } from "../../bsdasris/validation";
 
 const form: Partial<Form> = {
   id: "cjplbvecc000d0766j32r19am",
@@ -538,5 +540,66 @@ describe("processedInfoSchema", () => {
       noTraceability: null
     };
     expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+  });
+
+  test("transporter SIRET is optional when a valid foreign vatNumber is present", () => {
+    const transporter = {
+      transporterCompanyName: "Thalys",
+      transporterCompanyVatNumber: "BE0541696005",
+      transporterCompanyAddress: "Bruxelles",
+      transporterCompanyContact: "Contact",
+      transporterCompanyPhone: "00 00 00 00 00",
+      transporterCompanyMail: "contact@thalys.com",
+      transporterIsExemptedOfReceipt: true
+    };
+    expect(transporterSchemaFn(false).isValidSync(transporter)).toEqual(true);
+  });
+
+  test("transporter vatNumber is optional when a valid SIRET is present", () => {
+    const transporter = {
+      transporterCompanyName: "Code en Stock",
+      transporterCompanySiret: "85001946400021",
+      transporterCompanyAddress: "Marseille",
+      transporterCompanyContact: "Contact",
+      transporterCompanyPhone: "00 00 00 00 00",
+      transporterCompanyMail: "contact@codeenstock.fr",
+      transporterIsExemptedOfReceipt: true
+    };
+    expect(transporterSchemaFn(false).isValidSync(transporter)).toEqual(true);
+  });
+
+  test("transporter SIRET is required with a french vatNumber", async () => {
+    const transporter = {
+      transporterCompanyName: "Code en Stock",
+      transporterCompanyVatNumber: "FR87850019464",
+      transporterCompanyAddress: "Marseille",
+      transporterCompanyContact: "Contact",
+      transporterCompanyPhone: "00 00 00 00 00",
+      transporterCompanyMail: "contact@codeenstock.fr",
+      transporterIsExemptedOfReceipt: true
+    };
+    const validateFn = () => transporterSchemaFn(false).validate(transporter);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
+    );
+  });
+
+  test("transporter vatNumber should be valid", async () => {
+    const transporter = {
+      transporterCompanyName: "Code en Stock",
+      transporterCompanyVatNumber: "invalid",
+      transporterCompanyAddress: "Marseille",
+      transporterCompanyContact: "Contact",
+      transporterCompanyPhone: "00 00 00 00 00",
+      transporterCompanyMail: "contact@codeenstock.fr",
+      transporterIsExemptedOfReceipt: true
+    };
+
+    const validateFn = () => transporterSchemaFn(false).validate(transporter);
+
+    await expect(validateFn()).rejects.toThrow(
+      "transporterCompanyVatNumber n'est pas un numéro de TVA intracommunautaire valide"
+    );
   });
 });
