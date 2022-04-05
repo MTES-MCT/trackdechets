@@ -42,8 +42,13 @@ const updateFormResolver = async (
 
   const { updateFormInput } = validateArgs(args);
 
-  const { id, appendix2Forms, temporaryStorageDetail, ...formContent } =
-    updateFormInput;
+  const {
+    id,
+    appendix2Forms,
+    temporaryStorageDetail,
+    intermediaries,
+    ...formContent
+  } = updateFormInput;
 
   if (
     formContent.wasteDetails?.code &&

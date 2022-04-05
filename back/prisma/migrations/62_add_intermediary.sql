@@ -5,9 +5,9 @@ CREATE TABLE "Intermediary" (
     "vatNumber" TEXT,
     "name" TEXT NOT NULL,
     "address" TEXT NOT NULL,
-    "contact" TEXT NOT NULL,
-    "phone" TEXT NOT NULL,
-    "mail" TEXT NOT NULL,
+    "contact" TEXT,
+    "phone" TEXT,
+    "mail" TEXT,
     "formId" TEXT,
 
     CONSTRAINT "Intermediary_pkey" PRIMARY KEY ("id")

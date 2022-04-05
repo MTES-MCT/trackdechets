@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Intermediary, Prisma } from "@prisma/client";
 import { isDangerous } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { eventEmitter, TDEvent } from "../../../events/emitter";
@@ -26,8 +26,12 @@ const createFormResolver = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const { appendix2Forms, temporaryStorageDetail, ...formContent } =
-    createFormInput;
+  const {
+    appendix2Forms,
+    temporaryStorageDetail,
+    intermediaries,
+    ...formContent
+  } = createFormInput;
 
   if (
     formContent.wasteDetails?.code &&
@@ -49,6 +53,9 @@ const createFormResolver = async (
           destinationCompanySiret:
             temporaryStorageDetail.destination.company.siret
         }
+      : {}),
+    ...(intermediaries?.length
+      ? { intermediaries: intermediaries.map(i => ({ siret: i.siret })) }
       : {})
   };
 
@@ -68,7 +75,18 @@ const createFormResolver = async (
     ...form,
     readableId: getReadableId(),
     owner: { connect: { id: user.id } },
-    appendix2Forms: appendix2Forms ? { connect: appendix2Forms } : undefined
+    appendix2Forms: appendix2Forms ? { connect: appendix2Forms } : undefined,
+    intermediaries: {
+      createMany: {
+        data: intermediaries.map(i => ({
+          ...i,
+          // TODO autocomplete with SIRENE or vat info
+          siret: i.siret ?? "",
+          name: i.name ?? "",
+          address: i.address ?? ""
+        }))
+      }
+    }
   };
 
   await draftFormSchema.validate(formCreateInput);

@@ -93,6 +93,16 @@ function isFormMultiModalTransporter(userSirets: string[], form: FormSirets) {
   return transportSegmentSirets.some(s => userSirets.includes(s));
 }
 
+function isFormIntermediary(userSirets: string[], form: FormSirets) {
+  if (!form.intermediaries) {
+    return false;
+  }
+  const intermediarySirets = form.intermediaries.map(
+    intermediary => intermediary.siret
+  );
+  return intermediarySirets.some(i => userSirets.includes(i));
+}
+
 export async function isFormContributor(user: User, form: FormSirets) {
   const userSirets = await getCachedUserSirets(user.id);
 
@@ -105,7 +115,8 @@ export async function isFormContributor(user: User, form: FormSirets) {
     isFormEcoOrganisme,
     isFormTransporterAfterTempStorage,
     isFormDestinationAfterTempStorage,
-    isFormMultiModalTransporter
+    isFormMultiModalTransporter,
+    isFormIntermediary
   ].some(isFormRole => isFormRole(userSirets, form));
 }
 

@@ -4,7 +4,8 @@ import {
   TransportSegment,
   Prisma,
   TransportMode,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  Intermediary
 } from "@prisma/client";
 import { FormStatus } from "../generated/graphql/types";
 
@@ -31,6 +32,8 @@ export type FormSirets = Pick<
   >;
 } & {
   transportSegments?: Pick<TransportSegment, "transporterCompanySiret">[];
+} & {
+  intermediaries?: Pick<Intermediary, "siret">[];
 };
 
 // shape of a BSDD v2
