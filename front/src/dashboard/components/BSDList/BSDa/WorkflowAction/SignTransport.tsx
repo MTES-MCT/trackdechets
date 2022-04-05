@@ -32,7 +32,7 @@ export function SignTransport({ siret, bsdaId }: Props) {
     Pick<Mutation, "updateBsda">,
     MutationUpdateBsdaArgs
   >(UPDATE_BSDA);
-  const [signBsda, { loading }] = useMutation<
+  const [signBsda, { loading, error: signatureError }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs
   >(SIGN_BSDA, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
@@ -146,6 +146,11 @@ export function SignTransport({ siret, bsdaId }: Props) {
                 {updateError && (
                   <div className="notification notification--error">
                     {updateError.message}
+                  </div>
+                )}
+                {signatureError && (
+                  <div className="notification notification--error">
+                    {signatureError.message}
                   </div>
                 )}
 

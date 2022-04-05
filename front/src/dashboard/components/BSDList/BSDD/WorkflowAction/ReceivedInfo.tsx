@@ -63,7 +63,7 @@ const validationSchema = (form: TdForm) =>
       // we only care about the day, not the exact time
       .transform(value => startOfDay(parseDate(value)))
       .min(
-        startOfDay(parseDate(form.sentAt!)),
+        startOfDay(parseDate(form.emittedAt!)),
         "La date de réception du déchet ne peut pas être antérieure à sa date d'émission."
       ),
     receivedBy: yup
@@ -112,7 +112,7 @@ export default function ReceivedInfo({
               Date de présentation
               <Field
                 component={DateInput}
-                minDate={parseDate(form.sentAt!)}
+                minDate={parseDate(form.takenOverAt!)}
                 name="receivedAt"
                 className="td-input"
               />

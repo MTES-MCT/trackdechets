@@ -79,6 +79,13 @@ export function getSiretsByTab(
       break;
     }
     case Status.SEALED: {
+      setFieldTab("emitterCompanySiret", "isForActionFor");
+      setFieldTab("ecoOrganismeSiret", "isForActionFor");
+      setFieldTab("transporterCompanySiret", "isToCollectFor");
+
+      break;
+    }
+    case Status.SIGNED_BY_PRODUCER: {
       setFieldTab("transporterCompanySiret", "isToCollectFor");
 
       break;
@@ -111,6 +118,15 @@ export function getSiretsByTab(
       break;
     }
     case Status.RESEALED: {
+      setFieldTab("recipientCompanySiret", "isForActionFor");
+      setFieldTab(
+        "temporaryStorageDetailTransporterCompanySiret",
+        "isToCollectFor"
+      );
+
+      break;
+    }
+    case Status.SIGNED_BY_TEMP_STORER: {
       setFieldTab(
         "temporaryStorageDetailTransporterCompanySiret",
         "isToCollectFor"
@@ -176,6 +192,7 @@ function toBsdElastic(form: FullForm): BsdElastic {
     type: "BSDD",
     id: form.id,
     readableId: form.readableId,
+    customId: form.customId,
     createdAt: form.createdAt.getTime(),
     emitterCompanyName: form.emitterCompanyName ?? "",
     emitterCompanySiret: form.emitterCompanySiret ?? "",

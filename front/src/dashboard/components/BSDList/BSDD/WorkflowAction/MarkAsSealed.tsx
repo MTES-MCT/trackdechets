@@ -37,7 +37,7 @@ export default function MarkAsSealed({ form, siret }: WorkflowActionProps) {
         const sealedForm = data.markAsSealed;
         if (sealedForm.status === FormStatus.Sealed)
           cogoToast.success(
-            `Le numéro #${sealedForm.readableId} a été affecté au bordereau. Vous pouvez le retrouver dans l'onglet "Suivi"`
+            `Le numéro #${sealedForm.readableId} a été affecté au bordereau. Vous pouvez le retrouver dans l'onglet "Pour action".`
           );
       }
     },
@@ -63,10 +63,11 @@ export default function MarkAsSealed({ form, siret }: WorkflowActionProps) {
           <div>
             <p>
               Cette action aura pour effet de valider les données du bordereau
-              et de le faire apparaitre dans l'onglet "À collecter" du tableau
-              de bord transporteur. Un identifiant unique lui sera attribué et
-              vous pourrez générer un PDF. Le bordereau pourra cependant
-              toujours être modifié ou supprimé depuis l'onglet "Suivi".
+              et de le faire apparaitre dans l'onglet "Pour action" de
+              l'émetteur ainsi que l'onglet "À collecter" du transporteur. Un
+              identifiant unique lui sera attribué et vous pourrez générer un
+              PDF. Le bordereau pourra cependant toujours être modifié ou
+              supprimé depuis l'onglet "Pour action", "À collecter" ou "Suivi".
             </p>
 
             <div className="td-modal-actions">

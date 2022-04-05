@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Trackdéchets a vocation à simplifier la gestion de vos déchets dangereux au quotidien : 0 papier, traçabilité en temps réel, informations regroupées sur un outil unique, vérification des prestataires"
+    />
+    <meta
+      name="keywords"
+      content="bsd, bsds, bsdr, dechet, dechet dangereux, cerfa, tracabilite"
+    />
+    <!--
+      manifest.json provides metadata used when your web app is added to the
+      homescreen on Android. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+    <link rel="manifest" href="/manifest.json" />
+    <title>Trackdéchets | La tracabilité des déchets en toute sécurité</title>
+  </head>
+  <body>
+    <noscript>
+      Pour accéder à toutes les fonctionnalités de ce site, vous devez activer
+      JavaScript. Voici les
+      <a href="https://www.enable-javascript.com/fr/">
+        instructions pour activer JavaScript dans votre navigateur Web</a
+      >.
+    </noscript>
+    <div id="root"></div>
+
+    <script>
+      window.global = window;
+      var exports = {};
+    </script>
+    <script type="module" src="/src/index.tsx"></script>
+  </body>
+</html>

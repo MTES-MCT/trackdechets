@@ -6,11 +6,12 @@ import {
 } from "../../../generated/graphql/types";
 import { Company, CompanyType, Prisma } from "@prisma/client";
 import prisma from "../../../prisma";
-import { searchCompany } from "../../sirene";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../database";
 import { checkIsCompanyMember } from "../../../users/permissions";
+
+const MAX_FAVORITES = 10;
 
 function matchesFavoriteType(
   company: Company,
@@ -194,27 +195,32 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
       return prev;
     }, []);
 
-  if (
-    // the user's company matches the provided favorite type
-    matchesFavoriteType(company, type) &&
-    // their company is not included in the results yet
-    favorites.find(favorite => favorite.siret === company.siret) == null
-  ) {
-    // append their own company to the results
-    const companySearchResult = await searchCompany(company.siret);
+  // return early
+  if (favorites.length + 1 >= MAX_FAVORITES) {
+    favorites.splice(MAX_FAVORITES);
+    return favorites;
+  }
+
+  // the user's company matches the provided favorite type
+  const isMatchingType = matchesFavoriteType(company, type);
+  // their company is not included in the results yet
+  const isAlreadyListed = favorites.find(
+    favorite => favorite.siret === company.siret
+  );
+  if (isMatchingType && !isAlreadyListed) {
     favorites.push({
       name: company.name,
       siret: company.siret,
-      address: companySearchResult.address,
+      vatNumber: company.vatNumber,
+      address: company.address,
       contact: user.name,
       phone: user.phone,
       mail: user.email
     });
   }
 
-  // Return up to 10 results
-  favorites.splice(10);
-
+  // Return up to MAX_FAVORITES results
+  favorites.splice(MAX_FAVORITES);
   return favorites;
 };
 

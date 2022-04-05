@@ -684,6 +684,41 @@ describe("Query.forms", () => {
     expect(data.forms[0].wasteDetails.code).toBe("01 03 04*");
   });
 
+  it("should filter by customId", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    await createForms(user.id, [
+      {
+        customId: "custom1",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      },
+      {
+        customId: "custom2",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      },
+      {
+        customId: null,
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    ]);
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "forms">>(
+      `query Forms($customId: String) {
+          forms(customId: $customId) {
+            customId
+          }
+        }
+      `,
+      { variables: { customId: "custom1" } }
+    );
+
+    expect(data.forms.length).toBe(1);
+    expect(data.forms[0].customId).toBe("custom1");
+  });
+
   it("should filter by siretPresentOnForm", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const otherCompany = await companyFactory();

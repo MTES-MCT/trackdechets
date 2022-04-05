@@ -5,13 +5,7 @@ import styles from "../AccountField.module.scss";
 
 describe("<AccountField />", () => {
   it("should render label, value, tooltip and modifier", () => {
-    const {
-      container,
-      getByLabelText,
-      getByText,
-      getByRole,
-      queryByRole,
-    } = render(
+    const { container, getByText, getByRole, queryByRole } = render(
       <AccountField
         name="username"
         label="Nom utilisateur"
@@ -24,10 +18,10 @@ describe("<AccountField />", () => {
 
     expect(container.querySelector("div")).toHaveClass(styles.field);
 
-    // it should container label
-    expect(getByLabelText("Nom utilisateur")).toBeInTheDocument();
+    // it should contain label
+    expect(getByText("Nom utilisateur")).toBeInTheDocument();
 
-    // it should container tooltip trigger
+    // it should contain tooltip trigger
     expect(getByRole("button")).toBeInTheDocument();
 
     // it should contain field value
@@ -53,7 +47,7 @@ describe("<AccountField />", () => {
         label="Nom utilisateur"
         value="John Snow"
         renderForm={toggleEdition => (
-          <form onSubmit={() => toggleEdition()}>
+          <form name="a form" onSubmit={() => toggleEdition()}>
             <button type="submit" data-test-id="submit-button" />
           </form>
         )}

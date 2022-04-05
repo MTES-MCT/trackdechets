@@ -28,7 +28,7 @@ Le token (voir [Authentification](../reference/authentification)) doit être ren
 ![playground-token](../../static/img/playground-token.png)
 ## Exécuter une requête GraphQL
 
-Vous pouvez écrire des requêtes GraphQL dans la zone de texte à gauche. Exemple avec la reqête `companyInfos` permettant d'obtenir des informations sur un établissement partenaire :
+Vous pouvez écrire des requêtes GraphQL dans la zone de texte à gauche. Exemple avec la requête `companyInfos` permettant d'obtenir des informations sur un établissement partenaire :
 
 ![playground-query](../../static/img/playground-query.png)
 

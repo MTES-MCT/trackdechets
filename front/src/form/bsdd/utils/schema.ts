@@ -36,6 +36,7 @@ const companySchema = object().shape({
     then: string().required("La sélection d'une entreprise est obligatoire"),
     otherwise: string().nullable(),
   }),
+  vatNumber: string().ensure(),
   address: string().required(),
   country: string()
     .oneOf([
@@ -57,7 +58,7 @@ const companySchema = object().shape({
 const destinationSchema = companySchema.concat(
   object().shape({
     siret: string().test(
-      "is-registered",
+      "is-registered-test",
       `Cet établissement n'est pas inscrit sur Trackdéchets ou son profil
     ne lui permet pas d'être destinataire du bordereau. Seuls les établissements
     inscrits sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement

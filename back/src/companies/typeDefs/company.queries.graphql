@@ -1,10 +1,16 @@
 type Query {
   """
   Renvoie des informations publiques sur un établissement
-  extrait de la base SIRENE et de la base des installations
+  extrait de la base SIRENE ou de la base européenne VIES
+  et de la base des installations
   classées pour la protection de l'environnement (ICPE)
   """
-  companyInfos("SIRET de l'établissement" siret: String!): CompanyPublic!
+  companyInfos(
+    """SIRET de l'établissement, supporte aussi un numéro TVA intracommunautaire"""
+    siret: String
+    """Autre identifiant, par ex. numéro TVA intracommunautaire"""
+    clue: String
+  ): CompanyPublic!
 
   """
   Effectue une recherche floue sur la base SIRENE et enrichit
@@ -13,10 +19,11 @@ type Query {
   searchCompanies(
     """
     Champ utilisé pour faire une recherche floue
-    sur la nom de l'établissement, ex: 'Boulangerie Dupont'
+    sur le nom de l'établissement, ex: 'Boulangerie Dupont',
+    ou sur le numéro de SIRET ou TVA intracommunautaire
     """
     clue: String!
-    "(Optionnel) Filtre les résultats par numéro de département"
+    "(Optionnel) Filtre les résultats par numéro de département français"
     department: String
   ): [CompanySearchResult!]!
 

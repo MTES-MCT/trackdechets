@@ -4,6 +4,7 @@ export const FAVORITES = gql`
   query Favorites($siret: String!, $type: FavoriteType!) {
     favorites(siret: $siret, type: $type) {
       siret
+      vatNumber
       name
       address
       contact
@@ -35,9 +36,10 @@ export const FAVORITES = gql`
 `;
 
 export const COMPANY_INFOS = gql`
-  query SignupCompanyInfos($siret: String!) {
-    companyInfos(siret: $siret) {
+  query SignupCompanyInfos($siret: String!, $clue: String) {
+    companyInfos(siret: $siret, clue: $clue) {
       siret
+      vatNumber
       name
       naf
       libelleNaf

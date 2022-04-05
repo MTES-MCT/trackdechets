@@ -6,7 +6,7 @@ import { sendVerificationCodeLetter } from "../common/post";
 import prisma from "../prisma";
 import { sameDayMidnight } from "../utils";
 import { getInstallation, getRubriques } from "./database";
-import { searchCompany } from "./sirene";
+import { searchCompany } from "./search";
 
 export const anomalies = {
   NO_ANOMALY: "no_anomaly",

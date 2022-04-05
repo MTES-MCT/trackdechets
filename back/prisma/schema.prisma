@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["interactiveTransactions"]
 }
 
@@ -76,6 +76,7 @@ enum Consistence {
 enum Status {
   DRAFT
   SEALED
+  SIGNED_BY_PRODUCER
   SENT
   RECEIVED
   ACCEPTED
@@ -89,6 +90,7 @@ enum Status {
   TEMP_STORED
   TEMP_STORER_ACCEPTED
   RESEALED
+  SIGNED_BY_TEMP_STORER
   RESENT
 }
 
@@ -160,6 +162,7 @@ model Application {
 model Company {
   id                                   String                    @id @default(cuid())
   siret                                String                    @unique
+  vatNumber                            String?                   @unique
   updatedAt                            DateTime                  @updatedAt @db.Timestamptz(6)
   createdAt                            DateTime                  @default(now()) @db.Timestamptz(6)
   securityCode                         Int
@@ -196,7 +199,7 @@ model Company {
   bsddRevisionRequests                 BsddRevisionRequest[]
 }
 
-// Companies with restricted diffusion of SIRENE information (police, army, etc)
+// Companies with restricted diffusion of SIRENE or VAT information (police, army, etc)
 
 // "Certaines entreprises demandent à ne pas figurer sur les listes de diffusion publique
 // en vertu de l'article A123-96 du code du commerce. On parle d‘entreprise non diffusable.
@@ -207,8 +210,9 @@ model Company {
 // Cette table permet également de stocker de "faux établissements" pouvant être visés lors
 // du rattachement d'établissements de test sur l'environnement sandbox
 model AnonymousCompany {
-  id          String @id @default(cuid())
-  siret       String @unique
+  id          String  @id @default(cuid())
+  siret       String  @unique
+  vatNumber   String? @unique
   name        String
   address     String
   codeNaf     String
@@ -273,6 +277,7 @@ model Form {
   transporterCompanyContact          String?
   transporterCompanyPhone            String?
   transporterCompanyMail             String?
+  transporterCompanyVatNumber        String?
   transporterReceipt                 String?
   transporterDepartment              String?
   transporterValidityLimit           DateTime?               @db.Timestamptz(6)
@@ -287,6 +292,11 @@ model Form {
   wasteDetailsIsDangerous            Boolean                 @default(false)
   readableId                         String                  @unique
   status                             Status                  @default(DRAFT)
+  emittedBy                          String?
+  emittedAt                          DateTime?               @db.Timestamptz(6)
+  emittedByEcoOrganisme              Boolean?
+  takenOverBy                        String?
+  takenOverAt                        DateTime?               @db.Timestamptz(6)
   sentAt                             DateTime?               @db.Timestamptz(6)
   sentBy                             String?
   isAccepted                         Boolean?                @default(false)
@@ -559,6 +569,10 @@ model TemporaryStorageDetail {
   transporterNumberPlate           String?
   transporterCustomInfo            String?
   transporterTransportMode         TransportMode?          @default(ROAD)
+  emittedBy                        String?
+  emittedAt                        DateTime?               @db.Timestamptz(6)
+  takenOverBy                      String?
+  takenOverAt                      DateTime?               @db.Timestamptz(6)
   signedByTransporter              Boolean?
   signedBy                         String?
   signedAt                         DateTime?               @db.Timestamptz(6)
@@ -869,6 +883,7 @@ model Bsdasri {
   // transporter
   transporterCompanyName              String?
   transporterCompanySiret             String?
+  transporterCompanyVatNumber         String?
   transporterCompanyAddress           String?
   transporterCompanyPhone             String?
   transporterCompanyContact           String?
@@ -1154,6 +1169,7 @@ model Bsda {
   wasteConsistence  BsdaConsistence?
   wasteSealNumbers  String[]
   wasteAdr          String?
+  wastePop          Boolean          @default(value: false)
 
   packagings       Json          @default("[]")
   // DEPRECATED - remove after migration
@@ -1255,8 +1271,8 @@ model Bsda {
 }
 
 model Event {
-  id         String   @id @default(cuid())
-  createdAt  DateTime @default(now())
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
 
   streamId String
   type     String

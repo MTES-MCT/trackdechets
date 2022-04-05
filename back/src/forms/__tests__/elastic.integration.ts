@@ -33,8 +33,9 @@ describe("getSiretsByTab", () => {
       opt: { status: Status.SEALED }
     });
     const fullForm = await getFullForm(form);
-    const { isFollowFor, isToCollectFor } = getSiretsByTab(fullForm);
-    expect(isFollowFor).toContain(form.emitterCompanySiret);
+    const { isFollowFor, isForActionFor, isToCollectFor } =
+      getSiretsByTab(fullForm);
+    expect(isForActionFor).toContain(form.emitterCompanySiret);
     expect(isFollowFor).toContain(form.recipientCompanySiret);
     expect(isToCollectFor).toContain(form.transporterCompanySiret);
   });
@@ -190,10 +191,11 @@ describe("getSiretsByTab", () => {
       ownerId: user.id
     });
     const fullForm = await getFullForm(form);
-    const { isFollowFor, isToCollectFor } = getSiretsByTab(fullForm);
+    const { isFollowFor, isForActionFor, isToCollectFor } =
+      getSiretsByTab(fullForm);
     expect(isFollowFor).toContain(form.emitterCompanySiret);
     expect(isFollowFor).toContain(form.transporterCompanySiret);
-    expect(isFollowFor).toContain(form.recipientCompanySiret);
+    expect(isForActionFor).toContain(form.recipientCompanySiret);
     expect(isFollowFor).toContain(
       fullForm.temporaryStorageDetail.destinationCompanySiret
     );

@@ -9,6 +9,7 @@ import { expandFormFromDb } from "../../form-converter";
 import { TemporaryStorageCannotReceive } from "../../errors";
 import prisma from "../../../prisma";
 import { getFormRepository } from "../../repository";
+import { WasteAcceptationStatus } from "@prisma/client";
 
 const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   parent,
@@ -52,6 +53,10 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
     await prisma.transportSegment.deleteMany({
       where: { id: { in: staleSegments.map(s => s.id) } }
     });
+  }
+
+  if (receivedInfo.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED) {
+    await formRepository.removeAppendix2(id);
   }
 
   return expandFormFromDb(receivedForm);

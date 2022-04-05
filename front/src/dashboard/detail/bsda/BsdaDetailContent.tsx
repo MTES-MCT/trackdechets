@@ -8,7 +8,7 @@ import {
 } from "common/components/Icons";
 import routes from "common/routes";
 import { useDuplicate } from "dashboard/components/BSDList/BSDa/BSDaActions/useDuplicate";
-import { statusLabels } from "dashboard/constants";
+import { statusLabels, transportModeLabels } from "dashboard/constants";
 import styles from "dashboard/detail/common/BSDDetailContent.module.scss";
 import { DateRow, DetailRow } from "dashboard/detail/common/Components";
 import { getVerboseAcceptationStatus } from "dashboard/detail/common/utils";
@@ -45,30 +45,48 @@ const Emitter = ({ form }: { form: Bsda }) => {
   return (
     <div className={styles.detailColumns}>
       <div className={styles.detailGrid}>
-        <Company label="Émetteur" company={emitter?.company} />
+        {emitter?.isPrivateIndividual ? (
+          <>
+            <DetailRow
+              value={emitter?.company?.name}
+              label="Nom de l'émetteur (particulier)"
+            />
+            <DetailRow
+              value={emitter?.company?.address}
+              label="Adresse de l'émetteur (particulier)"
+            />
+            <DetailRow
+              value={emitter?.company?.phone}
+              label="Téléphone de l'émetteur (particulier)"
+            />
+            <DetailRow
+              value={emitter?.company?.mail}
+              label="Email de l'émetteur (particulier)"
+            />
+          </>
+        ) : (
+          <Company label="Émetteur" company={emitter?.company} />
+        )}
         <DetailRow
           value={emitter?.pickupSite?.name}
           label="Nom du chantier/collecte"
         />
-        <DetailRow
-          value={emitter?.pickupSite?.address}
-          label="Adresse chantier/collecte"
-        />
-        <DetailRow
-          value={emitter?.pickupSite?.infos}
-          label="Informations complémentaires"
-        />
         {!!emitter?.pickupSite?.address && (
           <>
-            <dt>Adresse</dt>
+            <dt>Adresse chantier/collecte</dt>
             <dd>
               {emitter?.pickupSite?.address} {emitter?.pickupSite?.postalCode}{" "}
               {emitter?.pickupSite?.city}
             </dd>
           </>
         )}
+        <DetailRow
+          value={emitter?.pickupSite?.infos}
+          label="Informations complémentaires"
+        />
       </div>
       <div className={styles.detailGrid}>
+        <DetailRow value={emitter?.customInfo} label="Champ libre émetteur" />
         <DateRow value={emitter?.emission?.signature?.date} label="Signé le" />
         <DetailRow
           value={emitter?.emission?.signature?.author}
@@ -132,6 +150,14 @@ const Transporter = ({ form }: { form: Bsda }) => {
           value={transporter?.customInfo}
           label="Informations tranporteur"
         />
+        <DetailRow
+          value={
+            transporter?.transport?.mode
+              ? transportModeLabels[transporter.transport.mode]
+              : ""
+          }
+          label="Mode de transport"
+        />
         <DateRow
           value={transporter?.transport?.plates?.join(", ")}
           label="Immatriculations"
@@ -151,12 +177,15 @@ const Recipient = ({ form }: { form: Bsda }) => {
       </div>
       <div className={styles.detailGrid}>
         <DetailRow
+          value={destination?.customInfo}
+          label="Champ libre destinataire"
+        />
+        <DetailRow value={destination?.cap} label="CAP" />
+        <DetailRow
           value={destination?.reception?.weight}
           label="Poids reçu"
           units="tonne(s)"
         />
-      </div>
-      <div className={styles.detailGrid}>
         <DetailRow
           value={getVerboseAcceptationStatus(
             destination?.reception?.acceptationStatus
@@ -166,6 +195,10 @@ const Recipient = ({ form }: { form: Bsda }) => {
         <DetailRow
           value={destination?.reception?.refusalReason}
           label="Motif de refus"
+        />
+        <DateRow
+          value={destination?.reception?.date}
+          label="Réception effectuée le"
         />
         <DetailRow
           value={destination?.reception?.signature?.author}
@@ -178,8 +211,12 @@ const Recipient = ({ form }: { form: Bsda }) => {
       </div>
       <div className={styles.detailGrid}>
         <DetailRow
+          value={destination?.plannedOperationCode}
+          label="Opération de traitement prévue"
+        />
+        <DetailRow
           value={destination?.operation?.code}
-          label="Opération de traitement"
+          label="Opération de traitement réalisée"
         />
         <DateRow
           value={destination?.operation?.date}
@@ -257,10 +294,13 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
         <h4 className={styles.detailTitle}>
           <IconBSDa className="tw-mr-2" />
           <span className={styles.detailStatus}>
-            [{form.isDraft ? "Brouillon" : statusLabels[form["bsdaStatus"]]}]
+            [{form.isDraft ? "Brouillon" : statusLabels[form.status]}]
           </span>
-          {!form.isDraft && <span>{form.id}</span>}
-          {!!form?.grouping?.length && <span>Bordereau de groupement</span>}
+          <span>
+            {form.id} {form.isDraft && " (Brouillon)"}
+          </span>
+          {!!form?.grouping?.length && <span> - Bordereau de groupement</span>}
+          {!!form?.forwardedIn?.id && <span> - Bordereau de réexpédition</span>}
         </h4>
 
         <div className={styles.detailContent}>
@@ -283,6 +323,19 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             <dd>
               {form.waste?.materialName} {form.waste?.familyCode}
             </dd>
+            <dt>
+              Poids {form.destination?.reception?.weight ? "reçu" : "envoyé"}
+            </dt>
+            <dd>
+              {form.destination?.reception?.weight ? (
+                <>{form.destination?.reception?.weight} tonne(s)</>
+              ) : (
+                <>
+                  {form?.weight?.value} tonne(s) (
+                  {form?.weight?.isEstimate ? "estimé" : "réel"})
+                </>
+              )}
+            </dd>
           </div>
 
           <div className={styles.detailGrid}>
@@ -298,13 +351,16 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
 
             <dt>Scellés</dt>
             <dd>{form?.waste?.sealNumbers?.join(", ")}</dd>
+
+            <dt>Présence de POP</dt>
+            <dd>{form?.waste?.pop ? "Oui" : "Non"}</dd>
           </div>
 
           <div className={styles.detailGrid}>
-            {form?.grouping?.length && (
+            {Boolean(form?.grouping?.length) && (
               <>
-                <dt>Bordereau groupés:</dt>
-                <dd> {form?.grouping?.join(", ")}</dd>
+                <dt>Bordereaux groupés:</dt>
+                <dd> {form?.grouping?.map(g => g.id).join(", ")}</dd>
               </>
             )}
           </div>

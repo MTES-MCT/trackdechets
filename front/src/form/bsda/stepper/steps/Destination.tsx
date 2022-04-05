@@ -39,19 +39,6 @@ export function Destination({ disabled }) {
         heading="Entreprise de destination"
       />
 
-      <div className="form__row">
-        <label>
-          <input
-            type="checkbox"
-            onChange={onNextDestinationToggle}
-            disabled={disabled}
-            checked={hasNextDestination}
-            className="td-checkbox"
-          />
-          La destination indiquée n’est pas l’exutoire final
-        </label>
-      </div>
-
       {!isDechetterie && (
         <div className="form__row">
           <label>
@@ -98,6 +85,19 @@ export function Destination({ disabled }) {
             </>
           )}
         </Field>
+      </div>
+
+      <div className="form__row">
+        <label>
+          <input
+            type="checkbox"
+            onChange={onNextDestinationToggle}
+            disabled={disabled}
+            checked={hasNextDestination}
+            className="td-checkbox"
+          />
+          La destination indiquée n’est pas l’exutoire final
+        </label>
       </div>
 
       {hasNextDestination && (

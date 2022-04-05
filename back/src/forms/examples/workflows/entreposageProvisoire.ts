@@ -1,25 +1,28 @@
 import { createFormTempStorage } from "../steps/createForm";
 import { markAsSealed } from "../steps/markAsSealed";
-import {
-  signedByTransporter,
-  signedByTransporterAfterTempStorage
-} from "../steps/signedByTransporter";
 import { markAsTempStored } from "../steps/markAsTempStored";
 import { markAsResealed } from "../steps/markAsResealed";
 import { markAsReceived } from "../steps/markAsReceived";
 import { markAsProcessed } from "../steps/markAsProcessed";
 import { Workflow } from "../../../common/workflow";
+import {
+  signEmissionForm,
+  signEmissionFormAfterTempStorage
+} from "../steps/signEmissionForm";
+import {
+  signTransportForm,
+  signTransportFormAfterTempStorage
+} from "../steps/signTransportForm";
 
 const workflow: Workflow = {
   title: "Entreposage provisoire",
   description: `Les informations principales du BSDD sont remplies par l'émetteur du bordereau
 en précisant isTempStorage=true dans les informations de destination. Le destinataire correspond à
-l'installation d'entreposage provisoire. La signature de l'envoi se fait sur le terminal du transporteur
-grâce au code de signature de l'émetteur. L'installation d'entreposage provisoire accepte les déchets
-et complète les informations du second transporteur et de la destination finale (si ce n'est pas déjà fait par l'émetteur).
-La signature de l'envoi après entreposage provisoire se fait sur le terminal du transporteur n°2 grâce au code de signature de
-l'installation d'entreposage provisoire. L'installation de destination finale accepte le déchet et valide
-le traitement.`,
+l'installation d'entreposage provisoire. L'émetteur signe l'envoi, suivit du transporteur.
+L'installation d'entreposage provisoire accepte les déchets et complète les informations du
+second transporteur et de la destination finale (si ce n'est pas déjà fait par l'émetteur).
+L'installation d'entreposage provisoire signe l'envoi, suivit du transporteur n°2. L'installation
+de destination finale accepte le déchet et valide le traitement.`,
   companies: [
     { name: "producteur", companyTypes: ["PRODUCER"] },
     { name: "transporteur1", companyTypes: ["TRANSPORTER"] },
@@ -30,10 +33,12 @@ le traitement.`,
   steps: [
     createFormTempStorage("producteur"),
     markAsSealed("producteur"),
-    signedByTransporter("transporteur1"),
+    signEmissionForm("producteur"),
+    signTransportForm("transporteur1"),
     markAsTempStored("ttr"),
     markAsResealed("ttr"),
-    signedByTransporterAfterTempStorage("transporteur2"),
+    signEmissionFormAfterTempStorage("ttr"),
+    signTransportFormAfterTempStorage("transporteur2"),
     markAsReceived("traiteur"),
     markAsProcessed("traiteur")
   ],
@@ -47,14 +52,16 @@ le traitement.`,
   },
   chart: `
 graph LR
-AO(NO STATE) -->|createForm| A
-A(DRAFT) -->|markAsSealed| B(SEALED)
-B -->|signedByTransporter| C(SENT)
-C -->|markAsTempStored| D1(TEMP_STORER_ACCEPTED)
-D2(TEMP_STORER_ACCEPTED) --> |markAsResealed| E(RESEALED)
-E --> |signedByTransporter| F(RESENT)
-F --> |markAsReceived| G(RECEIVED)
-G --> |markAsProcessed| H(PROCESSED)`
+NO_STATE(NO STATE) --> |createForm| DRAFT
+DRAFT --> |markAsSealed| SEALED
+SEALED --> |signEmissionForm| SIGNED_BY_PRODUCER
+SIGNED_BY_PRODUCER --> |signTransportForm| SENT
+SENT --> |markAsTempStored| TEMP_STORER_ACCEPTED
+TEMP_STORER_ACCEPTED2(TEMP_STORER_ACCEPTED) --> |markAsResealed| RESEALED
+RESEALED --> |signEmissionForm| SIGNED_BY_TEMP_STORER
+SIGNED_BY_TEMP_STORER --> |signTransportForm| RESENT
+RESENT --> |markAsReceived| RECEIVED
+RECEIVED --> |markAsProcessed| PROCESSED`
 };
 
 export default workflow;

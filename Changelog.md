@@ -5,17 +5,79 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.04.1] ~04/04/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+- [Possibilité de rattacher à son compte des établissements hors-france par recherche à partir de leur numéro de TVA. Type d'établissements hors-France forcé à Transporteur. Amélioration de l'édition des bordereaux pour chercher par numéro de TVA les transporteurs inscrits sur Trackdéchets](https://github.com/MTES-MCT/trackdechets/pull/1240)
+  - Migrations pour ajouter `Company.vatNumber` et index et ajouter dans les borderaux où manquait encore un `transporterCompanyVatNumber`
+  - Ajout d'un client de recherche et validation de coordonnées sur numéro de TVA intra-communautaire (service http://ec.europa.eu/taxation_customs/vies/)
+  - ajout de `transporterCompanyVatNumber` dans les différents PDF
+  - ajout de la colonne `vatNumber` dans AnonymousCompany et mutations pour permettre d'ajouter quand même des établissements manuellement si le numéro de TVA n'est pas trouvé par le service VIES;
+  - extension de CompanySelector.tsx pour valider un numéro TVA et remplir les infos Company (le nom et l'adresse) automatiquement.
+  - extension d' AccountCompanyAdd.tsx pour supporter un numéro TVA et remplir les infos Company (le nom et l'adresse) automatiquement.
+  - Refacto `companyInfos` pour déplacer toute la logique dans `company/search.ts` et capable de chercher à la fois par SIRET et par TVA.
+  - Ajout de la possibilité de filtrer sur le champ `customId` (recherche exacte) sur le tableau de bord et dans la query `forms` [PR 1284](https://github.com/MTES-MCT/trackdechets/pull/1284)
+
+#### :bug: Corrections de bugs
+
+- fix CSS du stepper pour éviter le chevauchement du texte en responsive dans Stepper.module.scss.
+- Correction du refraichissement de l'interface après une création ou une suppression d'établissement [PR 1278](https://github.com/MTES-MCT/trackdechets/pull/1278)
+- Correction de l'affichage du caractère dangereux Oui/Non sur le PDF [PR 1280](https://github.com/MTES-MCT/trackdechets/pull/1280)
+- Correction de l'adresse de collecte incomplète pour le BSDA dans le registre [PR 1281](https://github.com/MTES-MCT/trackdechets/pull/1281)
+- Correction des statuts `AWAITING_GROUP` et `NO_TRACEABILITY` en cas d'import d'un BSDD papier via la mutation `importPaperForm` [PR 1283](https://github.com/MTES-MCT/trackdechets/pull/1283)
+- Affichage de l'adresse de collecte/chantier sur le détail d'une annexe 2 lorsque celle-ci est présente [PR 1286](https://github.com/MTES-MCT/trackdechets/pull/1286)
+- Détachement des annexes 2 en cas de refus [PR 1282](https://github.com/MTES-MCT/trackdechets/pull/1282)
+- Ajout d'un script de suppression des établissements orphelins et décodage des noms d'établissements contenant la chaîne de caractère \&amp; [PR 1288](https://github.com/MTES-MCT/trackdechets/pull/1288)
+
+#### :boom: Breaking changes
+
+- Flexibilisation de la signature producteur / transporteur et installation d'entreposage provisoire / transporteur [PR 1214](https://github.com/MTES-MCT/trackdechets/pull/1186)
+  - Ajout du statut `SIGNED_BY_PRODUCER` qui arrive après `SEALED` et avant `SENT`.
+  - Ajout du statut `SIGNED_BY_TEMP_STORER` qui arrive après `RESEALED` et avant `RESENT`.
+  - Ajout de la mutation `signEmissionForm` qui permet de passer du statut `SEALED` à `SIGNED_BY_PRODUCER` ainsi que de `RESEALED` à `SIGNED_BY_TEMP_STORER`. Il est possible d'utiliser le code de signature d'un acteur pour signer en son nom sans qu'il soit authentifié.
+  - Ajout de la mutation `signTransportForm` qui permet de passer du statut `SIGNED_BY_PRODUCER` à `SENT` ainsi que de `SIGNED_BY_TEMP_STORER` à `RESENT`. Il est possible d'utiliser le code de signature pour signer au nom du transporteur sans qu'il soit authentifié.
+  - Ajout des champs :
+    - `Form.emittedAt`, `Form.emittedBy`, `TemporaryStorageDetail.emittedAt`, `TemporaryStorageDetail.emittedBy` : date et nom de la personne signant pour le producteur, éco-organisme ou installation d'entreposage provisoire.
+    - `Form.emittedByEcoOrganisme` : indique si c'est l'éco-organisme qui a signé ou pas.
+    - `Form.takenOverAt`, `Form.takenOverBy`, `TemporaryStorageDetail.takenOverAt`, `TemporaryStorageDetail.takenOverBy` : date et nom de la personne signant pour le transporteur initial ou après entreposage provisoire.
+  - Dépréciation des champs :
+    - `Form.sentAt` : remplacé par `Form.takenOverAt`, qui peut différer de `Form.emittedAt`. Durant sa période de dépréciation le champ continue d'être remplit par la bonne valeur (`Form.takenOverAt`).
+    - `Form.sentBy` : remplacé par `Form.emittedBy`. Durant sa période de dépréciation le champ continue d'être remplit par la bonne valeur (`Form.emittedBy`).
+    - `TemporaryStorageDetail.signedAt` : remplacé par `TemporaryStorageDetail.takenOverAt`, qui peut différer de `TemporaryStorageDetail.emittedAt`. Durant sa période de dépréciation le champ continue d'être remplit par la bonne valeur (`TemporaryStorageDetail.takenOverAt`).
+    - `TemporaryStorageDetail.signedBy` : remplacé par `TemporaryStorageDetail.takenOverBy`. Durant sa période de dépréciation le champ continue d'être remplit par la bonne valeur (`TemporaryStorageDetail.takenOverBy`).
+  - Déprécation de la mutation `signedByTransporter`, remplacée par `signEmissionForm` et `signTransportForm` pour faire en deux temps ce qui se faisait avant en un temps. Elle permet toujours de faire passer un bordereau du statut `SEALED` à `SENT` et de `RESEALED` à `RESENT` tout en remplissant les nouveaux champs. En revanche, elle ne permet pas de gérer le statut `SIGNED_BY_PRODUCER` et `SIGNED_BY_TEMP_STORER`.
+
+#### :nail_care: Améliorations
+
+- Nombreuses améliorations sur le BSDA (plus de champs dans l'aperçu, meilleure validation des données, corrections de bugs sur le groupement, amélioration de wordings...) [PR 1271](https://github.com/MTES-MCT/trackdechets/pull/1271)
+- Passage au client ElasticSearch TD interne pour le script add-address-lat-long.ts
+
+#### :memo: Documentation
+
+- Mise à jour de la documentation : Tutoriels > Démarrage Rapide > Obtenir un jeton d'accès [PR 1277](https://github.com/MTES-MCT/trackdechets/pull/1277)
+- Mise à jour de la référence du champ `Dasri.allowDirectTakeOver` [PR 1277](https://github.com/MTES-MCT/trackdechets/pull/1277)
+- Ajout de badges de tests sur le README.md et correction lien search
+- Mis à jour fonctionnement de recherche Sirene
+- Ajout d'un embed de la vidéo #14 "Introduction de Trackdéchets par API" au tutoriel de démarrage rapide [PR 1285](https://github.com/MTES-MCT/trackdechets/pull/1285)
+
+#### :house: Interne
+
+- Refactoring de `formRepository` [PR 1276](https://github.com/MTES-MCT/trackdechets/pull/1276)
+
 # [2022.03.1] ~14/03/2022
 
 #### :rocket: Nouvelles fonctionnalités
 
-- Ajout d'un client primaire nommé trackdechets dans `companies/sirene` basé sur notre propre index  ElasticSearch des données Sirene INSEE [PR 1214](https://github.com/MTES-MCT/trackdechets/pull/1214)
+- Ajout d'un client primaire nommé trackdechets dans `companies/sirene` basé sur notre propre index ElasticSearch des données Sirene INSEE [PR 1214](https://github.com/MTES-MCT/trackdechets/pull/1214)
 - Ajout du caractère dangereux pour des déchets dont le code ne comporte pas d'astérisque [PR 1177](https://github.com/MTES-MCT/trackdechets/pull/1177)
+
 #### :bug: Corrections de bugs
 
 - Correction de l'adresse chantier incomplète dans le registre [PR 1238](https://github.com/MTES-MCT/trackdechets/pull/1238)
 - Correction de l'indexation des filtres d'onglet du tableau de bord [PR 1215](https://github.com/MTES-MCT/trackdechets/pull/1215)
 - Correction d'un bug de corruption de la structure du payload renvoyé par l'API en présence des caractères spéciaux "<" et ">" [PR 1250](https://github.com/MTES-MCT/trackdechets/pull/1250)
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
@@ -577,7 +639,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :boom: Breaking changes
 
 - Seuls les établissements inscrits sur Trackdéchets en tant qu'installation de traitement ou de tri, transit, regoupement peuvent être visés en case 2 ou 14 [PR 784](https://github.com/MTES-MCT/trackdechets/pull/784)
-- Suppression du champ `companyTypes` du type `CompanySearchResult` retourné par la query `searchCompanies`. Ce champ avait été ajouté par erreur et renvoyait tout le temps `null` [PR 784](https://github.com/MTES-MCT/trackdechets/pull/784)
 - Validation exhaustive des champs pour les brouillons. Il était jusqu'à présent possible de saisir des valeurs invalides tant qu'un BSD était en brouillon. Les mêmes règles de validation que pour les bordereaux scéllés sont désormais appliquées [PR 764](https://github.com/MTES-MCT/trackdechets/pull/764)
 
 #### :bug: Corrections de bugs

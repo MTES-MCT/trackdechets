@@ -10,6 +10,9 @@ import { CompanyType } from "@prisma/client";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../../mailer/templates";
 import { Mutation } from "../../../../generated/graphql/types";
+import * as searchCompany from "../../../sirene/searchCompany";
+
+const searchSirene = jest.spyOn(searchCompany, "default");
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -24,6 +27,7 @@ const CREATE_COMPANY = `
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
     createCompany(companyInput: $companyInput) {
       siret
+      vatNumber
       gerepId
       name
       companyTypes
@@ -46,17 +50,26 @@ const CREATE_COMPANY = `
 `;
 
 describe("Mutation.createCompany", () => {
-  afterEach(() => resetDatabase());
+  afterEach(async () => {
+    await resetDatabase();
+    searchSirene.mockReset();
+  });
 
   it("should create company and userAssociation", async () => {
     const user = await userFactory();
 
     const companyInput = {
-      siret: "12345678912345",
+      orgId: "12345678912345",
       gerepId: "1234",
       companyName: "Acme",
       companyTypes: ["PRODUCER"]
     };
+
+    searchSirene.mockResolvedValueOnce({
+      siret: "12345678912345",
+      etatAdministratif: "A"
+    });
+
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await mutate<Pick<Mutation, "createCompany">>(
       CREATE_COMPANY,
@@ -68,7 +81,7 @@ describe("Mutation.createCompany", () => {
     );
 
     expect(data.createCompany).toMatchObject({
-      siret: companyInput.siret,
+      siret: companyInput.orgId,
       gerepId: companyInput.gerepId,
       name: companyInput.companyName,
       companyTypes: companyInput.companyTypes,
@@ -78,14 +91,14 @@ describe("Mutation.createCompany", () => {
     const newCompanyExists =
       (await prisma.company.findFirst({
         where: {
-          siret: companyInput.siret
+          siret: companyInput.orgId
         }
       })) != null;
     expect(newCompanyExists).toBe(true);
 
     const newCompanyAssociationExists =
       (await prisma.companyAssociation.findFirst({
-        where: { company: { siret: companyInput.siret }, user: { id: user.id } }
+        where: { company: { siret: companyInput.orgId }, user: { id: user.id } }
       })) != null;
     expect(newCompanyAssociationExists).toBe(true);
 
@@ -101,12 +114,18 @@ describe("Mutation.createCompany", () => {
     const user = await userFactory();
 
     const companyInput = {
-      siret: "12345678912345",
+      orgId: "12345678912345",
       gerepId: "1234",
       companyName: "Acme",
       companyTypes: ["PRODUCER"],
       allowBsdasriTakeOverWithoutSignature: true
     };
+
+    searchSirene.mockResolvedValueOnce({
+      siret: "12345678912345",
+      etatAdministratif: "A"
+    });
+
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await mutate<Pick<Mutation, "createCompany">>(
       CREATE_COMPANY,
@@ -118,7 +137,7 @@ describe("Mutation.createCompany", () => {
     );
 
     expect(data.createCompany).toMatchObject({
-      siret: companyInput.siret,
+      siret: companyInput.orgId,
       gerepId: companyInput.gerepId,
       name: companyInput.companyName,
       companyTypes: companyInput.companyTypes,
@@ -128,14 +147,14 @@ describe("Mutation.createCompany", () => {
     const newCompanyExists =
       (await prisma.company.findFirst({
         where: {
-          siret: companyInput.siret
+          siret: companyInput.orgId
         }
       })) != null;
     expect(newCompanyExists).toBe(true);
 
     const newCompanyAssociationExists =
       (await prisma.companyAssociation.findFirst({
-        where: { company: { siret: companyInput.siret }, user: { id: user.id } }
+        where: { company: { siret: companyInput.orgId }, user: { id: user.id } }
       })) != null;
     expect(newCompanyAssociationExists).toBe(true);
 
@@ -158,11 +177,16 @@ describe("Mutation.createCompany", () => {
       }
     });
     const companyInput = {
-      siret: "12345678912345",
+      orgId: "12345678912345",
       companyName: "Acme",
       companyTypes: ["TRANSPORTER"],
       transporterReceiptId: transporterReceipt.id
     };
+
+    searchSirene.mockResolvedValueOnce({
+      siret: "12345678912345",
+      etatAdministratif: "A"
+    });
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await mutate<Pick<Mutation, "createCompany">>(
@@ -196,11 +220,16 @@ describe("Mutation.createCompany", () => {
       }
     });
     const companyInput = {
-      siret: "12345678912345",
+      orgId: "12345678912345",
       companyName: "Acme",
       companyTypes: ["TRADER"],
       traderReceiptId: traderReceipt.id
     };
+
+    searchSirene.mockResolvedValueOnce({
+      siret: "12345678912345",
+      etatAdministratif: "A"
+    });
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await mutate<Pick<Mutation, "createCompany">>(
@@ -230,11 +259,17 @@ describe("Mutation.createCompany", () => {
 
     // try re-creating the same company
     const companyInput = {
-      siret: company.siret,
+      orgId: company.siret,
       gerepId: company.gerepId,
       companyName: company.name,
       companyTypes: company.companyTypes
     };
+
+    searchSirene.mockResolvedValueOnce({
+      siret: company.siret,
+      etatAdministratif: "A"
+    });
+
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const { errors, data } = await mutate(CREATE_COMPANY, {
       variables: {
@@ -248,12 +283,16 @@ describe("Mutation.createCompany", () => {
 
   it("should return an error when creating an unknown eco-organisme", async () => {
     const user = await userFactory();
+    searchSirene.mockResolvedValueOnce({
+      siret: "0".repeat(14),
+      etatAdministratif: "A"
+    });
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const { errors } = await mutate(CREATE_COMPANY, {
       variables: {
         companyInput: {
-          siret: "0".repeat(14),
+          orgId: "0".repeat(14),
           companyTypes: ["ECO_ORGANISME"]
         }
       }
@@ -271,14 +310,19 @@ describe("Mutation.createCompany", () => {
     const user = await userFactory();
 
     const companyInput = {
-      siret: "0".repeat(14),
+      orgId: "0".repeat(14),
       companyTypes: ["ECO_ORGANISME"]
     };
+    searchSirene.mockResolvedValueOnce({
+      siret: "0".repeat(14),
+      etatAdministratif: "A"
+    });
+
     await prisma.ecoOrganisme.create({
       data: {
         address: "",
         name: "Eco-Organisme",
-        siret: companyInput.siret
+        siret: companyInput.orgId
       }
     });
 
@@ -300,15 +344,20 @@ describe("Mutation.createCompany", () => {
     const user = await userFactory();
 
     const companyInput = {
-      siret: "0".repeat(14),
+      orgId: "0".repeat(14),
       companyTypes: ["ECO_ORGANISME"],
       ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
     };
+    searchSirene.mockResolvedValueOnce({
+      siret: "0".repeat(14),
+      etatAdministratif: "A"
+    });
+
     await prisma.ecoOrganisme.create({
       data: {
         address: "",
         name: "Eco-Organisme",
-        siret: companyInput.siret
+        siret: companyInput.orgId
       }
     });
 
@@ -331,10 +380,14 @@ describe("Mutation.createCompany", () => {
     const user = await userFactory();
 
     const companyInput = {
-      siret: "0".repeat(14),
+      orgId: "0".repeat(14),
       companyTypes: ["PRODUCER"],
       ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
     };
+    searchSirene.mockResolvedValueOnce({
+      siret: "0".repeat(14),
+      etatAdministratif: "A"
+    });
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const { errors } = await mutate(CREATE_COMPANY, {
@@ -363,7 +416,12 @@ describe("Mutation.createCompany", () => {
     const makeClient = require("../../../../__tests__/testClient").default;
     const mailsHelper = require("../../../../mailer/mailing");
     const geocode = require("../../../geocode");
-
+    const searchCompanyReload = require("../../../sirene/searchCompany");
+    const searchSireneMock = jest.spyOn(searchCompanyReload, "default");
+    searchSireneMock.mockResolvedValueOnce({
+      siret: "12345678912345",
+      etatAdministratif: "A"
+    });
     // No mails
     const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
     sendMailSpy.mockImplementation(() => Promise.resolve());
@@ -375,20 +433,22 @@ describe("Mutation.createCompany", () => {
 
     const user = await userFactory();
     const companyInput = {
-      siret: "12345678912345",
+      orgId: "12345678912345",
       gerepId: "1234",
       companyName: "Acme",
       companyTypes: [CompanyType.WASTEPROCESSOR]
     };
+
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    await mutate(CREATE_COMPANY, {
+    const { errors } = await mutate(CREATE_COMPANY, {
       variables: {
         companyInput
       }
     });
+    expect(errors).toBeUndefined();
 
     const company = await prisma.company.findUnique({
-      where: { siret: companyInput.siret }
+      where: { siret: companyInput.orgId }
     });
 
     expect(sendMailSpy).toHaveBeenCalledWith(

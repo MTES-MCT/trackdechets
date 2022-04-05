@@ -7,7 +7,7 @@ const companyForVerificationResolvers: CompanyForVerificationResolvers = {
     // returns first admin who joined
     const admin = await prisma.companyAssociation
       .findFirst({
-        where: { company: { siret: parent.siret }, role: UserRole.ADMIN }
+        where: { company: { id: parent.id }, role: UserRole.ADMIN }
       })
       .user();
     return admin;

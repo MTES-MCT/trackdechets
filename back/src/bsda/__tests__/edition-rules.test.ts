@@ -2,10 +2,11 @@ import { Bsda, BsdaType } from "@prisma/client";
 import { SealedFieldsError } from "../../bsvhu/errors";
 import { checkKeysEditability } from "../edition-rules";
 
+type BsdaWithGrouping = Bsda & { grouping: Bsda[] };
 describe("Bsda edition rules", () => {
   it("should allow edits before signature", () => {
     expect(() =>
-      checkKeysEditability({ type: BsdaType.GATHERING }, {} as Bsda)
+      checkKeysEditability({ type: BsdaType.GATHERING }, {} as BsdaWithGrouping)
     ).not.toThrow();
   });
 
@@ -13,7 +14,7 @@ describe("Bsda edition rules", () => {
     expect(() =>
       checkKeysEditability({ type: BsdaType.GATHERING }, {
         emitterEmissionSignatureDate: new Date()
-      } as Bsda)
+      } as BsdaWithGrouping)
     ).toThrow(SealedFieldsError);
   });
 
@@ -22,7 +23,7 @@ describe("Bsda edition rules", () => {
     try {
       checkKeysEditability({ type: BsdaType.GATHERING }, {
         emitterEmissionSignatureDate: new Date()
-      } as Bsda);
+      } as BsdaWithGrouping);
     } catch (err) {
       expect(err.message).toBe(
         "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: type"
@@ -35,7 +36,7 @@ describe("Bsda edition rules", () => {
     try {
       checkKeysEditability({ emitter: { company: { mail: "edit@td.com" } } }, {
         emitterEmissionSignatureDate: new Date()
-      } as Bsda);
+      } as BsdaWithGrouping);
     } catch (err) {
       expect(err.message).toBe(
         "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: emitter.company.mail"
@@ -50,7 +51,7 @@ describe("Bsda edition rules", () => {
         { destination: { company: { mail: "edit@td.com" } } },
         {
           emitterEmissionSignatureDate: new Date()
-        } as Bsda
+        } as BsdaWithGrouping
       );
     } catch (err) {
       expect(err.message).toBe(

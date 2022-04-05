@@ -75,7 +75,8 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
       familyCode: form.wasteFamilyCode,
       materialName: form.wasteMaterialName,
       sealNumbers: form.wasteSealNumbers,
-      adr: form.wasteAdr
+      adr: form.wasteAdr,
+      pop: form.wastePop
     }),
     weight: nullIfNoValues<BsdaWeight>({
       isEstimate: form.weightIsEstimate,
@@ -159,11 +160,11 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
       company: nullIfNoValues<FormCompany>({
         name: form.transporterCompanyName,
         siret: form.transporterCompanySiret,
+        vatNumber: form.transporterCompanyVatNumber,
         address: form.transporterCompanyAddress,
         contact: form.transporterCompanyContact,
         phone: form.transporterCompanyPhone,
-        mail: form.transporterCompanyMail,
-        vatNumber: form.transporterCompanyVatNumber
+        mail: form.transporterCompanyMail
       }),
       customInfo: form.transporterCustomInfo,
       recepisse: nullIfNoValues<BsdaRecepisse>({
@@ -445,7 +446,8 @@ function flattenBsdaWasteInput({ waste }: Pick<BsdaInput, "waste">) {
     wasteMaterialName:
       chain(waste, w => w.materialName) ?? chain(waste, w => w.name),
     wasteConsistence: chain(waste, w => w.consistence),
-    wasteSealNumbers: chain(waste, w => w.sealNumbers)
+    wasteSealNumbers: chain(waste, w => w.sealNumbers),
+    wastePop: chain(waste, w => w.pop)
   };
 }
 

@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import * as supportedBrowsers from "./supportedBrowsers";
+import supportedBrowsers from "./supportedBrowsers";
 
 type Props = {
   children: ReactNode;

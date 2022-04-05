@@ -11,6 +11,7 @@ import {
   FormStatus,
   Mutation,
   MutationMarkAsProcessedArgs,
+  ProcessedFormInput,
 } from "generated/graphql/types";
 import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
@@ -104,8 +105,9 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
           ))}
         </Field>
         <div>
-          Code de traitement initialement prévu par le producteur:{" "}
-          {form.recipient?.processingOperation}
+          Code de traitement prévu :{" "}
+          {form.temporaryStorageDetail?.destination?.processingOperation ??
+            form.recipient?.processingOperation}
         </div>
       </div>
       <div className="form__row">
@@ -140,7 +142,8 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
           <h4>Destination ultérieure prévue</h4>
           <CompanySelector
             name="nextDestination.company"
-            allowForeignCompanies
+            allowForeignCompanies={true}
+            displayVatSearch={false}
           />
 
           <div className="form__row">
@@ -211,7 +214,7 @@ export default function MarkAsProcessed({ form, siret }: WorkflowActionProps) {
       )}
       modalContent={close => (
         <div>
-          <Formik
+          <Formik<ProcessedFormInput>
             initialValues={{
               processingOperationDone: "",
               processingOperationDescription: "",
@@ -220,11 +223,22 @@ export default function MarkAsProcessed({ form, siret }: WorkflowActionProps) {
               nextDestination: null,
               noTraceability: null,
             }}
-            onSubmit={values =>
-              markAsProcessed({
-                variables: { id: form.id, processedInfo: values },
-              })
-            }
+            onSubmit={({ nextDestination, ...values }) => {
+              const cleanedNextDestination = nextDestination;
+              if (cleanedNextDestination?.company) {
+                // clean vatNumber that may have been added by CompanySelector
+                delete cleanedNextDestination.company["vatNumber"];
+              }
+              return markAsProcessed({
+                variables: {
+                  id: form.id,
+                  processedInfo: {
+                    ...values,
+                    nextDestination: cleanedNextDestination,
+                  },
+                },
+              });
+            }}
           >
             <ProcessedInfo form={form} close={close} />
           </Formik>

@@ -1,6 +1,6 @@
 import { Updater, registerUpdater } from "./helper/helper";
 import prisma from "../../src/prisma";
-import { searchCompany } from "../../src/companies/sirene/insee/client";
+import { searchCompany } from "../../src/companies/search";
 import geocode from "../../src/companies/geocode";
 
 function sleep(ms) {
@@ -18,6 +18,7 @@ export class AddAddressLatLongUpdater implements Updater {
       const companies = await prisma.company.findMany();
       for (const company of companies) {
         try {
+          // TODO index geocoding directly in trackdechets/search module by fetching geocoded SIRENE fron data.gouv.fr
           const companyInfo = await searchCompany(company.siret);
           const { latitude, longitude } = await geocode(companyInfo.address);
           await prisma.company.update({

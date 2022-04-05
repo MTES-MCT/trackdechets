@@ -60,7 +60,7 @@ export default withRouter(function LayoutContainer({ history }) {
   const email = data?.me?.email;
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== "production") {
+    if (import.meta.env.NODE_ENV !== "production") {
       return;
     }
 
@@ -71,7 +71,7 @@ export default withRouter(function LayoutContainer({ history }) {
   });
 
   useEffect(() => {
-    if (process.env.REACT_APP_SENTRY_DSN && email) {
+    if (import.meta.env.VITE_SENTRY_DSN && email) {
       Sentry.setUser({ email });
     }
   }, [email]);

@@ -13,6 +13,7 @@ import Tooltip from "common/components/Tooltip";
 import TagsInput from "common/components/tags-input/TagsInput";
 import WeightWidget from "./components/Weight";
 import { FieldTransportModeSelect } from "common/components";
+import initialState from "./utils/initial-state";
 
 /**
  *
@@ -68,6 +69,8 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
           name="transporter.company"
           heading="Entreprise de transport"
           optionalMail={true}
+          allowForeignCompanies={true}
+          registeredOnlyCompanies={true}
           onCompanySelected={transporter => {
             if (transporter.transporterReceipt) {
               setFieldValue(
@@ -84,7 +87,10 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
               );
             } else {
               setFieldValue("transporter.recepisse.number", "");
-              setFieldValue("transporter.recepisse.validityLimit", null);
+              setFieldValue(
+                "transporter.recepisse.validityLimit",
+                initialState().transporter.recepisse.validityLimit
+              );
               setFieldValue("transporter.recepisse.department", "");
             }
           }}

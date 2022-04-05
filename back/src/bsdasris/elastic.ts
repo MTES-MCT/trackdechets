@@ -113,6 +113,7 @@ function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
   return {
     id: bsdasri.id,
     readableId: bsdasri.id,
+    customId: "",
     type: "BSDASRI",
     emitterCompanyName: bsdasri.emitterCompanyName ?? "",
     emitterCompanySiret: bsdasri.emitterCompanySiret ?? "",

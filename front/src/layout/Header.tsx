@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   NavLink,
   Link,
@@ -180,14 +180,14 @@ export default withRouter(function Header({
   location,
   history,
 }: RouteComponentProps & HeaderProps) {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  const { VITE_API_ENDPOINT } = import.meta.env;
   const [menuHidden, toggleMenu] = useState(true);
 
   const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
-  const closeMobileMenu = React.useCallback(
-    () => isMobile && toggleMenu(true),
-    [isMobile, toggleMenu]
-  );
+  const closeMobileMenu = useCallback(() => isMobile && toggleMenu(true), [
+    isMobile,
+    toggleMenu,
+  ]);
 
   useEffect(() => {
     return history.listen(() => {
@@ -282,7 +282,7 @@ export default withRouter(function Header({
                 <form
                   className={styles.headerConnexion}
                   name="logout"
-                  action={`${REACT_APP_API_ENDPOINT}/logout`}
+                  action={`${VITE_API_ENDPOINT}/logout`}
                   method="post"
                 >
                   <button

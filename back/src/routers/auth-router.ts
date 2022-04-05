@@ -4,6 +4,7 @@ import querystring from "querystring";
 import { getUIBaseURL } from "../utils";
 import { sess } from "../server";
 import nocache from "../common/middlewares/nocache";
+import { ADMIN_IS_PERSONIFYING } from "../auth";
 
 const UI_BASE_URL = getUIBaseURL();
 
@@ -28,6 +29,13 @@ authRouter.post("/login", (req, res, next) => {
       );
     }
     req.login(user, () => {
+      if (info?.message === ADMIN_IS_PERSONIFYING) {
+        // when personifying a user account we reduce the session duration to 1 hour and display a message
+        const oneHourInMs = 3600000;
+        req.session.cookie.maxAge = oneHourInMs;
+        req.session.warningMessage = `Attention, vous êtes actuellement connecté avec le compte utilisateur ${user.email} pour une durée de 1 heure.`;
+      }
+
       const returnTo = req.body.returnTo || "/";
       return res.redirect(`${UI_BASE_URL}${returnTo}`);
     });
@@ -40,6 +48,7 @@ authRouter.get("/isAuthenticated", nocache, (req, res) => {
 
 authRouter.post("/logout", (req, res) => {
   req.logout();
+  delete req.session.warningMessage;
   res
     .clearCookie(sess.name, {
       domain: sess.cookie.domain,

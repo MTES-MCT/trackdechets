@@ -200,6 +200,9 @@ function flattenTransporterInput(input: { transporter?: TransporterInput }) {
     transporterCompanyMail: chain(input.transporter, t =>
       chain(t.company, c => c.mail)
     ),
+    transporterCompanyVatNumber: chain(input.transporter, t =>
+      chain(t.company, c => c.vatNumber)
+    ),
     transporterIsExemptedOfReceipt: chain(
       input.transporter,
       t => t.isExemptedOfReceipt
@@ -578,6 +581,7 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       company: nullIfNoValues<FormCompany>({
         name: form.transporterCompanyName,
         siret: form.transporterCompanySiret,
+        vatNumber: form.transporterCompanyVatNumber,
         address: form.transporterCompanyAddress,
         contact: form.transporterCompanyContact,
         phone: form.transporterCompanyPhone,
@@ -641,6 +645,11 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
     createdAt: form.createdAt,
     updatedAt: form.updatedAt,
     status: form.status as FormStatus,
+    emittedAt: form.emittedAt,
+    emittedBy: form.emittedBy,
+    emittedByEcoOrganisme: form.emittedByEcoOrganisme,
+    takenOverAt: form.takenOverAt,
+    takenOverBy: form.takenOverBy,
     signedByTransporter: form.signedByTransporter,
     sentAt: form.sentAt,
     sentBy: form.sentBy,
@@ -685,12 +694,17 @@ export function expandAppendix2FormFromDb(
     quantityReceived,
     processingOperationDone
   } = expandFormFromDb(prismaForm);
+
+  const hasPickupSite = emitter?.workSite?.postalCode?.length > 0;
+
   return {
     id,
     readableId,
     wasteDetails,
     emitter,
-    emitterPostalCode: extractPostalCode(emitter?.company?.address),
+    emitterPostalCode: hasPickupSite
+      ? emitter?.workSite?.postalCode
+      : extractPostalCode(emitter?.company?.address),
     signedAt,
     recipient,
     quantityReceived,
@@ -764,6 +778,10 @@ export function expandTemporaryStorageFromDb(
         ? temporaryStorageDetail.transporterTransportMode
         : null
     }),
+    emittedAt: temporaryStorageDetail.emittedAt,
+    emittedBy: temporaryStorageDetail.emittedBy,
+    takenOverBy: temporaryStorageDetail.takenOverBy,
+    takenOverAt: temporaryStorageDetail.takenOverAt,
     signedBy: temporaryStorageDetail.signedBy,
     signedAt: temporaryStorageDetail.signedAt
   };

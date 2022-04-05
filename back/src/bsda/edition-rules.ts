@@ -1,4 +1,4 @@
-import { Bsda } from "@prisma/client";
+import { Bsda, Prisma } from "@prisma/client";
 import { isObject, objectDiff } from "../forms/workflow/diff";
 import { BsdaInput, BsdaSignatureType } from "../generated/graphql/types";
 import { SealedFieldsError } from "../bsvhu/errors";
@@ -11,7 +11,15 @@ const signatureToFieldMapping: { [key in BsdaSignatureType]: keyof Bsda } = {
   OPERATION: "destinationOperationSignatureDate"
 };
 
-export function checkKeysEditability(updates: BsdaInput, bsda: Bsda) {
+const bsdaWithGrouping = Prisma.validator<Prisma.BsdaArgs>()({
+  include: { grouping: true }
+});
+type BsdaWithGrouping = Prisma.BsdaGetPayload<typeof bsdaWithGrouping>;
+
+export function checkKeysEditability(
+  updates: BsdaInput,
+  bsda: BsdaWithGrouping
+) {
   // Calculate diff between the update & the current form
   // as we allow reposting fields if they are not modified
   const diffInput = getDiffInput(updates, bsda);
@@ -41,7 +49,8 @@ const editableFields = {
     materialName: ifAwaitingSignature("WORK"),
     consistence: ifAwaitingSignature("WORK"),
     sealNumbers: ifAwaitingSignature("WORK"),
-    adr: ifAwaitingSignature("WORK")
+    adr: ifAwaitingSignature("WORK"),
+    pop: ifAwaitingSignature("WORK")
   },
   packagings: ifAwaitingSignature("WORK"),
   weight: ifAwaitingSignature("WORK"),
@@ -61,14 +70,21 @@ function ifAwaitingSignature(signature: BsdaSignatureType) {
   return (bsda: Bsda) => bsda[field] == null;
 }
 
-function getDiffInput(updates: BsdaInput, currentForm: Bsda) {
+function getDiffInput(updates: BsdaInput, currentForm: BsdaWithGrouping) {
   const prismaForm = expandBsdaFromDb(currentForm);
-  return objectDiff(prismaForm, updates);
+
+  return objectDiff(
+    {
+      ...prismaForm,
+      grouping: currentForm.grouping?.map(g => g.id)
+    },
+    updates
+  );
 }
 
 function getInvalidKeys(updates: BsdaInput, bsda: Bsda): string[] {
-  const listOfDeepKees = recursiveGetFlatKeys(updates);
-  return listOfDeepKees
+  const listOfDeepKeys = recursiveGetFlatKeys(updates);
+  return listOfDeepKeys
     .map(({ keys }) => {
       const rule = getSafeNestedKey(editableFields, keys);
       return rule(bsda) ? null : keys.join(".");

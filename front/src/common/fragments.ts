@@ -11,6 +11,7 @@ export const companyFragment = gql`
   fragment CompanyFragment on FormCompany {
     name
     siret
+    vatNumber
     address
     contact
     country
@@ -125,6 +126,10 @@ const brokerFragment = gql`
 
 export const temporaryStorageDetailFragment = gql`
   fragment TemporaryStorageDetailFragment on TemporaryStorageDetail {
+    emittedAt
+    emittedAt
+    takenOverAt
+    takenOverBy
     temporaryStorer {
       quantityType
       quantityReceived
@@ -189,6 +194,7 @@ export const segmentFragment = gql`
 export const staticFieldsFragment = gql`
   fragment StaticFieldsFragment on Form {
     readableId
+    customId
     createdAt
     status
     stateSummary {
@@ -221,6 +227,11 @@ const mutableFieldsFragment = gql`
     id
     customId
     sentAt
+    emittedAt
+    emittedBy
+    emittedByEcoOrganisme
+    takenOverAt
+    takenOverBy
     emitter {
       ...EmitterFragment
     }
@@ -640,9 +651,19 @@ export const bsdaFragment = gql`
         name
         siret
       }
+      customInfo
+      transport {
+        plates
+      }
     }
     waste {
       materialName
+    }
+    forwardedIn {
+      id
+    }
+    groupedIn {
+      id
     }
   }
 `;

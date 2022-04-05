@@ -10,10 +10,10 @@ import * as serviceWorker from "./serviceWorker";
 import * as Sentry from "@sentry/browser";
 import "@reach/tooltip/styles.css";
 
-if (process.env.REACT_APP_SENTRY_DSN) {
+if (import.meta.env.VITE_SENTRY_DSN) {
   Sentry.init({
-    dsn: process.env.REACT_APP_SENTRY_DSN,
-    environment: process.env.REACT_APP_SENTRY_ENVIRONMENT,
+    dsn: import.meta.env.VITE_SENTRY_DSN as string,
+    environment: import.meta.env.VITE_SENTRY_ENVIRONMENT as string,
     ignoreErrors: [
       // The user is having issues with their internet connection
       "NetworkError when attempting to fetch resource.",

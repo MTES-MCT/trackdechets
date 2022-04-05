@@ -5,11 +5,16 @@ import { ErrorCode } from "../../../../common/errors";
 import {
   companyFactory,
   formFactory,
+  formWithTempStorageFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
-import { Status } from "@prisma/client";
+import { CompanyType, Status, UserRole } from "@prisma/client";
+import {
+  Mutation,
+  MutationMarkAsTempStoredArgs
+} from "../../../../generated/graphql/types";
 
 const MARK_AS_TEMP_STORED = `
   mutation MarkAsTempStored($id: ID!, $tempStoredInfos: TempStoredFormInput!){
@@ -21,7 +26,7 @@ const MARK_AS_TEMP_STORED = `
 `;
 
 describe("{ mutation { markAsTempStored } }", () => {
-  afterAll(() => resetDatabase());
+  afterEach(() => resetDatabase());
 
   test("it fails when form is not SENT", async () => {
     const { user, company: tempStorerCompany } = await userWithCompanyFactory(
@@ -345,4 +350,83 @@ describe("{ mutation { markAsTempStored } }", () => {
       expect(tempStorage.tempStorerReceivedAt).toEqual(receivedAt);
     }
   );
+
+  it("should unlink appendix 2 in case of refusal", async () => {
+    const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
+      UserRole.MEMBER,
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const { user: destinationUser, company: destination } =
+      await userWithCompanyFactory(UserRole.MEMBER, {
+        companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+      });
+
+    const form1 = await formFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        status: "GROUPED",
+        processingOperationDone: "R 13",
+        recipientCompanySiret: ttr.siret
+      }
+    });
+
+    const form2 = await formFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        status: "GROUPED",
+        processingOperationDone: "R 13",
+        recipientCompanySiret: ttr.siret
+      }
+    });
+
+    const groupementForm = await formWithTempStorageFactory({
+      ownerId: ttrUser.id,
+      opt: {
+        emitterType: "APPENDIX2",
+        emitterCompanySiret: ttr.siret,
+        status: Status.SENT,
+        receivedBy: "Bill",
+        recipientCompanySiret: destination.siret,
+        receivedAt: new Date("2019-01-17"),
+        appendix2Forms: { connect: [{ id: form1.id }, { id: form2.id }] }
+      }
+    });
+
+    const { mutate } = makeClient(destinationUser);
+
+    await mutate<
+      Pick<Mutation, "markAsReceived">,
+      MutationMarkAsTempStoredArgs
+    >(MARK_AS_TEMP_STORED, {
+      variables: {
+        id: groupementForm.id,
+        tempStoredInfos: {
+          wasteAcceptationStatus: "REFUSED",
+          wasteRefusalReason: "Parce que",
+          receivedAt: "2019-01-18" as any,
+          receivedBy: "John",
+          quantityType: "REAL",
+          quantityReceived: 0
+        }
+      }
+    });
+
+    const updatedForm1 = await prisma.form.findUnique({
+      where: { id: form1.id }
+    });
+    const updatedForm2 = await prisma.form.findUnique({
+      where: { id: form2.id }
+    });
+    expect(updatedForm1.status).toEqual("AWAITING_GROUP");
+    expect(updatedForm2.status).toEqual("AWAITING_GROUP");
+
+    const appendix2Forms = await prisma.form
+      .findUnique({
+        where: { id: groupementForm.id }
+      })
+      .appendix2Forms();
+    expect(appendix2Forms).toEqual([]);
+  });
 });

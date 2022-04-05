@@ -95,6 +95,8 @@ export default function EditSegment({ siret, segment }: Props) {
                   <>
                     <CompanySelector
                       name="transporter.company"
+                      allowForeignCompanies={true}
+                      registeredOnlyCompanies={true}
                       onCompanySelected={transporter => {
                         if (transporter.transporterReceipt) {
                           setFieldValue(

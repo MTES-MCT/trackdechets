@@ -7,6 +7,9 @@ import {
   MutationDeleteCompanyArgs,
 } from "../generated/graphql/types";
 import AccountField from "./fields/AccountField";
+import { MY_COMPANIES } from "./AccountCompanyList";
+import routes from "common/routes";
+import { useHistory } from "react-router-dom";
 
 AccountCompanyAdvanced.fragments = {
   company: gql`
@@ -31,12 +34,18 @@ const DELETE_COMPANY = gql`
 export default function AccountCompanyAdvanced({
   company,
 }: AccountCompanyAdvancedProps) {
+  const history = useHistory();
+
   const [deleteCompany, { loading }] = useMutation<
     Pick<Mutation, "deleteCompany">,
     MutationDeleteCompanyArgs
   >(DELETE_COMPANY, {
     variables: { id: company.id },
-    refetchQueries: [GET_ME],
+    refetchQueries: [GET_ME, { query: MY_COMPANIES, variables: { first: 10 } }],
+    awaitRefetchQueries: true,
+    onCompleted: () => {
+      history.push(routes.account.companies.list);
+    },
   });
 
   return (

@@ -12,6 +12,9 @@ import * as COMPANY_TYPES from "../../../common/constants/COMPANY_TYPES";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../mailer/templates";
 import { deleteCachedUserSirets } from "../../../common/redis/users";
+import { isVat } from "../../../common/constants/companySearchHelpers";
+import { whereSiretOrVatNumber } from "../CompanySearchResult";
+import { searchCompany } from "../../search";
 
 /**
  * Create a new company and associate it to a user
@@ -45,12 +48,17 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   } = companyInput;
   const ecoOrganismeAgreements =
     companyInput.ecoOrganismeAgreements?.map(a => a.href) || [];
-  const siret = companyInput.siret.replace(/\s+/g, "");
-
+  const orgId = companyInput.orgId.replace(/\s+/g, "");
+  // check valid orgId
+  await searchCompany(orgId);
+  // FIXME this copies vat to siret in order to ensure backward compatibility
+  const siret = orgId;
+  let vatNumber: string;
+  if (isVat(orgId)) {
+    vatNumber = orgId;
+  }
   const existingCompany = await prisma.company.findUnique({
-    where: {
-      siret
-    }
+    where: whereSiretOrVatNumber({ siret, vatNumber })
   });
 
   if (existingCompany) {
@@ -59,7 +67,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     );
   }
 
-  if (companyTypes.includes("ECO_ORGANISME")) {
+  if (companyTypes.includes("ECO_ORGANISME") && siret) {
     const ecoOrganismeExists = await prisma.ecoOrganisme.findUnique({
       where: { siret }
     });
@@ -84,6 +92,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   const companyCreateInput: Prisma.CompanyCreateInput = {
     siret,
+    vatNumber,
     codeNaf,
     gerepId,
     name,

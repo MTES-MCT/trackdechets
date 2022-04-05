@@ -12,6 +12,9 @@ enum FormStatus {
   """
   SEALED
 
+  "BSD signé par l'émetteur du bordereau"
+  SIGNED_BY_PRODUCER
+
   "BSD envoyé vers l'établissement de destination"
   SENT
 
@@ -44,6 +47,9 @@ enum FormStatus {
 
   "Déchet avec les cadres 14-19 complétées (si besoin), prêt à partir du site d'entreposage ou reconditionnement"
   RESEALED
+
+  "BSD signé par l'entreposage provisoire pour enlèvement"
+  SIGNED_BY_TEMP_STORER
 
   "Déchet envoyé du site d'entreposage ou reconditionnement vers sa destination de traitement"
   RESENT

@@ -51,6 +51,8 @@ export const FullBsdaFragment = gql`
           company {
             ...CompanyFragment
           }
+          cap
+          plannedOperationCode
         }
       }
     }
@@ -66,6 +68,7 @@ export const FullBsdaFragment = gql`
       consistence
       sealNumbers
       adr
+      pop
     }
     weight {
       value
@@ -117,6 +120,12 @@ export const FullBsdaFragment = gql`
         message
         requiredFor
       }
+    }
+    grouping {
+      id
+    }
+    forwardedIn {
+      id
     }
   }
   ${companyFragment}

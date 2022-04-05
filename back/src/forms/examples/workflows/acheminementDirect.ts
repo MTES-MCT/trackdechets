@@ -1,15 +1,16 @@
 import { Workflow } from "../../../common/workflow";
 import { createForm } from "../steps/createForm";
 import { markAsSealed } from "../steps/markAsSealed";
-import { signedByTransporter } from "../steps/signedByTransporter";
 import { markAsReceived } from "../steps/markAsReceived";
 import { markAsProcessed } from "../steps/markAsProcessed";
+import { signEmissionForm } from "../steps/signEmissionForm";
+import { signTransportForm } from "../steps/signTransportForm";
 
 const workflow: Workflow = {
   title: "Acheminement direct du producteur à l'installation de traitement",
   description: `Les informations du BSDD sont remplies par le producteur du déchet.
-La signature de l'envoi se déroule sur le terminal du transporteur grâce au
-code de sécurité de l'émetteur puis le déchet est accepté et traité à l'installation de destination`,
+  L'émetteur signe l'envoi suivit par le transporteur puis le déchet est accepté
+  et traité à l'installation de destination.`,
   companies: [
     { name: "producteur", companyTypes: ["PRODUCER"] },
     { name: "transporteur", companyTypes: ["TRANSPORTER"] },
@@ -18,7 +19,8 @@ code de sécurité de l'émetteur puis le déchet est accepté et traité à l'i
   steps: [
     createForm("producteur"),
     markAsSealed("producteur"),
-    signedByTransporter("transporteur"),
+    signEmissionForm("producteur"),
+    signTransportForm("transporteur"),
     markAsReceived("traiteur"),
     markAsProcessed("traiteur")
   ],
@@ -30,11 +32,12 @@ code de sécurité de l'émetteur puis le déchet est accepté et traité à l'i
   },
   chart: `
 graph LR
-AO(NO STATE) -->|createForm| A
-A(DRAFT) -->|markAsSealed| B(SEALED)
-B -->|signedByTransporter| C(SENT)
-C --> |markAsReceived| D(ACCEPTED)
-D --> |markAsProcessed| E(PROCESSED)`
+NO_STATE(NO STATE) --> |createForm| DRAFT
+DRAFT --> |markAsSealed| SEALED
+SEALED --> |signEmissionForm| SIGNED_BY_PRODUCER
+SIGNED_BY_PRODUCER --> |signTransportForm| SENT
+SENT --> |markAsReceived| ACCEPTED
+ACCEPTED --> |markAsProcessed| PROCESSED`
 };
 
 export default workflow;

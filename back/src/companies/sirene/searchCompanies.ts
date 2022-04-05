@@ -2,25 +2,32 @@ import { searchCompanies as searchCompaniesInsee } from "./insee/client";
 import { searchCompanies as searchCompaniesDataGouv } from "./entreprise.data.gouv.fr/client";
 import { searchCompanies as searchCompaniesSocialGouv } from "./social.gouv/client";
 import { searchCompanies as searchCompaniesTD } from "./trackdechets/client";
-import { backoffIfTooManyRequests, throttle } from "./ratelimit";
+import {
+  backoffIfTestEnvs,
+  backoffIfTooManyRequests,
+  throttle
+} from "./ratelimit";
 import { redundant } from "./redundancy";
 
-const searchCompaniesInseeThrottled = backoffIfTooManyRequests(
-  searchCompaniesInsee,
-  {
+const searchCompaniesInseeThrottled = backoffIfTestEnvs(
+  backoffIfTooManyRequests(searchCompaniesInsee, {
     service: "insee"
-  }
+  })
 );
 
-const searchCompaniesDataGouvThrottled = throttle(searchCompaniesDataGouv, {
-  service: "data_gouv",
-  requestsPerSeconds: 8
-});
+const searchCompaniesDataGouvThrottled = backoffIfTestEnvs(
+  throttle(searchCompaniesDataGouv, {
+    service: "data_gouv",
+    requestsPerSeconds: 8
+  })
+);
 
-const searchCompaniesSocialGouvThrottled = throttle(searchCompaniesSocialGouv, {
-  service: "social_gouv",
-  requestsPerSeconds: 50
-});
+const searchCompaniesSocialGouvThrottled = backoffIfTestEnvs(
+  throttle(searchCompaniesSocialGouv, {
+    service: "social_gouv",
+    requestsPerSeconds: 50
+  })
+);
 
 // list different implementations of searchCompanies by
 // order of priority.

@@ -335,6 +335,7 @@ describe("flattenFormInput", () => {
       recipientCompanyMail: input.recipient.company.mail,
       transporterCompanyName: null,
       transporterCompanySiret: null,
+      transporterCompanyVatNumber: null,
       transporterCompanyAddress: null,
       transporterCompanyContact: null,
       transporterCompanyPhone: null,

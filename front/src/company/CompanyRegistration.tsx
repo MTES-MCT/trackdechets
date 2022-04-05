@@ -1,9 +1,9 @@
 import React from "react";
-import { CompanyPublic } from "generated/graphql/types";
+import { CompanySearchResult } from "generated/graphql/types";
 import routes from "common/routes";
 import { COMPANY_TYPES } from "login/CompanyType";
 
-type Props = Pick<CompanyPublic, "isRegistered" | "companyTypes">;
+type Props = Pick<CompanySearchResult, "isRegistered" | "companyTypes">;
 
 export default function CompanyRegistration(props: Props) {
   return (

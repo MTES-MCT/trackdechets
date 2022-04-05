@@ -32,8 +32,8 @@ AccountCompanyPage.fragments = {
 
 export default function AccountCompanyPage({ company }: Props) {
   const companyPage =
-    `${process.env.REACT_APP_URL_SCHEME}://` +
-    `${process.env.REACT_APP_HOSTNAME}` +
+    `${import.meta.env.VITE_URL_SCHEME}://` +
+    `${import.meta.env.VITE_HOSTNAME}` +
     generatePath(routes.company, { siret: company.siret });
 
   return (

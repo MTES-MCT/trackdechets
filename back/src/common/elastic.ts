@@ -30,6 +30,7 @@ export interface BsdElastic {
   id: string;
   createdAt: number;
   readableId: string;
+  customId: string;
   emitterCompanyName: string;
   emitterCompanySiret: string;
   transporterCompanyName: string;
@@ -104,6 +105,14 @@ const settings = {
         type: "char_group",
         tokenize_on_chars: ["whitespace", "-"]
       },
+      customId_ngram: {
+        type: "ngram",
+        token_chars: ["letter", "digit"]
+      },
+      customId_char_group: {
+        type: "char_group",
+        tokenize_on_chars: ["whitespace", "-", "_"]
+      },
       waste_ngram: {
         type: "ngram",
         min_gram: 1, // allow to search on "*" to get dangerous waste only
@@ -142,6 +151,9 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
         type: "keyword"
       }
     }
+  },
+  customId: {
+    type: "keyword"
   },
   type: {
     type: "keyword"
@@ -288,7 +300,7 @@ export const index: BsdIndex = {
   // Changing the value of index is a way to "bump" the model
   // Doing so will cause all BSDs to be reindexed in Elastic Search
   // when running the appropriate script
-  index: "bsds_0.2.2",
+  index: "bsds_0.2.3",
 
   // The next major version of Elastic Search doesn't use "type" anymore
   // so while it's required for the current version, we are not using it too much

@@ -12,6 +12,11 @@ import {
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { OPERATION, WASTE_CODES } from "./constants";
 import prisma from "../prisma";
+import {
+  isVat,
+  isSiret,
+  isFRVat
+} from "../common/constants/companySearchHelpers";
 
 const bsffSchema: yup.SchemaOf<
   Pick<
@@ -289,6 +294,7 @@ const beforeTransportSchema: yup.SchemaOf<
     | "packagings"
     | "transporterCompanyName"
     | "transporterCompanySiret"
+    | "transporterCompanyVatNumber"
     | "transporterCompanyAddress"
     | "transporterCompanyContact"
     | "transporterCompanyPhone"
@@ -325,12 +331,25 @@ const beforeTransportSchema: yup.SchemaOf<
     .required("Le nom du transporteur est requis"),
   transporterCompanySiret: yup
     .string()
-    .nullable()
-    .length(
-      14,
-      "Le SIRET du transporteur n'est pas au bon format (${length} caractères)"
-    )
-    .required("Le SIRET du transporteur est requis"),
+    .ensure()
+    .when("transporterCompanyVatNumber", (tva, schema) => {
+      if (!tva) {
+        return schema.test(
+          "is-siret",
+          "${path} n'est pas un numéro de SIRET valide",
+          value => isSiret(value)
+        );
+      }
+      return schema.nullable().notRequired();
+    }),
+  transporterCompanyVatNumber: yup
+    .string()
+    .ensure()
+    .test(
+      "is-vat",
+      "${path} n'est pas un numéro de TVA intracommunautaire valide",
+      value => !value || (isVat(value) && !isFRVat(value))
+    ),
   transporterCompanyAddress: yup
     .string()
     .nullable()

@@ -130,6 +130,7 @@ function toBsdElastic(bsda: Bsda): BsdElastic {
   return {
     type: "BSDA",
     id: bsda.id,
+    customId: "",
     readableId: bsda.id,
     createdAt: bsda.createdAt.getTime(),
     emitterCompanyName: bsda.emitterCompanyName ?? "",
