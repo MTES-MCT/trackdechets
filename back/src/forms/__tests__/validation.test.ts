@@ -8,7 +8,6 @@ import {
   transporterSchemaFn
 } from "../validation";
 import { ReceivedFormInput } from "../../generated/graphql/types";
-import { transporterSchema } from "../../bsdasris/validation";
 
 const form: Partial<Form> = {
   id: "cjplbvecc000d0766j32r19am",
