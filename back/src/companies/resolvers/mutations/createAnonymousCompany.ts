@@ -8,12 +8,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import prisma from "../../../prisma";
 import { nafCodes } from "../../../common/constants/NAF";
-import {
-  isSiret,
-  isVat,
-  isFRVat
-} from "../../../common/constants/companySearchHelpers";
-import { MISSING_COMPANY_SIRET } from "../../../forms/errors";
+import { isSiret } from "../../../common/constants/companySearchHelpers";
 
 const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
   yup.object({
@@ -30,25 +25,9 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
     siret: yup
       .string()
       .ensure()
-      .when("vatNumber", (tva, schema) => {
-        if (!tva) {
-          return schema
-            .required(`Anonymous Company : ${MISSING_COMPANY_SIRET}`)
-            .test(
-              "is-siret",
-              "${path} n'est pas un numéro de SIRET valide",
-              value => isSiret(value)
-            );
-        }
-        return schema.nullable().notRequired();
-      }),
-    vatNumber: yup
-      .string()
-      .ensure()
-      .test(
-        "is-vat",
-        "${path} n'est pas un numéro de TVA intracommunautaire valide",
-        value => !value || (isVat(value) && !isFRVat(value))
+      .required("n°SIRET requis")
+      .test("is-siret", "${path} n'est pas un numéro de SIRET valide", value =>
+        isSiret(value)
       )
   });
 

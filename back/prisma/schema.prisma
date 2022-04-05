@@ -558,6 +558,7 @@ model TemporaryStorageDetail {
   wasteDetailsQuantityType         QuantityType?
   transporterCompanyName           String?
   transporterCompanySiret          String?
+  transporterCompanyVatNumber      String?
   transporterCompanyAddress        String?
   transporterCompanyContact        String?
   transporterCompanyPhone          String?
