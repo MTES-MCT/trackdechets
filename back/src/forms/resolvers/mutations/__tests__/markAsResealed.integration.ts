@@ -16,12 +16,11 @@ import {
 } from "../../../../generated/graphql/types";
 import { gql } from "apollo-server-core";
 
-const MARK_AS_RESEALED = `
-  mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!){
+const MARK_AS_RESEALED = gql`
+  mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {
     markAsResealed(id: $id, resealedInfos: $resealedInfos) {
       id
       status
-      }
     }
   }
 `;
