@@ -292,10 +292,6 @@ input AnonymousCompanyInput {
   SIRET ou TVA si entreprise étrangère
   """
   siret: String!
-  """
-  Numéro de TVA intracommunautaire pour les entreprises étrangères
-  """
-  vatNumber: String
   name: String!
   codeNaf: String!
   address: String!
