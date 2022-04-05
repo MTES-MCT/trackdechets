@@ -784,4 +784,26 @@ describe("Mutation.createForm", () => {
     });
     expect(data.createForm.wasteDetails.isDangerous).toBe(true);
   });
+
+  it("should be possible to fill both a SIRET number and a TVA number for transporter", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory();
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitter.siret }
+          },
+          transporter: {
+            company: { siret: transporter.siret, vatNumber: "FR87850019464" }
+          }
+        }
+      }
+    });
+    expect(data?.createForm?.id).toBeDefined();
+  });
 });

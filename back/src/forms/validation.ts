@@ -37,7 +37,8 @@ import {
   MISSING_COMPANY_EMAIL,
   INVALID_WASTE_CODE,
   INVALID_PROCESSING_OPERATION,
-  EXTRANEOUS_NEXT_DESTINATION
+  EXTRANEOUS_NEXT_DESTINATION,
+  MISSING_COMPANY_SIRET_OR_VAT
 } from "./errors";
 import {
   isVat,
@@ -456,79 +457,87 @@ export const beforeSignedByTransporterSchema: yup.SchemaOf<
 });
 
 // 8 - Collecteur-transporteur
-const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> = isDraft =>
-  yup.object({
-    transporterCustomInfo: yup.string().nullable(),
-    transporterNumberPlate: yup.string().nullable(),
-    transporterCompanyName: yup
-      .string()
-      .ensure()
-      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_NAME}`),
-    transporterCompanySiret: yup
-      .string()
-      .ensure()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva && !isDraft) {
-          return schema.test(
-            "is-siret",
-            "${path} n'est pas un numéro de SIRET valide",
-            value => isSiret(value)
-          );
-        }
-        return schema.nullable().notRequired();
-      }),
-    transporterCompanyVatNumber: yup
-      .string()
-      .ensure()
-      .test(
-        "is-vat",
-        "${path} n'est pas un numéro de TVA intracommunautaire valide",
-        value => !value || (isVat(value) && !isFRVat(value))
-      ),
-    transporterCompanyAddress: yup
-      .string()
-      .ensure()
-      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_ADDRESS}`),
-    transporterCompanyContact: yup
-      .string()
-      .ensure()
-      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_CONTACT}`),
-    transporterCompanyPhone: yup
-      .string()
-      .ensure()
-      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_PHONE}`),
-    transporterCompanyMail: yup
-      .string()
-      .email()
-      .ensure()
-      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_EMAIL}`),
-    transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
-    transporterReceipt: yup
-      .string()
-      .when("transporterIsExemptedOfReceipt", (isExemptedOfReceipt, schema) =>
-        isExemptedOfReceipt
-          ? schema.notRequired().nullable()
-          : schema
-              .ensure()
-              .requiredIf(
-                !isDraft,
-                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
-              )
-      ),
-    transporterDepartment: yup
-      .string()
-      .when("transporterIsExemptedOfReceipt", (isExemptedOfReceipt, schema) =>
-        isExemptedOfReceipt
-          ? schema.notRequired().nullable()
-          : schema
-              .ensure()
-              .requiredIf(
-                !isDraft,
-                "Le département du transporteur est obligatoire"
-              )
-      ),
-    transporterValidityLimit: yup.date().nullable()
-  });
+export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
+  isDraft =>
+    yup.object({
+      transporterCustomInfo: yup.string().nullable(),
+      transporterNumberPlate: yup.string().nullable(),
+      transporterCompanyName: yup
+        .string()
+        .ensure()
+        .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_NAME}`),
+      transporterCompanySiret: yup
+        .string()
+        .ensure()
+        .when("transporterCompanyVatNumber", (tva, schema) => {
+          if (!tva && !isDraft) {
+            return schema
+              .required(`Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`)
+              .test(
+                "is-siret",
+                "${path} n'est pas un numéro de SIRET valide",
+                value => isSiret(value)
+              );
+          }
+          if (!isDraft && tva && isFRVat(tva)) {
+            return schema.required(
+              "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
+            );
+          }
+          return schema.nullable().notRequired();
+        }),
+      transporterCompanyVatNumber: yup
+        .string()
+        .ensure()
+        .test(
+          "is-vat",
+          "${path} n'est pas un numéro de TVA intracommunautaire valide",
+          value => !value || isVat(value)
+        ),
+      transporterCompanyAddress: yup
+        .string()
+        .ensure()
+        .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_ADDRESS}`),
+      transporterCompanyContact: yup
+        .string()
+        .ensure()
+        .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_CONTACT}`),
+      transporterCompanyPhone: yup
+        .string()
+        .ensure()
+        .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_PHONE}`),
+      transporterCompanyMail: yup
+        .string()
+        .email()
+        .ensure()
+        .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_EMAIL}`),
+      transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
+      transporterReceipt: yup
+        .string()
+        .when("transporterIsExemptedOfReceipt", (isExemptedOfReceipt, schema) =>
+          isExemptedOfReceipt
+            ? schema.notRequired().nullable()
+            : schema
+                .ensure()
+                .requiredIf(
+                  !isDraft,
+                  "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+                )
+        ),
+      transporterDepartment: yup
+        .string()
+        .when("transporterIsExemptedOfReceipt", (isExemptedOfReceipt, schema) =>
+          isExemptedOfReceipt
+            ? schema.notRequired().nullable()
+            : schema
+                .ensure()
+                .requiredIf(
+                  !isDraft,
+                  "Le département du transporteur est obligatoire"
+                )
+        ),
+      transporterValidityLimit: yup.date().nullable()
+    });
 
 // 8 - Collecteur-transporteur
 // 9 - Déclaration générale de l’émetteur du bordereau :

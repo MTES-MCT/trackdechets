@@ -18,7 +18,10 @@ import {
   isSiret,
   isFRVat
 } from "../common/constants/companySearchHelpers";
-import { MISSING_COMPANY_SIRET } from "../forms/errors";
+import {
+  MISSING_COMPANY_SIRET,
+  MISSING_COMPANY_SIRET_OR_VAT
+} from "../forms/errors";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
 // set yup default error messages
@@ -306,10 +309,17 @@ export const transporterSchema: FactorySchemaOf<
       .ensure()
       .when("transporterCompanyVatNumber", (tva, schema) => {
         if (!tva && context.transportSignature) {
-          return schema.test(
-            "is-siret",
-            "${path} n'est pas un numéro de SIRET valide",
-            value => isSiret(value)
+          return schema
+            .required(`Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`)
+            .test(
+              "is-siret",
+              "${path} n'est pas un numéro de SIRET valide",
+              value => isSiret(value)
+            );
+        }
+        if (context.transportSignature && tva && isFRVat(tva)) {
+          return schema.required(
+            "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
           );
         }
         return schema.nullable().notRequired();
@@ -320,7 +330,7 @@ export const transporterSchema: FactorySchemaOf<
       .test(
         "is-vat",
         "${path} n'est pas un numéro de TVA intracommunautaire valide",
-        value => !value || (isVat(value) && !isFRVat(value))
+        value => !value || isVat(value)
       ),
     transporterCompanyAddress: yup
       .string()
