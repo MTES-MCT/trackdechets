@@ -760,6 +760,7 @@ export function expandTemporaryStorageFromDb(
       company: nullIfNoValues({
         name: temporaryStorageDetail.transporterCompanyName,
         siret: temporaryStorageDetail.transporterCompanySiret,
+        vatNumber: temporaryStorageDetail.transporterCompanyVatNumber,
         address: temporaryStorageDetail.transporterCompanyAddress,
         contact: temporaryStorageDetail.transporterCompanyContact,
         phone: temporaryStorageDetail.transporterCompanyPhone,

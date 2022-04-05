@@ -10,12 +10,18 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { CompanyType, CompanyVerificationStatus, Status } from "@prisma/client";
+import {
+  Mutation,
+  MutationMarkAsResealedArgs
+} from "../../../../generated/graphql/types";
+import { gql } from "apollo-server-core";
 
 const MARK_AS_RESEALED = `
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!){
     markAsResealed(id: $id, resealedInfos: $resealedInfos) {
       id
       status
+      }
     }
   }
 `;
@@ -442,5 +448,73 @@ describe("Mutation markAsResealed", () => {
       n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 14 du bordereau.`
       })
     ]);
+  });
+
+  it("should work when a transporter vat number is present", async () => {
+    const owner = await userFactory();
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      { companyTypes: { set: [CompanyType.COLLECTOR] } }
+    );
+    const transporterAfterTempstorage = await companyFactory();
+
+    const { mutate } = makeClient(user);
+
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR]
+    });
+
+    const form = await formWithTempStorageFactory({
+      ownerId: owner.id,
+      opt: {
+        status: Status.TEMP_STORER_ACCEPTED,
+        recipientCompanySiret: collector.siret
+      },
+      tempStorageOpts: {
+        destinationCompanySiret: destination.siret
+      }
+    });
+
+    const { data } = await mutate<
+      Pick<Mutation, "markAsResealed">,
+      MutationMarkAsResealedArgs
+    >(
+      gql`
+        mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {
+          markAsResealed(id: $id, resealedInfos: $resealedInfos) {
+            temporaryStorageDetail {
+              transporter {
+                company {
+                  vatNumber
+                }
+              }
+            }
+          }
+        }
+      `,
+      {
+        variables: {
+          id: form.id,
+          resealedInfos: {
+            transporter: {
+              company: {
+                name: "Code en stock",
+                siret: transporterAfterTempstorage.siret,
+                vatNumber: "FR87850019464",
+                address: "Marseille",
+                contact: "Mr Transport",
+                phone: "00 00 00 00 00",
+                mail: "transporter@codenstock.fr"
+              },
+              isExemptedOfReceipt: true
+            }
+          }
+        }
+      }
+    );
+
+    expect(
+      data.markAsResealed.temporaryStorageDetail.transporter.company.vatNumber
+    ).toEqual("FR87850019464");
   });
 });
