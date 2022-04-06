@@ -43,15 +43,15 @@ describe("loggingMiddleware", () => {
     await request.get("/hello");
     expect(logMock.mock.calls).toHaveLength(2);
     for (const logCall of logMock.mock.calls) {
-      const { message, level, user } = logCall[0];
+      const { message, level } = logCall[0];
       expect(message).toEqual("GET /hello");
       expect(level).toEqual("info");
-      expect(user).toEqual("anonyme");
     }
     const startLog = logMock.mock.calls[0][0];
     expect(startLog.request_timing).toEqual("start");
 
     const responseLog = logMock.mock.calls[1][0];
+    expect(responseLog.user).toEqual("anonyme");
     expect(responseLog.response_body).toEqual("world");
     expect(responseLog.execution_time_num).toBeGreaterThanOrEqual(0);
     expect(responseLog.http_status).toEqual(200);
@@ -63,17 +63,25 @@ describe("loggingMiddleware", () => {
     expect(logMock.mock.calls).toHaveLength(2);
 
     for (const logCall of logMock.mock.calls) {
-      const { message, level, user, graphql_query } = logCall[0];
+      const {
+        message,
+        level,
+        graphql_query,
+        graphql_selection_name,
+        graphql_operation
+      } = logCall[0];
       expect(message).toEqual("POST /");
       expect(level).toEqual("info");
-      expect(user).toEqual("anonyme");
       expect(graphql_query).toEqual("{ me { name } }");
+      expect(graphql_selection_name).toEqual("me");
+      expect(graphql_operation).toEqual("query");
     }
 
     const startLog = logMock.mock.calls[0][0];
     expect(startLog.request_timing).toEqual("start");
 
     const responseLog = logMock.mock.calls[1][0];
+    expect(responseLog.user).toEqual("anonyme");
     expect(responseLog.response_body).toEqual(
       '{"data":{"me":{"name":"John Snow"}}}'
     );

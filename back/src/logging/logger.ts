@@ -10,4 +10,10 @@ const logger = createLogger({
   transports: [new transports.File({ filename: LOG_PATH })]
 });
 
+// TODO - remove
+setInterval(() => {
+  const memoryUsage = process.memoryUsage();
+  logger.info("Memory usage - TEMP", memoryUsage);
+}, 1000 * 60 * 3);
+
 export default logger;
