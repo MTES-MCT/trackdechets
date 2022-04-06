@@ -7,22 +7,39 @@ export function bsddReducer(
 ): Partial<Form> {
   switch (event.type) {
     case "BsddCreated": {
-      const { owner, updatedAt, createdAt, appendix2Forms, ...bsdd } =
-        event.data.content;
+      const {
+        owner,
+        updatedAt,
+        createdAt,
+        appendix2Forms,
+        wasteDetailsPackagingInfos,
+        ...bsdd
+      } = event.data.content;
       return {
         id: event.streamId,
         status: "DRAFT",
         ...bsdd,
+        wasteDetailsPackagingInfos:
+          wasteDetailsPackagingInfos as Prisma.JsonValue,
         ...dateConverter({}, bsdd)
       };
     }
 
     case "BsddUpdated": {
-      const { owner, updatedAt, createdAt, appendix2Forms, ...bsdd } = event
-        .data.content as Prisma.FormCreateInput; // TODO Check if we can we somehow keep Prisma.FormUpdateInput
+      const {
+        owner,
+        updatedAt,
+        createdAt,
+        appendix2Forms,
+        wasteDetailsPackagingInfos,
+        ...bsdd
+      } = event.data.content as Prisma.FormCreateInput; // TODO Check if we can we somehow keep Prisma.FormUpdateInput
+
       return {
         ...currentState,
         ...bsdd,
+        wasteDetailsPackagingInfos:
+          wasteDetailsPackagingInfos as Prisma.JsonValue,
         ...dateConverter(currentState, event.data.content as any)
       };
     }
