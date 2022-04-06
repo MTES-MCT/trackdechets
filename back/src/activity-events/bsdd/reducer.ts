@@ -19,8 +19,12 @@ export function bsddReducer(
         id: event.streamId,
         status: "DRAFT",
         ...bsdd,
-        wasteDetailsPackagingInfos:
-          wasteDetailsPackagingInfos as Prisma.JsonValue,
+        ...(wasteDetailsPackagingInfos
+          ? {
+              wasteDetailsPackagingInfos:
+                wasteDetailsPackagingInfos as Prisma.JsonValue
+            }
+          : {}),
         ...dateConverter({}, bsdd)
       };
     }
@@ -38,8 +42,12 @@ export function bsddReducer(
       return {
         ...currentState,
         ...bsdd,
-        wasteDetailsPackagingInfos:
-          wasteDetailsPackagingInfos as Prisma.JsonValue,
+        ...(wasteDetailsPackagingInfos
+          ? {
+              wasteDetailsPackagingInfos:
+                wasteDetailsPackagingInfos as Prisma.JsonValue
+            }
+          : {}),
         ...dateConverter(currentState, event.data.content as any)
       };
     }
