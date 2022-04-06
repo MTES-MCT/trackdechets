@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { gql } from "apollo-server-core";
 import logger from "../../logging/logger";
 import { getUid } from "../../utils";
 
@@ -11,11 +12,11 @@ export default function (graphQLPath: string) {
   return (req: Request, res: Response, next: NextFunction) => {
     const message = `${req.method} ${req.path}`;
     const requestMetadata: { [key: string]: any } = {
-      user: req.user?.email || "anonyme",
-      auth: req.user?.auth,
       ip: req.ip,
       http_params: req.params,
       http_query: req.query,
+      http_path: req.path,
+      http_method: req.method,
       request_timing: "start",
       request_id: getUid(16)
     };
@@ -24,6 +25,10 @@ export default function (graphQLPath: string) {
       requestMetadata.graphql_operation_name = req.body?.operationName;
       requestMetadata.graphql_variables = req.body?.variables;
       requestMetadata.graphql_query = req.body?.query;
+
+      const gqlDetails = parseGqlQuery(req.body?.query);
+      requestMetadata.graphql_operation = gqlDetails?.operation;
+      requestMetadata.graphql_selection_name = gqlDetails?.name;
     }
 
     logger.info(message, requestMetadata);
@@ -43,6 +48,8 @@ export default function (graphQLPath: string) {
 
       const metadataWithReponse = {
         ...requestMetadata,
+        user: req.user?.email || "anonyme",
+        auth: req.user?.auth,
         http_status: res.statusCode,
         request_timing: "end",
         execution_time_num: end.getTime() - start.getTime(), // in millis
@@ -54,4 +61,26 @@ export default function (graphQLPath: string) {
 
     next();
   };
+}
+
+function parseGqlQuery(query: string | undefined) {
+  if (!query) return;
+
+  try {
+    const parsedQuery = gql`
+      ${query}
+    `;
+
+    const definition = parsedQuery.definitions[0];
+    if (definition.kind !== "OperationDefinition") return;
+
+    const fieldSelection = definition.selectionSet.selections[0];
+
+    return {
+      operation: definition.operation,
+      name: fieldSelection.kind === "Field" ? fieldSelection.name.value : ""
+    };
+  } catch (_) {
+    return undefined;
+  }
 }
