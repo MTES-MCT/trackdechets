@@ -1,4 +1,4 @@
-import { Form, Prisma, Status } from "@prisma/client";
+import { Form, Intermediary, Prisma, Status } from "@prisma/client";
 import { isDangerous, WASTES_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -20,10 +20,12 @@ import { FormSirets } from "../../types";
 import {
   draftFormSchema,
   sealedFormSchema,
-  validateAppendix2Forms
+  validateAppendix2Forms,
+  validateIntermediariesInput
 } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
+import prisma from "../../../prisma";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -150,6 +152,46 @@ const updateFormResolver = async (
         create: flattenTemporaryStorageDetailInput(temporaryStorageDetail)
       };
     }
+  }
+
+  if (intermediaries) {
+    const validIntermediaries = await validateIntermediariesInput(
+      intermediaries
+    );
+    const existingIntermediaries = await prisma.form
+      .findUnique({ where: { id } })
+      .intermediaries();
+    // combine existing info with update info
+    const intermediariesInput = validIntermediaries.map(company => {
+      const match = existingIntermediaries.find(i => i.siret === company.siret);
+      return {
+        ...(match
+          ? {
+              id: match.id,
+              vatNumber: match.vatNumber,
+              name: match.name,
+              address: match.address,
+              contact: match.contact,
+              phone: match.phone,
+              mail: match.mail
+            }
+          : {}),
+        ...company
+      };
+    });
+    const deletedIntermediaries = existingIntermediaries.filter(
+      ({ siret }) => !validIntermediaries.map(i => i.siret).includes(siret)
+    );
+    formUpdateInput.intermediaries = {
+      deleteMany: deletedIntermediaries.map(({ id }) => ({ id })),
+      upsert: intermediariesInput.map(input => {
+        return {
+          create: input,
+          update: input,
+          where: { id: input.id ?? "" } // see https://github.com/prisma/prisma-client-js/issues/781
+        };
+      })
+    };
   }
 
   const updatedForm = await formRepository.update({ id }, formUpdateInput);

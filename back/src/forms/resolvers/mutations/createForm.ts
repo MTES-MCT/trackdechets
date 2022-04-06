@@ -1,4 +1,4 @@
-import { Intermediary, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { isDangerous } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { eventEmitter, TDEvent } from "../../../events/emitter";
@@ -17,7 +17,11 @@ import { checkIsFormContributor } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
 import { FormSirets } from "../../types";
-import { draftFormSchema, validateAppendix2Forms } from "../../validation";
+import {
+  draftFormSchema,
+  validateAppendix2Forms,
+  validateIntermediariesInput
+} from "../../validation";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -76,17 +80,15 @@ const createFormResolver = async (
     readableId: getReadableId(),
     owner: { connect: { id: user.id } },
     appendix2Forms: appendix2Forms ? { connect: appendix2Forms } : undefined,
-    intermediaries: {
-      createMany: {
-        data: intermediaries.map(i => ({
-          ...i,
-          // TODO autocomplete with SIRENE or vat info
-          siret: i.siret ?? "",
-          name: i.name ?? "",
-          address: i.address ?? ""
-        }))
-      }
-    }
+    ...(intermediaries?.length
+      ? {
+          intermediaries: {
+            createMany: {
+              data: await validateIntermediariesInput(intermediaries)
+            }
+          }
+        }
+      : {})
   };
 
   await draftFormSchema.validate(formCreateInput);

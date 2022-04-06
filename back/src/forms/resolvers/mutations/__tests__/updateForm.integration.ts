@@ -8,7 +8,11 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Mutation, UpdateFormInput } from "../../../../generated/graphql/types";
+import {
+  Mutation,
+  MutationUpdateFormArgs,
+  UpdateFormInput
+} from "../../../../generated/graphql/types";
 import { Status } from "@prisma/client";
 
 const UPDATE_FORM = `
@@ -41,6 +45,10 @@ const UPDATE_FORM = `
       }
       ecoOrganisme {
         siret
+      }
+      intermediaries {
+        siret
+        contact
       }
     }
   }
@@ -891,5 +899,130 @@ describe("Mutation.updateForm", () => {
       variables: { updateFormInput }
     });
     expect(data.updateForm.wasteDetails.isDangerous).toBe(true);
+  });
+
+  it("should be possible to add an intermediary", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret
+      }
+    });
+    const intermediary = await companyFactory();
+
+    const { mutate } = makeClient(user);
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      intermediaries: [
+        {
+          siret: intermediary.siret,
+          address: intermediary.address,
+          name: intermediary.address
+        }
+      ]
+    };
+    const { data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    expect(data.updateForm.intermediaries).toHaveLength(1);
+    expect(data.updateForm.intermediaries[0].siret).toEqual(intermediary.siret);
+  });
+
+  it("should be possible to update an intermediary", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const intermediary = await companyFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        intermediaries: {
+          create: {
+            siret: intermediary.siret,
+            contact: "Rose Durand",
+            name: "Intermédiaire",
+            address: "Quelque part"
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      intermediaries: [
+        {
+          siret: intermediary.siret,
+          contact: "Jean Dupont"
+        }
+      ]
+    };
+    const { data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    expect(data.updateForm.intermediaries).toHaveLength(1);
+    expect(data.updateForm.intermediaries[0].contact).toEqual("Jean Dupont");
+  });
+
+  it("should be possible to delete an intermediary", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const intermediary1 = await companyFactory();
+    const intermediary2 = await companyFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        intermediaries: {
+          createMany: {
+            data: [
+              {
+                siret: intermediary1.siret,
+                name: "Intermédiaire 1",
+                address: "Quelque part"
+              },
+              {
+                siret: intermediary2.siret,
+                name: "Intermédiaire 2",
+                address: "Quelque part"
+              }
+            ]
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      intermediaries: [
+        {
+          siret: intermediary1.siret
+        }
+      ]
+    };
+    const { data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    expect(data.updateForm.intermediaries).toHaveLength(1);
+    expect(data.updateForm.intermediaries[0].siret).toEqual(
+      intermediary1.siret
+    );
+    expect(
+      await prisma.intermediary.findMany({
+        where: { siret: intermediary2.siret }
+      })
+    ).toHaveLength(0);
   });
 });

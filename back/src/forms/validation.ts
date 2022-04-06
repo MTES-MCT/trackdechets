@@ -47,6 +47,7 @@ import {
   isFRVat
 } from "../common/constants/companySearchHelpers";
 import { searchCompany } from "../companies/search";
+
 // set yup default error messages
 configureYup();
 
@@ -1155,22 +1156,59 @@ export async function validateAppendix2Forms(
   return appendix2Forms;
 }
 
-export async function validateCompanyInput(
+/**
+ * Constraints on CompanyInput that apply to intermediary company input
+ * - SIRET is mandatory
+ * - only french companies are allowed
+ */
+const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
+  siret: yup
+    .string()
+    .ensure()
+    .required("Le N°SIRET est obligatoire pour une entreprise intermédiaire"),
+  vatNumber: yup
+    .string()
+    .notRequired()
+    .nullable()
+    .test(
+      "Le numéro de TVA français est invalide",
+      vat => !vat || isFRVat(vat)
+    ),
+  address: yup.string().notRequired().nullable(),
+  name: yup.string().notRequired().nullable(),
+  contact: yup.string().notRequired().nullable(),
+  phone: yup.string().notRequired().nullable(),
+  mail: yup.string().notRequired().nullable(),
+  country: yup
+    .string()
+    .notRequired()
+    .nullable()
+    .test(
+      "L'établissement intermédiaire doit être situé en France",
+      country => !country || country === "FR"
+    )
+});
+
+/**
+ * Validate intermediary input and convert it to Prisma IntermediaryCreateInput :
+ * - an intermediary company should be identified by a SIRET (french only)
+ * - address and name from SIRENE database takes precedence over user input data
+ */
+export async function validateIntermediaryInput(
   company: CompanyInput
-): Promise<CompanyInput> {
-  // TODO apply validation on companyInput to check SIRET end VAT formats
-  const validCompany = await searchCompany(company.siret ?? company.vatNumber);
+): Promise<Prisma.IntermediaryCreateInput> {
+  const { siret } = await intermediarySchema.validate(company);
+  const companySearchResult = await searchCompany(siret);
   return {
     ...company,
-    // overwite name and address with official data
-    ...(validCompany
-      ? { address: validCompany.address, name: validCompany.name }
-      : {})
+    siret: siret!, // presence of SIRET is validated in intermediarySchema
+    address: companySearchResult?.address ?? "",
+    name: companySearchResult?.name ?? ""
   };
 }
 
-export function validateCompanyInputs(
+export function validateIntermediariesInput(
   companies: CompanyInput[]
-): Promise<CompanyInput[]> {
-  return Promise.all(companies.map(validateCompanyInput));
+): Promise<Prisma.IntermediaryCreateInput[]> {
+  return Promise.all(companies.map(validateIntermediaryInput));
 }

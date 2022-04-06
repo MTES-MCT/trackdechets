@@ -85,6 +85,9 @@ const CREATE_FORM = `
       appendix2Forms {
         id
       }
+      intermediaries {
+        siret
+      }
     }
   }
 `;
@@ -805,5 +808,32 @@ describe("Mutation.createForm", () => {
       }
     });
     expect(data?.createForm?.id).toBeDefined();
+  });
+
+  it("should be possible to add intermediary companies", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+    const intermediary = await companyFactory();
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitter.siret }
+          },
+          intermediaries: [
+            {
+              siret: intermediary.siret,
+              address: intermediary.address,
+              name: intermediary.address
+            }
+          ]
+        }
+      }
+    });
+    expect(data.createForm.intermediaries).toHaveLength(1);
+    expect(data.createForm.intermediaries[0].siret).toEqual(intermediary.siret);
   });
 });

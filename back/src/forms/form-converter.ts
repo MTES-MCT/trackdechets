@@ -677,7 +677,8 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       })
     }),
     currentTransporterSiret: form.currentTransporterSiret,
-    nextTransporterSiret: form.nextTransporterSiret
+    nextTransporterSiret: form.nextTransporterSiret,
+    intermediaries: [] // will be resolved in Form resolver
   };
 }
 
