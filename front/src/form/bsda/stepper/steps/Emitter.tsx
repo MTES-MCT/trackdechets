@@ -23,7 +23,7 @@ export function Emitter({ disabled }) {
 
       {isValidBsdaSuite ? (
         <div className="notification">
-          Vous effectuez un groupement ou entreposage provisoire. L'entreprise
+          Vous effectuez un groupement ou une réexpédition. L'entreprise
           émettrice est obligatoirement la vôtre:{" "}
           {values.emitter?.company?.name} - {values.emitter?.company?.siret}
         </div>
