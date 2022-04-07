@@ -111,7 +111,10 @@ function SignTransportFormModal({
               <RedErrorMessage name="takenOverBy" />
             </div>
 
-            {siret !== form.transporter?.company?.siret && (
+            {![
+              form.transporter?.company?.siret,
+              form.temporaryStorageDetail?.transporter?.company?.siret,
+            ].includes(siret) && (
               <div className="form__row">
                 <label>
                   Code de signature du transporteur
