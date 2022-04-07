@@ -836,4 +836,65 @@ describe("Mutation.createForm", () => {
     expect(data.createForm.intermediaries).toHaveLength(1);
     expect(data.createForm.intermediaries[0].siret).toEqual(intermediary.siret);
   });
+
+  it("should not be possible to add the same intermediary twice", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+    const intermediary = await companyFactory();
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitter.siret }
+          },
+          intermediaries: [
+            {
+              siret: intermediary.siret,
+              address: intermediary.address,
+              name: intermediary.address
+            },
+            {
+              siret: intermediary.siret,
+              address: intermediary.address,
+              name: intermediary.address
+            }
+          ]
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous ne pouvez pas ajouter le même établissement en intermédiaire plusieurs fois"
+      })
+    ]);
+  });
+
+  it("should be possible to create a BSDD on which one of my company is intermediary", async () => {
+    const { user, company: intermediary } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          intermediaries: [
+            {
+              siret: intermediary.siret,
+              address: intermediary.address,
+              name: intermediary.address
+            }
+          ]
+        }
+      }
+    });
+    expect(data.createForm.intermediaries).toHaveLength(1);
+    expect(data.createForm.intermediaries[0].siret).toEqual(intermediary.siret);
+  });
 });

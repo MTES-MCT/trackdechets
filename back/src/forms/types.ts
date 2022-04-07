@@ -15,6 +15,7 @@ import { FormStatus } from "../generated/graphql/types";
 export interface FullForm extends Form {
   temporaryStorageDetail: TemporaryStorageDetail;
   transportSegments: TransportSegment[];
+  intermediaries: Intermediary[];
 }
 
 export type FormSirets = Pick<

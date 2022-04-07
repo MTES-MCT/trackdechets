@@ -1210,5 +1210,16 @@ export async function validateIntermediaryInput(
 export function validateIntermediariesInput(
   companies: CompanyInput[]
 ): Promise<Prisma.IntermediaryCreateInput[]> {
+  // check we do not add the same SIRET twice
+  const intermediarySirets = companies.map(c => c.siret);
+  const hasDuplicate = intermediarySirets.reduce((acc, curr, idx) => {
+    return acc || intermediarySirets.indexOf(curr) !== idx;
+  }, false);
+  if (hasDuplicate) {
+    throw new UserInputError(
+      "Vous ne pouvez pas ajouter le même établissement en intermédiaire plusieurs fois"
+    );
+  }
+
   return Promise.all(companies.map(validateIntermediaryInput));
 }

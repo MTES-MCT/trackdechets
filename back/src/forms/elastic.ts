@@ -236,7 +236,8 @@ export async function indexAllForms(
     },
     include: {
       temporaryStorageDetail: true,
-      transportSegments: true
+      transportSegments: true,
+      intermediaries: true
     }
   });
 

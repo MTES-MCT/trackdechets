@@ -8,7 +8,11 @@ const buildFindFullFormById: (deps: RepositoryFnDeps) => FindFullFormByIdFn =
   id => {
     return prisma.form.findUnique({
       where: { id },
-      include: { temporaryStorageDetail: true, transportSegments: true }
+      include: {
+        temporaryStorageDetail: true,
+        transportSegments: true,
+        intermediaries: true
+      }
     });
   };
 

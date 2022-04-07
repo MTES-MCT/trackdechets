@@ -15,16 +15,20 @@ import { FullForm } from "./types";
  * @param form
  */
 export async function getFullForm(form: Form): Promise<FullForm> {
-  const temporaryStorageDetail = await prisma.form
-    .findUnique({ where: { id: form.id } })
-    .temporaryStorageDetail();
-  const transportSegments = await prisma.form
-    .findUnique({ where: { id: form.id } })
-    .transportSegments();
+  const { temporaryStorageDetail, transportSegments, intermediaries } =
+    await prisma.form.findUnique({
+      where: { id: form.id },
+      include: {
+        temporaryStorageDetail: true,
+        transportSegments: true,
+        intermediaries: true
+      }
+    });
   return {
     ...form,
     temporaryStorageDetail,
-    transportSegments
+    transportSegments,
+    intermediaries
   };
 }
 

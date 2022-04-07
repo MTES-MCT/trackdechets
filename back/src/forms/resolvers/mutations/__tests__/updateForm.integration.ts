@@ -1025,4 +1025,82 @@ describe("Mutation.updateForm", () => {
       })
     ).toHaveLength(0);
   });
+
+  it("should not be possible to add the same intermediary twice", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+    const intermediary = await companyFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitter.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      intermediaries: [
+        {
+          siret: intermediary.siret,
+          address: intermediary.address,
+          name: intermediary.address
+        },
+        {
+          siret: intermediary.siret,
+          address: intermediary.address,
+          name: intermediary.address
+        }
+      ]
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous ne pouvez pas ajouter le même établissement en intermédiaire plusieurs fois"
+      })
+    ]);
+  });
+
+  it("should not be possible to remove my company from intermediary", async () => {
+    const { user, company: intermediary } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        intermediaries: {
+          create: {
+            siret: intermediary.siret,
+            name: "Intermédiaire",
+            address: "Quelque part"
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      intermediaries: []
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous ne pouvez pas enlever votre établissement du bordereau"
+      })
+    ]);
+  });
 });

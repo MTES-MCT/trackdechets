@@ -94,8 +94,10 @@ const updateFormResolver = async (
       formContent.recipient?.isTempStorage !== false) ||
     formContent.recipient?.isTempStorage === true;
 
-  const { temporaryStorageDetail: existingTemporaryStorageDetail } =
-    await formRepository.findFullFormById(id);
+  const {
+    temporaryStorageDetail: existingTemporaryStorageDetail,
+    intermediaries: existingIntermediaries
+  } = await formRepository.findFullFormById(id);
 
   // make sure user will still be form contributor after update
   const nextFormSirets: FormSirets = {
@@ -109,7 +111,10 @@ const updateFormResolver = async (
       form.traderCompanySiret ?? existingForm.traderCompanySiret,
     brokerCompanySiret:
       form.brokerCompanySiret ?? existingForm.brokerCompanySiret,
-    ecoOrganismeSiret: form.ecoOrganismeSiret ?? existingForm.ecoOrganismeSiret
+    ecoOrganismeSiret: form.ecoOrganismeSiret ?? existingForm.ecoOrganismeSiret,
+    intermediaries:
+      intermediaries?.map(({ siret }) => ({ siret })) ??
+      existingIntermediaries.map(({ siret }) => ({ siret }))
   };
 
   if (temporaryStorageDetail || existingTemporaryStorageDetail) {
@@ -158,9 +163,7 @@ const updateFormResolver = async (
     const validIntermediaries = await validateIntermediariesInput(
       intermediaries
     );
-    const existingIntermediaries = await prisma.form
-      .findUnique({ where: { id } })
-      .intermediaries();
+
     // combine existing info with update info
     const intermediariesInput = validIntermediaries.map(company => {
       const match = existingIntermediaries.find(i => i.siret === company.siret);
