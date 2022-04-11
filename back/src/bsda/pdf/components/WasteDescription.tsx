@@ -11,8 +11,6 @@ export function WasteDescription({ waste }: Props) {
       <p>
         Code déchet : {waste?.code}
         <br />
-        Dénomination : {waste?.name}
-        <br />
         Code famille : {waste?.familyCode}
         <br />
         Nom du matériau : {waste?.materialName}
