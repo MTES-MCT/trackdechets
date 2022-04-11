@@ -92,7 +92,7 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
         <div className="BoxRow">
           <div className="BoxCol">
             <p>
-              <strong>1.1 Producteur ou détenteur du déchet</strong>
+              <strong>1. Producteur ou détenteur du déchet</strong>
             </p>
             <p>
               <input
@@ -194,23 +194,21 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
           <div className="BoxRow">
             <div className="BoxCol">
               <p>
-                Si la destination indiquée n’est pas l’exutoire, indiquer ici le
-                SIRET, le Nom de l’exutoire final ainsi que le CAP et le code de
-                traitement final prévu :
+                <strong>4.1 Installation de destination finale</strong>
               </p>
               <p>
                 SIRET :{" "}
                 {bsda?.destination?.operation?.nextDestination?.company?.siret}
-                {" - "}
+                {" / "}
                 Nom (raison sociale) :{" "}
                 {bsda?.destination?.operation?.nextDestination?.company?.name}
-                {" - "}
+                {" / "}
                 Code prévu :{" "}
                 {
                   bsda?.destination?.operation?.nextDestination
                     ?.plannedOperationCode
                 }
-                {" - "}
+                {" / "}
                 CAP : {bsda?.destination?.operation?.nextDestination?.cap}
               </p>
             </div>

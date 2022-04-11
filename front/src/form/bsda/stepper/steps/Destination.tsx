@@ -96,7 +96,8 @@ export function Destination({ disabled }) {
             checked={hasNextDestination}
             className="td-checkbox"
           />
-          La destination indiquée n’est pas l’exutoire final
+          La destination indiquée ci avant n'est pas l'exutoire final, je dois
+          renseigner les informations sur la destination finale
         </label>
       </div>
 
