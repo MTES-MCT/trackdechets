@@ -10,7 +10,7 @@ function getTransporter(
   form: Form,
   temporaryStorageDetail: TemporaryStorageDetail
 ) {
-  if (["SEALED", "DRAFT"].includes(form.status)) {
+  if (["SEALED", "DRAFT", "SIGNED_BY_PRODUCER"].includes(form.status)) {
     return form.transporter?.company;
   }
 

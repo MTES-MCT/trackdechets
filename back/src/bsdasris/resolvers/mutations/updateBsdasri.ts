@@ -49,6 +49,7 @@ const fieldsAllowedForUpdateOnceSignedByEmitter: BsdasriField[] =
     "transporterCompanyPhone",
     "transporterCompanyContact",
     "transporterCompanyMail",
+    "transporterCompanyVatNumber",
     "transporterRecepisseNumber",
     "transporterRecepisseDepartment",
     "transporterRecepisseValidityLimit",

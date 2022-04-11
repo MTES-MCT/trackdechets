@@ -36,8 +36,8 @@ export function Worker({ disabled }) {
   if (isGroupement || isEntreposageProvisoire || isDechetterie) {
     return (
       <div className="notification">
-        Vous effectuez un groupement, un entreposage provisoire ou une collecte
-        en déchetterie. Il n'y a pas d'entreprise de travaux à saisir.
+        Vous effectuez un groupement, une réexpédition ou une collecte en
+        déchetterie. Il n'y a pas d'entreprise de travaux à saisir.
       </div>
     );
   }
