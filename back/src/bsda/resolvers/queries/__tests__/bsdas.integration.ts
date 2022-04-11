@@ -108,38 +108,39 @@ describe("Query.bsdas", () => {
     expect(data.bsdas.edges.length).toBe(fields.length);
   });
 
-  it.each(Object.keys(BSDA_CONTRIBUTORS_FIELDS))(
-    "should filter bsdas where user appears as %s",
-    async role => {
-      const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+  it.each(
+    Object.keys(BSDA_CONTRIBUTORS_FIELDS).filter(
+      key => key !== "nextDestination"
+    )
+  )("should filter bsdas where user appears as %s", async role => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
 
-      for (const field of Object.values(BSDA_CONTRIBUTORS_FIELDS)) {
-        await bsdaFactory({
-          opt: {
-            [field]: company.siret
-          }
-        });
-      }
+    for (const field of Object.values(BSDA_CONTRIBUTORS_FIELDS)) {
+      await bsdaFactory({
+        opt: {
+          [field]: company.siret
+        }
+      });
+    }
 
-      const { query } = makeClient(user);
-      const { data } = await query<Pick<Query, "bsdas">, QueryBsdasArgs>(
-        GET_BSDAS,
-        {
-          variables: {
-            where: {
-              [role]: {
-                company: {
-                  siret: { _eq: company.siret }
-                }
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsdas">, QueryBsdasArgs>(
+      GET_BSDAS,
+      {
+        variables: {
+          where: {
+            [role]: {
+              company: {
+                siret: { _eq: company.siret }
               }
             }
           }
         }
-      );
+      }
+    );
 
-      expect(data.bsdas.edges.length).toBe(1);
-    }
-  );
+    expect(data.bsdas.edges.length).toBe(1);
+  });
 
   it("should not return deleted bsdas", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);

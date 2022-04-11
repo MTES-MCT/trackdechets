@@ -22,7 +22,7 @@ export const BSDA_CONTRIBUTORS_FIELDS: Record<string, keyof BsdaContributors> =
     transporter: "transporterCompanySiret",
     worker: "workerCompanySiret",
     broker: "brokerCompanySiret",
-    nextDetination: "destinationOperationNextDestinationCompanySiret"
+    nextDestination: "destinationOperationNextDestinationCompanySiret"
   };
 
 export async function checkIsBsdaContributor(
