@@ -1,12 +1,12 @@
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-express";
-import { BsdasriStatus, BsdasriType } from "@prisma/client";
+import { BsdasriStatus, BsdasriType, Bsdasri } from "@prisma/client";
 import { DASRI_GROUPING_OPERATIONS_CODES } from "../../../common/constants";
 
-export const checkDasrisAreEligibleForSynthesis = async (
-  synthesizingIds,
-  emitterSiret
-) => {
+export const getEligibleDasrisForSynthesis = async (
+  synthesizingIds: string[],
+  emitterSiret: string
+): Promise<Bsdasri[]> => {
   if (!synthesizingIds) {
     return;
   }
@@ -29,8 +29,7 @@ export const checkDasrisAreEligibleForSynthesis = async (
       synthesizedIn: null,
       synthesizing: { none: {} },
       transporterCompanySiret: emitterSiret
-    },
-    select: { id: true }
+    }
   });
 
   const foundIds = found.map(el => el.id);
@@ -46,6 +45,8 @@ export const checkDasrisAreEligibleForSynthesis = async (
       ].join("\n")
     );
   }
+
+  return found;
 };
 
 export const checkDasrisAreGroupable = async (groupingIds, emitterSiret) => {
@@ -105,4 +106,37 @@ export const emitterBelongsToUserSirets = async (
   if (!userSirets.includes(emitterSiret)) {
     throw new UserInputError(`Le siret de l'émetteur doit être un des vôtres`);
   }
+};
+type dbPackaging = {
+  type: string;
+  other?: string;
+  quantity: number;
+  volume: number;
+};
+/**
+ * Aggregate packagings from several bsds and sum their volume an quantity by container type
+ */
+export const aggregatePackagings = (dasrisToAssociate: Bsdasri[]) => {
+  const packagingsArray = dasrisToAssociate.map(dasri =>
+    Array.isArray(dasri.transporterWastePackagings)
+      ? <dbPackaging[]>dasri.transporterWastePackagings
+      : []
+  );
+
+  return packagingsArray.reduce((prev, cur) => {
+    for (const packaging of cur) {
+      const found = prev.find(
+        item =>
+          item.type === packaging.type &&
+          item.other === packaging.other &&
+          item.volume === packaging.volume
+      );
+      if (found) {
+        found.quantity += packaging.quantity;
+      } else {
+        prev.push(packaging);
+      }
+    }
+    return prev;
+  }, []);
 };

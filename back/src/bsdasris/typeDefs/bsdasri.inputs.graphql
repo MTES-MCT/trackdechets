@@ -63,8 +63,8 @@ input BsdasriWhere {
   Si groupable: true, les bordereaux retournés:
     - ne regroupent pas d'autres bordereaux (groupement ou synthèse)
     - ne sont pas associés à un bordereau de synthèse ou de groupement
-  Si groupable: false les bordereaux retournés: 
-    - sont déjà associés à un bordereau de synthèse ou de groupement 
+  Si groupable: false les bordereaux retournés:
+    - sont déjà associés à un bordereau de synthèse ou de groupement
     - ou regroupent d'autres bordereaux (groupement ou synthèse)
   """
   groupable: Boolean
@@ -120,6 +120,7 @@ input BsdasriEmissionInput {
   weight: BsdasriWeightInput
   packagings: [BsdasriPackagingsInput!]
 }
+
 input BsdasriEmitterInput {
   company: CompanyInput
   pickupSite: PickupSiteInput
@@ -227,8 +228,14 @@ input BsdasriIdentificationInput {
 input BsdasriInput {
   waste: BsdasriWasteInput
 
+  """
+  Non accepté pour le dasri de synthèse
+  """
   emitter: BsdasriEmitterInput
 
+  """
+  Non accepté pour le dasri de synthèse
+  """
   ecoOrganisme: BsdasriEcoOrganismeInput
 
   transporter: BsdasriTransporterInput
@@ -241,12 +248,14 @@ input BsdasriInput {
   """
   identification: BsdasriIdentificationInput
 
-  "Liste des bordereaux que celui-ci groupe dans un bordereau de groupement"
+  "Liste des bordereaux que celui-ci groupe dans un bordereau de groupement. Incompatible avec le champ synthesizing."
   grouping: [ID!]
 
-  "Liste des bordereaux que celui-ci groupe dans un bordereau de synthèse"
+  "Liste des bordereaux que celui-ci groupe dans un bordereau de synthèse.  Incompatible avec le champ grouping."
   synthesizing: [ID!]
 }
+
+ 
 
 input BsdasriSignatureInput {
   "Type de signature apposée"

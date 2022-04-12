@@ -3,7 +3,7 @@ type Mutation {
   Crée un nouveau dasri en brouillon
   """
   createDraftBsdasri(
-    "Payload de création d'un dasri brouillon"
+    "Payload de création d'un dasri brouillon. Ne permet pas la création de dasri de synthèse."
     input: BsdasriInput!
   ): Bsdasri!
 
@@ -11,6 +11,11 @@ type Mutation {
   Crée un nouveau dasri
   """
   createBsdasri("Payload de création d'un dasri" input: BsdasriInput!): Bsdasri!
+
+  # """
+  # Crée un nouveau dasri de synthèse
+  # """
+  # createSynthesisBsdasri("Payload de création d'un dasri de synthèse" input: SynthesisBsdasriInput!): Bsdasri!
 
   """
   Met à jour un dasri existant.

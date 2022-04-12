@@ -10,7 +10,7 @@ import { updateBsda } from "../steps/updateBsda";
 
 const workflow: Workflow = {
   title: "Groupement de déchets",
-  description: `Un traiteur a 2 bordereaux qu'il souhaite groupés. Après la crétation des 2 bordereaux initiaux, un bordereau de groupement est créé.`,
+  description: `Un traiteur a 2 bordereaux qu'il souhaite grouper. Après la crétation des 2 bordereaux initiaux, un bordereau de groupement est créé.`,
   companies: [
     { name: "producteur", companyTypes: ["PRODUCER"] },
     { name: "producteur", companyTypes: ["PRODUCER"] },

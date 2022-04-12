@@ -36,28 +36,45 @@ interface Props {
   bsdasriFormType?: string;
 }
 type removableKey = keyof Bsdasri;
+const wasteKey = "waste";
+const ecoOrganismeKey = "ecoOrganisme";
+const emitterKey = "emitter";
+const transporterKey = "transporter";
+const destinationKey = "destination";
+const identificationKey = "identification";
+const synthesizingKey = "synthesizing";
+const groupingKey = "grouping";
 
+const getCommonKeys = (bsdasriType: BsdasriType): removableKey[] => {
+  if (bsdasriType === BsdasriType.Synthesis) {
+    return [groupingKey];
+  }
+  if (
+    bsdasriType === BsdasriType.Grouping ||
+    bsdasriType === BsdasriType.Simple
+  ) {
+    return [synthesizingKey];
+  }
+  return [];
+};
 /**
  * Do not resend sections locked by relevant signatures
  */
-const removeSignedSections = (input: BsdasriInput, status: BsdasriStatus) => {
-  const wasteKey = "waste";
-  const ecoOrganismeKey = "ecoOrganisme";
-  const emitterKey = "emitter";
-  const transporterKey = "transporter";
-  const destinationKey = "destination";
-  const identificationKey = "identification";
-  const synthesizingKey = "synthesizing";
-  const groupingKey = "grouping";
-
+const removeSignedSections = (
+  input: BsdasriInput,
+  status: BsdasriStatus,
+  bsdasriType: BsdasriType
+) => {
+  const commonKeys = getCommonKeys(bsdasriType);
   const mapping: Partial<Record<BsdasriStatus, removableKey[]>> = {
-    INITIAL: [],
+    INITIAL: [...commonKeys],
     SIGNED_BY_PRODUCER: [
       wasteKey,
       ecoOrganismeKey,
       emitterKey,
       synthesizingKey,
       groupingKey,
+      ...commonKeys,
     ],
     SENT: [
       wasteKey,
@@ -66,6 +83,7 @@ const removeSignedSections = (input: BsdasriInput, status: BsdasriStatus) => {
       transporterKey,
       synthesizingKey,
       groupingKey,
+      ...commonKeys,
     ],
     RECEIVED: [
       wasteKey,
@@ -76,6 +94,7 @@ const removeSignedSections = (input: BsdasriInput, status: BsdasriStatus) => {
       identificationKey,
       synthesizingKey,
       groupingKey,
+      ...commonKeys,
     ],
   };
 
@@ -153,7 +172,7 @@ export default function BsdasriStepsList(props: Props) {
       return updateBsdasri({
         variables: {
           id: formState.id,
-          input: removeSignedSections(input, status),
+          input: removeSignedSections(input, status, type),
         },
       });
     }

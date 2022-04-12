@@ -132,6 +132,7 @@ const INVALID_PROCESSING_OPERATION =
  *
  */
 export const synthesisSchema = () =>
+  // todo remove
   yup.object({
     emitterCompanySiret: yup
       .string()
@@ -697,13 +698,12 @@ export type BsdasriValidationContext = {
   receptionSignature?: boolean;
   operationSignature?: boolean;
   isGrouping?: boolean;
-  isSynthesizing?: boolean;
 };
 export function validateBsdasri(
   dasri: Partial<Prisma.BsdasriCreateInput>,
   context: BsdasriValidationContext
 ) {
-  let schema = emitterSchema(context)
+  const schema = emitterSchema(context)
     .concat(emissionSchema(context))
     .concat(transporterSchema(context))
     .concat(transportSchema(context))
@@ -711,11 +711,11 @@ export function validateBsdasri(
     .concat(receptionSchema(context))
     .concat(operationSchema(context))
     .concat(ecoOrganismeSchema(context));
-
+  // todo remove
   // synthesis specific rules
-  if (!!context.isSynthesizing) {
-    schema = schema.concat(synthesisSchema());
-  }
+  // if (!!context.isSynthesizing) {
+  //   schema = schema.concat(synthesisSchema());
+  // }
 
   return schema.validate(dasri, { abortEarly: false });
 }

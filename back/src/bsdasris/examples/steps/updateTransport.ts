@@ -13,6 +13,6 @@ export function updateTransport(company: string): WorkflowStep {
     expected: { status: "SIGNED_BY_PRODUCER" },
     data: response => response.updateBsdasri,
     company,
-    setContext: (ctx, data) => ({ ...ctx, bsd: data })
+    setContext: (ctx, data) => ({ ...ctx, bsd: data, bsdasri1: data })
   };
 }

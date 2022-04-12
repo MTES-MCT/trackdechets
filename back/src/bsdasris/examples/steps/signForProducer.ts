@@ -15,6 +15,6 @@ export function signForProducer(company: string): WorkflowStep {
     expected: { status: "SIGNED_BY_PRODUCER" },
     data: response => response.signBsdasri,
     company,
-    setContext: (ctx, data) => ({ ...ctx, bsd: data })
+    setContext: (ctx, data) => ({ ...ctx, bsd: data, bsdasri1: data })
   };
 }
