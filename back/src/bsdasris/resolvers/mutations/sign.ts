@@ -17,6 +17,14 @@ import {
 } from "./signatureUtils";
 import { indexBsdasri } from "../../elastic";
 
+const reindexAssociatedDasris = async dasriId => {
+  const updatedDasris = await prisma.bsdasri.findMany({
+    where: { synthesizedInId: dasriId }
+  });
+  for (const updatedDasri of updatedDasris) {
+    await indexBsdasri(updatedDasri);
+  }
+};
 /**
  * When synthesized dasri is received or processed, associated dasris are updated
  *
@@ -51,12 +59,7 @@ const cascadeOnSynthesized = async ({ dasri }) => {
         destinationReceptionSignatureDate
       }
     });
-    const updatedDasris = await prisma.bsdasri.findMany({
-      where: { synthesizedInId: dasri.id }
-    });
-    for (const updatedDasri of updatedDasris) {
-      await indexBsdasri(updatedDasri);
-    }
+    await reindexAssociatedDasris(dasri.id);
   }
 
   if (dasri.status === BsdasriStatus.PROCESSED) {
@@ -79,6 +82,7 @@ const cascadeOnSynthesized = async ({ dasri }) => {
         destinationOperationSignatureAuthor
       }
     });
+    await reindexAssociatedDasris(dasri.id);
   }
 };
 

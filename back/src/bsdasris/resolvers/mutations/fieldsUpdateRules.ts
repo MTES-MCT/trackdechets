@@ -65,7 +65,6 @@ export const synthesisInitialFieldsAllowedForUpdate: BsdasriField[] = fieldsAllo
     "emitterCompanyPhone",
     "emitterCompanyContact",
     "emitterCompanyMail",
-    // "transporterCompanySiret",
     // "transporterCompanyVatNumber",
     "transporterCompanyName",
     "transporterCompanyAddress",
