@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { gql } from "apollo-server-core";
 import logger from "../../logging/logger";
 import { getUid } from "../../utils";
+import { DefinitionNode, FieldNode } from "graphql";
 
 /**
  * Logging middleware
@@ -27,8 +28,8 @@ export default function (graphQLPath: string) {
       requestMetadata.graphql_query = req.body?.query;
 
       const gqlDetails = parseGqlQuery(req.body?.query);
-      requestMetadata.graphql_operation = gqlDetails?.operation;
-      requestMetadata.graphql_selection_name = gqlDetails?.name;
+      requestMetadata.graphql_operation = gqlDetails[0]?.operation;
+      requestMetadata.graphql_selection_name = gqlDetails[0]?.name;
     }
 
     logger.info(message, requestMetadata);
@@ -71,16 +72,23 @@ function parseGqlQuery(query: string | undefined) {
       ${query}
     `;
 
-    const definition = parsedQuery.definitions[0];
-    if (definition.kind !== "OperationDefinition") return;
-
-    const fieldSelection = definition.selectionSet.selections[0];
-
-    return {
-      operation: definition.operation,
-      name: fieldSelection.kind === "Field" ? fieldSelection.name.value : ""
-    };
+    return parsedQuery.definitions
+      .flatMap(definition => parseGqlDefinition(definition))
+      .filter(Boolean);
   } catch (_) {
-    return undefined;
+    return [];
   }
+}
+
+function parseGqlDefinition(definition: DefinitionNode) {
+  if (definition.kind !== "OperationDefinition") return undefined;
+
+  const fieldSelections = definition.selectionSet.selections.filter(
+    (selection): selection is FieldNode => selection.kind === "Field"
+  );
+
+  return fieldSelections.map(field => ({
+    operation: definition.operation,
+    name: field.name.value
+  }));
 }

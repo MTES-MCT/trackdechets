@@ -7,7 +7,7 @@ const graphQLPath = "/gql";
 describe("graphqlBatchLimiterMiddleware", () => {
   const app = express();
   app.use(json());
-  app.use(graphqlBatchLimiterMiddleware(graphQLPath));
+  app.use(graphQLPath, graphqlBatchLimiterMiddleware());
   app.post(graphQLPath, (req, res) => {
     res.status(200).send(req.body);
   });
