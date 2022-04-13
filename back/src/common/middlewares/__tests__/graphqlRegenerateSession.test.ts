@@ -1,11 +1,21 @@
 import express, { json } from "express";
 import session from "express-session";
 import supertest from "supertest";
-import { sess } from "../../../server";
 import { graphqlQueryParserMiddleware } from "../graphqlQueryParser";
 import { graphqlRegenerateSessionMiddleware } from "../graphqlRegenerateSession";
 
 const graphQLPath = "/gql";
+const sess: session.SessionOptions = {
+  name: "connect.sid",
+  secret: "a secret",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false,
+    domain: "test.local",
+    maxAge: 24 * 3600 * 1000
+  }
+};
 
 describe("graphqlRegenerateSessionMiddleware", () => {
   const app = express();
