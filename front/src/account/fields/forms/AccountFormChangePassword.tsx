@@ -7,6 +7,7 @@ import styles from "./AccountForm.module.scss";
 import { object, string } from "yup";
 import { MutationChangePasswordArgs, Mutation } from "generated/graphql/types";
 import classNames from "classnames";
+import { NotificationError } from "common/components/Error";
 
 type Props = {
   toggleEdition: () => void;
@@ -25,7 +26,7 @@ type V = MutationChangePasswordArgs & {
 };
 
 export default function AccountFormChangePassword({ toggleEdition }: Props) {
-  const [changePassword, { loading }] = useMutation<
+  const [changePassword, { loading, error }] = useMutation<
     Pick<Mutation, "changePassword">,
     MutationChangePasswordArgs
   >(CHANGE_PASSWORD, {
@@ -58,13 +59,9 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
   return (
     <Formik<V>
       initialValues={initialValues}
-      onSubmit={(values, { setFieldError, setSubmitting }) => {
+      onSubmit={(values, { setSubmitting }) => {
         changePassword({ variables: values }).catch(() => {
           setSubmitting(false);
-          setFieldError(
-            "oldPassword",
-            "Erreur. Vérifiez la saisie de votre ancien mot de passe."
-          );
         });
       }}
       validateOnChange={false}
@@ -106,6 +103,7 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
             <RedErrorMessage name="newPasswordConfirmation" />
           </div>
           {loading && <div>Envoi en cours...</div>}
+          {error && <NotificationError apolloError={error} />}
 
           <button
             className="btn btn--primary tw-mt-4"
