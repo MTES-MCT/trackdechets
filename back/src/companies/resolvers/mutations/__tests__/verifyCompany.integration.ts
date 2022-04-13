@@ -75,7 +75,7 @@ describe("mutation verifyCompany", () => {
     const { mutate } = makeClient(user);
     const { errors } = await mutate(VERIFY_COMPANY, {
       variables: {
-        input: { siret: "11111111111111", code: company.verificationCode }
+        input: { siret: "3".repeat(14), code: company.verificationCode }
       }
     });
     expect(errors).toEqual([

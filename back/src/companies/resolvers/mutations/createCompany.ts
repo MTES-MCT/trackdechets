@@ -11,7 +11,7 @@ import geocode from "../../geocode";
 import * as COMPANY_TYPES from "../../../common/constants/COMPANY_TYPES";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../mailer/templates";
-import { deleteCachedUserSirets } from "../../../common/redis/users";
+import { deleteCachedUserCompanies } from "../../../common/redis/users";
 import { isVat } from "../../../common/constants/companySearchHelpers";
 import { whereSiretOrVatNumber } from "../CompanySearchResult";
 import { searchCompany } from "../../search";
@@ -146,7 +146,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       role: "ADMIN"
     }
   });
-  await deleteCachedUserSirets(user.id);
+  await deleteCachedUserCompanies(user.id);
   const company = await companyAssociationPromise.company();
 
   // fill firstAssociationDate field if null (no need to update it if user was previously already associated)

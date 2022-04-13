@@ -46,9 +46,7 @@ function siretify(index) {
   if (siret.length > siretLength) {
     throw Error("Generated siret is too long");
   }
-  // polyfill for str.padStart
-  const padding = "0".repeat(siretLength - siret.length);
-  return padding + siret;
+  return siret.padStart(14, "1");
 }
 
 /**
@@ -384,3 +382,9 @@ export const ecoOrganismeFactory = async ({
 
   return ecoOrganisme;
 };
+
+export const toIntermediaryCompany = (company: Company, contact = "toto") => ({
+  siret: company.siret,
+  name: company.name,
+  contact
+});

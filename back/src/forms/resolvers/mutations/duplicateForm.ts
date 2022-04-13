@@ -103,8 +103,6 @@ function getDuplicateTemporaryStorageDetail({
  * Duplicate the content of a form into a new DRAFT form
  * A new readable ID is generated and some fields which
  * are not duplicable are omitted
- * @param formId
- * @param userId
  */
 const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
   parent,
@@ -127,6 +125,23 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
       getDuplicateTemporaryStorageDetail(fullForm.temporaryStorageDetail);
     newFormInput.temporaryStorageDetail = {
       create: temporaryStorageDetailCreateInput
+    };
+  }
+
+  if (fullForm.intermediaries) {
+    newFormInput.intermediaries = {
+      createMany: {
+        data: fullForm.intermediaries.map(int => ({
+          siret: int.siret,
+          address: int.address,
+          vatNumber: int.vatNumber,
+          name: int.name,
+          contact: int.contact,
+          phone: int.phone,
+          mail: int.mail
+        })),
+        skipDuplicates: true
+      }
     };
   }
 

@@ -6,7 +6,7 @@ input CompanyInput {
   siret: String
 
   """
-  Numéro de TVA intra-communautaire de l'établissement 
+  Numéro de TVA intra-communautaire de l'établissement
   """
   vatNumber: String
 

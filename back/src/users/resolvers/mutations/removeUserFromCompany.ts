@@ -8,7 +8,7 @@ import {
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getCompanyAssociationOrNotFound } from "../../database";
 import { checkIsCompanyAdmin } from "../../permissions";
-import { deleteCachedUserSirets } from "../../../common/redis/users";
+import { deleteCachedUserCompanies } from "../../../common/redis/users";
 
 const removeUserFromCompanyResolver: MutationResolvers["removeUserFromCompany"] =
   async (parent, { userId, siret }, context) => {
@@ -25,7 +25,7 @@ const removeUserFromCompanyResolver: MutationResolvers["removeUserFromCompany"] 
     });
 
     // clear cache
-    await deleteCachedUserSirets("userId");
+    await deleteCachedUserCompanies("userId");
 
     const dbCompany = await prisma.company.findUnique({ where: { siret } });
 

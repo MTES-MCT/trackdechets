@@ -16,8 +16,8 @@ import {
 import { checkIsFormContributor } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
-import { FormSirets } from "../../types";
-import { draftFormSchema } from "../../validation";
+import { FormCompanies } from "../../types";
+import { draftFormSchema, validateIntermediariesInput } from "../../validation";
 import { getFormOrFormNotFound } from "../../database";
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
@@ -31,8 +31,13 @@ const createFormResolver = async (
   return prisma.$transaction(async transaction => {
     const user = checkIsAuthenticated(context);
 
-    const { appendix2Forms, grouping, temporaryStorageDetail, ...formContent } =
-      createFormInput;
+    const {
+      appendix2Forms,
+      grouping,
+      temporaryStorageDetail,
+      intermediaries,
+      ...formContent
+    } = createFormInput;
 
     if (appendix2Forms && grouping) {
       throw new UserInputError(
@@ -48,7 +53,7 @@ const createFormResolver = async (
       formContent.wasteDetails.isDangerous = true;
     }
 
-    const formSirets: FormSirets = {
+    const formCompanies: FormCompanies = {
       emitterCompanySiret: formContent.emitter?.company?.siret,
       recipientCompanySiret: formContent.recipient?.company?.siret,
       transporterCompanySiret: formContent.transporter?.company?.siret,
@@ -60,12 +65,22 @@ const createFormResolver = async (
             destinationCompanySiret:
               temporaryStorageDetail.destination.company.siret
           }
+        : {}),
+      ...(intermediaries?.length
+        ? {
+            intermediariesVatNumbers: intermediaries?.map(
+              intermediary => intermediary.vatNumber ?? null
+            ),
+            intermediariesSirets: intermediaries?.map(
+              intermediary => intermediary.siret ?? null
+            )
+          }
         : {})
     };
 
     await checkIsFormContributor(
       user,
-      formSirets,
+      formCompanies,
       "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
     );
 
@@ -96,6 +111,15 @@ const createFormResolver = async (
           create: {}
         };
       }
+    }
+
+    if (intermediaries) {
+      formCreateInput.intermediaries = {
+        createMany: {
+          data: await validateIntermediariesInput(intermediaries),
+          skipDuplicates: true
+        }
+      };
     }
 
     const formRepository = getFormRepository(user, transaction);

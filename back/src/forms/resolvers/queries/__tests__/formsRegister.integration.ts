@@ -81,7 +81,7 @@ describe("query { formsRegister }", () => {
     const { query } = makeClient(user);
     const { errors } = await query<Pick<Query, "formsRegister">>(`
       query {
-        formsRegister(sirets: ["${company.siret}", "11111111111111"], exportType: OUTGOING, exportFormat: CSV) {
+        formsRegister(sirets: ["${company.siret}", "22222222222222"], exportType: OUTGOING, exportFormat: CSV) {
           token
           downloadLink
         }

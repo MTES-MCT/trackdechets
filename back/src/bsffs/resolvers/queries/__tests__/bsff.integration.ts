@@ -122,7 +122,7 @@ describe("Query.bsff", () => {
               numero: ficheInterventionNumero,
               weight: 2,
               detenteurCompanyName: "Acme",
-              detenteurCompanySiret: "1".repeat(14),
+              detenteurCompanySiret: "2".repeat(14),
               detenteurCompanyAddress: "12 rue de la Tige, 69000",
               detenteurCompanyMail: "contact@gmail.com",
               detenteurCompanyPhone: "06",

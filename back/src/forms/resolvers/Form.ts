@@ -5,6 +5,7 @@ import transportSegments from "./forms/transportSegments";
 import temporaryStorageDetail from "./forms/temporaryStorageDetail";
 import groupedIn from "./forms/groupedIn";
 import grouping from "./forms/grouping";
+import intermediaries from "./forms/intermediary";
 
 const formResolvers: FormResolvers = {
   appendix2Forms,
@@ -13,7 +14,8 @@ const formResolvers: FormResolvers = {
   stateSummary,
   transportSegments,
   groupedIn,
-  grouping
+  grouping,
+  intermediaries
 };
 
 export default formResolvers;

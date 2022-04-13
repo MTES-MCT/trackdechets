@@ -6,7 +6,11 @@ import {
   ResolversParentTypes
 } from "../../../generated/graphql/types";
 import { InvalidWasteCode, MissingTempStorageFlag } from "../../errors";
-import { checkCanUpdate, checkIsFormContributor } from "../../permissions";
+import {
+  checkCanUpdate,
+  checkIsFormContributor,
+  formToCompanies
+} from "../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
 import {
@@ -15,8 +19,12 @@ import {
   flattenTemporaryStorageDetailInput
 } from "../../form-converter";
 import { getFormRepository } from "../../repository";
-import { FormSirets } from "../../types";
-import { draftFormSchema, sealedFormSchema } from "../../validation";
+import { FormCompanies } from "../../types";
+import {
+  draftFormSchema,
+  sealedFormSchema,
+  validateIntermediariesInput
+} from "../../validation";
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
 import { Decimal } from "decimal.js-light";
@@ -44,6 +52,7 @@ const updateFormResolver = async (
       appendix2Forms,
       grouping,
       temporaryStorageDetail,
+      intermediaries,
       ...formContent
     } = updateFormInput;
 
@@ -83,27 +92,43 @@ const updateFormResolver = async (
         formContent.recipient?.isTempStorage !== false) ||
       formContent.recipient?.isTempStorage === true;
 
-    const { temporaryStorageDetail: existingTemporaryStorageDetail } =
-      await formRepository.findFullFormById(id);
+    const existingTemporaryStorageDetail = await prisma.form
+      .findUnique({
+        where: { id: existingForm.id }
+      })
+      .temporaryStorageDetail();
 
-    // make sure user will still be form contributor after update
-    const nextFormSirets: FormSirets = {
+    const formCompanies = await formToCompanies(existingForm);
+    const nextFormCompanies: FormCompanies = {
       emitterCompanySiret:
-        form.emitterCompanySiret ?? existingForm.emitterCompanySiret,
+        form.emitterCompanySiret ?? formCompanies.emitterCompanySiret,
       recipientCompanySiret:
-        form.recipientCompanySiret ?? existingForm.recipientCompanySiret,
+        form.recipientCompanySiret ?? formCompanies.recipientCompanySiret,
       transporterCompanySiret:
-        form.transporterCompanySiret ?? existingForm.transporterCompanySiret,
+        form.transporterCompanySiret ?? formCompanies.transporterCompanySiret,
       traderCompanySiret:
-        form.traderCompanySiret ?? existingForm.traderCompanySiret,
+        form.traderCompanySiret ?? formCompanies.traderCompanySiret,
       brokerCompanySiret:
-        form.brokerCompanySiret ?? existingForm.brokerCompanySiret,
+        form.brokerCompanySiret ?? formCompanies.brokerCompanySiret,
       ecoOrganismeSiret:
-        form.ecoOrganismeSiret ?? existingForm.ecoOrganismeSiret
+        form.ecoOrganismeSiret ?? formCompanies.ecoOrganismeSiret,
+      ...(intermediaries?.length
+        ? {
+            intermediariesVatNumbers: intermediaries?.map(
+              intermediary => intermediary.vatNumber ?? null
+            ),
+            intermediariesSirets: intermediaries?.map(
+              intermediary => intermediary.siret ?? null
+            )
+          }
+        : {
+            intermediariesVatNumbers: formCompanies.intermediariesVatNumbers,
+            intermediariesSirets: formCompanies.intermediariesSirets
+          })
     };
 
     if (temporaryStorageDetail || existingTemporaryStorageDetail) {
-      nextFormSirets.temporaryStorageDetail = {
+      nextFormCompanies.temporaryStorageDetail = {
         destinationCompanySiret:
           temporaryStorageDetail?.destination?.company?.siret ??
           existingTemporaryStorageDetail?.destinationCompanySiret,
@@ -114,10 +139,11 @@ const updateFormResolver = async (
 
     await checkIsFormContributor(
       user,
-      nextFormSirets,
+      nextFormCompanies,
       "Vous ne pouvez pas enlever votre établissement du bordereau"
     );
 
+    // Delete temporaryStorageDetail
     if (
       existingTemporaryStorageDetail &&
       (!isOrWillBeTempStorage || temporaryStorageDetail === null)
@@ -142,6 +168,51 @@ const updateFormResolver = async (
           create: flattenTemporaryStorageDetailInput(temporaryStorageDetail)
         };
       }
+    }
+
+    // Delete intermediaries
+    if (
+      (!!intermediaries && intermediaries?.length === 0) ||
+      intermediaries === null
+    ) {
+      formUpdateInput.intermediaries = {
+        deleteMany: {}
+      };
+    } else if (intermediaries?.length) {
+      // Update the intermediaties
+      const existingIntermediaries =
+        await prisma.intermediaryFormAssociation.findMany({
+          where: { formId: existingForm.id }
+        });
+      // combine existing info with update info
+      const intermediariesInput = intermediaries.map(companyInput => {
+        const match = existingIntermediaries.find(
+          ({ siret, vatNumber }) =>
+            siret === companyInput.siret || vatNumber === companyInput.vatNumber
+        );
+        return {
+          ...(match
+            ? {
+                ...match,
+                siret: companyInput.siret ?? "",
+                name: match.name ?? ""
+              }
+            : {}),
+          ...{
+            ...companyInput,
+            siret: companyInput.siret ?? "",
+            name: companyInput.name ?? ""
+          }
+        };
+      });
+
+      formUpdateInput.intermediaries = {
+        deleteMany: {},
+        createMany: {
+          data: await validateIntermediariesInput(intermediariesInput),
+          skipDuplicates: true
+        }
+      };
     }
 
     const updatedForm = await formRepository.update({ id }, formUpdateInput);

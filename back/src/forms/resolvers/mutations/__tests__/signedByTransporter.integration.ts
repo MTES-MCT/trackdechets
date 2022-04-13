@@ -5,11 +5,12 @@ import { ErrorCode } from "../../../../common/errors";
 import {
   companyFactory,
   formFactory,
+  toIntermediaryCompany,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
-import { Status } from "@prisma/client";
+import { Status, UserRole } from "@prisma/client";
 import { Mutation } from "../../../../generated/graphql/types";
 import { getFullForm } from "../../../../forms/database";
 
@@ -27,7 +28,7 @@ const SIGNED_BY_TRANSPORTER = `mutation SignedByTransporter($id: ID!, $signingIn
 }`;
 
 describe("Mutation.signedByTransporter", () => {
-  afterAll(() => resetDatabase());
+  afterEach(() => resetDatabase());
 
   it("should mark a form as signed with deprecated packagings field", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
@@ -336,6 +337,55 @@ describe("Mutation.signedByTransporter", () => {
         message: "Le transporteur doit signer pour valider l'enlèvement.",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should fail when signed by an intermediary", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const emitterCompany = await companyFactory();
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        sentAt: null,
+        status: "SEALED",
+        emitterCompanyName: emitterCompany.name,
+        emitterCompanySiret: emitterCompany.siret,
+        transporterCompanyName: company.name,
+        transporterCompanySiret: company.siret,
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary.company)]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(intermediary.user);
+    const { errors } = await mutate<Pick<Mutation, "signedByTransporter">>(
+      SIGNED_BY_TRANSPORTER,
+      {
+        variables: {
+          id: form.id,
+          signingInfo: {
+            sentAt: "2018-12-11T00:00:00.000Z",
+            signedByTransporter: false,
+            securityCode: 1234,
+            sentBy: "Roger Lapince",
+            signedByProducer: true,
+            packagingInfos: form.wasteDetailsPackagingInfos,
+            quantity: form.wasteDetailsQuantity
+          }
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous n'êtes pas autorisé à signer ce bordereau pour le transport",
+        extensions: expect.objectContaining({
+          code: ErrorCode.FORBIDDEN
         })
       })
     ]);

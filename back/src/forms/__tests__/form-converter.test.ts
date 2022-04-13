@@ -263,7 +263,8 @@ test("expandFormFromDb", () => {
     noTraceability: form.noTraceability,
     nextDestination: null,
     currentTransporterSiret: form.currentTransporterSiret,
-    nextTransporterSiret: form.nextTransporterSiret
+    nextTransporterSiret: form.nextTransporterSiret,
+    intermediaries: []
   };
 
   expect(expanded).toEqual(expected);

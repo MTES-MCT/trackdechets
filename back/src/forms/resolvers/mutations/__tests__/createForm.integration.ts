@@ -5,6 +5,7 @@ import { ErrorCode } from "../../../../common/errors";
 import {
   companyFactory,
   formFactory,
+  toIntermediaryCompany,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -15,7 +16,7 @@ import {
   Mutation,
   MutationCreateFormArgs
 } from "../../../../generated/graphql/types";
-import { EmitterType, Status } from "@prisma/client";
+import { EmitterType, Status, UserRole } from "@prisma/client";
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
@@ -92,6 +93,11 @@ const CREATE_FORM = `
           id
         }
       }
+      intermediaries {
+        name
+        siret
+        contact
+      }
     }
   }
 `;
@@ -160,6 +166,101 @@ describe("Mutation.createForm", () => {
       expect(data.createForm.id).toBeTruthy();
     }
   );
+
+  it("should allow an intermediary company to create a form", async () => {
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER, {
+      companyTypes: {
+        set: ["TRANSPORTER"]
+      }
+    });
+    const search = require("../../../../companies/search");
+    const searchCompanyMock = jest.spyOn(search, "searchCompany");
+    searchCompanyMock.mockResolvedValueOnce({
+      siret: intermediary.company.siret,
+      name: intermediary.company.name,
+      statutDiffusionEtablissement: "O",
+      address: intermediary.company.address
+    });
+    const intermediaryCreation = toIntermediaryCompany(intermediary.company);
+    const { mutate } = makeClient(intermediary.user);
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          intermediaries: [intermediaryCreation]
+        }
+      }
+    });
+
+    expect(data.createForm.intermediaries).toEqual([
+      expect.objectContaining({
+        name: intermediary.company.name,
+        siret: intermediary.company.siret,
+        contact: intermediaryCreation.contact
+      })
+    ]);
+  });
+
+  it("should not allow to create a form with a foreign intermediary", async () => {
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER, {
+      companyTypes: {
+        set: ["TRANSPORTER"]
+      },
+      vatNumber: "BE0541696005"
+    });
+    const { mutate } = makeClient(intermediary.user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          intermediaries: [
+            {
+              vatNumber: "BE0541696005",
+              name: "Belgian Co",
+              contact: "Benoit"
+            }
+          ]
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Seul les numéros de TVA en France sont valides",
+        extensions: {
+          code: "BAD_USER_INPUT"
+        }
+      })
+    ]);
+  });
+
+  it("should not allow to create a form with an intermediary with only a FR VAT number but no SIRET", async () => {
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER, {
+      companyTypes: {
+        set: ["TRANSPORTER"]
+      },
+      vatNumber: "FR87850019464"
+    });
+    const { mutate } = makeClient(intermediary.user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          intermediaries: [
+            {
+              vatNumber: "FR87850019464",
+              name: "Belgian Co",
+              contact: "Benoit"
+            }
+          ]
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Le N°SIRET est obligatoire pour une entreprise intermédiaire",
+        extensions: {
+          code: "BAD_USER_INPUT"
+        }
+      })
+    ]);
+  });
 
   it("should allow an eco-organisme to create a form", async () => {
     const { user, company: eo } = await userWithCompanyFactory("MEMBER", {
@@ -342,7 +443,7 @@ describe("Mutation.createForm", () => {
       },
       recipient: {
         company: {
-          siret: "11111111111111"
+          siret: "3".repeat(14)
         }
       }
     };

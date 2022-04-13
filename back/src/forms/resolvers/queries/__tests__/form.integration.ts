@@ -1,8 +1,9 @@
-import { Form as PrismaForm, Prisma } from "@prisma/client";
+import { Form as PrismaForm, Prisma, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Query } from "../../../../generated/graphql/types";
 import {
   formFactory,
+  toIntermediaryCompany,
   transportSegmentFactory,
   userFactory,
   userWithCompanyFactory
@@ -13,6 +14,18 @@ const GET_FORM_QUERY = `
   query GetForm($id: ID, $readableId: String) {
     form(id: $id, readableId: $readableId) {
       id
+    }
+  }
+`;
+
+const GET_FORM_INTERMEDIARY_QUERY = `
+  query GetForm($id: ID, $readableId: String) {
+    form(id: $id, readableId: $readableId) {
+      id
+      intermediaries {
+        name
+        siret
+      }
     }
   }
 `;
@@ -100,5 +113,55 @@ describe("Query.form", () => {
     });
 
     expect(data.form.id).toBe(form.id);
+  });
+
+  it("should return the intermediaries", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+    const form = await createForm({
+      emitterCompanySiret: company.siret,
+      intermediaries: { create: [toIntermediaryCompany(intermediary.company)] }
+    });
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "form">>(
+      GET_FORM_INTERMEDIARY_QUERY,
+      {
+        variables: {
+          readableId: form.readableId
+        }
+      }
+    );
+
+    expect(data.form.intermediaries).toEqual([
+      expect.objectContaining({
+        name: intermediary.company.name,
+        siret: intermediary.company.siret
+      })
+    ]);
+  });
+
+  it("should allow the intermediaries to read their form, but not sign", async () => {
+    const { company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+    const form = await createForm({
+      emitterCompanySiret: company.siret,
+      intermediaries: { create: [toIntermediaryCompany(intermediary.company)] }
+    });
+    const { query } = makeClient(intermediary.user);
+    const { data } = await query<Pick<Query, "form">>(
+      GET_FORM_INTERMEDIARY_QUERY,
+      {
+        variables: {
+          readableId: form.readableId
+        }
+      }
+    );
+
+    expect(data.form.intermediaries).toEqual([
+      expect.objectContaining({
+        name: intermediary.company.name,
+        siret: intermediary.company.siret
+      })
+    ]);
   });
 });
