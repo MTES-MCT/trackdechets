@@ -4,7 +4,7 @@ import { graphqlQueryParserMiddleware } from "../graphqlQueryParser";
 describe("graphqlQueryParserMiddleware", () => {
   const middleware = graphqlQueryParserMiddleware();
   const res = {} as Response;
-  const next = () => {};
+  const next = () => null;
 
   it("should return an empty array when there is no query", async () => {
     const req = {} as Request;

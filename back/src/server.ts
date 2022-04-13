@@ -23,6 +23,7 @@ import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatch
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
 import { graphqlQueryParserMiddleware } from "./common/middlewares/graphqlQueryParser";
 import { graphqlRateLimiterMiddleware } from "./common/middlewares/graphqlRatelimiter";
+import { graphqlRegenerateSessionMiddleware } from "./common/middlewares/graphqlRegenerateSession";
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
 import { graphiqlLandingPagePlugin } from "./common/plugins/graphiql";
 import sentryReporter from "./common/plugins/sentryReporter";
@@ -213,6 +214,7 @@ app.use(session(sess));
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(graphQLPath, graphqlRegenerateSessionMiddleware("changePassword"));
 
 // authentification routes used by td-ui (/login /logout, /isAuthenticated)
 app.use(authRouter);

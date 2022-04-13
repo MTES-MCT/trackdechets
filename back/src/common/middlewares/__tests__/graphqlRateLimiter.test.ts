@@ -9,7 +9,8 @@ describe("graphqlRateLimiterMiddleware", () => {
   const app = express();
   app.use(json());
   app.use(graphQLPath, graphqlQueryParserMiddleware()); // We rely on `graphqlQueryParserMiddleware`
-  app.use(graphQLPath, 
+  app.use(
+    graphQLPath,
     graphqlRateLimiterMiddleware("resendInvitation", {
       maxRequestsPerWindow: 1,
       windowMs: 10000,
