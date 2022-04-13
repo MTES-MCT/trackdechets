@@ -5,7 +5,8 @@ import { WorkflowStep } from "../../../common/workflow";
 export function createBsdasri1ToAssociate(company: string): WorkflowStep {
   return {
     description: `On prépare un premier bordereau destiné à être associé à un bordereau de synthèse.
-    Les informations du BSDASRI (PRED, transporteur, destinataire, déchets) sont remplies.`,
+    Les informations du BSDASRI (PRED, transporteur, destinataire, déchets) sont remplies.
+    Puis, il va suivre son cycle de vie jusqu'à l'emport du déchet par le transporteur (status SENT).`,
     mutation: mutations.createBsdasri,
     variables: ({ pred, transporteur, traiteur }) => ({
       input: {
@@ -28,7 +29,8 @@ export function createBsdasri1ToAssociate(company: string): WorkflowStep {
 export function createBsdasri2ToAssociate(company: string): WorkflowStep {
   return {
     description: `On prépare un second bordereau destiné à être associé à un bordereau de synthèse.
-    Les informations du BSDASRI (PRED, transporteur, destinataire, déchets) sont remplies.`,
+    Les informations du BSDASRI (PRED, transporteur, destinataire, déchets) sont remplies.
+    Puis, il va suivre son cycle de vie jusqu'à l'emport du déchet par le transporteur (status SENT).`,
     mutation: mutations.createBsdasri,
     variables: ({ pred, transporteur, traiteur }) => ({
       input: {
