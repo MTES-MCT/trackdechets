@@ -6,8 +6,8 @@ export const fieldsAllowedForUpdateOnceReceived: BsdasriField[] = [
   "destinationReceptionWasteWeightValue"
 ];
 
-export const fieldsAllowedForUpdateOnceSent: BsdasriField[] = fieldsAllowedForUpdateOnceReceived.concat(
-  [
+export const fieldsAllowedForUpdateOnceSent: BsdasriField[] =
+  fieldsAllowedForUpdateOnceReceived.concat([
     "destinationCompanyName",
     "destinationCompanySiret",
     "destinationCompanyAddress",
@@ -23,10 +23,9 @@ export const fieldsAllowedForUpdateOnceSent: BsdasriField[] = fieldsAllowedForUp
     "destinationReceptionDate",
     "identificationNumbers",
     "handedOverToRecipientAt" // optional field to be filled by transporter once waste is received
-  ]
-);
-export const fieldsAllowedForUpdateOnceSignedByEmitter: BsdasriField[] = fieldsAllowedForUpdateOnceSent.concat(
-  [
+  ]);
+export const fieldsAllowedForUpdateOnceSignedByEmitter: BsdasriField[] =
+  fieldsAllowedForUpdateOnceSent.concat([
     "transporterCompanyName",
     "transporterCompanySiret",
     "transporterCompanyVatNumber",
@@ -50,10 +49,9 @@ export const fieldsAllowedForUpdateOnceSignedByEmitter: BsdasriField[] = fieldsA
     "transporterCustomInfo",
     "transporterTransportMode",
     "transporterTransportPlates"
-  ]
-);
-export const synthesisInitialFieldsAllowedForUpdate: BsdasriField[] = fieldsAllowedForUpdateOnceSent.concat(
-  [
+  ]);
+export const synthesisInitialFieldsAllowedForUpdate: BsdasriField[] =
+  fieldsAllowedForUpdateOnceSent.concat([
     //  transporterCompanySiret  & transporterCompanyVatNumber are not editable
     "wasteCode",
     "wasteAdr",
@@ -86,12 +84,12 @@ export const synthesisInitialFieldsAllowedForUpdate: BsdasriField[] = fieldsAllo
     "transporterCustomInfo",
     "transporterTransportMode",
     "transporterTransportPlates"
-  ]
-);
+  ]);
 
 export const getFieldsAllorwedForUpdate = (bsdasri: Bsdasri) => {
   const allowedFields = {
-    [BsdasriStatus.SIGNED_BY_PRODUCER]: fieldsAllowedForUpdateOnceSignedByEmitter,
+    [BsdasriStatus.SIGNED_BY_PRODUCER]:
+      fieldsAllowedForUpdateOnceSignedByEmitter,
     [BsdasriStatus.SENT]: fieldsAllowedForUpdateOnceSent,
     [BsdasriStatus.RECEIVED]: fieldsAllowedForUpdateOnceReceived,
     [BsdasriStatus.PROCESSED]: []

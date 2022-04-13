@@ -31,10 +31,8 @@ describe("Mutation.updateBsdasri", () => {
   it("should allow associated bsds update on INITIAL synthesis dasri", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
 
-    const {
-      user: transporter,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const associated = await bsdasriFactory({
       opt: {
@@ -131,10 +129,8 @@ describe("Mutation.updateBsdasri", () => {
   it("should forbid empty associated bsds fields on INITIAL synthesis dasri", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
 
-    const {
-      user: transporter,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const associated = await bsdasriFactory({
       opt: {
@@ -188,10 +184,8 @@ describe("Mutation.updateBsdasri", () => {
   it("should forbid null associated bsds fields on INITIAL synthesis dasri", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
 
-    const {
-      user: transporter,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const associated = await bsdasriFactory({
       opt: {
@@ -249,10 +243,8 @@ describe("Mutation.updateBsdasri", () => {
   ])("should forbid associated bsds update on non %p dasri", async status => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
 
-    const {
-      user: transporter,
-      company: transporterCompany
-    } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
 
     const associated = await bsdasriFactory({
       opt: {
@@ -308,10 +300,8 @@ describe("Mutation.updateBsdasri", () => {
         "MEMBER"
       );
 
-      const {
-        user: transporter,
-        company: transporterCompany
-      } = await userWithCompanyFactory("MEMBER");
+      const { user: transporter, company: transporterCompany } =
+        await userWithCompanyFactory("MEMBER");
 
       const associated = await bsdasriFactory({
         opt: {
