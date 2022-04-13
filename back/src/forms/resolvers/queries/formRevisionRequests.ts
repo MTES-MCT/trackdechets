@@ -19,8 +19,8 @@ export default async function formRevisionRequests(
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
-  const company = await getCompanyOrCompanyNotFound({ siret });
   await checkIsCompanyMember({ id: user.id }, { siret });
+  const company = await getCompanyOrCompanyNotFound({ siret });
 
   const pageSize = Math.max(Math.min(first, MAX_SIZE), MIN_SIZE);
 
