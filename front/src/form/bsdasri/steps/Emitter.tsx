@@ -21,7 +21,76 @@ import BsdasriSelector from "form/bsdasri/components/grouping/BsdasriSelector";
 import BsdasriSelectorForSynthesis from "form/bsdasri/components/grouping/BsdasriSelectorForSynthesis";
 import { useParams } from "react-router-dom";
 
-export default function Emitter({ status, stepName, disabled = false }) {
+export default function GenericEmitter({ status, stepName, disabled = false }) {
+  const { values } = useFormikContext<Bsdasri>();
+
+  const isSynthesizing = values.type === BsdasriType.Synthesis;
+  if (isSynthesizing) {
+    return SynthesisEmitter({ status, stepName, editionDisabled: disabled });
+  }
+  return Emitter({ status, stepName, disabled });
+}
+
+export function SynthesisEmitter({
+  status,
+  stepName,
+  editionDisabled = false,
+  emissionEmphasis = false,
+}) {
+  const disabled = !!status && status !== BsdasriStatus.Initial;
+
+  return (
+    <>
+      <h3 className="form__section-heading">Bordereau de synthèse DASRI</h3>
+      <p>
+        Vous apparaitrez comme producteur et transporteur du bordereau de
+        synthèse
+      </p>
+      <BsdasriSelectorForSynthesis disabled={disabled} />
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": emissionEmphasis,
+        })}
+      >
+        <fieldset>
+          <legend className="tw-font-semibold">Code déchet</legend>
+          <Field
+            name="waste.code"
+            id="18 01 03*"
+            label="18 01 03* DASRI d'origine humaine"
+            component={RadioButton}
+            disabled={disabled}
+          />
+          <Field
+            name="waste.code"
+            id="18 01 02*"
+            label="18 01 02* DASRI d'origine animale"
+            component={RadioButton}
+            disabled={disabled}
+          />
+        </fieldset>
+      </div>
+      <div
+        className={classNames("form__row", {
+          "field-emphasis": emissionEmphasis,
+        })}
+      >
+        <label>
+          Code ADR
+          <Field
+            disabled={disabled}
+            type="text"
+            name="waste.adr"
+            className="td-input"
+          />
+        </label>
+
+        <RedErrorMessage name="waste.adr" />
+      </div>
+    </>
+  );
+}
+export function Emitter({ status, stepName, disabled = false }) {
   const editionDisabled =
     disabled ||
     [
@@ -31,7 +100,7 @@ export default function Emitter({ status, stepName, disabled = false }) {
     ].includes(status);
   const { values } = useFormikContext<Bsdasri>();
   const isRegrouping = values.type === BsdasriType.Grouping;
-  const isSynthesizing = values.type === BsdasriType.Synthesis;
+
   const emissionEmphasis = stepName === "emission";
 
   const { siret } = useParams<{ siret: string }>();
@@ -48,18 +117,6 @@ export default function Emitter({ status, stepName, disabled = false }) {
           <h3 className="form__section-heading">
             Bordereau de groupement DASRI
           </h3>
-
-          {values?.emitter?.company?.siret && !isUserCurrentEmitter && (
-            <p className="notification notification--error">
-              Pour préparer un bordereau de regroupement, vous devez y figurer
-              comme producteur
-            </p>
-          )}
-        </>
-      )}
-      {isSynthesizing && (
-        <>
-          <h3 className="form__section-heading">Bordereau de synthèse DASRI</h3>
 
           {values?.emitter?.company?.siret && !isUserCurrentEmitter && (
             <p className="notification notification--error">
@@ -122,9 +179,7 @@ export default function Emitter({ status, stepName, disabled = false }) {
       {isRegrouping && isUserCurrentEmitter && (
         <BsdasriSelector name="grouping" />
       )}
-      {isSynthesizing && isUserCurrentEmitter && (
-        <BsdasriSelectorForSynthesis name="synthesizing" />
-      )}
+
       <h4 className="form__section-heading">Conditionnement</h4>
       <div
         className={classNames("form__row", {
@@ -145,7 +200,7 @@ export default function Emitter({ status, stepName, disabled = false }) {
       >
         <WeightWidget
           disabled={editionDisabled}
-          switchLabel="Je souhaite ajouter un poids"
+          switchLabel="Je souhaite préciser le poids"
           dasriPath="emitter.emission"
           getInitialWeightFn={getInitialWeightFn}
         />

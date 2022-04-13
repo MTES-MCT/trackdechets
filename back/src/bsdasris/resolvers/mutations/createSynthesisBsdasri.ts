@@ -17,11 +17,10 @@ import { getCachedUserSirets } from "../../../common/redis/users";
  * Bsdasri creation mutation :
  * sets bsdasri type to `SYNTHESIS`
  * draft is not allowed
- * checks 
+ * checks
  * sets status to `INITIAL`
  * aggregate child dasris packagings into emitter and tranporter packagings
- * aggrsumegate child dasris transporter volumes into emitter and tranporter volumes
-
+ * aggregate child dasris transporter volumes into emitter and tranporter volumes
  */
 const createSynthesisBsdasri = async (
   input: BsdasriInput,
@@ -30,9 +29,13 @@ const createSynthesisBsdasri = async (
   const user = checkIsAuthenticated(context);
   const userSirets = await getCachedUserSirets(user.id);
 
-  if (input?.emitter || input?.ecoOrganisme) {
+  if (
+    input?.emitter ||
+    input?.ecoOrganisme ||
+    input?.transporter?.transport?.packagings
+  ) {
     throw new UserInputError(
-      `Les champs emitter, ecoOrganisme ne sont pas acceptés pour la création d'un dasri de synthèse `
+      `Les champs emitter, ecoOrganisme et packagings ne sont pas acceptés pour la création d'un dasri de synthèse `
     );
   }
 

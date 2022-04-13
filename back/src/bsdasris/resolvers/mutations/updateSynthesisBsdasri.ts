@@ -99,26 +99,24 @@ const updateSynthesisBsdasri = async ({
     dasrisToAssociate,
     dbBsdasri.status
   );
-
-  const flattenedInput = {
-    ...flattenBsdasriInput(rest),
-    ...synthesizedBsdasriArgs
-  };
-  const expectedBsdasri = { ...dbBsdasri, ...flattenedInput };
-
-  await validateBsdasri(expectedBsdasri, {
-    isGrouping: false
-  });
+  const flattenedInput = flattenBsdasriInput(rest);
   const flattenedFields = Object.keys(flattenedInput);
-
   const allowedFields = getFieldsAllorwedForUpdate(dbBsdasri);
-
   const diff = flattenedFields.filter(el => !allowedFields.includes(el));
 
   if (!!diff.length) {
     const errMessage = `Des champs ont été verrouillés via signature ou ne sont pas modifiables sur le dasri de synthèse: ${diff.join()}`;
     throw new ForbiddenError(errMessage);
   }
+  const flattenedArgs = {
+    ...flattenedInput,
+    ...synthesizedBsdasriArgs
+  };
+  const expectedBsdasri = { ...dbBsdasri, ...flattenedArgs };
+
+  await validateBsdasri(expectedBsdasri, {
+    isGrouping: false
+  });
 
   const synthesizingArgs = !!inputSynthesizing?.length
     ? {
@@ -132,7 +130,7 @@ const updateSynthesisBsdasri = async ({
 
   const updatedDasri = await prisma.bsdasri.update({
     where: { id },
-    data: { ...flattenedInput, ...synthesizingArgs }
+    data: { ...flattenedArgs, ...synthesizingArgs }
   });
 
   const expandedDasri = expandBsdasriFromDB(updatedDasri);

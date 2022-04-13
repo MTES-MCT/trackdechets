@@ -23,7 +23,9 @@ export default function Transport({ status, editionDisabled = false }) {
   }
   const { values, setFieldValue } = useFormikContext<Bsdasri>();
 
-  const showTransportFields = status === BsdasriStatus.SignedByProducer;
+  const showTransportFields =
+    status === BsdasriStatus.SignedByProducer ||
+    values.type === BsdasriType.Synthesis;
 
   const showTransportePlates = values?.transporter?.transport?.mode === "ROAD";
 
@@ -155,21 +157,23 @@ export default function Transport({ status, editionDisabled = false }) {
               </div>
             </label>
           </div>
-          <div
-            className={classNames("form__row", {
-              "field-emphasis": transportEmphasis,
-            })}
-          >
-            <Field
-              name="transporter.transport.packagings"
-              component={Packagings}
-              disabled={disabled}
-            />
-          </div>
+          {values.type !== BsdasriType.Synthesis && (
+            <div
+              className={classNames("form__row", {
+                "field-emphasis": transportEmphasis,
+              })}
+            >
+              <Field
+                name="transporter.transport.packagings"
+                component={Packagings}
+                disabled={disabled}
+              />
+            </div>
+          )}
           <h4 className="form__section-heading">Quantité transportée</h4>
           <WeightWidget
             disabled={disabled}
-            switchLabel="Je souhaite ajouter une quantité"
+            switchLabel="Je souhaite préciser le poids"
             dasriPath="transporter.transport"
             getInitialWeightFn={getInitialWeightFn}
           />

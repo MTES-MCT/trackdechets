@@ -1,13 +1,25 @@
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { Field, useFormikContext } from "formik";
-import { BsdasriStatus, Bsdasri } from "generated/graphql/types";
+
+import {
+  BsdasriStatus,
+  Bsdasri,
+  BsdasriType,
+  Query,
+  QueryCompanyInfosArgs,
+} from "generated/graphql/types";
 import React from "react";
 import initialState from "../utils/initial-state";
-
+import { gql, useQuery } from "@apollo/client";
+import { useParams } from "react-router-dom";
 import { FillFieldsInfo, DisabledFieldsInfo } from "../utils/commons";
 import classNames from "classnames";
 import Transport from "./Transport";
+import { Loader } from "common/components";
+import companyStyles from "form/common/components/company/CompanyResult.module.scss";
+import RedErrorMessage from "common/components/RedErrorMessage";
+
 /**
  *
  * Tweaked Transporter component where takeover fields can be displayed on demand
@@ -15,7 +27,7 @@ import Transport from "./Transport";
  */
 export function TransporterShowingTakeOverFields({ status, stepName }) {
   return (
-    <BaseTransporter
+    <Transporter
       status={status}
       displayTakeoverFields={true}
       stepName={stepName}
@@ -23,11 +35,15 @@ export function TransporterShowingTakeOverFields({ status, stepName }) {
   );
 }
 
-export default function Transporter({ status, stepName }) {
-  return <BaseTransporter status={status} stepName={stepName} />;
-}
-function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
-  const { setFieldValue } = useFormikContext<Bsdasri>();
+export default function Transporter({
+  status,
+  displayTakeoverFields = false,
+
+  stepName,
+}) {
+  const { setFieldValue, values } = useFormikContext<Bsdasri>();
+  const isSynthesizing = values.type === BsdasriType.Synthesis;
+
   // handedOverAt is editable even after dasri reception
   const showHandedOverAtField = [
     BsdasriStatus.Sent,
@@ -48,38 +64,42 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
           "field-emphasis": transportEmphasis,
         })}
       >
-        <CompanySelector
-          disabled={disabled}
-          name="transporter.company"
-          heading="Entreprise de transport"
-          optionalMail={true}
-          allowForeignCompanies={true}
-          registeredOnlyCompanies={true}
-          onCompanySelected={transporter => {
-            if (transporter.transporterReceipt) {
-              setFieldValue(
-                "transporter.recepisse.number",
-                transporter.transporterReceipt.receiptNumber
-              );
-              setFieldValue(
-                "transporter.recepisse.validityLimit",
-                transporter.transporterReceipt.validityLimit
-              );
-              setFieldValue(
-                "transporter.recepisse.department",
-                transporter.transporterReceipt.department
-              );
-            } else {
-              setFieldValue("transporter.recepisse.number", "");
-              setFieldValue(
-                "transporter.recepisse.validityLimit",
-                initialState().transporter.recepisse.validityLimit
-              );
+        {isSynthesizing ? (
+          <CurrentCompanyWidget disabled={disabled} />
+        ) : (
+          <CompanySelector
+            disabled={disabled}
+            name="transporter.company"
+            heading="Entreprise de transport"
+            optionalMail={true}
+            allowForeignCompanies={true}
+            registeredOnlyCompanies={true}
+            onCompanySelected={transporter => {
+              if (transporter.transporterReceipt) {
+                setFieldValue(
+                  "transporter.recepisse.number",
+                  transporter.transporterReceipt.receiptNumber
+                );
+                setFieldValue(
+                  "transporter.recepisse.validityLimit",
+                  transporter.transporterReceipt.validityLimit
+                );
+                setFieldValue(
+                  "transporter.recepisse.department",
+                  transporter.transporterReceipt.department
+                );
+              } else {
+                setFieldValue("transporter.recepisse.number", "");
+                setFieldValue(
+                  "transporter.recepisse.validityLimit",
+                  initialState().transporter.recepisse.validityLimit
+                );
 
-              setFieldValue("transporter.recepisse.department", "");
-            }
-          }}
-        />
+                setFieldValue("transporter.recepisse.department", "");
+              }
+            }}
+          />
+        )}
       </div>
 
       {showHandedOverAtField ? (
@@ -108,4 +128,141 @@ function BaseTransporter({ status, displayTakeoverFields = false, stepName }) {
       <Transport status={status} />
     </>
   );
+}
+
+const COMPANY_INFOS = gql`
+  query CompanyInfos($siret: String!) {
+    companyInfos(siret: $siret) {
+      siret
+      name
+      address
+      companyTypes
+      contactEmail
+      contactPhone
+      transporterReceipt {
+        receiptNumber
+        validityLimit
+        department
+      }
+    }
+  }
+`;
+
+function CurrentCompanyWidget({ disabled = false }) {
+  const { setFieldValue } = useFormikContext();
+
+  const { siret } = useParams<{ siret: string }>();
+  const { data, loading, error } = useQuery<
+    Pick<Query, "companyInfos">,
+    QueryCompanyInfosArgs
+  >(COMPANY_INFOS, {
+    variables: { siret },
+    fetchPolicy: "no-cache",
+
+    onCompleted: () => {
+      setFieldValue(
+        `transporter.company.mail`,
+        data?.companyInfos?.contactEmail
+      );
+      setFieldValue(
+        `transporter.company.phone`,
+        data?.companyInfos?.contactPhone
+      );
+      setFieldValue(
+        `transporter.company.phone`,
+        data?.companyInfos?.contactPhone
+      );
+      if (data?.companyInfos?.transporterReceipt) {
+        setFieldValue(
+          "transporter.recepisse.number",
+          data?.companyInfos?.transporterReceipt.receiptNumber
+        );
+        setFieldValue(
+          "transporter.recepisse.validityLimit",
+          data?.companyInfos?.transporterReceipt.validityLimit
+        );
+        setFieldValue(
+          "transporter.recepisse.department",
+          data?.companyInfos?.transporterReceipt.department
+        );
+      } else {
+        setFieldValue("transporter.recepisse.number", "");
+        setFieldValue(
+          "transporter.recepisse.validityLimit",
+          initialState().transporter.recepisse.validityLimit
+        );
+
+        setFieldValue("transporter.recepisse.department", "");
+      }
+    },
+  });
+  if (loading) {
+    return <Loader />;
+  }
+  if (error) {
+    return <div>error</div>;
+  }
+
+  if (!data) {
+    return <div>error</div>;
+  }
+
+  if (data) {
+    return (
+      <div>
+        <h4 className="form__section-heading">Entreprise de transport</h4>
+        <div
+          className={`${companyStyles.resultsItem}  ${companyStyles.isSelected}`}
+        >
+          <div className={companyStyles.content}>
+            <h6>{data?.companyInfos?.name}</h6>
+            <p>
+              {data?.companyInfos?.siret} - {data?.companyInfos?.address}
+            </p>
+          </div>
+        </div>
+        <div>
+          <label>
+            Personne à contacter
+            <Field
+              type="text"
+              name={`transporter.company.contact`}
+              placeholder="NOM Prénom"
+              className="td-input"
+              disabled={disabled}
+            />
+          </label>
+          <RedErrorMessage name={`transporter.company.contact.contact`} />
+        </div>
+
+        <div className="form__row">
+          <label>
+            Téléphone ou Fax
+            <Field
+              type="text"
+              name={`transporter.company.phone`}
+              placeholder="Numéro"
+              className={`td-input`}
+            />
+          </label>
+
+          <RedErrorMessage name={`transporter.company.phone`} />
+        </div>
+        <div className="form__row">
+          <label>
+            Mail (optionnel)
+            <Field
+              type="email"
+              name={`transporter.company.mail`}
+              className="td-input"
+              disabled={disabled}
+            />
+          </label>
+
+          <RedErrorMessage name={`transporter.company.mail`} />
+        </div>
+      </div>
+    );
+  }
+  return null;
 }

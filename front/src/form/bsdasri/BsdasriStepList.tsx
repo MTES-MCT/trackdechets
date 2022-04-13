@@ -18,7 +18,7 @@ import {
   BsdasriStatus,
   BsdasriType,
 } from "generated/graphql/types";
-import omit from "object.omit";
+import omitDeep from "omit-deep-lodash";
 import React, { ReactElement, useMemo } from "react";
 import { generatePath, useHistory, useParams } from "react-router-dom";
 import getInitialState from "./utils/initial-state";
@@ -35,7 +35,7 @@ interface Props {
   initialStep?: number;
   bsdasriFormType?: string;
 }
-type removableKey = keyof Bsdasri;
+
 const wasteKey = "waste";
 const ecoOrganismeKey = "ecoOrganisme";
 const emitterKey = "emitter";
@@ -44,10 +44,20 @@ const destinationKey = "destination";
 const identificationKey = "identification";
 const synthesizingKey = "synthesizing";
 const groupingKey = "grouping";
+const transporterCompanySiretKey = "transporter.company.siret";
+const transporterCompanyVatNumberKey = "transporter.company.vatNumber";
+const transporterTransportPackagingsKey = "transporter.transport.packagings";
+const transporterTransportVolumeKey = "transporter.transport.volume";
 
-const getCommonKeys = (bsdasriType: BsdasriType): removableKey[] => {
+const getCommonKeys = (bsdasriType: BsdasriType): string[] => {
   if (bsdasriType === BsdasriType.Synthesis) {
-    return [groupingKey];
+    return [
+      groupingKey,
+      transporterCompanySiretKey,
+      transporterCompanyVatNumberKey,
+      transporterTransportPackagingsKey,
+      transporterTransportVolumeKey,
+    ];
   }
   if (
     bsdasriType === BsdasriType.Grouping ||
@@ -60,13 +70,13 @@ const getCommonKeys = (bsdasriType: BsdasriType): removableKey[] => {
 /**
  * Do not resend sections locked by relevant signatures
  */
-const removeSignedSections = (
+const removeSections = (
   input: BsdasriInput,
   status: BsdasriStatus,
   bsdasriType: BsdasriType
 ) => {
   const commonKeys = getCommonKeys(bsdasriType);
-  const mapping: Partial<Record<BsdasriStatus, removableKey[]>> = {
+  const mapping: Partial<Record<BsdasriStatus, string[]>> = {
     INITIAL: [...commonKeys],
     SIGNED_BY_PRODUCER: [
       wasteKey,
@@ -97,8 +107,7 @@ const removeSignedSections = (
       ...commonKeys,
     ],
   };
-
-  return omit(input, mapping[status]);
+  return omitDeep(input, mapping[status]);
 };
 export default function BsdasriStepsList(props: Props) {
   const { siret } = useParams<{ siret: string }>();
@@ -169,17 +178,33 @@ export default function BsdasriStepsList(props: Props) {
     type: BsdasriType = BsdasriType.Simple
   ): Promise<any> {
     if (formState.id) {
+      if (type === BsdasriType.Synthesis) {
+        // synthesis bsdasri are  never created in draft state
+        const { grouping, emitter, ecoOrganisme, ...cleanedInput } = input;
+        return updateBsdasri({
+          variables: {
+            id: formState.id,
+            input: removeSections(cleanedInput, status, type),
+          },
+        });
+      }
       return updateBsdasri({
         variables: {
           id: formState.id,
-          input: removeSignedSections(input, status, type),
+          input: removeSections(input, status, type),
         },
       });
     }
 
     if (type === BsdasriType.Synthesis) {
+      const cleanedInput = omitDeep(input, [
+        groupingKey,
+        emitterKey,
+        ecoOrganismeKey,
+        transporterTransportPackagingsKey,
+      ]);
       // synthesis bsdasri are  never created in draft state
-      return createBsdasri({ variables: { input: input } });
+      return createBsdasri({ variables: { input: cleanedInput } });
     }
     return createDraftBsdasri({ variables: { input: input } });
   }

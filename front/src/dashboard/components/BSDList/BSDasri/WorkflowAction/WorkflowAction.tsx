@@ -127,7 +127,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
                   state: { background: location },
                 }}
               >
-                Signature transporteur (Synthèse)
+                Validation emport (Synthèse)
               </ActionLink>
             )}
           </>

@@ -18,7 +18,6 @@ const lineBreaksToBr = text =>
 export default function Workflow({ path }) {
   const { workflows } = usePluginData<any>("workflow-doc-plugin");
   const workflow = resolve(path, workflows);
-  console.log(workflow.description);
   return (
     <div>
       {workflow.description && (

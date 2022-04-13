@@ -14,7 +14,7 @@ import {
   SignatureType,
 } from "dashboard/components/BSDList/BSDasri/types";
 import { Field, useFormikContext } from "formik";
-import { omitDeep } from "common/omitDeep";
+import omitDeep from "omit-deep-lodash";
 import { getInitialWeightFn } from "form/bsdasri/utils/initial-state";
 import { Bsdasri, BsdasriType } from "generated/graphql/types";
 import Transport from "form/bsdasri/steps/Transport";
@@ -52,7 +52,7 @@ export function EmitterSignatureForm() {
       <h4 className="form__section-heading">Quantité remise</h4>
       <div className="form__row">
         <WeightWidget
-          switchLabel="Je souhaite ajouter un poids"
+          switchLabel="Je préciser une quantité"
           dasriPath="emitter.emission"
           getInitialWeightFn={getInitialWeightFn}
         />
@@ -171,7 +171,7 @@ export function SynthesisTransportSignatureForm() {
       <h4 className="form__section-heading">Quantité transportée</h4>
 
       <WeightWidget
-        switchLabel="Je souhaite ajouter un poids"
+        switchLabel="Je souhaite préciser le poids"
         dasriPath="transporter.transport"
         getInitialWeightFn={getInitialWeightFn}
       />
@@ -313,10 +313,13 @@ export const removeSections = (input, signatureType: SignatureType) => {
   const companySiretKey = "siret";
   const companyNameKey = "name";
   const customInfoKey = "customInfo";
-  const groupingBsdasrisKey = "grouping";
-  const synthesizingBsdasrisKey = "synthesizing";
+  const groupingKey = "grouping";
+  const synthesizingKey = "synthesizing";
   const synthesizedInKey = "synthesizedIn";
   const identificationKey = "identification";
+  const vatNumberKey = "vatNumber";
+  const transporterTransportPackagingsKey = "transporter.transport.packagings";
+  const transporterTransportVolumeKey = "transporter.transport.volume";
 
   const common = [
     wasteKey,
@@ -324,9 +327,11 @@ export const removeSections = (input, signatureType: SignatureType) => {
     companyNameKey,
     ecoOrganismeKey,
     customInfoKey,
-    groupingBsdasrisKey,
-    synthesizingBsdasrisKey,
+    groupingKey,
+    synthesizingKey,
     synthesizedInKey,
+    transporterTransportPackagingsKey,
+    transporterTransportVolumeKey,
   ];
   const mapping = {
     [BsdasriSignatureType.Emission]: [
@@ -338,6 +343,7 @@ export const removeSections = (input, signatureType: SignatureType) => {
     [ExtraSignatureType.SynthesisTakeOver]: [
       emitterKey,
       destinationKey,
+      vatNumberKey,
       ...common,
     ],
     [BsdasriSignatureType.Transport]: [emitterKey, destinationKey, ...common],

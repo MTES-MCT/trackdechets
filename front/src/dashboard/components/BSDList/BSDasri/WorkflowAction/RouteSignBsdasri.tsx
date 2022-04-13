@@ -109,7 +109,7 @@ export function RouteSignBsdasri({
 }) {
   const { id: formId, siret } = useParams<{ id: string; siret: string }>();
   const history = useHistory();
-  console.log(UIsignatureType);
+
   const { error, data, loading } = useQuery<
     Pick<Query, "bsdasri">,
     QueryBsdasriArgs

@@ -12,11 +12,6 @@ type Mutation {
   """
   createBsdasri("Payload de création d'un dasri" input: BsdasriInput!): Bsdasri!
 
-  # """
-  # Crée un nouveau dasri de synthèse
-  # """
-  # createSynthesisBsdasri("Payload de création d'un dasri de synthèse" input: SynthesisBsdasriInput!): Bsdasri!
-
   """
   Met à jour un dasri existant.
   Par défaut, tous les champs sont modifiables.
@@ -147,7 +142,7 @@ type Mutation {
     input: BsdasriSignatureWithSecretCodeInput!
   ): Bsdasri
   """
-  Duplique un bordereau Dasri
+  Duplique un bordereau Dasri (non applicable pour les bordereau de synthese ou de groupement)
   """
   duplicateBsdasri("ID d'un Bsdasri" id: ID!): Bsdasri
 

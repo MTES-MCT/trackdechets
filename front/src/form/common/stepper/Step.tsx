@@ -1,4 +1,4 @@
-import { createElement, ReactNode } from "react";
+import { createElement } from "react";
 import "./Step.scss";
 
 export interface IStepContainerProps {
