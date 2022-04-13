@@ -42,6 +42,7 @@ input BsdaStatusFilter {
 input BsdaEmitterWhere {
   company: CompanyWhere
   emission: BsdaEmissionWhere
+  customInfo: StringFilter
 }
 
 "Champs possibles pour le filtre sur l'émission"
@@ -53,11 +54,13 @@ input BsdaEmissionWhere {
 input BsdaTransporterWhere {
   company: CompanyWhere
   transport: BsdaTransportWhere
+  customInfo: StringFilter
 }
 
 "Champs possible pour le filtre sur le transport."
 input BsdaTransportWhere {
   signature: SignatureWhere
+  plates: StringNullableListFilter
 }
 
 "Champs possible pour le filtre sur la destination."
@@ -65,6 +68,7 @@ input BsdaDestinationWhere {
   company: CompanyWhere
   reception: BsdaReceptionWhere
   operation: BsdaOperationWhere
+  customInfo: StringFilter
 }
 
 "Champs possible pour le filtre sur le courtier."
