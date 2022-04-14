@@ -173,6 +173,14 @@ app.use(
     store
   })
 );
+app.use(
+  graphQLPath,
+  graphqlRateLimiterMiddleware("createPasswordResetRequest", {
+    windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
+    maxRequestsPerWindow: 1,
+    store
+  })
+);
 
 // logging middleware
 app.use(loggingMiddleware(graphQLPath));
