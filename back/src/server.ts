@@ -119,7 +119,7 @@ const store = new RateLimitRedisStore({
 
 app.use(
   rateLimit({
-    message: `Quota de ${maxrequestPerWindows} requêtes par minute excédée pour cette adresse IP, merci de réessayer plus tard.`,
+    message: `Quota de ${maxrequestPerWindows} requêtes par minute excédé pour cette adresse IP, merci de réessayer plus tard.`,
     windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
     max: maxrequestPerWindows,
     store

@@ -5,7 +5,7 @@ import {
 } from "../../generated/graphql/types";
 import { graphqlSpecificQueryHandlerMiddleware } from "./graphqlSpecificQueryHandler";
 
-type AllowedQueries = keyof QueryResolvers | keyof MutationResolvers;
+type GqlQueryKey = keyof QueryResolvers | keyof MutationResolvers;
 type Options = {
   store: rateLimit.Store;
   windowMs: number;
@@ -13,13 +13,13 @@ type Options = {
 };
 
 export function graphqlRateLimiterMiddleware(
-  rateLimitedQuery: AllowedQueries,
+  rateLimitedQuery: GqlQueryKey,
   options: Options
 ) {
   return graphqlSpecificQueryHandlerMiddleware(
     rateLimitedQuery,
     rateLimit({
-      message: `Quota de ${options.maxRequestsPerWindow} requêtes par minute excédée pour cette requête et adresse IP, merci de réessayer plus tard.`,
+      message: `Quota de ${options.maxRequestsPerWindow} requêtes par minute excédé pour cette requête et adresse IP, merci de réessayer plus tard.`,
       windowMs: options.windowMs,
       max: options.maxRequestsPerWindow,
       store: options.store,

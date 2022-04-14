@@ -4,10 +4,10 @@ import {
   QueryResolvers
 } from "../../generated/graphql/types";
 
-type AllowedQueries = keyof QueryResolvers | keyof MutationResolvers;
+type GqlQueryKey = keyof QueryResolvers | keyof MutationResolvers;
 
 export function graphqlSpecificQueryHandlerMiddleware(
-  query: AllowedQueries,
+  query: GqlQueryKey,
   middleware
 ) {
   return function (req: Request, res: Response, next: NextFunction) {

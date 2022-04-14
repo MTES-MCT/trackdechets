@@ -2,9 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import { MutationResolvers } from "../../generated/graphql/types";
 import { graphqlSpecificQueryHandlerMiddleware } from "./graphqlSpecificQueryHandler";
 
-type AllowedQueries = keyof MutationResolvers;
+type GqlQueryKey = keyof MutationResolvers;
 
-export function graphqlRegenerateSessionMiddleware(query: AllowedQueries) {
+export function graphqlRegenerateSessionMiddleware(query: GqlQueryKey) {
   return graphqlSpecificQueryHandlerMiddleware(
     query,
     function (req: Request, res: Response, next: NextFunction) {
