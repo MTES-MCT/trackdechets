@@ -5,7 +5,11 @@ import { UserInputError } from "apollo-server-express";
 import { InvalidTransition } from "../../../forms/errors";
 import prisma from "../../../../src/prisma";
 import dasriTransition from "../../workflow/dasriTransition";
-import { BsdasriType, BsdasriStatus } from "@prisma/client";
+import {
+  BsdasriType,
+  BsdasriStatus,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { checkCanEditBsdasri } from "../../permissions";
 
@@ -56,7 +60,8 @@ const cascadeOnSynthesized = async ({ dasri }) => {
         destinationReceptionDate,
         receptionSignatoryId,
         destinationReceptionSignatureAuthor,
-        destinationReceptionSignatureDate
+        destinationReceptionSignatureDate,
+        destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED
       }
     });
     await reindexAssociatedDasris(dasri.id);
