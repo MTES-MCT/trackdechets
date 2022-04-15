@@ -7,7 +7,8 @@ export const FillFieldsInfo = () => (
 );
 export const DisabledFieldsInfo = () => (
   <p className="notification notification--warning">
-    Les champs grisés ci-dessous ont été scellés via signature et ne sont plus
-    modifiables.
+    Les champs grisés ci-dessous ne sont plus modifiables parce qu'ils ont été
+    scellés via signature ou que ce bordereau est inclus dans une opération de
+    synthèse ou de regroupement.
   </p>
 );

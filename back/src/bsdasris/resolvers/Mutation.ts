@@ -1,4 +1,4 @@
-import createBsdasri from "./mutations/createBsdasri";
+import createBsdasri from "./mutations/create";
 import createDraftBsdasri from "./mutations/createDraftBsdasri";
 import updateBsdasri from "./mutations/updateBsdasri";
 import publishBsdasri from "./mutations/publishBsdasri";

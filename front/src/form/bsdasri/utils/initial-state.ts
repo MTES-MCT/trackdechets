@@ -1,7 +1,12 @@
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import { addYears, startOfYear } from "date-fns";
 
-import { BsdasriWeight, Bsdasri, PickupSite } from "generated/graphql/types";
+import {
+  BsdasriWeight,
+  Bsdasri,
+  PickupSite,
+  BsdasriType,
+} from "generated/graphql/types";
 
 export function getInitialEmitterPickupSiteFn(pickupSite?: PickupSite | null) {
   return {
@@ -19,6 +24,7 @@ export const getInitialWeightFn = (weight?: BsdasriWeight | null) => ({
 });
 
 const getInitialState = (f?: Bsdasri | null) => ({
+  type: BsdasriType.Simple,
   waste: {
     code: "18 01 03*",
     adr: "",
@@ -77,6 +83,7 @@ const getInitialState = (f?: Bsdasri | null) => ({
     },
   },
   grouping: [],
+  synthesizing: [],
 });
 
 export default getInitialState;

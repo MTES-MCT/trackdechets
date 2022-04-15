@@ -1,0 +1,529 @@
+import React from "react";
+import {
+  Document,
+  formatDate,
+  TRANSPORT_MODE_LABELS,
+  SignatureStamp
+} from "../../../common/pdf";
+import { Bsdasri, InitialBsdasri } from "../../../generated/graphql/types";
+import { TraceabilityTable } from "./TraceabilityTable";
+import { PackagingInfosTable } from "./PackagingInfosTable";
+import { FormCompanyFields } from "./FormCompanyFields";
+import { BsdasriType } from "@prisma/client";
+import { BsdasriSignature } from "../../../generated/graphql/types";
+
+/**
+ *
+ * Build full address from different fields
+ * Avoid repetition if city or postalCode are already include in address field
+ */
+export function buildAddress(addressComponents: string[]): string {
+  return addressComponents
+    .filter(bit => !!bit && !addressComponents[0].includes(bit))
+    .join(" ");
+}
+
+type Props = {
+  bsdasri: Bsdasri;
+  qrCode: string;
+  associatedBsdasris: InitialBsdasri[];
+};
+
+export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
+  return (
+    <Document title={bsdasri.id}>
+      <div className="Page">
+        {/* 3-parts header */}
+        <div className="BoxRow">
+          <div className="BoxCol TextAlignCenter">
+            <p>Art. R. 541-45 du code de l’environnement.</p>
+            <p>Textes règlementaires</p>
+          </div>
+          <div className="BoxCol TextAlignCenter">
+            <p>Ministère en charge de la Santé</p>
+            <h1>Bordereau de suivi de déchets de soins à risques infectieux</h1>
+            <p>
+              Document utilisé pour les DASRI, pour toutes les prises en charge
+              quel qu'en soit le poids
+            </p>
+            <p>Récépissé Trackdéchets</p>
+          </div>
+          <div className="BoxCol TextAlignCenter">
+            <div
+              className="QrCode"
+              dangerouslySetInnerHTML={{ __html: qrCode }}
+            />
+          </div>
+        </div>
+        {/* end 3-parts header */}
+
+        {/* Dasri type */}
+        <div className="BoxRow">
+          <div className="BoxCol">
+            <p>
+              J'édite un BSDASRI pour :{" "}
+              <input
+                type="checkbox"
+                checked={bsdasri.type === BsdasriType.SIMPLE}
+                readOnly
+              />{" "}
+              la prise en charge initiale de DASRI{" "}
+              <input
+                type="checkbox"
+                checked={bsdasri.type === BsdasriType.GROUPING}
+                readOnly
+              />{" "}
+              le groupement de DASRI sur un site relevant de la rubrique 2718{" "}
+              <input
+                type="checkbox"
+                checked={bsdasri.type === BsdasriType.SYNTHESIS}
+                readOnly
+              />{" "}
+              la synthèse des BSDASRI dans un véhicule sur un seul BSDASRI{" "}
+            </p>
+          </div>
+        </div>
+        {/* End Dasri type */}
+        {/* Dasri ID */}
+        <div className="BoxRow">
+          <div className="BoxCol">
+            <p>
+              <strong>N° Bordereau :</strong> {bsdasri.id}
+            </p>
+          </div>
+        </div>
+        {/* End Dasri ID */}
+        {/* Eco-org */}
+        <div className="BoxRow">
+          <div className="BoxCol">
+            <p>
+              L'éco-organisme DASTRI est identifié pour assurer la prise en
+              charge et/ou la traçabilité des DASRI{" "}
+              <input
+                type="checkbox"
+                checked={!!bsdasri?.ecoOrganisme?.siret}
+                readOnly
+              />
+            </p>
+          </div>
+        </div>
+        {/* End Eco-org */}
+        {/* PRED */}
+        <div className="BoxRow">
+          <div className="BoxCol">
+            <p>
+              <strong>1. Producteur ou détenteur des déchets</strong>
+            </p>
+            <FormCompanyFields
+              company={bsdasri.emitter?.company}
+              showCountryFields={false}
+            />
+            {!!bsdasri.emitter?.pickupSite?.name && (
+              <>
+                <p>
+                  <strong>Adresse de collecte</strong>
+                </p>
+                <p>
+                  Nom/raison sociale : {bsdasri.emitter?.pickupSite?.name}
+                  <br />
+                  Adresse :{" "}
+                  {buildAddress([
+                    bsdasri.emitter?.pickupSite?.address,
+                    bsdasri.emitter?.pickupSite?.postalCode,
+                    bsdasri.emitter?.pickupSite?.city
+                  ])}
+                  <br />{" "}
+                </p>
+              </>
+            )}
+            <p>Info libre : {bsdasri.emitter?.pickupSite?.infos}</p>
+
+            <p>
+              <strong>Date de remise au collecteur :</strong>{" "}
+            </p>
+            <hr />
+            <p>
+              <strong>Nom et signature du responsable :</strong>
+            </p>
+            <Signature signature={bsdasri?.emitter?.emission?.signature} />
+          </div>
+          <div className="BoxCol">
+            <p>
+              <strong>1.1 Déchets</strong>
+            </p>
+            <p>
+              Code nomenclature
+              <br />
+              <input
+                type="checkbox"
+                checked={bsdasri?.waste?.code === "18 01 03*"}
+                readOnly
+              />{" "}
+              18 01 03*: DASRI origine humaine
+              <br />
+              <input
+                type="checkbox"
+                checked={bsdasri?.waste?.code === "18 01 02*"}
+                readOnly
+              />{" "}
+              18 01 02* DASRI origine animale
+              <br />
+              <strong>Mention ADR : </strong> {bsdasri?.waste?.adr}
+            </p>
+            <hr />
+            <p>
+              <strong>Conditionnement / Quantité initiale </strong>
+            </p>
+            <PackagingInfosTable
+              packagingInfos={bsdasri?.emitter?.emission?.packagings}
+            />
+            <p>
+              <strong>
+                Quantité remise: {bsdasri?.emitter?.emission?.weight?.value} kg{" "}
+              </strong>
+            </p>
+            <input
+              type="checkbox"
+              checked={bsdasri?.emitter?.emission?.weight?.isEstimate === false}
+              readOnly
+            />{" "}
+            réelle <span> - </span>
+            <input
+              type="checkbox"
+              checked={bsdasri?.emitter?.emission?.weight?.isEstimate === true}
+              readOnly
+            />{" "}
+            estimée
+          </div>
+        </div>
+        {/* End PRED */}
+        {/* Transporter */}
+        <div className="BoxRow">
+          <div className="BoxCol">
+            <p>
+              <strong>2. Collecteur/transporteur</strong>
+            </p>
+            <FormCompanyFields
+              company={bsdasri.transporter?.company}
+              showCountryFields={false}
+            />
+            <p>
+              <strong>Récépissé</strong> <br />
+              <span>Numéro : {bsdasri?.transporter?.recepisse?.number}</span>
+              <br />
+              <span>
+                Département: {bsdasri?.transporter?.recepisse?.department}
+              </span>
+              <span> - </span>
+              <span>
+                Validité:{" "}
+                {formatDate(bsdasri?.transporter?.recepisse?.validityLimit)}
+              </span>
+            </p>
+            <p>
+              Mode de transport:{" "}
+              {bsdasri?.transporter?.transport?.mode
+                ? TRANSPORT_MODE_LABELS[bsdasri?.transporter?.transport?.mode]
+                : ""}
+            </p>
+            <p>
+              <strong>Date de remise à l'installation de destination :</strong>
+              {formatDate(
+                bsdasri?.transporter?.transport?.handedOverAt ??
+                  bsdasri?.destination?.reception?.date
+              )}
+            </p>
+            <hr />
+            <p>
+              <strong>Nom et signature du responsable :</strong>
+            </p>
+            <Signature signature={bsdasri?.transporter?.transport?.signature} />
+          </div>
+          <div className="BoxCol">
+            <p>
+              <strong>2.1 Déchets</strong>
+            </p>
+            <p>
+              Lot accepté
+              <br />
+              <input
+                type="checkbox"
+                checked={
+                  bsdasri?.transporter?.transport?.acceptation?.status ===
+                  "ACCEPTED"
+                }
+                readOnly
+              />{" "}
+              Oui
+              <span> </span>
+              <input
+                type="checkbox"
+                checked={
+                  bsdasri?.transporter?.transport?.acceptation?.status ===
+                  "REFUSED"
+                }
+                readOnly
+              />{" "}
+              Non
+              <span> </span>
+              <input
+                type="checkbox"
+                checked={
+                  bsdasri?.transporter?.transport?.acceptation?.status ===
+                  "PARTIALLY_REFUSED"
+                }
+                readOnly
+              />{" "}
+              Partiellement
+              <br />
+              {bsdasri?.transporter?.transport?.acceptation?.status ===
+                "PARTIALLY_REFUSED" && (
+                <>
+                  <p>
+                    Quantité refusée de refus:{" "}
+                    {
+                      bsdasri?.transporter?.transport?.acceptation
+                        ?.refusedWeight
+                    }
+                  </p>
+                  <p>
+                    Motif de refus:{" "}
+                    {
+                      bsdasri?.transporter?.transport?.acceptation
+                        ?.refusalReason
+                    }
+                  </p>
+                </>
+              )}
+            </p>
+            <p>
+              Date: {formatDate(bsdasri?.transporter?.transport?.takenOverAt)}
+            </p>
+            <hr />
+            <p>
+              <strong>Conditionnement / Quantité prise en charge </strong>
+            </p>
+            <PackagingInfosTable
+              packagingInfos={bsdasri?.transporter?.transport?.packagings}
+            />
+            <p>
+              <strong>
+                Quantité prise en charge:{" "}
+                {bsdasri?.transporter?.transport?.weight?.value} kg{" "}
+              </strong>
+            </p>
+            <input
+              type="checkbox"
+              checked={
+                bsdasri?.transporter?.transport?.weight?.isEstimate === false
+              }
+              readOnly
+            />{" "}
+            réelle <span> - </span>
+            <input
+              type="checkbox"
+              checked={
+                bsdasri?.transporter?.transport?.weight?.isEstimate === true
+              }
+              readOnly
+            />{" "}
+            estimée
+          </div>
+        </div>
+        {/* End Transporter */}
+        {/* Destination */}
+        <div className="BoxRow">
+          <div className="BoxCol">
+            <p>
+              <strong>3. Installation de destination</strong>
+            </p>
+            <FormCompanyFields
+              company={bsdasri.transporter?.company}
+              showCountryFields={false}
+            />
+          </div>
+          <div className="BoxCol">
+            <p>
+              <strong>3.1 Déchets</strong>
+            </p>
+            <p>
+              Lot accepté
+              <br />
+              <input
+                type="checkbox"
+                checked={
+                  bsdasri?.destination?.reception?.acceptation?.status ===
+                  "ACCEPTED"
+                }
+                readOnly
+              />{" "}
+              Oui
+              <input
+                type="checkbox"
+                checked={
+                  bsdasri?.destination?.reception?.acceptation?.status ===
+                  "REFUSED"
+                }
+                readOnly
+              />{" "}
+              Non
+              <span> </span>
+              <input
+                type="checkbox"
+                checked={
+                  bsdasri?.destination?.reception?.acceptation?.status ===
+                  "PARTIALLY_REFUSED"
+                }
+                readOnly
+              />{" "}
+              Partiellement
+              <br />
+              {bsdasri?.destination?.reception?.acceptation?.status ===
+                "PARTIALLY_REFUSED" && (
+                <>
+                  <p>
+                    Quantité refusée de refus:{" "}
+                    {
+                      bsdasri?.destination?.reception?.acceptation
+                        ?.refusedWeight
+                    }
+                  </p>
+                  <p>
+                    Motif de refus:{" "}
+                    {
+                      bsdasri?.destination?.reception?.acceptation
+                        ?.refusalReason
+                    }
+                  </p>
+                </>
+              )}
+              <p>Date: {formatDate(bsdasri?.destination?.reception?.date)}</p>
+            </p>
+            <hr />
+            <p>
+              <strong>Conditionnement / Quantité récéptionée </strong>
+            </p>
+            <PackagingInfosTable
+              packagingInfos={bsdasri?.destination?.reception?.packagings}
+            />
+          </div>
+        </div>
+        <div className="BoxRow">
+          <div className="BoxCol">
+            <p>
+              Je soussigné.e, certifie que l’opération indiquée ci- contre a
+              bien été réalisée pour la quantité de déchets renseignée.
+            </p>
+            <p>Nom et Signature du responsable de l'exploitation :</p>
+            <Signature signature={bsdasri?.destination?.operation?.signature} />
+          </div>
+          <div className="BoxCol">
+            <p>
+              <strong>3.2 Opération réalisée</strong>
+            </p>
+            <p>
+              Date de l'opération:{" "}
+              {formatDate(bsdasri?.destination?.operation?.date)}
+            </p>
+            <p>
+              <input
+                type="checkbox"
+                checked={bsdasri?.destination?.operation?.code === "R12"}
+                readOnly
+              />{" "}
+              Groupement avant R1 (R12) sur site relevant de la 2718
+            </p>
+            <p>
+              <input
+                type="checkbox"
+                checked={bsdasri?.destination?.operation?.code === "R1"}
+                readOnly
+              />{" "}
+              Incinération + valorisation énergétique (R1)
+            </p>
+            <p>
+              <input
+                type="checkbox"
+                checked={bsdasri?.destination?.operation?.code === "D12"}
+                readOnly
+              />{" "}
+              Groupement avant D9 ou D10 (D12) sur site relevant de la 2718
+            </p>
+            <p>
+              <input
+                type="checkbox"
+                checked={bsdasri?.destination?.operation?.code === "D9"}
+                readOnly
+              />{" "}
+              Prétraitement par désinfection (D9) - Banaliseur
+            </p>
+            <p>
+              <input
+                type="checkbox"
+                checked={bsdasri?.destination?.operation?.code === "D10"}
+                readOnly
+              />{" "}
+              Incinération (D10)
+            </p>
+
+            <p>
+              <strong>Quantité traitée </strong> :{" "}
+              {bsdasri?.destination?.operation?.weight?.value} Kg
+            </p>
+          </div>
+        </div>
+        {/* end Destination */}
+      </div>
+
+      {!!associatedBsdasris?.length && (
+        <>
+          <h1 className="TextAlignCenter">
+            Traçabilité associée au BSD n° {bsdasri.id}
+          </h1>
+          <p>
+            <strong className="TextUnderline">
+              Cas lié au mouvement de contenant(s)
+            </strong>
+          </p>
+          <p>
+            <input
+              type="checkbox"
+              checked={bsdasri?.type === BsdasriType.GROUPING}
+              readOnly
+            />{" "}
+            Groupement de déchets en transit (massification)
+          </p>
+          <p>
+            <input
+              type="checkbox"
+              checked={bsdasri?.type === BsdasriType.SYNTHESIS}
+              readOnly
+            />{" "}
+            Bordereau de synthèse de BSDASRI / DASRI dans un transport
+          </p>
+          <h3 className="TextAlignCenter">
+            Bordereau(x) associé(s) constituant l’historique de la traçabilité
+          </h3>
+          <TraceabilityTable previousBsdasris={associatedBsdasris} />
+        </>
+      )}
+    </Document>
+  );
+}
+
+type SignatureProps = {
+  signature: BsdasriSignature;
+};
+export function Signature({ signature }: SignatureProps) {
+  return (
+    <>
+      <p>
+        <span className="Row">
+          <span className="Col">Nom : {signature?.author}</span>
+          <span className="Col">Date : {formatDate(signature?.date)}</span>
+        </span>
+      </p>
+      {signature?.date && <SignatureStamp />}
+    </>
+  );
+}

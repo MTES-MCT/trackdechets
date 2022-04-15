@@ -38,11 +38,12 @@ export default {
     bsdasris: {
       view: "/dashboard/:siret/bsdasris/view/:id",
       create: "/dashboard/:siret/bsdasris/create",
-      createGroup: "/dashboard/:siret/bsdasris/create-group",
+
       edit: "/dashboard/:siret/bsdasris/edit/:id",
       sign: {
         publish: "/dashboard/:siret/bsdasris/publish/:id",
         directTakeover: "/dashboard/:siret/bsdasris/direct-takeover/:id",
+        synthesisTakeover: "/dashboard/:siret/bsdasris/synthesis-takeover/:id",
         emission: "/dashboard/:siret/bsdasris/emission/:id",
         emissionSecretCode:
           "/dashboard/:siret/bsdasris/sign-emitter-secret/:id",

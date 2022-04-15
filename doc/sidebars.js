@@ -57,6 +57,7 @@ module.exports = {
               BSDASRI: [
                 "tutoriels/examples/bsdasri/acheminement-direct",
                 "tutoriels/examples/bsdasri/emport-direct",
+                "tutoriels/examples/bsdasri/synthese",
               ],
               BSVHU: ["tutoriels/examples/bsvhu/vhu-vers-broyeur"],
               BSFF: ["tutoriels/examples/bsff/collecte-petites-quantites"],

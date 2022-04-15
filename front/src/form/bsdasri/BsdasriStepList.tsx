@@ -4,22 +4,30 @@ import routes from "common/routes";
 import GenericStepList, {
   getComputedState,
 } from "form/common/stepper/GenericStepList";
+
 import { IStepContainerProps } from "form/common/stepper/Step";
 import {
   Mutation,
   MutationCreateBsdasriArgs,
+  MutationCreateDraftBsdasriArgs,
   MutationUpdateBsdasriArgs,
   QueryBsdasriArgs,
   Query,
   Bsdasri,
   BsdasriInput,
   BsdasriStatus,
+  BsdasriType,
 } from "generated/graphql/types";
-import omit from "object.omit";
+import omitDeep from "omit-deep-lodash";
 import React, { ReactElement, useMemo } from "react";
 import { generatePath, useHistory, useParams } from "react-router-dom";
 import getInitialState from "./utils/initial-state";
-import { CREATE_BSDASRI, GET_BSDASRI, UPDATE_BSDASRI } from "./utils/queries";
+import {
+  CREATE_DRAFT_BSDASRI,
+  CREATE_BSDASRI,
+  GET_BSDASRI,
+  UPDATE_BSDASRI,
+} from "./utils/queries";
 
 interface Props {
   children: (dasriForm: Bsdasri | undefined) => ReactElement;
@@ -27,23 +35,66 @@ interface Props {
   initialStep?: number;
   bsdasriFormType?: string;
 }
-type removableKey = keyof Bsdasri;
 
+const wasteKey = "waste";
+const ecoOrganismeKey = "ecoOrganisme";
+const emitterKey = "emitter";
+const transporterKey = "transporter";
+const destinationKey = "destination";
+const identificationKey = "identification";
+const synthesizingKey = "synthesizing";
+const groupingKey = "grouping";
+const transporterCompanySiretKey = "transporter.company.siret";
+const transporterCompanyVatNumberKey = "transporter.company.vatNumber";
+const transporterTransportPackagingsKey = "transporter.transport.packagings";
+const transporterTransportVolumeKey = "transporter.transport.volume";
+
+const getCommonKeys = (bsdasriType: BsdasriType): string[] => {
+  if (bsdasriType === BsdasriType.Synthesis) {
+    return [
+      groupingKey,
+      transporterCompanySiretKey,
+      transporterCompanyVatNumberKey,
+      transporterTransportPackagingsKey,
+      transporterTransportVolumeKey,
+    ];
+  }
+  if (
+    bsdasriType === BsdasriType.Grouping ||
+    bsdasriType === BsdasriType.Simple
+  ) {
+    return [synthesizingKey];
+  }
+  return [];
+};
 /**
  * Do not resend sections locked by relevant signatures
  */
-const removeSignedSections = (input: BsdasriInput, status: BsdasriStatus) => {
-  const wasteKey = "waste";
-  const ecoOrganismeKey = "ecoOrganisme";
-  const emitterKey = "emitter";
-  const transporterKey = "transporter";
-  const destinationKey = "destination";
-  const identificationKey = "identification";
-
-  const mapping: Partial<Record<BsdasriStatus, removableKey[]>> = {
-    INITIAL: [],
-    SIGNED_BY_PRODUCER: [wasteKey, ecoOrganismeKey, emitterKey],
-    SENT: [wasteKey, ecoOrganismeKey, emitterKey, transporterKey],
+const removeSections = (
+  input: BsdasriInput,
+  status: BsdasriStatus,
+  bsdasriType: BsdasriType
+) => {
+  const commonKeys = getCommonKeys(bsdasriType);
+  const mapping: Partial<Record<BsdasriStatus, string[]>> = {
+    INITIAL: [...commonKeys],
+    SIGNED_BY_PRODUCER: [
+      wasteKey,
+      ecoOrganismeKey,
+      emitterKey,
+      synthesizingKey,
+      groupingKey,
+      ...commonKeys,
+    ],
+    SENT: [
+      wasteKey,
+      ecoOrganismeKey,
+      emitterKey,
+      transporterKey,
+      synthesizingKey,
+      groupingKey,
+      ...commonKeys,
+    ],
     RECEIVED: [
       wasteKey,
       ecoOrganismeKey,
@@ -51,9 +102,12 @@ const removeSignedSections = (input: BsdasriInput, status: BsdasriStatus) => {
       transporterKey,
       destinationKey,
       identificationKey,
+      synthesizingKey,
+      groupingKey,
+      ...commonKeys,
     ],
   };
-  return omit(input, mapping[status]);
+  return omitDeep(input, mapping[status]);
 };
 export default function BsdasriStepsList(props: Props) {
   const { siret } = useParams<{ siret: string }>();
@@ -86,6 +140,7 @@ export default function BsdasriStepsList(props: Props) {
   const mapRegrouped = dasri => ({
     ...dasri,
     grouping: dasri?.grouping.map(d => d.id),
+    synthesizing: dasri?.synthesizing?.map(d => d.id),
   });
 
   const formState = useMemo(
@@ -98,9 +153,15 @@ export default function BsdasriStepsList(props: Props) {
       ),
     [formQuery.data]
   );
+
   const status = formState.id
     ? formQuery?.data?.bsdasri?.["bsdasriStatus"]
     : "INITIAL";
+
+  const [createDraftBsdasri] = useMutation<
+    Pick<Mutation, "createDraftBsdasri">,
+    MutationCreateDraftBsdasriArgs
+  >(CREATE_DRAFT_BSDASRI);
 
   const [createBsdasri] = useMutation<
     Pick<Mutation, "createBsdasri">,
@@ -112,20 +173,46 @@ export default function BsdasriStepsList(props: Props) {
     MutationUpdateBsdasriArgs
   >(UPDATE_BSDASRI);
 
-  function saveForm(input: BsdasriInput): Promise<any> {
-    return formState.id
-      ? updateBsdasri({
+  function saveForm(
+    input: BsdasriInput,
+    type: BsdasriType = BsdasriType.Simple
+  ): Promise<any> {
+    if (formState.id) {
+      if (type === BsdasriType.Synthesis) {
+        // synthesis bsdasri are  never created in draft state
+        const { grouping, emitter, ecoOrganisme, ...cleanedInput } = input;
+        return updateBsdasri({
           variables: {
             id: formState.id,
-            input: removeSignedSections(input, status),
+            input: removeSections(cleanedInput, status, type),
           },
-        })
-      : createBsdasri({ variables: { input: input } });
+        });
+      }
+      return updateBsdasri({
+        variables: {
+          id: formState.id,
+          input: removeSections(input, status, type),
+        },
+      });
+    }
+
+    if (type === BsdasriType.Synthesis) {
+      const cleanedInput = omitDeep(input, [
+        groupingKey,
+        emitterKey,
+        ecoOrganismeKey,
+        transporterTransportPackagingsKey,
+      ]);
+      // synthesis bsdasri are  never created in draft state
+      return createBsdasri({ variables: { input: cleanedInput } });
+    }
+    return createDraftBsdasri({ variables: { input: input } });
   }
 
   function onSubmit(values) {
+    const { id, type, ...input } = values;
     if (
-      props.bsdasriFormType === "bsdasriRegroup" ||
+      type === BsdasriType.Grouping ||
       formQuery.data?.bsdasri?.type === "GROUPING"
     ) {
       if (!values?.grouping?.length) {
@@ -135,8 +222,8 @@ export default function BsdasriStepsList(props: Props) {
         return;
       }
     }
-    const { id, ...input } = values;
-    saveForm(input)
+
+    saveForm(input, type)
       .then(_ => {
         // TODO  redirect to the correct dashboard
         const redirectTo = generatePath(routes.dashboard.bsds.drafts, {

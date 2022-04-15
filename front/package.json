@@ -26,6 +26,7 @@
     "local-storage": "^2.0.0",
     "mapbox-gl": "^1.11.1",
     "object.omit": "^3.0.0",
+    "omit-deep-lodash": "^1.1.6",
     "query-string": "^6.10.1",
     "rc-tree": "^1.14.10",
     "react": "16.13.1",

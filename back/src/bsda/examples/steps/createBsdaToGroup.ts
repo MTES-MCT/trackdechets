@@ -5,8 +5,8 @@ import mutations from "../mutations";
 export function createBsda1ToGroup(company: string): WorkflowStep {
   return {
     description: `Les informations du BSDA sont remplies.
-    Ici, comme c'est le groupement qui nous intéresse on rempli un une seule fois toutes les informations du bordereaux, même celles de réception.
-    On a plus qu'à apposer les signatures sur le bordereau pour qu'il soit groupable.`,
+    Ici, comme c'est le groupement qui nous intéresse on remplit un une seule fois toutes les informations du bordereaux, même celles de réception.
+    On n'a plus qu'à apposer les signatures sur le bordereau pour qu'il soit groupable.`,
     mutation: mutations.createBsda,
     variables: ({ producteur, worker, transporteur, traiteur }) => ({
       input: {

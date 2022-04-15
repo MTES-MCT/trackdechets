@@ -38,6 +38,7 @@ export default function plugin(): Plugin<any> {
             bsdasriWorkflows.acheminementDirect
           ),
           emportDirect: parseWorkflow(bsdasriWorkflows.emportDirect),
+          dasriDeSynthese: parseWorkflow(bsdasriWorkflows.dasriDeSynthese),
         },
         bsvhu: {
           vhuVersBroyeur: parseWorkflow(bsvhuWorkflows.vhuVersBroyeur),

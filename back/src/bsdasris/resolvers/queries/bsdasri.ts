@@ -1,4 +1,4 @@
-import { unflattenBsdasri } from "../../converter";
+import { expandBsdasriFromDB } from "../../converter";
 
 import { MissingIdOrReadableId } from "../../../forms/errors";
 import { QueryResolvers } from "../../../generated/graphql/types";
@@ -23,7 +23,7 @@ const bsdasriResolver: QueryResolvers["bsdasri"] = async (_, args, context) => {
   const bsdasri = await getBsdasriOrNotFound(validArgs);
 
   await checkCanReadBsdasri(user, bsdasri);
-  return unflattenBsdasri(bsdasri);
+  return expandBsdasriFromDB(bsdasri);
 };
 
 export default bsdasriResolver;

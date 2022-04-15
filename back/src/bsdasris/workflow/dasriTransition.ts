@@ -6,7 +6,7 @@ import { InvalidTransition } from "../../forms/errors";
 import { validateBsdasri, BsdasriValidationContext } from "../validation";
 
 /**
- * Transition a form from initial state (ex: DRAFT) to next state (ex: SEALED)
+ * Transition a form from initial state (ex: SENT) to next state (ex: RECEIVED)
  * Allowed transitions are defined as a state machine using xstate
  */
 export default async function dasriTransition(
