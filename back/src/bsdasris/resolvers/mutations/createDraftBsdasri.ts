@@ -7,11 +7,11 @@ import { UserInputError } from "apollo-server-express";
 import createBsdasri from "./createBsdasri";
 
 const createDraftBsdasriResolver = async (
-  parent: ResolversParentTypes["Mutation"],
+  _: ResolversParentTypes["Mutation"],
   args: MutationCreateBsdasriArgs,
   context: GraphQLContext
 ) => {
-  if (args.input.synthesizing !== undefined) {
+  if (args.input.synthesizing?.length > 0) {
     throw new UserInputError(
       `La création de dasri de synthèse en brouillon n'est pas possible`
     );
