@@ -57,7 +57,7 @@ const updateSynthesisBsdasri = async ({
   } = input;
 
   // Validate form input
-  if (inputGrouping !== undefined && dbBsdasri.type !== BsdasriType.GROUPING) {
+  if (inputGrouping?.length > 0 && dbBsdasri.type !== BsdasriType.GROUPING) {
     throw new UserInputError(
       "Le champ grouping n'est accessible que sur les dasri de groupement"
     );
