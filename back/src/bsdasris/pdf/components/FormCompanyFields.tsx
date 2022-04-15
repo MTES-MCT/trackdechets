@@ -9,8 +9,10 @@ type FormCompanyFieldsProps = {
   showCountryFields?: Boolean;
 };
 
-export function FormCompanyFields({ company, showCountryFields }: FormCompanyFieldsProps) {
- 
+export function FormCompanyFields({
+  company,
+  showCountryFields
+}: FormCompanyFieldsProps) {
   const companyCountry = company
     ? countries.find(country => country.cca2 === company?.country) ??
       FRENCH_COUNTRY
@@ -19,32 +21,37 @@ export function FormCompanyFields({ company, showCountryFields }: FormCompanyFie
   return (
     <>
       <p>
+        Entreprise{" "}
         <input
           type="checkbox"
           checked={companyCountry && companyCountry.cca2 === "FR"}
           readOnly
-        />{" "}
-        Entreprise française
-        <br />
+        />
+        française
+        {"  "}
         <input
           type="checkbox"
           checked={companyCountry && companyCountry.cca2 !== "FR"}
           readOnly
         />{" "}
-        Entreprise étrangère
+        étrangère
       </p>
       <p>
         N° SIRET : {company?.siret}
         <br />
-        N° TVA intracommunautaire (le cas échéant) :<br />
+        {company?.vatNumber!! && (
+          <>
+            N° TVA intracommunautaire (le cas échéant) : {company?.vatNumber}
+            <br />
+          </>
+        )}
         RAISON SOCIALE : {company?.name}
         <br />
         Adresse complète : {company?.address}
         <br />
-        Pays (le cas échéant) :{" "}
-        {companyCountry == null || companyCountry.cca2 === "FR"
-          ? null
-          : companyCountry.name.common}
+        {companyCountry == null || companyCountry.cca2 === "FR" ? null : (
+          <span>Pays: {companyCountry.name.common} </span>
+        )}
       </p>
       <p>
         Tel : {company?.phone}
