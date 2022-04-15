@@ -8,6 +8,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 # [2022.04.2] ~25/04/2022
 
 #### :rocket: Nouvelles fonctionnalités
+
+- Ajout de filtres sur la query `bsdas`. Il est désormais possible de filtrer par `customInfo` pour le transporteur, émetteur et destinataire. Et de filtrer par plaque d'immatriculation [PR 1330](https://github.com/MTES-MCT/trackdechets/pull/1330)
+
 #### :bug: Corrections de bugs
 
 - Correction d'un bug d'affichage sur les révisions: lorsque plusieurs validations étaient nécessaires, les boutons d'action restaient affichés même après que la validation ait été acceptée [PR 1332](https://github.com/MTES-MCT/trackdechets/pull/1332)

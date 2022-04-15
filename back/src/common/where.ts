@@ -158,14 +158,17 @@ export function toPrismaStringFilter(
 
 /** Converter */
 export function toPrismaStringNullableListFilter(
-  stringFilter: StringNullableListFilter | undefined
+  stringNullableListFilter: StringNullableListFilter | undefined
 ): Prisma.StringNullableListFilter {
-  if (!stringFilter) {
+  if (!stringNullableListFilter) {
     return undefined;
   }
 
   return safeInput<Prisma.StringNullableListFilter>({
-    hasSome: stringFilter._in
+    hasSome: stringNullableListFilter._in,
+    equals: stringNullableListFilter._eq,
+    has: stringNullableListFilter._has,
+    hasEvery: stringNullableListFilter._hasEvery
   });
 }
 
