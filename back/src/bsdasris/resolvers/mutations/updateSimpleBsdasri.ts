@@ -44,13 +44,13 @@ const updateBsdasri = async ({
   const isGroupingType = dbBsdasri.type === BsdasriType.GROUPING;
   const flattenedInput = flattenBsdasriInput(input);
 
-  if (inputGrouping !== undefined && !isGroupingType) {
+  if (inputGrouping?.length > 0 && !isGroupingType) {
     throw new UserInputError(
       "Le champ grouping n'est accessible que sur les dasri de groupement."
     );
   }
 
-  if (inputSynthesizing !== undefined) {
+  if (inputSynthesizing?.length > 0) {
     throw new UserInputError(
       "Le champ synthesizing n'est accessible que sur les dasri de synthèse."
     );
