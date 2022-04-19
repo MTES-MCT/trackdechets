@@ -368,3 +368,34 @@ describe("checkSecurityCode", () => {
     expect(checkFn).rejects.toThrow("Le code de signature est invalide.");
   });
 });
+
+describe("checkCanRed", () => {
+  afterAll(resetDatabase);
+
+  it("should allow initial emitter", async () => {
+    const { user: initialEmitter, company: initialEmitterCompany } =
+      await userWithCompanyFactory("ADMIN");
+    const { user: ttr, company: ttrCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const initialForm = await formFactory({
+      ownerId: initialEmitter.id,
+      opt: {
+        emitterCompanySiret: initialEmitterCompany.siret,
+        recipientCompanySiret: ttrCompany.siret
+      }
+    });
+
+    const groupementForm = await formFactory({
+      ownerId: ttr.id,
+      opt: {
+        emitterType: "APPENDIX2",
+        emitterCompanySiret: ttrCompany.siret,
+        appendix2Forms: { connect: [{ id: initialForm.id }] }
+      }
+    });
+
+    const check = await checkCanRead(initialEmitter, groupementForm);
+    expect(check).toBe(true);
+  });
+});

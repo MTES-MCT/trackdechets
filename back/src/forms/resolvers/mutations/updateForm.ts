@@ -1,4 +1,4 @@
-import { Form, Prisma, Status } from "@prisma/client";
+import { EmitterType, Form, Prisma, Status } from "@prisma/client";
 import { isDangerous, WASTES_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -24,6 +24,7 @@ import {
 } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
+import { UserInputError } from "apollo-server-core";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -59,6 +60,21 @@ const updateFormResolver = async (
   await checkCanUpdate(user, existingForm);
 
   const form = flattenFormInput(formContent);
+
+  const existingAppendix2Forms = await formRepository.findAppendix2FormsById(
+    id
+  );
+  const futureEmitterType = form.emitterType ?? existingForm.emitterType;
+  const futureAppendix2Forms = appendix2Forms ?? existingAppendix2Forms;
+
+  if (
+    futureAppendix2Forms?.length &&
+    futureEmitterType !== EmitterType.APPENDIX2
+  ) {
+    throw new UserInputError(
+      "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+    );
+  }
 
   if (appendix2Forms) {
     await validateAppendix2Forms(appendix2Forms, { ...existingForm, ...form });
