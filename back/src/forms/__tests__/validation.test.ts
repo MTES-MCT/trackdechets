@@ -601,4 +601,75 @@ describe("processedInfoSchema", () => {
       "transporterCompanyVatNumber n'est pas un numéro de TVA intracommunautaire valide"
     );
   });
+  test("nextDestination should be defined when processing operation is groupement and noTraceability is false", () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 13",
+      processingOperationDescription: "Regroupement",
+      noTraceability: false
+    };
+
+    expect.assertions(1);
+
+    try {
+      processedInfoSchema.validateSync(processedInfo, { abortEarly: false });
+    } catch (err) {
+      expect(err.errors).toEqual([
+        "Destination ultérieure : L'opération de traitement est obligatoire",
+        "Destination ultérieure : Le nom de l'entreprise est obligatoire",
+        "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire",
+        "Destination ultérieure prévue : Le SIRET doit faire 14 caractères numériques",
+        "Destination ultérieure : L'adresse de l'entreprise est obligatoire",
+        "Destination ultérieure : Le contact dans l'entreprise est obligatoire",
+        "Destination ultérieure : Le téléphone de l'entreprise est obligatoire",
+        "Destination ultérieure : L'email de l'entreprise est obligatoire"
+      ]);
+    }
+  });
+
+  test("nextDestination company info is optional when noTraceability is true", () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "R 12",
+      processingOperationDescription: "Regroupement",
+      nextDestinationProcessingOperation: "R 1",
+      noTraceability: true
+    };
+    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+  });
+
+  test("nextDestination fields can be empty when noTraceability is true", () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "R 12",
+      processingOperationDescription: "Regroupement",
+      noTraceability: true,
+      nextDestinationProcessingOperation: "R 1",
+      nextDestinationCompanyName: "",
+      nextDestinationCompanySiret: "",
+      nextDestinationCompanyAddress: "",
+      nextDestinationCompanyContact: "",
+      nextDestinationCompanyPhone: "",
+      nextDestinationCompanyMail: ""
+    };
+    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+  });
+
+  test("nextDestination processingOperation is required when noTraceability is true", async () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "R 12",
+      processingOperationDescription: "Regroupement",
+      noTraceability: true
+    };
+    const validateFn = () => processedInfoSchema.validate(processedInfo);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Destination ultérieure : L'opération de traitement est obligatoire"
+    );
+  });
 });
