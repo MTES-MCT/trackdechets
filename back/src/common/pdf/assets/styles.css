@@ -52,6 +52,10 @@ td {
   text-align: center;
 }
 
+.TextUnderline {
+  text-decoration: underline;
+}
+
 .Row,
 .BoxRow {
   display: flex;

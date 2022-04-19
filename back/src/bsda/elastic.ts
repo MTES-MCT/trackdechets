@@ -4,16 +4,16 @@ import prisma from "../prisma";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 
-// | state              | emitter          | worker           | transporter | destination      |
-// |--------------------|------------------|------------------|-------------|------------------|
-// | INITIAL (draft)    | draft            | draft            | draft       | draft            |
-// | INITIAL            | action | follow  | follow | action  | follow      | follow | action  |
-// | SIGNED_BY_PRODUCER | follow           | action           | follow      | follow           |
-// | SIGNED_BY_WORKER   | follow           | follow           | to collect  | follow           |
-// | SENT               | follow           | follow           | collected   | action           |
-// | PROCESSED          | archive          | archive          | archive     | archive          |
-// | REFUSED            | archive          | archive          | archive     | archive          |
-// | AWAITING_CHILD     | follow           | follow           | follow      | follow           |
+// | state              | emitter         | worker          | transporter | destination     | nextDestination |
+// | ------------------ | --------------- | --------------- | ----------- | --------------- | --------------- |
+// | INITIAL (draft)    | draft           | draft           | draft       | draft           | follow          |
+// | INITIAL            | action / follow | follow / action | follow      | follow / action | follow          |
+// | SIGNED_BY_PRODUCER | follow          | action          | follow      | follow          | follow          |
+// | SIGNED_BY_WORKER   | follow          | follow          | to collect  | follow          | follow          |
+// | SENT               | follow          | follow          | collected   | action          | follow          |
+// | PROCESSED          | archive         | archive         | archive     | archive         | follow          |
+// | REFUSED            | archive         | archive         | archive     | archive         | follow          |
+// | AWAITING_CHILD     | follow          | follow          | follow      | follow          | follow          |
 function getWhere(
   bsda: Bsda
 ): Pick<
@@ -34,12 +34,14 @@ function getWhere(
     isCollectedFor: []
   };
 
-  const formSirets: Record<string, string | null | undefined> = {
+  const formSirets: Partial<Record<keyof Bsda, string | null | undefined>> = {
     emitterCompanySiret: bsda.emitterCompanySiret,
     workerCompanySiret: bsda.workerCompanySiret,
     destinationCompanySiret: bsda.destinationCompanySiret,
     transporterCompanySiret: bsda.transporterCompanySiret,
-    brokerCompanySiret: bsda.brokerCompanySiret
+    brokerCompanySiret: bsda.brokerCompanySiret,
+    destinationOperationNextDestinationCompanySiret:
+      bsda.destinationOperationNextDestinationCompanySiret
   };
 
   const siretsFilters = new Map<string, keyof typeof where>(

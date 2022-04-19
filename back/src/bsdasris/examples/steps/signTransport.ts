@@ -15,6 +15,6 @@ export function signTransport(company: string): WorkflowStep {
     expected: { status: "SENT" },
     data: response => response.signBsdasri,
     company,
-    setContext: (ctx, data) => ({ ...ctx, bsd: data })
+    setContext: (ctx, data) => ({ ...ctx, bsd: data, bsdasri1: data })
   };
 }

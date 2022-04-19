@@ -1,12 +1,14 @@
 import {
   IconBSDa,
   IconDuplicateFile,
+  IconPdf,
   IconRenewableEnergyEarth,
   IconWarehouseDelivery,
   IconWarehousePackage,
   IconWaterDam,
 } from "common/components/Icons";
 import routes from "common/routes";
+import { useDownloadPdf } from "dashboard/components/BSDList/BSDa/BSDaActions/useDownloadPdf";
 import { useDuplicate } from "dashboard/components/BSDList/BSDa/BSDaActions/useDuplicate";
 import { statusLabels, transportModeLabels } from "dashboard/constants";
 import styles from "dashboard/detail/common/BSDDetailContent.module.scss";
@@ -288,6 +290,8 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
       );
     },
   });
+  const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
+
   return (
     <div className={styles.detail}>
       <div className={styles.detailSummary}>
@@ -442,6 +446,16 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
         </div>
       </Tabs>
       <div className={styles.detailActions}>
+        {!form.isDraft && (
+          <button
+            type="button"
+            className="btn btn--outline-primary"
+            onClick={() => downloadPdf()}
+          >
+            <IconPdf size="24px" color="blueLight" />
+            <span>Pdf</span>
+          </button>
+        )}
         <button
           className="btn btn--outline-primary"
           onClick={() => duplicate()}

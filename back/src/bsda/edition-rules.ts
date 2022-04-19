@@ -4,6 +4,14 @@ import { BsdaInput, BsdaSignatureType } from "../generated/graphql/types";
 import { SealedFieldsError } from "../bsvhu/errors";
 import { expandBsdaFromDb } from "./converter";
 
+type StripTypeName<T> = Omit<T, "__typename">;
+type EditableRuleType<T> = Required<StripTypeName<T>>;
+type EditableFields<Type> = {
+  [Key in keyof EditableRuleType<Type>]:
+    | EditableFields<EditableRuleType<Type[Key]>>
+    | ReturnType<typeof ifAwaitingSignature>;
+};
+
 const signatureToFieldMapping: { [key in BsdaSignatureType]: keyof Bsda } = {
   EMISSION: "emitterEmissionSignatureDate",
   WORK: "workerWorkSignatureDate",
@@ -30,8 +38,7 @@ export function checkKeysEditability(
   }
 }
 
-// TODO typings
-const editableFields = {
+const editableFields: EditableFields<BsdaInput> = {
   type: ifAwaitingSignature("EMISSION"),
   emitter: ifAwaitingSignature("EMISSION"),
   destination: {

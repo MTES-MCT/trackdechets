@@ -1,6 +1,7 @@
 import React from "react";
 import {
   FormRevisionRequest,
+  RevisionRequestApprovalStatus,
   RevisionRequestStatus,
 } from "generated/graphql/types";
 import { useParams } from "react-router-dom";
@@ -14,12 +15,18 @@ type Props = {
 
 export function BsddRevisionAction({ review }: Props) {
   const { siret } = useParams<{ siret: string }>();
+  const currentApproval = review.approvals.find(
+    approval => approval.approverSiret === siret
+  );
 
-  if (review.status !== RevisionRequestStatus.Pending) {
-    return <BsddConsultRevision review={review} />;
+  if (currentApproval?.status === RevisionRequestApprovalStatus.Pending) {
+    return <BsddApproveRevision review={review} />;
   }
 
-  if (siret === review.authoringCompany.siret) {
+  if (
+    review.authoringCompany.siret === siret &&
+    review.status === RevisionRequestStatus.Pending
+  ) {
     return (
       <>
         <BsddConsultRevision review={review} />
@@ -28,5 +35,5 @@ export function BsddRevisionAction({ review }: Props) {
     );
   }
 
-  return <BsddApproveRevision review={review} />;
+  return <BsddConsultRevision review={review} />;
 }

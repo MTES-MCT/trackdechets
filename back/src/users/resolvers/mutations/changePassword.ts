@@ -7,7 +7,7 @@ import {
   MutationChangePasswordArgs,
   MutationResolvers
 } from "../../../generated/graphql/types";
-import { hashPassword } from "../../utils";
+import { hashPassword, isPasswordLongEnough } from "../../utils";
 
 /**
  * Change user password
@@ -24,7 +24,13 @@ export async function changePasswordFn(
     });
   }
 
-  const hashedPassword = await hashPassword(newPassword);
+  const trimmedPassword = newPassword.trim();
+  if (!isPasswordLongEnough(trimmedPassword)) {
+    throw new UserInputError("Le nouveau mot de passe est trop court.", {
+      invalidArgs: ["newPassword"]
+    });
+  }
+  const hashedPassword = await hashPassword(trimmedPassword);
   const updatedUser = await prisma.user.update({
     where: { id: userId },
     data: { password: hashedPassword }

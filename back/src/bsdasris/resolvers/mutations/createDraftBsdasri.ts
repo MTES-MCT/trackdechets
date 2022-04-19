@@ -3,15 +3,20 @@ import {
   ResolversParentTypes
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
-
-import createBsdasri from "./create";
+import { UserInputError } from "apollo-server-express";
+import createBsdasri from "./createBsdasri";
 
 const createDraftBsdasriResolver = async (
-  parent: ResolversParentTypes["Mutation"],
-  input: MutationCreateBsdasriArgs,
+  _: ResolversParentTypes["Mutation"],
+  args: MutationCreateBsdasriArgs,
   context: GraphQLContext
 ) => {
-  return createBsdasri(parent, input, context, true);
+  if (args.input.synthesizing?.length > 0) {
+    throw new UserInputError(
+      `La création de dasri de synthèse en brouillon n'est pas possible`
+    );
+  }
+  return createBsdasri(args.input, context, true);
 };
 
 export default createDraftBsdasriResolver;

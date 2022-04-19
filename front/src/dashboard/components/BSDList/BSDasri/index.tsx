@@ -30,6 +30,7 @@ export const COLUMNS: Record<
       <>
         <IconBSDasri style={{ fontSize: "24px" }} />
         {value === "GROUPING" && <span>Grp</span>}
+        {value === "SYNTHESIS" && <span>Synth</span>}
       </>
     ),
   },

@@ -44,7 +44,7 @@ export default function WeightWidget({
         <>
           <div className="form__row">
             <label>
-              Quantité en kg :
+              Poids en kg :
               <Field
                 component={NumberInput}
                 name={`${weightPath}.value`}

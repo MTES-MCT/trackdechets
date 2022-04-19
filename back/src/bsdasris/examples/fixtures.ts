@@ -66,6 +66,16 @@ const transportInput = {
   takenOverAt: "2022-04-27"
 };
 
+const synthesisTransportInput = {
+  acceptation: { status: "ACCEPTED" },
+
+  weight: {
+    value: 1,
+    isEstimate: false
+  },
+
+  takenOverAt: "2022-04-27"
+};
 function destinationCompanyInput(siret: string) {
   return {
     siret,
@@ -108,6 +118,7 @@ export default {
   transporteurCompanyInput,
   transporterInput,
   transportInput,
+  synthesisTransportInput,
   destinationCompanyInput,
   destinationInput,
   receptionInput,
