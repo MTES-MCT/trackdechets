@@ -73,10 +73,10 @@ export default function Appendix2MultiSelect() {
     if (!values.id || hasChanged) {
       // Computes sum of quantities of appendix2
       const totalQuantity = appendix2Selected.reduce((q, f) => {
-        if (!f.wasteDetails?.quantity) {
+        if (!f.quantityReceived) {
           return q;
         }
-        return q + f.wasteDetails?.quantity;
+        return q + f.quantityReceived;
       }, 0);
 
       // Computes the sum of packagingsInfos of appendix2

@@ -1,9 +1,43 @@
-import RedErrorMessage from "common/components/RedErrorMessage";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { Field, FieldProps, useFormikContext } from "formik";
-import { BsdasriWasteAcceptation } from "generated/graphql/types";
+import { BsdasriWasteAcceptation, Bsdasri } from "generated/graphql/types";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import React, { InputHTMLAttributes } from "react";
+import { Label, RedErrorMessage } from "common/components";
+import TdSwitch from "common/components/Switch";
+import { getNestedNode } from "common/helper";
+
+export function AcceptOnlyField({
+  field: { name, value },
+  dasriPath = "transporter.transport",
+}) {
+  const { values, setFieldValue } = useFormikContext<Bsdasri>();
+
+  const acceptationPath = `${name}.status`;
+  const showStatus = getNestedNode(values, acceptationPath);
+
+  function handleStatusToggle() {
+    if (!!showStatus) {
+      setFieldValue(acceptationPath, null, false);
+    } else {
+      setFieldValue(acceptationPath, "ACCEPTED", false);
+    }
+  }
+  return (
+    <>
+      <p className="tw-font-semibold">Lot accepté</p>
+
+      <Label>
+        <TdSwitch
+          checked={!!showStatus}
+          onChange={handleStatusToggle}
+          label="Accepté en totalité"
+        />
+      </Label>
+      <p>Un Dasri de synthèse ne peut être refusé</p>
+    </>
+  );
+}
 
 export default function Acceptation({
   field: { name, value },
@@ -74,7 +108,7 @@ export default function Acceptation({
                 name={`${name}.refusalReason`}
                 className="td-textarea"
                 disabled={props?.disabled}
-              />{" "}
+              />
             </label>
           </div>
         </>

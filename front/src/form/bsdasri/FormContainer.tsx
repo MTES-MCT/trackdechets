@@ -2,19 +2,16 @@ import { StepContainer } from "form/common/stepper/Step";
 import StepList from "./BsdasriStepList";
 import React from "react";
 import { useParams, useLocation } from "react-router-dom";
-import Emitter, { RegroupingEmitter } from "./Emitter";
-import Destination from "./Destination";
+import Emitter from "./steps/Emitter";
+import Destination from "./steps/Destination";
 import * as queryString from "query-string";
 
-import Transporter, { TransporterShowingTakeOverFields } from "./Transporter";
+import Transporter, {
+  TransporterShowingTakeOverFields,
+} from "./steps/Transporter";
+import { Type } from "./steps/Type";
 
-type BsdasriFormType = "bsdasri" | "bsdasriRegroup";
-
-export default function FormContainer({
-  bsdasriFormType = "bsdasri",
-}: {
-  bsdasriFormType?: BsdasriFormType;
-}) {
+export default function FormContainer() {
   const { id, siret } = useParams<{ id?: string; siret: string }>();
   const location = useLocation();
   const parsed = queryString.parse(location.search);
@@ -22,55 +19,63 @@ export default function FormContainer({
   const parseStepName = parsed?.step;
   const stepName =
     !!parseStepName && !Array.isArray(parseStepName) ? parseStepName : "";
-  const stepMapping = { emission: 0, transport: 1, reception: 2, operation: 2 };
+  const stepMapping = {
+    type: 0,
+    emission: 1,
+    transport: 2,
+    reception: 3,
+    operation: 4,
+  };
 
   const initialStep = stepMapping[stepName] || 0;
 
   return (
     <main className="main">
       <div className="container">
-        <StepList
-          formId={id}
-          initialStep={initialStep}
-          bsdasriFormType={bsdasriFormType}
-        >
+        <StepList formId={id} initialStep={initialStep}>
           {bsdasri => {
             const state = !!bsdasri ? bsdasri["bsdasriStatus"] : "";
             // Use a tweaked emitter component when creating or updating a grouping bsdasri
-            const emitterComponent =
-              bsdasriFormType === "bsdasriRegroup" ||
-              bsdasri?.type === "GROUPING"
-                ? RegroupingEmitter
-                : Emitter;
 
             // When transporter proceeds to direct takeover, form has to display some transporter tab fields
             // which are usually not displayed yet
-            const transporterComponent =
+            const TransporterComponent =
               state === "INITIAL" &&
               !bsdasri?.isDraft &&
               siret === bsdasri?.transporter?.company?.siret
                 ? TransporterShowingTakeOverFields
                 : Transporter;
-
+            // associated bsd can't be edited
+            const editionDisabled = !!bsdasri?.synthesizedIn?.id;
             return (
               <>
                 <StepContainer
-                  component={emitterComponent}
+                  component={Type}
+                  title="Type de bordereau"
+                  status={state}
+                  stepName={stepName}
+                  disabled={!!bsdasri?.id}
+                />
+                <StepContainer
+                  component={Emitter}
                   title="PRED"
                   status={state}
                   stepName={stepName}
+                  disabled={editionDisabled}
                 />
                 <StepContainer
-                  component={transporterComponent}
+                  component={TransporterComponent}
                   title="Collecteur - Transporteur"
                   status={state}
                   stepName={stepName}
+                  disabled={editionDisabled}
                 />
                 <StepContainer
                   component={Destination}
                   title="Installation destinataire"
                   status={state}
                   stepName={stepName}
+                  disabled={editionDisabled}
                 />
               </>
             );

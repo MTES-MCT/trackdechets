@@ -106,12 +106,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.SignedByTempStorer: {
-      if (
-        [
-          form.emitter?.company?.siret,
-          form.transporter?.company?.siret,
-        ].includes(siret)
-      ) {
+      if (siret === form.temporaryStorageDetail?.transporter?.company?.siret) {
         return <SignTransportForm {...props} />;
       }
       return null;

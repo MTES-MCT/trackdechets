@@ -1,5 +1,5 @@
 import { getIn, useFormikContext } from "formik";
-import React, { useEffect, useReducer, useMemo } from "react";
+import React, { useEffect, useReducer } from "react";
 
 import { Bsdasri } from "generated/graphql/types";
 import BsdasriTable from "./BsdasriTable";
@@ -37,14 +37,11 @@ export default function BsdasriSelector({ name }) {
   const { values, setFieldValue } = useFormikContext<Bsdasri>();
 
   const [state, dispatch] = useReducer(reducer, {
-    selected: getIn(values, name), //.map(f => f.id),
+    selected: getIn(values, name),
   });
 
   // memoize stored regrouped dasris
-  const regroupedInDB = useMemo(() => getIn(values, name) || [], [
-    name,
-    values,
-  ]);
+  const regroupedInDB = getIn(values, name) || [];
 
   useEffect(() => {
     setFieldValue(

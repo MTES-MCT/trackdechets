@@ -15,7 +15,7 @@
     - [Mettre à jour le changelog](#mettre-à-jour-le-changelog)
     - [Mettre à jour la documentation](#mettre-à-jour-la-documentation)
     - [Utiliser un backup de base de donnée](#utiliser-un-backup-de-base-de-donnée)
-      - [Procédure automatique avec Docker](#procédure-automatique-avec-docker)
+      - [Procédure automatique de restauration d'une base de donnée de production avec Docker](#procédure-automatique-de-restauration-dune-base-de-donnée-de-production-avec-docker)
       - [Procédure manuelle](#procédure-manuelle)
     - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
     - [Nourrir la base de donnée avec des données par défaut](#nourrir-la-base-de-donnée-avec-des-données-par-défaut)
@@ -188,19 +188,21 @@ Note : l'équipe n'a pas de conventions strictes concernant le nom des branches 
 
 ## Déploiement
 
-Le déploiement est géré par CircleCI à l'aide du fichier [./circle/config.yml](.circleci/config.yml).
+Le déploiement est géré par Scalingo à l'aide des fichiers de configuration `Procfile` et `.buildpacks` placés dans le front et l'api.
 Chaque update de la branche `dev` déclenche un déploiement sur l'environnement de recette. Chaque update de la branche `master` déclenche un déploiement sur les environnements sandbox et prod. Le déroulement dans le détails d'une mise en production est le suivant:
 
-1. Balayer la colonne Trello "Recette Métier" pour vérifier que l'étiquette "OK PASSAGE EN PROD" a bien été ajouté sur toutes les cartes.
-2. Faire le cahier de recette pour vérifier qu'il n'y a pas eu de régression sur les fonctionnalités critiques de l'application (login, signup, rattachement établissement, invitation collaborateur, création BSD)
-3. Mettre à jour le Changelog avec un nouveau numéro de version (versionnage calendaire)
+
+1. Faire le cahier de recette pour vérifier qu'il n'y a pas eu de régression sur les fonctionnalités critiques de l'application (login, signup, rattachement établissement, invitation collaborateur, création BSD)
+2. Balayer le tableau [Favro "Recette du xx/xx/xx"](https://favro.com/organization/ab14a4f0460a99a9d64d4945/02f1ec52bd91efc0adb3c38b) pour vérifier que l'étiquette "Recette OK --> EN PROD" a bien été ajoutée sur toutes les cartes.
+3. Mettre à jour le [Changelog.md](./Changelog.md) avec un nouveau numéro de version (versionnage calendaire)
 4. Créer une PR `dev` -> `master`
 5. Au besoin résoudre les conflits entre `master` et `dev` en fusionnant `master` dans `dev`
 6. Faire une relecture des différents changements apportés aux modèles de données et scripts de migration.
 7. Si possible faire tourner les migrations sur une copie de la base de prod en local.
-8. S'assurer que les nouvelles variables d'environnement (Cf `.env.model`) ont bien été ajoutée sur sandbox et prod
-9. Merger la PR et suivre l'avancement du déploiement sur le CI
-10. Se connecter à l'instance de prod et faire tourner le script `npm run update` dans le container `td-api`. Faire de même sur l'instance sandbox.
+8. S'assurer que les nouvelles variables d'environnement (Cf `.env.model`) ont bien été ajoutée sur Scalingo dans les environnements sandbox et prod respectivement pour les applications `front` et `api`
+9.  Merger la PR et suivre l'avancement de la CI github.
+10. Suivre l'avancement du déploiement sur Scalingo respectivement pour le front, l'api et la doc.
+
 
 ## Migrations
 
@@ -231,13 +233,12 @@ Les nouvelles fonctionnalités impactant l'API doivent être documentées dans l
 Il est possible d'importer un backup d'une base de donnée d'un environnement afin de le tester en local.
 La procédure qui suit aura pour effet de remplacer vos données en local par les données du backup.
 
-#### Procédure automatique avec Docker
+#### Procédure automatique de restauration d'une base de donnée de production avec Docker
 
 Un script d'automatisation a été mis en place. Il permet de restaurer soit un backup local, soit le dernier backup de la base de donnée distante choisie.
 Pour les backups distants, assurez vous d'avoir correctement configuré les variables d'environnement suivantes dans votre fichier `.env` local:
 
-- `DB_API_ID` - UUID Scaleway de la base de donnée que vous souhaitez restaurer (variable volontairement documentée dans `.env.model`)
-- `S3_SECRET_ACCESS_KEY` - clé d'API Scaleway
+- `SCALINGO_TOKEN` - clé d'API Scalingo
 
 ```bash
 $ pwd
@@ -251,7 +252,7 @@ $ ./restore-db.sh
 
 #### Procédure manuelle
 
-1. Télécharger un backup de la base de donnée `prisma` depuis Scaleway
+1. Télécharger un backup de la base de donnée nommée `prisma` que vous souhaitez restaurer
 2. Démarrer le container Postgres
    ```
    docker-compose -f docker-compose.dev.yml up --build postgres
@@ -268,10 +269,16 @@ $ ./restore-db.sh
    ```
 5. Restaurer le backup
    ```
-   # pg_restore -U trackdechets -d prisma --clean <fichier backup>
-   # exemple :
+   dropdb -U trackdechets prisma
+   createdb -U trackdechets prisma
+   psql -U trackdechets prisma
+     psql (13.3)
+     Type "help" for help.
+     prisma=# create schema default$default
+   # quit psql CTRL-D
    pg_restore -U trackdechets -d prisma --clean /var/backups/backup
    ```
+
 
 ### Créer un tampon de signature pour la génération PDF
 

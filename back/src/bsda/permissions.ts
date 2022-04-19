@@ -12,6 +12,7 @@ type BsdaContributors = Pick<
   | "transporterCompanySiret"
   | "workerCompanySiret"
   | "brokerCompanySiret"
+  | "destinationOperationNextDestinationCompanySiret"
 >;
 
 export const BSDA_CONTRIBUTORS_FIELDS: Record<string, keyof BsdaContributors> =
@@ -20,7 +21,8 @@ export const BSDA_CONTRIBUTORS_FIELDS: Record<string, keyof BsdaContributors> =
     destination: "destinationCompanySiret",
     transporter: "transporterCompanySiret",
     worker: "workerCompanySiret",
-    broker: "brokerCompanySiret"
+    broker: "brokerCompanySiret",
+    nextDestination: "destinationOperationNextDestinationCompanySiret"
   };
 
 export async function checkIsBsdaContributor(

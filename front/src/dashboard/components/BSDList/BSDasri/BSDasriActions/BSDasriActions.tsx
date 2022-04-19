@@ -21,7 +21,7 @@ import {
   IconDuplicateFile,
   IconPdf,
 } from "common/components/Icons";
-import { Bsdasri, BsdasriStatus } from "generated/graphql/types";
+import { Bsdasri, BsdasriStatus, BsdasriType } from "generated/graphql/types";
 import { useDownloadPdf } from "./useDownloadPdf";
 import styles from "../../BSDActions.module.scss";
 
@@ -98,10 +98,12 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
                   </MenuLink>
                 </>
               )}
-              <MenuItem onSelect={() => duplicateBsdasri()}>
-                <IconDuplicateFile size="24px" color="blueLight" />
-                Dupliquer
-              </MenuItem>
+              {form.type === BsdasriType.Simple && (
+                <MenuItem onSelect={() => duplicateBsdasri()}>
+                  <IconDuplicateFile size="24px" color="blueLight" />
+                  Dupliquer
+                </MenuItem>
+              )}
             </MenuList>
           </>
         )}

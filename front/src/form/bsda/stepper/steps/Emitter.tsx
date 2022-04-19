@@ -23,7 +23,7 @@ export function Emitter({ disabled }) {
 
       {isValidBsdaSuite ? (
         <div className="notification">
-          Vous effectuez un groupement ou entreposage provisoire. L'entreprise
+          Vous effectuez un groupement ou une réexpédition. L'entreprise
           émettrice est obligatoirement la vôtre:{" "}
           {values.emitter?.company?.name} - {values.emitter?.company?.siret}
         </div>
@@ -48,15 +48,28 @@ export function Emitter({ disabled }) {
       {values.emitter?.isPrivateIndividual || isValidBsdaSuite ? (
         <>
           <div className="form__row">
-            <label>
-              Nom et prénom
-              <Field
-                type="text"
-                name="emitter.company.name"
-                className="td-input td-input"
-                disabled={disabled}
-              />
-            </label>
+            {values.emitter?.isPrivateIndividual ? (
+              <label>
+                Nom et prénom
+                <Field
+                  type="text"
+                  name="emitter.company.name"
+                  className="td-input"
+                  disabled={disabled}
+                />
+              </label>
+            ) : (
+              <label>
+                Personne à contacter
+                <Field
+                  type="text"
+                  name="emitter.company.contact"
+                  placeholder="NOM Prénom"
+                  className="td-input"
+                  disabled={disabled}
+                />
+              </label>
+            )}
           </div>
           <div className="form__row">
             <label>
@@ -64,7 +77,7 @@ export function Emitter({ disabled }) {
               <Field
                 type="text"
                 name="emitter.company.address"
-                className="td-input td-input"
+                className="td-input"
                 disabled={disabled}
               />
             </label>

@@ -21,6 +21,9 @@ import { ErrorCode } from "./common/errors";
 import errorHandler from "./common/middlewares/errorHandler";
 import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";
 import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
+import { graphqlQueryParserMiddleware } from "./common/middlewares/graphqlQueryParser";
+import { graphqlRateLimiterMiddleware } from "./common/middlewares/graphqlRatelimiter";
+import { graphqlRegenerateSessionMiddleware } from "./common/middlewares/graphqlRegenerateSession";
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
 import { graphiqlLandingPagePlugin } from "./common/plugins/graphiql";
 import sentryReporter from "./common/plugins/sentryReporter";
@@ -109,16 +112,17 @@ if (Sentry) {
 
 const RATE_LIMIT_WINDOW_SECONDS = 60;
 const maxrequestPerWindows = parseInt(MAX_REQUESTS_PER_WINDOW, 10);
+const store = new RateLimitRedisStore({
+  client: redisClient,
+  expiry: RATE_LIMIT_WINDOW_SECONDS
+});
 
 app.use(
   rateLimit({
-    message: `Quota de ${maxrequestPerWindows} requêtes par minute excédée pour cette adresse IP, merci de réessayer plus tard.`,
+    message: `Quota de ${maxrequestPerWindows} requêtes par minute excédé pour cette adresse IP, merci de réessayer plus tard.`,
     windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
     max: maxrequestPerWindows,
-    store: new RateLimitRedisStore({
-      client: redisClient,
-      expiry: RATE_LIMIT_WINDOW_SECONDS
-    })
+    store
   })
 );
 
@@ -158,11 +162,28 @@ app.use(urlencoded({ extended: false }));
 app.use(json());
 
 // allow application/graphql header
-app.use(graphqlBodyParser);
+app.use(graphQLPath, graphqlBodyParser);
+app.use(graphQLPath, graphqlQueryParserMiddleware());
+app.use(graphQLPath, graphqlBatchLimiterMiddleware());
+app.use(
+  graphQLPath,
+  graphqlRateLimiterMiddleware("resendInvitation", {
+    windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
+    maxRequestsPerWindow: 1,
+    store
+  })
+);
+app.use(
+  graphQLPath,
+  graphqlRateLimiterMiddleware("createPasswordResetRequest", {
+    windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
+    maxRequestsPerWindow: 1,
+    store
+  })
+);
 
 // logging middleware
 app.use(loggingMiddleware(graphQLPath));
-app.use(graphqlBatchLimiterMiddleware(graphQLPath));
 
 /**
  * Set the following headers for cross-domain cookie
@@ -201,6 +222,7 @@ app.use(session(sess));
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(graphQLPath, graphqlRegenerateSessionMiddleware("changePassword"));
 
 // authentification routes used by td-ui (/login /logout, /isAuthenticated)
 app.use(authRouter);

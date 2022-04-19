@@ -25,6 +25,14 @@ export function TransporterInfoEdit({ bsda }: Props) {
     MutationUpdateBsdaArgs
   >(UPDATE_BSDA);
 
+  if (
+    !["SIGNED_BY_PRODUCER", "SIGNED_BY_WORKER", "INITIAL"].includes(
+      bsda["bsdaStatus"]
+    )
+  ) {
+    return null;
+  }
+
   return (
     <>
       <button

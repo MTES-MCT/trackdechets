@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { gql } from "apollo-server-core";
 import logger from "../../logging/logger";
 import { getUid } from "../../utils";
 
@@ -26,9 +25,8 @@ export default function (graphQLPath: string) {
       requestMetadata.graphql_variables = req.body?.variables;
       requestMetadata.graphql_query = req.body?.query;
 
-      const gqlDetails = parseGqlQuery(req.body?.query);
-      requestMetadata.graphql_operation = gqlDetails?.operation;
-      requestMetadata.graphql_selection_name = gqlDetails?.name;
+      requestMetadata.graphql_operation = req.gqlInfos[0]?.operation;
+      requestMetadata.graphql_selection_name = req.gqlInfos[0]?.name;
     }
 
     logger.info(message, requestMetadata);
@@ -61,26 +59,4 @@ export default function (graphQLPath: string) {
 
     next();
   };
-}
-
-function parseGqlQuery(query: string | undefined) {
-  if (!query) return;
-
-  try {
-    const parsedQuery = gql`
-      ${query}
-    `;
-
-    const definition = parsedQuery.definitions[0];
-    if (definition.kind !== "OperationDefinition") return;
-
-    const fieldSelection = definition.selectionSet.selections[0];
-
-    return {
-      operation: definition.operation,
-      name: fieldSelection.kind === "Field" ? fieldSelection.name.value : ""
-    };
-  } catch (_) {
-    return undefined;
-  }
 }

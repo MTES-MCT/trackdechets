@@ -20,7 +20,7 @@ describe("mutation changePassword", () => {
   it("should update a user password", async () => {
     const user = await userFactory();
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const newPassword = "newPass";
+    const newPassword = "newPassword";
     const { data } = await mutate<Pick<Mutation, "changePassword">>(
       CHANGE_PASSWORD,
       {

@@ -17,6 +17,7 @@ async function testWorkflow(workflow) {
   // run the steps one by one
   for (const step of workflow.steps) {
     const { mutate } = makeClient(context[step.company].user);
+
     const { errors, data: response } = await mutate(step.mutation, {
       variables: step.variables(context)
     });

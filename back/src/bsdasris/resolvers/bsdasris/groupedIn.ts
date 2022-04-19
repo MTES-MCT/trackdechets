@@ -1,7 +1,7 @@
 import { BsdasriResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 
-import { unflattenBsdasri } from "../../converter";
+import { expandBsdasriFromDB } from "../../converter";
 
 const groupedIn: BsdasriResolvers["groupedIn"] = async bsdasri => {
   const groupedIn = await prisma.bsdasri
@@ -10,7 +10,7 @@ const groupedIn: BsdasriResolvers["groupedIn"] = async bsdasri => {
   if (!groupedIn) {
     return null;
   }
-  return unflattenBsdasri(groupedIn);
+  return expandBsdasriFromDB(groupedIn);
 };
 
 export default groupedIn;

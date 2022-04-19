@@ -1,4 +1,5 @@
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
+import { GqlInfo } from "./common/middlewares/graphqlQueryParser";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
 import { createUserDataLoaders } from "./users/dataloaders";
 
@@ -13,5 +14,11 @@ export type GraphQLContext = ExpressContext & {
 declare module "express-session" {
   interface SessionData {
     warningMessage?: string;
+  }
+}
+
+declare module "express" {
+  interface Request {
+    gqlInfos?: GqlInfo[];
   }
 }

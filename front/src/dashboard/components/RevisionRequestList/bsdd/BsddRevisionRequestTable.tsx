@@ -10,16 +10,10 @@ import {
   TableCell,
 } from "common/components";
 import { BsddRevisionAction } from "./approve/BsddRevisionAction";
+import { BsddRevisionStatus } from "./approve/BsddRevisionStatus";
 
 type Props = {
   revisions: FormRevisionRequest[];
-};
-
-const STATUS_LABELS = {
-  PENDING: "En attente de validation",
-  ACCEPTED: "Approuvée",
-  REFUSED: "Refusée",
-  CANCELLED: "Annulée",
 };
 
 const COLUMNS = [
@@ -34,7 +28,8 @@ const COLUMNS = [
   },
   {
     Header: "Statut",
-    accessor: row => STATUS_LABELS[row.status],
+    accessor: () => null,
+    Cell: ({ row }) => <BsddRevisionStatus review={row.original} />,
   },
   {
     Header: "Actions",

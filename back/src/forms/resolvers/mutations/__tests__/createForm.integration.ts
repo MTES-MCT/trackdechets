@@ -14,7 +14,7 @@ import {
   Mutation,
   MutationCreateFormArgs
 } from "../../../../generated/graphql/types";
-import { Status } from "@prisma/client";
+import { EmitterType, Status } from "@prisma/client";
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
@@ -589,6 +589,7 @@ describe("Mutation.createForm", () => {
 
     const createFormInput = {
       emitter: {
+        type: EmitterType.APPENDIX2,
         company: {
           siret: ttr.siret
         }
@@ -631,6 +632,7 @@ describe("Mutation.createForm", () => {
 
     const createFormInput = {
       emitter: {
+        type: EmitterType.APPENDIX2,
         company: {
           siret: company.siret
         }
@@ -661,6 +663,7 @@ describe("Mutation.createForm", () => {
 
     const createFormInput = {
       emitter: {
+        type: EmitterType.APPENDIX2,
         company: {
           siret: ttr.siret
         }
@@ -687,6 +690,7 @@ describe("Mutation.createForm", () => {
 
     const createFormInput = {
       emitter: {
+        type: EmitterType.APPENDIX2,
         company: {
           siret: ttr.siret
         }
@@ -700,6 +704,34 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message: `Le bordereau ${appendix2.id} n'est pas en attente de regroupement`
+      })
+    ]);
+  });
+
+  it("should disallow linking an appendix2 form to a BSDD which emitter type is not APPENDIX2", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: { status: Status.SENT, recipientCompanySiret: ttr.siret }
+    });
+
+    const createFormInput = {
+      emitter: {
+        type: "PRODUCER",
+        company: {
+          siret: ttr.siret
+        }
+      },
+      appendix2Forms: [{ id: appendix2.id }]
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
       })
     ]);
   });

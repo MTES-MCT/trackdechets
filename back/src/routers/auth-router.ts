@@ -48,11 +48,12 @@ authRouter.get("/isAuthenticated", nocache, (req, res) => {
 
 authRouter.post("/logout", (req, res) => {
   req.logout();
-  delete req.session.warningMessage;
-  res
-    .clearCookie(sess.name, {
-      domain: sess.cookie.domain,
-      path: "/"
-    })
-    .redirect(`${UI_BASE_URL}`);
+  req.session.destroy(() => {
+    res
+      .clearCookie(sess.name, {
+        domain: sess.cookie.domain,
+        path: "/"
+      })
+      .redirect(`${UI_BASE_URL}`);
+  });
 });

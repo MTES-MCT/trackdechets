@@ -346,6 +346,7 @@ export const detailFormFragment = gql`
       name
     }
     groupedIn {
+      id
       readableId
     }
     appendix2Forms {
@@ -413,6 +414,16 @@ const dasriReceptionWasteDetailsFragment = gql`
     }
   }
 `;
+const initialDasriFragment = gql`
+  fragment InitialDasriFragment on InitialBsdasri {
+    id
+    quantity
+    volume
+    weight
+    takenOverAt
+    postalCode
+  }
+`;
 
 const wasteAcceptationFragment = gql`
   fragment WasteAcceptationFragment on BsdasriWasteAcceptation {
@@ -455,6 +466,9 @@ export const dashboardDasriFragment = gql`
       }
     }
     grouping {
+      id
+    }
+    synthesizing {
       id
     }
     createdAt
@@ -558,6 +572,12 @@ export const fullDasriFragment = gql`
       }
     }
     grouping {
+      ...InitialDasriFragment
+    }
+    synthesizing {
+      ...InitialDasriFragment
+    }
+    synthesizedIn {
       id
     }
     createdAt
@@ -572,6 +592,7 @@ export const fullDasriFragment = gql`
   ${dasriTransportWasteDetailsFragment}
   ${dasriReceptionWasteDetailsFragment}
   ${wasteAcceptationFragment}
+  ${initialDasriFragment}
 `;
 
 export const vhuFragment = gql`
