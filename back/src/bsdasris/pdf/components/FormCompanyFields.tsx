@@ -6,13 +6,9 @@ const FRENCH_COUNTRY = countries.find(country => country.cca2 === "FR");
 
 type FormCompanyFieldsProps = {
   company?: FormCompany;
-  showCountryFields?: Boolean;
 };
 
-export function FormCompanyFields({
-  company,
-  showCountryFields
-}: FormCompanyFieldsProps) {
+export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
   const companyCountry = company
     ? countries.find(country => country.cca2 === company?.country) ??
       FRENCH_COUNTRY
