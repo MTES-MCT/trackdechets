@@ -1,7 +1,9 @@
 import { CompanyRow, CompanyInfo } from "./types";
-import { searchCompany as dataGouv } from "../../companies/sirene/entreprise.data.gouv.fr/client";
-import { searchCompany as insee } from "../../companies/sirene/insee/client";
-import { searchCompany as socialGouv } from "../../companies/sirene/social.gouv/client";
+import {
+  searchCompanyInseeThrottled,
+  searchCompanyDataGouvThrottled,
+  searchCompanySocialGouvThrottled
+} from "../../companies/sirene/searchCompany";
 import { searchCompany as trackdechets } from "../../companies/sirene/trackdechets/client";
 import geocode from "../../companies/geocode";
 import { CompanySearchResult } from "../../generated/graphql/types";
@@ -20,19 +22,19 @@ export function getCompanyThrottled(
   let throttledClient = null;
   switch (opts.sireneProvider) {
     case "entreprise.data.gouv.fr":
-      throttledClient = dataGouv;
+      throttledClient = searchCompanyDataGouvThrottled;
       break;
 
     case "social.gouv":
-      throttledClient = socialGouv(siret);
+      throttledClient = searchCompanySocialGouvThrottled;
       break;
 
     case "insee":
-      throttledClient = insee(siret);
+      throttledClient = searchCompanyInseeThrottled;
       break;
 
     default:
-      // Not throtlled client
+      // Not throtlled in-house client
       return trackdechets(siret);
   }
 
