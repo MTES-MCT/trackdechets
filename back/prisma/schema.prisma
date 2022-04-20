@@ -360,9 +360,6 @@ model Form {
   temporaryStorageDetailId           String?                 @unique
   temporaryStorageDetail             TemporaryStorageDetail? @relation(fields: [temporaryStorageDetailId], references: [id])
   transportSegments                  TransportSegment[]
-  // appendix2Forms                     Form[]                  @relation("FormToForm")
-  // appendix2RootFormId                String?
-  // appendix2RootForm                  Form?                   @relation("FormToForm", fields: [appendix2RootFormId], references: [id])
   groupedIn                          FormGroupement[]        @relation("GroupedIn")
   grouping                           FormGroupement[]        @relation("Grouping")
 
@@ -377,15 +374,14 @@ model Form {
   @@index([traderCompanySiret], map: "_FormTraderCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_FormBrokerCompanySiretIdx")
   @@index([status], map: "_FormStatusIdx")
-  // @@index([appendix2RootFormId], map: "_FormAppendix2RootFormIdIdx")
 }
 
 model FormGroupement {
-  id            String   @id @default(cuid())
+  id            String @id @default(cuid())
   nextFormId    String
-  nextForm      Form     @relation(fields: [nextFormId], references: [id], name: "Grouping")
+  nextForm      Form   @relation(fields: [nextFormId], references: [id], name: "Grouping")
   initialFormId String
-  initialForm   Form     @relation(fields: [initialFormId], references: [id], name: "GroupedIn")
+  initialForm   Form   @relation(fields: [initialFormId], references: [id], name: "GroupedIn")
   quantity      Float
 
   @@index([nextFormId], map: "_FormGroupementNextFormId")
