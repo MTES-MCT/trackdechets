@@ -119,7 +119,7 @@ type Form {
   appendix2Forms: [Appendix2Form!] @deprecated(reason: "Utiliser `grouping`")
 
   "Bordereaux que celui-ci regroupe (Annexe 2)"
-  grouping: [Appendix2FormFraction!]
+  grouping: [InitialFormFraction!]
 
   "Bordereaux dans lequel celui-ci est regroupé (Annexe 2)"
   groupedIn: [FormFraction!]
@@ -184,7 +184,7 @@ type Appendix2Form {
 """
 Fraction d'un bordereau ajouté en annexe 2 d'un bordereau de regroupement
 """
-type Appendix2FormFraction {
+type InitialFormFraction {
   "Bordereau initial"
   form: Appendix2Form!
   "Quantité du bordereau initial affectée au bordereau de regroupement"

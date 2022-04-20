@@ -195,7 +195,7 @@ input CreateFormInput {
     @deprecated(reason: "Utiliser `grouping`")
 
   "Bordereaux que celui-ci regroupe (Annexe 2) - Permet une utilisation partielle du bordereau initial"
-  grouping: [Appendix2FormFractionInput!]
+  grouping: [InitialFormFractionInput!]
 
   ecoOrganisme: EcoOrganismeInput
 
@@ -240,7 +240,7 @@ input UpdateFormInput {
     @deprecated(reason: "Utiliser `grouping`")
 
   "Bordereaux que celui-ci regroupe (Annexe 2) - Permet une utilisation partielle du bordereau initial"
-  grouping: [Appendix2FormFractionInput!]
+  grouping: [InitialFormFractionInput!]
 
   ecoOrganisme: EcoOrganismeInput
 
@@ -285,7 +285,7 @@ input FormInput {
     @deprecated(reason: "Utiliser `grouping`")
 
   "Bordereaux que celui-ci regroupe (Annexe 2) - Permet une utilisation partielle du bordereau initial"
-  grouping: [Appendix2FormFractionInput!]
+  grouping: [InitialFormFractionInput!]
 
   ecoOrganisme: EcoOrganismeInput
 
@@ -309,7 +309,7 @@ input AppendixFormInput {
 """
 Fraction d'un bordereau ajouté en annexe 2 d'un bordereau de regroupement
 """
-type Appendix2FormFractionInput {
+type InitialFormFractionInput {
   "Identifiant unique du bordereau initial"
   id: ID!
   """
