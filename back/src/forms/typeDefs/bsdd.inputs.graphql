@@ -192,6 +192,11 @@ input CreateFormInput {
 
   "Annexe 2"
   appendix2Forms: [AppendixFormInput!]
+    @deprecated(reason: "Utiliser `grouping`")
+
+  "Bordereaux que celui-ci regroupe (Annexe 2) - Permet une utilisation partielle du bordereau initial"
+  grouping: [Appendix2FormFractionInput!]
+
   ecoOrganisme: EcoOrganismeInput
 
   temporaryStorageDetail: TemporaryStorageDetailInput
@@ -232,6 +237,11 @@ input UpdateFormInput {
 
   "Annexe 2"
   appendix2Forms: [AppendixFormInput!]
+    @deprecated(reason: "Utiliser `grouping`")
+
+  "Bordereaux que celui-ci regroupe (Annexe 2) - Permet une utilisation partielle du bordereau initial"
+  grouping: [Appendix2FormFractionInput!]
+
   ecoOrganisme: EcoOrganismeInput
 
   temporaryStorageDetail: TemporaryStorageDetailInput
@@ -272,6 +282,11 @@ input FormInput {
 
   "Annexe 2"
   appendix2Forms: [AppendixFormInput!]
+    @deprecated(reason: "Utiliser `grouping`")
+
+  "Bordereaux que celui-ci regroupe (Annexe 2) - Permet une utilisation partielle du bordereau initial"
+  grouping: [Appendix2FormFractionInput!]
+
   ecoOrganisme: EcoOrganismeInput
 
   temporaryStorageDetail: TemporaryStorageDetailInput
@@ -289,6 +304,20 @@ input AppendixFormInput {
   Le readableId permet de le récupérer via la query form.
   """
   readableId: ID
+}
+
+"""
+Fraction d'un bordereau ajouté en annexe 2 d'un bordereau de regroupement
+"""
+type Appendix2FormFractionInput {
+  "Identifiant unique du bordereau initial"
+  id: ID!
+  """
+  Quantité du bordereau initial affectée au bordereau de regroupement. Si omis,
+  la totalité de la quantité restante est affectée. La quantité renseignée ne peut
+  pas être supérieure à la quantité restante.
+  """
+  quantity: Float
 }
 
 "Payload de liaison d'un BSD à un eco-organisme"
