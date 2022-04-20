@@ -745,7 +745,12 @@ describe("Mutation.updateForm", () => {
         emitterType: EmitterType.APPENDIX2,
         status: "SEALED",
         emitterCompanySiret: ttr.siret,
-        appendix2Forms: { connect: { id: appendixForm.id } }
+        grouping: {
+          create: {
+            initialFormId: appendixForm.id,
+            quantity: appendixForm.quantityReceived
+          }
+        }
       }
     });
 
@@ -790,7 +795,12 @@ describe("Mutation.updateForm", () => {
         status: "SEALED",
         emitterCompanySiret: ttr.siret,
         emitterType: EmitterType.APPENDIX2,
-        appendix2Forms: { connect: { id: appendixForm.id } }
+        grouping: {
+          create: {
+            initialFormId: appendixForm.id,
+            quantity: appendixForm.quantityReceived
+          }
+        }
       }
     });
 
@@ -862,7 +872,12 @@ describe("Mutation.updateForm", () => {
         status: "DRAFT",
         emitterCompanySiret: ttr.siret,
         emitterType: EmitterType.APPENDIX2,
-        appendix2Forms: { connect: { id: appendixForm.id } }
+        grouping: {
+          create: {
+            initialFormId: appendixForm.id,
+            quantity: appendixForm.quantityReceived
+          }
+        }
       }
     });
 
@@ -943,7 +958,12 @@ describe("Mutation.updateForm", () => {
         status: "DRAFT",
         emitterCompanySiret: ttr.siret,
         emitterType: EmitterType.APPENDIX2,
-        appendix2Forms: { connect: { id: appendixForm.id } }
+        grouping: {
+          create: {
+            initialFormId: appendixForm.id,
+            quantity: appendixForm.quantityReceived
+          }
+        }
       }
     });
 

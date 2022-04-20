@@ -462,12 +462,14 @@ describe("mutation.markAsProcessed", () => {
       opt: {
         status: "ACCEPTED",
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
+        recipientCompanySiret: company.siret,
+        grouping: {
+          create: {
+            initialFormId: appendix2.id,
+            quantity: appendix2.quantityReceived
+          }
+        }
       }
-    });
-    await prisma.form.update({
-      where: { id: form.id },
-      data: { appendix2Forms: { connect: [{ id: appendix2.id }] } }
     });
 
     const { mutate } = makeClient(user);

@@ -11,7 +11,7 @@ export function bsddReducer(
         owner,
         updatedAt,
         createdAt,
-        appendix2Forms,
+        grouping,
         wasteDetailsPackagingInfos,
         ...bsdd
       } = event.data.content;
@@ -34,7 +34,7 @@ export function bsddReducer(
         owner,
         updatedAt,
         createdAt,
-        appendix2Forms,
+        grouping,
         wasteDetailsPackagingInfos,
         ...bsdd
       } = event.data.content as Prisma.FormCreateInput; // TODO Check if we can we somehow keep Prisma.FormUpdateInput

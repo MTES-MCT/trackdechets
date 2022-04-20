@@ -391,7 +391,12 @@ describe("checkCanRed", () => {
       opt: {
         emitterType: "APPENDIX2",
         emitterCompanySiret: ttrCompany.siret,
-        appendix2Forms: { connect: [{ id: initialForm.id }] }
+        grouping: {
+          create: {
+            initialFormId: initialForm.id,
+            quantity: initialForm.quantityReceived
+          }
+        }
       }
     });
 

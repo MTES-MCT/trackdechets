@@ -55,7 +55,6 @@ function getDuplicateFormInput(
     transporterCustomInfo,
     currentTransporterSiret,
     temporaryStorageDetailId,
-    appendix2RootFormId,
     ownerId,
 
     ...rest

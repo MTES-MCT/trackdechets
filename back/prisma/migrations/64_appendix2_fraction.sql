@@ -6,6 +6,7 @@ CREATE TABLE "FormGroupement" (
     "quantity" DOUBLE PRECISION NOT NULL,
 
     CONSTRAINT "FormGroupement_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "FormGroupement_pkey_unique_together" UNIQUE ("nextFormId", "initialFormId")
 );
 
 -- CreateIndex

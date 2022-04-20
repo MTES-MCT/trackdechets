@@ -309,7 +309,7 @@ input AppendixFormInput {
 """
 Fraction d'un bordereau ajouté en annexe 2 d'un bordereau de regroupement
 """
-type InitialFormFractionInput {
+input InitialFormFractionInput {
   "Identifiant unique du bordereau initial"
   id: ID!
   """

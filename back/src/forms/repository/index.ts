@@ -16,6 +16,7 @@ import buildCreateRevisionRequest from "./formRevisionRequest/createRevisionRequ
 import buildGetRevisionRequestById from "./formRevisionRequest/getRevisionRequestById";
 import buildRefuseRevisionRequestApproval from "./formRevisionRequest/refuseRevisionRequestApproval";
 import { FormActions, FormRevisionRequestActions } from "./types";
+import buildSetAppendix2 from "./form/setAppendix2";
 
 export type FormRepository = FormActions & FormRevisionRequestActions;
 
@@ -44,6 +45,10 @@ export function getFormRepository(user: Express.User): FormRepository {
     removeAppendix2: (...args) =>
       prisma.$transaction(prisma =>
         buildRemoveAppendix2({ prisma, user })(...args)
+      ),
+    setAppendix2: (...args) =>
+      prisma.$transaction(prisma =>
+        buildSetAppendix2({ prisma, user })(...args)
       )
   };
 

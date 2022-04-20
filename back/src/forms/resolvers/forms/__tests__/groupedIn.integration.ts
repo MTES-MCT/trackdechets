@@ -60,7 +60,12 @@ describe("groupedIn resolver", () => {
       ownerId: collector.id,
       opt: {
         emitterCompanySiret: collectorCompany.siret,
-        appendix2Forms: { connect: { id: appendix2.id } }
+        grouping: {
+          create: {
+            initialFormId: appendix2.id,
+            quantity: appendix2.quantityReceived
+          }
+        }
       }
     });
 

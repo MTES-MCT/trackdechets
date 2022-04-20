@@ -624,7 +624,14 @@ describe("Test Form reception", () => {
         receivedBy: "Bill",
         recipientCompanySiret: destination.siret,
         receivedAt: new Date("2019-01-17"),
-        appendix2Forms: { connect: [{ id: form1.id }, { id: form2.id }] }
+        grouping: {
+          createMany: {
+            data: [
+              { initialFormId: form1.id, quantity: form1.quantityReceived },
+              { initialFormId: form2.id, quantity: form2.quantityReceived }
+            ]
+          }
+        }
       }
     });
 

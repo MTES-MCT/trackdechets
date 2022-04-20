@@ -1,11 +1,14 @@
 import { FormResolvers } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { expandAppendix2FormFromDb } from "../../form-converter";
+import { getFormRepository } from "../../repository";
 
-const appendix2FormsResolver: FormResolvers["appendix2Forms"] = async form => {
-  const appendix2Forms = await prisma.form
-    .findUnique({ where: { id: form.id } })
-    .appendix2Forms();
+const appendix2FormsResolver: FormResolvers["appendix2Forms"] = async (
+  form,
+  _,
+  { user }
+) => {
+  const { findAppendix2FormsById } = getFormRepository(user);
+  const appendix2Forms = await findAppendix2FormsById(form.id);
   return appendix2Forms.map(expandAppendix2FormFromDb);
 };
 

@@ -1154,10 +1154,17 @@ export async function validateAppendix2Forms(
   );
 
   for (const appendix2 of appendix2Forms) {
-    if (appendix2.appendix2RootFormId) {
+    const groupedIn = (
+      await prisma.formGroupement.findMany({
+        where: { initialFormId: appendix2.id },
+        include: { nextForm: true }
+      })
+    ).map(g => g.nextForm);
+
+    if (groupedIn.length > 0) {
       if (
         !form?.id ||
-        (form?.id && appendix2.appendix2RootFormId !== form.id)
+        (form?.id && !groupedIn.map(f => f.id).includes(form.id))
       ) {
         // the form has already been grouped into another one
         throw new FormAlreadyInAppendix2(appendix2.id);

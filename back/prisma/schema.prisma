@@ -386,6 +386,7 @@ model FormGroupement {
 
   @@index([nextFormId], map: "_FormGroupementNextFormId")
   @@index([initialFormId], map: "_FormGroupementInitialFormId")
+  @@unique([nextFormId, initialFormId])
 }
 
 enum RevisionRequestStatus {

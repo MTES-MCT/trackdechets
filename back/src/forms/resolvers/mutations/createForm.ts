@@ -19,6 +19,7 @@ import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
 import { FormSirets } from "../../types";
 import { draftFormSchema, validateAppendix2Forms } from "../../validation";
+import { getFormOrFormNotFound } from "../../database";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -73,8 +74,7 @@ const createFormResolver = async (
   const formCreateInput: Prisma.FormCreateInput = {
     ...form,
     readableId: getReadableId(),
-    owner: { connect: { id: user.id } },
-    appendix2Forms: appendix2Forms ? { connect: appendix2Forms } : undefined
+    owner: { connect: { id: user.id } }
   };
 
   await draftFormSchema.validate(formCreateInput);
@@ -100,6 +100,19 @@ const createFormResolver = async (
 
   const formRepository = getFormRepository(user);
   const newForm = await formRepository.create(formCreateInput);
+
+  if (appendix2Forms) {
+    const initialForms = await Promise.all(
+      appendix2Forms.map(({ id }) => getFormOrFormNotFound({ id }))
+    );
+    await formRepository.setAppendix2({
+      form: newForm,
+      initialForms: initialForms.map(f => ({
+        form: f,
+        quantity: f.quantityReceived
+      }))
+    });
+  }
 
   eventEmitter.emit(TDEvent.CreateForm, {
     previousNode: null,

@@ -9,7 +9,6 @@ import {
 } from "@prisma/client";
 import * as QRCode from "qrcode";
 import concatStream from "concat-stream";
-import { isDangerous } from "../../common/constants";
 import {
   generatePdf,
   formatDate,
@@ -258,9 +257,13 @@ function TransporterFormCompanyFields({
 
 export async function generateBsddPdf(prismaForm: PrismaForm) {
   const fullPrismaForm = await getFullForm(prismaForm);
-  const appendix2Forms = await prisma.form.findMany({
-    where: { appendix2RootFormId: fullPrismaForm.id }
-  });
+  const appendix2Forms = (
+    await prisma.formGroupement.findMany({
+      where: { nextFormId: fullPrismaForm.id },
+      include: { initialForm: true }
+    })
+  ).map(g => g.initialForm);
+
   const form: GraphQLForm = {
     ...expandFormFromDb(fullPrismaForm),
     temporaryStorageDetail: fullPrismaForm.temporaryStorageDetail

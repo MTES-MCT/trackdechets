@@ -52,8 +52,13 @@ describe("Appendix2Form", () => {
     const regroupement = await formFactory({
       ownerId: emitterUser.id,
       opt: {
-        appendix2Forms: { connect: { id: appendix2.id } },
-        recipientCompanySiret: destination.siret
+        recipientCompanySiret: destination.siret,
+        grouping: {
+          create: {
+            initialFormId: appendix2.id,
+            quantity: appendix2.quantityReceived
+          }
+        }
       }
     });
 

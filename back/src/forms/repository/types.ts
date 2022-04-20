@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { CountFormsFn } from "./form/count";
 import { CreateFormFn } from "./form/create";
+import { SetAppendix2Fn } from "./form/setAppendix2";
 import { CreateTemporaryStorageFn } from "./form/createTemporaryStorage";
 import { DeleteFormFn } from "./form/delete";
 import { FindAppendix2FormsByIdFn } from "./form/findAppendix2FormsById";
@@ -52,6 +53,7 @@ export type FormActions = {
   createTemporaryStorage: CreateTemporaryStorageFn;
   count: CountFormsFn;
   removeAppendix2: RemoveAppendix2Fn;
+  setAppendix2: SetAppendix2Fn;
 };
 
 export type FormRevisionRequestActions = {

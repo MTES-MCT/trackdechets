@@ -78,18 +78,15 @@ const updateFormResolver = async (
 
   if (appendix2Forms) {
     await validateAppendix2Forms(appendix2Forms, { ...existingForm, ...form });
-    await handleFormsRemovedFromAppendix(
-      existingForm,
-      appendix2Forms,
-      formRepository
-    );
+    // await handleFormsRemovedFromAppendix(
+    //   existingForm,
+    //   appendix2Forms,
+    //   formRepository
+    // );
   }
 
   // Construct form update payload
-  const formUpdateInput: Prisma.FormUpdateInput = {
-    ...form,
-    appendix2Forms: appendix2Forms ? { set: appendix2Forms } : undefined
-  };
+  const formUpdateInput: Prisma.FormUpdateInput = form;
 
   // Validate form input
   if (existingForm.status === "DRAFT") {
@@ -165,7 +162,20 @@ const updateFormResolver = async (
 
   const updatedForm = await formRepository.update({ id }, formUpdateInput);
 
-  await handleFormsAddedToAppendix(updatedForm, user, formRepository);
+  if (appendix2Forms?.length) {
+    const initialForms = await Promise.all(
+      appendix2Forms.map(({ id }) => getFormOrFormNotFound({ id }))
+    );
+    await formRepository.setAppendix2({
+      form: existingForm,
+      initialForms: initialForms.map(f => ({
+        form: f,
+        quantity: f.quantityReceived
+      }))
+    });
+  }
+
+  //await handleFormsAddedToAppendix(updatedForm, user, formRepository);
 
   return expandFormFromDb(updatedForm);
 };

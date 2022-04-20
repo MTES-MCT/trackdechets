@@ -365,22 +365,24 @@ describe("{ mutation { markAsSent } }", () => {
 
     const recipientCompany = await companyFactory();
 
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: "DRAFT",
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret
-      }
-    });
     const appendix2 = await formFactory({
       ownerId: user.id,
       opt: { status: "AWAITING_GROUP" }
     });
 
-    await prisma.form.update({
-      where: { id: form.id },
-      data: { appendix2Forms: { connect: [{ id: appendix2.id }] } }
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        grouping: {
+          create: {
+            initialFormId: appendix2.id,
+            quantity: appendix2.quantityReceived
+          }
+        }
+      }
     });
 
     const { mutate } = makeClient(user);
@@ -407,22 +409,23 @@ describe("{ mutation { markAsSent } }", () => {
 
     const recipientCompany = await companyFactory();
 
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: { status: "GROUPED" }
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "SEALED",
         emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret
+        recipientCompanySiret: recipientCompany.siret,
+        grouping: {
+          create: {
+            initialFormId: appendix2.id,
+            quantity: appendix2.quantityReceived
+          }
+        }
       }
-    });
-    const appendix2 = await formFactory({
-      ownerId: user.id,
-      opt: { status: "GROUPED" }
-    });
-
-    await prisma.form.update({
-      where: { id: form.id },
-      data: { appendix2Forms: { connect: [{ id: appendix2.id }] } }
     });
 
     const { mutate } = makeClient(user);

@@ -163,7 +163,12 @@ describe("Mutation.deleteForm", () => {
         emitterType: "APPENDIX2",
         emitterCompanySiret: ttr.siret,
         status: "SEALED",
-        appendix2Forms: { connect: [{ id: appendix2.id }] }
+        grouping: {
+          create: {
+            initialFormId: appendix2.id,
+            quantity: appendix2.quantityReceived
+          }
+        }
       }
     });
 
@@ -181,15 +186,16 @@ describe("Mutation.deleteForm", () => {
 
     const deletedForm = await prisma.form.findUnique({
       where: { id: form.id },
-      include: { appendix2Forms: true }
+      include: { grouping: true }
     });
     expect(deletedForm.isDeleted).toBe(true);
-    expect(deletedForm.appendix2Forms).toEqual([]);
+    expect(deletedForm.grouping).toEqual([]);
 
     const disconnectedAppendix2 = await prisma.form.findUnique({
-      where: { id: appendix2.id }
+      where: { id: appendix2.id },
+      include: { groupedIn: true }
     });
-    expect(disconnectedAppendix2.appendix2RootFormId).toEqual(null);
+    expect(disconnectedAppendix2.groupedIn).toEqual([]);
     expect(disconnectedAppendix2.status).toEqual("AWAITING_GROUP");
   });
 });
