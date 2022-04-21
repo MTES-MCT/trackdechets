@@ -1,7 +1,10 @@
-import { Form, Status } from "@prisma/client";
+import { EmitterType, Form, Status } from "@prisma/client";
 import { UserInputError } from "apollo-server-core";
 import { RepositoryFnDeps } from "../types";
 import buildFindAppendix2FormsById from "./findAppendix2FormsById";
+import buildUpdateForm from "./update";
+import { getFinalDestinationSiret } from "../../database";
+import buildUpdateAppendix2Forms from "./updateAppendix2Forms";
 
 class FormFraction {
   form: Form;
@@ -10,14 +13,52 @@ class FormFraction {
 
 class SetAppendix2Args {
   form: Form;
-  initialForms: FormFraction[];
+  appendix2: FormFraction[];
 }
 
 export type SetAppendix2Fn = (args: SetAppendix2Args) => Promise<Form[]>;
 
+/**
+ * Set appendix2 on a groupement form by creating associations between
+ * the groupement form and the initial forms in the intermdediary table
+ * FormGroupement.
+ *
+ * - Previous associations not specified in the input should be discarded
+ * - If a form was already part of the appendix2, the quantity of the association
+ * should be updated
+ *
+ * This function should also recompute the status (AWAITING_GROUP or GROUPED) of the initial
+ * forms and the value of the field `quantityGrouped`.
+ *
+ * A form is considered GROUPED if its total quantity has been affected and if all
+ * its groupement forms are SEALED
+ *
+ * The function should also prevent affecting more quantity of an initial form
+ * than that has been received at the TTR site.
+ */
 const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
   ({ prisma, user }) =>
-  async ({ form, initialForms }) => {
+  async ({ form, appendix2 }) => {
+    // check groupement form type is APPENDIX2
+    if (appendix2.length && form.emitterType !== EmitterType.APPENDIX2) {
+      throw new UserInputError(
+        "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+      );
+    }
+
+    // check emitter of groupement form matches destination of initial form
+    for (const { form: initialForm } of appendix2) {
+      const appendix2DestinationSiret = await getFinalDestinationSiret(
+        initialForm
+      );
+
+      if (form.emitterCompanySiret !== appendix2DestinationSiret) {
+        throw new UserInputError(
+          `Le bordereau ${initialForm.id} n'est pas en possession du nouvel émetteur`
+        );
+      }
+    }
+
     const findAppendix2FormsById = buildFindAppendix2FormsById({
       prisma,
       user
@@ -25,100 +66,99 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
 
     const currentAppendix2Forms = await findAppendix2FormsById(form.id);
 
-    // delete existing appendix2 not present in input
-    const formsToUngroup = currentAppendix2Forms.filter(
-      f => !initialForms.map(({ form }) => form.id).includes(f.id)
-    );
-
-    await prisma.formGroupement.deleteMany({
+    // check grouped forms have status AWAITING_GROUP or GROUPED
+    const unawaitingGroupForm = await prisma.form.findFirst({
       where: {
-        initialFormId: { in: formsToUngroup.map(f => f.id) },
-        nextFormId: form.id
+        id: { in: appendix2.map(({ form }) => form.id) },
+        status: { not: { in: [Status.AWAITING_GROUP, Status.GROUPED] } }
       }
     });
-    // make sure to reset status to AWAITING_GROUP
-    await prisma.form.updateMany({
-      where: {
-        status: Status.GROUPED,
-        id: { in: formsToUngroup.map(f => f.id) }
-      },
-      data: { status: Status.AWAITING_GROUP }
-    });
 
-    // update or create new appendix2
-    for (const initialFormFraction of initialForms) {
-      // make sure total quantity is not greater than quantity received, or throw an exception
-      const aggregate = await prisma.formGroupement.aggregate({
-        _sum: { quantity: true },
-        where: {
-          initialFormId: initialFormFraction.form.id,
-          nextFormId: { not: form.id }
-        }
-      });
+    if (unawaitingGroupForm) {
+      throw new UserInputError(
+        `Le bordereau ${unawaitingGroupForm.id} n'est pas en attente de regroupement`
+      );
+    }
 
-      if (
-        aggregate._sum.quantity + initialFormFraction.quantity >
-        initialFormFraction.form.quantityReceived
-      ) {
-        const availableQuantity =
-          initialFormFraction.form.quantityReceived - aggregate._sum.quantity;
+    // check quantity grouped in each grouped form is not greater than quantity received
+    for (const { form: initialForm, quantity } of appendix2) {
+      if (quantity <= 0) {
         throw new UserInputError(
-          `La quantité restante à regrouper sur le BSDD ${initialFormFraction.form.readableId} est de ${availableQuantity}.
-          Vous tentez de regrouper ${initialFormFraction.quantity}.`
+          "La quantité regroupée doit être strictement supérieure à 0"
+        );
+      }
+      const quantityGroupedInOtherForms =
+        (
+          await prisma.formGroupement.aggregate({
+            _sum: { quantity: true },
+            where: {
+              initialFormId: initialForm.id,
+              nextFormId: { not: form.id }
+            }
+          })
+        )._sum.quantity ?? 0;
+
+      const quantityLeftToGroup =
+        initialForm.quantityReceived - quantityGroupedInOtherForms;
+
+      if (quantityLeftToGroup === 0) {
+        throw new UserInputError(
+          `Le bordereau ${initialForm.readableId} a déjà été regroupé en totalité`
         );
       }
 
-      if (
-        currentAppendix2Forms
-          .map(f => f.id)
-          .includes(initialFormFraction.form.id)
-      ) {
+      if (quantity > quantityLeftToGroup) {
+        throw new UserInputError(
+          `La quantité restante à regrouper sur le BSDD ${initialForm.readableId} est de ${quantityLeftToGroup}T.
+        Vous tentez de regrouper ${quantity}T.`
+        );
+      }
+    }
+
+    // delete existing appendix2 not present in input
+    await prisma.formGroupement.deleteMany({
+      where: {
+        nextFormId: form.id,
+        initialFormId: { notIn: appendix2.map(({ form }) => form.id) }
+      }
+    });
+
+    // update or create new appendix2
+    for (const { form: initialForm, quantity } of appendix2) {
+      if (currentAppendix2Forms.map(f => f.id).includes(initialForm.id)) {
         // update existing appendix2
         await prisma.formGroupement.updateMany({
           where: {
             nextFormId: form.id,
-            initialFormId: initialFormFraction.form.id
+            initialFormId: initialForm.id
           },
-          data: { quantity: initialFormFraction.quantity }
+          data: { quantity: quantity }
         });
       } else {
         // create appendix2
         await prisma.formGroupement.create({
           data: {
             nextFormId: form.id,
-            initialFormId: initialFormFraction.form.id,
-            quantity: initialFormFraction.quantity
+            initialFormId: initialForm.id,
+            quantity: quantity
           }
         });
       }
-
-      // set status to GROUPED if all groupement forms are SEALED and total quantity grouped is equal
-      // to quantity received
-      const formGroupements = await prisma.formGroupement.findMany({
-        where: { initialFormId: initialFormFraction.form.id },
-        include: { nextForm: true }
-      });
-
-      const { allSealed, quantityGrouped } = formGroupements.reduce(
-        (acc, gr) => {
-          return {
-            allSealed: acc.allSealed && gr.nextForm.status === "SEALED",
-            quantityGrouped: acc.quantityGrouped + gr.quantity
-          };
-        },
-        { allSealed: true, quantityGrouped: 0 }
-      );
-
-      if (
-        quantityGrouped == initialFormFraction.form.quantityReceived &&
-        allSealed
-      ) {
-        await prisma.form.update({
-          where: { id: initialFormFraction.form.id },
-          data: { status: "GROUPED" }
-        });
-      }
     }
+
+    const dirtyFormIds = [
+      ...new Set([
+        ...currentAppendix2Forms.map(f => f.id),
+        ...appendix2.map(({ form }) => form.id)
+      ])
+    ];
+
+    const dirtyForms = await prisma.form.findMany({
+      where: { id: { in: dirtyFormIds } }
+    });
+
+    const updateAppendix2Forms = buildUpdateAppendix2Forms({ prisma, user });
+    await updateAppendix2Forms(dirtyForms);
 
     return findAppendix2FormsById(form.id);
   };

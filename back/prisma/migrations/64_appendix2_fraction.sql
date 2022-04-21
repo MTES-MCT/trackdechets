@@ -35,4 +35,5 @@ DROP INDEX "_FormAppendix2RootFormIdIdx";
 -- AlterTable
 ALTER TABLE "Form" DROP COLUMN "appendix2RootFormId";
 
-
+-- AlterTable
+ALTER TABLE "Form" ADD COLUMN "quantityGrouped" DOUBLE PRECISION NOT NULL DEFAULT 0;

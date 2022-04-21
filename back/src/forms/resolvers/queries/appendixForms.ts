@@ -32,19 +32,9 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
     }
   });
 
-  const r = await prisma.$queryRaw`SELECT "id"
-  FROM "default$default"."Form" F
-  WHERE "status" = 'AWAITING_GROUP'
-  AND "quantityReceived" > (
-  SELECT COALESCE(SUM(g."quantity"), 0)
-  FROM "default$default"."Form" f
-  LEFT JOIN "default$default"."FormGroupement" g
-  ON f."id" = g."initialFormId"
-  WHERE f."id" = F."id");`;
-
-  console.log(r);
-
-  return queriedForms.map(f => expandFormFromDb(f));
+  return queriedForms
+    .filter(f => f.quantityGrouped < f.quantityReceived)
+    .map(f => expandFormFromDb(f));
 };
 
 export default appendixFormsResolver;

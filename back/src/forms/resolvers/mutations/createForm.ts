@@ -62,14 +62,14 @@ const createFormResolver = async (
 
   const form = flattenFormInput(formContent);
 
-  if (appendix2Forms?.length) {
-    if (formContent.emitter?.type !== EmitterType.APPENDIX2) {
-      throw new UserInputError(
-        "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
-      );
-    }
-    await validateAppendix2Forms(appendix2Forms, form);
-  }
+  // if (appendix2Forms?.length) {
+  //   if (formContent.emitter?.type !== EmitterType.APPENDIX2) {
+  //     throw new UserInputError(
+  //       "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+  //     );
+  //   }
+  //   await validateAppendix2Forms(appendix2Forms, form);
+  // }
 
   const formCreateInput: Prisma.FormCreateInput = {
     ...form,
@@ -107,7 +107,7 @@ const createFormResolver = async (
     );
     await formRepository.setAppendix2({
       form: newForm,
-      initialForms: initialForms.map(f => ({
+      appendix2: initialForms.map(f => ({
         form: f,
         quantity: f.quantityReceived
       }))

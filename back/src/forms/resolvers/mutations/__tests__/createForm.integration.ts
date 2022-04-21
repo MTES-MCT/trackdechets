@@ -610,12 +610,13 @@ describe("Mutation.createForm", () => {
   });
 
   it("should disallow creating a form with an appendix 2 if the appendix2 form is already part of another appendix", async () => {
-    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
 
     const appendix2 = await formFactory({
       ownerId: user.id,
       opt: {
         status: "AWAITING_GROUP",
+        recipientCompanySiret: ttr.siret,
         quantityReceived: 1
       }
     });
@@ -623,8 +624,8 @@ describe("Mutation.createForm", () => {
       ownerId: user.id,
       opt: {
         status: "DRAFT",
-        recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret,
+        recipientCompanyName: ttr.name,
+        recipientCompanySiret: ttr.siret,
         grouping: {
           create: {
             initialFormId: appendix2.id,
@@ -638,7 +639,7 @@ describe("Mutation.createForm", () => {
       emitter: {
         type: EmitterType.APPENDIX2,
         company: {
-          siret: company.siret
+          siret: ttr.siret
         }
       },
       appendix2Forms: [{ id: appendix2.id }]
@@ -650,7 +651,7 @@ describe("Mutation.createForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le bordereau ${appendix2.id} est déjà associé à un autre bordereau dans le cadre d'un regroupement avec annexe 2`,
+        message: `Le bordereau ${appendix2.readableId} a déjà été regroupé en totalité`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

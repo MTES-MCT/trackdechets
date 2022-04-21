@@ -1,8 +1,7 @@
-import { EmitterType, Form, Prisma, Status } from "@prisma/client";
+import { EmitterType, Prisma } from "@prisma/client";
 import { isDangerous, WASTES_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
-  AppendixFormInput,
   MutationUpdateFormArgs,
   ResolversParentTypes
 } from "../../../generated/graphql/types";
@@ -15,15 +14,9 @@ import {
   flattenFormInput,
   flattenTemporaryStorageDetailInput
 } from "../../form-converter";
-import { FormRepository, getFormRepository } from "../../repository";
+import { getFormRepository } from "../../repository";
 import { FormSirets } from "../../types";
-import {
-  draftFormSchema,
-  sealedFormSchema,
-  validateAppendix2Forms
-} from "../../validation";
-import transitionForm from "../../workflow/transitionForm";
-import { EventType } from "../../workflow/types";
+import { draftFormSchema, sealedFormSchema } from "../../validation";
 import { UserInputError } from "apollo-server-core";
 
 function validateArgs(args: MutationUpdateFormArgs) {
@@ -74,15 +67,6 @@ const updateFormResolver = async (
     throw new UserInputError(
       "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
     );
-  }
-
-  if (appendix2Forms) {
-    await validateAppendix2Forms(appendix2Forms, { ...existingForm, ...form });
-    // await handleFormsRemovedFromAppendix(
-    //   existingForm,
-    //   appendix2Forms,
-    //   formRepository
-    // );
   }
 
   // Construct form update payload
@@ -167,72 +151,15 @@ const updateFormResolver = async (
       appendix2Forms.map(({ id }) => getFormOrFormNotFound({ id }))
     );
     await formRepository.setAppendix2({
-      form: existingForm,
-      initialForms: initialForms.map(f => ({
+      form: updatedForm,
+      appendix2: initialForms.map(f => ({
         form: f,
         quantity: f.quantityReceived
       }))
     });
   }
 
-  //await handleFormsAddedToAppendix(updatedForm, user, formRepository);
-
   return expandFormFromDb(updatedForm);
 };
 
 export default updateFormResolver;
-
-async function handleFormsRemovedFromAppendix(
-  existingForm: Form,
-  appendix2Forms: AppendixFormInput[],
-  formRepository: FormRepository
-) {
-  if (existingForm.status !== Status.SEALED) {
-    return;
-  }
-
-  // When the form is sealed & has an appendix 2
-  // form no longer in the appendix must be set back to AWAITING_GROUP
-  const previousAppendix2Forms = await formRepository.findAppendix2FormsById(
-    existingForm.id
-  );
-
-  if (previousAppendix2Forms.length === 0) {
-    return;
-  }
-
-  const nextAppendix2Ids = appendix2Forms.map(form => form.id);
-
-  const appendix2ToUngroup = previousAppendix2Forms.filter(
-    groupedAppendix => !nextAppendix2Ids.includes(groupedAppendix.id)
-  );
-  await formRepository.updateMany(
-    appendix2ToUngroup.map(form => form.id),
-    {
-      status: Status.AWAITING_GROUP
-    }
-  );
-}
-
-async function handleFormsAddedToAppendix(
-  updatedForm: Form,
-  user: Express.User,
-  formRepository: FormRepository
-) {
-  if (updatedForm.status !== Status.SEALED) {
-    return;
-  }
-
-  // Mark potential additions to the appendix 2 as Grouped if the form is already sealed
-  const appendix2Forms = await formRepository.findAppendix2FormsById(
-    updatedForm.id
-  );
-  const promises = appendix2Forms
-    .filter(form => form.status !== Status.GROUPED)
-    .map(appendix => {
-      return transitionForm(user, appendix, {
-        type: EventType.MarkAsGrouped
-      });
-    });
-  await Promise.all(promises);
-}

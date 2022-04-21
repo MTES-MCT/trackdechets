@@ -362,6 +362,8 @@ model Form {
   transportSegments                  TransportSegment[]
   groupedIn                          FormGroupement[]        @relation("GroupedIn")
   grouping                           FormGroupement[]        @relation("Grouping")
+  // quantité affectée à des bordereaux de regroupement
+  quantityGrouped                    Float                   @default(0)
 
   ownerId              String
   owner                User                  @relation(fields: [ownerId], references: [id])
@@ -384,9 +386,9 @@ model FormGroupement {
   initialForm   Form   @relation(fields: [initialFormId], references: [id], name: "GroupedIn")
   quantity      Float
 
+  @@unique([nextFormId, initialFormId])
   @@index([nextFormId], map: "_FormGroupementNextFormId")
   @@index([initialFormId], map: "_FormGroupementInitialFormId")
-  @@unique([nextFormId, initialFormId])
 }
 
 enum RevisionRequestStatus {

@@ -16,6 +16,7 @@ import { CountRevisionRequestsFn } from "./formRevisionRequest/countRevisionRequ
 import { CreateRevisionRequestFn } from "./formRevisionRequest/createRevisionRequest";
 import { GetRevisionRequestByIdFn } from "./formRevisionRequest/getRevisionRequestById";
 import { RefuseRevisionRequestFn } from "./formRevisionRequest/refuseRevisionRequestApproval";
+import { UpdateAppendix2Forms } from "./form/updateAppendix2Forms";
 
 export type PrismaTransaction = Omit<
   PrismaClient,
@@ -54,6 +55,7 @@ export type FormActions = {
   count: CountFormsFn;
   removeAppendix2: RemoveAppendix2Fn;
   setAppendix2: SetAppendix2Fn;
+  updateAppendix2Forms: UpdateAppendix2Forms;
 };
 
 export type FormRevisionRequestActions = {
