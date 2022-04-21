@@ -54,7 +54,6 @@ export default function DasriPackagings({
                           name={`${name}.${idx}.quantity`}
                           placeholder="Nombre de colis"
                           min="1"
-                          max={10}
                           disabled={disabled}
                         />
                       </div>
