@@ -13,10 +13,13 @@ const FORM = gql`
     form(id: $id, readableId: $readableId) {
       id
       groupedIn {
-        id
-        wasteDetails {
-          code
+        form {
+          id
+          wasteDetails {
+            code
+          }
         }
+        quantity
       }
     }
   }
@@ -25,7 +28,7 @@ const FORM = gql`
 describe("groupedIn resolver", () => {
   afterAll(resetDatabase);
 
-  it("should return null if form is not grouped into another one", async () => {
+  it("should return an empty array if form is not grouped into another one", async () => {
     const { user, company: emitter } = await userWithCompanyFactory(
       UserRole.MEMBER
     );
@@ -37,7 +40,7 @@ describe("groupedIn resolver", () => {
     const { data } = await query<Pick<Query, "form">>(FORM, {
       variables: { id: form.id }
     });
-    expect(data.form.groupedIn).toEqual(null);
+    expect(data.form.groupedIn).toEqual([]);
   });
 
   it("should return form this one is grouped into", async () => {
@@ -52,7 +55,8 @@ describe("groupedIn resolver", () => {
       opt: {
         emitterCompanySiret: emitterCompany.siret,
         emitterCompanyAddress: "40 boulevard Voltaire 13001 Marseille",
-        recipientCompanySiret: collectorCompany.siret
+        recipientCompanySiret: collectorCompany.siret,
+        quantityReceived: 1
       }
     });
 
@@ -73,11 +77,14 @@ describe("groupedIn resolver", () => {
     const { data } = await query<Pick<Query, "form">>(FORM, {
       variables: { id: appendix2.id }
     });
-    expect(data.form.groupedIn).toEqual(
+    expect(data.form.groupedIn).toEqual([
       expect.objectContaining({
-        id: groupementForm.id,
-        wasteDetails: { code: groupementForm.wasteDetailsCode }
+        quantity: appendix2.quantityReceived,
+        form: {
+          id: groupementForm.id,
+          wasteDetails: { code: groupementForm.wasteDetailsCode }
+        }
       })
-    );
+    ]);
   });
 });

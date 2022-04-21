@@ -62,7 +62,8 @@ describe("appendix2Forms resolver", () => {
       opt: {
         emitterCompanySiret: emitterCompany.siret,
         emitterCompanyAddress: "40 boulevard Voltaire 13001 Marseille",
-        recipientCompanySiret: collectorCompany.siret
+        recipientCompanySiret: collectorCompany.siret,
+        quantityReceived: 1
       }
     });
 
@@ -119,7 +120,8 @@ describe("appendix2Forms resolver", () => {
         emitterWorkSiteAddress: "Rue du chantier",
         emitterWorkSiteCity: "Annonay",
         emitterWorkSitePostalCode: "07100",
-        recipientCompanySiret: collectorCompany.siret
+        recipientCompanySiret: collectorCompany.siret,
+        quantityReceived: 1
       }
     });
     const regroupementForm = await formFactory({

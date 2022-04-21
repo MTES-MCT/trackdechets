@@ -490,7 +490,7 @@ describe("Mutation.markAsSealed", () => {
     const destination = await destinationFactory();
     const appendix2 = await formFactory({
       ownerId: user.id,
-      opt: { status: "AWAITING_GROUP" }
+      opt: { status: "AWAITING_GROUP", quantityReceived: 1 }
     });
     const form = await formFactory({
       ownerId: user.id,

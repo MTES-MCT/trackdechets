@@ -365,7 +365,8 @@ describe("Test Form reception", () => {
       opt: {
         status: "GROUPED",
         processingOperationDone: "R 13",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -374,7 +375,8 @@ describe("Test Form reception", () => {
       opt: {
         status: "GROUPED",
         processingOperationDone: "R 13",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 

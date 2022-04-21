@@ -602,7 +602,8 @@ describe("Test Form reception", () => {
       opt: {
         status: "GROUPED",
         processingOperationDone: "R 13",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -611,7 +612,8 @@ describe("Test Form reception", () => {
       opt: {
         status: "GROUPED",
         processingOperationDone: "R 13",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -662,11 +664,13 @@ describe("Test Form reception", () => {
     expect(updatedForm1.status).toEqual("AWAITING_GROUP");
     expect(updatedForm2.status).toEqual("AWAITING_GROUP");
 
-    const appendix2Forms = await prisma.form
-      .findUnique({
-        where: { id: groupementForm.id }
+    const appendix2Forms = (
+      await prisma.formGroupement.findMany({
+        where: { nextFormId: groupementForm.id },
+        include: { initialForm: true }
       })
-      .appendix2Forms();
+    ).map(g => g.initialForm);
+
     expect(appendix2Forms).toEqual([]);
   });
 });

@@ -382,7 +382,8 @@ describe("checkCanRed", () => {
       ownerId: initialEmitter.id,
       opt: {
         emitterCompanySiret: initialEmitterCompany.siret,
-        recipientCompanySiret: ttrCompany.siret
+        recipientCompanySiret: ttrCompany.siret,
+        quantityReceived: 1
       }
     });
 

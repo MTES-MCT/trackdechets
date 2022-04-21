@@ -454,7 +454,8 @@ describe("mutation.markAsProcessed", () => {
     const appendix2 = await formFactory({
       ownerId: user.id,
       opt: {
-        status: "GROUPED"
+        status: "GROUPED",
+        quantityReceived: 1
       }
     });
     const form = await formFactory({

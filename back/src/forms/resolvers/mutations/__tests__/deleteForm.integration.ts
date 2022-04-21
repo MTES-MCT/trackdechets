@@ -154,7 +154,8 @@ describe("Mutation.deleteForm", () => {
       opt: {
         emitterCompanySiret: emitter.siret,
         recipientCompanySiret: ttr.siret,
-        status: "AWAITING_GROUP"
+        status: "AWAITING_GROUP",
+        quantityReceived: 1
       }
     });
     const form = await formFactory({

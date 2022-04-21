@@ -583,7 +583,8 @@ describe("Mutation.createForm", () => {
       ownerId: user.id,
       opt: {
         status: "AWAITING_GROUP",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -597,12 +598,12 @@ describe("Mutation.createForm", () => {
       appendix2Forms: [{ id: appendix2.id }]
     };
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<Pick<Mutation, "createForm">>(
-      CREATE_FORM,
-      {
-        variables: { createFormInput }
-      }
-    );
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: { createFormInput }
+    });
 
     expect(errors).toEqual(undefined);
     expect(data.createForm.appendix2Forms[0].id).toBe(appendix2.id);
@@ -614,7 +615,8 @@ describe("Mutation.createForm", () => {
     const appendix2 = await formFactory({
       ownerId: user.id,
       opt: {
-        status: "AWAITING_GROUP"
+        status: "AWAITING_GROUP",
+        quantityReceived: 1
       }
     });
     await formFactory({

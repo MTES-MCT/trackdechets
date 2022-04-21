@@ -346,8 +346,11 @@ export const detailFormFragment = gql`
       name
     }
     groupedIn {
-      id
-      readableId
+      quantity
+      form {
+        id
+        readableId
+      }
     }
     appendix2Forms {
       readableId

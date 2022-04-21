@@ -196,7 +196,7 @@ Fraction d'un bordereau initial affectée à un bordereau de regroupement
 """
 type FormFraction {
   "Bordereau de regroupement"
-  form: Form
+  form: Form!
   "Quantité du bordereau initial affectée au bordereau de regroupement"
   quantity: Float!
 }

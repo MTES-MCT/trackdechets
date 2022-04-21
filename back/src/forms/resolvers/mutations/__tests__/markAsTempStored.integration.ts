@@ -368,7 +368,8 @@ describe("{ mutation { markAsTempStored } }", () => {
       opt: {
         status: "GROUPED",
         processingOperationDone: "R 13",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -377,7 +378,8 @@ describe("{ mutation { markAsTempStored } }", () => {
       opt: {
         status: "GROUPED",
         processingOperationDone: "R 13",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 

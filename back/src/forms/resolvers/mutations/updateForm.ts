@@ -162,7 +162,7 @@ const updateFormResolver = async (
 
   const updatedForm = await formRepository.update({ id }, formUpdateInput);
 
-  if (appendix2Forms?.length) {
+  if (appendix2Forms) {
     const initialForms = await Promise.all(
       appendix2Forms.map(({ id }) => getFormOrFormNotFound({ id }))
     );

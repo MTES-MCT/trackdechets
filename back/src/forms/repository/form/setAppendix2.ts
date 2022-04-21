@@ -1,4 +1,4 @@
-import { Form } from "@prisma/client";
+import { Form, Status } from "@prisma/client";
 import { UserInputError } from "apollo-server-core";
 import { RepositoryFnDeps } from "../types";
 import buildFindAppendix2FormsById from "./findAppendix2FormsById";
@@ -25,52 +25,24 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
 
     const currentAppendix2Forms = await findAppendix2FormsById(form.id);
 
-    // update quantity of already existing appendix2 forms
-    const shouldBeUpdated = initialForms.filter(f =>
-      currentAppendix2Forms.map(f => f.id).includes(f.form.id)
-    );
-    for (const initialFormFraction of shouldBeUpdated) {
-      // make sure total quantity is not greater than quantity received, or throw an exception
-      const aggregate = await prisma.formGroupement.aggregate({
-        _sum: { quantity: true },
-        where: {
-          initialFormId: initialFormFraction.form.id,
-          nextFormId: { not: form.id }
-        }
-      });
-
-      if (
-        aggregate._sum.quantity + initialFormFraction.quantity >
-        initialFormFraction.form.quantityReceived
-      ) {
-        const availableQuantity =
-          initialFormFraction.form.quantityReceived - aggregate._sum.quantity;
-        throw new UserInputError(
-          `La quantité restante à regrouper sur le BSDD ${initialFormFraction.form.readableId} est de ${availableQuantity}.
-          Vous tentez de regrouper ${initialFormFraction.quantity}.`
-        );
-      }
-
-      await prisma.formGroupement.updateMany({
-        where: {
-          nextFormId: form.id,
-          initialFormId: initialFormFraction.form.id
-        },
-        data: { quantity: initialFormFraction.quantity }
-      });
-    }
-
     // delete existing appendix2 not present in input
-    const shouldBeDeleted = currentAppendix2Forms.filter(
+    const formsToUngroup = currentAppendix2Forms.filter(
       f => !initialForms.map(({ form }) => form.id).includes(f.id)
     );
+
     await prisma.formGroupement.deleteMany({
-      where: { id: { in: shouldBeDeleted.map(f => f.id) } }
+      where: {
+        initialFormId: { in: formsToUngroup.map(f => f.id) },
+        nextFormId: form.id
+      }
     });
     // make sure to reset status to AWAITING_GROUP
     await prisma.form.updateMany({
-      where: { status: "GROUPED", id: { in: shouldBeDeleted.map(f => f.id) } },
-      data: { status: "AWAITING_GROUP" }
+      where: {
+        status: Status.GROUPED,
+        id: { in: formsToUngroup.map(f => f.id) }
+      },
+      data: { status: Status.AWAITING_GROUP }
     });
 
     // update or create new appendix2

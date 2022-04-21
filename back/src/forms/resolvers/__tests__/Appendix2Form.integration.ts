@@ -45,7 +45,8 @@ describe("Appendix2Form", () => {
       opt: {
         status: Status.AWAITING_GROUP,
         emitterCompanySiret: emitter.siret,
-        recipientCompanySiret: collector.siret
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
       }
     });
 

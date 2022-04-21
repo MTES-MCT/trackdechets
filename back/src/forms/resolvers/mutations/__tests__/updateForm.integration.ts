@@ -728,14 +728,16 @@ describe("Mutation.updateForm", () => {
       ownerId: user.id,
       opt: {
         status: "GROUPED",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
     const toBeAppendixForm = await formFactory({
       ownerId: user.id,
       opt: {
         status: "AWAITING_GROUP",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -785,7 +787,8 @@ describe("Mutation.updateForm", () => {
       ownerId: user.id,
       opt: {
         status: "GROUPED",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -822,7 +825,11 @@ describe("Mutation.updateForm", () => {
     const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
     const initialAppendix2 = await formFactory({
       ownerId: user.id,
-      opt: { status: Status.AWAITING_GROUP, recipientCompanySiret: ttr.siret }
+      opt: {
+        status: Status.AWAITING_GROUP,
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
+      }
     });
 
     const form = await formFactory({
@@ -831,7 +838,12 @@ describe("Mutation.updateForm", () => {
         status: Status.SEALED,
         emitterCompanySiret: ttr.siret,
         emitterType: EmitterType.APPENDIX2,
-        appendix2Forms: { connect: [{ id: initialAppendix2.id }] }
+        grouping: {
+          create: {
+            initialFormId: initialAppendix2.id,
+            quantity: initialAppendix2.quantityReceived
+          }
+        }
       }
     });
 
@@ -862,7 +874,8 @@ describe("Mutation.updateForm", () => {
       ownerId: user.id,
       opt: {
         status: "GROUPED",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -948,7 +961,8 @@ describe("Mutation.updateForm", () => {
       ownerId: user.id,
       opt: {
         status: "GROUPED",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -990,7 +1004,8 @@ describe("Mutation.updateForm", () => {
       ownerId: user.id,
       opt: {
         status: "AWAITING_GROUP",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
