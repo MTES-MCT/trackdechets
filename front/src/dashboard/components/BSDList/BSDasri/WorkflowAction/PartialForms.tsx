@@ -330,7 +330,6 @@ export const removeSections = (input, signatureType: SignatureType) => {
     groupingKey,
     synthesizingKey,
     synthesizedInKey,
-    transporterTransportPackagingsKey,
     transporterTransportVolumeKey,
   ];
   const mapping = {
@@ -344,6 +343,8 @@ export const removeSections = (input, signatureType: SignatureType) => {
       emitterKey,
       destinationKey,
       vatNumberKey,
+      transporterTransportPackagingsKey,
+
       ...common,
     ],
     [BsdasriSignatureType.Transport]: [emitterKey, destinationKey, ...common],
