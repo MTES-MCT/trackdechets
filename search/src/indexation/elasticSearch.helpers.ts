@@ -66,7 +66,6 @@ export const sireneIndexConfig: IndexProcessConfig = {
   mappings: standardMapping,
   headers: [
     "siren",
-    "statutDiffusionUniteLegale",
     "unitePurgeeUniteLegale",
     "dateCreationUniteLegale",
     "sigleUniteLegale",

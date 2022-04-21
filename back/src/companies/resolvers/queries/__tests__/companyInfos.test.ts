@@ -139,7 +139,8 @@ describe("companyInfos search with a VAT number", () => {
       isRegistered: true,
       ecoOrganismeAgreements: [],
       companyTypes: [],
-      installation: undefined
+      installation: undefined,
+      statutDiffusionEtablissement: "O"
     });
   });
 
@@ -161,7 +162,8 @@ describe("companyInfos search with a VAT number", () => {
       isRegistered: false,
       companyTypes: [],
       ecoOrganismeAgreements: [],
-      installation: undefined
+      installation: undefined,
+      statutDiffusionEtablissement: "O"
     });
   });
 });

@@ -6,6 +6,20 @@ Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
 
+# [2022.05.1] ~16/05/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2022.04.2] ~25/04/2022
 
 #### :rocket: Nouvelles fonctionnalités
@@ -20,6 +34,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Il ne doit pas être possible de renseigner un champ `appendix2Forms` non vide lorsque `emitter { type }` est différent de `APPENDIX2` [PR 1306](https://github.com/MTES-MCT/trackdechets/pull/1306)
 - Prise en compte de la quantité acceptée plutôt que la quantité estimée lors du calcul automatique de la quantité du bordereau de regroupement [PR 1306](https://github.com/MTES-MCT/trackdechets/pull/1306)
 - Correction d'un bug d'affichage sur les révisions: lorsque plusieurs validations étaient nécessaires, les boutons d'action restaient affichés même après que la validation ait été acceptée [PR 1332](https://github.com/MTES-MCT/trackdechets/pull/1332)
+- Ne pas afficher les établissements non-diffusibles et ajout des statuts de diffusion selon l'INSEE sur CompanyPublic [PR 1341](https://github.com/MTES-MCT/trackdechets/pull/1341)
 
 #### :boom: Breaking changes
 #### :nail_care: Améliorations

@@ -39,6 +39,7 @@ const COMPANY_INFOS = gql`
         }
       }
       ecoOrganismeAgreements
+      statutDiffusionEtablissement
     }
   }
 `;
@@ -59,9 +60,13 @@ export default function CompanyInfo() {
   });
 
   const [geoInfo, setGeoInfo] = useState<GeoInfo | null>(null);
+  const [nonDiffusible, setNonDiffusible] = useState<true | false>(false);
 
   // Retrieves geo information from api-adresse.data.gouv.fr
   useEffect(() => {
+    if (data?.companyInfos.statutDiffusionEtablissement === "N") {
+      setNonDiffusible(true);
+    }
     if (data?.companyInfos?.address) {
       fetch(
         `https://api-adresse.data.gouv.fr/search/?q=${data.companyInfos.address}`
@@ -104,10 +109,10 @@ export default function CompanyInfo() {
       <div className="section">
         <div className="container">
           <CompanyHeader
-            name={company.name}
+            name={!nonDiffusible ? company.name : "non diffusible"}
             siret={company.siret || company.vatNumber}
-            naf={company.naf}
-            libelleNaf={company.libelleNaf}
+            naf={!nonDiffusible ? company.naf : "non diffusible"}
+            libelleNaf={!nonDiffusible ? company.libelleNaf : "non diffusible"}
           />
 
           <CompanyRegistration
@@ -118,8 +123,8 @@ export default function CompanyInfo() {
           <CompanyDisclaimer />
 
           <div className="columns">
-            <CompanyContact company={company} />
-            {geoInfo && (
+            {!nonDiffusible && <CompanyContact company={company} />}
+            {geoInfo && !nonDiffusible && (
               <CompanyMap lng={geoInfo.longitude} lat={geoInfo.latitude} />
             )}
           </div>

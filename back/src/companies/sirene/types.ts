@@ -11,7 +11,7 @@ export interface SearchResponseDataGouv {
     siret: string;
     etat_administratif: string;
     activite_principale: string;
-    statut_diffusion: string;
+    statut_diffusion: "O" | "N";
     numero_voie: string;
     indice_repetition: string;
     type_voie: string;
@@ -53,6 +53,7 @@ interface EtablissementInsee {
     codeCommuneEtablissement: string;
   };
   periodesEtablissement: PeriodeEtablissementInsee[];
+  statutDiffusionEtablissement: "O" | "N";
 }
 
 // Response from https://api.insee.fr/entreprises/siret/V3/siret/<VOTRE_SIRET>
@@ -74,6 +75,8 @@ export interface FullTextSearchResponseDataGouv {
     activite_principale: string;
     libelle_activite_principale: string;
     geo_adresse: string;
+    etat_administratif: string;
+    statut_diffusion: "O" | "N";
   }[];
 }
 
@@ -91,11 +94,14 @@ export interface SearchResponseSocialGouv {
   address: string;
   codeCommuneEtablissement: string;
   label: string;
+  statutDiffusionEtablissement: "O" | "N";
 }
 
 export interface MatchingEtablissementSocialGouv {
   siret: string;
   address: string;
+  etatAdministratif: string;
+  statutDiffusionEtablissement: "O" | "N";
 }
 
 export interface MatchingEntrepriseSocialGouv {

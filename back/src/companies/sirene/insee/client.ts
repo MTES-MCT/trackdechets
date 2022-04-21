@@ -47,7 +47,8 @@ function searchResponseToCompany({
     codeCommune: etablissement.adresseEtablissement.codeCommuneEtablissement,
     name: etablissement.uniteLegale.denominationUniteLegale,
     naf: lastPeriod?.activitePrincipaleEtablissement,
-    libelleNaf: ""
+    libelleNaf: "",
+    statutDiffusionEtablissement: etablissement.statutDiffusionEtablissement
   };
 
   if (company.naf) {

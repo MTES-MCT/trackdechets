@@ -110,6 +110,8 @@ async function getSiretCompanyInfo(siret: string): Promise<SireneSearchResult> {
     if (anonymousCompany) {
       return {
         ...anonymousCompany,
+        // required to avoid leaking non diffusible data to the public
+        statutDiffusionEtablissement: "N",
         etatAdministratif: "A",
         naf: anonymousCompany.codeNaf
       };
@@ -118,7 +120,9 @@ async function getSiretCompanyInfo(siret: string): Promise<SireneSearchResult> {
   }
 }
 
-function getVatCompanyInfo(vatNumber: string): Promise<CompanyVatSearchResult> {
+async function getVatCompanyInfo(
+  vatNumber: string
+): Promise<CompanyVatSearchResult> {
   if (isFRVat(vatNumber)) {
     throw new UserInputError(
       "Une entreprise française doit être identifiée par son SIRET et pas par sa TVA intracommunautaire",
@@ -127,6 +131,10 @@ function getVatCompanyInfo(vatNumber: string): Promise<CompanyVatSearchResult> {
       }
     );
   }
-
-  return searchVat(vatNumber);
+  const result = await searchVat(vatNumber);
+  return {
+    ...result,
+    // to ensure compatibility with the common type
+    statutDiffusionEtablissement: "O"
+  };
 }

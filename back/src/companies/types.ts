@@ -14,6 +14,7 @@ export interface CompanySearchResult extends CompanyBaseIdentifiers {
   isRegistered: boolean;
   companyTypes: CompanyType[];
   ecoOrganismeAgreements?: URL[];
+  statutDiffusionEtablissement: "O" | "N";
 }
 /**
  * Company interface only with identifiers

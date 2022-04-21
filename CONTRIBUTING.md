@@ -253,21 +253,21 @@ $ ./restore-db.sh
 #### Procédure manuelle
 
 1. Télécharger un backup de la base de donnée nommée `prisma` que vous souhaitez restaurer
-2. Démarrer le container Postgres
+2. Démarrer le conteneur postgres
    ```
    docker-compose -f docker-compose.dev.yml up --build postgres
    ```
-3. Copier le fichier de backup à l'intérieur du container
+3. Copier le fichier de backup à l'intérieur du conteneur
    ```
    # docker cp <fichier backup> <nom du container postgres>:<chemin où copier>
    # exemple :
    docker cp backup trackdechets_postgres_1:/var/backups
    ```
-4. Accéder au container Postgres
+4. Accéder au conteneur postgres
    ```
    docker exec -it $(docker ps -aqf "name=trackdechets_postgres") bash
    ```
-5. Restaurer le backup
+5. Restaurer le backup depus le conteneur postgres
    ```
    dropdb -U trackdechets prisma
    createdb -U trackdechets prisma
@@ -278,7 +278,8 @@ $ ./restore-db.sh
    # quit psql CTRL-D
    pg_restore -U trackdechets -d prisma --clean /var/backups/backup
    ```
-
+6. Quitter le shell du conteneur postgres
+7. Appliquer les migrations présentent dans votre branche actuelle du code source
 
 ### Créer un tampon de signature pour la génération PDF
 

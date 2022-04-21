@@ -25,6 +25,7 @@ describe("searchCompany", () => {
           code_commune: "13201",
           libelle_commune: "MARSEILLE",
           activite_principale: "62.01Z",
+          statut_diffusion: "O",
           unite_legale: {
             denomination: "CODE EN STOCK"
           }
@@ -42,7 +43,8 @@ describe("searchCompany", () => {
       codeCommune: "13201",
       name: "CODE EN STOCK",
       naf: "62.01Z",
-      libelleNaf: "Programmation informatique"
+      libelleNaf: "Programmation informatique",
+      statutDiffusionEtablissement: "O"
     };
     expect(company).toEqual(expected);
   });
@@ -140,7 +142,8 @@ describe("searchCompanies", () => {
       name: "CODE EN STOCK",
       naf: "6201Z",
       libelleNaf: "Programmation informatique",
-      etatAdministratif: "A"
+      etatAdministratif: "A",
+      statutDiffusionEtablissement: "O"
     };
     expect(companies[0]).toEqual(expected);
   });
@@ -231,7 +234,8 @@ describe("searchCompanies", () => {
       naf: "4724Z",
       libelleNaf:
         "Commerce de détail de pain, pâtisserie et confiserie en magasin spécialisé",
-      etatAdministratif: "A"
+      etatAdministratif: "A",
+      statutDiffusionEtablissement: "O"
     };
     expect(companies[0]).toEqual(expected);
     expect(axios.get).toHaveBeenCalledWith(

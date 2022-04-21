@@ -2,7 +2,7 @@ export interface SearchStockEtablissement {
   siren: string;
   nic: string;
   siret: string;
-  statutDiffusionEtablissement: string;
+  statutDiffusionEtablissement: "O" | "N";
   dateCreationEtablissement: string;
   trancheEffectifsEtablissement: string;
   anneeEffectifsEtablissement: string;
@@ -47,7 +47,6 @@ export interface SearchStockEtablissement {
   activitePrincipaleEtablissement: string;
   nomenclatureActivitePrincipaleEtablissement: string;
   caractereEmployeurEtablissement: string;
-  statutDiffusionUniteLegale: string;
   unitePurgeeUniteLegale: string;
   dateCreationUniteLegale: string;
   sigleUniteLegale: string;
