@@ -10,20 +10,20 @@ import {
 import { redundant } from "./redundancy";
 import { cache } from "./cache";
 
-const searchCompanyInseeThrottled = backoffIfTestEnvs(
+export const searchCompanyInseeThrottled = backoffIfTestEnvs(
   backoffIfTooManyRequests(searchCompanyInsee, {
     service: "insee"
   })
 );
 
-const searchCompanyDataGouvThrottled = backoffIfTestEnvs(
+export const searchCompanyDataGouvThrottled = backoffIfTestEnvs(
   throttle(searchCompanyDataGouv, {
     service: "data_gouv",
     requestsPerSeconds: 8
   })
 );
 
-const searchCompanySocialGouvThrottled = backoffIfTestEnvs(
+export const searchCompanySocialGouvThrottled = backoffIfTestEnvs(
   throttle(searchCompanySocialGouv, {
     service: "social_gouv",
     requestsPerSeconds: 50
