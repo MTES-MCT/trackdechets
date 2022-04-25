@@ -31,7 +31,7 @@ export async function searchCompany(
     });
   }
 
-  const companyInfo = await getCompanyInfo(cleanClue);
+  const companyInfo = await searchCompanyInfo(cleanClue);
 
   // retrieves trackdechets public CompanyInfo
   // it might be null if the company is not registered in TD
@@ -88,7 +88,7 @@ export const makeSearchCompanies =
 // in index.test.ts
 export const searchCompanies = makeSearchCompanies({ searchCompany });
 
-function getCompanyInfo(
+function searchCompanyInfo(
   clue: string
 ): Promise<SireneSearchResult | CompanyVatSearchResult> {
   if (isSiret(clue)) return getSiretCompanyInfo(clue);

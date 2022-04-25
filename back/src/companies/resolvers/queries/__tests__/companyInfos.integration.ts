@@ -311,7 +311,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
     expect(company).toEqual(expected);
   });
 
-  it("Hidden company in INSEE public data", async () => {
+  it("Hidden company in INSEE and not registered", async () => {
     searchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
     const gqlquery = `
       query {
@@ -331,13 +331,65 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
           }
         }
       }`;
-    const { errors } = await query<any>(gqlquery);
-    expect(errors[0]).toMatchObject({
-      extensions: {
-        code: "FORBIDDEN"
-      },
-      message:
-        "Les informations de cet établissement ne sont pas disponibles car son propriétaire a choisi de ne pas les rendre publiques lors de son enregistrement au Répertoire des Entreprises et des Établissements (SIRENE)"
+    const { data } = await query<any>(gqlquery);
+    expect(data.companyInfos).toMatchObject({
+      address: null,
+      contactEmail: null,
+      contactPhone: null,
+      etatAdministratif: null,
+      installation: null,
+      isRegistered: false,
+      libelleNaf: null,
+      naf: null,
+      name: null,
+      siret: "43317467900046",
+      website: null
+    });
+  });
+
+  it("Hidden company in INSEE and but registered", async () => {
+    searchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
+    await companyFactory({
+      siret: "85001946400013",
+      name: "Code en Stock",
+      contactEmail: "john.snow@trackdechets.fr",
+      contactPhone: "0600000000",
+      website: "https://trackdechets.beta.gouv.fr",
+      companyTypes: {
+        set: [CompanyType.WASTEPROCESSOR]
+      }
+    });
+    const gqlquery = `
+      query {
+        companyInfos(siret: "85001946400013") {
+          siret
+          etatAdministratif
+          name
+          address
+          naf
+          libelleNaf
+          isRegistered
+          contactEmail
+          contactPhone
+          website
+          installation {
+            codeS3ic
+          }
+        }
+      }`;
+    const { data } = await query<any>(gqlquery);
+    expect(data.companyInfos).toMatchObject({
+      address: null,
+      contactEmail: null,
+      contactPhone: null,
+      etatAdministratif: null,
+      installation: null,
+      isRegistered: true,
+      libelleNaf: null,
+      naf: null,
+      name: null,
+      siret: "85001946400013",
+      website: null
     });
   });
 });
