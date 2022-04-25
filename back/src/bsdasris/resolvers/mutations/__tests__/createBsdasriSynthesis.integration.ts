@@ -74,6 +74,11 @@ describe("Mutation.createDasri", () => {
           phone: "06 18 76 02 00",
           mail: "transporteur@test.fr",
           address: "avenue de la mer"
+        },
+        recepisse: {
+          number: "abcd",
+          department: "21",
+          validityLimit: new Date().toISOString()
         }
       },
 
@@ -81,7 +86,7 @@ describe("Mutation.createDasri", () => {
     };
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "createBsdasri">>(
+    const { data, errors } = await mutate<Pick<Mutation, "createBsdasri">>(
       CREATE_DASRI,
       {
         variables: {
@@ -89,7 +94,7 @@ describe("Mutation.createDasri", () => {
         }
       }
     );
-
+    console.log(errors);
     expect(data.createBsdasri.synthesizing.map(bsd => bsd.id)).toEqual([
       toAssociate1.id,
       toAssociate2.id

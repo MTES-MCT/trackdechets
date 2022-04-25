@@ -149,7 +149,7 @@ const COMPANY_INFOS = gql`
 `;
 
 function CurrentCompanyWidget({ disabled = false }) {
-  const { setFieldValue } = useFormikContext();
+  const { values, setFieldValue } = useFormikContext<Bsdasri>();
 
   const { siret } = useParams<{ siret: string }>();
   const { data, loading, error } = useQuery<
@@ -160,18 +160,19 @@ function CurrentCompanyWidget({ disabled = false }) {
     fetchPolicy: "no-cache",
 
     onCompleted: () => {
-      setFieldValue(
-        `transporter.company.mail`,
-        data?.companyInfos?.contactEmail
-      );
-      setFieldValue(
-        `transporter.company.phone`,
-        data?.companyInfos?.contactPhone
-      );
-      setFieldValue(
-        `transporter.company.phone`,
-        data?.companyInfos?.contactPhone
-      );
+      if (!values?.transporter?.company?.mail) {
+        setFieldValue(
+          `transporter.company.mail`,
+          data?.companyInfos?.contactEmail
+        );
+      }
+
+      if (!values?.transporter?.company?.phone) {
+        setFieldValue(
+          `transporter.company.phone`,
+          data?.companyInfos?.contactPhone
+        );
+      }
       if (data?.companyInfos?.transporterReceipt) {
         setFieldValue(
           "transporter.recepisse.number",
@@ -243,6 +244,7 @@ function CurrentCompanyWidget({ disabled = false }) {
               name={`transporter.company.phone`}
               placeholder="Numéro"
               className={`td-input`}
+              disabled={disabled}
             />
           </label>
 

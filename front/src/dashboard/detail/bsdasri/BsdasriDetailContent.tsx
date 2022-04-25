@@ -95,7 +95,9 @@ const Emitter = ({ form }: { form: Bsdasri }) => {
         />
         <DetailRow value={emitter?.emission?.volume} label="Volume" units="l" />
 
-        <Dasripackaging packagings={emitter?.emission?.packagings} />
+        {form.type !== BsdasriType.Synthesis && (
+          <Dasripackaging packagings={emitter?.emission?.packagings} />
+        )}
       </div>
       <div className={styles.detailGrid}>
         {emitter?.emission?.isTakenOverWithoutEmitterSignature && (
@@ -355,13 +357,6 @@ export default function BsdasriDetailContent({
               <dd> {form?.grouping?.join(", ")}</dd>
             </div>
           )}
-
-          {form?.synthesizing?.length && (
-            <div className={styles.detailGrid}>
-              <dt>Bordereau associés:</dt>
-              <dd> {form?.synthesizing.map(el => el.id)?.join(", ")}</dd>
-            </div>
-          )}
         </div>
       </div>
 
@@ -482,7 +477,7 @@ const Dasripackaging = ({
                 </td>
 
                 <td>{row.quantity}</td>
-                <td>{row.volume} l</td>
+                <td className="tw-whitespace-no-wrap">{row.volume} l</td>
               </tr>
             ))}
           </tbody>

@@ -1,33 +1,62 @@
 import React from "react";
 import { formatDate } from "common/datetime";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+  TableRowDigest,
+} from "common/components";
+
 export const InitialDasris = ({ initialBsdasris }) => {
   if (!initialBsdasris?.length) {
     return <div>Aucun bordereau associé</div>;
   }
+
   return (
-    <table className="td-table">
-      <thead>
-        <tr className="td-table__head-tr">
-          <th>Id</th>
-          <th>Quantité</th>
-          <th>Volume</th>
-          <th>Poids</th>
-          <th>Date d'enlèvement</th>
-          <th>Code postal</th>
-        </tr>
-      </thead>
-      <tbody>
+    <Table style={{ tableLayout: "fixed" }}>
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell>Id</TableHeaderCell>
+          <TableHeaderCell>Quantité</TableHeaderCell>
+          <TableHeaderCell>Volume</TableHeaderCell>
+          <TableHeaderCell>Poids</TableHeaderCell>
+          <TableHeaderCell>Enlèvement</TableHeaderCell>
+          <TableHeaderCell>Code postal</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
         {initialBsdasris.map(el => (
-          <tr key={el.id}>
-            <td>{el.id}</td>
-            <td>{el.quantity}</td>
-            <td>{el.volume}</td>
-            <td>{el.weight}</td>
-            <td>{formatDate(el.takenOverAt)}</td>
-            <td>{el.postalCode}</td>
-          </tr>
+          <TableRow key={el.id}>
+            <TableCell>{el.id}</TableCell>
+            <TableCell>{el.quantity}</TableCell>
+            <TableCell>{el.volume}</TableCell>
+            <TableCell>{el.weight || "Pesée non effectuée"}</TableCell>
+            <TableCell>{formatDate(el.takenOverAt)}</TableCell>
+            <TableCell>{el.postalCode}</TableCell>
+          </TableRow>
         ))}
-      </tbody>
-    </table>
+        <TableRowDigest>
+          <TableCell>
+            <strong>Total</strong>{" "}
+          </TableCell>
+          <TableCell>
+            {initialBsdasris.reduce((prev, curr) => prev + curr.quantity, 0)}
+          </TableCell>
+          <TableCell>
+            {initialBsdasris.reduce((prev, curr) => prev + curr.volume, 0)}
+          </TableCell>
+
+          <TableCell>
+            {initialBsdasris.reduce((prev, curr) => prev + curr.weight, 0) ||
+              "N/A"}
+          </TableCell>
+          <TableCell>{null}</TableCell>
+          <TableCell>{null}</TableCell>
+        </TableRowDigest>
+      </TableBody>
+    </Table>
   );
 };

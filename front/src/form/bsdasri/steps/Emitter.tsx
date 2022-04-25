@@ -37,16 +37,18 @@ export function SynthesisEmitter({
   editionDisabled = false,
   emissionEmphasis = false,
 }) {
+  const { values } = useFormikContext<Bsdasri>();
   const disabled = !!status && status !== BsdasriStatus.Initial;
 
   return (
     <>
       <h3 className="form__section-heading">Bordereau de synthèse DASRI</h3>
       <p>
-        Vous apparaitrez comme producteur et transporteur du bordereau de
-        synthèse
+        Votre établissement {values?.emitter?.company?.name} (
+        {values?.emitter?.company?.siret}) apparaîtra comme le détenteur et le
+        collecteur/transporteur sur ce bordereau de synthèse.
       </p>
-      <BsdasriSelectorForSynthesis disabled={disabled} />
+
       <div
         className={classNames("form__row", {
           "field-emphasis": emissionEmphasis,
@@ -70,6 +72,7 @@ export function SynthesisEmitter({
           />
         </fieldset>
       </div>
+      <BsdasriSelectorForSynthesis disabled={disabled} />
       <div
         className={classNames("form__row", {
           "field-emphasis": emissionEmphasis,

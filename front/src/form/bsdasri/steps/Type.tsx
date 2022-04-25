@@ -12,7 +12,7 @@ import {
 } from "generated/graphql/types";
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-
+import Tooltip from "common/components/Tooltip";
 type Props = { disabled: boolean };
 
 const COMPANY_INFOS = gql`
@@ -29,16 +29,26 @@ const COMPANY_INFOS = gql`
 const COMMON_OPTIONS = [
   {
     title: "simple",
+    explanation:
+      "Bordereau nécessaire à la collecte initiale chez un producteur/détenteur",
     value: BsdasriType.Simple,
   },
   {
     title: "de groupement",
+    explanation:
+      "Bordereau qui permet de grouper les BSDASRI simples et les déchets associés depuis un site relevant de la rubrique ICPE 2718",
+
     value: BsdasriType.Grouping,
   },
 ];
 const TRANSPORTER_OPTIONS = [
   {
     title: "de synthèse",
+
+    explanation: `Bordereau qui permet de faire la synthèse de BSDASRI simples qui ont été pris en charge 
+      par le collecteur au statut "collecté" pour simplifier la prise en charge par le destinataire
+      - ce bordereau ne peut être établi que par un collecteur/transporteur`,
+
     value: BsdasriType.Synthesis,
   },
 ];
@@ -101,19 +111,27 @@ export function Type({ disabled }: Props) {
       <h4 className="form__section-heading">Type de BSDASRI</h4>
 
       <div className="form__row">
-        <p>J'édite un BSDASRI :</p>
+        <p id="type-radio-group">J'édite un BSDASRI :</p>
       </div>
 
-      <div className="form__row">
+      <div
+        className="form__row"
+        role="radiogroup"
+        aria-labelledby="type-radio-group"
+      >
         {typeOptions.map(option => (
-          <Field
-            key={option.value}
-            disabled={disabled}
-            name="type"
-            id={option.value}
-            label={option.title}
-            component={RadioButton}
-          />
+          <label className="tw-block tw-flex tw-items-start" key={option.value}>
+            <Field
+              type="radio"
+              disabled={disabled}
+              name="type"
+              id={option.value}
+              value={option.value}
+              className="td-radio"
+            />
+            {option.title}
+            <Tooltip msg={option.explanation} />
+          </label>
         ))}
       </div>
     </>

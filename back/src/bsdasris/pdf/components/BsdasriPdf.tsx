@@ -491,7 +491,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               checked={bsdasri?.type === BsdasriType.GROUPING}
               readOnly
             />{" "}
-            Groupement de déchets en transit (massification)
+            Groupement de DASRI sur un site relevant de la rubrique 2718
           </p>
           <p>
             <input
@@ -499,7 +499,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               checked={bsdasri?.type === BsdasriType.SYNTHESIS}
               readOnly
             />{" "}
-            Bordereau de synthèse de BSDASRI / DASRI dans un transport
+            Synthèse de bordereaux de DASRI simples, pris en charge par le collecteur et au statut "collecté"
           </p>
           <h3 className="TextAlignCenter">
             Bordereau(x) associé(s) constituant l’historique de la traçabilité

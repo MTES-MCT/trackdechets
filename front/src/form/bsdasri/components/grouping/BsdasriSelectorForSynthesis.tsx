@@ -46,6 +46,7 @@ export default function BsdasriSelectorForSynthesis({ disabled }) {
         id: values?.id,
       },
       fetchPolicy: "network-only",
+      skip: !values?.id,
     }
   );
 
