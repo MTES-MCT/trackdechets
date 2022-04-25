@@ -25,6 +25,11 @@
   font-size: 14px;
   padding: 8px 20px;
   border-bottom: 1px solid $grey-light;
+  
+}
+
+.TableRowDigest .TableCell{
+  border-top: 3px solid $grey-light;
 }
 
 .TableHeaderCell {

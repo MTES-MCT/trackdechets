@@ -427,7 +427,7 @@ describe("mutation.markAsProcessed", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Destination ultérieure prévue: Le siret de l'entreprise est obligatoire"
+          "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire"
       })
     ]);
   });

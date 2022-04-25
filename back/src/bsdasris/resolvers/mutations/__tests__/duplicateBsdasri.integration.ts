@@ -4,6 +4,8 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
 import { Mutation } from "../../../../generated/graphql/types";
+import { BsdasriType } from "@prisma/client";
+
 const DUPLICATE_DASRI = `
 mutation DuplicateDasri($id: ID!){
   duplicateBsdasri(id: $id)  {
@@ -73,6 +75,42 @@ describe("Mutation.duplicateBsdasri", () => {
       })
     ]);
   });
+
+  it.each([BsdasriType.GROUPING, BsdasriType.SYNTHESIS])(
+    "should disallow %p  bsdasri duplication",
+    async dasriType => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const dasri = await bsdasriFactory({
+        opt: {
+          ...initialData(company),
+          type: dasriType
+        }
+      });
+
+      const { mutate } = makeClient(user); // emitter
+
+      const { errors } = await mutate<Pick<Mutation, "duplicateBsdasri">>(
+        DUPLICATE_DASRI,
+        {
+          variables: {
+            id: dasri.id
+          }
+        }
+      );
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Les dasris de synthèse ou de groupement ne sont pas duplicables",
+          extensions: expect.objectContaining({
+            code: ErrorCode.FORBIDDEN
+          })
+        })
+      ]);
+    }
+  );
+
   it("should duplicate a  dasri", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 

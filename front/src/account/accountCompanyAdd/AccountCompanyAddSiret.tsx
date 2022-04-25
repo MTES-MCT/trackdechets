@@ -113,9 +113,7 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
         {({ setFieldValue }) => (
           <Form className={styles.companyAddForm}>
             <div className={styles.field}>
-              <label className={`text-right ${styles.bold}`}>
-                SIRET ou numéro TVA pour un transporteur de l'UE
-              </label>
+              <label className={`text-right ${styles.bold}`}>SIRET</label>
               <div className={styles.field__value}>
                 <Field
                   name="siret"
@@ -126,6 +124,9 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
                   }}
                   disabled={isDisabled}
                 />
+                <p className="tw-font-bold">
+                  ou numéro TVA pour un transporteur de l'UE
+                </p>
                 {import.meta.env.VITE_ALLOW_TEST_COMPANY === "true" && (
                   <button
                     className={`tw-block tw-mt-1 tw-underline ${styles.smaller}`}

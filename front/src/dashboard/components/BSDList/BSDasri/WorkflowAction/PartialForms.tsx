@@ -1,29 +1,58 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { RedErrorMessage } from "common/components";
-import { BsdasriSignatureType } from "generated/graphql/types";
+import { BsdasriSignatureType, BsdasriStatus } from "generated/graphql/types";
 import Packagings from "form/bsdasri/components/packagings/Packagings";
 import WeightWidget from "form/bsdasri/components/Weight";
 import DateInput from "form/common/components/custom-inputs/DateInput";
-import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
+import Acceptation, {
+  AcceptOnlyField,
+} from "form/bsdasri/components/acceptation/Acceptation";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
+
 import {
   ExtraSignatureType,
   SignatureType,
 } from "dashboard/components/BSDList/BSDasri/types";
-import { Field } from "formik";
-import { omitDeep } from "common/omitDeep";
+import { Field, useFormikContext } from "formik";
+import omitDeep from "omit-deep-lodash";
 import { getInitialWeightFn } from "form/bsdasri/utils/initial-state";
+import { Bsdasri, BsdasriType } from "generated/graphql/types";
+import Transport from "form/bsdasri/steps/Transport";
 
-export function ProducerSignatureForm() {
+export function EmitterSignatureForm() {
   return (
     <>
       <div className="form__row">
-        <Field name="emitter.emission.packagingInfos" component={Packagings} />
+        <label>
+          Personne à contacter
+          <Field
+            type="text"
+            name="emitter.company.contact"
+            className="td-input"
+          />
+        </label>
+
+        <RedErrorMessage name="emitter.company.contact" />
+      </div>
+      <div className="form__row">
+        <label>
+          Téléphone ou Fax
+          <Field
+            type="text"
+            name="emitter.company.phone"
+            className="td-input"
+          />
+        </label>
+
+        <RedErrorMessage name="emitter.company.phone" />
+      </div>
+      <div className="form__row">
+        <Field name="emitter.emission.packagings" component={Packagings} />
       </div>
       <h4 className="form__section-heading">Quantité remise</h4>
       <div className="form__row">
         <WeightWidget
-          switchLabel="Je souhaite ajouter un poids"
+          switchLabel="Je préciser une quantité"
           dasriPath="emitter.emission"
           getInitialWeightFn={getInitialWeightFn}
         />
@@ -40,6 +69,46 @@ export function ProducerSignatureForm() {
   );
 }
 export function TransportSignatureForm() {
+  return (
+    <>
+      <div className="form__row">
+        <label>
+          Personne à contacter
+          <Field
+            type="text"
+            name="transporter.company.contact"
+            className="td-input"
+          />
+        </label>
+
+        <RedErrorMessage name="transporter.company.contact" />
+      </div>
+      <div className="form__row">
+        <label>
+          Téléphone ou Fax
+          <Field
+            type="text"
+            name="transporter.company.phone"
+            className="td-input"
+          />
+        </label>
+
+        <RedErrorMessage name="transporter.company.phone" />
+      </div>
+
+      <Transport status={BsdasriStatus.SignedByProducer} />
+    </>
+  );
+}
+
+export function SynthesisTransportSignatureForm() {
+  const { setFieldValue, values } = useFormikContext<Bsdasri>();
+
+  // is always accepted for synthesis
+  useEffect(() => {
+    setFieldValue(`transporter.transport.acceptation.status`, "ACCEPTED");
+  }, []);
+
   return (
     <>
       <div className="form__row">
@@ -83,12 +152,6 @@ export function TransportSignatureForm() {
       </div>
 
       <div className="form__row">
-        <Field
-          name="transporter.transport.acceptation"
-          component={Acceptation}
-        />
-      </div>
-      <div className="form__row">
         <label>
           Date de prise en charge
           <div className="td-date-wrapper">
@@ -109,7 +172,7 @@ export function TransportSignatureForm() {
       <h4 className="form__section-heading">Quantité transportée</h4>
 
       <WeightWidget
-        switchLabel="Je souhaite ajouter un poids"
+        switchLabel="Je souhaite préciser le poids"
         dasriPath="transporter.transport"
         getInitialWeightFn={getInitialWeightFn}
       />
@@ -118,14 +181,51 @@ export function TransportSignatureForm() {
 }
 
 export function ReceptionSignatureForm() {
+  const { values, setFieldValue } = useFormikContext<Bsdasri>();
+
+  // is always accepted for synthesis
+  useEffect(() => {
+    if (values.type === BsdasriType.Synthesis) {
+      setFieldValue(`destination.reception.acceptation.status`, "ACCEPTED");
+    }
+  }, []);
+
   return (
     <>
       <div className="form__row">
-        <Field
-          name="destination.reception.acceptation"
-          component={Acceptation}
-        />
+        <label>
+          Personne à contacter
+          <Field
+            type="text"
+            name="destination.company.contact"
+            className="td-input"
+          />
+        </label>
+
+        <RedErrorMessage name="destination.company.contact" />
       </div>
+      <div className="form__row">
+        <label>
+          Téléphone ou Fax
+          <Field
+            type="text"
+            name="destination.company.phone"
+            className="td-input"
+          />
+        </label>
+        <RedErrorMessage name="destination.company.phone" />
+      </div>
+      <div className="form__row">
+        <Field name="destination.reception.packagings" component={Packagings} />
+      </div>
+      {values.type !== BsdasriType.Synthesis && (
+        <div className="form__row">
+          <Field
+            name="destination.reception.acceptation"
+            component={Acceptation}
+          />
+        </div>
+      )}
       <div className="form__row">
         <label>
           Date de réception
@@ -214,28 +314,48 @@ export function OperationSignatureForm() {
 
 export const removeSections = (input, signatureType: SignatureType) => {
   const emitterKey = "emitter";
-
   const wasteKey = "waste";
   const ecoOrganismeKey = "ecoOrganisme";
   const transporterKey = "transporter";
   const destinationKey = "destination";
   const receptionKey = "reception";
   const operationKey = "operation";
-  const companyKey = "company";
+  const wholeCompanyKey = "company";
+  const companySiretKey = "siret";
+  const companyNameKey = "name";
   const customInfoKey = "customInfo";
-  const groupingBsdasrisKey = "grouping";
+  const groupingKey = "grouping";
+  const synthesizingKey = "synthesizing";
+  const synthesizedInKey = "synthesizedIn";
   const identificationKey = "identification";
+  const vatNumberKey = "vatNumber";
+  const transporterTransportPackagingsKey = "transporter.transport.packagings";
+  const transporterTransportVolumeKey = "transporter.transport.volume";
+
   const common = [
     wasteKey,
-    companyKey,
+    companySiretKey,
+    companyNameKey,
     ecoOrganismeKey,
     customInfoKey,
-    groupingBsdasrisKey,
+    groupingKey,
+    synthesizingKey,
+    synthesizedInKey,
+    transporterTransportVolumeKey,
   ];
   const mapping = {
     [BsdasriSignatureType.Emission]: [
       transporterKey,
       destinationKey,
+      ...common,
+    ],
+
+    [ExtraSignatureType.SynthesisTakeOver]: [
+      emitterKey,
+      destinationKey,
+      vatNumberKey,
+      transporterTransportPackagingsKey,
+
       ...common,
     ],
     [BsdasriSignatureType.Transport]: [emitterKey, destinationKey, ...common],
@@ -254,9 +374,11 @@ export const removeSections = (input, signatureType: SignatureType) => {
       emitterKey,
       transporterKey,
       receptionKey,
+      wholeCompanyKey,
       identificationKey,
       ...common,
     ],
   };
-  return omitDeep(input, mapping[signatureType]);
+  const { type, ...payload } = input;
+  return omitDeep(payload, mapping[signatureType]);
 };

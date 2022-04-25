@@ -103,7 +103,9 @@ const machine = Machine<any, BsdasriEvent>(
 
 export default machine;
 
-const emissionNotSigned = ctx => !ctx?.emitterSignedBy && !ctx.emitterSignedAt;
+const emissionNotSigned = ctx => {
+  return !ctx?.emitterSignedBy && !ctx.emitterSignedAt;
+};
 const transportNotSigned = ctx =>
   !ctx?.transporterSignedBy && !ctx.transporterSignedAt;
 const receptionNotSigned = ctx =>

@@ -11,9 +11,17 @@ export const GET_BSDASRI = gql`
   ${fullDasriFragment}
 `;
 
-export const CREATE_BSDASRI = gql`
+export const CREATE_DRAFT_BSDASRI = gql`
   mutation CreateDraftBsdasri($input: BsdasriInput!) {
     createDraftBsdasri(input: $input) {
+      id
+    }
+  }
+`;
+
+export const CREATE_BSDASRI = gql`
+  mutation CreateBsdasri($input: BsdasriInput!) {
+    createBsdasri(input: $input) {
       id
     }
   }

@@ -937,11 +937,14 @@ model Bsdasri {
   operationSignatoryId                        String?
   destinationOperationSignatureDate           DateTime?               @db.Timestamptz(6)
   destinationOperationSignatureAuthor         String?
-  // associations
-  grouping                                    Bsdasri[]               @relation("BsdasriToBsdasri")
-  groupedIn                                   Bsdasri?                @relation("BsdasriToBsdasri", fields: [groupedInId], references: [id])
+  // grouping
+  grouping                                    Bsdasri[]               @relation("BsdasriGrouping")
+  groupedIn                                   Bsdasri?                @relation("BsdasriGrouping", fields: [groupedInId], references: [id])
   groupedInId                                 String?
-
+  //synthesis
+  synthesizing                                Bsdasri[]               @relation("BsdasriSynthesizing")
+  synthesizedIn                               Bsdasri?                @relation("BsdasriSynthesizing", fields: [synthesizedInId], references: [id])
+  synthesizedInId                             String?
   @@index([emitterCompanySiret], map: "_BsdasriEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsdasriTransporterCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsdasriDestinationCompanySiretIdx")

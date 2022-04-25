@@ -3,7 +3,7 @@ type Mutation {
   Crée un nouveau dasri en brouillon
   """
   createDraftBsdasri(
-    "Payload de création d'un dasri brouillon"
+    "Payload de création d'un dasri brouillon. Ne permet pas la création de dasri de synthèse."
     input: BsdasriInput!
   ): Bsdasri!
 
@@ -142,7 +142,7 @@ type Mutation {
     input: BsdasriSignatureWithSecretCodeInput!
   ): Bsdasri
   """
-  Duplique un bordereau Dasri
+  Duplique un bordereau Dasri (non applicable pour les bordereau de synthese ou de groupement)
   """
   duplicateBsdasri("ID d'un Bsdasri" id: ID!): Bsdasri
 

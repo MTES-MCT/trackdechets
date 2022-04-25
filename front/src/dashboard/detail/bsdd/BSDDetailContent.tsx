@@ -280,6 +280,26 @@ type BSDDetailContentProps = {
   refetch?: () => void;
 };
 
+const GroupedIn = ({ form }: { form: Form }) => {
+  const [downloadPdf] = useDownloadPdf({
+    variables: { id: form.id },
+  });
+  return (
+    <DetailRow
+      value={
+        <span>
+          {form.readableId} (
+          <button className="link" onClick={() => downloadPdf()}>
+            Télécharger le PDF
+          </button>
+          )
+        </span>
+      }
+      label={`Annexé au bordereau n°`}
+    />
+  );
+};
+
 /**
  * Handle recipient or destination in case of temp storage
  */
@@ -329,12 +349,7 @@ const Recipient = ({
         />
         <DateRow value={form.processedAt} label="Traitement effectué le" />
         <DetailRow value={form.processedBy} label="Traitement effectué par" />
-        {form.groupedIn && (
-          <DetailRow
-            value={form.groupedIn.readableId}
-            label={`Annexé au bordereau n°`}
-          />
-        )}
+        {form.groupedIn && <GroupedIn form={form.groupedIn} />}
       </div>
     </>
   );

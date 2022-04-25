@@ -21,7 +21,7 @@ import {
 import { Bsdasri } from "@prisma/client";
 import prisma from "../../../prisma";
 import { expandFormFromDb } from "../../../forms/form-converter";
-import { unflattenBsdasri } from "../../../bsdasris/converter";
+import { expandBsdasriFromDB } from "../../../bsdasris/converter";
 import { expandVhuFormFromDb } from "../../../bsvhu/converter";
 import { expandBsdaFromDb } from "../../../bsda/converter";
 
@@ -231,7 +231,7 @@ async function buildDasris(dasris: Bsdasri[]) {
   // deduplicate sirets
   const uniqueSirets = Array.from(new Set(emitterSirets));
 
-  // build an array of sirets allwoing direct takeover
+  // build an array of sirets allowing direct takeover
   const allows = (
     await prisma.company.findMany({
       where: {
@@ -246,7 +246,7 @@ async function buildDasris(dasris: Bsdasri[]) {
 
   // expand dasris and insert `allowDirectTakeOver`
   return dasris.map(bsd => ({
-    ...unflattenBsdasri(bsd),
+    ...expandBsdasriFromDB(bsd),
     allowDirectTakeOver: allows.includes(bsd.emitterCompanySiret)
   }));
 }

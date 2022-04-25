@@ -5,3 +5,4 @@
 logs/
 .data
 docker-compose.override.yml
+.nvmrc

@@ -39,12 +39,6 @@ Ces index sont des alias et les commandes se chargent de faire un roulement des 
 
 En cas d'erreur durant l'indexation l'index alias en place n'est pas ecrasé, ce qui permet de continuer en production avec l'index existant sans encombres si l'indexation plante.
 
-- Si une archive zip locale des données existe, il est possible de passer le téléchargement en passant ces variables d'environnement:
-
-```
-export INSEE_SIRET_ZIP_PATH=~/Téléchargements/StockEtablissement_utf8.zip
-export INSEE_SIRENE_ZIP_PATH=~/Téléchargements/StockUniteLegale_utf8.zip
-```
 Puis de relancer chaque script
 
 - En production, nous avons choisi de fonctionner avec Scalingo pour le serveur ElasticSearch

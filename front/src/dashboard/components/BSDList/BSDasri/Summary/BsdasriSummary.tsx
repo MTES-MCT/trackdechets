@@ -2,16 +2,18 @@ import * as React from "react";
 import { Bsdasri } from "generated/graphql/types";
 import { BsdasriWasteSummary } from "./BsdasriWasteSummary";
 import { BsdasriJourneySummary } from "./BsdasriJourneySummary";
+import { BsdasriSynthesisSummary } from "./BsdasriSynthesisSummary";
 
-interface BdasriSummary {
+interface BdasriSummaryProps {
   bsdasri: Bsdasri;
 }
 
-export function BdasriSummary({ bsdasri }: BdasriSummary) {
+export function BdasriSummary({ bsdasri }: BdasriSummaryProps) {
   return (
     <>
       <BsdasriWasteSummary bsdasri={bsdasri} />
       <BsdasriJourneySummary bsdasri={bsdasri} />
+      <BsdasriSynthesisSummary bsdasri={bsdasri} />
     </>
   );
 }

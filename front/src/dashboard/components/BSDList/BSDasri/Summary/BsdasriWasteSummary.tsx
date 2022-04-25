@@ -13,13 +13,14 @@ interface BsdasriWasteSummaryProps {
 
 export function BsdasriWasteSummary({ bsdasri }: BsdasriWasteSummaryProps) {
   const section = {
-    INITIAL: "emission",
-    SIGNED_BY_PRODUCER: "emission",
-    SENT: "transport",
-    RECEIVED: "reception",
-    PROCESSED: "reception",
+    INITIAL: ["emitter", "emission"],
+    SIGNED_BY_PRODUCER: ["emitter", "emission"],
+    SENT: ["transporter", "transport"],
+    RECEIVED: ["destination", "reception"],
+    PROCESSED: ["destination", "reception"],
   }[bsdasri["bsdasriStatus"]];
 
+  const packagings = bsdasri?.[section[0]]?.[section[1]]?.packagings;
   return (
     <DataList>
       <DataListItem>
@@ -39,14 +40,14 @@ export function BsdasriWasteSummary({ bsdasri }: BsdasriWasteSummaryProps) {
       <DataListItem>
         <DataListTerm>Volume</DataListTerm>
         <DataListDescription>
-          {bsdasri?.[section]?.volume} litres
+          {bsdasri?.[section[0]]?.[section[1]]?.volume} litres
         </DataListDescription>
       </DataListItem>
       <DataListItem>
         <DataListTerm>Contenant(s)</DataListTerm>
         <DataListDescription>
-          {!!bsdasri[section]?.packagingInfos?.length &&
-            bsdasri[section]?.packagingInfos
+          {!!packagings?.length &&
+            packagings
               .map(
                 packaging =>
                   `${packaging.quantity}  ${packaging.other} ${packaging.type} (${packaging.volume} litre(s))`

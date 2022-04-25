@@ -7,8 +7,10 @@ import {
   Bsdasri,
   FormCompany,
   BsdasriPackaging,
+  BsdasriType,
 } from "generated/graphql/types";
 import routes from "common/routes";
+import { useDownloadPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/useDownloadPdf";
 
 import {
   IconWarehouseDelivery,
@@ -17,7 +19,7 @@ import {
   IconBSDasri,
   IconDuplicateFile,
 } from "common/components/Icons";
-
+import { InitialDasris } from "./InitialDasris";
 import QRCodeIcon from "react-qr-code";
 
 import styles from "dashboard/detail/common/BSDDetailContent.module.scss";
@@ -94,7 +96,9 @@ const Emitter = ({ form }: { form: Bsdasri }) => {
         />
         <DetailRow value={emitter?.emission?.volume} label="Volume" units="l" />
 
-        <Dasripackaging packagings={emitter?.emission?.packagings} />
+        {form.type !== BsdasriType.Synthesis && (
+          <Dasripackaging packagings={emitter?.emission?.packagings} />
+        )}
       </div>
       <div className={styles.detailGrid}>
         {emitter?.emission?.isTakenOverWithoutEmitterSignature && (
@@ -308,11 +312,17 @@ export default function BsdasriDetailContent({
       <div className={styles.detailSummary}>
         <h4 className={styles.detailTitle}>
           <IconBSDasri className="tw-mr-2" />
+
           <span className={styles.detailStatus}>
             [{form.isDraft ? "Brouillon" : statusLabels[form["bsdasriStatus"]]}]
           </span>
           {!form.isDraft && <span>{form.id}</span>}
-          {!!form?.grouping?.length && <span>Bordereau de groupement</span>}
+          {form?.type === BsdasriType.Grouping && (
+            <span className="tw-ml-2">Bordereau de groupement</span>
+          )}
+          {form?.type === BsdasriType.Synthesis && (
+            <span className="tw-ml-2">Bordereau de synthèse</span>
+          )}
         </h4>
 
         <div className={styles.detailContent}>
@@ -325,6 +335,7 @@ export default function BsdasriDetailContent({
             )}
           </div>
           <div className={styles.detailGrid}>
+            {form?.synthesizedIn && <SynthesizedIn form={form.synthesizedIn} />}
             <DateRow
               value={form.updatedAt}
               label="Dernière action sur le BSD"
@@ -342,14 +353,12 @@ export default function BsdasriDetailContent({
             <dd>{form?.waste?.adr}</dd>
           </div>
 
-          <div className={styles.detailGrid}>
-            {form?.grouping?.length && (
-              <>
-                <dt>Bordereau groupés:</dt>
-                <dd> {form?.grouping?.join(", ")}</dd>
-              </>
-            )}
-          </div>
+          {form?.grouping?.length && (
+            <div className={styles.detailGrid}>
+              <dt>Bordereau groupés:</dt>
+              <dd> {form?.grouping?.join(", ")}</dd>
+            </div>
+          )}
         </div>
       </div>
 
@@ -372,6 +381,12 @@ export default function BsdasriDetailContent({
             <IconRenewableEnergyEarth size="25px" />
             <span className={styles.detailTabCaption}>Destinataire</span>
           </Tab>
+          {form?.type === BsdasriType.Synthesis && (
+            <Tab className={styles.detailTab}>
+              <IconBSDasri style={{ fontSize: "24px" }} />
+              <span className={styles.detailTabCaption}>Bsds associés</span>
+            </Tab>
+          )}
         </TabList>
         {/* Tabs content */}
         <div className={styles.detailTabPanels}>
@@ -391,19 +406,35 @@ export default function BsdasriDetailContent({
               <Recipient form={form} />
             </div>
           </TabPanel>
+          {form?.type === BsdasriType.Grouping && (
+            <TabPanel className={styles.detailTabPanel}>
+              <div className={styles.detailColumns}>
+                <InitialDasris initialBsdasris={form?.grouping} />
+              </div>
+            </TabPanel>
+          )}
+          {form?.type === BsdasriType.Synthesis && (
+            <TabPanel className={styles.detailTabPanel}>
+              <div className={styles.detailColumns}>
+                <InitialDasris initialBsdasris={form?.synthesizing} />
+              </div>
+            </TabPanel>
+          )}
         </div>
       </Tabs>
       <DasriIdentificationNumbers
         identificationNumbers={form?.identification?.numbers}
       />
       <div className={styles.detailActions}>
-        <button
-          className="btn btn--outline-primary"
-          onClick={() => duplicate()}
-        >
-          <IconDuplicateFile size="24px" color="blueLight" />
-          <span>Dupliquer</span>
-        </button>
+        {form.type === BsdasriType.Simple && (
+          <button
+            className="btn btn--outline-primary"
+            onClick={() => duplicate()}
+          >
+            <IconDuplicateFile size="24px" color="blueLight" />
+            <span>Dupliquer</span>
+          </button>
+        )}
       </div>
     </div>
   );
@@ -448,7 +479,7 @@ const Dasripackaging = ({
                 </td>
 
                 <td>{row.quantity}</td>
-                <td>{row.volume} l</td>
+                <td className="tw-whitespace-no-wrap">{row.volume} l</td>
               </tr>
             ))}
           </tbody>
@@ -478,5 +509,25 @@ const AcceptationStatusRow = ({
       <dt>Lot accepté :</dt>
       <dd>{value ? getVerboseAcceptationStatus(value) : ""}</dd>
     </>
+  );
+};
+
+const SynthesizedIn = ({ form }: { form: Bsdasri }) => {
+  const [downloadPdf] = useDownloadPdf({
+    variables: { id: form.id },
+  });
+  return (
+    <DetailRow
+      value={
+        <span>
+          {form.id} (
+          <button className="link" onClick={() => downloadPdf()}>
+            PDF
+          </button>
+          )
+        </span>
+      }
+      label={`Associé au bordereau n°`}
+    />
   );
 };

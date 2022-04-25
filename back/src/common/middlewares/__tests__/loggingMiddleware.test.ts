@@ -2,6 +2,7 @@ import express, { json } from "express";
 import supertest from "supertest";
 import Transport from "winston-transport";
 import logger from "../../../logging/logger";
+import { graphqlQueryParserMiddleware } from "../graphqlQueryParser";
 import loggingMiddleware from "../loggingMiddleware";
 
 const logMock = jest.fn();
@@ -29,6 +30,7 @@ describe("loggingMiddleware", () => {
   const app = express();
   const graphQLPath = "/";
   app.use(json());
+  app.use(graphQLPath, graphqlQueryParserMiddleware()); // We rely on `graphqlQueryParserMiddleware`
   app.use(loggingMiddleware("/"));
   app.get("/hello", (req, res) => {
     res.status(200).send("world");

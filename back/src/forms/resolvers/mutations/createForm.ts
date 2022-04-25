@@ -1,4 +1,5 @@
-import { Prisma } from "@prisma/client";
+import { EmitterType, Prisma } from "@prisma/client";
+import { UserInputError } from "apollo-server-core";
 import { isDangerous } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { eventEmitter, TDEvent } from "../../../events/emitter";
@@ -60,7 +61,12 @@ const createFormResolver = async (
 
   const form = flattenFormInput(formContent);
 
-  if (appendix2Forms) {
+  if (appendix2Forms?.length) {
+    if (formContent.emitter?.type !== EmitterType.APPENDIX2) {
+      throw new UserInputError(
+        "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+      );
+    }
     await validateAppendix2Forms(appendix2Forms, form);
   }
 

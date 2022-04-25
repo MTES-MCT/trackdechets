@@ -1,4 +1,4 @@
-import { BsdasriStatus, Bsdasri } from "@prisma/client";
+import { BsdasriStatus, Bsdasri, BsdasriType } from "@prisma/client";
 import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 
@@ -10,6 +10,7 @@ import { getRegistryFields } from "./registry";
 // |--------------------|---------|-------------|-----------|
 // | initial (draft)    | draft   | draft       | draft     |
 // | initial            | action  | to collect  | follow    |
+// | initial(synthesis) | follow  | to collect  | follow    |
 // | signed_by_producer | follow  | to collect  | follow    |
 // | sent               | follow  | collected   | action    |
 // | received           | follow  | follow      | action    |
@@ -62,7 +63,11 @@ function getWhere(
           setTab(siretsFilters, fieldName, "isDraftFor");
         }
       } else {
-        setTab(siretsFilters, "emitterCompanySiret", "isForActionFor");
+        if (bsdasri.type !== BsdasriType.SYNTHESIS) {
+          // for Synthesis dasri emitter & transporter are the same company, INITIAL bsd should appear in `isToCollectFor` tab
+          setTab(siretsFilters, "emitterCompanySiret", "isForActionFor");
+        }
+
         setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
       }
       break;

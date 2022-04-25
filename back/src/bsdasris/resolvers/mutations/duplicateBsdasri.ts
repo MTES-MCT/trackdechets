@@ -1,4 +1,4 @@
-import { Bsdasri, BsdasriStatus, User } from "@prisma/client";
+import { Bsdasri, BsdasriStatus, User, BsdasriType } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import {
@@ -6,9 +6,11 @@ import {
   MutationResolvers
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
-import { unflattenBsdasri } from "../../converter";
+import { expandBsdasriFromDB } from "../../converter";
 import { getBsdasriOrNotFound } from "../../database";
 import { checkIsBsdasriContributor } from "../../permissions";
+import { ForbiddenError } from "apollo-server-express";
+
 import { indexBsdasri } from "../../elastic";
 /**
  *
@@ -30,6 +32,11 @@ const duplicateBsdasriResolver: MutationResolvers["duplicateBsdasri"] = async (
     id
   });
 
+  if (bsdasri.type !== BsdasriType.SIMPLE) {
+    throw new ForbiddenError(
+      "Les dasris de synthèse ou de groupement ne sont pas duplicables"
+    );
+  }
   await checkIsBsdasriContributor(
     user,
     bsdasri,
@@ -38,7 +45,7 @@ const duplicateBsdasriResolver: MutationResolvers["duplicateBsdasri"] = async (
 
   const newBsdasri = await duplicateBsdasri(user, bsdasri);
   await indexBsdasri(newBsdasri);
-  return unflattenBsdasri(newBsdasri);
+  return expandBsdasriFromDB(newBsdasri);
 };
 
 function duplicateBsdasri(
@@ -86,6 +93,7 @@ function duplicateBsdasri(
     destinationOperationSignatureDate,
     destinationOperationSignatureAuthor,
     groupedInId,
+    synthesizedInId,
     identificationNumbers,
 
     ...fieldsToCopy

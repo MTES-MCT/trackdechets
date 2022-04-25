@@ -141,7 +141,7 @@ describe("Mutation.createDasri", () => {
     );
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Les dasris suivants ne peuvent pas être regroupés ${toRegroup1.id}`,
+        message: `Les dasris suivants ne peuvent pas être inclus dans un bordereau de groupement ${toRegroup1.id}`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -222,7 +222,7 @@ describe("Mutation.createDasri", () => {
       where: { id: toRegroup1.id }
     });
     const grouped2 = await prisma.bsdasri.findUnique({
-      where: { id: toRegroup1.id }
+      where: { id: toRegroup2.id }
     });
     expect(grouped1.groupedInId).toEqual(data.createBsdasri.id);
 

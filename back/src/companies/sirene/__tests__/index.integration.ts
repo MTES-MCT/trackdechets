@@ -1,12 +1,12 @@
-import { UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
 import * as searchCompanyDecorated from "../searchCompany";
 import { searchCompany } from "../../search";
 import { resetDatabase } from "../../../../integration-tests/helper";
+import { AnonymousCompanyError } from "../errors";
 
 const searchCompanySpy = jest.spyOn(searchCompanyDecorated, "default");
 // Mock the fact a siret is not found in SIRENE API's
-searchCompanySpy.mockRejectedValue(new UserInputError("SIRET inconnue"));
+searchCompanySpy.mockRejectedValue(new AnonymousCompanyError());
 
 describe("searchCompany", () => {
   const OLD_ENV = process.env;

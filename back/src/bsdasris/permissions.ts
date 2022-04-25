@@ -1,5 +1,5 @@
-import { User, Bsdasri, BsdasriStatus } from "@prisma/client";
-
+import { User, Bsdasri, BsdasriStatus, BsdasriType } from "@prisma/client";
+import prisma from "../prisma";
 import { getCachedUserSirets } from "../common/redis/users";
 
 import { BsdasriSirets } from "./types";
@@ -26,6 +26,18 @@ export async function isDasriContributorHelper(
   ].filter(Boolean);
 
   return userSirets.some(siret => formSirets.includes(siret));
+}
+
+// Don't call directly in resolver to handle permissions
+export async function isDasriInitialEmitterHelper(user: User, dasriId: string) {
+  const userSirets = await getCachedUserSirets(user.id);
+  const bsdasris = await prisma.bsdasri.findMany({
+    where: { synthesizedIn: { id: dasriId } },
+    select: { emitterCompanySiret: true }
+  });
+  const synthesizedEmitterSirets = bsdasris.map(bsd => bsd.emitterCompanySiret);
+
+  return userSirets.some(siret => synthesizedEmitterSirets.includes(siret));
 }
 
 export async function checkIsBsdasriContributor(
@@ -57,14 +69,33 @@ export async function checkIsBsdasriPublishable(
 
   return true;
 }
+
+/**
+ *
+ * User can read :
+ * - simple bsdasri on which is siret is present
+ * - synthesis bsdasri which associates child dasris whose emitter is user
+ */
 export async function checkCanReadBsdasri(user: User, bsdasri: Bsdasri) {
-  return checkIsBsdasriContributor(
-    user,
-    bsdasri,
+  const isContributor = await isDasriContributorHelper(user, bsdasri);
+  if (isContributor) {
+    return true;
+  }
+
+  if (bsdasri.type === BsdasriType.SYNTHESIS) {
+    const isInitialEmitter = await isDasriInitialEmitterHelper(
+      user,
+      bsdasri.id
+    );
+    if (isInitialEmitter) {
+      return true;
+    }
+  }
+
+  throw new NotFormContributor(
     "Vous n'êtes pas autorisé à accéder à ce bordereau"
   );
 }
-
 export async function checkCanDeleteBsdasri(user: User, bsdasri: Bsdasri) {
   await checkIsBsdasriContributor(
     user,
@@ -78,5 +109,13 @@ export async function checkCanDeleteBsdasri(user: User, bsdasri: Bsdasri) {
     );
   }
 
+  return true;
+}
+
+export function checkCanEditBsdasri(bsdasri: Bsdasri) {
+  if (!!bsdasri.synthesizedInId)
+    throw new ForbiddenError(
+      "Ce bordereau est regroupé dans un bordereau de synthèse, il n'est pas modifiable, aucune signature ne peut y être apposée "
+    );
   return true;
 }

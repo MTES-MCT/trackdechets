@@ -114,6 +114,8 @@ type CompanyPublic {
   codePaysEtrangerEtablissement: String
   "État administratif de l'établissement. A = Actif, F = Fermé"
   etatAdministratif: String
+  "Statut de diffusion de l'établissement selon l'INSEE. O = Oui, N = Non"
+  statutDiffusionEtablissement: String
   "Adresse de l'établissement"
   address: String
   "Code commune de l'établissement"

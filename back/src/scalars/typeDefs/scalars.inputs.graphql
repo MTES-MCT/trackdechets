@@ -22,9 +22,17 @@ input IdFilter {
   _in: [ID!]
 }
 
-"Filtre pour les champs textuelles"
+"Filtre pour les champs textuels"
 input StringFilter {
   _eq: String
   _in: [String!]
   _contains: String
+}
+
+"Filtre pour les listes de chaînes de caractères"
+input StringNullableListFilter {
+  _in: [String!]
+  _eq: [String!]
+  _has: String
+  _hasEvery: [String!]
 }

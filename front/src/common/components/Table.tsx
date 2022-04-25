@@ -66,6 +66,18 @@ export function TableRow({ children, className, ...props }: TableRowProps) {
   );
 }
 
+export function TableRowDigest({
+  children,
+  className,
+  ...props
+}: TableRowProps) {
+  return (
+    <TableRow className={classNames(styles.TableRowDigest, className)}>
+      {children}
+    </TableRow>
+  );
+}
+
 interface TableHeaderCellProps
   extends React.HTMLAttributes<HTMLTableHeaderCellElement> {
   children?: React.ReactNode;

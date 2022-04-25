@@ -5,6 +5,46 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+
+# [2022.05.1] ~16/05/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+# [2022.04.2] ~25/04/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Permettre au producteur initial de télécharger le PDF du BSDD de regroupement depuis le détail du BSDD initial [PR 1306](https://github.com/MTES-MCT/trackdechets/pull/1306)
+- Ajout de filtres sur la query `bsdas`. Il est désormais possible de filtrer par `customInfo` pour le transporteur, émetteur et destinataire. Et de filtrer par plaque d'immatriculation [PR 1330](https://github.com/MTES-MCT/trackdechets/pull/1330)
+- Gestion des dasri de synthèse [PR 1287](https://github.com/MTES-MCT/trackdechets/pull/1287)
+- Destination ultérieure optionnelle en cas de rupture de traçabilité [PR 1302](https://github.com/MTES-MCT/trackdechets/pull/1302)
+
+#### :bug: Corrections de bugs
+
+- Il ne doit pas être possible de renseigner un champ `appendix2Forms` non vide lorsque `emitter { type }` est différent de `APPENDIX2` [PR 1306](https://github.com/MTES-MCT/trackdechets/pull/1306)
+- Prise en compte de la quantité acceptée plutôt que la quantité estimée lors du calcul automatique de la quantité du bordereau de regroupement [PR 1306](https://github.com/MTES-MCT/trackdechets/pull/1306)
+- Correction d'un bug d'affichage sur les révisions: lorsque plusieurs validations étaient nécessaires, les boutons d'action restaient affichés même après que la validation ait été acceptée [PR 1332](https://github.com/MTES-MCT/trackdechets/pull/1332)
+- Ne pas afficher les établissements non-diffusibles et ajout des statuts de diffusion selon l'INSEE sur CompanyPublic [PR 1341](https://github.com/MTES-MCT/trackdechets/pull/1341)
+
+#### :boom: Breaking changes
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+#### :house: Interne
+
+- Montée de version prisma@3.12.0 [PR 1303](https://github.com/MTES-MCT/trackdechets/pull/1303)
+
+
 # [2022.04.1] ~04/04/2022
 
 #### :rocket: Nouvelles fonctionnalités
@@ -18,6 +58,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
   - extension d' AccountCompanyAdd.tsx pour supporter un numéro TVA et remplir les infos Company (le nom et l'adresse) automatiquement.
   - Refacto `companyInfos` pour déplacer toute la logique dans `company/search.ts` et capable de chercher à la fois par SIRET et par TVA.
   - Ajout de la possibilité de filtrer sur le champ `customId` (recherche exacte) sur le tableau de bord et dans la query `forms` [PR 1284](https://github.com/MTES-MCT/trackdechets/pull/1284)
+  - Gestion des dasri de synthèse [PR 1287](https://github.com/MTES-MCT/trackdechets/pull/1287)
+
 
 #### :bug: Corrections de bugs
 

@@ -114,6 +114,9 @@ export const INVALID_SIRET_LENGTH =
 export const INVALID_PROCESSING_OPERATION =
   "Cette opération d’élimination / valorisation n'existe pas.";
 
+export const MISSING_PROCESSING_OPERATION =
+  "L'opération de traitement est obligatoire";
+
 export const INVALID_WASTE_CODE =
   "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement.";
 

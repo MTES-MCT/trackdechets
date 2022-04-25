@@ -1,22 +1,20 @@
 import { RedErrorMessage } from "common/components";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
+
 import { Field } from "formik";
 import React from "react";
 import { BsdasriStatus } from "generated/graphql/types";
-import Packagings from "./components/packagings/Packagings";
-import { FillFieldsInfo, DisabledFieldsInfo } from "./utils/commons";
+
+import Reception from "./Reception";
+import Operation from "./Operation";
+import { FillFieldsInfo, DisabledFieldsInfo } from "../utils/commons";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import classNames from "classnames";
 
-export default function Destination({ status, stepName }) {
-  const receptionDisabled = BsdasriStatus.Received === status;
-  // it's pointless to show reception or operation fields until form has relevant signatures
-  const showReceptionFields = [
-    BsdasriStatus.Sent,
-    BsdasriStatus.Received,
-  ].includes(status);
+export default function Destination({ status, stepName, disabled = false }) {
+  const receptionDisabled = disabled || BsdasriStatus.Received === status;
+
   const showOperationFields = status === BsdasriStatus.Received;
   const operationEmphasis = stepName === "operation";
   const receptionEmphasis = stepName === "reception";
@@ -49,52 +47,11 @@ export default function Destination({ status, stepName }) {
         </label>
       </div>
       <h4 className="form__section-heading">Réception du déchet</h4>
-      {showReceptionFields ? (
-        <>
-          <div
-            className={classNames("form__row", {
-              "field-emphasis": receptionEmphasis,
-            })}
-          >
-            <Field
-              name="destination.reception.acceptation"
-              component={Acceptation}
-              disabled={receptionDisabled}
-            />
-          </div>
-          <div
-            className={classNames("form__row", {
-              "field-emphasis": receptionEmphasis,
-            })}
-          >
-            <label>
-              Date de réception
-              <div className="td-date-wrapper">
-                <Field
-                  name="destination.reception.date"
-                  component={DateInput}
-                  className="td-input"
-                  disabled={receptionDisabled}
-                />
-              </div>
-            </label>
-            <RedErrorMessage name="destination.reception.date" />
-          </div>
-          <div
-            className={classNames("form__row", {
-              "field-emphasis": receptionEmphasis,
-            })}
-          >
-            <Field
-              name="destination.reception.packagings"
-              component={Packagings}
-              disabled={receptionDisabled}
-            />
-          </div>
-        </>
-      ) : (
-        <p>Cette section sera disponible quand le déchet aura été envoyé</p>
-      )}
+      <Reception status={status} disabled={disabled} />
+      <h4 className="form__section-heading">Traitement du déchet</h4>
+
+      <Operation status={status} disabled={disabled} />
+
       <h4 className="form__section-heading">Traitement du déchet</h4>
       {/*No need to disable operation fields, processed forms are not editable */}
       {showOperationFields ? (

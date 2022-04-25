@@ -9,6 +9,7 @@ const signBsdasri: MutationResolvers["signBsdasri"] = async (
   { id, input }: MutationSignBsdasriArgs,
   context
 ) => {
-  return sign({ id, input, context });
+  const { author, type } = input;
+  return sign({ id, author, type, context });
 };
 export default signBsdasri;

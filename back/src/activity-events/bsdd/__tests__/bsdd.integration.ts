@@ -205,7 +205,7 @@ describe("ActivityEvent.Bsdd", () => {
       where: { streamId: formId }
     });
     expect(nbEventsAfterSent).toBe(6); // +2, update + signature
-  });
+  }, 10000);
 
   it("should create a bsdd event when a revision request is applied", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
