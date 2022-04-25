@@ -12,6 +12,7 @@ import {
 } from "../common/constants/companySearchHelpers";
 import { SireneSearchResult } from "./sirene/types";
 import { CompanyVatSearchResult } from "./vat/vies/types";
+import { AnonymousCompanyError } from "./sirene/errors";
 
 const SIRET_OR_VAT_ERROR =
   "Il est obligatoire de rechercher soit avec un SIRET de 14 caractères soit avec un numéro de TVA intracommunautaire valide";
@@ -103,18 +104,25 @@ async function getSiretCompanyInfo(siret: string): Promise<SireneSearchResult> {
     return await decoratedSearchCompany(siret);
   } catch (err) {
     // The SIRET was not found in public data
-    // Try searching the companies with restricted access
-    const anonymousCompany = await prisma.anonymousCompany.findUnique({
-      where: { siret }
-    });
-    if (anonymousCompany) {
-      return {
-        ...anonymousCompany,
-        // required to avoid leaking non diffusible data to the public
-        statutDiffusionEtablissement: "N",
-        etatAdministratif: "A",
-        naf: anonymousCompany.codeNaf
-      };
+    if (err instanceof AnonymousCompanyError) {
+      // Try searching the companies with restricted access
+      const anonymousCompany = await prisma.anonymousCompany.findUnique({
+        where: { siret }
+      });
+      if (anonymousCompany) {
+        return {
+          ...anonymousCompany,
+          // required to avoid leaking non diffusible data to the public
+          statutDiffusionEtablissement: "N",
+          etatAdministratif: "A",
+          naf: anonymousCompany.codeNaf
+        };
+      } else {
+        return {
+          siret,
+          statutDiffusionEtablissement: "N"
+        } as SireneSearchResult;
+      }
     }
     throw err;
   }
