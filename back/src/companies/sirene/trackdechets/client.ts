@@ -42,7 +42,7 @@ const searchResponseToCompany = (
     etablissement.libelleCommuneEtablissement
   ]);
 
-  const company = {
+  const company: SireneSearchResult = {
     siret: etablissement.siret,
     etatAdministratif: etablissement.etatAdministratifEtablissement,
     address: fullAddress,
@@ -54,7 +54,8 @@ const searchResponseToCompany = (
     naf: etablissement.activitePrincipaleEtablissement,
     libelleNaf: etablissement.activitePrincipaleEtablissement
       ? libelleFromCodeNaf(etablissement.activitePrincipaleEtablissement)
-      : ""
+      : "",
+    statutDiffusionEtablissement: etablissement.statutDiffusionEtablissement
   };
 
   const isEntrepreneurIndividuel =

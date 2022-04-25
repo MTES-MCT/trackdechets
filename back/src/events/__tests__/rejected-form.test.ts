@@ -147,7 +147,8 @@ const insee1: CompanySearchResult = {
   addressCity: "Laville",
   codeCommune: "66001",
   isRegistered: true,
-  companyTypes: []
+  companyTypes: [],
+  statutDiffusionEtablissement: "O"
 };
 const insee2: CompanySearchResult = {
   siret: "12346085500055",
@@ -160,7 +161,8 @@ const insee2: CompanySearchResult = {
   addressCity: "Une ville",
   codeCommune: "77001",
   isRegistered: true,
-  companyTypes: []
+  companyTypes: [],
+  statutDiffusionEtablissement: "O"
 };
 
 // Mock pdf generator

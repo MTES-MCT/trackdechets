@@ -75,7 +75,8 @@ export const client = async (
       vatNumber: vatNumber,
       address: viesResult.address,
       name: viesResult.name,
-      codePaysEtrangerEtablissement: country.isoCode.short
+      codePaysEtrangerEtablissement: country.isoCode.short,
+      statutDiffusionEtablissement: "O"
     };
   } catch (err) {
     if (err instanceof UserInputError) {

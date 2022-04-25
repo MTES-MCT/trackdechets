@@ -17,7 +17,7 @@ describe("searchCompany", () => {
       body: {
         _source: {
           siret: "85001946400013",
-          statutDiffusionEtablissement: "A",
+          statutDiffusionEtablissement: "O",
           etatAdministratifEtablissement: "A",
           numeroVoieEtablissement: "4",
           indiceRepetitionEtablissement: "bis",
@@ -36,6 +36,7 @@ describe("searchCompany", () => {
     const expected = {
       siret: "85001946400013",
       etatAdministratif: "A",
+      statutDiffusionEtablissement: "O",
       address: "4 bis BD LONGCHAMP Bat G 13001 MARSEILLE",
       addressVoie: "4 bis BD LONGCHAMP Bat G",
       addressPostalCode: "13001",

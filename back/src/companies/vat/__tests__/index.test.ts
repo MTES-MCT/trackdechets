@@ -77,7 +77,8 @@ describe("searchVat client", () => {
       vatNumber: "IT09301420155",
       address: "address",
       name: "name",
-      codePaysEtrangerEtablissement: "IT"
+      codePaysEtrangerEtablissement: "IT",
+      statutDiffusionEtablissement: "O"
     };
     checkVatAsyncMock.mockResolvedValueOnce([testValue]);
     const res = await client("IT09301420155", createClientTest);

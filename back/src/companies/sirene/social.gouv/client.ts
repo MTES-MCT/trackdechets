@@ -27,7 +27,8 @@ function searchResponseToCompany(
     codeCommune: response.codeCommuneEtablissement,
     name: response.label,
     naf: "",
-    libelleNaf: response.activitePrincipale
+    libelleNaf: response.activitePrincipale,
+    statutDiffusionEtablissement: response.statutDiffusionEtablissement ?? "O"
   };
 
   return company;
@@ -81,7 +82,9 @@ function fullTextSearchResponseToCompanies(
       name: etablissement.name,
       naf: "",
       libelleNaf: "",
-      etatAdministratif: "A"
+      etatAdministratif: etablissement.etatAdministratif ?? "A",
+      statutDiffusionEtablissement:
+        etablissement.statutDiffusionEtablissement ?? "O"
     };
   });
 

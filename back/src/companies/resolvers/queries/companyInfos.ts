@@ -33,7 +33,7 @@ export async function getCompanyInfos(
   };
 }
 
-const companyInfosResolvers: QueryResolvers["companyInfos"] = (
+const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
   parent,
   args
 ) => {
@@ -45,7 +45,22 @@ const companyInfosResolvers: QueryResolvers["companyInfos"] = (
       }
     );
   }
-  return getCompanyInfos(!!args.siret ? args.siret : args.clue);
+  const companyInfos = await getCompanyInfos(
+    !!args.siret ? args.siret : args.clue
+  );
+  if (companyInfos.statutDiffusionEtablissement !== "N") {
+    return companyInfos;
+  } else {
+    // hide non diffusible Company from public query
+    return {
+      siret: companyInfos.siret,
+      vatNumber: companyInfos.vatNumber,
+      isRegistered: companyInfos.isRegistered,
+      companyTypes: companyInfos.companyTypes,
+      ecoOrganismeAgreements: companyInfos.ecoOrganismeAgreements,
+      statutDiffusionEtablissement: companyInfos.statutDiffusionEtablissement
+    } as CompanyPublic;
+  }
 };
 
 export default companyInfosResolvers;

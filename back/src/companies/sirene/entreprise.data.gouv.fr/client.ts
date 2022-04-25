@@ -42,7 +42,8 @@ function searchResponseToCompany({
     codeCommune: etablissement.code_commune,
     name: etablissement.unite_legale.denomination,
     naf: etablissement.activite_principale,
-    libelleNaf: ""
+    libelleNaf: "",
+    statutDiffusionEtablissement: etablissement.statut_diffusion
   };
 
   if (company.naf) {
@@ -125,7 +126,8 @@ function fullTextSearchResponseToCompanies(
       name: etablissement.nom_raison_sociale,
       naf: etablissement.activite_principale,
       libelleNaf: etablissement.libelle_activite_principale,
-      etatAdministratif: "A"
+      etatAdministratif: etablissement.etat_administratif ?? "A",
+      statutDiffusionEtablissement: etablissement.statut_diffusion ?? "O"
     };
   });
 }
