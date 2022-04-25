@@ -59,11 +59,11 @@ const getCommonKeys = (bsdasriType: BsdasriType): string[] => {
       transporterTransportVolumeKey,
     ];
   }
-  if (
-    bsdasriType === BsdasriType.Grouping ||
-    bsdasriType === BsdasriType.Simple
-  ) {
+  if (bsdasriType === BsdasriType.Grouping) {
     return [synthesizingKey];
+  }
+  if (bsdasriType === BsdasriType.Simple) {
+    return [synthesizingKey, groupingKey];
   }
   return [];
 };
