@@ -11,6 +11,7 @@ export interface IndexProcessConfig {
     body: ElasticBulkNonFlatPayload,
     extras: any
   ) => Promise<ElasticBulkNonFlatPayload>;
+  dataFormatterExtras?: any;
   mappings?: Record<string, any>;
   settings?: Record<string, any>;
 }

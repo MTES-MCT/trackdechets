@@ -19,6 +19,7 @@ import {
   ElasticBulkNonFlatPayload,
   IndexProcessConfig
 } from "./types";
+import { INDEX_ALIAS_NAME_SEPARATOR } from "./indexInsee.helpers";
 
 const pipeline = util.promisify(stream.pipeline);
 var pjson = require("../../package.json");
@@ -26,80 +27,6 @@ var pjson = require("../../package.json");
 // Max size of documents to index at once, also depends on ES JVM memory available
 const CHUNK_SIZE: number = parseInt(process.env.INDEX_CHUNK_SIZE, 10) || 10_000;
 
-// ES Mapping docs: https://www.elastic.co/guide/en/elasticsearch/reference/6.8/mapping.html
-export const standardMapping = {
-  _doc: {
-    dynamic_templates: [
-      {
-        dateType: {
-          match_pattern: "regex",
-          match: "^date.*$",
-          mapping: {
-            type: "date",
-            // docs : https://www.elastic.co/guide/en/elasticsearch/reference/6.8/ignore-malformed.html
-            ignore_malformed: true
-          }
-        }
-      }
-    ]
-  }
-};
-
-export const INDEX_ALIAS_NAME_SEPARATOR = "-";
-
-/**
- * stockunitelegale-* indexation config
- */
-export const sireneIndexConfig: IndexProcessConfig = {
-  alias: `stockunitelegale${INDEX_ALIAS_NAME_SEPARATOR}${
-    process.env.NODE_ENV ? process.env.NODE_ENV : "dev"
-  }${
-    process.env.INDEX_ALIAS_NAME_SUFFIX
-      ? process.env.INDEX_ALIAS_NAME_SUFFIX
-      : ""
-  }`,
-  // to match the filename inside zip
-  csvFileName: "StockUniteLegale_utf8.csv",
-  // zip target filename
-  zipFileName: "StockUniteLegale_utf8.zip",
-  idKey: "siren",
-  mappings: standardMapping,
-  headers: [
-    "siren",
-    "statutDiffusionUniteLegale",
-    "unitePurgeeUniteLegale",
-    "dateCreationUniteLegale",
-    "sigleUniteLegale",
-    "sexeUniteLegale",
-    "prenom1UniteLegale",
-    "prenom2UniteLegale",
-    "prenom3UniteLegale",
-    "prenom4UniteLegale",
-    "prenomUsuelUniteLegale",
-    "pseudonymeUniteLegale",
-    "identifiantAssociationUniteLegale",
-    "trancheEffectifsUniteLegale",
-    "anneeEffectifsUniteLegale",
-    "dateDernierTraitementUniteLegale",
-    "nombrePeriodesUniteLegale",
-    "categorieEntreprise",
-    "anneeCategorieEntreprise",
-    "dateDebut",
-    "etatAdministratifUniteLegale",
-    "nomUniteLegale",
-    "nomUsageUniteLegale",
-    "denominationUniteLegale",
-    "denominationUsuelle1UniteLegale",
-    "denominationUsuelle2UniteLegale",
-    "denominationUsuelle3UniteLegale",
-    "categorieJuridiqueUniteLegale",
-    "activitePrincipaleUniteLegale",
-    "nomenclatureActivitePrincipaleUniteLegale",
-    "nicSiegeUniteLegale",
-    "economieSocialeSolidaireUniteLegale",
-    "caractereEmployeurUniteLegale"
-  ]
-};
 
 /**
  * Common index name formatter
@@ -143,36 +70,38 @@ export const cleanOldIndexes = async (
   });
   const bindedIndexes = aliases.body.map((info: { index: any }) => info.index);
   logger.info(
-    `Pointing the index alias ${indexAlias} to the index ${indexName}`
+    `Pointing the index alias ${indexAlias} to the index ${indexName}.`
   );
-  await client.indices.putAlias({
-    index: indexName,
-    name: indexAlias
+  client.indices.updateAliases({
+    body: {
+      actions : [
+          ...(bindedIndexes.length ? [{ remove : { indices: bindedIndexes, alias: indexAlias } }] : []),
+          { add : { index: indexName, alias: indexAlias } }
+      ]
+  }
   });
   if (bindedIndexes.length) {
     logger.info(
-      `Removing alias pointers to older indices ${bindedIndexes.join(", ")}.`
+      `Removed alias pointers to older indices ${bindedIndexes.join(", ")}.`
     );
-    await client.indices.deleteAlias({
-      index: bindedIndexes,
-      name: indexAlias
-    });
   }
-  // Delete old indices completely
+  // Delete old indices to save disk space, except the last
   const indices = await client.cat.indices({
     index: `${indexAlias}${INDEX_ALIAS_NAME_SEPARATOR}${pjson.version}${INDEX_ALIAS_NAME_SEPARATOR}*`,
     format: "json"
   });
-  const oldIndexes = indices.body
-    .map((info: { index: any }) => info.index)
+  const oldIndices: string[] = indices.body
+    .map((info: { index: string }) => info.index)
     // Filter out the last indexName
-    // TODO feature : also keep the previous index in order to roll-back
-    .filter((name: string) => name !== indexName);
-  if (oldIndexes.length) {
+    .filter((name: string) => name !== indexName)
+    .sort();
+  // keep the last index in order to rollback if needed
+  oldIndices.pop();
+  if (oldIndices.length) {
     logger.info(
-      `Removing ${oldIndexes.length} old index(es) (${oldIndexes.join(", ")})`
+      `Removing ${oldIndices.length} old index(es) (${oldIndices.join(", ")})`
     );
-    await client.indices.delete({ index: oldIndexes.join(",") });
+    await client.indices.delete({ index: oldIndices.join(",") });
   }
 };
 
@@ -214,9 +143,7 @@ export const bulkIndex = async (
     }
     // append new data to the body before indexation
     if (typeof indexConfig.dataFormatterFn === "function") {
-      const formattedChunk = await indexConfig.dataFormatterFn(bodyChunk, {
-        sireneIndexConfig
-      });
+      const formattedChunk = await indexConfig.dataFormatterFn(bodyChunk, indexConfig.dataFormatterExtras);
       return requestBulkIndex(formattedChunk.flat());
     }
     return requestBulkIndex(bodyChunk.flat());
