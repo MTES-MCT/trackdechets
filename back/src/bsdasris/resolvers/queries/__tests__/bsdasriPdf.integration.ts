@@ -1,9 +1,13 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  userWithCompanyFactory,
+  companyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
 import { Query } from "../../../../generated/graphql/types";
+import { BsdasriType } from "@prisma/client";
 
 import { gql } from "apollo-server-express";
 
@@ -40,7 +44,7 @@ describe("Query.BsdasriPdf", () => {
     ]);
   });
 
-  it("should forbid access to user not on the bsd", async () => {
+  it("should forbid access to user not on the bsd (simple dasri)", async () => {
     const { company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
@@ -63,7 +67,7 @@ describe("Query.BsdasriPdf", () => {
     ]);
   });
 
-  it("should return a token for requested id", async () => {
+  it("should return a token for requested id (simple dasri)", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
@@ -75,6 +79,64 @@ describe("Query.BsdasriPdf", () => {
 
     const { data } = await query<Pick<Query, "bsdasriPdf">>(BSDASRI_PDF, {
       variables: { id: dasri.id }
+    });
+
+    expect(data.bsdasriPdf.token).toBeTruthy();
+  });
+  it("should forbid access to user not on the bsd (synthesis dasri)", async () => {
+    const { user } = await userWithCompanyFactory("MEMBER");
+    const initialCompany = await companyFactory();
+    const mainCompany = await companyFactory();
+
+    const initialBsdasri = await bsdasriFactory({
+      opt: {
+        ...initialData(initialCompany)
+      }
+    });
+    const synthesisBsdasri = await bsdasriFactory({
+      opt: {
+        type: BsdasriType.SYNTHESIS,
+        ...initialData(mainCompany),
+        synthesizing: { connect: [{ id: initialBsdasri.id }] }
+      }
+    });
+    const { query } = makeClient(user);
+
+    const { errors } = await query<Pick<Query, "bsdasriPdf">>(BSDASRI_PDF, {
+      variables: { id: synthesisBsdasri.id }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous n'êtes pas autorisé à accéder à ce bordereau",
+        extensions: expect.objectContaining({
+          code: ErrorCode.FORBIDDEN
+        })
+      })
+    ]);
+  });
+  it("should return a token for requested id (synthesis dasri)", async () => {
+    const { user, company: initialCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const mainCompany = await companyFactory();
+
+    const initialBsdasri = await bsdasriFactory({
+      opt: {
+        ...initialData(initialCompany)
+      }
+    });
+    const synthesisBsdasri = await bsdasriFactory({
+      opt: {
+        type: BsdasriType.SYNTHESIS,
+        ...initialData(mainCompany),
+        synthesizing: { connect: [{ id: initialBsdasri.id }] }
+      }
+    });
+    const { query } = makeClient(user);
+
+    const { data } = await query<Pick<Query, "bsdasriPdf">>(BSDASRI_PDF, {
+      variables: { id: synthesisBsdasri.id }
     });
 
     expect(data.bsdasriPdf.token).toBeTruthy();

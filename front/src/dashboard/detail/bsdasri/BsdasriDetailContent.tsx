@@ -10,6 +10,7 @@ import {
   BsdasriType,
 } from "generated/graphql/types";
 import routes from "common/routes";
+import { useDownloadPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/useDownloadPdf";
 
 import {
   IconWarehouseDelivery,
@@ -334,6 +335,7 @@ export default function BsdasriDetailContent({
             )}
           </div>
           <div className={styles.detailGrid}>
+            {form?.synthesizedIn && <SynthesizedIn form={form.synthesizedIn} />}
             <DateRow
               value={form.updatedAt}
               label="Dernière action sur le BSD"
@@ -507,5 +509,25 @@ const AcceptationStatusRow = ({
       <dt>Lot accepté :</dt>
       <dd>{value ? getVerboseAcceptationStatus(value) : ""}</dd>
     </>
+  );
+};
+
+const SynthesizedIn = ({ form }: { form: Bsdasri }) => {
+  const [downloadPdf] = useDownloadPdf({
+    variables: { id: form.id },
+  });
+  return (
+    <DetailRow
+      value={
+        <span>
+          {form.id} (
+          <button className="link" onClick={() => downloadPdf()}>
+            PDF
+          </button>
+          )
+        </span>
+      }
+      label={`Associé au bordereau n°`}
+    />
   );
 };
