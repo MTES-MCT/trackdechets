@@ -7,7 +7,17 @@ import {
   Query,
   QueryBsdasrisArgs,
   BsdasriStatus,
+  BsdasriPackaging,
 } from "generated/graphql/types";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+  TableRowDigest,
+} from "common/components";
 
 const GET_ELIGIBLE_BSDASRIS = gql`
   query Bsdasris($where: BsdasriWhere) {
@@ -40,29 +50,27 @@ const GET_ELIGIBLE_BSDASRIS = gql`
   }
 `;
 
-const aggregatePackagings = packagingsArray => {
+export const aggregatePackagings = (packagingsArray: BsdasriPackaging[][]) => {
   return packagingsArray.reduce((prev, cur) => {
-    for (const packaging of cur) {
-      const found = prev.find(
-        item => item.type === packaging.type && item.other === packaging.other
+    for (const packaging of cur ?? []) {
+      const idx = prev.findIndex(
+        item =>
+          item.type === packaging.type &&
+          item.other === packaging.other &&
+          item.volume === packaging.volume
       );
-      if (found) {
-        return prev.map(item =>
-          item.type === packaging.type && item.other === packaging.other
-            ? {
-                type: found.type,
-                other: found.other,
-                quantity: found.quantity + packaging.quantity,
-                volume: found.volume + packaging.volume,
-              }
-            : item
-        );
+      if (idx != -1) {
+        const found = prev[idx];
+        prev.splice(idx, 1, {
+          ...found,
+          quantity: found.quantity + packaging.quantity,
+        });
       } else {
-        return [...prev, packaging];
+        prev.push(packaging);
       }
     }
     return prev;
-  }, []);
+  }, [] as BsdasriPackaging[]);
 };
 const RefreshButton = ({ onClick }) => (
   <button
@@ -74,11 +82,11 @@ const RefreshButton = ({ onClick }) => (
   </button>
 );
 
-const SelectedBsdasrisSummary = ({ selectedItems }) => {
+const SelectedBsdasrisDigest = ({ selectedItems }) => {
   if (!selectedItems?.length) {
     return null;
   }
-  const packagings = selectedItems.map(
+  const packagings: BsdasriPackaging[][] = selectedItems.map(
     item => item?.transporter?.transport?.packagings ?? []
   );
 
@@ -86,42 +94,49 @@ const SelectedBsdasrisSummary = ({ selectedItems }) => {
   return (
     <div className="tw-mt-4">
       <p>Contenants</p>
-      <table className="td-table" style={{ display: "table-cell" }}>
-        <thead>
-          <tr>
-            <th>Quantité</th>
-            <th>Type</th>
-            <th>Autre</th>
-            <th>Volume</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table style={{ display: "table-cell" }}>
+        <TableHead>
+          <TableRow>
+            <TableHeaderCell>{""}</TableHeaderCell>
+            <TableHeaderCell>Quantité (kg)</TableHeaderCell>
+            <TableHeaderCell>Type</TableHeaderCell>
+
+            <TableHeaderCell>Volume (l)</TableHeaderCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {aggregatedPackagings.map(row => (
-            <tr key={`${row.type}${row.other}`}>
-              <td>{row.quantity}</td>
-              <td>{row.type}</td>
-              <td>{row.other}</td>
-              <td>{row.volume}</td>
-            </tr>
+            <TableRow key={`${row.type}${row.other}${row.volume}`}>
+              <TableCell>{""}</TableCell>
+              <TableCell>{row.quantity}</TableCell>
+              <TableCell>
+                {row.type} {!!row.other && `: ${row.other}`}
+              </TableCell>
+
+              <TableCell>{row.volume}</TableCell>
+            </TableRow>
           ))}
-          <tr>
-            <td>
+          <TableRowDigest>
+            <TableCell>
+              <strong>Total</strong>{" "}
+            </TableCell>
+            <TableCell>
               {aggregatedPackagings.reduce(
                 (prev, curr) => prev + curr.quantity,
                 0
               )}
-            </td>
-            <td />
-            <td />
-            <td>
+            </TableCell>
+            <TableCell>{null}</TableCell>
+
+            <TableCell>
               {aggregatedPackagings.reduce(
                 (prev, curr) => prev + curr.volume * curr.quantity,
                 0
               )}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </TableCell>
+          </TableRowDigest>
+        </TableBody>
+      </Table>
     </div>
   );
 };
@@ -146,7 +161,6 @@ export default function BsdasriTableSynthesis({
           {
             id: { _in: regroupedInDB },
           },
-
           {
             status: { _eq: BsdasriStatus.Sent },
             groupable: true,
@@ -174,6 +188,12 @@ export default function BsdasriTableSynthesis({
       </div>
     );
   }
+  const selectedBsdasris = bsdasris
+    .map(edge => edge.node)
+    .filter(node => selectedItems.includes(node.id));
+
+  const wasteCodes = new Set(selectedBsdasris.map(bsd => bsd.waste?.code));
+
   return (
     <>
       <p className="tw-my-2">
@@ -181,11 +201,21 @@ export default function BsdasriTableSynthesis({
         dasris que vous avez pris en charge.{" "}
         {!disabled && <RefreshButton onClick={refetch} />}
       </p>
-
-      <table className="td-table">
-        <thead>
-          <tr className="td-table__head-tr">
-            <th>
+      {!wasteCodes?.has(values?.waste?.code) && !!wasteCodes?.size && (
+        <p className="tw-mb-2 tw-text-red-700">
+          Les bordereaux sélectionnés ne portent pas le code déchet choisi.
+        </p>
+      )}
+      {wasteCodes?.size > 1 && (
+        <p className="tw-mb-2 tw-text-red-700">
+          Vous avez sélectionné des bordereaux avec des codes déchets
+          différents.
+        </p>
+      )}
+      <Table isSelectable>
+        <TableHead>
+          <TableRow>
+            <TableHeaderCell>
               <input
                 type="checkbox"
                 className="td-checkbox"
@@ -197,21 +227,21 @@ export default function BsdasriTableSynthesis({
                   )
                 }
               />
-            </th>
-            <th>Numéro</th>
-            <th>Code déchet</th>
-            <th>Producteur</th>
-            <th>Volume (transporteur)</th>
-          </tr>
-        </thead>
-        <tbody>
+            </TableHeaderCell>
+            <TableHeaderCell>Numéro</TableHeaderCell>
+            <TableHeaderCell>Code déchet</TableHeaderCell>
+            <TableHeaderCell>Producteur</TableHeaderCell>
+            <TableHeaderCell>Volume (transporteur)</TableHeaderCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {bsdasris.map(edge => (
-            <tr
+            <TableRow
               key={edge.node.id}
               onClick={() => onToggle(edge.node)}
               className="td-table__tr"
             >
-              <td>
+              <TableCell>
                 <input
                   type="checkbox"
                   className="td-checkbox"
@@ -219,22 +249,18 @@ export default function BsdasriTableSynthesis({
                   checked={selectedItems.indexOf(edge.node.id) > -1}
                   onChange={() => true}
                 />
-              </td>
-              <td>{edge.node.id}</td>
+              </TableCell>
+              <TableCell>{edge.node.id}</TableCell>
 
-              <td>{edge.node.waste?.code}</td>
-              <td>{edge.node.emitter?.company?.name}</td>
+              <TableCell>{edge.node.waste?.code}</TableCell>
+              <TableCell>{edge.node.emitter?.company?.name}</TableCell>
 
-              <td>{edge.node.transporter?.transport?.volume}</td>
-            </tr>
+              <TableCell>{edge.node.transporter?.transport?.volume}</TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-      <SelectedBsdasrisSummary
-        selectedItems={bsdasris
-          .map(edge => edge.node)
-          .filter(node => selectedItems.includes(node.id))}
-      />
+        </TableBody>
+      </Table>
+      <SelectedBsdasrisDigest selectedItems={selectedBsdasris} />
     </>
   );
 }

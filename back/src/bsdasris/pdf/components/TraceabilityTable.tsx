@@ -23,7 +23,7 @@ export function TraceabilityTable({ previousBsdasris }) {
             <td>{bsdasri?.id}</td>
             <td>{bsdasri?.quantity}</td>
             <td>{bsdasri?.volume}</td>
-            <td>{bsdasri?.weight}</td>
+            <td>{bsdasri?.weight || "Pesée non effectuée"}</td>
             <td>{formatDate(bsdasri?.takenOverAt)}</td>
             <td>{bsdasri?.postalCode}</td>
           </tr>

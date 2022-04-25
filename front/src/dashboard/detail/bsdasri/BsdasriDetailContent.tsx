@@ -10,6 +10,7 @@ import {
   BsdasriType,
 } from "generated/graphql/types";
 import routes from "common/routes";
+import { useDownloadPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/useDownloadPdf";
 
 import {
   IconWarehouseDelivery,
@@ -95,7 +96,9 @@ const Emitter = ({ form }: { form: Bsdasri }) => {
         />
         <DetailRow value={emitter?.emission?.volume} label="Volume" units="l" />
 
-        <Dasripackaging packagings={emitter?.emission?.packagings} />
+        {form.type !== BsdasriType.Synthesis && (
+          <Dasripackaging packagings={emitter?.emission?.packagings} />
+        )}
       </div>
       <div className={styles.detailGrid}>
         {emitter?.emission?.isTakenOverWithoutEmitterSignature && (
@@ -332,6 +335,7 @@ export default function BsdasriDetailContent({
             )}
           </div>
           <div className={styles.detailGrid}>
+            {form?.synthesizedIn && <SynthesizedIn form={form.synthesizedIn} />}
             <DateRow
               value={form.updatedAt}
               label="Dernière action sur le BSD"
@@ -353,13 +357,6 @@ export default function BsdasriDetailContent({
             <div className={styles.detailGrid}>
               <dt>Bordereau groupés:</dt>
               <dd> {form?.grouping?.join(", ")}</dd>
-            </div>
-          )}
-
-          {form?.synthesizing?.length && (
-            <div className={styles.detailGrid}>
-              <dt>Bordereau associés:</dt>
-              <dd> {form?.synthesizing.map(el => el.id)?.join(", ")}</dd>
             </div>
           )}
         </div>
@@ -482,7 +479,7 @@ const Dasripackaging = ({
                 </td>
 
                 <td>{row.quantity}</td>
-                <td>{row.volume} l</td>
+                <td className="tw-whitespace-no-wrap">{row.volume} l</td>
               </tr>
             ))}
           </tbody>
@@ -512,5 +509,25 @@ const AcceptationStatusRow = ({
       <dt>Lot accepté :</dt>
       <dd>{value ? getVerboseAcceptationStatus(value) : ""}</dd>
     </>
+  );
+};
+
+const SynthesizedIn = ({ form }: { form: Bsdasri }) => {
+  const [downloadPdf] = useDownloadPdf({
+    variables: { id: form.id },
+  });
+  return (
+    <DetailRow
+      value={
+        <span>
+          {form.id} (
+          <button className="link" onClick={() => downloadPdf()}>
+            PDF
+          </button>
+          )
+        </span>
+      }
+      label={`Associé au bordereau n°`}
+    />
   );
 };

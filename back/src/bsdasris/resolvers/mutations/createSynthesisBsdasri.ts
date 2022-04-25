@@ -91,7 +91,8 @@ const createSynthesisBsdasri = async (
   const synthesizedBsdasrisId = synthesizing.map(id => ({ id }));
 
   await validateBsdasri(flattenedInput, {
-    emissionSignature: true
+    emissionSignature: true,
+    isSynthesis: true
   });
 
   const newDasri = await prisma.bsdasri.create({

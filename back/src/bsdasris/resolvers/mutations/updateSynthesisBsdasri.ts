@@ -115,7 +115,7 @@ const updateSynthesisBsdasri = async ({
   const expectedBsdasri = { ...dbBsdasri, ...flattenedArgs };
 
   await validateBsdasri(expectedBsdasri, {
-    isGrouping: false
+    isSynthesis: true
   });
 
   const synthesizingArgs = !!inputSynthesizing?.length

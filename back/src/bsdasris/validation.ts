@@ -127,64 +127,38 @@ const INVALID_DASRI_WASTE_CODE =
 const INVALID_PROCESSING_OPERATION =
   "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée";
 
-/**
- * Emitter and tranporter must be the same company
- *
- */
-export const synthesisSchema = () =>
-  // todo remove
-  yup.object({
-    emitterCompanySiret: yup
-      .string()
-      .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
-      .required("Siret emetteur requis"),
-    transporterCompanySiret: yup
-      .string()
-      .length(14, `Transporteur: ${INVALID_SIRET_LENGTH}`)
-      .required("Siret trs Requis")
-      .test(
-        "emitter-must-be-transporter-for-dasri-synthesis",
-        "Pour un dasri de synthèse, les sirets du producteur est transporteur doivent être identiques",
-        function (value) {
-          return this.parent.emitterCompanySiret === value;
-        }
-      )
-  });
-
 export const emitterSchema: FactorySchemaOf<BsdasriValidationContext, Emitter> =
   context =>
     yup.object({
-      emitterCompanyName: yup
-        .string()
-        .requiredIf(
-          context.emissionSignature,
-          `Émetteur: ${MISSING_COMPANY_NAME}`
-        ),
+      emitterCompanyName: yup.string().requiredIf(
+        // field copied from transporter returning an error message would be confusing
+        context.emissionSignature && !context?.isSynthesis,
+        `Émetteur: ${MISSING_COMPANY_NAME}`
+      ),
       emitterCompanySiret: yup
         .string()
         .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
         .requiredIf(
-          context.emissionSignature,
+          // field copied from transporter returning an error message would be confusing
+          context.emissionSignature && !context?.isSynthesis,
           `Émetteur: ${MISSING_COMPANY_SIRET}`
         ),
-      emitterCompanyAddress: yup
-        .string()
-        .requiredIf(
-          context.emissionSignature,
-          `Émetteur: ${MISSING_COMPANY_ADDRESS}`
-        ),
+      emitterCompanyAddress: yup.string().requiredIf(
+        // field copied from transporter returning an error message would be confusing
+        context.emissionSignature && !context?.isSynthesis,
+        `Émetteur: ${MISSING_COMPANY_ADDRESS}`
+      ),
       emitterCompanyContact: yup
         .string()
         .requiredIf(
-          context.emissionSignature,
+          context.emissionSignature && !context?.isSynthesis,
           `Émetteur: ${MISSING_COMPANY_CONTACT}`
         ),
-      emitterCompanyPhone: yup
-        .string()
-        .requiredIf(
-          context.emissionSignature,
-          `Émetteur: ${MISSING_COMPANY_PHONE}`
-        ),
+      emitterCompanyPhone: yup.string().requiredIf(
+        // field copied from transporter returning an error message would be confusing
+        context.emissionSignature && !context?.isSynthesis,
+        `Émetteur: ${MISSING_COMPANY_PHONE}`
+      ),
       emitterCompanyMail: yup.string().email().ensure(),
 
       emitterPickupSiteName: yup.string().nullable(),
@@ -320,13 +294,14 @@ export const ecoOrganismeSchema: FactorySchemaOf<
 export const transporterSchema: FactorySchemaOf<
   BsdasriValidationContext,
   Transporter
-> = context =>
-  yup.object({
+> = context => {
+  const requiredForSynthesis = context.emissionSignature && context.isSynthesis;
+  return yup.object({
     transporterCompanyName: yup
       .string()
       .ensure()
       .requiredIf(
-        context.transportSignature,
+        context.transportSignature || requiredForSynthesis,
         `Transporteur: ${MISSING_COMPANY_NAME}`
       ),
     transporterCompanySiret: yup
@@ -361,21 +336,21 @@ export const transporterSchema: FactorySchemaOf<
       .string()
       .ensure()
       .requiredIf(
-        context.transportSignature,
+        context.transportSignature || requiredForSynthesis,
         `Transporteur: ${MISSING_COMPANY_ADDRESS}`
       ),
     transporterCompanyContact: yup
       .string()
       .ensure()
       .requiredIf(
-        context.transportSignature,
+        context.transportSignature || requiredForSynthesis,
         `Transporteur: ${MISSING_COMPANY_CONTACT}`
       ),
     transporterCompanyPhone: yup
       .string()
       .ensure()
       .requiredIf(
-        context.transportSignature,
+        context.transportSignature || requiredForSynthesis,
         `Transporteur: ${MISSING_COMPANY_PHONE}`
       ),
     transporterCompanyMail: yup.string().email().ensure(),
@@ -391,17 +366,18 @@ export const transporterSchema: FactorySchemaOf<
       .string()
       .ensure()
       .requiredIf(
-        context.transportSignature,
+        context.transportSignature || requiredForSynthesis,
         "Le département du transporteur est obligatoire"
       ),
 
     transporterRecepisseValidityLimit: yup
       .date()
       .requiredIf(
-        context.transportSignature,
+        context.transportSignature || requiredForSynthesis,
         "La date de validité du récépissé est obligatoire"
       )
   });
+};
 
 export const transportSchema: FactorySchemaOf<
   BsdasriValidationContext,
@@ -698,6 +674,7 @@ export type BsdasriValidationContext = {
   receptionSignature?: boolean;
   operationSignature?: boolean;
   isGrouping?: boolean;
+  isSynthesis?: boolean;
 };
 export function validateBsdasri(
   dasri: Partial<Prisma.BsdasriCreateInput>,
@@ -711,11 +688,6 @@ export function validateBsdasri(
     .concat(receptionSchema(context))
     .concat(operationSchema(context))
     .concat(ecoOrganismeSchema(context));
-  // todo remove
-  // synthesis specific rules
-  // if (!!context.isSynthesizing) {
-  //   schema = schema.concat(synthesisSchema());
-  // }
 
   return schema.validate(dasri, { abortEarly: false });
 }

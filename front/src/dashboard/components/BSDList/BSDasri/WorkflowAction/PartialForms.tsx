@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { RedErrorMessage } from "common/components";
 import { BsdasriSignatureType, BsdasriStatus } from "generated/graphql/types";
 import Packagings from "form/bsdasri/components/packagings/Packagings";
@@ -102,6 +102,13 @@ export function TransportSignatureForm() {
 }
 
 export function SynthesisTransportSignatureForm() {
+  const { setFieldValue, values } = useFormikContext<Bsdasri>();
+
+  // is always accepted for synthesis
+  useEffect(() => {
+    setFieldValue(`transporter.transport.acceptation.status`, "ACCEPTED");
+  }, []);
+
   return (
     <>
       <div className="form__row">
@@ -145,12 +152,6 @@ export function SynthesisTransportSignatureForm() {
       </div>
 
       <div className="form__row">
-        <Field
-          name="transporter.transport.acceptation"
-          component={AcceptOnlyField}
-        />
-      </div>
-      <div className="form__row">
         <label>
           Date de prise en charge
           <div className="td-date-wrapper">
@@ -180,9 +181,15 @@ export function SynthesisTransportSignatureForm() {
 }
 
 export function ReceptionSignatureForm() {
-  const { values } = useFormikContext<Bsdasri>();
-  const AcceptationComponent =
-    values.type === BsdasriType.Synthesis ? AcceptOnlyField : Acceptation;
+  const { values, setFieldValue } = useFormikContext<Bsdasri>();
+
+  // is always accepted for synthesis
+  useEffect(() => {
+    if (values.type === BsdasriType.Synthesis) {
+      setFieldValue(`destination.reception.acceptation.status`, "ACCEPTED");
+    }
+  }, []);
+
   return (
     <>
       <div className="form__row">
@@ -208,13 +215,17 @@ export function ReceptionSignatureForm() {
         </label>
         <RedErrorMessage name="destination.company.phone" />
       </div>
-
       <div className="form__row">
-        <Field
-          name="destination.reception.acceptation"
-          component={AcceptationComponent}
-        />
+        <Field name="destination.reception.packagings" component={Packagings} />
       </div>
+      {values.type !== BsdasriType.Synthesis && (
+        <div className="form__row">
+          <Field
+            name="destination.reception.acceptation"
+            component={Acceptation}
+          />
+        </div>
+      )}
       <div className="form__row">
         <label>
           Date de réception

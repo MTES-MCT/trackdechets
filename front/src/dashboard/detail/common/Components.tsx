@@ -2,7 +2,7 @@ import React, { ReactNode, useMemo } from "react";
 import { formatDate } from "common/datetime";
 import { PackagingInfo } from "generated/graphql/types";
 import { getPackagingInfosSummary } from "form/bsdd/utils/packagings";
-
+const nbsp = "\u00A0";
 export const DetailRow = ({
   value,
   label,
@@ -20,7 +20,8 @@ export const DetailRow = ({
     <>
       <dt>{label}</dt>
       <dd>
-        {value} {value ? units : null}
+        {value}
+        {!!units ? `${nbsp}${units}` : null}
       </dd>
     </>
   );

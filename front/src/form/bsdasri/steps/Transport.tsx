@@ -31,7 +31,7 @@ export default function Transport({ status, editionDisabled = false }) {
 
   const transportEmphasis = false;
   const AcceptationComponent =
-    values.type === BsdasriType.Synthesis ? AcceptOnlyField : Acceptation;
+    values.type === BsdasriType.Synthesis ? null : Acceptation;
 
   const disabled =
     editionDisabled ||
@@ -134,11 +134,13 @@ export default function Transport({ status, editionDisabled = false }) {
               "field-emphasis": transportEmphasis,
             })}
           >
-            <Field
-              name="transporter.transport.acceptation"
-              component={AcceptationComponent}
-              disabled={disabled}
-            />
+            {values.type !== BsdasriType.Synthesis && (
+              <Field
+                name="transporter.transport.acceptation"
+                component={Acceptation}
+                disabled={disabled}
+              />
+            )}
           </div>
           <div
             className={classNames("form__row", {

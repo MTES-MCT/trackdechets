@@ -7,10 +7,7 @@ import { Label, RedErrorMessage } from "common/components";
 import TdSwitch from "common/components/Switch";
 import { getNestedNode } from "common/helper";
 
-export function AcceptOnlyField({
-  field: { name, value },
-  dasriPath = "transporter.transport",
-}) {
+export function AcceptOnlyField({ field: { name } }) {
   const { values, setFieldValue } = useFormikContext<Bsdasri>();
 
   const acceptationPath = `${name}.status`;
