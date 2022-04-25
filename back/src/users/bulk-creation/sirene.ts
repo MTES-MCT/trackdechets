@@ -10,7 +10,7 @@ import { CompanySearchResult } from "../../generated/graphql/types";
 import { Opts } from ".";
 
 /**
- * Throttled version of getCompanyInfo to avoid hitting rate limit
+ * Throttled version of searchCompanyInfo to avoid hitting rate limit
  * of 7 requests / seconds
  * We wait 500ms before executing the function
  * @param siret

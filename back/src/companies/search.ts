@@ -12,6 +12,7 @@ import {
 } from "../common/constants/companySearchHelpers";
 import { SireneSearchResult } from "./sirene/types";
 import { CompanyVatSearchResult } from "./vat/vies/types";
+import { AnonymousCompanyError } from "./sirene/errors";
 
 const SIRET_OR_VAT_ERROR =
   "Il est obligatoire de rechercher soit avec un SIRET de 14 caractères soit avec un numéro de TVA intracommunautaire valide";
@@ -30,7 +31,7 @@ export async function searchCompany(
     });
   }
 
-  const companyInfo = await getCompanyInfo(cleanClue);
+  const companyInfo = await searchCompanyInfo(cleanClue);
 
   // retrieves trackdechets public CompanyInfo
   // it might be null if the company is not registered in TD
@@ -87,7 +88,7 @@ export const makeSearchCompanies =
 // in index.test.ts
 export const searchCompanies = makeSearchCompanies({ searchCompany });
 
-function getCompanyInfo(
+function searchCompanyInfo(
   clue: string
 ): Promise<SireneSearchResult | CompanyVatSearchResult> {
   if (isSiret(clue)) return getSiretCompanyInfo(clue);
@@ -103,18 +104,25 @@ async function getSiretCompanyInfo(siret: string): Promise<SireneSearchResult> {
     return await decoratedSearchCompany(siret);
   } catch (err) {
     // The SIRET was not found in public data
-    // Try searching the companies with restricted access
-    const anonymousCompany = await prisma.anonymousCompany.findUnique({
-      where: { siret }
-    });
-    if (anonymousCompany) {
-      return {
-        ...anonymousCompany,
-        // required to avoid leaking non diffusible data to the public
-        statutDiffusionEtablissement: "N",
-        etatAdministratif: "A",
-        naf: anonymousCompany.codeNaf
-      };
+    if (err instanceof AnonymousCompanyError) {
+      // Try searching the companies with restricted access
+      const anonymousCompany = await prisma.anonymousCompany.findUnique({
+        where: { siret }
+      });
+      if (anonymousCompany) {
+        return {
+          ...anonymousCompany,
+          // required to avoid leaking non diffusible data to the public
+          statutDiffusionEtablissement: "N",
+          etatAdministratif: "A",
+          naf: anonymousCompany.codeNaf
+        };
+      } else {
+        return {
+          siret,
+          statutDiffusionEtablissement: "N"
+        } as SireneSearchResult;
+      }
     }
     throw err;
   }
