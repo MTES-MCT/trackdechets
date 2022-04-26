@@ -19,12 +19,7 @@ import { ResponseError } from "@elastic/elasticsearch/lib/errors";
 
 const index = process.env.TD_COMPANY_ELASTICSEARCH_INDEX;
 
-/**
- * Specific Error class
- * to handle falling back to INSEE API client for hidden companies in public data
- * check redundancy.ts for processing company search client errors
- */
-export class CompanyNotFoundInTrackdechetsSearch extends Error {}
+export class CompanyNotFound extends Error {}
 
 /**
  * Build a company object from a search response
@@ -102,12 +97,9 @@ export const searchCompany = (siret: string): Promise<SireneSearchResult> =>
       if (error instanceof AnonymousCompanyError) {
         throw error;
       }
-      // 404 may mean Anonymous Company
-      // rely on `redundancy` to fallback on INSEE api to verify that or if SIRET does not exists.
+      // 404 veut peut-être dire non-diffusible, donc on se repose sur `redundancy` pour effectuer un requête sur les api publiques.
       if (error instanceof ResponseError && error.meta.statusCode === 404) {
-        throw new CompanyNotFoundInTrackdechetsSearch(
-          ProviderErrors.SiretNotFound
-        );
+        throw new CompanyNotFound(ProviderErrors.SiretNotFound);
       }
       logger.error(
         `${ProviderErrors.ServerError}: ${error.name}, ${error.message}, \n`,

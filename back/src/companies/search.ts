@@ -1,5 +1,5 @@
 import prisma from "../prisma";
-import redundantCachedSeachCompany from "./sirene/searchCompany";
+import decoratedSearchCompany from "./sirene/searchCompany";
 import decoratedSearchCompanies from "./sirene/searchCompanies";
 import { UserInputError } from "apollo-server-express";
 import { CompanySearchResult } from "./types";
@@ -88,35 +88,9 @@ export const makeSearchCompanies =
 // in index.test.ts
 export const searchCompanies = makeSearchCompanies({ searchCompany });
 
-async function searchCompanyInfo(
+function searchCompanyInfo(
   clue: string
 ): Promise<SireneSearchResult | CompanyVatSearchResult> {
-  // by-pass searching any SIRENE search API when it's a TEST company
-  if (isSiret(clue) && clue.startsWith("000000")) {
-    if (process.env.NODE_ENV === "production") {
-      // 404 "no results found"
-      throw new UserInputError("Aucun établissement trouvé avec ce SIRET", {
-        invalidArgs: ["siret"]
-      });
-    }
-    const anonymousCompany = await prisma.anonymousCompany.findUnique({
-      where: { siret: clue }
-    });
-    if (anonymousCompany) {
-      return {
-        ...anonymousCompany,
-        // required to avoid leaking anonymous data to the public
-        statutDiffusionEtablissement: "N",
-        etatAdministratif: "A",
-        naf: anonymousCompany.codeNaf
-      };
-    } else {
-      // 404 "no results found"
-      throw new UserInputError("Aucun établissement trouvé avec ce SIRET", {
-        invalidArgs: ["siret"]
-      });
-    }
-  }
   if (isSiret(clue)) return getSiretCompanyInfo(clue);
   if (isVat(clue)) return getVatCompanyInfo(clue);
 
@@ -127,29 +101,29 @@ async function searchCompanyInfo(
 
 async function getSiretCompanyInfo(siret: string): Promise<SireneSearchResult> {
   try {
-    return await redundantCachedSeachCompany(siret);
+    return await decoratedSearchCompany(siret);
   } catch (err) {
     // The SIRET was not found in public data
-    // Try searching the anonymous companies
-    const anonymousCompany = await prisma.anonymousCompany.findUnique({
-      where: { siret }
-    });
-    if (anonymousCompany) {
-      return {
-        ...anonymousCompany,
-        // required to avoid leaking anonymous data to the public
-        statutDiffusionEtablissement: "N",
-        etatAdministratif: "A",
-        naf: anonymousCompany.codeNaf
-      };
-    } else if (err instanceof AnonymousCompanyError) {
-      // And it's finally an anonymous that is not found in AnonymousCompany
-      return {
-        siret,
-        statutDiffusionEtablissement: "N"
-      } as SireneSearchResult;
+    if (err instanceof AnonymousCompanyError) {
+      // Try searching the companies with restricted access
+      const anonymousCompany = await prisma.anonymousCompany.findUnique({
+        where: { siret }
+      });
+      if (anonymousCompany) {
+        return {
+          ...anonymousCompany,
+          // required to avoid leaking non diffusible data to the public
+          statutDiffusionEtablissement: "N",
+          etatAdministratif: "A",
+          naf: anonymousCompany.codeNaf
+        };
+      } else {
+        return {
+          siret,
+          statutDiffusionEtablissement: "N"
+        } as SireneSearchResult;
+      }
     }
-
     throw err;
   }
 }

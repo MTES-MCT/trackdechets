@@ -30,9 +30,8 @@ export const searchCompanySocialGouvThrottled = backoffIfTestEnvs(
   })
 );
 
-// list different implementations of searchCompany by order of priority.
-// please keep searchCompanyTD then searchCompanyInseeThrottled in this order
-// in order to keep anonymous companies processing
+// list different implementations of searchCompany by
+// order of priority.
 const searchCompanyProviders = [
   searchCompanyTD,
   searchCompanyInseeThrottled,
