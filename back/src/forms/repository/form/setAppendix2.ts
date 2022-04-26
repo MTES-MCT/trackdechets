@@ -108,8 +108,11 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
 
       if (quantity > quantityLeftToGroup) {
         throw new UserInputError(
-          `La quantité restante à regrouper sur le BSDD ${initialForm.readableId} est de ${quantityLeftToGroup}T.
-        Vous tentez de regrouper ${quantity}T.`
+          `La quantité restante à regrouper sur le BSDD ${
+            initialForm.readableId
+          } est de ${quantityLeftToGroup.toFixed(
+            2
+          )}T. Vous tentez de regrouper ${quantity}T.`
         );
       }
     }

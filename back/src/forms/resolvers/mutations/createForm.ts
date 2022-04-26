@@ -29,7 +29,7 @@ const createFormResolver = async (
   return prisma.$transaction(async transaction => {
     const user = checkIsAuthenticated(context);
 
-    const { appendix2Forms, temporaryStorageDetail, ...formContent } =
+    const { appendix2Forms, grouping, temporaryStorageDetail, ...formContent } =
       createFormInput;
 
     if (
@@ -94,6 +94,7 @@ const createFormResolver = async (
     const newForm = await formRepository.create(formCreateInput);
 
     if (appendix2Forms) {
+      // appendix2Forms is DEPRECATED, consumers should use grouping instead
       const initialForms = await Promise.all(
         appendix2Forms.map(({ id }) => getFormOrFormNotFound({ id }))
       );
@@ -103,6 +104,19 @@ const createFormResolver = async (
           form: f,
           quantity: f.quantityReceived
         }))
+      });
+    }
+
+    if (grouping) {
+      const appendix2 = await Promise.all(
+        grouping.map(async ({ id, quantity }) => ({
+          form: await getFormOrFormNotFound({ id }),
+          quantity
+        }))
+      );
+      await formRepository.setAppendix2({
+        form: newForm,
+        appendix2
       });
     }
 

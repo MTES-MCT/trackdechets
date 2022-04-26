@@ -38,8 +38,13 @@ const updateFormResolver = async (
 
     const { updateFormInput } = validateArgs(args);
 
-    const { id, appendix2Forms, temporaryStorageDetail, ...formContent } =
-      updateFormInput;
+    const {
+      id,
+      appendix2Forms,
+      grouping,
+      temporaryStorageDetail,
+      ...formContent
+    } = updateFormInput;
 
     if (
       formContent.wasteDetails?.code &&
@@ -150,6 +155,7 @@ const updateFormResolver = async (
     const updatedForm = await formRepository.update({ id }, formUpdateInput);
 
     if (appendix2Forms) {
+      // appendix2Forms is DEPRECATED, consumers should use grouping instead
       const initialForms = await Promise.all(
         appendix2Forms.map(({ id }) => getFormOrFormNotFound({ id }))
       );
@@ -159,6 +165,19 @@ const updateFormResolver = async (
           form: f,
           quantity: f.quantityReceived
         }))
+      });
+    }
+
+    if (grouping) {
+      const appendix2 = await Promise.all(
+        grouping.map(async ({ id, quantity }) => ({
+          form: await getFormOrFormNotFound({ id }),
+          quantity
+        }))
+      );
+      await formRepository.setAppendix2({
+        form: updatedForm,
+        appendix2
       });
     }
 
