@@ -50,7 +50,7 @@ describe("searchCompany", () => {
   });
 
   // FIXME this case may not even exist in INSEE public data
-  it("should raise AnonymousCompanyError if non diffusible", async () => {
+  it("should raise AnonymousCompanyError if non-diffusible", async () => {
     (client.get as jest.Mock).mockResolvedValueOnce({
       body: {
         _source: {
