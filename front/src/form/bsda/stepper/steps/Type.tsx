@@ -83,12 +83,12 @@ export function Type({ disabled }: Props) {
   }, [type, setFieldValue, data]);
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <InlineError apolloError={error} />;
 
-  const typeOptions = data?.companyInfos.companyTypes?.includes(
-    "WASTE_CENTER" as CompanyType
-  )
-    ? [...COMMON_OPTIONS, ...DECHETTERIE_OPTIONS]
+  // On sandbox env, some AnonymousCompanies do not exist in Sirene index, let's default to common options
+  const typeOptions = !error
+    ? data?.companyInfos.companyTypes?.includes("WASTE_CENTER" as CompanyType)
+      ? [...COMMON_OPTIONS, ...DECHETTERIE_OPTIONS]
+      : COMMON_OPTIONS
     : COMMON_OPTIONS;
 
   return (

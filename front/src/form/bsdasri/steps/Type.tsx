@@ -102,9 +102,9 @@ export function Type({ disabled }: Props) {
   }, [type, setFieldValue, data]);
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <InlineError apolloError={error} />;
 
-  const typeOptions = getTypeOptions(data, !!id);
+  // On sandbox env, some AnonymousCompanies do not exist in Sirene index, let's default to common options
+  const typeOptions = error!! ? COMMON_OPTIONS : getTypeOptions(data, !!id);
 
   return (
     <>
