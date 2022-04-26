@@ -1,5 +1,4 @@
-import { EmitterType, Prisma } from "@prisma/client";
-import { UserInputError } from "apollo-server-core";
+import { Prisma } from "@prisma/client";
 import { isDangerous } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { eventEmitter, TDEvent } from "../../../events/emitter";
@@ -18,7 +17,7 @@ import { checkIsFormContributor } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
 import { FormSirets } from "../../types";
-import { draftFormSchema, validateAppendix2Forms } from "../../validation";
+import { draftFormSchema } from "../../validation";
 import { getFormOrFormNotFound } from "../../database";
 
 const createFormResolver = async (

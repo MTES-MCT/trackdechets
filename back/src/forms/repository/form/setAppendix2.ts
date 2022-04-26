@@ -2,7 +2,6 @@ import { EmitterType, Form, Status } from "@prisma/client";
 import { UserInputError } from "apollo-server-core";
 import { RepositoryFnDeps } from "../types";
 import buildFindAppendix2FormsById from "./findAppendix2FormsById";
-import buildUpdateForm from "./update";
 import { getFinalDestinationSiret } from "../../database";
 import buildUpdateAppendix2Forms from "./updateAppendix2Forms";
 
