@@ -16,6 +16,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Corrige l'affichage des formualire de mise à jour des récepissé [PR 1351](https://github.com/MTES-MCT/trackdechets/pull/1351)
+
 #### :memo: Documentation
 
 #### :house: Interne

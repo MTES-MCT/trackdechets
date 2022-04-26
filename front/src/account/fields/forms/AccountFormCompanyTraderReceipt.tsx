@@ -184,30 +184,32 @@ export default function AccountFormCompanyTransporterReceipt({
             {(updateOrCreateLoading ||
               deleteLoading ||
               updateCompanyLoading) && <div>Envoi en cours...</div>}
-            {traderReceipt && (
+            <div className="tw-mt-2">
+              {traderReceipt && (
+                <button
+                  className="btn btn--danger tw-mr-1"
+                  type="button"
+                  disabled={props.isSubmitting}
+                  onClick={async () => {
+                    await deleteTraderReceipt({
+                      variables: {
+                        input: { id: traderReceipt.id },
+                      },
+                    });
+                    toggleEdition();
+                  }}
+                >
+                  Supprimer
+                </button>
+              )}
               <button
-                className="button warning"
-                type="button"
+                className="btn btn--primary"
+                type="submit"
                 disabled={props.isSubmitting}
-                onClick={async () => {
-                  await deleteTraderReceipt({
-                    variables: {
-                      input: { id: traderReceipt.id },
-                    },
-                  });
-                  toggleEdition();
-                }}
               >
-                Supprimer
+                {traderReceipt ? "Modifier" : "Créer"}
               </button>
-            )}
-            <button
-              className="btn btn--primary"
-              type="submit"
-              disabled={props.isSubmitting}
-            >
-              {traderReceipt ? "Modifier" : "Créer"}
-            </button>
+            </div>
           </Form>
         )}
       </Formik>

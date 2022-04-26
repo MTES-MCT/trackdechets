@@ -161,21 +161,34 @@ export default function AccountFormCompanyTransporterReceipt({
                 <tr>
                   <td>Numéro de récépissé</td>
                   <td>
-                    <Field type="text" name="receiptNumber" />
+                    <Field
+                      type="text"
+                      name="receiptNumber"
+                      className="td-input"
+                    />
                     <RedErrorMessage name="receiptNumber" />
                   </td>
                 </tr>
                 <tr>
                   <td>Limite de validité</td>
                   <td>
-                    <Field name="validityLimit" component={DateInput} />
+                    <Field
+                      name="validityLimit"
+                      component={DateInput}
+                      className="td-input"
+                    />
                     <RedErrorMessage name="validityLimit" />
                   </td>
                 </tr>
                 <tr>
                   <td>Département</td>
                   <td>
-                    <Field type="text" name="department" placeholder="75" />
+                    <Field
+                      type="text"
+                      name="department"
+                      placeholder="75"
+                      className="td-input"
+                    />
                     <RedErrorMessage name="department" />
                   </td>
                 </tr>
@@ -184,30 +197,33 @@ export default function AccountFormCompanyTransporterReceipt({
             {(updateOrCreateLoading ||
               deleteLoading ||
               updateCompanyLoading) && <div>Envoi en cours...</div>}
-            {brokerReceipt && (
+
+            <div className="tw-mt-2">
+              {brokerReceipt && (
+                <button
+                  className="btn btn--danger tw-mr-1"
+                  type="button"
+                  disabled={props.isSubmitting}
+                  onClick={async () => {
+                    await deleteBrokerReceipt({
+                      variables: {
+                        input: { id: brokerReceipt.id },
+                      },
+                    });
+                    toggleEdition();
+                  }}
+                >
+                  Supprimer
+                </button>
+              )}
               <button
-                className="button warning"
-                type="button"
+                className="btn btn--primary"
+                type="submit"
                 disabled={props.isSubmitting}
-                onClick={async () => {
-                  await deleteBrokerReceipt({
-                    variables: {
-                      input: { id: brokerReceipt.id },
-                    },
-                  });
-                  toggleEdition();
-                }}
               >
-                Supprimer
+                {brokerReceipt ? "Modifier" : "Créer"}
               </button>
-            )}
-            <button
-              className="btn btn--primary"
-              type="submit"
-              disabled={props.isSubmitting}
-            >
-              {brokerReceipt ? "Modifier" : "Créer"}
-            </button>
+            </div>
           </Form>
         )}
       </Formik>
