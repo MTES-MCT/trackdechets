@@ -1,4 +1,8 @@
-import { searchCompany, searchCompanies, CompanyNotFound } from "../client";
+import {
+  searchCompany,
+  searchCompanies,
+  CompanyNotFoundInTrackdechetsSearch
+} from "../client";
 import { ErrorCode } from "../../../../common/errors";
 import client from "../esClient";
 import { ResponseError } from "@elastic/elasticsearch/lib/errors";
@@ -98,7 +102,9 @@ describe("searchCompany", () => {
         statusCode: 404
       } as unknown as ApiResponse)
     );
-    expect(searchCompany("xxxxxxxxxxxxxx")).rejects.toThrow(CompanyNotFound);
+    expect(searchCompany("xxxxxxxxxxxxxx")).rejects.toThrow(
+      CompanyNotFoundInTrackdechetsSearch
+    );
   });
 
   it(`should escalate other types of errors
