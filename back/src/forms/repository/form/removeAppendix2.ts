@@ -2,7 +2,7 @@ import { Form } from "@prisma/client";
 import { RepositoryFnDeps } from "../types";
 import buildFindAppendix2FormsById from "./findAppendix2FormsById";
 import buildFindUniqueForm from "./findUnique";
-import buildUpdateManyForms from "./updateMany";
+import buildUpdateAppendix2Forms from "./updateAppendix2Forms";
 
 export type RemoveAppendix2Fn = (id: string) => Promise<Form>;
 
@@ -16,15 +16,13 @@ const buildRemoveAppendix2: (deps: RepositoryFnDeps) => RemoveAppendix2Fn =
     const appendix2Forms = await findAppendix2FormsById(id);
 
     if (appendix2Forms.length) {
-      const updateManyForms = buildUpdateManyForms({ prisma, user });
       // disconnect appendix2
       await prisma.formGroupement.deleteMany({ where: { nextFormId: id } });
 
+      const updateAppendix2Forms = buildUpdateAppendix2Forms({ prisma, user });
+
       // roll back status
-      await updateManyForms(
-        appendix2Forms.map(f => f.id),
-        { status: "AWAITING_GROUP" }
-      );
+      await updateAppendix2Forms(appendix2Forms);
     }
 
     const findUniqueForm = buildFindUniqueForm({ prisma, user });

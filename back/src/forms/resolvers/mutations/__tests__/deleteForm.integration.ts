@@ -175,7 +175,7 @@ describe("Mutation.deleteForm", () => {
 
     await prisma.form.update({
       where: { id: appendix2.id },
-      data: { status: "GROUPED" }
+      data: { status: "GROUPED", quantityGrouped: appendix2.quantityReceived }
     });
 
     const { mutate } = makeClient(ttrUser);
@@ -198,5 +198,6 @@ describe("Mutation.deleteForm", () => {
     });
     expect(disconnectedAppendix2.groupedIn).toEqual([]);
     expect(disconnectedAppendix2.status).toEqual("AWAITING_GROUP");
+    expect(disconnectedAppendix2.quantityGrouped).toEqual(0);
   });
 });
