@@ -15,13 +15,20 @@ import buildCountRevisionRequests from "./formRevisionRequest/countRevisionReque
 import buildCreateRevisionRequest from "./formRevisionRequest/createRevisionRequest";
 import buildGetRevisionRequestById from "./formRevisionRequest/getRevisionRequestById";
 import buildRefuseRevisionRequestApproval from "./formRevisionRequest/refuseRevisionRequestApproval";
-import { FormActions, FormRevisionRequestActions } from "./types";
+import {
+  FormActions,
+  FormRevisionRequestActions,
+  PrismaTransaction
+} from "./types";
 import buildSetAppendix2 from "./form/setAppendix2";
 import buildUpdateAppendix2Forms from "./form/updateAppendix2Forms";
 
 export type FormRepository = FormActions & FormRevisionRequestActions;
 
-export function getFormRepository(user: Express.User): FormRepository {
+export function getFormRepository(
+  user: Express.User,
+  transaction?: PrismaTransaction
+): FormRepository {
   const formActions: FormActions = {
     // READ operations
     findUnique: buildFindUniqueForm({ prisma, user }),
@@ -30,31 +37,53 @@ export function getFormRepository(user: Express.User): FormRepository {
     count: buildCountForms({ prisma, user }),
     // WRITE OPERATIONS - wrapped into a transaction
     create: (...args) =>
-      prisma.$transaction(prisma => buildCreateForm({ prisma, user })(...args)),
+      transaction
+        ? buildCreateForm({ prisma: transaction, user })(...args)
+        : prisma.$transaction(prisma =>
+            buildCreateForm({ prisma, user })(...args)
+          ),
     update: (...args) =>
-      prisma.$transaction(prisma => buildUpdateForm({ prisma, user })(...args)),
+      transaction
+        ? buildUpdateForm({ prisma: transaction, user })(...args)
+        : prisma.$transaction(prisma =>
+            buildUpdateForm({ prisma, user })(...args)
+          ),
     updateMany: (...args) =>
-      prisma.$transaction(prisma =>
-        buildUpdateManyForms({ prisma, user })(...args)
-      ),
+      transaction
+        ? buildUpdateManyForms({ prisma: transaction, user })(...args)
+        : prisma.$transaction(prisma =>
+            buildUpdateManyForms({ prisma, user })(...args)
+          ),
     delete: (...args) =>
-      prisma.$transaction(prisma => buildDeleteForm({ prisma, user })(...args)),
+      transaction
+        ? buildDeleteForm({ prisma: transaction, user })(...args)
+        : prisma.$transaction(prisma =>
+            buildDeleteForm({ prisma, user })(...args)
+          ),
     createTemporaryStorage: (...args) =>
-      prisma.$transaction(prisma =>
-        buildCreateTemporaryStorage({ prisma, user })(...args)
-      ),
+      transaction
+        ? buildCreateTemporaryStorage({ prisma: transaction, user })(...args)
+        : prisma.$transaction(prisma =>
+            buildCreateTemporaryStorage({ prisma, user })(...args)
+          ),
     removeAppendix2: (...args) =>
-      prisma.$transaction(prisma =>
-        buildRemoveAppendix2({ prisma, user })(...args)
-      ),
+      transaction
+        ? buildRemoveAppendix2({ prisma: transaction, user })(...args)
+        : prisma.$transaction(prisma =>
+            buildRemoveAppendix2({ prisma, user })(...args)
+          ),
     setAppendix2: (...args) =>
-      prisma.$transaction(prisma =>
-        buildSetAppendix2({ prisma, user })(...args)
-      ),
+      transaction
+        ? buildSetAppendix2({ prisma: transaction, user })(...args)
+        : prisma.$transaction(prisma =>
+            buildSetAppendix2({ prisma, user })(...args)
+          ),
     updateAppendix2Forms: (...args) =>
-      prisma.$transaction(prisma =>
-        buildUpdateAppendix2Forms({ prisma, user })(...args)
-      )
+      transaction
+        ? buildUpdateAppendix2Forms({ prisma: transaction, user })(...args)
+        : prisma.$transaction(prisma =>
+            buildUpdateAppendix2Forms({ prisma, user })(...args)
+          )
   };
 
   const formRevisionRequestActions: FormRevisionRequestActions = {
@@ -63,21 +92,33 @@ export function getFormRepository(user: Express.User): FormRepository {
     countRevisionRequests: buildCountRevisionRequests({ prisma, user }),
     // WRITE operations - wrapped into a transaction
     cancelRevisionRequest: (...args) =>
-      prisma.$transaction(prisma =>
-        buildCancelRevisionRequest({ prisma, user })(...args)
-      ),
+      transaction
+        ? buildCancelRevisionRequest({ prisma: transaction, user })(...args)
+        : prisma.$transaction(prisma =>
+            buildCancelRevisionRequest({ prisma, user })(...args)
+          ),
     createRevisionRequest: (...args) =>
-      prisma.$transaction(prisma =>
-        buildCreateRevisionRequest({ prisma, user })(...args)
-      ),
+      transaction
+        ? buildCreateRevisionRequest({ prisma: transaction, user })(...args)
+        : prisma.$transaction(prisma =>
+            buildCreateRevisionRequest({ prisma, user })(...args)
+          ),
     acceptRevisionRequestApproval: (...args) =>
-      prisma.$transaction(prisma =>
-        buildAcceptRevisionRequestApproval({ prisma, user })(...args)
-      ),
+      transaction
+        ? buildAcceptRevisionRequestApproval({ prisma: transaction, user })(
+            ...args
+          )
+        : prisma.$transaction(prisma =>
+            buildAcceptRevisionRequestApproval({ prisma, user })(...args)
+          ),
     refuseRevisionRequestApproval: (...args) =>
-      prisma.$transaction(prisma =>
-        buildRefuseRevisionRequestApproval({ prisma, user })(...args)
-      )
+      transaction
+        ? buildRefuseRevisionRequestApproval({ prisma: transaction, user })(
+            ...args
+          )
+        : prisma.$transaction(prisma =>
+            buildRefuseRevisionRequestApproval({ prisma, user })(...args)
+          )
   };
 
   return {

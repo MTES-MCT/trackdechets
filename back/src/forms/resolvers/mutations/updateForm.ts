@@ -18,6 +18,7 @@ import { getFormRepository } from "../../repository";
 import { FormSirets } from "../../types";
 import { draftFormSchema, sealedFormSchema } from "../../validation";
 import { UserInputError } from "apollo-server-core";
+import prisma from "../../../prisma";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -32,134 +33,137 @@ const updateFormResolver = async (
   args: MutationUpdateFormArgs,
   context: GraphQLContext
 ) => {
-  const user = checkIsAuthenticated(context);
+  return prisma.$transaction(async transaction => {
+    const user = checkIsAuthenticated(context);
 
-  const { updateFormInput } = validateArgs(args);
+    const { updateFormInput } = validateArgs(args);
 
-  const { id, appendix2Forms, temporaryStorageDetail, ...formContent } =
-    updateFormInput;
+    const { id, appendix2Forms, temporaryStorageDetail, ...formContent } =
+      updateFormInput;
 
-  if (
-    formContent.wasteDetails?.code &&
-    isDangerous(formContent.wasteDetails?.code) &&
-    formContent.wasteDetails.isDangerous === undefined
-  ) {
-    formContent.wasteDetails.isDangerous = true;
-  }
-
-  const existingForm = await getFormOrFormNotFound({ id });
-  const formRepository = getFormRepository(user);
-
-  await checkCanUpdate(user, existingForm);
-
-  const form = flattenFormInput(formContent);
-
-  const existingAppendix2Forms = await formRepository.findAppendix2FormsById(
-    id
-  );
-  const futureEmitterType = form.emitterType ?? existingForm.emitterType;
-  const futureAppendix2Forms = appendix2Forms ?? existingAppendix2Forms;
-
-  if (
-    futureAppendix2Forms?.length &&
-    futureEmitterType !== EmitterType.APPENDIX2
-  ) {
-    throw new UserInputError(
-      "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
-    );
-  }
-
-  // Construct form update payload
-  const formUpdateInput: Prisma.FormUpdateInput = form;
-
-  // Validate form input
-  if (existingForm.status === "DRAFT") {
-    await draftFormSchema.validate({ ...existingForm, ...formUpdateInput });
-  } else {
-    await sealedFormSchema.validate({ ...existingForm, ...formUpdateInput });
-  }
-
-  const isOrWillBeTempStorage =
-    (existingForm.recipientIsTempStorage &&
-      formContent.recipient?.isTempStorage !== false) ||
-    formContent.recipient?.isTempStorage === true;
-
-  const { temporaryStorageDetail: existingTemporaryStorageDetail } =
-    await formRepository.findFullFormById(id);
-
-  // make sure user will still be form contributor after update
-  const nextFormSirets: FormSirets = {
-    emitterCompanySiret:
-      form.emitterCompanySiret ?? existingForm.emitterCompanySiret,
-    recipientCompanySiret:
-      form.recipientCompanySiret ?? existingForm.recipientCompanySiret,
-    transporterCompanySiret:
-      form.transporterCompanySiret ?? existingForm.transporterCompanySiret,
-    traderCompanySiret:
-      form.traderCompanySiret ?? existingForm.traderCompanySiret,
-    brokerCompanySiret:
-      form.brokerCompanySiret ?? existingForm.brokerCompanySiret,
-    ecoOrganismeSiret: form.ecoOrganismeSiret ?? existingForm.ecoOrganismeSiret
-  };
-
-  if (temporaryStorageDetail || existingTemporaryStorageDetail) {
-    nextFormSirets.temporaryStorageDetail = {
-      destinationCompanySiret:
-        temporaryStorageDetail?.destination?.company?.siret ??
-        existingTemporaryStorageDetail?.destinationCompanySiret,
-      transporterCompanySiret:
-        existingTemporaryStorageDetail?.transporterCompanySiret
-    };
-  }
-
-  await checkIsFormContributor(
-    user,
-    nextFormSirets,
-    "Vous ne pouvez pas enlever votre établissement du bordereau"
-  );
-
-  if (
-    existingTemporaryStorageDetail &&
-    (!isOrWillBeTempStorage || temporaryStorageDetail === null)
-  ) {
-    formUpdateInput.temporaryStorageDetail = { disconnect: true };
-  }
-
-  if (temporaryStorageDetail) {
-    if (!isOrWillBeTempStorage) {
-      // The user is trying to add a temporary storage detail
-      // but recipient is not set as temp storage on existing form
-      // or input
-      throw new MissingTempStorageFlag();
+    if (
+      formContent.wasteDetails?.code &&
+      isDangerous(formContent.wasteDetails?.code) &&
+      formContent.wasteDetails.isDangerous === undefined
+    ) {
+      formContent.wasteDetails.isDangerous = true;
     }
 
-    if (existingTemporaryStorageDetail) {
-      formUpdateInput.temporaryStorageDetail = {
-        update: flattenTemporaryStorageDetailInput(temporaryStorageDetail)
-      };
+    const existingForm = await getFormOrFormNotFound({ id });
+    const formRepository = getFormRepository(user, transaction);
+
+    await checkCanUpdate(user, existingForm);
+
+    const form = flattenFormInput(formContent);
+
+    const existingAppendix2Forms = await formRepository.findAppendix2FormsById(
+      id
+    );
+    const futureEmitterType = form.emitterType ?? existingForm.emitterType;
+    const futureAppendix2Forms = appendix2Forms ?? existingAppendix2Forms;
+
+    if (
+      futureAppendix2Forms?.length &&
+      futureEmitterType !== EmitterType.APPENDIX2
+    ) {
+      throw new UserInputError(
+        "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+      );
+    }
+
+    // Construct form update payload
+    const formUpdateInput: Prisma.FormUpdateInput = form;
+
+    // Validate form input
+    if (existingForm.status === "DRAFT") {
+      await draftFormSchema.validate({ ...existingForm, ...formUpdateInput });
     } else {
-      formUpdateInput.temporaryStorageDetail = {
-        create: flattenTemporaryStorageDetailInput(temporaryStorageDetail)
+      await sealedFormSchema.validate({ ...existingForm, ...formUpdateInput });
+    }
+
+    const isOrWillBeTempStorage =
+      (existingForm.recipientIsTempStorage &&
+        formContent.recipient?.isTempStorage !== false) ||
+      formContent.recipient?.isTempStorage === true;
+
+    const { temporaryStorageDetail: existingTemporaryStorageDetail } =
+      await formRepository.findFullFormById(id);
+
+    // make sure user will still be form contributor after update
+    const nextFormSirets: FormSirets = {
+      emitterCompanySiret:
+        form.emitterCompanySiret ?? existingForm.emitterCompanySiret,
+      recipientCompanySiret:
+        form.recipientCompanySiret ?? existingForm.recipientCompanySiret,
+      transporterCompanySiret:
+        form.transporterCompanySiret ?? existingForm.transporterCompanySiret,
+      traderCompanySiret:
+        form.traderCompanySiret ?? existingForm.traderCompanySiret,
+      brokerCompanySiret:
+        form.brokerCompanySiret ?? existingForm.brokerCompanySiret,
+      ecoOrganismeSiret:
+        form.ecoOrganismeSiret ?? existingForm.ecoOrganismeSiret
+    };
+
+    if (temporaryStorageDetail || existingTemporaryStorageDetail) {
+      nextFormSirets.temporaryStorageDetail = {
+        destinationCompanySiret:
+          temporaryStorageDetail?.destination?.company?.siret ??
+          existingTemporaryStorageDetail?.destinationCompanySiret,
+        transporterCompanySiret:
+          existingTemporaryStorageDetail?.transporterCompanySiret
       };
     }
-  }
 
-  const updatedForm = await formRepository.update({ id }, formUpdateInput);
-
-  if (appendix2Forms) {
-    const initialForms = await Promise.all(
-      appendix2Forms.map(({ id }) => getFormOrFormNotFound({ id }))
+    await checkIsFormContributor(
+      user,
+      nextFormSirets,
+      "Vous ne pouvez pas enlever votre établissement du bordereau"
     );
-    await formRepository.setAppendix2({
-      form: updatedForm,
-      appendix2: initialForms.map(f => ({
-        form: f,
-        quantity: f.quantityReceived
-      }))
-    });
-  }
 
-  return expandFormFromDb(updatedForm);
+    if (
+      existingTemporaryStorageDetail &&
+      (!isOrWillBeTempStorage || temporaryStorageDetail === null)
+    ) {
+      formUpdateInput.temporaryStorageDetail = { disconnect: true };
+    }
+
+    if (temporaryStorageDetail) {
+      if (!isOrWillBeTempStorage) {
+        // The user is trying to add a temporary storage detail
+        // but recipient is not set as temp storage on existing form
+        // or input
+        throw new MissingTempStorageFlag();
+      }
+
+      if (existingTemporaryStorageDetail) {
+        formUpdateInput.temporaryStorageDetail = {
+          update: flattenTemporaryStorageDetailInput(temporaryStorageDetail)
+        };
+      } else {
+        formUpdateInput.temporaryStorageDetail = {
+          create: flattenTemporaryStorageDetailInput(temporaryStorageDetail)
+        };
+      }
+    }
+
+    const updatedForm = await formRepository.update({ id }, formUpdateInput);
+
+    if (appendix2Forms) {
+      const initialForms = await Promise.all(
+        appendix2Forms.map(({ id }) => getFormOrFormNotFound({ id }))
+      );
+      await formRepository.setAppendix2({
+        form: updatedForm,
+        appendix2: initialForms.map(f => ({
+          form: f,
+          quantity: f.quantityReceived
+        }))
+      });
+    }
+
+    return expandFormFromDb(updatedForm);
+  });
 };
 
 export default updateFormResolver;

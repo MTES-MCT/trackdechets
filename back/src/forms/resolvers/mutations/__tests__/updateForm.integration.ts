@@ -263,9 +263,9 @@ describe("Mutation.updateForm", () => {
       variables: { updateFormInput }
     });
 
-    expect(errors).toMatchObject([
+    expect(errors).toEqual([
       expect.objectContaining({
-        extensions: { code: ErrorCode.FORBIDDEN },
+        extensions: expect.objectContaining({ code: ErrorCode.FORBIDDEN }),
         message: "Vous ne pouvez pas enlever votre établissement du bordereau"
       })
     ]);
@@ -1102,5 +1102,49 @@ describe("Mutation.updateForm", () => {
       variables: { updateFormInput }
     });
     expect(data.updateForm.wasteDetails.isDangerous).toBe(true);
+  });
+
+  it("should perform update in transaction", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: ttr.siret,
+        emitterType: EmitterType.APPENDIX2,
+        wasteDetailsCode: "01 03 04*"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          wasteDetails: {
+            code: "01 03 05*"
+          },
+          // throw an exception in appendix 2 association
+          appendix2Forms: [{ id: "does-not-exist" }]
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le bordereau avec l'identifiant "does-not-exist" n'existe pas.`
+      })
+    ]);
+
+    const updatedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
+
+    // check form has not been updated
+    expect(updatedForm.wasteDetailsCode).toEqual("01 03 04*");
   });
 });

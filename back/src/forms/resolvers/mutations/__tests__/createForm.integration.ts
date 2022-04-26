@@ -843,4 +843,38 @@ describe("Mutation.createForm", () => {
     });
     expect(data?.createForm?.id).toBeDefined();
   });
+
+  it("should perform form creation in transaction", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+
+    const formCountBeforeCreation = await prisma.form.count();
+    expect(formCountBeforeCreation).toEqual(0);
+
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          // let's throw an error in appendix2 association that happens
+          // after form creation in the mutation. Form creation should
+          // be rolled back
+          appendix2Forms: [{ id: "does-not-exist" }]
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le bordereau avec l'identifiant "does-not-exist" n'existe pas.`
+      })
+    ]);
+
+    // check form has not been created
+    const formCountAfterCreationAttempt = await prisma.form.count();
+    expect(formCountAfterCreationAttempt).toEqual(0);
+  });
 });
