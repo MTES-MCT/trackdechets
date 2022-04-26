@@ -492,6 +492,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: { status: "AWAITING_GROUP", quantityReceived: 1 }
     });
+
     const form = await formFactory({
       ownerId: user.id,
       opt: {

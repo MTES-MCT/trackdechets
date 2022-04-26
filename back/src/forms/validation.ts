@@ -5,8 +5,7 @@ import {
   QuantityType,
   WasteAcceptationStatus,
   Prisma,
-  CompanyVerificationStatus,
-  Status
+  CompanyVerificationStatus
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
@@ -19,15 +18,9 @@ import {
   WASTES_CODES
 } from "../common/constants";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
-import {
-  AppendixFormInput,
-  PackagingInfo,
-  Packagings
-} from "../generated/graphql/types";
+import { PackagingInfo, Packagings } from "../generated/graphql/types";
 import { isCollector, isWasteProcessor } from "../companies/validation";
-import { getFinalDestinationSiret, getFormOrFormNotFound } from "./database";
 import {
-  FormAlreadyInAppendix2,
   MISSING_COMPANY_NAME,
   MISSING_COMPANY_SIRET,
   INVALID_SIRET_LENGTH,
