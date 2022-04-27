@@ -160,7 +160,7 @@ export function getInitialState(f?: Form | null): FormInput {
       otherPackaging: null, // deprecated
       numberOfPackages: null, // deprecated
     },
-    appendix2Forms: f?.appendix2Forms ?? [],
+    grouping: f?.grouping ?? [],
     ecoOrganisme: f?.ecoOrganisme
       ? getInitialEcoOrganisme(f?.ecoOrganisme)
       : null,

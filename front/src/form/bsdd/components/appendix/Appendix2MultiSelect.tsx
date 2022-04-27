@@ -2,7 +2,12 @@ import { gql, useQuery } from "@apollo/client";
 import { InlineError } from "common/components/Error";
 import { formatDate } from "common/datetime";
 import { FieldArray, useFormikContext } from "formik";
-import { Form, Query, QueryAppendixFormsArgs } from "generated/graphql/types";
+import {
+  Form,
+  InitialFormFraction,
+  Query,
+  QueryAppendixFormsArgs,
+} from "generated/graphql/types";
 import React, { useEffect, useMemo, useState } from "react";
 
 const APPENDIX2_FORMS = gql`
@@ -35,7 +40,7 @@ const APPENDIX2_FORMS = gql`
 export default function Appendix2MultiSelect() {
   const [wasteCodeFilter, setWasteCodeFilter] = useState("");
   const { values, setFieldValue, getFieldMeta } = useFormikContext<Form>();
-  const meta = getFieldMeta<Form[]>("appendix2Forms");
+  const meta = getFieldMeta<InitialFormFraction[]>("grouping");
   const [hasChanged, setHasChanged] = useState(false);
 
   const { loading, error, data } = useQuery<
@@ -49,24 +54,29 @@ export default function Appendix2MultiSelect() {
     fetchPolicy: "network-only",
   });
 
-  // because { query { appendix2Forms } } does not return forms that
+  // because { query { appendixForms } } does not return forms that
   // have already been appended to a BSDD, we need to keep track of
-  // initial value of form.appendix2Forms when updating a BSDD
+  // initial value of form.grouping when updating a BSDD
   const appendix2Candidates = useMemo(() => {
     const appendix2Forms = data?.appendixForms ?? [];
-    const initialValue = (meta.initialValue ?? []).filter(f => {
-      return f.recipient?.company?.siret === values.emitter?.company?.siret;
+    const initialValue = (meta.initialValue ?? []).filter(g => {
+      return (
+        g.form.recipient?.company?.siret === values.emitter?.company?.siret
+      );
     });
-    return [...initialValue, ...appendix2Forms].filter(f => {
-      return wasteCodeFilter?.length
-        ? f.wasteDetails?.code?.includes(wasteCodeFilter)
-        : true;
-    });
+    return [...initialValue.map(({ form }) => form), ...appendix2Forms].filter(
+      f => {
+        return wasteCodeFilter?.length
+          ? f.wasteDetails?.code?.includes(wasteCodeFilter)
+          : true;
+      }
+    );
   }, [data, meta.initialValue, wasteCodeFilter, values.emitter]);
 
-  const appendix2Selected = useMemo(() => values.appendix2Forms ?? [], [
-    values.appendix2Forms,
-  ]);
+  const appendix2Selected = useMemo(
+    () => values.grouping?.map(({ form }) => form) ?? [],
+    [values.grouping]
+  );
 
   useEffect(() => {
     // avoid overwriting values on first render when updating a BSDD
@@ -116,9 +126,15 @@ export default function Appendix2MultiSelect() {
 
   function onSelectAll() {
     if (appendix2Selected.length === appendix2Candidates.length) {
-      setFieldValue("appendix2Forms", []);
+      setFieldValue("grouping", []);
     } else {
-      setFieldValue("appendix2Forms", appendix2Candidates);
+      setFieldValue(
+        "grouping",
+        appendix2Candidates.map(form => ({
+          form: { id: form.id },
+          quantity: form.quantityReceived,
+        }))
+      );
     }
   }
 
@@ -164,7 +180,7 @@ export default function Appendix2MultiSelect() {
         </thead>
         <tbody>
           <FieldArray
-            name="appendix2Forms"
+            name="grouping"
             render={({ push, remove }) => (
               <>
                 {appendix2Candidates.map((form, index) => (
@@ -173,7 +189,7 @@ export default function Appendix2MultiSelect() {
                       <input
                         type="checkbox"
                         className="td-checkbox"
-                        name={`appendix2Forms[${index}].id`}
+                        name={`grouping[${index}].id`}
                         value={form.id}
                         checked={appendix2Selected
                           .map(f => f.id)
@@ -181,7 +197,7 @@ export default function Appendix2MultiSelect() {
                         onChange={e => {
                           setHasChanged(true);
                           if (e.target.checked) {
-                            push(form);
+                            push({ form, quantity: form.quantityReceived });
                           } else {
                             const idx = appendix2Selected
                               .map(f => f.id)

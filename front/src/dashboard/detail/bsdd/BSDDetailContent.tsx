@@ -11,8 +11,8 @@ import {
   Form,
   FormCompany,
   FormStatus,
-  Appendix2Form,
   EmitterType,
+  InitialFormFraction,
 } from "generated/graphql/types";
 import {
   emitterTypeLabels,
@@ -357,11 +357,11 @@ const Recipient = ({
 };
 
 const Appendix2 = ({
-  appendix2Forms,
+  grouping,
 }: {
-  appendix2Forms: Appendix2Form[] | null | undefined;
+  grouping: InitialFormFraction[] | null | undefined;
 }) => {
-  if (!appendix2Forms?.length) {
+  if (!grouping?.length) {
     return <div>Aucun bordereau annexé</div>;
   }
   return (
@@ -378,26 +378,23 @@ const Appendix2 = ({
         </tr>
       </thead>
       <tbody>
-        {appendix2Forms.map((appendix2Form, index) => (
+        {grouping.map(({ form }, index) => (
           <tr key={index}>
-            <td>{appendix2Form?.readableId}</td>
-            <td>{appendix2Form?.wasteDetails?.code}</td>
-            <td>{appendix2Form?.wasteDetails?.name}</td>
+            <td>{form?.readableId}</td>
+            <td>{form?.wasteDetails?.code}</td>
+            <td>{form?.wasteDetails?.name}</td>
+            <td>{form?.quantityReceived ?? form?.wasteDetails?.quantity}</td>
             <td>
-              {appendix2Form?.quantityReceived ??
-                appendix2Form?.wasteDetails?.quantity}
-            </td>
-            <td>
-              {appendix2Form?.quantityReceived
+              {form?.quantityReceived
                 ? "R"
-                : appendix2Form?.wasteDetails?.quantityType?.charAt(0)}
+                : form?.wasteDetails?.quantityType?.charAt(0)}
             </td>
             <td>
-              {appendix2Form?.signedAt
-                ? format(new Date(appendix2Form?.signedAt), "dd/MM/yyyy")
+              {form?.signedAt
+                ? format(new Date(form?.signedAt), "dd/MM/yyyy")
                 : ""}
             </td>
-            <td>{appendix2Form?.emitterPostalCode}</td>
+            <td>{form?.emitterPostalCode}</td>
           </tr>
         ))}
       </tbody>
@@ -551,7 +548,7 @@ export default function BSDDetailContent({
             {/* Appendix2 tab panel */}
             {isRegroupement && (
               <TabPanel className={styles.detailTabPanel}>
-                <Appendix2 appendix2Forms={form.appendix2Forms} />
+                <Appendix2 grouping={form.grouping} />
               </TabPanel>
             )}
             {/* Emitter tab panel */}
