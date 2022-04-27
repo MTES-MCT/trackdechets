@@ -51,7 +51,7 @@ const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
   if (companyInfos.statutDiffusionEtablissement !== "N") {
     return companyInfos;
   } else {
-    // hide non diffusible Company from public query
+    // hide Anonymous Company from public query
     return {
       siret: companyInfos.siret,
       vatNumber: companyInfos.vatNumber,
