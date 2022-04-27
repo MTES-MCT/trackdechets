@@ -22,6 +22,7 @@ const absolutePathAliases: Record<string, string> = srcRootContent.reduce(
 export default defineConfig({
   build: {
     outDir: "build",
+    sourcemap: true,
   },
   plugins: [
     reactRefresh(),
