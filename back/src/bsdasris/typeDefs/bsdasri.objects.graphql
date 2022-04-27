@@ -46,7 +46,7 @@ type BsdasriRecepisse {
 Collecteur transporteur
 """
 type BsdasriTransporter {
-  "Établissement de destination"
+  "Établissement transporteur"
   company: FormCompany
 
   "Récépissé"
