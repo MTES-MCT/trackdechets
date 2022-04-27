@@ -109,8 +109,8 @@ const createFormResolver = async (
 
     if (grouping) {
       const appendix2 = await Promise.all(
-        grouping.map(async ({ id, quantity }) => ({
-          form: await getFormOrFormNotFound({ id }),
+        grouping.map(async ({ form, quantity }) => ({
+          form: await getFormOrFormNotFound(form),
           quantity
         }))
       );

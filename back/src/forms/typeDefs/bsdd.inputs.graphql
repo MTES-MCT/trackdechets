@@ -310,8 +310,8 @@ input AppendixFormInput {
 Fraction d'un bordereau ajouté en annexe 2 d'un bordereau de regroupement
 """
 input InitialFormFractionInput {
-  "Identifiant unique du bordereau initial"
-  id: ID!
+  "Bordereau annexé"
+  form: AppendixFormInput!
   """
   Quantité du bordereau initial affectée au bordereau de regroupement. Si omis,
   la totalité de la quantité restante est affectée. La quantité renseignée ne peut

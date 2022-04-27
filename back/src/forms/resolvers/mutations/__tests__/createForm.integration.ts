@@ -635,7 +635,7 @@ describe("Mutation.createForm", () => {
           siret: ttr.siret
         }
       },
-      grouping: [{ id: appendix2.id, quantity: 0.5 }]
+      grouping: [{ form: { id: appendix2.id }, quantity: 0.5 }]
     };
     const { mutate } = makeClient(user);
     const { data, errors } = await mutate<
@@ -670,7 +670,7 @@ describe("Mutation.createForm", () => {
           siret: ttr.siret
         }
       },
-      grouping: [{ id: initialForm.id, quantity: 0.5 }]
+      grouping: [{ form: { id: initialForm.id }, quantity: 0.5 }]
     };
     const { mutate } = makeClient(user);
     const {
@@ -801,7 +801,7 @@ describe("Mutation.createForm", () => {
         },
         // trying to group 0.5 of this form but the quantity left
         // to group is equal to 0.2 = 1 - 0.8
-        grouping: [{ id: appendix2.id, quantity: 0.5 }]
+        grouping: [{ form: { id: appendix2.id }, quantity: 0.5 }]
       };
       const { mutate } = makeClient(user);
       const { errors } = await mutate<Pick<Mutation, "createForm">>(
@@ -873,7 +873,9 @@ describe("Mutation.createForm", () => {
             siret: ttr.siret
           }
         },
-        grouping: [{ id: appendix2.id, quantity: appendix2.quantityReceived }]
+        grouping: [
+          { form: { id: appendix2.id }, quantity: appendix2.quantityReceived }
+        ]
       };
       const { mutate } = makeClient(user);
       const { errors } = await mutate<Pick<Mutation, "createForm">>(
@@ -935,7 +937,9 @@ describe("Mutation.createForm", () => {
           siret: ttr.siret
         }
       },
-      grouping: [{ id: appendix2.id, quantity: appendix2.quantityReceived }]
+      grouping: [
+        { form: { id: appendix2.id }, quantity: appendix2.quantityReceived }
+      ]
     };
     const { mutate } = makeClient(user);
     const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
@@ -994,7 +998,9 @@ describe("Mutation.createForm", () => {
           siret: ttr.siret
         }
       },
-      grouping: [{ id: appendix2.id, quantity: appendix2.quantityReceived }]
+      grouping: [
+        { form: { id: appendix2.id }, quantity: appendix2.quantityReceived }
+      ]
     };
     const { mutate } = makeClient(user);
     const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
@@ -1130,7 +1136,7 @@ describe("Mutation.createForm", () => {
           // let's throw an error in appendix2 association that happens
           // after form creation in the mutation. Form creation should
           // be rolled back
-          grouping: [{ id: "does-not-exist", quantity: 1 }]
+          grouping: [{ form: { id: "does-not-exist" }, quantity: 1 }]
         }
       }
     });
