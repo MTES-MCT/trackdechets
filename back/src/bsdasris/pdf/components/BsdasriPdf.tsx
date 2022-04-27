@@ -338,7 +338,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               <strong>3. Installation de destination</strong>
             </p>
             <FormCompanyFields
-              company={bsdasri.transporter?.company}
+              company={bsdasri.destination?.company}
               showCountryFields={false}
             />
           </div>
@@ -499,7 +499,8 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               checked={bsdasri?.type === BsdasriType.SYNTHESIS}
               readOnly
             />{" "}
-            Synthèse de bordereaux de DASRI simples, pris en charge par le collecteur et au statut "collecté"
+            Synthèse de bordereaux de DASRI simples, pris en charge par le
+            collecteur et au statut "collecté"
           </p>
           <h3 className="TextAlignCenter">
             Bordereau(x) associé(s) constituant l’historique de la traçabilité
