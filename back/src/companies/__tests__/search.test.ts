@@ -1,5 +1,25 @@
 import { makeSearchCompanies, searchCompany } from "../search";
 import { ErrorCode } from "../../common/errors";
+import prisma from "../../prisma";
+
+const createInput = {
+  siret: "00000012345698",
+  name: "Établissement de test",
+  address: "Adresse test",
+  codeNaf: "XXXXX",
+  libelleNaf: "Entreprise de test",
+  codeCommune: "00000"
+};
+
+jest.mock("../../prisma", () => ({
+  anonymousCompany: {
+    create: jest.fn(() => Promise.resolve(createInput)),
+    findUnique: jest.fn(() => Promise.resolve(createInput))
+  },
+  company: {
+    findUnique: jest.fn(() => Promise.resolve(null))
+  }
+}));
 
 describe("searchCompany", () => {
   it(`should throw BAD_USER_INPUT error if
@@ -30,6 +50,29 @@ describe("searchCompany", () => {
     } catch (e) {
       expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
     }
+  });
+
+  it(`should not allow test company when env var ALLOW_TEST_COMPANY is not setup`, async () => {
+    expect.assertions(1);
+    try {
+      await searchCompany("000000123546598");
+    } catch (e) {
+      expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    }
+  });
+
+  it(`should allow test company when env var ALLOW_TEST_COMPANY is setup`, async () => {
+    const OLD_ENV = process.env;
+    process.env.ALLOW_TEST_COMPANY = "true";
+    // re-load variables with custom env
+    jest.resetModules();
+
+    const { siret } = await prisma.anonymousCompany.create({
+      data: createInput
+    });
+    const testCompany = await searchCompany(siret);
+    expect(siret).toEqual(testCompany.siret);
+    process.env = OLD_ENV;
   });
 });
 
