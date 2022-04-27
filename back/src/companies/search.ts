@@ -93,7 +93,11 @@ async function searchCompanyInfo(
 ): Promise<SireneSearchResult | CompanyVatSearchResult> {
   // by-pass searching any SIRENE search API when it's a TEST company
   if (isSiret(clue) && clue.startsWith("000000")) {
-    if (process.env.NODE_ENV === "production") {
+    // Do not allow for test SIRET outside the sandbox host
+    if (
+      !process.env.ALLOW_TEST_COMPANY ||
+      process.env.ALLOW_TEST_COMPANY !== "true"
+    ) {
       // 404 "no results found"
       throw new UserInputError("Aucun établissement trouvé avec ce SIRET", {
         invalidArgs: ["siret"]
