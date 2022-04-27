@@ -46,12 +46,13 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     vhuAgrementBroyeurId,
     allowBsdasriTakeOverWithoutSignature
   } = companyInput;
+
   const ecoOrganismeAgreements =
     companyInput.ecoOrganismeAgreements?.map(a => a.href) || [];
+
+  // clean orgId
   const orgId = companyInput.orgId.replace(/\s+/g, "");
-  // check valid orgId
-  await searchCompany(orgId);
-  // FIXME this copies vat to siret in order to ensure backward compatibility
+  // copy VAT number to the SIRET field in order to ensure backward compatibility
   const siret = orgId;
   let vatNumber: string;
   if (isVat(orgId)) {
@@ -66,6 +67,9 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       `Cette entreprise existe déjà dans Trackdéchets. Contactez l'administrateur de votre entreprise afin qu'il puisse vous inviter à rejoindre l'organisation`
     );
   }
+
+  // check if orgId exists in public databases or in AnonymousCompany
+  await searchCompany(orgId);
 
   if (companyTypes.includes("ECO_ORGANISME") && siret) {
     const ecoOrganismeExists = await prisma.ecoOrganisme.findUnique({

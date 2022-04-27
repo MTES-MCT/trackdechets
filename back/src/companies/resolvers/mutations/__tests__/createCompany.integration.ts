@@ -284,7 +284,7 @@ describe("Mutation.createCompany", () => {
   it("should return an error when creating an unknown eco-organisme", async () => {
     const user = await userFactory();
     searchSirene.mockResolvedValueOnce({
-      siret: "0".repeat(14),
+      siret: "1".repeat(14),
       etatAdministratif: "A"
     });
 
@@ -292,7 +292,7 @@ describe("Mutation.createCompany", () => {
     const { errors } = await mutate(CREATE_COMPANY, {
       variables: {
         companyInput: {
-          orgId: "0".repeat(14),
+          orgId: "1".repeat(14),
           companyTypes: ["ECO_ORGANISME"]
         }
       }
@@ -310,11 +310,11 @@ describe("Mutation.createCompany", () => {
     const user = await userFactory();
 
     const companyInput = {
-      orgId: "0".repeat(14),
+      orgId: "1".repeat(14),
       companyTypes: ["ECO_ORGANISME"]
     };
     searchSirene.mockResolvedValueOnce({
-      siret: "0".repeat(14),
+      siret: "1".repeat(14),
       etatAdministratif: "A"
     });
 
@@ -344,12 +344,12 @@ describe("Mutation.createCompany", () => {
     const user = await userFactory();
 
     const companyInput = {
-      orgId: "0".repeat(14),
+      orgId: "1".repeat(14),
       companyTypes: ["ECO_ORGANISME"],
       ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
     };
     searchSirene.mockResolvedValueOnce({
-      siret: "0".repeat(14),
+      siret: "1".repeat(14),
       etatAdministratif: "A"
     });
 
@@ -380,12 +380,12 @@ describe("Mutation.createCompany", () => {
     const user = await userFactory();
 
     const companyInput = {
-      orgId: "0".repeat(14),
+      orgId: "1".repeat(14),
       companyTypes: ["PRODUCER"],
       ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
     };
     searchSirene.mockResolvedValueOnce({
-      siret: "0".repeat(14),
+      siret: "1".repeat(14),
       etatAdministratif: "A"
     });
 
