@@ -279,6 +279,7 @@ const mutableFieldsFragment = gql`
         processingOperationDone
       }
     }
+    quantityGrouped
     ecoOrganisme {
       name
       siret
@@ -369,6 +370,7 @@ export const detailFormFragment = gql`
         emitterPostalCode
       }
     }
+    quantityGrouped
   }
   ${transporterFormFragment}
 `;

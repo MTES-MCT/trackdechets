@@ -121,6 +121,9 @@ type Form {
   "Bordereaux que celui-ci regroupe (Annexe 2)"
   grouping: [InitialFormFraction!]
 
+  "Quantité déjà regroupé dans un ou plusieurs bordereaux de regroupement"
+  quantityGrouped: Float
+
   "Bordereaux dans lequel celui-ci est regroupé (Annexe 2)"
   groupedIn: [FormFraction!]
 
@@ -179,6 +182,9 @@ type Appendix2Form {
   par l'installation de regroupement
   """
   processingOperationDone: String
+
+  "Quantité déjà regroupé dans un ou plusieurs bordereaux de regroupement"
+  quantityGrouped: Float
 }
 
 """

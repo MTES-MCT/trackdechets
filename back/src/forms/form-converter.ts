@@ -659,6 +659,7 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
     receivedAt: form.receivedAt,
     signedAt: form.signedAt,
     quantityReceived: form.quantityReceived,
+    quantityGrouped: form.quantityGrouped,
     processingOperationDone: form.processingOperationDone,
     processingOperationDescription: form.processingOperationDescription,
     processedBy: form.processedBy,
@@ -692,7 +693,8 @@ export function expandAppendix2FormFromDb(
     recipient,
     signedAt,
     quantityReceived,
-    processingOperationDone
+    processingOperationDone,
+    quantityGrouped
   } = expandFormFromDb(prismaForm);
 
   const hasPickupSite = emitter?.workSite?.postalCode?.length > 0;
@@ -708,6 +710,7 @@ export function expandAppendix2FormFromDb(
     signedAt,
     recipient,
     quantityReceived,
+    quantityGrouped,
     processingOperationDone
   };
 }

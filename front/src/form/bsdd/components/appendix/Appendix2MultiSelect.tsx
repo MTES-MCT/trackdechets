@@ -32,6 +32,7 @@ const APPENDIX2_FORMS = gql`
       }
       signedAt
       quantityReceived
+      quantityGrouped
       processingOperationDone
     }
   }
@@ -64,34 +65,37 @@ export default function Appendix2MultiSelect() {
         g.form.recipient?.company?.siret === values.emitter?.company?.siret
       );
     });
-    return [...initialValue.map(({ form }) => form), ...appendix2Forms].filter(
-      f => {
-        return wasteCodeFilter?.length
-          ? f.wasteDetails?.code?.includes(wasteCodeFilter)
-          : true;
-      }
-    );
+    return [
+      ...initialValue,
+      ...appendix2Forms.map(f => ({
+        form: f,
+        quantity: f.quantityReceived!! - (f.quantityGrouped ?? 0),
+      })),
+    ].filter(({ form }) => {
+      return wasteCodeFilter?.length
+        ? form.wasteDetails?.code?.includes(wasteCodeFilter)
+        : true;
+    });
   }, [data, meta.initialValue, wasteCodeFilter, values.emitter]);
 
-  const appendix2Selected = useMemo(
-    () => values.grouping?.map(({ form }) => form) ?? [],
-    [values.grouping]
-  );
+  const appendix2Selected = useMemo(() => values.grouping ?? [], [
+    values.grouping,
+  ]);
 
   useEffect(() => {
     // avoid overwriting values on first render when updating a BSDD
     if (!values.id || hasChanged) {
       // Computes sum of quantities of appendix2
-      const totalQuantity = appendix2Selected.reduce((q, f) => {
-        if (!f.quantityReceived) {
+      const totalQuantity = appendix2Selected.reduce((q, { quantity }) => {
+        if (!quantity) {
           return q;
         }
-        return q + f.quantityReceived;
+        return q + quantity;
       }, 0);
 
       // Computes the sum of packagingsInfos of appendix2
       const totalPackagings = (() => {
-        const quantityByType = appendix2Selected.reduce((acc1, form) => {
+        const quantityByType = appendix2Selected.reduce((acc1, { form }) => {
           if (!form.wasteDetails?.packagingInfos) {
             return acc1;
           }
@@ -128,13 +132,7 @@ export default function Appendix2MultiSelect() {
     if (appendix2Selected.length === appendix2Candidates.length) {
       setFieldValue("grouping", []);
     } else {
-      setFieldValue(
-        "grouping",
-        appendix2Candidates.map(form => ({
-          form: { id: form.id },
-          quantity: form.quantityReceived,
-        }))
-      );
+      setFieldValue("grouping", appendix2Candidates);
     }
   }
 
@@ -174,16 +172,18 @@ export default function Appendix2MultiSelect() {
             </th>
             <th>Expéditeur initial</th>
             <th>Date de réception</th>
-            <th>Quantité</th>
+            <th>Quantité reçue</th>
+            <th>Quantité restante</th>
+            <th>Quantité à regrouper</th>
             <th>Opération réalisée</th>
           </tr>
         </thead>
         <tbody>
           <FieldArray
             name="grouping"
-            render={({ push, remove }) => (
+            render={({ push, remove, replace }) => (
               <>
-                {appendix2Candidates.map((form, index) => (
+                {appendix2Candidates.map(({ form, quantity }, index) => (
                   <tr key={form.id} className="td-table__tr">
                     <td>
                       <input
@@ -192,15 +192,15 @@ export default function Appendix2MultiSelect() {
                         name={`grouping[${index}].id`}
                         value={form.id}
                         checked={appendix2Selected
-                          .map(f => f.id)
+                          .map(({ form: f }) => f.id)
                           .includes(form.id)}
                         onChange={e => {
                           setHasChanged(true);
                           if (e.target.checked) {
-                            push({ form, quantity: form.quantityReceived });
+                            push({ form, quantity });
                           } else {
                             const idx = appendix2Selected
-                              .map(f => f.id)
+                              .map(({ form: f }) => f.id)
                               .indexOf(form.id);
                             remove(idx);
                           }
@@ -213,7 +213,35 @@ export default function Appendix2MultiSelect() {
                     </td>
                     <td>{form.emitter?.company?.name}</td>
                     <td>{formatDate(form.signedAt!)}</td>
-                    <td>{form.quantityReceived} tonnes</td>
+                    <td>{form.quantityReceived} T</td>
+                    <td>
+                      {form.quantityReceived!! - (form.quantityGrouped ?? 0)} T
+                    </td>
+                    <td>
+                      <input
+                        className="td-input"
+                        type="number"
+                        min={0}
+                        step={0.1}
+                        disabled={
+                          !appendix2Selected
+                            .map(({ form: f }) => f.id)
+                            .includes(form.id)
+                        }
+                        onChange={e => {
+                          const idx = appendix2Selected
+                            .map(({ form: f }) => f.id)
+                            .indexOf(form.id);
+                          replace(idx, { form, quantity: e.target.value });
+                        }}
+                        max={
+                          form.quantityReceived!! - (form.quantityGrouped ?? 0)
+                        }
+                        defaultValue={
+                          form.quantityReceived!! - (form.quantityGrouped ?? 0)
+                        }
+                      ></input>
+                    </td>
                     <td>{form.processingOperationDone}</td>
                   </tr>
                 ))}
