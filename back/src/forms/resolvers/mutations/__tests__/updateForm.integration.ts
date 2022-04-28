@@ -1155,7 +1155,7 @@ describe("Mutation.updateForm", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<
+    const { data } = await mutate<
       Pick<Mutation, "updateForm">,
       MutationUpdateFormArgs
     >(UPDATE_FORM, {
@@ -1167,7 +1167,6 @@ describe("Mutation.updateForm", () => {
         }
       }
     });
-    console.log(errors);
     expect(data.updateForm.appendix2Forms).toEqual([]);
     expect(data.updateForm.grouping).toEqual([]);
   });

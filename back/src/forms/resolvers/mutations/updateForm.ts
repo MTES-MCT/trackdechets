@@ -61,21 +61,6 @@ const updateFormResolver = async (
 
     const form = flattenFormInput(formContent);
 
-    const existingAppendix2Forms = await formRepository.findAppendix2FormsById(
-      id
-    );
-    const futureEmitterType = form.emitterType ?? existingForm.emitterType;
-    const futureAppendix2Forms = appendix2Forms ?? existingAppendix2Forms;
-
-    if (
-      futureAppendix2Forms?.length &&
-      futureEmitterType !== EmitterType.APPENDIX2
-    ) {
-      throw new UserInputError(
-        "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
-      );
-    }
-
     // Construct form update payload
     const formUpdateInput: Prisma.FormUpdateInput = form;
 
