@@ -813,7 +813,7 @@ describe("Mutation.createForm", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message: `La quantité restante à regrouper sur le BSDD ${appendix2.readableId} est de 0.20T. Vous tentez de regrouper 0.5T.`,
+          message: `La quantité restante à regrouper sur le BSDD ${appendix2.readableId} est de 0.200 T. Vous tentez de regrouper 0.5 T.`,
           extensions: expect.objectContaining({
             code: ErrorCode.BAD_USER_INPUT
           })

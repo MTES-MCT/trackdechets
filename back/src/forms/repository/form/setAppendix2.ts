@@ -114,7 +114,7 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
             initialForm.readableId
           } est de ${quantityLeftToGroup.toFixed(
             3
-          )}T. Vous tentez de regrouper ${quantity} T.`
+          )} T. Vous tentez de regrouper ${quantity} T.`
         );
       }
     }
