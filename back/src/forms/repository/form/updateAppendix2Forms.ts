@@ -33,19 +33,24 @@ const buildUpdateAppendix2Forms: (
           include: { nextForm: { select: { status: true } } }
         })
       ).map(g => g.nextForm);
-      const allSealed = groupementForms.reduce(
-        (acc, form) => acc && form.status !== Status.DRAFT,
-        true
-      );
 
-      const allProcessed = groupementForms.reduce(
-        (acc, form) =>
-          acc &&
-          [Status.PROCESSED, Status.NO_TRACEABILITY].includes(
-            form.status as any
-          ),
-        true
-      );
+      const allSealed =
+        groupementForms.length &&
+        groupementForms.reduce(
+          (acc, form) => acc && form.status !== Status.DRAFT,
+          true
+        );
+
+      const allProcessed =
+        groupementForms.length &&
+        groupementForms.reduce(
+          (acc, form) =>
+            acc &&
+            [Status.PROCESSED, Status.NO_TRACEABILITY].includes(
+              form.status as any
+            ),
+          true
+        );
 
       const nextStatus = allProcessed
         ? Status.PROCESSED
