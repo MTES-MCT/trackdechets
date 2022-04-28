@@ -49,6 +49,12 @@ const UPDATE_FORM = `
       appendix2Forms {
         id
       }
+      grouping {
+        quantity
+        form {
+          id
+        }
+      }
     }
   }
 `;
@@ -997,7 +1003,7 @@ describe("Mutation.updateForm", () => {
     expect(data.updateForm.appendix2Forms).toEqual([]);
   });
 
-  it("should be possible to re-associate same appendix2", async () => {
+  it("should be possible to re-associate same appendix2 (using UpdateFormInput.appendix2Forms)", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
 
     const appendixForm = await formFactory({
@@ -1045,6 +1051,92 @@ describe("Mutation.updateForm", () => {
     });
     expect(data2.updateForm.appendix2Forms).toHaveLength(1);
   });
+
+  it("should be possible to re-associate same appendix2 (using UpdateFormInput.grouping)", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
+    const appendixForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "AWAITING_GROUP",
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
+      }
+    });
+
+    const groupingForm1 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: ttr.siret,
+        emitterType: EmitterType.APPENDIX2
+      }
+    });
+
+    const groupingForm2 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: ttr.siret,
+        emitterType: EmitterType.APPENDIX2
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: groupingForm1.id,
+          grouping: [
+            {
+              form: { id: appendixForm.id },
+              quantity: 0.8
+            }
+          ]
+        }
+      }
+    });
+    expect(data.updateForm.grouping).toHaveLength(1);
+
+    const { data: data2 } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: groupingForm2.id,
+          grouping: [
+            {
+              form: { id: appendixForm.id },
+              quantity: 0.2
+            }
+          ]
+        }
+      }
+    });
+    expect(data2.updateForm.grouping).toHaveLength(1);
+
+    const { data: data3 } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: groupingForm2.id,
+          grouping: [
+            {
+              form: { id: appendixForm.id },
+              quantity: 0.2
+            }
+          ]
+        }
+      }
+    });
+    expect(data3.updateForm.grouping).toHaveLength(1);
+  }, 30000);
 
   it("should not be possible to set isDangerous=false with a waste code containing an *", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");

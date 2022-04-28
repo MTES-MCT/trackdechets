@@ -46,6 +46,7 @@ function getDuplicateFormInput(
     receivedAt,
     signedAt,
     quantityReceived,
+    quantityGrouped,
     processedBy,
     processedAt,
     processingOperationDone,

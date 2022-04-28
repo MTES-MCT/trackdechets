@@ -9,6 +9,7 @@ import {
   QueryAppendixFormsArgs,
 } from "generated/graphql/types";
 import React, { useEffect, useMemo, useState } from "react";
+import { Decimal } from "decimal.js-light";
 
 const APPENDIX2_FORMS = gql`
   query AppendixForms($siret: String!, $wasteCode: String) {
@@ -55,21 +56,31 @@ export default function Appendix2MultiSelect() {
     fetchPolicy: "network-only",
   });
 
+  const [quantitesToGroup, setQuantitesToGroup] = useState({});
+
   // because { query { appendixForms } } does not return forms that
   // have already been appended to a BSDD, we need to keep track of
   // initial value of form.grouping when updating a BSDD
   const appendix2Candidates = useMemo(() => {
-    const appendix2Forms = data?.appendixForms ?? [];
     const initialValue = (meta.initialValue ?? []).filter(g => {
       return (
         g.form.recipient?.company?.siret === values.emitter?.company?.siret
       );
     });
+    const appendix2Forms =
+      data?.appendixForms?.filter(
+        form => !initialValue.map(({ form }) => form.id).includes(form.id)
+      ) ?? [];
     return [
-      ...initialValue,
+      ...initialValue.map(({ form, quantity }) => ({
+        form,
+        quantity: new Decimal(quantity),
+      })),
       ...appendix2Forms.map(f => ({
         form: f,
-        quantity: f.quantityReceived!! - (f.quantityGrouped ?? 0),
+        quantity: new Decimal(f.quantityReceived!!).minus(
+          f.quantityGrouped ?? 0
+        ),
       })),
     ].filter(({ form }) => {
       return wasteCodeFilter?.length
@@ -81,6 +92,13 @@ export default function Appendix2MultiSelect() {
   const appendix2Selected = useMemo(() => values.grouping ?? [], [
     values.grouping,
   ]);
+
+  useEffect(() => {
+    const quantites = appendix2Selected.reduce((qs, { form, quantity }) => {
+      return { ...qs, [form.id]: quantity };
+    }, {});
+    setQuantitesToGroup(prevState => ({ ...prevState, ...quantites }));
+  }, [appendix2Selected]);
 
   useEffect(() => {
     // avoid overwriting values on first render when updating a BSDD
@@ -183,68 +201,100 @@ export default function Appendix2MultiSelect() {
             name="grouping"
             render={({ push, remove, replace }) => (
               <>
-                {appendix2Candidates.map(({ form, quantity }, index) => (
-                  <tr key={form.id} className="td-table__tr">
-                    <td>
-                      <input
-                        type="checkbox"
-                        className="td-checkbox"
-                        name={`grouping[${index}].id`}
-                        value={form.id}
-                        checked={appendix2Selected
-                          .map(({ form: f }) => f.id)
-                          .includes(form.id)}
-                        onChange={e => {
-                          setHasChanged(true);
-                          if (e.target.checked) {
-                            push({ form, quantity });
-                          } else {
-                            const idx = appendix2Selected
+                {appendix2Candidates.map(
+                  ({ form, quantity: defaultQuantity }, index) => {
+                    const quantitySet = quantitesToGroup[form.id];
+                    let quantityLeft = new Decimal(
+                      form.quantityReceived!!
+                    ).minus(form.quantityGrouped ?? 0);
+
+                    if (values.id) {
+                      quantityLeft = quantityLeft.plus(defaultQuantity);
+                    }
+
+                    return (
+                      <tr key={form.id} className="td-table__tr">
+                        <td>
+                          <input
+                            type="checkbox"
+                            className="td-checkbox"
+                            name={`grouping[${index}].id`}
+                            value={form.id}
+                            checked={appendix2Selected
                               .map(({ form: f }) => f.id)
-                              .indexOf(form.id);
-                            remove(idx);
-                          }
-                        }}
-                      />
-                    </td>
-                    <td>{form.readableId}</td>
-                    <td>
-                      {form.wasteDetails?.code} - {form.wasteDetails?.name}
-                    </td>
-                    <td>{form.emitter?.company?.name}</td>
-                    <td>{formatDate(form.signedAt!)}</td>
-                    <td>{form.quantityReceived} T</td>
-                    <td>
-                      {form.quantityReceived!! - (form.quantityGrouped ?? 0)} T
-                    </td>
-                    <td>
-                      <input
-                        className="td-input"
-                        type="number"
-                        min={0}
-                        step={0.1}
-                        disabled={
-                          !appendix2Selected
-                            .map(({ form: f }) => f.id)
-                            .includes(form.id)
-                        }
-                        onChange={e => {
-                          const idx = appendix2Selected
-                            .map(({ form: f }) => f.id)
-                            .indexOf(form.id);
-                          replace(idx, { form, quantity: e.target.value });
-                        }}
-                        max={
-                          form.quantityReceived!! - (form.quantityGrouped ?? 0)
-                        }
-                        defaultValue={
-                          form.quantityReceived!! - (form.quantityGrouped ?? 0)
-                        }
-                      ></input>
-                    </td>
-                    <td>{form.processingOperationDone}</td>
-                  </tr>
-                ))}
+                              .includes(form.id)}
+                            onChange={e => {
+                              if (e.target.checked) {
+                                push({
+                                  form,
+                                  quantity:
+                                    quantitySet !== undefined
+                                      ? quantitySet
+                                      : defaultQuantity.toNumber(),
+                                });
+                              } else {
+                                const idx = appendix2Selected
+                                  .map(({ form: f }) => f.id)
+                                  .indexOf(form.id);
+                                remove(idx);
+                              }
+                              setHasChanged(true);
+                            }}
+                          />
+                        </td>
+                        <td>{form.readableId}</td>
+                        <td>
+                          {form.wasteDetails?.code} - {form.wasteDetails?.name}
+                        </td>
+                        <td>{form.emitter?.company?.name}</td>
+                        <td>{formatDate(form.signedAt!)}</td>
+                        <td>{form.quantityReceived} T</td>
+                        <td>{quantityLeft.toNumber()} T</td>
+                        <td>
+                          <input
+                            className="td-input td-input--small"
+                            type="number"
+                            min={0}
+                            step={0.001} // increment kg
+                            disabled={
+                              !appendix2Selected
+                                .map(({ form: f }) => f.id)
+                                .includes(form.id)
+                            }
+                            onChange={e => {
+                              const idx = appendix2Selected
+                                .map(({ form: f }) => f.id)
+                                .indexOf(form.id);
+                              replace(idx, {
+                                form,
+                                quantity: e.target.value
+                                  ? parseFloat(e.target.value)
+                                  : 0,
+                              });
+                              setHasChanged(true);
+                            }}
+                            max={quantityLeft.toNumber()}
+                            defaultValue={defaultQuantity.toNumber()}
+                          ></input>
+                          {!!quantitySet &&
+                            quantityLeft.lessThan(quantitySet) && (
+                              <div className="error-message">
+                                Vous ne pouvez pas regrouper une quantité
+                                supérieure à la quantité restante sur ce
+                                bordereau qui est de {quantityLeft.toNumber()} T
+                              </div>
+                            )}
+                          {quantitySet === 0 && (
+                            <div className="error-message">
+                              La quantité doit être supérieure à 0
+                            </div>
+                          )}
+                        </td>
+                        <td>{form.processingOperationDone}</td>
+                      </tr>
+                    );
+                  }
+                )}
               </>
             )}
           />

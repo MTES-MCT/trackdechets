@@ -14,6 +14,11 @@ const buildUpdateAppendix2Forms: (
 
   return Promise.all(
     forms.map(async form => {
+      if (
+        ![Status.AWAITING_GROUP, Status.GROUPED].includes(form.status as any)
+      ) {
+        return form;
+      }
       const { id, quantityReceived } = form;
       const quantityGrouped =
         (
@@ -33,12 +38,26 @@ const buildUpdateAppendix2Forms: (
         true
       );
 
-      const nextStatus =
-        allSealed && quantityGrouped >= quantityReceived // case > should not happen
-          ? Status.GROUPED
-          : Status.AWAITING_GROUP;
+      const allProcessed = groupementForms.reduce(
+        (acc, form) =>
+          acc &&
+          [Status.PROCESSED, Status.NO_TRACEABILITY].includes(
+            form.status as any
+          ),
+        true
+      );
 
-      if (
+      const nextStatus = allProcessed
+        ? Status.PROCESSED
+        : allSealed && quantityGrouped >= quantityReceived // case > should not happen
+        ? Status.GROUPED
+        : Status.AWAITING_GROUP;
+
+      if (form.status === Status.GROUPED && nextStatus === Status.PROCESSED) {
+        return transitionForm(user, form, {
+          type: EventType.MarkAsProcessed
+        });
+      } else if (
         form.status === Status.AWAITING_GROUP &&
         nextStatus === Status.GROUPED
       ) {

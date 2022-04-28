@@ -276,6 +276,8 @@ const mutableFieldsFragment = gql`
           }
         }
         signedAt
+        quantityReceived
+        quantityGrouped
         processingOperationDone
       }
     }

@@ -52,18 +52,14 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
     formUpdateInput
   });
 
+  const { findAppendix2FormsById, updateAppendix2Forms } =
+    getFormRepository(user);
+
   // mark appendix2Forms as PROCESSED
-  const appendix2Forms = await getFormRepository(user).findAppendix2FormsById(
-    form.id
-  );
+  const appendix2Forms = await findAppendix2FormsById(form.id);
 
   if (appendix2Forms.length > 0) {
-    const promises = appendix2Forms.map(appendix => {
-      return transitionForm(user, appendix, {
-        type: EventType.MarkAsProcessed
-      });
-    });
-    await Promise.all(promises);
+    await updateAppendix2Forms(appendix2Forms);
   }
 
   return expandFormFromDb(processedForm);

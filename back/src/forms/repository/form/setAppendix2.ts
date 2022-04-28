@@ -4,6 +4,7 @@ import { RepositoryFnDeps } from "../types";
 import buildFindAppendix2FormsById from "./findAppendix2FormsById";
 import { getFinalDestinationSiret } from "../../database";
 import buildUpdateAppendix2Forms from "./updateAppendix2Forms";
+import { Decimal } from "decimal.js-light";
 
 class FormFraction {
   form: Form;
@@ -97,22 +98,23 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
           })
         )._sum.quantity ?? 0;
 
-      const quantityLeftToGroup =
-        initialForm.quantityReceived - quantityGroupedInOtherForms;
+      const quantityLeftToGroup = new Decimal(
+        initialForm.quantityReceived
+      ).minus(quantityGroupedInOtherForms);
 
-      if (quantityLeftToGroup === 0) {
+      if (quantityLeftToGroup.equals(0)) {
         throw new UserInputError(
           `Le bordereau ${initialForm.readableId} a déjà été regroupé en totalité`
         );
       }
 
-      if (quantity > quantityLeftToGroup) {
+      if (new Decimal(quantity).greaterThan(quantityLeftToGroup)) {
         throw new UserInputError(
           `La quantité restante à regrouper sur le BSDD ${
             initialForm.readableId
           } est de ${quantityLeftToGroup.toFixed(
-            2
-          )}T. Vous tentez de regrouper ${quantity}T.`
+            3
+          )}T. Vous tentez de regrouper ${quantity} T.`
         );
       }
     }
