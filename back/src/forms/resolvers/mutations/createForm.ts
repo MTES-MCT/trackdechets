@@ -21,6 +21,7 @@ import { draftFormSchema } from "../../validation";
 import { getFormOrFormNotFound } from "../../database";
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
+import Decimal from "decimal.js-light";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -104,10 +105,17 @@ const createFormResolver = async (
 
     if (grouping) {
       appendix2 = await Promise.all(
-        grouping.map(async ({ form, quantity }) => ({
-          form: await getFormOrFormNotFound(form),
-          quantity
-        }))
+        grouping.map(async ({ form, quantity }) => {
+          const foundForm = await getFormOrFormNotFound(form);
+          return {
+            form: foundForm,
+            quantity:
+              quantity ??
+              new Decimal(foundForm.quantityReceived)
+                .minus(foundForm.quantityGrouped)
+                .toNumber()
+          };
+        })
       );
     } else if (appendix2Forms) {
       appendix2 = await Promise.all(

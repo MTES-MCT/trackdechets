@@ -4,6 +4,7 @@ import acheminementDirectWorkflow from "../workflows/acheminementDirect";
 import multiModalWorkflow from "../workflows/multiModal";
 import entreposageProvisoireWorkflow from "../workflows/entreposageProvisoire";
 import importBsdPapier from "../workflows/importBsdPapier";
+import regroupement from "../workflows/regroupement";
 
 describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () => {
   afterEach(resetDatabase);
@@ -20,6 +21,14 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     entreposageProvisoireWorkflow.title,
     async () => {
       await testWorkflow(entreposageProvisoireWorkflow);
+    },
+    15000
+  );
+
+  test(
+    regroupement.title,
+    async () => {
+      await testWorkflow(regroupement);
     },
     15000
   );

@@ -1049,6 +1049,55 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
+  it.only("should default to quantity left when no quantity is specified in grouping", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.AWAITING_GROUP,
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1,
+        quantityGrouped: 0.5
+      }
+    });
+
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SEALED,
+        recipientCompanySiret: ttr.siret,
+        grouping: {
+          create: {
+            quantity: 0.5,
+            initialFormId: appendix2.id
+          }
+        }
+      }
+    });
+
+    const createFormInput: CreateFormInput = {
+      emitter: {
+        type: "APPENDIX2",
+        company: {
+          siret: ttr.siret
+        }
+      },
+      grouping: [{ form: { id: appendix2.id } }]
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+
+    expect(data.createForm.grouping).toEqual([
+      expect.objectContaining({
+        quantity: 1,
+        form: expect.objectContaining({ id: appendix2.id })
+      })
+    ]);
+  });
+
   it("should set isDangerous to `true` when specifying a waste code ending with *", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
