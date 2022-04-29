@@ -985,7 +985,7 @@ describe("Mutation.createForm", () => {
     const appendix2 = await formFactory({
       ownerId: user.id,
       opt: {
-        status: Status.SENT,
+        status: Status.AWAITING_GROUP,
         recipientCompanySiret: ttr.siret,
         quantityReceived: 1
       }
@@ -1010,6 +1010,41 @@ describe("Mutation.createForm", () => {
       expect.objectContaining({
         message:
           "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+      })
+    ]);
+  });
+
+  it("should throw error when trying to set both appendix2Forms and grouping", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.AWAITING_GROUP,
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
+      }
+    });
+
+    const createFormInput: CreateFormInput = {
+      emitter: {
+        type: "APPENDIX2",
+        company: {
+          siret: ttr.siret
+        }
+      },
+      grouping: [
+        { form: { id: appendix2.id }, quantity: appendix2.quantityReceived }
+      ],
+      appendix2Forms: [{ id: appendix2.id }]
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous pouvez renseigner soit `appendix2Forms` soit `grouping` mais pas les deux"
       })
     ]);
   });

@@ -13,7 +13,7 @@ class FormFraction {
 
 class SetAppendix2Args {
   form: Form;
-  appendix2: FormFraction[];
+  appendix2: FormFraction[] | null;
 }
 
 export type SetAppendix2Fn = (args: SetAppendix2Args) => Promise<Form[]>;
@@ -39,11 +39,26 @@ export type SetAppendix2Fn = (args: SetAppendix2Args) => Promise<Form[]>;
 const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
   ({ prisma, user }) =>
   async ({ form, appendix2 }) => {
-    // check groupement form type is APPENDIX2
-    if (appendix2.length && form.emitterType !== EmitterType.APPENDIX2) {
+    const findAppendix2FormsById = buildFindAppendix2FormsById({
+      prisma,
+      user
+    });
+
+    const currentAppendix2Forms = await findAppendix2FormsById(form.id);
+
+    // check groupement form type is APPENDIX2 if
+    if (
+      (appendix2?.length ||
+        (currentAppendix2Forms.length && appendix2?.length !== 0)) &&
+      form.emitterType !== EmitterType.APPENDIX2
+    ) {
       throw new UserInputError(
         "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
       );
+    }
+
+    if (appendix2 === null) {
+      return currentAppendix2Forms;
     }
 
     // check emitter of groupement form matches destination of initial form
@@ -58,13 +73,6 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
         );
       }
     }
-
-    const findAppendix2FormsById = buildFindAppendix2FormsById({
-      prisma,
-      user
-    });
-
-    const currentAppendix2Forms = await findAppendix2FormsById(form.id);
 
     // check grouped forms have status AWAITING_GROUP or GROUPED
     const unawaitingGroupForm = await prisma.form.findFirst({

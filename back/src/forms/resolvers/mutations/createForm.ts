@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Form, Prisma } from "@prisma/client";
 import { isDangerous } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { eventEmitter, TDEvent } from "../../../events/emitter";
@@ -20,6 +20,7 @@ import { FormSirets } from "../../types";
 import { draftFormSchema } from "../../validation";
 import { getFormOrFormNotFound } from "../../database";
 import prisma from "../../../prisma";
+import { UserInputError } from "apollo-server-core";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -31,6 +32,12 @@ const createFormResolver = async (
 
     const { appendix2Forms, grouping, temporaryStorageDetail, ...formContent } =
       createFormInput;
+
+    if (appendix2Forms && grouping) {
+      throw new UserInputError(
+        "Vous pouvez renseigner soit `appendix2Forms` soit `grouping` mais pas les deux"
+      );
+    }
 
     if (
       formContent.wasteDetails?.code &&
@@ -93,32 +100,31 @@ const createFormResolver = async (
     const formRepository = getFormRepository(user, transaction);
     const newForm = await formRepository.create(formCreateInput);
 
-    if (appendix2Forms) {
-      // appendix2Forms is DEPRECATED, consumers should use grouping instead
-      const initialForms = await Promise.all(
-        appendix2Forms.map(({ id }) => getFormOrFormNotFound({ id }))
-      );
-      await formRepository.setAppendix2({
-        form: newForm,
-        appendix2: initialForms.map(f => ({
-          form: f,
-          quantity: f.quantityReceived
-        }))
-      });
-    }
+    let appendix2: { quantity: number; form: Form }[] = null;
 
     if (grouping) {
-      const appendix2 = await Promise.all(
+      appendix2 = await Promise.all(
         grouping.map(async ({ form, quantity }) => ({
           form: await getFormOrFormNotFound(form),
           quantity
         }))
       );
-      await formRepository.setAppendix2({
-        form: newForm,
-        appendix2
-      });
+    } else if (appendix2Forms) {
+      appendix2 = await Promise.all(
+        appendix2Forms.map(async ({ id }) => {
+          const initialForm = await getFormOrFormNotFound({ id });
+          return {
+            form: initialForm,
+            quantity: initialForm.quantityReceived
+          };
+        })
+      );
     }
+
+    await formRepository.setAppendix2({
+      form: newForm,
+      appendix2
+    });
 
     eventEmitter.emit(TDEvent.CreateForm, {
       previousNode: null,
