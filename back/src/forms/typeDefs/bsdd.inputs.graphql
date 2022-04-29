@@ -190,7 +190,7 @@ input CreateFormInput {
   "Courtier"
   broker: BrokerInput
 
-  "Annexe 2"
+  "Annexe 2 - Deprecated : utiliser grouping"
   appendix2Forms: [AppendixFormInput!]
     @deprecated(reason: "Utiliser `grouping`")
 
@@ -235,7 +235,7 @@ input UpdateFormInput {
   "Courtier"
   broker: BrokerInput
 
-  "Annexe 2"
+  "Annexe 2 - Deprecated : utiliser grouping"
   appendix2Forms: [AppendixFormInput!]
     @deprecated(reason: "Utiliser `grouping`")
 
@@ -280,7 +280,7 @@ input FormInput {
   "Courtier"
   broker: BrokerInput
 
-  "Annexe 2"
+  "Annexe 2 - Deprecated : utiliser grouping"
   appendix2Forms: [AppendixFormInput!]
     @deprecated(reason: "Utiliser `grouping`")
 
