@@ -1306,6 +1306,65 @@ describe("Mutation.updateForm", () => {
     expect(data3.updateForm.grouping).toHaveLength(1);
   }, 30000);
 
+  it("should default to quantity left when no quantity is specified in grouping", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
+    const appendix2Form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "AWAITING_GROUP",
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1,
+        quantityGrouped: 0.2
+      }
+    });
+
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SEALED,
+        recipientCompanySiret: ttr.siret,
+        grouping: {
+          create: {
+            quantity: 0.2,
+            initialFormId: appendix2Form.id
+          }
+        }
+      }
+    });
+
+    const groupingForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: ttr.siret,
+        emitterType: EmitterType.APPENDIX2
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput: UpdateFormInput = {
+      id: groupingForm.id,
+      grouping: [{ form: { id: appendix2Form.id } }]
+    };
+
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(data.updateForm.grouping).toEqual([
+      expect.objectContaining({ form: { id: appendix2Form.id }, quantity: 0.8 })
+    ]);
+
+    const updatedAppendix2Form = await prisma.form.findFirst({
+      where: { id: appendix2Form.id }
+    });
+
+    expect(updatedAppendix2Form.quantityGrouped).toEqual(
+      updatedAppendix2Form.quantityReceived
+    );
+  });
+
   it("should not be possible to set isDangerous=false with a waste code containing an *", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await formFactory({

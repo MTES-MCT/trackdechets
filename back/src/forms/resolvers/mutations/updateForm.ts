@@ -19,6 +19,7 @@ import { FormSirets } from "../../types";
 import { draftFormSchema, sealedFormSchema } from "../../validation";
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
+import Decimal from "decimal.js-light";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -149,10 +150,17 @@ const updateFormResolver = async (
 
     if (grouping) {
       appendix2 = await Promise.all(
-        grouping.map(async ({ form, quantity }) => ({
-          form: await getFormOrFormNotFound(form),
-          quantity
-        }))
+        grouping.map(async ({ form, quantity }) => {
+          const foundForm = await getFormOrFormNotFound(form);
+          return {
+            form: foundForm,
+            quantity:
+              quantity ??
+              new Decimal(foundForm.quantityReceived)
+                .minus(foundForm.quantityGrouped)
+                .toNumber()
+          };
+        })
       );
     } else if (appendix2Forms) {
       appendix2 = await Promise.all(

@@ -1049,7 +1049,7 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
-  it.only("should default to quantity left when no quantity is specified in grouping", async () => {
+  it("should default to quantity left when no quantity is specified in grouping", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
     const appendix2 = await formFactory({
       ownerId: user.id,
@@ -1057,7 +1057,7 @@ describe("Mutation.createForm", () => {
         status: Status.AWAITING_GROUP,
         recipientCompanySiret: ttr.siret,
         quantityReceived: 1,
-        quantityGrouped: 0.5
+        quantityGrouped: 0.2
       }
     });
 
@@ -1068,7 +1068,7 @@ describe("Mutation.createForm", () => {
         recipientCompanySiret: ttr.siret,
         grouping: {
           create: {
-            quantity: 0.5,
+            quantity: 0.2,
             initialFormId: appendix2.id
           }
         }
@@ -1092,10 +1092,18 @@ describe("Mutation.createForm", () => {
 
     expect(data.createForm.grouping).toEqual([
       expect.objectContaining({
-        quantity: 1,
+        quantity: 0.8,
         form: expect.objectContaining({ id: appendix2.id })
       })
     ]);
+
+    const updatedAppendix2 = await prisma.form.findUnique({
+      where: { id: appendix2.id }
+    });
+
+    expect(updatedAppendix2.quantityGrouped).toEqual(
+      updatedAppendix2.quantityReceived
+    );
   });
 
   it("should set isDangerous to `true` when specifying a waste code ending with *", async () => {
