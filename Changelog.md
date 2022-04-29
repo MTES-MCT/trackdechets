@@ -13,7 +13,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
   - Dépréciation des champs :
     - `Form.appendix2Forms: [Appendix2Form!]` : remplacé par `Form.grouping: [InitialFormFraction!]`
     - `CreateFormInput.appendix2Forms: [AppendixFormInput!]` : remplacé par `CreateFormInput.grouping: [InitialFormFractionInput!]`
-    - `UpdateFormInput.appendix2Forms: [AppendixFormInput!]` : remplacé par `CreateFormInput.grouping: [InitialFormFractionInput!]`
+    - `UpdateFormInput.appendix2Forms: [AppendixFormInput!]` : remplacé par `UpdateFormInput.grouping: [InitialFormFractionInput!]`
   - Modification du type de retour de `Form.groupedIn: Form` qui devient `Form.groupedIn: [FormFraction!]`
   - Ajout des types :
     - `InitialFormFraction`
