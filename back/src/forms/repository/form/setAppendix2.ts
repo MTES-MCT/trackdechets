@@ -46,7 +46,7 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
 
     const currentAppendix2Forms = await findAppendix2FormsById(form.id);
 
-    // check groupement form type is APPENDIX2 if
+    // check groupement form type is APPENDIX2 if appendix2 is not empty
     if (
       (appendix2?.length ||
         (currentAppendix2Forms.length && appendix2?.length !== 0)) &&

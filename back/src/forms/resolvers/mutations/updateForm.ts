@@ -48,7 +48,7 @@ const updateFormResolver = async (
 
     if (appendix2Forms && grouping) {
       throw new UserInputError(
-        "Vous devez renseigné soit `appendix2Forms` soit `grouping` mais pas les deux"
+        "Vous devez renseigner soit `appendix2Forms` soit `grouping` mais pas les deux"
       );
     }
 
