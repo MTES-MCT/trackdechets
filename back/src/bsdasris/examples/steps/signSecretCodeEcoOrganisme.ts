@@ -11,7 +11,7 @@ export function signSecretCodeEcoOrganisme(
     variables: ({ bsd }) => ({
       id: bsd.id,
       input: {
-        author: "Dr Brun",
+        author: "Michel Martin",
         securityCode: secretCode,
         signatureAuthor: "ECO_ORGANISME"
       }

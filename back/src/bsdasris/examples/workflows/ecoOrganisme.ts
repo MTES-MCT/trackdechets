@@ -31,6 +31,7 @@ export default {
   ],
   docContext: {
     pred: { siret: "SIRET_PRODUCTEUR", securityCode: "XXXX" },
+    ecoOrganisme: { siret: "SIRET_ECO_ORGANISME", securityCode: "YYYY" },
     transporteur: { siret: "SIRET_TRANSPORTEUR" },
     traiteur: { siret: "SIRET_TRAITEUR" },
     bsd: { id: "ID_BSD" }

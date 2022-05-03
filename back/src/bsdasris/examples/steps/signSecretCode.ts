@@ -11,7 +11,7 @@ export function signSecretCode(
     variables: ({ bsd }) => ({
       id: bsd.id,
       input: {
-        author: "Dr Brun",
+        author: "Julien Dupond",
         securityCode: secretCode
       }
     }),
