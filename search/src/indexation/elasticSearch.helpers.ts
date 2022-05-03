@@ -284,7 +284,12 @@ export const unzipAndIndex = async (
   const writableStream = getWritableParserAndIndexer(indexConfig, indexName);
   await pipeline(
     fs.createReadStream(csvPath),
-    parse({ headers, ignoreEmpty: true })
+    parse({
+      headers,
+      ignoreEmpty: true,
+      discardUnmappedColumns: true,
+      ...(parseInt(process.env.MAX_ROWS, 10) && { maxRows: parseInt(process.env.MAX_ROWS, 10)})
+    })
       .on("error", error => {
         throw error;
       })
