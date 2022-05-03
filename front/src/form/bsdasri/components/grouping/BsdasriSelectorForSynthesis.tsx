@@ -63,7 +63,7 @@ export default function BsdasriSelectorForSynthesis({ disabled }) {
       "synthesizing",
       state.selected.map(s => s)
     );
-  }, [state, "synthesizing", setFieldValue]);
+  }, [state, setFieldValue]);
 
   function onToggle(payload: Bsdasri | Bsdasri[]) {
     if (Array.isArray(payload)) {

@@ -10,11 +10,7 @@ import {
 } from "generated/graphql/types";
 import { InlineError } from "common/components/Error";
 import { RedErrorMessage } from "common/components";
-import {
-  isFRVat,
-  isSiret,
-  isVat,
-} from "generated/constants/companySearchHelpers";
+import { isSiret } from "generated/constants/companySearchHelpers";
 import { nafCodes } from "generated/constants/NAF";
 
 export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";

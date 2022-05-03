@@ -59,7 +59,7 @@ export const aggregatePackagings = (packagingsArray: BsdasriPackaging[][]) => {
           item.other === packaging.other &&
           item.volume === packaging.volume
       );
-      if (idx != -1) {
+      if (idx !== -1) {
         const found = prev[idx];
         prev.splice(idx, 1, {
           ...found,

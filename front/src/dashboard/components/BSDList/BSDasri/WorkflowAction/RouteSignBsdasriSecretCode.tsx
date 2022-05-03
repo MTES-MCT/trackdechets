@@ -14,7 +14,6 @@ import {
   MutationSignBsdasriEmissionWithSecretCodeArgs,
   MutationUpdateBsdasriArgs,
   BsdasriSignatureType,
-  Bsdasri,
 } from "generated/graphql/types";
 import { getComputedState } from "form/common/stepper/GenericStepList";
 import getInitialState, {
@@ -24,7 +23,7 @@ import getInitialState, {
 import { GET_DETAIL_DASRI } from "common/queries";
 import { InlineError, NotificationError } from "common/components/Error";
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
-import { Formik, Field, Form, useFormikContext } from "formik";
+import { Formik, Field, Form } from "formik";
 import routes from "common/routes";
 import { removeSections } from "./PartialForms";
 import {
