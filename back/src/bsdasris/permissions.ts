@@ -22,7 +22,8 @@ export async function isDasriContributorHelper(
   const formSirets = [
     dasri.emitterCompanySiret,
     dasri.transporterCompanySiret,
-    dasri.destinationCompanySiret
+    dasri.destinationCompanySiret,
+    dasri.ecoOrganismeSiret
   ].filter(Boolean);
 
   return userSirets.some(siret => formSirets.includes(siret));

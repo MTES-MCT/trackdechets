@@ -245,10 +245,11 @@ model Declaration {
 }
 
 model EcoOrganisme {
-  id      String @id @default(cuid())
-  siret   String @unique
-  name    String
-  address String
+  id            String  @id @default(cuid())
+  siret         String  @unique
+  name          String
+  address       String
+  handleBsdasri Boolean @default(false)
 }
 
 model Form {
@@ -881,6 +882,7 @@ model Bsdasri {
   // Ecoorganisme
   ecoOrganismeName                    String?
   ecoOrganismeSiret                   String?
+  emittedByEcoOrganisme               Boolean                 @default(false)
   // transporter
   transporterCompanyName              String?
   transporterCompanySiret             String?

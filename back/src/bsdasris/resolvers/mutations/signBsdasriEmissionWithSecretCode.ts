@@ -10,12 +10,13 @@ const signBsdasriEmissionWithSecretCode: MutationResolvers["signBsdasriEmissionW
     { id, input }: MutationSignBsdasriEmissionWithSecretCodeArgs,
     context
   ) => {
-    const { securityCode, author } = input;
+    const { securityCode, author, signatureAuthor = "EMITTER" } = input;
     return sign({
       id,
       author,
       context,
-      securityCode
+      securityCode,
+      emissionSignatureAuthor: signatureAuthor
     });
   };
 

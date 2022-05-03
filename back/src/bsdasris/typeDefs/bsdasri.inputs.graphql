@@ -255,8 +255,6 @@ input BsdasriInput {
   synthesizing: [ID!]
 }
 
- 
-
 input BsdasriSignatureInput {
   "Type de signature apposée"
   type: BsdasriSignatureType!
@@ -269,4 +267,6 @@ input BsdasriSignatureWithSecretCodeInput {
   author: String!
   "Code de sécurité de l'entreprise pour laquelle on signe. Permet de signer en tant que. Optionnel"
   securityCode: Int!
+  "Dénomination de l'auteur de la signature, par défaut il s'agit de l'émetteur"
+  signatureAuthor: SignatureAuthor
 }

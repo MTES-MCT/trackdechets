@@ -11,6 +11,7 @@ import {
   BsdasriEcoOrganisme,
 } from "../../../../generated/graphql/types";
 import TdSwitch from "common/components/Switch";
+import { optionCSS } from "react-select/src/components/Option";
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -19,6 +20,7 @@ const GET_ECO_ORGANISMES = gql`
       name
       siret
       address
+      handleBsdasri
     }
   }
 `;
@@ -55,7 +57,7 @@ export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
       setFieldValue(field.name, getInitialEcoOrganisme(), false);
     }
   }
-
+  console.log(data);
   return (
     <>
       <div className="form__row">
@@ -73,15 +75,10 @@ export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
           {data && (
             <>
               <div className="form__row notification notification--info">
-                Veuillez sélectionner ci-dessous un des éco-organismes
-                enregistrés dans Trackdéchets.
+                Veuillez sélectionner ci-dessous l'éco-organisme agréé pour la
+                gestion des dasris.
               </div>
-              <SearchInput
-                id="eco-search"
-                placeholder="Filtrer les éco-organismes par nom..."
-                className={styles.ecoorganismeSearchInput}
-                onChange={event => setClue(event.target.value)}
-              />
+
               <div className={styles.list}>
                 <CompanyResults<EcoOrganisme>
                   onSelect={eo =>
@@ -90,9 +87,7 @@ export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
                       siret: eo.siret,
                     })
                   }
-                  results={data.ecoOrganismes.filter(eo =>
-                    eo.name.toLowerCase().includes(clue.toLowerCase())
-                  )}
+                  results={data.ecoOrganismes.filter(eo => !!eo.handleBsdasri)}
                   selectedItem={
                     data.ecoOrganismes.find(
                       eo => eo.siret === field.value?.siret

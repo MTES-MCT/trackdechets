@@ -42,7 +42,8 @@ const createBsdasri = async (
   const formSirets = {
     emitterCompanySiret: input.emitter?.company?.siret,
     destinationCompanySiret: input.destination?.company?.siret,
-    transporterCompanySiret: input.transporter?.company?.siret
+    transporterCompanySiret: input.transporter?.company?.siret,
+    ecoOrganismeSiret: input.ecoOrganisme?.siret
   };
 
   await checkIsBsdasriContributor(

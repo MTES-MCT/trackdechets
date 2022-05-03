@@ -137,7 +137,16 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               </>
             )}
             <p>Info libre : {bsdasri.emitter?.pickupSite?.infos}</p>
-
+            {bsdasri.emitter?.emission?.isTakenOverWithoutEmitterSignature && (
+              <p>
+                <strong>Enlevé sans signature PRED :</strong> Oui
+              </p>
+            )}
+            {bsdasri.emitter?.emission?.isTakenOverWithSecretCode && (
+              <p>
+                <strong>Signature avec code secret PRED :</strong> Oui
+              </p>
+            )}
             <p>
               <strong>Date de remise au collecteur :</strong>{" "}
             </p>

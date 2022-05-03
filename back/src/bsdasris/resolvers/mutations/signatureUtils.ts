@@ -20,10 +20,10 @@ type checkEmitterAllowsDirectTakeOverFn = ({
  */
 export const checkDirectakeOverIsAllowed: checkEmitterAllowsDirectTakeOverFn =
   async ({ signatureParams, bsdasri }) => {
-    if (
-      signatureParams.eventType === BsdasriEventType.SignTransport &&
-      bsdasri.status === BsdasriStatus.INITIAL
-    ) {
+    if (signatureParams.eventType !== BsdasriEventType.SignTransport) {
+      return undefined;
+    }
+    if (bsdasri.status === BsdasriStatus.INITIAL) {
       if (bsdasri.type == BsdasriType.GROUPING) {
         throw new UserInputError(
           "L'emport direct est interdit pour les bordereaux dasri de groupement"
@@ -51,46 +51,80 @@ export const checkDirectakeOverIsAllowed: checkEmitterAllowsDirectTakeOverFn =
 type checkEmitterAllowsSignatureWithCodeFn = ({
   signatureParams: BsdasriSignatureInfos,
   bsdasri: Dasri,
-  securityCode: number
+  securityCode: number,
+  emissionSignatureAuthor: SignatureAuthor
 }) => Promise<boolean>;
 /**
  * Dasri takeOver can be processed on the transporter device
- * To perform this, we expect a SEALED -> READY_TO_TAKEOVER signature, then a READY_TO_TAKEOVER -> SENT one
+ * To perform this, we expect a INITIAL -> SIGNED_BY_PRODUCER signature, then a SIGNED_BY_PRODUCER -> SENT one
  * This function is intended to perform checks to allow the first aforementionned transition, and verify
  * provided code matches emitter's one.
+ * We try to match the code with emitter secret code, then ecoorganisme secret code (if ecoorganisme belongs to the dasri)
  * A boolean is returned to be stored on Bsdasri model iot tell apart which dasris were taken over with secret code.
  */
-export const checkEmitterAllowsSignatureWithSecretCode: checkEmitterAllowsSignatureWithCodeFn =
-  async ({ signatureParams, bsdasri, securityCode }) => {
-    if (!securityCode) {
-      return false;
-    }
-    if (
-      signatureParams.eventType !==
-        BsdasriEventType.SignEmissionWithSecretCode ||
-      bsdasri.status !== BsdasriStatus.INITIAL
-    ) {
-      return false;
-    }
-    const emitterCompany = await getCompanyOrCompanyNotFound({
-      siret: bsdasri.emitterCompanySiret
-    });
 
-    if (!securityCode || securityCode !== emitterCompany.securityCode) {
-      throw new UserInputError(
-        "Erreur, le code de sécurité est manquant ou invalide"
-      );
+export const checkEmissionSignedWithSecretCode: checkEmitterAllowsSignatureWithCodeFn =
+  async ({
+    signatureParams,
+    bsdasri,
+    securityCode,
+    emissionSignatureAuthor
+  }) => {
+    const errMessage = "Erreur, le code de sécurité est invalide";
+    // Filter out irrelevant event types
+    if (
+      signatureParams.eventType !== BsdasriEventType.SignEmissionWithSecretCode
+    ) {
+      return undefined;
+    }
+    // security code not provided
+    if (!securityCode) {
+      throw new UserInputError("Erreur, le code de sécurité est manquant");
+    }
+    if (bsdasri.status !== BsdasriStatus.INITIAL) {
+      return undefined;
+    }
+
+    if (emissionSignatureAuthor === "ECO_ORGANISME") {
+      const ecoorganismeCompany = await getCompanyOrCompanyNotFound({
+        siret: bsdasri.ecoOrganismeSiret
+      });
+
+      if (securityCode !== ecoorganismeCompany.securityCode) {
+        throw new UserInputError(errMessage);
+      }
+    }
+    if (emissionSignatureAuthor === "EMITTER") {
+      const emitterCompany = await getCompanyOrCompanyNotFound({
+        siret: bsdasri.emitterCompanySiret
+      });
+
+      if (securityCode !== emitterCompany.securityCode) {
+        throw new UserInputError(errMessage);
+      }
     }
     return true;
   };
-
+export const checkIsSignedByEcoOrganisme = ({
+  signatureParams,
+  siretWhoSigns,
+  bsdasri
+}) => {
+  if (signatureParams.eventType !== BsdasriEventType.SignEmission) {
+    return undefined;
+  }
+  if (!bsdasri.ecoOrganismeSiret) {
+    return false;
+  }
+  return bsdasri.ecoOrganismeSiret === siretWhoSigns;
+};
 // Secret code signature rely on a specific mutation, here we use a common util to sign each dasri step
 type InternalBsdasriSignatureType =
   | BsdasriSignatureType
   | "EMISSION_WITH_SECRET_CODE";
 
 /**
- * Parameters to pass to state machine
+ * Signature parameters configuration
  */
 export const dasriSignatureMapping: Record<
   InternalBsdasriSignatureType,
@@ -102,15 +136,22 @@ export const dasriSignatureMapping: Record<
     eventType: BsdasriEventType.SignEmission,
     validationContext: { emissionSignature: true },
     signatoryField: "emissionSignatory",
-    authorizedSiret: bsdasri => bsdasri.emitterCompanySiret
+
+    authorizedSirets: bsdasri =>
+      bsdasri.type === BsdasriType.SIMPLE
+        ? [bsdasri.ecoOrganismeSiret, bsdasri.emitterCompanySiret].filter(
+            Boolean
+          )
+        : [bsdasri.emitterCompanySiret]
   },
+
   EMISSION_WITH_SECRET_CODE: {
     author: "emitterEmissionSignatureAuthor",
     date: "emitterEmissionSignatureDate",
     eventType: BsdasriEventType.SignEmissionWithSecretCode,
     validationContext: { emissionSignature: true },
     signatoryField: "emissionSignatory",
-    authorizedSiret: bsdasri => bsdasri.transporterCompanySiret // transporter can sign with emitter secret code (trs device)
+    authorizedSirets: bsdasri => [bsdasri.transporterCompanySiret] // transporter can sign with emitter secret code (trs device)
   },
   TRANSPORT: {
     author: "transporterTransportSignatureAuthor",
@@ -119,7 +160,7 @@ export const dasriSignatureMapping: Record<
     validationContext: { emissionSignature: true, transportSignature: true }, // validate emission in case of direct takeover
 
     signatoryField: "transportSignatory",
-    authorizedSiret: bsdasri => bsdasri.transporterCompanySiret
+    authorizedSirets: bsdasri => [bsdasri.transporterCompanySiret]
   },
 
   RECEPTION: {
@@ -128,7 +169,7 @@ export const dasriSignatureMapping: Record<
     eventType: BsdasriEventType.SignReception,
     validationContext: { receptionSignature: true },
     signatoryField: "receptionSignatory",
-    authorizedSiret: bsdasri => bsdasri.destinationCompanySiret
+    authorizedSirets: bsdasri => [bsdasri.destinationCompanySiret]
   },
   OPERATION: {
     author: "destinationOperationSignatureAuthor",
@@ -136,7 +177,7 @@ export const dasriSignatureMapping: Record<
     eventType: BsdasriEventType.SignOperation,
     validationContext: { operationSignature: true },
     signatoryField: "operationSignatory",
-    authorizedSiret: bsdasri => bsdasri.destinationCompanySiret
+    authorizedSirets: bsdasri => [bsdasri.destinationCompanySiret]
   }
 };
 
@@ -170,7 +211,8 @@ type BsdasriSignatureInfos = {
     | "destinationReceptionSignatureDate"
     | "destinationOperationSignatureDate";
   eventType: BsdasriEventType;
-  authorizedSiret: (bsdasri: Bsdasri) => string;
+
+  authorizedSirets: (bsdasri: Bsdasri) => string[];
   validationContext: BsdasriValidationContext;
   signatoryField:
     | "emissionSignatory"

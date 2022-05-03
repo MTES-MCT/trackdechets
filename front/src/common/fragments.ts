@@ -451,6 +451,9 @@ export const dashboardDasriFragment = gql`
         isTakenOverWithSecretCode
       }
     }
+    ecoOrganisme {
+      siret
+    }
     transporter {
       company {
         ...CompanyFragment

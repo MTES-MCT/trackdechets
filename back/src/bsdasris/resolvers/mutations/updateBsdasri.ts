@@ -41,7 +41,8 @@ const updateBsdasriResolver = async (
   const formSirets = {
     emitterCompanySiret: dbBsdasri?.emitterCompanySiret,
     destinationCompanySiret: dbBsdasri?.destinationCompanySiret,
-    transporterCompanySiret: dbBsdasri?.transporterCompanySiret
+    transporterCompanySiret: dbBsdasri?.transporterCompanySiret,
+    ecoOrganismeSiret: dbBsdasri?.ecoOrganismeSiret
   };
 
   await checkIsBsdasriContributor(

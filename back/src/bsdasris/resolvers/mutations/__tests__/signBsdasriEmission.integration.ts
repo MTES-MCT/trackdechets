@@ -78,14 +78,15 @@ describe("Mutation.signBsdasri emission", () => {
       }
     });
 
-    const signedByTransporterDasri = await prisma.bsdasri.findUnique({
+    const signedByEmitterDasri = await prisma.bsdasri.findUnique({
       where: { id: dasri.id }
     });
-    expect(signedByTransporterDasri.status).toEqual("SIGNED_BY_PRODUCER");
-    expect(signedByTransporterDasri.emitterEmissionSignatureAuthor).toEqual(
+    expect(signedByEmitterDasri.status).toEqual("SIGNED_BY_PRODUCER");
+    expect(signedByEmitterDasri.emitterEmissionSignatureAuthor).toEqual(
       "Marcel"
     );
-    expect(signedByTransporterDasri.emitterEmissionSignatureDate).toBeTruthy();
-    expect(signedByTransporterDasri.emissionSignatoryId).toEqual(user.id);
+    expect(signedByEmitterDasri.emitterEmissionSignatureDate).toBeTruthy();
+    expect(signedByEmitterDasri.emissionSignatoryId).toEqual(user.id);
+    expect(signedByEmitterDasri.emittedByEcoOrganisme).toBe(false);
   });
 });

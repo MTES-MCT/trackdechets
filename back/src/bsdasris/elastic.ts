@@ -40,7 +40,8 @@ function getWhere(
   const formSirets: Record<string, string | null | undefined> = {
     emitterCompanySiret: bsdasri.emitterCompanySiret,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
-    transporterCompanySiret: bsdasri.transporterCompanySiret
+    transporterCompanySiret: bsdasri.transporterCompanySiret,
+    ecoOrganismeSiret: bsdasri.ecoOrganismeSiret
   };
 
   const siretsFilters = new Map<string, keyof typeof where>(
@@ -48,6 +49,7 @@ function getWhere(
       .filter(([_, siret]) => !!siret)
       .map(([actor, _]) => [actor, "isFollowFor"])
   );
+
   type Mapping = Map<string, keyof typeof where>;
   const setTab = (map: Mapping, key: string, newValue: keyof typeof where) => {
     if (!map.has(key)) {
@@ -66,6 +68,7 @@ function getWhere(
         if (bsdasri.type !== BsdasriType.SYNTHESIS) {
           // for Synthesis dasri emitter & transporter are the same company, INITIAL bsd should appear in `isToCollectFor` tab
           setTab(siretsFilters, "emitterCompanySiret", "isForActionFor");
+          setTab(siretsFilters, "ecoOrganismeSiret", "isForActionFor");
         }
 
         setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
