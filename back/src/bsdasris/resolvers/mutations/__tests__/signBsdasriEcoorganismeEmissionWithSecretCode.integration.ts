@@ -24,7 +24,8 @@ describe("Mutation.signBsdasri emission with secret code", () => {
       data: {
         address: "",
         name: "Eco-Organisme",
-        siret: ecoOrganismeCompany.siret
+        siret: ecoOrganismeCompany.siret,
+        handleBsdasri: true
       }
     });
     const emitterCompany = await companyFactory();
@@ -78,7 +79,8 @@ describe("Mutation.signBsdasri emission with secret code", () => {
       data: {
         address: "",
         name: "Eco-Organisme",
-        siret: ecoOrganismeCompany.siret
+        siret: ecoOrganismeCompany.siret,
+        handleBsdasri: true
       }
     });
     const emitterCompany = await companyFactory();

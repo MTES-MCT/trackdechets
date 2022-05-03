@@ -11,7 +11,7 @@ async function testWorkflow(workflow) {
     if (workflowCompany.companyTypes.includes("ECO_ORGANISME")) {
       // create ecoOrganisme to allow its user to perform api calls
       const count = await prisma.company.count();
-      await ecoOrganismeFactory({ count });
+      await ecoOrganismeFactory({ count, handleBsdasri: true });
     }
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: workflowCompany.companyTypes,

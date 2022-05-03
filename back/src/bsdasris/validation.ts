@@ -277,13 +277,13 @@ export const ecoOrganismeSchema: FactorySchemaOf<
       .notRequired()
       .nullable()
       .test(
-        "is-known-eco-organisme",
-        "L'éco-organisme avec le siret \"${value}\" n'est pas reconnu.",
+        "is-known-bsdasri-eco-organisme",
+        "L'éco-organisme avec le siret \"${value}\" n'est pas reconnu ou n'est pas autorisé à gérer des dasris.",
         ecoOrganismeSiret =>
           ecoOrganismeSiret
             ? prisma.ecoOrganisme
                 .findFirst({
-                  where: { siret: ecoOrganismeSiret }
+                  where: { siret: ecoOrganismeSiret, handleBsdasri: true }
                 })
                 .then(el => el != null)
             : true
