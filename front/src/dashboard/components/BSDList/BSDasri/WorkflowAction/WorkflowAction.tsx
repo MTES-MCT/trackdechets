@@ -78,7 +78,9 @@ export function WorkflowAction(props: WorkflowActionProps) {
                 state: { background: location },
               }}
             >
-             {isEcoOrganisme ? "Signature Éco-organisme" : "Signature producteur"} 
+              {isEcoOrganisme
+                ? "Signature Éco-organisme"
+                : "Signature producteur"}
             </ActionLink>
           </>
         );

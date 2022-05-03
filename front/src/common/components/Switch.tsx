@@ -36,7 +36,7 @@ type FieldSwitchProps = FieldProps & {
   label: string;
 };
 
-// Compatilibty layer between the Switch and Formik's <Field />
+// Compatibility layer between the Switch and Formik's <Field />
 export function FieldSwitch({
   field: { checked, ...field },
   form: { setFieldValue },

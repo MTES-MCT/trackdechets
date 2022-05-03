@@ -1,9 +1,8 @@
 import { useQuery, gql } from "@apollo/client";
 import { useField, useFormikContext } from "formik";
-import React, { useState } from "react";
+import React from "react";
 import CompanyResults from "../../../common/components/company/CompanyResults";
 import styles from "./EcoOrganismes.module.scss";
-import SearchInput from "common/components/SearchInput";
 import {
   Query,
   EcoOrganisme,
@@ -11,7 +10,6 @@ import {
   BsdasriEcoOrganisme,
 } from "../../../../generated/graphql/types";
 import TdSwitch from "common/components/Switch";
-import { optionCSS } from "react-select/src/components/Option";
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -44,7 +42,7 @@ interface EcoOrganismesProps {
 export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
   const [field] = useField<Bsdasri["ecoOrganisme"]>(props);
   const { setFieldValue } = useFormikContext<Bsdasri>();
-  const [clue, setClue] = useState("");
+
   const { loading, error, data } = useQuery<Pick<Query, "ecoOrganismes">>(
     GET_ECO_ORGANISMES
   );
@@ -57,7 +55,6 @@ export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
       setFieldValue(field.name, getInitialEcoOrganisme(), false);
     }
   }
-  console.log(data);
   return (
     <>
       <div className="form__row">

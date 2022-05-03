@@ -1,11 +1,12 @@
 import React from "react";
-import { RedErrorMessage, Label } from "common/components";
+import { RedErrorMessage, Label, FieldSwitch } from "common/components";
 import Packagings from "form/bsdasri/components/packagings/Packagings";
 import WeightWidget from "form/bsdasri/components/Weight";
 import { useParams, useHistory, generatePath } from "react-router-dom";
 import { BdasriSummary } from "dashboard/components/BSDList/BSDasri/Summary/BsdasriSummary";
 import Loader from "common/components/Loaders";
 import { useQuery, useMutation } from "@apollo/client";
+
 import {
   Query,
   QueryBsdasriArgs,
@@ -13,6 +14,7 @@ import {
   MutationSignBsdasriEmissionWithSecretCodeArgs,
   MutationUpdateBsdasriArgs,
   BsdasriSignatureType,
+  Bsdasri,
 } from "generated/graphql/types";
 import { getComputedState } from "form/common/stepper/GenericStepList";
 import getInitialState, {
@@ -22,7 +24,7 @@ import getInitialState, {
 import { GET_DETAIL_DASRI } from "common/queries";
 import { InlineError, NotificationError } from "common/components/Error";
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
-import { Formik, Field, Form } from "formik";
+import { Formik, Field, Form, useFormikContext } from "formik";
 import routes from "common/routes";
 import { removeSections } from "./PartialForms";
 import {
@@ -95,11 +97,13 @@ export function RouteBSDasrisSignEmissionSecretCode() {
           signature: {
             author: "",
             securityCode: "",
+            signatureAuthor: false,
           },
         }}
         validationSchema={emissionSignatureSecretCodeValidationSchema}
         onSubmit={async values => {
           const { id, signature, ...rest } = values;
+
           await updateBsdasri({
             variables: {
               id: id,
@@ -114,6 +118,10 @@ export function RouteBSDasrisSignEmissionSecretCode() {
               input: {
                 ...signature,
                 securityCode: parseInt(signature.securityCode, 10),
+
+                signatureAuthor: !!signature.signatureAuthor
+                  ? "ECO_ORGANISME"
+                  : "EMITTER",
               },
             },
           });
@@ -146,6 +154,14 @@ export function RouteBSDasrisSignEmissionSecretCode() {
                   required
                   style={{ width: "100px" }}
                 />
+                {bsdasri?.ecoOrganisme?.siret && (
+                  <Field
+                    type="checkbox"
+                    component={FieldSwitch}
+                    name="signature.signatureAuthor"
+                    label="Le code est celui de l'éco-organisme"
+                  />
+                )}
               </div>
               <RedErrorMessage name="signature.securityCode" />
               <div className="form__row">
