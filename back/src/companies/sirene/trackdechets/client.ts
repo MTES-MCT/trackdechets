@@ -134,7 +134,7 @@ export const searchCompanies = (
   requestOptions?: Partial<TransportRequestOptions>
 ): Promise<SireneSearchResult[]> => {
   const qs = removeDiacritics(clue);
-  // Multi-match query docs https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html
+  // Match query on the merged field td_search_companies
   const must: QueryDslQueryContainer[] = [
     {
       match: {
