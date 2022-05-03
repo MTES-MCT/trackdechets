@@ -179,7 +179,7 @@ function transporterToGroupInput(siret: string) {
 function destinationToGroupInput(siret: string) {
   return {
     company: traiteurCompanyInput(siret),
-    plannedOperationCode: "D 13",
+    plannedOperationCode: "D 15",
     cap: "CAP",
     reception: {
       acceptationStatus: "ACCEPTED",
@@ -187,7 +187,7 @@ function destinationToGroupInput(siret: string) {
       weight: 2.1
     },
     operation: {
-      code: "D 13",
+      code: "D 15",
       date: new Date().toISOString() as any
     }
   };

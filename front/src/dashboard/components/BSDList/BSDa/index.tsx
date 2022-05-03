@@ -1,7 +1,7 @@
 import * as React from "react";
 import { CellProps, CellValue } from "react-table";
 
-import { Bsda, BsdaStatus } from "generated/graphql/types";
+import { Bsda, BsdaStatus, BsdaType } from "generated/graphql/types";
 import { IconBSDa } from "common/components/Icons";
 import { BSDaActions } from "./BSDaActions/BSDaActions";
 import { useParams } from "react-router-dom";
@@ -19,7 +19,6 @@ const bsdaVerboseStatuses: Record<BsdaStatus, string> = {
   AWAITING_CHILD: "En attente d'un BSDA suite",
 };
 
-// Basic implementation
 export const COLUMNS: Record<
   string,
   {
@@ -28,8 +27,14 @@ export const COLUMNS: Record<
   }
 > = {
   type: {
-    accessor: () => null,
-    Cell: () => <IconBSDa style={{ fontSize: "24px" }} />,
+    accessor: bsda => bsda["bsdaType"],
+    Cell: ({ value }) => (
+      <>
+        <IconBSDa style={{ fontSize: "24px" }} />
+        {value === BsdaType.Gathering && <span>Grp</span>}
+        {value === BsdaType.Reshipment && <span>Transit</span>}
+      </>
+    ),
   },
   readableId: {
     accessor: bsda => bsda.id,

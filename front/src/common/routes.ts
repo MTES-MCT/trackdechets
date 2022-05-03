@@ -1,4 +1,4 @@
-export default {
+const routes = {
   admin: {
     index: "/admin",
     verification: "/admin/verification",
@@ -89,3 +89,5 @@ export default {
     },
   },
 };
+
+export default routes;

@@ -5,7 +5,7 @@ import {
   TransportMode,
 } from "generated/graphql/types";
 
-export default {
+const initialState = {
   type: BsdaType.OtherCollections,
   emitter: {
     company: getInitialCompany(),
@@ -54,9 +54,12 @@ export default {
     plannedOperationCode: "",
     company: getInitialCompany(),
     operation: {
+      description: "",
       nextDestination: null,
     },
   },
   grouping: [],
   forwarding: null,
 };
+
+export default initialState;

@@ -53,7 +53,7 @@ export default async function sign(
 
   // Check that all necessary fields are filled
   await validateBsda(bsda, [], {
-    isPrivateIndividual: bsda.emitterIsPrivateIndividual,
+    skipPreviousBsdas: true,
     emissionSignature:
       bsda.emitterEmissionSignatureDate != null || input.type === "EMISSION",
     workSignature:

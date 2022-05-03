@@ -25,7 +25,9 @@ export function Transport({ disabled }: Props) {
         </label>
       ) : (
         <>
-          <h4 className="form__section-heading">Autorisations</h4>
+          <h4 className="form__section-heading">
+            Récépissé de déclaration de transport de déchets
+          </h4>
           <div className="form__row">
             <label>
               Numéro de récépissé

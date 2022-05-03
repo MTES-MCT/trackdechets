@@ -27,7 +27,7 @@ import {
 import { BsdaConsistence } from "../generated/graphql/types";
 import prisma from "../prisma";
 
-export const PARTIAL_OPERATIONS = ["R 12", "D 13", "D 15"];
+export const PARTIAL_OPERATIONS = ["R 13", "D 15"];
 const OPERATIONS = ["R 5", "D 5", "D 9", ...PARTIAL_OPERATIONS];
 type Emitter = Pick<
   Bsda,
@@ -71,6 +71,7 @@ type Destination = Pick<
   | "destinationReceptionAcceptationStatus"
   | "destinationReceptionRefusalReason"
   | "destinationOperationCode"
+  | "destinationOperationDescription"
   | "destinationOperationDate"
   | "destinationOperationNextDestinationCap"
 >;
@@ -105,8 +106,7 @@ type WasteDescription = Pick<
 >;
 
 interface BsdaValidationContext {
-  isType2710?: boolean;
-  isPrivateIndividual?: boolean;
+  skipPreviousBsdas?: boolean;
   emissionSignature?: boolean;
   transportSignature?: boolean;
   operationSignature?: boolean;
@@ -125,15 +125,23 @@ export async function validateBsda(
     .concat(wasteDescriptionSchema(context))
     .validate(bsda, { abortEarly: false });
 
-  await validatePreviousBsdas(bsda, previousBsdas);
+  if (!context.skipPreviousBsdas) {
+    await validatePreviousBsdas(bsda, previousBsdas);
+  }
 }
 
 async function validatePreviousBsdas(
   bsda: Partial<Prisma.BsdaCreateInput>,
   previousBsdas: Bsda[]
 ) {
-  if (previousBsdas.length === 0) {
+  if (!["GATHERING", "RESHIPMENT"].includes(bsda.type)) {
     return;
+  }
+
+  if (previousBsdas.length === 0) {
+    throw new UserInputError(
+      `Un bordereau de groupement ou de réexpédition doit obligatoirement être associé à au moins un bordereau.`
+    );
   }
 
   const previousBsdasWithDestination = previousBsdas.filter(
@@ -427,13 +435,23 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
           `Entreprise de destination: ${MISSING_COMPANY_EMAIL}`
         ),
       destinationCap: yup.string().when("type", {
-        is: BsdaType.COLLECTION_2710,
+        is: value =>
+          [
+            BsdaType.COLLECTION_2710,
+            BsdaType.GATHERING,
+            BsdaType.RESHIPMENT
+          ].includes(value),
         then: schema => schema.nullable(),
-        otherwise: schema =>
-          schema.requiredIf(
-            context.emissionSignature,
-            `Entreprise de destination: CAP obligatoire`
-          )
+        otherwise: s =>
+          s.when("destinationPlannedOperationCode", {
+            is: value => PARTIAL_OPERATIONS.includes(value),
+            then: schema => schema.nullable(),
+            otherwise: schema =>
+              schema.requiredIf(
+                context.emissionSignature,
+                `Entreprise de destination: CAP obligatoire`
+              )
+          })
       }),
       destinationPlannedOperationCode: yup
         .string()
@@ -516,6 +534,7 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
                 `Entreprise de destination: vous devez préciser le code d'opération réalisé`
               )
         }),
+      destinationOperationDescription: yup.string().nullable(),
       destinationOperationDate: yup
         .date()
         .when("destinationReceptionAcceptationStatus", {
@@ -631,7 +650,12 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
                   value => isSiret(value)
                 );
               }
-              return schema.nullable().notRequired();
+              return schema
+                .nullable()
+                .requiredIf(
+                  context.workSignature,
+                  `Transporteur: ${MISSING_COMPANY_SIRET}`
+                );
             })
         }),
       transporterCompanyVatNumber: yup

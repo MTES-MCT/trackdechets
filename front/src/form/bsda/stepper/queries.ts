@@ -123,9 +123,37 @@ export const FullBsdaFragment = gql`
     }
     grouping {
       id
+      waste {
+        code
+      }
+      destination {
+        cap
+        operation {
+          nextDestination {
+            cap
+          }
+        }
+        reception {
+          weight
+        }
+      }
     }
     forwardedIn {
       id
+      waste {
+        code
+      }
+      destination {
+        cap
+        operation {
+          nextDestination {
+            cap
+          }
+        }
+        reception {
+          weight
+        }
+      }
     }
   }
   ${companyFragment}

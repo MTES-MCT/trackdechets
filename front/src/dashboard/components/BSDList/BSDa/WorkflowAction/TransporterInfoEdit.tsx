@@ -4,7 +4,6 @@ import { IconPaperWrite } from "common/components/Icons";
 import TdModal from "common/components/Modal";
 import TagsInput from "common/components/tags-input/TagsInput";
 import Tooltip from "common/components/Tooltip";
-import { capitalize } from "common/helper";
 import { UPDATE_BSDA } from "form/bsda/stepper/queries";
 import { Field, Form, Formik } from "formik";
 import {

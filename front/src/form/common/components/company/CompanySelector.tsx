@@ -137,7 +137,6 @@ export default function CompanySelector({
       Object.keys(fields).forEach(key => {
         setFieldValue(`${field.name}.${key}`, fields[key]);
       });
-
       if (onCompanySelected) {
         onCompanySelected(company);
       }

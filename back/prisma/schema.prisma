@@ -1207,6 +1207,7 @@ model Bsda {
   destinationReceptionRefusalReason     String?
 
   destinationOperationCode            String?
+  destinationOperationDescription     String?
   destinationOperationDate            DateTime? @db.Timestamptz(6)
   destinationOperationSignatureAuthor String?
   destinationOperationSignatureDate   DateTime? @db.Timestamptz(6)

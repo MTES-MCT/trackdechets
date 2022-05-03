@@ -534,7 +534,7 @@ describe("Mutation.Bsda.sign", () => {
           transporterTransportSignatureAuthor: "Transporter",
           transporterTransportSignatureDate: new Date(),
           destinationCompanySiret: company.siret,
-          destinationOperationCode: "D 13"
+          destinationOperationCode: "D 15"
         }
       });
 
