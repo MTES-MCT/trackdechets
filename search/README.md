@@ -48,9 +48,9 @@ Puis de relancer chaque script
 
 (en date de mai 2022)
 <details>
-```
-http http://localhost:9200/stocketablissement-production/
-
+ - Réponse sur http://localhost:9200/stocketablissement-production/
+  
+```json
 {
     "stocketablissement-production-1.1.0-1650549309561": {
         "aliases": {
