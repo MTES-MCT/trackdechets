@@ -31,6 +31,7 @@ export default function plugin(): Plugin<any> {
           entreposageProvisoire: parseWorkflow(
             bsdWorkflows.entreposageProvisoire
           ),
+          regroupement: parseWorkflow(bsdWorkflows.regroupement),
           importBsdPapier: parseWorkflow(bsdWorkflows.importBsdPapier),
         },
         bsdasri: {

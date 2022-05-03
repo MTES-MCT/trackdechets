@@ -60,7 +60,7 @@ export function createGroupementForm(company: string): WorkflowStep {
       " La quantité restante pourra être utilisée dans d'autres annexes 2." +
       " Le bordereau initial passera de l'état AWAITING_GROUP à l'état GROUPED lorsque tous ses bordereaux de regroupement seront SEALED." +
       " Le bordereau initial passera de l'état GROUPED à l'état PROCESSED lorsque tous ses bordereaux de regroupement seront PROCESSED",
-    variables: ({ transporteur2, ttr, traiteur, initialForm }) => {
+    variables: ({ transporteur2, ttr, traiteur, initialBsd }) => {
       return {
         createFormInput: {
           emitter: {
@@ -72,8 +72,8 @@ export function createGroupementForm(company: string): WorkflowStep {
           wasteDetails: fixtures.wasteDetailsInput,
           grouping: [
             {
-              form: { id: initialForm.id },
-              quantity: initialForm.quantityReceived
+              form: { id: initialBsd.id },
+              quantity: initialBsd.quantityReceived
             }
           ]
         }

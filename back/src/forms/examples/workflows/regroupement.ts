@@ -39,16 +39,12 @@ const workflow: Workflow = {
     transporteur2: { siret: "SIRET_TRANSPORTEUR_2" },
     ttr: { siret: "SIRET_TTR" },
     traiteur: { siret: "SIRET_TRAITEUR" },
-    bsd: { id: "ID_BSD" }
+    bsd: { id: "ID_BSD" },
+    initialBsd: { id: "ID_INITIAL_BSD", quantityReceived: 1.0 }
   },
   chart: `
 graph LR
-NO_STATE(NO STATE) --> |createForm| DRAFT
-DRAFT --> |markAsSealed| SEALED
-SEALED --> |signEmissionForm| SIGNED_BY_PRODUCER
-SIGNED_BY_PRODUCER --> |signTransportForm| SENT
-SENT --> |markAsReceived| ACCEPTED
-ACCEPTED --> |markAsProcessed| AWAITING_GROUP
+ACCEPTED --> |markAsProcessed sur le BSD initial| AWAITING_GROUP
 AWAITING_GROUP --> |markAsSealed sur le BSD de regroupement | GROUPED
 GROUPED --> |markAsProcessed  sur le BSD de regroupement | PROCESSED
 `

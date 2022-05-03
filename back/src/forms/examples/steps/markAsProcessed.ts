@@ -27,6 +27,6 @@ export function markAsAwaitingGroup(company: string): WorkflowStep {
       id: bsd.id,
       processedInfo: fixtures.awaitingGroupInfoInput(traiteur.siret)
     }),
-    setContext: (ctx, data) => ({ ...ctx, initialForm: data })
+    setContext: (ctx, data) => ({ ...ctx, initialBsd: data })
   };
 }
