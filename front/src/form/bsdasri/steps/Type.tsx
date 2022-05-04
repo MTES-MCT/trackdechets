@@ -1,7 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import { InlineError } from "common/components/Error";
 
-import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useField, useFormikContext } from "formik";
 import {
   Bsdasri,
@@ -45,7 +44,7 @@ const TRANSPORTER_OPTIONS = [
   {
     title: "de synthèse",
 
-    explanation: `Bordereau qui permet de faire la synthèse de BSDASRI simples qui ont été pris en charge 
+    explanation: `Bordereau qui permet de faire la synthèse de BSDASRI simples qui ont été pris en charge
       par le collecteur au statut "collecté" pour simplifier la prise en charge par le destinataire
       - ce bordereau ne peut être établi que par un collecteur/transporteur`,
 

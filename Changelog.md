@@ -12,7 +12,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
-- Sandbox : permettre de créer et rechercher un établissment de test (siret commençant par "0000"). Améliorer la recherche d'établissements par `getCompanyInfos` en accélérant la recherche en cas d'entreprise de test, évitant de chercher les API de recherche interne ou tierces.
+- Sandbox : permettre de créer et rechercher un établissment de test (siret commençant par "0000"). Améliorer la recherche d'établissements par `getCompanyInfos` en accélérant la recherche en cas d'entreprise de test, évitant de chercher les API de recherche interne ou tierces. Les établissements de test ont `statutDiffusionEtablissement` à "O" pour ne pas apparaître comme des établissements non-diffusibles.
 
 #### :boom: Breaking changes
 
