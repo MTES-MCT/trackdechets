@@ -296,14 +296,6 @@ input FormInput {
 input AppendixFormInput {
   "Identifiant unique du bordereau"
   id: ID!
-
-  """
-  N° de bordereau
-
-  Déprécié : L'id du bordereau doit être utilisé comme identifiant (paramètre id).
-  Le readableId permet de le récupérer via la query form.
-  """
-  readableId: ID
 }
 
 """

@@ -19,6 +19,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
     - `InitialFormFraction`
     - `FormFraction`
     - `InitialFormFractionInput`
+  - Suppression de `AppendixFormInput.readableId` qui était un champ déjà déprécié
 
 # [2022.05.1] ~16/05/2022
 
