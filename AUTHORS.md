@@ -13,3 +13,4 @@
 * [Gabin Aureche](https://github.com/zhouzi) - Développeur
 * [Thomas Bouchardon](https://github.com/alfabouch ) - Développeur
 * [Elias Showk](https://github.com/elishowk) - Développeur
+* [Julien Seren-Rosso](https://github.com/kornifex) - Développeur
