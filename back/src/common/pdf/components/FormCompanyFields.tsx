@@ -6,11 +6,9 @@ const FRENCH_COUNTRY = countries.find(country => country.cca2 === "FR");
 
 type FormCompanyFieldsProps = {
   company?: FormCompany;
-  showCountryFields?: Boolean;
 };
 
-export function FormCompanyFields({ company, showCountryFields }: FormCompanyFieldsProps) {
- 
+export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
   const companyCountry = company
     ? countries.find(country => country.cca2 === company?.country) ??
       FRENCH_COUNTRY
@@ -21,14 +19,18 @@ export function FormCompanyFields({ company, showCountryFields }: FormCompanyFie
       <p>
         <input
           type="checkbox"
-          checked={companyCountry && companyCountry.cca2 === "FR"}
+          checked={
+            company?.siret && companyCountry && companyCountry.cca2 === "FR"
+          }
           readOnly
         />{" "}
         Entreprise française
         <br />
         <input
           type="checkbox"
-          checked={companyCountry && companyCountry.cca2 !== "FR"}
+          checked={
+            company?.siret && companyCountry && companyCountry.cca2 !== "FR"
+          }
           readOnly
         />{" "}
         Entreprise étrangère

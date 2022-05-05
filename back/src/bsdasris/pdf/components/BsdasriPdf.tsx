@@ -5,12 +5,15 @@ import {
   TRANSPORT_MODE_LABELS,
   SignatureStamp
 } from "../../../common/pdf";
-import { Bsdasri, InitialBsdasri } from "../../../generated/graphql/types";
+import {
+  Bsdasri,
+  InitialBsdasri,
+  BsdasriSignature
+} from "../../../generated/graphql/types";
 import { TraceabilityTable } from "./TraceabilityTable";
 import { PackagingInfosTable } from "./PackagingInfosTable";
 import { FormCompanyFields } from "./FormCompanyFields";
 import { BsdasriType } from "@prisma/client";
-import { BsdasriSignature } from "../../../generated/graphql/types";
 
 /**
  *
@@ -114,10 +117,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
             <p>
               <strong>1. Producteur ou détenteur des déchets</strong>
             </p>
-            <FormCompanyFields
-              company={bsdasri.emitter?.company}
-              showCountryFields={false}
-            />
+            <FormCompanyFields company={bsdasri.emitter?.company} />
             {!!bsdasri.emitter?.pickupSite?.name && (
               <>
                 <p>
@@ -203,10 +203,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
             <p>
               <strong>2. Collecteur/transporteur</strong>
             </p>
-            <FormCompanyFields
-              company={bsdasri.transporter?.company}
-              showCountryFields={false}
-            />
+            <FormCompanyFields company={bsdasri.transporter?.company} />
             <p>
               <strong>Récépissé</strong> <br />
               <span>Numéro : {bsdasri?.transporter?.recepisse?.number}</span>
@@ -337,10 +334,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
             <p>
               <strong>3. Installation de destination</strong>
             </p>
-            <FormCompanyFields
-              company={bsdasri.destination?.company}
-              showCountryFields={false}
-            />
+            <FormCompanyFields company={bsdasri.destination?.company} />
           </div>
           <div className="BoxCol">
             <p>
