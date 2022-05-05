@@ -105,8 +105,12 @@ export default function TransporterInfoEdit({
             >
               Annuler
             </button>
-            <button className="btn btn--primary" type="submit">
-              Modifier
+            <button
+              className="btn btn--primary"
+              type="submit"
+              disabled={formik.isSubmitting}
+            >
+              {formik.isSubmitting ? "Envoi en cours" : "Modifier"}
             </button>
           </div>
         </form>
