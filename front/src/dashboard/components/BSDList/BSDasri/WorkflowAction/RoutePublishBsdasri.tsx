@@ -94,6 +94,7 @@ export function RoutePublishBsdasri() {
         </button>
         <button
           className="btn btn--primary"
+          disabled={mutationLoading}
           onClick={() =>
             publishBsdasri({
               variables: {
