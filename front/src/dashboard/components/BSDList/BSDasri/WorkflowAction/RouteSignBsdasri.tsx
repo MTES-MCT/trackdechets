@@ -42,7 +42,7 @@ const forms = {
 
   [BsdasriSignatureType.Transport]: TransportSignatureForm,
   [ExtraSignatureType.DirectTakeover]: TransportSignatureForm,
-  // [ExtraSignatureType.SynthesisEmission]: EmitterSignatureForm,
+
   [ExtraSignatureType.SynthesisTakeOver]: SynthesisTransportSignatureForm,
 
   [BsdasriSignatureType.Reception]: ReceptionSignatureForm,

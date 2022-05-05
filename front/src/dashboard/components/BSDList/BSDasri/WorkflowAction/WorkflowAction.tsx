@@ -1,12 +1,10 @@
 import React from "react";
 
-import PublishBsdasri from "./PublishBsdasri";
-
 import { ActionLink } from "common/components";
 import { generatePath, useLocation, useRouteMatch } from "react-router-dom";
 
 import "@reach/menu-button/styles.css";
-import { IconCheckCircle1 } from "common/components/Icons";
+import { IconCheckCircle1, IconPaperWrite } from "common/components/Icons";
 
 import routes from "common/routes";
 
@@ -41,7 +39,20 @@ export function WorkflowAction(props: WorkflowActionProps) {
   const isTransporter = siret === form.transporter?.company?.siret;
   const isDestination = siret === form.destination?.company?.siret;
   if (isPublishable(form)) {
-    return <PublishBsdasri {...props} />;
+    return (
+      <ActionLink
+        icon={<IconPaperWrite size="24px" />}
+        to={{
+          pathname: generatePath(routes.dashboard.bsdasris.sign.publish, {
+            siret,
+            id: form.id,
+          }),
+          state: { background: location },
+        }}
+      >
+        Publier le bordereau
+      </ActionLink>
+    );
   }
   switch (form["bsdasriStatus"]) {
     case BsdasriStatus.Initial: {

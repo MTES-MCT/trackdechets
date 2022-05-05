@@ -14,6 +14,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Sandbox : permettre de créer et rechercher un établissment de test (siret commençant par "0000"). Améliorer la recherche d'établissements par `getCompanyInfos` en accélérant la recherche en cas d'entreprise de test, évitant de chercher les API de recherche interne ou tierces.
 - Désactive au moment de l'envoi le bouton du formulaire dans la modale permettant de mettre à jour la plaque d'immatriculation transporteur [PR 1371](https://github.com/MTES-MCT/trackdechets/pull/1371)
+- La modale de publication du Bsdasri n'affiche pas toutes les informations [PR 1359](https://github.com/MTES-MCT/trackdechets/pull/1359)
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
