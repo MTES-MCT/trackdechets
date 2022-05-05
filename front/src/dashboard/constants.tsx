@@ -7,7 +7,7 @@ export const statusLabels: { [key: string]: string } = {
   RECEIVED: "Reçu, en attente d'acceptation ou de refus",
   ACCEPTED: "Accepté, en attente de traitement",
   PROCESSED: "Traité",
-  AWAITING_GROUP: "Traité, en attente de regroupement",
+  AWAITING_GROUP: "En attente de regroupement",
   GROUPED: "Annexé à un bordereau de regroupement",
   NO_TRACEABILITY: "Regroupé, avec autorisation de rupture de traçabilité",
   REFUSED: "Refusé",
