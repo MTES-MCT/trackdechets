@@ -7,8 +7,8 @@
 const https = require("https");
 const fs = require("fs");
 
-const SCALINGO_API_URL = "api.osc-fr1.scalingo.com";
-const SCALINGO_DB_API_URL = "db-api.osc-fr1.scalingo.com";
+const SCALINGO_API_URL = "api.osc-secnum-fr1.scalingo.com";
+const SCALINGO_DB_API_URL = "db-api.osc-secnum-fr1.scalingo.com";
 const APP_NAME = "trackdechets-sandbox-api";
 
 async function run() {
