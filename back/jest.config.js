@@ -7,5 +7,6 @@ module.exports = {
   moduleNameMapper: {
     "^src/(.*)$": "<rootDir>/src/$1",
     "^integration-tests/(.*)$": "<rootDir>/integration-tests/$1"
-  }
+  },
+  reporters: ["default", "github-actions"]
 };
