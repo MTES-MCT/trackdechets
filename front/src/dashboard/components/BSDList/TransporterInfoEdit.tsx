@@ -59,7 +59,7 @@ export default function TransporterInfoEdit({
         : null,
     },
     onSubmit: values => {
-      updateTransporterPlate({
+      return updateTransporterPlate({
         variables: { id: form.id, [mutationFieldName]: values[fieldName] },
       });
     },
