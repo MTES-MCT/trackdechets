@@ -12,9 +12,12 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
-- Sandbox : permettre de créer et rechercher un établissment de test (siret commençant par "0000"). Améliorer la recherche d'établissements par `getCompanyInfos` en accélérant la recherche en cas d'entreprise de test, évitant de chercher les API de recherche interne ou tierces.
+
+- Sandbox : permettre de créer et rechercher un établissment de test (siret commençant par "00000"). Améliorer la recherche d'établissements par `getCompanyInfos` en accélérant la recherche en cas d'entreprise de test, évitant de chercher les API de recherche interne ou tierces.
+- Sandbox : Les établissements de test  (siret commençant par "00000") ont `statutDiffusionEtablissement` à "O" pour ne pas apparaître comme des établissements non-diffusibles. [PR 1368](https://github.com/MTES-MCT/trackdechets/pull/1368)
 - Désactive au moment de l'envoi le bouton du formulaire dans la modale permettant de mettre à jour la plaque d'immatriculation transporteur [PR 1371](https://github.com/MTES-MCT/trackdechets/pull/1371)
 - La modale de publication du Bsdasri n'affiche pas toutes les informations [PR 1359](https://github.com/MTES-MCT/trackdechets/pull/1359)
+- Indexation Sirene : correctifs [PR 1365](https://github.com/MTES-MCT/trackdechets/pull/1365) et [PR 1364](https://github.com/MTES-MCT/trackdechets/pull/1364)
 
 #### :boom: Breaking changes
 
