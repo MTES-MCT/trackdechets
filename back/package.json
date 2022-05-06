@@ -45,7 +45,7 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "^7.15.0",
+    "@elastic/elasticsearch": "^7.17.0",
     "@fast-csv/format": "^4.3.0",
     "@graphql-toolkit/file-loading": "^0.10.7",
     "@graphql-toolkit/schema-merging": "^0.10.7",

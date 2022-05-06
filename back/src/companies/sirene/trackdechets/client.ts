@@ -2,7 +2,7 @@ import {
   GetResponse,
   QueryDslQueryContainer
 } from "@elastic/elasticsearch/api/types";
-import { TransportRequestOptions } from "@elastic/elasticsearch/lib/Transport";
+import { errors } from "@elastic/elasticsearch";
 import logger from "../../../logging/logger";
 import { libelleFromCodeNaf, buildAddress, removeDiacritics } from "../utils";
 import { AnonymousCompanyError } from "../errors";
@@ -15,8 +15,8 @@ import {
   ProviderErrors
 } from "./types";
 import client from "./esClient";
-import { ResponseError } from "@elastic/elasticsearch/lib/errors";
 
+const { ResponseError } = errors;
 const index = process.env.TD_COMPANY_ELASTICSEARCH_INDEX;
 
 /**
@@ -131,7 +131,7 @@ export const searchCompanies = (
   clue: string,
   department?: string,
   options?: Partial<SearchOptions>,
-  requestOptions?: Partial<TransportRequestOptions>
+  requestOptions?
 ): Promise<SireneSearchResult[]> => {
   const qs = removeDiacritics(clue);
   // Multi-match query docs https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html
