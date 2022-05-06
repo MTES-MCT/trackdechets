@@ -45,6 +45,7 @@ export const COMPANY_INFOS = gql`
       libelleNaf
       address
       etatAdministratif
+      statutDiffusionEtablissement
       isRegistered
       companyTypes
       installation {

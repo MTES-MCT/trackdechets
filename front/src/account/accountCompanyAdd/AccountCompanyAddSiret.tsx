@@ -5,7 +5,10 @@ import cogoToast from "cogo-toast";
 import { COMPANY_INFOS } from "form/common/components/company/query";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import AutoFormattingCompanyInfosInput from "common/components/AutoFormattingCompanyInfosInput";
-import { NotificationError } from "common/components/Error";
+import {
+  NotificationError,
+  SimpleNotificationError,
+} from "common/components/Error";
 import styles from "../AccountCompanyAdd.module.scss";
 import { Mutation, Query } from "generated/graphql/types";
 import Tooltip from "common/components/Tooltip";
@@ -36,6 +39,7 @@ const CREATE_TEST_COMPANY = gql`
 export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
   const [isRegistered, setIsRegistered] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [isNonDiffusible, setIsNonDiffusible] = useState(false);
 
   const [searchCompany, { loading, error }] = useLazyQuery<
     Pick<Query, "companyInfos">
@@ -48,9 +52,14 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
             "Cet établissement est fermé, impossible de le créer"
           );
         } else {
-          setIsRegistered(companyInfos?.isRegistered ?? false);
+          if (companyInfos?.statutDiffusionEtablissement === "N") {
+            setIsNonDiffusible(true);
+            onCompanyInfos(null);
+          } else {
+            onCompanyInfos(companyInfos);
+          }
           setIsDisabled(!companyInfos?.isRegistered);
-          onCompanyInfos(companyInfos);
+          setIsRegistered(companyInfos?.isRegistered ?? false);
         }
       }
     },
@@ -66,19 +75,16 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
       {error && (
         <NotificationError
           apolloError={error}
-          message={error => {
-            if (
-              error.graphQLErrors.length &&
-              error.graphQLErrors[0].extensions?.code === "FORBIDDEN"
-            ) {
-              return (
-                "Nous n'avons pas pu récupérer les informations de cet établissement car il n'est pas diffusable. " +
-                "Veuillez nous contacter à l'adresse hello@trackdechets.beta.gouv.fr avec votre certificat d'inscription au répertoire des Entreprises et " +
-                "des Établissements (SIRENE) pour pouvoir procéder à la création de l'établissement"
-              );
-            }
-            return error.message;
-          }}
+          message={error => error.message}
+        />
+      )}
+      {isNonDiffusible && (
+        <SimpleNotificationError
+          message={
+            "Nous n'avons pas pu récupérer les informations de cet établissement car il n'est pas diffusable. " +
+            "Veuillez nous contacter à l'adresse hello@trackdechets.beta.gouv.fr avec votre certificat d'inscription au répertoire des Entreprises et " +
+            "des Établissements (SIRENE) pour pouvoir procéder à la création de l'établissement"
+          }
         />
       )}
       <Formik

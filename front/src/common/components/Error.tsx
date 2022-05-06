@@ -62,3 +62,21 @@ export function NotificationError({ apolloError, className, message }: Props) {
     </ErrorProvider>
   );
 }
+
+export function SimpleNotificationError({
+  className,
+  message,
+}: {
+  className?: string;
+  message: string;
+}) {
+  return (
+    <div
+      className={`notification notification--error tw-mt-2 ${
+        styles.lineBreak
+      } ${className ?? ""}`}
+    >
+      {message}
+    </div>
+  );
+}
