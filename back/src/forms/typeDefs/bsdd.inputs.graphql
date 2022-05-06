@@ -157,7 +157,7 @@ input NextDestinationInput {
   processingOperation: String!
 
   "Établissement de destination ultérieur"
-  company: InternationalCompanyInput!
+  company: InternationalCompanyInput
 }
 
 "Payload de création d'un bordereau"

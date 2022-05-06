@@ -10,6 +10,10 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
 import { Status } from "@prisma/client";
+import {
+  Mutation,
+  MutationMarkAsProcessedArgs
+} from "../../../../generated/graphql/types";
 
 jest.mock("axios", () => ({
   default: {
@@ -22,6 +26,11 @@ const MARK_AS_PROCESSED = `
     markAsProcessed(id: $id, processedInfo: $processedInfo) {
       id
       processingOperationDescription
+      nextDestination {
+        company {
+          siret
+        }
+      }
     }
   }
 `;
@@ -255,6 +264,12 @@ describe("mutation.markAsProcessed", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
+          "L'opération de traitement renseignée ne permet pas de destination ultérieure\n" +
+          "L'opération de traitement renseignée ne permet pas de destination ultérieure\n" +
+          "L'opération de traitement renseignée ne permet pas de destination ultérieure\n" +
+          "L'opération de traitement renseignée ne permet pas de destination ultérieure\n" +
+          "L'opération de traitement renseignée ne permet pas de destination ultérieure\n" +
+          "L'opération de traitement renseignée ne permet pas de destination ultérieure\n" +
           "L'opération de traitement renseignée ne permet pas de destination ultérieure"
       })
     ]);
@@ -427,7 +442,8 @@ describe("mutation.markAsProcessed", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire"
+          "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire\n" +
+          "Destination ultérieure prévue : Le SIRET doit faire 14 caractères numériques"
       })
     ]);
   });
@@ -505,5 +521,83 @@ describe("mutation.markAsProcessed", () => {
     });
     expect(resultingForm.status).toBe(Status.PROCESSED);
     expect(resultingForm.processedAt).toEqual(processedAt);
+  });
+
+  test("nextDestination.company should be optional when noTraceability is true", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "markAsProcessed">,
+      MutationMarkAsProcessedArgs
+    >(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z" as any,
+          noTraceability: true,
+          nextDestination: {
+            processingOperation: "D 1"
+          }
+        }
+      }
+    });
+
+    expect(data.markAsProcessed.nextDestination.company).toBeNull();
+  });
+
+  test("nextDestination.company should be mandatory when noTraceability is not true", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "markAsProcessed">,
+      MutationMarkAsProcessedArgs
+    >(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z" as any,
+          nextDestination: {
+            processingOperation: "D 1"
+          }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Destination ultérieure : Le nom de l'entreprise est obligatoire\n" +
+          "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire\n" +
+          "Destination ultérieure prévue : Le SIRET doit faire 14 caractères numériques\n" +
+          "Destination ultérieure : L'adresse de l'entreprise est obligatoire\n" +
+          "Destination ultérieure : Le contact dans l'entreprise est obligatoire\n" +
+          "Destination ultérieure : Le téléphone de l'entreprise est obligatoire\n" +
+          "Destination ultérieure : L'email de l'entreprise est obligatoire"
+      })
+    ]);
   });
 });
