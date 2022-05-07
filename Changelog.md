@@ -9,7 +9,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 # [2022.05.1] ~16/05/2022
 
 #### :rocket: Nouvelles fonctionnalités
-
+- Ajout d'un code `D 9 F` qui peut être utilisé comme code de traitement final sans obligation d'indiquer une destination ultérieure [PR 1369](https://github.com/MTES-MCT/trackdechets/pull/1369)
 #### :bug: Corrections de bugs
 
 

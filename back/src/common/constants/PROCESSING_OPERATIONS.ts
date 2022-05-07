@@ -137,6 +137,12 @@ export const PROCESSING_OPERATIONS: ProcessingOperation[] = [
   },
   {
     type: ProcessingOperationType.Eliminiation,
+    code: "D 9 F",
+    description:
+      "(final) Traitement physico-chimique non spécifié ailleurs dans la présente liste, aboutissant à des composés ou à des mélanges qui sont éliminés selon l'un des procédés numérotés D1 à D12 ( par exemple, évaporation, séchage, calcination, etc …)"
+  },
+  {
+    type: ProcessingOperationType.Eliminiation,
     code: "D 10",
     description: "Incinération à terre"
   },
