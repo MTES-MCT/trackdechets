@@ -18,9 +18,9 @@ import {
   TRANSPORT_MODE_LABELS
 } from "../../common/pdf";
 import {
-  Appendix2Form,
   Form as GraphQLForm,
   FormCompany,
+  InitialFormFraction,
   PackagingInfo,
   Transporter,
   TransportSegment
@@ -257,12 +257,12 @@ function TransporterFormCompanyFields({
 
 export async function generateBsddPdf(prismaForm: PrismaForm) {
   const fullPrismaForm = await getFullForm(prismaForm);
-  const appendix2Forms = (
+  const grouping = (
     await prisma.formGroupement.findMany({
       where: { nextFormId: fullPrismaForm.id },
       include: { initialForm: true }
     })
-  ).map(g => g.initialForm);
+  ).map(g => ({ form: g.initialForm, quantity: g.quantity }));
 
   const form: GraphQLForm = {
     ...expandFormFromDb(fullPrismaForm),
@@ -272,7 +272,10 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
     transportSegments: fullPrismaForm.transportSegments.map(
       expandTransportSegmentFromDb
     ),
-    appendix2Forms: appendix2Forms.map(expandAppendix2FormFromDb)
+    grouping: grouping.map(({ form, quantity }) => ({
+      form: expandAppendix2FormFromDb(form),
+      quantity
+    }))
   };
   const qrCode = await QRCode.toString(form.readableId, { type: "svg" });
   const html = ReactDOMServer.renderToStaticMarkup(
@@ -822,7 +825,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
         </div>
       )}
 
-      {form.appendix2Forms.length > 0 && (
+      {form.grouping?.length > 0 && (
         <div className="Page">
           <div className="BoxRow">
             <div className="BoxCol">
@@ -859,6 +862,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                     <th>Dénomination usuelle</th>
                     <th>Pesée (tonne)</th>
                     <th>Réelle / estimée</th>
+                    <th>Fraction regroupée (tonne)</th>
                     <th>Date de prise en charge initiale</th>
                     <th>Code postal lieu de collecte</th>
                   </tr>
@@ -866,30 +870,28 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 <tbody>
                   {(
                     [
-                      ...form.appendix2Forms,
+                      ...form.grouping,
                       ...Array.from({
-                        length: 10 - form.appendix2Forms.length
-                      }).fill(undefined)
-                    ] as Array<Appendix2Form | undefined>
-                  ).map((appendix2Form, index) => (
+                        length: 10 - form.grouping.length
+                      }).fill({ form: null, quantity: null })
+                    ] as Array<InitialFormFraction>
+                  ).map(({ form, quantity }, index) => (
                     <tr key={index}>
                       <td>{index + 1}</td>
-                      <td>{appendix2Form?.readableId}</td>
-                      <td>{appendix2Form?.wasteDetails?.code}</td>
-                      <td>{appendix2Form?.wasteDetails?.name}</td>
+                      <td>{form?.readableId}</td>
+                      <td>{form?.wasteDetails?.code}</td>
+                      <td>{form?.wasteDetails?.name}</td>
                       <td>
-                        {appendix2Form?.quantityReceived ??
-                          appendix2Form?.wasteDetails?.quantity}
+                        {form?.quantityReceived ?? form?.wasteDetails?.quantity}
                       </td>
                       <td>
-                        {appendix2Form?.quantityReceived
+                        {form?.quantityReceived
                           ? "R"
-                          : appendix2Form?.wasteDetails?.quantityType?.charAt(
-                              0
-                            )}
+                          : form?.wasteDetails?.quantityType?.charAt(0)}
                       </td>
-                      <td>{formatDate(appendix2Form?.signedAt)}</td>
-                      <td>{appendix2Form?.emitterPostalCode}</td>
+                      <td>{quantity}</td>
+                      <td>{formatDate(form?.signedAt)}</td>
+                      <td>{form?.emitterPostalCode}</td>
                     </tr>
                   ))}
                 </tbody>

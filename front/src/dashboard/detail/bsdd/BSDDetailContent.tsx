@@ -373,12 +373,13 @@ const Appendix2 = ({
           <th>Dénomination usuelle</th>
           <th>Pesée (tonne)</th>
           <th>Réelle / estimée</th>
+          <th>Fraction regroupée (tonne)</th>
           <th>Date de réception</th>
           <th>Code postal lieu de collecte</th>
         </tr>
       </thead>
       <tbody>
-        {grouping.map(({ form }, index) => (
+        {grouping.map(({ form, quantity }, index) => (
           <tr key={index}>
             <td>{form?.readableId}</td>
             <td>{form?.wasteDetails?.code}</td>
@@ -389,6 +390,7 @@ const Appendix2 = ({
                 ? "R"
                 : form?.wasteDetails?.quantityType?.charAt(0)}
             </td>
+            <td>{quantity}</td>
             <td>
               {form?.signedAt
                 ? format(new Date(form?.signedAt), "dd/MM/yyyy")
