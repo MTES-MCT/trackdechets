@@ -56,7 +56,7 @@ export default function Appendix2MultiSelect() {
     fetchPolicy: "network-only",
   });
 
-  const [quantitesToGroup, setQuantitesToGroup] = useState({});
+  const [quantitesToGroup, setQuantitiesToGroup] = useState({});
 
   // because { query { appendixForms } } does not return forms that
   // have already been appended to a BSDD, we need to keep track of
@@ -97,7 +97,7 @@ export default function Appendix2MultiSelect() {
     const quantites = appendix2Selected.reduce((qs, { form, quantity }) => {
       return { ...qs, [form.id]: quantity };
     }, {});
-    setQuantitesToGroup(prevState => ({ ...prevState, ...quantites }));
+    setQuantitiesToGroup(prevState => ({ ...prevState, ...quantites }));
   }, [appendix2Selected]);
 
   useEffect(() => {
@@ -208,6 +208,8 @@ export default function Appendix2MultiSelect() {
                       form.quantityReceived!!
                     ).minus(form.quantityGrouped ?? 0);
 
+                    console.log("quantitySet", quantitySet);
+
                     if (values.id) {
                       quantityLeft = quantityLeft.plus(defaultQuantity);
                     }
@@ -274,7 +276,9 @@ export default function Appendix2MultiSelect() {
                               setHasChanged(true);
                             }}
                             max={quantityLeft.toNumber()}
-                            defaultValue={defaultQuantity.toNumber()}
+                            defaultValue={
+                              quantitySet ?? defaultQuantity.toNumber()
+                            }
                           ></input>
                           {!!quantitySet &&
                             quantityLeft.lessThan(quantitySet) && (
@@ -284,9 +288,9 @@ export default function Appendix2MultiSelect() {
                                 bordereau qui est de {quantityLeft.toNumber()} T
                               </div>
                             )}
-                          {quantitySet === 0 && (
+                          {quantitySet < 0 && (
                             <div className="error-message">
-                              La quantité doit être supérieure à 0
+                              La quantité doit être un nombre supérieur à 0
                             </div>
                           )}
                         </td>
