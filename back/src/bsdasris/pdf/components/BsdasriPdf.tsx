@@ -144,7 +144,12 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
             )}
             {bsdasri.emitter?.emission?.isTakenOverWithSecretCode && (
               <p>
-                <strong>Signature avec code secret PRED :</strong> Oui
+                <strong>
+                  Signature avec code secret{" "}
+                  {!!bsdasri?.ecoOrganisme?.emittedByEcoOrganisme ? "Éco-Organisme" : "PRED"}{" "}
+                  :
+                </strong>{" "}
+                Oui
               </p>
             )}
             <p>

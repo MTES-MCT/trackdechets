@@ -10,7 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 - Ajout d'un code `D 9 F` qui peut être utilisé comme code de traitement final sans obligation d'indiquer une destination ultérieure [PR 1369](https://github.com/MTES-MCT/trackdechets/pull/1369)
-- Gestion des éco-organismes sur le Dasri: [PR 1362](https://github.com/MTES-MCT/trackdechets/pull/1362)
+- Gestion des éco-organismes sur les BSDASRI: [PR 1362](https://github.com/MTES-MCT/trackdechets/pull/1362)
 
 #### :bug: Corrections de bugs
 

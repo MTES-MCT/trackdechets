@@ -7,6 +7,8 @@ type BsdasriSignature {
 type BsdasriEcoOrganisme {
   name: String!
   siret: String!
+  "Indique si l'enlèvement a été signé par l'éco-organisme en charge du déchet."
+  emittedByEcoOrganisme: Boolean
 }
 
 "Émetteur du Bsdasri, Personne responsable de l'émimination des déchets (PRED)"
@@ -130,7 +132,7 @@ type BsdasriEmission {
   signature: BsdasriSignature
   "Emporté sans signature PRED avec son autorisation prélalable"
   isTakenOverWithoutEmitterSignature: Boolean
-  "Signature PRED avec code de sécurité"
+  "Signature émetteur avec code de sécurité: PRED ou éco-organisme si ecoOrganisme.emittedByEcoOrganisme vaut true"
   isTakenOverWithSecretCode: Boolean
 }
 
@@ -162,9 +164,9 @@ type InitialBsdasri {
   id: ID!
   "Nombre de contenants reçus"
   quantity: Int
-   "Volume reçu dans le cas d'un groupement, émis dans le cas d'une synthèse"
+  "Volume reçu dans le cas d'un groupement, émis dans le cas d'une synthèse"
   volume: Int
-   "Poids de déchets (en kg) traités dans le cas d'un groupement, émis (si renseigné) dans le cas d'une synthèse"
+  "Poids de déchets (en kg) traités dans le cas d'un groupement, émis (si renseigné) dans le cas d'une synthèse"
   weight: Float
   "Date de collecte initiale"
   takenOverAt: DateTime
@@ -179,7 +181,7 @@ type Bsdasri {
   createdAt: DateTime
   updatedAt: DateTime
   isDraft: Boolean!
-
+  
   waste: BsdasriWaste
 
   emitter: BsdasriEmitter

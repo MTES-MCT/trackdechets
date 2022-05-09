@@ -104,7 +104,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
                   state: { background: location },
                 }}
               >
-                Signature producteur (code secret)
+                Signature émetteur (code secret)
               </ActionLink>
             )}
 

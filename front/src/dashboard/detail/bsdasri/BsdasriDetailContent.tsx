@@ -110,7 +110,12 @@ const Emitter = ({ form }: { form: Bsdasri }) => {
         )}
         {emitter?.emission?.isTakenOverWithSecretCode && (
           <>
-            <dt>Signature avec code secret PRED</dt>
+            <dt>
+              Signature avec code secret{" "}
+              {form?.ecoOrganisme?.emittedByEcoOrganisme
+                ? "Éco-organisme"
+                : "PRED"}{" "}
+            </dt>
             <dd>Oui</dd>
           </>
         )}

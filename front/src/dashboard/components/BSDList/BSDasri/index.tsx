@@ -8,13 +8,23 @@ import { IconBSDasri } from "common/components/Icons";
 import { CellProps, CellValue } from "react-table";
 import { BSDAsriActions } from "dashboard/components/BSDList/BSDasri/BSDasriActions/BSDasriActions";
 import { WorkflowAction } from "./WorkflowAction";
+
 const dasriVerboseStatuses: Record<BsdasriStatus, string> = {
   INITIAL: "Initial",
-  SIGNED_BY_PRODUCER: "Signé par le producteur",
+  SIGNED_BY_PRODUCER: "Signé par l'émetteur",
   SENT: "Envoyé",
   RECEIVED: "Reçu",
   PROCESSED: "Traité",
   REFUSED: "Refusé",
+};
+
+const getDasriVerboseStatus = (bsdasri: Bsdasri): string => {
+  if (bsdasri.isDraft) {
+    return "Brouillon";
+  }
+  const status = bsdasri["bsdasriStatus"];
+
+  return dasriVerboseStatuses[status];
 };
 // Basic implementation
 export const COLUMNS: Record<
@@ -63,10 +73,7 @@ export const COLUMNS: Record<
     ),
   },
   status: {
-    accessor: dasri =>
-      dasri.isDraft
-        ? "Brouillon"
-        : dasriVerboseStatuses[dasri["bsdasriStatus"]], // unable to use dot notation because of conflicting status fields
+    accessor: dasri => getDasriVerboseStatus(dasri),
   },
 
   workflow: {

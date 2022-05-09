@@ -453,6 +453,7 @@ export const dashboardDasriFragment = gql`
     }
     ecoOrganisme {
       siret
+      emittedByEcoOrganisme
     }
     transporter {
       company {
@@ -517,6 +518,7 @@ export const fullDasriFragment = gql`
     ecoOrganisme {
       name
       siret
+      emittedByEcoOrganisme
     }
     transporter {
       company {

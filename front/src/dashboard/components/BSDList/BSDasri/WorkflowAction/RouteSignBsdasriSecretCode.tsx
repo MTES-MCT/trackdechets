@@ -84,10 +84,16 @@ export function RouteBSDasrisSignEmissionSecretCode() {
 
   return (
     <div>
-      <h2 className="td-modal-title">Signature producteur</h2>
+      <h2 className="td-modal-title">Signature émetteur</h2>
       <div className="notification success">
         Cet écran est à lire et signer par le{" "}
-        <strong>producteur du déchet</strong> sur le terminal du transporteur
+        <strong>producteur du déchet</strong>{" "}
+        {!!bsdasri?.ecoOrganisme?.siret && (
+          <>
+            ou <strong>l'éco-organisme</strong>{" "}
+          </>
+        )}
+        sur le terminal du transporteur
       </div>
       <BdasriSummary bsdasri={bsdasri} />
       <Formik
