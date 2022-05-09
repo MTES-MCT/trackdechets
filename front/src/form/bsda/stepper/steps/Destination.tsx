@@ -64,11 +64,11 @@ export function Destination({ disabled }) {
           <option />
           {hasNextDestination || isDechetterie ? (
             <>
-              <option value="R 12">
-                R 12 - Echange de déchets en vue de les soumettre à l'une des
-                opération R1 à R11
+              <option value="R 13">
+                R 13 - Stockage de déchets préalablement à l'une des opérations
+                R1 à R12 (à l’exclusion du stockage temporaire, avant collecte,
+                sur le site de production).
               </option>
-              <option value="D 13">D 13 - Groupement de déchets</option>
               <option value="D 15">D 15 - Entreposage provisoire</option>
             </>
           ) : (
@@ -123,7 +123,7 @@ export function Destination({ disabled }) {
 
           <div className="form__row">
             <label>
-              Opération d’élimination / valorisation prévue (code D/R)
+              Opération d"élimination / valorisation prévue (code D/R)
             </label>
             <Field
               as="select"
@@ -141,12 +141,6 @@ export function Destination({ disabled }) {
               <option value="D 9">
                 D 9 - Vitrification, traitement chimique ou prétraitement
               </option>
-              <option value="R 12">
-                R 12 - Echange de déchets en vue de les soumettre à l'une des
-                opération R1 à R11
-              </option>
-              <option value="D 13">D 13 - Groupement de déchets</option>
-              <option value="D 15">D 15 - Entreposage provisoire</option>
             </Field>
           </div>
         </>

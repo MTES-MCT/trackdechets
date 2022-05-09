@@ -15,7 +15,7 @@ export function createGroupingBsda(company: string): WorkflowStep {
         waste: fixtures.wasteInput(),
         packagings: fixtures.packagingsInput(),
         weight: fixtures.weightInput(),
-        grouping: [ctx.bsda_1.id, ctx.bsda_1.id]
+        grouping: [ctx.bsda_1.id, ctx.bsda_2.id]
       }
     }),
     expected: { status: "INITIAL" },
