@@ -106,9 +106,9 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
           })
         )._sum.quantity ?? 0;
 
-      const quantityLeftToGroup = new Decimal(
-        initialForm.quantityReceived
-      ).minus(quantityGroupedInOtherForms);
+      const quantityLeftToGroup = new Decimal(initialForm.quantityReceived)
+        .minus(quantityGroupedInOtherForms)
+        .toDecimalPlaces(6); // set precision to gramme
 
       if (quantityLeftToGroup.equals(0)) {
         throw new UserInputError(

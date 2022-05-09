@@ -1,4 +1,5 @@
 import { Form, Status } from "@prisma/client";
+import { Decimal } from "decimal.js-light";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { RepositoryFnDeps } from "../types";
@@ -20,13 +21,14 @@ const buildUpdateAppendix2Forms: (
         return form;
       }
       const { id, quantityReceived } = form;
-      const quantityGrouped =
+      const quantityGrouped = new Decimal(
         (
           await prisma.formGroupement.aggregate({
             _sum: { quantity: true },
             where: { initialFormId: id }
           })
-        )._sum.quantity ?? 0;
+        )._sum.quantity ?? 0
+      ).toDecimalPlaces(6); // set precision to gramme
       const groupementForms = (
         await prisma.formGroupement.findMany({
           where: { initialFormId: id },
@@ -54,7 +56,7 @@ const buildUpdateAppendix2Forms: (
 
       const nextStatus = allProcessed
         ? Status.PROCESSED
-        : allSealed && quantityGrouped >= quantityReceived // case > should not happen
+        : allSealed && quantityGrouped.greaterThanOrEqualTo(quantityReceived) // case > should not happen
         ? Status.GROUPED
         : Status.AWAITING_GROUP;
 
@@ -68,10 +70,13 @@ const buildUpdateAppendix2Forms: (
       ) {
         return transitionForm(user, form, {
           type: EventType.MarkAsGrouped,
-          formUpdateInput: { quantityGrouped }
+          formUpdateInput: { quantityGrouped: quantityGrouped.toNumber() }
         });
       } else {
-        return updateForm({ id }, { status: nextStatus, quantityGrouped });
+        return updateForm(
+          { id },
+          { status: nextStatus, quantityGrouped: quantityGrouped.toNumber() }
+        );
       }
     })
   );

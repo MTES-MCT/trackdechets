@@ -3,6 +3,7 @@ import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { expandFormFromDb } from "../../form-converter";
+import { Decimal } from "decimal.js-light";
 
 const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
   _,
@@ -32,8 +33,14 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
     }
   });
 
+  console.log(queriedForms.map(f => f.quantityGrouped));
+
   return queriedForms
-    .filter(f => f.quantityGrouped < f.quantityReceived)
+    .filter(
+      f =>
+        f.quantityReceived > 0 &&
+        new Decimal(f.quantityReceived).greaterThan(f.quantityGrouped)
+    )
     .map(f => expandFormFromDb(f));
 };
 

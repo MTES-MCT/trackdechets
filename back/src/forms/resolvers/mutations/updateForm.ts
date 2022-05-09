@@ -19,7 +19,7 @@ import { FormSirets } from "../../types";
 import { draftFormSchema, sealedFormSchema } from "../../validation";
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
-import Decimal from "decimal.js-light";
+import { Decimal } from "decimal.js-light";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;

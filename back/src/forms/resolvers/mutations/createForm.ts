@@ -21,7 +21,7 @@ import { draftFormSchema } from "../../validation";
 import { getFormOrFormNotFound } from "../../database";
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
-import Decimal from "decimal.js-light";
+import { Decimal } from "decimal.js-light";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
