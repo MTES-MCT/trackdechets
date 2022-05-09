@@ -8,7 +8,7 @@ type Props = {
   onSelect?: (value: any) => void;
 };
 
-export default function ({
+function WasteTreeModal({
   open = false,
   onClose = () => null,
   onSelect = () => null,
@@ -49,3 +49,5 @@ export default function ({
     </TdModal>
   );
 }
+
+export default WasteTreeModal;

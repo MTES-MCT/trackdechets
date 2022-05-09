@@ -39,6 +39,9 @@ export default function plugin(): Plugin<any> {
           ),
           emportDirect: parseWorkflow(bsdasriWorkflows.emportDirect),
           dasriDeSynthese: parseWorkflow(bsdasriWorkflows.dasriDeSynthese),
+          ecoOrganisme: parseWorkflow(bsdasriWorkflows.ecoOrganisme),
+          signatureCodeSecret: parseWorkflow(bsdasriWorkflows.signatureCodeSecret),
+          signatureCodeSecretEcoOrganisme: parseWorkflow(bsdasriWorkflows.signatureCodeSecretEcoOrganisme),
         },
         bsvhu: {
           vhuVersBroyeur: parseWorkflow(bsvhuWorkflows.vhuVersBroyeur),

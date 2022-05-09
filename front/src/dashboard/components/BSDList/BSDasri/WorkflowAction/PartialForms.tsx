@@ -4,9 +4,7 @@ import { BsdasriSignatureType, BsdasriStatus } from "generated/graphql/types";
 import Packagings from "form/bsdasri/components/packagings/Packagings";
 import WeightWidget from "form/bsdasri/components/Weight";
 import DateInput from "form/common/components/custom-inputs/DateInput";
-import Acceptation, {
-  AcceptOnlyField,
-} from "form/bsdasri/components/acceptation/Acceptation";
+import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 
 import {
@@ -102,12 +100,12 @@ export function TransportSignatureForm() {
 }
 
 export function SynthesisTransportSignatureForm() {
-  const { setFieldValue, values } = useFormikContext<Bsdasri>();
+  const { setFieldValue } = useFormikContext<Bsdasri>();
 
   // is always accepted for synthesis
   useEffect(() => {
     setFieldValue(`transporter.transport.acceptation.status`, "ACCEPTED");
-  }, []);
+  }, [setFieldValue]);
 
   return (
     <>
@@ -188,7 +186,7 @@ export function ReceptionSignatureForm() {
     if (values.type === BsdasriType.Synthesis) {
       setFieldValue(`destination.reception.acceptation.status`, "ACCEPTED");
     }
-  }, []);
+  }, [setFieldValue, values.type]);
 
   return (
     <>

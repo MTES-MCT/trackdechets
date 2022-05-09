@@ -51,7 +51,9 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
     }),
     ecoOrganisme: nullIfNoValues<BsdasriEcoOrganisme>({
       name: bsdasri.ecoOrganismeName,
-      siret: bsdasri.ecoOrganismeSiret
+      siret: bsdasri.ecoOrganismeSiret,
+      // do not return false because mandatory siret/name might be null and break query
+      emittedByEcoOrganisme: !!bsdasri.emittedByEcoOrganisme ? true : null
     }),
     emitter: nullIfNoValues<BsdasriEmitter>({
       company: nullIfNoValues<FormCompany>({

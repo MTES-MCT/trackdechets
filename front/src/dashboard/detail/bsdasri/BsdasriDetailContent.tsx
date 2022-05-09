@@ -67,8 +67,9 @@ const Emitter = ({ form }: { form: Bsdasri }) => {
       <div className={styles.detailGrid}>
         {form?.ecoOrganisme?.siret ? (
           <span className={classNames(styles.spanWidth, "tw-font-bold")}>
-            L'éco-organisme DASTRI est identifié pour assurer la prise en charge
-            et la traçabilité
+            L'éco-organisme {form?.ecoOrganisme?.name} (
+            {form?.ecoOrganisme?.siret}) est identifié pour assurer la prise en
+            charge et la traçabilité
           </span>
         ) : null}
         <Company label="Émetteur" company={emitter?.company} />
@@ -109,7 +110,12 @@ const Emitter = ({ form }: { form: Bsdasri }) => {
         )}
         {emitter?.emission?.isTakenOverWithSecretCode && (
           <>
-            <dt>Signature avec code secret PRED</dt>
+            <dt>
+              Signature avec code secret{" "}
+              {form?.ecoOrganisme?.emittedByEcoOrganisme
+                ? "Éco-organisme"
+                : "PRED"}{" "}
+            </dt>
             <dd>Oui</dd>
           </>
         )}

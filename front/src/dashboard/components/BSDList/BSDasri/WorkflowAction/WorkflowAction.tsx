@@ -36,6 +36,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
   const isSynthesis = form.type === BsdasriType.Synthesis;
   const isSimple = form.type === BsdasriType.Simple;
   const isEmitter = siret === form.emitter?.company?.siret;
+  const isEcoOrganisme = siret === form.ecoOrganisme?.siret;
   const isTransporter = siret === form.transporter?.company?.siret;
   const isDestination = siret === form.destination?.company?.siret;
   if (isPublishable(form)) {
@@ -59,8 +60,8 @@ export function WorkflowAction(props: WorkflowActionProps) {
       if (form.isDraft) {
         return null;
       }
-
-      if (isEmitter && isActTab && !isSynthesis) {
+      const isHolder = isEmitter || isEcoOrganisme;
+      if (isHolder && isActTab && !isSynthesis) {
         // no emitter signature for synthesis bsds
         return (
           <>
@@ -77,7 +78,9 @@ export function WorkflowAction(props: WorkflowActionProps) {
                 state: { background: location },
               }}
             >
-              Signature producteur
+              {isEcoOrganisme
+                ? "Signature Éco-organisme"
+                : "Signature producteur"}
             </ActionLink>
           </>
         );
@@ -101,7 +104,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
                   state: { background: location },
                 }}
               >
-                Signature producteur (code secret)
+                Signature émetteur (code secret)
               </ActionLink>
             )}
 

@@ -10,6 +10,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 - Ajout d'un code `D 9 F` qui peut être utilisé comme code de traitement final sans obligation d'indiquer une destination ultérieure [PR 1369](https://github.com/MTES-MCT/trackdechets/pull/1369)
+- Gestion des éco-organismes sur les BSDASRI: [PR 1362](https://github.com/MTES-MCT/trackdechets/pull/1362)
+
 #### :bug: Corrections de bugs
 
 
@@ -24,7 +26,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
-- Corrige l'affichage des formualire de mise à jour des récepissé [PR 1351](https://github.com/MTES-MCT/trackdechets/pull/1351)
+- Corrige l'affichage des formulaires de mise à jour des récepissés [PR 1351](https://github.com/MTES-MCT/trackdechets/pull/1351)
 
 #### :memo: Documentation
 

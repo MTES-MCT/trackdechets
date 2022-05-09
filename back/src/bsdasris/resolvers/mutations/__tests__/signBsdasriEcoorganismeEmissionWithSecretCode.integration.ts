@@ -1,6 +1,9 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  userWithCompanyFactory,
+  companyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
@@ -12,18 +15,33 @@ describe("Mutation.signBsdasri emission with secret code", () => {
   afterEach(resetDatabase);
 
   it("should deny emission signature if secret code is incorrect", async () => {
-    const { company } = await userWithCompanyFactory("MEMBER");
+    const { company: ecoOrganismeCompany } = await userWithCompanyFactory(
+      "MEMBER",
+      { securityCode: 7777 }
+    );
+
+    await prisma.ecoOrganisme.create({
+      data: {
+        address: "",
+        name: "Eco-Organisme",
+        siret: ecoOrganismeCompany.siret,
+        handleBsdasri: true
+      }
+    });
+    const emitterCompany = await companyFactory();
     const { user: transporter, company: transporterCompany } =
       await userWithCompanyFactory("MEMBER");
 
     let dasri = await bsdasriFactory({
       opt: {
-        ...initialData(company),
+        ...initialData(emitterCompany),
         status: BsdasriStatus.INITIAL,
+        ecoOrganismeSiret: ecoOrganismeCompany.siret,
+        ecoOrganismeName: ecoOrganismeCompany.name,
         transporterCompanySiret: transporterCompany.siret
       }
     });
-    const { mutate } = makeClient(transporter); // transporter
+    const { mutate } = makeClient(transporter); // for ecoOrganisme
 
     const { errors } = await mutate<
       Pick<Mutation, "signBsdasriEmissionWithSecretCode">
@@ -32,7 +50,8 @@ describe("Mutation.signBsdasri emission with secret code", () => {
         id: dasri.id,
         input: {
           author: "Joe",
-          securityCode: 9876 // should be 1234, factory default value
+          securityCode: 7771, // should be 7777, factory default value
+          signatureAuthor: "ECO_ORGANISME"
         }
       }
     });
@@ -52,18 +71,32 @@ describe("Mutation.signBsdasri emission with secret code", () => {
   });
 
   it("should put emission signature on a dasri when correct code is provided", async () => {
-    const { company } = await userWithCompanyFactory("MEMBER");
+    const { company: ecoOrganismeCompany } = await userWithCompanyFactory(
+      "MEMBER",
+      { securityCode: 7777 }
+    );
+    await prisma.ecoOrganisme.create({
+      data: {
+        address: "",
+        name: "Eco-Organisme",
+        siret: ecoOrganismeCompany.siret,
+        handleBsdasri: true
+      }
+    });
+    const emitterCompany = await companyFactory();
     const { user: transporter, company: transporterCompany } =
       await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(company),
+        ...initialData(emitterCompany),
         status: BsdasriStatus.INITIAL,
+        ecoOrganismeSiret: ecoOrganismeCompany.siret,
+        ecoOrganismeName: ecoOrganismeCompany.name,
         transporterCompanySiret: transporterCompany.siret
       }
     });
-    const { mutate } = makeClient(transporter); // emitter
+    const { mutate } = makeClient(transporter); // for ecoOrganisme
 
     await mutate<Pick<Mutation, "signBsdasriEmissionWithSecretCode">>(
       SIGN_DASRI_WITH_CODE,
@@ -71,8 +104,9 @@ describe("Mutation.signBsdasri emission with secret code", () => {
         variables: {
           id: dasri.id,
           input: {
-            author: "Marcel",
-            securityCode: 1234
+            author: "Jean-Maxence",
+            securityCode: 7777,
+            signatureAuthor: "ECO_ORGANISME"
           }
         }
       }
@@ -83,13 +117,13 @@ describe("Mutation.signBsdasri emission with secret code", () => {
     });
     expect(readyTotakeOverDasri.status).toEqual("SIGNED_BY_PRODUCER");
     expect(readyTotakeOverDasri.emitterEmissionSignatureAuthor).toEqual(
-      "Marcel"
+      "Jean-Maxence"
     );
     expect(readyTotakeOverDasri.emitterEmissionSignatureDate).toBeTruthy();
     expect(readyTotakeOverDasri.emissionSignatoryId).toEqual(transporter.id);
     expect(readyTotakeOverDasri.isEmissionTakenOverWithSecretCode).toEqual(
       true
     );
-    expect(readyTotakeOverDasri.emittedByEcoOrganisme).toEqual(false);
+    expect(readyTotakeOverDasri.emittedByEcoOrganisme).toEqual(true);
   });
 });

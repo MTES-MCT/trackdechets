@@ -278,6 +278,8 @@ type EcoOrganisme {
 
   "Adresse de l'éco-organisme"
   address: String!
+
+  handleBsdasri: Boolean
 }
 
 """
