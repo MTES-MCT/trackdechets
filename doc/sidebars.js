@@ -46,6 +46,12 @@ module.exports = {
           ],
         },
         {
+          "Usage Courant": [
+            "tutoriels/courant/query-bordereaux",
+           
+          ],
+        },
+        {
           Exemples: [
             {
               BSDD: [

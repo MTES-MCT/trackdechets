@@ -18,6 +18,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Désactive au moment de l'envoi le bouton du formulaire dans la modale permettant de mettre à jour la plaque d'immatriculation transporteur [PR 1371](https://github.com/MTES-MCT/trackdechets/pull/1371)
 - La modale de publication du Bsdasri n'affiche pas toutes les informations [PR 1359](https://github.com/MTES-MCT/trackdechets/pull/1359)
 - Indexation Sirene : correctifs [PR 1365](https://github.com/MTES-MCT/trackdechets/pull/1365) et [PR 1364](https://github.com/MTES-MCT/trackdechets/pull/1364)
+- Corrige le message d'erreur affiché en cas de dépassement d'imbrication d'opérateurs sur les filtres de requêtes[PR 1374](https://github.com/MTES-MCT/trackdechets/pull/1374)
 
 #### :boom: Breaking changes
 
