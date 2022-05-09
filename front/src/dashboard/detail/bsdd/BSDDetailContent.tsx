@@ -349,7 +349,7 @@ const Recipient = ({
         />
         <DateRow value={form.processedAt} label="Traitement effectué le" />
         <DetailRow value={form.processedBy} label="Traitement effectué par" />
-        {form.groupedIn?.length &&
+        {!!form.groupedIn?.length &&
           form.groupedIn.map(({ form }) => <GroupedIn form={form} />)}
       </div>
     </>
