@@ -11,7 +11,7 @@ type SqlRowToUpdate = {
 @registerUpdater(
   "Update deprecated BODY_BENNE BSDAs",
   "As BODY_BENNE is deprecated, we edit bsdas with this packaging and change them to CONTENEUR_BAG (equivalent)",
-  true
+  false
 )
 export class LoadAnonymousCompaniesUpdater implements Updater {
   async run() {
@@ -31,7 +31,9 @@ export class LoadAnonymousCompaniesUpdater implements Updater {
         const newPackagings = rowToUpdate.packagings.filter(
           p => (p.type as any) !== "BODY_BENNE"
         );
-        const bigBagPackaging = newPackagings.find(p => p.type === "CONTENEUR_BAG");
+        const bigBagPackaging = newPackagings.find(
+          p => p.type === "CONTENEUR_BAG"
+        );
 
         if (bigBagPackaging) {
           bigBagPackaging.quantity += rowToUpdate.p.quantity;
