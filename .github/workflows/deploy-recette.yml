@@ -1,8 +1,7 @@
-
 # Workflow de déploiement
 # Le front et le back ne sont pas inclut dans ce fichier car leur déploiement
 # se fait automatiquement via l'intégration Scalingo <> Github
-name: Deploy Recette
+name: Deploy Sentry Release on recette
 
 on:
   push:
@@ -10,7 +9,7 @@ on:
       - dev
 
 jobs:
-  release-recette:
+  sentry-release-recette:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -33,4 +32,3 @@ jobs:
           environment: recette
           sourcemaps: ./back/dist/src ./front/build/assets
           projects: trackdechets-api trackdechets-front
-
