@@ -14,8 +14,8 @@ export function WasteInfo({ disabled }) {
   if (isEntreposageProvisoire) {
     return (
       <div className="notification">
-        Vous effectuez une réexpédition. Les informations sur le déchet
-        ont été automatiquement reportées et ne sont pas modifiables.
+        Vous effectuez une réexpédition. Les informations sur le déchet ont été
+        automatiquement reportées et ne sont pas modifiables.
       </div>
     );
   }
