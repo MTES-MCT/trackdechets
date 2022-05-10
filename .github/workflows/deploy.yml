@@ -3,7 +3,7 @@
 # Workflow de déploiement
 # Le front et le back ne sont pas inclut dans ce fichier car leur déploiement
 # se fait automatiquement via l'intégration Scalingo <> Github
-name: Deploy
+name: Deploy Docs and Sentry Release on production
 
 on:
   push:
@@ -11,43 +11,29 @@ on:
       - master
 
 jobs:
-  release-back:
+  sentry-release-production:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: back
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
-      - name: Create a Sentry Release for the API
+      - name: Run npm ci
+        run: npm --prefix back ci & npm --prefix front ci
+
+      - name: Run build
+        run: npm --prefix back run build & npm --prefix front run build
+
+      - name: Create a Sentry Release
         uses: getsentry/action-release@v1.1.6
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: betagouv
-          SENTRY_PROJECT: trackdechets-api
           SENTRY_URL: https://sentry.incubateur.net/
         with:
           environment: production
-          sourcemaps: ./dist/src
-
-  release-front:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: front
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Create a Sentry Release for the frontend
-        uses: getsentry/action-release@v1.1.6
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: betagouv
-          SENTRY_PROJECT: trackdechets-front
-          SENTRY_URL: https://sentry.incubateur.net/
-        with:
-          environment: production
-          sourcemaps: ./build/assets
+          sourcemaps: ./back/dist/src ./front/build/assets
+          projects: trackdechets-api trackdechets-front
 
   doc:
     # Taken from https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus
