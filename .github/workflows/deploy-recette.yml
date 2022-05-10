@@ -10,50 +10,27 @@ on:
       - dev
 
 jobs:
-  release-back:
+  release-recette:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: back
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Run build
-        run: npm ci && npm run build
+      - name: Run npm ci
+        run: npm --prefix back ci & npm --prefix front ci
 
-      - name: Create a Sentry Release for the API
+      - name: Run build
+        run: npm --prefix back run build & npm --prefix front run build
+
+      - name: Create a Sentry Release
         uses: getsentry/action-release@v1.1.6
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: betagouv
-          SENTRY_PROJECT: trackdechets-api
           SENTRY_URL: https://sentry.incubateur.net/
         with:
           environment: recette
-          sourcemaps: ./back/dist/src
+          sourcemaps: ./back/dist/src ./front/build/assets
+          projects: trackdechets-api trackdechets-front
 
-  release-front:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: front
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Run build
-        run: npm ci && npm run build
-
-      - name: Create a Sentry Release for the frontend
-        uses: getsentry/action-release@v1.1.6
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: betagouv
-          SENTRY_PROJECT: trackdechets-front
-          SENTRY_URL: https://sentry.incubateur.net/
-        with:
-          environment: recette
-          sourcemaps: ./front/build/assets
