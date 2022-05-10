@@ -29,7 +29,7 @@ jobs:
           SENTRY_URL: https://sentry.incubateur.net/
         with:
           environment: recette
-          sourcemaps: ./dist/src
+          sourcemaps: ./back/dist/src
 
   release-front:
     runs-on: ubuntu-latest
@@ -50,4 +50,4 @@ jobs:
           SENTRY_URL: https://sentry.incubateur.net/
         with:
           environment: recette
-          sourcemaps: ./build/assets
+          sourcemaps: ./front/build/assets
