@@ -40,7 +40,7 @@ export function SignWork({ siret, bsdaId }: Props) {
   return (
     <SignBsda title="Signature entreprise de travaux" bsdaId={bsdaId}>
       {({ bsda, onClose }) =>
-        bsda.metadata?.errors.some(
+        bsda.metadata?.errors?.some(
           error => error.requiredFor === SignatureTypeInput.Emission
         ) ? (
           <>

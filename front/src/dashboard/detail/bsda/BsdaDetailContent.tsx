@@ -283,8 +283,12 @@ const Broker = ({ broker }) => (
 
 const NextDestination = ({
   nextDestination,
+  forwardedIn,
+  groupedIn,
 }: {
   nextDestination: BsdaNextDestination;
+  forwardedIn?: Bsda | null;
+  groupedIn?: Bsda | null;
 }) => (
   <div className={styles.detailColumns}>
     <div className={styles.detailGrid}>
@@ -308,11 +312,14 @@ const NextDestination = ({
     </div>
 
     <div className={styles.detailGrid}>
-      <dt>CAP</dt>
-      <dd>{nextDestination.cap}</dd>
+      <DetailRow value={nextDestination.cap} label="CAP" />
 
-      <dt>Opération de traitement prévue</dt>
-      <dd>{nextDestination.plannedOperationCode}</dd>
+      <DetailRow
+        value={nextDestination.plannedOperationCode}
+        label="Opération de traitement prévue"
+      />
+
+      <DetailRow value={forwardedIn?.id ?? groupedIn?.id} label="Annexé dans" />
     </div>
   </div>
 );
@@ -366,9 +373,9 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             <dt>Code déchet</dt>
             <dd>{form.waste?.code}</dd>
             <dt>Description du déchet</dt>
-            <dd>
-              {form.waste?.materialName} {form.waste?.familyCode}
-            </dd>
+            <dd>{form.waste?.materialName}</dd>
+            <dt>Code famille</dt>
+            <dd>{form.waste?.familyCode}</dd>
             <dt>
               Poids {form.destination?.reception?.weight ? "reçu" : "envoyé"}
             </dt>
@@ -509,6 +516,8 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             <TabPanel className={styles.detailTabPanel}>
               <NextDestination
                 nextDestination={form?.destination?.operation?.nextDestination}
+                forwardedIn={form.forwardedIn}
+                groupedIn={form.groupedIn}
               />
             </TabPanel>
           )}

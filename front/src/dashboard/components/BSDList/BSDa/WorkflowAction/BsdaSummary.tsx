@@ -15,7 +15,7 @@ export function BsdaSummary({ bsda }: BsdaSummaryProps) {
   return (
     <>
       <BsdaWasteSummary bsda={bsda} />
-      {initialBsdas && (
+      {!!initialBsdas?.length && (
         <div className="tw-pb-4">
           <DataListTerm>Bsdas associés</DataListTerm>
           <InitialBsdas bsdas={initialBsdas} />

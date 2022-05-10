@@ -14,7 +14,7 @@ export function WasteInfo({ disabled }) {
   if (isEntreposageProvisoire) {
     return (
       <div className="notification">
-        Vous effectuez un entreposage provisoire. Les informations sur le déchet
+        Vous effectuez une réexpédition. Les informations sur le déchet
         ont été automatiquement reportées et ne sont pas modifiables.
       </div>
     );
@@ -156,7 +156,7 @@ export function WasteInfoWorker({ disabled }) {
             </option>
             <option value="4">4 - amiante tissé ou tressé</option>
             <option value="5">5 - amiante en feuilles ou en plaques</option>
-            <option value="6">6 - Amiante lié à des matériaux inertes</option>
+            <option value="6">6 - amiante lié à des matériaux inertes</option>
             <option value="7">
               7 - amiante noyé dans une résine ou une matière plastique
             </option>
@@ -164,7 +164,7 @@ export function WasteInfoWorker({ disabled }) {
               8 - amiante dans des matériels et équipements
             </option>
             <option value="9">
-              9 - Tous les matériaux contaminés susceptibles d'émettre des
+              9 - tous les matériaux contaminés susceptibles d'émettre des
               fibres
             </option>
           </Field>

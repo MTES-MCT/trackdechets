@@ -32,7 +32,7 @@ export function SignEmission({ siret, bsdaId }: Props) {
   });
 
   return (
-    <SignBsda title="Signer" bsdaId={bsdaId}>
+    <SignBsda title="Signature émetteur" bsdaId={bsdaId}>
       {({ bsda, onClose }) =>
         bsda.metadata?.errors?.some(
           error => error.requiredFor === SignatureTypeInput.Emission

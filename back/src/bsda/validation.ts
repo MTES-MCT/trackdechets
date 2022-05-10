@@ -3,6 +3,7 @@ import {
   BsdaStatus,
   BsdaType,
   Prisma,
+  TransportMode,
   WasteAcceptationStatus
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
@@ -88,6 +89,7 @@ type Transporter = Pick<
   | "transporterRecepisseNumber"
   | "transporterRecepisseDepartment"
   | "transporterRecepisseValidityLimit"
+  | "transporterTransportMode"
   | "transporterTransportPlates"
 >;
 
@@ -705,10 +707,30 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
               `Transporteur: ${MISSING_COMPANY_EMAIL}`
             )
         }),
+      transporterTransportMode: yup
+        .mixed<TransportMode>()
+        .nullable()
+        .oneOf(
+          [null, ...Object.values(TransportMode)],
+          "Le mode de transport ne fait pas partie de la liste reconnue : ${values}"
+        )
+        .requiredIf(
+          context.transportSignature,
+          "Le mode de transport utilisé par le transporteur est requis"
+        ),
       transporterTransportPlates: yup
         .array()
         .of(yup.string())
         .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
+        .when("transporterTransportMode", {
+          is: TransportMode.ROAD,
+          then: schema =>
+            schema.requiredIf(
+              context.transportSignature,
+              "L'immatriculation du transporteur doit être saisie'"
+            ),
+          otherwise: schema => schema.nullable()
+        })
     });
 
 const wasteDescriptionSchema: FactorySchemaOf<

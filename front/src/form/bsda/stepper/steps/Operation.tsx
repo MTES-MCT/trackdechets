@@ -118,7 +118,7 @@ export default function Operation() {
             >
               <option value="...">Sélectionnez une valeur...</option>
               <option value="R 5">
-                R 5 - Recyclage ou récupération d’autres matières inorganiques.
+                R 5 - Recyclage ou récupération d'autres matières inorganiques.
               </option>
               <option value="D 5">
                 D 5 - Mise en décharge aménagée et autorisée en ISDD ou ISDND
@@ -127,11 +127,12 @@ export default function Operation() {
                 D 9 - Vitrification, traitement chimique ou prétraitement
               </option>
               <option value="R 13">
-                R 13 - Stockage de déchets préalablement à l'une des opérations
-                R1 à R12 (à l’exclusion du stockage temporaire, avant collecte,
-                sur le site de production).
+                R 13 - Opérations de transit incluant le groupement sans
+                transvasement préalable à R 5
               </option>
-              <option value="D 15">D 15 - Entreposage provisoire</option>
+              <option value="D 15">
+                D 15 - Transit incluant le groupement sans transvasement
+              </option>
             </Field>
             <p>Opération prévue: {values.destination?.plannedOperationCode}</p>
           </div>
@@ -142,7 +143,7 @@ export default function Operation() {
               <Field
                 type="text"
                 name="destination.operation.description"
-                placeholder="NOM Prénom"
+                placeholder="ISDD, ISDND, etc."
                 className="td-input"
               />
             </label>

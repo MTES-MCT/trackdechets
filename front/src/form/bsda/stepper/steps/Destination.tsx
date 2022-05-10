@@ -1,7 +1,7 @@
 import React from "react";
 import { Field, useFormikContext } from "formik";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import { Bsda } from "generated/graphql/types";
+import { Bsda, BsdaType } from "generated/graphql/types";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 
 export function Destination({ disabled }) {
@@ -9,7 +9,7 @@ export function Destination({ disabled }) {
   const hasNextDestination = Boolean(
     values.destination?.operation?.nextDestination
   );
-  const isDechetterie = values.type === "COLLECTION_2710";
+  const isDechetterie = values?.type === BsdaType.Collection_2710;
 
   function onNextDestinationToggle() {
     if (hasNextDestination) {
@@ -33,11 +33,55 @@ export function Destination({ disabled }) {
           plus modifiables.
         </div>
       )}
-      <CompanySelector
-        disabled={disabled}
-        name="destination.company"
-        heading="Entreprise de destination"
-      />
+
+      {isDechetterie ? (
+        <div className="form__row">
+          <div className="notification">
+            Vous effectuez une collecte en déchetterie. Il n'y a pas de
+            destination à saisir, votre entreprise a été automatiquement
+            sélectionnée.
+          </div>
+          <div className="form__row">
+            <label>
+              Personne à contacter
+              <Field
+                type="text"
+                name="destination.company.contact"
+                className="td-input"
+                disabled={disabled}
+              />
+            </label>
+          </div>
+          <div className="form__row">
+            <label>
+              Téléphone
+              <Field
+                type="text"
+                name="destination.company.phone"
+                className="td-input td-input--small"
+                disabled={disabled}
+              />
+            </label>
+          </div>
+          <div className="form__row">
+            <label>
+              Mail
+              <Field
+                type="text"
+                name="destination.company.mail"
+                className="td-input td-input--medium"
+                disabled={disabled}
+              />
+            </label>
+          </div>
+        </div>
+      ) : (
+        <CompanySelector
+          disabled={disabled}
+          name="destination.company"
+          heading="Entreprise de destination"
+        />
+      )}
 
       {!isDechetterie && (
         <div className="form__row">
@@ -65,16 +109,17 @@ export function Destination({ disabled }) {
           {hasNextDestination || isDechetterie ? (
             <>
               <option value="R 13">
-                R 13 - Stockage de déchets préalablement à l'une des opérations
-                R1 à R12 (à l’exclusion du stockage temporaire, avant collecte,
-                sur le site de production).
+                R 13 - Opérations de transit incluant le groupement sans
+                transvasement préalable à R 5
               </option>
-              <option value="D 15">D 15 - Entreposage provisoire</option>
+              <option value="D 15">
+                D 15 - Transit incluant le groupement sans transvasement
+              </option>
             </>
           ) : (
             <>
               <option value="R 5">
-                R 5 - Recyclage ou récupération d’autres matières inorganiques.
+                R 5 - Recyclage ou récupération d'autres matières inorganiques.
               </option>
               <option value="D 5">
                 D 5 - Mise en décharge aménagée et autorisée en ISDD ou ISDND
