@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run build
-        run: npm run ci && npm run build
+        run: npm ci && npm run build
 
       - name: Create a Sentry Release for the API
         uses: getsentry/action-release@v1.1.6
@@ -45,7 +45,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run build
-        run: npm run ci && npm run build
+        run: npm ci && npm run build
 
       - name: Create a Sentry Release for the frontend
         uses: getsentry/action-release@v1.1.6
