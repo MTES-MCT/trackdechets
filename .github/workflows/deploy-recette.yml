@@ -17,6 +17,8 @@ jobs:
         working-directory: back
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Create a Sentry Release for the API
         uses: getsentry/action-release@v1.1.6
@@ -28,7 +30,6 @@ jobs:
         with:
           environment: recette
           sourcemaps: ./dist/src
-          fetch-depth: 0
 
   release-front:
     runs-on: ubuntu-latest
@@ -37,6 +38,8 @@ jobs:
         working-directory: front
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Create a Sentry Release for the frontend
         uses: getsentry/action-release@v1.1.6
@@ -48,4 +51,3 @@ jobs:
         with:
           environment: recette
           sourcemaps: ./build/assets
-          fetch-depth: 0
