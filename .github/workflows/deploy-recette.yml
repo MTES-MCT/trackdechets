@@ -20,6 +20,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Run build
+        run: npm run build
+
       - name: Create a Sentry Release for the API
         uses: getsentry/action-release@v1.1.6
         env:
@@ -40,6 +43,9 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+
+      - name: Run build
+        run: npm run build
 
       - name: Create a Sentry Release for the frontend
         uses: getsentry/action-release@v1.1.6
