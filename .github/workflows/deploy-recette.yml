@@ -1,14 +1,13 @@
 
-
 # Workflow de déploiement
 # Le front et le back ne sont pas inclut dans ce fichier car leur déploiement
 # se fait automatiquement via l'intégration Scalingo <> Github
-name: Deploy
+name: Deploy Recette
 
 on:
   push:
     branches:
-      - master
+      - dev
 
 jobs:
   release-back:
@@ -27,7 +26,7 @@ jobs:
           SENTRY_PROJECT: trackdechets-api
           SENTRY_URL: https://sentry.incubateur.net/
         with:
-          environment: production
+          environment: recette
           sourcemaps: ./dist/src
 
   release-front:
@@ -46,40 +45,5 @@ jobs:
           SENTRY_PROJECT: trackdechets-front
           SENTRY_URL: https://sentry.incubateur.net/
         with:
-          environment: production
+          environment: recette
           sourcemaps: ./build/assets
-
-  doc:
-    # Taken from https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: doc
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Setup Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14.x'
-
-      - name: Get yarn cache
-        id: yarn-cache
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.yarn-cache.outputs.dir }}
-          key: ${{ runner.os }}-website-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-website-
-
-      - run: yarn install --frozen-lockfile
-      - run: yarn build
-
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./doc/build
