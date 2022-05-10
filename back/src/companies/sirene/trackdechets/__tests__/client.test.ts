@@ -1,13 +1,11 @@
-import {
-  searchCompany,
-  searchCompanies,
-  CompanyNotFoundInTrackdechetsSearch
-} from "../client";
+import { ApiResponse, errors } from "@elastic/elasticsearch";
+import { searchCompany, searchCompanies } from "../client";
 import { ErrorCode } from "../../../../common/errors";
 import client from "../esClient";
-import { ResponseError } from "@elastic/elasticsearch/lib/errors";
-import { ApiResponse } from "@elastic/elasticsearch/lib/Transport";
 import { SearchHit } from "../types";
+import { CompanyNotFound } from "../../../errors";
+
+const { ResponseError } = errors;
 
 jest.mock("../esClient");
 
@@ -54,7 +52,7 @@ describe("searchCompany", () => {
   });
 
   // FIXME this case may not even exist in INSEE public data
-  it("should raise AnonymousCompanyError if non diffusible", async () => {
+  it("should raise AnonymousCompanyError if non-diffusible", async () => {
     (client.get as jest.Mock).mockResolvedValueOnce({
       body: {
         _source: {
@@ -102,9 +100,7 @@ describe("searchCompany", () => {
         statusCode: 404
       } as unknown as ApiResponse)
     );
-    expect(searchCompany("xxxxxxxxxxxxxx")).rejects.toThrow(
-      CompanyNotFoundInTrackdechetsSearch
-    );
+    expect(searchCompany("xxxxxxxxxxxxxx")).rejects.toThrow(CompanyNotFound);
   });
 
   it(`should escalate other types of errors
