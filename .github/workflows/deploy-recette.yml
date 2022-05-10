@@ -28,6 +28,7 @@ jobs:
         with:
           environment: recette
           sourcemaps: ./dist/src
+          fetch-depth: 0
 
   release-front:
     runs-on: ubuntu-latest
@@ -47,3 +48,4 @@ jobs:
         with:
           environment: recette
           sourcemaps: ./build/assets
+          fetch-depth: 0
