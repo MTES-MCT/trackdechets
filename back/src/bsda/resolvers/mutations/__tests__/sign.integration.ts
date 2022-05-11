@@ -387,7 +387,9 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureDate: new Date(),
           workerWorkSignatureAuthor: "worker",
           workerWorkSignatureDate: new Date(),
-          transporterCompanySiret: transporter.company.siret
+          transporterCompanySiret: transporter.company.siret,
+          transporterTransportMode: "ROAD",
+          transporterTransportPlates: ["AA-00-XX"]
         }
       });
 

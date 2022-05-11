@@ -137,6 +137,10 @@ describe("Query.bsds.bsda base workflow", () => {
                 department: "83",
                 number: "1234",
                 validityLimit: new Date().toISOString() as any
+              },
+              transport: {
+                mode: "ROAD",
+                plates: ["AA-00-XX"]
               }
             },
             waste: {
