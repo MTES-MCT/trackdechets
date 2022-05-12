@@ -168,8 +168,8 @@ app.use(graphQLPath, graphqlBatchLimiterMiddleware());
 app.use(
   graphQLPath,
   graphqlRateLimiterMiddleware("resendInvitation", {
-    windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
-    maxRequestsPerWindow: 1,
+    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+    maxRequestsPerWindow: 10, // 10 requests each 3 minutes
     store
   })
 );

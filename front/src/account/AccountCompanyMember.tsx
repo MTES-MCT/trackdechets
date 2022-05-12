@@ -71,7 +71,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
     Pick<Mutation, "removeUserFromCompany">,
     MutationRemoveUserFromCompanyArgs
   >(REMOVE_USER_FROM_COMPANY);
-  const [deleteInvitation] = useMutation<
+  const [deleteInvitation, { loading: deleteLoading }] = useMutation<
     Pick<Mutation, "deleteInvitation">,
     MutationDeleteInvitationArgs
   >(DELETE_INVITATION, {
@@ -84,16 +84,22 @@ export default function AccountCompanyMember({ company, user }: Props) {
       });
     },
   });
-  const [resendInvitation] = useMutation(RESEND_INVITATION, {
-    onCompleted: () => {
-      cogoToast.success("Invitation renvoyée", { hideAfter: 5 });
-    },
-    onError: () => {
-      cogoToast.error("L'invitation n'a pas pu être renvoyée", {
-        hideAfter: 5,
-      });
-    },
-  });
+  const [resendInvitation, { loading: resendLoading }] = useMutation(
+    RESEND_INVITATION,
+    {
+      onCompleted: () => {
+        cogoToast.success("Invitation renvoyée", { hideAfter: 5 });
+      },
+      onError: () => {
+        cogoToast.error(
+          "L'invitation n'a pas pu être renvoyée. Veuillez réessayer dans quelques minutes.",
+          {
+            hideAfter: 5,
+          }
+        );
+      },
+    }
+  );
   return (
     <>
       <tr key={user.id}>
@@ -130,25 +136,31 @@ export default function AccountCompanyMember({ company, user }: Props) {
             <td className={styles["right-column"]}>
               <button
                 className="btn btn--primary"
+                disabled={deleteLoading}
                 onClick={() => {
                   deleteInvitation({
                     variables: { email: user.email, siret: company.siret },
                   });
                 }}
               >
-                <IconTrash /> Supprimer l'invitation
+                <IconTrash />{" "}
+                {deleteLoading
+                  ? "Suppression en cours"
+                  : "Supprimer l'invitation"}
               </button>
             </td>
             <td className={styles["right-column"]}>
               <button
                 className="btn btn--primary"
+                disabled={resendLoading}
                 onClick={() => {
                   resendInvitation({
                     variables: { email: user.email, siret: company.siret },
                   });
                 }}
               >
-                <IconEmailActionUnread /> Renvoyer l'invitation
+                <IconEmailActionUnread />{" "}
+                {resendLoading ? "Envoi en cours" : "Renvoyer l'invitation"}
               </button>
             </td>
           </>
