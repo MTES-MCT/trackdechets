@@ -60,16 +60,6 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
       if (noTraceability == null) {
         setFieldValue("noTraceability", false);
       }
-      if (noTraceability === true && nextDestination?.company?.siret?.length) {
-        setFieldValue("nextDestination.company", {
-          siret: "",
-          name: "",
-          address: "",
-          contact: "",
-          mail: "",
-          phone: "",
-        });
-      }
     } else {
       setFieldValue("nextDestination", null);
       setFieldValue("noTraceability", null);
@@ -130,7 +120,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
           />
         </label>
       </div>
-      {isGroupement && (
+      {isGroupement && noTraceability !== null && (
         <>
           <div className="form__row form__row--inline">
             <Field
@@ -181,6 +171,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
             allowForeignCompanies={true}
             displayVatSearch={false}
             skipFavorite={noTraceability === true}
+            optional={noTraceability === true}
           />
         </div>
       )}
