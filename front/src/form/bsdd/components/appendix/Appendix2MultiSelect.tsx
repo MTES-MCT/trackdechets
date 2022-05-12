@@ -208,8 +208,6 @@ export default function Appendix2MultiSelect() {
                       form.quantityReceived!!
                     ).minus(form.quantityGrouped ?? 0);
 
-                    console.log("quantitySet", quantitySet);
-
                     if (values.id) {
                       quantityLeft = quantityLeft.plus(defaultQuantity);
                     }

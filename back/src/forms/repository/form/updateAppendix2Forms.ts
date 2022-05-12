@@ -36,8 +36,12 @@ const buildUpdateAppendix2Forms: (
         })
       ).map(g => g.nextForm);
 
+      const groupedInTotality =
+        quantityGrouped.greaterThanOrEqualTo(quantityReceived); // case > should not happen
+
       const allSealed =
         groupementForms.length &&
+        groupedInTotality &&
         groupementForms.reduce(
           (acc, form) => acc && form.status !== Status.DRAFT,
           true
@@ -45,6 +49,7 @@ const buildUpdateAppendix2Forms: (
 
       const allProcessed =
         groupementForms.length &&
+        groupedInTotality &&
         groupementForms.reduce(
           (acc, form) =>
             acc &&
@@ -56,7 +61,7 @@ const buildUpdateAppendix2Forms: (
 
       const nextStatus = allProcessed
         ? Status.PROCESSED
-        : allSealed && quantityGrouped.greaterThanOrEqualTo(quantityReceived) // case > should not happen
+        : allSealed
         ? Status.GROUPED
         : Status.AWAITING_GROUP;
 
