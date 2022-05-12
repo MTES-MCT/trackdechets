@@ -7,6 +7,7 @@ import {
   InitialFormFraction,
   Query,
   QueryAppendixFormsArgs,
+  Packagings,
 } from "generated/graphql/types";
 import React, { useEffect, useMemo, useState } from "react";
 import { Decimal } from "decimal.js-light";
@@ -117,6 +118,7 @@ export default function Appendix2MultiSelect() {
           if (!form.wasteDetails?.packagingInfos) {
             return acc1;
           }
+
           return form.wasteDetails.packagingInfos.reduce(
             (acc2, packagingInfo) => {
               if (!acc2[packagingInfo.type]) {
@@ -127,8 +129,15 @@ export default function Appendix2MultiSelect() {
               }
               return {
                 ...acc2,
-                [packagingInfo.type]:
-                  packagingInfo.quantity + acc2[packagingInfo.type],
+                [packagingInfo.type]: [
+                  Packagings.Benne,
+                  Packagings.Citerne,
+                ].includes(packagingInfo.type)
+                  ? Math.min(
+                      packagingInfo.quantity + acc2[packagingInfo.type],
+                      2
+                    )
+                  : packagingInfo.quantity + acc2[packagingInfo.type],
               };
             },
             acc1
