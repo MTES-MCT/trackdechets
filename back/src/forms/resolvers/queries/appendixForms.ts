@@ -33,8 +33,6 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
     }
   });
 
-  console.log(queriedForms.map(f => f.quantityGrouped));
-
   return queriedForms
     .filter(
       f =>

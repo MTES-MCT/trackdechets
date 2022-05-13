@@ -23,15 +23,10 @@ const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
 
 describe("Test appendixForms", () => {
-<<<<<<< HEAD
   afterEach(async () => {
     await resetDatabase();
   });
   it("should return appendix 2 candidates", async () => {
-=======
-  afterEach(resetDatabase);
-  it("should return appendixForms data", async () => {
->>>>>>> abeddf45c (update typing of InitialFormFractionInput)
     const { user: emitter, company: emitterCompany } =
       await userWithCompanyFactory("ADMIN");
     const { user: ttr, company: ttrCompany } = await userWithCompanyFactory(
