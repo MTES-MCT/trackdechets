@@ -1,6 +1,7 @@
 import { UserInputError } from "apollo-server-express";
 import {
   CompanyPublic,
+  CompanySearchPrivate,
   QueryResolvers
 } from "../../../generated/graphql/types";
 import { getInstallation } from "../../database";
@@ -16,7 +17,7 @@ import { searchCompany } from "../../search";
  */
 export async function getCompanyInfos(
   siretOrVat: string
-): Promise<CompanyPublic> {
+): Promise<CompanyPublic | CompanySearchPrivate> {
   if (siretOrVat === undefined || !siretOrVat.length) {
     throw new UserInputError(
       "Paramètre absent. Un numéro SIRET ou de TVA intracommunautaire valide est requis",
@@ -45,13 +46,13 @@ const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
       }
     );
   }
-  const companyInfos = await getCompanyInfos(
+  const companyInfos = (await getCompanyInfos(
     !!args.siret ? args.siret : args.clue
-  );
+  )) as CompanyPublic;
   if (companyInfos.statutDiffusionEtablissement !== "N") {
     return companyInfos;
   } else {
-    // hide Anonymous Company from public query
+    // hide non-diffusible Company from public query
     return {
       siret: companyInfos.siret,
       vatNumber: companyInfos.vatNumber,
@@ -59,7 +60,7 @@ const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
       companyTypes: companyInfos.companyTypes,
       ecoOrganismeAgreements: companyInfos.ecoOrganismeAgreements,
       statutDiffusionEtablissement: companyInfos.statutDiffusionEtablissement
-    } as CompanyPublic;
+    };
   }
 };
 

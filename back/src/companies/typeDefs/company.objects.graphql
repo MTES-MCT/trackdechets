@@ -90,6 +90,7 @@ type CompanyPrivate {
   """
   ecoOrganismeAgreements: [URL!]!
 
+  "L'entreprise autorise l'enlèvement d'un Dasri sans sa signature"
   allowBsdasriTakeOverWithoutSignature: Boolean!
 }
 

@@ -70,6 +70,8 @@ export async function searchCompany(
     select: {
       id: true,
       siret: true,
+      name: true,
+      address: true,
       vatNumber: true,
       companyTypes: true,
       contactEmail: true,
@@ -85,8 +87,8 @@ export async function searchCompany(
     ecoOrganismeAgreements: [],
     isRegistered: trackdechetsCompanyInfo != null,
     companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
-    ...companyInfo,
-    ...convertUrls(trackdechetsCompanyInfo)
+    ...convertUrls(trackdechetsCompanyInfo),
+    ...companyInfo
   };
 }
 

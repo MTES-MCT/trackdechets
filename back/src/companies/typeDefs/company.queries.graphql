@@ -13,8 +13,8 @@ type Query {
   ): CompanyPublic!
 
   """
-  Effectue une recherche floue sur la base SIRENE et enrichit
-  les résultats avec des informations provenant de Trackdéchets
+  Effectue une recherche floue sur la base SIRENE et enrichie
+  avec des informations provenant de Trackdéchets
   """
   searchCompanies(
     """

@@ -4,6 +4,7 @@ import { CompanyType } from "../generated/graphql/types";
 export interface CompanySearchResult extends CompanyBaseIdentifiers {
   address: string;
   name: string;
+  // Ouvert "A", Fermé "F" (INSEE)
   etatAdministratif?: string;
   codeCommune?: string;
   naf?: string;
@@ -11,9 +12,11 @@ export interface CompanySearchResult extends CompanyBaseIdentifiers {
   addressVoie?: string;
   addressCity?: string;
   addressPostalCode?: string;
+  // Enregistré sur TD
   isRegistered: boolean;
   companyTypes: CompanyType[];
   ecoOrganismeAgreements?: URL[];
+  // diffusible ou non-diffusible légalement (INSEE)
   statutDiffusionEtablissement: "O" | "N";
 }
 /**
