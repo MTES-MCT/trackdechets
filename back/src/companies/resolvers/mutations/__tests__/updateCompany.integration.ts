@@ -114,4 +114,39 @@ describe("mutation updateCompany", () => {
       })
     ]);
   });
+
+  it("should return an error when trying to change Company type of a TRANSPORTER identified by VAT number", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: {
+        set: ["TRANSPORTER"]
+      },
+      vatNumber: "RO17579668",
+      siret: "RO17579668"
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+
+    const { errors } = await mutate(UPDATE_COMPANY, {
+      variables: {
+        siret: company.vatNumber,
+        companyTypes: ["ECO_ORGANISME", "TRANSPORTER"]
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de changer de type TRANSPORTER pour un établissement transporteur identifié par son numéro de TVA"
+      })
+    ]);
+
+    const { errors: errors2 } = await mutate(UPDATE_COMPANY, {
+      variables: {
+        siret: company.vatNumber,
+        companyTypes: ["TRANSPORTER"]
+      }
+    });
+
+    expect(errors2).toBeUndefined();
+  });
 });
