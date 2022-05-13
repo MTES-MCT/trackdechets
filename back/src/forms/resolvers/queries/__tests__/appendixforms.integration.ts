@@ -2,13 +2,21 @@ import * as mailsHelper from "../../../../mailer/mailing";
 import makeClient from "../../../../__tests__/testClient";
 import {
   formFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  formWithTempStorageFactory
 } from "../../../../__tests__/factories";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
+import { gql } from "apollo-server-core";
 
-const buildQuery = siret =>
-  `query { appendixForms (siret: "${siret}") { id } } `;
+const APPENDIX_FORMS = gql`
+  query AppendixForm($siret: String!) {
+    appendixForms(siret: $siret) {
+      id
+    }
+  }
+`;
+
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
@@ -66,9 +74,9 @@ describe("Test appendixForms", () => {
     const { query } = makeClient(recipient);
     const {
       data: { appendixForms }
-    } = await query<{ appendixForms: { id: string }[] }>(
-      buildQuery(recipientCompany.siret)
-    );
+    } = await query<{ appendixForms: { id: string }[] }>(APPENDIX_FORMS, {
+      variables: { siret: recipientCompany.siret }
+    });
 
     expect(appendixForms.length).toBe(1);
     expect(appendixForms[0].id).toBe(form.id);
@@ -93,9 +101,42 @@ describe("Test appendixForms", () => {
     // the queried siret is not recipientCompanySiret, result should be null
 
     const { query } = makeClient(recipient);
-    const { data, errors } = await query(buildQuery(emitterCompany.siret));
+    const { data, errors } = await query<{ appendixForms: { id: string }[] }>(
+      APPENDIX_FORMS,
+      {
+        variables: { siret: emitterCompany.siret }
+      }
+    );
     expect(errors).toHaveLength(1);
     expect(errors[0].extensions.code).toEqual(ErrorCode.FORBIDDEN);
     expect(data).toBe(null);
+  });
+
+  it("should return appendix 2 candidates for final destination after temp storage", async () => {
+    const { user: emitter, company: emitterCompany } =
+      await userWithCompanyFactory("ADMIN");
+    const { company: ttrCompany } = await userWithCompanyFactory("ADMIN");
+    const { user: destination, company: destinationCompany } =
+      await userWithCompanyFactory("ADMIN");
+
+    const form = await formWithTempStorageFactory({
+      ownerId: emitter.id,
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: ttrCompany.siret,
+        recipientIsTempStorage: true,
+        status: "AWAITING_GROUP"
+      },
+      tempStorageOpts: { destinationCompanySiret: destinationCompany.siret }
+    });
+    const { query } = makeClient(destination);
+    const {
+      data: { appendixForms }
+    } = await query<{ appendixForms: { id: string }[] }>(APPENDIX_FORMS, {
+      variables: { siret: destinationCompany.siret }
+    });
+
+    expect(appendixForms.length).toBe(1);
+    expect(appendixForms[0].id).toBe(form.id);
   });
 });
