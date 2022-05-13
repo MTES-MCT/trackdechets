@@ -40,6 +40,8 @@ interface CompanySelectorProps {
   disabled?: boolean;
   optionalMail?: boolean;
   skipFavorite?: boolean;
+  // whether the company is optional
+  optional?: boolean;
 }
 
 export default function CompanySelector({
@@ -52,6 +54,7 @@ export default function CompanySelector({
   disabled,
   optionalMail = false,
   skipFavorite = false,
+  optional = false,
 }: CompanySelectorProps) {
   // STATE
   const [isRegistered, setIsRegistered] = useState(true);
@@ -124,24 +127,45 @@ export default function CompanySelector({
     (company: CompanyFavorite) => {
       if (disabled) return;
 
-      const fields = {
-        siret: company.siret,
-        vatNumber: company.vatNumber,
-        name: company.name,
-        address: company.address,
-        contact: company.contact,
-        phone: company.phone,
-        mail: company.mail,
-      };
+      // avoid setting same company multiple times
+      if (company?.siret && company.siret !== field.value.siret) {
+        const fields = {
+          siret: company.siret,
+          vatNumber: company.vatNumber,
+          name: company.name,
+          address: company.address,
+          contact: company.contact,
+          phone: company.phone,
+          mail: company.mail,
+        };
 
-      Object.keys(fields).forEach(key => {
-        setFieldValue(`${field.name}.${key}`, fields[key]);
-      });
+        Object.keys(fields).forEach(key => {
+          setFieldValue(`${field.name}.${key}`, fields[key]);
+        });
+      } else if (optional) {
+        // allow unselecting the company
+        setFieldValue(field.name, {
+          siret: "",
+          name: "",
+          address: "",
+          contact: "",
+          mail: "",
+          phone: "",
+        });
+      }
+
       if (onCompanySelected) {
         onCompanySelected(company);
       }
     },
-    [field.name, setFieldValue, onCompanySelected, disabled]
+    [
+      field.name,
+      field.value.siret,
+      setFieldValue,
+      onCompanySelected,
+      disabled,
+      optional,
+    ]
   );
 
   const searchResults: CompanyFavorite[] = useMemo(
@@ -184,10 +208,12 @@ export default function CompanySelector({
   );
 
   useEffect(() => {
-    if (searchResults.length === 1 && field.value.siret === "") {
-      selectCompany(searchResults[0]);
+    if (!optional) {
+      if (searchResults.length === 1 && field.value.siret === "") {
+        selectCompany(searchResults[0]);
+      }
     }
-  }, [searchResults, field.value.siret, selectCompany]);
+  }, [searchResults, field.value.siret, selectCompany, optional]);
 
   useEffect(() => {
     const timeoutID = setTimeout(() => {
