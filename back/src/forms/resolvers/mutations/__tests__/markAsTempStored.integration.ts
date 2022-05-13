@@ -257,7 +257,7 @@ describe("{ mutation { markAsTempStored } }", () => {
     expect(statusLogs.length).toEqual(1);
   });
 
-  it("should not be possible to mark a BSD as temp stored if recipientIsTempStorage != true", async () => {
+  it("should set recipientIsTempStorage to true and create temporaryStorageDetail if recipientIsTempStorage is false", async () => {
     const { user, company: tempStorerCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
@@ -270,34 +270,41 @@ describe("{ mutation { markAsTempStored } }", () => {
         status: "SENT",
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: tempStorerCompany.siret,
-        recipientIsTempStorage: false,
-        temporaryStorageDetail: { create: {} }
+        recipientIsTempStorage: false
       }
     });
 
     const { mutate } = makeClient(user);
 
-    const { errors } = await mutate(MARK_AS_TEMP_STORED, {
+    const { data } = await mutate<
+      Pick<Mutation, "markAsTempStored">,
+      MutationMarkAsTempStoredArgs
+    >(MARK_AS_TEMP_STORED, {
       variables: {
         id: form.id,
         tempStoredInfos: {
           wasteAcceptationStatus: "ACCEPTED",
           wasteRefusalReason: "",
           receivedBy: "John Doe",
-          receivedAt: "2018-12-11T00:00:00.000Z",
-          signedAt: "2018-12-11T00:00:00.000Z",
+          receivedAt: "2018-12-11T00:00:00.000Z" as any,
+          signedAt: "2018-12-11T00:00:00.000Z" as any,
           quantityReceived: 2.4,
           quantityType: "REAL"
         }
       }
     });
 
-    expect(errors).toHaveLength(1);
-    expect(errors[0].message).toEqual(
-      "Ce bordereau ne peut pas être marqué comme entreposé provisoirement car le destinataire " +
-        "n'a pas été identifié comme étant une installation d'entreposage provisoire ou de reconditionnement"
+    expect(data.markAsTempStored.status).toEqual("TEMP_STORED");
+
+    const updatedForm = await prisma.form.findFirst({
+      where: { id: form.id },
+      include: { temporaryStorageDetail: true }
+    });
+
+    expect(updatedForm.recipientIsTempStorage).toEqual(true);
+    expect(updatedForm.temporaryStorageDetail.tempStorerReceivedBy).toEqual(
+      "John Doe"
     );
-    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 
   test.each(allowedFormats)(

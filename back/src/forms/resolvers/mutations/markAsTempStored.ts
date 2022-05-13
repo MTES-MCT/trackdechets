@@ -6,8 +6,7 @@ import { checkCanMarkAsTempStored } from "../../permissions";
 import { tempStoredInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
 import { expandFormFromDb } from "../../form-converter";
-import { DestinationCannotTempStore } from "../../errors";
-import { WasteAcceptationStatus } from "@prisma/client";
+import { Prisma, WasteAcceptationStatus } from "@prisma/client";
 import { getFormRepository } from "../../repository";
 
 const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
@@ -22,10 +21,6 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
 
   await checkCanMarkAsTempStored(user, form);
 
-  if (form.recipientIsTempStorage !== true) {
-    throw new DestinationCannotTempStore();
-  }
-
   const tempStorageUpdateInput = {
     tempStorerQuantityType: tempStoredInfos.quantityType,
     tempStorerQuantityReceived: tempStoredInfos.quantityReceived,
@@ -38,11 +33,25 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
 
   await tempStoredInfoSchema.validate(tempStorageUpdateInput);
 
-  const formUpdateInput = {
-    temporaryStorageDetail: {
-      update: tempStorageUpdateInput
-    }
-  };
+  const { temporaryStorageDetail } = await formRepository.findFullFormById(
+    form.id
+  );
+
+  let formUpdateInput: Prisma.FormUpdateInput = {};
+
+  if (temporaryStorageDetail) {
+    formUpdateInput = {
+      temporaryStorageDetail: { update: tempStorageUpdateInput }
+    };
+  } else {
+    // temporary storage installation have been mistakenly identified as
+    // final destination, set recipientIsTempStorage to true and create
+    // temporaryStorageDetail
+    formUpdateInput = {
+      recipientIsTempStorage: true,
+      temporaryStorageDetail: { create: tempStorageUpdateInput }
+    };
+  }
 
   const tempStoredForm = await transitionForm(user, form, {
     type: EventType.MarkAsTempStored,

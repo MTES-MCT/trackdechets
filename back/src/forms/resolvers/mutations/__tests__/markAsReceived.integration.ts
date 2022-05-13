@@ -6,6 +6,7 @@ import * as mailsHelper from "../../../../mailer/mailing";
 import {
   companyFactory,
   formFactory,
+  formWithTempStorageFactory,
   transportSegmentFactory,
   userFactory,
   userWithCompanyFactory
@@ -517,36 +518,50 @@ describe("Test Form reception", () => {
     expect(deleted).toEqual(null);
   });
 
-  it("should fail if recipient is temp storage", async () => {
-    const { recipient, form } = await prepareDB();
+  it(
+    "should delete temporaryStorageDetail and set recipientIsTempStorage to false " +
+      "if markAsReceived is called on a form where recipientIsTempStorage is true",
+    async () => {
+      // this case happens when the recipient was mistakenly
+      // identified as temporary storage by
 
-    await prisma.form.update({
-      where: { id: form.id },
-      data: { recipientIsTempStorage: true }
-    });
+      const { user: emitterUser, company: emitter } =
+        await userWithCompanyFactory("MEMBER");
+      const { user: destinationUser, company: destination } =
+        await userWithCompanyFactory("MEMBER");
 
-    const { mutate } = makeClient(recipient);
+      const form = await formWithTempStorageFactory({
+        ownerId: emitterUser.id,
+        opt: {
+          recipientCompanySiret: destination.siret,
+          emitterCompanySiret: emitter.siret
+        },
+        tempStorageOpts: { signedAt: null }
+      });
 
-    const { errors } = await mutate(MARK_AS_RECEIVED, {
-      variables: {
-        id: form.id,
-        receivedInfo: {
-          receivedBy: "Bill",
-          receivedAt: "2019-01-17T10:22:00+0100",
-          signedAt: "2019-01-17T10:22:00+0100",
-          wasteAcceptationStatus: "ACCEPTED",
-          quantityReceived: 11
+      const { mutate } = makeClient(destinationUser);
+
+      await mutate(MARK_AS_RECEIVED, {
+        variables: {
+          id: form.id,
+          receivedInfo: {
+            receivedBy: "Bill",
+            receivedAt: "2019-01-17T10:22:00+0100",
+            signedAt: "2019-01-17T10:22:00+0100",
+            wasteAcceptationStatus: "ACCEPTED",
+            quantityReceived: 11
+          }
         }
-      }
-    });
+      });
 
-    expect(errors).toHaveLength(1);
-    expect(errors[0].message).toEqual(
-      "Ce bordereau ne peut pas être marqué comme reçu car le destinataire est une installation " +
-        "d'entreposage provisoire ou de reconditionnement. Utiliser la mutation markAsTempStored " +
-        "pour marquer ce bordereau comme entreposé provisoirement"
-    );
-  });
+      const updatedForm = await prisma.form.findFirst({
+        where: { id: form.id },
+        include: { temporaryStorageDetail: true }
+      });
+      expect(updatedForm.recipientIsTempStorage).toEqual(false);
+      expect(updatedForm.temporaryStorageDetail).toBeNull();
+    }
+  );
 
   test.each(allowedFormats)(
     "%p should be a valid format for receivedAt",

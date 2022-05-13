@@ -62,26 +62,6 @@ export class InvaliSecurityCode extends ForbiddenError {
   }
 }
 
-export class TemporaryStorageCannotReceive extends UserInputError {
-  constructor() {
-    super(
-      "Ce bordereau ne peut pas être marqué comme reçu car le destinataire " +
-        "est une installation d'entreposage provisoire ou de reconditionnement. " +
-        "Utiliser la mutation markAsTempStored pour marquer ce bordereau comme entreposé provisoirement"
-    );
-  }
-}
-
-export class DestinationCannotTempStore extends UserInputError {
-  constructor() {
-    super(
-      "Ce bordereau ne peut pas être marqué comme entreposé provisoirement " +
-        "car le destinataire n'a pas été identifié comme étant une installation d'entreposage " +
-        "provisoire ou de reconditionnement"
-    );
-  }
-}
-
 export class FormAlreadyInAppendix2 extends UserInputError {
   constructor(id: string) {
     super(

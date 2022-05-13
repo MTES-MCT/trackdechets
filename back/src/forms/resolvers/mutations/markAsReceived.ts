@@ -6,10 +6,9 @@ import { checkCanMarkAsReceived } from "../../permissions";
 import { receivedInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
 import { expandFormFromDb } from "../../form-converter";
-import { TemporaryStorageCannotReceive } from "../../errors";
 import prisma from "../../../prisma";
 import { getFormRepository } from "../../repository";
-import { WasteAcceptationStatus } from "@prisma/client";
+import { WasteAcceptationStatus, Status, Prisma } from "@prisma/client";
 
 const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   parent,
@@ -22,23 +21,27 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   await checkCanMarkAsReceived(user, form);
   const formRepository = getFormRepository(user);
 
-  if (form.recipientIsTempStorage === true) {
-    // this form can be mark as received only if it has been
-    // taken over by the transporter after temp storage
-    const { temporaryStorageDetail } = await formRepository.findFullFormById(
-      form.id
-    );
-
-    if (!temporaryStorageDetail?.signedAt) {
-      throw new TemporaryStorageCannotReceive();
-    }
-  }
-
   await receivedInfoSchema.validate(receivedInfo);
-  const formUpdateInput = {
+
+  let formUpdateInput: Prisma.FormUpdateInput = {
     ...receivedInfo,
     currentTransporterSiret: ""
   };
+
+  if (form.recipientIsTempStorage && form.status === Status.SENT) {
+    // destination was initially identified as temporary storage
+    // but the destination is receiving the BSDD as final destination
+    // so we need to toggle off recipientIsTempStorage and delete
+    // temporaryStorageDetail
+    formUpdateInput = {
+      ...formUpdateInput,
+      recipientIsTempStorage: false,
+      temporaryStorageDetail: {
+        delete: true
+      }
+    };
+  }
+
   const receivedForm = await transitionForm(user, form, {
     type: EventType.MarkAsReceived,
     formUpdateInput
