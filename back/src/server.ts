@@ -45,7 +45,8 @@ const {
   SESSION_NAME,
   UI_HOST,
   MAX_REQUESTS_PER_WINDOW = "1000",
-  NODE_ENV
+  NODE_ENV,
+  TRUST_PROXY
 } = process.env;
 
 const Sentry = initSentry();
@@ -104,6 +105,11 @@ export const server = new ApolloServer({
 });
 
 export const app = express();
+
+if (TRUST_PROXY === "true") {
+  // when app runs behind a cdn, this allows us to get the forwarded user ip for rate limit
+  app.set("trust proxy", true);
+}
 
 if (Sentry) {
   // The request handler must be the first middleware on the app
@@ -229,9 +235,9 @@ app.use(authRouter);
 app.use(oauth2Router);
 
 app.get("/ping", (_, res) => res.send("Pong!"));
-app.get("/ip", (req, res) =>
-  res.send(`IP: ${req.ip} XFF: ${req.get("X-Forwarded-For")}`)
-);
+app.get("/ip", (req, res) => {
+  return res.send(`IP: ${req.ip} XFF: ${req.get("X-Forwarded-For")}`);
+});
 app.get("/userActivation", userActivationHandler);
 app.get("/download", downloadRouter);
 
