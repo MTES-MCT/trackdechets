@@ -19,14 +19,22 @@ export default function AccountCompanyAddBrokerReceipt() {
             <tr>
               <td>Numéro de récépissé</td>
               <td>
-                <Field type="text" name="brokerReceiptNumber" />
+                <Field
+                  type="text"
+                  name="brokerReceiptNumber"
+                  className="td-input"
+                />
                 <RedErrorMessage name="brokerReceiptNumber" />
               </td>
             </tr>
             <tr>
               <td>Limite de validité</td>
               <td>
-                <Field name="brokerReceiptValidity" component={DateInput} />
+                <Field
+                  name="brokerReceiptValidity"
+                  component={DateInput}
+                  className="td-input"
+                />
                 <RedErrorMessage name="brokerReceiptValidity" />
               </td>
             </tr>
@@ -37,6 +45,7 @@ export default function AccountCompanyAddBrokerReceipt() {
                   type="text"
                   name="brokerReceiptDepartment"
                   placeholder="75"
+                  className="td-input"
                 />
                 <RedErrorMessage name="brokerReceiptDepartment" />
               </td>
