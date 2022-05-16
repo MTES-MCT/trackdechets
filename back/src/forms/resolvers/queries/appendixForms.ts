@@ -14,11 +14,21 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
 
   const queriedForms = await prisma.form.findMany({
     where: {
-      ...(wasteCode && { wasteDetailsCode: wasteCode }),
-      status: "AWAITING_GROUP",
-      recipientCompanySiret: siret,
-      isDeleted: false,
-      appendix2RootFormId: null
+      AND: [
+        ...(wasteCode ? [{ wasteDetailsCode: wasteCode }] : []),
+        { status: "AWAITING_GROUP" },
+        {
+          OR: [
+            { recipientCompanySiret: siret },
+            {
+              recipientIsTempStorage: true,
+              temporaryStorageDetail: { destinationCompanySiret: siret }
+            }
+          ]
+        },
+        { isDeleted: false },
+        { appendix2RootFormId: null }
+      ]
     }
   });
 
