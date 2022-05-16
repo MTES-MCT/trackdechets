@@ -103,7 +103,7 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
         }
       >
         <JourneyStopName>Destinataire</JourneyStopName>
-        {finalRecipient.company && (
+        {!!finalRecipient.company?.siret && (
           <JourneyStopDescription>
             {finalRecipient.company.name} ({finalRecipient.company.siret})
             <br />
