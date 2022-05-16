@@ -46,9 +46,6 @@ export function WorkflowAction(props: WorkflowActionProps) {
     }
     case FormStatus.Sent: {
       if (siret === form.recipient?.company?.siret) {
-        if (isTempStorage) {
-          return <MarkAsTempStored {...props} />;
-        }
         return <MarkAsReceived {...props} />;
       }
 

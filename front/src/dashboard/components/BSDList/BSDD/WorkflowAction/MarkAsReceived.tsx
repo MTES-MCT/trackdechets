@@ -1,5 +1,10 @@
 import React from "react";
-import { Mutation, MutationMarkAsReceivedArgs } from "generated/graphql/types";
+import {
+  Mutation,
+  MutationMarkAsReceivedArgs,
+  MutationMarkAsTempStoredArgs,
+  WasteAcceptationStatus,
+} from "generated/graphql/types";
 import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
 import { WorkflowActionProps } from "./WorkflowAction";
@@ -19,17 +24,46 @@ const MARK_AS_RECEIVED = gql`
   ${statusChangeFragment}
 `;
 
+const MARK_AS_TEMP_STORED = gql`
+  mutation MarkAsTempStored($id: ID!, $tempStoredInfos: TempStoredFormInput!) {
+    markAsTempStored(id: $id, tempStoredInfos: $tempStoredInfos) {
+      ...StatusChange
+    }
+  }
+  ${statusChangeFragment}
+`;
+
 export default function MarkAsReceived({ form }: WorkflowActionProps) {
-  const [markAsReceived, { loading, error }] = useMutation<
-    Pick<Mutation, "markAsReceived">,
-    MutationMarkAsReceivedArgs
-  >(MARK_AS_RECEIVED, {
+  const [
+    markAsReceived,
+    { loading: markAsReceivedLoading, error: markAsReceivedError },
+  ] = useMutation<Pick<Mutation, "markAsReceived">, MutationMarkAsReceivedArgs>(
+    MARK_AS_RECEIVED,
+    {
+      refetchQueries: [GET_BSDS],
+      awaitRefetchQueries: true,
+      onError: () => {
+        // The error is handled in the UI
+      },
+    }
+  );
+
+  const [
+    markAsTempStored,
+    { loading: markAsTempStoredLoading, error: markAsTempStoredError },
+  ] = useMutation<
+    Pick<Mutation, "markAsTempStored">,
+    MutationMarkAsTempStoredArgs
+  >(MARK_AS_TEMP_STORED, {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
     onError: () => {
       // The error is handled in the UI
     },
   });
+
+  const loading = markAsReceivedLoading ?? markAsTempStoredLoading;
+  const error = markAsReceivedError ?? markAsTempStoredError;
 
   const actionLabel = "Valider la réception";
 
@@ -46,13 +80,27 @@ export default function MarkAsReceived({ form }: WorkflowActionProps) {
           <div>
             <ReceivedInfo
               form={form}
-              onSubmit={values => {
-                return markAsReceived({
-                  variables: {
-                    id: form.id,
-                    receivedInfo: values,
-                  },
-                });
+              onSubmit={({ isTempStorage, quantityType, ...values }) => {
+                return isTempStorage
+                  ? markAsTempStored({
+                      variables: {
+                        id: form.id,
+                        tempStoredInfos: {
+                          ...values,
+                          quantityType: quantityType!,
+                          quantityReceived: values.quantityReceived ?? 0,
+                          wasteAcceptationStatus:
+                            values.wasteAcceptationStatus ??
+                            WasteAcceptationStatus.Accepted,
+                        },
+                      },
+                    })
+                  : markAsReceived({
+                      variables: {
+                        id: form.id,
+                        receivedInfo: values,
+                      },
+                    });
               }}
               close={close}
             />
