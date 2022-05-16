@@ -440,16 +440,21 @@ export const transportSchema: FactorySchemaOf<
     transporterWasteWeightValue: yup
       .number()
       .nullable()
+
       .test(
         "transport-quantity-required-if-type-is-provided",
         "Le poids de déchets transportés en kg est obligatoire si vous renseignez le type de pesée",
         function (value) {
           return !!this.parent.transporterWasteWeightIsEstimate
-            ? !!value
+            ? ![null, undefined].includes(value)
             : true;
         }
       )
-      .min(0, "Le poids de déchets transportés doit être supérieur à 0"),
+      .test(
+        "transport-quantity-strictly-positive",
+        "Le poids de déchets transportés doit être supérieur à 0",
+        v => ([null, undefined].includes(v) ? true : v > 0)
+      ),
 
     transporterWasteWeightIsEstimate: yup
       .boolean()

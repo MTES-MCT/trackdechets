@@ -143,7 +143,7 @@ export default function Transport({ status, editionDisabled = false }) {
               "field-emphasis": transportEmphasis,
             })}
           >
-            <label>
+            <label className="tw-font-semibold">
               Date de prise en charge
               <div className="td-date-wrapper">
                 <Field

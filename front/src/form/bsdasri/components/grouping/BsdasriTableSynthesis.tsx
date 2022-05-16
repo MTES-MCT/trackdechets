@@ -18,6 +18,8 @@ import {
   TableRow,
   TableRowDigest,
 } from "common/components";
+import { RefreshButton } from "./Common";
+import { aggregatePackagings } from "./utils";
 
 const GET_ELIGIBLE_BSDASRIS = gql`
   query Bsdasris($where: BsdasriWhere) {
@@ -49,38 +51,6 @@ const GET_ELIGIBLE_BSDASRIS = gql`
     }
   }
 `;
-
-export const aggregatePackagings = (packagingsArray: BsdasriPackaging[][]) => {
-  return packagingsArray.reduce((prev, cur) => {
-    for (const packaging of cur ?? []) {
-      const idx = prev.findIndex(
-        item =>
-          item.type === packaging.type &&
-          item.other === packaging.other &&
-          item.volume === packaging.volume
-      );
-      if (idx !== -1) {
-        const found = prev[idx];
-        prev.splice(idx, 1, {
-          ...found,
-          quantity: found.quantity + packaging.quantity,
-        });
-      } else {
-        prev.push(packaging);
-      }
-    }
-    return prev;
-  }, [] as BsdasriPackaging[]);
-};
-const RefreshButton = ({ onClick }) => (
-  <button
-    type="button"
-    className="btn btn--small  btn--primary tw-mb-2"
-    onClick={() => onClick()}
-  >
-    Rafraîchir
-  </button>
-);
 
 const SelectedBsdasrisDigest = ({ selectedItems }) => {
   if (!selectedItems?.length) {

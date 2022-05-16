@@ -2,7 +2,7 @@ import { getIn, useFormikContext } from "formik";
 import React, { useEffect, useReducer } from "react";
 
 import { Bsdasri } from "generated/graphql/types";
-import BsdasriTable from "./BsdasriTable";
+import BsdasriTableGrouping from "./BsdasriTableGrouping";
 
 type State = { selected: string[] };
 
@@ -33,7 +33,7 @@ function reducer(state: State, action: Action) {
   }
 }
 
-export default function BsdasriSelector({ name }) {
+export default function BsdasriGroupingSelector({ name }) {
   const { values, setFieldValue } = useFormikContext<Bsdasri>();
 
   const [state, dispatch] = useReducer(reducer, {
@@ -76,7 +76,7 @@ export default function BsdasriSelector({ name }) {
         type R 12 ou D 12.
       </p>
 
-      <BsdasriTable
+      <BsdasriTableGrouping
         selectedItems={state.selected}
         onToggle={onToggle}
         regroupedInDB={regroupedInDB}

@@ -17,8 +17,8 @@ import { FillFieldsInfo, DisabledFieldsInfo } from "../utils/commons";
 import classNames from "classnames";
 
 import { BsdasriStatus, Bsdasri, BsdasriType } from "generated/graphql/types";
-import BsdasriSelector from "form/bsdasri/components/grouping/BsdasriSelector";
-import BsdasriSelectorForSynthesis from "form/bsdasri/components/grouping/BsdasriSelectorForSynthesis";
+import BsdasriGroupingSelector from "form/bsdasri/components/grouping/BsdasriGroupingSelector";
+import BsdasriSynthesisSelector from "form/bsdasri/components/grouping/BsdasriSynthesisSelector";
 import { useParams } from "react-router-dom";
 
 export default function GenericEmitter({ status, stepName, disabled = false }) {
@@ -72,7 +72,7 @@ export function SynthesisEmitter({
           />
         </fieldset>
       </div>
-      <BsdasriSelectorForSynthesis disabled={disabled} />
+      <BsdasriSynthesisSelector disabled={disabled} />
       <div
         className={classNames("form__row", {
           "field-emphasis": emissionEmphasis,
@@ -180,7 +180,7 @@ export function Emitter({ status, stepName, disabled = false }) {
         </fieldset>
       </div>
       {isRegrouping && isUserCurrentEmitter && (
-        <BsdasriSelector name="grouping" />
+        <BsdasriGroupingSelector name="grouping" />
       )}
 
       <h4 className="form__section-heading">Conditionnement</h4>

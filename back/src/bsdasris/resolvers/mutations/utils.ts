@@ -49,7 +49,10 @@ export const getEligibleDasrisForSynthesis = async (
   return found;
 };
 
-export const checkDasrisAreGroupable = async (groupingIds, emitterSiret) => {
+export const checkDasrisAreGroupable = async (
+  groupingIds: string[],
+  emitterSiret: string
+) => {
   if (!groupingIds) {
     return;
   }
