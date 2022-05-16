@@ -33,7 +33,8 @@ const getGroupedBsdasriArgs = (
 const updateBsdasri = async ({
   id,
   input,
-  dbBsdasri
+  dbBsdasri,
+  dbGrouping
 }: {
   id: string;
   dbBsdasri: Bsdasri;
@@ -72,8 +73,11 @@ const updateBsdasri = async ({
     await emitterIsAllowedToGroup(
       flattenedInput?.emitterCompanySiret ?? dbBsdasri?.emitterCompanySiret
     );
+    const newDasrisToGroup = inputGrouping.filter(
+      el => !dbGrouping.map(el => el.id).includes(el)
+    );
     await checkDasrisAreGroupable(
-      inputGrouping,
+      newDasrisToGroup,
       flattenedInput?.emitterCompanySiret ?? dbBsdasri?.emitterCompanySiret
     );
   }

@@ -34,11 +34,17 @@ export function WorkflowAction(props: WorkflowActionProps) {
   const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
   const isToCollectTab = !!useRouteMatch(routes.dashboard.transport.toCollect);
   const isSynthesis = form.type === BsdasriType.Synthesis;
+  const isAssociatedToSynthesis = !!form?.synthesizedIn?.id;
+
   const isSimple = form.type === BsdasriType.Simple;
   const isEmitter = siret === form.emitter?.company?.siret;
   const isEcoOrganisme = siret === form.ecoOrganisme?.siret;
   const isTransporter = siret === form.transporter?.company?.siret;
   const isDestination = siret === form.destination?.company?.siret;
+
+  if (isAssociatedToSynthesis) {
+    return null;
+  }
   if (isPublishable(form)) {
     return (
       <ActionLink

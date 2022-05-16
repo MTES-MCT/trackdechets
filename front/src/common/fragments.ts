@@ -478,6 +478,9 @@ export const dashboardDasriFragment = gql`
     createdAt
     updatedAt
     allowDirectTakeOver
+    synthesizedIn {
+      id
+    }
   }
   ${companyFragment}
 `;

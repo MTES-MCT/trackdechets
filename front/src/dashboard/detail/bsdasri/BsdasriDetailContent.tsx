@@ -313,6 +313,7 @@ export default function BsdasriDetailContent({
       );
     },
   });
+
   return (
     <div className={styles.detail}>
       <div className={styles.detailSummary}>
@@ -341,7 +342,18 @@ export default function BsdasriDetailContent({
             )}
           </div>
           <div className={styles.detailGrid}>
-            {form?.synthesizedIn && <SynthesizedIn form={form.synthesizedIn} />}
+            {!!form?.synthesizedIn?.id && (
+              <AssociatedTo
+                formId={form?.synthesizedIn?.id}
+                label="Associé au"
+              />
+            )}
+            {!!form?.groupedIn && (
+              <AssociatedTo
+                formId={form?.groupedIn?.id}
+                label="Regroupé dans"
+              />
+            )}
             <DateRow
               value={form.updatedAt}
               label="Dernière action sur le BSD"
@@ -358,13 +370,6 @@ export default function BsdasriDetailContent({
             <dt>Code onu</dt>
             <dd>{form?.waste?.adr}</dd>
           </div>
-
-          {form?.grouping?.length && (
-            <div className={styles.detailGrid}>
-              <dt>Bordereau groupés:</dt>
-              <dd> {form?.grouping?.join(", ")}</dd>
-            </div>
-          )}
         </div>
       </div>
 
@@ -387,10 +392,16 @@ export default function BsdasriDetailContent({
             <IconRenewableEnergyEarth size="25px" />
             <span className={styles.detailTabCaption}>Destinataire</span>
           </Tab>
-          {form?.type === BsdasriType.Synthesis && (
+          {[BsdasriType.Synthesis, BsdasriType.Grouping].includes(
+            form?.type
+          ) && (
             <Tab className={styles.detailTab}>
               <IconBSDasri style={{ fontSize: "24px" }} />
-              <span className={styles.detailTabCaption}>Bsds associés</span>
+              <span className={styles.detailTabCaption}>
+                {form?.type === BsdasriType.Grouping
+                  ? "Bsd groupés"
+                  : "Bsds associés"}
+              </span>
             </Tab>
           )}
         </TabList>
@@ -406,7 +417,7 @@ export default function BsdasriDetailContent({
             <Transporter form={form} />
           </TabPanel>
 
-          {/* Recipient  tab panel */}
+          {/* Recipient tab panel */}
           <TabPanel className={styles.detailTabPanel}>
             <div className={styles.detailColumns}>
               <Recipient form={form} />
@@ -518,22 +529,23 @@ const AcceptationStatusRow = ({
   );
 };
 
-const SynthesizedIn = ({ form }: { form: Bsdasri }) => {
+const AssociatedTo = ({ formId, label }: { formId: string; label: string }) => {
   const [downloadPdf] = useDownloadPdf({
-    variables: { id: form.id },
+    variables: { id: formId },
   });
+
   return (
     <DetailRow
       value={
         <span>
-          {form.id} (
+          {formId} (
           <button className="link" onClick={() => downloadPdf()}>
             PDF
           </button>
           )
         </span>
       }
-      label={`Associé au bordereau n°`}
+      label={`${label} bordereau n°`}
     />
   );
 };
