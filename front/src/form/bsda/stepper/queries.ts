@@ -138,6 +138,23 @@ export const FullBsdaFragment = gql`
         }
       }
     }
+    forwarding {
+      id
+      waste {
+        code
+      }
+      destination {
+        cap
+        operation {
+          nextDestination {
+            cap
+          }
+        }
+        reception {
+          weight
+        }
+      }
+    }
     forwardedIn {
       id
       waste {
@@ -154,6 +171,9 @@ export const FullBsdaFragment = gql`
           weight
         }
       }
+    }
+    groupedIn {
+      id
     }
   }
   ${companyFragment}

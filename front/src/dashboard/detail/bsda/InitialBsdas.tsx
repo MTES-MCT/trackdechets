@@ -7,9 +7,9 @@ import {
   TableHeaderCell,
   TableRow,
 } from "common/components/Table";
-import { useDownloadPdf } from "dashboard/components/BSDList/BSDD/BSDDActions/useDownloadPdf";
 import { InitialBsda } from "generated/graphql/types";
 import { IconPdf } from "common/components/Icons";
+import { useDownloadPdf } from "dashboard/components/BSDList/BSDa/BSDaActions/useDownloadPdf";
 
 export function InitialBsdas({ bsdas }: { bsdas: InitialBsda[] }) {
   const [downloadPdf] = useDownloadPdf({});

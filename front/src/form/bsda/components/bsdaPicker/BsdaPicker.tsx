@@ -166,6 +166,7 @@ function PickerTable({ bsdas, onClick, isSelected }) {
           <TableHeaderCell />
           <TableHeaderCell>Numéro</TableHeaderCell>
           <TableHeaderCell>Déchet</TableHeaderCell>
+          <TableHeaderCell>Quantité (tonnes)</TableHeaderCell>
           <TableHeaderCell>Émetteur</TableHeaderCell>
           <TableHeaderCell>Transporteur</TableHeaderCell>
           <TableHeaderCell>Destinataire</TableHeaderCell>
@@ -187,6 +188,7 @@ function PickerTable({ bsdas, onClick, isSelected }) {
               <TableCell>
                 {bsda.waste?.code} - {bsda.waste?.materialName ?? "inconnue"}
               </TableCell>
+              <TableCell>{bsda.destination?.reception?.weight}</TableCell>
               <TableCell>{bsda.emitter?.company?.name}</TableCell>
               <TableCell>{bsda.transporter?.company?.name}</TableCell>
               <TableCell>{bsda.destination?.company?.name}</TableCell>
