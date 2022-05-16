@@ -25,6 +25,8 @@ import {
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { UserInputError } from "apollo-server-core";
+import prisma from "../../../prisma";
+import { isCompanyMember } from "../../../companies/database";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -152,13 +154,31 @@ const updateFormResolver = async (
       throw new MissingTempStorageFlag();
     }
 
+    let destinationIsFilledByEmitter =
+      existingTemporaryStorageDetail.destinationIsFilledByEmitter ?? false;
+
+    if (nextFormSirets.emitterCompanySiret?.length) {
+      const emitterCompany = await prisma.company.findFirst({
+        where: { siret: nextFormSirets.emitterCompanySiret }
+      });
+      destinationIsFilledByEmitter =
+        temporaryStorageDetail.destination?.company?.siret?.length &&
+        (await isCompanyMember(user, emitterCompany));
+    }
+
     if (existingTemporaryStorageDetail) {
       formUpdateInput.temporaryStorageDetail = {
-        update: flattenTemporaryStorageDetailInput(temporaryStorageDetail)
+        update: {
+          ...flattenTemporaryStorageDetailInput(temporaryStorageDetail),
+          destinationIsFilledByEmitter
+        }
       };
     } else {
       formUpdateInput.temporaryStorageDetail = {
-        create: flattenTemporaryStorageDetailInput(temporaryStorageDetail)
+        create: {
+          ...flattenTemporaryStorageDetailInput(temporaryStorageDetail),
+          destinationIsFilledByEmitter
+        }
       };
     }
   }

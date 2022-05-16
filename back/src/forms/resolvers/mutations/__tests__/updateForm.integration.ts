@@ -40,6 +40,7 @@ const UPDATE_FORM = `
       }
       temporaryStorageDetail {
         destination {
+          isFilledByEmitter
           cap
         }
       }
@@ -520,6 +521,9 @@ describe("Mutation.updateForm", () => {
     expect(data.updateForm.temporaryStorageDetail.destination).toMatchObject(
       updateFormInput.temporaryStorageDetail.destination
     );
+    expect(
+      data.updateForm.temporaryStorageDetail.destination.isFilledByEmitter
+    ).toEqual(true);
   });
 
   it("should update the temporary storage", async () => {

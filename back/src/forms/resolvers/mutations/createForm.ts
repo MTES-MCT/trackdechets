@@ -2,6 +2,7 @@ import { EmitterType, Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-core";
 import { isDangerous } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { isCompanyMember } from "../../../companies/database";
 import { eventEmitter, TDEvent } from "../../../events/emitter";
 import {
   MutationCreateFormArgs,
@@ -19,6 +20,7 @@ import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
 import { FormSirets } from "../../types";
 import { draftFormSchema, validateAppendix2Forms } from "../../validation";
+import prisma from "../../../prisma";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -85,8 +87,23 @@ const createFormResolver = async (
       // recipient.isTempStorage=true, throw error
       throw new MissingTempStorageFlag();
     }
+
+    let destinationIsFilledByEmitter = false;
+
+    if (formSirets.emitterCompanySiret?.length) {
+      const emitterCompany = await prisma.company.findFirst({
+        where: { siret: formSirets.emitterCompanySiret }
+      });
+      destinationIsFilledByEmitter =
+        temporaryStorageDetail.destination?.company?.siret?.length &&
+        (await isCompanyMember(user, emitterCompany));
+    }
+
     formCreateInput.temporaryStorageDetail = {
-      create: flattenTemporaryStorageDetailInput(temporaryStorageDetail)
+      create: {
+        ...flattenTemporaryStorageDetailInput(temporaryStorageDetail),
+        destinationIsFilledByEmitter
+      }
     };
   } else {
     if (formContent.recipient?.isTempStorage === true) {

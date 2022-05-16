@@ -544,7 +544,7 @@ model TemporaryStorageDetail {
   tempStorerReceivedBy             String?
   tempStorerSignedAt               DateTime?               @db.Timestamptz(6)
   tempStorerSignedBy               String?
-  destinationIsFilledByEmitter     Boolean?                @default(true)
+  destinationIsFilledByEmitter     Boolean?                @default(false)
   destinationCompanyName           String?
   destinationCompanySiret          String?
   destinationCompanyAddress        String?

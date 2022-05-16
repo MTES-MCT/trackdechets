@@ -1,0 +1,1 @@
+ALTER TABLE "default$default"."TemporaryStorageDetail" ALTER "destinationIsFilledByEmitter" SET DEFAULT FALSE;
