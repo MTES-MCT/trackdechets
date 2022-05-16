@@ -134,21 +134,23 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
                   ou numéro TVA pour un transporteur de l'UE
                 </p>
                 {import.meta.env.VITE_ALLOW_TEST_COMPANY === "true" && (
-                  <button
-                    className={`tw-block tw-mt-1 tw-underline ${styles.smaller}`}
-                    type="button"
-                    onClick={() =>
-                      createTestCompany().then(response => {
-                        setFieldValue(
-                          "siret",
-                          response.data?.createTestCompany
-                        );
-                      })
-                    }
-                  >
-                    Obtenir un n°SIRET factice{" "}
+                  <div className="tw-flex">
+                    <button
+                      className={`tw-block tw-mt-1 tw-underline ${styles.smaller}`}
+                      type="button"
+                      onClick={() =>
+                        createTestCompany().then(response => {
+                          setFieldValue(
+                            "siret",
+                            response.data?.createTestCompany
+                          );
+                        })
+                      }
+                    >
+                      Obtenir un n°SIRET factice{" "}
+                    </button>
                     <Tooltip msg="Génère un n°SIRET unique permettant la création d'un établissement factice pour la réalisation de vos tests" />
-                  </button>
+                  </div>
                 )}
                 {isRegistered && (
                   <p className="error-message">
