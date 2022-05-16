@@ -64,6 +64,7 @@ export function FormWasteEmissionSummary({
   form,
 }: FormWasteEmissionSummaryProps) {
   const { values } = useFormikContext<FormValues>();
+
   const [fields, setFields] = React.useState<FormKeys[]>([]);
   const addField = (name: FormKeys) =>
     setFields(currentFields =>

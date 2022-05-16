@@ -64,21 +64,33 @@ function SignEmissionFormModal({
     MutationSignEmissionFormArgs
   >(SIGN_EMISSION_FORM);
 
+  const initialValues = {
+    emittedBy: "",
+    emittedByType: EmitterType.Emitter,
+    securityCode: "",
+    ...(form.status === FormStatus.Resealed
+      ? {
+          packagingInfos:
+            form.temporaryStorageDetail?.wasteDetails?.packagingInfos,
+          quantity: form.temporaryStorageDetail?.wasteDetails?.quantity ?? 0,
+          onuCode: form.temporaryStorageDetail?.wasteDetails?.onuCode ?? "",
+          transporterNumberPlate:
+            form.temporaryStorageDetail?.transporter?.numberPlate ?? "",
+        }
+      : {
+          packagingInfos: form.wasteDetails?.packagingInfos,
+          quantity: form.wasteDetails?.quantity ?? 0,
+          onuCode: form.wasteDetails?.onuCode ?? "",
+          transporterNumberPlate: form.transporter?.numberPlate ?? "",
+        }),
+  };
+
   return (
     <Modal onClose={onClose} ariaLabel={title} isOpen>
       <h2 className="td-modal-title">{title}</h2>
 
       <Formik
-        initialValues={{
-          packagingInfos: form.stateSummary?.packagingInfos,
-          quantity: form.stateSummary?.quantity ?? 0,
-          onuCode: form.stateSummary?.onuCode ?? "",
-          transporterNumberPlate:
-            form.stateSummary?.transporterNumberPlate ?? "",
-          emittedBy: "",
-          emittedByType: EmitterType.Emitter,
-          securityCode: "",
-        }}
+        initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={async values => {
           try {
