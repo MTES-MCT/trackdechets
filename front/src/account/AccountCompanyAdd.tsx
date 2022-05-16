@@ -106,14 +106,15 @@ export default function AccountCompanyAdd() {
     null
   );
 
-  // const [willManageDasris, setWillManageDasris] = useState(false);
-
   // QUERIES AND MUTATIONS
   const [createCompany, { error: savingError }] = useMutation<
     Pick<Mutation, "createCompany">,
     MutationCreateCompanyArgs
   >(CREATE_COMPANY, {
-    refetchQueries: [GET_ME, { query: MY_COMPANIES, variables: { first: 10 } }],
+    refetchQueries: [
+      { query: GET_ME },
+      { query: MY_COMPANIES, variables: { first: 10 } },
+    ],
     awaitRefetchQueries: true,
     onCompleted: () => {
       history.push(routes.account.companies.list);

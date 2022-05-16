@@ -23,17 +23,26 @@ export function BsdaWasteSummary({ bsda }: Props) {
         <DataListTerm>Code déchet</DataListTerm>
         <DataListDescription>{bsda.waste?.code}</DataListDescription>
       </DataListItem>
-      <DataListItem>
-        <DataListTerm>Numéro de CAP</DataListTerm>
-        <DataListDescription>{bsda.destination?.cap}</DataListDescription>
-      </DataListItem>
+      {bsda.destination?.operation?.nextDestination?.cap ? (
+        <DataListItem>
+          <DataListTerm>Numéro de CAP avec l'exutoire</DataListTerm>
+          <DataListDescription>
+            {bsda.destination?.operation?.nextDestination?.cap}
+          </DataListDescription>
+        </DataListItem>
+      ) : (
+        <DataListItem>
+          <DataListTerm>Numéro de CAP</DataListTerm>
+          <DataListDescription>{bsda.destination?.cap}</DataListDescription>
+        </DataListItem>
+      )}
       <DataListItem>
         <DataListTerm>Description</DataListTerm>
-        <DataListDescription>
-          {[bsda.waste?.materialName, bsda.waste?.familyCode]
-            .filter(Boolean)
-            .join(" / ")}
-        </DataListDescription>
+        <DataListDescription>{bsda.waste?.materialName}</DataListDescription>
+      </DataListItem>
+      <DataListItem>
+        <DataListTerm>Code famille</DataListTerm>
+        <DataListDescription>{bsda.waste?.familyCode}</DataListDescription>
       </DataListItem>
       <DataListItem>
         <DataListTerm>Poids</DataListTerm>

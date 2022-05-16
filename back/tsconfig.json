@@ -18,7 +18,10 @@
     "strictFunctionTypes": false,
     "strictNullChecks": false,
     "strictPropertyInitialization": false,
-    "jsx": "react"
+    "jsx": "react",
+    "sourceMap": true,
+    "inlineSources": true,
+    "sourceRoot": "/"
   },
   "include": ["src/**/*", "prisma/**/*"]
 }

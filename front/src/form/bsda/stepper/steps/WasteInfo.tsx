@@ -14,8 +14,8 @@ export function WasteInfo({ disabled }) {
   if (isEntreposageProvisoire) {
     return (
       <div className="notification">
-        Vous effectuez un entreposage provisoire. Les informations sur le déchet
-        ont été automatiquement reportées et ne sont pas modifiables.
+        Vous effectuez une réexpédition. Les informations sur le déchet ont été
+        automatiquement reportées et ne sont pas modifiables.
       </div>
     );
   }
@@ -136,13 +136,38 @@ export function WasteInfoWorker({ disabled }) {
     <>
       <div className="form__row">
         <label>
-          Code famille (Optionnel)
+          Code famille
           <Field
-            disabled={disabled}
-            type="text"
+            as="select"
             name="waste.familyCode"
-            className="td-input td-input--small"
-          />
+            className="td-select"
+            disabled={disabled}
+          >
+            <option value="...">Sélectionnez une valeur...</option>
+            <option value="1">
+              1 - amiante pur utilisé en bourrage ou en sac
+            </option>
+            <option value="2">
+              2 - amiante mélangé dans des poudres ou des produits minéraux sans
+              liaison forte
+            </option>
+            <option value="3">
+              3 - amiante intégré dans des liquides ou des solutions visqueuses
+            </option>
+            <option value="4">4 - amiante tissé ou tressé</option>
+            <option value="5">5 - amiante en feuilles ou en plaques</option>
+            <option value="6">6 - amiante lié à des matériaux inertes</option>
+            <option value="7">
+              7 - amiante noyé dans une résine ou une matière plastique
+            </option>
+            <option value="8">
+              8 - amiante dans des matériels et équipements
+            </option>
+            <option value="9">
+              9 - tous les matériaux contaminés susceptibles d'émettre des
+              fibres
+            </option>
+          </Field>
         </label>
       </div>
 

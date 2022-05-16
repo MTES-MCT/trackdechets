@@ -75,8 +75,6 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
   ];
 
   await validateBsda(bsda, previousBsdas, {
-    isPrivateIndividual: bsda.emitterIsPrivateIndividual,
-    isType2710: bsda.type === "COLLECTION_2710",
     emissionSignature: !isDraft
   });
 

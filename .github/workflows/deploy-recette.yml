@@ -1,0 +1,34 @@
+# Workflow de déploiement
+# Le front et le back ne sont pas inclut dans ce fichier car leur déploiement
+# se fait automatiquement via l'intégration Scalingo <> Github
+name: Deploy Sentry Release on recette
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  sentry-release-recette:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Run npm ci
+        run: npm --prefix back ci & npm --prefix front ci
+
+      - name: Run build
+        run: npm --prefix back run build & npm --prefix front run build
+
+      - name: Create a Sentry Release
+        uses: getsentry/action-release@v1.1.6
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: betagouv
+          SENTRY_URL: https://sentry.incubateur.net/
+        with:
+          environment: recette
+          sourcemaps: ./back/dist/src ./front/build/assets
+          projects: trackdechets-api trackdechets-front

@@ -104,6 +104,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
       }),
       operation: nullIfNoValues<BsdaOperation>({
         code: form.destinationOperationCode,
+        description: form.destinationOperationDescription,
         date: form.destinationOperationDate,
         signature: nullIfNoValues<Signature>({
           author: form.destinationOperationSignatureAuthor,
@@ -289,9 +290,11 @@ function flattenBsdaDestinationInput({
     destinationReceptionRefusalReason: chain(destination, d =>
       chain(d.reception, r => r.refusalReason)
     ),
-
     destinationOperationCode: chain(destination, d =>
       chain(d.operation, o => o.code)
+    ),
+    destinationOperationDescription: chain(destination, d =>
+      chain(d.operation, o => o.description)
     ),
     destinationOperationDate: chain(destination, d =>
       chain(d.operation, o => o.date)

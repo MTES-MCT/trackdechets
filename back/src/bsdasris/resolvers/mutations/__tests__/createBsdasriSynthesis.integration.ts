@@ -86,7 +86,7 @@ describe("Mutation.createDasri", () => {
     };
 
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+    const { data } = await mutate<Pick<Mutation, "createBsdasri">>(
       CREATE_DASRI,
       {
         variables: {
@@ -94,7 +94,6 @@ describe("Mutation.createDasri", () => {
         }
       }
     );
-    console.log(errors);
     expect(data.createBsdasri.synthesizing.map(bsd => bsd.id)).toEqual([
       toAssociate1.id,
       toAssociate2.id

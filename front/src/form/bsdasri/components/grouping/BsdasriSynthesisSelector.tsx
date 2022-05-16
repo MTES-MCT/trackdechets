@@ -1,9 +1,11 @@
 import { getIn, useFormikContext } from "formik";
 import React, { useEffect, useReducer } from "react";
-
+import { useQuery } from "@apollo/client";
 import { Bsdasri } from "generated/graphql/types";
-import BsdasriTable from "./BsdasriTable";
+import BsdasriTableSynthesis from "./BsdasriTableSynthesis";
+import { GET_DETAIL_DASRI } from "common/queries";
 
+import { Query, QueryBsdasriArgs } from "generated/graphql/types";
 type State = { selected: string[] };
 
 type Action =
@@ -20,6 +22,7 @@ function reducer(state: State, action: Action) {
       };
     case "unselect":
       const usp = action.payload;
+
       return {
         selected: state.selected.filter(v => v !== usp.id),
       };
@@ -33,22 +36,34 @@ function reducer(state: State, action: Action) {
   }
 }
 
-export default function BsdasriSelector({ name }) {
+export default function BsdasriSelectorForSynthesis({ disabled }) {
   const { values, setFieldValue } = useFormikContext<Bsdasri>();
 
+  const { data } = useQuery<Pick<Query, "bsdasri">, QueryBsdasriArgs>(
+    GET_DETAIL_DASRI,
+    {
+      variables: {
+        id: values?.id,
+      },
+      fetchPolicy: "network-only",
+      skip: !values?.id,
+    }
+  );
+
   const [state, dispatch] = useReducer(reducer, {
-    selected: getIn(values, name),
+    selected: getIn(values, "synthesizing"),
   });
 
-  // memoize stored regrouped dasris
-  const regroupedInDB = getIn(values, name) || [];
+  const regroupedInDB = !!data
+    ? data.bsdasri?.synthesizing?.map(dasri => dasri.id)
+    : [];
 
   useEffect(() => {
     setFieldValue(
-      name,
+      "synthesizing",
       state.selected.map(s => s)
     );
-  }, [state, name, setFieldValue]);
+  }, [state, setFieldValue]);
 
   function onToggle(payload: Bsdasri | Bsdasri[]) {
     if (Array.isArray(payload)) {
@@ -65,21 +80,23 @@ export default function BsdasriSelector({ name }) {
 
   return (
     <>
-      <h4 className="form__section-heading">Groupement de Dasris</h4>
-      <p className="tw-my-2">
-        Vous êtes en train de créer un bordereau de groupement. Veuillez
-        sélectionner ci-dessous les bordereaux à grouper.
-      </p>
-      <p className="tw-my-2">
-        Tous les bordereaux présentés ci-dessous correspondent à des bordereaux
-        dasris pour lesquels vous avez effectué une opération de traitement de
-        type R 12 ou D 12.
-      </p>
+      {disabled ? (
+        <h4 className="form__section-heading">Bordereaux associés</h4>
+      ) : (
+        <>
+          {" "}
+          <h4 className="form__section-heading">Bordereaux à associer</h4>
+          <p className="tw-my-2">
+            Veuillez sélectionner ci-dessous les bordereaux à associer.
+          </p>
+        </>
+      )}
 
-      <BsdasriTable
+      <BsdasriTableSynthesis
         selectedItems={state.selected}
         onToggle={onToggle}
         regroupedInDB={regroupedInDB}
+        disabled={disabled}
       />
     </>
   );

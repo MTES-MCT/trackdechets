@@ -4,7 +4,7 @@ import { registerUpdater, Updater } from "./helper/helper";
 @registerUpdater(
   "Replace &amp; with & in company names",
   "Replace &amp; with & in company names",
-  true
+  false
 )
 export class DecodeAmpersandsInCompanyNames implements Updater {
   async run() {

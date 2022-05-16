@@ -110,7 +110,7 @@ export default function Operation() {
           </div>
 
           <div className="form__row">
-            <label>Opération d’élimination / valorisation effectuée</label>
+            <label>Opération d'élimination / valorisation effectuée</label>
             <Field
               as="select"
               name="destination.operation.code"
@@ -118,7 +118,7 @@ export default function Operation() {
             >
               <option value="...">Sélectionnez une valeur...</option>
               <option value="R 5">
-                R 5 - Recyclage ou récupération d’autres matières inorganiques.
+                R 5 - Recyclage ou récupération d'autres matières inorganiques.
               </option>
               <option value="D 5">
                 D 5 - Mise en décharge aménagée et autorisée en ISDD ou ISDND
@@ -126,14 +126,27 @@ export default function Operation() {
               <option value="D 9">
                 D 9 - Vitrification, traitement chimique ou prétraitement
               </option>
-              <option value="R 12">
-                R 12 - Echange de déchets en vue de les soumettre à l'une des
-                opération R1 à R11
+              <option value="R 13">
+                R 13 - Opérations de transit incluant le groupement sans
+                transvasement préalable à R 5
               </option>
-              <option value="D 13">D 13 - Groupement de déchets</option>
-              <option value="D 15">D 15 - Entreposage provisoire</option>
+              <option value="D 15">
+                D 15 - Transit incluant le groupement sans transvasement
+              </option>
             </Field>
             <p>Opération prévue: {values.destination?.plannedOperationCode}</p>
+          </div>
+
+          <div className="form__row">
+            <label>
+              Description de l'opération (Optionnel)
+              <Field
+                type="text"
+                name="destination.operation.description"
+                placeholder="ISDD, ISDND, etc."
+                className="td-input"
+              />
+            </label>
           </div>
         </>
       )}

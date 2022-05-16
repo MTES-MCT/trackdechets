@@ -10,9 +10,7 @@ import { getInitialWeightFn } from "../utils/initial-state";
 import classNames from "classnames";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { BsdasriStatus, Bsdasri, BsdasriType } from "generated/graphql/types";
-import Acceptation, {
-  AcceptOnlyField,
-} from "form/bsdasri/components/acceptation/Acceptation";
+import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 
 export default function Transport({ status, editionDisabled = false }) {
   function handleTransportMode(e) {
@@ -30,8 +28,6 @@ export default function Transport({ status, editionDisabled = false }) {
   const showTransportePlates = values?.transporter?.transport?.mode === "ROAD";
 
   const transportEmphasis = false;
-  const AcceptationComponent =
-    values.type === BsdasriType.Synthesis ? null : Acceptation;
 
   const disabled =
     editionDisabled ||
@@ -147,7 +143,7 @@ export default function Transport({ status, editionDisabled = false }) {
               "field-emphasis": transportEmphasis,
             })}
           >
-            <label>
+            <label className="tw-font-semibold">
               Date de prise en charge
               <div className="td-date-wrapper">
                 <Field

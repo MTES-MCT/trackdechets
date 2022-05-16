@@ -1,9 +1,8 @@
 import { useQuery, gql } from "@apollo/client";
 import { useField, useFormikContext } from "formik";
-import React, { useState } from "react";
+import React from "react";
 import CompanyResults from "../../../common/components/company/CompanyResults";
 import styles from "./EcoOrganismes.module.scss";
-import SearchInput from "common/components/SearchInput";
 import {
   Query,
   EcoOrganisme,
@@ -19,6 +18,7 @@ const GET_ECO_ORGANISMES = gql`
       name
       siret
       address
+      handleBsdasri
     }
   }
 `;
@@ -42,7 +42,7 @@ interface EcoOrganismesProps {
 export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
   const [field] = useField<Bsdasri["ecoOrganisme"]>(props);
   const { setFieldValue } = useFormikContext<Bsdasri>();
-  const [clue, setClue] = useState("");
+
   const { loading, error, data } = useQuery<Pick<Query, "ecoOrganismes">>(
     GET_ECO_ORGANISMES
   );
@@ -55,7 +55,6 @@ export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
       setFieldValue(field.name, getInitialEcoOrganisme(), false);
     }
   }
-
   return (
     <>
       <div className="form__row">
@@ -73,15 +72,10 @@ export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
           {data && (
             <>
               <div className="form__row notification notification--info">
-                Veuillez sélectionner ci-dessous un des éco-organismes
-                enregistrés dans Trackdéchets.
+                Veuillez sélectionner ci-dessous l'éco-organisme agréé pour la
+                gestion des dasris.
               </div>
-              <SearchInput
-                id="eco-search"
-                placeholder="Filtrer les éco-organismes par nom..."
-                className={styles.ecoorganismeSearchInput}
-                onChange={event => setClue(event.target.value)}
-              />
+
               <div className={styles.list}>
                 <CompanyResults<EcoOrganisme>
                   onSelect={eo =>
@@ -90,9 +84,7 @@ export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
                       siret: eo.siret,
                     })
                   }
-                  results={data.ecoOrganismes.filter(eo =>
-                    eo.name.toLowerCase().includes(clue.toLowerCase())
-                  )}
+                  results={data.ecoOrganismes.filter(eo => !!eo.handleBsdasri)}
                   selectedItem={
                     data.ecoOrganismes.find(
                       eo => eo.siret === field.value?.siret

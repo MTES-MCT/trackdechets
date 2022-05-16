@@ -3,7 +3,7 @@ import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import { BsffType, TransportMode } from "generated/graphql/types";
 import { OPERATION } from "./constants";
 
-export default {
+const initialState = {
   type: BsffType.TracerFluide,
   emitter: {
     company: getInitialCompany(),
@@ -40,3 +40,5 @@ export default {
   ficheInterventions: [],
   previousBsffs: [],
 };
+
+export default initialState;

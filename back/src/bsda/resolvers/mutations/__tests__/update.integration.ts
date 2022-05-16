@@ -350,7 +350,7 @@ describe("Mutation.updateBsda", () => {
         emitterCompanySiret: emitter.company.siret,
         destinationCompanySiret: destination.company.siret,
         transporterCompanySiret: transporter.company.siret,
-        destinationOperationCode: "D 13"
+        destinationOperationCode: "D 15"
       }
     });
     const bsdaToGroup = await bsdaFactory({
@@ -360,7 +360,7 @@ describe("Mutation.updateBsda", () => {
         emitterCompanySiret: emitter.company.siret,
         destinationCompanySiret: destination.company.siret,
         transporterCompanySiret: transporter.company.siret,
-        destinationOperationCode: "D 13"
+        destinationOperationCode: "D 15"
       }
     });
 
@@ -406,7 +406,7 @@ describe("Mutation.updateBsda", () => {
         emitterCompanySiret: emitter.company.siret,
         destinationCompanySiret: destination.company.siret,
         transporterCompanySiret: transporter.company.siret,
-        destinationOperationCode: "D 13"
+        destinationOperationCode: "D 15"
       }
     });
 
@@ -416,7 +416,7 @@ describe("Mutation.updateBsda", () => {
         emitterCompanySiret: ttr.company.siret,
         destinationCompanySiret: destination.company.siret,
         transporterCompanySiret: transporter.company.siret,
-        destinationOperationCode: "D 13",
+        destinationOperationCode: "D 15",
         forwarding: { connect: { id: oldForwarded.id } }
       }
     });
@@ -427,7 +427,7 @@ describe("Mutation.updateBsda", () => {
         emitterCompanySiret: emitter.company.siret,
         destinationCompanySiret: ttr.company.siret,
         transporterCompanySiret: transporter.company.siret,
-        destinationOperationCode: "D 13"
+        destinationOperationCode: "D 15"
       }
     });
 

@@ -28,7 +28,7 @@ export function BsdaPicker({ name, bsdaId }: Props) {
   const { siret } = useParams<{ siret: string }>();
 
   const codeFilter =
-    name === "grouping" ? { _in: ["D 13", "R 12"] } : { _eq: "D 15" };
+    name === "grouping" ? { _in: ["D 15", "R 13"] } : { _eq: "D 15" };
   const { data } = useQuery<Pick<Query, "bsdas">, QueryBsdasArgs>(GET_BSDAS, {
     variables: {
       where: {
@@ -166,6 +166,7 @@ function PickerTable({ bsdas, onClick, isSelected }) {
           <TableHeaderCell />
           <TableHeaderCell>Numéro</TableHeaderCell>
           <TableHeaderCell>Déchet</TableHeaderCell>
+          <TableHeaderCell>Quantité (tonnes)</TableHeaderCell>
           <TableHeaderCell>Émetteur</TableHeaderCell>
           <TableHeaderCell>Transporteur</TableHeaderCell>
           <TableHeaderCell>Destinataire</TableHeaderCell>
@@ -187,6 +188,7 @@ function PickerTable({ bsdas, onClick, isSelected }) {
               <TableCell>
                 {bsda.waste?.code} - {bsda.waste?.materialName ?? "inconnue"}
               </TableCell>
+              <TableCell>{bsda.destination?.reception?.weight}</TableCell>
               <TableCell>{bsda.emitter?.company?.name}</TableCell>
               <TableCell>{bsda.transporter?.company?.name}</TableCell>
               <TableCell>{bsda.destination?.company?.name}</TableCell>

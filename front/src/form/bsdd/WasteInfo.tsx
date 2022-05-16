@@ -4,7 +4,10 @@ import Tooltip from "common/components/Tooltip";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { connect, Field } from "formik";
-import { isDangerous } from "generated/constants";
+import {
+  isDangerous,
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES,
+} from "generated/constants";
 import React, { useEffect } from "react";
 import Appendix2MultiSelect from "./components/appendix/Appendix2MultiSelect";
 import AppendixInfo from "./components/appendix/AppendixInfo";
@@ -116,7 +119,8 @@ export default connect<{}, Values>(function WasteInfo(props) {
           <p className="tw-my-2">
             Tous les bordereaux présentés ci-dessous correspondent à des
             bordereaux pour lesquels vous avez effectué une opération de
-            traitement de type D 13, D 14, D 15 ou R 13.
+            traitement de type{" "}
+            {PROCESSING_OPERATIONS_GROUPEMENT_CODES.join(", ")}.
           </p>
           <Appendix2MultiSelect />
         </>

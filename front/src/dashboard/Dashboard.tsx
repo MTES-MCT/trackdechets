@@ -29,6 +29,7 @@ import {
   RouteBsdsHistory,
 } from "./bsds";
 import { RouteBSDasrisSignEmissionSecretCode } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasriSecretCode";
+import { RoutePublishBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RoutePublishBsdasri";
 import { RouteSignBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
 import {
   RouteBSDasrisView,
@@ -208,6 +209,16 @@ export default function Dashboard() {
                   <RouteBsddRequestRevision />
                 </Modal>
               </Route>
+              <Route path={routes.dashboard.bsdasris.sign.publish}>
+                <Modal
+                  onClose={() => history.goBack()}
+                  ariaLabel="Publier un dasri"
+                  isOpen
+                >
+                  <RoutePublishBsdasri />
+                </Modal>
+              </Route>
+
               <Route path={routes.dashboard.bsdasris.sign.emissionSecretCode}>
                 <Modal
                   onClose={() => history.push(toCollectDashboard)}

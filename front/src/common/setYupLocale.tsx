@@ -11,6 +11,7 @@ const locale = {
   },
 };
 
-export default function () {
+function setYupLocale() {
   setLocale(locale);
 }
+export default setYupLocale;

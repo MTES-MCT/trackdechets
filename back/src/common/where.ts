@@ -30,7 +30,7 @@ export class NestingWhereError extends UserInputError {
   constructor(depthLimit = 2) {
     super(
       `Vous ne pouvez pas imbriquer des opérations` +
-        ` _and, _or et _not sur plus de ${depthLimit} niveaux`
+        ` _and, _or et _not sur plus de ${depthLimit - 1} niveaux`
     );
   }
 }

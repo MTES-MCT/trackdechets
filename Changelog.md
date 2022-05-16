@@ -5,18 +5,35 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-
 # [2022.05.1] ~16/05/2022
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Ajout d'un code `D 9 F` qui peut être utilisé comme code de traitement final sans obligation d'indiquer une destination ultérieure [PR 1369](https://github.com/MTES-MCT/trackdechets/pull/1369)
+- Gestion des éco-organismes sur les BSDASRI: [PR 1362](https://github.com/MTES-MCT/trackdechets/pull/1362)
+
 #### :bug: Corrections de bugs
 
-- Sandbox : permettre de créer et rechercher un établissment de test (siret commençant par "0000"). Améliorer la recherche d'établissements par `getCompanyInfos` en accélérant la recherche en cas d'entreprise de test, évitant de chercher les API de recherche interne ou tierces. Les établissements de test ont `statutDiffusionEtablissement` à "O" pour ne pas apparaître comme des établissements non-diffusibles.
+- Sandbox : permettre de créer et rechercher un établissment de test (siret commençant par "00000"). Améliorer la recherche d'établissements par `getCompanyInfos` en accélérant la recherche en cas d'entreprise de test, évitant de chercher les API de recherche interne ou tierces.
+- Sandbox : Les établissements de test (siret commençant par "00000") ont `statutDiffusionEtablissement` à "O" pour ne pas apparaître comme des établissements non-diffusibles. [PR 1368](https://github.com/MTES-MCT/trackdechets/pull/1368)
+- Désactive au moment de l'envoi le bouton du formulaire dans la modale permettant de mettre à jour la plaque d'immatriculation transporteur [PR 1371](https://github.com/MTES-MCT/trackdechets/pull/1371)
+- La modale de publication du Bsdasri n'affiche pas toutes les informations [PR 1359](https://github.com/MTES-MCT/trackdechets/pull/1359)
+- Indexation Sirene : correctifs [PR 1365](https://github.com/MTES-MCT/trackdechets/pull/1365) et [PR 1364](https://github.com/MTES-MCT/trackdechets/pull/1364)
+- Corrige le message d'erreur affiché en cas de dépassement d'imbrication d'opérateurs sur les filtres de requêtes[PR 1374](https://github.com/MTES-MCT/trackdechets/pull/1374)
+- Corrections de la gestion des dasri de groupement [1394](https://github.com/MTES-MCT/trackdechets/pull/1394)
 
 #### :boom: Breaking changes
 
+- Le mode de transport et la saisie d'une immatriculation (si transport route) sont désormais obligatoires sur le BSDA [PR 1379](https://github.com/MTES-MCT/trackdechets/pull/1379)
+- Suppression du code D 13 au profit du code D 15 sur le BSDA [PR 1366](https://github.com/MTES-MCT/trackdechets/pull/1366)
+- Suppression du code R 12 au profit du code R 13 sur le BSDA [PR 1366](https://github.com/MTES-MCT/trackdechets/pull/1366)
+
 #### :nail_care: Améliorations
+
+- Corrige l'affichage des formulaires de mise à jour des récepissés [PR 1351](https://github.com/MTES-MCT/trackdechets/pull/1351)
+- Amélioration de l'affichage du CAP final pour le BSDA dans le cas de transit ou groupement [PR 1366](https://github.com/MTES-MCT/trackdechets/pull/1366)
+- Codification des codes familles sur le BSDA [PR 1366](https://github.com/MTES-MCT/trackdechets/pull/1366)
+- Ajout d'une description du code de traitement sur le BSDA (permet de spécifier si ISDD ou ISDND par exemple) [PR 1366](https://github.com/MTES-MCT/trackdechets/pull/1366)
 
 #### :memo: Documentation
 
@@ -39,13 +56,14 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ne pas afficher les établissements non-diffusibles et ajout des statuts de diffusion selon l'INSEE sur CompanyPublic [PR 1341](https://github.com/MTES-MCT/trackdechets/pull/1341)
 
 #### :boom: Breaking changes
+
 #### :nail_care: Améliorations
 
 #### :memo: Documentation
+
 #### :house: Interne
 
 - Montée de version prisma@3.12.0 [PR 1303](https://github.com/MTES-MCT/trackdechets/pull/1303)
-
 
 # [2022.04.1] ~04/04/2022
 
@@ -61,7 +79,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
   - Refacto `companyInfos` pour déplacer toute la logique dans `company/search.ts` et capable de chercher à la fois par SIRET et par TVA.
   - Ajout de la possibilité de filtrer sur le champ `customId` (recherche exacte) sur le tableau de bord et dans la query `forms` [PR 1284](https://github.com/MTES-MCT/trackdechets/pull/1284)
   - Gestion des dasri de synthèse [PR 1287](https://github.com/MTES-MCT/trackdechets/pull/1287)
-
 
 #### :bug: Corrections de bugs
 

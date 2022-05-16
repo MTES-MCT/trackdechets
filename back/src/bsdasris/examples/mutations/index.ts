@@ -8,5 +8,8 @@ function loadMutation(name: string) {
 export default {
   createBsdasri: loadMutation("createBsdasri"),
   updateBsdasri: loadMutation("updateBsdasri"),
-  signBsdasri: loadMutation("signBsdasri")
+  signBsdasri: loadMutation("signBsdasri"),
+  signBsdasriEmissionWithSecretCode: loadMutation(
+    "signBsdasriEmissionWithSecretCode"
+  )
 };

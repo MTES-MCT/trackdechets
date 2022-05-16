@@ -61,6 +61,8 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   transporterRecepisseNumber: "a receipt",
   transporterRecepisseDepartment: "83",
   transporterRecepisseValidityLimit: "2019-11-27T00:00:00.000Z",
+  transporterTransportMode: "ROAD",
+  transporterTransportPlates: ["AA-00-XX"],
 
   destinationReceptionDate: "2019-11-27T00:00:00.000Z",
   destinationReceptionWeight: 1.2,

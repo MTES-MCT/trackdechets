@@ -4,7 +4,7 @@ import { registerUpdater, Updater } from "./helper/helper";
 @registerUpdater(
   "Remove orphan companies",
   "Remove orphan companies without any member",
-  true
+  false
 )
 export class RemoveOrphanCompanies implements Updater {
   async run() {

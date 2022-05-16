@@ -7,6 +7,7 @@ import {
   QueryBsdasriArgs,
   BsdasriSignatureType,
   MutationUpdateBsdasriArgs,
+  Bsdasri,
 } from "generated/graphql/types";
 import { NotificationError, InlineError } from "common/components/Error";
 import {
@@ -42,7 +43,7 @@ const forms = {
 
   [BsdasriSignatureType.Transport]: TransportSignatureForm,
   [ExtraSignatureType.DirectTakeover]: TransportSignatureForm,
-  // [ExtraSignatureType.SynthesisEmission]: EmitterSignatureForm,
+
   [ExtraSignatureType.SynthesisTakeOver]: SynthesisTransportSignatureForm,
 
   [BsdasriSignatureType.Reception]: ReceptionSignatureForm,
@@ -55,32 +56,35 @@ const UpdateForm = ({ signatureType }) => {
 
 const settings: {
   [id: string]: {
-    label: string;
+    getLabel: (dasri: Bsdasri, siret: string) => string;
     signatureType: BsdasriSignatureType;
     validationText: string;
   };
 } = {
   [BsdasriSignatureType.Emission]: {
-    label: "Signature producteur",
+    getLabel: (bsdasri, siret) =>
+      bsdasri.ecoOrganisme?.siret === siret
+        ? "Signature Éco-organisme"
+        : "Signature producteur",
     signatureType: BsdasriSignatureType.Emission,
     validationText:
       "En signant, je confirme la remise du déchet au transporteur. La signature est horodatée.",
   },
   [ExtraSignatureType.SynthesisTakeOver]: {
-    label: "Signature bordereau de synthèse",
+    getLabel: () => "Signature bordereau de synthèse",
     signatureType: BsdasriSignatureType.Transport,
     validationText:
       "En signant, je valide l'emport du bsd de synthèse et des bordereaux associés. Les bordereaux associés ne sont plus modifiables.",
   },
 
   [BsdasriSignatureType.Transport]: {
-    label: "Signature transporteur",
+    getLabel: () => "Signature transporteur",
     signatureType: BsdasriSignatureType.Transport,
     validationText:
       "En signant, je confirme l'emport du déchet. La signature est horodatée.",
   },
   [ExtraSignatureType.DirectTakeover]: {
-    label: "Emport direct transporteur",
+    getLabel: () => "Emport direct transporteur",
     signatureType: BsdasriSignatureType.Transport,
     validationText: `L'émetteur de bordereau a autorisé son emport direct, en tant que
     transporteur vous pouvez donc emporter le déchet concerné.
@@ -88,14 +92,14 @@ const settings: {
   },
 
   [BsdasriSignatureType.Reception]: {
-    label: "Signature reception",
+    getLabel: () => "Signature reception",
     signatureType: BsdasriSignatureType.Reception,
     validationText:
       "En signant, je confirme la réception des déchets pour la quantité indiquée dans ce bordereau. La signature est horodatée.",
   },
 
   [BsdasriSignatureType.Operation]: {
-    label: "Signature traitement",
+    getLabel: () => "Signature traitement",
     signatureType: BsdasriSignatureType.Operation,
     validationText:
       "En signant, je confirme le traitement des déchets pour la quantité indiquée dans ce bordereau. La signature est horodatée.",
@@ -152,7 +156,7 @@ export function RouteSignBsdasri({
 
   return (
     <div>
-      <h2 className="td-modal-title">{config.label}</h2>
+      <h2 className="td-modal-title">{config.getLabel(bsdasri, siret)}</h2>
       <BdasriSummary bsdasri={bsdasri} />
       <Formik
         initialValues={{

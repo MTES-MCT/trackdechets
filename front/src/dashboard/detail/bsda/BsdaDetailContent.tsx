@@ -15,11 +15,16 @@ import styles from "dashboard/detail/common/BSDDetailContent.module.scss";
 import { DateRow, DetailRow } from "dashboard/detail/common/Components";
 import { getVerboseAcceptationStatus } from "dashboard/detail/common/utils";
 import { PACKAGINGS_NAMES } from "form/bsda/components/packagings/Packagings";
-import { Bsda, FormCompany } from "generated/graphql/types";
+import {
+  Bsda,
+  BsdaNextDestination,
+  FormCompany,
+} from "generated/graphql/types";
 import React from "react";
 import QRCodeIcon from "react-qr-code";
 import { generatePath, useHistory, useParams } from "react-router-dom";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { InitialBsdas } from "./InitialBsdas";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -276,6 +281,49 @@ const Broker = ({ broker }) => (
   </>
 );
 
+const NextDestination = ({
+  nextDestination,
+  forwardedIn,
+  groupedIn,
+}: {
+  nextDestination: BsdaNextDestination;
+  forwardedIn?: Bsda | null;
+  groupedIn?: Bsda | null;
+}) => (
+  <div className={styles.detailColumns}>
+    <div className={styles.detailGrid}>
+      <dt>Courtier</dt>
+      <dd>{nextDestination.company?.name}</dd>
+
+      <dt>Siret</dt>
+      <dd>{nextDestination.company?.siret}</dd>
+
+      <dt>Adresse</dt>
+      <dd>{nextDestination.company?.address}</dd>
+
+      <dt>Tél</dt>
+      <dd>{nextDestination.company?.phone}</dd>
+
+      <dt>Mél</dt>
+      <dd>{nextDestination.company?.mail}</dd>
+
+      <dt>Contact</dt>
+      <dd>{nextDestination.company?.contact}</dd>
+    </div>
+
+    <div className={styles.detailGrid}>
+      <DetailRow value={nextDestination.cap} label="CAP" />
+
+      <DetailRow
+        value={nextDestination.plannedOperationCode}
+        label="Opération de traitement prévue"
+      />
+
+      <DetailRow value={forwardedIn?.id ?? groupedIn?.id} label="Annexé dans" />
+    </div>
+  </div>
+);
+
 export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
@@ -291,6 +339,7 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
     },
   });
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
+  const initialBsdas = form.forwarding ? [form.forwarding] : form.grouping;
 
   return (
     <div className={styles.detail}>
@@ -324,9 +373,9 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             <dt>Code déchet</dt>
             <dd>{form.waste?.code}</dd>
             <dt>Description du déchet</dt>
-            <dd>
-              {form.waste?.materialName} {form.waste?.familyCode}
-            </dd>
+            <dd>{form.waste?.materialName}</dd>
+            <dt>Code famille</dt>
+            <dd>{form.waste?.familyCode}</dd>
             <dt>
               Poids {form.destination?.reception?.weight ? "reçu" : "envoyé"}
             </dt>
@@ -399,7 +448,7 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             <Tab className={styles.detailTab}>
               <IconWarehouseDelivery size="25px" />
               <span className={styles.detailTabCaption}>
-                <span> Transporteur</span>
+                <span>Transporteur</span>
               </span>
             </Tab>
           )}
@@ -408,6 +457,24 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             <IconRenewableEnergyEarth size="25px" />
             <span className={styles.detailTabCaption}>Destinataire</span>
           </Tab>
+
+          {!!form?.destination?.operation?.nextDestination?.company?.name && (
+            <Tab className={styles.detailTab}>
+              <IconRenewableEnergyEarth size="25px" />
+              <span className={styles.detailTabCaption}>
+                <span>Exutoire final</span>
+              </span>
+            </Tab>
+          )}
+
+          {!!initialBsdas?.length && (
+            <Tab className={styles.detailTab}>
+              <IconBSDa style={{ fontSize: "25px" }} />
+              <span className={styles.detailTabCaption}>
+                <span>Bsdas associés</span>
+              </span>
+            </Tab>
+          )}
         </TabList>
         {/* Tabs content */}
         <div className={styles.detailTabPanels}>
@@ -443,6 +510,23 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
               <Recipient form={form} />
             </div>
           </TabPanel>
+
+          {/* Next destination tab panel */}
+          {!!form?.destination?.operation?.nextDestination?.company?.name && (
+            <TabPanel className={styles.detailTabPanel}>
+              <NextDestination
+                nextDestination={form?.destination?.operation?.nextDestination}
+                forwardedIn={form.forwardedIn}
+                groupedIn={form.groupedIn}
+              />
+            </TabPanel>
+          )}
+
+          {!!initialBsdas?.length && (
+            <TabPanel className={styles.detailTabPanel}>
+              <InitialBsdas bsdas={initialBsdas} />
+            </TabPanel>
+          )}
         </div>
       </Tabs>
       <div className={styles.detailActions}>

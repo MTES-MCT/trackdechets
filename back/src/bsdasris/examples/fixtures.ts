@@ -29,6 +29,12 @@ const emissionInput = {
   },
   packagings: [{ type: "BOITE_CARTON", quantity: 1, volume: 1 }]
 };
+function ecoorganismeInput(siret: string) {
+  return {
+    siret,
+    name: "Eco-organisme"
+  };
+}
 
 function transporteurCompanyInput(siret: string) {
   return {
@@ -115,6 +121,7 @@ export default {
   emitterCompanyInput,
   emitterInput,
   emissionInput,
+  ecoorganismeInput,
   transporteurCompanyInput,
   transporterInput,
   transportInput,

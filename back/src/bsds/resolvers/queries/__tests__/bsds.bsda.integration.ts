@@ -137,6 +137,10 @@ describe("Query.bsds.bsda base workflow", () => {
                 department: "83",
                 number: "1234",
                 validityLimit: new Date().toISOString() as any
+              },
+              transport: {
+                mode: "ROAD",
+                plates: ["AA-00-XX"]
               }
             },
             waste: {
@@ -151,7 +155,7 @@ describe("Query.bsds.bsda base workflow", () => {
             weight: { isEstimate: true, value: 1.2 },
             destination: {
               cap: "A cap",
-              plannedOperationCode: "D 13",
+              plannedOperationCode: "D 5",
               company: {
                 siret: destination.company.siret,
                 name: "destination",
@@ -726,7 +730,7 @@ describe("Query.bsds.bsda base workflow", () => {
       await prisma.bsda.update({
         where: { id: bsdaId },
         data: {
-          destinationOperationCode: "D 13",
+          destinationOperationCode: "D 15",
           status: "SENT",
           destinationOperationSignatureDate: null,
           destinationOperationSignatureAuthor: null

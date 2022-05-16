@@ -45,7 +45,7 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "^7.15.0",
+    "@elastic/elasticsearch": "^7.17.0",
     "@fast-csv/format": "^4.3.0",
     "@graphql-toolkit/file-loading": "^0.10.7",
     "@graphql-toolkit/schema-merging": "^0.10.7",
@@ -53,8 +53,8 @@
     "@graphql-tools/merge": "^8.2.0",
     "@graphql-tools/schema": "^8.3.0",
     "@prisma/client": "^3.12.0",
-    "@sentry/integrations": "^6.13.3",
-    "@sentry/node": "^6.13.3",
+    "@sentry/integrations": "^6.19.7",
+    "@sentry/node": "^6.19.6",
     "apollo-server-core": "^3.4.0",
     "apollo-server-express": "^3.4.0",
     "apollo-server-plugin-base": "^3.3.0",
@@ -160,7 +160,7 @@
     "eslint-plugin-no-only-tests": "^2.6.0",
     "eslint-plugin-prettier": "^4.0.0",
     "graphql-markdown": "^6.0.0",
-    "jest": "^27.3.1",
+    "jest": "^28.0.3",
     "jsonwebtoken": "^8.5.1",
     "node-mocks-http": "^1.11.0",
     "nodemon": "^2.0.14",
@@ -168,10 +168,10 @@
     "superagent-mock": "^4.0.0",
     "supertest": "^6.1.6",
     "ts-eager": "^2.0.2",
-    "ts-jest": "^27.0.7",
+    "ts-jest": "^28.0.1",
     "ts-node": "^10.4.0",
     "type-fest": "^2.5.1",
-    "typescript": "4.4.4",
+    "typescript": "^4.6.4",
     "ws": "^8.2.3"
   }
 }

@@ -59,6 +59,7 @@ export const companyFactory = async (
   companyOpts: Partial<Prisma.CompanyCreateInput> = {}
 ) => {
   const opts = companyOpts || {};
+
   const companyIndex = (await prisma.company.count()) + 1;
   return prisma.company.create({
     data: {
@@ -359,4 +360,27 @@ export const applicationFactory = async () => {
   });
 
   return application;
+};
+
+export const ecoOrganismeFactory = async ({
+  count = null,
+  handleBsdasri = false
+}: {
+  count?: number;
+  handleBsdasri?: boolean;
+}) => {
+  const ecoOrganismeIndex = !!count
+    ? count + 1
+    : (await prisma.ecoOrganisme.count()) + 1;
+
+  const ecoOrganisme = await prisma.ecoOrganisme.create({
+    data: {
+      address: "",
+      name: `Eco-Organisme ${ecoOrganismeIndex}`,
+      siret: siretify(ecoOrganismeIndex),
+      handleBsdasri
+    }
+  });
+
+  return ecoOrganisme;
 };

@@ -10,6 +10,7 @@ import {
   DestinationOperationCodeTypes,
 } from "generated/graphql/types";
 import { formatDate } from "common/datetime";
+import { RefreshButton } from "./Common";
 
 const GET_GROUPABLE_BSDASRIS = gql`
   query Bsdasris($where: BsdasriWhere) {
@@ -29,6 +30,12 @@ const GET_GROUPABLE_BSDASRIS = gql`
             reception {
               date
               volume
+              packagings {
+                type
+                other
+                quantity
+                volume
+              }
             }
             operation {
               code
@@ -40,16 +47,17 @@ const GET_GROUPABLE_BSDASRIS = gql`
   }
 `;
 
-export default function BsdasriTable({
+export default function BsdasriTableGrouping({
   selectedItems,
   onToggle,
+
   regroupedInDB,
 }) {
   const { values } = useFormikContext<
     Bsdasri & { dbRegroupedBsdasris: string[] }
   >();
 
-  const { loading, error, data } = useQuery<
+  const { loading, error, data, refetch } = useQuery<
     Pick<Query, "bsdasris">,
     QueryBsdasrisArgs
   >(GET_GROUPABLE_BSDASRIS, {
@@ -78,16 +86,17 @@ export default function BsdasriTable({
   if (error) return <InlineError apolloError={error} />;
   if (!data) return <p>Aucune donnée à afficher</p>;
 
-  const bsdasris = data.bsdasris?.edges;
+  const bsdasris = data.bsdasris?.edges ?? [];
 
   if (!bsdasris.length) {
     return (
       <div className="notification notification--error">
         Vous n'avez actuellement aucun bordereau qui peut être inclus dans ce
-        groupement.
+        groupement. <RefreshButton onClick={refetch} />
       </div>
     );
   }
+
   return (
     <table className="td-table">
       <thead>

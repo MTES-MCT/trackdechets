@@ -51,7 +51,9 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
     }),
     ecoOrganisme: nullIfNoValues<BsdasriEcoOrganisme>({
       name: bsdasri.ecoOrganismeName,
-      siret: bsdasri.ecoOrganismeSiret
+      siret: bsdasri.ecoOrganismeSiret,
+      // do not return false because mandatory siret/name might be null and break query
+      emittedByEcoOrganisme: !!bsdasri.emittedByEcoOrganisme ? true : null
     }),
     emitter: nullIfNoValues<BsdasriEmitter>({
       company: nullIfNoValues<FormCompany>({
@@ -78,7 +80,11 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
 
         weight: nullIfNoValues<BsdasriWeight>({
           value: bsdasri.emitterWasteWeightValue,
-          isEstimate: bsdasri.emitterWasteWeightIsEstimate
+          // due to a previous validation bug we might have null weigh value and not null isEstimate, thus breaking gql required return type
+
+          isEstimate: !!bsdasri.emitterWasteWeightValue
+            ? bsdasri.emitterWasteWeightIsEstimate
+            : null
         }),
 
         volume: bsdasri.emitterWasteVolume,
@@ -111,7 +117,10 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
 
         weight: nullIfNoValues<BsdasriWeight>({
           value: bsdasri.transporterWasteWeightValue,
-          isEstimate: bsdasri.transporterWasteWeightIsEstimate
+          // due to a previous validation bug we might have null weigh value and not null isEstimate, thus breaking gql required return type
+          isEstimate: !!bsdasri.transporterWasteWeightValue
+            ? bsdasri.transporterWasteWeightIsEstimate
+            : null
         }),
 
         volume: bsdasri.transporterWasteVolume,

@@ -59,7 +59,7 @@ enum destinationOperationCodeTypes {
 enum BsdasriSignatureType {
   "Signature du cadre émetteur (PRED)"
   EMISSION
-
+  
   "Signature du cadre collecteur transporteur"
   TRANSPORT
 
@@ -69,6 +69,7 @@ enum BsdasriSignatureType {
   "Signature du traitement du déchet"
   OPERATION
 }
+
 enum BsdasriType {
   "Bordereau dasri simple"
   SIMPLE
@@ -76,6 +77,6 @@ enum BsdasriType {
   "Bordereau dasri de groupement"
   GROUPING
 
-  "(Bientôt disponible) - Bordereau dasri de synthèse"
+  "Bordereau dasri de synthèse"
   SYNTHESIS
 }

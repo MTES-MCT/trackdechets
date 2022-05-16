@@ -13,8 +13,6 @@ const workflow: Workflow = {
   description: `Un traiteur a 2 bordereaux qu'il souhaite grouper. Après la crétation des 2 bordereaux initiaux, un bordereau de groupement est créé.`,
   companies: [
     { name: "producteur", companyTypes: ["PRODUCER"] },
-    { name: "producteur", companyTypes: ["PRODUCER"] },
-    { name: "producteur", companyTypes: ["PRODUCER"] },
     { name: "worker", companyTypes: ["PRODUCER"] },
     { name: "transporteur", companyTypes: ["TRANSPORTER"] },
     { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] },

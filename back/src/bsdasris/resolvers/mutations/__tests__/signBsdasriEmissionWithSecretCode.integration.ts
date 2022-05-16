@@ -39,7 +39,7 @@ describe("Mutation.signBsdasri emission with secret code", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Erreur, le code de sécurité est manquant ou invalide",
+        message: "Erreur, le code de sécurité est invalide",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -90,5 +90,6 @@ describe("Mutation.signBsdasri emission with secret code", () => {
     expect(readyTotakeOverDasri.isEmissionTakenOverWithSecretCode).toEqual(
       true
     );
+    expect(readyTotakeOverDasri.emittedByEcoOrganisme).toEqual(false);
   });
 });

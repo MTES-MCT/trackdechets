@@ -1,12 +1,10 @@
 import React from "react";
 
-import PublishBsdasri from "./PublishBsdasri";
-
 import { ActionLink } from "common/components";
 import { generatePath, useLocation, useRouteMatch } from "react-router-dom";
 
 import "@reach/menu-button/styles.css";
-import { IconCheckCircle1 } from "common/components/Icons";
+import { IconCheckCircle1, IconPaperWrite } from "common/components/Icons";
 
 import routes from "common/routes";
 
@@ -36,20 +34,40 @@ export function WorkflowAction(props: WorkflowActionProps) {
   const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
   const isToCollectTab = !!useRouteMatch(routes.dashboard.transport.toCollect);
   const isSynthesis = form.type === BsdasriType.Synthesis;
+  const isAssociatedToSynthesis = !!form?.synthesizedIn?.id;
+
   const isSimple = form.type === BsdasriType.Simple;
   const isEmitter = siret === form.emitter?.company?.siret;
+  const isEcoOrganisme = siret === form.ecoOrganisme?.siret;
   const isTransporter = siret === form.transporter?.company?.siret;
   const isDestination = siret === form.destination?.company?.siret;
+
+  if (isAssociatedToSynthesis) {
+    return null;
+  }
   if (isPublishable(form)) {
-    return <PublishBsdasri {...props} />;
+    return (
+      <ActionLink
+        icon={<IconPaperWrite size="24px" />}
+        to={{
+          pathname: generatePath(routes.dashboard.bsdasris.sign.publish, {
+            siret,
+            id: form.id,
+          }),
+          state: { background: location },
+        }}
+      >
+        Publier le bordereau
+      </ActionLink>
+    );
   }
   switch (form["bsdasriStatus"]) {
     case BsdasriStatus.Initial: {
       if (form.isDraft) {
         return null;
       }
-
-      if (isEmitter && isActTab && !isSynthesis) {
+      const isHolder = isEmitter || isEcoOrganisme;
+      if (isHolder && isActTab && !isSynthesis) {
         // no emitter signature for synthesis bsds
         return (
           <>
@@ -66,7 +84,9 @@ export function WorkflowAction(props: WorkflowActionProps) {
                 state: { background: location },
               }}
             >
-              Signature producteur
+              {isEcoOrganisme
+                ? "Signature Éco-organisme"
+                : "Signature producteur"}
             </ActionLink>
           </>
         );
@@ -90,7 +110,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
                   state: { background: location },
                 }}
               >
-                Signature producteur (code secret)
+                Signature émetteur (code secret)
               </ActionLink>
             )}
 

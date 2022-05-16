@@ -1,11 +1,12 @@
 import React from "react";
-import { RedErrorMessage, Label } from "common/components";
+import { RedErrorMessage, Label, FieldSwitch } from "common/components";
 import Packagings from "form/bsdasri/components/packagings/Packagings";
 import WeightWidget from "form/bsdasri/components/Weight";
 import { useParams, useHistory, generatePath } from "react-router-dom";
 import { BdasriSummary } from "dashboard/components/BSDList/BSDasri/Summary/BsdasriSummary";
 import Loader from "common/components/Loaders";
 import { useQuery, useMutation } from "@apollo/client";
+
 import {
   Query,
   QueryBsdasriArgs,
@@ -83,10 +84,16 @@ export function RouteBSDasrisSignEmissionSecretCode() {
 
   return (
     <div>
-      <h2 className="td-modal-title">Signature producteur</h2>
+      <h2 className="td-modal-title">Signature émetteur</h2>
       <div className="notification success">
         Cet écran est à lire et signer par le{" "}
-        <strong>producteur du déchet</strong> sur le terminal du transporteur
+        <strong>producteur du déchet</strong>{" "}
+        {!!bsdasri?.ecoOrganisme?.siret && (
+          <>
+            ou <strong>l'éco-organisme</strong>{" "}
+          </>
+        )}
+        sur le terminal du transporteur
       </div>
       <BdasriSummary bsdasri={bsdasri} />
       <Formik
@@ -95,11 +102,13 @@ export function RouteBSDasrisSignEmissionSecretCode() {
           signature: {
             author: "",
             securityCode: "",
+            signatureAuthor: false,
           },
         }}
         validationSchema={emissionSignatureSecretCodeValidationSchema}
         onSubmit={async values => {
           const { id, signature, ...rest } = values;
+
           await updateBsdasri({
             variables: {
               id: id,
@@ -114,6 +123,10 @@ export function RouteBSDasrisSignEmissionSecretCode() {
               input: {
                 ...signature,
                 securityCode: parseInt(signature.securityCode, 10),
+
+                signatureAuthor: !!signature.signatureAuthor
+                  ? "ECO_ORGANISME"
+                  : "EMITTER",
               },
             },
           });
@@ -146,6 +159,14 @@ export function RouteBSDasrisSignEmissionSecretCode() {
                   required
                   style={{ width: "100px" }}
                 />
+                {bsdasri?.ecoOrganisme?.siret && (
+                  <Field
+                    type="checkbox"
+                    component={FieldSwitch}
+                    name="signature.signatureAuthor"
+                    label="Le code est celui de l'éco-organisme"
+                  />
+                )}
               </div>
               <RedErrorMessage name="signature.securityCode" />
               <div className="form__row">
