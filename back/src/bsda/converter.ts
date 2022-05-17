@@ -449,7 +449,9 @@ function flattenBsdaWasteInput({ waste }: Pick<BsdaInput, "waste">) {
     wasteMaterialName:
       chain(waste, w => w.materialName) ?? chain(waste, w => w.name),
     wasteConsistence: chain(waste, w => w.consistence),
-    wasteSealNumbers: chain(waste, w => w.sealNumbers),
+    wasteSealNumbers: chain(waste, w =>
+      w.sealNumbers === null ? undefined : w.sealNumbers
+    ),
     wastePop: chain(waste, w => w.pop)
   };
 }
