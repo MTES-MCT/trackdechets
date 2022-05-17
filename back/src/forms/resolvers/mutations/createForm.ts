@@ -88,9 +88,15 @@ const createFormResolver = async (
       throw new MissingTempStorageFlag();
     }
 
-    let destinationIsFilledByEmitter = false;
+    // automatically computes the value of isFilledByEmitter based
+    // on the authenticated user if it is not set explicitly
+    let destinationIsFilledByEmitter =
+      temporaryStorageDetail?.destination?.isFilledByEmitter ?? false;
 
-    if (formSirets.emitterCompanySiret?.length) {
+    if (
+      temporaryStorageDetail?.destination?.isFilledByEmitter === undefined &&
+      formSirets.emitterCompanySiret?.length
+    ) {
       const emitterCompany = await prisma.company.findFirst({
         where: { siret: formSirets.emitterCompanySiret }
       });

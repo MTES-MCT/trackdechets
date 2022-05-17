@@ -154,10 +154,19 @@ const updateFormResolver = async (
       throw new MissingTempStorageFlag();
     }
 
+    // automatically computes the value of isFilledByEmitter based
+    // on the authenticated user if it is not set explicitly
     let destinationIsFilledByEmitter =
-      existingTemporaryStorageDetail.destinationIsFilledByEmitter ?? false;
+      temporaryStorageDetail?.destination?.isFilledByEmitter ??
+      (temporaryStorageDetail?.destination?.company === null
+        ? false
+        : existingTemporaryStorageDetail.destinationIsFilledByEmitter ?? false);
 
-    if (nextFormSirets.emitterCompanySiret?.length) {
+    if (
+      temporaryStorageDetail?.destination?.isFilledByEmitter === undefined &&
+      !!temporaryStorageDetail?.destination?.company?.siret &&
+      nextFormSirets.emitterCompanySiret?.length
+    ) {
       const emitterCompany = await prisma.company.findFirst({
         where: { siret: nextFormSirets.emitterCompanySiret }
       });

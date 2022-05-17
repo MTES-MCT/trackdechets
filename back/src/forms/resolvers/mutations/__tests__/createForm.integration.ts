@@ -340,6 +340,43 @@ describe("Mutation.createForm", () => {
     ).toEqual(false);
   });
 
+  it("should set destinationIsFilledByEmitter with user provided value", async () => {
+    const emitter = await companyFactory();
+    const { user, company: collector } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory();
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: emitter.siret,
+          name: emitter.name
+        }
+      },
+      recipient: {
+        company: {
+          siret: collector.siret
+        },
+        isTempStorage: true
+      },
+      temporaryStorageDetail: {
+        destination: {
+          isFilledByEmitter: true,
+          company: {
+            siret: destination.siret,
+            name: destination.name
+          }
+        }
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+    expect(
+      data.createForm.temporaryStorageDetail.destination.isFilledByEmitter
+    ).toEqual(true);
+  });
+
   it("should create a form with an empty temporary storage detail", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 

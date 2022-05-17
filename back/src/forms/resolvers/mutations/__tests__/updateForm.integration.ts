@@ -562,6 +562,160 @@ describe("Mutation.updateForm", () => {
     );
   });
 
+  it("should re-calculate destinationIsFilledByEmitter if destination after temp storage siret changes", async () => {
+    const { user: emitterUser, company: emitter } =
+      await userWithCompanyFactory("MEMBER");
+
+    const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const form = await formFactory({
+      ownerId: emitterUser.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitter.siret,
+        recipientCompanySiret: ttr.siret,
+        recipientIsTempStorage: true,
+        temporaryStorageDetail: {
+          create: {
+            destinationCompanySiret: "11111111111111",
+            destinationIsFilledByEmitter: false
+          }
+        }
+      }
+    });
+
+    const { mutate: mutateEmitter } = makeClient(emitterUser);
+    const { data: dataEmitter } = await mutateEmitter<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          temporaryStorageDetail: {
+            destination: {
+              company: {
+                siret: "22222222222222"
+              }
+            }
+          }
+        }
+      }
+    });
+
+    expect(
+      dataEmitter.updateForm.temporaryStorageDetail.destination
+        .isFilledByEmitter
+    ).toEqual(true);
+
+    const { mutate: mutateTtr } = makeClient(ttrUser);
+    const { data: dataTtr } = await mutateTtr<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          temporaryStorageDetail: {
+            destination: {
+              company: {
+                siret: "22222222222222"
+              }
+            }
+          }
+        }
+      }
+    });
+
+    expect(
+      dataTtr.updateForm.temporaryStorageDetail.destination.isFilledByEmitter
+    ).toEqual(false);
+  });
+
+  it("should reset destinationIsFilledByEmitter if destination after temp storage company is deleted", async () => {
+    const { user: emitterUser, company: emitter } =
+      await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: emitterUser.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitter.siret,
+        recipientIsTempStorage: true,
+        temporaryStorageDetail: {
+          create: {
+            destinationCompanySiret: "11111111111111",
+            destinationIsFilledByEmitter: true
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(emitterUser);
+    const { data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          temporaryStorageDetail: {
+            destination: {
+              company: null
+            }
+          }
+        }
+      }
+    });
+
+    expect(
+      data.updateForm.temporaryStorageDetail.destination.isFilledByEmitter
+    ).toEqual(false);
+  });
+
+  it("should use user-provided value for isFilledByEmitter", async () => {
+    const { user: emitterUser, company: emitter } =
+      await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: emitterUser.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitter.siret,
+        recipientIsTempStorage: true,
+        temporaryStorageDetail: {
+          create: {
+            destinationCompanySiret: "11111111111111",
+            destinationIsFilledByEmitter: true
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(emitterUser);
+    const { data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          temporaryStorageDetail: {
+            destination: {
+              isFilledByEmitter: false
+            }
+          }
+        }
+      }
+    });
+
+    expect(
+      data.updateForm.temporaryStorageDetail.destination.isFilledByEmitter
+    ).toEqual(false);
+  });
+
   it("should remove a temporary storage", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await formFactory({

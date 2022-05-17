@@ -207,6 +207,56 @@ describe("Mutation markAsResealed", () => {
     );
   });
 
+  it("should update isFilledByEmitter if siret is provided by TTR", async () => {
+    const owner = await userFactory();
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const destination = await destinationFactory();
+    const newDestination = await destinationFactory();
+
+    const { mutate } = makeClient(user);
+
+    const form = await formWithTempStorageFactory({
+      ownerId: owner.id,
+      opt: {
+        status: Status.TEMP_STORER_ACCEPTED,
+        recipientCompanySiret: collector.siret
+      },
+      tempStorageOpts: {
+        destinationCompanySiret: destination.siret,
+        destinationIsFilledByEmitter: true
+      }
+    });
+
+    await mutate<Pick<Mutation, "markAsResealed">, MutationMarkAsResealedArgs>(
+      MARK_AS_RESEALED,
+      {
+        variables: {
+          id: form.id,
+          resealedInfos: {
+            destination: {
+              company: {
+                siret: newDestination.siret
+              }
+            }
+          }
+        }
+      }
+    );
+
+    const resealedForm = await prisma.form.findUnique({
+      where: { id: form.id },
+      include: { temporaryStorageDetail: true }
+    });
+    expect(
+      resealedForm.temporaryStorageDetail.destinationIsFilledByEmitter
+    ).toEqual(false);
+  });
+
   test("when resealedInfos contains repackaging data", async () => {
     const owner = await userFactory();
     const { user, company: collector } = await userWithCompanyFactory(

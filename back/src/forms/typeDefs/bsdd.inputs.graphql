@@ -319,7 +319,10 @@ input DestinationInput {
   "Opération d'élimination / valorisation prévue (code D/R)"
   processingOperation: String
 
-  "Indique si c'est l'émetteur initial ou l'installation d'entreposage ou de reconditionnement qui a saisi les informations"
+  """
+  Indique si c'est l'émetteur initial ou l'installation d'entreposage ou de reconditionnement qui a saisi les informations.
+  Par défaut, cette valeur est calculée automatiquement en fonction de l'utilisateur authentifié.
+  """
   isFilledByEmitter: Boolean
 }
 

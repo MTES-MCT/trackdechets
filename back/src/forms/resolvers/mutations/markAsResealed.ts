@@ -39,6 +39,15 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
 
   const updateInput = flattenResealedFormInput(resealedInfos);
 
+  if (
+    updateInput.destinationIsFilledByEmitter === undefined &&
+    temporaryStorageDetail.destinationIsFilledByEmitter &&
+    updateInput.destinationCompanySiret !==
+      temporaryStorageDetail.destinationCompanySiret
+  ) {
+    updateInput.destinationIsFilledByEmitter = false;
+  }
+
   // validate input
   await resealedFormSchema.validate({
     ...temporaryStorageDetail,
