@@ -36,7 +36,7 @@ export const FAVORITES = gql`
 `;
 
 export const COMPANY_INFOS = gql`
-  query SignupCompanyInfos($siret: String!, $clue: String) {
+  query CompanyInfos($siret: String!, $clue: String) {
     companyInfos(siret: $siret, clue: $clue) {
       siret
       vatNumber
@@ -96,6 +96,42 @@ export const SEARCH_COMPANIES = gql`
       }
       vhuAgrementBroyeur {
         agrementNumber
+        department
+      }
+    }
+  }
+`;
+
+export const COMPANY_PRIVATE_INFOS = gql`
+  query CompanyPrivateInfos($clue: String!) {
+    companyPrivateInfos(clue: $clue) {
+      siret
+      vatNumber
+      name
+      naf
+      libelleNaf
+      address
+      etatAdministratif
+      statutDiffusionEtablissement
+      isRegistered
+      isAnonymousCompany
+      companyTypes
+      installation {
+        codeS3ic
+        urlFiche
+        rubriques {
+          rubrique
+          category
+        }
+      }
+      transporterReceipt {
+        receiptNumber
+        validityLimit
+        department
+      }
+      traderReceipt {
+        receiptNumber
+        validityLimit
         department
       }
     }

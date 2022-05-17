@@ -7,6 +7,7 @@ import CompanyPrivate from "./CompanyPrivate";
 import CompanyFavorite from "./CompanyFavorite";
 import CompanySearchResult from "./CompanySearchResult";
 import CompanyForVerification from "./CompanyForVerification";
+import CompanySearchPrivate from "./CompanySearchPrivate";
 
 export default {
   Query,
@@ -17,5 +18,6 @@ export default {
   CompanyPrivate,
   CompanyFavorite,
   CompanySearchResult,
-  CompanyForVerification
+  CompanyForVerification,
+  CompanySearchPrivate
 };
