@@ -86,3 +86,113 @@ type AnonymousCompany {
   siret: String!
   vatNumber: String
 }
+
+"Information sur un établissement recherché par le frontend"
+type CompanySearchPrivate {
+  "Profil de l'établissement"
+  companyTypes: [CompanyType!]!
+
+  "Identifiant GEREP"
+  gerepId: String
+
+  "Code de signature permettant de signer les BSD"
+  securityCode: Int
+
+  "État du processus de vérification de l'établissement"
+  verificationStatus: CompanyVerificationStatus
+
+  "Email de contact (visible sur la fiche entreprise)"
+  contactEmail: String
+
+  "Numéro de téléphone de contact (visible sur la fiche entreprise)"
+  contactPhone: String
+
+  "Site web (visible sur la fiche entreprise)"
+  website: String
+
+  "Liste des utilisateurs appartenant à cet établissement"
+  users: [CompanyMember!]
+
+  "Rôle de l'utilisateur authentifié au sein de cet établissement"
+  userRole: UserRole
+
+  """
+  Nom d'usage de l'entreprise qui permet de différencier
+  différents établissements ayant le même nom
+  """
+  givenName: String
+
+  "SIRET de l'établissement"
+  siret: String
+
+  "Numéro de TVA de l'établissement"
+  vatNumber: String
+
+  "Adresse de l'établissement"
+  address: String
+
+  "Nom de l'établissement"
+  name: String
+
+  "Code NAF de l'établissement"
+  naf: String
+
+  "Libellé NAF de l'établissement"
+  libelleNaf: String
+
+  """
+  Installation classée pour la protection de l'environnement (ICPE)
+  associé à cet établissement (le cas échéant)
+  """
+  installation: Installation
+
+  """
+  Récépissé transporteur (le cas échéant, pour les profils transporteur)
+  """
+  transporterReceipt: TransporterReceipt
+
+  """
+  Récépissé négociant (le cas échéant, pour les profils négociant)
+  """
+  traderReceipt: TraderReceipt
+
+  """
+  Récépissé courtier (le cas échéant, pour les profils courtier)
+  """
+  brokerReceipt: BrokerReceipt
+
+  """
+  Agrément démolisseur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementDemolisseur: VhuAgrement
+
+  """
+  Agrément broyeur (le cas échéant, pour les profils VHU)
+  """
+  vhuAgrementBroyeur: VhuAgrement
+
+  """
+  Liste des agréments de l'éco-organisme
+  """
+  ecoOrganismeAgreements: [URL!]
+
+  "L'entreprise autorise l'enlèvement d'un Dasri sans sa signature"
+  allowBsdasriTakeOverWithoutSignature: Boolean
+
+  "Code pays de l'établissement"
+  codePaysEtrangerEtablissement: String
+  "État administratif de l'établissement. A = Actif, F = Fermé"
+  etatAdministratif: String
+  "Statut de diffusion de l'établissement selon l'INSEE. O = Oui, N = Non"
+  statutDiffusionEtablissement: String
+
+  """
+  Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
+  """
+  isRegistered: Boolean!
+
+  """
+  Si oui on non cet établissement est inscrit sur TD comme AnonymousCompany
+  """
+  isAnonymousCompany: Boolean
+}

@@ -20,4 +20,13 @@ type Query {
     skip: Int
     where: CompanyForVerificationWhere
   ): CompanyForVerificationConnection!
+
+  """
+  Renvoie des informations restreintes sur un établissement
+  selon la même recherche par siret ou TVA que companyInfos
+  """
+  companyPrivateInfos(
+    """SIRET ou numéro TVA intracommunautaire"""
+    clue: String!
+  ): CompanySearchPrivate!
 }

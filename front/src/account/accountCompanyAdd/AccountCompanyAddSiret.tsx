@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { gql, useLazyQuery, useMutation } from "@apollo/client";
 import { Field, Form, Formik } from "formik";
 import cogoToast from "cogo-toast";
-import { COMPANY_INFOS } from "form/common/components/company/query";
+import { COMPANY_PRIVATE_INFOS } from "form/common/components/company/query";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import AutoFormattingCompanyInfosInput from "common/components/AutoFormattingCompanyInfosInput";
 import {
@@ -42,17 +42,21 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
   const [isNonDiffusible, setIsNonDiffusible] = useState(false);
 
   const [searchCompany, { loading, error }] = useLazyQuery<
-    Pick<Query, "companyInfos">
-  >(COMPANY_INFOS, {
+    Pick<Query, "companyPrivateInfos">
+  >(COMPANY_PRIVATE_INFOS, {
     onCompleted: data => {
-      if (data && data.companyInfos) {
-        const companyInfos = data.companyInfos;
+      if (data && data.companyPrivateInfos) {
+        const companyInfos = data.companyPrivateInfos;
         if (companyInfos.etatAdministratif === "F") {
           cogoToast.error(
             "Cet établissement est fermé, impossible de le créer"
           );
         } else {
-          if (companyInfos?.statutDiffusionEtablissement === "N") {
+          // Non-diffusible mais pas encore inscrit en AnonymousCompany
+          if (
+            companyInfos?.statutDiffusionEtablissement === "N" &&
+            !companyInfos?.isAnonymousCompany
+          ) {
             setIsNonDiffusible(true);
             onCompanyInfos(null);
           } else {
@@ -112,7 +116,7 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
           // reset company infos
           onCompanyInfos(null);
           searchCompany({
-            variables: { siret: values.siret },
+            variables: { clue: values.siret },
           });
         }}
       >
