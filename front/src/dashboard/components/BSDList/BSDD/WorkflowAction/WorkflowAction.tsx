@@ -4,7 +4,6 @@ import MarkAsSealed from "./MarkAsSealed";
 import MarkAsReceived from "./MarkAsReceived";
 import MarkAsAccepted from "./MarkAsAccepted";
 import MarkAsProcessed from "./MarkAsProcessed";
-import MarkAsTempStored from "./MarkAsTempStored";
 import MarkAsResealed from "./MarkAsResealed";
 import MarkAsTempStorerAccepted from "./MarkAsTempStorerAccepted";
 import SignEmissionForm from "./SignEmissionForm";
