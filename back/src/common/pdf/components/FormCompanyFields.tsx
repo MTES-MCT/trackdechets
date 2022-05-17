@@ -1,5 +1,7 @@
 import * as React from "react";
-import countries from "world-countries";
+import countries, { Country } from "world-countries";
+import { checkVAT } from "jsvat";
+import { countries as vatCountries } from "../../../common/constants/companySearchHelpers";
 import { FormCompany } from "../../../generated/graphql/types";
 
 const FRENCH_COUNTRY = countries.find(country => country.cca2 === "FR");
@@ -9,10 +11,21 @@ type FormCompanyFieldsProps = {
 };
 
 export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
-  const companyCountry = company
-    ? countries.find(country => country.cca2 === company?.country) ??
-      FRENCH_COUNTRY
-    : null;
+  let companyCountry: Country = null;
+
+  if (company) {
+    companyCountry =
+      countries.find(country => country.cca2 === company?.country) ??
+      FRENCH_COUNTRY;
+    if (company.vatNumber) {
+      const vatCountryCode = checkVAT(company.vatNumber.trim(), vatCountries)
+        ?.country?.isoCode.short;
+
+      companyCountry = countries.find(
+        country => country.cca2 === vatCountryCode
+      );
+    }
+  }
 
   return (
     <>
@@ -20,7 +33,10 @@ export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
         <input
           type="checkbox"
           checked={
-            company?.siret && companyCountry && companyCountry.cca2 === "FR"
+            !company?.vatNumber &&
+            company?.siret &&
+            companyCountry &&
+            companyCountry.cca2 === "FR"
           }
           readOnly
         />{" "}
@@ -29,16 +45,17 @@ export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
         <input
           type="checkbox"
           checked={
-            company?.siret && companyCountry && companyCountry.cca2 !== "FR"
+            company?.vatNumber && companyCountry && companyCountry.cca2 !== "FR"
           }
           readOnly
         />{" "}
         Entreprise étrangère
       </p>
       <p>
-        N° SIRET : {company?.siret}
+        N° SIRET : {!company?.vatNumber ? company?.siret : ""}
         <br />
-        N° TVA intracommunautaire (le cas échéant) :<br />
+        N° TVA intracommunautaire (le cas échéant) : {company?.vatNumber}
+        <br />
         RAISON SOCIALE : {company?.name}
         <br />
         Adresse complète : {company?.address}
