@@ -37,6 +37,7 @@ import { resolvers, typeDefs } from "./schema";
 import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
+import forwarded from "forwarded";
 
 const {
   SESSION_SECRET,
@@ -46,7 +47,7 @@ const {
   UI_HOST,
   MAX_REQUESTS_PER_WINDOW = "1000",
   NODE_ENV,
-  TRUST_PROXY
+  USE_XFF_HEADER
 } = process.env;
 
 const Sentry = initSentry();
@@ -106,11 +107,6 @@ export const server = new ApolloServer({
 
 export const app = express();
 
-if (TRUST_PROXY === "true") {
-  // when app runs behind a cdn, this allows us to get the forwarded user ip for rate limit
-  app.set("trust proxy", true);
-}
-
 if (Sentry) {
   // The request handler must be the first middleware on the app
   app.use(Sentry.Handlers.requestHandler());
@@ -128,6 +124,15 @@ app.use(
     message: `Quota de ${maxrequestPerWindows} requêtes par minute excédé pour cette adresse IP, merci de réessayer plus tard.`,
     windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
     max: maxrequestPerWindows,
+    keyGenerator: request => {
+      // use xff data as client ip when behind a cdn
+      if (USE_XFF_HEADER !== "true") {
+        return request.ip;
+      }
+      const parsed = forwarded(request);
+
+      return parsed.slice(-1);
+    },
     store
   })
 );
@@ -236,7 +241,12 @@ app.use(oauth2Router);
 
 app.get("/ping", (_, res) => res.send("Pong!"));
 app.get("/ip", (req, res) => {
-  return res.send(`IP: ${req.ip} XFF: ${req.get("X-Forwarded-For")}`);
+  const parsed = forwarded(req);
+  return res.send(
+    `IP: ${req.ip} | XFF: ${req.get(
+      "X-Forwarded-For"
+    )} | parsed: ${parsed.slice(-1)}`
+  );
 });
 app.get("/userActivation", userActivationHandler);
 app.get("/download", downloadRouter);
