@@ -7,7 +7,11 @@ const { REDIS_URL, QUEUE_NAME_SENDMAIL } = process.env;
 /**
  * Connect to mailQueue once for the server
  */
-export const mailQueue = new Queue(`${QUEUE_NAME_SENDMAIL}`, `${REDIS_URL}`);
+export const mailQueue = new Queue(`${QUEUE_NAME_SENDMAIL}`, `${REDIS_URL}`, {
+  defaultJobOptions: {
+    removeOnComplete: 10_000
+  }
+});
 
 /**
  * Utility function to add a sendMailJob to the queue
