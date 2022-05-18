@@ -78,6 +78,7 @@
     "express": "^4.17.1",
     "express-rate-limit": "^5.5.0",
     "express-session": "^1.17.2",
+    "forwarded": "^0.1.2",
     "gotenberg-js-client": "^0.7.0",
     "graphql": "^15.6.1",
     "graphql-codegen-factories": "0.0.10",
