@@ -30,6 +30,7 @@ import sentryReporter from "./common/plugins/sentryReporter";
 import { redisClient } from "./common/redis";
 import { initSentry } from "./common/sentry";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
+import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
 import { oauth2Router } from "./routers/oauth2-router";
@@ -243,6 +244,8 @@ app.use(
   "/graphiql",
   serveStatic(path.join(__dirname, "common/plugins/graphiql/assets"))
 );
+
+app.use(bullBoardPath, serverAdapter.getRouter());
 
 // Apply passport auth middlewares to the graphQL endpoint
 app.use(graphQLPath, passportBearerMiddleware, passportJwtMiddleware);

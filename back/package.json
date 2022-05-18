@@ -45,6 +45,8 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
+    "@bull-board/api": "^3.11.0",
+    "@bull-board/express": "^3.11.0",
     "@elastic/elasticsearch": "^7.17.0",
     "@fast-csv/format": "^4.3.0",
     "@graphql-toolkit/file-loading": "^0.10.7",
