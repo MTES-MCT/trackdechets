@@ -37,6 +37,11 @@ import { resolvers, typeDefs } from "./schema";
 import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
+<<<<<<< Updated upstream
+=======
+import forwarded from "forwarded";
+import { serverAdapter } from "./queue/bull-board";
+>>>>>>> Stashed changes
 
 const {
   SESSION_SECRET,
@@ -250,6 +255,11 @@ app.get("/exports", (_, res) =>
 app.use(
   "/graphiql",
   serveStatic(path.join(__dirname, "common/plugins/graphiql/assets"))
+);
+
+app.use(
+  "/queue/monitor/eradicate-override-facsimile-track",
+  serverAdapter.getRouter()
 );
 
 // Apply passport auth middlewares to the graphQL endpoint
