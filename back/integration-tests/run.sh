@@ -41,14 +41,8 @@ all(){
 
 chunk() {
     startcontainers
-
-    mapfile -t chunk_infos < <(echo "$1" | tr "-" "\n")
-    echo "🔢 >> Chunk index: ${chunk_infos[0]}/${chunk_infos[1]}"
-    tests_to_run=$(dockerexec "./integration-tests/get-chunk.sh ${chunk_infos[0]} ${chunk_infos[1]}")
-    chunk_length=$(echo "$tests_to_run" | tr -cd '|' | wc -c)
-    echo "📏 >> Chunk length $chunk_length"
-
-    runtest "(${tests_to_run::-1})"
+    echo "🔢 >> Chunk index: $1"
+    runtest "-- --shard=$1"
     stopcontainers
 }
 
