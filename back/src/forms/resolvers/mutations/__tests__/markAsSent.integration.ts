@@ -78,7 +78,10 @@ describe("{ mutation { markAsSent } }", () => {
       }
     });
 
-    form = await prisma.form.findUnique({ where: { id: form.id } });
+    form = await prisma.form.findUnique({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
 
     expect(form.status).toEqual("SENT");
 
@@ -120,7 +123,10 @@ describe("{ mutation { markAsSent } }", () => {
 
     await mutate(mutation);
 
-    form = await prisma.form.findUnique({ where: { id: form.id } });
+    form = await prisma.form.findUnique({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
 
     expect(form.status).toEqual("SENT");
 
@@ -156,7 +162,10 @@ describe("{ mutation { markAsSent } }", () => {
       }
     });
 
-    form = await prisma.form.findUnique({ where: { id: form.id } });
+    form = await prisma.form.findUnique({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
 
     expect(form.status).toEqual("SENT");
 
@@ -195,7 +204,10 @@ describe("{ mutation { markAsSent } }", () => {
       }
     });
 
-    form = await prisma.form.findUnique({ where: { id: form.id } });
+    form = await prisma.form.findUnique({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
 
     expect(form.status).toEqual("SENT");
 
@@ -274,7 +286,10 @@ describe("{ mutation { markAsSent } }", () => {
           "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement."
         )
       );
-      form = await prisma.form.findUnique({ where: { id: form.id } });
+      form = await prisma.form.findUnique({
+        where: { id: form.id },
+        include: { forwardedIn: true }
+      });
 
       expect(form.status).toEqual("DRAFT");
 
@@ -317,7 +332,10 @@ describe("{ mutation { markAsSent } }", () => {
       }
     });
 
-    form = await prisma.form.findUnique({ where: { id: form.id } });
+    form = await prisma.form.findUnique({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
 
     expect(form.status).toEqual(Status.SENT);
     expect(form.sentAt).toEqual(sentAt);

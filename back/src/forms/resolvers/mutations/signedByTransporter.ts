@@ -18,6 +18,7 @@ import {
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
+import { Prisma } from "@prisma/client";
 
 const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
   async (parent, args, context) => {
@@ -76,16 +77,15 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       // check security code is temp storer's
       await checkSecurityCode(form.recipientCompanySiret, securityCode);
 
-      const { temporaryStorageDetail } = await getFormRepository(
-        user
-      ).findFullFormById(id);
+      const { forwardedIn } = await getFormRepository(user).findFullFormById(
+        id
+      );
 
-      const hasWasteDetailsOverride =
-        !!temporaryStorageDetail.wasteDetailsQuantity;
+      const hasWasteDetailsOverride = !!forwardedIn.wasteDetailsQuantity;
 
-      const formUpdateInput = {
+      const formUpdateInput: Prisma.FormUpdateInput = {
         ...(!hasWasteDetailsOverride && wasteDetails),
-        temporaryStorageDetail: {
+        forwardedIn: {
           update: {
             // The following fields are deprecated but what this mutation used to fill
             // so we need to continue doing so until the mutation is completely removed

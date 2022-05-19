@@ -14,6 +14,7 @@ export function getPackagingInfosSummary(packagingInfos: PackagingInfo[]) {
     0
   );
   const packages = packagingInfos
+    .sort((p1, p2) => p1.type.localeCompare(p2.type))
     .map(packagingInfo => {
       const name =
         packagingInfo.type === Packagings.Autre

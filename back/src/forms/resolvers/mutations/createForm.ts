@@ -28,7 +28,7 @@ const createFormResolver = async (
   { createFormInput }: MutationCreateFormArgs,
   context: GraphQLContext
 ) => {
-  return prisma.$transaction(async transaction => {
+  const newForm = await prisma.$transaction(async transaction => {
     const user = checkIsAuthenticated(context);
 
     const {
@@ -86,9 +86,11 @@ const createFormResolver = async (
 
     const form = flattenFormInput(formContent);
 
+    const readableId = getReadableId();
+
     const formCreateInput: Prisma.FormCreateInput = {
       ...form,
-      readableId: getReadableId(),
+      readableId,
       owner: { connect: { id: user.id } }
     };
 
@@ -100,15 +102,22 @@ const createFormResolver = async (
         // recipient.isTempStorage=true, throw error
         throw new MissingTempStorageFlag();
       }
-      formCreateInput.temporaryStorageDetail = {
-        create: flattenTemporaryStorageDetailInput(temporaryStorageDetail)
+      formCreateInput.forwardedIn = {
+        create: {
+          owner: { connect: { id: user.id } },
+          readableId: `${readableId}-suite`,
+          ...flattenTemporaryStorageDetailInput(temporaryStorageDetail)
+        }
       };
     } else {
       if (formContent.recipient?.isTempStorage === true) {
         // Recipient is temp storage but no details provided
         // Create empty temporary storage details
-        formCreateInput.temporaryStorageDetail = {
-          create: {}
+        formCreateInput.forwardedIn = {
+          create: {
+            owner: { connect: { id: user.id } },
+            readableId: `${readableId}-suite`
+          }
         };
       }
     }
@@ -164,9 +173,9 @@ const createFormResolver = async (
       updatedFields: {},
       mutation: "CREATED"
     });
-
-    return expandFormFromDb(newForm);
+    return newForm;
   });
+  return expandFormFromDb(newForm);
 };
 
 export default createFormResolver;

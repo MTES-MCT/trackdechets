@@ -40,6 +40,8 @@ Chaque changement d'état s'effectue grâce à une mutation.
 | `markAsResealed`           | <div><ul><li>`TEMP_STORED -> RESEALED`</li><li>`RESEALED -> RESEALED`</li></ul></div>                                           | [ResealedFormInput](../api-reference/bsdd/inputObjects#resealedtoredforminput)                | Uniquement le site d'entreposage temporaire ou de reconditionnement                                                                                                        |
 | `importPaperForm`          | `SEALED -> PROCESSED`                                                                                                           | [ImportPaperFormInput](../api-reference/bsdd/inputObjects#importpaperforminput)               | Uniquement l'entreprise de destination                                                                                                                                     |
 
+
+
 Le diagramme ci dessous retrace le cycle de vie d'un BSD dans Trackdéchets:
 
 <Mermaid
@@ -73,5 +75,20 @@ RESEALED -->|markAsResealed| RESEALED
 RESEALED -->|signEmissionForm| SIGNED_BY_TEMP_STORER
 SIGNED_BY_TEMP_STORER -->|signTransportForm| RESENT(RESENT)
 RESENT --> ACCEPTED
+`}
+/>
+
+Il est également possible de supprimer ou ajouter une étape d'entreposage provisoire ou reconditionnement
+en appelant `markAsProcessed` de façon anticipée sur un bordereau à l'état `TEMP_STORER_ACCEPTED` ou en appelant `markAsResealed`
+sur un bordereau à l'état `ACCEPTED`.
+
+
+<Mermaid
+  chart={`
+graph TD
+ACCEPTED -->|markAsProcessed| PROCESSED(PROCESSED - AWAITING_GROUP - NO_TRACEABILITY)
+ACCEPTED -.->|markAsResealed| RESEALED(RESEALED)
+TEMP_STORER_ACCEPTED -->|markAsResealed| RESEALED(RESEALED)
+TEMP_STORER_ACCEPTED -.->|markAsProcessed| PROCESSED(PROCESSED / AWAITING_GROUP / NO_TRACEABILITY)
 `}
 />

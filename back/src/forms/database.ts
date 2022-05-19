@@ -15,11 +15,9 @@ import { FullForm } from "./types";
  * @param form
  */
 export async function getFullForm(form: Form): Promise<FullForm> {
-  const temporaryStorageDetail = await prisma.form
-    .findUnique({
-      where: { id: form.id }
-    })
-    .temporaryStorageDetail();
+  const forwardedIn = await prisma.form
+    .findUnique({ where: { id: form.id } })
+    .forwardedIn();
   const transportSegments = await prisma.form
     .findUnique({
       where: { id: form.id }
@@ -33,7 +31,7 @@ export async function getFullForm(form: Form): Promise<FullForm> {
 
   return {
     ...form,
-    temporaryStorageDetail,
+    forwardedIn,
     transportSegments,
     intermediaries
   };
@@ -73,8 +71,8 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
     ["RECIPIENT"]: [
       { recipientCompanySiret: siret },
       {
-        temporaryStorageDetail: {
-          destinationCompanySiret: siret
+        forwardedIn: {
+          recipientCompanySiret: siret
         }
       }
     ],
@@ -89,7 +87,7 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
         }
       },
       {
-        temporaryStorageDetail: {
+        forwardedIn: {
           transporterCompanySiret: siret
         }
       }
@@ -110,11 +108,8 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
 }
 
 export async function getFinalDestinationSiret(form: Form) {
-  return form.temporaryStorageDetailId
-    ? (
-        await prisma.form
-          .findUnique({ where: { id: form.id } })
-          .temporaryStorageDetail()
-      )?.destinationCompanySiret
+  return form.forwardedInId
+    ? (await prisma.form.findUnique({ where: { id: form.id } }).forwardedIn())
+        ?.recipientCompanySiret
     : form.recipientCompanySiret;
 }

@@ -1,10 +1,4 @@
-import {
-  Form,
-  QuantityType,
-  Status,
-  TemporaryStorageDetail,
-  TransportSegment
-} from "@prisma/client";
+import { Form, QuantityType, Status, TransportSegment } from "@prisma/client";
 import { Bsdd } from "./types";
 
 /**
@@ -18,7 +12,7 @@ export function simpleFormToBsdd(
   const [transporter2, transporter3] = form.transportSegments ?? [];
 
   return {
-    id: form.readableId,
+    id: tov1ReadableId(form.readableId),
     customId: form.customId,
     createdAt: form.createdAt,
     updatedAt: form.updatedAt,
@@ -161,161 +155,10 @@ export function simpleFormToBsdd(
   };
 }
 
-/**
- * Convert a form with temporary storage into a BSDD v2
- */
-export function formWithTempStorageToBsdd(
-  form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
-    grouping: { initialForm: Form }[];
-  } & { transportSegments: TransportSegment[] }
-): Bsdd & { forwarding: Bsdd & { grouping: Bsdd[] } } {
-  const temporaryStorage = form.temporaryStorageDetail;
-  const initial: Bsdd = {
-    ...simpleFormToBsdd(form),
-    destinationReceptionDate: temporaryStorage.tempStorerReceivedAt,
-    destinationReceptionWeight: temporaryStorage.tempStorerQuantityReceived,
-    destinationReceptionAcceptationStatus:
-      temporaryStorage.tempStorerWasteAcceptationStatus,
-    destinationReceptionRefusalReason:
-      temporaryStorage.tempStorerWasteRefusalReason,
-    destinationReceptionSignatureAuthor: temporaryStorage.tempStorerSignedBy,
-    destinationReceptionSignatureDate: temporaryStorage.tempStorerSignedAt,
-    destinationPlannedOperationCode: form.recipientProcessingOperation,
-    destinationOperationCode: form.recipientProcessingOperation,
-    destinationOperationSignatureAuthor: form.receivedBy,
-    destinationOperationSignatureDate: form.receivedAt,
-    destinationOperationDate: form.receivedAt,
-    destinationOperationNoTraceability: false,
-    destinationOperationNextDestinationCompanyName: null,
-    destinationOperationNextDestinationCompanySiret: null,
-    destinationOperationNextDestinationCompanyVatNumber: null,
-    destinationOperationNextDestinationCompanyAddress: null,
-    destinationOperationNextDestinationCompanyContact: null,
-    destinationOperationNextDestinationCompanyPhone: null,
-    destinationOperationNextDestinationCompanyMail: null
-  };
-
-  const reexpedition: Bsdd = {
-    id: form.readableId,
-    customId: null,
-    createdAt: form.createdAt,
-    updatedAt: form.updatedAt,
-    isDeleted: form.isDeleted,
-    isDraft: form.status == Status.DRAFT,
-    status: form.status,
-    wasteCode: form.wasteDetailsCode,
-    wasteDescription: form.wasteDetailsName,
-    pop: form.wasteDetailsPop,
-    traderCompanyName: form.traderCompanyName,
-    traderCompanySiret: form.traderCompanySiret,
-    traderCompanyAddress: form.traderCompanyAddress,
-    traderCompanyContact: form.traderCompanyContact,
-    traderCompanyPhone: form.traderCompanyPhone,
-    traderCompanyMail: form.traderCompanyMail,
-    traderRecepisseNumber: form.traderReceipt,
-    traderRecepisseDepartment: form.traderDepartment,
-    traderRecepisseValidityLimit: form.traderValidityLimit,
-    brokerCompanyName: form.brokerCompanyName,
-    brokerCompanySiret: form.brokerCompanySiret,
-    brokerCompanyAddress: form.brokerCompanyAddress,
-    brokerCompanyContact: form.brokerCompanyContact,
-    brokerCompanyPhone: form.brokerCompanyPhone,
-    brokerCompanyMail: form.brokerCompanyMail,
-    brokerRecepisseNumber: form.brokerReceipt,
-    brokerRecepisseDepartment: form.brokerDepartment,
-    brokerRecepisseValidityLimit: form.brokerValidityLimit,
-    ecoOrganismeName: form.ecoOrganismeName,
-    ecoOrganismeSiret: form.ecoOrganismeSiret,
-    emitterCompanyName: form.recipientCompanyName,
-    emitterCompanySiret: form.recipientCompanySiret,
-    emitterCompanyAddress: form.recipientCompanyAddress,
-    emitterCompanyContact: form.recipientCompanyContact,
-    emitterCompanyPhone: form.recipientCompanyPhone,
-    emitterCompanyMail: form.recipientCompanyMail,
-    emitterCustomInfo: null,
-    emitterPickupSiteName: null,
-    emitterPickupSiteAddress: null,
-    emitterPickupSiteCity: null,
-    emitterPickupSitePostalCode: null,
-    emitterPickupSiteInfos: null,
-    emitterEmissionSignatureAuthor: temporaryStorage.signedBy,
-    emitterEmissionSignatureDate: temporaryStorage.signedAt,
-    packagings: temporaryStorage.wasteDetailsPackagingInfos,
-    weightValue: temporaryStorage.wasteDetailsQuantity,
-    wasteAdr: temporaryStorage.wasteDetailsOnuCode,
-    weightIsEstimate:
-      temporaryStorage.wasteDetailsQuantityType == QuantityType.ESTIMATED,
-    transporterCompanyName: temporaryStorage.transporterCompanyName,
-    transporterCompanySiret: temporaryStorage.transporterCompanySiret,
-    transporterCompanyVatNumber: form.transporterCompanyVatNumber,
-    transporterCompanyAddress: temporaryStorage.transporterCompanyAddress,
-    transporterCompanyContact: temporaryStorage.transporterCompanyContact,
-    transporterCompanyPhone: temporaryStorage.transporterCompanyPhone,
-    transporterCompanyMail: temporaryStorage.transporterCompanyMail,
-    transporterCustomInfo: temporaryStorage.transporterCustomInfo,
-    transporterRecepisseIsExempted:
-      temporaryStorage.transporterIsExemptedOfReceipt,
-    transporterRecepisseNumber: temporaryStorage.transporterReceipt,
-    transporterRecepisseDepartment: temporaryStorage.transporterDepartment,
-    transporterRecepisseValidityLimit:
-      temporaryStorage.transporterValidityLimit,
-    transporterTransportMode: null,
-    transporterNumberPlates: form.transporterNumberPlate
-      ? [form.transporterNumberPlate]
-      : [],
-    transporterTransportTakenOverAt: temporaryStorage.signedAt,
-    transporterTransportSignatureAuthor: temporaryStorage.signedBy,
-    transporterTransportSignatureDate: temporaryStorage.signedAt,
-    destinationCompanyName: temporaryStorage.destinationCompanyName,
-    destinationCompanySiret: temporaryStorage.destinationCompanySiret,
-    destinationCompanyAddress: temporaryStorage.destinationCompanyAddress,
-    destinationCompanyContact: temporaryStorage.destinationCompanyContact,
-    destinationCompanyPhone: temporaryStorage.destinationCompanyPhone,
-    destinationCompanyMail: temporaryStorage.destinationCompanyMail,
-    destinationCustomInfo: null,
-    destinationReceptionDate: form.receivedAt,
-    destinationReceptionWeight: form.quantityReceived,
-    destinationReceptionAcceptationStatus: form.wasteAcceptationStatus,
-    destinationReceptionRefusalReason: form.wasteRefusalReason,
-    destinationReceptionSignatureAuthor: form.receivedBy,
-    destinationReceptionSignatureDate: form.receivedAt,
-    destinationPlannedOperationCode: form.recipientProcessingOperation,
-    destinationOperationCode: form.processingOperationDone,
-    destinationOperationSignatureAuthor: form.processedBy,
-    destinationOperationSignatureDate: form.processedAt,
-    destinationOperationDate: form.processedAt,
-    destinationOperationNoTraceability: form.noTraceability,
-    destinationCap: form.recipientCap,
-    destinationOperationNextDestinationCompanyName:
-      form.nextDestinationCompanyName,
-    destinationOperationNextDestinationCompanySiret:
-      form.nextDestinationCompanySiret,
-    destinationOperationNextDestinationCompanyVatNumber: null,
-    destinationOperationNextDestinationCompanyAddress:
-      form.nextDestinationCompanyAddress,
-    destinationOperationNextDestinationCompanyContact:
-      form.nextDestinationCompanyContact,
-    destinationOperationNextDestinationCompanyPhone:
-      form.nextDestinationCompanyPhone,
-    destinationOperationNextDestinationCompanyMail:
-      form.nextDestinationCompanyMail
-  };
-
-  return {
-    ...reexpedition,
-    forwarding: {
-      ...initial,
-      grouping: form.grouping.map(({ initialForm }) =>
-        simpleFormToBsdd(initialForm)
-      )
-    }
-  };
-}
-
 export function formToBsdd(
-  form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
-    grouping: { initialForm: Form }[];
-  } & { transportSegments: TransportSegment[] }
+  form: Form & { forwarding?: Form } & {
+    grouping?: { initialForm: Form }[];
+  } & { transportSegments?: TransportSegment[] }
 ): Bsdd & { grouping: Bsdd[] } & { forwarding: Bsdd & { grouping: Bsdd[] } } {
   let grouping: Bsdd[] = [];
 
@@ -325,9 +168,23 @@ export function formToBsdd(
     );
   }
 
-  if (form.temporaryStorageDetail) {
-    return { ...formWithTempStorageToBsdd(form), grouping };
-  } else {
-    return { ...simpleFormToBsdd(form), forwarding: null, grouping };
-  }
+  return {
+    ...simpleFormToBsdd(form),
+    ...(form.forwarding
+      ? {
+          forwarding: {
+            ...simpleFormToBsdd(form.forwarding),
+            grouping: null
+          }
+        }
+      : { forwarding: null }),
+    grouping
+  };
+}
+
+/**
+ * Do not expose BSD suite id (ex : BSD-20220603-PDTKKH7W2-suite) to end user
+ */
+export function tov1ReadableId(readableId: string) {
+  return readableId.replace("-suite", "");
 }

@@ -42,7 +42,7 @@ const updateFormResolver = async (
   args: MutationUpdateFormArgs,
   context: GraphQLContext
 ) => {
-  return prisma.$transaction(async transaction => {
+  const updatedForm = await prisma.$transaction(async transaction => {
     const user = checkIsAuthenticated(context);
 
     const { updateFormInput } = validateArgs(args);
@@ -92,11 +92,11 @@ const updateFormResolver = async (
         formContent.recipient?.isTempStorage !== false) ||
       formContent.recipient?.isTempStorage === true;
 
-    const existingTemporaryStorageDetail = await prisma.form
+    const forwardedIn = await prisma.form
       .findUnique({
         where: { id: existingForm.id }
       })
-      .temporaryStorageDetail();
+      .forwardedIn();
 
     const formCompanies = await formToCompanies(existingForm);
     const nextFormCompanies: FormCompanies = {
@@ -127,13 +127,12 @@ const updateFormResolver = async (
           })
     };
 
-    if (temporaryStorageDetail || existingTemporaryStorageDetail) {
-      nextFormCompanies.temporaryStorageDetail = {
-        destinationCompanySiret:
+    if (temporaryStorageDetail || forwardedIn) {
+      nextFormCompanies.forwardedIn = {
+        recipientCompanySiret:
           temporaryStorageDetail?.destination?.company?.siret ??
-          existingTemporaryStorageDetail?.destinationCompanySiret,
-        transporterCompanySiret:
-          existingTemporaryStorageDetail?.transporterCompanySiret
+          forwardedIn?.recipientCompanySiret,
+        transporterCompanySiret: forwardedIn?.transporterCompanySiret
       };
     }
 
@@ -145,10 +144,10 @@ const updateFormResolver = async (
 
     // Delete temporaryStorageDetail
     if (
-      existingTemporaryStorageDetail &&
+      forwardedIn &&
       (!isOrWillBeTempStorage || temporaryStorageDetail === null)
     ) {
-      formUpdateInput.temporaryStorageDetail = { disconnect: true };
+      formUpdateInput.forwardedIn = { delete: true };
     }
 
     if (temporaryStorageDetail) {
@@ -159,13 +158,17 @@ const updateFormResolver = async (
         throw new MissingTempStorageFlag();
       }
 
-      if (existingTemporaryStorageDetail) {
-        formUpdateInput.temporaryStorageDetail = {
+      if (forwardedIn) {
+        formUpdateInput.forwardedIn = {
           update: flattenTemporaryStorageDetailInput(temporaryStorageDetail)
         };
       } else {
-        formUpdateInput.temporaryStorageDetail = {
-          create: flattenTemporaryStorageDetailInput(temporaryStorageDetail)
+        formUpdateInput.forwardedIn = {
+          create: {
+            owner: { connect: { id: user.id } },
+            readableId: `${form.readableId}-suite`,
+            ...flattenTemporaryStorageDetailInput(temporaryStorageDetail)
+          }
         };
       }
     }
@@ -250,8 +253,9 @@ const updateFormResolver = async (
       appendix2
     });
 
-    return expandFormFromDb(updatedForm);
+    return updatedForm;
   });
+  return expandFormFromDb(updatedForm);
 };
 
 export default updateFormResolver;

@@ -1,4 +1,5 @@
 import { toPrismaBsds } from "../common/elastic";
+import { tov1ReadableId } from "../forms/compat";
 import { WasteRegistryType } from "../generated/graphql/types";
 import { toWastes } from "./converters";
 import { searchBsds } from "./elastic";
@@ -47,7 +48,7 @@ async function getWasteConnection<WasteType extends GenericWaste>(
     searchHits.hits.map(hit => hit._source),
     {
       BSDD: {
-        temporaryStorageDetail: true,
+        forwarding: true,
         grouping: { include: { initialForm: true } },
         transportSegments: true
       },
@@ -56,12 +57,15 @@ async function getWasteConnection<WasteType extends GenericWaste>(
       BSFF: { grouping: true, forwarding: true, repackaging: true }
     }
   );
-  const wastes = toWastes<WasteType>(registryType, args.sirets, bsds);
+
+  const wastes = toWastes<WasteType>(registryType, bsds);
 
   const edges = hits.reduce<Array<WasteEdge<WasteType>>>(
     (acc, { _source: { type, id, readableId } }) => {
       const waste = wastes[type].find(waste =>
-        type === "BSDD" ? waste.id === readableId : waste.id === id
+        type === "BSDD"
+          ? waste.id === tov1ReadableId(readableId)
+          : waste.id === id
       );
 
       if (waste) {

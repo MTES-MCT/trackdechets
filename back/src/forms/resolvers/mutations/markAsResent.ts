@@ -1,13 +1,14 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
-import { expandFormFromDb, flattenResentFormInput } from "../../form-converter";
+import { expandFormFromDb, flattenFormInput } from "../../form-converter";
 import transitionForm from "../../workflow/transitionForm";
 import { checkCanMarkAsResent } from "../../permissions";
 import { UserInputError } from "apollo-server-express";
-import { resealedFormSchema } from "../../validation";
+import { checkCompaniesType, sealedFormSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
+import { EmitterType, Prisma, Status } from "@prisma/client";
 
 const markAsResentResolver: MutationResolvers["markAsResent"] = async (
   parent,
@@ -20,30 +21,52 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
 
   const form = await getFormOrFormNotFound({ id });
 
-  await checkCanMarkAsResent(user, form);
   const formRepository = getFormRepository(user);
 
-  if (form.status === "TEMP_STORER_ACCEPTED") {
-    const { temporaryStorageDetail } = await formRepository.findFullFormById(
-      form.id
-    );
+  const { forwardedIn } = await formRepository.findFullFormById(form.id);
 
-    if (temporaryStorageDetail === null) {
-      throw new UserInputError(
-        "Ce bordereau ne correspond pas à un entreposage provisoire ou un reconditionnemnt"
-      );
-    }
-    await resealedFormSchema.validate({
-      ...temporaryStorageDetail,
-      ...flattenResentFormInput(resentInfos)
-    });
+  if (forwardedIn === null) {
+    throw new UserInputError(
+      "Ce bordereau ne correspond pas à un entreposage provisoire ou un reconditionnemnt"
+    );
   }
 
-  const formUpdateInput = {
-    temporaryStorageDetail: {
-      update: flattenResentFormInput(resentInfos)
+  await checkCanMarkAsResent(user, form);
+
+  const { destination, transporter, wasteDetails } = resentInfos;
+
+  // copy basic info from initial BSD and overwrite it with resealedInfos
+  const updateInput: Prisma.FormUpdateInput = {
+    emitterType: EmitterType.PRODUCER,
+    emitterCompanySiret: form.recipientCompanySiret,
+    emitterCompanyName: form.recipientCompanyName,
+    emitterCompanyAddress: form.recipientCompanyAddress,
+    emitterCompanyContact: form.recipientCompanyContact,
+    emitterCompanyMail: form.recipientCompanyMail,
+    emitterCompanyPhone: form.recipientCompanyPhone,
+    wasteDetailsCode: form.wasteDetailsCode,
+    wasteDetailsConsistence: form.wasteDetailsConsistence,
+    wasteDetailsIsDangerous: form.wasteDetailsIsDangerous,
+    wasteDetailsName: form.wasteDetailsName,
+    wasteDetailsOnuCode: form.wasteDetailsOnuCode,
+    wasteDetailsPop: form.wasteDetailsPop,
+    ...flattenFormInput({ transporter, wasteDetails, recipient: destination })
+  };
+
+  // validate input
+  await sealedFormSchema.validate({
+    ...forwardedIn,
+    ...updateInput
+  });
+
+  await checkCompaniesType(form);
+
+  const formUpdateInput: Prisma.FormUpdateInput = {
+    forwardedIn: {
+      update: { ...updateInput, status: Status.SENT }
     }
   };
+
   const resentForm = await transitionForm(user, form, {
     type: EventType.MarkAsResent,
     formUpdateInput

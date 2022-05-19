@@ -10,6 +10,15 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout de la révision BSDA, qui rend possible la modification de certains champs du bordereau même après la fin de son cycle de vie [PR 1443](https://github.com/MTES-MCT/trackdechets/pull/1443)
+- Ajout de la possibilité d'ajouter un supprimer une étape d'entreposage provisoire sur le BSDD [PR 1449](https://github.com/MTES-MCT/trackdechets/pull/1449)
+
+```mermaid
+graph TD
+ACCEPTED -->|markAsProcessed| PROCESSED(PROCESSED / AWAITING_GROUP / NO_TRACEABILITY)
+ACCEPTED -.->|markAsResealed| RESEALED(RESEALED)
+TEMP_STORER_ACCEPTED -->|markAsResealed| RESEALED(RESEALED)
+TEMP_STORER_ACCEPTED -.->|markAsProcessed| PROCESSED(PROCESSED / AWAITING_GROUP / NO_TRACEABILITY)
+```
 
 
 #### :bug: Corrections de bugs
@@ -18,7 +27,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :boom: Breaking changes
 #### :nail_care: Améliorations
- 
+
 - Affiche les adresses emails des administrateurs d'un établissement lors d'une demande de rattachement si l'email du requérant appartient au même nom de domaine [PR 1429](https://github.com/MTES-MCT/trackdechets/pull/1429)
 
 - Ajout de suggestions lors de l'ajout d'un établissement fermé. [PR 1463](https://github.com/MTES-MCT/trackdechets/pull/1463)

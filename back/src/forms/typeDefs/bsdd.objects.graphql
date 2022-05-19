@@ -302,6 +302,7 @@ type TemporaryStorer {
   receivedBy: String
 }
 
+"Destination finale après entreposage provisoire ou reconditionement"
 type Destination {
   "N° de CAP (le cas échéant)"
   cap: String
@@ -312,7 +313,10 @@ type Destination {
   "Établissement de destination"
   company: FormCompany
 
-  "Indique si l'information a été saisie par l'émetteur du bordereau ou l'installation d'entreposage"
+  """
+  DEPRECATED (renvoie toujours `false`) - Indique si l'information a été saisie par
+  l'émetteur du bordereau ou l'installation d'entreposage
+  """
   isFilledByEmitter: Boolean
 }
 

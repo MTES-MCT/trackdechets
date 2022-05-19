@@ -2,6 +2,7 @@ import * as React from "react";
 import { Field, useFormikContext } from "formik";
 import {
   Form,
+  FormStatus,
   QuantityType,
   SignTransportFormInput,
 } from "generated/graphql/types";
@@ -43,6 +44,8 @@ export function FormWasteTransportSummary({
         .filter((name, index, fields) => fields.indexOf(name) === index)
     );
 
+  const { temporaryStorageDetail } = form;
+
   return (
     <>
       <DataList>
@@ -58,26 +61,51 @@ export function FormWasteTransportSummary({
         </DataListItem>
         <DataListItem>
           <DataListTerm>Poids en tonnes</DataListTerm>
-          <DataListDescription>
-            {form.wasteDetails?.quantity}{" "}
-            {form.wasteDetails?.quantityType === QuantityType.Estimated
-              ? "(estimé)"
-              : ""}
-          </DataListDescription>
+
+          {form.status === FormStatus.SignedByTempStorer ? (
+            <DataListDescription>
+              {temporaryStorageDetail?.wasteDetails?.quantity}{" "}
+              {temporaryStorageDetail?.wasteDetails?.quantityType ===
+              QuantityType.Estimated
+                ? "(estimé)"
+                : ""}
+            </DataListDescription>
+          ) : (
+            <DataListDescription>
+              {form.wasteDetails?.quantity}{" "}
+              {form.wasteDetails?.quantityType === QuantityType.Estimated
+                ? "(estimé)"
+                : ""}
+            </DataListDescription>
+          )}
         </DataListItem>
         <DataListItem>
           <DataListTerm>Contenant(s)</DataListTerm>
-          <DataListDescription>
-            {form.wasteDetails?.packagingInfos
-              ?.map(packaging => `${packaging.quantity} ${packaging.type}`)
-              .join(", ")}
-          </DataListDescription>
+          {form.status === FormStatus.SignedByTempStorer ? (
+            <DataListDescription>
+              {temporaryStorageDetail?.wasteDetails?.packagingInfos
+                ?.map(packaging => `${packaging.quantity} ${packaging.type}`)
+                .join(", ")}
+            </DataListDescription>
+          ) : (
+            <DataListDescription>
+              {form.wasteDetails?.packagingInfos
+                ?.map(packaging => `${packaging.quantity} ${packaging.type}`)
+                .join(", ")}
+            </DataListDescription>
+          )}
         </DataListItem>
         <DataListItem>
           <DataListTerm>Code ADR (ONU)</DataListTerm>
-          <DataListDescription>
-            {form.wasteDetails?.onuCode ?? "Non soumis"}
-          </DataListDescription>
+          {form.status === FormStatus.SignedByTempStorer ? (
+            <DataListDescription>
+              {temporaryStorageDetail?.wasteDetails?.onuCode ?? "Non soumis"}
+            </DataListDescription>
+          ) : (
+            <DataListDescription>
+              {form.wasteDetails?.onuCode ?? "Non soumis"}
+            </DataListDescription>
+          )}
         </DataListItem>
         <DataListItem>
           <DataListTerm>Plaque d'immatriculation</DataListTerm>

@@ -4,12 +4,17 @@ import CompanySelector from "form/common/components/company/CompanySelector";
 import styles from "./TemporaryStorage.module.scss";
 import classNames from "classnames";
 import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";
+import TdTooltip from "common/components/Tooltip";
 
 export default function TemporaryStorage(props) {
+  const tooltipMsg =
+    "Permet de donner une consigne particulière concernant" +
+    " le lieu de transformation ou de traitement du déchet," +
+    " après la phase intermédiaire d’entreposage provisoire ou de reconditionnement.";
   return (
     <>
       <h4 className="form__section-heading">
-        Installation de destination prévue
+        Installation de destination prévue <TdTooltip msg={tooltipMsg} />
       </h4>
       <CompanySelector
         name={

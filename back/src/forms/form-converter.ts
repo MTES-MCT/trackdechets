@@ -1,14 +1,13 @@
 import {
   Form as PrismaForm,
-  TemporaryStorageDetail as PrismaTemporaryStorageDetail,
   TransportSegment as PrismaTransportSegment,
   Prisma,
-  BsddRevisionRequest
+  BsddRevisionRequest,
+  Form
 } from "@prisma/client";
 import {
   Form as GraphQLForm,
   Appendix2Form as GraphQLAppendix2Form,
-  TemporaryStorageDetail as GraphQLTemporaryStorageDetail,
   TransportSegment as GraphQLTransportSegment,
   Emitter,
   Recipient,
@@ -25,11 +24,9 @@ import {
   TemporaryStorageDetailInput,
   EmitterInput,
   ProcessedFormInput,
-  ResealedFormInput,
   DestinationInput,
   WasteDetailsInput,
   TransporterInput,
-  ResentFormInput,
   RecipientInput,
   TraderInput,
   BrokerInput,
@@ -47,47 +44,11 @@ import {
   FormRevisionRequestTemporaryStorageDetail,
   FormRevisionRequestDestination,
   FormRevisionRequestRecipient,
-  ParcelNumber
+  ParcelNumber,
+  Destination
 } from "../generated/graphql/types";
 import { extractPostalCode } from "../utils";
-
-export function flattenObjectForDb(
-  input,
-  previousKeys = [],
-  dbObject = {}
-): Partial<PrismaForm> {
-  const relations = ["temporaryStorageDetail"];
-
-  Object.keys(input || {}).forEach(key => {
-    if (relations.includes(key)) {
-      dbObject[key] = {};
-      return input[key]
-        ? flattenObjectForDb(input[key], [], dbObject[key])
-        : {};
-    }
-
-    if (
-      input[key] &&
-      !Array.isArray(input[key]) &&
-      typeof input[key] === "object"
-    ) {
-      return flattenObjectForDb(input[key], [...previousKeys, key], dbObject);
-    }
-
-    const objectKey = [...previousKeys, key]
-      .map((k, i) => {
-        if (i !== 0) {
-          return k.charAt(0).toUpperCase() + k.slice(1);
-        }
-        return k;
-      })
-      .join("");
-
-    dbObject[objectKey] = input[key];
-  });
-
-  return dbObject;
-}
+import prisma from "../prisma";
 
 /**
  * Return null if all object values are null
@@ -137,28 +98,28 @@ export function undefinedOrDefault<I>(value: I, defaultValue: I): I {
 
 function flattenDestinationInput(input: {
   destination?: DestinationInput;
-}): Prisma.TemporaryStorageDetailCreateInput {
+}): Partial<Prisma.FormCreateInput> {
   return {
-    destinationCompanyName: chain(input.destination, d =>
+    recipientCompanyName: chain(input.destination, d =>
       chain(d.company, c => c.name)
     ),
-    destinationCompanySiret: chain(input.destination, d =>
+    recipientCompanySiret: chain(input.destination, d =>
       chain(d.company, c => c.siret)
     ),
-    destinationCompanyAddress: chain(input.destination, d =>
+    recipientCompanyAddress: chain(input.destination, d =>
       chain(d.company, c => c.address)
     ),
-    destinationCompanyContact: chain(input.destination, d =>
+    recipientCompanyContact: chain(input.destination, d =>
       chain(d.company, c => c.contact)
     ),
-    destinationCompanyPhone: chain(input.destination, d =>
+    recipientCompanyPhone: chain(input.destination, d =>
       chain(d.company, c => c.phone)
     ),
-    destinationCompanyMail: chain(input.destination, d =>
+    recipientCompanyMail: chain(input.destination, d =>
       chain(d.company, c => c.mail)
     ),
-    destinationCap: chain(input.destination, d => d.cap),
-    destinationProcessingOperation: chain(
+    recipientCap: chain(input.destination, d => d.cap),
+    recipientProcessingOperation: chain(
       input.destination,
       d => d.processingOperation
     )
@@ -181,13 +142,11 @@ function flattenWasteDetailsInput(input: { wasteDetails?: WasteDetailsInput }) {
     wasteDetailsParcelNumbers: chain(input.wasteDetails, w =>
       undefinedOrDefault(w.parcelNumbers, [])
     ),
-    wasteDetailsAnalysisReferences: chain(
-      input.wasteDetails,
-      w => w.analysisReferences
+    wasteDetailsAnalysisReferences: chain(input.wasteDetails, w =>
+      undefinedOrDefault(w.analysisReferences, [])
     ),
-    wasteDetailsLandIdentifiers: chain(
-      input.wasteDetails,
-      w => w.landIdentifiers
+    wasteDetailsLandIdentifiers: chain(input.wasteDetails, w =>
+      undefinedOrDefault(w.landIdentifiers, [])
     )
   };
 }
@@ -486,30 +445,8 @@ function flattenReceivedInfo(receivedInfo: ReceivedFormInput) {
 
 export function flattenTemporaryStorageDetailInput(
   tempStorageInput: TemporaryStorageDetailInput
-): Prisma.TemporaryStorageDetailCreateInput {
+): Partial<Prisma.FormCreateInput> {
   return safeInput(flattenDestinationInput(tempStorageInput));
-}
-
-export function flattenResealedFormInput(
-  resealedFormInput: ResealedFormInput
-): Prisma.TemporaryStorageDetailUpdateInput {
-  return safeInput({
-    ...flattenDestinationInput(resealedFormInput),
-    ...flattenWasteDetailsInput(resealedFormInput),
-    ...flattenTransporterInput(resealedFormInput)
-  });
-}
-
-export function flattenResentFormInput(
-  resentFormInput: ResentFormInput
-): Prisma.TemporaryStorageDetailUpdateInput {
-  return safeInput({
-    ...flattenDestinationInput(resentFormInput),
-    ...flattenWasteDetailsInput(resentFormInput),
-    ...flattenTransporterInput(resentFormInput),
-    signedBy: resentFormInput.signedBy,
-    signedAt: resentFormInput.signedAt
-  });
 }
 
 export function flattenSignedByTransporterInput(
@@ -561,7 +498,11 @@ export function flattenTransportSegmentInput(
 /**
  * Expand form data from db
  */
-export function expandFormFromDb(form: PrismaForm): GraphQLForm {
+export async function expandFormFromDb(form: PrismaForm): Promise<GraphQLForm> {
+  const forwardedIn: Form = form.forwardedInId
+    ? await prisma.form.findUnique({ where: { id: form.id } }).forwardedIn()
+    : null;
+
   return {
     id: form.id,
     readableId: form.readableId,
@@ -678,39 +619,135 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
     signedByTransporter: form.signedByTransporter,
     sentAt: form.sentAt,
     sentBy: form.sentBy,
-    wasteAcceptationStatus: form.wasteAcceptationStatus,
-    wasteRefusalReason: form.wasteRefusalReason,
-    receivedBy: form.receivedBy,
-    receivedAt: form.receivedAt,
-    signedAt: form.signedAt,
-    quantityReceived: form.quantityReceived,
+    wasteAcceptationStatus: forwardedIn
+      ? forwardedIn.wasteAcceptationStatus
+      : form.wasteAcceptationStatus,
+    wasteRefusalReason: forwardedIn
+      ? forwardedIn.wasteRefusalReason
+      : form.wasteRefusalReason,
+    receivedBy: forwardedIn ? forwardedIn.receivedBy : form.receivedBy,
+    receivedAt: forwardedIn ? forwardedIn.receivedAt : form.receivedAt,
+    signedAt: forwardedIn ? forwardedIn.signedAt : form.signedAt,
+    quantityReceived: forwardedIn
+      ? forwardedIn.quantityReceived
+      : form.quantityReceived,
     quantityGrouped: form.quantityGrouped,
-    processingOperationDone: form.processingOperationDone,
-    processingOperationDescription: form.processingOperationDescription,
-    processedBy: form.processedBy,
-    processedAt: form.processedAt,
-    noTraceability: form.noTraceability,
-    nextDestination: nullIfNoValues<NextDestination>({
-      processingOperation: form.nextDestinationProcessingOperation,
-      company: nullIfNoValues<FormCompany>({
-        name: form.nextDestinationCompanyName,
-        siret: form.nextDestinationCompanySiret,
-        address: form.nextDestinationCompanyAddress,
-        country: form.nextDestinationCompanyCountry,
-        contact: form.nextDestinationCompanyContact,
-        phone: form.nextDestinationCompanyPhone,
-        mail: form.nextDestinationCompanyMail
-      })
-    }),
+    processingOperationDone: forwardedIn
+      ? forwardedIn.processingOperationDone
+      : form.processingOperationDone,
+    processingOperationDescription: forwardedIn
+      ? forwardedIn.processingOperationDescription
+      : form.processingOperationDescription,
+    processedBy: forwardedIn ? forwardedIn.processedBy : form.processedBy,
+    processedAt: forwardedIn ? forwardedIn.processedAt : form.processedAt,
+    noTraceability: forwardedIn
+      ? forwardedIn.noTraceability
+      : form.noTraceability,
+    nextDestination: forwardedIn
+      ? nullIfNoValues<NextDestination>({
+          processingOperation: forwardedIn.nextDestinationProcessingOperation,
+          company: nullIfNoValues<FormCompany>({
+            name: forwardedIn.nextDestinationCompanyName,
+            siret: forwardedIn.nextDestinationCompanySiret,
+            address: forwardedIn.nextDestinationCompanyAddress,
+            country: forwardedIn.nextDestinationCompanyCountry,
+            contact: forwardedIn.nextDestinationCompanyContact,
+            phone: forwardedIn.nextDestinationCompanyPhone,
+            mail: forwardedIn.nextDestinationCompanyMail
+          })
+        })
+      : nullIfNoValues<NextDestination>({
+          processingOperation: form.nextDestinationProcessingOperation,
+          company: nullIfNoValues<FormCompany>({
+            name: form.nextDestinationCompanyName,
+            siret: form.nextDestinationCompanySiret,
+            address: form.nextDestinationCompanyAddress,
+            country: form.nextDestinationCompanyCountry,
+            contact: form.nextDestinationCompanyContact,
+            phone: form.nextDestinationCompanyPhone,
+            mail: form.nextDestinationCompanyMail
+          })
+        }),
     currentTransporterSiret: form.currentTransporterSiret,
     nextTransporterSiret: form.nextTransporterSiret,
-    intermediaries: []
+    intermediaries: [],
+    temporaryStorageDetail: forwardedIn
+      ? {
+          temporaryStorer: {
+            quantityType: form.quantityReceivedType,
+            quantityReceived: form.quantityReceived,
+            wasteAcceptationStatus: form.wasteAcceptationStatus,
+            wasteRefusalReason: form.wasteRefusalReason,
+            receivedAt: form.receivedAt,
+            receivedBy: form.receivedBy
+          },
+          destination: nullIfNoValues<Destination>({
+            cap: forwardedIn.recipientCap,
+            processingOperation: forwardedIn.recipientProcessingOperation,
+            company: nullIfNoValues<FormCompany>({
+              name: forwardedIn.recipientCompanyName,
+              siret: forwardedIn.recipientCompanySiret,
+              address: forwardedIn.recipientCompanyAddress,
+              contact: forwardedIn.recipientCompanyContact,
+              phone: forwardedIn.recipientCompanyPhone,
+              mail: forwardedIn.recipientCompanyMail
+            }),
+            isFilledByEmitter: false // DEPRECATED, always returns false
+          }),
+          wasteDetails: nullIfNoValues<WasteDetails>({
+            code: forwardedIn.wasteDetailsCode,
+            name: forwardedIn.wasteDetailsName,
+            onuCode: forwardedIn.wasteDetailsOnuCode,
+            packagingInfos:
+              forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[],
+            // DEPRECATED - To remove with old packaging fields
+            ...getDeprecatedPackagingApiFields(
+              forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[]
+            ),
+            quantity: forwardedIn.wasteDetailsQuantity,
+            quantityType: forwardedIn.wasteDetailsQuantityType,
+            consistence: forwardedIn.wasteDetailsConsistence,
+            pop: forwardedIn.wasteDetailsPop,
+            isDangerous: forwardedIn.wasteDetailsIsDangerous
+          }),
+          transporter: nullIfNoValues<Transporter>({
+            company: nullIfNoValues<FormCompany>({
+              name: forwardedIn.transporterCompanyName,
+              siret: forwardedIn.transporterCompanySiret,
+              vatNumber: forwardedIn.transporterCompanyVatNumber,
+              address: forwardedIn.transporterCompanyAddress,
+              contact: forwardedIn.transporterCompanyContact,
+              phone: forwardedIn.transporterCompanyPhone,
+              mail: forwardedIn.transporterCompanyMail
+            }),
+            isExemptedOfReceipt: forwardedIn.transporterIsExemptedOfReceipt,
+            receipt: forwardedIn.transporterReceipt,
+            department: forwardedIn.transporterDepartment,
+            validityLimit: forwardedIn.transporterValidityLimit,
+            numberPlate: forwardedIn.transporterNumberPlate,
+            customInfo: forwardedIn.transporterCustomInfo,
+            // transportMode has default value in DB but we do not want to return anything
+            // if the transporter siret is not defined
+            mode: forwardedIn.transporterCompanySiret
+              ? forwardedIn.transporterTransportMode
+              : null
+          }),
+          emittedAt: forwardedIn.emittedAt,
+          emittedBy: forwardedIn.emittedBy,
+          takenOverAt: forwardedIn.takenOverAt,
+          takenOverBy: forwardedIn.takenOverBy,
+          // Deprecated: Remplacé par takenOverAt
+          signedAt: forwardedIn.takenOverAt,
+          // Deprecated: Remplacé par emittedBy
+          signedBy: forwardedIn.emittedBy
+        }
+      : null
   };
 }
 
-export function expandAppendix2FormFromDb(
+export async function expandAppendix2FormFromDb(
   prismaForm: PrismaForm
-): GraphQLAppendix2Form {
+): Promise<GraphQLAppendix2Form> {
   const {
     id,
     readableId,
@@ -721,7 +758,7 @@ export function expandAppendix2FormFromDb(
     quantityReceived,
     processingOperationDone,
     quantityGrouped
-  } = expandFormFromDb(prismaForm);
+  } = await expandFormFromDb(prismaForm);
 
   const hasPickupSite = emitter?.workSite?.postalCode?.length > 0;
 
@@ -738,82 +775,6 @@ export function expandAppendix2FormFromDb(
     quantityReceived,
     quantityGrouped,
     processingOperationDone
-  };
-}
-
-/**
- * Expand temporary storage data from db
- */
-export function expandTemporaryStorageFromDb(
-  temporaryStorageDetail: PrismaTemporaryStorageDetail
-): GraphQLTemporaryStorageDetail {
-  return {
-    temporaryStorer: nullIfNoValues({
-      quantityType: temporaryStorageDetail.tempStorerQuantityType,
-      quantityReceived: temporaryStorageDetail.tempStorerQuantityReceived,
-      wasteAcceptationStatus:
-        temporaryStorageDetail.tempStorerWasteAcceptationStatus,
-      wasteRefusalReason: temporaryStorageDetail.tempStorerWasteRefusalReason,
-      receivedAt: temporaryStorageDetail.tempStorerReceivedAt,
-      receivedBy: temporaryStorageDetail.tempStorerReceivedBy
-    }),
-    destination: nullIfNoValues({
-      cap: temporaryStorageDetail.destinationCap,
-      processingOperation:
-        temporaryStorageDetail.destinationProcessingOperation,
-      company: nullIfNoValues({
-        name: temporaryStorageDetail.destinationCompanyName,
-        siret: temporaryStorageDetail.destinationCompanySiret,
-        address: temporaryStorageDetail.destinationCompanyAddress,
-        contact: temporaryStorageDetail.destinationCompanyContact,
-        phone: temporaryStorageDetail.destinationCompanyPhone,
-        mail: temporaryStorageDetail.destinationCompanyMail
-      }),
-      isFilledByEmitter: temporaryStorageDetail.destinationIsFilledByEmitter
-    }),
-    wasteDetails: nullIfNoValues({
-      code: null,
-      name: null,
-      onuCode: temporaryStorageDetail.wasteDetailsOnuCode,
-      packagingInfos:
-        temporaryStorageDetail.wasteDetailsPackagingInfos as PackagingInfo[],
-      // DEPRECATED - To remove with old packaging fields
-      ...getDeprecatedPackagingApiFields(
-        temporaryStorageDetail.wasteDetailsPackagingInfos as PackagingInfo[]
-      ),
-      quantity: temporaryStorageDetail.wasteDetailsQuantity,
-      quantityType: temporaryStorageDetail.wasteDetailsQuantityType,
-      consistence: null
-    }),
-    transporter: nullIfNoValues({
-      company: nullIfNoValues({
-        name: temporaryStorageDetail.transporterCompanyName,
-        siret: temporaryStorageDetail.transporterCompanySiret,
-        vatNumber: temporaryStorageDetail.transporterCompanyVatNumber,
-        address: temporaryStorageDetail.transporterCompanyAddress,
-        contact: temporaryStorageDetail.transporterCompanyContact,
-        phone: temporaryStorageDetail.transporterCompanyPhone,
-        mail: temporaryStorageDetail.transporterCompanyMail
-      }),
-      isExemptedOfReceipt:
-        temporaryStorageDetail.transporterIsExemptedOfReceipt,
-      receipt: temporaryStorageDetail.transporterReceipt,
-      department: temporaryStorageDetail.transporterDepartment,
-      validityLimit: temporaryStorageDetail.transporterValidityLimit,
-      numberPlate: temporaryStorageDetail.transporterNumberPlate,
-      customInfo: null,
-      // transportMode has default value in DB but we do not want to return anything
-      // if the transporter siret is not defined
-      mode: temporaryStorageDetail.transporterCompanySiret
-        ? temporaryStorageDetail.transporterTransportMode
-        : null
-    }),
-    emittedAt: temporaryStorageDetail.emittedAt,
-    emittedBy: temporaryStorageDetail.emittedBy,
-    takenOverBy: temporaryStorageDetail.takenOverBy,
-    takenOverAt: temporaryStorageDetail.takenOverAt,
-    signedBy: temporaryStorageDetail.signedBy,
-    signedAt: temporaryStorageDetail.signedAt
   };
 }
 

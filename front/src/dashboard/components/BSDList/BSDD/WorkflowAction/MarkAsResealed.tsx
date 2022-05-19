@@ -6,7 +6,13 @@ import CompanySelector from "form/common/components/company/CompanySelector";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import Packagings from "form/bsdd/components/packagings/Packagings";
-import { FormStatus, Mutation, WasteDetails } from "generated/graphql/types";
+import {
+  FormStatus,
+  Mutation,
+  QuantityType,
+  ResealedFormInput,
+} from "generated/graphql/types";
+import { packagingsEqual } from "generated/constants/formHelpers";
 import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "common/components/Modal";
@@ -28,52 +34,23 @@ const MARK_RESEALED = gql`
   ${statusChangeFragment}
 `;
 
-export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
+export default function MarkAsResealed({ form }: WorkflowActionProps) {
   const initialValues = mergeDefaults(
     emptyState,
     form.temporaryStorageDetail || {}
   );
+
   const [isRefurbished, setIsRefurbished] = useState(
-    !!form.temporaryStorageDetail?.wasteDetails?.quantity
+    !!form.temporaryStorageDetail?.wasteDetails?.packagingInfos &&
+      !packagingsEqual(
+        form.temporaryStorageDetail?.wasteDetails?.packagingInfos,
+        form.wasteDetails?.packagingInfos
+      )
   );
 
-  function onChangeRefurbished(values, setFieldValue: (field, value) => void) {
+  function onChangeRefurbished() {
     const willBeRefurbished = !isRefurbished;
     setIsRefurbished(willBeRefurbished);
-
-    if (willBeRefurbished) {
-      const { wasteDetails } = form;
-
-      if (wasteDetails == null) {
-        return;
-      }
-
-      const keys: Array<keyof WasteDetails> = [
-        "onuCode",
-        "packagingInfos",
-        "quantity",
-        "quantityType",
-      ];
-      keys.forEach(key => {
-        switch (key) {
-          case "packagingInfos": {
-            if (
-              wasteDetails[key]?.length &&
-              values.wasteDetails[key].length === 0
-            ) {
-              setFieldValue(`wasteDetails.${key}`, wasteDetails[key]);
-            }
-            break;
-          }
-          default: {
-            if (wasteDetails[key] && !values.wasteDetails[key]) {
-              setFieldValue(`wasteDetails.${key}`, wasteDetails[key]);
-            }
-            break;
-          }
-        }
-      });
-    }
   }
 
   const [markAsResealed, { error, loading }] = useMutation<
@@ -102,37 +79,42 @@ export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
     <TdModalTrigger
       ariaLabel={actionLabel}
       trigger={open => (
-        <ActionButton icon={<IconPaperWrite size="24px" />} onClick={open}>
+        <ActionButton
+          icon={<IconPaperWrite size="24px" />}
+          onClick={open}
+          secondary={form.status !== FormStatus.TempStorerAccepted}
+        >
           {actionLabel}
         </ActionButton>
       )}
       modalContent={close => (
         <div>
-          <Formik
+          <Formik<ResealedFormInput>
             initialValues={initialValues}
-            onSubmit={values =>
+            onSubmit={({ wasteDetails, ...values }) =>
               markAsResealed({
-                variables: { id: form.id, resealedInfos: values },
+                variables: {
+                  id: form.id,
+                  resealedInfos: {
+                    ...values,
+                    ...(isRefurbished ? { wasteDetails } : {}),
+                  },
+                },
               })
             }
           >
-            {({ values, setFieldValue }) => (
+            {() => (
               <Form>
+                {form.status !== FormStatus.TempStorerAccepted && (
+                  <div className="notification notification--warning">
+                    Vous vous apprêtez à ajouter une étape d'entreposage
+                    provisoire ou de reconditionnement sur un BSDD pour lequel
+                    cette étape n'était pas prévue initialement.
+                  </div>
+                )}
                 <h5 className="form__section-heading">
                   Installation de destination prévue
                 </h5>
-
-                <div className="form__row form__row--inline">
-                  <Field
-                    name="destination.isFilledByEmitter"
-                    type="checkbox"
-                    id="isFilledByEmitter"
-                    className="td-checkbox"
-                  />
-                  <label htmlFor="isFilledByEmitter">
-                    Je suis l'émetteur du bordereau
-                  </label>
-                </div>
 
                 <CompanySelector name="destination.company" />
 
@@ -160,7 +142,7 @@ export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
                     checked={isRefurbished}
                     id="id_isRefurbished"
                     className="td-checkbox"
-                    onChange={() => onChangeRefurbished(values, setFieldValue)}
+                    onChange={onChangeRefurbished}
                   />
                   <label htmlFor="id_isRefurbished">
                     Les déchets ont subi un reconditionnement, je dois saisir
@@ -267,7 +249,7 @@ const emptyState = {
     },
     cap: "",
     processingOperation: "",
-    isFilledByEmitter: true,
+    isFilledByEmitter: false,
   },
   transporter: {
     isExemptedOfReceipt: false,
@@ -288,6 +270,6 @@ const emptyState = {
     onuCode: "",
     packagingInfos: [],
     quantity: null,
-    quantityType: "ESTIMATED",
+    quantityType: QuantityType.Estimated,
   },
 };

@@ -1,4 +1,4 @@
-import { Form, Status } from "@prisma/client";
+import { Form, Prisma, Status } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import {
   MutationResolvers,
@@ -42,7 +42,7 @@ const signatures: Partial<
       );
     }
 
-    const formUpdateInput = {
+    const formUpdateInput: Prisma.FormUpdateInput = {
       wasteDetailsPackagingInfos:
         args.input.packagingInfos ?? existingForm.wasteDetailsPackagingInfos,
       wasteDetailsQuantity:
@@ -57,7 +57,7 @@ const signatures: Partial<
       emittedBy: args.input.emittedBy,
       emittedByEcoOrganisme: args.input.emittedByEcoOrganisme ?? false
     };
-    const futureForm: Form = {
+    const futureForm: Prisma.FormUpdateInput = {
       ...existingForm,
       ...formUpdateInput
     };
@@ -81,24 +81,24 @@ const signatures: Partial<
 
     const existingFullForm = await getFullForm(existingForm);
     const formUpdateInput = {
-      temporaryStorageDetail: {
+      forwardedIn: {
         update: {
+          status: Status.SIGNED_BY_PRODUCER,
           wasteDetailsPackagingInfos:
             args.input.packagingInfos ??
-            existingFullForm.temporaryStorageDetail
-              .wasteDetailsPackagingInfos ??
+            existingFullForm.forwardedIn.wasteDetailsPackagingInfos ??
             existingFullForm.wasteDetailsPackagingInfos,
           wasteDetailsQuantity:
             args.input.quantity ??
-            existingFullForm.temporaryStorageDetail.wasteDetailsQuantity ??
+            existingFullForm.forwardedIn.wasteDetailsQuantity ??
             existingFullForm.wasteDetailsQuantity,
           wasteDetailsOnuCode:
             args.input.onuCode ??
-            existingFullForm.temporaryStorageDetail.wasteDetailsOnuCode ??
+            existingFullForm.forwardedIn.wasteDetailsOnuCode ??
             existingFullForm.wasteDetailsOnuCode,
           transporterNumberPlate:
             args.input.transporterNumberPlate ??
-            existingFullForm.temporaryStorageDetail.transporterNumberPlate,
+            existingFullForm.forwardedIn.transporterNumberPlate,
 
           emittedAt: args.input.emittedAt,
           emittedBy: args.input.emittedBy
@@ -107,9 +107,9 @@ const signatures: Partial<
     };
     const futureFullForm: FullForm = {
       ...existingFullForm,
-      temporaryStorageDetail: {
-        ...existingFullForm.temporaryStorageDetail,
-        ...formUpdateInput.temporaryStorageDetail.update
+      forwardedIn: {
+        ...existingFullForm.forwardedIn,
+        ...formUpdateInput.forwardedIn.update
       }
     };
 

@@ -1,10 +1,4 @@
-import {
-  Form,
-  Prisma,
-  Status,
-  TemporaryStorageDetail,
-  User
-} from "@prisma/client";
+import { Form, Prisma, Status, User } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { eventEmitter, TDEvent } from "../../../events/emitter";
 import { MutationResolvers } from "../../../generated/graphql/types";
@@ -45,6 +39,7 @@ function getDuplicateFormInput(
     receivedBy,
     receivedAt,
     signedAt,
+    signedBy,
     quantityReceived,
     quantityGrouped,
     processedBy,
@@ -55,9 +50,9 @@ function getDuplicateFormInput(
     transporterNumberPlate,
     transporterCustomInfo,
     currentTransporterSiret,
+    forwardedInId,
     temporaryStorageDetailId,
     ownerId,
-
     ...rest
   }: Form
 ): Prisma.FormCreateInput {
@@ -67,36 +62,6 @@ function getDuplicateFormInput(
     status: "DRAFT" as Status,
     owner: { connect: { id: user.id } }
   };
-}
-
-/**
- * Duplicate a temporary storage detail by stripping
- * the properties that should not be copied.
- *
- * @param {Form} form the form to which the duplicated temporary storage detail should be linked to
- * @param {TemporaryStorageDetail} temporaryStorageDetail the temporary storage detail to duplicate
- */
-function getDuplicateTemporaryStorageDetail({
-  id,
-  tempStorerQuantityType,
-  tempStorerQuantityReceived,
-  tempStorerWasteAcceptationStatus,
-  tempStorerWasteRefusalReason,
-  tempStorerReceivedAt,
-  tempStorerReceivedBy,
-  tempStorerSignedAt,
-  transporterNumberPlate,
-  emittedAt,
-  emittedBy,
-  takenOverAt,
-  takenOverBy,
-  signedByTransporter,
-  signedBy,
-  signedAt,
-
-  ...rest
-}: TemporaryStorageDetail) {
-  return rest;
 }
 
 /**
@@ -120,11 +85,12 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
   const newFormInput = getDuplicateFormInput(user, existingForm);
 
   const fullForm = await formRepository.findFullFormById(existingForm.id);
-  if (fullForm.temporaryStorageDetail) {
-    const temporaryStorageDetailCreateInput =
-      getDuplicateTemporaryStorageDetail(fullForm.temporaryStorageDetail);
-    newFormInput.temporaryStorageDetail = {
-      create: temporaryStorageDetailCreateInput
+  if (fullForm.forwardedIn) {
+    newFormInput.forwardedIn = {
+      create: {
+        readableId: `${newFormInput.readableId}-suite`,
+        ...getDuplicateFormInput(user, fullForm.forwardedIn)
+      }
     };
   }
 

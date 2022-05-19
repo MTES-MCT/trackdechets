@@ -158,10 +158,7 @@ const TempStorage = ({ form }) => {
           <dt>Adresse</dt>
           <dd>{temporaryStorageDetail?.destination?.company?.address}</dd>
 
-          <DetailRow
-            value={temporaryStorageDetail?.destination?.cap}
-            label="Numéro de CAP"
-          />
+          <DetailRow value={form?.recipient?.cap} label="Numéro de CAP" />
 
           <DetailRow
             value={temporaryStorageDetail?.destination?.processingOperation}
@@ -499,7 +496,7 @@ export default function BSDDetailContent({
 
             <div className={styles.detailGrid}>
               <dt>Code onu</dt>
-              <dd>{form?.wasteDetails?.onuCode}</dd>
+              <dd>{form?.stateSummary?.onuCode}</dd>
               <dt>POP</dt> <dd>{form.wasteDetails?.pop ? "Oui" : "Non"}</dd>
             </div>
 
@@ -744,6 +741,7 @@ export default function BSDDetailContent({
               </Link>
             </>
           )}
+
           <WorkflowAction siret={siret} form={form} />
           {children}
         </div>

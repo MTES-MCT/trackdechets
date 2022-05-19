@@ -209,7 +209,7 @@ const formdata = {
   emitterCompanyAddress: "20 Avenue de la 1ère Dfl 13000 Marseille",
   sentBy: "signe",
   status: "SENT" as Status,
-  wasteRefusalReason: "",
+  wasteRefusalReason: null,
   recipientCompanySiret: "56847895684123",
   transporterCompanyMail: "transporter@td.io",
   wasteDetailsName: "Divers",
@@ -239,23 +239,21 @@ const formdata = {
   recipientCompanyName: "WASTE COMPANY"
 };
 
-export const tempStorageData: Prisma.TemporaryStorageDetailCreateInput = {
-  tempStorerQuantityType: "ESTIMATED",
-  tempStorerQuantityReceived: 1,
-  tempStorerWasteAcceptationStatus: "ACCEPTED",
-  tempStorerWasteRefusalReason: null,
-  tempStorerReceivedAt: "2019-12-20T00:00:00.000Z",
-  tempStorerReceivedBy: "John Dupont",
-  tempStorerSignedAt: "2019-12-20T00:00:00.000Z",
-  destinationIsFilledByEmitter: true,
-  destinationCompanyName: "Incinérateur du Grand Est",
-  destinationCompanySiret: "65478235968471",
-  destinationCompanyAddress: "4 chemin des déchets, Mulhouse",
-  destinationCompanyContact: "Louis Henry",
-  destinationCompanyPhone: "0700000000",
-  destinationCompanyMail: "louis.henry@idge.org",
-  destinationCap: "",
-  destinationProcessingOperation: "R 1",
+export const forwardedInData: Partial<Prisma.FormCreateInput> = {
+  quantityReceived: 1,
+  wasteAcceptationStatus: "ACCEPTED",
+  wasteRefusalReason: null,
+  receivedAt: "2019-12-20T00:00:00.000Z",
+  receivedBy: "John Dupont",
+  signedAt: "2019-12-20T00:00:00.000Z",
+  recipientCompanyName: "Incinérateur du Grand Est",
+  recipientCompanySiret: "65478235968471",
+  recipientCompanyAddress: "4 chemin des déchets, Mulhouse",
+  recipientCompanyContact: "Louis Henry",
+  recipientCompanyPhone: "0700000000",
+  recipientCompanyMail: "louis.henry@idge.org",
+  recipientCap: "CAP",
+  recipientProcessingOperation: "R 1",
   wasteDetailsOnuCode: "",
   wasteDetailsPackagingInfos: [],
   wasteDetailsQuantity: 1,
@@ -272,8 +270,7 @@ export const tempStorageData: Prisma.TemporaryStorageDetailCreateInput = {
   transporterValidityLimit: "2019-11-27T00:00:00.000Z",
   transporterNumberPlate: "AD-007-XX",
   signedByTransporter: true,
-  signedBy: "Mathieu O'connor",
-  signedAt: "2019-11-28T00:00:00.000Z"
+  signedBy: "Mathieu O'connor"
 };
 
 export const transportSegmentFactory = async ({ formId, segmentPayload }) => {
@@ -298,25 +295,31 @@ export const formFactory = async ({
       readableId: getReadableId(),
       ...formParams,
       owner: { connect: { id: ownerId } }
-    }
+    },
+    include: { forwardedIn: true }
   });
 };
 
 export const formWithTempStorageFactory = async ({
   ownerId,
   opt = {},
-  tempStorageOpts = {}
+  forwardedInOpts = {}
 }: {
   ownerId: string;
   opt?: Partial<Prisma.FormCreateInput>;
-  tempStorageOpts?: Partial<Prisma.TemporaryStorageDetailCreateInput>;
+  forwardedInOpts?: Partial<Prisma.FormCreateInput>;
 }) => {
   return formFactory({
     ownerId,
     opt: {
       recipientIsTempStorage: true,
-      temporaryStorageDetail: {
-        create: { ...tempStorageData, ...tempStorageOpts }
+      forwardedIn: {
+        create: {
+          readableId: getReadableId(),
+          owner: { connect: { id: ownerId } },
+          ...forwardedInData,
+          ...forwardedInOpts
+        }
       },
       ...opt
     }
