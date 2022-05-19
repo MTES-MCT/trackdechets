@@ -19,6 +19,7 @@ import {
   Mutation,
   MutationMarkAsTempStorerAcceptedArgs
 } from "../../../../generated/graphql/types";
+import getReadableId from "../../../readableId";
 
 const MARK_AS_TEMP_STORER_ACCEPTED = `
     mutation MarkAsTempStorerAccepted($id: ID!, $tempStorerAcceptedInfo: TempStorerAcceptedFormInput!){
@@ -46,7 +47,9 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: tempStorerCompany.siret,
         recipientIsTempStorage: true,
-        temporaryStorageDetail: { create: {} }
+        forwardedIn: {
+          create: { readableId: getReadableId(), ownerId: user.id }
+        }
       }
     });
 
@@ -85,7 +88,9 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: tempStorerCompany.siret,
         recipientIsTempStorage: true,
-        temporaryStorageDetail: { create: {} },
+        forwardedIn: {
+          create: { readableId: getReadableId(), ownerId: user.id }
+        },
         receivedBy: "John Doe",
         receivedAt: "2018-12-11T00:00:00.000Z"
       }
@@ -138,7 +143,9 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: tempStorerCompany.siret,
         recipientIsTempStorage: true,
-        temporaryStorageDetail: { create: {} },
+        forwardedIn: {
+          create: { readableId: getReadableId(), ownerId: user.id }
+        },
         receivedBy: "John Doe",
         receivedAt: "2018-12-11T00:00:00.000Z"
       }
@@ -191,7 +198,9 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: tempStorerCompany.siret,
         recipientIsTempStorage: true,
-        temporaryStorageDetail: { create: {} },
+        forwardedIn: {
+          create: { readableId: getReadableId(), ownerId: user.id }
+        },
         receivedBy: "John Doe",
         receivedAt: "2018-12-11T00:00:00.000Z"
       }
@@ -219,14 +228,8 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
       where: { id: form.id }
     });
 
-    const tempStorage = await prisma.form
-      .findUnique({
-        where: { id: form.id }
-      })
-      .temporaryStorageDetail();
-
     expect(formAfterMutation.status).toEqual(Status.TEMP_STORER_ACCEPTED);
-    expect(tempStorage.tempStorerSignedAt).toEqual(signedAt);
+    expect(formAfterMutation.signedAt).toEqual(signedAt);
   });
 
   it("should unlink appendix 2 in case of refusal", async () => {

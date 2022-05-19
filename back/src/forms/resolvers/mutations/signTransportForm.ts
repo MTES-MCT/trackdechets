@@ -1,4 +1,4 @@
-import { Form, Status } from "@prisma/client";
+import { Form, Prisma, Status } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import {
   MutationResolvers,
@@ -56,25 +56,26 @@ const signatures: Partial<
     const existingFullForm = await getFullForm(existingForm);
 
     await checkCanSignFor(
-      existingFullForm.temporaryStorageDetail.transporterCompanySiret,
+      existingFullForm.forwardedIn.transporterCompanySiret,
       user,
       args.securityCode
     );
 
-    const formUpdateInput = {
-      temporaryStorageDetail: {
+    const formUpdateInput: Prisma.FormUpdateInput = {
+      forwardedIn: {
         update: {
+          status: Status.SENT,
           takenOverAt: args.input.takenOverAt,
           takenOverBy: args.input.takenOverBy,
           transporterNumberPlate:
             args.input.transporterNumberPlate ??
-            existingFullForm.temporaryStorageDetail.transporterNumberPlate,
+            existingFullForm.forwardedIn.transporterNumberPlate,
 
           // The following fields are deprecated
           // but we need to fill them until we remove them completely
           signedByTransporter: true,
-          signedAt: args.input.takenOverAt,
-          signedBy: existingFullForm.temporaryStorageDetail.emittedBy
+          sentAt: args.input.takenOverAt,
+          sentBy: existingForm.emittedBy
         }
       }
     };

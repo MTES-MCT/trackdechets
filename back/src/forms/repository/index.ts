@@ -1,9 +1,9 @@
 import prisma from "../../prisma";
 import buildCountForms from "./form/count";
 import buildCreateForm from "./form/create";
-import buildCreateTemporaryStorage from "./form/createTemporaryStorage";
 import buildDeleteForm from "./form/delete";
 import buildFindAppendix2FormsById from "./form/findAppendix2FormsById";
+import buildFindForwardedInById from "./form/findForwardedInById";
 import buildFindFullFormById from "./form/findFullFormById";
 import buildFindUniqueForm from "./form/findUnique";
 import buildRemoveAppendix2 from "./form/removeAppendix2";
@@ -34,6 +34,7 @@ export function getFormRepository(
     findUnique: buildFindUniqueForm({ prisma, user }),
     findFullFormById: buildFindFullFormById({ prisma, user }),
     findAppendix2FormsById: buildFindAppendix2FormsById({ prisma, user }),
+    findForwardedInById: buildFindForwardedInById({ prisma, user }),
     count: buildCountForms({ prisma, user }),
     // WRITE OPERATIONS - wrapped into a transaction
     create: (...args) =>
@@ -59,12 +60,6 @@ export function getFormRepository(
         ? buildDeleteForm({ prisma: transaction, user })(...args)
         : prisma.$transaction(prisma =>
             buildDeleteForm({ prisma, user })(...args)
-          ),
-    createTemporaryStorage: (...args) =>
-      transaction
-        ? buildCreateTemporaryStorage({ prisma: transaction, user })(...args)
-        : prisma.$transaction(prisma =>
-            buildCreateTemporaryStorage({ prisma, user })(...args)
           ),
     removeAppendix2: (...args) =>
       transaction

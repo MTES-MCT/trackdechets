@@ -23,7 +23,7 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
             { recipientCompanySiret: siret },
             {
               recipientIsTempStorage: true,
-              temporaryStorageDetail: { destinationCompanySiret: siret }
+              forwardedIn: { recipientCompanySiret: siret }
             }
           ]
         },
@@ -32,13 +32,15 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
     }
   });
 
-  return queriedForms
-    .filter(
-      f =>
-        f.quantityReceived > 0 &&
-        new Decimal(f.quantityReceived).greaterThan(f.quantityGrouped)
-    )
-    .map(f => expandFormFromDb(f));
+  return Promise.all(
+    queriedForms
+      .filter(
+        f =>
+          f.quantityReceived > 0 &&
+          new Decimal(f.quantityReceived).greaterThan(f.quantityGrouped)
+      )
+      .map(f => expandFormFromDb(f))
+  );
 };
 
 export default appendixFormsResolver;

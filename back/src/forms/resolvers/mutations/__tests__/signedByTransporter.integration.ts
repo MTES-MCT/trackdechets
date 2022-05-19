@@ -13,6 +13,7 @@ import { allowedFormats } from "../../../../common/dates";
 import { Status, UserRole } from "@prisma/client";
 import { Mutation } from "../../../../generated/graphql/types";
 import { getFullForm } from "../../../../forms/database";
+import getReadableId from "../../../readableId";
 
 jest.mock("axios", () => ({
   default: {
@@ -455,19 +456,19 @@ describe("Mutation.signedByTransporter", () => {
         recipientCompanyName: temporaryStorage.company.name,
         recipientCompanySiret: temporaryStorage.company.siret,
         sentAt: "2019-11-20T00:00:00.000Z",
-        temporaryStorageDetail: {
+        forwardedIn: {
           create: {
-            tempStorerQuantityType: "REAL",
-            tempStorerQuantityReceived: 2.4,
-            tempStorerWasteAcceptationStatus: "ACCEPTED",
-            tempStorerReceivedAt: "2019-11-20T00:00:00.000Z",
-            tempStorerReceivedBy: temporaryStorage.user.name,
-            tempStorerSignedAt: "2019-11-20T00:00:00.000Z",
-            destinationIsFilledByEmitter: false,
-            destinationCompanyName: finalRecipient.company.name,
-            destinationCompanySiret: finalRecipient.company.siret,
-            destinationCap: "",
-            destinationProcessingOperation: "R 6",
+            readableId: getReadableId(),
+            ownerId: transporter.user.id,
+            quantityReceived: 2.4,
+            wasteAcceptationStatus: "ACCEPTED",
+            receivedAt: "2019-11-20T00:00:00.000Z",
+            receivedBy: temporaryStorage.user.name,
+            signedAt: "2019-11-20T00:00:00.000Z",
+            recipientCompanyName: finalRecipient.company.name,
+            recipientCompanySiret: finalRecipient.company.siret,
+            recipientCap: "",
+            recipientProcessingOperation: "R 6",
             transporterCompanyName: transporter.company.name,
             transporterCompanySiret: transporter.company.siret,
             transporterIsExemptedOfReceipt: false,
@@ -505,10 +506,9 @@ describe("Mutation.signedByTransporter", () => {
     expect(resultingFullForm).toEqual(
       expect.objectContaining({
         status: "RESENT",
-        temporaryStorageDetail: expect.objectContaining({
+        forwardedIn: expect.objectContaining({
           signedAt: resentAt,
           signedBy: temporaryStorage.user.name,
-
           emittedAt: resentAt,
           emittedBy: temporaryStorage.user.name,
           takenOverAt: resentAt,

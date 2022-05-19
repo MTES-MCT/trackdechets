@@ -15,6 +15,7 @@ import {
   Mutation,
   MutationMarkAsTempStoredArgs
 } from "../../../../generated/graphql/types";
+import getReadableId from "../../../readableId";
 
 const MARK_AS_TEMP_STORED = `
   mutation MarkAsTempStored($id: ID!, $tempStoredInfos: TempStoredFormInput!){
@@ -42,7 +43,9 @@ describe("{ mutation { markAsTempStored } }", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: tempStorerCompany.siret,
         recipientIsTempStorage: true,
-        temporaryStorageDetail: { create: {} }
+        forwardedIn: {
+          create: { ownerId: user.id, readableId: getReadableId() }
+        }
       }
     });
 
@@ -82,7 +85,9 @@ describe("{ mutation { markAsTempStored } }", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: tempStorerCompany.siret,
         recipientIsTempStorage: true,
-        temporaryStorageDetail: { create: {} }
+        forwardedIn: {
+          create: { readableId: getReadableId(), ownerId: user.id }
+        }
       }
     });
 
@@ -131,7 +136,9 @@ describe("{ mutation { markAsTempStored } }", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: tempStorerCompany.siret,
         recipientIsTempStorage: true,
-        temporaryStorageDetail: { create: {} }
+        forwardedIn: {
+          create: { readableId: getReadableId(), ownerId: user.id }
+        }
       }
     });
 
@@ -181,7 +188,9 @@ describe("{ mutation { markAsTempStored } }", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: tempStorerCompany.siret,
         recipientIsTempStorage: true,
-        temporaryStorageDetail: { create: {} }
+        forwardedIn: {
+          create: { readableId: getReadableId(), ownerId: user.id }
+        }
       }
     });
 
@@ -199,10 +208,11 @@ describe("{ mutation { markAsTempStored } }", () => {
       }
     });
 
-    const updatedTemporaryStorageDetail = await prisma.form
-      .findUnique({ where: { id: form.id } })
-      .temporaryStorageDetail();
-    expect(updatedTemporaryStorageDetail.tempStorerSignedAt).toBeNull();
+    const updatedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
+
+    expect(updatedForm.signedAt).toBeNull();
   });
 
   test("the temp storer of the BSD can mark it as REFUSED", async () => {
@@ -219,7 +229,9 @@ describe("{ mutation { markAsTempStored } }", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: tempStorerCompany.siret,
         recipientIsTempStorage: true,
-        temporaryStorageDetail: { create: {} }
+        forwardedIn: {
+          create: { readableId: getReadableId(), ownerId: user.id }
+        }
       }
     });
 
@@ -271,7 +283,9 @@ describe("{ mutation { markAsTempStored } }", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: tempStorerCompany.siret,
         recipientIsTempStorage: false,
-        temporaryStorageDetail: { create: {} }
+        forwardedIn: {
+          create: { readableId: getReadableId(), ownerId: user.id }
+        }
       }
     });
 
@@ -316,7 +330,9 @@ describe("{ mutation { markAsTempStored } }", () => {
           emitterCompanySiret: emitterCompany.siret,
           recipientCompanySiret: tempStorerCompany.siret,
           recipientIsTempStorage: true,
-          temporaryStorageDetail: { create: {} }
+          forwardedIn: {
+            create: { readableId: getReadableId(), ownerId: user.id }
+          }
         }
       });
 
@@ -340,14 +356,8 @@ describe("{ mutation { markAsTempStored } }", () => {
         where: { id: form.id }
       });
 
-      const tempStorage = await prisma.form
-        .findUnique({
-          where: { id: form.id }
-        })
-        .temporaryStorageDetail();
-
       expect(formAfterMutation.status).toEqual(Status.TEMP_STORED);
-      expect(tempStorage.tempStorerReceivedAt).toEqual(receivedAt);
+      expect(formAfterMutation.receivedAt).toEqual(receivedAt);
     }
   );
 

@@ -1,70 +1,9 @@
-import { TemporaryStorageDetail } from "@prisma/client";
-import prisma from "../../../prisma";
+import { Status } from "@prisma/client";
 import {
   Form,
   FormResolvers,
-  PackagingInfo
+  TemporaryStorageDetail
 } from "../../../generated/graphql/types";
-
-function getTransporter(
-  form: Form,
-  temporaryStorageDetail: TemporaryStorageDetail
-) {
-  if (["SEALED", "DRAFT", "SIGNED_BY_PRODUCER"].includes(form.status)) {
-    return form.transporter?.company;
-  }
-
-  if (
-    temporaryStorageDetail &&
-    ["RESEALED", "TEMP_STORED", "TEMP_STORER_ACCEPTED"].includes(form.status)
-  ) {
-    return {
-      name: temporaryStorageDetail.transporterCompanyName,
-      siret: temporaryStorageDetail.transporterCompanySiret,
-      address: temporaryStorageDetail.transporterCompanyAddress,
-      contact: temporaryStorageDetail.transporterCompanyContact,
-      phone: temporaryStorageDetail.transporterCompanyPhone,
-      mail: temporaryStorageDetail.transporterCompanyMail
-    };
-  }
-
-  return null;
-}
-
-function getRecipient(
-  form: Form,
-  temporaryStorageDetail: TemporaryStorageDetail
-) {
-  if (
-    temporaryStorageDetail &&
-    !["DRAFT", "SENT", "SEALED"].includes(form.status)
-  ) {
-    return {
-      name: temporaryStorageDetail.destinationCompanyName,
-      siret: temporaryStorageDetail.destinationCompanySiret,
-      address: temporaryStorageDetail.destinationCompanyAddress,
-      contact: temporaryStorageDetail.destinationCompanyContact,
-      phone: temporaryStorageDetail.destinationCompanyPhone,
-      mail: temporaryStorageDetail.destinationCompanyMail
-    };
-  }
-
-  return form.recipient?.company;
-}
-
-function getEmitter(
-  form: Form,
-  temporaryStorageDetail: TemporaryStorageDetail
-) {
-  if (
-    temporaryStorageDetail &&
-    ["TEMP_STORED", "TEMP_STORER_ACCEPTED", "RESEALED"].includes(form.status)
-  ) {
-    return form.recipient?.company;
-  }
-
-  return form.emitter?.company;
-}
 
 function getLastActionOn(
   form: Form,
@@ -72,7 +11,7 @@ function getLastActionOn(
 ): Date {
   switch (form.status) {
     case "SENT":
-      return form.sentAt;
+      return form.takenOverAt;
     case "RECEIVED":
     case "ACCEPTED":
       return form.receivedAt;
@@ -81,69 +20,72 @@ function getLastActionOn(
     case "TEMP_STORED":
     case "TEMP_STORER_ACCEPTED":
     case "RESEALED":
-      return temporaryStorageDetail.tempStorerReceivedAt;
+      return temporaryStorageDetail?.temporaryStorer?.receivedAt;
     case "RESENT":
-      return temporaryStorageDetail.signedAt;
+      return temporaryStorageDetail.takenOverAt;
     default:
       return form.createdAt;
   }
 }
 
-function getQuantity(
-  form: Form,
-  temporaryStorageDetail: TemporaryStorageDetail
-): number | null {
-  // When the form is received we have the definitive quantity
-  if (form.quantityReceived != null) {
-    return form.quantityReceived;
-  }
-  // When form is temp stored the quantity is reported on arrival and might be changed
-  if (form.recipient?.isTempStorage) {
-    // Repackaging
-    if (temporaryStorageDetail?.wasteDetailsQuantity) {
-      return temporaryStorageDetail.wasteDetailsQuantity;
-    }
-
-    // Arrival
-    if (temporaryStorageDetail?.tempStorerQuantityReceived != null) {
-      return temporaryStorageDetail.tempStorerQuantityReceived;
-    }
-  }
-  // Not a lot happened yet, use the quantity input
-  if (form.wasteDetails?.quantity) {
-    return form.wasteDetails.quantity;
-  }
-  // For drafts, we might not have a quantity yet
-  return null;
-}
-
 export async function getStateSummary(form: Form) {
-  const temporaryStorageDetail = await prisma.form
-    .findUnique({ where: { id: form.id } })
-    .temporaryStorageDetail();
+  const { temporaryStorageDetail } = form;
+
+  // This boolean is true when a form with temporary
+  // storage has been resealed or resent
+  const isResealed =
+    form.recipient?.isTempStorage &&
+    !!temporaryStorageDetail &&
+    (form.status === Status.RESEALED ||
+      !!form.temporaryStorageDetail?.emittedAt);
+
+  const quantity =
+    form.quantityReceived ??
+    ([Status.TEMP_STORED, Status.TEMP_STORER_ACCEPTED].includes(
+      form.status as any
+    )
+      ? form.temporaryStorageDetail?.temporaryStorer?.quantityReceived
+      : isResealed
+      ? form.temporaryStorageDetail?.wasteDetails?.quantity
+      : form.wasteDetails?.quantity);
+
+  const onuCode = isResealed
+    ? form.temporaryStorageDetail?.wasteDetails?.onuCode
+    : form.wasteDetails?.onuCode;
 
   const packagingInfos =
-    temporaryStorageDetail?.wasteDetailsPackagingInfos &&
-    (temporaryStorageDetail?.wasteDetailsPackagingInfos as PackagingInfo[])
-      .length > 0
-      ? (temporaryStorageDetail?.wasteDetailsPackagingInfos as PackagingInfo[])
-      : form.wasteDetails?.packagingInfos ?? [];
+    (isResealed
+      ? form.temporaryStorageDetail?.wasteDetails?.packagingInfos
+      : form.wasteDetails?.packagingInfos) ?? [];
+
+  const transporter = isResealed
+    ? {
+        transporterNumberPlate:
+          form.temporaryStorageDetail?.transporter?.numberPlate,
+        transporterCustomInfo:
+          form.temporaryStorageDetail?.transporter?.customInfo,
+        transporter: form.temporaryStorageDetail?.transporter.company
+      }
+    : {
+        transporterNumberPlate: form.transporter?.numberPlate,
+        transporterCustomInfo: form.transporter?.customInfo,
+        transporter: form.transporter.company
+      };
+
+  const recipient = isResealed
+    ? form.temporaryStorageDetail?.destination?.company
+    : form.recipient?.company;
+
+  const emitter = isResealed ? form.recipient?.company : form.emitter?.company;
 
   return {
-    quantity: getQuantity(form, temporaryStorageDetail),
+    quantity,
     packagingInfos,
     packagings: packagingInfos.map(pi => pi.type),
-    onuCode:
-      temporaryStorageDetail?.wasteDetailsOnuCode ?? form.wasteDetails?.onuCode,
-    transporterNumberPlate:
-      temporaryStorageDetail?.transporterNumberPlate ??
-      form.transporter?.numberPlate,
-    transporterCustomInfo:
-      temporaryStorageDetail?.transporterCustomInfo ??
-      form.transporter?.customInfo,
-    transporter: getTransporter(form, temporaryStorageDetail),
-    recipient: getRecipient(form, temporaryStorageDetail),
-    emitter: getEmitter(form, temporaryStorageDetail),
+    onuCode,
+    ...transporter,
+    recipient,
+    emitter,
     lastActionOn: getLastActionOn(form, temporaryStorageDetail)
   };
 }

@@ -9,6 +9,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import getReadableId from "../../../readableId";
 
 const SIGN_TRANSPORT_FORM = `
   mutation SignTransportForm($id: ID!, $input: SignTransportFormInput!, $securityCode: Int) {
@@ -184,8 +185,10 @@ describe("signTransportForm", () => {
         status: "SIGNED_BY_TEMP_STORER",
         recipientCompanySiret: temporaryStorage.company.siret,
         recipientCompanyName: temporaryStorage.company.name,
-        temporaryStorageDetail: {
+        forwardedIn: {
           create: {
+            readableId: getReadableId(),
+            ownerId: temporaryStorage.user.id,
             emittedAt: emittedAt,
             emittedBy: temporaryStorage.user.name,
             transporterCompanySiret: transporter.company.siret,
@@ -235,8 +238,10 @@ describe("signTransportForm", () => {
         status: "SIGNED_BY_TEMP_STORER",
         recipientCompanySiret: temporaryStorage.company.siret,
         recipientCompanyName: temporaryStorage.company.name,
-        temporaryStorageDetail: {
+        forwardedIn: {
           create: {
+            readableId: getReadableId(),
+            ownerId: temporaryStorage.user.id,
             emittedAt: emittedAt,
             emittedBy: temporaryStorage.user.name,
             transporterCompanySiret: transporter.company.siret,
@@ -287,8 +292,10 @@ describe("signTransportForm", () => {
         status: "SIGNED_BY_TEMP_STORER",
         recipientCompanySiret: temporaryStorage.company.siret,
         recipientCompanyName: temporaryStorage.company.name,
-        temporaryStorageDetail: {
+        forwardedIn: {
           create: {
+            readableId: getReadableId(),
+            ownerId: temporaryStorage.user.id,
             emittedAt: emittedAt,
             emittedBy: temporaryStorage.user.name,
             transporterCompanySiret: transporter.company.siret,
