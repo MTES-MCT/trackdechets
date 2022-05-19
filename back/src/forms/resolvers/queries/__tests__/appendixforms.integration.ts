@@ -190,7 +190,7 @@ describe("Test appendixForms", () => {
         status: "AWAITING_GROUP",
         quantityReceived: 1
       },
-      tempStorageOpts: { destinationCompanySiret: destinationCompany.siret }
+      forwardedInOpts: { recipientCompanySiret: destinationCompany.siret }
     });
     const { query } = makeClient(destination);
     const {

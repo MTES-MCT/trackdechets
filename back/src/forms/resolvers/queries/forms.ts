@@ -70,7 +70,7 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
     }
   });
 
-  return queriedForms.map(f => expandFormFromDb(f));
+  return Promise.all(queriedForms.map(f => expandFormFromDb(f)));
 };
 
 function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
@@ -120,7 +120,7 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
               {
                 AND: [
                   {
-                    temporaryStorageDetail: { destinationCompanySiret: siret } // installation de destination finale
+                    forwardedIn: { recipientCompanySiret: siret } // installation de destination finale
                   },
                   {
                     status: {

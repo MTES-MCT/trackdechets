@@ -56,7 +56,7 @@ const buildAcceptRevisionRequestApproval: (
       data: {
         ...bsddUpdate,
         ...(temporaryStorageUpdate && {
-          temporaryStorageDetail: { update: { ...temporaryStorageUpdate } }
+          forwardedIn: { update: { ...temporaryStorageUpdate } }
         })
       }
     });

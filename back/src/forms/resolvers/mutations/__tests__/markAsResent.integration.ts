@@ -7,6 +7,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { CompanyType } from "@prisma/client";
 
 const MARK_AS_RESENT = `
   mutation MarkAsResent($id: ID!, $resentInfos: ResentFormInput!){
@@ -22,7 +23,13 @@ describe("Mutation markAsResent", () => {
 
   test("it fails when form is not TEMP_STORER_ACCEPTED", async () => {
     const owner = await userFactory();
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: [CompanyType.COLLECTOR] }
+    });
+
+    const { company: destination } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+    });
 
     const { mutate } = makeClient(user);
 
@@ -31,7 +38,8 @@ describe("Mutation markAsResent", () => {
       opt: {
         status: "DRAFT",
         recipientCompanySiret: company.siret
-      }
+      },
+      forwardedInOpts: { recipientCompanySiret: destination.siret }
     });
 
     const { errors } = await mutate(MARK_AS_RESENT, {
@@ -52,7 +60,13 @@ describe("Mutation markAsResent", () => {
 
   test("the temp storer of the BSD can resend it", async () => {
     const owner = await userFactory();
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: [CompanyType.COLLECTOR] }
+    });
+
+    const { company: destination } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+    });
 
     const { mutate } = makeClient(user);
 
@@ -61,7 +75,8 @@ describe("Mutation markAsResent", () => {
       opt: {
         status: "TEMP_STORER_ACCEPTED",
         recipientCompanySiret: company.siret
-      }
+      },
+      forwardedInOpts: { recipientCompanySiret: destination.siret }
     });
 
     await mutate(MARK_AS_RESENT, {
@@ -82,7 +97,12 @@ describe("Mutation markAsResent", () => {
 
   test("it should fail if temporary storage detail is incomplete", async () => {
     const owner = await userFactory();
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: [CompanyType.COLLECTOR] }
+    });
+    const { company: destination } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+    });
 
     const { mutate } = makeClient(user);
 
@@ -91,14 +111,15 @@ describe("Mutation markAsResent", () => {
       opt: {
         status: "TEMP_STORER_ACCEPTED",
         recipientCompanySiret: company.siret
-      }
+      },
+      forwardedInOpts: { recipientCompanySiret: destination.siret }
     });
 
     // assume destination siret missing
     await prisma.form.update({
       where: { id: form.id },
       data: {
-        temporaryStorageDetail: { update: { destinationCompanySiret: "" } }
+        forwardedIn: { update: { recipientCompanySiret: "" } }
       }
     });
 
@@ -114,7 +135,7 @@ describe("Mutation markAsResent", () => {
 
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual(
-      "Destination prévue: Le siret de l'entreprise est obligatoire"
+      "Destinataire: Le siret de l'entreprise est obligatoire"
     );
     expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
     const resealedForm = await prisma.form.findUnique({
@@ -125,7 +146,12 @@ describe("Mutation markAsResent", () => {
 
   test("it should work if resentInfos is completing current data", async () => {
     const owner = await userFactory();
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: [CompanyType.COLLECTOR] }
+    });
+    const { company: destination } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+    });
 
     const { mutate } = makeClient(user);
 
@@ -134,14 +160,15 @@ describe("Mutation markAsResent", () => {
       opt: {
         status: "TEMP_STORER_ACCEPTED",
         recipientCompanySiret: company.siret
-      }
+      },
+      forwardedInOpts: { recipientCompanySiret: destination.siret }
     });
 
     // assume destination siret is missing
     await prisma.form.update({
       where: { id: form.id },
       data: {
-        temporaryStorageDetail: { update: { destinationCompanySiret: "" } }
+        forwardedIn: { update: { recipientCompanySiret: "" } }
       }
     });
 

@@ -1,4 +1,4 @@
-import { WasteAcceptationStatus } from "@prisma/client";
+import { Status, WasteAcceptationStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
@@ -24,10 +24,20 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
 
   const acceptedForm = await transitionForm(user, form, {
     type: EventType.MarkAsAccepted,
-    formUpdateInput: {
-      ...acceptedInfo,
-      signedAt: new Date(acceptedInfo.signedAt)
-    }
+    formUpdateInput: form.forwardedInId
+      ? {
+          forwardedIn: {
+            update: {
+              status: Status.ACCEPTED,
+              ...acceptedInfo,
+              signedAt: new Date(acceptedInfo.signedAt)
+            }
+          }
+        }
+      : {
+          ...acceptedInfo,
+          signedAt: new Date(acceptedInfo.signedAt)
+        }
   });
 
   if (acceptedInfo.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED) {

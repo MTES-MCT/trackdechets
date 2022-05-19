@@ -337,9 +337,11 @@ describe("Incoming wastes registry", () => {
         receivedAt: new Date(),
         processedAt: new Date()
       },
-      tempStorageOpts: {
-        destinationCompanySiret: destination.siret,
-        tempStorerReceivedAt: new Date()
+      forwardedInOpts: {
+        emitterCompanySiret: ttr.siret,
+        emitterCompanyName: ttr.name,
+        recipientCompanySiret: destination.siret,
+        receivedAt: new Date()
       }
     });
     await indexForm(await getFullForm(form));

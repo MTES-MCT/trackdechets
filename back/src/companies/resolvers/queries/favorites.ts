@@ -79,7 +79,7 @@ async function getRecentPartners(
       { traderCompanySiret: siret },
       { brokerCompanySiret: siret },
       {
-        temporaryStorageDetail: { destinationCompanySiret: siret }
+        forwardedIn: { recipientCompanySiret: siret }
       },
       { transporterCompanySiret: siret },
       {
@@ -121,30 +121,30 @@ async function getRecentPartners(
         ...defaultArgs,
         where: {
           ...defaultWhere,
-          temporaryStorageDetail: {
-            destinationCompanySiret: { not: "" }
+          forwardedIn: {
+            recipientCompanySiret: { not: "" }
           }
         },
         select: {
-          temporaryStorageDetail: {
+          forwardedIn: {
             select: {
-              destinationCompanyName: true,
-              destinationCompanySiret: true,
-              destinationCompanyAddress: true,
-              destinationCompanyContact: true,
-              destinationCompanyPhone: true,
-              destinationCompanyMail: true
+              recipientCompanyName: true,
+              recipientCompanySiret: true,
+              recipientCompanyAddress: true,
+              recipientCompanyContact: true,
+              recipientCompanyPhone: true,
+              recipientCompanyMail: true
             }
           }
         }
       });
       return forms.map(form => ({
-        name: form.temporaryStorageDetail.destinationCompanyName,
-        siret: form.temporaryStorageDetail.destinationCompanySiret,
-        address: form.temporaryStorageDetail.destinationCompanyAddress,
-        contact: form.temporaryStorageDetail.destinationCompanyContact,
-        phone: form.temporaryStorageDetail.destinationCompanyPhone,
-        mail: form.temporaryStorageDetail.destinationCompanyMail
+        name: form.forwardedIn?.recipientCompanyName,
+        siret: form.forwardedIn?.recipientCompanySiret,
+        address: form.forwardedIn?.recipientCompanyAddress,
+        contact: form.forwardedIn?.recipientCompanyContact,
+        phone: form.forwardedIn?.recipientCompanyPhone,
+        mail: form.forwardedIn?.recipientCompanyMail
       }));
     }
     case "EMITTER":

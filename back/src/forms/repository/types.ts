@@ -2,9 +2,9 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import { CountFormsFn } from "./form/count";
 import { CreateFormFn } from "./form/create";
 import { SetAppendix2Fn } from "./form/setAppendix2";
-import { CreateTemporaryStorageFn } from "./form/createTemporaryStorage";
 import { DeleteFormFn } from "./form/delete";
 import { FindAppendix2FormsByIdFn } from "./form/findAppendix2FormsById";
+import { FindForwardedInByIdFn } from "./form/findForwardedInById";
 import { FindFullFormByIdFn } from "./form/findFullFormById";
 import { FindUniqueFormFn } from "./form/findUnique";
 import { RemoveAppendix2Fn } from "./form/removeAppendix2";
@@ -37,7 +37,7 @@ export type RepositoryFnBuilder<Fn> = (deps: RepositoryFnDeps) => Fn;
 
 const formWithLinkedObjects = Prisma.validator<Prisma.FormArgs>()({
   include: {
-    temporaryStorageDetail: true,
+    forwardedIn: true,
     transportSegments: true,
     intermediaries: true
   }
@@ -51,11 +51,11 @@ export type FormActions = {
   findUnique: FindUniqueFormFn;
   findFullFormById: FindFullFormByIdFn;
   findAppendix2FormsById: FindAppendix2FormsByIdFn;
+  findForwardedInById: FindForwardedInByIdFn;
   create: CreateFormFn;
   update: UpdateFormFn;
   updateMany: UpdateManyFormFn;
   delete: DeleteFormFn;
-  createTemporaryStorage: CreateTemporaryStorageFn;
   count: CountFormsFn;
   removeAppendix2: RemoveAppendix2Fn;
   setAppendix2: SetAppendix2Fn;

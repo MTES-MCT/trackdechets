@@ -7,6 +7,7 @@ import { AuthType } from "../../../../auth";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { Query } from "../../../../generated/graphql/types";
+import getReadableId from "../../../../forms/readableId";
 
 const FAVORITES = `query Favorites($siret: String!, $type: FavoriteType!) {
   favorites(siret: $siret, type: $type) {
@@ -293,10 +294,7 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         recipientCompanySiret: "0".repeat(14),
-        recipientIsTempStorage: true,
-        temporaryStorageDetail: {
-          create: {}
-        }
+        recipientIsTempStorage: true
       }
     });
 
@@ -326,16 +324,18 @@ describe("query favorites", () => {
       opt: {
         recipientCompanySiret: "0".repeat(14),
         recipientIsTempStorage: true,
-        temporaryStorageDetail: {
+        forwardedIn: {
           create: {
-            destinationCompanySiret: "1".repeat(14)
+            readableId: getReadableId(),
+            ownerId: user.id,
+            recipientCompanySiret: "1".repeat(14)
           }
         }
       }
     });
-    const temporaryStorageDetail = await prisma.form
+    const forwardedIn = await prisma.form
       .findUnique({ where: { id: form.id } })
-      .temporaryStorageDetail();
+      .forwardedIn();
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
@@ -347,7 +347,7 @@ describe("query favorites", () => {
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: temporaryStorageDetail.destinationCompanySiret
+        siret: forwardedIn.recipientCompanySiret
       })
     ]);
   });

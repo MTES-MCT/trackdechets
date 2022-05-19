@@ -288,7 +288,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   const expandedDasris = await buildDasris(bsdasris);
 
   const bsds: Record<BsdType, Bsd[]> = {
-    BSDD: bsdds.map(expandFormFromDb),
+    BSDD: await Promise.all(bsdds.map(expandFormFromDb)),
     BSDASRI: expandedDasris,
     BSVHU: bsvhus.map(expandVhuFormFromDb),
     BSDA: bsdas.map(expandBsdaFromDb),

@@ -16,6 +16,7 @@ import {
   UpdateFormInput
 } from "../../../../generated/graphql/types";
 import * as validation from "../../../validation";
+import getReadableId from "../../../readableId";
 
 const UPDATE_FORM = `
   mutation UpdateForm($updateFormInput: UpdateFormInput!) {
@@ -804,9 +805,11 @@ describe("Mutation.updateForm", () => {
         status: "DRAFT",
         emitterCompanySiret: company.siret,
         recipientIsTempStorage: true,
-        temporaryStorageDetail: {
+        forwardedIn: {
           create: {
-            destinationCap: "OLD CAP"
+            readableId: getReadableId(),
+            ownerId: user.id,
+            recipientCap: "OLD CAP"
           }
         }
       }
@@ -839,9 +842,11 @@ describe("Mutation.updateForm", () => {
       opt: {
         status: "DRAFT",
         emitterCompanySiret: company.siret,
-        temporaryStorageDetail: {
+        forwardedIn: {
           create: {
-            destinationCap: "CAP"
+            readableId: getReadableId(),
+            ownerId: user.id,
+            recipientCap: "CAP"
           }
         }
       }

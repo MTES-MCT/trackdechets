@@ -10,14 +10,6 @@ import {
   QueryTransportedWastesArgs,
   AllWaste
 } from "../generated/graphql/types";
-import {
-  Bsda,
-  Bsdasri,
-  Bsff,
-  Bsvhu,
-  Form,
-  TemporaryStorageDetail
-} from "@prisma/client";
 import { integer } from "@elastic/elasticsearch/api/types";
 
 export type GenericWaste =
@@ -50,21 +42,3 @@ export type WasteConnection<WasteType extends GenericWaste> = {
   pageInfo: PageInfo;
   edges: WasteEdge<WasteType>[];
 };
-
-export interface BsdsToWastesConverter<Waste> {
-  BSDD: (
-    bsd: Form & {
-      temporaryStorageDetail: TemporaryStorageDetail;
-      appendix2Forms: Form[];
-    },
-    sirets: string[]
-  ) => Waste[];
-  BSDA: (bsda: Bsda & { forwarding: Bsda } & { grouping: Bsda[] }) => Waste;
-  BSDASRI: (bsdasri: Bsdasri & { grouping: Bsdasri[] }) => Waste;
-  BSVHU: (bsvhu: Bsvhu) => Waste;
-  BSFF: (
-    bsff: Bsff & { forwarding: Bsff } & { repackaging: Bsff[] } & {
-      grouping: Bsff[];
-    }
-  ) => Waste;
-}

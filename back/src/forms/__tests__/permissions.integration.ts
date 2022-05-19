@@ -111,12 +111,11 @@ async function checkTransporterAfterTempStoragePermission(
       status: formStatus
     }
   });
-  const tempStorageDetail = await prisma.form
-    .findUnique({ where: { id: form.id } })
-    .temporaryStorageDetail();
-  await prisma.temporaryStorageDetail.update({
-    data: { transporterCompanySiret: company.siret },
-    where: { id: tempStorageDetail.id }
+  await prisma.form.update({
+    where: { id: form.id },
+    data: {
+      forwardedIn: { update: { transporterCompanySiret: company.siret } }
+    }
   });
   return permission(user, form);
 }
@@ -133,12 +132,11 @@ async function checkDestinationAfterTempStoragePermission(
       status: formStatus
     }
   });
-  const tempStorageDetail = await prisma.form
-    .findUnique({ where: { id: form.id } })
-    .temporaryStorageDetail();
-  await prisma.temporaryStorageDetail.update({
-    data: { destinationCompanySiret: company.siret },
-    where: { id: tempStorageDetail.id }
+  await prisma.form.update({
+    where: { id: form.id },
+    data: {
+      forwardedIn: { update: { recipientCompanySiret: company.siret } }
+    }
   });
   return permission(user, form);
 }

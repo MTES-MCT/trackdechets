@@ -227,14 +227,14 @@ describe("Mutation.duplicateForm", () => {
       opt: { emitterCompanySiret: company.siret }
     });
     const {
-      destinationCompanyName,
-      destinationCompanySiret,
-      destinationCompanyAddress,
-      destinationCompanyContact,
-      destinationCompanyPhone,
-      destinationCompanyMail,
-      destinationCap,
-      destinationProcessingOperation,
+      recipientCompanyName,
+      recipientCompanySiret,
+      recipientCompanyAddress,
+      recipientCompanyContact,
+      recipientCompanyPhone,
+      recipientCompanyMail,
+      recipientCap,
+      recipientProcessingOperation,
       wasteDetailsOnuCode,
       wasteDetailsPackagingInfos,
       wasteDetailsQuantity,
@@ -249,9 +249,7 @@ describe("Mutation.duplicateForm", () => {
       transporterReceipt,
       transporterDepartment,
       transporterValidityLimit
-    } = await prisma.form
-      .findUnique({ where: { id: form.id } })
-      .temporaryStorageDetail();
+    } = await prisma.form.findUnique({ where: { id: form.id } }).forwardedIn();
 
     const { mutate } = makeClient(user);
     const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
@@ -271,25 +269,24 @@ describe("Mutation.duplicateForm", () => {
           id: duplicatedForm.id
         }
       })
-      .temporaryStorageDetail();
+      .forwardedIn();
 
     expect(duplicatedForm.recipientIsTempStorage).toBe(true);
     expect(duplicatedTemporaryStorageDetail).toMatchObject({
-      tempStorerQuantityType: null,
-      tempStorerQuantityReceived: null,
-      tempStorerWasteAcceptationStatus: null,
-      tempStorerWasteRefusalReason: null,
-      tempStorerReceivedAt: null,
-      tempStorerReceivedBy: null,
-      tempStorerSignedAt: null,
-      destinationCompanyName,
-      destinationCompanySiret,
-      destinationCompanyAddress,
-      destinationCompanyContact,
-      destinationCompanyPhone,
-      destinationCompanyMail,
-      destinationCap,
-      destinationProcessingOperation,
+      quantityReceived: null,
+      wasteAcceptationStatus: null,
+      wasteRefusalReason: null,
+      receivedAt: null,
+      receivedBy: null,
+      signedAt: null,
+      recipientCompanyName,
+      recipientCompanySiret,
+      recipientCompanyAddress,
+      recipientCompanyContact,
+      recipientCompanyPhone,
+      recipientCompanyMail,
+      recipientCap,
+      recipientProcessingOperation,
       wasteDetailsOnuCode,
       wasteDetailsPackagingInfos,
       wasteDetailsQuantity,
@@ -306,8 +303,7 @@ describe("Mutation.duplicateForm", () => {
       transporterValidityLimit,
       transporterNumberPlate: null,
       signedByTransporter: null,
-      signedBy: null,
-      signedAt: null
+      signedBy: null
     });
   });
 

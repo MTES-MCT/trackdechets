@@ -353,7 +353,7 @@ describe("Test Form reception", () => {
     expect(frm.status).toBe("RECEIVED");
     expect(frm.wasteAcceptationStatus).toBe("ACCEPTED");
     expect(frm.receivedBy).toBe("Hugo");
-    expect(frm.wasteRefusalReason).toBe("");
+    expect(frm.wasteRefusalReason).toBe(null);
     expect(frm.quantityReceived).toBe(22.7);
   });
 

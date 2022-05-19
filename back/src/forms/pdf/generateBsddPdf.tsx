@@ -28,7 +28,6 @@ import {
 import {
   expandAppendix2FormFromDb,
   expandFormFromDb,
-  expandTemporaryStorageFromDb,
   expandTransportSegmentFromDb
 } from "../form-converter";
 import { getFullForm } from "../database";
@@ -264,17 +263,16 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
   ).map(g => ({ form: g.initialForm, quantity: g.quantity }));
 
   const form: GraphQLForm = {
-    ...expandFormFromDb(fullPrismaForm),
-    temporaryStorageDetail: fullPrismaForm.temporaryStorageDetail
-      ? expandTemporaryStorageFromDb(fullPrismaForm.temporaryStorageDetail)
-      : null,
+    ...(await expandFormFromDb(fullPrismaForm)),
     transportSegments: fullPrismaForm.transportSegments.map(
       expandTransportSegmentFromDb
     ),
-    grouping: grouping.map(({ form, quantity }) => ({
-      form: expandAppendix2FormFromDb(form),
-      quantity
-    }))
+    grouping: await Promise.all(
+      grouping.map(async ({ form, quantity }) => ({
+        form: await expandAppendix2FormFromDb(form),
+        quantity
+      }))
+    )
   };
   const qrCode = await QRCode.toString(form.readableId, { type: "svg" });
   const html = ReactDOMServer.renderToStaticMarkup(

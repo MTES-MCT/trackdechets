@@ -360,8 +360,6 @@ model Form {
   ecoOrganismeName                   String?
   ecoOrganismeSiret                  String?
   signedBy                           String?
-  temporaryStorageDetailId           String?                 @unique
-  temporaryStorageDetail             TemporaryStorageDetail? @relation(fields: [temporaryStorageDetailId], references: [id])
   transportSegments                  TransportSegment[]
   groupedIn                          FormGroupement[]        @relation("GroupedIn")
   grouping                           FormGroupement[]        @relation("Grouping")
@@ -376,6 +374,10 @@ model Form {
   StatusLog            StatusLog[]
   bsddRevisionRequests BsddRevisionRequest[]
   intermediaries       IntermediaryFormAssociation[]
+
+  forwarding    Form?   @relation("BsddForwarding")
+  forwardedInId String? @unique
+  forwardedIn   Form?   @relation("BsddForwarding", fields: [forwardedInId], references: [id])
 
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
@@ -570,56 +572,6 @@ model StatusLog {
 
   @@index([userId], map: "_StatusLogUserIdIdx")
   @@index([formId], map: "_StatusLogFormIdIdx")
-}
-
-model TemporaryStorageDetail {
-  id                               String                  @id @default(cuid())
-  tempStorerQuantityType           QuantityType?
-  tempStorerQuantityReceived       Float?
-  tempStorerWasteAcceptationStatus WasteAcceptationStatus?
-  tempStorerWasteRefusalReason     String?
-  tempStorerReceivedAt             DateTime?               @db.Timestamptz(6)
-  tempStorerReceivedBy             String?
-  tempStorerSignedAt               DateTime?               @db.Timestamptz(6)
-  tempStorerSignedBy               String?
-  destinationIsFilledByEmitter     Boolean?                @default(true)
-  destinationCompanyName           String?
-  destinationCompanySiret          String?
-  destinationCompanyAddress        String?
-  destinationCompanyContact        String?
-  destinationCompanyPhone          String?
-  destinationCompanyMail           String?
-  destinationCap                   String?
-  destinationProcessingOperation   String?
-  wasteDetailsOnuCode              String?
-  wasteDetailsPackagingInfos       Json                    @default("[]")
-  wasteDetailsQuantity             Float?
-  wasteDetailsQuantityType         QuantityType?
-  transporterCompanyName           String?
-  transporterCompanySiret          String?
-  transporterCompanyVatNumber      String?
-  transporterCompanyAddress        String?
-  transporterCompanyContact        String?
-  transporterCompanyPhone          String?
-  transporterCompanyMail           String?
-  transporterIsExemptedOfReceipt   Boolean?
-  transporterReceipt               String?
-  transporterDepartment            String?
-  transporterValidityLimit         DateTime?               @db.Timestamptz(6)
-  transporterNumberPlate           String?
-  transporterCustomInfo            String?
-  transporterTransportMode         TransportMode?          @default(ROAD)
-  emittedBy                        String?
-  emittedAt                        DateTime?               @db.Timestamptz(6)
-  takenOverBy                      String?
-  takenOverAt                      DateTime?               @db.Timestamptz(6)
-  signedByTransporter              Boolean?
-  signedBy                         String?
-  signedAt                         DateTime?               @db.Timestamptz(6)
-  Form                             Form[]
-
-  @@index([destinationCompanySiret], map: "_TemporaryStorageDetailDestinationCompanyIdx")
-  @@index([transporterCompanySiret], map: "_TemporaryStorageDetailTransporterCompanySiretIdx")
 }
 
 model TraderReceipt {
