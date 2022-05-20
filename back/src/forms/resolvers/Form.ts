@@ -4,6 +4,7 @@ import appendix2Forms from "./forms/appendix2Forms";
 import transportSegments from "./forms/transportSegments";
 import temporaryStorageDetail from "./forms/temporaryStorageDetail";
 import groupedIn from "./forms/groupedIn";
+import grouping from "./forms/grouping";
 
 const formResolvers: FormResolvers = {
   appendix2Forms,
@@ -11,7 +12,8 @@ const formResolvers: FormResolvers = {
   // Somme contextual values, depending on the form status / type, mostly to ease the display
   stateSummary,
   transportSegments,
-  groupedIn
+  groupedIn,
+  grouping
 };
 
 export default formResolvers;

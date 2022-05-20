@@ -11,8 +11,8 @@ import {
   Form,
   FormCompany,
   FormStatus,
-  Appendix2Form,
   EmitterType,
+  InitialFormFraction,
 } from "generated/graphql/types";
 import {
   emitterTypeLabels,
@@ -349,18 +349,19 @@ const Recipient = ({
         />
         <DateRow value={form.processedAt} label="Traitement effectué le" />
         <DetailRow value={form.processedBy} label="Traitement effectué par" />
-        {form.groupedIn && <GroupedIn form={form.groupedIn} />}
+        {!!form.groupedIn?.length &&
+          form.groupedIn.map(({ form }) => <GroupedIn form={form} />)}
       </div>
     </>
   );
 };
 
 const Appendix2 = ({
-  appendix2Forms,
+  grouping,
 }: {
-  appendix2Forms: Appendix2Form[] | null | undefined;
+  grouping: InitialFormFraction[] | null | undefined;
 }) => {
-  if (!appendix2Forms?.length) {
+  if (!grouping?.length) {
     return <div>Aucun bordereau annexé</div>;
   }
   return (
@@ -372,31 +373,30 @@ const Appendix2 = ({
           <th>Dénomination usuelle</th>
           <th>Pesée (tonne)</th>
           <th>Réelle / estimée</th>
+          <th>Fraction regroupée (tonne)</th>
           <th>Date de réception</th>
           <th>Code postal lieu de collecte</th>
         </tr>
       </thead>
       <tbody>
-        {appendix2Forms.map((appendix2Form, index) => (
+        {grouping.map(({ form, quantity }, index) => (
           <tr key={index}>
-            <td>{appendix2Form?.readableId}</td>
-            <td>{appendix2Form?.wasteDetails?.code}</td>
-            <td>{appendix2Form?.wasteDetails?.name}</td>
+            <td>{form?.readableId}</td>
+            <td>{form?.wasteDetails?.code}</td>
+            <td>{form?.wasteDetails?.name}</td>
+            <td>{form?.quantityReceived ?? form?.wasteDetails?.quantity}</td>
             <td>
-              {appendix2Form?.quantityReceived ??
-                appendix2Form?.wasteDetails?.quantity}
-            </td>
-            <td>
-              {appendix2Form?.quantityReceived
+              {form?.quantityReceived
                 ? "R"
-                : appendix2Form?.wasteDetails?.quantityType?.charAt(0)}
+                : form?.wasteDetails?.quantityType?.charAt(0)}
             </td>
+            <td>{quantity}</td>
             <td>
-              {appendix2Form?.signedAt
-                ? format(new Date(appendix2Form?.signedAt), "dd/MM/yyyy")
+              {form?.signedAt
+                ? format(new Date(form?.signedAt), "dd/MM/yyyy")
                 : ""}
             </td>
-            <td>{appendix2Form?.emitterPostalCode}</td>
+            <td>{form?.emitterPostalCode}</td>
           </tr>
         ))}
       </tbody>
@@ -550,7 +550,7 @@ export default function BSDDetailContent({
             {/* Appendix2 tab panel */}
             {isRegroupement && (
               <TabPanel className={styles.detailTabPanel}>
-                <Appendix2 appendix2Forms={form.appendix2Forms} />
+                <Appendix2 grouping={form.grouping} />
               </TabPanel>
             )}
             {/* Emitter tab panel */}

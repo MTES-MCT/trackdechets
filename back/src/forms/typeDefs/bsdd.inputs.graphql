@@ -190,8 +190,13 @@ input CreateFormInput {
   "Courtier"
   broker: BrokerInput
 
-  "Annexe 2"
+  "Annexe 2 - Deprecated : utiliser grouping"
   appendix2Forms: [AppendixFormInput!]
+    @deprecated(reason: "Utiliser `grouping`")
+
+  "Bordereaux que celui-ci regroupe (Annexe 2) - Permet une utilisation partielle du bordereau initial"
+  grouping: [InitialFormFractionInput!]
+
   ecoOrganisme: EcoOrganismeInput
 
   temporaryStorageDetail: TemporaryStorageDetailInput
@@ -230,8 +235,13 @@ input UpdateFormInput {
   "Courtier"
   broker: BrokerInput
 
-  "Annexe 2"
+  "Annexe 2 - Deprecated : utiliser grouping"
   appendix2Forms: [AppendixFormInput!]
+    @deprecated(reason: "Utiliser `grouping`")
+
+  "Bordereaux que celui-ci regroupe (Annexe 2) - Permet une utilisation partielle du bordereau initial"
+  grouping: [InitialFormFractionInput!]
+
   ecoOrganisme: EcoOrganismeInput
 
   temporaryStorageDetail: TemporaryStorageDetailInput
@@ -270,8 +280,13 @@ input FormInput {
   "Courtier"
   broker: BrokerInput
 
-  "Annexe 2"
+  "Annexe 2 - Deprecated : utiliser grouping"
   appendix2Forms: [AppendixFormInput!]
+    @deprecated(reason: "Utiliser `grouping`")
+
+  "Bordereaux que celui-ci regroupe (Annexe 2) - Permet une utilisation partielle du bordereau initial"
+  grouping: [InitialFormFractionInput!]
+
   ecoOrganisme: EcoOrganismeInput
 
   temporaryStorageDetail: TemporaryStorageDetailInput
@@ -281,14 +296,20 @@ input FormInput {
 input AppendixFormInput {
   "Identifiant unique du bordereau"
   id: ID!
+}
 
+"""
+Fraction d'un bordereau ajouté en annexe 2 d'un bordereau de regroupement
+"""
+input InitialFormFractionInput {
+  "Bordereau annexé"
+  form: AppendixFormInput!
   """
-  N° de bordereau
-
-  Déprécié : L'id du bordereau doit être utilisé comme identifiant (paramètre id).
-  Le readableId permet de le récupérer via la query form.
+  Quantité du bordereau initial affectée au bordereau de regroupement. Si omis,
+  la totalité de la quantité restante est affectée. La quantité renseignée ne peut
+  pas être supérieure à la quantité restante.
   """
-  readableId: ID
+  quantity: Float
 }
 
 "Payload de liaison d'un BSD à un eco-organisme"

@@ -31,9 +31,9 @@ export default function Emitter() {
   function onChangeEmitterType(e) {
     const previousEmitterType = values.emitter?.type;
     emitterTypeField.onChange(e);
-    if (previousEmitterType === "APPENDIX2" && values.appendix2Forms?.length) {
+    if (previousEmitterType === "APPENDIX2" && values.grouping?.length) {
       // make sure to empty appendix2 forms when de-selecting APPENDIX2
-      setFieldValue("appendix2Forms", []);
+      setFieldValue("grouping", []);
     }
   }
 
@@ -104,10 +104,10 @@ export default function Emitter() {
           <MyCompanySelector
             fieldName="emitter.company"
             onSelect={() => {
-              if (values.appendix2Forms?.length) {
+              if (values.grouping?.length) {
                 // make sure to empty appendix2 forms because new emitter may
                 // not be recipient of the select appendix 2 forms
-                setFieldValue("appendix2Forms", []);
+                setFieldValue("grouping", []);
               }
             }}
           />

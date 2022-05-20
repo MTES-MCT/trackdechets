@@ -448,13 +448,14 @@ describe("mutation.markAsProcessed", () => {
     ]);
   });
 
-  it("should mark appendix2 forms as grouped", async () => {
+  it("should mark appendix2 forms as processed", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
     const appendix2 = await formFactory({
       ownerId: user.id,
       opt: {
-        status: "GROUPED"
+        status: "GROUPED",
+        quantityReceived: 1
       }
     });
     const form = await formFactory({
@@ -462,12 +463,14 @@ describe("mutation.markAsProcessed", () => {
       opt: {
         status: "ACCEPTED",
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
+        recipientCompanySiret: company.siret,
+        grouping: {
+          create: {
+            initialFormId: appendix2.id,
+            quantity: appendix2.quantityReceived
+          }
+        }
       }
-    });
-    await prisma.form.update({
-      where: { id: form.id },
-      data: { appendix2Forms: { connect: [{ id: appendix2.id }] } }
     });
 
     const { mutate } = makeClient(user);
@@ -488,6 +491,51 @@ describe("mutation.markAsProcessed", () => {
       where: { id: appendix2.id }
     });
     expect(appendix2grouped.status).toEqual("PROCESSED");
+  });
+
+  it("should not mark appendix2 forms as processed if they are partially grouped", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "AWAITING_GROUP",
+        quantityReceived: 1
+      }
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        grouping: {
+          create: {
+            initialFormId: appendix2.id,
+            quantity: 0.1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 1",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z"
+        }
+      }
+    });
+
+    const appendix2grouped = await prisma.form.findUnique({
+      where: { id: appendix2.id }
+    });
+    expect(appendix2grouped.status).toEqual("AWAITING_GROUP");
   });
 
   test.each(allowedFormats)("%p is a valid format for processedAt", async f => {

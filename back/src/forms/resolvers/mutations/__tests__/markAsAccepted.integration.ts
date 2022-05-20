@@ -365,7 +365,8 @@ describe("Test Form reception", () => {
       opt: {
         status: "GROUPED",
         processingOperationDone: "R 13",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -374,7 +375,8 @@ describe("Test Form reception", () => {
       opt: {
         status: "GROUPED",
         processingOperationDone: "R 13",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -387,7 +389,14 @@ describe("Test Form reception", () => {
         receivedBy: "Bill",
         recipientCompanySiret: destination.siret,
         receivedAt: new Date("2019-01-17"),
-        appendix2Forms: { connect: [{ id: form1.id }, { id: form2.id }] }
+        grouping: {
+          createMany: {
+            data: [
+              { initialFormId: form1.id, quantity: form1.quantityReceived },
+              { initialFormId: form2.id, quantity: form2.quantityReceived }
+            ]
+          }
+        }
       }
     });
 
@@ -418,11 +427,14 @@ describe("Test Form reception", () => {
     expect(updatedForm1.status).toEqual("AWAITING_GROUP");
     expect(updatedForm2.status).toEqual("AWAITING_GROUP");
 
-    const appendix2Forms = await prisma.form
+    const groupement = await prisma.form
       .findUnique({
         where: { id: groupementForm.id }
       })
-      .appendix2Forms();
+      .grouping({ include: { initialForm: true } });
+
+    const appendix2Forms = groupement.map(g => g.initialForm);
+
     expect(appendix2Forms).toEqual([]);
   });
 });

@@ -46,6 +46,7 @@ function getDuplicateFormInput(
     receivedAt,
     signedAt,
     quantityReceived,
+    quantityGrouped,
     processedBy,
     processedAt,
     processingOperationDone,
@@ -55,7 +56,6 @@ function getDuplicateFormInput(
     transporterCustomInfo,
     currentTransporterSiret,
     temporaryStorageDetailId,
-    appendix2RootFormId,
     ownerId,
 
     ...rest

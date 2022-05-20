@@ -5,6 +5,27 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.06.1] ~06/06/2022
+
+#### :rocket: Nouvelles fonctionnalités
+#### :bug: Corrections de bugs
+#### :boom: Breaking changes
+
+- Fractionnement d'un BSDD dans plusieurs annexes 2 :
+  - Dépréciation des champs :
+    - `Form.appendix2Forms: [Appendix2Form!]` : remplacé par `Form.grouping: [InitialFormFraction!]`
+    - `CreateFormInput.appendix2Forms: [AppendixFormInput!]` : remplacé par `CreateFormInput.grouping: [InitialFormFractionInput!]`
+    - `UpdateFormInput.appendix2Forms: [AppendixFormInput!]` : remplacé par `UpdateFormInput.grouping: [InitialFormFractionInput!]`
+  - Modification du type de retour de `Form.groupedIn: Form` qui devient `Form.groupedIn: [FormFraction!]`
+  - Ajout des types :
+    - `InitialFormFraction`
+    - `FormFraction`
+    - `InitialFormFractionInput`
+  - Suppression de `AppendixFormInput.readableId` qui était un champ déjà déprécié
+#### :nail_care: Améliorations
+#### :memo: Documentation
+
+#### :house: Interne
 # [2022.05.1] ~16/05/2022
 
 #### :rocket: Nouvelles fonctionnalités

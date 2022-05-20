@@ -7,8 +7,11 @@ const buildFindAppendix2FormsById: (
   deps: RepositoryFnDeps
 ) => FindAppendix2FormsByIdFn =
   ({ prisma }) =>
-  id => {
-    return prisma.form.findUnique({ where: { id } }).appendix2Forms();
+  async id => {
+    const grouping = await prisma.form
+      .findUnique({ where: { id } })
+      .grouping({ include: { initialForm: true } });
+    return grouping.map(g => g.initialForm);
   };
 
 export default buildFindAppendix2FormsById;

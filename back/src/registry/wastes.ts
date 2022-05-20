@@ -48,7 +48,7 @@ async function getWasteConnection<WasteType extends GenericWaste>(
     {
       BSDD: {
         temporaryStorageDetail: true,
-        appendix2Forms: true,
+        grouping: { include: { initialForm: true } },
         transportSegments: true
       },
       BSDA: { grouping: true, forwarding: true },

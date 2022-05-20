@@ -116,10 +116,16 @@ type Form {
   nextDestination: NextDestination
 
   "Bordereaux que celui-ci regroupe (Annexe 2)"
-  appendix2Forms: [Appendix2Form!]
+  appendix2Forms: [Appendix2Form!] @deprecated(reason: "Utiliser `grouping`")
 
-  "Bordereau dans lequel celui-ci est regroupé (Annexe 2)"
-  groupedIn: Form
+  "Bordereaux que celui-ci regroupe (Annexe 2)"
+  grouping: [InitialFormFraction!]
+
+  "Quantité déjà regroupé dans un ou plusieurs bordereaux de regroupement"
+  quantityGrouped: Float
+
+  "Bordereaux dans lequel celui-ci est regroupé (Annexe 2)"
+  groupedIn: [FormFraction!]
 
   ecoOrganisme: FormEcoOrganisme
 
@@ -176,6 +182,29 @@ type Appendix2Form {
   par l'installation de regroupement
   """
   processingOperationDone: String
+
+  "Quantité déjà regroupé dans un ou plusieurs bordereaux de regroupement"
+  quantityGrouped: Float
+}
+
+"""
+Fraction d'un bordereau ajouté en annexe 2 d'un bordereau de regroupement
+"""
+type InitialFormFraction {
+  "Bordereau initial"
+  form: Appendix2Form!
+  "Quantité du bordereau initial affectée au bordereau de regroupement"
+  quantity: Float!
+}
+
+"""
+Fraction d'un bordereau initial affectée à un bordereau de regroupement
+"""
+type FormFraction {
+  "Bordereau de regroupement"
+  form: Form!
+  "Quantité du bordereau initial affectée au bordereau de regroupement"
+  quantity: Float!
 }
 
 """

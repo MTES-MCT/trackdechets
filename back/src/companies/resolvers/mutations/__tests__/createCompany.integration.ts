@@ -459,5 +459,5 @@ describe("Mutation.createCompany", () => {
     );
 
     process.env = OLD_ENV;
-  });
+  }, 30000);
 });

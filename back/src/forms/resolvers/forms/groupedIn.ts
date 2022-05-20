@@ -3,15 +3,15 @@ import prisma from "../../../prisma";
 import { expandFormFromDb } from "../../form-converter";
 
 const groupedInResolver: FormResolvers["groupedIn"] = async form => {
-  const groupedIn = await prisma.form
-    .findUnique({
-      where: { id: form.id }
-    })
-    .appendix2RootForm();
-  if (groupedIn) {
-    return expandFormFromDb(groupedIn);
-  }
-  return null;
+  const groupement = await prisma.formGroupement.findMany({
+    where: { initialFormId: form.id },
+    include: { nextForm: true }
+  });
+
+  return groupement.map(({ nextForm, quantity }) => ({
+    form: expandFormFromDb(nextForm),
+    quantity
+  }));
 };
 
 export default groupedInResolver;

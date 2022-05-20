@@ -17,3 +17,16 @@ export function markAsProcessed(company: string): WorkflowStep {
     setContext: (ctx, data) => ({ ...ctx, bsd: data })
   };
 }
+
+export function markAsAwaitingGroup(company: string): WorkflowStep {
+  return {
+    ...markAsProcessed(company),
+    description: `Le bordereau est marqué en attente de regroupement (AWAITING_GROUP)`,
+    expected: { status: "AWAITING_GROUP" },
+    variables: ({ bsd, traiteur }) => ({
+      id: bsd.id,
+      processedInfo: fixtures.awaitingGroupInfoInput(traiteur.siret)
+    }),
+    setContext: (ctx, data) => ({ ...ctx, initialBsd: data })
+  };
+}

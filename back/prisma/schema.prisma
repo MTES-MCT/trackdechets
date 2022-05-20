@@ -360,13 +360,18 @@ model Form {
   temporaryStorageDetailId           String?                 @unique
   temporaryStorageDetail             TemporaryStorageDetail? @relation(fields: [temporaryStorageDetailId], references: [id])
   transportSegments                  TransportSegment[]
-  appendix2Forms                     Form[]                  @relation("FormToForm")
-  appendix2RootFormId                String?
-  appendix2RootForm                  Form?                   @relation("FormToForm", fields: [appendix2RootFormId], references: [id])
-  ownerId                            String
-  owner                              User                    @relation(fields: [ownerId], references: [id])
-  StatusLog                          StatusLog[]
-  bsddRevisionRequests               BsddRevisionRequest[]
+  groupedIn                          FormGroupement[]        @relation("GroupedIn")
+  grouping                           FormGroupement[]        @relation("Grouping")
+  // quantité affectée à des bordereaux de regroupement
+  quantityGrouped                    Float                   @default(0)
+
+  // TODO delete after release 2022.06.1
+  appendix2RootFormId String?
+
+  ownerId              String
+  owner                User                  @relation(fields: [ownerId], references: [id])
+  StatusLog            StatusLog[]
+  bsddRevisionRequests BsddRevisionRequest[]
 
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
@@ -374,7 +379,19 @@ model Form {
   @@index([traderCompanySiret], map: "_FormTraderCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_FormBrokerCompanySiretIdx")
   @@index([status], map: "_FormStatusIdx")
-  @@index([appendix2RootFormId], map: "_FormAppendix2RootFormIdIdx")
+}
+
+model FormGroupement {
+  id            String @id @default(cuid())
+  nextFormId    String
+  nextForm      Form   @relation(fields: [nextFormId], references: [id], name: "Grouping")
+  initialFormId String
+  initialForm   Form   @relation(fields: [initialFormId], references: [id], name: "GroupedIn")
+  quantity      Float
+
+  @@unique([nextFormId, initialFormId])
+  @@index([nextFormId], map: "_FormGroupementNextFormId")
+  @@index([initialFormId], map: "_FormGroupementInitialFormId")
 }
 
 enum RevisionRequestStatus {
