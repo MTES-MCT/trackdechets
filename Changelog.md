@@ -7,6 +7,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2022.06.1] ~06/06/2022
 
+#### :rocket: Nouvelles fonctionnalités
+#### :bug: Corrections de bugs
 #### :boom: Breaking changes
 
 - Fractionnement d'un BSDD dans plusieurs annexes 2 :
@@ -20,7 +22,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
     - `FormFraction`
     - `InitialFormFractionInput`
   - Suppression de `AppendixFormInput.readableId` qui était un champ déjà déprécié
+#### :nail_care: Améliorations
+#### :memo: Documentation
 
+#### :house: Interne
 # [2022.05.1] ~16/05/2022
 
 #### :rocket: Nouvelles fonctionnalités
