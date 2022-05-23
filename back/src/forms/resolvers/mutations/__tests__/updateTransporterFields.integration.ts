@@ -97,7 +97,7 @@ describe("Forms -> updateTransporterFields mutation", () => {
   `;
     const { errors } = await mutate(mutation);
     expect(errors[0].message).toEqual(
-      "Ce champ n'est pas modifiable sur un bordereau qui n'est pas en statut scellé"
+      "Ce champ n'est pas modifiable sur un bordereau qui n'est pas en statut scellé ou signé par le producteur"
     );
 
     form = await prisma.form.findUnique({ where: { id: form.id } });

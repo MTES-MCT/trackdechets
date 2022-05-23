@@ -2,7 +2,8 @@ import { useMutation, gql } from "@apollo/client";
 import { useFormik } from "formik";
 import React, { useState } from "react";
 
-import { Form as FormModel, FormStatus } from "generated/graphql/types";
+import { Form as FormModel } from "generated/graphql/types";
+import { isBsddTransporterFieldEditable } from "generated/constants/formHelpers";
 import { NotificationError } from "common/components/Error";
 import { capitalize } from "common/helper";
 import { IconPaperWrite } from "common/components/Icons";
@@ -65,7 +66,7 @@ export default function TransporterInfoEdit({
     },
   });
 
-  if (![FormStatus.Sealed, FormStatus.SignedByProducer].includes(form.status)) {
+  if (!isBsddTransporterFieldEditable(form.status)) {
     return null;
   }
   return (
