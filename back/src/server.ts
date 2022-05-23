@@ -266,7 +266,17 @@ app.use(
   serveStatic(path.join(__dirname, "common/plugins/graphiql/assets"))
 );
 
-app.use(bullBoardPath, serverAdapter.getRouter());
+function ensureLoggedInAndAdmin() {
+  // check passeport populated user is admin
+  return function (req, res, next) {
+    if (!req.isAuthenticated || !req.isAuthenticated() || !req?.user?.isAdmin) {
+      return res.status(404).send("Not found");
+    }
+
+    next();
+  };
+}
+app.use(bullBoardPath, ensureLoggedInAndAdmin(), serverAdapter.getRouter());
 
 // Apply passport auth middlewares to the graphQL endpoint
 app.use(graphQLPath, passportBearerMiddleware, passportJwtMiddleware);
