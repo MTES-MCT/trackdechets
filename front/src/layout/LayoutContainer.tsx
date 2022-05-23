@@ -31,11 +31,13 @@ const BsdaFormContainer = lazy(() => import("form/bsda/FormContainer"));
 const SignupInfo = lazy(() => import("login/SignupInfos"));
 const WasteSelector = lazy(() => import("login/WasteSelector"));
 
-const Invite = lazy(() => import("login/Invite"));
-const PasswordResetRequest = lazy(() => import("login/PasswordResetRequest"));
+const Invite = lazy(() => import("login/Invite.new"));
+const PasswordResetRequest = lazy(() =>
+  import("login/PasswordResetRequest.new")
+);
 const PasswordReset = lazy(() => import("login/PasswordReset"));
-const Login = lazy(() => import("login/Login"));
-const Signup = lazy(() => import("login/Signup"));
+const Login = lazy(() => import("login/Login.new"));
+const Signup = lazy(() => import("login/Signup.new"));
 const Dialog = lazy(() => import("oauth2/Dialog"));
 const Company = lazy(() => import("company/Company"));
 const WasteTree = lazy(() => import("search/WasteTree"));

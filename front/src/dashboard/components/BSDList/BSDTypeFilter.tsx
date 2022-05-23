@@ -65,7 +65,12 @@ export function BSDTypeFilter({
               <IconChevronDown className={styles.BSDTypeFilterToggleIcon} />
             )}
           </MenuButton>
-          <MenuList className={styles.BSDTypeFilterMenu}>
+          <MenuList
+            className={classNames(
+              "fr-raw-link fr-raw-list",
+              styles.BSDTypeFilterMenu
+            )}
+          >
             {OPTIONS.map(({ value, Icon, label }) => {
               const isChecked = filterValue.includes(value);
 

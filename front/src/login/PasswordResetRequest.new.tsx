@@ -2,7 +2,7 @@ import { useMutation, gql } from "@apollo/client";
 import React, { useState, createRef } from "react";
 import {
   Mutation,
-  MutationResendActivationEmailArgs,
+  MutationCreatePasswordResetRequestArgs,
 } from "generated/graphql/types";
 
 import {
@@ -17,26 +17,26 @@ import {
 } from "@dataesr/react-dsfr";
 import styles from "./Login.module.scss";
 
-const RESEND_ACTIVATION_EMAIL = gql`
-  mutation ResendActivationEmail($email: String!) {
-    resendActivationEmail(email: $email)
+const RESET_PASSWORD = gql`
+  mutation CreatePasswordResetRequest($email: String!) {
+    createPasswordResetRequest(email: $email)
   }
 `;
 
-export default function ResendActivationEmail() {
+export default function PasswordResetRequest() {
   const [submittable, setSubmittable] = useState(false);
 
-  const [resendActivationEmail, { data, error }] = useMutation<
-    Pick<Mutation, "resendActivationEmail">,
-    MutationResendActivationEmailArgs
-  >(RESEND_ACTIVATION_EMAIL);
+  const [createPasswordResetReques, { data, error }] = useMutation<
+    Pick<Mutation, "createPasswordResetRequest">,
+    MutationCreatePasswordResetRequestArgs
+  >(RESET_PASSWORD);
 
   const emailRef = createRef<HTMLInputElement>();
 
-  const onClickSend = () => {
+  const onClickSubmit = () => {
     const email = emailRef.current?.value || "";
 
-    resendActivationEmail({ variables: { email } });
+    createPasswordResetReques({ variables: { email } });
   };
 
   const onChange = () => {
@@ -72,12 +72,11 @@ export default function ResendActivationEmail() {
         <Row justifyContent="center" spacing="mb-2w">
           <Col spacing="m-auto">
             <Title as="h1" look="h3" spacing="mb-3w">
-              Renvoyer l'email d'activation
+              Réinitialisation de votre mot de passe
             </Title>
             <Text as="p">
-              Si vous n'avez pas reçu d'email d'activation suite à votre
-              inscription, vous pouvez en renvoyer un en renseignant votre
-              adresse email ci-dessous :
+              Afin de réinitialiser votre mot de passe, merci de saisir votre
+              email. Un lien vous sera transmis à cette adresse email.
             </Text>
             <TextInput
               // @ts-ignore
@@ -90,8 +89,8 @@ export default function ResendActivationEmail() {
         </Row>
         <Row justifyContent="right">
           <Col className={styles.resetFlexCol}>
-            <Button disabled={!submittable} size="md" onClick={onClickSend}>
-              Renvoyer l'email
+            <Button disabled={!submittable} size="md" onClick={onClickSubmit}>
+              Réinitialiser
             </Button>
           </Col>
         </Row>

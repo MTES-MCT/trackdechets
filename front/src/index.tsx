@@ -4,11 +4,11 @@ import "react-app-polyfill/stable";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import "./scss/index.scss";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import * as Sentry from "@sentry/browser";
 import "@reach/tooltip/styles.css";
+import "./scss/index.scss";
 
 if (import.meta.env.VITE_SENTRY_DSN) {
   Sentry.init({

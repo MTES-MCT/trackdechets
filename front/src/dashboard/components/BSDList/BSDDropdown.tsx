@@ -2,6 +2,7 @@ import React from "react";
 import { generatePath, Link } from "react-router-dom";
 import { Menu, MenuList, MenuButton, MenuLink } from "@reach/menu-button";
 import routes from "common/routes";
+import styles from "./BSDActions.module.scss";
 
 type Props = { siret: string };
 
@@ -23,9 +24,10 @@ export function BSDDropdown({ siret }: Props) {
       <MenuButton className="btn btn--primary">
         Créer un bordereau <span aria-hidden>▾</span>
       </MenuButton>
-      <MenuList>
+      <MenuList className="fr-raw-link fr-raw-list">
         {links.map(link => (
           <MenuLink
+            className={styles.BSDDropdown}
             as={Link}
             to={generatePath(link.route, { siret })}
             key={link.title}
