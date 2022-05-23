@@ -194,9 +194,22 @@ export const formSchema = object().shape({
     .nullable()
     .shape({
       company: companySchema,
-      validityLimit: date().nullable(true),
-      department: string().nullable(),
-      receipt: string().nullable(),
+      validityLimit: date().required(
+        "La date de limite de validité est obligatoire"
+      ),
+      department: string().required("Le département est obligatoire"),
+      receipt: string().required("Le numéro de récépissé est obligatoire"),
+    }),
+  broker: object()
+    .notRequired()
+    .nullable()
+    .shape({
+      company: companySchema,
+      validityLimit: date().required(
+        "La date de limite de validité est obligatoire"
+      ),
+      department: string().required("Le département est obligatoire"),
+      receipt: string().required("Le numéro de récépissé est obligatoire"),
     }),
   wasteDetails: object().shape({
     code: string().required("Code déchet manquant"),
