@@ -23,6 +23,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
     - `InitialFormFractionInput`
   - Suppression de `AppendixFormInput.readableId` qui était un champ déjà déprécié
 #### :nail_care: Améliorations
+
+- Auto-remplissage du pays et du numéro TVA éventuel pour le PDF des BSDD (transporteurs identifiés par TVA) [PR 1399](https://github.com/MTES-MCT/trackdechets/pull/1399)
+
 #### :memo: Documentation
 
 #### :house: Interne

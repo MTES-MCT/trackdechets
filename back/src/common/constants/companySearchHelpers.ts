@@ -81,8 +81,8 @@ export const isSiret = (clue: string): boolean =>
  */
 export const isVat = (clue: string): boolean => {
   if (!clue) return false;
-  const isRegextValid = checkVAT(clue.trim(), countries);
-  return isRegextValid.isValid;
+  const isRegexValid = checkVAT(clue.trim(), countries);
+  return isRegexValid.isValid;
 };
 
 /**
