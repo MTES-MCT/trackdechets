@@ -55,6 +55,16 @@ export const wasteDetailsFragment = gql`
     consistence
     pop
     isDangerous
+    parcelNumbers {
+      city
+      postalCode
+      prefix
+      section
+      number
+      x
+      y
+    }
+    analysisReferences
   }
 `;
 

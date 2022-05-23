@@ -291,6 +291,8 @@ model Form {
   wasteDetailsQuantityType           QuantityType?
   wasteDetailsPop                    Boolean                 @default(false)
   wasteDetailsIsDangerous            Boolean                 @default(false)
+  wasteDetailsParcelNumbers          Json                    @default("[]")
+  wasteDetailsAnalysisReferences     String[]
   readableId                         String                  @unique
   status                             Status                  @default(DRAFT)
   emittedBy                          String?

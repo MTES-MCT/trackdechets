@@ -566,6 +566,36 @@ input WasteDetailsInput {
   dont le code ne comporte pas d'astérisque.
   """
   isDangerous: Boolean
+
+  """
+  Utilisé en cas de bordereau de terre excavée ou sédiment.
+  La ou les parcelles cadastrales du lieu de production des terres excavées et sédiments avec leurs identifications,
+  ou, en cas de domaine non cadastré, l'identification précise du lieu géographique de production
+  """
+  parcelNumbers: [ParcelNumberInput!]
+
+  "Numéros de référence(s) d'analyse(s)"
+  analysisReferences: [String]
+}
+
+"""
+Payload lié au numéro de parcelle cadastrale
+"""
+input ParcelNumberInput {
+  "Ville"
+  city: String
+  "Code postal"
+  postalCode: String
+  "Prefixe cadastral"
+  prefix: String
+  "Numéro de section cadastrale"
+  section: String
+  "Numéro de parcelle cadastrale"
+  number: String
+  "Coordonnée X au format Lambert II, à utiliser uniquement en cas de domaine non cadastré"
+  x: Float
+  "Coordonnée Y au format Lambert II, à utiliser uniquement en cas de domaine non cadastré"
+  y: Float
 }
 
 """

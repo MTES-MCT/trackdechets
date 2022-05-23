@@ -93,6 +93,8 @@ type WasteDetails = Pick<
   | "wasteDetailsQuantityType"
   | "wasteDetailsConsistence"
   | "wasteDetailsPop"
+  | "wasteDetailsParcelNumbers"
+  | "wasteDetailsAnalysisReferences"
 >;
 
 type Transporter = Pick<
@@ -394,6 +396,16 @@ const packagingInfoFn = (isDraft: boolean) =>
       )
   });
 
+const parcelNumber = yup.object({
+  city: yup.string().required(),
+  postalCode: yup.string().required(),
+  prefix: yup.string().nullable(),
+  section: yup.string().nullable(),
+  number: yup.string().nullable(),
+  x: yup.number().nullable(),
+  y: yup.number().nullable()
+});
+
 // 3 - Dénomination du déchet
 // 4 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
 // 5 - Conditionnement
@@ -468,7 +480,9 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
             `Un déchet avec un code comportant un astérisque est forcément dangereux`
           ),
       otherwise: () => yup.boolean()
-    })
+    }),
+    wasteDetailsParcelNumbers: yup.array().of(parcelNumber),
+    wasteDetailsAnalysisReferences: yup.array().of(yup.string())
   });
 
 export const wasteDetailsSchema = wasteDetailsSchemaFn(false);

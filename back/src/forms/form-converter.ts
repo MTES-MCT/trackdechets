@@ -46,7 +46,8 @@ import {
   FormRevisionRequestWasteDetails,
   FormRevisionRequestTemporaryStorageDetail,
   FormRevisionRequestDestination,
-  FormRevisionRequestRecipient
+  FormRevisionRequestRecipient,
+  ParcelNumber
 } from "../generated/graphql/types";
 import { extractPostalCode } from "../utils";
 
@@ -176,7 +177,14 @@ function flattenWasteDetailsInput(input: { wasteDetails?: WasteDetailsInput }) {
     wasteDetailsName: chain(input.wasteDetails, w => w.name),
     wasteDetailsConsistence: chain(input.wasteDetails, w => w.consistence),
     wasteDetailsPop: chain(input.wasteDetails, w => w.pop),
-    wasteDetailsIsDangerous: chain(input.wasteDetails, w => w.isDangerous)
+    wasteDetailsIsDangerous: chain(input.wasteDetails, w => w.isDangerous),
+    wasteDetailsParcelNumbers: chain(input.wasteDetails, w =>
+      undefinedOrDefault(w.parcelNumbers, [])
+    ),
+    wasteDetailsAnalysisReferences: chain(
+      input.wasteDetails,
+      w => w.analysisReferences
+    )
   };
 }
 
@@ -610,7 +618,9 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       quantityType: form.wasteDetailsQuantityType,
       consistence: form.wasteDetailsConsistence,
       pop: form.wasteDetailsPop,
-      isDangerous: form.wasteDetailsIsDangerous
+      isDangerous: form.wasteDetailsIsDangerous,
+      parcelNumbers: form.wasteDetailsParcelNumbers as ParcelNumber[],
+      analysisReferences: form.wasteDetailsAnalysisReferences
     }),
     trader: nullIfNoValues<Trader>({
       company: nullIfNoValues<FormCompany>({

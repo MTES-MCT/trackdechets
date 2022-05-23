@@ -460,6 +460,35 @@ type WasteDetails {
 
   "Caractère dangereux du déchet au sens de l’article R541-8 du code de l’environnement"
   isDangerous: Boolean
+
+  """
+  Identifiants des parcelles cadastrales concernées, ou,
+  en cas de domaine non cadastré, l'identification précise des lieux géographiques de production
+  """
+  parcelNumbers: [ParcelNumber!]
+
+  "Numéros de référence(s) d'analyse(s)"
+  analysisReferences: [String]
+}
+
+"""
+Identification des parcelles cadastrales
+"""
+type ParcelNumber {
+  "Ville"
+  city: String
+  "Code postal"
+  postalCode: String
+  "Prefixe cadastral"
+  prefix: String
+  "Numéro de section cadastrale"
+  section: String
+  "Numéro de parcelle cadastrale"
+  number: String
+  "Coordonnée X au format Lambert II, en cas de domaine non cadastré"
+  x: Float
+  "Coordonnée Y au format Lambert II, en cas de domaine non cadastré"
+  y: Float
 }
 
 "Négociant (case 7)"
