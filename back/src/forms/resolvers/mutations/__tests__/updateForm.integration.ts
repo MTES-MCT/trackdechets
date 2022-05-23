@@ -156,7 +156,7 @@ describe("Mutation.updateForm", () => {
     ]);
   });
 
-  it.each(["emitter", "trader", "recipient", "transporter"])(
+  it.each(["emitter", "trader", "broker", "recipient", "transporter"])(
     "should allow %p to update a draft form",
     async role => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -184,7 +184,7 @@ describe("Mutation.updateForm", () => {
     }
   );
 
-  it.each(["emitter", "trader", "recipient", "transporter"])(
+  it.each(["emitter", "trader", "broker", "recipient", "transporter"])(
     "should allow %p to update a sealed form",
     async role => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -192,7 +192,19 @@ describe("Mutation.updateForm", () => {
         ownerId: user.id,
         opt: {
           [`${role}CompanySiret`]: company.siret,
-          status: "SEALED"
+          status: "SEALED",
+          ...(["trader", "broker"].includes(role)
+            ? {
+                [`${role}CompanyName`]: "Trader or Broker",
+                [`${role}CompanyContact`]: "Mr Trader or Broker",
+                [`${role}CompanyMail`]: "traderbroker@trackdechets.fr",
+                [`${role}CompanyAddress`]: "Wall street",
+                [`${role}CompanyPhone`]: "00 00 00 00 00",
+                [`${role}Receipt`]: "receipt",
+                [`${role}Department`]: "07",
+                [`${role}ValidityLimit`]: new Date("2023-01-01")
+              }
+            : {})
         }
       });
 

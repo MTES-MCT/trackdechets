@@ -22,6 +22,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
     - `FormFraction`
     - `InitialFormFractionInput`
   - Suppression de `AppendixFormInput.readableId` qui était un champ déjà déprécié
+- Les informations de contact et de récépissé des courtiers et négociants sont désormais obligatoires lorsqu'un courtier ou un négociant apparait sur un BSDD. [PR 1418](https://github.com/MTES-MCT/trackdechets/pull/1418/)
 #### :nail_care: Améliorations
 
 - Auto-remplissage du pays et du numéro TVA éventuel pour le PDF des BSDD (transporteurs identifiés par TVA) [PR 1399](https://github.com/MTES-MCT/trackdechets/pull/1399)
