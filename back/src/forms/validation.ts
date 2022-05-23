@@ -107,6 +107,32 @@ type Transporter = Pick<
   | "transporterCompanyVatNumber"
 >;
 
+type Trader = Pick<
+  Prisma.FormCreateInput,
+  | "traderCompanyName"
+  | "traderCompanySiret"
+  | "traderCompanyAddress"
+  | "traderCompanyContact"
+  | "traderCompanyPhone"
+  | "traderCompanyMail"
+  | "traderReceipt"
+  | "traderDepartment"
+  | "traderValidityLimit"
+>;
+
+type Broker = Pick<
+  Prisma.FormCreateInput,
+  | "brokerCompanyName"
+  | "brokerCompanySiret"
+  | "brokerCompanyAddress"
+  | "brokerCompanyContact"
+  | "brokerCompanyPhone"
+  | "brokerCompanyMail"
+  | "brokerReceipt"
+  | "brokerDepartment"
+  | "brokerValidityLimit"
+>;
+
 type ReceivedInfo = Pick<
   Prisma.FormCreateInput,
   | "isAccepted"
@@ -532,6 +558,155 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
         ),
       transporterValidityLimit: yup.date().nullable()
     });
+
+export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
+  yup.object({
+    traderCompanySiret: yup
+      .string()
+      .notRequired()
+      .nullable()
+      .matches(/^$|^\d{14}$/, {
+        message: `Négociant: ${INVALID_SIRET_LENGTH}`
+      }),
+    traderCompanyName: yup.string().when("traderCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_NAME}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    traderCompanyAddress: yup.string().when("traderCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_ADDRESS}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    traderCompanyContact: yup.string().when("traderCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_CONTACT}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    traderCompanyPhone: yup.string().when("traderCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_PHONE}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    traderCompanyMail: yup
+      .string()
+      .email()
+      .when("traderCompanySiret", {
+        is: siret => siret?.length === 14,
+        then: schema =>
+          schema
+            .ensure()
+            .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_EMAIL}`),
+        otherwise: schema => schema.notRequired().nullable()
+      }),
+    traderReceipt: yup.string().when("traderCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, "Négociant: Numéro de récepissé obligatoire"),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    traderDepartment: yup.string().when("traderCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, "Négociant : Département obligatoire"),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    traderValidityLimit: yup.date().when("traderCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema.requiredIf(!isDraft, "Négociant : Date de validité obligatoire"),
+      otherwise: schema => schema.notRequired().nullable()
+    })
+  });
+
+export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
+  yup.object({
+    brokerCompanySiret: yup
+      .string()
+      .notRequired()
+      .nullable()
+      .matches(/^$|^\d{14}$/, {
+        message: `Courtier : ${INVALID_SIRET_LENGTH}`
+      }),
+    brokerCompanyName: yup.string().when("brokerCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_NAME}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    brokerCompanyAddress: yup.string().when("brokerCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_ADDRESS}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    brokerCompanyContact: yup.string().when("brokerCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_CONTACT}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    brokerCompanyPhone: yup.string().when("brokerCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_PHONE}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    brokerCompanyMail: yup.string().when("brokerCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_EMAIL}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    brokerReceipt: yup.string().when("brokerCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, "Courtier : Numéro de récepissé obligatoire"),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    brokerDepartment: yup.string().when("brokerCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, "Courtier : Département obligatoire"),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    brokerValidityLimit: yup.date().when("brokerCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema.requiredIf(!isDraft, "Courtier : Date de validité obligatoire"),
+      otherwise: schema => schema.notRequired().nullable()
+    })
+  });
 
 // 8 - Collecteur-transporteur
 // 9 - Déclaration générale de l’émetteur du bordereau :
@@ -987,7 +1162,9 @@ const baseFormSchemaFn = (isDraft: boolean) =>
     .concat(ecoOrganismeSchema)
     .concat(recipientSchemaFn(isDraft))
     .concat(wasteDetailsSchemaFn(isDraft))
-    .concat(transporterSchemaFn(isDraft));
+    .concat(transporterSchemaFn(isDraft))
+    .concat(traderSchemaFn(isDraft))
+    .concat(brokerSchemaFn(isDraft));
 
 export const sealedFormSchema = baseFormSchemaFn(false);
 export const draftFormSchema = baseFormSchemaFn(true);
