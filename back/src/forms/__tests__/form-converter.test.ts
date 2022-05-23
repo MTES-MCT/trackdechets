@@ -353,7 +353,9 @@ describe("flattenFormInput", () => {
       wasteDetailsQuantityType: null,
       wasteDetailsConsistence: null,
       wasteDetailsPop: null,
-      wasteDetailsIsDangerous: null
+      wasteDetailsIsDangerous: null,
+      wasteDetailsAnalysisReferences: null,
+      wasteDetailsParcelNumbers: null
     };
 
     expect(flattened).toEqual(expected);
@@ -375,7 +377,9 @@ describe("flattenFormInput", () => {
       wasteDetailsPop: null,
       wasteDetailsIsDangerous: null,
       wasteDetailsQuantity: null,
-      wasteDetailsQuantityType: null
+      wasteDetailsQuantityType: null,
+      wasteDetailsParcelNumbers: null,
+      wasteDetailsAnalysisReferences: null
     });
   });
 
