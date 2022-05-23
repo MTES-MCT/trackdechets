@@ -2,7 +2,7 @@ import { useMutation, gql } from "@apollo/client";
 import { useFormik } from "formik";
 import React, { useState } from "react";
 
-import { Form as FormModel } from "generated/graphql/types";
+import { Form as FormModel, FormStatus } from "generated/graphql/types";
 import { NotificationError } from "common/components/Error";
 import { capitalize } from "common/helper";
 import { IconPaperWrite } from "common/components/Icons";
@@ -65,7 +65,7 @@ export default function TransporterInfoEdit({
     },
   });
 
-  if (form.status !== "SEALED") {
+  if (![FormStatus.Sealed, FormStatus.SignedByProducer].includes(form.status)) {
     return null;
   }
   return (
