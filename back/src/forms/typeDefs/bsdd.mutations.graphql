@@ -86,6 +86,8 @@ type Mutation {
     pop
   }
   ```
+  Lorsqu'un courtier ou un négociant est présent sur le BSDD, les informations de contact,
+  ainsi que le numéro, la limite de validité et le département du récépissé sont obligatoires.
   """
   markAsSealed("ID d'un BSD" id: ID!): Form
 
