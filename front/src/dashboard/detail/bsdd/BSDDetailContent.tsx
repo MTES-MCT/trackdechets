@@ -476,10 +476,17 @@ export default function BSDDetailContent({
               <dd>{getVerboseConsistence(form.wasteDetails?.consistence)}</dd>
               <DetailRow
                 value={form.wasteDetails?.parcelNumbers
-                  ?.map(pn =>
-                    [pn.prefix, pn.section, pn.number, pn.x, pn.y]
-                      .filter(Boolean)
-                      .join("/")
+                  ?.map(
+                    pn =>
+                      `${pn.city} - ${pn.postalCode} - ${[
+                        pn.prefix,
+                        pn.section,
+                        pn.number,
+                        pn.x,
+                        pn.y,
+                      ]
+                        .filter(Boolean)
+                        .join("/")}`
                   )
                   .join(", ")}
                 label="Numéro(s) de parcelle(s)"
