@@ -15,7 +15,10 @@ type Mutation {
   saveForm("Payload du BSD" formInput: FormInput!): Form
     @deprecated(reason: "Utiliser createForm / updateForm selon le besoin")
 
-  "Met à jour la plaque d'immatriculation ou le champ libre du transporteur"
+  """
+  Met à jour la plaque d'immatriculation ou le champ libre du transporteur.
+  Disponible pour le Bsdd au statut SEALED ou SIGNED_BY_PRODUCER.
+  """
   updateTransporterFields(
     "ID d'un BSD"
     id: ID!

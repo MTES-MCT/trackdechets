@@ -1,5 +1,6 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { isBsddTransporterFieldEditable } from "../../../common/constants/formHelpers";
 import { getFormOrFormNotFound } from "../../database";
 import { ForbiddenError } from "apollo-server-express";
 import { checkCanUpdateTransporterFields } from "../../permissions";
@@ -16,9 +17,9 @@ const updateTransporterFieldsResolver: MutationResolvers["updateTransporterField
 
     const form = await getFormOrFormNotFound({ id });
 
-    if (form.status !== "SEALED") {
+    if (!isBsddTransporterFieldEditable(form.status)) {
       throw new ForbiddenError(
-        "Ce champ n'est pas modifiable sur un bordereau qui n'est pas en statut scellé"
+        "Ce champ n'est pas modifiable sur un bordereau qui n'est pas en statut scellé ou signé par le producteur"
       );
     }
 

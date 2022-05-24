@@ -3,6 +3,7 @@ import { useFormik } from "formik";
 import React, { useState } from "react";
 
 import { Form as FormModel } from "generated/graphql/types";
+import { isBsddTransporterFieldEditable } from "generated/constants/formHelpers";
 import { NotificationError } from "common/components/Error";
 import { capitalize } from "common/helper";
 import { IconPaperWrite } from "common/components/Icons";
@@ -65,7 +66,7 @@ export default function TransporterInfoEdit({
     },
   });
 
-  if (form.status !== "SEALED") {
+  if (!isBsddTransporterFieldEditable(form.status)) {
     return null;
   }
   return (
