@@ -111,7 +111,7 @@ describe("Mutation.Bsda.createDraft", () => {
       },
       destination: {
         company: {
-          siret: "11111111111111"
+          siret: "3".repeat(14)
         }
       }
     };

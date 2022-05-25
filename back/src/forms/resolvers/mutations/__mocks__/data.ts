@@ -119,7 +119,8 @@ export function getNewValidForm(): GraphQLForm {
       ],
       quantity: 1.5,
       quantityType: "REAL" as QuantityType
-    }
+    },
+    intermediaries: []
   };
 }
 
@@ -207,7 +208,8 @@ const EMPTY_FORM = {
       cap: "",
       processingOperation: ""
     }
-  }
+  },
+  intermediaries: []
 };
 
 // Don't expose the object to avoid sharing modified values of it

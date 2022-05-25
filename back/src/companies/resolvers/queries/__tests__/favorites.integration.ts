@@ -104,7 +104,7 @@ describe("query favorites", () => {
     const secondForm = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: "1".repeat(14)
+        emitterCompanySiret: "2".repeat(14)
       }
     });
 

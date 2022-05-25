@@ -36,7 +36,7 @@ const MARK_AS_PROCESSED = `
 `;
 
 describe("mutation.markAsProcessed", () => {
-  afterAll(() => resetDatabase());
+  afterEach(() => resetDatabase());
 
   it("should fail if current user is not recipient", async () => {
     const { user } = await userWithCompanyFactory("ADMIN");

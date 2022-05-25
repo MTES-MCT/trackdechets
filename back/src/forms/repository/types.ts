@@ -36,7 +36,11 @@ export interface RepositoryDeps {
 export type RepositoryFnBuilder<Fn> = (deps: RepositoryFnDeps) => Fn;
 
 const formWithLinkedObjects = Prisma.validator<Prisma.FormArgs>()({
-  include: { temporaryStorageDetail: true, transportSegments: true }
+  include: {
+    temporaryStorageDetail: true,
+    transportSegments: true,
+    intermediaries: true
+  }
 });
 
 export type FullForm = Prisma.FormGetPayload<typeof formWithLinkedObjects>;

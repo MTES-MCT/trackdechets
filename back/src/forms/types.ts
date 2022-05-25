@@ -4,7 +4,8 @@ import {
   TransportSegment,
   Prisma,
   TransportMode,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  IntermediaryFormAssociation
 } from "@prisma/client";
 import { FormStatus } from "../generated/graphql/types";
 
@@ -14,9 +15,10 @@ import { FormStatus } from "../generated/graphql/types";
 export interface FullForm extends Form {
   temporaryStorageDetail: TemporaryStorageDetail;
   transportSegments: TransportSegment[];
+  intermediaries: IntermediaryFormAssociation[];
 }
 
-export type FormSirets = Pick<
+export type FormCompanies = Pick<
   Form,
   | "emitterCompanySiret"
   | "recipientCompanySiret"
@@ -25,12 +27,17 @@ export type FormSirets = Pick<
   | "brokerCompanySiret"
   | "ecoOrganismeSiret"
 > & {
-  temporaryStorageDetail?: Pick<
-    TemporaryStorageDetail,
-    "transporterCompanySiret" | "destinationCompanySiret"
+  temporaryStorageDetail?: Partial<
+    Pick<
+      TemporaryStorageDetail,
+      "transporterCompanySiret" | "destinationCompanySiret"
+    >
   >;
 } & {
   transportSegments?: Pick<TransportSegment, "transporterCompanySiret">[];
+} & {
+  intermediariesVatNumbers?: string[];
+  intermediariesSirets?: string[];
 };
 
 // shape of a BSDD v2

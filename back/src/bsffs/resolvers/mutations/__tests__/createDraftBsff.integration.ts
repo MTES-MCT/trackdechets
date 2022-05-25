@@ -91,7 +91,7 @@ describe("Mutation.createDraftBsff", () => {
           emitter: {
             company: {
               name: "Clim' Clean",
-              siret: "1".repeat(14),
+              siret: "2".repeat(14),
               address: "12 rue de Laval 69000",
               contact: "Marco Polo",
               mail: "marco.polo@gmail.com"

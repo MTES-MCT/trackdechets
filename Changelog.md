@@ -8,6 +8,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 # [2022.06.1] ~06/06/2022
 
 #### :rocket: Nouvelles fonctionnalités
+
+- Ajout par l'API d'entreprises intermédiaires sur un bsdd via `Form.intermediaries` et `FormInput.intermediaries` dans l'API GraphQL. L'intermédiaire peut créer et mettre à jour un bordereau via l'API [PR 1331](https://github.com/MTES-MCT/trackdechets/pull/1331)
+
 #### :bug: Corrections de bugs
 #### :boom: Breaking changes
 

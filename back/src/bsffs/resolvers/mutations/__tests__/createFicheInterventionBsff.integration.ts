@@ -22,7 +22,7 @@ const variables: MutationCreateFicheInterventionBsffArgs = {
     detenteur: {
       company: {
         name: "Acme",
-        siret: "1".repeat(14),
+        siret: "3".repeat(14),
         address: "12 rue de la Tige, 69000",
         mail: "contact@gmail.com",
         phone: "06",

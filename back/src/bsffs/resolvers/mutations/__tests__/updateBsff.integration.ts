@@ -186,7 +186,7 @@ describe("Mutation.updateBsff", () => {
         input: {
           emitter: {
             company: {
-              siret: "1".repeat(14)
+              siret: "2".repeat(14)
             }
           }
         }

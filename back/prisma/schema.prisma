@@ -369,9 +369,10 @@ model Form {
   appendix2RootFormId String?
 
   ownerId              String
-  owner                User                  @relation(fields: [ownerId], references: [id])
+  owner                User                          @relation(fields: [ownerId], references: [id])
   StatusLog            StatusLog[]
   bsddRevisionRequests BsddRevisionRequest[]
+  intermediaries       IntermediaryFormAssociation[]
 
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
@@ -392,6 +393,23 @@ model FormGroupement {
   @@unique([nextFormId, initialFormId])
   @@index([nextFormId], map: "_FormGroupementNextFormId")
   @@index([initialFormId], map: "_FormGroupementInitialFormId")
+}
+
+// Entreprise jouant le rôle d'intermédiaire sur un bordereau
+model IntermediaryFormAssociation {
+  id        String   @id @default(cuid())
+  formId    String
+  name      String
+  siret     String
+  contact   String
+  vatNumber String?
+  address   String?
+  phone     String?
+  mail      String?
+  form      Form     @relation(fields: [formId], references: [id])
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([formId], map: "_IntermediaryFormAssociationFormIdIdx")
 }
 
 enum RevisionRequestStatus {

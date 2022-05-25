@@ -61,6 +61,7 @@ export function getSiretsByTab(
   const fieldTabs = new Map<string, keyof typeof siretsByTab>(
     Object.entries(formSirets)
       .filter(item => !!item[1])
+      // initialize all SIRET into "isFollowFor"
       .map(item => [item[0], "isFollowFor"])
   );
 
@@ -70,6 +71,9 @@ export function getSiretsByTab(
     }
     fieldTabs.set(field, tab);
   }
+
+  // initialize intermediaries into isFollowFor
+  form.intermediaries.map(({ siret }) => fieldTabs.set(siret, "isFollowFor"));
 
   switch (form.status) {
     case Status.DRAFT: {
@@ -216,7 +220,8 @@ function toBsdElastic(form: FullForm): BsdElastic {
     transporterCustomInfo: form.transporterCustomInfo,
     ...siretsByTab,
     sirets: Object.values(siretsByTab).flat(),
-    ...getRegistryFields(form)
+    ...getRegistryFields(form),
+    intermediaries: form.intermediaries
   };
 }
 
@@ -236,7 +241,8 @@ export async function indexAllForms(
     },
     include: {
       temporaryStorageDetail: true,
-      transportSegments: true
+      transportSegments: true,
+      intermediaries: true
     }
   });
 

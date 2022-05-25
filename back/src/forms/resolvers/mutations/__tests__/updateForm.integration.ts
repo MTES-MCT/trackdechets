@@ -1,9 +1,11 @@
+import { EmitterType, Status, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
 import {
   companyFactory,
   formFactory,
+  toIntermediaryCompany,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -13,7 +15,7 @@ import {
   MutationUpdateFormArgs,
   UpdateFormInput
 } from "../../../../generated/graphql/types";
-import { EmitterType, Status } from "@prisma/client";
+import * as validation from "../../../validation";
 
 const UPDATE_FORM = `
   mutation UpdateForm($updateFormInput: UpdateFormInput!) {
@@ -37,6 +39,9 @@ const UPDATE_FORM = `
           postalCode
           infos
         }
+        company {
+          siret
+        }
       }
       temporaryStorageDetail {
         destination {
@@ -55,11 +60,24 @@ const UPDATE_FORM = `
           id
         }
       }
+      intermediaries {
+        siret
+        name
+      }
     }
   }
 `;
 
+const validateSpy = jest.spyOn(validation, "validateIntermediariesInput");
+const validateIntermediariesInputMock = jest.fn();
+validateSpy.mockImplementation((...args) =>
+  validateIntermediariesInputMock(...args)
+);
+
 describe("Mutation.updateForm", () => {
+  beforeEach(() => {
+    validateIntermediariesInputMock.mockReset();
+  });
   afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
@@ -273,7 +291,7 @@ describe("Mutation.updateForm", () => {
       // try to remove user's company from the form
       emitter: {
         company: {
-          siret: "11111111111111"
+          siret: "3".repeat(14)
         }
       }
     };
@@ -283,7 +301,9 @@ describe("Mutation.updateForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        extensions: expect.objectContaining({ code: ErrorCode.FORBIDDEN }),
+        extensions: expect.objectContaining({
+          code: ErrorCode.FORBIDDEN
+        }),
         message: "Vous ne pouvez pas enlever votre établissement du bordereau"
       })
     ]);
@@ -480,6 +500,242 @@ describe("Mutation.updateForm", () => {
     });
 
     expect(data.updateForm.ecoOrganisme).toBeNull();
+  });
+
+  it("should add the first intermediary on an existing ", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret
+      }
+    });
+    validateIntermediariesInputMock.mockResolvedValueOnce([
+      toIntermediaryCompany(intermediary.company)
+    ]);
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          intermediaries: [toIntermediaryCompany(intermediary.company)]
+        }
+      }
+    });
+    // replace the previous
+    expect(data.updateForm.intermediaries).toEqual([
+      expect.objectContaining({
+        name: intermediary.company.name,
+        siret: intermediary.company.siret
+      })
+    ]);
+  });
+
+  it("should update the intermediary (twice)", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary2 = await userWithCompanyFactory(UserRole.MEMBER);
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary.company)]
+        }
+      }
+    });
+    validateIntermediariesInputMock.mockResolvedValueOnce([
+      toIntermediaryCompany(intermediary2.company)
+    ]);
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          emitter: {
+            type: "OTHER"
+          },
+          intermediaries: [toIntermediaryCompany(intermediary2.company)]
+        }
+      }
+    });
+    // replace the previous
+    expect(data.updateForm.intermediaries).toEqual([
+      expect.objectContaining({
+        name: intermediary2.company.name,
+        siret: intermediary2.company.siret
+      })
+    ]);
+    validateIntermediariesInputMock.mockResolvedValueOnce([
+      toIntermediaryCompany(intermediary2.company),
+      toIntermediaryCompany(intermediary.company)
+    ]);
+    //update a 2nd time
+    const { data: data2 } = await mutate<Pick<Mutation, "updateForm">>(
+      UPDATE_FORM,
+      {
+        variables: {
+          updateFormInput: {
+            id: form.id,
+            emitter: {
+              type: "OTHER"
+            },
+            intermediaries: [
+              toIntermediaryCompany(intermediary2.company),
+              toIntermediaryCompany(intermediary.company)
+            ]
+          }
+        }
+      }
+    );
+
+    expect(data2.updateForm.intermediaries).toEqual([
+      {
+        name: intermediary2.company.name,
+        siret: intermediary2.company.siret
+      },
+      {
+        name: intermediary.company.name,
+        siret: intermediary.company.siret
+      }
+    ]);
+  });
+
+  it("should remove the intermediary when input is an empty array", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary.company)]
+        }
+      }
+    });
+    const { mutate } = makeClient(user);
+
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          emitter: {
+            type: "OTHER"
+          },
+          intermediaries: []
+        }
+      }
+    });
+
+    expect(data.updateForm.intermediaries).toEqual([]);
+  });
+
+  it("should remove the intermediary when input intermediaries is null", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary.company)]
+        }
+      }
+    });
+    const { mutate } = makeClient(user);
+
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          emitter: {
+            type: "OTHER"
+          },
+          intermediaries: null
+        }
+      }
+    });
+
+    expect(data.updateForm.intermediaries).toEqual([]);
+  });
+
+  it("should not update the intermediary when no input", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary.company)]
+        }
+      }
+    });
+    const { mutate } = makeClient(user);
+
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          emitter: {
+            type: "OTHER"
+          }
+        }
+      }
+    });
+
+    expect(data.updateForm.intermediaries).toEqual([
+      {
+        name: intermediary.company.name,
+        siret: intermediary.company.siret
+      }
+    ]);
+  });
+
+  it("should update a form as an intermediary", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary.company)]
+        }
+      }
+    });
+
+    const updateFormInput = {
+      id: form.id,
+      wasteDetails: {
+        name: "things"
+      }
+    };
+    const { mutate } = makeClient(intermediary.user);
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    expect(data.updateForm.wasteDetails).toMatchObject(
+      updateFormInput.wasteDetails
+    );
+    expect(data.updateForm.intermediaries).toEqual([
+      {
+        name: intermediary.company.name,
+        siret: intermediary.company.siret
+      }
+    ]);
   });
 
   it("should update a form", async () => {

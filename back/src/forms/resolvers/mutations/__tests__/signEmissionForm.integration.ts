@@ -5,6 +5,7 @@ import {
 } from "../../../../generated/graphql/types";
 import {
   formFactory,
+  toIntermediaryCompany,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -31,7 +32,7 @@ const SIGN_EMISSION_FORM = `
 `;
 
 describe("signEmissionForm", () => {
-  afterAll(resetDatabase);
+  afterEach(resetDatabase);
 
   it("should sign emission", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
@@ -99,6 +100,38 @@ describe("signEmissionForm", () => {
         input: {
           emittedAt: "2018-12-11T00:00:00.000Z" as unknown as Date,
           emittedBy: emitter.user.name,
+          quantity: 1
+        }
+      }
+    });
+
+    expect(errors).not.toBeUndefined();
+  });
+
+  it("should throw an error if the form is signed by an intermdediary", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const intermediary = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary.company)]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(intermediary.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "signEmissionForm">,
+      MutationSignEmissionFormArgs
+    >(SIGN_EMISSION_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          emittedAt: "2018-12-11T00:00:00.000Z" as unknown as Date,
+          emittedBy: intermediary.user.name,
           quantity: 1
         }
       }

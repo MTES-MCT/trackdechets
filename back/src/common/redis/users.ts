@@ -1,18 +1,40 @@
 import { redisClient, generateKey } from "./redis";
 import { getUserCompanies } from "../../users/database";
 
-export const cacheKey = (userId: string): string =>
+const CACHED_COMPANY_EXPIRATION = 10 * 60; // 10 minutes
+
+export const getUserCompanySiretCacheKey = (userId: string): string =>
   generateKey("userSirets", userId);
 
-const CACHED_SIRET_EXPIRATION = 10 * 60; // 10 minutes
+export const getUserCompaniesCacheKey = (userId: string): string =>
+  generateKey("userCompanies", userId);
 
 /**
  * Delete the cached sirets for a given user
  * @param userId
  */
-export async function deleteCachedUserSirets(userId: string): Promise<void> {
-  const key = cacheKey(userId); // non-existent keys are ignored
-  await redisClient.unlink(key);
+export async function deleteCachedUserCompanies(userId: string): Promise<void> {
+  const sirets = getUserCompanySiretCacheKey(userId); // non-existent keys are ignored
+  const ids = getUserCompaniesCacheKey(userId); // non-existent keys are ignored
+  await Promise.all([redisClient.unlink(sirets), redisClient.unlink(ids)]);
+}
+
+/**
+ * Store Company id in a redis SET
+ * @param userId
+ * @param ids
+ */
+export async function setCachedUserCompanyId(
+  userId: string,
+  ids: string[]
+): Promise<void> {
+  const key = getUserCompaniesCacheKey(userId);
+
+  await redisClient
+    .pipeline()
+    .sadd(key, ids)
+    .expire(key, CACHED_COMPANY_EXPIRATION)
+    .exec();
 }
 
 /**
@@ -24,22 +46,23 @@ export async function setCachedUserSirets(
   userId: string,
   sirets: string[]
 ): Promise<void> {
-  const key = cacheKey(userId);
+  const key = getUserCompanySiretCacheKey(userId);
 
   await redisClient
     .pipeline()
     .sadd(key, sirets)
-    .expire(key, CACHED_SIRET_EXPIRATION)
+    .expire(key, CACHED_COMPANY_EXPIRATION)
     .exec();
 }
 
 /**
+ * DEPRECATED in favor of getCachedUserCompanies
  * Retrieve cached sirets if found in redis, or query the db and cache them
  * @param userId
  * @returns array of sirets
  */
 export async function getCachedUserSirets(userId: string): Promise<string[]> {
-  const key = cacheKey(userId);
+  const key = getUserCompanySiretCacheKey(userId);
   const exists = await redisClient.exists(key);
   if (!!exists) {
     return redisClient.smembers(key);
@@ -50,4 +73,29 @@ export async function getCachedUserSirets(userId: string): Promise<string[]> {
 
   await setCachedUserSirets(userId, sirets);
   return sirets;
+}
+
+/**
+ * Retrieve cached Company siret and vatNumber
+ * if found in redis, or query the db and cache them
+ * @param userId
+ * @returns array of sirets and vatNumber
+ */
+export async function getCachedUserCompanies(
+  userId: string
+): Promise<string[]> {
+  const key = getUserCompaniesCacheKey(userId);
+  const exists = await redisClient.exists(key);
+  if (!!exists) {
+    return redisClient.smembers(key);
+  }
+  // refresh cache
+  const companies = await getUserCompanies(userId);
+  const ids = [
+    ...companies.map(c => c.siret),
+    ...companies.map(c => c.vatNumber)
+  ];
+  const cleanIds = ids.filter(id => !!id);
+  await setCachedUserCompanyId(userId, cleanIds);
+  return cleanIds;
 }

@@ -56,7 +56,6 @@ async function getWasteConnection<WasteType extends GenericWaste>(
       BSFF: { grouping: true, forwarding: true, repackaging: true }
     }
   );
-
   const wastes = toWastes<WasteType>(registryType, args.sirets, bsds);
 
   const edges = hits.reduce<Array<WasteEdge<WasteType>>>(

@@ -11,20 +11,31 @@ import { FullForm } from "./types";
 
 /**
  * Returns a prisma Form with all linked objects
- * (owner, ecoOrganisme, temporaryStorage, transportSegments)
+ * (owner, ecoOrganisme, temporaryStorage, transportSegments, intermediaries)
  * @param form
  */
 export async function getFullForm(form: Form): Promise<FullForm> {
   const temporaryStorageDetail = await prisma.form
-    .findUnique({ where: { id: form.id } })
+    .findUnique({
+      where: { id: form.id }
+    })
     .temporaryStorageDetail();
   const transportSegments = await prisma.form
-    .findUnique({ where: { id: form.id } })
+    .findUnique({
+      where: { id: form.id }
+    })
     .transportSegments();
+  const intermediaries = await prisma.form
+    .findUnique({
+      where: { id: form.id }
+    })
+    .intermediaries();
+
   return {
     ...form,
     temporaryStorageDetail,
-    transportSegments
+    transportSegments,
+    intermediaries
   };
 }
 
