@@ -34,6 +34,7 @@ jobs:
           environment: production
           sourcemaps: ./back/dist/src ./front/build/assets
           projects: trackdechets-api trackdechets-front
+          ignore_missing: true
 
   doc:
     # Taken from https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus
