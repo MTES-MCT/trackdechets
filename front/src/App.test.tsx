@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createRoot } from "react-dom/client";
+import * as ReactDOM from "react-dom";
 import App from "./App";
 
 // mock old browser detection
@@ -10,8 +10,6 @@ jest.mock("./supportedBrowsers", () => ({
 it("renders without crashing", () => {
   const div = document.createElement("div");
 
-  const root = createRoot(div);
-  root.render(<App />);
-
-  root.unmount();
+  ReactDOM.render(<App />, div);
+  ReactDOM.unmountComponentAtNode(div);
 });

@@ -1,8 +1,8 @@
 import "react-app-polyfill/ie11";
 import "react-app-polyfill/stable";
 
-import React from "react";
-import { createRoot, hydrateRoot } from "react-dom/client";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 
 import "./scss/index.scss";
 import App from "./App";
@@ -35,10 +35,9 @@ if (import.meta.env.VITE_SENTRY_DSN) {
 const rootElement = document.getElementById("root");
 
 if (rootElement && rootElement.hasChildNodes()) {
-  hydrateRoot(rootElement, <App />);
+  ReactDOM.hydrate(<App />, rootElement);
 } else {
-  const root = createRoot(rootElement);
-  root.render(<App />);
+  ReactDOM.render(<App />, rootElement);
 }
 
 // If you want your app to work offline and load faster, you can change
