@@ -421,17 +421,17 @@ const parcelNumber = yup.object({
   prefix: yup
     .string()
     .min(1)
-    .max(4)
+    .max(5)
     .required("Parcelle: le préfixe est obligatoire"),
   section: yup
     .string()
     .min(1)
-    .max(3)
+    .max(5)
     .required("Parcelle: la section est obligatoire"),
   number: yup
     .string()
     .min(1)
-    .max(3)
+    .max(5)
     .required("Parcelle: le numéro de parcelle est obligatoire")
 });
 const parcelCoordinates = yup.object({
