@@ -180,9 +180,8 @@ export async function prepareSegment(
   );
 
   const segment = await prisma.transportSegment.findFirst({
-    where: { segmentNumber: transportSegments.length + 1 }
+    where: { segmentNumber: transportSegments.length + 1, form: { id: id } }
   });
-
   return expandTransportSegmentFromDb(segment);
 }
 

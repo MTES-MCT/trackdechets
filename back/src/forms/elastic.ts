@@ -264,5 +264,9 @@ export async function indexAllForms(
 }
 
 export function indexForm(form: FullForm, ctx?: GraphQLContext) {
+  // prevent unwanted cascaded reindexation
+  if (form.isDeleted) {
+    return null;
+  }
   return indexBsd(toBsdElastic(form), ctx);
 }

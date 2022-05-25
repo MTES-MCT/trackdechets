@@ -140,6 +140,141 @@ describe("Mutation.Bsda.create", () => {
       input.destination.company.siret
     );
   });
+
+  it("should allow creating a valid form with null sealNumbers field", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const input: BsdaInput = {
+      emitter: {
+        isPrivateIndividual: false,
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      worker: {
+        company: {
+          siret: "22222222222222",
+          name: "worker",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      waste: {
+        code: "16 01 06",
+        adr: "ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: null
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: "11111111111111",
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<Pick<Mutation, "createBsda">>(
+      CREATE_BSDA,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    console.log(errors);
+    expect(data.createBsda.id).toMatch(
+      new RegExp(`^BSDA-[0-9]{8}-[A-Z0-9]{9}$`)
+    );
+    expect(data.createBsda.destination.company.siret).toBe(
+      input.destination.company.siret
+    );
+  });
+
+  it("should allow creating a valid form without sealNumbers field", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const input: BsdaInput = {
+      emitter: {
+        isPrivateIndividual: false,
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      worker: {
+        company: {
+          siret: "22222222222222",
+          name: "worker",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      waste: {
+        code: "16 01 06",
+        adr: "ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material"
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: "11111111111111",
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<Pick<Mutation, "createBsda">>(
+      CREATE_BSDA,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    console.log(errors);
+    expect(data.createBsda.id).toMatch(
+      new RegExp(`^BSDA-[0-9]{8}-[A-Z0-9]{9}$`)
+    );
+    expect(data.createBsda.destination.company.siret).toBe(
+      input.destination.company.siret
+    );
+  });
   it("should allow creating the form if up to 2 plates are submitted", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
