@@ -82,6 +82,16 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
 
   const companyTypes = args.companyTypes || company.companyTypes;
   const { ecoOrganismeAgreements } = args;
+  // update to anything else than ony a TRANSPORTER
+  const updateOtherThanTransporter = args.companyTypes?.some(
+    elt => elt !== "TRANSPORTER"
+  );
+  // check that a TRANSPORTER identified by VAT is not updated to any other type
+  if (company.vatNumber === company.siret && updateOtherThanTransporter) {
+    throw new UserInputError(
+      "Impossible de changer de type TRANSPORTER pour un établissement transporteur identifié par son numéro de TVA"
+    );
+  }
   if (companyTypes.includes("ECO_ORGANISME")) {
     if (
       Array.isArray(ecoOrganismeAgreements) &&

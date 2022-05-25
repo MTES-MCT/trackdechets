@@ -460,4 +460,61 @@ describe("Mutation.createCompany", () => {
 
     process.env = OLD_ENV;
   }, 30000);
+
+  it("should allow to create a TRANSPORTER company with VAT number only", async () => {
+    const user = await userFactory();
+    const companyInput = {
+      orgId: "RO17579668",
+      companyTypes: ["TRANSPORTER"]
+    };
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    expect(data).toEqual({
+      createCompany: {
+        allowBsdasriTakeOverWithoutSignature: false,
+        companyTypes: ["TRANSPORTER"],
+        ecoOrganismeAgreements: [],
+        gerepId: null,
+        name: null,
+        siret: "RO17579668",
+        traderReceipt: null,
+        transporterReceipt: null,
+        vatNumber: "RO17579668"
+      }
+    });
+  });
+
+  it("should return an error when creating any type but a TRANSPORTER company with VAT number", async () => {
+    const user = await userFactory();
+
+    for (const type in CompanyType) {
+      if (type === "TRANSPORTER") {
+        continue;
+      }
+      const companyInput = {
+        orgId: "RO17579668",
+        companyTypes: [type]
+      };
+
+      const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+      const { errors } = await mutate(CREATE_COMPANY, {
+        variables: {
+          companyInput
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Impossible de créer un établissement identifié par un numéro de TVA d'un autre type que TRANSPORTER"
+        })
+      ]);
+    }
+  });
 });

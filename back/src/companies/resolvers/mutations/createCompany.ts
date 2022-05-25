@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { CompanyType, Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { convertUrls } from "../../database";
 import prisma from "../../../prisma";
@@ -57,6 +57,11 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   let vatNumber: string;
   if (isVat(orgId)) {
     vatNumber = orgId;
+    if (companyTypes.join("") !== CompanyType.TRANSPORTER) {
+      throw new UserInputError(
+        "Impossible de créer un établissement identifié par un numéro de TVA d'un autre type que TRANSPORTER"
+      );
+    }
   }
   const existingCompany = await prisma.company.findUnique({
     where: whereSiretOrVatNumber({ siret, vatNumber })
