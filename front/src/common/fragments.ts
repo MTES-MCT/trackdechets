@@ -65,6 +65,7 @@ export const wasteDetailsFragment = gql`
       y
     }
     analysisReferences
+    landIdentifiers
   }
 `;
 

@@ -18,8 +18,6 @@ const newParcelNumber = {
   prefix: "",
   number: "",
   section: "",
-  x: null,
-  y: null,
 };
 export function ParcelNumbersSelector({ field }: FieldProps) {
   const { setFieldValue } = useFormikContext<Form>();
@@ -101,6 +99,16 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
 
       <div className="form__row">
         <label>
+          Identifiant(s) du terrain lorsque les terres ont été extraites d'un
+          terrain placé en secteur d'information sur les sols au titre de
+          l'article L. 125-6
+          <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
+          <TagsInput name="wasteDetails.landIdentifiers" />
+        </label>
+      </div>
+
+      <div className="form__row">
+        <label>
           Références d'analyses
           <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
           <TagsInput name="wasteDetails.analysisReferences" />
@@ -111,13 +119,12 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
 }
 
 function ParcelDetails({ index, parcelNumber, arrayHelpers }) {
-  const showParcelNumberGps = useMemo(() => {
+  const showParcelNumber = useMemo(() => {
     return (
-      !parcelNumber.prefix &&
-      !parcelNumber.section &&
-      !parcelNumber.number &&
-      parcelNumber.x !== null &&
-      parcelNumber.y !== null
+      parcelNumber.prefix ||
+      parcelNumber.section ||
+      parcelNumber.number ||
+      !("x" in parcelNumber)
     );
   }, [parcelNumber]);
 
@@ -126,21 +133,20 @@ function ParcelDetails({ index, parcelNumber, arrayHelpers }) {
     index: number,
     arrayHelpers: FieldArrayRenderProps
   ) {
-    if (showParcelNumberGps) {
+    if (showParcelNumber) {
       arrayHelpers.replace(index, {
-        ...newParcelNumber,
-        city: parcelNumber.city,
-        postalCode: parcelNumber.postalCode,
-        x: null,
-        y: null,
-      });
-    } else {
-      arrayHelpers.replace(index, {
-        ...newParcelNumber,
         city: parcelNumber.city,
         postalCode: parcelNumber.postalCode,
         x: 0,
         y: 0,
+      });
+    } else {
+      arrayHelpers.replace(index, {
+        city: parcelNumber.city,
+        postalCode: parcelNumber.postalCode,
+        prefix: "",
+        number: "",
+        section: "",
       });
     }
   }
@@ -148,15 +154,15 @@ function ParcelDetails({ index, parcelNumber, arrayHelpers }) {
   return (
     <>
       <div className="form__row">
-        {showParcelNumberGps ? (
-          <ParcelGps index={index} />
-        ) : (
+        {showParcelNumber ? (
           <ParcelCadastral index={index} />
+        ) : (
+          <ParcelGps index={index} />
         )}
       </div>
       <div className="form__row">
         <TdSwitch
-          checked={showParcelNumberGps}
+          checked={!showParcelNumber}
           onChange={() => handleGpsToggle(parcelNumber, index, arrayHelpers)}
           label="Le domaine n'est pas cadastré, je n'ai pas les numéros de parcelle,
           j'indique les coordonnées GPS (au format lambert II étendu)"
@@ -173,8 +179,8 @@ function ParcelCadastral({ index }) {
         Si le numéro dont vous disposez ressemble à "000-AB-25", 000 est le
         prefixe, AB la section, et 25 le numéro de parcelle. Pour retrouver le
         numéro à partir d'une adresse, rendez-vous sur le site{" "}
-        <a href="https://errial.georisques.gouv.fr/#/" className="tw-underline">
-          Errial
+        <a href="https://cadastre.data.gouv.fr/map" className="tw-underline">
+          du cadastre
         </a>
       </p>
       <div className="tw-flex tw-justify-between">

@@ -416,6 +416,131 @@ describe("draftFormSchema", () => {
       "emitterCompanyMail must be a valid email"
     );
   });
+
+  it("should be invalid when passing a parcelNumber with unknown properties", async () => {
+    const validateFn = () =>
+      draftFormSchema.validate({
+        ...form,
+        wasteDetailsParcelNumbers: [
+          {
+            foo: "bar"
+          }
+        ]
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Parcelle: impossible d'avoir à la fois des coorrdonnées GPS et un numéro de parcelle"
+    );
+  });
+
+  it("should be invalid when passing a parcelNumber with no city and postal code", async () => {
+    const validateFn = () =>
+      draftFormSchema.validate({
+        ...form,
+        wasteDetailsParcelNumbers: [
+          {
+            x: 1.2,
+            y: 1.3
+          }
+        ]
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Parcelle: le code postal est obligatoire"
+    );
+  });
+
+  it("should be invalid when passing a parcelNumber coordinate and number", async () => {
+    const validateFn = () =>
+      draftFormSchema.validate({
+        ...form,
+        wasteDetailsParcelNumbers: [
+          {
+            city: "Paris",
+            postalCode: "750012",
+            prefix: "000",
+            section: "AB",
+            number: "25",
+            x: 1.2,
+            y: 1.3
+          }
+        ]
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Parcelle: impossible d'avoir à la fois des coorrdonnées GPS et un numéro de parcelle"
+    );
+  });
+
+  it("should be valid when passing a parcelNumber number", async () => {
+    const isValid = await draftFormSchema.isValid({
+      ...form,
+      wasteDetailsParcelNumbers: [
+        {
+          city: "Paris",
+          postalCode: "750012",
+          prefix: "000",
+          section: "AB",
+          number: "25"
+        }
+      ]
+    });
+
+    expect(isValid).toBe(true);
+  });
+
+  it("should be valid when passing a parcelNumber coordinates", async () => {
+    const isValid = await draftFormSchema.isValid({
+      ...form,
+      wasteDetailsParcelNumbers: [
+        {
+          city: "Paris",
+          postalCode: "750012",
+          x: 1.2,
+          y: 1.3
+        }
+      ]
+    });
+
+    expect(isValid).toBe(true);
+  });
+
+  it("should be invalid when passing an incomplete parcelNumber number", async () => {
+    const validateFn = () =>
+      draftFormSchema.validate({
+        ...form,
+        wasteDetailsParcelNumbers: [
+          {
+            city: "Paris",
+            postalCode: "750012",
+            prefix: "000",
+            section: "AB"
+          }
+        ]
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Parcelle: le numéro de parcelle est obligatoire"
+    );
+  });
+
+  it("should be invalid when passing an incomplete parcelNumber coordinates", async () => {
+    const validateFn = () =>
+      draftFormSchema.validate({
+        ...form,
+        wasteDetailsParcelNumbers: [
+          {
+            city: "Paris",
+            postalCode: "750012",
+            x: 1.2
+          }
+        ]
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Parcelle: la coordonnée Y est obligatoire"
+    );
+  });
 });
 
 describe("processedInfoSchema", () => {

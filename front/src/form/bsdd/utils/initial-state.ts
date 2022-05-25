@@ -158,6 +158,7 @@ export function getInitialState(f?: Form | null): FormInput {
       isDangerous: f?.wasteDetails?.isDangerous ?? false,
       parcelNumbers: f?.wasteDetails?.parcelNumbers ?? [],
       analysisReferences: f?.wasteDetails?.analysisReferences ?? [],
+      landIdentifiers: f?.wasteDetails?.landIdentifiers ?? [],
       packagings: null, // deprecated
       otherPackaging: null, // deprecated
       numberOfPackages: null, // deprecated

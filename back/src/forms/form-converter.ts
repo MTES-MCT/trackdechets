@@ -184,6 +184,10 @@ function flattenWasteDetailsInput(input: { wasteDetails?: WasteDetailsInput }) {
     wasteDetailsAnalysisReferences: chain(
       input.wasteDetails,
       w => w.analysisReferences
+    ),
+    wasteDetailsLandIdentifiers: chain(
+      input.wasteDetails,
+      w => w.landIdentifiers
     )
   };
 }
@@ -620,7 +624,8 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       pop: form.wasteDetailsPop,
       isDangerous: form.wasteDetailsIsDangerous,
       parcelNumbers: form.wasteDetailsParcelNumbers as ParcelNumber[],
-      analysisReferences: form.wasteDetailsAnalysisReferences
+      analysisReferences: form.wasteDetailsAnalysisReferences,
+      landIdentifiers: form.wasteDetailsLandIdentifiers
     }),
     trader: nullIfNoValues<Trader>({
       company: nullIfNoValues<FormCompany>({

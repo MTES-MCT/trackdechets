@@ -575,7 +575,10 @@ input WasteDetailsInput {
   parcelNumbers: [ParcelNumberInput!]
 
   "Numéros de référence(s) d'analyse(s)"
-  analysisReferences: [String]
+  analysisReferences: [String!]
+
+  "Identifiant(s) du ou des terrains lorsque les terres ont été extraites d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6"
+  landIdentifiers: [String!]
 }
 
 """
@@ -583,9 +586,9 @@ Payload lié au numéro de parcelle cadastrale
 """
 input ParcelNumberInput {
   "Ville"
-  city: String
+  city: String!
   "Code postal"
-  postalCode: String
+  postalCode: String!
   "Prefixe cadastral"
   prefix: String
   "Numéro de section cadastrale"

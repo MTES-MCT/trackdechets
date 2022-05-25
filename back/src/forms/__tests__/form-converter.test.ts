@@ -355,7 +355,8 @@ describe("flattenFormInput", () => {
       wasteDetailsPop: null,
       wasteDetailsIsDangerous: null,
       wasteDetailsAnalysisReferences: null,
-      wasteDetailsParcelNumbers: null
+      wasteDetailsParcelNumbers: null,
+      wasteDetailsLandIdentifiers: null
     };
 
     expect(flattened).toEqual(expected);
@@ -379,7 +380,8 @@ describe("flattenFormInput", () => {
       wasteDetailsQuantity: null,
       wasteDetailsQuantityType: null,
       wasteDetailsParcelNumbers: null,
-      wasteDetailsAnalysisReferences: null
+      wasteDetailsAnalysisReferences: null,
+      wasteDetailsLandIdentifiers: null
     });
   });
 

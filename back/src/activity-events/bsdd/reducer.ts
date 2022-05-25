@@ -15,6 +15,7 @@ export function bsddReducer(
         wasteDetailsPackagingInfos,
         wasteDetailsParcelNumbers,
         wasteDetailsAnalysisReferences,
+        wasteDetailsLandIdentifiers,
         ...bsdd
       } = event.data.content;
       return {
@@ -39,6 +40,12 @@ export function bsddReducer(
                 wasteDetailsAnalysisReferences as string[]
             }
           : {}),
+        ...(wasteDetailsLandIdentifiers
+          ? {
+              wasteDetailsLandIdentifiers:
+                wasteDetailsLandIdentifiers as string[]
+            }
+          : {}),
         ...dateConverter({}, bsdd)
       };
     }
@@ -52,6 +59,7 @@ export function bsddReducer(
         wasteDetailsPackagingInfos,
         wasteDetailsParcelNumbers,
         wasteDetailsAnalysisReferences,
+        wasteDetailsLandIdentifiers,
         ...bsdd
       } = event.data.content as Prisma.FormCreateInput; // TODO Check if we can we somehow keep Prisma.FormUpdateInput
 
@@ -74,6 +82,12 @@ export function bsddReducer(
           ? {
               wasteDetailsAnalysisReferences:
                 wasteDetailsAnalysisReferences as string[]
+            }
+          : {}),
+        ...(wasteDetailsLandIdentifiers
+          ? {
+              wasteDetailsLandIdentifiers:
+                wasteDetailsLandIdentifiers as string[]
             }
           : {}),
         ...dateConverter(currentState, event.data.content as any)
