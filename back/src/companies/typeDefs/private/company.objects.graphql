@@ -25,6 +25,9 @@ type CompanyFavorite {
   "Email de contact"
   mail: String
 
+  "Code pays de l'établissement"
+  codePaysEtrangerEtablissement: String
+
   """
   Récépissé transporteur associé à cet établissement (le cas échéant)
   """

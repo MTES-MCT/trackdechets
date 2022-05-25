@@ -10,6 +10,8 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../database";
 import { checkIsCompanyMember } from "../../../users/permissions";
+import { countries } from "../../../common/constants/companySearchHelpers";
+import { checkVAT } from "jsvat";
 
 const MAX_FAVORITES = 10;
 
@@ -190,6 +192,9 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
     // Remove duplicates (by company siret)
     .reduce<CompanyFavorite[]>((prev, cur) => {
       if (prev.find(el => el.siret === cur.siret) == null) {
+        cur.codePaysEtrangerEtablissement = !cur.vatNumber
+          ? "FR"
+          : checkVAT(company.vatNumber, countries)?.country?.isoCode.short;
         return prev.concat([cur]);
       }
       return prev;
@@ -215,7 +220,10 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
       address: company.address,
       contact: user.name,
       phone: user.phone,
-      mail: user.email
+      mail: user.email,
+      codePaysEtrangerEtablissement: !company.vatNumber
+        ? "FR"
+        : checkVAT(company.vatNumber, countries)?.country?.isoCode.short
     });
   }
 

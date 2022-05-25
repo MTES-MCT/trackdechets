@@ -2,6 +2,7 @@ import { useLazyQuery, useQuery } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import { Field, Form, Formik, useField, useFormikContext } from "formik";
 import React, { useEffect, useCallback, useMemo, useState } from "react";
+import { checkVAT } from "jsvat";
 import { IconSearch } from "common/components/Icons";
 import { constantCase } from "constant-case";
 import { InlineError, NotificationError } from "common/components/Error";
@@ -11,7 +12,9 @@ import {
   isFRVat,
   isSiret,
   isVat,
+  countries as vatCountries,
 } from "generated/constants/companySearchHelpers";
+
 import CompanyResults from "./CompanyResults";
 import styles from "./CompanySelector.module.scss";
 import { FAVORITES, SEARCH_COMPANIES } from "./query";
@@ -137,7 +140,16 @@ export default function CompanySelector({
           contact: company.contact,
           phone: company.phone,
           mail: company.mail,
+          country: company.codePaysEtrangerEtablissement,
         };
+
+        if (company.vatNumber) {
+          const vatCountryCode = checkVAT(company.vatNumber, vatCountries)
+            ?.country?.isoCode.short;
+          if (vatCountryCode) {
+            fields.country = vatCountryCode;
+          }
+        }
 
         Object.keys(fields).forEach(key => {
           setFieldValue(`${field.name}.${key}`, fields[key]);
