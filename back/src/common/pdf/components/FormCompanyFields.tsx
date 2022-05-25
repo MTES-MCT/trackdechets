@@ -63,7 +63,7 @@ export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
         Pays (le cas échéant) :{" "}
         {companyCountry == null || companyCountry.cca2 === "FR"
           ? null
-          : companyCountry.name.common}
+          : companyCountry.cca2}
       </p>
       <p>
         Tel : {company?.phone}
