@@ -14,7 +14,8 @@ import { allowedFormats } from "../../../../common/dates";
 import {
   CreateFormInput,
   Mutation,
-  MutationCreateFormArgs
+  MutationCreateFormArgs,
+  ParcelNumber
 } from "../../../../generated/graphql/types";
 import { EmitterType, Status, UserRole } from "@prisma/client";
 
@@ -83,6 +84,15 @@ const CREATE_FORM = `
           quantity
         }
         isDangerous
+        parcelNumbers {
+          city
+          postalCode
+          prefix
+          section
+          number
+          x
+          y
+        }
       }
       appendix2Forms {
         id
@@ -402,6 +412,48 @@ describe("Mutation.createForm", () => {
     });
 
     expect(data.createForm.temporaryStorageDetail).toBeTruthy();
+  });
+
+  it("should create a form with parcel numbers", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const parcelNumbers: ParcelNumber[] = [
+      {
+        city: "Paris",
+        postalCode: "75001",
+        x: 12000,
+        y: 12000
+      },
+      {
+        city: "Paris",
+        postalCode: "75001",
+        number: "0039",
+        prefix: "000",
+        section: "OS"
+      }
+    ];
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      wasteDetails: {
+        parcelNumbers
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+
+    expect(data.createForm.wasteDetails.parcelNumbers[0]).toMatchObject(
+      parcelNumbers[0]
+    );
+    expect(data.createForm.wasteDetails.parcelNumbers[1]).toMatchObject(
+      parcelNumbers[1]
+    );
   });
 
   it("should return an error when creating a form with a temporary storage detail but no temp storage flag", async () => {

@@ -12,6 +12,7 @@ import React, { useEffect } from "react";
 import Appendix2MultiSelect from "./components/appendix/Appendix2MultiSelect";
 import AppendixInfo from "./components/appendix/AppendixInfo";
 import Packagings from "./components/packagings/Packagings";
+import { ParcelNumbersSelector } from "./components/parcel-number/ParcelNumber";
 import { WasteCodeSelect, wasteCodeValidator } from "./components/waste-code";
 import "./WasteInfo.scss";
 
@@ -205,6 +206,14 @@ export default connect<{}, Values>(function WasteInfo(props) {
         </label>
 
         <RedErrorMessage name="wasteDetails.onuCode" />
+      </div>
+
+      <h4 className="form__section-heading">Terres et sédiments</h4>
+      <div className="form__row">
+        <Field
+          component={ParcelNumbersSelector}
+          name="wasteDetails.parcelNumbers"
+        />
       </div>
     </>
   );

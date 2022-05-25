@@ -93,6 +93,9 @@ type WasteDetails = Pick<
   | "wasteDetailsQuantityType"
   | "wasteDetailsConsistence"
   | "wasteDetailsPop"
+  | "wasteDetailsParcelNumbers"
+  | "wasteDetailsAnalysisReferences"
+  | "wasteDetailsLandIdentifiers"
 >;
 
 type Transporter = Pick<
@@ -394,6 +397,54 @@ const packagingInfoFn = (isDraft: boolean) =>
       )
   });
 
+const parcelCommonInfos = yup
+  .object({
+    city: yup.string().required("Parcelle: la ville est obligatoire"),
+    postalCode: yup
+      .string()
+      .required("Parcelle: le code postal est obligatoire")
+  })
+  .test(
+    "no-unknown",
+    "Parcelle: impossible d'avoir à la fois des coorrdonnées GPS et un numéro de parcelle",
+    (value, testContext) => {
+      const { fields } = testContext.schema;
+      const known = Object.keys(fields);
+      const unknownKeys = Object.keys(value || {}).filter(
+        key => known.indexOf(key) === -1
+      );
+
+      return unknownKeys.length === 0;
+    }
+  );
+const parcelNumber = yup.object({
+  prefix: yup
+    .string()
+    .min(1)
+    .max(5)
+    .required("Parcelle: le préfixe est obligatoire"),
+  section: yup
+    .string()
+    .min(1)
+    .max(5)
+    .required("Parcelle: la section est obligatoire"),
+  number: yup
+    .string()
+    .min(1)
+    .max(5)
+    .required("Parcelle: le numéro de parcelle est obligatoire")
+});
+const parcelCoordinates = yup.object({
+  x: yup.number().required("Parcelle: la coordonnée X est obligatoire"),
+  y: yup.number().required("Parcelle: la coordonnée Y est obligatoire")
+});
+const parcelInfos = yup.lazy(value => {
+  if (value.prefix || value.section || value.number) {
+    return parcelCommonInfos.concat(parcelNumber);
+  }
+  return parcelCommonInfos.concat(parcelCoordinates);
+});
+
 // 3 - Dénomination du déchet
 // 4 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
 // 5 - Conditionnement
@@ -468,7 +519,10 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
             `Un déchet avec un code comportant un astérisque est forcément dangereux`
           ),
       otherwise: () => yup.boolean()
-    })
+    }),
+    wasteDetailsParcelNumbers: yup.array().of(parcelInfos as any),
+    wasteDetailsAnalysisReferences: yup.array().of(yup.string()),
+    wasteDetailsLandIdentifiers: yup.array().of(yup.string())
   });
 
 export const wasteDetailsSchema = wasteDetailsSchemaFn(false);

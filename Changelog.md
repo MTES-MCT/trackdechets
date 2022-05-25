@@ -10,8 +10,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout par l'API d'entreprises intermédiaires sur un bsdd via `Form.intermediaries` et `FormInput.intermediaries` dans l'API GraphQL. L'intermédiaire peut créer et mettre à jour un bordereau via l'API [PR 1331](https://github.com/MTES-MCT/trackdechets/pull/1331)
+- Possibilité d'ajouter des numéros de parcelles et des références d'analyses sur le BSDD [PR 1417](https://github.com/MTES-MCT/trackdechets/pull/1417)
 
 #### :bug: Corrections de bugs
+
 #### :boom: Breaking changes
 
 - Fractionnement d'un BSDD dans plusieurs annexes 2 :
@@ -26,6 +28,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
     - `InitialFormFractionInput`
   - Suppression de `AppendixFormInput.readableId` qui était un champ déjà déprécié
 - Les informations de contact et de récépissé des courtiers et négociants sont désormais obligatoires lorsqu'un courtier ou un négociant apparait sur un BSDD. [PR 1418](https://github.com/MTES-MCT/trackdechets/pull/1418/)
+
 #### :nail_care: Améliorations
 
 - Auto-remplissage du pays et du numéro TVA éventuel pour le PDF des BSDD (transporteurs identifiés par TVA) [PR 1399](https://github.com/MTES-MCT/trackdechets/pull/1399)
@@ -35,6 +38,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :memo: Documentation
 
 #### :house: Interne
+
 # [2022.05.1] ~16/05/2022
 
 #### :rocket: Nouvelles fonctionnalités

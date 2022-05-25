@@ -474,6 +474,27 @@ export default function BSDDetailContent({
               />
               <dt>Consistance</dt>{" "}
               <dd>{getVerboseConsistence(form.wasteDetails?.consistence)}</dd>
+              <DetailRow
+                value={form.wasteDetails?.parcelNumbers
+                  ?.map(
+                    pn =>
+                      `${pn.city} - ${pn.postalCode} - ${[
+                        pn.prefix,
+                        pn.section,
+                        pn.number,
+                        pn.x,
+                        pn.y,
+                      ]
+                        .filter(Boolean)
+                        .join("/")}`
+                  )
+                  .join(", ")}
+                label="Numéro(s) de parcelle(s)"
+              />
+              <DetailRow
+                value={form.wasteDetails?.analysisReferences?.join(", ")}
+                label="Référence(s) d'analyse(s)"
+              />
             </div>
 
             <div className={styles.detailGrid}>
