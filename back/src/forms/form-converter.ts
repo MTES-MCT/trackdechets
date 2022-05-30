@@ -828,6 +828,8 @@ export function expandBsddRevisionRequestContent(
     }),
     trader: nullIfNoValues<Trader>({
       company: nullIfNoValues<FormCompany>({
+        name: bsddRevisionRequest.traderCompanyName,
+        siret: bsddRevisionRequest.traderCompanySiret,
         address: bsddRevisionRequest.traderCompanyAddress,
         contact: bsddRevisionRequest.traderCompanyContact,
         phone: bsddRevisionRequest.traderCompanyPhone,
