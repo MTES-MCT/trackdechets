@@ -178,9 +178,23 @@ function ParcelCadastral({ index }) {
       <p>
         Si le numéro dont vous disposez ressemble à "000-AB-25", 000 est le
         prefixe, AB la section, et 25 le numéro de parcelle. Pour retrouver le
-        numéro à partir d'une adresse, rendez-vous sur le site{" "}
-        <a href="https://cadastre.data.gouv.fr/map" className="tw-underline">
-          du cadastre
+        numéro à partir d'une adresse, rendez-vous sur{" "}
+        <a
+          href="https://cadastre.data.gouv.fr/map"
+          target="_blank"
+          className="tw-underline"
+          rel="noreferrer"
+        >
+          le site du cadastre
+        </a>
+        , ou{" "}
+        <a
+          href="https://errial.georisques.gouv.fr/#/"
+          target="_blank"
+          className="tw-underline"
+          rel="noreferrer"
+        >
+          le site Errial
         </a>
       </p>
       <div className="tw-flex tw-justify-between">
