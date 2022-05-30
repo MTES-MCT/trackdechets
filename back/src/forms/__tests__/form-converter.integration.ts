@@ -77,7 +77,10 @@ describe("expandFormFromDb", () => {
         quantityType: form.wasteDetailsQuantityType,
         consistence: form.wasteDetailsConsistence,
         pop: false,
-        isDangerous: true
+        isDangerous: true,
+        analysisReferences: [],
+        landIdentifiers: [],
+        parcelNumbers: []
       },
       trader: {
         company: {
@@ -105,6 +108,7 @@ describe("expandFormFromDb", () => {
         department: null,
         validityLimit: null
       },
+      intermediaries: [],
       ecoOrganisme: null,
       createdAt: form.createdAt,
       updatedAt: form.updatedAt,

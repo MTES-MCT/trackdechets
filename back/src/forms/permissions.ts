@@ -38,13 +38,12 @@ export async function formToCompanies(form: Form): Promise<FormCompanies> {
           }))
         }
       : {}),
-    ...(fullForm.temporaryStorageDetail
+    ...(fullForm.forwardedIn
       ? {
-          temporaryStorageDetail: {
-            destinationCompanySiret:
-              fullForm.temporaryStorageDetail.destinationCompanySiret,
+          forwardedIn: {
+            recipientCompanySiret: fullForm.forwardedIn.recipientCompanySiret,
             transporterCompanySiret:
-              fullForm.temporaryStorageDetail.transporterCompanySiret
+              fullForm.forwardedIn.transporterCompanySiret
           }
         }
       : {})

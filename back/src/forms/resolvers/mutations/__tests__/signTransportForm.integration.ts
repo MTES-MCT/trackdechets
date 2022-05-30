@@ -324,25 +324,20 @@ describe("signTransportForm", () => {
   });
 
   it("should throw an error if signed by an intermediary", async () => {
-    const temporaryStorage = await userWithCompanyFactory("ADMIN");
     const intermediary = await userWithCompanyFactory("ADMIN");
+    const emitter = await userWithCompanyFactory("ADMIN");
     const transporter = await userWithCompanyFactory("ADMIN");
+    const recipient = await userWithCompanyFactory("ADMIN");
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
     const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
     const form = await formFactory({
-      ownerId: temporaryStorage.user.id,
+      ownerId: emitter.user.id,
       opt: {
-        status: "SIGNED_BY_TEMP_STORER",
-        recipientCompanySiret: temporaryStorage.company.siret,
-        recipientCompanyName: temporaryStorage.company.name,
-        temporaryStorageDetail: {
-          create: {
-            emittedAt: emittedAt,
-            emittedBy: temporaryStorage.user.name,
-            transporterCompanySiret: transporter.company.siret,
-            transporterCompanyName: transporter.company.name
-          }
-        },
+        status: "SIGNED_BY_PRODUCER",
+        recipientCompanySiret: recipient.company.siret,
+        transporterCompanySiret: transporter.company.siret,
+        recipientCompanyName: recipient.company.name,
+        emittedAt,
         intermediaries: {
           create: [toIntermediaryCompany(intermediary.company)]
         }
@@ -359,11 +354,15 @@ describe("signTransportForm", () => {
         input: {
           takenOverAt: takenOverAt.toISOString() as unknown as Date,
           takenOverBy: intermediary.user.name
-        },
-        securityCode: 9999
+        }
       }
     });
 
-    expect(errors).not.toBeUndefined();
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous n'êtes pas autorisé à signer ce bordereau pour cet acteur"
+      })
+    ]);
   });
 });
