@@ -86,7 +86,10 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
   const fullForm = await formRepository.findFullFormById(existingForm.id);
   if (fullForm.forwardedIn) {
     newFormInput.forwardedIn = {
-      create: getDuplicateFormInput(user, fullForm.forwardedIn)
+      create: {
+        readableId: `${newFormInput.readableId}-suite`,
+        ...getDuplicateFormInput(user, fullForm.forwardedIn)
+      }
     };
   }
 
