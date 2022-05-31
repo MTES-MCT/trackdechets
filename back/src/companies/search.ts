@@ -44,7 +44,8 @@ export async function searchCompany(
       ...anonymousCompany,
       statutDiffusionEtablissement: cleanClue.startsWith("000000") ? "O" : "N",
       etatAdministratif: "A",
-      naf: anonymousCompany.codeNaf
+      naf: anonymousCompany.codeNaf,
+      codePaysEtrangerEtablissement: "FR"
     };
   } else if (
     process.env.ALLOW_TEST_COMPANY === "true" &&
@@ -127,7 +128,8 @@ async function getSiretCompanyInfo(siret: string): Promise<SireneSearchResult> {
         // required to avoid leaking anonymous data to the public
         statutDiffusionEtablissement: "N",
         etatAdministratif: "A",
-        naf: anonymousCompany.codeNaf
+        naf: anonymousCompany.codeNaf,
+        codePaysEtrangerEtablissement: "FR"
       };
     } else if (err instanceof AnonymousCompanyError) {
       // And it's finally an anonymous that is not found in AnonymousCompany

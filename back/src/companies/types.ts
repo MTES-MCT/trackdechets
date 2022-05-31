@@ -18,6 +18,7 @@ export interface CompanySearchResult extends CompanyBaseIdentifiers {
   ecoOrganismeAgreements?: URL[];
   // diffusible ou non-diffusible légalement (INSEE)
   statutDiffusionEtablissement: "O" | "N";
+  codePaysEtrangerEtablissement?: string;
 }
 /**
  * Company interface only with identifiers

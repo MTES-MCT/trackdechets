@@ -97,7 +97,7 @@ export default function CompanySelector({
     Pick<Query, "companyInfos">
   >(COMPANY_INFOS, {
     onCompleted: data => {
-      if (data && data.companyInfos) {
+      if (data?.companyInfos) {
         const companyInfos = data.companyInfos;
         if (!companyInfos.isRegistered && registeredOnlyCompanies) {
           cogoToast.error(
@@ -194,6 +194,7 @@ export default function CompanySelector({
             brokerReceipt,
             vhuAgrementDemolisseur,
             vhuAgrementBroyeur,
+            codePaysEtrangerEtablissement,
           }) =>
             ({
               // convert CompanySearchResult to CompanyFavorite
@@ -206,7 +207,9 @@ export default function CompanySelector({
               brokerReceipt,
               vhuAgrementDemolisseur,
               vhuAgrementBroyeur,
-
+              codePaysEtrangerEtablissement: codePaysEtrangerEtablissement?.length
+                ? codePaysEtrangerEtablissement
+                : "FR",
               __typename: "CompanyFavorite",
               contact: "",
               phone: "",
