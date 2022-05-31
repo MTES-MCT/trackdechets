@@ -1,9 +1,8 @@
 import { CompanyType, UserRole } from "@prisma/client";
 import * as yup from "yup";
 import prisma from "../../prisma";
-import { getCompanyThrottled } from "./sirene";
 import { CompanyRow } from "./types";
-import { opts } from ".";
+import { searchCompany } from "../../companies/search";
 
 /**
  * Validation schema for company
@@ -18,7 +17,7 @@ export const companyValidationSchema = yup.object({
       "Siret ${value} was not found in SIRENE database",
       async value => {
         try {
-          await getCompanyThrottled(value, opts);
+          await searchCompany(value);
           return true;
         } catch (err) {
           return false;
