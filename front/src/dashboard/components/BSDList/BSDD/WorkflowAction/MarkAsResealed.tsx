@@ -6,7 +6,13 @@ import CompanySelector from "form/common/components/company/CompanySelector";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import Packagings from "form/bsdd/components/packagings/Packagings";
-import { FormStatus, Mutation, WasteDetails } from "generated/graphql/types";
+import {
+  FormStatus,
+  Mutation,
+  QuantityType,
+  ResealedFormInput,
+  WasteDetails,
+} from "generated/graphql/types";
 import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "common/components/Modal";
@@ -108,11 +114,17 @@ export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
       )}
       modalContent={close => (
         <div>
-          <Formik
+          <Formik<ResealedFormInput>
             initialValues={initialValues}
-            onSubmit={values =>
+            onSubmit={({ wasteDetails, ...values }) =>
               markAsResealed({
-                variables: { id: form.id, resealedInfos: values },
+                variables: {
+                  id: form.id,
+                  resealedInfos: {
+                    ...values,
+                    ...(isRefurbished ? { wasteDetails } : {}),
+                  },
+                },
               })
             }
           >
@@ -288,6 +300,6 @@ const emptyState = {
     onuCode: "",
     packagingInfos: [],
     quantity: null,
-    quantityType: "ESTIMATED",
+    quantityType: QuantityType.Estimated,
   },
 };

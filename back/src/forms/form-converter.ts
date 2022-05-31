@@ -142,13 +142,11 @@ function flattenWasteDetailsInput(input: { wasteDetails?: WasteDetailsInput }) {
     wasteDetailsParcelNumbers: chain(input.wasteDetails, w =>
       undefinedOrDefault(w.parcelNumbers, [])
     ),
-    wasteDetailsAnalysisReferences: chain(
-      input.wasteDetails,
-      w => w.analysisReferences
+    wasteDetailsAnalysisReferences: chain(input.wasteDetails, w =>
+      undefinedOrDefault(w.analysisReferences, [])
     ),
-    wasteDetailsLandIdentifiers: chain(
-      input.wasteDetails,
-      w => w.landIdentifiers
+    wasteDetailsLandIdentifiers: chain(input.wasteDetails, w =>
+      undefinedOrDefault(w.landIdentifiers, [])
     )
   };
 }
