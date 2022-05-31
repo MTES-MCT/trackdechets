@@ -82,7 +82,7 @@ export default function BsdaStepsList(props: Props) {
   const cleanupFields = (input: BsdaInput): BsdaInput => {
     // When created through api, this field might be null in db
     // We send it as false at creation time from the UI, but we dont have any
-    // mean to edit it, and it is lcoked once signe by worker
+    // mean to edit it, and it is locked once signed by worker
     // This can lead to unsolvable cases.
     // While waiting a better fix (eg. an editable field or to default the field as false),
     // this function unlocks users
