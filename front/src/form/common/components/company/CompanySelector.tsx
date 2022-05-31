@@ -201,7 +201,15 @@ export default function CompanySelector({
               mail: "",
             } as CompanyFavorite)
         )
-        .concat(favoritesData?.favorites ?? []) ??
+        // Concat user favorites companies, except the siret already in Search results
+        .concat(
+          favoritesData?.favorites?.filter(
+            fav =>
+              !searchData?.searchCompanies
+                .map(company => company.siret)
+                .includes(fav.siret)
+          ) ?? []
+        ) ??
       favoritesData?.favorites ??
       [],
     [searchData, favoritesData]
