@@ -15,6 +15,7 @@ import { useMutation } from "@apollo/client";
 import { SUBMIT_FORM_REVISION_REQUEST_APPROVAL } from "../query";
 import { Field, Form, Formik } from "formik";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
+import { formatDate } from "common/datetime";
 
 type Props = {
   review: FormRevisionRequest;
@@ -174,7 +175,8 @@ function traderAndBrokerFormatter(
       </div>
       <div>
         Récepissé: {entity.receipt} - Département: {entity.department} - Date
-        limite de validité: {entity.validityLimit}
+        limite de validité:{" "}
+        {entity.validityLimit ? formatDate(entity.validityLimit) : ""}
       </div>
     </>
   );
