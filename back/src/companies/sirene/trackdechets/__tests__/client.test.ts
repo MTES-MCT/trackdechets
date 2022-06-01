@@ -30,7 +30,8 @@ describe("searchCompany", () => {
           codeCommuneEtablissement: "13201",
           libelleCommuneEtablissement: "MARSEILLE",
           activitePrincipaleEtablissement: "62.01Z",
-          denominationUniteLegale: "CODE EN STOCK"
+          denominationUniteLegale: "CODE EN STOCK",
+          codePaysEtrangerEtablissement: ""
         }
       }
     });
@@ -46,7 +47,8 @@ describe("searchCompany", () => {
       codeCommune: "13201",
       name: "CODE EN STOCK",
       naf: "62.01Z",
-      libelleNaf: "Programmation informatique"
+      libelleNaf: "Programmation informatique",
+      codePaysEtrangerEtablissement: ""
     };
     expect(company).toEqual(expected);
   });
