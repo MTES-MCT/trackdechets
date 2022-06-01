@@ -65,7 +65,7 @@ const buildAcceptRevisionRequestApproval: (
       data: {
         streamId: updatedApproval.revisionRequestId,
         actor: user.id,
-        type: "BsddRevisionRequestRefused",
+        type: "BsddRevisionRequestAccepted",
         data: {
           content: {
             status: RevisionRequestApprovalStatus.ACCEPTED,
@@ -114,6 +114,8 @@ function getUpdateFromFormRevisionRequest(
     brokerReceipt: revisionRequest.brokerReceipt,
     brokerDepartment: revisionRequest.brokerDepartment,
     brokerValidityLimit: revisionRequest.brokerValidityLimit,
+    traderCompanyName: revisionRequest.traderCompanyName,
+    traderCompanySiret: revisionRequest.traderCompanySiret,
     traderCompanyAddress: revisionRequest.traderCompanyAddress,
     traderCompanyContact: revisionRequest.traderCompanyContact,
     traderCompanyPhone: revisionRequest.traderCompanyPhone,
