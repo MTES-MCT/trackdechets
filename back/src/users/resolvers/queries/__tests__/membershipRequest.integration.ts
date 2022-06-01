@@ -17,6 +17,7 @@ const MEMBERSHIP_REQUEST = `
       siret
       name
       status
+      sentTo
     }
   }
 `;
@@ -82,7 +83,8 @@ describe("query membershipRequest", () => {
     const membershipRequest = await prisma.membershipRequest.create({
       data: {
         user: { connect: { id: requester.id } },
-        company: { connect: { id: company.id } }
+        company: { connect: { id: company.id } },
+        sentTo: [admin.email, "someotheradmin@test.fr"]
       }
     });
     const { query } = makeClient(admin);
@@ -97,7 +99,8 @@ describe("query membershipRequest", () => {
       status: "PENDING",
       email: requester.email,
       siret: company.siret,
-      name: company.name
+      name: company.name,
+      sentTo: [admin.email, "so****@test.fr"] // emails not belonging to user email domain are partially redacted
     });
   });
 

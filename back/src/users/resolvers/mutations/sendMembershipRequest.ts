@@ -13,6 +13,7 @@ import {
   membershipRequest as membershipRequestMail,
   membershipRequestConfirmation
 } from "../../../mailer/templates";
+import { getEmailDomain, canSeeEmail } from "../../utils";
 
 const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] =
   async (parent, { siret }, context) => {
@@ -67,10 +68,25 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
     );
 
     // send membership request confirmation to requester
+    // Iot let him/her know about admin emails, we filter them (same domain name, no public email providers)
+    const adminEmails = admins.map(a => a.email);
+    const userEmailDomain = getEmailDomain(user?.email);
+
+    const displayableAdminEmails = adminEmails
+      .filter(email => canSeeEmail(email, userEmailDomain))
+      .join(", ");
+    const adminEmailsInfo = !!displayableAdminEmails
+      ? `Si vous n'avez pas de retour au bout de quelques jours, vous pourrez contacter: ${displayableAdminEmails}`
+      : "";
+
     await sendMail(
       renderMail(membershipRequestConfirmation, {
         to: [{ email: user.email, name: user.name }],
-        variables: { companyName: company.name, companySiret: company.siret }
+        variables: {
+          companyName: company.name,
+          companySiret: company.siret,
+          adminEmailsInfo: adminEmailsInfo
+        }
       })
     );
 
