@@ -474,40 +474,40 @@ describe("draftFormSchema", () => {
 
   it("should be valid when passing a null parcelNumber coordinate and number", async () => {
     const isValid = await draftFormSchema.isValid({
-        ...form,
-        wasteDetailsParcelNumbers: [
-          {
-            city: "Paris",
-            postalCode: "750012",
-            prefix: "000",
-            section: "AB",
-            number: "25",
-            x: null,
-            y: null
-          }
-        ]
-      });
+      ...form,
+      wasteDetailsParcelNumbers: [
+        {
+          city: "Paris",
+          postalCode: "750012",
+          prefix: "000",
+          section: "AB",
+          number: "25",
+          x: null,
+          y: null
+        }
+      ]
+    });
 
-      expect(isValid).toBe(true);
+    expect(isValid).toBe(true);
   });
 
   it("should be valid when passing a parcelNumber coordinate and bull number", async () => {
     const isValid = await draftFormSchema.isValid({
-        ...form,
-        wasteDetailsParcelNumbers: [
-          {
-            city: "Paris",
-            postalCode: "750012",
-            prefix: null,
-            section: null,
-            number: null,
-            x: 1.2,
-            y: 1.3
-          }
-        ]
-      });
+      ...form,
+      wasteDetailsParcelNumbers: [
+        {
+          city: "Paris",
+          postalCode: "750012",
+          prefix: null,
+          section: null,
+          number: null,
+          x: 1.2,
+          y: 1.3
+        }
+      ]
+    });
 
-      expect(isValid).toBe(true);
+    expect(isValid).toBe(true);
   });
 
   it("should be valid when passing a parcelNumber number", async () => {

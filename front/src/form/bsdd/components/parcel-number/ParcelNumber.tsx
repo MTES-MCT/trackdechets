@@ -37,7 +37,7 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
       <TdSwitch
         checked={showParcelNumberSelector}
         onChange={handleparcelNumberToggle}
-        label="Je souhaite ajouter une parcelle cadastrale pour la traçabilité des terres et sédiments"
+        label="Je souhaite ajouter une parcelle cadastrale pour la traçabilité des terres et sédiments (optionnel)"
       />
 
       {showParcelNumberSelector && (
@@ -101,7 +101,7 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
         <label>
           Identifiant(s) du terrain lorsque les terres ont été extraites d'un
           terrain placé en secteur d'information sur les sols au titre de
-          l'article L. 125-6
+          l'article L. 125-6 (optionnel)
           <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
           <TagsInput name="wasteDetails.landIdentifiers" />
         </label>
@@ -109,7 +109,7 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
 
       <div className="form__row">
         <label>
-          Références d'analyses
+          Références d'analyses (optionnel)
           <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
           <TagsInput name="wasteDetails.analysisReferences" />
         </label>
