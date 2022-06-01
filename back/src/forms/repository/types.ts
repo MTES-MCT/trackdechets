@@ -23,10 +23,11 @@ export type PrismaTransaction = Omit<
   "$connect" | "$disconnect" | "$on" | "$transaction" | "$use"
 >;
 
-export interface RepositoryFnDeps {
-  prisma: PrismaTransaction;
+export type ReadRepositoryFnDeps = { prisma: PrismaTransaction };
+export type WriteRepositoryFnDeps = ReadRepositoryFnDeps & {
   user: Express.User;
-}
+};
+export type RepositoryFnDeps = WriteRepositoryFnDeps;
 
 export interface RepositoryDeps {
   prisma: PrismaClient;

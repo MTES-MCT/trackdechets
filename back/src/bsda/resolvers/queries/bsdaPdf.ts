@@ -1,4 +1,3 @@
-import prisma from "../../../prisma";
 import { QueryBsdaPdfArgs } from "../../../generated/graphql/types";
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -7,11 +6,12 @@ import { getBsdaOrNotFound } from "../../database";
 import { checkIsBsdaContributor } from "../../permissions";
 import { buildPdf } from "../../pdf/generator";
 import { DownloadHandler } from "../../../routers/downloadRouter";
+import { getBsdaRepository } from "../../repository";
 
 export const bsdaPdfDownloadHandler: DownloadHandler<QueryBsdaPdfArgs> = {
   name: "bsdaPdf",
-  handler: async (_, res, { id }) => {
-    const bsda = await prisma.bsda.findUnique({ where: { id } });
+  handler: async (req, res, { id }) => {
+    const bsda = await getBsdaRepository(req.user).findUnique({ id });
     const readableStream = await buildPdf(bsda);
     readableStream.pipe(createPDFResponse(res, bsda.id));
   }

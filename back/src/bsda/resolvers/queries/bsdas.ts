@@ -1,6 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryBsdasArgs } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb } from "../../converter";
 import { toPrismaWhereInput } from "../../where";
@@ -8,6 +7,7 @@ import { applyMask } from "../../../common/where";
 import { BSDA_CONTRIBUTORS_FIELDS } from "../../permissions";
 import { getConnection } from "../../../common/pagination";
 import { getCachedUserSirets } from "../../../common/redis/users";
+import { getBsdaRepository } from "../../repository";
 
 export default async function bsdas(
   _,
@@ -30,14 +30,13 @@ export default async function bsdas(
   };
 
   const where = applyMask(prismaWhere, mask);
-
-  const totalCount = await prisma.bsda.count({ where });
+  const bsdaRepository = getBsdaRepository(user);
+  const totalCount = await bsdaRepository.count(where);
 
   return getConnection({
     totalCount,
     findMany: prismaPaginationArgs =>
-      prisma.bsda.findMany({
-        where,
+      bsdaRepository.findMany(where, {
         ...prismaPaginationArgs,
         orderBy: { createdAt: "desc" }
       }),
