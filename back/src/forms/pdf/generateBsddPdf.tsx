@@ -229,16 +229,15 @@ function TransporterFormCompanyFields({
         <FormCompanyFields company={transporter?.company} />
       </div>
       <div className="Col">
-        <p>
-          <input
-            type="checkbox"
-            checked={transporter?.isExemptedOfReceipt}
-            readOnly
-          />{" "}
-          Je déclare être exempté de récépissé au titre de l’article R.541-50 du
-          code de l’environnement
-        </p>
-        <ReceiptFields {...(transporter ?? {})} />
+        {transporter?.isExemptedOfReceipt ? (
+          <p>
+            <input type="checkbox" checked readOnly /> Je déclare être exempté
+            de récépissé au titre de l'article R.541-50 du code de
+            l'environnement
+          </p>
+        ) : (
+          <ReceiptFields {...(transporter ?? {})} />
+        )}
         <p>
           Mode de transport :{" "}
           {transporter?.mode ? TRANSPORT_MODE_LABELS[transporter.mode] : null}
