@@ -19,7 +19,10 @@ export function BsddRevisionAction({ review }: Props) {
     approval => approval.approverSiret === siret
   );
 
-  if (currentApproval?.status === RevisionRequestApprovalStatus.Pending) {
+  if (
+    review.status === RevisionRequestStatus.Pending &&
+    currentApproval?.status === RevisionRequestApprovalStatus.Pending
+  ) {
     return <BsddApproveRevision review={review} />;
   }
 
