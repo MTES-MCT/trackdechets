@@ -113,7 +113,7 @@ export default function Recipient() {
           {isDangerousWaste ? (
             <Tooltip
               msg={`Le champ CAP est obligatoire pour les déchets dangereux.
-Il est important car il qualifie les conditions de gestion et de traitement du déchets entre le producteur et l'entreprise de destination.`}
+Il est important car il qualifie les conditions de gestion et de traitement du déchet entre le producteur et l'entreprise de destination.`}
             />
           ) : (
             " (Optionnel pour les déchets non dangereux)"
