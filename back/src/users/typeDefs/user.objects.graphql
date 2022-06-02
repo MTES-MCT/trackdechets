@@ -54,8 +54,11 @@ type MembershipRequest {
 
   """
   Liste des adresses email correspondant aux comptes administrateurs à qui la demande
-  de rattachement a été envoyée. Les adresses emails sont partiellement masquées de la
-  façon suivante j********w@trackdechets.fr
+  de rattachement a été envoyée. Si l'email associé au compte qui effectue la requête
+  n'appartient pas au même domaine, les adresses emails sont partiellement masquées de la
+  façon suivante j********w@trackdechets.fr.
+  Les adresses emails issues de fournisseurs de boite mail (gmail, orange, yahoo etc) 
+  sont toujours partiellement masquées.
   """
   sentTo: [String!]!
 }
