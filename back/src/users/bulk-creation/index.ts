@@ -29,7 +29,6 @@ function printHelp() {
   Options:
   -- --help                         Print help
   -- --validateOnly                 Only perform validation csv files
-  -- --sireneProvider=providerName  Choose provider name (directory name under src/companies/sirene/*)
   -- --csvDir=/path/to/csv/dir      Specify custom csv directory
   `);
 }
@@ -38,7 +37,6 @@ export interface Opts {
   validateOnly: boolean;
   csvDir: string;
   console?: any;
-  sireneProvider?: "entreprise.data.gouv.fr" | "insee" | "social.gouv";
 }
 
 export const opts: Opts = {
@@ -60,10 +58,6 @@ async function run(argv = process.argv.slice(2)): Promise<void> {
 
   if (args.csvDir) {
     opts.csvDir = args.csvDir;
-  }
-
-  if (args.sireneProvider) {
-    opts.sireneProvider = args.sireneProvider;
   }
 
   await bulkCreate(opts);
@@ -142,7 +136,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
   for (const c of companies) {
     try {
       console.info(`Add sirene info for company ${c.siret}`);
-      const sirenified = await sirenify(c, opts);
+      const sirenified = await sirenify(c);
       sirenifiedCompanies.push(sirenified);
     } catch (err) {
       console.error(err);
