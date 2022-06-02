@@ -12,8 +12,8 @@ jest.mock("../../../prisma", () => ({
 
 const mockSirene = jest.fn();
 
-jest.mock("../sirene", () => ({
-  getCompanyThrottled: jest.fn(() => mockSirene())
+jest.mock("../../../companies/search", () => ({
+  searchCompany: jest.fn(() => mockSirene())
 }));
 
 describe("company validation", () => {
