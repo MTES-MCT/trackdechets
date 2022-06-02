@@ -429,7 +429,7 @@ describe("draftFormSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Parcelle: impossible d'avoir à la fois des coorrdonnées GPS et un numéro de parcelle"
+      "Parcelle: impossible d'avoir à la fois des coordonnées GPS et un numéro de parcelle"
     );
   });
 
@@ -468,8 +468,46 @@ describe("draftFormSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Parcelle: impossible d'avoir à la fois des coorrdonnées GPS et un numéro de parcelle"
+      "Parcelle: impossible d'avoir à la fois des coordonnées GPS et un numéro de parcelle"
     );
+  });
+
+  it("should be valid when passing a null parcelNumber coordinate and number", async () => {
+    const isValid = await draftFormSchema.isValid({
+      ...form,
+      wasteDetailsParcelNumbers: [
+        {
+          city: "Paris",
+          postalCode: "750012",
+          prefix: "000",
+          section: "AB",
+          number: "25",
+          x: null,
+          y: null
+        }
+      ]
+    });
+
+    expect(isValid).toBe(true);
+  });
+
+  it("should be valid when passing a parcelNumber coordinate and bull number", async () => {
+    const isValid = await draftFormSchema.isValid({
+      ...form,
+      wasteDetailsParcelNumbers: [
+        {
+          city: "Paris",
+          postalCode: "750012",
+          prefix: null,
+          section: null,
+          number: null,
+          x: 1.2,
+          y: 1.3
+        }
+      ]
+    });
+
+    expect(isValid).toBe(true);
   });
 
   it("should be valid when passing a parcelNumber number", async () => {

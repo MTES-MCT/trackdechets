@@ -406,15 +406,15 @@ const parcelCommonInfos = yup
   })
   .test(
     "no-unknown",
-    "Parcelle: impossible d'avoir à la fois des coorrdonnées GPS et un numéro de parcelle",
+    "Parcelle: impossible d'avoir à la fois des coordonnées GPS et un numéro de parcelle",
     (value, testContext) => {
       const { fields } = testContext.schema;
       const known = Object.keys(fields);
-      const unknownKeys = Object.keys(value || {}).filter(
+      const unknownKeys: string[] = Object.keys(value || {}).filter(
         key => known.indexOf(key) === -1
       );
 
-      return unknownKeys.length === 0;
+      return unknownKeys.every(key => value[key] == null);
     }
   );
 const parcelNumber = yup.object({
