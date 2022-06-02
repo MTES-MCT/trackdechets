@@ -20,7 +20,7 @@ describe("company validation", () => {
   beforeEach(() => {
     mockCompanyExists.mockResolvedValue(false);
     mockUserExists.mockResolvedValue(false);
-    mockSirene.mockReset();
+    mockSirene.mockResolvedValue({});
   });
 
   const originalWarn = console.warn;
@@ -184,6 +184,20 @@ describe("company validation", () => {
         contactPhone: "01-00-00-00" // missing two digits
       })
     ).rejects.toThrow(ValidationError);
+  });
+
+  test("closed company", async () => {
+    mockSirene.mockImplementationOnce(() =>
+      Promise.resolve({ etatAdministratif: "F" })
+    );
+    await expect(
+      validateCompany({
+        siret: "12345678901234",
+        companyTypes: ["PRODUCER"]
+      })
+    ).rejects.toThrow(
+      "Siret 12345678901234 was not found in SIRENE database or company is closed"
+    );
   });
 });
 

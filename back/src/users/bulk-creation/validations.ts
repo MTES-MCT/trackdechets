@@ -14,10 +14,13 @@ export const companyValidationSchema = yup.object({
     .length(14)
     .test(
       "sirene-validation-failed",
-      "Siret ${value} was not found in SIRENE database",
+      "Siret ${value} was not found in SIRENE database or company is closed",
       async value => {
         try {
-          await searchCompany(value);
+          const company = await searchCompany(value);
+          if (company.etatAdministratif === "F") {
+            return false;
+          }
           return true;
         } catch (err) {
           return false;
