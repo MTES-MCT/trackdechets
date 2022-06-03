@@ -1,5 +1,5 @@
 import prisma from "../prisma";
-import redundantCachedSeachCompany from "./sirene/searchCompany";
+import redundantCachedSearchSirene from "./sirene/searchCompany";
 import decoratedSearchCompanies from "./sirene/searchCompanies";
 import { UserInputError } from "apollo-server-express";
 import { CompanySearchResult } from "./types";
@@ -23,6 +23,7 @@ const SIRET_OR_VAT_ERROR =
 
 /**
  * Search one company by SIRET or VAT number
+ * Supports Test SIRET and AnonymousCompany
  */
 export async function searchCompany(
   clue: string
@@ -35,7 +36,7 @@ export async function searchCompany(
     });
   }
   let companyInfo: SireneSearchResult | CompanyVatSearchResult;
-  // search for test or anonymous companies
+  // search for test or anonymous companies first
   const anonymousCompany = await prisma.anonymousCompany.findUnique({
     where: { siret: cleanClue }
   });
@@ -44,7 +45,8 @@ export async function searchCompany(
       ...anonymousCompany,
       statutDiffusionEtablissement: cleanClue.startsWith("000000") ? "O" : "N",
       etatAdministratif: "A",
-      naf: anonymousCompany.codeNaf
+      naf: anonymousCompany.codeNaf,
+      codePaysEtrangerEtablissement: "FR"
     };
   } else if (
     process.env.ALLOW_TEST_COMPANY === "true" &&
@@ -55,8 +57,12 @@ export async function searchCompany(
       invalidArgs: ["siret", "clue"]
     });
   } else {
-    if (isSiret(cleanClue)) companyInfo = await getSiretCompanyInfo(cleanClue);
-    else if (isVat(cleanClue)) companyInfo = await getVatCompanyInfo(cleanClue);
+    // Search public company databases
+    if (isSiret(cleanClue)) {
+      companyInfo = await searchSireneOrNotFound(cleanClue);
+    } else if (isVat(cleanClue)) {
+      companyInfo = await searchVatFrOnlyOrNotFound(cleanClue);
+    }
   }
 
   // append Company data
@@ -92,6 +98,7 @@ export async function searchCompany(
   };
 }
 
+// used for dependency injection in tests to easily mock `searchCompany`
 export const makeSearchCompanies =
   ({ searchCompany }: SearchCompaniesDeps) =>
   (clue: string, department?: string) => {
@@ -108,13 +115,11 @@ export const makeSearchCompanies =
     return decoratedSearchCompanies(clue, department);
   };
 
-// use dependency injection here to easily mock `searchCompany`
-// in index.test.ts
-export const searchCompanies = makeSearchCompanies({ searchCompany });
-
-async function getSiretCompanyInfo(siret: string): Promise<SireneSearchResult> {
+async function searchSireneOrNotFound(
+  siret: string
+): Promise<SireneSearchResult> {
   try {
-    return await redundantCachedSeachCompany(siret);
+    return await redundantCachedSearchSirene(siret);
   } catch (err) {
     // The SIRET was not found in public data
     // Try searching the anonymous companies
@@ -127,7 +132,8 @@ async function getSiretCompanyInfo(siret: string): Promise<SireneSearchResult> {
         // required to avoid leaking anonymous data to the public
         statutDiffusionEtablissement: "N",
         etatAdministratif: "A",
-        naf: anonymousCompany.codeNaf
+        naf: anonymousCompany.codeNaf,
+        codePaysEtrangerEtablissement: "FR"
       };
     } else if (err instanceof AnonymousCompanyError) {
       // And it's finally an anonymous that is not found in AnonymousCompany
@@ -141,7 +147,7 @@ async function getSiretCompanyInfo(siret: string): Promise<SireneSearchResult> {
   }
 }
 
-async function getVatCompanyInfo(
+async function searchVatFrOnlyOrNotFound(
   vatNumber: string
 ): Promise<CompanyVatSearchResult> {
   if (isFRVat(vatNumber)) {
@@ -152,6 +158,7 @@ async function getVatCompanyInfo(
       }
     );
   }
+  // throws UserInputError if not found
   const result = await searchVat(vatNumber);
   return {
     ...result,
@@ -159,3 +166,5 @@ async function getVatCompanyInfo(
     statutDiffusionEtablissement: "O"
   };
 }
+
+export const searchCompanies = makeSearchCompanies({ searchCompany });

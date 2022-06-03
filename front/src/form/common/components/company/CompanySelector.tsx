@@ -2,6 +2,7 @@ import { useLazyQuery, useQuery } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import { Field, Form, Formik, useField, useFormikContext } from "formik";
 import React, { useEffect, useCallback, useMemo, useState } from "react";
+import { checkVAT } from "jsvat";
 import { IconSearch } from "common/components/Icons";
 import { constantCase } from "constant-case";
 import { InlineError, NotificationError } from "common/components/Error";
@@ -11,7 +12,9 @@ import {
   isFRVat,
   isSiret,
   isVat,
+  countries as vatCountries,
 } from "generated/constants/companySearchHelpers";
+
 import CompanyResults from "./CompanyResults";
 import styles from "./CompanySelector.module.scss";
 import { FAVORITES, SEARCH_COMPANIES } from "./query";
@@ -94,7 +97,7 @@ export default function CompanySelector({
     Pick<Query, "companyInfos">
   >(COMPANY_INFOS, {
     onCompleted: data => {
-      if (data && data.companyInfos) {
+      if (data?.companyInfos) {
         const companyInfos = data.companyInfos;
         if (!companyInfos.isRegistered && registeredOnlyCompanies) {
           cogoToast.error(
@@ -137,7 +140,16 @@ export default function CompanySelector({
           contact: company.contact,
           phone: company.phone,
           mail: company.mail,
+          country: company.codePaysEtrangerEtablissement,
         };
+
+        if (company.vatNumber) {
+          const vatCountryCode = checkVAT(company.vatNumber, vatCountries)
+            ?.country?.isoCode.short;
+          if (vatCountryCode) {
+            fields.country = vatCountryCode;
+          }
+        }
 
         Object.keys(fields).forEach(key => {
           setFieldValue(`${field.name}.${key}`, fields[key]);
@@ -182,8 +194,12 @@ export default function CompanySelector({
             brokerReceipt,
             vhuAgrementDemolisseur,
             vhuAgrementBroyeur,
-          }) =>
-            ({
+            codePaysEtrangerEtablissement,
+            etatAdministratif,
+          }) => {
+            // exclude closed companies in SIRENE data
+            if (etatAdministratif !== "A") return {};
+            return {
               // convert CompanySearchResult to CompanyFavorite
               siret,
               vatNumber,
@@ -194,13 +210,17 @@ export default function CompanySelector({
               brokerReceipt,
               vhuAgrementDemolisseur,
               vhuAgrementBroyeur,
-
+              codePaysEtrangerEtablissement: codePaysEtrangerEtablissement?.length
+                ? codePaysEtrangerEtablissement
+                : "FR",
               __typename: "CompanyFavorite",
               contact: "",
               phone: "",
               mail: "",
-            } as CompanyFavorite)
+            } as CompanyFavorite;
+          }
         )
+        .filter(company => Object.keys(company).length > 0)
         // Concat user favorites companies, except the siret already in Search results
         .concat(
           favoritesData?.favorites?.filter(

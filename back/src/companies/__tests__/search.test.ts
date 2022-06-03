@@ -72,6 +72,7 @@ describe("searchCompany", () => {
     });
     const testCompany = await searchCompany(siret);
     expect(siret).toEqual(testCompany.siret);
+    expect("FR").toEqual(testCompany.codePaysEtrangerEtablissement);
     process.env = OLD_ENV;
   });
 });
@@ -97,7 +98,8 @@ describe("searchCompanies", () => {
       addressVoie: "40 boulevard",
       addressCity: "Marseille",
       addressPostalCode: "13001",
-      etatAdministratif: "A"
+      etatAdministratif: "A",
+      codePaysEtrangerEtablissement: "FR"
     };
     searchCompanyMock.mockResolvedValue(company);
     const companies = await searchCompanies("11111111111111");

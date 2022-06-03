@@ -34,6 +34,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Auto-remplissage du pays et du numéro TVA éventuel pour le PDF des BSDD (transporteurs identifiés par TVA) [PR 1399](https://github.com/MTES-MCT/trackdechets/pull/1399)
 - Permettre d'éditer les champs Bsdd champ libre et plaques d'immatriculations pour le statut SIGNED_BY_PRODUCER [PR 1416](https://github.com/MTES-MCT/trackdechets/pull/1416)
 - Restreindre les changements de type d'établissement à Transporteur seulement quand un établissement est identifié par un numéro de TVA. [PR 1390](https://github.com/MTES-MCT/trackdechets/pull/1390)
+- Sélecteur d'établissement dans l'édition d'un BSD [PR 1424](https://github.com/MTES-MCT/trackdechets/pull/1424)
+  - Auto-completion du pays en fonction du numéro TVA quand on sélectionne un transporteur étranger.
+  - Dédoublonnage établissements dans la recherche
+  - Exclusion des Établissements fermés dans les résultats de recherche
+  - Empêcher de choisir manuellement FR quand un transporteur étranger est sélectionné
 
 #### :memo: Documentation
 

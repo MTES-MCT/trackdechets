@@ -25,6 +25,9 @@ type CompanyFavorite {
   "Email de contact"
   mail: String
 
+  "Code pays de l'établissement"
+  codePaysEtrangerEtablissement: String
+
   """
   Récépissé transporteur associé à cet établissement (le cas échéant)
   """
@@ -181,6 +184,7 @@ type CompanySearchPrivate {
 
   "Code pays de l'établissement"
   codePaysEtrangerEtablissement: String
+
   "État administratif de l'établissement. A = Actif, F = Fermé"
   etatAdministratif: String
   "Statut de diffusion de l'établissement selon l'INSEE. O = Oui, N = Non"
