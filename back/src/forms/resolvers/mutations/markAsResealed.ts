@@ -37,6 +37,7 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
   // copy basic info from initial BSD and overwrite it with resealedInfos
   const updateInput: Prisma.FormUpdateInput = {
     emitterType: EmitterType.PRODUCER,
+    emittedByEcoOrganisme: false,
     emitterCompanySiret: form.recipientCompanySiret,
     emitterCompanyName: form.recipientCompanyName,
     emitterCompanyAddress: form.recipientCompanyAddress,
@@ -52,6 +53,8 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     wasteDetailsQuantityType: "REAL",
     wasteDetailsQuantity: form.quantityReceived,
     wasteDetailsPackagingInfos: form.wasteDetailsPackagingInfos,
+    wasteDetailsAnalysisReferences: [],
+    wasteDetailsLandIdentifiers: [],
     ...flattenFormInput({ transporter, wasteDetails, recipient: destination })
   };
 
