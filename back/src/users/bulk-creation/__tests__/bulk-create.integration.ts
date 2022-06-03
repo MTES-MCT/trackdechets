@@ -9,16 +9,11 @@ const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
 
 jest.mock("../sirene", () => ({
-  getCompanyThrottled: jest.fn(() =>
-    Promise.resolve({
-      naf: "62.01Z",
-      name: "NAME FROM SIRENE"
-    })
-  ),
   sirenify: jest.fn(company =>
     Promise.resolve({
       ...company,
       name: "NAME FROM SIRENE",
+      address: "40 boulevard Volatire 13001 Marseille",
       codeNaf: "62.01Z"
     })
   )
@@ -58,8 +53,7 @@ describe("bulk create users and companies from csv files", () => {
       info: jest.fn(),
       error: jest.fn(),
       log: global.console.log
-    },
-    sireneProvider: "entreprise.data.gouv.fr"
+    }
   };
 
   async function bulkCreateIdempotent() {

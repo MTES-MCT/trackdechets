@@ -1277,7 +1277,7 @@ model Bsda {
   transporterRecepisseDepartment    String?
   transporterRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
-  transporterTransportMode            TransportMode?
+  transporterTransportMode            TransportMode? @default(ROAD)
   transporterTransportPlates          String[]
   transporterTransportTakenOverAt     DateTime?      @db.Timestamptz(6)
   transporterTransportSignatureAuthor String?
