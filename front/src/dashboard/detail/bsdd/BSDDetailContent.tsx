@@ -158,10 +158,7 @@ const TempStorage = ({ form }) => {
           <dt>Adresse</dt>
           <dd>{temporaryStorageDetail?.destination?.company?.address}</dd>
 
-          <DetailRow
-            value={temporaryStorageDetail?.destination?.cap}
-            label="Numéro de CAP"
-          />
+          <DetailRow value={form?.recipient?.cap} label="Numéro de CAP" />
 
           <DetailRow
             value={temporaryStorageDetail?.destination?.processingOperation}
