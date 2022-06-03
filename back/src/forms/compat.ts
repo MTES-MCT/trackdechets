@@ -12,7 +12,7 @@ export function simpleFormToBsdd(
   const [transporter2, transporter3] = form.transportSegments ?? [];
 
   return {
-    id: form.readableId,
+    id: tov1ReadableId(form.readableId),
     customId: form.customId,
     createdAt: form.createdAt,
     updatedAt: form.updatedAt,
@@ -180,4 +180,11 @@ export function formToBsdd(
       : { forwarding: null }),
     grouping
   };
+}
+
+/**
+ * Do not expose BSD suite id (ex : BSD-20220603-PDTKKH7W2-suite) to end user
+ */
+export function tov1ReadableId(readableId: string) {
+  return readableId.replace("-suite", "");
 }
