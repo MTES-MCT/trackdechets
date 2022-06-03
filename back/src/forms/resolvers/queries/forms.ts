@@ -66,7 +66,8 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
           ? [getFormsRightFilter(rest.siretPresentOnForm, [])]
           : [])
       ],
-      isDeleted: false
+      isDeleted: false,
+      forwarding: null
     }
   });
 
