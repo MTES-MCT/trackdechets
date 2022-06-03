@@ -18,6 +18,13 @@ const buildDeleteForm: (deps: RepositoryFnDeps) => DeleteFormFn =
       data: { isDeleted: true }
     });
 
+    if (deletedForm.forwardedInId) {
+      await prisma.form.update({
+        where,
+        data: { forwardedIn: { update: { isDeleted: true } } }
+      });
+    }
+
     await prisma.event.create({
       data: {
         streamId: deletedForm.id,

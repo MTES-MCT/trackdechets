@@ -3,11 +3,13 @@ import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
 import {
   formFactory,
+  formWithTempStorageFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
+import { Status } from "@prisma/client";
 
 const DELETE_FORM = `
 mutation DeleteForm($id: ID!) {
@@ -199,5 +201,22 @@ describe("Mutation.deleteForm", () => {
     expect(disconnectedAppendix2.groupedIn).toEqual([]);
     expect(disconnectedAppendix2.status).toEqual("AWAITING_GROUP");
     expect(disconnectedAppendix2.quantityGrouped).toEqual(0);
+  });
+
+  it("should delete bsd suite", async () => {
+    const { user: emitterUser, company: emitter } =
+      await userWithCompanyFactory("MEMBER");
+    const { forwardedIn, ...form } = await formWithTempStorageFactory({
+      ownerId: emitterUser.id,
+      opt: { status: Status.DRAFT, emitterCompanySiret: emitter.siret }
+    });
+    const { mutate } = makeClient(emitterUser);
+    await mutate<Pick<Mutation, "deleteForm">>(DELETE_FORM, {
+      variables: { id: form.id }
+    });
+    const updatedForwardedInForm = await prisma.form.findUnique({
+      where: { id: forwardedIn.id }
+    });
+    expect(updatedForwardedInForm.isDeleted).toEqual(true);
   });
 });
