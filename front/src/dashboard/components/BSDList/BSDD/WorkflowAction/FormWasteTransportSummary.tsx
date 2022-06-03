@@ -43,6 +43,8 @@ export function FormWasteTransportSummary({
         .filter((name, index, fields) => fields.indexOf(name) === index)
     );
 
+  const { temporaryStorageDetail } = form;
+
   return (
     <>
       <DataList>
@@ -58,26 +60,50 @@ export function FormWasteTransportSummary({
         </DataListItem>
         <DataListItem>
           <DataListTerm>Poids en tonnes</DataListTerm>
-          <DataListDescription>
-            {form.wasteDetails?.quantity}{" "}
-            {form.wasteDetails?.quantityType === QuantityType.Estimated
-              ? "(estimé)"
-              : ""}
-          </DataListDescription>
+          {temporaryStorageDetail?.wasteDetails?.quantity ? (
+            <DataListDescription>
+              {temporaryStorageDetail?.wasteDetails?.quantity}{" "}
+              {temporaryStorageDetail?.wasteDetails?.quantityType ===
+              QuantityType.Estimated
+                ? "(estimé)"
+                : ""}
+            </DataListDescription>
+          ) : (
+            <DataListDescription>
+              {form.wasteDetails?.quantity}{" "}
+              {form.wasteDetails?.quantityType === QuantityType.Estimated
+                ? "(estimé)"
+                : ""}
+            </DataListDescription>
+          )}
         </DataListItem>
         <DataListItem>
           <DataListTerm>Contenant(s)</DataListTerm>
-          <DataListDescription>
-            {form.wasteDetails?.packagingInfos
-              ?.map(packaging => `${packaging.quantity} ${packaging.type}`)
-              .join(", ")}
-          </DataListDescription>
+          {temporaryStorageDetail ? (
+            <DataListDescription>
+              {temporaryStorageDetail.wasteDetails?.packagingInfos
+                ?.map(packaging => `${packaging.quantity} ${packaging.type}`)
+                .join(", ")}
+            </DataListDescription>
+          ) : (
+            <DataListDescription>
+              {form.wasteDetails?.packagingInfos
+                ?.map(packaging => `${packaging.quantity} ${packaging.type}`)
+                .join(", ")}
+            </DataListDescription>
+          )}
         </DataListItem>
         <DataListItem>
           <DataListTerm>Code ADR (ONU)</DataListTerm>
-          <DataListDescription>
-            {form.wasteDetails?.onuCode ?? "Non soumis"}
-          </DataListDescription>
+          {temporaryStorageDetail ? (
+            <DataListDescription>
+              {temporaryStorageDetail.wasteDetails?.onuCode ?? "Non soumis"}
+            </DataListDescription>
+          ) : (
+            <DataListDescription>
+              {form.wasteDetails?.onuCode ?? "Non soumis"}
+            </DataListDescription>
+          )}
         </DataListItem>
         <DataListItem>
           <DataListTerm>Plaque d'immatriculation</DataListTerm>
