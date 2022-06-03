@@ -473,9 +473,12 @@ describe("mutation / importPaperForm", () => {
       expect(statusLogs[0].status).toEqual("PROCESSED");
       expect(statusLogs[0].updatedFields).toEqual({
         isImportedFromPaper: true,
+        emittedAt: importedData.signingInfo.sentAt,
+        emittedBy: importedData.signingInfo.sentBy,
         signedByTransporter: true,
         sentAt: importedData.signingInfo.sentAt,
         sentBy: importedData.signingInfo.sentBy,
+        takenOverAt: importedData.signingInfo.sentAt,
         wasteAcceptationStatus:
           importedData.receivedInfo.wasteAcceptationStatus,
         receivedBy: importedData.receivedInfo.receivedBy,
