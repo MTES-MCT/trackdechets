@@ -6,6 +6,12 @@ import { FindRelatedEntityFn } from "./bsda/findRelatedEntity";
 import { FindUniqueBsdaFn } from "./bsda/findUnique";
 import { UpdateBsdaFn } from "./bsda/update";
 import { UpdateManyBsdaFn } from "./bsda/updateMany";
+import { AcceptRevisionRequestApprovalFn } from "./revisionRequest/accept";
+import { CancelRevisionRequestFn } from "./revisionRequest/cancel";
+import { CountRevisionRequestFn } from "./revisionRequest/count";
+import { CreateRevisionRequestFn } from "./revisionRequest/create";
+import { FindUniqueRevisionRequestFn } from "./revisionRequest/findUnique";
+import { RefuseRevisionRequestApprovalFn } from "./revisionRequest/refuse";
 
 export type BsdaActions = {
   findUnique: FindUniqueBsdaFn;
@@ -16,4 +22,11 @@ export type BsdaActions = {
   updateMany: UpdateManyBsdaFn;
   delete: DeleteBsdaFn;
   count: CountBsdasFn;
+
+  countRevisionRequests: CountRevisionRequestFn;
+  findUniqueRevisionRequest: FindUniqueRevisionRequestFn;
+  createRevisionRequest: CreateRevisionRequestFn;
+  cancelRevisionRequest: CancelRevisionRequestFn;
+  acceptRevisionRequestApproval: AcceptRevisionRequestApprovalFn
+  refuseRevisionRequestApproval: RefuseRevisionRequestApprovalFn;
 };

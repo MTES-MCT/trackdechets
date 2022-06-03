@@ -9,6 +9,12 @@ import { buildUpdateBsda } from "./bsda/update";
 import { buildUpdateManyBsdas } from "./bsda/updateMany";
 import { buildFindManyBsda } from "./bsda/findMany";
 import { buildFindRelatedBsdaEntity } from "./bsda/findRelatedEntity";
+import { buildCreateRevisionRequest } from "./revisionRequest/create";
+import { buildCountRevisionRequests } from "./revisionRequest/count";
+import { buildFindUniqueRevisionRequest } from "./revisionRequest/findUnique";
+import { buildCancelRevisionRequest } from "./revisionRequest/cancel";
+import { buildAcceptRevisionRequestApproval } from "./revisionRequest/accept";
+import { buildRefuseRevisionRequestApproval } from "./revisionRequest/refuse";
 
 export type BsdaRepository = BsdaActions;
 
@@ -38,7 +44,9 @@ export function getReadonlyBsdaRepository() {
   return {
     findUnique: buildFindUniqueBsda({ prisma }),
     findMany: buildFindManyBsda({ prisma }),
-    findRelatedEntity: buildFindRelatedBsdaEntity({ prisma })
+    findRelatedEntity: buildFindRelatedBsdaEntity({ prisma }),
+    countRevisionRequests: buildCountRevisionRequests({ prisma }),
+    findUniqueRevisionRequest: buildFindUniqueRevisionRequest({ prisma })
   };
 }
 
@@ -55,6 +63,14 @@ export function getBsdaRepository(
     create: useTransaction(buildCreateBsda),
     delete: useTransaction(buildDeleteBsda),
     update: useTransaction(buildUpdateBsda),
-    updateMany: useTransaction(buildUpdateManyBsdas)
+    updateMany: useTransaction(buildUpdateManyBsdas),
+    createRevisionRequest: useTransaction(buildCreateRevisionRequest),
+    cancelRevisionRequest: useTransaction(buildCancelRevisionRequest),
+    acceptRevisionRequestApproval: useTransaction(
+      buildAcceptRevisionRequestApproval
+    ),
+    refuseRevisionRequestApproval: useTransaction(
+      buildRefuseRevisionRequestApproval
+    )
   };
 }

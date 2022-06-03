@@ -29,7 +29,7 @@ import { BsdaConsistence } from "../generated/graphql/types";
 import prisma from "../prisma";
 
 export const PARTIAL_OPERATIONS = ["R 13", "D 15"];
-const OPERATIONS = ["R 5", "D 5", "D 9", ...PARTIAL_OPERATIONS];
+export const OPERATIONS = ["R 5", "D 5", "D 9", ...PARTIAL_OPERATIONS];
 type Emitter = Pick<
   Bsda,
   | "emitterIsPrivateIndividual"

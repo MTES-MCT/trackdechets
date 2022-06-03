@@ -197,6 +197,7 @@ model Company {
   MembershipRequest                    MembershipRequest[]
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
   bsddRevisionRequests                 BsddRevisionRequest[]
+  BsdaRevisionRequest                  BsdaRevisionRequest[]
 }
 
 // Companies with restricted diffusion of SIRENE or VAT information (police, army, etc)
@@ -1307,12 +1308,77 @@ model Bsda {
   childBsda   Bsda?   @relation("BsdasToBsda", fields: [childBsdaId], references: [id])
   childBsdaId String?
 
+  BsdaRevisionRequest BsdaRevisionRequest[]
   @@index([emitterCompanySiret], map: "_BsdaEmitterCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_BsdaBrokerCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsdaDestinationCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsdaTransporterCompanySiretIdx")
   @@index([workerCompanySiret], map: "_BsdaWorkerCompanySiretIdx")
   @@index([status], map: "_BsdaStatusIdx")
+}
+
+model BsdaRevisionRequest {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  bsdaId             String
+  bsda               Bsda    @relation(fields: [bsdaId], references: [id])
+  authoringCompanyId String
+  authoringCompany   Company @relation(fields: [authoringCompanyId], references: [id])
+
+  approvals BsdaRevisionRequestApproval[]
+
+  wasteCode         String?
+  wastePop          Boolean?
+  packagings        Json?
+  wasteSealNumbers  String[]
+  wasteMaterialName String?
+
+  destinationCap                  String?
+  destinationReceptionWeight      Float?
+  destinationOperationCode        String?
+  destinationOperationDescription String?
+
+  brokerCompanyName            String?
+  brokerCompanySiret           String?
+  brokerCompanyAddress         String?
+  brokerCompanyContact         String?
+  brokerCompanyPhone           String?
+  brokerCompanyMail            String?
+  brokerRecepisseNumber        String?
+  brokerRecepisseDepartment    String?
+  brokerRecepisseValidityLimit DateTime? @db.Timestamptz(6)
+
+
+  emitterPickupSiteName       String?
+  emitterPickupSiteAddress    String?
+  emitterPickupSiteCity       String?
+  emitterPickupSitePostalCode String?
+  emitterPickupSiteInfos      String?
+
+  comment String
+
+  status RevisionRequestStatus @default(PENDING)
+
+  @@index([authoringCompanyId], map: "_BsdaRevisionRequestAuthoringCompanyIdIdx")
+  @@index([bsdaId], map: "_BsdaRevisionRequestBsdaIdIdx")
+}
+
+model BsdaRevisionRequestApproval {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  revisionRequestId String
+  revisionRequest   BsdaRevisionRequest @relation(fields: [revisionRequestId], references: [id])
+  approverSiret     String
+
+  status  RevisionRequestApprovalStatus @default(PENDING)
+  comment String?
+
+  @@index([revisionRequestId], map: "_BsdaRevisionRequestApprovalRevisionRequestIdIdx")
+  @@index([approverSiret], map: "_BsdaRevisionRequestApprovalApproverSiretIdx")
 }
 
 model Event {
