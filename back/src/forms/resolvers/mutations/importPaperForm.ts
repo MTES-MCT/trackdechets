@@ -77,7 +77,10 @@ async function updateForm(
   const formUpdateInput: Prisma.FormUpdateInput = {
     ...flattenedFormInput,
     isImportedFromPaper: true,
-    signedByTransporter: true
+    signedByTransporter: true,
+    emittedAt: flattenedFormInput.sentAt,
+    emittedBy: flattenedFormInput.sentBy,
+    takenOverAt: flattenedFormInput.sentAt
   };
 
   return transitionForm(user, form, {
