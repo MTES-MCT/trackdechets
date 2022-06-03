@@ -78,6 +78,7 @@ export const SEARCH_COMPANIES = gql`
       siret
       name
       address
+      etatAdministratif
       codePaysEtrangerEtablissement
       installation {
         codeS3ic

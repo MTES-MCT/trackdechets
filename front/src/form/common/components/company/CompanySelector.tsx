@@ -195,8 +195,11 @@ export default function CompanySelector({
             vhuAgrementDemolisseur,
             vhuAgrementBroyeur,
             codePaysEtrangerEtablissement,
-          }) =>
-            ({
+            etatAdministratif,
+          }) => {
+            // exclude closed companies in SIRENE data
+            if (etatAdministratif !== "A") return {};
+            return {
               // convert CompanySearchResult to CompanyFavorite
               siret,
               vatNumber,
@@ -214,8 +217,10 @@ export default function CompanySelector({
               contact: "",
               phone: "",
               mail: "",
-            } as CompanyFavorite)
+            } as CompanyFavorite;
+          }
         )
+        .filter(company => Object.keys(company).length > 0)
         // Concat user favorites companies, except the siret already in Search results
         .concat(
           favoritesData?.favorites?.filter(
