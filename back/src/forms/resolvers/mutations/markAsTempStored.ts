@@ -29,11 +29,12 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
 
   await receivedInfoSchema.validate(tempStoredInfos);
 
-  // TODO handle quantityType in case of temporary storage
   const { quantityType, ...tmpStoredInfos } = tempStoredInfos;
 
   const formUpdateInput: Prisma.FormUpdateInput = {
     ...tmpStoredInfos,
+    // quantity type can be estimated in case of temporary storage
+    quantityReceivedType: quantityType,
     currentTransporterSiret: ""
   };
 

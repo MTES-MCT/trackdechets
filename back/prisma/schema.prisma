@@ -306,6 +306,7 @@ model Form {
   isAccepted                         Boolean?                @default(false)
   receivedAt                         DateTime?               @db.Timestamptz(6)
   quantityReceived                   Float?
+  quantityReceivedType               QuantityType?
   processingOperationDone            String?
   wasteDetailsName                   String?
   isDeleted                          Boolean?                @default(false)
@@ -360,11 +361,16 @@ model Form {
   ecoOrganismeName                   String?
   ecoOrganismeSiret                  String?
   signedBy                           String?
-  transportSegments                  TransportSegment[]
-  groupedIn                          FormGroupement[]        @relation("GroupedIn")
-  grouping                           FormGroupement[]        @relation("Grouping")
+
+  // TODO delete after release 2022.06.2
+  temporaryStorageDetailId String?                 @unique
+  temporaryStorageDetail   TemporaryStorageDetail? @relation(fields: [temporaryStorageDetailId], references: [id])
+
+  transportSegments TransportSegment[]
+  groupedIn         FormGroupement[]   @relation("GroupedIn")
+  grouping          FormGroupement[]   @relation("Grouping")
   // quantité affectée à des bordereaux de regroupement
-  quantityGrouped                    Float                   @default(0)
+  quantityGrouped   Float              @default(0)
 
   // TODO delete after release 2022.06.1
   appendix2RootFormId String?
@@ -572,6 +578,57 @@ model StatusLog {
 
   @@index([userId], map: "_StatusLogUserIdIdx")
   @@index([formId], map: "_StatusLogFormIdIdx")
+}
+
+// TODO delete after release 2022.06.2
+model TemporaryStorageDetail {
+  id                               String                  @id @default(cuid())
+  tempStorerQuantityType           QuantityType?
+  tempStorerQuantityReceived       Float?
+  tempStorerWasteAcceptationStatus WasteAcceptationStatus?
+  tempStorerWasteRefusalReason     String?
+  tempStorerReceivedAt             DateTime?               @db.Timestamptz(6)
+  tempStorerReceivedBy             String?
+  tempStorerSignedAt               DateTime?               @db.Timestamptz(6)
+  tempStorerSignedBy               String?
+  destinationIsFilledByEmitter     Boolean?                @default(true)
+  destinationCompanyName           String?
+  destinationCompanySiret          String?
+  destinationCompanyAddress        String?
+  destinationCompanyContact        String?
+  destinationCompanyPhone          String?
+  destinationCompanyMail           String?
+  destinationCap                   String?
+  destinationProcessingOperation   String?
+  wasteDetailsOnuCode              String?
+  wasteDetailsPackagingInfos       Json                    @default("[]")
+  wasteDetailsQuantity             Float?
+  wasteDetailsQuantityType         QuantityType?
+  transporterCompanyName           String?
+  transporterCompanySiret          String?
+  transporterCompanyVatNumber      String?
+  transporterCompanyAddress        String?
+  transporterCompanyContact        String?
+  transporterCompanyPhone          String?
+  transporterCompanyMail           String?
+  transporterIsExemptedOfReceipt   Boolean?
+  transporterReceipt               String?
+  transporterDepartment            String?
+  transporterValidityLimit         DateTime?               @db.Timestamptz(6)
+  transporterNumberPlate           String?
+  transporterCustomInfo            String?
+  transporterTransportMode         TransportMode?          @default(ROAD)
+  emittedBy                        String?
+  emittedAt                        DateTime?               @db.Timestamptz(6)
+  takenOverBy                      String?
+  takenOverAt                      DateTime?               @db.Timestamptz(6)
+  signedByTransporter              Boolean?
+  signedBy                         String?
+  signedAt                         DateTime?               @db.Timestamptz(6)
+  Form                             Form[]
+
+  @@index([destinationCompanySiret], map: "_TemporaryStorageDetailDestinationCompanyIdx")
+  @@index([transporterCompanySiret], map: "_TemporaryStorageDetailTransporterCompanySiretIdx")
 }
 
 model TraderReceipt {
