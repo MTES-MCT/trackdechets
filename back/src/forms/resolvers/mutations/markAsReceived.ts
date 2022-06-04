@@ -9,7 +9,12 @@ import { expandFormFromDb } from "../../form-converter";
 import { TemporaryStorageCannotReceive } from "../../errors";
 import prisma from "../../../prisma";
 import { getFormRepository } from "../../repository";
-import { Prisma, Status, WasteAcceptationStatus } from "@prisma/client";
+import {
+  Prisma,
+  QuantityType,
+  Status,
+  WasteAcceptationStatus
+} from "@prisma/client";
 
 const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   parent,
@@ -50,6 +55,7 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
       }
     : {
         ...receivedInfo,
+        quantityReceivedType: QuantityType.REAL,
         currentTransporterSiret: ""
       };
 
