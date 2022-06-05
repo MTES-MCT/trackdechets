@@ -1,4 +1,5 @@
 import { Status, Form } from "@prisma/client";
+import { indexForm } from "../../forms/elastic";
 import prisma from "../../prisma";
 
 function getForwardedInStatus(form: Form) {
@@ -23,14 +24,20 @@ function getForwardedInStatus(form: Form) {
 export default async function createForwardedInForms() {
   // list forms with temporary storage detail
   const forms = await prisma.form.findMany({
-    where: { temporaryStorageDetailId: { not: null } },
+    where: { temporaryStorageDetailId: { not: null }, forwardedInId: null },
     include: { temporaryStorageDetail: true }
   });
   console.log(`There are ${forms.length} forms to migrate`);
+
   for (const form of forms) {
     const { temporaryStorageDetail } = form;
-    await prisma.form.update({
+    const fullForm = await prisma.form.update({
       where: { id: form.id },
+      include: {
+        forwardedIn: true,
+        transportSegments: true,
+        intermediaries: true
+      },
       data: {
         quantityReceived: temporaryStorageDetail.tempStorerQuantityReceived,
         quantityReceivedType: temporaryStorageDetail.tempStorerQuantityType,
@@ -173,5 +180,6 @@ export default async function createForwardedInForms() {
         }
       }
     });
+    await indexForm(fullForm);
   }
 }
