@@ -1,4 +1,5 @@
 import { Breadcrumb, BreadcrumbItem } from "common/components";
+import { BsdaRevisionRequestList } from "dashboard/components/RevisionRequestList/bsda";
 import { BsddRevisionRequestList } from "dashboard/components/RevisionRequestList/bsdd";
 import React from "react";
 
@@ -11,6 +12,7 @@ export function RouteBsdsReview() {
       </Breadcrumb>
 
       <BsddRevisionRequestList />
+      <BsdaRevisionRequestList />
     </>
   );
 }
