@@ -27,9 +27,19 @@ import {
   BsdaWeight,
   BsdaEcoOrganisme,
   BsdaNextDestination,
-  BsdaRevisionRequestContentInput
+  BsdaRevisionRequestContentInput,
+  BsdaRevisionRequestContent,
+  BsdaRevisionRequestEmitter,
+  BsdaRevisionRequestWaste,
+  BsdaRevisionRequestDestination,
+  BsdaRevisionRequestOperation,
+  BsdaRevisionRequestReception
 } from "../generated/graphql/types";
-import { Prisma, Bsda as PrismaBsda } from "@prisma/client";
+import {
+  Prisma,
+  Bsda as PrismaBsda,
+  BsdaRevisionRequest
+} from "@prisma/client";
 
 export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
   return {
@@ -541,5 +551,53 @@ export function flattenBsdaRevisionRequestInput(
         chain(d.reception, r => (r.weight ? r.weight * 1000 : r.weight))
       )
     )
+  };
+}
+
+export function expandBsdaRevisionRequestContent(
+  bsdaRevisionRequest: BsdaRevisionRequest
+): BsdaRevisionRequestContent {
+  return {
+    emitter: nullIfNoValues<BsdaRevisionRequestEmitter>({
+      pickupSite: nullIfNoValues<BsdaPickupSite>({
+        address: bsdaRevisionRequest.emitterPickupSiteAddress,
+        city: bsdaRevisionRequest.emitterPickupSiteCity,
+        infos: bsdaRevisionRequest.emitterPickupSiteInfos,
+        name: bsdaRevisionRequest.emitterPickupSiteName,
+        postalCode: bsdaRevisionRequest.emitterPickupSitePostalCode
+      })
+    }),
+    packagings: bsdaRevisionRequest.packagings as BsdaPackaging[],
+    waste: nullIfNoValues<BsdaRevisionRequestWaste>({
+      code: bsdaRevisionRequest.wasteCode,
+      materialName: bsdaRevisionRequest.wasteMaterialName,
+      pop: bsdaRevisionRequest.wastePop,
+      sealNumbers: bsdaRevisionRequest.wasteSealNumbers
+    }),
+    broker: nullIfNoValues<BsdaBroker>({
+      company: nullIfNoValues<FormCompany>({
+        name: bsdaRevisionRequest.brokerCompanyName,
+        siret: bsdaRevisionRequest.brokerCompanySiret,
+        address: bsdaRevisionRequest.brokerCompanyAddress,
+        contact: bsdaRevisionRequest.brokerCompanyContact,
+        phone: bsdaRevisionRequest.brokerCompanyPhone,
+        mail: bsdaRevisionRequest.brokerCompanyMail
+      }),
+      recepisse: nullIfNoValues<BsdaRecepisse>({
+        department: bsdaRevisionRequest.brokerRecepisseDepartment,
+        number: bsdaRevisionRequest.brokerRecepisseNumber,
+        validityLimit: bsdaRevisionRequest.brokerRecepisseValidityLimit
+      })
+    }),
+    destination: nullIfNoValues<BsdaRevisionRequestDestination>({
+      cap: bsdaRevisionRequest.destinationCap,
+      operation: nullIfNoValues<BsdaRevisionRequestOperation>({
+        code: bsdaRevisionRequest.destinationOperationCode,
+        description: bsdaRevisionRequest.destinationOperationDescription
+      }),
+      reception: nullIfNoValues<BsdaRevisionRequestReception>({
+        weight: bsdaRevisionRequest.destinationReceptionWeight
+      })
+    })
   };
 }

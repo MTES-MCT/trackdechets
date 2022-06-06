@@ -52,7 +52,7 @@ export type RevisionRequestContent = Pick<
   | "emitterPickupSiteInfos"
 >;
 
-export default async function createBsdaRevisionRequest(
+export async function createBsdaRevisionRequest(
   _,
   { input }: MutationCreateBsdaRevisionRequestArgs,
   context: GraphQLContext

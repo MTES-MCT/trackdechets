@@ -376,3 +376,7 @@ input BsdaRevisionRequestWasteInput {
   "Contient des Polluants Organiques Persistants (POP) oui / non"
   pop: Boolean
 }
+
+input BsdaRevisionRequestWhere {
+  status: RevisionRequestStatus
+}

@@ -25,6 +25,19 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
       }
     });
 
+    // Status updates are done only through signature
+    if (data.status) {
+      await prisma.event.create({
+        data: {
+          streamId: bsda.id,
+          actor: user.id,
+          type: "BsdaSigned",
+          data: { status: data.status },
+          metadata: { ...logMetadata, authType: user.auth }
+        }
+      });
+    }
+
     await indexBsda(bsda, { user } as GraphQLContext);
 
     return bsda;

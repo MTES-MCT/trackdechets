@@ -6,7 +6,7 @@ import {
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../../common/permissions";
-import { MutationSubmitFormRevisionRequestApprovalArgs } from "../../../../generated/graphql/types";
+import { MutationSubmitBsdaRevisionRequestApprovalArgs } from "../../../../generated/graphql/types";
 import { GraphQLContext } from "../../../../types";
 import { getUserCompanies } from "../../../../users/database";
 import { getBsdaRepository } from "../../../repository";
@@ -19,9 +19,9 @@ type BsdaRevisionRequestWithApprovals = Prisma.BsdaRevisionRequestGetPayload<
   typeof bsdaRevisionRequestWithApprovals
 >;
 
-export default async function submitFormRevisionRequestApproval(
+export async function submitBsdaRevisionRequestApproval(
   _,
-  { id, isApproved, comment }: MutationSubmitFormRevisionRequestApprovalArgs,
+  { id, isApproved, comment }: MutationSubmitBsdaRevisionRequestApprovalArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);

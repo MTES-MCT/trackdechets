@@ -60,8 +60,8 @@ export function buildAcceptRevisionRequestApproval(
       data: { status: RevisionRequestStatus.ACCEPTED }
     });
 
-    const updateData = getUpdateFromFormRevisionRequest(revisionRequest);
-    await prisma.form.update({
+    const updateData = getUpdateFromRevisionRequest(revisionRequest);
+    await prisma.bsda.update({
       where: { id: revisionRequest.bsdaId },
       data: updateData
     });
@@ -88,11 +88,17 @@ export function buildAcceptRevisionRequestApproval(
   };
 }
 
-function getUpdateFromFormRevisionRequest(
-  revisionRequest: BsdaRevisionRequest
-) {
-  const { bsdaId, comment, createdAt, id, status, ...bsdaUpdate } =
-    revisionRequest;
+function getUpdateFromRevisionRequest(revisionRequest: BsdaRevisionRequest) {
+  const {
+    bsdaId,
+    comment,
+    updatedAt,
+    authoringCompanyId,
+    createdAt,
+    id,
+    status,
+    ...bsdaUpdate
+  } = revisionRequest;
 
   function removeEmpty(obj) {
     const cleanedObject = Object.fromEntries(

@@ -6,7 +6,7 @@ import { GraphQLContext } from "../../../../types";
 import { getUserCompanies } from "../../../../users/database";
 import { getBsdaRepository } from "../../../repository";
 
-export default async function cancelBsdaRevisionRequest(
+export async function cancelBsdaRevisionRequest(
   _,
   { id }: MutationCancelBsdaRevisionRequestArgs,
   context: GraphQLContext

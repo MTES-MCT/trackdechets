@@ -15,7 +15,10 @@ type BsdaContributors = Pick<
   | "destinationOperationNextDestinationCompanySiret"
 >;
 
-export const BSDA_REVISION_REQUESTER_FIELDS: Record<string, keyof BsdaContributors> = {
+export const BSDA_REVISION_REQUESTER_FIELDS: Record<
+  string,
+  keyof BsdaContributors
+> = {
   emitter: "emitterCompanySiret",
   destination: "destinationCompanySiret",
   worker: "workerCompanySiret",
@@ -99,5 +102,7 @@ export async function checkCanRequestRevision(user: User, bsda: Bsda) {
     field => bsda[field]
   );
 
-  return userSirets.some(siret => formSirets.includes(siret));
+  if (!userSirets.some(siret => formSirets.includes(siret))) {
+    throw new UserInputError(`Vous n'êtes pas autorisé à réviser ce bordereau`);
+  }
 }

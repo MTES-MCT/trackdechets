@@ -10,6 +10,7 @@ import { AcceptRevisionRequestApprovalFn } from "./revisionRequest/accept";
 import { CancelRevisionRequestFn } from "./revisionRequest/cancel";
 import { CountRevisionRequestFn } from "./revisionRequest/count";
 import { CreateRevisionRequestFn } from "./revisionRequest/create";
+import { FindManyBsdaRevisionRequestFn } from "./revisionRequest/findMany";
 import { FindUniqueRevisionRequestFn } from "./revisionRequest/findUnique";
 import { RefuseRevisionRequestApprovalFn } from "./revisionRequest/refuse";
 
@@ -25,6 +26,7 @@ export type BsdaActions = {
 
   countRevisionRequests: CountRevisionRequestFn;
   findUniqueRevisionRequest: FindUniqueRevisionRequestFn;
+  findManyBsdaRevisionRequest: FindManyBsdaRevisionRequestFn;
   createRevisionRequest: CreateRevisionRequestFn;
   cancelRevisionRequest: CancelRevisionRequestFn;
   acceptRevisionRequestApproval: AcceptRevisionRequestApprovalFn
