@@ -11,10 +11,16 @@ export type DeleteBsdaFn = (
 export function buildDeleteBsda(deps: RepositoryFnDeps): DeleteBsdaFn {
   return async (where, logMetadata) => {
     const { user, prisma } = deps;
-
     const deletedBsda = await prisma.bsda.update({
       where,
-      data: { isDeleted: true }
+      data: { isDeleted: true, forwardingId: null }
+    });
+
+    await prisma.bsda.updateMany({
+      where: { groupedInId: deletedBsda.id },
+      data: {
+        groupedInId: null
+      }
     });
 
     await prisma.event.create({
