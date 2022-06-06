@@ -265,7 +265,7 @@ export async function indexForm(form: FullForm, ctx?: GraphQLContext) {
     return null;
   }
   if (form.forwardedIn) {
-    // index next BSD and forget
+    // index next BSD asynchronously
     indexBsd(
       toBsdElastic({
         ...form.forwardedIn,
