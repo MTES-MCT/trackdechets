@@ -3,7 +3,9 @@ import { ReadRepositoryFnDeps } from "../../../forms/repository/types";
 
 export type CountBsdasFn = (where: Prisma.BsdaWhereInput) => Promise<number>;
 
-export function buildCountBsdas({ prisma }: ReadRepositoryFnDeps): CountBsdasFn {
+export function buildCountBsdas({
+  prisma
+}: ReadRepositoryFnDeps): CountBsdasFn {
   return where => {
     return prisma.bsda.count({ where });
   };

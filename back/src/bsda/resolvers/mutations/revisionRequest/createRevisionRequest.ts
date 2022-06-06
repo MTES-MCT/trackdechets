@@ -75,7 +75,7 @@ export async function createBsdaRevisionRequest(
     authoringCompany.siret
   );
 
-  const flatContent = await getFlatContent(content, bsda);
+  const flatContent = await getFlatContent(content);
 
   return bsdaRepository.createRevisionRequest({
     bsda: { connect: { id: bsda.id } },
@@ -156,8 +156,7 @@ async function getAuthoringCompany(
 }
 
 async function getFlatContent(
-  content: BsdaRevisionRequestContentInput,
-  bsda: Bsda
+  content: BsdaRevisionRequestContentInput
 ): Promise<RevisionRequestContent> {
   const flatContent = flattenBsdaRevisionRequestInput(content);
 

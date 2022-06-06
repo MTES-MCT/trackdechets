@@ -19,7 +19,7 @@ import { buildFindManyBsdaRevisionRequest } from "./revisionRequest/findMany";
 
 export type BsdaRepository = BsdaActions;
 
-function transactionWrapper<Builder extends Function>(
+function transactionWrapper<Builder extends (args) => any>(
   user: Express.User,
   transaction: PrismaTransaction | undefined,
   builder: Builder
@@ -49,7 +49,7 @@ export function getReadonlyBsdaRepository() {
     findRelatedEntity: buildFindRelatedBsdaEntity({ prisma }),
     countRevisionRequests: buildCountRevisionRequests({ prisma }),
     findUniqueRevisionRequest: buildFindUniqueRevisionRequest({ prisma }),
-    findManyBsdaRevisionRequest: buildFindManyBsdaRevisionRequest({ prisma }),
+    findManyBsdaRevisionRequest: buildFindManyBsdaRevisionRequest({ prisma })
   };
 }
 

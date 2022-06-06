@@ -29,6 +29,6 @@ export type BsdaActions = {
   findManyBsdaRevisionRequest: FindManyBsdaRevisionRequestFn;
   createRevisionRequest: CreateRevisionRequestFn;
   cancelRevisionRequest: CancelRevisionRequestFn;
-  acceptRevisionRequestApproval: AcceptRevisionRequestApprovalFn
+  acceptRevisionRequestApproval: AcceptRevisionRequestApprovalFn;
   refuseRevisionRequestApproval: RefuseRevisionRequestApprovalFn;
 };
